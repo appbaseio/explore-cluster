@@ -2,7 +2,9 @@ import React from 'react';
 import { Card, Icon } from 'antd';
 import PropTypes from 'prop-types';
 
-const AppCard = ({ title, data, appName }) => (
+import StatsBox from './StatsBox';
+
+const AppCard = ({ title, data }) => (
 	<Card
 		title={title}
 		style={{
@@ -11,6 +13,7 @@ const AppCard = ({ title, data, appName }) => (
 		}}
 		bodyStyle={{ paddingBottom: '40px' }}
 	>
+		<StatsBox data={data} />
 		<div
 			css={{
 				color: '#aaa',
@@ -27,10 +30,7 @@ const AppCard = ({ title, data, appName }) => (
 
 AppCard.propTypes = {
 	title: PropTypes.node.isRequired,
-	appName: PropTypes.string.isRequired,
 	data: PropTypes.object, // eslint-disable-line
-	shared: PropTypes.bool, // eslint-disable-line
-	permissions: PropTypes.object, // eslint-disable-line
 };
 
 export default AppCard;

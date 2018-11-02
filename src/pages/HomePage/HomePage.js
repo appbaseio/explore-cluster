@@ -118,9 +118,7 @@ class HomePage extends Component {
 								<AppCard
 									key={name}
 									title={title}
-									appName={name}
-									data={apps[name]}
-									// permissions={permissions ? permissions[name] : null}
+									data={apps.data[name]}
 								/>
 							</Link>
 						</Col>

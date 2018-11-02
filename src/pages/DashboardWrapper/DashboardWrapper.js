@@ -154,6 +154,7 @@ class DashboardWrapper extends Component {
 						paddingTop: 60,
 						minHeight: '100vh',
 						marginLeft: collapsed ? '80px' : '260px',
+						overflowY: 'scroll',
 					}}
 				>
 					<AppHeader big={collapsed} minimal showApp={false} />
