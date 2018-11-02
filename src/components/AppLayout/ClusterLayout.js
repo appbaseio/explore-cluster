@@ -174,23 +174,14 @@ class ClusterLayout extends React.PureComponent {
 							exact
 							path="/cluster/import"
 							render={props => (
-								<AppPageContainer
-									{...props}
-									component={ImporterPage}
-									shouldFetchAppInfo={false}
-									shouldFetchAppPlan={false}
-								/>
+								<AppPageContainer {...props} component={ImporterPage} />
 							)}
 						/>
 						<Route
 							exact
 							path="/cluster/mappings"
 							render={props => (
-								<AppPageContainer
-									{...props}
-									component={MappingsPage}
-									shouldFetchAppInfo={false}
-								/>
+								<AppPageContainer {...props} component={MappingsPage} />
 							)}
 						/>
 						<Route
@@ -211,24 +202,14 @@ class ClusterLayout extends React.PureComponent {
 							exact
 							path="/cluster/browse"
 							render={props => (
-								<AppPageContainer
-									{...props}
-									component={BrowserPage}
-									shouldFetchAppInfo={false}
-									shouldFetchAppPlan={false}
-								/>
+								<AppPageContainer {...props} component={BrowserPage} isCluster />
 							)}
 						/>
 						<Route
 							exact
 							path="/cluster/search-preview"
 							render={props => (
-								<AppPageContainer
-									{...props}
-									component={SandboxPage}
-									shouldFetchAppInfo={false}
-									shouldFetchAppPlan={false}
-								/>
+								<AppPageContainer {...props} component={SandboxPage} />
 							)}
 						/>
 					</Switch>

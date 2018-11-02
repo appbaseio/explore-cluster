@@ -28,6 +28,7 @@ AppPageContainer.defaultProps = {
 
 AppPageContainer.propTypes = {
 	isLoading: PropTypes.bool,
+	appName: PropTypes.string.isRequired,
 	component: PropTypes.func.isRequired,
 	updateCurrentApp: PropTypes.func.isRequired,
 };

@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import {
  Row, Col, Button, Icon,
 } from 'antd';
-import { string, func } from 'prop-types';
+import { string, func, bool } from 'prop-types';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import URL from 'url-parser-lite';
@@ -43,15 +43,12 @@ class BrowserPage extends Component {
 	}
 
 	render() {
-		const { appName, credentials } = this.props;
+		const { appName, credentials, isCluster } = this.props;
 		const { protocol, host } = URL(SCALR_API);
-
-		const dejavu = {
-			url: `${protocol}://${credentials}@${host}`,
-			appname: appName,
-		};
-		const url = JSON.stringify(dejavu);
-		const iframeURL = `https://opensource.appbase.io/dejavu/live/#?app=${url}&hf=false&subscribe=false`;
+		const url = `${protocol}://${credentials}@${host}`;
+		const iframeURL = `https://dejavu.appbase.io/?${
+			isCluster ? '' : `appname=${appName}&`
+		}url=${url}&mode=view&sidebar=false`;
 
 		return (
 			<Fragment>
@@ -137,10 +134,15 @@ class BrowserPage extends Component {
 	}
 }
 
+BrowserPage.defaultProps = {
+	isCluster: false,
+};
+
 BrowserPage.propTypes = {
 	appName: string.isRequired,
 	credentials: string.isRequired,
 	updateCurrentApp: func.isRequired,
+	isCluster: bool,
 };
 
 const mapStateToProps = (state) => {

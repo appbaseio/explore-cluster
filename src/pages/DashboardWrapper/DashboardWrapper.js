@@ -32,6 +32,10 @@ const routes = {
 		icon: 'home',
 		link: '/',
 	},
+	'Browse Data': {
+		icon: 'hdd',
+		link: '/cluster/browse',
+	},
 	Analytics: {
 		icon: 'line-chart',
 		menu: [
