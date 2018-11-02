@@ -3,7 +3,7 @@ import { USER } from '../constants';
 
 export default function userReducer(
 	state: Object = {
-		isLoading: true,
+		isLoading: false,
 		data: null,
 		error: null,
 	},
@@ -18,11 +18,9 @@ export default function userReducer(
 			};
 		}
 		case USER.LOAD_SUCCESS: {
-			const { picture: userPicture, avatar_url, ...rest } = action.payload;
-			const picture = userPicture || avatar_url;
 			return {
 				isLoading: false,
-				data: { picture, ...rest },
+				data: action.payload,
 				error: null,
 			};
 		}

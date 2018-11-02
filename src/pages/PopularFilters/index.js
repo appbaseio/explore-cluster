@@ -6,7 +6,6 @@ import Overlay from '../../components/Overlay';
 import Container from '../../components/Container';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import PopularFilters from '../../batteries/components/analytics/components/PopularFilters';
-import { getAppPlanByName } from '../../batteries/modules/selectors';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -55,12 +54,9 @@ PopularFiltersWrapper.propTypes = {
 	isGrowth: PropTypes.bool.isRequired,
 };
 
-const mapStateToProps = (state) => {
-	const appPlan = getAppPlanByName(state);
-	return {
-		appName: get(state, '$getCurrentApp.name'),
-		plan: get(appPlan, 'plan', 'free'),
-		isGrowth: get(appPlan, 'isGrowth'),
-	};
-};
+const mapStateToProps = state => ({
+	appName: get(state, '$getCurrentApp.name'),
+	plan: 'growth',
+	isGrowth: true,
+});
 export default connect(mapStateToProps)(PopularFiltersWrapper);

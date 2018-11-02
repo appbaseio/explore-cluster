@@ -6,7 +6,6 @@ import Container from '../../components/Container';
 import Overlay from '../../components/Overlay';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Analytics from '../../batteries/components/analytics';
-import { getAppPlanByName } from '../../batteries/modules/selectors';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -61,12 +60,9 @@ AnalyticsView.propTypes = {
 	plan: PropTypes.string.isRequired,
 };
 
-const mapStateToProps = (state) => {
-	const appPlan = getAppPlanByName(state);
-	return {
-		appName: get(state, '$getCurrentApp.name'),
-		plan: get(appPlan, 'plan'),
-		isPaidUser: get(appPlan, 'isPaid'),
-	};
-};
+const mapStateToProps = state => ({
+	appName: get(state, '$getCurrentApp.name'),
+	plan: 'growth',
+	isPaidUser: true,
+});
 export default connect(mapStateToProps)(AnalyticsView);

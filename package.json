@@ -8,7 +8,7 @@
 	"license": "MIT",
 	"private": false,
 	"scripts": {
-		"start": "webpack-dev-server --mode development --content-base . --history-api-fallback  --hot --inline --progress --colors --port 1357",
+		"start": "webpack-dev-server --mode development --content-base . --history-api-fallback  --hot --inline --progress --colors --port 3333",
 		"build": "webpack --mode production",
 		"glow": "glow --watch"
 	},

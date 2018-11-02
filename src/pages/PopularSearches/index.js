@@ -6,7 +6,6 @@ import Overlay from '../../components/Overlay';
 import Container from '../../components/Container';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import PopularSearches from '../../batteries/components/analytics/components/PopularSearches';
-import { getAppPlanByName } from '../../batteries/modules/selectors';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -59,12 +58,9 @@ PopularSearchesWrapper.propTypes = {
 	isPaidUser: PropTypes.bool.isRequired,
 };
 
-const mapStateToProps = (state) => {
-	const appPlan = getAppPlanByName(state);
-	return {
-		appName: get(state, '$getCurrentApp.name'),
-		plan: get(appPlan, 'plan'),
-		isPaidUser: get(appPlan, 'isPaid'),
-	};
-};
+const mapStateToProps = state => ({
+	appName: get(state, '$getCurrentApp.name'),
+	plan: 'growth',
+	isPaidUser: true,
+});
 export default connect(mapStateToProps)(PopularSearchesWrapper);

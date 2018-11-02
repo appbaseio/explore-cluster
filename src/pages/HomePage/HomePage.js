@@ -2,20 +2,19 @@ import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { css } from 'react-emotion';
 import {
- Row, Col, Icon, Button, Tooltip, Dropdown, Menu,
+ Row, Col, Icon, Button, Layout,
 } from 'antd';
 import get from 'lodash/get';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
-import FullHeader from '../../components/FullHeader';
 import Header from '../../components/Header';
-import Container from '../../components/Container';
 import CreateAppModal from './CreateAppModal';
 import AppCard from '../../components/AppCard';
+import Loader from '../../components/Loader';
 
-import { getAppsOwners as getOwners } from '../../actions';
-import { getUserPermissions } from '../../batteries/modules/actions';
+import { getAppsOwners as getOwners, loadApps } from '../../actions';
+// import { getUserPermissions } from '../../batteries/modules/actions';
 import { mediaKey } from '../../utils/media';
 
 const link = css`
@@ -35,85 +34,30 @@ const link = css`
 class HomePage extends Component {
 	constructor() {
 		super();
+
 		this.sortOptions = [{ label: 'Name', key: 'name' }, { label: 'Most Recent', key: 'time' }];
 		this.state = {
 			showModal: false, // modal for create new app
-			sortBy: 'name',
 		};
 	}
 
 	componentDidMount() {
 		const {
 			// prettier-ignore
-			appsOwners,
-			getAppsOwners,
-			permissions,
-			fetchPermissions,
 			apps,
-			history,
+			// permissions,
+			// fetchPermissions,
+			fetchApps,
 		} = this.props;
 
-		const hasVisitedTutorial = JSON.parse(localStorage.getItem('hasVisitedTutorial'));
+		// if (!permissions) {
+		// 	fetchPermissions();
+		// }
 
-		if (!hasVisitedTutorial && !Object.keys(apps).length) {
-			history.push('/tutorial');
-		}
-
-		if (!appsOwners.isFetching && !getAppsOwners.data) {
-			getAppsOwners();
-		}
-		if (!permissions) {
-			fetchPermissions();
+		if (!apps.data && !apps.isFetching) {
+			fetchApps();
 		}
 	}
-
-	handleSortOption = (e) => {
-		const { key } = e;
-		this.setState({
-			sortBy: key,
-		});
-	};
-
-	renderSortOptions = () => {
-		const { sortBy } = this.state;
-		const selectedOption = this.sortOptions.find(option => option.key === sortBy);
-		const menu = (
-			<Menu onClick={this.handleSortOption}>
-				{this.sortOptions.map(option => (
-					<Menu.Item key={option.key}>{option.label}</Menu.Item>
-				))}
-			</Menu>
-		);
-		return (
-			<Dropdown overlay={menu} trigger={['click']}>
-				<Button>
-					Sort by {selectedOption.label} <Icon type="down" />
-				</Button>
-			</Dropdown>
-		);
-	};
-
-	getSortedApps = () => {
-		const {
-			apps,
-			appsMetrics: { data },
-		} = this.props;
-		const { sortBy } = this.state;
-
-		switch (sortBy) {
-			case 'time': {
-				const sortedApps = Object.entries(data)
-					.sort(
-						(prevApp, nextApp) => new Date(nextApp[1].timestamp).getTime()
-							- new Date(prevApp[1].timestamp).getTime(),
-					)
-					.map(app => app[0]);
-				return sortedApps;
-			}
-			default:
-				return Object.keys(apps).sort();
-		}
-	};
 
 	handleChange = () => {
 		this.setState(state => ({
@@ -121,161 +65,143 @@ class HomePage extends Component {
 		}));
 	};
 
-	render() {
-		const { showModal } = this.state;
-		const {
-			user,
-			appsMetrics: { data },
-			apps,
-			username,
-			history,
-			appsOwners,
-			permissions,
-		} = this.props;
+	renderApps = () => {
+		const { apps } = this.props;
+		if (apps.isFetching) return <Loader />;
 
-		const firstName = username ? username.split(' ')[0] : 'Bud';
-		const owners = appsOwners.data || {};
-		const sortedApps = this.getSortedApps();
+		const sortedApps = apps.data ? Object.keys(apps.data) : [];
 		return (
-			<Fragment>
-				<FullHeader />
-				<Header>
-					<Row type="flex" justify="space-between" gutter={16}>
-						<Col lg={18}>
-							<h2>Howdy, {firstName}. Welcome to your dashboard!</h2>
+			<Row css={{ padding: 30 }} gutter={20}>
+				{sortedApps.length ? null : (
+					<section
+						css={{
+							display: 'flex',
+							flexDirection: 'column',
+							justifyContent: 'center',
+							alignItems: 'center',
+							paddingTop: '80px',
+						}}
+					>
+						<Icon
+							type="exclamation-circle"
+							theme="outlined"
+							style={{ fontSize: 34, marginBottom: 10 }}
+						/>
+						<h2>No apps found</h2>
+						<p>
+							Create an app or try out the{' '}
+							<Link to="/tutorial">interactive tutorial</Link> to get started
+						</p>
+					</section>
+				)}
 
-							<Row>
-								<Col lg={18}>
-									<p>
-										This is your apps manager view. Here, you can create a new
-										app and manage your existing apps.
-									</p>
-								</Col>
-							</Row>
-
-							<Link to="/tutorial" className={link}>
-								<Icon type="book" /> Interactive Tutorial
-							</Link>
-							<a
-								href="https://docs.appbase.io/javascript/quickstart.html"
-								className={link}
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								<Icon type="rocket" /> JS Quickstart
-							</a>
-							<a
-								href="https://docs.appbase.io/rest-quickstart.html"
-								className={link}
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								<Icon type="code-o" /> REST Quickstart
-							</a>
-						</Col>
-						<Col
-							lg={6}
+				{sortedApps.map((name) => {
+					const title = (
+						<div
 							css={{
 								display: 'flex',
-								flexDirection: 'column-reverse',
-								paddingBottom: 20,
-
-								[mediaKey.small]: {
-									paddingTop: 20,
-								},
+								justifyContent: 'space-between',
+								height: 32,
+								alignItems: 'center',
 							}}
 						>
-							<Button size="large" type="primary" block onClick={this.handleChange}>
-								<Icon type="plus" /> Create a new app
-							</Button>
-						</Col>
-					</Row>
-				</Header>
+							{name}
+						</div>
+					);
 
-				<Container>
-					<Row gutter={20}>
-						{sortedApps.length ? (
-							<Row
-								type="flex"
-								justify="space-between"
-								gutter={16}
-								style={{
-									height: 60,
-									alignItems: 'center',
-									padding: '0px 18px',
-								}}
+					return (
+						<Col key={name} lg={8} md={12} sm={24}>
+							<Link
+								to={`/app/${name}/overview`}
+								css={{ marginBottom: 20, display: 'block' }}
 							>
-								<h2
-									style={{
-										paddingLeft: 0,
-										lineHeight: '21px',
-										margin: 0,
-									}}
+								<AppCard
+									key={name}
+									title={title}
+									appName={name}
+									data={apps[name]}
+									// permissions={permissions ? permissions[name] : null}
+								/>
+							</Link>
+						</Col>
+					);
+				})}
+			</Row>
+		);
+	};
+
+	render() {
+		const { showModal } = this.state;
+		const { username, history } = this.props;
+
+		const firstName = username ? username.split(' ')[0] : 'Bud';
+
+		return (
+			<Fragment>
+				<Layout
+					css={{
+						minHeight: 'calc(100vh - 60px)',
+					}}
+				>
+					<Header>
+						<Row type="flex" justify="space-between" gutter={16}>
+							<Col lg={18}>
+								<h2>Howdy, {firstName}. Welcome to your dashboard!</h2>
+
+								<Row>
+									<Col lg={18}>
+										<p>
+											This is your apps manager view. Here, you can create a
+											new app and manage your existing apps.
+										</p>
+									</Col>
+								</Row>
+
+								<Link to="/tutorial" className={link}>
+									<Icon type="book" /> Interactive Tutorial
+								</Link>
+								<a
+									href="https://docs.appbase.io/javascript/quickstart.html"
+									className={link}
+									target="_blank"
+									rel="noopener noreferrer"
 								>
-									All Apps
-								</h2>
-								{this.renderSortOptions()}
-							</Row>
-						) : (
-							<section
+									<Icon type="rocket" /> JS Quickstart
+								</a>
+								<a
+									href="https://docs.appbase.io/rest-quickstart.html"
+									className={link}
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									<Icon type="code-o" /> REST Quickstart
+								</a>
+							</Col>
+							<Col
+								lg={6}
 								css={{
 									display: 'flex',
-									flexDirection: 'column',
-									justifyContent: 'center',
-									alignItems: 'center',
-									paddingTop: '80px',
+									flexDirection: 'column-reverse',
+									paddingBottom: 20,
+
+									[mediaKey.small]: {
+										paddingTop: 20,
+									},
 								}}
 							>
-								<Icon
-									type="exclamation-circle"
-									theme="outlined"
-									style={{ fontSize: 34, marginBottom: 10 }}
-								/>
-								<h2>No apps found</h2>
-								<p>Create an app or try out the interactive tutorial to get started</p>
-							</section>
-						)}
-
-						{sortedApps.map((name) => {
-							const title = (
-								<div
-									css={{
-										display: 'flex',
-										justifyContent: 'space-between',
-										height: 32,
-										alignItems: 'center',
-									}}
+								<Button
+									size="large"
+									type="primary"
+									block
+									onClick={this.handleChange}
 								>
-									{name}{' '}
-									{owners[name] && user !== owners[name] ? (
-										<Tooltip title={`Shared by ${owners[name]}`}>
-											<Button shape="circle" icon="share-alt" />
-										</Tooltip>
-									) : null}
-								</div>
-							);
-
-							return (
-								<Col key={name} lg={8} md={12} sm={24}>
-									<Link
-										to={`/app/${name}/overview`}
-										css={{ marginBottom: 20, display: 'block' }}
-									>
-										<AppCard
-											key={name}
-											title={title}
-											data={data}
-											appName={name}
-											appId={apps[name]}
-											permissions={permissions ? permissions[name] : null}
-											shared={owners[name] && user !== owners[name]}
-										/>
-									</Link>
-								</Col>
-							);
-						})}
-					</Row>
-				</Container>
+									<Icon type="plus" /> Create a new app
+								</Button>
+							</Col>
+						</Row>
+					</Header>
+					{this.renderApps()}
+				</Layout>
 				<CreateAppModal
 					history={history}
 					handleModal={this.handleChange}
@@ -287,29 +213,25 @@ class HomePage extends Component {
 }
 
 HomePage.propTypes = {
-	user: PropTypes.string.isRequired,
 	username: PropTypes.string.isRequired,
 	apps: PropTypes.object.isRequired,
-	appsMetrics: PropTypes.object.isRequired,
 	history: PropTypes.object.isRequired,
-	appsOwners: PropTypes.object.isRequired,
-	getAppsOwners: PropTypes.func.isRequired,
-	permissions: PropTypes.object, // eslint-disable-line
-	fetchPermissions: PropTypes.func.isRequired,
+	// permissions: PropTypes.object, // eslint-disable-line
+	// fetchPermissions: PropTypes.func.isRequired,
+	fetchApps: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = state => ({
-	user: get(state, 'user.data.email'),
-	username: get(state, 'user.data.name'),
+	user: get(state, 'user.data.username'),
+	username: get(state, 'user.data.username'),
 	apps: get(state, 'apps'),
-	appsMetrics: get(state, 'appsMetrics'),
-	appsOwners: get(state, 'appsOwners'),
-	permissions: get(state, '$getAppPermissions.results'),
+	// permissions: get(state, '$getAppPermissions.results'),
 });
 
 const mapDispatchToProps = dispatch => ({
 	getAppsOwners: () => dispatch(getOwners()),
-	fetchPermissions: () => dispatch(getUserPermissions()),
+	// fetchPermissions: () => dispatch(getUserPermissions()),
+	fetchApps: () => dispatch(loadApps()),
 });
 
 export default connect(

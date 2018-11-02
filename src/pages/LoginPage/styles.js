@@ -27,7 +27,8 @@ const card = css`
 		margin-bottom: 25px;
 	}
 
-	a {
+	a,
+	button {
 		margin: 4px 0;
 		display: flex;
 		flex-direction: row;

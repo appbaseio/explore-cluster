@@ -9,11 +9,6 @@ const AppWrapper = Loadable({
 	loading: () => <div />,
 });
 
-const NoMatch = Loadable({
-	loader: () => import('../../NoMatch'),
-	loading: () => <div />,
-});
-
 const ClusterPage = Loadable({
 	loader: () => import('../ClusterPage'),
 	loading: Loader,
@@ -34,8 +29,8 @@ const ProfilePage = Loadable({
 	loading: Loader,
 });
 
-const HomePage = Loadable({
-	loader: () => import('../HomePage'),
+const DashboardWrapper = Loadable({
+	loader: () => import('../DashboardWrapper'),
 	loading: Loader,
 });
 
@@ -51,7 +46,6 @@ const EndPage = Loadable({
 
 const Wrapper = () => (
 	<Switch>
-		<Route exact path="/" component={HomePage} />
 		<Route exact path="/tutorial" component={OnboardingPage} />
 		<Route exact path="/tutorial/finish" component={EndPage} />
 		<Route exact path="/clusters" component={ClusterPage} />
@@ -59,7 +53,7 @@ const Wrapper = () => (
 		<Route path="/clusters/:id" component={ClusterInfoPage} />
 		<Route exact path="/profile" component={ProfilePage} />
 		<Route path="/app/:appName?/:route?" component={AppWrapper} />
-		<Route component={NoMatch} />
+		<Route component={DashboardWrapper} />
 	</Switch>
 );
 

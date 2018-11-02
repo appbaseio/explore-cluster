@@ -1,18 +1,21 @@
 import {
- take, takeEvery, call, put,
+ takeEvery, call, put, select,
 } from 'redux-saga/effects';
 import { APPS } from '../constants';
-import { getAppsMetrics, getAppsOwners } from '../utils';
+import { getESIndices, getAppsOwners } from '../utils';
 import {
- setAppsMetrics, setAppsMetricsError, setAppsOwners, setAppsOwnersError,
+ loadAppsSuccess, loadAppsError, setAppsOwners, setAppsOwnersError,
 } from '../actions';
+
+const getUser = state => state.user.data;
 
 function* appWorker() {
 	try {
-		const metrics = yield call(getAppsMetrics);
-		yield put(setAppsMetrics(metrics));
+		const user = yield select(getUser);
+		const apps = yield call(getESIndices, user.authToken);
+		yield put(loadAppsSuccess(apps));
 	} catch (e) {
-		yield put(setAppsMetricsError(e));
+		yield put(loadAppsError(e));
 	}
 }
 
@@ -27,6 +30,5 @@ function* appsOwnersWorker() {
 
 export default function* appSaga() {
 	yield takeEvery(APPS.LOAD_OWNERS, appsOwnersWorker);
-	yield take(APPS.LOAD);
-	yield call(appWorker);
+	yield takeEvery(APPS.LOAD, appWorker);
 }

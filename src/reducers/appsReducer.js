@@ -1,18 +1,51 @@
 // @flow
 import { APPS } from '../constants';
 
-export default function appsReducer(state: Object = {}, action: Object): ?Object {
+export default function appsReducer(
+	state: Object = {
+		isFetching: false,
+		data: null,
+		error: null,
+	},
+	action: Object,
+): ?Object {
 	switch (action.type) {
 		case APPS.LOAD: {
-			return action.payload;
+			return {
+				isFetching: true,
+				data: null,
+				error: null,
+			};
 		}
-		case APPS.APPEND: {
-			return { ...state, ...action.payload };
+		case APPS.LOAD_SUCCESS: {
+			return {
+				isFetching: false,
+				data: action.payload,
+				error: null,
+			};
+		}
+		case APPS.LOAD_FAIL: {
+			return {
+				isFetching: false,
+				data: null,
+				error: action.error,
+			};
 		}
 		case APPS.DELETE_APP: {
-			const apps = state;
+			const apps = state.data;
 			delete apps[action.payload];
-			return apps;
+			return {
+				isFetching: false,
+				data: apps,
+				error: null,
+			};
+		}
+		case APPS.APPEND: {
+			return {
+				isFetching: false,
+				data: { ...state.data, ...action.payload },
+				error: null,
+			};
 		}
 		default:
 			return state;

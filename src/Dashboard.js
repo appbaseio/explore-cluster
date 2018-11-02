@@ -9,7 +9,6 @@ import Loader from './components/Loader';
 import Logo from './components/Logo';
 import PrivateRoute from './pages/LoginPage/PrivateRoute';
 import Wrapper from './pages/Wrapper';
-import { loadUser } from './actions';
 
 // routes
 const LoginPage = Loadable({
@@ -26,11 +25,6 @@ class Dashboard extends Component {
 	state = {
 		error: false,
 	};
-
-	componentDidMount() {
-		const { loadAppbaseUser } = this.props;
-		loadAppbaseUser();
-	}
 
 	componentDidCatch() {
 		this.setState({
@@ -98,18 +92,13 @@ class Dashboard extends Component {
 
 Dashboard.propTypes = {
 	user: PropTypes.object.isRequired,
-	loadAppbaseUser: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = ({ user }) => ({
 	user,
 });
 
-const mapDispatchToProps = dispatch => ({
-	loadAppbaseUser: () => dispatch(loadUser()),
-});
-
 export default connect(
 	mapStateToProps,
-	mapDispatchToProps,
+	null,
 )(Dashboard);

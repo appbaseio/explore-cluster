@@ -5,15 +5,16 @@ import {
 import { string, func } from 'prop-types';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
+import URL from 'url-parser-lite';
 
 import {
 	setCurrentApp,
 	getPermission as getPermissionFromAppbase,
 } from '../../batteries/modules/actions';
-import { getAppPermissionsByName } from '../../batteries/modules/selectors';
 
 import Header from '../../components/Header';
 import Loader from '../../components/Loader';
+import { SCALR_API } from '../../batteries/utils';
 
 class BrowserPage extends Component {
 	componentDidMount() {
@@ -24,8 +25,8 @@ class BrowserPage extends Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { appName, appId } = this.props;
-		if (appName !== prevProps.appName || appId !== prevProps.appId) {
+		const { appName } = this.props;
+		if (appName !== prevProps.appName) {
 			this.init();
 		}
 	}
@@ -35,18 +36,18 @@ class BrowserPage extends Component {
 		const {
 			updateCurrentApp,
 			appName,
-			appId,
-			getPermission,
+			// getPermission,
 		} = this.props;
-		updateCurrentApp(appName, appId);
-		getPermission(appName);
+		updateCurrentApp(appName);
+		// getPermission(appName);
 	}
 
 	render() {
 		const { appName, credentials } = this.props;
+		const { protocol, host } = URL(SCALR_API);
 
 		const dejavu = {
-			url: `https://${credentials}@scalr.api.appbase.io`,
+			url: `${protocol}://${credentials}@${host}`,
 			appname: appName,
 		};
 		const url = JSON.stringify(dejavu);
@@ -138,22 +139,20 @@ class BrowserPage extends Component {
 
 BrowserPage.propTypes = {
 	appName: string.isRequired,
-	appId: string.isRequired,
 	credentials: string.isRequired,
 	updateCurrentApp: func.isRequired,
-	getPermission: func.isRequired,
 };
 
 const mapStateToProps = (state) => {
-	const { username, password } = get(getAppPermissionsByName(state), 'credentials', {});
+	const { username, password } = get(state, 'user.data', {});
 	return {
 		credentials: username ? `${username}:${password}` : '',
 	};
 };
 
 const mapDispatchToProps = dispatch => ({
-	updateCurrentApp: (appName, appId) => dispatch(setCurrentApp(appName, appId)),
-	getPermission: appId => dispatch(getPermissionFromAppbase(appId)),
+	updateCurrentApp: appName => dispatch(setCurrentApp(appName, appName)),
+	getPermission: appName => dispatch(getPermissionFromAppbase(appName)),
 });
 
 export default connect(

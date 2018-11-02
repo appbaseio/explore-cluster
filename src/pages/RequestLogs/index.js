@@ -6,7 +6,6 @@ import Overlay from '../../components/Overlay';
 import Container from '../../components/Container';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import RequestLogs from '../../batteries/components/analytics/components/RequestLogs';
-import { getAppPlanByName } from '../../batteries/modules/selectors';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -64,12 +63,9 @@ RequestLogsWrapper.propTypes = {
 	isPaidUser: PropTypes.bool.isRequired,
 };
 
-const mapStateToProps = (state) => {
-	const appPlan = getAppPlanByName(state);
-	return {
-		appName: get(state, '$getCurrentApp.name'),
-		plan: get(appPlan, 'plan'),
-		isPaidUser: get(appPlan, 'isPaid'),
-	};
-};
+const mapStateToProps = state => ({
+	appName: get(state, '$getCurrentApp.name'),
+	plan: 'growth',
+	isPaidUser: true,
+});
 export default connect(mapStateToProps)(RequestLogsWrapper);

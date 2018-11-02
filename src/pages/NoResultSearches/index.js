@@ -6,7 +6,6 @@ import Overlay from '../../components/Overlay';
 import Container from '../../components/Container';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import NoResultSearch from '../../batteries/components/analytics/components/NoResultsSearch';
-import { getAppPlanByName } from '../../batteries/modules/selectors';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -54,12 +53,9 @@ NoResultSearchWrapper.propTypes = {
 	isPaidUser: PropTypes.bool.isRequired,
 };
 
-const mapStateToProps = (state) => {
-	const appPlan = getAppPlanByName(state);
-	return {
-		appName: get(state, '$getCurrentApp.name'),
-		plan: get(appPlan, 'plan'),
-		isPaidUser: get(appPlan, 'isPaid'),
-	};
-};
+const mapStateToProps = state => ({
+	appName: get(state, '$getCurrentApp.name'),
+	plan: 'growth',
+	isPaidUser: true,
+});
 export default connect(mapStateToProps)(NoResultSearchWrapper);

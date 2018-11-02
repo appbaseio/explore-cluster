@@ -1,19 +1,39 @@
 import { ACC_API } from '../constants/config';
 
-export async function getUser() {
-	const response = await fetch(`${ACC_API}/user`, { credentials: 'include' });
+export async function getUser(username, password) {
+	const authToken = btoa(`${username}:${password}`);
+	const response = await fetch(`${ACC_API}/_user`, {
+		method: 'GET',
+		headers: {
+			Authorization: `Basic ${authToken}`,
+		},
+	});
 	const data = await response.json();
 	if (response.status >= 400) {
 		throw new Error(data);
 	}
 
-	const user = {
-		...data.body,
-		...data.body.details,
-	};
+	return { username, password, authToken };
+}
 
-	const { apps } = data.body;
-	return { user, apps };
+export async function getESIndices(authToken) {
+	const response = await fetch(`${ACC_API}/_cat/indices?format=json`, {
+		method: 'GET',
+		headers: {
+			Authorization: `Basic ${authToken}`,
+		},
+	});
+	const data = await response.json();
+	if (response.status >= 400) {
+		throw new Error(data);
+	}
+
+	const indices = {};
+	data.forEach((item) => {
+		indices[item.index] = item;
+	});
+
+	return indices;
 }
 
 export async function getAppsMetrics() {

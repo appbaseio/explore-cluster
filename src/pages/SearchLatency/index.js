@@ -1,11 +1,9 @@
 import React from 'react';
-import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Container from '../../components/Container';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import SearchPerformance from '../../batteries/components/analytics/components/SearchLatency';
-import { getAppPlanByName } from '../../batteries/modules/selectors';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -51,11 +49,8 @@ SearchLatencyWrapper.propTypes = {
 	isGrowth: PropTypes.bool.isRequired,
 };
 
-const mapStateToProps = (state) => {
-	const appPlan = getAppPlanByName(state);
-	return {
-		plan: get(appPlan, 'plan', 'free'),
-		isGrowth: get(appPlan, 'isGrowth'),
-	};
-};
+const mapStateToProps = () => ({
+	plan: 'growth',
+	isGrowth: true,
+});
 export default connect(mapStateToProps)(SearchLatencyWrapper);

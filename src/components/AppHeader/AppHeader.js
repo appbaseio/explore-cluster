@@ -1,15 +1,10 @@
 import React from 'react';
-import {
- Layout, Menu, Icon, Button,
-} from 'antd';
+import { Layout, Menu, Icon } from 'antd';
 import { Link } from 'react-router-dom';
-import {
- string, object, bool, number,
-} from 'prop-types';
+import { string, object, bool } from 'prop-types';
 import { css } from 'react-emotion';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { media } from '../../utils/media';
 import MenuSlider from '../FullHeader/MenuSlider';
 import UserMenu from './UserMenu';
 import headerStyles from './styles';
@@ -27,71 +22,54 @@ const noBorder = css`
 		color: #1890ff !important;
 	}
 `;
-const trialText = css`
-	line-height: 2em;
-	font-size: 0.9em;
-`;
-const trialBtn = css`
-	${media.small(css`
-		display: none;
-	`)};
-`;
 
 const AppHeader = ({
- currentApp, user, big, isUsingTrial, daysLeft,
+ currentApp, user, big, showApp, minimal,
 }) => (
 	<Header
 		className={headerStyles}
-		css={{ width: big ? 'calc(100% - 80px)' : 'calc(100% - 260px)' }}
+		css={{
+			width: big ? 'calc(100% - 80px)' : 'calc(100% - 260px)',
+			justifyContent: minimal ? 'flex-end !important' : 'space-between',
+		}}
 	>
-		<Menu mode="horizontal">
-			<Menu.Item key="back" className={noBorder} style={{ padding: 0 }}>
-				<Link to="/">
-					<Icon type="arrow-left" />
-				</Link>
-			</Menu.Item>
-			<Menu.Item key="1" className={noBorder}>
-				<span>{currentApp || 'Loading...'}</span>
-			</Menu.Item>
-		</Menu>
-		{isUsingTrial && (
-			<Button
-				css={trialBtn}
-				style={{
-					height: 'auto',
-				}}
-				type="danger"
-				href="billing"
-			>
-				<span css={trialText}>
-					{daysLeft > 0
-						? `Trial expires in ${daysLeft} ${
-								daysLeft > 1 ? 'days' : 'day'
-						  }. Upgrade now`
-						: 'Trial expired. Upgrade now'}
-				</span>
-			</Button>
+		{minimal ? null : (
+			<Menu mode="horizontal">
+				<Menu.Item key="back" className={noBorder} style={{ padding: 0 }}>
+					<Link to="/">
+						<Icon type="arrow-left" />
+					</Link>
+				</Menu.Item>
+				{showApp ? (
+					<Menu.Item key="1" className={noBorder}>
+						<span>{currentApp || 'Loading...'}</span>
+					</Menu.Item>
+				) : null}
+			</Menu>
 		)}
 		<UserMenu user={user} />
 		<MenuSlider />
 	</Header>
 );
 
+AppHeader.defaultProps = {
+	showApp: true,
+};
+
 AppHeader.propTypes = {
 	currentApp: string,
 	user: object.isRequired,
-	isUsingTrial: bool.isRequired,
-	daysLeft: number.isRequired,
 	big: bool.isRequired,
+	minimal: bool,
+	showApp: bool,
 };
 
 AppHeader.defaultProps = {
 	currentApp: null,
+	minimal: false,
 };
 
 const mapStateToProps = state => ({
-	isUsingTrial: get(state, '$getUserPlan.trial') || false,
-	daysLeft: get(state, '$getUserPlan.daysLeft', 0),
 	currentApp: get(state, '$getCurrentApp.name'),
 	user: state.user.data,
 });

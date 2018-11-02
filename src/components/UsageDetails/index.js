@@ -102,16 +102,14 @@ const UsageDetails = ({ plan, computedMetrics }) => {
 };
 UsageDetails.defaultProps = {
 	computedMetrics: undefined,
+	plan: 'growth',
 };
 UsageDetails.propTypes = {
-	plan: PropTypes.string.isRequired,
-	appName: PropTypes.string.isRequired,
+	plan: PropTypes.string,
 	computedMetrics: PropTypes.object,
 };
 
 const mapStateToProps = state => ({
-	appName: get(state, '$getCurrentApp.name'),
-	plan: get(getAppPlanByName(state), 'plan'),
 	computedMetrics: get(getAppMetricsByName(state), 'computedMetrics'),
 });
 export default connect(mapStateToProps)(UsageDetails);

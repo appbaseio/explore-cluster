@@ -1,11 +1,9 @@
 // @flow
-import {
- USER, APPS, CREATE_APP,
-} from '../constants';
+import { USER, APPS, CREATE_APP } from '../constants';
 import { createAction } from '../batteries/modules/actions/utils';
 
-export function loadUser(): Object {
-	return createAction(USER.LOAD, null, null, null);
+export function loadUser(username: string, password: string): Object {
+	return createAction(USER.LOAD, { username, password }, null, null);
 }
 
 export function setUser(user: Object): Object {
@@ -16,8 +14,16 @@ export function setUserError(error: Object): Object {
 	return createAction(USER.LOAD_FAIL, null, error, null);
 }
 
-export function loadApps(apps: Object): Object {
-	return createAction(APPS.LOAD, apps, null, null);
+export function loadApps(): Object {
+	return createAction(APPS.LOAD, null, null, null);
+}
+
+export function loadAppsSuccess(apps: Object): Object {
+	return createAction(APPS.LOAD_SUCCESS, apps, null, null);
+}
+
+export function loadAppsError(error: Object): Object {
+	return createAction(APPS.LOAD_FAIL, null, error, null);
 }
 
 export function appendApp(app: Object): Object {
