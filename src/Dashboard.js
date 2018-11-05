@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Button, Icon } from 'antd';
 
+import { loadUser } from './actions';
 import Loader from './components/Loader';
 import Logo from './components/Logo';
 import PrivateRoute from './pages/LoginPage/PrivateRoute';
@@ -21,10 +22,39 @@ const SignupPage = Loadable({
 	loading: Loader,
 });
 
+const URLSearchParams = require('url-search-params');
+
 class Dashboard extends Component {
 	state = {
 		error: false,
+		isLoading: true,
 	};
+
+	componentDidMount() {
+		const { loadArcUser } = this.props;
+		const params = new URLSearchParams(window.location.search);
+		if (params.has('username') && params.has('password')) {
+			const username = params.get('username');
+			const password = params.get('password');
+
+			loadArcUser(username, password);
+		} else {
+			this.setState({
+				isLoading: false,
+			});
+		}
+	}
+
+	static getDerivedStateFromProps(props, state) {
+		const { isLoading } = state;
+		if (props.user.data && isLoading) {
+			return {
+				isLoading: false,
+			};
+		}
+
+		return null;
+	}
 
 	componentDidCatch() {
 		this.setState({
@@ -34,9 +64,9 @@ class Dashboard extends Component {
 
 	render() {
 		const { user } = this.props;
-		const { error } = this.state;
+		const { error, isLoading } = this.state;
 
-		if (user.isLoading) {
+		if (user.isLoading || isLoading) {
 			return <Loader />;
 		}
 
@@ -92,13 +122,18 @@ class Dashboard extends Component {
 
 Dashboard.propTypes = {
 	user: PropTypes.object.isRequired,
+	loadArcUser: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = ({ user }) => ({
 	user,
 });
 
+const mapDispatchToProps = dispatch => ({
+	loadArcUser: (u, p) => dispatch(loadUser(u, p)),
+});
+
 export default connect(
 	mapStateToProps,
-	null,
+	mapDispatchToProps,
 )(Dashboard);

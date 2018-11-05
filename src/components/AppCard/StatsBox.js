@@ -43,8 +43,10 @@ export default function StatsBox({ data }) {
 
 	return (
 		<Row gutter={8}>
-			{cols.map(col => (
-				<Col span={12}>{col}</Col>
+			{cols.map((col, index) => (
+				<Col key={`stats-${index + 1}`} span={12}>
+					{col}
+				</Col>
 			))}
 		</Row>
 	);
