@@ -27,6 +27,20 @@ export default function StatsBox({ data }) {
 			</div>
 		));
 
+	if (!cols.length) {
+		return (
+			<div
+				css={{
+					padding: 60,
+					textAlign: 'center',
+					color: 'rgba(0,0,0,0.45)',
+				}}
+			>
+				No data
+			</div>
+		);
+	}
+
 	return (
 		<Row gutter={8}>
 			{cols.map(col => (

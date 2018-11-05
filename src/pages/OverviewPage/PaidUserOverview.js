@@ -14,7 +14,7 @@ import Loader from '../../batteries/components/shared/Loader/Spinner';
 import { exampleConfig } from '../../constants/config';
 import { getAppMetrics, getAppAnalytics } from '../../batteries/modules/actions';
 import { getFilteredResults } from '../../batteries/utils/heplers';
-import UsageDetails from '../../components/UsageDetails';
+import StatsBox from '../../components/AppCard/StatsBox';
 import Searches from '../../batteries/components/analytics/components/Searches';
 import RequestLogs from '../../batteries/components/analytics/components/RequestLogs';
 
@@ -77,8 +77,14 @@ class PaidUserOverview extends React.Component {
 
 	render() {
 		const {
- isFetching, popularSearches, noResults, appName, searchVolume,
-} = this.props;
+			// prettier-ignore
+			isFetching,
+			popularSearches,
+			noResults,
+			appName,
+			searchVolume,
+			stats,
+		} = this.props;
 		if (isFetching) {
 			return <Loader />;
 		}
@@ -86,7 +92,18 @@ class PaidUserOverview extends React.Component {
 			<Container>
 				<Flex css={main} justifyContent="space-between">
 					<div css={usage}>
-						<UsageDetails />
+						<Card
+							title="Overview"
+							css={{
+								minWidth: 320,
+								minHeight: '100%',
+								paddingBottom: '15px',
+								overflow: 'hidden',
+							}}
+							bodyStyle={{ paddingBottom: '40px' }}
+						>
+							<StatsBox data={stats} />
+						</Card>
 					</div>
 					<Card css={chart} title="Daily Search Volume">
 						<SearchVolumeChart
@@ -139,12 +156,15 @@ PaidUserOverview.propTypes = {
 	searchVolume: PropTypes.array,
 	popularSearches: PropTypes.array,
 	noResults: PropTypes.array,
+	stats: PropTypes.object.isRequired,
 };
 const mapStateToProps = (state) => {
 	const analytics = getAppAnalyticsByName(state);
+	const appName = get(state, '$getCurrentApp.name');
 	return {
 		isFetching: get(state, '$getAppMetrics.isFetching'),
-		appName: get(state, '$getCurrentApp.name'),
+		appName,
+		stats: get(state, `apps.data['${appName}']`, {}),
 		popularSearches: get(analytics, 'popularSearches'),
 		noResults: get(analytics, 'noResultSearches'),
 		searchVolume: get(analytics, 'searchVolume'),
