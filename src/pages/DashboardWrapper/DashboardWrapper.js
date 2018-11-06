@@ -49,13 +49,12 @@ const routes = {
 			{ label: 'Request Logs', link: '/cluster/request-logs' },
 		],
 	},
-	// Security: {
-	// 	icon: 'key',
-	// 	menu: [
-	// 		{ label: 'API Credentials', link: 'credentials' },
-	// 		{ label: 'Sharing Settings', link: 'share-settings' },
-	// 	],
-	// },
+	Security: {
+		icon: 'key',
+		menu: [
+			{ label: 'API Credentials', link: '/cluster/credentials' },
+		],
+	},
 	// Billing: {
 	// 	icon: 'credit-card',
 	// 	link: 'billing',

@@ -15,16 +15,15 @@ import Flex from '../../batteries/components/shared/Flex';
 import Loader from '../../batteries/components/shared/Loader/Spinner';
 import { displayErrors } from '../../utils/helper';
 import { getPermission } from '../../batteries/modules/actions/permission';
-import { Button as UpgradeButton } from '../../batteries/components/Mappings/styles';
 import Grid from './Grid';
 import { getAppMappings } from '../../batteries/modules/actions';
 import { createCredentials as Messages, hoverMessage } from '../../utils/messages';
-import { getTraversedMappingsByAppName, getAppPermissionsByName, getAppPlanByName } from '../../batteries/modules/selectors';
+import { getTraversedMappingsByAppName, getAppPermissionsByName } from '../../batteries/modules/selectors';
 import {
 	Types, getDefaultAclOptionsByPlan,
 	aclOptionsLabel, getAclOptionsByPlan, isNegative,
 } from './utils';
-import WhiteList from './WhiteList';
+// import WhiteList from './WhiteList';
 
 const { Option } = Select;
 const CheckboxGroup = Checkbox.Group;
@@ -53,10 +52,11 @@ class CreateCredentials extends React.Component {
 			operationType: [Types.read, Validators.required],
 			acl: [{ value: getDefaultAclOptionsByPlan(props.plan), disabled: !props.isPaidUser },
 				Validators.required],
-			referers: [{ value: ['*'], disabled: !props.isPaidUser }],
-			sources: [{ value: ['0.0.0.0/0'], disabled: !props.isPaidUser }],
-			include_fields: [{ value: ['*'], disabled: !props.isPaidUser }],
+			// referers: [{ value: ['*'], disabled: !props.isPaidUser }],
+			// sources: [{ value: ['0.0.0.0/0'], disabled: !props.isPaidUser }],
+			include_fields: [{ value: ['*'], disabled: false }],
 			exclude_fields: [{ value: [], disabled: true }],
+			indices: [{ value: ['*'], disabled: false }],
 			ip_limit: [
 				{ value: 7200, disabled: !props.isPaidUser },
 				[Validators.required, isNegative],
@@ -66,12 +66,13 @@ class CreateCredentials extends React.Component {
 	}
 
 	componentDidMount() {
-		const { disabled, initialValues, isPermissionPresent } = this.props;
+		const { disabled, initialValues } = this.props;
 		if (disabled) {
 			this.form.disable();
 		} else {
 			const includeFieldsHandler = this.form.get('include_fields');
 			const excludeFieldsHandler = this.form.get('exclude_fields');
+			const indicesHandler = this.form.get('indices');
 			includeFieldsHandler.valueChanges.subscribe((value) => {
 				if (value && value.includes('*')) {
 					excludeFieldsHandler.disable({ emitEvent: false });
@@ -88,6 +89,14 @@ class CreateCredentials extends React.Component {
 					includeFieldsHandler.enable({ emitEvent: false });
 				}
 			});
+			indicesHandler.valueChanges.subscribe((value) => {
+				if (value && value.includes('*')) {
+					indicesHandler.disable({ emitEvent: false });
+					indicesHandler.reset([]);
+				} else {
+					indicesHandler.enable({ emitEvent: false });
+				}
+			});
 		}
 		if (initialValues) {
 			let operationType;
@@ -100,10 +109,6 @@ class CreateCredentials extends React.Component {
 				return true;
 			});
 			this.form.patchValue({ ...initialValues, operationType });
-		}
-		if (!isPermissionPresent) {
-			const { fetchPermissions } = this.props;
-			fetchPermissions();
 		}
 	}
 
@@ -118,6 +123,7 @@ class CreateCredentials extends React.Component {
 	componentWillUnmount() {
 		this.form.get('include_fields').valueChanges.unsubscribe();
 		this.form.get('exclude_fields').valueChanges.unsubscribe();
+		this.form.get('indices').valueChanges.unsubscribe();
 	}
 
 	getMappings() {
@@ -294,7 +300,7 @@ class CreateCredentials extends React.Component {
 										);
 									}}
 								/>
-								<Grid label="Security" toolTipMessage={Messages.security} />
+								{/* <Grid label="Security" toolTipMessage={Messages.security} />
 								<FieldControl
 									name="referers"
 									render={control => (
@@ -326,7 +332,36 @@ class CreateCredentials extends React.Component {
 											}}
 										/>
 									)}
+								/> */}
+
+								<FieldControl
+									strict={false}
+									name="indices"
+									render={({ handler }) => {
+										const inputHandler = handler();
+										const { value } = this.form.get('indices');
+										return (
+											<Grid
+												label="Indices"
+												toolTipMessage={Messages.indices}
+												component={(
+													<Select
+														placeholder="Enter indices"
+														mode="tags"
+														style={{ width: '100%' }}
+														tokenSeparators={[',']}
+														value={value}
+														{...inputHandler}
+														onChange={(val) => {
+															inputHandler.onChange(calculateValue(val));
+														}}
+													/>
+												)}
+											/>
+										);
+									}}
 								/>
+
 								<div css="margin-top: 30px">
 									<span css={styles.formLabel}>Fields Filtering</span>
 									<Tooltip
@@ -354,7 +389,7 @@ class CreateCredentials extends React.Component {
 														style={{ width: '100%' }}
 														{...inputHandler}
 														onChange={(value) => {
-																inputHandler.onChange(calculateValue(value));
+															inputHandler.onChange(calculateValue(value));
 														}}
 													>
 														<Option key="*">* (Include all fields)</Option>
@@ -503,8 +538,8 @@ CreateCredentials.propTypes = {
 		write: PropTypes.bool,
 		operationType: PropTypes.object,
 		acl: PropTypes.arrayOf(PropTypes.string),
-		referers: PropTypes.arrayOf(PropTypes.string),
-		sources: PropTypes.arrayOf(PropTypes.string),
+		// referers: PropTypes.arrayOf(PropTypes.string),
+		// sources: PropTypes.arrayOf(PropTypes.string),
 		include_fields: PropTypes.arrayOf(PropTypes.string),
 		exclude_fields: PropTypes.arrayOf(PropTypes.string),
 		ip_limit: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
@@ -527,15 +562,14 @@ CreateCredentials.propTypes = {
 const mapStateToProps = (state) => {
 	const mappings = getTraversedMappingsByAppName(state);
 	const appPermissions = getAppPermissionsByName(state);
-	const plan = getAppPlanByName(state);
 	return {
-		isPaidUser: get(plan, 'isPaid'),
+		isPaidUser: true,
 		appName: get(state, '$getCurrentApp.name'),
 		mappings: mappings || [],
 		isPermissionPresent: !!appPermissions,
 		isLoadingMappings: get(state, '$getAppMappings.isFetching') || get(state, '$getAppPermissions.isFetching'),
 		credentials: get(appPermissions, 'credentials'),
-		plan: get(plan, 'plan'),
+		plan: 'growth',
 		isSubmitting: get(state, '$createAppPermission.isFetching') || get(state, '$updateAppPermission.isFetching') || get(state, '$createAppShare.isFetching'),
 		errors: [
 			get(state, '$getAppMappings.error'),

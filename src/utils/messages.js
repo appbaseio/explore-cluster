@@ -31,10 +31,9 @@ export const createCredentials = {
 			credential.
 		</div>
 	),
-	sources: () => (
+	indices: () => (
 		<div style={{ maxWidth: 220 }}>
-			Only selected IP ranges (in CIDR format) are authorized to call the API with this
-			credential.
+			Only selected indices are authorized to call the API with this credential.
 		</div>
 	),
 	fieldFiltering: () => (
