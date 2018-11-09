@@ -18,6 +18,20 @@ const stats = css`
 const blackList = ['index', 'uuid'];
 
 export default function StatsBox({ data }) {
+	const noData = (
+		<div
+			css={{
+				padding: 60,
+				textAlign: 'center',
+				color: 'rgba(0,0,0,0.45)',
+			}}
+		>
+			No data
+		</div>
+	);
+
+	if (typeof data !== 'object') return noData;
+
 	const cols = Object.keys(data)
 		.filter(item => !blackList.includes(item))
 		.map(item => (
@@ -27,19 +41,7 @@ export default function StatsBox({ data }) {
 			</div>
 		));
 
-	if (!cols.length) {
-		return (
-			<div
-				css={{
-					padding: 60,
-					textAlign: 'center',
-					color: 'rgba(0,0,0,0.45)',
-				}}
-			>
-				No data
-			</div>
-		);
-	}
+	if (!cols.length) return noData;
 
 	return (
 		<Row gutter={8}>

@@ -1,17 +1,20 @@
-import { takeEvery, call, put } from 'redux-saga/effects';
+import {
+ takeEvery, call, put, select,
+} from 'redux-saga/effects';
 import { CREATE_APP } from '../constants';
 import { getCreateApp } from '../utils';
-import {
- setCreateApp, createAppFail, appendApp,
-} from '../actions';
+import { setCreateApp, createAppFail, appendApp } from '../actions';
 
 import { getUserPermissions } from '../batteries/modules/actions';
 
+const getUser = state => state.user.data;
+
 function* createAppWorker(options) {
 	try {
-		const response = yield call(getCreateApp, options);
+		const user = yield select(getUser);
+		const response = yield call(getCreateApp, options, user.authToken);
 		yield put(appendApp({ [options.appName]: String(response.id) }));
-    yield (put(getUserPermissions()));
+		yield put(getUserPermissions());
 		yield put(setCreateApp(response));
 	} catch (e) {
 		yield put(createAppFail(e));

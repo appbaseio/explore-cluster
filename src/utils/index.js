@@ -56,17 +56,16 @@ export async function getAppsOwners() {
 	return data.body;
 }
 
-export async function getCreateApp(options) {
-	const response = await fetch(`${ACC_API}/app/${options.appName}`, {
+export async function getCreateApp(options, authToken) {
+	const response = await fetch(`${ACC_API}/${options.appName}`, {
 		method: 'PUT',
-		credentials: 'include',
 		headers: {
 			'Content-Type': 'application/json',
+			Authorization: `Basic ${authToken}`,
 		},
-		body: JSON.stringify({
-			category: options.category,
-			es_version: options.es_version,
-		}),
+		// body: JSON.stringify({
+		// 	es_version: options.es_version,
+		// }),
 	});
 
 	const data = await response.json();
@@ -74,8 +73,8 @@ export async function getCreateApp(options) {
 		throw new Error(JSON.stringify(data));
 	}
 
-	const { body, message } = data;
-	return { ...body, message };
+	const { body, acknowledged } = data;
+	return { ...body, acknowledged };
 }
 
 // returns the required param from the url

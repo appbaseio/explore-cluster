@@ -3,17 +3,12 @@ import { connect } from 'react-redux';
 import {
  Row, Col, Icon, Modal, Input, Radio, List, Popover, notification,
 } from 'antd';
-import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 import {
 	modalHeading,
 	input,
 	radiobtn,
-	pricebtn,
-	clusterInfo,
-	planDetails,
-	planInfo,
 } from './styles';
 import { validateAppName, validationsList } from '../../utils/helper';
 
@@ -26,9 +21,7 @@ class CreateAppModal extends Component {
 		super(props);
 		this.state = {
 			appName: '',
-			plan: 'free',
 			hasJSON: false,
-			category: 'generic',
 			elasticVersion: '5',
 			validationPopOver: false,
 		};
@@ -39,12 +32,23 @@ class CreateAppModal extends Component {
 		resetApp();
 	}
 
+	componentDidUpdate = () => {
+		const { createdApp, history } = this.props; //eslint-disable-line
+		const { hasJSON, appName } = this.state;
+		if (createdApp.data && createdApp.data.acknowledged) {
+			if (hasJSON) {
+				history.push(`app/${appName}/import`);
+			} else {
+				history.push(`app/${appName}`);
+			}
+		}
+	};
+
 	handleOk = async () => {
-		const { appName, category, elasticVersion } = this.state;
+		const { appName, elasticVersion } = this.state;
 		const { handleCreateApp } = this.props;
 		const options = {
 			appName,
-			category,
 			es_version: elasticVersion,
 		};
 
@@ -77,65 +81,17 @@ class CreateAppModal extends Component {
 		handleModal();
 	};
 
-	handleMenuClick = (e) => {
-		const category = e.key;
-		this.setState({
-			category,
-		});
-	};
-
 	handleValidationPopOver = () => {
 		this.setState(({ validationPopOver }) => ({
 			validationPopOver: !validationPopOver,
 		}));
 	};
 
-	componentDidUpdate = () => {
-		const { createdApp, history } = this.props; //eslint-disable-line
-		const { hasJSON, appName } = this.state;
-		if (createdApp.data && createdApp.data.id) {
-			if (hasJSON) {
-				history.push(`app/${appName}/import`);
-			} else {
-				history.push(`app/${appName}`);
-			}
-		}
-	};
-
-	generateGrid = ({
-		// prettier-ignore
-		type,
-		price,
-		records,
-		calls,
-	}) => (
-		<Row type="flex" justify="space-between">
-			<Col span={4} className={planDetails}>
-				{type}
-			</Col>
-			<Col span={6} className={planDetails}>
-				{price}
-			</Col>
-			<Col span={4} className={planDetails}>
-				{records}
-			</Col>
-			<Col span={4} className={planDetails}>
-				{calls}
-			</Col>
-			<Col className={planInfo}>
-				<a href="https://appbase.io/pricing/" target="_blank" rel="noopener noreferrer">
-					<Icon type="info-circle" />
-				</a>
-			</Col>
-		</Row>
-	);
-
 	render() {
 		const {
 			// prettier-ignore
 			appName,
 			hasJSON,
-			plan,
 			elasticVersion,
 			validationPopOver,
 		} = this.state;
@@ -152,24 +108,9 @@ class CreateAppModal extends Component {
 				onCancel={this.handleCancel}
 				width={600}
 			>
-				<section className={clusterInfo}>
-					<div>
-						<Icon
-							type="info-circle"
-							css={{
-								color: 'rgb(24,144,255)',
-								marginRight: 8,
-							}}
-							theme="filled"
-						/>
-						<span>Alternatively, you can also create a dedicated cluster.</span>
-					</div>
-					<Link to="/clusters">Create a Cluster</Link>
-				</section>
-
 				<div>
 					<Row type="flex" justify="space-between" align="middle">
-						<h3 className={modalHeading}>App Name</h3>
+						<h3 style={{ marginTop: 0 }} className={modalHeading}>App Name</h3>
 						<Popover
 							placement="right"
 							content={(
@@ -206,41 +147,6 @@ class CreateAppModal extends Component {
 							{createdApp.error.actual.message}
 						</div>
 					) : null}
-				</div>
-
-				<div>
-					<h3 className={modalHeading}>Choose Plan</h3>
-					<RadioGroup
-						value={plan}
-						name="plan"
-						onChange={this.handleChange}
-						style={{ width: '100%' }}
-					>
-						<Radio value="free" className={pricebtn}>
-							{this.generateGrid({
-								type: 'Free',
-								price: '$0 per month',
-								records: '10K records',
-								calls: '100K API calls',
-							})}
-						</Radio>
-						<Radio value="bootstrap" className={pricebtn}>
-							{this.generateGrid({
-								type: 'Bootstrap',
-								price: '$29 per month',
-								records: '100K records',
-								calls: '1M API calls',
-							})}
-						</Radio>
-						<Radio value="growth" className={pricebtn}>
-							{this.generateGrid({
-								type: 'Growth',
-								price: '$89 per month',
-								records: '1M records',
-								calls: '10M API calls',
-							})}
-						</Radio>
-					</RadioGroup>
 				</div>
 
 				<div>
