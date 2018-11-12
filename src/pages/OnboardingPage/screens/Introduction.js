@@ -66,36 +66,25 @@ export default class Introduction extends Component {
 				.createApp(value)
 				.then(res => res.json())
 				.then((res) => {
-					if (res.body && res.body.id) {
+					if (res.index) {
 						app = {
 							appName: value,
-							id: res.body.id,
-							password: res.body.password,
-							username: res.body.username,
+							id: value,
 						};
 						appbaseHelpers.updateApp(app);
 						this.props.setAppName(value);
+
+						this.setState(
+							{
+								appId: value,
+							},
+							this.props.nextScreen,
+						);
 					} else {
 						this.setError(
 							'Your app name is not unique. Please try with a different app name.',
 						);
 						this.input.focus();
-					}
-				})
-				.then((res) => {
-					if (app.appName) {
-						appbaseHelpers.getWritePermissions().then((permission) => {
-							app = Object.assign(app, permission);
-							appbaseHelpers.updateApp(app);
-							this.setState(
-								{
-									appId: app.id,
-								},
-								() => {
-									this.props.nextScreen();
-								},
-							);
-						});
 					}
 				})
 				.catch((e) => {

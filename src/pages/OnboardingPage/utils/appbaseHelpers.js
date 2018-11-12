@@ -1,4 +1,6 @@
 import Appbase from 'appbase-js';
+import parser from 'url-parser-lite';
+
 import settings from './settings';
 import mappingObj from './moviesMapping';
 import moviesData from './data';
@@ -15,12 +17,37 @@ const streamingData = {
 	tagline: 'Episode VIII - The Last Jedi',
 };
 
+const getAuthToken = () => {
+	let token = null;
+	try {
+		// eslint-disable-next-line
+		token = JSON.parse(JSON.parse(localStorage.getItem('persist:root')).user).data.authToken;
+	} catch (e) {
+		console.error(e);
+	}
+	return token;
+};
+
+const getCredentials = () => {
+	let username = null;
+	let password = null;
+	try {
+		// eslint-disable-next-line
+		username = JSON.parse(JSON.parse(localStorage.getItem('persist:root')).user).data.username;
+		password = JSON.parse(JSON.parse(localStorage.getItem('persist:root')).user).data.password;
+	} catch (e) {
+		console.error(e);
+	}
+	return { username, password };
+};
+
 class AppbaseUtils {
 	constructor() {
 		this.user = null;
 		this.app = null;
 		this.accountAddress = ACC_API;
 		this.address = SCALR_API;
+		this.authToken = getAuthToken();
 	}
 
 	getApp = () => (this.app ? this.app.id : '');
@@ -28,9 +55,9 @@ class AppbaseUtils {
 	getUser() {
 		return fetch(`${this.accountAddress}/user`, {
 			method: 'GET',
-			credentials: 'include',
 			headers: {
 				'content-type': 'application/json',
+				Authorization: `Basic ${this.authToken}`,
 			},
 		});
 	}
@@ -38,9 +65,9 @@ class AppbaseUtils {
 	logout() {
 		return fetch(`${this.accountAddress}/logout?next=`, {
 			method: 'GET',
-			credentials: 'include',
 			headers: {
 				'content-type': 'application/json',
+				Authorization: `Basic ${this.authToken}`,
 			},
 		});
 	}
@@ -50,14 +77,16 @@ class AppbaseUtils {
 		return new Promise((resolve, reject) => {
 			fetch(`${this.accountAddress}/app/${appId}/permissions`, {
 				method: 'GET',
-				credentials: 'include',
 				headers: {
 					'content-type': 'application/json',
+					Authorization: `Basic ${this.authToken}`,
 				},
 			})
 				.then(res => res.json())
 				.then((data) => {
-					const permissions = data.body.filter(permission => permission.read && permission.write);
+					const permissions = data.body.filter(
+						permission => permission.read && permission.write,
+					);
 					resolve(permissions[0]);
 				})
 				.catch((e) => {
@@ -67,46 +96,42 @@ class AppbaseUtils {
 	}
 
 	createApp(appname) {
-		return fetch(`${this.accountAddress}/app/${appname}`, {
+		return fetch(`${this.accountAddress}/${appname}`, {
 			method: 'PUT',
-			credentials: 'include',
 			headers: {
 				'content-type': 'application/json',
+				Authorization: `Basic ${this.authToken}`,
 			},
-			body: JSON.stringify({
-				es_version: '5',
-			}),
+			// body: JSON.stringify({
+			// 	es_version: '5',
+			// }),
 		});
 	}
 
 	applyAnalyzers = () => {
 		const { appName } = this.app;
-		const credentials = `${this.app.username}:${this.app.password}`;
 
 		return new Promise((resolve, reject) => {
 			fetch(`${this.address}/${appName}/_close`, {
 				method: 'POST',
-				credentials: 'include',
 				headers: {
-					Authorization: `Basic ${btoa(credentials)}`,
+					Authorization: `Basic ${this.authToken}`,
 					'content-type': 'application/json',
 				},
 			})
 				.then(() => {
 					fetch(`${this.address}/${appName}/_settings`, {
 						method: 'PUT',
-						credentials: 'include',
 						headers: {
-							Authorization: `Basic ${btoa(credentials)}`,
+							Authorization: `Basic ${this.authToken}`,
 							'content-type': 'application/json',
 						},
 						body: JSON.stringify(settings),
 					}).then(() => {
 						fetch(`${this.address}/${appName}/_open`, {
 							method: 'POST',
-							credentials: 'include',
 							headers: {
-								Authorization: `Basic ${btoa(credentials)}`,
+								Authorization: `Basic ${this.authToken}`,
 								'content-type': 'application/json',
 							},
 						}).then(() => {
@@ -130,14 +155,12 @@ class AppbaseUtils {
 
 	updateMapping = () => {
 		const type = 'movies';
-		const credentials = `${this.app.username}:${this.app.password}`;
 		this.app.type = type;
 
 		return fetch(`${this.address}/${this.app.appName}/_mapping/${type}?update_all_types=true`, {
 			method: 'POST',
-			credentials: 'include',
 			headers: {
-				Authorization: `Basic ${btoa(credentials)}`,
+				Authorization: `Basic ${this.authToken}`,
 				'content-type': 'application/json',
 			},
 			body: JSON.stringify(mappingObj),
@@ -153,11 +176,12 @@ class AppbaseUtils {
 			finalData.push(indexObj);
 			finalData.push(record);
 		});
+		const { username, password } = getCredentials();
 		this.appbaseRef = Appbase({
 			url: this.address,
 			app: this.app.appName,
-			username: this.app.username,
-			password: this.app.password,
+			username,
+			password,
 		});
 		return new Promise((resolve, reject) => {
 			this.appbaseRef
@@ -174,8 +198,7 @@ class AppbaseUtils {
 		});
 	};
 
-	indexNewData = () =>
-		new Promise((resolve, reject) => {
+	indexNewData = () => new Promise((resolve, reject) => {
 			this.appbaseRef
 				.index({
 					type: this.app.type,
@@ -189,16 +212,21 @@ class AppbaseUtils {
 				});
 		});
 
-	appConfig = () => ({
-		app: this.app.appName,
-		credentials: `${this.app.username}:${this.app.password}`,
-		type: this.app.type,
-	});
+	appConfig = () => {
+		const { username, password } = getCredentials();
+		return {
+			app: this.app.appName,
+			credentials: `${username}:${password}`,
+			type: this.app.type,
+		};
+	};
 
 	createURL(cb) {
+		const { username, password } = getCredentials();
+		const { protocol, host } = parser(SCALR_API);
 		const obj = {
 			appname: this.app.appName,
-			url: `https://${this.app.username}:${this.app.password}@scalr.api.appbase.io`,
+			url: `${protocol}://${username}:${password}@${host}`,
 			selectedType: this.app.type ? [this.app.type] : [],
 		};
 

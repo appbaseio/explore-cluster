@@ -9,6 +9,7 @@ import {
 } from '@appbaseio/reactivesearch';
 
 import appbaseHelpers from '../utils/appbaseHelpers';
+import { SCALR_API } from '../../../constants/config';
 
 const onData = res => ({
 	image: `https://image.tmdb.org/t/p/w92${res.poster_path}`,
@@ -33,9 +34,9 @@ const onData = res => ({
 	),
 });
 
-const renderFilters = fields => {
+const renderFilters = (fields) => {
 	if (fields && fields.length) {
-		return fields.map(field => {
+		return fields.map((field) => {
 			switch (field) {
 				case 'genres': {
 					return (
@@ -96,15 +97,15 @@ const renderFilters = fields => {
 
 const getFields = (fields, suffix) => {
 	let newFields = [];
-	fields.forEach(item => {
-		suffix.forEach(str => {
+	fields.forEach((item) => {
+		suffix.forEach((str) => {
 			newFields = [...newFields, `${item}${str}`];
 		});
 	});
 	return newFields;
 };
 
-const getWeights = fields => {
+const getWeights = (fields) => {
 	const weights = {
 		original_title: 10,
 		'original_title.raw': 10,
@@ -132,6 +133,7 @@ export default class SearchApp extends Component {
 		return (
 			<ReactiveBase
 				{...this.appConfig}
+				url={SCALR_API}
 				className="search-app"
 				theme={{
 					colors: {
