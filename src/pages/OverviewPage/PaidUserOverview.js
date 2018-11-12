@@ -105,17 +105,15 @@ class PaidUserOverview extends React.Component {
 							<StatsBox data={stats} />
 						</Card>
 					</div>
-					<Card css={chart} title="Daily Search Volume">
-						<SearchVolumeChart
-							width={
-								window.innerWidth > 670
-									? window.innerWidth - 670
-									: window.innerWidth - 150
-							}
-							height={210}
-							data={searchVolume}
-						/>
-					</Card>
+					<SearchVolumeChart
+						width={
+							window.innerWidth > 670
+								? window.innerWidth - 690
+								: window.innerWidth - 150
+						}
+						height={210}
+						data={searchVolume}
+					/>
 				</Flex>
 				<Flex css={results}>
 					<div css={searchCls}>
