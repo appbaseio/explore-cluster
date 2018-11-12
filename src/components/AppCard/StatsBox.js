@@ -4,18 +4,43 @@ import { css } from 'react-emotion';
 
 const title = css`
 	font-weight: bold;
-	font-size: 14px;
+	font-size: 13px;
 	text-transform: uppercase;
-	color: #888;
+	color: #aaa;
+	margin-top: 2px;
+	margin-bottom: 18px;
 `;
 
 const stats = css`
-	font-size: 14px;
+	font-size: 16px;
 	text-transform: capitalize;
-	margin-bottom: 16px;
 `;
 
-const blackList = ['index', 'uuid'];
+const colorBar = css`
+	background-color: yellow;
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	display: block;
+	margin: 6px 0;
+`;
+
+const renderItem = (item) => {
+	switch (item) {
+		case 'pri':
+			return 'shards';
+		case 'rep':
+			return 'replicas';
+		case 'docs.count':
+			return 'total records';
+		case 'store.size':
+			return 'size';
+		default:
+			return item;
+	}
+};
+
+const blackList = ['index', 'uuid', 'docs.deleted', 'pri.store.size'];
 
 export default function StatsBox({ data }) {
 	const noData = (
@@ -36,8 +61,14 @@ export default function StatsBox({ data }) {
 		.filter(item => !blackList.includes(item))
 		.map(item => (
 			<div>
-				<div className={title}>{item.split('.').join(' ')}</div>
-				<div className={stats}>{data[item]}</div>
+				<div className={stats}>
+					{item === 'health' ? (
+						<span css={{ backgroundColor: data[item] }} className={colorBar} />
+					) : (
+						data[item]
+					)}
+				</div>
+				<div className={title}>{renderItem(item)}</div>
 			</div>
 		));
 
