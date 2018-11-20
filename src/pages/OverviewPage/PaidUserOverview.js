@@ -74,18 +74,16 @@ class PaidUserOverview extends React.Component {
 			<Container>
 				<Flex css={main} justifyContent="space-between">
 					<div css={usage}>
-						<Card
-							title="Overview"
-							css={{
+						<StatsBox
+							style={{
 								minWidth: 320,
 								minHeight: '100%',
 								paddingBottom: '15px',
 								overflow: 'hidden',
 							}}
-							bodyStyle={{ paddingBottom: '40px' }}
-						>
-							<StatsBox data={stats} />
-						</Card>
+							title="Overview"
+							data={stats}
+						/>
 					</div>
 					<SearchVolumeChart
 						width={

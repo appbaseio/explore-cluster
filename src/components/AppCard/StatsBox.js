@@ -1,8 +1,10 @@
 import React from 'react';
-import { Row, Col } from 'antd';
+import {
+ Row, Col, Card, Tag,
+} from 'antd';
 import { css } from 'react-emotion';
 
-const title = css`
+const titleStyles = css`
 	font-weight: bold;
 	font-size: 13px;
 	text-transform: uppercase;
@@ -40,9 +42,16 @@ const renderItem = (item) => {
 	}
 };
 
-const blackList = ['index', 'uuid', 'docs.deleted', 'pri.store.size'];
+const blackList = ['index', 'uuid', 'docs.deleted', 'pri.store.size', 'health', 'status'];
 
-export default function StatsBox({ data }) {
+const flex = {
+	display: 'flex',
+	flexDirection: 'row',
+	justifyContent: 'space-between',
+	alignItems: 'center',
+};
+
+export default function StatsBox({ data, title, style = {} }) {
 	const noData = (
 		<div
 			css={{
@@ -55,32 +64,44 @@ export default function StatsBox({ data }) {
 		</div>
 	);
 
-	if (typeof data !== 'object') return noData;
-
-	const cols = Object.keys(data)
-		.filter(item => !blackList.includes(item))
-		.map(item => (
-			<div>
-				<div className={stats}>
-					{item === 'health' ? (
-						<span css={{ backgroundColor: data[item] }} className={colorBar} />
-					) : (
-						data[item]
-					)}
+	let cols = [];
+	if (typeof data === 'object') {
+		cols = Object.keys(data)
+			.filter(item => !blackList.includes(item))
+			.map(item => (
+				<div>
+					<div className={stats}>{data[item]}</div>
+					<div className={titleStyles}>{renderItem(item)}</div>
 				</div>
-				<div className={title}>{renderItem(item)}</div>
-			</div>
-		));
+			));
+	}
 
-	if (!cols.length) return noData;
+	const cardTitle = (
+		<div css={flex}>
+			<span css={flex}>
+				{title} &nbsp;&nbsp;
+				<Tag>{data.status}</Tag>
+			</span>
+			<span css={{ backgroundColor: data.health }} className={colorBar} />
+		</div>
+	);
 
 	return (
-		<Row gutter={8}>
-			{cols.map((col, index) => (
-				<Col key={`stats-${index + 1}`} span={12}>
-					{col}
-				</Col>
-			))}
-		</Row>
+		<Card
+			title={cardTitle}
+			style={{
+				overflow: 'hidden',
+				...style,
+			}}
+		>
+			<Row gutter={8}>
+				{cols.length ? null : noData}
+				{cols.map((col, index) => (
+					<Col key={`stats-${index + 1}`} span={12}>
+						{col}
+					</Col>
+				))}
+			</Row>
+		</Card>
 	);
 }
