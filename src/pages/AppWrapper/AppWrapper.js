@@ -7,7 +7,6 @@ import { connect } from 'react-redux';
 import get from 'lodash/get';
 import AppLayout from '../../components/AppLayout';
 import { setCurrentApp } from '../../batteries/modules/actions';
-import UpgradeButton from '../../components/Button/UpgradeBtnSidebar';
 import Logo from '../../components/Logo';
 
 import { getParam } from '../../utils';
@@ -47,12 +46,7 @@ const routes = {
 		icon: 'key',
 		menu: [
 			{ label: 'API Credentials', link: 'credentials' },
-			{ label: 'Sharing Settings', link: 'share-settings' },
 		],
-	},
-	Billing: {
-		icon: 'credit-card',
-		link: 'billing',
 	},
 };
 
@@ -236,7 +230,6 @@ class AppWrapper extends Component {
 								</Menu.Item>
 							);
 						})}
-						{!collapsed && <UpgradeButton link={`/app/${appName}/billing`} />}
 					</Menu>
 				</Sider>
 				<AppLayout collapsed={collapsed} {...this.props} />
