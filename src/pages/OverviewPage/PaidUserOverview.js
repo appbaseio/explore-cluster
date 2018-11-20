@@ -10,9 +10,8 @@ import Flex from '../../batteries/components/shared/Flex';
 import DemoCards from '../../components/DemoCard';
 import Container from '../../components/Container';
 import { getAppAnalyticsByName } from '../../batteries/modules/selectors';
-import Loader from '../../batteries/components/shared/Loader/Spinner';
 import { exampleConfig } from '../../constants/config';
-import { getAppMetrics, getAppAnalytics } from '../../batteries/modules/actions';
+import { getAppAnalytics } from '../../batteries/modules/actions';
 import { getFilteredResults } from '../../batteries/utils/heplers';
 import StatsBox from '../../components/AppCard/StatsBox';
 import Searches from '../../batteries/components/analytics/components/Searches';
@@ -21,19 +20,6 @@ import RequestLogs from '../../batteries/components/analytics/components/Request
 const main = css`
 	${mediaKey.small} {
 		flex-direction: column;
-	}
-`;
-const chart = css`
-	margin-left: 10px;
-	width: 100%;
-	${mediaKey.small} {
-		height: 300px;
-		margin-left: 0;
-		margin-top: 20px;
-		.ant-card-body {
-			padding-left: 0px;
-			padding-right: 0px;
-		}
 	}
 `;
 const usage = css`
@@ -66,8 +52,7 @@ const noResultsCls = css`
 `;
 class PaidUserOverview extends React.Component {
 	componentDidMount() {
-		const { fetchAppMetrics, fetchAppAnalytics } = this.props;
-		fetchAppMetrics();
+		const { fetchAppAnalytics } = this.props;
 		fetchAppAnalytics();
 	}
 
@@ -78,16 +63,13 @@ class PaidUserOverview extends React.Component {
 	render() {
 		const {
 			// prettier-ignore
-			isFetching,
+			// isFetching,
 			popularSearches,
 			noResults,
 			appName,
 			searchVolume,
 			stats,
 		} = this.props;
-		if (isFetching) {
-			return <Loader />;
-		}
 		return (
 			<Container>
 				<Flex css={main} justifyContent="space-between">
@@ -147,9 +129,7 @@ PaidUserOverview.defaultProps = {
 	noResults: [],
 };
 PaidUserOverview.propTypes = {
-	fetchAppMetrics: PropTypes.func.isRequired,
 	fetchAppAnalytics: PropTypes.func.isRequired,
-	isFetching: PropTypes.bool.isRequired,
 	appName: PropTypes.string.isRequired,
 	searchVolume: PropTypes.array,
 	popularSearches: PropTypes.array,
@@ -157,19 +137,24 @@ PaidUserOverview.propTypes = {
 	stats: PropTypes.object.isRequired,
 };
 const mapStateToProps = (state) => {
-	const analytics = getAppAnalyticsByName(state);
+	const analyticsArr = getAppAnalyticsByName(state) || [];
+	let analytics = {};
+	analyticsArr.forEach((item) => {
+		analytics = {
+			...analytics,
+			...item,
+		};
+	});
 	const appName = get(state, '$getCurrentApp.name');
 	return {
-		isFetching: get(state, '$getAppMetrics.isFetching'),
 		appName,
 		stats: get(state, `apps.data['${appName}']`, {}),
-		popularSearches: get(analytics, 'popularSearches'),
-		noResults: get(analytics, 'noResultSearches'),
-		searchVolume: get(analytics, 'searchVolume'),
+		popularSearches: get(analytics, 'popular_searches'),
+		noResults: get(analytics, 'no_results_searches'),
+		searchVolume: get(analytics, 'search_volume'),
 	};
 };
 const mapDispatchToProps = dispatch => ({
-	fetchAppMetrics: (appId, appName) => dispatch(getAppMetrics(appId, appName)),
 	fetchAppAnalytics: (appName, plan) => dispatch(getAppAnalytics(appName, plan)),
 });
 export default connect(
