@@ -2,9 +2,9 @@ import {
  takeEvery, call, put, select,
 } from 'redux-saga/effects';
 import { APPS } from '../constants';
-import { getESIndices, getAppsOwners } from '../utils';
+import { getESIndices } from '../utils';
 import {
- loadAppsSuccess, loadAppsError, setAppsOwners, setAppsOwnersError,
+ loadAppsSuccess, loadAppsError,
 } from '../actions';
 
 const getUser = state => state.user.data;
@@ -19,16 +19,6 @@ function* appWorker() {
 	}
 }
 
-function* appsOwnersWorker() {
-	try {
-		const owners = yield call(getAppsOwners);
-		yield put(setAppsOwners(owners));
-	} catch (e) {
-		yield put(setAppsOwnersError(e));
-	}
-}
-
 export default function* appSaga() {
-	yield takeEvery(APPS.LOAD_OWNERS, appsOwnersWorker);
 	yield takeEvery(APPS.LOAD, appWorker);
 }

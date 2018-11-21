@@ -13,8 +13,7 @@ import CreateAppModal from './CreateAppModal';
 import AppCard from '../../components/AppCard';
 import Loader from '../../components/Loader';
 
-import { getAppsOwners as getOwners, loadApps } from '../../actions';
-// import { getUserPermissions } from '../../batteries/modules/actions';
+import { loadApps } from '../../actions';
 import { mediaKey } from '../../utils/media';
 
 const link = css`
@@ -32,10 +31,13 @@ const link = css`
 `;
 
 class HomePage extends Component {
-	constructor() {
-		super();
+	constructor(props) {
+		super(props);
 
-		this.sortOptions = [{ label: 'Name', key: 'name' }, { label: 'Most Recent', key: 'time' }];
+		this.sortOptions = [
+			{ label: 'Name', key: 'name' },
+			{ label: 'Most Recent', key: 'time' },
+		];
 		this.state = {
 			showModal: false, // modal for create new app
 		};
@@ -45,14 +47,8 @@ class HomePage extends Component {
 		const {
 			// prettier-ignore
 			apps,
-			// permissions,
-			// fetchPermissions,
 			fetchApps,
 		} = this.props;
-
-		// if (!permissions) {
-		// 	fetchPermissions();
-		// }
 
 		if (!apps.data && !apps.isFetching) {
 			fetchApps();
@@ -214,8 +210,6 @@ HomePage.propTypes = {
 	username: PropTypes.string.isRequired,
 	apps: PropTypes.object.isRequired,
 	history: PropTypes.object.isRequired,
-	// permissions: PropTypes.object, // eslint-disable-line
-	// fetchPermissions: PropTypes.func.isRequired,
 	fetchApps: PropTypes.func.isRequired,
 };
 
@@ -223,12 +217,9 @@ const mapStateToProps = state => ({
 	user: get(state, 'user.data.username'),
 	username: get(state, 'user.data.username'),
 	apps: get(state, 'apps'),
-	// permissions: get(state, '$getAppPermissions.results'),
 });
 
 const mapDispatchToProps = dispatch => ({
-	getAppsOwners: () => dispatch(getOwners()),
-	// fetchPermissions: () => dispatch(getUserPermissions()),
 	fetchApps: () => dispatch(loadApps()),
 });
 

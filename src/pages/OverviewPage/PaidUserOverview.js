@@ -2,7 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import { css } from 'react-emotion';
-import { Card } from 'antd';
 import PropTypes from 'prop-types';
 import { mediaKey } from '../../utils/media';
 import SearchVolumeChart from '../../batteries/components/shared/Chart/SearchVolume';
@@ -11,6 +10,7 @@ import DemoCards from '../../components/DemoCard';
 import Container from '../../components/Container';
 import { getAppAnalyticsByName } from '../../batteries/modules/selectors';
 import { exampleConfig } from '../../constants/config';
+import { loadApps } from '../../actions';
 import { getAppAnalytics } from '../../batteries/modules/actions';
 import { getFilteredResults } from '../../batteries/utils/heplers';
 import StatsBox from '../../components/AppCard/StatsBox';
@@ -52,8 +52,10 @@ const noResultsCls = css`
 `;
 class PaidUserOverview extends React.Component {
 	componentDidMount() {
-		const { fetchAppAnalytics } = this.props;
+		const { fetchAppAnalytics, stats, fetchApps } = this.props;
 		fetchAppAnalytics();
+
+		if (!Object.keys(stats).length) fetchApps();
 	}
 
 	redirectTo = (url) => {
@@ -133,6 +135,7 @@ PaidUserOverview.propTypes = {
 	popularSearches: PropTypes.array,
 	noResults: PropTypes.array,
 	stats: PropTypes.object.isRequired,
+	fetchApps: PropTypes.func.isRequired,
 };
 const mapStateToProps = (state) => {
 	const analyticsArr = getAppAnalyticsByName(state) || [];
@@ -154,6 +157,7 @@ const mapStateToProps = (state) => {
 };
 const mapDispatchToProps = dispatch => ({
 	fetchAppAnalytics: (appName, plan) => dispatch(getAppAnalytics(appName, plan)),
+	fetchApps: () => dispatch(loadApps()),
 });
 export default connect(
 	mapStateToProps,
