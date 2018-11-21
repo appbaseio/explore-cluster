@@ -2,11 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { css } from 'emotion';
 import {
-	Icon, Modal, Input, Checkbox,
+	Icon, Modal, Input,
 	Radio, Tooltip, Button, Select,
 } from 'antd';
 import {
-	FormBuilder, Validators, FieldGroup, FieldControl,
+	FieldArray, FormBuilder, FormArray, Validators, FieldGroup, FieldControl, FormControl, FormGroup,
 } from 'react-reactive-form';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
@@ -20,14 +20,12 @@ import { getAppMappings } from '../../batteries/modules/actions';
 import { createCredentials as Messages, hoverMessage } from '../../utils/messages';
 import { getTraversedMappingsByAppName, getAppPermissionsByName } from '../../batteries/modules/selectors';
 import {
-	Types, getDefaultAclOptionsByPlan,
-	aclOptionsLabel, getAclOptionsByPlan, isNegative,
+	Types, getDefaultAclOptionsByPlan, isNegative, defaultRateLimits,
 } from './utils';
+import Acl from './Acl';
 // import WhiteList from './WhiteList';
 
-const { Option } = Select;
-const CheckboxGroup = Checkbox.Group;
-
+// const { Option } = Select;
 const modal = css`
 	.ant-modal-content {
 		width: 580px;
@@ -50,12 +48,18 @@ class CreateCredentials extends React.Component {
 		this.form = FormBuilder.group({
 			description: '',
 			operationType: [Types.read, Validators.required],
-			acl: [{ value: getDefaultAclOptionsByPlan(props.plan), disabled: !props.isPaidUser },
-				Validators.required],
+			acl: new FormArray(getDefaultAclOptionsByPlan(props.plan).map(acl => new FormGroup({
+				acl: new FormControl(acl),
+				tag: new FormControl(true),
+				rateLimit: new FormControl(defaultRateLimits[acl]),
+			}))),
+
+			// [{ value: getDefaultAclOptionsByPlan(props.plan), disabled: !props.isPaidUser },
+			// 	Validators.required],
 			// referers: [{ value: ['*'], disabled: !props.isPaidUser }],
 			// sources: [{ value: ['0.0.0.0/0'], disabled: !props.isPaidUser }],
-			include_fields: [{ value: ['*'], disabled: false }],
-			exclude_fields: [{ value: [], disabled: true }],
+			// include_fields: [{ value: ['*'], disabled: false }],
+			// exclude_fields: [{ value: [], disabled: true }],
 			indices: [{ value: ['*'], disabled: false }],
 			ip_limit: [
 				{ value: 7200, disabled: !props.isPaidUser },
@@ -70,25 +74,25 @@ class CreateCredentials extends React.Component {
 		if (disabled) {
 			this.form.disable();
 		} else {
-			const includeFieldsHandler = this.form.get('include_fields');
-			const excludeFieldsHandler = this.form.get('exclude_fields');
+			// const includeFieldsHandler = this.form.get('include_fields');
+			// const excludeFieldsHandler = this.form.get('exclude_fields');
 			const indicesHandler = this.form.get('indices');
-			includeFieldsHandler.valueChanges.subscribe((value) => {
-				if (value && value.includes('*')) {
-					excludeFieldsHandler.disable({ emitEvent: false });
-					excludeFieldsHandler.reset([]);
-				} else {
-					excludeFieldsHandler.enable({ emitEvent: false });
-				}
-			});
-			excludeFieldsHandler.valueChanges.subscribe((value) => {
-				if (value && value.includes('*')) {
-					includeFieldsHandler.disable({ emitEvent: false });
-					includeFieldsHandler.reset([]);
-				} else {
-					includeFieldsHandler.enable({ emitEvent: false });
-				}
-			});
+			// includeFieldsHandler.valueChanges.subscribe((value) => {
+			// 	if (value && value.includes('*')) {
+			// 		excludeFieldsHandler.disable({ emitEvent: false });
+			// 		excludeFieldsHandler.reset([]);
+			// 	} else {
+			// 		excludeFieldsHandler.enable({ emitEvent: false });
+			// 	}
+			// });
+			// excludeFieldsHandler.valueChanges.subscribe((value) => {
+			// 	if (value && value.includes('*')) {
+			// 		includeFieldsHandler.disable({ emitEvent: false });
+			// 		includeFieldsHandler.reset([]);
+			// 	} else {
+			// 		includeFieldsHandler.enable({ emitEvent: false });
+			// 	}
+			// });
 			indicesHandler.valueChanges.subscribe((value) => {
 				if (value && value.includes('*')) {
 					indicesHandler.disable({ emitEvent: false });
@@ -121,8 +125,8 @@ class CreateCredentials extends React.Component {
 	}
 
 	componentWillUnmount() {
-		this.form.get('include_fields').valueChanges.unsubscribe();
-		this.form.get('exclude_fields').valueChanges.unsubscribe();
+		// this.form.get('include_fields').valueChanges.unsubscribe();
+		// this.form.get('exclude_fields').valueChanges.unsubscribe();
 		this.form.get('indices').valueChanges.unsubscribe();
 	}
 
@@ -152,7 +156,7 @@ class CreateCredentials extends React.Component {
 
 	render() {
 		const {
- show, handleCancel, isPaidUser, isSubmitting, plan, mappings, disabled,
+ show, handleCancel, isPaidUser, isSubmitting, disabled,
  saveButtonText, isLoadingMappings, shouldHaveEmailField, initialValues,
 } = this.props;
 		return (
@@ -277,7 +281,19 @@ class CreateCredentials extends React.Component {
 										</div>
 									</div>
 								)}
-								<FieldControl
+								<FieldArray
+									name="acl"
+									render={control => (
+										<Grid
+											label="Acls"
+											toolTipMessage={Messages.acls}
+											component={(
+												<Acl control={control} />
+											)}
+										/>
+									)}
+								/>
+								{/* <FieldControl
 									name="acl"
 									render={({ handler }) => {
 										const inputHandler = handler();
@@ -286,20 +302,21 @@ class CreateCredentials extends React.Component {
 												label="ACLs"
 												toolTipMessage={Messages.acls}
 												component={(
-													<CheckboxGroup
-														css="label { font-weight: 100 }"
-														{...inputHandler}
-														options={getAclOptionsByPlan(plan).map(o => aclOptionsLabel[o])}
-														value={inputHandler.value.map(o => aclOptionsLabel[o])}
-														onChange={(value) => {
-															inputHandler.onChange(value.map(v => v.toLowerCase()));
-														}}
-													/>
+
+													// <CheckboxGroup
+													// 	css="label { font-weight: 100 }"
+													// 	{...inputHandler}
+													// 	options={getAclOptionsByPlan(plan).map(o => aclOptionsLabel[o])}
+													// 	value={inputHandler.value.map(o => aclOptionsLabel[o])}
+													// 	onChange={(value) => {
+													// 		inputHandler.onChange(value.map(v => v.toLowerCase()));
+													// 	}}
+													// />
 												)}
 											/>
 										);
 									}}
-								/>
+								/> */}
 								{/* <Grid label="Security" toolTipMessage={Messages.security} />
 								<FieldControl
 									name="referers"
@@ -372,7 +389,7 @@ class CreateCredentials extends React.Component {
 										<i className="fas fa-info-circle" />
 									</Tooltip>
 								</div>
-								<FieldControl
+								{/* <FieldControl
 									strict={false}
 									name="include_fields"
 									render={({ handler }) => {
@@ -401,11 +418,6 @@ class CreateCredentials extends React.Component {
 																			title={v}
 																		>
 																			{v}
-																			{/* <span
-																				css={styles.fieldBadge}
-																			>
-																				{i}
-																			</span> */}
 																		</Option>
 																	);
 																}
@@ -443,11 +455,6 @@ class CreateCredentials extends React.Component {
 																	return (
 																		<Option key={v}>
 																			{v}
-																			{/* <span
-																				css={styles.fieldBadge}
-																			>
-																				{i}
-																			</span> */}
 																		</Option>
 																	);
 																}
@@ -458,7 +465,7 @@ class CreateCredentials extends React.Component {
 											/>
 										);
 									}}
-								/>
+								/> */}
 								<FieldControl
 									name="ip_limit"
 									render={({ handler, hasError }) => (
@@ -540,8 +547,8 @@ CreateCredentials.propTypes = {
 		acl: PropTypes.arrayOf(PropTypes.string),
 		// referers: PropTypes.arrayOf(PropTypes.string),
 		// sources: PropTypes.arrayOf(PropTypes.string),
-		include_fields: PropTypes.arrayOf(PropTypes.string),
-		exclude_fields: PropTypes.arrayOf(PropTypes.string),
+		// include_fields: PropTypes.arrayOf(PropTypes.string),
+		// exclude_fields: PropTypes.arrayOf(PropTypes.string),
 		ip_limit: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 		ttl: PropTypes.number,
 		meta: PropTypes.object,

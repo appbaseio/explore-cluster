@@ -75,6 +75,18 @@ export const Types = {
 		write: true,
 	},
 };
+export const defaultRateLimits = {
+	docs: 0,
+	search: 0,
+	indices: 0,
+	cat: 0,
+	clusters: 0,
+	misc: 0,
+	user: 0,
+	permission: 0,
+	analytics: 0,
+	streams: 0,
+};
 // Acl options
 export const aclOptions = [
 	'docs',
