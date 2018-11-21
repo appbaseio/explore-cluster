@@ -1,7 +1,14 @@
-export const ACC_API = 'http://localhost:8000';
-export const SCALR_API = 'http://localhost:8000';
-// export const ACC_API = 'https://accapi-staging.bottleneck.io';
-// export const SCALR_API = 'https://api-staging.bottleneck.io';
+const getURL = () => {
+	let url = localStorage.getItem('url');
+	const params = new URLSearchParams(window.location.search);
+	if (!url) {
+		url = params.has('url') ? params.get('url') : 'nulall';
+	}
+	return url === 'null' ? 'http://localhost:8000' : url;
+};
+
+export const ACC_API = getURL();
+export const SCALR_API = getURL();
 export const SCALR_URL = 'scalr.api.appbase.io';
 export const IMPORTER_LINK = 'https://importer.appbase.io/?app=';
 

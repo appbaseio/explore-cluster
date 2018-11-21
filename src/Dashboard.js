@@ -33,6 +33,10 @@ class Dashboard extends Component {
 	componentDidMount() {
 		const { loadArcUser } = this.props;
 		const params = new URLSearchParams(window.location.search);
+		if (params.has('url')) {
+			const url = params.get('url');
+			localStorage.setItem('url', url);
+		}
 		if (params.has('username') && params.has('password')) {
 			const username = params.get('username');
 			const password = params.get('password');
