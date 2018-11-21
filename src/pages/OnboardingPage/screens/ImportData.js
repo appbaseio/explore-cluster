@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Icon } from 'antd';
+import parser from 'url-parser-lite';
 
 import Footer from '../components/Footer';
 import Loader from '../components/Loader';
@@ -84,10 +85,10 @@ export default class Introduction extends Component {
 			.then(() => {
 				appbaseHelpers.createURL(this.setURL);
 			})
-			.catch(e => {
+			.catch((e) => {
 				if (
-					e._bodyInit ===
-					'{"error":{"root_cause":[{"type":"parse_exception","reason":"request body is required"}],"type":"parse_exception","reason":"request body is required"},"status":400}'
+					e._bodyInit
+					=== '{"error":{"root_cause":[{"type":"parse_exception","reason":"request body is required"}],"type":"parse_exception","reason":"request body is required"},"status":400}'
 				) {
 					appbaseHelpers.createURL(this.setURL);
 				}
@@ -115,7 +116,7 @@ export default class Introduction extends Component {
 		</div>
 	);
 
-	setURL = url => {
+	setURL = (url) => {
 		this.setState({
 			url,
 		});
@@ -193,8 +194,7 @@ export default class Introduction extends Component {
 									>
 										REST based APIs
 									</a>{' '}
-									enable indexing data in a programming language
-									of your choice.
+									enable indexing data in a programming language of your choice.
 								</p>
 							</div>
 						</div>
@@ -214,6 +214,17 @@ export default class Introduction extends Component {
 
 	render() {
 		if (this.state.layout === 0) return this.renderImportContent();
+
+		const { url } = this.state;
+		let iframeURL = null;
+		if (url) {
+			const config = JSON.parse(url);
+			const { protocol, host, auth } = parser(config.url);
+			const dejavuAddress = `${protocol}://${auth}@${host}`;
+			iframeURL = `https://dejavu.appbase.io/?appname=${
+				config.appname
+			}&url=${dejavuAddress}&mode=view&sidebar=false&appswitcher=false`;
+		}
 
 		return (
 			<div>
@@ -236,16 +247,14 @@ export default class Introduction extends Component {
 						)}
 					</div>
 				</div>
-				{this.state.url ? (
+				{iframeURL ? (
 					<div>
 						<iframe
-							src={`https://opensource.appbase.io/dejavu/live/#?app=${
-								this.state.url
-							}&hf=false&subscribe=false&sidebar=false`}
 							height="600px"
 							width="100%"
-							frameBorder="0"
 							title="dejavu"
+							src={iframeURL}
+							frameBorder="0"
 							style={{ marginTop: '-10px' }}
 							onLoad={this.hideLoader}
 						/>
