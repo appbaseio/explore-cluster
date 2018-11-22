@@ -2,7 +2,7 @@ const getURL = () => {
 	let url = localStorage.getItem('url');
 	const params = new URLSearchParams(window.location.search);
 	if (!url) {
-		url = params.has('url') ? params.get('url') : 'nulall';
+		url = params.has('url') ? params.get('url') : 'null';
 	}
 	return url === 'null' ? 'http://localhost:8000' : url;
 };
