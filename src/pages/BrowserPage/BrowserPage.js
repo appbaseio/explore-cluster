@@ -42,9 +42,9 @@ class BrowserPage extends Component {
 		const { appName, credentials, isCluster } = this.props;
 		const { protocol, host } = URL(SCALR_API);
 		const url = `${protocol}://${credentials}@${host}`;
-		const iframeURL = `https://dejavu.appbase.io/?${
-			isCluster ? '' : `appname=${appName}&`
-		}url=${url}&mode=view&sidebar=false&appswitcher=false`;
+		const iframeURL = `https://dejavu.appbase.io/?appname=${
+			isCluster ? '*' : appName
+		}&url=${url}&mode=view&sidebar=false&appswitcher=false`;
 
 		return (
 			<section>
