@@ -22,7 +22,6 @@ class CreateAppModal extends Component {
 		this.state = {
 			appName: '',
 			hasJSON: false,
-			elasticVersion: '5',
 			validationPopOver: false,
 		};
 	}
@@ -45,11 +44,10 @@ class CreateAppModal extends Component {
 	};
 
 	handleOk = async () => {
-		const { appName, elasticVersion } = this.state;
+		const { appName } = this.state;
 		const { handleCreateApp } = this.props;
 		const options = {
 			appName,
-			es_version: elasticVersion,
 		};
 
 		const isValid = validateAppName(appName);
@@ -92,7 +90,6 @@ class CreateAppModal extends Component {
 			// prettier-ignore
 			appName,
 			hasJSON,
-			elasticVersion,
 			validationPopOver,
 		} = this.state;
 		const { createdApp, showModal } = this.props;
@@ -162,24 +159,6 @@ class CreateAppModal extends Component {
 						</Radio>
 					</RadioGroup>
 				</div>
-
-				<Row>
-					<Col span={14}>
-						<h3 className={modalHeading}>Pick Your Elasticsearch Version</h3>
-						<RadioGroup
-							value={elasticVersion}
-							name="elasticVersion"
-							onChange={this.handleChange}
-						>
-							<Radio className={radiobtn} value="5">
-								5
-							</Radio>
-							<Radio className={radiobtn} value="6">
-								6
-							</Radio>
-						</RadioGroup>
-					</Col>
-				</Row>
 			</Modal>
 		);
 	}
