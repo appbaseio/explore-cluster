@@ -4,9 +4,9 @@ import { USER } from '../constants';
 import { getUser } from '../utils';
 import { setUser, loadApps, setUserError } from '../actions';
 
-function* authWorker(username, password) {
+function* authWorker(username, password, url) {
 	try {
-		const user = yield call(getUser, username, password);
+		const user = yield call(getUser, username, password, url);
 		yield put(setUser(user));
 		yield put(loadApps());
 	} catch (e) {
@@ -16,5 +16,5 @@ function* authWorker(username, password) {
 
 export default function* authSaga() {
 	const { payload } = yield take(USER.LOAD);
-	yield call(authWorker, payload.username, payload.password);
+	yield call(authWorker, payload.username, payload.password, payload.url);
 }

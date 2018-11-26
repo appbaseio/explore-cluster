@@ -2,8 +2,8 @@
 import { USER, APPS, CREATE_APP } from '../constants';
 import { createAction } from '../batteries/modules/actions/utils';
 
-export function loadUser(username: string, password: string): Object {
-	return createAction(USER.LOAD, { username, password }, null, null);
+export function loadUser(username: string, password: string, url?: string): Object {
+	return createAction(USER.LOAD, { username, password, url }, null, null);
 }
 
 export function setUser(user: Object): Object {

@@ -1,8 +1,9 @@
 import { ACC_API } from '../constants/config';
 
-export async function getUser(username, password) {
+export async function getUser(username, password, url) {
+	const api = url || ACC_API;
 	const authToken = btoa(`${username}:${password}`);
-	const response = await fetch(`${ACC_API}/_user`, {
+	const response = await fetch(`${api}/_user`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Basic ${authToken}`,
