@@ -125,7 +125,7 @@ class CreateAppModal extends Component {
 						</Popover>
 					</Row>
 					<p css={{ fontSize: 14, margin: '-4px 0 8px 0', lineHeight: '20px' }}>
-						App names are unique across appbase.io and should be lowercase. Click
+						App names are unique across the cluster and should use lowercase alphabets. Click
 						<span style={{ color: '#1890ff' }} onClick={this.handleValidationPopOver}>
 							{' '}
 							here

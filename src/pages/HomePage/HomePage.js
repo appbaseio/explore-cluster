@@ -34,10 +34,7 @@ class HomePage extends Component {
 	constructor(props) {
 		super(props);
 
-		this.sortOptions = [
-			{ label: 'Name', key: 'name' },
-			{ label: 'Most Recent', key: 'time' },
-		];
+		this.sortOptions = [{ label: 'Name', key: 'name' }, { label: 'Most Recent', key: 'time' }];
 		this.state = {
 			showModal: false, // modal for create new app
 		};
@@ -111,11 +108,7 @@ class HomePage extends Component {
 								to={`/app/${name}/overview`}
 								css={{ marginBottom: 20, display: 'block' }}
 							>
-								<AppCard
-									key={name}
-									title={title}
-									data={apps.data[name]}
-								/>
+								<AppCard key={name} title={title} data={apps.data[name]} />
 							</Link>
 						</Col>
 					);
@@ -126,9 +119,7 @@ class HomePage extends Component {
 
 	render() {
 		const { showModal } = this.state;
-		const { username, history } = this.props;
-
-		const firstName = username ? username.split(' ')[0] : 'Bud';
+		const { history } = this.props;
 
 		return (
 			<Fragment>
@@ -140,7 +131,7 @@ class HomePage extends Component {
 					<Header>
 						<Row type="flex" justify="space-between" gutter={16}>
 							<Col lg={18}>
-								<h2>Howdy, {firstName}. Welcome to your dashboard!</h2>
+								<h2>Howdy, welcome to your dashboard!</h2>
 
 								<Row>
 									<Col lg={18}>
@@ -207,7 +198,6 @@ class HomePage extends Component {
 }
 
 HomePage.propTypes = {
-	username: PropTypes.string.isRequired,
 	apps: PropTypes.object.isRequired,
 	history: PropTypes.object.isRequired,
 	fetchApps: PropTypes.func.isRequired,
@@ -215,7 +205,6 @@ HomePage.propTypes = {
 
 const mapStateToProps = state => ({
 	user: get(state, 'user.data.username'),
-	username: get(state, 'user.data.username'),
 	apps: get(state, 'apps'),
 });
 

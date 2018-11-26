@@ -8,9 +8,9 @@ import { IMPORTER_LINK } from '../../constants/config';
 
 function getLink() {
 	const parameters = {
-		platform: 'appbase',
+		platform: 'elasticsearch',
 	};
-	return `${IMPORTER_LINK}${JSON.stringify(parameters)}`;
+	return `${IMPORTER_LINK}${JSON.stringify(parameters)}&header=false`;
 }
 
 const ImporterPage = () => (
