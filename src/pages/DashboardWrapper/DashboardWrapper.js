@@ -7,6 +7,7 @@ import Loadable from 'react-loadable';
 
 import Loader from '../../components/Loader';
 import AppHeader from '../../components/AppHeader';
+import Logo from '../../components/Logo';
 import { breakpoints } from '../../utils/media';
 
 const NoMatch = Loadable({
@@ -109,6 +110,15 @@ class DashboardWrapper extends Component {
 							});
 						}}
 					>
+						<Menu.Item style={{ margin: '15px auto' }}>
+							<Link to="/">
+								{collapsed ? (
+									<Logo type="small" width={20} />
+								) : (
+									<Logo type="white" width={160} />
+								)}
+							</Link>
+						</Menu.Item>
 						{Object.keys(routes).map((route) => {
 							if (routes[route].menu) {
 								const Title = (
