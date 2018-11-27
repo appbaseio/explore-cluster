@@ -30,7 +30,7 @@ const { SubMenu } = Menu;
 
 const routes = {
 	'Cluster Overview': {
-		icon: 'home',
+		icon: 'cluster',
 		link: '/',
 	},
 	'Browse Data': {
@@ -52,14 +52,8 @@ const routes = {
 	},
 	Security: {
 		icon: 'key',
-		menu: [
-			{ label: 'API Credentials', link: '/cluster/credentials' },
-		],
+		menu: [{ label: 'API Credentials', link: '/cluster/credentials' }],
 	},
-	// Billing: {
-	// 	icon: 'credit-card',
-	// 	link: 'billing',
-	// },
 };
 
 class DashboardWrapper extends Component {
@@ -67,9 +61,15 @@ class DashboardWrapper extends Component {
 		super();
 
 		const collapsed = window.innerWidth <= breakpoints.medium;
+		let showHeader = true;
+		try {
+			showHeader = JSON.parse(sessionStorage.getItem('header'));
+		} catch (e) {
+			console.log(e);
+		}
 		this.state = {
 			collapsed,
-			activeSubMenu: null,
+			showHeader,
 		};
 	}
 
@@ -78,7 +78,7 @@ class DashboardWrapper extends Component {
 	};
 
 	render() {
-		const { collapsed } = this.state;
+		const { collapsed, showHeader } = this.state;
 
 		return (
 			<Layout>
@@ -110,15 +110,17 @@ class DashboardWrapper extends Component {
 							});
 						}}
 					>
-						<Menu.Item style={{ margin: '15px auto' }}>
-							<Link to="/">
-								{collapsed ? (
-									<Logo type="small" width={20} />
-								) : (
-									<Logo type="white" width={160} />
-								)}
-							</Link>
-						</Menu.Item>
+						{showHeader ? (
+							<Menu.Item style={{ margin: '15px auto' }}>
+								<Link to="/">
+									{collapsed ? (
+										<Logo type="small" width={20} />
+									) : (
+										<Logo type="white" width={160} />
+									)}
+								</Link>
+							</Menu.Item>
+						) : null}
 						{Object.keys(routes).map((route) => {
 							if (routes[route].menu) {
 								const Title = (
@@ -160,13 +162,14 @@ class DashboardWrapper extends Component {
 				</Sider>
 				<Layout
 					css={{
-						paddingTop: 60,
+						paddingTop: showHeader ? 60 : 0,
 						minHeight: '100vh',
 						marginLeft: collapsed ? '80px' : '260px',
 						overflowY: 'scroll',
 					}}
 				>
-					<AppHeader big={collapsed} minimal showApp={false} />
+					{showHeader && <AppHeader big={collapsed} minimal showApp={false} />}
+
 					<Switch>
 						<Route exact path="/" component={HomePage} />
 						<Route

@@ -86,16 +86,16 @@ const RequestLogs = Loadable({
 
 class AppLayout extends React.PureComponent {
 	render() {
-		const { collapsed } = this.props;
+		const { collapsed, showHeader } = this.props;
 		return (
 			<Layout
 				css={{
-					paddingTop: 60,
+					paddingTop: showHeader ? 60 : 0,
 					minHeight: '100vh',
 					marginLeft: collapsed ? '80px' : '260px',
 				}}
 			>
-				<AppHeader big={collapsed} />
+				{showHeader && <AppHeader big={collapsed} />}
 				<ErrorPage {...this.props}>
 					<Switch>
 						<Route

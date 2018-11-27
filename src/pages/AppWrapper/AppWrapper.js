@@ -150,6 +150,7 @@ class AppWrapper extends Component {
 	render() {
 		const {
 			collapsed,
+			showHeader,
 			appName,
 			activeSubMenu,
 			activeMenuItem, // prettier-ignore
@@ -186,10 +187,17 @@ class AppWrapper extends Component {
 					>
 						<Menu.Item style={{ margin: '15px auto' }}>
 							<Link to="/">
-								{collapsed ? (
-									<Logo type="small" width={20} />
-								) : (
-									<Logo type="white" width={160} />
+								{showHeader ? // eslint-disable-line
+									collapsed ? (
+										<Logo type="small" width={20} />
+									) : (
+										<Logo type="white" width={160} />
+									)
+								: (
+									<React.Fragment>
+										<Icon type="cluster" />
+										Cluster Overview
+									</React.Fragment>
 								)}
 							</Link>
 						</Menu.Item>
@@ -232,7 +240,7 @@ class AppWrapper extends Component {
 						})}
 					</Menu>
 				</Sider>
-				<AppLayout collapsed={collapsed} {...this.props} />
+				<AppLayout showHeader={showHeader} collapsed={collapsed} {...this.props} />
 			</Layout>
 		);
 	}
