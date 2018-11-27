@@ -86,14 +86,14 @@ const RequestLogs = Loadable({
 
 class ClusterLayout extends React.PureComponent {
 	render() {
-		const { collapsed } = this.props;
+		const { collapsed, showHeader } = this.props;
 		return (
 			<Layout
 				css={{
 					minHeight: 'calc(100vh - 60px)',
 				}}
 			>
-				<AppHeader big={collapsed} />
+				{showHeader && <AppHeader big={collapsed} />}
 				<ErrorPage {...this.props}>
 					<Switch>
 						<Route
