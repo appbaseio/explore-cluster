@@ -35,7 +35,7 @@ class Dashboard extends Component {
 		const params = new URLSearchParams(window.location.search);
 		if (params.has('url')) {
 			const url = params.get('url');
-			localStorage.setItem('url', url);
+			sessionStorage.setItem('url', url);
 		}
 		if (params.has('username') && params.has('password')) {
 			const username = params.get('username');

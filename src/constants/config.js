@@ -1,5 +1,5 @@
 const getURL = () => {
-	let url = localStorage.getItem('url');
+	let url = sessionStorage.getItem('url');
 	const params = new URLSearchParams(window.location.search);
 	if (!url) {
 		url = params.has('url') ? params.get('url') : 'null';

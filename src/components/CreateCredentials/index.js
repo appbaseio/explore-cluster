@@ -54,12 +54,6 @@ class CreateCredentials extends React.Component {
 				rateLimit: new FormControl(defaultRateLimits[acl]),
 			}))),
 
-			// [{ value: getDefaultAclOptionsByPlan(props.plan), disabled: !props.isPaidUser },
-			// 	Validators.required],
-			// referers: [{ value: ['*'], disabled: !props.isPaidUser }],
-			// sources: [{ value: ['0.0.0.0/0'], disabled: !props.isPaidUser }],
-			// include_fields: [{ value: ['*'], disabled: false }],
-			// exclude_fields: [{ value: [], disabled: true }],
 			indices: [{ value: ['*'], disabled: false }],
 			ip_limit: [
 				{ value: 7200, disabled: !props.isPaidUser },
@@ -74,25 +68,7 @@ class CreateCredentials extends React.Component {
 		if (disabled) {
 			this.form.disable();
 		} else {
-			// const includeFieldsHandler = this.form.get('include_fields');
-			// const excludeFieldsHandler = this.form.get('exclude_fields');
 			const indicesHandler = this.form.get('indices');
-			// includeFieldsHandler.valueChanges.subscribe((value) => {
-			// 	if (value && value.includes('*')) {
-			// 		excludeFieldsHandler.disable({ emitEvent: false });
-			// 		excludeFieldsHandler.reset([]);
-			// 	} else {
-			// 		excludeFieldsHandler.enable({ emitEvent: false });
-			// 	}
-			// });
-			// excludeFieldsHandler.valueChanges.subscribe((value) => {
-			// 	if (value && value.includes('*')) {
-			// 		includeFieldsHandler.disable({ emitEvent: false });
-			// 		includeFieldsHandler.reset([]);
-			// 	} else {
-			// 		includeFieldsHandler.enable({ emitEvent: false });
-			// 	}
-			// });
 			indicesHandler.valueChanges.subscribe((value) => {
 				if (value && value.includes('*')) {
 					indicesHandler.disable({ emitEvent: false });
@@ -125,8 +101,6 @@ class CreateCredentials extends React.Component {
 	}
 
 	componentWillUnmount() {
-		// this.form.get('include_fields').valueChanges.unsubscribe();
-		// this.form.get('exclude_fields').valueChanges.unsubscribe();
 		this.form.get('indices').valueChanges.unsubscribe();
 	}
 
@@ -293,64 +267,6 @@ class CreateCredentials extends React.Component {
 										/>
 									)}
 								/>
-								{/* <FieldControl
-									name="acl"
-									render={({ handler }) => {
-										const inputHandler = handler();
-										return (
-											<Grid
-												label="ACLs"
-												toolTipMessage={Messages.acls}
-												component={(
-
-													// <CheckboxGroup
-													// 	css="label { font-weight: 100 }"
-													// 	{...inputHandler}
-													// 	options={getAclOptionsByPlan(plan).map(o => aclOptionsLabel[o])}
-													// 	value={inputHandler.value.map(o => aclOptionsLabel[o])}
-													// 	onChange={(value) => {
-													// 		inputHandler.onChange(value.map(v => v.toLowerCase()));
-													// 	}}
-													// />
-												)}
-											/>
-										);
-									}}
-								/> */}
-								{/* <Grid label="Security" toolTipMessage={Messages.security} />
-								<FieldControl
-									name="referers"
-									render={control => (
-										<WhiteList
-											toolTipMessage={Messages.referers}
-											control={control}
-											type="dropdown"
-											defaultSuggestionValue="https://example.com/"
-											label="HTTP Referers"
-											inputProps={{
-												placeholder: 'Add a HTTP Referer',
-											}}
-										/>
-									)}
-								/>
-								<FieldControl
-									name="sources"
-									render={control => (
-										<WhiteList
-											control={control}
-											toolTipMessage={Messages.sources}
-											label="IP Sources"
-											defaultValue={{
-												value: '0.0.0.0/0 (default)',
-												description: 'Matches all IP sources',
-											}}
-											inputProps={{
-												placeholder: 'Add an IP Source in CIDR format',
-											}}
-										/>
-									)}
-								/> */}
-
 								<FieldControl
 									strict={false}
 									name="indices"
@@ -379,93 +295,6 @@ class CreateCredentials extends React.Component {
 									}}
 								/>
 
-								<div css="margin-top: 30px">
-									<span css={styles.formLabel}>Fields Filtering</span>
-									<Tooltip
-										css="margin-left: 5px;color:#898989"
-										overlay={Messages.fieldFiltering}
-										mouseLeaveDelay={0}
-									>
-										<i className="fas fa-info-circle" />
-									</Tooltip>
-								</div>
-								{/* <FieldControl
-									strict={false}
-									name="include_fields"
-									render={({ handler }) => {
-										const inputHandler = handler();
-										const excludedFields = this.form.get('exclude_fields').value;
-										return (
-											<Grid
-												label={<span css={styles.subHeader}>Include</span>}
-												toolTipMessage={Messages.include}
-												component={(
-													<Select
-														placeholder="Select field value"
-														mode="multiple"
-														style={{ width: '100%' }}
-														{...inputHandler}
-														onChange={(value) => {
-															inputHandler.onChange(calculateValue(value));
-														}}
-													>
-														<Option key="*">* (Include all fields)</Option>
-														{Object.keys(mappings).map(i => mappings[i].map((v) => {
-																if (!excludedFields.includes(v)) {
-																	return (
-																		<Option
-																			key={v}
-																			title={v}
-																		>
-																			{v}
-																		</Option>
-																	);
-																}
-																return null;
-															}))}
-													</Select>
-												)}
-											/>
-										);
-									}}
-								/>
-								<FieldControl
-									strict={false}
-									name="exclude_fields"
-									render={({ handler }) => {
-										const inputHandler = handler();
-										const includedFields = this.form.get('include_fields').value;
-										return (
-											<Grid
-												label={<span css={styles.subHeader}>Exclude</span>}
-												toolTipMessage={Messages.exclude}
-												component={(
-													<Select
-														placeholder="Select field value"
-														mode="multiple"
-														style={{ width: '100%' }}
-														{...inputHandler}
-														onChange={(value) => {
-															inputHandler.onChange(calculateValue(value));
-														}}
-													>
-														<Option key="*">* (Exclude all fields)</Option>
-														{Object.keys(mappings).map(i => mappings[i].map((v) => {
-																if (!includedFields.includes(v)) {
-																	return (
-																		<Option key={v}>
-																			{v}
-																		</Option>
-																	);
-																}
-																return null;
-															}))}
-													</Select>
-												)}
-											/>
-										);
-									}}
-								/> */}
 								<FieldControl
 									name="ip_limit"
 									render={({ handler, hasError }) => (
@@ -545,10 +374,6 @@ CreateCredentials.propTypes = {
 		write: PropTypes.bool,
 		operationType: PropTypes.object,
 		acl: PropTypes.arrayOf(PropTypes.string),
-		// referers: PropTypes.arrayOf(PropTypes.string),
-		// sources: PropTypes.arrayOf(PropTypes.string),
-		// include_fields: PropTypes.arrayOf(PropTypes.string),
-		// exclude_fields: PropTypes.arrayOf(PropTypes.string),
 		ip_limit: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 		ttl: PropTypes.number,
 		meta: PropTypes.object,

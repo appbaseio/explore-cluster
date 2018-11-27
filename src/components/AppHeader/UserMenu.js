@@ -18,7 +18,7 @@ const userMenu = css`
 
 const handleLogout = () => {
 	localStorage.removeItem('persist:root');
-	localStorage.removeItem('url');
+	sessionStorage.removeItem('url');
 	window.location.href = '/';
 };
 
