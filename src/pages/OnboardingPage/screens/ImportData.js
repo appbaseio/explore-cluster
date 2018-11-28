@@ -223,7 +223,7 @@ export default class Introduction extends Component {
 			const dejavuAddress = `${protocol}://${auth}@${host}`;
 			iframeURL = `https://dejavu.appbase.io/?appname=${
 				config.appname
-			}&url=${dejavuAddress}&mode=view&sidebar=false&appswitcher=false`;
+			}&url=${dejavuAddress}&mode=view&sidebar=false&appswitcher=false&footer=false`;
 		}
 
 		return (
