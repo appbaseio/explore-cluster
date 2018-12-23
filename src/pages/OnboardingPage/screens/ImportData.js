@@ -44,7 +44,7 @@ export default class Introduction extends Component {
 		};
 	}
 
-	setError = (e) => {
+	setError = e => {
 		if (this.interval) clearInterval(this.interval);
 		this.setState(
 			{
@@ -85,10 +85,10 @@ export default class Introduction extends Component {
 			.then(() => {
 				appbaseHelpers.createURL(this.setURL);
 			})
-			.catch((e) => {
+			.catch(e => {
 				if (
-					e._bodyInit
-					=== '{"error":{"root_cause":[{"type":"parse_exception","reason":"request body is required"}],"type":"parse_exception","reason":"request body is required"},"status":400}'
+					e._bodyInit ===
+					'{"error":{"root_cause":[{"type":"parse_exception","reason":"request body is required"}],"type":"parse_exception","reason":"request body is required"},"status":400}'
 				) {
 					appbaseHelpers.createURL(this.setURL);
 				}
@@ -116,7 +116,7 @@ export default class Introduction extends Component {
 		</div>
 	);
 
-	setURL = (url) => {
+	setURL = url => {
 		this.setState({
 			url,
 		});
@@ -223,7 +223,7 @@ export default class Introduction extends Component {
 			const dejavuAddress = `${protocol}://${auth}@${host}`;
 			iframeURL = `https://dejavu.appbase.io/?appname=${
 				config.appname
-			}&url=${dejavuAddress}&mode=view&sidebar=false&appswitcher=false&footer=false`;
+			}&url=${dejavuAddress}&footer=false&sidebar=false&appswitcher=false&mode=edit&cloneApp=false&oldBanner=false`;
 		}
 
 		return (

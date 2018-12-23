@@ -44,7 +44,7 @@ class BrowserPage extends Component {
 		const url = `${protocol}://${credentials}@${host}`;
 		const iframeURL = `https://dejavu.appbase.io/?appname=${
 			isCluster ? '*' : appName
-		}&url=${url}&mode=view&sidebar=false&appswitcher=false&footer=false`;
+		}&url=${url}&footer=false&sidebar=false&appswitcher=false&mode=edit&cloneApp=false&oldBanner=false`;
 
 		return (
 			<section>
