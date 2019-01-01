@@ -9,9 +9,7 @@ import {
 } from 'prop-types';
 import CreateCredentials from '../../components/CreateCredentials';
 import Container from '../../components/Container';
-import {
-	getAppPermissionsByName,
-} from '../../batteries/modules/selectors';
+import { getAppPermissionsByName } from '../../batteries/modules/selectors';
 import Permission from './Permission';
 import { displayErrors } from '../../utils/helper';
 import {

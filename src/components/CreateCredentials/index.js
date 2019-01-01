@@ -45,6 +45,9 @@ const calculateValue = (value) => {
 class CreateCredentials extends React.Component {
 	constructor(props) {
 		super(props);
+
+		this.isApp = !window.location.pathname.startsWith('/cluster/credentials');
+
 		this.form = FormBuilder.group({
 			description: '',
 			operationType: [Types.read, Validators.required],
@@ -54,7 +57,7 @@ class CreateCredentials extends React.Component {
 				rateLimit: new FormControl(defaultRateLimits[acl]),
 			}))),
 
-			indices: [{ value: ['*'], disabled: false }],
+			indices: this.isApp ? [{ value: [props.appName], disabled: false }] : [{ value: ['*'], disabled: false }],
 			ip_limit: [
 				{ value: 7200, disabled: !props.isPaidUser },
 				[Validators.required, isNegative],
@@ -267,33 +270,39 @@ class CreateCredentials extends React.Component {
 										/>
 									)}
 								/>
-								<FieldControl
-									strict={false}
-									name="indices"
-									render={({ handler }) => {
-										const inputHandler = handler();
-										const { value } = this.form.get('indices');
-										return (
-											<Grid
-												label="Indices"
-												toolTipMessage={Messages.indices}
-												component={(
-													<Select
-														placeholder="Enter indices"
-														mode="tags"
-														style={{ width: '100%' }}
-														tokenSeparators={[',']}
-														value={value}
-														{...inputHandler}
-														onChange={(val) => {
-															inputHandler.onChange(calculateValue(val));
-														}}
-													/>
-												)}
+								{
+									this.isApp
+										? null
+										: (
+											<FieldControl
+												strict={false}
+												name="indices"
+												render={({ handler }) => {
+													const inputHandler = handler();
+													const { value } = this.form.get('indices');
+													return (
+														<Grid
+															label="Indices"
+															toolTipMessage={Messages.indices}
+															component={(
+																<Select
+																	placeholder="Enter indices"
+																	mode="tags"
+																	style={{ width: '100%' }}
+																	tokenSeparators={[',']}
+																	value={value}
+																	{...inputHandler}
+																	onChange={(val) => {
+																		inputHandler.onChange(calculateValue(val));
+																	}}
+																/>
+															)}
+														/>
+													);
+												}}
 											/>
-										);
-									}}
-								/>
+										)
+								}
 
 								<FieldControl
 									name="ip_limit"
