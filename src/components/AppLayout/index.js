@@ -1,7 +1,8 @@
 import React from 'react';
-import { Layout } from 'antd';
+import { Layout, Breadcrumb } from 'antd';
 import Loadable from 'react-loadable';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Link } from 'react-router-dom';
+
 import AppHeader from '../AppHeader';
 import Loader from '../Loader';
 import AppPageContainer from '../AppPageContainer';
@@ -87,6 +88,7 @@ const RequestLogs = Loadable({
 class AppLayout extends React.PureComponent {
 	render() {
 		const { collapsed, showHeader } = this.props;
+		const { appName } = this.props.match.params; // eslint-disable-line
 		return (
 			<Layout
 				css={{
@@ -96,6 +98,24 @@ class AppLayout extends React.PureComponent {
 				}}
 			>
 				{showHeader && <AppHeader big={collapsed} />}
+				<Layout.Header
+					css={{
+						background: '#fff',
+						position: 'sticky',
+						top: 0,
+						height: 40,
+						alignItems: 'center',
+						display: 'flex',
+						boxShadow: '0 2px 8px #f0f1f2',
+					}}
+				>
+					<Breadcrumb>
+						<Breadcrumb.Item>
+							<Link to="/">Cluster Overview</Link>
+						</Breadcrumb.Item>
+						<Breadcrumb.Item>{appName}</Breadcrumb.Item>
+					</Breadcrumb>
+				</Layout.Header>
 				<ErrorPage {...this.props}>
 					<Switch>
 						<Route

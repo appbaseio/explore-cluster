@@ -44,9 +44,7 @@ const routes = {
 	},
 	Security: {
 		icon: 'key',
-		menu: [
-			{ label: 'API Credentials', link: 'credentials' },
-		],
+		menu: [{ label: 'API Credentials', link: 'credentials' }],
 	},
 };
 
@@ -91,10 +89,23 @@ let url;
 class AppWrapper extends Component {
 	constructor(props) {
 		super(props);
+
+		let showHeader = true;
+		try {
+			const header = JSON.parse(sessionStorage.getItem('header'));
+			if (header !== undefined) {
+				showHeader = header;
+			}
+		} catch (e) {
+			console.log(e);
+		}
+
 		const collapsed = window.innerWidth <= breakpoints.medium;
 		const getActiveMenuData = getActiveMenu(props);
+
 		this.state = {
 			collapsed,
+			showHeader,
 			appName: props.match.params.appName, // eslint-disable-line
 			...getActiveMenuData,
 		};
@@ -187,13 +198,13 @@ class AppWrapper extends Component {
 					>
 						<Menu.Item style={{ margin: '15px auto' }}>
 							<Link to="/">
-								{showHeader ? // eslint-disable-line
+								{showHeader ? ( // eslint-disable-line
 									collapsed ? (
 										<Logo type="small" width={20} />
 									) : (
 										<Logo type="white" width={160} />
 									)
-								: (
+								) : (
 									<React.Fragment>
 										<Icon type="cluster" />
 										Cluster Overview

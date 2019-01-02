@@ -63,7 +63,10 @@ class DashboardWrapper extends Component {
 		const collapsed = window.innerWidth <= breakpoints.medium;
 		let showHeader = true;
 		try {
-			showHeader = JSON.parse(sessionStorage.getItem('header'));
+			const header = JSON.parse(sessionStorage.getItem('header'));
+			if (header !== undefined) {
+				showHeader = header;
+			}
 		} catch (e) {
 			console.log(e);
 		}
