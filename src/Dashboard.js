@@ -40,6 +40,8 @@ class Dashboard extends Component {
 		if (params.has('header')) {
 			const header = params.get('header');
 			sessionStorage.setItem('header', header);
+		} else {
+			sessionStorage.setItem('header', true);
 		}
 		if (params.has('username') && params.has('password')) {
 			const username = params.get('username');
