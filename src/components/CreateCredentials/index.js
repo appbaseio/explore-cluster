@@ -2,11 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { css } from 'emotion';
 import {
-	Icon, Modal, Input,
-	Radio, Tooltip, Button, Select,
+ Icon, Modal, Input, Radio, Tooltip, Button, Select,
 } from 'antd';
 import {
-	FieldArray, FormBuilder, FormArray, Validators, FieldGroup, FieldControl, FormControl, FormGroup,
+	FieldArray,
+	FormBuilder,
+	FormArray,
+	Validators,
+	FieldGroup,
+	FieldControl,
+	FormControl,
+	FormGroup,
 } from 'react-reactive-form';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
@@ -18,9 +24,12 @@ import { getPermission } from '../../batteries/modules/actions/permission';
 import Grid from './Grid';
 import { getAppMappings } from '../../batteries/modules/actions';
 import { createCredentials as Messages, hoverMessage } from '../../utils/messages';
-import { getTraversedMappingsByAppName, getAppPermissionsByName } from '../../batteries/modules/selectors';
 import {
-	Types, getDefaultAclOptionsByPlan, isNegative, defaultRateLimits,
+	getTraversedMappingsByAppName,
+	getAppPermissionsByName,
+} from '../../batteries/modules/selectors';
+import {
+ Types, getDefaultAclOptionsByPlan, isNegative, defaultRateLimits,
 } from './utils';
 import Acl from './Acl';
 import WhiteList from './WhiteList';
@@ -51,14 +60,20 @@ class CreateCredentials extends React.Component {
 		this.form = FormBuilder.group({
 			description: '',
 			operationType: [Types.read, Validators.required],
-			acl: new FormArray(getDefaultAclOptionsByPlan(props.plan).map(acl => new FormGroup({
-				acl: new FormControl(acl),
-				tag: new FormControl(true),
-				rateLimit: new FormControl(defaultRateLimits[acl]),
-			}))),
+			acl: new FormArray(
+				getDefaultAclOptionsByPlan(props.plan).map(
+					acl => new FormGroup({
+							acl: new FormControl(acl),
+							tag: new FormControl(true),
+							rateLimit: new FormControl(defaultRateLimits[acl]),
+						}),
+				),
+			),
 			referers: [{ value: ['*'], disabled: false }],
 			sources: [{ value: ['0.0.0.0/0'], disabled: false }],
-			indices: this.isApp ? [{ value: [props.appName], disabled: false }] : [{ value: ['*'], disabled: false }],
+			indices: this.isApp
+				? [{ value: [props.appName], disabled: false }]
+				: [{ value: ['*'], disabled: false }],
 			ip_limit: [
 				{ value: 7200, disabled: !props.isPaidUser },
 				[Validators.required, isNegative],
@@ -134,9 +149,16 @@ class CreateCredentials extends React.Component {
 
 	render() {
 		const {
- show, handleCancel, isPaidUser, isSubmitting, disabled,
- saveButtonText, isLoadingMappings, shouldHaveEmailField, initialValues,
-} = this.props;
+			show,
+			handleCancel,
+			isPaidUser,
+			isSubmitting,
+			disabled,
+			saveButtonText,
+			isLoadingMappings,
+			shouldHaveEmailField,
+			initialValues,
+		} = this.props;
 		return (
 			<FieldGroup
 				strict={false}
@@ -148,245 +170,254 @@ class CreateCredentials extends React.Component {
 						}}
 						title={this.getText}
 						css={modal}
-						footer={!disabled ? [
-							<Button key="back" onClick={handleCancel}>
-								Cancel
-							</Button>,
-							<Button
-								loading={isSubmitting}
-								disabled={invalid}
-								key="submit"
-								type="primary"
-								onClick={this.handleSubmit}
-							>
-								{saveButtonText || (this.isEditing ? 'Save' : 'Generate')}
-							</Button>,
-						] : [
-								<Button key="back" onClick={handleCancel}>
-									Cancel
-								</Button>,
-							]
+						footer={
+							!disabled
+								? [
+										<Button key="back" onClick={handleCancel}>
+											Cancel
+										</Button>,
+										<Button
+											loading={isSubmitting}
+											disabled={invalid}
+											key="submit"
+											type="primary"
+											onClick={this.handleSubmit}
+										>
+											{saveButtonText
+												|| (this.isEditing ? 'Save' : 'Generate')}
+										</Button>,
+								  ]
+								: [
+										<Button key="back" onClick={handleCancel}>
+											Cancel
+										</Button>,
+								  ]
 						}
 						visible={show}
 						onCancel={handleCancel}
 					>
-					{
-						isLoadingMappings ? <Loader style={{ marginTop: '-100px', marginBottom: '120px' }} /> : (
-						<React.Fragment>
-							<div css="position: relative">
-								{shouldHaveEmailField && (
-									<FieldControl
-										strict={false}
-										name="email"
-										formState={initialValues && initialValues.email}
-										options={{
-											validators: [Validators.required, Validators.email],
-										}}
-										render={({ handler }) => (
-											<Grid
-												label="Email"
-												toolTipMessage={Messages.email}
-												component={(
-													<Input
-														autoFocus={!this.isEditing}
-														placeholder="Add email"
-														{...handler()}
-													/>
-												)}
-											/>
-										)}
-									/>)
-								}
-								<FieldControl
-									strict={false}
-									name="description"
-									render={({ handler }) => (
-										<Grid
-											label="Description"
-											toolTipMessage={Messages.description}
-											component={(
-												<Input
-													autoFocus={!shouldHaveEmailField && !this.isEditing}
-													placeholder="Add an optional description for this credential"
-													{...handler()}
+						{isLoadingMappings ? (
+							<Loader style={{ marginTop: '-100px', marginBottom: '120px' }} />
+						) : (
+							<React.Fragment>
+								<div css="position: relative">
+									{shouldHaveEmailField && (
+										<FieldControl
+											strict={false}
+											name="email"
+											formState={initialValues && initialValues.email}
+											options={{
+												validators: [Validators.required, Validators.email],
+											}}
+											render={({ handler }) => (
+												<Grid
+													label="Email"
+													toolTipMessage={Messages.email}
+													component={(
+<Input
+															autoFocus={!this.isEditing}
+															placeholder="Add email"
+															{...handler()}
+/>
+)}
 												/>
 											)}
 										/>
 									)}
-								/>
-								<FieldControl
-									name="operationType"
-									render={({ handler }) => (
-										<Grid
-											label="Key Type"
-											toolTipMessage={Messages.operationType}
-											component={(
-												<Radio.Group
-													{...handler()}
-													css="label { font-weight: 100 }"
+									<FieldControl
+										strict={false}
+										name="description"
+										render={({ handler }) => (
+											<Grid
+												label="Description"
+												toolTipMessage={Messages.description}
+												component={(
+<Input
+														autoFocus={
+															!shouldHaveEmailField && !this.isEditing
+														}
+														placeholder="Add an optional description for this credential"
+														{...handler()}
+/>
+)}
+											/>
+										)}
+									/>
+									<FieldControl
+										name="operationType"
+										render={({ handler }) => (
+											<Grid
+												label="Key Type"
+												toolTipMessage={Messages.operationType}
+												component={(
+<Radio.Group
+														{...handler()}
+														css="label { font-weight: 100 }"
+>
+														{Object.keys(Types).map(type => (
+															<Radio key={type} value={Types[type]}>
+																{Types[type].description}
+															</Radio>
+														))}
+</Radio.Group>
+)}
+											/>
+										)}
+									/>
+									{!isPaidUser && (
+										<div css={styles.overlay}>
+											<div css={styles.upgradePlan}>
+												<div style={{ marginBottom: 20 }}>
+													<Icon type="lock" css="font-size: 40px" />
+												</div>
+												Upgrade to a paid plan to add advanced security
+												permissions.
+												<Tooltip overlay={hoverMessage} mouseLeaveDelay={0}>
+													<i className="fas fa-info-circle" />
+												</Tooltip>
+												<Button
+													type="primary"
+													css="margin-top: 10px"
+													href="billing"
+													target="_blank"
+													style={{
+														marginTop: 20,
+													}}
 												>
-													{Object.keys(Types).map(type => (
-														<Radio key={type} value={Types[type]}>
-															{Types[type].description}
-														</Radio>
-													))}
-												</Radio.Group>
-											)}
-										/>
-									)}
-								/>
-								{!isPaidUser && (
-									<div css={styles.overlay}>
-										<div css={styles.upgradePlan}>
-											<div style={{ marginBottom: 20 }}>
-												<Icon type="lock" css="font-size: 40px" />
+													Upgrade Now
+												</Button>
 											</div>
-											Upgrade to a paid plan to add advanced security permissions.
-											<Tooltip overlay={hoverMessage} mouseLeaveDelay={0}>
-												<i className="fas fa-info-circle" />
-											</Tooltip>
-											<Button
-												type="primary"
-												css="margin-top: 10px"
-												href="billing"
-												target="_blank"
-												style={{
-													marginTop: 20,
-												}}
-											>
-												Upgrade Now
-											</Button>
 										</div>
-									</div>
-								)}
-								<FieldArray
-									name="acl"
-									render={control => (
-										<Grid
-											label="Acls"
-											toolTipMessage={Messages.acls}
-											component={(
-												<Acl control={control} />
-											)}
+									)}
+									<FieldArray
+										name="acl"
+										render={control => (
+											<Grid
+												label="Acls"
+												toolTipMessage={Messages.acls}
+												component={<Acl control={control} />}
+											/>
+										)}
+									/>
+									{this.isApp ? null : (
+										<FieldControl
+											strict={false}
+											name="indices"
+											render={({ handler }) => {
+												const inputHandler = handler();
+												const { value } = this.form.get('indices');
+												return (
+													<Grid
+														label="Indices"
+														toolTipMessage={Messages.indices}
+														component={(
+<Select
+																placeholder="Enter indices"
+																mode="tags"
+																style={{ width: '100%' }}
+																tokenSeparators={[',']}
+																value={value}
+																{...inputHandler}
+																onChange={(val) => {
+																	inputHandler.onChange(
+																		calculateValue(val),
+																	);
+																}}
+/>
+)}
+													/>
+												);
+											}}
 										/>
 									)}
-								/>
-								{
-									this.isApp
-										? null
-										: (
-											<FieldControl
-												strict={false}
-												name="indices"
-												render={({ handler }) => {
-													const inputHandler = handler();
-													const { value } = this.form.get('indices');
-													return (
-														<Grid
-															label="Indices"
-															toolTipMessage={Messages.indices}
-															component={(
-																<Select
-																	placeholder="Enter indices"
-																	mode="tags"
-																	style={{ width: '100%' }}
-																	tokenSeparators={[',']}
-																	value={value}
-																	{...inputHandler}
-																	onChange={(val) => {
-																		inputHandler.onChange(calculateValue(val));
-																	}}
-																/>
-															)}
-														/>
-													);
+									<Grid label="Security" toolTipMessage={Messages.security} />
+									<FieldControl
+										name="referers"
+										render={control => (
+											<WhiteList
+												toolTipMessage={Messages.referers}
+												control={control}
+												type="dropdown"
+												defaultSuggestionValue="https://example.com/"
+												label="HTTP Referers"
+												inputProps={{
+													placeholder: 'Add a HTTP Referer',
 												}}
 											/>
-										)
-								}
-								<Grid label="Security" toolTipMessage={Messages.security} />
-								<FieldControl
-									name="referers"
-									render={control => (
-										<WhiteList
-											toolTipMessage={Messages.referers}
-											control={control}
-											type="dropdown"
-											defaultSuggestionValue="https://example.com/"
-											label="HTTP Referers"
-											inputProps={{
-												placeholder: 'Add a HTTP Referer',
-											}}
-										/>
-									)}
-								/>
-								<FieldControl
-									name="sources"
-									render={control => (
-										<WhiteList
-											control={control}
-											toolTipMessage={Messages.sources}
-											label="IP Sources"
-											defaultValue={{
-												value: '0.0.0.0/0 (default)',
-												description: 'Matches all IP sources',
-											}}
-											inputProps={{
-												placeholder: 'Add an IP Source in CIDR format',
-											}}
-										/>
-									)}
-								/>
-								<FieldControl
-									name="ip_limit"
-									render={({ handler, hasError }) => (
-										<Grid
-											label="Max API calls/IP/hour"
-											toolTipMessage={Messages.ipLimit}
-											component={(
-												<Flex justifyContent="center" alignItems="center">
-													<Input
-														type="number"
-														css="border: solid 1px #9195A2!important;width: 120px"
-														{...handler()}
-													/>
-													{hasError('isNegative') && (
-														<span css="color: red;margin-left: 10px">
-															Field value can{"'"}t be negative.
-														</span>
-													)}
-												</Flex>
-											)}
-										/>
-									)}
-								/>
-								<FieldControl
-									name="ttl"
-									render={({ handler, hasError }) => (
-										<Grid
-											label="TTL"
-											toolTipMessage={Messages.ttl}
-											component={(
-												<Flex justifyContent="center" alignItems="center">
-													<Input
-														type="number"
-														css="border: solid 1px #9195A2!important;width: 120px"
-														{...handler()}
-													/>
-													{hasError('isNegative') && (
-														<span css="color: red;margin-left: 10px">
-															Field value can{"'"}t be negative.
-														</span>
-													)}
-												</Flex>
-											)}
-										/>
-									)}
-								/>
-							</div>
-						</React.Fragment>)
-					}
-
+										)}
+									/>
+									<FieldControl
+										name="sources"
+										render={control => (
+											<WhiteList
+												control={control}
+												toolTipMessage={Messages.sources}
+												label="IP Sources"
+												defaultValue={{
+													value: '0.0.0.0/0 (default)',
+													description: 'Matches all IP sources',
+												}}
+												inputProps={{
+													placeholder: 'Add an IP Source in CIDR format',
+												}}
+											/>
+										)}
+									/>
+									<FieldControl
+										name="ip_limit"
+										render={({ handler, hasError }) => (
+											<Grid
+												label="Max API calls/IP/hour"
+												toolTipMessage={Messages.ipLimit}
+												component={(
+<Flex
+														justifyContent="center"
+														alignItems="center"
+>
+														<Input
+															type="number"
+															css="border: solid 1px #9195A2!important;width: 120px"
+															{...handler()}
+														/>
+														{hasError('isNegative') && (
+															<span css="color: red;margin-left: 10px">
+																Field value can{"'"}t be negative.
+															</span>
+														)}
+</Flex>
+)}
+											/>
+										)}
+									/>
+									<FieldControl
+										name="ttl"
+										render={({ handler, hasError }) => (
+											<Grid
+												label="TTL"
+												toolTipMessage={Messages.ttl}
+												component={(
+<Flex
+														justifyContent="center"
+														alignItems="center"
+>
+														<Input
+															type="number"
+															css="border: solid 1px #9195A2!important;width: 120px"
+															{...handler()}
+														/>
+														{hasError('isNegative') && (
+															<span css="color: red;margin-left: 10px">
+																Field value can{"'"}t be negative.
+															</span>
+														)}
+</Flex>
+)}
+											/>
+										)}
+									/>
+								</div>
+							</React.Fragment>
+						)}
 					</Modal>
 				)}
 			/>
@@ -416,6 +447,8 @@ CreateCredentials.propTypes = {
 		write: PropTypes.bool,
 		operationType: PropTypes.object,
 		acl: PropTypes.arrayOf(PropTypes.string),
+		sources: PropTypes.arrayOf(PropTypes.string),
+		include_fields: PropTypes.arrayOf(PropTypes.string),
 		ip_limit: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 		ttl: PropTypes.number,
 		meta: PropTypes.object,
@@ -441,10 +474,14 @@ const mapStateToProps = (state) => {
 		appName: get(state, '$getCurrentApp.name'),
 		mappings: mappings || [],
 		isPermissionPresent: !!appPermissions,
-		isLoadingMappings: get(state, '$getAppMappings.isFetching') || get(state, '$getAppPermissions.isFetching'),
+		isLoadingMappings:
+			get(state, '$getAppMappings.isFetching') || get(state, '$getAppPermissions.isFetching'),
 		credentials: get(appPermissions, 'credentials'),
 		plan: 'growth',
-		isSubmitting: get(state, '$createAppPermission.isFetching') || get(state, '$updateAppPermission.isFetching') || get(state, '$createAppShare.isFetching'),
+		isSubmitting:
+			get(state, '$createAppPermission.isFetching')
+			|| get(state, '$updateAppPermission.isFetching')
+			|| get(state, '$createAppShare.isFetching'),
 		errors: [
 			get(state, '$getAppMappings.error'),
 			get(state, '$createAppPermission.error'),
@@ -459,4 +496,7 @@ const mapDispatchToProps = dispatch => ({
 	fetchPermissions: appName => dispatch(getPermission(appName)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(CreateCredentials);
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps,
+)(CreateCredentials);
