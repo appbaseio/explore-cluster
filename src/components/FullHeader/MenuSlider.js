@@ -5,9 +5,7 @@ import { css } from 'react-emotion';
 import { array, bool } from 'prop-types';
 
 import { media } from '../../utils/media';
-import { ACC_API } from '../../constants/config';
-
-const logoutURL = `${ACC_API}/logout?next=https://appbase.io`;
+import { getURL } from '../../constants/config';
 
 const menuBtn = css`
 	border: 0;
@@ -50,6 +48,8 @@ class MenuSlider extends React.Component {
 
 	handleLogout = () => {
 		localStorage.setItem('hasVisitedTutorial', false);
+		const ACC_API = getURL();
+		const logoutURL = `${ACC_API}/logout?next=https://appbase.io`;
 		window.location.href = logoutURL;
 	};
 

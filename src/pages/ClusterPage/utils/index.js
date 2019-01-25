@@ -1,7 +1,8 @@
-import { ACC_API } from '../../../constants/config';
+import { getURL } from '../../../constants/config';
 
 export function getClusters() {
 	return new Promise((resolve, reject) => {
+		const ACC_API = getURL();
 		fetch(`${ACC_API}/v1/clusters`, {
 			method: 'GET',
 			credentials: 'include',
@@ -22,6 +23,7 @@ export function getClusters() {
 export function getClusterData(id) {
 	return new Promise((resolve, reject) => {
 		let hasError = false;
+		const ACC_API = getURL();
 		fetch(`${ACC_API}/v1/_status/${id}`, {
 			method: 'GET',
 			credentials: 'include',
@@ -51,6 +53,7 @@ export function deployCluster(cluster, id) {
 	const body = JSON.stringify(cluster);
 	return new Promise((resolve, reject) => {
 		let hasError = false;
+		const ACC_API = getURL();
 		fetch(`${ACC_API}/v1/_deploy${id ? `/${id}` : ''}`, {
 			method: 'POST',
 			credentials: 'include',
@@ -85,6 +88,7 @@ export function deployCluster(cluster, id) {
 
 export function deleteCluster(id) {
 	return new Promise((resolve, reject) => {
+		const ACC_API = getURL();
 		fetch(`${ACC_API}/v1/_delete/${id}`, {
 			method: 'DELETE',
 			credentials: 'include',

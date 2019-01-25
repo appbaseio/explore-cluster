@@ -23,7 +23,7 @@ import {
 	Types, getDefaultAclOptionsByPlan, isNegative, defaultRateLimits,
 } from './utils';
 import Acl from './Acl';
-// import WhiteList from './WhiteList';
+import WhiteList from './WhiteList';
 
 // const { Option } = Select;
 const modal = css`
@@ -56,7 +56,8 @@ class CreateCredentials extends React.Component {
 				tag: new FormControl(true),
 				rateLimit: new FormControl(defaultRateLimits[acl]),
 			}))),
-
+			referers: [{ value: ['*'], disabled: false }],
+			sources: [{ value: ['0.0.0.0/0'], disabled: false }],
 			indices: this.isApp ? [{ value: [props.appName], disabled: false }] : [{ value: ['*'], disabled: false }],
 			ip_limit: [
 				{ value: 7200, disabled: !props.isPaidUser },
@@ -303,7 +304,39 @@ class CreateCredentials extends React.Component {
 											/>
 										)
 								}
-
+								<Grid label="Security" toolTipMessage={Messages.security} />
+								<FieldControl
+									name="referers"
+									render={control => (
+										<WhiteList
+											toolTipMessage={Messages.referers}
+											control={control}
+											type="dropdown"
+											defaultSuggestionValue="https://example.com/"
+											label="HTTP Referers"
+											inputProps={{
+												placeholder: 'Add a HTTP Referer',
+											}}
+										/>
+									)}
+								/>
+								<FieldControl
+									name="sources"
+									render={control => (
+										<WhiteList
+											control={control}
+											toolTipMessage={Messages.sources}
+											label="IP Sources"
+											defaultValue={{
+												value: '0.0.0.0/0 (default)',
+												description: 'Matches all IP sources',
+											}}
+											inputProps={{
+												placeholder: 'Add an IP Source in CIDR format',
+											}}
+										/>
+									)}
+								/>
 								<FieldControl
 									name="ip_limit"
 									render={({ handler, hasError }) => (

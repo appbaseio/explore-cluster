@@ -7,6 +7,12 @@ import { setUser, loadApps, setUserError } from '../actions';
 function* authWorker(username, password, url) {
 	try {
 		const user = yield call(getUser, username, password, url);
+
+		sessionStorage.setItem('url', url);
+		sessionStorage.setItem('username', username);
+		sessionStorage.setItem('password', password);
+		sessionStorage.setItem('authToken', user.authToken);
+
 		yield put(setUser(user));
 		yield put(loadApps());
 	} catch (e) {

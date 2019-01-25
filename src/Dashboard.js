@@ -47,6 +47,9 @@ class Dashboard extends Component {
 			const username = params.get('username');
 			const password = params.get('password');
 
+			sessionStorage.setItem('username', username);
+			sessionStorage.setItem('password', password);
+
 			loadArcUser(username, password);
 		} else {
 			this.setState({

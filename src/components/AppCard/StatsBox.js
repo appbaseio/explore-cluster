@@ -82,7 +82,12 @@ export default function StatsBox({ data, title, style = {} }) {
 				{title} &nbsp;&nbsp;
 				<Tag>{data.status}</Tag>
 			</span>
-			<span style={{ backgroundColor: data.health }} className={colorBar} />
+			<span
+				style={{
+					backgroundColor: data.health === 'green' ? 'limegreen' : data.health,
+				}}
+				className={colorBar}
+			/>
 		</div>
 	);
 

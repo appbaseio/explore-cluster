@@ -1,14 +1,12 @@
-const getURL = () => {
+export const getURL = () => {
 	let url = sessionStorage.getItem('url');
 	const params = new URLSearchParams(window.location.search);
 	if (!url) {
 		url = params.has('url') ? params.get('url') : 'null';
 	}
-	return url === 'null' ? 'http://localhost:8000' : url;
+	return url === 'null' ? 'https://example.com' : url;
 };
 
-export const ACC_API = getURL();
-export const SCALR_API = getURL();
 export const SCALR_URL = 'scalr.api.appbase.io';
 export const IMPORTER_LINK = 'https://importer.appbase.io/?app=';
 

@@ -9,7 +9,7 @@ import {
 } from '@appbaseio/reactivesearch';
 
 import appbaseHelpers from '../utils/appbaseHelpers';
-import { SCALR_API } from '../../../constants/config';
+import { getURL } from '../../../constants/config';
 
 const onData = res => ({
 	image: `https://image.tmdb.org/t/p/w92${res.poster_path}`,
@@ -130,6 +130,7 @@ export default class SearchApp extends Component {
 
 	render() {
 		const fields = getFields(this.props.fields, ['', '.search']);
+		const SCALR_API = getURL();
 		return (
 			<ReactiveBase
 				{...this.appConfig}

@@ -10,7 +10,7 @@ import {
 } from '../../batteries/modules/actions';
 
 import Loader from '../../components/Loader';
-import { SCALR_API } from '../../batteries/utils';
+import { getURL } from '../../constants/config';
 
 class BrowserPage extends Component {
 	componentDidMount() {
@@ -40,6 +40,7 @@ class BrowserPage extends Component {
 
 	render() {
 		const { appName, credentials, isCluster } = this.props;
+		const SCALR_API = getURL();
 		const { protocol, host } = URL(SCALR_API);
 		const url = `${protocol}://${credentials}@${host}`;
 		const iframeURL = `https://dejavu.appbase.io/?appname=${

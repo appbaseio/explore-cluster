@@ -6,10 +6,10 @@ import {
 import { Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
-import { ACC_API } from '../../constants/config';
 import { loadUser } from '../../actions';
 import Logo from '../../components/Logo';
 import { container, card, gitlabBtn } from './styles';
+import { getURL } from '../../constants/config';
 
 class LoginPage extends Component {
 	constructor(props) {
@@ -35,6 +35,7 @@ class LoginPage extends Component {
 		if (user.data) {
 			return <Redirect to="/" />;
 		}
+		const ACC_API = getURL();
 		return (
 			<section className={container}>
 				<Logo width={200} />

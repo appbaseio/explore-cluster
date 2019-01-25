@@ -1,6 +1,7 @@
-import { ACC_API } from '../constants/config';
+import { getURL } from '../constants/config';
 
 export async function getUser(username, password, url) {
+	const ACC_API = getURL();
 	const api = url || ACC_API;
 	const authToken = btoa(`${username}:${password}`);
 	const response = await fetch(`${api}/_user`, {
@@ -18,6 +19,7 @@ export async function getUser(username, password, url) {
 }
 
 export async function getESIndices(authToken) {
+	const ACC_API = getURL();
 	const response = await fetch(`${ACC_API}/_cat/indices?format=json`, {
 		method: 'GET',
 		headers: {
@@ -38,6 +40,7 @@ export async function getESIndices(authToken) {
 }
 
 export async function getAppsMetrics() {
+	const ACC_API = getURL();
 	const response = await fetch(`${ACC_API}/user/apps/metrics`, { credentials: 'include' });
 	const data = await response.json();
 	if (response.status >= 400) {
@@ -48,6 +51,7 @@ export async function getAppsMetrics() {
 }
 
 export async function getAppsOwners() {
+	const ACC_API = getURL();
 	const response = await fetch(`${ACC_API}/user/apps`, { credentials: 'include' });
 	const data = await response.json();
 	if (response.status >= 400) {
@@ -58,6 +62,7 @@ export async function getAppsOwners() {
 }
 
 export async function getCreateApp(options, authToken) {
+	const ACC_API = getURL();
 	const response = await fetch(`${ACC_API}/${options.appName}`, {
 		method: 'PUT',
 		headers: {
@@ -90,6 +95,7 @@ export function getParam(name, url) {
 }
 
 export async function deleteApp(appId) {
+	const ACC_API = getURL();
 	const response = await fetch(`${ACC_API}/app/${appId}`, {
 		credentials: 'include',
 		method: 'DELETE',

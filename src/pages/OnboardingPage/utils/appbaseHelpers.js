@@ -4,7 +4,7 @@ import parser from 'url-parser-lite';
 import settings from './settings';
 import mappingObj from './moviesMapping';
 import moviesData from './data';
-import { ACC_API, SCALR_API } from '../../../constants/config';
+import { getURL } from '../../../constants/config';
 
 const streamingData = {
 	genres: 'Action',
@@ -20,8 +20,7 @@ const streamingData = {
 const getAuthToken = () => {
 	let token = null;
 	try {
-		// eslint-disable-next-line
-		token = JSON.parse(JSON.parse(localStorage.getItem('persist:root')).user).data.authToken;
+		token = sessionStorage.getItem('authToken');
 	} catch (e) {
 		console.error(e);
 	}
@@ -32,9 +31,8 @@ const getCredentials = () => {
 	let username = null;
 	let password = null;
 	try {
-		// eslint-disable-next-line
-		username = JSON.parse(JSON.parse(localStorage.getItem('persist:root')).user).data.username;
-		password = JSON.parse(JSON.parse(localStorage.getItem('persist:root')).user).data.password;
+		username = sessionStorage.getItem('username');
+		password = sessionStorage.getItem('password');
 	} catch (e) {
 		console.error(e);
 	}
@@ -45,8 +43,9 @@ class AppbaseUtils {
 	constructor() {
 		this.user = null;
 		this.app = null;
+		const ACC_API = getURL();
 		this.accountAddress = ACC_API;
-		this.address = SCALR_API;
+		this.address = ACC_API;
 		this.authToken = getAuthToken();
 	}
 
@@ -223,7 +222,8 @@ class AppbaseUtils {
 
 	createURL(cb) {
 		const { username, password } = getCredentials();
-		const { protocol, host } = parser(SCALR_API);
+		const ACC_API = getURL();
+		const { protocol, host } = parser(ACC_API);
 		const obj = {
 			appname: this.app.appName,
 			url: `${protocol}://${username}:${password}@${host}`,

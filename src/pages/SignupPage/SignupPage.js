@@ -7,14 +7,17 @@ import { Redirect, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 import Logo from '../../components/Logo';
-import { ACC_API } from '../../constants/config';
+import { getURL } from '../../constants/config';
 
 import {
  container, card, githubBtn, googleBtn, gitlabBtn,
 } from '../LoginPage/styles';
 import { checkbox } from './styles';
 
-const getSignupURL = provider => `${ACC_API}/login/${provider}?next=${window.location.origin}`;
+const getSignupURL = (provider) => {
+	const ACC_API = getURL();
+	return `${ACC_API}/login/${provider}?next=${window.location.origin}`;
+};
 
 class SignupPage extends React.Component {
 	state = {

@@ -1,10 +1,22 @@
 // @flow
 import { USER } from '../constants';
 
+const defaultUsername = sessionStorage.getItem('username');
+const defaultPassword = sessionStorage.getItem('password');
+const defaultToken = sessionStorage.getItem('authToken');
+
+const defaultUserData =	defaultUsername && defaultPassword && defaultToken
+		? {
+				username: defaultUsername,
+				password: defaultPassword,
+				authToken: defaultToken,
+		  } // eslint-disable-line
+		: null;
+
 export default function userReducer(
 	state: Object = {
 		isLoading: false,
-		data: null,
+		data: defaultUserData,
 		error: null,
 	},
 	action: Object,
