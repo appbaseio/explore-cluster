@@ -55,10 +55,11 @@ class Permission extends React.Component {
 
 	handleEditCred = () => {
 		const { permissionInfo, showForm } = this.props;
+		const { ops } = permissionInfo;
 		const formPayload = {
 			description: permissionInfo.description,
-			read: permissionInfo.read,
-			write: permissionInfo.write,
+			read: ops.includes('read'),
+			write: ops.includes('write'),
 			acl: permissionInfo.acl,
 			referers: permissionInfo.referers,
 			sources: permissionInfo.sources,
