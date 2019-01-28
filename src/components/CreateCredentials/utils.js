@@ -63,16 +63,19 @@ export const Types = {
 		description: 'Read-only key',
 		read: true,
 		write: false,
+		delete: false,
 	},
 	write: {
 		description: 'Write-only key',
 		read: false,
+		delete: false,
 		write: true,
 	},
 	admin: {
 		description: 'Admin key',
 		read: true,
 		write: true,
+		delete: true,
 	},
 };
 export const defaultRateLimits = {

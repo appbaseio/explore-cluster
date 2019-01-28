@@ -41,13 +41,14 @@ const routes = {
 		icon: 'line-chart',
 		menu: [
 			{ label: 'Overview', link: '/cluster/analytics' },
+			{ label: 'Request Logs', link: '/cluster/request-logs' },
 			{ label: 'Popular Searches', link: '/cluster/popular-searches' },
 			{ label: 'No Result Searches', link: '/cluster/no-results-searches' },
 			{ label: 'Popular Filters', link: '/cluster/popular-filters' },
 			{ label: 'Popular Results', link: '/cluster/popular-results' },
-			{ label: 'Search Latency', link: '/cluster/search-latency' },
 			{ label: 'Geo Distribution', link: '/cluster/geo-distribution' },
-			{ label: 'Request Logs', link: '/cluster/request-logs' },
+			{ label: 'Requests Per Minute', link: '/cluster/requests-per-minute' },
+			{ label: 'Search Latency', link: '/cluster/search-latency' },
 		],
 	},
 	Security: {

@@ -12,6 +12,10 @@ const AnalyticsPage = Loadable({
 	loader: () => import('../../pages/AnalyticsPage'),
 	loading: Loader,
 });
+const RequestDistributionPage = Loadable({
+	loader: () => import('../../pages/RequestDistributionPage'),
+	loading: Loader,
+});
 const GeoDistributionPage = Loadable({
 	loader: () => import('../../pages/GeoDistributionPage'),
 	loading: Loader,
@@ -144,6 +148,13 @@ class AppLayout extends React.PureComponent {
 							path="/app/:appName/popular-searches"
 							component={props => (
 								<AppPageContainer {...props} component={PopularSearches} />
+							)}
+						/>
+						<Route
+							exact
+							path="/app/:appName/requests-per-minute"
+							component={props => (
+								<AppPageContainer {...props} component={RequestDistributionPage} />
 							)}
 						/>
 						<Route

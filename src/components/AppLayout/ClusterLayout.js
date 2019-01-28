@@ -83,6 +83,10 @@ const RequestLogs = Loadable({
 	loader: () => import('../../pages/RequestLogs'),
 	loading: Loader,
 });
+const RequestDistributionPage = Loadable({
+	loader: () => import('../../pages/RequestDistributionPage'),
+	loading: Loader,
+});
 
 class ClusterLayout extends React.PureComponent {
 	render() {
@@ -161,6 +165,13 @@ class ClusterLayout extends React.PureComponent {
 							path="/cluster/request-logs/:tab?"
 							component={props => (
 								<AppPageContainer {...props} component={RequestLogs} />
+							)}
+						/>
+						<Route
+							exact
+							path="/cluster/requests-per-minute"
+							component={props => (
+								<AppPageContainer {...props} component={RequestDistributionPage} />
 							)}
 						/>
 						<Route

@@ -101,7 +101,8 @@ class CreateCredentials extends React.Component {
 			let operationType;
 			Object.keys(Types).every((k) => {
 				const type = Types[k];
-				if (type.read === initialValues.read && type.write === initialValues.write) {
+				if (type.read === initialValues.read
+					&& type.write === initialValues.write && type.delete === initialValues.delete) {
 					operationType = type;
 					return false;
 				}
