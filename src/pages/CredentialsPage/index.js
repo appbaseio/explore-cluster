@@ -249,10 +249,15 @@ Credentials.propTypes = {
 	errors: array.isRequired,
 	handleDeleteApp: func.isRequired,
 };
+
 const mapStateToProps = (state) => {
-	const appPermissions = getAppPermissionsByName(state);
+	const appName = get(state, '$getCurrentApp.name');
+	let appPermissions = get(state, '$getAppPermissions.results.default');
+	if (appName) {
+		appPermissions = getAppPermissionsByName(state);
+	}
 	return {
-		appName: get(state, '$getCurrentApp.name'),
+		appName,
 		appId: get(state, '$getCurrentApp.id'),
 		permissions: get(appPermissions, 'results', []),
 		isPaidUser: true,

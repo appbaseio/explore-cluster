@@ -24,11 +24,12 @@ class AppPageContainer extends Component {
 
 AppPageContainer.defaultProps = {
 	isLoading: false,
+	appName: '',
 };
 
 AppPageContainer.propTypes = {
 	isLoading: PropTypes.bool,
-	appName: PropTypes.string.isRequired,
+	appName: PropTypes.string,
 	component: PropTypes.func.isRequired,
 	updateCurrentApp: PropTypes.func.isRequired,
 };
