@@ -1,8 +1,10 @@
 export const getURL = () => {
 	let url = sessionStorage.getItem('url');
 	const params = new URLSearchParams(window.location.search);
-	if (!url) {
+	if (!url || url === 'undefined') {
 		url = params.has('url') ? params.get('url') : 'null';
+
+		if (url) sessionStorage.setItem('url', url);
 	}
 	return url === 'null' ? 'https://example.com' : url;
 };
