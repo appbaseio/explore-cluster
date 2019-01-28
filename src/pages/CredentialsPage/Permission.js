@@ -60,6 +60,7 @@ class Permission extends React.Component {
 			description: permissionInfo.description,
 			read: ops.includes('read'),
 			write: ops.includes('write'),
+			delete: ops.includes('delete'),
 			acl: permissionInfo.acl,
 			referers: permissionInfo.referers,
 			sources: permissionInfo.sources,

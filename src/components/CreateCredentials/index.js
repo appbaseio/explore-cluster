@@ -108,7 +108,7 @@ class CreateCredentials extends React.Component {
 				return true;
 			});
 			// removes undefined valued-keys
-			const values = JSON.parse(JSON.stringify({ ...initialValues, operationType }));
+			const values = { ...JSON.parse(JSON.stringify(initialValues)), operationType };
 			this.form.patchValue(values);
 		}
 	}
