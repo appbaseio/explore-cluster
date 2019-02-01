@@ -31,6 +31,7 @@ const AppHeader = ({
 		css={{
 			width: big ? 'calc(100% - 80px)' : 'calc(100% - 260px)',
 			justifyContent: minimal ? 'flex-end !important' : 'space-between',
+			left: big ? '80px' : '260px',
 		}}
 	>
 		{minimal ? null : (
