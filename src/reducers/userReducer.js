@@ -4,12 +4,14 @@ import { USER } from '../constants';
 const defaultUsername = sessionStorage.getItem('username');
 const defaultPassword = sessionStorage.getItem('password');
 const defaultToken = sessionStorage.getItem('authToken');
+const defaultIsAdmin = sessionStorage.getItem('isAdmin');
 
 const defaultUserData =	defaultUsername && defaultPassword && defaultToken
 		? {
 				username: defaultUsername,
 				password: defaultPassword,
 				authToken: defaultToken,
+				isAdmin: Boolean(defaultIsAdmin),
 		  } // eslint-disable-line
 		: null;
 

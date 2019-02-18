@@ -53,7 +53,10 @@ const routes = {
 	},
 	Security: {
 		icon: 'key',
-		menu: [{ label: 'API Credentials', link: '/cluster/credentials' }],
+		menu: [
+			{ label: 'API Credentials', link: '/cluster/credentials' },
+			{ label: 'User Management', link: '/cluster/user-management' },
+		],
 	},
 };
 

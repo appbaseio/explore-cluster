@@ -45,7 +45,10 @@ const routes = {
 	},
 	Security: {
 		icon: 'key',
-		menu: [{ label: 'API Credentials', link: 'credentials' }],
+		menu: [
+			{ label: 'API Credentials', link: 'credentials' },
+			{ label: 'User Management', link: 'user-management' },
+		],
 	},
 };
 

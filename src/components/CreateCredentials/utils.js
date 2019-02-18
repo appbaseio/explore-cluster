@@ -1,3 +1,7 @@
+import isEqual from 'lodash/isEqual';
+import sortBy from 'lodash/sortBy';
+import get from 'lodash/get';
+
 export const Suggestions = {
 	1: {
 		prefix: '',
@@ -61,34 +65,30 @@ export const isNegative = (control) => {
 export const Types = {
 	read: {
 		description: 'Read-only key',
-		read: true,
-		write: false,
-		delete: false,
+		ops: ['read'],
 	},
 	write: {
 		description: 'Write-only key',
-		read: false,
-		delete: false,
-		write: true,
+		ops: ['write'],
 	},
 	admin: {
 		description: 'Admin key',
-		read: true,
-		write: true,
-		delete: true,
+		ops: ['read', 'write', 'delete'],
 	},
 };
+export const categoriesWithRateLimit = ['docs', 'search', 'indices', 'cat', 'clusters', 'misc'];
+export const isRateLimitPresent = acl => categoriesWithRateLimit.includes(acl);
 export const defaultRateLimits = {
-	docs: 0,
-	search: 0,
-	indices: 0,
-	cat: 0,
-	clusters: 0,
-	misc: 0,
-	user: 0,
-	permission: 0,
-	analytics: 0,
-	streams: 0,
+	docs: 5,
+	search: 5,
+	indices: 5,
+	cat: 5,
+	clusters: 5,
+	misc: 5,
+	user: 5,
+	permission: 5,
+	analytics: 5,
+	streams: 5,
 };
 // Acl options
 export const aclOptions = [
@@ -128,3 +128,75 @@ export const aclOptionsLabel = {
 	analytics: 'analytics',
 	streams: 'streams',
 };
+
+const filterCategories = (value) => {
+	const limits = value.ip_limit ? { ip_limit: parseFloat(value.ip_limit, 10) } : undefined;
+	const categories = [];
+	get(value, 'categories', []).forEach((category) => {
+		if (category.tag) {
+			if (category.rateLimit !== undefined) {
+				limits[`${category.acl}_limit`] = parseFloat(category.rateLimit, 10);
+			}
+			categories.push(category.acl);
+		}
+	});
+	return {
+		limits,
+		categories,
+	};
+};
+
+const getCategories = (value) => {
+	const categories = [];
+	aclOptions.forEach((category) => {
+		const obj = {
+			acl: category,
+			tag: get(value, 'categories', []).includes(category),
+		};
+		if (value.limits) {
+			obj.rateLimit = value.limits[`${category}_limit`];
+		}
+		categories.push(obj);
+	});
+	return categories;
+};
+
+export const getOperationType = (value) => {
+	let operationType;
+	Object.keys(Types).every((k) => {
+		const type = Types[k];
+		if (isEqual(sortBy(value.ops), sortBy(type.ops))) {
+			operationType = type;
+			return false;
+		}
+		return true;
+	});
+	return operationType;
+};
+
+export const mapFormToValues = (value) => {
+	const filteredCategories = filterCategories(value);
+	return {
+		indices: value.indices,
+		description: value.description,
+		ops: value.operationType.ops,
+		referers: value.referers,
+		sources: value.sources,
+		limits: filteredCategories.limits,
+		categories: filteredCategories.categories,
+		ttl: parseInt(value.ttl, 10) || undefined,
+		username: value.username,
+		password: value.password,
+		email: value.email,
+		is_admin: value.isAdmin,
+	};
+};
+
+export const mapValuesToForm = value => ({
+	...value,
+	operationType: getOperationType(value),
+	categories: getCategories(value),
+	ip_limit: get(value, 'limits.ip_limit'),
+	ttl: parseInt(value.ttl, 10),
+	isAdmin: value.is_admin,
+});

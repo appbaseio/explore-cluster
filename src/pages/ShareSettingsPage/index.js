@@ -165,20 +165,14 @@ ShareSettingsView.propTypes = {
 	errors: PropTypes.array.isRequired,
 };
 
-const mapStateToProps = (state) => {
-	const appOwner = get(state, '$getAppInfo.app.owner');
-	const userEmail = get(state, 'user.data.email');
-	return {
-		isPaidUser: get(getAppPlanByName(state), 'isPaid'),
-		appId: get(state, '$getCurrentApp.id'),
-		isOwner: appOwner === userEmail,
-		isLoading: get(state, '$getSharedApp.isFetching'),
-		errors: [get(state, '$getSharedApp.error')],
-		sharedUsers: get(state, '$getSharedApp.results', []),
-		success:
-			get(state, '$createAppShare.success') || get(state, '$updateAppPermission.success'),
-	};
-};
+const mapStateToProps = state => ({
+	isPaidUser: get(getAppPlanByName(state), 'isPaid'),
+	appId: get(state, '$getCurrentApp.id'),
+	isLoading: get(state, '$getSharedApp.isFetching'),
+	errors: [get(state, '$getSharedApp.error')],
+	sharedUsers: get(state, '$getSharedApp.results', []),
+	success: get(state, '$createAppShare.success') || get(state, '$updateAppPermission.success'),
+});
 const mapDispatchToProps = dispatch => ({
 	fetchAppShare: appId => dispatch(getSharedApp(appId)),
 	shareApp: (appId, payload) => dispatch(createAppShare(appId, payload)),

@@ -12,6 +12,10 @@ const AnalyticsPage = Loadable({
 	loader: () => import('../../pages/AnalyticsPage'),
 	loading: Loader,
 });
+const UserManagementPage = Loadable({
+	loader: () => import('../../pages/UserManagementPage'),
+	loading: Loader,
+});
 const RequestDistributionPage = Loadable({
 	loader: () => import('../../pages/RequestDistributionPage'),
 	loading: Loader,
@@ -162,6 +166,13 @@ class AppLayout extends React.PureComponent {
 							path="/app/:appName/credentials"
 							component={props => (
 								<AppPageContainer {...props} component={CredentialsPage} />
+							)}
+						/>
+						<Route
+							exact
+							path="/app/:appName/user-management"
+							component={props => (
+								<AppPageContainer {...props} component={UserManagementPage} />
 							)}
 						/>
 						<Route

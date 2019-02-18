@@ -135,22 +135,10 @@ class Credentials extends Component {
 
 	handleSubmit = (form, username) => {
 		const { currentPermissionInfo } = this.state;
-		const requestPayload = { ...form.value.operationType, ...form.value };
-		delete requestPayload.operationType;
-		Object.keys(requestPayload).forEach((k) => {
-			if (requestPayload[k] !== undefined) {
-				if (k === 'ttl') {
-					requestPayload[k] = parseInt(requestPayload[k], 10);
-				}
-				if (k === 'ip_limit') {
-					requestPayload[k] = parseFloat(requestPayload[k], 10);
-				}
-			}
-		});
 		if (currentPermissionInfo || username) {
-			this.updatePermission(requestPayload, username);
+			this.updatePermission(form.mappedValues, username);
 		} else {
-			this.newPermission(requestPayload);
+			this.newPermission(form.mappedValues);
 		}
 	};
 
