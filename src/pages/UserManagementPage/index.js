@@ -122,7 +122,7 @@ class UserManagementPage extends React.Component {
 	};
 
 	render() {
-		const { users, isFetching } = this.props;
+		const { users, isFetching, isAdmin } = this.props;
 		const { showForm, currentPermissionInfo } = this.state;
 		if (isFetching) {
 			return <Loader />;
@@ -131,7 +131,12 @@ class UserManagementPage extends React.Component {
 			<React.Fragment>
 				<Card
 					extra={(
-<Button onClick={this.handleShow} size="large" type="primary">
+<Button
+							disabled={!isAdmin}
+							onClick={this.handleShow}
+							size="large"
+							type="primary"
+>
 							Create User
 </Button>
 )}
@@ -174,6 +179,7 @@ UserManagementPage.propTypes = {
 	credentials: PropTypes.string.isRequired,
 	createUser: PropTypes.func.isRequired,
 	updateUser: PropTypes.func.isRequired,
+	isAdmin: PropTypes.bool.isRequired,
 	deleteUser: PropTypes.func.isRequired,
 	fetchUsers: PropTypes.func.isRequired,
 	isFetching: PropTypes.bool.isRequired,
@@ -185,6 +191,7 @@ const mapStateToProps = (state) => {
 		credentials: username ? `${username}:${password}` : null,
 		users: get(state, '$getClusterUsers.results', []),
 		isFetching: get(state, '$getClusterUsers.isFetching', false),
+		isAdmin: get(state, 'user.data.isAdmin'),
 	};
 };
 const mapDispatchToProps = dispatch => ({
