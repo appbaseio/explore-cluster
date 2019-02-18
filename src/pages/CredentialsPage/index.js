@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import get from 'lodash/get';
 import {
- Card, Table, Popconfirm, Tooltip, Button,
+ Card, Table, Popconfirm, Tooltip, Button, Alert,
 } from 'antd';
 import { connect } from 'react-redux';
 import {
@@ -20,6 +20,7 @@ import {
 	deleteApp,
 } from '../../batteries/modules/actions';
 import Loader from '../../batteries/components/shared/Loader/Spinner';
+import { getURL } from '../../constants/config';
 
 const columns = [
 	{
@@ -151,6 +152,8 @@ class Credentials extends Component {
 		return (
 			<Container>
 				<Card title="Credentials">
+					<h4>Host URL for this cluster:</h4>
+					<Alert message={getURL()} type="info" css={{ marginBottom: 20 }} />
 					<Table
 						scroll={{ x: 700 }}
 						dataSource={permissions.map(permission => ({

@@ -59,6 +59,11 @@ const BrowserPage = Loadable({
 	loading: Loader,
 });
 
+const QueryRulesPage = Loadable({
+	loader: () => import('../../pages/QueryRules'),
+	loading: Loader,
+});
+
 const SandboxPage = Loadable({
 	loader: () => import('../../pages/SandboxPage'),
 	loading: Loader,
@@ -261,6 +266,19 @@ class AppLayout extends React.PureComponent {
 								<AppPageContainer
 									{...props}
 									component={BrowserPage}
+									shouldFetchAppInfo={false}
+									shouldFetchAppPlan={false}
+								/>
+							)}
+						/>
+
+						<Route
+							exact
+							path="/app/:appName/query-rules"
+							render={props => (
+								<AppPageContainer
+									{...props}
+									component={QueryRulesPage}
 									shouldFetchAppInfo={false}
 									shouldFetchAppPlan={false}
 								/>
