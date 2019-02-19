@@ -47,7 +47,7 @@ class HomePage extends Component {
 			fetchApps,
 		} = this.props;
 
-		if (!apps.data && !apps.isFetching) {
+		if (!apps.isFetching) {
 			fetchApps();
 		}
 	}
