@@ -18,7 +18,7 @@ function getLink(appname, credentials) {
 	const parameters = {
 		appname,
 		hosturl: url,
-		platform: 'elasticsearch',
+		platform: 'es',
 	};
 	return `${IMPORTER_LINK}${JSON.stringify(parameters)}&header=false`;
 }
