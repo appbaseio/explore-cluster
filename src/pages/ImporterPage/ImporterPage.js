@@ -2,24 +2,33 @@ import React, { Fragment } from 'react';
 import {
  Row, Col, Button, Icon,
 } from 'antd';
+import { connect } from 'react-redux';
+import { string } from 'prop-types';
+import get from 'lodash/get';
+import URL from 'url-parser-lite';
 
 import Header from '../../components/Header';
-import { IMPORTER_LINK } from '../../constants/config';
+import { IMPORTER_LINK, getURL } from '../../constants/config';
 
-function getLink() {
+function getLink(appname, credentials) {
+	const API = getURL();
+	const { protocol, host } = URL(API);
+	const url = `${protocol}://${credentials}@${host}`;
+
 	const parameters = {
+		appname,
+		hosturl: url,
 		platform: 'elasticsearch',
 	};
 	return `${IMPORTER_LINK}${JSON.stringify(parameters)}&header=false`;
 }
 
-const ImporterPage = () => (
+const ImporterPage = ({ appName, credentials }) => (
 	<Fragment>
 		<Header compact>
 			<Row type="flex" justify="space-between" gutter={16}>
 				<Col lg={18}>
 					<h2>Import Data</h2>
-
 					<Row>
 						<Col lg={18}>
 							<p>
@@ -77,7 +86,7 @@ const ImporterPage = () => (
 		<section>
 			<iframe
 				title="Importer"
-				src={getLink()}
+				src={getLink(appName, credentials)}
 				frameBorder="0"
 				width="100%"
 				height={`${window.innerHeight - 243 || 600}px`}
@@ -86,4 +95,16 @@ const ImporterPage = () => (
 	</Fragment>
 );
 
-export default ImporterPage;
+ImporterPage.propTypes = {
+	appName: string.isRequired,
+	credentials: string.isRequired,
+};
+
+const mapStateToProps = (state) => {
+	const { username, password } = get(state, 'user.data', {});
+	return {
+		credentials: username ? `${username}:${password}` : '',
+	};
+};
+
+export default connect(mapStateToProps)(ImporterPage);
