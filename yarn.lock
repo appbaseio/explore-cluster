@@ -3156,9 +3156,10 @@ codesandbox-import-utils@^1.2.16:
     istextorbinary "^2.2.1"
     lz-string "^1.4.4"
 
-codesandbox@^1.2.16:
+codesandbox@1.2.16:
   version "1.2.16"
   resolved "https://registry.yarnpkg.com/codesandbox/-/codesandbox-1.2.16.tgz#178bbc48eecab2747f6f04ac54d4cc072d7ce75d"
+  integrity sha512-bAx6G95Wv6+e+n+uj6aDWs+1ZsinWZsauGAfOV10HcIC/R/nJufg6e8/xgF2fBZovewKC7XMpVBmMDb8U7dEig==
   dependencies:
     axios "^0.16.2"
     chalk "^1.1.3"
@@ -8525,9 +8526,10 @@ react-is@^16.7.0:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.8.2.tgz#09891d324cad1cb0c1f2d91f70a71a4bee34df0f"
   integrity sha512-D+NxhSR2HUCjYky1q1DwpNUD44cDpUXzSmmFyC3ug1bClcU/iDNy0YNn1iwme28fn+NFhpA13IndOd42CrFb+Q==
 
-react-joyride@^2.0.0-15:
+react-joyride@2.0.0-15:
   version "2.0.0-15"
   resolved "https://registry.yarnpkg.com/react-joyride/-/react-joyride-2.0.0-15.tgz#58f9274b8de739b78648ae260826319ea066ae44"
+  integrity sha512-Svq83mXybNN2Ods0/WrAl/qG2liv3UwgcGgMe7avl1fk0NYi6XtHTkk4xrEKMKtxroL79bwJLo5BKWpZh+W0fA==
   dependencies:
     deep-diff "^1.0.1"
     deepmerge "^2.1.1"
