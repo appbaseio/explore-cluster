@@ -30,6 +30,11 @@ const CredentialsPage = Loadable({
 	loading: Loader,
 });
 
+const UserManagementPage = Loadable({
+	loader: () => import('../../pages/UserManagementPage'),
+	loading: Loader,
+});
+
 const OverviewPage = Loadable({
 	loader: () => import('../../pages/OverviewPage'),
 	loading: Loader,
@@ -126,6 +131,13 @@ class ClusterLayout extends React.PureComponent {
 							path="/cluster/credentials"
 							component={props => (
 								<AppPageContainer {...props} component={CredentialsPage} />
+							)}
+						/>
+						<Route
+							exact
+							path="/cluster/user-management"
+							component={props => (
+								<AppPageContainer {...props} component={UserManagementPage} />
 							)}
 						/>
 						<Route

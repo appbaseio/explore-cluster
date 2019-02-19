@@ -15,7 +15,12 @@ export async function getUser(username, password, url) {
 		throw new Error(data);
 	}
 
-	return { username, password, authToken };
+	return {
+		username,
+		password,
+		authToken,
+		isAdmin: data.is_admin,
+	};
 }
 
 export async function getESIndices(authToken) {

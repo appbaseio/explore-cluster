@@ -12,7 +12,7 @@ function* authWorker(username, password, url) {
 		sessionStorage.setItem('username', username);
 		sessionStorage.setItem('password', password);
 		sessionStorage.setItem('authToken', user.authToken);
-
+		sessionStorage.setItem('isAdmin', user.isAdmin);
 		yield put(setUser(user));
 		yield put(loadApps());
 	} catch (e) {

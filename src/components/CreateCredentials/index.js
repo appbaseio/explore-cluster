@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { css } from 'emotion';
 import {
- Icon, Modal, Input, Radio, Tooltip, Button, Select,
+ Icon, Modal, Input, Radio, Tooltip, Button, Select, Checkbox,
 } from 'antd';
 import {
 	FieldArray,
@@ -29,7 +29,13 @@ import {
 	getAppPermissionsByName,
 } from '../../batteries/modules/selectors';
 import {
- Types, getDefaultAclOptionsByPlan, isNegative, defaultRateLimits,
+	Types,
+	getDefaultAclOptionsByPlan,
+	isNegative,
+	defaultRateLimits,
+	isRateLimitPresent,
+	mapFormToValues,
+	mapValuesToForm,
 } from './utils';
 import Acl from './Acl';
 import WhiteList from './WhiteList';
@@ -38,6 +44,9 @@ import WhiteList from './WhiteList';
 const modal = css`
 	.ant-modal-content {
 		width: 580px;
+	}
+	.input-error {
+		border-color: tomato;
 	}
 `;
 const calculateValue = (value) => {
@@ -57,29 +66,58 @@ class CreateCredentials extends React.Component {
 
 		this.isApp = !window.location.pathname.startsWith('/cluster/credentials');
 
-		this.form = FormBuilder.group({
-			description: '',
-			operationType: [Types.read, Validators.required],
-			acl: new FormArray(
-				getDefaultAclOptionsByPlan(props.plan).map(
-					acl => new FormGroup({
-							acl: new FormControl(acl),
-							tag: new FormControl(true),
-							rateLimit: new FormControl(defaultRateLimits[acl]),
-						}),
-				),
-			),
-			referers: [{ value: ['*'], disabled: false }],
-			sources: [{ value: ['0.0.0.0/0'], disabled: false }],
-			indices: this.isApp
-				? [{ value: [props.appName], disabled: false }]
-				: [{ value: ['*'], disabled: false }],
-			ip_limit: [
-				{ value: 7200, disabled: !props.isPaidUser },
-				[Validators.required, isNegative],
-			],
-			ttl: [{ value: 0, disabled: !props.isPaidUser }, [Validators.required, isNegative]],
-		});
+		this.form = props.isUserManagement
+			? FormBuilder.group({
+					username: ['', Validators.required],
+					password: ['', Validators.required],
+					email: ['', Validators.email],
+					isAdmin: [false],
+					operationType: [Types.read, Validators.required],
+					categories: new FormArray(
+						getDefaultAclOptionsByPlan(props.plan).map(
+							acl => new FormGroup({
+									acl: new FormControl(acl),
+									tag: new FormControl(true),
+								}),
+						),
+					),
+					indices: this.isApp
+						? [{ value: [props.appName], disabled: false }]
+						: [{ value: ['*'], disabled: false }],
+			  })
+			: FormBuilder.group({
+					description: '',
+					operationType: [Types.read, Validators.required],
+					categories: new FormArray(
+						getDefaultAclOptionsByPlan(props.plan).map(
+							acl => new FormGroup({
+									acl: new FormControl(acl),
+									tag: new FormControl(true),
+									...(isRateLimitPresent(acl)
+										? {
+												rateLimit: new FormControl(
+													defaultRateLimits[acl],
+													isNegative,
+												),
+										  }
+										: null),
+								}),
+						),
+					),
+					referers: [{ value: ['*'], disabled: false }],
+					sources: [{ value: ['0.0.0.0/0'], disabled: false }],
+					indices: this.isApp
+						? [{ value: [props.appName], disabled: false }]
+						: [{ value: ['*'], disabled: false }],
+					ip_limit: [
+						{ value: 7200, disabled: !props.isPaidUser },
+						[Validators.required, isNegative],
+					],
+					ttl: [
+						{ value: 0, disabled: !props.isPaidUser },
+						[Validators.required, isNegative],
+					],
+			  });
 	}
 
 	componentDidMount() {
@@ -98,19 +136,7 @@ class CreateCredentials extends React.Component {
 			});
 		}
 		if (initialValues) {
-			let operationType;
-			Object.keys(Types).every((k) => {
-				const type = Types[k];
-				if (type.read === initialValues.read
-					&& type.write === initialValues.write && type.delete === initialValues.delete) {
-					operationType = type;
-					return false;
-				}
-				return true;
-			});
-			// removes undefined valued-keys
-			const values = { ...JSON.parse(JSON.stringify(initialValues)), operationType };
-			this.form.patchValue(values);
+			this.form.patchValue(mapValuesToForm(JSON.parse(JSON.stringify(initialValues))));
 		}
 	}
 
@@ -147,7 +173,8 @@ class CreateCredentials extends React.Component {
 
 	handleSubmit = () => {
 		const { onSubmit } = this.props;
-		onSubmit(this.form, get(this.props, 'initialValues.meta.username'));
+		this.form.mappedValues = JSON.parse(JSON.stringify(mapFormToValues(this.form.value)));
+		onSubmit(this.form, get(this.props, 'initialValues.username'));
 	};
 
 	render() {
@@ -159,8 +186,7 @@ class CreateCredentials extends React.Component {
 			disabled,
 			saveButtonText,
 			isLoadingMappings,
-			shouldHaveEmailField,
-			initialValues,
+			isUserManagement,
 		} = this.props;
 		return (
 			<FieldGroup
@@ -204,22 +230,87 @@ class CreateCredentials extends React.Component {
 						) : (
 							<React.Fragment>
 								<div css="position: relative">
-									{shouldHaveEmailField && (
+									{isUserManagement && (
+										<React.Fragment>
+											<FieldControl
+												strict={false}
+												control={this.form.get('username')}
+												render={({ handler }) => (
+													<Grid
+														label="Username"
+														toolTipMessage={Messages.username}
+														component={(
+<Input
+																autoFocus={!this.isEditing}
+																placeholder="Enter username"
+																{...handler()}
+/>
+)}
+													/>
+												)}
+											/>
+											<FieldControl
+												strict={false}
+												control={this.form.get('password')}
+												render={({ handler }) => (
+													<Grid
+														label="Password"
+														toolTipMessage={Messages.password}
+														component={(
+<Input
+																placeholder="Enter password"
+																{...handler()}
+																type="password"
+/>
+)}
+													/>
+												)}
+											/>
+											<FieldControl
+												strict={false}
+												control={this.form.get('email')}
+												render={({ handler }) => (
+													<Grid
+														label="Email"
+														toolTipMessage={Messages.email}
+														component={(
+<Input
+																placeholder="Enter email"
+																{...handler()}
+/>
+)}
+													/>
+												)}
+											/>
+											<FieldControl
+												strict={false}
+												control={this.form.get('isAdmin')}
+												render={({ handler }) => (
+													<Grid
+														label="Admin"
+														toolTipMessage={Messages.isAdmin}
+														component={
+															<Checkbox {...handler('checkbox')} />
+														}
+													/>
+												)}
+											/>
+										</React.Fragment>
+									)}
+									{!isUserManagement && (
 										<FieldControl
 											strict={false}
-											name="email"
-											formState={initialValues && initialValues.email}
-											options={{
-												validators: [Validators.required, Validators.email],
-											}}
+											name="description"
 											render={({ handler }) => (
 												<Grid
-													label="Email"
-													toolTipMessage={Messages.email}
+													label="Description"
+													toolTipMessage={Messages.description}
 													component={(
 <Input
-															autoFocus={!this.isEditing}
-															placeholder="Add email"
+															autoFocus={
+																!isUserManagement && !this.isEditing
+															}
+															placeholder="Add an optional description for this credential"
 															{...handler()}
 />
 )}
@@ -227,25 +318,6 @@ class CreateCredentials extends React.Component {
 											)}
 										/>
 									)}
-									<FieldControl
-										strict={false}
-										name="description"
-										render={({ handler }) => (
-											<Grid
-												label="Description"
-												toolTipMessage={Messages.description}
-												component={(
-<Input
-														autoFocus={
-															!shouldHaveEmailField && !this.isEditing
-														}
-														placeholder="Add an optional description for this credential"
-														{...handler()}
-/>
-)}
-											/>
-										)}
-									/>
 									<FieldControl
 										name="operationType"
 										render={({ handler }) => (
@@ -293,12 +365,17 @@ class CreateCredentials extends React.Component {
 										</div>
 									)}
 									<FieldArray
-										name="acl"
+										name="categories"
 										render={control => (
 											<Grid
-												label="Acls"
+												label="Categories"
 												toolTipMessage={Messages.acls}
-												component={<Acl control={control} />}
+												component={(
+<Acl
+														control={control}
+														isRateLimitPresent={!isUserManagement}
+/>
+)}
 											/>
 										)}
 									/>
@@ -333,91 +410,102 @@ class CreateCredentials extends React.Component {
 											}}
 										/>
 									)}
-									<Grid label="Security" toolTipMessage={Messages.security} />
-									<FieldControl
-										name="referers"
-										render={control => (
-											<WhiteList
-												toolTipMessage={Messages.referers}
-												control={control}
-												type="dropdown"
-												defaultSuggestionValue="https://example.com/"
-												label="HTTP Referers"
-												inputProps={{
-													placeholder: 'Add a HTTP Referer',
-												}}
-											/>
-										)}
-									/>
-									<FieldControl
-										name="sources"
-										render={control => (
-											<WhiteList
-												control={control}
-												toolTipMessage={Messages.sources}
-												label="IP Sources"
-												defaultValue={{
-													value: '0.0.0.0/0 (default)',
-													description: 'Matches all IP sources',
-												}}
-												inputProps={{
-													placeholder: 'Add an IP Source in CIDR format',
-												}}
-											/>
-										)}
-									/>
-									<FieldControl
-										name="ip_limit"
-										render={({ handler, hasError }) => (
+									{!isUserManagement && (
+										<React.Fragment>
 											<Grid
-												label="Max API calls/IP/hour"
-												toolTipMessage={Messages.ipLimit}
-												component={(
+												label="Security"
+												toolTipMessage={Messages.security}
+											/>
+											<FieldControl
+												name="referers"
+												render={control => (
+													<WhiteList
+														toolTipMessage={Messages.referers}
+														control={control}
+														type="dropdown"
+														defaultSuggestionValue="https://example.com/"
+														label="HTTP Referers"
+														inputProps={{
+															placeholder: 'Add a HTTP Referer',
+														}}
+													/>
+												)}
+											/>
+											<FieldControl
+												name="sources"
+												render={control => (
+													<WhiteList
+														control={control}
+														toolTipMessage={Messages.sources}
+														label="IP Sources"
+														defaultValue={{
+															value: '0.0.0.0/0 (default)',
+															description: 'Matches all IP sources',
+														}}
+														inputProps={{
+															placeholder:
+																'Add an IP Source in CIDR format',
+														}}
+													/>
+												)}
+											/>
+											<FieldControl
+												name="ip_limit"
+												render={({ handler, hasError }) => (
+													<Grid
+														label="Max API calls/IP/hour"
+														toolTipMessage={Messages.ipLimit}
+														component={(
 <Flex
-														justifyContent="center"
-														alignItems="center"
+																justifyContent="center"
+																alignItems="center"
 >
-														<Input
-															type="number"
-															css="border: solid 1px #9195A2!important;width: 120px"
-															{...handler()}
-														/>
-														{hasError('isNegative') && (
-															<span css="color: red;margin-left: 10px">
-																Field value can{"'"}t be negative.
-															</span>
-														)}
+																<Input
+																	type="number"
+																	css="border: solid 1px #9195A2!important;width: 120px"
+																	{...handler()}
+																/>
+																{hasError('isNegative') && (
+																	<span css="color: red;margin-left: 10px">
+																		Field value can{"'"}t be
+																		negative.
+																	</span>
+																)}
 </Flex>
 )}
+													/>
+												)}
 											/>
-										)}
-									/>
-									<FieldControl
-										name="ttl"
-										render={({ handler, hasError }) => (
-											<Grid
-												label="TTL"
-												toolTipMessage={Messages.ttl}
-												component={(
+											<FieldControl
+												name="ttl"
+												render={({ handler, hasError }) => (
+													<Grid
+														label="TTL"
+														toolTipMessage={Messages.ttl}
+														component={(
 <Flex
-														justifyContent="center"
-														alignItems="center"
+																justifyContent="center"
+																alignItems="center"
 >
-														<Input
-															type="number"
-															css="border: solid 1px #9195A2!important;width: 120px"
-															{...handler()}
-														/>
-														{hasError('isNegative') && (
-															<span css="color: red;margin-left: 10px">
-																Field value can{"'"}t be negative.
-															</span>
-														)}
+																<Input
+																	type="number"
+																	min="0"
+																	css="border: solid 1px #9195A2!important;width: 120px"
+																	{...handler()}
+																/>
+																{hasError('isNegative') && (
+																	<span css="color: red;margin-left: 10px">
+																		Field value can{"'"}t be
+																		negative.
+																	</span>
+																)}
 </Flex>
 )}
+													/>
+												)}
 											/>
-										)}
-									/>
+										</React.Fragment>
+									)}
 								</div>
 							</React.Fragment>
 						)}
@@ -436,7 +524,7 @@ CreateCredentials.defaultProps = {
 	saveButtonText: undefined,
 	permissions: undefined,
 	titleText: undefined,
-	shouldHaveEmailField: false,
+	isUserManagement: false,
 };
 CreateCredentials.propTypes = {
 	isPaidUser: PropTypes.bool,
@@ -449,7 +537,7 @@ CreateCredentials.propTypes = {
 		read: PropTypes.bool,
 		write: PropTypes.bool,
 		operationType: PropTypes.object,
-		acl: PropTypes.arrayOf(PropTypes.string),
+		categories: PropTypes.arrayOf(PropTypes.string),
 		sources: PropTypes.arrayOf(PropTypes.string),
 		include_fields: PropTypes.arrayOf(PropTypes.string),
 		ip_limit: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
@@ -457,7 +545,7 @@ CreateCredentials.propTypes = {
 		meta: PropTypes.object,
 	}),
 	isPermissionPresent: PropTypes.bool.isRequired,
-	appName: PropTypes.string.isRequired,
+	appName: PropTypes.string, // eslint-disable-line
 	handleCancel: PropTypes.func.isRequired,
 	isLoadingMappings: PropTypes.bool.isRequired,
 	disabled: PropTypes.bool,
@@ -466,7 +554,7 @@ CreateCredentials.propTypes = {
 	errors: PropTypes.array.isRequired,
 	plan: PropTypes.oneOf(['free', 'growth', 'bootstrap']).isRequired,
 	titleText: PropTypes.string,
-	shouldHaveEmailField: PropTypes.bool,
+	isUserManagement: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => {
@@ -484,12 +572,14 @@ const mapStateToProps = (state) => {
 		isSubmitting:
 			get(state, '$createAppPermission.isFetching')
 			|| get(state, '$updateAppPermission.isFetching')
-			|| get(state, '$createAppShare.isFetching'),
+			|| get(state, '$createClusterUser.isFetching')
+			|| get(state, '$updateClusterUser.isFetching'),
 		errors: [
 			get(state, '$getAppMappings.error'),
 			get(state, '$createAppPermission.error'),
 			get(state, '$updateAppPermission.error'),
-			get(state, '$createAppShare.error'),
+			get(state, '$createClusterUser.error'),
+			get(state, '$updateClusterUser.error'),
 		],
 	};
 };

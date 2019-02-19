@@ -3,8 +3,10 @@ import {
  Button, Popconfirm, Tooltip, notification,
 } from 'antd';
 import { css } from 'react-emotion';
-import { object, func } from 'prop-types';
+import { connect } from 'react-redux';
+import { object, func, bool } from 'prop-types';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import get from 'lodash/get';
 import Flex from '../../batteries/components/shared/Flex';
 
 const EyeIcon = require('react-feather/dist/icons/eye').default;
@@ -61,7 +63,7 @@ class Permission extends React.Component {
 				username: permissionInfo.username,
 			},
 		};
-		showForm(permissionInfo, formPayload);
+		showForm(formPayload);
 	};
 
 	handleDeleteCred = async () => {
@@ -71,6 +73,8 @@ class Permission extends React.Component {
 
 	render() {
 		const { viewKey } = this.state;
+		const { isAdmin } = this.props;
+		const disabled = !isAdmin;
 		return (
 			<Flex css={main} alignItems="center">
 				<Flex justifyContent="space-between" alignItems="center" css={container}>
@@ -80,19 +84,23 @@ class Permission extends React.Component {
 							placement="topLeft"
 							title={viewKey ? 'Hide credentials' : 'View credentials'}
 						>
-							<Button onClick={this.handleViewClick} type="normal">
+							<Button
+								disabled={disabled}
+								onClick={this.handleViewClick}
+								type="normal"
+							>
 								{viewKey ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
 							</Button>
 						</Tooltip>
 						<CopyToClipboard text={this.key} onCopy={this.handleCopyCred}>
 							<Tooltip placement="topLeft" title="Copy To Clipboard">
-								<Button type="normal">
+								<Button disabled={disabled} type="normal">
 									<CopyIcon size={16} />
 								</Button>
 							</Tooltip>
 						</CopyToClipboard>
 						<Tooltip placement="topLeft" title="Edit credentials">
-							<Button onClick={this.handleEditCred} type="normal">
+							<Button disabled={disabled} onClick={this.handleEditCred} type="normal">
 								<EditIcon size={16} />
 							</Button>
 						</Tooltip>
@@ -104,7 +112,7 @@ class Permission extends React.Component {
 					okText="Yes"
 					cancelText="No"
 				>
-					<Button type="danger">
+					<Button disabled={disabled} type="danger">
 						<DeleteIcon size={16} />
 					</Button>
 				</Popconfirm>
@@ -115,8 +123,13 @@ class Permission extends React.Component {
 
 Permission.propTypes = {
 	permissionInfo: object.isRequired,
+	isAdmin: bool.isRequired,
 	showForm: func.isRequired,
 	deletePermission: func.isRequired,
 };
 
-export default Permission;
+const mapStateToProps = state => ({
+	isAdmin: get(state, 'user.data.isAdmin'),
+});
+
+export default connect(mapStateToProps)(Permission);
