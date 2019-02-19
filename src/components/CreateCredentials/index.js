@@ -33,12 +33,13 @@ import {
 	getDefaultAclOptionsByPlan,
 	isNegative,
 	defaultRateLimits,
-	isRateLimitPresent,
 	mapFormToValues,
 	mapValuesToForm,
+	defaultAclOptions,
 } from './utils';
 import Acl from './Acl';
 import WhiteList from './WhiteList';
+import PasswordInput from './PasswordInput';
 
 // const { Option } = Select;
 const modal = css`
@@ -60,6 +61,8 @@ const calculateValue = (value) => {
 	}
 	return value;
 };
+
+const CheckboxGroup = Checkbox.Group;
 class CreateCredentials extends React.Component {
 	constructor(props) {
 		super(props);
@@ -73,14 +76,7 @@ class CreateCredentials extends React.Component {
 					email: ['', Validators.email],
 					isAdmin: [false],
 					operationType: [Types.read, Validators.required],
-					categories: new FormArray(
-						getDefaultAclOptionsByPlan(props.plan).map(
-							acl => new FormGroup({
-									acl: new FormControl(acl),
-									tag: new FormControl(true),
-								}),
-						),
-					),
+					categories: [defaultAclOptions],
 					indices: this.isApp
 						? [{ value: [props.appName], disabled: false }]
 						: [{ value: ['*'], disabled: false }],
@@ -93,14 +89,10 @@ class CreateCredentials extends React.Component {
 							acl => new FormGroup({
 									acl: new FormControl(acl),
 									tag: new FormControl(true),
-									...(isRateLimitPresent(acl)
-										? {
-												rateLimit: new FormControl(
-													defaultRateLimits[acl],
-													isNegative,
-												),
-										  }
-										: null),
+									rateLimit: new FormControl(
+										defaultRateLimits[acl],
+										isNegative,
+									),
 								}),
 						),
 					),
@@ -121,7 +113,7 @@ class CreateCredentials extends React.Component {
 	}
 
 	componentDidMount() {
-		const { disabled, initialValues } = this.props;
+		const { disabled, initialValues, isUserManagement } = this.props;
 		if (disabled) {
 			this.form.disable();
 		} else {
@@ -136,7 +128,7 @@ class CreateCredentials extends React.Component {
 			});
 		}
 		if (initialValues) {
-			this.form.patchValue(mapValuesToForm(JSON.parse(JSON.stringify(initialValues))));
+			this.form.patchValue(mapValuesToForm(JSON.parse(JSON.stringify(initialValues)), !isUserManagement));
 		}
 	}
 
@@ -172,8 +164,8 @@ class CreateCredentials extends React.Component {
 	}
 
 	handleSubmit = () => {
-		const { onSubmit } = this.props;
-		this.form.mappedValues = JSON.parse(JSON.stringify(mapFormToValues(this.form.value)));
+		const { onSubmit, isUserManagement } = this.props;
+		this.form.mappedValues = JSON.parse(JSON.stringify(mapFormToValues(this.form.value, !isUserManagement)));
 		onSubmit(this.form, get(this.props, 'initialValues.username'));
 	};
 
@@ -257,12 +249,11 @@ class CreateCredentials extends React.Component {
 														label="Password"
 														toolTipMessage={Messages.password}
 														component={(
-<Input
+															<PasswordInput
 																placeholder="Enter password"
 																{...handler()}
-																type="password"
-/>
-)}
+															/>
+														)}
 													/>
 												)}
 											/>
@@ -322,7 +313,7 @@ class CreateCredentials extends React.Component {
 										name="operationType"
 										render={({ handler }) => (
 											<Grid
-												label="Key Type"
+												label="Access Type"
 												toolTipMessage={Messages.operationType}
 												component={(
 <Radio.Group
@@ -364,21 +355,41 @@ class CreateCredentials extends React.Component {
 											</div>
 										</div>
 									)}
-									<FieldArray
-										name="categories"
-										render={control => (
-											<Grid
-												label="Categories"
-												toolTipMessage={Messages.acls}
-												component={(
-<Acl
-														control={control}
-														isRateLimitPresent={!isUserManagement}
-/>
-)}
-											/>
-										)}
-									/>
+									{
+										isUserManagement ? (
+											<FieldControl
+												name="categories"
+												render={({ handler }) => (
+													<Grid
+														label="Categories"
+														toolTipMessage={Messages.categories}
+														component={(
+															<CheckboxGroup
+																css="label { font-weight: 100 }"
+																options={defaultAclOptions}
+																{...handler()}
+															/>
+														)}
+													/>
+												)}
+											/>)
+											: (
+												<FieldArray
+													name="categories"
+													render={control => (
+														<Grid
+															label="Categories"
+															toolTipMessage={Messages.categories}
+															component={(
+																<Acl
+																	control={control}
+																	isRateLimitPresent={!isUserManagement}
+																/>
+															)}
+														/>
+													)}
+												/>
+											)}
 									{this.isApp ? null : (
 										<FieldControl
 											strict={false}

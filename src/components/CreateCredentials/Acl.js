@@ -32,7 +32,7 @@ class Acl extends React.PureComponent {
 
 		this.columns = [
 			{
-				title: 'Name',
+				title: 'Category',
 				dataIndex: 'key',
 				key: 'key',
 			},

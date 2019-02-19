@@ -64,45 +64,28 @@ export const isNegative = (control) => {
 // Operation types
 export const Types = {
 	read: {
-		description: 'Read-only key',
+		description: 'Read-only',
 		ops: ['read'],
 	},
 	write: {
-		description: 'Write-only key',
+		description: 'Write-only',
 		ops: ['write'],
 	},
 	admin: {
-		description: 'Admin key',
+		description: 'Admin',
 		ops: ['read', 'write', 'delete'],
 	},
 };
-export const categoriesWithRateLimit = ['docs', 'search', 'indices', 'cat', 'clusters', 'misc'];
-export const isRateLimitPresent = acl => categoriesWithRateLimit.includes(acl);
 export const defaultRateLimits = {
-	docs: 5,
-	search: 5,
-	indices: 5,
-	cat: 5,
-	clusters: 5,
-	misc: 5,
-	user: 5,
-	permission: 5,
-	analytics: 5,
-	streams: 5,
+	docs: 0,
+	search: 0,
+	indices: 0,
+	cat: 0,
+	clusters: 0,
+	misc: 0,
 };
 // Acl options
-export const aclOptions = [
-	'docs',
-	'search',
-	'indices',
-	'cat',
-	'clusters',
-	'misc',
-	'user',
-	'permission',
-	'analytics',
-	'streams',
-];
+export const aclOptions = ['docs', 'search', 'indices', 'cat', 'clusters', 'misc'];
 // Default Selected Acl
 export const defaultAclOptions = aclOptions;
 /**
@@ -174,7 +157,7 @@ export const getOperationType = (value) => {
 	return operationType;
 };
 
-export const mapFormToValues = (value) => {
+export const mapFormToValues = (value, hasLimits) => {
 	const filteredCategories = filterCategories(value);
 	return {
 		indices: value.indices,
@@ -183,20 +166,20 @@ export const mapFormToValues = (value) => {
 		referers: value.referers,
 		sources: value.sources,
 		limits: filteredCategories.limits,
-		categories: filteredCategories.categories,
 		ttl: parseInt(value.ttl, 10) || undefined,
 		username: value.username,
 		password: value.password,
 		email: value.email,
 		is_admin: value.isAdmin,
+		categories: hasLimits ? filteredCategories.categories : value.categories,
 	};
 };
 
-export const mapValuesToForm = value => ({
+export const mapValuesToForm = (value, hasLimits) => ({
 	...value,
 	operationType: getOperationType(value),
-	categories: getCategories(value),
 	ip_limit: get(value, 'limits.ip_limit'),
 	ttl: parseInt(value.ttl, 10),
 	isAdmin: value.is_admin,
+	...(hasLimits && { categories: getCategories(value) }),
 });

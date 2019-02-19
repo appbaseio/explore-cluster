@@ -7,7 +7,7 @@ import Flex from '../../batteries/components/shared/Flex';
 const Grid = ({
  label, component, toolTipMessage, gridRatio, ...rest
 }) => (
-	<Flex css="margin-top: 30px" {...rest}>
+	<Flex css="margin-bottom: 30px" {...rest}>
 		<Flex
 			css={`
 				flex: ${gridRatio * 100}%;

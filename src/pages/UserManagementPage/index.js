@@ -1,10 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Card, Button, Table } from 'antd';
+import {
+ Card, Button, Table, Alert,
+} from 'antd';
 import PropTypes from 'prop-types';
+import { css } from 'react-emotion';
 import get from 'lodash/get';
 import CredentialsForm from '../../components/CreateCredentials';
 import Permission from './Permission';
+import Password from './Password';
 import Loader from '../../batteries/components/shared/Loader/Spinner';
 import {
 	getClusterUsers,
@@ -12,7 +16,13 @@ import {
 	deleteClusterUser,
 	updateClusterUser,
 } from '../../batteries/modules/actions';
+import Container from '../../components/Container';
 
+const tableCls = css`
+	tr:hover td {
+		background: transparent;
+	}
+`;
 let lastIndex = 0;
 const updateIndex = () => {
 	lastIndex += 1;
@@ -21,16 +31,25 @@ const updateIndex = () => {
 
 const columns = [
 	{
-		title: 'Users',
+		title: 'Username',
+		key: `username${updateIndex()}`,
+		render: ({ permissionInfo }) => permissionInfo.username,
+	},
+	{
+		title: 'Password',
+		key: `password${updateIndex()}`,
+		// eslint-disable-next-line
+		render: ({ permissionInfo }) => <Password password={permissionInfo.password} />,
+	},
+	{
+		title: 'Email',
 		key: `email${updateIndex()}`,
-		render: ({ permissionInfo }) => permissionInfo.email || 'Anonymous',
-		width: '50%',
+		render: ({ permissionInfo }) => permissionInfo.email || 'No email',
 	},
 	{
 		title: 'Actions',
 		render: permission => <Permission {...permission} />,
 		key: 'credentials',
-		width: '50%',
 	},
 ];
 
@@ -128,8 +147,9 @@ class UserManagementPage extends React.Component {
 			return <Loader />;
 		}
 		return (
-			<React.Fragment>
+			<Container>
 				<Card
+					title="Manage Users"
 					extra={(
 <Button
 							disabled={!isAdmin}
@@ -141,8 +161,13 @@ class UserManagementPage extends React.Component {
 </Button>
 )}
 				>
+					<Alert
+						message="Create/Manage additional users that can access Arc."
+						type="info"
+						css={{ marginBottom: 20 }}
+					/>
 					<Table
-						scroll={{ x: 700 }}
+						scroll={{ x: 900 }}
 						dataSource={users.map(user => ({
 							permissionInfo: user,
 							deletePermission: this.deletePermission,
@@ -154,9 +179,7 @@ class UserManagementPage extends React.Component {
 							)}`
 						}
 						columns={columns}
-						css="tr:hover td {
-            background: transparent;
-        }"
+						css={tableCls}
 					/>
 				</Card>
 				{showForm && (
@@ -164,13 +187,13 @@ class UserManagementPage extends React.Component {
 						handleCancel={this.handleCancel}
 						isUserManagement
 						show={showForm}
-						saveButtonText={!currentPermissionInfo ? 'Create User' : undefined}
+						saveButtonText={!currentPermissionInfo ? 'Create' : 'Save'}
 						onSubmit={this.handleSubmit}
 						initialValues={currentPermissionInfo}
-						titleText={!currentPermissionInfo ? 'Create User' : undefined}
+						titleText={!currentPermissionInfo ? 'Create User' : 'Edit User'}
 					/>
 				)}
-			</React.Fragment>
+			</Container>
 		);
 	}
 }
