@@ -23,7 +23,7 @@ import { displayErrors } from '../../utils/helper';
 import { getPermission } from '../../batteries/modules/actions/permission';
 import Grid from './Grid';
 import { getAppMappings } from '../../batteries/modules/actions';
-import { createCredentials as Messages, hoverMessage } from '../../utils/messages';
+import { getMessages, hoverMessage } from '../../utils/messages';
 import {
 	getTraversedMappingsByAppName,
 	getAppPermissionsByName,
@@ -180,6 +180,7 @@ class CreateCredentials extends React.Component {
 			isLoadingMappings,
 			isUserManagement,
 		} = this.props;
+		const Messages = getMessages(isUserManagement);
 		return (
 			<FieldGroup
 				strict={false}
@@ -279,7 +280,7 @@ class CreateCredentials extends React.Component {
 												render={({ handler }) => (
 													<Grid
 														label="Admin"
-														toolTipMessage={Messages.isAdmin}
+														toolTipMessage={Messages.admin}
 														component={
 															<Checkbox {...handler('checkbox')} />
 														}
