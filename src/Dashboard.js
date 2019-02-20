@@ -33,6 +33,12 @@ class Dashboard extends Component {
 	componentDidMount() {
 		const { loadArcUser } = this.props;
 		const params = new URLSearchParams(window.location.search);
+		if (params.has('showHelpChat')) {
+			const showHelpChat = params.get('showHelpChat');
+			sessionStorage.setItem('showHelpChat', showHelpChat);
+		} else {
+			sessionStorage.setItem('showHelpChat', true);
+		}
 		if (params.has('url')) {
 			const url = params.get('url');
 			sessionStorage.setItem('url', url);

@@ -5,13 +5,22 @@ import HelpChat from '../../components/HelpChat';
 
 const AUTH_ROUTES = ['/login', '/signup'];
 
+function getHelpChatParam() {
+	const storedValue = sessionStorage.showHelpChat;
+
+	if (storedValue) {
+		return JSON.parse(storedValue);
+	}
+	return true;
+}
+
 const PrivateRoute = ({ component: Component, user, ...rest }) => (
 	<Route
 		{...rest}
 		render={props => (user.data ? (
 				<React.Fragment>
 					<Component {...props} />
-					<HelpChat user={user.data} />
+					{getHelpChatParam() ? <HelpChat user={user.data} /> : null}
 				</React.Fragment>
 			) : AUTH_ROUTES.includes(window.location.pathname) ? null : (
 				<Redirect to="/login" />
