@@ -3,10 +3,7 @@ import { css } from 'react-emotion';
 const container = css`
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-	justify-content: center;
 	min-height: 100vh;
-	background-image: linear-gradient(120deg, #eef5ff 0%, #c2e9fb 100%);
 `;
 
 const card = css`

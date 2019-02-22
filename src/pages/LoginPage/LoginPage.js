@@ -7,7 +7,7 @@ import { Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 import { loadUser } from '../../actions';
-import Logo from '../../components/Logo';
+import LoginContainer from '../../components/LoginContainer';
 import { container, card, gitlabBtn } from './styles';
 import { getURL } from '../../constants/config';
 
@@ -37,42 +37,43 @@ class LoginPage extends Component {
 		}
 		const ACC_API = getURL();
 		return (
-			<section className={container}>
-				<Logo width={200} />
-				<Card className={card} bordered={false}>
-					<h2>Sign in to get started</h2>
-					<Input
-						ref={this.url}
-						size="large"
-						defaultValue={ACC_API}
-						prefix={<Icon type="cluster" style={{ color: 'rgba(0,0,0,.25)' }} />}
-						placeholder="Cluster URL"
-					/>
-					<Input
-						css={{
-							margin: '6px 0',
-						}}
-						ref={this.username}
-						size="large"
-						prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
-						placeholder="Username"
-					/>
-					<Input
-						css={{
-							margin: '0 0 6px 0',
-						}}
-						ref={this.password}
-						size="large"
-						prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
-						type="password"
-						placeholder="Password"
-					/>
-					<Button onClick={this.login} className={gitlabBtn} size="small" block>
-						Signin
-						<Icon type="arrow-right" />
-					</Button>
-				</Card>
-			</section>
+			<LoginContainer>
+				<section className={container}>
+					<Card className={card} bordered={false}>
+						<h2>Sign in to get started</h2>
+						<Input
+							ref={this.url}
+							size="large"
+							defaultValue={ACC_API}
+							prefix={<Icon type="cluster" style={{ color: 'rgba(0,0,0,.25)' }} />}
+							placeholder="Cluster URL"
+						/>
+						<Input
+							css={{
+								margin: '6px 0',
+							}}
+							ref={this.username}
+							size="large"
+							prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
+							placeholder="Username"
+						/>
+						<Input
+							css={{
+								margin: '0 0 6px 0',
+							}}
+							ref={this.password}
+							size="large"
+							prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
+							type="password"
+							placeholder="Password"
+						/>
+						<Button onClick={this.login} className={gitlabBtn} size="small" block>
+							Signin
+							<Icon type="arrow-right" />
+						</Button>
+					</Card>
+				</section>
+			</LoginContainer>
 		);
 	}
 }
