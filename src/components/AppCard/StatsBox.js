@@ -1,8 +1,10 @@
 import React from 'react';
 import {
- Row, Col, Card, Tag,
+ Row, Col, Card, Tag, Icon,
 } from 'antd';
 import { css } from 'react-emotion';
+import { cardActions, actionIcon, deleteButton } from './styles';
+import DeleteAppModal from './DeleteAppModal';
 
 const titleStyles = css`
 	font-weight: bold;
@@ -51,62 +53,120 @@ const flex = {
 	alignItems: 'center',
 };
 
-export default function StatsBox({ data, title, style = {} }) {
-	const noData = (
-		<div
-			css={{
-				padding: 60,
-				textAlign: 'center',
-				color: 'rgba(0,0,0,0.45)',
-			}}
-		>
-			No data
-		</div>
-	);
+const noData = (
+	<div
+		css={{
+			padding: 60,
+			textAlign: 'center',
+			color: 'rgba(0,0,0,0.45)',
+		}}
+	>
+		No data
+	</div>
+);
 
-	let cols = [];
-	if (typeof data === 'object') {
-		cols = Object.keys(data)
-			.filter(item => !blackList.includes(item))
-			.map(item => (
-				<div>
-					<div className={stats}>{data[item]}</div>
-					<div className={titleStyles}>{renderItem(item)}</div>
-				</div>
-			));
-	}
+export default class StatsBox extends React.Component {
+	state = {
+		deleteModal: false,
+	};
 
-	const cardTitle = (
-		<div css={flex}>
-			<span css={flex}>
-				{title} &nbsp;&nbsp;
-				<Tag>{data.status}</Tag>
-			</span>
-			<span
+	handleDeleteModal = () => {
+		const { deleteModal: currentValue } = this.state;
+		this.setState({
+			deleteModal: !currentValue,
+		});
+	};
+
+	render() {
+		let cols = [];
+		const {
+			title, data, style, showDelete,
+		} = this.props; // prettier-ignore
+		const { deleteModal } = this.state;
+		if (typeof data === 'object') {
+			cols = Object.keys(data)
+				.filter(item => !blackList.includes(item))
+				.map(item => (
+					<div>
+						<div className={stats}>{data[item]}</div>
+						<div className={titleStyles}>{renderItem(item)}</div>
+					</div>
+				));
+		}
+
+		const cardTitle = (
+			<div css={flex}>
+				<span css={flex}>
+					{title} &nbsp;&nbsp;
+					<Tag>{data.status}</Tag>
+				</span>
+				<span
+					style={{
+						backgroundColor: data.health === 'green' ? 'limegreen' : data.health,
+					}}
+					className={colorBar}
+				/>
+			</div>
+		);
+
+		return (
+			<Card
+				title={cardTitle}
 				style={{
-					backgroundColor: data.health === 'green' ? 'limegreen' : data.health,
+					overflow: 'hidden',
+					...style,
 				}}
-				className={colorBar}
-			/>
-		</div>
-	);
+				bodyStyle={{ paddingBottom: '40px' }}
+				className={cardActions}
+			>
+				<Row gutter={8}>
+					{cols.length ? null : noData}
+					{cols.map((col, index) => (
+						<Col key={`stats-${index + 1}`} span={12}>
+							{col}
+						</Col>
+					))}
+				</Row>
+				{showDelete ? (
+					<React.Fragment>
+						<div
+							css={{
+								color: '#aaa',
+								position: 'absolute',
+								bottom: 10,
+								textAlign: 'center',
+								width: 'calc(100% - 48px)',
+							}}
+						>
+							<Icon type="ellipsis" theme="outlined" />
+						</div>
 
-	return (
-		<Card
-			title={cardTitle}
-			style={{
-				overflow: 'hidden',
-				...style,
-			}}
-		>
-			<Row gutter={8}>
-				{cols.length ? null : noData}
-				{cols.map((col, index) => (
-					<Col key={`stats-${index + 1}`} span={12}>
-						{col}
-					</Col>
-				))}
-			</Row>
-		</Card>
-	);
+						<div
+							className="card-actions"
+							key={title}
+							onClick={(e) => {
+								e.preventDefault();
+							}}
+						>
+							<Row type="flex">
+								<Col
+									span={24}
+									className={deleteButton}
+									onClick={this.handleDeleteModal}
+								>
+									<Icon className={actionIcon} type="delete" />
+									Delete Index
+								</Col>
+							</Row>
+							<DeleteAppModal
+								appName={data.index}
+								deleteModal={deleteModal}
+								handleDeleteModal={this.handleDeleteModal}
+							/>
+						</div>
+					</React.Fragment>
+				) : null}
+			</Card>
+		);
+	}
 }
