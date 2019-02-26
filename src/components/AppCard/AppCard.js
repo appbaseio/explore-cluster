@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import StatsBox from './StatsBox';
 
-const AppCard = ({ title, data }) => <StatsBox data={data} title={title} />;
+const AppCard = ({ title, data }) => <StatsBox data={data} showDelete title={title} />;
 
 AppCard.propTypes = {
 	title: PropTypes.node.isRequired,

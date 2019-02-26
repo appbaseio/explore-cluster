@@ -99,16 +99,23 @@ export function getParam(name, url) {
 	return results == null ? null : results[1];
 }
 
-export async function deleteApp(appId) {
+export async function deleteApp(appName) {
 	const ACC_API = getURL();
-	const response = await fetch(`${ACC_API}/app/${appId}`, {
-		credentials: 'include',
-		method: 'DELETE',
-	});
-	const data = await response.json();
-	if (response.status >= 400) {
-		throw new Error(data);
-	}
+	const authToken = sessionStorage.getItem('authToken');
+	try {
+		const response = await fetch(`${ACC_API}/${appName}`, {
+			headers: {
+				Authorization: `Basic ${authToken}`,
+			},
+			method: 'DELETE',
+		});
+		const data = await response.json();
+		if (response.status >= 400) {
+			throw new Error(data);
+		}
 
-	return data.message;
+		return data.acknowledged;
+	} catch (e) {
+		return { message: 'An error occured while deleting the app. Please try again.' };
+	}
 }

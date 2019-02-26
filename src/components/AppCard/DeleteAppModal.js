@@ -14,25 +14,32 @@ class DeleteAppModal extends React.Component {
 	handleDelete = () => {
 		const {
 			// prettier-ignore
-			appId,
 			appName,
 			handleDeleteModal,
 			handleRemoveApp,
 		} = this.props;
 
-		deleteApp(appId)
-			.then(() => {
-				handleRemoveApp(appName);
-				handleDeleteModal();
-				message.success(`${appName} deleted`);
-			})
-			.catch(() => {
-				message.error('Something went wrong. Try again.');
-			});
-
 		this.setState({
 			loading: true,
 		});
+
+		deleteApp(appName)
+			.then(() => {
+				handleRemoveApp(appName);
+				handleDeleteModal();
+				message.success(`${appName} Deleted!`);
+				this.setState({
+					loading: false,
+					deleteAppName: '',
+				});
+			})
+			.catch((e) => {
+				message.error(e.message);
+				this.setState({
+					loading: false,
+					deleteAppName: '',
+				});
+			});
 	};
 
 	handleInputChange = (e) => {
@@ -78,7 +85,6 @@ class DeleteAppModal extends React.Component {
 
 DeleteAppModal.propTypes = {
 	deleteModal: PropTypes.bool.isRequired,
-	appId: PropTypes.string.isRequired,
 	appName: PropTypes.string.isRequired,
 	handleDeleteModal: PropTypes.func.isRequired,
 	handleRemoveApp: PropTypes.func.isRequired,

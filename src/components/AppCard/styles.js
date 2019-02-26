@@ -22,7 +22,6 @@ const cardActions = css`
 	position: relative;
 	overflow: hidden;
 	padding: 25px auto;
-	max-height: 205px;
 	${mediaKey.xsmall} {
 		max-height: none;
 	}

@@ -83,6 +83,7 @@ class PaidUserOverview extends React.Component {
 								paddingBottom: '15px',
 								overflow: 'hidden',
 							}}
+							showDelete={false}
 							title="Overview"
 							data={stats}
 						/>
