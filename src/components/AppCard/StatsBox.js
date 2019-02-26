@@ -114,6 +114,7 @@ export default class StatsBox extends React.Component {
 				title={cardTitle}
 				style={{
 					overflow: 'hidden',
+					minHeight: '256px',
 					...style,
 				}}
 				bodyStyle={{ paddingBottom: '40px' }}
