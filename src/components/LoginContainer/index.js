@@ -4,56 +4,69 @@ import PropTypes from 'prop-types';
 import Flex from '../../batteries/components/shared/Flex';
 import Logo from '../Logo';
 import AppbaseUsers from '../AppbaseUsers';
-import { main } from './styles';
+import { main, footer } from './styles';
 
 const LoginContainer = ({ children }) => (
 	<React.Fragment>
 		<Flex css={main}>
 			<Flex className="content" flexDirection="column">
-				<Logo type="black" width={200} />
+				<Logo width={200} />
 				<h2 className="title">
-					Try Arc today to give superpowers to your ElasticSearch cluster.
+					<mark>
+						Give <span className="highlight">superpowers</span> to your
+						&nbsp;ElasticSearch cluster!
+					</mark>
 				</h2>
 				<p>
 					Arc helps you with building the best search experience while you focus on
-					serving your users!
+					serving your users. It can be used with appbase.io clusters or your own
+					ElasticSearch cluster.
 				</p>
 				<div className="signup_description">
-					<h4>
-						Arc can be used with appbase.io clusters or your own ElasticSearch cluster.
-						See installation guide here.
-					</h4>
 					<ul className="signup_benefits">
 						<li>
 							<Icon type="check" className="icon" />
-							Deployment Flexibility: Our cloud, your cloud, local environment - works
-							everywhere
+							<span>
+								Deployment Flexibility: Our cloud, your cloud, local environment -
+								works everywhere
+							</span>
 						</li>
 						<li>
 							<Icon type="check" className="icon" />
-							Import JSON / CSV data or use our CLI for importing from your favorite
-							data source
+							<span>
+								Import JSON / CSV data or use our CLI for importing from your
+								favorite data source
+							</span>
 						</li>
 						<li>
 							<Icon type="check" className="icon" />
-							Browse data, edit mappings, build search visually, and create query
-							rules
+							<span>
+								Browse data, edit mappings, build search visually, and create query
+								rules
+							</span>
 						</li>
 						<li>
 							<Icon type="check" className="icon" />
-							Get actionable analytics to improve content and increase your search ROI
+							<span>
+								Get actionable analytics to improve content and increase your search
+								ROI
+							</span>
 						</li>
 						<li>
 							<Icon type="check" className="icon" />
-							Get best-in-class security with read/write permissions, granular ACLs
-							and more
+							<span>
+								Get best-in-class security with read/write permissions, granular
+								ACLs and more
+							</span>
 						</li>
 					</ul>
 				</div>
-				<AppbaseUsers title="You're in good company" />
 			</Flex>
 			<Flex flexDirection="column">{children}</Flex>
 		</Flex>
+		<div css={footer}>
+			<AppbaseUsers title="You're in good company" />
+		</div>
 	</React.Fragment>
 );
 

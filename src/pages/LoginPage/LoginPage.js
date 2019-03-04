@@ -39,7 +39,7 @@ class LoginPage extends Component {
 		return (
 			<LoginContainer>
 				<section className={container}>
-					<Card className={card} bordered={false}>
+					<Card style={{ marginTop: 70 }} className={card} bordered={false}>
 						<h2>Sign in to get started</h2>
 						<Input
 							ref={this.url}
