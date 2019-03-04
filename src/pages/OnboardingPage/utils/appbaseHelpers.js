@@ -12,7 +12,7 @@ const streamingData = {
 	original_title: 'Star Wars: The Last Jedi',
 	overview:
 		'Rey develops her newly discovered abilities with the guidance of Luke Skywalker, who is unsettled by the strength of her powers. Meanwhile, the Resistance prepares to do battle with the First Order.',
-	poster_path: '/kOVEVeg59E0wsnXmF9nrh6OmWII.jpg',
+	poster_path: 'https://image.tmdb.org/t/p/w185/kOVEVeg59E0wsnXmF9nrh6OmWII.jpg',
 	release_year: 2017,
 	tagline: 'Episode VIII - The Last Jedi',
 };

@@ -11,8 +11,8 @@ import {
 import appbaseHelpers from '../utils/appbaseHelpers';
 import { getURL } from '../../../constants/config';
 
-const onData = res => ({
-	image: `https://image.tmdb.org/t/p/w92${res.poster_path}`,
+const renderData = res => ({
+	image: res.poster_path,
 	title: res.original_title,
 	description: (
 		<div>
@@ -183,7 +183,7 @@ export default class SearchApp extends Component {
 							and: ['search', 'genres', 'original_language', 'release_year'],
 						}}
 						size={4}
-						onData={onData}
+						renderData={renderData}
 						className="right-col"
 						innerClass={{
 							listItem: 'list-item',
