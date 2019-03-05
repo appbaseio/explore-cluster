@@ -153,7 +153,7 @@ const mapStateToProps = (state) => {
 		stats: get(state, `apps.data['${appName}']`, {}),
 		popularSearches: get(analytics, 'popular_searches'),
 		noResults: get(analytics, 'no_results_searches'),
-		searchVolume: get(analytics, 'search_volume'),
+		searchVolume: get(analytics, 'search_histogram'),
 	};
 };
 const mapDispatchToProps = dispatch => ({
