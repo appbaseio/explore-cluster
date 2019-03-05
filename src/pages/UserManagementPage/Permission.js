@@ -42,7 +42,7 @@ class Permission extends React.Component {
 				</Flex>
 				<Tooltip placement="topLeft" title="Delete User">
 					<Popconfirm
-						title="Are you sure delete this key?"
+						title="Are you sure delete this user?"
 						onConfirm={this.handleDeleteCred}
 						okText="Yes"
 						cancelText="No"

@@ -17,6 +17,7 @@ import {
 	updateClusterUser,
 } from '../../batteries/modules/actions';
 import Container from '../../components/Container';
+import { getURL } from '../../constants/config';
 
 const tableCls = css`
 	tr:hover td {
@@ -161,11 +162,8 @@ class UserManagementPage extends React.Component {
 </Button>
 )}
 				>
-					<Alert
-						message="Create/Manage additional users that can access Arc."
-						type="info"
-						css={{ marginBottom: 20 }}
-					/>
+						<h4>Host URL for this cluster:</h4>
+					<Alert message={getURL()} type="info" css={{ marginBottom: 20 }} />
 					<Table
 						scroll={{ x: 900 }}
 						dataSource={users.map(user => ({

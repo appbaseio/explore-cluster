@@ -67,15 +67,15 @@ class CreateCredentials extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.isApp = !window.location.pathname.startsWith('/cluster/credentials');
+		this.isApp = !window.location.pathname.startsWith('/cluster/user-management');
 
 		this.form = props.isUserManagement
 			? FormBuilder.group({
 					username: ['', Validators.required],
 					password: ['', Validators.required],
-					email: ['', Validators.email],
+					email: [undefined, Validators.email],
 					isAdmin: [false],
-					operationType: [Types.read, Validators.required],
+					operationType: [Types.read],
 					categories: [defaultAclOptions],
 					indices: this.isApp
 						? [{ value: [props.appName], disabled: false }]
@@ -118,14 +118,36 @@ class CreateCredentials extends React.Component {
 			this.form.disable();
 		} else {
 			const indicesHandler = this.form.get('indices');
-			indicesHandler.valueChanges.subscribe((value) => {
-				if (value && value.includes('*')) {
-					indicesHandler.disable({ emitEvent: false });
-					indicesHandler.reset([]);
-				} else {
-					indicesHandler.enable({ emitEvent: false });
-				}
-			});
+			const adminHandler = this.form.get('isAdmin');
+			const opsHandler = this.form.get('operationType');
+			const categoriesHandler = this.form.get('categories');
+			if (adminHandler) {
+				adminHandler.valueChanges.subscribe((value) => {
+					if (value) {
+						opsHandler.setValue(Types.admin);
+						categoriesHandler.setValue(defaultAclOptions);
+						opsHandler.disable();
+						categoriesHandler.disable();
+						indicesHandler.disable();
+					} else {
+						opsHandler.setValue(Types.read);
+						categoriesHandler.setValue(defaultAclOptions);
+						opsHandler.enable();
+						categoriesHandler.enable();
+						indicesHandler.enable();
+					}
+				});
+			}
+			if (indicesHandler) {
+				indicesHandler.valueChanges.subscribe((value) => {
+					if (value && value.includes('*')) {
+						indicesHandler.disable({ emitEvent: false });
+						indicesHandler.reset([]);
+					} else if (adminHandler && !adminHandler.value) {
+						indicesHandler.enable({ emitEvent: false });
+					}
+				});
+			}
 		}
 		if (initialValues) {
 			this.form.patchValue(mapValuesToForm(JSON.parse(JSON.stringify(initialValues)), !isUserManagement));
@@ -141,7 +163,16 @@ class CreateCredentials extends React.Component {
 	}
 
 	componentWillUnmount() {
-		this.form.get('indices').valueChanges.unsubscribe();
+		const indicesHandler = this.form.get('indices');
+		const adminHandler = this.form.get('isAdmin');
+		const categoriesHandler = this.form.get('categories');
+		if (indicesHandler) {
+			indicesHandler.valueChanges.unsubscribe();
+		}
+		if (adminHandler) {
+			adminHandler.valueChanges.unsubscribe();
+		}
+		categoriesHandler.valueChanges.unsubscribe();
 	}
 
 	getMappings() {
@@ -260,6 +291,19 @@ class CreateCredentials extends React.Component {
 											/>
 											<FieldControl
 												strict={false}
+												control={this.form.get('isAdmin')}
+												render={({ handler }) => (
+													<Grid
+														label="Admin"
+														toolTipMessage={Messages.admin}
+														component={
+															<Checkbox {...handler('checkbox')} />
+														}
+													/>
+												)}
+											/>
+											<FieldControl
+												strict={false}
 												control={this.form.get('email')}
 												render={({ handler }) => (
 													<Grid
@@ -271,19 +315,6 @@ class CreateCredentials extends React.Component {
 																{...handler()}
 />
 )}
-													/>
-												)}
-											/>
-											<FieldControl
-												strict={false}
-												control={this.form.get('isAdmin')}
-												render={({ handler }) => (
-													<Grid
-														label="Admin"
-														toolTipMessage={Messages.admin}
-														component={
-															<Checkbox {...handler('checkbox')} />
-														}
 													/>
 												)}
 											/>

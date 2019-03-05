@@ -48,7 +48,6 @@ const routes = {
 		icon: 'key',
 		menu: [
 			{ label: 'API Credentials', link: 'credentials' },
-			{ label: 'User Management', link: 'user-management' },
 		],
 	},
 };

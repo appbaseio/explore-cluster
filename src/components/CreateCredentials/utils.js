@@ -77,15 +77,32 @@ export const Types = {
 	},
 };
 export const defaultRateLimits = {
-	docs: 0,
-	search: 0,
-	indices: 0,
-	cat: 0,
-	clusters: 0,
-	misc: 0,
+	docs: 10,
+	search: 10,
+	indices: 10,
+	cat: 10,
+	clusters: 10,
+	misc: 10,
+	user: 10,
+	permission: 10,
+	analytics: 10,
+	streams: 10,
+	rules: 10,
 };
 // Acl options
-export const aclOptions = ['docs', 'search', 'indices', 'cat', 'clusters', 'misc'];
+export const aclOptions = [
+	'docs',
+	'search',
+	'indices',
+	'cat',
+	'clusters',
+	'misc',
+	'user',
+	'permission',
+	'analytics',
+	'streams',
+	'rules',
+];
 // Default Selected Acl
 export const defaultAclOptions = aclOptions;
 /**
@@ -110,6 +127,7 @@ export const aclOptionsLabel = {
 	permission: 'permission',
 	analytics: 'analytics',
 	streams: 'streams',
+	rules: 'rules',
 };
 
 const filterCategories = (value) => {
@@ -162,7 +180,7 @@ export const mapFormToValues = (value, hasLimits) => {
 	return {
 		indices: value.indices,
 		description: value.description,
-		ops: value.operationType.ops,
+		ops: value.operationType && value.operationType.ops,
 		referers: value.referers,
 		sources: value.sources,
 		limits: filteredCategories.limits,
@@ -177,7 +195,7 @@ export const mapFormToValues = (value, hasLimits) => {
 
 export const mapValuesToForm = (value, hasLimits) => ({
 	...value,
-	operationType: getOperationType(value),
+	operationType: value.is_admin ? Types.admin : getOperationType(value),
 	ip_limit: get(value, 'limits.ip_limit'),
 	ttl: parseInt(value.ttl, 10),
 	isAdmin: value.is_admin,
