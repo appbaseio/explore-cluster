@@ -136,8 +136,8 @@ class HomePage extends Component {
 								<Row>
 									<Col lg={18}>
 										<p>
-											This is your apps manager view. Here, you can create a
-											new app and manage your existing apps.
+											This is your cluster manager view. Here, you can create
+											a new index and manage your existing indices.
 										</p>
 									</Col>
 								</Row>
@@ -180,7 +180,7 @@ class HomePage extends Component {
 									block
 									onClick={this.handleChange}
 								>
-									<Icon type="plus" /> Create a new app
+									<Icon type="plus" /> Create a new index
 								</Button>
 							</Col>
 						</Row>

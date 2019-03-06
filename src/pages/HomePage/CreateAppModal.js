@@ -5,11 +5,7 @@ import {
 } from 'antd';
 import PropTypes from 'prop-types';
 
-import {
-	modalHeading,
-	input,
-	radiobtn,
-} from './styles';
+import { modalHeading, input, radiobtn } from './styles';
 import { validateAppName, validationsList } from '../../utils/helper';
 
 import { createApp, resetCreatedApp } from '../../actions';
@@ -105,14 +101,16 @@ class CreateAppModal extends Component {
 				onOk={this.handleOk}
 				destroyOnClose
 				okButtonProps={{ loading: createdApp.isLoading }}
-				okText="Create App"
-				title="Create App"
+				okText="Create Index"
+				title="Create Index"
 				onCancel={this.handleCancel}
 				width={600}
 			>
 				<div>
 					<Row type="flex" justify="space-between" align="middle">
-						<h3 style={{ marginTop: 0 }} className={modalHeading}>App Name</h3>
+						<h3 style={{ marginTop: 0 }} className={modalHeading}>
+							Index Name
+						</h3>
 						<Popover
 							placement="right"
 							content={(
@@ -122,7 +120,7 @@ class CreateAppModal extends Component {
 									renderItem={item => <List.Item>{item}</List.Item>}
 								/>
 							)} // prettier-ignore
-							title="App name validations"
+							title="Index name validations"
 							trigger="click"
 							visible={validationPopOver}
 						>
@@ -130,7 +128,8 @@ class CreateAppModal extends Component {
 						</Popover>
 					</Row>
 					<p css={{ fontSize: 14, margin: '-4px 0 8px 0', lineHeight: '20px' }}>
-						App names are unique across the cluster and should use lowercase alphabets. Click
+						Index names are unique across the cluster and should use lowercase
+						alphabets. Click
 						<span style={{ color: '#1890ff' }} onClick={this.handleValidationPopOver}>
 							{' '}
 							here
@@ -138,7 +137,7 @@ class CreateAppModal extends Component {
 						to see more rules.
 					</p>
 					<Input
-						placeholder="Enter a unique app name"
+						placeholder="Enter a unique index name"
 						name="appName"
 						className={input}
 						onChange={this.handleChange}
@@ -153,7 +152,7 @@ class CreateAppModal extends Component {
 
 				<div>
 					<h3 className={modalHeading}>
-						Do you have a JSON or CSV dataset to import into this app?
+						Do you have a JSON or CSV dataset to import into this index?
 					</h3>
 					<RadioGroup value={hasJSON} name="hasJSON" onChange={this.handleChange}>
 						<Radio className={radiobtn} value>

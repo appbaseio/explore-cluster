@@ -69,11 +69,11 @@ class DeleteAppModal extends React.Component {
 				okButtonProps={{ type: 'danger', disabled, loading }}
 			>
 				<p>
-					Type the app name <span style={{ fontWeight: '600' }}>{appName}</span> below to
-					delete the app. This action cannot be undone.
+					Type the index name <span style={{ fontWeight: '600' }}>{appName}</span> below
+					to delete the index. This action cannot be undone.
 				</p>
 				<Input
-					placeholder="Confirm appname"
+					placeholder="Confirm Delete"
 					onChange={this.handleInputChange}
 					value={deleteAppName}
 					name="deleteAppName"
