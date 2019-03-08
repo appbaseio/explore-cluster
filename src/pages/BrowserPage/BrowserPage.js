@@ -10,9 +10,14 @@ import {
 } from '../../batteries/modules/actions';
 
 import Loader from '../../components/Loader';
+import Frame from '../../components/Frame';
 import { getURL } from '../../constants/config';
 
 class BrowserPage extends Component {
+	state = {
+		isFrameLoading: true,
+	};
+
 	componentDidMount() {
 		const { credentials } = this.props;
 		if (!credentials) {
@@ -27,6 +32,12 @@ class BrowserPage extends Component {
 		}
 	}
 
+	frameLoaded = () => {
+		this.setState({
+			isFrameLoading: false,
+		});
+	};
+
 	init() {
 		// prettier-ignore
 		const {
@@ -40,6 +51,7 @@ class BrowserPage extends Component {
 
 	render() {
 		const { appName, credentials, isCluster } = this.props;
+		const { isFrameLoading } = this.state;
 		const SCALR_API = getURL();
 		const { protocol, host } = URL(SCALR_API);
 		const url = `${protocol}://${credentials}@${host}`;
@@ -50,13 +62,18 @@ class BrowserPage extends Component {
 		return (
 			<section>
 				{credentials ? (
-					<iframe
-						height={`${window.innerHeight - 60 || 600}px`}
-						width="100%"
-						title="dejavu"
-						src={iframeURL}
-						frameBorder="0"
-					/>
+					<React.Fragment>
+						{isFrameLoading && <Loader />}
+						<Frame
+							height={`${window.innerHeight - 60 || 600}px`}
+							width="100%"
+							title="dejavu"
+							id="dejavu"
+							onLoad={this.frameLoaded}
+							src={iframeURL}
+							frameBorder="0"
+						/>
+					</React.Fragment>
 				) : (
 					<Loader />
 				)}

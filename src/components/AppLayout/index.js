@@ -104,6 +104,7 @@ class AppLayout extends React.PureComponent {
 					paddingTop: showHeader ? 60 : 0,
 					minHeight: '100vh',
 					marginLeft: collapsed ? '80px' : '260px',
+					position: 'relative',
 				}}
 			>
 				{showHeader && <AppHeader big={collapsed} />}
@@ -225,7 +226,7 @@ class AppLayout extends React.PureComponent {
 						/>
 						<Route
 							exact
-							path="/app/:appName/mappings"
+							path="/app/:appName/settings"
 							render={props => (
 								<AppPageContainer
 									{...props}
