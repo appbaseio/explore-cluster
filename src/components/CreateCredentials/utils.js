@@ -1,6 +1,7 @@
 import isEqual from 'lodash/isEqual';
 import sortBy from 'lodash/sortBy';
 import get from 'lodash/get';
+import filter from 'lodash/filter';
 
 export const Suggestions = {
 	1: {
@@ -199,5 +200,6 @@ export const mapValuesToForm = (value, hasLimits) => ({
 	ip_limit: get(value, 'limits.ip_limit'),
 	ttl: parseInt(value.ttl, 10),
 	isAdmin: value.is_admin,
+	indices: value.indices ? filter(value.indices, o => o !== '') : undefined,
 	...(hasLimits && { categories: getCategories(value) }),
 });

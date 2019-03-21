@@ -67,7 +67,7 @@ class CreateCredentials extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.isApp = !window.location.pathname.startsWith('/cluster/user-management');
+		this.isApp = !window.location.pathname.startsWith(props.isUserManagement ? '/cluster/user-management' : '/cluster/credentials');
 
 		this.form = props.isUserManagement
 			? FormBuilder.group({
@@ -135,16 +135,6 @@ class CreateCredentials extends React.Component {
 						opsHandler.enable();
 						categoriesHandler.enable();
 						indicesHandler.enable();
-					}
-				});
-			}
-			if (indicesHandler) {
-				indicesHandler.valueChanges.subscribe((value) => {
-					if (value && value.includes('*')) {
-						indicesHandler.disable({ emitEvent: false });
-						indicesHandler.reset([]);
-					} else if (adminHandler && !adminHandler.value) {
-						indicesHandler.enable({ emitEvent: false });
 					}
 				});
 			}
