@@ -1,7 +1,16 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
- Row, Col, Icon, Modal, Input, Radio, List, Popover, notification,
+	Row,
+	Col,
+	Icon,
+	Modal,
+	Input,
+	Radio,
+	List,
+	Popover,
+	notification,
+	InputNumber,
 } from 'antd';
 import PropTypes from 'prop-types';
 
@@ -19,6 +28,8 @@ class CreateAppModal extends Component {
 			appName: '',
 			hasJSON: false,
 			validationPopOver: false,
+			shards: 5,
+			replicas: 0,
 		};
 	}
 
@@ -40,10 +51,14 @@ class CreateAppModal extends Component {
 	};
 
 	handleOk = async () => {
-		const { appName } = this.state;
+		const { appName, shards, replicas } = this.state;
 		const { handleCreateApp } = this.props;
 		const options = {
 			appName,
+			settings: {
+				number_of_shards: shards,
+				number_of_replicas: replicas,
+			},
 		};
 
 		const isValid = validateAppName(appName);
@@ -75,6 +90,12 @@ class CreateAppModal extends Component {
 		});
 	};
 
+	handleInputNumber = (name, value) => {
+		this.setState({
+			[name]: value,
+		});
+	};
+
 	handleCancel = () => {
 		const { handleModal } = this.props;
 		handleModal();
@@ -92,6 +113,8 @@ class CreateAppModal extends Component {
 			appName,
 			hasJSON,
 			validationPopOver,
+			shards,
+			replicas,
 		} = this.state;
 		const { createdApp, showModal } = this.props;
 
@@ -142,6 +165,32 @@ class CreateAppModal extends Component {
 						className={input}
 						onChange={this.handleChange}
 						value={appName}
+					/>
+					<h3 style={{ marginTop: 20 }} className={modalHeading}>
+						Shards
+					</h3>
+					<InputNumber
+						placeholder="Enter number of shards"
+						name="shards"
+						max={100}
+						style={{ width: '100%' }}
+						min={0}
+						step={1}
+						onChange={value => this.handleInputNumber('shards', value)}
+						value={shards}
+					/>
+					<h3 style={{ marginTop: 20 }} className={modalHeading}>
+						Replicas
+					</h3>
+					<InputNumber
+						placeholder="Enter number of replicas"
+						name="replicas"
+						max={2}
+						min={0}
+						style={{ width: '100%' }}
+						step={1}
+						onChange={value => this.handleInputNumber('replicas', value)}
+						value={replicas}
 					/>
 					{createdApp && createdApp.error ? (
 						<div css={{ color: 'tomato', marginTop: 8 }}>

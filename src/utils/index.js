@@ -70,6 +70,11 @@ export async function getCreateApp(options, authToken) {
 	const ACC_API = getURL();
 	const response = await fetch(`${ACC_API}/${options.appName}`, {
 		method: 'PUT',
+		body: JSON.stringify({
+			settings: {
+				...options.settings,
+			},
+		}),
 		headers: {
 			'Content-Type': 'application/json',
 			Authorization: `Basic ${authToken}`,
