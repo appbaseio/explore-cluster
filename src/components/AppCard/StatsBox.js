@@ -3,7 +3,9 @@ import {
  Row, Col, Card, Tag, Icon,
 } from 'antd';
 import { css } from 'react-emotion';
-import { cardActions, actionIcon, deleteButton } from './styles';
+import {
+ cardActions, actionIcon, deleteButton, columnSeparator,
+} from './styles';
 import DeleteAppModal from './DeleteAppModal';
 
 const titleStyles = css`
@@ -150,8 +152,12 @@ export default class StatsBox extends React.Component {
 							}}
 						>
 							<Row type="flex">
+								<Col span={12} className={columnSeparator}>
+									<Icon className={actionIcon} type="thunderbolt" />
+									Explore
+								</Col>
 								<Col
-									span={24}
+									span={12}
 									className={deleteButton}
 									onClick={this.handleDeleteModal}
 								>
