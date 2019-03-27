@@ -144,22 +144,23 @@ export default class StatsBox extends React.Component {
 							<Icon type="ellipsis" theme="outlined" />
 						</div>
 
-						<div
-							className="card-actions"
-							key={title}
-							onClick={(e) => {
-								e.preventDefault();
-							}}
-						>
+						<div className="card-actions" key={title}>
 							<Row type="flex">
-								<Col span={12} className={columnSeparator}>
+								<Col
+									span={12}
+									className={columnSeparator}
+									css={{ color: '#1890ff' }}
+								>
 									<Icon className={actionIcon} type="thunderbolt" />
 									Explore
 								</Col>
 								<Col
 									span={12}
 									className={deleteButton}
-									onClick={this.handleDeleteModal}
+									onClick={(e) => {
+										e.preventDefault();
+										this.handleDeleteModal();
+									}}
 								>
 									<Icon className={actionIcon} type="delete" />
 									Delete Index
