@@ -59,26 +59,28 @@ class DeleteAppModal extends React.Component {
 		}
 
 		return (
-			<Modal
-				visible={deleteModal}
-				onOk={this.handleDelete}
-				onCancel={handleDeleteModal}
-				destroyOnClose
-				title="Confirm Delete"
-				okText="Delete"
-				okButtonProps={{ type: 'danger', disabled, loading }}
-			>
-				<p>
-					Type the index name <span style={{ fontWeight: '600' }}>{appName}</span> below
-					to delete the index. This action cannot be undone.
-				</p>
-				<Input
-					placeholder="Confirm Delete"
-					onChange={this.handleInputChange}
-					value={deleteAppName}
-					name="deleteAppName"
-				/>
-			</Modal>
+			<div onClick={e => e.preventDefault()}>
+				<Modal
+					visible={deleteModal}
+					onOk={this.handleDelete}
+					onCancel={handleDeleteModal}
+					destroyOnClose
+					title="Confirm Delete"
+					okText="Delete"
+					okButtonProps={{ type: 'danger', disabled, loading }}
+				>
+					<p>
+						Type the index name <span style={{ fontWeight: '600' }}>{appName}</span>{' '}
+						below to delete the index. This action cannot be undone.
+					</p>
+					<Input
+						placeholder="Confirm Delete"
+						onChange={this.handleInputChange}
+						value={deleteAppName}
+						name="deleteAppName"
+					/>
+				</Modal>
+			</div>
 		);
 	}
 }
