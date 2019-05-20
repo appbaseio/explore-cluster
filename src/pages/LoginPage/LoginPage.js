@@ -3,9 +3,8 @@ import { connect } from 'react-redux';
 import {
  Card, Button, Icon, Input,
 } from 'antd';
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-
 import { loadUser } from '../../actions';
 import LoginContainer from '../../components/LoginContainer';
 import { container, card, gitlabBtn } from './styles';
@@ -72,6 +71,23 @@ class LoginPage extends Component {
 							<Icon type="arrow-right" />
 						</Button>
 					</Card>
+					<Link to="/install">
+						<Button
+							size="large"
+							ghost
+							css={{
+								border: 0,
+								boxShadow: 'none',
+								color: '#424242',
+								margin: '20px 0',
+								fontSize: 18,
+								letterSpacing: '0.02rem',
+							}}
+						>
+							Install A New Arc Instance
+							<Icon type="arrow-right" />
+						</Button>
+					</Link>
 				</section>
 			</LoginContainer>
 		);

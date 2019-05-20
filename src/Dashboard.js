@@ -10,6 +10,7 @@ import Loader from './components/Loader';
 import Logo from './components/Logo';
 import PrivateRoute from './pages/LoginPage/PrivateRoute';
 import Wrapper from './pages/Wrapper';
+import InstallPage from './pages/InstallPage';
 
 // routes
 const LoginPage = Loadable({
@@ -48,6 +49,12 @@ class Dashboard extends Component {
 			sessionStorage.setItem('header', header);
 		} else {
 			sessionStorage.setItem('header', true);
+		}
+		if (params.has('email')) {
+			const email = params.get('email');
+			sessionStorage.setItem('signup-email', email);
+		} else {
+			sessionStorage.setItem('signup-email', '');
 		}
 		if (params.has('username') && params.has('password')) {
 			const username = params.get('username');
@@ -130,6 +137,7 @@ class Dashboard extends Component {
 		return (
 			<Router>
 				<Fragment>
+					<Route exact path="/install" component={InstallPage} />
 					<Route exact path="/login" component={LoginPage} />
 					<Route exact path="/signup" component={SignupPage} />
 					<PrivateRoute user={user} component={Wrapper} />
