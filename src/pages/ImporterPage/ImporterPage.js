@@ -5,22 +5,17 @@ import {
 import { connect } from 'react-redux';
 import { string } from 'prop-types';
 import get from 'lodash/get';
-import URL from 'url-parser-lite';
 
 import Header from '../../components/Header';
-import { IMPORTER_LINK, getURL } from '../../constants/config';
+import { IMPORTER_LINK } from '../../constants/config';
 
-function getLink(appname, credentials) {
-	const API = getURL();
-	const { protocol, host } = URL(API);
-	const url = `${protocol}://${credentials}@${host}`;
-
+function getLink(appname) {
 	const parameters = {
-		appname,
-		hosturl: url,
-		platform: 'es',
+		type: 'Cluster',
+		index: appname,
+		cluster: sessionStorage.getItem('cluster') || '',
 	};
-	return `${IMPORTER_LINK}${JSON.stringify(parameters)}&header=false`;
+	return `${IMPORTER_LINK}?destination=${JSON.stringify(parameters)}&embed=true`;
 }
 
 const ImporterPage = ({ appName, credentials }) => (
