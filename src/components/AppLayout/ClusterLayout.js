@@ -11,6 +11,10 @@ const AnalyticsPage = Loadable({
 	loader: () => import('../../pages/AnalyticsPage'),
 	loading: Loader,
 });
+const SearchTemplatesPage = Loadable({
+	loader: () => import('../../pages/SearchTemplatesPage'),
+	loading: Loader,
+});
 const GeoDistributionPage = Loadable({
 	loader: () => import('../../pages/GeoDistributionPage'),
 	loading: Loader,
@@ -110,6 +114,13 @@ class ClusterLayout extends React.PureComponent {
 							path="/cluster/overview"
 							component={props => (
 								<AppPageContainer {...props} component={OverviewPage} />
+							)}
+						/>
+						<Route
+							exact
+							path="/cluster/search-templates"
+							component={props => (
+								<AppPageContainer {...props} component={SearchTemplatesPage} />
 							)}
 						/>
 						<Route
