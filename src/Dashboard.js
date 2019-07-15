@@ -56,6 +56,10 @@ class Dashboard extends Component {
 		} else {
 			sessionStorage.setItem('signup-email', '');
 		}
+		if (params.has('cluster')) {
+			const cluster = params.get('cluster');
+			sessionStorage.setItem('cluster', cluster);
+		}
 		if (params.has('username') && params.has('password')) {
 			const username = params.get('username');
 			const password = params.get('password');
