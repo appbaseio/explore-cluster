@@ -27,6 +27,12 @@ const container = css`
 	}
 	width: 370px;
 `;
+const passwordContainer = css`
+	overflow-x: scroll;
+	::-webkit-scrollbar {
+		width: none;
+	}
+`;
 class Permission extends React.Component {
 	state = {
 		viewKey: false,
@@ -42,13 +48,16 @@ class Permission extends React.Component {
 		const { viewKey } = this.state;
 		const { isAdmin, password } = this.props;
 		const disabled = !isAdmin;
+		const extraMsg = 'Please note that the password is in encrypted form.';
 		return (
 			<Flex css={main} alignItems="center">
 				<Flex justifyContent="space-between" alignItems="center" css={container}>
-					<span>{viewKey ? password : '##################################'}</span>
+					<span className={passwordContainer}>
+						{viewKey ? password : '##################################'}
+					</span>
 					<Tooltip
 						placement="topLeft"
-						title={viewKey ? 'Hide password' : 'View password'}
+						title={`${viewKey ? 'Hide password' : 'View password'}, ${extraMsg}`}
 					>
 						<Button disabled={disabled} onClick={this.handleViewClick} type="normal">
 							{viewKey ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
