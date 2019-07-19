@@ -15,7 +15,6 @@ import {
 	deleteAppTemplate,
 	validateAppTemplate,
 } from '../../batteries/modules/actions';
-import { getAppTemplatesByName } from '../../batteries/modules/selectors';
 import Actions from './Actions';
 import CreateTemplate from './CreateTemplate';
 import GetAPIEndpoint from './GetAPIEndpoint';
@@ -288,7 +287,6 @@ SearchTemplates.defaultProps = {
 SearchTemplates.propTypes = {
 	isLoading: PropTypes.bool.isRequired,
 	isDeleting: PropTypes.bool.isRequired,
-	appName: PropTypes.string.isRequired,
 	fetchTemplates: PropTypes.func.isRequired,
 	saveTemplate: PropTypes.func.isRequired,
 	deleteTemplate: PropTypes.func.isRequired,
@@ -298,8 +296,7 @@ SearchTemplates.propTypes = {
 };
 
 const mapStateToProps = state => ({
-	templates: getAppTemplatesByName(state),
-	appName: get(state, '$getCurrentApp.name'),
+	templates: get(state, '$getAppTemplates.results', []),
 	isLoading: get(state, '$getAppTemplates.isFetching', false),
 	isDeleting: get(state, '$deleteAppTemplate.isFetching', false),
 	errors: [
