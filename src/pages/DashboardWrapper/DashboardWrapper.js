@@ -33,6 +33,10 @@ const routes = {
 		icon: 'cluster',
 		link: '/',
 	},
+	Develop: {
+		icon: 'dashboard',
+		menu: [{ label: 'Search Templates', link: '/cluster/search-templates', tag: 'Beta' }],
+	},
 	'Browse Data': {
 		icon: 'hdd',
 		link: '/cluster/browse',

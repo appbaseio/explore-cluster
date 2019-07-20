@@ -12,6 +12,10 @@ const AnalyticsPage = Loadable({
 	loader: () => import('../../pages/AnalyticsPage'),
 	loading: Loader,
 });
+const SearchTemplatesPage = Loadable({
+	loader: () => import('../../pages/SearchTemplatesPage'),
+	loading: Loader,
+});
 const RequestDistributionPage = Loadable({
 	loader: () => import('../../pages/RequestDistributionPage'),
 	loading: Loader,
@@ -269,6 +273,18 @@ class AppLayout extends React.PureComponent {
 								<AppPageContainer
 									{...props}
 									component={QueryRulesPage}
+									shouldFetchAppInfo={false}
+									shouldFetchAppPlan={false}
+								/>
+							)}
+						/>
+						<Route
+							exact
+							path="/app/:appName/search-templates"
+							render={props => (
+								<AppPageContainer
+									{...props}
+									component={SearchTemplatesPage}
 									shouldFetchAppInfo={false}
 									shouldFetchAppPlan={false}
 								/>

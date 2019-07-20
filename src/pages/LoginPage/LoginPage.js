@@ -34,7 +34,6 @@ class LoginPage extends Component {
 		if (user.data) {
 			return <Redirect to="/" />;
 		}
-		const ACC_API = getURL();
 		return (
 			<LoginContainer>
 				<section className={container}>
@@ -43,7 +42,6 @@ class LoginPage extends Component {
 						<Input
 							ref={this.url}
 							size="large"
-							defaultValue={ACC_API}
 							prefix={<Icon type="cluster" style={{ color: 'rgba(0,0,0,.25)' }} />}
 							placeholder="Cluster URL"
 						/>
