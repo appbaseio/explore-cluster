@@ -274,6 +274,8 @@ class CreateCredentials extends React.Component {
 															<PasswordInput
 																placeholder="Enter password"
 																{...handler()}
+																control={this.form.get('password')}
+																isEditing={this.isEditing}
 															/>
 														)}
 													/>

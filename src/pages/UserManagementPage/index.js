@@ -37,7 +37,7 @@ const columns = [
 		render: ({ permissionInfo }) => permissionInfo.username,
 	},
 	{
-		title: 'Password',
+		title: 'Password (We encrypt all passwords)',
 		key: `password${updateIndex()}`,
 		// eslint-disable-next-line
 		render: ({ permissionInfo }) => <Password password={permissionInfo.password} />,

@@ -1,13 +1,9 @@
 import React from 'react';
-import { Button, Tooltip } from 'antd';
 import { css } from 'react-emotion';
 import { connect } from 'react-redux';
-import { string, bool } from 'prop-types';
+import { string } from 'prop-types';
 import get from 'lodash/get';
 import Flex from '../../batteries/components/shared/Flex';
-
-const EyeIcon = require('react-feather/dist/icons/eye').default;
-const EyeOffIcon = require('react-feather/dist/icons/eye-off').default;
 
 const main = css`
 	.ant-btn {
@@ -27,12 +23,7 @@ const container = css`
 	}
 	width: 370px;
 `;
-const passwordContainer = css`
-	overflow-x: scroll;
-	::-webkit-scrollbar {
-		width: none;
-	}
-`;
+
 class Permission extends React.Component {
 	state = {
 		viewKey: false,
@@ -46,23 +37,12 @@ class Permission extends React.Component {
 
 	render() {
 		const { viewKey } = this.state;
-		const { isAdmin, password } = this.props;
-		const disabled = !isAdmin;
-		const extraMsg = 'Please note that the password is in encrypted form.';
+		const { password } = this.props;
+
 		return (
 			<Flex css={main} alignItems="center">
 				<Flex justifyContent="space-between" alignItems="center" css={container}>
-					<span className={passwordContainer}>
-						{viewKey ? password : '##################################'}
-					</span>
-					<Tooltip
-						placement="topLeft"
-						title={`${viewKey ? 'Hide password' : 'View password'}, ${extraMsg}`}
-					>
-						<Button disabled={disabled} onClick={this.handleViewClick} type="normal">
-							{viewKey ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
-						</Button>
-					</Tooltip>
+					<span>{viewKey ? password : '##################################'}</span>
 				</Flex>
 			</Flex>
 		);
@@ -71,7 +51,6 @@ class Permission extends React.Component {
 
 Permission.propTypes = {
 	password: string.isRequired,
-	isAdmin: bool.isRequired,
 };
 
 const mapStateToProps = state => ({
