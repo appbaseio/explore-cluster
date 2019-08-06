@@ -67,7 +67,7 @@ class EmailAuth extends React.Component {
 				message.error('Something went wrong.');
 			}
 		} else {
-			message.error('Please enter a valid email.');
+			message.error('Please enter a valid email');
 		}
 	};
 
