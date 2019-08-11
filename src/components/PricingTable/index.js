@@ -4,7 +4,7 @@ import { Check } from 'react-feather';
 import { connect } from 'react-redux';
 import Stripe from 'react-stripe-checkout';
 import {
-	Tooltip, Modal, Button,
+ Tooltip, Modal, Button, Input, notification,
 } from 'antd';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
@@ -15,8 +15,13 @@ import NewPricingCard from './NewPricingCard';
 import theme from './theme';
 import { media, hexToRgb } from '../../utils/media';
 import { planBasePrice, displayErrors } from '../../utils/helper';
-import { createAppSubscription, deleteAppSubscription, getAppPlan } from '../../batteries/modules/actions';
+import {
+	createAppSubscription,
+	deleteAppSubscription,
+	getAppPlan,
+} from '../../batteries/modules/actions';
 import { getAppPlanByName } from '../../batteries/modules/selectors';
+import Flex from '../../batteries/components/shared/Flex';
 
 const CheckList = ({ list }) => list.map(item => (
 		<li key={item}>
@@ -274,16 +279,20 @@ class PricingTable extends Component {
 			active: undefined,
 			plans: this.plans,
 			showConfirmBox: false,
+			otp: '',
+			showOtpModal: false,
+			message: '',
+			resending: false,
 		};
 		// test key
-		// this.stripeKey = 'pk_test_DYtAxDRTg6cENksacX1zhE02';
+		this.stripeKey = 'pk_test_DYtAxDRTg6cENksacX1zhE02';
 		// live key
-		this.stripeKey = 'pk_live_ihb1fzO4h1ykymhpZsA3GaQR';
+		// this.stripeKey = 'pk_live_ihb1fzO4h1ykymhpZsA3GaQR';
 	}
 
 	componentDidUpdate(prevProps) {
 		const { errors } = this.props;
-		displayErrors(errors, prevProps.errors);
+		displayErrors(errors, prevProps.errors, true);
 	}
 
 	get getText() {
@@ -297,36 +306,102 @@ class PricingTable extends Component {
 		return undefined;
 	}
 
+	get isOtpValid() {
+		const { otp } = this.state;
+		return otp && otp.length === 6;
+	}
+
 	handleToken = (token, plan) => {
 		const { createSubscription, fetchAppPlan } = this.props;
-		createSubscription(token, plan).then(({ payload }) => {
-			if (payload) {
+		createSubscription(token, plan).then((response) => {
+			if (response && response.payload) {
 				fetchAppPlan();
 			}
 		});
 	};
 
+	closeOtpModal = () => {
+		this.setState({
+			showOtpModal: false,
+			otp: '',
+		});
+	};
+
+	openOtpModal = () => {
+		this.setState({
+			showOtpModal: true,
+			otp: '',
+		});
+	};
+
 	deleteSubscription = () => {
-		const { deleteSubscription, fetchAppPlan } = this.props;
-		deleteSubscription().then(({ payload }) => {
-			if (payload) {
-				fetchAppPlan();
+		const { deleteSubscription } = this.props;
+		deleteSubscription().then((action) => {
+			const message = get(action, 'payload.message');
+			if (message) {
 				this.cancelConfirmBox();
+				this.setState({
+					showOtpModal: true,
+					message,
+				});
 			}
 		});
-	}
+	};
+
+	deleteFinalSubscription = () => {
+		const { otp } = this.state;
+		const { deleteSubscription, fetchAppPlan } = this.props;
+		deleteSubscription({
+			otp: String(otp),
+		}).then((action) => {
+			const payload = get(action, 'payload');
+			if (payload) {
+				this.closeOtpModal();
+				const message = get(action, 'payload.message');
+				if (message) {
+					notification.success({
+						title: 'Unsubscribed successfully.',
+						message,
+					});
+				}
+				fetchAppPlan();
+			}
+		});
+	};
+
+	resendCode = () => {
+		const { deleteSubscription } = this.props;
+		this.setState({
+			resending: true,
+		});
+		deleteSubscription().then((action) => {
+			this.setState({
+				resending: false,
+			});
+			const message = get(action, 'payload.message');
+			if (message) {
+				this.setState({
+					otp: '',
+				});
+				notification.success({
+					title: 'OTP sent successfully',
+					message,
+				});
+			}
+		});
+	};
 
 	showConfirmBox = () => {
 		this.setState({
 			showConfirmBox: true,
 		});
-	}
+	};
 
 	cancelConfirmBox = () => {
 		this.setState({
 			showConfirmBox: false,
 		});
-	}
+	};
 
 	calcPrice(planName) {
 		const { plans } = this.state;
@@ -349,14 +424,17 @@ class PricingTable extends Component {
 		const {
 			plans,
 			bootstrap,
-			growth,
-			active,
+			//  growth, active,
 			showConfirmBox,
+			showOtpModal,
+			message,
+			resending,
+			otp,
 		} = this.state;
 		const {
 			isFreePlan,
 			isBootstrapPlan,
-			isGrowthPlan,
+			//  isGrowthPlan,
 			isSubmitting,
 			isLoading,
 		} = this.props;
@@ -366,7 +444,54 @@ class PricingTable extends Component {
 		return (
 			<React.Fragment>
 				<Modal
-					title="Delete Subscription"
+					title="Cancel Subscription"
+					visible={showOtpModal}
+					onCancel={this.closeOtpModal}
+					footer={[
+						<Button key="back1" onClick={this.closeOtpModal}>
+							Cancel
+						</Button>,
+						<Button
+							loading={resending}
+							key="resend"
+							type="primary"
+							onClick={this.resendCode}
+						>
+							Resend Code
+						</Button>,
+						<Button
+							loading={!resending && isSubmitting}
+							key="submit1"
+							type="danger"
+							onClick={this.deleteFinalSubscription}
+							disabled={!this.isOtpValid}
+						>
+							Unsubscribe
+						</Button>,
+					]}
+				>
+					{message && <p>{message}</p>}
+					<div style={{ margin: '20px 0px' }}>
+						<Flex>
+							<Input
+								addonBefore="Enter OTP"
+								name="otp"
+								value={otp}
+								autoFocus
+								onChange={(e) => {
+									this.setState({
+										otp: e.target.value,
+									});
+								}}
+								style={{
+									width: '300px',
+								}}
+							/>
+						</Flex>
+					</div>
+				</Modal>
+				<Modal
+					title="Cancel Subscription"
 					visible={showConfirmBox}
 					onCancel={this.cancelConfirmBox}
 					footer={[
@@ -383,7 +508,10 @@ class PricingTable extends Component {
 						</Button>,
 					]}
 				>
-					<p>Are you sure to unsubscribe current subscription?</p>
+					<p>
+						Canceling the subscription would make the dashboard
+						GUI and Arc endpoints inaccessible within 24 hours.
+					</p>
 				</Modal>
 				<Table className={hideOnLarge}>
 					<thead>
@@ -405,29 +533,31 @@ class PricingTable extends Component {
 								</Caption>
 							</td>
 							<td>
-								<Title>BOOTSTRAP</Title>
+								<Title>BASIC</Title>
 								<Price>
 									${this.calcPrice('bootstrap')}
 									<br />
 									<small>/month</small>
 								</Price>
 							</td>
-							<td>
+							{/* <td>
 								<Title>GROWTH</Title>
 								<Price>
 									${this.calcPrice('growth')}
 									<br />
 									<small>/month</small>
 								</Price>
-							</td>
+							</td> */}
 						</tr>
 					</thead>
 					<tbody>
 						<tr className={HeadingTr}>
 							<td>Core Platform</td>
 							<td />
-							<td>{active === 'bootstrap' && this.getText}</td>
-							<td>{active === 'growth' && this.getText}</td>
+							<td>{/* {active === 'bootstrap' && this.getText} */}</td>
+							{/* <td>
+							{active === 'growth' && this.getText}
+							</td> */}
 						</tr>
 						<tr>
 							<td>
@@ -450,7 +580,7 @@ class PricingTable extends Component {
 									}}
 								/>
 							</td>
-							<td>
+							{/* <td>
 								<PlusMinus
 									values={plans.growth.records}
 									onChange={(value, index) => {
@@ -462,7 +592,7 @@ class PricingTable extends Component {
 										});
 									}}
 								/>
-							</td>
+							</td> */}
 						</tr>
 						<tr>
 							<td>
@@ -485,7 +615,7 @@ class PricingTable extends Component {
 									}}
 								/>
 							</td>
-							<td>
+							{/* <td>
 								<PlusMinus
 									values={plans.growth.apiCalls}
 									onChange={(value, index) => {
@@ -497,13 +627,13 @@ class PricingTable extends Component {
 										});
 									}}
 								/>
-							</td>
+							</td> */}
 						</tr>
 						<tr className={HeadingTr}>
 							<td>FEATURES</td>
 							<td />
 							<td />
-							<td />
+							{/* <td /> */}
 						</tr>
 						<tr>
 							<td>
@@ -518,9 +648,9 @@ class PricingTable extends Component {
 							<td>
 								<Check />
 							</td>
-							<td>
+							{/* <td>
 								<Check />
-							</td>
+							</td> */}
 						</tr>
 						<tr>
 							<td>
@@ -541,7 +671,7 @@ class PricingTable extends Component {
 							</td>
 							<td>-</td>
 							<td>Basic</td>
-							<td>Included</td>
+							{/* <td>Included</td> */}
 						</tr>
 						<tr>
 							<td>
@@ -564,9 +694,9 @@ class PricingTable extends Component {
 							<td>
 								<Check />
 							</td>
-							<td>
+							{/* <td>
 								<Check />
-							</td>
+							</td> */}
 						</tr>
 						<tr>
 							<td>
@@ -587,7 +717,7 @@ class PricingTable extends Component {
 							</td>
 							<td>Basic</td>
 							<td>1 Profile</td>
-							<td>3 Profiles</td>
+							{/* <td>3 Profiles</td> */}
 						</tr>
 						<tr>
 							<td>
@@ -608,7 +738,7 @@ class PricingTable extends Component {
 							</td>
 							<td>-</td>
 							<td>7 days Retention</td>
-							<td>30 days Retention</td>
+							{/* <td>30 days Retention</td> */}
 						</tr>
 						<tr>
 							<td>
@@ -621,9 +751,9 @@ class PricingTable extends Component {
 							</td>
 							<td>-</td>
 							<td>-</td>
-							<td>
+							{/* <td>
 								<Check />
-							</td>
+							</td> */}
 						</tr>
 						<tr className={HeadingTr}>
 							<td>
@@ -640,7 +770,7 @@ class PricingTable extends Component {
 							</td>
 							<td />
 							<td />
-							<td />
+							{/* <td /> */}
 						</tr>
 						<tr>
 							<td>
@@ -653,7 +783,7 @@ class PricingTable extends Component {
 							</td>
 							<td>Community</td>
 							<td>Email</td>
-							<td>Email</td>
+							{/* <td>Email</td> */}
 						</tr>
 						<tr>
 							<td>
@@ -666,7 +796,7 @@ class PricingTable extends Component {
 							</td>
 							<td>Community</td>
 							<td>Basic</td>
-							<td>Priority</td>
+							{/* <td>Priority</td> */}
 						</tr>
 						<tr>
 							<td>
@@ -687,7 +817,7 @@ class PricingTable extends Component {
 							</td>
 							<td>-</td>
 							<td>Can be added</td>
-							<td>Can be added</td>
+							{/* <td>Can be added</td> */}
 						</tr>
 						<tr>
 							<td>
@@ -708,7 +838,7 @@ class PricingTable extends Component {
 							</td>
 							<td>-</td>
 							<td>Can be added</td>
-							<td>Can be added</td>
+							{/* <td>Can be added</td> */}
 						</tr>
 						<tr>
 							<td>
@@ -729,7 +859,7 @@ class PricingTable extends Component {
 							</td>
 							<td>-</td>
 							<td>Can be added</td>
-							<td>Can be added</td>
+							{/* <td>Can be added</td> */}
 						</tr>
 					</tbody>
 					<tfoot>
@@ -737,9 +867,9 @@ class PricingTable extends Component {
 							<td />
 							<td>
 								<Stripe
-									name="Appbase.io Free Plan"
+									name="Arc Free Plan"
 									amount={0}
-									token={token => this.handleToken(token, 'free')}
+									token={token => this.handleToken(token, 'open_source')}
 									disabled={isFreePlan}
 									stripeKey={this.stripeKey}
 								>
@@ -758,9 +888,9 @@ class PricingTable extends Component {
 							</td>
 							<td>
 								<Stripe
-									name="Appbase.io Bootstrap Plan"
+									name="Arc Basic Plan"
 									amount={this.plans.bootstrap.basePrice * 100}
-									token={token => this.handleToken(token, 'bootstrap-monthly')}
+									token={token => this.handleToken(token, 'arc-basic')}
 									stripeKey={this.stripeKey}
 									disabled={isBootstrapPlan}
 								>
@@ -778,7 +908,7 @@ class PricingTable extends Component {
 									</AppButton>
 								</Stripe>
 							</td>
-							<td>
+							{/* <td>
 								<Stripe
 									name="Appbase.io Growth Plan"
 									disabled={isGrowthPlan}
@@ -799,7 +929,7 @@ class PricingTable extends Component {
 										{isGrowthPlan ? 'Unsubscribe' : 'Subscribe'}
 									</AppButton>
 								</Stripe>
-							</td>
+							</td> */}
 						</tr>
 					</tfoot>
 				</Table>
@@ -822,7 +952,7 @@ class PricingTable extends Component {
 						price="$0"
 						stripeName="Appbase.io Free Plan"
 						amount={0}
-						token={token => this.handleToken(token, 'free')}
+						token={token => this.handleToken(token, 'open_source')}
 						stripeKey={this.stripeKey}
 						pricingList={['10K Records', '100K API Calls']}
 					>
@@ -830,12 +960,12 @@ class PricingTable extends Component {
 					</NewPricingCard>
 					<NewPricingCard
 						css={{ backgroundColor: theme.badge.blue }}
-						name="Bootstrap"
+						name="Basic"
 						isCurrentPlan={isBootstrapPlan}
 						price={`$${this.plans.bootstrap.basePrice}`}
-						stripeName="Appbase.io Bootstrap Plan"
+						stripeName="Appbase.io Basic Plan"
 						amount={this.plans.bootstrap.basePrice * 100}
-						token={token => this.handleToken(token, 'bootstrap-monthly')}
+						token={token => this.handleToken(token, 'arc-basic')}
 						stripeKey={this.stripeKey}
 						linkColor="inherit"
 						pricingList={['50K Records', '1M API Calls']}
@@ -861,7 +991,7 @@ class PricingTable extends Component {
 							]}
 						/>
 					</NewPricingCard>
-					<NewPricingCard
+					{/* <NewPricingCard
 						css={{ backgroundColor: theme.badge.darkBlue }}
 						name="Growth"
 						isCurrentPlan={isGrowthPlan}
@@ -894,7 +1024,7 @@ class PricingTable extends Component {
 								'Premium support can be added',
 							]}
 						/>
-					</NewPricingCard>
+					</NewPricingCard> */}
 				</div>
 			</React.Fragment>
 		);
@@ -909,7 +1039,7 @@ PricingTable.propTypes = {
 	isSubmitting: PropTypes.bool.isRequired,
 	isFreePlan: PropTypes.bool.isRequired,
 	isBootstrapPlan: PropTypes.bool.isRequired,
-	isGrowthPlan: PropTypes.bool.isRequired,
+	// isGrowthPlan: PropTypes.bool.isRequired,
 	errors: PropTypes.array.isRequired,
 };
 const mapStateToProps = (state) => {
@@ -917,10 +1047,11 @@ const mapStateToProps = (state) => {
 	return {
 		isSubmitting: get(state, '$deleteAppSubscription.isFetching'),
 		isLoading: get(state, '$createAppSubscription.isFetching'),
-		isFreePlan: !get(appPlan, 'isPaid'),
-		isBootstrapPlan: get(appPlan, 'isBootstrap'),
-		isGrowthPlan: get(appPlan, 'isGrowth'),
+		isFreePlan: !get(appPlan, 'isPaid') || get(appPlan, 'trial', false),
+		isBootstrapPlan: get(appPlan, 'isBootstrap') && !get(appPlan, 'trial'),
+		isGrowthPlan: get(appPlan, 'isGrowth') && !get(appPlan, 'trial'),
 		errors: [
+			get(state, '$createAppSubscription.error'),
 			get(state, '$deleteAppSubscription.error'),
 		],
 	};
@@ -928,7 +1059,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = dispatch => ({
 	createSubscription: (plan, stripeToken) => dispatch(createAppSubscription(plan, stripeToken)),
-	deleteSubscription: appName => dispatch(deleteAppSubscription(appName)),
+	deleteSubscription: payload => dispatch(deleteAppSubscription(payload)),
 	fetchAppPlan: () => dispatch(getAppPlan()),
 });
 

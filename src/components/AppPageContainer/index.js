@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-
-import { setCurrentApp } from '../../batteries/modules/actions';
+import Loader from '../Loader';
+import { setCurrentApp, getAppPlan } from '../../batteries/modules/actions';
 
 class AppPageContainer extends Component {
 	constructor(props) {
@@ -15,9 +15,19 @@ class AppPageContainer extends Component {
 		}
 	}
 
+	componentDidMount() {
+		const { isClusterPlanFetched, fetchClusterPlan } = this.props;
+
+		if (!isClusterPlanFetched) {
+			fetchClusterPlan();
+		}
+	}
+
 	render() {
 		const { isLoading, component, ...props } = this.props;
-
+		if (isLoading) {
+			return <Loader />;
+		}
 		return React.createElement(component, props);
 	}
 }
@@ -25,24 +35,31 @@ class AppPageContainer extends Component {
 AppPageContainer.defaultProps = {
 	isLoading: false,
 	appName: '',
+	shouldFetchUserPlan: true,
 };
 
 AppPageContainer.propTypes = {
 	isLoading: PropTypes.bool,
 	appName: PropTypes.string,
+	shouldFetchUserPlan: PropTypes.bool,
 	component: PropTypes.func.isRequired,
 	updateCurrentApp: PropTypes.func.isRequired,
+	fetchClusterPlan: PropTypes.func.isRequired,
+	isClusterPlanFetched: PropTypes.bool.isRequired,
 };
 
 const mapStateToProps = (state, ownProps) => {
 	const appName = get(ownProps, 'match.params.appName');
 	return {
 		appName,
+		isClusterPlanFetched: !!get(state, '$getAppPlan.results'),
+		isLoading: get(state, '$getAppPlan.isFetching'),
 	};
 };
 
 const mapDispatchToProps = dispatch => ({
 	updateCurrentApp: appName => dispatch(setCurrentApp(appName, appName)),
+	fetchClusterPlan: () => dispatch(getAppPlan()),
 });
 
 export default connect(

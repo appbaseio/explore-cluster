@@ -65,7 +65,7 @@ RequestLogsWrapper.propTypes = {
 
 const mapStateToProps = state => ({
 	appName: get(state, '$getCurrentApp.name'),
-	plan: 'growth',
-	isPaidUser: true,
+	plan: get(state, '$getAppPlan.results.plan'),
+	isPaidUser: get(state, '$getAppPlan.results.isPaid'),
 });
 export default connect(mapStateToProps)(RequestLogsWrapper);

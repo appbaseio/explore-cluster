@@ -6,7 +6,7 @@ export const getURL = () => {
 
 		if (url) sessionStorage.setItem('url', url);
 	}
-	return url === 'null' ? 'https://example.com' : url;
+	return url === 'null' ? 'http://localhost:8000' : url;
 };
 
 export const SCALR_URL = 'scalr.api.appbase.io';

@@ -23,52 +23,71 @@ const uppercase = css`
 	text-transform: uppercase;
 `;
 
-const Billing = ({ plan, isOnTrial, planValidity }) => (
+const Billing = ({
+ plan, isOnTrial, planValidity, nodeCount,
+}) => (
 	<React.Fragment>
 		<BannerHeader
-			title="Upgrade your plan"
+			title={plan !== 'Basic' ? 'Upgrade Your Plan Now' : 'Your Current Plan Info'}
 			description=""
 			component={(
 <Row>
-					<Flex alignItems="center" className={uppercase}>
+					<Flex alignItems="center">
 						<Grid
 							style={{
-								width: '400px',
+								width: '540px',
 								margin: '0px',
 							}}
-							gridRatio={0.25}
+							gridRatio={0.4}
 							label={<h3 css={heading}>Plan</h3>}
-							component={plan}
+							component={isOnTrial ? `${plan} (Trial Mode)` : plan}
 						/>
 					</Flex>
 
 					{planValidity && (
-						<Flex alignItems="center" className={uppercase}>
+						<Flex alignItems="center">
 							<Grid
 								style={{
-									width: '400px',
+									width: '540px',
 									margin: '0px',
 									marginTop: '-35px',
 								}}
-								gridRatio={0.25}
-								label={<h3 css={heading}>Valid till</h3>}
+								gridRatio={0.4}
+								label={<h3 css={heading}>Valid Up To</h3>}
 								component={new Date(planValidity * 1000).toDateString()}
 							/>
 						</Flex>
 					)}
-					{isOnTrial && (
-						<Flex alignItems="center" className={uppercase}>
+					{nodeCount ? (
+						<Flex alignItems="center">
 							<Grid
 								style={{
-									width: '400px',
+									width: '540px',
+									margin: '0px',
 									marginTop: '-35px',
 								}}
-								gridRatio={0.25}
-								label={<h3 css={heading}>Trial peroid</h3>}
-								component={isOnTrial ? 'Yes' : 'Expired'}
+								gridRatio={0.4}
+								label={<h3 css={heading}>Total ElasticSearch Nodes</h3>}
+								component={nodeCount}
 							/>
 						</Flex>
-					)}
+					) : null}
+					{nodeCount ? (
+						<Flex alignItems="center">
+							<Grid
+								style={{
+									width: '540px',
+									margin: '0px',
+									marginTop: '-35px',
+								}}
+								gridRatio={0.4}
+								label={<h3 css={heading}>Effective Monthly Price</h3>}
+								component={`$${eval(
+									nodeCount * 49,
+								)} (calculated at $0.07/node hour)`}
+							/>
+						</Flex>
+					) : null}
 </Row>
 )}
 		/>
@@ -80,17 +99,23 @@ const Billing = ({ plan, isOnTrial, planValidity }) => (
 	</React.Fragment>
 );
 
+Billing.defaultProps = {
+	nodeCount: undefined,
+};
+
 Billing.propTypes = {
 	plan: PropTypes.string.isRequired,
 	planValidity: PropTypes.number.isRequired,
 	isOnTrial: PropTypes.bool.isRequired,
+	nodeCount: PropTypes.number,
 };
 
 const mapStateToProps = (state) => {
 	const appPlan = getAppPlanByName(state);
 	return {
-		plan: get(appPlan, 'tier'),
+		plan: get(appPlan, 'tier') === 'arc-basic' ? 'Basic' : 'Free',
 		planValidity: get(appPlan, 'tier_validity'),
+		nodeCount: get(appPlan, 'node_count'),
 		isOnTrial: get(appPlan, 'trial'),
 	};
 };

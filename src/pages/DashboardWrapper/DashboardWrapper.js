@@ -62,6 +62,13 @@ const routes = {
 			{ label: 'User Management', link: '/cluster/user-management' },
 		],
 	},
+	Account: {
+		icon: 'setting',
+		menu: [
+			{ label: 'Profile', link: '/cluster/profile' },
+			{ label: 'Billing', link: '/cluster/billing' },
+		],
+	},
 };
 
 class DashboardWrapper extends Component {

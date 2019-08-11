@@ -77,7 +77,6 @@ class EmailAuth extends React.Component {
 		try {
 			const response = await fetch(`${ACC_API}/arc/instance`, {
 				method: 'PUT',
-				credentials: 'include',
 				headers: {
 					'content-type': 'application/json',
 				},

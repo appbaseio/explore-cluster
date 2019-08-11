@@ -12,7 +12,6 @@ import {
 } from 'react-reactive-form';
 import { updateUser } from '../../batteries/modules/actions';
 import Container from '../../components/Container';
-import FullHeader from '../../components/FullHeader';
 import Flex from '../../batteries/components/shared/Flex';
 import Banner from '../../components/Banner/Header';
 import countryCodes from '../../utils/countryCodes';
@@ -117,7 +116,6 @@ class ProfilePage extends React.Component {
 		const firstName = username ? username.split(' ')[0] : 'Bud';
 		return (
 			<React.Fragment>
-				<FullHeader />
 				<Banner title={`Hi ${firstName},`} description="This is your profile view." />
 				<Container>
 					<FieldGroup control={this.profileForm} strict={false}>
@@ -259,16 +257,17 @@ class ProfilePage extends React.Component {
 	}
 }
 const mapStateToProps = (state) => {
-	const phoneInfo = get(state, 'user.data.phone');
+	const userData = get(state, '$getAppPlan.results.metadata');
+	const phoneInfo = get(userData, 'phone');
 	return {
 		isSubmitting: get(state, '$updateUser.isFetching'),
 		errors: [get(state, '$updateUser.error')],
 		isSuccess: get(state, '$updateUser.success'),
-		usecase: get(state, 'user.data.usecase'),
-		deploymentTimeframe: get(state, 'user.data.deployment-timeframe'),
+		usecase: get(userData, 'usecase'),
+		deploymentTimeframe: get(userData, 'deployment-timeframe'),
 		phone: get(phoneInfo, 'length') ? phoneInfo.split('-')[1] : '',
-		company: get(state, 'user.data.company'),
-		username: get(state, 'user.data.name'),
+		company: get(userData, 'company'),
+		username: get(userData, 'name'),
 		countryCode: get(phoneInfo, 'length')
 			? get(countryCodes.find(item => item.dial_code === phoneInfo.split('-')[0]), 'code', '')
 			: '',

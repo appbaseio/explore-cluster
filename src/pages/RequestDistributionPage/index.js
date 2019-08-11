@@ -65,11 +65,8 @@ RequestDistributionWrapper.propTypes = {
 	isGrowth: PropTypes.bool.isRequired,
 };
 
-const mapStateToProps = (state) => {
-	const appPlan = getAppPlanByName(state);
-	return {
-		plan: get(appPlan, 'plan', 'free'),
-		isGrowth: get(appPlan, 'isGrowth', true),
-	};
-};
+const mapStateToProps = state => ({
+		plan: get(state, '$getAppPlan.results.plan'),
+		isGrowth: get(state, '$getAppPlan.results.isPaid'),
+	});
 export default connect(mapStateToProps)(RequestDistributionWrapper);

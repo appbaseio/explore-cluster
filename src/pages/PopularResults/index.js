@@ -56,7 +56,7 @@ PopularResultsWrapper.propTypes = {
 
 const mapStateToProps = state => ({
 	appName: get(state, '$getCurrentApp.name'),
-	plan: 'growth',
-	isGrowth: true,
+	plan: get(state, '$getAppPlan.results.plan'),
+	isGrowth: get(state, '$getAppPlan.results.isPaid'),
 });
 export default connect(mapStateToProps)(PopularResultsWrapper);

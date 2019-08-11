@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import get from 'lodash/get';
 import Container from '../../components/Container';
 import Overlay from '../../components/Overlay';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
@@ -62,8 +63,8 @@ SearchLatencyWrapper.propTypes = {
 	isGrowth: PropTypes.bool.isRequired,
 };
 
-const mapStateToProps = () => ({
-	plan: 'growth',
-	isGrowth: true,
+const mapStateToProps = state => ({
+	plan: get(state, '$getAppPlan.results.plan'),
+	isGrowth: get(state, '$getAppPlan.results.isPaid'),
 });
 export default connect(mapStateToProps)(SearchLatencyWrapper);

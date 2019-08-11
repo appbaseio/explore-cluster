@@ -7,10 +7,10 @@ export const keySummary = {
 	write: 'Write credentials',
 };
 
-export const displayErrors = (nextErrors = [], prevErrors = []) => {
+export const displayErrors = (nextErrors = [], prevErrors = [], showNotification = false) => {
 	nextErrors.map((error, index) => {
 		if (error && error !== prevErrors[index]) {
-			if (process.env.NODE_ENV === 'development') {
+			if (showNotification || process.env.NODE_ENV === 'development') {
 				notification.error({
 					message: 'Error',
 					description: error.message,
@@ -20,7 +20,6 @@ export const displayErrors = (nextErrors = [], prevErrors = []) => {
 		return null;
 	});
 };
-
 
 export const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1);
 
@@ -66,7 +65,7 @@ export const planLimits = {
 };
 
 export const planBasePrice = {
-	bootstrap: 29,
+	bootstrap: 49,
 	growth: 89,
 };
 

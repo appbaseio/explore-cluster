@@ -3,13 +3,14 @@ import { connect } from 'react-redux';
 import Loadable from 'react-loadable';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Button, Icon } from 'antd';
-
+import { Button, Icon, Modal } from 'antd';
+import get from 'lodash/get';
 import { loadUser } from './actions';
 import Loader from './components/Loader';
 import Logo from './components/Logo';
 import PrivateRoute from './pages/LoginPage/PrivateRoute';
 import Wrapper from './pages/Wrapper';
+import BillingPage from './pages/BillingPage';
 import InstallPage from './pages/InstallPage';
 
 // routes
@@ -86,6 +87,27 @@ class Dashboard extends Component {
 		return null;
 	}
 
+	componentDidUpdate(prevProps) {
+		const { error, status } = this.props;
+		if (status === 402 && error && error !== prevProps.error) {
+			// eslint-disable-next-line
+			this.setState(
+				{
+					isLoading: false,
+				},
+				() => Modal.error({
+						title: error.message,
+						content:
+							'Are you using a valid Arc ID? If so, please subscribe to a paid plan to continue using Arc.',
+						okText: 'Go to billing',
+						onOk: () => {
+							window.location = '/billing';
+						},
+					}),
+			);
+		}
+	}
+
 	componentDidCatch() {
 		this.setState({
 			error: true,
@@ -141,6 +163,7 @@ class Dashboard extends Component {
 		return (
 			<Router>
 				<Fragment>
+					<Route exact path="/billing" component={BillingPage} />
 					<Route exact path="/install" component={InstallPage} />
 					<Route exact path="/login" component={LoginPage} />
 					<Route exact path="/signup" component={SignupPage} />
@@ -151,13 +174,22 @@ class Dashboard extends Component {
 	}
 }
 
+Dashboard.defaultProps = {
+	error: undefined,
+	status: undefined,
+};
+
 Dashboard.propTypes = {
 	user: PropTypes.object.isRequired,
 	loadArcUser: PropTypes.func.isRequired,
+	status: PropTypes.number,
+	error: PropTypes.any,
 };
 
 const mapStateToProps = ({ user }) => ({
 	user,
+	error: get(user, 'error'),
+	status: get(user, 'error.actual.status'),
 });
 
 const mapDispatchToProps = dispatch => ({

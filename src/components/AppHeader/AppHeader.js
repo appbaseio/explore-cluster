@@ -1,12 +1,17 @@
 import React from 'react';
-import { Layout, Menu, Icon } from 'antd';
+import {
+ Layout, Menu, Icon, Tooltip, Button, Row,
+} from 'antd';
 import { Link } from 'react-router-dom';
-import { string, object, bool } from 'prop-types';
+import {
+ string, object, bool, number,
+} from 'prop-types';
 import { css } from 'react-emotion';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import MenuSlider from '../FullHeader/MenuSlider';
 import UserMenu from './UserMenu';
+import { media } from '../../utils/media';
 import headerStyles from './styles';
 
 const { Header } = Layout;
@@ -22,9 +27,18 @@ const noBorder = css`
 		color: #1890ff !important;
 	}
 `;
+const trialText = css`
+	line-height: 2em;
+	font-size: 0.9em;
+`;
+const trialBtn = css`
+	${media.small(css`
+		display: none;
+	`)};
+`;
 
 const AppHeader = ({
- currentApp, user, big, showApp, minimal,
+ currentApp, user, big, showApp, minimal, isUsingTrial, daysLeft,
 }) => (
 	<Header
 		className={headerStyles}
@@ -48,7 +62,26 @@ const AppHeader = ({
 				) : null}
 			</Menu>
 		)}
-		<UserMenu user={user} />
+
+		{isUsingTrial && (
+			<div style={{ marginRight: 20 }}>
+				<Tooltip title="You are currently on a trial which unlocks all the paid Arc plan features. You can upgrade to a paid plan anytime till the trial expires. Post trial expiration, you won't be able to access Arc.">
+					<Button css={trialBtn} type="danger" href="billing">
+						<span css={trialText}>
+							{daysLeft > 0
+								? `Trial expires in ${daysLeft} ${
+										daysLeft > 1 ? 'days' : 'day'
+								  }. Upgrade now`
+								: 'Trial has expired. Upgrade Now'}
+						</span>
+					</Button>
+				</Tooltip>
+			</div>
+		)}
+
+		<Row justify="space-between" align="middle">
+			<UserMenu user={user} />
+		</Row>
 		<MenuSlider />
 	</Header>
 );
@@ -63,6 +96,8 @@ AppHeader.propTypes = {
 	big: bool.isRequired,
 	minimal: bool,
 	showApp: bool,
+	isUsingTrial: bool.isRequired,
+	daysLeft: number.isRequired,
 };
 
 AppHeader.defaultProps = {
@@ -73,6 +108,8 @@ AppHeader.defaultProps = {
 const mapStateToProps = state => ({
 	currentApp: get(state, '$getCurrentApp.name'),
 	user: state.user.data,
+	isUsingTrial: get(state, '$getAppPlan.results.trial') || false,
+	daysLeft: get(state, '$getAppPlan.results.daysLeft', 0),
 });
 
 export default connect(mapStateToProps)(AppHeader);
