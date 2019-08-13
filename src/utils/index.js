@@ -10,7 +10,7 @@ export async function getUser(username, password, url) {
 			Authorization: `Basic ${authToken}`,
 		},
 	});
-	if (response.status >= 402) {
+	if (response.status === 402) {
 		// eslint-disable-next-line
 		throw {
 			message: 'Payment is required',
