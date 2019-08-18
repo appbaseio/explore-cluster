@@ -4,14 +4,15 @@ import parser from 'url-parser-lite';
 import settings from './settings';
 import mappingObj from './moviesMapping';
 import moviesData from './data';
-import { getURL } from '../../../constants/config';
+import {
+	getURL
+} from '../../../constants/config';
 
 const streamingData = {
 	genres: 'Action',
 	original_language: 'English',
 	original_title: 'Star Wars: The Last Jedi',
-	overview:
-		'Rey develops her newly discovered abilities with the guidance of Luke Skywalker, who is unsettled by the strength of her powers. Meanwhile, the Resistance prepares to do battle with the First Order.',
+	overview: 'Rey develops her newly discovered abilities with the guidance of Luke Skywalker, who is unsettled by the strength of her powers. Meanwhile, the Resistance prepares to do battle with the First Order.',
 	poster_path: 'https://image.tmdb.org/t/p/w185/kOVEVeg59E0wsnXmF9nrh6OmWII.jpg',
 	release_year: 2017,
 	tagline: 'Episode VIII - The Last Jedi',
@@ -36,7 +37,10 @@ const getCredentials = () => {
 	} catch (e) {
 		console.error(e);
 	}
-	return { username, password };
+	return {
+		username,
+		password
+	};
 };
 
 class AppbaseUtils {
@@ -75,12 +79,12 @@ class AppbaseUtils {
 		const appId = this.getApp();
 		return new Promise((resolve, reject) => {
 			fetch(`${this.accountAddress}/app/${appId}/permissions`, {
-				method: 'GET',
-				headers: {
-					'content-type': 'application/json',
-					Authorization: `Basic ${this.authToken}`,
-				},
-			})
+					method: 'GET',
+					headers: {
+						'content-type': 'application/json',
+						Authorization: `Basic ${this.authToken}`,
+					},
+				})
 				.then(res => res.json())
 				.then((data) => {
 					const permissions = data.body.filter(
@@ -108,16 +112,18 @@ class AppbaseUtils {
 	}
 
 	applyAnalyzers = () => {
-		const { appName } = this.app;
+		const {
+			appName
+		} = this.app;
 
 		return new Promise((resolve, reject) => {
 			fetch(`${this.address}/${appName}/_close`, {
-				method: 'POST',
-				headers: {
-					Authorization: `Basic ${this.authToken}`,
-					'content-type': 'application/json',
-				},
-			})
+					method: 'POST',
+					headers: {
+						Authorization: `Basic ${this.authToken}`,
+						'content-type': 'application/json',
+					},
+				})
 				.then(() => {
 					fetch(`${this.address}/${appName}/_settings`, {
 						method: 'PUT',
@@ -153,10 +159,10 @@ class AppbaseUtils {
 	};
 
 	updateMapping = () => {
-		const type = 'movies';
+		const type = '_doc';
 		this.app.type = type;
 
-		return fetch(`${this.address}/${this.app.appName}/_mapping/${type}?update_all_types=true`, {
+		return fetch(`${this.address}/${this.app.appName}/_mapping`, {
 			method: 'POST',
 			headers: {
 				Authorization: `Basic ${this.authToken}`,
@@ -175,7 +181,10 @@ class AppbaseUtils {
 			finalData.push(indexObj);
 			finalData.push(record);
 		});
-		const { username, password } = getCredentials();
+		const {
+			username,
+			password
+		} = getCredentials();
 		this.appbaseRef = Appbase({
 			url: this.address,
 			app: this.app.appName,
@@ -198,21 +207,24 @@ class AppbaseUtils {
 	};
 
 	indexNewData = () => new Promise((resolve, reject) => {
-			this.appbaseRef
-				.index({
-					type: this.app.type,
-					body: streamingData,
-				})
-				.then(() => {
-					resolve();
-				})
-				.catch((e) => {
-					reject(e);
-				});
-		});
+		this.appbaseRef
+			.index({
+				type: this.app.type,
+				body: streamingData,
+			})
+			.then(() => {
+				resolve();
+			})
+			.catch((e) => {
+				reject(e);
+			});
+	});
 
 	appConfig = () => {
-		const { username, password } = getCredentials();
+		const {
+			username,
+			password
+		} = getCredentials();
 		return {
 			app: this.app.appName,
 			credentials: `${username}:${password}`,
@@ -221,9 +233,15 @@ class AppbaseUtils {
 	};
 
 	createURL(cb) {
-		const { username, password } = getCredentials();
+		const {
+			username,
+			password
+		} = getCredentials();
 		const ACC_API = getURL();
-		const { protocol, host } = parser(ACC_API);
+		const {
+			protocol,
+			host
+		} = parser(ACC_API);
 		const obj = {
 			appname: this.app.appName,
 			url: `${protocol}://${username}:${password}@${host}`,

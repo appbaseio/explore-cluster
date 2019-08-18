@@ -5,34 +5,15 @@ import {
 	SelectedFilters,
 	MultiList,
 	ResultList,
+	ReactiveList,
 	DynamicRangeSlider,
 } from '@appbaseio/reactivesearch';
 
 import appbaseHelpers from '../utils/appbaseHelpers';
 import { getURL } from '../../../constants/config';
 
-const renderData = res => ({
-	image: res.poster_path,
-	title: res.original_title,
-	description: (
-		<div>
-			<p
-				style={{ fontSize: '16px', lineHeight: '24px' }}
-				dangerouslySetInnerHTML={{ __html: res.tagline }}
-			/>
-			<p
-				style={{
-					color: '#888',
-					margin: '8px 0',
-					fontSize: '13px',
-					lineHeight: '18px',
-				}}
-				dangerouslySetInnerHTML={{ __html: res.overview }}
-			/>
-			<div>{res.genres ? <span className="tag">{res.genres}</span> : null}</div>
-		</div>
-	),
-});
+
+const { ResultListWrapper } = ReactiveList;
 
 const renderFilters = (fields) => {
 	if (fields && fields.length) {
@@ -89,6 +70,8 @@ const renderFilters = (fields) => {
 						/>
 					);
 				}
+				default:
+					return null;
 			}
 		});
 	}
@@ -119,6 +102,105 @@ const getWeights = (fields) => {
 	};
 
 	return fields.map(item => weights[item]);
+};
+
+const renderResultList = () => (
+	<ReactiveList
+		componentId="results"
+		dataField="name"
+		react={{
+			and: ['search', 'genres', 'original_language', 'release_year'],
+		}}
+		size={4}
+		className="right-col"
+		innerClass={{
+			listItem: 'list-item',
+			resultStats: 'result-stats',
+		}}
+		pagination
+		stream
+	>
+		{({ data }) => (
+			<ResultListWrapper>
+				{data.map(item => (
+					<ResultList key={item._id}>
+						<ResultList.Image src={item.poster_path} />
+						<ResultList.Content>
+							<ResultList.Title
+								dangerouslySetInnerHTML={{
+									__html: item.original_title,
+								}}
+							/>
+							<ResultList.Description>
+								<div>
+									<p
+										style={{ fontSize: '16px', lineHeight: '24px' }}
+										dangerouslySetInnerHTML={{ __html: item.tagline }}
+									/>
+									<p
+										style={{
+											color: '#888',
+											margin: '8px 0',
+											fontSize: '13px',
+											lineHeight: '18px',
+										}}
+										dangerouslySetInnerHTML={{ __html: item.overview }}
+									/>
+									<div>
+										{item.genres ? (
+											<span className="tag">{item.genres}</span>
+										) : null}
+									</div>
+								</div>
+							</ResultList.Description>
+						</ResultList.Content>
+					</ResultList>
+				))}
+			</ResultListWrapper>
+		)}
+	</ReactiveList>
+);
+
+const renderJSONList = () => (
+	<ReactiveList
+		componentId="results"
+		dataField="name"
+		react={{
+			and: ['search', 'genres', 'original_language', 'release_year'],
+		}}
+		size={4}
+		renderItem={res => (
+			<pre
+				key={res._id}
+				style={{
+					background: 'rgba(239,239,239,.4)',
+					padding: '15px 20px',
+					color: '#424242',
+					borderRadius: '5px',
+				}}
+			>
+				{JSON.stringify(res, null, 2)}
+			</pre>
+		)}
+		className="right-col"
+		innerClass={{
+			listItem: 'list-item',
+			resultStats: 'result-stats',
+		}}
+		pagination
+		stream
+	/>
+);
+
+const renderCode = (lib) => {
+	switch (lib) {
+		case 'react':
+			return renderResultList();
+		case 'raw_json':
+			return renderJSONList();
+		default:
+			return renderResultList();
+	}
 };
 
 export default class SearchApp extends Component {
@@ -176,22 +258,7 @@ export default class SearchApp extends Component {
 
 				<div className={this.props.facets && this.props.facets.length ? 'multi-col' : ''}>
 					<div className="left-col">{renderFilters(this.props.facets)}</div>
-					<ResultList
-						componentId="results"
-						dataField="name"
-						react={{
-							and: ['search', 'genres', 'original_language', 'release_year'],
-						}}
-						size={4}
-						renderData={renderData}
-						className="right-col"
-						innerClass={{
-							listItem: 'list-item',
-							resultStats: 'result-stats',
-						}}
-						pagination
-						stream
-					/>
+					{renderCode(this.props.ui)}
 				</div>
 			</ReactiveBase>
 		);
