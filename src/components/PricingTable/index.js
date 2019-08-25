@@ -34,6 +34,7 @@ const hideOnLarge = css`
 	${media.ipadPro(css`
 		display: none;
 	`)};
+	width: 80%;
 	margin: 50px auto;
 	user-select: none;
 `;
@@ -509,8 +510,8 @@ class PricingTable extends Component {
 					]}
 				>
 					<p>
-						Canceling the subscription would make the dashboard
-						GUI and Arc endpoints inaccessible within 24 hours.
+						Canceling the subscription would make the dashboard GUI and Arc endpoints
+						inaccessible within 24 hours.
 					</p>
 				</Modal>
 				<Table className={hideOnLarge}>
@@ -520,325 +521,213 @@ class PricingTable extends Component {
 								<Tooltip title="hey bro" />
 							</td>
 							<td>
-								<Title>FREE</Title>
+								<Title>OPEN SOURCE</Title>
 								<Price>
 									$0
 									<br />
-									<small>/month</small>
 								</Price>
 								<Caption>
-									<a href="https://appbase.io/static/poweredby_logo_placement.zip">
-										Requires appbase.io logo placement
-									</a>
+									Apache 2.0 licensed. Free to use, modify, actively maintained.
 								</Caption>
 							</td>
 							<td>
-								<Title>BASIC</Title>
+								<Title>STANDARD PLAN</Title>
 								<Price>
-									${this.calcPrice('bootstrap')}
+									$49
 									<br />
-									<small>/month</small>
+									<small style={{ fontWeight: 700 }}>/node/month</small>
 								</Price>
 							</td>
-							{/* <td>
-								<Title>GROWTH</Title>
-								<Price>
-									${this.calcPrice('growth')}
-									<br />
-									<small>/month</small>
-								</Price>
-							</td> */}
 						</tr>
 					</thead>
 					<tbody>
 						<tr className={HeadingTr}>
-							<td>Core Platform</td>
-							<td />
-							<td>{/* {active === 'bootstrap' && this.getText} */}</td>
-							{/* <td>
-							{active === 'growth' && this.getText}
-							</td> */}
-						</tr>
-						<tr>
-							<td>
-								<Tooltip
-									placement="rightTop"
-									title="A record (aka document) holds one object stored as a JSON into the database."
-								>
-									Records
-								</Tooltip>
-							</td>
-							<td>10K</td>
-							<td>
-								<PlusMinus
-									values={plans.bootstrap.records}
-									onChange={(value, index) => {
-										this.setState({
-											active: 'bootstrap',
-											bootstrap: Object.assign(bootstrap, { record: index }),
-										});
-									}}
-								/>
-							</td>
-							{/* <td>
-								<PlusMinus
-									values={plans.growth.records}
-									onChange={(value, index) => {
-										this.setState({
-											active: 'growth',
-											growth: Object.assign(growth, {
-												record: index,
-											}),
-										});
-									}}
-								/>
-							</td> */}
-						</tr>
-						<tr>
-							<td>
-								<Tooltip
-									placement="rightTop"
-									title="One API call is a read, write, update, search or a streaming response."
-								>
-									API Calls
-								</Tooltip>
-							</td>
-							<td>100K</td>
-							<td>
-								<PlusMinus
-									values={plans.bootstrap.apiCalls}
-									onChange={(value, index) => {
-										this.setState({
-											bootstrap: Object.assign(bootstrap, { apiCall: index }),
-											active: 'bootstrap',
-										});
-									}}
-								/>
-							</td>
-							{/* <td>
-								<PlusMinus
-									values={plans.growth.apiCalls}
-									onChange={(value, index) => {
-										this.setState({
-											growth: Object.assign(growth, {
-												apiCall: index,
-											}),
-											active: 'growth',
-										});
-									}}
-								/>
-							</td> */}
-						</tr>
-						<tr className={HeadingTr}>
-							<td>FEATURES</td>
+							<td>Security</td>
 							<td />
 							<td />
-							{/* <td /> */}
 						</tr>
 						<tr>
 							<td>
 								<Tooltip
 									placement="rightTop"
-									title="Invite team members and collaborate together on your app."
+									title="Encrypt and Serve all search data over HTTPS."
 								>
-									Team Access
+									TLS Security
 								</Tooltip>
 							</td>
-							<td>-</td>
 							<td>
 								<Check />
 							</td>
-							{/* <td>
-								<Check />
-							</td> */}
-						</tr>
-						<tr>
-							<td>
-								<Tooltip
-									placement="rightTop"
-									title="Set fine-grained access control policies per API key. Secure using HTTP Referers, IP sources and more."
-								>
-									<span>
-										<a
-											href="https://appbase.io/pricing#features"
-											target="_blank"
-											rel="noopener noreferrer"
-										>
-											ACLs & Security
-										</a>
-									</span>
-								</Tooltip>
-							</td>
-							<td>-</td>
-							<td>Basic</td>
-							{/* <td>Included</td> */}
-						</tr>
-						<tr>
-							<td>
-								<Tooltip
-									placement="rightTop"
-									title="Edit your app schema on the fly without worrying about data loss."
-								>
-									<span>
-										<a
-											href="https://appbase.io/pricing#features"
-											target="_blank"
-											rel="noopener noreferrer"
-										>
-											Editable Mappings
-										</a>
-									</span>
-								</Tooltip>
-							</td>
-							<td>-</td>
 							<td>
 								<Check />
 							</td>
-							{/* <td>
-								<Check />
-							</td> */}
 						</tr>
 						<tr>
 							<td>
 								<Tooltip
 									placement="rightTop"
-									title="Test-drive and tune your search relevancy without breaking a sweat."
+									title="Create and Manage Users. Set Admin, categories, ACLs, operations, index access patterns."
 								>
-									<span>
-										<a
-											href="https://appbase.io/pricing#features"
-											target="_blank"
-											rel="noopener noreferrer"
-										>
-											Search Sandbox
-										</a>
-									</span>
+									User Management
 								</Tooltip>
 							</td>
-							<td>Basic</td>
-							<td>1 Profile</td>
-							{/* <td>3 Profiles</td> */}
+							<td>REST API</td>
+							<td>REST API + Dashboard UI</td>
 						</tr>
 						<tr>
 							<td>
 								<Tooltip
 									placement="rightTop"
-									title="Get actionable analytics on popular searches, no result searches and clicks and conversions."
+									title="Login selective access to Arc's dashboard management features."
 								>
-									<span>
-										<a
-											href="https://appbase.io/pricing#features"
-											target="_blank"
-											rel="noopener noreferrer"
-										>
-											Analytics
-										</a>
-									</span>
+									Team Collaboration
 								</Tooltip>
 							</td>
 							<td>-</td>
-							<td>7 days Retention</td>
-							{/* <td>30 days Retention</td> */}
+							<td>Dashboard UI</td>
 						</tr>
 						<tr>
 							<td>
 								<Tooltip
 									placement="rightTop"
-									title="Create app, API keys, edit mappings and get analytics and insights via API."
+									title="Set Granular ACLs, time to live, IP based Rate Limits, Restrict by IP Sources and HTTP Referrers."
 								>
-									<span>Accounts API</span>
+									Permission Management
+								</Tooltip>
+							</td>
+							<td>REST API</td>
+							<td>REST API + Dashboard UI</td>
+						</tr>
+						<tr>
+							<td>
+								<Tooltip
+									placement="rightTop"
+									title="Authorize users via JWTs instead of exposing Basic Auth credentials, create user roles and map them to permissions."
+								>
+									Role Based Access Control
+								</Tooltip>
+							</td>
+							<td>REST API</td>
+							<td>REST API + Dashboard UI</td>
+						</tr>
+						<tr>
+							<td>
+								<Tooltip
+									placement="rightTop"
+									title="Create secure endpoints that can prevent script injection."
+								>
+									Search Templates
 								</Tooltip>
 							</td>
 							<td>-</td>
-							<td>-</td>
-							{/* <td>
-								<Check />
-							</td> */}
+							<td>REST API + Dashboard UI</td>
 						</tr>
 						<tr className={HeadingTr}>
 							<td>
-								Support and Guidance
+								Actionable Analytics
 								<small>
-									<a
-										href="https://appbase.io/pricing#support"
-										target="_blank"
-										rel="noopener noreferrer"
-									>
-										Get premium support and business SLAs
-									</a>
+									Popular Searches, No Result Searches, Popular Filters and
+									Results, Click and Conversion Tracking
 								</small>
 							</td>
 							<td />
 							<td />
-							{/* <td /> */}
 						</tr>
 						<tr>
 							<td>
 								<Tooltip
 									placement="rightTop"
-									title="Support on core platform features."
+									title="Categorized request logs of all incoming requests, and responses.Useful for auditing / debugging"
 								>
-									Platform Support
+									Request Logs
 								</Tooltip>
 							</td>
-							<td>Community</td>
-							<td>Email</td>
-							{/* <td>Email</td> */}
+							<td>REST API</td>
+							<td>REST API + Dashboard UI</td>
 						</tr>
 						<tr>
 							<td>
 								<Tooltip
 									placement="rightTop"
-									title="Support on non-core libraries, tools and open-source projects."
+									title="An enhanced suggestions index auto-populated daily based on the analytics data."
 								>
-									Tools Support
-								</Tooltip>
-							</td>
-							<td>Community</td>
-							<td>Basic</td>
-							{/* <td>Priority</td> */}
-						</tr>
-						<tr>
-							<td>
-								<Tooltip
-									placement="rightTop"
-									title="One time support on getting started, migrations and setup."
-								>
-									<span>
-										<a
-											href="https://appbase.io/pricing#support"
-											target="_blank"
-											rel="noopener noreferrer"
-										>
-											Onboarding Support
-										</a>
-									</span>
+									Enhanced Suggestions
 								</Tooltip>
 							</td>
 							<td>-</td>
-							<td>Can be added</td>
-							{/* <td>Can be added</td> */}
+							<td>REST API</td>
+						</tr>
+						<tr className={HeadingTr}>
+							<td>Developer Experience</td>
+							<td />
+							<td />
 						</tr>
 						<tr>
 							<td>
 								<Tooltip
 									placement="rightTop"
-									title="1:1 reviews with an engineer on data modeling, best practices and scaling."
+									title="Edit Mappings (aka search schema) on the fly."
 								>
-									<span>
-										<a
-											href="https://appbase.io/pricing#support"
-											target="_blank"
-											rel="noopener noreferrer"
-										>
-											Architecture Reviews
-										</a>
-									</span>
+									Editable Mappings
+								</Tooltip>
+							</td>
+							<td>REST API</td>
+							<td>REST API + Dashboard UI</td>
+						</tr>
+						<tr>
+							<td>
+								<Tooltip placement="rightTop" title="Create and Manage synonyms.">
+									Synonyms
 								</Tooltip>
 							</td>
 							<td>-</td>
-							<td>Can be added</td>
-							{/* <td>Can be added</td> */}
+							<td>Dashboard UI</td>
+						</tr>
+						<tr>
+							<td>
+								<Tooltip
+									placement="rightTop"
+									title="Visually build and test search relevancy, and export code."
+								>
+									Search Preview
+								</Tooltip>
+							</td>
+							<td>-</td>
+							<td>Dashboard UI</td>
+						</tr>
+						<tr>
+							<td>
+								<Tooltip
+									placement="rightTop"
+									title="Import, Search, Create and Edit Data visually."
+								>
+									Data Browser
+								</Tooltip>
+							</td>
+							<td>
+								<small>Partially available as open-source plugins.</small>
+							</td>
+							<td>Dashboard UI</td>
+						</tr>
+						<tr>
+							<td>
+								<Tooltip
+									placement="rightTop"
+									title="Promote Results, Hide Results based on incoming search queries."
+								>
+									Query Rules
+								</Tooltip>
+							</td>
+							<td>-</td>
+							<td>REST API + Dashboard UI</td>
+						</tr>
+						<tr className={HeadingTr}>
+							<td>
+								Support and Guidance
+								<small>Get premium support and business SLAs</small>
+							</td>
+							<td />
+							<td />
 						</tr>
 						<tr>
 							<td>
@@ -846,20 +735,11 @@ class PricingTable extends Component {
 									placement="rightTop"
 									title="Get dedicated onsite support with 1-day SLAs."
 								>
-									<span>
-										<a
-											href="https://appbase.io/pricing#support"
-											target="_blank"
-											rel="noopener noreferrer"
-										>
-											Premium Support
-										</a>
-									</span>
+									Premium Support
 								</Tooltip>
 							</td>
-							<td>-</td>
 							<td>Can be added</td>
-							{/* <td>Can be added</td> */}
+							<td>Can be added</td>
 						</tr>
 					</tbody>
 					<tfoot>
@@ -954,9 +834,31 @@ class PricingTable extends Component {
 						amount={0}
 						token={token => this.handleToken(token, 'open_source')}
 						stripeKey={this.stripeKey}
-						pricingList={['10K Records', '100K API Calls']}
+						pricingList={[]}
 					>
-						<CheckList list={['Weekly analytics e-mail', 'Community support']} />
+						<ListCaption style={{ color: theme.colors.footer }}>Security</ListCaption>
+						<CheckList
+							list={[
+								'TLS Security',
+								'User Management',
+								'Pemissions Management',
+								'Role Based Access Control',
+							]}
+						/>
+						<ListCaption style={{ color: theme.colors.footer }}>
+							Actionable Analytics
+						</ListCaption>
+						<CheckList list={['Request Logs']} />
+						<ListCaption style={{ color: theme.colors.footer }}>
+							Developer Experience
+						</ListCaption>
+						<CheckList
+							list={['Editable Mappings', 'Data Browser (Partially Available)']}
+						/>
+						<ListCaption style={{ color: theme.colors.footer }}>
+							Support and Guidance
+						</ListCaption>
+						<CheckList list={['Premium support can be added']} />
 					</NewPricingCard>
 					<NewPricingCard
 						css={{ backgroundColor: theme.badge.blue }}
@@ -968,28 +870,35 @@ class PricingTable extends Component {
 						token={token => this.handleToken(token, 'arc-basic')}
 						stripeKey={this.stripeKey}
 						linkColor="inherit"
-						pricingList={['50K Records', '1M API Calls']}
+						pricingList={[]}
 						buttonText={isBootstrapPlan ? 'Unsubscribe' : undefined}
 						onClickButton={isBootstrapPlan ? this.showConfirmBox : undefined}
 					>
-						<ListCaption>Features</ListCaption>
+						<ListCaption>Security</ListCaption>
 						<CheckList
 							list={[
-								'Team access',
-								'ACLs & enhanced security',
-								'Editable mappings',
-								'1 Search Sandbox profile',
-								'7-days analytics retention',
+								'TLS Security',
+								'User Management',
+								'Team Collaboration',
+								'Pemissions Management',
+								'Role Based Access Control',
+								'Search Templates',
+							]}
+						/>
+						<ListCaption>Actionable Analytics</ListCaption>
+						<CheckList list={['Request Logs', 'Enhanced Suggestions']} />
+						<ListCaption>Developer Experience</ListCaption>
+						<CheckList
+							list={[
+								'Editable Mappings',
+								'Search Preview',
+								'Synonyms',
+								'Query Rules',
+								'Data Browser',
 							]}
 						/>
 						<ListCaption>Support and Guidance</ListCaption>
-						<CheckList
-							list={[
-								'Email support',
-								'Basic tooling support',
-								'Premium support can be added',
-							]}
-						/>
+						<CheckList list={['Premium support can be added']} />
 					</NewPricingCard>
 					{/* <NewPricingCard
 						css={{ backgroundColor: theme.badge.darkBlue }}
@@ -1038,7 +947,7 @@ PricingTable.propTypes = {
 	isLoading: PropTypes.bool.isRequired,
 	isSubmitting: PropTypes.bool.isRequired,
 	isFreePlan: PropTypes.bool.isRequired,
-	isBootstrapPlan: PropTypes.bool.isRequired,
+	isBootstrapPlan: PropTypes.bool,
 	// isGrowthPlan: PropTypes.bool.isRequired,
 	errors: PropTypes.array.isRequired,
 };

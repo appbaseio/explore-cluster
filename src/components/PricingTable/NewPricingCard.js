@@ -142,7 +142,7 @@ NewPricingCard.propTypes = {
 	name: string,
 	onClickLink: func,
 	children: node,
-	isCurrentPlan: bool.isRequired,
+	isCurrentPlan: bool,
 	buttonText: string,
 	onClickButton: func,
 };

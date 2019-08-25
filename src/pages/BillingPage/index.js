@@ -105,8 +105,8 @@ Billing.defaultProps = {
 
 Billing.propTypes = {
 	plan: PropTypes.string.isRequired,
-	planValidity: PropTypes.number.isRequired,
-	isOnTrial: PropTypes.bool.isRequired,
+	planValidity: PropTypes.number,
+	isOnTrial: PropTypes.bool,
 	nodeCount: PropTypes.number,
 };
 
