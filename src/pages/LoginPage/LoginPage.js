@@ -8,7 +8,6 @@ import PropTypes from 'prop-types';
 import { loadUser } from '../../actions';
 import LoginContainer from '../../components/LoginContainer';
 import { container, card, gitlabBtn } from './styles';
-import { getURL } from '../../constants/config';
 
 class LoginPage extends Component {
 	constructor(props) {

@@ -22,6 +22,19 @@ export async function getUser(username, password, url) {
 		throw new Error(data);
 	}
 
+	const res = await fetch(`${api}/_buildinfo`, {
+		headers: {
+			Authorization: `Basic ${btoa(`${username}:${password}`)}`,
+		},
+	});
+	if (res.status === 400) {
+		// eslint-disable-next-line
+		throw {
+			message: 'Payment is required',
+			status: 402,
+		};
+	}
+
 	return {
 		username,
 		password,

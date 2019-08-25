@@ -12,6 +12,7 @@ import PrivateRoute from './pages/LoginPage/PrivateRoute';
 import Wrapper from './pages/Wrapper';
 import BillingPage from './pages/BillingPage';
 import InstallPage from './pages/InstallPage';
+import { getBuildInfo } from './batteries/modules/actions';
 
 // routes
 const LoginPage = Loadable({
@@ -33,7 +34,7 @@ class Dashboard extends Component {
 	};
 
 	componentDidMount() {
-		const { loadArcUser } = this.props;
+		const { loadArcUser, fetchBuildInfo } = this.props;
 		const params = new URLSearchParams(window.location.search);
 		if (params.has('showHelpChat')) {
 			const showHelpChat = params.get('showHelpChat');
@@ -74,6 +75,7 @@ class Dashboard extends Component {
 				isLoading: false,
 			});
 		}
+		fetchBuildInfo();
 	}
 
 	static getDerivedStateFromProps(props, state) {
@@ -182,6 +184,7 @@ Dashboard.defaultProps = {
 Dashboard.propTypes = {
 	user: PropTypes.object.isRequired,
 	loadArcUser: PropTypes.func.isRequired,
+	fetchBuildInfo: PropTypes.func.isRequired,
 	status: PropTypes.number,
 	error: PropTypes.any,
 };
@@ -194,6 +197,7 @@ const mapStateToProps = ({ user }) => ({
 
 const mapDispatchToProps = dispatch => ({
 	loadArcUser: (u, p) => dispatch(loadUser(u, p)),
+	fetchBuildInfo: () => dispatch(getBuildInfo()),
 });
 
 export default connect(
