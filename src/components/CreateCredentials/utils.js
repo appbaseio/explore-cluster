@@ -62,6 +62,14 @@ export const isNegative = (control) => {
 	}
 	return undefined;
 };
+
+export const isNegativeTTL = (control) => {
+	if (control.value !== -1 && control.value && parseInt(control.value, 10) < 0) {
+		return { isNegative: true };
+	}
+	return undefined;
+};
+
 // Operation types
 export const Types = {
 	read: {

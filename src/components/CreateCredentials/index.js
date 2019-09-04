@@ -32,6 +32,7 @@ import {
 	Types,
 	getDefaultAclOptionsByPlan,
 	isNegative,
+	isNegativeTTL,
 	defaultRateLimits,
 	mapFormToValues,
 	mapValuesToForm,
@@ -107,7 +108,7 @@ class CreateCredentials extends React.Component {
 					],
 					ttl: [
 						{ value: 0, disabled: !props.isPaidUser },
-						[Validators.required, isNegative],
+						[Validators.required, isNegativeTTL],
 					],
 			  });
 	}
