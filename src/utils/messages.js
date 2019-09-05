@@ -10,7 +10,9 @@ export const hoverMessage = Message(
 // remove the key from object if don't want to show the tooltip
 export const userManagementMessages = {
 	// username: Message("Add username to access the Arc."),
-	// password: Message("Add password to access the Arc."),
+	password: Message(
+		'The password will be encrypted once saved, and you will not be able to view it again. You can update it anytime.',
+	),
 	email: Message('An email to share credential key.'),
 	admin: Message('A user with admin access can view, create and modify other users.'),
 	operationType: Message(
