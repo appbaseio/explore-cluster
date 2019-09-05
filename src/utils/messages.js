@@ -47,7 +47,7 @@ export const credentialsMessages = {
 		`Selected fields aren't returned in the search response. In case of a field being present
 			in both include and exclude, exclude has a priority.`,
 	),
-	ttl: Message("Expiry time for this credential (in seconds). 0 means that it doesn't expire."),
+	ttl: Message("Expiry time for this credential (in seconds). -1 means that it doesn't expire."),
 	ipLimit: Message('Set a per hour ratelimit on API calls per IP address.'),
 };
 
