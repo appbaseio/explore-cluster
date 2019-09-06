@@ -4,7 +4,10 @@ import {
 } from 'antd';
 import { Switch, Route, Link } from 'react-router-dom';
 import Loadable from 'react-loadable';
+import { connect } from 'react-redux';
+import get from 'lodash/get';
 
+import { bool } from 'prop-types';
 import Loader from '../../components/Loader';
 import AppHeader from '../../components/AppHeader';
 import Logo from '../../components/Logo';
@@ -28,7 +31,7 @@ const ClusterLayout = Loadable({
 const { Sider } = Layout;
 const { SubMenu } = Menu;
 
-const routes = {
+const defaultRoutes = {
 	'Cluster Overview': {
 		icon: 'cluster',
 		link: '/',
@@ -62,6 +65,9 @@ const routes = {
 			{ label: 'User Management', link: '/cluster/user-management' },
 		],
 	},
+};
+
+const accountRoute = {
 	Account: {
 		icon: 'setting',
 		menu: [
@@ -88,7 +94,21 @@ class DashboardWrapper extends Component {
 		this.state = {
 			collapsed,
 			showHeader,
+			routes: defaultRoutes,
 		};
+	}
+
+	componentDidUpdate(prevProps) {
+		const { isBillingEnabled } = this.props;
+		if (isBillingEnabled && isBillingEnabled !== prevProps.isBillingEnabled) {
+			// eslint-disable-next-line
+			this.setState({
+				routes: {
+					...defaultRoutes,
+					...accountRoute,
+				},
+			});
+		}
 	}
 
 	onCollapse = (collapsed) => {
@@ -96,7 +116,7 @@ class DashboardWrapper extends Component {
 	};
 
 	render() {
-		const { collapsed, showHeader } = this.state;
+		const { collapsed, showHeader, routes } = this.state;
 
 		return (
 			<Layout>
@@ -204,4 +224,19 @@ class DashboardWrapper extends Component {
 	}
 }
 
-export default DashboardWrapper;
+DashboardWrapper.defaultProps = {
+	isBillingEnabled: false,
+};
+
+DashboardWrapper.propTypes = {
+	isBillingEnabled: bool,
+};
+
+const mapStateToProps = state => ({
+	isBillingEnabled: get(state, '$getBuildInfo.results.billing'),
+});
+
+export default connect(
+	mapStateToProps,
+	null,
+)(DashboardWrapper);
