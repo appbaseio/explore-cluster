@@ -8,6 +8,7 @@ import PropTypes from 'prop-types';
 import { loadUser } from '../../actions';
 import LoginContainer from '../../components/LoginContainer';
 import { container, card, gitlabBtn } from './styles';
+import { getURLCredentials } from '../../utils';
 
 class LoginPage extends Component {
 	constructor(props) {
@@ -28,6 +29,16 @@ class LoginPage extends Component {
 		}
 	};
 
+	onClusterURLBlur = (event) => {
+		const { value } = event.target;
+		const credObj = getURLCredentials(value);
+		if (!credObj) return;
+		const originURL = value.split('@')[1];
+		this.url.current.input.value = `${window.location.protocol}//${originURL}`;
+		this.username.current.input.value = credObj.username;
+		this.password.current.input.value = credObj.password;
+	};
+
 	render() {
 		const { user } = this.props;
 		if (user.data) {
@@ -43,6 +54,7 @@ class LoginPage extends Component {
 							size="large"
 							prefix={<Icon type="cluster" style={{ color: 'rgba(0,0,0,.25)' }} />}
 							placeholder="Cluster URL"
+							onBlur={this.onClusterURLBlur}
 						/>
 						<Input
 							css={{

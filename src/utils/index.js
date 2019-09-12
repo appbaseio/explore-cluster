@@ -1,3 +1,4 @@
+import { chain } from 'lodash';
 import { getURL } from '../constants/config';
 
 export async function getUser(username, password, url) {
@@ -144,3 +145,13 @@ export async function deleteApp(appName) {
 		return { message: 'An error occured while deleting the app. Please try again.' };
 	}
 }
+
+// checks whether it is a valid URL
+export const isAbsoluteURL = str => /^[a-z][a-z0-9+.-]*:/.test(str);
+
+// extract credentials from URL
+export const getURLCredentials = url => {
+	if (!isAbsoluteURL(url) || !url.includes('@')) return null;
+	const credArr = chain(url).split('@').get(0).split('//').get(1).split(':').value();
+	return { username: credArr[0], password: credArr[1] };
+};

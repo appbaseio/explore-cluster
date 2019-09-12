@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Button, Icon, Modal } from 'antd';
 import get from 'lodash/get';
+import URLSearchParams from '@ungap/url-search-params';
 import { loadUser } from './actions';
 import Loader from './components/Loader';
 import Logo from './components/Logo';
@@ -24,8 +25,6 @@ const SignupPage = Loadable({
 	loader: () => import('./pages/SignupPage'),
 	loading: Loader,
 });
-
-const URLSearchParams = require('url-search-params');
 
 class Dashboard extends Component {
 	state = {
