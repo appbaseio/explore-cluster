@@ -155,3 +155,6 @@ export const getURLCredentials = url => {
 	const credArr = chain(url).split('@').get(0).split('//').get(1).split(':').value();
 	return { username: credArr[0], password: credArr[1] };
 };
+
+// remove trailing slashes from URL
+export const removeTrailingSlashes = url => url.replace(/\/+$/, "");
