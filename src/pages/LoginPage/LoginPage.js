@@ -35,8 +35,8 @@ class LoginPage extends Component {
 		if (!credObj) return;
 		const originURL = value.split('@')[1];
 		this.url.current.input.value = `${window.location.protocol}//${removeTrailingSlashes(originURL)}`;
-		this.username.current.input.value = credObj.username;
-		this.password.current.input.value = credObj.password;
+		this.username.current.input.value = credObj.username || '';
+		this.password.current.input.value = credObj.password || '';
 	};
 
 	render() {
