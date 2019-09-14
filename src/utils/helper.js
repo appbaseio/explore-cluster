@@ -21,6 +21,17 @@ export const displayErrors = (nextErrors = [], prevErrors = [], showNotification
 	});
 };
 
+export const isBase64 = (str) => {
+	if (str === '' || str.trim() === '') {
+		return false;
+	}
+	try {
+		return btoa(atob(str)) === str;
+	} catch (err) {
+		return false;
+	}
+};
+
 export const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1);
 
 export const compressNumber = (amount) => {

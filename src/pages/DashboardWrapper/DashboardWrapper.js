@@ -63,6 +63,7 @@ const defaultRoutes = {
 		menu: [
 			{ label: 'API Credentials', link: '/cluster/credentials' },
 			{ label: 'User Management', link: '/cluster/user-management' },
+			{ label: 'Role Based Access', link: '/cluster/role-based-access', tag: 'Beta' },
 		],
 	},
 };

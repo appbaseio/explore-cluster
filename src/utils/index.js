@@ -44,6 +44,16 @@ export async function getUser(username, password, url) {
 	};
 }
 
+const getAuthToken = () => {
+	let token = null;
+	try {
+		token = sessionStorage.getItem('authToken');
+	} catch (e) {
+		console.error(e);
+	}
+	return token;
+};
+
 export async function getESIndices(authToken) {
 	const ACC_API = getURL();
 	const response = await fetch(`${ACC_API}/_cat/indices?format=json`, {
@@ -146,6 +156,41 @@ export async function deleteApp(appName) {
 	}
 }
 
+export const setRole = (username, role) =>
+	new Promise((resolve, reject) => {
+		const ACC_API = getURL();
+		const authToken = getAuthToken();
+		fetch(`${ACC_API}/_permission/${username}`, {
+			method: 'PATCH',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Basic ${authToken}`,
+			},
+			body: JSON.stringify({
+				role,
+			}),
+		})
+			.then(res => res.json())
+			.then(data => resolve({ ...data, message: data.message }))
+			.catch(error => reject(error));
+	});
+
+export const deleteRole = (appId, username) =>
+	new Promise((resolve, reject) => {
+		const ACC_API = getURL();
+		const authToken = getAuthToken();
+		fetch(`${ACC_API}/_permission/${username}`, {
+			method: 'DELETE',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Basic ${authToken}`,
+			},
+			body: JSON.stringify({}),
+		})
+			.then(res => res.json())
+			.then(data => resolve({ ...data.body, message: data.message }))
+			.catch(error => reject(error));
+	});
 // checks whether it is a valid URL
 export const isAbsoluteURL = str => /^[a-z][a-z0-9+.-]*:/.test(str);
 

@@ -101,6 +101,11 @@ const RequestDistributionPage = Loadable({
 	loading: Loader,
 });
 
+const RoleBaseAccess = Loadable({
+	loader: () => import('../../pages/RoleBaseAccess'),
+	loading: Loader,
+});
+
 class ClusterLayout extends React.PureComponent {
 	render() {
 		const { collapsed, showHeader } = this.props;
@@ -255,6 +260,13 @@ class ClusterLayout extends React.PureComponent {
 							path="/cluster/search-preview"
 							render={props => (
 								<AppPageContainer {...props} component={SandboxPage} />
+							)}
+						/>
+						<Route
+							exact
+							path="/cluster/role-based-access"
+							component={props => (
+								<AppPageContainer {...props} component={RoleBaseAccess} />
 							)}
 						/>
 					</Switch>
