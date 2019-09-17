@@ -100,12 +100,18 @@ class RoleBaseAccess extends React.Component {
 
 		if (updateKeyError && prevUpdateError !== updateKeyError) {
 			notification.error({
-				message: updateKeyError,
+				message:
+					updateKeyError.message
+					|| updateKeyError.reason
+					|| 'Error while updating the Public Key.',
 			});
 		}
 		if (publicKeyError && prevKeyError !== publicKeyError) {
 			notification.error({
-				message: publicKeyError,
+				message:
+					publicKeyError.message
+					|| publicKeyError.reason
+					|| 'Error while fetching the Public Key.',
 			});
 		}
 	}
@@ -354,8 +360,8 @@ const mapStateToProps = (state) => {
 		isPermissionsLoading: get(state, '$getAppPermissions.isFetching'),
 		isPublicKeyLoading: get(state, '$getAppPublicKey.isFetching'),
 		publicKey: atob(get(state, '$getAppPublicKey.results.public_key', '')),
-		publicKeyError: get(state, '$getAppPublicKey.error.actual.error.message', ''),
-		updateKeyError: get(state, '$updateAppPublicKey.error.actual.error.message', ''),
+		publicKeyError: get(state, '$getAppPublicKey.error.actual.error', ''),
+		updateKeyError: get(state, '$updateAppPublicKey.error.actual.error', ''),
 		updatedKey: get(state, '$updateAppPublicKey.results', ''),
 		updatingKeyes: get(state, '$updateAppPublicKey.isFetching'),
 		roleKey: get(state, '$getAppPublicKey.results.role_key', ''),
