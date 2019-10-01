@@ -38,7 +38,7 @@ const RequestDistributionWrapper = ({ plan, isGrowth }) => (
 			<React.Fragment>
 				{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
 				<Container>
-					<RequestDistribution />
+					<RequestDistribution filterId="request_distribution_page" />
 				</Container>
 			</React.Fragment>
 		) : (
@@ -66,7 +66,7 @@ RequestDistributionWrapper.propTypes = {
 };
 
 const mapStateToProps = state => ({
-		plan: get(state, '$getAppPlan.results.plan'),
-		isGrowth: get(state, '$getAppPlan.results.isPaid'),
-	});
+	plan: get(state, '$getAppPlan.results.plan'),
+	isGrowth: get(state, '$getAppPlan.results.isPaid'),
+});
 export default connect(mapStateToProps)(RequestDistributionWrapper);
