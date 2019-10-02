@@ -37,7 +37,7 @@ const SearchLatencyWrapper = ({ plan, isGrowth }) => (
 			<React.Fragment>
 				{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
 				<Container>
-					<SearchPerformance />
+					<SearchPerformance filterId="search_latency_page" />
 				</Container>
 			</React.Fragment>
 		) : (

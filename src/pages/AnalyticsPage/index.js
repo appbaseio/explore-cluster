@@ -37,7 +37,12 @@ const AnalyticsView = ({ appName, isPaidUser, plan }) => (
 			<React.Fragment>
 				{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
 				<Container>
-					<Analytics displayReplaySearch chartWidth={window.innerWidth - 400} appName={appName} />
+					<Analytics
+						filterId="analytics_page"
+						displayReplaySearch
+						chartWidth={window.innerWidth - 400}
+						appName={appName}
+					/>
 				</Container>
 			</React.Fragment>
 		) : (
