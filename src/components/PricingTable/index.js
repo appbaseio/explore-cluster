@@ -433,12 +433,8 @@ class PricingTable extends Component {
 			otp,
 		} = this.state;
 		const {
-			isFreePlan,
-			isBootstrapPlan,
-			//  isGrowthPlan,
-			isSubmitting,
-			isLoading,
-		} = this.props;
+ isFreePlan, isBootstrapPlan, isGrowthPlan, isSubmitting, isLoading,
+} = this.props;
 		if (isLoading) {
 			return <Loader show message="Updating Plan... Please wait!" />;
 		}
@@ -521,28 +517,43 @@ class PricingTable extends Component {
 								<Tooltip title="hey bro" />
 							</td>
 							<td>
-								<Title>OPEN SOURCE</Title>
+								<Title>BASIC PLAN</Title>
 								<Price>
-									$0
+									$9
 									<br />
+									<small style={{ fontWeight: 700 }}>/month</small>
 								</Price>
-								<Caption>
-									Apache 2.0 licensed. Free to use, modify, actively maintained.
-								</Caption>
+								<Caption>Works with 1 ElasticSearch node</Caption>
 							</td>
 							<td>
 								<Title>STANDARD PLAN</Title>
 								<Price>
-									$49
+									$59
 									<br />
-									<small style={{ fontWeight: 700 }}>/node/month</small>
+									<small style={{ fontWeight: 700 }}>/month</small>
 								</Price>
+								<Caption style={{ color: 'white' }}>
+									Works with upto 3 ElasticSearch nodes.
+								</Caption>
+							</td>
+
+							<td>
+								<Title>ENTERPRISE PLAN</Title>
+								<Price>
+									$499
+									<br />
+									<small style={{ fontWeight: 700 }}>/month</small>
+								</Price>
+								<Caption style={{ color: 'white' }}>
+									Works with upto 10 ElasticSearch nodes.
+								</Caption>
 							</td>
 						</tr>
 					</thead>
 					<tbody>
 						<tr className={HeadingTr}>
 							<td>Security</td>
+							<td />
 							<td />
 							<td />
 						</tr>
@@ -561,6 +572,9 @@ class PricingTable extends Component {
 							<td>
 								<Check />
 							</td>
+							<td>
+								<Check />
+							</td>
 						</tr>
 						<tr>
 							<td>
@@ -571,7 +585,8 @@ class PricingTable extends Component {
 									User Management
 								</Tooltip>
 							</td>
-							<td>REST API</td>
+							<td>REST API + Dashboard UI</td>
+							<td>REST API + Dashboard UI</td>
 							<td>REST API + Dashboard UI</td>
 						</tr>
 						<tr>
@@ -583,7 +598,8 @@ class PricingTable extends Component {
 									Team Collaboration
 								</Tooltip>
 							</td>
-							<td>-</td>
+							<td>Dashboard UI</td>
+							<td>Dashboard UI</td>
 							<td>Dashboard UI</td>
 						</tr>
 						<tr>
@@ -595,7 +611,8 @@ class PricingTable extends Component {
 									Permission Management
 								</Tooltip>
 							</td>
-							<td>REST API</td>
+							<td>REST API + Dashboard UI</td>
+							<td>REST API + Dashboard UI</td>
 							<td>REST API + Dashboard UI</td>
 						</tr>
 						<tr>
@@ -607,7 +624,8 @@ class PricingTable extends Component {
 									Role Based Access Control
 								</Tooltip>
 							</td>
-							<td>REST API</td>
+							<td>REST API + Dashboard UI</td>
+							<td>REST API + Dashboard UI</td>
 							<td>REST API + Dashboard UI</td>
 						</tr>
 						<tr>
@@ -619,7 +637,8 @@ class PricingTable extends Component {
 									Search Templates
 								</Tooltip>
 							</td>
-							<td>-</td>
+							<td>REST API + Dashboard UI</td>
+							<td>REST API + Dashboard UI</td>
 							<td>REST API + Dashboard UI</td>
 						</tr>
 						<tr className={HeadingTr}>
@@ -632,6 +651,7 @@ class PricingTable extends Component {
 							</td>
 							<td />
 							<td />
+							<td />
 						</tr>
 						<tr>
 							<td>
@@ -642,7 +662,8 @@ class PricingTable extends Component {
 									Request Logs
 								</Tooltip>
 							</td>
-							<td>REST API</td>
+							<td>REST API + Dashboard UI</td>
+							<td>REST API + Dashboard UI</td>
 							<td>REST API + Dashboard UI</td>
 						</tr>
 						<tr>
@@ -655,10 +676,12 @@ class PricingTable extends Component {
 								</Tooltip>
 							</td>
 							<td>-</td>
-							<td>REST API</td>
+							<td>-</td>
+							<td>-</td>
 						</tr>
 						<tr className={HeadingTr}>
 							<td>Developer Experience</td>
+							<td />
 							<td />
 							<td />
 						</tr>
@@ -671,7 +694,8 @@ class PricingTable extends Component {
 									Editable Mappings
 								</Tooltip>
 							</td>
-							<td>REST API</td>
+							<td>REST API + Dashboard UI</td>
+							<td>REST API + Dashboard UI</td>
 							<td>REST API + Dashboard UI</td>
 						</tr>
 						<tr>
@@ -680,7 +704,8 @@ class PricingTable extends Component {
 									Synonyms
 								</Tooltip>
 							</td>
-							<td>-</td>
+							<td>Dashboard UI</td>
+							<td>Dashboard UI</td>
 							<td>Dashboard UI</td>
 						</tr>
 						<tr>
@@ -692,7 +717,8 @@ class PricingTable extends Component {
 									Search Preview
 								</Tooltip>
 							</td>
-							<td>-</td>
+							<td>Dashboard UI</td>
+							<td>Dashboard UI</td>
 							<td>Dashboard UI</td>
 						</tr>
 						<tr>
@@ -704,9 +730,8 @@ class PricingTable extends Component {
 									Data Browser
 								</Tooltip>
 							</td>
-							<td>
-								<small>Partially available as open-source plugins.</small>
-							</td>
+							<td>Dashboard UI</td>
+							<td>Dashboard UI</td>
 							<td>Dashboard UI</td>
 						</tr>
 						<tr>
@@ -718,7 +743,8 @@ class PricingTable extends Component {
 									Query Rules
 								</Tooltip>
 							</td>
-							<td>-</td>
+							<td>REST API + Dashboard UI</td>
+							<td>REST API + Dashboard UI</td>
 							<td>REST API + Dashboard UI</td>
 						</tr>
 						<tr className={HeadingTr}>
@@ -726,6 +752,7 @@ class PricingTable extends Component {
 								Support and Guidance
 								<small>Get premium support and business SLAs</small>
 							</td>
+							<td />
 							<td />
 							<td />
 						</tr>
@@ -740,6 +767,7 @@ class PricingTable extends Component {
 							</td>
 							<td>Can be added</td>
 							<td>Can be added</td>
+							<td>Included</td>
 						</tr>
 					</tbody>
 					<tfoot>
@@ -788,7 +816,7 @@ class PricingTable extends Component {
 									</AppButton>
 								</Stripe>
 							</td>
-							{/* <td>
+							<td>
 								<Stripe
 									name="Appbase.io Growth Plan"
 									disabled={isGrowthPlan}
@@ -809,7 +837,7 @@ class PricingTable extends Component {
 										{isGrowthPlan ? 'Unsubscribe' : 'Subscribe'}
 									</AppButton>
 								</Stripe>
-							</td> */}
+							</td>
 						</tr>
 					</tfoot>
 				</Table>
@@ -826,45 +854,47 @@ class PricingTable extends Component {
 				>
 					<NewPricingCard
 						css={{ color: theme.colors.accentText }}
-						name="Free"
+						name="Basic"
 						isCurrentPlan={isFreePlan}
 						buttonText={isFreePlan ? 'Current Plan' : undefined}
-						price="$0"
+						price="$9"
 						stripeName="Appbase.io Free Plan"
 						amount={0}
 						token={token => this.handleToken(token, 'open_source')}
 						stripeKey={this.stripeKey}
 						pricingList={[]}
 					>
-						<ListCaption style={{ color: theme.colors.footer }}>Security</ListCaption>
+						<ListCaption>Security</ListCaption>
 						<CheckList
 							list={[
 								'TLS Security',
 								'User Management',
+								'Team Collaboration',
 								'Pemissions Management',
 								'Role Based Access Control',
+								'Search Templates',
 							]}
 						/>
-						<ListCaption style={{ color: theme.colors.footer }}>
-							Actionable Analytics
-						</ListCaption>
-						<CheckList list={['Request Logs']} />
-						<ListCaption style={{ color: theme.colors.footer }}>
-							Developer Experience
-						</ListCaption>
+						<ListCaption>Actionable Analytics</ListCaption>
+						<CheckList list={['Request Logs', 'Enhanced Suggestions']} />
+						<ListCaption>Developer Experience</ListCaption>
 						<CheckList
-							list={['Editable Mappings', 'Data Browser (Partially Available)']}
+							list={[
+								'Editable Mappings',
+								'Search Preview',
+								'Synonyms',
+								'Query Rules',
+								'Data Browser',
+							]}
 						/>
-						<ListCaption style={{ color: theme.colors.footer }}>
-							Support and Guidance
-						</ListCaption>
+						<ListCaption>Support and Guidance</ListCaption>
 						<CheckList list={['Premium support can be added']} />
 					</NewPricingCard>
 					<NewPricingCard
 						css={{ backgroundColor: theme.badge.blue }}
-						name="Basic"
+						name="Standard"
 						isCurrentPlan={isBootstrapPlan}
-						price={`$${this.plans.bootstrap.basePrice}`}
+						price="$59"
 						stripeName="Appbase.io Basic Plan"
 						amount={this.plans.bootstrap.basePrice * 100}
 						token={token => this.handleToken(token, 'arc-basic')}
@@ -900,40 +930,46 @@ class PricingTable extends Component {
 						<ListCaption>Support and Guidance</ListCaption>
 						<CheckList list={['Premium support can be added']} />
 					</NewPricingCard>
-					{/* <NewPricingCard
+					<NewPricingCard
 						css={{ backgroundColor: theme.badge.darkBlue }}
-						name="Growth"
+						name="Enterprise"
 						isCurrentPlan={isGrowthPlan}
-						price={`$${this.plans.growth.basePrice}`}
+						price="$499"
 						stripeName="Appbase.io Growth Plan"
 						amount={this.plans.growth.basePrice * 100}
 						token={token => this.handleToken(token, 'growth-monthly')}
 						stripeKey={this.stripeKey}
 						linkColor="inherit"
-						pricingList={['1M Records', '10M API Calls']}
+						pricingList={[]}
 						buttonText={isGrowthPlan ? 'Unsubscribe' : undefined}
 						onClickButton={isGrowthPlan ? this.showConfirmBox : undefined}
 					>
-						<ListCaption>Features</ListCaption>
+						<ListCaption>Security</ListCaption>
 						<CheckList
 							list={[
-								'Team access',
-								'ACLs & enhanced security',
-								'Editable mappings',
-								'3 Search Sandbox profiles',
-								'30-days analytics retention',
-								'Accounts & Analytics API access',
+								'TLS Security',
+								'User Management',
+								'Team Collaboration',
+								'Pemissions Management',
+								'Role Based Access Control',
+								'Search Templates',
+							]}
+						/>
+						<ListCaption>Actionable Analytics</ListCaption>
+						<CheckList list={['Request Logs', 'Enhanced Suggestions']} />
+						<ListCaption>Developer Experience</ListCaption>
+						<CheckList
+							list={[
+								'Editable Mappings',
+								'Search Preview',
+								'Synonyms',
+								'Query Rules',
+								'Data Browser',
 							]}
 						/>
 						<ListCaption>Support and Guidance</ListCaption>
-						<CheckList
-							list={[
-								'Email support',
-								'Priority tooling support',
-								'Premium support can be added',
-							]}
-						/>
-					</NewPricingCard> */}
+						<CheckList list={['Premium support Included']} />
+					</NewPricingCard>
 				</div>
 			</React.Fragment>
 		);
@@ -948,7 +984,7 @@ PricingTable.propTypes = {
 	isSubmitting: PropTypes.bool.isRequired,
 	isFreePlan: PropTypes.bool.isRequired,
 	isBootstrapPlan: PropTypes.bool,
-	// isGrowthPlan: PropTypes.bool.isRequired,
+	isGrowthPlan: PropTypes.bool,
 	errors: PropTypes.array.isRequired,
 };
 const mapStateToProps = (state) => {

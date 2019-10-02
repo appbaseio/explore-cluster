@@ -202,4 +202,10 @@ export const getURLCredentials = url => {
 };
 
 // remove trailing slashes from URL
-export const removeTrailingSlashes = url => url.replace(/\/+$/, "");
+export const removeTrailingSlashes = url => url.replace(/\/+$/, '');
+
+// get protocol from url
+export const getProtocol = url => {
+	if (!isAbsoluteURL(url)) return;
+	return url.split('/')[0];
+};

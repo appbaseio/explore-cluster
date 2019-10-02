@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 import { loadUser } from '../../actions';
 import LoginContainer from '../../components/LoginContainer';
 import { container, card, gitlabBtn } from './styles';
-import { getURLCredentials, removeTrailingSlashes } from '../../utils';
+import { getProtocol, getURLCredentials, removeTrailingSlashes } from '../../utils';
 
 class LoginPage extends Component {
 	constructor(props) {
@@ -34,7 +34,7 @@ class LoginPage extends Component {
 		const credObj = getURLCredentials(value);
 		if (!credObj) return;
 		const originURL = value.split('@')[1];
-		this.url.current.input.value = `${window.location.protocol}//${removeTrailingSlashes(originURL)}`;
+		this.url.current.input.value = `${getProtocol(value)}//${removeTrailingSlashes(originURL)}`;
 		this.username.current.input.value = credObj.username || '';
 		this.password.current.input.value = credObj.password || '';
 	};

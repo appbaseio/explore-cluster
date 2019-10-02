@@ -36,7 +36,12 @@ const PopularFiltersWrapper = ({ appName, plan, isGrowth }) => (
 			<React.Fragment>
 				{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
 				<Container>
-					<PopularFilters displayReplaySearch appName={appName} plan={plan} />
+					<PopularFilters
+						filterId="popular_filters_page"
+						displayReplaySearch
+						appName={appName}
+						plan={plan}
+					/>
 				</Container>
 			</React.Fragment>
 		) : (
