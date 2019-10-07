@@ -1,5 +1,7 @@
 import React from 'react';
-import { Icon, Input, Select } from 'antd';
+import {
+ Icon, Input, Select, Button, Alert,
+} from 'antd';
 import PropTypes from 'prop-types';
 import styles from './styles';
 import Grid from './Grid';
@@ -30,7 +32,7 @@ class WhiteList extends React.Component {
 		});
 	};
 
-	hanldeOnChange = (value) => {
+	handleOnChange = (value) => {
 		this.setState({
 			text: value,
 		});
@@ -79,6 +81,8 @@ class WhiteList extends React.Component {
 			label,
 			inputProps,
 			defaultSuggestionValue,
+			defaultValue,
+			handleWarningMessage,
 			control: {
  value, handler, hasError, disabled, enabled,
 },
@@ -86,12 +90,34 @@ class WhiteList extends React.Component {
 			toolTipMessage,
 		} = this.props;
 		const { text } = this.state;
+		const { onChange } = handler();
 		return (
 			<Grid
 				label={<span css={styles.subHeader}>{label}</span>}
 				toolTipMessage={toolTipMessage}
 				component={(
 <Flex css="width: 100%;position: relative" flexDirection="column">
+						{!(value && value.includes(defaultValue)) && (
+							<Alert
+								style={{ marginBottom: 10 }}
+								message={(
+<Flex justifyContent="space-between">
+										<span
+											style={{
+												maxWidth: 280,
+											}}
+										>
+											{handleWarningMessage(defaultValue)}
+										</span>
+										<Button onClick={() => onChange([defaultValue])}>
+											Reset
+										</Button>
+</Flex>
+)}
+								type="warning"
+							/>
+						)}
+
 						{value.map(item => (
 							<Flex
 								key={item}
@@ -144,9 +170,7 @@ class WhiteList extends React.Component {
 										Object.keys(Suggestions).map((k) => {
 											const suggestion = Suggestions[k];
 											if (text) {
-												const suggestionValue = `${
-													suggestion.prefix
-												}${text}${suggestion.suffix}`;
+												const suggestionValue = `${suggestion.prefix}${text}${suggestion.suffix}`;
 												return (
 													<Select.Option key={suggestionValue}>
 														<Flex justifyContent="space-between">
@@ -184,7 +208,7 @@ class WhiteList extends React.Component {
 									{...handler()}
 									value={text}
 									onChange={(e) => {
-										this.hanldeOnChange(e.target.value);
+										this.handleOnChange(e.target.value);
 									}}
 									onBlur={this.submitOnBlur}
 									onKeyPress={(event) => {
@@ -203,6 +227,8 @@ class WhiteList extends React.Component {
 	}
 }
 WhiteList.propTypes = {
+	handleWarningMessage: PropTypes.func,
+	defaultValue: PropTypes.string,
 	label: PropTypes.string,
 	toolTipMessage: PropTypes.any,
 	inputProps: PropTypes.object,

@@ -461,6 +461,8 @@ class CreateCredentials extends React.Component {
 														type="dropdown"
 														defaultSuggestionValue="https://example.com/"
 														label="HTTP Referers"
+														defaultValue="*"
+														handleWarningMessage={defaultValue => `Warning! You don't have the default value (${defaultValue}) as selected which means that only the selected referers will be considered as valid.`}
 														inputProps={{
 															placeholder: 'Add a HTTP Referer',
 														}}
@@ -474,10 +476,8 @@ class CreateCredentials extends React.Component {
 														control={control}
 														toolTipMessage={Messages.sources}
 														label="IP Sources"
-														defaultValue={{
-															value: '0.0.0.0/0 (default)',
-															description: 'Matches all IP sources',
-														}}
+														handleWarningMessage={defaultValue => `Warning! You don't have the default value (${defaultValue}) as selected which means that only the selected sources will be considered as valid.`}
+														defaultValue="0.0.0.0/0"
 														inputProps={{
 															placeholder:
 																'Add an IP Source in CIDR format',

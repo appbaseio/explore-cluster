@@ -226,10 +226,12 @@ class Credentials extends Component {
 }
 Credentials.defaultProps = {
 	isLoading: false,
+	appName: undefined,
+	appId: undefined,
 };
 Credentials.propTypes = {
-	appName: string.isRequired,
-	appId: string.isRequired,
+	appName: string,
+	appId: string,
 	permissions: array.isRequired,
 	fetchPermissions: func.isRequired,
 	handleCreatePermission: func.isRequired,
