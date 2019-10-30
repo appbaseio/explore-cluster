@@ -14,6 +14,7 @@ import { getAppPlanByName } from '../../batteries/modules/selectors';
 import { updateAppPaymentMethod } from '../../batteries/modules/actions';
 import Loader from '../../batteries/components/shared/Loader';
 import { displayErrors } from '../../utils/helper';
+import { STRIPE_KEY } from '../../constants';
 
 const TextLink = styled('span')`
 	color: rgb(111, 99, 245);
@@ -35,11 +36,6 @@ const uppercase = css`
 `;
 
 class Billing extends Component {
-	// test key
-	stripeKey = 'pk_test_DYtAxDRTg6cENksacX1zhE02';
-	// live key
-	// stripeKey = 'pk_live_ihb1fzO4h1ykymhpZsA3GaQR';
-
 	static defaultProps = {
 		nodeCount: undefined,
 	};
@@ -126,7 +122,7 @@ class Billing extends Component {
 								</Flex>
 							) : null}
 							<Stripe
-								stripeKey={this.stripeKey}
+								stripeKey={STRIPE_KEY.TEST}
 								panelLabel="Update Payment"
 								token={updatePayment}
 							>
