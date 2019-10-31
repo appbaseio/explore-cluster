@@ -209,3 +209,12 @@ export const getProtocol = url => {
 	if (!isAbsoluteURL(url)) return;
 	return url.split('/')[0];
 };
+
+// https://{url}?search=xyz => {search: xyz}
+export const getURLParameters = url =>
+	(url.match(/([^?=&]+)(=([^&]*))/g) || []).reduce(
+		(a, v) => ((a[v.slice(0, v.indexOf('='))] = v.slice(v.indexOf('=') + 1)), a),
+		{},
+	);
+
+export const isEmpty = val => val == null || !(Object.keys(val) || val).length;

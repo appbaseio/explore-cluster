@@ -8,7 +8,14 @@ import PropTypes from 'prop-types';
 import { loadUser } from '../../actions';
 import LoginContainer from '../../components/LoginContainer';
 import { container, card, gitlabBtn } from './styles';
-import { getProtocol, getURLCredentials, removeTrailingSlashes } from '../../utils';
+import {
+	getProtocol,
+	getURLCredentials,
+	getURLParameters,
+	isEmpty,
+	removeTrailingSlashes,
+} from '../../utils';
+import { getURL } from '../../constants/config';
 
 class LoginPage extends Component {
 	constructor(props) {
@@ -16,6 +23,10 @@ class LoginPage extends Component {
 		this.username = React.createRef();
 		this.password = React.createRef();
 		this.url = React.createRef();
+	}
+
+	componentDidMount() {
+		this.url.current.input.value = getURL() || '';
 	}
 
 	login = () => {
@@ -31,12 +42,20 @@ class LoginPage extends Component {
 
 	onClusterURLBlur = (event) => {
 		const { value } = event.target;
-		const credObj = getURLCredentials(value);
-		if (!credObj) return;
-		const originURL = value.split('@')[1];
-		this.url.current.input.value = `${getProtocol(value)}//${removeTrailingSlashes(originURL)}`;
+		if (!value) return;
+		const credObj = getURLCredentials(value) || {};
+		this.url.current.input.value = this.getURL(value);
 		this.username.current.input.value = credObj.username || '';
 		this.password.current.input.value = credObj.password || '';
+	};
+
+	getURL = (value) => {
+		const credObj = getURLCredentials(value) || {};
+		const { url } = getURLParameters(value);
+		const originURL = value.split('@')[1];
+		if (url) return removeTrailingSlashes(url);
+		if (!isEmpty(credObj)) return `${getProtocol(value)}//${removeTrailingSlashes(originURL || '')}`;
+		return removeTrailingSlashes(value);
 	};
 
 	render() {
