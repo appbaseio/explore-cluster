@@ -286,8 +286,8 @@ class PricingTable extends Component {
 			message: '',
 			resending: false,
 		};
-		// test key
-		this.stripeKey = STRIPE_KEY.TEST;
+		// live key
+		this.stripeKey = STRIPE_KEY.LIVE;
 	}
 
 	componentDidUpdate(prevProps) {

@@ -122,7 +122,7 @@ class Billing extends Component {
 								</Flex>
 							) : null}
 							<Stripe
-								stripeKey={STRIPE_KEY.TEST}
+								stripeKey={STRIPE_KEY.LIVE}
 								panelLabel="Update Payment"
 								token={updatePayment}
 							>
