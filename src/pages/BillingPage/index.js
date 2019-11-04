@@ -113,7 +113,7 @@ Billing.propTypes = {
 const mapStateToProps = (state) => {
 	const appPlan = getAppPlanByName(state);
 	return {
-		plan: get(appPlan, 'tier') === 'arc-basic' ? 'Basic' : 'Free',
+		plan: get(appPlan, 'tier') || 'Free',
 		planValidity: get(appPlan, 'tier_validity'),
 		nodeCount: get(appPlan, 'node_count'),
 		isOnTrial: get(appPlan, 'trial'),

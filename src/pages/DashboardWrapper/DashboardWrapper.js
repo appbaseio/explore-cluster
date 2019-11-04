@@ -234,7 +234,7 @@ DashboardWrapper.propTypes = {
 };
 
 const mapStateToProps = state => ({
-	isBillingEnabled: get(state, '$getBuildInfo.results.billing'),
+	isBillingEnabled: get(state, '$getAppPlan.results.billing_type'),
 });
 
 export default connect(

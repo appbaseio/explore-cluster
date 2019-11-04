@@ -23,7 +23,7 @@ export async function getUser(username, password, url) {
 		throw new Error(data);
 	}
 
-	const res = await fetch(`${api}/_buildinfo`, {
+	const res = await fetch(`${api}/arc/plan`, {
 		headers: {
 			Authorization: `Basic ${btoa(`${username}:${password}`)}`,
 		},
@@ -197,7 +197,13 @@ export const isAbsoluteURL = str => /^[a-z][a-z0-9+.-]*:/.test(str);
 // extract credentials from URL
 export const getURLCredentials = url => {
 	if (!isAbsoluteURL(url) || !url.includes('@')) return null;
-	const credArr = chain(url).split('@').get(0).split('//').get(1).split(':').value();
+	const credArr = chain(url)
+		.split('@')
+		.get(0)
+		.split('//')
+		.get(1)
+		.split(':')
+		.value();
 	return { username: credArr[0], password: credArr[1] };
 };
 
