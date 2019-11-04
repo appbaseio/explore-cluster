@@ -22,6 +22,8 @@ import {
 } from '../../batteries/modules/actions';
 import { getAppPlanByName } from '../../batteries/modules/selectors';
 import Flex from '../../batteries/components/shared/Flex';
+import Unsubscribe from './Unsubscribe';
+import { STRIPE_KEY } from '../../constants';
 
 const CheckList = ({ list }) => list.map(item => (
 		<li key={item}>
@@ -285,10 +287,8 @@ class PricingTable extends Component {
 			message: '',
 			resending: false,
 		};
-		// test key
-		this.stripeKey = 'pk_test_DYtAxDRTg6cENksacX1zhE02';
 		// live key
-		// this.stripeKey = 'pk_live_ihb1fzO4h1ykymhpZsA3GaQR';
+		this.stripeKey = STRIPE_KEY.LIVE;
 	}
 
 	componentDidUpdate(prevProps) {
@@ -487,29 +487,13 @@ class PricingTable extends Component {
 						</Flex>
 					</div>
 				</Modal>
-				<Modal
-					title="Cancel Subscription"
-					visible={showConfirmBox}
-					onCancel={this.cancelConfirmBox}
-					footer={[
-						<Button key="back" onClick={this.cancelConfirmBox}>
-							Cancel
-						</Button>,
-						<Button
-							loading={isSubmitting}
-							key="submit"
-							type="primary"
-							onClick={this.deleteSubscription}
-						>
-							Unsubscribe
-						</Button>,
-					]}
-				>
-					<p>
-						Canceling the subscription would make the dashboard GUI and Arc endpoints
-						inaccessible within 24 hours.
-					</p>
-				</Modal>
+				{showConfirmBox && (
+					<Unsubscribe
+						deleteSubscription={this.deleteSubscription}
+						loading={isSubmitting}
+						onCancel={this.cancelConfirmBox}
+					/>
+				)}
 				<Table className={hideOnLarge}>
 					<thead>
 						<tr colSpan="1">
