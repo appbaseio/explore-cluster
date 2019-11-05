@@ -53,5 +53,16 @@ export const credentialsMessages = {
 	ipLimit: Message('Set a per hour ratelimit on API calls per IP address.'),
 };
 
+// Messages for query suggestions
+export const suggestionsMessages = {
+	blacklist: Message('A list of queries which can be marked as blacklist.'),
+	external_suggestions: Message('Define your custom suggestions.'),
+	min_count: Message('Min value of count for the suggestions.'),
+	min_hits: Message('Define the minimum number of results that must present for a suggestion.'),
+	number_of_days: Message(
+		'Define the number of days after which you want to re-calculate the suggestions.',
+	),
+	indices: Message('Only selected indices will be considered to calculate the suggestions.'),
+};
 // eslint-disable-next-line
 export const getMessages = isUserManagement => isUserManagement ? userManagementMessages : credentialsMessages;
