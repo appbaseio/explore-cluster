@@ -40,7 +40,7 @@ const defaultRoutes = {
 		icon: 'dashboard',
 		menu: [
 			{ label: 'Search Templates', link: '/cluster/search-templates', tag: 'Beta' },
-			{ label: 'Query Suggestions', link: 'query-suggestions', tag: 'Beta' },
+			{ label: 'Query Suggestions', link: '/cluster/query-suggestions', tag: 'Beta' },
 		],
 	},
 	'Browse Data': {
