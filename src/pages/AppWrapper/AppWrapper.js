@@ -30,6 +30,7 @@ const routes = {
 			{ label: 'Search Preview', link: 'search-preview', tag: 'Beta' },
 			{ label: 'Query Rules', link: 'query-rules', tag: 'Beta' },
 			{ label: 'Search Templates', link: 'search-templates', tag: 'Beta' },
+			{ label: 'Query Suggestions', link: 'query-suggestions', tag: 'Beta' },
 		],
 	},
 	Analytics: {

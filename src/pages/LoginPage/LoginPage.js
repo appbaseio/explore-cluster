@@ -26,7 +26,9 @@ class LoginPage extends Component {
 	}
 
 	componentDidMount() {
-		this.url.current.input.value = getURL() || '';
+		if (this.url && this.url.current) {
+			this.url.current.input.value = getURL() || '';
+		}
 	}
 
 	login = () => {
