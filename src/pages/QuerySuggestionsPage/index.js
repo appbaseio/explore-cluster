@@ -47,7 +47,14 @@ class QuerySuggestions extends React.Component {
 			props.getPreferences().then((action) => {
 				const payload = get(action, 'payload');
 				if (payload) {
-					this.form.patchValue(payload);
+					this.form.patchValue({
+						blacklist: payload.blacklist || [],
+						external_suggestions: payload.external_suggestions,
+						min_count: parseInt(payload.min_count, 10),
+						min_hits: parseInt(payload.min_hits, 10),
+						number_of_days: parseInt(payload.number_of_days, 10),
+						indices: payload.indices || [],
+					});
 				}
 			});
 		}
