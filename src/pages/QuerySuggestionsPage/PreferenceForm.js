@@ -27,56 +27,84 @@ const modal = css`
 	background-color: #fff;
 	padding: 50px 70px;
 	width: 100%;
+	.error {
+		color: tomato;
+		padding: 5px 0;
+	}
 	.input-error {
 		border-color: tomato;
 	}
 `;
 
-const PreferenceForm = ({ control, handleSaveTemplate, isLoading }) => (
+const InputElement = ({
+ name, label, toolTipMessage, inputProps, placeholder,
+}) => (
+	<FieldControl
+		name={name}
+		render={({
+ handler, invalid, touched, hasError, getError,
+}) => (
+			<Grid
+				label={label}
+				toolTipMessage={toolTipMessage}
+				component={(
+<div style={{ width: '100%' }}>
+						<div>
+							<Input
+								className={touched && invalid ? 'input-error' : null}
+								placeholder={placeholder}
+								type="number"
+								{...handler()}
+								{...inputProps}
+							/>
+						</div>
+
+						{touched && invalid && (
+							<div className="error">
+								{(hasError('required')
+									&& `Please enter ${label.toLowerCase()} value.`)
+									|| (hasError('min')
+										&& `Minimum allowed value for ${label.toLowerCase()} is ${
+											getError('min').min
+										}.`)
+									|| (hasError('max')
+										&& `Maximum allowed value for ${label.toLowerCase()} is ${
+											getError('max').max
+										}.`)}
+							</div>
+						)}
+</div>
+)}
+			/>
+		)}
+	/>
+);
+
+const PreferenceForm = ({
+ control, handleSaveTemplate, isLoading, indices,
+}) => (
 	<FieldGroup
 		control={control}
 		strict={false}
-		render={() => (
+		render={({ pristine, invalid: invalidForm }) => (
 			<div css={modal}>
-				<FieldControl
+				<InputElement
 					name="min_count"
-					render={({ handler }) => (
-						<Grid
-							label="Min Count"
-							toolTipMessage={Messages.min_count}
-							component={
-								<Input placeholder="Enter min count" type="number" {...handler()} />
-							}
-						/>
-					)}
+					label="Min Count"
+					placeholder="Enter min count"
+					toolTipMessage={Messages.min_count}
 				/>
-				<FieldControl
+				<InputElement
 					name="number_of_days"
-					render={({ handler }) => (
-						<Grid
-							label="Number of days"
-							toolTipMessage={Messages.number_of_days}
-							component={(
-<Input
-									placeholder="Enter number of days"
-									type="number"
-									{...handler()}
-/>
-)}
-						/>
-					)}
+					label="Number of days"
+					placeholder="Enter number of days"
+					toolTipMessage={Messages.number_of_days}
 				/>
-				<FieldControl
+				<InputElement
 					name="min_hits"
-					render={({ handler }) => (
-						<Grid
-							label="Min Hits"
-							toolTipMessage={Messages.min_hits}
-							component={
-								<Input placeholder="Enter min hits" type="number" {...handler()} />
-							}
-						/>
-					)}
+					label="Min Hits"
+					placeholder="Enter min hits"
+					toolTipMessage={Messages.min_hits}
 				/>
 				<FieldControl
 					name="indices"
@@ -97,7 +125,12 @@ const PreferenceForm = ({ control, handleSaveTemplate, isLoading }) => (
 										onChange={(val) => {
 											inputHandler.onChange(calculateValue(val));
 										}}
-/>
+>
+										<Select.Option value="*">All (*)</Select.Option>
+										{indices.map(index => (
+											<Select.Option key={index}>{index}</Select.Option>
+										))}
+</Select>
 )}
 							/>
 						);
@@ -115,6 +148,7 @@ const PreferenceForm = ({ control, handleSaveTemplate, isLoading }) => (
 <Select
 										placeholder="Enter blacklist queries"
 										mode="tags"
+										notFoundContent={null}
 										style={{ width: '100%' }}
 										tokenSeparators={[',']}
 										{...inputHandler}
@@ -183,6 +217,7 @@ const PreferenceForm = ({ control, handleSaveTemplate, isLoading }) => (
 					size="large"
 					type="primary"
 					loading={isLoading}
+					disabled={isLoading || invalidForm || pristine}
 				>
 					Save
 				</Button>
@@ -195,6 +230,7 @@ PreferenceForm.propTypes = {
 	handleSaveTemplate: PropTypes.func.isRequired,
 	control: PropTypes.object.isRequired,
 	isLoading: PropTypes.bool.isRequired,
+	indices: PropTypes.array.isRequired,
 };
 
 const mapStateToProps = state => ({
