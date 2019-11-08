@@ -1,7 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 import { connect } from 'react-redux';
-import { notification } from 'antd';
+import {
+ notification, Alert, Card, Button,
+} from 'antd';
 import get from 'lodash/get';
 import { FormBuilder, Validators } from 'react-reactive-form';
 import { css } from 'emotion';
@@ -18,6 +21,7 @@ import { isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import { getURL } from '../../constants/config';
 import { getAuthToken } from '../../batteries/components/analytics/utils';
+import Flex from '../../batteries/components/shared/Flex';
 
 const main = css`
 	.actionBtn {
@@ -39,6 +43,7 @@ class QuerySuggestions extends React.Component {
 		super(props);
 		this.state = {
 			indices: [],
+			total: undefined,
 		};
 		this.form = FormBuilder.group({
 			blacklist: [[]],
@@ -58,7 +63,7 @@ class QuerySuggestions extends React.Component {
 						min_count: parseInt(payload.min_count, 10),
 						min_hits: parseInt(payload.min_hits, 10),
 						number_of_days: parseInt(payload.number_of_days, 10),
-						indices: payload.indices || [],
+						indices: payload.indices || ['*'],
 					});
 				}
 			});
@@ -72,6 +77,24 @@ class QuerySuggestions extends React.Component {
 				.then((indices) => {
 					this.setState({
 						indices: Object.keys(indices),
+					});
+				})
+				.catch(err => console.error(err));
+			fetch(`${getURL()}/.suggestions/_search`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Basic ${getAuthToken()}`,
+				},
+				body: JSON.stringify({
+					size: 0,
+					query: { match_all: {} },
+				}),
+			})
+				.then(res => res.json())
+				.then((res) => {
+					this.setState({
+						total: get(res, 'hits.total.value'),
 					});
 				})
 				.catch(err => console.error(err));
@@ -117,7 +140,7 @@ class QuerySuggestions extends React.Component {
 		const {
  isLoading, preferences, tier, featureSuggestions,
 } = this.props;
-		const { indices } = this.state;
+		const { indices, total } = this.state;
 		if (!isValidPlan(tier, featureSuggestions)) {
 			return (
 				<React.Fragment>
@@ -139,6 +162,29 @@ class QuerySuggestions extends React.Component {
 			<React.Fragment>
 				<Banner {...bannerDetails} />
 				<Container css={main}>
+					{total !== undefined && get(preferences, 'index') && (
+						<Card>
+							<Flex justifyContent="space-between">
+								<Flex>
+									<Alert
+										message={`Last synced ${total} query suggestions at ${moment(
+											preferences.last_synced_time * 1000,
+										).format('DD/MM/YYYY hh:mm A')}.`}
+										type="info"
+										showIcon
+									/>
+								</Flex>
+								<Flex>
+									<Button
+										type="primary"
+										href={`/app/${preferences.index}/browse`}
+									>
+										View
+									</Button>
+								</Flex>
+							</Flex>
+						</Card>
+					)}
 					<PreferenceForm
 						indices={indices}
 						handleSaveTemplate={this.handleSaveTemplate}
