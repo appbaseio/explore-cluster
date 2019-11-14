@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import {
- array, node, string, func, bool,
+ array, node, string, func,
 } from 'prop-types';
 import styled, { css } from 'react-emotion';
-import Stripe from 'react-stripe-checkout';
 import { media } from '../../utils/media';
 import ClickToShow from './ClickToShow';
+import PaymentButtonMobile from './PaymentButtonMobile';
 
 const PricingCard = styled('div')`
 	border-radius: 14px;
@@ -48,16 +48,6 @@ const PriceWrapper = styled('div')`
 	}
 `;
 
-const Link = styled('a')`
-	font-size: 1rem;
-	text-transform: uppercase;
-	text-decoration: none;
-	font-weight: 600;
-	font-weight: 700;
-	border-bottom-width: 2px;
-	border-bottom-style: dashed;
-`;
-
 const PricingList = styled('ul')`
 	list-style: none;
 	padding: 0;
@@ -86,6 +76,7 @@ class NewPricingCard extends Component {
 			isCurrentPlan,
 			buttonText,
 			onClickButton,
+			plan,
 			...rest
 		} = this.props;
 		return (
@@ -96,18 +87,14 @@ class NewPricingCard extends Component {
 						{price}
 						<div>/month</div>
 					</PriceWrapper>
-					<Stripe
+					<PaymentButtonMobile
+						plan={plan}
+						buttonText={buttonText}
 						disabled={isCurrentPlan}
 						name={stripeName}
-						amount={amount}
-						token={token}
-						stripeKey={stripeKey}
-					>
-						{/* eslint-disable-next-line */}
-						<Link onClick={onClickButton} css={{ color: linkColor }}>
-							{buttonText}
-						</Link>
-					</Stripe>
+						handleToken={token}
+						linkColor={linkColor}
+					/>
 				</PricingCardHeader>
 				<PricingList css={{ fontWeight: 700 }}>
 					{pricingList.map(list => (
@@ -137,12 +124,12 @@ NewPricingCard.defaultProps = {
 };
 NewPricingCard.propTypes = {
 	price: string,
+	plan: string.isRequired,
 	linkColor: string,
 	pricingList: array,
 	name: string,
 	onClickLink: func,
 	children: node,
-	isCurrentPlan: bool,
 	buttonText: string,
 	onClickButton: func,
 };

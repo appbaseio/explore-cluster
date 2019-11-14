@@ -244,7 +244,7 @@ const HeadingTr = css`
 	}
 `;
 
-class PricingTable extends Component {
+class HostedArcBilling extends Component {
 	constructor(props) {
 		super(props);
 
@@ -454,7 +454,7 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 							<td>
 								<Title>BASIC PLAN</Title>
 								<Price>
-									{this.getPlan(PRICE_BY_PLANS[ARC_PLANS.ARC_BASIC])}
+									{this.getPlan(PRICE_BY_PLANS[ARC_PLANS.HOSTED_ARC_BASIC])}
 									<br />
 									<small style={{ fontWeight: 700 }}>/month</small>
 								</Price>
@@ -463,7 +463,7 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 							<td>
 								<Title>STANDARD PLAN</Title>
 								<Price>
-									{this.getPlan(PRICE_BY_PLANS[ARC_PLANS.ARC_STANDARD])}
+									{this.getPlan(PRICE_BY_PLANS[ARC_PLANS.HOSTED_ARC_STANDARD])}
 									<br />
 									<small style={{ fontWeight: 700 }}>/month</small>
 								</Price>
@@ -475,7 +475,7 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 							<td>
 								<Title>ENTERPRISE PLAN</Title>
 								<Price>
-									{this.getPlan(PRICE_BY_PLANS[ARC_PLANS.ARC_ENTERPRISE])}
+									{this.getPlan(PRICE_BY_PLANS[ARC_PLANS.HOSTED_ARC_ENTERPRISE])}
 									<br />
 									<small style={{ fontWeight: 700 }}>/month</small>
 								</Price>
@@ -711,7 +711,7 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 							<td>
 								<PaymentButton
 									name="Arc Basic Plan"
-									plan={ARC_PLANS.ARC_BASIC}
+									plan={ARC_PLANS.HOSTED_ARC_BASIC}
 									disabled={isArcBasic}
 									handleToken={this.handleToken}
 									subscriptionID={subscriptionID}
@@ -720,7 +720,7 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 							<td>
 								<PaymentButton
 									name="Arc Standard Plan"
-									plan={ARC_PLANS.ARC_STANDARD}
+									plan={ARC_PLANS.HOSTED_ARC_STANDARD}
 									disabled={isArcStandard}
 									handleToken={this.handleToken}
 									subscriptionID={subscriptionID}
@@ -733,7 +733,7 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 							<td>
 								<PaymentButton
 									name="Arc Enterprise Plan"
-									plan={ARC_PLANS.ARC_ENTERPRISE}
+									plan={ARC_PLANS.HOSTED_ARC_ENTERPRISE}
 									disabled={isArcEnterprise}
 									handleToken={this.handleToken}
 									subscriptionID={subscriptionID}
@@ -762,11 +762,11 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 						name="Basic"
 						isCurrentPlan={isArcBasic}
 						buttonText={isArcBasic ? 'Current Plan' : undefined}
-						price={this.getPlan(PRICE_BY_PLANS[ARC_PLANS.ARC_BASIC])}
+						price={this.getPlan(PRICE_BY_PLANS[ARC_PLANS.HOSTED_ARC_BASIC])}
 						stripeName="Arc basic plan"
-						plan={ARC_PLANS.ARC_BASIC}
-						amount={PRICE_BY_PLANS[ARC_PLANS.ARC_BASIC] * 100}
-						token={token => this.handleToken(token, ARC_PLANS.ARC_BASIC)}
+						plan={ARC_PLANS.HOSTED_ARC_BASIC}
+						amount={PRICE_BY_PLANS[ARC_PLANS.HOSTED_ARC_BASIC] * 100}
+						token={token => this.handleToken(token, ARC_PLANS.HOSTED_ARC_BASIC)}
 						stripeKey={this.stripeKey}
 						pricingList={[]}
 					>
@@ -799,12 +799,12 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 					<NewPricingCard
 						css={{ backgroundColor: theme.badge.blue }}
 						name="Standard"
-						plan={ARC_PLANS.ARC_STANDARD}
+						plan={ARC_PLANS.HOSTED_ARC_STANDARD}
 						isCurrentPlan={isArcStandard}
-						price={this.getPlan(PRICE_BY_PLANS[ARC_PLANS.ARC_STANDARD])}
+						price={this.getPlan(PRICE_BY_PLANS[ARC_PLANS.HOSTED_ARC_STANDARD])}
 						stripeName="Appbase.io Standard Plan"
-						amount={PRICE_BY_PLANS[ARC_PLANS.ARC_STANDARD] * 100}
-						token={token => this.handleToken(token, ARC_PLANS.ARC_STANDARD)}
+						amount={PRICE_BY_PLANS[ARC_PLANS.HOSTED_ARC_STANDARD] * 100}
+						token={token => this.handleToken(token, ARC_PLANS.HOSTED_ARC_STANDARD)}
 						stripeKey={this.stripeKey}
 						linkColor="inherit"
 						pricingList={[]}
@@ -840,12 +840,12 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 					<NewPricingCard
 						css={{ backgroundColor: theme.badge.darkBlue }}
 						name="Enterprise"
-						plan={ARC_PLANS.ARC_ENTERPRISE}
+						plan={ARC_PLANS.HOSTED_ARC_ENTERPRISE}
 						isCurrentPlan={isArcEnterprise}
-						price={this.getPlan(PRICE_BY_PLANS[ARC_PLANS.ARC_ENTERPRISE])}
+						price={this.getPlan(PRICE_BY_PLANS[ARC_PLANS.HOSTED_ARC_ENTERPRISE])}
 						stripeName="Arc enterprise plan"
-						amount={PRICE_BY_PLANS[ARC_PLANS.ARC_ENTERPRISE] * 100}
-						token={token => this.handleToken(token, ARC_PLANS.ARC_ENTERPRISE)}
+						amount={PRICE_BY_PLANS[ARC_PLANS.HOSTED_ARC_ENTERPRISE] * 100}
+						token={token => this.handleToken(token, ARC_PLANS.HOSTED_ARC_ENTERPRISE)}
 						stripeKey={this.stripeKey}
 						linkColor="inherit"
 						pricingList={[]}
@@ -884,14 +884,14 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 	}
 }
 
-PricingTable.defaultProps = {
+HostedArcBilling.defaultProps = {
 	isArcBasic: false,
 	isArcStandard: false,
 	isArcEnterprise: false,
 	subscriptionID: '',
 };
 
-PricingTable.propTypes = {
+HostedArcBilling.propTypes = {
 	createSubscription: PropTypes.func.isRequired,
 	deleteSubscription: PropTypes.func.isRequired,
 	fetchAppPlan: PropTypes.func.isRequired,
@@ -929,4 +929,4 @@ const mapDispatchToProps = dispatch => ({
 export default connect(
 	mapStateToProps,
 	mapDispatchToProps,
-)(PricingTable);
+)(HostedArcBilling);
