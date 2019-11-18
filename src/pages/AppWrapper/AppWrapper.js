@@ -49,9 +49,11 @@ const routes = {
 	},
 	Security: {
 		icon: 'key',
-		menu: [
-			{ label: 'API Credentials', link: 'credentials' },
-		],
+		menu: [{ label: 'API Credentials', link: 'credentials' }],
+	},
+	Billing: {
+		icon: 'credit-card',
+		link: 'billing',
 	},
 };
 

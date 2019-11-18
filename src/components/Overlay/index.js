@@ -46,7 +46,7 @@ const Overlay = ({
 				<div>
 					<Icon type="lock" css={icon} />
 				</div>
-				<Button type="primary" css="margin-top: 10px" href="billing" target="_blank">
+				<Button type="primary" css="margin-top: 10px" href="billing">
 					Upgrade Now
 				</Button>
 			</div>
