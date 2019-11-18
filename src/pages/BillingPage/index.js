@@ -16,6 +16,7 @@ import Loader from '../../batteries/components/shared/Loader';
 import { displayErrors } from '../../utils/helper';
 import { STRIPE_KEY } from '../../constants';
 import HostedArcBilling from '../../components/PricingTable/HostedArcBilling';
+import { PRICE_BY_PLANS, EFFECTIVE_PRICE_BY_PLANS } from '../../batteries/utils';
 
 const TextLink = styled('span')`
 	color: rgb(111, 99, 245);
@@ -125,9 +126,7 @@ class Billing extends Component {
 										}}
 										gridRatio={0.4}
 										label={<h3 css={heading}>Effective Monthly Price</h3>}
-										component={`$${eval(
-											nodeCount * 49,
-										)} (calculated at $0.07/node hour)`}
+										component={`$${nodeCount * PRICE_BY_PLANS[plan]} (calculated at $${EFFECTIVE_PRICE_BY_PLANS[plan]}/node hour)`}
 									/>
 								</Flex>
 							) : null}
