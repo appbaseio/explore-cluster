@@ -2,16 +2,19 @@ import React, { Component } from 'react';
 import styled, { css } from 'react-emotion';
 import { Check } from 'react-feather';
 import { connect } from 'react-redux';
+import Stripe from 'react-stripe-checkout';
 import {
  Tooltip, Modal, Button, Input, notification,
 } from 'antd';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
+import AppButton from './AppButton';
 import Loader from '../../batteries/components/shared/Loader';
+import PlusMinus from './PlusMinus';
 import NewPricingCard from './NewPricingCard';
 import theme from './theme';
 import { media, hexToRgb } from '../../utils/media';
-import { displayErrors } from '../../utils/helper';
+import { planBasePrice, displayErrors } from '../../utils/helper';
 import {
 	createAppSubscription,
 	deleteAppSubscription,
@@ -21,8 +24,6 @@ import { getAppPlanByName } from '../../batteries/modules/selectors';
 import Flex from '../../batteries/components/shared/Flex';
 import Unsubscribe from './Unsubscribe';
 import { STRIPE_KEY } from '../../constants';
-import { ARC_PLANS, PRICE_BY_PLANS } from '../../batteries/utils';
-import PaymentButton from './PaymentButton';
 
 const CheckList = ({ list }) => list.map(item => (
 		<li key={item}>
@@ -248,7 +249,38 @@ class PricingTable extends Component {
 	constructor(props) {
 		super(props);
 
+		const bootstrap = {
+			records: [],
+			apiCalls: [],
+			basePrice: planBasePrice.bootstrap,
+		};
+
+		const growth = {
+			records: [],
+			apiCalls: [],
+			basePrice: planBasePrice.growth,
+		};
+
+		for (let i = 1; i <= 20; i += 1) {
+			const val = i * 50;
+			bootstrap.records.push(`${val === 1000 ? '1M' : `${val}K`}`);
+			bootstrap.apiCalls.push(`${i}M`);
+			growth.records.push(`${i}M`);
+			growth.apiCalls.push(`${i * 10}M`);
+		}
+
+		this.plans = { bootstrap, growth };
 		this.state = {
+			bootstrap: {
+				record: 0,
+				apiCall: 0,
+			},
+			growth: {
+				record: 0,
+				apiCall: 0,
+			},
+			active: undefined,
+			plans: this.plans,
 			showConfirmBox: false,
 			otp: '',
 			showOtpModal: false,
@@ -264,29 +296,29 @@ class PricingTable extends Component {
 		displayErrors(errors, prevProps.errors, true);
 	}
 
+	get getText() {
+		const { active } = this.state;
+		if (active) {
+			if (active === 'bootstrap' && this.calcPrice('bootstrap') > this.calcPrice('growth')) {
+				return 'Growth plan will be cheaper.';
+			}
+			return 'Plan scales as usage.';
+		}
+		return undefined;
+	}
+
 	get isOtpValid() {
 		const { otp } = this.state;
 		return otp && otp.length === 6;
 	}
 
 	handleToken = (token, plan) => {
-		const { createSubscription, fetchAppPlan, subscriptionID } = this.props;
-		const isTesting = false; // SET true to test with test stripe keys
-		if (subscriptionID) {
-			// Update plan
-			createSubscription(null, plan, isTesting).then((response) => {
-				if (response && response.payload) {
-					fetchAppPlan();
-				}
-			});
-		} else {
-			// Create subscription
-			createSubscription(token, plan, isTesting).then((response) => {
-				if (response && response.payload) {
-					fetchAppPlan();
-				}
-			});
-		}
+		const { createSubscription, fetchAppPlan } = this.props;
+		createSubscription(token, plan).then((response) => {
+			if (response && response.payload) {
+				fetchAppPlan();
+			}
+		});
 	};
 
 	closeOtpModal = () => {
@@ -372,10 +404,27 @@ class PricingTable extends Component {
 		});
 	};
 
-	getPlan = value => `$${value}`;
+	calcPrice(planName) {
+		const { plans } = this.state;
+		const { basePrice } = plans[planName];
+		// eslint-disable-next-line
+		const { record, apiCall } = this.state[planName];
+
+		let recordIncrement = 5;
+		let apiIncrement = 5;
+		if (planName === 'growth') {
+			recordIncrement = 50;
+			apiIncrement = 50;
+		}
+		const incrementedRecord = record * recordIncrement;
+		const incrementedApiCall = apiCall * apiIncrement;
+		return basePrice + incrementedRecord + incrementedApiCall;
+	}
 
 	render() {
 		const {
+			plans,
+			bootstrap,
 			//  growth, active,
 			showConfirmBox,
 			showOtpModal,
@@ -384,7 +433,7 @@ class PricingTable extends Component {
 			otp,
 		} = this.state;
 		const {
-isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptionID,
+ isFreePlan, isBootstrapPlan, isGrowthPlan, isSubmitting, isLoading,
 } = this.props;
 		if (isLoading) {
 			return <Loader show message="Updating Plan... Please wait!" />;
@@ -454,7 +503,7 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 							<td>
 								<Title>BASIC PLAN</Title>
 								<Price>
-									{this.getPlan(PRICE_BY_PLANS[ARC_PLANS.ARC_BASIC])}
+									$9
 									<br />
 									<small style={{ fontWeight: 700 }}>/month</small>
 								</Price>
@@ -463,7 +512,7 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 							<td>
 								<Title>STANDARD PLAN</Title>
 								<Price>
-									{this.getPlan(PRICE_BY_PLANS[ARC_PLANS.ARC_STANDARD])}
+									$59
 									<br />
 									<small style={{ fontWeight: 700 }}>/month</small>
 								</Price>
@@ -475,7 +524,7 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 							<td>
 								<Title>ENTERPRISE PLAN</Title>
 								<Price>
-									{this.getPlan(PRICE_BY_PLANS[ARC_PLANS.ARC_ENTERPRISE])}
+									$499
 									<br />
 									<small style={{ fontWeight: 700 }}>/month</small>
 								</Price>
@@ -709,39 +758,69 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 						<tr>
 							<td />
 							<td>
-								<PaymentButton
+								<Stripe
+									name="Arc Free Plan"
+									amount={0}
+									token={token => this.handleToken(token, 'open_source')}
+									disabled={isFreePlan}
+									stripeKey={this.stripeKey}
+								>
+									<AppButton
+										uppercase
+										big
+										bold
+										shadow
+										color={theme.colors.accentText}
+										backgroundColor={theme.colors.accent}
+										css={{ marginTop: 40 }}
+									>
+										{isFreePlan ? 'Current Plan' : 'Subscribe'}
+									</AppButton>
+								</Stripe>
+							</td>
+							<td>
+								<Stripe
 									name="Arc Basic Plan"
-									plan={ARC_PLANS.ARC_BASIC}
-									disabled={isArcBasic}
-									handleToken={this.handleToken}
-									subscriptionID={subscriptionID}
-								/>
+									amount={this.plans.bootstrap.basePrice * 100}
+									token={token => this.handleToken(token, 'arc-basic')}
+									stripeKey={this.stripeKey}
+									disabled={isBootstrapPlan}
+								>
+									<AppButton
+										uppercase
+										big
+										bold
+										shadow
+										color="#FFFFFF"
+										backgroundColor={theme.badge.blue}
+										css={{ marginTop: 40 }}
+										onClick={isBootstrapPlan ? this.showConfirmBox : undefined}
+									>
+										{isBootstrapPlan ? 'Unsubscribe' : 'Subscribe'}
+									</AppButton>
+								</Stripe>
 							</td>
 							<td>
-								<PaymentButton
-									name="Arc Standard Plan"
-									plan={ARC_PLANS.ARC_STANDARD}
-									disabled={isArcStandard}
-									handleToken={this.handleToken}
-									subscriptionID={subscriptionID}
-									btnProps={{
-										color: '#FFFFFF',
-										backgroundColor: theme.badge.blue,
-									}}
-								/>
-							</td>
-							<td>
-								<PaymentButton
-									name="Arc Enterprise Plan"
-									plan={ARC_PLANS.ARC_ENTERPRISE}
-									disabled={isArcEnterprise}
-									handleToken={this.handleToken}
-									subscriptionID={subscriptionID}
-									btnProps={{
-										color: '#FFFFFF',
-										backgroundColor: theme.badge.darkBlue,
-									}}
-								/>
+								<Stripe
+									name="Appbase.io Growth Plan"
+									disabled={isGrowthPlan}
+									amount={this.plans.growth.basePrice * 100}
+									token={token => this.handleToken(token, 'growth-monthly')}
+									stripeKey={this.stripeKey}
+								>
+									<AppButton
+										uppercase
+										big
+										bold
+										shadow
+										color="#FFFFFF"
+										backgroundColor={theme.badge.darkBlue}
+										onClick={isGrowthPlan ? this.showConfirmBox : undefined}
+										css={{ marginTop: 40 }}
+									>
+										{isGrowthPlan ? 'Unsubscribe' : 'Subscribe'}
+									</AppButton>
+								</Stripe>
 							</td>
 						</tr>
 					</tfoot>
@@ -760,13 +839,12 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 					<NewPricingCard
 						css={{ color: theme.colors.accentText }}
 						name="Basic"
-						isCurrentPlan={isArcBasic}
-						buttonText={isArcBasic ? 'Current Plan' : undefined}
-						price={this.getPlan(PRICE_BY_PLANS[ARC_PLANS.ARC_BASIC])}
-						stripeName="Arc basic plan"
-						plan={ARC_PLANS.ARC_BASIC}
-						amount={PRICE_BY_PLANS[ARC_PLANS.ARC_BASIC] * 100}
-						token={token => this.handleToken(token, ARC_PLANS.ARC_BASIC)}
+						isCurrentPlan={isFreePlan}
+						buttonText={isFreePlan ? 'Current Plan' : undefined}
+						price="$9"
+						stripeName="Appbase.io Free Plan"
+						amount={0}
+						token={token => this.handleToken(token, 'open_source')}
 						stripeKey={this.stripeKey}
 						pricingList={[]}
 					>
@@ -799,17 +877,16 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 					<NewPricingCard
 						css={{ backgroundColor: theme.badge.blue }}
 						name="Standard"
-						plan={ARC_PLANS.ARC_STANDARD}
-						isCurrentPlan={isArcStandard}
-						price={this.getPlan(PRICE_BY_PLANS[ARC_PLANS.ARC_STANDARD])}
-						stripeName="Appbase.io Standard Plan"
-						amount={PRICE_BY_PLANS[ARC_PLANS.ARC_STANDARD] * 100}
-						token={token => this.handleToken(token, ARC_PLANS.ARC_STANDARD)}
+						isCurrentPlan={isBootstrapPlan}
+						price="$59"
+						stripeName="Appbase.io Basic Plan"
+						amount={this.plans.bootstrap.basePrice * 100}
+						token={token => this.handleToken(token, 'arc-basic')}
 						stripeKey={this.stripeKey}
 						linkColor="inherit"
 						pricingList={[]}
-						buttonText={isArcStandard ? 'Unsubscribe' : undefined}
-						onClickButton={isArcStandard ? this.showConfirmBox : undefined}
+						buttonText={isBootstrapPlan ? 'Unsubscribe' : undefined}
+						onClickButton={isBootstrapPlan ? this.showConfirmBox : undefined}
 					>
 						<ListCaption>Security</ListCaption>
 						<CheckList
@@ -840,17 +917,16 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 					<NewPricingCard
 						css={{ backgroundColor: theme.badge.darkBlue }}
 						name="Enterprise"
-						plan={ARC_PLANS.ARC_ENTERPRISE}
-						isCurrentPlan={isArcEnterprise}
-						price={this.getPlan(PRICE_BY_PLANS[ARC_PLANS.ARC_ENTERPRISE])}
-						stripeName="Arc enterprise plan"
-						amount={PRICE_BY_PLANS[ARC_PLANS.ARC_ENTERPRISE] * 100}
-						token={token => this.handleToken(token, ARC_PLANS.ARC_ENTERPRISE)}
+						isCurrentPlan={isGrowthPlan}
+						price="$499"
+						stripeName="Appbase.io Growth Plan"
+						amount={this.plans.growth.basePrice * 100}
+						token={token => this.handleToken(token, 'growth-monthly')}
 						stripeKey={this.stripeKey}
 						linkColor="inherit"
 						pricingList={[]}
-						buttonText={isArcEnterprise ? 'Unsubscribe' : undefined}
-						onClickButton={isArcEnterprise ? this.showConfirmBox : undefined}
+						buttonText={isGrowthPlan ? 'Unsubscribe' : undefined}
+						onClickButton={isGrowthPlan ? this.showConfirmBox : undefined}
 					>
 						<ListCaption>Security</ListCaption>
 						<CheckList
@@ -884,24 +960,16 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 	}
 }
 
-PricingTable.defaultProps = {
-	isArcBasic: false,
-	isArcStandard: false,
-	isArcEnterprise: false,
-	subscriptionID: '',
-};
-
 PricingTable.propTypes = {
 	createSubscription: PropTypes.func.isRequired,
 	deleteSubscription: PropTypes.func.isRequired,
 	fetchAppPlan: PropTypes.func.isRequired,
 	isLoading: PropTypes.bool.isRequired,
 	isSubmitting: PropTypes.bool.isRequired,
-	isArcBasic: PropTypes.bool,
-	isArcStandard: PropTypes.bool,
-	isArcEnterprise: PropTypes.bool,
+	isFreePlan: PropTypes.bool.isRequired,
+	isBootstrapPlan: PropTypes.bool,
+	isGrowthPlan: PropTypes.bool,
 	errors: PropTypes.array.isRequired,
-	subscriptionID: PropTypes.string,
 };
 const mapStateToProps = (state) => {
 	const appPlan = getAppPlanByName(state);
@@ -909,10 +977,8 @@ const mapStateToProps = (state) => {
 		isSubmitting: get(state, '$deleteAppSubscription.isFetching'),
 		isLoading: get(state, '$createAppSubscription.isFetching'),
 		isFreePlan: !get(appPlan, 'isPaid') || get(appPlan, 'trial', false),
-		isArcBasic: get(appPlan, 'isArcBasic') && !get(appPlan, 'trial'),
-		isArcStandard: get(appPlan, 'isArcStandard') && !get(appPlan, 'trial'),
-		isArcEnterprise: get(appPlan, 'isArcEnterprise') && !get(appPlan, 'trial'),
-		subscriptionID: get(appPlan, 'subscription_id'),
+		isBootstrapPlan: get(appPlan, 'isBootstrap') && !get(appPlan, 'trial'),
+		isGrowthPlan: get(appPlan, 'isGrowth') && !get(appPlan, 'trial'),
 		errors: [
 			get(state, '$createAppSubscription.error'),
 			get(state, '$deleteAppSubscription.error'),
@@ -921,7 +987,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = dispatch => ({
-	createSubscription: (plan, stripeToken, test) => dispatch(createAppSubscription(plan, stripeToken, test)),
+	createSubscription: (plan, stripeToken) => dispatch(createAppSubscription(plan, stripeToken)),
 	deleteSubscription: payload => dispatch(deleteAppSubscription(payload)),
 	fetchAppPlan: () => dispatch(getAppPlan()),
 });

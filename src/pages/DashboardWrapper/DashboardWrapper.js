@@ -7,12 +7,11 @@ import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 
-import { bool, func } from 'prop-types';
+import { bool } from 'prop-types';
 import Loader from '../../components/Loader';
 import AppHeader from '../../components/AppHeader';
 import Logo from '../../components/Logo';
 import { breakpoints } from '../../utils/media';
-import { getAppPlan } from '../../batteries/modules/actions';
 
 const NoMatch = Loadable({
 	loader: () => import('../../NoMatch'),
@@ -101,13 +100,6 @@ class DashboardWrapper extends Component {
 			showHeader,
 			routes: defaultRoutes,
 		};
-	}
-
-	componentDidMount() {
-		const { isClusterPlanFetched, fetchClusterPlan, isClusterPlanFetching } = this.props;
-		if (!isClusterPlanFetching && !isClusterPlanFetched) {
-			fetchClusterPlan();
-		}
 	}
 
 	componentDidUpdate(prevProps) {
@@ -238,24 +230,17 @@ class DashboardWrapper extends Component {
 
 DashboardWrapper.defaultProps = {
 	isBillingEnabled: false,
-	isClusterPlanFetching: false,
 };
 
 DashboardWrapper.propTypes = {
 	isBillingEnabled: bool,
-	fetchClusterPlan: func.isRequired,
-	isClusterPlanFetching: bool,
-	isClusterPlanFetched: bool.isRequired,
 };
 
 const mapStateToProps = state => ({
-	isBillingEnabled: !!get(state, '$getAppPlan.results.billing_type'),
-	isClusterPlanFetched: get(state, '$getAppPlan.success'),
-	isClusterPlanFetching: get(state, '$getAppPlan.isFetching', false),
+	isBillingEnabled: get(state, '$getAppPlan.results.billing_type'),
 });
 
-const mapDispatchToProps = dispatch => ({
-	fetchClusterPlan: () => dispatch(getAppPlan()),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(DashboardWrapper);
+export default connect(
+	mapStateToProps,
+	null,
+)(DashboardWrapper);

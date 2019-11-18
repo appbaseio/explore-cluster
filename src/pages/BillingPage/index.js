@@ -15,7 +15,6 @@ import { updateAppPaymentMethod } from '../../batteries/modules/actions';
 import Loader from '../../batteries/components/shared/Loader';
 import { displayErrors } from '../../utils/helper';
 import { STRIPE_KEY } from '../../constants';
-import HostedArcBilling from '../../components/PricingTable/HostedArcBilling';
 
 const TextLink = styled('span')`
 	color: rgb(111, 99, 245);
@@ -30,6 +29,10 @@ const heading = css`
 	min-width: 100px;
 	letter-spacing: 0.01rem;
 	color: #888;
+`;
+
+const uppercase = css`
+	text-transform: uppercase;
 `;
 
 class Billing extends Component {
@@ -51,22 +54,9 @@ class Billing extends Component {
 			nodeCount,
 			updatePayment,
 			isLoading,
-			isHostedArc,
-			isClusterBilling,
 		} = this.props;
 		if (isLoading) {
 			return <Loader show message="Updating Payment Method... Please wait!" />;
-		}
-		if (isClusterBilling) {
-			return (
-				<Card>
-					<p>
-						It is not possible to upgrade a plan automatically as the current plan is
-						tied to the server resources. Reach out to <a href="mailto:info@appbase.io">support</a> if you want to upgrade
-						your plan.
-					</p>
-				</Card>
-			);
 		}
 		return (
 			<React.Fragment>
@@ -74,7 +64,7 @@ class Billing extends Component {
 					title={plan !== 'Basic' ? 'Upgrade Your Plan Now' : 'Your Current Plan Info'}
 					description=""
 					component={(
-<Row>
+						<Row>
 							<Flex alignItems="center">
 								<Grid
 									style={{
@@ -138,12 +128,12 @@ class Billing extends Component {
 							>
 								<TextLink>Update Payment Method</TextLink>
 							</Stripe>
-</Row>
-)}
+						</Row>
+					)}
 				/>
 				<Container>
 					<Card bodyStyle={{ padding: 0 }}>
-						{isHostedArc ? <HostedArcBilling /> : <PricingTable />}
+						<PricingTable />
 					</Card>
 				</Container>
 			</React.Fragment>
@@ -155,9 +145,7 @@ Billing.propTypes = {
 	plan: PropTypes.string.isRequired,
 	planValidity: PropTypes.number,
 	isOnTrial: PropTypes.bool,
-	isHostedArc: PropTypes.bool,
 	nodeCount: PropTypes.number,
-	isClusterBilling: PropTypes.bool.isRequired,
 	updatePayment: PropTypes.func.isRequired,
 	isLoading: PropTypes.bool.isRequired,
 	errors: PropTypes.array.isRequired,
@@ -170,8 +158,6 @@ const mapStateToProps = (state) => {
 		planValidity: get(appPlan, 'tier_validity'),
 		nodeCount: get(appPlan, 'node_count'),
 		isOnTrial: get(appPlan, 'trial'),
-		isHostedArc: get(appPlan, 'isHostedArc', false),
-		isClusterBilling: get(appPlan, 'isClusterBilling', false),
 		isLoading: get(state, '$updateAppPaymentMethod.isFetching'),
 		errors: [get(state, '$updateAppPaymentMethod.error')],
 	};
@@ -181,4 +167,7 @@ const mapDispatchToProps = dispatch => ({
 	updatePayment: token => dispatch(updateAppPaymentMethod(token, 'APP')),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps())(Billing);
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps(),
+)(Billing);

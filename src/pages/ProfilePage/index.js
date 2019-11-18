@@ -225,7 +225,7 @@ class ProfilePage extends React.Component {
 												style={{
 													marginTop: '7px',
 												}}
-												placeholder="Company"
+												placeholder="Username"
 												{...handler()}
 											/>
 										</div>
@@ -269,15 +269,14 @@ const mapStateToProps = (state) => {
 		company: get(userData, 'company'),
 		username: get(userData, 'name'),
 		countryCode: get(phoneInfo, 'length')
-			? get(
-					countryCodes.find(item => item.dial_code === phoneInfo.split('-')[0]),
-					'code',
-					'',
-			  )
+			? get(countryCodes.find(item => item.dial_code === phoneInfo.split('-')[0]), 'code', '')
 			: '',
 	};
 };
 const mapDispatchToProps = dispatch => ({
 	setUser: info => dispatch(updateUser(info)),
 });
-export default connect(mapStateToProps, mapDispatchToProps)(ProfilePage);
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps,
+)(ProfilePage);
