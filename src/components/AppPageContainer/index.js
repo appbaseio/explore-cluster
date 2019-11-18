@@ -16,8 +16,10 @@ class AppPageContainer extends Component {
 	}
 
 	componentDidMount() {
-		const { isClusterPlanFetched, fetchClusterPlan, isClusterPlanFetching } = this.props;
-		if (!isClusterPlanFetching && !isClusterPlanFetched) {
+		const {
+ isClusterPlanFetched, fetchClusterPlan, isClusterPlanFetching, isError,
+} = this.props;
+		if (!isClusterPlanFetching && !isClusterPlanFetched && !isError) {
 			fetchClusterPlan();
 		}
 	}
@@ -34,6 +36,7 @@ class AppPageContainer extends Component {
 AppPageContainer.defaultProps = {
 	isLoading: false,
 	isClusterPlanFetching: false,
+	isError: undefined,
 	appName: '',
 	shouldFetchUserPlan: true,
 };
@@ -41,6 +44,7 @@ AppPageContainer.defaultProps = {
 AppPageContainer.propTypes = {
 	isLoading: PropTypes.bool,
 	appName: PropTypes.string,
+	isError: PropTypes.any,
 	shouldFetchUserPlan: PropTypes.bool,
 	component: PropTypes.func.isRequired,
 	updateCurrentApp: PropTypes.func.isRequired,
@@ -56,6 +60,7 @@ const mapStateToProps = (state, ownProps) => {
 		isClusterPlanFetched: get(state, '$getAppPlan.success'),
 		isClusterPlanFetching: get(state, '$getAppPlan.isFetching', false),
 		isLoading: get(state, '$getAppPlan.isFetching'),
+		isError: get(state, '$getAppPlan.error'),
 	};
 };
 
