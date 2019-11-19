@@ -51,10 +51,8 @@ class Billing extends Component {
 			return (
 				<Card bodyStyle={{ padding: '20px 50px' }}>
 					<p>
-						It is not possible to upgrade a plan automatically as the current plan is
-						tied to the server resources. Reach out to{' '}
-						<a href="mailto:info@appbase.io">support</a> if you want to upgrade your
-						plan.
+						To upgrade your current current cluster plan, reach out to support either
+						via chat or at <a href="mailto:support@appbase.io">support@appbase.io</a>.
 					</p>
 				</Card>
 			);
