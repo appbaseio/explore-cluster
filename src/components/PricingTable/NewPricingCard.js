@@ -77,6 +77,7 @@ class NewPricingCard extends Component {
 			buttonText,
 			onClickButton,
 			plan,
+			subscriptionID,
 			...rest
 		} = this.props;
 		return (
@@ -90,7 +91,9 @@ class NewPricingCard extends Component {
 					<PaymentButtonMobile
 						plan={plan}
 						buttonText={buttonText}
-						disabled={isCurrentPlan}
+						isCurrentPlan={isCurrentPlan}
+						handleUnsubscribe={onClickButton}
+						subscriptionID={subscriptionID}
 						name={stripeName}
 						handleToken={token}
 						linkColor={linkColor}
@@ -116,6 +119,7 @@ NewPricingCard.defaultProps = {
 	price: undefined,
 	linkColor: undefined,
 	pricingList: undefined,
+	subscriptionID: undefined,
 	name: undefined,
 	onClickLink: undefined,
 	children: undefined,
@@ -125,6 +129,7 @@ NewPricingCard.defaultProps = {
 NewPricingCard.propTypes = {
 	price: string,
 	plan: string.isRequired,
+	subscriptionID: string,
 	linkColor: string,
 	pricingList: array,
 	name: string,

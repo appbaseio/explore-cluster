@@ -712,35 +712,38 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 								<PaymentButton
 									name="Arc Basic Plan"
 									plan={ARC_PLANS.ARC_BASIC}
-									disabled={isArcBasic}
+									isCurrentPlan={isArcBasic}
 									handleToken={this.handleToken}
 									subscriptionID={subscriptionID}
+									handleUnsubscribe={this.showConfirmBox}
 								/>
 							</td>
 							<td>
 								<PaymentButton
 									name="Arc Standard Plan"
 									plan={ARC_PLANS.ARC_STANDARD}
-									disabled={isArcStandard}
+									isCurrentPlan={isArcStandard}
 									handleToken={this.handleToken}
 									subscriptionID={subscriptionID}
 									btnProps={{
 										color: '#FFFFFF',
 										backgroundColor: theme.badge.blue,
 									}}
+									handleUnsubscribe={this.showConfirmBox}
 								/>
 							</td>
 							<td>
 								<PaymentButton
 									name="Arc Enterprise Plan"
 									plan={ARC_PLANS.ARC_ENTERPRISE}
-									disabled={isArcEnterprise}
+									isCurrentPlan={isArcEnterprise}
 									handleToken={this.handleToken}
 									subscriptionID={subscriptionID}
 									btnProps={{
 										color: '#FFFFFF',
 										backgroundColor: theme.badge.darkBlue,
 									}}
+									handleUnsubscribe={this.showConfirmBox}
 								/>
 							</td>
 						</tr>
@@ -760,8 +763,10 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 					<NewPricingCard
 						css={{ color: theme.colors.accentText }}
 						name="Basic"
+						subscriptionID={subscriptionID}
 						isCurrentPlan={isArcBasic}
-						buttonText={isArcBasic ? 'Current Plan' : undefined}
+						buttonText={isArcBasic ? 'Unsubscribe' : undefined}
+						onClickButton={this.showConfirmBox}
 						price={this.getPlan(PRICE_BY_PLANS[ARC_PLANS.ARC_BASIC])}
 						stripeName="Arc basic plan"
 						plan={ARC_PLANS.ARC_BASIC}
@@ -799,6 +804,7 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 					<NewPricingCard
 						css={{ backgroundColor: theme.badge.blue }}
 						name="Standard"
+						subscriptionID={subscriptionID}
 						plan={ARC_PLANS.ARC_STANDARD}
 						isCurrentPlan={isArcStandard}
 						price={this.getPlan(PRICE_BY_PLANS[ARC_PLANS.ARC_STANDARD])}
@@ -809,7 +815,7 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 						linkColor="inherit"
 						pricingList={[]}
 						buttonText={isArcStandard ? 'Unsubscribe' : undefined}
-						onClickButton={isArcStandard ? this.showConfirmBox : undefined}
+						onClickButton={this.showConfirmBox}
 					>
 						<ListCaption>Security</ListCaption>
 						<CheckList
@@ -840,6 +846,7 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 					<NewPricingCard
 						css={{ backgroundColor: theme.badge.darkBlue }}
 						name="Enterprise"
+						subscriptionID={subscriptionID}
 						plan={ARC_PLANS.ARC_ENTERPRISE}
 						isCurrentPlan={isArcEnterprise}
 						price={this.getPlan(PRICE_BY_PLANS[ARC_PLANS.ARC_ENTERPRISE])}
@@ -850,7 +857,7 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 						linkColor="inherit"
 						pricingList={[]}
 						buttonText={isArcEnterprise ? 'Unsubscribe' : undefined}
-						onClickButton={isArcEnterprise ? this.showConfirmBox : undefined}
+						onClickButton={this.showConfirmBox}
 					>
 						<ListCaption>Security</ListCaption>
 						<CheckList

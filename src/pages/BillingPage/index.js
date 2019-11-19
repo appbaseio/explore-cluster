@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import styled, { css } from 'react-emotion';
-import { Card, Row } from 'antd';
+import { Card, Row, Collapse } from 'antd';
 import { connect } from 'react-redux';
 import Stripe from 'react-stripe-checkout';
 import Container from '../../components/Container';
@@ -33,6 +33,8 @@ const heading = css`
 	color: #888;
 `;
 
+const { Panel } = Collapse;
+
 class Billing extends Component {
 	static defaultProps = {
 		nodeCount: undefined,
@@ -41,6 +43,38 @@ class Billing extends Component {
 	componentDidUpdate(prevProps) {
 		const { errors } = this.props;
 		displayErrors(errors, prevProps.errors, true);
+	}
+
+	get billingView() {
+		const { isHostedArc, isClusterBilling } = this.props;
+		if (isClusterBilling) {
+			return (
+				<Card bodyStyle={{ padding: '20px 50px' }}>
+					<p>
+						It is not possible to upgrade a plan automatically as the current plan is
+						tied to the server resources. Reach out to{' '}
+						<a href="mailto:info@appbase.io">support</a> if you want to upgrade your
+						plan.
+					</p>
+				</Card>
+			);
+		}
+		if (isHostedArc) {
+			return (
+				<Container>
+					<Card bodyStyle={{ padding: 0 }}>
+						<HostedArcBilling />
+					</Card>
+				</Container>
+			);
+		}
+		return (
+			<Container>
+				<Card bodyStyle={{ padding: 0 }}>
+					<PricingTable />
+				</Card>
+			</Container>
+		);
 	}
 
 	render() {
@@ -52,22 +86,13 @@ class Billing extends Component {
 			nodeCount,
 			updatePayment,
 			isLoading,
+			subscriptionID,
+			isPaid,
 			isHostedArc,
 			isClusterBilling,
 		} = this.props;
 		if (isLoading) {
 			return <Loader show message="Updating Payment Method... Please wait!" />;
-		}
-		if (isClusterBilling) {
-			return (
-				<Card>
-					<p>
-						It is not possible to upgrade a plan automatically as the current plan is
-						tied to the server resources. Reach out to <a href="mailto:info@appbase.io">support</a> if you want to upgrade
-						your plan.
-					</p>
-				</Card>
-			);
 		}
 		return (
 			<React.Fragment>
@@ -88,7 +113,7 @@ class Billing extends Component {
 								/>
 							</Flex>
 
-							{planValidity && (
+							{planValidity ? (
 								<Flex alignItems="center">
 									<Grid
 										style={{
@@ -101,7 +126,7 @@ class Billing extends Component {
 										component={new Date(planValidity * 1000).toDateString()}
 									/>
 								</Flex>
-							)}
+							) : null}
 							{nodeCount ? (
 								<Flex alignItems="center">
 									<Grid
@@ -126,7 +151,10 @@ class Billing extends Component {
 										}}
 										gridRatio={0.4}
 										label={<h3 css={heading}>Effective Monthly Price</h3>}
-										component={`$${nodeCount * PRICE_BY_PLANS[plan]} (calculated at $${EFFECTIVE_PRICE_BY_PLANS[plan]}/node hour)`}
+										component={`$${nodeCount
+											* PRICE_BY_PLANS[plan]} (calculated at $${
+											EFFECTIVE_PRICE_BY_PLANS[plan]
+										}/node hour)`}
 									/>
 								</Flex>
 							) : null}
@@ -140,19 +168,61 @@ class Billing extends Component {
 </Row>
 )}
 				/>
-				<Container>
-					<Card bodyStyle={{ padding: 0 }}>
-						{isHostedArc ? <HostedArcBilling /> : <PricingTable />}
+				{this.billingView}
+				{subscriptionID && isPaid && (isHostedArc || isClusterBilling) && (
+					<Card
+						style={{
+							borderBottom: 0,
+							borderRight: 0,
+							borderLeft: 0,
+						}}
+					>
+						<Collapse
+							bordered={false}
+							style={{
+								marginLeft: 12,
+							}}
+						>
+							<Panel
+								style={{
+									borderBottom: 0,
+								}}
+								showArrow={false}
+								header={
+									<span style={{ color: 'tomato' }}>Looking To Unsubscribe?</span>
+								}
+								key="1"
+							>
+								<p>
+									You can delete the cluster from the{' '}
+									<a href="https://dashboard.appbase.io/clusters" target="blank">
+										cluster detail view
+									</a>{' '}
+									to unsubscribe from your current plan. You will lose access to
+									Arc APIs and dashboard views after doing this.
+								</p>
+							</Panel>
+						</Collapse>
 					</Card>
-				</Container>
+				)}
 			</React.Fragment>
 		);
 	}
 }
 
+Billing.defaultProps = {
+	planValidity: undefined,
+	subscriptionID: undefined,
+	isOnTrial: false,
+	isHostedArc: false,
+	isPaid: false,
+};
+
 Billing.propTypes = {
 	plan: PropTypes.string.isRequired,
 	planValidity: PropTypes.number,
+	isPaid: PropTypes.bool,
+	subscriptionID: PropTypes.string,
 	isOnTrial: PropTypes.bool,
 	isHostedArc: PropTypes.bool,
 	nodeCount: PropTypes.number,
@@ -169,8 +239,10 @@ const mapStateToProps = (state) => {
 		planValidity: get(appPlan, 'tier_validity'),
 		nodeCount: get(appPlan, 'node_count'),
 		isOnTrial: get(appPlan, 'trial'),
+		isPaid: get(appPlan, 'isPaid', false),
 		isHostedArc: get(appPlan, 'isHostedArc', false),
 		isClusterBilling: get(appPlan, 'isClusterBilling', false),
+		subscriptionID: get(appPlan, 'subscription_id'),
 		isLoading: get(state, '$updateAppPaymentMethod.isFetching'),
 		errors: [get(state, '$updateAppPaymentMethod.error')],
 	};

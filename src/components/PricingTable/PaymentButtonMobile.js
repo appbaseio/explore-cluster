@@ -2,9 +2,10 @@ import React from 'react';
 import Stripe from 'react-stripe-checkout';
 import { Modal } from 'antd';
 import PropTypes from 'prop-types';
+import get from 'lodash/get';
 import styled from 'react-emotion';
-import AppButton from './AppButton';
-import theme from './theme';
+import { connect } from 'react-redux';
+import { getAppPlanByName } from '../../batteries/modules/selectors';
 
 import { STRIPE_KEY } from '../../constants';
 import { PRICE_BY_PLANS } from '../../batteries/utils';
@@ -22,6 +23,24 @@ const Link = styled('a')`
 
 class PaymentButtonMobile extends React.Component {
 	state = { visible: false };
+
+	get text() {
+		const {
+ isCurrentPlan, handleUnsubscribe, subscriptionID, isPaid,
+} = this.props;
+		if (subscriptionID && isCurrentPlan) {
+			if (handleUnsubscribe && isPaid) {
+				return 'Unsubscribe';
+			}
+			return 'Current Plan';
+		}
+		return 'Subscribe';
+	}
+
+	get shouldDisableButton() {
+		const { isCurrentPlan, handleUnsubscribe, isPaid } = this.props;
+		return isCurrentPlan && !handleUnsubscribe && isPaid;
+	}
 
 	showModal = () => {
 		this.setState({
@@ -46,29 +65,17 @@ class PaymentButtonMobile extends React.Component {
 		const {
 			name,
 			plan,
-			disabled,
+			isCurrentPlan,
 			handleToken,
 			subscriptionID,
 			btnProps,
-			buttonText,
+			handleUnsubscribe,
 			linkColor,
 		} = this.props;
 		if (subscriptionID) {
 			return (
 				<React.Fragment>
-					<AppButton
-						uppercase
-						big
-						bold
-						shadow
-						color={theme.colors.accentText}
-						backgroundColor={theme.colors.accent}
-						onClick={disabled ? null : this.showModal}
-						css={{ marginTop: 40 }}
-						{...btnProps}
-					>
-						{disabled ? 'Current Plan' : 'Subscribe'}
-					</AppButton>
+					<Link disabled={this.shouldDisableButton} onClick={isCurrentPlan ? handleUnsubscribe : this.showModal} css={{ color: linkColor }} {...btnProps}>{this.text}</Link>
 					<Modal
 						title="Update plan"
 						visible={visible}
@@ -88,43 +95,44 @@ class PaymentButtonMobile extends React.Component {
 				name={name}
 				amount={PRICE_BY_PLANS[plan] * 100}
 				token={token => handleToken(token, plan)}
-				disabled={disabled}
+				disabled={isCurrentPlan}
 				stripeKey={STRIPE_KEY.LIVE}
 			>
-				<AppButton
-					uppercase
-					big
-					bold
-					shadow
-					color={theme.colors.accentText}
-					backgroundColor={theme.colors.accent}
-					css={{ marginTop: 40 }}
-					{...btnProps}
-				>
-					{disabled ? 'Current Plan' : 'Subscribe'}
-				</AppButton>
-				<Link css={{ color: linkColor }}>{buttonText}</Link>
+			<Link css={{ color: linkColor }}>{this.text}</Link>
 			</Stripe>
 		);
 	}
 }
 
 PaymentButtonMobile.defaultProps = {
-	disabled: false,
+	isCurrentPlan: false,
 	linkColor: '',
 	subscriptionID: '',
+	handleUnsubscribe: undefined,
 	btnProps: null,
+	isPaid: false,
 	buttonText: 'Subscribe',
 };
 
 PaymentButtonMobile.propTypes = {
 	name: PropTypes.string.isRequired,
+	handleUnsubscribe: PropTypes.func,
 	linkColor: PropTypes.string,
 	buttonText: PropTypes.string,
 	plan: PropTypes.string.isRequired,
+	isPaid: PropTypes.bool,
 	btnProps: PropTypes.object,
-	disabled: PropTypes.bool,
+	isCurrentPlan: PropTypes.bool,
 	handleToken: PropTypes.func.isRequired,
 	subscriptionID: PropTypes.string,
 };
-export default PaymentButtonMobile;
+
+const mapStateToProps = (state) => {
+	const appPlan = getAppPlanByName(state);
+	return {
+		isPaid: get(appPlan, 'isPaid', false),
+	};
+};
+
+
+export default connect(mapStateToProps, null)(PaymentButtonMobile);
