@@ -252,4 +252,4 @@ const mapDispatchToProps = dispatch => ({
 	updatePayment: token => dispatch(updateAppPaymentMethod(token, 'APP')),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps())(Billing);
+export default connect(mapStateToProps, mapDispatchToProps)(Billing);
