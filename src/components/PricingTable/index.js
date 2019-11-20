@@ -35,7 +35,7 @@ const hideOnLarge = css`
 	${media.ipadPro(css`
 		display: none;
 	`)};
-	width: 80%;
+	width: 90%;
 	margin: 50px auto;
 	user-select: none;
 `;
@@ -89,6 +89,7 @@ const Table = styled('table')`
 	> thead > tr > td,
 	> tbody > tr > td {
 		width: 205px;
+		color: #232E44;
 		border: 1.5px solid #f4f4f4;
 		border-bottom: 0;
 		padding: 11px 2px;
