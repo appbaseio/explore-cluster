@@ -1,7 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 import { connect } from 'react-redux';
-import { notification } from 'antd';
+import {
+ notification, Alert, Card, Button,
+} from 'antd';
 import get from 'lodash/get';
 import { FormBuilder, Validators } from 'react-reactive-form';
 import { css } from 'emotion';
@@ -16,6 +19,9 @@ import {
 import PreferenceForm from './PreferenceForm';
 import { isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
+import { getURL } from '../../constants/config';
+import { getAuthToken } from '../../batteries/components/analytics/utils';
+import Flex from '../../batteries/components/shared/Flex';
 
 const main = css`
 	.actionBtn {
@@ -35,21 +41,63 @@ const bannerDetails = {
 class QuerySuggestions extends React.Component {
 	constructor(props) {
 		super(props);
+		this.state = {
+			indices: [],
+			total: undefined,
+		};
 		this.form = FormBuilder.group({
 			blacklist: [[]],
 			external_suggestions: null,
-			min_count: 1,
-			min_hits: 5,
-			number_of_days: [30, Validators.required],
+			min_count: [1, [Validators.required, Validators.min(0), Validators.max(1000)]],
+			min_hits: [5, [Validators.required, Validators.min(0)]],
+			number_of_days: [30, [Validators.required, Validators.min(1), Validators.max(365)]],
 			indices: [['*']],
 		});
 		if (isValidPlan(props.tier, props.featureSuggestions)) {
 			props.getPreferences().then((action) => {
 				const payload = get(action, 'payload');
 				if (payload) {
-					this.form.patchValue(payload);
+					this.form.patchValue({
+						blacklist: payload.blacklist || [],
+						external_suggestions: payload.external_suggestions,
+						min_count: parseInt(payload.min_count, 10),
+						min_hits: parseInt(payload.min_hits, 10),
+						number_of_days: parseInt(payload.number_of_days, 10),
+						indices: payload.indices || ['*'],
+					});
 				}
 			});
+			fetch(`${getURL()}/_alias`, {
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Basic ${getAuthToken()}`,
+				},
+			})
+				.then(res => res.json())
+				.then((indices) => {
+					this.setState({
+						indices: Object.keys(indices),
+					});
+				})
+				.catch(err => console.error(err));
+			fetch(`${getURL()}/.suggestions/_search`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					Authorization: `Basic ${getAuthToken()}`,
+				},
+				body: JSON.stringify({
+					size: 0,
+					query: { match_all: {} },
+				}),
+			})
+				.then(res => res.json())
+				.then((res) => {
+					this.setState({
+						total: get(res, 'hits.total.value'),
+					});
+				})
+				.catch(err => console.error(err));
 		}
 	}
 
@@ -76,7 +124,7 @@ class QuerySuggestions extends React.Component {
 			savePreferences(payload).then((action) => {
 				if (get(action, 'payload')) {
 					notification.success({
-						message: 'Preferences saved successfully.',
+						message: 'Query Suggestions preferences saved successfully.',
 					});
 					getPreferences();
 				}
@@ -92,6 +140,7 @@ class QuerySuggestions extends React.Component {
 		const {
  isLoading, preferences, tier, featureSuggestions,
 } = this.props;
+		const { indices, total } = this.state;
 		if (!isValidPlan(tier, featureSuggestions)) {
 			return (
 				<React.Fragment>
@@ -113,7 +162,31 @@ class QuerySuggestions extends React.Component {
 			<React.Fragment>
 				<Banner {...bannerDetails} />
 				<Container css={main}>
+					{total !== undefined && get(preferences, 'index') && (
+						<Card>
+							<Flex justifyContent="space-between">
+								<Flex>
+									<Alert
+										message={`Last synced ${total} query suggestions at ${moment(
+											preferences.last_synced_time * 1000,
+										).format('DD/MM/YYYY hh:mm A')}.`}
+										type="info"
+										showIcon
+									/>
+								</Flex>
+								<Flex>
+									<Button
+										type="primary"
+										href={`/app/${preferences.index}/browse`}
+									>
+										View
+									</Button>
+								</Flex>
+							</Flex>
+						</Card>
+					)}
 					<PreferenceForm
+						indices={indices}
 						handleSaveTemplate={this.handleSaveTemplate}
 						control={this.form}
 					/>
