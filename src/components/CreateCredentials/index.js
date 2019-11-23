@@ -523,7 +523,7 @@ class CreateCredentials extends React.Component {
 											/>
 											<Grid
 												label="Fields Filtering"
-												toolTipMessage={Messages.fieldFilterin}
+												toolTipMessage={Messages.fieldFiltering}
 											/>
 											<FieldControl
 												strict={false}
@@ -541,8 +541,10 @@ class CreateCredentials extends React.Component {
 															component={(
 <Select
 																	placeholder="Select field value"
-																	mode="multiple"
+																	mode="tags"
+																	notFoundContent={null}
 																	style={{ width: '100%' }}
+																	tokenSeparators={[',']}
 																	{...inputHandler}
 																	onChange={(value) => {
 																		inputHandler.onChange(
@@ -564,9 +566,6 @@ class CreateCredentials extends React.Component {
 												name="exclude_fields"
 												render={({ handler }) => {
 													const inputHandler = handler();
-													// const includedFields = this.form.get(
-													// 	'include_fields',
-													// ).value;
 													return (
 														<Grid
 															label={(
@@ -578,7 +577,8 @@ class CreateCredentials extends React.Component {
 															component={(
 <Select
 																	placeholder="Select field value"
-																	mode="multiple"
+																	mode="tags"
+																	notFoundContent={null}
 																	style={{ width: '100%' }}
 																	{...inputHandler}
 																	onChange={(value) => {
