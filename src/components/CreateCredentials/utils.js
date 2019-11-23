@@ -198,6 +198,8 @@ export const mapFormToValues = (value, hasLimits) => {
 		password: value.password,
 		email: value.email,
 		is_admin: value.isAdmin,
+		include_fields: value.include_fields,
+		exclude_fields: value.exclude_fields,
 		categories: hasLimits ? filteredCategories.categories : value.categories,
 	};
 };
