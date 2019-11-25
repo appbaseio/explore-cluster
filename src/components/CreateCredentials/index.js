@@ -42,7 +42,8 @@ import Acl from './Acl';
 import WhiteList from './WhiteList';
 import PasswordInput from './PasswordInput';
 
-// const { Option } = Select;
+const { Option } = Select;
+
 const modal = css`
 	.ant-modal-content {
 		width: 580px;
@@ -68,7 +69,9 @@ class CreateCredentials extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.isApp = !window.location.pathname.startsWith(props.isUserManagement ? '/cluster/user-management' : '/cluster/credentials');
+		this.isApp = !window.location.pathname.startsWith(
+			props.isUserManagement ? '/cluster/user-management' : '/cluster/credentials',
+		);
 
 		this.form = props.isUserManagement
 			? FormBuilder.group({
@@ -90,10 +93,7 @@ class CreateCredentials extends React.Component {
 							acl => new FormGroup({
 									acl: new FormControl(acl),
 									tag: new FormControl(true),
-									rateLimit: new FormControl(
-										defaultRateLimits[acl],
-										isNegative,
-									),
+									rateLimit: new FormControl(defaultRateLimits[acl], isNegative),
 								}),
 						),
 					),
@@ -110,6 +110,8 @@ class CreateCredentials extends React.Component {
 						{ value: 0, disabled: !props.isPaidUser },
 						[Validators.required, isNegativeTTL],
 					],
+					include_fields: [['*']],
+					exclude_fields: [{ value: [], disabled: true }],
 			  });
 	}
 
@@ -139,16 +141,38 @@ class CreateCredentials extends React.Component {
 					}
 				});
 			}
+			if (!isUserManagement) {
+				const includeFieldsHandler = this.form.get('include_fields');
+				const excludeFieldsHandler = this.form.get('exclude_fields');
+				includeFieldsHandler.valueChanges.subscribe((value) => {
+					if (value && value.includes('*')) {
+						excludeFieldsHandler.disable({ emitEvent: false });
+						excludeFieldsHandler.reset([]);
+					} else {
+						excludeFieldsHandler.enable({ emitEvent: false });
+					}
+				});
+				excludeFieldsHandler.valueChanges.subscribe((value) => {
+					if (value && value.includes('*')) {
+						includeFieldsHandler.disable({ emitEvent: false });
+						includeFieldsHandler.reset([]);
+					} else {
+						includeFieldsHandler.enable({ emitEvent: false });
+					}
+				});
+			}
 		}
 		if (initialValues) {
-			this.form.patchValue(mapValuesToForm(JSON.parse(JSON.stringify(initialValues)), !isUserManagement));
+			this.form.patchValue(
+				mapValuesToForm(JSON.parse(JSON.stringify(initialValues)), !isUserManagement),
+			);
 		}
 	}
 
 	componentDidUpdate(prevProps) {
 		const { errors, credentials } = this.props;
 		if (credentials && credentials !== prevProps.credentials) {
-			this.getMappings();
+			// this.getMappings();
 		}
 		displayErrors(errors, prevProps.errors);
 	}
@@ -157,11 +181,19 @@ class CreateCredentials extends React.Component {
 		const indicesHandler = this.form.get('indices');
 		const adminHandler = this.form.get('isAdmin');
 		const categoriesHandler = this.form.get('categories');
+		const includeFieldsHandler = this.form.get('include_fields');
+		const excludeFieldsHandler = this.form.get('exclude_fields');
 		if (indicesHandler) {
 			indicesHandler.valueChanges.unsubscribe();
 		}
 		if (adminHandler) {
 			adminHandler.valueChanges.unsubscribe();
+		}
+		if (includeFieldsHandler) {
+			includeFieldsHandler.valueChanges.unsubscribe();
+		}
+		if (excludeFieldsHandler) {
+			excludeFieldsHandler.valueChanges.unsubscribe();
 		}
 		categoriesHandler.valueChanges.unsubscribe();
 	}
@@ -187,7 +219,9 @@ class CreateCredentials extends React.Component {
 
 	handleSubmit = () => {
 		const { onSubmit, isUserManagement } = this.props;
-		this.form.mappedValues = JSON.parse(JSON.stringify(mapFormToValues(this.form.value, !isUserManagement)));
+		this.form.mappedValues = JSON.parse(
+			JSON.stringify(mapFormToValues(this.form.value, !isUserManagement)),
+		);
 		onSubmit(this.form, get(this.props, 'initialValues.username'));
 	};
 
@@ -272,13 +306,13 @@ class CreateCredentials extends React.Component {
 														label="Password"
 														toolTipMessage={Messages.password}
 														component={(
-															<PasswordInput
+<PasswordInput
 																placeholder="Enter password"
 																{...handler()}
 																control={this.form.get('password')}
 																isEditing={this.isEditing}
-															/>
-														)}
+/>
+)}
 													/>
 												)}
 											/>
@@ -380,41 +414,40 @@ class CreateCredentials extends React.Component {
 											</div>
 										</div>
 									)}
-									{
-										isUserManagement ? (
-											<FieldControl
-												name="categories"
-												render={({ handler }) => (
-													<Grid
-														label="Categories"
-														toolTipMessage={Messages.categories}
-														component={(
-															<CheckboxGroup
-																css="label { font-weight: 100 }"
-																options={defaultAclOptions}
-																{...handler()}
-															/>
-														)}
-													/>
-												)}
-											/>)
-											: (
-												<FieldArray
-													name="categories"
-													render={control => (
-														<Grid
-															label="Categories"
-															toolTipMessage={Messages.categories}
-															component={(
-																<Acl
-																	control={control}
-																	isRateLimitPresent={!isUserManagement}
-																/>
-															)}
-														/>
-													)}
+									{isUserManagement ? (
+										<FieldControl
+											name="categories"
+											render={({ handler }) => (
+												<Grid
+													label="Categories"
+													toolTipMessage={Messages.categories}
+													component={(
+<CheckboxGroup
+															css="label { font-weight: 100 }"
+															options={defaultAclOptions}
+															{...handler()}
+/>
+)}
 												/>
 											)}
+										/>
+									) : (
+										<FieldArray
+											name="categories"
+											render={control => (
+												<Grid
+													label="Categories"
+													toolTipMessage={Messages.categories}
+													component={(
+<Acl
+															control={control}
+															isRateLimitPresent={!isUserManagement}
+/>
+)}
+												/>
+											)}
+										/>
+									)}
 									{this.isApp ? null : (
 										<FieldControl
 											strict={false}
@@ -462,7 +495,8 @@ class CreateCredentials extends React.Component {
 														defaultSuggestionValue="https://example.com/"
 														label="HTTP Referers"
 														defaultValue="*"
-														handleWarningMessage={defaultValue => `Warning! You don't have the default value (${defaultValue}) as selected which means that only the selected referers will be considered as valid.`}
+														handleWarningMessage={defaultValue => `Warning! You don't have the default value (${defaultValue}) as selected which means that only the selected referers will be considered as valid.`
+														}
 														inputProps={{
 															placeholder: 'Add a HTTP Referer',
 														}}
@@ -476,7 +510,8 @@ class CreateCredentials extends React.Component {
 														control={control}
 														toolTipMessage={Messages.sources}
 														label="IP Sources"
-														handleWarningMessage={defaultValue => `Warning! You don't have the default value (${defaultValue}) as selected which means that only the selected sources will be considered as valid.`}
+														handleWarningMessage={defaultValue => `Warning! You don't have the default value (${defaultValue}) as selected which means that only the selected sources will be considered as valid.`
+														}
 														defaultValue="0.0.0.0/0"
 														inputProps={{
 															placeholder:
@@ -484,6 +519,83 @@ class CreateCredentials extends React.Component {
 														}}
 													/>
 												)}
+											/>
+											<Grid
+												label="Fields Filtering"
+												toolTipMessage={Messages.fieldFiltering}
+											/>
+											<FieldControl
+												strict={false}
+												name="include_fields"
+												render={({ handler }) => {
+													const inputHandler = handler();
+													return (
+														<Grid
+															label={(
+<span css={styles.subHeader}>
+																	Include
+</span>
+)}
+															toolTipMessage={Messages.include}
+															component={(
+<Select
+																	placeholder="Select field value"
+																	mode="tags"
+																	notFoundContent={null}
+																	style={{ width: '100%' }}
+																	tokenSeparators={[',']}
+																	{...inputHandler}
+																	value={inputHandler.value || []}
+																	onChange={(value) => {
+																		inputHandler.onChange(
+																			calculateValue(value),
+																		);
+																	}}
+>
+																	<Option key="*">
+																		* (Include all fields)
+																	</Option>
+</Select>
+)}
+														/>
+													);
+												}}
+											/>
+											<FieldControl
+												strict={false}
+												name="exclude_fields"
+												render={({ handler }) => {
+													const inputHandler = handler();
+													return (
+														<Grid
+															label={(
+																<span css={styles.subHeader}>
+																	Exclude
+																</span>
+)}
+															toolTipMessage={Messages.exclude}
+															component={(
+<Select
+																	placeholder="Select field value"
+																	mode="tags"
+																	notFoundContent={null}
+																	style={{ width: '100%' }}
+																	{...inputHandler}
+																	value={inputHandler.value || []}
+																	onChange={(value) => {
+																		inputHandler.onChange(
+																			calculateValue(value),
+																		);
+																	}}
+>
+																	<Option key="*">
+																		* (Exclude all fields)
+																	</Option>
+</Select>
+)}
+														/>
+													);
+												}}
 											/>
 											<FieldControl
 												name="ip_limit"
@@ -603,7 +715,7 @@ const mapStateToProps = (state) => {
 		isPermissionPresent: !!appPermissions,
 		isLoadingMappings:
 			get(state, '$getAppMappings.isFetching') || get(state, '$getAppPermissions.isFetching'),
-		credentials: get(appPermissions, 'credentials'),
+		credentials: get(appPermissions, 'credentials.credentials'),
 		plan: 'growth',
 		isSubmitting:
 			get(state, '$createAppPermission.isFetching')
@@ -625,7 +737,4 @@ const mapDispatchToProps = dispatch => ({
 	fetchPermissions: appName => dispatch(getPermission(appName)),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(CreateCredentials);
+export default connect(mapStateToProps, mapDispatchToProps)(CreateCredentials);
