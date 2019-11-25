@@ -110,7 +110,7 @@ class CreateCredentials extends React.Component {
 						{ value: 0, disabled: !props.isPaidUser },
 						[Validators.required, isNegativeTTL],
 					],
-					include_fields: [{ value: ['*'] }],
+					include_fields: [['*']],
 					exclude_fields: [{ value: [], disabled: true }],
 			  });
 	}
@@ -235,7 +235,6 @@ class CreateCredentials extends React.Component {
 			saveButtonText,
 			isLoadingMappings,
 			isUserManagement,
-			credentials,
 		} = this.props;
 		const Messages = getMessages(isUserManagement);
 		return (
@@ -546,6 +545,7 @@ class CreateCredentials extends React.Component {
 																	style={{ width: '100%' }}
 																	tokenSeparators={[',']}
 																	{...inputHandler}
+																	value={inputHandler.value || []}
 																	onChange={(value) => {
 																		inputHandler.onChange(
 																			calculateValue(value),
@@ -581,6 +581,7 @@ class CreateCredentials extends React.Component {
 																	notFoundContent={null}
 																	style={{ width: '100%' }}
 																	{...inputHandler}
+																	value={inputHandler.value || []}
 																	onChange={(value) => {
 																		inputHandler.onChange(
 																			calculateValue(value),
