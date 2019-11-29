@@ -94,7 +94,7 @@ class QuerySuggestions extends React.Component {
 				.then(res => res.json())
 				.then((res) => {
 					this.setState({
-						total: get(res, 'hits.total') || get(res, 'hits.total.value'),
+						total: get(res, 'hits.total.value') || get(res, 'hits.total'),
 					});
 				})
 				.catch(err => console.error(err));
