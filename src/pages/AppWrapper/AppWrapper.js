@@ -181,7 +181,7 @@ class AppWrapper extends Component {
 					width={260}
 					css={{
 						height: '100vh',
-						position: 'fixed',
+						position: 'fixed !important',
 						left: 0,
 					}}
 					collapsible
