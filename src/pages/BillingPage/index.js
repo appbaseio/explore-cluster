@@ -18,6 +18,10 @@ import { STRIPE_KEY } from '../../constants';
 import HostedArcBilling from '../../components/PricingTable/HostedArcBilling';
 import { PRICE_BY_PLANS, EFFECTIVE_PRICE_BY_PLANS } from '../../batteries/utils';
 
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
 const TextLink = styled('span')`
 	color: rgb(111, 99, 245);
 	font-weight: 600;
@@ -149,8 +153,8 @@ class Billing extends Component {
 										}}
 										gridRatio={0.4}
 										label={<h3 css={heading}>Effective Monthly Price</h3>}
-										component={`$${nodeCount
-											* PRICE_BY_PLANS[plan]} (calculated at $${
+										component={`$${numberWithCommas(nodeCount
+											* PRICE_BY_PLANS[plan])} (calculated at $${
 											EFFECTIVE_PRICE_BY_PLANS[plan]
 										}/node hour)`}
 									/>
