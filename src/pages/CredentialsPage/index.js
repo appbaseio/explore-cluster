@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import get from 'lodash/get';
 import {
- Card, Table, Popconfirm, Tooltip, Button, Alert,
+ Card, Table, Popconfirm, Tooltip, Button, Alert, Typography,
 } from 'antd';
 import { connect } from 'react-redux';
 import {
@@ -151,9 +151,16 @@ class Credentials extends Component {
 		}
 		return (
 			<Container>
-				<Card title="Credentials">
+				<Card
+					title="Credentials"
+					extra={(
+						<a href="https://docs.appbase.io/docs/security/Credentials/" rel="noopener noreferrer" target="_blank">
+							Read Docs
+						</a>
+					)}
+				>
 					<h4>Host URL for this cluster:</h4>
-					<Alert message={getURL()} type="info" css={{ marginBottom: 20 }} />
+					<Alert message={<Typography.Paragraph style={{ marginBottom: 0 }} copyable={{ text: getURL() }}>{getURL()}</Typography.Paragraph>} type="info" css={{ marginBottom: 20 }} />
 					<Table
 						scroll={{ x: 700 }}
 						dataSource={permissions.map(permission => ({
