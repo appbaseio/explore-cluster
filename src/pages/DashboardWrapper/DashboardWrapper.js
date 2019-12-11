@@ -13,6 +13,7 @@ import AppHeader from '../../components/AppHeader';
 import Logo from '../../components/Logo';
 import { breakpoints } from '../../utils/media';
 import { getAppPlan } from '../../batteries/modules/actions';
+import { getParam } from '../../utils';
 
 const NoMatch = Loadable({
 	loader: () => import('../../NoMatch'),
@@ -80,9 +81,47 @@ const accountRoute = {
 	},
 };
 
+const getActiveMenu = (props, prevActiveSubMenu = []) => {
+	let activeSubMenu = 'App Overview';
+	let activeMenuItem = 'App Overview';
+	let pathname = props.location.pathname; // eslint-disable-line
+	if (!pathname) {
+		pathname = getParam('view') || '';
+	}
+	const routes = defaultRoutes;
+	Object.keys(routes).some((route) => {
+		if (routes[route].menu) {
+			const active = routes[route].menu.find(item => pathname === item.link);
+
+			if (active) {
+				activeSubMenu = route;
+				activeMenuItem = active.label;
+				return true;
+			}
+		} else if (pathname === routes[route].link) {
+			activeSubMenu = route;
+			activeMenuItem = route;
+			return true;
+		}
+		return false;
+	});
+	if (prevActiveSubMenu.includes(activeSubMenu)) {
+		return {
+			activeSubMenu: prevActiveSubMenu,
+			activeMenuItem: [activeMenuItem],
+		};
+	}
+	return {
+		activeSubMenu: [activeSubMenu, ...prevActiveSubMenu],
+		activeMenuItem: [activeMenuItem],
+	};
+};
+
+let url;
+
 class DashboardWrapper extends Component {
-	constructor() {
-		super();
+	constructor(props) {
+		super(props);
 
 		const collapsed = window.innerWidth <= breakpoints.medium;
 		let showHeader = true;
@@ -94,11 +133,37 @@ class DashboardWrapper extends Component {
 		} catch (e) {
 			console.log(e);
 		}
+		const getActiveMenuData = getActiveMenu(props);
 		this.state = {
 			collapsed,
+			appName: props.match.params.appName, // eslint-disable-line
+
 			showHeader,
 			routes: defaultRoutes,
+			...getActiveMenuData,
 		};
+	}
+
+	static getDerivedStateFromProps(props, state) {
+		const { appName } = props.match.params;
+		const { currentApp } = props;
+		let setActiveMenu = null;
+		if (props.match.url !== url) {
+			setActiveMenu = {
+				...getActiveMenu(props, state.activeSubMenu),
+				url: props.match.url,
+			};
+		}
+		({ url } = props.match);
+		if (appName && appName !== state.appName) {
+			return { appName, ...setActiveMenu };
+		}
+
+		if (!appName && !state.appName && currentApp) {
+			// gets last used appName from redux-persist
+			return { appName: currentApp, ...setActiveMenu };
+		}
+		return { ...setActiveMenu };
 	}
 
 	componentDidMount() {
@@ -126,7 +191,9 @@ class DashboardWrapper extends Component {
 	};
 
 	render() {
-		const { collapsed, showHeader, routes } = this.state;
+		const {
+ collapsed, showHeader, routes, activeSubMenu, activeMenuItem,
+} = this.state;
 
 		return (
 			<Layout>
@@ -143,8 +210,8 @@ class DashboardWrapper extends Component {
 				>
 					<Menu
 						theme="dark"
-						// openKeys={activeSubMenu}
-						// selectedKeys={activeMenuItem}
+						openKeys={activeSubMenu}
+						selectedKeys={activeMenuItem}
 						mode="inline"
 						css={{
 							overflow: 'auto',
