@@ -8,13 +8,8 @@ import { string } from 'prop-types';
 import get from 'lodash/get';
 import Importer from '@appbaseio-confidential/importer';
 import applyClusterSettings from '@appbaseio-confidential/importer/lib/utils/applyClusterSettings';
-import PCKG from '@appbaseio-confidential/importer/package.json';
-
 
 import Header from '../../components/Header';
-import { IMPORTER_LINK } from '../../constants/config';
-
-console.log("IMPORTER PACKAGE VERSION", PCKG.version)
 
 injectGlobal`
 	.ant-layout-header{
@@ -31,21 +26,34 @@ class ImporterPage extends React.Component {
 	async componentDidMount() {
 		const { type, appName: index } = this.props;
 		const cluster = sessionStorage.getItem('cluster') || '';
-		if (type !== 'arc') {
+		const { host, protocol } = new URL(sessionStorage.getItem('url'));
+		const username = sessionStorage.getItem('username');
+		const password = sessionStorage.getItem('password');
+		const uri = `${protocol}//${username}:${password}@${host}`;
+
+		if (type === 'cluster') {
 			try {
-				const parameters = await applyClusterSettings(cluster, index);
-				this.setState({
-					destinationParams: parameters,
-				});
+				if (index) {
+					const parameters = await applyClusterSettings(cluster, index);
+					this.setState({
+						destinationParams: parameters,
+					});
+				} else {
+					this.setState({
+						destinationParams: {
+							index,
+							cluster,
+							type: 'AppbaseCluster',
+							uri: `${uri}/${index}`,
+							tier: 'paid',
+						},
+					});
+				}
 			} catch (e) {
 				console.error(e);
 			}
 			this.togglePreparing();
 		} else {
-			const { host, protocol } = new URL(sessionStorage.getItem('url'));
-			const username = sessionStorage.getItem('username');
-			const password = sessionStorage.getItem('password');
-			const uri = `${protocol}//${username}:${password}@${host}`;
 			const parameters = {
 				type: 'AppbaseCluster',
 				clusterType: 'self-hosted',
@@ -75,8 +83,8 @@ class ImporterPage extends React.Component {
 		const { destinationParams, preparingApp } = this.state;
 		const isLocalES = destinationParams
 			? destinationParams.uri.includes('localhost')
-			  || destinationParams.uri.includes('127.0.0.1')
-			  || destinationParams.uri.includes('0.0.0.0')
+			|| destinationParams.uri.includes('127.0.0.1')
+			|| destinationParams.uri.includes('0.0.0.0')
 			: false;
 		return (
 			<Fragment>
@@ -87,18 +95,18 @@ class ImporterPage extends React.Component {
 							<Row>
 								<Col lg={18}>
 									<p>
-										Bring your data from JSON or CSV files into appbase.io via
-										the Import GUI.
+										Bring data from JSON/CSV/ElasticSearch/SQL sources into
+										appbase.io via GUI.
 										<br />
 										<br />
-										Or use our CLI tool for importing data from data sources
-										like MongoDB, Postgres, MySQL -{' '}
+										Want to use other sources like MongoDB or 3rd party APIs?
+										Read the{' '}
 										<a
-											href="https://medium.appbase.io/abc-import-import-your-mongodb-sql-json-csv-data-into-elasticsearch-a202cafafc0d"
+											href="https://docs.appbase.io/docs/data/Import/"
 											target="_blank"
 											rel="noopener noreferrer"
 										>
-											learn more
+											docs
 										</a>
 										.
 									</p>
