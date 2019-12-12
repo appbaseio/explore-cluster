@@ -143,23 +143,24 @@ class HomePage extends Component {
 								</Row>
 
 								<Link to="/tutorial" className={link}>
-									<Icon type="book" /> Interactive Tutorial
+									Interactive Tutorial <Icon type="book" />
 								</Link>
 								<a
-									href="https://docs.appbase.io/javascript/quickstart.html"
+									href="https://docs.appbase.io/data/Import/"
 									className={link}
 									target="_blank"
 									rel="noopener noreferrer"
 								>
-									<Icon type="rocket" /> JS Quickstart
+									Importing Data <Icon type="link" />
 								</a>
 								<a
-									href="https://docs.appbase.io/rest-quickstart.html"
+									href="https://docs.appbase.io/integrations"
 									className={link}
 									target="_blank"
 									rel="noopener noreferrer"
 								>
-									<Icon type="code-o" /> REST Quickstart
+									APIs and Integrations{' '}
+									<Icon type="link" />
 								</a>
 							</Col>
 							<Col
