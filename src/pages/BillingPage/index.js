@@ -9,9 +9,10 @@ import Container from '../../components/Container';
 import BannerHeader from '../../components/Banner/Header';
 import PricingTable from '../../components/PricingTable';
 import Grid from '../../components/CreateCredentials/Grid';
+import GlobalLoader from '../../batteries/components/shared/Loader/Spinner';
 import Flex from '../../batteries/components/shared/Flex';
 import { getAppPlanByName } from '../../batteries/modules/selectors';
-import { updateAppPaymentMethod } from '../../batteries/modules/actions';
+import { updateAppPaymentMethod, getAppPlan } from '../../batteries/modules/actions';
 import Loader from '../../batteries/components/shared/Loader';
 import { displayErrors } from '../../utils/helper';
 import { STRIPE_KEY } from '../../constants';
@@ -43,6 +44,13 @@ class Billing extends Component {
 	static defaultProps = {
 		nodeCount: undefined,
 	};
+
+	componentDidMount() {
+		const { isAppPlanFetched, fetchAppPlan } = this.props;
+		if (!isAppPlanFetched) {
+			fetchAppPlan();
+		}
+	}
 
 	componentDidUpdate(prevProps) {
 		const { errors } = this.props;
@@ -92,7 +100,11 @@ class Billing extends Component {
 			isPaid,
 			isHostedArc,
 			isClusterBilling,
+			isFetchingPlan,
 		} = this.props;
+		if (isFetchingPlan) {
+			return <GlobalLoader />;
+		}
 		if (isLoading) {
 			return <Loader show message="Updating Payment Method... Please wait!" />;
 		}
@@ -217,17 +229,22 @@ Billing.defaultProps = {
 	subscriptionID: undefined,
 	isOnTrial: false,
 	isHostedArc: false,
+	isAppPlanFetched: false,
 	isPaid: false,
+	isFetchingPlan: false,
 };
 
 Billing.propTypes = {
 	plan: PropTypes.string.isRequired,
 	planValidity: PropTypes.number,
+	fetchAppPlan: PropTypes.func.isRequired,
 	isPaid: PropTypes.bool,
 	subscriptionID: PropTypes.string,
 	isOnTrial: PropTypes.bool,
+	isFetchingPlan: PropTypes.bool,
 	isHostedArc: PropTypes.bool,
 	nodeCount: PropTypes.number,
+	isAppPlanFetched: PropTypes.bool,
 	isClusterBilling: PropTypes.bool.isRequired,
 	updatePayment: PropTypes.func.isRequired,
 	isLoading: PropTypes.bool.isRequired,
@@ -237,6 +254,8 @@ Billing.propTypes = {
 const mapStateToProps = (state) => {
 	const appPlan = getAppPlanByName(state);
 	return {
+		isFetchingPlan: get(state, '$getAppPlan.isFetching'),
+		isAppPlanFetched: !!getAppPlanByName(state),
 		plan: get(appPlan, 'tier') || 'Free',
 		planValidity: get(appPlan, 'tier_validity'),
 		nodeCount: get(appPlan, 'node_count'),
@@ -251,6 +270,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = dispatch => ({
+	fetchAppPlan: () => dispatch(getAppPlan()),
 	updatePayment: token => dispatch(updateAppPaymentMethod(token, 'APP')),
 });
 

@@ -96,8 +96,15 @@ class Dashboard extends Component {
 				},
 				() => Modal.error({
 						title: error.message,
-						content:
-							'Are you using a valid Arc ID? If so, please subscribe to a paid plan to continue using Arc.',
+						content: (
+							<p>
+								Are you using a valid Arc ID? If so, please subscribe to a paid plan
+								to continue using Arc. It takes up to 1 hour for the billing change
+								to get reflected. If you have subscribed and continue to see this
+								message, reach out to us at <a href="mailto:support@appbase.io">support@appbase.io</a>
+								.
+							</p>
+						),
 						okText: 'Go to billing',
 						onOk: () => {
 							window.location = '/billing';
@@ -195,7 +202,4 @@ const mapDispatchToProps = dispatch => ({
 	loadArcUser: (u, p) => dispatch(loadUser(u, p)),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(Dashboard);
+export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);
