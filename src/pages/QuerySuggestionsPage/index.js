@@ -93,8 +93,15 @@ class QuerySuggestions extends React.Component {
 			})
 				.then(res => res.json())
 				.then((res) => {
+					let total;
+					if (Number.isNaN(get(res, 'hits.total.value'))) {
+						total = get(res, 'hits.total');
+					} else {
+						total = get(res, 'hits.total.value');
+					}
+
 					this.setState({
-						total: get(res, 'hits.total.value') || get(res, 'hits.total'),
+						total,
 					});
 				})
 				.catch(err => console.error(err));
@@ -179,7 +186,7 @@ class QuerySuggestions extends React.Component {
 										type="primary"
 										href={`/app/${preferences.index}/browse`}
 									>
-										View
+										Browse data
 									</Button>
 								</Flex>
 							</Flex>
