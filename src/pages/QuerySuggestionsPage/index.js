@@ -94,10 +94,10 @@ class QuerySuggestions extends React.Component {
 				.then(res => res.json())
 				.then((res) => {
 					let total;
-					if (Number.isNaN(get(res, 'hits.total.value'))) {
-						total = get(res, 'hits.total');
-					} else {
+					if (typeof get(res, 'hits.total') === 'object') {
 						total = get(res, 'hits.total.value');
+					} else {
+						total = get(res, 'hits.total');
 					}
 
 					this.setState({

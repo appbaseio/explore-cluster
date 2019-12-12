@@ -314,7 +314,7 @@ DashboardWrapper.propTypes = {
 };
 
 const mapStateToProps = state => ({
-	isBillingEnabled: !!get(state, '$getAppPlan.results.billing_type'),
+	isBillingEnabled: !(get(state, '$getAppPlan.results.billing') === false),
 	isClusterPlanFetched: get(state, '$getAppPlan.success'),
 	isClusterPlanFetching: get(state, '$getAppPlan.isFetching', false),
 });
