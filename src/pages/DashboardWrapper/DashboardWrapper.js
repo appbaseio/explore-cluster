@@ -148,13 +148,13 @@ class DashboardWrapper extends Component {
 		const { appName } = props.match.params;
 		const { currentApp } = props;
 		let setActiveMenu = null;
-		if (props.match.url !== url) {
+		if (props.location.pathname !== url) {
 			setActiveMenu = {
 				...getActiveMenu(props, state.activeSubMenu),
-				url: props.match.url,
+				url: props.location.pathname,
 			};
 		}
-		({ url } = props.match);
+		(url = props.location.pathname);
 		if (appName && appName !== state.appName) {
 			return { appName, ...setActiveMenu };
 		}
