@@ -28,7 +28,12 @@ const columns = [
 		key: 'description',
 		render: ({ permissionInfo }) => (
 			<span>
-				{permissionInfo.expired ? <Icon style={{ color: 'orange', fontSize: 16 }} type="warning" /> : null} {permissionInfo.description || 'No Description'}
+				{permissionInfo.expired ? (
+					<Tooltip placement="topLeft" title="It seems like the permission has been expired.">
+						<Icon style={{ color: 'orange', fontSize: 16, cursor: 'pointer' }} type="warning" />
+					</Tooltip>
+				) : null}{' '}
+				{permissionInfo.description || 'No Description'}
 			</span>
 		),
 		width: '50%',
