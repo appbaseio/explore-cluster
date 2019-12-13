@@ -1,6 +1,8 @@
 import { notification } from 'antd';
 import get from 'lodash/get';
 
+const URLSearchParams = require('url-search-params');
+
 export const keySummary = {
 	admin: 'Admin credentials',
 	read: 'Read credentials',
@@ -129,3 +131,17 @@ export const validationsList = [
 	'Cannot start with -, _, +',
 	'Cannot be . or ..',
 ];
+
+export function getUrlParams(url) {
+	if (!url) {
+		return {};
+	}
+	const searchParams = new URLSearchParams(url);
+	return Array.from(searchParams.entries()).reduce(
+		(allParams, [key, value]) => ({
+			...allParams,
+			[key]: value,
+		}),
+		{},
+	);
+}

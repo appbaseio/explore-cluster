@@ -42,7 +42,9 @@ class CreateAppModal extends Component {
 		const { createdApp, history } = this.props; //eslint-disable-line
 		const { hasJSON, appName } = this.state;
 		if (createdApp.data && createdApp.data.acknowledged) {
-			if (hasJSON) {
+			if (hasJSON === 'sample') {
+				history.push(`app/${appName}/import?load-data=true`);
+			} else if (hasJSON) {
 				history.push(`app/${appName}/import`);
 			} else {
 				history.push(`app/${appName}`);
@@ -51,7 +53,9 @@ class CreateAppModal extends Component {
 	};
 
 	handleOk = async () => {
-		const { appName, shards, replicas } = this.state;
+		const {
+			appName, shards, replicas,
+		} = this.state;
 		const { handleCreateApp } = this.props;
 		const options = {
 			appName,
@@ -209,6 +213,9 @@ class CreateAppModal extends Component {
 						</Radio>
 						<Radio className={radiobtn} value={false}>
 							No
+						</Radio>
+						<Radio className={radiobtn} value="sample">
+							Load Sample Data
 						</Radio>
 					</RadioGroup>
 				</div>

@@ -10,6 +10,9 @@ import Importer from '@appbaseio-confidential/importer';
 import applyClusterSettings from '@appbaseio-confidential/importer/lib/utils/applyClusterSettings';
 
 import Header from '../../components/Header';
+import { getUrlParams } from '../../utils/helper';
+
+console.log('IMPORTER PACKAGE VERSION', PCKG.version);
 
 injectGlobal`
 	.ant-layout-header{
@@ -86,6 +89,16 @@ class ImporterPage extends React.Component {
 			|| destinationParams.uri.includes('127.0.0.1')
 			|| destinationParams.uri.includes('0.0.0.0')
 			: false;
+		const urlParams = getUrlParams(window.location.search);
+		const loadSample = urlParams['load-data'] && JSON.parse(urlParams['load-data']);
+		const sourceParams = loadSample
+			? {
+					subType: 'url',
+					uri:
+						'https://raw.githubusercontent.com/appbaseio/cdn/dev/appbase/ecommerce_data.json',
+					type: 'SourceFile',
+			  }
+			: undefined;
 		return (
 			<Fragment>
 				<Header compact>
@@ -160,7 +173,7 @@ class ImporterPage extends React.Component {
 							<Skeleton active />
 						</div>
 					) : (
-						<Importer initUser={user} arc embed initDestination={destinationParams} />
+						<Importer initSource={sourceParams} initUser={user} arc embed initDestination={destinationParams} />
 					)}
 				</section>
 			</Fragment>
