@@ -176,7 +176,7 @@ class QuerySuggestions extends React.Component {
 									<Alert
 										message={`Last synced ${total} query suggestions at ${moment(
 											preferences.last_synced_time * 1000,
-										).format('DD/MM/YYYY hh:mm A')}.`}
+										).format('MMM DD, YYYY hh:mm A')}.`}
 										type="info"
 										showIcon
 									/>
