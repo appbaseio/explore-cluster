@@ -155,7 +155,9 @@ class Credentials extends Component {
 
 	render() {
 		const { showCredForm, currentPermissionInfo, mappings } = this.state;
-		const { isLoading, permissions, isOwner } = this.props;
+		const {
+ isLoading, permissions, isOwner, location,
+} = this.props;
 		if (isLoading) {
 			return <Loader />;
 		}
@@ -164,11 +166,11 @@ class Credentials extends Component {
 				<Card
 					title="Credentials"
 					extra={(
-<a
+						<a
 							href="https://docs.appbase.io/docs/security/Credentials/"
 							rel="noopener noreferrer"
 							target="_blank"
->
+						>
 							Read Docs
 </a>
 )}
@@ -176,13 +178,13 @@ class Credentials extends Component {
 					<h4>Host URL for this cluster:</h4>
 					<Alert
 						message={(
-<Typography.Paragraph
+							<Typography.Paragraph
 								style={{ marginBottom: 0 }}
 								copyable={{ text: getURL() }}
->
+							>
 								{getURL()}
-</Typography.Paragraph>
-)}
+							</Typography.Paragraph>
+						)}
 						type="info"
 						css={{ marginBottom: 20 }}
 					/>
@@ -227,7 +229,7 @@ class Credentials extends Component {
 						New Credentials
 					</Button>
 				)}
-				{isOwner && (
+				{isOwner && location.pathname !== '/cluster/credentials' && (
 					<Tooltip
 						placement="rightTop"
 						title="Deleting an app is a permanent action, and will delete all the associated data, credentials and team sharing settings."

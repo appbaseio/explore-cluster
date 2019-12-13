@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import {
- Card, Button, Table, Alert,
+ Card, Button, Table, Alert, Typography,
 } from 'antd';
 import PropTypes from 'prop-types';
 import { css } from 'react-emotion';
@@ -19,6 +19,7 @@ import {
 import Container from '../../components/Container';
 import { getURL } from '../../constants/config';
 
+const { Paragraph } = Typography;
 const tableCls = css`
 	tr:hover td {
 		background: transparent;
@@ -152,18 +153,38 @@ class UserManagementPage extends React.Component {
 				<Card
 					title="Manage Users"
 					extra={(
-<Button
-							disabled={!isAdmin}
-							onClick={this.handleShow}
-							size="large"
-							type="primary"
->
-							Create User
-</Button>
-)}
+						<a
+							href="https://docs.appbase.io/security/UserManagement/"
+							target="_blank"
+							rel="noopener noreferrer"
+						>
+							Read Docs
+						</a>
+					)}
 				>
-						<h4>Host URL for this cluster:</h4>
-					<Alert message={getURL()} type="info" css={{ marginBottom: 20 }} />
+					<Paragraph strong>Login URL for this cluster:</Paragraph>
+					<Alert
+						showIcon
+						message={(
+							<React.Fragment>
+								<Paragraph>
+									A user added via user management will need to visit the below
+									URL and enter their username and password to have access to the
+									cluster's dashboard view.
+								</Paragraph>
+								<Paragraph
+									strong
+									copyable={{
+										text: `https://arc-dashboard.appbase.io?url=${getURL()}`,
+									}}
+								>
+									{`https://arc-dashboard.appbase.io?url=${getURL()}`}
+								</Paragraph>
+							</React.Fragment>
+						)}
+						type="info"
+						css={{ marginBottom: 20 }}
+					/>
 					<Table
 						scroll={{ x: 900 }}
 						dataSource={users.map(user => ({
@@ -180,6 +201,10 @@ class UserManagementPage extends React.Component {
 						css={tableCls}
 					/>
 				</Card>
+
+				<Button style={{ marginTop: 10 }} disabled={!isAdmin} onClick={this.handleShow} size="large" type="primary">
+					Create User
+				</Button>
 				{showForm && (
 					<CredentialsForm
 						handleCancel={this.handleCancel}
