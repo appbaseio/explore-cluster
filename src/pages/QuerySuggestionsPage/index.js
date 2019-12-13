@@ -186,7 +186,7 @@ class QuerySuggestions extends React.Component {
 										type="primary"
 										href={`/app/${preferences.index}/browse`}
 									>
-										Browse data
+										Browse Data
 									</Button>
 								</Flex>
 							</Flex>
