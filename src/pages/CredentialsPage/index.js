@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import get from 'lodash/get';
 import {
- Card, Table, Popconfirm, Tooltip, Button, Alert, Typography,
+ Card, Table, Popconfirm, Tooltip, Button, Alert, Typography, Icon,
 } from 'antd';
 import { connect } from 'react-redux';
 import {
@@ -26,8 +26,13 @@ const columns = [
 	{
 		title: 'Type',
 		key: 'description',
-		render: ({ permissionInfo }) => permissionInfo.description || 'No Description',
+		render: ({ permissionInfo }) => (
+			<span>
+				{permissionInfo.expired ? <Icon style={{ color: 'orange', fontSize: 16 }} type="warning" /> : null} {permissionInfo.description || 'No Description'}
+			</span>
+		),
 		width: '50%',
+		disabled: true,
 	},
 	{
 		title: 'Credentials',
@@ -154,13 +159,28 @@ class Credentials extends Component {
 				<Card
 					title="Credentials"
 					extra={(
-						<a href="https://docs.appbase.io/docs/security/Credentials/" rel="noopener noreferrer" target="_blank">
+<a
+							href="https://docs.appbase.io/docs/security/Credentials/"
+							rel="noopener noreferrer"
+							target="_blank"
+>
 							Read Docs
-						</a>
-					)}
+</a>
+)}
 				>
 					<h4>Host URL for this cluster:</h4>
-					<Alert message={<Typography.Paragraph style={{ marginBottom: 0 }} copyable={{ text: getURL() }}>{getURL()}</Typography.Paragraph>} type="info" css={{ marginBottom: 20 }} />
+					<Alert
+						message={(
+<Typography.Paragraph
+								style={{ marginBottom: 0 }}
+								copyable={{ text: getURL() }}
+>
+								{getURL()}
+</Typography.Paragraph>
+)}
+						type="info"
+						css={{ marginBottom: 20 }}
+					/>
 					<Table
 						scroll={{ x: 700 }}
 						dataSource={permissions.map(permission => ({
@@ -280,7 +300,4 @@ const mapDispatchToProps = dispatch => ({
 	handleDeleteApp: appId => dispatch(deleteApp(appId)),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(Credentials);
+export default connect(mapStateToProps, mapDispatchToProps)(Credentials);

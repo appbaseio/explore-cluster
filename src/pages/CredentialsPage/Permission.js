@@ -71,6 +71,8 @@ class Permission extends React.Component {
 
 	render() {
 		const { viewKey } = this.state;
+		const { permissionInfo } = this.props;
+		const isExpired = permissionInfo.expired;
 		return (
 			<Flex css={main} alignItems="center">
 				<Flex justifyContent="space-between" alignItems="center" css={container}>
@@ -92,7 +94,7 @@ class Permission extends React.Component {
 							</Tooltip>
 						</CopyToClipboard>
 						<Tooltip placement="topLeft" title="Edit credentials">
-							<Button onClick={this.handleEditCred} type="normal">
+							<Button disabled={isExpired} onClick={this.handleEditCred} type="normal">
 								<EditIcon size={16} />
 							</Button>
 						</Tooltip>
