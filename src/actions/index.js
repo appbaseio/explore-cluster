@@ -1,5 +1,7 @@
 // @flow
-import { USER, APPS, CREATE_APP } from '../constants';
+import {
+ USER, APPS, CREATE_APP, APP_SCREEN_PREFERENCES,
+} from '../constants';
 import { createAction } from '../batteries/modules/actions/utils';
 
 export function loadUser(username: string, password: string, url?: string): Object {
@@ -69,4 +71,8 @@ export function createAppFail(error: Object): Object {
 
 export function removeAppData(options: Object): Object {
 	return createAction(APPS.DELETE_APP, options, null, null);
+}
+
+export function updateAppScreenPreferences(payload: Object): Object {
+	return { type: APP_SCREEN_PREFERENCES.UPDATE_PREFERENCES, payload };
 }

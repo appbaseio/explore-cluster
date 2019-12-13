@@ -10,11 +10,11 @@ import PropTypes from 'prop-types';
 
 import Header from '../../components/Header';
 import CreateAppModal from './CreateAppModal';
-import AppCard from '../../components/AppCard';
 import Loader from '../../components/Loader';
 
 import { loadApps } from '../../actions';
 import { mediaKey } from '../../utils/media';
+import AppDataWrapper from '../../components/AppDataWrapper';
 
 const link = css`
 	font-size: 16px;
@@ -88,31 +88,7 @@ class HomePage extends Component {
 					</section>
 				)}
 
-				{sortedApps.map((name) => {
-					const title = (
-						<div
-							css={{
-								display: 'flex',
-								justifyContent: 'space-between',
-								height: 32,
-								alignItems: 'center',
-							}}
-						>
-							{name}
-						</div>
-					);
-
-					return (
-						<Col key={name} lg={8} md={12} sm={24}>
-							<Link
-								to={`/app/${name}/overview`}
-								css={{ marginBottom: 20, display: 'block' }}
-							>
-								<AppCard key={name} title={title} data={apps.data[name]} />
-							</Link>
-						</Col>
-					);
-				})}
+				<AppDataWrapper apps={apps} />
 			</Row>
 		);
 	};
