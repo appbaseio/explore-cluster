@@ -29,6 +29,14 @@ const StyledIcon = styled(Icon)`
 	color: ${({ selected }) => selected && 'rgb(27, 144, 255)'};
 `;
 
+const sysIndicesCheckbox = css`
+	white-space: nowrap;
+	margin-left: 5px;
+	@media (max-width: 600px) {
+		margin-left: 0;
+	}
+`;
+
 function AppFilters({
  apps, children, preferences, updatePreferences,
 }) {
@@ -67,7 +75,11 @@ function AppFilters({
 						onChange={handleInputChange}
 						style={{ width: '69%' }}
 					/>
-					<Checkbox defaultChecked={systemIndices} onChange={handleCheckboxChange}>
+					<Checkbox
+						className={sysIndicesCheckbox}
+						defaultChecked={systemIndices}
+						onChange={handleCheckboxChange}
+					>
 						Show system indices
 					</Checkbox>
 				</div>

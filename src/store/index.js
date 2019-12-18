@@ -11,7 +11,7 @@ import rootReducer from '../reducers';
 const persistConfig = {
 	key: 'root',
 	storage,
-	whitelist: ['$getCurrentApp'],
+	whitelist: ['$getCurrentApp', 'appsScreenPreferences'],
 };
 
 const allReducers = {
