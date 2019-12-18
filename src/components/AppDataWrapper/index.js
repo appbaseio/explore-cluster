@@ -1,14 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Col } from 'antd';
+import { Col, Empty } from 'antd';
 import { Link } from 'react-router-dom';
+import { css } from 'emotion';
 import AppCard from '../AppCard';
 import AppTable from '../AppTable';
 import AppFilters from '../AppFilters';
 
+const noData = css`
+	background-color: #ffffff;
+	margin: 0 10px;
+	padding: 40px;
+`;
+
 function AppDataWrapper({ apps }) {
 	const renderData = (data, showListView) => {
 		if (showListView) return <AppTable apps={data} />;
+		if (data.length === 0) return <Empty className={noData} image={Empty.PRESENTED_IMAGE_SIMPLE} />;
 		return data.map((app) => {
 			const title = (
 				<div

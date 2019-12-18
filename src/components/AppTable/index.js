@@ -10,6 +10,7 @@ const tableStyle = css`
 	background-color: white;
 	margin-left: 10px;
 	margin-right: 10px;
+	padding: 10px;
 `;
 
 const getFileSizeInBytes = (size) => {
@@ -38,6 +39,7 @@ const columns = [
 			return 0;
 		},
 		defaultSortOrder: 'ascend',
+		width: '15vw',
 	},
 	{
 		title: 'Status',
