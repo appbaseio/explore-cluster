@@ -17,6 +17,7 @@ class DeleteAppModal extends React.Component {
 			appName,
 			handleDeleteModal,
 			handleRemoveApp,
+			onDelete,
 		} = this.props;
 
 		this.setState({
@@ -28,6 +29,9 @@ class DeleteAppModal extends React.Component {
 				handleRemoveApp(appName);
 				handleDeleteModal();
 				message.success(`${appName} Deleted!`);
+				if (onDelete) {
+					onDelete();
+				}
 				this.setState({
 					loading: false,
 					deleteAppName: '',
@@ -90,6 +94,7 @@ DeleteAppModal.propTypes = {
 	appName: PropTypes.string.isRequired,
 	handleDeleteModal: PropTypes.func.isRequired,
 	handleRemoveApp: PropTypes.func.isRequired,
+	onDelete: PropTypes.func,
 };
 
 const mapDispatchToProps = dispatch => ({

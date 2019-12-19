@@ -17,10 +17,10 @@ import {
 	createPermission,
 	deletePermission,
 	updatePermission,
-	deleteApp,
 } from '../../batteries/modules/actions';
 import Loader from '../../batteries/components/shared/Loader/Spinner';
 import { getURL } from '../../constants/config';
+import DeleteAppModal from '../../components/AppCard/DeleteAppModal';
 
 const columns = [
 	{
@@ -52,6 +52,7 @@ class Credentials extends Component {
 		super(props);
 		this.state = {
 			showCredForm: false,
+			deleteModal: false,
 			currentPermissionInfo: undefined,
 		};
 	}
@@ -67,6 +68,13 @@ class Credentials extends Component {
 		}
 		displayErrors(errors, prevProps.errors);
 	}
+
+	handleDeleteModal = () => {
+		const { deleteModal: currentValue } = this.state;
+		this.setState({
+			deleteModal: !currentValue,
+		});
+	};
 
 	refetchPermissions = () => {
 		const { appName, fetchPermissions } = this.props;
@@ -134,15 +142,6 @@ class Credentials extends Component {
 		});
 	};
 
-	deleteApp = () => {
-		const { handleDeleteApp, appId } = this.props;
-		handleDeleteApp(appId).then(({ payload }) => {
-			if (payload) {
-				// Redirect to home
-				window.location = window.origin;
-			}
-		});
-	};
 
 	handleSubmit = (form, username) => {
 		const { currentPermissionInfo } = this.state;
@@ -153,11 +152,17 @@ class Credentials extends Component {
 		}
 	};
 
+	deleteApp = () => {
+		window.location = window.origin;
+	}
+
 	render() {
-		const { showCredForm, currentPermissionInfo, mappings } = this.state;
 		const {
- isLoading, permissions, isOwner, location,
-} = this.props;
+			showCredForm, currentPermissionInfo, mappings, deleteModal,
+		} = this.state;
+		const {
+			isLoading, permissions, isOwner, location, appName, appId,
+		} = this.props;
 		if (isLoading) {
 			return <Loader />;
 		}
@@ -172,8 +177,8 @@ class Credentials extends Component {
 							target="_blank"
 						>
 							Read Docs
-</a>
-)}
+						</a>
+					)}
 				>
 					<h4>Host URL for this cluster:</h4>
 					<Alert
@@ -234,26 +239,27 @@ class Credentials extends Component {
 						placement="rightTop"
 						title="Deleting an app is a permanent action, and will delete all the associated data, credentials and team sharing settings."
 					>
-						<Popconfirm
-							title="Are you sure delete this app?"
-							onConfirm={this.deleteApp}
-							okText="Yes"
-							cancelText="No"
-							placement="topLeft"
+						<Button
+							onClick={this.handleDeleteModal}
+							style={{
+								margin: '10px 10px',
+								float: 'right',
+							}}
+							type="danger"
+							size="large"
 						>
-							<Button
-								style={{
-									margin: '10px 10px',
-									float: 'right',
-								}}
-								type="danger"
-								size="large"
-							>
-								Delete App
-							</Button>
-						</Popconfirm>
+							Delete Index
+						</Button>
 					</Tooltip>
 				)}
+
+				<DeleteAppModal
+					appName={appName}
+					onDelete={this.deleteApp}
+					appId={appId}
+					deleteModal={deleteModal}
+					handleDeleteModal={this.handleDeleteModal}
+				/>
 			</Container>
 		);
 	}
@@ -274,7 +280,6 @@ Credentials.propTypes = {
 	isOwner: bool.isRequired,
 	isLoading: bool,
 	errors: array.isRequired,
-	handleDeleteApp: func.isRequired,
 };
 
 const mapStateToProps = (state) => {
@@ -304,7 +309,6 @@ const mapDispatchToProps = dispatch => ({
 	handleCreatePermission: (appName, payload) => dispatch(createPermission(appName, payload)),
 	handleDeletePermission: (appName, username) => dispatch(deletePermission(appName, username)),
 	handleEditPermission: (appName, username, payload) => dispatch(updatePermission(appName, username, payload)),
-	handleDeleteApp: appId => dispatch(deleteApp(appId)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Credentials);
