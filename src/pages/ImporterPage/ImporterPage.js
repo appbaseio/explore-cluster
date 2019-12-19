@@ -12,8 +12,6 @@ import applyClusterSettings from '@appbaseio-confidential/importer/lib/utils/app
 import Header from '../../components/Header';
 import { getUrlParams } from '../../utils/helper';
 
-console.log('IMPORTER PACKAGE VERSION', PCKG.version);
-
 injectGlobal`
 	.ant-layout-header{
 		background: white !important;
