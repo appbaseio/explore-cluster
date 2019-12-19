@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { css } from 'emotion';
 import { colorBar } from '../AppCard/StatsBox';
 import AppActions from '../AppActions';
+import { renderNoData } from '../AppDataWrapper';
 
 const tableStyle = css`
 	background-color: white;
@@ -79,7 +80,7 @@ const columns = [
 	},
 ];
 
-function AppTable({ apps, history }) {
+function AppTable({ apps, history, onCreateModalChange }) {
 	return (
 		<Table
 			className={tableStyle}
@@ -95,6 +96,9 @@ function AppTable({ apps, history }) {
 					data={record}
 				/>
 			)}
+			locale={{
+				emptyText: renderNoData(onCreateModalChange),
+			}}
 		/>
 	);
 }

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
- Row, Icon, Input, Checkbox, Tooltip,
+ Row, Icon, Input, Checkbox, Tooltip, Radio,
 } from 'antd';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -21,12 +21,6 @@ const searchClass = css`
 		display: -webkit-box;
 		width: 77%;
 	}
-`;
-
-const StyledIcon = styled(Icon)`
-	font-size: 24px;
-	cursor: pointer;
-	color: ${({ selected }) => selected && 'rgb(27, 144, 255)'};
 `;
 
 const sysIndicesCheckbox = css`
@@ -83,21 +77,23 @@ function AppFilters({
 						Show system indices
 					</Checkbox>
 				</div>
-				<div className={commonFlex} style={{ width: '56px' }}>
-					<Tooltip title="Show as grid view">
-						<StyledIcon
-							selected={!listView}
-							onClick={() => handleListToggle(false)}
-							type="appstore"
-						/>
-					</Tooltip>
-					<Tooltip title="Show as list view" placement="topRight">
-						<StyledIcon
-							selected={listView}
-							onClick={() => handleListToggle(true)}
-							type="unordered-list"
-						/>
-					</Tooltip>
+				<div>
+					<Radio.Group
+						defaultValue={preferences.showListView ? 'list' : 'card'}
+						buttonStyle="solid"
+						onChange={e => handleListToggle(e.target.value === 'list')}
+					>
+						<Tooltip title="Show as list view">
+							<Radio.Button value="list">
+								<Icon type="unordered-list" />
+							</Radio.Button>
+						</Tooltip>
+						<Tooltip title="Show as grid view" placement="topRight">
+							<Radio.Button value="card">
+								<Icon type="appstore" />
+							</Radio.Button>
+						</Tooltip>
+					</Radio.Group>
 				</div>
 			</div>
 			<Row>{children(data, listView)}</Row>

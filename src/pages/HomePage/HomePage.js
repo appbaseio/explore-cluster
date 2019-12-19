@@ -80,15 +80,15 @@ class HomePage extends Component {
 							theme="outlined"
 							style={{ fontSize: 34, marginBottom: 10 }}
 						/>
-						<h2>No apps found</h2>
+						<h2>No indices found</h2>
 						<p>
-							Create an app or try out the{' '}
+							Create an index or try out the{' '}
 							<Link to="/tutorial">interactive tutorial</Link> to get started
 						</p>
 					</section>
 				)}
 
-				<AppDataWrapper apps={apps} />
+				<AppDataWrapper apps={apps} onCreateModalChange={this.handleChange} />
 			</Row>
 		);
 	};
