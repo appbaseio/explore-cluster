@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
 import {
- Button, Col, Icon,
+ Button, Col, Icon, Empty
 } from 'antd';
 import { Link } from 'react-router-dom';
 import { css } from 'emotion';
@@ -63,12 +64,9 @@ function AppDataWrapper({ apps, onCreateModalChange }) {
 					md={12}
 					sm={24}
 				>
-					<Link
-						to={`/app/${app.index}/overview`}
-						css={{ marginBottom: 20, display: 'block' }}
-					>
+					<div css={{ marginBottom: 20, display: 'block', cursor: 'pointer' }}>
 						<AppCard key={app.index} title={title} data={app} />
-					</Link>
+					</div>
 				</Col>
 			);
 		});

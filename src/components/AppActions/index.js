@@ -1,11 +1,15 @@
 import React, { Component } from 'react';
 import { Col, Icon, Row } from 'antd';
-import { actionIcon, columnSeparator, deleteButton } from '../AppCard/styles';
+import {
+ actionIcon, cloneButton, columnSeparator, deleteButton,
+} from '../AppCard/styles';
 import DeleteAppModal from '../AppCard/DeleteAppModal';
+import CloneIndex from '../CloneIndex';
 
 class AppActions extends Component {
 	state = {
 		deleteModal: false,
+		cloneModal: false,
 	};
 
 	handleDeleteModal = () => {
@@ -15,14 +19,25 @@ class AppActions extends Component {
 		});
 	};
 
+	handleCloneModal = () => {
+		const { cloneModal: currentValue } = this.state;
+		this.setState({
+			cloneModal: !currentValue,
+		});
+	};
+
+	handleCancel = () => {
+		this.setState({ cloneModal: false });
+	};
+
 	render() {
 		const { title, data, onExploreClick } = this.props;
-		const { deleteModal } = this.state;
+		const { deleteModal, cloneModal } = this.state;
 		return (
 			<div className="card-actions" key={title}>
 				<Row type="flex">
 					<Col
-						span={12}
+						span={8}
 						className={columnSeparator}
 						css={{ color: '#1890ff' }}
 						onClick={onExploreClick}
@@ -31,7 +46,18 @@ class AppActions extends Component {
 						Explore
 					</Col>
 					<Col
-						span={12}
+						span={8}
+						className={cloneButton}
+						onClick={(e) => {
+							e.preventDefault();
+							this.handleCloneModal();
+						}}
+					>
+						<Icon className={actionIcon} type="copy" />
+						Clone Index
+					</Col>
+					<Col
+						span={8}
 						className={deleteButton}
 						onClick={(e) => {
 							e.preventDefault();
@@ -47,6 +73,7 @@ class AppActions extends Component {
 					deleteModal={deleteModal}
 					handleDeleteModal={this.handleDeleteModal}
 				/>
+				{cloneModal && <CloneIndex handleCancel={this.handleCancel} index={data.index} />}
 			</div>
 		);
 	}

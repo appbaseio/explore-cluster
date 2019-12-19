@@ -87,6 +87,10 @@ const deleteButton = css`
 	}
 `;
 
+const cloneButton = css`
+	${columnSeparator};
+`;
+
 const statsContainer = css`
 	${mediaKey.xsmall} {
 		width: 100%;
@@ -114,4 +118,5 @@ export {
 	actionIcon,
 	statsContainer,
 	skeleton,
+	cloneButton,
 };

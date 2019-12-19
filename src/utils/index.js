@@ -175,6 +175,23 @@ export const setRole = (username, role) =>
 			.catch(error => reject(error));
 	});
 
+export async function cloneApp(source, destination, payload = {}) {
+	if (!source || !destination) return;
+	const ACC_API = getURL();
+	const authToken = sessionStorage.getItem('authToken');
+	const response = await fetch(`${ACC_API}/_reindex/${source}/${destination}`, {
+		headers: {
+			Authorization: `Basic ${authToken}`,
+		},
+		method: 'POST',
+		body: JSON.stringify(payload),
+	});
+	if (response.status >= 400) {
+		throw new Error(data);
+	}
+	return true;
+}
+
 export const deleteRole = (appId, username) =>
 	new Promise((resolve, reject) => {
 		const ACC_API = getURL();

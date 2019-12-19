@@ -3,6 +3,7 @@ import {
  Card, Col, Icon, Row, Tag,
 } from 'antd';
 import { css } from 'react-emotion';
+import { withRouter } from 'react-router-dom';
 import { cardActions } from './styles';
 import AppActions from '../AppActions';
 
@@ -65,7 +66,7 @@ const noData = (
 	</div>
 );
 
-export default function StatsBox(props) {
+function StatsBox(props) {
 	let cols = [];
 	const {
 		title, data, style, showDelete,
@@ -82,7 +83,12 @@ export default function StatsBox(props) {
 	}
 
 	const cardTitle = (
-		<div css={flex}>
+		<div
+			onClick={() => {
+				props.history.push(`/app/${data.index}/overview`);
+			}}
+			css={flex}
+		>
 			<span css={flex}>
 				{title} &nbsp;&nbsp;
 				<Tag>{data.status}</Tag>
@@ -107,7 +113,12 @@ export default function StatsBox(props) {
 			bodyStyle={{ paddingBottom: '40px' }}
 			className={cardActions}
 		>
-			<Row gutter={8}>
+			<Row
+				onClick={() => {
+					props.history.push(`/app/${data.index}/overview`);
+				}}
+				gutter={8}
+			>
 				{cols.length ? null : noData}
 				{cols.map((col, index) => (
 					<Col key={`stats-${index + 1}`} span={12}>
@@ -129,9 +140,17 @@ export default function StatsBox(props) {
 						<Icon type="ellipsis" theme="outlined" />
 					</div>
 
-					<AppActions title={title} data={data} />
+					<AppActions
+						onExploreClick={() => {
+							props.history.push(`/app/${data.index}/overview`);
+						}}
+						title={title}
+						data={data}
+					/>
 				</React.Fragment>
 			) : null}
 		</Card>
 	);
 }
+
+export default withRouter(StatsBox);
