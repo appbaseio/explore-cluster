@@ -69,6 +69,10 @@ const defaultRoutes = {
 			{ label: 'Role Based Access', link: '/cluster/role-based-access', tag: 'Beta' },
 		],
 	},
+	Billing: {
+		icon: 'credit-card',
+		link: 'billing',
+	},
 };
 
 const accountRoute = {
@@ -323,4 +327,7 @@ const mapDispatchToProps = dispatch => ({
 	fetchClusterPlan: () => dispatch(getAppPlan()),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(DashboardWrapper);
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps,
+)(DashboardWrapper);
