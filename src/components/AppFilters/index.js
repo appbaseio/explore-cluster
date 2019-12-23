@@ -83,14 +83,14 @@ function AppFilters({
 						buttonStyle="solid"
 						onChange={e => handleListToggle(e.target.value === 'list')}
 					>
-						<Tooltip title="Show as list view">
-							<Radio.Button value="list">
-								<Icon type="unordered-list" />
-							</Radio.Button>
-						</Tooltip>
 						<Tooltip title="Show as grid view" placement="topRight">
 							<Radio.Button value="card">
 								<Icon type="appstore" />
+							</Radio.Button>
+						</Tooltip>
+						<Tooltip title="Show as list view">
+							<Radio.Button value="list">
+								<Icon type="unordered-list" />
 							</Radio.Button>
 						</Tooltip>
 					</Radio.Group>
