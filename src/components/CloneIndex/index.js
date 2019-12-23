@@ -48,8 +48,8 @@ const CloneIndex = ({
 				resetValues();
 				history.push(`/app/${destIndex}/overview`);
 			})
-			.catch(() => {
-				message.error('An error occurred while cloning the index. Please try again.');
+			.catch((e) => {
+				message.error(e.message);
 				resetValues();
 			});
 	};
@@ -67,10 +67,10 @@ const CloneIndex = ({
 			onCancel={handleCancel}
 			okText="Clone"
 			confirmLoading={loading}
-			okButtonProps={{ disabled: !destIndex }}
+			okButtonProps={{ disabled: !destIndex || exists }}
 		>
 			<Row className={centerAligned}>
-				<Col span={8}>
+				<Col style={{ marginBottom: exists ? '20px' : '1px' }} span={8}>
 					Destination Index{' '}
 					<Tooltip title="Destination Index should be a new index name that doesn't already exist in the cluster.">
 						<Icon style={{ cursor: 'pointer' }} type="info-circle" />
