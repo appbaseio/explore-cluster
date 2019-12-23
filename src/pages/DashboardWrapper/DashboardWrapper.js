@@ -71,7 +71,7 @@ const defaultRoutes = {
 	},
 	Billing: {
 		icon: 'credit-card',
-		link: 'billing',
+		link: '/cluster/billing',
 	},
 };
 
