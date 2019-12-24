@@ -1,7 +1,5 @@
 import React, { Fragment } from 'react';
-import {
- Row, Col, Button, Icon, Skeleton, Alert,
-} from 'antd';
+import { Row, Col, Button, Icon, Skeleton, Alert } from 'antd';
 import { injectGlobal } from 'emotion';
 import { connect } from 'react-redux';
 import { string } from 'prop-types';
@@ -77,15 +75,13 @@ class ImporterPage extends React.Component {
 	};
 
 	render() {
-		const {
- appName, credentials, type, user,
-} = this.props;
+		const { appName, credentials, type, user } = this.props;
 
 		const { destinationParams, preparingApp } = this.state;
 		const isLocalES = destinationParams
-			? destinationParams.uri.includes('localhost')
-			|| destinationParams.uri.includes('127.0.0.1')
-			|| destinationParams.uri.includes('0.0.0.0')
+			? destinationParams.uri.includes('localhost') ||
+			  destinationParams.uri.includes('127.0.0.1') ||
+			  destinationParams.uri.includes('0.0.0.0')
 			: false;
 		const urlParams = getUrlParams(window.location.search);
 		const loadSample = urlParams['load-data'] && JSON.parse(urlParams['load-data']);
@@ -94,7 +90,8 @@ class ImporterPage extends React.Component {
 					subType: 'url',
 					uri:
 						'https://raw.githubusercontent.com/appbaseio/cdn/dev/appbase/ecommerce_data.json',
-					type: 'SourceFile',
+					extraType: 'SourceFile',
+					type: 'json',
 			  }
 			: undefined;
 		return (
@@ -171,7 +168,17 @@ class ImporterPage extends React.Component {
 							<Skeleton active />
 						</div>
 					) : (
-						<Importer initSource={sourceParams} initUser={user} arc embed initDestination={destinationParams} />
+						<Importer
+							initSource={sourceParams}
+							initUser={
+								user && user.data && user.data.email
+									? user
+									: { data: { email: 'user@arc.appbase.io' } }
+							}
+							arc
+							embed
+							initDestination={destinationParams}
+						/>
 					)}
 				</section>
 			</Fragment>
@@ -184,12 +191,12 @@ ImporterPage.propTypes = {
 	credentials: string.isRequired,
 };
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
 	const { username, password } = get(state, 'user.data', {});
 	return {
 		credentials: username ? `${username}:${password}` : '',
 		type: get(state, '$getAppPlan.results.billing_type'),
-		user: get(state, 'user', { data: {} }),
+		user: get(state, 'user', { data: { email: 'user@arc.appbase.io' } }),
 	};
 };
 

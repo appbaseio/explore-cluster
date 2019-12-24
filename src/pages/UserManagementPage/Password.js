@@ -42,7 +42,7 @@ class Permission extends React.Component {
 		return (
 			<Flex css={main} alignItems="center">
 				<Flex justifyContent="space-between" alignItems="center" css={container}>
-					<span>{viewKey ? password : '##################################'}</span>
+					<span>{viewKey ? password : '##########################'}</span>
 				</Flex>
 			</Flex>
 		);
