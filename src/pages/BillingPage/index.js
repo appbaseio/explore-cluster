@@ -165,10 +165,12 @@ class Billing extends Component {
 										}}
 										gridRatio={0.4}
 										label={<h3 css={heading}>Effective Monthly Price</h3>}
-										component={`$${numberWithCommas(nodeCount
+										component={isClusterBilling ? `$${numberWithCommas(nodeCount
 											* PRICE_BY_PLANS[plan])} (calculated at $${
 											EFFECTIVE_PRICE_BY_PLANS[plan]
-										}/node hour)`}
+										}/node hour)` : `$${numberWithCommas(PRICE_BY_PLANS[plan])} (calculated at $${
+											EFFECTIVE_PRICE_BY_PLANS[plan]
+										}/hour)`}
 									/>
 								</Flex>
 							) : null}

@@ -713,6 +713,7 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 									name="Arc Basic Plan"
 									plan={ARC_PLANS.HOSTED_ARC_BASIC}
 									disabled={isArcBasic}
+									isCurrentPlan={isArcBasic}
 									handleToken={this.handleToken}
 									subscriptionID={subscriptionID}
 								/>
@@ -722,6 +723,7 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 									name="Arc Standard Plan"
 									plan={ARC_PLANS.HOSTED_ARC_STANDARD}
 									disabled={isArcStandard}
+									isCurrentPlan={isArcStandard}
 									handleToken={this.handleToken}
 									subscriptionID={subscriptionID}
 									btnProps={{
@@ -735,6 +737,7 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 									name="Arc Enterprise Plan"
 									plan={ARC_PLANS.HOSTED_ARC_ENTERPRISE}
 									disabled={isArcEnterprise}
+									isCurrentPlan={isArcEnterprise}
 									handleToken={this.handleToken}
 									subscriptionID={subscriptionID}
 									btnProps={{
@@ -769,6 +772,7 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 						token={token => this.handleToken(token, ARC_PLANS.HOSTED_ARC_BASIC)}
 						stripeKey={this.stripeKey}
 						pricingList={[]}
+						subscriptionID={subscriptionID}
 					>
 						<ListCaption>Security</ListCaption>
 						<CheckList
@@ -799,6 +803,7 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 					<NewPricingCard
 						css={{ backgroundColor: theme.badge.blue }}
 						name="Standard"
+						subscriptionID={subscriptionID}
 						plan={ARC_PLANS.HOSTED_ARC_STANDARD}
 						isCurrentPlan={isArcStandard}
 						price={this.getPlan(PRICE_BY_PLANS[ARC_PLANS.HOSTED_ARC_STANDARD])}
@@ -840,6 +845,7 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 					<NewPricingCard
 						css={{ backgroundColor: theme.badge.darkBlue }}
 						name="Enterprise"
+						subscriptionID={subscriptionID}
 						plan={ARC_PLANS.HOSTED_ARC_ENTERPRISE}
 						isCurrentPlan={isArcEnterprise}
 						price={this.getPlan(PRICE_BY_PLANS[ARC_PLANS.HOSTED_ARC_ENTERPRISE])}
