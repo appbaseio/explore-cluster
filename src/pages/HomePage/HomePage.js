@@ -122,7 +122,7 @@ class HomePage extends Component {
 									Interactive Tutorial <Icon type="book" />
 								</Link>
 								<a
-									href="https://docs.appbase.io/data/Import/"
+									href="https://docs.appbase.io/docs/data/Import/"
 									className={link}
 									target="_blank"
 									rel="noopener noreferrer"
