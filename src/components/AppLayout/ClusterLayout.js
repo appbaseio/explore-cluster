@@ -37,6 +37,11 @@ const BillingPage = Loadable({
 	loading: Loader,
 });
 
+const Functions = Loadable({
+	loader: () => import('../../pages/Functions'),
+	loading: Loader,
+});
+
 const CredentialsPage = Loadable({
 	loader: () => import('../../pages/CredentialsPage'),
 	loading: Loader,
@@ -278,6 +283,14 @@ class ClusterLayout extends React.PureComponent {
 							path="/cluster/role-based-access"
 							component={props => (
 								<AppPageContainer {...props} component={RoleBaseAccess} />
+							)}
+						/>
+
+						<Route
+							exact
+							path="/cluster/functions"
+							component={props => (
+								<AppPageContainer {...props} component={Functions} />
 							)}
 						/>
 					</Switch>

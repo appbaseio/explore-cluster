@@ -45,6 +45,7 @@ const defaultRoutes = {
 			{ label: 'Browse Data', link: '/cluster/browse' },
 			{ label: 'Search Templates', link: '/cluster/search-templates', tag: 'Beta' },
 			{ label: 'Query Suggestions', link: '/cluster/query-suggestions', tag: 'Beta' },
+			{ label: 'Functions', link: '/cluster/functions', tag: 'Beta' },
 		],
 	},
 	Analytics: {
