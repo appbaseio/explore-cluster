@@ -135,8 +135,7 @@ class HomePage extends Component {
 									target="_blank"
 									rel="noopener noreferrer"
 								>
-									APIs and Integrations{' '}
-									<Icon type="link" />
+									APIs and Integrations <Icon type="link" />
 								</a>
 							</Col>
 							<Col

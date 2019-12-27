@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useState } from 'react';
 import {
  Row, Col, Button, Icon, List, Switch, Card, Divider, Tooltip,
 } from 'antd';
@@ -11,6 +11,8 @@ import Header from '../../components/Header';
 import { getFunctions, updateFunctions } from '../../batteries/modules/actions';
 import CreateFunction from './CreateFunction';
 import TriggerFunction from './TriggerFunction';
+import InvokeFunctionModal from '../../components/InvokeFunctionModal';
+import DeployFunctionModal from '../../components/DeployFunctionModal';
 
 const IconText = ({ type, text }) => (
 	<span>
@@ -19,7 +21,28 @@ const IconText = ({ type, text }) => (
 	</span>
 );
 
+function InvokeButton({ item }) {
+	const [visible, setVisible] = useState(false);
+	return (
+		<>
+			<Button onClick={() => setVisible(true)} style={{ marginLeft: 8 }} type="primary">
+				<Icon type="experiment" />
+				Invoke Function
+			</Button>
+			{visible && (
+				<InvokeFunctionModal
+					handleCancel={() => setVisible(false)}
+					invocationCount={item.function.invocation_count}
+					functionName={item._id}
+				/>
+			)}
+		</>
+	);
+}
+
 class FunctionsPage extends React.Component {
+	state = { invokeModal: false, deployModal: false };
+
 	componentDidMount() {
 		const { fetchFunctions, appName } = this.props;
 		fetchFunctions(appName);
@@ -38,8 +61,13 @@ class FunctionsPage extends React.Component {
 		});
 	};
 
+	handleCancel = (modalKey) => {
+		this.setState({ [modalKey]: false });
+	};
+
 	render() {
 		const { isLoading, functions } = this.props;
+		const { deployModal } = this.state;
 
 		if (isLoading) {
 			return <Loader />;
@@ -49,7 +77,7 @@ class FunctionsPage extends React.Component {
 				<Header compact>
 					<Row type="flex" justify="space-between" align="middle" gutter={16}>
 						<Col lg={18}>
-							<h2>Functions</h2>
+							<h2>Deployed Functions</h2>
 							<Row>
 								<Col lg={18}>
 									<p>
@@ -68,7 +96,14 @@ class FunctionsPage extends React.Component {
 						>
 							<CreateFunction />
 
-							<Button type="primary" size="large" rel="noopener noreferrer">
+							<Button
+								onClick={() => {
+									this.setState({ deployModal: true });
+								}}
+								type="primary"
+								size="large"
+								rel="noopener noreferrer"
+							>
 								<Icon type="deployment-unit" />
 								Deploy Function
 							</Button>
@@ -84,23 +119,20 @@ class FunctionsPage extends React.Component {
 								<List.Item
 									key={item._id}
 									extra={(
-										<React.Fragment>
+          <React.Fragment>
 											<TriggerFunction
 												isLoading={item.triggerUpdation}
 												refetchFunction={this.refetchFunction}
 												node={item}
 											/>
 
-											<Button style={{ marginLeft: 8 }} type="primary">
-												<Icon type="experiment" />
-												Invoke Function
-											</Button>
+											<InvokeButton item={item} />
 										</React.Fragment>
-									)}
+        )}
 								>
 									<List.Item.Meta
 										title={(
-											<React.Fragment>
+           <React.Fragment>
 												{item.function.service}
 												<Tooltip
 													title={`${
@@ -115,7 +147,7 @@ class FunctionsPage extends React.Component {
 													/>
 												</Tooltip>
 											</React.Fragment>
-										)}
+         )}
 										description={[
 											<IconText
 												type="container"
@@ -133,6 +165,11 @@ class FunctionsPage extends React.Component {
 											/>,
 										]}
 									/>
+									{deployModal && (
+										<DeployFunctionModal
+											handleCancel={() => this.handleCancel('deployModal')}
+										/>
+									)}
 								</List.Item>
 							)}
 						/>
@@ -159,4 +196,7 @@ const mapDispatchToProps = dispatch => ({
 	fetchFunctions: appName => dispatch(getFunctions(appName)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(FunctionsPage);
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps,
+)(FunctionsPage);
