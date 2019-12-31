@@ -25,7 +25,8 @@ const bannerMessagesAnalytics = {
 		title: 'No Result Searches',
 		description: 'Understand which user searches are yielding no results.',
 		buttonText: 'Read Docs',
-		href: 'https://docs.appbase.io',
+		href:
+			'https://docs.appbase.io/docs/analytics/Overview/#understand-content-gaps-with-no-results-queries',
 	},
 };
 
