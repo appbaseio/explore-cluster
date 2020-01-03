@@ -13,10 +13,7 @@ const deleteIcon = css`
 	cursor: pointer;
 `;
 
-const EnvTable = ({ dataSource }) => {
-	const [data, setData] = useState(
-		dataSource.length === 0 ? [{ key: '', value: '' }] : dataSource,
-	);
+const EnvTable = ({ dataSource: data, setData }) => {
 	const handleAdd = () => {
 		const newData = [...data, { key: '', value: '' }];
 		setData(newData);

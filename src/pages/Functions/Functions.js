@@ -54,8 +54,9 @@ class FunctionsPage extends React.Component {
 	};
 
 	handleEnable = (isChecked, node) => {
+		if (!node) return;
 		const { putFunctions } = this.props;
-		putFunctions(node._id, {
+		putFunctions(node.function.service, {
 			...node,
 			enabled: isChecked,
 		});
@@ -165,16 +166,14 @@ class FunctionsPage extends React.Component {
 											/>,
 										]}
 									/>
-									{deployModal && (
-										<DeployFunctionModal
-											handleCancel={() => this.handleCancel('deployModal')}
-										/>
-									)}
 								</List.Item>
 							)}
 						/>
 					</Card>
 				</section>
+				{deployModal && (
+					<DeployFunctionModal handleCancel={() => this.handleCancel('deployModal')} />
+				)}
 			</Fragment>
 		);
 	}

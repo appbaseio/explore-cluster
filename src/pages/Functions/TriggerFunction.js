@@ -40,15 +40,15 @@ class TriggerFunction extends React.Component {
 	handleSave = () => {
 		const { putFunctions, node } = this.props;
 		const {
- type, when, expression, request 
+ type, when, expression, request,
 } = this.state;
 		putFunctions(node.function.service, {
 			...node,
 			trigger: {
 				type,
-				when,
+				executeBefore: when === 'before',
 			},
-			extraRequestPayload: request,
+			extraRequestPayload: request || {},
 			expression,
 		}).then(() => this.handleModal());
 	};
@@ -61,7 +61,7 @@ class TriggerFunction extends React.Component {
 
 	render() {
 		const {
- isVisible, type, when, expression, request 
+ isVisible, type, when, expression, request,
 } = this.state;
 		const { node, isLoading } = this.props;
 		const enviroment = `index = ['abc']
@@ -158,4 +158,7 @@ const mapDispatchToProps = dispatch => ({
 	putFunctions: (appName, payload) => dispatch(updateFunctions(appName, payload, true)),
 });
 
-export default connect(null, mapDispatchToProps)(TriggerFunction);
+export default connect(
+	null,
+	mapDispatchToProps,
+)(TriggerFunction);

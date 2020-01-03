@@ -1,38 +1,69 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Modal, Row, Skeleton } from 'antd';
-import PrivateRegistry from './components/PrivateRegistry';
 import {
- handleInputClosure, isTrue, later, renderInputField,
-} from './helper';
+ message, Modal, notification, Row,
+} from 'antd';
+import { connect } from 'react-redux';
+import get from 'lodash/get';
+import PrivateRegistry from './components/PrivateRegistry';
+import { handleInputClosure, isTrue, renderInputField } from './helper';
 import EnvTable from './components/EnvTable';
 import { modalHeading } from '../../pages/HomePage/styles';
+import { createFunction } from '../../batteries/modules/actions';
 
 const DeployFunctionModal = ({
- dockerImg, funcName, envData, handleCancel,
+	dockerImg,
+	funcName,
+	envData,
+	handleCancel,
+	deployFunction,
+	loading,
+	error,
+	success,
 }) => {
-	const [loading, setLoading] = useState(false);
+	const [didMount, setDidMount] = useState(false);
 	const [functionName, setFunctionName] = useState(funcName);
 	const [dockerImage, setDockerImage] = useState(dockerImg);
 	const [globalError, setGlobalError] = useState({});
+	const [envDataSource, setEnvData] = useState(
+		envData.length === 0 ? [{ key: '', value: '' }] : envData,
+	);
 
 	const handleInputRequired = handleInputClosure(setGlobalError, globalError);
 
-	// useEffect(() => {
-	// 	const apiCall = async () => {
-	// 		setLoading(true);
-	// 		// TODO: replace with API
-	// 		await later(500);
-	// 		setFunctionName('hello func');
-	// 		setDockerImage('hello docker');
-	// 		setLoading(false);
-	// 	};
-	// 	apiCall();
-	// }, []);
+	useEffect(() => {
+		if (didMount) {
+			if (success) {
+				message.success(`${functionName} function deployed successfully`);
+				handleCancel();
+			} else if (error) {
+				notification.error({
+					message: 'Error',
+					description: error,
+				});
+			}
+		} else if (!didMount) setDidMount(true);
+	}, [error, success]);
 
-	function getModalContent() {
-		if (loading) return <Skeleton />;
-		return (
+	const handleSubmit = () => {
+		const parsedEnvData = envDataSource.reduce((objAcc, envSource) => {
+			const { key, value } = envSource;
+			if (key && value) objAcc[key] = value;
+			return objAcc;
+		}, {});
+		deployFunction(functionName, { image: dockerImage, envVars: parsedEnvData });
+	};
+
+	return (
+		<Modal
+			title="Deploy Function"
+			onCancel={handleCancel}
+			okText="Deploy"
+			visible
+			okButtonProps={{ disabled: Object.values(globalError).some(isTrue) }}
+			onOk={handleSubmit}
+			confirmLoading={loading}
+		>
 			<>
 				<Row>
 					<h3 className={modalHeading} style={{ marginTop: 0 }}>
@@ -60,21 +91,9 @@ const DeployFunctionModal = ({
 					<PrivateRegistry globalError={globalError} setGlobalError={setGlobalError} />
 				</Row>
 				<Row>
-					<EnvTable dataSource={envData} />
+					<EnvTable dataSource={envDataSource} setData={setEnvData} />
 				</Row>
 			</>
-		);
-	}
-
-	return (
-		<Modal
-			title="Deploy Function"
-			onCancel={handleCancel}
-			okText="Deploy"
-			visible
-			okButtonProps={{ disabled: Object.values(globalError).some(isTrue) }}
-		>
-			{getModalContent()}
 		</Modal>
 	);
 };
@@ -93,4 +112,17 @@ DeployFunctionModal.defaultProps = {
 	handleCancel: () => {},
 };
 
-export default DeployFunctionModal;
+const mapStateToProps = state => ({
+	loading: get(state, '$getAppFunctions.isCreating'),
+	error: get(state, '$getAppFunctions.error'),
+	success: get(state, '$getAppFunctions.success'),
+});
+
+const mapDispatchToProps = dispatch => ({
+	deployFunction: (name, payload) => dispatch(createFunction(name, payload)),
+});
+
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps,
+)(DeployFunctionModal);
