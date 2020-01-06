@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
  Button, Modal, Row, Skeleton,
 } from 'antd';
 import { css } from 'emotion';
-import { later } from '../DeployFunctionModal/helper';
+import get from 'lodash/get';
+import { connect } from 'react-redux';
 import { modalHeading } from '../../pages/HomePage/styles';
 import Ace from '../../batteries/components/SearchSandbox/containers/AceEditor';
 import { FUNCTIONS } from '../../constants';
+import { invokeFunction } from '../../batteries/modules/actions';
 
 const title = css`
 	display: flex;
@@ -27,13 +29,23 @@ function InvokeResponse({ responseData, status, time }) {
 			</Row>
 			<Row>
 				<h3 className={modalHeading}>Response Data</h3>
-				<pre style={{ width: 300 }}>{JSON.stringify(responseData, null, 4)}</pre>
+				<pre>{JSON.stringify(responseData, null, 4)}</pre>
 			</Row>
 		</>
 	);
 }
 
-const InvokeFunctionModal = ({ functionName, invocationCount, handleCancel }) => {
+const InvokeFunctionModal = ({
+	functionName,
+	invocationCount,
+	handleCancel,
+	invokeFunction,
+	error,
+	success,
+	invokeResults,
+	loading,
+}) => {
+	const [didMount, setDidMount] = useState(false);
 	const [requestData, setRequestData] = useState();
 	const [isValidJSON, setIsValidJSON] = useState(true);
 	const [status, setStatus] = useState();
@@ -60,15 +72,23 @@ const InvokeFunctionModal = ({ functionName, invocationCount, handleCancel }) =>
 		setIsValidJSON(isValid);
 	};
 
-	const handleSubmit = async () => {
+	const handleSubmit = () => {
 		setInvokeState(FUNCTIONS.INVOKING);
-		// TODO: replace with API
-		await later(500);
-		setStatus(200);
-		setRoundTrip('1500ms');
-		setResponseData({ value: 'hello world' });
-		setInvokeState(FUNCTIONS.INVOKED);
+		invokeFunction(functionName, requestData);
 	};
+
+	useEffect(() => {
+		if (didMount) {
+			if (success) {
+				setResponseData(invokeResults);
+				setStatus(200);
+			} else if (error) {
+				setResponseData(error.message);
+				setStatus(error.actual.code);
+			}
+			setInvokeState(FUNCTIONS.INVOKED);
+		} else setDidMount(true);
+	}, [error, success]);
 
 	return (
 		<Modal
@@ -101,11 +121,11 @@ const InvokeFunctionModal = ({ functionName, invocationCount, handleCancel }) =>
 				/>
 			</Row>
 			<Row style={{ marginTop: '16px' }}>
-				<Button disabled={!isValidJSON} onClick={handleSubmit} type="primary">
+				<Button disabled={!isValidJSON || loading} onClick={handleSubmit} type="primary">
 					Invoke
 				</Button>
 			</Row>
-			{invokeState === FUNCTIONS.INVOKING ? (
+			{loading ? (
 				<Skeleton />
 			) : (
 				invokeState !== FUNCTIONS.NOT_INVOKED && (
@@ -128,4 +148,18 @@ InvokeFunctionModal.defaultProps = {
 	invocationCount: 0,
 };
 
-export default InvokeFunctionModal;
+const mapStateToProps = state => ({
+	loading: get(state, '$getAppFunctions.isInvoking'),
+	error: get(state, '$getAppFunctions.error'),
+	success: get(state, '$getAppFunctions.success'),
+	invokeResults: get(state, '$getAppFunctions.invokeResults'),
+});
+
+const mapDispatchToProps = dispatch => ({
+	invokeFunction: (name, payload) => dispatch(invokeFunction(name, payload)),
+});
+
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps,
+)(InvokeFunctionModal);

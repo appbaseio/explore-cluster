@@ -32,8 +32,8 @@ function InvokeButton({ item }) {
 			{visible && (
 				<InvokeFunctionModal
 					handleCancel={() => setVisible(false)}
-					invocationCount={item.function.invocation_count}
-					functionName={item._id}
+					invocationCount={item.invocationCount}
+					functionName={item.function.service}
 				/>
 			)}
 		</>

@@ -42,7 +42,7 @@ const DeployFunctionModal = ({
 					description: error,
 				});
 			}
-		} else if (!didMount) setDidMount(true);
+		} else setDidMount(true);
 	}, [error, success]);
 
 	const handleSubmit = () => {
