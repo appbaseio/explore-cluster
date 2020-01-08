@@ -34,24 +34,6 @@ class TriggerFunction extends React.Component {
 		};
 	}
 
-	componentDidUpdate(prevProps) {
-		const {
-			error: error1,
-			function: { service },
-		} = this.props.node || {};
-		if (prevProps.node.error !== error1) {
-			if (error1) {
-				notification.error({
-					message: 'Error',
-					description: error1,
-				});
-			} else {
-				message.success(`${service} triggered successfully`);
-				this.handleModal();
-			}
-		}
-	}
-
 	handleModal = () => {
 		this.setState(prevState => ({
 			isVisible: !prevState.isVisible,
@@ -71,6 +53,16 @@ class TriggerFunction extends React.Component {
 			},
 			extraRequestPayload: parsedValue,
 			expression,
+		}).then((res) => {
+			if (res && res.error) {
+				notification.error({
+					message: 'Error',
+					description: res.error.message,
+				});
+			} else {
+				message.success(`${node.function.service} triggered successfully`);
+				this.handleModal();
+			}
 		});
 	};
 
