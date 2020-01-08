@@ -119,7 +119,7 @@ class FunctionsPage extends React.Component {
 							dataSource={functions}
 							renderItem={item => (
 								<List.Item
-									key={item._id}
+									key={item.function.service}
 									extra={(
           <React.Fragment>
 											<TriggerFunction
