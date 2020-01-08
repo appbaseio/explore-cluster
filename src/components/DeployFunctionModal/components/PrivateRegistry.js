@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
  Button, Collapse, Form, Input, notification, Row, message,
@@ -14,6 +14,16 @@ const PrivateRegistry = ({ globalError, setGlobalError }) => {
 	const [password, setPassword] = useState('');
 	const [email, setEmail] = useState('');
 	const [url, setURL] = useState('');
+
+	useEffect(() => {
+		setGlobalError({
+			...globalError,
+			username: true,
+			email: true,
+			password: true,
+			url: true,
+		});
+	}, []);
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -104,7 +114,14 @@ const PrivateRegistry = ({ globalError, setGlobalError }) => {
 							</Row>
 						</Row>
 						<Row style={{ marginTop: '16px' }}>
-							<Button onClick={handleSubmit} loading={loading} type="primary">
+							<Button
+								disabled={['email', 'username', 'password', 'url'].some(
+									item => globalError[item],
+								)}
+								onClick={handleSubmit}
+								loading={loading}
+								type="primary"
+							>
 								Save Private Registry
 							</Button>
 						</Row>
