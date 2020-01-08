@@ -23,6 +23,16 @@ const headerStyle = css`
 	}
 `;
 
+const handlerCode = `module.exports = (event, context) => {
+    if (event.body && event.body.env && event.body.env.query === "iphone") {
+        event.body.env.query = "iphone X"
+    }
+    context
+        .status(200)
+        .succeed(event.body);
+}
+`;
+
 const Code = ({ text }) => (
 	<Paragraph style={{ display: 'flex', alignItems: 'baseline', margin: 0 }} copyable={{ text }}>
 		<pre
@@ -51,7 +61,6 @@ const PanelHeader = ({ icon, text, title }) => (
 		</div>
 	</div>
 );
-
 
 class CreateFunction extends React.Component {
 	state = { visible: false };
@@ -132,17 +141,7 @@ class CreateFunction extends React.Component {
 							<Paragraph>
 								Here you can add business logic, example if you want to change query
 							</Paragraph>
-							<Code
-								text="module.exports = async (event, context) => {
-									let result;
-    if (event.env.query == 'iphone') {
-       result.env.query = 'iphone x';
-    }
-   return context
-        .status(200)
-        .succeed(result);
-}"
-							/>
+							<Code text={handlerCode} />
 							<Paragraph strong>6. Update image name</Paragraph>
 							<Paragraph>
 								In functionName.yaml file, update image name to either your
@@ -155,16 +154,19 @@ class CreateFunction extends React.Component {
 						</Collapse.Panel>
 						<Collapse.Panel
 							header={(
-								<PanelHeader
+        <PanelHeader
 									title="Quick Tutorial"
 									icon="play-circle"
 									text="Here is a small video which will explain how to create a server less function built using NodeJS."
 								/>
-							)}
+      )}
 							showArrow={false}
 							key={2}
 						>
-							<Button type="primary"><Icon type="play-circle" />Watch the tutorial</Button>
+							<Button type="primary">
+								<Icon type="play-circle" />
+								Watch the tutorial
+							</Button>
 						</Collapse.Panel>
 					</Collapse>
 				</Modal>

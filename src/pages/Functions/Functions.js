@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import {
- Row, Col, Button, Icon, List, Switch, Card, Divider, Tooltip,
+ Button, Card, Col, Divider, Icon, List, Row, Switch, Tooltip,
 } from 'antd';
 import { connect } from 'react-redux';
 import { string } from 'prop-types';
@@ -13,6 +13,7 @@ import CreateFunction from './CreateFunction';
 import TriggerFunction from './TriggerFunction';
 import InvokeFunctionModal from '../../components/InvokeFunctionModal';
 import DeployFunctionModal from '../../components/DeployFunctionModal';
+import DeleteFunction from './DeleteFunction';
 
 const IconText = ({ type, text }) => (
 	<span>
@@ -128,6 +129,10 @@ class FunctionsPage extends React.Component {
 											/>
 
 											<InvokeButton item={item} />
+											<DeleteFunction
+												name={item.function.service}
+												loading={item.isDeleting}
+											/>
 										</React.Fragment>
         )}
 								>
