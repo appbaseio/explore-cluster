@@ -26,10 +26,10 @@ const PrivateRegistry = ({ globalError, setGlobalError }) => {
 				registry_url: url,
 			});
 			message.success(response);
-		} catch (e) {
+		} catch (error) {
 			notification.error({
 				message: 'Error',
-				description: e,
+				description: error,
 			});
 		}
 		setLoading(false);

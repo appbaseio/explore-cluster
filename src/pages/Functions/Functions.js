@@ -79,12 +79,12 @@ class FunctionsPage extends React.Component {
 				<Header compact>
 					<Row type="flex" justify="space-between" align="middle" gutter={16}>
 						<Col lg={18}>
-							<h2>Deployed Functions</h2>
+							<h2>Functions</h2>
 							<Row>
 								<Col lg={18}>
 									<p>
-										Bring data from JSON/CSV/ElasticSearch/SQL sources into
-										appbase.io via GUI.
+										Create &quot;If this, then that&quot; style functions to
+										add your own custom search and security logic.
 									</p>
 								</Col>
 							</Row>
