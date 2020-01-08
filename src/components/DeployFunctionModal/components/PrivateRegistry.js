@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import {
  Button, Collapse, Form, Input, notification, Row, message,
 } from 'antd';
@@ -8,16 +7,17 @@ import { handleInputClosure, renderInputField } from '../helper';
 import { modalHeading } from '../../../pages/HomePage/styles';
 import { setPrivateRegistry } from '../../../utils';
 
-const PrivateRegistry = ({ globalError, setGlobalError }) => {
+const PrivateRegistry = () => {
 	const [loading, setLoading] = useState(false);
 	const [username, setUserName] = useState('');
 	const [password, setPassword] = useState('');
 	const [email, setEmail] = useState('');
 	const [url, setURL] = useState('');
+	const [localError, setLocalError] = useState({});
 
 	useEffect(() => {
-		setGlobalError({
-			...globalError,
+		setLocalError({
+			...localError,
 			username: true,
 			email: true,
 			password: true,
@@ -44,13 +44,13 @@ const PrivateRegistry = ({ globalError, setGlobalError }) => {
 		}
 		setLoading(false);
 	};
-	const handleInputRequired = handleInputClosure(setGlobalError, globalError);
+	const handleInputRequired = handleInputClosure(setLocalError, localError);
 
 	const handleEmailChange = (e) => {
 		const { value } = e.target;
 		const hasError = Validators.email({ value }) || {};
 		setEmail(value);
-		setGlobalError({ ...globalError, email: hasError.email });
+		setLocalError({ ...localError, email: hasError.email });
 	};
 
 	return (
@@ -72,7 +72,7 @@ const PrivateRegistry = ({ globalError, setGlobalError }) => {
 									Username
 								</h3>
 								{renderInputField({
-									globalError,
+									globalError: localError,
 									fieldName: 'username',
 									fieldValue: username,
 									handleInputRequired,
@@ -82,7 +82,7 @@ const PrivateRegistry = ({ globalError, setGlobalError }) => {
 							<Row>
 								<h3 className={modalHeading}>Password</h3>
 								{renderInputField({
-									globalError,
+									globalError: localError,
 									fieldName: 'password',
 									fieldValue: password,
 									handleInputRequired,
@@ -95,8 +95,8 @@ const PrivateRegistry = ({ globalError, setGlobalError }) => {
 							<Row>
 								<h3 className={modalHeading}>Email</h3>
 								<Form.Item
-									validateStatus={globalError.email ? 'error' : null}
-									help={globalError.email ? 'Enter a valid email id' : ''}
+									validateStatus={localError.email ? 'error' : null}
+									help={localError.email ? 'Enter a valid email id' : ''}
 									style={{ marginBottom: 0 }}
 								>
 									<Input value={email} onChange={handleEmailChange} />
@@ -105,7 +105,7 @@ const PrivateRegistry = ({ globalError, setGlobalError }) => {
 							<Row>
 								<h3 className={modalHeading}>Registry URL</h3>
 								{renderInputField({
-									globalError,
+									globalError: localError,
 									fieldName: 'url',
 									fieldValue: url,
 									handleInputRequired,
@@ -115,9 +115,7 @@ const PrivateRegistry = ({ globalError, setGlobalError }) => {
 						</Row>
 						<Row style={{ marginTop: '16px' }}>
 							<Button
-								disabled={['email', 'username', 'password', 'url'].some(
-									item => globalError[item],
-								)}
+								disabled={Object.values(localError).some(item => item)}
 								onClick={handleSubmit}
 								loading={loading}
 								type="primary"
@@ -130,11 +128,6 @@ const PrivateRegistry = ({ globalError, setGlobalError }) => {
 			</Collapse>
 		</>
 	);
-};
-
-PrivateRegistry.propTypes = {
-	globalError: PropTypes.object.isRequired,
-	setGlobalError: PropTypes.func.isRequired,
 };
 
 export default PrivateRegistry;
