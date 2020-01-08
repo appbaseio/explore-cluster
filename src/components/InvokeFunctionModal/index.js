@@ -47,6 +47,7 @@ const InvokeFunctionModal = ({
 }) => {
 	const [didMount, setDidMount] = useState(false);
 	const [requestData, setRequestData] = useState();
+	const [parsedData, setParsedData] = useState({});
 	const [isValidJSON, setIsValidJSON] = useState(true);
 	const [status, setStatus] = useState();
 	const [roundTrip, setRoundTrip] = useState();
@@ -64,7 +65,7 @@ const InvokeFunctionModal = ({
 	const handleRequestDataChange = (value) => {
 		let isValid = true;
 		try {
-			JSON.parse(value);
+			setParsedData(JSON.parse(value));
 		} catch (e) {
 			isValid = false;
 		}
@@ -74,7 +75,7 @@ const InvokeFunctionModal = ({
 
 	const handleSubmit = () => {
 		setInvokeState(FUNCTIONS.INVOKING);
-		invokeFunction(functionName, requestData);
+		invokeFunction(functionName, parsedData);
 	};
 
 	useEffect(() => {
