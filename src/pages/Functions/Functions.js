@@ -42,6 +42,77 @@ function InvokeButton({ item }) {
 	);
 }
 
+function BeautifulDnd(props: {
+	onDragStart: () => void,
+	onDragEnd: result => undefined,
+	render: (dropProvided: any) => *,
+}) {
+	return (
+		<DragDropContext onDragStart={props.onDragStart} onDragEnd={props.onDragEnd}>
+			<section style={{ padding: 50 }}>
+				<Card bordered title="All Functions">
+					<Droppable droppableId="LIST">{props.render}</Droppable>
+				</Card>
+			</section>
+		</DragDropContext>
+	);
+}
+
+function DndDraggable(props: { item: T, index: number, render: (dragProvided: any) => * }) {
+	return (
+		<Draggable draggableId={props.item.function.service} index={props.index}>
+			{props.render}
+		</Draggable>
+	);
+}
+
+function Actions(props: { item: T, refetchFunction: () => void }) {
+	return (
+		<React.Fragment>
+			<TriggerFunction
+				isLoading={props.item.triggerUpdation}
+				refetchFunction={props.refetchFunction}
+				node={props.item}
+			/>
+
+			<InvokeButton item={props.item} />
+			<DeleteFunction name={props.item.function.service} loading={props.item.isDeleting} />
+		</React.Fragment>
+	);
+}
+
+function FunctionItem(props: { item: T, onChange: (e?: any) => undefined }) {
+	return (
+		<List.Item.Meta
+			title={(
+    <React.Fragment>
+					{props.item.function.service}
+					<Tooltip title={`${props.item.enabled ? 'Disable' : 'Enable'} Function`}>
+						<Switch
+							style={{
+								marginLeft: 8,
+							}}
+							loading={props.item.isToggling}
+							onChange={props.onChange}
+							checked={props.item.enabled}
+						/>
+					</Tooltip>
+				</React.Fragment>
+  )}
+			description={[
+				<IconText type="container" key="container" text={props.item.function.image} />,
+				<Divider
+					type="vertical"
+					style={{
+						margin: '0 16px',
+					}}
+				/>,
+				<IconText text={props.item.function.invocation_count} type="api" key="api" />,
+			]}
+		/>
+	);
+}
+
 class FunctionsPage extends React.Component {
 	state = { invokeModal: false, deployModal: false };
 
@@ -74,7 +145,7 @@ class FunctionsPage extends React.Component {
 		if (window.navigator.vibrate) {
 			window.navigator.vibrate(100);
 		}
-	}
+	};
 
 	onDragEnd = (result) => {
 		if (!result.destination) return;
@@ -139,132 +210,48 @@ class FunctionsPage extends React.Component {
 						</Col>
 					</Row>
 				</Header>
-				<DragDropContext onDragStart={this.onDragStart} onDragEnd={this.onDragEnd}>
-					<section style={{ padding: 50 }}>
-						<Card bordered title="All Functions">
-							<Droppable droppableId="LIST">
-								{dropProvided => (
-									<div ref={dropProvided.innerRef}>
-										<List
-											rowKey={item => item.function.service}
-											itemLayout="vertical"
-											dataSource={this.sortedDataSource}
-											renderItem={(item, index) => (
-												<Draggable
+				<BeautifulDnd
+					onDragStart={this.onDragStart}
+					onDragEnd={this.onDragEnd}
+					render={dropProvided => (
+						<div ref={dropProvided.innerRef}>
+							<List
+								rowKey={item => item.function.service}
+								itemLayout="vertical"
+								dataSource={this.sortedDataSource}
+								renderItem={(item, index) => (
+									<DndDraggable
+										key={item.function.service}
+										item={item}
+										index={index}
+										render={dragProvided => (
+											<div
+												ref={dragProvided.innerRef}
+												{...dragProvided.draggableProps}
+												{...dragProvided.dragHandleProps}
+											>
+												<List.Item
 													key={item.function.service}
-													draggableId={item.function.service}
-													index={index}
+													extra={(
+              <Actions
+															item={item}
+															refetchFunction={this.refetchFunction}
+														/>
+            )}
 												>
-													{(dragProvided) => {
-														console.log({ dragProvided });
-														return (
-															<div
-																ref={dragProvided.innerRef}
-																{...dragProvided.draggableProps}
-																{...dragProvided.dragHandleProps}
-															>
-																<List.Item
-																	key={item.function.service}
-																	extra={(
-                  <React.Fragment>
-																			<TriggerFunction
-																				isLoading={
-																					item.triggerUpdation
-																				}
-																				refetchFunction={
-																					this
-																						.refetchFunction
-																				}
-																				node={item}
-																			/>
-
-																			<InvokeButton
-																				item={item}
-																			/>
-																			<DeleteFunction
-																				name={
-																					item.function
-																						.service
-																				}
-																				loading={
-																					item.isDeleting
-																				}
-																			/>
-																		</React.Fragment>
-                )}
-																>
-																	<List.Item.Meta
-																		title={(
-                   <React.Fragment>
-																				{
-																					item.function
-																						.service
-																				}
-																				<Tooltip
-																					title={`${
-																						item.enabled
-																							? 'Disable'
-																							: 'Enable'
-																					} Function`}
-																				>
-																					<Switch
-																						style={{
-																							marginLeft: 8,
-																						}}
-																						loading={
-																							item.isToggling
-																						}
-																						onChange={e => this.handleEnable(
-																								e,
-																								item,
-																							)
-																						}
-																						checked={
-																							item.enabled
-																						}
-																					/>
-																				</Tooltip>
-																			</React.Fragment>
-                 )}
-																		description={[
-																			<IconText
-																				type="container"
-																				key="container"
-																				text={
-																					item.function
-																						.image
-																				}
-																			/>,
-																			<Divider
-																				type="vertical"
-																				style={{
-																					margin:
-																						'0 16px',
-																				}}
-																			/>,
-																			<IconText
-																				text={
-																					item.function
-																						.invocation_count
-																				}
-																				type="api"
-																				key="api"
-																			/>,
-																		]}
-																	/>
-																</List.Item>
-															</div>
-														);
-													}}
-												</Draggable>
-											)}
-										/>
-									</div>
+													<FunctionItem
+														item={item}
+														onChange={e => this.handleEnable(e, item)}
+													/>
+												</List.Item>
+											</div>
+										)}
+									/>
 								)}
-							</Droppable>
-						</Card>
-					</section>
-				</DragDropContext>
+							/>
+						</div>
+					)}
+				/>
 				{deployModal && (
 					<DeployFunctionModal handleCancel={() => this.handleCancel('deployModal')} />
 				)}
