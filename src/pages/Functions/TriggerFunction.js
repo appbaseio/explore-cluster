@@ -1,11 +1,12 @@
 import React from 'react';
 import {
- Button, Modal, Icon, Typography, Radio, Popover,
+ Button, Icon, message, Modal, notification, Popover, Radio, Typography,
 } from 'antd';
 import { connect } from 'react-redux';
 import { css } from 'emotion';
 import TextArea from 'antd/lib/input/TextArea';
 import { updateFunctions } from '../../batteries/modules/actions';
+import Ace from '../../batteries/components/SearchSandbox/containers/AceEditor';
 
 const { Paragraph } = Typography;
 
@@ -25,10 +26,30 @@ class TriggerFunction extends React.Component {
 		this.state = {
 			isVisible: false,
 			type: (props.node && props.node.trigger && props.node.trigger.type) || 'filter',
-			when: (props.node && props.node.trigger && props.node.trigger.when) || 'after',
+			when: (props.node && props.node.trigger && props.node.trigger.when) || 'before',
 			request: '',
 			expression: '',
+			isValidJSON: true,
+			parsedValue: {},
 		};
+	}
+
+	componentDidUpdate(prevProps) {
+		const {
+			error: error1,
+			function: { service },
+		} = this.props.node || {};
+		if (prevProps.node.error !== error1) {
+			if (error1) {
+				notification.error({
+					message: 'Error',
+					description: error1,
+				});
+			} else {
+				message.success(`${service} triggered successfully`);
+				this.handleModal();
+			}
+		}
 	}
 
 	handleModal = () => {
@@ -40,7 +61,7 @@ class TriggerFunction extends React.Component {
 	handleSave = () => {
 		const { putFunctions, node } = this.props;
 		const {
- type, when, expression, request,
+ type, when, expression, parsedValue,
 } = this.state;
 		putFunctions(node.function.service, {
 			...node,
@@ -48,9 +69,9 @@ class TriggerFunction extends React.Component {
 				type,
 				executeBefore: when === 'before',
 			},
-			extraRequestPayload: request || {},
+			extraRequestPayload: parsedValue,
 			expression,
-		}).then(() => this.handleModal());
+		});
 	};
 
 	handleChange = (e) => {
@@ -59,9 +80,20 @@ class TriggerFunction extends React.Component {
 		});
 	};
 
+	handleRequestChange = (value) => {
+		let isValid = true;
+		let parsedValue;
+		try {
+			parsedValue = JSON.parse(value);
+		} catch (e) {
+			isValid = false;
+		}
+		this.setState({ parsedValue, request: value, isValidJSON: isValid });
+	};
+
 	render() {
 		const {
- isVisible, type, when, expression, request,
+ isVisible, type, when, expression, request, isValidJSON,
 } = this.state;
 		const { node, isLoading } = this.props;
 		const enviroment = `index = ['abc']
@@ -102,6 +134,7 @@ filter = [{"year": "2018"}]`;
 					okText="Save"
 					okButtonProps={{
 						loading: isLoading,
+						disabled: !isValidJSON,
 					}}
 				>
 					<Paragraph style={{ marginBottom: 10 }} strong>
@@ -141,11 +174,21 @@ filter = [{"year": "2018"}]`;
 						<Paragraph className={paragraphStyle} strong>
 							Extra Request
 						</Paragraph>
-						<TextArea
-							placeholder="Enter Extra Request"
-							onChange={this.handleChange}
+						<Ace
+							mode="json"
 							value={request}
-							name="request"
+							onChange={this.handleRequestChange}
+							name="editor-JSON"
+							fontSize={14}
+							showPrintMargin
+							style={{ width: '100%', maxHeight: '100px' }}
+							showGutter
+							highlightActiveLine
+							setOptions={{
+								showLineNumbers: true,
+								tabSize: 2,
+							}}
+							editorProps={{ $blockScrolling: true }}
 						/>
 					</React.Fragment>
 				</Modal>
