@@ -227,7 +227,6 @@ export async function setPrivateRegistry(payload = {}) {
 		body: JSON.stringify(payload),
 	});
 	const data = await response.json();
-	console.log({ data });
 	if (response.status >= 400) {
 		throw data.error.message;
 	}
