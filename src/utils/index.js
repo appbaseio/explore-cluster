@@ -213,6 +213,28 @@ export const deleteRole = (appId, username) =>
 			.then(data => resolve({ ...data.body, message: data.message }))
 			.catch(error => reject(error));
 	});
+
+// set private registry
+export async function setPrivateRegistry(payload = {}) {
+	const ACC_API = getURL();
+	const authToken = sessionStorage.getItem('authToken');
+
+	const response = await fetch(`${ACC_API}/_functions/registry_config`, {
+		headers: {
+			Authorization: `Basic ${authToken}`,
+		},
+		method: 'PUT',
+		body: JSON.stringify(payload),
+	});
+	const data = await response.json();
+	console.log({ data });
+	if (response.status >= 400) {
+		throw data.error.message;
+	}
+
+	return data.message;
+}
+
 // checks whether it is a valid URL
 export const isAbsoluteURL = str => /^[a-z][a-z0-9+.-]*:/.test(str);
 

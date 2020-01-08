@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import {
- Button, Collapse, Form, Input, Row, Skeleton,
+ Button, Collapse, Form, Input, notification, Row, message,
 } from 'antd';
 import { Validators } from 'react-reactive-form';
-import { handleInputClosure, later, renderInputField } from '../helper';
+import { handleInputClosure, renderInputField } from '../helper';
 import { modalHeading } from '../../../pages/HomePage/styles';
+import { setPrivateRegistry } from '../../../utils';
 
 const PrivateRegistry = ({ globalError, setGlobalError }) => {
 	const [loading, setLoading] = useState(false);
@@ -14,21 +15,24 @@ const PrivateRegistry = ({ globalError, setGlobalError }) => {
 	const [email, setEmail] = useState('');
 	const [url, setURL] = useState('');
 
-	// useEffect(() => {
-	// 	const apiCall = async () => {
-	// 		setLoading(true);
-	// 		// TODO: replace with API
-	// 		await later(500);
-	// 		setUserName('anuj');
-	// 		setPassword('shah');
-	// 		setLoading(false);
-	// 	};
-	// 	apiCall();
-	// }, []);
-
-	const handleSubmit = (e) => {
+	const handleSubmit = async (e) => {
 		e.preventDefault();
-		//	TODO: handle POST method
+		setLoading(true);
+		try {
+			const response = await setPrivateRegistry({
+				username,
+				password,
+				email,
+				registry_url: url,
+			});
+			message.success(response);
+		} catch (e) {
+			notification.error({
+				message: 'Error',
+				description: e,
+			});
+		}
+		setLoading(false);
 	};
 	const handleInputRequired = handleInputClosure(setGlobalError, globalError);
 
@@ -38,8 +42,6 @@ const PrivateRegistry = ({ globalError, setGlobalError }) => {
 		setEmail(value);
 		setGlobalError({ ...globalError, email: hasError.email });
 	};
-
-	if (loading) return <Skeleton />;
 
 	return (
 		<>
@@ -102,7 +104,7 @@ const PrivateRegistry = ({ globalError, setGlobalError }) => {
 							</Row>
 						</Row>
 						<Row style={{ marginTop: '16px' }}>
-							<Button onClick={handleSubmit} type="primary">
+							<Button onClick={handleSubmit} loading={loading} type="primary">
 								Save Private Registry
 							</Button>
 						</Row>
