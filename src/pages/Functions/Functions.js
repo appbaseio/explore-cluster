@@ -7,6 +7,7 @@ import { string } from 'prop-types';
 import get from 'lodash/get';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
+import { css } from 'emotion';
 import Loader from '../../components/Loader';
 import Header from '../../components/Header';
 import { getFunctions, reorderFunction, updateFunctions } from '../../batteries/modules/actions';
@@ -69,6 +70,12 @@ function DndDraggable(props: { item: T, index: number, render: (dragProvided: an
 function Actions(props: { item: T, refetchFunction: () => void }) {
 	return (
 		<React.Fragment>
+			<div className="showOnHover">
+				<DeleteFunction
+					name={props.item.function.service}
+					loading={props.item.isDeleting}
+				/>
+			</div>
 			<TriggerFunction
 				isLoading={props.item.triggerUpdation}
 				refetchFunction={props.refetchFunction}
@@ -76,7 +83,6 @@ function Actions(props: { item: T, refetchFunction: () => void }) {
 			/>
 
 			<InvokeButton item={props.item} />
-			<DeleteFunction name={props.item.function.service} loading={props.item.isDeleting} />
 		</React.Fragment>
 	);
 }
@@ -102,6 +108,7 @@ function FunctionItem(props: { item: T, onChange: (e?: any) => undefined }) {
 			description={[
 				<IconText type="container" key="container" text={props.item.function.image} />,
 				<Divider
+					key={props.item.function.service}
 					type="vertical"
 					style={{
 						margin: '0 16px',
@@ -112,6 +119,18 @@ function FunctionItem(props: { item: T, onChange: (e?: any) => undefined }) {
 		/>
 	);
 }
+
+const listClass = css`
+	.showOnHover {
+		display: none;
+	}
+	&:hover,
+	&:focus {
+		.showOnHover {
+			display: initial;
+		}
+	}
+`;
 
 class FunctionsPage extends React.Component {
 	state = { invokeModal: false, deployModal: false };
@@ -231,6 +250,7 @@ class FunctionsPage extends React.Component {
 												{...dragProvided.dragHandleProps}
 											>
 												<List.Item
+													className={listClass}
 													key={item.function.service}
 													extra={(
               <Actions
