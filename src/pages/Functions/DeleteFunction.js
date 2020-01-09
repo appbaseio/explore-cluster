@@ -33,7 +33,6 @@ function DeleteFunction({ name, deleteFunctions, loading }) {
 				<Input
 					onChange={(event) => {
 						const { value } = event.target;
-						console.log({ value });
 						setDisabled(value !== name);
 					}}
 					style={{ marginTop: '12px' }}

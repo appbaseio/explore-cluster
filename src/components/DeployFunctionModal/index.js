@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
- message, Modal, notification, Row,
+ message, Modal, notification, Radio, Row,
 } from 'antd';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
@@ -22,6 +22,7 @@ const DeployFunctionModal = ({
 	success,
 }) => {
 	const [didMount, setDidMount] = useState(false);
+	const [radioValue, setValue] = useState('yes');
 	const [functionName, setFunctionName] = useState(funcName);
 	const [dockerImage, setDockerImage] = useState(dockerImg);
 	const [globalError, setGlobalError] = useState({});
@@ -51,7 +52,11 @@ const DeployFunctionModal = ({
 			if (key && value) objAcc[key] = value;
 			return objAcc;
 		}, {});
-		deployFunction(functionName, { image: dockerImage, envVars: parsedEnvData });
+		deployFunction(functionName, {
+			image: dockerImage,
+			envVars: parsedEnvData,
+			secrets: radioValue === 'no' ? ['registry'] : undefined,
+		});
 	};
 
 	return (
@@ -88,8 +93,20 @@ const DeployFunctionModal = ({
 					})}
 				</Row>
 				<Row>
-					<PrivateRegistry globalError={globalError} setGlobalError={setGlobalError} />
+					<h3 className={modalHeading}>Is your docker image public?</h3>
+					<Radio.Group onChange={e => setValue(e.target.value)} value={radioValue}>
+						<Radio value="yes">yes</Radio>
+						<Radio value="no">no</Radio>
+					</Radio.Group>
 				</Row>
+				{radioValue === 'no' && (
+					<Row>
+						<PrivateRegistry
+							globalError={globalError}
+							setGlobalError={setGlobalError}
+						/>
+					</Row>
+				)}
 				<Row>
 					<EnvTable dataSource={envDataSource} setData={setEnvData} />
 				</Row>

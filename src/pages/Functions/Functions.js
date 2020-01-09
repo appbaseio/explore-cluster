@@ -271,6 +271,7 @@ class FunctionsPage extends React.Component {
 									/>
 								)}
 							/>
+							{dropProvided.placeholder}
 						</div>
 					)}
 				/>
