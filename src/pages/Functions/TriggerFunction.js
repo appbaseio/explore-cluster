@@ -4,6 +4,7 @@ import {
 } from 'antd';
 import { connect } from 'react-redux';
 import { css } from 'emotion';
+import { get } from 'lodash';
 import TextArea from 'antd/lib/input/TextArea';
 import { updateFunctions } from '../../batteries/modules/actions';
 import Ace from '../../batteries/components/SearchSandbox/containers/AceEditor';
@@ -27,10 +28,10 @@ class TriggerFunction extends React.Component {
 			isVisible: false,
 			type: (props.node && props.node.trigger && props.node.trigger.type) || 'filter',
 			when: (props.node && props.node.trigger && props.node.trigger.when) || 'before',
-			request: '',
-			expression: '',
+			request: JSON.stringify(get(props.node, 'extraRequestPayload', {})),
+			expression: (props.node && props.node.trigger && props.node.trigger.expression) || '',
 			isValidJSON: true,
-			parsedValue: {},
+			parsedValue: get(props.node, 'extraRequestPayload', {}),
 		};
 	}
 
@@ -50,9 +51,9 @@ class TriggerFunction extends React.Component {
 			trigger: {
 				type,
 				executeBefore: when === 'before',
+				expression,
 			},
 			extraRequestPayload: parsedValue,
-			expression,
 		}).then((res) => {
 			if (res && res.error) {
 				notification.error({
