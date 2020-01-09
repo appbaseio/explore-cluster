@@ -68,6 +68,19 @@ function DndDraggable(props: { item: T, index: number, render: (dragProvided: an
 	);
 }
 
+function UpdateFunction({ item }) {
+	const [visible, setVisible] = useState(false);
+	return (
+		<>
+			<Button onClick={() => setVisible(true)} style={{ marginRight: 8 }}>
+				<Icon type="edit" />
+				Update Function
+			</Button>
+			{visible && <DeployFunctionModal handleCancel={() => setVisible(false)} node={item} />}
+		</>
+	);
+}
+
 function Actions(props: { item: T, refetchFunction: () => void }) {
 	return (
 		<React.Fragment>
@@ -77,6 +90,7 @@ function Actions(props: { item: T, refetchFunction: () => void }) {
 					loading={props.item.isDeleting}
 				/>
 			</div>
+			<UpdateFunction item={props.item} />
 			<TriggerFunction
 				isLoading={props.item.triggerUpdation}
 				refetchFunction={props.refetchFunction}

@@ -9,42 +9,56 @@ import PrivateRegistry from './components/PrivateRegistry';
 import { handleInputClosure, isTrue, renderInputField } from './helper';
 import EnvTable from './components/EnvTable';
 import { modalHeading } from '../../pages/HomePage/styles';
-import { createFunction } from '../../batteries/modules/actions';
+import { createFunction, updateFunctions } from '../../batteries/modules/actions';
 
 const DeployFunctionModal = ({
-	dockerImg,
-	funcName,
-	envData,
+	node,
 	handleCancel,
 	deployFunction,
 	loading,
 	error,
 	success,
+	putFunctions,
 }) => {
+	const oriEnvData = get(node, 'function.envVars', {});
+	const revEnvData = Object.keys(oriEnvData).map(key => ({
+		key,
+		value: oriEnvData[key],
+	}));
 	const [didMount, setDidMount] = useState(false);
-	const [radioValue, setValue] = useState('yes');
-	const [functionName, setFunctionName] = useState(funcName);
-	const [dockerImage, setDockerImage] = useState(dockerImg);
+	const [radioValue, setValue] = useState(get(node, 'function.secrets') ? 'no' : 'yes');
+	const [functionName, setFunctionName] = useState(get(node, 'function.service'));
+	const [dockerImage, setDockerImage] = useState(get(node, 'function.image'));
 	const [globalError, setGlobalError] = useState({});
 	const [envDataSource, setEnvData] = useState(
-		envData.length === 0 ? [{ key: '', value: '' }] : envData,
+		revEnvData.length === 0 ? [{ key: '', value: '' }] : revEnvData,
 	);
 
 	const handleInputRequired = handleInputClosure(setGlobalError, globalError);
 
 	useEffect(() => {
 		if (didMount) {
-			if (success) {
-				message.success(`${functionName} function deployed successfully`);
-				handleCancel();
-			} else if (error) {
-				notification.error({
-					message: 'Error',
-					description: error,
-				});
-			}
+			if (node) {
+				if (node.success) {
+					message.success(`${functionName} function updated successfully`);
+					handleCancel();
+				} else if (node.error) {
+					notification.error({
+						message: 'Error',
+						description: node.error,
+					});
+				}
+			} else if (success) {
+					message.success(`${functionName} function deployed successfully`);
+					handleCancel();
+				} else if (error) {
+					notification.error({
+						message: 'Error',
+						description: error,
+					});
+				}
 		} else setDidMount(true);
-	}, [error, success]);
+	}, [error, success, node]);
 
 	const handleSubmit = () => {
 		const parsedEnvData = envDataSource.reduce((objAcc, envSource) => {
@@ -52,11 +66,21 @@ const DeployFunctionModal = ({
 			if (key && value) objAcc[key] = value;
 			return objAcc;
 		}, {});
-		deployFunction(functionName, {
+		const payload = {
 			image: dockerImage,
 			envVars: parsedEnvData,
 			secrets: radioValue === 'no' ? ['registry'] : undefined,
-		});
+		};
+		if (node) {
+			const newPayload = {
+				...node,
+				function: {
+					...node.function,
+					...payload,
+				},
+			};
+			putFunctions(functionName, newPayload);
+		} else deployFunction(functionName, payload);
 	};
 
 	return (
@@ -67,7 +91,7 @@ const DeployFunctionModal = ({
 			visible
 			okButtonProps={{ disabled: Object.values(globalError).some(isTrue) }}
 			onOk={handleSubmit}
-			confirmLoading={loading}
+			confirmLoading={loading || get(node, 'isToggling')}
 		>
 			<>
 				<Row>
@@ -80,6 +104,7 @@ const DeployFunctionModal = ({
 						fieldValue: functionName,
 						handleInputRequired,
 						setterFunc: setFunctionName,
+						extraProps: { disabled: !!node },
 					})}
 				</Row>
 				<Row>
@@ -116,9 +141,6 @@ const DeployFunctionModal = ({
 };
 
 DeployFunctionModal.propTypes = {
-	dockerImg: PropTypes.string,
-	funcName: PropTypes.string,
-	envData: PropTypes.array,
 	handleCancel: PropTypes.func,
 };
 
@@ -137,6 +159,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
 	deployFunction: (name, payload) => dispatch(createFunction(name, payload)),
+	putFunctions: (appName, payload) => dispatch(updateFunctions(appName, payload)),
 });
 
 export default connect(
