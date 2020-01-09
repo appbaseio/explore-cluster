@@ -16,6 +16,7 @@ import TriggerFunction from './TriggerFunction';
 import InvokeFunctionModal from '../../components/InvokeFunctionModal';
 import DeployFunctionModal from '../../components/DeployFunctionModal';
 import DeleteFunction from './DeleteFunction';
+import { getPrivateRegistry } from '../../batteries/modules/actions/registry';
 
 const IconText = ({ type, text }) => (
 	<span>
@@ -136,8 +137,9 @@ class FunctionsPage extends React.Component {
 	state = { invokeModal: false, deployModal: false };
 
 	componentDidMount() {
-		const { fetchFunctions, appName } = this.props;
+		const { fetchFunctions, appName, fetchRegistries } = this.props;
 		fetchFunctions(appName);
+		fetchRegistries();
 	}
 
 	refetchFunction = () => {
@@ -295,6 +297,7 @@ const mapDispatchToProps = dispatch => ({
 	putFunctions: (appName, payload) => dispatch(updateFunctions(appName, payload)),
 	fetchFunctions: appName => dispatch(getFunctions(appName)),
 	reorderFunctions: (source, destination) => dispatch(reorderFunction(source, destination)),
+	fetchRegistries: () => dispatch(getPrivateRegistry()),
 });
 
 export default connect(

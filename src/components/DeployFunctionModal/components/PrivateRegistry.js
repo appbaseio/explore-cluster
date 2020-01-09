@@ -3,46 +3,50 @@ import {
  Button, Collapse, Form, Input, notification, Row, message,
 } from 'antd';
 import { Validators } from 'react-reactive-form';
+import get from 'lodash/get';
+import { connect } from 'react-redux';
 import { handleInputClosure, renderInputField } from '../helper';
 import { modalHeading } from '../../../pages/HomePage/styles';
-import { setPrivateRegistry } from '../../../utils';
+import { updatePrivateRegistry } from '../../../batteries/modules/actions/registry';
 
-const PrivateRegistry = () => {
-	const [loading, setLoading] = useState(false);
-	const [username, setUserName] = useState('');
-	const [password, setPassword] = useState('');
-	const [email, setEmail] = useState('');
-	const [url, setURL] = useState('');
+const PrivateRegistry = ({
+ registry, updateRegistry, error, success, loading,
+}) => {
+	const [didMount, setDidMount] = useState(false);
+	const [username, setUserName] = useState(registry.username);
+	const [password, setPassword] = useState(registry.password);
+	const [email, setEmail] = useState(registry.email);
+	const [url, setURL] = useState(registry.registry_url);
 	const [localError, setLocalError] = useState({});
 
 	useEffect(() => {
-		setLocalError({
-			...localError,
-			username: true,
-			email: true,
-			password: true,
-			url: true,
-		});
-	}, []);
+		if (didMount) {
+			if (success) {
+				message.success('Secret saved successfully');
+			} else if (error) {
+				notification.error({
+					message: 'Error',
+					description: error,
+				});
+			}
+		} else setDidMount(true);
+	}, [error, success]);
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		setLoading(true);
-		try {
-			const response = await setPrivateRegistry({
-				username,
-				password,
-				email,
-				registry_url: url,
-			});
-			message.success(response);
-		} catch (error) {
-			notification.error({
-				message: 'Error',
-				description: error,
-			});
-		}
-		setLoading(false);
+		setLocalError({
+			email: !email,
+			password: !password,
+			url: !url,
+			username: !username,
+		});
+		if ([email, password, url, username].some(item => !item)) return;
+		updateRegistry({
+			username,
+			password,
+			email,
+			registry_url: url,
+		});
 	};
 	const handleInputRequired = handleInputClosure(setLocalError, localError);
 
@@ -130,4 +134,18 @@ const PrivateRegistry = () => {
 	);
 };
 
-export default PrivateRegistry;
+const mapStateToProps = state => ({
+	registry: get(state, '$getAppRegistries'),
+	loading: get(state, '$getAppRegistries.updating'),
+	success: get(state, '$getAppRegistries.success'),
+	error: get(state, '$getAppRegistries.error'),
+});
+
+const mapDispatchToProps = dispatch => ({
+	updateRegistry: payload => dispatch(updatePrivateRegistry(payload)),
+});
+
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps,
+)(PrivateRegistry);
