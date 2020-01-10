@@ -17,6 +17,10 @@ import InvokeFunctionModal from '../../components/InvokeFunctionModal';
 import DeployFunctionModal from '../../components/DeployFunctionModal';
 import DeleteFunction from './DeleteFunction';
 import { getPrivateRegistry } from '../../batteries/modules/actions/registry';
+import Logs from './Logs';
+import { isValidPlan } from '../../batteries/utils';
+import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
+import Overlay from '../../components/Overlay';
 
 const IconText = ({ type, text }) => (
 	<span>
@@ -122,6 +126,23 @@ const tagStyle = css`
 	border-image: initial;
 `;
 
+const bannerDetails = {
+	title: 'Functions',
+	description: 'GUI to manage functions for query suggestions.',
+	buttonText: 'Read more',
+	icon: 'pencil',
+};
+
+function Log({ name }) {
+	const [visible, setVisible] = useState(false);
+	return (
+		<>
+			<Icon onClick={() => setVisible(true)} style={{ cursor: 'pointer' }} type="database" />
+			{visible && <Logs name={name} />}
+		</>
+	);
+}
+
 function FunctionItem(props: { item: T, onChange: (e?: any) => undefined }) {
 	const {
  function: func, enabled, availableReplicas, isToggling,
@@ -163,6 +184,8 @@ function FunctionItem(props: { item: T, onChange: (e?: any) => undefined }) {
 								name={props.item.function.service}
 								loading={props.item.isDeleting}
 							/>
+							<VerticalDivider />
+							<Log name={props.item.function.service} />
 						</div>
 					)}
 				</>
@@ -236,9 +259,26 @@ class FunctionsPage extends React.Component {
 	};
 
 	render() {
-		const { isLoading, functions } = this.props;
+		const {
+ isLoading, functions, tier, featureFunctions,
+} = this.props;
 		const { deployModal } = this.state;
 		this.sortedDataSource = (functions || []).sort((a, b) => a.order - b.order);
+
+		if (!isValidPlan(tier, featureFunctions)) {
+			return (
+				<React.Fragment>
+					<Banner {...bannerDetails} />
+					<Overlay
+						style={{
+							maxWidth: '70%',
+						}}
+						src="https://i.imgur.com/JvTEWo5.png"
+						alt="functions"
+					/>
+				</React.Fragment>
+			);
+		}
 
 		if (isLoading) {
 			return <Loader />;
@@ -353,6 +393,8 @@ const mapStateToProps = state => ({
 	user: get(state, 'user', { data: {} }),
 	isLoading: get(state, '$getAppFunctions.isFetching'),
 	functions: get(state, '$getAppFunctions.results'),
+	tier: get(state, '$getAppPlan.results.tier'),
+	featureFunctions: get(state, '$getAppPlan.results.feature_functions', false),
 });
 
 const mapDispatchToProps = dispatch => ({

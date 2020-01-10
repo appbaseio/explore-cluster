@@ -1,5 +1,6 @@
 import { chain } from 'lodash';
 import { getURL } from '../constants/config';
+import { later } from '../components/DeployFunctionModal/helper';
 
 export async function getUser(username, password, url) {
 	const ACC_API = getURL();
@@ -232,6 +233,14 @@ export async function setPrivateRegistry(payload = {}) {
 	}
 
 	return data.message;
+}
+
+// fetch logs
+export function fetchLogs(name = 'default') {
+	const ACC_API = getURL();
+	const authToken = sessionStorage.getItem('authToken');
+	// TODO: integrate logs API
+	return later(1000);
 }
 
 // checks whether it is a valid URL
