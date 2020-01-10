@@ -81,6 +81,7 @@ const PrivateRegistry = ({
 									fieldValue: username,
 									handleInputRequired,
 									setterFunc: setUserName,
+									extraProps: { placeholder: 'Enter Username' },
 								})}
 							</Row>
 							<Row>
@@ -93,6 +94,7 @@ const PrivateRegistry = ({
 									setterFunc: setPassword,
 									extraProps: {
 										type: 'password',
+										placeholder: 'Enter Password',
 									},
 								})}
 							</Row>
@@ -103,7 +105,11 @@ const PrivateRegistry = ({
 									help={localError.email ? 'Enter a valid email id' : ''}
 									style={{ marginBottom: 0 }}
 								>
-									<Input value={email} onChange={handleEmailChange} />
+									<Input
+										value={email}
+										onChange={handleEmailChange}
+										placeholder="Enter Email"
+									/>
 								</Form.Item>
 							</Row>
 							<Row>
@@ -114,6 +120,7 @@ const PrivateRegistry = ({
 									fieldValue: url,
 									handleInputRequired,
 									setterFunc: setURL,
+									extraProps: { placeholder: 'Enter Registry URL' },
 								})}
 							</Row>
 						</Row>

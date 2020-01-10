@@ -20,8 +20,8 @@ import { getPrivateRegistry } from '../../batteries/modules/actions/registry';
 
 const IconText = ({ type, text }) => (
 	<span>
-		<Icon type={type} style={{ marginRight: 8 }} />
-		{text}
+		<Icon type={type} />
+		{text && <span style={{ marginLeft: 8 }}>{text}</span>}
 	</span>
 );
 
@@ -31,7 +31,7 @@ function InvokeButton({ item }) {
 		<>
 			<Button onClick={() => setVisible(true)} style={{ marginLeft: 8 }} type="primary">
 				<Icon type="experiment" />
-				Invoke Function
+				Invoke
 			</Button>
 			{visible && (
 				<InvokeFunctionModal
@@ -72,10 +72,12 @@ function UpdateFunction({ item }) {
 	const [visible, setVisible] = useState(false);
 	return (
 		<>
-			<Button onClick={() => setVisible(true)} style={{ marginRight: 8 }}>
-				<Icon type="edit" />
-				Update Function
-			</Button>
+			<Icon
+				onClick={() => setVisible(true)}
+				style={{ cursor: 'pointer' }}
+				theme="twoTone"
+				type="edit"
+			/>
 			{visible && <DeployFunctionModal handleCancel={() => setVisible(false)} node={item} />}
 		</>
 	);
@@ -84,13 +86,6 @@ function UpdateFunction({ item }) {
 function Actions(props: { item: T, refetchFunction: () => void }) {
 	return (
 		<React.Fragment>
-			<div className="showOnHover">
-				<DeleteFunction
-					name={props.item.function.service}
-					loading={props.item.isDeleting}
-				/>
-			</div>
-			<UpdateFunction item={props.item} />
 			<TriggerFunction
 				isLoading={props.item.triggerUpdation}
 				refetchFunction={props.refetchFunction}
@@ -102,35 +97,76 @@ function Actions(props: { item: T, refetchFunction: () => void }) {
 	);
 }
 
+function VerticalDivider() {
+	return (
+		<Divider
+			type="vertical"
+			style={{
+				margin: '0 12px',
+			}}
+		/>
+	);
+}
+
+const tagStyle = css`
+	background-color: rgb(238, 238, 238);
+	color: rgb(51, 51, 51);
+	font-size: 13px;
+	font-weight: 400;
+	border-radius: 3px;
+	padding: 2px 8px;
+	margin: 0px 12px;
+	border-width: 1px;
+	border-style: solid;
+	border-color: rgb(204, 204, 204);
+	border-image: initial;
+`;
+
 function FunctionItem(props: { item: T, onChange: (e?: any) => undefined }) {
+	const {
+ function: func, enabled, availableReplicas, isToggling,
+} = props.item;
 	return (
 		<List.Item.Meta
 			title={(
     <React.Fragment>
-					{props.item.function.service}
-					<Tooltip title={`${props.item.enabled ? 'Disable' : 'Enable'} Function`}>
-						<Switch
-							style={{
-								marginLeft: 8,
-							}}
-							loading={props.item.isToggling}
-							onChange={props.onChange}
-							checked={props.item.enabled}
-						/>
-					</Tooltip>
+					{func.service}
+					{availableReplicas > 0 ? (
+						<Tooltip title={`${enabled ? 'Disable' : 'Enable'} Function`}>
+							<Switch
+								style={{
+									marginLeft: 8,
+								}}
+								loading={isToggling}
+								onChange={props.onChange}
+								checked={enabled}
+							/>
+						</Tooltip>
+					) : (
+						<span className={tagStyle}>
+							{availableReplicas === 0 ? 'failed' : 'Deployment in progress'}
+						</span>
+					)}
 				</React.Fragment>
   )}
-			description={[
-				<IconText type="container" key="container" text={props.item.function.image} />,
-				<Divider
-					key={props.item.function.service}
-					type="vertical"
-					style={{
-						margin: '0 16px',
-					}}
-				/>,
-				<IconText text={props.item.function.invocation_count} type="api" key="api" />,
-			]}
+			description={(
+    <>
+					<IconText type="container" key="container" text={props.item.function.image} />
+					<VerticalDivider />
+					<IconText text={props.item.invocationCount.toString()} type="api" key="api" />
+					{props.item.availableReplicas > 0 && (
+						<div className="showOnHover">
+							<VerticalDivider />
+							<UpdateFunction item={props.item} />
+							<VerticalDivider />
+							<DeleteFunction
+								name={props.item.function.service}
+								loading={props.item.isDeleting}
+							/>
+						</div>
+					)}
+				</>
+  )}
 		/>
 	);
 }
@@ -267,13 +303,24 @@ class FunctionsPage extends React.Component {
 											>
 												<List.Item
 													className={listClass}
+													style={{
+														borderBottom:
+															index
+															!== this.sortedDataSource.length - 1
+																? '1px solid #e8e8e8'
+																: null,
+													}}
 													key={item.function.service}
-													extra={(
-              <Actions
-															item={item}
-															refetchFunction={this.refetchFunction}
-														/>
-            )}
+													extra={
+														item.availableReplicas > 0 && (
+															<Actions
+																item={item}
+																refetchFunction={
+																	this.refetchFunction
+																}
+															/>
+														)
+													}
 												>
 													<FunctionItem
 														item={item}

@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import {
- message, Modal, notification, Radio, Row,
-} from 'antd';
+import { message, Modal, notification, Radio, Row } from 'antd';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import PrivateRegistry from './components/PrivateRegistry';
 import { handleInputClosure, isTrue, renderInputField } from './helper';
 import EnvTable from './components/EnvTable';
 import { modalHeading } from '../../pages/HomePage/styles';
-import { createFunction, updateFunctions } from '../../batteries/modules/actions';
+import {
+	createFunction,
+	getSingleFunction,
+	updateFunctions,
+} from '../../batteries/modules/actions';
 
 const DeployFunctionModal = ({
 	node,
@@ -19,6 +21,7 @@ const DeployFunctionModal = ({
 	error,
 	success,
 	putFunctions,
+	getFunction,
 }) => {
 	const oriEnvData = get(node, 'function.envVars', {});
 	const revEnvData = Object.keys(oriEnvData).map(key => ({
@@ -49,14 +52,17 @@ const DeployFunctionModal = ({
 					});
 				}
 			} else if (success) {
-					message.success(`${functionName} function deployed successfully`);
-					handleCancel();
-				} else if (error) {
-					notification.error({
-						message: 'Error',
-						description: error,
-					});
-				}
+				message.success(`${functionName} function deployed successfully`);
+				setTimeout(() => {
+					getFunction(functionName);
+				}, 600000);
+				handleCancel();
+			} else if (error) {
+				notification.error({
+					message: 'Error',
+					description: error,
+				});
+			}
 		} else setDidMount(true);
 	}, [error, success, node]);
 
@@ -104,7 +110,7 @@ const DeployFunctionModal = ({
 						fieldValue: functionName,
 						handleInputRequired,
 						setterFunc: setFunctionName,
-						extraProps: { disabled: !!node },
+						extraProps: { disabled: !!node, placeholder: 'Enter Function Name' },
 					})}
 				</Row>
 				<Row>
@@ -115,6 +121,7 @@ const DeployFunctionModal = ({
 						fieldValue: dockerImage,
 						handleInputRequired,
 						setterFunc: setDockerImage,
+						extraProps: { placeholder: 'Enter Docker Image' },
 					})}
 				</Row>
 				<Row>
@@ -160,6 +167,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
 	deployFunction: (name, payload) => dispatch(createFunction(name, payload)),
 	putFunctions: (appName, payload) => dispatch(updateFunctions(appName, payload)),
+	getFunction: appName => dispatch(getSingleFunction(appName)),
 });
 
 export default connect(

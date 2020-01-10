@@ -10,15 +10,13 @@ function DeleteFunction({ name, deleteFunctions, loading }) {
 	const [visible, setVisible] = useState(false);
 	return (
 		<>
-			<Button
-				type="danger"
-				style={{ marginRight: 8 }}
-				loading={loading}
+			<Icon
+				theme="twoTone"
+				type="delete"
+				twoToneColor="#d11a2a"
+				style={{ cursor: 'pointer' }}
 				onClick={() => setVisible(true)}
-			>
-				<Icon type="delete" />
-				Delete Function
-			</Button>
+			/>
 			<Modal
 				confirmLoading={loading}
 				okText="Delete"
