@@ -24,10 +24,12 @@ const paragraphStyle = css`
 class TriggerFunction extends React.Component {
 	constructor(props) {
 		super(props);
+		const executeBeforeVal = get(props.node, 'trigger.executeBefore');
 		this.state = {
 			isVisible: false,
 			type: (props.node && props.node.trigger && props.node.trigger.type) || 'filter',
-			when: (props.node && props.node.trigger && props.node.trigger.when) || 'before',
+			when:
+				executeBeforeVal !== undefined ? (executeBeforeVal ? 'before' : 'after') : 'before',
 			request: JSON.stringify(get(props.node, 'extraRequestPayload', {})),
 			expression: (props.node && props.node.trigger && props.node.trigger.expression) || '',
 			isValidJSON: true,

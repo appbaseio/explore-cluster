@@ -1,6 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import {
- Button, Card, Col, Divider, Icon, List, Row, Switch, Tooltip,
+ Button, Card, Col, Collapse, Divider, Icon, List, Row, Switch, Tooltip,
 } from 'antd';
 import { connect } from 'react-redux';
 import { string } from 'prop-types';
@@ -134,12 +134,12 @@ const bannerDetails = {
 };
 
 function Log({ name }) {
-	const [visible, setVisible] = useState(false);
 	return (
-		<>
-			<Icon onClick={() => setVisible(true)} style={{ cursor: 'pointer' }} type="database" />
-			{visible && <Logs name={name} />}
-		</>
+		<Collapse style={{ marginTop: 10 }} destroyInactivePanel>
+			<Collapse.Panel key="show-logs" header="Show Logs">
+				<Logs name={name} />
+			</Collapse.Panel>
+		</Collapse>
 	);
 }
 
@@ -184,10 +184,9 @@ function FunctionItem(props: { item: T, onChange: (e?: any) => undefined }) {
 								name={props.item.function.service}
 								loading={props.item.isDeleting}
 							/>
-							<VerticalDivider />
-							<Log name={props.item.function.service} />
 						</div>
 					)}
+					<Log name={props.item.function.service} />
 				</>
   )}
 		/>
