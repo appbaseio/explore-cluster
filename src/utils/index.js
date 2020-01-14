@@ -246,8 +246,26 @@ export async function fetchLogs(name = 'default') {
 		},
 		method: 'GET',
 	});
-	console.log({response})
 	const data = await response.clone().text();
+	if (response.status >= 400) {
+		throw data.error.message;
+	}
+
+	return data;
+}
+
+// checks open-faas health
+export async function getFunctionHealthCheck() {
+	const ACC_API = getURL();
+	const authToken = sessionStorage.getItem('authToken');
+	const response = await fetch(`${ACC_API}/_functions/health`, {
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Basic ${authToken}`,
+		},
+		method: 'GET',
+	});
+	const data = await response.json();
 	if (response.status >= 400) {
 		throw data.error.message;
 	}

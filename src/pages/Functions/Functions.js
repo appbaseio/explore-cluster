@@ -1,6 +1,16 @@
 import React, { Fragment, useState } from 'react';
 import {
- Button, Card, Col, Collapse, Divider, Icon, List, Row, Switch, Tooltip,
+	Button,
+	Card,
+	Col,
+	Collapse,
+	Divider,
+	Icon,
+	List,
+	Result,
+	Row,
+	Switch,
+	Tooltip,
 } from 'antd';
 import { connect } from 'react-redux';
 import { string } from 'prop-types';
@@ -21,6 +31,7 @@ import Logs from './Logs';
 import { isValidPlan } from '../../batteries/utils';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Overlay from '../../components/Overlay';
+import { getFunctionHealthCheck } from '../../utils';
 
 const IconText = ({ type, text }) => (
 	<span>
@@ -212,12 +223,28 @@ const listClass = css`
 `;
 
 class FunctionsPage extends React.Component {
-	state = { invokeModal: false, deployModal: false };
+	state = {
+		invokeModal: false,
+		deployModal: false,
+		checking: false,
+		healthError: null,
+	};
 
-	componentDidMount() {
-		const { fetchFunctions, appName, fetchRegistries } = this.props;
-		fetchFunctions(appName);
-		fetchRegistries();
+	async componentDidMount() {
+		const {
+ fetchFunctions, appName, fetchRegistries, tier, featureFunctions,
+} = this.props;
+		try {
+			this.setState({ checking: true });
+			await getFunctionHealthCheck();
+			this.setState({ checking: false });
+			if (isValidPlan(tier, featureFunctions)) {
+				fetchFunctions(appName);
+				fetchRegistries();
+			}
+		} catch (e) {
+			this.setState({ checking: false, healthError: e });
+		}
 	}
 
 	getListStyle(index, dragSnapshot) {
@@ -276,7 +303,7 @@ class FunctionsPage extends React.Component {
 		const {
  isLoading, functions, tier, featureFunctions,
 } = this.props;
-		const { deployModal } = this.state;
+		const { deployModal, checking, healthError } = this.state;
 		this.sortedDataSource = (functions || []).sort((a, b) => a.order - b.order);
 
 		if (!isValidPlan(tier, featureFunctions)) {
@@ -294,8 +321,13 @@ class FunctionsPage extends React.Component {
 			);
 		}
 
-		if (isLoading) {
+		if (isLoading || checking) {
 			return <Loader />;
+		}
+		if (healthError) {
+			return (
+				<Result status="500" title="500" subTitle="Sorry, the open-fass service is down." />
+			);
 		}
 		return (
 			<Fragment>
