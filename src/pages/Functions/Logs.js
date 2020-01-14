@@ -47,7 +47,7 @@ function Logs({ name }) {
 				}}
 				type="reload"
 			/>
-			<pre>{logs}</pre>
+			<pre style={{ width: '45vw' }}>{logs}</pre>
 		</div>
 	);
 }

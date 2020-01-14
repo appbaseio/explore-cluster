@@ -236,11 +236,23 @@ export async function setPrivateRegistry(payload = {}) {
 }
 
 // fetch logs
-export function fetchLogs(name = 'default') {
+export async function fetchLogs(name = 'default') {
 	const ACC_API = getURL();
 	const authToken = sessionStorage.getItem('authToken');
-	// TODO: integrate logs API
-	return later(1000);
+	const response = await fetch(`${ACC_API}/_function/${name}/logs`, {
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Basic ${authToken}`,
+		},
+		method: 'GET',
+	});
+	console.log({response})
+	const data = await response.clone().text();
+	if (response.status >= 400) {
+		throw data.error.message;
+	}
+
+	return data;
 }
 
 // checks whether it is a valid URL

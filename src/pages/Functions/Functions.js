@@ -145,7 +145,7 @@ function Log({ name }) {
 
 function FunctionItem(props: { item: T, onChange: (e?: any) => undefined }) {
 	const {
- function: func, enabled, availableReplicas, isToggling,
+ function: func, enabled, availableReplicas, isToggling, order,
 } = props.item;
 	return (
 		<List.Item.Meta
@@ -168,13 +168,16 @@ function FunctionItem(props: { item: T, onChange: (e?: any) => undefined }) {
 							{availableReplicas === 0 ? 'failed' : 'Deployment in progress'}
 						</span>
 					)}
+					<Tooltip title="Drag to re-order the sequence of invoking the functions">
+						<span className={tagStyle}>Order: {order}</span>
+					</Tooltip>
 				</React.Fragment>
   )}
 			description={(
     <>
 					<IconText type="container" key="container" text={props.item.function.image} />
 					<VerticalDivider />
-					<IconText text={props.item.invocationCount.toString()} type="api" key="api" />
+					<IconText text={(props.item.invocationCount || '').toString()} type="api" key="api" />
 					{props.item.availableReplicas > 0 && (
 						<div className="showOnHover">
 							<VerticalDivider />
@@ -186,7 +189,6 @@ function FunctionItem(props: { item: T, onChange: (e?: any) => undefined }) {
 							/>
 						</div>
 					)}
-					<Log name={props.item.function.service} />
 				</>
   )}
 		/>
@@ -212,6 +214,15 @@ class FunctionsPage extends React.Component {
 		const { fetchFunctions, appName, fetchRegistries } = this.props;
 		fetchFunctions(appName);
 		fetchRegistries();
+	}
+
+	getListStyle(index, dragSnapshot) {
+		return {
+			padding: 10,
+			borderBottom: index !== this.sortedDataSource.length - 1 ? '1px solid #e8e8e8' : null,
+			backgroundColor: dragSnapshot.isDragging ? '#91d5ff' : 'initial',
+			border: dragSnapshot.isDragging ? '1px solid #40a9ff' : 'initial',
+		};
 	}
 
 	refetchFunction = () => {
@@ -334,7 +345,7 @@ class FunctionsPage extends React.Component {
 										key={item.function.service}
 										item={item}
 										index={index}
-										render={dragProvided => (
+										render={(dragProvided, dragSnapshot) => (
 											<div
 												ref={dragProvided.innerRef}
 												{...dragProvided.draggableProps}
@@ -342,13 +353,7 @@ class FunctionsPage extends React.Component {
 											>
 												<List.Item
 													className={listClass}
-													style={{
-														borderBottom:
-															index
-															!== this.sortedDataSource.length - 1
-																? '1px solid #e8e8e8'
-																: null,
-													}}
+													style={this.getListStyle(index, dragSnapshot)}
 													key={item.function.service}
 													extra={
 														item.availableReplicas > 0 && (
@@ -365,6 +370,7 @@ class FunctionsPage extends React.Component {
 														item={item}
 														onChange={e => this.handleEnable(e, item)}
 													/>
+													<Log name={item.function.service} />
 												</List.Item>
 											</div>
 										)}
