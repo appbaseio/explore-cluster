@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { message, Modal, notification, Radio, Row } from 'antd';
+import {
+ message, Modal, notification, Radio, Row,
+} from 'antd';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import PrivateRegistry from './components/PrivateRegistry';
@@ -12,6 +14,8 @@ import {
 	getSingleFunction,
 	updateFunctions,
 } from '../../batteries/modules/actions';
+
+const TEN_MINUTES = 10 * 60;
 
 const DeployFunctionModal = ({
 	node,
@@ -53,9 +57,18 @@ const DeployFunctionModal = ({
 				}
 			} else if (success) {
 				message.success(`${functionName} function deployed successfully`);
-				setTimeout(() => {
-					getFunction(functionName);
-				}, 600000);
+				const myInterval = setInterval(handleDeploymentCheck, 120000);
+				function handleDeploymentCheck() {
+					const currTimeStamp = (Date.now() / 1000) | 0;
+					getFunction(functionName).then((res) => {
+						if (res && res.payload) {
+							const { updated_at, availableReplicas } = res.payload;
+							if (currTimeStamp - updated_at > TEN_MINUTES || availableReplicas > 0) {
+								clearInterval(myInterval);
+							}
+						}
+					});
+				}
 				handleCancel();
 			} else if (error) {
 				notification.error({
