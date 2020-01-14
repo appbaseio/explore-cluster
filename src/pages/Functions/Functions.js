@@ -133,11 +133,11 @@ const bannerDetails = {
 	icon: 'pencil',
 };
 
-function Log({ name }) {
+function Log({ name, style }) {
 	return (
 		<Collapse style={{ marginTop: 10 }} destroyInactivePanel>
 			<Collapse.Panel key="show-logs" header="Show Logs">
-				<Logs name={name} />
+				<Logs style={style} name={name} />
 			</Collapse.Panel>
 		</Collapse>
 	);
@@ -177,7 +177,11 @@ function FunctionItem(props: { item: T, onChange: (e?: any) => undefined }) {
     <>
 					<IconText type="container" key="container" text={props.item.function.image} />
 					<VerticalDivider />
-					<IconText text={(props.item.invocationCount || '').toString()} type="api" key="api" />
+					<IconText
+						text={(props.item.invocationCount || '').toString()}
+						type="api"
+						key="api"
+					/>
 					{props.item.availableReplicas > 0 && (
 						<div className="showOnHover">
 							<VerticalDivider />
@@ -219,9 +223,9 @@ class FunctionsPage extends React.Component {
 	getListStyle(index, dragSnapshot) {
 		return {
 			padding: 10,
-			borderBottom: index !== this.sortedDataSource.length - 1 ? '1px solid #e8e8e8' : null,
 			backgroundColor: dragSnapshot.isDragging ? '#91d5ff' : 'initial',
 			border: dragSnapshot.isDragging ? '1px solid #40a9ff' : 'initial',
+			borderBottom: index !== this.sortedDataSource.length - 1 ? '1px solid #e8e8e8' : null,
 		};
 	}
 
@@ -370,7 +374,15 @@ class FunctionsPage extends React.Component {
 														item={item}
 														onChange={e => this.handleEnable(e, item)}
 													/>
-													<Log name={item.function.service} />
+													<Log
+														name={item.function.service}
+														style={{
+															width:
+																item.availableReplicas > 0
+																	? '45vw'
+																	: '100%',
+														}}
+													/>
 												</List.Item>
 											</div>
 										)}

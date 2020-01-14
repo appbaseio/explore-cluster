@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Icon, notification, Skeleton } from 'antd';
 import { fetchLogs } from '../../utils';
 
-function Logs({ name }) {
+function Logs({ name, style }) {
 	const [logs, setLogs] = useState('');
 	const [loading, setLoading] = useState(false);
 
@@ -47,7 +47,7 @@ function Logs({ name }) {
 				}}
 				type="reload"
 			/>
-			<pre style={{ width: '45vw' }}>{logs}</pre>
+			<pre style={style}>{logs}</pre>
 		</div>
 	);
 }
