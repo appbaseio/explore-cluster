@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import {
 	Button,
 	Card,
@@ -20,7 +20,12 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { css } from 'emotion';
 import Loader from '../../components/Loader';
 import Header from '../../components/Header';
-import { getFunctions, reorderFunction, updateFunctions } from '../../batteries/modules/actions';
+import {
+	getFunctions,
+	getSingleFunction,
+	reorderFunction,
+	updateFunctions,
+} from '../../batteries/modules/actions';
 import CreateFunction from './CreateFunction';
 import TriggerFunction from './TriggerFunction';
 import InvokeFunctionModal from '../../components/InvokeFunctionModal';
@@ -32,6 +37,7 @@ import { isValidPlan } from '../../batteries/utils';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Overlay from '../../components/Overlay';
 import { getFunctionHealthCheck } from '../../utils';
+import { deploymentCheck } from '../../components/DeployFunctionModal/helper';
 
 const IconText = ({ type, text }) => (
 	<span>
@@ -83,8 +89,15 @@ function DndDraggable(props: { item: T, index: number, render: (dragProvided: an
 	);
 }
 
-function UpdateFunction({ item }) {
+function UpdateFunction({ item, getFunction }) {
 	const [visible, setVisible] = useState(false);
+	useEffect(() => {
+		const myInterval = setInterval(handleDeploymentCheck, 1200);
+		function handleDeploymentCheck() {
+			deploymentCheck(getFunction, item.function.service, myInterval);
+		}
+		return () => clearInterval(myInterval);
+	}, []);
 	return (
 		<>
 			<Icon
@@ -154,7 +167,7 @@ function Log({ name, style }) {
 	);
 }
 
-function FunctionItem(props: { item: T, onChange: (e?: any) => undefined }) {
+function FunctionItem(props: { item: T, onChange: (e?: any) => undefined, getFunction: func }) {
 	const {
  function: func, enabled, availableReplicas, isToggling, order,
 } = props.item;
@@ -196,7 +209,7 @@ function FunctionItem(props: { item: T, onChange: (e?: any) => undefined }) {
 					{props.item.availableReplicas > 0 && (
 						<div className="showOnHover">
 							<VerticalDivider />
-							<UpdateFunction item={props.item} />
+							<UpdateFunction item={props.item} getFunction={props.getFunction} />
 							<VerticalDivider />
 							<DeleteFunction
 								name={props.item.function.service}
@@ -301,7 +314,7 @@ class FunctionsPage extends React.Component {
 
 	render() {
 		const {
- isLoading, functions, tier, featureFunctions,
+ isLoading, functions, tier, featureFunctions, getFunction,
 } = this.props;
 		const { deployModal, checking, healthError } = this.state;
 		this.sortedDataSource = (functions || []).sort((a, b) => a.order - b.order);
@@ -405,6 +418,7 @@ class FunctionsPage extends React.Component {
 													<FunctionItem
 														item={item}
 														onChange={e => this.handleEnable(e, item)}
+														getFunction={getFunction}
 													/>
 													<Log
 														name={item.function.service}
@@ -451,6 +465,7 @@ const mapDispatchToProps = dispatch => ({
 	fetchFunctions: appName => dispatch(getFunctions(appName)),
 	reorderFunctions: (source, destination) => dispatch(reorderFunction(source, destination)),
 	fetchRegistries: () => dispatch(getPrivateRegistry()),
+	getFunction: appName => dispatch(getSingleFunction(appName)),
 });
 
 export default connect(

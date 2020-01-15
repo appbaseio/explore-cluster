@@ -6,7 +6,9 @@ import {
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import PrivateRegistry from './components/PrivateRegistry';
-import { handleInputClosure, isTrue, renderInputField } from './helper';
+import {
+ deploymentCheck, handleInputClosure, isTrue, renderInputField,
+} from './helper';
 import EnvTable from './components/EnvTable';
 import { modalHeading } from '../../pages/HomePage/styles';
 import {
@@ -14,8 +16,6 @@ import {
 	getSingleFunction,
 	updateFunctions,
 } from '../../batteries/modules/actions';
-
-const TEN_MINUTES = 10 * 60;
 
 const DeployFunctionModal = ({
 	node,
@@ -44,6 +44,7 @@ const DeployFunctionModal = ({
 	const handleInputRequired = handleInputClosure(setGlobalError, globalError);
 
 	useEffect(() => {
+		let myInterval;
 		if (didMount) {
 			if (node) {
 				if (node.success) {
@@ -57,17 +58,9 @@ const DeployFunctionModal = ({
 				}
 			} else if (success) {
 				message.success(`${functionName} function deployed successfully`);
-				const myInterval = setInterval(handleDeploymentCheck, 120000);
+				myInterval = setInterval(handleDeploymentCheck, 120000);
 				function handleDeploymentCheck() {
-					const currTimeStamp = (Date.now() / 1000) | 0;
-					getFunction(functionName).then((res) => {
-						if (res && res.payload) {
-							const { updated_at, availableReplicas } = res.payload;
-							if (currTimeStamp - updated_at > TEN_MINUTES || availableReplicas > 0) {
-								clearInterval(myInterval);
-							}
-						}
-					});
+					deploymentCheck(getFunction, functionName, myInterval);
 				}
 				handleCancel();
 			} else if (error) {
@@ -77,6 +70,9 @@ const DeployFunctionModal = ({
 				});
 			}
 		} else setDidMount(true);
+		return () => {
+			if (myInterval) clearInterval(myInterval);
+		};
 	}, [error, success, node]);
 
 	const handleSubmit = () => {

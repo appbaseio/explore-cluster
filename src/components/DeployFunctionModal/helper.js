@@ -54,3 +54,17 @@ export function handleInputClosure(setGlobalError, globalError) {
 	};
 	return handleInputRequired;
 }
+
+const TEN_MINUTES = 10 * 60;
+
+export function deploymentCheck(getFunction, functionName, myInterval) {
+	const currTimeStamp = (Date.now() / 1000) | 0;
+	getFunction(functionName).then((res) => {
+		if (res && res.payload) {
+			const { updated_at, availableReplicas } = res.payload;
+			if (currTimeStamp - updated_at > TEN_MINUTES || availableReplicas > 0) {
+				clearInterval(myInterval);
+			}
+		}
+	});
+}
