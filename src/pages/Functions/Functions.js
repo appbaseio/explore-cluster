@@ -92,7 +92,7 @@ function DndDraggable(props: { item: T, index: number, render: (dragProvided: an
 function UpdateFunction({ item, getFunction }) {
 	const [visible, setVisible] = useState(false);
 	useEffect(() => {
-		const myInterval = setInterval(handleDeploymentCheck, 1200);
+		const myInterval = setInterval(handleDeploymentCheck, 120000);
 		function handleDeploymentCheck() {
 			deploymentCheck(getFunction, item.function.service, myInterval);
 		}
