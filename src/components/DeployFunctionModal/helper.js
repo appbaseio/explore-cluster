@@ -55,15 +55,12 @@ export function handleInputClosure(setGlobalError, globalError) {
 	return handleInputRequired;
 }
 
-const DEPLOYMENT_TIME = 10 * 60;
-
 export async function deploymentCheck(getFunction, functionName, myInterval) {
-	const currTimeStamp = (Date.now() / 1000) | 0;
 	try {
 		const res = await getFunction(functionName);
 		if (res && res.payload) {
-			const { updated_at, availableReplicas } = res.payload;
-			if (currTimeStamp - updated_at > DEPLOYMENT_TIME || availableReplicas > 0) {
+			const { deploymentStatus } = res.payload;
+			if (deploymentStatus === 'active' || deploymentStatus === 'failed') {
 				clearInterval(myInterval);
 			}
 		}

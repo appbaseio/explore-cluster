@@ -23,6 +23,7 @@ const DeployFunctionModal = ({
 	putFunctions,
 	getFunction,
 }) => {
+	console.log('node', node);
 	const oriEnvData = get(node, 'function.envVars', {});
 	const revEnvData = Object.keys(oriEnvData).map(key => ({
 		key,
@@ -40,11 +41,11 @@ const DeployFunctionModal = ({
 	const handleInputRequired = handleInputClosure(setGlobalError, globalError);
 
 	useEffect(() => {
-		let myInterval;
 		if (didMount) {
 			if (node) {
 				if (node.success) {
 					message.success(`${functionName} function updated successfully`);
+
 					handleCancel();
 				} else if (node.error) {
 					notification.error({
@@ -53,11 +54,7 @@ const DeployFunctionModal = ({
 					});
 				}
 			} else if (success) {
-				message.success(`${functionName} function deployed successfully`);
-				myInterval = setInterval(handleDeploymentCheck, 120000);
-				function handleDeploymentCheck() {
-					deploymentCheck(getFunction, functionName, myInterval);
-				}
+				message.success(`${functionName} function deployment started`);
 				handleCancel();
 			} else if (error) {
 				notification.error({
@@ -66,12 +63,16 @@ const DeployFunctionModal = ({
 				});
 			}
 		} else setDidMount(true);
-		return () => {
-			if (myInterval) clearInterval(myInterval);
-		};
+		// return () => {
+		// 	if (myInterval) clearInterval(myInterval);
+		// };
 	}, [error, success, node]);
 
 	const handleSubmit = () => {
+		let myInterval = null;
+		function handleDeploymentCheck() {
+			deploymentCheck(getFunction, functionName, myInterval);
+		}
 		const parsedEnvData = envDataSource.reduce((objAcc, envSource) => {
 			const { key, value } = envSource;
 			if (key && value) objAcc[key] = value;
@@ -90,8 +91,17 @@ const DeployFunctionModal = ({
 					...payload,
 				},
 			};
+			if (node.function.image !== dockerImage) {
+				newPayload.deploymentStatus = 'in_progress';
+			}
 			putFunctions(functionName, newPayload);
-		} else deployFunction(functionName, payload);
+			if (node.function.image !== dockerImage) {
+				myInterval = setInterval(handleDeploymentCheck, 7000);
+			}
+		} else {
+			deployFunction(functionName, payload);
+			myInterval = setInterval(handleDeploymentCheck, 7000);
+		}
 	};
 
 	return (

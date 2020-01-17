@@ -78,15 +78,8 @@ function DndDraggable({ index, render, item }) {
 	);
 }
 
-function UpdateFunction({ item, getFunction }) {
+function UpdateFunction({ item }) {
 	const [visible, setVisible] = useState(false);
-	useEffect(() => {
-		const myInterval = setInterval(handleDeploymentCheck, 120000);
-		function handleDeploymentCheck() {
-			deploymentCheck(getFunction, item.function.service, myInterval);
-		}
-		return () => clearInterval(myInterval);
-	}, []);
 	return (
 		<>
 			<Icon
@@ -153,12 +146,28 @@ function FunctionItem({ item, onChange, getFunction }) {
 	const {
 		function: func,
 		enabled,
-		availableReplicas,
 		isToggling,
 		order,
 		invocationCount,
 		isDeleting,
+		deploymentStatus,
 	} = item;
+	useEffect(() => {
+		let interval = null;
+		function handleDeploymentCheck() {
+			deploymentCheck(getFunction, func.service, interval);
+		}
+
+		if (deploymentStatus === 'in_progress') {
+			interval = setInterval(handleDeploymentCheck, 7000);
+		}
+
+		return function cleanUp() {
+			if (interval) {
+				clearInterval(interval);
+			}
+		};
+	}, [deploymentStatus]);
 	function toggleLogsState() {
 		setIsLogsOpen(!isLogsOpen);
 	}
@@ -172,7 +181,7 @@ function FunctionItem({ item, onChange, getFunction }) {
 					#{order}
 					{'  '}
 					{func.service}
-					{availableReplicas > 0 ? (
+					{deploymentStatus === 'active' ? (
 						<Tooltip title={`${enabled ? 'Disable' : 'Enable'} Function`}>
 							<Switch
 								style={{
@@ -185,7 +194,13 @@ function FunctionItem({ item, onChange, getFunction }) {
 						</Tooltip>
 					) : (
 						<span className={tagStyle}>
-							{availableReplicas === 0 ? 'failed' : 'Deployment in progress'}
+							{deploymentStatus === 'failed' ? (
+								<Tooltip title="Please verify if you are using correct docker image with appropriate permissions">
+									<span style={{ color: 'red' }}>Deployment Failed</span>
+								</Tooltip>
+							) : (
+								'Deployment in progress'
+							)}
 						</span>
 					)}
 				</React.Fragment>
@@ -197,14 +212,12 @@ function FunctionItem({ item, onChange, getFunction }) {
 					<IconText text={(invocationCount || '').toString()} type="api" key="api" />
 					<VerticalDivider />
 					<Logs name={func.service} isOpen={isLogsOpen} toggleIsOpen={toggleLogsState} />
-					{availableReplicas > 0 && (
-						<div className="showOnHover">
-							<VerticalDivider />
-							<UpdateFunction item={item} getFunction={getFunction} />
-							<VerticalDivider />
-							<DeleteFunction name={func.service} loading={isDeleting} />
-						</div>
-					)}
+					<div className="showOnHover">
+						<VerticalDivider />
+						<UpdateFunction item={item} getFunction={getFunction} />
+						<VerticalDivider />
+						<DeleteFunction name={func.service} loading={isDeleting} />
+					</div>
 				</>
 			}
 		/>
@@ -463,7 +476,7 @@ class FunctionsPage extends React.Component {
 												<List.Item
 													key={item.function.service}
 													extra={
-														item.availableReplicas > 0 && (
+														item.deploymentStatus === 'active' && (
 															<Actions
 																item={item}
 																refetchFunction={

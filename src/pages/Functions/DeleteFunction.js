@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Icon, Input, Modal } from 'antd';
+import { Icon, Input, Modal } from 'antd';
 import { connect } from 'react-redux';
 import { deleteFunction } from '../../batteries/modules/actions';
 
