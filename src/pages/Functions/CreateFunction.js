@@ -105,12 +105,18 @@ class CreateFunction extends React.Component {
 									icon="code"
 									text={
 										<React.Fragment>
-											<a title="faas-cli" href="">
+											<a
+												title="faas-cli"
+												href="https://github.com/openfaas/faas-cli"
+											>
 												faas-cli
 											</a>{' '}
 											allows you quickly create and deploy a serverless
 											functions using some pre-defined{' '}
-											<a title="faas-cli" href="">
+											<a
+												title="faas-cli"
+												href="https://docs.openfaas.com/cli/templates/#templates"
+											>
 												templates
 											</a>
 											.
