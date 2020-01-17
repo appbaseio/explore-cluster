@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
- Button, Collapse, Form, Input, notification, Row, message,
-} from 'antd';
+import { Button, Collapse, Form, Input, notification, Row, message } from 'antd';
 import { Validators } from 'react-reactive-form';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
@@ -9,9 +7,7 @@ import { handleInputClosure, renderInputField } from '../helper';
 import { modalHeading } from '../../../pages/HomePage/styles';
 import { updatePrivateRegistry } from '../../../batteries/modules/actions/registry';
 
-const PrivateRegistry = ({
- registry, updateRegistry, error, success, loading,
-}) => {
+const PrivateRegistry = ({ registry, updateRegistry, error, success, loading }) => {
 	const [didMount, setDidMount] = useState(false);
 	const [username, setUserName] = useState(registry.username);
 	const [password, setPassword] = useState(registry.password);
@@ -32,7 +28,7 @@ const PrivateRegistry = ({
 		} else setDidMount(true);
 	}, [error, success]);
 
-	const handleSubmit = async (e) => {
+	const handleSubmit = async e => {
 		e.preventDefault();
 		setLocalError({
 			email: !email,
@@ -50,7 +46,7 @@ const PrivateRegistry = ({
 	};
 	const handleInputRequired = handleInputClosure(setLocalError, localError);
 
-	const handleEmailChange = (e) => {
+	const handleEmailChange = e => {
 		const { value } = e.target;
 		const hasError = Validators.email({ value }) || {};
 		setEmail(value);
@@ -62,11 +58,11 @@ const PrivateRegistry = ({
 			<Collapse style={{ marginTop: '20px' }}>
 				<Collapse.Panel
 					key="private-registry"
-					header={(
-      <span className={modalHeading} style={{ fontSize: '16px' }}>
+					header={
+						<span className={modalHeading} style={{ fontSize: '16px' }}>
 							Set Private Registry Info
 						</span>
-    )}
+					}
 				>
 					<>
 						{' '}
@@ -152,7 +148,4 @@ const mapDispatchToProps = dispatch => ({
 	updateRegistry: payload => dispatch(updatePrivateRegistry(payload)),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(PrivateRegistry);
+export default connect(mapStateToProps, mapDispatchToProps)(PrivateRegistry);

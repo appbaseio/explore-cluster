@@ -10,7 +10,7 @@ export default class Search extends Component {
 		selectedOption: this.props.searchFields.map(item => ({ label: item, value: item })) || [],
 	};
 
-	setError = (e) => {
+	setError = e => {
 		if (this.interval) clearInterval(this.interval);
 		this.setState(
 			{
@@ -24,7 +24,7 @@ export default class Search extends Component {
 		);
 	};
 
-	handleChange = (selectedOption) => {
+	handleChange = selectedOption => {
 		if (!selectedOption.length) {
 			this.setError('There should be at least one field set for search.');
 		} else {

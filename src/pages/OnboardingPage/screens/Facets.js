@@ -10,11 +10,11 @@ export default class Search extends Component {
 		selectedOption: this.props.facetFields.map(item => ({ label: item, value: item })) || [],
 	};
 
-	handleChange = (selectedOption) => {
+	handleChange = selectedOption => {
 		this.setState({ selectedOption });
 	};
 
-	setError = (e) => {
+	setError = e => {
 		if (this.interval) clearInterval(this.interval);
 		this.setState(
 			{
@@ -28,7 +28,7 @@ export default class Search extends Component {
 		);
 	};
 
-	handleChange = (selectedOption) => {
+	handleChange = selectedOption => {
 		if (!selectedOption.length) {
 			this.setError('There should be at least one field set for aggregation.');
 		} else {

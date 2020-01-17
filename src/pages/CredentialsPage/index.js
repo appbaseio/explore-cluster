@@ -1,12 +1,8 @@
 import React, { Component } from 'react';
 import get from 'lodash/get';
-import {
- Card, Table, Popconfirm, Tooltip, Button, Alert, Typography, Icon,
-} from 'antd';
+import { Card, Table, Popconfirm, Tooltip, Button, Alert, Typography, Icon } from 'antd';
 import { connect } from 'react-redux';
-import {
- string, func, bool, array,
-} from 'prop-types';
+import { string, func, bool, array } from 'prop-types';
 import CreateCredentials from '../../components/CreateCredentials';
 import Container from '../../components/Container';
 import { getAppPermissionsByName } from '../../batteries/modules/selectors';
@@ -29,8 +25,14 @@ const columns = [
 		render: ({ permissionInfo }) => (
 			<span>
 				{permissionInfo.expired ? (
-					<Tooltip placement="topLeft" title="It seems like the permission has been expired.">
-						<Icon style={{ color: 'orange', fontSize: 16, cursor: 'pointer' }} type="warning" />
+					<Tooltip
+						placement="topLeft"
+						title="It seems like the permission has been expired."
+					>
+						<Icon
+							style={{ color: 'orange', fontSize: 16, cursor: 'pointer' }}
+							type="warning"
+						/>
 					</Tooltip>
 				) : null}{' '}
 				{permissionInfo.description || 'No Description'}
@@ -103,7 +105,7 @@ class Credentials extends Component {
 		});
 	};
 
-	showForm = (permissionInfo) => {
+	showForm = permissionInfo => {
 		if (permissionInfo) {
 			this.setState({
 				showCredForm: true,
@@ -117,7 +119,7 @@ class Credentials extends Component {
 		}
 	};
 
-	newPermission = (request) => {
+	newPermission = request => {
 		const { appName, handleCreatePermission } = this.props;
 		handleCreatePermission(appName, request).then(({ payload }) => {
 			if (payload) {
@@ -133,7 +135,7 @@ class Credentials extends Component {
 		});
 	};
 
-	deletePermission = (username) => {
+	deletePermission = username => {
 		const { appName, handleDeletePermission } = this.props;
 		handleDeletePermission(appName, username).then(({ payload }) => {
 			if (payload) {
@@ -141,7 +143,6 @@ class Credentials extends Component {
 			}
 		});
 	};
-
 
 	handleSubmit = (form, username) => {
 		const { currentPermissionInfo } = this.state;
@@ -154,15 +155,11 @@ class Credentials extends Component {
 
 	deleteApp = () => {
 		window.location = window.origin;
-	}
+	};
 
 	render() {
-		const {
-			showCredForm, currentPermissionInfo, mappings, deleteModal,
-		} = this.state;
-		const {
-			isLoading, permissions, isOwner, location, appName, appId,
-		} = this.props;
+		const { showCredForm, currentPermissionInfo, mappings, deleteModal } = this.state;
+		const { isLoading, permissions, isOwner, location, appName, appId } = this.props;
 		if (isLoading) {
 			return <Loader />;
 		}
@@ -170,7 +167,7 @@ class Credentials extends Component {
 			<Container>
 				<Card
 					title="Credentials"
-					extra={(
+					extra={
 						<a
 							href="https://docs.appbase.io/docs/security/Credentials/"
 							rel="noopener noreferrer"
@@ -178,18 +175,18 @@ class Credentials extends Component {
 						>
 							Read Docs
 						</a>
-					)}
+					}
 				>
 					<h4>Host URL for this cluster:</h4>
 					<Alert
-						message={(
+						message={
 							<Typography.Paragraph
 								style={{ marginBottom: 0 }}
 								copyable={{ text: getURL() }}
 							>
 								{getURL()}
 							</Typography.Paragraph>
-						)}
+						}
 						type="info"
 						css={{ marginBottom: 20 }}
 					/>
@@ -200,7 +197,8 @@ class Credentials extends Component {
 							deletePermission: this.deletePermission,
 							showForm: this.showForm,
 						}))}
-						rowKey={row => `${get(row, 'permissionInfo.username')}${get(
+						rowKey={row =>
+							`${get(row, 'permissionInfo.username')}${get(
 								row,
 								'permissionInfo.password',
 							)}`
@@ -282,7 +280,7 @@ Credentials.propTypes = {
 	errors: array.isRequired,
 };
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
 	const appName = get(state, '$getCurrentApp.name');
 	let appPermissions = get(state, '$getAppPermissions.results.default');
 	if (appName) {
@@ -308,7 +306,8 @@ const mapDispatchToProps = dispatch => ({
 	fetchPermissions: appName => dispatch(getPermission(appName)),
 	handleCreatePermission: (appName, payload) => dispatch(createPermission(appName, payload)),
 	handleDeletePermission: (appName, username) => dispatch(deletePermission(appName, username)),
-	handleEditPermission: (appName, username, payload) => dispatch(updatePermission(appName, username, payload)),
+	handleEditPermission: (appName, username, payload) =>
+		dispatch(updatePermission(appName, username, payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Credentials);

@@ -1,19 +1,49 @@
 import React, { useEffect, useState } from 'react';
-import { Icon, notification, Skeleton } from 'antd';
+import { Icon, notification, Skeleton, Tooltip } from 'antd';
 import { fetchLogs } from '../../utils';
 
-function Logs({ name, style }) {
-	const [logs, setLogs] = useState('');
-	const [loading, setLoading] = useState(false);
+function Logs({ name, isOpen, toggleIsOpen }) {
+	const [data, setData] = useState({
+		isFetching: true,
+		logs: [],
+	});
+
+	useEffect(() => {
+		let isCancelled = false;
+		const fetchData = async () => {
+			const res = await fetchLogs(name);
+			if (!isCancelled) {
+				setData({
+					isFetching: false,
+					logs: res,
+				});
+			}
+		};
+		if (isOpen) {
+			fetchData();
+		}
+		return function cleanup() {
+			isCancelled = true;
+		};
+	}, [isOpen]);
 
 	async function logsApi() {
-		setLoading(true);
 		try {
+			setData({
+				...data,
+				isFetching: true,
+			});
 			const response = await fetchLogs(name);
-			setLogs(response);
-			setLoading(false);
+			setData({
+				...data,
+				isFetching: false,
+				logs: response,
+			});
 		} catch (e) {
-			setLoading(false);
+			setData({
+				...data,
+				isFetching: true,
+			});
 			notification.error({
 				type: 'error',
 				message: e,
@@ -21,34 +51,62 @@ function Logs({ name, style }) {
 		}
 	}
 
-	useEffect(() => {
-		logsApi();
-	}, []);
-
-	if (loading) return <Skeleton />;
-
 	return (
-		<div
-			style={{
-				background: '#000000a8',
-				color: '#f8fafc',
-				padding: 10,
-				borderRadius: 3,
-				maxHeight: 500,
-				overflow: 'auto',
-			}}
-		>
-			<Icon
-				onClick={logsApi}
-				style={{
-					display: 'flex',
-					justifyContent: 'flex-end',
-					cursor: 'pointer',
-				}}
-				type="reload"
-			/>
-			<pre style={style}>{logs}</pre>
-		</div>
+		<>
+			<Tooltip title="Function logs">
+				<Icon type="ordered-list" style={{ cursor: 'pointer' }} onClick={toggleIsOpen} />
+			</Tooltip>
+			{isOpen && (
+				<div
+					style={{
+						height: 150,
+						overflow: 'auto',
+						position: 'absolute',
+						bottom: 30,
+						left: 30,
+						right: 30,
+						borderRadius: '3px',
+					}}
+				>
+					<Skeleton loading={data.isFetching} active={data.isFetching}>
+						<div
+							style={{
+								background: '#222222',
+								color: '#d6d6d6',
+								height: '100%',
+								overflow: 'auto',
+								position: 'relative',
+							}}
+						>
+							<div
+								style={{
+									position: 'sticky',
+									display: 'flex',
+									justifyContent: 'flex-end',
+									alignItems: 'center',
+									height: 25,
+									top: 0,
+									zIndex: 100,
+									padding: 5,
+									paddingRight: 30,
+									background: '#000',
+								}}
+							>
+								<Icon onClick={logsApi} type="reload" />
+								<Icon
+									onClick={toggleIsOpen}
+									type="close"
+									style={{ marginLeft: 10 }}
+								/>
+							</div>
+							<div style={{ padding: '5px 20px', zIndex: 90 }}>
+								<pre>{data.logs}</pre>
+							</div>
+						</div>
+					</Skeleton>
+				</div>
+			)}
+		</>
 	);
 }
 

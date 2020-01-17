@@ -9,7 +9,7 @@ import Grid from '../../components/CreateCredentials/Grid';
 import Ace from '../../batteries/components/SearchSandbox/containers/AceEditor';
 import { suggestionsMessages as Messages } from '../../utils/messages';
 
-const calculateValue = (value) => {
+const calculateValue = value => {
 	const index = value.indexOf('*');
 	if (index > -1) {
 		if (index === 0 && value.length !== 1) {
@@ -36,19 +36,15 @@ const modal = css`
 	}
 `;
 
-const InputElement = ({
- name, label, toolTipMessage, inputProps, placeholder,
-}) => (
+const InputElement = ({ name, label, toolTipMessage, inputProps, placeholder }) => (
 	<FieldControl
 		name={name}
-		render={({
- handler, invalid, touched, hasError, getError,
-}) => (
+		render={({ handler, invalid, touched, hasError, getError }) => (
 			<Grid
 				label={label}
 				toolTipMessage={toolTipMessage}
-				component={(
-<div style={{ width: '100%' }}>
+				component={
+					<div style={{ width: '100%' }}>
 						<div>
 							<Input
 								className={touched && invalid ? 'input-error' : null}
@@ -61,28 +57,26 @@ const InputElement = ({
 
 						{touched && invalid && (
 							<div className="error">
-								{(hasError('required')
-									&& `Please enter ${label.toLowerCase()} value.`)
-									|| (hasError('min')
-										&& `Minimum allowed value for ${label.toLowerCase()} is ${
+								{(hasError('required') &&
+									`Please enter ${label.toLowerCase()} value.`) ||
+									(hasError('min') &&
+										`Minimum allowed value for ${label.toLowerCase()} is ${
 											getError('min').min
-										}.`)
-									|| (hasError('max')
-										&& `Maximum allowed value for ${label.toLowerCase()} is ${
+										}.`) ||
+									(hasError('max') &&
+										`Maximum allowed value for ${label.toLowerCase()} is ${
 											getError('max').max
 										}.`)}
 							</div>
 						)}
-</div>
-)}
+					</div>
+				}
 			/>
 		)}
 	/>
 );
 
-const PreferenceForm = ({
- control, handleSaveTemplate, isLoading, indices,
-}) => (
+const PreferenceForm = ({ control, handleSaveTemplate, isLoading, indices }) => (
 	<FieldGroup
 		control={control}
 		strict={false}
@@ -114,24 +108,24 @@ const PreferenceForm = ({
 							<Grid
 								label="Indices"
 								toolTipMessage={Messages.indices}
-								component={(
-<Select
+								component={
+									<Select
 										placeholder="Enter indices"
 										mode="tags"
 										style={{ width: '100%' }}
 										tokenSeparators={[',']}
 										value={value}
 										{...inputHandler}
-										onChange={(val) => {
+										onChange={val => {
 											inputHandler.onChange(calculateValue(val));
 										}}
->
+									>
 										<Select.Option value="*">All (*)</Select.Option>
 										{indices.map(index => (
 											<Select.Option key={index}>{index}</Select.Option>
 										))}
-</Select>
-)}
+									</Select>
+								}
 							/>
 						);
 					}}
@@ -144,16 +138,16 @@ const PreferenceForm = ({
 							<Grid
 								label="Blacklist"
 								toolTipMessage={Messages.blacklist}
-								component={(
-<Select
+								component={
+									<Select
 										placeholder="Enter blacklist queries"
 										mode="tags"
 										notFoundContent={null}
 										style={{ width: '100%' }}
 										tokenSeparators={[',']}
 										{...inputHandler}
-/>
-)}
+									/>
+								}
 							/>
 						);
 					}}
@@ -176,8 +170,8 @@ const PreferenceForm = ({
 								}}
 								toolTipMessage={Messages.external_suggestions}
 								label="External Suggestions"
-								component={(
-<Ace
+								component={
+									<Ace
 										defaultValue=""
 										mode="json"
 										value={
@@ -205,8 +199,8 @@ const PreferenceForm = ({
 										editorProps={{
 											$blockScrolling: true,
 										}}
-/>
-)}
+									/>
+								}
 							/>
 						);
 					}}
@@ -236,7 +230,4 @@ PreferenceForm.propTypes = {
 const mapStateToProps = state => ({
 	isLoading: get(state, '$saveSuggestionsPreferences.isFetching', false),
 });
-export default connect(
-	mapStateToProps,
-	null,
-)(PreferenceForm);
+export default connect(mapStateToProps, null)(PreferenceForm);

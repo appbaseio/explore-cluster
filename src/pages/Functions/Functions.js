@@ -1,17 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import {
-	Button,
-	Card,
-	Col,
-	Collapse,
-	Divider,
-	Icon,
-	List,
-	Result,
-	Row,
-	Switch,
-	Tooltip,
-} from 'antd';
+import { Button, Col, Divider, Icon, List, Result, Row, Switch, Tooltip } from 'antd';
 import { connect } from 'react-redux';
 import { string } from 'prop-types';
 import get from 'lodash/get';
@@ -33,11 +21,18 @@ import DeployFunctionModal from '../../components/DeployFunctionModal';
 import DeleteFunction from './DeleteFunction';
 import { getPrivateRegistry } from '../../batteries/modules/actions/registry';
 import Logs from './Logs';
-import { isValidPlan } from '../../batteries/utils';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Overlay from '../../components/Overlay';
 import { getFunctionHealthCheck } from '../../utils';
 import { deploymentCheck } from '../../components/DeployFunctionModal/helper';
+
+const validPlans = [
+	'2019-production-2',
+	'2019-production-3',
+	'2019-production-4',
+	'arc-enterprise',
+	'hosted-arc-enterprise',
+];
 
 const IconText = ({ type, text }) => (
 	<span>
@@ -65,26 +60,20 @@ function InvokeButton({ item }) {
 	);
 }
 
-function BeautifulDnd(props: {
-	onDragStart: () => void,
-	onDragEnd: result => undefined,
-	render: (dropProvided: any) => *,
-}) {
+function BeautifulDnd({ onDragStart, onDragEnd, render }) {
 	return (
-		<DragDropContext onDragStart={props.onDragStart} onDragEnd={props.onDragEnd}>
+		<DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
 			<section style={{ padding: 50 }}>
-				<Card bordered title="All Functions">
-					<Droppable droppableId="LIST">{props.render}</Droppable>
-				</Card>
+				<Droppable droppableId="LIST">{render}</Droppable>
 			</section>
 		</DragDropContext>
 	);
 }
 
-function DndDraggable(props: { item: T, index: number, render: (dragProvided: any) => * }) {
+function DndDraggable({ index, render, item }) {
 	return (
-		<Draggable draggableId={props.item.function.service} index={props.index}>
-			{props.render}
+		<Draggable draggableId={item.function.service} index={index}>
+			{render}
 		</Draggable>
 	);
 }
@@ -111,16 +100,16 @@ function UpdateFunction({ item, getFunction }) {
 	);
 }
 
-function Actions(props: { item: T, refetchFunction: () => void }) {
+function Actions({ item, refetchFunction }) {
 	return (
 		<React.Fragment>
 			<TriggerFunction
-				isLoading={props.item.triggerUpdation}
-				refetchFunction={props.refetchFunction}
-				node={props.item}
+				isLoading={item.triggerUpdation}
+				refetchFunction={refetchFunction}
+				node={item}
 			/>
 
-			<InvokeButton item={props.item} />
+			<InvokeButton item={item} />
 		</React.Fragment>
 	);
 }
@@ -152,29 +141,36 @@ const tagStyle = css`
 
 const bannerDetails = {
 	title: 'Functions',
-	description: 'GUI to manage functions for query suggestions.',
+	description:
+		'Create "If this, then that" style functions to add your own custom search and security logic.',
 	buttonText: 'Read more',
 	icon: 'pencil',
+	href: 'https://docs.appbase.io/docs/search/Functions/',
 };
 
-function Log({ name, style }) {
-	return (
-		<Collapse style={{ marginTop: 10 }} destroyInactivePanel>
-			<Collapse.Panel key="show-logs" header="Show Logs">
-				<Logs style={style} name={name} />
-			</Collapse.Panel>
-		</Collapse>
-	);
-}
-
-function FunctionItem(props: { item: T, onChange: (e?: any) => undefined, getFunction: func }) {
+function FunctionItem({ item, onChange, getFunction }) {
+	const [isLogsOpen, setIsLogsOpen] = useState(false);
 	const {
- function: func, enabled, availableReplicas, isToggling, order,
-} = props.item;
+		function: func,
+		enabled,
+		availableReplicas,
+		isToggling,
+		order,
+		invocationCount,
+		isDeleting,
+	} = item;
+	function toggleLogsState() {
+		setIsLogsOpen(!isLogsOpen);
+	}
 	return (
 		<List.Item.Meta
-			title={(
-    <React.Fragment>
+			style={{
+				height: isLogsOpen ? 200 : 'auto',
+			}}
+			title={
+				<React.Fragment>
+					#{order}
+					{'  '}
 					{func.service}
 					{availableReplicas > 0 ? (
 						<Tooltip title={`${enabled ? 'Disable' : 'Enable'} Function`}>
@@ -183,7 +179,7 @@ function FunctionItem(props: { item: T, onChange: (e?: any) => undefined, getFun
 									marginLeft: 8,
 								}}
 								loading={isToggling}
-								onChange={props.onChange}
+								onChange={onChange}
 								checked={enabled}
 							/>
 						</Tooltip>
@@ -192,38 +188,37 @@ function FunctionItem(props: { item: T, onChange: (e?: any) => undefined, getFun
 							{availableReplicas === 0 ? 'failed' : 'Deployment in progress'}
 						</span>
 					)}
-					<Tooltip title="Drag to re-order the sequence of invoking the functions">
-						<span className={tagStyle}>Order: {order}</span>
-					</Tooltip>
 				</React.Fragment>
-  )}
-			description={(
-    <>
-					<IconText type="container" key="container" text={props.item.function.image} />
+			}
+			description={
+				<>
+					<IconText type="container" key="container" text={func.image} />
 					<VerticalDivider />
-					<IconText
-						text={(props.item.invocationCount || '').toString()}
-						type="api"
-						key="api"
-					/>
-					{props.item.availableReplicas > 0 && (
+					<IconText text={(invocationCount || '').toString()} type="api" key="api" />
+					<VerticalDivider />
+					<Logs name={func.service} isOpen={isLogsOpen} toggleIsOpen={toggleLogsState} />
+					{availableReplicas > 0 && (
 						<div className="showOnHover">
 							<VerticalDivider />
-							<UpdateFunction item={props.item} getFunction={props.getFunction} />
+							<UpdateFunction item={item} getFunction={getFunction} />
 							<VerticalDivider />
-							<DeleteFunction
-								name={props.item.function.service}
-								loading={props.item.isDeleting}
-							/>
+							<DeleteFunction name={func.service} loading={isDeleting} />
 						</div>
 					)}
 				</>
-  )}
+			}
 		/>
 	);
 }
 
-const listClass = css`
+const listItemClass = css`
+	border-radius: 3px;
+	box-shadow: rgba(0, 0, 0, 0.05) 0px 3px 5px 0px;
+	background-color: rgb(255, 255, 255);
+	margin-bottom: 20px;
+	padding: 20px 40px;
+	position: relative;
+
 	.showOnHover {
 		display: none;
 	}
@@ -237,36 +232,33 @@ const listClass = css`
 
 class FunctionsPage extends React.Component {
 	state = {
-		invokeModal: false,
 		deployModal: false,
 		checking: false,
 		healthError: null,
+		notFoundError: null,
 	};
 
 	async componentDidMount() {
-		const {
- fetchFunctions, appName, fetchRegistries, tier, featureFunctions,
-} = this.props;
+		const { fetchFunctions, appName, fetchRegistries, tier } = this.props;
 		try {
-			this.setState({ checking: true });
-			await getFunctionHealthCheck();
-			this.setState({ checking: false });
-			if (isValidPlan(tier, featureFunctions)) {
+			if (validPlans.indexOf(tier) > -1) {
+				this.setState({ checking: true });
+				await getFunctionHealthCheck();
+				this.setState({ checking: false });
 				fetchFunctions(appName);
 				fetchRegistries();
 			}
 		} catch (e) {
-			this.setState({ checking: false, healthError: e });
+			console.log(e);
+			if (e.status === 404) {
+				this.setState({
+					checking: false,
+					notFoundError: e.message,
+				});
+			} else {
+				this.setState({ checking: false, healthError: e.message });
+			}
 		}
-	}
-
-	getListStyle(index, dragSnapshot) {
-		return {
-			padding: 10,
-			backgroundColor: dragSnapshot.isDragging ? '#91d5ff' : 'initial',
-			border: dragSnapshot.isDragging ? '1px solid #40a9ff' : 'initial',
-			borderBottom: index !== this.sortedDataSource.length - 1 ? '1px solid #e8e8e8' : null,
-		};
 	}
 
 	refetchFunction = () => {
@@ -283,7 +275,7 @@ class FunctionsPage extends React.Component {
 		});
 	};
 
-	handleCancel = (modalKey) => {
+	handleCancel = modalKey => {
 		this.setState({ [modalKey]: false });
 	};
 
@@ -295,7 +287,7 @@ class FunctionsPage extends React.Component {
 		}
 	};
 
-	onDragEnd = (result) => {
+	onDragEnd = result => {
 		if (!result.destination) return;
 		if (result.destination.index === result.source.index) {
 			return;
@@ -313,13 +305,11 @@ class FunctionsPage extends React.Component {
 	};
 
 	render() {
-		const {
- isLoading, functions, tier, featureFunctions, getFunction,
-} = this.props;
-		const { deployModal, checking, healthError } = this.state;
+		const { isLoading, functions, tier, getFunction } = this.props;
+		const { deployModal, checking, healthError, notFoundError } = this.state;
 		this.sortedDataSource = (functions || []).sort((a, b) => a.order - b.order);
 
-		if (!isValidPlan(tier, featureFunctions)) {
+		if (tier && validPlans.indexOf(tier) === -1) {
 			return (
 				<React.Fragment>
 					<Banner {...bannerDetails} />
@@ -327,7 +317,7 @@ class FunctionsPage extends React.Component {
 						style={{
 							maxWidth: '70%',
 						}}
-						src="https://i.imgur.com/JvTEWo5.png"
+						src="https://www.dropbox.com/s/pdtq9rhf4jkg8kp/Screenshot%202020-01-17%2014.03.54.png?raw=1"
 						alt="functions"
 					/>
 				</React.Fragment>
@@ -337,9 +327,38 @@ class FunctionsPage extends React.Component {
 		if (isLoading || checking) {
 			return <Loader />;
 		}
+
 		if (healthError) {
 			return (
 				<Result status="500" title="500" subTitle="Sorry, the open-fass service is down." />
+			);
+		}
+
+		if (notFoundError) {
+			return (
+				<React.Fragment>
+					<Banner {...bannerDetails} />
+					<Result
+						status="404"
+						title="Enable Functions"
+						subTitle={
+							<p>
+								Functions are not enabled on this instance. Please check the link
+								below to get started with functions.
+								<br />
+								For more support, you can reach out to us on info@appbase.io
+							</p>
+						}
+						extra={
+							<a
+								href="https://docs.appbase.io/docs/search/Functions/#quick-start"
+								className="ant-btn ant-btn-primary ant-btn-lg"
+							>
+								Enable Functions
+							</a>
+						}
+					/>
+				</React.Fragment>
 			);
 		}
 		return (
@@ -386,6 +405,34 @@ class FunctionsPage extends React.Component {
 					render={dropProvided => (
 						<div ref={dropProvided.innerRef}>
 							<List
+								locale={{
+									emptyText: (
+										<div
+											css={{
+												display: 'flex',
+												flexDirection: 'column',
+												justifyContent: 'center',
+												alignItems: 'center',
+											}}
+										>
+											<h3>No functions Deployed Yet!</h3>
+											<br />
+											<Button
+												onClick={() => {
+													this.setState({ deployModal: true });
+												}}
+												type="primary"
+												rel="noopener noreferrer"
+												style={{
+													width: 250,
+												}}
+											>
+												<Icon type="deployment-unit" />
+												Start Deploying Function
+											</Button>
+										</div>
+									),
+								}}
 								rowKey={item => item.function.service}
 								itemLayout="vertical"
 								dataSource={this.sortedDataSource}
@@ -394,15 +441,26 @@ class FunctionsPage extends React.Component {
 										key={item.function.service}
 										item={item}
 										index={index}
-										render={(dragProvided, dragSnapshot) => (
+										render={dragProvided => (
 											<div
+												className={listItemClass}
 												ref={dragProvided.innerRef}
 												{...dragProvided.draggableProps}
-												{...dragProvided.dragHandleProps}
 											>
+												<Tooltip title="Drag to re-order the sequence of invoking the functions">
+													<Icon
+														type="drag"
+														{...dragProvided.dragHandleProps}
+														className="showOnHover"
+														style={{
+															fontSize: '18px',
+															position: 'absolute',
+															left: 15,
+															top: 35,
+														}}
+													/>
+												</Tooltip>
 												<List.Item
-													className={listClass}
-													style={this.getListStyle(index, dragSnapshot)}
 													key={item.function.service}
 													extra={
 														item.availableReplicas > 0 && (
@@ -419,15 +477,6 @@ class FunctionsPage extends React.Component {
 														item={item}
 														onChange={e => this.handleEnable(e, item)}
 														getFunction={getFunction}
-													/>
-													<Log
-														name={item.function.service}
-														style={{
-															width:
-																item.availableReplicas > 0
-																	? '45vw'
-																	: '100%',
-														}}
 													/>
 												</List.Item>
 											</div>
@@ -468,7 +517,4 @@ const mapDispatchToProps = dispatch => ({
 	getFunction: appName => dispatch(getSingleFunction(appName)),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(FunctionsPage);
+export default connect(mapStateToProps, mapDispatchToProps)(FunctionsPage);

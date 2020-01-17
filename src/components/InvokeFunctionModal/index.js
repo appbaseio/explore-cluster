@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import {
- Button, Modal, Row, Skeleton,
-} from 'antd';
+import { Button, Modal, Row, Skeleton } from 'antd';
 import { css } from 'emotion';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
@@ -62,7 +60,7 @@ const InvokeFunctionModal = ({
 		);
 	}
 
-	const handleRequestDataChange = (value) => {
+	const handleRequestDataChange = value => {
 		let isValid = true;
 		try {
 			setParsedData(JSON.parse(value));
@@ -160,7 +158,4 @@ const mapDispatchToProps = dispatch => ({
 	invokeFunction: (name, payload) => dispatch(invokeFunction(name, payload)),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(InvokeFunctionModal);
+export default connect(mapStateToProps, mapDispatchToProps)(InvokeFunctionModal);

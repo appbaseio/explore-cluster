@@ -29,8 +29,9 @@ export default class Onboarding extends Component {
 	};
 
 	nextScreen = () => {
-		this.setState((state) => {
-			const currentScreen =	state.currentScreen + 1 < state.totalScreen
+		this.setState(state => {
+			const currentScreen =
+				state.currentScreen + 1 < state.totalScreen
 					? state.currentScreen + 1
 					: state.currentScreen;
 
@@ -43,9 +44,9 @@ export default class Onboarding extends Component {
 	};
 
 	previousScreen = () => {
-		this.setState((state) => {
-			const currentScreen = state.currentScreen - 1 >= 0
-				? state.currentScreen - 1 : state.currentScreen;
+		this.setState(state => {
+			const currentScreen =
+				state.currentScreen - 1 >= 0 ? state.currentScreen - 1 : state.currentScreen;
 
 			return {
 				...state,
@@ -58,7 +59,7 @@ export default class Onboarding extends Component {
 		});
 	};
 
-	setScreen = (currentScreen) => {
+	setScreen = currentScreen => {
 		this.setState(state => ({
 			...state,
 			currentScreen:
@@ -72,25 +73,25 @@ export default class Onboarding extends Component {
 		});
 	};
 
-	setURL = (url) => {
+	setURL = url => {
 		this.setState({
 			url,
 		});
 	};
 
-	setSearchFields = (searchFields) => {
+	setSearchFields = searchFields => {
 		this.setState({
 			searchFields,
 		});
 	};
 
-	setFacetFields = (facetFields) => {
+	setFacetFields = facetFields => {
 		this.setState({
 			facetFields,
 		});
 	};
 
-	setAppName = (newApp) => {
+	setAppName = newApp => {
 		this.setState({
 			newApp,
 		});
@@ -100,12 +101,10 @@ export default class Onboarding extends Component {
 		const { history } = this.props;
 		localStorage.setItem('hasVisitedTutorial', true);
 		history.push('/');
-	}
+	};
 
 	renderCurrentScreen = () => {
-		const {
-			currentScreen, hasJSON, url, searchFields, facetFields, newApp,
-		} = this.state;
+		const { currentScreen, hasJSON, url, searchFields, facetFields, newApp } = this.state;
 		const RenderScreen = screens[currentScreen];
 		let props = {};
 
@@ -165,8 +164,7 @@ export default class Onboarding extends Component {
 						<div
 							className="color"
 							style={{
-								width: `${((currentScreen + 1) * 100)
-									/ totalScreen}%`,
+								width: `${((currentScreen + 1) * 100) / totalScreen}%`,
 							}}
 						/>
 					</div>

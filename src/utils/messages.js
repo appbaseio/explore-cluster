@@ -65,4 +65,5 @@ export const suggestionsMessages = {
 	indices: Message('Only selected indices will be considered to calculate the suggestions.'),
 };
 // eslint-disable-next-line
-export const getMessages = isUserManagement => isUserManagement ? userManagementMessages : credentialsMessages;
+export const getMessages = isUserManagement =>
+	isUserManagement ? userManagementMessages : credentialsMessages;

@@ -1,14 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import {
- message, Modal, notification, Radio, Row,
-} from 'antd';
+import { message, Modal, notification, Radio, Row } from 'antd';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import PrivateRegistry from './components/PrivateRegistry';
-import {
- deploymentCheck, handleInputClosure, isTrue, renderInputField,
-} from './helper';
+import { deploymentCheck, handleInputClosure, isTrue, renderInputField } from './helper';
 import EnvTable from './components/EnvTable';
 import { modalHeading } from '../../pages/HomePage/styles';
 import {
@@ -179,7 +175,4 @@ const mapDispatchToProps = dispatch => ({
 	getFunction: appName => dispatch(getSingleFunction(appName)),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(DeployFunctionModal);
+export default connect(mapStateToProps, mapDispatchToProps)(DeployFunctionModal);

@@ -23,7 +23,7 @@ export const displayErrors = (nextErrors = [], prevErrors = [], showNotification
 	});
 };
 
-export const isBase64 = (str) => {
+export const isBase64 = str => {
 	if (str === '' || str.trim() === '') {
 		return false;
 	}
@@ -36,7 +36,7 @@ export const isBase64 = (str) => {
 
 export const capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1);
 
-export const compressNumber = (amount) => {
+export const compressNumber = amount => {
 	let mAmount = amount;
 	let finalNum = null;
 	try {
@@ -114,10 +114,11 @@ export const getAppCount = (appStats, plan) => {
 	return obj;
 };
 
-export const validateAppName = (name) => {
+export const validateAppName = name => {
 	const symbolsToCheck = /[\s#&*'"\\|,<>\/?]/; //eslint-disable-line
 	const nameCharacters = name.split('');
-	const startsWith =		nameCharacters[0] === '+' || nameCharacters[0] === '-' || nameCharacters[0] === '_';
+	const startsWith =
+		nameCharacters[0] === '+' || nameCharacters[0] === '-' || nameCharacters[0] === '_';
 
 	if (name === '.' || name === '..' || name === '' || symbolsToCheck.test(name) || startsWith) {
 		return false;

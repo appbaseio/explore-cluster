@@ -69,7 +69,7 @@ export async function getESIndices(authToken) {
 	}
 
 	const indices = {};
-	data.forEach((item) => {
+	data.forEach(item => {
 		indices[item.index] = item;
 	});
 
@@ -239,7 +239,7 @@ export async function setPrivateRegistry(payload = {}) {
 export async function fetchLogs(name = 'default') {
 	const ACC_API = getURL();
 	const authToken = sessionStorage.getItem('authToken');
-	const response = await fetch(`${ACC_API}/_function/${name}/logs`, {
+	const response = await fetch(`${ACC_API}/_function/${name}/logs?tail=100`, {
 		headers: {
 			'Content-Type': 'application/json',
 			Authorization: `Basic ${authToken}`,
@@ -267,7 +267,10 @@ export async function getFunctionHealthCheck() {
 	});
 	const data = await response.json();
 	if (response.status >= 400) {
-		throw data.error.message;
+		throw {
+			status: response.status,
+			message: data.error.message,
+		};
 	}
 
 	return data;

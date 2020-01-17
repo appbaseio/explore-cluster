@@ -1,7 +1,5 @@
 import React from 'react';
-import {
- Button, Icon, message, Modal, notification, Popover, Radio, Typography,
-} from 'antd';
+import { Button, Icon, message, Modal, notification, Popover, Radio, Typography } from 'antd';
 import { connect } from 'react-redux';
 import { css } from 'emotion';
 import { get } from 'lodash';
@@ -45,9 +43,7 @@ class TriggerFunction extends React.Component {
 
 	handleSave = () => {
 		const { putFunctions, node } = this.props;
-		const {
- type, when, expression, parsedValue,
-} = this.state;
+		const { type, when, expression, parsedValue } = this.state;
 		putFunctions(node.function.service, {
 			...node,
 			trigger: {
@@ -56,7 +52,7 @@ class TriggerFunction extends React.Component {
 				expression,
 			},
 			extraRequestPayload: parsedValue,
-		}).then((res) => {
+		}).then(res => {
 			if (res && res.error) {
 				notification.error({
 					message: 'Error',
@@ -69,13 +65,13 @@ class TriggerFunction extends React.Component {
 		});
 	};
 
-	handleChange = (e) => {
+	handleChange = e => {
 		this.setState({
 			[e.target.name]: e.target.value,
 		});
 	};
 
-	handleRequestChange = (value) => {
+	handleRequestChange = value => {
 		let isValid = true;
 		let parsedValue;
 		try {
@@ -87,9 +83,7 @@ class TriggerFunction extends React.Component {
 	};
 
 	render() {
-		const {
- isVisible, type, when, expression, request, isValidJSON,
-} = this.state;
+		const { isVisible, type, when, expression, request, isValidJSON } = this.state;
 		const { node, isLoading } = this.props;
 		const enviroment = `index = ['abc']
 category = 'search'
@@ -196,7 +190,4 @@ const mapDispatchToProps = dispatch => ({
 	putFunctions: (appName, payload) => dispatch(updateFunctions(appName, payload, true)),
 });
 
-export default connect(
-	null,
-	mapDispatchToProps,
-)(TriggerFunction);
+export default connect(null, mapDispatchToProps)(TriggerFunction);

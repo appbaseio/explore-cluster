@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import {
- Button, Col, Icon, Input, Row,
-} from 'antd';
+import { Button, Col, Icon, Input, Row } from 'antd';
 import { css } from 'emotion';
 import { commonRowPad } from '../helper';
 import { modalHeading } from '../../../pages/HomePage/styles';
@@ -30,7 +28,7 @@ const EnvTable = ({ dataSource: data, setData }) => {
 			...data.slice(index + 1),
 		]);
 	};
-	const handleDelete = (index) => {
+	const handleDelete = index => {
 		setData([...data.slice(0, index), ...data.slice(index + 1)]);
 	};
 	return (

@@ -1,7 +1,5 @@
 import React from 'react';
-import {
- Button, Popconfirm, Tooltip, notification,
-} from 'antd';
+import { Button, Popconfirm, Tooltip, notification } from 'antd';
 import { css } from 'react-emotion';
 import { object, func } from 'prop-types';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -94,7 +92,11 @@ class Permission extends React.Component {
 							</Tooltip>
 						</CopyToClipboard>
 						<Tooltip placement="topLeft" title="Edit credentials">
-							<Button disabled={isExpired} onClick={this.handleEditCred} type="normal">
+							<Button
+								disabled={isExpired}
+								onClick={this.handleEditCred}
+								type="normal"
+							>
 								<EditIcon size={16} />
 							</Button>
 						</Tooltip>

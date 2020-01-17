@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import {
- array, node, string, func,
-} from 'prop-types';
+import { array, node, string, func } from 'prop-types';
 import styled, { css } from 'react-emotion';
 import { media } from '../../utils/media';
 import ClickToShow from './ClickToShow';

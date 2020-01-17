@@ -4,9 +4,7 @@ import { Tooltip, Icon } from 'antd';
 import styles from './styles';
 import Flex from '../../batteries/components/shared/Flex';
 
-const Grid = ({
- label, component, toolTipMessage, gridRatio, toolTipProps, ...rest
-}) => (
+const Grid = ({ label, component, toolTipMessage, gridRatio, toolTipProps, ...rest }) => (
 	<Flex css="margin-bottom: 30px" {...rest}>
 		<Flex
 			css={`

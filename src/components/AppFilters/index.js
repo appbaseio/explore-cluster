@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
- Row, Icon, Input, Checkbox, Tooltip, Radio,
-} from 'antd';
+import { Row, Icon, Input, Checkbox, Tooltip, Radio } from 'antd';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { css } from 'emotion';
@@ -31,9 +29,7 @@ const sysIndicesCheckbox = css`
 	}
 `;
 
-function AppFilters({
- apps, children, preferences, updatePreferences,
-}) {
+function AppFilters({ apps, children, preferences, updatePreferences }) {
 	const [data, setData] = useState([]);
 	const [systemIndices, setSystemIndices] = useState(preferences.showSystemIndices);
 	const [searchTerm, setSearchTerm] = useState('');
@@ -45,14 +41,14 @@ function AppFilters({
 			: apps.filter(dataItem => dataItem.index && dataItem.index[0] !== '.');
 		setData(dataToPonder.filter(dataItem => dataItem.index.includes(searchTerm)));
 	};
-	const handleInputChange = (e) => {
+	const handleInputChange = e => {
 		setSearchTerm(e.target.value);
 	};
-	const handleCheckboxChange = (e) => {
+	const handleCheckboxChange = e => {
 		setSystemIndices(e.target.checked);
 		updatePreferences({ showSystemIndices: e.target.checked });
 	};
-	const handleListToggle = (checked) => {
+	const handleListToggle = checked => {
 		setListView(checked);
 		updatePreferences({ showListView: checked });
 	};
@@ -117,7 +113,4 @@ const mapDispatchToProps = dispatch => ({
 	updatePreferences: payload => dispatch(updateAppScreenPreferences(payload)),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(AppFilters);
+export default connect(mapStateToProps, mapDispatchToProps)(AppFilters);

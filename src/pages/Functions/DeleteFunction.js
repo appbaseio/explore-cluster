@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import {
- Button, Icon, Input, Modal,
-} from 'antd';
+import { Button, Icon, Input, Modal } from 'antd';
 import { connect } from 'react-redux';
 import { deleteFunction } from '../../batteries/modules/actions';
 
@@ -29,7 +27,7 @@ function DeleteFunction({ name, deleteFunctions, loading }) {
 				Type the function name <span style={{ fontWeight: '600' }}>{name}</span> below to
 				delete this function. This action cannot be undone.
 				<Input
-					onChange={(event) => {
+					onChange={event => {
 						const { value } = event.target;
 						setDisabled(value !== name);
 					}}
@@ -44,7 +42,4 @@ const mapDispatchToProps = dispatch => ({
 	deleteFunctions: funcName => dispatch(deleteFunction(funcName)),
 });
 
-export default connect(
-	null,
-	mapDispatchToProps,
-)(DeleteFunction);
+export default connect(null, mapDispatchToProps)(DeleteFunction);

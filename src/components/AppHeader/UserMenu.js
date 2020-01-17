@@ -1,8 +1,6 @@
 import React from 'react';
 import { object } from 'prop-types';
-import {
- Menu, Avatar, Dropdown, Icon,
-} from 'antd';
+import { Menu, Avatar, Dropdown, Icon } from 'antd';
 import { css } from 'react-emotion';
 import { media } from '../../utils/media';
 

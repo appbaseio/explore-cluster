@@ -37,9 +37,7 @@ const icon = css`
 		font-size: 20px;
 	`)};
 `;
-const Overlay = ({
- src, alt, lockSectionStyle, ...props
-}) => (
+const Overlay = ({ src, alt, lockSectionStyle, ...props }) => (
 	<div css={imgContainer} {...props}>
 		<div css={overlay}>
 			<div css={upgradePlan} style={lockSectionStyle}>

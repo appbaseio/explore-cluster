@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import {
- Icon, Menu, Layout, Tag,
-} from 'antd';
+import { Icon, Menu, Layout, Tag } from 'antd';
 import { Switch, Route, Link } from 'react-router-dom';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
@@ -94,7 +92,7 @@ const getActiveMenu = (props, prevActiveSubMenu = []) => {
 		pathname = getParam('view') || '';
 	}
 	const routes = defaultRoutes;
-	Object.keys(routes).some((route) => {
+	Object.keys(routes).some(route => {
 		if (routes[route].menu) {
 			const active = routes[route].menu.find(item => pathname === item.link);
 
@@ -159,7 +157,7 @@ class DashboardWrapper extends Component {
 				url: props.location.pathname,
 			};
 		}
-		(url = props.location.pathname);
+		url = props.location.pathname;
 		if (appName && appName !== state.appName) {
 			return { appName, ...setActiveMenu };
 		}
@@ -191,14 +189,12 @@ class DashboardWrapper extends Component {
 		}
 	}
 
-	onCollapse = (collapsed) => {
+	onCollapse = collapsed => {
 		this.setState({ collapsed });
 	};
 
 	render() {
-		const {
- collapsed, showHeader, routes, activeSubMenu, activeMenuItem,
-} = this.state;
+		const { collapsed, showHeader, routes, activeSubMenu, activeMenuItem } = this.state;
 
 		return (
 			<Layout>
@@ -224,7 +220,7 @@ class DashboardWrapper extends Component {
 							width: '100%',
 							height: 'calc(100% - 102px)',
 						}}
-						onOpenChange={(param) => {
+						onOpenChange={param => {
 							this.setState({
 								activeSubMenu: param,
 							});
@@ -241,7 +237,7 @@ class DashboardWrapper extends Component {
 								</Link>
 							</Menu.Item>
 						) : null}
-						{Object.keys(routes).map((route) => {
+						{Object.keys(routes).map(route => {
 							if (routes[route].menu) {
 								const Title = (
 									<span>
@@ -328,7 +324,4 @@ const mapDispatchToProps = dispatch => ({
 	fetchClusterPlan: () => dispatch(getAppPlan()),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(DashboardWrapper);
+export default connect(mapStateToProps, mapDispatchToProps)(DashboardWrapper);

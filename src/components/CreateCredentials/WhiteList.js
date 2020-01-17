@@ -1,7 +1,5 @@
 import React from 'react';
-import {
- Icon, Input, Select, Button, Alert,
-} from 'antd';
+import { Icon, Input, Select, Button, Alert } from 'antd';
 import PropTypes from 'prop-types';
 import styles from './styles';
 import Grid from './Grid';
@@ -17,7 +15,7 @@ class WhiteList extends React.Component {
 		};
 	}
 
-	handleSelectOption = (value) => {
+	handleSelectOption = value => {
 		this.setState(() => {
 			const { control } = this.props;
 			if (value && !control.value.includes(value)) {
@@ -32,13 +30,13 @@ class WhiteList extends React.Component {
 		});
 	};
 
-	handleOnChange = (value) => {
+	handleOnChange = value => {
 		this.setState({
 			text: value,
 		});
 	};
 
-	handleOnSearch = (value) => {
+	handleOnSearch = value => {
 		if (!(value && value.startsWith('**'))) {
 			this.setState({
 				text: value.trim(),
@@ -46,7 +44,7 @@ class WhiteList extends React.Component {
 		}
 	};
 
-	removeItem = (item) => {
+	removeItem = item => {
 		const { control } = this.props;
 		const { value } = control;
 		const index = value.indexOf(item);
@@ -83,9 +81,7 @@ class WhiteList extends React.Component {
 			defaultSuggestionValue,
 			defaultValue,
 			handleWarningMessage,
-			control: {
- value, handler, hasError, disabled, enabled,
-},
+			control: { value, handler, hasError, disabled, enabled },
 			type,
 			toolTipMessage,
 		} = this.props;
@@ -95,13 +91,13 @@ class WhiteList extends React.Component {
 			<Grid
 				label={<span css={styles.subHeader}>{label}</span>}
 				toolTipMessage={toolTipMessage}
-				component={(
-<Flex css="width: 100%;position: relative" flexDirection="column">
+				component={
+					<Flex css="width: 100%;position: relative" flexDirection="column">
 						{!(value && value.includes(defaultValue)) && (
 							<Alert
 								style={{ marginBottom: 10 }}
-								message={(
-<Flex justifyContent="space-between">
+								message={
+									<Flex justifyContent="space-between">
 										<span
 											style={{
 												maxWidth: 280,
@@ -112,8 +108,8 @@ class WhiteList extends React.Component {
 										<Button onClick={() => onChange([defaultValue])}>
 											Reset
 										</Button>
-</Flex>
-)}
+									</Flex>
+								}
 								type="warning"
 							/>
 						)}
@@ -167,7 +163,7 @@ class WhiteList extends React.Component {
 											</Flex>
 										</Select.Option>
 									) : (
-										Object.keys(Suggestions).map((k) => {
+										Object.keys(Suggestions).map(k => {
 											const suggestion = Suggestions[k];
 											if (text) {
 												const suggestionValue = `${suggestion.prefix}${text}${suggestion.suffix}`;
@@ -207,11 +203,11 @@ class WhiteList extends React.Component {
 									{...inputProps}
 									{...handler()}
 									value={text}
-									onChange={(e) => {
+									onChange={e => {
 										this.handleOnChange(e.target.value);
 									}}
 									onBlur={this.submitOnBlur}
-									onKeyPress={(event) => {
+									onKeyPress={event => {
 										if (event.key === 'Enter') {
 											this.submitOnBlur();
 										}
@@ -220,8 +216,8 @@ class WhiteList extends React.Component {
 							)}
 							{hasError('invalidIP') && <div css={styles.error}>Not a valid IP</div>}
 						</div>
-</Flex>
-)}
+					</Flex>
+				}
 			/>
 		);
 	}

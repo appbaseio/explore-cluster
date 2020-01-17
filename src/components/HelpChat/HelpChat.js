@@ -1,8 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {
- Button, Dropdown, Menu, Modal, Input, message,
-} from 'antd';
+import { Button, Dropdown, Menu, Modal, Input, message } from 'antd';
 import { css } from 'emotion';
 
 import { heading, subHeading } from './styles';
@@ -33,7 +31,7 @@ class HelpButton extends React.Component {
 		});
 	};
 
-	handleChange = (e) => {
+	handleChange = e => {
 		const { name, value } = e.target;
 		this.setState({
 			[name]: value,
@@ -74,7 +72,7 @@ class HelpButton extends React.Component {
 				},
 			)
 				.then(res => res.json())
-				.then((data) => {
+				.then(data => {
 					const displayMessage = data.inlineMessage
 						.replace('<p>', '')
 						.replace('</p>', '');
@@ -93,7 +91,7 @@ class HelpButton extends React.Component {
 		}
 	};
 
-	handleClick = (e) => {
+	handleClick = e => {
 		const { key } = e;
 		switch (key) {
 			case 'chat': {
@@ -182,6 +180,7 @@ class HelpButton extends React.Component {
 	}
 }
 
-const HelpChat = props => ReactDOM.createPortal(<HelpButton {...props} />, document.getElementById('help'));
+const HelpChat = props =>
+	ReactDOM.createPortal(<HelpButton {...props} />, document.getElementById('help'));
 
 export default HelpChat;

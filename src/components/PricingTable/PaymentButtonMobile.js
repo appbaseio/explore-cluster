@@ -25,9 +25,7 @@ class PaymentButtonMobile extends React.Component {
 	state = { visible: false };
 
 	get text() {
-		const {
- isCurrentPlan, handleUnsubscribe, subscriptionID, isPaid,
-} = this.props;
+		const { isCurrentPlan, handleUnsubscribe, subscriptionID, isPaid } = this.props;
 		if (subscriptionID && isCurrentPlan) {
 			if (handleUnsubscribe && isPaid) {
 				return 'Unsubscribe';
@@ -75,7 +73,14 @@ class PaymentButtonMobile extends React.Component {
 		if (subscriptionID) {
 			return (
 				<React.Fragment>
-					<Link disabled={this.shouldDisableButton} onClick={isCurrentPlan ? handleUnsubscribe : this.showModal} css={{ color: linkColor }} {...btnProps}>{this.text}</Link>
+					<Link
+						disabled={this.shouldDisableButton}
+						onClick={isCurrentPlan ? handleUnsubscribe : this.showModal}
+						css={{ color: linkColor }}
+						{...btnProps}
+					>
+						{this.text}
+					</Link>
 					<Modal
 						title="Update plan"
 						visible={visible}
@@ -98,7 +103,7 @@ class PaymentButtonMobile extends React.Component {
 				disabled={isCurrentPlan}
 				stripeKey={STRIPE_KEY.LIVE}
 			>
-			<Link css={{ color: linkColor }}>{this.text}</Link>
+				<Link css={{ color: linkColor }}>{this.text}</Link>
 			</Stripe>
 		);
 	}
@@ -127,12 +132,11 @@ PaymentButtonMobile.propTypes = {
 	subscriptionID: PropTypes.string,
 };
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
 	const appPlan = getAppPlanByName(state);
 	return {
 		isPaid: get(appPlan, 'isPaid', false),
 	};
 };
-
 
 export default connect(mapStateToProps, null)(PaymentButtonMobile);

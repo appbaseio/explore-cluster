@@ -1,6 +1,4 @@
-import {
- takeEvery, call, put, select,
-} from 'redux-saga/effects';
+import { takeEvery, call, put, select } from 'redux-saga/effects';
 import { APPS } from '../constants';
 import { getESIndices } from '../utils';
 import { loadAppsSuccess, loadAppsError } from '../actions';

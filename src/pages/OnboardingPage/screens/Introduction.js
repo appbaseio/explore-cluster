@@ -18,7 +18,7 @@ export default class Introduction extends Component {
 		};
 	}
 
-	setError = (e) => {
+	setError = e => {
 		if (this.interval) clearInterval(this.interval);
 		this.setState(
 			{
@@ -65,7 +65,7 @@ export default class Introduction extends Component {
 			appbaseHelpers
 				.createApp(value)
 				.then(res => res.json())
-				.then((res) => {
+				.then(res => {
 					if (res.index) {
 						app = {
 							appName: value,
@@ -87,7 +87,7 @@ export default class Introduction extends Component {
 						this.input.focus();
 					}
 				})
-				.catch((e) => {
+				.catch(e => {
 					this.setError(
 						'Some error occurred. Please try again with a different app name.',
 					);
@@ -105,7 +105,7 @@ export default class Introduction extends Component {
 				<input
 					autoFocus
 					className="input"
-					ref={(ref) => {
+					ref={ref => {
 						this.input = ref;
 					}}
 					type="text"

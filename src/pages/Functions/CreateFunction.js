@@ -1,7 +1,5 @@
 import React from 'react';
-import {
- Modal, Button, Collapse, Icon, Typography,
-} from 'antd';
+import { Modal, Button, Collapse, Icon, Typography } from 'antd';
 import { withRouter } from 'react-router-dom';
 import { css } from 'emotion';
 
@@ -101,11 +99,11 @@ class CreateFunction extends React.Component {
 				>
 					<Collapse defaultActiveKey={1} accordion bordered={false}>
 						<Collapse.Panel
-							header={(
+							header={
 								<PanelHeader
 									title="Create function using faas-cli"
 									icon="code"
-									text={(
+									text={
 										<React.Fragment>
 											<a title="faas-cli" href="">
 												faas-cli
@@ -117,9 +115,9 @@ class CreateFunction extends React.Component {
 											</a>
 											.
 										</React.Fragment>
-									)}
+									}
 								/>
-							)}
+							}
 							showArrow={false}
 							key={1}
 						>
@@ -153,13 +151,13 @@ class CreateFunction extends React.Component {
 							<Code text="faas-cli push -f function.yml" />
 						</Collapse.Panel>
 						<Collapse.Panel
-							header={(
-        <PanelHeader
+							header={
+								<PanelHeader
 									title="Quick Tutorial"
 									icon="play-circle"
 									text="Here is a small video which will explain how to create a server less function built using NodeJS."
 								/>
-      )}
+							}
 							showArrow={false}
 							key={2}
 						>

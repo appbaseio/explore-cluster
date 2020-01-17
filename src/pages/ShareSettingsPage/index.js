@@ -85,7 +85,7 @@ class ShareSettingsView extends React.Component {
 		});
 	};
 
-	handleSubmit = (form) => {
+	handleSubmit = form => {
 		const { appId, shareApp, handleEditPermission } = this.props;
 		const { selectedSettings } = this.state;
 		const requestPayload = { ...form.value.operationType, ...form.value };
@@ -97,7 +97,7 @@ class ShareSettingsView extends React.Component {
 		}
 	};
 
-	handleEdit = (setting) => {
+	handleEdit = setting => {
 		this.setState({
 			showForm: true,
 			selectedSettings: setting,
@@ -117,11 +117,11 @@ class ShareSettingsView extends React.Component {
 				) : (
 					<React.Fragment>
 						<Card
-							extra={(
-<Button onClick={this.handleShare} size="large" type="primary">
+							extra={
+								<Button onClick={this.handleShare} size="large" type="primary">
 									Share
-</Button>
-)}
+								</Button>
+							}
 						>
 							<Table
 								scroll={{ x: 700 }}
@@ -129,7 +129,8 @@ class ShareSettingsView extends React.Component {
 									settingInfo: user,
 									handleEdit: this.handleEdit,
 								}))}
-								rowKey={row => `${get(row, 'settingInfo.username')}:${get(
+								rowKey={row =>
+									`${get(row, 'settingInfo.username')}:${get(
 										row,
 										'settingInfo.password',
 									)}`
@@ -176,10 +177,8 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
 	fetchAppShare: appId => dispatch(getSharedApp(appId)),
 	shareApp: (appId, payload) => dispatch(createAppShare(appId, payload)),
-	handleEditPermission: (appId, username, payload) => dispatch(updatePermission(appId, username, payload)),
+	handleEditPermission: (appId, username, payload) =>
+		dispatch(updatePermission(appId, username, payload)),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(ShareSettingsView);
+export default connect(mapStateToProps, mapDispatchToProps)(ShareSettingsView);

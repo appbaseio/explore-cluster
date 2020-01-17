@@ -37,7 +37,7 @@ class DeleteAppModal extends React.Component {
 					deleteAppName: '',
 				});
 			})
-			.catch((e) => {
+			.catch(e => {
 				message.error(e.message);
 				this.setState({
 					loading: false,
@@ -46,7 +46,7 @@ class DeleteAppModal extends React.Component {
 			});
 	};
 
-	handleInputChange = (e) => {
+	handleInputChange = e => {
 		const { name, value } = e.target;
 		this.setState({
 			[name]: value,
@@ -101,7 +101,4 @@ const mapDispatchToProps = dispatch => ({
 	handleRemoveApp: options => dispatch(removeAppData(options)),
 });
 
-export default connect(
-	null,
-	mapDispatchToProps,
-)(DeleteAppModal);
+export default connect(null, mapDispatchToProps)(DeleteAppModal);

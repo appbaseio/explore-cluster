@@ -17,14 +17,15 @@ function getHelpChatParam() {
 const PrivateRoute = ({ component: Component, user, ...rest }) => (
 	<Route
 		{...rest}
-		render={props => (user.data ? (
+		render={props =>
+			user.data ? (
 				<React.Fragment>
 					<Component {...props} />
 					{getHelpChatParam() ? <HelpChat user={user.data} /> : null}
 				</React.Fragment>
 			) : AUTH_ROUTES.includes(window.location.pathname) ? null : (
 				<Redirect to="/login" />
-			))
+			)
 		}
 	/>
 );

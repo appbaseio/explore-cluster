@@ -14,7 +14,7 @@ class EmailAuth extends React.Component {
 		otp: '',
 	};
 
-	handleInput = (e) => {
+	handleInput = e => {
 		const {
 			target: { name, value },
 		} = e;

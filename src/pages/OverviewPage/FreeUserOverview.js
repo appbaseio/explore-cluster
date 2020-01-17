@@ -25,7 +25,7 @@ const FreeUserOverview = () => (
 		<Header compact>
 			<Row type="flex" justify="space-between" gutter={16}>
 				<Col md={18}>
-					<h2>Welcome to your app{'\''}s dashboard view</h2>
+					<h2>Welcome to your app{"'"}s dashboard view</h2>
 					<Row>
 						<Col span={18}>
 							<p>
@@ -45,7 +45,11 @@ const FreeUserOverview = () => (
 							target="_blank"
 							rel="noreferrer noopener"
 						>
-							<img alt="Web Apps" css={image} src="../../../static/images/WebApp@2x.png" />
+							<img
+								alt="Web Apps"
+								css={image}
+								src="../../../static/images/WebApp@2x.png"
+							/>
 							Web App
 						</Button>
 					</div>

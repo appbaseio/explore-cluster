@@ -13,7 +13,7 @@ const codes = [
 	{ name: 'Armenia', flag: '🇦🇲', code: 'AM', dial_code: '374' },
 	{ name: 'Aruba', flag: '🇦🇼', code: 'AW', dial_code: '297' },
 	{ name: 'Australia', flag: '🇦🇺', code: 'AU', dial_code: '61' },
-    { name: 'Austria', flag: '🇦🇹', code: 'AT', dial_code: '43' },
+	{ name: 'Austria', flag: '🇦🇹', code: 'AT', dial_code: '43' },
 	{ name: 'Azerbaijan', flag: '🇦🇿', code: 'AZ', dial_code: '994' },
 	{ name: 'Bahamas', flag: '🇧🇸', code: 'BS', dial_code: '1242' },
 	{ name: 'Bahrain', flag: '🇧🇭', code: 'BH', dial_code: '973' },
