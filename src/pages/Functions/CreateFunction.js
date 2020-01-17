@@ -162,6 +162,7 @@ class CreateFunction extends React.Component {
 							key={2}
 						>
 							<iframe
+								title="video"
 								width="450"
 								height="315"
 								src="https://www.youtube.com/embed/wQZ5_mbbU5I"
