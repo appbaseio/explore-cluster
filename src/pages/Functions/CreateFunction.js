@@ -161,10 +161,17 @@ class CreateFunction extends React.Component {
 							showArrow={false}
 							key={2}
 						>
-							<Button type="primary">
-								<Icon type="play-circle" />
-								Watch the tutorial
-							</Button>
+							<iframe
+								width="450"
+								height="315"
+								src="https://www.youtube.com/embed/wQZ5_mbbU5I"
+								frameBorder="0"
+								allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+								allowFullScreen
+								style={{
+									borderRadius: 3,
+								}}
+							/>
 						</Collapse.Panel>
 					</Collapse>
 				</Modal>
