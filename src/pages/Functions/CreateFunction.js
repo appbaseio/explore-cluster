@@ -140,19 +140,19 @@ class CreateFunction extends React.Component {
 							</Paragraph>
 
 							<Paragraph strong>4. Create a Function</Paragraph>
-							<Code text="faas new --lang node10-express" />
-							<Paragraph strong>5. Update functionName/handler.js</Paragraph>
+							<Code text="faas new --lang node10-express my-first-function" />
+							<Paragraph strong>5. Update my-first-function/handler.js</Paragraph>
 							<Paragraph>
 								Here you can add business logic, example if you want to change query
 							</Paragraph>
 							<Code text={handlerCode} />
 							<Paragraph strong>6. Update image name</Paragraph>
 							<Paragraph>
-								In functionName.yaml file, update image name to either your
+								In my-first-function.yaml file, update image name to either your
 								docker-username/image or private-registry/image
 							</Paragraph>
 							<Paragraph strong>7. Build image</Paragraph>
-							<Code text="faas-cli build -f functionName.yml" />
+							<Code text="faas-cli build -f my-first-function.yml" />
 							<Paragraph strong>8. Push image</Paragraph>
 							<Code text="faas-cli push -f function.yml" />
 						</Collapse.Panel>
