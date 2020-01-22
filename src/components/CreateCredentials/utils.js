@@ -81,7 +81,7 @@ export const Types = {
 		ops: ['write'],
 	},
 	admin: {
-		description: 'Admin',
+		description: 'Read & Write',
 		ops: ['read', 'write', 'delete'],
 	},
 };
