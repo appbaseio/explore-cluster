@@ -1,11 +1,23 @@
 import React from 'react';
-import { Button, Icon, message, Modal, notification, Popover, Radio, Typography } from 'antd';
+import {
+	Button,
+	Icon,
+	message,
+	Modal,
+	notification,
+	Popover,
+	Radio,
+	Table,
+	Typography,
+} from 'antd';
 import { connect } from 'react-redux';
 import { css } from 'emotion';
 import { get } from 'lodash';
 import TextArea from 'antd/lib/input/TextArea';
 import { updateFunctions } from '../../batteries/modules/actions';
 import Ace from '../../batteries/components/SearchSandbox/containers/AceEditor';
+
+import './index.css';
 
 const { Paragraph } = Typography;
 
@@ -18,6 +30,80 @@ const paragraphStyle = css`
 	margin-top: 20px;
 	margin-bottom: 10px !important;
 `;
+
+const columns = [
+	{
+		title: 'Variable',
+		dataIndex: 'variable',
+	},
+	{
+		title: 'Description',
+		dataIndex: 'description',
+		width: 600,
+	},
+	{
+		title: 'Example values',
+		dataIndex: 'example',
+	},
+];
+const data = [
+	{
+		key: '1',
+		variable: 'category',
+		type: 'string',
+		description:
+			'Category is the classification of the type of the incoming request. It can be one of docs , search, indices, cat, clusters, misc, analytics.',
+		example: 'search',
+	},
+	{
+		key: '2',
+		variable: 'acl',
+		type: 'string',
+		description: (
+			<>
+				An ACL is granular classification of the category of the incoming request. You can
+				see the full list of values over{' '}
+				<a
+					target="_blank"
+					rel="noopener noreferrer"
+					href="https://arc-api.appbase.io/?version=latest#c736042c-7247-41a7-ab26-91e6861a1167"
+				>
+					here
+				</a>
+				.
+			</>
+		),
+		example: 'msearch',
+	},
+	{
+		key: '3',
+		variable: 'index',
+		type: 'Array<string>',
+		description: 'The search index/indices used in the incoming request.',
+		example: '["books"]',
+	},
+	{
+		key: '4',
+		variable: 'filter',
+		type: 'Array<{[key]: <string>]: string}>',
+		description: 'The search filters (aka facets) if present in the search query.',
+		example: '[ { "year": 2011 } ]',
+	},
+	{
+		key: '5',
+		variable: 'query',
+		type: 'string',
+		description: 'The search query string when present.',
+		example: 'budget smart phone',
+	},
+	{
+		key: '6',
+		variable: 'now',
+		type: 'int',
+		description: 'Request timestamp.',
+		example: '1578485425',
+	},
+];
 
 class TriggerFunction extends React.Component {
 	constructor(props) {
@@ -101,11 +187,23 @@ filter = [{"year": "2018"}]`;
 					Filter expressions allow setting a trigger condition for the function. You can
 					read more to understand the syntax.{' '}
 				</Paragraph>
-				<Paragraph strong>Enviroment</Paragraph>
-				<pre className={codeStyle}>{enviroment}</pre>
-
-				<Paragraph strong>Example Expression</Paragraph>
+				<Paragraph strong>Environment</Paragraph>
+				<Paragraph>
+					<Table dataSource={data} columns={columns} size="small" pagination={false} />
+				</Paragraph>
+				<Paragraph strong>Expressions</Paragraph>
 				<pre className={codeStyle}>{code}</pre>
+				<Paragraph>
+					We use this package to evaluate the expressions. Know more about syntax over{' '}
+					<a
+						target="_blank"
+						rel="noopener noreferrer"
+						href="https://github.com/antonmedv/expr/blob/master/docs/Language-Definition.md"
+					>
+						here
+					</a>
+					.
+				</Paragraph>
 			</div>
 		);
 
@@ -117,6 +215,7 @@ filter = [{"year": "2018"}]`;
 				</Button>
 				<Modal
 					title={`Set Trigger for ${node.function.service}`}
+					style={{ top: 20 }}
 					visible={isVisible}
 					onOk={this.handleSave}
 					onCancel={this.handleModal}
@@ -138,7 +237,13 @@ filter = [{"year": "2018"}]`;
 						<React.Fragment>
 							<Paragraph className={paragraphStyle} strong>
 								Trigger Type
-								<Popover content={content} title="Filter expression Syntax">
+								<Popover
+									content={content}
+									title="Filter Expression Syntax"
+									autoAdjustOverflow={false}
+									placement="bottom"
+									overlayClassName="popover-overflow"
+								>
 									<Icon style={{ marginLeft: 5 }} type="info-circle" />
 								</Popover>
 							</Paragraph>
