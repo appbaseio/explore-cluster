@@ -33,9 +33,7 @@ const EnvTable = ({ dataSource: data, setData }) => {
 	};
 	return (
 		<>
-			<h3 className={modalHeading} style={{ fontSize: '16px' }}>
-				Env Variables
-			</h3>
+			<h3 className={modalHeading}>Env Variables</h3>
 			{data.map((dataItem, index) => (
 				<Row className={commonRowPad} gutter={15} key={index}>
 					<Col span={11}>

@@ -42,10 +42,11 @@ const InvokeFunctionModal = ({
 	success,
 	invokeResults,
 	loading,
+	initialRequestData,
 }) => {
 	const [didMount, setDidMount] = useState(false);
-	const [requestData, setRequestData] = useState();
-	const [parsedData, setParsedData] = useState({});
+	const [requestData, setRequestData] = useState(JSON.stringify(initialRequestData || {}));
+	const [parsedData, setParsedData] = useState(initialRequestData || {});
 	const [isValidJSON, setIsValidJSON] = useState(true);
 	const [status, setStatus] = useState();
 	const [roundTrip, setRoundTrip] = useState();
@@ -62,12 +63,12 @@ const InvokeFunctionModal = ({
 
 	const handleRequestDataChange = value => {
 		let isValid = true;
+		setRequestData(value);
 		try {
 			setParsedData(JSON.parse(value));
 		} catch (e) {
 			isValid = false;
 		}
-		setRequestData(value);
 		setIsValidJSON(isValid);
 	};
 
@@ -100,7 +101,7 @@ const InvokeFunctionModal = ({
 		>
 			<Row>
 				<h3 className={modalHeading} style={{ marginTop: 0 }}>
-					Extra Request Data
+					Request Data
 				</h3>
 				<Ace
 					mode="json"

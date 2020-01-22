@@ -8,6 +8,7 @@ import {
 	Popover,
 	Radio,
 	Table,
+	Tooltip,
 	Typography,
 } from 'antd';
 import { connect } from 'react-redux';
@@ -236,7 +237,7 @@ filter = [{"year": "2018"}]`;
 					{type === 'filter' ? (
 						<React.Fragment>
 							<Paragraph className={paragraphStyle} strong>
-								Trigger Type
+								Filter Expression
 								<Popover
 									content={content}
 									title="Filter Expression Syntax"
@@ -267,6 +268,18 @@ filter = [{"year": "2018"}]`;
 					<React.Fragment>
 						<Paragraph className={paragraphStyle} strong>
 							Extra Request
+							<Tooltip
+								title={
+									<>
+										You can optionally add an additional request object (in JSON
+										format) that will be accessible to the function as
+										<b> event.body.extraRequestPayload</b> when it's invoked at
+										all times.
+									</>
+								}
+							>
+								<Icon style={{ marginLeft: 5 }} type="info-circle" />
+							</Tooltip>
 						</Paragraph>
 						<Ace
 							mode="json"

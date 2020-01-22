@@ -106,9 +106,9 @@ const DeployFunctionModal = ({
 
 	return (
 		<Modal
-			title="Deploy Function"
+			title={node ? `Update ${node.function.service}` : 'Deploy Function'}
 			onCancel={handleCancel}
-			okText="Deploy"
+			okText={node ? 'Update' : 'Deploy'}
 			visible
 			okButtonProps={{ disabled: Object.values(globalError).some(isTrue) }}
 			onOk={handleSubmit}

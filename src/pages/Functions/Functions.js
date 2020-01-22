@@ -54,6 +54,7 @@ function InvokeButton({ item }) {
 					handleCancel={() => setVisible(false)}
 					invocationCount={item.invocationCount}
 					functionName={item.function.service}
+					initialRequestData={item.extraRequestPayload}
 				/>
 			)}
 		</>

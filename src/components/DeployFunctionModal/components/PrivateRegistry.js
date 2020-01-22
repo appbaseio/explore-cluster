@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import { handleInputClosure, renderInputField } from '../helper';
 import { modalHeading } from '../../../pages/HomePage/styles';
 import { updatePrivateRegistry } from '../../../batteries/modules/actions/registry';
+import { isAbsoluteURL } from '../../../utils';
 
 const PrivateRegistry = ({ registry, updateRegistry, error, success, loading }) => {
 	const [didMount, setDidMount] = useState(false);
@@ -58,11 +59,7 @@ const PrivateRegistry = ({ registry, updateRegistry, error, success, loading }) 
 			<Collapse style={{ marginTop: '20px' }}>
 				<Collapse.Panel
 					key="private-registry"
-					header={
-						<span className={modalHeading} style={{ fontSize: '16px' }}>
-							Set Private Registry Info
-						</span>
-					}
+					header={<span className={modalHeading}>Set Private Registry Info</span>}
 				>
 					<>
 						{' '}
@@ -114,9 +111,17 @@ const PrivateRegistry = ({ registry, updateRegistry, error, success, loading }) 
 									globalError: localError,
 									fieldName: 'url',
 									fieldValue: url,
-									handleInputRequired,
+									handleInputRequired: (e, fieldName, setterFunc) => {
+										const { value } = e.target;
+										setterFunc(value);
+										setLocalError({
+											...localError,
+											[fieldName]: !isAbsoluteURL(value),
+										});
+									},
 									setterFunc: setURL,
 									extraProps: { placeholder: 'Enter Registry URL' },
+									errorMessage: 'Enter Valid URL',
 								})}
 							</Row>
 						</Row>

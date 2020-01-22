@@ -26,11 +26,12 @@ export function renderInputField({
 	handleInputRequired,
 	setterFunc,
 	extraProps,
+	errorMessage = 'Field Required',
 }) {
 	return (
 		<Form.Item
 			validateStatus={globalError[fieldName] ? 'error' : null}
-			help={globalError[fieldName] ? 'Field Required' : ''}
+			help={globalError[fieldName] ? errorMessage : ''}
 			style={{ marginBottom: 0 }}
 		>
 			<Input
