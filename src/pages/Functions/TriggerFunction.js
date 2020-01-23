@@ -13,7 +13,7 @@ import {
 } from 'antd';
 import { connect } from 'react-redux';
 import { css } from 'emotion';
-import { get } from 'lodash';
+import { get, pick } from 'lodash';
 import TextArea from 'antd/lib/input/TextArea';
 import { updateFunctions } from '../../batteries/modules/actions';
 import Ace from '../../batteries/components/SearchSandbox/containers/AceEditor';
@@ -132,7 +132,7 @@ class TriggerFunction extends React.Component {
 		const { putFunctions, node } = this.props;
 		const { type, when, expression, parsedValue } = this.state;
 		putFunctions(node.function.service, {
-			...node,
+			...pick(node, ['enabled', 'order', 'function']),
 			trigger: {
 				type,
 				executeBefore: when === 'before',
