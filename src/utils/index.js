@@ -239,7 +239,8 @@ function extractLogs(data) {
 	const parsedData = data.match(regex);
 	return parsedData.reduce((stringAcc, data) => {
 		const split = data.split(`"text":`)[1].split('}')[0];
-		return stringAcc + split.replace(/['"]+/g, '') + '\n';
+		const filtered = split.replace(/['"]+/g, '');
+		return stringAcc + filtered.replace(/\\n/g, '') + '\n';
 	}, '');
 }
 
