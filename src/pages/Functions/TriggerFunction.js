@@ -80,28 +80,30 @@ const data = [
 		key: '3',
 		variable: 'index',
 		type: 'Array<string>',
-		description: 'The search index/indices used in the incoming request.',
-		example: '["books"]',
+		description:
+			'The search index/indices used in the incoming request, default to ["*"] if no index is present.',
+		example: '["my-index"]',
 	},
 	{
 		key: '4',
 		variable: 'filter',
 		type: 'Array<{[key]: <string>]: string}>',
-		description: 'The search filters (aka facets) if present in the search query.',
+		description:
+			'The search filters (aka facets) if present in the search query. If no filters are passed, this will contain an empty array.',
 		example: '[ { "year": 2011 } ]',
 	},
 	{
 		key: '5',
 		variable: 'query',
 		type: 'string',
-		description: 'The search query string when present.',
+		description: 'The search query string when present, default to "" if no query is present.',
 		example: 'budget smart phone',
 	},
 	{
 		key: '6',
 		variable: 'now',
 		type: 'int',
-		description: 'Request timestamp.',
+		description: 'Request timestamp in seconds since epoch.',
 		example: '1578485425',
 	},
 ];
@@ -112,7 +114,7 @@ class TriggerFunction extends React.Component {
 		const executeBeforeVal = get(props.node, 'trigger.executeBefore');
 		this.state = {
 			isVisible: false,
-			type: (props.node && props.node.trigger && props.node.trigger.type) || 'filter',
+			type: (props.node && props.node.trigger && props.node.trigger.type) || 'always',
 			when:
 				executeBeforeVal !== undefined ? (executeBeforeVal ? 'before' : 'after') : 'before',
 			request: JSON.stringify(get(props.node, 'extraRequestPayload', {})),

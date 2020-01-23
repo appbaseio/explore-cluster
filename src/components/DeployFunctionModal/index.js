@@ -23,7 +23,6 @@ const DeployFunctionModal = ({
 	putFunctions,
 	getFunction,
 }) => {
-	console.log('node', node);
 	const oriEnvData = get(node, 'function.envVars', {});
 	const revEnvData = Object.keys(oriEnvData).map(key => ({
 		key,

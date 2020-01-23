@@ -109,7 +109,7 @@ function getPayload(parsedData, executeBefore) {
 			acl: 'search',
 			category: 'search',
 			index: '.books',
-			filter: [{ year: 2005 }],
+			filter: [{ year: 2011 }],
 			query: 'harry',
 			now: 1578485425,
 		},
