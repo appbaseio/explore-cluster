@@ -233,11 +233,10 @@ function FunctionItem({ item, onChange, getFunction }) {
 	);
 }
 
-const listItemClass = props => css`
-	border: ${props.isDragging ? '1px solid #40a9ff' : null};
+const listItemClass = css`
 	border-radius: 3px;
 	box-shadow: rgba(0, 0, 0, 0.05) 0px 3px 5px 0px;
-	background-color: ${props.isDragging ? '#91d5ff' : 'rgb(255, 255, 255)'};
+	background-color: rgb(255, 255, 255);
 	margin-bottom: 20px;
 	padding: 20px 40px;
 	position: relative;
@@ -466,14 +465,11 @@ class FunctionsPage extends React.Component {
 										key={item.function.service}
 										item={item}
 										index={index}
-										render={(dragProvided, dragSnapshot) => (
+										render={dragProvided => (
 											<div
-												className={listItemClass({
-													isDragging: dragSnapshot.isDragging,
-												})}
+												className={listItemClass}
 												ref={dragProvided.innerRef}
 												{...dragProvided.draggableProps}
-												{...dragProvided.dragHandleProps}
 											>
 												<Tooltip title="Drag to re-order the sequence of invoking the functions">
 													<Icon
