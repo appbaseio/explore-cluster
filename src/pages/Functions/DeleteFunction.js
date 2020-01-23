@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Icon, Input, Modal } from 'antd';
+import { Icon, Input, Modal, Tooltip } from 'antd';
 import { connect } from 'react-redux';
 import { deleteFunction } from '../../batteries/modules/actions';
 
@@ -8,13 +8,15 @@ function DeleteFunction({ name, deleteFunctions, loading }) {
 	const [visible, setVisible] = useState(false);
 	return (
 		<>
-			<Icon
-				theme="twoTone"
-				type="delete"
-				twoToneColor="#d11a2a"
-				style={{ cursor: 'pointer' }}
-				onClick={() => setVisible(true)}
-			/>
+			<Tooltip title="Delete Function">
+				<Icon
+					theme="twoTone"
+					type="delete"
+					twoToneColor="#d11a2a"
+					style={{ cursor: 'pointer' }}
+					onClick={() => setVisible(true)}
+				/>
+			</Tooltip>
 			<Modal
 				confirmLoading={loading}
 				okText="Delete"

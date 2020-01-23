@@ -55,6 +55,7 @@ function InvokeButton({ item }) {
 					invocationCount={item.invocationCount}
 					functionName={item.function.service}
 					initialRequestData={item.extraRequestPayload}
+					executeBefore={get(item, 'trigger.executeBefore')}
 				/>
 			)}
 		</>
@@ -83,12 +84,14 @@ function UpdateFunction({ item }) {
 	const [visible, setVisible] = useState(false);
 	return (
 		<>
-			<Icon
-				onClick={() => setVisible(true)}
-				style={{ cursor: 'pointer' }}
-				theme="twoTone"
-				type="edit"
-			/>
+			<Tooltip title="Edit Function">
+				<Icon
+					onClick={() => setVisible(true)}
+					style={{ cursor: 'pointer' }}
+					theme="twoTone"
+					type="edit"
+				/>
+			</Tooltip>
 			{visible && <DeployFunctionModal handleCancel={() => setVisible(false)} node={item} />}
 		</>
 	);
@@ -97,11 +100,13 @@ function UpdateFunction({ item }) {
 function Actions({ item, refetchFunction }) {
 	return (
 		<React.Fragment>
-			<TriggerFunction
-				isLoading={item.triggerUpdation}
-				refetchFunction={refetchFunction}
-				node={item}
-			/>
+			{item.enabled && (
+				<TriggerFunction
+					isLoading={item.triggerUpdation}
+					refetchFunction={refetchFunction}
+					node={item}
+				/>
+			)}
 
 			<InvokeButton item={item} />
 		</React.Fragment>
@@ -183,16 +188,19 @@ function FunctionItem({ item, onChange, getFunction }) {
 					{'  '}
 					{func.service}
 					{deploymentStatus === 'active' ? (
-						<Tooltip title={`${enabled ? 'Disable' : 'Enable'} Function`}>
-							<Switch
-								style={{
-									marginLeft: 8,
-								}}
-								loading={isToggling}
-								onChange={onChange}
-								checked={enabled}
-							/>
-						</Tooltip>
+						<>
+							<span className={tagStyle}>Active</span>
+							<Tooltip title={`${enabled ? 'Disable' : 'Enable'} Function`}>
+								<Switch
+									style={{
+										marginLeft: 8,
+									}}
+									loading={isToggling}
+									onChange={onChange}
+									checked={enabled}
+								/>
+							</Tooltip>
+						</>
 					) : (
 						<span className={tagStyle}>
 							{deploymentStatus === 'failed' ? (
@@ -210,8 +218,8 @@ function FunctionItem({ item, onChange, getFunction }) {
 				<>
 					<IconText type="container" key="container" text={func.image} />
 					<VerticalDivider />
-					<IconText text={(invocationCount || '').toString()} type="api" key="api" />
-					<VerticalDivider />
+					{/* <IconText text={(invocationCount || '').toString()} type="api" key="api" /> */}
+					{/* <VerticalDivider /> */}
 					<Logs name={func.service} isOpen={isLogsOpen} toggleIsOpen={toggleLogsState} />
 					<div className="showOnHover">
 						<VerticalDivider />
@@ -366,6 +374,8 @@ class FunctionsPage extends React.Component {
 						}
 						extra={
 							<a
+								target="_blank"
+								rel="noopener noreferrer"
 								href="https://docs.appbase.io/docs/search/Functions/#quick-start"
 								className="ant-btn ant-btn-primary ant-btn-lg"
 							>

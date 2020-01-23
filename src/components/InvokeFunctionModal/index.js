@@ -33,6 +33,89 @@ function InvokeResponse({ responseData, status, time }) {
 	);
 }
 
+function getPayload(parsedData, executeBefore) {
+	return {
+		extraRequestPayload: parsedData,
+		request: {
+			url: 'http://127.0.0.1:9200/.books/_search',
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: {
+				query: {
+					match: {
+						title: {
+							query: 'harry',
+						},
+					},
+				},
+			},
+		},
+		response: executeBefore
+			? undefined
+			: {
+					body: {
+						_shards: {
+							failed: 0,
+							skipped: 0,
+							successful: 1,
+							total: 1,
+						},
+						hits: {
+							hits: [
+								{
+									_id: '9E41hG8B-WWLBcH3Zqmb',
+									_index: '.books',
+									_score: 1,
+									_source: {
+										authors: 'J.K. Rowling',
+										average_rating: 4.73,
+										average_rating_rounded: 5,
+										books_count: 6,
+										id: 3753,
+										image:
+											'https://images.gr-assets.com/books/1328867351l/10.jpg',
+										image_medium:
+											'https://images.gr-assets.com/books/1328867351m/10.jpg',
+										isbn: '439827604',
+										language_code: 'eng',
+										original_publication_year: 2005,
+										original_series: 'Harry Potter',
+										original_title:
+											'Harry Potter Collection (Harry Potter, #1-6)',
+										ratings_count: 24618,
+										title: 'Harry Potter Collection (Harry Potter, #1-6)',
+									},
+									_type: '_doc',
+								},
+							],
+							max_score: 1,
+							total: {
+								relation: 'eq',
+								value: 3,
+							},
+						},
+						timed_out: false,
+						took: 1058,
+					},
+					headers: {
+						'Access-Control-Allow-Credentials': true,
+						'Content-Type': 'application/json',
+					},
+					status: 200,
+			  },
+		env: {
+			acl: 'search',
+			category: 'search',
+			index: '.books',
+			filter: [{ year: 2005 }],
+			query: 'harry',
+			now: 1578485425,
+		},
+	};
+}
+
 const InvokeFunctionModal = ({
 	functionName,
 	invocationCount,
@@ -43,10 +126,15 @@ const InvokeFunctionModal = ({
 	invokeResults,
 	loading,
 	initialRequestData,
+	executeBefore,
 }) => {
 	const [didMount, setDidMount] = useState(false);
-	const [requestData, setRequestData] = useState(JSON.stringify(initialRequestData || {}));
-	const [parsedData, setParsedData] = useState(initialRequestData || {});
+	const [requestData, setRequestData] = useState(
+		JSON.stringify(getPayload(initialRequestData || {}, executeBefore), null, 2),
+	);
+	const [parsedData, setParsedData] = useState(
+		getPayload(initialRequestData || {}, executeBefore),
+	);
 	const [isValidJSON, setIsValidJSON] = useState(true);
 	const [status, setStatus] = useState();
 	const [roundTrip, setRoundTrip] = useState();
@@ -56,7 +144,7 @@ const InvokeFunctionModal = ({
 		return (
 			<div className={title}>
 				<div>Invoke Function for {functionName}</div>
-				<div style={{ marginRight: '25px' }}>Invocation Count: {invocationCount}</div>
+				{/* <div style={{ marginRight: '25px' }}>Invocation Count: {invocationCount}</div> */}
 			</div>
 		);
 	}
@@ -110,7 +198,7 @@ const InvokeFunctionModal = ({
 					name="editor-JSON"
 					fontSize={14}
 					showPrintMargin
-					style={{ width: '100%', maxHeight: '100px' }}
+					style={{ width: '100%', maxHeight: '300px' }}
 					showGutter
 					highlightActiveLine
 					setOptions={{
