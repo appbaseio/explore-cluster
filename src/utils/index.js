@@ -1,6 +1,5 @@
 import { chain } from 'lodash';
 import { getURL } from '../constants/config';
-import { later } from '../components/DeployFunctionModal/helper';
 
 export async function getUser(username, password, url) {
 	const ACC_API = getURL();
@@ -235,6 +234,15 @@ export async function setPrivateRegistry(payload = {}) {
 	return data.message;
 }
 
+function extractLogs(data) {
+	const regex = new RegExp(/("text"):\s*([^\n]*)/, 'ig');
+	const parsedData = data.match(regex);
+	return parsedData.reduce((stringAcc, data) => {
+		const split = data.split(`"text":`)[1].split('}')[0];
+		return stringAcc + split.replace(/['"]+/g, '') + '\n';
+	}, '');
+}
+
 // fetch logs
 export async function fetchLogs(name = 'default') {
 	const ACC_API = getURL();
@@ -250,7 +258,9 @@ export async function fetchLogs(name = 'default') {
 	if (response.status >= 400) {
 		throw data.error.message;
 	}
-
+	if (data) {
+		return extractLogs(data);
+	}
 	return data;
 }
 
