@@ -99,8 +99,11 @@ const DeployFunctionModal = ({
 				myInterval = setInterval(handleDeploymentCheck, 7000);
 			}
 		} else {
-			deployFunction(functionName, payload);
-			myInterval = setInterval(handleDeploymentCheck, 7000);
+			deployFunction(functionName, payload).then(res => {
+				if (!(res && res.error)) {
+					myInterval = setInterval(handleDeploymentCheck, 7000);
+				}
+			});
 		}
 	};
 
