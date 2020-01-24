@@ -136,6 +136,8 @@ const tagStyle = css`
 	border-style: solid;
 	border-color: rgb(204, 204, 204);
 	border-image: initial;
+	text-transform: capitalize;
+	display: inline-block;
 `;
 
 const bannerDetails = {
@@ -187,9 +189,9 @@ function FunctionItem({ item, onChange, getFunction }) {
 					#{order}
 					{'  '}
 					{func.service}
-					{deploymentStatus === 'active' ? (
+					{deploymentStatus === 'active' || deploymentStatus === 'disabled' ? (
 						<>
-							<span className={tagStyle}>Active</span>
+							<span className={tagStyle}>{deploymentStatus}</span>
 							<Tooltip title={`${enabled ? 'Disable' : 'Enable'} Function`}>
 								<Switch
 									style={{
@@ -294,6 +296,7 @@ class FunctionsPage extends React.Component {
 		putFunctions(node.function.service, {
 			...node,
 			enabled: isChecked,
+			deploymentStatus: isChecked ? 'in_progress' : 'disabled',
 		});
 	};
 
