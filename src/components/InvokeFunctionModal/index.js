@@ -21,10 +21,11 @@ function InvokeResponse({ responseData, status, time }) {
 				<h3 className={modalHeading}>Response Status</h3>
 				{status}
 			</Row>
-			<Row>
-				<h3 className={modalHeading}>Roundtrip Time</h3>
-				{time}
-			</Row>
+			{/* TODO: to be calculated */}
+			{/* <Row> */}
+			{/*	<h3 className={modalHeading}>Roundtrip Time</h3> */}
+			{/*	{time} */}
+			{/* </Row> */}
 			<Row>
 				<h3 className={modalHeading}>Response Data</h3>
 				<pre>{JSON.stringify(responseData, null, 4)}</pre>
