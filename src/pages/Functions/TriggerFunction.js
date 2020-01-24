@@ -22,11 +22,6 @@ import './index.css';
 
 const { Paragraph } = Typography;
 
-const codeStyle = css`
-	padding: 10px;
-	background: #f8f8f8;
-`;
-
 const paragraphStyle = css`
 	margin-top: 20px;
 	margin-bottom: 10px !important;
@@ -45,20 +40,26 @@ const columns = [
 	{
 		title: 'Example values',
 		dataIndex: 'example',
+		render: text => <b>{text}</b>,
 	},
 ];
 const data = [
 	{
 		key: '1',
-		variable: 'Category',
+		variable: '$.category',
 		type: 'string',
-		description:
-			'Category is the classification of the type of the incoming request. It can be one of docs , search, indices, cat, clusters, misc, analytics.',
+		description: (
+			<>
+				Category is the classification of the type of the incoming request. It can be one of
+				<b> docs</b>, <b>search</b>, <b>indices</b>, <b>cat</b>, <b>clusters</b>,{' '}
+				<b>misc</b>, <b>analytics</b>.
+			</>
+		),
 		example: 'search',
 	},
 	{
 		key: '2',
-		variable: 'ACL',
+		variable: '$.acl',
 		type: 'string',
 		description: (
 			<>
@@ -78,33 +79,122 @@ const data = [
 	},
 	{
 		key: '3',
-		variable: 'Index',
+		variable: '$.index',
 		type: 'Array<string>',
-		description:
-			'The search index/indices used in the incoming request, default to ["*"] if no index is present.',
+		description: (
+			<>
+				The search index/indices used in the incoming request, default to{' '}
+				<b>[&#34;*&#34;]</b> if no index is present.
+			</>
+		),
 		example: '["my-index"]',
 	},
 	{
 		key: '4',
-		variable: 'Filter',
-		type: 'Array<{[key]: <string>]: string}>',
-		description:
-			'The search filters (aka facets) if present in the search query. If no filters are passed, this will contain an empty array.',
-		example: '[ { "year": 2011 } ]',
+		variable: '$.query',
+		type: 'string',
+		description: (
+			<>
+				The search query string when present, default to <b>&#34;&#34;</b> if no query is
+				present.
+			</>
+		),
+		example: 'budget smart phone',
 	},
 	{
 		key: '5',
-		variable: 'Now',
+		variable: '$.filter',
+		type: 'Array<{[key]: <string>]: string}>',
+		description:
+			'The search filters (aka facets) if present in the search query. If no filters are passed, this will contain an empty array.',
+		example: '{ "year": 2011 }',
+	},
+	{
+		key: '6',
+		variable: '$.now',
 		type: 'int',
 		description: 'Request timestamp in seconds since epoch.',
 		example: '1578485425',
 	},
+];
+
+const expressionColumns = [
+	{ title: 'Example', dataIndex: 'example' },
+	{ title: 'Description', dataIndex: 'description' },
+];
+
+const expressionData = [
 	{
-		key: '6',
-		variable: 'Query',
-		type: 'string',
-		description: 'The search query string when present, default to "" if no query is present.',
-		example: 'budget smart phone',
+		example: (
+			<>
+				$.category matches <b>search</b>
+			</>
+		),
+		description: (
+			<>
+				Filters the <b>search</b> requests.
+			</>
+		),
+	},
+	{
+		example: (
+			<>
+				$.category matches <b>search</b> and $.acl matches <b>msearch</b>
+			</>
+		),
+		description: (
+			<>
+				Filters the <b>_msearch</b> requests.
+			</>
+		),
+	},
+	{
+		example: (
+			<>
+				<b>my-index</b> in $.index
+			</>
+		),
+		description: (
+			<>
+				Filters the requests by <b>my-index</b>.
+			</>
+		),
+	},
+	{
+		example: (
+			<>
+				$.query startsWith <b>iphone</b>
+			</>
+		),
+		description: (
+			<>
+				Filters the requests for which search query starts with <b>iphone</b>.
+			</>
+		),
+	},
+	{
+		example: (
+			<>
+				$.filter.year matches <b>2012</b>
+			</>
+		),
+		description: (
+			<>
+				Filters the requests for which year <b>filter</b> is set to <b>2012</b>.
+			</>
+		),
+	},
+	{
+		example: (
+			<>
+				$.now &gt; <b>1578485425</b>
+			</>
+		),
+		description: (
+			<>
+				Filters the requests made after <b>Jan 08 2020</b>.
+			</>
+		),
 	},
 ];
 
@@ -116,6 +206,7 @@ class TriggerFunction extends React.Component {
 			isVisible: false,
 			type: (props.node && props.node.trigger && props.node.trigger.type) || 'always',
 			when:
+				// eslint-disable-next-line no-nested-ternary
 				executeBeforeVal !== undefined ? (executeBeforeVal ? 'before' : 'after') : 'before',
 			request: JSON.stringify(get(props.node, 'extraRequestPayload', {})),
 			expression: (props.node && props.node.trigger && props.node.trigger.expression) || '',
@@ -148,7 +239,7 @@ class TriggerFunction extends React.Component {
 					description: res.error.message,
 				});
 			} else {
-				message.success(`${node.function.service} triggered successfully`);
+				message.success(`${node.function.service} updated successfully`);
 				this.handleModal();
 			}
 		});
@@ -174,12 +265,6 @@ class TriggerFunction extends React.Component {
 	render() {
 		const { isVisible, type, when, expression, request, isValidJSON } = this.state;
 		const { node, isLoading } = this.props;
-		const expressionExamples = `Category matches 'search' ⇒ Filters the 'search' requests.
-Category matches 'search' and ACL matches 'msearch' ⇒ Filters the '_msearch' requests.
-'my-index' in Index ⇒ Filters the requests by 'my-index'.
-Query startsWith 'iphone' ⇒ Filters the requests for which search query starts with 'iphone'.
-Filter.year matches '2012' ⇒ Filters the requests for which year 'filter' is set to '2012'.
-Now > 1578485425 ⇒ Filters the requests made after 'Jan 08 2020'.`;
 		const content = (
 			<div>
 				<Paragraph>
@@ -191,7 +276,14 @@ Now > 1578485425 ⇒ Filters the requests made after 'Jan 08 2020'.`;
 					<Table dataSource={data} columns={columns} size="small" pagination={false} />
 				</Paragraph>
 				<Paragraph strong>Expressions</Paragraph>
-				<pre className={codeStyle}>{expressionExamples}</pre>
+				<Paragraph>
+					<Table
+						dataSource={expressionData}
+						columns={expressionColumns}
+						size="small"
+						pagination={false}
+					/>
+				</Paragraph>
 				<Paragraph>
 					We use this package to evaluate the expressions. Know more about syntax over{' '}
 					<a
@@ -271,8 +363,8 @@ Now > 1578485425 ⇒ Filters the requests made after 'Jan 08 2020'.`;
 									<>
 										You can optionally add an additional request object (in JSON
 										format) that will be accessible to the function as
-										<b> event.body.extraRequestPayload</b> when it's invoked at
-										all times.
+										<b> event.body.extraRequestPayload</b> when it&#39;s invoked
+										at all times.
 									</>
 								}
 							>

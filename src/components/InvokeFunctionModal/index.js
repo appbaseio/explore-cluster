@@ -107,11 +107,11 @@ function getPayload(parsedData, executeBefore) {
 					status: 200,
 			  },
 		env: {
-			acl: 'search',
+			acl: 'msearch',
 			category: 'search',
-			index: '.books',
-			filter: [{ year: 2011 }],
-			query: 'harry',
+			index: ['my-index'],
+			filter: { year: 2011 },
+			query: 'budget smart phone',
 			now: 1578485425,
 		},
 	};
