@@ -50,7 +50,7 @@ const columns = [
 const data = [
 	{
 		key: '1',
-		variable: 'category',
+		variable: 'Category',
 		type: 'string',
 		description:
 			'Category is the classification of the type of the incoming request. It can be one of docs , search, indices, cat, clusters, misc, analytics.',
@@ -58,7 +58,7 @@ const data = [
 	},
 	{
 		key: '2',
-		variable: 'acl',
+		variable: 'ACL',
 		type: 'string',
 		description: (
 			<>
@@ -78,7 +78,7 @@ const data = [
 	},
 	{
 		key: '3',
-		variable: 'index',
+		variable: 'Index',
 		type: 'Array<string>',
 		description:
 			'The search index/indices used in the incoming request, default to ["*"] if no index is present.',
@@ -86,7 +86,7 @@ const data = [
 	},
 	{
 		key: '4',
-		variable: 'filter',
+		variable: 'Filter',
 		type: 'Array<{[key]: <string>]: string}>',
 		description:
 			'The search filters (aka facets) if present in the search query. If no filters are passed, this will contain an empty array.',
@@ -94,17 +94,17 @@ const data = [
 	},
 	{
 		key: '5',
-		variable: 'query',
-		type: 'string',
-		description: 'The search query string when present, default to "" if no query is present.',
-		example: 'budget smart phone',
-	},
-	{
-		key: '6',
-		variable: 'now',
+		variable: 'Now',
 		type: 'int',
 		description: 'Request timestamp in seconds since epoch.',
 		example: '1578485425',
+	},
+	{
+		key: '6',
+		variable: 'Query',
+		type: 'string',
+		description: 'The search query string when present, default to "" if no query is present.',
+		example: 'budget smart phone',
 	},
 ];
 
@@ -174,16 +174,12 @@ class TriggerFunction extends React.Component {
 	render() {
 		const { isVisible, type, when, expression, request, isValidJSON } = this.state;
 		const { node, isLoading } = this.props;
-		const enviroment = `index = ['abc']
-category = 'search'
-acl = 'search'
-query = 'iphone'
-filter = [{"year": "2018"}]`;
-		const code = `'abc' in index
-
-'abc' in index and query contains 'iphone' // combination use
-
-(category matches 'docs' and acl matches 'create') and not (index matches '^logs*$')`;
+		const expressionExamples = `Category matches 'search' ⇒ Filters the 'search' requests.
+Category matches 'search' and ACL matches 'msearch' ⇒ Filters the '_msearch' requests.
+'my-index' in Index ⇒ Filters the requests by 'my-index'.
+Query startsWith 'iphone' ⇒ Filters the requests for which search query starts with 'iphone'.
+Filter.year matches '2012' ⇒ Filters the requests for which year 'filter' is set to '2012'.
+Now > 1578485425 ⇒ Filters the requests made after 'Jan 08 2020'.`;
 		const content = (
 			<div>
 				<Paragraph>
@@ -195,7 +191,7 @@ filter = [{"year": "2018"}]`;
 					<Table dataSource={data} columns={columns} size="small" pagination={false} />
 				</Paragraph>
 				<Paragraph strong>Expressions</Paragraph>
-				<pre className={codeStyle}>{code}</pre>
+				<pre className={codeStyle}>{expressionExamples}</pre>
 				<Paragraph>
 					We use this package to evaluate the expressions. Know more about syntax over{' '}
 					<a
@@ -310,4 +306,7 @@ const mapDispatchToProps = dispatch => ({
 	putFunctions: (appName, payload) => dispatch(updateFunctions(appName, payload, true)),
 });
 
-export default connect(null, mapDispatchToProps)(TriggerFunction);
+export default connect(
+	null,
+	mapDispatchToProps,
+)(TriggerFunction);
