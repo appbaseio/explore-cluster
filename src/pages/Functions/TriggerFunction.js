@@ -46,7 +46,7 @@ const columns = [
 const data = [
 	{
 		key: '1',
-		variable: '$.category',
+		variable: '$category',
 		type: 'string',
 		description: (
 			<>
@@ -59,7 +59,7 @@ const data = [
 	},
 	{
 		key: '2',
-		variable: '$.acl',
+		variable: '$acl',
 		type: 'string',
 		description: (
 			<>
@@ -79,7 +79,7 @@ const data = [
 	},
 	{
 		key: '3',
-		variable: '$.index',
+		variable: '$index',
 		type: 'Array<string>',
 		description: (
 			<>
@@ -91,7 +91,7 @@ const data = [
 	},
 	{
 		key: '4',
-		variable: '$.query',
+		variable: '$query',
 		type: 'string',
 		description: (
 			<>
@@ -103,15 +103,15 @@ const data = [
 	},
 	{
 		key: '5',
-		variable: '$.filter',
+		variable: '$filter',
 		type: 'Array<{[key]: <string>]: string}>',
 		description:
 			'The search filters (aka facets) if present in the search query. If no filters are passed, this will contain an empty array.',
-		example: '{ "year": 2011 }',
+		example: '{ "year": 2012 }',
 	},
 	{
 		key: '6',
-		variable: '$.now',
+		variable: '$now',
 		type: 'int',
 		description: 'Request timestamp in seconds since epoch.',
 		example: '1578485425',
@@ -127,7 +127,7 @@ const expressionData = [
 	{
 		example: (
 			<>
-				$.category matches <b>search</b>
+				$category matches <b>search</b>
 			</>
 		),
 		description: (
@@ -139,7 +139,7 @@ const expressionData = [
 	{
 		example: (
 			<>
-				$.category matches <b>search</b> and $.acl matches <b>msearch</b>
+				$category matches <b>search</b> and $acl matches <b>msearch</b>
 			</>
 		),
 		description: (
@@ -151,7 +151,7 @@ const expressionData = [
 	{
 		example: (
 			<>
-				<b>my-index</b> in $.index
+				<b>my-index</b> in $index
 			</>
 		),
 		description: (
@@ -163,7 +163,7 @@ const expressionData = [
 	{
 		example: (
 			<>
-				$.query startsWith <b>iphone</b>
+				$query startsWith <b>iphone</b>
 			</>
 		),
 		description: (
@@ -175,7 +175,7 @@ const expressionData = [
 	{
 		example: (
 			<>
-				$.filter.year matches <b>2012</b>
+				$filter.year matches <b>2012</b>
 			</>
 		),
 		description: (
@@ -187,7 +187,7 @@ const expressionData = [
 	{
 		example: (
 			<>
-				$.now &gt; <b>1578485425</b>
+				$now &gt; <b>1578485425</b>
 			</>
 		),
 		description: (

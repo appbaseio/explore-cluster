@@ -110,7 +110,7 @@ function getPayload(parsedData, executeBefore) {
 			acl: 'msearch',
 			category: 'search',
 			index: ['my-index'],
-			filter: { year: 2011 },
+			filter: { year: 2012 },
 			query: 'budget smart phone',
 			now: 1578485425,
 		},
