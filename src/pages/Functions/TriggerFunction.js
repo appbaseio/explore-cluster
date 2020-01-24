@@ -306,7 +306,4 @@ const mapDispatchToProps = dispatch => ({
 	putFunctions: (appName, payload) => dispatch(updateFunctions(appName, payload, true)),
 });
 
-export default connect(
-	null,
-	mapDispatchToProps,
-)(TriggerFunction);
+export default connect(null, mapDispatchToProps)(TriggerFunction);

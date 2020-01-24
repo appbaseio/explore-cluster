@@ -100,13 +100,11 @@ function UpdateFunction({ item }) {
 function Actions({ item, refetchFunction }) {
 	return (
 		<React.Fragment>
-			{item.enabled && (
-				<TriggerFunction
-					isLoading={item.triggerUpdation}
-					refetchFunction={refetchFunction}
-					node={item}
-				/>
-			)}
+			<TriggerFunction
+				isLoading={item.triggerUpdation}
+				refetchFunction={refetchFunction}
+				node={item}
+			/>
 
 			<InvokeButton item={item} />
 		</React.Fragment>
@@ -219,13 +217,23 @@ function FunctionItem({ item, onChange, getFunction }) {
 			description={
 				<>
 					<IconText type="container" key="container" text={func.image} />
-					<VerticalDivider />
-					{/* <IconText text={(invocationCount || '').toString()} type="api" key="api" /> */}
-					{/* <VerticalDivider /> */}
-					<Logs name={func.service} isOpen={isLogsOpen} toggleIsOpen={toggleLogsState} />
+					{item.enabled && (
+						<>
+							<VerticalDivider />
+							<Logs
+								name={func.service}
+								isOpen={isLogsOpen}
+								toggleIsOpen={toggleLogsState}
+							/>
+						</>
+					)}
 					<div className="showOnHover">
-						<VerticalDivider />
-						<UpdateFunction item={item} getFunction={getFunction} />
+						{item.enabled && (
+							<>
+								<VerticalDivider />
+								<UpdateFunction item={item} getFunction={getFunction} />
+							</>
+						)}
 						<VerticalDivider />
 						<DeleteFunction name={func.service} loading={isDeleting} />
 					</div>
@@ -490,7 +498,8 @@ class FunctionsPage extends React.Component {
 												<List.Item
 													key={item.function.service}
 													extra={
-														item.deploymentStatus === 'active' && (
+														item.deploymentStatus === 'active' &&
+														item.enabled && (
 															<Actions
 																item={item}
 																refetchFunction={
