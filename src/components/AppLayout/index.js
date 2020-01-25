@@ -113,7 +113,7 @@ class AppLayout extends React.PureComponent {
 		const { appName } = this.props.match.params; // eslint-disable-line
 		return (
 			<Layout
-				css={{
+				style={{
 					paddingTop: showHeader ? 60 : 0,
 					minHeight: '100vh',
 					marginLeft: collapsed ? '80px' : '260px',
