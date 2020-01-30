@@ -14,21 +14,23 @@ const title = css`
 	justify-content: space-between;
 `;
 
-function InvokeResponse({ responseData, status, time }) {
+function InvokeResponse({ responseData, status }) {
+	console.log('response data', responseData);
+	const { headers, ...rest } = responseData;
+	// ___headers___['X-Duration-Seconds']
 	return (
 		<>
 			<Row>
 				<h3 className={modalHeading}>Response Status</h3>
 				{status}
 			</Row>
-			{/* TODO: to be calculated */}
-			{/* <Row> */}
-			{/*	<h3 className={modalHeading}>Roundtrip Time</h3> */}
-			{/*	{time} */}
-			{/* </Row> */}
+			<Row>
+				<h3 className={modalHeading}>Execution Time</h3>
+				{headers['X-Duration-Seconds']}s
+			</Row>
 			<Row>
 				<h3 className={modalHeading}>Response Data</h3>
-				<pre>{JSON.stringify(responseData, null, 4)}</pre>
+				<pre>{JSON.stringify(rest, null, 4)}</pre>
 			</Row>
 		</>
 	);
@@ -185,7 +187,7 @@ const InvokeFunctionModal = ({
 			onCancel={handleCancel}
 			okText="Done"
 			visible
-			okButtonProps={{ style: { display: 'none' } }}
+			footer={null}
 			width={600}
 		>
 			<Row>
@@ -217,7 +219,8 @@ const InvokeFunctionModal = ({
 			{loading ? (
 				<Skeleton />
 			) : (
-				invokeState !== FUNCTIONS.NOT_INVOKED && (
+				invokeState !== FUNCTIONS.NOT_INVOKED &&
+				responseData && (
 					<InvokeResponse status={status} time={roundTrip} responseData={responseData} />
 				)
 			)}
