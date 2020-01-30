@@ -31,8 +31,8 @@
   integrity sha512-jCH+k2Vjlno4YWl6g535nHR09PwCEmTBKAG6VqF+rhkrSPRLfgpU2maagwbZPLjaHuU5Jd1DFQ2KJpQuI6uG8w==
 
 "@appbaseio-confidential/importer@git+https://1dc0d0fc07f05943afdde9bdb85b7aa438a0ce3b:x-oauth-basic@github.com/appbaseio-confidential/importer#importer/lib":
-  version "2.0.0-alpha.14"
-  resolved "git+https://1dc0d0fc07f05943afdde9bdb85b7aa438a0ce3b:x-oauth-basic@github.com/appbaseio-confidential/importer#018e29d58d1f77bc2fb22e24fc9d4121210c5ca8"
+  version "2.0.0-alpha.17"
+  resolved "git+https://1dc0d0fc07f05943afdde9bdb85b7aa438a0ce3b:x-oauth-basic@github.com/appbaseio-confidential/importer#d3cc61512b99067a20c488adda49c8819fda4075"
   dependencies:
     aws-sdk "^2.469.0"
     emotion "^10.0.9"
