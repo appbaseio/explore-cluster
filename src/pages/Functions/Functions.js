@@ -140,8 +140,7 @@ const tagStyle = css`
 
 const bannerDetails = {
 	title: 'Functions',
-	description:
-		'Create "If this, then that" style functions to add your own custom search and security logic.',
+	description: `Create "If this, then that" style functions to add your own custom search and security logic. Functions will be executed in the order in which they are listed. You can drag and drop a function to change the ordering sequence.`,
 	buttonText: 'Read more',
 	icon: 'pencil',
 	href: 'https://docs.appbase.io/docs/search/Functions/',
@@ -184,7 +183,6 @@ function FunctionItem({ item, onChange, getFunction }) {
 			}}
 			title={
 				<React.Fragment>
-					#{order}
 					{'  '}
 					{func.service}
 					{deploymentStatus === 'active' || deploymentStatus === 'disabled' ? (
@@ -250,6 +248,8 @@ const listItemClass = css`
 	margin-bottom: 20px;
 	padding: 20px 40px;
 	position: relative;
+	display: flex;
+	justify-content: space-between;
 
 	.showOnHover {
 		display: none;
@@ -363,7 +363,26 @@ class FunctionsPage extends React.Component {
 
 		if (healthError) {
 			return (
-				<Result status="500" title="500" subTitle="Sorry, the open-fass service is down." />
+				<Result
+					status="warning"
+					title="500"
+					subTitle={
+						<div>
+							Sorry, the Open Faas service is down.
+							<br />
+							Please check{' '}
+							<a
+								href="https://docs.appbase.io/docs/search/Functions"
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								docs
+							</a>{' '}
+							for further information, or you can reach out to us at{' '}
+							<a href="mailto:support@appbase.io">support@appbase.io</a>
+						</div>
+					}
+				/>
 			);
 		}
 
@@ -405,8 +424,10 @@ class FunctionsPage extends React.Component {
 							<Row>
 								<Col lg={18}>
 									<p>
-										Create &quot;If this, then that&quot; style functions to add
-										your own custom search and security logic.
+										Create &quot;If this, then tha&quot; style functions to add
+										your own custom search and security logic. Functions will be
+										executed in the order in which they are listed. You can drag
+										and drop a function to change the ordering sequence.
 									</p>
 								</Col>
 							</Row>
@@ -483,17 +504,35 @@ class FunctionsPage extends React.Component {
 												{...dragProvided.draggableProps}
 											>
 												<Tooltip title="Drag to re-order the sequence of invoking the functions">
-													<Icon
-														type="drag"
-														{...dragProvided.dragHandleProps}
-														className="showOnHover"
+													<div
 														style={{
-															fontSize: '18px',
-															position: 'absolute',
-															left: 15,
-															top: 35,
+															display: 'flex',
+															padding: '18px 15px 15px 0',
+															cursor: 'pointer',
 														}}
-													/>
+													>
+														<div
+															style={{
+																display: 'flex',
+																flexDirection: 'column',
+															}}
+															{...dragProvided.dragHandleProps}
+														>
+															<Icon type="caret-up" />
+															<Icon
+																type="caret-down"
+																style={{ marginTop: '-6px' }}
+															/>
+														</div>
+														<div
+															style={{
+																fontWeight: 'bolder',
+																marginLeft: 5,
+															}}
+														>
+															{item.order}
+														</div>
+													</div>
 												</Tooltip>
 												<List.Item
 													key={item.function.service}
@@ -508,6 +547,9 @@ class FunctionsPage extends React.Component {
 															/>
 														)
 													}
+													style={{
+														flex: 1,
+													}}
 												>
 													<FunctionItem
 														item={item}

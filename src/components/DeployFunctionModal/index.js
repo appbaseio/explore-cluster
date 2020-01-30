@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import get from 'lodash/get';
 import PrivateRegistry from './components/PrivateRegistry';
 import { deploymentCheck, handleInputClosure, isTrue, renderInputField } from './helper';
-import EnvTable from './components/EnvTable';
+// import EnvTable from './components/EnvTable';
 import { modalHeading } from '../../pages/HomePage/styles';
 import {
 	createFunction,
@@ -156,9 +156,11 @@ const DeployFunctionModal = ({
 						/>
 					</Row>
 				)}
-				<Row>
-					<EnvTable dataSource={envDataSource} setData={setEnvData} />
-				</Row>
+				{/**
+					<Row>
+						<EnvTable dataSource={envDataSource} setData={setEnvData} />
+					</Row>
+				*/}
 			</>
 		</Modal>
 	);
