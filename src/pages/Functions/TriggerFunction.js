@@ -125,11 +125,7 @@ const expressionColumns = [
 
 const expressionData = [
 	{
-		example: (
-			<>
-				$category matches <b>search</b>
-			</>
-		),
+		example: <code>$category matches &apos;search&apos;</code>,
 		description: (
 			<>
 				Filters the <b>search</b> requests.
@@ -138,9 +134,7 @@ const expressionData = [
 	},
 	{
 		example: (
-			<>
-				$category matches <b>search</b> and $acl matches <b>msearch</b>
-			</>
+			<code>$category matches &apos;search&apos; and $acl matches &apos;msearch&apos;</code>
 		),
 		description: (
 			<>
@@ -149,11 +143,7 @@ const expressionData = [
 		),
 	},
 	{
-		example: (
-			<>
-				<b>my-index</b> in $index
-			</>
-		),
+		example: <code>&apos;my-index&apos; in $index</code>,
 		description: (
 			<>
 				Filters the requests by <b>my-index</b>.
@@ -161,11 +151,7 @@ const expressionData = [
 		),
 	},
 	{
-		example: (
-			<>
-				$query startsWith <b>iphone</b>
-			</>
-		),
+		example: <code>$query startsWith &apos;iphone&apos;</code>,
 		description: (
 			<>
 				Filters the requests for which search query starts with <b>iphone</b>.
@@ -173,11 +159,7 @@ const expressionData = [
 		),
 	},
 	{
-		example: (
-			<>
-				$filter.year matches <b>2012</b>
-			</>
-		),
+		example: <code>$filter.year matches &apos;2012&apos;</code>,
 		description: (
 			<>
 				Filters the requests for which year <b>filter</b> is set to <b>2012</b>.
@@ -185,11 +167,7 @@ const expressionData = [
 		),
 	},
 	{
-		example: (
-			<>
-				$now &gt; <b>1578485425</b>
-			</>
-		),
+		example: <code>$now &gt; 1578485425</code>,
 		description: (
 			<>
 				Filters the requests made after <b>Jan 08 2020</b>.
