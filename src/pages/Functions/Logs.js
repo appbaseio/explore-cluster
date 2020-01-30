@@ -63,7 +63,7 @@ function Logs({ name, isOpen, toggleIsOpen }) {
 						overflow: 'auto',
 						position: 'absolute',
 						bottom: 30,
-						left: 30,
+						left: 80,
 						right: 30,
 						borderRadius: '3px',
 					}}
@@ -76,6 +76,8 @@ function Logs({ name, isOpen, toggleIsOpen }) {
 								height: '100%',
 								overflow: 'auto',
 								position: 'relative',
+								marginTop: 10,
+								borderRadius: '3px',
 							}}
 						>
 							<div
@@ -88,7 +90,7 @@ function Logs({ name, isOpen, toggleIsOpen }) {
 									top: 0,
 									zIndex: 100,
 									padding: 5,
-									paddingRight: 30,
+									paddingRight: 10,
 									background: '#000',
 								}}
 							>

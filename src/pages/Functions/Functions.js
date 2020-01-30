@@ -183,8 +183,7 @@ function FunctionItem({ item, onChange, getFunction }) {
 			}}
 			title={
 				<React.Fragment>
-					{'  '}
-					{func.service}
+					<b>{func.service}</b>
 					{deploymentStatus === 'active' || deploymentStatus === 'disabled' ? (
 						<>
 							<span className={tagStyle}>{deploymentStatus}</span>
@@ -225,16 +224,14 @@ function FunctionItem({ item, onChange, getFunction }) {
 							/>
 						</>
 					)}
-					<div className="showOnHover">
-						{item.enabled && (
-							<>
-								<VerticalDivider />
-								<UpdateFunction item={item} getFunction={getFunction} />
-							</>
-						)}
-						<VerticalDivider />
-						<DeleteFunction name={func.service} loading={isDeleting} />
-					</div>
+					{item.enabled && (
+						<>
+							<VerticalDivider />
+							<UpdateFunction item={item} getFunction={getFunction} />
+						</>
+					)}
+					<VerticalDivider />
+					<DeleteFunction name={func.service} loading={isDeleting} />
 				</>
 			}
 		/>
