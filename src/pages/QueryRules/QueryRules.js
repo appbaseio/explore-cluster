@@ -8,9 +8,9 @@ import {
 	setCurrentApp,
 	getPermission as getPermissionFromAppbase,
 } from '../../batteries/modules/actions';
+import { getUrlParams } from '../../utils/helper';
 
 import Loader from '../../components/Loader';
-import Frame from '../../components/Frame';
 import { getURL } from '../../constants/config';
 
 class QueryRules extends Component {
@@ -52,12 +52,23 @@ class QueryRules extends Component {
 	render() {
 		const { appName, credentials, isCluster } = this.props;
 		const { isFrameLoading } = this.state;
+		const urlParams = getUrlParams(window.location.search);
 		const SCALR_API = getURL();
 		const { protocol, host } = URL(SCALR_API);
 		const url = `${protocol}://${credentials}@${host}`;
-		const iframeURL = `https://arc-promoted-results.netlify.com/promoted-results-queries/?appname=${
+		let iframeURL = `https://arc-promoted-results.netlify.com/promoted-results-queries/?appname=${
 			isCluster ? '*' : appName
 		}&url=${url}&footer=false&sidebar=false&appswitcher=false&mode=edit&cloneApp=false&oldBanner=false`;
+
+		if (urlParams.operator && urlParams.searchTerm) {
+			iframeURL = `https://arc-promoted-results.netlify.com/promoted-results/?appname=${
+				isCluster ? '*' : appName
+			}&url=${url}&footer=false&sidebar=false&appswitcher=false&mode=edit&cloneApp=false&oldBanner=false&queryOperator=${
+				urlParams.operator
+			}&searchTerm=${urlParams.searchTerm}&rule=${urlParams.operator}_${
+				urlParams.searchTerm
+			}`;
+		}
 
 		return (
 			<section>

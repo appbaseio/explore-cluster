@@ -40,20 +40,21 @@ const PopularSearchesWrapper = ({ appName, plan, isPaidUser }) => (
 					<PopularSearches
 						filterId="popular_searches_page"
 						displayReplaySearch
+						displayQueryRule
 						appName={appName}
 						plan={plan}
 					/>
 				</Container>
 			</React.Fragment>
 		) : (
-			<React.Fragment>
-				<Banner {...bannerMessagesAnalytics.free} />
-				<Overlay
-					src="/static/images/analytics/PopularSearches.png"
-					alt="popular searches"
-				/>
-			</React.Fragment>
-		)}
+				<React.Fragment>
+					<Banner {...bannerMessagesAnalytics.free} />
+					<Overlay
+						src="/static/images/analytics/PopularSearches.png"
+						alt="popular searches"
+					/>
+				</React.Fragment>
+			)}
 	</React.Fragment>
 );
 

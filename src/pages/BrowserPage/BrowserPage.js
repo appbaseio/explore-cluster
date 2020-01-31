@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { string, func, bool } from 'prop-types';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
+import Loadable from 'react-loadable';
+import { injectGlobal } from 'emotion';
 import URL from 'url-parser-lite';
 
 import {
@@ -10,14 +12,23 @@ import {
 } from '../../batteries/modules/actions';
 
 import Loader from '../../components/Loader';
-import Frame from '../../components/Frame';
 import { getURL } from '../../constants/config';
 
-class BrowserPage extends Component {
-	state = {
-		isFrameLoading: true,
-	};
+/* eslint-disable */
+injectGlobal`
+	.ace_editor,
+	.ace_editor div,
+	.ace_editor div span {
+		font-family: monospace !important;
+	}
+`;
 
+const DejavuComponent = Loadable({
+	loader: () => import('@appbaseio/dejavu-browser'),
+	loading: Loader,
+});
+
+class BrowserPage extends Component {
 	componentDidMount() {
 		const { credentials } = this.props;
 		if (!credentials) {
@@ -32,12 +43,6 @@ class BrowserPage extends Component {
 		}
 	}
 
-	frameLoaded = () => {
-		this.setState({
-			isFrameLoading: false,
-		});
-	};
-
 	init() {
 		// prettier-ignore
 		const {
@@ -51,29 +56,33 @@ class BrowserPage extends Component {
 
 	render() {
 		const { appName, credentials, isCluster } = this.props;
-		const { isFrameLoading } = this.state;
 		const SCALR_API = getURL();
 		const { protocol, host } = URL(SCALR_API);
 		const url = `${protocol}://${credentials}@${host}`;
-		const iframeURL = `https://dejavu.appbase.io/?appname=${
-			isCluster ? '*' : appName
-		}&url=${url}&footer=false&sidebar=false&appswitcher=false&mode=edit&cloneApp=false&oldBanner=false`;
-
+		const dejavu = {
+			url,
+			appname: isCluster ? '*' : appName,
+		};
 		return (
-			<section>
+			<section
+				style={{
+					backgroundColor: '#ffffff',
+					height: `${window.innerHeight - 65}px`,
+					padding: 20,
+				}}
+			>
 				{credentials ? (
-					<React.Fragment>
-						{isFrameLoading && <Loader />}
-						<Frame
-							height={`${window.innerHeight - 60 || 600}px`}
-							width="100%"
-							title="dejavu"
-							id="dejavu"
-							onLoad={this.frameLoaded}
-							src={iframeURL}
-							frameBorder="0"
+					<div>
+						<DejavuComponent
+							app={dejavu.appname}
+							url={dejavu.url}
+							credentials={credentials}
+							URLParams={false}
+							showHeaders={false}
+							forceReconnect
+							hasCloneApp={false}
 						/>
-					</React.Fragment>
+					</div>
 				) : (
 					<Loader />
 				)}

@@ -133,7 +133,6 @@ class CreateCredentials extends React.Component {
 						indicesHandler.disable();
 					} else {
 						opsHandler.setValue(Types.read);
-						categoriesHandler.setValue(defaultAclOptions);
 						opsHandler.enable();
 						categoriesHandler.enable();
 						indicesHandler.enable();
@@ -616,7 +615,7 @@ class CreateCredentials extends React.Component {
 																/>
 																{hasError('isNegative') && (
 																	<span css="color: red;margin-left: 10px">
-																		Field value can{"'"}t be
+																		Field value can&apos;t be
 																		negative.
 																	</span>
 																)}
@@ -644,7 +643,7 @@ class CreateCredentials extends React.Component {
 																/>
 																{hasError('isNegative') && (
 																	<span css="color: red;margin-left: 10px">
-																		Field value can{"'"}t be
+																		Field value can&apos;t be
 																		negative.
 																	</span>
 																)}

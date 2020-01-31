@@ -54,7 +54,7 @@ function AppFilters({ apps, children, preferences, updatePreferences }) {
 	};
 	useEffect(() => {
 		setFilteredData();
-	}, [searchTerm, systemIndices]);
+	}, [searchTerm, systemIndices, apps]);
 
 	return (
 		<>

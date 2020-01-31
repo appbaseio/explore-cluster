@@ -10,9 +10,20 @@ import applyClusterSettings from '@appbaseio-confidential/importer/lib/utils/app
 import Header from '../../components/Header';
 import { getUrlParams } from '../../utils/helper';
 
+// Adding this style for Importer components because we dont import styles with Importer Library
+import 'antd/es/upload/style/css';
+import 'antd/es/select/style/css';
+import 'antd/es/divider/style/css';
+import 'antd/es/switch/style/css';
+import 'antd/es/modal/style/css';
+
 injectGlobal`
 	.ant-layout-header{
 		background: white !important;
+	}
+
+	.ant-modal-confirm-body > .anticon + .ant-modal-confirm-title + .ant-modal-confirm-content {
+    	margin-left: 0;
 	}
 `;
 

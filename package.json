@@ -52,9 +52,10 @@
 	},
 	"dependencies": {
 		"@appbaseio-confidential/importer": "git+https://1dc0d0fc07f05943afdde9bdb85b7aa438a0ce3b:x-oauth-basic@github.com/appbaseio-confidential/importer#importer/lib",
+		"@appbaseio/dejavu-browser": "^0.1.6",
 		"@appbaseio/designkit": "^0.9.1",
 		"@appbaseio/reactivecore": "^8.2.9",
-		"@appbaseio/reactivesearch": "^3.2.2",
+		"@appbaseio/reactivesearch": "^3.2.4",
 		"@babel/plugin-proposal-class-properties": "^7.0.0-rc.1",
 		"@typeform/embed": "^0.14.1",
 		"@ungap/url-search-params": "^0.1.2",

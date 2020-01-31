@@ -39,17 +39,18 @@ const NoResultSearchWrapper = ({ appName, plan, isPaidUser }) => (
 					<NoResultSearch
 						filterId="no_results_page"
 						displayReplaySearch
+						displayQueryRule
 						appName={appName}
 						plan={plan}
 					/>
 				</Container>
 			</React.Fragment>
 		) : (
-			<React.Fragment>
-				<Banner {...bannerMessagesAnalytics.free} />
-				<Overlay src="/static/images/analytics/NoResults.png" alt="no results searches" />
-			</React.Fragment>
-		)}
+				<React.Fragment>
+					<Banner {...bannerMessagesAnalytics.free} />
+					<Overlay src="/static/images/analytics/NoResults.png" alt="no results searches" />
+				</React.Fragment>
+			)}
 	</React.Fragment>
 );
 
