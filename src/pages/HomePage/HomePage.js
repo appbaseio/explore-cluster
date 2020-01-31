@@ -1,9 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { css } from 'react-emotion';
-import {
- Row, Col, Icon, Button, Layout,
-} from 'antd';
+import { Row, Col, Icon, Button, Layout } from 'antd';
 import get from 'lodash/get';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
@@ -34,7 +32,10 @@ class HomePage extends Component {
 	constructor(props) {
 		super(props);
 
-		this.sortOptions = [{ label: 'Name', key: 'name' }, { label: 'Most Recent', key: 'time' }];
+		this.sortOptions = [
+			{ label: 'Name', key: 'name' },
+			{ label: 'Most Recent', key: 'time' },
+		];
 		this.state = {
 			showModal: false, // modal for create new app
 		};
@@ -135,8 +136,7 @@ class HomePage extends Component {
 									target="_blank"
 									rel="noopener noreferrer"
 								>
-									APIs and Integrations{' '}
-									<Icon type="link" />
+									APIs and Integrations <Icon type="link" />
 								</a>
 							</Col>
 							<Col
@@ -189,7 +189,4 @@ const mapDispatchToProps = dispatch => ({
 	fetchApps: () => dispatch(loadApps()),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(HomePage);
+export default connect(mapStateToProps, mapDispatchToProps)(HomePage);

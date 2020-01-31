@@ -53,9 +53,7 @@ class CreateAppModal extends Component {
 	};
 
 	handleOk = async () => {
-		const {
-			appName, shards, replicas,
-		} = this.state;
+		const { appName, shards, replicas } = this.state;
 		const { handleCreateApp } = this.props;
 		const options = {
 			appName,
@@ -79,7 +77,7 @@ class CreateAppModal extends Component {
 		}
 	};
 
-	handleChange = (e) => {
+	handleChange = e => {
 		const {
 			target: { name, value },
 		} = e;
@@ -242,7 +240,4 @@ const mapDispatchToProps = dispatch => ({
 	resetApp: () => dispatch(resetCreatedApp()),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(CreateAppModal);
+export default connect(mapStateToProps, mapDispatchToProps)(CreateAppModal);

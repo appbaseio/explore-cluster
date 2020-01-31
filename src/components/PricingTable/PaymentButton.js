@@ -15,9 +15,7 @@ class PaymentButton extends React.Component {
 	state = { visible: false };
 
 	get text() {
-		const {
- isCurrentPlan, handleUnsubscribe, subscriptionID, isPaid,
-} = this.props;
+		const { isCurrentPlan, handleUnsubscribe, subscriptionID, isPaid } = this.props;
 		if (subscriptionID && isCurrentPlan) {
 			if (handleUnsubscribe && isPaid) {
 				return 'Unsubscribe';
@@ -50,12 +48,17 @@ class PaymentButton extends React.Component {
 		});
 	};
 
-
 	render() {
 		const { visible } = this.state;
 		const {
- name, plan, isCurrentPlan, handleToken, subscriptionID, btnProps, handleUnsubscribe,
-} = this.props;
+			name,
+			plan,
+			isCurrentPlan,
+			handleToken,
+			subscriptionID,
+			btnProps,
+			handleUnsubscribe,
+		} = this.props;
 		if (subscriptionID) {
 			return (
 				<React.Fragment>
@@ -131,12 +134,11 @@ PaymentButton.propTypes = {
 	subscriptionID: PropTypes.string,
 };
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
 	const appPlan = getAppPlanByName(state);
 	return {
 		isPaid: get(appPlan, 'isPaid', false),
 	};
 };
-
 
 export default connect(mapStateToProps, null)(PaymentButton);

@@ -46,7 +46,7 @@ SandboxPage.propTypes = {
 	updateCurrentApp: func.isRequired,
 };
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
 	const { username, password } = get(state, 'user.data', {});
 	return {
 		credentials: username ? `${username}:${password}` : null,
@@ -57,7 +57,4 @@ const mapDispatchToProps = dispatch => ({
 	updateCurrentApp: appName => dispatch(setCurrentApp(appName, appName)),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(SandboxPage);
+export default connect(mapStateToProps, mapDispatchToProps)(SandboxPage);

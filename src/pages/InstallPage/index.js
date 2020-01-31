@@ -1,8 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import {
- Card, Button, Icon, Checkbox,
-} from 'antd';
+import { Card, Button, Icon, Checkbox } from 'antd';
 import { Redirect, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import EmailAuth from './EmailAuth';
@@ -23,7 +21,7 @@ class InstallPage extends React.Component {
 		}));
 	};
 
-	handleChange = (e) => {
+	handleChange = e => {
 		const {
 			target: { name: checkboxName },
 		} = e;
@@ -67,8 +65,8 @@ class InstallPage extends React.Component {
 										paddingLeft: 5,
 									}}
 								>
-									By creating an arc instance, you agree to our Terms of Service and
-									Privacy Policy.
+									By creating an arc instance, you agree to our Terms of Service
+									and Privacy Policy.
 								</div>
 							</Checkbox>
 							<Checkbox
@@ -127,7 +125,4 @@ const mapStateToProps = ({ user }) => ({
 	user,
 });
 
-export default connect(
-	mapStateToProps,
-	null,
-)(InstallPage);
+export default connect(mapStateToProps, null)(InstallPage);

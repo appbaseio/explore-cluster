@@ -17,8 +17,11 @@ class AppPageContainer extends Component {
 
 	componentDidMount() {
 		const {
- isClusterPlanFetched, fetchClusterPlan, isClusterPlanFetching, isError,
-} = this.props;
+			isClusterPlanFetched,
+			fetchClusterPlan,
+			isClusterPlanFetching,
+			isError,
+		} = this.props;
 		if (!isClusterPlanFetching && !isClusterPlanFetched && !isError) {
 			fetchClusterPlan();
 		}
@@ -69,7 +72,4 @@ const mapDispatchToProps = dispatch => ({
 	fetchClusterPlan: () => dispatch(getAppPlan()),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(AppPageContainer);
+export default connect(mapStateToProps, mapDispatchToProps)(AppPageContainer);

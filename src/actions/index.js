@@ -1,7 +1,5 @@
 // @flow
-import {
- USER, APPS, CREATE_APP, APP_SCREEN_PREFERENCES,
-} from '../constants';
+import { USER, APPS, CREATE_APP, APP_SCREEN_PREFERENCES } from '../constants';
 import { createAction } from '../batteries/modules/actions/utils';
 
 export function loadUser(username: string, password: string, url?: string): Object {

@@ -1,7 +1,5 @@
 import React from 'react';
-import {
- Row, Col, Icon, notification,
-} from 'antd';
+import { Row, Col, Icon, notification } from 'antd';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import PropTypes from 'prop-types';
 
@@ -117,7 +115,7 @@ class ActionButtons extends React.Component {
 			appName,
 			appId,
 			shared,
-			permissions, // prettier-ignore
+			permissions // prettier-ignore
 		} = this.props;
 		const { deleteModal } = this.state;
 
@@ -134,7 +132,7 @@ class ActionButtons extends React.Component {
 			<div
 				className="card-actions"
 				key={appName}
-				onClick={(e) => {
+				onClick={e => {
 					e.preventDefault();
 					e.stopPropagation();
 				}}

@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import {
- Layout, Menu, Icon, Tag,
-} from 'antd';
+import { Layout, Menu, Icon, Tag } from 'antd';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import AppLayout from '../../components/AppLayout';
@@ -66,7 +64,7 @@ const getActiveMenu = (props, prevActiveSubMenu = []) => {
 		pathname = getParam('view') || '';
 	}
 
-	Object.keys(routes).some((route) => {
+	Object.keys(routes).some(route => {
 		if (routes[route].menu) {
 			const active = routes[route].menu.find(item => pathname === item.link);
 
@@ -163,7 +161,7 @@ class AppWrapper extends Component {
 		}
 	}
 
-	onCollapse = (collapsed) => {
+	onCollapse = collapsed => {
 		this.setState({ collapsed });
 	};
 
@@ -173,7 +171,7 @@ class AppWrapper extends Component {
 			showHeader,
 			appName,
 			activeSubMenu,
-			activeMenuItem, // prettier-ignore
+			activeMenuItem // prettier-ignore
 		} = this.state;
 		return (
 			<Layout>
@@ -199,7 +197,7 @@ class AppWrapper extends Component {
 							width: '100%',
 							height: 'calc(100% - 102px)',
 						}}
-						onOpenChange={(param) => {
+						onOpenChange={param => {
 							this.setState({
 								activeSubMenu: param,
 							});
@@ -221,7 +219,7 @@ class AppWrapper extends Component {
 								)}
 							</Link>
 						</Menu.Item>
-						{Object.keys(routes).map((route) => {
+						{Object.keys(routes).map(route => {
 							if (routes[route].menu) {
 								const Title = (
 									<span>
@@ -274,7 +272,4 @@ const mapDispatchToProps = dispatch => ({
 	updateCurrentApp: (appName, appId) => dispatch(setCurrentApp(appName, appId)),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(AppWrapper);
+export default connect(mapStateToProps, mapDispatchToProps)(AppWrapper);

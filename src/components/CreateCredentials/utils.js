@@ -25,7 +25,7 @@ export const Suggestions = {
 		description: 'Matches referers containing',
 	},
 };
-export const getSuggestionCode = (str) => {
+export const getSuggestionCode = str => {
 	if (str === '*') {
 		return 'Matches All';
 	}
@@ -40,11 +40,11 @@ export const getSuggestionCode = (str) => {
 	}
 	return Suggestions[1].description;
 };
-export const ipValidator = (value) => {
+export const ipValidator = value => {
 	const splitIp = value && value.split('/');
 	if (
-		splitIp
-		&& /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
+		splitIp &&
+		/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
 			splitIp[0],
 		)
 	) {
@@ -56,14 +56,14 @@ export const ipValidator = (value) => {
 	}
 	return false;
 };
-export const isNegative = (control) => {
+export const isNegative = control => {
 	if (control.value && parseInt(control.value, 10) < 0) {
 		return { isNegative: true };
 	}
 	return undefined;
 };
 
-export const isNegativeTTL = (control) => {
+export const isNegativeTTL = control => {
 	if (control.value !== -1 && control.value && parseInt(control.value, 10) < 0) {
 		return { isNegative: true };
 	}
@@ -139,10 +139,10 @@ export const aclOptionsLabel = {
 	rules: 'rules',
 };
 
-const filterCategories = (value) => {
+const filterCategories = value => {
 	const limits = value.ip_limit ? { ip_limit: parseFloat(value.ip_limit, 10) } : undefined;
 	const categories = [];
-	get(value, 'categories', []).forEach((category) => {
+	get(value, 'categories', []).forEach(category => {
 		if (category.tag) {
 			if (category.rateLimit !== undefined) {
 				limits[`${category.acl}_limit`] = parseFloat(category.rateLimit, 10);
@@ -156,9 +156,9 @@ const filterCategories = (value) => {
 	};
 };
 
-const getCategories = (value) => {
+const getCategories = value => {
 	const categories = [];
-	aclOptions.forEach((category) => {
+	aclOptions.forEach(category => {
 		const obj = {
 			acl: category,
 			tag: get(value, 'categories', []).includes(category),
@@ -171,9 +171,9 @@ const getCategories = (value) => {
 	return categories;
 };
 
-export const getOperationType = (value) => {
+export const getOperationType = value => {
 	let operationType;
-	Object.keys(Types).every((k) => {
+	Object.keys(Types).every(k => {
 		const type = Types[k];
 		if (isEqual(sortBy(value.ops), sortBy(type.ops))) {
 			operationType = type;

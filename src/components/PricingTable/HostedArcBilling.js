@@ -2,9 +2,7 @@ import React, { Component } from 'react';
 import styled, { css } from 'react-emotion';
 import { Check } from 'react-feather';
 import { connect } from 'react-redux';
-import {
- Tooltip, Modal, Button, Input, notification,
-} from 'antd';
+import { Tooltip, Modal, Button, Input, notification } from 'antd';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import Loader from '../../batteries/components/shared/Loader';
@@ -24,7 +22,8 @@ import { STRIPE_KEY } from '../../constants';
 import { ARC_PLANS, PRICE_BY_PLANS } from '../../batteries/utils';
 import PaymentButton from './PaymentButton';
 
-const CheckList = ({ list }) => list.map(item => (
+const CheckList = ({ list }) =>
+	list.map(item => (
 		<li key={item}>
 			<Check css={{ marginRight: '6px', fontWeight: 'strong' }} width="15" height="15" />{' '}
 			{item}
@@ -274,14 +273,14 @@ class HostedArcBilling extends Component {
 		const isTesting = false; // SET true to test with test stripe keys
 		if (subscriptionID) {
 			// Update plan
-			createSubscription(null, plan, isTesting).then((response) => {
+			createSubscription(null, plan, isTesting).then(response => {
 				if (response && response.payload) {
 					fetchAppPlan();
 				}
 			});
 		} else {
 			// Create subscription
-			createSubscription(token, plan, isTesting).then((response) => {
+			createSubscription(token, plan, isTesting).then(response => {
 				if (response && response.payload) {
 					fetchAppPlan();
 				}
@@ -305,7 +304,7 @@ class HostedArcBilling extends Component {
 
 	deleteSubscription = () => {
 		const { deleteSubscription } = this.props;
-		deleteSubscription().then((action) => {
+		deleteSubscription().then(action => {
 			const message = get(action, 'payload.message');
 			if (message) {
 				this.cancelConfirmBox();
@@ -322,7 +321,7 @@ class HostedArcBilling extends Component {
 		const { deleteSubscription, fetchAppPlan } = this.props;
 		deleteSubscription({
 			otp: String(otp),
-		}).then((action) => {
+		}).then(action => {
 			const payload = get(action, 'payload');
 			if (payload) {
 				this.closeOtpModal();
@@ -343,7 +342,7 @@ class HostedArcBilling extends Component {
 		this.setState({
 			resending: true,
 		});
-		deleteSubscription().then((action) => {
+		deleteSubscription().then(action => {
 			this.setState({
 				resending: false,
 			});
@@ -384,8 +383,13 @@ class HostedArcBilling extends Component {
 			otp,
 		} = this.state;
 		const {
-isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptionID,
-} = this.props;
+			isArcBasic,
+			isArcStandard,
+			isSubmitting,
+			isLoading,
+			isArcEnterprise,
+			subscriptionID,
+		} = this.props;
 		if (isLoading) {
 			return <Loader show message="Updating Plan... Please wait!" />;
 		}
@@ -426,7 +430,7 @@ isArcBasic, isArcStandard, isSubmitting, isLoading, isArcEnterprise, subscriptio
 								name="otp"
 								value={otp}
 								autoFocus
-								onChange={(e) => {
+								onChange={e => {
 									this.setState({
 										otp: e.target.value,
 									});
@@ -909,7 +913,7 @@ HostedArcBilling.propTypes = {
 	errors: PropTypes.array.isRequired,
 	subscriptionID: PropTypes.string,
 };
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
 	const appPlan = getAppPlanByName(state);
 	return {
 		isSubmitting: get(state, '$deleteAppSubscription.isFetching'),
@@ -927,12 +931,10 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = dispatch => ({
-	createSubscription: (plan, stripeToken, test) => dispatch(createAppSubscription(plan, stripeToken, test)),
+	createSubscription: (plan, stripeToken, test) =>
+		dispatch(createAppSubscription(plan, stripeToken, test)),
 	deleteSubscription: payload => dispatch(deleteAppSubscription(payload)),
 	fetchAppPlan: () => dispatch(getAppPlan()),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(HostedArcBilling);
+export default connect(mapStateToProps, mapDispatchToProps)(HostedArcBilling);

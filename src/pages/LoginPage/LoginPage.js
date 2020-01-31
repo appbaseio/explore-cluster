@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import {
- Card, Button, Icon, Input,
-} from 'antd';
+import { Card, Button, Icon, Input } from 'antd';
 import { Redirect, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { loadUser } from '../../actions';
@@ -42,7 +40,7 @@ class LoginPage extends Component {
 		}
 	};
 
-	onClusterURLBlur = (event) => {
+	onClusterURLBlur = event => {
 		const { value } = event.target;
 		if (!value) return;
 		const credObj = getURLCredentials(value) || {};
@@ -51,12 +49,13 @@ class LoginPage extends Component {
 		this.password.current.input.value = credObj.password || '';
 	};
 
-	getURL = (value) => {
+	getURL = value => {
 		const credObj = getURLCredentials(value) || {};
 		const { url } = getURLParameters(value);
 		const originURL = value.split('@')[1];
 		if (url) return removeTrailingSlashes(url);
-		if (!isEmpty(credObj)) return `${getProtocol(value)}//${removeTrailingSlashes(originURL || '')}`;
+		if (!isEmpty(credObj))
+			return `${getProtocol(value)}//${removeTrailingSlashes(originURL || '')}`;
 		return removeTrailingSlashes(value);
 	};
 
@@ -137,7 +136,4 @@ const mapDispatchToProps = dispatch => ({
 	loadArcUser: (u, p, url) => dispatch(loadUser(u, p, url)),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(LoginPage);
+export default connect(mapStateToProps, mapDispatchToProps)(LoginPage);

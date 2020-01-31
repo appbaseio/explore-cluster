@@ -14,7 +14,7 @@ const tableStyle = css`
 	padding: 10px;
 `;
 
-const getFileSizeInBytes = (size) => {
+const getFileSizeInBytes = size => {
 	if (typeof size !== 'string') return size;
 	const sizeInt = size.match(/\d+/)[0];
 	if (size.includes('gb')) {

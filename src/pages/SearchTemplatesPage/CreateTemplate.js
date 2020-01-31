@@ -59,7 +59,7 @@ class CreateTemplate extends React.Component {
 		const editMode = !!props.templateId;
 		const nameControl = props.control.get('name');
 		if (editMode) {
-			props.fetchTemplate(props.templateId).then((action) => {
+			props.fetchTemplate(props.templateId).then(action => {
 				if (get(action, 'payload')) {
 					const source = get(action, 'payload.script.source');
 					const sourceStr = getString(source);
@@ -149,8 +149,8 @@ class CreateTemplate extends React.Component {
 								}}
 								gridRatio={0.15}
 								label="Template Name"
-								component={(
-<FieldControl
+								component={
+									<FieldControl
 										name="name"
 										render={({
 											handler,
@@ -172,17 +172,17 @@ class CreateTemplate extends React.Component {
 													/>
 													{isError && (
 														<span className="error">
-															{(hasError('required')
-																&& 'Please enter template name.')
-																|| (hasError('pattern')
-																	&& 'Template name can not have spaces or special characters.')}
+															{(hasError('required') &&
+																'Please enter template name.') ||
+																(hasError('pattern') &&
+																	'Template name can not have spaces or special characters.')}
 														</span>
 													)}
 												</Flex>
 											);
 										}}
-/>
-)}
+									/>
+								}
 							/>
 							<Grid
 								toolTipMessage={queryMessage}
@@ -197,8 +197,8 @@ class CreateTemplate extends React.Component {
 								}}
 								gridRatio={0.15}
 								label="Query"
-								component={(
-<FieldControl
+								component={
+									<FieldControl
 										name="query"
 										render={({ handler }) => {
 											const inputHandler = handler();
@@ -237,8 +237,8 @@ class CreateTemplate extends React.Component {
 												/>
 											);
 										}}
-/>
-)}
+									/>
+								}
 							/>
 						</Card>
 						<TemplateResponse />
@@ -273,7 +273,4 @@ const mapDispatchToProps = dispatch => ({
 	fetchTemplate: id => dispatch(getAppTemplate(id)),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(CreateTemplate);
+export default connect(mapStateToProps, mapDispatchToProps)(CreateTemplate);

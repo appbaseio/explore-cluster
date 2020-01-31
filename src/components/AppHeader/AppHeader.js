@@ -1,11 +1,7 @@
 import React from 'react';
-import {
- Layout, Menu, Icon, Tooltip, Button, Row,
-} from 'antd';
+import { Layout, Menu, Icon, Tooltip, Button, Row } from 'antd';
 import { Link } from 'react-router-dom';
-import {
- string, object, bool, number,
-} from 'prop-types';
+import { string, object, bool, number } from 'prop-types';
 import { css } from 'react-emotion';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
@@ -37,9 +33,7 @@ const trialBtn = css`
 	`)};
 `;
 
-const AppHeader = ({
- currentApp, user, big, showApp, minimal, isUsingTrial, daysLeft,
-}) => (
+const AppHeader = ({ currentApp, user, big, showApp, minimal, isUsingTrial, daysLeft }) => (
 	<Header
 		className={headerStyles}
 		css={{

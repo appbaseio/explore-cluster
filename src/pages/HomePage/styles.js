@@ -53,6 +53,4 @@ const planInfo = css`
 	`)};
 `;
 
-export {
- modalHeading, radiobtn, input, pricebtn, clusterInfo, planDetails, planInfo,
-};
+export { modalHeading, radiobtn, input, pricebtn, clusterInfo, planDetails, planInfo };

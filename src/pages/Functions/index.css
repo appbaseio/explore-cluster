@@ -1,0 +1,4 @@
+.popover-overflow .ant-popover-inner-content {
+	height: 500px;
+	overflow-y: scroll;
+}

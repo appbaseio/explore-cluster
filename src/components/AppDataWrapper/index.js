@@ -1,9 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import {
- Button, Col, Icon, Empty
-} from 'antd';
+import { Button, Col, Icon, Empty } from 'antd';
 import { Link } from 'react-router-dom';
 import { css } from 'emotion';
 import AppCard from '../AppCard';
@@ -42,7 +40,7 @@ function AppDataWrapper({ apps, onCreateModalChange }) {
 		if (data.length === 0) {
 			return <div className={noData}>{renderNoData(onCreateModalChange)}</div>;
 		}
-		return data.map((app) => {
+		return data.map(app => {
 			const title = (
 				<div
 					css={{

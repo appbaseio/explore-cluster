@@ -20,7 +20,7 @@ import HostedArcBilling from '../../components/PricingTable/HostedArcBilling';
 import { PRICE_BY_PLANS, EFFECTIVE_PRICE_BY_PLANS } from '../../batteries/utils';
 
 function numberWithCommas(x) {
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
 const TextLink = styled('span')`
@@ -113,8 +113,8 @@ class Billing extends Component {
 				<BannerHeader
 					title={plan !== 'Basic' ? 'Upgrade Your Plan Now' : 'Your Current Plan Info'}
 					description=""
-					component={(
-<Row>
+					component={
+						<Row>
 							<Flex alignItems="center">
 								<Grid
 									style={{
@@ -165,12 +165,19 @@ class Billing extends Component {
 										}}
 										gridRatio={0.4}
 										label={<h3 css={heading}>Effective Monthly Price</h3>}
-										component={isClusterBilling ? `$${numberWithCommas(nodeCount
-											* PRICE_BY_PLANS[plan])} (calculated at $${
-											EFFECTIVE_PRICE_BY_PLANS[plan]
-										}/node hour)` : `$${numberWithCommas(PRICE_BY_PLANS[plan])} (calculated at $${
-											EFFECTIVE_PRICE_BY_PLANS[plan]
-										}/hour)`}
+										component={
+											isClusterBilling
+												? `$${numberWithCommas(
+														nodeCount * PRICE_BY_PLANS[plan],
+												  )} (calculated at $${
+														EFFECTIVE_PRICE_BY_PLANS[plan]
+												  }/node hour)`
+												: `$${numberWithCommas(
+														PRICE_BY_PLANS[plan],
+												  )} (calculated at $${
+														EFFECTIVE_PRICE_BY_PLANS[plan]
+												  }/hour)`
+										}
 									/>
 								</Flex>
 							) : null}
@@ -181,8 +188,8 @@ class Billing extends Component {
 							>
 								<TextLink>Update Payment Method</TextLink>
 							</Stripe>
-</Row>
-)}
+						</Row>
+					}
 				/>
 				{this.billingView}
 				{subscriptionID && isPaid && (isHostedArc || isClusterBilling) && (
@@ -253,7 +260,7 @@ Billing.propTypes = {
 	errors: PropTypes.array.isRequired,
 };
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
 	const appPlan = getAppPlanByName(state);
 	return {
 		isFetchingPlan: get(state, '$getAppPlan.isFetching'),

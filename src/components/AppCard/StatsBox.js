@@ -1,7 +1,5 @@
 import React from 'react';
-import {
- Card, Col, Icon, Row, Tag,
-} from 'antd';
+import { Card, Col, Icon, Row, Tag } from 'antd';
 import { css } from 'react-emotion';
 import { withRouter } from 'react-router-dom';
 import { cardActions } from './styles';
@@ -30,7 +28,7 @@ export const colorBar = css`
 	margin: 6px 0;
 `;
 
-const renderItem = (item) => {
+const renderItem = item => {
 	switch (item) {
 		case 'pri':
 			return 'shards';

@@ -84,6 +84,4 @@ const gitlabBtn = css`
 	}
 `;
 
-export {
- container, card, githubBtn, googleBtn, gitlabBtn,
-};
+export { container, card, githubBtn, googleBtn, gitlabBtn };

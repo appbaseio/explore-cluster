@@ -15,7 +15,8 @@ class Acl extends React.PureComponent {
 					render={({ handler }) => <Checkbox {...handler('checkbox')} />}
 				/>
 			),
-			RateLimit: () => (groupCtrl.get('rateLimit') ? (
+			RateLimit: () =>
+				groupCtrl.get('rateLimit') ? (
 					<FieldControl
 						control={groupCtrl.get('rateLimit')}
 						render={({ handler, invalid }) => (
@@ -27,7 +28,7 @@ class Acl extends React.PureComponent {
 							/>
 						)}
 					/>
-				) : null),
+				) : null,
 		}));
 
 		this.columns = [

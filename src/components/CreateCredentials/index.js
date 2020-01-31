@@ -1,9 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { css } from 'emotion';
-import {
- Icon, Modal, Input, Radio, Tooltip, Button, Select, Checkbox,
-} from 'antd';
+import { Icon, Modal, Input, Radio, Tooltip, Button, Select, Checkbox } from 'antd';
 import {
 	FieldArray,
 	FormBuilder,
@@ -52,7 +50,7 @@ const modal = css`
 		border-color: tomato;
 	}
 `;
-const calculateValue = (value) => {
+const calculateValue = value => {
 	const index = value.indexOf('*');
 	if (index > -1) {
 		if (index === 0 && value.length !== 1) {
@@ -90,7 +88,8 @@ class CreateCredentials extends React.Component {
 					operationType: [Types.read, Validators.required],
 					categories: new FormArray(
 						getDefaultAclOptionsByPlan(props.plan).map(
-							acl => new FormGroup({
+							acl =>
+								new FormGroup({
 									acl: new FormControl(acl),
 									tag: new FormControl(true),
 									rateLimit: new FormControl(defaultRateLimits[acl], isNegative),
@@ -125,7 +124,7 @@ class CreateCredentials extends React.Component {
 			const opsHandler = this.form.get('operationType');
 			const categoriesHandler = this.form.get('categories');
 			if (adminHandler) {
-				adminHandler.valueChanges.subscribe((value) => {
+				adminHandler.valueChanges.subscribe(value => {
 					if (value) {
 						opsHandler.setValue(Types.admin);
 						categoriesHandler.setValue(defaultAclOptions);
@@ -143,7 +142,7 @@ class CreateCredentials extends React.Component {
 			if (!isUserManagement) {
 				const includeFieldsHandler = this.form.get('include_fields');
 				const excludeFieldsHandler = this.form.get('exclude_fields');
-				includeFieldsHandler.valueChanges.subscribe((value) => {
+				includeFieldsHandler.valueChanges.subscribe(value => {
 					if (value && value.includes('*')) {
 						excludeFieldsHandler.disable({ emitEvent: false });
 						excludeFieldsHandler.reset([]);
@@ -151,7 +150,7 @@ class CreateCredentials extends React.Component {
 						excludeFieldsHandler.enable({ emitEvent: false });
 					}
 				});
-				excludeFieldsHandler.valueChanges.subscribe((value) => {
+				excludeFieldsHandler.valueChanges.subscribe(value => {
 					if (value && value.includes('*')) {
 						includeFieldsHandler.disable({ emitEvent: false });
 						includeFieldsHandler.reset([]);
@@ -260,8 +259,8 @@ class CreateCredentials extends React.Component {
 											type="primary"
 											onClick={this.handleSubmit}
 										>
-											{saveButtonText
-												|| (this.isEditing ? 'Save' : 'Generate')}
+											{saveButtonText ||
+												(this.isEditing ? 'Save' : 'Generate')}
 										</Button>,
 								  ]
 								: [
@@ -287,13 +286,13 @@ class CreateCredentials extends React.Component {
 													<Grid
 														label="Username"
 														toolTipMessage={Messages.username}
-														component={(
-<Input
+														component={
+															<Input
 																autoFocus={!this.isEditing}
 																placeholder="Enter username"
 																{...handler()}
-/>
-)}
+															/>
+														}
 													/>
 												)}
 											/>
@@ -304,14 +303,14 @@ class CreateCredentials extends React.Component {
 													<Grid
 														label="Password"
 														toolTipMessage={Messages.password}
-														component={(
-<PasswordInput
+														component={
+															<PasswordInput
 																placeholder="Enter password"
 																{...handler()}
 																control={this.form.get('password')}
 																isEditing={this.isEditing}
-/>
-)}
+															/>
+														}
 													/>
 												)}
 											/>
@@ -335,12 +334,12 @@ class CreateCredentials extends React.Component {
 													<Grid
 														label="Email"
 														toolTipMessage={Messages.email}
-														component={(
-<Input
+														component={
+															<Input
 																placeholder="Enter email"
 																{...handler()}
-/>
-)}
+															/>
+														}
 													/>
 												)}
 											/>
@@ -354,15 +353,15 @@ class CreateCredentials extends React.Component {
 												<Grid
 													label="Description"
 													toolTipMessage={Messages.description}
-													component={(
-<Input
+													component={
+														<Input
 															autoFocus={
 																!isUserManagement && !this.isEditing
 															}
 															placeholder="Add an optional description for this credential"
 															{...handler()}
-/>
-)}
+														/>
+													}
 												/>
 											)}
 										/>
@@ -373,18 +372,18 @@ class CreateCredentials extends React.Component {
 											<Grid
 												label="Access Type"
 												toolTipMessage={Messages.operationType}
-												component={(
-<Radio.Group
+												component={
+													<Radio.Group
 														{...handler()}
 														css="label { font-weight: 100 }"
->
+													>
 														{Object.keys(Types).map(type => (
 															<Radio key={type} value={Types[type]}>
 																{Types[type].description}
 															</Radio>
 														))}
-</Radio.Group>
-)}
+													</Radio.Group>
+												}
 											/>
 										)}
 									/>
@@ -420,13 +419,13 @@ class CreateCredentials extends React.Component {
 												<Grid
 													label="Categories"
 													toolTipMessage={Messages.categories}
-													component={(
-<CheckboxGroup
+													component={
+														<CheckboxGroup
 															css="label { font-weight: 100 }"
 															options={defaultAclOptions}
 															{...handler()}
-/>
-)}
+														/>
+													}
 												/>
 											)}
 										/>
@@ -437,12 +436,12 @@ class CreateCredentials extends React.Component {
 												<Grid
 													label="Categories"
 													toolTipMessage={Messages.categories}
-													component={(
-<Acl
+													component={
+														<Acl
 															control={control}
 															isRateLimitPresent={!isUserManagement}
-/>
-)}
+														/>
+													}
 												/>
 											)}
 										/>
@@ -458,21 +457,21 @@ class CreateCredentials extends React.Component {
 													<Grid
 														label="Indices"
 														toolTipMessage={Messages.indices}
-														component={(
-<Select
+														component={
+															<Select
 																placeholder="Enter indices"
 																mode="tags"
 																style={{ width: '100%' }}
 																tokenSeparators={[',']}
 																value={value}
 																{...inputHandler}
-																onChange={(val) => {
+																onChange={val => {
 																	inputHandler.onChange(
 																		calculateValue(val),
 																	);
 																}}
-/>
-)}
+															/>
+														}
 													/>
 												);
 											}}
@@ -494,7 +493,8 @@ class CreateCredentials extends React.Component {
 														defaultSuggestionValue="https://example.com/"
 														label="HTTP Referers"
 														defaultValue="*"
-														handleWarningMessage={defaultValue => `Warning! You don't have the default value (${defaultValue}) as selected which means that only the selected referers will be considered as valid.`
+														handleWarningMessage={defaultValue =>
+															`Warning! You don't have the default value (${defaultValue}) as selected which means that only the selected referers will be considered as valid.`
 														}
 														inputProps={{
 															placeholder: 'Add a HTTP Referer',
@@ -509,7 +509,8 @@ class CreateCredentials extends React.Component {
 														control={control}
 														toolTipMessage={Messages.sources}
 														label="IP Sources"
-														handleWarningMessage={defaultValue => `Warning! You don't have the default value (${defaultValue}) as selected which means that only the selected sources will be considered as valid.`
+														handleWarningMessage={defaultValue =>
+															`Warning! You don't have the default value (${defaultValue}) as selected which means that only the selected sources will be considered as valid.`
 														}
 														defaultValue="0.0.0.0/0"
 														inputProps={{
@@ -530,14 +531,14 @@ class CreateCredentials extends React.Component {
 													const inputHandler = handler();
 													return (
 														<Grid
-															label={(
-<span css={styles.subHeader}>
+															label={
+																<span css={styles.subHeader}>
 																	Include
-</span>
-)}
+																</span>
+															}
 															toolTipMessage={Messages.include}
-															component={(
-<Select
+															component={
+																<Select
 																	placeholder="Select field value"
 																	mode="tags"
 																	notFoundContent={null}
@@ -545,17 +546,17 @@ class CreateCredentials extends React.Component {
 																	tokenSeparators={[',']}
 																	{...inputHandler}
 																	value={inputHandler.value || []}
-																	onChange={(value) => {
+																	onChange={value => {
 																		inputHandler.onChange(
 																			calculateValue(value),
 																		);
 																	}}
->
+																>
 																	<Option key="*">
 																		* (Include all fields)
 																	</Option>
-</Select>
-)}
+																</Select>
+															}
 														/>
 													);
 												}}
@@ -567,31 +568,31 @@ class CreateCredentials extends React.Component {
 													const inputHandler = handler();
 													return (
 														<Grid
-															label={(
+															label={
 																<span css={styles.subHeader}>
 																	Exclude
 																</span>
-)}
+															}
 															toolTipMessage={Messages.exclude}
-															component={(
-<Select
+															component={
+																<Select
 																	placeholder="Select field value"
 																	mode="tags"
 																	notFoundContent={null}
 																	style={{ width: '100%' }}
 																	{...inputHandler}
 																	value={inputHandler.value || []}
-																	onChange={(value) => {
+																	onChange={value => {
 																		inputHandler.onChange(
 																			calculateValue(value),
 																		);
 																	}}
->
+																>
 																	<Option key="*">
 																		* (Exclude all fields)
 																	</Option>
-</Select>
-)}
+																</Select>
+															}
 														/>
 													);
 												}}
@@ -602,11 +603,11 @@ class CreateCredentials extends React.Component {
 													<Grid
 														label="Max API calls/IP/hour"
 														toolTipMessage={Messages.ipLimit}
-														component={(
-<Flex
+														component={
+															<Flex
 																justifyContent="center"
 																alignItems="center"
->
+															>
 																<Input
 																	type="number"
 																	css="border: solid 1px #9195A2!important;width: 120px"
@@ -618,8 +619,8 @@ class CreateCredentials extends React.Component {
 																		negative.
 																	</span>
 																)}
-</Flex>
-)}
+															</Flex>
+														}
 													/>
 												)}
 											/>
@@ -629,11 +630,11 @@ class CreateCredentials extends React.Component {
 													<Grid
 														label="TTL"
 														toolTipMessage={Messages.ttl}
-														component={(
-<Flex
+														component={
+															<Flex
 																justifyContent="center"
 																alignItems="center"
->
+															>
 																<Input
 																	type="number"
 																	min="0"
@@ -646,8 +647,8 @@ class CreateCredentials extends React.Component {
 																		negative.
 																	</span>
 																)}
-</Flex>
-)}
+															</Flex>
+														}
 													/>
 												)}
 											/>
@@ -704,7 +705,7 @@ CreateCredentials.propTypes = {
 	isUserManagement: PropTypes.bool,
 };
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
 	const mappings = getTraversedMappingsByAppName(state);
 	const appPermissions = getAppPermissionsByName(state);
 	return {
@@ -717,10 +718,10 @@ const mapStateToProps = (state) => {
 		credentials: get(appPermissions, 'credentials.credentials'),
 		plan: 'growth',
 		isSubmitting:
-			get(state, '$createAppPermission.isFetching')
-			|| get(state, '$updateAppPermission.isFetching')
-			|| get(state, '$createClusterUser.isFetching')
-			|| get(state, '$updateClusterUser.isFetching'),
+			get(state, '$createAppPermission.isFetching') ||
+			get(state, '$updateAppPermission.isFetching') ||
+			get(state, '$createClusterUser.isFetching') ||
+			get(state, '$updateClusterUser.isFetching'),
 		errors: [
 			get(state, '$getAppMappings.error'),
 			get(state, '$createAppPermission.error'),

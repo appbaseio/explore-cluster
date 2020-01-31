@@ -1,8 +1,6 @@
 import React from 'react';
 import get from 'lodash/get';
-import {
- Card, Input, Form, Button, Icon, Table, Skeleton, notification,
-} from 'antd';
+import { Card, Input, Form, Button, Icon, Table, Skeleton, notification } from 'antd';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
@@ -88,9 +86,9 @@ class RoleBaseAccess extends React.Component {
 			: updatedKey.public_key;
 
 		if (
-			updatedKey
-			&& !isPublicKeyLoading
-			&& (newKey !== oldKey || updatedKey.role_key !== roleKey)
+			updatedKey &&
+			!isPublicKeyLoading &&
+			(newKey !== oldKey || updatedKey.role_key !== roleKey)
 		) {
 			notification.success({
 				message: updatedKey.message,
@@ -101,17 +99,17 @@ class RoleBaseAccess extends React.Component {
 		if (updateKeyError && prevUpdateError !== updateKeyError) {
 			notification.error({
 				message:
-					updateKeyError.message
-					|| updateKeyError.reason
-					|| 'Error while updating the Public Key.',
+					updateKeyError.message ||
+					updateKeyError.reason ||
+					'Error while updating the Public Key.',
 			});
 		}
 		if (publicKeyError && prevKeyError !== publicKeyError) {
 			notification.error({
 				message:
-					publicKeyError.message
-					|| publicKeyError.reason
-					|| 'Error while fetching the Public Key.',
+					publicKeyError.message ||
+					publicKeyError.reason ||
+					'Error while fetching the Public Key.',
 			});
 		}
 	}
@@ -123,19 +121,19 @@ class RoleBaseAccess extends React.Component {
 		});
 	};
 
-	handleChange = (e) => {
+	handleChange = e => {
 		this.setState({
 			[e.target.name]: e.target.value,
 		});
 	};
 
-	handleRole = (e) => {
+	handleRole = e => {
 		this.setState({
 			[e.target.name]: e.target.value,
 		});
 	};
 
-	setLoading = (id) => {
+	setLoading = id => {
 		this.setState(prevState => ({
 			loadingKey: {
 				...prevState.loadingKey,
@@ -144,7 +142,7 @@ class RoleBaseAccess extends React.Component {
 		}));
 	};
 
-	showKey = (id) => {
+	showKey = id => {
 		this.setState(prevState => ({
 			visibleKey: {
 				...prevState.visibleKey,
@@ -153,7 +151,7 @@ class RoleBaseAccess extends React.Component {
 		}));
 	};
 
-	saveRole = async (value) => {
+	saveRole = async value => {
 		try {
 			this.setLoading(value.username);
 			const { fetchPermissions } = this.props;
@@ -210,7 +208,8 @@ class RoleBaseAccess extends React.Component {
 			<React.Fragment>
 				<Banner
 					{...bannerMessage}
-					onClick={() => window.open('https://docs.appbase.io/docs/security/Role/', '_blank')
+					onClick={() =>
+						window.open('https://docs.appbase.io/docs/security/Role/', '_blank')
 					}
 				/>
 				<Container>
@@ -243,8 +242,8 @@ class RoleBaseAccess extends React.Component {
 								<Form.Item style={labelMargin}>
 									<Button
 										disabled={
-											currentRoleKey === roleKey
-											&& currentPublicKey === publicKey
+											currentRoleKey === roleKey &&
+											currentPublicKey === publicKey
 										}
 										type="primary"
 										onClick={this.handleSave}
@@ -272,7 +271,8 @@ class RoleBaseAccess extends React.Component {
 								<Column
 									title="Description"
 									key="description"
-									render={value => (value && value.description) || 'No Description'
+									render={value =>
+										(value && value.description) || 'No Description'
 									}
 								/>
 								<Column
@@ -323,8 +323,8 @@ class RoleBaseAccess extends React.Component {
 									render={value => (
 										<Button
 											disabled={
-												(this.state[`${value.username}`] || '')
-												=== value.role
+												(this.state[`${value.username}`] || '') ===
+												value.role
 											}
 											onClick={() => this.saveRole(value)}
 											type="primary"
@@ -349,7 +349,7 @@ class RoleBaseAccess extends React.Component {
 	}
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
 	const planState = getAppPlanByName(state);
 	const appPermissions = getAppPermissionsByName(state);
 
@@ -370,12 +370,10 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = dispatch => ({
 	fetchPermissions: appName => dispatch(getPermission(appName)),
 	fetchPublicKey: appName => dispatch(getPublicKey(appName)),
-	setKeyes: (appName, publicKey, roleKey) => dispatch(
+	setKeyes: (appName, publicKey, roleKey) =>
+		dispatch(
 			updatePublicKey(appName, isBase64(publicKey) ? publicKey : btoa(publicKey), roleKey),
 		),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(RoleBaseAccess);
+export default connect(mapStateToProps, mapDispatchToProps)(RoleBaseAccess);

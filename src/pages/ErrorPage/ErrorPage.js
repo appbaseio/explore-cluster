@@ -72,7 +72,4 @@ const mapStateToProps = ({ user }) => ({
 	user,
 });
 
-export default connect(
-	mapStateToProps,
-	null,
-)(ErrorPage);
+export default connect(mapStateToProps, null)(ErrorPage);

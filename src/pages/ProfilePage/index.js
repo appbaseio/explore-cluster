@@ -1,15 +1,11 @@
 import React from 'react';
-import {
- Input, Select, Icon, notification, Button,
-} from 'antd';
+import { Input, Select, Icon, notification, Button } from 'antd';
 import get from 'lodash/get';
 import { css } from 'react-emotion';
 import { connect } from 'react-redux';
 import PhoneInput from 'react-intl-tel-input';
 import 'react-intl-tel-input/dist/main.css';
-import {
- FormBuilder, FieldGroup, FieldControl, Validators,
-} from 'react-reactive-form';
+import { FormBuilder, FieldGroup, FieldControl, Validators } from 'react-reactive-form';
 import { updateUser } from '../../batteries/modules/actions';
 import Container from '../../components/Container';
 import Flex from '../../batteries/components/shared/Flex';
@@ -79,9 +75,7 @@ class ProfilePage extends React.Component {
 	}
 
 	componentDidMount() {
-		const {
- usecase, deploymentTimeframe, phone, company,
-} = this.props;
+		const { usecase, deploymentTimeframe, phone, company } = this.props;
 		this.profileForm.patchValue({
 			usecase,
 			deploymentTimeframe,
@@ -256,7 +250,7 @@ class ProfilePage extends React.Component {
 		);
 	}
 }
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
 	const userData = get(state, '$getAppPlan.results.metadata');
 	const phoneInfo = get(userData, 'phone');
 	return {

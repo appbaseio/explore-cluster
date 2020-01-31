@@ -68,7 +68,7 @@ export async function getESIndices(authToken) {
 	}
 
 	const indices = {};
-	data.forEach((item) => {
+	data.forEach(item => {
 		indices[item.index] = item;
 	});
 
@@ -213,6 +213,80 @@ export const deleteRole = (appId, username) =>
 			.then(data => resolve({ ...data.body, message: data.message }))
 			.catch(error => reject(error));
 	});
+
+// set private registry
+export async function setPrivateRegistry(payload = {}) {
+	const ACC_API = getURL();
+	const authToken = sessionStorage.getItem('authToken');
+
+	const response = await fetch(`${ACC_API}/_functions/registry_config`, {
+		headers: {
+			Authorization: `Basic ${authToken}`,
+		},
+		method: 'PUT',
+		body: JSON.stringify(payload),
+	});
+	const data = await response.json();
+	if (response.status >= 400) {
+		throw data.error.message;
+	}
+
+	return data.message;
+}
+
+function extractLogs(data) {
+	const regex = new RegExp(/("text"):\s*([^\n]*)/, 'ig');
+	const parsedData = data.match(regex);
+	return parsedData.reduce((stringAcc, data) => {
+		const split = data.split(`"text":`)[1].split('}')[0];
+		const filtered = split.replace(/['"]+/g, '');
+		return stringAcc + filtered.replace(/\\n/g, '') + '\n';
+	}, '');
+}
+
+// fetch logs
+export async function fetchLogs(name = 'default') {
+	const ACC_API = getURL();
+	const authToken = sessionStorage.getItem('authToken');
+	const response = await fetch(`${ACC_API}/_function/${name}/logs?tail=100`, {
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Basic ${authToken}`,
+		},
+		method: 'GET',
+	});
+	const data = await response.clone().text();
+	if (response.status >= 400) {
+		throw data.error.message;
+	}
+	if (data) {
+		return extractLogs(data);
+	}
+	return data;
+}
+
+// checks open-faas health
+export async function getFunctionHealthCheck() {
+	const ACC_API = getURL();
+	const authToken = sessionStorage.getItem('authToken');
+	const response = await fetch(`${ACC_API}/_functions/health`, {
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Basic ${authToken}`,
+		},
+		method: 'GET',
+	});
+	const data = await response.json();
+	if (response.status >= 400) {
+		throw {
+			status: response.status,
+			message: data.error.message,
+		};
+	}
+
+	return data;
+}
+
 // checks whether it is a valid URL
 export const isAbsoluteURL = str => /^[a-z][a-z0-9+.-]*:/.test(str);
 

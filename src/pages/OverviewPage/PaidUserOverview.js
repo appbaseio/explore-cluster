@@ -58,7 +58,7 @@ class PaidUserOverview extends React.Component {
 		if (!Object.keys(stats).length) fetchApps();
 	}
 
-	redirectTo = (url) => {
+	redirectTo = url => {
 		window.location = url;
 	};
 
@@ -138,10 +138,10 @@ PaidUserOverview.propTypes = {
 	stats: PropTypes.object.isRequired,
 	fetchApps: PropTypes.func.isRequired,
 };
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
 	const analyticsArr = getAppAnalyticsByName(state) || [];
 	let analytics = {};
-	analyticsArr.forEach((item) => {
+	analyticsArr.forEach(item => {
 		analytics = {
 			...analytics,
 			...item,
@@ -160,7 +160,4 @@ const mapDispatchToProps = dispatch => ({
 	fetchAppAnalytics: (appName, plan) => dispatch(getAppAnalytics(appName, plan)),
 	fetchApps: () => dispatch(loadApps()),
 });
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(PaidUserOverview);
+export default connect(mapStateToProps, mapDispatchToProps)(PaidUserOverview);

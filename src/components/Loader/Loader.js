@@ -8,8 +8,8 @@ const styles = css`
 	transform: translate(-50%, -50%);
 `;
 
-const Loader = () => (
-	<div className={styles}>
+const Loader = props => (
+	<div className={styles} {...props}>
 		<img src="/static/images/loader.svg" alt="loading" />
 	</div>
 );

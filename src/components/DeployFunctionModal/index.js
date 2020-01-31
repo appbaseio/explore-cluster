@@ -1,0 +1,192 @@
+import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+import { message, Modal, notification, Radio, Row } from 'antd';
+import { connect } from 'react-redux';
+import get from 'lodash/get';
+import PrivateRegistry from './components/PrivateRegistry';
+import { deploymentCheck, handleInputClosure, isTrue, renderInputField } from './helper';
+// import EnvTable from './components/EnvTable';
+import { modalHeading } from '../../pages/HomePage/styles';
+import {
+	createFunction,
+	getSingleFunction,
+	updateFunctions,
+} from '../../batteries/modules/actions';
+
+const DeployFunctionModal = ({
+	node,
+	handleCancel,
+	deployFunction,
+	loading,
+	error,
+	success,
+	putFunctions,
+	getFunction,
+}) => {
+	const oriEnvData = get(node, 'function.envVars', {});
+	const revEnvData = Object.keys(oriEnvData).map(key => ({
+		key,
+		value: oriEnvData[key],
+	}));
+	const [didMount, setDidMount] = useState(false);
+	const [radioValue, setValue] = useState(get(node, 'function.secrets') ? 'no' : 'yes');
+	const [functionName, setFunctionName] = useState(get(node, 'function.service'));
+	const [dockerImage, setDockerImage] = useState(get(node, 'function.image'));
+	const [globalError, setGlobalError] = useState({});
+	const [envDataSource, setEnvData] = useState(
+		revEnvData.length === 0 ? [{ key: '', value: '' }] : revEnvData,
+	);
+
+	const handleInputRequired = handleInputClosure(setGlobalError, globalError);
+
+	useEffect(() => {
+		if (didMount) {
+			if (node) {
+				if (node.success) {
+					message.success(`${functionName} function updated successfully`);
+
+					handleCancel();
+				} else if (node.error) {
+					notification.error({
+						message: 'Error',
+						description: node.error,
+					});
+				}
+			} else if (success) {
+				message.success(`${functionName} function deployment started`);
+				handleCancel();
+			} else if (error) {
+				notification.error({
+					message: 'Error',
+					description: error,
+				});
+			}
+		} else setDidMount(true);
+		// return () => {
+		// 	if (myInterval) clearInterval(myInterval);
+		// };
+	}, [error, success, node]);
+
+	const handleSubmit = () => {
+		let myInterval = null;
+		function handleDeploymentCheck() {
+			deploymentCheck(getFunction, functionName, myInterval);
+		}
+		const parsedEnvData = envDataSource.reduce((objAcc, envSource) => {
+			const { key, value } = envSource;
+			if (key && value) objAcc[key] = value;
+			return objAcc;
+		}, {});
+		const payload = {
+			image: dockerImage,
+			envVars: parsedEnvData,
+			secrets: radioValue === 'no' ? ['registry'] : undefined,
+		};
+		if (node) {
+			const newPayload = {
+				...node,
+				function: {
+					...node.function,
+					...payload,
+				},
+			};
+			if (node.function.image !== dockerImage) {
+				newPayload.deploymentStatus = 'in_progress';
+			}
+			putFunctions(functionName, newPayload);
+			if (node.function.image !== dockerImage) {
+				myInterval = setInterval(handleDeploymentCheck, 7000);
+			}
+		} else {
+			deployFunction(functionName, payload).then(res => {
+				if (!(res && res.error)) {
+					myInterval = setInterval(handleDeploymentCheck, 7000);
+				}
+			});
+		}
+	};
+
+	return (
+		<Modal
+			title={node ? `Update ${node.function.service}` : 'Deploy Function'}
+			onCancel={handleCancel}
+			okText={node ? 'Update' : 'Deploy'}
+			visible
+			okButtonProps={{ disabled: Object.values(globalError).some(isTrue) }}
+			onOk={handleSubmit}
+			confirmLoading={loading || get(node, 'isToggling')}
+		>
+			<>
+				<Row>
+					<h3 className={modalHeading} style={{ marginTop: 0 }}>
+						Function Name
+					</h3>
+					{renderInputField({
+						globalError,
+						fieldName: 'functionName',
+						fieldValue: functionName,
+						handleInputRequired,
+						setterFunc: setFunctionName,
+						extraProps: { disabled: !!node, placeholder: 'Enter Function Name' },
+					})}
+				</Row>
+				<Row>
+					<h3 className={modalHeading}>Docker Image</h3>
+					{renderInputField({
+						globalError,
+						fieldName: 'dockerImage',
+						fieldValue: dockerImage,
+						handleInputRequired,
+						setterFunc: setDockerImage,
+						extraProps: { placeholder: 'Enter Docker Image' },
+					})}
+				</Row>
+				<Row>
+					<h3 className={modalHeading}>Is your docker image public?</h3>
+					<Radio.Group onChange={e => setValue(e.target.value)} value={radioValue}>
+						<Radio value="yes">yes</Radio>
+						<Radio value="no">no</Radio>
+					</Radio.Group>
+				</Row>
+				{radioValue === 'no' && (
+					<Row>
+						<PrivateRegistry
+							globalError={globalError}
+							setGlobalError={setGlobalError}
+						/>
+					</Row>
+				)}
+				{/**
+					<Row>
+						<EnvTable dataSource={envDataSource} setData={setEnvData} />
+					</Row>
+				*/}
+			</>
+		</Modal>
+	);
+};
+
+DeployFunctionModal.propTypes = {
+	handleCancel: PropTypes.func,
+};
+
+DeployFunctionModal.defaultProps = {
+	dockerImg: '',
+	funcName: '',
+	envData: [],
+	handleCancel: () => {},
+};
+
+const mapStateToProps = state => ({
+	loading: get(state, '$getAppFunctions.isCreating'),
+	error: get(state, '$getAppFunctions.error'),
+	success: get(state, '$getAppFunctions.success'),
+});
+
+const mapDispatchToProps = dispatch => ({
+	deployFunction: (name, payload) => dispatch(createFunction(name, payload)),
+	putFunctions: (appName, payload) => dispatch(updateFunctions(appName, payload)),
+	getFunction: appName => dispatch(getSingleFunction(appName)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(DeployFunctionModal);

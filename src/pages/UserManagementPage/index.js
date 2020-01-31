@@ -1,8 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import {
- Card, Button, Table, Alert, Typography,
-} from 'antd';
+import { Card, Button, Table, Alert, Typography } from 'antd';
 import PropTypes from 'prop-types';
 import { css } from 'react-emotion';
 import get from 'lodash/get';
@@ -65,7 +63,7 @@ class UserManagementPage extends React.Component {
 		this.refetchPermissions();
 	}
 
-	showForm = (permissionInfo) => {
+	showForm = permissionInfo => {
 		if (permissionInfo) {
 			this.setState({
 				showForm: true,
@@ -98,7 +96,7 @@ class UserManagementPage extends React.Component {
 		});
 	};
 
-	handleSubmit = (form) => {
+	handleSubmit = form => {
 		const { credentials, createUser, updateUser } = this.props;
 		const { currentPermissionInfo } = this.state;
 		// handle edit
@@ -133,7 +131,7 @@ class UserManagementPage extends React.Component {
 		}
 	};
 
-	deletePermission = (username) => {
+	deletePermission = username => {
 		const { credentials, deleteUser } = this.props;
 		deleteUser(credentials, username).then(({ payload }) => {
 			if (payload) {
@@ -152,7 +150,7 @@ class UserManagementPage extends React.Component {
 			<Container>
 				<Card
 					title="Manage Users"
-					extra={(
+					extra={
 						<a
 							href="https://docs.appbase.io/security/UserManagement/"
 							target="_blank"
@@ -160,12 +158,12 @@ class UserManagementPage extends React.Component {
 						>
 							Read Docs
 						</a>
-					)}
+					}
 				>
 					<Paragraph strong>Login URL for this cluster:</Paragraph>
 					<Alert
 						showIcon
-						message={(
+						message={
 							<React.Fragment>
 								<Paragraph>
 									A user added via user management will need to visit the below
@@ -181,7 +179,7 @@ class UserManagementPage extends React.Component {
 									{`https://arc-dashboard.appbase.io?url=${getURL()}`}
 								</Paragraph>
 							</React.Fragment>
-						)}
+						}
 						type="info"
 						css={{ marginBottom: 20 }}
 					/>
@@ -192,7 +190,8 @@ class UserManagementPage extends React.Component {
 							deletePermission: this.deletePermission,
 							showForm: this.showForm,
 						}))}
-						rowKey={row => `${get(row, 'permissionInfo.username')}:${get(
+						rowKey={row =>
+							`${get(row, 'permissionInfo.username')}:${get(
 								row,
 								'permissionInfo.password',
 							)}`
@@ -202,7 +201,13 @@ class UserManagementPage extends React.Component {
 					/>
 				</Card>
 
-				<Button style={{ marginTop: 10 }} disabled={!isAdmin} onClick={this.handleShow} size="large" type="primary">
+				<Button
+					style={{ marginTop: 10 }}
+					disabled={!isAdmin}
+					onClick={this.handleShow}
+					size="large"
+					type="primary"
+				>
 					Create User
 				</Button>
 				{showForm && (
@@ -231,7 +236,7 @@ UserManagementPage.propTypes = {
 	isFetching: PropTypes.bool.isRequired,
 	users: PropTypes.array, // eslint-disable-line
 };
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
 	const { username, password } = get(state, 'user.data', {});
 	return {
 		credentials: username ? `${username}:${password}` : null,
@@ -244,10 +249,8 @@ const mapDispatchToProps = dispatch => ({
 	fetchUsers: credentials => dispatch(getClusterUsers(credentials)),
 	createUser: (credentials, payload) => dispatch(createClusterUser(credentials, payload)),
 	deleteUser: (credentials, username) => dispatch(deleteClusterUser(credentials, username)),
-	updateUser: (credentials, username, payload) => dispatch(updateClusterUser(credentials, username, payload)),
+	updateUser: (credentials, username, payload) =>
+		dispatch(updateClusterUser(credentials, username, payload)),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(UserManagementPage);
+export default connect(mapStateToProps, mapDispatchToProps)(UserManagementPage);

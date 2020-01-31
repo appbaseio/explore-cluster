@@ -46,7 +46,8 @@ export default class PlusMinus extends Component {
 		const { handlePlus, onChange } = this.props;
 		const { selectedValueIndex } = this.state;
 
-		const index =			selectedValueIndex >= this.state.values.length - 1
+		const index =
+			selectedValueIndex >= this.state.values.length - 1
 				? selectedValueIndex
 				: selectedValueIndex + 1;
 		if (handlePlus) {

@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
-import {
- Col, Form, Icon, Input, message, Modal, notification, Radio, Row, Tooltip,
-} from 'antd';
+import { Col, Form, Icon, Input, message, Modal, notification, Radio, Row, Tooltip } from 'antd';
 import { css } from 'emotion';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -20,9 +18,7 @@ const radioStyle = css`
 	line-height: 30px;
 `;
 
-const CloneIndex = ({
- handleCancel, index, existingApps, history,
-}) => {
+const CloneIndex = ({ handleCancel, index, existingApps, history }) => {
 	const [destIndex, setDestIndex] = useState('');
 	const [action, setAction] = useState('mappings');
 	const [loading, setLoading] = useState(false);
@@ -48,7 +44,7 @@ const CloneIndex = ({
 				resetValues();
 				history.push(`/app/${destIndex}/overview`);
 			})
-			.catch((e) => {
+			.catch(e => {
 				message.error(e.message);
 				resetValues();
 			});

@@ -2,9 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { connect } from 'react-redux';
-import {
- notification, Alert, Card, Button,
-} from 'antd';
+import { notification, Alert, Card, Button } from 'antd';
 import get from 'lodash/get';
 import { FormBuilder, Validators } from 'react-reactive-form';
 import { css } from 'emotion';
@@ -54,7 +52,7 @@ class QuerySuggestions extends React.Component {
 			indices: [['*']],
 		});
 		if (isValidPlan(props.tier, props.featureSuggestions)) {
-			props.getPreferences().then((action) => {
+			props.getPreferences().then(action => {
 				const payload = get(action, 'payload');
 				if (payload) {
 					this.form.patchValue({
@@ -74,7 +72,7 @@ class QuerySuggestions extends React.Component {
 				},
 			})
 				.then(res => res.json())
-				.then((indices) => {
+				.then(indices => {
 					this.setState({
 						indices: Object.keys(indices),
 					});
@@ -92,7 +90,7 @@ class QuerySuggestions extends React.Component {
 				}),
 			})
 				.then(res => res.json())
-				.then((res) => {
+				.then(res => {
 					let total;
 					if (typeof get(res, 'hits.total') === 'object') {
 						total = get(res, 'hits.total.value');
@@ -123,12 +121,12 @@ class QuerySuggestions extends React.Component {
 				min_hits: Number(this.form.value.min_hits),
 				number_of_days: Number(this.form.value.number_of_days),
 				external_suggestions:
-					this.form.value.external_suggestions
-					&& typeof this.form.value.external_suggestions === 'string'
+					this.form.value.external_suggestions &&
+					typeof this.form.value.external_suggestions === 'string'
 						? JSON.parse(this.form.value.external_suggestions)
 						: [],
 			};
-			savePreferences(payload).then((action) => {
+			savePreferences(payload).then(action => {
 				if (get(action, 'payload')) {
 					notification.success({
 						message: 'Query Suggestions preferences saved successfully.',
@@ -144,9 +142,7 @@ class QuerySuggestions extends React.Component {
 	};
 
 	render() {
-		const {
- isLoading, preferences, tier, featureSuggestions,
-} = this.props;
+		const { isLoading, preferences, tier, featureSuggestions } = this.props;
 		const { indices, total } = this.state;
 		if (!isValidPlan(tier, featureSuggestions)) {
 			return (
@@ -233,7 +229,4 @@ const mapDispatchToProps = dispatch => ({
 	savePreferences: payload => dispatch(saveSuggestionsPreferences(payload)),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(QuerySuggestions);
+export default connect(mapStateToProps, mapDispatchToProps)(QuerySuggestions);

@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { Col, Icon, Row } from 'antd';
-import {
- actionIcon, cloneButton, columnSeparator, deleteButton,
-} from '../AppCard/styles';
+import { actionIcon, cloneButton, columnSeparator, deleteButton } from '../AppCard/styles';
 import DeleteAppModal from '../AppCard/DeleteAppModal';
 import CloneIndex from '../CloneIndex';
 
@@ -48,7 +46,7 @@ class AppActions extends Component {
 					<Col
 						span={8}
 						className={cloneButton}
-						onClick={(e) => {
+						onClick={e => {
 							e.preventDefault();
 							this.handleCloneModal();
 						}}
@@ -59,7 +57,7 @@ class AppActions extends Component {
 					<Col
 						span={8}
 						className={deleteButton}
-						onClick={(e) => {
+						onClick={e => {
 							e.preventDefault();
 							this.handleDeleteModal();
 						}}
