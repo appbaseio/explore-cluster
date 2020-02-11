@@ -135,7 +135,15 @@ class CreateFunction extends React.Component {
 							<Paragraph strong>3. Get function template</Paragraph>
 							<Paragraph>
 								In this example we are using NodeJS template, you can select
-								template for other languages [here](link to templates).
+								template for other languages{' '}
+								<a
+									href="https://docs.openfaas.com/cli/templates/"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									here
+								</a>
+								.
 								<Code text="faas-cli template pull https://github.com/openfaas-incubator/node10-express-template" />
 							</Paragraph>
 
@@ -168,16 +176,16 @@ class CreateFunction extends React.Component {
 							key={2}
 						>
 							<iframe
-								title="video"
-								width="450"
-								height="315"
-								src="https://www.youtube.com/embed/wQZ5_mbbU5I"
-								frameBorder="0"
-								allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-								allowFullScreen
+								title="functions demo"
 								style={{
 									borderRadius: 3,
 								}}
+								width="450"
+								height="315"
+								src="https://www.youtube.com/embed/ak7nbXxjY-c"
+								frameBorder="0"
+								allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+								allowFullScreen
 							/>
 						</Collapse.Panel>
 					</Collapse>
