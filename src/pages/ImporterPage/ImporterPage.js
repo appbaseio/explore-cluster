@@ -56,6 +56,7 @@ class ImporterPage extends React.Component {
 							type: 'AppbaseCluster',
 							uri: `${uri}/${index}`,
 							tier: 'paid',
+							url: uri,
 						},
 					});
 				}
@@ -69,8 +70,9 @@ class ImporterPage extends React.Component {
 				clusterType: 'self-hosted',
 				index,
 				cluster: uri || '',
-				uri,
+				uri: index ? `${uri}/${index}` : uri,
 				tier: 'paid',
+				url: uri,
 			};
 			this.setState({
 				destinationParams: parameters,
