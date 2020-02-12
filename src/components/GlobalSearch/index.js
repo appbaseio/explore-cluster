@@ -44,7 +44,6 @@ class GlobalSearch extends Component {
 					innerClass={{
 						input: `ant-input ${css`
 							padding-left: 35px !important;
-							height: 32px !important;
 							background: #fff !important;
 						`}`,
 					}}

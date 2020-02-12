@@ -342,10 +342,10 @@ class FunctionsPage extends React.Component {
 		return (
 			<ReactiveBase
 				url={getURL()}
-				app=".logs,.users"
+				app="phones,movie-app"
 				credentials={atob(sessionStorage.getItem('authToken'))}
 			>
-				<GlobalSearch indexes={['.logs', '.users']} />
+				<GlobalSearch indexes={['phones', 'movie-app']} />
 			</ReactiveBase>
 		);
 		const { isLoading, functions, tier, getFunction } = this.props;
