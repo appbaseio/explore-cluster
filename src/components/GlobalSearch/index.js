@@ -5,6 +5,8 @@ import { Icon, Skeleton } from 'antd';
 import { keys } from 'lodash';
 import { fetchMappings } from '../../utils';
 
+import './index.css';
+
 class GlobalSearch extends Component {
 	state = { loading: false, dataFields: [] };
 
@@ -37,7 +39,7 @@ class GlobalSearch extends Component {
 		const { onSuggestionSelect } = this.props;
 		if (loading) return <Skeleton />;
 		return (
-			<div css={{ position: 'relative' }}>
+			<div className="input-box" css={{ position: 'relative' }}>
 				<DataSearch
 					componentId="GlobalSearch"
 					dataField={dataFields}
@@ -52,14 +54,17 @@ class GlobalSearch extends Component {
 					onValueSelected={value => {
 						if (onSuggestionSelect) onSuggestionSelect(value);
 					}}
+					showDistinctSuggestions
 				/>
 				<Icon
+					className="search-icon"
 					type="search"
 					css={{
 						position: 'absolute',
 						top: '50%',
 						transform: 'translateY(-50%)',
 						left: '10px',
+						color: 'rgba(0, 0, 0, 0.45)',
 					}}
 				/>
 			</div>
