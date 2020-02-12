@@ -6,6 +6,7 @@ import get from 'lodash/get';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
 import { css } from 'emotion';
+import { ReactiveBase } from '@appbaseio/reactivesearch';
 import Loader from '../../components/Loader';
 import Header from '../../components/Header';
 import {
@@ -25,6 +26,8 @@ import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Overlay from '../../components/Overlay';
 import { getFunctionHealthCheck } from '../../utils';
 import { deploymentCheck } from '../../components/DeployFunctionModal/helper';
+import GlobalSearch from '../../components/GlobalSearch';
+import { getURL } from '../../constants/config';
 
 const validPlans = [
 	'2019-production-2',
@@ -335,6 +338,16 @@ class FunctionsPage extends React.Component {
 	};
 
 	render() {
+		// TODO: remove this example demonstrating use of GlobalSearch
+		return (
+			<ReactiveBase
+				url={getURL()}
+				app=".logs,.users"
+				credentials={atob(sessionStorage.getItem('authToken'))}
+			>
+				<GlobalSearch indexes={['.logs', '.users']} />
+			</ReactiveBase>
+		);
 		const { isLoading, functions, tier, getFunction } = this.props;
 		const { deployModal, checking, healthError, notFoundError } = this.state;
 		this.sortedDataSource = (functions || []).sort((a, b) => a.order - b.order);
