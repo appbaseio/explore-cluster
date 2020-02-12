@@ -28,6 +28,7 @@ import { getFunctionHealthCheck } from '../../utils';
 import { deploymentCheck } from '../../components/DeployFunctionModal/helper';
 import GlobalSearch from '../../components/GlobalSearch';
 import { getURL } from '../../constants/config';
+import PromoteResults from '../../components/PromoteResults';
 
 const validPlans = [
 	'2019-production-2',
@@ -338,15 +339,15 @@ class FunctionsPage extends React.Component {
 	};
 
 	render() {
-		// TODO: remove this example demonstrating use of GlobalSearch
+		// TODO: remove this example demonstrating use of PromoteResults
 		return (
-			<ReactiveBase
-				url={getURL()}
-				app="phones,movie-app"
-				credentials={atob(sessionStorage.getItem('authToken'))}
-			>
-				<GlobalSearch indexes={['phones', 'movie-app']} />
-			</ReactiveBase>
+			<PromoteResults
+				dataSource={[
+					{ doc: { key1: 'value1', key2: 'value2', id: '21' }, position: 1 },
+					{ doc: { key3: 'value3', key4: 'value4', id: '12' }, position: 2 },
+				]}
+				indexes={['phones', 'movie-app']}
+			/>
 		);
 		const { isLoading, functions, tier, getFunction } = this.props;
 		const { deployModal, checking, healthError, notFoundError } = this.state;

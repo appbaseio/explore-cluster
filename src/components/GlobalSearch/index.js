@@ -36,7 +36,7 @@ class GlobalSearch extends Component {
 
 	render() {
 		const { dataFields, loading } = this.state;
-		const { onSuggestionSelect } = this.props;
+		const { onSuggestionSelect, className } = this.props;
 		if (loading) return <Skeleton />;
 		return (
 			<div className="input-box" css={{ position: 'relative' }}>
@@ -47,7 +47,7 @@ class GlobalSearch extends Component {
 						input: `ant-input ${css`
 							padding-left: 35px !important;
 							background: #fff !important;
-						`}`,
+						`} ${className}`,
 					}}
 					debounce={5}
 					showIcon={false}
