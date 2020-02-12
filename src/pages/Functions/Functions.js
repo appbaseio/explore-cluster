@@ -29,6 +29,7 @@ import { deploymentCheck } from '../../components/DeployFunctionModal/helper';
 import GlobalSearch from '../../components/GlobalSearch';
 import { getURL } from '../../constants/config';
 import PromoteResults from '../../components/PromoteResults';
+import HideResults from '../../components/HideResults';
 
 const validPlans = [
 	'2019-production-2',
@@ -341,13 +342,16 @@ class FunctionsPage extends React.Component {
 	render() {
 		// TODO: remove this example demonstrating use of PromoteResults
 		return (
-			<PromoteResults
-				dataSource={[
-					{ doc: { key1: 'value1', key2: 'value2', _id: '21' }, position: 1 },
-					{ doc: { key3: 'value3', key4: 'value4', _id: '12' }, position: 2 },
-				]}
-				indexes={['phones', 'movie-app']}
-			/>
+			<>
+				<PromoteResults
+					dataSource={[
+						{ doc: { key1: 'value1', key2: 'value2', _id: '21' }, position: 1 },
+						{ doc: { key3: 'value3', key4: 'value4', _id: '12' }, position: 2 },
+					]}
+					indexes={['phones', 'movie-app']}
+				/>
+				<HideResults hiddenResults={['1', '2']} indexes={['phones', 'movie-app']} />
+			</>
 		);
 		const { isLoading, functions, tier, getFunction } = this.props;
 		const { deployModal, checking, healthError, notFoundError } = this.state;
@@ -606,4 +610,7 @@ const mapDispatchToProps = dispatch => ({
 	getFunction: appName => dispatch(getSingleFunction(appName)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(FunctionsPage);
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps,
+)(FunctionsPage);
