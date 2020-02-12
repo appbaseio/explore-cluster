@@ -21,13 +21,17 @@ const flex = css`
 class PromoteResults extends Component {
 	constructor(props) {
 		super(props);
-		this.state = { selectedSuggestion: null, dataSource: props.dataSource || [] };
+		this.state = {
+			selectedSuggestion: null,
+			dataSource: props.dataSource || [],
+			suggestionSource: null,
+		};
 	}
 
 	handleAdd = () => {
-		const { dataSource, selectedSuggestion } = this.state;
+		const { dataSource, selectedSuggestion, suggestionSource } = this.state;
 		if (!selectedSuggestion) return;
-		const newData = [...dataSource, { position: 1, doc: { id: selectedSuggestion } }];
+		const newData = [...dataSource, { position: 1, doc: suggestionSource }];
 		this.setState({ dataSource: newData });
 	};
 
@@ -66,8 +70,8 @@ class PromoteResults extends Component {
 					<div style={{ width: '91%' }}>
 						<GlobalSearch
 							indexes={indexes}
-							onSuggestionSelect={selectedSuggestion => {
-								this.setState({ selectedSuggestion });
+							onSuggestionSelect={(selectedSuggestion, cause, source) => {
+								this.setState({ selectedSuggestion, suggestionSource: source });
 							}}
 						/>
 					</div>

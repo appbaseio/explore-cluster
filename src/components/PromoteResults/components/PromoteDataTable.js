@@ -8,7 +8,7 @@ const popoverContent = css`
 	overflow-y: auto;
 	overflow-x: auto;
 	word-wrap: break-word;
-	max-width: 200px;
+	max-width: 300px;
 	max-height: 300px;
 `;
 
@@ -77,7 +77,7 @@ export function PromoteJSONView({ record }) {
 					}}
 				>
 					{` {...} `}
-					{get(record, 'doc.id')}
+					{get(record, 'doc._id')}
 				</span>
 			</Popover>
 		</>

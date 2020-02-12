@@ -51,8 +51,8 @@ class GlobalSearch extends Component {
 					}}
 					debounce={5}
 					showIcon={false}
-					onValueSelected={value => {
-						if (onSuggestionSelect) onSuggestionSelect(value);
+					onValueSelected={(value, cause, source) => {
+						if (onSuggestionSelect) onSuggestionSelect(value, cause, source);
 					}}
 					showDistinctSuggestions
 				/>

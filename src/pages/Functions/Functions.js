@@ -343,8 +343,8 @@ class FunctionsPage extends React.Component {
 		return (
 			<PromoteResults
 				dataSource={[
-					{ doc: { key1: 'value1', key2: 'value2', id: '21' }, position: 1 },
-					{ doc: { key3: 'value3', key4: 'value4', id: '12' }, position: 2 },
+					{ doc: { key1: 'value1', key2: 'value2', _id: '21' }, position: 1 },
+					{ doc: { key3: 'value3', key4: 'value4', _id: '12' }, position: 2 },
 				]}
 				indexes={['phones', 'movie-app']}
 			/>
