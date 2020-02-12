@@ -27,6 +27,11 @@ const QueryRulesPage = Loadable({
 	loader: () => import('../../pages/QueryRules'),
 	loading: Loader,
 });
+
+const QueryRulesForm = Loadable({
+	loader: () => import('../../pages/QueryRules/QueryRulesForm'),
+	loading: Loader,
+});
 const GeoDistributionPage = Loadable({
 	loader: () => import('../../pages/GeoDistributionPage'),
 	loading: Loader,
@@ -246,6 +251,13 @@ class ClusterLayout extends React.PureComponent {
 							path="/cluster/rules"
 							render={props => (
 								<AppPageContainer {...props} component={QueryRulesPage} />
+							)}
+						/>
+						<Route
+							exact
+							path="/cluster/rules/new"
+							render={props => (
+								<AppPageContainer {...props} component={QueryRulesForm} />
 							)}
 						/>
 						<Route

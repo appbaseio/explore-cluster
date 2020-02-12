@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { Col, Row, Layout, Button, Icon, message } from 'antd';
 import { css } from 'emotion';
+import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
 
@@ -87,10 +88,12 @@ class QueryRules extends Component {
 									flexDirection: 'column',
 								}}
 							>
-								<Button type="primary" size="large" rel="noopener noreferrer">
-									<Icon type="plus" />
-									Create Rule
-								</Button>
+								<Link to="/cluster/rules/new">
+									<Button block type="primary" size="large" rel="noopener noreferrer">
+										<Icon type="plus" />
+										Create Rule
+									</Button>
+								</Link>
 								<Button
 									style={{ marginTop: 10 }}
 									type="primary"
