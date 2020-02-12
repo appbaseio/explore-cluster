@@ -265,6 +265,23 @@ export async function fetchLogs(name = 'default') {
 	return data;
 }
 
+export async function fetchMappings(name = '*') {
+	const ACC_API = getURL();
+	const authToken = sessionStorage.getItem('authToken');
+	const response = await fetch(`${ACC_API}/${name}/_mapping`, {
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Basic ${authToken}`,
+		},
+		method: 'GET',
+	});
+	const data = await response.json();
+	if (response.status >= 400) {
+		throw data.error.message;
+	}
+	return data;
+}
+
 // checks open-faas health
 export async function getFunctionHealthCheck() {
 	const ACC_API = getURL();
