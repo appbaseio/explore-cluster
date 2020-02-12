@@ -3,7 +3,7 @@ import { Card, Row, Col, Icon, Button, Switch, Tooltip, Typography, message } fr
 import { css } from 'emotion';
 import { connect } from 'react-redux';
 
-import Action from './Action';
+import ActionView from './ActionView';
 import MobileMenu from './MobileMenu';
 import { deleteRule, toggleRuleStatus } from '../../../batteries/modules/actions';
 
@@ -126,7 +126,7 @@ class QueryCard extends React.Component {
 					<Col xl={8} lg={7} md={12} sm={24}>
 						{rule.actions.map(action => (
 							<div key={Object.keys(action)[0]} className={section}>
-								<Action action={action} />
+								<ActionView action={action} />
 							</div>
 						))}
 					</Col>

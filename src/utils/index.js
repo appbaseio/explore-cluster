@@ -1,4 +1,4 @@
-import { chain } from 'lodash';
+import { chain, keys } from 'lodash';
 import { getURL } from '../constants/config';
 
 export async function getUser(username, password, url) {
@@ -320,3 +320,38 @@ export const getURLParameters = url =>
 	);
 
 export const isEmpty = val => val == null || !(Object.keys(val) || val).length;
+
+export async function getClusterMappings() {
+	const ACC_API = getURL();
+	const authToken = sessionStorage.getItem('authToken');
+	const response = await fetch(`${ACC_API}/*/_mapping`, {
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Basic ${authToken}`,
+		},
+		method: 'GET',
+	});
+	const mappings = await response.json();
+	if (response.status >= 400) {
+		throw data.error.message;
+	}
+	return mappings;
+}
+
+export function getDatafields(mappings, indexes) {
+	const hasAllIndex = indexes.includes('*');
+	const dataFields = Object.keys(mappings)
+		.filter(index => !index.startsWith('.'))
+		.filter(index => hasAllIndex || indexes.includes(index))
+		.reduce((acc, key) => {
+			const { properties } = mappings[key].mappings;
+			const nestedDataFields = keys(properties).filter(property => {
+				return (
+					properties[property].type === 'string' || properties[property].type === 'text'
+				);
+			});
+			return [...acc, ...nestedDataFields];
+		}, []);
+
+	return [...new Set(dataFields)];
+}
