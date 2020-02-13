@@ -1,16 +1,19 @@
 import React from 'react';
-import { Card, Tooltip, Icon, Typography, Button } from 'antd';
+import { Button, Card, Icon, Tooltip, Typography } from 'antd';
 import { css } from 'emotion';
 import DNDWrapper from '../../../../components/DNDWrapper';
-// import PromoteResult from './PromoteResult';
-// import HideResult from './HideResult';
-// import Functions from './Functions';
 import CustomData from './CustomData';
 import ReplaceSearch from './ReplaceSearch';
+import PromoteResults from '../../../../components/PromoteResults';
+import HideResults from '../../../../components/HideResults';
+import ExecuteFunction from '../../../../components/ExecuteFunction';
 
 const componentMappings = {
 	replace_search_term: ReplaceSearch,
 	custom_data: CustomData,
+	promote_result: PromoteResults,
+	hide_result: HideResults,
+	function: ExecuteFunction,
 };
 
 const actionMapping = {
@@ -107,11 +110,23 @@ class Actions extends React.Component {
 
 	renderComponent = item => {
 		const Component = componentMappings[item.type];
+		const getProps = () => {
+			const defaultProps = { value: item.data };
+			const { indexes, dataFields } = this.props;
+			if (item.type === 'promote_result' || item.type === 'hide_result') {
+				return {
+					...defaultProps,
+					indexes,
+					dataFields,
+				};
+			}
+			return defaultProps;
+		};
 		if (Component) {
 			return (
 				<Component
 					onChange={value => this.handleChange(item.type, value)}
-					value={item.data}
+					{...getProps()}
 				/>
 			);
 		}

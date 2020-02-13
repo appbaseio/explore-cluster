@@ -12,6 +12,8 @@ const popoverContent = css`
 	max-height: 300px;
 `;
 
+const overflow = { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
+
 export function PromoteDataTable({ positionRender, dataRender, dataSource, actionRender }) {
 	return (
 		<Table
@@ -74,6 +76,8 @@ export function PromoteJSONView({ record }) {
 					css={{
 						cursor: 'pointer',
 						margin: '0 7px',
+						maxWidth: '75%',
+						...overflow,
 					}}
 				>
 					{` {...} `}

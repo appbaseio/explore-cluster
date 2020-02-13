@@ -23,41 +23,55 @@ class PromoteResults extends Component {
 		super(props);
 		this.state = {
 			selectedSuggestion: null,
-			dataSource: props.dataSource || [],
+			dataSource: props.value || [],
 			suggestionSource: null,
 		};
 	}
+
+	setStateCallback = () => {
+		const { onChange } = this.props;
+		if (onChange) {
+			const { dataSource: dataSourceNew } = this.state;
+			onChange(dataSourceNew);
+		}
+	};
 
 	handleAdd = () => {
 		const { dataSource, selectedSuggestion, suggestionSource } = this.state;
 		if (!selectedSuggestion) return;
 		const newData = [...dataSource, { position: 1, doc: suggestionSource }];
-		this.setState({ dataSource: newData });
+		this.setState({ dataSource: newData }, this.setStateCallback);
 	};
 
 	handleItemChange = (value, index, field) => {
 		const { dataSource } = this.state;
-		this.setState({
-			dataSource: [
-				...dataSource.slice(0, index),
-				{
-					...dataSource[index],
-					[field]: value,
-				},
-				...dataSource.slice(index + 1),
-			],
-		});
+		this.setState(
+			{
+				dataSource: [
+					...dataSource.slice(0, index),
+					{
+						...dataSource[index],
+						[field]: value,
+					},
+					...dataSource.slice(index + 1),
+				],
+			},
+			this.setStateCallback,
+		);
 	};
 
 	handleDelete = index => {
 		const { dataSource } = this.state;
-		this.setState({
-			dataSource: [...dataSource.slice(0, index), ...dataSource.slice(index + 1)],
-		});
+		this.setState(
+			{
+				dataSource: [...dataSource.slice(0, index), ...dataSource.slice(index + 1)],
+			},
+			this.setStateCallback,
+		);
 	};
 
 	render() {
-		const { indexes } = this.props;
+		const { indexes, dataFields } = this.props;
 		const { dataSource } = this.state;
 		return (
 			<div style={{ padding: 12 }}>
@@ -67,12 +81,13 @@ class PromoteResults extends Component {
 					credentials={atob(sessionStorage.getItem('authToken'))}
 					className={flex}
 				>
-					<div style={{ width: '91%' }}>
+					<div style={{ width: '75%' }}>
 						<GlobalSearch
 							indexes={indexes}
 							onSuggestionSelect={(selectedSuggestion, cause, source) => {
 								this.setState({ selectedSuggestion, suggestionSource: source });
 							}}
+							dataFields={dataFields}
 						/>
 					</div>
 					<Button type="primary" onClick={this.handleAdd}>

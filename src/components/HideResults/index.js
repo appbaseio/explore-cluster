@@ -16,10 +16,18 @@ class HideResults extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			hiddenResults: props.hiddenResults,
+			hiddenResults: props.value,
 			currentId: null,
 		};
 	}
+
+	setStateCallback = () => {
+		const { onChange } = this.props;
+		if (onChange) {
+			const { hiddenResults: hiddenResultsNew } = this.state;
+			onChange(hiddenResultsNew);
+		}
+	};
 
 	onSuggestionSelect = (selectedSuggestion, cause, source) => {
 		this.setState({
@@ -30,7 +38,7 @@ class HideResults extends Component {
 	onHide = () => {
 		const { currentId, hiddenResults } = this.state;
 		if (!currentId) return;
-		this.setState({ hiddenResults: [...hiddenResults, currentId] });
+		this.setState({ hiddenResults: [...hiddenResults, currentId] }, this.setStateCallback);
 	};
 
 	onClose = (e, id) => {
@@ -39,12 +47,12 @@ class HideResults extends Component {
 		const index = hiddenResults.indexOf(id);
 		if (index !== -1) {
 			hiddenResults.splice(index, 1);
-			this.setState({ hiddenResults });
+			this.setState({ hiddenResults }, this.setStateCallback);
 		}
 	};
 
 	render() {
-		const { indexes } = this.props;
+		const { indexes, dataFields } = this.props;
 		const { hiddenResults } = this.state;
 		return (
 			<div style={{ padding: 12, background: '#fff' }}>
@@ -54,10 +62,11 @@ class HideResults extends Component {
 					credentials={atob(sessionStorage.getItem('authToken'))}
 					className={flex}
 				>
-					<div style={{ width: '92%' }}>
+					<div style={{ width: '82%' }}>
 						<GlobalSearch
 							indexes={indexes}
 							onSuggestionSelect={this.onSuggestionSelect}
+							dataFields={dataFields}
 						/>
 					</div>
 					<Button type="primary" onClick={this.onHide}>
@@ -75,5 +84,9 @@ class HideResults extends Component {
 		);
 	}
 }
+
+HideResults.defaultProps = {
+	hiddenResults: [],
+};
 
 export default HideResults;

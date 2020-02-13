@@ -1,43 +1,13 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { DataSearch } from '@appbaseio/reactivesearch';
 import { css } from 'react-emotion';
-import { Icon, Skeleton } from 'antd';
-import { keys } from 'lodash';
-import { fetchMappings } from '../../utils';
+import { Icon } from 'antd';
 
 import './index.css';
 
-class GlobalSearch extends Component {
-	state = { loading: false, dataFields: [] };
-
-	async componentDidMount() {
-		this.setState({ loading: true });
-		try {
-			const { indexes } = this.props;
-			const mappings = await fetchMappings();
-			const dataFields = Object.keys(mappings)
-				.filter(key => indexes.includes(key) && key[0] !== '.')
-				.reduce((acc, key) => {
-					const { properties } = mappings[key].mappings;
-					const nestedDataFields = keys(properties).filter(property => {
-						return (
-							properties[property].type === 'string' ||
-							properties[property].type === 'text'
-						);
-					});
-					return [...acc, ...nestedDataFields];
-				}, []);
-			this.setState({ dataFields, loading: false });
-		} catch (e) {
-			console.error(e);
-			this.setState({ loading: false });
-		}
-	}
-
+class GlobalSearch extends PureComponent {
 	render() {
-		const { dataFields, loading } = this.state;
-		const { onSuggestionSelect, className } = this.props;
-		if (loading) return <Skeleton />;
+		const { onSuggestionSelect, className, dataFields } = this.props;
 		return (
 			<div className="input-box" css={{ position: 'relative' }}>
 				<DataSearch
@@ -47,6 +17,7 @@ class GlobalSearch extends Component {
 						input: `ant-input ${css`
 							padding-left: 35px !important;
 							background: #fff !important;
+							margin-bottom: 0 !important;
 						`} ${className}`,
 					}}
 					debounce={5}

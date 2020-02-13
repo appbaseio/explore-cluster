@@ -4,17 +4,17 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
 import {
-	Button,
-	Icon,
-	Card,
-	Typography,
-	Input,
-	Row,
-	Col,
-	Divider,
-	Radio,
-	DatePicker,
 	Affix,
+	Button,
+	Card,
+	Col,
+	DatePicker,
+	Divider,
+	Icon,
+	Input,
+	Radio,
+	Row,
+	Typography,
 } from 'antd';
 import { loadApps } from '../../actions';
 import IndexDropdown from './components/IndexDropdown';
@@ -140,6 +140,7 @@ class QueryRulesForm extends React.Component {
 			query,
 			queryValue,
 			actions,
+			selectedIndexes,
 		} = this.state;
 		return (
 			<div className={container}>
@@ -210,7 +211,12 @@ class QueryRulesForm extends React.Component {
 							</Col>
 
 							<Col md={12} sm={24}>
-								<Actions actions={actions} onChange={this.updateActions} />
+								<Actions
+									dataFields={dataFields}
+									indexes={selectedIndexes}
+									actions={actions}
+									onChange={this.updateActions}
+								/>
 								<ActionSelector actions={actions} onChange={this.setActions} />
 							</Col>
 						</Row>
