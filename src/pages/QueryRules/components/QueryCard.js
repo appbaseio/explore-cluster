@@ -1,0 +1,172 @@
+import React from 'react';
+import { Card, Row, Col, Icon, Button, Switch, Tooltip, Typography, message } from 'antd';
+import { css } from 'emotion';
+import { connect } from 'react-redux';
+
+import ActionView from './ActionView';
+import MobileMenu from './MobileMenu';
+import { deleteRule, toggleRuleStatus } from '../../../batteries/modules/actions';
+
+const title = css`
+	font-size: 16px;
+	color: rgba(0, 0, 0, 0.85);
+	margin: 0;
+	font-weight: bold;
+`;
+
+const description = css`
+	color: rgba(0, 0, 0, 0.65);
+	font-size: 14px;
+	margin: 0;
+`;
+
+const section = css`
+	margin-bottom: 10px;
+`;
+
+const actions = css`
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+
+	button:not(:first-child) {
+		margin-left: 5px;
+	}
+`;
+
+const dragIcon = css`
+	display: flex;
+	align-items: center;
+	justify-content: space-evenly;
+	padding: 2px;
+	border-radius: 2px;
+	transition: all ease 0.2s;
+	&:hover {
+		background: #f5f5f5;
+	}
+`;
+
+const mobileMenu = css`
+	display: none;
+	@media (max-width: 992px) {
+		display: block;
+		position: absolute;
+		top: 0;
+		right: 0;
+		z-index: 1;
+	}
+`;
+
+const card = css`
+	.show-on-hover {
+		transform: rotateX(90deg);
+		opacity: 0;
+		transition: all ease 0.3s;
+	}
+	&:hover {
+		.show-on-hover {
+			transform: rotateX(0deg);
+			opacity: 1;
+		}
+	}
+`;
+
+class QueryCard extends React.Component {
+	componentDidUpdate(prevProps) {
+		const {
+			rule: { deleteError, toggleError },
+		} = this.props;
+		if (deleteError !== prevProps.rule.deleteError) {
+			message.error('Error while deleting rule');
+		}
+
+		if (toggleError !== prevProps.rule.toggleError) {
+			message.error('Error while updating rule status');
+		}
+	}
+
+	handleRuleStatus = value => {
+		const { toggleRule, rule } = this.props;
+		toggleRule({
+			id: rule.id,
+			enabled: value,
+		});
+	};
+
+	render() {
+		const { rule, dragProvided, dragSnapshot, removeRule } = this.props;
+		return (
+			<Card
+				hoverable
+				className={card}
+				style={{
+					background: dragSnapshot.isDragging ? '#e6f7ff' : 'white',
+				}}
+			>
+				<Row style={{ position: 'relative' }} gutter={8}>
+					<div className={mobileMenu}>
+						<MobileMenu />
+					</div>
+					<Col xs={1}>
+						<Tooltip title="Drag to update the ordering of rules">
+							<div {...dragProvided.dragHandleProps} className={dragIcon}>
+								<Icon type="drag" />
+								<Typography.Text strong>{rule.order}</Typography.Text>
+							</div>
+						</Tooltip>
+					</Col>
+					<Col xl={8} lg={6} md={11} sm={24}>
+						<h4 className={title}>{rule.name}</h4>
+						<p className={description}>{rule.description}</p>
+						<p className={description}>
+							<strong>{rule.trigger.expression}</strong>
+						</p>
+					</Col>
+					<Col xl={8} lg={7} md={12} sm={24}>
+						{rule.actions.map(action => (
+							<div key={Object.keys(action)[0]} className={section}>
+								<ActionView action={action} />
+							</div>
+						))}
+					</Col>
+					<Col xl={7} lg={10} xs={0}>
+						<div className={actions}>
+							<Button
+								onClick={() => removeRule(rule.id)}
+								className="show-on-hover"
+								ghost
+								type="danger"
+							>
+								<Icon type={rule.isDeleting ? 'loading' : 'delete'} /> Delete
+							</Button>
+							<Button type="primary">
+								<Icon type="copy" /> Clone
+							</Button>
+							<Button type="primary">
+								<Icon type="edit" /> Edit
+							</Button>
+						</div>
+						<div style={{ marginTop: 30 }}>
+							<Tooltip title="Click to disable Rule">
+								<Switch
+									loading={rule.isToggling}
+									checked={rule.enabled}
+									onChange={this.handleRuleStatus}
+									style={{ marginLeft: 'auto', display: 'block' }}
+								/>
+							</Tooltip>
+						</div>
+					</Col>
+				</Row>
+			</Card>
+		);
+	}
+}
+
+const mapDispatchToProps = dispatch => ({
+	removeRule: id => dispatch(deleteRule(id)),
+	toggleRule: rule => dispatch(toggleRuleStatus(rule)),
+});
+
+export default connect(null, mapDispatchToProps)(QueryCard);
