@@ -7,6 +7,7 @@ import DNDWrapper from '../../../../components/DNDWrapper';
 // import Functions from './Functions';
 import CustomData from './CustomData';
 import ReplaceSearch from './ReplaceSearch';
+import { getErrorMessage } from '../../error';
 
 const componentMappings = {
 	replace_search_term: ReplaceSearch,
@@ -73,10 +74,10 @@ class Actions extends React.Component {
 
 	handleChange = (type, value) => {
 		const { actions: originalActions, onChange } = this.props;
-		const actions = JSON.parse(JSON.stringify(originalActions));
+		let actions = JSON.parse(JSON.stringify(originalActions));
 		switch (type) {
 			case 'replace_search_term': {
-				actions.map(action => {
+				actions = actions.map(action => {
 					if (action.type === 'replace_search_term') {
 						return {
 							...action,
@@ -88,7 +89,7 @@ class Actions extends React.Component {
 				break;
 			}
 			case 'custom_data': {
-				actions.map(action => {
+				actions = actions.map(action => {
 					if (action.type === 'custom_data') {
 						return {
 							...action,
@@ -102,7 +103,11 @@ class Actions extends React.Component {
 			default:
 				return;
 		}
-		onChange(actions);
+		onChange(actions, {
+			[type]: {
+				hasError: false,
+			},
+		});
 	};
 
 	renderComponent = item => {
@@ -128,7 +133,7 @@ class Actions extends React.Component {
 	};
 
 	render() {
-		const { actions } = this.props;
+		const { actions, error } = this.props;
 		return (
 			<React.Fragment>
 				<DNDWrapper
@@ -141,6 +146,10 @@ class Actions extends React.Component {
 						<Card
 							style={{
 								background: dragSnapshot.isDragging ? '#e6f7ff' : 'white',
+								borderColor:
+									error[item.type] && error[item.type].hasError
+										? '#f5222d'
+										: '#e8e8e8',
 							}}
 							title={
 								<div className="action-head">
@@ -173,6 +182,7 @@ class Actions extends React.Component {
 							key={item.type}
 							hoverable
 						>
+							{getErrorMessage(error[item.type])}
 							{this.renderComponent(item)}
 						</Card>
 					)}

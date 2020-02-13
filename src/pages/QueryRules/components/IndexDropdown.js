@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { get } from 'lodash';
 
 import { loadApps } from '../../../actions';
+import { getErrorClass } from '../error';
 
 const { Option } = Select;
 
@@ -50,7 +51,7 @@ class IndexDropdown extends React.Component {
 	};
 
 	render() {
-		const { apps } = this.props;
+		const { apps, error } = this.props;
 		const { selectedIndexes } = this.state;
 
 		if (!apps) {
@@ -63,6 +64,7 @@ class IndexDropdown extends React.Component {
 				mode="multiple"
 				style={{ width: '100%' }}
 				placeholder="Select Indexes"
+				className={getErrorClass(error)}
 				value={selectedIndexes}
 				onChange={this.handleChange}
 			>

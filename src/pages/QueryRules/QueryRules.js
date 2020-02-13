@@ -18,8 +18,11 @@ const container = css`
 
 class QueryRules extends Component {
 	componentDidMount() {
-		const { fetchRules } = this.props;
-		fetchRules();
+		const { fetchRules, rules } = this.props;
+
+		if (!rules) {
+			fetchRules();
+		}
 	}
 
 	componentDidUpdate(prevProps) {
@@ -89,7 +92,12 @@ class QueryRules extends Component {
 								}}
 							>
 								<Link to="/cluster/rules/new">
-									<Button block type="primary" size="large" rel="noopener noreferrer">
+									<Button
+										block
+										type="primary"
+										size="large"
+										rel="noopener noreferrer"
+									>
 										<Icon type="plus" />
 										Create Rule
 									</Button>

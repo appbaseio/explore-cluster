@@ -1,6 +1,7 @@
 import React from 'react';
 import { css } from 'emotion';
 import { Card, Select, Icon } from 'antd';
+import { getErrorClass, getErrorMessage } from '../error';
 
 const { Option } = Select;
 
@@ -12,7 +13,7 @@ const actions = {
 	promote_result: { name: 'Promote Result', data: [] },
 	hide_result: { name: 'Hide Result', data: [] },
 	replace_search_term: { name: 'Replace Search Term', data: '' },
-	custom_data: { name: 'Return Custom Data', data: "" },
+	custom_data: { name: 'Return Custom Data', data: '' },
 	function: { name: 'f(x) Apply Function', data: '' },
 };
 
@@ -27,12 +28,13 @@ class ActionSelector extends React.Component {
 	};
 
 	render() {
-		const { actions: selectedActions } = this.props;
+		const { actions: selectedActions, error } = this.props;
 		const optionsToShow = Object.keys(actions).filter(
 			action => !selectedActions.find(item => item.type === action),
 		);
 		return (
-			<Card className={cardStyles} hoverable>
+			<Card className={css([cardStyles, getErrorClass(error)])} hoverable>
+				{getErrorMessage(error)}
 				{optionsToShow.length ? (
 					<Select
 						onChange={this.handleDropdown}

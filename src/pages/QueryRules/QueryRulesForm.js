@@ -15,13 +15,19 @@ import {
 	Radio,
 	DatePicker,
 	Affix,
+	Alert,
+	message,
 } from 'antd';
-import { loadApps } from '../../actions';
+
 import IndexDropdown from './components/IndexDropdown';
 import Conditions from './components/Conditions';
-import { getClusterMappings, getDatafields } from '../../utils';
 import ActionSelector from './components/ActionSelector';
 import Actions from './components/Actions';
+import { getErrorMessages, getErrorClass, getErrorMessage, getErrorCount } from './error';
+
+import { addQueryRule, getRules } from '../../batteries/modules/actions/rules';
+
+import { getClusterMappings, getDatafields } from '../../utils';
 
 const { RangePicker } = DatePicker;
 
@@ -33,6 +39,7 @@ const container = css`
 		width: 100%;
 		padding: 20px;
 		background: white;
+		align-items: center;
 		box-sizing: border-box;
 		display: flex;
 		justify-content: flex-end;
@@ -79,9 +86,16 @@ class QueryRulesForm extends React.Component {
 		// internal state
 		mappings: [],
 		dataFields: [],
+
+		error: {},
 	};
 
 	componentDidMount() {
+		const { rules, fetchRules } = this.props;
+
+		if (!rules) {
+			fetchRules();
+		}
 		const { selectedIndexes } = this.state;
 		getClusterMappings()
 			.then(mappings => {
@@ -95,10 +109,28 @@ class QueryRulesForm extends React.Component {
 			.catch(e => console.log(e));
 	}
 
+	componentDidUpdate(prevProps) {
+		const { isCreating, createError } = this.props;
+		if (!isCreating && prevProps.isCreating !== isCreating) {
+			if (createError) {
+				message.error(createError);
+			} else {
+				message.success('Successfully Created Rule');
+			}
+		}
+	}
+
 	handleInput = e => {
-		this.setState({
-			[e.target.name]: e.target.value,
-		});
+		const { name, value } = e.target;
+		this.setState(prevState => ({
+			[name]: value,
+			error: {
+				...prevState.error,
+				[name]: {
+					hasError: false,
+				},
+			},
+		}));
 	};
 
 	handleDropdown = (name, value) => {
@@ -110,23 +142,93 @@ class QueryRulesForm extends React.Component {
 	handleIndex = selectedIndexes => {
 		const { mappings } = this.state;
 		const dataFields = getDatafields(mappings, selectedIndexes);
-		this.setState({
+		this.setState(prevState => ({
 			selectedIndexes,
 			dataFields,
 			dataField: dataFields[0] || '',
-		});
+			error: {
+				...prevState.error,
+				selectedIndexes: {
+					hasError: false,
+				},
+			},
+		}));
 	};
 
 	setActions = action => {
 		this.setState(prevState => ({
 			actions: [...prevState.actions, action],
+			error: {
+				...prevState.error,
+				actions: {
+					hasError: false,
+				},
+			},
 		}));
 	};
 
-	updateActions = actions => {
-		this.setState({
+	updateActions = (actions, error) => {
+		this.setState(prevState => ({
 			actions,
-		});
+			error: {
+				...prevState.error,
+				...error,
+			},
+		}));
+	};
+
+	getCreateRuleStatus = () => {
+		this.setState(
+			prevState => ({
+				error: getErrorMessages(prevState),
+			}),
+			this.handleSave,
+		);
+	};
+
+	handleSave = () => {
+		const {
+			condition,
+			description,
+			name,
+			dataField,
+			dataFieldValue,
+			query,
+			queryValue,
+			actions,
+			error,
+			selectedIndexes,
+		} = this.state;
+
+		const { createRule } = this.props;
+
+		const triggerCondition = {
+			expression: `'${selectedIndexes.join(',')}' in $index`,
+		};
+
+		if (condition === 'filter') {
+			if (query && queryValue) {
+				triggerCondition.expression = `${triggerCondition.expression} and $query ${query} '${queryValue}'`;
+			}
+
+			if (dataField && dataFieldValue) {
+				triggerCondition.expression = `${triggerCondition.expression} and $filter.${dataField} matches '${dataFieldValue}`;
+			}
+		}
+
+		const hasError = !!Object.keys(error).length;
+
+		if (!hasError) {
+			createRule({
+				name,
+				description,
+				actions,
+				trigger: {
+					type: condition,
+					...triggerCondition,
+				},
+			});
+		}
 	};
 
 	render() {
@@ -140,7 +242,10 @@ class QueryRulesForm extends React.Component {
 			query,
 			queryValue,
 			actions,
+			error,
 		} = this.state;
+		const { isCreating } = this.props;
+		const errorCount = getErrorCount(error);
 		return (
 			<div className={container}>
 				<Link to="/cluster/rules">
@@ -153,7 +258,14 @@ class QueryRulesForm extends React.Component {
 					<Typography.Title level={3}>Create Query Rule</Typography.Title>
 					<section className={formStyle}>
 						<label>Rule Name</label>
-						<Input name="name" value={name} onChange={this.handleInput} />
+						{getErrorMessage(error.name)}
+						<Input
+							name="name"
+							className={getErrorClass(error.name)}
+							value={name}
+							placeholder="Enter Rule Name"
+							onChange={this.handleInput}
+						/>
 
 						<label>Rule Description</label>
 						<Input.TextArea
@@ -174,7 +286,11 @@ class QueryRulesForm extends React.Component {
 
 							<Col md={12} sm={24}>
 								<label>Indexes</label>
-								<IndexDropdown onChange={this.handleIndex} />
+								{getErrorMessage(error.selectedIndexes)}
+								<IndexDropdown
+									error={error && error.selectedIndexes}
+									onChange={this.handleIndex}
+								/>
 
 								<Radio.Group
 									name="condition"
@@ -188,6 +304,7 @@ class QueryRulesForm extends React.Component {
 								{condition === 'filter' ? (
 									<Conditions
 										onChange={this.handleInput}
+										error={error}
 										dataFields={dataFields}
 										dataField={dataField}
 										dataFieldValue={dataFieldValue}
@@ -210,19 +327,33 @@ class QueryRulesForm extends React.Component {
 							</Col>
 
 							<Col md={12} sm={24}>
-								<Actions actions={actions} onChange={this.updateActions} />
-								<ActionSelector actions={actions} onChange={this.setActions} />
+								<Actions
+									error={error}
+									actions={actions}
+									onChange={this.updateActions}
+								/>
+								<ActionSelector
+									error={error && error.actions}
+									actions={actions}
+									onChange={this.setActions}
+								/>
 							</Col>
 						</Row>
 					</section>
 				</Card>
 				<Affix offsetBottom={0}>
 					<div className="card-footer">
-						<Button type="danger" ghost>
-							Cancel
-						</Button>
+						{errorCount ? (
+							<Alert
+								style={{ marginRight: 10 }}
+								message={`${errorCount} errors found`}
+								type="error"
+								showIcon
+							/>
+						) : null}
 
-						<Button style={{ marginLeft: 10 }} type="primary">
+						<Button size="large" onClick={this.getCreateRuleStatus} type="primary">
+							<Icon type={isCreating ? 'loading' : 'save'} />
 							Save
 						</Button>
 					</div>
@@ -233,11 +364,14 @@ class QueryRulesForm extends React.Component {
 }
 
 const mapStateToProps = state => ({
-	apps: get(state, 'apps'),
+	isCreating: get(state, '$getAppRules.create.isLoading'),
+	createError: get(state, '$getAppRules.create.error.actual'),
+	rules: get(state, '$getAppRules.results'),
 });
 
 const mapDispatchToProps = dispatch => ({
-	fetchApps: () => dispatch(loadApps()),
+	fetchRules: () => dispatch(getRules()),
+	createRule: rule => dispatch(addQueryRule(rule)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(QueryRulesForm);

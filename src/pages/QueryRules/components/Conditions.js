@@ -1,5 +1,6 @@
 import React from 'react';
 import { Select, Input, Row, Col } from 'antd';
+import { getErrorClass, getErrorMessage } from '../error';
 
 const { Option } = Select;
 
@@ -11,6 +12,7 @@ const Conditions = ({
 	query,
 	queryValue,
 	onDropdownChange,
+	error,
 }) => (
 	<Row gutter={16}>
 		<Col md={12} sm={24}>
@@ -18,6 +20,7 @@ const Conditions = ({
 			<Select
 				onChange={value => onDropdownChange('query', value)}
 				value={query}
+				className={getErrorClass(error.query)}
 				style={{ width: '100%' }}
 			>
 				<Option value="is">Query is</Option>
@@ -28,11 +31,19 @@ const Conditions = ({
 		</Col>
 		<Col md={12} sm={24}>
 			<label>Value</label>
-			<Input name="queryValue" value={queryValue} onChange={onChange} />
+			{getErrorMessage(error.queryValue)}
+			<Input
+				className={getErrorClass(error.queryValue)}
+				name="queryValue"
+				value={queryValue}
+				onChange={onChange}
+			/>
 		</Col>
 		<Col md={12} sm={24}>
 			<label>DataField</label>
+			{getErrorMessage(error.dataField)}
 			<Select
+				className={getErrorClass(error.dataField)}
 				onChange={value => onDropdownChange('dataField', value)}
 				value={dataField}
 				style={{ width: '100%' }}
@@ -44,7 +55,13 @@ const Conditions = ({
 		</Col>
 		<Col md={12} sm={24}>
 			<label>Value</label>
-			<Input name="dataFieldValue" value={dataFieldValue} onChange={onChange} />
+			{getErrorMessage(error.dataFieldValue)}
+			<Input
+				className={getErrorClass(error.dataFieldValue)}
+				name="dataFieldValue"
+				value={dataFieldValue}
+				onChange={onChange}
+			/>
 		</Col>
 	</Row>
 );

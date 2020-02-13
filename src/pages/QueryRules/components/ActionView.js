@@ -10,21 +10,21 @@ const subTitle = css`
 `;
 
 const Action = ({ action }) => {
-	const actionType = Object.keys(action)[0];
+	const actionType = action.type;
 
 	switch (actionType) {
 		case 'replace_search_term':
-			return action.replace_search_term ? (
+			return action.data ? (
 				<React.Fragment>
 					<h4 className={subTitle}>Replace Search Term</h4>
-					<Tag>{action.replace_search_term}</Tag>
+					<Tag>{action.data}</Tag>
 				</React.Fragment>
 			) : null;
 		case 'hide_result':
-			return action.hide_result ? (
+			return action.data ? (
 				<React.Fragment>
 					<h4 className={subTitle}>Hide Result</h4>
-					{action.hide_result.map(id => (
+					{action.data.map(id => (
 						<Tag color="red" key={id}>
 							{id}
 						</Tag>
@@ -33,10 +33,10 @@ const Action = ({ action }) => {
 			) : null;
 
 		case 'promote_result':
-			return action.promote_result ? (
+			return action.data ? (
 				<React.Fragment>
 					<h4 className={subTitle}>Promote Result</h4>
-					{action.promote_result.map(item => (
+					{action.data.map(item => (
 						<Tag color="blue" key={item.doc.id}>
 							{item.doc.id}
 						</Tag>
@@ -44,12 +44,12 @@ const Action = ({ action }) => {
 				</React.Fragment>
 			) : null;
 		case 'add_filter':
-			return action.add_filter ? (
+			return action.data ? (
 				<React.Fragment>
 					<h4 className={subTitle}>Add Filter</h4>
-					{Object.keys(action.add_filter).map(filter => (
+					{Object.keys(action.data).map(filter => (
 						<Typography.Text key={filter} style={{ display: 'block', margin: '2px 0' }}>
-							<strong>{filter}: </strong> {action.add_filter[filter]}
+							<strong>{filter}: </strong> {action.data[filter]}
 							<br />
 						</Typography.Text>
 					))}
@@ -57,20 +57,20 @@ const Action = ({ action }) => {
 			) : null;
 		case 'function':
 			return (
-				action.function && (
+				action.data && (
 					<React.Fragment>
 						<h4 className={subTitle}>Function</h4>
-						<Tag color="purple">{action.function}</Tag>
+						<Tag color="purple">{action.data}</Tag>
 					</React.Fragment>
 				)
 			);
 
 		case 'custom_data':
 			return (
-				action.custom_data && (
+				action.data && (
 					<React.Fragment>
 						<h4 className={subTitle}>Custom Data</h4>
-						<Popover content={<pre>{JSON.stringify(action.custom_data, null, 4)}</pre>}>
+						<Popover content={<pre>{JSON.stringify(action.data, null, 4)}</pre>}>
 							<Tag color="green">{`{...}`}</Tag>
 						</Popover>
 					</React.Fragment>
