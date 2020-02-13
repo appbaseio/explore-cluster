@@ -8,6 +8,8 @@ import { loadApps } from '../../actions';
 import IndexDropdown from './components/IndexDropdown';
 import Conditions from './components/Conditions';
 import { getClusterMappings, getDatafields } from '../../utils';
+import ActionSelector from './components/ActionSelector';
+import Actions from './components/Actions';
 
 const { RangePicker } = DatePicker;
 
@@ -48,16 +50,7 @@ class QueryRulesForm extends React.Component {
 		queryValue: '',
 
 		// actions
-		actions: [
-			{
-				type: 'promote_result',
-				data: [
-					// this can be filled by onChange of indiviual components
-					// define all this components under Actions Folder
-				],
-			},
-			// append here whenever select is triggered
-		],
+		actions: [],
 
 		// internal state
 		mappings: [],
@@ -100,6 +93,18 @@ class QueryRulesForm extends React.Component {
 		});
 	};
 
+	setActions = action => {
+		this.setState(prevState => ({
+			actions: [...prevState.actions, action],
+		}));
+	};
+
+	updateActions = actions => {
+		this.setState({
+			actions,
+		});
+	};
+
 	render() {
 		const {
 			condition,
@@ -110,6 +115,7 @@ class QueryRulesForm extends React.Component {
 			dataFieldValue,
 			query,
 			queryValue,
+			actions,
 		} = this.state;
 		return (
 			<div className={container}>
@@ -180,8 +186,8 @@ class QueryRulesForm extends React.Component {
 							</Col>
 
 							<Col md={12} sm={24}>
-								{/* Loop over actions from State */}
-								<div>{/* Select Input */}</div>
+								<Actions actions={actions} onChange={this.updateActions} />
+								<ActionSelector actions={actions} onChange={this.setActions} />
 							</Col>
 						</Row>
 					</section>
