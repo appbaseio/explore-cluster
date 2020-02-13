@@ -21,6 +21,28 @@ class HideResults extends Component {
 		};
 	}
 
+	onSuggestionSelect = (selectedSuggestion, cause, source) => {
+		this.setState({
+			currentId: source._id,
+		});
+	};
+
+	onHide = () => {
+		const { currentId, hiddenResults } = this.state;
+		if (!currentId) return;
+		this.setState({ hiddenResults: [...hiddenResults, currentId] });
+	};
+
+	onClose = (e, id) => {
+		e.preventDefault();
+		const { hiddenResults } = this.state;
+		const index = hiddenResults.indexOf(id);
+		if (index !== -1) {
+			hiddenResults.splice(index, 1);
+			this.setState({ hiddenResults });
+		}
+	};
+
 	render() {
 		const { indexes } = this.props;
 		const { hiddenResults } = this.state;
@@ -35,37 +57,16 @@ class HideResults extends Component {
 					<div style={{ width: '92%' }}>
 						<GlobalSearch
 							indexes={indexes}
-							onSuggestionSelect={(selectedSuggestion, cause, source) => {
-								this.setState({
-									currentId: source._id,
-								});
-							}}
+							onSuggestionSelect={this.onSuggestionSelect}
 						/>
 					</div>
-					<Button
-						type="primary"
-						onClick={() => {
-							const { currentId } = this.state;
-							if (!currentId) return;
-							this.setState({ hiddenResults: [...hiddenResults, currentId] });
-						}}
-					>
+					<Button type="primary" onClick={this.onHide}>
 						Hide
 					</Button>
 				</ReactiveBase>
 				<div>
 					{hiddenResults.map(id => (
-						<Tag
-							closable
-							onClose={e => {
-								e.preventDefault();
-								const index = hiddenResults.indexOf(id);
-								if (index !== -1) {
-									hiddenResults.splice(index, 1);
-									this.setState({ hiddenResults });
-								}
-							}}
-						>
+						<Tag closable onClose={e => this.onClose(e, id)}>
 							{id}
 						</Tag>
 					))}
