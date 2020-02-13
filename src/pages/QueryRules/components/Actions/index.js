@@ -5,8 +5,13 @@ import DNDWrapper from '../../../../components/DNDWrapper';
 // import PromoteResult from './PromoteResult';
 // import HideResult from './HideResult';
 // import Functions from './Functions';
-// import CustomData from './CustomData';
-// import ReplaceSearch from './ReplaceSearch';
+import CustomData from './CustomData';
+import ReplaceSearch from './ReplaceSearch';
+
+const componentMappings = {
+	replace_search_term: ReplaceSearch,
+	custom_data: CustomData,
+};
 
 const actionMapping = {
 	promote_result: 'Promote Result',
@@ -66,6 +71,62 @@ class Actions extends React.Component {
 		}
 	};
 
+	handleChange = (type, value) => {
+		const { actions: originalActions, onChange } = this.props;
+		const actions = JSON.parse(JSON.stringify(originalActions));
+		switch (type) {
+			case 'replace_search_term': {
+				actions.map(action => {
+					if (action.type === 'replace_search_term') {
+						return {
+							...action,
+							data: value,
+						};
+					}
+					return action;
+				});
+				break;
+			}
+			case 'custom_data': {
+				actions.map(action => {
+					if (action.type === 'custom_data') {
+						return {
+							...action,
+							data: value,
+						};
+					}
+					return action;
+				});
+				break;
+			}
+			default:
+				return;
+		}
+		onChange(actions);
+	};
+
+	renderComponent = item => {
+		const Component = componentMappings[item.type];
+		if (Component) {
+			return (
+				<Component
+					onChange={value => this.handleChange(item.type, value)}
+					value={item.data}
+				/>
+			);
+		}
+		return null;
+	};
+
+	deleteAction = type => {
+		const { actions: originalActions, onChange } = this.props;
+		const actions = JSON.parse(JSON.stringify(originalActions)).filter(
+			item => item.type !== type,
+		);
+
+		onChange(actions);
+	};
+
 	render() {
 		const { actions } = this.props;
 		return (
@@ -100,6 +161,7 @@ class Actions extends React.Component {
 											size="small"
 											type="danger"
 											ghost
+											onClick={() => this.deleteAction(item.type)}
 											className="delete-icon"
 											shape="circle"
 											icon="delete"
@@ -111,7 +173,7 @@ class Actions extends React.Component {
 							key={item.type}
 							hoverable
 						>
-							Cool
+							{this.renderComponent(item)}
 						</Card>
 					)}
 				</DNDWrapper>

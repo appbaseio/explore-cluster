@@ -3,7 +3,19 @@ import { css } from 'emotion';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
-import { Button, Icon, Card, Typography, Input, Row, Col, Divider, Radio, DatePicker } from 'antd';
+import {
+	Button,
+	Icon,
+	Card,
+	Typography,
+	Input,
+	Row,
+	Col,
+	Divider,
+	Radio,
+	DatePicker,
+	Affix,
+} from 'antd';
 import { loadApps } from '../../actions';
 import IndexDropdown from './components/IndexDropdown';
 import Conditions from './components/Conditions';
@@ -15,6 +27,18 @@ const { RangePicker } = DatePicker;
 
 const container = css`
 	padding: 50px;
+	position: relative;
+
+	.card-footer {
+		width: 100%;
+		padding: 20px;
+		background: white;
+		box-sizing: border-box;
+		display: flex;
+		justify-content: flex-end;
+		border: 1px solid #e8e8e8;
+		box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.15);
+	}
 `;
 
 const formStyle = css`
@@ -191,8 +215,18 @@ class QueryRulesForm extends React.Component {
 							</Col>
 						</Row>
 					</section>
-					{/* Sticky Footer */}
 				</Card>
+				<Affix offsetBottom={0}>
+					<div className="card-footer">
+						<Button type="danger" ghost>
+							Cancel
+						</Button>
+
+						<Button style={{ marginLeft: 10 }} type="primary">
+							Save
+						</Button>
+					</div>
+				</Affix>
 			</div>
 		);
 	}

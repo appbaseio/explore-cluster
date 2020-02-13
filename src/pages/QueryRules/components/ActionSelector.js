@@ -12,7 +12,7 @@ const actions = {
 	promote_result: { name: 'Promote Result', data: [] },
 	hide_result: { name: 'Hide Result', data: [] },
 	replace_search_term: { name: 'Replace Search Term', data: '' },
-	custom_data: { name: 'Return Custom Data', data: {} },
+	custom_data: { name: 'Return Custom Data', data: "" },
 	function: { name: 'f(x) Apply Function', data: '' },
 };
 
