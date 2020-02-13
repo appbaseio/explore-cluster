@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Dropdown, Icon, Menu, Radio, Skeleton, Table } from 'antd';
+import { Button, Dropdown, Icon, Menu, Radio, Result, Skeleton, Table } from 'antd';
 import { get } from 'lodash';
 import { getFunctions } from '../../../batteries/utils/app';
 import { dropdown } from '../../../batteries/components/Mappings/styles';
@@ -49,13 +49,28 @@ class SetFunctionTrigger extends Component {
 		});
 	};
 
-	handleRadioChange = value => {
-		this.setState({ selected: value });
-	};
-
 	render() {
-		const { loading, functions, selected } = this.state;
+		const { loading, functions } = this.state;
+		const { selected, handleRadioChange } = this.props;
 		if (loading) return <Skeleton />;
+		if (functions && functions.length === 0) {
+			const { setActiveKey } = this.props;
+			return (
+				<Result
+					status="warning"
+					title="500"
+					subTitle={
+						<div>
+							Sorry, there are no deployed functions.
+							<br />
+							{/* eslint-disable-next-line */}
+							<a onClick={() => setActiveKey('new')}>Deploy a new function</a> to get
+							started.
+						</div>
+					}
+				/>
+			);
+		}
 		return (
 			<Table
 				rowKey={record => record.function.service}
@@ -65,7 +80,7 @@ class SetFunctionTrigger extends Component {
 						render: (text, record) => (
 							<Radio
 								checked={selected === record.function.service}
-								onChange={() => this.handleRadioChange(record.function.service)}
+								onChange={() => handleRadioChange(record.function.service)}
 							>
 								{record.function.service}
 							</Radio>

@@ -11,10 +11,14 @@ class ExecuteFunction extends Component {
 		this.state = { activeKey: 'trigger' };
 	}
 
+	handleRadioChange = value => {
+		this.setState({ selected: value });
+	};
+
 	setActiveKey = activeKey => this.setState({ activeKey });
 
 	render() {
-		const { activeKey } = this.state;
+		const { activeKey, selected } = this.state;
 		return (
 			<Tabs
 				style={{ background: '#fff', padding: 12 }}
@@ -22,10 +26,21 @@ class ExecuteFunction extends Component {
 				onChange={this.setActiveKey}
 			>
 				<TabPane tab="Functions" key="trigger">
-					{activeKey === 'trigger' && <SetFunctionTrigger />}
+					{activeKey === 'trigger' && (
+						<SetFunctionTrigger
+							handleRadioChange={this.handleRadioChange}
+							selected={selected}
+							setActiveKey={this.setActiveKey}
+						/>
+					)}
 				</TabPane>
 				<TabPane tab="New Function" key="new">
-					{activeKey === 'new' && <NewFunctionForm />}
+					{activeKey === 'new' && (
+						<NewFunctionForm
+							onSuccess={this.handleRadioChange}
+							setActiveKey={this.setActiveKey}
+						/>
+					)}
 				</TabPane>
 			</Tabs>
 		);
