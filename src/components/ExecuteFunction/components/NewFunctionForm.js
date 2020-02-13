@@ -1,0 +1,69 @@
+import React, { Component } from 'react';
+
+import { Button, notification, message } from 'antd';
+import { handleInputClosure } from '../../DeployFunctionModal/helper';
+import { DeployFunctionForm } from '../../DeployFunctionModal/components/DeployFunctionForm';
+import { createFunction } from '../../../batteries/utils/app';
+
+class NewFunctionForm extends Component {
+	state = { error: {} };
+
+	setFormValue = (key, value) => {
+		this.setState({ [key]: value });
+	};
+
+	setError = error => this.setState({ error });
+
+	handleSubmit = async e => {
+		e.preventDefault();
+		const { functionName, dockerImage } = this.state;
+		this.setError({
+			functionName: !functionName,
+			dockerImage: !dockerImage,
+		});
+		if ([functionName, dockerImage].some(item => !item)) return;
+		this.setState({ loading: true });
+		try {
+			await createFunction(functionName, { image: dockerImage });
+			message.success(`${functionName} deployed successfully`);
+			this.setState({ loading: false });
+			// eslint-disable-next-line no-shadow
+		} catch (e) {
+			notification.error({
+				message: 'Error',
+				description: e.message,
+			});
+			this.setState({ loading: false });
+		}
+	};
+
+	render() {
+		const { functionName, dockerImage, radioValue, error, loading } = this.state;
+		const handleInputRequired = handleInputClosure(this.setError, error);
+		return (
+			<>
+				<DeployFunctionForm
+					globalError={error}
+					setGlobalError={this.setError}
+					functionName={functionName}
+					handleInputRequired={handleInputRequired}
+					setFunctionName={value => this.setFormValue('functionName', value)}
+					dockerImage={dockerImage}
+					setDockerImage={value => this.setFormValue('dockerImage', value)}
+					onChange={e => this.setFormValue('radioValue', e.target.value)}
+					value={radioValue}
+				/>
+				<Button
+					loading={loading}
+					style={{ marginTop: '24px' }}
+					type="primary"
+					onClick={this.handleSubmit}
+				>
+					Deploy Function
+				</Button>
+			</>
+		);
+	}
+}
+
+export default NewFunctionForm;

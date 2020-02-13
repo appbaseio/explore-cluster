@@ -30,6 +30,7 @@ import GlobalSearch from '../../components/GlobalSearch';
 import { getURL } from '../../constants/config';
 import PromoteResults from '../../components/PromoteResults';
 import HideResults from '../../components/HideResults';
+import ExecuteFunction from '../../components/ExecuteFunction';
 
 const validPlans = [
 	'2019-production-2',
@@ -340,6 +341,8 @@ class FunctionsPage extends React.Component {
 	};
 
 	render() {
+		// TODO: remove this: only for testing
+		return <ExecuteFunction />;
 		// TODO: remove this example demonstrating use of PromoteResults
 		return (
 			<>
@@ -610,7 +613,4 @@ const mapDispatchToProps = dispatch => ({
 	getFunction: appName => dispatch(getSingleFunction(appName)),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(FunctionsPage);
+export default connect(mapStateToProps, mapDispatchToProps)(FunctionsPage);
