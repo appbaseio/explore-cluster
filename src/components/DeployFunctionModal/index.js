@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { message, Modal, notification, Radio, Row } from 'antd';
+import { message, Modal, notification } from 'antd';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import PrivateRegistry from './components/PrivateRegistry';
-import { deploymentCheck, handleInputClosure, isTrue, renderInputField } from './helper';
+import { deploymentCheck, handleInputClosure, isTrue } from './helper';
 // import EnvTable from './components/EnvTable';
-import { modalHeading } from '../../pages/HomePage/styles';
 import {
 	createFunction,
 	getSingleFunction,
 	updateFunctions,
 } from '../../batteries/modules/actions';
+import { DeployFunctionForm } from './components/DeployFunctionForm';
 
 const DeployFunctionModal = ({
 	node,
@@ -112,56 +111,24 @@ const DeployFunctionModal = ({
 			onCancel={handleCancel}
 			okText={node ? 'Update' : 'Deploy'}
 			visible
-			okButtonProps={{ disabled: Object.values(globalError).some(isTrue) }}
+			okButtonProps={{
+				disabled: Object.values(globalError).some(isTrue),
+			}}
 			onOk={handleSubmit}
 			confirmLoading={loading || get(node, 'isToggling')}
 		>
-			<>
-				<Row>
-					<h3 className={modalHeading} style={{ marginTop: 0 }}>
-						Function Name
-					</h3>
-					{renderInputField({
-						globalError,
-						fieldName: 'functionName',
-						fieldValue: functionName,
-						handleInputRequired,
-						setterFunc: setFunctionName,
-						extraProps: { disabled: !!node, placeholder: 'Enter Function Name' },
-					})}
-				</Row>
-				<Row>
-					<h3 className={modalHeading}>Docker Image</h3>
-					{renderInputField({
-						globalError,
-						fieldName: 'dockerImage',
-						fieldValue: dockerImage,
-						handleInputRequired,
-						setterFunc: setDockerImage,
-						extraProps: { placeholder: 'Enter Docker Image' },
-					})}
-				</Row>
-				<Row>
-					<h3 className={modalHeading}>Is your docker image public?</h3>
-					<Radio.Group onChange={e => setValue(e.target.value)} value={radioValue}>
-						<Radio value="yes">yes</Radio>
-						<Radio value="no">no</Radio>
-					</Radio.Group>
-				</Row>
-				{radioValue === 'no' && (
-					<Row>
-						<PrivateRegistry
-							globalError={globalError}
-							setGlobalError={setGlobalError}
-						/>
-					</Row>
-				)}
-				{/**
-					<Row>
-						<EnvTable dataSource={envDataSource} setData={setEnvData} />
-					</Row>
-				*/}
-			</>
+			<DeployFunctionForm
+				globalError={globalError}
+				functionName={functionName}
+				handleInputRequired={handleInputRequired}
+				setFunctionName={setFunctionName}
+				node={node}
+				dockerImage={dockerImage}
+				setDockerImage={setDockerImage}
+				onChange={e => setValue(e.target.value)}
+				value={radioValue}
+				setGlobalError={setGlobalError}
+			/>
 		</Modal>
 	);
 };
