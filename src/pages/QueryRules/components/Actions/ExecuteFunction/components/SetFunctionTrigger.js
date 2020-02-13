@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Button, Dropdown, Icon, Menu, Radio, Result, Skeleton, Table } from 'antd';
 import { get } from 'lodash';
-import { getFunctions } from '../../../batteries/utils/app';
-import { dropdown } from '../../../batteries/components/Mappings/styles';
+import { getFunctions } from '../../../../../../batteries/utils/app';
+import { dropdown } from '../../../../../../batteries/components/Mappings/styles';
 
 function TriggerDropdown({ overlay, selectedOption }) {
 	return (
@@ -18,7 +18,7 @@ function TriggerDropdown({ overlay, selectedOption }) {
 class SetFunctionTrigger extends Component {
 	constructor(props) {
 		super(props);
-		this.state = { loading: false, selected: null };
+		this.state = { loading: false };
 	}
 
 	async componentDidMount() {

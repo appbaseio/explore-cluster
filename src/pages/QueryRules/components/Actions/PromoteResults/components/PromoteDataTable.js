@@ -2,7 +2,7 @@ import { css } from 'emotion';
 import { Icon, InputNumber, Popover, Table } from 'antd';
 import React from 'react';
 import { get } from 'lodash';
-import JsonView from '../../JsonView';
+import JsonView from '../../../../../../components/JsonView';
 
 const popoverContent = css`
 	overflow-y: auto;

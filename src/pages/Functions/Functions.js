@@ -6,7 +6,6 @@ import get from 'lodash/get';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
 import { css } from 'emotion';
-import { ReactiveBase } from '@appbaseio/reactivesearch';
 import Loader from '../../components/Loader';
 import Header from '../../components/Header';
 import {
@@ -26,11 +25,6 @@ import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Overlay from '../../components/Overlay';
 import { getFunctionHealthCheck } from '../../utils';
 import { deploymentCheck } from '../../components/DeployFunctionModal/helper';
-import GlobalSearch from '../../components/GlobalSearch';
-import { getURL } from '../../constants/config';
-import PromoteResults from '../../components/PromoteResults';
-import HideResults from '../../components/HideResults';
-import ExecuteFunction from '../../components/ExecuteFunction';
 
 const validPlans = [
 	'2019-production-2',
@@ -341,21 +335,6 @@ class FunctionsPage extends React.Component {
 	};
 
 	render() {
-		// TODO: remove this: only for testing
-		return <ExecuteFunction />;
-		// TODO: remove this example demonstrating use of PromoteResults
-		return (
-			<>
-				<PromoteResults
-					dataSource={[
-						{ doc: { key1: 'value1', key2: 'value2', _id: '21' }, position: 1 },
-						{ doc: { key3: 'value3', key4: 'value4', _id: '12' }, position: 2 },
-					]}
-					indexes={['phones', 'movie-app']}
-				/>
-				<HideResults hiddenResults={['1', '2']} indexes={['phones', 'movie-app']} />
-			</>
-		);
 		const { isLoading, functions, tier, getFunction } = this.props;
 		const { deployModal, checking, healthError, notFoundError } = this.state;
 		this.sortedDataSource = (functions || []).sort((a, b) => a.order - b.order);

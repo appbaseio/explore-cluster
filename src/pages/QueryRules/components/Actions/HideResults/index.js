@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import { ReactiveBase } from '@appbaseio/reactivesearch';
 import { Button, Tag } from 'antd';
 import { css } from 'emotion';
-import { getURL } from '../../constants/config';
-import GlobalSearch from '../GlobalSearch';
+import { getURL } from '../../../../../constants/config';
+import GlobalSearch from '../../../../../components/GlobalSearch';
 
 const flex = css`
 	display: flex;
@@ -21,7 +21,7 @@ class HideResults extends Component {
 		};
 	}
 
-	setStateCallback = () => {
+	updateResults = () => {
 		const { onChange } = this.props;
 		if (onChange) {
 			const { hiddenResults: hiddenResultsNew } = this.state;
@@ -38,7 +38,7 @@ class HideResults extends Component {
 	onHide = () => {
 		const { currentId, hiddenResults } = this.state;
 		if (!currentId) return;
-		this.setState({ hiddenResults: [...hiddenResults, currentId] }, this.setStateCallback);
+		this.setState({ hiddenResults: [...hiddenResults, currentId] }, this.updateResults);
 	};
 
 	onClose = (e, id) => {
@@ -47,7 +47,7 @@ class HideResults extends Component {
 		const index = hiddenResults.indexOf(id);
 		if (index !== -1) {
 			hiddenResults.splice(index, 1);
-			this.setState({ hiddenResults }, this.setStateCallback);
+			this.setState({ hiddenResults }, this.updateResults);
 		}
 	};
 

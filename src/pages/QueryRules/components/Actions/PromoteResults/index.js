@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import { ReactiveBase } from '@appbaseio/reactivesearch';
 import { Button } from 'antd';
 import { css } from 'emotion';
-import { getURL } from '../../constants/config';
-import GlobalSearch from '../GlobalSearch';
+import { getURL } from '../../../../../constants/config';
+import GlobalSearch from '../../../../../components/GlobalSearch';
 import {
 	PromoteActions,
 	PromoteDataTable,
@@ -28,7 +28,7 @@ class PromoteResults extends Component {
 		};
 	}
 
-	setStateCallback = () => {
+	updateResults = () => {
 		const { onChange } = this.props;
 		if (onChange) {
 			const { dataSource: dataSourceNew } = this.state;
@@ -40,7 +40,7 @@ class PromoteResults extends Component {
 		const { dataSource, selectedSuggestion, suggestionSource } = this.state;
 		if (!selectedSuggestion) return;
 		const newData = [...dataSource, { position: 1, doc: suggestionSource }];
-		this.setState({ dataSource: newData }, this.setStateCallback);
+		this.setState({ dataSource: newData }, this.updateResults);
 	};
 
 	handleItemChange = (value, index, field) => {
@@ -56,7 +56,7 @@ class PromoteResults extends Component {
 					...dataSource.slice(index + 1),
 				],
 			},
-			this.setStateCallback,
+			this.updateResults,
 		);
 	};
 
@@ -66,7 +66,7 @@ class PromoteResults extends Component {
 			{
 				dataSource: [...dataSource.slice(0, index), ...dataSource.slice(index + 1)],
 			},
-			this.setStateCallback,
+			this.updateResults,
 		);
 	};
 

@@ -4,9 +4,9 @@ import { css } from 'emotion';
 import DNDWrapper from '../../../../components/DNDWrapper';
 import CustomData from './CustomData';
 import ReplaceSearch from './ReplaceSearch';
-import PromoteResults from '../../../../components/PromoteResults';
-import HideResults from '../../../../components/HideResults';
-import ExecuteFunction from '../../../../components/ExecuteFunction';
+import PromoteResults from './PromoteResults';
+import HideResults from './HideResults';
+import ExecuteFunction from './ExecuteFunction';
 
 const componentMappings = {
 	replace_search_term: ReplaceSearch,
