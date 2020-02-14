@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Button, Dropdown, Icon, Menu, Radio, Result, Skeleton, Table } from 'antd';
 import { get } from 'lodash';
-import { getFunctions } from '../../../../../../batteries/utils/app';
-import { dropdown } from '../../../../../../batteries/components/Mappings/styles';
+import { getFunctions } from '../../../../../batteries/utils/app';
+import { dropdown } from '../../../../../batteries/components/Mappings/styles';
 
 function TriggerDropdown({ overlay, selectedOption }) {
 	return (
@@ -111,7 +111,10 @@ class SetFunctionTrigger extends Component {
 								option => option.value === get(record, 'trigger.executeBefore'),
 							);
 							return (
-								<TriggerDropdown overlay={menu} selectedOption={selectedOption} />
+								<TriggerDropdown
+									overlay={menu}
+									selectedOption={selectedOption || options[1]}
+								/>
 							);
 						},
 					},

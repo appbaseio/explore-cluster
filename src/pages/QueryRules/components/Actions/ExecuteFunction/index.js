@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Tabs } from 'antd';
-import SetFunctionTrigger from './components/SetFunctionTrigger';
-import NewFunctionForm from './components/NewFunctionForm';
+import SetFunctionTrigger from './SetFunctionTrigger';
+import NewFunctionForm from './NewFunctionForm';
 
 const { TabPane } = Tabs;
 

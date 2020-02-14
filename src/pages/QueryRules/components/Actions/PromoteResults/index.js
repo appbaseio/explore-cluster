@@ -9,7 +9,7 @@ import {
 	PromoteDataTable,
 	PromoteJSONView,
 	PromotePosition,
-} from './components/PromoteDataTable';
+} from './PromoteDataTable';
 
 const flex = css`
 	display: flex;
