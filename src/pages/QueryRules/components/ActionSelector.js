@@ -1,7 +1,7 @@
 import React from 'react';
 import { css } from 'emotion';
 import { Card, Select, Icon } from 'antd';
-import { getErrorClass, getErrorMessage } from '../error';
+import { getErrorClass, getErrorMessage } from '../utils/error';
 
 const { Option } = Select;
 

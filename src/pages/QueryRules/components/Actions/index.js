@@ -7,7 +7,7 @@ import DNDWrapper from '../../../../components/DNDWrapper';
 // import Functions from './Functions';
 import CustomData from './CustomData';
 import ReplaceSearch from './ReplaceSearch';
-import { getErrorMessage } from '../../error';
+import { getErrorMessage } from '../../utils/error';
 
 const componentMappings = {
 	replace_search_term: ReplaceSearch,
@@ -129,7 +129,11 @@ class Actions extends React.Component {
 			item => item.type !== type,
 		);
 
-		onChange(actions);
+		onChange(actions, {
+			[type]: {
+				hasError: false,
+			},
+		});
 	};
 
 	render() {

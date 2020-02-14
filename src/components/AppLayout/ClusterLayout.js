@@ -260,6 +260,14 @@ class ClusterLayout extends React.PureComponent {
 								<AppPageContainer {...props} component={QueryRulesForm} />
 							)}
 						/>
+
+						<Route
+							exact
+							path="/cluster/rules/:id"
+							render={props => (
+								<AppPageContainer {...props} component={QueryRulesForm} />
+							)}
+						/>
 						<Route
 							exact
 							path="/cluster/mappings"

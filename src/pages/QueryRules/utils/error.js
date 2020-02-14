@@ -64,17 +64,19 @@ const getErrorMessages = state => {
 		const isDataFieldsPresent = !!(dataField && dataFieldValue);
 		const isQueryPresent = !!queryValue;
 		if (!isQueryPresent) {
-			if (!dataFieldValue) {
-				error.dataFieldValue = { hasError: true, description: 'Value cannot be empty' };
-			}
-
-			if (!dataField) {
-				error.dataField = { hasError: true, description: 'Select a mapping' };
+			if (!dataFieldValue || !dataField) {
+				error.condition = {
+					hasError: true,
+					description: 'Either dataField value or query is needed',
+				};
 			}
 		}
 
 		if (!isDataFieldsPresent && !queryValue) {
-			error.queryValue = { hasError: true, description: 'Query cannot be empty' };
+			error.condition = {
+				hasError: true,
+				description: 'Either dataField value or query is needed',
+			};
 		}
 	}
 

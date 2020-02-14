@@ -1,6 +1,6 @@
 import React from 'react';
 import { Select, Input, Row, Col } from 'antd';
-import { getErrorClass, getErrorMessage } from '../error';
+import { getErrorClass, getErrorMessage } from '../utils/error';
 
 const { Option } = Select;
 
@@ -15,12 +15,12 @@ const Conditions = ({
 	error,
 }) => (
 	<Row gutter={16}>
+		<Col xs={24}>{getErrorMessage(error)}</Col>
 		<Col md={12} sm={24}>
 			<label>Select Condition</label>
 			<Select
 				onChange={value => onDropdownChange('query', value)}
 				value={query}
-				className={getErrorClass(error.query)}
 				style={{ width: '100%' }}
 			>
 				<Option value="is">Query is</Option>
@@ -31,9 +31,8 @@ const Conditions = ({
 		</Col>
 		<Col md={12} sm={24}>
 			<label>Value</label>
-			{getErrorMessage(error.queryValue)}
 			<Input
-				className={getErrorClass(error.queryValue)}
+				className={queryValue ? '' : getErrorClass(error)}
 				name="queryValue"
 				value={queryValue}
 				onChange={onChange}
@@ -41,11 +40,10 @@ const Conditions = ({
 		</Col>
 		<Col md={12} sm={24}>
 			<label>DataField</label>
-			{getErrorMessage(error.dataField)}
 			<Select
-				className={getErrorClass(error.dataField)}
 				onChange={value => onDropdownChange('dataField', value)}
 				value={dataField}
+				className={dataField ? '' : getErrorClass(error)}
 				style={{ width: '100%' }}
 			>
 				{dataFields.map(field => (
@@ -55,9 +53,8 @@ const Conditions = ({
 		</Col>
 		<Col md={12} sm={24}>
 			<label>Value</label>
-			{getErrorMessage(error.dataFieldValue)}
 			<Input
-				className={getErrorClass(error.dataFieldValue)}
+				className={dataFieldValue ? '' : getErrorClass(error)}
 				name="dataFieldValue"
 				value={dataFieldValue}
 				onChange={onChange}

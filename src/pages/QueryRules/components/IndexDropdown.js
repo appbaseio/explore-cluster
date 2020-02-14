@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { get } from 'lodash';
 
 import { loadApps } from '../../../actions';
-import { getErrorClass } from '../error';
+import { getErrorClass } from '../utils/error';
 
 const { Option } = Select;
 
