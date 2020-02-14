@@ -20,11 +20,7 @@ class ExecuteFunction extends Component {
 	render() {
 		const { activeKey, selected } = this.state;
 		return (
-			<Tabs
-				style={{ background: '#fff', padding: 12 }}
-				activeKey={activeKey}
-				onChange={this.setActiveKey}
-			>
+			<Tabs activeKey={activeKey} onChange={this.setActiveKey}>
 				<TabPane tab="Functions" key="trigger">
 					{activeKey === 'trigger' && (
 						<SetFunctionTrigger

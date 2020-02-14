@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import ActionView from './ActionView';
 import MobileMenu from './MobileMenu';
 import { deleteRule, toggleRuleStatus } from '../../../batteries/modules/actions';
+import CloneRule from './Actions/CloneRule';
 
 const title = css`
 	font-size: 16px;
@@ -106,7 +107,7 @@ class QueryCard extends React.Component {
 			>
 				<Row style={{ position: 'relative' }} gutter={8}>
 					<div className={mobileMenu}>
-						<MobileMenu />
+						<MobileMenu rule={rule} removeRule={removeRule} />
 					</div>
 					<Col xs={1}>
 						<Tooltip title="Drag to update the ordering of rules">
@@ -140,9 +141,7 @@ class QueryCard extends React.Component {
 							>
 								<Icon type={rule.isDeleting ? 'loading' : 'delete'} /> Delete
 							</Button>
-							<Button type="primary">
-								<Icon type="copy" /> Clone
-							</Button>
+							<CloneRule rule={rule} />
 							<Button type="primary">
 								<Icon type="edit" /> Edit
 							</Button>

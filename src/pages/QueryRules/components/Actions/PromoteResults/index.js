@@ -77,16 +77,15 @@ class PromoteResults extends Component {
 	render() {
 		const { indexes, dataFields } = this.props;
 		const { dataSource } = this.state;
-		console.log(this.globalSearchRef);
 		return (
-			<div style={{ padding: 12 }}>
+			<div>
 				<ReactiveBase
 					app={indexes.join(',')}
 					url={getURL()}
 					credentials={atob(sessionStorage.getItem('authToken'))}
 					className={flex}
 				>
-					<div style={{ width: '75%' }}>
+					<div style={{ width: '79%' }}>
 						<GlobalSearch
 							indexes={indexes}
 							onSuggestionSelect={(selectedSuggestion, cause, source) => {
