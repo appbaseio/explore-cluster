@@ -107,7 +107,7 @@ class QueryCard extends React.Component {
 			>
 				<Row style={{ position: 'relative' }} gutter={8}>
 					<div className={mobileMenu}>
-						<MobileMenu />
+						<MobileMenu rule={rule} removeRule={removeRule} />
 					</div>
 					<Col xs={1}>
 						<Tooltip title="Drag to update the ordering of rules">
