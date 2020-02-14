@@ -3,8 +3,15 @@ import { Button, Icon, Input, message, Modal, notification, Typography } from 'a
 import { connect } from 'react-redux';
 import { cloneQueryRule } from '../../../../batteries/modules/actions';
 
-// eslint-disable-next-line no-shadow
-function CloneRule({ rule, cloneQueryRule, isMobile = false }) {
+function CloneRule({
+	rule,
+	// eslint-disable-next-line no-shadow
+	cloneQueryRule,
+	isMobile = false,
+	ghost = false,
+	buttonStyle = {},
+	buttonSize = 'default',
+}) {
 	const [ruleName, setRuleName] = useState(undefined);
 	const [visible, setVisible] = useState(false);
 	const [didMount, setDidMount] = useState(false);
@@ -32,7 +39,13 @@ function CloneRule({ rule, cloneQueryRule, isMobile = false }) {
 				</div>
 			);
 		return (
-			<Button onClick={() => setVisible(true)} type="primary">
+			<Button
+				onClick={() => setVisible(true)}
+				type="primary"
+				ghost={ghost}
+				style={buttonStyle}
+				size={buttonSize}
+			>
 				<Icon type="copy" /> Clone
 			</Button>
 		);

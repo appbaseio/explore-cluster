@@ -83,7 +83,7 @@ class HideResults extends Component {
 				</ReactiveBase>
 				<div>
 					{hiddenResults.map(id => (
-						<Tag closable onClose={e => this.onClose(e, id)}>
+						<Tag key={id} closable onClose={e => this.onClose(e, id)}>
 							{id}
 						</Tag>
 					))}

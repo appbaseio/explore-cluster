@@ -4,6 +4,7 @@ import { css } from 'emotion';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
+import { get } from 'lodash';
 import ActionView from './ActionView';
 import MobileMenu from './MobileMenu';
 import { deleteRule, toggleRuleStatus } from '../../../batteries/modules/actions';
@@ -123,7 +124,7 @@ class QueryCard extends React.Component {
 						<h4 className={title}>{rule.name}</h4>
 						<p className={description}>{rule.description}</p>
 						<p className={description}>
-							<strong>{rule.trigger.expression}</strong>
+							<strong>{get(rule, 'trigger.expression')}</strong>
 						</p>
 					</Col>
 					<Col xl={8} lg={7} md={12} sm={24}>

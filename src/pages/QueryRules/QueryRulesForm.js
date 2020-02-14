@@ -33,6 +33,7 @@ import { addQueryRule, getRules, putRule, deleteRule } from '../../batteries/mod
 
 import { getClusterMappings, getDatafields } from '../../utils';
 import { getParsedRule, getExpressionFromValue } from './utils';
+import CloneRule from './components/Actions/CloneRule';
 
 const { RangePicker } = DatePicker;
 
@@ -352,6 +353,7 @@ class QueryRulesForm extends React.Component {
 			rules,
 			removeRule,
 			isDeleting,
+			unparsedRule,
 		} = this.props;
 
 		if (isEditPage && (!rules.length || rulesLoading)) {
@@ -503,15 +505,13 @@ class QueryRulesForm extends React.Component {
 					<div className={`${isEditPage ? 'space-between' : ''} card-footer`}>
 						{isEditPage ? (
 							<div>
-								<Button
-									style={{ marginRight: 10 }}
-									size="large"
+								<CloneRule
+									buttonSize="large"
+									buttonStyle={{ marginRight: 10 }}
 									ghost
-									type="primary"
-								>
-									<Icon type="copy" />
-									Clone
-								</Button>
+									rule={unparsedRule}
+								/>
+
 								<Button
 									onClick={() => removeRule(rule.id)}
 									size="large"
@@ -571,6 +571,7 @@ const mapStateToProps = (state, props) => {
 		return {
 			...defaultState,
 			rule: getParsedRule(ruleData),
+			unparsedRule: ruleData,
 			isUpdating: get(ruleData, 'update.isLoading'),
 			updateError: get(ruleData, 'update.error'),
 
