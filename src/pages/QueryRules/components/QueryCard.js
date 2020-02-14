@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, Row, Col, Icon, Button, Switch, Tooltip, Typography, message } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 
 import ActionView from './ActionView';
 import MobileMenu from './MobileMenu';
@@ -31,7 +32,8 @@ const actions = css`
 	flex-wrap: wrap;
 	justify-content: flex-end;
 
-	button:not(:first-child) {
+	button:not(:first-child),
+	a {
 		margin-left: 5px;
 	}
 `;
@@ -142,9 +144,11 @@ class QueryCard extends React.Component {
 								<Icon type={rule.isDeleting ? 'loading' : 'delete'} /> Delete
 							</Button>
 							<CloneRule rule={rule} />
-							<Button type="primary">
-								<Icon type="edit" /> Edit
-							</Button>
+							<Link to={`/cluster/rules/${rule.id}`}>
+								<Button type="primary">
+									<Icon type="edit" /> Edit
+								</Button>
+							</Link>
 						</div>
 						<div style={{ marginTop: 30 }}>
 							<Tooltip title="Click to disable Rule">

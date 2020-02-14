@@ -7,7 +7,7 @@ import ReplaceSearch from './ReplaceSearch';
 import PromoteResults from './PromoteResults';
 import HideResults from './HideResults';
 import ExecuteFunction from './ExecuteFunction';
-import { getErrorMessage } from '../../error';
+import { getErrorMessage } from '../../utils/error';
 
 const componentMappings = {
 	replace_search_term: ReplaceSearch,
@@ -168,7 +168,11 @@ class Actions extends React.Component {
 			item => item.type !== type,
 		);
 
-		onChange(actions);
+		onChange(actions, {
+			[type]: {
+				hasError: false,
+			},
+		});
 	};
 
 	render() {
