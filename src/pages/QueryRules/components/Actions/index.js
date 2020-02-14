@@ -103,6 +103,30 @@ class Actions extends React.Component {
 				});
 				break;
 			}
+			case 'promote_result': {
+				actions = actions.map(action => {
+					if (action.type === 'promote_result') {
+						return {
+							...action,
+							data: value,
+						};
+					}
+					return action;
+				});
+				break;
+			}
+			case 'hide_result': {
+				actions = actions.map(action => {
+					if (action.type === 'hide_result') {
+						return {
+							...action,
+							data: value,
+						};
+					}
+					return action;
+				});
+				break;
+			}
 			default:
 				return;
 		}

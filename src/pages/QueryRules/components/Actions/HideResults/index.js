@@ -62,14 +62,14 @@ class HideResults extends Component {
 		const { indexes, dataFields } = this.props;
 		const { hiddenResults } = this.state;
 		return (
-			<div style={{ padding: 12, background: '#fff' }}>
+			<div>
 				<ReactiveBase
 					app={indexes.join(',')}
 					url={getURL()}
 					credentials={atob(sessionStorage.getItem('authToken'))}
 					className={flex}
 				>
-					<div style={{ width: '82%' }}>
+					<div style={{ width: '85%' }}>
 						<GlobalSearch
 							indexes={indexes}
 							onSuggestionSelect={this.onSuggestionSelect}
