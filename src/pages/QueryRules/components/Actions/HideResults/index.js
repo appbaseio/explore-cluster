@@ -19,6 +19,7 @@ class HideResults extends Component {
 			hiddenResults: props.value,
 			currentId: null,
 		};
+		this.globalSearchRef = React.createRef();
 	}
 
 	updateResults = () => {
@@ -38,7 +39,13 @@ class HideResults extends Component {
 	onHide = () => {
 		const { currentId, hiddenResults } = this.state;
 		if (!currentId) return;
-		this.setState({ hiddenResults: [...hiddenResults, currentId] }, this.updateResults);
+		this.setState(
+			{ hiddenResults: [...hiddenResults, currentId], currentId: null },
+			this.updateResults,
+		);
+		if (this.globalSearchRef) {
+			this.globalSearchRef.current.handleSearchValueChange('');
+		}
 	};
 
 	onClose = (e, id) => {
@@ -67,6 +74,7 @@ class HideResults extends Component {
 							indexes={indexes}
 							onSuggestionSelect={this.onSuggestionSelect}
 							dataFields={dataFields}
+							ref={this.globalSearchRef}
 						/>
 					</div>
 					<Button type="primary" onClick={this.onHide}>

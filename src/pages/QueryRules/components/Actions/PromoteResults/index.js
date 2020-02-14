@@ -26,6 +26,7 @@ class PromoteResults extends Component {
 			dataSource: props.value || [],
 			suggestionSource: null,
 		};
+		this.globalSearchRef = React.createRef();
 	}
 
 	updateResults = () => {
@@ -40,7 +41,10 @@ class PromoteResults extends Component {
 		const { dataSource, selectedSuggestion, suggestionSource } = this.state;
 		if (!selectedSuggestion) return;
 		const newData = [...dataSource, { position: 1, doc: suggestionSource }];
-		this.setState({ dataSource: newData }, this.updateResults);
+		this.setState({ dataSource: newData, selectedSuggestion: null }, this.updateResults);
+		if (this.globalSearchRef) {
+			this.globalSearchRef.current.handleSearchValueChange('');
+		}
 	};
 
 	handleItemChange = (value, index, field) => {
@@ -73,6 +77,7 @@ class PromoteResults extends Component {
 	render() {
 		const { indexes, dataFields } = this.props;
 		const { dataSource } = this.state;
+		console.log(this.globalSearchRef);
 		return (
 			<div style={{ padding: 12 }}>
 				<ReactiveBase
@@ -88,6 +93,7 @@ class PromoteResults extends Component {
 								this.setState({ selectedSuggestion, suggestionSource: source });
 							}}
 							dataFields={dataFields}
+							ref={this.globalSearchRef}
 						/>
 					</div>
 					<Button type="primary" onClick={this.handleAdd}>

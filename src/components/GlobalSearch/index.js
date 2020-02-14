@@ -6,8 +6,19 @@ import { Icon } from 'antd';
 import './index.css';
 
 class GlobalSearch extends PureComponent {
+	state = {
+		searchValue: '',
+	};
+
+	handleSearchValueChange = searchValue => {
+		this.setState({
+			searchValue,
+		});
+	};
+
 	render() {
 		const { onSuggestionSelect, className, dataFields } = this.props;
+		const { searchValue } = this.state;
 		return (
 			<div className="input-box" css={{ position: 'relative' }}>
 				<DataSearch
@@ -29,9 +40,13 @@ class GlobalSearch extends PureComponent {
 					debounce={5}
 					showIcon={false}
 					onValueSelected={(value, cause, source) => {
-						if (onSuggestionSelect) onSuggestionSelect(value, cause, source);
+						if (onSuggestionSelect) {
+							onSuggestionSelect(value, cause, source);
+						}
 					}}
 					showDistinctSuggestions
+					onChange={this.handleSearchValueChange}
+					value={searchValue}
 				/>
 				<Icon
 					className="search-icon"
