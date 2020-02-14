@@ -18,7 +18,13 @@ class GlobalSearch extends PureComponent {
 							padding-left: 35px !important;
 							background: #fff !important;
 							margin-bottom: 0 !important;
+							height: 33px !important;
 						`} ${className}`,
+						list: css`
+							top: 32px !important;
+							font-size: 0.8rem !important;
+							border-radius: 5px !important;
+						`,
 					}}
 					debounce={5}
 					showIcon={false}
