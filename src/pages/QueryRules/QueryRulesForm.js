@@ -12,7 +12,6 @@ import {
 	Row,
 	Col,
 	Divider,
-	Radio,
 	DatePicker,
 	Affix,
 	Alert,
@@ -560,7 +559,6 @@ const mapStateToProps = (state, props) => {
 			rule: getParsedRule(ruleData),
 			isUpdating: get(ruleData, 'update.isLoading'),
 			updateError: get(ruleData, 'update.error'),
-
 			isDeleting: get(ruleData, 'isDeleting'),
 			deleteError: get(ruleData, 'deleteError'),
 		};
