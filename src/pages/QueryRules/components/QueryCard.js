@@ -9,6 +9,7 @@ import ActionView from './ActionView';
 import MobileMenu from './MobileMenu';
 import { deleteRule, toggleRuleStatus } from '../../../batteries/modules/actions';
 import CloneRule from './Actions/CloneRule';
+import { hasValuesChanged } from '../utils';
 
 const title = css`
 	font-size: 16px;
@@ -77,6 +78,10 @@ const card = css`
 `;
 
 class QueryCard extends React.Component {
+	shouldComponentUpdate(nextProps) {
+		return hasValuesChanged(this.props, nextProps, ['rule', 'dragProvided', 'dragSnapshot']);
+	}
+
 	componentDidUpdate(prevProps) {
 		const {
 			rule: { deleteError, toggleError },

@@ -8,6 +8,7 @@ import PromoteResults from './PromoteResults';
 import HideResults from './HideResults';
 import ExecuteFunction from './ExecuteFunction';
 import { getErrorMessage } from '../../utils/error';
+import { hasValuesChanged } from '../../utils';
 
 const componentMappings = {
 	replace_search_term: ReplaceSearch,
@@ -24,6 +25,8 @@ const actionMapping = {
 	custom_data: 'Return Custom Data',
 	function: 'f(x) Apply Function',
 };
+
+const errorKeys = Object.keys(actionMapping).map(item => `error.${item}`);
 
 const cardStyles = css`
 	margin-bottom: 15px;
@@ -62,6 +65,10 @@ const cardStyles = css`
 `;
 
 class Actions extends React.Component {
+	shouldComponentUpdate(nextProps) {
+		return hasValuesChanged(this.props, nextProps, ['actions', ...errorKeys]);
+	}
+
 	onDragEnd = result => {
 		if (result.source.index !== result.destination.index) {
 			const { actions: originalActions, onChange } = this.props;
