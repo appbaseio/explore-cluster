@@ -447,27 +447,17 @@ class QueryRulesForm extends React.Component {
 									onChange={this.handleIndex}
 								/>
 
-								<Radio.Group
-									name="condition"
+								<Conditions
 									onChange={this.handleInput}
-									value={condition}
-									style={{ display: 'flex', margin: '15px 0' }}
-								>
-									<Radio value="filter">Conditions</Radio>
-									<Radio value="always">Always</Radio>
-								</Radio.Group>
-								{condition === 'filter' ? (
-									<Conditions
-										onChange={this.handleInput}
-										error={error.condition}
-										dataFields={dataFields}
-										dataField={dataField}
-										dataFieldValue={dataFieldValue}
-										query={query}
-										onDropdownChange={this.handleDropdown}
-										queryValue={queryValue}
-									/>
-								) : null}
+									error={error.condition}
+									condition={condition}
+									dataFields={dataFields}
+									dataField={dataField}
+									dataFieldValue={dataFieldValue}
+									query={query}
+									onDropdownChange={this.handleDropdown}
+									queryValue={queryValue}
+								/>
 								<label>Timeframe</label>
 								<RangePicker style={{ width: '100%' }} />
 							</Col>

@@ -5,6 +5,7 @@ import { get } from 'lodash';
 
 import { loadApps } from '../../../actions';
 import { getErrorClass } from '../utils/error';
+import { hasValuesChanged } from '../utils';
 
 const { Option } = Select;
 
@@ -19,6 +20,10 @@ class IndexDropdown extends React.Component {
 		if (!apps) {
 			fetchApps();
 		}
+	}
+
+	shouldComponentUpdate(nextProps) {
+		return hasValuesChanged(this.props, nextProps, ['apps', 'error']);
 	}
 
 	handleChange = values => {

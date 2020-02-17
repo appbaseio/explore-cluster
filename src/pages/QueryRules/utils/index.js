@@ -1,3 +1,5 @@
+import { get } from 'lodash';
+
 const getParsedRule = rule => {
 	if (rule) {
 		let values = {};
@@ -71,4 +73,15 @@ const getExpressionFromValue = ({
 	return expression;
 };
 
-export { getParsedRule, getExpressionFromValue };
+const hasValuesChanged = (prevValue, nextValue, keys) => {
+	if (typeof keys === 'string') {
+		return prevValue[keys] !== nextValue[keys];
+	}
+
+	const keysChanged = keys.some(
+		key => JSON.stringify(get(prevValue, key)) !== JSON.stringify(get(nextValue, key)),
+	);
+	return keysChanged;
+};
+
+export { getParsedRule, getExpressionFromValue, hasValuesChanged };

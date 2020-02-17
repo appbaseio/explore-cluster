@@ -2,6 +2,7 @@ import React from 'react';
 import { css } from 'emotion';
 import { Card, Select, Icon } from 'antd';
 import { getErrorClass, getErrorMessage } from '../utils/error';
+import { hasValuesChanged } from '../utils';
 
 const { Option } = Select;
 
@@ -18,6 +19,10 @@ const actions = {
 };
 
 class ActionSelector extends React.Component {
+	shouldComponentUpdate(nextProps) {
+		return hasValuesChanged(nextProps, this.props, ['actions', 'error']);
+	}
+
 	handleDropdown = value => {
 		const { onChange } = this.props;
 
