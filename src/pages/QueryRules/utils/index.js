@@ -10,6 +10,7 @@ const getParsedRule = rule => {
 		values.actions = rule.actions;
 		values.enabled = rule.enabled;
 		values.order = rule.order;
+		values.timeframe = rule.trigger.timeframe || null;
 		values.condition = rule.trigger.type;
 
 		values = { ...values, ...getValueFromExpression(rule.trigger.expression) };
@@ -22,7 +23,12 @@ const getParsedRule = rule => {
 const getValueFromExpression = expression => {
 	const pattern = /"(.*?)"/;
 	const allQueries = expression.split('and');
-	const value = {};
+	const value = {
+		dataField: '',
+		dataFieldValue: '',
+		query: '',
+		queryValue: '',
+	};
 	const indexQuery = allQueries.find(query => query.includes('$index'));
 	const searchQuery = allQueries.find(query => query.includes('$query'));
 	const filterQuery = allQueries.find(query => query.includes('$filter'));

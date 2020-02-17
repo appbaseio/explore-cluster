@@ -21,6 +21,7 @@ import {
 	Skeleton,
 	Result,
 } from 'antd';
+import moment from 'moment';
 
 import IndexDropdown from './components/IndexDropdown';
 import Conditions from './components/Conditions';
@@ -98,6 +99,8 @@ class QueryRulesForm extends React.Component {
 			query: 'is',
 			queryValue: '',
 
+			timeframe: null,
+
 			// rule status
 			enabled: false,
 
@@ -132,7 +135,6 @@ class QueryRulesForm extends React.Component {
 				this.setState({
 					mappings,
 					dataFields,
-					dataField: dataFields[0] || '',
 				});
 			})
 			.catch(e => console.log(e));
@@ -269,6 +271,7 @@ class QueryRulesForm extends React.Component {
 			selectedIndexes,
 			isEditPage,
 			enabled,
+			timeframe,
 		} = this.state;
 
 		const { createRule, updateRule } = this.props;
@@ -288,6 +291,7 @@ class QueryRulesForm extends React.Component {
 					queryValue,
 					condition,
 				}),
+				timeframe,
 			},
 		};
 		if (!hasError) {
@@ -316,6 +320,7 @@ class QueryRulesForm extends React.Component {
 			'actions',
 			'selectedIndexes',
 			'enabled',
+			'timeframe',
 		];
 
 		const { rule } = this.props;
@@ -325,6 +330,19 @@ class QueryRulesForm extends React.Component {
 			});
 		}
 		return false;
+	};
+
+	handleTime = date => {
+		if (date.length) {
+			const [startDate, endDate] = date;
+			this.setState({
+				timeframe: [moment(startDate).unix() * 1000, moment(endDate).unix() * 1000],
+			});
+		} else {
+			this.setState({
+				timeframe: null,
+			});
+		}
 	};
 
 	render() {
@@ -341,6 +359,7 @@ class QueryRulesForm extends React.Component {
 			error,
 			isEditPage,
 			enabled,
+			timeframe,
 		} = this.state;
 		const {
 			isCreating,
@@ -458,7 +477,15 @@ class QueryRulesForm extends React.Component {
 									queryValue={queryValue}
 								/>
 								<label>Timeframe</label>
-								<RangePicker style={{ width: '100%' }} />
+								<RangePicker
+									value={
+										timeframe
+											? [moment(timeframe[0]), moment(timeframe[1])]
+											: null
+									}
+									onChange={this.handleTime}
+									style={{ width: '100%' }}
+								/>
 							</Col>
 						</Row>
 						<Divider />
