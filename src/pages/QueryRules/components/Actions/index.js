@@ -127,6 +127,18 @@ class Actions extends React.Component {
 				});
 				break;
 			}
+			case 'function': {
+				actions = actions.map(action => {
+					if (action.type === 'function') {
+						return {
+							...action,
+							data: value,
+						};
+					}
+					return action;
+				});
+				break;
+			}
 			default:
 				return;
 		}

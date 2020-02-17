@@ -3,8 +3,7 @@ import { Input, message, Modal, notification } from 'antd';
 import { connect } from 'react-redux';
 import { cloneQueryRule } from '../../../../../batteries/modules/actions';
 
-// eslint-disable-next-line no-shadow
-function CloneRuleModal({ rule, cloneQueryRule, handleCancel }) {
+function CloneRuleModal({ rule, cloneQueryRule: cloneQueryRuleAction, handleCancel }) {
 	const [ruleName, setRuleName] = useState(undefined);
 	const [didMount, setDidMount] = useState(false);
 	useEffect(() => {
@@ -25,7 +24,7 @@ function CloneRuleModal({ rule, cloneQueryRule, handleCancel }) {
 		<Modal
 			okText="Clone"
 			onOk={() =>
-				cloneQueryRule(rule, {
+				cloneQueryRuleAction(rule, {
 					...rule,
 					name: ruleName,
 				})

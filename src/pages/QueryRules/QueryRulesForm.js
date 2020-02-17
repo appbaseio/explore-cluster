@@ -21,6 +21,7 @@ import {
 	Tooltip,
 	Skeleton,
 	Result,
+	notification,
 } from 'antd';
 
 import IndexDropdown from './components/IndexDropdown';
@@ -34,6 +35,7 @@ import { addQueryRule, getRules, putRule, deleteRule } from '../../batteries/mod
 import { getClusterMappings, getDatafields } from '../../utils';
 import { getParsedRule, getExpressionFromValue } from './utils';
 import CloneRule from './components/Actions/CloneRule';
+import { updateFunctions } from '../../batteries/utils/app';
 
 const { RangePicker } = DatePicker;
 
@@ -266,20 +268,21 @@ class QueryRulesForm extends React.Component {
 			dataFieldValue,
 			query,
 			queryValue,
-			actions,
 			error,
 			selectedIndexes,
 			isEditPage,
 			enabled,
 		} = this.state;
 
+		let { actions } = this.state;
+
 		const { createRule, updateRule } = this.props;
 
 		const hasError = !!Object.keys(error).length;
+
 		const params = {
 			name,
 			description,
-			actions,
 			trigger: {
 				type: condition,
 				expression: getExpressionFromValue({
@@ -292,16 +295,64 @@ class QueryRulesForm extends React.Component {
 				}),
 			},
 		};
+
+		function updateFunction(selectedFunction, res) {
+			if (selectedFunction) {
+				// eslint-disable-next-line no-param-reassign
+				selectedFunction.queryRules = [
+					...(selectedFunction.queryRules || []),
+					res.payload.id,
+				]
+					// remove duplicate rule ids
+					.filter((value, index, self) => {
+						return self.indexOf(value) === index;
+					});
+				notification.info({
+					message: 'Updating Function',
+					description: `Updating function ${selectedFunction.service} with ${res.payload.name} rule`,
+				});
+				updateFunctions(selectedFunction.service, selectedFunction)
+					.then(() => {
+						notification.success({
+							message: 'Success',
+							description: `Function ${selectedFunction.service} updated successfully.`,
+						});
+					})
+					.catch(e => {
+						notification.error({
+							message: 'Error',
+							description: e,
+						});
+					});
+			}
+		}
+
 		if (!hasError) {
+			let selectedFunction;
+			actions = actions.map(action => {
+				if (action.type === 'function') {
+					selectedFunction = get(action, 'data.function');
+					return {
+						...action,
+						data: get(action, 'data.function.service'),
+					};
+				}
+				return action;
+			});
+			params.actions = actions;
 			const { rule } = this.props;
 			if (isEditPage) {
 				updateRule({
 					...params,
 					id: rule.id,
 					enabled,
+				}).then(res => {
+					updateFunction(selectedFunction, res);
 				});
 			} else {
-				createRule(params);
+				createRule(params).then(res => {
+					updateFunction(selectedFunction, res);
+				});
 			}
 		}
 	};

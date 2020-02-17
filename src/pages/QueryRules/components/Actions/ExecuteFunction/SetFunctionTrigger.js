@@ -34,24 +34,43 @@ class SetFunctionTrigger extends Component {
 
 	handleTriggerChange = (clickParam, index) => {
 		const { functions } = this.state;
-		this.setState({
-			functions: [
-				...functions.slice(0, index),
-				{
-					...functions[index],
-					trigger: {
-						...functions[index].trigger,
-						executeBefore: clickParam.key === 'true',
+		this.setState(
+			{
+				functions: [
+					...functions.slice(0, index),
+					{
+						...functions[index],
+						trigger: {
+							...functions[index].trigger,
+							executeBefore: clickParam.key === 'true',
+						},
 					},
-				},
-				...functions.slice(index + 1),
-			],
-		});
+					...functions.slice(index + 1),
+				],
+			},
+			this.handleUpdates,
+		);
+	};
+
+	handleChange = record => {
+		const { handleRadioChange } = this.props;
+		this.handleUpdates(record);
+		handleRadioChange(record.function.service);
+	};
+
+	handleUpdates = record => {
+		const { onChange, selected } = this.props;
+		const { functions } = this.state;
+		const functionName = record ? record.function.service : selected;
+		if (onChange) {
+			const selectedFunction = functions.find(obj => obj.function.service === functionName);
+			onChange(selectedFunction);
+		}
 	};
 
 	render() {
 		const { loading, functions } = this.state;
-		const { selected, handleRadioChange } = this.props;
+		const { selected } = this.props;
 		if (loading) return <Skeleton />;
 		if (functions && functions.length === 0) {
 			const { setActiveKey } = this.props;
@@ -80,7 +99,7 @@ class SetFunctionTrigger extends Component {
 						render: (text, record) => (
 							<Radio
 								checked={selected === record.function.service}
-								onChange={() => handleRadioChange(record.function.service)}
+								onChange={() => this.handleChange(record)}
 							>
 								{record.function.service}
 							</Radio>

@@ -365,9 +365,7 @@ export function getDatafields(mappings, indexes) {
 			const nestedDataFields = keys(properties).filter(property => {
 				return (
 					properties[property].type === 'string' ||
-					properties[property].type === 'text' ||
-					properties[property].type === 'integer' ||
-					properties[property].type === 'long'
+					properties[property].type === 'text'
 				);
 			});
 			return [...acc, ...nestedDataFields];

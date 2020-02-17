@@ -17,7 +17,7 @@ class NewFunctionForm extends Component {
 	handleSubmit = async e => {
 		e.preventDefault();
 		const { functionName, dockerImage } = this.state;
-		const { onSuccess, setActiveKey } = this.props;
+		const { onSuccess, setActiveKey, onChange } = this.props;
 		this.setError({
 			functionName: !functionName,
 			dockerImage: !dockerImage,
@@ -25,9 +25,10 @@ class NewFunctionForm extends Component {
 		if ([functionName, dockerImage].some(item => !item)) return;
 		this.setState({ loading: true });
 		try {
-			await createFunction(functionName, { image: dockerImage });
+			const response = await createFunction(functionName, { image: dockerImage });
 			message.success(`${functionName} deployed successfully`);
 			setActiveKey('trigger');
+			if (onChange) onChange(response);
 			if (onSuccess) onSuccess(functionName);
 			this.setState({ loading: false });
 			// eslint-disable-next-line no-shadow
