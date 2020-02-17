@@ -100,11 +100,13 @@ function UpdateFunction({ item }) {
 function Actions({ item, refetchFunction }) {
 	return (
 		<React.Fragment>
-			<TriggerFunction
-				isLoading={item.triggerUpdation}
-				refetchFunction={refetchFunction}
-				node={item}
-			/>
+			{(item.queryRules || []).length === 0 && (
+				<TriggerFunction
+					isLoading={item.triggerUpdation}
+					refetchFunction={refetchFunction}
+					node={item}
+				/>
+			)}
 
 			<InvokeButton item={item} />
 		</React.Fragment>
