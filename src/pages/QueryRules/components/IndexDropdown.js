@@ -23,7 +23,7 @@ class IndexDropdown extends React.Component {
 	}
 
 	shouldComponentUpdate(nextProps) {
-		return hasValuesChanged(this.props, nextProps, ['apps', 'error']);
+		return hasValuesChanged(this.props, nextProps, ['apps', 'error', 'selectedIndexes']);
 	}
 
 	handleChange = values => {

@@ -9,6 +9,7 @@ class Conditions extends React.Component {
 	shouldComponentUpdate(nextProps) {
 		return hasValuesChanged(this.props, nextProps, [
 			'dataFields',
+			'dataField',
 			'dataFieldValue',
 			'query',
 			'queryValue',
