@@ -1,5 +1,7 @@
 import { chain, keys } from 'lodash';
 import { getURL } from '../constants/config';
+import { notification } from 'antd';
+import { updateFunctions } from '../batteries/utils/app';
 
 export async function getUser(username, password, url) {
 	const ACC_API = getURL();
@@ -364,12 +366,39 @@ export function getDatafields(mappings, indexes) {
 			const { properties } = mappings[key].mappings;
 			const nestedDataFields = keys(properties).filter(property => {
 				return (
-					properties[property].type === 'string' ||
-					properties[property].type === 'text'
+					properties[property].type === 'string' || properties[property].type === 'text'
 				);
 			});
 			return [...acc, ...nestedDataFields];
 		}, []);
 
 	return [...new Set(dataFields)];
+}
+
+export function updateFunction(selectedFunction, res) {
+	if (selectedFunction) {
+		// eslint-disable-next-line no-param-reassign
+		selectedFunction.queryRules = [...(selectedFunction.queryRules || []), res.payload.id]
+			// remove duplicate rule ids
+			.filter((value, index, self) => {
+				return self.indexOf(value) === index;
+			});
+		notification.info({
+			message: 'Updating Function',
+			description: `Updating function ${selectedFunction.service} with ${res.payload.name} rule`,
+		});
+		updateFunctions(selectedFunction.service, selectedFunction)
+			.then(() => {
+				notification.success({
+					message: 'Success',
+					description: `Function ${selectedFunction.service} updated successfully.`,
+				});
+			})
+			.catch(e => {
+				notification.error({
+					message: 'Error',
+					description: e,
+				});
+			});
+	}
 }

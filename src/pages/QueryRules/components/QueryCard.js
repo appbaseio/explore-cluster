@@ -8,7 +8,7 @@ import { get } from 'lodash';
 import ActionView from './ActionView';
 import MobileMenu from './MobileMenu';
 import { deleteRule, toggleRuleStatus } from '../../../batteries/modules/actions';
-import CloneRule from './Actions/CloneRule';
+import CloneRule from './CloneRule';
 import { hasValuesChanged } from '../utils';
 
 const title = css`

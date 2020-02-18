@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { get } from 'lodash';
 import {
 	Affix,
+	Alert,
 	Button,
 	Card,
 	Col,
@@ -12,15 +13,13 @@ import {
 	Divider,
 	Icon,
 	Input,
-	Row,
-	Typography,
-	Alert,
 	message,
+	Result,
+	Row,
+	Skeleton,
 	Switch,
 	Tooltip,
-	Skeleton,
-	Result,
-	notification,
+	Typography,
 } from 'antd';
 import moment from 'moment';
 
@@ -28,14 +27,13 @@ import IndexDropdown from './components/IndexDropdown';
 import Conditions from './components/Conditions';
 import ActionSelector from './components/ActionSelector';
 import Actions from './components/Actions';
-import { getErrorMessages, getErrorClass, getErrorMessage, getErrorCount } from './utils/error';
+import { getErrorClass, getErrorCount, getErrorMessage, getErrorMessages } from './utils/error';
 
-import { addQueryRule, getRules, putRule, deleteRule } from '../../batteries/modules/actions/rules';
+import { addQueryRule, deleteRule, getRules, putRule } from '../../batteries/modules/actions/rules';
 
-import { getClusterMappings, getDatafields } from '../../utils';
-import { getParsedRule, getExpressionFromValue } from './utils';
-import CloneRule from './components/Actions/CloneRule';
-import { updateFunctions } from '../../batteries/utils/app';
+import { getClusterMappings, getDatafields, updateFunction } from '../../utils';
+import { getExpressionFromValue, getParsedRule } from './utils';
+import CloneRule from './components/CloneRule';
 
 const { RangePicker } = DatePicker;
 
@@ -298,37 +296,6 @@ class QueryRulesForm extends React.Component {
 				timeframe,
 			},
 		};
-
-		function updateFunction(selectedFunction, res) {
-			if (selectedFunction) {
-				// eslint-disable-next-line no-param-reassign
-				selectedFunction.queryRules = [
-					...(selectedFunction.queryRules || []),
-					res.payload.id,
-				]
-					// remove duplicate rule ids
-					.filter((value, index, self) => {
-						return self.indexOf(value) === index;
-					});
-				notification.info({
-					message: 'Updating Function',
-					description: `Updating function ${selectedFunction.service} with ${res.payload.name} rule`,
-				});
-				updateFunctions(selectedFunction.service, selectedFunction)
-					.then(() => {
-						notification.success({
-							message: 'Success',
-							description: `Function ${selectedFunction.service} updated successfully.`,
-						});
-					})
-					.catch(e => {
-						notification.error({
-							message: 'Error',
-							description: e,
-						});
-					});
-			}
-		}
 
 		if (!hasError) {
 			let selectedFunction;

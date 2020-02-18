@@ -59,7 +59,7 @@ export function PromoteDataTable({ positionRender, dataRender, dataSource, actio
 }
 
 export function PromotePosition({ value, onChange }) {
-	return <InputNumber value={Number(value)} onChange={onChange} min={0} />;
+	return <InputNumber value={Number(value)} onChange={onChange} min={1} />;
 }
 
 export function PromoteJSONView({ record }) {

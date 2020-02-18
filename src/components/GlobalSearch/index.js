@@ -3,7 +3,14 @@ import { DataSearch } from '@appbaseio/reactivesearch';
 import { css } from 'react-emotion';
 import { Icon } from 'antd';
 
-import './index.css';
+const inputBox = css`
+	&:hover,
+	&:focus {
+		.search-icon {
+			color: rgba(0, 0, 0, 0.85);
+		}
+	}
+`;
 
 class GlobalSearch extends PureComponent {
 	state = {
@@ -20,7 +27,7 @@ class GlobalSearch extends PureComponent {
 		const { onSuggestionSelect, className, dataFields } = this.props;
 		const { searchValue } = this.state;
 		return (
-			<div className="input-box" css={{ position: 'relative' }}>
+			<div className={inputBox} css={{ position: 'relative' }}>
 				<DataSearch
 					componentId="GlobalSearch"
 					dataField={dataFields}

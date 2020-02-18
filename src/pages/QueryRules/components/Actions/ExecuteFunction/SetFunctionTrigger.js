@@ -16,10 +16,7 @@ function TriggerDropdown({ overlay, selectedOption }) {
 }
 
 class SetFunctionTrigger extends Component {
-	constructor(props) {
-		super(props);
-		this.state = { loading: false };
-	}
+	state = { loading: false };
 
 	async componentDidMount() {
 		try {

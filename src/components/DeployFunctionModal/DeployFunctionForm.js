@@ -1,7 +1,7 @@
 import { Radio, Row } from 'antd';
 import React from 'react';
-import { modalHeading } from '../../../pages/HomePage/styles';
-import { renderInputField } from '../helper';
+import { modalHeading } from '../../pages/HomePage/styles';
+import { renderInputField } from './helper';
 import PrivateRegistry from './PrivateRegistry';
 
 // eslint-disable-next-line import/prefer-default-export

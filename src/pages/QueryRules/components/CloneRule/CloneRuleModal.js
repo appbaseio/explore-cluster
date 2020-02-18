@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Input, message, Modal, notification } from 'antd';
 import { connect } from 'react-redux';
-import { cloneQueryRule } from '../../../../../batteries/modules/actions';
+import { cloneQueryRule } from '../../../../batteries/modules/actions';
 
 function CloneRuleModal({ rule, cloneQueryRule: cloneQueryRuleAction, handleCancel }) {
-	const [ruleName, setRuleName] = useState(undefined);
+	const [ruleName, setRuleName] = useState(null);
 	const [didMount, setDidMount] = useState(false);
 	useEffect(() => {
 		if (!ruleName) return;

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import { Button, notification, message } from 'antd';
 import { handleInputClosure } from '../../../../../components/DeployFunctionModal/helper';
-import { DeployFunctionForm } from '../../../../../components/DeployFunctionModal/components/DeployFunctionForm';
+import { DeployFunctionForm } from '../../../../../components/DeployFunctionModal/DeployFunctionForm';
 import { createFunction } from '../../../../../batteries/utils/app';
 
 class NewFunctionForm extends Component {

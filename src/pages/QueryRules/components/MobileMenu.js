@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Checkbox, Dropdown, Icon, Menu, Typography } from 'antd';
 import { css } from 'emotion';
-import CloneRule from './Actions/CloneRule';
+import CloneRule from './CloneRule';
 
 const menuStyle = css`
 	font-size: 14px;

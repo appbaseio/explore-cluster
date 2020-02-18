@@ -10,7 +10,7 @@ import {
 	getSingleFunction,
 	updateFunctions,
 } from '../../batteries/modules/actions';
-import { DeployFunctionForm } from './components/DeployFunctionForm';
+import { DeployFunctionForm } from './DeployFunctionForm';
 
 const DeployFunctionModal = ({
 	node,
