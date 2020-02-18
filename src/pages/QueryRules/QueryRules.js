@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Col, Row, Layout, Button, Icon, message } from 'antd';
+import { Col, Row, Layout, Button, Icon, message, Result } from 'antd';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -9,6 +9,9 @@ import QueryCard from './components/QueryCard';
 import { getRules, reorderRules } from '../../batteries/modules/actions';
 import Loader from '../../components/Loader';
 import DNDWrapper from '../../components/DNDWrapper';
+import Overlay from '../../components/Overlay';
+import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
+import { validPlans, bannerDetails } from './utils';
 
 const { Header } = Layout;
 
@@ -60,7 +63,22 @@ class QueryRules extends Component {
 	};
 
 	render() {
-		const { rules, isLoading } = this.props;
+		const { rules, isLoading, tier } = this.props;
+
+		if (tier && validPlans.indexOf(tier) === -1) {
+			return (
+				<React.Fragment>
+					<Banner {...bannerDetails} />
+					<Overlay
+						style={{
+							maxWidth: '70%',
+						}}
+						src="https://i.imgur.com/WmzxSHs.png"
+						alt="Query Rules"
+					/>
+				</React.Fragment>
+			);
+		}
 
 		if (isLoading) {
 			return <Loader />;
@@ -116,21 +134,36 @@ class QueryRules extends Component {
 					</div>
 				</Header>
 				<div className={container}>
-					<DNDWrapper
-						onDragEnd={this.onDragEnd}
-						items={rules && rules.sort((a, b) => a.order - b.order)}
-						dropId="RULES"
-						indexKey="order"
-						idKey="id"
-					>
-						{({ item, dragProvided, dragSnapshot }) => (
-							<QueryCard
-								dragProvided={dragProvided}
-								dragSnapshot={dragSnapshot}
-								rule={item}
-							/>
-						)}
-					</DNDWrapper>
+					{rules && rules.length ? (
+						<DNDWrapper
+							onDragEnd={this.onDragEnd}
+							items={rules.sort((a, b) => a.order - b.order)}
+							dropId="RULES"
+							indexKey="order"
+							idKey="id"
+						>
+							{({ item, dragProvided, dragSnapshot }) => (
+								<QueryCard
+									dragProvided={dragProvided}
+									dragSnapshot={dragSnapshot}
+									rule={item}
+								/>
+							)}
+						</DNDWrapper>
+					) : (
+						<Result
+							title="No Rules Present"
+							subTitle="Create a new Rule to get started."
+							extra={
+								<Link to="/cluster/rules/new">
+									<Button type="primary">
+										<Icon type="plus" />
+										Create Rule
+									</Button>
+								</Link>
+							}
+						/>
+					)}
 				</div>
 			</Fragment>
 		);
@@ -143,6 +176,7 @@ const mapStateToProps = state => ({
 	hasError: get(state, '$getAppRules.error'),
 	reordering: get(state, '$getAppRules.reordering'),
 	deleted: get(state, '$getAppRules.deleted'),
+	tier: get(state, '$getAppPlan.results.tier'),
 });
 
 const mapDispatchToProps = dispatch => ({

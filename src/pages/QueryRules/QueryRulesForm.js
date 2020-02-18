@@ -31,8 +31,10 @@ import { getErrorMessages, getErrorClass, getErrorMessage, getErrorCount } from 
 import { addQueryRule, getRules, putRule, deleteRule } from '../../batteries/modules/actions/rules';
 
 import { getClusterMappings, getDatafields } from '../../utils';
-import { getParsedRule, getExpressionFromValue } from './utils';
+import { getParsedRule, getExpressionFromValue, validPlans, bannerDetails } from './utils';
 import DeleteModal from '../../components/DeleteModal';
+import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
+import Overlay from '../../components/Overlay';
 
 const { RangePicker } = DatePicker;
 
@@ -373,7 +375,23 @@ class QueryRulesForm extends React.Component {
 			rules,
 			removeRule,
 			isDeleting,
+			tier,
 		} = this.props;
+
+		if (tier && validPlans.indexOf(tier) === -1) {
+			return (
+				<React.Fragment>
+					<Banner {...bannerDetails} />
+					<Overlay
+						style={{
+							maxWidth: '70%',
+						}}
+						src="https://i.imgur.com/WmzxSHs.png"
+						alt="Query Rules"
+					/>
+				</React.Fragment>
+			);
+		}
 
 		if (isEditPage && (!rules.length || rulesLoading)) {
 			return (
@@ -603,6 +621,7 @@ const mapStateToProps = (state, props) => {
 		createError: get(state, '$getAppRules.create.error.actual'),
 		rules: get(state, '$getAppRules.results', []),
 		rulesLoading: get(state, '$getAppRules.isFetching'),
+		tier: get(state, '$getAppPlan.results.tier'),
 	};
 
 	if (id) {

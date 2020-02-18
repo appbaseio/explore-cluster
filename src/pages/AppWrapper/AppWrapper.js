@@ -26,7 +26,7 @@ const routes = {
 			{ label: 'Browse Data', link: 'browse' },
 			{ label: 'Query Explorer', link: 'query' },
 			{ label: 'Search Preview', link: 'search-preview', tag: 'Beta' },
-			{ label: 'Rules', link: '/cluster/rules', tag: 'Beta', hasExactPath: true },
+			{ label: 'Query Rules', link: '/cluster/rules', tag: 'Beta', hasExactPath: true },
 			{ label: 'Search Templates', link: 'search-templates', tag: 'Beta' },
 			{ label: 'Query Suggestions', link: 'query-suggestions', tag: 'Beta' },
 		],
