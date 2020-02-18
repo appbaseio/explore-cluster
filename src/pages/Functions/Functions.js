@@ -421,7 +421,7 @@ class FunctionsPage extends React.Component {
 							<Row>
 								<Col lg={18}>
 									<p>
-										Create &quot;If this, then tha&quot; style functions to add
+										Create &quot;If this, then that&quot; style functions to add
 										your own custom search and security logic. Functions will be
 										executed in the order in which they are listed. You can drag
 										and drop a function to change the ordering sequence.
