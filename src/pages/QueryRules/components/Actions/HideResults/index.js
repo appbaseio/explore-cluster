@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { ReactiveBase } from '@appbaseio/reactivesearch';
-import { Button, Tag } from 'antd';
+import { Button, notification, Tag } from 'antd';
 import { css } from 'emotion';
 import { getURL } from '../../../../../constants/config';
 import GlobalSearch from '../../../../../components/GlobalSearch';
@@ -39,6 +39,13 @@ class HideResults extends Component {
 	onHide = () => {
 		const { currentId, hiddenResults } = this.state;
 		if (!currentId) return;
+		if (hiddenResults.includes(currentId)) {
+			notification.info({
+				message: 'Hide Result',
+				description: `${currentId} is already hidden.`,
+			});
+			return;
+		}
 		this.setState(
 			{ hiddenResults: [...hiddenResults, currentId], currentId: null },
 			this.updateResults,
@@ -69,7 +76,7 @@ class HideResults extends Component {
 					credentials={atob(sessionStorage.getItem('authToken'))}
 					className={flex}
 				>
-					<div style={{ width: '85%' }}>
+					<div style={{ width: '100%', marginRight: 5 }}>
 						<GlobalSearch
 							indexes={indexes}
 							onSuggestionSelect={this.onSuggestionSelect}

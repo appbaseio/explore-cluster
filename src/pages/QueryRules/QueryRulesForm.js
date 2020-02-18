@@ -34,6 +34,7 @@ import { addQueryRule, deleteRule, getRules, putRule } from '../../batteries/mod
 import { getClusterMappings, getDatafields, updateFunction } from '../../utils';
 import { getExpressionFromValue, getParsedRule } from './utils';
 import CloneRule from './components/CloneRule';
+import { Info } from '../../components/Info';
 
 const { RangePicker } = DatePicker;
 
@@ -166,7 +167,8 @@ class QueryRulesForm extends React.Component {
 			if (createError) {
 				message.error(createError);
 			} else {
-				message.success('Successfully Created Rule');
+				message.success('successfully created rule');
+				history.push('/cluster/rules');
 			}
 		}
 
@@ -174,7 +176,8 @@ class QueryRulesForm extends React.Component {
 			if (updateError) {
 				message.error(updateError);
 			} else {
-				message.success('Successfully Updated Rule');
+				message.success('successfully updated rule');
+				history.push('/cluster/rules');
 			}
 		}
 
@@ -485,13 +488,6 @@ class QueryRulesForm extends React.Component {
 							</Col>
 
 							<Col md={12} sm={24}>
-								<label>Indexes</label>
-								{getErrorMessage(error.selectedIndexes)}
-								<IndexDropdown
-									error={error && error.selectedIndexes}
-									onChange={this.handleIndex}
-								/>
-
 								<Conditions
 									onChange={this.handleInput}
 									error={error.condition}
@@ -503,7 +499,25 @@ class QueryRulesForm extends React.Component {
 									onDropdownChange={this.handleDropdown}
 									queryValue={queryValue}
 								/>
-								<label>Timeframe</label>
+								<div style={{ marginBottom: 15 }}>
+									<label>
+										Index to apply rule to
+										<Info content="Select the index or indices to apply the rule to." />
+									</label>
+									{getErrorMessage(error.selectedIndexes)}
+									<IndexDropdown
+										error={error && error.selectedIndexes}
+										onChange={this.handleIndex}
+									/>
+								</div>
+
+								<label>
+									Timeframe(optional)
+									<Info
+										content="Set a timeframe during which this rule should be triggered.
+									You can also set either of the start time or end time (without setting the other)."
+									/>
+								</label>
 								<RangePicker
 									value={
 										timeframe

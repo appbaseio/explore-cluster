@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { ReactiveBase } from '@appbaseio/reactivesearch';
-import { Button } from 'antd';
+import { Button, notification } from 'antd';
 import { css } from 'emotion';
 import { getURL } from '../../../../../constants/config';
 import GlobalSearch from '../../../../../components/GlobalSearch';
@@ -40,6 +40,13 @@ class PromoteResults extends Component {
 	handleAdd = () => {
 		const { dataSource, selectedSuggestion, suggestionSource } = this.state;
 		if (!selectedSuggestion) return;
+		if (dataSource.findIndex(item => item.doc._id === suggestionSource._id) > -1) {
+			notification.info({
+				message: 'Promote Result',
+				description: `${selectedSuggestion} is already promoted.`,
+			});
+			return;
+		}
 		const newData = [...dataSource, { position: 1, doc: suggestionSource }];
 		this.setState({ dataSource: newData, selectedSuggestion: null }, this.updateResults);
 		if (this.globalSearchRef) {
@@ -85,7 +92,7 @@ class PromoteResults extends Component {
 					credentials={atob(sessionStorage.getItem('authToken'))}
 					className={flex}
 				>
-					<div style={{ width: '79%' }}>
+					<div style={{ width: '100%', marginRight: 5 }}>
 						<GlobalSearch
 							indexes={indexes}
 							onSuggestionSelect={(selectedSuggestion, cause, source) => {

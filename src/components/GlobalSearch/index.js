@@ -42,12 +42,13 @@ class GlobalSearch extends PureComponent {
 							top: 34px !important;
 							font-size: 0.8rem !important;
 							border-radius: 5px !important;
+							max-height: 420px !important;
 						`,
 					}}
 					debounce={5}
 					showIcon={false}
 					onValueSelected={(value, cause, source) => {
-						if (onSuggestionSelect) {
+						if (onSuggestionSelect && cause === 'SUGGESTION_SELECT') {
 							onSuggestionSelect(value, cause, source);
 						}
 					}}

@@ -69,12 +69,10 @@ class SetFunctionTrigger extends Component {
 		const { loading, functions } = this.state;
 		const { selected } = this.props;
 		if (loading) return <Skeleton />;
-		if (functions && functions.length === 0) {
+		if ((functions || []).length === 0) {
 			const { setActiveKey } = this.props;
 			return (
 				<Result
-					status="warning"
-					title="500"
 					subTitle={
 						<div>
 							Sorry, there are no deployed functions.

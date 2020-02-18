@@ -66,7 +66,12 @@ const cardStyles = css`
 
 class Actions extends React.Component {
 	shouldComponentUpdate(nextProps) {
-		return hasValuesChanged(this.props, nextProps, ['actions', ...errorKeys]);
+		return hasValuesChanged(this.props, nextProps, [
+			'actions',
+			'dataFields',
+			'searchFields',
+			...errorKeys,
+		]);
 	}
 
 	onDragEnd = result => {

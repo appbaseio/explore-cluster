@@ -2,6 +2,7 @@ import React from 'react';
 import { Select, Input, Row, Col, Radio } from 'antd';
 import { getErrorClass, getErrorMessage } from '../utils/error';
 import { hasValuesChanged } from '../utils';
+import { Info } from '../../../components/Info';
 
 const { Option } = Select;
 
@@ -38,8 +39,8 @@ class Conditions extends React.Component {
 					value={condition}
 					style={{ display: 'flex', margin: '15px 0' }}
 				>
-					<Radio value="filter">Conditions</Radio>
-					<Radio value="always">Always</Radio>
+					<Radio value="filter">Set Condition</Radio>
+					<Radio value="always">Always Trigger</Radio>
 				</Radio.Group>
 				{condition === 'filter' ? (
 					<Row gutter={16}>
@@ -67,7 +68,10 @@ class Conditions extends React.Component {
 							/>
 						</Col>
 						<Col md={12} sm={24}>
-							<label>DataField</label>
+							<label>
+								Filter
+								<Info content="Select a filter field and value which needs to be set before triggering this rule." />
+							</label>
 							<Select
 								onChange={value => onDropdownChange('dataField', value)}
 								value={dataField}
