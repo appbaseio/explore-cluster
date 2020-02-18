@@ -104,7 +104,7 @@ class QueryCard extends React.Component {
 	};
 
 	render() {
-		const { rule, dragProvided, dragSnapshot, removeRule } = this.props;
+		const { rule, dragProvided, dragSnapshot, removeRule, toggleRule } = this.props;
 		return (
 			<Card
 				hoverable
@@ -115,7 +115,7 @@ class QueryCard extends React.Component {
 			>
 				<Row style={{ position: 'relative' }} gutter={8}>
 					<div className={mobileMenu}>
-						<MobileMenu rule={rule} removeRule={removeRule} />
+						<MobileMenu rule={rule} removeRule={removeRule} toggleRule={toggleRule} />
 					</div>
 					<Col xs={1}>
 						<Tooltip title="Drag to update the ordering of rules">
