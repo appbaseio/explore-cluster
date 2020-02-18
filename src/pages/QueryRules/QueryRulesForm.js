@@ -17,7 +17,6 @@ import {
 	Alert,
 	message,
 	Switch,
-	Tooltip,
 	Skeleton,
 	Result,
 } from 'antd';
@@ -33,6 +32,7 @@ import { addQueryRule, getRules, putRule, deleteRule } from '../../batteries/mod
 
 import { getClusterMappings, getDatafields } from '../../utils';
 import { getParsedRule, getExpressionFromValue } from './utils';
+import DeleteModal from '../../components/DeleteModal';
 
 const { RangePicker } = DatePicker;
 
@@ -189,6 +189,10 @@ class QueryRulesForm extends React.Component {
 		const { name, value } = e.target;
 		this.setState(prevState => ({
 			[name]: value,
+			actions:
+				name === 'condition'
+					? prevState.actions.filter(action => action.type !== 'replace_search_term')
+					: prevState.actions,
 			error: {
 				...prevState.error,
 				[name === 'dataFieldValue' || name === 'queryValue' ? 'condition' : name]: {
@@ -424,9 +428,23 @@ class QueryRulesForm extends React.Component {
 							{isEditPage ? 'Update' : 'Create'} Query Rule
 						</Typography.Title>
 						{isEditPage ? (
-							<Tooltip title="Update Rule Status">
-								<Switch checked={enabled} onChange={this.handleStatus} />
-							</Tooltip>
+							<div className="flex center">
+								<label
+									style={{
+										fontWeight: 600,
+										marginRight: 5,
+										color: 'rgba(0,0,0,0.65)',
+									}}
+									htmlFor="enable"
+								>
+									{`${enabled ? 'Disable' : 'Enable'} Rule`}
+								</label>
+								<Switch
+									id="enable"
+									checked={enabled}
+									onChange={this.handleStatus}
+								/>
+							</div>
 						) : null}
 					</div>
 					<section className={formStyle}>
@@ -458,7 +476,7 @@ class QueryRulesForm extends React.Component {
 							</Col>
 
 							<Col md={12} sm={24}>
-								<label>Indexes</label>
+								<label>Indices</label>
 								{getErrorMessage(error.selectedIndexes)}
 								<IndexDropdown
 									error={error && error.selectedIndexes}
@@ -479,7 +497,7 @@ class QueryRulesForm extends React.Component {
 								<label>Timeframe</label>
 								<RangePicker
 									value={
-										timeframe
+										timeframe && timeframe.length
 											? [moment(timeframe[0]), moment(timeframe[1])]
 											: null
 									}
@@ -525,15 +543,23 @@ class QueryRulesForm extends React.Component {
 									<Icon type="copy" />
 									Clone
 								</Button>
-								<Button
-									onClick={() => removeRule(rule.id)}
-									size="large"
-									type="danger"
-									ghost
+								<DeleteModal
+									name="Rule"
+									value={rule.name.toLowerCase().replace(/ /g, '_')}
+									title="Delete Rule"
+									onDelete={() => removeRule(rule.id)}
 								>
-									<Icon type={isDeleting ? 'loading' : 'delete'} />
-									Delete
-								</Button>
+									{({ handleModal }) => (
+										<Button
+											size="large"
+											onClick={handleModal}
+											ghost
+											type="danger"
+										>
+											<Icon type={isDeleting ? 'loading' : 'delete'} /> Delete
+										</Button>
+									)}
+								</DeleteModal>
 							</div>
 						) : null}
 						<div className="flex flex-end">

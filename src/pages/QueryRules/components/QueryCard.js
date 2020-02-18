@@ -8,6 +8,7 @@ import ActionView from './ActionView';
 import MobileMenu from './MobileMenu';
 import { deleteRule, toggleRuleStatus } from '../../../batteries/modules/actions';
 import { hasValuesChanged } from '../utils';
+import DeleteModal from '../../../components/DeleteModal';
 
 const title = css`
 	font-size: 16px;
@@ -35,6 +36,11 @@ const actions = css`
 	button:not(:first-child),
 	a {
 		margin-left: 5px;
+	}
+	@media (max-width: 1024px) {
+		button {
+			margin-top: 5px;
+		}
 	}
 `;
 
@@ -103,6 +109,7 @@ class QueryCard extends React.Component {
 
 	render() {
 		const { rule, dragProvided, dragSnapshot, removeRule } = this.props;
+		const actionButtonSize = window.innerWidth < 1090 ? 'small' : 'default';
 		return (
 			<Card
 				hoverable
@@ -123,48 +130,66 @@ class QueryCard extends React.Component {
 							</div>
 						</Tooltip>
 					</Col>
-					<Col xl={8} lg={6} md={11} sm={24}>
+					<Col xl={7} lg={7} md={11} sm={24}>
 						<h4 className={title}>{rule.name}</h4>
 						<p className={description}>{rule.description}</p>
 						<p className={description}>
 							<strong>{rule.trigger.expression}</strong>
 						</p>
 					</Col>
-					<Col xl={8} lg={7} md={12} sm={24}>
+					<Col lg={7} md={12} sm={24}>
 						{rule.actions.map(action => (
 							<div key={action.type} className={section}>
 								<ActionView action={action} />
 							</div>
 						))}
 					</Col>
-					<Col xl={7} lg={10} xs={0}>
+					<Col xl={9} lg={9} xs={0}>
 						<div className={actions}>
-							<Button
-								onClick={() => removeRule(rule.id)}
-								className="show-on-hover"
-								ghost
-								type="danger"
+							<DeleteModal
+								name="Rule"
+								value={rule.name.toLowerCase().replace(/ /g, '_')}
+								title="Delete Rule"
+								onDelete={() => removeRule(rule.id)}
 							>
-								<Icon type={rule.isDeleting ? 'loading' : 'delete'} /> Delete
-							</Button>
-							<Button type="primary">
+								{({ handleModal }) => (
+									<Button
+										onClick={handleModal}
+										className="show-on-hover"
+										ghost
+										size={actionButtonSize}
+										type="danger"
+									>
+										<Icon type={rule.isDeleting ? 'loading' : 'delete'} />{' '}
+										Delete
+									</Button>
+								)}
+							</DeleteModal>
+							<Button size={actionButtonSize} type="primary">
 								<Icon type="copy" /> Clone
 							</Button>
 							<Link to={`/cluster/rules/${rule.id}`}>
-								<Button type="primary">
+								<Button size={actionButtonSize} type="primary">
 									<Icon type="edit" /> Edit
 								</Button>
 							</Link>
 						</div>
-						<div style={{ marginTop: 30 }}>
-							<Tooltip title="Click to disable Rule">
-								<Switch
-									loading={rule.isToggling}
-									checked={rule.enabled}
-									onChange={this.handleRuleStatus}
-									style={{ marginLeft: 'auto', display: 'block' }}
-								/>
-							</Tooltip>
+						<div
+							style={{
+								marginTop: 30,
+								display: 'flex',
+								alignItems: 'center',
+								justifyContent: 'flex-end',
+							}}
+						>
+							<Typography.Text strong style={{ marginRight: 5 }}>
+								{rule.enabled ? 'Disable' : 'Enable'} Rule
+							</Typography.Text>
+							<Switch
+								loading={rule.isToggling}
+								checked={rule.enabled}
+								onChange={this.handleRuleStatus}
+							/>
 						</div>
 					</Col>
 				</Row>

@@ -26,7 +26,7 @@ const routes = {
 			{ label: 'Browse Data', link: 'browse' },
 			{ label: 'Query Explorer', link: 'query' },
 			{ label: 'Search Preview', link: 'search-preview', tag: 'Beta' },
-			{ label: 'Query Rules', link: 'query-rules', tag: 'Beta' },
+			{ label: 'Rules', link: '/cluster/rules', tag: 'Beta', hasExactPath: true },
 			{ label: 'Search Templates', link: 'search-templates', tag: 'Beta' },
 			{ label: 'Query Suggestions', link: 'query-suggestions', tag: 'Beta' },
 		],
@@ -231,7 +231,14 @@ class AppWrapper extends Component {
 									<SubMenu key={route} title={Title}>
 										{routes[route].menu.map(item => (
 											<Menu.Item key={item.label}>
-												<Link replace to={`/app/${appName}/${item.link}`}>
+												<Link
+													replace
+													to={
+														item.hasExactPath
+															? item.link
+															: `/app/${appName}/${item.link}`
+													}
+												>
 													{item.label}
 													{item.tag ? (
 														<Tag

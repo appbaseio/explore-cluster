@@ -32,11 +32,12 @@ class Conditions extends React.Component {
 		} = this.props;
 		return (
 			<React.Fragment>
+				<label style={{ marginTop: 15 }}>Trigger</label>
 				<Radio.Group
 					name="condition"
 					onChange={onChange}
 					value={condition}
-					style={{ display: 'flex', margin: '15px 0' }}
+					style={{ display: 'flex', marginBottom: '15px' }}
 				>
 					<Radio value="filter">Conditions</Radio>
 					<Radio value="always">Always</Radio>
