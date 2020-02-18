@@ -133,9 +133,11 @@ class QueryRulesForm extends React.Component {
 		getClusterMappings()
 			.then(mappings => {
 				const dataFields = getDatafields(mappings, ['*']);
+				const searchFields = getDatafields(mappings, ['*'], true);
 				this.setState({
 					mappings,
 					dataFields,
+					searchFields,
 				});
 			})
 			.catch(e => console.log(e));
@@ -214,9 +216,12 @@ class QueryRulesForm extends React.Component {
 	handleIndex = selectedIndexes => {
 		const { mappings } = this.state;
 		const dataFields = getDatafields(mappings, selectedIndexes);
+		const searchFields = getDatafields(mappings, selectedIndexes, true);
+
 		this.setState(prevState => ({
 			selectedIndexes,
 			dataFields,
+			searchFields,
 			dataField: dataFields[0] || '',
 			error: {
 				...prevState.error,
@@ -370,6 +375,7 @@ class QueryRulesForm extends React.Component {
 			description,
 			name,
 			dataFields,
+			searchFields,
 			dataField,
 			dataFieldValue,
 			query,
@@ -521,6 +527,7 @@ class QueryRulesForm extends React.Component {
 							<Col md={12} sm={24}>
 								<Actions
 									dataFields={dataFields}
+									searchFields={searchFields}
 									indexes={selectedIndexes}
 									actions={actions}
 									onChange={this.updateActions}

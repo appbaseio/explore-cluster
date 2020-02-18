@@ -160,12 +160,12 @@ class Actions extends React.Component {
 		const Component = componentMappings[item.type];
 		const getProps = () => {
 			const defaultProps = { value: item.data };
-			const { indexes, dataFields } = this.props;
+			const { indexes, searchFields } = this.props;
 			if (item.type === 'promote_result' || item.type === 'hide_result') {
 				return {
 					...defaultProps,
 					indexes,
-					dataFields,
+					dataFields: searchFields,
 				};
 			}
 			return defaultProps;

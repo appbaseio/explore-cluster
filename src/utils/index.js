@@ -1,6 +1,6 @@
 import { chain, keys } from 'lodash';
-import { getURL } from '../constants/config';
 import { notification } from 'antd';
+import { getURL } from '../constants/config';
 import { updateFunctions } from '../batteries/utils/app';
 
 export async function getUser(username, password, url) {
@@ -357,17 +357,28 @@ export async function getClusterMappings() {
 	return mappings;
 }
 
-export function getDatafields(mappings, indexes) {
+export function getDatafields(mappings, indexes, isSearch = false) {
 	const hasAllIndex = indexes.includes('*');
+
+	function filtered(properties, property) {
+		if (isSearch)
+			return properties[property].type === 'string' || properties[property].type === 'text';
+		return (
+			properties[property].type === 'string' ||
+			properties[property].type === 'text' ||
+			properties[property].type === 'integer' ||
+			properties[property].type === 'long' ||
+			properties[property].type === 'bool'
+		);
+	}
+
 	const dataFields = Object.keys(mappings)
 		.filter(index => !index.startsWith('.'))
 		.filter(index => hasAllIndex || indexes.includes(index))
 		.reduce((acc, key) => {
 			const { properties } = mappings[key].mappings;
 			const nestedDataFields = keys(properties).filter(property => {
-				return (
-					properties[property].type === 'string' || properties[property].type === 'text'
-				);
+				return filtered(properties, property);
 			});
 			return [...acc, ...nestedDataFields];
 		}, []);
