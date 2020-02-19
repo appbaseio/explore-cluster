@@ -18,9 +18,6 @@ import {
 	Row,
 	Skeleton,
 	Switch,
-	Skeleton,
-	Result,
-	Tooltip,
 	Typography,
 } from 'antd';
 import moment from 'moment';
@@ -33,8 +30,6 @@ import { getErrorClass, getErrorCount, getErrorMessage, getErrorMessages } from 
 
 import { addQueryRule, deleteRule, getRules, putRule } from '../../batteries/modules/actions/rules';
 
-import { getClusterMappings, getDatafields, updateFunction } from '../../utils';
-import { getExpressionFromValue, getParsedRule } from './utils';
 import CloneRule from './components/CloneRule';
 import { Info } from '../../components/Info';
 import { getClusterMappings, getDatafields } from '../../utils';

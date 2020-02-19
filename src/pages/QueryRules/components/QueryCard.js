@@ -167,7 +167,7 @@ class QueryCard extends React.Component {
 									</Button>
 								)}
 							</DeleteModal>
-							<CloneRule rule={rule} />
+							<CloneRule rule={rule} buttonSize={actionButtonSize} />
 							<Link to={`/cluster/rules/${rule.id}`}>
 								<Button size={actionButtonSize} type="primary">
 									<Icon type="edit" /> Edit
