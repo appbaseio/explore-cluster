@@ -4,9 +4,10 @@ import { Button, notification, message } from 'antd';
 import { handleInputClosure } from '../../../../../components/DeployFunctionModal/helper';
 import { DeployFunctionForm } from '../../../../../components/DeployFunctionModal/DeployFunctionForm';
 import { createFunction } from '../../../../../batteries/utils/app';
+import TestFunction from './TestFunction';
 
 class NewFunctionForm extends Component {
-	state = { error: {} };
+	state = { error: {}, success: false };
 
 	setFormValue = (key, value) => {
 		this.setState({ [key]: value });
@@ -27,10 +28,10 @@ class NewFunctionForm extends Component {
 		try {
 			const response = await createFunction(functionName, { image: dockerImage });
 			message.success(`${functionName} deployed successfully`);
-			setActiveKey('trigger');
+			// setActiveKey('trigger');
 			if (onChange) onChange(response);
 			if (onSuccess) onSuccess(functionName);
-			this.setState({ loading: false });
+			this.setState({ loading: false, success: true });
 			// eslint-disable-next-line no-shadow
 		} catch (e) {
 			notification.error({
@@ -42,8 +43,9 @@ class NewFunctionForm extends Component {
 	};
 
 	render() {
-		const { functionName, dockerImage, radioValue, error, loading } = this.state;
+		const { functionName, dockerImage, radioValue, error, loading, success } = this.state;
 		const handleInputRequired = handleInputClosure(this.setError, error);
+		if (success) return <TestFunction functionName={functionName} />;
 		return (
 			<>
 				<DeployFunctionForm

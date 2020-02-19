@@ -15,7 +15,7 @@ export function InvokeResponse({ responseData, status }) {
 			</Row>
 			<Row>
 				<h3 className={modalHeading}>Execution Time</h3>
-				{headers['X-Duration-Seconds']}s
+				{headers ? `${headers['X-Duration-Seconds']}s` : ''}
 			</Row>
 			<Row>
 				<h3 className={modalHeading}>Response Data</h3>

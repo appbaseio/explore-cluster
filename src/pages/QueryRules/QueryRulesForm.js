@@ -548,7 +548,7 @@ class QueryRulesForm extends React.Component {
 								</div>
 
 								<label>
-									Timeframe(optional)
+									Timeframe (optional)
 									<Info
 										content="Set a timeframe during which this rule should be triggered.
 									You can also set either of the start time or end time (without setting the other)."
