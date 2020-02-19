@@ -18,6 +18,8 @@ import {
 	Row,
 	Skeleton,
 	Switch,
+	Skeleton,
+	Result,
 	Tooltip,
 	Typography,
 } from 'antd';
@@ -35,6 +37,11 @@ import { getClusterMappings, getDatafields, updateFunction } from '../../utils';
 import { getExpressionFromValue, getParsedRule } from './utils';
 import CloneRule from './components/CloneRule';
 import { Info } from '../../components/Info';
+import { getClusterMappings, getDatafields } from '../../utils';
+import { getParsedRule, getExpressionFromValue, validPlans, bannerDetails } from './utils';
+import DeleteModal from '../../components/DeleteModal';
+import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
+import Overlay from '../../components/Overlay';
 
 const { RangePicker } = DatePicker;
 
@@ -195,6 +202,10 @@ class QueryRulesForm extends React.Component {
 		const { name, value } = e.target;
 		this.setState(prevState => ({
 			[name]: value,
+			actions:
+				name === 'condition'
+					? prevState.actions.filter(action => action.type !== 'replace_search_term')
+					: prevState.actions,
 			error: {
 				...prevState.error,
 				[name === 'dataFieldValue' || name === 'queryValue' ? 'condition' : name]: {
@@ -399,7 +410,23 @@ class QueryRulesForm extends React.Component {
 			removeRule,
 			isDeleting,
 			unparsedRule,
+			tier,
 		} = this.props;
+
+		if (tier && validPlans.indexOf(tier) === -1) {
+			return (
+				<React.Fragment>
+					<Banner {...bannerDetails} />
+					<Overlay
+						style={{
+							maxWidth: '70%',
+						}}
+						src="https://i.imgur.com/WmzxSHs.png"
+						alt="Query Rules"
+					/>
+				</React.Fragment>
+			);
+		}
 
 		if (isEditPage && (!rules.length || rulesLoading)) {
 			return (
@@ -454,9 +481,23 @@ class QueryRulesForm extends React.Component {
 							{isEditPage ? 'Update' : 'Create'} Query Rule
 						</Typography.Title>
 						{isEditPage ? (
-							<Tooltip title="Update Rule Status">
-								<Switch checked={enabled} onChange={this.handleStatus} />
-							</Tooltip>
+							<div className="flex center">
+								<label
+									style={{
+										fontWeight: 600,
+										marginRight: 5,
+										color: 'rgba(0,0,0,0.65)',
+									}}
+									htmlFor="enable"
+								>
+									{`${enabled ? 'Disable' : 'Enable'} Rule`}
+								</label>
+								<Switch
+									id="enable"
+									checked={enabled}
+									onChange={this.handleStatus}
+								/>
+							</div>
 						) : null}
 					</div>
 					<section className={formStyle}>
@@ -520,7 +561,7 @@ class QueryRulesForm extends React.Component {
 								</label>
 								<RangePicker
 									value={
-										timeframe
+										timeframe && timeframe.length
 											? [moment(timeframe[0]), moment(timeframe[1])]
 											: null
 									}
@@ -567,15 +608,23 @@ class QueryRulesForm extends React.Component {
 									rule={unparsedRule}
 								/>
 
-								<Button
-									onClick={() => removeRule(rule.id)}
-									size="large"
-									type="danger"
-									ghost
+								<DeleteModal
+									name="Rule"
+									value={rule.name.toLowerCase().replace(/ /g, '_')}
+									title="Delete Rule"
+									onDelete={() => removeRule(rule.id)}
 								>
-									<Icon type={isDeleting ? 'loading' : 'delete'} />
-									Delete
-								</Button>
+									{({ handleModal }) => (
+										<Button
+											size="large"
+											onClick={handleModal}
+											ghost
+											type="danger"
+										>
+											<Icon type={isDeleting ? 'loading' : 'delete'} /> Delete
+										</Button>
+									)}
+								</DeleteModal>
 							</div>
 						) : null}
 						<div className="flex flex-end">
@@ -619,6 +668,7 @@ const mapStateToProps = (state, props) => {
 		createError: get(state, '$getAppRules.create.error.actual'),
 		rules: get(state, '$getAppRules.results', []),
 		rulesLoading: get(state, '$getAppRules.isFetching'),
+		tier: get(state, '$getAppPlan.results.tier'),
 	};
 
 	if (id) {
