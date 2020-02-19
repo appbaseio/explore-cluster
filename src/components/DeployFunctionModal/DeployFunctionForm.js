@@ -50,8 +50,8 @@ export function DeployFunctionForm(props) {
 			<Row>
 				<h3 className={modalHeading}>Is your docker image public?</h3>
 				<Radio.Group onChange={onChange} value={value}>
-					<Radio value="yes">yes</Radio>
-					<Radio value="no">no</Radio>
+					<Radio value="yes">Yes</Radio>
+					<Radio value="no">No</Radio>
 				</Radio.Group>
 			</Row>
 			{value === 'no' && (

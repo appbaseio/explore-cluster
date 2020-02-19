@@ -42,17 +42,21 @@ class TestFunction extends Component {
 
 	render() {
 		const { isValidJSON, invokeState, loading, requestData, status, responseData } = this.state;
+		const { functionName } = this.props;
 		return (
-			<InvokeFunctionBody
-				invokeState={invokeState}
-				validJSON={isValidJSON}
-				loading={loading}
-				value={requestData}
-				onChange={this.handleRequestDataChange}
-				onClick={this.handleSubmit}
-				status={status}
-				responseData={responseData}
-			/>
+			<>
+				<h3>Invoke {functionName}</h3>
+				<InvokeFunctionBody
+					invokeState={invokeState}
+					validJSON={isValidJSON}
+					loading={loading}
+					value={requestData}
+					onChange={this.handleRequestDataChange}
+					onClick={this.handleSubmit}
+					status={status}
+					responseData={responseData}
+				/>
+			</>
 		);
 	}
 }
