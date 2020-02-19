@@ -4,7 +4,6 @@ import { message, Modal, notification } from 'antd';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import { deploymentCheck, handleInputClosure, isTrue } from './helper';
-// import EnvTable from './components/EnvTable';
 import {
 	createFunction,
 	getSingleFunction,
