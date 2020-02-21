@@ -14,6 +14,7 @@ import {
 	Icon,
 	Input,
 	message,
+	notification,
 	Result,
 	Row,
 	Skeleton,
@@ -32,13 +33,28 @@ import { addQueryRule, deleteRule, getRules, putRule } from '../../batteries/mod
 
 import CloneRule from './components/CloneRule';
 import { Info } from '../../components/Info';
-import { getClusterMappings, getDatafields } from '../../utils';
-import { getParsedRule, getExpressionFromValue, validPlans, bannerDetails } from './utils';
+import { getClusterMappings, getDatafields, getSelectedIndexes, updateFunction } from '../../utils';
+import { bannerDetails, getExpressionFromValue, getParsedRule, validPlans } from './utils';
 import DeleteModal from '../../components/DeleteModal';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Overlay from '../../components/Overlay';
+import { mediaKey } from '../../utils/media';
 
 const { RangePicker } = DatePicker;
+
+const link = css`
+	font-size: 16px;
+	margin-right: 30px;
+
+	i {
+		margin-right: 4px;
+	}
+
+	${mediaKey.small} {
+		display: block;
+		line-height: 48px;
+	}
+`;
 
 const container = css`
 	padding: 50px;
@@ -84,6 +100,14 @@ const formStyle = css`
 	}
 `;
 
+function DocsLink({ url }) {
+	return (
+		<a href={url} className={link} target="_blank" rel="noopener noreferrer">
+			Check Documentation <Icon type="arrow-right" />
+		</a>
+	);
+}
+
 class QueryRulesForm extends React.Component {
 	constructor(props) {
 		super(props);
@@ -117,6 +141,7 @@ class QueryRulesForm extends React.Component {
 			isEditPage: !!hasId,
 
 			error: {},
+			loading: false,
 		};
 	}
 
@@ -132,7 +157,7 @@ class QueryRulesForm extends React.Component {
 				...rule,
 			});
 		}
-
+		this.setState({ loading: true });
 		getClusterMappings()
 			.then(mappings => {
 				const dataFields = getDatafields(mappings, ['*']);
@@ -141,9 +166,13 @@ class QueryRulesForm extends React.Component {
 					mappings,
 					dataFields,
 					searchFields,
+					loading: false,
 				});
 			})
-			.catch(e => console.log(e));
+			.catch(e => {
+				this.setState({ loading: false });
+				console.log(e);
+			});
 	}
 
 	componentDidUpdate(prevProps) {
@@ -176,7 +205,7 @@ class QueryRulesForm extends React.Component {
 
 		if (isEditPage && !isUpdating && prevProps.isUpdating !== isUpdating) {
 			if (updateError) {
-				message.error(updateError);
+				notification.error({ message: 'Error', description: updateError.message });
 			} else {
 				message.success('successfully updated rule');
 				history.push('/cluster/rules');
@@ -187,7 +216,7 @@ class QueryRulesForm extends React.Component {
 			if (deleteError) {
 				message.error(deleteError);
 			} else {
-				message.success('Successfully Deleted Rule');
+				message.success('successfully deleted rule');
 				history.replace('/cluster/rules');
 			}
 		}
@@ -369,7 +398,10 @@ class QueryRulesForm extends React.Component {
 		if (date.length) {
 			const [startDate, endDate] = date;
 			this.setState({
-				timeframe: [moment(startDate).unix() * 1000, moment(endDate).unix() * 1000],
+				timeframe: {
+					start_time: moment(startDate).unix() * 1000,
+					end_time: moment(endDate).unix() * 1000,
+				},
 			});
 		} else {
 			this.setState({
@@ -395,6 +427,8 @@ class QueryRulesForm extends React.Component {
 			isEditPage,
 			enabled,
 			timeframe,
+			mappings,
+			loading,
 		} = this.state;
 		const {
 			isCreating,
@@ -423,7 +457,7 @@ class QueryRulesForm extends React.Component {
 			);
 		}
 
-		if (isEditPage && (!rules.length || rulesLoading)) {
+		if ((isEditPage && (!rules.length || rulesLoading)) || loading) {
 			return (
 				<div className={container}>
 					<Card>
@@ -519,7 +553,12 @@ class QueryRulesForm extends React.Component {
 									If (Set Trigger Condition)
 								</Typography.Title>
 								<Typography.Text>
-									Condition based on which this query rule will be executed
+									<div>
+										Condition based on which this query rule will be executed.
+									</div>
+									<div style={{ marginTop: 10 }}>
+										<DocsLink url="https://docs.appbase.io/docs/search/Rules/#configure-if-condition" />
+									</div>
 								</Typography.Text>
 							</Col>
 
@@ -557,12 +596,21 @@ class QueryRulesForm extends React.Component {
 								</label>
 								<RangePicker
 									value={
-										timeframe && timeframe.length
-											? [moment(timeframe[0]), moment(timeframe[1])]
+										timeframe
+											? [
+													moment(timeframe.start_time),
+													moment(timeframe.end_time),
+											  ]
 											: null
 									}
 									onChange={this.handleTime}
 									style={{ width: '100%' }}
+									disabledDate={current => {
+										// Can not select days before today
+										const now = new Date();
+										now.setHours(0, 0, 0, 0);
+										return current && current.valueOf() < now.valueOf();
+									}}
 								/>
 							</Col>
 						</Row>
@@ -571,7 +619,13 @@ class QueryRulesForm extends React.Component {
 							<Col md={12} sm={24}>
 								<Typography.Title level={4}>Then (Set Actions)</Typography.Title>
 								<Typography.Text>
-									What action to take when above query conditions are satisfied
+									<div>
+										What action to take when above query conditions are
+										satisfied
+									</div>
+									<div style={{ marginTop: 10 }}>
+										<DocsLink url="https://docs.appbase.io/docs/search/Rules/#configure-then-actions" />
+									</div>
 								</Typography.Text>
 							</Col>
 
@@ -579,7 +633,7 @@ class QueryRulesForm extends React.Component {
 								<Actions
 									dataFields={dataFields}
 									searchFields={searchFields}
-									indexes={selectedIndexes}
+									indexes={getSelectedIndexes(selectedIndexes, mappings)}
 									actions={actions}
 									onChange={this.updateActions}
 									error={error}

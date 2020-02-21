@@ -1,23 +1,14 @@
 import React, { Component } from 'react';
 import { ReactiveBase } from '@appbaseio/reactivesearch';
-import { Button, notification, Tag } from 'antd';
-import { css } from 'emotion';
+import { notification, Tag } from 'antd';
 import { getURL } from '../../../../../constants/config';
 import GlobalSearch from '../../../../../components/GlobalSearch';
-
-const flex = css`
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 12px;
-`;
 
 class HideResults extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			hiddenResults: props.value,
-			currentId: null,
 		};
 		this.globalSearchRef = React.createRef();
 	}
@@ -30,29 +21,21 @@ class HideResults extends Component {
 		}
 	};
 
-	onSuggestionSelect = (selectedSuggestion, cause, source) => {
-		this.setState({
-			currentId: source._id,
-		});
-	};
-
-	onHide = () => {
-		const { currentId, hiddenResults } = this.state;
+	onHide = (...value) => {
+		if (!value[2]) return;
+		const { hiddenResults } = this.state;
+		const currentId = value[2]._id;
 		if (!currentId) return;
 		if (hiddenResults.includes(currentId)) {
 			notification.info({
 				message: 'Hide Result',
 				description: `${currentId} is already hidden.`,
 			});
+			this.clearSearch();
 			return;
 		}
-		this.setState(
-			{ hiddenResults: [...hiddenResults, currentId], currentId: null },
-			this.updateResults,
-		);
-		if (this.globalSearchRef) {
-			this.globalSearchRef.current.handleSearchValueChange('');
-		}
+		this.setState({ hiddenResults: [...hiddenResults, currentId] }, this.updateResults);
+		this.clearSearch();
 	};
 
 	onClose = (e, id) => {
@@ -65,28 +48,30 @@ class HideResults extends Component {
 		}
 	};
 
+	clearSearch() {
+		if (this.globalSearchRef) {
+			this.globalSearchRef.current.handleSearchValueChange('');
+		}
+	}
+
 	render() {
 		const { indexes, dataFields } = this.props;
 		const { hiddenResults } = this.state;
 		return (
 			<div>
 				<ReactiveBase
-					app={indexes.join(',')}
+					app={indexes.join(',') || '*'}
 					url={getURL()}
 					credentials={atob(sessionStorage.getItem('authToken'))}
-					className={flex}
+					style={{ marginBottom: 12 }}
 				>
-					<div style={{ width: '100%', marginRight: 5 }}>
-						<GlobalSearch
-							indexes={indexes}
-							onSuggestionSelect={this.onSuggestionSelect}
-							dataFields={dataFields}
-							ref={this.globalSearchRef}
-						/>
-					</div>
-					<Button type="primary" onClick={this.onHide}>
-						Hide
-					</Button>
+					<GlobalSearch
+						indexes={indexes}
+						onValueSelected={this.onHide}
+						dataFields={dataFields}
+						ref={this.globalSearchRef}
+						// onKeyDown={this.handleAdd}
+					/>
 				</ReactiveBase>
 				<div>
 					{hiddenResults.map(id => (

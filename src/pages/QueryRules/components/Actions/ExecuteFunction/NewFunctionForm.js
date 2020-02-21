@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
 
-import { Button, notification, message } from 'antd';
-import { handleInputClosure } from '../../../../../components/DeployFunctionModal/helper';
+import { Button, notification, Result } from 'antd';
+import {
+	deploymentCheck,
+	handleInputClosure,
+} from '../../../../../components/DeployFunctionModal/helper';
 import { DeployFunctionForm } from '../../../../../components/DeployFunctionModal/DeployFunctionForm';
-import { createFunction } from '../../../../../batteries/utils/app';
+import { createFunction, getSingleFunction } from '../../../../../batteries/utils/app';
 import TestFunction from './TestFunction';
 
 class NewFunctionForm extends Component {
-	state = { error: {}, success: false };
+	state = { error: {}, deploymentStatus: null };
 
 	setFormValue = (key, value) => {
 		this.setState({ [key]: value });
@@ -18,20 +21,25 @@ class NewFunctionForm extends Component {
 	handleSubmit = async e => {
 		e.preventDefault();
 		const { functionName, dockerImage } = this.state;
-		const { onSuccess, setActiveKey, onChange } = this.props;
+		const { onSuccess, onChange } = this.props;
 		this.setError({
 			functionName: !functionName,
 			dockerImage: !dockerImage,
 		});
 		if ([functionName, dockerImage].some(item => !item)) return;
+		let myInterval = null;
+		const handleDeploymentCheck = async () => {
+			const res = await deploymentCheck(getSingleFunction, functionName, myInterval);
+			this.setState({ deploymentStatus: res.deploymentStatus });
+		};
 		this.setState({ loading: true });
 		try {
 			const response = await createFunction(functionName, { image: dockerImage });
-			message.success(`${functionName} deployed successfully`);
+			myInterval = setInterval(handleDeploymentCheck, 7000);
 			// setActiveKey('trigger');
 			if (onChange) onChange(response);
 			if (onSuccess) onSuccess(functionName);
-			this.setState({ loading: false, success: true });
+			this.setState({ loading: false, deploymentStatus: 'in_progress' });
 			// eslint-disable-next-line no-shadow
 		} catch (e) {
 			notification.error({
@@ -43,9 +51,20 @@ class NewFunctionForm extends Component {
 	};
 
 	render() {
-		const { functionName, dockerImage, radioValue, error, loading, success } = this.state;
+		const {
+			functionName,
+			dockerImage,
+			radioValue,
+			error,
+			loading,
+			deploymentStatus,
+		} = this.state;
 		const handleInputRequired = handleInputClosure(this.setError, error);
-		if (success) return <TestFunction functionName={functionName} />;
+		if (deploymentStatus === 'in_progress')
+			return <Result subTitle="Deployment in progress..." />;
+		if (deploymentStatus === 'failed')
+			return <Result status="500" subTitle="Sorry, the function failed to deploy." />;
+		if (deploymentStatus === 'active') return <TestFunction functionName={functionName} />;
 		return (
 			<>
 				<DeployFunctionForm

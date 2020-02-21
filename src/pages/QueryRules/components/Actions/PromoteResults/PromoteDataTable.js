@@ -24,6 +24,7 @@ export function PromoteDataTable({ positionRender, dataRender, dataSource, actio
 					title: 'Position',
 					dataIndex: 'position',
 					render: positionRender,
+					width: 100,
 				},
 				{
 					title: (
@@ -59,7 +60,9 @@ export function PromoteDataTable({ positionRender, dataRender, dataSource, actio
 }
 
 export function PromotePosition({ value, onChange }) {
-	return <InputNumber value={Number(value)} onChange={onChange} min={1} />;
+	return (
+		<InputNumber style={{ width: '100%' }} value={Number(value)} onChange={onChange} min={1} />
+	);
 }
 
 export function PromoteJSONView({ record }) {
@@ -73,7 +76,7 @@ export function PromoteJSONView({ record }) {
 				}
 				trigger="click"
 			>
-				<span
+				<div
 					css={{
 						cursor: 'pointer',
 						margin: '0 7px',
@@ -83,7 +86,7 @@ export function PromoteJSONView({ record }) {
 				>
 					{` {...} `}
 					{get(record, 'doc._id')}
-				</span>
+				</div>
 			</Popover>
 		</>
 	);

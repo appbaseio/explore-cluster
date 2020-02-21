@@ -44,7 +44,7 @@ class ActionView extends React.Component {
 						<h4 className={subTitle}>Promote Result</h4>
 						{action.data.map(item => (
 							<Tag color="blue" key={item.doc.id}>
-								{item.doc.id}
+								{item.doc._id}
 							</Tag>
 						))}
 					</React.Fragment>

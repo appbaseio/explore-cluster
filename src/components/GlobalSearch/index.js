@@ -24,7 +24,13 @@ class GlobalSearch extends PureComponent {
 	};
 
 	render() {
-		const { onSuggestionSelect, className, dataFields } = this.props;
+		const {
+			onSuggestionSelect,
+			className,
+			dataFields,
+			onKeyDown,
+			onValueSelected,
+		} = this.props;
 		const { searchValue } = this.state;
 		return (
 			<div className={inputBox} css={{ position: 'relative' }}>
@@ -55,6 +61,8 @@ class GlobalSearch extends PureComponent {
 					showDistinctSuggestions
 					onChange={this.handleSearchValueChange}
 					value={searchValue}
+					onKeyDown={onKeyDown}
+					onValueSelected={onValueSelected}
 				/>
 				<Icon
 					className="search-icon"

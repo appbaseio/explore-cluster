@@ -13,7 +13,7 @@ const title = css`
 	justify-content: space-between;
 `;
 
-function getPayload(parsedData, executeBefore) {
+export function getPayload(parsedData, executeBefore) {
 	return {
 		extraRequestPayload: parsedData,
 		request: {

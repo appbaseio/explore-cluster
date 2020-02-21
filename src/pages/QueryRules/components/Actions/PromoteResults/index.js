@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { ReactiveBase } from '@appbaseio/reactivesearch';
-import { Button, notification } from 'antd';
-import { css } from 'emotion';
+import { notification } from 'antd';
 import { getURL } from '../../../../../constants/config';
 import GlobalSearch from '../../../../../components/GlobalSearch';
 import {
@@ -11,20 +10,11 @@ import {
 	PromotePosition,
 } from './PromoteDataTable';
 
-const flex = css`
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 12px;
-`;
-
 class PromoteResults extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			selectedSuggestion: null,
 			dataSource: props.value || [],
-			suggestionSource: null,
 		};
 		this.globalSearchRef = React.createRef();
 	}
@@ -37,21 +27,23 @@ class PromoteResults extends Component {
 		}
 	};
 
-	handleAdd = () => {
-		const { dataSource, selectedSuggestion, suggestionSource } = this.state;
+	handleAdd = (...value) => {
+		if (!value[2]) return;
+		const { dataSource } = this.state;
+		// eslint-disable-next-line no-unused-vars
+		const [selectedSuggestion, _, suggestionSource] = value;
 		if (!selectedSuggestion) return;
 		if (dataSource.findIndex(item => item.doc._id === suggestionSource._id) > -1) {
 			notification.info({
 				message: 'Promote Result',
 				description: `${selectedSuggestion} is already promoted.`,
 			});
+			this.clearSearch();
 			return;
 		}
 		const newData = [...dataSource, { position: 1, doc: suggestionSource }];
-		this.setState({ dataSource: newData, selectedSuggestion: null }, this.updateResults);
-		if (this.globalSearchRef) {
-			this.globalSearchRef.current.handleSearchValueChange('');
-		}
+		this.setState({ dataSource: newData }, this.updateResults);
+		this.clearSearch();
 	};
 
 	handleItemChange = (value, index, field) => {
@@ -81,30 +73,30 @@ class PromoteResults extends Component {
 		);
 	};
 
+	clearSearch() {
+		if (this.globalSearchRef) {
+			this.globalSearchRef.current.handleSearchValueChange('');
+		}
+	}
+
 	render() {
 		const { indexes, dataFields } = this.props;
 		const { dataSource } = this.state;
 		return (
 			<div>
 				<ReactiveBase
-					app={indexes.join(',')}
+					app={indexes.join(',') || '*'}
 					url={getURL()}
 					credentials={atob(sessionStorage.getItem('authToken'))}
-					className={flex}
+					style={{ marginBottom: 12 }}
 				>
-					<div style={{ width: '100%', marginRight: 5 }}>
-						<GlobalSearch
-							indexes={indexes}
-							onSuggestionSelect={(selectedSuggestion, cause, source) => {
-								this.setState({ selectedSuggestion, suggestionSource: source });
-							}}
-							dataFields={dataFields}
-							ref={this.globalSearchRef}
-						/>
-					</div>
-					<Button type="primary" onClick={this.handleAdd}>
-						Promote
-					</Button>
+					<GlobalSearch
+						indexes={indexes}
+						onValueSelected={this.handleAdd}
+						dataFields={dataFields}
+						ref={this.globalSearchRef}
+						// onKeyDown={this.handleAdd}
+					/>
 				</ReactiveBase>
 				<PromoteDataTable
 					positionRender={(text, record, index) => (

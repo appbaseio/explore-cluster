@@ -2,9 +2,16 @@ import React, { Component } from 'react';
 import { FUNCTIONS } from '../../../../../constants';
 import { InvokeFunctionBody } from '../../../../../components/InvokeFunctionModal/InvokeFunctionBody';
 import { invokeFunction } from '../../../../../batteries/utils/app';
+import { getPayload } from '../../../../../components/InvokeFunctionModal';
 
 class TestFunction extends Component {
-	state = { isValidJSON: true, invokeState: FUNCTIONS.NOT_INVOKED, loading: false };
+	state = {
+		isValidJSON: true,
+		invokeState: FUNCTIONS.NOT_INVOKED,
+		loading: false,
+		requestData: JSON.stringify(getPayload({}, true), null, 2),
+		parsedData: getPayload({}, true),
+	};
 
 	handleRequestDataChange = value => {
 		let isValid = true;

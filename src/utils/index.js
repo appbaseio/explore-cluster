@@ -1,4 +1,4 @@
-import { chain, keys } from 'lodash';
+import { chain, get, keys } from 'lodash';
 import { notification } from 'antd';
 import { getURL } from '../constants/config';
 import { updateFunctions } from '../batteries/utils/app';
@@ -412,4 +412,12 @@ export function updateFunction(selectedFunction, res) {
 				});
 			});
 	}
+}
+
+export function getSelectedIndexes(selectedIndexes, mappings) {
+	if ((selectedIndexes || []).length === 0 || get(selectedIndexes, 0) === '*') {
+		return keys(mappings)
+			.filter(key => !key.startsWith('.'));
+	}
+	return selectedIndexes;
 }
