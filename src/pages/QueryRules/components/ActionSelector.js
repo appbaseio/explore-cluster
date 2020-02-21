@@ -13,14 +13,14 @@ const cardStyles = css`
 const actions = {
 	promote_result: { name: 'Promote Result', data: [] },
 	hide_result: { name: 'Hide Result', data: [] },
-	replace_search_term: { name: 'Replace Search Term', data: '' },
+	replace_search_term: { name: 'Replace Search Term', data: '', isDisabledOnAlways: true },
 	custom_data: { name: 'Return Custom Data', data: '' },
 	function: { name: 'f(x) Apply Function', data: '' },
 };
 
 class ActionSelector extends React.Component {
 	shouldComponentUpdate(nextProps) {
-		return hasValuesChanged(nextProps, this.props, ['actions', 'error']);
+		return hasValuesChanged(nextProps, this.props, ['actions', 'error', 'condition']);
 	}
 
 	handleDropdown = value => {
@@ -33,7 +33,7 @@ class ActionSelector extends React.Component {
 	};
 
 	render() {
-		const { actions: selectedActions, error } = this.props;
+		const { actions: selectedActions, error, condition } = this.props;
 		const optionsToShow = Object.keys(actions).filter(
 			action => !selectedActions.find(item => item.type === action),
 		);
@@ -48,7 +48,16 @@ class ActionSelector extends React.Component {
 						value={undefined}
 					>
 						{optionsToShow.map(action => (
-							<Option key={action}>{actions[action].name}</Option>
+							<Option
+								disabled={
+									condition === 'always'
+										? actions[action].isDisabledOnAlways
+										: false
+								}
+								key={action}
+							>
+								{actions[action].name}
+							</Option>
 						))}
 					</Select>
 				) : (

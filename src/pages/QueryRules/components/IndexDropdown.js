@@ -10,10 +10,6 @@ import { hasValuesChanged } from '../utils';
 const { Option } = Select;
 
 class IndexDropdown extends React.Component {
-	state = {
-		selectedIndexes: ['*'],
-	};
-
 	componentDidMount() {
 		const { apps, fetchApps } = this.props;
 
@@ -27,37 +23,21 @@ class IndexDropdown extends React.Component {
 	}
 
 	handleChange = values => {
-		const { onChange } = this.props;
-		this.setState(
-			prevState => {
-				const isAllIndex = prevState.selectedIndexes.includes('*');
-				const isSelectingAllIndex = values.includes('*');
+		const { onChange, selectedIndexes } = this.props;
+		const isAllIndex = selectedIndexes.includes('*');
+		const isSelectingAllIndex = values.includes('*');
 
-				if (isAllIndex) {
-					return {
-						selectedIndexes: values.filter(index => index !== '*'),
-					};
-				}
-				if (isSelectingAllIndex) {
-					return {
-						selectedIndexes: ['*'],
-					};
-				}
-
-				return {
-					selectedIndexes: values,
-				};
-			},
-			() => {
-				const { selectedIndexes } = this.state;
-				onChange(selectedIndexes);
-			},
-		);
+		if (isAllIndex) {
+			onChange(values.filter(index => index !== '*'));
+		} else if (isSelectingAllIndex) {
+			onChange(['*']);
+		} else {
+			onChange(values);
+		}
 	};
 
 	render() {
-		const { apps, error } = this.props;
-		const { selectedIndexes } = this.state;
+		const { apps, error, selectedIndexes } = this.props;
 
 		if (!apps) {
 			return null;

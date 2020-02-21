@@ -542,6 +542,7 @@ class QueryRulesForm extends React.Component {
 									</label>
 									{getErrorMessage(error.selectedIndexes)}
 									<IndexDropdown
+										selectedIndexes={selectedIndexes}
 										error={error && error.selectedIndexes}
 										onChange={this.handleIndex}
 									/>
@@ -586,6 +587,7 @@ class QueryRulesForm extends React.Component {
 								<ActionSelector
 									error={error && error.actions}
 									actions={actions}
+									condition={condition}
 									onChange={this.setActions}
 								/>
 							</Col>
