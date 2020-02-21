@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import { Button, notification, Result } from 'antd';
+import { Button, notification, Result, Spin } from 'antd';
 import {
 	deploymentCheck,
 	handleInputClosure,
@@ -61,7 +61,20 @@ class NewFunctionForm extends Component {
 		} = this.state;
 		const handleInputRequired = handleInputClosure(this.setError, error);
 		if (deploymentStatus === 'in_progress')
-			return <Result subTitle="Deployment in progress..." />;
+			return (
+				<div
+					style={{
+						display: 'flex',
+						justifyContent: 'center',
+						alignItems: 'center',
+						flexDirection: 'column',
+						paddingTop: 30,
+					}}
+				>
+					<Spin />
+					<h3> Hang tight deployment in progress!</h3>
+				</div>
+			);
 		if (deploymentStatus === 'failed')
 			return <Result status="500" subTitle="Sorry, the function failed to deploy." />;
 		if (deploymentStatus === 'active') return <TestFunction functionName={functionName} />;
@@ -76,7 +89,7 @@ class NewFunctionForm extends Component {
 					dockerImage={dockerImage}
 					setDockerImage={value => this.setFormValue('dockerImage', value)}
 					onChange={e => this.setFormValue('radioValue', e.target.value)}
-					value={radioValue}
+					value={radioValue || 'yes'}
 				/>
 				<Button
 					loading={loading}
