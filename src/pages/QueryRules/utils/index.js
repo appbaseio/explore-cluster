@@ -91,6 +91,7 @@ const hasValuesChanged = (prevValue, nextValue, keys) => {
 };
 
 const validPlans = [
+	'2019-production-1',
 	'2019-production-2',
 	'2019-production-3',
 	'2019-production-4',
