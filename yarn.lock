@@ -1839,22 +1839,22 @@ anymatch@^2.0.0:
     micromatch "^3.1.4"
     normalize-path "^2.1.1"
 
-appbase-js@^4.0.1-beta:
-  version "4.0.1-beta"
-  resolved "https://registry.yarnpkg.com/appbase-js/-/appbase-js-4.0.1-beta.tgz#ed597ae1c37174d765bff75bd73028c71f8be6d8"
-  integrity sha512-G4ZQSrBIgCZPl5bb6a+01hGdgh5Cpp+jiPqsGscXkRRAs5m7x3EmR8jEUBlqIzNWymERGqfp1SmPhdMApLdJgA==
+appbase-js@^4.0.2-beta.11:
+  version "4.0.2-beta.11"
+  resolved "https://registry.yarnpkg.com/appbase-js/-/appbase-js-4.0.2-beta.11.tgz#fbc87723983fb869e0cb9d70c7c5d8707164133f"
+  integrity sha512-bRMV12r3GFk2LO9V2/AFON9IzGg7uN1fLl5AtZVh6M8Pn+gIL+G5Z7VaFxU9Q66y13iuEWftxVneNKtkkUhu8g==
   dependencies:
     cross-fetch "^2.2.2"
     json-stable-stringify "^1.0.1"
     querystring "^0.2.0"
     stream "^0.0.2"
     url-parser-lite "^0.1.0"
-    ws "^2.2.0"
+    ws "^6.1.2"
 
-appbase-js@^4.0.2-beta.11:
-  version "4.0.2-beta.11"
-  resolved "https://registry.yarnpkg.com/appbase-js/-/appbase-js-4.0.2-beta.11.tgz#fbc87723983fb869e0cb9d70c7c5d8707164133f"
-  integrity sha512-bRMV12r3GFk2LO9V2/AFON9IzGg7uN1fLl5AtZVh6M8Pn+gIL+G5Z7VaFxU9Q66y13iuEWftxVneNKtkkUhu8g==
+appbase-js@^4.0.2-beta.13:
+  version "4.0.2-beta.13"
+  resolved "https://registry.yarnpkg.com/appbase-js/-/appbase-js-4.0.2-beta.13.tgz#1ec8c26a79e398fdd98de49779ba1523d52d8912"
+  integrity sha512-iHMpa1gS8FxX+dNc/E7CiGUXwTIbQMggK6szZ8GbG5n26vmpxFcS6jdVZ24+8f8s5cMTCiePfu/a84HQpOD35A==
   dependencies:
     cross-fetch "^2.2.2"
     json-stable-stringify "^1.0.1"
@@ -11491,11 +11491,6 @@ safe-buffer@>=5.1.0, safe-buffer@^5.0.1, safe-buffer@^5.1.0, safe-buffer@^5.1.1,
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.2.0.tgz#b74daec49b1148f88c64b68d49b1e815c1f2f519"
   integrity sha512-fZEwUGbVl7kouZs1jCdMLdt95hdIv0ZeHg6L7qPeciMZhZ+/gdesW4wgTARkrFWEpspjEATAzUGPG8N2jJiwbg==
 
-safe-buffer@~5.0.1:
-  version "5.0.1"
-  resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.0.1.tgz#d263ca54696cd8a306b5ca6551e92de57918fbe7"
-  integrity sha1-0mPKVGls2KMGtcplUekt5XkY++c=
-
 safe-regex@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/safe-regex/-/safe-regex-1.1.0.tgz#40a3669f3b077d1e943d44629e157dd48023bf2e"
@@ -12699,11 +12694,6 @@ uglifyjs-webpack-plugin@^1.2.4:
     webpack-sources "^1.1.0"
     worker-farm "^1.5.2"
 
-ultron@~1.1.0:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/ultron/-/ultron-1.1.1.tgz#9fe1536a10a664a65266a1e3ccf85fd36302bc9c"
-  integrity sha512-UIEXBNeYmKptWH6z8ZnqTeS8fV74zG0/eRU9VGkpzz+LIJNs8W/zM/L+7ctCkRrgbNnnR0xxw4bKOr0cW0N0Og==
-
 underscore.deferred@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/underscore.deferred/-/underscore.deferred-0.4.0.tgz#2753de633b9ff7db601a2f3fa2af92b3dd290e6c"
@@ -13317,14 +13307,6 @@ write@1.0.3:
   integrity sha512-/lg70HAjtkUgWPVZhZcm+T4hkL8Zbtp1nFNOn3lRrxnlv50SRBv7cR7RqR+GMsd3hUXy9hWBo4CHTbFTcOYwig==
   dependencies:
     mkdirp "^0.5.1"
-
-ws@^2.2.0:
-  version "2.3.1"
-  resolved "https://registry.yarnpkg.com/ws/-/ws-2.3.1.tgz#6b94b3e447cb6a363f785eaf94af6359e8e81c80"
-  integrity sha1-a5Sz5EfLajY/eF6vlK9jWejoHIA=
-  dependencies:
-    safe-buffer "~5.0.1"
-    ultron "~1.1.0"
 
 ws@^6.1.2, ws@^6.2.1:
   version "6.2.1"

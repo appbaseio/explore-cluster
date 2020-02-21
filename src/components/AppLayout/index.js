@@ -107,6 +107,11 @@ const QueryExplorerPage = Loadable({
 	loading: Loader,
 });
 
+const AggsPage = Loadable({
+	loader: () => import('../../pages/AggsPage'),
+	loading: Loader,
+});
+
 class AppLayout extends React.PureComponent {
 	render() {
 		const { collapsed, showHeader } = this.props;
@@ -325,6 +330,19 @@ class AppLayout extends React.PureComponent {
 								<AppPageContainer
 									{...props}
 									component={SandboxPage}
+									shouldFetchAppInfo={false}
+									shouldFetchAppPlan={false}
+								/>
+							)}
+						/>
+
+						<Route
+							exact
+							path="/app/:appName/aggs"
+							render={props => (
+								<AppPageContainer
+									{...props}
+									component={AggsPage}
 									shouldFetchAppInfo={false}
 									shouldFetchAppPlan={false}
 								/>

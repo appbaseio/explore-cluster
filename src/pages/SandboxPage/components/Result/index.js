@@ -1,0 +1,56 @@
+import React from 'react';
+import { Card, Radio, Icon, Row, Button } from 'antd';
+import QueryView from './QueryView';
+import ListView from './ListView';
+
+class Result extends React.Component {
+	state = {
+		view: 'query',
+	};
+
+	handleViewChange = e => {
+		this.setState({
+			view: e.target.value,
+		});
+	};
+
+	render() {
+		const { filters, search, result, app, credentials, url } = this.props;
+		const { view } = this.state;
+		const listIds = filters.map((_, index) => `list-${index}`);
+		return (
+			<Card>
+				<Row type="flex" justify="space-between" align="middle">
+					<Button ghost type="primary">
+						<Icon type="edit" />
+						Set Result View
+					</Button>
+					<Radio.Group value={view} onChange={this.handleViewChange}>
+						<Radio.Button value="list">
+							<Icon style={{ marginRight: 5 }} type="unordered-list" />
+							Results
+						</Radio.Button>
+						<Radio.Button value="query">
+							<Icon style={{ marginRight: 5 }} type="code" />
+							Raw
+						</Radio.Button>
+					</Radio.Group>
+				</Row>
+				{view === 'list' ? (
+					<ListView result={result} listIds={listIds} />
+				) : (
+					<QueryView
+						app={app}
+						credentials={credentials}
+						url={url}
+						filters={filters}
+						search={search}
+						result={result}
+					/>
+				)}
+			</Card>
+		);
+	}
+}
+
+export default Result;
