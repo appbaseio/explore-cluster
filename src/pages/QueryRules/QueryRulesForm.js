@@ -43,9 +43,9 @@ import { mediaKey } from '../../utils/media';
 const { RangePicker } = DatePicker;
 
 const link = css`
-	font-size: 16px;
+	font-size: 14px;
 	margin-right: 30px;
-
+	cursor: pointer;
 	i {
 		margin-right: 4px;
 	}
@@ -103,7 +103,7 @@ const formStyle = css`
 function DocsLink({ url }) {
 	return (
 		<a href={url} className={link} target="_blank" rel="noopener noreferrer">
-			Check Documentation <Icon type="arrow-right" />
+			Learn more <Icon type="link" />
 		</a>
 	);
 }
