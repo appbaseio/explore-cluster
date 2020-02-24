@@ -52,7 +52,7 @@ const getErrorMessages = state => {
 	function hasError(item) {
 		if (!item.data) return true;
 		if (Array.isArray(item.data)) return !item.data.length;
-		return false;
+		return Object.keys(item.data).length === 0;
 	}
 
 	if (actions.length) {

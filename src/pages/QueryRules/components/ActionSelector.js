@@ -16,6 +16,8 @@ const actions = {
 	replace_search_term: { name: 'Replace Search Term', data: '', isDisabledOnAlways: true },
 	custom_data: { name: 'Return Custom Data', data: '' },
 	function: { name: 'f(x) Apply Function', data: '' },
+	remove_words: { name: 'Remove Word', data: [] },
+	replace_words: { name: 'Replace Word', data: {} },
 };
 
 class ActionSelector extends React.Component {

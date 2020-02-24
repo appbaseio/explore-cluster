@@ -4,11 +4,13 @@ import { css } from 'emotion';
 import DNDWrapper from '../../../../components/DNDWrapper';
 import CustomData from './CustomData';
 import ReplaceSearch from './ReplaceSearch';
+import ReplaceWord from './ReplaceWord';
 import PromoteResults from './PromoteResults';
 import HideResults from './HideResults';
 import ExecuteFunction from './ExecuteFunction';
 import { getErrorMessage } from '../../utils/error';
 import { hasValuesChanged } from '../../utils';
+import RemoveWord from './RemoveWord';
 
 const componentMappings = {
 	replace_search_term: ReplaceSearch,
@@ -16,6 +18,8 @@ const componentMappings = {
 	promote_result: PromoteResults,
 	hide_result: HideResults,
 	function: ExecuteFunction,
+	remove_words: RemoveWord,
+	replace_words: ReplaceWord,
 };
 
 const actionMapping = {
@@ -24,6 +28,8 @@ const actionMapping = {
 	replace_search_term: 'Replace Search Term',
 	custom_data: 'Return Custom Data',
 	function: 'f(x) Apply Function',
+	remove_words: 'Remove Word(s)',
+	replace_words: 'Replace Word',
 };
 
 const errorKeys = Object.keys(actionMapping).map(item => `error.${item}`);
@@ -142,6 +148,30 @@ class Actions extends React.Component {
 			case 'function': {
 				actions = actions.map(action => {
 					if (action.type === 'function') {
+						return {
+							...action,
+							data: value,
+						};
+					}
+					return action;
+				});
+				break;
+			}
+			case 'remove_words': {
+				actions = actions.map(action => {
+					if (action.type === 'remove_words') {
+						return {
+							...action,
+							data: value,
+						};
+					}
+					return action;
+				});
+				break;
+			}
+			case 'replace_words': {
+				actions = actions.map(action => {
+					if (action.type === 'replace_words') {
 						return {
 							...action,
 							data: value,
