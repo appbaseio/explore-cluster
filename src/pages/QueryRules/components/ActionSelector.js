@@ -1,8 +1,9 @@
 import React from 'react';
 import { css } from 'emotion';
-import { Card, Select, Icon } from 'antd';
+import { Card, Icon, Select } from 'antd';
 import { getErrorClass, getErrorMessage } from '../utils/error';
 import { hasValuesChanged } from '../utils';
+import { getFunctionHealthCheck } from '../../../utils';
 
 const { Option } = Select;
 
@@ -15,14 +16,28 @@ const actions = {
 	hide_result: { name: 'Hide Result', data: [] },
 	replace_search_term: { name: 'Replace Search Term', data: '', isDisabledOnAlways: true },
 	custom_data: { name: 'Return Custom Data', data: '' },
-	function: { name: 'f(x) Apply Function', data: '' },
+	function: { name: 'f(x) Apply Function', data: '', checkHealth: true },
 	remove_words: { name: 'Remove Word', data: [] },
 	replace_words: { name: 'Replace Word', data: {} },
 };
 
 class ActionSelector extends React.Component {
-	shouldComponentUpdate(nextProps) {
-		return hasValuesChanged(nextProps, this.props, ['actions', 'error', 'condition']);
+	state = { healthy: true };
+
+	async componentDidMount() {
+		try {
+			await getFunctionHealthCheck();
+		} catch (e) {
+			this.setState({ healthy: false });
+		}
+	}
+
+	shouldComponentUpdate(nextProps, nextState) {
+		const { healthy } = this.state;
+		return (
+			hasValuesChanged(nextProps, this.props, ['actions', 'error', 'condition']) ||
+			healthy !== nextState.healthy
+		);
 	}
 
 	handleDropdown = value => {
@@ -32,6 +47,14 @@ class ActionSelector extends React.Component {
 			type: value,
 			data: actions[value].data,
 		});
+	};
+
+	getDisabled = (condition, action) => {
+		if (actions[action].checkHealth) {
+			const { healthy } = this.state;
+			return !healthy;
+		}
+		return condition === 'always' ? actions[action].isDisabledOnAlways : false;
 	};
 
 	render() {
@@ -50,14 +73,7 @@ class ActionSelector extends React.Component {
 						value={undefined}
 					>
 						{optionsToShow.map(action => (
-							<Option
-								disabled={
-									condition === 'always'
-										? actions[action].isDisabledOnAlways
-										: false
-								}
-								key={action}
-							>
+							<Option disabled={this.getDisabled(condition, action)} key={action}>
 								{actions[action].name}
 							</Option>
 						))}

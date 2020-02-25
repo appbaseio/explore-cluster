@@ -10,6 +10,8 @@ const subTitle = css`
 	font-weight: bold;
 `;
 
+const { Text } = Typography;
+
 class ActionView extends React.Component {
 	shouldComponentUpdate(nextProps) {
 		return hasValuesChanged(nextProps, this.props, 'action');
@@ -85,7 +87,28 @@ class ActionView extends React.Component {
 						</React.Fragment>
 					)
 				);
-
+			case 'remove_words':
+				return action.data ? (
+					<React.Fragment>
+						<h4 className={subTitle}>Remove Search Words</h4>
+						{action.data.map(word => (
+							<Tag>{word}</Tag>
+						))}
+					</React.Fragment>
+				) : null;
+			case 'replace_words':
+				return action.data ? (
+					<React.Fragment>
+						<h4 className={subTitle}>Replace Search Words</h4>
+						<Tag>
+							<Text delete>{action.data.word}</Text>
+						</Tag>
+						with{' '}
+						<Tag style={{ marginLeft: 5 }}>
+							<Text>{action.data.replaceWith}</Text>
+						</Tag>
+					</React.Fragment>
+				) : null;
 			default:
 				return null;
 		}

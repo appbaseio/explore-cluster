@@ -376,7 +376,7 @@ export function getDatafields(mappings, indexes, isSearch = false) {
 		.filter(index => !index.startsWith('.'))
 		.filter(index => hasAllIndex || indexes.includes(index))
 		.reduce((acc, key) => {
-			const { properties } = mappings[key].mappings;
+			const { properties } = get(mappings[key], 'mappings._doc') || mappings[key].mappings;
 			const nestedDataFields = keys(properties).filter(property => {
 				return filtered(properties, property);
 			});
@@ -416,8 +416,7 @@ export function updateFunction(selectedFunction, res) {
 
 export function getSelectedIndexes(selectedIndexes, mappings) {
 	if ((selectedIndexes || []).length === 0 || get(selectedIndexes, 0) === '*') {
-		return keys(mappings)
-			.filter(key => !key.startsWith('.'));
+		return keys(mappings).filter(key => !key.startsWith('.'));
 	}
 	return selectedIndexes;
 }

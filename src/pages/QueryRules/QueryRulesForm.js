@@ -399,8 +399,8 @@ class QueryRulesForm extends React.Component {
 			const [startDate, endDate] = date;
 			this.setState({
 				timeframe: {
-					start_time: moment(startDate).unix() * 1000,
-					end_time: moment(endDate).unix() * 1000,
+					start_time: moment(startDate).unix(),
+					end_time: moment(endDate).unix(),
 				},
 			});
 		} else {
@@ -598,8 +598,8 @@ class QueryRulesForm extends React.Component {
 									value={
 										timeframe
 											? [
-													moment(timeframe.start_time),
-													moment(timeframe.end_time),
+													moment(timeframe.start_time * 1000),
+													moment(timeframe.end_time * 1000),
 											  ]
 											: null
 									}
@@ -745,4 +745,7 @@ const mapDispatchToProps = dispatch => ({
 	removeRule: id => dispatch(deleteRule(id)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(QueryRulesForm);
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps,
+)(QueryRulesForm);
