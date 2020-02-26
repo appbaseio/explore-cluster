@@ -21,7 +21,8 @@ const getParsedRule = rule => {
 };
 
 const getValueFromExpression = expression => {
-	const pattern = /"(.*?)"/;
+	const pattern = /'(.*?)'/;
+	const doubleQuote = /"(.*?)"/;
 	const allQueries = expression.split('and');
 	const value = {
 		dataField: '',
@@ -33,22 +34,30 @@ const getValueFromExpression = expression => {
 	const searchQuery = allQueries.find(query => query.includes('$query'));
 	const filterQuery = allQueries.find(query => query.includes('$filter'));
 	if (indexQuery) {
-		value.selectedIndexes = indexQuery.match(pattern)[1].split(',');
+		const isDoubleQuotePresent = indexQuery.includes(`"`);
+		value.selectedIndexes = indexQuery
+			.match(isDoubleQuotePresent ? doubleQuote : pattern)[1]
+			.split(',');
 	}
 
 	if (searchQuery) {
-		value.queryValue = searchQuery.match(pattern)[1];
+		const isDoubleQuotePresent = searchQuery.includes(`"`);
+		value.queryValue = searchQuery.match(isDoubleQuotePresent ? doubleQuote : pattern)[1];
 		value.query = searchQuery
 			.replace('$query', '')
+			.replace(`'${value.queryValue}'`, '')
 			.replace(`"${value.queryValue}"`, '')
 			.trim();
 	}
 
 	if (filterQuery) {
-		value.dataFieldValue = filterQuery.match(pattern)[1];
+		const isDoubleQuotePresent = filterQuery.includes(`"`);
+
+		value.dataFieldValue = filterQuery.match(isDoubleQuotePresent ? doubleQuote : pattern)[1];
 		value.dataField = filterQuery
 			.replace('$filter.', '')
 			.replace('matches', '')
+			.replace(`'${value.dataFieldValue}'`, '')
 			.replace(`"${value.dataFieldValue}"`, '')
 			.trim();
 	}
@@ -64,15 +73,15 @@ const getExpressionFromValue = ({
 	selectedIndexes,
 	condition,
 }) => {
-	let expression = `"${selectedIndexes.join(',')}" in $index`;
+	let expression = `'${selectedIndexes.join(',')}' in $index`;
 
 	if (condition === 'filter') {
 		if (query && queryValue) {
-			expression = `${expression} and $query ${query} "${queryValue}"`;
+			expression = `${expression} and $query ${query} '${queryValue}'`;
 		}
 
 		if (dataField && dataFieldValue) {
-			expression = `${expression} and $filter.${dataField} matches "${dataFieldValue}"`;
+			expression = `${expression} and $filter.${dataField} matches '${dataFieldValue}'`;
 		}
 	}
 
