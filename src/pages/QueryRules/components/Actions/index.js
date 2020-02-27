@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Card, Icon, Tooltip, Typography } from 'antd';
 import { css } from 'emotion';
+import { Info } from 'react-feather';
 import DNDWrapper from '../../../../components/DNDWrapper';
 import CustomData from './CustomData';
 import ReplaceSearch from './ReplaceSearch';
@@ -258,9 +259,27 @@ class Actions extends React.Component {
 												className="drag-icon"
 											/>
 										</Tooltip>
-										<Typography.Text strong>
-											{actionMapping[item.type]}
-										</Typography.Text>
+										<Tooltip title={item.toolTip}>
+											<div
+												style={{
+													display: 'inline-flex',
+													justifyContent: 'center',
+													alignItems: 'center',
+												}}
+											>
+												<Typography.Text strong>
+													{actionMapping[item.type]}
+												</Typography.Text>
+
+												<Info
+													style={{
+														marginLeft: 5,
+														color: '#898989',
+														height: 20,
+													}}
+												/>
+											</div>
+										</Tooltip>
 									</div>
 									<div>
 										<Button
