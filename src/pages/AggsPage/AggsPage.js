@@ -2,7 +2,19 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
 import { css } from 'emotion';
-import { Card, Select, Affix, Row, Button, Col, Dropdown, Icon, Menu } from 'antd';
+import {
+	Card,
+	Select,
+	Affix,
+	Row,
+	Button,
+	Col,
+	Dropdown,
+	Icon,
+	Menu,
+	InputNumber,
+	Switch,
+} from 'antd';
 
 import { getAppMappings } from '../../batteries/modules/actions';
 import { getURL } from '../../constants/config';
@@ -17,10 +29,35 @@ const container = css`
 	padding: 50px;
 `;
 
+const cardStyle = css`
+	label {
+		display: block;
+		font-weight: 500;
+		margin-bottom: 5px;
+		color: rgba(0, 0, 0, 0.85);
+	}
+
+	.input {
+		margin-bottom: 15px;
+		min-width: 200px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.input.no-bottom {
+		margin-bottom: 0;
+	}
+`;
+
 class AggsPage extends React.Component {
 	state = {
 		searchableMappings: [],
 		aggTypes: {},
+		dataField: {},
+		count: '',
+		sort: undefined,
+		includeNullValue: false,
 	};
 
 	mappingsRef = React.createRef(null);
@@ -78,13 +115,27 @@ class AggsPage extends React.Component {
 	};
 
 	handleAggType = (address, value) => {
+		const parsedAddress = address.split('.').reduce((agg, key, index) => {
+			if (index % 2 !== 0) {
+				return agg ? `${agg}.${key}` : key;
+			}
+			return agg;
+		}, '');
 		this.setState(prevState => ({
 			aggTypes: { ...prevState.aggTypes, [address]: value },
+			dataField: { ...prevState.dataField, [parsedAddress]: value },
 		}));
 	};
 
+	handleChange = (name, value) => {
+		this.setState({
+			[name]: value,
+		});
+	};
+
 	render() {
-		const { searchableMappings, aggTypes } = this.state;
+		const { searchableMappings, aggTypes, sort, count, includeNullValue } = this.state;
+		const sortOptions = ['Count', 'Ascending', 'Descending'];
 		return (
 			<div className={container}>
 				<Card>
@@ -125,7 +176,7 @@ class AggsPage extends React.Component {
 							},
 						}}
 						renderFooter={({ cancelChanges, confirmChanges, isDirty }) => (
-							<Affix offsetBottom={0}>
+							<Affix offsetBottom={73}>
 								<Row
 									style={{
 										padding: 10,
@@ -143,7 +194,7 @@ class AggsPage extends React.Component {
 												showSearch
 												placeholder="Add new aggregation field"
 												optionFilterProp="children"
-												style={{ width: 200 }}
+												style={{ minWidth: 200 }}
 												onChange={this.handleAddField}
 												filterOption={(input, option) =>
 													option.props.children
@@ -181,6 +232,58 @@ class AggsPage extends React.Component {
 						)}
 					/>
 				</Card>
+				<Card className={cardStyle}>
+					<label>
+						Default Size For Aggregations <Icon type="info-circle" />
+					</label>
+					<InputNumber
+						onChange={value => this.handleChange('count', value)}
+						value={count}
+						min={10}
+						placeholder="Enter default aggs size"
+						className="input"
+					/>
+					<label>
+						Default Sort <Icon type="info-circle" />
+					</label>
+					<Select
+						placeholder="Select default Sort"
+						value={sort}
+						optionFilterProp="children"
+						style={{ minWidth: 200, marginBottom: '15px' }}
+						onChange={value => this.handleChange('sort', value)}
+						filterOption={(input, option) =>
+							option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+						}
+					>
+						{sortOptions.map(sortOption => (
+							<Option key={sortOption} value={sortOption.toLowerCase()}>
+								{sortOption}
+							</Option>
+						))}
+					</Select>
+					<label>
+						Include Null Values <Icon type="info-circle" />
+					</label>
+					<Switch
+						checked={includeNullValue}
+						onChange={value => this.handleChange('includeNullValue', value)}
+					/>
+				</Card>
+				<Affix offsetBottom={0}>
+					<div
+						style={{
+							padding: 20,
+							background: 'white',
+							boxShadow: 'rgba(0, 0, 0, 0.1) 0px -4px 7px 0px',
+						}}
+					>
+						<Button type="primary">
+							<Icon type="save" />
+							Save Settings
+						</Button>
+					</div>
+				</Affix>
 			</div>
 		);
 	}
