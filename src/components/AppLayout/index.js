@@ -112,6 +112,11 @@ const AggsPage = Loadable({
 	loading: Loader,
 });
 
+const SearchSettingsPage = Loadable({
+	loader: () => import('../../pages/SearchSettingsPage'),
+	loading: Loader,
+});
+
 class AppLayout extends React.PureComponent {
 	render() {
 		const { collapsed, showHeader } = this.props;
@@ -343,6 +348,19 @@ class AppLayout extends React.PureComponent {
 								<AppPageContainer
 									{...props}
 									component={AggsPage}
+									shouldFetchAppInfo={false}
+									shouldFetchAppPlan={false}
+								/>
+							)}
+						/>
+
+						<Route
+							exact
+							path="/app/:appName/search-settings"
+							render={props => (
+								<AppPageContainer
+									{...props}
+									component={SearchSettingsPage}
 									shouldFetchAppInfo={false}
 									shouldFetchAppPlan={false}
 								/>
