@@ -97,6 +97,7 @@ export const defaultRateLimits = {
 	analytics: 10,
 	streams: 10,
 	rules: 10,
+	reactivesearch: 10,
 };
 // Acl options
 export const aclOptions = [
@@ -111,6 +112,7 @@ export const aclOptions = [
 	'analytics',
 	'streams',
 	'rules',
+	'reactivesearch',
 ];
 // Default Selected Acl
 export const defaultAclOptions = aclOptions;
@@ -136,6 +138,7 @@ export const aclOptionsLabel = {
 	permission: 'permission',
 	analytics: 'analytics',
 	streams: 'streams',
+	reactivesearch: 'reactivesearch',
 	rules: 'rules',
 };
 
