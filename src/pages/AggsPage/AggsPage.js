@@ -14,20 +14,33 @@ import {
 	Menu,
 	InputNumber,
 	Switch,
+	notification,
+	message,
 } from 'antd';
 
-import { getAppMappings } from '../../batteries/modules/actions';
+import {
+	getAppMappings,
+	putSettings,
+	getDefaultSettings,
+	getSettings,
+} from '../../batteries/modules/actions';
 import { getURL } from '../../constants/config';
 import Mappings from '../../batteries/components/Mappings/Mappings';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import { getAggsMappings } from '../../batteries/utils/mappings';
 import { dropdown } from '../../batteries/components/Mappings/styles';
+import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 
 const { Option } = Select;
 
 const container = css`
 	padding: 50px;
 `;
+
+const bannerMessage = {
+	title: 'Aggregations Settings',
+	buttonText: 'Read Docs',
+};
 
 const cardStyle = css`
 	label {
@@ -53,24 +66,25 @@ const cardStyle = css`
 class AggsPage extends React.Component {
 	state = {
 		searchableMappings: [],
-		aggTypes: {},
 		dataField: {},
 		count: '',
 		sort: undefined,
 		includeNullValue: false,
+		isDirty: false,
 	};
 
 	mappingsRef = React.createRef(null);
 
 	async componentDidMount() {
-		const { appName, credentials, fetchMappings } = this.props;
+		const { appName, credentials, fetchMappings, getSettingsAction } = this.props;
 		const url = getURL();
 
+		getSettingsAction(appName);
 		fetchMappings(appName, credentials, url);
 	}
 
 	componentDidUpdate(prevProps) {
-		const { mappings } = this.props;
+		const { mappings, settings, isLoading } = this.props;
 		if (mappings && JSON.stringify(prevProps.mappings) !== JSON.stringify(mappings)) {
 			const searchableMappings = this.getSearchableMappings(mappings);
 
@@ -79,7 +93,20 @@ class AggsPage extends React.Component {
 				searchableMappings,
 			});
 		}
+
+		if (prevProps.isLoading !== isLoading && !isLoading && settings && settings.aggregations) {
+			this.initData(settings);
+		}
 	}
+
+	initData = settings => {
+		this.setState({
+			count: settings.aggregations.size,
+			sort: settings.aggregations.sortBy,
+			includeNullValue: settings.aggregations.includeNullValues,
+			dataField: settings.aggregations.dataField,
+		});
+	};
 
 	getSearchableMappings = mappings => {
 		const parsedMappings = getAggsMappings(mappings, true);
@@ -96,8 +123,13 @@ class AggsPage extends React.Component {
 	handleMappingChange = mappings => {
 		const searchableMappings = this.getSearchableMappings(mappings);
 
+		let isDirty = false;
+		if (get(this.mappingsRef, 'current.wrappedInstance', null)) {
+			isDirty = get(this.mappingsRef, 'current.wrappedInstance.state.dirty');
+		}
 		this.setState({
 			searchableMappings,
+			isDirty,
 		});
 	};
 
@@ -115,15 +147,8 @@ class AggsPage extends React.Component {
 	};
 
 	handleAggType = (address, value) => {
-		const parsedAddress = address.split('.').reduce((agg, key, index) => {
-			if (index % 2 !== 0) {
-				return agg ? `${agg}.${key}` : key;
-			}
-			return agg;
-		}, '');
 		this.setState(prevState => ({
-			aggTypes: { ...prevState.aggTypes, [address]: value },
-			dataField: { ...prevState.dataField, [parsedAddress]: value },
+			dataField: { ...prevState.dataField, [address]: value },
 		}));
 	};
 
@@ -133,158 +158,229 @@ class AggsPage extends React.Component {
 		});
 	};
 
+	handleSave = () => {
+		const { isDirty, dataField, sort, count, includeNullValue } = this.state;
+		const { updateSettingsAction, appName, settings } = this.props;
+		const reIndex = get(this.mappingsRef, 'current.wrappedInstance.reIndex');
+
+		updateSettingsAction(appName, {
+			...settings,
+			aggregations: {
+				...settings.aggregations,
+				dataField,
+				size: count,
+				sortBy: sort,
+				includeNullValues: includeNullValue,
+			},
+		})
+			.then(res => {
+				if (res && res.error) {
+					notification.error({
+						message: 'Failed to save Aggregation Settings',
+						description: res.error.message,
+					});
+				} else {
+					message.success(`Aggregation settings for ${appName} saved successfully`);
+
+					if (isDirty) {
+						reIndex();
+					}
+				}
+			})
+			.catch(e => {
+				notification.error({
+					message: 'Failed to save Aggregation Settings',
+					description: e.message,
+				});
+			});
+	};
+
+	resetChanges = () => {
+		const cancelChanges = get(this.mappingsRef, 'current.wrappedInstance.cancelChanges');
+		const { settings } = this.props;
+		this.initData(settings);
+		cancelChanges();
+	};
+
 	render() {
-		const { searchableMappings, aggTypes, sort, count, includeNullValue } = this.state;
-		const sortOptions = ['Count', 'Ascending', 'Descending'];
+		const {
+			searchableMappings,
+			dataField,
+			sort,
+			count,
+			includeNullValue,
+			isDirty,
+		} = this.state;
+		const { isUpdating } = this.props;
+		const sortOptions = [
+			{ name: 'Count', value: 'count' },
+			{ name: 'Ascending', value: 'asc' },
+			{ name: 'Descending', value: 'desc' },
+		];
 		return (
-			<div className={container}>
-				<Card>
-					<Mappings
-						showSynonyms={false}
-						showShards={false}
-						ref={this.mappingsRef}
-						showReplicas={false}
-						showMappingInfo={false}
-						showCardWrapper={false}
-						hideSearchType
-						hideDelete
-						hideDataType
-						onChange={this.handleMappingChange}
-						column={{
-							title: 'Aggregation Type',
-							render: ({ fields, field, address }) => {
-								const hasKeyword = !!get(fields, `${field}.fields.keyword`, false);
-								let options = ['term', 'range'];
-								if (hasKeyword) {
-									options = ['term'];
-								}
-								const menu = (
-									<Menu onClick={e => this.handleAggType(address, e.key)}>
-										{options.map(option => (
-											<Menu.Item key={option}>{option}</Menu.Item>
-										))}
-									</Menu>
-								);
-								return (
-									<Dropdown overlay={menu}>
-										<Button className={dropdown}>
-											{aggTypes[address] || 'Select Type'}
-											<Icon type="down" />
-										</Button>
-									</Dropdown>
-								);
-							},
-						}}
-						renderFooter={({ cancelChanges, confirmChanges, isDirty }) => (
-							<Affix offsetBottom={73}>
-								<Row
-									style={{
-										padding: 10,
-										border: '1px solid #e8e8e8',
-										background: 'white',
-										width: '100%',
-									}}
-									type="flex"
-									justify="space-between"
-								>
-									<Col>
-										{searchableMappings.length ? (
-											<Select
-												key={searchableMappings.length}
-												showSearch
-												placeholder="Add new aggregation field"
-												optionFilterProp="children"
-												style={{ minWidth: 200 }}
-												onChange={this.handleAddField}
-												filterOption={(input, option) =>
-													option.props.children
-														.toLowerCase()
-														.indexOf(input.toLowerCase()) >= 0
-												}
-											>
-												{searchableMappings.map(mapping => (
-													<Option
-														key={mapping._address}
-														value={mapping._address}
-													>
-														{mapping.address}
-													</Option>
-												))}
-											</Select>
-										) : null}
-									</Col>
-									<Col>
-										{isDirty && (
-											<React.Fragment>
-												<Button
-													type="primary"
-													style={{ margin: '0 10px' }}
-													onClick={confirmChanges}
+			<React.Fragment>
+				<Banner {...bannerMessage} />
+				<div className={container}>
+					<Card>
+						<Mappings
+							showSynonyms={false}
+							showShards={false}
+							ref={this.mappingsRef}
+							showReplicas={false}
+							showMappingInfo={false}
+							showCardWrapper={false}
+							hideSearchType
+							hideDelete
+							hideDataType
+							onChange={this.handleMappingChange}
+							column={{
+								title: 'Aggregation Type',
+								render: ({ fields, field, address }) => {
+									const hasKeyword = !!get(
+										fields,
+										`${field}.fields.keyword`,
+										false,
+									);
+									let options = ['term', 'range'];
+									if (hasKeyword) {
+										options = ['term'];
+									}
+
+									const parsedAddress = address
+										.split('.')
+										.reduce((agg, key, index) => {
+											if (index % 2 !== 0) {
+												return agg ? `${agg}.${key}` : key;
+											}
+											return agg;
+										}, '');
+									const menu = (
+										<Menu
+											onClick={e => this.handleAggType(parsedAddress, e.key)}
+										>
+											{options.map(option => (
+												<Menu.Item key={option}>{option}</Menu.Item>
+											))}
+										</Menu>
+									);
+									return (
+										<Dropdown overlay={menu}>
+											<Button className={dropdown}>
+												{dataField[parsedAddress] || 'Select Type'}
+												<Icon type="down" />
+											</Button>
+										</Dropdown>
+									);
+								},
+							}}
+							renderFooter={() =>
+								searchableMappings.length ? (
+									<Affix offsetBottom={73}>
+										<Row
+											style={{
+												padding: 10,
+												border: '1px solid #e8e8e8',
+												background: 'white',
+												width: '100%',
+											}}
+											type="flex"
+											justify="space-between"
+										>
+											<Col>
+												<Select
+													key={searchableMappings.length}
+													showSearch
+													placeholder="Add new aggregation field"
+													optionFilterProp="children"
+													style={{ minWidth: 200 }}
+													onChange={this.handleAddField}
+													filterOption={(input, option) =>
+														option.props.children
+															.toLowerCase()
+															.indexOf(input.toLowerCase()) >= 0
+													}
 												>
-													Confirm Mapping Changes
-												</Button>
-												<Button onClick={cancelChanges}>Cancel</Button>
-											</React.Fragment>
-										)}
-									</Col>
-								</Row>
-							</Affix>
-						)}
-					/>
-				</Card>
-				<Card className={cardStyle}>
-					<label>
-						Default Size For Aggregations <Icon type="info-circle" />
-					</label>
-					<InputNumber
-						onChange={value => this.handleChange('count', value)}
-						value={count}
-						min={10}
-						placeholder="Enter default aggs size"
-						className="input"
-					/>
-					<label>
-						Default Sort <Icon type="info-circle" />
-					</label>
-					<Select
-						placeholder="Select default Sort"
-						value={sort}
-						optionFilterProp="children"
-						style={{ minWidth: 200, marginBottom: '15px' }}
-						onChange={value => this.handleChange('sort', value)}
-						filterOption={(input, option) =>
-							option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-						}
-					>
-						{sortOptions.map(sortOption => (
-							<Option key={sortOption} value={sortOption.toLowerCase()}>
-								{sortOption}
-							</Option>
-						))}
-					</Select>
-					<label>
-						Include Null Values <Icon type="info-circle" />
-					</label>
-					<Switch
-						checked={includeNullValue}
-						onChange={value => this.handleChange('includeNullValue', value)}
-					/>
-				</Card>
-				<Affix offsetBottom={0}>
-					<div
-						style={{
-							padding: 20,
-							background: 'white',
-							boxShadow: 'rgba(0, 0, 0, 0.1) 0px -4px 7px 0px',
-						}}
-					>
-						<Button type="primary">
-							<Icon type="save" />
-							Save Settings
-						</Button>
-					</div>
-				</Affix>
-			</div>
+													{searchableMappings.map(mapping => (
+														<Option
+															key={mapping._address}
+															value={mapping._address}
+														>
+															{mapping.address}
+														</Option>
+													))}
+												</Select>
+											</Col>
+										</Row>
+									</Affix>
+								) : null
+							}
+						/>
+					</Card>
+					<Card className={cardStyle}>
+						<label>
+							Default Size For Aggregations <Icon type="info-circle" />
+						</label>
+						<InputNumber
+							onChange={value => this.handleChange('count', value)}
+							value={count}
+							min={10}
+							placeholder="Enter default aggs size"
+							className="input"
+						/>
+						<label>
+							Default Sort <Icon type="info-circle" />
+						</label>
+						<Select
+							placeholder="Select default Sort"
+							value={sort}
+							optionFilterProp="children"
+							style={{ minWidth: 200, marginBottom: '15px' }}
+							onChange={value => this.handleChange('sort', value)}
+							filterOption={(input, option) =>
+								option.props.children.toLowerCase().indexOf(input.toLowerCase()) >=
+								0
+							}
+						>
+							{sortOptions.map(sortOption => (
+								<Option key={sortOption.value} value={sortOption.value}>
+									{sortOption.name}
+								</Option>
+							))}
+						</Select>
+						<label>
+							Include Null Values <Icon type="info-circle" />
+						</label>
+						<Switch
+							checked={includeNullValue}
+							onChange={value => this.handleChange('includeNullValue', value)}
+						/>
+					</Card>
+					<Affix offsetBottom={0}>
+						<div
+							style={{
+								padding: 20,
+								background: 'white',
+								boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.15)',
+								boxSizing: 'border-box',
+								border: '1px solid #e8e8e8',
+							}}
+						>
+							<Button type="primary" loading={isUpdating} onClick={this.handleSave}>
+								<Icon type={isUpdating ? 'loading' : 'save'} />
+								{isDirty ? 'Apply Settings and Reindex' : 'Save Settings'}
+							</Button>
+							<Button
+								onClick={this.resetChanges}
+								style={{ marginLeft: 10 }}
+								type="danger"
+								ghost
+							>
+								Reset
+							</Button>
+						</div>
+					</Affix>
+				</div>
+			</React.Fragment>
 		);
 	}
 }
@@ -293,16 +389,25 @@ const mapStateToProps = state => {
 	const mappings = getRawMappingsByAppName(state) || null;
 
 	const { username, password } = get(state, 'user.data', {});
+	const appName = get(state, '$getCurrentApp.name');
 	return {
+		isLoading: get(state, '$getAppSettings.isFetching'),
+		settings: get(state, ['$getAppSettings', 'settings', appName]),
+		isUpdating: get(state, '$getAppSettings.isUpdating'),
+		resetState: get(state, '$getAppSettings.default', {}),
 		credentials: username ? `${username}:${password}` : null,
 		mappings,
 		isFetchingMapping: get(state, '$getAppMappings.isFetching'),
+		appName,
 	};
 };
 
 const mapDispatchToProps = dispatch => ({
 	fetchMappings: (appName, credentials, url) =>
 		dispatch(getAppMappings(appName, credentials, url)),
+	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
+	getSettingsAction: name => dispatch(getSettings(name)),
+	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AggsPage);
