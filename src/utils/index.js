@@ -394,15 +394,16 @@ export function updateFunction(selectedFunction, res) {
 			.filter((value, index, self) => {
 				return self.indexOf(value) === index;
 			});
+		const { service } = selectedFunction.function;
 		notification.info({
 			message: 'Updating Function',
-			description: `Updating function ${selectedFunction.service} with ${res.payload.name} rule`,
+			description: `Updating function ${service} with ${res.payload.name} rule`,
 		});
-		updateFunctions(selectedFunction.service, selectedFunction)
+		updateFunctions(service, selectedFunction)
 			.then(() => {
 				notification.success({
 					message: 'Success',
-					description: `Function ${selectedFunction.service} updated successfully.`,
+					description: `Function ${service} updated successfully.`,
 				});
 			})
 			.catch(e => {

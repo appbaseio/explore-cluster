@@ -2,7 +2,7 @@ import React from 'react';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { get } from 'lodash';
+import { get, pick } from 'lodash';
 import {
 	Affix,
 	Alert,
@@ -344,7 +344,14 @@ class QueryRulesForm extends React.Component {
 			let selectedFunction;
 			actions = actions.map(action => {
 				if (action.type === 'function') {
-					selectedFunction = get(action, 'data.function');
+					selectedFunction = pick(action.data, [
+						'enabled',
+						'order',
+						'trigger',
+						'extraRequestPayload',
+						'function',
+						'queryRules',
+					]);
 					return {
 						...action,
 						data: get(action, 'data.function.service'),
@@ -745,7 +752,4 @@ const mapDispatchToProps = dispatch => ({
 	removeRule: id => dispatch(deleteRule(id)),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(QueryRulesForm);
+export default connect(mapStateToProps, mapDispatchToProps)(QueryRulesForm);
