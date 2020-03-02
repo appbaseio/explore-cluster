@@ -18,7 +18,11 @@ class QueryView extends React.Component {
 	constructor(props) {
 		super(props);
 		const { filters, search, result, app, url, credentials } = props;
-		const generatedQuery = generateQuery({ filters, search, result });
+		const generatedQuery = generateQuery({
+			filters,
+			search,
+			result,
+		});
 
 		this.appbaseRef = Appbase({
 			app,

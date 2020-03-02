@@ -5,7 +5,7 @@ import ListView from './ListView';
 
 class Result extends React.Component {
 	state = {
-		view: 'query',
+		view: 'list',
 	};
 
 	handleViewChange = e => {
@@ -17,7 +17,7 @@ class Result extends React.Component {
 	render() {
 		const { filters, search, result, app, credentials, url } = this.props;
 		const { view } = this.state;
-		const listIds = filters.map((_, index) => `list-${index}`);
+		const listIds = Object.keys(filters.dataField).map((_, index) => `list-${index}`);
 		return (
 			<Card>
 				<Row type="flex" justify="space-between" align="middle">

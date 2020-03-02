@@ -10,6 +10,7 @@ const ListView = ({ result, listIds }) => (
 			react={{
 				and: ['search', ...listIds],
 			}}
+			dataField="_score"
 			componentId="result"
 			render={({ data, loading }) => {
 				if (loading) {

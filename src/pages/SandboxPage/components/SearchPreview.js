@@ -47,24 +47,24 @@ class SearchPreview extends React.Component {
 								<Switch defaultChecked id="analytics" />
 							</label>
 						</div>
-						<Button size="large" type="primary">
+						{/* <Button size="large" type="primary">
 							<Icon type="code-sandbox" />
 							Open in Codesandbox
-						</Button>
+						</Button> */}
 					</Row>
 				</Col>
-				<ReactiveBase app={app} credentials={credentials} url={url}>
+				<ReactiveBase app={app} enableAppbase credentials={credentials} url={url}>
 					<Col md={6}>
-						<Filter aggs={settings.filter} />
+						<Filter app={app} aggs={settings.aggregations} />
 					</Col>
 					<Col md={18}>
 						<Affix offsetTop={60}>
-							<Search search={settings.search} />
+							<Search app={app} search={settings.search} />
 						</Affix>
 						<Result
-							result={settings.result}
+							result={settings.results}
 							search={settings.search}
-							filters={settings.filter}
+							filters={settings.aggregations}
 							app={app}
 							url={url}
 							credentials={credentials}

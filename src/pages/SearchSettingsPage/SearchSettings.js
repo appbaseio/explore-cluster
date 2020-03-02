@@ -88,17 +88,20 @@ class SearchSettingsPage extends React.Component {
 	}
 
 	initData = settings => {
-		const dataField = settings.search.dataField.reduce(
-			(agg, field, index) => ({
-				...agg,
-				[field]: settings.search.fieldWeights[index],
-			}),
-			{},
-		);
+		const dataField =
+			settings && settings.search
+				? settings.search.dataField.reduce(
+						(agg, field, index) => ({
+							...agg,
+							[field]: settings.search.fieldWeights[index],
+						}),
+						{},
+				  )
+				: {};
 		this.setState({
-			typoTolerance: settings.search.fuzziness,
-			hasTypoTolerance: !!settings.search.fuzziness,
-			hasSearchOperators: settings.search.searchOperators,
+			typoTolerance: get(settings, 'search.fuzziness'),
+			hasTypoTolerance: !!get(settings, 'search.fuzziness', false),
+			hasSearchOperators: get(settings, 'search.searchOperators', false),
 			dataField,
 		});
 	};

@@ -1,10 +1,10 @@
 const generateQuery = ({ filters, search, result }) => {
-	const filtersData = filters.map((filter, index) => {
+	const filtersData = Object.keys(filters.dataField).map((filter, index) => {
 		return {
-			...filter,
 			id: `list-${index}`,
-			type: 'term',
-			dataField: Array.isArray(filter.dataField) ? filter.dataField : [filter.dataField],
+			dataField: typeof filter === 'string' ? [filter] : filter,
+			sortBy: filters.sortBy,
+			size: filters.size,
 		};
 	});
 
