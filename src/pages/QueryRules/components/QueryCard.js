@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Row, Col, Icon, Button, Switch, Tooltip, Typography, message } from 'antd';
+import { Button, Card, Col, Icon, message, Row, Switch, Tooltip, Typography } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -11,6 +11,7 @@ import { deleteRule, toggleRuleStatus } from '../../../batteries/modules/actions
 import CloneRule from './CloneRule';
 import { hasValuesChanged } from '../utils';
 import DeleteModal from '../../../components/DeleteModal';
+import { handleQueryRuleDelete } from '../../../utils';
 
 const title = css`
 	font-size: 16px;
@@ -152,7 +153,7 @@ class QueryCard extends React.Component {
 								name="Rule"
 								value={rule.name.toLowerCase().replace(/ /g, '_')}
 								title="Delete Rule"
-								onDelete={() => removeRule(rule.id)}
+								onDelete={() => handleQueryRuleDelete(rule, removeRule)}
 							>
 								{({ handleModal }) => (
 									<Button

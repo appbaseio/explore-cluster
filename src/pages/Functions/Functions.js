@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { Button, Col, Divider, Icon, List, Result, Row, Switch, Tooltip } from 'antd';
+import { Button, Col, Divider, Icon, List, Popover, Result, Row, Switch, Tooltip } from 'antd';
 import { connect } from 'react-redux';
 import { string } from 'prop-types';
 import get from 'lodash/get';
@@ -113,10 +113,14 @@ function UpdateFunction({ item }) {
 	);
 }
 
+function isQueryRuleAssociated(item) {
+	return (item.queryRules || []).length !== 0;
+}
+
 function Actions({ item, refetchFunction }) {
 	return (
 		<React.Fragment>
-			{(item.queryRules || []).length !== 0 ? (
+			{isQueryRuleAssociated(item) ? (
 				<Link to="/cluster/rules" className={link}>
 					Associated Query Rules <Icon type="link" />
 				</Link>
@@ -253,7 +257,13 @@ function FunctionItem({ item, onChange, getFunction }) {
 						</>
 					)}
 					<VerticalDivider />
-					<DeleteFunction name={func.service} loading={isDeleting} />
+					{isQueryRuleAssociated(item) ? (
+						<Popover content="This function is associated with a query rule, please delete rule first.">
+							<Icon type="delete" />
+						</Popover>
+					) : (
+						<DeleteFunction name={func.service} loading={isDeleting} />
+					)}
 				</>
 			}
 		/>

@@ -127,7 +127,7 @@ class SetFunctionTrigger extends Component {
 							return (
 								<TriggerDropdown
 									overlay={menu}
-									selectedOption={selectedOption || options[1]}
+									selectedOption={selectedOption || options[0]}
 								/>
 							);
 						},

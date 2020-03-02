@@ -33,12 +33,20 @@ import { addQueryRule, deleteRule, getRules, putRule } from '../../batteries/mod
 
 import CloneRule from './components/CloneRule';
 import { Info } from '../../components/Info';
-import { getClusterMappings, getDatafields, getSelectedIndexes, updateFunction } from '../../utils';
+import {
+	deleteQueryRuleInFunction,
+	getClusterMappings,
+	getDatafields,
+	getSelectedIndexes,
+	handleQueryRuleDelete,
+	updateFunction,
+} from '../../utils';
 import { bannerDetails, getExpressionFromValue, getParsedRule, validPlans } from './utils';
 import DeleteModal from '../../components/DeleteModal';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Overlay from '../../components/Overlay';
 import { mediaKey } from '../../utils/media';
+import { getSingleFunction } from '../../batteries/utils/app';
 
 const { RangePicker } = DatePicker;
 
@@ -124,7 +132,7 @@ class QueryRulesForm extends React.Component {
 			// filter state
 			dataField: '',
 			dataFieldValue: '',
-			query: 'is',
+			query: 'matches',
 			queryValue: '',
 
 			timeframe: null,
@@ -354,24 +362,52 @@ class QueryRulesForm extends React.Component {
 					]);
 					return {
 						...action,
-						data: get(action, 'data.function.service'),
+						data: get(action, 'data.function.service') || action.data,
 					};
 				}
 				return action;
 			});
 			params.actions = actions;
-			const { rule } = this.props;
+			const { rule, unparsedRule } = this.props;
 			if (isEditPage) {
 				updateRule({
 					...params,
 					id: rule.id,
 					enabled,
 				}).then(res => {
-					updateFunction(selectedFunction, res);
+					const prevFunction = get(
+						unparsedRule.actions.find(rule => rule.type === 'function'),
+						'data',
+					);
+					const newFunction = get(
+						actions.find(rule => rule.type === 'function'),
+						'data',
+					);
+					if (prevFunction !== newFunction && prevFunction) {
+						getSingleFunction(prevFunction).then(func => {
+							updateFunction({
+								selectedFunction: func,
+								res,
+								updateQueryFn: deleteQueryRuleInFunction,
+								description: null,
+							});
+							updateFunction({
+								selectedFunction,
+								res,
+							});
+						});
+					} else
+						updateFunction({
+							selectedFunction,
+							res,
+						});
 				});
 			} else {
 				createRule(params).then(res => {
-					updateFunction(selectedFunction, res);
+					updateFunction({
+						selectedFunction,
+						res,
+					});
 				});
 			}
 		}
@@ -670,7 +706,7 @@ class QueryRulesForm extends React.Component {
 									name="Rule"
 									value={rule.name.toLowerCase().replace(/ /g, '_')}
 									title="Delete Rule"
-									onDelete={() => removeRule(rule.id)}
+									onDelete={() => handleQueryRuleDelete(rule, removeRule)}
 								>
 									{({ handleModal }) => (
 										<Button
