@@ -1,5 +1,7 @@
-import { chain, keys } from 'lodash';
+import { chain, get, keys } from 'lodash';
+import { notification } from 'antd';
 import { getURL } from '../constants/config';
+import { getSingleFunction, updateFunctions } from '../batteries/utils/app';
 
 export async function getUser(username, password, url) {
 	const ACC_API = getURL();
@@ -265,6 +267,23 @@ export async function fetchLogs(name = 'default') {
 	return data;
 }
 
+export async function fetchMappings(name = '*') {
+	const ACC_API = getURL();
+	const authToken = sessionStorage.getItem('authToken');
+	const response = await fetch(`${ACC_API}/${name}/_mapping`, {
+		headers: {
+			'Content-Type': 'application/json',
+			Authorization: `Basic ${authToken}`,
+		},
+		method: 'GET',
+	});
+	const data = await response.json();
+	if (response.status >= 400) {
+		throw data.error.message;
+	}
+	return data;
+}
+
 // checks open-faas health
 export async function getFunctionHealthCheck() {
 	const ACC_API = getURL();
@@ -338,23 +357,109 @@ export async function getClusterMappings() {
 	return mappings;
 }
 
-export function getDatafields(mappings, indexes) {
+export function getDatafields(mappings, indexes, isSearch = false) {
 	const hasAllIndex = indexes.includes('*');
+
+	function filtered(properties, property) {
+		if (isSearch)
+			return properties[property].type === 'string' || properties[property].type === 'text';
+		return (
+			properties[property].type === 'string' ||
+			properties[property].type === 'text' ||
+			properties[property].type === 'integer' ||
+			properties[property].type === 'long' ||
+			properties[property].type === 'bool'
+		);
+	}
+
 	const dataFields = Object.keys(mappings)
 		.filter(index => !index.startsWith('.'))
 		.filter(index => hasAllIndex || indexes.includes(index))
 		.reduce((acc, key) => {
-			const { properties } = mappings[key].mappings;
+			const { properties } = get(mappings[key], 'mappings._doc') || mappings[key].mappings;
 			const nestedDataFields = keys(properties).filter(property => {
-				return (
-					properties[property].type === 'string' ||
-					properties[property].type === 'text' ||
-					properties[property].type === 'integer' ||
-					properties[property].type === 'long'
-				);
+				return filtered(properties, property);
 			});
 			return [...acc, ...nestedDataFields];
 		}, []);
 
 	return [...new Set(dataFields)];
+}
+
+function updateQueryRules(selectedFunction, res) {
+	selectedFunction.queryRules = [...(selectedFunction.queryRules || []), res.payload.id]
+		// remove duplicate rule ids
+		.filter((value, index, self) => {
+			return self.indexOf(value) === index;
+		});
+}
+
+export function deleteQueryRuleInFunction(selectedFunction, res) {
+	const index = selectedFunction.queryRules.indexOf(res.payload.id);
+	if (index !== -1) selectedFunction.queryRules.splice(index, 1);
+}
+
+export function updateFunction({
+	selectedFunction,
+	res,
+	updateQueryFn = updateQueryRules,
+	description = `Updating function ${get(selectedFunction, 'function.service')} with ${
+		res.payload.name
+	} rule`,
+}) {
+	if (selectedFunction && get(selectedFunction, 'function.service')) {
+		updateQueryFn(selectedFunction, res);
+		const service = get(selectedFunction, 'function.service');
+		if (description)
+			notification.info({
+				message: 'Updating Function',
+				description: description,
+			});
+		updateFunctions(service, selectedFunction)
+			.then(() => {
+				if (description)
+					notification.success({
+						message: 'Success',
+						description: `Function ${service} updated successfully.`,
+					});
+			})
+			.catch(e => {
+				notification.error({
+					message: 'Error',
+					description: e,
+				});
+			});
+	}
+}
+
+export function getSelectedIndexes(selectedIndexes, mappings) {
+	if ((selectedIndexes || []).length === 0 || get(selectedIndexes, 0) === '*') {
+		return keys(mappings).filter(key => !key.startsWith('.'));
+	}
+	return selectedIndexes;
+}
+
+export async function handleQueryRuleDelete(rule, removeRule) {
+	const functionIndex = rule.actions.findIndex(item => item.type === 'function');
+	if (functionIndex !== -1) {
+		try {
+			const res = await getSingleFunction(rule.actions[functionIndex].data);
+			updateFunction({
+				selectedFunction: res,
+				res: { payload: rule },
+				updateQueryFn: deleteQueryRuleInFunction,
+				description: `Updating function ${get(res, 'function.service')} by removing ${
+					rule.name
+				} rule`,
+			});
+			await removeRule(rule.id);
+		} catch (e) {
+			notification.error({
+				message: 'error',
+				description: get(e, 'message'),
+			});
+		}
+	} else {
+		await removeRule(rule.id);
+	}
 }

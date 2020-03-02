@@ -1,14 +1,17 @@
 import React from 'react';
-import { Card, Row, Col, Icon, Button, Switch, Tooltip, Typography, message } from 'antd';
+import { Button, Card, Col, Icon, message, Row, Switch, Tooltip, Typography } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
+import { get } from 'lodash';
 import ActionView from './ActionView';
 import MobileMenu from './MobileMenu';
 import { deleteRule, toggleRuleStatus } from '../../../batteries/modules/actions';
+import CloneRule from './CloneRule';
 import { hasValuesChanged } from '../utils';
 import DeleteModal from '../../../components/DeleteModal';
+import { handleQueryRuleDelete } from '../../../utils';
 
 const title = css`
 	font-size: 16px;
@@ -108,7 +111,7 @@ class QueryCard extends React.Component {
 	};
 
 	render() {
-		const { rule, dragProvided, dragSnapshot, removeRule } = this.props;
+		const { rule, dragProvided, dragSnapshot, removeRule, toggleRule } = this.props;
 		const actionButtonSize = window.innerWidth < 1090 ? 'small' : 'default';
 		return (
 			<Card
@@ -120,7 +123,7 @@ class QueryCard extends React.Component {
 			>
 				<Row style={{ position: 'relative' }} gutter={8}>
 					<div className={mobileMenu}>
-						<MobileMenu />
+						<MobileMenu rule={rule} removeRule={removeRule} toggleRule={toggleRule} />
 					</div>
 					<Col xs={1}>
 						<Tooltip title="Drag to update the ordering of rules">
@@ -134,7 +137,7 @@ class QueryCard extends React.Component {
 						<h4 className={title}>{rule.name}</h4>
 						<p className={description}>{rule.description}</p>
 						<p className={description}>
-							<strong>{rule.trigger.expression}</strong>
+							<strong>{get(rule, 'trigger.expression')}</strong>
 						</p>
 					</Col>
 					<Col lg={7} md={12} sm={24}>
@@ -150,7 +153,7 @@ class QueryCard extends React.Component {
 								name="Rule"
 								value={rule.name.toLowerCase().replace(/ /g, '_')}
 								title="Delete Rule"
-								onDelete={() => removeRule(rule.id)}
+								onDelete={() => handleQueryRuleDelete(rule, removeRule)}
 							>
 								{({ handleModal }) => (
 									<Button
@@ -165,9 +168,7 @@ class QueryCard extends React.Component {
 									</Button>
 								)}
 							</DeleteModal>
-							<Button size={actionButtonSize} type="primary">
-								<Icon type="copy" /> Clone
-							</Button>
+							<CloneRule rule={rule} buttonSize={actionButtonSize} />
 							<Link to={`/cluster/rules/${rule.id}`}>
 								<Button size={actionButtonSize} type="primary">
 									<Icon type="edit" /> Edit

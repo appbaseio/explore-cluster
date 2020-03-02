@@ -3,10 +3,10 @@ import { Button, Collapse, Form, Input, notification, Row, message } from 'antd'
 import { Validators } from 'react-reactive-form';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
-import { handleInputClosure, renderInputField } from '../helper';
-import { modalHeading } from '../../../pages/HomePage/styles';
-import { updatePrivateRegistry } from '../../../batteries/modules/actions/registry';
-import { isAbsoluteURL } from '../../../utils';
+import { handleInputClosure, renderInputField } from './helper';
+import { modalHeading } from '../../pages/HomePage/styles';
+import { updatePrivateRegistry } from '../../batteries/modules/actions/registry';
+import { isAbsoluteURL } from '../../utils';
 
 const PrivateRegistry = ({ registry, updateRegistry, error, success, loading }) => {
 	const [didMount, setDidMount] = useState(false);

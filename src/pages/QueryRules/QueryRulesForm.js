@@ -2,23 +2,24 @@ import React from 'react';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { get } from 'lodash';
+import { get, pick } from 'lodash';
 import {
-	Button,
-	Icon,
-	Card,
-	Typography,
-	Input,
-	Row,
-	Col,
-	Divider,
-	DatePicker,
 	Affix,
 	Alert,
+	Button,
+	Card,
+	Col,
+	DatePicker,
+	Divider,
+	Icon,
+	Input,
 	message,
-	Switch,
-	Skeleton,
+	notification,
 	Result,
+	Row,
+	Skeleton,
+	Switch,
+	Typography,
 } from 'antd';
 import moment from 'moment';
 
@@ -26,17 +27,42 @@ import IndexDropdown from './components/IndexDropdown';
 import Conditions from './components/Conditions';
 import ActionSelector from './components/ActionSelector';
 import Actions from './components/Actions';
-import { getErrorMessages, getErrorClass, getErrorMessage, getErrorCount } from './utils/error';
+import { getErrorClass, getErrorCount, getErrorMessage, getErrorMessages } from './utils/error';
 
-import { addQueryRule, getRules, putRule, deleteRule } from '../../batteries/modules/actions/rules';
+import { addQueryRule, deleteRule, getRules, putRule } from '../../batteries/modules/actions/rules';
 
-import { getClusterMappings, getDatafields } from '../../utils';
-import { getParsedRule, getExpressionFromValue, validPlans, bannerDetails } from './utils';
+import CloneRule from './components/CloneRule';
+import { Info } from '../../components/Info';
+import {
+	deleteQueryRuleInFunction,
+	getClusterMappings,
+	getDatafields,
+	getSelectedIndexes,
+	handleQueryRuleDelete,
+	updateFunction,
+} from '../../utils';
+import { bannerDetails, getExpressionFromValue, getParsedRule, validPlans } from './utils';
 import DeleteModal from '../../components/DeleteModal';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Overlay from '../../components/Overlay';
+import { mediaKey } from '../../utils/media';
+import { getSingleFunction } from '../../batteries/utils/app';
 
 const { RangePicker } = DatePicker;
+
+const link = css`
+	font-size: 14px;
+	margin-right: 30px;
+	cursor: pointer;
+	i {
+		margin-right: 4px;
+	}
+
+	${mediaKey.small} {
+		display: block;
+		line-height: 48px;
+	}
+`;
 
 const container = css`
 	padding: 50px;
@@ -82,6 +108,14 @@ const formStyle = css`
 	}
 `;
 
+function DocsLink({ url }) {
+	return (
+		<a href={url} className={link} target="_blank" rel="noopener noreferrer">
+			Learn more <Icon type="link" />
+		</a>
+	);
+}
+
 class QueryRulesForm extends React.Component {
 	constructor(props) {
 		super(props);
@@ -98,7 +132,7 @@ class QueryRulesForm extends React.Component {
 			// filter state
 			dataField: '',
 			dataFieldValue: '',
-			query: 'is',
+			query: 'matches',
 			queryValue: '',
 
 			timeframe: null,
@@ -115,6 +149,7 @@ class QueryRulesForm extends React.Component {
 			isEditPage: !!hasId,
 
 			error: {},
+			loading: false,
 		};
 	}
 
@@ -130,16 +165,22 @@ class QueryRulesForm extends React.Component {
 				...rule,
 			});
 		}
-
+		this.setState({ loading: true });
 		getClusterMappings()
 			.then(mappings => {
 				const dataFields = getDatafields(mappings, ['*']);
+				const searchFields = getDatafields(mappings, ['*'], true);
 				this.setState({
 					mappings,
 					dataFields,
+					searchFields,
+					loading: false,
 				});
 			})
-			.catch(e => console.log(e));
+			.catch(e => {
+				this.setState({ loading: false });
+				console.log(e);
+			});
 	}
 
 	componentDidUpdate(prevProps) {
@@ -165,15 +206,17 @@ class QueryRulesForm extends React.Component {
 			if (createError) {
 				message.error(createError);
 			} else {
-				message.success('Successfully Created Rule');
+				message.success('successfully created rule');
+				history.push('/cluster/rules');
 			}
 		}
 
 		if (isEditPage && !isUpdating && prevProps.isUpdating !== isUpdating) {
 			if (updateError) {
-				message.error(updateError);
+				notification.error({ message: 'Error', description: updateError.message });
 			} else {
-				message.success('Successfully Updated Rule');
+				message.success('successfully updated rule');
+				history.push('/cluster/rules');
 			}
 		}
 
@@ -181,7 +224,7 @@ class QueryRulesForm extends React.Component {
 			if (deleteError) {
 				message.error(deleteError);
 			} else {
-				message.success('Successfully Deleted Rule');
+				message.success('successfully deleted rule');
 				history.replace('/cluster/rules');
 			}
 		}
@@ -219,9 +262,12 @@ class QueryRulesForm extends React.Component {
 	handleIndex = selectedIndexes => {
 		const { mappings } = this.state;
 		const dataFields = getDatafields(mappings, selectedIndexes);
+		const searchFields = getDatafields(mappings, selectedIndexes, true);
+
 		this.setState(prevState => ({
 			selectedIndexes,
 			dataFields,
+			searchFields,
 			dataField: dataFields[0] || '',
 			error: {
 				...prevState.error,
@@ -272,7 +318,6 @@ class QueryRulesForm extends React.Component {
 			dataFieldValue,
 			query,
 			queryValue,
-			actions,
 			error,
 			selectedIndexes,
 			isEditPage,
@@ -280,13 +325,15 @@ class QueryRulesForm extends React.Component {
 			timeframe,
 		} = this.state;
 
+		let { actions } = this.state;
+
 		const { createRule, updateRule } = this.props;
 
 		const hasError = !!Object.keys(error).length;
+
 		const params = {
 			name,
 			description,
-			actions,
 			trigger: {
 				type: condition,
 				expression: getExpressionFromValue({
@@ -300,16 +347,68 @@ class QueryRulesForm extends React.Component {
 				timeframe,
 			},
 		};
+
 		if (!hasError) {
-			const { rule } = this.props;
+			let selectedFunction;
+			actions = actions.map(action => {
+				if (action.type === 'function') {
+					selectedFunction = pick(action.data, [
+						'enabled',
+						'order',
+						'trigger',
+						'extraRequestPayload',
+						'function',
+						'queryRules',
+					]);
+					return {
+						...action,
+						data: get(action, 'data.function.service') || action.data,
+					};
+				}
+				return action;
+			});
+			params.actions = actions;
+			const { rule, unparsedRule } = this.props;
 			if (isEditPage) {
 				updateRule({
 					...params,
 					id: rule.id,
 					enabled,
+				}).then(res => {
+					const prevFunction = get(
+						unparsedRule.actions.find(rule => rule.type === 'function'),
+						'data',
+					);
+					const newFunction = get(
+						actions.find(rule => rule.type === 'function'),
+						'data',
+					);
+					if (prevFunction !== newFunction && prevFunction) {
+						getSingleFunction(prevFunction).then(func => {
+							updateFunction({
+								selectedFunction: func,
+								res,
+								updateQueryFn: deleteQueryRuleInFunction,
+								description: null,
+							});
+							updateFunction({
+								selectedFunction,
+								res,
+							});
+						});
+					} else
+						updateFunction({
+							selectedFunction,
+							res,
+						});
 				});
 			} else {
-				createRule(params);
+				createRule(params).then(res => {
+					updateFunction({
+						selectedFunction,
+						res,
+					});
+				});
 			}
 		}
 	};
@@ -342,7 +441,10 @@ class QueryRulesForm extends React.Component {
 		if (date.length) {
 			const [startDate, endDate] = date;
 			this.setState({
-				timeframe: [moment(startDate).unix() * 1000, moment(endDate).unix() * 1000],
+				timeframe: {
+					start_time: moment(startDate).unix(),
+					end_time: moment(endDate).unix(),
+				},
 			});
 		} else {
 			this.setState({
@@ -357,15 +459,19 @@ class QueryRulesForm extends React.Component {
 			description,
 			name,
 			dataFields,
+			searchFields,
 			dataField,
 			dataFieldValue,
 			query,
 			queryValue,
 			actions,
+			selectedIndexes,
 			error,
 			isEditPage,
 			enabled,
 			timeframe,
+			mappings,
+			loading,
 		} = this.state;
 		const {
 			isCreating,
@@ -375,6 +481,7 @@ class QueryRulesForm extends React.Component {
 			rules,
 			removeRule,
 			isDeleting,
+			unparsedRule,
 			tier,
 		} = this.props;
 
@@ -393,7 +500,7 @@ class QueryRulesForm extends React.Component {
 			);
 		}
 
-		if (isEditPage && (!rules.length || rulesLoading)) {
+		if ((isEditPage && (!rules.length || rulesLoading)) || loading) {
 			return (
 				<div className={container}>
 					<Card>
@@ -489,18 +596,16 @@ class QueryRulesForm extends React.Component {
 									If (Set Trigger Condition)
 								</Typography.Title>
 								<Typography.Text>
-									Condition based on which this query rule will be executed
+									<div>
+										Condition based on which this query rule will be executed.
+									</div>
+									<div style={{ marginTop: 10 }}>
+										<DocsLink url="https://docs.appbase.io/docs/search/Rules/#configure-if-condition" />
+									</div>
 								</Typography.Text>
 							</Col>
 
 							<Col md={12} sm={24}>
-								<label>Indices</label>
-								{getErrorMessage(error.selectedIndexes)}
-								<IndexDropdown
-									error={error && error.selectedIndexes}
-									onChange={this.handleIndex}
-								/>
-
 								<Conditions
 									onChange={this.handleInput}
 									error={error.condition}
@@ -512,15 +617,43 @@ class QueryRulesForm extends React.Component {
 									onDropdownChange={this.handleDropdown}
 									queryValue={queryValue}
 								/>
-								<label>Timeframe</label>
+								<div style={{ marginBottom: 15 }}>
+									<label>
+										Index to apply rule to
+										<Info content="Select the index or indices to apply the rule to." />
+									</label>
+									{getErrorMessage(error.selectedIndexes)}
+									<IndexDropdown
+										selectedIndexes={selectedIndexes}
+										error={error && error.selectedIndexes}
+										onChange={this.handleIndex}
+									/>
+								</div>
+
+								<label>
+									Timeframe (optional)
+									<Info
+										content="Set a timeframe during which this rule should be triggered.
+									You can also set either of the start time or end time (without setting the other)."
+									/>
+								</label>
 								<RangePicker
 									value={
-										timeframe && timeframe.length
-											? [moment(timeframe[0]), moment(timeframe[1])]
+										timeframe
+											? [
+													moment(timeframe.start_time * 1000),
+													moment(timeframe.end_time * 1000),
+											  ]
 											: null
 									}
 									onChange={this.handleTime}
 									style={{ width: '100%' }}
+									disabledDate={current => {
+										// Can not select days before today
+										const now = new Date();
+										now.setHours(0, 0, 0, 0);
+										return current && current.valueOf() < now.valueOf();
+									}}
 								/>
 							</Col>
 						</Row>
@@ -529,19 +662,29 @@ class QueryRulesForm extends React.Component {
 							<Col md={12} sm={24}>
 								<Typography.Title level={4}>Then (Set Actions)</Typography.Title>
 								<Typography.Text>
-									What action to take when above query conditions are satisfied
+									<div>
+										What action to take when above query conditions are
+										satisfied
+									</div>
+									<div style={{ marginTop: 10 }}>
+										<DocsLink url="https://docs.appbase.io/docs/search/Rules/#configure-then-actions" />
+									</div>
 								</Typography.Text>
 							</Col>
 
 							<Col md={12} sm={24}>
 								<Actions
-									error={error}
+									dataFields={dataFields}
+									searchFields={searchFields}
+									indexes={getSelectedIndexes(selectedIndexes, mappings)}
 									actions={actions}
 									onChange={this.updateActions}
+									error={error}
 								/>
 								<ActionSelector
 									error={error && error.actions}
 									actions={actions}
+									condition={condition}
 									onChange={this.setActions}
 								/>
 							</Col>
@@ -552,20 +695,18 @@ class QueryRulesForm extends React.Component {
 					<div className={`${isEditPage ? 'space-between' : ''} card-footer`}>
 						{isEditPage ? (
 							<div>
-								<Button
-									style={{ marginRight: 10 }}
-									size="large"
+								<CloneRule
+									buttonSize="large"
+									buttonStyle={{ marginRight: 10 }}
 									ghost
-									type="primary"
-								>
-									<Icon type="copy" />
-									Clone
-								</Button>
+									rule={unparsedRule}
+								/>
+
 								<DeleteModal
 									name="Rule"
 									value={rule.name.toLowerCase().replace(/ /g, '_')}
 									title="Delete Rule"
-									onDelete={() => removeRule(rule.id)}
+									onDelete={() => handleQueryRuleDelete(rule, removeRule)}
 								>
 									{({ handleModal }) => (
 										<Button
@@ -629,6 +770,7 @@ const mapStateToProps = (state, props) => {
 		return {
 			...defaultState,
 			rule: getParsedRule(ruleData),
+			unparsedRule: ruleData,
 			isUpdating: get(ruleData, 'update.isLoading'),
 			updateError: get(ruleData, 'update.error'),
 			isDeleting: get(ruleData, 'isDeleting'),

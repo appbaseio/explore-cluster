@@ -98,7 +98,12 @@ class QueryRules extends Component {
 								<h2>Query Rules</h2>
 								<Row>
 									<Col lg={18}>
-										<p>Create &quot;If this, then that&quot; rules</p>
+										<p>
+											Create &quot;If this, then that&quot; rules. Query Rules
+											will be executed in the order in which they are listed.
+											You can drag and drop a rule to change the ordering
+											sequence.
+										</p>
 									</Col>
 								</Row>
 							</Col>

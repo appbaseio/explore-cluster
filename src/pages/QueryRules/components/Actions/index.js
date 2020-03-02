@@ -1,18 +1,26 @@
 import React from 'react';
-import { Card, Tooltip, Icon, Typography, Button } from 'antd';
+import { Button, Card, Icon, Tooltip, Typography } from 'antd';
 import { css } from 'emotion';
+import { Info } from 'react-feather';
 import DNDWrapper from '../../../../components/DNDWrapper';
-// import PromoteResult from './PromoteResult';
-// import HideResult from './HideResult';
-// import Functions from './Functions';
 import CustomData from './CustomData';
 import ReplaceSearch from './ReplaceSearch';
+import ReplaceWord from './ReplaceWord';
+import PromoteResults from './PromoteResults';
+import HideResults from './HideResults';
+import ExecuteFunction from './ExecuteFunction';
 import { getErrorMessage } from '../../utils/error';
 import { hasValuesChanged } from '../../utils';
+import RemoveWord from './RemoveWord';
 
 const componentMappings = {
 	replace_search_term: ReplaceSearch,
 	custom_data: CustomData,
+	promote_result: PromoteResults,
+	hide_result: HideResults,
+	function: ExecuteFunction,
+	remove_words: RemoveWord,
+	replace_words: ReplaceWord,
 };
 
 const actionMapping = {
@@ -21,6 +29,8 @@ const actionMapping = {
 	replace_search_term: 'Replace Search Term',
 	custom_data: 'Return Custom Data',
 	function: 'f(x) Apply Function',
+	remove_words: 'Remove Word(s)',
+	replace_words: 'Replace Word',
 };
 
 const errorKeys = Object.keys(actionMapping).map(item => `error.${item}`);
@@ -63,7 +73,12 @@ const cardStyles = css`
 
 class Actions extends React.Component {
 	shouldComponentUpdate(nextProps) {
-		return hasValuesChanged(this.props, nextProps, ['actions', ...errorKeys]);
+		return hasValuesChanged(this.props, nextProps, [
+			'actions',
+			'dataFields',
+			'searchFields',
+			...errorKeys,
+		]);
 	}
 
 	onDragEnd = result => {
@@ -107,6 +122,66 @@ class Actions extends React.Component {
 				});
 				break;
 			}
+			case 'promote_result': {
+				actions = actions.map(action => {
+					if (action.type === 'promote_result') {
+						return {
+							...action,
+							data: value,
+						};
+					}
+					return action;
+				});
+				break;
+			}
+			case 'hide_result': {
+				actions = actions.map(action => {
+					if (action.type === 'hide_result') {
+						return {
+							...action,
+							data: value,
+						};
+					}
+					return action;
+				});
+				break;
+			}
+			case 'function': {
+				actions = actions.map(action => {
+					if (action.type === 'function') {
+						return {
+							...action,
+							data: value,
+						};
+					}
+					return action;
+				});
+				break;
+			}
+			case 'remove_words': {
+				actions = actions.map(action => {
+					if (action.type === 'remove_words') {
+						return {
+							...action,
+							data: value,
+						};
+					}
+					return action;
+				});
+				break;
+			}
+			case 'replace_words': {
+				actions = actions.map(action => {
+					if (action.type === 'replace_words') {
+						return {
+							...action,
+							data: value,
+						};
+					}
+					return action;
+				});
+				break;
+			}
 			default:
 				return;
 		}
@@ -119,11 +194,23 @@ class Actions extends React.Component {
 
 	renderComponent = item => {
 		const Component = componentMappings[item.type];
+		const getProps = () => {
+			const defaultProps = { value: item.data };
+			const { indexes, searchFields } = this.props;
+			if (item.type === 'promote_result' || item.type === 'hide_result') {
+				return {
+					...defaultProps,
+					indexes,
+					dataFields: searchFields,
+				};
+			}
+			return defaultProps;
+		};
 		if (Component) {
 			return (
 				<Component
 					onChange={value => this.handleChange(item.type, value)}
-					value={item.data}
+					{...getProps()}
 				/>
 			);
 		}
@@ -172,9 +259,27 @@ class Actions extends React.Component {
 												className="drag-icon"
 											/>
 										</Tooltip>
-										<Typography.Text strong>
-											{actionMapping[item.type]}
-										</Typography.Text>
+										<Tooltip title={item.toolTip}>
+											<div
+												style={{
+													display: 'inline-flex',
+													justifyContent: 'center',
+													alignItems: 'center',
+												}}
+											>
+												<Typography.Text strong>
+													{actionMapping[item.type]}
+												</Typography.Text>
+
+												<Info
+													style={{
+														marginLeft: 5,
+														color: '#898989',
+														height: 20,
+													}}
+												/>
+											</div>
+										</Tooltip>
 									</div>
 									<div>
 										<Button

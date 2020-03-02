@@ -1,8 +1,9 @@
 import React from 'react';
 import { css } from 'emotion';
-import { Card, Select, Icon } from 'antd';
+import { Card, Icon, Select } from 'antd';
 import { getErrorClass, getErrorMessage } from '../utils/error';
 import { hasValuesChanged } from '../utils';
+import { getFunctionHealthCheck } from '../../../utils';
 
 const { Option } = Select;
 
@@ -11,16 +12,139 @@ const cardStyles = css`
 `;
 
 const actions = {
-	promote_result: { name: 'Promote Result', data: [] },
-	hide_result: { name: 'Hide Result', data: [] },
-	replace_search_term: { name: 'Replace Search Term', data: '' },
-	custom_data: { name: 'Return Custom Data', data: '' },
-	function: { name: 'f(x) Apply Function', data: '' },
+	promote_result: {
+		name: 'Promote Result',
+		data: [],
+		toolTip: (
+			<>
+				Promote a result and show it at a specific position within the search results.
+				<a
+					target="_blank"
+					rel="noopener noreferrer"
+					href="https://docs.appbase.io/docs/search/Rules/#promote-results"
+				>
+					Learn more
+				</a>
+			</>
+		),
+	},
+	hide_result: {
+		name: 'Hide Result',
+		data: [],
+		toolTip: (
+			<>
+				Hide a document from search results.
+				<a
+					target="_blank"
+					rel="noopener noreferrer"
+					href="https://docs.appbase.io/docs/search/Rules/#hide-results"
+				>
+					Learn more
+				</a>
+			</>
+		),
+	},
+	replace_search_term: {
+		name: 'Replace Search Term',
+		data: '',
+		isDisabledOnAlways: true,
+		toolTip: (
+			<>
+				Replace the whole search term with another search term.
+				<a
+					target="_blank"
+					rel="noopener noreferrer"
+					href="https://docs.appbase.io/docs/search/Rules/#replace-search-term"
+				>
+					Learn more
+				</a>
+			</>
+		),
+	},
+	custom_data: {
+		name: 'Return Custom Data',
+		data: '',
+		toolTip: (
+			<>
+				Add extra JSON data to be returned with your search results.{' '}
+				<a
+					target="_blank"
+					rel="noopener noreferrer"
+					href="https://docs.appbase.io/docs/search/Rules/#custom-data"
+				>
+					Learn more
+				</a>
+			</>
+		),
+	},
+	function: {
+		name: 'f(x) Apply Function',
+		data: '',
+		checkHealth: true,
+		toolTip: (
+			<>
+				Add a custom function to make changed without any limitations.{' '}
+				<a
+					target="_blank"
+					rel="noopener noreferrer"
+					href="https://docs.appbase.io/docs/search/Functions"
+				>
+					Learn more
+				</a>
+			</>
+		),
+	},
+	remove_words: {
+		name: 'Remove Word',
+		data: [],
+		toolTip: (
+			<>
+				Remove a word(s) from the search term.{' '}
+				<a
+					target="_blank"
+					rel="noopener noreferrer"
+					href="https://docs.appbase.io/docs/search/Rules/#remove-words"
+				>
+					Learn more
+				</a>
+			</>
+		),
+	},
+	replace_words: {
+		name: 'Replace Word',
+		data: {},
+		toolTip: (
+			<>
+				Replace all the instances of a word in the applied search term.{' '}
+				<a
+					target="_blank"
+					rel="noopener noreferrer"
+					href="https://docs.appbase.io/docs/search/Rules/#replace-words"
+				>
+					Learn more
+				</a>
+			</>
+		),
+	},
 };
 
 class ActionSelector extends React.Component {
-	shouldComponentUpdate(nextProps) {
-		return hasValuesChanged(nextProps, this.props, ['actions', 'error']);
+	state = { healthy: true };
+
+	async componentDidMount() {
+		try {
+			await getFunctionHealthCheck();
+		} catch (e) {
+			this.setState({ healthy: false });
+		}
+	}
+
+	shouldComponentUpdate(nextProps, nextState) {
+		const { healthy } = this.state;
+		return (
+			hasValuesChanged(nextProps, this.props, ['actions', 'error', 'condition']) ||
+			healthy !== nextState.healthy
+		);
 	}
 
 	handleDropdown = value => {
@@ -29,11 +153,20 @@ class ActionSelector extends React.Component {
 		onChange({
 			type: value,
 			data: actions[value].data,
+			toolTip: actions[value].toolTip,
 		});
 	};
 
+	getDisabled = (condition, action) => {
+		if (actions[action].checkHealth) {
+			const { healthy } = this.state;
+			return !healthy;
+		}
+		return condition === 'always' ? actions[action].isDisabledOnAlways : false;
+	};
+
 	render() {
-		const { actions: selectedActions, error } = this.props;
+		const { actions: selectedActions, error, condition } = this.props;
 		const optionsToShow = Object.keys(actions).filter(
 			action => !selectedActions.find(item => item.type === action),
 		);
@@ -48,7 +181,9 @@ class ActionSelector extends React.Component {
 						value={undefined}
 					>
 						{optionsToShow.map(action => (
-							<Option key={action}>{actions[action].name}</Option>
+							<Option disabled={this.getDisabled(condition, action)} key={action}>
+								{actions[action].name}
+							</Option>
 						))}
 					</Select>
 				) : (

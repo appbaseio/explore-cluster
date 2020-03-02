@@ -59,13 +59,15 @@ export function handleInputClosure(setGlobalError, globalError) {
 export async function deploymentCheck(getFunction, functionName, myInterval) {
 	try {
 		const res = await getFunction(functionName);
-		if (res && res.payload) {
-			const { deploymentStatus } = res.payload;
+		if (res) {
+			const { deploymentStatus } = res.payload ? res.payload : res;
 			if (deploymentStatus === 'active' || deploymentStatus === 'failed') {
 				clearInterval(myInterval);
 			}
 		}
+		return res;
 	} catch (e) {
 		console.error(e);
 	}
+	return null;
 }

@@ -1,11 +1,12 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { Button, Col, Divider, Icon, List, Result, Row, Switch, Tooltip } from 'antd';
+import { Button, Col, Divider, Icon, List, Popover, Result, Row, Switch, Tooltip } from 'antd';
 import { connect } from 'react-redux';
 import { string } from 'prop-types';
 import get from 'lodash/get';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
 import { css } from 'emotion';
+import { Link } from 'react-router-dom';
 import Loader from '../../components/Loader';
 import Header from '../../components/Header';
 import {
@@ -25,6 +26,7 @@ import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Overlay from '../../components/Overlay';
 import { getFunctionHealthCheck } from '../../utils';
 import { deploymentCheck } from '../../components/DeployFunctionModal/helper';
+import { mediaKey } from '../../utils/media';
 
 const validPlans = [
 	'2019-production-2',
@@ -33,6 +35,20 @@ const validPlans = [
 	'arc-enterprise',
 	'hosted-arc-enterprise',
 ];
+
+const link = css`
+	font-size: 14px;
+	margin-right: 10px;
+	cursor: pointer;
+	i {
+		margin-right: 4px;
+	}
+
+	${mediaKey.small} {
+		display: block;
+		line-height: 48px;
+	}
+`;
 
 const IconText = ({ type, text }) => (
 	<span>
@@ -97,14 +113,24 @@ function UpdateFunction({ item }) {
 	);
 }
 
+function isQueryRuleAssociated(item) {
+	return (item.queryRules || []).length !== 0;
+}
+
 function Actions({ item, refetchFunction }) {
 	return (
 		<React.Fragment>
-			<TriggerFunction
-				isLoading={item.triggerUpdation}
-				refetchFunction={refetchFunction}
-				node={item}
-			/>
+			{isQueryRuleAssociated(item) ? (
+				<Link to="/cluster/rules" className={link}>
+					Associated Query Rules <Icon type="link" />
+				</Link>
+			) : (
+				<TriggerFunction
+					isLoading={item.triggerUpdation}
+					refetchFunction={refetchFunction}
+					node={item}
+				/>
+			)}
 
 			<InvokeButton item={item} />
 		</React.Fragment>
@@ -231,7 +257,13 @@ function FunctionItem({ item, onChange, getFunction }) {
 						</>
 					)}
 					<VerticalDivider />
-					<DeleteFunction name={func.service} loading={isDeleting} />
+					{isQueryRuleAssociated(item) ? (
+						<Popover content="This function is associated with a query rule, please delete rule first.">
+							<Icon type="delete" />
+						</Popover>
+					) : (
+						<DeleteFunction name={func.service} loading={isDeleting} />
+					)}
 				</>
 			}
 		/>
