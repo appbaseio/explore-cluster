@@ -68,7 +68,7 @@ class QueryRules extends Component {
 		if (tier && validPlans.indexOf(tier) === -1) {
 			return (
 				<React.Fragment>
-					<Banner {...bannerDetails} />
+					<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
 					<Overlay
 						style={{
 							maxWidth: '70%',
@@ -131,6 +131,7 @@ class QueryRules extends Component {
 									ghost
 									size="large"
 									rel="noopener noreferrer"
+									onClick={() => window.open(bannerDetails.href)}
 								>
 									Read More
 								</Button>

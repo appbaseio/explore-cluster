@@ -493,7 +493,7 @@ class QueryRulesForm extends React.Component {
 						style={{
 							maxWidth: '70%',
 						}}
-						src="https://i.imgur.com/WmzxSHs.png"
+						src="https://i.imgur.com/SL8nuRt.png"
 						alt="Query Rules"
 					/>
 				</React.Fragment>
@@ -584,11 +584,7 @@ class QueryRulesForm extends React.Component {
 						/>
 
 						<label>Rule Description</label>
-						<Input.TextArea
-							name="description"
-							value={description}
-							onChange={this.handleInput}
-						/>
+						<Input name="description" value={description} onChange={this.handleInput} />
 						<Divider />
 						<Row gutter={8}>
 							<Col md={12} sm={24}>
@@ -730,7 +726,7 @@ class QueryRulesForm extends React.Component {
 									showIcon
 								/>
 							) : null}
-							{isEditPage && !hasChanged ? (
+							{isEditPage && !hasChanged && !(isCreating || isUpdating) ? (
 								<Alert
 									style={{ marginRight: 10 }}
 									message="No Changes"

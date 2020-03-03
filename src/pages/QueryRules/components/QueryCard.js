@@ -150,8 +150,8 @@ class QueryCard extends React.Component {
 					<Col xl={9} lg={9} xs={0}>
 						<div className={actions}>
 							<DeleteModal
-								name="Rule"
-								value={rule.name.toLowerCase().replace(/ /g, '_')}
+								name="rule"
+								value={rule.name}
 								title="Delete Rule"
 								onDelete={() => handleQueryRuleDelete(rule, removeRule)}
 							>
@@ -184,13 +184,17 @@ class QueryCard extends React.Component {
 							}}
 						>
 							<Typography.Text strong style={{ marginRight: 5 }}>
-								{rule.enabled ? 'Disable' : 'Enable'} Rule
+								Rule Status
 							</Typography.Text>
-							<Switch
-								loading={rule.isToggling}
-								checked={rule.enabled}
-								onChange={this.handleRuleStatus}
-							/>
+							<Tooltip
+								title={`Toggle to ${rule.enabled ? 'disable' : 'enable'} the rule`}
+							>
+								<Switch
+									loading={rule.isToggling}
+									checked={rule.enabled}
+									onChange={this.handleRuleStatus}
+								/>
+							</Tooltip>
 						</div>
 					</Col>
 				</Row>
@@ -204,4 +208,7 @@ const mapDispatchToProps = dispatch => ({
 	toggleRule: rule => dispatch(toggleRuleStatus(rule)),
 });
 
-export default connect(null, mapDispatchToProps)(QueryCard);
+export default connect(
+	null,
+	mapDispatchToProps,
+)(QueryCard);
