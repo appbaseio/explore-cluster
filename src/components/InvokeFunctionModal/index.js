@@ -1,42 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Modal, Row, Skeleton } from 'antd';
+import { Modal } from 'antd';
 import { css } from 'emotion';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
-import { modalHeading } from '../../pages/HomePage/styles';
-import Ace from '../../batteries/components/SearchSandbox/containers/AceEditor';
 import { FUNCTIONS } from '../../constants';
 import { invokeFunction } from '../../batteries/modules/actions';
+import { InvokeFunctionBody } from './InvokeFunctionBody';
 
 const title = css`
 	display: flex;
 	justify-content: space-between;
 `;
 
-function InvokeResponse({ responseData, status }) {
-	console.log('response data', responseData);
-	const { headers, ...rest } = responseData;
-	// ___headers___['X-Duration-Seconds']
-	return (
-		<>
-			<Row>
-				<h3 className={modalHeading}>Response Status</h3>
-				{status}
-			</Row>
-			<Row>
-				<h3 className={modalHeading}>Execution Time</h3>
-				{headers['X-Duration-Seconds']}s
-			</Row>
-			<Row>
-				<h3 className={modalHeading}>Response Data</h3>
-				<pre>{JSON.stringify(rest, null, 4)}</pre>
-			</Row>
-		</>
-	);
-}
-
-function getPayload(parsedData, executeBefore) {
+export function getPayload(parsedData, executeBefore) {
 	return {
 		extraRequestPayload: parsedData,
 		request: {
@@ -190,40 +167,17 @@ const InvokeFunctionModal = ({
 			footer={null}
 			width={600}
 		>
-			<Row>
-				<h3 className={modalHeading} style={{ marginTop: 0 }}>
-					Request Data
-				</h3>
-				<Ace
-					mode="json"
-					value={requestData}
-					onChange={handleRequestDataChange}
-					name="editor-JSON"
-					fontSize={14}
-					showPrintMargin
-					style={{ width: '100%', maxHeight: '300px' }}
-					showGutter
-					highlightActiveLine
-					setOptions={{
-						showLineNumbers: true,
-						tabSize: 2,
-					}}
-					editorProps={{ $blockScrolling: true }}
-				/>
-			</Row>
-			<Row style={{ marginTop: '16px' }}>
-				<Button disabled={!isValidJSON || loading} onClick={handleSubmit} type="primary">
-					Invoke
-				</Button>
-			</Row>
-			{loading ? (
-				<Skeleton />
-			) : (
-				invokeState !== FUNCTIONS.NOT_INVOKED &&
-				responseData && (
-					<InvokeResponse status={status} time={roundTrip} responseData={responseData} />
-				)
-			)}
+			<InvokeFunctionBody
+				value={requestData}
+				onChange={handleRequestDataChange}
+				validJSON={isValidJSON}
+				loading={loading}
+				onClick={handleSubmit}
+				invokeState={invokeState}
+				responseData={responseData}
+				status={status}
+				time={roundTrip}
+			/>
 		</Modal>
 	);
 };
@@ -251,4 +205,7 @@ const mapDispatchToProps = dispatch => ({
 	invokeFunction: (name, payload) => dispatch(invokeFunction(name, payload)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(InvokeFunctionModal);
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps,
+)(InvokeFunctionModal);

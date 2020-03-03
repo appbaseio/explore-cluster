@@ -71,10 +71,10 @@
     react-slick "^0.24.0"
     slick-carousel "^1.8.1"
 
-"@appbaseio/reactivecore@9.3.0-beta.1":
-  version "9.3.0-beta.1"
-  resolved "https://registry.yarnpkg.com/@appbaseio/reactivecore/-/reactivecore-9.3.0-beta.1.tgz#33b68613df5a058fdf8eea08d9c4f2bccf1c60c9"
-  integrity sha512-i74Ugp+Zff/uQ/9VOiQv0AKJAnxRMSBEpslXpUflGehRnl6ONVXp2AQu68aQS0rMI1Tsu9V6M6oz7/Wmew1JMg==
+"@appbaseio/reactivecore@9.3.0-beta.2":
+  version "9.3.0-beta.2"
+  resolved "https://registry.yarnpkg.com/@appbaseio/reactivecore/-/reactivecore-9.3.0-beta.2.tgz#c645a83d2f386214241a7af4af1930c5acdd033c"
+  integrity sha512-9M7HvxCn+5jqqqBE6XFe7/FOjw1FlDmyFiPa9HUEJxATXpMbEQcrnEI4+aU3ymzAG+lmD+Z2uhmT8xVY6U7Qyw==
   dependencies:
     cross-fetch "^3.0.4"
     prop-types "^15.6.0"
@@ -91,12 +91,12 @@
     redux "^4.0.0"
     redux-thunk "^2.3.0"
 
-"@appbaseio/reactivesearch@^3.5.0-beta.1":
-  version "3.5.0-beta.1"
-  resolved "https://registry.yarnpkg.com/@appbaseio/reactivesearch/-/reactivesearch-3.5.0-beta.1.tgz#d543a15b06be1b84b3ae633d9ecbd57219aa5656"
-  integrity sha512-3FucG/DzN5jmkdF33AC3xNDub7EI1sSXfsRRpVppsgUW5LTXs3yC+u4bnV5iOWuXi4A9RQ7bddHoSHELG3wCeQ==
+"@appbaseio/reactivesearch@^3.5.0-beta.2":
+  version "3.5.0-beta.2"
+  resolved "https://registry.yarnpkg.com/@appbaseio/reactivesearch/-/reactivesearch-3.5.0-beta.2.tgz#79a93f8e3862a04a56e8f32781680921241f5067"
+  integrity sha512-h4LhM7GXMKuPOpivJ6gLGSg0CtWcFtnM0gUyajz+8kLERnukWZJVpn+SQHh5157NySoWorLO8+S1qWITRbXZUA==
   dependencies:
-    "@appbaseio/reactivecore" "9.3.0-beta.1"
+    "@appbaseio/reactivecore" "9.3.0-beta.2"
     appbase-js "^4.0.2-beta.13"
     cross-env "^5.2.0"
     downshift "^1.31.2"

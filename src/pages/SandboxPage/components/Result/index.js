@@ -15,9 +15,8 @@ class Result extends React.Component {
 	};
 
 	render() {
-		const { filters, search, result, app, credentials, url } = this.props;
+		const { result, app, credentials, url, onChange, query } = this.props;
 		const { view } = this.state;
-		const listIds = Object.keys(filters.dataField).map((_, index) => `list-${index}`);
 		return (
 			<Card>
 				<Row type="flex" justify="space-between" align="middle">
@@ -37,15 +36,14 @@ class Result extends React.Component {
 					</Radio.Group>
 				</Row>
 				{view === 'list' ? (
-					<ListView result={result} listIds={listIds} />
+					<ListView result={result} />
 				) : (
 					<QueryView
 						app={app}
 						credentials={credentials}
 						url={url}
-						filters={filters}
-						search={search}
-						result={result}
+						query={query}
+						onChange={onChange}
 					/>
 				)}
 			</Card>

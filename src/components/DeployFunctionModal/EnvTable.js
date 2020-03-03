@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Col, Icon, Input, Row } from 'antd';
 import { css } from 'emotion';
-import { commonRowPad } from '../helper';
-import { modalHeading } from '../../../pages/HomePage/styles';
+import { commonRowPad } from './helper';
+import { modalHeading } from '../../pages/HomePage/styles';
 
 const deleteIcon = css`
 	color: red;

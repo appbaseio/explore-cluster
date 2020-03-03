@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Row, Col, Button, Icon, Switch, Affix } from 'antd';
+import { Row, Col, Switch, Affix } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
@@ -8,9 +8,12 @@ import { ReactiveBase } from '@appbaseio/reactivesearch';
 
 import Filter from './Filter';
 
-import { getSettings } from '../../../batteries/modules/actions';
+import { getSettings, getAppMappings } from '../../../batteries/modules/actions';
 import Search from './Search';
 import Result from './Result/index';
+import { generateQuery } from '../utils';
+import { getAggsMappings } from '../../../batteries/utils/mappings';
+import { getRawMappingsByAppName } from '../../../batteries/modules/selectors';
 
 const container = css`
 	padding: 16px;
@@ -21,13 +24,97 @@ const container = css`
 `;
 
 class SearchPreview extends React.Component {
+	state = {
+		settings: null,
+		searchableMappings: [],
+		hasMappingsLoaded: false,
+	};
+
 	componentDidMount() {
-		const { app, fetchSearchSettings } = this.props;
+		const { app, fetchSearchSettings, fetchMappings, credentials, url } = this.props;
 		fetchSearchSettings(app);
+		fetchMappings(app, credentials, url);
 	}
+
+	componentDidUpdate(prevProps) {
+		const { mappings } = this.props;
+		if (mappings && JSON.stringify(prevProps.mappings) !== JSON.stringify(mappings)) {
+			const searchableMappings = this.getSearchableMappings(mappings);
+
+			// eslint-disable-next-line
+			this.setState({
+				searchableMappings,
+				hasMappingsLoaded: true,
+			});
+		}
+	}
+
+	getSearchableMappings = mappings => {
+		const parsedMappings = getAggsMappings(mappings, true);
+		const searchableMappings = parsedMappings
+			.filter(mapping => mapping.usecase === 'search' || mapping.usecase === 'searchaggs')
+			.map(item => item.address);
+
+		return searchableMappings;
+	};
+
+	static getDerivedStateFromProps(props, state) {
+		if (state && !state.settings && props.settings) {
+			if (
+				state.hasMappingsLoaded &&
+				props.mappings &&
+				props.settings &&
+				props.settings.search &&
+				props.settings.search.dataField &&
+				props.settings.search.dataField.length === 0
+			) {
+				return {
+					settings: generateQuery({
+						...props.settings,
+						search: {
+							...props.settings.search,
+							dataField: state.searchableMappings,
+							fieldWeights: new Array(state.searchableMappings.length).fill(1),
+						},
+					}),
+				};
+			}
+			return {
+				settings: generateQuery(props.settings),
+			};
+		}
+		if (
+			state.hasMappingsLoaded &&
+			props.mappings &&
+			props.settings &&
+			props.settings.search &&
+			props.settings.search.dataField &&
+			props.settings.search.dataField.length === 0
+		) {
+			return {
+				settings: generateQuery({
+					...props.settings,
+					search: {
+						...props.settings.search,
+						dataField: state.searchableMappings,
+						fieldWeights: new Array(state.searchableMappings.length).fill(1),
+					},
+				}),
+			};
+		}
+
+		return state;
+	}
+
+	handleSettingsChange = settings => {
+		this.setState({
+			settings,
+		});
+	};
 
 	render() {
 		const { settings, app, credentials, url } = this.props;
+		const { settings: stateSettings } = this.state;
 
 		if (!settings) {
 			return null;
@@ -37,6 +124,13 @@ class SearchPreview extends React.Component {
 			return null;
 		}
 
+		if (!stateSettings) {
+			return null;
+		}
+
+		const aggregations = stateSettings.filter(item => item.id.startsWith('list'));
+		const search = stateSettings.find(item => item.id === 'search');
+		const result = stateSettings.find(item => item.id === 'result');
 		return (
 			<Row className={container} gutter={16}>
 				<Col xs={24}>
@@ -55,18 +149,18 @@ class SearchPreview extends React.Component {
 				</Col>
 				<ReactiveBase app={app} enableAppbase credentials={credentials} url={url}>
 					<Col md={6}>
-						<Filter app={app} aggs={settings.aggregations} />
+						<Filter app={app} aggs={aggregations} />
 					</Col>
 					<Col md={18}>
 						<Affix offsetTop={60}>
-							<Search app={app} search={settings.search} />
+							<Search app={app} search={search} />
 						</Affix>
 						<Result
-							result={settings.results}
-							search={settings.search}
-							filters={settings.aggregations}
+							result={result}
+							query={stateSettings}
 							app={app}
 							url={url}
+							onChange={this.handleSettingsChange}
 							credentials={credentials}
 						/>
 					</Col>
@@ -78,10 +172,13 @@ class SearchPreview extends React.Component {
 
 const mapStateToProps = (state, props) => ({
 	settings: get(state.$getAppSettings, `settings.${props.app}`),
+	mappings: getRawMappingsByAppName(state) || null,
 });
 
 const mapDispatchToProps = dispatch => ({
 	fetchSearchSettings: appName => dispatch(getSettings(appName)),
+	fetchMappings: (appName, credentials, url) =>
+		dispatch(getAppMappings(appName, credentials, url)),
 });
 
 SearchPreview.propTypes = {

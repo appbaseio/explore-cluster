@@ -5,7 +5,7 @@ import { css } from 'emotion';
 
 import AceEditor from '../../../../batteries/components/SearchSandbox/containers/AceEditor';
 
-import { isValidJSON, generateQuery } from '../../utils';
+import { isValidJSON } from '../../utils';
 
 const headingStyle = css`
 	font-size: 16px;
@@ -17,13 +17,7 @@ const headingStyle = css`
 class QueryView extends React.Component {
 	constructor(props) {
 		super(props);
-		const { filters, search, result, app, url, credentials } = props;
-		const generatedQuery = generateQuery({
-			filters,
-			search,
-			result,
-		});
-
+		const { query, app, url, credentials } = props;
 		this.appbaseRef = Appbase({
 			app,
 			url,
@@ -31,8 +25,8 @@ class QueryView extends React.Component {
 		});
 
 		this.state = {
-			query: generatedQuery,
-			isValid: isValidJSON(generatedQuery),
+			query: JSON.stringify(query, null, 4),
+			isValid: isValidJSON(query),
 			isExecuting: false,
 			response: null,
 		};
@@ -46,16 +40,29 @@ class QueryView extends React.Component {
 
 	handleEditor = value => {
 		const isValid = isValidJSON(value);
+		if (isValid) {
+			const parsedQuery = JSON.parse(value);
+			const isNotValidId = parsedQuery.some(
+				item =>
+					!(item.id === 'search' || item.id === 'result' || item.id.startsWith('list')),
+			);
 
-		this.setState({
-			query: value,
-			isValid,
-			response: null,
-		});
+			if (isNotValidId) {
+				message.error('Changing id is not allowed.');
+				this.forceUpdate();
+				return;
+			}
+			this.setState({
+				query: value,
+				isValid,
+				response: null,
+			});
+		}
 	};
 
 	runQuery = () => {
 		const { query } = this.state;
+		const { onChange } = this.props;
 
 		const parsedQuery = JSON.parse(query);
 		this.toggleExecutionStatus();
@@ -65,6 +72,9 @@ class QueryView extends React.Component {
 				this.setState({
 					response: JSON.stringify(res, null, 4),
 				});
+				if (onChange) {
+					onChange(parsedQuery);
+				}
 				this.toggleExecutionStatus();
 			})
 			.catch(e => {

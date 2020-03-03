@@ -1,23 +1,24 @@
-const generateQuery = ({ filters, search, result }) => {
+const generateQuery = ({ aggregations: filters, search, results }) => {
 	const filtersData = Object.keys(filters.dataField).map((filter, index) => {
+		const filterField = filters.dataField[filter] === 'term' ? `${filter}.keyword` : filter;
 		return {
 			id: `list-${index}`,
-			dataField: typeof filter === 'string' ? [filter] : filter,
+			dataField: typeof filterField === 'string' ? [filterField] : filterField,
 			sortBy: filters.sortBy,
 			size: filters.size,
 		};
 	});
 
 	const filtersId = filtersData.map(filter => filter.id);
-
+	const resultDataField = results.dataField || '_score';
 	const query = [
 		{
-			...result,
+			...results,
 			id: 'result',
 			react: {
 				and: ['search', ...filtersId],
 			},
-			dataField: Array.isArray(result.dataField) ? result.dataField : [result.dataField],
+			dataField: Array.isArray(resultDataField) ? resultDataField : [resultDataField],
 		},
 		{
 			...search,
@@ -26,8 +27,7 @@ const generateQuery = ({ filters, search, result }) => {
 		},
 		...filtersData,
 	];
-
-	return JSON.stringify(query, null, 4);
+	return query;
 };
 
 const isValidJSON = value => {
@@ -42,4 +42,21 @@ const isValidJSON = value => {
 	return false;
 };
 
-export { isValidJSON, generateQuery };
+const flatObject = (obj, path = '') => {
+	const newObj = JSON.parse(JSON.stringify(obj));
+
+	return Object.keys(newObj).reduce((agg, key) => {
+		if (!Array.isArray(newObj[key]) && typeof newObj[key] === 'object') {
+			return {
+				...agg,
+				...flatObject(newObj[key], path ? `${path}.${key}` : key),
+			};
+		}
+		return {
+			...agg,
+			[path ? `${path}.${key}` : key]: newObj[key],
+		};
+	}, {});
+};
+
+export { isValidJSON, generateQuery, flatObject };

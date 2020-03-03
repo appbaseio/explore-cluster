@@ -296,19 +296,6 @@ class AppLayout extends React.PureComponent {
 								/>
 							)}
 						/>
-
-						<Route
-							exact
-							path="/app/:appName/query-rules"
-							render={props => (
-								<AppPageContainer
-									{...props}
-									component={QueryRulesPage}
-									shouldFetchAppInfo={false}
-									shouldFetchAppPlan={false}
-								/>
-							)}
-						/>
 						<Route
 							exact
 							path="/app/:appName/search-templates"
