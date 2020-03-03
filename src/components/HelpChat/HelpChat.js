@@ -11,7 +11,6 @@ const helpIcon = css`
 	i {
 		font-size: 22px !important;
 		position: relative;
-		top: 2px;
 	}
 `;
 
@@ -112,6 +111,12 @@ class HelpButton extends React.Component {
 			case 'privacy':
 				window.open('https://appbase.io/privacy/', '_blank');
 				break;
+			case 'whats_new':
+				window.open(
+					'https://www.notion.so/appbase/Appbase-io-Change-Log-506702ad91c147c3a6674e988ba59f91',
+					'_blank',
+				);
+				break;
 			default:
 		}
 	};
@@ -131,6 +136,9 @@ class HelpButton extends React.Component {
 				</Menu.Item>
 				<Menu.Item key="support">
 					<h3 className={heading}>Get Support!</h3>
+				</Menu.Item>
+				<Menu.Item key="whats_new">
+					<p className={subHeading}>See what{`'`}s new ✨</p>
 				</Menu.Item>
 				<Menu.Item key="twitter">
 					<p className={subHeading}>@appbaseio - Twitter</p>
