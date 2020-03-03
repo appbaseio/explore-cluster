@@ -42,10 +42,10 @@
     url-search-params "^1.1.0"
     uuid "^3.3.2"
 
-"@appbaseio/dejavu-browser@^3.4.3":
-  version "3.4.3"
-  resolved "https://registry.yarnpkg.com/@appbaseio/dejavu-browser/-/dejavu-browser-3.4.3.tgz#a529a2388ba01e52357b4b5094b46b127054da4d"
-  integrity sha512-8X1CKK5JUfJMR2EemILi5ZbpVuK+02eZJelR0Dx2vw/eEBdjZqFUvYq5m3uhRI2P0kldNplMIDguSfAA5Cb45g==
+"@appbaseio/dejavu-browser@^3.4.4":
+  version "3.4.4"
+  resolved "https://registry.yarnpkg.com/@appbaseio/dejavu-browser/-/dejavu-browser-3.4.4.tgz#49ef8c9cf29495a27558ca3161a89e2f2dfd5754"
+  integrity sha512-NXO2LlIRydykVvqqEX3Dwdo9BOC3VJHTaPIAzHHzfrgjRTiKKwXVVhZJDtLb6RD8MQOANPlRPPRSk0Lu5IQ0kA==
   dependencies:
     "@divyanshu013/media" "^1.0.0"
     cross-storage "^1.0.0"
