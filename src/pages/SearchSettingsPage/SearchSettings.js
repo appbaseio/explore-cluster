@@ -20,6 +20,7 @@ import {
 	getSettings,
 	putSettings,
 	getAppMappings,
+	deleteSettings,
 } from '../../batteries/modules/actions';
 import { getURL } from '../../constants/config';
 import Mappings from '../../batteries/components/Mappings/Mappings';
@@ -30,6 +31,7 @@ import { ReviewAndSave } from '../../components/ReviewAndSave';
 import SearchPreviewModal from '../../components/SearchPreviewModal';
 import { SettingsFooter } from '../../components/SettingsFooter';
 import { container } from '../ResultsPage/styles';
+import { getReIndexedName } from '../../utils';
 
 const { Option } = Select;
 
@@ -179,7 +181,6 @@ class SearchSettingsPage extends React.Component {
 			hasSearchOperators,
 		} = this.state;
 		const { updateSettingsAction, appName, settings } = this.props;
-		const reIndex = get(this.mappingsRef, 'current.wrappedInstance.reIndex');
 
 		updateSettingsAction(appName, {
 			...settings,
@@ -201,7 +202,7 @@ class SearchSettingsPage extends React.Component {
 					message.success(`Search settings for ${appName} saved successfully`);
 
 					if (isDirty) {
-						reIndex();
+						this.reIndex();
 					}
 				}
 			})
@@ -232,6 +233,26 @@ class SearchSettingsPage extends React.Component {
 			});
 	};
 
+	reIndex = async () => {
+		const reIndex = get(this.mappingsRef, 'current.wrappedInstance.reIndex');
+		const { dataField, typoTolerance, hasTypoTolerance, hasSearchOperators } = this.state;
+		const { updateSettingsAction, appName, settings, deleteSettingsAction } = this.props;
+
+		deleteSettingsAction(appName);
+		reIndex(() =>
+			updateSettingsAction(getReIndexedName(appName), {
+				...settings,
+				search: {
+					...settings.search,
+					fuzziness: hasTypoTolerance ? typoTolerance : 0,
+					dataField: Object.keys(dataField),
+					fieldWeights: Object.values(dataField),
+					searchOperators: hasSearchOperators,
+				},
+			}),
+		);
+	};
+
 	render() {
 		const {
 			dataField,
@@ -240,6 +261,7 @@ class SearchSettingsPage extends React.Component {
 			hasTypoTolerance,
 			typoTolerance,
 			visible,
+			isDirty,
 		} = this.state;
 		const { isUpdating, settings, appName, resetState } = this.props;
 		const toleranceOptions = ['AUTO', 1, 2];
@@ -377,12 +399,15 @@ class SearchSettingsPage extends React.Component {
 						onSubmit={this.handleSave}
 						resetState={resetState}
 						onReset={this.resetToDefault}
-						disabled={isEqual(get(settings, 'search'), {
-							fuzziness: hasTypoTolerance ? typoTolerance : 0,
-							searchOperators: hasSearchOperators,
-							dataField: Object.keys(dataField),
-							fieldWeights: Object.values(dataField),
-						})}
+						disabled={
+							!isDirty &&
+							isEqual(get(settings, 'search'), {
+								fuzziness: hasTypoTolerance ? typoTolerance : 0,
+								searchOperators: hasSearchOperators,
+								dataField: Object.keys(dataField),
+								fieldWeights: Object.values(dataField),
+							})
+						}
 						reviewAndSave={() => (
 							<ReviewAndSave
 								oldValues={get(settings, 'search')}
@@ -432,6 +457,7 @@ const mapDispatchToProps = dispatch => ({
 	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
 	getSettingsAction: name => dispatch(getSettings(name)),
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
+	deleteSettingsAction: name => dispatch(deleteSettings(name)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchSettingsPage);

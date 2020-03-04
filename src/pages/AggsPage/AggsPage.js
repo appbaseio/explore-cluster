@@ -23,6 +23,7 @@ import {
 	putSettings,
 	getDefaultSettings,
 	getSettings,
+	deleteSettings,
 } from '../../batteries/modules/actions';
 import { getURL } from '../../constants/config';
 import Mappings from '../../batteries/components/Mappings/Mappings';
@@ -34,6 +35,7 @@ import { SettingsFooter } from '../../components/SettingsFooter';
 import { ReviewAndSave } from '../../components/ReviewAndSave';
 import { container } from '../ResultsPage/styles';
 import SearchPreviewModal from '../../components/SearchPreviewModal';
+import { getReIndexedName } from '../../utils';
 
 const { Option } = Select;
 
@@ -168,7 +170,6 @@ class AggsPage extends React.Component {
 	handleSave = () => {
 		const { isDirty, dataField, sort, count, includeNullValue } = this.state;
 		const { updateSettingsAction, appName, settings } = this.props;
-		const reIndex = get(this.mappingsRef, 'current.wrappedInstance.reIndex');
 
 		updateSettingsAction(appName, {
 			...settings,
@@ -190,7 +191,7 @@ class AggsPage extends React.Component {
 					message.success(`Aggregation settings for ${appName} saved successfully`);
 
 					if (isDirty) {
-						reIndex();
+						this.reIndex();
 					}
 				}
 			})
@@ -200,6 +201,26 @@ class AggsPage extends React.Component {
 					description: e.message,
 				});
 			});
+	};
+
+	reIndex = async () => {
+		const reIndex = get(this.mappingsRef, 'current.wrappedInstance.reIndex');
+		const { dataField, sort, count, includeNullValue } = this.state;
+		const { updateSettingsAction, appName, settings, deleteSettingsAction } = this.props;
+
+		deleteSettingsAction(appName);
+		reIndex(() =>
+			updateSettingsAction(getReIndexedName(appName), {
+				...settings,
+				aggregations: {
+					...settings.aggregations,
+					dataField,
+					size: count,
+					sortBy: sort,
+					includeNullValues: includeNullValue,
+				},
+			}),
+		);
 	};
 
 	resetChanges = () => {
@@ -228,6 +249,7 @@ class AggsPage extends React.Component {
 			count,
 			includeNullValue,
 			visible,
+			isDirty,
 		} = this.state;
 		const { isUpdating, settings, resetState, appName } = this.props;
 		const sortOptions = [
@@ -375,42 +397,20 @@ class AggsPage extends React.Component {
 							onChange={value => this.handleChange('includeNullValue', value)}
 						/>
 					</Card>
-					{/* <Affix offsetBottom={0}>
-						<div
-							style={{
-								padding: 20,
-								background: 'white',
-								boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.15)',
-								boxSizing: 'border-box',
-								border: '1px solid #e8e8e8',
-							}}
-						>
-							<Button type="primary" loading={isUpdating} onClick={this.handleSave}>
-								<Icon type={isUpdating ? 'loading' : 'save'} />
-								{isDirty ? 'Apply Settings and Reindex' : 'Save Settings'}
-							</Button>
-							<Button
-								onClick={this.resetChanges}
-								style={{ marginLeft: 10 }}
-								type="danger"
-								ghost
-							>
-								Reset
-							</Button>
-						</div>
-					</Affix> */}
-
 					<SettingsFooter
 						loading={isUpdating}
 						onSubmit={this.handleSave}
 						resetState={resetState}
 						onReset={this.resetToDefault}
-						disabled={isEqual(get(settings, 'aggregations'), {
-							size: count,
-							sortBy: sort,
-							includeNullValues: includeNullValue,
-							dataField,
-						})}
+						disabled={
+							!isDirty &&
+							isEqual(get(settings, 'aggregations'), {
+								size: count,
+								sortBy: sort,
+								includeNullValues: includeNullValue,
+								dataField,
+							})
+						}
 						reviewAndSave={() => (
 							<ReviewAndSave
 								oldValues={get(settings, 'aggregations')}
@@ -459,6 +459,7 @@ const mapDispatchToProps = dispatch => ({
 	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
 	getSettingsAction: name => dispatch(getSettings(name)),
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
+	deleteSettingsAction: name => dispatch(deleteSettings(name)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AggsPage);
