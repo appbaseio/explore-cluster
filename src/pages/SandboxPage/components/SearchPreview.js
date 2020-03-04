@@ -14,6 +14,7 @@ import Result from './Result/index';
 import { generateQuery } from '../utils';
 import { getAggsMappings } from '../../../batteries/utils/mappings';
 import { getRawMappingsByAppName } from '../../../batteries/modules/selectors';
+import { getURL } from '../../../constants/config';
 
 const container = css`
 	padding: 16px;
@@ -73,8 +74,10 @@ class SearchPreview extends React.Component {
 						...props.settings,
 						search: {
 							...props.settings.search,
-							dataField: state.searchableMappings,
-							fieldWeights: new Array(state.searchableMappings.length).fill(1),
+							dataField: state.searchableMappings.reduce((agg, field) => {
+								return [...agg, field, `${field}.search`];
+							}, []),
+							fieldWeights: new Array(state.searchableMappings.length * 2).fill(1),
 						},
 					}),
 				};
@@ -96,8 +99,10 @@ class SearchPreview extends React.Component {
 					...props.settings,
 					search: {
 						...props.settings.search,
-						dataField: state.searchableMappings,
-						fieldWeights: new Array(state.searchableMappings.length).fill(1),
+						dataField: state.searchableMappings.reduce((agg, field) => {
+							return [...agg, field, `${field}.search`];
+						}, []),
+						fieldWeights: new Array(state.searchableMappings.length * 2).fill(1),
 					},
 				}),
 			};
@@ -170,10 +175,15 @@ class SearchPreview extends React.Component {
 	}
 }
 
-const mapStateToProps = (state, props) => ({
-	settings: get(state.$getAppSettings, `settings.${props.app}`),
-	mappings: getRawMappingsByAppName(state) || null,
-});
+const mapStateToProps = (state, props) => {
+	const { username, password } = get(state, 'user.data', {});
+	return {
+		settings: get(state.$getAppSettings, `settings.${props.app}`),
+		mappings: getRawMappingsByAppName(state) || null,
+		credentials: username ? `${username}:${password}` : null,
+		url: getURL(),
+	};
+};
 
 const mapDispatchToProps = dispatch => ({
 	fetchSearchSettings: appName => dispatch(getSettings(appName)),

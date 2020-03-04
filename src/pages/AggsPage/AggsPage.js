@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { get } from 'lodash';
+import { get, isEqual } from 'lodash';
 import { css } from 'emotion';
 import {
 	Card,
@@ -30,12 +30,12 @@ import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import { getAggsMappings } from '../../batteries/utils/mappings';
 import { dropdown } from '../../batteries/components/Mappings/styles';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
+import { SettingsFooter } from '../../components/SettingsFooter';
+import { ReviewAndSave } from '../../components/ReviewAndSave';
+import { container } from '../ResultsPage/styles';
+import SearchPreviewModal from '../../components/SearchPreviewModal';
 
 const { Option } = Select;
-
-const container = css`
-	padding: 50px;
-`;
 
 const bannerMessage = {
 	title: 'Aggregations Settings',
@@ -71,6 +71,7 @@ class AggsPage extends React.Component {
 		sort: undefined,
 		includeNullValue: false,
 		isDirty: false,
+		visible: false,
 	};
 
 	mappingsRef = React.createRef(null);
@@ -98,6 +99,12 @@ class AggsPage extends React.Component {
 			this.initData(settings);
 		}
 	}
+
+	toggleVisible = () => {
+		this.setState(prevState => ({
+			visible: !prevState.visible,
+		}));
+	};
 
 	initData = settings => {
 		this.setState({
@@ -202,6 +209,17 @@ class AggsPage extends React.Component {
 		cancelChanges();
 	};
 
+	resetToDefault = () => {
+		const { getDefaultSettingsAction, defaultSettings } = this.props;
+		if (defaultSettings) this.initData(defaultSettings);
+		else
+			getDefaultSettingsAction().then(res => {
+				if (res && res.payload) {
+					this.initData(res.payload);
+				}
+			});
+	};
+
 	render() {
 		const {
 			searchableMappings,
@@ -209,9 +227,9 @@ class AggsPage extends React.Component {
 			sort,
 			count,
 			includeNullValue,
-			isDirty,
+			visible,
 		} = this.state;
-		const { isUpdating } = this.props;
+		const { isUpdating, settings, resetState, appName } = this.props;
 		const sortOptions = [
 			{ name: 'Count', value: 'count' },
 			{ name: 'Ascending', value: 'asc' },
@@ -221,6 +239,7 @@ class AggsPage extends React.Component {
 			<React.Fragment>
 				<Banner {...bannerMessage} />
 				<div className={container}>
+					<SearchPreviewModal app={appName} />
 					<Card>
 						<Mappings
 							showSynonyms={false}
@@ -232,6 +251,7 @@ class AggsPage extends React.Component {
 							hideSearchType
 							hideDelete
 							hideDataType
+							hidePropertiesType
 							onChange={this.handleMappingChange}
 							column={{
 								title: 'Aggregation Type',
@@ -355,7 +375,7 @@ class AggsPage extends React.Component {
 							onChange={value => this.handleChange('includeNullValue', value)}
 						/>
 					</Card>
-					<Affix offsetBottom={0}>
+					{/* <Affix offsetBottom={0}>
 						<div
 							style={{
 								padding: 20,
@@ -378,7 +398,38 @@ class AggsPage extends React.Component {
 								Reset
 							</Button>
 						</div>
-					</Affix>
+					</Affix> */}
+
+					<SettingsFooter
+						loading={isUpdating}
+						onSubmit={this.handleSave}
+						resetState={resetState}
+						onReset={this.resetToDefault}
+						disabled={isEqual(get(settings, 'aggregations'), {
+							size: count,
+							sortBy: sort,
+							includeNullValues: includeNullValue,
+							dataField,
+						})}
+						reviewAndSave={() => (
+							<ReviewAndSave
+								oldValues={get(settings, 'aggregations')}
+								newValues={{
+									size: count,
+									sortBy: sort,
+									includeNullValues: includeNullValue,
+									dataField,
+								}}
+								onClick={this.toggleVisible}
+								visible={visible}
+								onRevert={this.resetChanges}
+								onSave={() => {
+									this.handleSave();
+									this.toggleVisible();
+								}}
+							/>
+						)}
+					/>
 				</div>
 			</React.Fragment>
 		);

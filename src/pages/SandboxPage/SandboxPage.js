@@ -34,7 +34,7 @@ class SandboxPage extends Component {
 
 		return (
 			<div>
-				<SearchPreview credentials={credentials} app={appName} url={getURL()} />
+				<SearchPreview app={appName} />
 			</div>
 		);
 	}

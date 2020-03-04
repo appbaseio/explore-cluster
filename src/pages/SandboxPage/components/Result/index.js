@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Radio, Icon, Row, Button, Alert } from 'antd';
 import { StateProvider } from '@appbaseio/reactivesearch';
+import { Link } from 'react-router-dom';
 import { get } from 'lodash';
 import QueryView from './QueryView';
 import ListView from './ListView';
@@ -42,10 +43,12 @@ class Result extends React.Component {
 					}}
 				/>
 				<Row type="flex" justify="space-between" align="middle">
-					<Button ghost type="primary">
-						<Icon type="edit" />
-						Set Result View
-					</Button>
+					<Link to={`/app/${app}/results/`}>
+						<Button ghost type="primary">
+							<Icon type="edit" />
+							Set Result View
+						</Button>
+					</Link>
 					<Radio.Group value={view} onChange={this.handleViewChange}>
 						<Radio.Button value="list">
 							<Icon style={{ marginRight: 5 }} type="unordered-list" />

@@ -1,13 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { get } from 'lodash';
+import { get, isEqual } from 'lodash';
 import { css } from 'emotion';
 import {
 	Card,
 	Select,
 	Affix,
 	Row,
-	Button,
 	Col,
 	Icon,
 	InputNumber,
@@ -28,12 +27,11 @@ import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { getAggsMappings } from '../../batteries/utils/mappings';
 import { ReviewAndSave } from '../../components/ReviewAndSave';
+import SearchPreviewModal from '../../components/SearchPreviewModal';
+import { SettingsFooter } from '../../components/SettingsFooter';
+import { container } from '../ResultsPage/styles';
 
 const { Option } = Select;
-
-const container = css`
-	padding: 50px;
-`;
 
 const bannerMessage = {
 	title: 'Search Settings',
@@ -158,7 +156,11 @@ class SearchSettingsPage extends React.Component {
 
 	handleSearchWeight = (address, value) => {
 		this.setState(prevState => ({
-			dataField: { ...prevState.dataField, [address]: value },
+			dataField: {
+				...prevState.dataField,
+				[address]: value,
+				[`${address}.search`]: value,
+			},
 		}));
 	};
 
@@ -219,6 +221,17 @@ class SearchSettingsPage extends React.Component {
 		this.toggleVisible();
 	};
 
+	resetToDefault = () => {
+		const { getDefaultSettingsAction, defaultSettings } = this.props;
+		if (defaultSettings) this.initData(defaultSettings);
+		else
+			getDefaultSettingsAction().then(res => {
+				if (res && res.payload) {
+					this.initData(res.payload);
+				}
+			});
+	};
+
 	render() {
 		const {
 			dataField,
@@ -226,15 +239,15 @@ class SearchSettingsPage extends React.Component {
 			hasSearchOperators,
 			hasTypoTolerance,
 			typoTolerance,
-			isDirty,
 			visible,
 		} = this.state;
-		const { isUpdating, settings } = this.props;
-		const toleranceOptions = ['auto', 1, 2];
+		const { isUpdating, settings, appName, resetState } = this.props;
+		const toleranceOptions = ['AUTO', 1, 2];
 		return (
 			<React.Fragment>
 				<Banner {...bannerMessage} />
 				<div className={container}>
+					<SearchPreviewModal app={appName} />
 					<Card>
 						<Mappings
 							showSynonyms={false}
@@ -247,6 +260,7 @@ class SearchSettingsPage extends React.Component {
 							hideNoType
 							hideDelete
 							hideDataType
+							hidePropertiesType
 							onChange={this.handleMappingChange}
 							column={{
 								title: 'Field Weight',
@@ -261,7 +275,7 @@ class SearchSettingsPage extends React.Component {
 										}, '');
 									return (
 										<InputNumber
-											min={1}
+											min={0}
 											style={{ minWidth: 150, marginLeft: 12 }}
 											value={dataField[parsedAddress]}
 											onChange={value =>
@@ -358,27 +372,18 @@ class SearchSettingsPage extends React.Component {
 							</React.Fragment>
 						)}
 					</Card>
-					<Affix offsetBottom={0}>
-						<div
-							style={{
-								padding: 20,
-								background: 'white',
-								boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.15)',
-								boxSizing: 'border-box',
-								border: '1px solid #e8e8e8',
-								display: 'flex',
-								justifyContent: 'flex-end',
-							}}
-						>
-							<Button
-								size="large"
-								onClick={this.resetChanges}
-								style={{ marginRight: 10 }}
-								type="danger"
-								ghost
-							>
-								Reset
-							</Button>
+					<SettingsFooter
+						loading={isUpdating}
+						onSubmit={this.handleSave}
+						resetState={resetState}
+						onReset={this.resetToDefault}
+						disabled={isEqual(get(settings, 'search'), {
+							fuzziness: hasTypoTolerance ? typoTolerance : 0,
+							searchOperators: hasSearchOperators,
+							dataField: Object.keys(dataField),
+							fieldWeights: Object.values(dataField),
+						})}
+						reviewAndSave={() => (
 							<ReviewAndSave
 								oldValues={get(settings, 'search')}
 								newValues={{
@@ -395,17 +400,8 @@ class SearchSettingsPage extends React.Component {
 									this.toggleVisible();
 								}}
 							/>
-							<Button
-								size="large"
-								type="primary"
-								loading={isUpdating}
-								onClick={this.handleSave}
-							>
-								<Icon type="save" />
-								{isDirty ? 'Apply Settings and Reindex' : 'Save Settings'}
-							</Button>
-						</div>
-					</Affix>
+						)}
+					/>
 				</div>
 			</React.Fragment>
 		);
@@ -424,6 +420,7 @@ const mapStateToProps = state => {
 		resetState: get(state, '$getAppSettings.default', {}),
 		credentials: username ? `${username}:${password}` : null,
 		mappings,
+		defaultSettings: get(state, '$getAppSettings.defaultSettings'),
 		isFetchingMapping: get(state, '$getAppMappings.isFetching'),
 		appName,
 	};
