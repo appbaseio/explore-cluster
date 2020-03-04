@@ -29,6 +29,8 @@ const routes = {
 			{ label: 'Query Rules', link: '/cluster/rules', tag: 'Beta', hasExactPath: true },
 			{ label: 'Search Templates', link: 'search-templates', tag: 'Beta' },
 			{ label: 'Query Suggestions', link: 'query-suggestions', tag: 'Beta' },
+			{ label: 'Result Settings', link: 'results', tag: 'Beta' },
+			{ label: 'Language Settings', link: 'languages', tag: 'Beta' },
 		],
 	},
 	Analytics: {

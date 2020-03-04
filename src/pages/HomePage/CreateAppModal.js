@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
 	Row,
-	Col,
 	Icon,
 	Modal,
 	Input,
@@ -11,6 +10,7 @@ import {
 	Popover,
 	notification,
 	InputNumber,
+	Select,
 } from 'antd';
 import PropTypes from 'prop-types';
 
@@ -18,6 +18,8 @@ import { modalHeading, input, radiobtn } from './styles';
 import { validateAppName, validationsList } from '../../utils/helper';
 
 import { createApp, resetCreatedApp } from '../../actions';
+import { LanguageDropdown } from '../../components/LanguageDropdown';
+import languages from '../../constants/language';
 
 const RadioGroup = Radio.Group;
 
@@ -30,6 +32,7 @@ class CreateAppModal extends Component {
 			validationPopOver: false,
 			shards: 5,
 			replicas: 0,
+			language: 'english',
 		};
 	}
 
@@ -53,13 +56,14 @@ class CreateAppModal extends Component {
 	};
 
 	handleOk = async () => {
-		const { appName, shards, replicas } = this.state;
+		const { appName, shards, replicas, language } = this.state;
 		const { handleCreateApp } = this.props;
 		const options = {
 			appName,
 			settings: {
 				number_of_shards: shards,
 				number_of_replicas: replicas,
+				analysis: languages[language].analysis,
 			},
 		};
 
@@ -117,6 +121,7 @@ class CreateAppModal extends Component {
 			validationPopOver,
 			shards,
 			replicas,
+			language,
 		} = this.state;
 		const { createdApp, showModal } = this.props;
 
@@ -167,6 +172,19 @@ class CreateAppModal extends Component {
 						className={input}
 						onChange={this.handleChange}
 						value={appName}
+					/>
+					<h3 style={{ marginTop: 20 }} className={modalHeading}>
+						Select Language
+					</h3>
+					<LanguageDropdown
+						style={{ width: '30%' }}
+						value={language}
+						onSelect={value => this.setState({ language: value })}
+						renderOption={lang => (
+							<Select.Option key={lang.value} value={lang.value}>
+								{lang.label}
+							</Select.Option>
+						)}
 					/>
 					<h3 style={{ marginTop: 20 }} className={modalHeading}>
 						Shards

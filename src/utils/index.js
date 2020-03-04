@@ -463,3 +463,17 @@ export async function handleQueryRuleDelete(rule, removeRule) {
 		await removeRule(rule.id);
 	}
 }
+
+export function getReIndexedName(appName) {
+	const reindexedRegex = new RegExp('.*reindexed_[0-9]+', 'g');
+	const matched = appName.match(reindexedRegex);
+	let newName;
+	if (matched) {
+		const splittedPart = appName.split('_');
+		splittedPart[splittedPart.length - 1] = Number(splittedPart[splittedPart.length - 1]) + 1;
+		newName = splittedPart.join('_');
+	} else {
+		newName = `${appName}_reindexed_1`;
+	}
+	return newName;
+}

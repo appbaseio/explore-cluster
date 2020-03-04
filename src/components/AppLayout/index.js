@@ -112,6 +112,16 @@ const AggsPage = Loadable({
 	loading: Loader,
 });
 
+const ResultsPage = Loadable({
+	loader: () => import('../../pages/ResultsPage'),
+	loading: Loader,
+});
+
+const LanguagePage = Loadable({
+	loader: () => import('../../pages/LanguageSettings'),
+	loading: Loader,
+});
+
 const SearchSettingsPage = Loadable({
 	loader: () => import('../../pages/SearchSettingsPage'),
 	loading: Loader,
@@ -335,6 +345,30 @@ class AppLayout extends React.PureComponent {
 								<AppPageContainer
 									{...props}
 									component={AggsPage}
+									shouldFetchAppInfo={false}
+									shouldFetchAppPlan={false}
+								/>
+							)}
+						/>
+						<Route
+							exact
+							path="/app/:appName/results"
+							render={props => (
+								<AppPageContainer
+									{...props}
+									component={ResultsPage}
+									shouldFetchAppInfo={false}
+									shouldFetchAppPlan={false}
+								/>
+							)}
+						/>
+						<Route
+							exact
+							path="/app/:appName/languages"
+							render={props => (
+								<AppPageContainer
+									{...props}
+									component={LanguagePage}
 									shouldFetchAppInfo={false}
 									shouldFetchAppPlan={false}
 								/>
