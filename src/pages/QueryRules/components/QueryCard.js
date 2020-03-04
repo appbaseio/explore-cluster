@@ -157,9 +157,11 @@ class QueryCard extends React.Component {
 							>
 								{({ handleModal }) => (
 									<div
+										className="show-on-hover"
 										style={{
 											marginRight: 10,
 											marginBottom: 3,
+											color: '#999',
 										}}
 										onClick={handleModal}
 									>
