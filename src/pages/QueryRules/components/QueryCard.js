@@ -156,17 +156,16 @@ class QueryCard extends React.Component {
 								onDelete={() => handleQueryRuleDelete(rule, removeRule)}
 							>
 								{({ handleModal }) => (
-									<a
+									<div
 										style={{
 											marginRight: 10,
 											marginBottom: 3,
-											color: '#d11a2a',
 										}}
 										onClick={handleModal}
 									>
 										<Icon type={rule.isDeleting ? 'loading' : 'delete'} />{' '}
 										Delete
-									</a>
+									</div>
 								)}
 							</DeleteModal>
 							<CloneRule rule={rule} buttonSize={actionButtonSize} />
