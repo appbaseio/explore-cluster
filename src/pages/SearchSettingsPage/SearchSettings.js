@@ -27,6 +27,7 @@ import Mappings from '../../batteries/components/Mappings/Mappings';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { getAggsMappings } from '../../batteries/utils/mappings';
+import { ReviewAndSave } from '../../components/ReviewAndSave';
 
 const { Option } = Select;
 
@@ -59,6 +60,7 @@ class SearchSettingsPage extends React.Component {
 		hasSearchOperators: undefined,
 		hasTypoTolerance: false,
 		isDirty: false,
+		visible: false,
 	};
 
 	mappingsRef = React.createRef(null);
@@ -86,6 +88,12 @@ class SearchSettingsPage extends React.Component {
 			this.initData(settings);
 		}
 	}
+
+	toggleVisible = () => {
+		this.setState(prevState => ({
+			visible: !prevState.visible,
+		}));
+	};
 
 	initData = settings => {
 		const dataField =
@@ -208,6 +216,7 @@ class SearchSettingsPage extends React.Component {
 		const { settings } = this.props;
 		this.initData(settings);
 		cancelChanges();
+		this.toggleVisible();
 	};
 
 	render() {
@@ -218,8 +227,9 @@ class SearchSettingsPage extends React.Component {
 			hasTypoTolerance,
 			typoTolerance,
 			isDirty,
+			visible,
 		} = this.state;
-		const { isUpdating } = this.props;
+		const { isUpdating, settings } = this.props;
 		const toleranceOptions = ['auto', 1, 2];
 		return (
 			<React.Fragment>
@@ -356,19 +366,43 @@ class SearchSettingsPage extends React.Component {
 								boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.15)',
 								boxSizing: 'border-box',
 								border: '1px solid #e8e8e8',
+								display: 'flex',
+								justifyContent: 'flex-end',
 							}}
 						>
-							<Button type="primary" loading={isUpdating} onClick={this.handleSave}>
-								<Icon type={isUpdating ? 'loading' : 'save'} />
-								{isDirty ? 'Apply Settings and Reindex' : 'Save Settings'}
-							</Button>
 							<Button
+								size="large"
 								onClick={this.resetChanges}
-								style={{ marginLeft: 10 }}
+								style={{ marginRight: 10 }}
 								type="danger"
 								ghost
 							>
 								Reset
+							</Button>
+							<ReviewAndSave
+								oldValues={get(settings, 'search')}
+								newValues={{
+									fuzziness: hasTypoTolerance ? typoTolerance : 0,
+									searchOperators: hasSearchOperators,
+									dataField: Object.keys(dataField),
+									fieldWeights: Object.values(dataField),
+								}}
+								onClick={this.toggleVisible}
+								visible={visible}
+								onRevert={this.resetChanges}
+								onSave={() => {
+									this.handleSave();
+									this.toggleVisible();
+								}}
+							/>
+							<Button
+								size="large"
+								type="primary"
+								loading={isUpdating}
+								onClick={this.handleSave}
+							>
+								<Icon type="save" />
+								{isDirty ? 'Apply Settings and Reindex' : 'Save Settings'}
 							</Button>
 						</div>
 					</Affix>
