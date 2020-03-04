@@ -156,16 +156,17 @@ class QueryCard extends React.Component {
 								onDelete={() => handleQueryRuleDelete(rule, removeRule)}
 							>
 								{({ handleModal }) => (
-									<Button
+									<a
+										style={{
+											marginRight: 10,
+											marginBottom: 3,
+											color: '#d11a2a',
+										}}
 										onClick={handleModal}
-										className="show-on-hover"
-										ghost
-										size={actionButtonSize}
-										type="danger"
 									>
 										<Icon type={rule.isDeleting ? 'loading' : 'delete'} />{' '}
 										Delete
-									</Button>
+									</a>
 								)}
 							</DeleteModal>
 							<CloneRule rule={rule} buttonSize={actionButtonSize} />
@@ -208,7 +209,4 @@ const mapDispatchToProps = dispatch => ({
 	toggleRule: rule => dispatch(toggleRuleStatus(rule)),
 });
 
-export default connect(
-	null,
-	mapDispatchToProps,
-)(QueryCard);
+export default connect(null, mapDispatchToProps)(QueryCard);

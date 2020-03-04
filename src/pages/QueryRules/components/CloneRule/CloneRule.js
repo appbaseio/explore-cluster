@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Icon, message, notification, Typography } from 'antd';
 import { connect } from 'react-redux';
+import { omit } from 'lodash';
 import { cloneQueryRule } from '../../../../batteries/modules/actions';
 
 class CloneRule extends React.Component {
@@ -14,7 +15,7 @@ class CloneRule extends React.Component {
 	handleClone = () => {
 		const { cloneQueryRuleAction, rule } = this.props;
 		cloneQueryRuleAction(rule, {
-			...rule,
+			...omit(rule, 'order'),
 			name: `${rule.name} (cloned)`,
 		}).then(res => {
 			if (res && res.error) {

@@ -19,6 +19,7 @@ import {
 	Row,
 	Skeleton,
 	Switch,
+	Tooltip,
 	Typography,
 } from 'antd';
 import moment from 'moment';
@@ -562,13 +563,17 @@ class QueryRulesForm extends React.Component {
 									}}
 									htmlFor="enable"
 								>
-									{`${enabled ? 'Disable' : 'Enable'} Rule`}
+									Rule Status
 								</label>
-								<Switch
-									id="enable"
-									checked={enabled}
-									onChange={this.handleStatus}
-								/>
+								<Tooltip
+									title={`Toggle to ${enabled ? 'disable' : 'enable'} the rule`}
+								>
+									<Switch
+										id="enable"
+										checked={enabled}
+										onChange={this.handleStatus}
+									/>
+								</Tooltip>
 							</div>
 						) : null}
 					</div>
