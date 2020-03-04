@@ -19,7 +19,7 @@ const Search = props => {
 						</Button>
 					</Link>
 				</Col>
-				<Col>
+				<Col xs={24}>
 					<SelectedFilters />
 				</Col>
 			</Row>

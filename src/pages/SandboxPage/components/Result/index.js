@@ -1,5 +1,7 @@
 import React from 'react';
-import { Card, Radio, Icon, Row, Button } from 'antd';
+import { Card, Radio, Icon, Row, Button, Alert } from 'antd';
+import { StateProvider } from '@appbaseio/reactivesearch';
+import { get } from 'lodash';
 import QueryView from './QueryView';
 import ListView from './ListView';
 
@@ -19,6 +21,26 @@ class Result extends React.Component {
 		const { view } = this.state;
 		return (
 			<Card>
+				<StateProvider
+					includeKeys={['settings']}
+					componentIds={['result']}
+					render={({ searchState }) => {
+						const rulesApplied = get(searchState, 'result.settings.queryRules', []);
+						if (rulesApplied.length) {
+							return (
+								<Alert
+									type="info"
+									icon="info"
+									style={{ marginBottom: 8 }}
+									message={`${rulesApplied.length} Query ${
+										rulesApplied.length > 1 ? 'rules' : 'rule'
+									} applied`}
+								/>
+							);
+						}
+						return null;
+					}}
+				/>
 				<Row type="flex" justify="space-between" align="middle">
 					<Button ghost type="primary">
 						<Icon type="edit" />
