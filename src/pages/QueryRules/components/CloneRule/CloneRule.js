@@ -1,43 +1,63 @@
-import React, { useState } from 'react';
-import { Button, Icon, Typography } from 'antd';
-import CloneRuleModal from './CloneRuleModal';
+import React from 'react';
+import { Button, Icon, message, notification, Typography } from 'antd';
+import { connect } from 'react-redux';
+import { omit } from 'lodash';
+import { cloneQueryRule } from '../../../../batteries/modules/actions';
 
-function CloneRule({
-	rule,
-	isMobile = false,
-	ghost = false,
-	buttonStyle = {},
-	buttonSize = 'default',
-}) {
-	const [visible, setVisible] = useState(false);
+class CloneRule extends React.Component {
+	static defaultProps = {
+		isMobile: false,
+		ghost: false,
+		buttonStyle: {},
+		buttonSize: 'default',
+	};
 
-	function getButton() {
-		if (isMobile)
+	handleClone = () => {
+		const { cloneQueryRuleAction, rule } = this.props;
+		cloneQueryRuleAction(rule, {
+			...omit(rule, 'order'),
+			name: `${rule.name} (cloned)`,
+		}).then(res => {
+			if (res && res.error) {
+				notification.error({
+					message: 'Error',
+					description: res.error,
+				});
+			} else {
+				message.success(`${rule.name} cloned successfully`);
+			}
+		});
+	};
+
+	render() {
+		const { rule, isMobile, ghost, buttonStyle, buttonSize } = this.props;
+
+		if (isMobile) {
 			return (
 				// eslint-disable-next-line
-				<div onClick={() => setVisible(true)}>
-					<Icon type="copy" /> <Typography.Text>Clone</Typography.Text>
+				<div onClick={this.handleClone}>
+					<Icon type={rule.isCloning ? 'loading' : 'copy'} />{' '}
+					<Typography.Text>Clone</Typography.Text>
 				</div>
 			);
+		}
 		return (
 			<Button
-				onClick={() => setVisible(true)}
+				onClick={this.handleClone}
 				type="primary"
 				ghost={ghost}
 				style={buttonStyle}
 				size={buttonSize}
+				disabled={rule.isCloning}
 			>
-				<Icon type="copy" /> Clone
+				<Icon type={rule.isCloning ? 'loading' : 'copy'} /> Clone
 			</Button>
 		);
 	}
-
-	return (
-		<>
-			{getButton()}
-			{visible && <CloneRuleModal rule={rule} handleCancel={() => setVisible(false)} />}
-		</>
-	);
 }
 
-export default CloneRule;
+const mapDispatchToProps = dispatch => ({
+	cloneQueryRuleAction: (rule, newRule) => dispatch(cloneQueryRule(rule, newRule)),
+});
+
+export default connect(null, mapDispatchToProps)(CloneRule);

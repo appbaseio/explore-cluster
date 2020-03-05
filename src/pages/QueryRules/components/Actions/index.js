@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button, Card, Icon, Tooltip, Typography } from 'antd';
 import { css } from 'emotion';
-import { Info } from 'react-feather';
 import DNDWrapper from '../../../../components/DNDWrapper';
 import CustomData from './CustomData';
 import ReplaceSearch from './ReplaceSearch';
@@ -10,8 +9,9 @@ import PromoteResults from './PromoteResults';
 import HideResults from './HideResults';
 import ExecuteFunction from './ExecuteFunction';
 import { getErrorMessage } from '../../utils/error';
-import { hasValuesChanged } from '../../utils';
+import { hasValuesChanged, toolTips } from '../../utils';
 import RemoveWord from './RemoveWord';
+import { Info } from '../../../../components/Info';
 
 const componentMappings = {
 	replace_search_term: ReplaceSearch,
@@ -259,27 +259,20 @@ class Actions extends React.Component {
 												className="drag-icon"
 											/>
 										</Tooltip>
-										<Tooltip title={item.toolTip}>
-											<div
-												style={{
-													display: 'inline-flex',
-													justifyContent: 'center',
-													alignItems: 'center',
-												}}
-											>
-												<Typography.Text strong>
-													{actionMapping[item.type]}
-												</Typography.Text>
 
-												<Info
-													style={{
-														marginLeft: 5,
-														color: '#898989',
-														height: 20,
-													}}
-												/>
-											</div>
-										</Tooltip>
+										<div
+											style={{
+												display: 'inline-flex',
+												justifyContent: 'center',
+												alignItems: 'center',
+											}}
+										>
+											<Typography.Text strong>
+												{actionMapping[item.type]}
+											</Typography.Text>
+
+											<Info content={toolTips[item.type]} />
+										</div>
 									</div>
 									<div>
 										<Button

@@ -86,7 +86,12 @@ const card = css`
 
 class QueryCard extends React.Component {
 	shouldComponentUpdate(nextProps) {
-		return hasValuesChanged(this.props, nextProps, ['rule', 'dragProvided', 'dragSnapshot']);
+		return hasValuesChanged(this.props, nextProps, [
+			'rule',
+			'dragProvided',
+			'dragSnapshot',
+			'index',
+		]);
 	}
 
 	componentDidUpdate(prevProps) {
@@ -111,7 +116,7 @@ class QueryCard extends React.Component {
 	};
 
 	render() {
-		const { rule, dragProvided, dragSnapshot, removeRule, toggleRule } = this.props;
+		const { rule, dragProvided, dragSnapshot, removeRule, toggleRule, index } = this.props;
 		const actionButtonSize = window.innerWidth < 1090 ? 'small' : 'default';
 		return (
 			<Card
@@ -129,7 +134,7 @@ class QueryCard extends React.Component {
 						<Tooltip title="Drag to update the ordering of rules">
 							<div {...dragProvided.dragHandleProps} className={dragIcon}>
 								<Icon type="drag" />
-								<Typography.Text strong>{rule.order}</Typography.Text>
+								<Typography.Text strong>{index + 1}</Typography.Text>
 							</div>
 						</Tooltip>
 					</Col>
@@ -150,22 +155,24 @@ class QueryCard extends React.Component {
 					<Col xl={9} lg={9} xs={0}>
 						<div className={actions}>
 							<DeleteModal
-								name="Rule"
-								value={rule.name.toLowerCase().replace(/ /g, '_')}
+								name="rule"
+								value={rule.name}
 								title="Delete Rule"
 								onDelete={() => handleQueryRuleDelete(rule, removeRule)}
 							>
 								{({ handleModal }) => (
-									<Button
-										onClick={handleModal}
+									<div
 										className="show-on-hover"
-										ghost
-										size={actionButtonSize}
-										type="danger"
+										style={{
+											marginRight: 10,
+											marginBottom: 3,
+											color: '#999',
+										}}
+										onClick={handleModal}
 									>
 										<Icon type={rule.isDeleting ? 'loading' : 'delete'} />{' '}
 										Delete
-									</Button>
+									</div>
 								)}
 							</DeleteModal>
 							<CloneRule rule={rule} buttonSize={actionButtonSize} />
@@ -184,13 +191,17 @@ class QueryCard extends React.Component {
 							}}
 						>
 							<Typography.Text strong style={{ marginRight: 5 }}>
-								{rule.enabled ? 'Disable' : 'Enable'} Rule
+								Rule Status
 							</Typography.Text>
-							<Switch
-								loading={rule.isToggling}
-								checked={rule.enabled}
-								onChange={this.handleRuleStatus}
-							/>
+							<Tooltip
+								title={`Toggle to ${rule.enabled ? 'disable' : 'enable'} the rule`}
+							>
+								<Switch
+									loading={rule.isToggling}
+									checked={rule.enabled}
+									onChange={this.handleRuleStatus}
+								/>
+							</Tooltip>
 						</div>
 					</Col>
 				</Row>

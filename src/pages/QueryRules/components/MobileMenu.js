@@ -28,6 +28,7 @@ const MobileMenu = props => {
 					</Menu.Item>
 					<Menu.Item key="2">
 						<Checkbox
+							checked={rule.enabled}
 							onChange={e => toggleRule({ id: rule.id, enabled: e.target.checked })}
 						>
 							Rule Status

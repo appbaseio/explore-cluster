@@ -68,7 +68,7 @@ class QueryRules extends Component {
 		if (tier && validPlans.indexOf(tier) === -1) {
 			return (
 				<React.Fragment>
-					<Banner {...bannerDetails} />
+					<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
 					<Overlay
 						style={{
 							maxWidth: '70%',
@@ -99,10 +99,10 @@ class QueryRules extends Component {
 								<Row>
 									<Col lg={18}>
 										<p>
-											Create &quot;If this, then that&quot; rules. Query Rules
-											will be executed in the order in which they are listed.
-											You can drag and drop a rule to change the ordering
-											sequence.
+											Create &quot;If this, then that&quot; style query rules.
+											Query Rules will be executed in the order in which they
+											are listed. You can drag and drop a rule to change the
+											ordering sequence.
 										</p>
 									</Col>
 								</Row>
@@ -131,6 +131,7 @@ class QueryRules extends Component {
 									ghost
 									size="large"
 									rel="noopener noreferrer"
+									onClick={() => window.open(bannerDetails.href)}
 								>
 									Read More
 								</Button>
@@ -147,11 +148,12 @@ class QueryRules extends Component {
 							indexKey="order"
 							idKey="id"
 						>
-							{({ item, dragProvided, dragSnapshot }) => (
+							{({ item, dragProvided, dragSnapshot, index }) => (
 								<QueryCard
 									dragProvided={dragProvided}
 									dragSnapshot={dragSnapshot}
 									rule={item}
+									index={index}
 								/>
 							)}
 						</DNDWrapper>

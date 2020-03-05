@@ -15,116 +15,32 @@ const actions = {
 	promote_result: {
 		name: 'Promote Result',
 		data: [],
-		toolTip: (
-			<>
-				Promote a result and show it at a specific position within the search results.
-				<a
-					target="_blank"
-					rel="noopener noreferrer"
-					href="https://docs.appbase.io/docs/search/Rules/#promote-results"
-				>
-					Learn more
-				</a>
-			</>
-		),
 	},
 	hide_result: {
 		name: 'Hide Result',
 		data: [],
-		toolTip: (
-			<>
-				Hide a document from search results.
-				<a
-					target="_blank"
-					rel="noopener noreferrer"
-					href="https://docs.appbase.io/docs/search/Rules/#hide-results"
-				>
-					Learn more
-				</a>
-			</>
-		),
 	},
 	replace_search_term: {
 		name: 'Replace Search Term',
 		data: '',
 		isDisabledOnAlways: true,
-		toolTip: (
-			<>
-				Replace the whole search term with another search term.
-				<a
-					target="_blank"
-					rel="noopener noreferrer"
-					href="https://docs.appbase.io/docs/search/Rules/#replace-search-term"
-				>
-					Learn more
-				</a>
-			</>
-		),
 	},
 	custom_data: {
 		name: 'Return Custom Data',
 		data: '',
-		toolTip: (
-			<>
-				Add extra JSON data to be returned with your search results.{' '}
-				<a
-					target="_blank"
-					rel="noopener noreferrer"
-					href="https://docs.appbase.io/docs/search/Rules/#custom-data"
-				>
-					Learn more
-				</a>
-			</>
-		),
 	},
 	function: {
 		name: 'f(x) Apply Function',
 		data: '',
 		checkHealth: true,
-		toolTip: (
-			<>
-				Add a custom function to make changed without any limitations.{' '}
-				<a
-					target="_blank"
-					rel="noopener noreferrer"
-					href="https://docs.appbase.io/docs/search/Functions"
-				>
-					Learn more
-				</a>
-			</>
-		),
 	},
 	remove_words: {
 		name: 'Remove Word',
 		data: [],
-		toolTip: (
-			<>
-				Remove a word(s) from the search term.{' '}
-				<a
-					target="_blank"
-					rel="noopener noreferrer"
-					href="https://docs.appbase.io/docs/search/Rules/#remove-words"
-				>
-					Learn more
-				</a>
-			</>
-		),
 	},
 	replace_words: {
 		name: 'Replace Word',
 		data: {},
-		toolTip: (
-			<>
-				Replace all the instances of a word in the applied search term.{' '}
-				<a
-					target="_blank"
-					rel="noopener noreferrer"
-					href="https://docs.appbase.io/docs/search/Rules/#replace-words"
-				>
-					Learn more
-				</a>
-			</>
-		),
 	},
 };
 
