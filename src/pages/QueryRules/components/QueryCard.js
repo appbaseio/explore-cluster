@@ -86,7 +86,12 @@ const card = css`
 
 class QueryCard extends React.Component {
 	shouldComponentUpdate(nextProps) {
-		return hasValuesChanged(this.props, nextProps, ['rule', 'dragProvided', 'dragSnapshot']);
+		return hasValuesChanged(this.props, nextProps, [
+			'rule',
+			'dragProvided',
+			'dragSnapshot',
+			'index',
+		]);
 	}
 
 	componentDidUpdate(prevProps) {
@@ -111,7 +116,7 @@ class QueryCard extends React.Component {
 	};
 
 	render() {
-		const { rule, dragProvided, dragSnapshot, removeRule, toggleRule } = this.props;
+		const { rule, dragProvided, dragSnapshot, removeRule, toggleRule, index } = this.props;
 		const actionButtonSize = window.innerWidth < 1090 ? 'small' : 'default';
 		return (
 			<Card
@@ -129,7 +134,7 @@ class QueryCard extends React.Component {
 						<Tooltip title="Drag to update the ordering of rules">
 							<div {...dragProvided.dragHandleProps} className={dragIcon}>
 								<Icon type="drag" />
-								<Typography.Text strong>{rule.order}</Typography.Text>
+								<Typography.Text strong>{index + 1}</Typography.Text>
 							</div>
 						</Tooltip>
 					</Col>
