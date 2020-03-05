@@ -40,6 +40,7 @@ class DNDWrapper extends React.Component {
 													item,
 													dragProvided,
 													dragSnapshot,
+													index,
 												})}
 											</div>
 										)}

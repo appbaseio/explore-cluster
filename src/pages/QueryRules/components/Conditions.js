@@ -65,7 +65,7 @@ class Conditions extends React.Component {
 						<Col xs={24}>{getErrorMessage(error)}</Col>
 						<Col md={12} sm={24}>
 							<label>
-								Select Condition{' '}
+								Query{' '}
 								<Info
 									content={
 										<>

@@ -3,7 +3,6 @@ import { Row, Icon, Input, Checkbox, Tooltip, Radio } from 'antd';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { css } from 'emotion';
-import styled from 'react-emotion';
 import { updateAppScreenPreferences } from '../../actions';
 
 const commonFlex = css`
@@ -39,7 +38,7 @@ function AppFilters({ apps, children, preferences, updatePreferences }) {
 		const dataToPonder = systemIndices
 			? apps
 			: apps.filter(dataItem => dataItem.index && dataItem.index[0] !== '.');
-		setData(dataToPonder.filter(dataItem => dataItem.index.includes(searchTerm)));
+		setData(dataToPonder.filter(dataItem => (dataItem.index || '').includes(searchTerm)));
 	};
 	const handleInputChange = e => {
 		setSearchTerm(e.target.value);

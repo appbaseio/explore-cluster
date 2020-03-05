@@ -1,4 +1,5 @@
 import { get } from 'lodash';
+import React from 'react';
 
 const getParsedRule = rule => {
 	if (rule) {
@@ -110,10 +111,104 @@ const validPlans = [
 
 const bannerDetails = {
 	title: 'Query Rules',
-	description: `Create "If this, then that" rules`,
+	description: 'Create "If this, then that" style query rules',
 	buttonText: 'Read More',
 	icon: 'pencil',
 	href: 'https://docs.appbase.io/docs/search/Rules/',
 };
 
-export { getParsedRule, getExpressionFromValue, hasValuesChanged, bannerDetails, validPlans };
+const toolTips = {
+	promote_result: (
+		<>
+			Promote a result and show it at a specific position within the search results.{' '}
+			<a
+				target="_blank"
+				rel="noopener noreferrer"
+				href="https://docs.appbase.io/docs/search/Rules/#promote-results"
+			>
+				Learn more
+			</a>
+		</>
+	),
+	hide_result: (
+		<>
+			Hide a document from search results.{' '}
+			<a
+				target="_blank"
+				rel="noopener noreferrer"
+				href="https://docs.appbase.io/docs/search/Rules/#hide-results"
+			>
+				Learn more
+			</a>
+		</>
+	),
+	replace_search_term: (
+		<>
+			Replace the whole search term with another search term.{' '}
+			<a
+				target="_blank"
+				rel="noopener noreferrer"
+				href="https://docs.appbase.io/docs/search/Rules/#replace-search-term"
+			>
+				Learn more
+			</a>
+		</>
+	),
+	custom_data: (
+		<>
+			Add extra JSON data to be returned with your search results.{' '}
+			<a
+				target="_blank"
+				rel="noopener noreferrer"
+				href="https://docs.appbase.io/docs/search/Rules/#custom-data"
+			>
+				Learn more
+			</a>
+		</>
+	),
+	function: (
+		<>
+			Add a custom function to make changed without any limitations.{' '}
+			<a
+				target="_blank"
+				rel="noopener noreferrer"
+				href="https://docs.appbase.io/docs/search/Functions"
+			>
+				Learn more
+			</a>
+		</>
+	),
+	remove_words: (
+		<>
+			Remove a word(s) from the search term.{' '}
+			<a
+				target="_blank"
+				rel="noopener noreferrer"
+				href="https://docs.appbase.io/docs/search/Rules/#remove-words"
+			>
+				Learn more
+			</a>
+		</>
+	),
+	replace_words: (
+		<>
+			Replace all the instances of a word in the applied search term.{' '}
+			<a
+				target="_blank"
+				rel="noopener noreferrer"
+				href="https://docs.appbase.io/docs/search/Rules/#replace-words"
+			>
+				Learn more
+			</a>
+		</>
+	),
+};
+
+export {
+	getParsedRule,
+	getExpressionFromValue,
+	hasValuesChanged,
+	bannerDetails,
+	validPlans,
+	toolTips,
+};
