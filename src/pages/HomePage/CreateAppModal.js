@@ -51,7 +51,13 @@ class CreateAppModal extends Component {
 		language = getLanguageFallback(language);
 		if (createdApp.data && createdApp.data.acknowledged) {
 			updateSettingsAction(appName, {
-				language: { language, applyStopwords: true, normalizeDiacritics: true },
+				language: {
+					language,
+					applyStopwords: true,
+					normalizeDiacritics: true,
+					customStopwords: [],
+					stemmingExceptions: [],
+				},
 			});
 			if (hasJSON === 'sample') {
 				history.push(`app/${appName}/import?load-data=true`);
@@ -269,4 +275,7 @@ const mapDispatchToProps = dispatch => ({
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(CreateAppModal);
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps,
+)(CreateAppModal);

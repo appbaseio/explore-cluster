@@ -22,22 +22,20 @@ const routes = {
 		icon: 'dashboard',
 		menu: [
 			{ label: 'Import Data', link: 'import' },
-			{ label: 'App Settings', link: 'settings', tag: 'Beta' },
 			{ label: 'Browse Data', link: 'browse' },
+			{ label: 'Request Logs', link: 'request-logs' },
 			{ label: 'Query Explorer', link: 'query' },
 			{ label: 'Search Preview', link: 'search-preview', tag: 'Beta' },
+			{ label: 'Functions', link: '/cluster/functions', tag: 'Beta', hasExactPath: true },
 			{ label: 'Query Rules', link: '/cluster/rules', tag: 'Beta', hasExactPath: true },
 			{ label: 'Search Templates', link: 'search-templates', tag: 'Beta' },
 			{ label: 'Query Suggestions', link: 'query-suggestions', tag: 'Beta' },
-			{ label: 'Result Settings', link: 'results', tag: 'Beta' },
-			{ label: 'Language Settings', link: 'languages', tag: 'Beta' },
 		],
 	},
 	Analytics: {
 		icon: 'line-chart',
 		menu: [
 			{ label: 'Overview', link: 'analytics' },
-			{ label: 'Request Logs', link: 'request-logs' },
 			{ label: 'Popular Searches', link: 'popular-searches' },
 			{ label: 'No Result Searches', link: 'no-results-searches' },
 			{ label: 'Popular Filters', link: 'popular-filters' },
@@ -45,6 +43,16 @@ const routes = {
 			{ label: 'Geo Distribution', link: 'geo-distribution' },
 			{ label: 'Requests Per Minute', link: 'requests-per-minute' },
 			{ label: 'Search Latency', link: 'search-latency' },
+		],
+	},
+	'Search Relevancy': {
+		icon: 'search',
+		menu: [
+			{ label: 'Language Settings', link: 'languages', tag: 'Beta' },
+			{ label: 'Search Settings', link: 'search', tag: 'Beta' },
+			{ label: 'Aggregation Settings', link: 'aggs', tag: 'Beta' },
+			{ label: 'Result Settings', link: 'results', tag: 'Beta' },
+			{ label: 'Schema', link: 'settings', tag: 'Beta' },
 		],
 	},
 	Security: {

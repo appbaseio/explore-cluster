@@ -75,7 +75,7 @@ class ResultsPage extends React.Component {
 		getFieldDecorator('highlightFields');
 		const formValues = Object.keys(results || {}).reduce((formObj, key) => {
 			if (key === 'highlightOptions') {
-				const { number_of_fragments, fragment_size, pre_tags } = results[key];
+				const { number_of_fragments, fragment_size, pre_tags } = results[key] || {};
 				this.registerFields(getFieldDecorator);
 				formObj.number_of_fragments = number_of_fragments;
 				formObj.fragment_size = fragment_size;

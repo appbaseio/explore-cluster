@@ -46,11 +46,16 @@ export class ReviewAndSave extends React.Component {
 				<Modal
 					title="Review Settings Before Saving"
 					visible={visible}
-					okText="Review and Save"
-					cancelText="Revert Changes"
-					onCancel={onRevert}
-					onOk={onSave}
-					width={500}
+					onCancel={onClick}
+					width={1000}
+					footer={[
+						<Button key="back" onClick={onRevert}>
+							Revert Changes
+						</Button>,
+						<Button key="submit" type="primary" onClick={onSave}>
+							Review and Save
+						</Button>,
+					]}
 				>
 					<DiffTable
 						object={difference}

@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { Icon, Menu, Layout, Tag } from 'antd';
-import { Switch, Route, Link } from 'react-router-dom';
+import { Icon, Layout, Menu } from 'antd';
+import { Link, Route, Switch } from 'react-router-dom';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
-import get from 'lodash/get';
+import { get, keys } from 'lodash';
 
 import { bool, func } from 'prop-types';
 import Loader from '../../components/Loader';
@@ -12,6 +12,8 @@ import Logo from '../../components/Logo';
 import { breakpoints } from '../../utils/media';
 import { getAppPlan } from '../../batteries/modules/actions';
 import { getParam } from '../../utils';
+import { LabelTag } from '../../components/LabelTag';
+import { IndexSwitcher } from '../../components/IndexSwitcher';
 
 const NoMatch = Loadable({
 	loader: () => import('../../NoMatch'),
@@ -41,17 +43,19 @@ const defaultRoutes = {
 		menu: [
 			{ label: 'Import Data', link: '/cluster/import' },
 			{ label: 'Browse Data', link: '/cluster/browse' },
-			{ label: 'Search Templates', link: '/cluster/search-templates', tag: 'Beta' },
-			{ label: 'Query Suggestions', link: '/cluster/query-suggestions', tag: 'Beta' },
+			{ label: 'Request Logs', link: '/cluster/request-logs' },
+			{ label: 'Query Explorer', link: 'query', openIndexMenu: true },
+			{ label: 'Search Preview', link: 'search-preview', tag: 'Beta', openIndexMenu: true },
 			{ label: 'Functions', link: '/cluster/functions', tag: 'Beta' },
 			{ label: 'Query Rules', link: '/cluster/rules', tag: 'Beta' },
+			{ label: 'Search Templates', link: '/cluster/search-templates', tag: 'Beta' },
+			{ label: 'Query Suggestions', link: '/cluster/query-suggestions', tag: 'Beta' },
 		],
 	},
 	Analytics: {
 		icon: 'line-chart',
 		menu: [
 			{ label: 'Overview', link: '/cluster/analytics' },
-			{ label: 'Request Logs', link: '/cluster/request-logs' },
 			{ label: 'Popular Searches', link: '/cluster/popular-searches' },
 			{ label: 'No Result Searches', link: '/cluster/no-results-searches' },
 			{ label: 'Popular Filters', link: '/cluster/popular-filters' },
@@ -59,6 +63,16 @@ const defaultRoutes = {
 			{ label: 'Geo Distribution', link: '/cluster/geo-distribution' },
 			{ label: 'Requests Per Minute', link: '/cluster/requests-per-minute' },
 			{ label: 'Search Latency', link: '/cluster/search-latency' },
+		],
+	},
+	'Search Relevancy': {
+		icon: 'search',
+		menu: [
+			{ label: 'Language Settings', link: 'languages', tag: 'Beta', openIndexMenu: true },
+			{ label: 'Search Settings', link: 'search', tag: 'Beta', openIndexMenu: true },
+			{ label: 'Aggregation Settings', link: 'aggs', tag: 'Beta', openIndexMenu: true },
+			{ label: 'Result Settings', link: 'results', tag: 'Beta', openIndexMenu: true },
+			{ label: 'Schema', link: 'settings', tag: 'Beta', openIndexMenu: true },
 		],
 	},
 	Security: {
@@ -196,6 +210,9 @@ class DashboardWrapper extends Component {
 
 	render() {
 		const { collapsed, showHeader, routes, activeSubMenu, activeMenuItem } = this.state;
+		const { apps } = this.props;
+
+		const filteredApps = keys(apps).filter(app => !app.startsWith('.'));
 
 		return (
 			<Layout>
@@ -250,17 +267,16 @@ class DashboardWrapper extends Component {
 									<SubMenu key={route} title={Title}>
 										{routes[route].menu.map(item => (
 											<Menu.Item key={item.label}>
-												<Link replace to={item.link}>
-													{item.label}
-													{item.tag ? (
-														<Tag
-															style={{ fontSize: 10, marginLeft: 8 }}
-															color="#001529"
-														>
-															{item.tag}
-														</Tag>
-													) : null}
-												</Link>
+												{item.openIndexMenu ? (
+													<IndexSwitcher
+														item={item}
+														filteredApps={filteredApps}
+													/>
+												) : (
+													<Link replace to={item.link}>
+														<LabelTag item={item} />
+													</Link>
+												)}
 											</Menu.Item>
 										))}
 									</SubMenu>
@@ -319,6 +335,7 @@ const mapStateToProps = state => ({
 	isBillingEnabled: !(get(state, '$getAppPlan.results.billing') === false),
 	isClusterPlanFetched: get(state, '$getAppPlan.success'),
 	isClusterPlanFetching: get(state, '$getAppPlan.isFetching', false),
+	apps: get(state, 'apps.data'),
 });
 
 const mapDispatchToProps = dispatch => ({

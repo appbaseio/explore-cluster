@@ -12,7 +12,7 @@ const Search = props => {
 					<DataSearch {...search} autosuggest componentId={search.id} />
 				</Col>
 				<Col xs={4}>
-					<Link to={`/app/${app}/search-settings`}>
+					<Link to={`/app/${app}/search`}>
 						<Button size="large" ghost type="primary">
 							<Icon type="edit" />
 							Set Search

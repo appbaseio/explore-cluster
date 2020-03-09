@@ -377,7 +377,7 @@ class AppLayout extends React.PureComponent {
 
 						<Route
 							exact
-							path="/app/:appName/search-settings"
+							path="/app/:appName/search"
 							render={props => (
 								<AppPageContainer
 									{...props}
