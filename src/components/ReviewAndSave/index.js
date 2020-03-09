@@ -50,7 +50,7 @@ export class ReviewAndSave extends React.Component {
 					cancelText="Revert Changes"
 					onCancel={onRevert}
 					onOk={onSave}
-					width={1000}
+					width={500}
 				>
 					<DiffTable
 						object={difference}

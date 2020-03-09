@@ -4,6 +4,7 @@ import { Card, Form, Input, message, notification, Select, Switch } from 'antd';
 
 import { cloneDeep, get, pick } from 'lodash';
 import {
+	deleteSettings,
 	getAppMappings,
 	getDefaultSettings,
 	getSettings,
@@ -16,10 +17,13 @@ import { container, label } from '../ResultsPage/styles';
 import { LanguageDropdown } from '../../components/LanguageDropdown';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import { getURL } from '../../constants/config';
-import { doPost } from '../../batteries/utils/requestService';
 import { isEqual } from '../../batteries/utils';
-import { getReIndexedName } from '../../utils';
 import { ReviewAndSave } from '../../components/ReviewAndSave';
+import { SettingTooltip } from '../../components/SettingTooltip';
+import { applyLanguageAnalyzers } from '../../batteries/utils/mappings';
+import { doPost } from '../../batteries/utils/requestService';
+import { getReIndexedName } from '../../utils';
+import languages from '../../constants/language';
 
 const bannerMessage = {
 	title: 'Language Settings',
@@ -28,7 +32,7 @@ const bannerMessage = {
 };
 
 class LanguageSettings extends React.Component {
-	state = { visible: false };
+	state = { visible: false, loading: false };
 
 	componentDidMount() {
 		const {
@@ -61,21 +65,7 @@ class LanguageSettings extends React.Component {
 	getAnalyzerMappings = (res, getFieldValue) => {
 		// avoid mutation
 		const analyzerMappings = cloneDeep(res.payload.properties);
-		const lang = {
-			type: 'text',
-			analyzer: getFieldValue('language'),
-		};
-		Object.keys(analyzerMappings || {}).forEach(key => {
-			const { type, fields } = analyzerMappings[key];
-			if (type === 'text') {
-				if (fields) {
-					fields.lang = lang;
-				} else {
-					analyzerMappings[key].fields = { lang };
-				}
-			}
-		});
-		return analyzerMappings;
+		return applyLanguageAnalyzers(analyzerMappings, getFieldValue('language'));
 	};
 
 	handleSubmit = e => {
@@ -87,6 +77,7 @@ class LanguageSettings extends React.Component {
 			settings,
 			credentials,
 			fetchMappings,
+			deleteSettingsAction,
 		} = this.props;
 		const ACC_API = getURL();
 		const authToken = sessionStorage.getItem('authToken');
@@ -111,19 +102,37 @@ class LanguageSettings extends React.Component {
 				fetchMappings(appName, credentials, ACC_API).then(res => {
 					if (res && res.payload) {
 						const analyzerMappings = this.getAnalyzerMappings(res, getFieldValue);
+						this.setState({ loading: true });
+						deleteSettingsAction(appName);
 						doPost(
 							`${ACC_API}/_reindex/${appName}`,
-							{ mappings: { properties: analyzerMappings } },
+							{
+								mappings: { properties: analyzerMappings },
+								settings: {
+									analysis: languages[getFieldValue('language')].analysis,
+								},
+							},
 							{
 								Authorization: `Basic ${authToken}`,
 							},
 						).then(() => {
 							const newName = getReIndexedName(appName);
-							const { history } = this.props;
-							// TODO: remove the comment once continuous call to `appWorker` is blocked
-							// history.push(`/app/${newName}`);
+							updateSettingsAction(newName, {
+								...settings,
+								language: languagePayload,
+							}).then(response => {
+								if (response && response.payload) {
+									const { history } = this.props;
+									history.push(`/`);
+								} else {
+									this.setState({ loading: false });
+									notification.error({
+										message: 'Failed to save Language Settings',
+										description: get(response, 'error.message'),
+									});
+								}
+							});
 						});
-						updateSettings(languagePayload);
 					}
 				});
 			};
@@ -179,7 +188,7 @@ class LanguageSettings extends React.Component {
 			resetState,
 			settings,
 		} = this.props;
-		const { visible } = this.state;
+		const { visible, loading } = this.state;
 
 		if (isLoading) return <Loader />;
 
@@ -189,7 +198,14 @@ class LanguageSettings extends React.Component {
 				<div className={container}>
 					<Form layout="vertical" className={label}>
 						<Card>
-							<Form.Item label="Choose Your Language">
+							<Form.Item
+								label={
+									<>
+										Choose Your Language
+										<SettingTooltip />
+									</>
+								}
+							>
 								{getFieldDecorator('language')(
 									<LanguageDropdown
 										renderOption={lang => (
@@ -207,13 +223,27 @@ class LanguageSettings extends React.Component {
 								)}
 							</div>
 							{!getFieldValue('applyStopwords') && (
-								<Form.Item label="Provide Custom Stopwords">
+								<Form.Item
+									label={
+										<>
+											Provide Custom Stopwords
+											<SettingTooltip />
+										</>
+									}
+								>
 									{getFieldDecorator('customStopwords')(
 										<Input.TextArea placeholder="Add comma separated stopwords" />,
 									)}
 								</Form.Item>
 							)}
-							<Form.Item label="Stemming Exceptions">
+							<Form.Item
+								label={
+									<>
+										Stemming Exceptions
+										<SettingTooltip />
+									</>
+								}
+							>
 								{getFieldDecorator('stemmingExceptions')(
 									<Input.TextArea placeholder="Add comma separated words to avoid stemming on" />,
 								)}
@@ -228,7 +258,7 @@ class LanguageSettings extends React.Component {
 					</Form>
 
 					<SettingsFooter
-						loading={isUpdating}
+						loading={isUpdating || loading}
 						onSubmit={this.handleSubmit}
 						resetState={resetState}
 						onReset={this.resetLanguageSettings}
@@ -282,6 +312,7 @@ const mapDispatchToProps = dispatch => ({
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
 	fetchMappings: (appName, credentials, url) =>
 		dispatch(getAppMappings(appName, credentials, url)),
+	deleteSettingsAction: name => dispatch(deleteSettings(name)),
 });
 
 const LanguageForm = Form.create({ name: 'language' })(LanguageSettings);

@@ -177,7 +177,7 @@ class CreateAppModal extends Component {
 						Select Language
 					</h3>
 					<LanguageDropdown
-						style={{ width: '30%' }}
+						style={{ width: '100%' }}
 						value={language}
 						onSelect={value => this.setState({ language: value })}
 						renderOption={lang => (

@@ -16,7 +16,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_arabic: {
+				arabic: {
 					tokenizer: 'standard',
 					filter: [
 						'lowercase',
@@ -47,7 +47,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_armenian: {
+				armenian: {
 					tokenizer: 'standard',
 					filter: ['lowercase', 'armenian_stop', 'armenian_keywords', 'armenian_stemmer'],
 				},
@@ -71,7 +71,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_basque: {
+				basque: {
 					tokenizer: 'standard',
 					filter: ['lowercase', 'basque_stop', 'basque_keywords', 'basque_stemmer'],
 				},
@@ -95,7 +95,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_bengali: {
+				bengali: {
 					tokenizer: 'standard',
 					filter: [
 						'lowercase',
@@ -127,7 +127,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_brazilian: {
+				brazilian: {
 					tokenizer: 'standard',
 					filter: [
 						'lowercase',
@@ -156,7 +156,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_bulgarian: {
+				bulgarian: {
 					tokenizer: 'standard',
 					filter: [
 						'lowercase',
@@ -190,7 +190,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_catalan: {
+				catalan: {
 					tokenizer: 'standard',
 					filter: [
 						'catalan_elision',
@@ -248,7 +248,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_cjk: {
+				cjk: {
 					tokenizer: 'standard',
 					filter: ['cjk_width', 'lowercase', 'cjk_bigram', 'english_stop'],
 				},
@@ -272,7 +272,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_czech: {
+				czech: {
 					tokenizer: 'standard',
 					filter: ['lowercase', 'czech_stop', 'czech_keywords', 'czech_stemmer'],
 				},
@@ -296,7 +296,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_danish: {
+				danish: {
 					tokenizer: 'standard',
 					filter: ['lowercase', 'danish_stop', 'danish_keywords', 'danish_stemmer'],
 				},
@@ -324,7 +324,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_dutch: {
+				dutch: {
 					tokenizer: 'standard',
 					filter: [
 						'lowercase',
@@ -358,7 +358,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_english: {
+				english: {
 					tokenizer: 'standard',
 					filter: [
 						'english_possessive_stemmer',
@@ -388,7 +388,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_estonian: {
+				estonian: {
 					tokenizer: 'standard',
 					filter: ['lowercase', 'estonian_stop', 'estonian_keywords', 'estonian_stemmer'],
 				},
@@ -412,7 +412,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_finnish: {
+				finnish: {
 					tokenizer: 'standard',
 					filter: ['lowercase', 'finnish_stop', 'finnish_keywords', 'finnish_stemmer'],
 				},
@@ -455,7 +455,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_french: {
+				french: {
 					tokenizer: 'standard',
 					filter: [
 						'french_elision',
@@ -485,7 +485,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_galician: {
+				galician: {
 					tokenizer: 'standard',
 					filter: ['lowercase', 'galician_stop', 'galician_keywords', 'galician_stemmer'],
 				},
@@ -509,7 +509,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_german: {
+				german: {
 					tokenizer: 'standard',
 					filter: [
 						'lowercase',
@@ -543,7 +543,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_greek: {
+				greek: {
 					tokenizer: 'standard',
 					filter: ['greek_lowercase', 'greek_stop', 'greek_keywords', 'greek_stemmer'],
 				},
@@ -567,7 +567,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_hindi: {
+				hindi: {
 					tokenizer: 'standard',
 					filter: [
 						'lowercase',
@@ -599,7 +599,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_hungarian: {
+				hungarian: {
 					tokenizer: 'standard',
 					filter: [
 						'lowercase',
@@ -628,7 +628,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_indonesian: {
+				indonesian: {
 					tokenizer: 'standard',
 					filter: [
 						'lowercase',
@@ -671,7 +671,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_irish: {
+				irish: {
 					tokenizer: 'standard',
 					filter: [
 						'irish_hyphenation',
@@ -729,7 +729,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_italian: {
+				italian: {
 					tokenizer: 'standard',
 					filter: [
 						'italian_elision',
@@ -759,7 +759,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_latvian: {
+				latvian: {
 					tokenizer: 'standard',
 					filter: ['lowercase', 'latvian_stop', 'latvian_keywords', 'latvian_stemmer'],
 				},
@@ -783,7 +783,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_lithuanian: {
+				lithuanian: {
 					tokenizer: 'standard',
 					filter: [
 						'lowercase',
@@ -812,7 +812,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_norwegian: {
+				norwegian: {
 					tokenizer: 'standard',
 					filter: [
 						'lowercase',
@@ -839,7 +839,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_persian: {
+				persian: {
 					tokenizer: 'standard',
 					char_filter: ['zero_width_spaces'],
 					filter: [
@@ -870,7 +870,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_portuguese: {
+				portuguese: {
 					tokenizer: 'standard',
 					filter: [
 						'lowercase',
@@ -899,7 +899,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_romanian: {
+				romanian: {
 					tokenizer: 'standard',
 					filter: ['lowercase', 'romanian_stop', 'romanian_keywords', 'romanian_stemmer'],
 				},
@@ -923,7 +923,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_russian: {
+				russian: {
 					tokenizer: 'standard',
 					filter: ['lowercase', 'russian_stop', 'russian_keywords', 'russian_stemmer'],
 				},
@@ -947,7 +947,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_sorani: {
+				sorani: {
 					tokenizer: 'standard',
 					filter: [
 						'sorani_normalization',
@@ -978,7 +978,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_spanish: {
+				spanish: {
 					tokenizer: 'standard',
 					filter: ['lowercase', 'spanish_stop', 'spanish_keywords', 'spanish_stemmer'],
 				},
@@ -1002,7 +1002,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_swedish: {
+				swedish: {
 					tokenizer: 'standard',
 					filter: ['lowercase', 'swedish_stop', 'swedish_keywords', 'swedish_stemmer'],
 				},
@@ -1030,7 +1030,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_turkish: {
+				turkish: {
 					tokenizer: 'standard',
 					filter: [
 						'apostrophe',
@@ -1052,7 +1052,7 @@ export default {
 				},
 			},
 			analyzer: {
-				rebuilt_thai: {
+				thai: {
 					tokenizer: 'thai',
 					filter: ['lowercase', 'decimal_digit', 'thai_stop'],
 				},

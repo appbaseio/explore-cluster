@@ -1,17 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import {
-	Card,
-	Col,
-	Form,
-	Input,
-	InputNumber,
-	message,
-	notification,
-	Row,
-	Select,
-	Switch,
-} from 'antd';
+import { Card, Form, Input, InputNumber, message, notification, Select, Switch } from 'antd';
 
 import { get, pick } from 'lodash';
 import { getDefaultSettings, getSettings, putSettings } from '../../batteries/modules/actions';
@@ -21,6 +10,7 @@ import { SettingsFooter } from '../../components/SettingsFooter';
 import { container, label } from './styles';
 import { isEqual } from '../../batteries/utils';
 import { ReviewAndSave } from '../../components/ReviewAndSave';
+import { SettingTooltip } from '../../components/SettingTooltip';
 
 const bannerMessage = {
 	title: 'Results Settings',
@@ -85,12 +75,11 @@ class ResultsPage extends React.Component {
 		getFieldDecorator('highlightFields');
 		const formValues = Object.keys(results || {}).reduce((formObj, key) => {
 			if (key === 'highlightOptions') {
-				const { number_of_fragments, fragment_size, pre_tags, post_tags } = results[key];
+				const { number_of_fragments, fragment_size, pre_tags } = results[key];
 				this.registerFields(getFieldDecorator);
 				formObj.number_of_fragments = number_of_fragments;
 				formObj.fragment_size = fragment_size;
 				formObj.pre_tags = get(pre_tags, 0);
-				formObj.post_tags = get(post_tags, 0);
 			} else {
 				formObj[key] = results[key];
 			}
@@ -107,7 +96,6 @@ class ResultsPage extends React.Component {
 		getFieldDecorator('number_of_fragments');
 		getFieldDecorator('fragment_size');
 		getFieldDecorator('pre_tags');
-		getFieldDecorator('post_tags');
 	};
 
 	handleSubmit = e => {
@@ -133,7 +121,8 @@ class ResultsPage extends React.Component {
 	};
 
 	getResultsPayload = values => {
-		const { pre_tags, number_of_fragments, fragment_size, post_tags } = values;
+		const { pre_tags, number_of_fragments, fragment_size } = values;
+		const post_tags = pre_tags ? `</${pre_tags.split('<')[1]}` : [];
 		const getHighlightOptions = () => {
 			if (!values.highlight) return undefined;
 			return {
@@ -158,7 +147,14 @@ class ResultsPage extends React.Component {
 
 	renderIncludeExclude = (excludeFields, includeFields) => (
 		<>
-			<Form.Item label="Include Fields">
+			<Form.Item
+				label={
+					<>
+						Include Fields
+						<SettingTooltip />
+					</>
+				}
+			>
 				<Select
 					placeholder="Select field value"
 					mode="tags"
@@ -173,7 +169,14 @@ class ResultsPage extends React.Component {
 				</Select>
 			</Form.Item>
 
-			<Form.Item label="Exclude Fields">
+			<Form.Item
+				label={
+					<>
+						Exclude Fields
+						<SettingTooltip />
+					</>
+				}
+			>
 				<Select
 					placeholder="Select field value"
 					mode="tags"
@@ -192,7 +195,14 @@ class ResultsPage extends React.Component {
 
 	renderHighlightFields = getFieldDecorator => (
 		<>
-			<Form.Item label="Fields To Highlight">
+			<Form.Item
+				label={
+					<>
+						Fields To Highlight
+						<SettingTooltip />
+					</>
+				}
+			>
 				{getFieldDecorator('highlightFields')(
 					<Select
 						placeholder="Select field value"
@@ -203,22 +213,38 @@ class ResultsPage extends React.Component {
 					/>,
 				)}
 			</Form.Item>
-			<Form.Item label="Highlight start and end tags">
-				<Row gutter={22}>
-					<Col span={12}>
-						{getFieldDecorator('pre_tags')(<Input placeholder="<mark>" />)}
-					</Col>
-					<Col span={12}>
-						{getFieldDecorator('post_tags')(<Input placeholder="</mark>" />)}
-					</Col>
-				</Row>
+			<Form.Item
+				label={
+					<>
+						Highlight start tag
+						<SettingTooltip />
+					</>
+				}
+			>
+				{getFieldDecorator('pre_tags', {
+					rules: [{ pattern: /^<\w*>$/g, message: 'Please enter a valid tag.' }],
+				})(<Input style={{ width: '17%' }} placeholder="<mark>" />)}
 			</Form.Item>
-			<Form.Item label="Highlight Fragment Size">
+			<Form.Item
+				label={
+					<>
+						Highlight Fragment Size
+						<SettingTooltip />
+					</>
+				}
+			>
 				{getFieldDecorator('fragment_size')(
 					<InputNumber style={{ width: '17%' }} placeholder="Enter fragment size" />,
 				)}
 			</Form.Item>
-			<Form.Item label="Number Of Fragments">
+			<Form.Item
+				label={
+					<>
+						Number Of Fragments
+						<SettingTooltip />
+					</>
+				}
+			>
 				{getFieldDecorator('number_of_fragments')(
 					<InputNumber style={{ width: '17%' }} placeholder="Enter no of fragments" />,
 				)}
@@ -259,7 +285,14 @@ class ResultsPage extends React.Component {
 				<div className={container}>
 					<Form layout="vertical" className={label}>
 						<Card>
-							<Form.Item label="Page Size">
+							<Form.Item
+								label={
+									<>
+										Page Size
+										<SettingTooltip />
+									</>
+								}
+							>
 								{getFieldDecorator('size')(
 									<InputNumber
 										style={{ width: '15%' }}
