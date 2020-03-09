@@ -1,25 +1,28 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
-	Row,
 	Icon,
-	Modal,
 	Input,
-	Radio,
-	List,
-	Popover,
-	notification,
 	InputNumber,
+	List,
+	Modal,
+	notification,
+	Popover,
+	Radio,
+	Row,
 	Select,
 } from 'antd';
+import _get from 'lodash/get';
 import PropTypes from 'prop-types';
 
-import { modalHeading, input, radiobtn } from './styles';
+import { input, modalHeading, radiobtn } from './styles';
 import { validateAppName, validationsList } from '../../utils/helper';
 
 import { createApp, resetCreatedApp } from '../../actions';
 import { LanguageDropdown } from '../../components/LanguageDropdown';
 import languages from '../../constants/language';
+import { putSettings } from '../../batteries/modules/actions';
+import { getLanguageFallback } from '../../utils/language';
 
 const RadioGroup = Radio.Group;
 
@@ -32,7 +35,7 @@ class CreateAppModal extends Component {
 			validationPopOver: false,
 			shards: 5,
 			replicas: 0,
-			language: 'english',
+			language: 'universal',
 		};
 	}
 
@@ -42,9 +45,14 @@ class CreateAppModal extends Component {
 	}
 
 	componentDidUpdate = () => {
-		const { createdApp, history } = this.props; //eslint-disable-line
+		const { createdApp, history, updateSettingsAction } = this.props; //eslint-disable-line
 		const { hasJSON, appName } = this.state;
+		let { language } = this.state;
+		language = getLanguageFallback(language);
 		if (createdApp.data && createdApp.data.acknowledged) {
+			updateSettingsAction(appName, {
+				language: { language, applyStopwords: true, normalizeDiacritics: true },
+			});
 			if (hasJSON === 'sample') {
 				history.push(`app/${appName}/import?load-data=true`);
 			} else if (hasJSON) {
@@ -56,14 +64,16 @@ class CreateAppModal extends Component {
 	};
 
 	handleOk = async () => {
-		const { appName, shards, replicas, language } = this.state;
+		const { appName, shards, replicas } = this.state;
 		const { handleCreateApp } = this.props;
+		let { language } = this.state;
+		language = getLanguageFallback(language);
 		const options = {
 			appName,
 			settings: {
 				number_of_shards: shards,
 				number_of_replicas: replicas,
-				analysis: languages[language].analysis,
+				analysis: _get(languages, [language, 'analysis']),
 			},
 		};
 
@@ -256,6 +266,7 @@ const mapStateToProps = ({ apps, appsMetrics, createdApp }) => ({
 const mapDispatchToProps = dispatch => ({
 	handleCreateApp: options => dispatch(createApp(options)),
 	resetApp: () => dispatch(resetCreatedApp()),
+	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateAppModal);

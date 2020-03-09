@@ -6,10 +6,6 @@ export default {
 					type: 'stop',
 					stopwords: '_arabic_',
 				},
-				arabic_keywords: {
-					type: 'keyword_marker',
-					keywords: ['مثال'],
-				},
 				arabic_stemmer: {
 					type: 'stemmer',
 					language: 'arabic',
@@ -23,7 +19,6 @@ export default {
 						'decimal_digit',
 						'arabic_stop',
 						'arabic_normalization',
-						'arabic_keywords',
 						'arabic_stemmer',
 					],
 				},
@@ -37,10 +32,6 @@ export default {
 					type: 'stop',
 					stopwords: '_armenian_',
 				},
-				armenian_keywords: {
-					type: 'keyword_marker',
-					keywords: ['օրինակ'],
-				},
 				armenian_stemmer: {
 					type: 'stemmer',
 					language: 'armenian',
@@ -49,7 +40,7 @@ export default {
 			analyzer: {
 				armenian: {
 					tokenizer: 'standard',
-					filter: ['lowercase', 'armenian_stop', 'armenian_keywords', 'armenian_stemmer'],
+					filter: ['lowercase', 'armenian_stop', 'armenian_stemmer'],
 				},
 			},
 		},
@@ -61,10 +52,6 @@ export default {
 					type: 'stop',
 					stopwords: '_basque_',
 				},
-				basque_keywords: {
-					type: 'keyword_marker',
-					keywords: ['Adibidez'],
-				},
 				basque_stemmer: {
 					type: 'stemmer',
 					language: 'basque',
@@ -73,7 +60,7 @@ export default {
 			analyzer: {
 				basque: {
 					tokenizer: 'standard',
-					filter: ['lowercase', 'basque_stop', 'basque_keywords', 'basque_stemmer'],
+					filter: ['lowercase', 'basque_stop', 'basque_stemmer'],
 				},
 			},
 		},
@@ -84,10 +71,6 @@ export default {
 				bengali_stop: {
 					type: 'stop',
 					stopwords: '_bengali_',
-				},
-				bengali_keywords: {
-					type: 'keyword_marker',
-					keywords: ['উদাহরণ'],
 				},
 				bengali_stemmer: {
 					type: 'stemmer',
@@ -100,7 +83,7 @@ export default {
 					filter: [
 						'lowercase',
 						'decimal_digit',
-						'bengali_keywords',
+
 						'indic_normalization',
 						'bengali_normalization',
 						'bengali_stop',
@@ -117,10 +100,6 @@ export default {
 					type: 'stop',
 					stopwords: '_brazilian_',
 				},
-				brazilian_keywords: {
-					type: 'keyword_marker',
-					keywords: ['exemplo'],
-				},
 				brazilian_stemmer: {
 					type: 'stemmer',
 					language: 'brazilian',
@@ -129,12 +108,7 @@ export default {
 			analyzer: {
 				brazilian: {
 					tokenizer: 'standard',
-					filter: [
-						'lowercase',
-						'brazilian_stop',
-						'brazilian_keywords',
-						'brazilian_stemmer',
-					],
+					filter: ['lowercase', 'brazilian_stop', 'brazilian_stemmer'],
 				},
 			},
 		},
@@ -146,10 +120,6 @@ export default {
 					type: 'stop',
 					stopwords: '_bulgarian_',
 				},
-				bulgarian_keywords: {
-					type: 'keyword_marker',
-					keywords: ['пример'],
-				},
 				bulgarian_stemmer: {
 					type: 'stemmer',
 					language: 'bulgarian',
@@ -158,12 +128,7 @@ export default {
 			analyzer: {
 				bulgarian: {
 					tokenizer: 'standard',
-					filter: [
-						'lowercase',
-						'bulgarian_stop',
-						'bulgarian_keywords',
-						'bulgarian_stemmer',
-					],
+					filter: ['lowercase', 'bulgarian_stop', 'bulgarian_stemmer'],
 				},
 			},
 		},
@@ -180,10 +145,6 @@ export default {
 					type: 'stop',
 					stopwords: '_catalan_',
 				},
-				catalan_keywords: {
-					type: 'keyword_marker',
-					keywords: ['example'],
-				},
 				catalan_stemmer: {
 					type: 'stemmer',
 					language: 'catalan',
@@ -192,13 +153,7 @@ export default {
 			analyzer: {
 				catalan: {
 					tokenizer: 'standard',
-					filter: [
-						'catalan_elision',
-						'lowercase',
-						'catalan_stop',
-						'catalan_keywords',
-						'catalan_stemmer',
-					],
+					filter: ['catalan_elision', 'lowercase', 'catalan_stop', 'catalan_stemmer'],
 				},
 			},
 		},
@@ -262,10 +217,6 @@ export default {
 					type: 'stop',
 					stopwords: '_czech_',
 				},
-				czech_keywords: {
-					type: 'keyword_marker',
-					keywords: ['příklad'],
-				},
 				czech_stemmer: {
 					type: 'stemmer',
 					language: 'czech',
@@ -274,7 +225,7 @@ export default {
 			analyzer: {
 				czech: {
 					tokenizer: 'standard',
-					filter: ['lowercase', 'czech_stop', 'czech_keywords', 'czech_stemmer'],
+					filter: ['lowercase', 'czech_stop', 'czech_stemmer'],
 				},
 			},
 		},
@@ -286,10 +237,6 @@ export default {
 					type: 'stop',
 					stopwords: '_danish_',
 				},
-				danish_keywords: {
-					type: 'keyword_marker',
-					keywords: ['eksempel'],
-				},
 				danish_stemmer: {
 					type: 'stemmer',
 					language: 'danish',
@@ -298,7 +245,7 @@ export default {
 			analyzer: {
 				danish: {
 					tokenizer: 'standard',
-					filter: ['lowercase', 'danish_stop', 'danish_keywords', 'danish_stemmer'],
+					filter: ['lowercase', 'danish_stop', 'danish_stemmer'],
 				},
 			},
 		},
@@ -309,10 +256,6 @@ export default {
 				dutch_stop: {
 					type: 'stop',
 					stopwords: '_dutch_',
-				},
-				dutch_keywords: {
-					type: 'keyword_marker',
-					keywords: ['voorbeeld'],
 				},
 				dutch_stemmer: {
 					type: 'stemmer',
@@ -326,13 +269,7 @@ export default {
 			analyzer: {
 				dutch: {
 					tokenizer: 'standard',
-					filter: [
-						'lowercase',
-						'dutch_stop',
-						'dutch_keywords',
-						'dutch_override',
-						'dutch_stemmer',
-					],
+					filter: ['lowercase', 'dutch_stop', 'dutch_override', 'dutch_stemmer'],
 				},
 			},
 		},
@@ -343,10 +280,6 @@ export default {
 				english_stop: {
 					type: 'stop',
 					stopwords: '_english_',
-				},
-				english_keywords: {
-					type: 'keyword_marker',
-					keywords: ['example'],
 				},
 				english_stemmer: {
 					type: 'stemmer',
@@ -364,7 +297,7 @@ export default {
 						'english_possessive_stemmer',
 						'lowercase',
 						'english_stop',
-						'english_keywords',
+
 						'english_stemmer',
 					],
 				},
@@ -378,10 +311,6 @@ export default {
 					type: 'stop',
 					stopwords: '_estonian_',
 				},
-				estonian_keywords: {
-					type: 'keyword_marker',
-					keywords: ['näide'],
-				},
 				estonian_stemmer: {
 					type: 'stemmer',
 					language: 'estonian',
@@ -390,7 +319,7 @@ export default {
 			analyzer: {
 				estonian: {
 					tokenizer: 'standard',
-					filter: ['lowercase', 'estonian_stop', 'estonian_keywords', 'estonian_stemmer'],
+					filter: ['lowercase', 'estonian_stop', 'estonian_stemmer'],
 				},
 			},
 		},
@@ -402,10 +331,6 @@ export default {
 					type: 'stop',
 					stopwords: '_finnish_',
 				},
-				finnish_keywords: {
-					type: 'keyword_marker',
-					keywords: ['esimerkki'],
-				},
 				finnish_stemmer: {
 					type: 'stemmer',
 					language: 'finnish',
@@ -414,7 +339,7 @@ export default {
 			analyzer: {
 				finnish: {
 					tokenizer: 'standard',
-					filter: ['lowercase', 'finnish_stop', 'finnish_keywords', 'finnish_stemmer'],
+					filter: ['lowercase', 'finnish_stop', 'finnish_stemmer'],
 				},
 			},
 		},
@@ -445,10 +370,6 @@ export default {
 					type: 'stop',
 					stopwords: '_french_',
 				},
-				french_keywords: {
-					type: 'keyword_marker',
-					keywords: ['Example'],
-				},
 				french_stemmer: {
 					type: 'stemmer',
 					language: 'light_french',
@@ -457,13 +378,7 @@ export default {
 			analyzer: {
 				french: {
 					tokenizer: 'standard',
-					filter: [
-						'french_elision',
-						'lowercase',
-						'french_stop',
-						'french_keywords',
-						'french_stemmer',
-					],
+					filter: ['french_elision', 'lowercase', 'french_stop', 'french_stemmer'],
 				},
 			},
 		},
@@ -475,10 +390,6 @@ export default {
 					type: 'stop',
 					stopwords: '_galician_',
 				},
-				galician_keywords: {
-					type: 'keyword_marker',
-					keywords: ['exemplo'],
-				},
 				galician_stemmer: {
 					type: 'stemmer',
 					language: 'galician',
@@ -487,7 +398,7 @@ export default {
 			analyzer: {
 				galician: {
 					tokenizer: 'standard',
-					filter: ['lowercase', 'galician_stop', 'galician_keywords', 'galician_stemmer'],
+					filter: ['lowercase', 'galician_stop', 'galician_stemmer'],
 				},
 			},
 		},
@@ -499,10 +410,6 @@ export default {
 					type: 'stop',
 					stopwords: '_german_',
 				},
-				german_keywords: {
-					type: 'keyword_marker',
-					keywords: ['Beispiel'],
-				},
 				german_stemmer: {
 					type: 'stemmer',
 					language: 'light_german',
@@ -511,13 +418,7 @@ export default {
 			analyzer: {
 				german: {
 					tokenizer: 'standard',
-					filter: [
-						'lowercase',
-						'german_stop',
-						'german_keywords',
-						'german_normalization',
-						'german_stemmer',
-					],
+					filter: ['lowercase', 'german_stop', 'german_normalization', 'german_stemmer'],
 				},
 			},
 		},
@@ -533,10 +434,6 @@ export default {
 					type: 'lowercase',
 					language: 'greek',
 				},
-				greek_keywords: {
-					type: 'keyword_marker',
-					keywords: ['παράδειγμα'],
-				},
 				greek_stemmer: {
 					type: 'stemmer',
 					language: 'greek',
@@ -545,7 +442,7 @@ export default {
 			analyzer: {
 				greek: {
 					tokenizer: 'standard',
-					filter: ['greek_lowercase', 'greek_stop', 'greek_keywords', 'greek_stemmer'],
+					filter: ['greek_lowercase', 'greek_stop', 'greek_stemmer'],
 				},
 			},
 		},
@@ -556,10 +453,6 @@ export default {
 				hindi_stop: {
 					type: 'stop',
 					stopwords: '_hindi_',
-				},
-				hindi_keywords: {
-					type: 'keyword_marker',
-					keywords: ['उदाहरण'],
 				},
 				hindi_stemmer: {
 					type: 'stemmer',
@@ -572,7 +465,7 @@ export default {
 					filter: [
 						'lowercase',
 						'decimal_digit',
-						'hindi_keywords',
+
 						'indic_normalization',
 						'hindi_normalization',
 						'hindi_stop',
@@ -589,10 +482,6 @@ export default {
 					type: 'stop',
 					stopwords: '_hungarian_',
 				},
-				hungarian_keywords: {
-					type: 'keyword_marker',
-					keywords: ['példa'],
-				},
 				hungarian_stemmer: {
 					type: 'stemmer',
 					language: 'hungarian',
@@ -601,12 +490,7 @@ export default {
 			analyzer: {
 				hungarian: {
 					tokenizer: 'standard',
-					filter: [
-						'lowercase',
-						'hungarian_stop',
-						'hungarian_keywords',
-						'hungarian_stemmer',
-					],
+					filter: ['lowercase', 'hungarian_stop', 'hungarian_stemmer'],
 				},
 			},
 		},
@@ -618,10 +502,6 @@ export default {
 					type: 'stop',
 					stopwords: '_indonesian_',
 				},
-				indonesian_keywords: {
-					type: 'keyword_marker',
-					keywords: ['contoh'],
-				},
 				indonesian_stemmer: {
 					type: 'stemmer',
 					language: 'indonesian',
@@ -630,12 +510,7 @@ export default {
 			analyzer: {
 				indonesian: {
 					tokenizer: 'standard',
-					filter: [
-						'lowercase',
-						'indonesian_stop',
-						'indonesian_keywords',
-						'indonesian_stemmer',
-					],
+					filter: ['lowercase', 'indonesian_stop', 'indonesian_stemmer'],
 				},
 			},
 		},
@@ -661,10 +536,6 @@ export default {
 					type: 'lowercase',
 					language: 'irish',
 				},
-				irish_keywords: {
-					type: 'keyword_marker',
-					keywords: ['sampla'],
-				},
 				irish_stemmer: {
 					type: 'stemmer',
 					language: 'irish',
@@ -678,7 +549,7 @@ export default {
 						'irish_elision',
 						'irish_lowercase',
 						'irish_stop',
-						'irish_keywords',
+
 						'irish_stemmer',
 					],
 				},
@@ -719,10 +590,6 @@ export default {
 					type: 'stop',
 					stopwords: '_italian_',
 				},
-				italian_keywords: {
-					type: 'keyword_marker',
-					keywords: ['esempio'],
-				},
 				italian_stemmer: {
 					type: 'stemmer',
 					language: 'light_italian',
@@ -731,13 +598,7 @@ export default {
 			analyzer: {
 				italian: {
 					tokenizer: 'standard',
-					filter: [
-						'italian_elision',
-						'lowercase',
-						'italian_stop',
-						'italian_keywords',
-						'italian_stemmer',
-					],
+					filter: ['italian_elision', 'lowercase', 'italian_stop', 'italian_stemmer'],
 				},
 			},
 		},
@@ -749,10 +610,6 @@ export default {
 					type: 'stop',
 					stopwords: '_latvian_',
 				},
-				latvian_keywords: {
-					type: 'keyword_marker',
-					keywords: ['piemērs'],
-				},
 				latvian_stemmer: {
 					type: 'stemmer',
 					language: 'latvian',
@@ -761,7 +618,7 @@ export default {
 			analyzer: {
 				latvian: {
 					tokenizer: 'standard',
-					filter: ['lowercase', 'latvian_stop', 'latvian_keywords', 'latvian_stemmer'],
+					filter: ['lowercase', 'latvian_stop', 'latvian_stemmer'],
 				},
 			},
 		},
@@ -773,10 +630,6 @@ export default {
 					type: 'stop',
 					stopwords: '_lithuanian_',
 				},
-				lithuanian_keywords: {
-					type: 'keyword_marker',
-					keywords: ['pavyzdys'],
-				},
 				lithuanian_stemmer: {
 					type: 'stemmer',
 					language: 'lithuanian',
@@ -785,12 +638,7 @@ export default {
 			analyzer: {
 				lithuanian: {
 					tokenizer: 'standard',
-					filter: [
-						'lowercase',
-						'lithuanian_stop',
-						'lithuanian_keywords',
-						'lithuanian_stemmer',
-					],
+					filter: ['lowercase', 'lithuanian_stop', 'lithuanian_stemmer'],
 				},
 			},
 		},
@@ -802,10 +650,6 @@ export default {
 					type: 'stop',
 					stopwords: '_norwegian_',
 				},
-				norwegian_keywords: {
-					type: 'keyword_marker',
-					keywords: ['eksempel'],
-				},
 				norwegian_stemmer: {
 					type: 'stemmer',
 					language: 'norwegian',
@@ -814,12 +658,7 @@ export default {
 			analyzer: {
 				norwegian: {
 					tokenizer: 'standard',
-					filter: [
-						'lowercase',
-						'norwegian_stop',
-						'norwegian_keywords',
-						'norwegian_stemmer',
-					],
+					filter: ['lowercase', 'norwegian_stop', 'norwegian_stemmer'],
 				},
 			},
 		},
@@ -860,10 +699,6 @@ export default {
 					type: 'stop',
 					stopwords: '_portuguese_',
 				},
-				portuguese_keywords: {
-					type: 'keyword_marker',
-					keywords: ['exemplo'],
-				},
 				portuguese_stemmer: {
 					type: 'stemmer',
 					language: 'light_portuguese',
@@ -872,12 +707,7 @@ export default {
 			analyzer: {
 				portuguese: {
 					tokenizer: 'standard',
-					filter: [
-						'lowercase',
-						'portuguese_stop',
-						'portuguese_keywords',
-						'portuguese_stemmer',
-					],
+					filter: ['lowercase', 'portuguese_stop', 'portuguese_stemmer'],
 				},
 			},
 		},
@@ -889,10 +719,6 @@ export default {
 					type: 'stop',
 					stopwords: '_romanian_',
 				},
-				romanian_keywords: {
-					type: 'keyword_marker',
-					keywords: ['exemplu'],
-				},
 				romanian_stemmer: {
 					type: 'stemmer',
 					language: 'romanian',
@@ -901,7 +727,7 @@ export default {
 			analyzer: {
 				romanian: {
 					tokenizer: 'standard',
-					filter: ['lowercase', 'romanian_stop', 'romanian_keywords', 'romanian_stemmer'],
+					filter: ['lowercase', 'romanian_stop', 'romanian_stemmer'],
 				},
 			},
 		},
@@ -913,10 +739,6 @@ export default {
 					type: 'stop',
 					stopwords: '_russian_',
 				},
-				russian_keywords: {
-					type: 'keyword_marker',
-					keywords: ['пример'],
-				},
 				russian_stemmer: {
 					type: 'stemmer',
 					language: 'russian',
@@ -925,7 +747,7 @@ export default {
 			analyzer: {
 				russian: {
 					tokenizer: 'standard',
-					filter: ['lowercase', 'russian_stop', 'russian_keywords', 'russian_stemmer'],
+					filter: ['lowercase', 'russian_stop', 'russian_stemmer'],
 				},
 			},
 		},
@@ -936,10 +758,6 @@ export default {
 				sorani_stop: {
 					type: 'stop',
 					stopwords: '_sorani_',
-				},
-				sorani_keywords: {
-					type: 'keyword_marker',
-					keywords: ['mînak'],
 				},
 				sorani_stemmer: {
 					type: 'stemmer',
@@ -954,7 +772,7 @@ export default {
 						'lowercase',
 						'decimal_digit',
 						'sorani_stop',
-						'sorani_keywords',
+
 						'sorani_stemmer',
 					],
 				},
@@ -968,10 +786,6 @@ export default {
 					type: 'stop',
 					stopwords: '_spanish_',
 				},
-				spanish_keywords: {
-					type: 'keyword_marker',
-					keywords: ['ejemplo'],
-				},
 				spanish_stemmer: {
 					type: 'stemmer',
 					language: 'light_spanish',
@@ -980,7 +794,7 @@ export default {
 			analyzer: {
 				spanish: {
 					tokenizer: 'standard',
-					filter: ['lowercase', 'spanish_stop', 'spanish_keywords', 'spanish_stemmer'],
+					filter: ['lowercase', 'spanish_stop', 'spanish_stemmer'],
 				},
 			},
 		},
@@ -992,10 +806,6 @@ export default {
 					type: 'stop',
 					stopwords: '_swedish_',
 				},
-				swedish_keywords: {
-					type: 'keyword_marker',
-					keywords: ['exempel'],
-				},
 				swedish_stemmer: {
 					type: 'stemmer',
 					language: 'swedish',
@@ -1004,7 +814,7 @@ export default {
 			analyzer: {
 				swedish: {
 					tokenizer: 'standard',
-					filter: ['lowercase', 'swedish_stop', 'swedish_keywords', 'swedish_stemmer'],
+					filter: ['lowercase', 'swedish_stop', 'swedish_stemmer'],
 				},
 			},
 		},
@@ -1020,10 +830,6 @@ export default {
 					type: 'lowercase',
 					language: 'turkish',
 				},
-				turkish_keywords: {
-					type: 'keyword_marker',
-					keywords: ['örnek'],
-				},
 				turkish_stemmer: {
 					type: 'stemmer',
 					language: 'turkish',
@@ -1032,13 +838,7 @@ export default {
 			analyzer: {
 				turkish: {
 					tokenizer: 'standard',
-					filter: [
-						'apostrophe',
-						'turkish_lowercase',
-						'turkish_stop',
-						'turkish_keywords',
-						'turkish_stemmer',
-					],
+					filter: ['apostrophe', 'turkish_lowercase', 'turkish_stop', 'turkish_stemmer'],
 				},
 			},
 		},

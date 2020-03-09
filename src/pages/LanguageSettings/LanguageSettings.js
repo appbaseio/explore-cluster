@@ -23,7 +23,7 @@ import { SettingTooltip } from '../../components/SettingTooltip';
 import { applyLanguageAnalyzers } from '../../batteries/utils/mappings';
 import { doPost } from '../../batteries/utils/requestService';
 import { getReIndexedName } from '../../utils';
-import languages from '../../constants/language';
+import { buildLanguageAnalysis, getLanguageFallback } from '../../utils/language';
 
 const bannerMessage = {
 	title: 'Language Settings',
@@ -102,14 +102,17 @@ class LanguageSettings extends React.Component {
 				fetchMappings(appName, credentials, ACC_API).then(res => {
 					if (res && res.payload) {
 						const analyzerMappings = this.getAnalyzerMappings(res, getFieldValue);
+						let language = getFieldValue('language');
+						language = getLanguageFallback(language);
 						this.setState({ loading: true });
 						deleteSettingsAction(appName);
+						const analysis = buildLanguageAnalysis(language, languagePayload);
 						doPost(
 							`${ACC_API}/_reindex/${appName}`,
 							{
 								mappings: { properties: analyzerMappings },
 								settings: {
-									analysis: languages[getFieldValue('language')].analysis,
+									analysis,
 								},
 							},
 							{
@@ -199,15 +202,17 @@ class LanguageSettings extends React.Component {
 					<Form layout="vertical" className={label}>
 						<Card>
 							<Form.Item
+								style={{ paddingBottom: 0 }}
 								label={
 									<>
 										Choose Your Language
-										<SettingTooltip />
+										<SettingTooltip title="Sets the languages at the index level for language-specific processing such as tokenization and normalization." />
 									</>
 								}
 							>
 								{getFieldDecorator('language')(
 									<LanguageDropdown
+										formStyle={{ paddingBottom: 0 }}
 										renderOption={lang => (
 											<Select.Option key={lang.value} value={lang.value}>
 												{lang.label}
@@ -222,25 +227,25 @@ class LanguageSettings extends React.Component {
 									<Switch />,
 								)}
 							</div>
-							{!getFieldValue('applyStopwords') && (
-								<Form.Item
-									label={
-										<>
-											Provide Custom Stopwords
-											<SettingTooltip />
-										</>
-									}
-								>
-									{getFieldDecorator('customStopwords')(
-										<Input.TextArea placeholder="Add comma separated stopwords" />,
-									)}
-								</Form.Item>
-							)}
+
+							<Form.Item
+								label={
+									<>
+										Provide Custom Stopwords
+										<SettingTooltip title="Removes these words from query before searching." />
+									</>
+								}
+							>
+								{getFieldDecorator('customStopwords')(
+									<Input.TextArea placeholder="Add comma separated stopwords" />,
+								)}
+							</Form.Item>
+
 							<Form.Item
 								label={
 									<>
 										Stemming Exceptions
-										<SettingTooltip />
+										<SettingTooltip title="Words which should be excluded from stemming." />
 									</>
 								}
 							>
