@@ -29,6 +29,7 @@ export class ReviewAndSave extends React.Component {
 			buttonProps,
 			onClick,
 			oldValues,
+			loading,
 		} = this.props;
 		const difference = this.difference(oldValues, newValues);
 		return (
@@ -38,6 +39,8 @@ export class ReviewAndSave extends React.Component {
 						onClick={onClick}
 						size="large"
 						style={{ marginRight: 10 }}
+						type="primary"
+						loading={loading}
 						{...buttonProps}
 					>
 						Review and Save

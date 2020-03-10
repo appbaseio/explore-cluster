@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { get, isEqual } from 'lodash';
+import { get } from 'lodash';
 import { css } from 'emotion';
 import {
 	Card,
@@ -227,6 +227,7 @@ class AggsPage extends React.Component {
 		const cancelChanges = get(this.mappingsRef, 'current.wrappedInstance.cancelChanges');
 		const { settings } = this.props;
 		this.initData(settings);
+		this.toggleVisible();
 		cancelChanges();
 	};
 
@@ -399,20 +400,11 @@ class AggsPage extends React.Component {
 					</Card>
 					<SettingsFooter
 						loading={isUpdating}
-						onSubmit={this.handleSave}
 						resetState={resetState}
 						onReset={this.resetToDefault}
-						disabled={
-							!isDirty &&
-							isEqual(get(settings, 'aggregations'), {
-								size: count,
-								sortBy: sort,
-								includeNullValues: includeNullValue,
-								dataField,
-							})
-						}
 						reviewAndSave={() => (
 							<ReviewAndSave
+								loading={isUpdating}
 								oldValues={get(settings, 'aggregations')}
 								newValues={{
 									size: count,

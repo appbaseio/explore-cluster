@@ -96,10 +96,6 @@ const AppHeader = ({
 	</Header>
 );
 
-AppHeader.defaultProps = {
-	showApp: true,
-};
-
 AppHeader.propTypes = {
 	currentApp: string,
 	user: object.isRequired,
@@ -111,6 +107,7 @@ AppHeader.propTypes = {
 };
 
 AppHeader.defaultProps = {
+	showApp: true,
 	currentApp: null,
 	minimal: false,
 };

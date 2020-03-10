@@ -17,7 +17,6 @@ import { container, label } from '../ResultsPage/styles';
 import { LanguageDropdown } from '../../components/LanguageDropdown';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import { getURL } from '../../constants/config';
-import { isEqual } from '../../batteries/utils';
 import { ReviewAndSave } from '../../components/ReviewAndSave';
 import { SettingTooltip } from '../../components/SettingTooltip';
 import {
@@ -211,7 +210,7 @@ class LanguageSettings extends React.Component {
 
 	render() {
 		const {
-			form: { getFieldDecorator, getFieldValue, getFieldsValue, setFieldsValue },
+			form: { getFieldDecorator, getFieldsValue, setFieldsValue },
 			isLoading,
 			isUpdating,
 			resetState,
@@ -290,16 +289,12 @@ class LanguageSettings extends React.Component {
 
 					<SettingsFooter
 						loading={isUpdating || loading}
-						onSubmit={this.handleSubmit}
 						resetState={resetState}
 						onReset={this.resetLanguageSettings}
 						saveText="Apply Settings And Re-index"
-						disabled={isEqual(
-							get(settings, 'language'),
-							this.getLanguagePayload(getFieldsValue()),
-						)}
 						reviewAndSave={() => (
 							<ReviewAndSave
+								loading={isUpdating || loading}
 								oldValues={get(settings, 'language')}
 								newValues={this.getLanguagePayload(getFieldsValue())}
 								onClick={this.toggleVisible}

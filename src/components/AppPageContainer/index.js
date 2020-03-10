@@ -32,7 +32,7 @@ class AppPageContainer extends Component {
 		if (isLoading) {
 			return <Loader />;
 		}
-		return React.createElement(component, props);
+		return <div key={props.appName}>{React.createElement(component, props)}</div>;
 	}
 }
 

@@ -8,7 +8,6 @@ import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Loader from '../../components/Loader';
 import { SettingsFooter } from '../../components/SettingsFooter';
 import { container, label } from './styles';
-import { isEqual } from '../../batteries/utils';
 import { ReviewAndSave } from '../../components/ReviewAndSave';
 import { SettingTooltip } from '../../components/SettingTooltip';
 
@@ -322,15 +321,11 @@ class ResultsPage extends React.Component {
 
 					<SettingsFooter
 						loading={isUpdating}
-						onSubmit={this.handleSubmit}
 						resetState={resetState}
 						onReset={this.resetResultSettings}
-						disabled={isEqual(
-							get(settings, 'results'),
-							this.getResultsPayload(getFieldsValue()),
-						)}
 						reviewAndSave={() => (
 							<ReviewAndSave
+								loading={isUpdating}
 								oldValues={get(settings, 'results')}
 								newValues={this.getResultsPayload(getFieldsValue())}
 								onClick={this.toggleVisible}

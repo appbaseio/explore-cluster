@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { get, isEqual } from 'lodash';
+import { get } from 'lodash';
 import { css } from 'emotion';
 import {
 	Card,
@@ -396,20 +396,11 @@ class SearchSettingsPage extends React.Component {
 					</Card>
 					<SettingsFooter
 						loading={isUpdating}
-						onSubmit={this.handleSave}
 						resetState={resetState}
 						onReset={this.resetToDefault}
-						disabled={
-							!isDirty &&
-							isEqual(get(settings, 'search'), {
-								fuzziness: hasTypoTolerance ? typoTolerance : 0,
-								searchOperators: hasSearchOperators,
-								dataField: Object.keys(dataField),
-								fieldWeights: Object.values(dataField),
-							})
-						}
 						reviewAndSave={() => (
 							<ReviewAndSave
+								loading={isUpdating}
 								oldValues={get(settings, 'search')}
 								newValues={{
 									fuzziness: hasTypoTolerance ? typoTolerance : 0,

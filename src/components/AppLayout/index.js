@@ -129,7 +129,7 @@ const SearchSettingsPage = Loadable({
 
 class AppLayout extends React.PureComponent {
 	render() {
-		const { collapsed, showHeader } = this.props;
+		const { collapsed, showHeader, match, history } = this.props;
 		const { appName } = this.props.match.params; // eslint-disable-line
 		return (
 			<Layout
@@ -140,7 +140,7 @@ class AppLayout extends React.PureComponent {
 					position: 'relative',
 				}}
 			>
-				{showHeader && <AppHeader big={collapsed} />}
+				{showHeader && <AppHeader big={collapsed} match={match} history={history} />}
 				<Layout.Header
 					css={{
 						background: '#fff',
