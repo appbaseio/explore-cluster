@@ -20,8 +20,12 @@ import { getURL } from '../../constants/config';
 import { isEqual } from '../../batteries/utils';
 import { ReviewAndSave } from '../../components/ReviewAndSave';
 import { SettingTooltip } from '../../components/SettingTooltip';
-import { applyLanguageAnalyzers } from '../../batteries/utils/mappings';
-import { doPost } from '../../batteries/utils/requestService';
+import {
+	applyLanguageAnalyzers,
+	getESVersion,
+	reIndex,
+	getSettings as getAppSettings,
+} from '../../batteries/utils/mappings';
 import { getReIndexedName } from '../../utils';
 import { buildLanguageAnalysis, getLanguageFallback } from '../../utils/language';
 
@@ -34,12 +38,15 @@ const bannerMessage = {
 class LanguageSettings extends React.Component {
 	state = { visible: false, loading: false };
 
-	componentDidMount() {
+	async componentDidMount() {
 		const {
 			appName,
 			getSettingsAction,
 			form: { setFieldsValue },
+			credentials,
 		} = this.props;
+		const esVersion = await getESVersion(appName, credentials);
+		this.setState({ esVersion });
 		getSettingsAction(appName).then(res => {
 			if (res && res.payload) {
 				this.setFormValues(res, setFieldsValue);
@@ -65,7 +72,7 @@ class LanguageSettings extends React.Component {
 	getAnalyzerMappings = (res, getFieldValue) => {
 		// avoid mutation
 		const analyzerMappings = cloneDeep(res.payload.properties);
-		return applyLanguageAnalyzers(analyzerMappings, getFieldValue('language'));
+		return applyLanguageAnalyzers(analyzerMappings, this.getFallBackLanguage(getFieldValue));
 	};
 
 	handleSubmit = e => {
@@ -80,62 +87,75 @@ class LanguageSettings extends React.Component {
 			deleteSettingsAction,
 		} = this.props;
 		const ACC_API = getURL();
-		const authToken = sessionStorage.getItem('authToken');
 		validateFields((err, values) => {
-			const updateSettings = languagePayload => {
-				updateSettingsAction(appName, {
+			const handleReIndexSuccess = languagePayload => {
+				const newName = getReIndexedName(appName);
+				updateSettingsAction(newName, {
 					...settings,
 					language: languagePayload,
-				}).then(res => {
-					if (res && res.error) {
-						notification.error({
-							message: 'Error',
-							description: res.error.message,
-						});
-					} else {
+				}).then(response => {
+					if (response && response.payload) {
+						const { history } = this.props;
 						message.success(`Language settings for ${appName} saved successfully`);
+						history.push(`/`);
+					} else {
+						this.setState({ loading: false });
+						notification.error({
+							message: 'Failed to save Language Settings',
+							description: get(response, 'error.message'),
+						});
 					}
 				});
 			};
 
-			const reIndexAndUpdateSettings = languagePayload => {
+			const handleReIndexError = reIndexErr => {
+				this.setState({ loading: false });
+				notification.error({
+					message: 'error',
+					description: reIndexErr.message,
+				});
+			};
+
+			const reIndexAndUpdateSettings = async languagePayload => {
+				const { esVersion } = this.state;
+
+				const appSettings = await getAppSettings(appName, credentials).then(
+					data => data[appName].settings,
+				);
+
 				fetchMappings(appName, credentials, ACC_API).then(res => {
 					if (res && res.payload) {
 						const analyzerMappings = this.getAnalyzerMappings(res, getFieldValue);
-						let language = getFieldValue('language');
-						language = getLanguageFallback(language);
+						const language = this.getFallBackLanguage(getFieldValue);
 						this.setState({ loading: true });
 						deleteSettingsAction(appName);
 						const analysis = buildLanguageAnalysis(language, languagePayload);
-						doPost(
-							`${ACC_API}/_reindex/${appName}`,
-							{
-								mappings: { properties: analyzerMappings },
-								settings: {
-									analysis,
+						const { analyzer, filter } = get(appSettings, 'index.analysis', {});
+						const { analyzer: analyzerNew, filter: filterNew } = analysis || {};
+						reIndex({
+							mappings: analyzerMappings,
+							appId: appName,
+							version: esVersion,
+							credentials,
+							settings: {
+								analysis: {
+									analyzer: {
+										...analyzer,
+										...analyzerNew,
+									},
+									filter: {
+										...filter,
+										...filterNew,
+									},
 								},
 							},
-							{
-								Authorization: `Basic ${authToken}`,
-							},
-						).then(() => {
-							const newName = getReIndexedName(appName);
-							updateSettingsAction(newName, {
-								...settings,
-								language: languagePayload,
-							}).then(response => {
-								if (response && response.payload) {
-									const { history } = this.props;
-									history.push(`/`);
-								} else {
-									this.setState({ loading: false });
-									notification.error({
-										message: 'Failed to save Language Settings',
-										description: get(response, 'error.message'),
-									});
-								}
+						})
+							.then(() => {
+								handleReIndexSuccess(languagePayload);
+							})
+							.catch(reIndexErr => {
+								handleReIndexError(reIndexErr);
 							});
-						});
 					}
 				});
 			};
@@ -145,6 +165,12 @@ class LanguageSettings extends React.Component {
 				reIndexAndUpdateSettings(languagePayload);
 			}
 		});
+	};
+
+	getFallBackLanguage = getFieldValue => {
+		let language = getFieldValue('language');
+		language = getLanguageFallback(language);
+		return language;
 	};
 
 	getLanguagePayload = values => {
