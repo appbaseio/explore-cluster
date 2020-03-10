@@ -9,6 +9,7 @@ import MenuSlider from '../FullHeader/MenuSlider';
 import UserMenu from './UserMenu';
 import { media } from '../../utils/media';
 import headerStyles from './styles';
+import AppSwitcher from '../AppSwitcher';
 
 const { Header } = Layout;
 const noBorder = css`
@@ -33,7 +34,17 @@ const trialBtn = css`
 	`)};
 `;
 
-const AppHeader = ({ currentApp, user, big, showApp, minimal, isUsingTrial, daysLeft }) => (
+const AppHeader = ({
+	currentApp,
+	user,
+	big,
+	minimal,
+	isUsingTrial,
+	daysLeft,
+	history,
+	match,
+	showApp,
+}) => (
 	<Header
 		className={headerStyles}
 		css={{
@@ -49,11 +60,16 @@ const AppHeader = ({ currentApp, user, big, showApp, minimal, isUsingTrial, days
 						<Icon type="arrow-left" />
 					</Link>
 				</Menu.Item>
-				{showApp ? (
+
+				{showApp && (
 					<Menu.Item key="1" className={noBorder}>
-						<span>{currentApp || 'Loading...'}</span>
+						<AppSwitcher
+							currentApp={currentApp || 'Loading...'}
+							history={history}
+							match={match}
+						/>
 					</Menu.Item>
-				) : null}
+				)}
 			</Menu>
 		)}
 
