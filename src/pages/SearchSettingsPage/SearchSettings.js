@@ -13,6 +13,7 @@ import {
 	Switch,
 	notification,
 	message,
+	Tooltip,
 } from 'antd';
 
 import {
@@ -28,10 +29,10 @@ import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { getAggsMappings } from '../../batteries/utils/mappings';
 import { ReviewAndSave } from '../../components/ReviewAndSave';
-import SearchPreviewModal from '../../components/SearchPreviewModal';
 import { SettingsFooter } from '../../components/SettingsFooter';
 import { container } from '../ResultsPage/styles';
 import { getReIndexedName, getSubFields } from '../../utils';
+import { settingsMap } from '../../components/ReviewAndSave/helper';
 
 const { Option } = Select;
 
@@ -243,6 +244,7 @@ class SearchSettingsPage extends React.Component {
 					this.initData(res.payload);
 				}
 			});
+		this.toggleVisible();
 	};
 
 	reIndex = async () => {
@@ -367,7 +369,10 @@ class SearchSettingsPage extends React.Component {
 					</Card>
 					<Card className={cardStyle}>
 						<label>
-							Search Operators <Icon type="info-circle" />
+							Search Operators{' '}
+							<Tooltip title={settingsMap.searchOperators.description}>
+								<Icon type="info-circle" />
+							</Tooltip>
 						</label>
 						<Switch
 							checked={hasSearchOperators}
@@ -375,7 +380,10 @@ class SearchSettingsPage extends React.Component {
 						/>
 
 						<label>
-							Enable Typo Tolerance <Icon type="info-circle" />
+							Enable Typo Tolerance{' '}
+							<Tooltip title="Enable this to return documents that contain terms similar to the search term.">
+								<Icon type="info-circle" />
+							</Tooltip>
 						</label>
 						<Switch
 							checked={hasTypoTolerance}
@@ -385,7 +393,12 @@ class SearchSettingsPage extends React.Component {
 						{hasTypoTolerance && (
 							<React.Fragment>
 								<label>
-									Typo Tolerance <Icon type="info-circle" />
+									Typo Tolerance{' '}
+									<Tooltip
+										title={`Sets a maximum edit distance on the search parameters, can be 1, 2 or "AUTO".`}
+									>
+										<Icon type="info-circle" />
+									</Tooltip>
 								</label>
 								<Select
 									placeholder="Select typo tolerance"

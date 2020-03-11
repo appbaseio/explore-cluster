@@ -10,6 +10,7 @@ import { SettingsFooter } from '../../components/SettingsFooter';
 import { container, label } from './styles';
 import { ReviewAndSave } from '../../components/ReviewAndSave';
 import { SettingTooltip } from '../../components/SettingTooltip';
+import { settingsMap } from '../../components/ReviewAndSave/helper';
 
 const bannerMessage = {
 	title: 'Results Settings',
@@ -67,6 +68,7 @@ class ResultsPage extends React.Component {
 					this.setFormValues(res, getFieldDecorator, setFieldsValue);
 				}
 			});
+		this.toggleVisible();
 	};
 
 	setFormValues = (res, getFieldDecorator, setFieldsValue) => {
@@ -150,7 +152,7 @@ class ResultsPage extends React.Component {
 				label={
 					<>
 						Include Fields
-						<SettingTooltip />
+						<SettingTooltip title={settingsMap.includeFields.description} />
 					</>
 				}
 			>
@@ -172,7 +174,7 @@ class ResultsPage extends React.Component {
 				label={
 					<>
 						Exclude Fields
-						<SettingTooltip />
+						<SettingTooltip title={settingsMap.excludeFields.description} />
 					</>
 				}
 			>
@@ -198,7 +200,7 @@ class ResultsPage extends React.Component {
 				label={
 					<>
 						Fields To Highlight
-						<SettingTooltip />
+						<SettingTooltip title={settingsMap.highlightFields.description} />
 					</>
 				}
 			>
@@ -215,8 +217,8 @@ class ResultsPage extends React.Component {
 			<Form.Item
 				label={
 					<>
-						Highlight start tag
-						<SettingTooltip />
+						Highlight Start Tag
+						<SettingTooltip title="Enter the start tag and end tag would be formed based on that. E.g. if you type <mark> end_tag would be </mark>." />
 					</>
 				}
 			>
@@ -228,7 +230,7 @@ class ResultsPage extends React.Component {
 				label={
 					<>
 						Highlight Fragment Size
-						<SettingTooltip />
+						<SettingTooltip title="Fragment size for the search results with highlight." />
 					</>
 				}
 			>
@@ -240,7 +242,7 @@ class ResultsPage extends React.Component {
 				label={
 					<>
 						Number Of Fragments
-						<SettingTooltip />
+						<SettingTooltip title="Number of fragments for the search results with highlight." />
 					</>
 				}
 			>
@@ -288,7 +290,7 @@ class ResultsPage extends React.Component {
 								label={
 									<>
 										Page Size
-										<SettingTooltip />
+										<SettingTooltip title={settingsMap.size.description} />
 									</>
 								}
 							>

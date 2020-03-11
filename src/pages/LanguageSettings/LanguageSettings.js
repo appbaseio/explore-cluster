@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Card, Form, Input, message, notification, Select, Switch } from 'antd';
 
-import { cloneDeep, get, pick } from 'lodash';
+import { cloneDeep, get, omit, omitBy, pick } from 'lodash';
 import {
 	deleteSettings,
 	getAppMappings,
@@ -139,11 +139,15 @@ class LanguageSettings extends React.Component {
 							settings: {
 								analysis: {
 									analyzer: {
-										...analyzer,
+										...omit(analyzer, get(settings, 'language.language')),
 										...analyzerNew,
 									},
 									filter: {
-										...filter,
+										...omitBy(filter, (key, value) =>
+											(value || '').startsWith(
+												get(settings, 'language.language'),
+											),
+										),
 										...filterNew,
 									},
 								},
@@ -196,6 +200,7 @@ class LanguageSettings extends React.Component {
 					this.setFormValues(res, setFieldsValue);
 				}
 			});
+		this.toggleVisible();
 	};
 
 	revertChanges = (settings, setFieldsValue) => {

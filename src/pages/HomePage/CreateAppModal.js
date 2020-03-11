@@ -21,7 +21,7 @@ import { validateAppName, validationsList } from '../../utils/helper';
 import { createApp, resetCreatedApp } from '../../actions';
 import { LanguageDropdown } from '../../components/LanguageDropdown';
 import languages from '../../constants/language';
-import { putSettings } from '../../batteries/modules/actions';
+import { getDefaultSettings, putSettings } from '../../batteries/modules/actions';
 import { getLanguageFallback } from '../../utils/language';
 
 const RadioGroup = Radio.Group;
@@ -33,7 +33,7 @@ class CreateAppModal extends Component {
 			appName: '',
 			hasJSON: false,
 			validationPopOver: false,
-			shards: 5,
+			shards: 1,
 			replicas: 0,
 			language: 'universal',
 		};
@@ -45,20 +45,35 @@ class CreateAppModal extends Component {
 	}
 
 	componentDidUpdate = () => {
-		const { createdApp, history, updateSettingsAction } = this.props; //eslint-disable-line
+		const {
+			createdApp,
+			history,
+			updateSettingsAction,
+			defaultSettings,
+			getDefaultSettingsAction,
+		} = this.props; //eslint-disable-line
 		const { hasJSON, appName } = this.state;
 		let { language } = this.state;
 		language = getLanguageFallback(language);
-		if (createdApp.data && createdApp.data.acknowledged) {
+
+		const updateSettings = settings => {
 			updateSettingsAction(appName, {
+				...settings,
 				language: {
+					...settings.language,
 					language,
-					applyStopwords: true,
-					normalizeDiacritics: true,
-					customStopwords: [],
-					stemmingExceptions: [],
 				},
 			});
+		};
+
+		if (createdApp.data && createdApp.data.acknowledged) {
+			if (defaultSettings) updateSettings(defaultSettings);
+			else
+				getDefaultSettingsAction().then(res => {
+					if (res && res.payload) {
+						updateSettings(res.payload);
+					}
+				});
 			if (hasJSON === 'sample') {
 				history.push(`app/${appName}/import?load-data=true`);
 			} else if (hasJSON) {
@@ -263,19 +278,18 @@ CreateAppModal.propTypes = {
 	resetApp: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = ({ apps, appsMetrics, createdApp }) => ({
-	apps,
-	appsMetrics,
-	createdApp,
+const mapStateToProps = state => ({
+	apps: state.apps,
+	appsMetrics: state.appsMetrics,
+	createdApp: state.createdApp,
+	defaultSettings: _get(state, '$getAppSettings.defaultSettings'),
 });
 
 const mapDispatchToProps = dispatch => ({
 	handleCreateApp: options => dispatch(createApp(options)),
 	resetApp: () => dispatch(resetCreatedApp()),
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
+	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(CreateAppModal);
+export default connect(mapStateToProps, mapDispatchToProps)(CreateAppModal);

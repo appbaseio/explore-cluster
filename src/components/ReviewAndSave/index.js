@@ -32,9 +32,10 @@ export class ReviewAndSave extends React.Component {
 			loading,
 		} = this.props;
 		const difference = this.difference(oldValues, newValues);
+		const isDifferent = keys(difference).length > 0;
 		return (
 			<>
-				{keys(difference).length > 0 && (
+				{isDifferent && (
 					<Button
 						onClick={onClick}
 						size="large"
@@ -48,7 +49,7 @@ export class ReviewAndSave extends React.Component {
 				)}
 				<Modal
 					title="Review Settings Before Saving"
-					visible={visible}
+					visible={isDifferent ? visible : false}
 					onCancel={onClick}
 					width={1000}
 					footer={[
