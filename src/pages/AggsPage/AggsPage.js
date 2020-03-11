@@ -118,7 +118,10 @@ class AggsPage extends React.Component {
 	};
 
 	getSearchableMappings = mappings => {
-		const parsedMappings = getAggsMappings(mappings, true);
+		const aggsResponse = getAggsMappings(mappings, true);
+		const parsedMappings = Array.isArray(aggsResponse)
+			? aggsResponse
+			: Object.keys(aggsResponse);
 		const searchableMappings = parsedMappings
 			.filter(mapping => mapping.usecase === 'search')
 			.map(mapping => ({
@@ -250,7 +253,6 @@ class AggsPage extends React.Component {
 			count,
 			includeNullValue,
 			visible,
-			isDirty,
 		} = this.state;
 		const { isUpdating, settings, resetState, appName } = this.props;
 		const sortOptions = [

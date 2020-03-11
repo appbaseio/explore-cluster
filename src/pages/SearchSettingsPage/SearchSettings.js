@@ -115,7 +115,10 @@ class SearchSettingsPage extends React.Component {
 	};
 
 	getAggsMappings = mappings => {
-		const parsedMappings = getAggsMappings(mappings, true);
+		const aggsResponse = getAggsMappings(mappings, true);
+		const parsedMappings = Array.isArray(aggsResponse)
+			? aggsResponse
+			: Object.keys(aggsResponse);
 		const aggsMappings = parsedMappings.filter
 			? parsedMappings
 					.filter(mapping => mapping.usecase === 'aggs' || mapping.usecase === 'none')
