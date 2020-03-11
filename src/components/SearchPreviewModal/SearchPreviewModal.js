@@ -6,11 +6,7 @@ import SearchPreview from '../../pages/SandboxPage/components/SearchPreview';
 
 const modalStyles = css`
 	&.ant-modal {
-		top: 0 !important;
-	}
-
-	.ant-modal-content {
-		border-radius: 0 !important;
+		top: 5% !important;
 	}
 `;
 
@@ -30,12 +26,12 @@ class SearchPreviewModal extends React.Component {
 		const { app } = this.props;
 		return (
 			<React.Fragment>
-				<Button type="primary" onClick={this.toggleVisibilty} ghost>
+				<Button type="primary" size="large" onClick={this.toggleVisibilty} ghost>
 					Open Search Preview
 				</Button>
 				<Modal
 					footer={null}
-					width="100%"
+					width="95%"
 					className={modalStyles}
 					onCancel={this.toggleVisibilty}
 					destroyOnClose

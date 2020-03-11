@@ -31,7 +31,7 @@ import { ReviewAndSave } from '../../components/ReviewAndSave';
 import SearchPreviewModal from '../../components/SearchPreviewModal';
 import { SettingsFooter } from '../../components/SettingsFooter';
 import { container } from '../ResultsPage/styles';
-import { getReIndexedName } from '../../utils';
+import { getReIndexedName, getSubFields } from '../../utils';
 
 const { Option } = Select;
 
@@ -127,9 +127,9 @@ class SearchSettingsPage extends React.Component {
 							.split('.')
 							.join('.properties.')}`,
 						address: mapping.address,
+						fields: mapping.fields,
 					}))
 			: {};
-
 		return aggsMappings;
 	};
 
@@ -159,12 +159,12 @@ class SearchSettingsPage extends React.Component {
 		}
 	};
 
-	handleSearchWeight = (address, value) => {
+	handleSearchWeight = ({ address, value, settings }) => {
+		const fields = getSubFields({ fields: settings.fields, weight: value, address });
 		this.setState(prevState => ({
 			dataField: {
 				...prevState.dataField,
-				[address]: value,
-				[`${address}.search`]: value,
+				...fields,
 			},
 		}));
 	};
@@ -184,14 +184,23 @@ class SearchSettingsPage extends React.Component {
 			hasSearchOperators,
 		} = this.state;
 		const { updateSettingsAction, appName, settings } = this.props;
+		const nonZeroFields = Object.keys(dataField).reduce((agg, field) => {
+			if (dataField[field]) {
+				return {
+					...agg,
+					[field]: dataField[field],
+				};
+			}
+			return agg;
+		}, {});
 
 		updateSettingsAction(appName, {
 			...settings,
 			search: {
 				...settings.search,
 				fuzziness: hasTypoTolerance ? typoTolerance : 0,
-				dataField: Object.keys(dataField),
-				fieldWeights: Object.values(dataField),
+				dataField: Object.keys(nonZeroFields),
+				fieldWeights: Object.values(nonZeroFields),
 				searchOperators: hasSearchOperators,
 			},
 		})
@@ -264,7 +273,6 @@ class SearchSettingsPage extends React.Component {
 			hasTypoTolerance,
 			typoTolerance,
 			visible,
-			isDirty,
 		} = this.state;
 		const { isUpdating, settings, appName, resetState } = this.props;
 		const toleranceOptions = ['AUTO', 1, 2];
@@ -272,7 +280,6 @@ class SearchSettingsPage extends React.Component {
 			<React.Fragment>
 				<Banner {...bannerMessage} />
 				<div className={container}>
-					<SearchPreviewModal app={appName} />
 					<Card>
 						<Mappings
 							showSynonyms={false}
@@ -289,7 +296,7 @@ class SearchSettingsPage extends React.Component {
 							onChange={this.handleMappingChange}
 							column={{
 								title: 'Field Weight',
-								render: ({ address }) => {
+								render: ({ address, settings: mappingSettings }) => {
 									const parsedAddress = address
 										.split('.')
 										.reduce((agg, key, index) => {
@@ -304,7 +311,11 @@ class SearchSettingsPage extends React.Component {
 											style={{ minWidth: 150, marginLeft: 12 }}
 											value={dataField[parsedAddress]}
 											onChange={value =>
-												this.handleSearchWeight(parsedAddress, value)
+												this.handleSearchWeight({
+													address: parsedAddress,
+													value,
+													settings: mappingSettings,
+												})
 											}
 											placeholder="Enter field weight"
 										/>
@@ -401,6 +412,8 @@ class SearchSettingsPage extends React.Component {
 						loading={isUpdating}
 						resetState={resetState}
 						onReset={this.resetToDefault}
+						showSearchPreview
+						app={appName}
 						reviewAndSave={() => (
 							<ReviewAndSave
 								loading={isUpdating}

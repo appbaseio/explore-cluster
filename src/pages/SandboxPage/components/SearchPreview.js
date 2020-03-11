@@ -15,6 +15,7 @@ import { generateQuery } from '../utils';
 import { getAggsMappings } from '../../../batteries/utils/mappings';
 import { getRawMappingsByAppName } from '../../../batteries/modules/selectors';
 import { getURL } from '../../../constants/config';
+import { getSubFields } from '../../../utils';
 
 const container = css`
 	padding: 16px;
@@ -29,6 +30,7 @@ class SearchPreview extends React.Component {
 		settings: null,
 		searchableMappings: [],
 		hasMappingsLoaded: false,
+		isAnalyticsEnabled: false,
 	};
 
 	componentDidMount() {
@@ -51,10 +53,19 @@ class SearchPreview extends React.Component {
 	}
 
 	getSearchableMappings = mappings => {
-		const parsedMappings = getAggsMappings(mappings, true);
+		const aggsResponse = getAggsMappings(mappings, true);
+		const parsedMappings = Array.isArray(aggsResponse)
+			? aggsResponse
+			: Object.keys(aggsResponse);
 		const searchableMappings = parsedMappings
 			.filter(mapping => mapping.usecase === 'search' || mapping.usecase === 'searchaggs')
-			.map(item => item.address);
+			.reduce(
+				(agg, item) => ({
+					...agg,
+					...getSubFields({ address: item.address, weight: 1, fields: item.fields }),
+				}),
+				{},
+			);
 
 		return searchableMappings;
 	};
@@ -74,10 +85,8 @@ class SearchPreview extends React.Component {
 						...props.settings,
 						search: {
 							...props.settings.search,
-							dataField: state.searchableMappings.reduce((agg, field) => {
-								return [...agg, field, `${field}.search`];
-							}, []),
-							fieldWeights: new Array(state.searchableMappings.length * 2).fill(1),
+							dataField: Object.keys(state.searchableMappings),
+							fieldWeights: Object.values(state.searchableMappings),
 						},
 					}),
 				};
@@ -99,10 +108,8 @@ class SearchPreview extends React.Component {
 					...props.settings,
 					search: {
 						...props.settings.search,
-						dataField: state.searchableMappings.reduce((agg, field) => {
-							return [...agg, field, `${field}.search`];
-						}, []),
-						fieldWeights: new Array(state.searchableMappings.length * 2).fill(1),
+						dataField: Object.keys(state.searchableMappings),
+						fieldWeights: Object.values(state.searchableMappings),
 					},
 				}),
 			};
@@ -117,9 +124,15 @@ class SearchPreview extends React.Component {
 		});
 	};
 
+	toggleAnalytics = value => {
+		this.setState({
+			isAnalyticsEnabled: value,
+		});
+	};
+
 	render() {
 		const { settings, app, credentials, url } = this.props;
-		const { settings: stateSettings } = this.state;
+		const { settings: stateSettings, isAnalyticsEnabled } = this.state;
 
 		if (!settings) {
 			return null;
@@ -143,7 +156,12 @@ class SearchPreview extends React.Component {
 						<div>
 							<label htmlFor="analytics">
 								Record analytics
-								<Switch defaultChecked id="analytics" />
+								<Switch
+									checked={isAnalyticsEnabled}
+									style={{ marginLeft: 5 }}
+									onChange={this.toggleAnalytics}
+									id="analytics"
+								/>
 							</label>
 						</div>
 						{/* <Button size="large" type="primary">
@@ -152,7 +170,13 @@ class SearchPreview extends React.Component {
 						</Button> */}
 					</Row>
 				</Col>
-				<ReactiveBase app={app} enableAppbase credentials={credentials} url={url}>
+				<ReactiveBase
+					app={app}
+					enableAppbase
+					credentials={credentials}
+					url={url}
+					analytics={isAnalyticsEnabled}
+				>
 					<Col md={6}>
 						<Filter app={app} aggs={aggregations} />
 					</Col>

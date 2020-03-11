@@ -50,13 +50,14 @@ const ListItemWrapper = ({ item }) => {
 	);
 };
 
-const renderLoadMore = ({ size, loadMore, data }) => {
+const renderLoadMore = ({ size, loadMore, data, loading }) => {
 	if (data.length < size) {
 		return null;
 	}
 
 	return (
 		<Button onClick={loadMore} block type="primary" ghost>
+			{loading && <Icon type="loading" />}
 			Load More
 		</Button>
 	);
@@ -69,12 +70,11 @@ const ListView = ({ result }) => (
 		<Container hasPagination={result.pagination}>
 			<ReactiveList
 				{...result}
-				loader="Loading Results"
 				scrollTarget="result-container"
 				style={{ margin: '12px 0' }}
 				componentId={result.id}
 				render={({ data, loading, loadMore }) => {
-					if (loading) {
+					if (loading && (!data || !data.length)) {
 						return <Spin />;
 					}
 					return (
@@ -83,7 +83,7 @@ const ListView = ({ result }) => (
 								<ListItem key={item._id} item={item} />
 							))}
 							{result.pagination ||
-								renderLoadMore({ loadMore, data, size: result.size })}
+								renderLoadMore({ loading, loadMore, data, size: result.size })}
 						</React.Fragment>
 					);
 				}}

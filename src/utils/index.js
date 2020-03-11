@@ -477,3 +477,24 @@ export function getReIndexedName(appName) {
 	}
 	return newName;
 }
+
+export function getSubFields({ fields, weight, address }) {
+	if (fields) {
+		const subFields = Object.keys(fields).reduce((agg, field) => {
+			if (field === 'search' || field === 'autosuggest') {
+				return {
+					...agg,
+					[`${address}.${field}`]: weight ? 1 : 0,
+				};
+			}
+			return {
+				...agg,
+				[`${address}.${field}`]: weight,
+			};
+		}, {});
+
+		return { [address]: weight, ...subFields };
+	}
+
+	return { [address]: weight };
+}

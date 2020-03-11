@@ -74,15 +74,16 @@
     react-slick "^0.24.0"
     slick-carousel "^1.8.1"
 
-"@appbaseio/reactivecore@9.3.0-beta.2":
-  version "9.3.0-beta.2"
-  resolved "https://registry.yarnpkg.com/@appbaseio/reactivecore/-/reactivecore-9.3.0-beta.2.tgz#c645a83d2f386214241a7af4af1930c5acdd033c"
-  integrity sha512-9M7HvxCn+5jqqqBE6XFe7/FOjw1FlDmyFiPa9HUEJxATXpMbEQcrnEI4+aU3ymzAG+lmD+Z2uhmT8xVY6U7Qyw==
+"@appbaseio/reactivecore@9.3.0-beta.4":
+  version "9.3.0-beta.4"
+  resolved "https://registry.yarnpkg.com/@appbaseio/reactivecore/-/reactivecore-9.3.0-beta.4.tgz#94489761d260737ff2132130bca07b52adc40054"
+  integrity sha512-fVR2g68To/if1RKXbH1LBnTgFg6SfTGblrAs7eq9BGf5I1ZUNK/f+ZJwHOav3SY4TwPtmvKbYnLeLHI7HjINvg==
   dependencies:
     cross-fetch "^3.0.4"
     prop-types "^15.6.0"
     redux "^4.0.0"
     redux-thunk "^2.3.0"
+    xdate "^0.8.2"
 
 "@appbaseio/reactivecore@^8.2.9":
   version "8.2.17"
@@ -94,13 +95,13 @@
     redux "^4.0.0"
     redux-thunk "^2.3.0"
 
-"@appbaseio/reactivesearch@^3.5.0-beta.2":
-  version "3.5.0-beta.2"
-  resolved "https://registry.yarnpkg.com/@appbaseio/reactivesearch/-/reactivesearch-3.5.0-beta.2.tgz#79a93f8e3862a04a56e8f32781680921241f5067"
-  integrity sha512-h4LhM7GXMKuPOpivJ6gLGSg0CtWcFtnM0gUyajz+8kLERnukWZJVpn+SQHh5157NySoWorLO8+S1qWITRbXZUA==
+"@appbaseio/reactivesearch@3.5.0-beta.6":
+  version "3.5.0-beta.6"
+  resolved "https://registry.yarnpkg.com/@appbaseio/reactivesearch/-/reactivesearch-3.5.0-beta.6.tgz#84bd683591125252835369f6b38d2f7fcba8c680"
+  integrity sha512-rd6YjYTRFAg0Q02oT3WX5F6gfCldBJcVlDhei6ZAn077GqkwX1tcqFB6kVnLvgkYlCQVxlhBNt9gTQDb4zOyQw==
   dependencies:
-    "@appbaseio/reactivecore" "9.3.0-beta.2"
-    appbase-js "^4.0.2-beta.13"
+    "@appbaseio/reactivecore" "9.3.0-beta.4"
+    appbase-js "4.0.2"
     cross-env "^5.2.0"
     downshift "^1.31.2"
     emotion "^9.0.0"
@@ -1867,6 +1868,18 @@ anymatch@^2.0.0:
   dependencies:
     micromatch "^3.1.4"
     normalize-path "^2.1.1"
+
+appbase-js@4.0.2:
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/appbase-js/-/appbase-js-4.0.2.tgz#a2de2ff8ca0f6e3dc14df357533a7b5c452c3e6e"
+  integrity sha512-rLcdjPSHTP42y3NTIlBRyJAFjT3oT516J/loQ/eTojvVUcvSm+40GYD/bPpVgOmGWSXpWMnLxiw82yu5m+nl3Q==
+  dependencies:
+    cross-fetch "^2.2.2"
+    json-stable-stringify "^1.0.1"
+    querystring "^0.2.0"
+    stream "^0.0.2"
+    url-parser-lite "^0.1.0"
+    ws "^6.1.2"
 
 appbase-js@^4.0.2-beta.13:
   version "4.0.2-beta.13"

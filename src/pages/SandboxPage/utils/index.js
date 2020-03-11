@@ -1,16 +1,21 @@
 const generateQuery = ({ aggregations: filters, search, results }) => {
-	const filtersData = Object.keys(filters.dataField).map((filter, index) => {
-		const filterField = filters.dataField[filter] === 'term' ? `${filter}.keyword` : filter;
-		return {
-			id: `list-${index}`,
-			dataField: typeof filterField === 'string' ? [filterField] : filterField,
-			sortBy: filters.sortBy,
-			size: filters.size,
-		};
-	});
+	const filtersData =
+		filters && filters.dataField
+			? Object.keys(filters.dataField).map((filter, index) => {
+					const filterField =
+						filters.dataField[filter] === 'term' ? `${filter}.keyword` : filter;
+					return {
+						id: `list-${index}`,
+						dataField: typeof filterField === 'string' ? [filterField] : filterField,
+						sortBy: filters.sortBy,
+						size: filters.size,
+					};
+			  })
+			: [];
 
 	const filtersId = filtersData.map(filter => filter.id);
 	const resultDataField = results.dataField || '_score';
+	const searchDataField = search.dataField || [];
 	const query = [
 		{
 			...results,
@@ -18,12 +23,14 @@ const generateQuery = ({ aggregations: filters, search, results }) => {
 			react: {
 				and: ['search', ...filtersId],
 			},
+			size: results.size || 10,
 			dataField: Array.isArray(resultDataField) ? resultDataField : [resultDataField],
 		},
 		{
 			...search,
 			id: 'search',
-			dataField: Array.isArray(search.dataField) ? search.dataField : [search.dataField],
+			dataField: Array.isArray(searchDataField) ? searchDataField : [searchDataField],
+			fieldWeights: search.fieldWeights || [],
 		},
 		...filtersData,
 	];
