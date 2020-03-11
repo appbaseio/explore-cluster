@@ -1,10 +1,7 @@
 import { Col, Icon, Row, Table } from 'antd';
 import { get, keys } from 'lodash';
 import React from 'react';
-
-const settingsMap = {
-	size: { title: 'Page Size', description: 'No of results shown in a page.' },
-};
+import { settingsMap } from './helper';
 
 // eslint-disable-next-line import/prefer-default-export
 export function DiffTable({ object, parseDiff }) {
@@ -24,6 +21,7 @@ export function DiffTable({ object, parseDiff }) {
 							<div>{get(settingsMap, [text, 'description'], null)}</div>
 						</>
 					),
+					width: 500,
 				},
 				{
 					title: 'Value',
