@@ -236,6 +236,7 @@ class SearchSettingsPage extends React.Component {
 					this.initData(res.payload);
 				}
 			});
+		this.toggleVisible();
 	};
 
 	reIndex = async () => {

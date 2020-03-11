@@ -68,6 +68,7 @@ class ResultsPage extends React.Component {
 					this.setFormValues(res, getFieldDecorator, setFieldsValue);
 				}
 			});
+		this.toggleVisible();
 	};
 
 	setFormValues = (res, getFieldDecorator, setFieldsValue) => {

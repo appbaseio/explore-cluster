@@ -245,6 +245,7 @@ class AggsPage extends React.Component {
 					this.initData(res.payload);
 				}
 			});
+		this.toggleVisible();
 	};
 
 	render() {

@@ -196,6 +196,7 @@ class LanguageSettings extends React.Component {
 					this.setFormValues(res, setFieldsValue);
 				}
 			});
+		this.toggleVisible();
 	};
 
 	revertChanges = (settings, setFieldsValue) => {
