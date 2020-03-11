@@ -1,36 +1,7 @@
 import { Col, Icon, Row, Table } from 'antd';
 import { get, keys } from 'lodash';
 import React from 'react';
-
-const settingsMap = {
-	size: { title: 'Page Size', description: 'No. of results shown in a page.' },
-	fieldWeights: {
-		title: 'Field Weights',
-		description: 'Search weight for the database fields.',
-	},
-	dataField: {
-		title: 'DataField',
-		description: 'Database field(s) to be queried against.',
-	},
-	searchOperators: {
-		title: 'Search Operators',
-		description:
-			'Enable use of special characters in the search query to enable an advanced search behavior.',
-	},
-	includeNullValues: {
-		title: 'Include Null Values',
-		description:
-			'Enable to show sparse data or document or items not having the value in the specified field or mapping',
-	},
-	fuzziness: {
-		title: 'Typo Tolerance',
-		description: 'Sets a maximum edit distance on the search parameters.',
-	},
-	sortBy: {
-		title: 'Sort By',
-		description: 'Sort the results by either Count, Ascending or Descending order.',
-	}
-};
+import { settingsMap } from './helper';
 
 // eslint-disable-next-line import/prefer-default-export
 export function DiffTable({ object, parseDiff }) {
@@ -50,6 +21,7 @@ export function DiffTable({ object, parseDiff }) {
 							<div>{get(settingsMap, [text, 'description'], null)}</div>
 						</>
 					),
+					width: 500,
 				},
 				{
 					title: 'Value',
