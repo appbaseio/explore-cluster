@@ -46,7 +46,6 @@ class AppSwitcher extends React.Component {
 							boxShadow: 'none',
 							padding: 0,
 							minWidth: 115,
-							marginLeft: -5,
 						}}
 					>
 						<span>{currentApp || 'Loading...'}</span>

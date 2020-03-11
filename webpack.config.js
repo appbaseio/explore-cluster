@@ -1,4 +1,23 @@
+const SentryPlugin = require('@sentry/webpack-plugin');
+
+require('dotenv').config();
+
+const isProduction = process.env.NODE_ENV === 'production';
+
+const plugins = [];
+
 const path = require('path');
+
+if (isProduction && !!process.env.SENTRY_TOKEN) {
+	plugins.push(
+		new SentryPlugin({
+			include: './dist',
+			ignore: ['node_modules', 'webpack.config.js'],
+			configFile: './.sentryclirc',
+			debug: true,
+		}),
+	);
+}
 
 module.exports = {
 	entry: path.join(__dirname, 'src/index.js'),
@@ -8,6 +27,7 @@ module.exports = {
 		filename: 'build.js',
 		chunkFilename: '[name].[contenthash].build.js',
 	},
+	plugins,
 	module: {
 		rules: [
 			{

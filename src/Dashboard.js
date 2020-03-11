@@ -6,6 +6,8 @@ import PropTypes from 'prop-types';
 import { Button, Icon, Modal } from 'antd';
 import get from 'lodash/get';
 import URLSearchParams from '@ungap/url-search-params';
+import * as Sentry from '@sentry/browser';
+
 import { loadUser } from './actions';
 import Loader from './components/Loader';
 import Logo from './components/Logo';
@@ -13,6 +15,10 @@ import PrivateRoute from './pages/LoginPage/PrivateRoute';
 import Wrapper from './pages/Wrapper';
 import BillingPage from './pages/BillingPage';
 import InstallPage from './pages/InstallPage';
+
+Sentry.init({
+	dsn: 'https://8e07fb23ba8f46d8a730e65496bb7f00@sentry.io/58038',
+});
 
 // routes
 const LoginPage = Loadable({
@@ -94,15 +100,16 @@ class Dashboard extends Component {
 				{
 					isLoading: false,
 				},
-				() => Modal.error({
+				() =>
+					Modal.error({
 						title: error.message,
 						content: (
 							<p>
 								Are you using a valid Arc ID? If so, please subscribe to a paid plan
 								to continue using Arc. It takes up to 1 hour for the billing change
 								to get reflected. If you have subscribed and continue to see this
-								message, reach out to us at <a href="mailto:support@appbase.io">support@appbase.io</a>
-								.
+								message, reach out to us at{' '}
+								<a href="mailto:support@appbase.io">support@appbase.io</a>.
 							</p>
 						),
 						okText: 'Go to billing',
@@ -114,9 +121,15 @@ class Dashboard extends Component {
 		}
 	}
 
-	componentDidCatch() {
+	componentDidCatch(error, errorInfo) {
 		this.setState({
 			error: true,
+		});
+		Sentry.withScope(scope => {
+			Object.keys(errorInfo).forEach(key => {
+				scope.setExtra(key, errorInfo[key]);
+			});
+			Sentry.captureException(error);
 		});
 	}
 
