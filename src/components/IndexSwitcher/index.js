@@ -1,4 +1,4 @@
-import { Button, Dropdown, Icon, Menu, Popconfirm } from 'antd';
+import { Button, Dropdown, Icon, Menu, Popconfirm, Tooltip } from 'antd';
 import { Link } from 'react-router-dom';
 import React from 'react';
 import { css } from 'emotion';
@@ -8,6 +8,9 @@ import { LabelTag } from '../LabelTag';
 const popOverClass = css`
 	.ant-popover-buttons {
 		display: none;
+	}
+	.ant-popover-inner-content {
+		padding: 12px;
 	}
 `;
 
@@ -50,14 +53,16 @@ export function IndexSwitcher({ item, filteredApps = [] }) {
 			overlayClassName={popOverClass}
 			placement="right"
 			icon={
-				<Icon
-					style={{
-						fontSize: 17,
-						marginTop: 2,
-						color: '#1890ff',
-					}}
-					type="info-circle"
-				/>
+				<Tooltip title="Select an app to navigate to.">
+					<Icon
+						style={{
+							fontSize: 17,
+							marginTop: 2,
+							color: '#1890ff',
+						}}
+						type="info-circle"
+					/>
+				</Tooltip>
 			}
 			title={getTitle()}
 		>

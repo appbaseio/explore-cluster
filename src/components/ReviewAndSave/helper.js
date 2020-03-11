@@ -9,7 +9,7 @@ export const settingsMap = {
 	},
 	excludeFields: {
 		title: 'Exclude Fields',
-		description: 'Fields to exclude from the search results',
+		description: 'Fields to exclude from the search results.',
 	},
 	highlight: {
 		title: 'Highlight',
@@ -22,7 +22,7 @@ export const settingsMap = {
 	highlightOptions: {
 		title: 'Highlight Options',
 		description:
-			'Set custom options for your highlight results such as number_of_fragments, fragment_size, pre_tags and post_tags',
+			'Set custom options for your highlight results such as number_of_fragments, fragment_size, pre_tags and post_tags.',
 	},
 	language: {
 		title: 'Language',
@@ -31,7 +31,7 @@ export const settingsMap = {
 	},
 	applyStopwords: {
 		title: 'Apply Default Stopwords',
-		description: 'Sets whether to apply default stopwords for language or not',
+		description: 'Sets whether to apply default stopwords for language or not.',
 	},
 	customStopwords: {
 		title: 'Apply Custom Stopwords',

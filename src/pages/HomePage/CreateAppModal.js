@@ -33,7 +33,7 @@ class CreateAppModal extends Component {
 			appName: '',
 			hasJSON: false,
 			validationPopOver: false,
-			shards: 5,
+			shards: 1,
 			replicas: 0,
 			language: 'universal',
 		};
@@ -275,7 +275,4 @@ const mapDispatchToProps = dispatch => ({
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(CreateAppModal);
+export default connect(mapStateToProps, mapDispatchToProps)(CreateAppModal);

@@ -16,6 +16,7 @@ import {
 	Switch,
 	notification,
 	message,
+	Tooltip,
 } from 'antd';
 
 import {
@@ -36,6 +37,7 @@ import { ReviewAndSave } from '../../components/ReviewAndSave';
 import { container } from '../ResultsPage/styles';
 import SearchPreviewModal from '../../components/SearchPreviewModal';
 import { getReIndexedName } from '../../utils';
+import { settingsMap } from '../../components/ReviewAndSave/helper';
 
 const { Option } = Select;
 
@@ -363,7 +365,10 @@ class AggsPage extends React.Component {
 					</Card>
 					<Card className={cardStyle}>
 						<label>
-							Default Size For Aggregations <Icon type="info-circle" />
+							Default Size For Aggregations{' '}
+							<Tooltip title="Set size for aggregations.">
+								<Icon type="info-circle" />
+							</Tooltip>
 						</label>
 						<InputNumber
 							onChange={value => this.handleChange('count', value)}
@@ -373,7 +378,10 @@ class AggsPage extends React.Component {
 							className="input"
 						/>
 						<label>
-							Default Sort <Icon type="info-circle" />
+							Default Sort{' '}
+							<Tooltip title={settingsMap.sortBy.description}>
+								<Icon type="info-circle" />
+							</Tooltip>
 						</label>
 						<Select
 							placeholder="Select default Sort"
@@ -393,7 +401,10 @@ class AggsPage extends React.Component {
 							))}
 						</Select>
 						<label>
-							Include Null Values <Icon type="info-circle" />
+							Include Null Values{' '}
+							<Tooltip title={settingsMap.includeNullValues.description}>
+								<Icon type="info-circle" />
+							</Tooltip>
 						</label>
 						<Switch
 							checked={includeNullValue}
