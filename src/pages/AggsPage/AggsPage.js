@@ -262,6 +262,7 @@ class AggsPage extends React.Component {
 			{ name: 'Ascending', value: 'asc' },
 			{ name: 'Descending', value: 'desc' },
 		];
+		const { size: savedSize, ...restSavedAggs } = get(settings, 'aggregations', {});
 		return (
 			<React.Fragment>
 				<Banner {...bannerMessage} />
@@ -365,7 +366,7 @@ class AggsPage extends React.Component {
 					<Card className={cardStyle}>
 						<label>
 							Default Size For Aggregations{' '}
-							<Tooltip title="Set size for aggregations.">
+							<Tooltip title={settingsMap.agg_size.description}>
 								<Icon type="info-circle" />
 							</Tooltip>
 						</label>
@@ -419,9 +420,12 @@ class AggsPage extends React.Component {
 						reviewAndSave={() => (
 							<ReviewAndSave
 								loading={isUpdating}
-								oldValues={get(settings, 'aggregations')}
+								oldValues={{
+									...restSavedAggs,
+									agg_size: savedSize,
+								}}
 								newValues={{
-									size: count,
+									agg_size: count,
 									sortBy: sort,
 									includeNullValues: includeNullValue,
 									dataField,

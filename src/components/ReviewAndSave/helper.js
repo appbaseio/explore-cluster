@@ -71,4 +71,8 @@ export const settingsMap = {
 		title: 'Sort By',
 		description: 'Sort the results by either Count, Ascending or Descending order.',
 	},
+	agg_size: {
+		title: 'Size',
+		description: 'No. of items to show.',
+	},
 };
