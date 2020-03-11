@@ -35,7 +35,6 @@ import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { SettingsFooter } from '../../components/SettingsFooter';
 import { ReviewAndSave } from '../../components/ReviewAndSave';
 import { container } from '../ResultsPage/styles';
-import SearchPreviewModal from '../../components/SearchPreviewModal';
 import { getReIndexedName } from '../../utils';
 import { settingsMap } from '../../components/ReviewAndSave/helper';
 
@@ -267,7 +266,6 @@ class AggsPage extends React.Component {
 			<React.Fragment>
 				<Banner {...bannerMessage} />
 				<div className={container}>
-					<SearchPreviewModal app={appName} />
 					<Card>
 						<Mappings
 							showSynonyms={false}
@@ -416,6 +414,8 @@ class AggsPage extends React.Component {
 						loading={isUpdating}
 						resetState={resetState}
 						onReset={this.resetToDefault}
+						showSearchPreview
+						app={appName}
 						reviewAndSave={() => (
 							<ReviewAndSave
 								loading={isUpdating}
