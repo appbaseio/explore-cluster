@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout, Menu, Icon, Tooltip, Button, Row } from 'antd';
+import { Layout, Menu, Icon, Tooltip, Button, Row, Breadcrumb } from 'antd';
 import { Link } from 'react-router-dom';
 import { string, object, bool, number } from 'prop-types';
 import { css } from 'react-emotion';
@@ -44,6 +44,8 @@ const AppHeader = ({
 	history,
 	match,
 	showApp,
+	collapsed,
+	onToggle,
 }) => (
 	<Header
 		className={headerStyles}
@@ -53,23 +55,48 @@ const AppHeader = ({
 			left: big ? '80px' : '260px',
 		}}
 	>
-		{minimal ? null : (
+		{minimal ? (
+			<Icon
+				style={{ position: 'absolute', left: 20 }}
+				className="trigger"
+				type={collapsed ? 'menu-unfold' : 'menu-fold'}
+				onClick={onToggle}
+			/>
+		) : (
 			<Menu mode="horizontal">
 				<Menu.Item key="back" className={noBorder} style={{ padding: 0 }}>
-					<Link to="/">
-						<Icon type="arrow-left" />
-					</Link>
+					<Icon
+						className="trigger"
+						type={collapsed ? 'menu-unfold' : 'menu-fold'}
+						onClick={onToggle}
+					/>
+				</Menu.Item>
+				<Menu.Item className={noBorder} style={{ marginBottom: 12 }} key="breadcrumb">
+					<Breadcrumb>
+						<Breadcrumb.Item>
+							<Link to="/">Cluster Overview</Link>
+						</Breadcrumb.Item>
+						{showApp && (
+							<Breadcrumb.Item>
+								<AppSwitcher
+									currentApp={currentApp || 'Loading...'}
+									history={history}
+									match={match}
+								/>
+							</Breadcrumb.Item>
+						)}
+					</Breadcrumb>
 				</Menu.Item>
 
-				{showApp && (
-					<Menu.Item key="1" className={noBorder}>
-						<AppSwitcher
-							currentApp={currentApp || 'Loading...'}
-							history={history}
-							match={match}
-						/>
-					</Menu.Item>
-				)}
+				{/*{showApp && (*/}
+				{/*	<Menu.Item key="1" className={noBorder}>*/}
+				{/*		<AppSwitcher*/}
+				{/*			currentApp={currentApp || 'Loading...'}*/}
+				{/*			history={history}*/}
+				{/*			match={match}*/}
+				{/*		/>*/}
+				{/*	</Menu.Item>*/}
+				{/*)}*/}
 			</Menu>
 		)}
 

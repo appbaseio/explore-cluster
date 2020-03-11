@@ -204,8 +204,8 @@ class DashboardWrapper extends Component {
 		}
 	}
 
-	onCollapse = collapsed => {
-		this.setState({ collapsed });
+	onCollapse = () => {
+		this.setState(prevState => ({ collapsed: !prevState.collapsed }));
 	};
 
 	render() {
@@ -301,7 +301,15 @@ class DashboardWrapper extends Component {
 						overflowY: 'scroll',
 					}}
 				>
-					{showHeader && <AppHeader big={collapsed} minimal showApp={false} />}
+					{showHeader && (
+						<AppHeader
+							collapsed={collapsed}
+							onToggle={this.onCollapse}
+							big={collapsed}
+							minimal
+							showApp={false}
+						/>
+					)}
 
 					<Switch>
 						<Route exact path="/" component={HomePage} />

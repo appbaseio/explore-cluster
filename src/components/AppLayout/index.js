@@ -129,8 +129,7 @@ const SearchSettingsPage = Loadable({
 
 class AppLayout extends React.PureComponent {
 	render() {
-		const { collapsed, showHeader, match, history } = this.props;
-		const { appName } = this.props.match.params; // eslint-disable-line
+		const { collapsed, showHeader, match, history, onToggle } = this.props;
 		return (
 			<Layout
 				style={{
@@ -140,25 +139,15 @@ class AppLayout extends React.PureComponent {
 					position: 'relative',
 				}}
 			>
-				{showHeader && <AppHeader big={collapsed} match={match} history={history} />}
-				<Layout.Header
-					css={{
-						background: '#fff',
-						position: 'sticky',
-						top: 0,
-						height: 40,
-						alignItems: 'center',
-						display: 'flex',
-						boxShadow: '0 2px 8px #f0f1f2',
-					}}
-				>
-					<Breadcrumb>
-						<Breadcrumb.Item>
-							<Link to="/">Cluster Overview</Link>
-						</Breadcrumb.Item>
-						<Breadcrumb.Item>{appName}</Breadcrumb.Item>
-					</Breadcrumb>
-				</Layout.Header>
+				{showHeader && (
+					<AppHeader
+						big={collapsed}
+						match={match}
+						history={history}
+						collapsed={collapsed}
+						onToggle={onToggle}
+					/>
+				)}
 				<ErrorPage {...this.props}>
 					<Switch>
 						<Route

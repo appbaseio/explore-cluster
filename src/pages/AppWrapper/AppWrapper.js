@@ -171,8 +171,8 @@ class AppWrapper extends Component {
 		}
 	}
 
-	onCollapse = collapsed => {
-		this.setState({ collapsed });
+	onCollapse = () => {
+		this.setState(prevState => ({ collapsed: !prevState.collapsed }));
 	};
 
 	render() {
@@ -275,7 +275,12 @@ class AppWrapper extends Component {
 						})}
 					</Menu>
 				</Sider>
-				<AppLayout showHeader={showHeader} collapsed={collapsed} {...this.props} />
+				<AppLayout
+					showHeader={showHeader}
+					collapsed={collapsed}
+					{...this.props}
+					onToggle={this.onCollapse}
+				/>
 			</Layout>
 		);
 	}
