@@ -9,6 +9,24 @@ const Search = props => {
 		<Card>
 			<Row type="flex" gutter={8} align="middle" justify="space-between">
 				<Col xs={20}>
+					{search.dataField && search.dataField.length ? null : (
+						<div
+							style={{
+								position: 'absolute',
+								top: 0,
+								left: 0,
+								width: '100%',
+								height: '100%',
+								background: 'rgba(255,255,255,0.6)',
+								zIndex: 2,
+								display: 'flex',
+								justifyContent: 'center',
+								alignItems: 'center',
+							}}
+						>
+							Set searchable fields to enable search.
+						</div>
+					)}
 					<DataSearch {...search} autosuggest componentId={search.id} />
 				</Col>
 				<Col xs={4}>

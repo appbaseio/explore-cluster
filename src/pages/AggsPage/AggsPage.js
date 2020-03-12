@@ -35,7 +35,6 @@ import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { SettingsFooter } from '../../components/SettingsFooter';
 import { ReviewAndSave } from '../../components/ReviewAndSave';
 import { container } from '../ResultsPage/styles';
-import SearchPreviewModal from '../../components/SearchPreviewModal';
 import { getReIndexedName } from '../../utils';
 import { settingsMap } from '../../components/ReviewAndSave/helper';
 
@@ -263,11 +262,11 @@ class AggsPage extends React.Component {
 			{ name: 'Ascending', value: 'asc' },
 			{ name: 'Descending', value: 'desc' },
 		];
+		const { size: savedSize, ...restSavedAggs } = get(settings, 'aggregations', {});
 		return (
 			<React.Fragment>
 				<Banner {...bannerMessage} />
 				<div className={container}>
-					<SearchPreviewModal app={appName} />
 					<Card>
 						<Mappings
 							showSynonyms={false}
@@ -367,7 +366,7 @@ class AggsPage extends React.Component {
 					<Card className={cardStyle}>
 						<label>
 							Default Size For Aggregations{' '}
-							<Tooltip title="Set size for aggregations.">
+							<Tooltip title={settingsMap.agg_size.description}>
 								<Icon type="info-circle" />
 							</Tooltip>
 						</label>
@@ -416,12 +415,17 @@ class AggsPage extends React.Component {
 						loading={isUpdating}
 						resetState={resetState}
 						onReset={this.resetToDefault}
+						showSearchPreview
+						app={appName}
 						reviewAndSave={() => (
 							<ReviewAndSave
 								loading={isUpdating}
-								oldValues={get(settings, 'aggregations')}
+								oldValues={{
+									...restSavedAggs,
+									agg_size: savedSize,
+								}}
 								newValues={{
-									size: count,
+									agg_size: count,
 									sortBy: sort,
 									includeNullValues: includeNullValue,
 									dataField,
