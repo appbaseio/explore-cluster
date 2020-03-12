@@ -127,6 +127,11 @@ const SearchSettingsPage = Loadable({
 	loading: Loader,
 });
 
+const IndexSettingsPage = Loadable({
+	loader: () => import('../../pages/IndexSettings'),
+	loading: Loader,
+});
+
 class AppLayout extends React.PureComponent {
 	render() {
 		const { collapsed, showHeader, match, history, onToggle } = this.props;
@@ -346,6 +351,18 @@ class AppLayout extends React.PureComponent {
 								<AppPageContainer
 									{...props}
 									component={ResultsPage}
+									shouldFetchAppInfo={false}
+									shouldFetchAppPlan={false}
+								/>
+							)}
+						/>
+						<Route
+							exact
+							path="/app/:appName/index-settings"
+							render={props => (
+								<AppPageContainer
+									{...props}
+									component={IndexSettingsPage}
 									shouldFetchAppInfo={false}
 									shouldFetchAppPlan={false}
 								/>
