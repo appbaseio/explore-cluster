@@ -16,6 +16,7 @@ import { ReviewAndSave } from '../../components/ReviewAndSave';
 import { SettingTooltip } from '../../components/SettingTooltip';
 import { settingsMap } from '../../components/ReviewAndSave/helper';
 import { getTraversedMappingsByAppName } from '../../batteries/modules/selectors';
+import { isEqual } from '../../batteries/utils';
 
 const bannerMessage = {
 	title: 'Results Settings',
@@ -50,12 +51,14 @@ class ResultsPage extends React.Component {
 			appName,
 			getSettingsAction,
 			form: { getFieldDecorator, setFieldsValue },
+			getDefaultSettingsAction,
 		} = this.props;
 		getSettingsAction(appName).then(res => {
 			if (res && res.payload) {
 				this.setFormValues(res, getFieldDecorator, setFieldsValue);
 			}
 		});
+		getDefaultSettingsAction();
 		this.getMappings();
 	}
 
@@ -74,7 +77,7 @@ class ResultsPage extends React.Component {
 					this.setFormValues(res, getFieldDecorator, setFieldsValue);
 				}
 			});
-		this.toggleVisible();
+		this.toggleVisible(true);
 	};
 
 	setFormValues = (res, getFieldDecorator, setFieldsValue) => {
@@ -295,8 +298,8 @@ class ResultsPage extends React.Component {
 		</>
 	);
 
-	toggleVisible = () => {
-		this.setState(prevState => ({ visible: !prevState.visible }));
+	toggleVisible = (isReset = false) => {
+		this.setState(prevState => ({ visible: !prevState.visible, isReset }));
 	};
 
 	revertChanges = (settings, getFieldDecorator, setFieldsValue) => {
@@ -316,8 +319,9 @@ class ResultsPage extends React.Component {
 			isUpdating,
 			resetState,
 			settings,
+			defaultSettings,
 		} = this.props;
-		const { includeFields, excludeFields, visible } = this.state;
+		const { includeFields, excludeFields, visible, isReset } = this.state;
 
 		return (
 			<>
@@ -363,13 +367,17 @@ class ResultsPage extends React.Component {
 					<SettingsFooter
 						loading={isUpdating}
 						resetState={resetState}
+						showReset={
+							!isEqual(get(settings, 'results'), get(defaultSettings, 'results'))
+						}
 						onReset={this.resetResultSettings}
 						reviewAndSave={() => (
 							<ReviewAndSave
 								loading={isUpdating}
+								isReset={isReset}
 								oldValues={get(settings, 'results')}
 								newValues={this.getResultsPayload(getFieldsValue())}
-								onClick={this.toggleVisible}
+								onClick={() => this.toggleVisible(false)}
 								visible={visible}
 								onRevert={() => {
 									this.revertChanges(settings, getFieldDecorator, setFieldsValue);

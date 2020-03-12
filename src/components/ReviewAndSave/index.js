@@ -30,9 +30,18 @@ export class ReviewAndSave extends React.Component {
 			onClick,
 			oldValues,
 			loading,
+			isReset,
 		} = this.props;
 		const difference = this.difference(oldValues, newValues);
 		const isDifferent = keys(difference).length > 0;
+		const footer = [
+			<Button key="back" onClick={onRevert}>
+				Revert Changes
+			</Button>,
+			<Button key="submit" type="primary" onClick={onSave}>
+				{isReset ? 'Reset To Default' : 'Review and Save'}
+			</Button>,
+		];
 		return (
 			<>
 				{isDifferent && (
@@ -48,18 +57,11 @@ export class ReviewAndSave extends React.Component {
 					</Button>
 				)}
 				<Modal
-					title="Review Settings Before Saving"
+					title={isReset ? 'Reset Settings' : 'Review Settings Before Saving'}
 					visible={isDifferent ? visible : false}
 					onCancel={onClick}
 					width={1000}
-					footer={[
-						<Button key="back" onClick={onRevert}>
-							Revert Changes
-						</Button>,
-						<Button key="submit" type="primary" onClick={onSave}>
-							Review and Save
-						</Button>,
-					]}
+					footer={isReset ? footer[1] : footer}
 				>
 					<DiffTable
 						object={difference}

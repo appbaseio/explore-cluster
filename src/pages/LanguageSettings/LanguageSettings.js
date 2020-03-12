@@ -27,6 +27,7 @@ import {
 } from '../../batteries/utils/mappings';
 import { getReIndexedName } from '../../utils';
 import { buildLanguageAnalysis, getLanguageFallback } from '../../utils/language';
+import { isEqual } from '../../batteries/utils';
 
 const bannerMessage = {
 	title: 'Language Settings',
@@ -52,7 +53,7 @@ class LanguageSettings extends React.Component {
 				this.setFormValues(res, setFieldsValue);
 			}
 		});
-		getDefaultSettingsAction(appName);
+		getDefaultSettingsAction();
 	}
 
 	setFormValues = (res, setFieldsValue) => {
@@ -66,8 +67,8 @@ class LanguageSettings extends React.Component {
 		setFieldsValue(formValues);
 	};
 
-	toggleVisible = () => {
-		this.setState(prevState => ({ visible: !prevState.visible }));
+	toggleVisible = (isReset = false) => {
+		this.setState(prevState => ({ visible: !prevState.visible, isReset }));
 	};
 
 	getAnalyzerMappings = (res, getFieldValue) => {
@@ -205,7 +206,7 @@ class LanguageSettings extends React.Component {
 					this.setFormValues(res, setFieldsValue);
 				}
 			});
-		this.toggleVisible();
+		this.toggleVisible(true);
 	};
 
 	revertChanges = (settings, setFieldsValue) => {
@@ -224,8 +225,9 @@ class LanguageSettings extends React.Component {
 			isUpdating,
 			resetState,
 			settings,
+			defaultSettings,
 		} = this.props;
-		const { visible, loading } = this.state;
+		const { visible, loading, isReset } = this.state;
 
 		return (
 			<>
@@ -299,12 +301,16 @@ class LanguageSettings extends React.Component {
 						resetState={resetState}
 						onReset={this.resetLanguageSettings}
 						saveText="Apply Settings And Re-index"
+						showReset={
+							!isEqual(get(settings, 'language'), get(defaultSettings, 'language'))
+						}
 						reviewAndSave={() => (
 							<ReviewAndSave
 								loading={isUpdating || loading}
+								isReset={isReset}
 								oldValues={get(settings, 'language')}
 								newValues={this.getLanguagePayload(getFieldsValue())}
-								onClick={this.toggleVisible}
+								onClick={() => this.toggleVisible(false)}
 								visible={visible}
 								onRevert={() => {
 									this.revertChanges(settings, setFieldsValue);
