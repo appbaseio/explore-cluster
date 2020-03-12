@@ -27,7 +27,7 @@ class SearchPreviewModal extends React.Component {
 		return (
 			<React.Fragment>
 				<Button type="primary" size="large" onClick={this.toggleVisibilty} ghost>
-					Open Search Preview
+					Test Search Settings
 				</Button>
 				<Modal
 					footer={null}

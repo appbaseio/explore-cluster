@@ -26,7 +26,7 @@ class QueryView extends React.Component {
 
 		this.state = {
 			query: JSON.stringify(query, null, 4),
-			isValid: isValidJSON(query),
+			isValid: isValidJSON(JSON.stringify(query)),
 			isExecuting: false,
 			response: null,
 		};
@@ -56,6 +56,10 @@ class QueryView extends React.Component {
 				query: value,
 				isValid,
 				response: null,
+			});
+		} else {
+			this.setState({
+				isValid,
 			});
 		}
 	};

@@ -9,7 +9,13 @@ const Filter = props => {
 		<React.Fragment>
 			{aggs.map(agg => (
 				<Card key={agg.dataField}>
-					<MultiList {...agg} componentId={agg.id} loader="Loading Items" />
+					<MultiList
+						{...agg}
+						title={agg.id}
+						renderNoResults={() => 'No Data Found'}
+						componentId={agg.id}
+						loader="Loading Items"
+					/>
 				</Card>
 			))}
 

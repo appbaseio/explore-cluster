@@ -17,6 +17,7 @@ import {
 	notification,
 	message,
 	Tooltip,
+	Skeleton,
 } from 'antd';
 
 import {
@@ -80,11 +81,33 @@ class AggsPage extends React.Component {
 	mappingsRef = React.createRef(null);
 
 	async componentDidMount() {
-		const { appName, credentials, fetchMappings, getSettingsAction } = this.props;
+		const {
+			appName,
+			credentials,
+			fetchMappings,
+			getSettingsAction,
+			isFetchingMapping,
+			mappings,
+			settings,
+		} = this.props;
 		const url = getURL();
 
-		getSettingsAction(appName);
-		fetchMappings(appName, credentials, url);
+		if (settings) {
+			this.initData(settings);
+		} else {
+			getSettingsAction(appName);
+		}
+
+		if (!mappings && !isFetchingMapping) {
+			fetchMappings(appName, credentials, url);
+		} else if (mappings) {
+			const searchableMappings = this.getSearchableMappings(mappings);
+
+			// eslint-disable-next-line
+			this.setState({
+				searchableMappings,
+			});
+		}
 	}
 
 	componentDidUpdate(prevProps) {
@@ -159,7 +182,19 @@ class AggsPage extends React.Component {
 		}
 	};
 
-	handleAggType = (address, value) => {
+	hasKeyword = settings => {
+		if (settings && settings.type === 'keyword') {
+			return true;
+		}
+		if (get(settings, 'fields.keyword.type', '') === 'keyword') {
+			return true;
+		}
+
+		return false;
+	};
+
+	handleAggType = ({ address, value }) => {
+		console.log(address);
 		this.setState(prevState => ({
 			dataField: { ...prevState.dataField, [address]: value },
 		}));
@@ -256,17 +291,23 @@ class AggsPage extends React.Component {
 			includeNullValue,
 			visible,
 		} = this.state;
-		const { isUpdating, settings, resetState, appName } = this.props;
+		const { isUpdating, settings, resetState, appName, isLoading } = this.props;
 		const sortOptions = [
 			{ name: 'Count', value: 'count' },
 			{ name: 'Ascending', value: 'asc' },
 			{ name: 'Descending', value: 'desc' },
 		];
 		const { size: savedSize, ...restSavedAggs } = get(settings, 'aggregations', {});
+		console.log(this.mappingsRef)
 		return (
 			<React.Fragment>
 				<Banner {...bannerMessage} />
 				<div className={container}>
+					{isLoading ? (
+						<Card>
+							<Skeleton />
+						</Card>
+					) : null}
 					<Card>
 						<Mappings
 							showSynonyms={false}
@@ -282,12 +323,8 @@ class AggsPage extends React.Component {
 							onChange={this.handleMappingChange}
 							column={{
 								title: 'Aggregation Type',
-								render: ({ fields, field, address }) => {
-									const hasKeyword = !!get(
-										fields,
-										`${field}.fields.keyword`,
-										false,
-									);
+								render: ({ address, settings: mappingSettings }) => {
+									const hasKeyword = this.hasKeyword(mappingSettings);
 									let options = ['term', 'range'];
 									if (hasKeyword) {
 										options = ['term'];
@@ -301,9 +338,17 @@ class AggsPage extends React.Component {
 											}
 											return agg;
 										}, '');
+									const aggKey = hasKeyword
+										? `${parsedAddress}.keyword`
+										: parsedAddress;
 									const menu = (
 										<Menu
-											onClick={e => this.handleAggType(parsedAddress, e.key)}
+											onClick={e =>
+												this.handleAggType({
+													address: aggKey,
+													value: e.key,
+												})
+											}
 										>
 											{options.map(option => (
 												<Menu.Item key={option}>{option}</Menu.Item>
@@ -313,7 +358,7 @@ class AggsPage extends React.Component {
 									return (
 										<Dropdown overlay={menu}>
 											<Button className={dropdown}>
-												{dataField[parsedAddress] || 'Select Type'}
+												{dataField[aggKey] || 'Select Type'}
 												<Icon type="down" />
 											</Button>
 										</Dropdown>

@@ -2,8 +2,7 @@ const generateQuery = ({ aggregations: filters, search, results }) => {
 	const filtersData =
 		filters && filters.dataField
 			? Object.keys(filters.dataField).map((filter, index) => {
-					const filterField =
-						filters.dataField[filter] === 'term' ? `${filter}.keyword` : filter;
+					const filterField = filter;
 					return {
 						id: `list-${index}`,
 						dataField: typeof filterField === 'string' ? [filterField] : filterField,

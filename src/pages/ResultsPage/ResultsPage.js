@@ -275,6 +275,7 @@ class ResultsPage extends React.Component {
 			isUpdating,
 			resetState,
 			settings,
+			appName,
 		} = this.props;
 		const { includeFields, excludeFields, visible } = this.state;
 
@@ -324,6 +325,8 @@ class ResultsPage extends React.Component {
 					<SettingsFooter
 						loading={isUpdating}
 						resetState={resetState}
+						showSearchPreview
+						app={appName}
 						onReset={this.resetResultSettings}
 						reviewAndSave={() => (
 							<ReviewAndSave

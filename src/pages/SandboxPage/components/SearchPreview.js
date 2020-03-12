@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Row, Col, Switch, Affix } from 'antd';
+import { Row, Col, Switch, Tooltip } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
@@ -154,15 +154,17 @@ class SearchPreview extends React.Component {
 				<Col xs={24}>
 					<Row className="my-16" type="flex" align="middle" justify="space-between">
 						<div>
-							<label htmlFor="analytics">
-								Record analytics
-								<Switch
-									checked={isAnalyticsEnabled}
-									style={{ marginLeft: 5 }}
-									onChange={this.toggleAnalytics}
-									id="analytics"
-								/>
-							</label>
+							<Tooltip title="Switch for whether to record analytics based on the search and click requests made from the Search Preview view.">
+								<label htmlFor="analytics">
+									Record analytics
+									<Switch
+										checked={isAnalyticsEnabled}
+										style={{ marginLeft: 5 }}
+										onChange={this.toggleAnalytics}
+										id="analytics"
+									/>
+								</label>
+							</Tooltip>
 						</div>
 						{/* <Button size="large" type="primary">
 							<Icon type="code-sandbox" />
@@ -181,9 +183,7 @@ class SearchPreview extends React.Component {
 						<Filter app={app} aggs={aggregations} />
 					</Col>
 					<Col md={18}>
-						<Affix offsetTop={60}>
-							<Search app={app} search={search} />
-						</Affix>
+						<Search app={app} search={search} />
 						<Result
 							result={result}
 							query={stateSettings}

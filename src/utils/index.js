@@ -38,6 +38,23 @@ export async function getUser(username, password, url) {
 		};
 	}
 
+	// Dont use await over here as we dont need these immediately.
+	fetch(`${api}`, {
+		method: 'GET',
+		headers: {
+			Authorization: `Basic ${authToken}`,
+		},
+	})
+		.then(es => es.json())
+		.then(esResponse => {
+			const version = get(esResponse, 'version.number');
+			sessionStorage.setItem('version', version);
+		})
+		.catch(e => {
+			console.error('Error while fetching the ElasticSearch details');
+			console.error(e);
+		});
+
 	return {
 		username,
 		password,

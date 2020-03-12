@@ -220,6 +220,7 @@ class LanguageSettings extends React.Component {
 			isUpdating,
 			resetState,
 			settings,
+			appName,
 		} = this.props;
 		const { visible, loading } = this.state;
 
@@ -295,6 +296,8 @@ class LanguageSettings extends React.Component {
 					<SettingsFooter
 						loading={isUpdating || loading}
 						resetState={resetState}
+						showSearchPreview
+						app={appName}
 						onReset={this.resetLanguageSettings}
 						saveText="Apply Settings And Re-index"
 						reviewAndSave={() => (

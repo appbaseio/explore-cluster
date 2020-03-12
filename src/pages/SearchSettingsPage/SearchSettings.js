@@ -14,6 +14,7 @@ import {
 	notification,
 	message,
 	Tooltip,
+	Skeleton,
 } from 'antd';
 
 import {
@@ -67,11 +68,32 @@ class SearchSettingsPage extends React.Component {
 	mappingsRef = React.createRef(null);
 
 	componentDidMount() {
-		const { appName, credentials, fetchMappings, getSettingsAction } = this.props;
+		const {
+			appName,
+			credentials,
+			fetchMappings,
+			getSettingsAction,
+			mappings,
+			isFetchingMapping,
+			settings,
+		} = this.props;
 		const url = getURL();
-		getSettingsAction(appName);
 
-		fetchMappings(appName, credentials, url);
+		if (settings) {
+			this.initData(settings);
+		} else {
+			getSettingsAction(appName);
+		}
+		if (!mappings && !isFetchingMapping) {
+			fetchMappings(appName, credentials, url);
+		} else if (mappings) {
+			const aggsMappings = this.getAggsMappings(mappings);
+
+			// eslint-disable-next-line
+			this.setState({
+				aggsMappings,
+			});
+		}
 	}
 
 	componentDidUpdate(prevProps) {
@@ -276,12 +298,18 @@ class SearchSettingsPage extends React.Component {
 			typoTolerance,
 			visible,
 		} = this.state;
-		const { isUpdating, settings, appName, resetState } = this.props;
+		const { isUpdating, settings, appName, resetState, isLoading } = this.props;
 		const toleranceOptions = ['AUTO', 1, 2];
+
 		return (
 			<React.Fragment>
 				<Banner {...bannerMessage} />
 				<div className={container}>
+					{isLoading ? (
+						<Card>
+							<Skeleton />
+						</Card>
+					) : null}
 					<Card>
 						<Mappings
 							showSynonyms={false}

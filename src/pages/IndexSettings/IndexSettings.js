@@ -4,7 +4,7 @@ import { get } from 'lodash';
 import { Card, notification } from 'antd';
 
 import { getAppMappings, setCurrentApp } from '../../batteries/modules/actions';
-import { getURL } from '../../constants/config';
+import { getURL, getVersion } from '../../constants/config';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { container } from '../ResultsPage/styles';
@@ -32,7 +32,7 @@ class IndexSettings extends React.Component {
 		shards: null,
 		replicas: null,
 		visible: false,
-		isUpdating: false,
+		isReindexing: false,
 		isFetching: false,
 		shardsModal: false,
 		replicasModal: false,
@@ -42,11 +42,12 @@ class IndexSettings extends React.Component {
 	allocated_replicas = null;
 
 	async componentDidMount() {
-		const { appName, credentials, fetchMappings } = this.props;
+		const { appName, credentials, fetchMappings, mappings } = this.props;
 		const url = getURL();
 		this.initializeSettings();
-
-		fetchMappings(appName, credentials, url);
+		if (!mappings) {
+			fetchMappings(appName, credentials, url);
+		}
 	}
 
 	componentDidUpdate(prevProps) {
@@ -66,7 +67,7 @@ class IndexSettings extends React.Component {
 	initializeSettings = async () => {
 		const { credentials, appName } = this.props;
 
-		const esVersion = await getESVersion(appName, credentials);
+		const esVersion = getVersion() || (await getESVersion(appName, credentials));
 		const nodes = await getNodes(appName, credentials);
 
 		this.setState({
@@ -94,7 +95,7 @@ class IndexSettings extends React.Component {
 		this.handleModal('replicasModal');
 
 		this.setState({
-			isUpdating: true,
+			isReindexing: true,
 		});
 		this.reIndex();
 	};
@@ -103,7 +104,7 @@ class IndexSettings extends React.Component {
 		this.handleModal('shardsModal');
 
 		this.setState({
-			isUpdating: true,
+			isReindexing: true,
 		});
 		this.reIndex();
 	};
@@ -121,7 +122,7 @@ class IndexSettings extends React.Component {
 		reIndex(mappings, appName, [], type, esVersion, credentials, appSettings)
 			.then(() => {
 				this.setState({
-					isUpdating: false,
+					isReindexing: false,
 				});
 
 				const updatedAppName = getReIndexedName(appName);
@@ -136,14 +137,21 @@ class IndexSettings extends React.Component {
 					message: 'Reindexing Failed',
 				});
 				this.setState({
-					isUpdating: false,
+					isReindexing: false,
 					showError: true,
 				});
 			});
 	};
 
 	render() {
-		const { shards, replicas, isUpdating, shardsModal, replicasModal, totalNodes } = this.state;
+		const {
+			shards,
+			replicas,
+			isReindexing,
+			shardsModal,
+			replicasModal,
+			totalNodes,
+		} = this.state;
 		const { allocated_replicas, allocated_shards } = this;
 		const { isFetchingMapping } = this.props;
 
@@ -163,7 +171,7 @@ class IndexSettings extends React.Component {
 			<React.Fragment>
 				<Banner {...bannerMessage} />
 
-				<Loader show={isUpdating} message="Re-indexing your data... Please wait!" />
+				<Loader show={isReindexing} message="Re-indexing your data... Please wait!" />
 				<div className={container}>
 					<Shards
 						handleSlider={this.handleSlider}
