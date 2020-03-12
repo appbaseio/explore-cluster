@@ -132,7 +132,7 @@ class LanguageSettings extends React.Component {
 						const { analyzer, filter } = get(appSettings, 'index.analysis', {});
 						const { analyzer: analyzerNew, filter: filterNew } = analysis || {};
 						reIndex({
-							mappings: analyzerMappings,
+							mappings: { properties: analyzerMappings },
 							appId: appName,
 							version: esVersion,
 							credentials,
