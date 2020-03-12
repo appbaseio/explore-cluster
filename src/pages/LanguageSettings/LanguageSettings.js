@@ -9,9 +9,9 @@ import {
 	getDefaultSettings,
 	getSettings,
 	putSettings,
+	setCurrentApp,
 } from '../../batteries/modules/actions';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
-import Loader from '../../components/Loader';
 import { SettingsFooter } from '../../components/SettingsFooter';
 import { container, label } from '../ResultsPage/styles';
 import { LanguageDropdown } from '../../components/LanguageDropdown';
@@ -43,6 +43,7 @@ class LanguageSettings extends React.Component {
 			getSettingsAction,
 			form: { setFieldsValue },
 			credentials,
+			getDefaultSettingsAction,
 		} = this.props;
 		const esVersion = await getESVersion(appName, credentials);
 		this.setState({ esVersion });
@@ -51,6 +52,7 @@ class LanguageSettings extends React.Component {
 				this.setFormValues(res, setFieldsValue);
 			}
 		});
+		getDefaultSettingsAction(appName);
 	}
 
 	setFormValues = (res, setFieldsValue) => {
@@ -84,6 +86,7 @@ class LanguageSettings extends React.Component {
 			credentials,
 			fetchMappings,
 			deleteSettingsAction,
+			updateCurrentApp,
 		} = this.props;
 		const ACC_API = getURL();
 		validateFields((err, values) => {
@@ -96,7 +99,9 @@ class LanguageSettings extends React.Component {
 					if (response && response.payload) {
 						const { history } = this.props;
 						message.success(`Language settings for ${appName} saved successfully`);
-						history.push(`/`);
+						const updatedAppName = getReIndexedName(appName);
+						updateCurrentApp(updatedAppName);
+						history.replace(`/app/${updatedAppName}/languages/`);
 					} else {
 						this.setState({ loading: false });
 						notification.error({
@@ -216,14 +221,11 @@ class LanguageSettings extends React.Component {
 	render() {
 		const {
 			form: { getFieldDecorator, getFieldsValue, setFieldsValue },
-			isLoading,
 			isUpdating,
 			resetState,
 			settings,
 		} = this.props;
 		const { visible, loading } = this.state;
-
-		if (isLoading) return <Loader />;
 
 		return (
 			<>
@@ -344,6 +346,7 @@ const mapDispatchToProps = dispatch => ({
 	fetchMappings: (appName, credentials, url) =>
 		dispatch(getAppMappings(appName, credentials, url)),
 	deleteSettingsAction: name => dispatch(deleteSettings(name)),
+	updateCurrentApp: appName => dispatch(setCurrentApp(appName, appName)),
 });
 
 const LanguageForm = Form.create({ name: 'language' })(LanguageSettings);
