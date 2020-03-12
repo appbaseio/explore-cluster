@@ -9,9 +9,9 @@ import {
 	getDefaultSettings,
 	getSettings,
 	putSettings,
+	setCurrentApp,
 } from '../../batteries/modules/actions';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
-import Loader from '../../components/Loader';
 import { SettingsFooter } from '../../components/SettingsFooter';
 import { container, label } from '../ResultsPage/styles';
 import { LanguageDropdown } from '../../components/LanguageDropdown';
@@ -27,6 +27,7 @@ import {
 } from '../../batteries/utils/mappings';
 import { getReIndexedName } from '../../utils';
 import { buildLanguageAnalysis, getLanguageFallback } from '../../utils/language';
+import { isEqual } from '../../batteries/utils';
 
 const bannerMessage = {
 	title: 'Language Settings',
@@ -43,6 +44,7 @@ class LanguageSettings extends React.Component {
 			getSettingsAction,
 			form: { setFieldsValue },
 			credentials,
+			getDefaultSettingsAction,
 		} = this.props;
 		const esVersion = await getESVersion(appName, credentials);
 		this.setState({ esVersion });
@@ -51,6 +53,7 @@ class LanguageSettings extends React.Component {
 				this.setFormValues(res, setFieldsValue);
 			}
 		});
+		getDefaultSettingsAction();
 	}
 
 	setFormValues = (res, setFieldsValue) => {
@@ -64,8 +67,8 @@ class LanguageSettings extends React.Component {
 		setFieldsValue(formValues);
 	};
 
-	toggleVisible = () => {
-		this.setState(prevState => ({ visible: !prevState.visible }));
+	toggleVisible = (isReset = false) => {
+		this.setState(prevState => ({ visible: !prevState.visible, isReset }));
 	};
 
 	getAnalyzerMappings = (res, getFieldValue) => {
@@ -84,6 +87,7 @@ class LanguageSettings extends React.Component {
 			credentials,
 			fetchMappings,
 			deleteSettingsAction,
+			updateCurrentApp,
 		} = this.props;
 		const ACC_API = getURL();
 		validateFields((err, values) => {
@@ -96,7 +100,9 @@ class LanguageSettings extends React.Component {
 					if (response && response.payload) {
 						const { history } = this.props;
 						message.success(`Language settings for ${appName} saved successfully`);
-						history.push(`/`);
+						const updatedAppName = getReIndexedName(appName);
+						updateCurrentApp(updatedAppName);
+						history.replace(`/app/${updatedAppName}/languages/`);
 					} else {
 						this.setState({ loading: false });
 						notification.error({
@@ -132,7 +138,7 @@ class LanguageSettings extends React.Component {
 						const { analyzer, filter } = get(appSettings, 'index.analysis', {});
 						const { analyzer: analyzerNew, filter: filterNew } = analysis || {};
 						reIndex({
-							mappings: analyzerMappings,
+							mappings: { properties: analyzerMappings },
 							appId: appName,
 							version: esVersion,
 							credentials,
@@ -200,7 +206,7 @@ class LanguageSettings extends React.Component {
 					this.setFormValues(res, setFieldsValue);
 				}
 			});
-		this.toggleVisible();
+		this.toggleVisible(true);
 	};
 
 	revertChanges = (settings, setFieldsValue) => {
@@ -216,15 +222,13 @@ class LanguageSettings extends React.Component {
 	render() {
 		const {
 			form: { getFieldDecorator, getFieldsValue, setFieldsValue },
-			isLoading,
 			isUpdating,
 			resetState,
 			settings,
 			appName,
+			defaultSettings,
 		} = this.props;
-		const { visible, loading } = this.state;
-
-		if (isLoading) return <Loader />;
+		const { visible, loading, isReset } = this.state;
 
 		return (
 			<>
@@ -300,12 +304,16 @@ class LanguageSettings extends React.Component {
 						app={appName}
 						onReset={this.resetLanguageSettings}
 						saveText="Apply Settings And Re-index"
+						showReset={
+							!isEqual(get(settings, 'language'), get(defaultSettings, 'language'))
+						}
 						reviewAndSave={() => (
 							<ReviewAndSave
 								loading={isUpdating || loading}
+								isReset={isReset}
 								oldValues={get(settings, 'language')}
 								newValues={this.getLanguagePayload(getFieldsValue())}
-								onClick={this.toggleVisible}
+								onClick={() => this.toggleVisible(false)}
 								visible={visible}
 								onRevert={() => {
 									this.revertChanges(settings, setFieldsValue);
@@ -347,6 +355,7 @@ const mapDispatchToProps = dispatch => ({
 	fetchMappings: (appName, credentials, url) =>
 		dispatch(getAppMappings(appName, credentials, url)),
 	deleteSettingsAction: name => dispatch(deleteSettings(name)),
+	updateCurrentApp: appName => dispatch(setCurrentApp(appName, appName)),
 });
 
 const LanguageForm = Form.create({ name: 'language' })(LanguageSettings);

@@ -3,14 +3,20 @@ import { connect } from 'react-redux';
 import { Card, Form, Input, InputNumber, message, notification, Select, Switch } from 'antd';
 
 import { get, pick } from 'lodash';
-import { getDefaultSettings, getSettings, putSettings } from '../../batteries/modules/actions';
+import {
+	getAppMappings,
+	getDefaultSettings,
+	getSettings,
+	putSettings,
+} from '../../batteries/modules/actions';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
-import Loader from '../../components/Loader';
 import { SettingsFooter } from '../../components/SettingsFooter';
 import { container, label } from './styles';
 import { ReviewAndSave } from '../../components/ReviewAndSave';
 import { SettingTooltip } from '../../components/SettingTooltip';
 import { settingsMap } from '../../components/ReviewAndSave/helper';
+import { getTraversedMappingsByAppName } from '../../batteries/modules/selectors';
+import { isEqual } from '../../batteries/utils';
 
 const bannerMessage = {
 	title: 'Results Settings',
@@ -45,12 +51,15 @@ class ResultsPage extends React.Component {
 			appName,
 			getSettingsAction,
 			form: { getFieldDecorator, setFieldsValue },
+			getDefaultSettingsAction,
 		} = this.props;
 		getSettingsAction(appName).then(res => {
 			if (res && res.payload) {
 				this.setFormValues(res, getFieldDecorator, setFieldsValue);
 			}
 		});
+		getDefaultSettingsAction();
+		this.getMappings();
 	}
 
 	resetResultSettings = e => {
@@ -68,7 +77,7 @@ class ResultsPage extends React.Component {
 					this.setFormValues(res, getFieldDecorator, setFieldsValue);
 				}
 			});
-		this.toggleVisible();
+		this.toggleVisible(true);
 	};
 
 	setFormValues = (res, getFieldDecorator, setFieldsValue) => {
@@ -121,6 +130,14 @@ class ResultsPage extends React.Component {
 		});
 	};
 
+	getMappings() {
+		const { appName, fetchMappings, credentials, mappings } = this.props;
+		if (credentials && !mappings) {
+			// Fetch Mappings if permissions are present
+			fetchMappings(appName, credentials);
+		}
+	}
+
 	getResultsPayload = values => {
 		const { pre_tags, number_of_fragments, fragment_size } = values;
 		const post_tags = pre_tags ? `</${pre_tags.split('<')[1]}` : [];
@@ -167,6 +184,16 @@ class ResultsPage extends React.Component {
 					onChange={value => this.setState({ includeFields: calculateValue(value) })}
 				>
 					<Select.Option key="*">* (Include all fields)</Select.Option>
+					{(this.props.mappings || []).map(v => {
+						if (!excludeFields.includes(v)) {
+							return (
+								<Select.Option key={v} title={v}>
+									{v}
+								</Select.Option>
+							);
+						}
+						return null;
+					})}
 				</Select>
 			</Form.Item>
 
@@ -189,6 +216,16 @@ class ResultsPage extends React.Component {
 					onChange={value => this.setState({ excludeFields: calculateValue(value) })}
 				>
 					<Select.Option key="*">* (Exclude all fields)</Select.Option>
+					{(this.props.mappings || []).map(v => {
+						if (!includeFields.includes(v)) {
+							return (
+								<Select.Option key={v} title={v}>
+									{v}
+								</Select.Option>
+							);
+						}
+						return null;
+					})}
 				</Select>
 			</Form.Item>
 		</>
@@ -211,13 +248,21 @@ class ResultsPage extends React.Component {
 						notFoundContent={null}
 						style={{ width: '100%' }}
 						tokenSeparators={[',']}
-					/>,
+					>
+						{(this.props.mappings || []).map(v => {
+							return (
+								<Select.Option key={v} title={v}>
+									{v}
+								</Select.Option>
+							);
+						})}
+					</Select>,
 				)}
 			</Form.Item>
 			<Form.Item
 				label={
 					<>
-						Highlight Start Tag
+						Highlight Tag
 						<SettingTooltip title="Enter the start tag and end tag would be formed based on that. E.g. if you type <mark> end_tag would be </mark>." />
 					</>
 				}
@@ -253,8 +298,8 @@ class ResultsPage extends React.Component {
 		</>
 	);
 
-	toggleVisible = () => {
-		this.setState(prevState => ({ visible: !prevState.visible }));
+	toggleVisible = (isReset = false) => {
+		this.setState(prevState => ({ visible: !prevState.visible, isReset }));
 	};
 
 	revertChanges = (settings, getFieldDecorator, setFieldsValue) => {
@@ -271,15 +316,13 @@ class ResultsPage extends React.Component {
 	render() {
 		const {
 			form: { getFieldDecorator, getFieldValue, getFieldsValue, setFieldsValue },
-			isLoading,
 			isUpdating,
 			resetState,
 			settings,
 			appName,
+			defaultSettings,
 		} = this.props;
-		const { includeFields, excludeFields, visible } = this.state;
-
-		if (isLoading) return <Loader />;
+		const { includeFields, excludeFields, visible, isReset } = this.state;
 
 		return (
 			<>
@@ -327,13 +370,17 @@ class ResultsPage extends React.Component {
 						resetState={resetState}
 						showSearchPreview
 						app={appName}
+						showReset={
+							!isEqual(get(settings, 'results'), get(defaultSettings, 'results'))
+						}
 						onReset={this.resetResultSettings}
 						reviewAndSave={() => (
 							<ReviewAndSave
 								loading={isUpdating}
+								isReset={isReset}
 								oldValues={get(settings, 'results')}
 								newValues={this.getResultsPayload(getFieldsValue())}
-								onClick={this.toggleVisible}
+								onClick={() => this.toggleVisible(false)}
 								visible={visible}
 								onRevert={() => {
 									this.revertChanges(settings, getFieldDecorator, setFieldsValue);
@@ -353,8 +400,12 @@ class ResultsPage extends React.Component {
 
 const mapStateToProps = state => {
 	const appName = get(state, '$getCurrentApp.name');
+	const mappings = getTraversedMappingsByAppName(state);
+	const { username, password } = get(state, 'user.data', {});
 	return {
 		appName,
+		mappings,
+		credentials: `${username}:${password}`,
 		isLoading: get(state, '$getAppSettings.isFetching'),
 		settings: get(state, ['$getAppSettings', 'settings', appName]),
 		isUpdating: get(state, '$getAppSettings.isUpdating'),
@@ -367,6 +418,7 @@ const mapDispatchToProps = dispatch => ({
 	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
 	getSettingsAction: name => dispatch(getSettings(name)),
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
+	fetchMappings: (appName, credentials) => dispatch(getAppMappings(appName, credentials)),
 });
 
 const ResultsForm = Form.create({ name: 'results' })(ResultsPage);

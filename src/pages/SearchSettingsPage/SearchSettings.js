@@ -34,6 +34,7 @@ import { SettingsFooter } from '../../components/SettingsFooter';
 import { container } from '../ResultsPage/styles';
 import { getReIndexedName, getSubFields } from '../../utils';
 import { settingsMap } from '../../components/ReviewAndSave/helper';
+import { isEqual } from '../../batteries/utils';
 
 const { Option } = Select;
 
@@ -76,6 +77,8 @@ class SearchSettingsPage extends React.Component {
 			mappings,
 			isFetchingMapping,
 			settings,
+			getDefaultSettingsAction,
+			defaultSettings,
 		} = this.props;
 		const url = getURL();
 
@@ -93,6 +96,10 @@ class SearchSettingsPage extends React.Component {
 			this.setState({
 				aggsMappings,
 			});
+		}
+
+		if (!defaultSettings) {
+			getDefaultSettingsAction();
 		}
 	}
 
@@ -112,9 +119,10 @@ class SearchSettingsPage extends React.Component {
 		}
 	}
 
-	toggleVisible = () => {
+	toggleVisible = (isReset = false) => {
 		this.setState(prevState => ({
 			visible: !prevState.visible,
+			isReset,
 		}));
 	};
 
@@ -266,7 +274,7 @@ class SearchSettingsPage extends React.Component {
 					this.initData(res.payload);
 				}
 			});
-		this.toggleVisible();
+		this.toggleVisible(true);
 	};
 
 	reIndex = async () => {
@@ -297,8 +305,16 @@ class SearchSettingsPage extends React.Component {
 			hasTypoTolerance,
 			typoTolerance,
 			visible,
+			isReset,
 		} = this.state;
-		const { isUpdating, settings, appName, resetState, isLoading } = this.props;
+		const {
+			isUpdating,
+			settings,
+			appName,
+			resetState,
+			defaultSettings,
+			isLoading,
+		} = this.props;
 		const toleranceOptions = ['AUTO', 1, 2];
 
 		return (
@@ -455,9 +471,13 @@ class SearchSettingsPage extends React.Component {
 						onReset={this.resetToDefault}
 						showSearchPreview
 						app={appName}
+						showReset={
+							!isEqual(get(settings, 'search'), get(defaultSettings, 'search'))
+						}
 						reviewAndSave={() => (
 							<ReviewAndSave
 								loading={isUpdating}
+								isReset={isReset}
 								oldValues={get(settings, 'search')}
 								newValues={{
 									fuzziness: hasTypoTolerance ? typoTolerance : 0,
@@ -465,7 +485,7 @@ class SearchSettingsPage extends React.Component {
 									dataField: Object.keys(dataField),
 									fieldWeights: Object.values(dataField),
 								}}
-								onClick={this.toggleVisible}
+								onClick={() => this.toggleVisible(false)}
 								visible={visible}
 								onRevert={this.resetChanges}
 								onSave={() => {

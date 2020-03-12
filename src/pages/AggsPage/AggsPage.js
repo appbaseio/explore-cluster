@@ -38,6 +38,7 @@ import { ReviewAndSave } from '../../components/ReviewAndSave';
 import { container } from '../ResultsPage/styles';
 import { getReIndexedName } from '../../utils';
 import { settingsMap } from '../../components/ReviewAndSave/helper';
+import { isEqual } from '../../batteries/utils';
 
 const { Option } = Select;
 
@@ -89,6 +90,8 @@ class AggsPage extends React.Component {
 			isFetchingMapping,
 			mappings,
 			settings,
+			getDefaultSettingsAction,
+			defaultSettings,
 		} = this.props;
 		const url = getURL();
 
@@ -108,6 +111,10 @@ class AggsPage extends React.Component {
 				searchableMappings,
 			});
 		}
+
+		if (!defaultSettings) {
+			getDefaultSettingsAction();
+		}
 	}
 
 	componentDidUpdate(prevProps) {
@@ -126,9 +133,10 @@ class AggsPage extends React.Component {
 		}
 	}
 
-	toggleVisible = () => {
+	toggleVisible = (isReset = false) => {
 		this.setState(prevState => ({
 			visible: !prevState.visible,
+			isReset,
 		}));
 	};
 
@@ -194,7 +202,6 @@ class AggsPage extends React.Component {
 	};
 
 	handleAggType = ({ address, value }) => {
-		console.log(address);
 		this.setState(prevState => ({
 			dataField: { ...prevState.dataField, [address]: value },
 		}));
@@ -279,7 +286,7 @@ class AggsPage extends React.Component {
 					this.initData(res.payload);
 				}
 			});
-		this.toggleVisible();
+		this.toggleVisible(true);
 	};
 
 	render() {
@@ -290,15 +297,22 @@ class AggsPage extends React.Component {
 			count,
 			includeNullValue,
 			visible,
+			isReset,
 		} = this.state;
-		const { isUpdating, settings, resetState, appName, isLoading } = this.props;
+		const {
+			isUpdating,
+			settings,
+			resetState,
+			appName,
+			isLoading,
+			defaultSettings,
+		} = this.props;
 		const sortOptions = [
 			{ name: 'Count', value: 'count' },
 			{ name: 'Ascending', value: 'asc' },
 			{ name: 'Descending', value: 'desc' },
 		];
 		const { size: savedSize, ...restSavedAggs } = get(settings, 'aggregations', {});
-		console.log(this.mappingsRef)
 		return (
 			<React.Fragment>
 				<Banner {...bannerMessage} />
@@ -460,11 +474,18 @@ class AggsPage extends React.Component {
 						loading={isUpdating}
 						resetState={resetState}
 						onReset={this.resetToDefault}
+						showReset={
+							!isEqual(
+								get(settings, 'aggregations'),
+								get(defaultSettings, 'aggregations'),
+							)
+						}
 						showSearchPreview
 						app={appName}
 						reviewAndSave={() => (
 							<ReviewAndSave
 								loading={isUpdating}
+								isReset={isReset}
 								oldValues={{
 									...restSavedAggs,
 									agg_size: savedSize,
@@ -475,7 +496,7 @@ class AggsPage extends React.Component {
 									includeNullValues: includeNullValue,
 									dataField,
 								}}
-								onClick={this.toggleVisible}
+								onClick={() => this.toggleVisible(false)}
 								visible={visible}
 								onRevert={this.resetChanges}
 								onSave={() => {
@@ -505,6 +526,7 @@ const mapStateToProps = state => {
 		mappings,
 		isFetchingMapping: get(state, '$getAppMappings.isFetching'),
 		appName,
+		defaultSettings: get(state, '$getAppSettings.defaultSettings'),
 	};
 };
 

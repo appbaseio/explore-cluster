@@ -10,21 +10,24 @@ export function SettingsFooter({
 	reviewAndSave = () => {},
 	showSearchPreview,
 	app,
+	showReset = true,
 }) {
 	return (
 		<Affix offsetBottom={0}>
 			<div className="flex space-between card-footer">
 				{app && showSearchPreview ? <SearchPreviewModal app={app} /> : <div />}
 				<div>
-					<Button
-						onClick={onReset}
-						style={{ marginRight: 10 }}
-						size="large"
-						loading={resetState.loading}
-						disabled={loading}
-					>
-						Reset to Default Settings
-					</Button>
+					{showReset && (
+						<Button
+							onClick={onReset}
+							style={{ marginRight: 10 }}
+							size="large"
+							loading={resetState.loading}
+							disabled={loading}
+						>
+							Reset to Default Settings
+						</Button>
+					)}
 					{reviewAndSave()}
 				</div>
 			</div>
