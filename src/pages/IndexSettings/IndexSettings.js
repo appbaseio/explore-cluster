@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
-import { Card, notification } from 'antd';
+import { Card, notification, message } from 'antd';
 
 import { getAppMappings, setCurrentApp } from '../../batteries/modules/actions';
 import { getURL, getVersion } from '../../constants/config';
@@ -16,6 +16,7 @@ import {
 	getUpdatedSettings,
 	reIndex,
 	getTypesFromMapping,
+	updateSettings,
 } from '../../batteries/utils/mappings';
 import Replicas from './Replicas';
 import Shards from './Shards';
@@ -36,6 +37,7 @@ class IndexSettings extends React.Component {
 		isFetching: false,
 		shardsModal: false,
 		replicasModal: false,
+		isUpdating: false,
 	};
 
 	allocated_shards = null;
@@ -92,12 +94,45 @@ class IndexSettings extends React.Component {
 	};
 
 	updateReplicas = () => {
+		const { replicas } = this.state;
+		const { appName, credentials } = this.props;
 		this.handleModal('replicasModal');
 
 		this.setState({
-			isReindexing: true,
+			isUpdating: true,
 		});
-		this.reIndex();
+		updateSettings({
+			appName,
+			settings: {
+				index: {
+					number_of_replicas: replicas,
+				},
+			},
+			credentials,
+		})
+			.then(data => data.json())
+			.then(res => {
+				if (res.acknowledged) {
+					message.success('Replicas updated successfully');
+				} else {
+					notification.error({
+						message: 'Replicas updation Failed',
+						description: res.message || JSON.stringify(res),
+					});
+				}
+				this.setState({
+					isUpdating: false,
+				});
+			})
+			.catch(e => {
+				notification.error({
+					message: 'Replicas updation Failed',
+					description: e.message || JSON.stringify(e),
+				});
+				this.setState({
+					isUpdating: false,
+				});
+			});
 	};
 
 	updateShards = () => {
@@ -151,6 +186,7 @@ class IndexSettings extends React.Component {
 			shardsModal,
 			replicasModal,
 			totalNodes,
+			isUpdating,
 		} = this.state;
 		const { allocated_replicas, allocated_shards } = this;
 		const { isFetchingMapping } = this.props;
@@ -189,6 +225,7 @@ class IndexSettings extends React.Component {
 						replicasModal={replicasModal}
 						totalNodes={totalNodes}
 						replicas={replicas}
+						loading={isUpdating}
 						allocated_replicas={allocated_replicas}
 					/>
 				</div>

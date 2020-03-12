@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Button, Slider, Modal } from 'antd';
+import { Card, Button, Slider, Modal, Alert, Icon } from 'antd';
 import { cardTitle } from '../../batteries/components/Mappings/styles';
 
 const Replicas = ({
@@ -10,6 +10,7 @@ const Replicas = ({
 	handleSlider,
 	replicasModal,
 	handleModal,
+	loading,
 }) => (
 	<React.Fragment>
 		<Card
@@ -20,7 +21,12 @@ const Replicas = ({
 						<h4>Manage Replicas</h4>
 						<p>Configure the number of replicas for your app.</p>
 					</div>
-					<Button onClick={() => handleModal('replicasModal')} type="primary">
+					<Button
+						disabled={loading}
+						onClick={() => handleModal('replicasModal')}
+						type="primary"
+					>
+						{loading ? <Icon type="loading" /> : null}
 						Change Replicas
 					</Button>
 				</div>
@@ -40,13 +46,17 @@ const Replicas = ({
 			onCancel={() => handleModal('replicasModal')}
 		>
 			<h4>Move slider to change the number of replicas for your app.</h4>
-			<Slider
-				step={1}
-				marks={{ 0: '0', 1: '1', 2: '2' }}
-				max={totalNodes}
-				value={+replicas}
-				onChange={value => handleSlider('replicas', value)}
-			/>
+			{totalNodes - 1 > 0 ? (
+				<Slider
+					step={1}
+					marks={{ 0: '0', 1: '1', 2: '2' }}
+					max={totalNodes - 1}
+					value={+replicas}
+					onChange={value => handleSlider('replicas', value)}
+				/>
+			) : (
+				<Alert message="Cannot add more replicas to the index as total nodes allowed is 1." />
+			)}
 		</Modal>
 	</React.Fragment>
 );
