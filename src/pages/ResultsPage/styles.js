@@ -26,6 +26,12 @@ export const container = css`
 		border: 1px solid #e8e8e8;
 		box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.15);
 	}
+
+	.ant-card-body-padding-bottom-0 {
+		.ant-card-body {
+			padding-bottom: 0;
+		}
+	}
 `;
 
 export const label = css`

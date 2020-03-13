@@ -234,7 +234,7 @@ class LanguageSettings extends React.Component {
 			<>
 				<Banner {...bannerMessage} />
 				<div className={container}>
-					<Form layout="vertical" className={label}>
+					<Form layout="vertical" className={`${label} ant-card-body-padding-bottom-0`}>
 						<Card>
 							<Form.Item
 								style={{ paddingBottom: 0 }}
