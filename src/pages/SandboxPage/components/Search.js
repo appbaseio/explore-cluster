@@ -1,8 +1,9 @@
 import React from 'react';
-import { Card, Button, Icon, Row, Col } from 'antd';
+import { Card, Button, Icon, Row, Col, Tooltip } from 'antd';
 import { Link } from 'react-router-dom';
 import { DataSearch, SelectedFilters } from '@appbaseio/reactivesearch';
 import { css } from 'emotion';
+import { settingsMap } from '../../../components/ReviewAndSave/helper';
 
 const highlighter = css`
 	width: 6px;
@@ -63,10 +64,12 @@ const Search = props => {
 				</Col>
 				<Col xs={4}>
 					<Link to={`/app/${app}/search`}>
-						<Button size="large" ghost type="primary">
-							<Icon type="edit" />
-							Set Search
-						</Button>
+						<Tooltip title={settingsMap.set_search.description}>
+							<Button size="large" ghost type="primary">
+								<Icon type="edit" />
+								{settingsMap.set_search.title}
+							</Button>
+						</Tooltip>
 						{search.dataField && search.dataField.length ? null : (
 							<span className={highlighter} />
 						)}

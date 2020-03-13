@@ -75,4 +75,24 @@ export const settingsMap = {
 		title: 'Size',
 		description: 'No. of items to show.',
 	},
+	field_weight: {
+		title: 'Field Weight',
+		description: 'Set the search weight for the database fields.'
+	},
+	agg_type: {
+		title: 'Aggregation Type',
+		description: 'Set the aggregation type for the database fields.'
+	},
+	set_search: {
+		title: 'Set Search',
+		description: 'Set search settings and fields to enhance Search behavior.'
+	},
+	set_result: {
+		title: 'Set Result View',
+		description: 'Set result settings to enhance Result behavior.'
+	},
+	set_aggs: {
+		title: 'Set Aggregations',
+		description: 'Set aggregations field for better filtering of results.'
+	}
 };

@@ -341,7 +341,16 @@ class SearchSettingsPage extends React.Component {
 							hidePropertiesType
 							onChange={this.handleMappingChange}
 							column={{
-								title: 'Field Weight',
+								title: (
+									<React.Fragment>
+										{settingsMap.field_weight.title}
+										<Tooltip title={settingsMap.field_weight.description}>
+											<span style={{ marginLeft: 5 }}>
+												<Icon type="info-circle" />
+											</span>
+										</Tooltip>
+									</React.Fragment>
+								),
 								render: ({ address, settings: mappingSettings }) => {
 									const parsedAddress = address
 										.split('.')

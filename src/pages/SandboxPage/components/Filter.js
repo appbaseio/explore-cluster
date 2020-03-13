@@ -1,7 +1,8 @@
 import React from 'react';
-import { Card, Icon, Button } from 'antd';
+import { Card, Icon, Button, Tooltip } from 'antd';
 import { Link } from 'react-router-dom';
 import { MultiList } from '@appbaseio/reactivesearch';
+import { settingsMap } from '../../../components/ReviewAndSave/helper';
 
 const Filter = props => {
 	const { app, aggs } = props;
@@ -20,10 +21,12 @@ const Filter = props => {
 			))}
 
 			<Link to={`/app/${app}/aggs`}>
-				<Button style={{ marginTop: 8 }} block type="primary">
-					<Icon type="edit" />
-					Set Aggregations
-				</Button>
+				<Tooltip title={settingsMap.set_aggs.description}>
+					<Button style={{ marginTop: 8 }} block type="primary">
+						<Icon type="edit" />
+						{settingsMap.set_aggs.title}
+					</Button>
+				</Tooltip>
 			</Link>
 		</React.Fragment>
 	);

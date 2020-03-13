@@ -159,6 +159,8 @@ class AggsPage extends React.Component {
 			.map(mapping => ({
 				_address: `${mapping.type}.${mapping.address.split('.').join('.properties.')}`,
 				address: mapping.address,
+				fields: mapping.fields,
+				type: mapping.type,
 			}));
 
 		return searchableMappings;
@@ -179,6 +181,9 @@ class AggsPage extends React.Component {
 
 	handleAddField = value => {
 		if (get(this.mappingsRef, 'current.wrappedInstance', null)) {
+			const { searchableMappings } = this.state;
+			const mapping = searchableMappings.find(item => item._address === value);
+
 			const esVersion = get(this.mappingsRef, 'current.wrappedInstance.state.esVersion');
 			const setMapping = get(this.mappingsRef, 'current.wrappedInstance.setMapping');
 
@@ -186,6 +191,16 @@ class AggsPage extends React.Component {
 				const address = +esVersion > 6 ? `properties.${value}` : value;
 
 				setMapping(address, 'text', 'searchaggs');
+
+				if (mapping) {
+					const parsedAddress = `${mapping.address}.keyword`;
+					this.setState(state => ({
+						dataField: {
+							...state.dataField,
+							[parsedAddress]: 'term',
+						},
+					}));
+				}
 			}
 		}
 	};
@@ -336,12 +351,21 @@ class AggsPage extends React.Component {
 							hidePropertiesType
 							onChange={this.handleMappingChange}
 							column={{
-								title: 'Aggregation Type',
+								title: (
+									<React.Fragment>
+										{settingsMap.agg_type.title}
+										<Tooltip title={settingsMap.agg_type.description}>
+											<span style={{ marginLeft: 5 }}>
+												<Icon type="info-circle" />
+											</span>
+										</Tooltip>
+									</React.Fragment>
+								),
 								render: ({ address, settings: mappingSettings }) => {
 									const hasKeyword = this.hasKeyword(mappingSettings);
-									let options = ['term', 'range'];
+									let options = ['Term', 'Range'];
 									if (hasKeyword) {
-										options = ['term'];
+										options = ['Term'];
 									}
 
 									const parsedAddress = address
@@ -365,7 +389,9 @@ class AggsPage extends React.Component {
 											}
 										>
 											{options.map(option => (
-												<Menu.Item key={option}>{option}</Menu.Item>
+												<Menu.Item key={option.toLowerCase()}>
+													{option}
+												</Menu.Item>
 											))}
 										</Menu>
 									);
