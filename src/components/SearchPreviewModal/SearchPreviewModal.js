@@ -8,6 +8,11 @@ const modalStyles = css`
 	&.ant-modal {
 		top: 5% !important;
 	}
+
+	.ant-modal-body {
+		max-height: 90vh;
+		overflow-y: scroll;
+	}
 `;
 
 class SearchPreviewModal extends React.Component {
