@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dropdown, Menu, Button, Icon } from 'antd';
 import { connect } from 'react-redux';
-
+import { withRouter } from 'react-router-dom';
 import { get, keys } from 'lodash';
 import { setCurrentApp } from '../../batteries/modules/actions';
 import { loadApps } from '../../actions';
@@ -16,7 +16,14 @@ class AppSwitcher extends React.Component {
 	}
 
 	render() {
-		const { apps, currentApp, history, updateCurrentApp, match } = this.props;
+		const {
+			apps,
+			currentApp,
+			history,
+			updateCurrentApp,
+			match,
+			preserveButtonStyle,
+		} = this.props;
 		const route = get(match, 'params.route');
 
 		const filteredApps = keys(apps).filter(app => !app.startsWith('.'));
@@ -29,7 +36,7 @@ class AppSwitcher extends React.Component {
 				onClick={e => {
 					const appName = e.key;
 					updateCurrentApp(appName);
-					history.push(`/app/${appName}/${route || ''}`);
+					history.replace(`/app/${appName}/${route || ''}`);
 				}}
 			>
 				{filteredApps.map(app => (
@@ -41,12 +48,16 @@ class AppSwitcher extends React.Component {
 			<React.Fragment>
 				<Dropdown trigger={['click']} overlay={menu}>
 					<Button
-						style={{
-							border: 0,
-							boxShadow: 'none',
-							padding: 0,
-							minWidth: 115,
-						}}
+						style={
+							preserveButtonStyle
+								? {}
+								: {
+										border: 0,
+										boxShadow: 'none',
+										padding: 0,
+										minWidth: 115,
+								  }
+						}
 					>
 						<span>{currentApp || 'Loading...'}</span>
 						<Icon type="down" />
@@ -66,4 +77,4 @@ const mapDispatchToProps = dispatch => ({
 	fetchApps: () => dispatch(loadApps()),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(AppSwitcher);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(AppSwitcher));

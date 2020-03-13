@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { Result } from 'antd';
 import Loader from '../Loader';
 import { setCurrentApp, getAppPlan } from '../../batteries/modules/actions';
+import AppSwitcher from '../AppSwitcher';
 
 class AppPageContainer extends Component {
 	constructor(props) {
@@ -28,9 +30,24 @@ class AppPageContainer extends Component {
 	}
 
 	render() {
-		const { isLoading, component, ...props } = this.props;
-		if (isLoading) {
+		const { isLoading, isFetchingApps, component, apps, ...props } = this.props;
+		if (isLoading || isFetchingApps) {
 			return <Loader />;
+		}
+		if (apps && !Object.keys(apps).includes(props.appName)) {
+			return (
+				<Result
+					status="404"
+					title="Invalid Index"
+					subTitle={
+						<p>
+							You are trying to access a invalid index. Please select a existing index
+							to access the page.
+						</p>
+					}
+					extra={<AppSwitcher preserveButtonStyle currentApp="Select a Index" />}
+				/>
+			);
 		}
 		return <div key={props.appName}>{React.createElement(component, props)}</div>;
 	}
@@ -64,6 +81,8 @@ const mapStateToProps = (state, ownProps) => {
 		isClusterPlanFetching: get(state, '$getAppPlan.isFetching', false),
 		isLoading: get(state, '$getAppPlan.isFetching'),
 		isError: get(state, '$getAppPlan.error'),
+		fetchingApps: get(state, 'apps.isFetching'),
+		apps: get(state, 'apps.data'),
 	};
 };
 

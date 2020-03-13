@@ -22,6 +22,7 @@ import Replicas from './Replicas';
 import Shards from './Shards';
 import Loader from '../../batteries/components/shared/Loader';
 import { getReIndexedName } from '../../utils';
+import { appendApp } from '../../actions';
 
 const bannerMessage = {
 	title: 'Index Settings',
@@ -145,7 +146,7 @@ class IndexSettings extends React.Component {
 	};
 
 	reIndex = async () => {
-		const { appName, credentials, mappings, history, updateCurrentApp } = this.props;
+		const { appName, credentials, mappings, history, updateCurrentApp, addApp } = this.props;
 		const { shards, replicas, esVersion } = this.state;
 		const type = getTypesFromMapping(mappings);
 		let appSettings = await getSettings(appName, credentials).then(
@@ -161,6 +162,9 @@ class IndexSettings extends React.Component {
 				});
 
 				const updatedAppName = getReIndexedName(appName);
+				addApp({
+					[updatedAppName]: {},
+				});
 				updateCurrentApp(updatedAppName);
 
 				history.replace(`/app/${updatedAppName}/index-settings/`);
@@ -251,6 +255,7 @@ const mapDispatchToProps = dispatch => ({
 	fetchMappings: (appName, credentials, url) =>
 		dispatch(getAppMappings(appName, credentials, url)),
 	updateCurrentApp: app => dispatch(setCurrentApp(app)),
+	addApp: app => dispatch(appendApp(app)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(IndexSettings);
