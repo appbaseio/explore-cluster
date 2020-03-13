@@ -34,7 +34,7 @@ class AppPageContainer extends Component {
 		if (isLoading || isFetchingApps) {
 			return <Loader />;
 		}
-		if (apps && !Object.keys(apps).includes(props.appName)) {
+		if (props.appName && apps && !Object.keys(apps).includes(props.appName)) {
 			return (
 				<Result
 					status="404"
