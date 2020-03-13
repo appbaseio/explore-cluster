@@ -155,7 +155,15 @@ class IndexSettings extends React.Component {
 
 		appSettings = getUpdatedSettings({ settings: appSettings, shards, replicas });
 
-		reIndex(mappings, appName, [], type, esVersion, credentials, appSettings)
+		reIndex({
+			mappings,
+			appId: appName,
+			excludeFields: [],
+			type,
+			esVersion,
+			credentials,
+			settings: appSettings,
+		})
 			.then(() => {
 				this.setState({
 					isReindexing: false,

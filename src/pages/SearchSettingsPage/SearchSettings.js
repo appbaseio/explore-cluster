@@ -35,6 +35,7 @@ import { container } from '../ResultsPage/styles';
 import { getReIndexedName, getSubFields } from '../../utils';
 import { settingsMap } from '../../components/ReviewAndSave/helper';
 import { isEqual } from '../../batteries/utils';
+import mappingUsecase from '../../batteries/utils/mappingUsecase';
 
 const { Option } = Select;
 
@@ -166,11 +167,42 @@ class SearchSettingsPage extends React.Component {
 
 	handleMappingChange = mappings => {
 		const aggsMappings = this.getAggsMappings(mappings);
+		const { dataField } = this.state;
+
 		let isDirty = false;
 		if (get(this.mappingsRef, 'current.wrappedInstance', null)) {
 			isDirty = get(this.mappingsRef, 'current.wrappedInstance.state.dirty');
 		}
 
+		const mappingAddresses = aggsMappings ? aggsMappings.map(mapping => mapping.address) : [];
+		const searchSubFields = ['search', 'english', 'lang', 'autosuggest', 'keyword'];
+
+		const fieldsTobeDeleteFromState = Object.keys(dataField).filter(item =>
+			mappingAddresses.includes(item),
+		);
+
+		if (fieldsTobeDeleteFromState && fieldsTobeDeleteFromState.length) {
+			const subFields = fieldsTobeDeleteFromState.reduce((agg, item) => {
+				return [...agg, item, ...searchSubFields.map(sf => `${item}.${sf}`)];
+			}, []);
+
+			const updatedFields = Object.keys(dataField).reduce((agg, item) => {
+				if (subFields.includes(item)) {
+					return agg;
+				}
+				return {
+					...agg,
+					[item]: dataField[item],
+				};
+			}, {});
+
+			this.setState({
+				dataField: updatedFields,
+				aggsMappings,
+				isDirty,
+			});
+			return;
+		}
 		this.setState({
 			aggsMappings,
 			isDirty,
@@ -179,6 +211,9 @@ class SearchSettingsPage extends React.Component {
 
 	handleAddField = value => {
 		if (get(this.mappingsRef, 'current.wrappedInstance', null)) {
+			const { aggsMappings } = this.state;
+			const mapping = aggsMappings.find(item => item._address === value);
+
 			const esVersion = get(this.mappingsRef, 'current.wrappedInstance.state.esVersion');
 			const setMapping = get(this.mappingsRef, 'current.wrappedInstance.setMapping');
 
@@ -186,6 +221,20 @@ class SearchSettingsPage extends React.Component {
 				const address = +esVersion > 6 ? `properties.${value}` : value;
 
 				setMapping(address, 'text', 'searchaggs');
+
+				if (mapping) {
+					const fields = getSubFields({
+						fields: mappingUsecase.searchaggs.fields,
+						weight: 1,
+						address: mapping.address,
+					});
+					this.setState(state => ({
+						dataField: {
+							...state.dataField,
+							...fields,
+						},
+					}));
+				}
 			}
 		}
 	};

@@ -168,11 +168,47 @@ class AggsPage extends React.Component {
 
 	handleMappingChange = mappings => {
 		const searchableMappings = this.getSearchableMappings(mappings);
+		const { dataField } = this.state;
 
 		let isDirty = false;
 		if (get(this.mappingsRef, 'current.wrappedInstance', null)) {
 			isDirty = get(this.mappingsRef, 'current.wrappedInstance.state.dirty');
 		}
+
+		const mappingAddresses = searchableMappings
+			? searchableMappings
+					.map(mapping => mapping.address)
+					.reduce((agg, item) => [...agg, item, `${item}.keyword`], [])
+			: [];
+		const aggFields = ['keyword'];
+
+		const fieldsTobeDeleteFromState = Object.keys(dataField).filter(item =>
+			mappingAddresses.includes(item),
+		);
+
+		if (fieldsTobeDeleteFromState && fieldsTobeDeleteFromState.length) {
+			const subFields = fieldsTobeDeleteFromState.reduce((agg, item) => {
+				return [...agg, item, ...aggFields.map(sf => `${item}.${sf}`)];
+			}, []);
+
+			const updatedFields = Object.keys(dataField).reduce((agg, item) => {
+				if (subFields.includes(item)) {
+					return agg;
+				}
+				return {
+					...agg,
+					[item]: dataField[item],
+				};
+			}, {});
+
+			this.setState({
+				dataField: updatedFields,
+				searchableMappings,
+				isDirty,
+			});
+			return;
+		}
+
 		this.setState({
 			searchableMappings,
 			isDirty,
