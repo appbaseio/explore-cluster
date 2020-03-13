@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Card, Form, Input, InputNumber, message, notification, Select, Switch } from 'antd';
 
-import { get, pick } from 'lodash';
+import { get, pick, isEmpty } from 'lodash';
 import {
 	getAppMappings,
 	getDefaultSettings,
@@ -132,7 +132,7 @@ class ResultsPage extends React.Component {
 
 	getMappings() {
 		const { appName, fetchMappings, credentials, mappings } = this.props;
-		if (credentials && !mappings) {
+		if (credentials && get(mappings, 'length') === 0) {
 			// Fetch Mappings if permissions are present
 			fetchMappings(appName, credentials);
 		}
@@ -231,7 +231,7 @@ class ResultsPage extends React.Component {
 		</>
 	);
 
-	renderHighlightFields = getFieldDecorator => (
+	renderHighlightFields = (getFieldDecorator, defaultSettings) => (
 		<>
 			<Form.Item
 				label={
@@ -241,7 +241,9 @@ class ResultsPage extends React.Component {
 					</>
 				}
 			>
-				{getFieldDecorator('highlightFields')(
+				{getFieldDecorator('highlightFields', {
+					initialValue: get(defaultSettings, 'results.highlightFields'),
+				})(
 					<Select
 						placeholder="Select field value"
 						mode="tags"
@@ -268,6 +270,7 @@ class ResultsPage extends React.Component {
 				}
 			>
 				{getFieldDecorator('pre_tags', {
+					initialValue: get(defaultSettings, 'results.highlightOptions.pre_tags.0'),
 					rules: [{ pattern: /^<\w*>$/g, message: 'Please enter a valid tag.' }],
 				})(<Input style={{ width: '17%' }} placeholder="<mark>" />)}
 			</Form.Item>
@@ -279,9 +282,9 @@ class ResultsPage extends React.Component {
 					</>
 				}
 			>
-				{getFieldDecorator('fragment_size')(
-					<InputNumber style={{ width: '17%' }} placeholder="Enter fragment size" />,
-				)}
+				{getFieldDecorator('fragment_size', {
+					initialValue: get(defaultSettings, 'results.highlightOptions.fragment_size'),
+				})(<InputNumber style={{ width: '17%' }} placeholder="Enter fragment size" />)}
 			</Form.Item>
 			<Form.Item
 				label={
@@ -291,9 +294,12 @@ class ResultsPage extends React.Component {
 					</>
 				}
 			>
-				{getFieldDecorator('number_of_fragments')(
-					<InputNumber style={{ width: '17%' }} placeholder="Enter no of fragments" />,
-				)}
+				{getFieldDecorator('number_of_fragments', {
+					initialValue: get(
+						defaultSettings,
+						'results.highlightOptions.number_of_fragments',
+					),
+				})(<InputNumber style={{ width: '17%' }} placeholder="Enter no of fragments" />)}
 			</Form.Item>
 		</>
 	);
@@ -328,7 +334,7 @@ class ResultsPage extends React.Component {
 			<>
 				<Banner {...bannerMessage} />
 				<div className={container}>
-					<Form layout="vertical" className={label}>
+					<Form layout="vertical" className={`${label} ant-card-body-padding-bottom-0`}>
 						<Card>
 							<Form.Item
 								label={
@@ -361,7 +367,7 @@ class ResultsPage extends React.Component {
 							</div>
 
 							{getFieldValue('highlight') &&
-								this.renderHighlightFields(getFieldDecorator)}
+								this.renderHighlightFields(getFieldDecorator, defaultSettings)}
 						</Card>
 					</Form>
 
@@ -404,7 +410,7 @@ const mapStateToProps = state => {
 	const { username, password } = get(state, 'user.data', {});
 	return {
 		appName,
-		mappings,
+		mappings: isEmpty(mappings) ? [] : mappings,
 		credentials: `${username}:${password}`,
 		isLoading: get(state, '$getAppSettings.isFetching'),
 		settings: get(state, ['$getAppSettings', 'settings', appName]),
