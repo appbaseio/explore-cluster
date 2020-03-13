@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Card, Form, Input, InputNumber, message, notification, Select, Switch } from 'antd';
 
-import { get, pick } from 'lodash';
+import { get, pick, isEmpty } from 'lodash';
 import {
 	getAppMappings,
 	getDefaultSettings,
@@ -132,7 +132,7 @@ class ResultsPage extends React.Component {
 
 	getMappings() {
 		const { appName, fetchMappings, credentials, mappings } = this.props;
-		if (credentials && !mappings) {
+		if (credentials && get(mappings, 'length') === 0) {
 			// Fetch Mappings if permissions are present
 			fetchMappings(appName, credentials);
 		}
@@ -404,7 +404,7 @@ const mapStateToProps = state => {
 	const { username, password } = get(state, 'user.data', {});
 	return {
 		appName,
-		mappings,
+		mappings: isEmpty(mappings) ? [] : mappings,
 		credentials: `${username}:${password}`,
 		isLoading: get(state, '$getAppSettings.isFetching'),
 		settings: get(state, ['$getAppSettings', 'settings', appName]),
