@@ -32,12 +32,20 @@ import { getAggsMappings } from '../../batteries/utils/mappings';
 import { ReviewAndSave } from '../../components/ReviewAndSave';
 import { SettingsFooter } from '../../components/SettingsFooter';
 import { container } from '../ResultsPage/styles';
-import { getReIndexedName, getSubFields } from '../../utils';
+import { getReIndexedName, getSubFields, validSettingsPlans } from '../../utils';
 import { settingsMap } from '../../components/ReviewAndSave/helper';
 import { isEqual } from '../../batteries/utils';
 import mappingUsecase from '../../batteries/utils/mappingUsecase';
+import Overlay from '../../components/Overlay';
 
 const { Option } = Select;
+
+const bannerDetails = {
+	title: 'Search Settings',
+	buttonText: 'Read More',
+	icon: 'pencil',
+	href: 'https://docs.appbase.io/docs/search/Preview/',
+};
 
 const bannerMessage = {
 	title: 'Search Settings',
@@ -363,8 +371,24 @@ class SearchSettingsPage extends React.Component {
 			resetState,
 			defaultSettings,
 			isLoading,
+			tier,
 		} = this.props;
 		const toleranceOptions = ['AUTO', 1, 2];
+
+		if (tier && validSettingsPlans.indexOf(tier) === -1) {
+			return (
+				<React.Fragment>
+					<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
+					<Overlay
+						style={{
+							maxWidth: '70%',
+						}}
+						src="https://i.imgur.com/8ENnHVv.png"
+						alt="Search Settings"
+					/>
+				</React.Fragment>
+			);
+		}
 
 		return (
 			<React.Fragment>
@@ -574,6 +598,7 @@ const mapStateToProps = state => {
 		defaultSettings: get(state, '$getAppSettings.defaultSettings'),
 		isFetchingMapping: get(state, '$getAppMappings.isFetching'),
 		appName,
+		tier: get(state, '$getAppPlan.results.tier'),
 	};
 };
 

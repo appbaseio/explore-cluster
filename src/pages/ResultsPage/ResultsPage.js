@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Card, Form, Input, InputNumber, message, notification, Select, Switch } from 'antd';
 
-import { get, pick, isEmpty } from 'lodash';
+import { get, isEmpty, pick } from 'lodash';
 import {
 	getAppMappings,
 	getDefaultSettings,
@@ -17,9 +17,18 @@ import { SettingTooltip } from '../../components/SettingTooltip';
 import { settingsMap } from '../../components/ReviewAndSave/helper';
 import { getTraversedMappingsByAppName } from '../../batteries/modules/selectors';
 import { isEqual } from '../../batteries/utils';
+import Overlay from '../../components/Overlay';
+import { validSettingsPlans } from '../../utils';
+
+const bannerDetails = {
+	title: 'Result Settings',
+	buttonText: 'Read More',
+	icon: 'pencil',
+	href: 'https://docs.appbase.io/docs/search/Preview/',
+};
 
 const bannerMessage = {
-	title: 'Results Settings',
+	title: 'Result Settings',
 	buttonText: 'Read Docs',
 };
 
@@ -327,8 +336,24 @@ class ResultsPage extends React.Component {
 			settings,
 			appName,
 			defaultSettings,
+			tier,
 		} = this.props;
 		const { includeFields, excludeFields, visible, isReset } = this.state;
+
+		if (tier && validSettingsPlans.indexOf(tier) === -1) {
+			return (
+				<React.Fragment>
+					<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
+					<Overlay
+						style={{
+							maxWidth: '70%',
+						}}
+						src="https://i.imgur.com/14EGIG3.png"
+						alt="Results Page"
+					/>
+				</React.Fragment>
+			);
+		}
 
 		return (
 			<>
@@ -417,6 +442,7 @@ const mapStateToProps = state => {
 		isUpdating: get(state, '$getAppSettings.isUpdating'),
 		resetState: get(state, '$getAppSettings.default', {}),
 		defaultSettings: get(state, '$getAppSettings.defaultSettings'),
+		tier: get(state, '$getAppPlan.results.tier'),
 	};
 };
 

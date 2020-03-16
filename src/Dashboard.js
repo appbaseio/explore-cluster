@@ -40,6 +40,12 @@ class Dashboard extends Component {
 	componentDidMount() {
 		const { loadArcUser } = this.props;
 		const params = new URLSearchParams(window.location.search);
+		if (params.has('showProfile')) {
+			const showProfile = params.get('showProfile');
+			sessionStorage.setItem('showProfile', showProfile);
+		} else {
+			sessionStorage.setItem('showProfile', true);
+		}
 		if (params.has('showHelpChat')) {
 			const showHelpChat = params.get('showHelpChat');
 			sessionStorage.setItem('showHelpChat', showHelpChat);
@@ -215,4 +221,7 @@ const mapDispatchToProps = dispatch => ({
 	loadArcUser: (u, p) => dispatch(loadUser(u, p)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps,
+)(Dashboard);

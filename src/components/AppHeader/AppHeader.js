@@ -34,6 +34,15 @@ const trialBtn = css`
 	`)};
 `;
 
+function showProfile() {
+	const storedValue = sessionStorage.getItem('showProfile');
+
+	if (storedValue) {
+		return JSON.parse(storedValue);
+	}
+	return true;
+}
+
 const AppHeader = ({
 	currentApp,
 	user,
@@ -88,15 +97,15 @@ const AppHeader = ({
 					</Breadcrumb>
 				</Menu.Item>
 
-				{/*{showApp && (*/}
-				{/*	<Menu.Item key="1" className={noBorder}>*/}
-				{/*		<AppSwitcher*/}
-				{/*			currentApp={currentApp || 'Loading...'}*/}
-				{/*			history={history}*/}
-				{/*			match={match}*/}
-				{/*		/>*/}
-				{/*	</Menu.Item>*/}
-				{/*)}*/}
+				{/* {showApp && ( */}
+				{/*	<Menu.Item key="1" className={noBorder}> */}
+				{/*		<AppSwitcher */}
+				{/*			currentApp={currentApp || 'Loading...'} */}
+				{/*			history={history} */}
+				{/*			match={match} */}
+				{/*		/> */}
+				{/*	</Menu.Item> */}
+				{/* )} */}
 			</Menu>
 		)}
 
@@ -116,9 +125,11 @@ const AppHeader = ({
 			</div>
 		)}
 
-		<Row justify="space-between" align="middle">
-			<UserMenu user={user} />
-		</Row>
+		{showProfile() && (
+			<Row justify="space-between" align="middle">
+				<UserMenu user={user} />
+			</Row>
+		)}
 		<MenuSlider />
 	</Header>
 );

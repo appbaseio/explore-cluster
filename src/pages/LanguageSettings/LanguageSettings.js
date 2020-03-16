@@ -25,9 +25,18 @@ import {
 	reIndex,
 	getSettings as getAppSettings,
 } from '../../batteries/utils/mappings';
-import { getReIndexedName } from '../../utils';
+import { getReIndexedName, validSettingsPlans } from '../../utils';
 import { buildLanguageAnalysis, getLanguageFallback } from '../../utils/language';
 import { isEqual } from '../../batteries/utils';
+import Overlay from '../../components/Overlay';
+import { appendApp } from '../../actions';
+
+const bannerDetails = {
+	title: 'Language Settings',
+	buttonText: 'Read More',
+	icon: 'pencil',
+	href: 'https://docs.appbase.io/docs/search/Preview/',
+};
 
 const bannerMessage = {
 	title: 'Language Settings',
@@ -88,6 +97,7 @@ class LanguageSettings extends React.Component {
 			fetchMappings,
 			deleteSettingsAction,
 			updateCurrentApp,
+			addApp,
 		} = this.props;
 		const ACC_API = getURL();
 		validateFields((err, values) => {
@@ -101,6 +111,7 @@ class LanguageSettings extends React.Component {
 						const { history } = this.props;
 						message.success(`Language settings for ${appName} saved successfully`);
 						const updatedAppName = getReIndexedName(appName);
+						addApp({ [updatedAppName]: {} });
 						updateCurrentApp(updatedAppName);
 						history.replace(`/app/${updatedAppName}/languages/`);
 					} else {
@@ -227,8 +238,24 @@ class LanguageSettings extends React.Component {
 			settings,
 			appName,
 			defaultSettings,
+			tier,
 		} = this.props;
 		const { visible, loading, isReset } = this.state;
+
+		if (tier && validSettingsPlans.indexOf(tier) === -1) {
+			return (
+				<React.Fragment>
+					<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
+					<Overlay
+						style={{
+							maxWidth: '70%',
+						}}
+						src="https://i.imgur.com/HyFaPF6.png"
+						alt="Language Settings"
+					/>
+				</React.Fragment>
+			);
+		}
 
 		return (
 			<>
@@ -345,6 +372,7 @@ const mapStateToProps = state => {
 		defaultSettings: get(state, '$getAppSettings.defaultSettings'),
 		credentials: username ? `${username}:${password}` : null,
 		mappings,
+		tier: get(state, '$getAppPlan.results.tier'),
 	};
 };
 
@@ -356,6 +384,7 @@ const mapDispatchToProps = dispatch => ({
 		dispatch(getAppMappings(appName, credentials, url)),
 	deleteSettingsAction: name => dispatch(deleteSettings(name)),
 	updateCurrentApp: appName => dispatch(setCurrentApp(appName, appName)),
+	addApp: appName => dispatch(appendApp(appName)),
 });
 
 const LanguageForm = Form.create({ name: 'language' })(LanguageSettings);

@@ -36,11 +36,19 @@ import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { SettingsFooter } from '../../components/SettingsFooter';
 import { ReviewAndSave } from '../../components/ReviewAndSave';
 import { container } from '../ResultsPage/styles';
-import { getReIndexedName } from '../../utils';
+import { getReIndexedName, validSettingsPlans } from '../../utils';
 import { settingsMap } from '../../components/ReviewAndSave/helper';
 import { isEqual } from '../../batteries/utils';
+import Overlay from '../../components/Overlay';
 
 const { Option } = Select;
+
+const bannerDetails = {
+	title: 'Aggregation Settings',
+	buttonText: 'Read More',
+	icon: 'pencil',
+	href: 'https://docs.appbase.io/docs/search/Preview/',
+};
 
 const bannerMessage = {
 	title: 'Aggregations Settings',
@@ -357,6 +365,7 @@ class AggsPage extends React.Component {
 			appName,
 			isLoading,
 			defaultSettings,
+			tier,
 		} = this.props;
 		const sortOptions = [
 			{ name: 'Count', value: 'count' },
@@ -364,6 +373,22 @@ class AggsPage extends React.Component {
 			{ name: 'Descending', value: 'desc' },
 		];
 		const { size: savedSize, ...restSavedAggs } = get(settings, 'aggregations', {});
+
+		if (tier && validSettingsPlans.indexOf(tier) === -1) {
+			return (
+				<React.Fragment>
+					<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
+					<Overlay
+						style={{
+							maxWidth: '70%',
+						}}
+						src="https://i.imgur.com/XcUicGH.png"
+						alt="Aggregation Settings"
+					/>
+				</React.Fragment>
+			);
+		}
+
 		return (
 			<React.Fragment>
 				<Banner {...bannerMessage} />
@@ -589,6 +614,7 @@ const mapStateToProps = state => {
 		isFetchingMapping: get(state, '$getAppMappings.isFetching'),
 		appName,
 		defaultSettings: get(state, '$getAppSettings.defaultSettings'),
+		tier: get(state, '$getAppPlan.results.tier'),
 	};
 };
 
