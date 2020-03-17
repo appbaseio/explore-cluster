@@ -44,18 +44,17 @@ export class ReviewAndSave extends React.Component {
 		];
 		return (
 			<>
-				{isDifferent && (
-					<Button
-						onClick={onClick}
-						size="large"
-						style={{ marginRight: 10 }}
-						type="primary"
-						loading={loading}
-						{...buttonProps}
-					>
-						Review and Save
-					</Button>
-				)}
+				<Button
+					onClick={onClick}
+					size="large"
+					style={{ marginRight: 10 }}
+					type="primary"
+					loading={loading}
+					disabled={!isDifferent}
+					{...buttonProps}
+				>
+					Review and Save
+				</Button>
 				<Modal
 					title={isReset ? 'Reset Settings' : 'Review Settings Before Saving'}
 					visible={isDifferent ? visible : false}
