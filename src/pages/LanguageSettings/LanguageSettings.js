@@ -29,7 +29,7 @@ import { getReIndexedName, validSettingsPlans } from '../../utils';
 import { buildLanguageAnalysis, getLanguageFallback } from '../../utils/language';
 import { isEqual } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
-import { appendApp } from '../../actions';
+import { appendApp, removeAppData } from '../../actions';
 
 const bannerDetails = {
 	title: 'Language Settings',
@@ -98,6 +98,7 @@ class LanguageSettings extends React.Component {
 			deleteSettingsAction,
 			updateCurrentApp,
 			addApp,
+			deleteApp,
 		} = this.props;
 		const ACC_API = getURL();
 		validateFields((err, values) => {
@@ -112,6 +113,7 @@ class LanguageSettings extends React.Component {
 						message.success(`Language settings for ${appName} saved successfully`);
 						const updatedAppName = getReIndexedName(appName);
 						addApp({ [updatedAppName]: {} });
+						deleteApp(appName);
 						updateCurrentApp(updatedAppName);
 						history.replace(`/app/${updatedAppName}/languages/`);
 					} else {
@@ -385,6 +387,7 @@ const mapDispatchToProps = dispatch => ({
 	deleteSettingsAction: name => dispatch(deleteSettings(name)),
 	updateCurrentApp: appName => dispatch(setCurrentApp(appName, appName)),
 	addApp: appName => dispatch(appendApp(appName)),
+	deleteApp: appName => dispatch(removeAppData(appName)),
 });
 
 const LanguageForm = Form.create({ name: 'language' })(LanguageSettings);
