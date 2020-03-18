@@ -40,6 +40,7 @@ import { getReIndexedName, validSettingsPlans } from '../../utils';
 import { settingsMap } from '../../components/ReviewAndSave/helper';
 import { isEqual } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
+import { highlighter } from '../SandboxPage/components/Search';
 
 const { Option } = Select;
 
@@ -366,6 +367,7 @@ class AggsPage extends React.Component {
 			isLoading,
 			defaultSettings,
 			tier,
+			traversedMappings,
 		} = this.props;
 		const sortOptions = [
 			{ name: 'Count', value: 'count' },
@@ -409,6 +411,26 @@ class AggsPage extends React.Component {
 							hideSearchType
 							hideDelete
 							hideDataType
+							isMappingsView={false}
+							renderMappingInfo={({ dirty }) => {
+								if (
+									!dirty &&
+									searchableMappings.length === traversedMappings.length
+								) {
+									return (
+										<p
+											style={{
+												color: '#999',
+												margin: 0,
+												textAlign: 'center',
+											}}
+										>
+											Add aggregation fields from dropdown.
+										</p>
+									);
+								}
+								return null;
+							}}
 							hidePropertiesType
 							onChange={this.handleMappingChange}
 							column={{
@@ -466,7 +488,7 @@ class AggsPage extends React.Component {
 									);
 								},
 							}}
-							renderFooter={() =>
+							renderFooter={({ isDirty }) =>
 								searchableMappings.length ? (
 									<Affix offsetBottom={73}>
 										<Row
@@ -502,6 +524,11 @@ class AggsPage extends React.Component {
 														</Option>
 													))}
 												</Select>
+												{!isDirty &&
+												searchableMappings.length ===
+													traversedMappings.length ? (
+													<span className={highlighter} />
+												) : null}
 											</Col>
 										</Row>
 									</Affix>
@@ -611,6 +638,7 @@ const mapStateToProps = state => {
 		resetState: get(state, '$getAppSettings.default', {}),
 		credentials: username ? `${username}:${password}` : null,
 		mappings,
+		traversedMappings: get(state, `$getAppMappings.traversedMappings.${appName}`, []),
 		isFetchingMapping: get(state, '$getAppMappings.isFetching'),
 		appName,
 		defaultSettings: get(state, '$getAppSettings.defaultSettings'),

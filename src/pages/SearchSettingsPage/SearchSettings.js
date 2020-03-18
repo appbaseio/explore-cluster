@@ -37,6 +37,7 @@ import { settingsMap } from '../../components/ReviewAndSave/helper';
 import { isEqual } from '../../batteries/utils';
 import mappingUsecase from '../../batteries/utils/mappingUsecase';
 import Overlay from '../../components/Overlay';
+import { highlighter } from '../SandboxPage/components/Search';
 
 const { Option } = Select;
 
@@ -372,6 +373,7 @@ class SearchSettingsPage extends React.Component {
 			defaultSettings,
 			isLoading,
 			tier,
+			traversedMappings,
 		} = this.props;
 		const toleranceOptions = ['AUTO', 1, 2];
 
@@ -411,6 +413,23 @@ class SearchSettingsPage extends React.Component {
 							hideNoType
 							hideDelete
 							hideDataType
+							isMappingsView={false}
+							renderMappingInfo={({ dirty }) => {
+								if (!dirty && aggsMappings.length === traversedMappings.length) {
+									return (
+										<p
+											style={{
+												color: '#999',
+												textAlign: 'center',
+												margin: 0,
+											}}
+										>
+											Add searchable fields from dropdown.
+										</p>
+									);
+								}
+								return null;
+							}}
 							hidePropertiesType
 							onChange={this.handleMappingChange}
 							column={{
@@ -450,7 +469,7 @@ class SearchSettingsPage extends React.Component {
 									);
 								},
 							}}
-							renderFooter={() =>
+							renderFooter={({ isDirty }) =>
 								aggsMappings.length ? (
 									<Affix offsetBottom={73}>
 										<Row
@@ -486,6 +505,10 @@ class SearchSettingsPage extends React.Component {
 														</Option>
 													))}
 												</Select>
+												{!isDirty &&
+												aggsMappings.length === traversedMappings.length ? (
+													<span className={highlighter} />
+												) : null}
 											</Col>
 										</Row>
 									</Affix>
@@ -597,6 +620,7 @@ const mapStateToProps = state => {
 		mappings,
 		defaultSettings: get(state, '$getAppSettings.defaultSettings'),
 		isFetchingMapping: get(state, '$getAppMappings.isFetching'),
+		traversedMappings: get(state, `$getAppMappings.traversedMappings.${appName}`, []),
 		appName,
 		tier: get(state, '$getAppPlan.results.tier'),
 	};
