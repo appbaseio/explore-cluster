@@ -96,16 +96,6 @@ const AppHeader = ({
 						)}
 					</Breadcrumb>
 				</Menu.Item>
-
-				{/* {showApp && ( */}
-				{/*	<Menu.Item key="1" className={noBorder}> */}
-				{/*		<AppSwitcher */}
-				{/*			currentApp={currentApp || 'Loading...'} */}
-				{/*			history={history} */}
-				{/*			match={match} */}
-				{/*		/> */}
-				{/*	</Menu.Item> */}
-				{/* )} */}
 			</Menu>
 		)}
 
