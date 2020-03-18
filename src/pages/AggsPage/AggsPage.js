@@ -137,6 +137,15 @@ class AggsPage extends React.Component {
 			});
 		}
 
+		if (
+			prevProps.isLoading !== isLoading &&
+			!isLoading &&
+			settings &&
+			JSON.stringify(prevProps.settings) !== JSON.stringify(settings)
+		) {
+			this.initData(settings);
+		}
+
 		if (prevProps.isLoading !== isLoading && !isLoading && settings && settings.aggregations) {
 			this.initData(settings);
 		}
@@ -628,12 +637,14 @@ class AggsPage extends React.Component {
 
 const mapStateToProps = state => {
 	const mappings = getRawMappingsByAppName(state) || null;
-
+	const defaultSettings = get(state.$getAppSettings, `defaultSettings`);
+	const errorCode = get(state, '$getAppSettings.error.actual.code');
+	const defaultSearchSettings = errorCode === 404 ? defaultSettings : null;
 	const { username, password } = get(state, 'user.data', {});
 	const appName = get(state, '$getCurrentApp.name');
 	return {
 		isLoading: get(state, '$getAppSettings.isFetching'),
-		settings: get(state, ['$getAppSettings', 'settings', appName]),
+		settings: get(state, ['$getAppSettings', 'settings', appName], defaultSearchSettings),
 		isUpdating: get(state, '$getAppSettings.isUpdating'),
 		resetState: get(state, '$getAppSettings.default', {}),
 		credentials: username ? `${username}:${password}` : null,
@@ -641,7 +652,7 @@ const mapStateToProps = state => {
 		traversedMappings: get(state, `$getAppMappings.traversedMappings.${appName}`, []),
 		isFetchingMapping: get(state, '$getAppMappings.isFetching'),
 		appName,
-		defaultSettings: get(state, '$getAppSettings.defaultSettings'),
+		defaultSettings,
 		tier: get(state, '$getAppPlan.results.tier'),
 	};
 };

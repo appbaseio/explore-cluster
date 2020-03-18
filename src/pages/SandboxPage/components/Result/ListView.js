@@ -38,7 +38,7 @@ const ListItemWrapper = ({ item }) => {
 										{JSON.stringify(item[key])}
 									</Popover>
 								) : (
-									<span>{JSON.stringify(item[key]) || 'N/A'}</span>
+									<span dangerouslySetInnerHTML={{__html : JSON.stringify(item[key]) || 'N/A' }} />
 								)}
 							</Col>
 						</React.Fragment>
