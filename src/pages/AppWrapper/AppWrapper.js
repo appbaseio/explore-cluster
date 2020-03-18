@@ -182,7 +182,7 @@ class AppWrapper extends Component {
 				await updateSettingsAction(appName, defaultSettings);
 			} else {
 				const res = await getDefaultSettingsAction();
-				if (res && res.payload) updateSettingsAction(appName, res.payload);
+				if (res && res.payload) await updateSettingsAction(appName, res.payload);
 			}
 			this.setState({ loading: false });
 		}
