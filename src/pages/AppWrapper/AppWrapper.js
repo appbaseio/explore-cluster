@@ -175,9 +175,15 @@ class AppWrapper extends Component {
 			defaultSettings,
 			updateSettingsAction,
 			getDefaultSettingsAction,
+			getSettingsAction,
 		} = this.props;
 		if (!settings) {
 			this.setState({ loading: true });
+			const settingsResponse = await getSettingsAction(appName);
+			if (settingsResponse && !settingsResponse.error) {
+				this.setState({ loading: false });
+				return;
+			}
 			if (defaultSettings) {
 				await updateSettingsAction(appName, defaultSettings);
 			} else {
@@ -190,11 +196,11 @@ class AppWrapper extends Component {
 
 	componentDidUpdate(prevProps) {
 		const { history, currentApp, match, settings } = this.props;
-		const { appName } = this.state;
+		const { appName, loading } = this.state;
 
 		const route = match.params.route || '';
 
-		if (settings !== prevProps.settings && !settings) {
+		if (settings !== prevProps.settings && !settings && !loading) {
 			this.handleSettings(currentApp);
 		}
 
