@@ -4,11 +4,17 @@ import { Layout, Menu, Icon, Tag } from 'antd';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import AppLayout from '../../components/AppLayout';
-import { setCurrentApp } from '../../batteries/modules/actions';
+import {
+	getDefaultSettings,
+	getSettings,
+	putSettings,
+	setCurrentApp,
+} from '../../batteries/modules/actions';
 import Logo from '../../components/Logo';
 
 import { getParam } from '../../utils';
 import { breakpoints } from '../../utils/media';
+import Loader from '../../components/Loader';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
@@ -156,16 +162,41 @@ class AppWrapper extends Component {
 		const { history, match } = this.props;
 		const view = getParam('view') || '';
 
+		this.handleSettings(appName);
+
 		if (!match.params.appName && appName) {
 			history.push(`/app/${appName}/${view}`);
 		}
 	}
 
-	componentDidUpdate() {
-		const { history, currentApp, match } = this.props;
+	handleSettings = async appName => {
+		const {
+			settings,
+			defaultSettings,
+			updateSettingsAction,
+			getDefaultSettingsAction,
+		} = this.props;
+		if (!settings) {
+			this.setState({ loading: true });
+			if (defaultSettings) {
+				await updateSettingsAction(appName, defaultSettings);
+			} else {
+				const res = await getDefaultSettingsAction();
+				if (res && res.payload) updateSettingsAction(appName, res.payload);
+			}
+			this.setState({ loading: false });
+		}
+	};
+
+	componentDidUpdate(prevProps) {
+		const { history, currentApp, match, settings } = this.props;
 		const { appName } = this.state;
 
 		const route = match.params.route || '';
+
+		if (settings !== prevProps.settings && !settings) {
+			this.handleSettings(currentApp);
+		}
 
 		if (currentApp && appName !== currentApp) {
 			history.push(`/app/${currentApp}/${route}`);
@@ -182,8 +213,10 @@ class AppWrapper extends Component {
 			showHeader,
 			appName,
 			activeSubMenu,
-			activeMenuItem // prettier-ignore
+			activeMenuItem,
+			loading,
 		} = this.state;
+
 		return (
 			<Layout>
 				<Sider
@@ -276,23 +309,35 @@ class AppWrapper extends Component {
 						})}
 					</Menu>
 				</Sider>
-				<AppLayout
-					showHeader={showHeader}
-					collapsed={collapsed}
-					{...this.props}
-					onToggle={this.onCollapse}
-				/>
+				{loading ? (
+					<Loader />
+				) : (
+					<AppLayout
+						showHeader={showHeader}
+						collapsed={collapsed}
+						{...this.props}
+						onToggle={this.onCollapse}
+					/>
+				)}
 			</Layout>
 		);
 	}
 }
 
-const mapStateToProps = state => ({
-	currentApp: get(state, '$getCurrentApp.name'),
-});
+const mapStateToProps = state => {
+	const appName = get(state, '$getCurrentApp.name');
+	return {
+		currentApp: appName,
+		defaultSettings: get(state, '$getAppSettings.defaultSettings'),
+		settings: get(state, ['$getAppSettings', 'settings', appName]),
+	};
+};
 
 const mapDispatchToProps = dispatch => ({
 	updateCurrentApp: (appName, appId) => dispatch(setCurrentApp(appName, appId)),
+	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
+	getSettingsAction: name => dispatch(getSettings(name)),
+	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AppWrapper);
