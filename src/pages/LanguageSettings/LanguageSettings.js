@@ -219,7 +219,7 @@ class LanguageSettings extends React.Component {
 					};
 				}
 				const data = properties[key];
-				const { fields } = properties[key];
+				const fields = get(properties[key], 'fields', {});
 				if (fields.search || fields.autosuggest) {
 					const fieldIndex = get(settings, 'search.dataField', []).findIndex(
 						field => field === keyPath,
