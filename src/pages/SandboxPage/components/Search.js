@@ -5,7 +5,7 @@ import { DataSearch, SelectedFilters } from '@appbaseio/reactivesearch';
 import { css } from 'emotion';
 import { settingsMap } from '../../../components/ReviewAndSave/helper';
 
-const highlighter = css`
+export const highlighter = css`
 	width: 6px;
 	height: 6px;
 	padding: 5px;
