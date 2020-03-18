@@ -102,11 +102,25 @@ class LanguageSettings extends React.Component {
 		} = this.props;
 		const ACC_API = getURL();
 		validateFields((err, values) => {
-			const handleReIndexSuccess = languagePayload => {
+			const handleReIndexSuccess = (languagePayload, mappings) => {
 				const newName = getReIndexedName(appName);
+				const dataFields = cloneDeep(get(settings, 'search.dataField', []));
+				const fieldWeights = cloneDeep(get(settings, 'search.fieldWeights', []));
+				this.traverseDataFields(
+					dataFields,
+					fieldWeights,
+					mappings,
+					settings,
+					languagePayload,
+				);
 				updateSettingsAction(newName, {
 					...settings,
 					language: languagePayload,
+					search: {
+						...settings.search,
+						dataField: dataFields,
+						fieldWeights,
+					},
 				}).then(response => {
 					if (response && response.payload) {
 						const { history } = this.props;
@@ -173,7 +187,7 @@ class LanguageSettings extends React.Component {
 							},
 						})
 							.then(() => {
-								handleReIndexSuccess(languagePayload);
+								handleReIndexSuccess(languagePayload, analyzerMappings);
 							})
 							.catch(reIndexErr => {
 								handleReIndexError(reIndexErr);
@@ -187,6 +201,43 @@ class LanguageSettings extends React.Component {
 				reIndexAndUpdateSettings(languagePayload);
 			}
 		});
+	};
+
+	traverseDataFields = (dataFields, fieldWeights = [], mappings, settings, languagePayload) => {
+		let keyPath = '';
+		const applyDataFields = (properties = {}, level = 0) => {
+			Object.keys(properties).reduce((agg, key) => {
+				if (level === 0) keyPath += `${key}`;
+				else keyPath += `.${key}`;
+				if (properties[key].properties) {
+					return {
+						...agg,
+						[key]: {
+							...properties[key],
+							properties: applyDataFields(properties[key].properties, level + 1),
+						},
+					};
+				}
+				const data = properties[key];
+				const { fields } = properties[key];
+				if (fields.search || fields.autosuggest) {
+					const fieldIndex = get(settings, 'search.dataField', []).findIndex(
+						field => field === keyPath,
+					);
+					if (!dataFields.includes(`${keyPath}.lang`)) {
+						dataFields.push(`${keyPath}.lang`);
+						fieldWeights.push(get(settings, `search.fieldWeights.${fieldIndex}`, 1));
+					}
+				}
+				data.fields = fields;
+				keyPath = '';
+				return {
+					...agg,
+					[key]: data,
+				};
+			}, {});
+		};
+		if (languagePayload.language !== 'universal') applyDataFields(mappings);
 	};
 
 	getFallBackLanguage = getFieldValue => {
