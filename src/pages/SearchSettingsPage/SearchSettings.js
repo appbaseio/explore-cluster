@@ -286,7 +286,7 @@ class SearchSettingsPage extends React.Component {
 		updateSettingsAction(appName, {
 			...settings,
 			search: {
-				...settings.search,
+				...get(settings, 'search', {}),
 				fuzziness: hasTypoTolerance ? typoTolerance : 0,
 				dataField: Object.keys(nonZeroFields),
 				fieldWeights: Object.values(nonZeroFields),
@@ -345,7 +345,7 @@ class SearchSettingsPage extends React.Component {
 			updateSettingsAction(getReIndexedName(appName), {
 				...settings,
 				search: {
-					...settings.search,
+					...((settings && settings.search) || {}),
 					fuzziness: hasTypoTolerance ? typoTolerance : 0,
 					dataField: Object.keys(dataField),
 					fieldWeights: Object.values(dataField),

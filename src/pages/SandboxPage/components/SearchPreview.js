@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Row, Col, Switch, Tooltip } from 'antd';
+import { Row, Col, Switch, Tooltip, Spin } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
@@ -141,19 +141,33 @@ class SearchPreview extends React.Component {
 	};
 
 	render() {
-		const { settings, app, credentials, url } = this.props;
+		const { settings, app, credentials, url, fetchingDefaultSettings } = this.props;
 		const { settings: stateSettings, isAnalyticsEnabled } = this.state;
 
 		if (!settings) {
 			return null;
 		}
 
+		if (fetchingDefaultSettings) {
+			return (
+				<div className={container}>
+					<Spin />
+					<p>Fetching default Settings</p>
+				</div>
+			);
+		}
+
 		if (settings.isFetching) {
-			return null;
+			return (
+				<div className={container}>
+					<Spin />
+					<p>Fetching Settings</p>
+				</div>
+			);
 		}
 
 		if (!stateSettings) {
-			return null;
+			return <p>Settings not found.</p>;
 		}
 
 		const aggregations = stateSettings.filter(item => item.id.startsWith('list'));
@@ -211,8 +225,10 @@ class SearchPreview extends React.Component {
 
 const mapStateToProps = (state, props) => {
 	const { username, password } = get(state, 'user.data', {});
+	const defaultSettings = get(state.$getAppSettings, `defaultSettings`);
 	return {
-		settings: get(state.$getAppSettings, `settings.${props.app}`),
+		settings: get(state.$getAppSettings, `settings.${props.app}`, defaultSettings),
+		fetchingDefaultSettings: get(state.$getAppSettings, `default.loading`),
 		mappings: getRawMappingsByAppName(state) || null,
 		credentials: username ? `${username}:${password}` : null,
 		url: getURL(),

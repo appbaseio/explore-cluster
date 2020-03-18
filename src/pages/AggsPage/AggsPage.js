@@ -280,7 +280,7 @@ class AggsPage extends React.Component {
 		updateSettingsAction(appName, {
 			...settings,
 			aggregations: {
-				...settings.aggregations,
+				...get(settings, 'aggregations', {}),
 				dataField,
 				size: count,
 				sortBy: sort,
@@ -319,7 +319,7 @@ class AggsPage extends React.Component {
 			updateSettingsAction(getReIndexedName(appName), {
 				...settings,
 				aggregations: {
-					...settings.aggregations,
+					...((settings && settings.aggregations) || {}),
 					dataField,
 					size: count,
 					sortBy: sort,
