@@ -463,7 +463,4 @@ const mapDispatchToProps = dispatch => ({
 
 const LanguageForm = Form.create({ name: 'language' })(LanguageSettings);
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(LanguageForm);
+export default connect(mapStateToProps, mapDispatchToProps)(LanguageForm);
