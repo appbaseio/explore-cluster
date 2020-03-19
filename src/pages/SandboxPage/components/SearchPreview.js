@@ -34,8 +34,20 @@ class SearchPreview extends React.Component {
 	};
 
 	componentDidMount() {
-		const { app, fetchSearchSettings, fetchMappings, credentials, url, mappings } = this.props;
-		fetchSearchSettings(app);
+		const {
+			app,
+			fetchSearchSettings,
+			fetchMappings,
+			credentials,
+			url,
+			mappings,
+			settings,
+		} = this.props;
+
+		if (!settings) {
+			fetchSearchSettings(app);
+		}
+
 		if (mappings) {
 			const searchableMappings = this.getSearchableMappings(mappings);
 
