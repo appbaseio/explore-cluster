@@ -75,7 +75,7 @@ const getAuthToken = () => {
 
 export async function getESIndices(authToken) {
 	const ACC_API = getURL();
-	const response = await fetch(`${ACC_API}/_cat/indices?format=json`, {
+	const response = await fetch(`${ACC_API}/_aliasedindices`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Basic ${authToken}`,

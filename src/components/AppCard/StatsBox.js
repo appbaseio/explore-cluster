@@ -43,7 +43,7 @@ const renderItem = item => {
 	}
 };
 
-const blackList = ['index', 'uuid', 'docs.deleted', 'pri.store.size', 'health', 'status'];
+const blackList = ['index', 'uuid', 'docs.deleted', 'pri.store.size', 'health', 'status', 'alias'];
 
 const flex = {
 	display: 'flex',

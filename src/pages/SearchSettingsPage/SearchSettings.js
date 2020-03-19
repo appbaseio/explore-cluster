@@ -190,42 +190,12 @@ class SearchSettingsPage extends React.Component {
 
 	handleMappingChange = mappings => {
 		const aggsMappings = this.getAggsMappings(mappings);
-		const { dataField } = this.state;
 
 		let isDirty = false;
 		if (get(this.mappingsRef, 'current.wrappedInstance', null)) {
 			isDirty = get(this.mappingsRef, 'current.wrappedInstance.state.dirty');
 		}
 
-		const mappingAddresses = aggsMappings ? aggsMappings.map(mapping => mapping.address) : [];
-		const searchSubFields = ['search', 'english', 'lang', 'autosuggest', 'keyword'];
-
-		const fieldsTobeDeleteFromState = Object.keys(dataField).filter(item =>
-			mappingAddresses.includes(item),
-		);
-
-		if (fieldsTobeDeleteFromState && fieldsTobeDeleteFromState.length) {
-			const subFields = fieldsTobeDeleteFromState.reduce((agg, item) => {
-				return [...agg, item, ...searchSubFields.map(sf => `${item}.${sf}`)];
-			}, []);
-
-			const updatedFields = Object.keys(dataField).reduce((agg, item) => {
-				if (subFields.includes(item)) {
-					return agg;
-				}
-				return {
-					...agg,
-					[item]: dataField[item],
-				};
-			}, {});
-
-			this.setState({
-				dataField: updatedFields,
-				aggsMappings,
-				isDirty,
-			});
-			return;
-		}
 		this.setState({
 			aggsMappings,
 			isDirty,
@@ -377,6 +347,91 @@ class SearchSettingsPage extends React.Component {
 		);
 	};
 
+	handleUsecaseChange = (field, type, usecase) => {
+		const address = field.startsWith('properties.properties')
+			? field.replace('properties.properties', 'properties')
+			: field;
+		const parsedAddress = address.split('.').reduce((agg, key, index) => {
+			if (index % 2 !== 0) {
+				return agg ? `${agg}.${key}` : key;
+			}
+			return agg;
+		}, '');
+		const { dataField } = this.state;
+		const fieldChanged = parsedAddress;
+
+		if (usecase === 'aggs' || usecase === 'none') {
+			const searchSubFields = ['search', 'english', 'lang', 'autosuggest', 'keyword'];
+
+			const subFields = [
+				fieldChanged,
+				...searchSubFields.map(item => `${fieldChanged}.${item}`),
+			];
+
+			const updatedFields = Object.keys(dataField).reduce((agg, item) => {
+				if (subFields.includes(item)) {
+					return agg;
+				}
+				return {
+					...agg,
+					[item]: dataField[item],
+				};
+			}, {});
+
+			this.setState({
+				dataField: updatedFields,
+			});
+			return;
+		}
+
+		if (usecase === 'search') {
+			const subField = `${fieldChanged}.keyword`;
+
+			const updatedFields = Object.keys(dataField).reduce((agg, item) => {
+				if (subField === item) {
+					return agg;
+				}
+				return {
+					...agg,
+					[item]: dataField[item],
+				};
+			}, {});
+
+			this.setState({
+				dataField: updatedFields,
+			});
+			return;
+		}
+
+		if (usecase === 'searchaggs') {
+			const searchSubFields = Object.keys(mappingUsecase.searchaggs.fields);
+
+			const subFields = [
+				fieldChanged,
+				...searchSubFields.map(item => `${fieldChanged}.${item}`),
+			];
+
+			const notContainedField = subFields.filter(
+				item => !Object.keys(dataField).includes(item),
+			);
+
+			const weight = dataField[fieldChanged] || 1;
+			const updatedFields = notContainedField.reduce(
+				(agg, item) => ({
+					...agg,
+					[item]: weight,
+				}),
+				{},
+			);
+			this.setState({
+				dataField: {
+					...dataField,
+					...updatedFields,
+				},
+			});
+		}
+	};
+
 	render() {
 		const {
 			dataField,
@@ -435,6 +490,7 @@ class SearchSettingsPage extends React.Component {
 							hideAggsType
 							hideNoType
 							hideDelete
+							onUsecaseChange={this.handleUsecaseChange}
 							hideDataType
 							isMappingsView={false}
 							renderMappingInfo={({ dirty }) => {
