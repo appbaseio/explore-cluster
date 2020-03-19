@@ -25,7 +25,7 @@ export function SettingsFooter({
 							loading={resetState.loading}
 							disabled={loading}
 						>
-							Reset to Default Settings
+							Reset To Default Settings
 						</Button>
 					)}
 					{reviewAndSave()}

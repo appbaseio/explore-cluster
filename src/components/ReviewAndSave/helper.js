@@ -43,7 +43,7 @@ export const settingsMap = {
 	},
 	normalizeDiacritics: {
 		title: 'Normalize Diacritics',
-		description: 'Parses accents of a language.',
+		description: 'Removes accents/diacritics from search string.',
 	},
 	fieldWeights: {
 		title: 'Field Weights',
@@ -77,22 +77,22 @@ export const settingsMap = {
 	},
 	field_weight: {
 		title: 'Field Weight',
-		description: 'Set the search weight for the database fields.'
+		description: 'Set the search weight for the database fields.',
 	},
 	agg_type: {
 		title: 'Aggregation Type',
-		description: 'Set the aggregation type for the database fields.'
+		description: 'Set the aggregation type for the database fields.',
 	},
 	set_search: {
 		title: 'Set Search',
-		description: 'Set search settings and fields to enhance Search behavior.'
+		description: 'Set search settings and fields to enhance Search behavior.',
 	},
 	set_result: {
 		title: 'Set Result View',
-		description: 'Set result settings to enhance Result behavior.'
+		description: 'Set result settings to enhance Result behavior.',
 	},
 	set_aggs: {
 		title: 'Set Aggregations',
-		description: 'Set aggregations field for better filtering of results.'
-	}
+		description: 'Set aggregations field for better filtering of results.',
+	},
 };

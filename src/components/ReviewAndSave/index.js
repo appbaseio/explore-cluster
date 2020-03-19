@@ -39,7 +39,7 @@ export class ReviewAndSave extends React.Component {
 				Revert Changes
 			</Button>,
 			<Button key="submit" type="primary" onClick={onSave}>
-				{isReset ? 'Reset To Default' : 'Review and Save'}
+				{isReset ? 'Reset To Default Settings' : 'Review and Save'}
 			</Button>,
 		];
 		return (
@@ -56,9 +56,12 @@ export class ReviewAndSave extends React.Component {
 					Review and Save
 				</Button>
 				<Modal
-					title={isReset ? 'Reset Settings' : 'Review Settings Before Saving'}
+					title={isReset ? 'Reset To Default Settings' : 'Review Settings Before Saving'}
 					visible={isDifferent ? visible : false}
-					onCancel={onClick}
+					onCancel={() => {
+						if (isReset) onRevert();
+						else onClick();
+					}}
 					width={1000}
 					footer={isReset ? footer[1] : footer}
 				>

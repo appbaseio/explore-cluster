@@ -41,7 +41,7 @@ export function IndexSwitcher({ item, filteredApps = [] }) {
 		return (
 			<Dropdown overlay={menu}>
 				<Button className={dropdown} style={{ minWidth: 200 }}>
-					Select App
+					Select Index
 					<Icon type="down" />
 				</Button>
 			</Dropdown>
@@ -53,7 +53,7 @@ export function IndexSwitcher({ item, filteredApps = [] }) {
 			overlayClassName={popOverClass}
 			placement="right"
 			icon={
-				<Tooltip title="Select an app to navigate to.">
+				<Tooltip title="Select an index to navigate to.">
 					<Icon
 						style={{
 							fontSize: 17,

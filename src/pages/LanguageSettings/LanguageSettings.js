@@ -30,6 +30,7 @@ import { buildLanguageAnalysis, getLanguageFallback } from '../../utils/language
 import { isEqual } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import { appendApp, removeAppData } from '../../actions';
+import { settingsMap } from '../../components/ReviewAndSave/helper';
 
 const bannerDetails = {
 	title: 'Language Settings',
@@ -315,13 +316,14 @@ class LanguageSettings extends React.Component {
 								label={
 									<>
 										Choose Your Language
-										<SettingTooltip title="Sets the languages at the index level for language-specific processing such as tokenization and normalization." />
+										<SettingTooltip title={settingsMap.language.description} />
 									</>
 								}
 							>
 								{getFieldDecorator('language')(
 									<LanguageDropdown
 										formStyle={{ paddingBottom: 0 }}
+										style={{ width: '20%', minWidth: '35%' }}
 										renderOption={lang => (
 											<Select.Option key={lang.value} value={lang.value}>
 												{lang.label}
@@ -331,17 +333,22 @@ class LanguageSettings extends React.Component {
 								)}
 							</Form.Item>
 							<div style={{ paddingBottom: 32 }}>
-								<label style={{ marginRight: 10 }}>Apply Default Stopwords</label>
-								{getFieldDecorator('applyStopwords', { valuePropName: 'checked' })(
-									<Switch />,
-								)}
+								<label>Apply Default Stopwords</label>
+								<SettingTooltip title={settingsMap.applyStopwords.description} />
+								<div style={{ marginTop: 5 }}>
+									{getFieldDecorator('applyStopwords', {
+										valuePropName: 'checked',
+									})(<Switch />)}
+								</div>
 							</div>
 
 							<Form.Item
 								label={
 									<>
 										Provide Custom Stopwords
-										<SettingTooltip title="Removes these words from query before searching." />
+										<SettingTooltip
+											title={settingsMap.customStopwords.description}
+										/>
 									</>
 								}
 							>
@@ -354,7 +361,9 @@ class LanguageSettings extends React.Component {
 								label={
 									<>
 										Stemming Exceptions
-										<SettingTooltip title="Words which should be excluded from stemming." />
+										<SettingTooltip
+											title={settingsMap.stemmingExceptions.description}
+										/>
 									</>
 								}
 							>
@@ -363,10 +372,15 @@ class LanguageSettings extends React.Component {
 								)}
 							</Form.Item>
 							<div style={{ paddingBottom: 32 }}>
-								<label style={{ marginRight: 10 }}>Normalize Diacritics</label>
-								{getFieldDecorator('normalizeDiacritics', {
-									valuePropName: 'checked',
-								})(<Switch />)}
+								<label>Normalize Diacritics</label>
+								<SettingTooltip
+									title={settingsMap.normalizeDiacritics.description}
+								/>
+								<div style={{ marginTop: 5 }}>
+									{getFieldDecorator('normalizeDiacritics', {
+										valuePropName: 'checked',
+									})(<Switch />)}
+								</div>
 							</div>
 						</Card>
 					</Form>
@@ -375,7 +389,6 @@ class LanguageSettings extends React.Component {
 						loading={isUpdating || loading}
 						resetState={resetState}
 						showSearchPreview
-						app={appName}
 						onReset={this.resetLanguageSettings}
 						saveText="Apply Settings And Re-index"
 						showReset={
