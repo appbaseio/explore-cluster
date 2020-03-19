@@ -617,7 +617,7 @@ class SearchSettingsPage extends React.Component {
 								hasTestSettings: true,
 							},
 							buttonProps: {
-								disabled: isDirty,
+								showTooltip: isDirty,
 								tooltip: settingsMap.disable_search_settings.description,
 							},
 						}}

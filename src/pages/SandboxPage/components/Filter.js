@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Icon, Button, Tooltip } from 'antd';
 import { Link } from 'react-router-dom';
+import { get } from 'lodash';
 import { MultiList } from '@appbaseio/reactivesearch';
 import { settingsMap } from '../../../components/ReviewAndSave/helper';
 
@@ -12,8 +13,13 @@ const Filter = props => {
 				<Card key={agg.dataField}>
 					<MultiList
 						{...agg}
-						title={agg.id}
-						renderNoResults={() => 'No Data Found'}
+						title={get(agg, 'dataField[0]', '').replace('.keyword', '')}
+						renderNoResults={() =>
+							`No Data Found for ${get(agg, 'dataField[0]', '').replace(
+								'.keyword',
+								'',
+							)}`
+						}
 						componentId={agg.id}
 						loader="Loading Items"
 					/>

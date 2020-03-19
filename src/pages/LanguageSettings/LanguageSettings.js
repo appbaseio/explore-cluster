@@ -287,9 +287,9 @@ class LanguageSettings extends React.Component {
 			isUpdating,
 			resetState,
 			settings,
-			appName,
 			defaultSettings,
 			tier,
+			appName,
 		} = this.props;
 		const { visible, loading, isReset } = this.state;
 
@@ -392,6 +392,16 @@ class LanguageSettings extends React.Component {
 						loading={isUpdating || loading}
 						resetState={resetState}
 						showSearchPreview
+						app={appName}
+						searchPreviewModalProps={{
+							buttonProps: {
+								showTooltip: !isEqual(
+									this.getLanguagePayload(getFieldsValue()),
+									get(settings, 'language'),
+								),
+								tooltip: settingsMap.disable_search_settings.description,
+							},
+						}}
 						onReset={this.resetLanguageSettings}
 						saveText="Apply Settings And Re-index"
 						showReset={

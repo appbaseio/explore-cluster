@@ -96,6 +96,6 @@ export const settingsMap = {
 		description: 'Set aggregations field for better filtering of results.',
 	},
 	disable_search_settings: {
-		description: 'Please save your settings before you can test them.'
+		description: `Certain actions require a save before they're applied in Search Preview.`
 	}
 };

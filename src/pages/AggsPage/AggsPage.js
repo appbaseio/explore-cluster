@@ -90,7 +90,7 @@ class AggsPage extends React.Component {
 
 	mappingsRef = React.createRef(null);
 
-	async componentDidMount() {
+	componentDidMount() {
 		const {
 			appName,
 			credentials,
@@ -631,7 +631,7 @@ class AggsPage extends React.Component {
 								hasTestSettings: true,
 							},
 							buttonProps: {
-								disabled: isDirty,
+								showTooltip: isDirty,
 								tooltip: settingsMap.disable_search_settings.description,
 							},
 						}}

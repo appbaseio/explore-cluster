@@ -31,21 +31,15 @@ class SearchPreviewModal extends React.Component {
 		const { app, searchPreviewProps, buttonProps } = this.props;
 		return (
 			<React.Fragment>
-				{buttonProps && buttonProps.disabled && buttonProps.tooltip ? (
+				{buttonProps && buttonProps.showTooltip && buttonProps.tooltip ? (
 					<Tooltip title={buttonProps.tooltip}>
-						<Button type="primary" size="large" disabled>
-							Test Search Settings
+						<Button type="primary" size="large" onClick={this.toggleVisibilty} ghost>
+							Test Search Relevancy
 						</Button>
 					</Tooltip>
 				) : (
-					<Button
-						type="primary"
-						size="large"
-						{...buttonProps}
-						onClick={this.toggleVisibilty}
-						ghost
-					>
-						Test Search Settings
+					<Button type="primary" size="large" onClick={this.toggleVisibilty} ghost>
+						Test Search Relevancy
 					</Button>
 				)}
 
