@@ -167,7 +167,10 @@ class LanguageSettings extends React.Component {
 							settings: {
 								analysis: {
 									analyzer: {
-										...omit(analyzer, get(settings, 'language.language')),
+										...omit(analyzer, [
+											get(settings, 'language.language'),
+											'standard_asciifolding',
+										]),
 										...analyzerNew,
 									},
 									filter: {
@@ -450,4 +453,7 @@ const mapDispatchToProps = dispatch => ({
 
 const LanguageForm = Form.create({ name: 'language' })(LanguageSettings);
 
-export default connect(mapStateToProps, mapDispatchToProps)(LanguageForm);
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps,
+)(LanguageForm);
