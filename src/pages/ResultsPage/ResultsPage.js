@@ -308,7 +308,7 @@ class ResultsPage extends React.Component {
 						defaultSettings,
 						'results.highlightOptions.number_of_fragments',
 					),
-				})(<InputNumber style={{ width: '17%' }} placeholder="Enter no of fragments" />)}
+				})(<InputNumber style={{ width: '17%' }} placeholder="Enter number of fragments" />)}
 			</Form.Item>
 		</>
 	);

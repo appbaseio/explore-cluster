@@ -1,7 +1,7 @@
 export const settingsMap = {
 	size: {
 		title: 'Page Size',
-		description: 'No of results shown in a page.',
+		description: 'Number of results shown in a page.',
 	},
 	includeFields: {
 		title: 'Include Fields',
@@ -73,7 +73,7 @@ export const settingsMap = {
 	},
 	agg_size: {
 		title: 'Size',
-		description: 'No. of items to show.',
+		description: 'Number of items to show.',
 	},
 	field_weight: {
 		title: 'Field Weight',
