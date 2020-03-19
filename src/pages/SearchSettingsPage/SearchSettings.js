@@ -76,6 +76,8 @@ class SearchSettingsPage extends React.Component {
 		visible: false,
 	};
 
+	noUseCaseMappings = [];
+
 	mappingsRef = React.createRef(null);
 
 	componentDidMount() {
@@ -124,7 +126,6 @@ class SearchSettingsPage extends React.Component {
 			});
 		}
 
-
 		if (
 			prevProps.isLoading !== isLoading &&
 			!isLoading &&
@@ -133,7 +134,6 @@ class SearchSettingsPage extends React.Component {
 		) {
 			this.initData(settings);
 		}
-
 
 		if (prevProps.isLoading !== isLoading && !isLoading && settings && settings.search) {
 			this.initData(settings);
@@ -171,9 +171,12 @@ class SearchSettingsPage extends React.Component {
 		const parsedMappings = Array.isArray(aggsResponse)
 			? aggsResponse
 			: Object.keys(aggsResponse);
+		this.noUseCaseMappings = parsedMappings.filter
+			? parsedMappings.filter(mapping => mapping.usecase === 'none')
+			: [];
 		const aggsMappings = parsedMappings.filter
 			? parsedMappings
-					.filter(mapping => mapping.usecase === 'aggs' || mapping.usecase === 'none')
+					.filter(mapping => mapping.usecase === 'aggs')
 					.map(mapping => ({
 						_address: `${mapping.type}.${mapping.address
 							.split('.')
@@ -334,6 +337,14 @@ class SearchSettingsPage extends React.Component {
 		this.toggleVisible();
 	};
 
+	handleDeleteField = ({ address }) => {
+		const setMapping = get(this.mappingsRef, 'current.wrappedInstance.setMapping');
+
+		if (setMapping) {
+			setMapping(address, 'text', 'aggs');
+		}
+	};
+
 	resetToDefault = () => {
 		const { getDefaultSettingsAction, defaultSettings } = this.props;
 		if (defaultSettings) this.initData(defaultSettings);
@@ -426,7 +437,10 @@ class SearchSettingsPage extends React.Component {
 							hideDataType
 							isMappingsView={false}
 							renderMappingInfo={({ dirty }) => {
-								if (!dirty && aggsMappings.length === traversedMappings.length) {
+								if (
+									aggsMappings.length + this.noUseCaseMappings.length ===
+									traversedMappings.length
+								) {
 									return (
 										<p
 											style={{
@@ -443,6 +457,7 @@ class SearchSettingsPage extends React.Component {
 							}}
 							hidePropertiesType
 							onChange={this.handleMappingChange}
+							onDeleteField={this.handleDeleteField}
 							column={{
 								title: (
 									<React.Fragment>
@@ -516,8 +531,9 @@ class SearchSettingsPage extends React.Component {
 														</Option>
 													))}
 												</Select>
-												{!isDirty &&
-												aggsMappings.length === traversedMappings.length ? (
+												{aggsMappings.length +
+													this.noUseCaseMappings.length ===
+												traversedMappings.length ? (
 													<span className={highlighter} />
 												) : null}
 											</Col>

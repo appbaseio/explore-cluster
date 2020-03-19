@@ -41,6 +41,11 @@ const Shards = ({
 			<Slider
 				step={1}
 				max={100}
+				min={1}
+				marks={{
+					1: 1,
+					100: 100,
+				}}
 				value={+shards}
 				onChange={value => handleSlider('shards', value)}
 			/>
