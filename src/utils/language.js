@@ -25,7 +25,8 @@ export function buildLanguageAnalysis(language, languagePayload) {
 				},
 			};
 			const { filter } = analysis.analyzer[language];
-			filter.splice(filter.length - 1, 0, `${language}_keywords`);
+			if (language === 'universal') filter.push(`${language}_keywords`);
+			else filter.splice(filter.length - 1, 0, `${language}_keywords`);
 		}
 		if (languagePayload.normalizeDiacritics) {
 			analysis.analyzer = {

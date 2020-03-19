@@ -1,4 +1,20 @@
 export default {
+	universal: {
+		analysis: {
+			filter: {
+				universal_stop: {
+					type: 'stop',
+					stopwords: [],
+				},
+			},
+			analyzer: {
+				universal: {
+					tokenizer: 'standard',
+					filter: ['universal_stop'],
+				},
+			},
+		},
+	},
 	arabic: {
 		analysis: {
 			filter: {
@@ -297,7 +313,6 @@ export default {
 						'english_possessive_stemmer',
 						'lowercase',
 						'english_stop',
-
 						'english_stemmer',
 					],
 				},

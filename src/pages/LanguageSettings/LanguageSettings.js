@@ -106,13 +106,7 @@ class LanguageSettings extends React.Component {
 				const newName = getReIndexedName(appName);
 				const dataFields = cloneDeep(get(settings, 'search.dataField', []));
 				const fieldWeights = cloneDeep(get(settings, 'search.fieldWeights', []));
-				this.traverseDataFields(
-					dataFields,
-					fieldWeights,
-					mappings,
-					settings,
-					languagePayload,
-				);
+				this.traverseDataFields(dataFields, fieldWeights, mappings, settings);
 				updateSettingsAction(newName, {
 					...settings,
 					language: languagePayload,
@@ -203,7 +197,7 @@ class LanguageSettings extends React.Component {
 		});
 	};
 
-	traverseDataFields = (dataFields, fieldWeights = [], mappings, settings, languagePayload) => {
+	traverseDataFields = (dataFields, fieldWeights = [], mappings, settings) => {
 		let keyPath = '';
 		const applyDataFields = (properties = {}, level = 0) => {
 			Object.keys(properties).reduce((agg, key) => {
@@ -237,7 +231,7 @@ class LanguageSettings extends React.Component {
 				};
 			}, {});
 		};
-		if (languagePayload.language !== 'universal') applyDataFields(mappings);
+		applyDataFields(mappings);
 	};
 
 	getFallBackLanguage = getFieldValue => {
