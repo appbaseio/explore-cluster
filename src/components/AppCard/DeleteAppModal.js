@@ -2,8 +2,10 @@ import React from 'react';
 import { Modal, Input, message } from 'antd';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { deleteApp } from '../../utils';
+import { get } from 'lodash';
+import { deleteApp, validSettingsPlans } from '../../utils';
 import { removeAppData } from '../../actions';
+import { deleteSettings } from '../../batteries/modules/actions';
 
 class DeleteAppModal extends React.Component {
 	state = {
@@ -11,18 +13,23 @@ class DeleteAppModal extends React.Component {
 		loading: false,
 	};
 
-	handleDelete = () => {
+	handleDelete = async () => {
 		const {
-			// prettier-ignore
 			appName,
 			handleDeleteModal,
 			handleRemoveApp,
 			onDelete,
+			deleteSettingsAction,
+			tier,
 		} = this.props;
 
 		this.setState({
 			loading: true,
 		});
+
+		if (tier && validSettingsPlans.indexOf(tier) !== -1) {
+			await deleteSettingsAction(appName);
+		}
 
 		deleteApp(appName)
 			.then(() => {
@@ -97,8 +104,13 @@ DeleteAppModal.propTypes = {
 	onDelete: PropTypes.func,
 };
 
-const mapDispatchToProps = dispatch => ({
-	handleRemoveApp: options => dispatch(removeAppData(options)),
+const mapStateToProps = state => ({
+	tier: get(state, '$getAppPlan.results.tier'),
 });
 
-export default connect(null, mapDispatchToProps)(DeleteAppModal);
+const mapDispatchToProps = dispatch => ({
+	handleRemoveApp: options => dispatch(removeAppData(options)),
+	deleteSettingsAction: name => dispatch(deleteSettings(name)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(DeleteAppModal);
