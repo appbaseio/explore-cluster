@@ -381,6 +381,7 @@ class AggsPage extends React.Component {
 			includeNullValue,
 			visible,
 			isReset,
+			isDirty,
 		} = this.state;
 		const {
 			isUpdating,
@@ -510,7 +511,7 @@ class AggsPage extends React.Component {
 									);
 								},
 							}}
-							renderFooter={({ isDirty }) =>
+							renderFooter={() =>
 								searchableMappings.length ? (
 									<Affix offsetBottom={73}>
 										<Row
@@ -616,6 +617,24 @@ class AggsPage extends React.Component {
 							)
 						}
 						showSearchPreview
+						searchPreviewModalProps={{
+							searchPreviewProps: {
+								testSettings: {
+									...(settings || {}),
+									aggregations: {
+										size: count,
+										sortBy: sort,
+										includeNullValues: includeNullValue,
+										dataField,
+									},
+								},
+								hasTestSettings: true,
+							},
+							buttonProps: {
+								disabled: isDirty,
+								tooltip: settingsMap.disable_search_settings.description,
+							},
+						}}
 						app={appName}
 						reviewAndSave={() => (
 							<ReviewAndSave

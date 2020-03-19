@@ -404,6 +404,17 @@ class ResultsPage extends React.Component {
 						showReset={
 							!isEqual(get(settings, 'results'), get(defaultSettings, 'results'))
 						}
+						searchPreviewModalProps={{
+							searchPreviewProps: {
+								testSettings: {
+									...(settings || {}),
+									results: {
+										...this.getResultsPayload(getFieldsValue()),
+									},
+								},
+								hasTestSettings: true,
+							},
+						}}
 						onReset={this.resetResultSettings}
 						reviewAndSave={() => (
 							<ReviewAndSave

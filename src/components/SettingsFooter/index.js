@@ -9,13 +9,18 @@ export function SettingsFooter({
 	onReset,
 	reviewAndSave = () => {},
 	showSearchPreview,
+	searchPreviewModalProps,
 	app,
 	showReset = true,
 }) {
 	return (
 		<Affix offsetBottom={0}>
 			<div className="flex space-between card-footer">
-				{app && showSearchPreview ? <SearchPreviewModal app={app} /> : <div />}
+				{app && showSearchPreview ? (
+					<SearchPreviewModal {...searchPreviewModalProps} app={app} />
+				) : (
+					<div />
+				)}
 				<div>
 					{showReset && (
 						<Button
@@ -34,3 +39,7 @@ export function SettingsFooter({
 		</Affix>
 	);
 }
+
+SettingsFooter.defaultProps = {
+	searchPreviewModalProps: {},
+};

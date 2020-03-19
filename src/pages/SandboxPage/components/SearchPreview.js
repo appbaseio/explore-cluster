@@ -42,10 +42,16 @@ class SearchPreview extends React.Component {
 			url,
 			mappings,
 			settings,
+			hasTestSettings,
+			testSettings,
 		} = this.props;
 
 		if (!settings) {
 			fetchSearchSettings(app);
+		} else if (hasTestSettings) {
+			this.setState({
+				settings: generateQuery(testSettings),
+			});
 		}
 
 		if (mappings) {
@@ -93,7 +99,7 @@ class SearchPreview extends React.Component {
 	};
 
 	static getDerivedStateFromProps(props, state) {
-		if (state && !state.settings && props.settings) {
+		if (!props.hasTestSettings && state && !state.settings && props.settings) {
 			if (
 				state.hasMappingsLoaded &&
 				props.mappings &&
@@ -118,6 +124,7 @@ class SearchPreview extends React.Component {
 			};
 		}
 		if (
+			!props.hasTestSettings &&
 			state.hasMappingsLoaded &&
 			props.mappings &&
 			props.settings &&

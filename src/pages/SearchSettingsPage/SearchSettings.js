@@ -386,6 +386,7 @@ class SearchSettingsPage extends React.Component {
 			typoTolerance,
 			visible,
 			isReset,
+			isDirty,
 		} = this.state;
 		const {
 			isUpdating,
@@ -495,7 +496,7 @@ class SearchSettingsPage extends React.Component {
 									);
 								},
 							}}
-							renderFooter={({ isDirty }) =>
+							renderFooter={() =>
 								aggsMappings.length ? (
 									<Affix offsetBottom={73}>
 										<Row
@@ -602,6 +603,24 @@ class SearchSettingsPage extends React.Component {
 						resetState={resetState}
 						onReset={this.resetToDefault}
 						showSearchPreview
+						searchPreviewModalProps={{
+							searchPreviewProps: {
+								testSettings: {
+									...(settings || {}),
+									search: {
+										fuzziness: hasTypoTolerance ? typoTolerance : 0,
+										searchOperators: hasSearchOperators,
+										dataField: Object.keys(dataField),
+										fieldWeights: Object.values(dataField),
+									},
+								},
+								hasTestSettings: true,
+							},
+							buttonProps: {
+								disabled: isDirty,
+								tooltip: settingsMap.disable_search_settings.description,
+							},
+						}}
 						app={appName}
 						showReset={
 							!isEqual(get(settings, 'search'), get(defaultSettings, 'search'))

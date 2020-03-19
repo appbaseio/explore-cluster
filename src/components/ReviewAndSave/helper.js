@@ -95,4 +95,7 @@ export const settingsMap = {
 		title: 'Set Aggregations',
 		description: 'Set aggregations field for better filtering of results.',
 	},
+	disable_search_settings: {
+		description: 'Please save your settings before you can test them.'
+	}
 };

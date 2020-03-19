@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Modal } from 'antd';
+import { Button, Modal, Tooltip } from 'antd';
 import { css } from 'emotion';
 
 import SearchPreview from '../../pages/SandboxPage/components/SearchPreview';
@@ -28,12 +28,27 @@ class SearchPreviewModal extends React.Component {
 
 	render() {
 		const { visible } = this.state;
-		const { app } = this.props;
+		const { app, searchPreviewProps, buttonProps } = this.props;
 		return (
 			<React.Fragment>
-				<Button type="primary" size="large" onClick={this.toggleVisibilty} ghost>
-					Test Search Settings
-				</Button>
+				{buttonProps && buttonProps.disabled && buttonProps.tooltip ? (
+					<Tooltip title={buttonProps.tooltip}>
+						<Button type="primary" size="large" disabled>
+							Test Search Settings
+						</Button>
+					</Tooltip>
+				) : (
+					<Button
+						type="primary"
+						size="large"
+						{...buttonProps}
+						onClick={this.toggleVisibilty}
+						ghost
+					>
+						Test Search Settings
+					</Button>
+				)}
+
 				<Modal
 					footer={null}
 					width="95%"
@@ -42,11 +57,16 @@ class SearchPreviewModal extends React.Component {
 					destroyOnClose
 					visible={visible}
 				>
-					<SearchPreview app={app} />
+					<SearchPreview app={app} {...searchPreviewProps} />
 				</Modal>
 			</React.Fragment>
 		);
 	}
 }
+
+SearchPreviewModal.defaultProps = {
+	searchPreviewProps: {},
+	buttonProps: {},
+};
 
 export default SearchPreviewModal;
