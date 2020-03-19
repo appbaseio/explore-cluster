@@ -23,6 +23,7 @@ import { LanguageDropdown } from '../../components/LanguageDropdown';
 import languages from '../../constants/language';
 import { getDefaultSettings, putSettings } from '../../batteries/modules/actions';
 import { getLanguageFallback } from '../../utils/language';
+import { validSettingsPlans } from '../../utils';
 
 const RadioGroup = Radio.Group;
 
@@ -51,7 +52,8 @@ class CreateAppModal extends Component {
 			updateSettingsAction,
 			defaultSettings,
 			getDefaultSettingsAction,
-		} = this.props; //eslint-disable-line
+			tier,
+		} = this.props;
 		const { hasJSON, appName } = this.state;
 		let { language } = this.state;
 		language = getLanguageFallback(language);
@@ -66,14 +68,21 @@ class CreateAppModal extends Component {
 			});
 		};
 
-		if (createdApp.data && createdApp.data.acknowledged) {
-			if (defaultSettings) updateSettings(defaultSettings);
-			else
+		const handleSettingsUpdate = () => {
+			if (defaultSettings) {
+				updateSettings(defaultSettings);
+			} else {
 				getDefaultSettingsAction().then(res => {
 					if (res && res.payload) {
 						updateSettings(res.payload);
 					}
 				});
+			}
+		};
+
+		if (createdApp.data && createdApp.data.acknowledged) {
+			// restrict calling API if it's not a valid plan
+			if (tier && validSettingsPlans.indexOf(tier) !== -1) handleSettingsUpdate();
 			if (hasJSON === 'sample') {
 				history.push(`app/${appName}/import?load-data=true`);
 			} else if (hasJSON) {
@@ -283,6 +292,7 @@ const mapStateToProps = state => ({
 	appsMetrics: state.appsMetrics,
 	createdApp: state.createdApp,
 	defaultSettings: _get(state, '$getAppSettings.defaultSettings'),
+	tier: _get(state, '$getAppPlan.results.tier'),
 });
 
 const mapDispatchToProps = dispatch => ({

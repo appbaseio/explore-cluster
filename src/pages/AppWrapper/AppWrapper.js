@@ -12,7 +12,7 @@ import {
 } from '../../batteries/modules/actions';
 import Logo from '../../components/Logo';
 
-import { getParam } from '../../utils';
+import { getParam, validSettingsPlans } from '../../utils';
 import { breakpoints } from '../../utils/media';
 import Loader from '../../components/Loader';
 
@@ -176,7 +176,10 @@ class AppWrapper extends Component {
 			updateSettingsAction,
 			getDefaultSettingsAction,
 			getSettingsAction,
+			tier,
 		} = this.props;
+		// restrict calling API if it's not a valid plan
+		if (tier && validSettingsPlans.indexOf(tier) === -1) return;
 		if (!settings) {
 			this.setState({ loading: true });
 			const settingsResponse = await getSettingsAction(appName);
@@ -336,6 +339,7 @@ const mapStateToProps = state => {
 		currentApp: appName,
 		defaultSettings: get(state, '$getAppSettings.defaultSettings'),
 		settings: get(state, ['$getAppSettings', 'settings', appName]),
+		tier: get(state, '$getAppPlan.results.tier'),
 	};
 };
 
