@@ -173,12 +173,18 @@ class AggsPage extends React.Component {
 			? aggsResponse
 			: Object.keys(aggsResponse);
 		const searchableMappings = parsedMappings
-			.filter(mapping => mapping.usecase === 'search')
+			.filter(
+				mapping =>
+					mapping.usecase === 'search' ||
+					(mapping.usecase === 'none' && mapping.fieldType === 'text'),
+			)
 			.map(mapping => ({
 				_address: `${mapping.type}.${mapping.address.split('.').join('.properties.')}`,
 				address: mapping.address,
 				fields: mapping.fields,
 				type: mapping.type,
+				usecase: mapping.usecase,
+				fieldType: mapping.fieldType,
 			}));
 
 		return searchableMappings;
@@ -358,6 +364,14 @@ class AggsPage extends React.Component {
 		this.toggleVisible(true);
 	};
 
+	handleDeleteField = ({ address }) => {
+		const setMapping = get(this.mappingsRef, 'current.wrappedInstance.setMapping');
+
+		if (setMapping) {
+			setMapping(address, 'text', 'search');
+		}
+	};
+
 	render() {
 		const {
 			searchableMappings,
@@ -419,13 +433,11 @@ class AggsPage extends React.Component {
 							showCardWrapper={false}
 							hideSearchType
 							hideDelete
+							hideNoneTextType
 							hideDataType
 							isMappingsView={false}
 							renderMappingInfo={({ dirty }) => {
-								if (
-									!dirty &&
-									searchableMappings.length === traversedMappings.length
-								) {
+								if (searchableMappings.length === traversedMappings.length) {
 									return (
 										<p
 											style={{
@@ -442,6 +454,7 @@ class AggsPage extends React.Component {
 							}}
 							hidePropertiesType
 							onChange={this.handleMappingChange}
+							onDeleteField={this.handleDeleteField}
 							column={{
 								title: (
 									<React.Fragment>
@@ -533,9 +546,8 @@ class AggsPage extends React.Component {
 														</Option>
 													))}
 												</Select>
-												{!isDirty &&
-												searchableMappings.length ===
-													traversedMappings.length ? (
+												{searchableMappings.length ===
+												traversedMappings.length ? (
 													<span className={highlighter} />
 												) : null}
 											</Col>
