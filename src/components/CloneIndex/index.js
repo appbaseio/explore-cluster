@@ -22,7 +22,7 @@ const radioStyle = css`
 `;
 
 const CloneIndex = props => {
-	const { handleCancel, index, existingApps, history } = props;
+	const { handleCancel, index, existingApps, history, tier } = props;
 	const [destIndex, setDestIndex] = useState('');
 	const [action, setAction] = useState(['settings.mappings', 'data']);
 	const [loading, setLoading] = useState(false);
@@ -31,6 +31,10 @@ const CloneIndex = props => {
 	function resetValues() {
 		setLoading(false);
 		setDestIndex('');
+	}
+
+	function isValidPlan() {
+		return tier && validSettingsPlans.indexOf(tier) !== -1;
 	}
 
 	const handleSubmit = () => {
@@ -49,8 +53,8 @@ const CloneIndex = props => {
 		}
 		cloneApp(index, destIndex, { action: actions })
 			.then(async () => {
-				const { tier, getSettingsAction, updateSettingsAction, addApp } = props;
-				if (hasSearchRelevancy && tier && validSettingsPlans.indexOf(tier) !== -1) {
+				const { getSettingsAction, updateSettingsAction, addApp } = props;
+				if (hasSearchRelevancy && isValidPlan()) {
 					const res = await getSettingsAction(index);
 					if (res && res.payload) {
 						await updateSettingsAction(destIndex, res.payload);
@@ -71,6 +75,12 @@ const CloneIndex = props => {
 		setDestIndex(e.target.value);
 		setExists(existingApps.includes(e.target.value));
 	}
+
+	const searchRelevancyCheckbox = (
+		<Checkbox disabled={!isValidPlan()} className={radioStyle} value="search_relevancy">
+			Copy Search Relevancy Settings
+		</Checkbox>
+	);
 
 	return (
 		<Modal
@@ -116,9 +126,13 @@ const CloneIndex = props => {
 						</Checkbox>
 					</div>
 					<div>
-						<Checkbox className={radioStyle} value="search_relevancy">
-							Copy Search Relevancy Settings
-						</Checkbox>
+						{isValidPlan() ? (
+							searchRelevancyCheckbox
+						) : (
+							<Tooltip title="This feature is only available on selected plans.">
+								{searchRelevancyCheckbox}
+							</Tooltip>
+						)}
 					</div>
 				</Checkbox.Group>
 			</Row>
