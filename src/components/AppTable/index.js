@@ -33,10 +33,14 @@ const columns = [
 	{
 		title: 'Name',
 		dataIndex: 'index',
-		render: text => <Link to={`/app/${text}/overview`}>{text}</Link>,
+		render: (text, record) => (
+			<Link to={`/app/${record.alias || record.index}/overview`}>
+				{record.alias || record.index}
+			</Link>
+		),
 		sorter: (a, b) => {
-			if (a.index < b.index) return -1;
-			if (a.index > b.index) return 1;
+			if ((a.alias || a.index) < (b.alias || b.index)) return -1;
+			if ((a.alias || a.index) < (b.alias || b.index)) return 1;
 			return 0;
 		},
 		defaultSortOrder: 'ascend',

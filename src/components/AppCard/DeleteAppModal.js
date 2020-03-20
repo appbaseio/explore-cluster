@@ -21,6 +21,7 @@ class DeleteAppModal extends React.Component {
 			onDelete,
 			deleteSettingsAction,
 			tier,
+			index,
 		} = this.props;
 
 		this.setState({
@@ -31,7 +32,7 @@ class DeleteAppModal extends React.Component {
 			await deleteSettingsAction(appName);
 		}
 
-		deleteApp(appName)
+		deleteApp(index)
 			.then(() => {
 				handleRemoveApp(appName);
 				handleDeleteModal();
