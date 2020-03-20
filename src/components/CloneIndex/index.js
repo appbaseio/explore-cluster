@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { Col, Form, Icon, Input, message, Modal, notification, Radio, Row, Tooltip } from 'antd';
+import { Checkbox, Col, Form, Icon, Input, message, Modal, notification, Row, Tooltip } from 'antd';
 import { css } from 'emotion';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import { cloneApp } from '../../utils';
+import { flatten, get, isEmpty, map } from 'lodash';
+import { cloneApp, validSettingsPlans } from '../../utils';
 import { validateAppName } from '../../utils/helper';
+import { getSettings, putSettings } from '../../batteries/modules/actions';
+import { appendApp } from '../../actions';
 
 const centerAligned = css`
 	display: flex;
@@ -18,15 +21,20 @@ const radioStyle = css`
 	line-height: 30px;
 `;
 
-const CloneIndex = ({ handleCancel, index, existingApps, history }) => {
+const CloneIndex = props => {
+	const { handleCancel, index, existingApps, history, tier } = props;
 	const [destIndex, setDestIndex] = useState('');
-	const [action, setAction] = useState('mappings');
+	const [action, setAction] = useState(['settings.mappings', 'data']);
 	const [loading, setLoading] = useState(false);
 	const [exists, setExists] = useState(false);
 
 	function resetValues() {
 		setLoading(false);
 		setDestIndex('');
+	}
+
+	function isValidPlan() {
+		return tier && validSettingsPlans.indexOf(tier) !== -1;
 	}
 
 	const handleSubmit = () => {
@@ -38,10 +46,23 @@ const CloneIndex = ({ handleCancel, index, existingApps, history }) => {
 			return;
 		}
 		setLoading(true);
-		cloneApp(index, destIndex, { action })
-			.then(() => {
+		const actions = flatten(map(action, item => item.split('.')));
+		let hasSearchRelevancy;
+		if (actions.includes('search_relevancy')) {
+			hasSearchRelevancy = true;
+		}
+		cloneApp(index, destIndex, { action: actions })
+			.then(async () => {
+				const { getSettingsAction, updateSettingsAction, addApp } = props;
+				if (hasSearchRelevancy && isValidPlan()) {
+					const res = await getSettingsAction(index);
+					if (res && res.payload) {
+						await updateSettingsAction(destIndex, res.payload);
+					}
+				}
 				message.success(`${destIndex} successfully cloned from ${index}`);
 				resetValues();
+				addApp({ [destIndex]: {} });
 				history.push(`/app/${destIndex}/overview`);
 			})
 			.catch(e => {
@@ -55,6 +76,12 @@ const CloneIndex = ({ handleCancel, index, existingApps, history }) => {
 		setExists(existingApps.includes(e.target.value));
 	}
 
+	const searchRelevancyCheckbox = (
+		<Checkbox disabled={!isValidPlan()} className={radioStyle} value="search_relevancy">
+			Copy Search Relevancy Settings
+		</Checkbox>
+	);
+
 	return (
 		<Modal
 			title={`Clone Index ${index}`}
@@ -63,7 +90,7 @@ const CloneIndex = ({ handleCancel, index, existingApps, history }) => {
 			onCancel={handleCancel}
 			okText="Clone"
 			confirmLoading={loading}
-			okButtonProps={{ disabled: !destIndex || exists }}
+			okButtonProps={{ disabled: !destIndex || exists || isEmpty(action) }}
 		>
 			<Row className={centerAligned}>
 				<Col style={{ marginBottom: exists ? '20px' : '1px' }} span={8}>
@@ -87,14 +114,27 @@ const CloneIndex = ({ handleCancel, index, existingApps, history }) => {
 				</Col>
 			</Row>
 			<Row style={{ paddingTop: '35px' }}>
-				<Radio.Group defaultValue={action} onChange={e => setAction(e.target.value)}>
-					<Radio className={radioStyle} value="mappings">
-						Clone Mappings
-					</Radio>
-					<Radio className={radioStyle} value="data">
-						Clone Mappings and Copy Data
-					</Radio>
-				</Radio.Group>
+				<Checkbox.Group value={action} onChange={setAction}>
+					<div>
+						<Checkbox className={radioStyle} value="settings.mappings">
+							Clone Settings and Mappings
+						</Checkbox>
+					</div>
+					<div>
+						<Checkbox className={radioStyle} value="data">
+							Copy Index Data
+						</Checkbox>
+					</div>
+					<div>
+						{isValidPlan() ? (
+							searchRelevancyCheckbox
+						) : (
+							<Tooltip title="This feature is only available on selected plans.">
+								{searchRelevancyCheckbox}
+							</Tooltip>
+						)}
+					</div>
+				</Checkbox.Group>
 			</Row>
 		</Modal>
 	);
@@ -111,6 +151,13 @@ CloneIndex.defaultProps = {
 
 const mapStateToProps = state => ({
 	existingApps: Object.keys(state.apps.data || {}),
+	tier: get(state, '$getAppPlan.results.tier'),
 });
 
-export default withRouter(connect(mapStateToProps)(CloneIndex));
+const mapDispatchToProps = dispatch => ({
+	getSettingsAction: name => dispatch(getSettings(name)),
+	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
+	addApp: appName => dispatch(appendApp(appName)),
+});
+
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(CloneIndex));
