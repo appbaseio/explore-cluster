@@ -33,33 +33,6 @@ class Conditions extends React.Component {
 		} = this.props;
 		return (
 			<React.Fragment>
-				<label style={{ marginTop: 15 }}>
-					Trigger
-					<Info
-						content={
-							<>
-								When to trigger the rule. Choose one of the two options, a condition
-								or an always on trigger.{' '}
-								<a
-									href="https://docs.appbase.io/docs/search/Rules/#configure-if-condition"
-									target="_blank"
-									rel="noopener noreferrer"
-								>
-									Learn more
-								</a>
-							</>
-						}
-					/>
-				</label>
-				<Radio.Group
-					name="condition"
-					onChange={onChange}
-					value={condition}
-					style={{ display: 'flex', marginBottom: '15px' }}
-				>
-					<Radio value="filter">Set Condition</Radio>
-					<Radio value="always">Always Trigger</Radio>
-				</Radio.Group>
 				{condition === 'filter' ? (
 					<Row gutter={16}>
 						<Col xs={24}>{getErrorMessage(error)}</Col>
