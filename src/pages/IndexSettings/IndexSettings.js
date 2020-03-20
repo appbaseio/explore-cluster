@@ -21,7 +21,6 @@ import {
 import Replicas from './Replicas';
 import Shards from './Shards';
 import Loader from '../../batteries/components/shared/Loader';
-import { getReIndexedName } from '../../utils';
 import { appendApp, removeAppData } from '../../actions';
 
 const bannerMessage = {
@@ -147,15 +146,7 @@ class IndexSettings extends React.Component {
 	};
 
 	reIndex = async () => {
-		const {
-			appName,
-			credentials,
-			mappings,
-			history,
-			updateCurrentApp,
-			addApp,
-			deleteApp,
-		} = this.props;
+		const { appName, credentials, mappings } = this.props;
 		const { shards, replicas, esVersion } = this.state;
 		const type = getTypesFromMapping(mappings);
 		let appSettings = await getSettings(appName, credentials).then(
@@ -177,15 +168,7 @@ class IndexSettings extends React.Component {
 				this.setState({
 					isReindexing: false,
 				});
-
-				const updatedAppName = getReIndexedName(appName);
-				addApp({
-					[updatedAppName]: {},
-				});
-				updateCurrentApp(updatedAppName);
-				deleteApp(appName);
-
-				history.replace(`/app/${updatedAppName}/index-settings/`);
+				message.success('Number of shards updated successfully');
 			})
 			.catch(err => {
 				console.error(err);

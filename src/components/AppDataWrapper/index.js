@@ -50,7 +50,7 @@ function AppDataWrapper({ apps, onCreateModalChange }) {
 						alignItems: 'center',
 					}}
 				>
-					{app.index}
+					{app.alias || app.index}
 				</div>
 			);
 

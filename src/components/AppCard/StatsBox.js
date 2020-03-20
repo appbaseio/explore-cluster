@@ -83,7 +83,7 @@ function StatsBox(props) {
 	const cardTitle = (
 		<div
 			onClick={() => {
-				props.history.push(`/app/${data.index}/overview`);
+				props.history.push(`/app/${data.alias || data.index}/overview`);
 			}}
 			css={flex}
 		>

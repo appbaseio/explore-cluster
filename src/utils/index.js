@@ -88,7 +88,7 @@ export async function getESIndices(authToken) {
 
 	const indices = {};
 	data.forEach(item => {
-		indices[item.index] = item;
+		indices[item.alias || item.index] = item;
 	});
 
 	return indices;

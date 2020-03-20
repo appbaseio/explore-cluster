@@ -25,7 +25,7 @@ import {
 	reIndex,
 	getSettings as getAppSettings,
 } from '../../batteries/utils/mappings';
-import { getReIndexedName, validSettingsPlans } from '../../utils';
+import { validSettingsPlans } from '../../utils';
 import { buildLanguageAnalysis, getLanguageFallback } from '../../utils/language';
 import { isEqual } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
@@ -91,48 +91,17 @@ class LanguageSettings extends React.Component {
 		e.preventDefault();
 		const {
 			form: { getFieldValue, validateFields },
-			updateSettingsAction,
 			appName,
 			settings,
 			credentials,
 			fetchMappings,
 			deleteSettingsAction,
-			updateCurrentApp,
-			addApp,
-			deleteApp,
 		} = this.props;
 		const ACC_API = getURL();
 		validateFields((err, values) => {
-			const handleReIndexSuccess = (languagePayload, mappings) => {
-				const newName = getReIndexedName(appName);
-				const dataFields = cloneDeep(get(settings, 'search.dataField', []));
-				const fieldWeights = cloneDeep(get(settings, 'search.fieldWeights', []));
-				this.traverseDataFields(dataFields, fieldWeights, mappings, settings);
-				updateSettingsAction(newName, {
-					...settings,
-					language: languagePayload,
-					search: {
-						...settings.search,
-						dataField: dataFields,
-						fieldWeights,
-					},
-				}).then(response => {
-					if (response && response.payload) {
-						const { history } = this.props;
-						message.success(`Language settings for ${appName} saved successfully`);
-						const updatedAppName = getReIndexedName(appName);
-						addApp({ [updatedAppName]: {} });
-						deleteApp(appName);
-						updateCurrentApp(updatedAppName);
-						history.replace(`/app/${updatedAppName}/languages/`);
-					} else {
-						this.setState({ loading: false });
-						notification.error({
-							message: 'Failed to save Language Settings',
-							description: get(response, 'error.message'),
-						});
-					}
-				});
+			const handleReIndexSuccess = () => {
+				this.setState({ loading: false });
+				message.success(`Language settings for ${appName} saved successfully`);
 			};
 
 			const handleReIndexError = reIndexErr => {

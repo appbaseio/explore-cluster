@@ -329,22 +329,7 @@ class SearchSettingsPage extends React.Component {
 
 	reIndex = async () => {
 		const reIndex = get(this.mappingsRef, 'current.wrappedInstance.reIndex');
-		const { dataField, typoTolerance, hasTypoTolerance, hasSearchOperators } = this.state;
-		const { updateSettingsAction, appName, settings, deleteSettingsAction } = this.props;
-
-		deleteSettingsAction(appName);
-		reIndex(() =>
-			updateSettingsAction(getReIndexedName(appName), {
-				...settings,
-				search: {
-					...((settings && settings.search) || {}),
-					fuzziness: hasTypoTolerance ? typoTolerance : 0,
-					dataField: Object.keys(dataField),
-					fieldWeights: Object.values(dataField),
-					searchOperators: hasSearchOperators,
-				},
-			}),
-		);
+		reIndex();
 	};
 
 	handleUsecaseChange = (field, type, usecase) => {

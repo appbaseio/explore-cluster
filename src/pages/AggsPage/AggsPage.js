@@ -36,7 +36,7 @@ import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { SettingsFooter } from '../../components/SettingsFooter';
 import { ReviewAndSave } from '../../components/ReviewAndSave';
 import { container } from '../ResultsPage/styles';
-import { getReIndexedName, validSettingsPlans } from '../../utils';
+import { validSettingsPlans } from '../../utils';
 import { settingsMap } from '../../components/ReviewAndSave/helper';
 import { isEqual } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
@@ -326,22 +326,8 @@ class AggsPage extends React.Component {
 
 	reIndex = async () => {
 		const reIndex = get(this.mappingsRef, 'current.wrappedInstance.reIndex');
-		const { dataField, sort, count, includeNullValue } = this.state;
-		const { updateSettingsAction, appName, settings, deleteSettingsAction } = this.props;
 
-		deleteSettingsAction(appName);
-		reIndex(() =>
-			updateSettingsAction(getReIndexedName(appName), {
-				...settings,
-				aggregations: {
-					...((settings && settings.aggregations) || {}),
-					dataField,
-					size: count,
-					sortBy: sort,
-					includeNullValues: includeNullValue,
-				},
-			}),
-		);
+		reIndex();
 	};
 
 	resetChanges = () => {
@@ -436,8 +422,9 @@ class AggsPage extends React.Component {
 							hideDelete
 							hideNoneTextType
 							hideDataType
+							hideGeoType
 							isMappingsView={false}
-							renderMappingInfo={({ dirty }) => {
+							renderMappingInfo={() => {
 								if (searchableMappings.length === traversedMappings.length) {
 									return (
 										<p
