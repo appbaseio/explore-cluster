@@ -140,7 +140,7 @@ function StatsBox(props) {
 
 					<AppActions
 						onExploreClick={() => {
-							props.history.push(`/app/${data.index}/overview`);
+							props.history.push(`/app/${data.alias || data.index}/overview`);
 						}}
 						title={title}
 						data={data}

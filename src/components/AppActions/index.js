@@ -71,7 +71,9 @@ class AppActions extends Component {
 					deleteModal={deleteModal}
 					handleDeleteModal={this.handleDeleteModal}
 				/>
-				{cloneModal && <CloneIndex handleCancel={this.handleCancel} index={data.index} />}
+				{cloneModal && (
+					<CloneIndex handleCancel={this.handleCancel} index={data.alias || data.index} />
+				)}
 			</div>
 		);
 	}

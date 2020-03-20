@@ -91,7 +91,7 @@ function AppTable({ apps, history, onCreateModalChange }) {
 			expandedRowRender={record => (
 				<AppActions
 					onExploreClick={() => {
-						history.push(`/app/${record.index}/overview`);
+						history.push(`/app/${record.alias || record.index}/overview`);
 					}}
 					data={record}
 				/>
