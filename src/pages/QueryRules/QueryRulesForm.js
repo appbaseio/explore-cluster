@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import React from 'react';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
@@ -15,6 +16,7 @@ import {
 	Input,
 	message,
 	notification,
+	Radio,
 	Result,
 	Row,
 	Skeleton,
@@ -23,7 +25,6 @@ import {
 	Typography,
 } from 'antd';
 import moment from 'moment';
-
 import IndexDropdown from './components/IndexDropdown';
 import Conditions from './components/Conditions';
 import ActionSelector from './components/ActionSelector';
@@ -48,6 +49,19 @@ import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Overlay from '../../components/Overlay';
 import { mediaKey } from '../../utils/media';
 import { getSingleFunction } from '../../batteries/utils/app';
+
+import { updateAppScreenPreferences } from '../../actions';
+import {
+	AdvancedEditor,
+	CustomAutoComplete,
+	parseExpression,
+} from '../../components/AdvancedEditor';
+
+const customReactFilter = css`
+	.react-filter-box {
+		height: 36px;
+	}
+`;
 
 const { RangePicker } = DatePicker;
 
@@ -151,11 +165,13 @@ class QueryRulesForm extends React.Component {
 
 			error: {},
 			loading: false,
+
+			showAdvancedEditor: false,
 		};
 	}
 
 	componentDidMount() {
-		const { rules, fetchRules, rule } = this.props;
+		const { rules, fetchRules, rule, preferences } = this.props;
 		const { isEditPage } = this.state;
 		if (!(rules && rules.length)) {
 			fetchRules();
@@ -164,6 +180,7 @@ class QueryRulesForm extends React.Component {
 		if (isEditPage && rule) {
 			this.setState({
 				...rule,
+				showAdvancedEditor: get(preferences, `showAdvancedEditor.${rule.id}`),
 			});
 		}
 		this.setState({ loading: true });
@@ -324,11 +341,13 @@ class QueryRulesForm extends React.Component {
 			isEditPage,
 			enabled,
 			timeframe,
+			showAdvancedEditor,
+			advancedExpression,
 		} = this.state;
 
 		let { actions } = this.state;
 
-		const { createRule, updateRule } = this.props;
+		const { createRule, updateRule, updatePreferences } = this.props;
 
 		const hasError = !!Object.keys(error).length;
 
@@ -337,14 +356,18 @@ class QueryRulesForm extends React.Component {
 			description,
 			trigger: {
 				type: condition,
-				expression: getExpressionFromValue({
-					selectedIndexes,
-					dataFieldValue,
-					dataField,
-					query,
-					queryValue,
-					condition,
-				}),
+				expression: showAdvancedEditor
+					? `'${selectedIndexes.join(',')}' in $index and ${parseExpression(
+							advancedExpression,
+					  )}`
+					: getExpressionFromValue({
+							selectedIndexes,
+							dataFieldValue,
+							dataField,
+							query,
+							queryValue,
+							condition,
+					  }),
 				timeframe,
 			},
 		};
@@ -376,14 +399,12 @@ class QueryRulesForm extends React.Component {
 					id: rule.id,
 					enabled,
 				}).then(res => {
+					updatePreferences({ showAdvancedEditor: { [rule.id]: showAdvancedEditor } });
 					const prevFunction = get(
 						unparsedRule.actions.find(rule => rule.type === 'function'),
 						'data',
 					);
-					const newFunction = get(
-						actions.find(rule => rule.type === 'function'),
-						'data',
-					);
+					const newFunction = get(actions.find(rule => rule.type === 'function'), 'data');
 					if (prevFunction !== newFunction && prevFunction) {
 						getSingleFunction(prevFunction).then(func => {
 							updateFunction({
@@ -405,6 +426,9 @@ class QueryRulesForm extends React.Component {
 				});
 			} else {
 				createRule(params).then(res => {
+					updatePreferences({
+						showAdvancedEditor: { [get(res, 'payload.id')]: showAdvancedEditor },
+					});
 					updateFunction({
 						selectedFunction,
 						res,
@@ -428,6 +452,10 @@ class QueryRulesForm extends React.Component {
 			'enabled',
 			'timeframe',
 		];
+
+		const { showAdvancedEditor } = this.state;
+
+		if (showAdvancedEditor) keys.push('advancedExpression');
 
 		const { rule } = this.props;
 		if (rule) {
@@ -454,6 +482,23 @@ class QueryRulesForm extends React.Component {
 		}
 	};
 
+	onParseOk = () => {
+		if (!this._query) return;
+		this.setState(prevState => ({
+			advancedExpression: this._query,
+			error: {
+				...prevState.error,
+				condition: {
+					hasError: false,
+				},
+			},
+		}));
+	};
+
+	toggleAdvancedEditor = () => {
+		this.setState(prevState => ({ showAdvancedEditor: !prevState.showAdvancedEditor }));
+	};
+
 	render() {
 		const {
 			condition,
@@ -473,6 +518,7 @@ class QueryRulesForm extends React.Component {
 			timeframe,
 			mappings,
 			loading,
+			showAdvancedEditor,
 		} = this.state;
 		const {
 			isCreating,
@@ -485,6 +531,14 @@ class QueryRulesForm extends React.Component {
 			unparsedRule,
 			tier,
 		} = this.props;
+
+		this.customAutoComplete = new CustomAutoComplete(
+			null,
+			dataFields.map(dataField => ({
+				columnField: dataField,
+				type: 'selection',
+			})),
+		);
 
 		if (tier && validPlans.indexOf(tier) === -1) {
 			return (
@@ -607,17 +661,33 @@ class QueryRulesForm extends React.Component {
 							</Col>
 
 							<Col md={12} sm={24}>
-								<Conditions
+								<label style={{ marginTop: 15 }}>
+									Trigger
+									<Info
+										content={
+											<>
+												When to trigger the rule. Choose one of the two
+												options, a condition or an always on trigger.{' '}
+												<a
+													href="https://docs.appbase.io/docs/search/Rules/#configure-if-condition"
+													target="_blank"
+													rel="noopener noreferrer"
+												>
+													Learn more
+												</a>
+											</>
+										}
+									/>
+								</label>
+								<Radio.Group
+									name="condition"
 									onChange={this.handleInput}
-									error={error.condition}
-									condition={condition}
-									dataFields={dataFields}
-									dataField={dataField}
-									dataFieldValue={dataFieldValue}
-									query={query}
-									onDropdownChange={this.handleDropdown}
-									queryValue={queryValue}
-								/>
+									value={condition}
+									style={{ display: 'flex', marginBottom: '15px' }}
+								>
+									<Radio value="filter">Set Condition</Radio>
+									<Radio value="always">Always Trigger</Radio>
+								</Radio.Group>
 								<div style={{ marginBottom: 15 }}>
 									<label>
 										Index to apply rule to
@@ -630,6 +700,49 @@ class QueryRulesForm extends React.Component {
 										onChange={this.handleIndex}
 									/>
 								</div>
+								{condition === 'filter' && (
+									<label
+										style={{
+											marginBottom: 15,
+											color: '#1890ff',
+											cursor: 'pointer',
+										}}
+										onClick={this.toggleAdvancedEditor}
+									>
+										{showAdvancedEditor ? 'Hide' : 'Show'} Advanced Editor
+									</label>
+								)}
+								{!showAdvancedEditor && (
+									<>
+										<Conditions
+											onChange={this.handleInput}
+											error={error.condition}
+											condition={condition}
+											dataFields={dataFields}
+											dataField={dataField}
+											dataFieldValue={dataFieldValue}
+											query={query}
+											onDropdownChange={this.handleDropdown}
+											queryValue={queryValue}
+										/>
+									</>
+								)}
+								{showAdvancedEditor && condition === 'filter' && (
+									<div className={customReactFilter}>
+										<label>
+											Advanced Editor
+											<Info content="Handle complex queries with nested operations." />
+										</label>
+										{getErrorMessage(error.condition)}
+										<AdvancedEditor
+											onChange={query => {
+												this._query = query;
+											}}
+											autoCompleteHandler={this.customAutoComplete}
+											onParseOk={this.onParseOk}
+										/>
+									</div>
+								)}
 
 								<label>
 									Timeframe (optional)
@@ -776,6 +889,7 @@ const mapStateToProps = (state, props) => {
 			updateError: get(ruleData, 'update.error'),
 			isDeleting: get(ruleData, 'isDeleting'),
 			deleteError: get(ruleData, 'deleteError'),
+			preferences: state.appsScreenPreferences,
 		};
 	}
 
@@ -787,6 +901,10 @@ const mapDispatchToProps = dispatch => ({
 	createRule: rule => dispatch(addQueryRule(rule)),
 	updateRule: rule => dispatch(putRule(rule)),
 	removeRule: id => dispatch(deleteRule(id)),
+	updatePreferences: payload => dispatch(updateAppScreenPreferences(payload)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(QueryRulesForm);
+export default connect(
+	mapStateToProps,
+	mapDispatchToProps,
+)(QueryRulesForm);
