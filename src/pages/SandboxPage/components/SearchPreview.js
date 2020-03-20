@@ -220,7 +220,9 @@ class SearchPreview extends React.Component {
 					enableAppbase
 					credentials={credentials}
 					url={url}
-					analytics={isAnalyticsEnabled}
+					appbaseConfig={{
+						recordAnalytics: isAnalyticsEnabled,
+					}}
 				>
 					<Col md={6}>
 						<Filter app={app} aggs={aggregations} />

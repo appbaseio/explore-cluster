@@ -32,7 +32,7 @@ import { getAggsMappings } from '../../batteries/utils/mappings';
 import { ReviewAndSave } from '../../components/ReviewAndSave';
 import { SettingsFooter } from '../../components/SettingsFooter';
 import { container } from '../ResultsPage/styles';
-import { getReIndexedName, getSubFields, validSettingsPlans } from '../../utils';
+import { getSubFields, validSettingsPlans } from '../../utils';
 import { settingsMap } from '../../components/ReviewAndSave/helper';
 import { isEqual } from '../../batteries/utils';
 import mappingUsecase from '../../batteries/utils/mappingUsecase';
@@ -205,11 +205,12 @@ class SearchSettingsPage extends React.Component {
 	handleAddField = value => {
 		if (get(this.mappingsRef, 'current.wrappedInstance', null)) {
 			const { aggsMappings } = this.state;
+			const { settings } = this.props;
 			const mapping = aggsMappings.find(item => item._address === value);
 
 			const esVersion = get(this.mappingsRef, 'current.wrappedInstance.state.esVersion');
 			const setMapping = get(this.mappingsRef, 'current.wrappedInstance.setMapping');
-
+			const hasLanguage = get(settings, 'language.language') !== 'universal';
 			if (esVersion && setMapping) {
 				const address = +esVersion > 6 ? `properties.${value}` : value;
 
@@ -217,7 +218,9 @@ class SearchSettingsPage extends React.Component {
 
 				if (mapping) {
 					const fields = getSubFields({
-						fields: mappingUsecase.searchaggs.fields,
+						fields: hasLanguage
+							? { ...mappingUsecase.searchaggs.fields, lang: {} }
+							: { ...mappingUsecase.searchaggs.fields },
 						weight: 1,
 						address: mapping.address,
 					});
@@ -478,7 +481,7 @@ class SearchSettingsPage extends React.Component {
 							onUsecaseChange={this.handleUsecaseChange}
 							hideDataType
 							isMappingsView={false}
-							renderMappingInfo={({ dirty }) => {
+							renderMappingInfo={() => {
 								if (
 									aggsMappings.length + this.noUseCaseMappings.length ===
 									traversedMappings.length
