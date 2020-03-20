@@ -95,21 +95,41 @@ class LanguageSettings extends React.Component {
 			settings,
 			credentials,
 			fetchMappings,
-			deleteSettingsAction,
+			updateSettingsAction,
 		} = this.props;
 		const ACC_API = getURL();
 		validateFields((err, values) => {
-			const handleReIndexSuccess = () => {
-				this.setState({ loading: false });
-				message.success(`Language settings for ${appName} saved successfully`);
-			};
-
 			const handleReIndexError = reIndexErr => {
 				this.setState({ loading: false });
 				notification.error({
 					message: 'error',
 					description: reIndexErr.message,
 				});
+			};
+			const handleReIndexSuccess = (languagePayload, mappings) => {
+				const dataFields = cloneDeep(get(settings, 'search.dataField', []));
+				const fieldWeights = cloneDeep(get(settings, 'search.fieldWeights', []));
+				this.traverseDataFields(dataFields, fieldWeights, mappings, settings);
+				updateSettingsAction(appName, {
+					...settings,
+					language: languagePayload,
+					search: {
+						...settings.search,
+						dataField: dataFields,
+						fieldWeights,
+					},
+				})
+					.then(response => {
+						this.setState({ loading: false });
+						if (response && response.payload) {
+							message.success(`Language settings for ${appName} saved successfully`);
+						} else {
+							handleReIndexError(get(response, 'error'));
+						}
+					})
+					.catch(err2 => {
+						handleReIndexError(err2);
+					});
 			};
 
 			const reIndexAndUpdateSettings = async languagePayload => {
@@ -124,7 +144,6 @@ class LanguageSettings extends React.Component {
 						const analyzerMappings = this.getAnalyzerMappings(res, getFieldValue);
 						const language = this.getFallBackLanguage(getFieldValue);
 						this.setState({ loading: true });
-						deleteSettingsAction(appName);
 						const analysis = buildLanguageAnalysis(language, languagePayload);
 						const { analyzer, filter } = get(appSettings, 'index.analysis', {});
 						const { analyzer: analyzerNew, filter: filterNew } = analysis || {};
