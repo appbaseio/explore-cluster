@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Card, Form, Input, message, notification, Select, Switch } from 'antd';
 
-import { cloneDeep, get, omit, omitBy, pick } from 'lodash';
+import { cloneDeep, compact, get, omit, omitBy, pick } from 'lodash';
 import {
 	deleteSettings,
 	getAppMappings,
@@ -247,9 +247,11 @@ class LanguageSettings extends React.Component {
 	getLanguagePayload = values => {
 		const languagePayload = pick(values, ['language', 'applyStopwords', 'normalizeDiacritics']);
 		const { customStopwords, stemmingExceptions } = values;
-		languagePayload.customStopwords = customStopwords ? customStopwords.split(',') : [];
+		languagePayload.customStopwords = customStopwords
+			? compact(customStopwords.trim().split(','))
+			: [];
 		languagePayload.stemmingExceptions = stemmingExceptions
-			? stemmingExceptions.split(',')
+			? compact(stemmingExceptions.trim().split(','))
 			: [];
 		return languagePayload;
 	};
