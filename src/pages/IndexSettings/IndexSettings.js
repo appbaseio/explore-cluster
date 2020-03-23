@@ -111,7 +111,6 @@ class IndexSettings extends React.Component {
 			},
 			credentials,
 		})
-			.then(data => data.json())
 			.then(res => {
 				if (res.acknowledged) {
 					message.success('Replicas updated successfully');

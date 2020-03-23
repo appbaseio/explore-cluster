@@ -457,7 +457,36 @@ class SearchSettingsPage extends React.Component {
 				</React.Fragment>
 			);
 		}
+		const sortedDataField = Object.keys(dataField)
+			.sort()
+			.reduce((agg, field) => {
+				return {
+					...agg,
+					[field]: dataField[field],
+				};
+			}, {});
+		const fieldWeights = get(settings, 'search.fieldWeights', []);
+		const savedDataField = get(settings, 'search.dataField', []).reduce((agg, field, index) => {
+			return {
+				...agg,
+				[field]: fieldWeights[index],
+			};
+		}, {});
 
+		const sortedSavedDataField = Object.keys(savedDataField)
+			.sort()
+			.reduce((agg, field) => {
+				return {
+					...agg,
+					[field]: dataField[field],
+				};
+			}, {});
+
+		const { dataField: savedField, fieldWeights: savedWeight, ...rest } = get(
+			settings,
+			'search',
+			{},
+		);
 		return (
 			<React.Fragment>
 				<Banner {...bannerMessage} />
@@ -673,12 +702,16 @@ class SearchSettingsPage extends React.Component {
 							<ReviewAndSave
 								loading={isUpdating}
 								isReset={isReset}
-								oldValues={get(settings, 'search')}
+								oldValues={{
+									...rest,
+									dataField: Object.keys(sortedSavedDataField),
+									fieldWeights: Object.values(sortedSavedDataField),
+								}}
 								newValues={{
 									fuzziness: hasTypoTolerance ? typoTolerance : 0,
 									searchOperators: hasSearchOperators,
-									dataField: Object.keys(dataField),
-									fieldWeights: Object.values(dataField),
+									dataField: Object.keys(sortedDataField),
+									fieldWeights: Object.values(sortedDataField),
 								}}
 								onClick={() => this.toggleVisible(false)}
 								visible={visible}
