@@ -4,7 +4,7 @@ export default {
 			filter: {
 				universal_stop: {
 					type: 'stop',
-					stopwords: [],
+					stopwords: '_english_',
 				},
 			},
 			analyzer: {

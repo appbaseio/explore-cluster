@@ -72,8 +72,8 @@ const defaultRoutes = {
 			{ label: 'Search Settings', link: 'search', tag: 'Beta', openIndexMenu: true },
 			{ label: 'Aggregation Settings', link: 'aggs', tag: 'Beta', openIndexMenu: true },
 			{ label: 'Result Settings', link: 'results', tag: 'Beta', openIndexMenu: true },
-			{ label: 'Schema', link: 'settings', tag: 'Beta', openIndexMenu: true },
 			{ label: 'Index Settings', link: 'index-settings', tag: 'Beta', openIndexMenu: true },
+			{ label: 'Schema', link: 'settings', tag: 'Beta', openIndexMenu: true },
 		],
 	},
 	Security: {

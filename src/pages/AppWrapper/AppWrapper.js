@@ -58,8 +58,8 @@ const routes = {
 			{ label: 'Search Settings', link: 'search', tag: 'Beta' },
 			{ label: 'Aggregation Settings', link: 'aggs', tag: 'Beta' },
 			{ label: 'Result Settings', link: 'results', tag: 'Beta' },
-			{ label: 'Schema', link: 'settings', tag: 'Beta' },
 			{ label: 'Index Settings', link: 'index-settings', tag: 'Beta' },
+			{ label: 'Schema', link: 'settings', tag: 'Beta' },
 		],
 	},
 	Security: {

@@ -523,3 +523,19 @@ export const validSettingsPlans = [
 	'2019-production-4',
 	'arc-enterprise',
 ];
+
+function ltrim(str) {
+	if (!str) return str;
+	return str.replace(/^\s+/g, '');
+}
+
+function rtrim(str) {
+	if (!str) return str;
+	return str.replace(/\s+$/g, '');
+}
+
+export function removeWhiteSpaces(str) {
+	str = ltrim(str);
+	str = rtrim(str);
+	return str;
+}

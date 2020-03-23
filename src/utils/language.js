@@ -3,6 +3,14 @@ import languages from '../constants/language';
 
 export function buildLanguageAnalysis(language, languagePayload) {
 	const analysis = cloneDeep(get(languages, [language, 'analysis']));
+
+	const getStopwords = () => {
+		const defaultStopWords = get(analysis, `filter.${language}_stop.stopwords`);
+		const { customStopwords, applyStopwords } = languagePayload;
+		if (defaultStopWords && applyStopwords) return [defaultStopWords, ...customStopwords];
+		return customStopwords;
+	};
+
 	if (analysis) {
 		if (!languagePayload.applyStopwords) {
 			omit(analysis.filter, `${language}_stop`);
@@ -12,7 +20,7 @@ export function buildLanguageAnalysis(language, languagePayload) {
 				...analysis.filter,
 				[`${language}_stop`]: {
 					type: 'stop',
-					stopwords: languagePayload.customStopwords,
+					stopwords: getStopwords(),
 				},
 			};
 		}

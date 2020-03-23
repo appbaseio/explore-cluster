@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import React from 'react';
 import { connect } from 'react-redux';
 import { Card, Form, Input, message, notification, Select, Switch } from 'antd';
@@ -22,10 +23,10 @@ import { SettingTooltip } from '../../components/SettingTooltip';
 import {
 	applyLanguageAnalyzers,
 	getESVersion,
-	reIndex,
 	getSettings as getAppSettings,
+	reIndex,
 } from '../../batteries/utils/mappings';
-import { validSettingsPlans } from '../../utils';
+import { removeWhiteSpaces, validSettingsPlans } from '../../utils';
 import { buildLanguageAnalysis, getLanguageFallback } from '../../utils/language';
 import { isEqual } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
@@ -210,7 +211,7 @@ class LanguageSettings extends React.Component {
 					const fieldIndex = get(settings, 'search.dataField', []).findIndex(
 						field => field === keyPath,
 					);
-					if (!dataFields.includes(`${keyPath}.lang`)) {
+					if (!dataFields.includes(`${keyPath}.lang` && fieldIndex !== -1)) {
 						dataFields.push(`${keyPath}.lang`);
 						fieldWeights.push(get(settings, `search.fieldWeights.${fieldIndex}`, 1));
 					}
@@ -236,10 +237,20 @@ class LanguageSettings extends React.Component {
 		const languagePayload = pick(values, ['language', 'applyStopwords', 'normalizeDiacritics']);
 		const { customStopwords, stemmingExceptions } = values;
 		languagePayload.customStopwords = customStopwords
-			? compact(customStopwords.trim().split(','))
+			? compact(
+					customStopwords
+						.trim()
+						.split(',')
+						.map(str => removeWhiteSpaces(str)),
+			  )
 			: [];
 		languagePayload.stemmingExceptions = stemmingExceptions
-			? compact(stemmingExceptions.trim().split(','))
+			? compact(
+					stemmingExceptions
+						.trim()
+						.split(',')
+						.map(str => removeWhiteSpaces(str)),
+			  )
 			: [];
 		return languagePayload;
 	};
