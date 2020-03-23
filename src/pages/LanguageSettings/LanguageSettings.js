@@ -32,6 +32,7 @@ import { isEqual } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import { appendApp, removeAppData } from '../../actions';
 import { settingsMap } from '../../components/ReviewAndSave/helper';
+import Loader from '../../components/Loader';
 
 const bannerDetails = {
 	title: 'Language Settings',
@@ -47,7 +48,7 @@ const bannerMessage = {
 };
 
 class LanguageSettings extends React.Component {
-	state = { visible: false, loading: false };
+	state = { visible: false, loading: false, initiating: false };
 
 	async componentDidMount() {
 		const {
@@ -57,9 +58,11 @@ class LanguageSettings extends React.Component {
 			credentials,
 			getDefaultSettingsAction,
 		} = this.props;
+		this.setState({ initiating: true });
 		const esVersion = await getESVersion(appName, credentials);
 		this.setState({ esVersion });
 		getSettingsAction(appName).then(res => {
+			this.setState({ initiating: false });
 			if (res && res.payload) {
 				this.setFormValues(res, setFieldsValue);
 			}
@@ -140,11 +143,12 @@ class LanguageSettings extends React.Component {
 					data => data[appName].settings,
 				);
 
+				this.setState({ loading: true });
+
 				fetchMappings(appName, credentials, ACC_API).then(res => {
 					if (res && res.payload) {
 						const analyzerMappings = this.getAnalyzerMappings(res, getFieldValue);
 						const language = this.getFallBackLanguage(getFieldValue);
-						this.setState({ loading: true });
 						const analysis = buildLanguageAnalysis(language, languagePayload);
 						const { analyzer, filter } = get(appSettings, 'index.analysis', {});
 						const { analyzer: analyzerNew, filter: filterNew } = analysis || {};
@@ -292,7 +296,9 @@ class LanguageSettings extends React.Component {
 			tier,
 			appName,
 		} = this.props;
-		const { visible, loading, isReset } = this.state;
+		const { visible, loading, isReset, initiating } = this.state;
+
+		if (initiating) return <Loader />;
 
 		if (tier && validSettingsPlans.indexOf(tier) === -1) {
 			return (
