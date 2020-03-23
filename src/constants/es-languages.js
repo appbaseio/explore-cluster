@@ -22,7 +22,7 @@ export const languages = [
 	},
 	{
 		value: 'brazilian',
-		label: 'Brazilian',
+		label: 'Brazilian Portuguese',
 	},
 	{
 		value: 'bulgarian',
@@ -35,22 +35,6 @@ export const languages = [
 	{
 		value: 'chinese',
 		label: 'Chinese',
-	},
-	{
-		value: 'japanese',
-		label: 'Japanese',
-	},
-	{
-		value: 'korean',
-		label: 'Korean',
-	},
-	{
-		value: 'polish',
-		label: 'Polish',
-	},
-	{
-		value: 'ukranian',
-		label: 'Ukranian',
 	},
 	{
 		value: 'cjk',
@@ -117,6 +101,14 @@ export const languages = [
 		label: 'Italian',
 	},
 	{
+		value: 'japanese',
+		label: 'Japanese',
+	},
+	{
+		value: 'korean',
+		label: 'Korean',
+	},
+	{
 		value: 'latvian',
 		label: 'Latvian',
 	},
@@ -131,6 +123,10 @@ export const languages = [
 	{
 		value: 'persian',
 		label: 'Persian',
+	},
+	{
+		value: 'polish',
+		label: 'Polish',
 	},
 	{
 		value: 'portuguese',
@@ -157,11 +153,15 @@ export const languages = [
 		label: 'Swedish',
 	},
 	{
+		value: 'thai',
+		label: 'Thai',
+	},
+	{
 		value: 'turkish',
 		label: 'Turkish',
 	},
 	{
-		value: 'thai',
-		label: 'Thai',
+		value: 'ukranian',
+		label: 'Ukranian',
 	},
 ];
