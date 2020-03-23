@@ -35,7 +35,7 @@ const Shards = ({
 			onCancel={() => handleModal('shardsModal')}
 		>
 			<h4>
-				Move slider to change the number of shards for your app. Read more{' '}
+				Update value to change the number of shards for your app. Read more{' '}
 				<a
 					target="_blank"
 					rel="noopener noreferrer"
