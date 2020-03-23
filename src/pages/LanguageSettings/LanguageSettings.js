@@ -215,7 +215,7 @@ class LanguageSettings extends React.Component {
 					const fieldIndex = get(settings, 'search.dataField', []).findIndex(
 						field => field === keyPath,
 					);
-					if (!dataFields.includes(`${keyPath}.lang` && fieldIndex !== -1)) {
+					if (!dataFields.includes(`${keyPath}.lang`) && fieldIndex !== -1) {
 						dataFields.push(`${keyPath}.lang`);
 						fieldWeights.push(get(settings, `search.fieldWeights.${fieldIndex}`, 1));
 					}
