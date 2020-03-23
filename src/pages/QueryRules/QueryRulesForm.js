@@ -404,7 +404,10 @@ class QueryRulesForm extends React.Component {
 						unparsedRule.actions.find(rule => rule.type === 'function'),
 						'data',
 					);
-					const newFunction = get(actions.find(rule => rule.type === 'function'), 'data');
+					const newFunction = get(
+						actions.find(rule => rule.type === 'function'),
+						'data',
+					);
 					if (prevFunction !== newFunction && prevFunction) {
 						getSingleFunction(prevFunction).then(func => {
 							updateFunction({
@@ -532,13 +535,13 @@ class QueryRulesForm extends React.Component {
 			tier,
 		} = this.props;
 
-		this.customAutoComplete = new CustomAutoComplete(
-			null,
-			dataFields.map(dataField => ({
+		this.customAutoComplete = new CustomAutoComplete(null, [
+			{ columnField: '$query', type: 'selection' },
+			...dataFields.map(dataField => ({
 				columnField: dataField,
 				type: 'selection',
 			})),
-		);
+		]);
 
 		if (tier && validPlans.indexOf(tier) === -1) {
 			return (
@@ -904,7 +907,4 @@ const mapDispatchToProps = dispatch => ({
 	updatePreferences: payload => dispatch(updateAppScreenPreferences(payload)),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(QueryRulesForm);
+export default connect(mapStateToProps, mapDispatchToProps)(QueryRulesForm);

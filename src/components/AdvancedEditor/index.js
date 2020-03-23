@@ -40,17 +40,33 @@ const operators = [
 ];
 
 export const parseOperator = (query, operator) => {
-	const filterRegex = new RegExp(`(\\w*) ${operator} (\\w*)`, 'g');
+	const filterRegex = new RegExp(`(?![$query ])(\\w*) ${operator} (\\w*)`, 'g');
 	query = query.replace(filterRegex, `$filter.$1 ${operator} '$2'`);
 	return query;
 };
 
+function parseQueryOperator(query, operator) {
+	const queryRegex = new RegExp(`(\\$query) ${operator} (\\w*)`);
+	query = query.replace(queryRegex, `$1 ${operator} '$2'`);
+	return query;
+}
+
+function parseQuery(query) {
+	operators.forEach(op => {
+		query = parseQueryOperator(query, op);
+	});
+	const queryNegationRegex = new RegExp(`(\\$query) (doesnot(\\w*)) ('\\w*')`, 'g');
+	query = query.replace(queryNegationRegex, 'not ($1 $3 $4)');
+	return query;
+}
+
 export const parseExpression = (query = '') => {
-	const regex = new RegExp(`(\\$\\w*\\.\\w*) (doesnot(\\w*)) ('\\w*')`, 'g');
+	const negationRegex = new RegExp(`(\\$\\w*\\.\\w*) (doesnot(\\w*)) ('\\w*')`, 'g');
 	operators.forEach(op => {
 		query = parseOperator(query, op);
 	});
-	query = query.replace(regex, 'not ($1 $3 $4)');
+	query = parseQuery(query);
+	query = query.replace(negationRegex, 'not ($1 $3 $4)');
 	query = query.replace(/AND/g, 'and');
 	query = query.replace(/OR/g, 'or');
 	return query;
