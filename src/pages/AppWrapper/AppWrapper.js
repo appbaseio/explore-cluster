@@ -30,7 +30,6 @@ const routes = {
 			{ label: 'Import Data', link: 'import' },
 			{ label: 'Browse Data', link: 'browse' },
 			{ label: 'Request Logs', link: 'request-logs' },
-			{ label: 'Query Explorer', link: 'query' },
 			{ label: 'Search Preview', link: 'search-preview', tag: 'Beta' },
 			{ label: 'Functions', link: '/cluster/functions', tag: 'Beta', hasExactPath: true },
 			{ label: 'Query Rules', link: '/cluster/rules', tag: 'Beta', hasExactPath: true },

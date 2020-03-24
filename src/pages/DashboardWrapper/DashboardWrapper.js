@@ -41,10 +41,9 @@ const defaultRoutes = {
 	Develop: {
 		icon: 'dashboard',
 		menu: [
-			{ label: 'Import Data', link: '/cluster/import' },
+			{ label: 'Import Data', link: 'import', openIndexMenu: true },
 			{ label: 'Browse Data', link: '/cluster/browse' },
 			{ label: 'Request Logs', link: '/cluster/request-logs' },
-			{ label: 'Query Explorer', link: 'query', openIndexMenu: true },
 			{ label: 'Search Preview', link: 'search-preview', tag: 'Beta', openIndexMenu: true },
 			{ label: 'Functions', link: '/cluster/functions', tag: 'Beta' },
 			{ label: 'Query Rules', link: '/cluster/rules', tag: 'Beta' },
