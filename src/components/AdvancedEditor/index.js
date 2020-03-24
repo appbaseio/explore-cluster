@@ -81,7 +81,7 @@ const unParseOperator = (query, operator) => {
 };
 
 const unParseQueryOperator = (query, operator) => {
-	const queryRegex = new RegExp(`(\\$query) ${operator} '(\\w*)'`);
+	const queryRegex = new RegExp(`(\\$query) ${operator} '(\\w*)'`, 'g');
 	query = query.replace(queryRegex, `$1 ${operator} $2`);
 	return query;
 };
