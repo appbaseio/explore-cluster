@@ -54,6 +54,7 @@ import { updateAppScreenPreferences } from '../../actions';
 import {
 	AdvancedEditor,
 	CustomAutoComplete,
+	getRawQuery,
 	parseExpression,
 } from '../../components/AdvancedEditor';
 
@@ -171,16 +172,18 @@ class QueryRulesForm extends React.Component {
 	}
 
 	componentDidMount() {
-		const { rules, fetchRules, rule, preferences } = this.props;
+		const { rules, fetchRules, rule, preferences, unparsedRule } = this.props;
 		const { isEditPage } = this.state;
 		if (!(rules && rules.length)) {
 			fetchRules();
 		}
 
 		if (isEditPage && rule) {
+			const { showAdvancedEditor, rawQuery } = getRawQuery(preferences, unparsedRule);
 			this.setState({
 				...rule,
-				showAdvancedEditor: get(preferences, `showAdvancedEditor.${rule.id}`),
+				showAdvancedEditor,
+				rawQuery,
 			});
 		}
 		this.setState({ loading: true });
@@ -211,12 +214,17 @@ class QueryRulesForm extends React.Component {
 			deleteError,
 			isDeleting,
 			history,
+			preferences,
+			unparsedRule,
 		} = this.props;
 		const { isEditPage } = this.state;
 
 		if (isEditPage && prevProps.rule !== rule) {
+			const { showAdvancedEditor, rawQuery } = getRawQuery(preferences, unparsedRule);
 			this.setState({
 				...rule,
+				showAdvancedEditor,
+				rawQuery,
 			});
 		}
 
@@ -486,9 +494,10 @@ class QueryRulesForm extends React.Component {
 	};
 
 	onParseOk = () => {
-		if (!this._query) return;
+		const { rawQuery } = this.state;
+		if (!rawQuery) return;
 		this.setState(prevState => ({
-			advancedExpression: this._query,
+			advancedExpression: rawQuery,
 			error: {
 				...prevState.error,
 				condition: {
@@ -522,6 +531,7 @@ class QueryRulesForm extends React.Component {
 			mappings,
 			loading,
 			showAdvancedEditor,
+			rawQuery,
 		} = this.state;
 		const {
 			isCreating,
@@ -738,8 +748,9 @@ class QueryRulesForm extends React.Component {
 										</label>
 										{getErrorMessage(error.condition)}
 										<AdvancedEditor
-											onChange={query => {
-												this._query = query;
+											query={rawQuery}
+											onChange={raw => {
+												this.setState({ rawQuery: raw });
 											}}
 											autoCompleteHandler={this.customAutoComplete}
 											onParseOk={this.onParseOk}
@@ -884,15 +895,18 @@ const mapStateToProps = (state, props) => {
 
 	if (id) {
 		const ruleData = defaultState.rules.find(rule => rule.id === id);
+		const preferences = state.appsScreenPreferences;
 		return {
 			...defaultState,
-			rule: getParsedRule(ruleData),
+			rule: get(preferences, `showAdvancedEditor.${ruleData && ruleData.id}`)
+				? getParsedRule(ruleData)
+				: ruleData,
 			unparsedRule: ruleData,
 			isUpdating: get(ruleData, 'update.isLoading'),
 			updateError: get(ruleData, 'update.error'),
 			isDeleting: get(ruleData, 'isDeleting'),
 			deleteError: get(ruleData, 'deleteError'),
-			preferences: state.appsScreenPreferences,
+			preferences,
 		};
 	}
 
