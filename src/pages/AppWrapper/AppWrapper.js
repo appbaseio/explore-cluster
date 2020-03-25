@@ -60,6 +60,7 @@ const routes = {
 			{ label: 'Result Settings', link: 'results', tag: 'Beta' },
 			{ label: 'Index Settings', link: 'index-settings', tag: 'Beta' },
 			{ label: 'Schema', link: 'settings', tag: 'Beta' },
+			{ label: 'Synonyms', link: 'synonyms', tag: 'Beta' },
 		],
 	},
 	Security: {

@@ -74,6 +74,7 @@ const defaultRoutes = {
 			{ label: 'Result Settings', link: 'results', tag: 'Beta', openIndexMenu: true },
 			{ label: 'Index Settings', link: 'index-settings', tag: 'Beta', openIndexMenu: true },
 			{ label: 'Schema', link: 'settings', tag: 'Beta', openIndexMenu: true },
+			{ label: 'Synonyms', link: 'synonyms', tag: 'Beta', openIndexMenu: true },
 		],
 	},
 	Security: {
