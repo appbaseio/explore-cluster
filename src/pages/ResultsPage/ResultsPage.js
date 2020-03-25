@@ -443,10 +443,11 @@ class ResultsPage extends React.Component {
 const mapStateToProps = state => {
 	const appName = get(state, '$getCurrentApp.name');
 	const mappings = getTraversedMappingsByAppName(state);
+	const parsedMappings = Array.isArray(mappings) ? mappings : [];
 	const { username, password } = get(state, 'user.data', {});
 	return {
 		appName,
-		mappings: isEmpty(mappings) ? [] : mappings,
+		mappings: isEmpty(parsedMappings) ? [] : parsedMappings,
 		credentials: `${username}:${password}`,
 		isLoading: get(state, '$getAppSettings.isFetching'),
 		settings: get(state, ['$getAppSettings', 'settings', appName]),
