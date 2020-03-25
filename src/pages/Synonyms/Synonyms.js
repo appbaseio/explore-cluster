@@ -6,7 +6,10 @@ import { get } from 'lodash';
 
 import { container } from '../ResultsPage/styles';
 import SynonymsModal from './components/SynonymsModal';
-import { getSynonyms } from './api';
+import { getSynonyms, deleteSynonym } from './api';
+import { getURL } from '../../constants/config';
+import { getSettings, getMappings } from '../../batteries/utils/mappings';
+import { getSynonymsAnalyzerSettings, updateSynonymsSettings } from './utils';
 
 const expression = css`
 	.light {
@@ -16,29 +19,6 @@ const expression = css`
 	}
 `;
 
-const data = [
-	{
-		type: 'equivalent',
-		synonym: 'a, b',
-		id: '1',
-	},
-	{
-		type: 'one-way',
-		synonym: 'a, b => c',
-		id: '2',
-	},
-	{
-		type: 'equivalent',
-		synonym: 'a, d,e,g',
-		id: '3',
-	},
-	{
-		type: 'one-way',
-		synonym: 'a, b => z',
-		id: '4',
-	},
-];
-
 class Synonyms extends React.Component {
 	state = {
 		isFetching: false,
@@ -46,6 +26,10 @@ class Synonyms extends React.Component {
 	};
 
 	componentDidMount() {
+		this.fetchSynonym();
+	}
+
+	fetchSynonym = () => {
 		const { appName, credentials } = this.props;
 		this.setState({
 			isFetching: true,
@@ -66,10 +50,64 @@ class Synonyms extends React.Component {
 					isFetching: false,
 				});
 			});
-	}
+	};
+
+	handleDelete = async id => {
+		const { credentials, appName } = this.props;
+		const { synonyms } = this.state;
+		const url = getURL();
+		this.setState({
+			isDeleting: id,
+		});
+		const settings = await getSettings(appName, credentials, url).then(
+			data => data[appName].settings,
+		);
+
+		const mappings = await getMappings(appName, credentials, url);
+		const syonymsToBeSaved = synonyms.filter(syn => syn._id !== id).map(item => item.synonym);
+		const synonymsAnalyzerSettings = getSynonymsAnalyzerSettings({
+			settings,
+			isSynonymsAnalyzerPresent: true,
+			synonyms: syonymsToBeSaved,
+		});
+
+		const updateBackend = () => {
+			deleteSynonym({
+				credentials,
+				id,
+			})
+				.then(() => {
+					this.setState({
+						isDeleting: null,
+					});
+					message.success('Successfully deleted synonym');
+				})
+				.catch(e => {
+					this.setState({
+						isDeleting: null,
+					});
+					message.error(e.message || 'Failed while deleting synonym');
+				});
+		};
+
+		updateSynonymsSettings({
+			needReindex: false,
+			mappings,
+			settings: {
+				analysis: synonymsAnalyzerSettings,
+			},
+			credentials,
+			appName,
+		})
+			.then(updateBackend)
+			.catch(e => {
+				this.toggleLoading();
+				message.error(e.message || 'Failed to delete synonyms');
+			});
+	};
 
 	render() {
-		const { synonyms, isFetching } = this.state;
+		const { synonyms, isFetching, isDeleting } = this.state;
 		const columns = [
 			{
 				title: 'Type',
@@ -96,7 +134,7 @@ class Synonyms extends React.Component {
 			},
 			{
 				title: 'Action',
-				dataIndex: 'id',
+				dataIndex: '_id',
 				key: 'id',
 				render: (value, record) => {
 					return (
@@ -104,7 +142,8 @@ class Synonyms extends React.Component {
 							<SynonymsModal
 								type={record.type}
 								indexSynonyms={synonyms}
-								id={record.id}
+								id={record._id}
+								refetch={this.fetchSynonym}
 								synonyms={record.synonym}
 								renderButton={({ handleModal }) => {
 									return (
@@ -121,7 +160,9 @@ class Synonyms extends React.Component {
 							<Button
 								shape="circle-outline"
 								size="small"
+								loading={isDeleting === value}
 								type="danger"
+								onClick={() => this.handleDelete(value)}
 								icon="delete"
 							/>
 						</div>
@@ -137,6 +178,7 @@ class Synonyms extends React.Component {
 						{/* Datasearch would come here for filtering */}
 						<SynonymsModal
 							indexSynonyms={synonyms}
+							refetch={this.fetchSynonym}
 							isAddModal
 							renderButton={({ handleModal }) => {
 								return (
@@ -150,7 +192,7 @@ class Synonyms extends React.Component {
 					<Table
 						loading={isFetching}
 						rowKey={row => {
-							return row.id;
+							return row._id;
 						}}
 						bordered={false}
 						dataSource={synonyms}

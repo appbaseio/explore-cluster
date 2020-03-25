@@ -11,10 +11,11 @@ import {
 	getSynonymsAnalyzerSettings,
 	getParsedSynonyms,
 	getUpdatedSynonymsSubfields,
-	applySynonyms,
+	updateSynonymsSettings,
 } from '../utils';
-import { getURL, getVersion } from '../../../constants/config';
-import { getSettings, getMappings, reIndex } from '../../../batteries/utils/mappings';
+import { getURL } from '../../../constants/config';
+import { getSettings, getMappings } from '../../../batteries/utils/mappings';
+import { updateSynonyms } from '../api';
 
 const { Option } = Select;
 
@@ -64,7 +65,15 @@ class SynonymsModal extends React.Component {
 
 	handleSave = async () => {
 		this.toggleLoading();
-		const { appName, credentials, url, indexSynonyms: allSynonyms, id } = this.props;
+		const {
+			appName,
+			credentials,
+			url,
+			indexSynonyms: allSynonyms,
+			id,
+			isAddModal,
+			refetch,
+		} = this.props;
 		const { type, alternatives, synonyms, searchTerm } = this.state;
 
 		// TODO: We need to consider already exisiting synonyms
@@ -77,7 +86,6 @@ class SynonymsModal extends React.Component {
 			data => data[appName].settings,
 		);
 
-		const version = getVersion();
 		const isSynonymsAnalyzerPresent = hasSynonymsAnalyzer(settings);
 		let mappings = await getMappings(appName, credentials, url);
 
@@ -95,50 +103,40 @@ class SynonymsModal extends React.Component {
 			mappings = getUpdatedSynonymsSubfields(mappings);
 		}
 
-		const handleReindex = () => {
-			reIndex({
-				mappings,
-				settings: synonymsAnalyzerSettings,
-				appId: appName,
-				version,
-				credentials,
-			})
-				.then(res => {
-					this.toggleLoading();
-					message.success('Successfully updated synonyms');
-				})
-				.catch(e => {
-					this.toggleLoading();
-					message.success('Failed while updating synonyms');
-				});
-		};
-
-		if (!hasSubfield) {
-			// we need to update mappings that's why reindex is required
-			handleReindex();
-		} else {
-			applySynonyms({
+		const handleSaveData = () => {
+			updateSynonyms({
 				appName,
 				credentials,
-				settings: {
-					analysis: synonymsAnalyzerSettings,
-				},
-				url,
+				synonyms: isAddModal
+					? [{ synonym: parsedSynonyms, type, index: appName }]
+					: [{ _id: id, synonym: parsedSynonyms, type, index: appName }],
 			})
 				.then(() => {
 					this.toggleLoading();
+					this.handleModal();
+					refetch();
 					message.success('Synonyms updated Successfully');
 				})
 				.catch(e => {
-					if (e.message === 'AWS') {
-						handleReindex();
-					} else {
-						this.toggleLoading();
-						message.success('Failed while updating synonyms');
-						console.error('Error');
-					}
+					this.toggleLoading();
+					message.error(e.message || 'Failed while updating synonyms');
 				});
-		}
+		};
+
+		updateSynonymsSettings({
+			needReindex: !hasSubfield,
+			mappings,
+			settings: {
+				analysis: synonymsAnalyzerSettings,
+			},
+			credentials,
+			appName,
+		})
+			.then(handleSaveData)
+			.catch(e => {
+				this.toggleLoading();
+				message.error(e.message || 'Failed to update synonyms');
+			});
 	};
 
 	render() {

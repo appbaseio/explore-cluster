@@ -20,7 +20,7 @@ export const getSynonyms = ({ appName, credentials }) => {
 export const updateSynonyms = ({ appName, credentials, synonyms }) => {
 	const url = getURL();
 	return new Promise((resolve, reject) => {
-		fetch(`${url}/_synonym/${appName}`, {
+		fetch(`${url}/_synonyms/${appName}`, {
 			method: 'PUT',
 			headers: {
 				...getAuthHeaders(credentials),
@@ -37,7 +37,7 @@ export const updateSynonyms = ({ appName, credentials, synonyms }) => {
 export const deleteSynonym = ({ id, credentials }) => {
 	const url = getURL();
 	return new Promise((resolve, reject) => {
-		fetch(`${url}/_synonym/${id}`, {
+		fetch(`${url}/_synonyms/${id}`, {
 			method: 'DELETE',
 			headers: {
 				...getAuthHeaders(credentials),
