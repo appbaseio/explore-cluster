@@ -66,7 +66,7 @@ export const getSynonymsAnalyzerSettings = ({ settings, isSynonymsAnalyzerPresen
 				...get(settings, 'index.analysis.filter', {}),
 				synonym_graph: {
 					type: 'synonym_graph',
-					synonyms: synonyms.join(','),
+					synonyms: synonyms.filter(Boolean),
 				},
 			},
 			analyzer: {

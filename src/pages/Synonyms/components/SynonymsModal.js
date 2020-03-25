@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Select, Tooltip, Icon } from 'antd';
+import { Modal, Select, Tooltip, Icon, message } from 'antd';
 import { get } from 'lodash';
 import { connect } from 'react-redux';
 
@@ -24,6 +24,7 @@ class SynonymsModal extends React.Component {
 		const { synonyms, type } = props;
 		const synonymsState = getSynonymsState({ synonyms, type });
 		this.state = {
+			isLoading: false,
 			showModal: false,
 			type: type || 'equivalent',
 
@@ -36,6 +37,12 @@ class SynonymsModal extends React.Component {
 			...synonymsState,
 		};
 	}
+
+	toggleLoading = () => {
+		this.setState(prevState => ({
+			isLoading: !prevState.isLoading,
+		}));
+	};
 
 	handleModal = () => {
 		this.setState(state => ({
@@ -56,12 +63,14 @@ class SynonymsModal extends React.Component {
 	};
 
 	handleSave = async () => {
-		// Pseudo Code
-		const { appName, credentials, url } = this.props;
+		this.toggleLoading();
+		const { appName, credentials, url, indexSynonyms: allSynonyms, id } = this.props;
 		const { type, alternatives, synonyms, searchTerm } = this.state;
 
 		// TODO: We need to consider already exisiting synonyms
-		// const indexSynonyms = []
+		const indexSynonyms = id
+			? allSynonyms.filter(syn => syn._id !== id).map(item => item.synonym)
+			: allSynonyms.map(item => item.synonym);
 
 		const parsedSynonyms = getParsedSynonyms({ type, alternatives, synonyms, searchTerm });
 		const settings = await getSettings(appName, credentials, url).then(
@@ -79,7 +88,7 @@ class SynonymsModal extends React.Component {
 		const synonymsAnalyzerSettings = getSynonymsAnalyzerSettings({
 			settings,
 			isSynonymsAnalyzerPresent,
-			synonyms: [parsedSynonyms],
+			synonyms: [...indexSynonyms, parsedSynonyms],
 		});
 		if (!hasSubfield) {
 			// update all subfields for search
@@ -93,7 +102,15 @@ class SynonymsModal extends React.Component {
 				appId: appName,
 				version,
 				credentials,
-			}).then(res => console.log(res));
+			})
+				.then(res => {
+					this.toggleLoading();
+					message.success('Successfully updated synonyms');
+				})
+				.catch(e => {
+					this.toggleLoading();
+					message.success('Failed while updating synonyms');
+				});
 		};
 
 		if (!hasSubfield) {
@@ -104,15 +121,20 @@ class SynonymsModal extends React.Component {
 				appName,
 				credentials,
 				settings: {
-					analysis: settings.index.analysis,
+					analysis: synonymsAnalyzerSettings,
 				},
 				url,
 			})
-				.then(res => console.log(res))
+				.then(() => {
+					this.toggleLoading();
+					message.success('Synonyms updated Successfully');
+				})
 				.catch(e => {
 					if (e.message === 'AWS') {
 						handleReindex();
 					} else {
+						this.toggleLoading();
+						message.success('Failed while updating synonyms');
 						console.error('Error');
 					}
 				});
@@ -120,7 +142,7 @@ class SynonymsModal extends React.Component {
 	};
 
 	render() {
-		const { showModal, type, alternatives, synonyms, searchTerm } = this.state;
+		const { showModal, type, alternatives, synonyms, searchTerm, isLoading } = this.state;
 		const { renderButton } = this.props;
 		return (
 			<React.Fragment>
@@ -133,6 +155,10 @@ class SynonymsModal extends React.Component {
 					visible={showModal}
 					onCancel={this.handleModal}
 					onOk={this.handleSave}
+					okText="Update"
+					okButtonProps={{
+						loading: isLoading,
+					}}
 				>
 					<label>
 						Select Type{' '}
