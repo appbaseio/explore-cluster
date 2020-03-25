@@ -45,10 +45,7 @@ const defaultRoutes = {
 			{ label: 'Browse Data', link: '/cluster/browse' },
 			{ label: 'Request Logs', link: '/cluster/request-logs' },
 			{ label: 'Search Preview', link: 'search-preview', tag: 'Beta', openIndexMenu: true },
-			{ label: 'Functions', link: '/cluster/functions', tag: 'Beta' },
-			{ label: 'Query Rules', link: '/cluster/rules', tag: 'Beta' },
 			{ label: 'Search Templates', link: '/cluster/search-templates', tag: 'Beta' },
-			{ label: 'Query Suggestions', link: '/cluster/query-suggestions', tag: 'Beta' },
 		],
 	},
 	Analytics: {
@@ -73,6 +70,9 @@ const defaultRoutes = {
 			{ label: 'Result Settings', link: 'results', tag: 'Beta', openIndexMenu: true },
 			{ label: 'Index Settings', link: 'index-settings', tag: 'Beta', openIndexMenu: true },
 			{ label: 'Schema', link: 'settings', tag: 'Beta', openIndexMenu: true },
+			{ label: 'Query Suggestions', link: '/cluster/query-suggestions', tag: 'Beta' },
+			{ label: 'Query Rules', link: '/cluster/rules', tag: 'Beta' },
+			{ label: 'Functions', link: '/cluster/functions', tag: 'Beta' },
 		],
 	},
 	Security: {
