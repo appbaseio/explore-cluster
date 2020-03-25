@@ -107,8 +107,7 @@ export const unParseExpression = (query = '') => {
 	return query;
 };
 
-export const getRawQuery = (preferences, unparsedRule) => {
-	const showAdvancedEditor = get(preferences, `showAdvancedEditor.${unparsedRule.id}`);
+export const getRawQuery = (showAdvancedEditor, unparsedRule) => {
 	let rawQuery;
 	if (showAdvancedEditor) {
 		rawQuery = get(unparsedRule, 'trigger.expression', '');
@@ -117,8 +116,5 @@ export const getRawQuery = (preferences, unparsedRule) => {
 		else rawQuery = rawQuery[0];
 		rawQuery = unParseExpression(rawQuery);
 	}
-	return {
-		showAdvancedEditor,
-		rawQuery,
-	};
+	return unParseExpression(rawQuery);
 };

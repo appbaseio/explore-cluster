@@ -1,4 +1,4 @@
-/* eslint-disable no-param-reassign */
+/* eslint-disable no-param-reassign,camelcase */
 import React from 'react';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
@@ -50,7 +50,6 @@ import Overlay from '../../components/Overlay';
 import { mediaKey } from '../../utils/media';
 import { getSingleFunction } from '../../batteries/utils/app';
 
-import { updateAppScreenPreferences } from '../../actions';
 import {
 	AdvancedEditor,
 	CustomAutoComplete,
@@ -166,23 +165,20 @@ class QueryRulesForm extends React.Component {
 
 			error: {},
 			loading: false,
-
-			showAdvancedEditor: false,
 		};
 	}
 
 	componentDidMount() {
-		const { rules, fetchRules, rule, preferences, unparsedRule } = this.props;
+		const { rules, fetchRules, rule, unparsedRule } = this.props;
 		const { isEditPage } = this.state;
 		if (!(rules && rules.length)) {
 			fetchRules();
 		}
 
 		if (isEditPage && rule) {
-			const { showAdvancedEditor, rawQuery } = getRawQuery(preferences, unparsedRule);
+			const rawQuery = getRawQuery(rule.show_advance_editor, unparsedRule);
 			this.setState({
 				...rule,
-				showAdvancedEditor,
 				rawQuery,
 			});
 		}
@@ -214,16 +210,14 @@ class QueryRulesForm extends React.Component {
 			deleteError,
 			isDeleting,
 			history,
-			preferences,
 			unparsedRule,
 		} = this.props;
 		const { isEditPage } = this.state;
 
 		if (isEditPage && prevProps.rule !== rule) {
-			const { showAdvancedEditor, rawQuery } = getRawQuery(preferences, unparsedRule);
+			const rawQuery = getRawQuery(rule.show_advance_editor, unparsedRule);
 			this.setState({
 				...rule,
-				showAdvancedEditor,
 				rawQuery,
 			});
 		}
@@ -349,22 +343,23 @@ class QueryRulesForm extends React.Component {
 			isEditPage,
 			enabled,
 			timeframe,
-			showAdvancedEditor,
+			show_advance_editor,
 			advancedExpression,
 		} = this.state;
 
 		let { actions } = this.state;
 
-		const { createRule, updateRule, updatePreferences } = this.props;
+		const { createRule, updateRule } = this.props;
 
 		const hasError = !!Object.keys(error).length;
 
 		const params = {
 			name,
 			description,
+			show_advance_editor,
 			trigger: {
 				type: condition,
-				expression: showAdvancedEditor
+				expression: show_advance_editor
 					? `'${selectedIndexes.join(',')}' in $index and ${parseExpression(
 							advancedExpression,
 					  )}`
@@ -407,7 +402,6 @@ class QueryRulesForm extends React.Component {
 					id: rule.id,
 					enabled,
 				}).then(res => {
-					updatePreferences({ showAdvancedEditor: { [rule.id]: showAdvancedEditor } });
 					const prevFunction = get(
 						unparsedRule.actions.find(rule => rule.type === 'function'),
 						'data',
@@ -437,9 +431,6 @@ class QueryRulesForm extends React.Component {
 				});
 			} else {
 				createRule(params).then(res => {
-					updatePreferences({
-						showAdvancedEditor: { [get(res, 'payload.id')]: showAdvancedEditor },
-					});
 					updateFunction({
 						selectedFunction,
 						res,
@@ -464,9 +455,9 @@ class QueryRulesForm extends React.Component {
 			'timeframe',
 		];
 
-		const { showAdvancedEditor } = this.state;
+		const { show_advance_editor } = this.state;
 
-		if (showAdvancedEditor) keys.push('advancedExpression');
+		if (show_advance_editor) keys.push('advancedExpression');
 
 		const { rule } = this.props;
 		if (rule) {
@@ -508,7 +499,7 @@ class QueryRulesForm extends React.Component {
 	};
 
 	toggleAdvancedEditor = () => {
-		this.setState(prevState => ({ showAdvancedEditor: !prevState.showAdvancedEditor }));
+		this.setState(prevState => ({ show_advance_editor: !prevState.show_advance_editor }));
 	};
 
 	render() {
@@ -530,7 +521,7 @@ class QueryRulesForm extends React.Component {
 			timeframe,
 			mappings,
 			loading,
-			showAdvancedEditor,
+			show_advance_editor,
 			rawQuery,
 		} = this.state;
 		const {
@@ -722,10 +713,10 @@ class QueryRulesForm extends React.Component {
 										}}
 										onClick={this.toggleAdvancedEditor}
 									>
-										{showAdvancedEditor ? 'Hide' : 'Show'} Advanced Editor
+										{show_advance_editor ? 'Hide' : 'Show'} Advanced Editor
 									</label>
 								)}
-								{!showAdvancedEditor && (
+								{!show_advance_editor && (
 									<>
 										<Conditions
 											onChange={this.handleInput}
@@ -740,7 +731,7 @@ class QueryRulesForm extends React.Component {
 										/>
 									</>
 								)}
-								{showAdvancedEditor && condition === 'filter' && (
+								{show_advance_editor && condition === 'filter' && (
 									<div className={customReactFilter}>
 										<label>
 											Advanced Editor
@@ -895,18 +886,14 @@ const mapStateToProps = (state, props) => {
 
 	if (id) {
 		const ruleData = defaultState.rules.find(rule => rule.id === id);
-		const preferences = state.appsScreenPreferences;
 		return {
 			...defaultState,
-			rule: get(preferences, `showAdvancedEditor.${ruleData && ruleData.id}`)
-				? getParsedRule(ruleData)
-				: ruleData,
+			rule: get(ruleData, 'show_advance_editor') ? ruleData : getParsedRule(ruleData),
 			unparsedRule: ruleData,
 			isUpdating: get(ruleData, 'update.isLoading'),
 			updateError: get(ruleData, 'update.error'),
 			isDeleting: get(ruleData, 'isDeleting'),
 			deleteError: get(ruleData, 'deleteError'),
-			preferences,
 		};
 	}
 
@@ -918,7 +905,6 @@ const mapDispatchToProps = dispatch => ({
 	createRule: rule => dispatch(addQueryRule(rule)),
 	updateRule: rule => dispatch(putRule(rule)),
 	removeRule: id => dispatch(deleteRule(id)),
-	updatePreferences: payload => dispatch(updateAppScreenPreferences(payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(QueryRulesForm);

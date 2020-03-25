@@ -25,7 +25,7 @@ const getErrorMessages = state => {
 		condition,
 		dataField,
 		selectedIndexes,
-		showAdvancedEditor,
+		show_advance_editor,
 		advancedExpression,
 	} = state;
 	const error = {};
@@ -71,7 +71,7 @@ const getErrorMessages = state => {
 	if (condition === 'filter') {
 		const isDataFieldsPresent = !!(dataField && dataFieldValue);
 		const isQueryPresent = !!queryValue;
-		if (showAdvancedEditor) {
+		if (show_advance_editor) {
 			if (!advancedExpression)
 				error.condition = {
 					hasError: true,

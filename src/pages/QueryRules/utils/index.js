@@ -13,6 +13,7 @@ const getParsedRule = rule => {
 		values.order = rule.order;
 		values.timeframe = rule.trigger.timeframe || null;
 		values.condition = rule.trigger.type;
+		values.show_advance_editor = rule.show_advance_editor;
 
 		values = { ...values, ...getValueFromExpression(rule.trigger.expression) };
 
