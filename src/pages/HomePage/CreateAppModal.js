@@ -45,7 +45,7 @@ class CreateAppModal extends Component {
 		resetApp();
 	}
 
-	componentDidUpdate = () => {
+	componentDidUpdate = async () => {
 		const {
 			createdApp,
 			history,
@@ -58,8 +58,8 @@ class CreateAppModal extends Component {
 		let { language } = this.state;
 		language = getLanguageFallback(language);
 
-		const updateSettings = settings => {
-			updateSettingsAction(appName, {
+		const updateSettings = async settings => {
+			await updateSettingsAction(appName, {
 				...settings,
 				language: {
 					...settings.language,
@@ -68,13 +68,13 @@ class CreateAppModal extends Component {
 			});
 		};
 
-		const handleSettingsUpdate = () => {
+		const handleSettingsUpdate = async () => {
 			if (defaultSettings) {
-				updateSettings(defaultSettings);
+				await updateSettings(defaultSettings);
 			} else {
-				getDefaultSettingsAction().then(res => {
+				getDefaultSettingsAction().then(async res => {
 					if (res && res.payload) {
-						updateSettings(res.payload);
+						await updateSettings(res.payload);
 					}
 				});
 			}
@@ -82,7 +82,7 @@ class CreateAppModal extends Component {
 
 		if (createdApp.data && createdApp.data.acknowledged) {
 			// restrict calling API if it's not a valid plan
-			if (tier && validSettingsPlans.indexOf(tier) !== -1) handleSettingsUpdate();
+			if (tier && validSettingsPlans.indexOf(tier) !== -1) await handleSettingsUpdate();
 			if (hasJSON === 'sample') {
 				history.push(`app/${appName}/import?load-data=true`);
 			} else if (hasJSON) {
