@@ -14,6 +14,7 @@ import { getAppPlan } from '../../batteries/modules/actions';
 import { getParam } from '../../utils';
 import { LabelTag } from '../../components/LabelTag';
 import { IndexSwitcher } from '../../components/IndexSwitcher';
+import { loadApps } from '../../actions';
 
 const NoMatch = Loadable({
 	loader: () => import('../../NoMatch'),
@@ -185,9 +186,19 @@ class DashboardWrapper extends Component {
 	}
 
 	componentDidMount() {
-		const { isClusterPlanFetched, fetchClusterPlan, isClusterPlanFetching } = this.props;
+		const {
+			isClusterPlanFetched,
+			fetchClusterPlan,
+			isClusterPlanFetching,
+			apps,
+			fetchApps,
+		} = this.props;
 		if (!isClusterPlanFetching && !isClusterPlanFetched) {
 			fetchClusterPlan();
+		}
+
+		if (!apps) {
+			fetchApps();
 		}
 	}
 
@@ -348,6 +359,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
 	fetchClusterPlan: () => dispatch(getAppPlan()),
+	fetchApps: () => dispatch(loadApps()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DashboardWrapper);

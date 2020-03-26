@@ -17,7 +17,7 @@ import { SettingsFooter } from '../../components/SettingsFooter';
 import { container, label } from '../ResultsPage/styles';
 import { LanguageDropdown } from '../../components/LanguageDropdown';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
-import { getURL } from '../../constants/config';
+import { getURL, getVersion } from '../../constants/config';
 import { ReviewAndSave } from '../../components/ReviewAndSave';
 import { SettingTooltip } from '../../components/SettingTooltip';
 import {
@@ -59,7 +59,7 @@ class LanguageSettings extends React.Component {
 			getDefaultSettingsAction,
 		} = this.props;
 		this.setState({ initiating: true });
-		const esVersion = await getESVersion(appName, credentials);
+		const esVersion = getVersion() || (await getESVersion(appName, credentials));
 		this.setState({ esVersion });
 		getSettingsAction(appName).then(res => {
 			this.setState({ initiating: false });

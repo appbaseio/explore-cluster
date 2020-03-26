@@ -41,8 +41,9 @@ class CreateAppModal extends Component {
 	}
 
 	componentDidMount() {
-		const { resetApp } = this.props;
+		const { resetApp, defaultSettings, getDefaultSettingsAction } = this.props;
 		resetApp();
+		if (!defaultSettings) getDefaultSettingsAction();
 	}
 
 	componentDidUpdate = async () => {

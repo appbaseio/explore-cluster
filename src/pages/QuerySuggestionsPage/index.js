@@ -36,6 +36,14 @@ const bannerDetails = {
 	href: 'https://docs.appbase.io/docs/analytics/Implement/',
 };
 
+const cardStyle = css`
+	max-width: 800px;
+	margin: auto;
+	.ant-card-body {
+		padding: 24px 0;
+	}
+`;
+
 class QuerySuggestions extends React.Component {
 	constructor(props) {
 		super(props);
@@ -166,8 +174,8 @@ class QuerySuggestions extends React.Component {
 				<Banner {...bannerDetails} />
 				<Container css={main}>
 					{total !== undefined && get(preferences, 'index') && (
-						<Card>
-							<Flex justifyContent="space-between">
+						<Card className={cardStyle}>
+							<Flex justifyContent="space-between" style={{ alignItems: 'center' }}>
 								<Flex>
 									<Alert
 										message={`Last synced ${total} query suggestions at ${moment(
