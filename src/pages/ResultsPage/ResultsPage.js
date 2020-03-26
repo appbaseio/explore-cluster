@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import React from 'react';
 import { connect } from 'react-redux';
 import { Card, Form, Input, InputNumber, message, notification, Select, Switch } from 'antd';
@@ -115,6 +116,8 @@ class ResultsPage extends React.Component {
 		getFieldDecorator('number_of_fragments');
 		getFieldDecorator('fragment_size');
 		getFieldDecorator('pre_tags');
+		getFieldDecorator('post_tags');
+		getFieldDecorator('highlightFields');
 	};
 
 	handleSubmit = e => {
@@ -148,19 +151,20 @@ class ResultsPage extends React.Component {
 	}
 
 	getResultsPayload = values => {
+		const { defaultSettings } = this.props;
+		const defaultHighlightOptions = get(defaultSettings, 'results.highlightOptions', {});
 		const { pre_tags, number_of_fragments, fragment_size } = values;
 		const post_tags = pre_tags ? `</${pre_tags.split('<')[1]}` : [];
-		const getHighlightOptions = () => {
-			if (!values.highlight) return undefined;
-			return {
-				pre_tags: [pre_tags],
-				post_tags: [post_tags],
-				fragment_size,
-				number_of_fragments,
-			};
-		};
+		const getHighlightOptions = () => ({
+			pre_tags: pre_tags ? [pre_tags] : defaultHighlightOptions.pre_tags,
+			post_tags: pre_tags ? [post_tags] : defaultHighlightOptions.post_tags,
+			fragment_size: fragment_size || defaultHighlightOptions.fragment_size,
+			number_of_fragments: number_of_fragments || defaultHighlightOptions.number_of_fragments,
+		});
 
 		let resultsPayload = pick(values, ['size', 'highlight', 'highlightFields']);
+		resultsPayload.highlightFields =
+			resultsPayload.highlightFields || get(defaultSettings, 'results.highlightFields');
 		const { includeFields, excludeFields } = this.state;
 		const highlightOptions = getHighlightOptions();
 		resultsPayload = {
@@ -308,7 +312,12 @@ class ResultsPage extends React.Component {
 						defaultSettings,
 						'results.highlightOptions.number_of_fragments',
 					),
-				})(<InputNumber style={{ width: '17%' }} placeholder="Enter number of fragments" />)}
+				})(
+					<InputNumber
+						style={{ width: '17%' }}
+						placeholder="Enter number of fragments"
+					/>,
+				)}
 			</Form.Item>
 		</>
 	);
