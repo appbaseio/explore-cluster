@@ -555,7 +555,7 @@ class AggsPage extends React.Component {
 						<InputNumber
 							onChange={value => this.handleChange('count', value)}
 							value={count}
-							min={10}
+							min={1}
 							placeholder="Enter default aggs size"
 							className="input"
 						/>
