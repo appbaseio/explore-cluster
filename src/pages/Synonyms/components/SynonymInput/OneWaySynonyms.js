@@ -15,12 +15,13 @@ const OneWaySynonym = props => {
 	return (
 		<React.Fragment>
 			<label>Search term</label>
-			<Input value={searchTerm} onChange={handleInput} placeholder="Enter serarch term" />
+			<Input value={searchTerm} onChange={handleInput} placeholder="Enter search term" />
 
 			<label>Alternatives</label>
 			<Select
 				mode="tags"
 				style={{ width: '100%' }}
+				placeholder="Add comma separated alternatives"
 				value={alternatives}
 				onChange={handleChange}
 				tokenSeparators={[',']}
