@@ -31,7 +31,6 @@ const routes = {
 			{ label: 'Browse Data', link: 'browse' },
 			{ label: 'Request Logs', link: 'request-logs' },
 			{ label: 'Search Preview', link: 'search-preview', tag: 'Beta' },
-			{ label: 'Search Templates', link: 'search-templates', tag: 'Beta' },
 		],
 	},
 	Analytics: {
@@ -65,17 +64,9 @@ const routes = {
 		icon: 'key',
 		menu: [
 			{ label: 'API Credentials', link: 'credentials' },
-			{
-				label: 'User Management',
-				link: '/cluster/user-management',
-				hasExactPath: true,
-			},
-			{
-				label: 'Role Based Access',
-				link: '/cluster/role-based-access',
-				hasExactPath: true,
-				tag: 'Beta',
-			},
+			{ label: 'User Management', link: '/cluster/user-management' },
+			{ label: 'Role Based Access', link: '/cluster/role-based-access', tag: 'Beta' },
+			{ label: 'Search Templates', link: 'search-templates', tag: 'Beta' },
 		],
 	},
 	Billing: {

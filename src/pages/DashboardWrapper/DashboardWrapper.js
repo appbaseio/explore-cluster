@@ -45,7 +45,6 @@ const defaultRoutes = {
 			{ label: 'Browse Data', link: '/cluster/browse' },
 			{ label: 'Request Logs', link: '/cluster/request-logs' },
 			{ label: 'Search Preview', link: 'search-preview', tag: 'Beta', openIndexMenu: true },
-			{ label: 'Search Templates', link: '/cluster/search-templates', tag: 'Beta' },
 		],
 	},
 	Analytics: {
@@ -81,6 +80,7 @@ const defaultRoutes = {
 			{ label: 'API Credentials', link: '/cluster/credentials' },
 			{ label: 'User Management', link: '/cluster/user-management' },
 			{ label: 'Role Based Access', link: '/cluster/role-based-access', tag: 'Beta' },
+			{ label: 'Search Templates', link: '/cluster/search-templates', tag: 'Beta' },
 		],
 	},
 	Billing: {

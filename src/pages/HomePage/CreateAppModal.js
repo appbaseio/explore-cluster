@@ -207,6 +207,7 @@ class CreateAppModal extends Component {
 						to see more rules.
 					</p>
 					<Input
+						autoComplete="new-appname"
 						placeholder="Enter a unique index name"
 						name="appName"
 						className={input}
