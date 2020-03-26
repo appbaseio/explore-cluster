@@ -687,7 +687,7 @@ class SearchSettingsPage extends React.Component {
 										fieldWeights: Object.values(dataField),
 									},
 								},
-								hasTestSettings: true,
+								hasTestSettings: Object.keys(dataField).length > 0,
 							},
 							buttonProps: {
 								showTooltip: isDirty,

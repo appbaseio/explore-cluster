@@ -47,7 +47,6 @@ const Shards = ({
 			</h4>
 			<InputNumber
 				max={100}
-				style={{ width: '100%' }}
 				min={1}
 				value={+shards}
 				onChange={value => handleSlider('shards', value)}

@@ -1,13 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Input, Select, Button } from 'antd';
+import { Input, Select, Button, Affix } from 'antd';
 import { css } from 'react-emotion';
 import PropTypes from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import Grid from '../../components/CreateCredentials/Grid';
 import Ace from '../../batteries/components/SearchSandbox/containers/AceEditor';
 import { suggestionsMessages as Messages } from '../../utils/messages';
+import SearchPreviewModal from '../../components/SearchPreviewModal';
 
 const calculateValue = value => {
 	const index = value.indexOf('*');
@@ -76,7 +77,7 @@ const InputElement = ({ name, label, toolTipMessage, inputProps, placeholder }) 
 	/>
 );
 
-const PreferenceForm = ({ control, handleSaveTemplate, isLoading, indices }) => (
+const PreferenceForm = ({ control, handleSaveTemplate, isLoading, indices, appName }) => (
 	<FieldGroup
 		control={control}
 		strict={false}
@@ -205,16 +206,27 @@ const PreferenceForm = ({ control, handleSaveTemplate, isLoading, indices }) => 
 						);
 					}}
 				/>
-				<Button
-					onClick={handleSaveTemplate}
-					style={{ float: 'right' }}
-					size="large"
-					type="primary"
-					loading={isLoading}
-					disabled={isLoading || invalidForm || pristine}
-				>
-					Save
-				</Button>
+				<Affix offsetBottom={0}>
+					<div
+						style={{
+							display: 'flex',
+							justifyContent: 'space-between',
+							padding: 20,
+							background: 'white',
+						}}
+					>
+						<SearchPreviewModal app={appName} />
+						<Button
+							onClick={handleSaveTemplate}
+							size="large"
+							type="primary"
+							loading={isLoading}
+							disabled={isLoading || invalidForm || pristine}
+						>
+							Save
+						</Button>
+					</div>
+				</Affix>
 			</div>
 		)}
 	/>
@@ -229,5 +241,6 @@ PreferenceForm.propTypes = {
 
 const mapStateToProps = state => ({
 	isLoading: get(state, '$saveSuggestionsPreferences.isFetching', false),
+	appName: get(state, '$getCurrentApp.name'),
 });
 export default connect(mapStateToProps, null)(PreferenceForm);
