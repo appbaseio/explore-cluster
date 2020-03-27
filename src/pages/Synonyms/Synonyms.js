@@ -37,6 +37,10 @@ const search = css`
 		display: flex;
 	}
 
+	.hide {
+		display: none;
+	}
+
 	.filter,
 	.search {
 		min-width: 200px;
@@ -256,9 +260,16 @@ class Synonyms extends React.Component {
 							<div className={search}>
 								<div>
 									<SingleDropdownList
+										className="hide"
+										componentId="index"
+										defaultValue={appName}
+										dataField="index.keyword"
+									/>
+									<SingleDropdownList
 										className="filter"
 										componentId="type"
 										dataField="type.keyword"
+										react={{ and: ['index'] }}
 									/>
 									<DataSearch
 										innerClass={{
@@ -273,6 +284,7 @@ class Synonyms extends React.Component {
 											'synonym.lang',
 											'synonym.search',
 										]}
+										react={{ and: ['index'] }}
 										componentId="search"
 									/>
 								</div>
@@ -294,20 +306,11 @@ class Synonyms extends React.Component {
 								componentId="result"
 								renderResultStats={() => null}
 								key={key}
-								defaultQuery={() => ({
-									query: {
-										match: {
-											index: {
-												query: appName,
-											},
-										},
-									},
-								})}
 								loader={<div />}
 								pagination
 								dataField="_score"
 								react={{
-									and: ['search', 'type'],
+									and: ['search', 'type', 'index'],
 								}}
 								render={({ loading, data }) => (
 									<Table
