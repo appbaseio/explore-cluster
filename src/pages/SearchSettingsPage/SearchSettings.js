@@ -119,6 +119,7 @@ class SearchSettingsPage extends React.Component {
 		const { mappings, settings, isLoading } = this.props;
 		if (mappings && JSON.stringify(prevProps.mappings) !== JSON.stringify(mappings)) {
 			const aggsMappings = this.getAggsMappings(mappings);
+			this.initData(settings);
 
 			// eslint-disable-next-line
 			this.setState({
@@ -148,16 +149,8 @@ class SearchSettingsPage extends React.Component {
 	};
 
 	initData = settings => {
-		const dataField =
-			settings && settings.search
-				? settings.search.dataField.reduce(
-						(agg, field, index) => ({
-							...agg,
-							[field]: settings.search.fieldWeights[index],
-						}),
-						{},
-				  )
-				: {};
+		const dataField = settings && settings.search ? this.getDataFields(settings) : {};
+
 		this.setState({
 			typoTolerance: get(settings, 'search.fuzziness'),
 			hasTypoTolerance: !!get(settings, 'search.fuzziness', false),
@@ -166,17 +159,55 @@ class SearchSettingsPage extends React.Component {
 		});
 	};
 
+	getDataFields = settings => {
+		const { mappings } = this.props;
+		let searchableFields = settings.search.dataField;
+		if (searchableFields.length === 0 && mappings) {
+			const aggsResponse = getAggsMappings(mappings, true);
+			const parsedMappings = Array.isArray(aggsResponse)
+				? aggsResponse
+				: Object.keys(aggsResponse);
+
+			const originalSearchableFields = parsedMappings.filter(
+				mapping =>
+					mapping.fieldType === 'text' &&
+					(mapping.usecase === 'search' || mapping.usecase === 'searchaggs'),
+			);
+
+			searchableFields = originalSearchableFields.reduce((agg, item) => {
+				return [
+					...agg,
+					...Object.keys(
+						getSubFields({ address: item.address, weight: 1, fields: item.fields }),
+					),
+				];
+			}, []);
+		}
+
+		return searchableFields.reduce(
+			(agg, field, index) => ({
+				...agg,
+				[field]: settings.search.fieldWeights[index] || 1,
+			}),
+			{},
+		);
+	};
+
 	getAggsMappings = mappings => {
 		const aggsResponse = getAggsMappings(mappings, true);
 		const parsedMappings = Array.isArray(aggsResponse)
 			? aggsResponse
 			: Object.keys(aggsResponse);
 		this.noUseCaseMappings = parsedMappings.filter
-			? parsedMappings.filter(mapping => mapping.usecase === 'none')
+			? parsedMappings.filter(mapping => mapping.usecase === 'text')
 			: [];
 		const aggsMappings = parsedMappings.filter
 			? parsedMappings
-					.filter(mapping => mapping.usecase === 'aggs')
+					.filter(
+						mapping =>
+							mapping.fieldType === 'text' &&
+							(mapping.usecase === 'none' || mapping.usecase === 'aggs'),
+					)
 					.map(mapping => ({
 						_address: `${mapping.type}.${mapping.address
 							.split('.')
@@ -349,7 +380,14 @@ class SearchSettingsPage extends React.Component {
 		const fieldChanged = parsedAddress;
 
 		if (usecase === 'aggs' || usecase === 'none') {
-			const searchSubFields = ['search', 'english', 'lang', 'autosuggest', 'keyword'];
+			const searchSubFields = [
+				'search',
+				'english',
+				'lang',
+				'autosuggest',
+				'keyword',
+				'synonyms',
+			];
 
 			const subFields = [
 				fieldChanged,

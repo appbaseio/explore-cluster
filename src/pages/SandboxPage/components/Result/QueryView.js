@@ -60,6 +60,7 @@ class QueryView extends React.Component {
 		} else {
 			this.setState({
 				isValid,
+				query: value,
 			});
 		}
 	};
