@@ -97,5 +97,8 @@ export const settingsMap = {
 	},
 	disable_search_settings: {
 		description: `Certain actions require a save before they're applied in Search Preview.`
+	},
+	synonyms: {
+		description: 'Enable synonyms for better searching across similar words'
 	}
 };

@@ -18,10 +18,12 @@ import { getSettings, getMappings } from '../../batteries/utils/mappings';
 import { getSynonymsAnalyzerSettings, updateSynonymsSettings } from './utils';
 import DeleteModal from '../../components/DeleteModal/DeleteModal';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
+import { SettingsFooter } from '../../components/SettingsFooter';
 
 const expression = css`
+	font-weight: 15px;
 	.light {
-		font-size: 12px;
+		font-size: 13px;
 		color: #8c8c8c;
 		margin: 0 5px;
 	}
@@ -44,6 +46,22 @@ const search = css`
 	.filter,
 	.search {
 		min-width: 200px;
+	}
+
+	.filter button {
+		border-radius: 4px 0px 0px 4px;
+	}
+
+	.search {
+		border-radius: 0;
+
+		input {
+			border-radius: 0 4px 4px 0;
+		}
+
+		> div > div > div {
+			top: 11px;
+		}
 	}
 
 	@media (max-width: 768px) {
@@ -174,12 +192,41 @@ class Synonyms extends React.Component {
 							<span className={expression}>
 								{value.split('=>')[1]}
 								<Icon className="light" type="arrow-right" />
-								{value.split('=>')[0]}
+								<span>( </span>
+								{value
+									.split('=>')[0]
+									.split(',')
+									.map((item, index) => {
+										if (index === value.split('=>')[0].split(',').length - 1) {
+											return item;
+										}
+										return (
+											<React.Fragment>
+												{item}
+												<span className="light">OR</span>
+											</React.Fragment>
+										);
+									})}
+								<span> )</span>
 							</span>
 						);
 					}
 
-					return value;
+					return (
+						<span className={expression}>
+							{value.split(',').map((item, index) => {
+								if (index === value.split(',').length - 1) {
+									return item;
+								}
+								return (
+									<React.Fragment>
+										{item}
+										<Icon type="swap" className="light" />
+									</React.Fragment>
+								);
+							})}
+						</span>
+					);
 				},
 			},
 			{
@@ -269,12 +316,15 @@ class Synonyms extends React.Component {
 										className="filter"
 										componentId="type"
 										dataField="type.keyword"
+										selectAllLabel="All Synonyms"
+										placeholder="Select a Type"
 										react={{ and: ['index'] }}
 									/>
 									<DataSearch
 										innerClass={{
 											input: 'ant-input',
 										}}
+										placeholder="Search synonym"
 										className="search"
 										icon={<Icon type="search" />}
 										dataField={[
@@ -312,6 +362,7 @@ class Synonyms extends React.Component {
 								react={{
 									and: ['search', 'type', 'index'],
 								}}
+								renderNoResults={() => null}
 								render={({ loading, data }) => (
 									<Table
 										loading={loading}
@@ -327,6 +378,9 @@ class Synonyms extends React.Component {
 							/>
 						</ReactiveBase>
 					</Card>
+					{synonyms.length > 0 ? (
+						<SettingsFooter app={appName} showReset={false} showSearchPreview />
+					) : null}
 				</div>
 			</React.Fragment>
 		);
