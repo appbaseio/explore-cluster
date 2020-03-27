@@ -17,9 +17,8 @@ import { ReviewAndSave } from '../../components/ReviewAndSave';
 import { SettingTooltip } from '../../components/SettingTooltip';
 import { settingsMap } from '../../components/ReviewAndSave/helper';
 import { getTraversedMappingsByAppName } from '../../batteries/modules/selectors';
-import { isEqual } from '../../batteries/utils';
+import { isEqual, isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
-import { validSettingsPlans } from '../../utils';
 
 const bannerDetails = {
 	title: 'Result Settings',
@@ -62,13 +61,14 @@ class ResultsPage extends React.Component {
 			getSettingsAction,
 			form: { getFieldDecorator, setFieldsValue },
 			getDefaultSettingsAction,
+			defaultSettings,
 		} = this.props;
 		getSettingsAction(appName).then(res => {
 			if (res && res.payload) {
 				this.setFormValues(res, getFieldDecorator, setFieldsValue);
 			}
 		});
-		getDefaultSettingsAction();
+		if (!defaultSettings) getDefaultSettingsAction();
 		this.getMappings();
 	}
 
@@ -346,10 +346,11 @@ class ResultsPage extends React.Component {
 			appName,
 			defaultSettings,
 			tier,
+			featureSearchRelevancy,
 		} = this.props;
 		const { includeFields, excludeFields, visible, isReset } = this.state;
 
-		if (tier && validSettingsPlans.indexOf(tier) === -1) {
+		if (!isValidPlan(tier, featureSearchRelevancy)) {
 			return (
 				<React.Fragment>
 					<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
@@ -464,6 +465,7 @@ const mapStateToProps = state => {
 		resetState: get(state, '$getAppSettings.default', {}),
 		defaultSettings: get(state, '$getAppSettings.defaultSettings'),
 		tier: get(state, '$getAppPlan.results.tier'),
+		featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
 	};
 };
 

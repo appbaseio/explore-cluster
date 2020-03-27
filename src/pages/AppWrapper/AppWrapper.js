@@ -12,9 +12,10 @@ import {
 } from '../../batteries/modules/actions';
 import Logo from '../../components/Logo';
 
-import { getParam, validSettingsPlans } from '../../utils';
+import { getParam } from '../../utils';
 import { breakpoints } from '../../utils/media';
 import Loader from '../../components/Loader';
+import { isValidPlan } from '../../batteries/utils';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
@@ -206,9 +207,10 @@ class AppWrapper extends Component {
 			getDefaultSettingsAction,
 			getSettingsAction,
 			tier,
+			featureSearchRelevancy,
 		} = this.props;
 		// restrict calling API if it's not a valid plan
-		if (tier && validSettingsPlans.indexOf(tier) === -1) return;
+		if (!isValidPlan(tier, featureSearchRelevancy)) return;
 		if (!settings) {
 			this.setState({ loading: true });
 			const settingsResponse = await getSettingsAction(appName);
@@ -361,6 +363,7 @@ const mapStateToProps = state => {
 		defaultSettings: get(state, '$getAppSettings.defaultSettings'),
 		settings: get(state, ['$getAppSettings', 'settings', appName]),
 		tier: get(state, '$getAppPlan.results.tier'),
+		featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
 	};
 };
 

@@ -32,9 +32,9 @@ import { getAggsMappings } from '../../batteries/utils/mappings';
 import { ReviewAndSave } from '../../components/ReviewAndSave';
 import { SettingsFooter } from '../../components/SettingsFooter';
 import { container } from '../ResultsPage/styles';
-import { getSubFields, validSettingsPlans } from '../../utils';
+import { getSubFields } from '../../utils';
 import { settingsMap } from '../../components/ReviewAndSave/helper';
-import { isEqual } from '../../batteries/utils';
+import { isEqual, isValidPlan } from '../../batteries/utils';
 import mappingUsecase from '../../batteries/utils/mappingUsecase';
 import Overlay from '../../components/Overlay';
 import { highlighter } from '../SandboxPage/components/Search';
@@ -440,10 +440,11 @@ class SearchSettingsPage extends React.Component {
 			isLoading,
 			tier,
 			traversedMappings,
+			featureSearchRelevancy,
 		} = this.props;
 		const toleranceOptions = ['AUTO', 1, 2];
 
-		if (tier && validSettingsPlans.indexOf(tier) === -1) {
+		if (!isValidPlan(tier, featureSearchRelevancy)) {
 			return (
 				<React.Fragment>
 					<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
@@ -749,6 +750,7 @@ const mapStateToProps = state => {
 		traversedMappings: get(state, `$getAppMappings.traversedMappings.${appName}`, []),
 		appName,
 		tier: get(state, '$getAppPlan.results.tier'),
+		featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
 	};
 };
 

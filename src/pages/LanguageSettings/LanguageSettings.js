@@ -26,9 +26,9 @@ import {
 	getSettings as getAppSettings,
 	reIndex,
 } from '../../batteries/utils/mappings';
-import { removeWhiteSpaces, validSettingsPlans } from '../../utils';
+import { removeWhiteSpaces } from '../../utils';
 import { buildLanguageAnalysis, getLanguageFallback } from '../../utils/language';
-import { isEqual } from '../../batteries/utils';
+import { isEqual, isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import { appendApp, removeAppData } from '../../actions';
 import { settingsMap } from '../../components/ReviewAndSave/helper';
@@ -295,12 +295,13 @@ class LanguageSettings extends React.Component {
 			defaultSettings,
 			tier,
 			appName,
+			featureSearchRelevancy,
 		} = this.props;
 		const { visible, loading, isReset, initiating } = this.state;
 
 		if (initiating) return <Loader />;
 
-		if (tier && validSettingsPlans.indexOf(tier) === -1) {
+		if (!isValidPlan(tier, featureSearchRelevancy)) {
 			return (
 				<React.Fragment>
 					<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
@@ -453,6 +454,7 @@ const mapStateToProps = state => {
 		credentials: username ? `${username}:${password}` : null,
 		mappings,
 		tier: get(state, '$getAppPlan.results.tier'),
+		featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
 	};
 };
 

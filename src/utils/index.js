@@ -516,14 +516,6 @@ export function getSubFields({ fields, weight, address }) {
 	return { [address]: weight };
 }
 
-export const validSettingsPlans = [
-	'2019-production-1',
-	'2019-production-2',
-	'2019-production-3',
-	'2019-production-4',
-	'arc-enterprise',
-];
-
 function ltrim(str) {
 	if (!str) return str;
 	return str.replace(/^\s+/g, '');
