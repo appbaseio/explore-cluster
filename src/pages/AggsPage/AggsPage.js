@@ -36,9 +36,9 @@ import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { SettingsFooter } from '../../components/SettingsFooter';
 import { ReviewAndSave } from '../../components/ReviewAndSave';
 import { container } from '../ResultsPage/styles';
-import { validSettingsPlans } from '../../utils';
+import { getSubFields } from '../../utils';
 import { settingsMap } from '../../components/ReviewAndSave/helper';
-import { isEqual } from '../../batteries/utils';
+import { isEqual, isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import { highlighter } from '../SandboxPage/components/Search';
 
@@ -87,6 +87,8 @@ class AggsPage extends React.Component {
 		isDirty: false,
 		visible: false,
 	};
+
+	searchableMappings = {};
 
 	mappingsRef = React.createRef(null);
 
@@ -172,6 +174,28 @@ class AggsPage extends React.Component {
 		const parsedMappings = Array.isArray(aggsResponse)
 			? aggsResponse
 			: Object.keys(aggsResponse);
+		const originalSearchableFields = parsedMappings.filter(
+			mapping =>
+				mapping.fieldType === 'text' &&
+				(mapping.usecase === 'search' || mapping.usecase === 'searchaggs'),
+		);
+
+		const searchableFields = originalSearchableFields.reduce((agg, item) => {
+			return [
+				...agg,
+				...Object.keys(
+					getSubFields({ address: item.address, weight: 1, fields: item.fields }),
+				),
+			];
+		}, []);
+
+		this.searchableMappings = searchableFields.reduce(
+			(agg, field) => ({
+				...agg,
+				[field]: 1,
+			}),
+			{},
+		);
 		const searchableMappings = parsedMappings
 			.filter(
 				mapping =>
@@ -378,6 +402,7 @@ class AggsPage extends React.Component {
 			defaultSettings,
 			tier,
 			traversedMappings,
+			featureSearchRelevancy,
 		} = this.props;
 		const sortOptions = [
 			{ name: 'Count', value: 'count' },
@@ -386,7 +411,7 @@ class AggsPage extends React.Component {
 		];
 		const { size: savedSize, ...restSavedAggs } = get(settings, 'aggregations', {});
 
-		if (tier && validSettingsPlans.indexOf(tier) === -1) {
+		if (!isValidPlan(tier, featureSearchRelevancy)) {
 			return (
 				<React.Fragment>
 					<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
@@ -555,7 +580,7 @@ class AggsPage extends React.Component {
 						<InputNumber
 							onChange={value => this.handleChange('count', value)}
 							value={count}
-							min={10}
+							min={1}
 							placeholder="Enter default aggs size"
 							className="input"
 						/>
@@ -608,6 +633,22 @@ class AggsPage extends React.Component {
 							searchPreviewProps: {
 								testSettings: {
 									...(settings || {}),
+									search: {
+										...settings.search,
+										dataField:
+											settings.search &&
+											settings.search.dataField &&
+											settings.search.dataField.length > 0
+												? settings.search.dataField
+												: Object.keys(this.searchableMappings),
+
+										fieldWeights:
+											settings.search &&
+											settings.search.dataField &&
+											settings.search.dataField.length > 0
+												? settings.search.fieldWeights
+												: Object.values(this.searchableMappings),
+									},
 									aggregations: {
 										size: count,
 										sortBy: sort,
@@ -672,6 +713,7 @@ const mapStateToProps = state => {
 		appName,
 		defaultSettings,
 		tier: get(state, '$getAppPlan.results.tier'),
+		featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
 	};
 };
 

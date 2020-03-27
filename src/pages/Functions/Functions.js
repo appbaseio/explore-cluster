@@ -1,5 +1,17 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { Button, Col, Divider, Icon, List, Popover, Result, Row, Switch, Tooltip } from 'antd';
+import {
+	Button,
+	Col,
+	Divider,
+	Icon,
+	List,
+	Popover,
+	Result,
+	Row,
+	Switch,
+	Tooltip,
+	Affix,
+} from 'antd';
 import { connect } from 'react-redux';
 import { string } from 'prop-types';
 import get from 'lodash/get';
@@ -27,6 +39,7 @@ import Overlay from '../../components/Overlay';
 import { getFunctionHealthCheck } from '../../utils';
 import { deploymentCheck } from '../../components/DeployFunctionModal/helper';
 import { mediaKey } from '../../utils/media';
+import SearchPreviewModal from '../../components/SearchPreviewModal';
 
 const validPlans = [
 	'2019-production-2',
@@ -81,9 +94,7 @@ function InvokeButton({ item }) {
 function BeautifulDnd({ onDragStart, onDragEnd, render }) {
 	return (
 		<DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
-			<section style={{ padding: 50 }}>
-				<Droppable droppableId="LIST">{render}</Droppable>
-			</section>
+			<Droppable droppableId="LIST">{render}</Droppable>
 		</DragDropContext>
 	);
 }
@@ -367,7 +378,7 @@ class FunctionsPage extends React.Component {
 	};
 
 	render() {
-		const { isLoading, functions, tier, getFunction } = this.props;
+		const { isLoading, functions, tier, getFunction, appName } = this.props;
 		const { deployModal, checking, healthError, notFoundError } = this.state;
 		this.sortedDataSource = (functions || []).sort((a, b) => a.order - b.order);
 
@@ -484,117 +495,136 @@ class FunctionsPage extends React.Component {
 						</Col>
 					</Row>
 				</Header>
-				<BeautifulDnd
-					onDragStart={this.onDragStart}
-					onDragEnd={this.onDragEnd}
-					render={dropProvided => (
-						<div ref={dropProvided.innerRef}>
-							<List
-								locale={{
-									emptyText: (
-										<div
-											css={{
-												display: 'flex',
-												flexDirection: 'column',
-												justifyContent: 'center',
-												alignItems: 'center',
-											}}
-										>
-											<h3>No functions Deployed Yet!</h3>
-											<br />
-											<Button
-												onClick={() => {
-													this.setState({ deployModal: true });
-												}}
-												type="primary"
-												rel="noopener noreferrer"
-												style={{
-													width: 250,
-												}}
-											>
-												<Icon type="deployment-unit" />
-												Start Deploying Function
-											</Button>
-										</div>
-									),
-								}}
-								rowKey={item => item.function.service}
-								itemLayout="vertical"
-								dataSource={this.sortedDataSource}
-								renderItem={(item, index) => (
-									<DndDraggable
-										key={item.function.service}
-										item={item}
-										index={index}
-										render={dragProvided => (
+				<section style={{ padding: 50 }}>
+					<BeautifulDnd
+						onDragStart={this.onDragStart}
+						onDragEnd={this.onDragEnd}
+						render={dropProvided => (
+							<div ref={dropProvided.innerRef}>
+								<List
+									locale={{
+										emptyText: (
 											<div
-												className={listItemClass}
-												ref={dragProvided.innerRef}
-												{...dragProvided.draggableProps}
+												css={{
+													display: 'flex',
+													flexDirection: 'column',
+													justifyContent: 'center',
+													alignItems: 'center',
+												}}
 											>
-												<Tooltip title="Drag to re-order the sequence of invoking the functions">
-													<div
-														style={{
-															display: 'flex',
-															padding: '18px 15px 15px 0',
-															cursor: 'pointer',
-														}}
-													>
+												<h3>No functions Deployed Yet!</h3>
+												<br />
+												<Button
+													onClick={() => {
+														this.setState({ deployModal: true });
+													}}
+													type="primary"
+													rel="noopener noreferrer"
+													style={{
+														width: 250,
+													}}
+												>
+													<Icon type="deployment-unit" />
+													Start Deploying Function
+												</Button>
+											</div>
+										),
+									}}
+									rowKey={item => item.function.service}
+									itemLayout="vertical"
+									dataSource={this.sortedDataSource}
+									renderItem={(item, index) => (
+										<DndDraggable
+											key={item.function.service}
+											item={item}
+											index={index}
+											render={dragProvided => (
+												<div
+													className={listItemClass}
+													ref={dragProvided.innerRef}
+													{...dragProvided.draggableProps}
+												>
+													<Tooltip title="Drag to re-order the sequence of invoking the functions">
 														<div
 															style={{
 																display: 'flex',
-																flexDirection: 'column',
-															}}
-															{...dragProvided.dragHandleProps}
-														>
-															<Icon type="caret-up" />
-															<Icon
-																type="caret-down"
-																style={{ marginTop: '-6px' }}
-															/>
-														</div>
-														<div
-															style={{
-																fontWeight: 'bolder',
-																marginLeft: 5,
+																padding: '18px 15px 15px 0',
+																cursor: 'pointer',
 															}}
 														>
-															{item.order}
+															<div
+																style={{
+																	display: 'flex',
+																	flexDirection: 'column',
+																}}
+																{...dragProvided.dragHandleProps}
+															>
+																<Icon type="caret-up" />
+																<Icon
+																	type="caret-down"
+																	style={{ marginTop: '-6px' }}
+																/>
+															</div>
+															<div
+																style={{
+																	fontWeight: 'bolder',
+																	marginLeft: 5,
+																}}
+															>
+																{item.order}
+															</div>
 														</div>
-													</div>
-												</Tooltip>
-												<List.Item
-													key={item.function.service}
-													extra={
-														item.deploymentStatus === 'active' &&
-														item.enabled && (
-															<Actions
-																item={item}
-																refetchFunction={
-																	this.refetchFunction
-																}
-															/>
-														)
-													}
-													style={{
-														flex: 1,
-													}}
-												>
-													<FunctionItem
-														item={item}
-														onChange={e => this.handleEnable(e, item)}
-														getFunction={getFunction}
-													/>
-												</List.Item>
-											</div>
-										)}
-									/>
-								)}
-							/>
-							{dropProvided.placeholder}
+													</Tooltip>
+													<List.Item
+														key={item.function.service}
+														extra={
+															item.deploymentStatus === 'active' &&
+															item.enabled && (
+																<Actions
+																	item={item}
+																	refetchFunction={
+																		this.refetchFunction
+																	}
+																/>
+															)
+														}
+														style={{
+															flex: 1,
+														}}
+													>
+														<FunctionItem
+															item={item}
+															onChange={e =>
+																this.handleEnable(e, item)
+															}
+															getFunction={getFunction}
+														/>
+													</List.Item>
+												</div>
+											)}
+										/>
+									)}
+								/>
+								{dropProvided.placeholder}
+							</div>
+						)}
+					/>
+					<Affix offsetBottom={0}>
+						<div
+							style={{
+								display: 'flex',
+								justifyContent: 'space-between',
+								padding: 20,
+								background: 'white',
+								border: '1px solid #e8e8e8',
+								boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.15)',
+							}}
+						>
+							<SearchPreviewModal app={appName} />
 						</div>
-					)}
-				/>
+					</Affix>
+				</section>
+
 				{deployModal && (
 					<DeployFunctionModal handleCancel={() => this.handleCancel('deployModal')} />
 				)}

@@ -1,10 +1,17 @@
 import React from 'react';
-import { Dropdown, Menu, Button, Icon } from 'antd';
+import { Select } from 'antd';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { get, keys } from 'lodash';
+import { css } from 'emotion';
 import { setCurrentApp } from '../../batteries/modules/actions';
 import { loadApps } from '../../actions';
+
+const selectStyle = css`
+	.ant-select-selection {
+		border: none;
+	}
+`;
 
 class AppSwitcher extends React.Component {
 	componentDidMount() {
@@ -16,53 +23,38 @@ class AppSwitcher extends React.Component {
 	}
 
 	render() {
-		const {
-			apps,
-			currentApp,
-			history,
-			updateCurrentApp,
-			match,
-			preserveButtonStyle,
-		} = this.props;
+		const { apps, currentApp, history, updateCurrentApp, match } = this.props;
 		const route = get(match, 'params.route');
 
 		const filteredApps = keys(apps).filter(app => !app.startsWith('.'));
-		const menu = (
-			<Menu
-				css={{
-					maxHeight: 250,
-					overflowY: 'scroll',
-				}}
-				onClick={e => {
-					const appName = e.key;
-					updateCurrentApp(appName);
-					history.replace(`/app/${appName}/${route || ''}`);
-				}}
-			>
-				{filteredApps.map(app => (
-					<Menu.Item key={app}>{app}</Menu.Item>
-				))}
-			</Menu>
-		);
+
+		const sortedApps = (filteredApps || []).sort((a, b) => {
+			if (a < b) {
+				return -1;
+			}
+			if (a > b) {
+				return 1;
+			}
+			return 0;
+		});
 		return (
 			<React.Fragment>
-				<Dropdown trigger={['click']} overlay={menu}>
-					<Button
-						style={
-							preserveButtonStyle
-								? {}
-								: {
-										border: 0,
-										boxShadow: 'none',
-										padding: 0,
-										minWidth: 115,
-								  }
-						}
-					>
-						<span>{currentApp || 'Loading...'}</span>
-						<Icon type="down" />
-					</Button>
-				</Dropdown>
+				<Select
+					className={selectStyle}
+					value={currentApp}
+					style={{ minWidth: 180 }}
+					onSelect={appName => {
+						updateCurrentApp(appName);
+						history.replace(`/app/${appName}/${route || ''}`);
+					}}
+					showSearch
+				>
+					{sortedApps.map(app => (
+						<Select.Option key={app} value={app}>
+							{app}
+						</Select.Option>
+					))}
+				</Select>
 			</React.Fragment>
 		);
 	}

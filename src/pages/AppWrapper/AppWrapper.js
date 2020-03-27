@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Layout, Menu, Icon, Tag } from 'antd';
+import { Layout, Menu, Icon, Tag, Tooltip } from 'antd';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import AppLayout from '../../components/AppLayout';
@@ -12,9 +12,10 @@ import {
 } from '../../batteries/modules/actions';
 import Logo from '../../components/Logo';
 
-import { getParam, validSettingsPlans } from '../../utils';
+import { getParam } from '../../utils';
 import { breakpoints } from '../../utils/media';
 import Loader from '../../components/Loader';
+import { isValidPlan } from '../../batteries/utils';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
@@ -30,12 +31,7 @@ const routes = {
 			{ label: 'Import Data', link: 'import' },
 			{ label: 'Browse Data', link: 'browse' },
 			{ label: 'Request Logs', link: 'request-logs' },
-			{ label: 'Query Explorer', link: 'query' },
 			{ label: 'Search Preview', link: 'search-preview', tag: 'Beta' },
-			{ label: 'Functions', link: '/cluster/functions', tag: 'Beta', hasExactPath: true },
-			{ label: 'Query Rules', link: '/cluster/rules', tag: 'Beta', hasExactPath: true },
-			{ label: 'Search Templates', link: 'search-templates', tag: 'Beta' },
-			{ label: 'Query Suggestions', link: 'query-suggestions', tag: 'Beta' },
 		],
 	},
 	Analytics: {
@@ -61,11 +57,19 @@ const routes = {
 			{ label: 'Index Settings', link: 'index-settings', tag: 'Beta' },
 			{ label: 'Schema', link: 'settings', tag: 'Beta' },
 			{ label: 'Synonyms', link: 'synonyms', tag: 'Beta' },
+			{ label: 'Query Suggestions', link: 'query-suggestions', tag: 'Beta' },
+			{ label: 'Query Rules', link: '/cluster/rules', tag: 'Beta', hasExactPath: true },
+			{ label: 'Functions', link: '/cluster/functions', tag: 'Beta', hasExactPath: true },
 		],
 	},
 	Security: {
 		icon: 'key',
-		menu: [{ label: 'API Credentials', link: 'credentials' }],
+		menu: [
+			{ label: 'API Credentials', link: 'credentials' },
+			{ label: 'User Management', link: '/cluster/user-management' },
+			{ label: 'Role Based Access', link: '/cluster/role-based-access', tag: 'Beta' },
+			{ label: 'Search Templates', link: 'search-templates', tag: 'Beta' },
+		],
 	},
 	Billing: {
 		icon: 'credit-card',
@@ -108,6 +112,17 @@ const getActiveMenu = (props, prevActiveSubMenu = []) => {
 		activeSubMenu: [activeSubMenu, ...prevActiveSubMenu],
 		activeMenuItem: [activeMenuItem],
 	};
+};
+
+const WithRedirectTooltip = ({ showTooltip, children }) => {
+	if (showTooltip) {
+		return (
+			<Tooltip placement="rightBottom" title="This will redirect you to the cluster view">
+				{children}
+			</Tooltip>
+		);
+	}
+	return children;
 };
 
 let url;
@@ -170,6 +185,21 @@ class AppWrapper extends Component {
 		}
 	}
 
+	componentDidUpdate(prevProps) {
+		const { history, currentApp, match, settings } = this.props;
+		const { appName, loading } = this.state;
+
+		const route = match.params.route || '';
+
+		if (settings !== prevProps.settings && !settings && !loading) {
+			this.handleSettings(currentApp);
+		}
+
+		if (currentApp && appName !== currentApp) {
+			history.push(`/app/${currentApp}/${route}`);
+		}
+	}
+
 	handleSettings = async appName => {
 		const {
 			settings,
@@ -178,9 +208,10 @@ class AppWrapper extends Component {
 			getDefaultSettingsAction,
 			getSettingsAction,
 			tier,
+			featureSearchRelevancy,
 		} = this.props;
 		// restrict calling API if it's not a valid plan
-		if (tier && validSettingsPlans.indexOf(tier) === -1) return;
+		if (!isValidPlan(tier, featureSearchRelevancy)) return;
 		if (!settings) {
 			this.setState({ loading: true });
 			const settingsResponse = await getSettingsAction(appName);
@@ -197,21 +228,6 @@ class AppWrapper extends Component {
 			this.setState({ loading: false });
 		}
 	};
-
-	componentDidUpdate(prevProps) {
-		const { history, currentApp, match, settings } = this.props;
-		const { appName, loading } = this.state;
-
-		const route = match.params.route || '';
-
-		if (settings !== prevProps.settings && !settings && !loading) {
-			this.handleSettings(currentApp);
-		}
-
-		if (currentApp && appName !== currentApp) {
-			history.push(`/app/${currentApp}/${route}`);
-		}
-	}
 
 	onCollapse = () => {
 		this.setState(prevState => ({ collapsed: !prevState.collapsed }));
@@ -285,24 +301,31 @@ class AppWrapper extends Component {
 									<SubMenu key={route} title={Title}>
 										{routes[route].menu.map(item => (
 											<Menu.Item key={item.label}>
-												<Link
-													replace
-													to={
-														item.hasExactPath
-															? item.link
-															: `/app/${appName}/${item.link}`
-													}
+												<WithRedirectTooltip
+													showTooltip={item.hasExactPath}
 												>
-													{item.label}
-													{item.tag ? (
-														<Tag
-															style={{ fontSize: 10, marginLeft: 8 }}
-															color="#001529"
-														>
-															{item.tag}
-														</Tag>
-													) : null}
-												</Link>
+													<Link
+														replace
+														to={
+															item.hasExactPath
+																? item.link
+																: `/app/${appName}/${item.link}`
+														}
+													>
+														{item.label}
+														{item.tag ? (
+															<Tag
+																style={{
+																	fontSize: 10,
+																	marginLeft: 8,
+																}}
+																color="#001529"
+															>
+																{item.tag}
+															</Tag>
+														) : null}
+													</Link>
+												</WithRedirectTooltip>
 											</Menu.Item>
 										))}
 									</SubMenu>
@@ -341,6 +364,7 @@ const mapStateToProps = state => {
 		defaultSettings: get(state, '$getAppSettings.defaultSettings'),
 		settings: get(state, ['$getAppSettings', 'settings', appName]),
 		tier: get(state, '$getAppPlan.results.tier'),
+		featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
 	};
 };
 

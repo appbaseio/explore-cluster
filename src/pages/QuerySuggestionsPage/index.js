@@ -33,8 +33,17 @@ const bannerDetails = {
 	description: 'GUI to manage preferences for query suggestions.',
 	buttonText: 'Read more',
 	icon: 'pencil',
-	href: 'https://docs.appbase.io/docs/analytics/Implement/',
+	href: 'https://docs.appbase.io/docs/analytics/QuerySuggestions/',
 };
+
+const cardStyle = css`
+	max-width: 800px;
+	margin: auto;
+	padding: 0 15px;
+	.ant-card-body {
+		padding: 24px 0;
+	}
+`;
 
 class QuerySuggestions extends React.Component {
 	constructor(props) {
@@ -166,8 +175,8 @@ class QuerySuggestions extends React.Component {
 				<Banner {...bannerDetails} />
 				<Container css={main}>
 					{total !== undefined && get(preferences, 'index') && (
-						<Card>
-							<Flex justifyContent="space-between">
+						<Card className={cardStyle}>
+							<Flex justifyContent="space-between" style={{ alignItems: 'center' }}>
 								<Flex>
 									<Alert
 										message={`Last synced ${total} query suggestions at ${moment(

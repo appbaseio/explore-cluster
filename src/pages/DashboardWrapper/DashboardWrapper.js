@@ -14,6 +14,7 @@ import { getAppPlan } from '../../batteries/modules/actions';
 import { getParam } from '../../utils';
 import { LabelTag } from '../../components/LabelTag';
 import { IndexSwitcher } from '../../components/IndexSwitcher';
+import { loadApps } from '../../actions';
 
 const NoMatch = Loadable({
 	loader: () => import('../../NoMatch'),
@@ -41,15 +42,10 @@ const defaultRoutes = {
 	Develop: {
 		icon: 'dashboard',
 		menu: [
-			{ label: 'Import Data', link: '/cluster/import' },
+			{ label: 'Import Data', link: 'import', openIndexMenu: true },
 			{ label: 'Browse Data', link: '/cluster/browse' },
 			{ label: 'Request Logs', link: '/cluster/request-logs' },
-			{ label: 'Query Explorer', link: 'query', openIndexMenu: true },
 			{ label: 'Search Preview', link: 'search-preview', tag: 'Beta', openIndexMenu: true },
-			{ label: 'Functions', link: '/cluster/functions', tag: 'Beta' },
-			{ label: 'Query Rules', link: '/cluster/rules', tag: 'Beta' },
-			{ label: 'Search Templates', link: '/cluster/search-templates', tag: 'Beta' },
-			{ label: 'Query Suggestions', link: '/cluster/query-suggestions', tag: 'Beta' },
 		],
 	},
 	Analytics: {
@@ -75,6 +71,9 @@ const defaultRoutes = {
 			{ label: 'Index Settings', link: 'index-settings', tag: 'Beta', openIndexMenu: true },
 			{ label: 'Schema', link: 'settings', tag: 'Beta', openIndexMenu: true },
 			{ label: 'Synonyms', link: 'synonyms', tag: 'Beta', openIndexMenu: true },
+			{ label: 'Query Suggestions', link: '/cluster/query-suggestions', tag: 'Beta' },
+			{ label: 'Query Rules', link: '/cluster/rules', tag: 'Beta' },
+			{ label: 'Functions', link: '/cluster/functions', tag: 'Beta' },
 		],
 	},
 	Security: {
@@ -83,6 +82,7 @@ const defaultRoutes = {
 			{ label: 'API Credentials', link: '/cluster/credentials' },
 			{ label: 'User Management', link: '/cluster/user-management' },
 			{ label: 'Role Based Access', link: '/cluster/role-based-access', tag: 'Beta' },
+			{ label: 'Search Templates', link: '/cluster/search-templates', tag: 'Beta' },
 		],
 	},
 	Billing: {
@@ -187,9 +187,19 @@ class DashboardWrapper extends Component {
 	}
 
 	componentDidMount() {
-		const { isClusterPlanFetched, fetchClusterPlan, isClusterPlanFetching } = this.props;
+		const {
+			isClusterPlanFetched,
+			fetchClusterPlan,
+			isClusterPlanFetching,
+			apps,
+			fetchApps,
+		} = this.props;
 		if (!isClusterPlanFetching && !isClusterPlanFetched) {
 			fetchClusterPlan();
+		}
+
+		if (!apps) {
+			fetchApps();
 		}
 	}
 
@@ -212,7 +222,7 @@ class DashboardWrapper extends Component {
 
 	render() {
 		const { collapsed, showHeader, routes, activeSubMenu, activeMenuItem } = this.state;
-		const { apps } = this.props;
+		const { apps, history } = this.props;
 
 		const filteredApps = keys(apps).filter(app => !app.startsWith('.'));
 
@@ -273,6 +283,7 @@ class DashboardWrapper extends Component {
 													<IndexSwitcher
 														item={item}
 														filteredApps={filteredApps}
+														history={history}
 													/>
 												) : (
 													<Link replace to={item.link}>
@@ -350,6 +361,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
 	fetchClusterPlan: () => dispatch(getAppPlan()),
+	fetchApps: () => dispatch(loadApps()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DashboardWrapper);

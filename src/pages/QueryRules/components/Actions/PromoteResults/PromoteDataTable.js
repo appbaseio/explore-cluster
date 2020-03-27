@@ -12,6 +12,14 @@ const popoverContent = css`
 	max-height: 300px;
 `;
 
+const responsiveInput = css`
+	width: 100%;
+	min-width: 6vw;
+	@media (max-width: 600px) {
+		min-width: 8vw;
+	}
+`;
+
 const overflow = { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
 
 export function PromoteDataTable({ positionRender, dataRender, dataSource, actionRender }) {
@@ -61,7 +69,12 @@ export function PromoteDataTable({ positionRender, dataRender, dataSource, actio
 
 export function PromotePosition({ value, onChange }) {
 	return (
-		<InputNumber style={{ width: '100%' }} value={Number(value)} onChange={onChange} min={1} />
+		<InputNumber
+			className={responsiveInput}
+			value={Number(value)}
+			onChange={onChange}
+			min={1}
+		/>
 	);
 }
 

@@ -32,9 +32,9 @@ import { getAggsMappings } from '../../batteries/utils/mappings';
 import { ReviewAndSave } from '../../components/ReviewAndSave';
 import { SettingsFooter } from '../../components/SettingsFooter';
 import { container } from '../ResultsPage/styles';
-import { getSubFields, validSettingsPlans } from '../../utils';
+import { getSubFields } from '../../utils';
 import { settingsMap } from '../../components/ReviewAndSave/helper';
-import { isEqual } from '../../batteries/utils';
+import { isEqual, isValidPlan } from '../../batteries/utils';
 import mappingUsecase from '../../batteries/utils/mappingUsecase';
 import Overlay from '../../components/Overlay';
 import { highlighter } from '../SandboxPage/components/Search';
@@ -120,6 +120,7 @@ class SearchSettingsPage extends React.Component {
 		const { mappings, settings, isLoading } = this.props;
 		if (mappings && JSON.stringify(prevProps.mappings) !== JSON.stringify(mappings)) {
 			const aggsMappings = this.getAggsMappings(mappings);
+			this.initData(settings);
 
 			// eslint-disable-next-line
 			this.setState({
@@ -149,16 +150,8 @@ class SearchSettingsPage extends React.Component {
 	};
 
 	initData = settings => {
-		const dataField =
-			settings && settings.search
-				? settings.search.dataField.reduce(
-						(agg, field, index) => ({
-							...agg,
-							[field]: settings.search.fieldWeights[index],
-						}),
-						{},
-				  )
-				: {};
+		const dataField = settings && settings.search ? this.getDataFields(settings) : {};
+
 		this.setState({
 			typoTolerance: get(settings, 'search.fuzziness'),
 			hasTypoTolerance: !!get(settings, 'search.fuzziness', false),
@@ -168,17 +161,55 @@ class SearchSettingsPage extends React.Component {
 		});
 	};
 
+	getDataFields = settings => {
+		const { mappings } = this.props;
+		let searchableFields = settings.search.dataField;
+		if (searchableFields.length === 0 && mappings) {
+			const aggsResponse = getAggsMappings(mappings, true);
+			const parsedMappings = Array.isArray(aggsResponse)
+				? aggsResponse
+				: Object.keys(aggsResponse);
+
+			const originalSearchableFields = parsedMappings.filter(
+				mapping =>
+					mapping.fieldType === 'text' &&
+					(mapping.usecase === 'search' || mapping.usecase === 'searchaggs'),
+			);
+
+			searchableFields = originalSearchableFields.reduce((agg, item) => {
+				return [
+					...agg,
+					...Object.keys(
+						getSubFields({ address: item.address, weight: 1, fields: item.fields }),
+					),
+				];
+			}, []);
+		}
+
+		return searchableFields.reduce(
+			(agg, field, index) => ({
+				...agg,
+				[field]: settings.search.fieldWeights[index] || 1,
+			}),
+			{},
+		);
+	};
+
 	getAggsMappings = mappings => {
 		const aggsResponse = getAggsMappings(mappings, true);
 		const parsedMappings = Array.isArray(aggsResponse)
 			? aggsResponse
 			: Object.keys(aggsResponse);
 		this.noUseCaseMappings = parsedMappings.filter
-			? parsedMappings.filter(mapping => mapping.usecase === 'none')
+			? parsedMappings.filter(mapping => mapping.usecase === 'text')
 			: [];
 		const aggsMappings = parsedMappings.filter
 			? parsedMappings
-					.filter(mapping => mapping.usecase === 'aggs')
+					.filter(
+						mapping =>
+							mapping.fieldType === 'text' &&
+							(mapping.usecase === 'none' || mapping.usecase === 'aggs'),
+					)
 					.map(mapping => ({
 						_address: `${mapping.type}.${mapping.address
 							.split('.')
@@ -355,7 +386,14 @@ class SearchSettingsPage extends React.Component {
 		const fieldChanged = parsedAddress;
 
 		if (usecase === 'aggs' || usecase === 'none') {
-			const searchSubFields = ['search', 'english', 'lang', 'autosuggest', 'keyword'];
+			const searchSubFields = [
+				'search',
+				'english',
+				'lang',
+				'autosuggest',
+				'keyword',
+				'synonyms',
+			];
 
 			const subFields = [
 				fieldChanged,
@@ -447,10 +485,11 @@ class SearchSettingsPage extends React.Component {
 			isLoading,
 			tier,
 			traversedMappings,
+			featureSearchRelevancy,
 		} = this.props;
 		const toleranceOptions = ['AUTO', 1, 2];
 
-		if (tier && validSettingsPlans.indexOf(tier) === -1) {
+		if (!isValidPlan(tier, featureSearchRelevancy)) {
 			return (
 				<React.Fragment>
 					<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
@@ -705,7 +744,7 @@ class SearchSettingsPage extends React.Component {
 										fieldWeights: Object.values(dataField),
 									},
 								},
-								hasTestSettings: true,
+								hasTestSettings: Object.keys(dataField).length > 0,
 							},
 							buttonProps: {
 								showTooltip: isDirty,
@@ -769,6 +808,7 @@ const mapStateToProps = state => {
 		traversedMappings: get(state, `$getAppMappings.traversedMappings.${appName}`, []),
 		appName,
 		tier: get(state, '$getAppPlan.results.tier'),
+		featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
 	};
 };
 

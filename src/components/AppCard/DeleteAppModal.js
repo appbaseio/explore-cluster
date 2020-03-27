@@ -3,9 +3,10 @@ import { Modal, Input, message } from 'antd';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
-import { deleteApp, validSettingsPlans } from '../../utils';
+import { deleteApp } from '../../utils';
 import { removeAppData } from '../../actions';
 import { deleteSettings } from '../../batteries/modules/actions';
+import { isValidPlan } from '../../batteries/utils';
 
 class DeleteAppModal extends React.Component {
 	state = {
@@ -22,13 +23,14 @@ class DeleteAppModal extends React.Component {
 			deleteSettingsAction,
 			tier,
 			index,
+			featureSearchRelevancy,
 		} = this.props;
 
 		this.setState({
 			loading: true,
 		});
 
-		if (tier && validSettingsPlans.indexOf(tier) !== -1) {
+		if (isValidPlan(tier, featureSearchRelevancy)) {
 			await deleteSettingsAction(appName);
 		}
 
@@ -107,6 +109,7 @@ DeleteAppModal.propTypes = {
 
 const mapStateToProps = state => ({
 	tier: get(state, '$getAppPlan.results.tier'),
+	featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
 });
 
 const mapDispatchToProps = dispatch => ({

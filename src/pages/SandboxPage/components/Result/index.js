@@ -33,7 +33,7 @@ class Result extends React.Component {
 								<Alert
 									type="info"
 									icon="info"
-									style={{ marginBottom: 8 }}
+									style={{ margin: '0px 0 16px' }}
 									message={`${rulesApplied.length} Query ${
 										rulesApplied.length > 1 ? 'rules' : 'rule'
 									} applied`}

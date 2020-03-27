@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import React from 'react';
 import { connect } from 'react-redux';
 import { Card, Form, Input, InputNumber, message, notification, Select, Switch } from 'antd';
@@ -16,9 +17,8 @@ import { ReviewAndSave } from '../../components/ReviewAndSave';
 import { SettingTooltip } from '../../components/SettingTooltip';
 import { settingsMap } from '../../components/ReviewAndSave/helper';
 import { getTraversedMappingsByAppName } from '../../batteries/modules/selectors';
-import { isEqual } from '../../batteries/utils';
+import { isEqual, isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
-import { validSettingsPlans } from '../../utils';
 
 const bannerDetails = {
 	title: 'Result Settings',
@@ -61,13 +61,14 @@ class ResultsPage extends React.Component {
 			getSettingsAction,
 			form: { getFieldDecorator, setFieldsValue },
 			getDefaultSettingsAction,
+			defaultSettings,
 		} = this.props;
 		getSettingsAction(appName).then(res => {
 			if (res && res.payload) {
 				this.setFormValues(res, getFieldDecorator, setFieldsValue);
 			}
 		});
-		getDefaultSettingsAction();
+		if (!defaultSettings) getDefaultSettingsAction();
 		this.getMappings();
 	}
 
@@ -115,6 +116,8 @@ class ResultsPage extends React.Component {
 		getFieldDecorator('number_of_fragments');
 		getFieldDecorator('fragment_size');
 		getFieldDecorator('pre_tags');
+		getFieldDecorator('post_tags');
+		getFieldDecorator('highlightFields');
 	};
 
 	handleSubmit = e => {
@@ -148,19 +151,20 @@ class ResultsPage extends React.Component {
 	}
 
 	getResultsPayload = values => {
+		const { defaultSettings } = this.props;
+		const defaultHighlightOptions = get(defaultSettings, 'results.highlightOptions', {});
 		const { pre_tags, number_of_fragments, fragment_size } = values;
 		const post_tags = pre_tags ? `</${pre_tags.split('<')[1]}` : [];
-		const getHighlightOptions = () => {
-			if (!values.highlight) return undefined;
-			return {
-				pre_tags: [pre_tags],
-				post_tags: [post_tags],
-				fragment_size,
-				number_of_fragments,
-			};
-		};
+		const getHighlightOptions = () => ({
+			pre_tags: pre_tags ? [pre_tags] : defaultHighlightOptions.pre_tags,
+			post_tags: pre_tags ? [post_tags] : defaultHighlightOptions.post_tags,
+			fragment_size: fragment_size || defaultHighlightOptions.fragment_size,
+			number_of_fragments: number_of_fragments || defaultHighlightOptions.number_of_fragments,
+		});
 
 		let resultsPayload = pick(values, ['size', 'highlight', 'highlightFields']);
+		resultsPayload.highlightFields =
+			resultsPayload.highlightFields || get(defaultSettings, 'results.highlightFields');
 		const { includeFields, excludeFields } = this.state;
 		const highlightOptions = getHighlightOptions();
 		resultsPayload = {
@@ -308,7 +312,12 @@ class ResultsPage extends React.Component {
 						defaultSettings,
 						'results.highlightOptions.number_of_fragments',
 					),
-				})(<InputNumber style={{ width: '17%' }} placeholder="Enter number of fragments" />)}
+				})(
+					<InputNumber
+						style={{ width: '17%' }}
+						placeholder="Enter number of fragments"
+					/>,
+				)}
 			</Form.Item>
 		</>
 	);
@@ -337,10 +346,11 @@ class ResultsPage extends React.Component {
 			appName,
 			defaultSettings,
 			tier,
+			featureSearchRelevancy,
 		} = this.props;
 		const { includeFields, excludeFields, visible, isReset } = this.state;
 
-		if (tier && validSettingsPlans.indexOf(tier) === -1) {
+		if (!isValidPlan(tier, featureSearchRelevancy)) {
 			return (
 				<React.Fragment>
 					<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
@@ -443,10 +453,11 @@ class ResultsPage extends React.Component {
 const mapStateToProps = state => {
 	const appName = get(state, '$getCurrentApp.name');
 	const mappings = getTraversedMappingsByAppName(state);
+	const parsedMappings = Array.isArray(mappings) ? mappings : [];
 	const { username, password } = get(state, 'user.data', {});
 	return {
 		appName,
-		mappings: isEmpty(mappings) ? [] : mappings,
+		mappings: isEmpty(parsedMappings) ? [] : parsedMappings,
 		credentials: `${username}:${password}`,
 		isLoading: get(state, '$getAppSettings.isFetching'),
 		settings: get(state, ['$getAppSettings', 'settings', appName]),
@@ -454,6 +465,7 @@ const mapStateToProps = state => {
 		resetState: get(state, '$getAppSettings.default', {}),
 		defaultSettings: get(state, '$getAppSettings.defaultSettings'),
 		tier: get(state, '$getAppPlan.results.tier'),
+		featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
 	};
 };
 
