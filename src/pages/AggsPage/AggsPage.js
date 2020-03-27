@@ -36,6 +36,7 @@ import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { SettingsFooter } from '../../components/SettingsFooter';
 import { ReviewAndSave } from '../../components/ReviewAndSave';
 import { container } from '../ResultsPage/styles';
+import { getSubFields } from '../../utils';
 import { settingsMap } from '../../components/ReviewAndSave/helper';
 import { isEqual, isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
@@ -86,6 +87,8 @@ class AggsPage extends React.Component {
 		isDirty: false,
 		visible: false,
 	};
+
+	searchableMappings = {};
 
 	mappingsRef = React.createRef(null);
 
@@ -171,6 +174,28 @@ class AggsPage extends React.Component {
 		const parsedMappings = Array.isArray(aggsResponse)
 			? aggsResponse
 			: Object.keys(aggsResponse);
+		const originalSearchableFields = parsedMappings.filter(
+			mapping =>
+				mapping.fieldType === 'text' &&
+				(mapping.usecase === 'search' || mapping.usecase === 'searchaggs'),
+		);
+
+		const searchableFields = originalSearchableFields.reduce((agg, item) => {
+			return [
+				...agg,
+				...Object.keys(
+					getSubFields({ address: item.address, weight: 1, fields: item.fields }),
+				),
+			];
+		}, []);
+
+		this.searchableMappings = searchableFields.reduce(
+			(agg, field) => ({
+				...agg,
+				[field]: 1,
+			}),
+			{},
+		);
 		const searchableMappings = parsedMappings
 			.filter(
 				mapping =>
@@ -608,6 +633,22 @@ class AggsPage extends React.Component {
 							searchPreviewProps: {
 								testSettings: {
 									...(settings || {}),
+									search: {
+										...settings.search,
+										dataField:
+											settings.search &&
+											settings.search.dataField &&
+											settings.search.dataField.length > 0
+												? settings.search.dataField
+												: Object.keys(this.searchableMappings),
+
+										fieldWeights:
+											settings.search &&
+											settings.search.dataField &&
+											settings.search.dataField.length > 0
+												? settings.search.fieldWeights
+												: Object.values(this.searchableMappings),
+									},
 									aggregations: {
 										size: count,
 										sortBy: sort,
