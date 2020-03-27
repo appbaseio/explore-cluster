@@ -42,12 +42,13 @@ import {
 	handleQueryRuleDelete,
 	updateFunction,
 } from '../../utils';
-import { bannerDetails, getExpressionFromValue, getParsedRule, validPlans } from './utils';
+import { bannerDetails, getExpressionFromValue, getParsedRule } from './utils';
 import DeleteModal from '../../components/DeleteModal';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Overlay from '../../components/Overlay';
 import { mediaKey } from '../../utils/media';
 import { getSingleFunction } from '../../batteries/utils/app';
+import { isValidPlan } from '../../batteries/utils';
 
 const { RangePicker } = DatePicker;
 
@@ -484,9 +485,10 @@ class QueryRulesForm extends React.Component {
 			isDeleting,
 			unparsedRule,
 			tier,
+			featureRules,
 		} = this.props;
 
-		if (tier && validPlans.indexOf(tier) === -1) {
+		if (!isValidPlan(tier, featureRules)) {
 			return (
 				<React.Fragment>
 					<Banner {...bannerDetails} />
@@ -764,6 +766,7 @@ const mapStateToProps = (state, props) => {
 		rules: get(state, '$getAppRules.results', []),
 		rulesLoading: get(state, '$getAppRules.isFetching'),
 		tier: get(state, '$getAppPlan.results.tier'),
+		featureRules: get(state, '$getAppPlan.results.feature_rules', false),
 	};
 
 	if (id) {
