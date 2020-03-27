@@ -9,9 +9,10 @@ import QueryCard from './components/QueryCard';
 import { getRules, reorderRules } from '../../batteries/modules/actions';
 import Loader from '../../components/Loader';
 import DNDWrapper from '../../components/DNDWrapper';
+import { isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
-import { validPlans, bannerDetails } from './utils';
+import { bannerDetails } from './utils';
 
 const { Header } = Layout;
 
@@ -21,10 +22,11 @@ const container = css`
 
 class QueryRules extends Component {
 	componentDidMount() {
-		const { fetchRules, rules } = this.props;
-
-		if (!rules) {
-			fetchRules();
+		const { fetchRules, rules, tier, featureRules } = this.props;
+		if (isValidPlan(tier, featureRules)) {
+			if (!rules) {
+				fetchRules();
+			}
 		}
 	}
 
@@ -63,9 +65,9 @@ class QueryRules extends Component {
 	};
 
 	render() {
-		const { rules, isLoading, tier } = this.props;
+		const { rules, isLoading, tier, featureRules } = this.props;
 
-		if (tier && validPlans.indexOf(tier) === -1) {
+		if (!isValidPlan(tier, featureRules)) {
 			return (
 				<React.Fragment>
 					<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
@@ -184,6 +186,7 @@ const mapStateToProps = state => ({
 	reordering: get(state, '$getAppRules.reordering'),
 	deleted: get(state, '$getAppRules.deleted'),
 	tier: get(state, '$getAppPlan.results.tier'),
+	featureRules: get(state, '$getAppPlan.results.feature_rules', false),
 });
 
 const mapDispatchToProps = dispatch => ({
