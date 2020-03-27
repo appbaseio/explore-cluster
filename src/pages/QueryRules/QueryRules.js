@@ -172,20 +172,22 @@ class QueryRules extends Component {
 							}
 						/>
 					)}
-					<Affix offsetBottom={0}>
-						<div
-							style={{
-								display: 'flex',
-								justifyContent: 'space-between',
-								padding: 20,
-								background: 'white',
-								border: '1px solid #e8e8e8',
-								boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.15)',
-							}}
-						>
-							<SearchPreviewModal app={appName} />
-						</div>
-					</Affix>
+					{rules && rules.length > 0 ? (
+						<Affix offsetBottom={0}>
+							<div
+								style={{
+									display: 'flex',
+									justifyContent: 'space-between',
+									padding: 20,
+									background: 'white',
+									border: '1px solid #e8e8e8',
+									boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.15)',
+								}}
+							>
+								<SearchPreviewModal app={appName} />
+							</div>
+						</Affix>
+					) : null}
 				</div>
 			</Fragment>
 		);
