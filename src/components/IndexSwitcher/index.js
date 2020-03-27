@@ -37,6 +37,7 @@ export function IndexSwitcher({ item, filteredApps = [], history }) {
 			return <div style={{ margin: 4 }}>Please create an index to get started.</div>;
 		return (
 			<Select
+				placeholder="Search for an index."
 				style={{ minWidth: 180 }}
 				onSelect={value => {
 					history.replace(`/app/${value}/${item.link}`);
