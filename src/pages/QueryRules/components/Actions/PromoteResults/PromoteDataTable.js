@@ -14,6 +14,7 @@ const popoverContent = css`
 
 const responsiveInput = css`
 	width: 100%;
+	min-width: 6vw;
 	@media (max-width: 600px) {
 		min-width: 8vw;
 	}
