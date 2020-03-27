@@ -21,7 +21,7 @@ import {
 import Replicas from './Replicas';
 import Shards from './Shards';
 import Loader from '../../batteries/components/shared/Loader';
-import { appendApp, removeAppData } from '../../actions';
+import { appendApp, loadApps, removeAppData } from '../../actions';
 
 const bannerMessage = {
 	title: 'Index Settings',
@@ -45,9 +45,10 @@ class IndexSettings extends React.Component {
 	allocated_replicas = null;
 
 	async componentDidMount() {
-		const { appName, credentials, fetchMappings, mappings } = this.props;
+		const { appName, credentials, fetchMappings, mappings, fetchApps } = this.props;
 		const url = getURL();
 		this.initializeSettings();
+		fetchApps();
 		if (!mappings) {
 			fetchMappings(appName, credentials, url);
 		}
@@ -96,7 +97,7 @@ class IndexSettings extends React.Component {
 
 	updateReplicas = () => {
 		const { replicas } = this.state;
-		const { appName, credentials } = this.props;
+		const { appName, credentials, addApp, apps } = this.props;
 		this.handleModal('replicasModal');
 
 		this.setState({
@@ -113,6 +114,7 @@ class IndexSettings extends React.Component {
 		})
 			.then(res => {
 				if (res.acknowledged) {
+					addApp({ [appName]: { ...get(apps, ['data', appName], {}), rep: replicas } });
 					message.success('Replicas updated successfully');
 				} else {
 					notification.error({
@@ -145,7 +147,7 @@ class IndexSettings extends React.Component {
 	};
 
 	reIndex = async () => {
-		const { appName, credentials, mappings } = this.props;
+		const { appName, credentials, mappings, addApp, apps } = this.props;
 		const { shards, replicas, esVersion } = this.state;
 		const type = getTypesFromMapping(mappings);
 		let appSettings = await getSettings(appName, credentials).then(
@@ -166,6 +168,9 @@ class IndexSettings extends React.Component {
 			.then(() => {
 				this.setState({
 					isReindexing: false,
+				});
+				addApp({
+					[appName]: { ...get(apps, ['data', appName], {}), pri: shards, rep: replicas },
 				});
 				message.success('Number of shards updated successfully');
 			})
@@ -244,6 +249,7 @@ const mapStateToProps = state => {
 	const { username, password } = get(state, 'user.data', {});
 	const appName = get(state, '$getCurrentApp.name');
 	return {
+		apps: state.apps,
 		credentials: username ? `${username}:${password}` : null,
 		mappings,
 		isFetchingMapping: get(state, '$getAppMappings.isFetching'),
@@ -257,6 +263,7 @@ const mapDispatchToProps = dispatch => ({
 	updateCurrentApp: app => dispatch(setCurrentApp(app)),
 	addApp: app => dispatch(appendApp(app)),
 	deleteApp: appName => dispatch(removeAppData(appName)),
+	fetchApps: () => dispatch(loadApps()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(IndexSettings);

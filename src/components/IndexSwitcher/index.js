@@ -1,8 +1,7 @@
-import { Button, Dropdown, Icon, Menu, Popconfirm, Tooltip } from 'antd';
+import { Icon, Popconfirm, Select, Tooltip } from 'antd';
 import { Link } from 'react-router-dom';
 import React from 'react';
 import { css } from 'emotion';
-import { dropdown } from '../../batteries/components/Mappings/styles';
 import { LabelTag } from '../LabelTag';
 
 const popOverClass = css`
@@ -15,7 +14,7 @@ const popOverClass = css`
 `;
 
 // eslint-disable-next-line import/prefer-default-export
-export function IndexSwitcher({ item, filteredApps = [] }) {
+export function IndexSwitcher({ item, filteredApps = [], history }) {
 	if (filteredApps.length === 1)
 		return (
 			<Link to={`/app/${filteredApps[0]}/${item.link}`}>
@@ -23,28 +22,34 @@ export function IndexSwitcher({ item, filteredApps = [] }) {
 			</Link>
 		);
 
-	const menu = (
-		<Menu>
-			{filteredApps.map(app => (
-				<Menu.Item key={app}>
-					<Link replace to={`/app/${app}/${item.link}`}>
-						{app}
-					</Link>
-				</Menu.Item>
-			))}
-		</Menu>
-	);
+	const sortedApps = filteredApps.sort((a, b) => {
+		if (a < b) {
+			return -1;
+		}
+		if (a > b) {
+			return 1;
+		}
+		return 0;
+	});
 
 	function getTitle() {
 		if (filteredApps.length === 0)
 			return <div style={{ margin: 4 }}>Please create an index to get started.</div>;
 		return (
-			<Dropdown overlay={menu}>
-				<Button className={dropdown} style={{ minWidth: 200 }}>
-					Select Index
-					<Icon type="down" />
-				</Button>
-			</Dropdown>
+			<Select
+				placeholder="Search for an index."
+				style={{ minWidth: 180 }}
+				onSelect={value => {
+					history.replace(`/app/${value}/${item.link}`);
+				}}
+				showSearch
+			>
+				{sortedApps.map(app => (
+					<Select.Option key={app} value={app}>
+						{app}
+					</Select.Option>
+				))}
+			</Select>
 		);
 	}
 

@@ -5,10 +5,11 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { flatten, get, isEmpty, map } from 'lodash';
-import { cloneApp, validSettingsPlans } from '../../utils';
+import { cloneApp } from '../../utils';
 import { validateAppName } from '../../utils/helper';
 import { getSettings, putSettings } from '../../batteries/modules/actions';
 import { appendApp } from '../../actions';
+import { isValidPlan } from '../../batteries/utils';
 
 const centerAligned = css`
 	display: flex;
@@ -22,7 +23,7 @@ const radioStyle = css`
 `;
 
 const CloneIndex = props => {
-	const { handleCancel, index, existingApps, history, tier } = props;
+	const { handleCancel, index, existingApps, history, tier, featureSearchRelevancy } = props;
 	const [destIndex, setDestIndex] = useState('');
 	const [action, setAction] = useState(['settings.mappings', 'data']);
 	const [loading, setLoading] = useState(false);
@@ -31,10 +32,6 @@ const CloneIndex = props => {
 	function resetValues() {
 		setLoading(false);
 		setDestIndex('');
-	}
-
-	function isValidPlan() {
-		return tier && validSettingsPlans.indexOf(tier) !== -1;
 	}
 
 	const handleSubmit = () => {
@@ -54,7 +51,7 @@ const CloneIndex = props => {
 		cloneApp(index, destIndex, { action: actions })
 			.then(async () => {
 				const { getSettingsAction, updateSettingsAction, addApp } = props;
-				if (hasSearchRelevancy && isValidPlan()) {
+				if (hasSearchRelevancy && isValidPlan(tier, featureSearchRelevancy)) {
 					const res = await getSettingsAction(index);
 					if (res && res.payload) {
 						await updateSettingsAction(destIndex, res.payload);
@@ -77,7 +74,11 @@ const CloneIndex = props => {
 	}
 
 	const searchRelevancyCheckbox = (
-		<Checkbox disabled={!isValidPlan()} className={radioStyle} value="search_relevancy">
+		<Checkbox
+			disabled={!isValidPlan(tier, featureSearchRelevancy)}
+			className={radioStyle}
+			value="search_relevancy"
+		>
 			Copy Search Relevancy Settings
 		</Checkbox>
 	);
@@ -126,7 +127,7 @@ const CloneIndex = props => {
 						</Checkbox>
 					</div>
 					<div>
-						{isValidPlan() ? (
+						{isValidPlan(tier, featureSearchRelevancy) ? (
 							searchRelevancyCheckbox
 						) : (
 							<Tooltip title="This feature is only available on selected plans.">
@@ -152,6 +153,7 @@ CloneIndex.defaultProps = {
 const mapStateToProps = state => ({
 	existingApps: Object.keys(state.apps.data || {}),
 	tier: get(state, '$getAppPlan.results.tier'),
+	featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
 });
 
 const mapDispatchToProps = dispatch => ({

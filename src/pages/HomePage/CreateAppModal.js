@@ -12,9 +12,9 @@ import {
 	Row,
 	Select,
 } from 'antd';
-import _get from 'lodash/get';
 import PropTypes from 'prop-types';
 
+import { get } from 'lodash';
 import { input, modalHeading, radiobtn } from './styles';
 import { validateAppName, validationsList } from '../../utils/helper';
 
@@ -23,7 +23,7 @@ import { LanguageDropdown } from '../../components/LanguageDropdown';
 import languages from '../../constants/language';
 import { getDefaultSettings, putSettings } from '../../batteries/modules/actions';
 import { getLanguageFallback } from '../../utils/language';
-import { validSettingsPlans } from '../../utils';
+import { isValidPlan } from '../../batteries/utils';
 
 const RadioGroup = Radio.Group;
 
@@ -54,6 +54,7 @@ class CreateAppModal extends Component {
 			defaultSettings,
 			getDefaultSettingsAction,
 			tier,
+			featureSearchRelevancy,
 		} = this.props;
 		const { hasJSON, appName } = this.state;
 		let { language } = this.state;
@@ -83,7 +84,7 @@ class CreateAppModal extends Component {
 
 		if (createdApp.data && createdApp.data.acknowledged) {
 			// restrict calling API if it's not a valid plan
-			if (tier && validSettingsPlans.indexOf(tier) !== -1) await handleSettingsUpdate();
+			if (isValidPlan(tier, featureSearchRelevancy)) await handleSettingsUpdate();
 			if (hasJSON === 'sample') {
 				history.push(`app/${appName}/import?load-data=true`);
 			} else if (hasJSON) {
@@ -104,7 +105,7 @@ class CreateAppModal extends Component {
 			settings: {
 				number_of_shards: shards,
 				number_of_replicas: replicas,
-				analysis: _get(languages, [language, 'analysis']),
+				analysis: get(languages, [language, 'analysis']),
 			},
 		};
 
@@ -293,8 +294,9 @@ const mapStateToProps = state => ({
 	apps: state.apps,
 	appsMetrics: state.appsMetrics,
 	createdApp: state.createdApp,
-	defaultSettings: _get(state, '$getAppSettings.defaultSettings'),
-	tier: _get(state, '$getAppPlan.results.tier'),
+	defaultSettings: get(state, '$getAppSettings.defaultSettings'),
+	tier: get(state, '$getAppPlan.results.tier'),
+	featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
 });
 
 const mapDispatchToProps = dispatch => ({

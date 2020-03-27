@@ -36,9 +36,9 @@ import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { SettingsFooter } from '../../components/SettingsFooter';
 import { ReviewAndSave } from '../../components/ReviewAndSave';
 import { container } from '../ResultsPage/styles';
-import { validSettingsPlans, getSubFields } from '../../utils';
+import { getSubFields } from '../../utils';
 import { settingsMap } from '../../components/ReviewAndSave/helper';
-import { isEqual } from '../../batteries/utils';
+import { isEqual, isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import { highlighter } from '../SandboxPage/components/Search';
 
@@ -402,6 +402,7 @@ class AggsPage extends React.Component {
 			defaultSettings,
 			tier,
 			traversedMappings,
+			featureSearchRelevancy,
 		} = this.props;
 		const sortOptions = [
 			{ name: 'Count', value: 'count' },
@@ -410,7 +411,7 @@ class AggsPage extends React.Component {
 		];
 		const { size: savedSize, ...restSavedAggs } = get(settings, 'aggregations', {});
 
-		if (tier && validSettingsPlans.indexOf(tier) === -1) {
+		if (!isValidPlan(tier, featureSearchRelevancy)) {
 			return (
 				<React.Fragment>
 					<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
@@ -712,6 +713,7 @@ const mapStateToProps = state => {
 		appName,
 		defaultSettings,
 		tier: get(state, '$getAppPlan.results.tier'),
+		featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
 	};
 };
 

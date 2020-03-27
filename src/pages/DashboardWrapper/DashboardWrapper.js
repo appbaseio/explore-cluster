@@ -221,7 +221,7 @@ class DashboardWrapper extends Component {
 
 	render() {
 		const { collapsed, showHeader, routes, activeSubMenu, activeMenuItem } = this.state;
-		const { apps } = this.props;
+		const { apps, history } = this.props;
 
 		const filteredApps = keys(apps).filter(app => !app.startsWith('.'));
 
@@ -282,6 +282,7 @@ class DashboardWrapper extends Component {
 													<IndexSwitcher
 														item={item}
 														filteredApps={filteredApps}
+														history={history}
 													/>
 												) : (
 													<Link replace to={item.link}>
