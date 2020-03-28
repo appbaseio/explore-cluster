@@ -30,7 +30,7 @@ class SearchPreview extends React.Component {
 		settings: null,
 		searchableMappings: [],
 		hasMappingsLoaded: false,
-		isAnalyticsEnabled: false,
+		isAnalyticsEnabled: true,
 	};
 
 	componentDidMount() {
@@ -197,9 +197,9 @@ class SearchPreview extends React.Component {
 				<Col xs={24}>
 					<Row className="my-16" type="flex" align="middle" justify="space-between">
 						<div>
-							<Tooltip title="Switch for whether to record analytics based on the search and click requests made from the Search Preview view.">
+							<Tooltip title="Toggle to record search and click analytics events from the search relevancy view.">
 								<label htmlFor="analytics">
-									Record analytics
+									Record Analytics
 									<Switch
 										checked={isAnalyticsEnabled}
 										style={{ marginLeft: 5 }}

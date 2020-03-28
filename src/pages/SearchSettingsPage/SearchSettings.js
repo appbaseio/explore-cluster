@@ -70,7 +70,7 @@ class SearchSettingsPage extends React.Component {
 	state = {
 		aggsMappings: [],
 		dataField: {},
-		hasSearchOperators: undefined,
+		hasSearchOperators: false,
 		hasTypoTolerance: false,
 		isDirty: false,
 		visible: false,
@@ -658,7 +658,7 @@ class SearchSettingsPage extends React.Component {
 					</Card>
 					<Card className={cardStyle}>
 						<label>
-							Search Operators{' '}
+							{settingsMap.searchOperators.title}{' '}
 							<Tooltip title={settingsMap.searchOperators.description}>
 								<Icon type="info-circle" />
 							</Tooltip>
@@ -669,8 +669,8 @@ class SearchSettingsPage extends React.Component {
 						/>
 
 						<label>
-							Enable Typo Tolerance{' '}
-							<Tooltip title="Enable this to return documents that contain terms similar to the search term.">
+							{settingsMap.enableTypoTolerance.title}{' '}
+							<Tooltip title={settingsMap.enableTypoTolerance.description}>
 								<Icon type="info-circle" />
 							</Tooltip>
 						</label>
@@ -682,10 +682,8 @@ class SearchSettingsPage extends React.Component {
 						{hasTypoTolerance && (
 							<React.Fragment>
 								<label>
-									Typo Tolerance{' '}
-									<Tooltip
-										title={`Sets a maximum edit distance on the search parameters, can be 1, 2 or "AUTO".`}
-									>
+									{settingsMap.typoToleranceValue.title}{' '}
+									<Tooltip title={settingsMap.typoToleranceValue.description}>
 										<Icon type="info-circle" />
 									</Tooltip>
 								</label>

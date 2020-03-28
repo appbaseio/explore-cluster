@@ -17,7 +17,7 @@ const Shards = ({
 				<div className={cardTitle}>
 					<div>
 						<h4>Manage Shards</h4>
-						<p>Configure the number of shards for your app.</p>
+						<p>Configure the number of shards for your index.</p>
 					</div>
 					<Button onClick={() => handleModal('shardsModal')} type="primary">
 						Change Shards
@@ -35,7 +35,7 @@ const Shards = ({
 			onCancel={() => handleModal('shardsModal')}
 		>
 			<h4>
-				Update value to change the number of shards for your app. Read more{' '}
+				Update value to change the number of shards for your index. Read more{' '}
 				<a
 					target="_blank"
 					rel="noopener noreferrer"

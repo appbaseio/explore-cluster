@@ -1,7 +1,7 @@
-export const settingsMap = {
+const settingsMap = {
 	size: {
 		title: 'Page Size',
-		description: 'Number of results shown in a page.',
+		description: 'Number of results to show in a page',
 	},
 	includeFields: {
 		title: 'Include Fields',
@@ -9,15 +9,28 @@ export const settingsMap = {
 	},
 	excludeFields: {
 		title: 'Exclude Fields',
-		description: 'Fields to exclude from the search results.',
+		description: 'Fields to exclude from the search results',
 	},
 	highlight: {
 		title: 'Highlight',
-		description: 'Whether highlighting should be enabled in the search results.',
+		description: 'Whether highlighting should be enabled in the search results',
+	},
+	highlightTag: {
+		title: 'Highlight Tag',
+		description: 'Enter the highlight tag that should be returned, e.g. <mark> or <em>',
+	},
+	highlightFragment: {
+		title: 'Highlight Fragment Size',
+		description: 'The size of the highlighted fragment in characters',
+	},
+	highlightTotalFragments: {
+		title: 'Number of Fragments',
+		description:
+			'Maximum number of fragments to return. If set to 0, no fragments are returned.',
 	},
 	highlightFields: {
 		title: 'Highlight Fields',
-		description: 'Specifying the fields which should be returned with the matching highlights.',
+		description: 'Specify the fields that should be highlighted',
 	},
 	highlightOptions: {
 		title: 'Highlight Options',
@@ -26,24 +39,24 @@ export const settingsMap = {
 	},
 	language: {
 		title: 'Language',
-		description:
-			'Sets the languages at the index level for language-specific processing such as tokenization and normalization.',
+		description: 'Set the search engine language for this index. Defaults to Universal.',
 	},
 	applyStopwords: {
 		title: 'Apply Default Stopwords',
-		description: 'Sets whether to apply default stopwords for language or not.',
+		description: 'Enable or disable application of default stopwords. Enabled by default.',
 	},
 	customStopwords: {
 		title: 'Apply Custom Stopwords',
-		description: 'Removes these words from query before searching.',
+		description:
+			'Set comma separated stopwords to be ignored during the language specifc analysis process.',
 	},
 	stemmingExceptions: {
 		title: 'Stemming Exceptions',
-		description: 'Words which should be excluded from stemming.',
+		description: "Set words that are excluded from your language's stemming process.",
 	},
 	normalizeDiacritics: {
 		title: 'Normalize Diacritics',
-		description: 'Removes accents/diacritics from search string.',
+		description: 'Enabling this will normalize diacritics for your language.',
 	},
 	fieldWeights: {
 		title: 'Field Weights',
@@ -56,16 +69,21 @@ export const settingsMap = {
 	searchOperators: {
 		title: 'Search Operators',
 		description:
-			'Enable use of special characters in the search query to enable an advanced search behavior.',
+			'Enable or disable use of search operators (e.g. +, |, *, -) for an advanced search behavior.',
 	},
 	includeNullValues: {
 		title: 'Include Null Values',
 		description:
 			'Enable to show sparse data or document or items not having the value in the specified field or mapping',
 	},
-	fuzziness: {
+	enableTypoTolerance: {
+		title: 'Enable Typo Tolerance',
+		description: 'Enable or disable typo tolerance for search',
+	},
+	typoToleranceValue: {
 		title: 'Typo Tolerance',
-		description: 'Sets a maximum edit distance on the search parameters.',
+		description:
+			'Set the maximum typo tolerance of characters to handle per word. Value can be set to auto, or can be specific value like 1 or 2.',
 	},
 	sortBy: {
 		title: 'Sort By',
@@ -77,11 +95,13 @@ export const settingsMap = {
 	},
 	field_weight: {
 		title: 'Field Weight',
-		description: 'Set the search weight for the database fields.',
+		description:
+			'Set the search weight to boost query matches against this field. Higher weight fields imply a higher boost.',
 	},
 	agg_type: {
 		title: 'Aggregation Type',
-		description: 'Set the aggregation type for the database fields.',
+		description:
+			'Set the aggregation type for the fields. Only fields with their type set appear in the "Test Search Relevancy" UI view.',
 	},
 	set_search: {
 		title: 'Set Search',
@@ -96,6 +116,8 @@ export const settingsMap = {
 		description: 'Set aggregations field for better filtering of results.',
 	},
 	disable_search_settings: {
-		description: `Certain actions require a save before they're applied in Search Preview.`
-	}
+		description: `Certain actions require a save before they're applied in Search Preview.`,
+	},
 };
+
+export { settingsMap };

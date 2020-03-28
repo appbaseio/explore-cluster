@@ -181,13 +181,13 @@ class ResultsPage extends React.Component {
 			<Form.Item
 				label={
 					<>
-						Include Fields
+						{settingsMap.includeFields.title}
 						<SettingTooltip title={settingsMap.includeFields.description} />
 					</>
 				}
 			>
 				<Select
-					placeholder="Select field value"
+					placeholder="Select one ore more fields"
 					mode="tags"
 					notFoundContent={null}
 					style={{ width: '100%' }}
@@ -213,13 +213,13 @@ class ResultsPage extends React.Component {
 			<Form.Item
 				label={
 					<>
-						Exclude Fields
+						{settingsMap.excludeFields.title}
 						<SettingTooltip title={settingsMap.excludeFields.description} />
 					</>
 				}
 			>
 				<Select
-					placeholder="Select field value"
+					placeholder="Select one or more fields"
 					mode="tags"
 					notFoundContent={null}
 					style={{ width: '100%' }}
@@ -249,7 +249,7 @@ class ResultsPage extends React.Component {
 			<Form.Item
 				label={
 					<>
-						Fields To Highlight
+						{settingsMap.highlightFields.title}
 						<SettingTooltip title={settingsMap.highlightFields.description} />
 					</>
 				}
@@ -258,7 +258,7 @@ class ResultsPage extends React.Component {
 					initialValue: get(defaultSettings, 'results.highlightFields'),
 				})(
 					<Select
-						placeholder="Select field value"
+						placeholder="Select one or more fields"
 						mode="tags"
 						notFoundContent={null}
 						style={{ width: '100%' }}
@@ -277,33 +277,33 @@ class ResultsPage extends React.Component {
 			<Form.Item
 				label={
 					<>
-						Highlight Tag
-						<SettingTooltip title="Enter the start tag and end tag would be formed based on that. E.g. if you type <mark> end_tag would be </mark>." />
+						{settingsMap.highlightTag.title}
+						<SettingTooltip title={settingsMap.highlightTag.description} />
 					</>
 				}
 			>
 				{getFieldDecorator('pre_tags', {
 					initialValue: get(defaultSettings, 'results.highlightOptions.pre_tags.0'),
-					rules: [{ pattern: /^<\w*>$/g, message: 'Please enter a valid tag.' }],
+					rules: [{ pattern: /^<\w*>$/g, message: 'Please enter a valid tag' }],
 				})(<Input style={{ width: '17%' }} placeholder="<mark>" />)}
 			</Form.Item>
 			<Form.Item
 				label={
 					<>
-						Highlight Fragment Size
-						<SettingTooltip title="Fragment size for the search results with highlight." />
+						{settingsMap.highlightFragment.title}
+						<SettingTooltip title={settingsMap.highlightFragment.description} />
 					</>
 				}
 			>
 				{getFieldDecorator('fragment_size', {
 					initialValue: get(defaultSettings, 'results.highlightOptions.fragment_size'),
-				})(<InputNumber style={{ width: '17%' }} placeholder="Enter fragment size" />)}
+				})(<InputNumber style={{ width: '17%' }} placeholder="100" />)}
 			</Form.Item>
 			<Form.Item
 				label={
 					<>
-						Number Of Fragments
-						<SettingTooltip title="Number of fragments for the search results with highlight." />
+						{settingsMap.highlightTotalFragments.title}
+						<SettingTooltip title={settingsMap.highlightTotalFragments.description} />
 					</>
 				}
 			>
@@ -312,12 +312,7 @@ class ResultsPage extends React.Component {
 						defaultSettings,
 						'results.highlightOptions.number_of_fragments',
 					),
-				})(
-					<InputNumber
-						style={{ width: '17%' }}
-						placeholder="Enter number of fragments"
-					/>,
-				)}
+				})(<InputNumber style={{ width: '17%' }} placeholder="5" />)}
 			</Form.Item>
 		</>
 	);
@@ -374,7 +369,7 @@ class ResultsPage extends React.Component {
 							<Form.Item
 								label={
 									<>
-										Page Size
+										{settingsMap.size.title}
 										<SettingTooltip title={settingsMap.size.description} />
 									</>
 								}
