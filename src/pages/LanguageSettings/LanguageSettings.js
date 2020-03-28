@@ -326,7 +326,7 @@ class LanguageSettings extends React.Component {
 								style={{ paddingBottom: 0 }}
 								label={
 									<>
-										Choose Your Language
+										{settingsMap.language.title}
 										<SettingTooltip title={settingsMap.language.description} />
 									</>
 								}
@@ -344,7 +344,7 @@ class LanguageSettings extends React.Component {
 								)}
 							</Form.Item>
 							<div style={{ paddingBottom: 32 }}>
-								<label>Apply Default Stopwords</label>
+								<label>{settingsMap.applyStopwords.title}</label>
 								<SettingTooltip title={settingsMap.applyStopwords.description} />
 								<div style={{ marginTop: 5 }}>
 									{getFieldDecorator('applyStopwords', {
@@ -356,7 +356,7 @@ class LanguageSettings extends React.Component {
 							<Form.Item
 								label={
 									<>
-										Provide Custom Stopwords
+										{settingsMap.customStopwords.title}
 										<SettingTooltip
 											title={settingsMap.customStopwords.description}
 										/>
@@ -371,7 +371,7 @@ class LanguageSettings extends React.Component {
 							<Form.Item
 								label={
 									<>
-										Stemming Exceptions
+										{settingsMap.stemmingExceptions.title}
 										<SettingTooltip
 											title={settingsMap.stemmingExceptions.description}
 										/>
@@ -383,7 +383,7 @@ class LanguageSettings extends React.Component {
 								)}
 							</Form.Item>
 							<div style={{ paddingBottom: 32 }}>
-								<label>Normalize Diacritics</label>
+								<label>{settingsMap.normalizeDiacritics.title}</label>
 								<SettingTooltip
 									title={settingsMap.normalizeDiacritics.description}
 								/>

@@ -19,7 +19,7 @@ const Replicas = ({
 				<div className={cardTitle}>
 					<div>
 						<h4>Manage Replicas</h4>
-						<p>Configure the number of replicas for your app.</p>
+						<p>Configure the number of replicas for your index.</p>
 					</div>
 					<Button
 						disabled={loading}
@@ -45,7 +45,7 @@ const Replicas = ({
 			}}
 			onCancel={() => handleModal('replicasModal')}
 		>
-			<h4>Move slider to change the number of replicas for your app.</h4>
+			<h4>Move slider to change the number of replicas for your index.</h4>
 			{totalNodes - 1 > 0 ? (
 				<Slider
 					step={1}
@@ -55,7 +55,7 @@ const Replicas = ({
 					onChange={value => handleSlider('replicas', value)}
 				/>
 			) : (
-				<Alert message="Cannot add more replicas to the index as total nodes allowed is 1." />
+				<Alert message="Cannot add any replicas to the index as you are running a single-node instance." />
 			)}
 		</Modal>
 	</React.Fragment>

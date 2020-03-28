@@ -48,6 +48,7 @@ class AppSwitcher extends React.Component {
 						history.replace(`/app/${appName}/${route || ''}`);
 					}}
 					showSearch
+					autoFocus
 				>
 					{sortedApps.map(app => (
 						<Select.Option key={app} value={app}>
