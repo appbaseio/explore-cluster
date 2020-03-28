@@ -1,0 +1,45 @@
+import React from 'react';
+import { Affix, Button } from 'antd';
+import SearchPreviewModal from '../SearchPreviewModal';
+
+// eslint-disable-next-line import/prefer-default-export
+export function SettingsFooter({
+	loading,
+	resetState,
+	onReset,
+	reviewAndSave = () => {},
+	showSearchPreview,
+	searchPreviewModalProps,
+	app,
+	showReset = true,
+}) {
+	return (
+		<Affix offsetBottom={0}>
+			<div className="flex space-between card-footer">
+				{app && showSearchPreview ? (
+					<SearchPreviewModal {...searchPreviewModalProps} app={app} />
+				) : (
+					<div />
+				)}
+				<div>
+					{showReset && (
+						<Button
+							onClick={onReset}
+							style={{ marginRight: 10 }}
+							size="large"
+							loading={resetState.loading}
+							disabled={loading}
+						>
+							Reset To Default Settings
+						</Button>
+					)}
+					{reviewAndSave()}
+				</div>
+			</div>
+		</Affix>
+	);
+}
+
+SettingsFooter.defaultProps = {
+	searchPreviewModalProps: {},
+};

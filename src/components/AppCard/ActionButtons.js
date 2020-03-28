@@ -113,6 +113,7 @@ class ActionButtons extends React.Component {
 	render() {
 		const {
 			appName,
+			index,
 			appId,
 			shared,
 			permissions // prettier-ignore
@@ -181,6 +182,7 @@ class ActionButtons extends React.Component {
 				</Row>
 				<DeleteAppModal
 					appName={appName}
+					index={index}
 					appId={appId}
 					deleteModal={deleteModal}
 					handleDeleteModal={this.handleDeleteModal}

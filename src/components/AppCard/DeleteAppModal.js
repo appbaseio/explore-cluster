@@ -2,8 +2,11 @@ import React from 'react';
 import { Modal, Input, message } from 'antd';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { get } from 'lodash';
 import { deleteApp } from '../../utils';
 import { removeAppData } from '../../actions';
+import { deleteSettings } from '../../batteries/modules/actions';
+import { isValidPlan } from '../../batteries/utils';
 
 class DeleteAppModal extends React.Component {
 	state = {
@@ -11,20 +14,27 @@ class DeleteAppModal extends React.Component {
 		loading: false,
 	};
 
-	handleDelete = () => {
+	handleDelete = async () => {
 		const {
-			// prettier-ignore
 			appName,
 			handleDeleteModal,
 			handleRemoveApp,
 			onDelete,
+			deleteSettingsAction,
+			tier,
+			index,
+			featureSearchRelevancy,
 		} = this.props;
 
 		this.setState({
 			loading: true,
 		});
 
-		deleteApp(appName)
+		if (isValidPlan(tier, featureSearchRelevancy)) {
+			await deleteSettingsAction(appName);
+		}
+
+		deleteApp(index)
 			.then(() => {
 				handleRemoveApp(appName);
 				handleDeleteModal();
@@ -97,8 +107,14 @@ DeleteAppModal.propTypes = {
 	onDelete: PropTypes.func,
 };
 
-const mapDispatchToProps = dispatch => ({
-	handleRemoveApp: options => dispatch(removeAppData(options)),
+const mapStateToProps = state => ({
+	tier: get(state, '$getAppPlan.results.tier'),
+	featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
 });
 
-export default connect(null, mapDispatchToProps)(DeleteAppModal);
+const mapDispatchToProps = dispatch => ({
+	handleRemoveApp: options => dispatch(removeAppData(options)),
+	deleteSettingsAction: name => dispatch(deleteSettings(name)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(DeleteAppModal);

@@ -9,6 +9,11 @@ export const getURL = () => {
 	return url === 'null' ? 'http://localhost:8000' : url;
 };
 
+export const getVersion = () => {
+	const version = sessionStorage.getItem('version');
+	return version;
+};
+
 export const SCALR_URL = 'scalr.api.appbase.io';
 export const ACC_API = 'https://accapi.appbase.io';
 export const SCALR_API = 'https://scalr.api.appbase.io';

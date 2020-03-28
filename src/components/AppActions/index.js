@@ -67,11 +67,14 @@ class AppActions extends Component {
 					</Col>
 				</Row>
 				<DeleteAppModal
-					appName={data.index}
+					appName={data.alias || data.index}
+					index={data.index}
 					deleteModal={deleteModal}
 					handleDeleteModal={this.handleDeleteModal}
 				/>
-				{cloneModal && <CloneIndex handleCancel={this.handleCancel} index={data.index} />}
+				{cloneModal && (
+					<CloneIndex handleCancel={this.handleCancel} index={data.alias || data.index} />
+				)}
 			</div>
 		);
 	}

@@ -4,9 +4,9 @@ import { connect } from 'react-redux';
 import get from 'lodash/get';
 
 import { setCurrentApp } from '../../batteries/modules/actions';
-import SearchSandbox from '../../batteries/components/SearchSandbox';
-import Editor from '../../batteries/components/SearchSandbox/containers/Editor';
 import Loader from '../../components/Loader';
+import SearchPreview from './components/SearchPreview';
+import { getURL } from '../../constants/config';
 
 class SandboxPage extends Component {
 	componentDidUpdate(prevProps) {
@@ -33,9 +33,9 @@ class SandboxPage extends Component {
 		}
 
 		return (
-			<SearchSandbox appId={appName} appName={appName} credentials={credentials} isDashboard>
-				<Editor />
-			</SearchSandbox>
+			<div>
+				<SearchPreview app={appName} />
+			</div>
 		);
 	}
 }

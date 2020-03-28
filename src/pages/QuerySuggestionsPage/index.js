@@ -33,14 +33,23 @@ const bannerDetails = {
 	description: 'GUI to manage preferences for query suggestions.',
 	buttonText: 'Read more',
 	icon: 'pencil',
-	href: 'https://docs.appbase.io/docs/analytics/Implement/',
+	href: 'https://docs.appbase.io/docs/analytics/QuerySuggestions/',
 };
+
+const cardStyle = css`
+	max-width: 800px;
+	margin: auto;
+	padding: 0 15px;
+	.ant-card-body {
+		padding: 24px 0;
+	}
+`;
 
 class QuerySuggestions extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			indices: [],
+			indices: props.apps ? Object.keys(props.apps).sort() : [],
 			total: undefined,
 		};
 		this.form = FormBuilder.group({
@@ -67,19 +76,6 @@ class QuerySuggestions extends React.Component {
 					});
 				}
 			});
-			fetch(`${getURL()}/_alias`, {
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Basic ${getAuthToken()}`,
-				},
-			})
-				.then(res => res.json())
-				.then(indices => {
-					this.setState({
-						indices: Object.keys(indices),
-					});
-				})
-				.catch(err => console.error(err));
 			fetch(`${getURL()}/.suggestions/_search`, {
 				method: 'POST',
 				headers: {
@@ -168,8 +164,8 @@ class QuerySuggestions extends React.Component {
 				<Banner {...bannerDetails} />
 				<Container css={main}>
 					{total !== undefined && get(preferences, 'index') && (
-						<Card>
-							<Flex justifyContent="space-between">
+						<Card className={cardStyle}>
+							<Flex justifyContent="space-between" style={{ alignItems: 'center' }}>
 								<Flex>
 									<Alert
 										message={`Last synced ${total} query suggestions at ${moment(
@@ -217,6 +213,7 @@ QuerySuggestions.propTypes = {
 
 const mapStateToProps = state => ({
 	preferences: get(state, '$getSuggestionsPreferences.results', {}),
+	apps: get(state, 'apps.data', {}),
 	tier: get(state, '$getAppPlan.results.tier'),
 	featureSuggestions: get(state, '$getAppPlan.results.feature_suggestions', false),
 	isLoading: get(state, '$getSuggestionsPreferences.isFetching', false),

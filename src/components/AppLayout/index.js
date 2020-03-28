@@ -63,8 +63,8 @@ const BrowserPage = Loadable({
 	loading: Loader,
 });
 
-const QueryRulesPage = Loadable({
-	loader: () => import('../../pages/QueryRules'),
+const SynonymsPage = Loadable({
+	loader: () => import('../../pages/Synonyms'),
 	loading: Loader,
 });
 
@@ -107,10 +107,34 @@ const QueryExplorerPage = Loadable({
 	loading: Loader,
 });
 
+const AggsPage = Loadable({
+	loader: () => import('../../pages/AggsPage'),
+	loading: Loader,
+});
+
+const ResultsPage = Loadable({
+	loader: () => import('../../pages/ResultsPage'),
+	loading: Loader,
+});
+
+const LanguagePage = Loadable({
+	loader: () => import('../../pages/LanguageSettings'),
+	loading: Loader,
+});
+
+const SearchSettingsPage = Loadable({
+	loader: () => import('../../pages/SearchSettingsPage'),
+	loading: Loader,
+});
+
+const IndexSettingsPage = Loadable({
+	loader: () => import('../../pages/IndexSettings'),
+	loading: Loader,
+});
+
 class AppLayout extends React.PureComponent {
 	render() {
-		const { collapsed, showHeader } = this.props;
-		const { appName } = this.props.match.params; // eslint-disable-line
+		const { collapsed, showHeader, match, history, onToggle } = this.props;
 		return (
 			<Layout
 				style={{
@@ -120,25 +144,15 @@ class AppLayout extends React.PureComponent {
 					position: 'relative',
 				}}
 			>
-				{showHeader && <AppHeader big={collapsed} />}
-				<Layout.Header
-					css={{
-						background: '#fff',
-						position: 'sticky',
-						top: 0,
-						height: 40,
-						alignItems: 'center',
-						display: 'flex',
-						boxShadow: '0 2px 8px #f0f1f2',
-					}}
-				>
-					<Breadcrumb>
-						<Breadcrumb.Item>
-							<Link to="/">Cluster Overview</Link>
-						</Breadcrumb.Item>
-						<Breadcrumb.Item>{appName}</Breadcrumb.Item>
-					</Breadcrumb>
-				</Layout.Header>
+				{showHeader && (
+					<AppHeader
+						big={collapsed}
+						match={match}
+						history={history}
+						collapsed={collapsed}
+						onToggle={onToggle}
+					/>
+				)}
 				<ErrorPage {...this.props}>
 					<Switch>
 						<Route
@@ -312,6 +326,81 @@ class AppLayout extends React.PureComponent {
 								<AppPageContainer
 									{...props}
 									component={SandboxPage}
+									shouldFetchAppInfo={false}
+									shouldFetchAppPlan={false}
+								/>
+							)}
+						/>
+
+						<Route
+							exact
+							path="/app/:appName/aggs"
+							render={props => (
+								<AppPageContainer
+									{...props}
+									component={AggsPage}
+									shouldFetchAppInfo={false}
+									shouldFetchAppPlan={false}
+								/>
+							)}
+						/>
+						<Route
+							exact
+							path="/app/:appName/results"
+							render={props => (
+								<AppPageContainer
+									{...props}
+									component={ResultsPage}
+									shouldFetchAppInfo={false}
+									shouldFetchAppPlan={false}
+								/>
+							)}
+						/>
+						<Route
+							exact
+							path="/app/:appName/index-settings"
+							render={props => (
+								<AppPageContainer
+									{...props}
+									component={IndexSettingsPage}
+									shouldFetchAppInfo={false}
+									shouldFetchAppPlan={false}
+								/>
+							)}
+						/>
+						<Route
+							exact
+							path="/app/:appName/languages"
+							render={props => (
+								<AppPageContainer
+									{...props}
+									component={LanguagePage}
+									shouldFetchAppInfo={false}
+									shouldFetchAppPlan={false}
+								/>
+							)}
+						/>
+
+						<Route
+							exact
+							path="/app/:appName/search"
+							render={props => (
+								<AppPageContainer
+									{...props}
+									component={SearchSettingsPage}
+									shouldFetchAppInfo={false}
+									shouldFetchAppPlan={false}
+								/>
+							)}
+						/>
+
+						<Route
+							exact
+							path="/app/:appName/synonyms"
+							render={props => (
+								<AppPageContainer
+									{...props}
+									component={SynonymsPage}
 									shouldFetchAppInfo={false}
 									shouldFetchAppPlan={false}
 								/>

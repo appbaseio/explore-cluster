@@ -38,6 +38,23 @@ export async function getUser(username, password, url) {
 		};
 	}
 
+	// Dont use await over here as we dont need these immediately.
+	fetch(`${api}`, {
+		method: 'GET',
+		headers: {
+			Authorization: `Basic ${authToken}`,
+		},
+	})
+		.then(es => es.json())
+		.then(esResponse => {
+			const version = get(esResponse, 'version.number');
+			sessionStorage.setItem('version', version);
+		})
+		.catch(e => {
+			console.error('Error while fetching the ElasticSearch details');
+			console.error(e);
+		});
+
 	return {
 		username,
 		password,
@@ -58,7 +75,7 @@ const getAuthToken = () => {
 
 export async function getESIndices(authToken) {
 	const ACC_API = getURL();
-	const response = await fetch(`${ACC_API}/_cat/indices?format=json`, {
+	const response = await fetch(`${ACC_API}/_aliasedindices`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Basic ${authToken}`,
@@ -71,7 +88,7 @@ export async function getESIndices(authToken) {
 
 	const indices = {};
 	data.forEach(item => {
-		indices[item.index] = item;
+		indices[item.alias || item.index] = item;
 	});
 
 	return indices;
@@ -462,4 +479,55 @@ export async function handleQueryRuleDelete(rule, removeRule) {
 	} else {
 		await removeRule(rule.id);
 	}
+}
+
+export function getReIndexedName(appName) {
+	const reindexedRegex = new RegExp('.*reindexed_[0-9]+', 'g');
+	const matched = appName.match(reindexedRegex);
+	let newName;
+	if (matched) {
+		const splittedPart = appName.split('_');
+		splittedPart[splittedPart.length - 1] = Number(splittedPart[splittedPart.length - 1]) + 1;
+		newName = splittedPart.join('_');
+	} else {
+		newName = `${appName}_reindexed_1`;
+	}
+	return newName;
+}
+
+export function getSubFields({ fields, weight, address }) {
+	if (fields) {
+		const subFields = Object.keys(fields).reduce((agg, field) => {
+			if (field === 'search' || field === 'autosuggest') {
+				return {
+					...agg,
+					[`${address}.${field}`]: weight ? 1 : 0,
+				};
+			}
+			return {
+				...agg,
+				[`${address}.${field}`]: weight,
+			};
+		}, {});
+
+		return { [address]: weight, ...subFields };
+	}
+
+	return { [address]: weight };
+}
+
+function ltrim(str) {
+	if (!str) return str;
+	return str.replace(/^\s+/g, '');
+}
+
+function rtrim(str) {
+	if (!str) return str;
+	return str.replace(/\s+$/g, '');
+}
+
+export function removeWhiteSpaces(str) {
+	str = ltrim(str);
+	str = rtrim(str);
+	return str;
 }
