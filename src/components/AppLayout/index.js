@@ -63,8 +63,8 @@ const BrowserPage = Loadable({
 	loading: Loader,
 });
 
-const QueryRulesPage = Loadable({
-	loader: () => import('../../pages/QueryRules'),
+const SynonymsPage = Loadable({
+	loader: () => import('../../pages/Synonyms'),
 	loading: Loader,
 });
 
@@ -388,6 +388,19 @@ class AppLayout extends React.PureComponent {
 								<AppPageContainer
 									{...props}
 									component={SearchSettingsPage}
+									shouldFetchAppInfo={false}
+									shouldFetchAppPlan={false}
+								/>
+							)}
+						/>
+
+						<Route
+							exact
+							path="/app/:appName/synonyms"
+							render={props => (
+								<AppPageContainer
+									{...props}
+									component={SynonymsPage}
 									shouldFetchAppInfo={false}
 									shouldFetchAppPlan={false}
 								/>

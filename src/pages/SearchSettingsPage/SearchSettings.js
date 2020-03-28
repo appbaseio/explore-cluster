@@ -74,6 +74,7 @@ class SearchSettingsPage extends React.Component {
 		hasTypoTolerance: false,
 		isDirty: false,
 		visible: false,
+		enableSynonyms: false,
 	};
 
 	noUseCaseMappings = [];
@@ -156,6 +157,7 @@ class SearchSettingsPage extends React.Component {
 			hasTypoTolerance: !!get(settings, 'search.fuzziness', false),
 			hasSearchOperators: get(settings, 'search.searchOperators', false),
 			dataField,
+			enableSynonyms: get(settings, 'synonyms.enabled'),
 		});
 	};
 
@@ -288,6 +290,7 @@ class SearchSettingsPage extends React.Component {
 			dataField,
 			typoTolerance,
 			hasTypoTolerance,
+			enableSynonyms,
 			hasSearchOperators,
 		} = this.state;
 		const { updateSettingsAction, appName, settings } = this.props;
@@ -309,6 +312,9 @@ class SearchSettingsPage extends React.Component {
 				dataField: Object.keys(nonZeroFields),
 				fieldWeights: Object.values(nonZeroFields),
 				searchOperators: hasSearchOperators,
+			},
+			synonyms: {
+				enabled: enableSynonyms,
 			},
 		})
 			.then(res => {
@@ -467,6 +473,7 @@ class SearchSettingsPage extends React.Component {
 			typoTolerance,
 			visible,
 			isReset,
+			enableSynonyms,
 			isDirty,
 		} = this.state;
 		const {
@@ -707,6 +714,17 @@ class SearchSettingsPage extends React.Component {
 								</Select>
 							</React.Fragment>
 						)}
+
+						<label>
+							Enable Synonyms{' '}
+							<Tooltip title={settingsMap.synonyms.description}>
+								<Icon type="info-circle" />
+							</Tooltip>
+						</label>
+						<Switch
+							checked={enableSynonyms}
+							onChange={value => this.handleChange('enableSynonyms', value)}
+						/>
 					</Card>
 					<SettingsFooter
 						loading={isUpdating}
@@ -743,12 +761,14 @@ class SearchSettingsPage extends React.Component {
 									...rest,
 									dataField: Object.keys(sortedSavedDataField),
 									fieldWeights: Object.values(sortedSavedDataField),
+									synonyms: get(settings, 'synonyms.enabled'),
 								}}
 								newValues={{
 									fuzziness: hasTypoTolerance ? typoTolerance : 0,
 									searchOperators: hasSearchOperators,
 									dataField: Object.keys(sortedDataField),
 									fieldWeights: Object.values(sortedDataField),
+									synonyms: enableSynonyms,
 								}}
 								onClick={() => this.toggleVisible(false)}
 								visible={visible}
