@@ -49,7 +49,7 @@ class QuerySuggestions extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			indices: [],
+			indices: props.apps ? Object.keys(props.apps).sort() : [],
 			total: undefined,
 		};
 		this.form = FormBuilder.group({
@@ -74,19 +74,6 @@ class QuerySuggestions extends React.Component {
 					});
 				}
 			});
-			fetch(`${getURL()}/_alias`, {
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Basic ${getAuthToken()}`,
-				},
-			})
-				.then(res => res.json())
-				.then(indices => {
-					this.setState({
-						indices: Object.keys(indices),
-					});
-				})
-				.catch(err => console.error(err));
 			fetch(`${getURL()}/.suggestions/_search`, {
 				method: 'POST',
 				headers: {
@@ -224,6 +211,7 @@ QuerySuggestions.propTypes = {
 
 const mapStateToProps = state => ({
 	preferences: get(state, '$getSuggestionsPreferences.results', {}),
+	apps: get(state, 'apps.data', {}),
 	tier: get(state, '$getAppPlan.results.tier'),
 	featureSuggestions: get(state, '$getAppPlan.results.feature_suggestions', false),
 	isLoading: get(state, '$getSuggestionsPreferences.isFetching', false),

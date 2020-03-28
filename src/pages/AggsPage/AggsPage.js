@@ -634,8 +634,9 @@ class AggsPage extends React.Component {
 								testSettings: {
 									...(settings || {}),
 									search: {
-										...settings.search,
+										...get(settings, 'search', {}),
 										dataField:
+											settings &&
 											settings.search &&
 											settings.search.dataField &&
 											settings.search.dataField.length > 0
@@ -643,6 +644,7 @@ class AggsPage extends React.Component {
 												: Object.keys(this.searchableMappings),
 
 										fieldWeights:
+											settings &&
 											settings.search &&
 											settings.search.dataField &&
 											settings.search.dataField.length > 0

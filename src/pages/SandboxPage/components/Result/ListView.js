@@ -13,9 +13,10 @@ const Container = ({ hasPagination, children }) => {
 };
 
 const ListItemWrapper = ({ item }) => {
+	const { _promoted, _click_id, _index, highlight, index, ...rest } = item;
 	return (
 		<div className={listItem}>
-			{item._promoted && (
+			{_promoted && (
 				<Tooltip title="Item promoted using Query Rules">
 					<Tag color="#faad14">
 						<Icon type="star" />
@@ -24,22 +25,32 @@ const ListItemWrapper = ({ item }) => {
 			)}
 			<ExpandCollapse previewHeight="200px" expandText="Show more">
 				<Row className="row" gutter={8}>
-					{Object.keys(item).map(key => (
+					{Object.keys(rest).map(key => (
 						<React.Fragment key={key}>
 							<Col md={10}>{key}</Col>
 							<Col md={1} className="text-center">
 								:
 							</Col>
 							<Col md={11} className="text-ellipsis">
-								{typeof item[key] === 'object' ? (
-									<Popover
-										content={<pre>{JSON.stringify(item[key], null, 4)}</pre>}
-									>
-										{JSON.stringify(item[key])}
-									</Popover>
-								) : (
-									<span dangerouslySetInnerHTML={{__html : JSON.stringify(item[key]) || 'N/A' }} />
-								)}
+								<Popover
+									content={
+										typeof rest[key] === 'object' ? (
+											<pre>{JSON.stringify(rest[key], null, 4)}</pre>
+										) : (
+											rest[key]
+										)
+									}
+								>
+									{typeof rest[key] === 'object' ? (
+										JSON.stringify(rest[key])
+									) : (
+										<span
+											dangerouslySetInnerHTML={{
+												__html: JSON.stringify(rest[key]) || 'N/A',
+											}}
+										/>
+									)}
+								</Popover>
 							</Col>
 						</React.Fragment>
 					))}
