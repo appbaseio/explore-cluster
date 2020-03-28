@@ -58,6 +58,7 @@ class QuerySuggestions extends React.Component {
 			min_count: [1, [Validators.required, Validators.min(0), Validators.max(1000)]],
 			min_hits: [5, [Validators.required, Validators.min(0)]],
 			number_of_days: [30, [Validators.required, Validators.min(1), Validators.max(365)]],
+			transform_diacritics: false,
 			indices: [['*']],
 		});
 		if (isValidPlan(props.tier, props.featureSuggestions)) {
@@ -71,6 +72,7 @@ class QuerySuggestions extends React.Component {
 						min_hits: parseInt(payload.min_hits, 10),
 						number_of_days: parseInt(payload.number_of_days, 10),
 						indices: payload.indices || ['*'],
+						transform_diacritics: payload.transform_diacritics,
 					});
 				}
 			});

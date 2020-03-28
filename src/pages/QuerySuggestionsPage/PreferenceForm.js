@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Input, Select, Button, Affix } from 'antd';
+import { Input, Select, Button, Affix, Checkbox } from 'antd';
 import { css } from 'react-emotion';
 import PropTypes from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
@@ -152,6 +152,22 @@ const PreferenceForm = ({ control, handleSaveTemplate, isLoading, indices, appNa
 							/>
 						);
 					}}
+				/>
+				<FieldControl
+					name="transform_diacritics"
+					render={({ handler }) => (
+						<Grid
+							label="Transform Diacritics"
+							toolTipMessage={Messages.transform_diacritics}
+							component={
+								<div style={{ width: '100%' }}>
+									<div>
+										<Checkbox {...handler('checkbox')} />
+									</div>
+								</div>
+							}
+						/>
+					)}
 				/>
 				<FieldControl
 					name="external_suggestions"
