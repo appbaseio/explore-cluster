@@ -105,6 +105,7 @@ class ImporterPage extends React.Component {
 						'https://raw.githubusercontent.com/appbaseio/cdn/dev/appbase/ecommerce_data.json',
 					extraType: 'SourceFile',
 					type: 'json',
+					useBulk: true,
 			  }
 			: undefined;
 		return (

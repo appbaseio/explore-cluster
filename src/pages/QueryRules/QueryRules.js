@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { Col, Row, Layout, Button, Icon, message, Result } from 'antd';
+import { Col, Row, Layout, Button, Icon, message, Result, Affix } from 'antd';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -9,9 +9,11 @@ import QueryCard from './components/QueryCard';
 import { getRules, reorderRules } from '../../batteries/modules/actions';
 import Loader from '../../components/Loader';
 import DNDWrapper from '../../components/DNDWrapper';
+import { isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
+import SearchPreviewModal from '../../components/SearchPreviewModal';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
-import { validPlans, bannerDetails } from './utils';
+import { bannerDetails } from './utils';
 
 const { Header } = Layout;
 
@@ -21,10 +23,11 @@ const container = css`
 
 class QueryRules extends Component {
 	componentDidMount() {
-		const { fetchRules, rules } = this.props;
-
-		if (!rules) {
-			fetchRules();
+		const { fetchRules, rules, tier, featureRules } = this.props;
+		if (isValidPlan(tier, featureRules)) {
+			if (!rules) {
+				fetchRules();
+			}
 		}
 	}
 
@@ -63,9 +66,9 @@ class QueryRules extends Component {
 	};
 
 	render() {
-		const { rules, isLoading, tier } = this.props;
+		const { rules, isLoading, tier, appName, featureRules } = this.props;
 
-		if (tier && validPlans.indexOf(tier) === -1) {
+		if (!isValidPlan(tier, featureRules)) {
 			return (
 				<React.Fragment>
 					<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
@@ -171,6 +174,22 @@ class QueryRules extends Component {
 							}
 						/>
 					)}
+					{rules && rules.length > 0 ? (
+						<Affix offsetBottom={0}>
+							<div
+								style={{
+									display: 'flex',
+									justifyContent: 'space-between',
+									padding: 20,
+									background: 'white',
+									border: '1px solid #e8e8e8',
+									boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.15)',
+								}}
+							>
+								<SearchPreviewModal app={appName} />
+							</div>
+						</Affix>
+					) : null}
 				</div>
 			</Fragment>
 		);
@@ -184,6 +203,8 @@ const mapStateToProps = state => ({
 	reordering: get(state, '$getAppRules.reordering'),
 	deleted: get(state, '$getAppRules.deleted'),
 	tier: get(state, '$getAppPlan.results.tier'),
+	appName: get(state, '$getCurrentApp.name'),
+	featureRules: get(state, '$getAppPlan.results.feature_rules', false),
 });
 
 const mapDispatchToProps = dispatch => ({

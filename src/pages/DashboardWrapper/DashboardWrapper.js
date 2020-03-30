@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import { Icon, Menu, Layout, Tag } from 'antd';
-import { Switch, Route, Link } from 'react-router-dom';
+import { Icon, Layout, Menu } from 'antd';
+import { Link, Route, Switch } from 'react-router-dom';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
-import get from 'lodash/get';
+import { get, keys } from 'lodash';
 
 import { bool, func } from 'prop-types';
 import Loader from '../../components/Loader';
@@ -12,6 +12,9 @@ import Logo from '../../components/Logo';
 import { breakpoints } from '../../utils/media';
 import { getAppPlan } from '../../batteries/modules/actions';
 import { getParam } from '../../utils';
+import { LabelTag } from '../../components/LabelTag';
+import { IndexSwitcher } from '../../components/IndexSwitcher';
+import { loadApps } from '../../actions';
 
 const NoMatch = Loadable({
 	loader: () => import('../../NoMatch'),
@@ -39,19 +42,16 @@ const defaultRoutes = {
 	Develop: {
 		icon: 'dashboard',
 		menu: [
-			{ label: 'Import Data', link: '/cluster/import' },
+			{ label: 'Import Data', link: 'import', openIndexMenu: true },
 			{ label: 'Browse Data', link: '/cluster/browse' },
-			{ label: 'Search Templates', link: '/cluster/search-templates', tag: 'Beta' },
-			{ label: 'Query Suggestions', link: '/cluster/query-suggestions', tag: 'Beta' },
-			{ label: 'Functions', link: '/cluster/functions', tag: 'Beta' },
-			{ label: 'Query Rules', link: '/cluster/rules', tag: 'Beta' },
+			{ label: 'Request Logs', link: '/cluster/request-logs' },
+			{ label: 'Search Preview', link: 'search-preview', tag: 'Beta', openIndexMenu: true },
 		],
 	},
 	Analytics: {
 		icon: 'line-chart',
 		menu: [
 			{ label: 'Overview', link: '/cluster/analytics' },
-			{ label: 'Request Logs', link: '/cluster/request-logs' },
 			{ label: 'Popular Searches', link: '/cluster/popular-searches' },
 			{ label: 'No Result Searches', link: '/cluster/no-results-searches' },
 			{ label: 'Popular Filters', link: '/cluster/popular-filters' },
@@ -61,12 +61,28 @@ const defaultRoutes = {
 			{ label: 'Search Latency', link: '/cluster/search-latency' },
 		],
 	},
+	'Search Relevancy': {
+		icon: 'search',
+		menu: [
+			{ label: 'Language Settings', link: 'languages', tag: 'Beta', openIndexMenu: true },
+			{ label: 'Search Settings', link: 'search', tag: 'Beta', openIndexMenu: true },
+			{ label: 'Aggregation Settings', link: 'aggs', tag: 'Beta', openIndexMenu: true },
+			{ label: 'Result Settings', link: 'results', tag: 'Beta', openIndexMenu: true },
+			{ label: 'Index Settings', link: 'index-settings', tag: 'Beta', openIndexMenu: true },
+			{ label: 'Schema', link: 'settings', tag: 'Beta', openIndexMenu: true },
+			{ label: 'Synonyms', link: 'synonyms', tag: 'Beta', openIndexMenu: true },
+			{ label: 'Query Suggestions', link: '/cluster/query-suggestions', tag: 'Beta' },
+			{ label: 'Query Rules', link: '/cluster/rules', tag: 'Beta' },
+			{ label: 'Functions', link: '/cluster/functions', tag: 'Beta' },
+		],
+	},
 	Security: {
 		icon: 'key',
 		menu: [
 			{ label: 'API Credentials', link: '/cluster/credentials' },
 			{ label: 'User Management', link: '/cluster/user-management' },
 			{ label: 'Role Based Access', link: '/cluster/role-based-access', tag: 'Beta' },
+			{ label: 'Search Templates', link: '/cluster/search-templates', tag: 'Beta' },
 		],
 	},
 	Billing: {
@@ -171,9 +187,19 @@ class DashboardWrapper extends Component {
 	}
 
 	componentDidMount() {
-		const { isClusterPlanFetched, fetchClusterPlan, isClusterPlanFetching } = this.props;
+		const {
+			isClusterPlanFetched,
+			fetchClusterPlan,
+			isClusterPlanFetching,
+			apps,
+			fetchApps,
+		} = this.props;
 		if (!isClusterPlanFetching && !isClusterPlanFetched) {
 			fetchClusterPlan();
+		}
+
+		if (!apps) {
+			fetchApps();
 		}
 	}
 
@@ -190,12 +216,15 @@ class DashboardWrapper extends Component {
 		}
 	}
 
-	onCollapse = collapsed => {
-		this.setState({ collapsed });
+	onCollapse = () => {
+		this.setState(prevState => ({ collapsed: !prevState.collapsed }));
 	};
 
 	render() {
 		const { collapsed, showHeader, routes, activeSubMenu, activeMenuItem } = this.state;
+		const { apps, history } = this.props;
+
+		const filteredApps = keys(apps).filter(app => !app.startsWith('.'));
 
 		return (
 			<Layout>
@@ -250,17 +279,17 @@ class DashboardWrapper extends Component {
 									<SubMenu key={route} title={Title}>
 										{routes[route].menu.map(item => (
 											<Menu.Item key={item.label}>
-												<Link replace to={item.link}>
-													{item.label}
-													{item.tag ? (
-														<Tag
-															style={{ fontSize: 10, marginLeft: 8 }}
-															color="#001529"
-														>
-															{item.tag}
-														</Tag>
-													) : null}
-												</Link>
+												{item.openIndexMenu ? (
+													<IndexSwitcher
+														item={item}
+														filteredApps={filteredApps}
+														history={history}
+													/>
+												) : (
+													<Link replace to={item.link}>
+														<LabelTag item={item} />
+													</Link>
+												)}
 											</Menu.Item>
 										))}
 									</SubMenu>
@@ -285,7 +314,15 @@ class DashboardWrapper extends Component {
 						overflowY: 'scroll',
 					}}
 				>
-					{showHeader && <AppHeader big={collapsed} minimal showApp={false} />}
+					{showHeader && (
+						<AppHeader
+							collapsed={collapsed}
+							onToggle={this.onCollapse}
+							big={collapsed}
+							minimal
+							showApp={false}
+						/>
+					)}
 
 					<Switch>
 						<Route exact path="/" component={HomePage} />
@@ -319,10 +356,12 @@ const mapStateToProps = state => ({
 	isBillingEnabled: !(get(state, '$getAppPlan.results.billing') === false),
 	isClusterPlanFetched: get(state, '$getAppPlan.success'),
 	isClusterPlanFetching: get(state, '$getAppPlan.isFetching', false),
+	apps: get(state, 'apps.data'),
 });
 
 const mapDispatchToProps = dispatch => ({
 	fetchClusterPlan: () => dispatch(getAppPlan()),
+	fetchApps: () => dispatch(loadApps()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DashboardWrapper);

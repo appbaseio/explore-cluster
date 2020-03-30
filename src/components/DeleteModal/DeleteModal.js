@@ -28,7 +28,7 @@ class DeleteModal extends React.Component {
 
 	render() {
 		const { input, isVisible } = this.state;
-		const { name, value, children, title } = this.props;
+		const { name, value, children, title, text } = this.props;
 		const isMatching = value === input;
 		return (
 			<React.Fragment>
@@ -47,8 +47,12 @@ class DeleteModal extends React.Component {
 					onCancel={this.handleVisibility}
 				>
 					<Typography.Paragraph>
-						Type the {name} name <strong>{value}</strong> below to delete the {name}.
-						This action cannot be undone.
+						{text || (
+							<React.Fragment>
+								Type the {name} name <strong>{value}</strong> below to delete the{' '}
+								{name}. This action cannot be undone.
+							</React.Fragment>
+						)}
 					</Typography.Paragraph>
 					<Input
 						value={input}

@@ -1,14 +1,21 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Layout, Menu, Icon, Tag } from 'antd';
+import { Layout, Menu, Icon, Tag, Tooltip } from 'antd';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import AppLayout from '../../components/AppLayout';
-import { setCurrentApp } from '../../batteries/modules/actions';
+import {
+	getDefaultSettings,
+	getSettings,
+	putSettings,
+	setCurrentApp,
+} from '../../batteries/modules/actions';
 import Logo from '../../components/Logo';
 
 import { getParam } from '../../utils';
 import { breakpoints } from '../../utils/media';
+import Loader from '../../components/Loader';
+import { isValidPlan } from '../../batteries/utils';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
@@ -22,20 +29,15 @@ const routes = {
 		icon: 'dashboard',
 		menu: [
 			{ label: 'Import Data', link: 'import' },
-			{ label: 'App Settings', link: 'settings', tag: 'Beta' },
 			{ label: 'Browse Data', link: 'browse' },
-			{ label: 'Query Explorer', link: 'query' },
+			{ label: 'Request Logs', link: 'request-logs' },
 			{ label: 'Search Preview', link: 'search-preview', tag: 'Beta' },
-			{ label: 'Query Rules', link: '/cluster/rules', tag: 'Beta', hasExactPath: true },
-			{ label: 'Search Templates', link: 'search-templates', tag: 'Beta' },
-			{ label: 'Query Suggestions', link: 'query-suggestions', tag: 'Beta' },
 		],
 	},
 	Analytics: {
 		icon: 'line-chart',
 		menu: [
 			{ label: 'Overview', link: 'analytics' },
-			{ label: 'Request Logs', link: 'request-logs' },
 			{ label: 'Popular Searches', link: 'popular-searches' },
 			{ label: 'No Result Searches', link: 'no-results-searches' },
 			{ label: 'Popular Filters', link: 'popular-filters' },
@@ -45,9 +47,29 @@ const routes = {
 			{ label: 'Search Latency', link: 'search-latency' },
 		],
 	},
+	'Search Relevancy': {
+		icon: 'search',
+		menu: [
+			{ label: 'Language Settings', link: 'languages', tag: 'Beta' },
+			{ label: 'Search Settings', link: 'search', tag: 'Beta' },
+			{ label: 'Aggregation Settings', link: 'aggs', tag: 'Beta' },
+			{ label: 'Result Settings', link: 'results', tag: 'Beta' },
+			{ label: 'Index Settings', link: 'index-settings', tag: 'Beta' },
+			{ label: 'Schema', link: 'settings', tag: 'Beta' },
+			{ label: 'Synonyms', link: 'synonyms', tag: 'Beta' },
+			{ label: 'Query Suggestions', link: 'query-suggestions', tag: 'Beta' },
+			{ label: 'Query Rules', link: '/cluster/rules', tag: 'Beta', hasExactPath: true },
+			{ label: 'Functions', link: '/cluster/functions', tag: 'Beta', hasExactPath: true },
+		],
+	},
 	Security: {
 		icon: 'key',
-		menu: [{ label: 'API Credentials', link: 'credentials' }],
+		menu: [
+			{ label: 'API Credentials', link: 'credentials' },
+			{ label: 'User Management', link: '/cluster/user-management' },
+			{ label: 'Role Based Access', link: '/cluster/role-based-access', tag: 'Beta' },
+			{ label: 'Search Templates', link: 'search-templates', tag: 'Beta' },
+		],
 	},
 	Billing: {
 		icon: 'credit-card',
@@ -90,6 +112,17 @@ const getActiveMenu = (props, prevActiveSubMenu = []) => {
 		activeSubMenu: [activeSubMenu, ...prevActiveSubMenu],
 		activeMenuItem: [activeMenuItem],
 	};
+};
+
+const WithRedirectTooltip = ({ showTooltip, children }) => {
+	if (showTooltip) {
+		return (
+			<Tooltip placement="rightBottom" title="This will redirect you to the cluster view">
+				{children}
+			</Tooltip>
+		);
+	}
+	return children;
 };
 
 let url;
@@ -145,24 +178,59 @@ class AppWrapper extends Component {
 		const { history, match } = this.props;
 		const view = getParam('view') || '';
 
+		this.handleSettings(appName);
+
 		if (!match.params.appName && appName) {
 			history.push(`/app/${appName}/${view}`);
 		}
 	}
 
-	componentDidUpdate() {
-		const { history, currentApp, match } = this.props;
-		const { appName } = this.state;
+	componentDidUpdate(prevProps) {
+		const { history, currentApp, match, settings } = this.props;
+		const { appName, loading } = this.state;
 
 		const route = match.params.route || '';
+
+		if (settings !== prevProps.settings && !settings && !loading) {
+			this.handleSettings(currentApp);
+		}
 
 		if (currentApp && appName !== currentApp) {
 			history.push(`/app/${currentApp}/${route}`);
 		}
 	}
 
-	onCollapse = collapsed => {
-		this.setState({ collapsed });
+	handleSettings = async appName => {
+		const {
+			settings,
+			defaultSettings,
+			updateSettingsAction,
+			getDefaultSettingsAction,
+			getSettingsAction,
+			tier,
+			featureSearchRelevancy,
+		} = this.props;
+		// restrict calling API if it's not a valid plan
+		if (!isValidPlan(tier, featureSearchRelevancy)) return;
+		if (!settings) {
+			this.setState({ loading: true });
+			const settingsResponse = await getSettingsAction(appName);
+			if (settingsResponse && !settingsResponse.error) {
+				this.setState({ loading: false });
+				return;
+			}
+			if (defaultSettings) {
+				await updateSettingsAction(appName, defaultSettings);
+			} else {
+				const res = await getDefaultSettingsAction();
+				if (res && res.payload) await updateSettingsAction(appName, res.payload);
+			}
+			this.setState({ loading: false });
+		}
+	};
+
+	onCollapse = () => {
+		this.setState(prevState => ({ collapsed: !prevState.collapsed }));
 	};
 
 	render() {
@@ -171,8 +239,10 @@ class AppWrapper extends Component {
 			showHeader,
 			appName,
 			activeSubMenu,
-			activeMenuItem // prettier-ignore
+			activeMenuItem,
+			loading,
 		} = this.state;
+
 		return (
 			<Layout>
 				<Sider
@@ -231,24 +301,31 @@ class AppWrapper extends Component {
 									<SubMenu key={route} title={Title}>
 										{routes[route].menu.map(item => (
 											<Menu.Item key={item.label}>
-												<Link
-													replace
-													to={
-														item.hasExactPath
-															? item.link
-															: `/app/${appName}/${item.link}`
-													}
+												<WithRedirectTooltip
+													showTooltip={item.hasExactPath}
 												>
-													{item.label}
-													{item.tag ? (
-														<Tag
-															style={{ fontSize: 10, marginLeft: 8 }}
-															color="#001529"
-														>
-															{item.tag}
-														</Tag>
-													) : null}
-												</Link>
+													<Link
+														replace
+														to={
+															item.hasExactPath
+																? item.link
+																: `/app/${appName}/${item.link}`
+														}
+													>
+														{item.label}
+														{item.tag ? (
+															<Tag
+																style={{
+																	fontSize: 10,
+																	marginLeft: 8,
+																}}
+																color="#001529"
+															>
+																{item.tag}
+															</Tag>
+														) : null}
+													</Link>
+												</WithRedirectTooltip>
 											</Menu.Item>
 										))}
 									</SubMenu>
@@ -265,18 +342,37 @@ class AppWrapper extends Component {
 						})}
 					</Menu>
 				</Sider>
-				<AppLayout showHeader={showHeader} collapsed={collapsed} {...this.props} />
+				{loading ? (
+					<Loader />
+				) : (
+					<AppLayout
+						showHeader={showHeader}
+						collapsed={collapsed}
+						{...this.props}
+						onToggle={this.onCollapse}
+					/>
+				)}
 			</Layout>
 		);
 	}
 }
 
-const mapStateToProps = state => ({
-	currentApp: get(state, '$getCurrentApp.name'),
-});
+const mapStateToProps = state => {
+	const appName = get(state, '$getCurrentApp.name');
+	return {
+		currentApp: appName,
+		defaultSettings: get(state, '$getAppSettings.defaultSettings'),
+		settings: get(state, ['$getAppSettings', 'settings', appName]),
+		tier: get(state, '$getAppPlan.results.tier'),
+		featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
+	};
+};
 
 const mapDispatchToProps = dispatch => ({
 	updateCurrentApp: (appName, appId) => dispatch(setCurrentApp(appName, appId)),
+	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
+	getSettingsAction: name => dispatch(getSettings(name)),
+	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AppWrapper);

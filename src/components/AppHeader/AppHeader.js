@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout, Menu, Icon, Tooltip, Button, Row } from 'antd';
+import { Layout, Menu, Icon, Tooltip, Button, Row, Breadcrumb } from 'antd';
 import { Link } from 'react-router-dom';
 import { string, object, bool, number } from 'prop-types';
 import { css } from 'react-emotion';
@@ -9,6 +9,7 @@ import MenuSlider from '../FullHeader/MenuSlider';
 import UserMenu from './UserMenu';
 import { media } from '../../utils/media';
 import headerStyles from './styles';
+import AppSwitcher from '../AppSwitcher';
 
 const { Header } = Layout;
 const noBorder = css`
@@ -33,7 +34,28 @@ const trialBtn = css`
 	`)};
 `;
 
-const AppHeader = ({ currentApp, user, big, showApp, minimal, isUsingTrial, daysLeft }) => (
+function showProfile() {
+	const storedValue = sessionStorage.getItem('showProfile');
+
+	if (storedValue) {
+		return JSON.parse(storedValue);
+	}
+	return true;
+}
+
+const AppHeader = ({
+	currentApp,
+	user,
+	big,
+	minimal,
+	isUsingTrial,
+	daysLeft,
+	history,
+	match,
+	showApp,
+	collapsed,
+	onToggle,
+}) => (
 	<Header
 		className={headerStyles}
 		css={{
@@ -42,18 +64,38 @@ const AppHeader = ({ currentApp, user, big, showApp, minimal, isUsingTrial, days
 			left: big ? '80px' : '260px',
 		}}
 	>
-		{minimal ? null : (
+		{minimal ? (
+			<Icon
+				style={{ position: 'absolute', left: 20 }}
+				className="trigger"
+				type={collapsed ? 'menu-unfold' : 'menu-fold'}
+				onClick={onToggle}
+			/>
+		) : (
 			<Menu mode="horizontal">
 				<Menu.Item key="back" className={noBorder} style={{ padding: 0 }}>
-					<Link to="/">
-						<Icon type="arrow-left" />
-					</Link>
+					<Icon
+						className="trigger"
+						type={collapsed ? 'menu-unfold' : 'menu-fold'}
+						onClick={onToggle}
+					/>
 				</Menu.Item>
-				{showApp ? (
-					<Menu.Item key="1" className={noBorder}>
-						<span>{currentApp || 'Loading...'}</span>
-					</Menu.Item>
-				) : null}
+				<Menu.Item className={noBorder} style={{ marginBottom: 12 }} key="breadcrumb">
+					<Breadcrumb>
+						<Breadcrumb.Item>
+							<Link to="/">Cluster Overview</Link>
+						</Breadcrumb.Item>
+						{showApp && (
+							<Breadcrumb.Item>
+								<AppSwitcher
+									currentApp={currentApp || 'Loading...'}
+									history={history}
+									match={match}
+								/>
+							</Breadcrumb.Item>
+						)}
+					</Breadcrumb>
+				</Menu.Item>
 			</Menu>
 		)}
 
@@ -73,16 +115,14 @@ const AppHeader = ({ currentApp, user, big, showApp, minimal, isUsingTrial, days
 			</div>
 		)}
 
-		<Row justify="space-between" align="middle">
-			<UserMenu user={user} />
-		</Row>
+		{showProfile() && (
+			<Row justify="space-between" align="middle">
+				<UserMenu user={user} />
+			</Row>
+		)}
 		<MenuSlider />
 	</Header>
 );
-
-AppHeader.defaultProps = {
-	showApp: true,
-};
 
 AppHeader.propTypes = {
 	currentApp: string,
@@ -95,6 +135,7 @@ AppHeader.propTypes = {
 };
 
 AppHeader.defaultProps = {
+	showApp: true,
 	currentApp: null,
 	minimal: false,
 };

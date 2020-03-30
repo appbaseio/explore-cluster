@@ -43,7 +43,7 @@ const renderItem = item => {
 	}
 };
 
-const blackList = ['index', 'uuid', 'docs.deleted', 'pri.store.size', 'health', 'status'];
+const blackList = ['index', 'uuid', 'docs.deleted', 'pri.store.size', 'health', 'status', 'alias'];
 
 const flex = {
 	display: 'flex',
@@ -83,7 +83,7 @@ function StatsBox(props) {
 	const cardTitle = (
 		<div
 			onClick={() => {
-				props.history.push(`/app/${data.index}/overview`);
+				props.history.push(`/app/${data.alias || data.index}/overview`);
 			}}
 			css={flex}
 		>
@@ -140,7 +140,7 @@ function StatsBox(props) {
 
 					<AppActions
 						onExploreClick={() => {
-							props.history.push(`/app/${data.index}/overview`);
+							props.history.push(`/app/${data.alias || data.index}/overview`);
 						}}
 						title={title}
 						data={data}

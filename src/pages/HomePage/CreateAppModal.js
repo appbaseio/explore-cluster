@@ -1,23 +1,29 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import {
-	Row,
-	Col,
 	Icon,
-	Modal,
 	Input,
-	Radio,
-	List,
-	Popover,
-	notification,
 	InputNumber,
+	List,
+	Modal,
+	notification,
+	Popover,
+	Radio,
+	Row,
+	Select,
 } from 'antd';
 import PropTypes from 'prop-types';
 
-import { modalHeading, input, radiobtn } from './styles';
+import { get } from 'lodash';
+import { input, modalHeading, radiobtn } from './styles';
 import { validateAppName, validationsList } from '../../utils/helper';
 
 import { createApp, resetCreatedApp } from '../../actions';
+import { LanguageDropdown } from '../../components/LanguageDropdown';
+import languages from '../../constants/language';
+import { getDefaultSettings, putSettings } from '../../batteries/modules/actions';
+import { getLanguageFallback } from '../../utils/language';
+import { isValidPlan } from '../../batteries/utils';
 
 const RadioGroup = Radio.Group;
 
@@ -28,20 +34,57 @@ class CreateAppModal extends Component {
 			appName: '',
 			hasJSON: false,
 			validationPopOver: false,
-			shards: 5,
+			shards: 1,
 			replicas: 0,
+			language: 'universal',
 		};
 	}
 
 	componentDidMount() {
-		const { resetApp } = this.props;
+		const { resetApp, defaultSettings, getDefaultSettingsAction } = this.props;
 		resetApp();
+		if (!defaultSettings) getDefaultSettingsAction();
 	}
 
-	componentDidUpdate = () => {
-		const { createdApp, history } = this.props; //eslint-disable-line
+	componentDidUpdate = async () => {
+		const {
+			createdApp,
+			history,
+			updateSettingsAction,
+			defaultSettings,
+			getDefaultSettingsAction,
+			tier,
+			featureSearchRelevancy,
+		} = this.props;
 		const { hasJSON, appName } = this.state;
+		let { language } = this.state;
+		language = getLanguageFallback(language);
+
+		const updateSettings = async settings => {
+			await updateSettingsAction(appName, {
+				...settings,
+				language: {
+					...settings.language,
+					language,
+				},
+			});
+		};
+
+		const handleSettingsUpdate = async () => {
+			if (defaultSettings) {
+				await updateSettings(defaultSettings);
+			} else {
+				getDefaultSettingsAction().then(async res => {
+					if (res && res.payload) {
+						await updateSettings(res.payload);
+					}
+				});
+			}
+		};
+
 		if (createdApp.data && createdApp.data.acknowledged) {
+			// restrict calling API if it's not a valid plan
+			if (isValidPlan(tier, featureSearchRelevancy)) await handleSettingsUpdate();
 			if (hasJSON === 'sample') {
 				history.push(`app/${appName}/import?load-data=true`);
 			} else if (hasJSON) {
@@ -55,11 +98,14 @@ class CreateAppModal extends Component {
 	handleOk = async () => {
 		const { appName, shards, replicas } = this.state;
 		const { handleCreateApp } = this.props;
+		let { language } = this.state;
+		language = getLanguageFallback(language);
 		const options = {
 			appName,
 			settings: {
 				number_of_shards: shards,
 				number_of_replicas: replicas,
+				analysis: get(languages, [language, 'analysis']),
 			},
 		};
 
@@ -117,6 +163,7 @@ class CreateAppModal extends Component {
 			validationPopOver,
 			shards,
 			replicas,
+			language,
 		} = this.state;
 		const { createdApp, showModal } = this.props;
 
@@ -162,11 +209,25 @@ class CreateAppModal extends Component {
 						to see more rules.
 					</p>
 					<Input
+						autoComplete="new-appname"
 						placeholder="Enter a unique index name"
 						name="appName"
 						className={input}
 						onChange={this.handleChange}
 						value={appName}
+					/>
+					<h3 style={{ marginTop: 20 }} className={modalHeading}>
+						Select Language
+					</h3>
+					<LanguageDropdown
+						style={{ width: '100%' }}
+						value={language}
+						onSelect={value => this.setState({ language: value })}
+						renderOption={lang => (
+							<Select.Option key={lang.value} value={lang.value}>
+								{lang.label}
+							</Select.Option>
+						)}
 					/>
 					<h3 style={{ marginTop: 20 }} className={modalHeading}>
 						Shards
@@ -229,15 +290,20 @@ CreateAppModal.propTypes = {
 	resetApp: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = ({ apps, appsMetrics, createdApp }) => ({
-	apps,
-	appsMetrics,
-	createdApp,
+const mapStateToProps = state => ({
+	apps: state.apps,
+	appsMetrics: state.appsMetrics,
+	createdApp: state.createdApp,
+	defaultSettings: get(state, '$getAppSettings.defaultSettings'),
+	tier: get(state, '$getAppPlan.results.tier'),
+	featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
 });
 
 const mapDispatchToProps = dispatch => ({
 	handleCreateApp: options => dispatch(createApp(options)),
 	resetApp: () => dispatch(resetCreatedApp()),
+	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
+	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateAppModal);

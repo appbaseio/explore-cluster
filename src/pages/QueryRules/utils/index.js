@@ -101,15 +101,6 @@ const hasValuesChanged = (prevValue, nextValue, keys) => {
 	return keysChanged;
 };
 
-const validPlans = [
-	'2019-production-1',
-	'2019-production-2',
-	'2019-production-3',
-	'2019-production-4',
-	'arc-enterprise',
-	'hosted-arc-enterprise',
-];
-
 const bannerDetails = {
 	title: 'Query Rules',
 	description: 'Create "If this, then that" style query rules',
@@ -205,11 +196,4 @@ const toolTips = {
 	),
 };
 
-export {
-	getParsedRule,
-	getExpressionFromValue,
-	hasValuesChanged,
-	bannerDetails,
-	validPlans,
-	toolTips,
-};
+export { getParsedRule, getExpressionFromValue, hasValuesChanged, bannerDetails, toolTips };
