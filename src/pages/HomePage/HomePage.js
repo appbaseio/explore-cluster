@@ -61,7 +61,7 @@ class HomePage extends Component {
 
 	renderApps = () => {
 		const { apps } = this.props;
-		if (apps.isFetching) return <Loader />;
+		if (apps.isFetching) return <Loader style={{ marginTop: 20 }} />;
 
 		const sortedApps = apps.data ? Object.keys(apps.data) : [];
 		return (
