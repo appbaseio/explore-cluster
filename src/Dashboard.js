@@ -156,6 +156,7 @@ class Dashboard extends Component {
 						display: 'flex',
 						flexDirection: 'column',
 						height: '100vh',
+						overflowY: 'auto',
 					}}
 				>
 					<Logo />
@@ -221,7 +222,4 @@ const mapDispatchToProps = dispatch => ({
 	loadArcUser: (u, p) => dispatch(loadUser(u, p)),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(Dashboard);
+export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);

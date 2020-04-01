@@ -40,7 +40,7 @@ class Unsubscribe extends Component {
 				onCancel={onCancel}
 				footer={[
 					<Button key="back" onClick={onCancel}>
-						I{"'"}ve changed my mind
+						I've changed my mind
 					</Button>,
 					<Button
 						loading={loading}
@@ -74,18 +74,17 @@ class Unsubscribe extends Component {
 					)}
 					{typeFormStep === TYPE_FORM.UNLOADED && (
 						<p>
-							We{"'"}re sorry to see you go. Are you sure you want to unsubscribe from
-							the current plan? Canceling the subscription would make the dashboard
-							GUI and Arc endpoints inaccessible within 24 hours.
+							We're sorry to see you go. Are you sure you want to unsubscribe from the
+							current plan? Canceling the subscription would make the dashboard GUI
+							and Arc endpoints inaccessible within 24 hours.
 							<br />
-							<p style={{ fontSize: '14px' }}>
-								You{"'"}ll be asked for a one question feedback survey.
-							</p>
+							<br />
+							<p>You'll be asked for a one question feedback survey.</p>
 						</p>
 					)}
 					{typeFormStep === TYPE_FORM.SUBMITTED && (
 						<p>
-							Thanks for giving us feedback. We{"'"}ll keep in mind to make appbase.io
+							Thanks for giving us feedback. We'll keep in mind to make appbase.io
 							better.
 						</p>
 					)}

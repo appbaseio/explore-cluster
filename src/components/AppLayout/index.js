@@ -142,6 +142,7 @@ class AppLayout extends React.PureComponent {
 					minHeight: '100vh',
 					marginLeft: collapsed ? '80px' : '260px',
 					position: 'relative',
+					overflowY: 'auto',
 				}}
 			>
 				{showHeader && (

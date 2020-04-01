@@ -102,7 +102,7 @@ class HomePage extends Component {
 			<Fragment>
 				<Layout
 					css={{
-						minHeight: 'calc(100vh - 60px)',
+						minHeight: 'calc(100vh - 65px)',
 					}}
 				>
 					<Header>

@@ -45,6 +45,10 @@ class Billing extends Component {
 		nodeCount: undefined,
 	};
 
+	state = {
+		isShowingUnsubscribeArcModal: false,
+	};
+
 	componentDidMount() {
 		const { isAppPlanFetched, fetchAppPlan } = this.props;
 		if (!isAppPlanFetched) {
@@ -59,6 +63,7 @@ class Billing extends Component {
 
 	get billingView() {
 		const { isHostedArc, isClusterBilling } = this.props;
+		const { isShowingUnsubscribeArcModal } = this.state;
 		if (isClusterBilling) {
 			return (
 				<Card bodyStyle={{ padding: '20px 50px' }}>
@@ -81,11 +86,20 @@ class Billing extends Component {
 		return (
 			<Container>
 				<Card bodyStyle={{ padding: 0 }}>
-					<PricingTable />
+					<PricingTable
+						showUnsubscribeModal={isShowingUnsubscribeArcModal}
+						onToggleUnsubscribeModal={this.onShowUnsubscribeArcModal}
+					/>
 				</Card>
 			</Container>
 		);
 	}
+
+	onShowUnsubscribeArcModal = () => {
+		this.setState(currentState => ({
+			isShowingUnsubscribeArcModal: !currentState.isShowingUnsubscribeArcModal,
+		}));
+	};
 
 	render() {
 		// prettier-ignore
@@ -108,6 +122,7 @@ class Billing extends Component {
 		if (isLoading) {
 			return <Loader show message="Updating Payment Method... Please wait!" />;
 		}
+		const isSelfHostedArc = !isHostedArc && !isClusterBilling;
 		return (
 			<React.Fragment>
 				<BannerHeader
@@ -223,6 +238,50 @@ class Billing extends Component {
 									</a>{' '}
 									to unsubscribe from your current plan. You will lose access to
 									Arc APIs and dashboard views after doing this.
+								</p>
+							</Panel>
+						</Collapse>
+					</Card>
+				)}
+				{!subscriptionID && !isPaid && !isOnTrial && (
+					<Card bodyStyle={{ padding: '20px 50px' }}>
+						<p style={{ marginBottom: '0' }}>
+							Need a trial extended?{' '}
+							<TextLink onClick={() => window.Intercom('show')}>
+								Chat with us
+							</TextLink>
+						</p>
+					</Card>
+				)}
+				{isPaid && isSelfHostedArc && (
+					<Card
+						style={{
+							borderBottom: 0,
+							borderRight: 0,
+							borderLeft: 0,
+						}}
+					>
+						<Collapse
+							bordered={false}
+							style={{
+								marginLeft: 12,
+							}}
+						>
+							<Panel
+								style={{
+									borderBottom: 0,
+								}}
+								showArrow={false}
+								header={
+									<span style={{ color: 'tomato' }}>Looking To Unsubscribe?</span>
+								}
+								key="1"
+							>
+								<p>
+									You can unsubscribe by clicking{' '}
+									<TextLink onClick={this.onShowUnsubscribeArcModal}>
+										here
+									</TextLink>
 								</p>
 							</Panel>
 						</Collapse>

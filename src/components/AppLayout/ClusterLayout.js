@@ -130,7 +130,8 @@ class ClusterLayout extends React.PureComponent {
 		return (
 			<Layout
 				css={{
-					minHeight: 'calc(100vh - 60px)',
+					minHeight: 'calc(100vh - 65px)',
+					overflowY: 'auto',
 				}}
 			>
 				{showHeader && <AppHeader big={collapsed} />}
