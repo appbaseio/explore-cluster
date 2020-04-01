@@ -1,4 +1,6 @@
-const generateQuery = ({ aggregations: filters, search, results }) => {
+import { get } from 'lodash';
+
+const generateQuery = ({ aggregations: filters, search, results, synonyms }) => {
 	const filtersData =
 		filters && filters.dataField
 			? Object.keys(filters.dataField).map((filter, index) => {
@@ -30,6 +32,7 @@ const generateQuery = ({ aggregations: filters, search, results }) => {
 			id: 'search',
 			dataField: Array.isArray(searchDataField) ? searchDataField : [searchDataField],
 			fieldWeights: search.fieldWeights || [],
+			enableSynonyms: get(synonyms, 'enabled', true),
 		},
 		...filtersData,
 	];

@@ -65,6 +65,16 @@ class SynonymsModal extends React.Component {
 		}));
 	};
 
+	handleCloseModal = () => {
+		this.setState({
+			showModal: false,
+			alternatives: [],
+			searchTerm: '',
+			synonyms: [],
+			type: 'equivalent',
+		});
+	};
+
 	handleType = type => {
 		this.setState({
 			type,
@@ -181,7 +191,7 @@ class SynonymsModal extends React.Component {
 				<Modal
 					title={isAddModal ? 'Add new Synonym' : 'Update Synonym'}
 					visible={showModal}
-					onCancel={this.handleModal}
+					onCancel={this.handleCloseModal}
 					onOk={this.handleSave}
 					destroyOnClose
 					okText={isAddModal ? 'Add' : 'Update'}

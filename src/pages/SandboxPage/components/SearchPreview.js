@@ -8,7 +8,7 @@ import { ReactiveBase } from '@appbaseio/reactivesearch';
 
 import Filter from './Filter';
 
-import { getSettings, getAppMappings } from '../../../batteries/modules/actions';
+import { getSettings, getAppMappings, getRules } from '../../../batteries/modules/actions';
 import Search from './Search';
 import Result from './Result/index';
 import { generateQuery } from '../utils';
@@ -16,6 +16,7 @@ import { getAggsMappings } from '../../../batteries/utils/mappings';
 import { getRawMappingsByAppName } from '../../../batteries/modules/selectors';
 import { getURL } from '../../../constants/config';
 import { getSubFields } from '../../../utils';
+import { isValidPlan } from '../../../batteries/utils';
 
 const container = css`
 	padding: 16px;
@@ -44,7 +45,17 @@ class SearchPreview extends React.Component {
 			settings,
 			hasTestSettings,
 			testSettings,
+			rules,
+			fetchRules,
+			tier,
+			featureRules,
 		} = this.props;
+
+		if (isValidPlan(tier, featureRules)) {
+			if (!rules) {
+				fetchRules();
+			}
+		}
 
 		if (!settings) {
 			fetchSearchSettings(app);
@@ -160,7 +171,7 @@ class SearchPreview extends React.Component {
 	};
 
 	render() {
-		const { settings, app, credentials, url, fetchingDefaultSettings } = this.props;
+		const { settings, app, credentials, url, fetchingDefaultSettings, rules } = this.props;
 		const { settings: stateSettings, isAnalyticsEnabled } = this.state;
 
 		if (!settings) {
@@ -234,6 +245,7 @@ class SearchPreview extends React.Component {
 							query={stateSettings}
 							app={app}
 							url={url}
+							rules={rules}
 							onChange={this.handleSettingsChange}
 							credentials={credentials}
 						/>
@@ -253,10 +265,14 @@ const mapStateToProps = (state, props) => {
 		mappings: getRawMappingsByAppName(state) || null,
 		credentials: username ? `${username}:${password}` : null,
 		url: getURL(),
+		rules: get(state, '$getAppRules.results'),
+		tier: get(state, '$getAppPlan.results.tier'),
+		featureRules: get(state, '$getAppPlan.results.feature_rules', false),
 	};
 };
 
 const mapDispatchToProps = dispatch => ({
+	fetchRules: () => dispatch(getRules()),
 	fetchSearchSettings: appName => dispatch(getSettings(appName)),
 	fetchMappings: (appName, credentials, url) =>
 		dispatch(getAppMappings(appName, credentials, url)),
