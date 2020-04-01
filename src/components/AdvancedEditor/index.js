@@ -35,6 +35,7 @@ const operators = [
 	'endsWith',
 	'doesnotendsWith',
 	'matches',
+	'doesnotmatches',
 	'<',
 	'>',
 	'<=',
@@ -42,7 +43,7 @@ const operators = [
 ];
 
 const parseOperator = (query, operator) => {
-	const filterRegex = new RegExp(`(?![$query ])(\\w*) ${operator} (\\w*)`, 'g');
+	const filterRegex = new RegExp(`(?![$query ])([.\\w]*) ${operator} (\\w*)`, 'g');
 	query = query.replace(filterRegex, `$filter.$1 ${operator} '$2'`);
 	return query;
 };
@@ -69,13 +70,13 @@ export const parseExpression = (query = '') => {
 	});
 	query = parseQuery(query);
 	query = query.replace(negationRegex, 'not ($1 $3 $4)');
-	query = query.replace(/AND/g, 'and');
-	query = query.replace(/OR/g, 'or');
+	query = query.replace(/\bAND\b/g, 'and');
+	query = query.replace(/\bOR\b/g, 'or');
 	return query;
 };
 
 const unParseOperator = (query, operator) => {
-	const filterRegex = new RegExp(`\\$filter.(\\w*) ${operator} '(\\w*)'`, 'g');
+	const filterRegex = new RegExp(`\\$filter.([\\w.]*) ${operator} '(\\w*)'`, 'g');
 	query = query.replace(filterRegex, `$1 ${operator} $2`);
 	return query;
 };
@@ -102,19 +103,22 @@ export const unParseExpression = (query = '') => {
 	});
 	query = unParseQuery(query);
 	query = query.replace(antiNegationRegex, '$1 doesnot$2 $3');
-	query = query.replace(/and/g, 'AND');
-	query = query.replace(/or/g, 'OR');
+	query = query.replace(/\band\b/g, 'AND');
+	query = query.replace(/\bor\b/g, 'OR');
 	return query;
 };
 
 export const getRawQuery = (showAdvancedEditor, unparsedRule) => {
 	let rawQuery;
+	let indexes;
 	if (showAdvancedEditor) {
 		rawQuery = get(unparsedRule, 'trigger.expression', '');
 		rawQuery = rawQuery.split('in $index and ');
-		if (rawQuery.length > 1) rawQuery = rawQuery[1];
-		else rawQuery = rawQuery[0];
-		rawQuery = unParseExpression(rawQuery);
+		const pattern = /'(.*?)'/;
+		if (rawQuery.length > 1) {
+			indexes = rawQuery[0].match(pattern)[1].split(',');
+			rawQuery = rawQuery[1];
+		} else rawQuery = rawQuery[0];
 	}
-	return unParseExpression(rawQuery);
+	return { rawQuery: unParseExpression(rawQuery), indexes };
 };

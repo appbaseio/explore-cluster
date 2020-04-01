@@ -166,6 +166,7 @@ class QueryRulesForm extends React.Component {
 
 			error: {},
 			loading: false,
+			editorKey: Date.now(),
 		};
 	}
 
@@ -177,10 +178,13 @@ class QueryRulesForm extends React.Component {
 		}
 
 		if (isEditPage && rule) {
-			const rawQuery = getRawQuery(rule.show_advance_editor, unparsedRule);
+			const { show_advance_editor } = rule;
+			const { rawQuery, indexes } = getRawQuery(show_advance_editor, unparsedRule);
 			this.setState({
 				...rule,
 				rawQuery,
+				advancedExpression: rawQuery,
+				selectedIndexes: show_advance_editor ? indexes : rule.selectedIndexes,
 			});
 		}
 		this.setState({ loading: true });
@@ -215,11 +219,14 @@ class QueryRulesForm extends React.Component {
 		} = this.props;
 		const { isEditPage } = this.state;
 
-		if (isEditPage && prevProps.rule !== rule) {
-			const rawQuery = getRawQuery(rule.show_advance_editor, unparsedRule);
+		if (isEditPage && prevProps.rule !== rule && !isUpdating) {
+			const { show_advance_editor } = rule;
+			const { rawQuery, indexes } = getRawQuery(show_advance_editor, unparsedRule);
 			this.setState({
 				...rule,
 				rawQuery,
+				advancedExpression: rawQuery,
+				selectedIndexes: show_advance_editor ? indexes : rule.selectedIndexes,
 			});
 		}
 
@@ -286,6 +293,7 @@ class QueryRulesForm extends React.Component {
 		const searchFields = getDatafields(mappings, selectedIndexes, true);
 
 		this.setState(prevState => ({
+			editorKey: Date.now(),
 			selectedIndexes,
 			dataFields,
 			searchFields,
@@ -524,6 +532,7 @@ class QueryRulesForm extends React.Component {
 			loading,
 			show_advance_editor,
 			rawQuery,
+			editorKey,
 		} = this.state;
 		const {
 			isCreating,
@@ -741,6 +750,7 @@ class QueryRulesForm extends React.Component {
 										</label>
 										{getErrorMessage(error.condition)}
 										<AdvancedEditor
+											key={editorKey}
 											query={rawQuery}
 											onChange={raw => {
 												this.setState({ rawQuery: raw });
