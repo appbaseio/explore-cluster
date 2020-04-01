@@ -249,7 +249,6 @@ class PricingTable extends Component {
 		super(props);
 
 		this.state = {
-			showConfirmBox: false,
 			otp: '',
 			showOtpModal: false,
 			message: '',
@@ -360,16 +359,9 @@ class PricingTable extends Component {
 		});
 	};
 
-	showConfirmBox = () => {
-		this.setState({
-			showConfirmBox: true,
-		});
-	};
-
 	cancelConfirmBox = () => {
-		this.setState({
-			showConfirmBox: false,
-		});
+		const { onToggleUnsubscribeModal } = this.props;
+		onToggleUnsubscribeModal();
 	};
 
 	getPlan = value => `$${value}`;
@@ -377,7 +369,6 @@ class PricingTable extends Component {
 	render() {
 		const {
 			//  growth, active,
-			showConfirmBox,
 			showOtpModal,
 			message,
 			resending,
@@ -390,6 +381,8 @@ class PricingTable extends Component {
 			isLoading,
 			isArcEnterprise,
 			subscriptionID,
+			showUnsubscribeModal,
+			onToggleUnsubscribeModal,
 		} = this.props;
 		if (isLoading) {
 			return <Loader show message="Updating Plan... Please wait!" />;
@@ -443,7 +436,7 @@ class PricingTable extends Component {
 						</Flex>
 					</div>
 				</Modal>
-				{showConfirmBox && (
+				{showUnsubscribeModal && (
 					<Unsubscribe
 						deleteSubscription={this.deleteSubscription}
 						loading={isSubmitting}
@@ -720,7 +713,7 @@ class PricingTable extends Component {
 									isCurrentPlan={isArcBasic}
 									handleToken={this.handleToken}
 									subscriptionID={subscriptionID}
-									handleUnsubscribe={this.showConfirmBox}
+									handleUnsubscribe={onToggleUnsubscribeModal}
 								/>
 							</td>
 							<td>
@@ -734,7 +727,7 @@ class PricingTable extends Component {
 										color: '#FFFFFF',
 										backgroundColor: theme.badge.blue,
 									}}
-									handleUnsubscribe={this.showConfirmBox}
+									handleUnsubscribe={onToggleUnsubscribeModal}
 								/>
 							</td>
 							<td>
@@ -748,7 +741,7 @@ class PricingTable extends Component {
 										color: '#FFFFFF',
 										backgroundColor: theme.badge.darkBlue,
 									}}
-									handleUnsubscribe={this.showConfirmBox}
+									handleUnsubscribe={onToggleUnsubscribeModal}
 								/>
 							</td>
 						</tr>
@@ -771,7 +764,7 @@ class PricingTable extends Component {
 						subscriptionID={subscriptionID}
 						isCurrentPlan={isArcBasic}
 						buttonText={isArcBasic ? 'Unsubscribe' : undefined}
-						onClickButton={this.showConfirmBox}
+						onClickButton={onToggleUnsubscribeModal}
 						price={this.getPlan(PRICE_BY_PLANS[ARC_PLANS.ARC_BASIC])}
 						stripeName="Arc basic plan"
 						plan={ARC_PLANS.ARC_BASIC}
@@ -820,7 +813,7 @@ class PricingTable extends Component {
 						linkColor="inherit"
 						pricingList={[]}
 						buttonText={isArcStandard ? 'Unsubscribe' : undefined}
-						onClickButton={this.showConfirmBox}
+						onClickButton={onToggleUnsubscribeModal}
 					>
 						<ListCaption>Security</ListCaption>
 						<CheckList
@@ -862,7 +855,7 @@ class PricingTable extends Component {
 						linkColor="inherit"
 						pricingList={[]}
 						buttonText={isArcEnterprise ? 'Unsubscribe' : undefined}
-						onClickButton={this.showConfirmBox}
+						onClickButton={onToggleUnsubscribeModal}
 					>
 						<ListCaption>Security</ListCaption>
 						<CheckList
