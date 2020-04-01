@@ -1,9 +1,9 @@
 import React, { Component, Fragment } from 'react';
-import { Col, Row, Layout, Button, Icon, message, Result, Affix } from 'antd';
+import { Affix, Button, Col, Icon, Layout, message, Result, Row } from 'antd';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { get } from 'lodash';
+import { get, keys } from 'lodash';
 
 import QueryCard from './components/QueryCard';
 import { getRules, reorderRules } from '../../batteries/modules/actions';
@@ -11,9 +11,9 @@ import Loader from '../../components/Loader';
 import DNDWrapper from '../../components/DNDWrapper';
 import { isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
-import SearchPreviewModal from '../../components/SearchPreviewModal';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { bannerDetails } from './utils';
+import { SearchPreviewSwitcher } from '../../components/SearchPreviewSwitcher';
 
 const { Header } = Layout;
 
@@ -22,6 +22,8 @@ const container = css`
 `;
 
 class QueryRules extends Component {
+	state = { visible: false };
+
 	componentDidMount() {
 		const { fetchRules, rules, tier, featureRules } = this.props;
 		if (isValidPlan(tier, featureRules)) {
@@ -65,8 +67,19 @@ class QueryRules extends Component {
 		}
 	};
 
+	toggleVisibility = () => {
+		this.setState(prevState => ({
+			visible: !prevState.visible,
+		}));
+	};
+
+	onAppSelect = app => {
+		this.setState({ app, visible: true });
+	};
+
 	render() {
-		const { rules, isLoading, tier, appName, featureRules } = this.props;
+		const { rules, isLoading, tier, featureRules, apps } = this.props;
+		const { visible, app } = this.state;
 
 		if (!isValidPlan(tier, featureRules)) {
 			return (
@@ -86,6 +99,8 @@ class QueryRules extends Component {
 		if (isLoading) {
 			return <Loader />;
 		}
+
+		const filteredApps = keys(apps).filter(app => !app.startsWith('.'));
 
 		return (
 			<Fragment>
@@ -186,7 +201,13 @@ class QueryRules extends Component {
 									boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.15)',
 								}}
 							>
-								<SearchPreviewModal app={appName} />
+								<SearchPreviewSwitcher
+									filteredApps={filteredApps}
+									onSelect={this.onAppSelect}
+									onCancel={this.toggleVisibility}
+									visible={visible}
+									app={app}
+								/>
 							</div>
 						</Affix>
 					) : null}
@@ -205,6 +226,7 @@ const mapStateToProps = state => ({
 	tier: get(state, '$getAppPlan.results.tier'),
 	appName: get(state, '$getCurrentApp.name'),
 	featureRules: get(state, '$getAppPlan.results.feature_rules', false),
+	apps: get(state, 'apps.data'),
 });
 
 const mapDispatchToProps = dispatch => ({

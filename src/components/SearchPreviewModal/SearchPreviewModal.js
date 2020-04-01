@@ -4,7 +4,7 @@ import { css } from 'emotion';
 
 import SearchPreview from '../../pages/SandboxPage/components/SearchPreview';
 
-const modalStyles = css`
+export const modalStyles = css`
 	&.ant-modal {
 		top: 5% !important;
 	}

@@ -19,6 +19,7 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
+import { keys } from 'lodash';
 import Loader from '../../components/Loader';
 import Header from '../../components/Header';
 import {
@@ -39,7 +40,7 @@ import Overlay from '../../components/Overlay';
 import { getFunctionHealthCheck } from '../../utils';
 import { deploymentCheck } from '../../components/DeployFunctionModal/helper';
 import { mediaKey } from '../../utils/media';
-import SearchPreviewModal from '../../components/SearchPreviewModal';
+import { SearchPreviewSwitcher } from '../../components/SearchPreviewSwitcher';
 
 const validPlans = [
 	'2019-production-2',
@@ -377,10 +378,22 @@ class FunctionsPage extends React.Component {
 		reorderFunctions(updatedSource, updatedDestination);
 	};
 
+	toggleVisibility = () => {
+		this.setState(prevState => ({
+			visible: !prevState.visible,
+		}));
+	};
+
+	onAppSelect = app => {
+		this.setState({ app, visible: true });
+	};
+
 	render() {
-		const { isLoading, functions, tier, getFunction, appName } = this.props;
-		const { deployModal, checking, healthError, notFoundError } = this.state;
+		const { isLoading, functions, tier, getFunction, apps } = this.props;
+		const { deployModal, checking, healthError, notFoundError, visible, app } = this.state;
 		this.sortedDataSource = (functions || []).sort((a, b) => a.order - b.order);
+
+		const filteredApps = keys(apps).filter(app => !app.startsWith('.'));
 
 		if (tier && validPlans.indexOf(tier) === -1) {
 			return (
@@ -620,7 +633,13 @@ class FunctionsPage extends React.Component {
 								boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.15)',
 							}}
 						>
-							<SearchPreviewModal app={appName} />
+							<SearchPreviewSwitcher
+								filteredApps={filteredApps}
+								onSelect={this.onAppSelect}
+								onCancel={this.toggleVisibility}
+								visible={visible}
+								app={app}
+							/>
 						</div>
 					</Affix>
 				</section>
@@ -644,6 +663,7 @@ const mapStateToProps = state => ({
 	functions: get(state, '$getAppFunctions.results'),
 	tier: get(state, '$getAppPlan.results.tier'),
 	featureFunctions: get(state, '$getAppPlan.results.feature_functions', false),
+	apps: get(state, 'apps.data'),
 });
 
 const mapDispatchToProps = dispatch => ({
