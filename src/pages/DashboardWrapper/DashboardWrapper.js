@@ -76,6 +76,10 @@ const defaultRoutes = {
 			{ label: 'Functions', link: '/cluster/functions', tag: 'Beta' },
 		],
 	},
+	'Curated Insights': {
+		icon: 'rise',
+		link: '/cluster/curated-insights',
+	},
 	Security: {
 		icon: 'key',
 		menu: [

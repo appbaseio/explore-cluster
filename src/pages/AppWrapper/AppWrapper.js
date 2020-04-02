@@ -62,6 +62,11 @@ const routes = {
 			{ label: 'Functions', link: '/cluster/functions', tag: 'Beta', hasExactPath: true },
 		],
 	},
+	'Curated Insights': {
+		icon: 'rise',
+		link: '/cluster/curated-insights',
+		hasExactPath: true,
+	},
 	Security: {
 		icon: 'key',
 		menu: [

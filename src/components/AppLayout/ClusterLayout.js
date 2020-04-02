@@ -124,6 +124,12 @@ const RoleBaseAccess = Loadable({
 	loading: Loader,
 });
 
+
+const ClusterInsights = Loadable({
+	loader: () => import('../../pages/ClusterInsights'),
+	loading: Loader,
+});
+
 class ClusterLayout extends React.PureComponent {
 	render() {
 		const { collapsed, showHeader } = this.props;
@@ -324,6 +330,13 @@ class ClusterLayout extends React.PureComponent {
 							path="/cluster/functions"
 							component={props => (
 								<AppPageContainer {...props} component={Functions} />
+							)}
+						/>
+						<Route
+							exact
+							path="/cluster/curated-insights"
+							component={props => (
+								<AppPageContainer {...props} component={ClusterInsights} />
 							)}
 						/>
 					</Switch>
