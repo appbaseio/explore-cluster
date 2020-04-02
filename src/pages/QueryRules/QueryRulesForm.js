@@ -60,7 +60,10 @@ import {
 
 const customReactFilter = css`
 	.react-filter-box {
-		height: 36px;
+		height: 100%;
+	}
+	.CodeMirror {
+		height: 100%;
 	}
 `;
 
@@ -190,12 +193,13 @@ class QueryRulesForm extends React.Component {
 		this.setState({ loading: true });
 		getClusterMappings()
 			.then(mappings => {
-				const dataFields = getDatafields(mappings, ['*']);
-				const searchFields = getDatafields(mappings, ['*'], true);
+				const [dataFields, fieldMap] = getDatafields(mappings, ['*']);
+				const [searchFields] = getDatafields(mappings, ['*'], true);
 				this.setState({
 					mappings,
 					dataFields,
 					searchFields,
+					fieldMap,
 					loading: false,
 				});
 			})
@@ -289,8 +293,8 @@ class QueryRulesForm extends React.Component {
 
 	handleIndex = selectedIndexes => {
 		const { mappings } = this.state;
-		const dataFields = getDatafields(mappings, selectedIndexes);
-		const searchFields = getDatafields(mappings, selectedIndexes, true);
+		const [dataFields] = getDatafields(mappings, selectedIndexes);
+		const [searchFields] = getDatafields(mappings, selectedIndexes, true);
 
 		this.setState(prevState => ({
 			editorKey: Date.now(),
@@ -354,6 +358,7 @@ class QueryRulesForm extends React.Component {
 			timeframe,
 			show_advance_editor,
 			advancedExpression,
+			fieldMap,
 		} = this.state;
 
 		let { actions } = this.state;
@@ -371,6 +376,7 @@ class QueryRulesForm extends React.Component {
 				expression: show_advance_editor
 					? `'${selectedIndexes.join(',')}' in $index and ${parseExpression(
 							advancedExpression,
+							fieldMap,
 					  )}`
 					: getExpressionFromValue({
 							selectedIndexes,
@@ -533,6 +539,7 @@ class QueryRulesForm extends React.Component {
 			show_advance_editor,
 			rawQuery,
 			editorKey,
+			fieldMap,
 		} = this.state;
 		const {
 			isCreating,
@@ -550,7 +557,7 @@ class QueryRulesForm extends React.Component {
 		this.customAutoComplete = new CustomAutoComplete(null, [
 			{ columnField: '$query', type: 'selection' },
 			...dataFields.map(dataField => ({
-				columnField: dataField,
+				columnField: dataField.replace(/.keyword/g, ''),
 				type: 'selection',
 			})),
 		]);

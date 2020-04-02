@@ -1,5 +1,5 @@
 import React from 'react';
-import { Select, Input, Row, Col, Radio } from 'antd';
+import { Select, Input, Row, Col } from 'antd';
 import { getErrorClass, getErrorMessage } from '../utils/error';
 import { hasValuesChanged } from '../utils';
 import { Info } from '../../../components/Info';
@@ -85,9 +85,10 @@ class Conditions extends React.Component {
 								value={dataField}
 								className={dataField ? '' : getErrorClass(error)}
 								style={{ width: '100%' }}
+								showSearch
 							>
 								{dataFields.map(field => (
-									<Option key={field}>{field}</Option>
+									<Option key={field}>{field.replace(/.keyword/g, '')}</Option>
 								))}
 							</Select>
 						</Col>

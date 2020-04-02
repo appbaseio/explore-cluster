@@ -13,6 +13,7 @@ export const AdvancedEditor = props => {
 			onChange={onChange}
 			autoCompleteHandler={autoCompleteHandler}
 			onParseOk={onParseOk}
+			editorConfig={{ lineWrapping: true }}
 		/>
 	);
 };
@@ -42,9 +43,26 @@ const operators = [
 	'>=',
 ];
 
-const parseOperator = (query, operator) => {
-	const filterRegex = new RegExp(`(?![$query ])([.\\w]*) ${operator} (\\w*)`, 'g');
+const applyFilterRegex = (filterRegex, query, fieldMap) => {
+	let matches = [];
+	// eslint-disable-next-line no-cond-assign
+	while ((matches = filterRegex.exec(query))) {
+		if (fieldMap[matches[1]]) {
+			query = query.replace(matches[1], fieldMap[matches[1]]);
+		}
+	}
+	return query;
+};
+
+const parseOperator = (query, operator, fieldMap = {}) => {
+	const filterRegex = new RegExp(`(?![$query ])([.\\w]*) ${operator} ([^"]\\w*[^ \\d])`, 'g');
+	const filterRegex2 = new RegExp(`(?![$query ])([.\\w]*) ${operator} ("\\w.*")`, 'g');
+	const numberRegex = new RegExp(`(?![$query ])([.\\w]*) ${operator} (\\d+)`, 'g');
+	query = applyFilterRegex(filterRegex, query, fieldMap);
+	query = applyFilterRegex(filterRegex2, query, fieldMap);
 	query = query.replace(filterRegex, `$filter.$1 ${operator} '$2'`);
+	query = query.replace(filterRegex2, `$filter.$1 ${operator} $2`);
+	query = query.replace(numberRegex, `$filter.$1 ${operator} $2`);
 	return query;
 };
 
@@ -63,10 +81,10 @@ const parseQuery = query => {
 	return query;
 };
 
-export const parseExpression = (query = '') => {
+export const parseExpression = (query = '', fieldMap) => {
 	const negationRegex = new RegExp(`(\\$\\w*\\.\\w*) (doesnot(\\w*)) ('\\w*')`, 'g');
 	operators.forEach(op => {
-		query = parseOperator(query, op);
+		query = parseOperator(query, op, fieldMap);
 	});
 	query = parseQuery(query);
 	query = query.replace(negationRegex, 'not ($1 $3 $4)');
@@ -77,7 +95,12 @@ export const parseExpression = (query = '') => {
 
 const unParseOperator = (query, operator) => {
 	const filterRegex = new RegExp(`\\$filter.([\\w.]*) ${operator} '(\\w*)'`, 'g');
+	const filterRegex2 = new RegExp(`\\$filter.([\\w.]*) ${operator} "([\\w ]*)"`, 'g');
+	const numberRegex = new RegExp(`\\$filter.([\\w.]*) ${operator} (\\d)+`, 'g');
 	query = query.replace(filterRegex, `$1 ${operator} $2`);
+	query = query.replace(filterRegex2, `$1 ${operator} "$2"`);
+	query = query.replace(numberRegex, `$1 ${operator} $2`);
+	query = query.replace(/.keyword/g, '');
 	return query;
 };
 

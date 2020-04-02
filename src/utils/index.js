@@ -1,4 +1,4 @@
-import { chain, get, keys } from 'lodash';
+import { chain, get, keys, values } from 'lodash';
 import { notification } from 'antd';
 import { getURL } from '../constants/config';
 import { getSingleFunction, updateFunctions } from '../batteries/utils/app';
@@ -376,6 +376,7 @@ export async function getClusterMappings() {
 
 export function getDatafields(mappings, indexes, isSearch = false) {
 	const hasAllIndex = indexes.includes('*');
+	let fieldMap = {};
 
 	function filtered(properties, property) {
 		if (isSearch)
@@ -394,13 +395,18 @@ export function getDatafields(mappings, indexes, isSearch = false) {
 		.filter(index => hasAllIndex || indexes.includes(index))
 		.reduce((acc, key) => {
 			const { properties } = get(mappings[key], 'mappings._doc') || mappings[key].mappings;
-			const nestedDataFields = keys(properties).filter(property => {
-				return filtered(properties, property);
-			});
-			return [...acc, ...nestedDataFields];
+			const newProperties = keys(properties).reduce((acc, key) => {
+				if (filtered(properties, key)) {
+					acc[key] = properties[key];
+				}
+				return acc;
+			}, {});
+			const nestedDataFields = getNestedDataFields(newProperties);
+			fieldMap = { ...fieldMap, ...nestedDataFields };
+			return [...acc, ...values(nestedDataFields)];
 		}, []);
 
-	return [...new Set(dataFields)];
+	return [[...new Set(dataFields)], fieldMap];
 }
 
 function updateQueryRules(selectedFunction, res) {
@@ -531,3 +537,36 @@ export function removeWhiteSpaces(str) {
 	str = rtrim(str);
 	return str;
 }
+
+export const getNestedDataFields = (mappings = {}) => {
+	let keyPath = '';
+	const fieldMap = {};
+	const applyNestedFields = (properties = {}, level = 0) => {
+		Object.keys(properties).reduce((agg, key) => {
+			if (level === 0) keyPath += `${key}`;
+			else keyPath += `.${key}`;
+			if (properties[key].properties) {
+				return {
+					...agg,
+					[key]: {
+						...properties[key],
+						properties: applyNestedFields(properties[key].properties, level + 1),
+					},
+				};
+			}
+			const data = properties[key];
+			const fields = get(properties[key], 'fields', {});
+			if (get(data, 'type') === 'string' || get(data, 'type') === 'text') {
+				if (fields.keyword) fieldMap[keyPath] = `${keyPath}.keyword`;
+			} else fieldMap[keyPath] = keyPath;
+			data.fields = fields;
+			keyPath = '';
+			return {
+				...agg,
+				[key]: data,
+			};
+		}, {});
+	};
+	applyNestedFields(mappings);
+	return fieldMap;
+};
