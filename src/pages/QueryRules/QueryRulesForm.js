@@ -236,7 +236,7 @@ class QueryRulesForm extends React.Component {
 
 		if (!isEditPage && !isCreating && prevProps.isCreating !== isCreating) {
 			if (createError) {
-				message.error(createError);
+				notification.error({ message: 'error', description: get(createError, 'message') });
 			} else {
 				message.success('successfully created rule');
 				history.push('/cluster/rules');
