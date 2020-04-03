@@ -185,15 +185,7 @@ const bannerDetails = {
 
 function FunctionItem({ item, onChange, getFunction }) {
 	const [isLogsOpen, setIsLogsOpen] = useState(false);
-	const {
-		function: func,
-		enabled,
-		isToggling,
-		order,
-		invocationCount,
-		isDeleting,
-		deploymentStatus,
-	} = item;
+	const { function: func, enabled, isToggling, isDeleting, deploymentStatus } = item;
 	useEffect(() => {
 		let interval = null;
 		function handleDeploymentCheck() {
@@ -311,9 +303,9 @@ class FunctionsPage extends React.Component {
 	};
 
 	async componentDidMount() {
-		const { fetchFunctions, appName, fetchRegistries, tier } = this.props;
+		const { fetchFunctions, appName, fetchRegistries, tier, featureFunctions } = this.props;
 		try {
-			if (validPlans.indexOf(tier) > -1) {
+			if (validPlans.indexOf(tier) > -1 || featureFunctions) {
 				this.setState({ checking: true });
 				await getFunctionHealthCheck();
 				this.setState({ checking: false });
@@ -378,11 +370,11 @@ class FunctionsPage extends React.Component {
 	};
 
 	render() {
-		const { isLoading, functions, tier, getFunction, appName } = this.props;
+		const { isLoading, functions, tier, getFunction, appName, featureFunctions } = this.props;
 		const { deployModal, checking, healthError, notFoundError } = this.state;
 		this.sortedDataSource = (functions || []).sort((a, b) => a.order - b.order);
 
-		if (tier && validPlans.indexOf(tier) === -1) {
+		if (tier && validPlans.indexOf(tier) === -1 && !featureFunctions) {
 			return (
 				<React.Fragment>
 					<Banner {...bannerDetails} />
