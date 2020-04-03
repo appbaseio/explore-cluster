@@ -842,7 +842,7 @@ class QueryRulesForm extends React.Component {
 
 								<DeleteModal
 									name="Rule"
-									value={rule.name.toLowerCase().replace(/ /g, '_')}
+									value={(rule.name || '').toLowerCase().replace(/ /g, '_')}
 									title="Delete Rule"
 									onDelete={() => handleQueryRuleDelete(rule, removeRule)}
 								>
@@ -905,7 +905,7 @@ const mapStateToProps = (state, props) => {
 	};
 
 	if (id) {
-		const ruleData = defaultState.rules.find(rule => rule.id === id);
+		const ruleData = defaultState.rules.find(rule => rule.id === id) || {};
 		return {
 			...defaultState,
 			rule: get(ruleData, 'show_advance_editor') ? ruleData : getParsedRule(ruleData),
