@@ -906,6 +906,9 @@ const mapStateToProps = (state, props) => {
 
 	if (id) {
 		const ruleData = defaultState.rules.find(rule => rule.id === id) || {};
+		const { type, timeframe } = ruleData.trigger || {};
+		ruleData.condition = type;
+		ruleData.timeframe = timeframe || null;
 		return {
 			...defaultState,
 			rule: get(ruleData, 'show_advance_editor') ? ruleData : getParsedRule(ruleData),
