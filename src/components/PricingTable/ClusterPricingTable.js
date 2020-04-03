@@ -80,7 +80,7 @@ const data = [
 		desc: 'Production-I tier and above.',
 	},
 	{
-		key: '3',
+		key: '4',
 		name: (
 			<RowContent>
 				<div>Query Rules</div>
@@ -92,7 +92,7 @@ const data = [
 		desc: 'Production-I tier and above.',
 	},
 	{
-		key: '4',
+		key: '5',
 		name: (
 			<RowContent>
 				<div>Functions</div>
