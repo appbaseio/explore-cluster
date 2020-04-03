@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Icon, message, notification, Typography } from 'antd';
 import { connect } from 'react-redux';
-import { omit } from 'lodash';
+import { omit, get } from 'lodash';
 import { cloneQueryRule } from '../../../../batteries/modules/actions';
 
 class CloneRule extends React.Component {
@@ -21,7 +21,7 @@ class CloneRule extends React.Component {
 			if (res && res.error) {
 				notification.error({
 					message: 'Error',
-					description: res.error,
+					description: get(res.error, 'message'),
 				});
 			} else {
 				message.success(`${rule.name} cloned successfully`);
