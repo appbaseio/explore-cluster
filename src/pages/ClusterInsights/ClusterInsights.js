@@ -1,10 +1,14 @@
 import React from 'react';
-import { Button, Spin } from 'antd';
+import { Button, Spin, message, Popconfirm } from 'antd';
 import Stripe from 'react-stripe-checkout';
+import { connect } from 'react-redux';
+import { get } from 'lodash';
 
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { container } from '../ResultsPage/styles';
-import { getSubscription, updateSubscription } from './api';
+import { getSubscription, updateSubscription, deleteSubscription } from './api';
+import { STRIPE_KEY } from '../../constants';
+import InsightLink from './components/InsightLink';
 
 class ClusterInsights extends React.Component {
 	state = {
@@ -12,45 +16,63 @@ class ClusterInsights extends React.Component {
 		updatingSubscription: false,
 		fetchingSubscription: false,
 		insight_link: null,
+		deletingSubscription: false,
 	};
 
 	componentDidMount() {
-		this.toggleFetching();
-		getSubscription()
-			.then(res => {
-				this.setState({
-					...res,
-				});
-				this.toggleFetching();
-			})
-			.catch(e => {
-				this.toggleFetching();
-			});
+		this.fetchInsights();
 	}
 
-	toggleFetching = () => {
+	toggleLoading = key => {
 		this.setState(state => ({
-			fetchingSubscription: !state.fetchingSubscription,
+			[key]: !state[key],
 		}));
 	};
 
-	toggleUpdating = () => {
-		this.setState(state => ({
-			updatingSubscription: !state.updatingSubscription,
-		}));
+	fetchInsights = () => {
+		const { credentials } = this.props;
+		this.toggleLoading('fetchingSubscription');
+		getSubscription(credentials)
+			.then(res => {
+				this.setState({
+					hasSubscribed: res.has_subscribed,
+					insight_link: res.insight_link,
+				});
+				this.toggleLoading('fetchingSubscription');
+			})
+			.catch(e => {
+				message.error(e.message);
+				this.toggleLoading('fetchingSubscription');
+			});
 	};
 
 	handleToken = token => {
-		this.toggleUpdating();
-		updateSubscription(token)
+		this.toggleLoading('updatingSubscription');
+		const { credentials } = this.props;
+		updateSubscription({ token, credentials })
 			.then(res => {
-				this.setState({
-					...res,
-				});
-				this.toggleUpdating();
+				message.success(res.message);
+				this.toggleLoading('updatingSubscription');
+				this.fetchInsights();
 			})
 			.catch(e => {
-				this.toggleUpdating();
+				message.error(e.message);
+				this.toggleLoading('updatingSubscription');
+			});
+	};
+
+	unsubscribe = () => {
+		this.toggleLoading('deletingSubscription');
+		const { credentials } = this.props;
+		deleteSubscription(credentials)
+			.then(res => {
+				message.success(res.message);
+				this.toggleLoading('deletingSubscription');
+				this.fetchInsights();
+			})
+			.catch(e => {
+				message.error(e.message);
+				this.toggleLoading('deletingSubscription');
 			});
 	};
 
@@ -60,6 +82,7 @@ class ClusterInsights extends React.Component {
 			fetchingSubscription,
 			updatingSubscription,
 			insight_link,
+			deletingSubscription,
 		} = this.state;
 		return (
 			<React.Fragment>
@@ -79,24 +102,41 @@ class ClusterInsights extends React.Component {
 								Learn More
 							</Button>
 
-							<Stripe
-								name="Curated Insights"
-								amount={50000}
-								token={this.handleToken}
-								disabled={hasSubscribed}
-								stripeKey="12345"
-							>
-								<Button
-									loading={fetchingSubscription || updatingSubscription}
-									disabled={hasSubscribed}
-									style={{ marginBottom: 10 }}
-									size="large"
-									type="primary"
-									block
+							{hasSubscribed ? (
+								<Popconfirm
+									title="Are you sure you want to unsubscribe from Curated Insights?"
+									onConfirm={this.unsubscribe}
+									okText="Yes"
+									cancelText="No"
 								>
-									{hasSubscribed ? 'Subscribed' : ' Subscribe Now'}
-								</Button>
-							</Stripe>
+									<Button
+										type="danger"
+										style={{ marginBottom: 10 }}
+										size="large"
+										loading={deletingSubscription}
+										ghost
+									>
+										Unsubscribe
+									</Button>
+								</Popconfirm>
+							) : (
+								<Stripe
+									name="Curated Insights"
+									amount={50000}
+									token={this.handleToken}
+									stripeKey={STRIPE_KEY.TEST}
+								>
+									<Button
+										loading={fetchingSubscription || updatingSubscription}
+										style={{ marginBottom: 10 }}
+										size="large"
+										type="primary"
+										block
+									>
+										Subscribe Now
+									</Button>
+								</Stripe>
+							)}
 						</React.Fragment>
 					)}
 				/>
@@ -106,17 +146,7 @@ class ClusterInsights extends React.Component {
 					</div>
 				) : (
 					<div className={container}>
-						{hasSubscribed && insight_link ? (
-							<iframe
-								src=""
-								height="600px"
-								width="100%"
-								title="Curated Insights"
-								frameBorder="0"
-							/>
-						) : (
-							'Preview Image'
-						)}
+						<InsightLink hasSubscribed={hasSubscribed} insight_link={insight_link} />
 					</div>
 				)}
 			</React.Fragment>
@@ -124,4 +154,11 @@ class ClusterInsights extends React.Component {
 	}
 }
 
-export default ClusterInsights;
+const mapStateToProps = state => {
+	const { username, password } = get(state, 'user.data', {});
+	return {
+		credentials: `${username}:${password}`,
+	};
+};
+
+export default connect(mapStateToProps)(ClusterInsights);

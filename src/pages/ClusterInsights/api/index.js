@@ -1,19 +1,60 @@
-export const getSubscription = () => {
+import { getURL } from '../../../constants/config';
+import { getAuthHeaders } from '../../../batteries/utils/mappings';
+
+export const getSubscription = credentials => {
 	return new Promise((resolve, reject) => {
-		setTimeout(() => {
-			resolve({
-				hasSubscribed: false,
+		fetch(`${getURL()}/arc/curated_insights`, {
+			method: 'GET',
+			headers: {
+				...getAuthHeaders(credentials),
+				'Content-Type': 'application/json',
+			},
+		})
+			.then(res => res.json())
+			.then(res => {
+				resolve(res);
+			})
+			.catch(e => {
+				reject(e);
 			});
-		}, 1000);
 	});
 };
 
-export const updateSubscription = () => {
+export const updateSubscription = ({ token, credentials }) => {
 	return new Promise((resolve, reject) => {
-		setTimeout(() => {
-			resolve({
-				hasSubscribed: true,
+		fetch(`${getURL()}/arc/curated_insights?test=true`, {
+			method: 'POST',
+			body: JSON.stringify({ token }),
+			headers: {
+				...getAuthHeaders(credentials),
+				'Content-Type': 'application/json',
+			},
+		})
+			.then(res => res.json())
+			.then(res => {
+				resolve(res);
+			})
+			.catch(e => {
+				reject(e);
 			});
-		}, 2000);
+	});
+};
+
+export const deleteSubscription = credentials => {
+	return new Promise((resolve, reject) => {
+		fetch(`${getURL()}/arc/curated_insights?test=true`, {
+			method: 'DELETE',
+			headers: {
+				...getAuthHeaders(credentials),
+				'Content-Type': 'application/json',
+			},
+		})
+			.then(res => res.json())
+			.then(res => {
+				resolve(res);
+			})
+			.catch(e => {
+				reject(e);
+			});
 	});
 };
