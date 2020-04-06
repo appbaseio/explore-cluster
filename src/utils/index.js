@@ -386,7 +386,8 @@ export function getDatafields(mappings, indexes, isSearch = false) {
 			properties[property].type === 'text' ||
 			properties[property].type === 'integer' ||
 			properties[property].type === 'long' ||
-			properties[property].type === 'bool'
+			properties[property].type === 'bool' ||
+			properties[property].type === 'float'
 		);
 	}
 

@@ -55,9 +55,9 @@ const applyFilterRegex = (filterRegex, query, fieldMap) => {
 };
 
 const parseOperator = (query, operator, fieldMap = {}) => {
-	const filterRegex = new RegExp(`(?![$query ])([.\\w]*) ${operator} ([^"]\\w*[^ \\d])`, 'g');
-	const filterRegex2 = new RegExp(`(?![$query ])([.\\w]*) ${operator} ("\\w.*")`, 'g');
-	const numberRegex = new RegExp(`(?![$query ])([.\\w]*) ${operator} (\\d+)`, 'g');
+	const filterRegex = new RegExp(`(?![$query ])([.#@\\w]*) ${operator} ([^"]\\w*[^ \\d])`, 'g');
+	const filterRegex2 = new RegExp(`(?![$query ])([.#@\\w]*) ${operator} ("\\w.*")`, 'g');
+	const numberRegex = new RegExp(`(?![$query ])([.#@\\w]*) ${operator} (\\d+)`, 'g');
 	query = applyFilterRegex(filterRegex, query, fieldMap);
 	query = applyFilterRegex(filterRegex2, query, fieldMap);
 	query = query.replace(filterRegex, `$filter.$1 ${operator} '$2'`);
@@ -82,12 +82,14 @@ const parseQuery = query => {
 };
 
 export const parseExpression = (query = '', fieldMap) => {
-	const negationRegex = new RegExp(`(\\$\\w*\\.\\w*) (doesnot(\\w*)) ('\\w*')`, 'g');
+	const negationRegex = new RegExp(`(\\$filter[.#@\\w]*) (doesnot(\\w*)) ('\\w*')`, 'g');
+	const negationRegex2 = new RegExp(`(\\$filter[.#@\\w]*) (doesnot(\\w*)) ("[\\w ]*")`, 'g');
 	operators.forEach(op => {
 		query = parseOperator(query, op, fieldMap);
 	});
 	query = parseQuery(query);
 	query = query.replace(negationRegex, 'not ($1 $3 $4)');
+	query = query.replace(negationRegex2, 'not ($1 $3 $4)');
 	query = query.replace(/\bAND\b/g, 'and');
 	query = query.replace(/\bOR\b/g, 'or');
 	return query;
@@ -120,7 +122,7 @@ const unParseQuery = query => {
 };
 
 export const unParseExpression = (query = '') => {
-	const antiNegationRegex = new RegExp(`not \\((\\w*) (\\w*) (\\w*)\\)`, 'g');
+	const antiNegationRegex = new RegExp(`not \\(([.#@\\w]*) (\\w*) ([\\w" ]*)\\)`, 'g');
 	operators.forEach(op => {
 		query = unParseOperator(query, op);
 	});
