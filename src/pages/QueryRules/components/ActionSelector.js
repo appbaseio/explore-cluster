@@ -84,7 +84,7 @@ class ActionSelector extends React.Component {
 	render() {
 		const { actions: selectedActions, error, condition } = this.props;
 		const optionsToShow = Object.keys(actions).filter(
-			action => !selectedActions.find(item => item.type === action),
+			action => !(selectedActions || []).find(item => item.type === action),
 		);
 		return (
 			<Card className={css([cardStyles, getErrorClass(error)])} hoverable>
