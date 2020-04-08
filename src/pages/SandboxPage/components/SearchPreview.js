@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Row, Col, Switch, Tooltip, Spin } from 'antd';
+import { Row, Col, Switch, Tooltip, Spin, Button, Icon } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
@@ -17,6 +17,7 @@ import { getRawMappingsByAppName } from '../../../batteries/modules/selectors';
 import { getURL } from '../../../constants/config';
 import { getSubFields } from '../../../utils';
 import { isValidPlan } from '../../../batteries/utils';
+import generateSandboxURL from '../utils/sandbox-generator';
 
 const container = css`
 	padding: 16px;
@@ -170,6 +171,14 @@ class SearchPreview extends React.Component {
 		});
 	};
 
+	generateCodeSandbox = () => {
+		const { settings } = this.state;
+		const { app, credentials, url } = this.props;
+		const codesandboxURL = generateSandboxURL({ settings, app, credentials, url });
+
+		window.open(codesandboxURL, '_blank');
+	};
+
 	render() {
 		const { settings, app, credentials, url, fetchingDefaultSettings, rules } = this.props;
 		const { settings: stateSettings, isAnalyticsEnabled } = this.state;
@@ -220,10 +229,10 @@ class SearchPreview extends React.Component {
 								</label>
 							</Tooltip>
 						</div>
-						{/* <Button size="large" type="primary">
+						<Button onClick={this.generateCodeSandbox} size="large" type="primary">
 							<Icon type="code-sandbox" />
 							Open in Codesandbox
-						</Button> */}
+						</Button>
 					</Row>
 				</Col>
 				<ReactiveBase
