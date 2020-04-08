@@ -40,7 +40,7 @@ import Overlay from '../../components/Overlay';
 import { getFunctionHealthCheck } from '../../utils';
 import { deploymentCheck } from '../../components/DeployFunctionModal/helper';
 import { mediaKey } from '../../utils/media';
-import { SearchPreviewSwitcher } from '../../components/SearchPreviewSwitcher';
+import SearchPreviewSwitcher from '../../components/SearchPreviewSwitcher';
 
 const validPlans = [
 	'2019-production-2',

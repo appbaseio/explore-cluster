@@ -9,7 +9,7 @@ import { keys } from 'lodash';
 import Grid from '../../components/CreateCredentials/Grid';
 import Ace from '../../batteries/components/SearchSandbox/containers/AceEditor';
 import { suggestionsMessages as Messages } from '../../utils/messages';
-import { SearchPreviewSwitcher } from '../../components/SearchPreviewSwitcher';
+import SearchPreviewSwitcher from '../../components/SearchPreviewSwitcher';
 
 const calculateValue = value => {
 	const index = value.indexOf('*');

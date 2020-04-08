@@ -13,7 +13,7 @@ import { isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { bannerDetails } from './utils';
-import { SearchPreviewSwitcher } from '../../components/SearchPreviewSwitcher';
+import SearchPreviewSwitcher from '../../components/SearchPreviewSwitcher';
 
 const { Header } = Layout;
 
