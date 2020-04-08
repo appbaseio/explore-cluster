@@ -19,6 +19,8 @@ import { getSynonymsAnalyzerSettings, updateSynonymsSettings } from './utils';
 import DeleteModal from '../../components/DeleteModal/DeleteModal';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { SettingsFooter } from '../../components/SettingsFooter';
+import { isValidPlan } from '../../batteries/utils';
+import Overlay from '../../components/Overlay';
 
 const expression = css`
 	font-weight: 15px;
@@ -174,8 +176,29 @@ class Synonyms extends React.Component {
 
 	render() {
 		const { synonyms, isDeleting, key } = this.state;
-		const { credentials, appName } = this.props;
+		const { credentials, appName, tier, featureSynonyms } = this.props;
 		const url = getURL();
+
+		const bannerMessage = {
+			title: 'Manage Synonyms',
+			buttonText: 'Read Docs',
+		};
+
+		if (!isValidPlan(tier, featureSynonyms)) {
+			return (
+				<React.Fragment>
+					<Banner {...bannerMessage} />
+					<Overlay
+						style={{
+							maxWidth: '70%',
+						}}
+						src="https://i.imgur.com/fO0Zomn.png"
+						alt="Synonyms"
+					/>
+				</React.Fragment>
+			);
+		}
+
 		const columns = [
 			{
 				title: 'Type',
@@ -241,7 +264,7 @@ class Synonyms extends React.Component {
 								indexSynonyms={synonyms}
 								id={record._id}
 								refetch={this.fetchSynonym}
-								synonyms={record.synonym}
+								synonyms={record.synonym || []}
 								handleSynonyms={this.handleUpdate}
 								renderButton={({ handleModal }) => {
 									return (
@@ -283,10 +306,7 @@ class Synonyms extends React.Component {
 				width: 100,
 			},
 		];
-		const bannerMessage = {
-			title: 'Manage Synonyms',
-			buttonText: 'Read Docs',
-		};
+
 
 		return (
 			<React.Fragment>
@@ -339,7 +359,7 @@ class Synonyms extends React.Component {
 									/>
 								</div>
 								<SynonymsModal
-									indexSynonyms={synonyms}
+									indexSynonyms={synonyms || []}
 									refetch={this.fetchSynonym}
 									isAddModal
 									handleSynonyms={this.handleUpdate}
@@ -391,6 +411,8 @@ const mapStateToProps = state => {
 	const { username, password } = get(state, 'user.data', {});
 	return {
 		credentials: username ? `${username}:${password}` : null,
+		tier: get(state, '$getAppPlan.results.tier'),
+		featureSynonyms: get(state, '$getAppPlan.results.feature_synonyms', false),
 	};
 };
 
