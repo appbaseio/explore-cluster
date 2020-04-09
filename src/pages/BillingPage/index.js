@@ -17,16 +17,15 @@ import Loader from '../../batteries/components/shared/Loader';
 import { displayErrors } from '../../utils/helper';
 import { STRIPE_KEY } from '../../constants';
 import HostedArcBilling from '../../components/PricingTable/HostedArcBilling';
+import ClusterPricingTable from '../../components/PricingTable/ClusterPricingTable';
 import { PRICE_BY_PLANS, EFFECTIVE_PRICE_BY_PLANS } from '../../batteries/utils';
 
 function numberWithCommas(x) {
 	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
-const TextLink = styled('span')`
-	color: rgb(111, 99, 245);
-	font-weight: 600;
-	text-decoration: underline;
+const StyledLink = styled.a`
+	color: dodgerblue;
 	cursor: pointer;
 `;
 
@@ -67,9 +66,25 @@ class Billing extends Component {
 		if (isClusterBilling) {
 			return (
 				<Card bodyStyle={{ padding: '20px 50px' }}>
+					<ClusterPricingTable />
+					<p style={{ paddingTop: '20px' }}>
+						Read more about the pricing plans over{' '}
+						<a
+							href="https://appbase.io/pricing/"
+							target="_blank"
+							rel="noopener noreferrer"
+							style={{
+								color: 'dodgerblue',
+								textDecoration: 'none',
+							}}
+						>
+							here
+						</a>
+						.
+					</p>
 					<p>
-						To upgrade your current current cluster plan, reach out to support either
-						via chat or at <a href="mailto:support@appbase.io">support@appbase.io</a>.
+						<StyledLink onClick={this.openChatWindow}>Chat with us </StyledLink>to
+						upgrade your plan
 					</p>
 				</Card>
 			);
@@ -99,6 +114,10 @@ class Billing extends Component {
 		this.setState(currentState => ({
 			isShowingUnsubscribeArcModal: !currentState.isShowingUnsubscribeArcModal,
 		}));
+	};
+
+	openChatWindow = () => {
+		window.Intercom('show');
 	};
 
 	render() {
@@ -201,7 +220,7 @@ class Billing extends Component {
 								panelLabel="Update Payment"
 								token={updatePayment}
 							>
-								<TextLink>Update Payment Method</TextLink>
+								<StyledLink>Update Payment Method</StyledLink>
 							</Stripe>
 						</Row>
 					}
@@ -247,9 +266,7 @@ class Billing extends Component {
 					<Card bodyStyle={{ padding: '20px 50px' }}>
 						<p style={{ marginBottom: '0' }}>
 							Need a trial extended?{' '}
-							<TextLink onClick={() => window.Intercom('show')}>
-								Chat with us
-							</TextLink>
+							<StyledLink onClick={this.openChatWindow}>Chat with us</StyledLink>
 						</p>
 					</Card>
 				)}
@@ -279,9 +296,9 @@ class Billing extends Component {
 							>
 								<p>
 									You can unsubscribe by clicking{' '}
-									<TextLink onClick={this.onShowUnsubscribeArcModal}>
+									<StyledLink onClick={this.onShowUnsubscribeArcModal}>
 										here
-									</TextLink>
+									</StyledLink>
 								</p>
 							</Panel>
 						</Collapse>
