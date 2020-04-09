@@ -412,7 +412,7 @@ const mapStateToProps = state => {
 	return {
 		credentials: username ? `${username}:${password}` : null,
 		tier: get(state, '$getAppPlan.results.tier'),
-		featureSynonyms: get(state, '$getAppPlan.results.feature_synonyms', false),
+		featureSynonyms: get(state, '$getAppPlan.results.feature_search_relevancy', false),
 	};
 };
 
