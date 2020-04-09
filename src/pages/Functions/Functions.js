@@ -27,6 +27,7 @@ import {
 	reorderFunction,
 	updateFunctions,
 } from '../../batteries/modules/actions';
+import { isValidPlan, features } from '../../batteries/utils';
 import CreateFunction from './CreateFunction';
 import TriggerFunction from './TriggerFunction';
 import InvokeFunctionModal from '../../components/InvokeFunctionModal';
@@ -40,14 +41,6 @@ import { getFunctionHealthCheck } from '../../utils';
 import { deploymentCheck } from '../../components/DeployFunctionModal/helper';
 import { mediaKey } from '../../utils/media';
 import SearchPreviewModal from '../../components/SearchPreviewModal';
-
-const validPlans = [
-	'2019-production-2',
-	'2019-production-3',
-	'2019-production-4',
-	'arc-enterprise',
-	'hosted-arc-enterprise',
-];
 
 const link = css`
 	font-size: 14px;
@@ -185,15 +178,7 @@ const bannerDetails = {
 
 function FunctionItem({ item, onChange, getFunction }) {
 	const [isLogsOpen, setIsLogsOpen] = useState(false);
-	const {
-		function: func,
-		enabled,
-		isToggling,
-		order,
-		invocationCount,
-		isDeleting,
-		deploymentStatus,
-	} = item;
+	const { function: func, enabled, isToggling, isDeleting, deploymentStatus } = item;
 	useEffect(() => {
 		let interval = null;
 		function handleDeploymentCheck() {
@@ -311,9 +296,9 @@ class FunctionsPage extends React.Component {
 	};
 
 	async componentDidMount() {
-		const { fetchFunctions, appName, fetchRegistries, tier } = this.props;
+		const { fetchFunctions, appName, fetchRegistries, tier, featureFunctions } = this.props;
 		try {
-			if (validPlans.indexOf(tier) > -1) {
+			if (isValidPlan(tier, featureFunctions, features.FUNCTIONS)) {
 				this.setState({ checking: true });
 				await getFunctionHealthCheck();
 				this.setState({ checking: false });
@@ -378,11 +363,11 @@ class FunctionsPage extends React.Component {
 	};
 
 	render() {
-		const { isLoading, functions, tier, getFunction, appName } = this.props;
+		const { isLoading, functions, tier, getFunction, appName, featureFunctions } = this.props;
 		const { deployModal, checking, healthError, notFoundError } = this.state;
 		this.sortedDataSource = (functions || []).sort((a, b) => a.order - b.order);
 
-		if (tier && validPlans.indexOf(tier) === -1) {
+		if (tier && !isValidPlan(tier, featureFunctions, features.FUNCTIONS)) {
 			return (
 				<React.Fragment>
 					<Banner {...bannerDetails} />
