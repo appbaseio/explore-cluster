@@ -66,4 +66,27 @@ const listItem = css`
 	}
 `;
 
-export { listItem };
+const ruleStyle = css`
+	display: flex;
+	justify-content: space-between;
+	padding: 5px 0;
+
+	p {
+		margin: 0;
+		font-size: 14px;
+		color: rgba(0, 0, 0, 0.65);
+	}
+
+	p.name {
+		font-weight: bold;
+	}
+
+	p.expression {
+		color: rgba(0, 0, 0, 0.55);
+	}
+
+	@media (max-width: 576) {
+		flex-direction: column;
+	}
+`;
+export { listItem, ruleStyle };

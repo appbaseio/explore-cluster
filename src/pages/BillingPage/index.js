@@ -17,16 +17,15 @@ import Loader from '../../batteries/components/shared/Loader';
 import { displayErrors } from '../../utils/helper';
 import { STRIPE_KEY } from '../../constants';
 import HostedArcBilling from '../../components/PricingTable/HostedArcBilling';
+import ClusterPricingTable from '../../components/PricingTable/ClusterPricingTable';
 import { PRICE_BY_PLANS, EFFECTIVE_PRICE_BY_PLANS } from '../../batteries/utils';
 
 function numberWithCommas(x) {
 	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
-const TextLink = styled('span')`
-	color: rgb(111, 99, 245);
-	font-weight: 600;
-	text-decoration: underline;
+const StyledLink = styled.a`
+	color: dodgerblue;
 	cursor: pointer;
 `;
 
@@ -45,6 +44,10 @@ class Billing extends Component {
 		nodeCount: undefined,
 	};
 
+	state = {
+		isShowingUnsubscribeArcModal: false,
+	};
+
 	componentDidMount() {
 		const { isAppPlanFetched, fetchAppPlan } = this.props;
 		if (!isAppPlanFetched) {
@@ -59,12 +62,29 @@ class Billing extends Component {
 
 	get billingView() {
 		const { isHostedArc, isClusterBilling } = this.props;
+		const { isShowingUnsubscribeArcModal } = this.state;
 		if (isClusterBilling) {
 			return (
 				<Card bodyStyle={{ padding: '20px 50px' }}>
+					<ClusterPricingTable />
+					<p style={{ paddingTop: '20px' }}>
+						Read more about the pricing plans over{' '}
+						<a
+							href="https://appbase.io/pricing/"
+							target="_blank"
+							rel="noopener noreferrer"
+							style={{
+								color: 'dodgerblue',
+								textDecoration: 'none',
+							}}
+						>
+							here
+						</a>
+						.
+					</p>
 					<p>
-						To upgrade your current current cluster plan, reach out to support either
-						via chat or at <a href="mailto:support@appbase.io">support@appbase.io</a>.
+						<StyledLink onClick={this.openChatWindow}>Chat with us </StyledLink>to
+						upgrade your plan
 					</p>
 				</Card>
 			);
@@ -81,11 +101,24 @@ class Billing extends Component {
 		return (
 			<Container>
 				<Card bodyStyle={{ padding: 0 }}>
-					<PricingTable />
+					<PricingTable
+						showUnsubscribeModal={isShowingUnsubscribeArcModal}
+						onToggleUnsubscribeModal={this.onShowUnsubscribeArcModal}
+					/>
 				</Card>
 			</Container>
 		);
 	}
+
+	onShowUnsubscribeArcModal = () => {
+		this.setState(currentState => ({
+			isShowingUnsubscribeArcModal: !currentState.isShowingUnsubscribeArcModal,
+		}));
+	};
+
+	openChatWindow = () => {
+		window.Intercom('show');
+	};
 
 	render() {
 		// prettier-ignore
@@ -108,6 +141,7 @@ class Billing extends Component {
 		if (isLoading) {
 			return <Loader show message="Updating Payment Method... Please wait!" />;
 		}
+		const isSelfHostedArc = !isHostedArc && !isClusterBilling;
 		return (
 			<React.Fragment>
 				<BannerHeader
@@ -186,7 +220,7 @@ class Billing extends Component {
 								panelLabel="Update Payment"
 								token={updatePayment}
 							>
-								<TextLink>Update Payment Method</TextLink>
+								<StyledLink>Update Payment Method</StyledLink>
 							</Stripe>
 						</Row>
 					}
@@ -223,6 +257,48 @@ class Billing extends Component {
 									</a>{' '}
 									to unsubscribe from your current plan. You will lose access to
 									Arc APIs and dashboard views after doing this.
+								</p>
+							</Panel>
+						</Collapse>
+					</Card>
+				)}
+				{!subscriptionID && !isPaid && !isOnTrial && (
+					<Card bodyStyle={{ padding: '20px 50px' }}>
+						<p style={{ marginBottom: '0' }}>
+							Need a trial extended?{' '}
+							<StyledLink onClick={this.openChatWindow}>Chat with us</StyledLink>
+						</p>
+					</Card>
+				)}
+				{isPaid && isSelfHostedArc && (
+					<Card
+						style={{
+							borderBottom: 0,
+							borderRight: 0,
+							borderLeft: 0,
+						}}
+					>
+						<Collapse
+							bordered={false}
+							style={{
+								marginLeft: 12,
+							}}
+						>
+							<Panel
+								style={{
+									borderBottom: 0,
+								}}
+								showArrow={false}
+								header={
+									<span style={{ color: 'tomato' }}>Looking To Unsubscribe?</span>
+								}
+								key="1"
+							>
+								<p>
+									You can unsubscribe by clicking{' '}
+									<StyledLink onClick={this.onShowUnsubscribeArcModal}>
+										here
+									</StyledLink>
 								</p>
 							</Panel>
 						</Collapse>

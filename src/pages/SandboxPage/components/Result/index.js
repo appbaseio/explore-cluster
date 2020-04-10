@@ -1,11 +1,12 @@
 import React from 'react';
-import { Card, Radio, Icon, Row, Button, Alert, Tooltip } from 'antd';
+import { Card, Radio, Icon, Row, Button, Alert, Tooltip, Typography } from 'antd';
 import { StateProvider } from '@appbaseio/reactivesearch';
 import { Link } from 'react-router-dom';
 import { get } from 'lodash';
 import QueryView from './QueryView';
 import ListView from './ListView';
 import { settingsMap } from '../../../../components/ReviewAndSave/helper';
+import { ruleStyle } from './styles';
 
 class Result extends React.Component {
 	state = {
@@ -19,7 +20,7 @@ class Result extends React.Component {
 	};
 
 	render() {
-		const { result, app, credentials, url, onChange, query } = this.props;
+		const { result, app, credentials, url, onChange, query, rules } = this.props;
 		const { view } = this.state;
 		return (
 			<Card>
@@ -34,9 +35,39 @@ class Result extends React.Component {
 									type="info"
 									icon="info"
 									style={{ margin: '0px 0 16px' }}
-									message={`${rulesApplied.length} Query ${
-										rulesApplied.length > 1 ? 'rules' : 'rule'
-									} applied`}
+									message={
+										<React.Fragment>
+											<Typography.Text>
+												Query {rulesApplied.length > 1 ? 'rules' : 'rule'}{' '}
+												applied
+											</Typography.Text>
+											{rulesApplied.map(rule => {
+												const ruleInfo = (rules || []).find(
+													r => r.id === rule,
+												);
+
+												return (
+													<div className={ruleStyle}>
+														<div>
+															<p className="name">{ruleInfo.name}</p>
+															<p className="expression">
+																{ruleInfo &&
+																	ruleInfo.trigger &&
+																	ruleInfo.trigger.expression}
+															</p>
+														</div>
+														<div>
+															<Link to={`/cluster/rules/${rule}`}>
+																<Button size="small">
+																	Edit Rule
+																</Button>
+															</Link>
+														</div>
+													</div>
+												);
+											})}
+										</React.Fragment>
+									}
 								/>
 							);
 						}

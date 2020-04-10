@@ -311,7 +311,7 @@ class DashboardWrapper extends Component {
 						paddingTop: showHeader ? 60 : 0,
 						minHeight: '100vh',
 						marginLeft: collapsed ? '80px' : '260px',
-						overflowY: 'scroll',
+						overflowY: 'auto',
 					}}
 				>
 					{showHeader && (
