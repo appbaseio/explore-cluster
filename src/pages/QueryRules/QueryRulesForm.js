@@ -507,6 +507,7 @@ class QueryRulesForm extends React.Component {
 		if (!rawQuery) return;
 		this.setState(prevState => ({
 			advancedExpression: rawQuery,
+			expressionError: false,
 			error: {
 				...prevState.error,
 				condition: {
@@ -516,8 +517,25 @@ class QueryRulesForm extends React.Component {
 		}));
 	};
 
+	onParseError = () => {
+		this.setState({ expressionError: true });
+	};
+
 	toggleAdvancedEditor = () => {
 		this.setState(prevState => ({ show_advance_editor: !prevState.show_advance_editor }));
+	};
+
+	handleExpression = raw => {
+		if ((raw || '').trim() === '') {
+			const value = (raw || '').trim();
+			this.setState({
+				rawQuery: value,
+				advancedExpression: value,
+				expressionError: false,
+			});
+		} else {
+			this.setState({ rawQuery: raw });
+		}
 	};
 
 	render() {
@@ -762,11 +780,10 @@ class QueryRulesForm extends React.Component {
 										<AdvancedEditor
 											key={editorKey}
 											query={rawQuery}
-											onChange={raw => {
-												this.setState({ rawQuery: raw });
-											}}
+											onChange={this.handleExpression}
 											autoCompleteHandler={this.customAutoComplete}
 											onParseOk={this.onParseOk}
+											onParseError={this.onParseError}
 										/>
 									</div>
 								)}

@@ -6,13 +6,14 @@ import 'react-filter-box/lib/react-filter-box.css';
 import { get } from 'lodash';
 
 export const AdvancedEditor = props => {
-	const { autoCompleteHandler, onChange, onParseOk, query } = props;
+	const { autoCompleteHandler, onChange, onParseOk, query, onParseError } = props;
 	return (
 		<ReactFilterBox
 			query={query}
 			onChange={onChange}
 			autoCompleteHandler={autoCompleteHandler}
 			onParseOk={onParseOk}
+			onParseError={onParseError}
 			editorConfig={{ lineWrapping: true }}
 		/>
 	);
