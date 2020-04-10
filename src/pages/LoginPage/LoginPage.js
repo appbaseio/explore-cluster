@@ -29,9 +29,15 @@ class LoginPage extends Component {
 			this.url.current.input.value = urlValue;
 			const credObj = getURLCredentials(urlValue) || {};
 			this.url.current.input.value = this.getURL(urlValue);
-			this.username.current.input.value = credObj.username || '';
-			this.password.current.input.value = credObj.password || '';
+			this.setCredentials(credObj);
 		}
+	}
+
+	setCredentials(credObj) {
+		if (this.username && this.username.current)
+			this.username.current.input.value = credObj.username || '';
+		if (this.password && this.password.current)
+			this.password.current.input.value = credObj.password || '';
 	}
 
 	login = () => {
@@ -49,10 +55,9 @@ class LoginPage extends Component {
 		const { value } = event.target;
 		if (!value) return;
 		const credObj = getURLCredentials(value) || {};
-		this.url.current.input.value = this.getURL(value);
+		if (this.url && this.url.current) this.url.current.input.value = this.getURL(value);
 		if (!isEmpty(credObj)) {
-			this.username.current.input.value = credObj.username || '';
-			this.password.current.input.value = credObj.password || '';
+			this.setCredentials(credObj);
 		}
 	};
 
