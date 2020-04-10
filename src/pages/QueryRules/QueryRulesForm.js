@@ -62,6 +62,9 @@ const customReactFilter = css`
 	.react-filter-box {
 		height: 100%;
 	}
+	.react-filter-box.error {
+		border-color: #f5222d;
+	}
 	.CodeMirror {
 		height: 100%;
 	}

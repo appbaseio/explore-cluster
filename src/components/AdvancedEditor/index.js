@@ -146,8 +146,8 @@ export const getRawQuery = (showAdvancedEditor, unparsedRule) => {
 		rawQuery = get(unparsedRule, 'trigger.expression', '');
 		rawQuery = rawQuery.split('in $index and ');
 		const pattern = /'(.*?)'/;
+		indexes = rawQuery[0].match(pattern)[1].split(',');
 		if (rawQuery.length > 1) {
-			indexes = rawQuery[0].match(pattern)[1].split(',');
 			rawQuery = rawQuery[1];
 		} else rawQuery = rawQuery[0];
 	}

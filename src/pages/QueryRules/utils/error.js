@@ -27,6 +27,7 @@ const getErrorMessages = state => {
 		selectedIndexes,
 		show_advance_editor,
 		advancedExpression,
+		rawQuery,
 	} = state;
 	const error = {};
 
@@ -72,10 +73,10 @@ const getErrorMessages = state => {
 		const isDataFieldsPresent = !!(dataField && dataFieldValue);
 		const isQueryPresent = !!queryValue;
 		if (show_advance_editor) {
-			if (!advancedExpression)
+			if (!advancedExpression || !rawQuery)
 				error.condition = {
 					hasError: true,
-					description: 'Advanced Expression is needed.',
+					description: 'Advanced expression is needed',
 				};
 		} else {
 			if (!isQueryPresent) {
