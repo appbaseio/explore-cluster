@@ -25,7 +25,12 @@ class LoginPage extends Component {
 
 	componentDidMount() {
 		if (this.url && this.url.current) {
-			this.url.current.input.value = getURL() || '';
+			const urlValue = getURL() || '';
+			this.url.current.input.value = urlValue;
+			const credObj = getURLCredentials(urlValue) || {};
+			this.url.current.input.value = this.getURL(urlValue);
+			this.username.current.input.value = credObj.username || '';
+			this.password.current.input.value = credObj.password || '';
 		}
 	}
 
@@ -45,8 +50,10 @@ class LoginPage extends Component {
 		if (!value) return;
 		const credObj = getURLCredentials(value) || {};
 		this.url.current.input.value = this.getURL(value);
-		this.username.current.input.value = credObj.username || '';
-		this.password.current.input.value = credObj.password || '';
+		if (!isEmpty(credObj)) {
+			this.username.current.input.value = credObj.username || '';
+			this.password.current.input.value = credObj.password || '';
+		}
 	};
 
 	getURL = value => {
@@ -75,6 +82,7 @@ class LoginPage extends Component {
 							prefix={<Icon type="cluster" style={{ color: 'rgba(0,0,0,.25)' }} />}
 							placeholder="Cluster URL"
 							onBlur={this.onClusterURLBlur}
+							onPressEnter={this.onClusterURLBlur}
 						/>
 						<Input
 							css={{
