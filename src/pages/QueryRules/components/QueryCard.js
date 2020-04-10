@@ -148,7 +148,7 @@ class QueryCard extends React.Component {
 						</p>
 					</Col>
 					<Col lg={7} md={12} sm={24}>
-						{rule.actions.map(action => (
+						{get(rule, 'actions', []).map(action => (
 							<div key={action.type} className={section}>
 								<ActionView action={action} />
 							</div>
