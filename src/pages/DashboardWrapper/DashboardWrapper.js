@@ -323,14 +323,11 @@ class DashboardWrapper extends Component {
 							showApp={false}
 						/>
 					)}
-
 					<Switch>
 						<Route exact path="/" component={HomePage} />
 						<Route
 							path="/cluster"
-							component={() => (
-								<ClusterLayout collapsed={collapsed} {...this.props} />
-							)}
+							render={() => <ClusterLayout collapsed={collapsed} {...this.props} />}
 						/>
 						<Route component={NoMatch} />
 					</Switch>
