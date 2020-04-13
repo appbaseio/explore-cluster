@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign,camelcase */
 import React from 'react';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
@@ -15,6 +16,7 @@ import {
 	Input,
 	message,
 	notification,
+	Radio,
 	Result,
 	Row,
 	Skeleton,
@@ -23,7 +25,6 @@ import {
 	Typography,
 } from 'antd';
 import moment from 'moment';
-
 import IndexDropdown from './components/IndexDropdown';
 import Conditions from './components/Conditions';
 import ActionSelector from './components/ActionSelector';
@@ -49,6 +50,26 @@ import Overlay from '../../components/Overlay';
 import { mediaKey } from '../../utils/media';
 import { getSingleFunction } from '../../batteries/utils/app';
 import { isValidPlan } from '../../batteries/utils';
+
+import { AdvancedEditor, CustomAutoComplete } from '../../components/AdvancedEditor';
+import { getRawQuery, parseExpression } from '../../components/AdvancedEditor/helper';
+
+const customReactFilter = css`
+	.react-filter-box {
+		height: 100%;
+	}
+	.react-filter-box.focus {
+		border-color: #40a9ff;
+		box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+	}
+	.react-filter-box.error {
+		border-color: #f5222d;
+		box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+	}
+	.CodeMirror {
+		height: 100%;
+	}
+`;
 
 const { RangePicker } = DatePicker;
 
@@ -152,30 +173,37 @@ class QueryRulesForm extends React.Component {
 
 			error: {},
 			loading: false,
+			editorKey: Date.now(),
 		};
 	}
 
 	componentDidMount() {
-		const { rules, fetchRules, rule } = this.props;
+		const { rules, fetchRules, rule, unparsedRule } = this.props;
 		const { isEditPage } = this.state;
 		if (!(rules && rules.length)) {
 			fetchRules();
 		}
 
 		if (isEditPage && rule) {
+			const { show_advance_editor } = rule;
+			const { rawQuery, indexes } = getRawQuery(show_advance_editor, unparsedRule);
 			this.setState({
 				...rule,
+				rawQuery,
+				advancedExpression: rawQuery,
+				selectedIndexes: show_advance_editor ? indexes : rule.selectedIndexes,
 			});
 		}
 		this.setState({ loading: true });
 		getClusterMappings()
 			.then(mappings => {
-				const dataFields = getDatafields(mappings, ['*']);
-				const searchFields = getDatafields(mappings, ['*'], true);
+				const [dataFields, fieldMap] = getDatafields(mappings, ['*']);
+				const [searchFields] = getDatafields(mappings, ['*'], true);
 				this.setState({
 					mappings,
 					dataFields,
 					searchFields,
+					fieldMap,
 					loading: false,
 				});
 			})
@@ -195,18 +223,24 @@ class QueryRulesForm extends React.Component {
 			deleteError,
 			isDeleting,
 			history,
+			unparsedRule,
 		} = this.props;
 		const { isEditPage } = this.state;
 
-		if (isEditPage && prevProps.rule !== rule) {
+		if (isEditPage && prevProps.rule !== rule && !isUpdating) {
+			const { show_advance_editor } = rule;
+			const { rawQuery, indexes } = getRawQuery(show_advance_editor, unparsedRule);
 			this.setState({
 				...rule,
+				rawQuery,
+				advancedExpression: rawQuery,
+				selectedIndexes: show_advance_editor ? indexes : rule.selectedIndexes,
 			});
 		}
 
 		if (!isEditPage && !isCreating && prevProps.isCreating !== isCreating) {
 			if (createError) {
-				message.error(createError);
+				notification.error({ message: 'error', description: get(createError, 'message') });
 			} else {
 				message.success('successfully created rule');
 				history.push('/cluster/rules');
@@ -263,10 +297,11 @@ class QueryRulesForm extends React.Component {
 
 	handleIndex = selectedIndexes => {
 		const { mappings } = this.state;
-		const dataFields = getDatafields(mappings, selectedIndexes);
-		const searchFields = getDatafields(mappings, selectedIndexes, true);
+		const [dataFields] = getDatafields(mappings, selectedIndexes);
+		const [searchFields] = getDatafields(mappings, selectedIndexes, true);
 
 		this.setState(prevState => ({
+			editorKey: Date.now(),
 			selectedIndexes,
 			dataFields,
 			searchFields,
@@ -325,6 +360,9 @@ class QueryRulesForm extends React.Component {
 			isEditPage,
 			enabled,
 			timeframe,
+			show_advance_editor,
+			advancedExpression,
+			fieldMap,
 		} = this.state;
 
 		let { actions } = this.state;
@@ -336,16 +374,22 @@ class QueryRulesForm extends React.Component {
 		const params = {
 			name,
 			description,
+			show_advance_editor,
 			trigger: {
 				type: condition,
-				expression: getExpressionFromValue({
-					selectedIndexes,
-					dataFieldValue,
-					dataField,
-					query,
-					queryValue,
-					condition,
-				}),
+				expression: show_advance_editor
+					? `'${selectedIndexes.join(',')}' in $index and ${parseExpression(
+							advancedExpression,
+							fieldMap,
+					  )}`
+					: getExpressionFromValue({
+							selectedIndexes,
+							dataFieldValue,
+							dataField,
+							query,
+							queryValue,
+							condition,
+					  }),
 				timeframe,
 			},
 		};
@@ -430,6 +474,10 @@ class QueryRulesForm extends React.Component {
 			'timeframe',
 		];
 
+		const { show_advance_editor } = this.state;
+
+		if (show_advance_editor) keys.push('advancedExpression');
+
 		const { rule } = this.props;
 		if (rule) {
 			return keys.some(key => {
@@ -455,6 +503,42 @@ class QueryRulesForm extends React.Component {
 		}
 	};
 
+	onParseOk = () => {
+		const { rawQuery } = this.state;
+		if (!rawQuery) return;
+		this.setState(prevState => ({
+			advancedExpression: rawQuery,
+			expressionError: false,
+			error: {
+				...prevState.error,
+				condition: {
+					hasError: false,
+				},
+			},
+		}));
+	};
+
+	onParseError = () => {
+		this.setState({ expressionError: true });
+	};
+
+	toggleAdvancedEditor = () => {
+		this.setState(prevState => ({ show_advance_editor: !prevState.show_advance_editor }));
+	};
+
+	handleExpression = raw => {
+		if ((raw || '').trim() === '') {
+			const value = (raw || '').trim();
+			this.setState({
+				rawQuery: value,
+				advancedExpression: value,
+				expressionError: false,
+			});
+		} else {
+			this.setState({ rawQuery: raw });
+		}
+	};
+
 	render() {
 		const {
 			condition,
@@ -474,6 +558,10 @@ class QueryRulesForm extends React.Component {
 			timeframe,
 			mappings,
 			loading,
+			show_advance_editor,
+			rawQuery,
+			editorKey,
+			fieldMap,
 		} = this.state;
 		const {
 			isCreating,
@@ -487,6 +575,14 @@ class QueryRulesForm extends React.Component {
 			tier,
 			featureRules,
 		} = this.props;
+
+		this.customAutoComplete = new CustomAutoComplete(null, [
+			{ columnField: '$query', type: 'selection' },
+			...dataFields.map(dataField => ({
+				columnField: dataField.replace(/.keyword/g, ''),
+				type: 'selection',
+			})),
+		]);
 
 		if (!isValidPlan(tier, featureRules)) {
 			return (
@@ -609,17 +705,33 @@ class QueryRulesForm extends React.Component {
 							</Col>
 
 							<Col md={12} sm={24}>
-								<Conditions
+								<label style={{ marginTop: 15 }}>
+									Trigger
+									<Info
+										content={
+											<>
+												When to trigger the rule. Choose one of the two
+												options, a condition or an always on trigger.{' '}
+												<a
+													href="https://docs.appbase.io/docs/search/Rules/#configure-if-condition"
+													target="_blank"
+													rel="noopener noreferrer"
+												>
+													Learn more
+												</a>
+											</>
+										}
+									/>
+								</label>
+								<Radio.Group
+									name="condition"
 									onChange={this.handleInput}
-									error={error.condition}
-									condition={condition}
-									dataFields={dataFields}
-									dataField={dataField}
-									dataFieldValue={dataFieldValue}
-									query={query}
-									onDropdownChange={this.handleDropdown}
-									queryValue={queryValue}
-								/>
+									value={condition}
+									style={{ display: 'flex', marginBottom: '15px' }}
+								>
+									<Radio value="filter">Set Condition</Radio>
+									<Radio value="always">Always Trigger</Radio>
+								</Radio.Group>
 								<div style={{ marginBottom: 15 }}>
 									<label>
 										Index to apply rule to
@@ -632,6 +744,52 @@ class QueryRulesForm extends React.Component {
 										onChange={this.handleIndex}
 									/>
 								</div>
+								{condition === 'filter' && (
+									<label
+										style={{
+											marginBottom: 15,
+											color: '#1890ff',
+											cursor: 'pointer',
+										}}
+										onClick={this.toggleAdvancedEditor}
+									>
+										{show_advance_editor ? 'Hide' : 'Show'} Advanced Editor
+									</label>
+								)}
+								{!show_advance_editor && (
+									<>
+										<Conditions
+											onChange={this.handleInput}
+											error={error.condition}
+											condition={condition}
+											dataFields={dataFields}
+											dataField={dataField}
+											dataFieldValue={dataFieldValue}
+											query={query}
+											onDropdownChange={this.handleDropdown}
+											queryValue={queryValue}
+										/>
+									</>
+								)}
+								{show_advance_editor && condition === 'filter' && (
+									<div className={customReactFilter}>
+										<label>
+											Advanced Editor
+											<Info
+												content={`Handle complex queries with nested operations. Use double quotes (") for strings that include spaces, e.g $query == "Jhon Mae"`}
+											/>
+										</label>
+										{getErrorMessage(error.condition)}
+										<AdvancedEditor
+											key={editorKey}
+											query={rawQuery}
+											onChange={this.handleExpression}
+											autoCompleteHandler={this.customAutoComplete}
+											onParseOk={this.onParseOk}
+											onParseError={this.onParseError}
+										/>
+									</div>
+								)}
 
 								<label>
 									Timeframe (optional)
@@ -707,7 +865,7 @@ class QueryRulesForm extends React.Component {
 
 								<DeleteModal
 									name="Rule"
-									value={rule.name.toLowerCase().replace(/ /g, '_')}
+									value={(rule.name || '').toLowerCase().replace(/ /g, '_')}
 									title="Delete Rule"
 									onDelete={() => handleQueryRuleDelete(rule, removeRule)}
 								>
@@ -770,10 +928,13 @@ const mapStateToProps = (state, props) => {
 	};
 
 	if (id) {
-		const ruleData = defaultState.rules.find(rule => rule.id === id);
+		const ruleData = defaultState.rules.find(rule => rule.id === id) || {};
+		const { type, timeframe } = ruleData.trigger || {};
+		ruleData.condition = type;
+		ruleData.timeframe = timeframe || null;
 		return {
 			...defaultState,
-			rule: getParsedRule(ruleData),
+			rule: get(ruleData, 'show_advance_editor') ? ruleData : getParsedRule(ruleData),
 			unparsedRule: ruleData,
 			isUpdating: get(ruleData, 'update.isLoading'),
 			updateError: get(ruleData, 'update.error'),

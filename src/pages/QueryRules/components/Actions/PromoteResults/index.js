@@ -93,7 +93,7 @@ class PromoteResults extends Component {
 					<GlobalSearch
 						indexes={indexes}
 						onValueSelected={this.handleAdd}
-						dataFields={dataFields}
+						dataFields={(dataFields || []).map(field => field.replace(/.keyword/g, ''))}
 						ref={this.globalSearchRef}
 						// onKeyDown={this.handleAdd}
 					/>

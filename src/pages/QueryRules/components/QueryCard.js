@@ -142,11 +142,13 @@ class QueryCard extends React.Component {
 						<h4 className={title}>{rule.name}</h4>
 						<p className={description}>{rule.description}</p>
 						<p className={description}>
-							<strong>{get(rule, 'trigger.expression')}</strong>
+							<strong>
+								{get(rule, 'trigger.expression', '').replace(/.keyword/g, '')}
+							</strong>
 						</p>
 					</Col>
 					<Col lg={7} md={12} sm={24}>
-						{rule.actions.map(action => (
+						{get(rule, 'actions', []).map(action => (
 							<div key={action.type} className={section}>
 								<ActionView action={action} />
 							</div>

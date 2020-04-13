@@ -1,9 +1,11 @@
 import { get } from 'lodash';
 import React from 'react';
 
-const getParsedRule = rule => {
+const getParsedRule = (rule = {}) => {
 	if (rule) {
 		let values = {};
+
+		const { expression, type, timeframe } = rule.trigger || {};
 
 		values.name = rule.name;
 		values.id = rule.id;
@@ -11,17 +13,18 @@ const getParsedRule = rule => {
 		values.actions = rule.actions;
 		values.enabled = rule.enabled;
 		values.order = rule.order;
-		values.timeframe = rule.trigger.timeframe || null;
-		values.condition = rule.trigger.type;
+		values.timeframe = timeframe || null;
+		values.condition = type;
+		values.show_advance_editor = rule.show_advance_editor;
 
-		values = { ...values, ...getValueFromExpression(rule.trigger.expression) };
+		values = { ...values, ...getValueFromExpression(expression) };
 
 		return values;
 	}
 	return null;
 };
 
-const getValueFromExpression = expression => {
+const getValueFromExpression = (expression = '') => {
 	const pattern = /'(.*?)'/;
 	const doubleQuote = /"(.*?)"/;
 	const allQueries = expression.split('and');
