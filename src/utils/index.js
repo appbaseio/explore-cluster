@@ -1,4 +1,4 @@
-import { chain, get, keys, values } from 'lodash';
+import { chain, get, includes, keys, values } from 'lodash';
 import { notification } from 'antd';
 import { getURL } from '../constants/config';
 import { getSingleFunction, updateFunctions } from '../batteries/utils/app';
@@ -396,13 +396,29 @@ export function getDatafields(mappings, indexes, isSearch = false) {
 		.filter(index => hasAllIndex || indexes.includes(index))
 		.reduce((acc, key) => {
 			const { properties } = get(mappings[key], 'mappings._doc') || mappings[key].mappings;
-			const newProperties = keys(properties).reduce((acc, key) => {
-				if (filtered(properties, key)) {
-					acc[key] = properties[key];
+			const fieldTree = getFieldsTree(properties);
+			const nestedDataFields = keys(fieldTree).reduce((acc, field) => {
+				const fieldObj = fieldTree[field];
+				const { type, fields } = fieldObj || {};
+
+				const setKeyWordField = () => {
+					if (type === 'text' || type === 'string') {
+						if (includes(fields, 'keyword')) {
+							acc[field] = `${field}.keyword`;
+						} else {
+							acc[field] = field;
+						}
+					}
+				};
+
+				if (isSearch) {
+					setKeyWordField(type, fields);
+				} else {
+					if (type === 'text' || type === 'string') setKeyWordField(type, fields);
+					else acc[field] = field;
 				}
 				return acc;
 			}, {});
-			const nestedDataFields = getNestedDataFields(newProperties);
 			fieldMap = { ...fieldMap, ...nestedDataFields };
 			return [...acc, ...values(nestedDataFields)];
 		}, []);
@@ -539,35 +555,26 @@ export function removeWhiteSpaces(str) {
 	return str;
 }
 
-export const getNestedDataFields = (mappings = {}) => {
-	let keyPath = '';
-	const fieldMap = {};
-	const applyNestedFields = (properties = {}, level = 0) => {
-		Object.keys(properties).reduce((agg, key) => {
-			if (level === 0) keyPath += `${key}`;
-			else keyPath += `.${key}`;
-			if (properties[key].properties) {
-				return {
-					...agg,
-					[key]: {
-						...properties[key],
-						properties: applyNestedFields(properties[key].properties, level + 1),
-					},
-				};
-			}
-			const data = properties[key];
-			const fields = get(properties[key], 'fields', {});
-			if (get(data, 'type') === 'string' || get(data, 'type') === 'text') {
-				if (fields.keyword) fieldMap[keyPath] = `${keyPath}.keyword`;
-			} else fieldMap[keyPath] = keyPath;
-			data.fields = fields;
-			keyPath = '';
-			return {
-				...agg,
-				[key]: data,
+const getFieldsTree = (mappings = {}, prefix = null) => {
+	let tree = {};
+	Object.keys(mappings).forEach(key => {
+		if (mappings[key].properties) {
+			tree = {
+				...tree,
+				...getFieldsTree(mappings[key].properties, `${prefix ? `${prefix}.` : ''}${key}`),
 			};
-		}, {});
-	};
-	applyNestedFields(mappings);
-	return fieldMap;
+		} else {
+			const originalFields = mappings[key].fields;
+			tree = {
+				...tree,
+				[`${prefix ? `${prefix}.` : ''}${key}`]: {
+					type: mappings[key].type,
+					fields: mappings[key].fields ? Object.keys(mappings[key].fields) : [],
+					originalFields: originalFields || {},
+				},
+			};
+		}
+	});
+
+	return tree;
 };

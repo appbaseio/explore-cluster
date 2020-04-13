@@ -51,19 +51,20 @@ import { mediaKey } from '../../utils/media';
 import { getSingleFunction } from '../../batteries/utils/app';
 import { isValidPlan } from '../../batteries/utils';
 
-import {
-	AdvancedEditor,
-	CustomAutoComplete,
-	getRawQuery,
-	parseExpression,
-} from '../../components/AdvancedEditor';
+import { AdvancedEditor, CustomAutoComplete } from '../../components/AdvancedEditor';
+import { getRawQuery, parseExpression } from '../../components/AdvancedEditor/helper';
 
 const customReactFilter = css`
 	.react-filter-box {
 		height: 100%;
 	}
+	.react-filter-box.focus {
+		border-color: #40a9ff;
+		box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+	}
 	.react-filter-box.error {
 		border-color: #f5222d;
+		box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
 	}
 	.CodeMirror {
 		height: 100%;
@@ -774,7 +775,9 @@ class QueryRulesForm extends React.Component {
 									<div className={customReactFilter}>
 										<label>
 											Advanced Editor
-											<Info content="Handle complex queries with nested operations." />
+											<Info
+												content={`Handle complex queries with nested operations. Use double quotes (") for strings that include spaces, e.g $query == "Jhon Mae"`}
+											/>
 										</label>
 										{getErrorMessage(error.condition)}
 										<AdvancedEditor
