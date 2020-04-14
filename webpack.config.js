@@ -37,7 +37,7 @@ module.exports = {
 		chunkFilename: '[name].[contenthash].bundle.js',
 	},
 	plugins,
-	devtool: isProduction ? 'source-map' : 'none',
+	devtool: 'source-map',
 	module: {
 		rules: [
 			{
