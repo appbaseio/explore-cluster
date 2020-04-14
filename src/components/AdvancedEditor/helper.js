@@ -1,19 +1,20 @@
 /* eslint-disable no-param-reassign */
-import { get } from 'lodash';
+import { get, invert, keys, values } from 'lodash';
 
 // list of operators supported by advanced editor
-export const operators = [
-	'==',
-	'!=',
-	'contains',
-	'doesnotcontains',
-	'startsWith',
-	'doesnotstartsWith',
-	'endsWith',
-	'doesnotendsWith',
-	'matches',
-	'doesnotmatches',
-];
+export const operatorsMap = {
+	exactlyMatches: '==',
+	doesNotMatch: '!=',
+	contains: 'contains',
+	doesNotContain: 'doesnotcontains',
+	startsWith: 'startsWith',
+	doesNotStartWith: 'doesnotstartsWith',
+	endsWith: 'endsWith',
+	doesNotEndWith: 'doesnotendsWith',
+	regularExpressionMatch: 'matches',
+};
+
+const reverseOperatorMap = invert(operatorsMap);
 
 // handles keyword fields
 const applyFilterRegex = (filterRegex, query, fieldMap) => {
@@ -46,7 +47,7 @@ const parseOperator = (query, operator, fieldMap = {}) => {
 };
 
 /*
- parses each of the query operator
+ parses each of the query operator ((==, !=, contains, doesnotcontains and more (refer to operatorsMap constant above)))
  1. $query == hello
  2. $query == 'hello'
  3. $query == "hello world"
@@ -65,7 +66,7 @@ const parseQueryOperator = (query, operator) => {
  2. $query doesnotcontains "hello world" -> not ($query contains "hello world")
 */
 const parseQuery = query => {
-	operators.forEach(op => {
+	values(operatorsMap).forEach(op => {
 		query = parseQueryOperator(query, op);
 	});
 	const queryNegationRegex = new RegExp(`(\\$query) (doesnot(\\w*)) ('\\w*')`, 'g');
@@ -84,7 +85,10 @@ export const parseExpression = (query = '', fieldMap) => {
 	query = query.replace(/'/g, `"`);
 	const negationRegex = new RegExp(`(\\$filter[.#@\\w]*) (doesnot(\\w*)) ('\\w*')`, 'g');
 	const negationRegex2 = new RegExp(`(\\$filter[.#@\\w]*) (doesnot(\\w*)) ("[\\w ]*")`, 'g');
-	operators.forEach(op => {
+	keys(operatorsMap).forEach(operator => {
+		query = parseCustomOperator(query, operator);
+	});
+	values(operatorsMap).forEach(op => {
 		query = parseOperator(query, op, fieldMap);
 	});
 	query = parseQuery(query);
@@ -96,7 +100,7 @@ export const parseExpression = (query = '', fieldMap) => {
 };
 
 /*
- unparses operators of type
+ unparses operators of type (==, !=, contains, doesnotcontains and more (refer to operatorsMap constant above))
  1.	category.name == hello
  2.	category.name == "hello world"
  3. category.name == 'hello'
@@ -132,13 +136,27 @@ const unParseQueryOperator = (query, operator) => {
  OUT: $query doesnotcontains "hello world"
 */
 const unParseQuery = query => {
-	operators.forEach(op => {
+	values(operatorsMap).forEach(op => {
 		query = unParseQueryOperator(query, op);
 	});
 	const queryNegationRegex = new RegExp(`not \\((\\$query) (\\w*) ([\\w" ]*)\\)`, 'g');
 	query = query.replace(queryNegationRegex, '$1 doesnot$2 $3');
 	return query;
 };
+
+// parse operators like (== -> exactlyMatches, != -> doesNotMatch and more(refer operatorsMap constant above))
+function parseCustomOperator(query, customOperator) {
+	const customOperatorRegex = new RegExp(`\\b${customOperator}\\b`, 'g');
+	query = query.replace(customOperatorRegex, operatorsMap[customOperator]);
+	return query;
+}
+
+// parse operators like (exactlyMatches -> ==, doesNotMatch -> != and more(refer reverseOperatorMap constant above))
+function unParseCustomOperator(query, customOperator) {
+	const customOperatorRegex = new RegExp(`\\b${customOperator}\\b`, 'g');
+	query = query.replace(customOperatorRegex, reverseOperatorMap[customOperator]);
+	return query;
+}
 
 /*
  unparse whole expression
@@ -147,13 +165,19 @@ const unParseQuery = query => {
 */
 export const unParseExpression = (query = '') => {
 	const antiNegationRegex = new RegExp(`not \\(([.#@\\w]*) (\\w*) ([\\w" ]*)\\)`, 'g');
-	operators.forEach(op => {
+	values(operatorsMap).forEach(op => {
 		query = unParseOperator(query, op);
 	});
 	query = unParseQuery(query);
 	query = query.replace(antiNegationRegex, '$1 doesnot$2 $3');
 	query = query.replace(/\band\b/g, 'AND');
 	query = query.replace(/\bor\b/g, 'OR');
+	keys(reverseOperatorMap).forEach(op => {
+		query = unParseCustomOperator(query, op);
+	});
+	// special case for arithmetic comparision opertors, bc they're not word boundaries
+	query = query.replace(/==/g, reverseOperatorMap['==']);
+	query = query.replace(/!=/g, reverseOperatorMap['!=']);
 	return query;
 };
 
