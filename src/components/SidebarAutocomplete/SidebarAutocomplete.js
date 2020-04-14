@@ -1,8 +1,7 @@
 import React from 'react';
 import { get } from 'lodash';
-import { List } from 'antd';
+import { List, Breadcrumb, Tag } from 'antd';
 import { css } from 'emotion';
-import { LabelTag } from '../LabelTag';
 import { IndexSwitcher } from '../IndexSwitcher';
 import { WithRedirectTooltip } from '../../pages/AppWrapper/AppWrapper';
 
@@ -19,11 +18,20 @@ const listStyle = css`
 	}
 	.ant-list-item-meta-title {
 		color: white;
-		margin: 0;
 	}
 	.ant-list-item-meta-description {
 		color: #e8e8e8;
 		font-size: 13px;
+	}
+	.ant-breadcrumb {
+		font-size: 13px;
+		color: #d9d9d9;
+	}
+	.ant-breadcrumb-separator {
+		color: #bfbfbf;
+	}
+	.ant-breadcrumb > span:last-child {
+		color: white;
 	}
 	.flex {
 		display: flex;
@@ -35,6 +43,14 @@ const listStyle = css`
 	}
 `;
 
+const SearchItem = ({ item }) => {
+	return (
+		<Breadcrumb separator=">">
+			{item.label && <Breadcrumb.Item>{item.title}</Breadcrumb.Item>}
+			<Breadcrumb.Item>{item.label || item.title}</Breadcrumb.Item>
+		</Breadcrumb>
+	);
+};
 
 const SidebarAutocomplete = ({ routes, value, filteredApps, history, resetAutoComplete }) => {
 	const filteredMenus = routes.filter(
@@ -68,22 +84,40 @@ const SidebarAutocomplete = ({ routes, value, filteredApps, history, resetAutoCo
 									<IndexSwitcher
 										filteredApps={filteredApps}
 										history={history}
+										renderItem={popConfirmProps => {
+											return (
+												<div {...popConfirmProps}>
+													<SearchItem item={item} />
+													{item.tag ? (
+														<Tag
+															style={{
+																fontSize: 10,
+															}}
+															color="#002140"
+														>
+															{item.tag}
+														</Tag>
+													) : null}
+												</div>
+											);
+										}}
 										item={item}
 									/>
 								) : (
-									item.label || item.title
+									<SearchItem item={item} />
 								)
 							}
 							description={
-								item.openIndexMenu ? null : (
-									<LabelTag
-										className="flex space-between"
-										item={{
-											label: item.label ? item.title : '',
-											tag: item.tag,
+								!item.openIndexMenu && item.tag ? (
+									<Tag
+										style={{
+											fontSize: 10,
 										}}
-									/>
-								)
+										color="#002140"
+									>
+										{item.tag}
+									</Tag>
+								) : null
 							}
 						/>
 					</List.Item>

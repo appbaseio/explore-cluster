@@ -303,6 +303,7 @@ class DashboardWrapper extends Component {
 								value={value}
 								onChange={this.handleSearchTerm}
 								placeholder="Search menu item"
+								suffix={<Icon type="search" />}
 							/>
 						</div>
 
