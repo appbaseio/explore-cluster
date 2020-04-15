@@ -36,13 +36,26 @@ const applyFilterRegex = (filterRegex, query, fieldMap) => {
 */
 const parseOperator = (query, operator, fieldMap = {}) => {
 	const filterRegex = new RegExp(`(?![$query ])([.#@\\w]*) ${operator} ([^"]\\w*)`, 'g');
-	const filterRegex2 = new RegExp(`(?![$query ])([.#@\\w]*) ${operator} ("[\\w ]*")`, 'g');
+	const filterRegexDoubleQuotes = new RegExp(
+		`(?![$query ])([.#@\\w]*) ${operator} ("[\\w ]*")`,
+		'g',
+	);
+	const filterRegexDataField = new RegExp(
+		`(?![$query ])("[.#@\\w()\\-:/ ]*") ${operator} ([^"]\\w*)`,
+		'g',
+	);
+	const filterRegexDataFieldDoubleQuotes = new RegExp(
+		`(?![$query ])("[.#@\\w()\\-:/ ]*") ${operator} ("[\\w ]*")`,
+		'g',
+	);
 	const numberRegex = new RegExp(`(?![$query ])([.#@\\w]*) ${operator} (\\d+)`, 'g');
 	query = applyFilterRegex(filterRegex, query, fieldMap);
-	query = applyFilterRegex(filterRegex2, query, fieldMap);
+	query = applyFilterRegex(filterRegexDoubleQuotes, query, fieldMap);
 	query = query.replace(filterRegex, `$filter.$1 ${operator} '$2'`);
-	query = query.replace(filterRegex2, `$filter.$1 ${operator} $2`);
+	query = query.replace(filterRegexDoubleQuotes, `$filter.$1 ${operator} $2`);
 	query = query.replace(numberRegex, `$filter.$1 ${operator} $2`);
+	query = query.replace(filterRegexDataField, `$filter[$1] ${operator} '$2'`);
+	query = query.replace(filterRegexDataFieldDoubleQuotes, `$filter[$1] ${operator} $2`);
 	return query;
 };
 
@@ -91,6 +104,14 @@ export const parseExpression = (query = '', fieldMap) => {
 		`(\\$filter[.#@\\w]*) (doesnot(\\w*)) ("[\\w ]*")`,
 		'g',
 	);
+	const negationRegexDataField = new RegExp(
+		`(\\$filter\\["[.#@\\w()\\-:/ ]*"]) (doesnot(\\w*)) ('[\\w ]*')`,
+		'g',
+	);
+	const negationRegexDataFieldDoubleQuotes = new RegExp(
+		`(\\$filter\\["[.#@\\w()\\-:/ ]*"]) (doesnot(\\w*)) ("[\\w ]*")`,
+		'g',
+	);
 	keys(operatorsMap).forEach(operator => {
 		query = parseCustomOperator(query, operator);
 	});
@@ -100,6 +121,8 @@ export const parseExpression = (query = '', fieldMap) => {
 	query = parseQuery(query);
 	query = query.replace(negationRegex, 'not ($1 $3 $4)');
 	query = query.replace(negationRegexDoubleQuotes, 'not ($1 $3 $4)');
+	query = query.replace(negationRegexDataField, 'not ($1 $3 $4)');
+	query = query.replace(negationRegexDataFieldDoubleQuotes, 'not ($1 $3 $4)');
 	query = query.replace(/\bAND\b/g, 'and');
 	query = query.replace(/\bOR\b/g, 'or');
 	return query;
@@ -117,10 +140,20 @@ const unParseOperator = (query, operator) => {
 		`\\$filter.([\\w.]*) ${operator} "([\\w ]*)"`,
 		'g',
 	);
+	const dataFieldBackend = new RegExp(
+		`\\$filter\\["([\\w.()\\-:/ ]*)"] ${operator} '(\\w*)'`,
+		'g',
+	);
+	const dataFieldBackendDoubleQuotes = new RegExp(
+		`\\$filter\\["([\\w.()\\-:/ ]*)"] ${operator} "([\\w ]*)"`,
+		'g',
+	);
 	const numberRegex = new RegExp(`\\$filter.([\\w.]*) ${operator} (\\d)+`, 'g');
 	query = query.replace(filterRegexBackend, `$1 ${operator} $2`);
 	query = query.replace(filterRegexBackendDoubleQuotes, `$1 ${operator} "$2"`);
 	query = query.replace(numberRegex, `$1 ${operator} $2`);
+	query = query.replace(dataFieldBackend, `"$1" ${operator} $2`);
+	query = query.replace(dataFieldBackendDoubleQuotes, `"$1" ${operator} "$2"`);
 	query = query.replace(/.keyword/g, '');
 	return query;
 };
@@ -173,7 +206,7 @@ function unParseCustomOperator(query, customOperator) {
  OUT: $query == hello AND category.name == "foo bar"
 */
 export const unParseExpression = (query = '') => {
-	const antiNegationRegex = new RegExp(`not \\(([.#@\\w]*) (\\w*) ([\\w" ]*)\\)`, 'g');
+	const antiNegationRegex = new RegExp(`not \\(([.#@\\w\\-)(":/ ]*) (\\w*) ([\\w" ]*)\\)`, 'g');
 	values(operatorsMap).forEach(op => {
 		query = unParseOperator(query, op);
 	});
