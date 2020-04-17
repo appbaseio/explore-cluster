@@ -1,11 +1,25 @@
 import React from 'react';
 import { getParameters } from 'codesandbox/lib/api/define';
 import reactElementToJSXString from 'react-element-to-jsx-string';
+import prettier from 'prettier/standalone';
+import babylon from 'prettier/parser-babel';
 
 const dependencies = {
 	react: '16.8.0',
 	'react-dom': '16.8.0',
 	'@appbaseio/reactivesearch': '3.7.2',
+};
+
+const sandboxCodeFormat = (code) => {
+	return prettier.format(code, {
+		parser: 'babel',
+		plugins: [babylon],
+		tabWidth: 4,
+		useTabs: true,
+		semi: true,
+		singleQuote: true,
+		printWidth: 100,
+	});
 };
 
 const html = `<!DOCTYPE html>
@@ -38,10 +52,6 @@ const rootElement = document.getElementById("root");
 ReactDOM.render(<App />, rootElement);
 `;
 
-const sandboxCodeFormat = code => {
-	return code.split('\n').join('\n\t\t\t\t');
-};
-
 const generateAppCode = ({ searchCode, filtersCode, resultCode, app, url, credentials }) => {
 	return `
 import React from 'react';
@@ -49,7 +59,8 @@ import {
 	ReactiveBase,
 	ReactiveList,
 	MultiList,
-	DataSearch
+	DataSearch,
+	SelectedFilters,
 } from '@appbaseio/reactivesearch';
 import './styles.css';
 
@@ -58,11 +69,12 @@ const App = () => {
 		<ReactiveBase app="${app}" credentials="${credentials}" enableAppbase url="${url}">
 			<div className="app">
 				<div>
-					${sandboxCodeFormat(filtersCode)}
+					${filtersCode}
 				</div>
 				<div>
-					${sandboxCodeFormat(searchCode)}
-					${sandboxCodeFormat(resultCode)}
+					${searchCode}
+					<SelectedFilters />
+					${resultCode}
 				</div>
 			</div>
 		</ReactiveBase>
@@ -73,15 +85,20 @@ export default App;
 	`;
 };
 
-const styles = `
-body {
+const styles = `body {
   margin: 0;
 }
 
 .app {
   display: grid;
-  grid-template-columns: 0.5fr 1fr;
+  grid-template-columns: 1fr 1fr;
   overflow: hidden;
+  grid-gap: 15px;
+  padding: 10px;
+}
+
+.filter {
+	min-width: 250px;
 }
 
 pre {
@@ -116,11 +133,14 @@ const generateSearchCode = ({ id: searchId, ...searchProps }) => {
 	}).replace('div', 'DataSearch');
 };
 
-const generateFiltersCode = filtersWithProps => {
+const generateFiltersCode = (filtersWithProps) => {
 	return filtersWithProps.reduce((agg, { id, ...filter }) => {
-		const listCode = reactElementToJSXString(<div {...filter} componentId={id} />, {
-			showFunctions: false,
-		}).replace('div', 'MultiList');
+		const listCode = reactElementToJSXString(
+			<div {...filter} className="filter" componentId={id} />,
+			{
+				showFunctions: false,
+			},
+		).replace('div', 'MultiList');
 
 		if (agg) {
 			return `${agg}\n${listCode}`;
@@ -130,10 +150,10 @@ const generateFiltersCode = filtersWithProps => {
 };
 
 const generateSandboxURL = ({ settings, app, credentials, url }) => {
-	const searchSettings = settings.find(setting => setting.id === 'search');
-	const resultSettings = settings.find(setting => setting.id === 'result');
+	const searchSettings = settings.find((setting) => setting.id === 'search');
+	const resultSettings = settings.find((setting) => setting.id === 'result');
 	const filtersWithProps = settings.filter(
-		setting => setting.id !== 'search' && setting.id !== 'result',
+		(setting) => setting.id !== 'search' && setting.id !== 'result',
 	);
 
 	const searchCode = generateSearchCode(searchSettings);
@@ -142,29 +162,52 @@ const generateSandboxURL = ({ settings, app, credentials, url }) => {
 
 	const filtersCode = generateFiltersCode(filtersWithProps);
 
-	const parameters = getParameters({
-		files: {
-			'public/index.html': { content: html },
-			'src/index.js': {
-				content: index,
-			},
-			'src/App.js': {
-				content: generateAppCode({
-					searchCode,
-					resultCode,
-					filtersCode,
-					app,
-					credentials,
-					url,
-				}),
-			},
-			'src/styles.css': { content: styles },
-			'package.json': {
-				content: {
-					dependencies,
-				},
+	const unFormattedFiles = {
+		'public/index.html': { content: html },
+		'src/index.js': {
+			content: index,
+		},
+		'src/App.js': {
+			content: generateAppCode({
+				searchCode,
+				resultCode,
+				filtersCode,
+				app,
+				credentials,
+				url,
+			}),
+		},
+		'src/styles.css': { content: styles },
+		'package.json': {
+			content: {
+				name: 'ReactiveSearch Starter',
+				description:
+					'Reactivesearch Starter generated from Search Preview feature of Appbase.io',
+				version: '0.0.1',
+				keywords: ['react', 'reactivesearch'],
+				main: 'src/index.js',
+				browserslist: ['>0.2%', 'not dead', 'not ie <= 11', 'not op_mini all'],
+				author: 'jyash97@gmail.com',
+				dependencies,
 			},
 		},
+	};
+
+	const files = Object.keys(unFormattedFiles).reduce(
+		(agg, item) => ({
+			...agg,
+			[item]: {
+				content: item.endsWith('.js')
+					? sandboxCodeFormat(unFormattedFiles[item].content)
+					: unFormattedFiles[item].content,
+			},
+		}),
+		{},
+	);
+
+	console.log(files);
+	const parameters = getParameters({
+		files,
 	});
 
 	return `https://codesandbox.io/api/v1/sandboxes/define?parameters=${parameters}`;
