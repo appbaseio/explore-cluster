@@ -524,7 +524,7 @@ class SearchSettingsPage extends React.Component {
 			.reduce((agg, field) => {
 				return {
 					...agg,
-					[field]: dataField[field],
+					[field]: savedDataField[field],
 				};
 			}, {});
 
