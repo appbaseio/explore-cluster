@@ -324,7 +324,7 @@ class AppWrapper extends Component {
 								<Input
 									value={value}
 									onChange={this.handleSearchTerm}
-									placeholder="Search menu item"
+									placeholder="Search for a menu item"
 									suffix={<Icon type="search" />}
 								/>
 							</div>
