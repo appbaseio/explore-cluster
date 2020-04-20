@@ -578,3 +578,25 @@ const getFieldsTree = (mappings = {}, prefix = null) => {
 
 	return tree;
 };
+
+export const getParsedRoutes = routes =>
+	Object.keys(routes).reduce((agg, route) => {
+		const routeItem = routes[route];
+		if (routeItem.menu) {
+			return [
+				...agg,
+				...routeItem.menu.map(item => ({
+					...item,
+					title: route,
+					icon: routeItem.icon,
+				})),
+			];
+		}
+		return [
+			...agg,
+			{
+				...routeItem,
+				title: route,
+			},
+		];
+	}, []);
