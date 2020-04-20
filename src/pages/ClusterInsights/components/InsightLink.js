@@ -21,7 +21,15 @@ const InsightLink = ({ hasSubscribed, insight_link }) => {
 		);
 	}
 
-	return <iframe src="" height="600px" width="100%" title="Curated Insights" frameBorder="0" />;
+	return (
+		<iframe
+			src={insight_link}
+			height="600px"
+			width="100%"
+			title="Curated Insights"
+			frameBorder="0"
+		/>
+	);
 };
 
 export default InsightLink;
