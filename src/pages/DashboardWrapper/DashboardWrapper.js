@@ -115,9 +115,9 @@ const getActiveMenu = (props, prevActiveSubMenu = []) => {
 		pathname = getParam('view') || '';
 	}
 	const routes = defaultRoutes;
-	Object.keys(routes).some(route => {
+	Object.keys(routes).some((route) => {
 		if (routes[route].menu) {
-			const active = routes[route].menu.find(item => pathname === item.link);
+			const active = routes[route].menu.find((item) => pathname === item.link);
 
 			if (active) {
 				activeSubMenu = route;
@@ -238,7 +238,7 @@ class DashboardWrapper extends Component {
 		}
 	}
 
-	handleSearchTerm = e => {
+	handleSearchTerm = (e) => {
 		this.setState({
 			value: e.target.value,
 		});
@@ -251,14 +251,14 @@ class DashboardWrapper extends Component {
 	};
 
 	onCollapse = () => {
-		this.setState(prevState => ({ collapsed: !prevState.collapsed }));
+		this.setState((prevState) => ({ collapsed: !prevState.collapsed }));
 	};
 
 	render() {
 		const { collapsed, showHeader, routes, activeSubMenu, activeMenuItem, value } = this.state;
 		const { apps, history } = this.props;
 
-		const filteredApps = keys(apps).filter(app => !app.startsWith('.'));
+		const filteredApps = keys(apps).filter((app) => !app.startsWith('.'));
 
 		return (
 			<Layout>
@@ -284,7 +284,7 @@ class DashboardWrapper extends Component {
 							width: '100%',
 							height: 'calc(100% - 102px)',
 						}}
-						onOpenChange={param => {
+						onOpenChange={(param) => {
 							this.setState({
 								activeSubMenu: param,
 							});
@@ -306,7 +306,7 @@ class DashboardWrapper extends Component {
 								<Input
 									value={value}
 									onChange={this.handleSearchTerm}
-									placeholder="Search menu item"
+									placeholder="Search for a menu item"
 									suffix={<Icon type="search" />}
 								/>
 							</div>
@@ -323,7 +323,7 @@ class DashboardWrapper extends Component {
 						)}
 
 						{!value &&
-							Object.keys(routes).map(route => {
+							Object.keys(routes).map((route) => {
 								if (routes[route].menu) {
 									const Title = (
 										<span>
@@ -333,7 +333,7 @@ class DashboardWrapper extends Component {
 									);
 									return (
 										<SubMenu key={route} title={Title}>
-											{routes[route].menu.map(item => (
+											{routes[route].menu.map((item) => (
 												<Menu.Item key={item.label}>
 													{item.openIndexMenu ? (
 														<IndexSwitcher
@@ -380,10 +380,22 @@ class DashboardWrapper extends Component {
 						/>
 					)}
 					<Switch>
-						<Route exact path="/" render={() => <HomePage />} />
+						<Route
+							exact
+							path="/"
+							render={({ history: routeHistory }) => (
+								<HomePage history={routeHistory} />
+							)}
+						/>
 						<Route
 							path="/cluster"
-							render={() => <ClusterLayout collapsed={collapsed} {...this.props} />}
+							render={(routeProps) => (
+								<ClusterLayout
+									collapsed={collapsed}
+									{...this.props}
+									{...routeProps}
+								/>
+							)}
 						/>
 						<Route component={NoMatch} />
 					</Switch>
@@ -405,14 +417,14 @@ DashboardWrapper.propTypes = {
 	isClusterPlanFetched: bool.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	isBillingEnabled: !(get(state, '$getAppPlan.results.billing') === false),
 	isClusterPlanFetched: get(state, '$getAppPlan.success'),
 	isClusterPlanFetching: get(state, '$getAppPlan.isFetching', false),
 	apps: get(state, 'apps.data'),
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	fetchClusterPlan: () => dispatch(getAppPlan()),
 	fetchApps: () => dispatch(loadApps()),
 });

@@ -1,6 +1,6 @@
 import React from 'react';
 import { get } from 'lodash';
-import { List, Breadcrumb, Tag } from 'antd';
+import { List, Breadcrumb, Tag, Empty } from 'antd';
 import { css } from 'emotion';
 import { IndexSwitcher } from '../IndexSwitcher';
 import { WithRedirectTooltip } from '../../pages/AppWrapper/AppWrapper';
@@ -43,6 +43,12 @@ const listStyle = css`
 	}
 `;
 
+const emptyStyle = css`
+	.ant-empty-description {
+		color: #fafafa;
+	}
+`;
+
 const SearchItem = ({ item }) => {
 	return (
 		<Breadcrumb separator=">">
@@ -54,28 +60,34 @@ const SearchItem = ({ item }) => {
 
 const SidebarAutocomplete = ({ routes, value, filteredApps, history, resetAutoComplete }) => {
 	const filteredMenus = routes.filter(
-		menu =>
-			get(menu, 'title', '')
-				.toLowerCase()
-				.includes(value.toLowerCase()) ||
-			get(menu, 'label', '')
-				.toLowerCase()
-				.includes(value.toLowerCase()),
+		(menu) =>
+			get(menu, 'title', '').toLowerCase().includes(value.toLowerCase()) ||
+			get(menu, 'label', '').toLowerCase().includes(value.toLowerCase()),
 	);
 
-	const handleListClick = item => {
+	const handleListClick = (item) => {
 		if (!item.openIndexMenu) {
 			resetAutoComplete();
 			history.push(item.link);
 		}
 	};
 
+	if (filteredMenus.length === 0) {
+		return (
+			<Empty
+				className={emptyStyle}
+				description="No menu item found"
+				image={Empty.PRESENTED_IMAGE_SIMPLE}
+			/>
+		);
+	}
+
 	return (
 		<List
 			itemLayout="horizontal"
 			dataSource={filteredMenus}
 			className={listStyle}
-			renderItem={item => (
+			renderItem={(item) => (
 				<WithRedirectTooltip showTooltip={item.hasExactPath}>
 					<List.Item onClick={() => handleListClick(item)} key={item.label}>
 						<List.Item.Meta
@@ -84,7 +96,7 @@ const SidebarAutocomplete = ({ routes, value, filteredApps, history, resetAutoCo
 									<IndexSwitcher
 										filteredApps={filteredApps}
 										history={history}
-										renderItem={popConfirmProps => {
+										renderItem={(popConfirmProps) => {
 											return (
 												<div {...popConfirmProps}>
 													<SearchItem item={item} />
