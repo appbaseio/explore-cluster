@@ -180,6 +180,10 @@ class AppWrapper extends Component {
 			// gets last used appName from redux-persist
 			return { appName: currentApp, ...setActiveMenu };
 		}
+
+		if (state.collapsed) {
+			return { value: '' };
+		}
 		return { ...setActiveMenu };
 	}
 
@@ -315,14 +319,16 @@ class AppWrapper extends Component {
 							</Link>
 						</Menu.Item>
 
-						<div className={searchInputStyle}>
-							<Input
-								value={value}
-								onChange={this.handleSearchTerm}
-								placeholder="Search menu item"
-								suffix={<Icon type="search" />}
-							/>
-						</div>
+						{collapsed ? null : (
+							<div className={searchInputStyle}>
+								<Input
+									value={value}
+									onChange={this.handleSearchTerm}
+									placeholder="Search menu item"
+									suffix={<Icon type="search" />}
+								/>
+							</div>
+						)}
 
 						{value && (
 							<SidebarAutocomplete
