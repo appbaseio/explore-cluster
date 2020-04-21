@@ -272,7 +272,10 @@ class AggsPage extends React.Component {
 			const setMapping = get(this.mappingsRef, 'current.wrappedInstance.setMapping');
 
 			if (esVersion && setMapping) {
-				const address = +esVersion > 6 ? `properties.${value}` : value;
+				const address =
+					+esVersion > 6
+						? `properties.${value}`
+						: value.replace('_doc.', '_doc.properties.');
 
 				setMapping(address, 'text', 'searchaggs');
 
@@ -486,14 +489,7 @@ class AggsPage extends React.Component {
 										options = ['Term'];
 									}
 
-									const parsedAddress = address
-										.split('.')
-										.reduce((agg, key, index) => {
-											if (index % 2 !== 0) {
-												return agg ? `${agg}.${key}` : key;
-											}
-											return agg;
-										}, '');
+									const parsedAddress = address.replace(/properties./g, '');
 									const aggKey = hasKeyword
 										? `${parsedAddress}.keyword`
 										: parsedAddress;

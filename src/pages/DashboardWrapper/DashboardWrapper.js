@@ -95,8 +95,6 @@ const defaultRoutes = {
 
 const parsedRoutes = getParsedRoutes(defaultRoutes);
 
-console.log(parsedRoutes);
-
 const accountRoute = {
 	Account: {
 		icon: 'setting',
