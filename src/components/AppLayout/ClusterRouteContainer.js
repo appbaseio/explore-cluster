@@ -123,6 +123,11 @@ const RoleBaseAccess = Loadable({
 	loading: Loader,
 });
 
+const ClusterInsights = Loadable({
+	loader: () => import('../../pages/ClusterInsights'),
+	loading: Loader,
+});
+
 class ClusterRouteContainer extends React.Component {
 	shouldComponentUpdate(nextProps) {
 		const { location } = this.props;
@@ -298,6 +303,14 @@ class ClusterRouteContainer extends React.Component {
 						exact
 						path="/cluster/functions"
 						component={props => <AppPageContainer {...props} component={Functions} />}
+					/>
+
+					<Route
+						exact
+						path="/cluster/curated-insights"
+						component={props => (
+							<AppPageContainer {...props} component={ClusterInsights} />
+						)}
 					/>
 				</Switch>
 			</ErrorPage>
