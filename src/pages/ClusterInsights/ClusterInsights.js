@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Spin, message, Popconfirm } from 'antd';
+import { Button, message, Popconfirm } from 'antd';
 import Stripe from 'react-stripe-checkout';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
@@ -9,6 +9,7 @@ import { container } from '../ResultsPage/styles';
 import { getSubscription, updateSubscription, deleteSubscription } from './api';
 import { STRIPE_KEY } from '../../constants';
 import InsightLink from './components/InsightLink';
+import Loader from '../../components/Loader';
 
 class ClusterInsights extends React.Component {
 	state = {
@@ -23,8 +24,8 @@ class ClusterInsights extends React.Component {
 		this.fetchInsights();
 	}
 
-	toggleLoading = key => {
-		this.setState(state => ({
+	toggleLoading = (key) => {
+		this.setState((state) => ({
 			[key]: !state[key],
 		}));
 	};
@@ -33,29 +34,29 @@ class ClusterInsights extends React.Component {
 		const { credentials } = this.props;
 		this.toggleLoading('fetchingSubscription');
 		getSubscription(credentials)
-			.then(res => {
+			.then((res) => {
 				this.setState({
 					hasSubscribed: res.has_subscribed,
 					insight_link: res.insight_link,
 				});
 				this.toggleLoading('fetchingSubscription');
 			})
-			.catch(e => {
+			.catch((e) => {
 				message.error(e.message);
 				this.toggleLoading('fetchingSubscription');
 			});
 	};
 
-	handleToken = token => {
+	handleToken = (token) => {
 		this.toggleLoading('updatingSubscription');
 		const { credentials } = this.props;
 		updateSubscription({ token, credentials })
-			.then(res => {
+			.then((res) => {
 				message.success(res.message);
 				this.toggleLoading('updatingSubscription');
 				this.fetchInsights();
 			})
-			.catch(e => {
+			.catch((e) => {
 				message.error(e.message);
 				this.toggleLoading('updatingSubscription');
 			});
@@ -65,12 +66,12 @@ class ClusterInsights extends React.Component {
 		this.toggleLoading('deletingSubscription');
 		const { credentials } = this.props;
 		deleteSubscription(credentials)
-			.then(res => {
+			.then((res) => {
 				message.success(res.message);
 				this.toggleLoading('deletingSubscription');
 				this.fetchInsights();
 			})
-			.catch(e => {
+			.catch((e) => {
 				message.error(e.message);
 				this.toggleLoading('deletingSubscription');
 			});
@@ -124,7 +125,7 @@ class ClusterInsights extends React.Component {
 									name="Curated Insights"
 									amount={50000}
 									token={this.handleToken}
-									stripeKey={STRIPE_KEY.TEST}
+									stripeKey={STRIPE_KEY.LIVE}
 								>
 									<Button
 										loading={fetchingSubscription || updatingSubscription}
@@ -141,9 +142,7 @@ class ClusterInsights extends React.Component {
 					)}
 				/>
 				{fetchingSubscription ? (
-					<div style={{ textAlign: 'center', padding: 50 }}>
-						<Spin size="large" />
-					</div>
+					<Loader />
 				) : (
 					<div className={container}>
 						<InsightLink hasSubscribed={hasSubscribed} insight_link={insight_link} />
@@ -154,7 +153,7 @@ class ClusterInsights extends React.Component {
 	}
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
 	const { username, password } = get(state, 'user.data', {});
 	return {
 		credentials: `${username}:${password}`,

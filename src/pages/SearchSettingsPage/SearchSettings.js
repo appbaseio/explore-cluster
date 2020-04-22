@@ -143,13 +143,13 @@ class SearchSettingsPage extends React.Component {
 	}
 
 	toggleVisible = (isReset = false) => {
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			visible: !prevState.visible,
 			isReset,
 		}));
 	};
 
-	initData = settings => {
+	initData = (settings) => {
 		const dataField = settings && settings.search ? this.getDataFields(settings) : {};
 
 		this.setState({
@@ -161,7 +161,7 @@ class SearchSettingsPage extends React.Component {
 		});
 	};
 
-	getDataFields = settings => {
+	getDataFields = (settings) => {
 		const { mappings } = this.props;
 		let searchableFields = settings.search.dataField;
 		if (searchableFields.length === 0 && mappings) {
@@ -171,7 +171,7 @@ class SearchSettingsPage extends React.Component {
 				: Object.keys(aggsResponse);
 
 			const originalSearchableFields = parsedMappings.filter(
-				mapping =>
+				(mapping) =>
 					mapping.fieldType === 'text' &&
 					(mapping.usecase === 'search' || mapping.usecase === 'searchaggs'),
 			);
@@ -189,28 +189,28 @@ class SearchSettingsPage extends React.Component {
 		return searchableFields.reduce(
 			(agg, field, index) => ({
 				...agg,
-				[field]: settings.search.fieldWeights[index] || 1,
+				[field]: get(settings, `search.fieldWeights.${index}`, 1),
 			}),
 			{},
 		);
 	};
 
-	getAggsMappings = mappings => {
+	getAggsMappings = (mappings) => {
 		const aggsResponse = getAggsMappings(mappings, true);
 		const parsedMappings = Array.isArray(aggsResponse)
 			? aggsResponse
 			: Object.keys(aggsResponse);
 		this.noUseCaseMappings = parsedMappings.filter
-			? parsedMappings.filter(mapping => mapping.usecase === 'text')
+			? parsedMappings.filter((mapping) => mapping.usecase === 'text')
 			: [];
 		const aggsMappings = parsedMappings.filter
 			? parsedMappings
 					.filter(
-						mapping =>
+						(mapping) =>
 							mapping.fieldType === 'text' &&
 							(mapping.usecase === 'none' || mapping.usecase === 'aggs'),
 					)
-					.map(mapping => ({
+					.map((mapping) => ({
 						_address: `${mapping.type}.${mapping.address
 							.split('.')
 							.join('.properties.')}`,
@@ -221,7 +221,7 @@ class SearchSettingsPage extends React.Component {
 		return aggsMappings;
 	};
 
-	handleMappingChange = mappings => {
+	handleMappingChange = (mappings) => {
 		const aggsMappings = this.getAggsMappings(mappings);
 
 		let isDirty = false;
@@ -235,18 +235,20 @@ class SearchSettingsPage extends React.Component {
 		});
 	};
 
-	handleAddField = value => {
+	handleAddField = (value) => {
 		if (get(this.mappingsRef, 'current.wrappedInstance', null)) {
 			const { aggsMappings } = this.state;
 			const { settings } = this.props;
-			const mapping = aggsMappings.find(item => item._address === value);
+			const mapping = aggsMappings.find((item) => item._address === value);
 
 			const esVersion = get(this.mappingsRef, 'current.wrappedInstance.state.esVersion');
 			const setMapping = get(this.mappingsRef, 'current.wrappedInstance.setMapping');
 			const hasLanguage = get(settings, 'language.language') !== 'universal';
 			if (esVersion && setMapping) {
-				const address = +esVersion > 6 ? `properties.${value}` : value;
-
+				const address =
+					+esVersion > 6
+						? `properties.${value}`
+						: value.replace('_doc.', '_doc.properties.');
 				setMapping(address, 'text', 'searchaggs');
 
 				if (mapping) {
@@ -257,7 +259,7 @@ class SearchSettingsPage extends React.Component {
 						weight: 1,
 						address: mapping.address,
 					});
-					this.setState(state => ({
+					this.setState((state) => ({
 						dataField: {
 							...state.dataField,
 							...fields,
@@ -270,7 +272,7 @@ class SearchSettingsPage extends React.Component {
 
 	handleSearchWeight = ({ address, value, settings }) => {
 		const fields = getSubFields({ fields: settings.fields, weight: value, address });
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			dataField: {
 				...prevState.dataField,
 				...fields,
@@ -294,30 +296,21 @@ class SearchSettingsPage extends React.Component {
 			hasSearchOperators,
 		} = this.state;
 		const { updateSettingsAction, appName, settings } = this.props;
-		const nonZeroFields = Object.keys(dataField).reduce((agg, field) => {
-			if (dataField[field]) {
-				return {
-					...agg,
-					[field]: dataField[field],
-				};
-			}
-			return agg;
-		}, {});
 
 		updateSettingsAction(appName, {
 			...settings,
 			search: {
 				...get(settings, 'search', {}),
 				fuzziness: hasTypoTolerance ? typoTolerance : 0,
-				dataField: Object.keys(nonZeroFields),
-				fieldWeights: Object.values(nonZeroFields),
+				dataField: Object.keys(dataField),
+				fieldWeights: Object.values(dataField),
 				searchOperators: hasSearchOperators,
 			},
 			synonyms: {
 				enabled: enableSynonyms,
 			},
 		})
-			.then(res => {
+			.then((res) => {
 				if (res && res.error) {
 					notification.error({
 						message: 'Failed to save Search Settings',
@@ -331,7 +324,7 @@ class SearchSettingsPage extends React.Component {
 					}
 				}
 			})
-			.catch(e => {
+			.catch((e) => {
 				notification.error({
 					message: 'Failed to save Search Settings',
 					description: e.message,
@@ -359,7 +352,7 @@ class SearchSettingsPage extends React.Component {
 		const { getDefaultSettingsAction, defaultSettings } = this.props;
 		if (defaultSettings) this.initData(defaultSettings);
 		else
-			getDefaultSettingsAction().then(res => {
+			getDefaultSettingsAction().then((res) => {
 				if (res && res.payload) {
 					this.initData(res.payload);
 				}
@@ -397,7 +390,7 @@ class SearchSettingsPage extends React.Component {
 
 			const subFields = [
 				fieldChanged,
-				...searchSubFields.map(item => `${fieldChanged}.${item}`),
+				...searchSubFields.map((item) => `${fieldChanged}.${item}`),
 			];
 
 			const updatedFields = Object.keys(dataField).reduce((agg, item) => {
@@ -440,11 +433,11 @@ class SearchSettingsPage extends React.Component {
 
 			const subFields = [
 				fieldChanged,
-				...searchSubFields.map(item => `${fieldChanged}.${item}`),
+				...searchSubFields.map((item) => `${fieldChanged}.${item}`),
 			];
 
 			const notContainedField = subFields.filter(
-				item => !Object.keys(dataField).includes(item),
+				(item) => !Object.keys(dataField).includes(item),
 			);
 
 			const weight = dataField[fieldChanged] || 1;
@@ -524,7 +517,7 @@ class SearchSettingsPage extends React.Component {
 			.reduce((agg, field) => {
 				return {
 					...agg,
-					[field]: dataField[field],
+					[field]: savedDataField[field],
 				};
 			}, {});
 
@@ -590,20 +583,13 @@ class SearchSettingsPage extends React.Component {
 									</React.Fragment>
 								),
 								render: ({ address, settings: mappingSettings }) => {
-									const parsedAddress = address
-										.split('.')
-										.reduce((agg, key, index) => {
-											if (index % 2 !== 0) {
-												return agg ? `${agg}.${key}` : key;
-											}
-											return agg;
-										}, '');
+									const parsedAddress = address.replace(/properties./g, '');
 									return (
 										<InputNumber
 											min={0}
 											style={{ minWidth: 150, marginLeft: 12 }}
 											value={dataField[parsedAddress]}
-											onChange={value =>
+											onChange={(value) =>
 												this.handleSearchWeight({
 													address: parsedAddress,
 													value,
@@ -642,7 +628,7 @@ class SearchSettingsPage extends React.Component {
 															.indexOf(input.toLowerCase()) >= 0
 													}
 												>
-													{aggsMappings.map(mapping => (
+													{aggsMappings.map((mapping) => (
 														<Option
 															key={mapping._address}
 															value={mapping._address}
@@ -672,7 +658,7 @@ class SearchSettingsPage extends React.Component {
 						</label>
 						<Switch
 							checked={hasSearchOperators}
-							onChange={value => this.handleChange('hasSearchOperators', value)}
+							onChange={(value) => this.handleChange('hasSearchOperators', value)}
 						/>
 
 						<label>
@@ -683,7 +669,7 @@ class SearchSettingsPage extends React.Component {
 						</label>
 						<Switch
 							checked={hasTypoTolerance}
-							onChange={value => this.handleChange('hasTypoTolerance', value)}
+							onChange={(value) => this.handleChange('hasTypoTolerance', value)}
 						/>
 
 						{hasTypoTolerance && (
@@ -699,14 +685,14 @@ class SearchSettingsPage extends React.Component {
 									value={typoTolerance}
 									optionFilterProp="children"
 									style={{ minWidth: 200, marginBottom: '15px' }}
-									onChange={value => this.handleChange('typoTolerance', value)}
+									onChange={(value) => this.handleChange('typoTolerance', value)}
 									filterOption={(input, option) =>
 										option.props.children
 											.toLowerCase()
 											.indexOf(input.toLowerCase()) >= 0
 									}
 								>
-									{toleranceOptions.map(option => (
+									{toleranceOptions.map((option) => (
 										<Option key={option} value={option}>
 											{option}
 										</Option>
@@ -723,7 +709,7 @@ class SearchSettingsPage extends React.Component {
 						</label>
 						<Switch
 							checked={enableSynonyms}
-							onChange={value => this.handleChange('enableSynonyms', value)}
+							onChange={(value) => this.handleChange('enableSynonyms', value)}
 						/>
 					</Card>
 					<SettingsFooter
@@ -786,7 +772,7 @@ class SearchSettingsPage extends React.Component {
 	}
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
 	const mappings = getRawMappingsByAppName(state) || null;
 
 	const { username, password } = get(state, 'user.data', {});
@@ -810,13 +796,13 @@ const mapStateToProps = state => {
 	};
 };
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	fetchMappings: (appName, credentials, url) =>
 		dispatch(getAppMappings(appName, credentials, url)),
 	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
-	getSettingsAction: name => dispatch(getSettings(name)),
+	getSettingsAction: (name) => dispatch(getSettings(name)),
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
-	deleteSettingsAction: name => dispatch(deleteSettings(name)),
+	deleteSettingsAction: (name) => dispatch(deleteSettings(name)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchSettingsPage);

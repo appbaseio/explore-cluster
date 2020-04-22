@@ -4,7 +4,7 @@ export const getURL = () => {
 	if (!url || url === 'undefined') {
 		url = params.has('url') ? params.get('url') : 'null';
 
-		if (url) sessionStorage.setItem('url', url);
+		if (url) sessionStorage.setItem('url', url.replace(/\/+$/, ''));
 	}
 	return url === 'null' ? 'http://localhost:8000' : url;
 };

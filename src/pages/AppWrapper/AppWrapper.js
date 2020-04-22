@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { Layout, Menu, Icon, Tag, Tooltip } from 'antd';
+import { Layout, Menu, Icon, Tag, Tooltip, Input } from 'antd';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import AppLayout from '../../components/AppLayout';
@@ -12,10 +12,12 @@ import {
 } from '../../batteries/modules/actions';
 import Logo from '../../components/Logo';
 
-import { getParam } from '../../utils';
+import { getParam, getParsedRoutes } from '../../utils';
 import { breakpoints } from '../../utils/media';
 import Loader from '../../components/Loader';
 import { isValidPlan } from '../../batteries/utils';
+import { searchInputStyle } from '../DashboardWrapper/DashboardWrapper';
+import SidebarAutocomplete from '../../components/SidebarAutocomplete';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
@@ -71,8 +73,13 @@ const routes = {
 		icon: 'key',
 		menu: [
 			{ label: 'API Credentials', link: 'credentials' },
-			{ label: 'User Management', link: '/cluster/user-management' },
-			{ label: 'Role Based Access', link: '/cluster/role-based-access', tag: 'Beta' },
+			{ label: 'User Management', link: '/cluster/user-management', hasExactPath: true },
+			{
+				label: 'Role Based Access',
+				link: '/cluster/role-based-access',
+				tag: 'Beta',
+				hasExactPath: true,
+			},
 			{ label: 'Search Templates', link: 'search-templates', tag: 'Beta' },
 		],
 	},
@@ -81,6 +88,8 @@ const routes = {
 		link: 'billing',
 	},
 };
+
+const parsedRoutes = getParsedRoutes(routes);
 
 const getActiveMenu = (props, prevActiveSubMenu = []) => {
 	let activeSubMenu = 'App Overview';
@@ -119,7 +128,7 @@ const getActiveMenu = (props, prevActiveSubMenu = []) => {
 	};
 };
 
-const WithRedirectTooltip = ({ showTooltip, children }) => {
+export const WithRedirectTooltip = ({ showTooltip, children }) => {
 	if (showTooltip) {
 		return (
 			<Tooltip placement="rightBottom" title="This will redirect you to the cluster view">
@@ -152,6 +161,7 @@ class AppWrapper extends Component {
 			collapsed,
 			showHeader,
 			appName: props.match.params.appName, // eslint-disable-line
+			value: '',
 			...getActiveMenuData,
 		};
 	}
@@ -175,12 +185,16 @@ class AppWrapper extends Component {
 			// gets last used appName from redux-persist
 			return { appName: currentApp, ...setActiveMenu };
 		}
+
+		if (state.collapsed) {
+			return { value: '' };
+		}
 		return { ...setActiveMenu };
 	}
 
 	componentDidMount() {
-		const { appName } = this.state;
-		const { history, match } = this.props;
+		const { appName, loading } = this.state;
+		const { history, match, currentApp, settings } = this.props;
 		const view = getParam('view') || '';
 
 		this.handleSettings(appName);
@@ -188,22 +202,35 @@ class AppWrapper extends Component {
 		if (!match.params.appName && appName) {
 			history.push(`/app/${appName}/${view}`);
 		}
+
+		if (!settings && !loading) {
+			this.handleSettings(currentApp);
+		}
 	}
 
-	componentDidUpdate(prevProps) {
-		const { history, currentApp, match, settings } = this.props;
-		const { appName, loading } = this.state;
+	componentDidUpdate() {
+		const { history, currentApp, match } = this.props;
+		const { appName } = this.state;
 
 		const route = match.params.route || '';
 
-		if (settings !== prevProps.settings && !settings && !loading) {
-			this.handleSettings(currentApp);
-		}
 
 		if (currentApp && appName !== currentApp) {
 			history.push(`/app/${currentApp}/${route}`);
 		}
 	}
+
+	handleSearchTerm = e => {
+		this.setState({
+			value: e.target.value,
+		});
+	};
+
+	resetSearch = () => {
+		this.setState({
+			value: '',
+		});
+	};
 
 	handleSettings = async appName => {
 		const {
@@ -246,7 +273,10 @@ class AppWrapper extends Component {
 			activeSubMenu,
 			activeMenuItem,
 			loading,
+			value,
 		} = this.state;
+
+		const { history } = this.props;
 
 		return (
 			<Layout>
@@ -294,57 +324,79 @@ class AppWrapper extends Component {
 								)}
 							</Link>
 						</Menu.Item>
-						{Object.keys(routes).map(route => {
-							if (routes[route].menu) {
-								const Title = (
-									<span>
-										<Icon type={routes[route].icon} />
-										<span>{route}</span>
-									</span>
-								);
-								return (
-									<SubMenu key={route} title={Title}>
-										{routes[route].menu.map(item => (
-											<Menu.Item key={item.label}>
-												<WithRedirectTooltip
-													showTooltip={item.hasExactPath}
-												>
-													<Link
-														replace
-														to={
-															item.hasExactPath
-																? item.link
-																: `/app/${appName}/${item.link}`
-														}
+
+						{collapsed ? null : (
+							<div className={searchInputStyle}>
+								<Input
+									value={value}
+									onChange={this.handleSearchTerm}
+									placeholder="Search for a menu item"
+									suffix={<Icon type="search" />}
+								/>
+							</div>
+						)}
+
+						{value && (
+							<SidebarAutocomplete
+								history={history}
+								routes={parsedRoutes}
+								value={value}
+								resetAutoComplete={this.resetSearch}
+							/>
+						)}
+
+						{!value &&
+							Object.keys(routes).map(route => {
+								if (routes[route].menu) {
+									const Title = (
+										<span>
+											<Icon type={routes[route].icon} />
+											<span>{route}</span>
+										</span>
+									);
+									return (
+										<SubMenu key={route} title={Title}>
+											{routes[route].menu.map(item => (
+												<Menu.Item key={item.label}>
+													<WithRedirectTooltip
+														showTooltip={item.hasExactPath}
 													>
-														{item.label}
-														{item.tag ? (
-															<Tag
-																style={{
-																	fontSize: 10,
-																	marginLeft: 8,
-																}}
-																color="#001529"
-															>
-																{item.tag}
-															</Tag>
-														) : null}
-													</Link>
-												</WithRedirectTooltip>
-											</Menu.Item>
-										))}
-									</SubMenu>
+														<Link
+															replace
+															to={
+																item.hasExactPath
+																	? item.link
+																	: `/app/${appName}/${item.link}`
+															}
+														>
+															{item.label}
+															{item.tag ? (
+																<Tag
+																	style={{
+																		fontSize: 10,
+																		marginLeft: 8,
+																	}}
+																	color="#001529"
+																>
+																	{item.tag}
+																</Tag>
+															) : null}
+														</Link>
+													</WithRedirectTooltip>
+												</Menu.Item>
+											))}
+										</SubMenu>
+									);
+								}
+								return (
+									<Menu.Item key={route}>
+										<Link replace to={`/app/${appName}/${routes[route].link}`}>
+											<Icon type={routes[route].icon} />
+											<span>{route}</span>
+										</Link>
+									</Menu.Item>
 								);
-							}
-							return (
-								<Menu.Item key={route}>
-									<Link replace to={`/app/${appName}/${routes[route].link}`}>
-										<Icon type={routes[route].icon} />
-										<span>{route}</span>
-									</Link>
-								</Menu.Item>
-							);
-						})}
+							})}
 					</Menu>
 				</Sider>
 				{loading ? (

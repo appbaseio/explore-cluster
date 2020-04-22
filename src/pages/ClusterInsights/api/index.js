@@ -22,7 +22,7 @@ export const getSubscription = credentials => {
 
 export const updateSubscription = ({ token, credentials }) => {
 	return new Promise((resolve, reject) => {
-		fetch(`${getURL()}/arc/curated_insights?test=true`, {
+		fetch(`${getURL()}/arc/curated_insights`, {
 			method: 'POST',
 			body: JSON.stringify({ token }),
 			headers: {
@@ -42,7 +42,7 @@ export const updateSubscription = ({ token, credentials }) => {
 
 export const deleteSubscription = credentials => {
 	return new Promise((resolve, reject) => {
-		fetch(`${getURL()}/arc/curated_insights?test=true`, {
+		fetch(`${getURL()}/arc/curated_insights`, {
 			method: 'DELETE',
 			headers: {
 				...getAuthHeaders(credentials),

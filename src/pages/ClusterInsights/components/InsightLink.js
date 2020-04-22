@@ -1,6 +1,7 @@
 import React from 'react';
-import { Result, Button, Spin } from 'antd';
+import { Result, Button } from 'antd';
 import Frame from '../../../components/Frame';
+import Loader from '../../../components/Loader';
 
 class InsightLink extends React.Component {
 	constructor(props) {
@@ -21,7 +22,18 @@ class InsightLink extends React.Component {
 		const { frameLoading } = this.state;
 
 		if (!hasSubscribed) {
-			return 'Placeholder Image';
+			return (
+				<Result
+					status="warning"
+					title="Insights not available"
+					subTitle="Please subscribe to get Curated Insights."
+					extra={
+						<Button onClick={() => window.Intercom('show')} type="primary">
+							Chat with us
+						</Button>
+					}
+				/>
+			);
 		}
 
 		if (hasSubscribed && !insight_link) {
@@ -41,7 +53,7 @@ class InsightLink extends React.Component {
 
 		return (
 			<React.Fragment>
-				{frameLoading && <Spin />}
+				{frameLoading && <Loader />}
 				<Frame
 					src={insight_link}
 					id="curated-insights"

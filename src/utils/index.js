@@ -1,4 +1,4 @@
-import { chain, get, keys } from 'lodash';
+import { chain, get, includes, keys, values } from 'lodash';
 import { notification } from 'antd';
 import { getURL } from '../constants/config';
 import { getSingleFunction, updateFunctions } from '../batteries/utils/app';
@@ -376,6 +376,7 @@ export async function getClusterMappings() {
 
 export function getDatafields(mappings, indexes, isSearch = false) {
 	const hasAllIndex = indexes.includes('*');
+	let fieldMap = {};
 
 	function filtered(properties, property) {
 		if (isSearch)
@@ -385,7 +386,8 @@ export function getDatafields(mappings, indexes, isSearch = false) {
 			properties[property].type === 'text' ||
 			properties[property].type === 'integer' ||
 			properties[property].type === 'long' ||
-			properties[property].type === 'bool'
+			properties[property].type === 'bool' ||
+			properties[property].type === 'float'
 		);
 	}
 
@@ -394,13 +396,34 @@ export function getDatafields(mappings, indexes, isSearch = false) {
 		.filter(index => hasAllIndex || indexes.includes(index))
 		.reduce((acc, key) => {
 			const { properties } = get(mappings[key], 'mappings._doc') || mappings[key].mappings;
-			const nestedDataFields = keys(properties).filter(property => {
-				return filtered(properties, property);
-			});
-			return [...acc, ...nestedDataFields];
+			const fieldTree = getFieldsTree(properties);
+			const nestedDataFields = keys(fieldTree).reduce((acc, field) => {
+				const fieldObj = fieldTree[field];
+				const { type, fields } = fieldObj || {};
+
+				const setKeyWordField = () => {
+					if (type === 'text' || type === 'string') {
+						if (includes(fields, 'keyword')) {
+							acc[field] = `${field}.keyword`;
+						} else {
+							acc[field] = field;
+						}
+					}
+				};
+
+				if (isSearch) {
+					setKeyWordField(type, fields);
+				} else {
+					if (type === 'text' || type === 'string') setKeyWordField(type, fields);
+					else acc[field] = field;
+				}
+				return acc;
+			}, {});
+			fieldMap = { ...fieldMap, ...nestedDataFields };
+			return [...acc, ...values(nestedDataFields)];
 		}, []);
 
-	return [...new Set(dataFields)];
+	return [[...new Set(dataFields)], fieldMap];
 }
 
 function updateQueryRules(selectedFunction, res) {
@@ -531,3 +554,49 @@ export function removeWhiteSpaces(str) {
 	str = rtrim(str);
 	return str;
 }
+
+const getFieldsTree = (mappings = {}, prefix = null) => {
+	let tree = {};
+	Object.keys(mappings).forEach(key => {
+		if (mappings[key].properties) {
+			tree = {
+				...tree,
+				...getFieldsTree(mappings[key].properties, `${prefix ? `${prefix}.` : ''}${key}`),
+			};
+		} else {
+			const originalFields = mappings[key].fields;
+			tree = {
+				...tree,
+				[`${prefix ? `${prefix}.` : ''}${key}`]: {
+					type: mappings[key].type,
+					fields: mappings[key].fields ? Object.keys(mappings[key].fields) : [],
+					originalFields: originalFields || {},
+				},
+			};
+		}
+	});
+
+	return tree;
+};
+
+export const getParsedRoutes = routes =>
+	Object.keys(routes).reduce((agg, route) => {
+		const routeItem = routes[route];
+		if (routeItem.menu) {
+			return [
+				...agg,
+				...routeItem.menu.map(item => ({
+					...item,
+					title: route,
+					icon: routeItem.icon,
+				})),
+			];
+		}
+		return [
+			...agg,
+			{
+				...routeItem,
+				title: route,
+			},
+		];
+	}, []);

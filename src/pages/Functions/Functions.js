@@ -19,6 +19,7 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
+import { keys } from 'lodash';
 import Loader from '../../components/Loader';
 import Header from '../../components/Header';
 import {
@@ -27,6 +28,7 @@ import {
 	reorderFunction,
 	updateFunctions,
 } from '../../batteries/modules/actions';
+import { isValidPlan, features } from '../../batteries/utils';
 import CreateFunction from './CreateFunction';
 import TriggerFunction from './TriggerFunction';
 import InvokeFunctionModal from '../../components/InvokeFunctionModal';
@@ -39,15 +41,7 @@ import Overlay from '../../components/Overlay';
 import { getFunctionHealthCheck } from '../../utils';
 import { deploymentCheck } from '../../components/DeployFunctionModal/helper';
 import { mediaKey } from '../../utils/media';
-import SearchPreviewModal from '../../components/SearchPreviewModal';
-
-const validPlans = [
-	'2019-production-2',
-	'2019-production-3',
-	'2019-production-4',
-	'arc-enterprise',
-	'hosted-arc-enterprise',
-];
+import SearchPreviewSwitcher from '../../components/SearchPreviewSwitcher';
 
 const link = css`
 	font-size: 14px;
@@ -185,15 +179,7 @@ const bannerDetails = {
 
 function FunctionItem({ item, onChange, getFunction }) {
 	const [isLogsOpen, setIsLogsOpen] = useState(false);
-	const {
-		function: func,
-		enabled,
-		isToggling,
-		order,
-		invocationCount,
-		isDeleting,
-		deploymentStatus,
-	} = item;
+	const { function: func, enabled, isToggling, isDeleting, deploymentStatus } = item;
 	useEffect(() => {
 		let interval = null;
 		function handleDeploymentCheck() {
@@ -311,9 +297,9 @@ class FunctionsPage extends React.Component {
 	};
 
 	async componentDidMount() {
-		const { fetchFunctions, appName, fetchRegistries, tier } = this.props;
+		const { fetchFunctions, appName, fetchRegistries, tier, featureFunctions } = this.props;
 		try {
-			if (validPlans.indexOf(tier) > -1) {
+			if (isValidPlan(tier, featureFunctions, features.FUNCTIONS)) {
 				this.setState({ checking: true });
 				await getFunctionHealthCheck();
 				this.setState({ checking: false });
@@ -377,12 +363,24 @@ class FunctionsPage extends React.Component {
 		reorderFunctions(updatedSource, updatedDestination);
 	};
 
+	toggleVisibility = () => {
+		this.setState(prevState => ({
+			visible: !prevState.visible,
+		}));
+	};
+
+	onAppSelect = app => {
+		this.setState({ app, visible: true });
+	};
+
 	render() {
-		const { isLoading, functions, tier, getFunction, appName } = this.props;
-		const { deployModal, checking, healthError, notFoundError } = this.state;
+		const { isLoading, functions, tier, getFunction, apps, featureFunctions } = this.props;
+		const { deployModal, checking, healthError, notFoundError, visible, app } = this.state;
 		this.sortedDataSource = (functions || []).sort((a, b) => a.order - b.order);
 
-		if (tier && validPlans.indexOf(tier) === -1) {
+		const filteredApps = keys(apps).filter(app => !app.startsWith('.'));
+
+		if (tier && !isValidPlan(tier, featureFunctions, features.FUNCTIONS)) {
 			return (
 				<React.Fragment>
 					<Banner {...bannerDetails} />
@@ -620,7 +618,13 @@ class FunctionsPage extends React.Component {
 								boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.15)',
 							}}
 						>
-							<SearchPreviewModal app={appName} />
+							<SearchPreviewSwitcher
+								filteredApps={filteredApps}
+								onSelect={this.onAppSelect}
+								onCancel={this.toggleVisibility}
+								visible={visible}
+								app={app}
+							/>
 						</div>
 					</Affix>
 				</section>
@@ -644,6 +648,7 @@ const mapStateToProps = state => ({
 	functions: get(state, '$getAppFunctions.results'),
 	tier: get(state, '$getAppPlan.results.tier'),
 	featureFunctions: get(state, '$getAppPlan.results.feature_functions', false),
+	apps: get(state, 'apps.data'),
 });
 
 const mapDispatchToProps = dispatch => ({

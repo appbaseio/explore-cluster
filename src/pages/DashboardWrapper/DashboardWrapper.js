@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { Icon, Layout, Menu } from 'antd';
+import { Icon, Layout, Menu, Input } from 'antd';
 import { Link, Route, Switch } from 'react-router-dom';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
 import { get, keys } from 'lodash';
+import { css } from 'emotion';
 
 import { bool, func } from 'prop-types';
 import Loader from '../../components/Loader';
@@ -11,10 +12,11 @@ import AppHeader from '../../components/AppHeader';
 import Logo from '../../components/Logo';
 import { breakpoints } from '../../utils/media';
 import { getAppPlan } from '../../batteries/modules/actions';
-import { getParam } from '../../utils';
+import { getParam, getParsedRoutes } from '../../utils';
 import { LabelTag } from '../../components/LabelTag';
 import { IndexSwitcher } from '../../components/IndexSwitcher';
 import { loadApps } from '../../actions';
+import SidebarAutocomplete from '../../components/SidebarAutocomplete';
 
 const NoMatch = Loadable({
 	loader: () => import('../../NoMatch'),
@@ -95,6 +97,8 @@ const defaultRoutes = {
 	},
 };
 
+const parsedRoutes = getParsedRoutes(defaultRoutes);
+
 const accountRoute = {
 	Account: {
 		icon: 'setting',
@@ -113,9 +117,9 @@ const getActiveMenu = (props, prevActiveSubMenu = []) => {
 		pathname = getParam('view') || '';
 	}
 	const routes = defaultRoutes;
-	Object.keys(routes).some(route => {
+	Object.keys(routes).some((route) => {
 		if (routes[route].menu) {
-			const active = routes[route].menu.find(item => pathname === item.link);
+			const active = routes[route].menu.find((item) => pathname === item.link);
 
 			if (active) {
 				activeSubMenu = route;
@@ -141,6 +145,18 @@ const getActiveMenu = (props, prevActiveSubMenu = []) => {
 	};
 };
 
+export const searchInputStyle = css`
+	text-align: center;
+	padding: 10px 16px;
+	input {
+		opacity: 0.3;
+
+		&:focus {
+			opacity: 1;
+		}
+	}
+`;
+
 let url;
 
 class DashboardWrapper extends Component {
@@ -164,6 +180,7 @@ class DashboardWrapper extends Component {
 
 			showHeader,
 			routes: defaultRoutes,
+			value: '',
 			...getActiveMenuData,
 		};
 	}
@@ -186,6 +203,9 @@ class DashboardWrapper extends Component {
 		if (!appName && !state.appName && currentApp) {
 			// gets last used appName from redux-persist
 			return { appName: currentApp, ...setActiveMenu };
+		}
+		if (state.collapsed) {
+			return { value: '' };
 		}
 		return { ...setActiveMenu };
 	}
@@ -220,15 +240,27 @@ class DashboardWrapper extends Component {
 		}
 	}
 
+	handleSearchTerm = (e) => {
+		this.setState({
+			value: e.target.value,
+		});
+	};
+
+	resetSearch = () => {
+		this.setState({
+			value: '',
+		});
+	};
+
 	onCollapse = () => {
-		this.setState(prevState => ({ collapsed: !prevState.collapsed }));
+		this.setState((prevState) => ({ collapsed: !prevState.collapsed }));
 	};
 
 	render() {
-		const { collapsed, showHeader, routes, activeSubMenu, activeMenuItem } = this.state;
+		const { collapsed, showHeader, routes, activeSubMenu, activeMenuItem, value } = this.state;
 		const { apps, history } = this.props;
 
-		const filteredApps = keys(apps).filter(app => !app.startsWith('.'));
+		const filteredApps = keys(apps).filter((app) => !app.startsWith('.'));
 
 		return (
 			<Layout>
@@ -254,7 +286,7 @@ class DashboardWrapper extends Component {
 							width: '100%',
 							height: 'calc(100% - 102px)',
 						}}
-						onOpenChange={param => {
+						onOpenChange={(param) => {
 							this.setState({
 								activeSubMenu: param,
 							});
@@ -271,43 +303,65 @@ class DashboardWrapper extends Component {
 								</Link>
 							</Menu.Item>
 						) : null}
-						{Object.keys(routes).map(route => {
-							if (routes[route].menu) {
-								const Title = (
-									<span>
-										<Icon type={routes[route].icon} />
-										<span>{route}</span>
-									</span>
-								);
+						{collapsed ? null : (
+							<div className={searchInputStyle}>
+								<Input
+									value={value}
+									onChange={this.handleSearchTerm}
+									placeholder="Search for a menu item"
+									suffix={<Icon type="search" />}
+								/>
+							</div>
+						)}
+
+						{value && (
+							<SidebarAutocomplete
+								filteredApps={filteredApps}
+								history={history}
+								routes={parsedRoutes}
+								value={value}
+								resetAutoComplete={this.resetSearch}
+							/>
+						)}
+
+						{!value &&
+							Object.keys(routes).map((route) => {
+								if (routes[route].menu) {
+									const Title = (
+										<span>
+											<Icon type={routes[route].icon} />
+											<span>{route}</span>
+										</span>
+									);
+									return (
+										<SubMenu key={route} title={Title}>
+											{routes[route].menu.map((item) => (
+												<Menu.Item key={item.label}>
+													{item.openIndexMenu ? (
+														<IndexSwitcher
+															item={item}
+															filteredApps={filteredApps}
+															history={history}
+														/>
+													) : (
+														<Link replace to={item.link}>
+															<LabelTag item={item} />
+														</Link>
+													)}
+												</Menu.Item>
+											))}
+										</SubMenu>
+									);
+								}
 								return (
-									<SubMenu key={route} title={Title}>
-										{routes[route].menu.map(item => (
-											<Menu.Item key={item.label}>
-												{item.openIndexMenu ? (
-													<IndexSwitcher
-														item={item}
-														filteredApps={filteredApps}
-														history={history}
-													/>
-												) : (
-													<Link replace to={item.link}>
-														<LabelTag item={item} />
-													</Link>
-												)}
-											</Menu.Item>
-										))}
-									</SubMenu>
+									<Menu.Item key={route}>
+										<Link replace to={routes[route].link}>
+											<Icon type={routes[route].icon} />
+											<span>{route}</span>
+										</Link>
+									</Menu.Item>
 								);
-							}
-							return (
-								<Menu.Item key={route}>
-									<Link replace to={routes[route].link}>
-										<Icon type={routes[route].icon} />
-										<span>{route}</span>
-									</Link>
-								</Menu.Item>
-							);
-						})}
+							})}
 					</Menu>
 				</Sider>
 				<Layout
@@ -327,13 +381,22 @@ class DashboardWrapper extends Component {
 							showApp={false}
 						/>
 					)}
-
 					<Switch>
-						<Route exact path="/" component={HomePage} />
+						<Route
+							exact
+							path="/"
+							render={({ history: routeHistory }) => (
+								<HomePage history={routeHistory} />
+							)}
+						/>
 						<Route
 							path="/cluster"
-							component={() => (
-								<ClusterLayout collapsed={collapsed} {...this.props} />
+							render={(routeProps) => (
+								<ClusterLayout
+									collapsed={collapsed}
+									{...this.props}
+									{...routeProps}
+								/>
 							)}
 						/>
 						<Route component={NoMatch} />
@@ -356,14 +419,14 @@ DashboardWrapper.propTypes = {
 	isClusterPlanFetched: bool.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	isBillingEnabled: !(get(state, '$getAppPlan.results.billing') === false),
 	isClusterPlanFetched: get(state, '$getAppPlan.success'),
 	isClusterPlanFetching: get(state, '$getAppPlan.isFetching', false),
 	apps: get(state, 'apps.data'),
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	fetchClusterPlan: () => dispatch(getAppPlan()),
 	fetchApps: () => dispatch(loadApps()),
 });

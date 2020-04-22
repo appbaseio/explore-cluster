@@ -14,11 +14,11 @@ const popOverClass = css`
 `;
 
 // eslint-disable-next-line import/prefer-default-export
-export function IndexSwitcher({ item, filteredApps = [], history }) {
+export function IndexSwitcher({ item = {}, filteredApps = [], history, onSelect, renderItem }) {
 	if (filteredApps.length === 1)
 		return (
 			<Link to={`/app/${filteredApps[0]}/${item.link}`}>
-				<LabelTag item={item} />
+				{renderItem ? renderItem() : <LabelTag item={item} />}
 			</Link>
 		);
 
@@ -40,7 +40,8 @@ export function IndexSwitcher({ item, filteredApps = [], history }) {
 				placeholder="Search for an index."
 				style={{ minWidth: 180 }}
 				onSelect={value => {
-					history.replace(`/app/${value}/${item.link}`);
+					if (onSelect) onSelect(value);
+					else history.replace(`/app/${value}/${item.link}`);
 				}}
 				showSearch
 			>
@@ -71,7 +72,7 @@ export function IndexSwitcher({ item, filteredApps = [], history }) {
 			}
 			title={getTitle()}
 		>
-			<LabelTag item={item} />
+			{renderItem ? renderItem() : <LabelTag item={item} />}
 		</Popconfirm>
 	);
 }
