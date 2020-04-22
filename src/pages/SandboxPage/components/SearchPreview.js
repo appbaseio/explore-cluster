@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Row, Col, Switch, Tooltip, Spin, Button, Icon } from 'antd';
+import { Row, Col, Switch, Tooltip, Spin, Button, Icon, Empty } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
@@ -92,13 +92,13 @@ class SearchPreview extends React.Component {
 		}
 	}
 
-	getSearchableMappings = mappings => {
+	getSearchableMappings = (mappings) => {
 		const aggsResponse = getAggsMappings(mappings, true);
 		const parsedMappings = Array.isArray(aggsResponse)
 			? aggsResponse
 			: Object.keys(aggsResponse);
 		const searchableMappings = parsedMappings
-			.filter(mapping => mapping.usecase === 'search' || mapping.usecase === 'searchaggs')
+			.filter((mapping) => mapping.usecase === 'search' || mapping.usecase === 'searchaggs')
 			.reduce(
 				(agg, item) => ({
 					...agg,
@@ -156,16 +156,35 @@ class SearchPreview extends React.Component {
 			};
 		}
 
+		if (
+			!props.settings &&
+			state.searchableMappings &&
+			props.mappings &&
+			props.settingsErrorCode === 402
+		) {
+			return {
+				settings: generateQuery({
+					search: {
+						dataField: Object.keys(state.searchableMappings),
+						fieldWeights: Object.values(state.searchableMappings),
+					},
+					results: {
+						dataField: '_score',
+					},
+				}),
+			};
+		}
+
 		return state;
 	}
 
-	handleSettingsChange = settings => {
+	handleSettingsChange = (settings) => {
 		this.setState({
 			settings,
 		});
 	};
 
-	toggleAnalytics = value => {
+	toggleAnalytics = (value) => {
 		this.setState({
 			isAnalyticsEnabled: value,
 		});
@@ -183,10 +202,6 @@ class SearchPreview extends React.Component {
 		const { settings, app, credentials, url, fetchingDefaultSettings, rules } = this.props;
 		const { settings: stateSettings, isAnalyticsEnabled } = this.state;
 
-		if (!settings) {
-			return null;
-		}
-
 		if (fetchingDefaultSettings) {
 			return (
 				<div className={container}>
@@ -196,7 +211,7 @@ class SearchPreview extends React.Component {
 			);
 		}
 
-		if (settings.isFetching) {
+		if (settings && settings.isFetching) {
 			return (
 				<div className={container}>
 					<Spin />
@@ -206,12 +221,16 @@ class SearchPreview extends React.Component {
 		}
 
 		if (!stateSettings) {
-			return <p>Settings not found.</p>;
+			return null;
 		}
 
-		const aggregations = stateSettings.filter(item => item.id.startsWith('list'));
-		const search = stateSettings.find(item => item.id === 'search');
-		const result = stateSettings.find(item => item.id === 'result');
+		if (!stateSettings && !settings) {
+			return <Empty description="Settings not found" />;
+		}
+
+		const aggregations = stateSettings.filter((item) => item.id.startsWith('list'));
+		const search = stateSettings.find((item) => item.id === 'search');
+		const result = stateSettings.find((item) => item.id === 'result');
 		return (
 			<Row className={container} gutter={16}>
 				<Col xs={24}>
@@ -270,6 +289,7 @@ const mapStateToProps = (state, props) => {
 	const defaultSettings = get(state.$getAppSettings, `defaultSettings`);
 	return {
 		settings: get(state.$getAppSettings, `settings.${props.app}`, defaultSettings),
+		settingsErrorCode: get(state.$getAppSettings, `error.actual.code`, null),
 		fetchingDefaultSettings: get(state.$getAppSettings, `default.loading`),
 		mappings: getRawMappingsByAppName(state) || null,
 		credentials: username ? `${username}:${password}` : null,
@@ -280,9 +300,9 @@ const mapStateToProps = (state, props) => {
 	};
 };
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	fetchRules: () => dispatch(getRules()),
-	fetchSearchSettings: appName => dispatch(getSettings(appName)),
+	fetchSearchSettings: (appName) => dispatch(getSettings(appName)),
 	fetchMappings: (appName, credentials, url) =>
 		dispatch(getAppMappings(appName, credentials, url)),
 });
