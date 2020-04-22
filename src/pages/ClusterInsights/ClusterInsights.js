@@ -24,8 +24,8 @@ class ClusterInsights extends React.Component {
 		this.fetchInsights();
 	}
 
-	toggleLoading = (key) => {
-		this.setState((state) => ({
+	toggleLoading = key => {
+		this.setState(state => ({
 			[key]: !state[key],
 		}));
 	};
@@ -34,29 +34,29 @@ class ClusterInsights extends React.Component {
 		const { credentials } = this.props;
 		this.toggleLoading('fetchingSubscription');
 		getSubscription(credentials)
-			.then((res) => {
+			.then(res => {
 				this.setState({
 					hasSubscribed: res.has_subscribed,
 					insight_link: res.insight_link,
 				});
 				this.toggleLoading('fetchingSubscription');
 			})
-			.catch((e) => {
+			.catch(e => {
 				message.error(e.message);
 				this.toggleLoading('fetchingSubscription');
 			});
 	};
 
-	handleToken = (token) => {
+	handleToken = token => {
 		this.toggleLoading('updatingSubscription');
 		const { credentials } = this.props;
 		updateSubscription({ token, credentials })
-			.then((res) => {
+			.then(res => {
 				message.success(res.message);
 				this.toggleLoading('updatingSubscription');
 				this.fetchInsights();
 			})
-			.catch((e) => {
+			.catch(e => {
 				message.error(e.message);
 				this.toggleLoading('updatingSubscription');
 			});
@@ -66,12 +66,12 @@ class ClusterInsights extends React.Component {
 		this.toggleLoading('deletingSubscription');
 		const { credentials } = this.props;
 		deleteSubscription(credentials)
-			.then((res) => {
+			.then(res => {
 				message.success(res.message);
 				this.toggleLoading('deletingSubscription');
 				this.fetchInsights();
 			})
-			.catch((e) => {
+			.catch(e => {
 				message.error(e.message);
 				this.toggleLoading('deletingSubscription');
 			});
@@ -105,10 +105,17 @@ class ClusterInsights extends React.Component {
 
 							{hasSubscribed ? (
 								<Popconfirm
-									title="Are you sure you want to unsubscribe from Curated Insights?"
+									title={
+										<div>
+											Are you sure you want to unsubscribe
+											<br />
+											from Curated Insights?
+										</div>
+									}
 									onConfirm={this.unsubscribe}
 									okText="Yes"
 									cancelText="No"
+									placement="bottom"
 								>
 									<Button
 										type="danger"
@@ -142,7 +149,9 @@ class ClusterInsights extends React.Component {
 					)}
 				/>
 				{fetchingSubscription ? (
-					<Loader />
+					<div className={container} style={{ minHeight: 600 }}>
+						<Loader />
+					</div>
 				) : (
 					<div className={container}>
 						<InsightLink hasSubscribed={hasSubscribed} insight_link={insight_link} />
@@ -153,7 +162,7 @@ class ClusterInsights extends React.Component {
 	}
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
 	const { username, password } = get(state, 'user.data', {});
 	return {
 		credentials: `${username}:${password}`,
