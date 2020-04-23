@@ -54,8 +54,8 @@ const parseOperator = (query, operator, fieldMap = {}) => {
 	query = query.replace(filterRegex, `$filter.$1 ${operator} '$2'`);
 	query = query.replace(filterRegexDoubleQuotes, `$filter.$1 ${operator} $2`);
 	query = query.replace(numberRegex, `$filter.$1 ${operator} $2`);
-	query = query.replace(filterRegexDataField, `$filter[$1] ${operator} '$2'`);
-	query = query.replace(filterRegexDataFieldDoubleQuotes, `$filter[$1] ${operator} $2`);
+	query = query.replace(filterRegexDataField, `$filter[$1].keyword ${operator} '$2'`);
+	query = query.replace(filterRegexDataFieldDoubleQuotes, `$filter[$1].keyword ${operator} $2`);
 	return query;
 };
 
@@ -78,8 +78,8 @@ const parseQueryOperator = (query, operator) => {
  1. $query doesnotcontains hello -> not ($query contains hello)
  2. $query doesnotcontains "hello world" -> not ($query contains "hello world")
 */
-const parseQuery = query => {
-	values(operatorsMap).forEach(op => {
+const parseQuery = (query) => {
+	values(operatorsMap).forEach((op) => {
 		query = parseQueryOperator(query, op);
 	});
 	const queryNegationRegex = new RegExp(`(\\$query) (doesnot(\\w*)) ('\\w*')`, 'g');
@@ -112,10 +112,10 @@ export const parseExpression = (query = '', fieldMap) => {
 		`(\\$filter\\["[.#@\\w()\\-:/ ]*"]) (doesnot(\\w*)) ("[\\w ]*")`,
 		'g',
 	);
-	keys(operatorsMap).forEach(operator => {
+	keys(operatorsMap).forEach((operator) => {
 		query = parseCustomOperator(query, operator);
 	});
-	values(operatorsMap).forEach(op => {
+	values(operatorsMap).forEach((op) => {
 		query = parseOperator(query, op, fieldMap);
 	});
 	query = parseQuery(query);
@@ -177,8 +177,8 @@ const unParseQueryOperator = (query, operator) => {
  IN: not ($query contains "hello world")
  OUT: $query doesnotcontains "hello world"
 */
-const unParseQuery = query => {
-	values(operatorsMap).forEach(op => {
+const unParseQuery = (query) => {
+	values(operatorsMap).forEach((op) => {
 		query = unParseQueryOperator(query, op);
 	});
 	const queryNegationRegex = new RegExp(`not \\((\\$query) (\\w*) ([\\w" ]*)\\)`, 'g');
@@ -207,14 +207,14 @@ function unParseCustomOperator(query, customOperator) {
 */
 export const unParseExpression = (query = '') => {
 	const antiNegationRegex = new RegExp(`not \\(([.#@\\w\\-)(":/ ]*) (\\w*) ([\\w" ]*)\\)`, 'g');
-	values(operatorsMap).forEach(op => {
+	values(operatorsMap).forEach((op) => {
 		query = unParseOperator(query, op);
 	});
 	query = unParseQuery(query);
 	query = query.replace(antiNegationRegex, '$1 doesnot$2 $3');
 	query = query.replace(/\band\b/g, 'AND');
 	query = query.replace(/\bor\b/g, 'OR');
-	keys(reverseOperatorMap).forEach(op => {
+	keys(reverseOperatorMap).forEach((op) => {
 		query = unParseCustomOperator(query, op);
 	});
 	// special case for arithmetic comparision opertors, bc they're not word boundaries
