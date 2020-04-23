@@ -1,8 +1,8 @@
 /* eslint-disable no-param-reassign,prefer-destructuring */
 import React from 'react';
-import ReactFilterBox, { GridDataAutoCompleteHandler } from 'react-filter-box';
+import ReactFilterBox, { GridDataAutoCompleteHandler } from '@appbaseio/react-filter-box';
 import { keys } from 'lodash';
-import 'react-filter-box/lib/react-filter-box.css';
+import '@appbaseio/react-filter-box/lib/react-filter-box.css';
 import { operatorsMap } from './helper';
 
 export const AdvancedEditor = props => {
