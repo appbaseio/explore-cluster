@@ -38,7 +38,7 @@ class DeleteAppModal extends React.Component {
 			.then(() => {
 				handleRemoveApp(appName);
 				handleDeleteModal();
-				message.success(`${appName} Deleted!`);
+				message.success(`${appName} deleted!`);
 				if (onDelete) {
 					onDelete();
 				}
