@@ -220,12 +220,12 @@ function unParseCustomOperator(query, customOperator) {
  OUT: $query == hello AND category.name == "foo bar"
 */
 export const unParseExpression = (query = '') => {
-	const antiNegationRegex = new RegExp(`not \\(([.#@\\w\\-)(":/ ]*) (\\w*) ([\\w" ]*)\\)`, 'g');
+	const antiNegationRegex = new RegExp(`not \\("([.#@\\w\\-)(:/ ]*)" (\\w*) ([\\w" ]*)\\)`, 'g');
 	values(operatorsMap).forEach((op) => {
 		query = unParseOperator(query, op);
 	});
 	query = unParseQuery(query);
-	query = query.replace(antiNegationRegex, '$1 doesnot$2 $3');
+	query = query.replace(antiNegationRegex, '"$1" doesnot$2 $3');
 	query = query.replace(/\band\b/g, 'AND');
 	query = query.replace(/\bor\b/g, 'OR');
 	keys(reverseOperatorMap).forEach((op) => {
