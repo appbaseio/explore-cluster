@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import get from 'lodash/get';
-import { Card, Table, Popconfirm, Tooltip, Button, Alert, Typography, Icon } from 'antd';
+import { Card, Table, Tooltip, Button, Alert, Typography, Icon, Result } from 'antd';
 import { connect } from 'react-redux';
 import { string, func, bool, array } from 'prop-types';
 import CreateCredentials from '../../components/CreateCredentials';
@@ -43,7 +43,7 @@ const columns = [
 	},
 	{
 		title: 'Credentials',
-		render: permission => <Permission {...permission} />,
+		render: (permission) => <Permission {...permission} />,
 		key: 'credentials',
 		width: '50%',
 	},
@@ -60,7 +60,10 @@ class Credentials extends Component {
 	}
 
 	componentDidMount() {
-		this.refetchPermissions();
+		const { isAdmin } = this.props;
+		if (isAdmin) {
+			this.refetchPermissions();
+		}
 	}
 
 	componentDidUpdate(prevProps) {
@@ -105,7 +108,7 @@ class Credentials extends Component {
 		});
 	};
 
-	showForm = permissionInfo => {
+	showForm = (permissionInfo) => {
 		if (permissionInfo) {
 			this.setState({
 				showCredForm: true,
@@ -119,7 +122,7 @@ class Credentials extends Component {
 		}
 	};
 
-	newPermission = request => {
+	newPermission = (request) => {
 		const { appName, handleCreatePermission } = this.props;
 		handleCreatePermission(appName, request).then(({ payload }) => {
 			if (payload) {
@@ -135,7 +138,7 @@ class Credentials extends Component {
 		});
 	};
 
-	deletePermission = username => {
+	deletePermission = (username) => {
 		const { appName, handleDeletePermission } = this.props;
 		handleDeletePermission(appName, username).then(({ payload }) => {
 			if (payload) {
@@ -159,9 +162,20 @@ class Credentials extends Component {
 
 	render() {
 		const { showCredForm, currentPermissionInfo, mappings, deleteModal } = this.state;
-		const { isLoading, permissions, isOwner, location, appName, appId } = this.props;
+		const { isLoading, permissions, isOwner, location, appName, appId, isAdmin } = this.props;
 		if (isLoading) {
 			return <Loader />;
+		}
+		if (!isAdmin) {
+			return (
+				<Container>
+					<Result
+						status="403"
+						title="401"
+						subTitle="Sorry, you are not authorized to access this page. Please contact your admin."
+					/>
+				</Container>
+			);
 		}
 		return (
 			<Container>
@@ -192,12 +206,12 @@ class Credentials extends Component {
 					/>
 					<Table
 						scroll={{ x: 700 }}
-						dataSource={permissions.map(permission => ({
+						dataSource={permissions.map((permission) => ({
 							permissionInfo: permission,
 							deletePermission: this.deletePermission,
 							showForm: this.showForm,
 						}))}
-						rowKey={row =>
+						rowKey={(row) =>
 							`${get(row, 'permissionInfo.username')}${get(
 								row,
 								'permissionInfo.password',
@@ -276,11 +290,12 @@ Credentials.propTypes = {
 	handleDeletePermission: func.isRequired,
 	handleEditPermission: func.isRequired,
 	isOwner: bool.isRequired,
+	isAdmin: bool.isRequired,
 	isLoading: bool,
 	errors: array.isRequired,
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');
 	let appPermissions = get(state, '$getAppPermissions.results.default');
 	if (appName) {
@@ -292,6 +307,7 @@ const mapStateToProps = state => {
 		permissions: get(appPermissions, 'results', []),
 		isPaidUser: true,
 		isOwner: true,
+		isAdmin: get(state, 'user.data.isAdmin', false),
 		isLoading: get(state, '$getAppPermissions.isFetching'),
 		errors: [
 			get(state, '$getAppPermissions.error'),
@@ -302,8 +318,8 @@ const mapStateToProps = state => {
 		],
 	};
 };
-const mapDispatchToProps = dispatch => ({
-	fetchPermissions: appName => dispatch(getPermission(appName)),
+const mapDispatchToProps = (dispatch) => ({
+	fetchPermissions: (appName) => dispatch(getPermission(appName)),
 	handleCreatePermission: (appName, payload) => dispatch(createPermission(appName, payload)),
 	handleDeletePermission: (appName, username) => dispatch(deletePermission(appName, username)),
 	handleEditPermission: (appName, username, payload) =>
