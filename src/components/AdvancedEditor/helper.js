@@ -17,7 +17,8 @@ export const operatorsMap = {
 const reverseOperatorMap = invert(operatorsMap);
 
 // handles keyword fields
-const applyFilterRegex = (filterRegex, query, fieldMap) => {
+const applyFilterRegex = (filterRegex, query = '', fieldMap = {}) => {
+	if (!filterRegex) return query;
 	let matches = [];
 	// eslint-disable-next-line no-cond-assign
 	while ((matches = filterRegex.exec(query))) {
@@ -29,7 +30,8 @@ const applyFilterRegex = (filterRegex, query, fieldMap) => {
 };
 
 // handles keyword for dataFields
-const applyFilterRegexDataField = (filterRegex, query, fieldMap) => {
+const applyFilterRegexDataField = (filterRegex, query = '', fieldMap = {}) => {
+	if (!filterRegex) return query;
 	let matches = [];
 	// eslint-disable-next-line no-cond-assign
 	while ((matches = filterRegex.exec(query))) {
@@ -46,7 +48,7 @@ const applyFilterRegexDataField = (filterRegex, query, fieldMap) => {
  2.	category.name == "hello world"
  3. category.name == 'hello'
 */
-const parseOperator = (query, operator, fieldMap = {}) => {
+const parseOperator = (query = '', operator, fieldMap = {}) => {
 	const filterRegex = new RegExp(`(?![$query ])([.#@\\w]*) ${operator} ([^"]\\w*)`, 'g');
 	const filterRegexDoubleQuotes = new RegExp(
 		`(?![$query ])([.#@\\w]*) ${operator} ("[\\w ]*")`,
@@ -92,7 +94,7 @@ const parseQueryOperator = (query, operator) => {
  1. $query doesnotcontains hello -> not ($query contains hello)
  2. $query doesnotcontains "hello world" -> not ($query contains "hello world")
 */
-const parseQuery = (query) => {
+const parseQuery = (query = '') => {
 	values(operatorsMap).forEach((op) => {
 		query = parseQueryOperator(query, op);
 	});
@@ -111,7 +113,7 @@ const parseQuery = (query) => {
  IN: $query == hello AND category.name == "foo bar"
  OUT: $query == 'hello' and $filter.category.name.keyword == "foo bar"
 */
-export const parseExpression = (query = '', fieldMap) => {
+export const parseExpression = (query = '', fieldMap = {}) => {
 	query = query.replace(/'/g, `"`);
 	const negationRegex = new RegExp(`(\\$filter[.#@\\w]*) (doesnot(\\w*)) ('\\w*')`, 'g');
 	const negationRegexDoubleQuotes = new RegExp(
@@ -148,7 +150,7 @@ export const parseExpression = (query = '', fieldMap) => {
  2.	category.name == "hello world"
  3. category.name == 'hello'
 */
-const unParseOperator = (query, operator) => {
+const unParseOperator = (query = '', operator) => {
 	const filterRegexBackend = new RegExp(`\\$filter.([\\w.]*) ${operator} '(\\w*)'`, 'g');
 	const filterRegexBackendDoubleQuotes = new RegExp(
 		`\\$filter.([\\w.]*) ${operator} "([\\w ]*)"`,
@@ -178,7 +180,7 @@ const unParseOperator = (query, operator) => {
  2. $query == 'hello'
  3. $query == "hello world"
 */
-const unParseQueryOperator = (query, operator) => {
+const unParseQueryOperator = (query = '', operator) => {
 	const queryRegex = new RegExp(`(\\$query) ${operator} '(\\w*)'`, 'g');
 	const queryRegexDoubleQuotes = new RegExp(`(\\$query) ${operator} "([\\w ]*)"`, 'g');
 	query = query.replace(queryRegex, `$1 ${operator} $2`);
@@ -191,7 +193,7 @@ const unParseQueryOperator = (query, operator) => {
  IN: not ($query contains "hello world")
  OUT: $query doesnotcontains "hello world"
 */
-const unParseQuery = (query) => {
+const unParseQuery = (query = '') => {
 	values(operatorsMap).forEach((op) => {
 		query = unParseQueryOperator(query, op);
 	});
@@ -201,14 +203,14 @@ const unParseQuery = (query) => {
 };
 
 // parse operators like (== -> exactlyMatches, != -> doesNotMatch and more(refer operatorsMap constant above))
-function parseCustomOperator(query, customOperator) {
+function parseCustomOperator(query = '', customOperator) {
 	const customOperatorRegex = new RegExp(`\\b${customOperator}\\b`, 'g');
 	query = query.replace(customOperatorRegex, operatorsMap[customOperator]);
 	return query;
 }
 
 // parse operators like (exactlyMatches -> ==, doesNotMatch -> != and more(refer reverseOperatorMap constant above))
-function unParseCustomOperator(query, customOperator) {
+function unParseCustomOperator(query = '', customOperator) {
 	const customOperatorRegex = new RegExp(`\\b${customOperator}\\b`, 'g');
 	query = query.replace(customOperatorRegex, reverseOperatorMap[customOperator]);
 	return query;
