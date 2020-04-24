@@ -1,7 +1,7 @@
 import { getURL } from '../../../constants/config';
 import { getAuthHeaders } from '../../../batteries/utils/mappings';
 
-export const getSubscription = credentials => {
+export const getSubscription = (credentials) => {
 	return new Promise((resolve, reject) => {
 		fetch(`${getURL()}/arc/curated_insights`, {
 			method: 'GET',
@@ -10,11 +10,11 @@ export const getSubscription = credentials => {
 				'Content-Type': 'application/json',
 			},
 		})
-			.then(res => res.json())
-			.then(res => {
+			.then((res) => res.json())
+			.then((res) => {
 				resolve(res);
 			})
-			.catch(e => {
+			.catch((e) => {
 				reject(e);
 			});
 	});
@@ -30,17 +30,17 @@ export const updateSubscription = ({ token, credentials }) => {
 				'Content-Type': 'application/json',
 			},
 		})
-			.then(res => res.json())
-			.then(res => {
+			.then((res) => res.json())
+			.then((res) => {
 				resolve(res);
 			})
-			.catch(e => {
+			.catch((e) => {
 				reject(e);
 			});
 	});
 };
 
-export const deleteSubscription = credentials => {
+export const deleteSubscription = (credentials) => {
 	return new Promise((resolve, reject) => {
 		fetch(`${getURL()}/arc/curated_insights`, {
 			method: 'DELETE',
@@ -49,11 +49,11 @@ export const deleteSubscription = credentials => {
 				'Content-Type': 'application/json',
 			},
 		})
-			.then(res => res.json())
-			.then(res => {
+			.then((res) => res.json())
+			.then((res) => {
 				resolve(res);
 			})
-			.catch(e => {
+			.catch((e) => {
 				reject(e);
 			});
 	});

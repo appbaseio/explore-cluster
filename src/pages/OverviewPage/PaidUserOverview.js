@@ -58,7 +58,7 @@ class PaidUserOverview extends React.Component {
 		if (!Object.keys(stats).length) fetchApps();
 	}
 
-	redirectTo = url => {
+	redirectTo = (url) => {
 		window.location = url;
 	};
 
@@ -138,15 +138,17 @@ PaidUserOverview.propTypes = {
 	stats: PropTypes.object.isRequired,
 	fetchApps: PropTypes.func.isRequired,
 };
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
 	const analyticsArr = getAppAnalyticsByName(state) || [];
 	let analytics = {};
-	analyticsArr.forEach(item => {
-		analytics = {
-			...analytics,
-			...item,
-		};
-	});
+	if (Array.isArray(analyticsArr)) {
+		analyticsArr.forEach((item) => {
+			analytics = {
+				...analytics,
+				...item,
+			};
+		});
+	}
 	const appName = get(state, '$getCurrentApp.name');
 	return {
 		appName,
@@ -156,7 +158,7 @@ const mapStateToProps = state => {
 		searchVolume: get(analytics, 'search_histogram'),
 	};
 };
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	fetchAppAnalytics: (appName, plan) => dispatch(getAppAnalytics(appName, plan)),
 	fetchApps: () => dispatch(loadApps()),
 });
