@@ -18,16 +18,18 @@ const SearchPreviewSwitcher = ({ app, filteredApps, onCancel, onSelect, visible 
 			}}
 			onSelect={onSelect}
 		/>
-		<Modal
-			footer={null}
-			width="95%"
-			className={modalStyles}
-			onCancel={onCancel}
-			destroyOnClose
-			visible={visible}
-		>
-			<SearchPreview app={app} />
-		</Modal>
+		{visible && (
+			<Modal
+				footer={null}
+				width="95%"
+				className={modalStyles}
+				onCancel={onCancel}
+				destroyOnClose
+				visible={visible}
+			>
+				<SearchPreview app={app} />
+			</Modal>
+		)}
 	</>
 );
 
