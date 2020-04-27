@@ -5,7 +5,7 @@ import { setCreateApp, createAppFail, appendApp } from '../actions';
 
 import { getUserPermissions } from '../batteries/modules/actions';
 
-const getUser = state => state.user.data;
+const getUser = (state) => state.user.data;
 
 function* createAppWorker(options) {
 	try {

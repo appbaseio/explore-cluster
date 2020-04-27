@@ -30,7 +30,7 @@ const columns = [
 		title: 'Actions',
 		key: 'actions',
 		width: 400,
-		render: item => (
+		render: (item) => (
 			<Actions
 				handleRender={() => item.handleRender(item.template_id)}
 				handleEdit={() => item.handleEdit(item.template_id)}
@@ -110,23 +110,23 @@ class SearchTemplates extends React.Component {
 		fetchTemplates();
 	};
 
-	toggleCreateMode = status => {
+	toggleCreateMode = (status) => {
 		this.form.reset();
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			createMode: status === undefined ? !prevState.createMode : status,
 			currentTemplate: null,
 		}));
 	};
 
-	toggleEditMode = status => {
-		this.setState(prevState => ({
+	toggleEditMode = (status) => {
+		this.setState((prevState) => ({
 			currentTemplate: prevState.editMode ? null : prevState.currentTemplate,
 			editMode: status === undefined ? !prevState.editMode : status,
 		}));
 	};
 
-	togglecopyEndpoint = status => {
-		this.setState(prevState => ({
+	togglecopyEndpoint = (status) => {
+		this.setState((prevState) => ({
 			currentTemplate: prevState.copyEndpoint ? null : prevState.currentTemplate,
 			copyEndpoint: status === undefined ? !prevState.copyEndpoint : status,
 		}));
@@ -149,7 +149,7 @@ class SearchTemplates extends React.Component {
 					source: requestBody.source,
 				},
 			};
-			saveTemplate(name, payload).then(action => {
+			saveTemplate(name, payload).then((action) => {
 				if (get(action, 'payload.acknowledged')) {
 					notification.success({
 						message: 'Template saved successfully.',
@@ -166,7 +166,7 @@ class SearchTemplates extends React.Component {
 		}
 	};
 
-	handleValidateTemplate = templateId => {
+	handleValidateTemplate = (templateId) => {
 		const { validateTemplate } = this.props;
 		const { query } = this.form.value;
 		const queryControl = this.form.get('query');
@@ -181,7 +181,7 @@ class SearchTemplates extends React.Component {
 			if (!queryControl.valid) {
 				throw new Error('Please enter valid JSON query.');
 			}
-			validateTemplate(requestBody, templateId).then(action => {
+			validateTemplate(requestBody, templateId).then((action) => {
 				if (get(action, 'payload')) {
 					window.scrollTo(0, document.body.scrollHeight);
 				}
@@ -193,9 +193,9 @@ class SearchTemplates extends React.Component {
 		}
 	};
 
-	handleDelete = id => {
+	handleDelete = (id) => {
 		const { deleteTemplate } = this.props;
-		deleteTemplate(id).then(action => {
+		deleteTemplate(id).then((action) => {
 			if (get(action, 'payload.acknowledged')) {
 				notification.success({
 					message: 'Template deleted successfully.',
@@ -205,7 +205,7 @@ class SearchTemplates extends React.Component {
 		});
 	};
 
-	handleEdit = id => {
+	handleEdit = (id) => {
 		this.setState(
 			{
 				currentTemplate: id,
@@ -214,7 +214,7 @@ class SearchTemplates extends React.Component {
 		);
 	};
 
-	handleRender = id => {
+	handleRender = (id) => {
 		this.setState(
 			{
 				currentTemplate: id,
@@ -246,8 +246,8 @@ class SearchTemplates extends React.Component {
 							}
 						>
 							<Table
-								rowKey={item => item.template_id}
-								dataSource={templates.map(item => ({
+								rowKey={(item) => item.template_id}
+								dataSource={templates.map((item) => ({
 									handleDelete: this.handleDelete,
 									handleEdit: this.handleEdit,
 									handleRender: this.handleRender,
@@ -293,7 +293,7 @@ SearchTemplates.propTypes = {
 	errors: PropTypes.array.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	templates: get(state, '$getAppTemplates.results', []),
 	isLoading: get(state, '$getAppTemplates.isFetching', false),
 	isDeleting: get(state, '$deleteAppTemplate.isFetching', false),
@@ -305,10 +305,10 @@ const mapStateToProps = state => ({
 	],
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	fetchTemplates: () => dispatch(getAppTemplates()),
 	saveTemplate: (name, payload) => dispatch(saveAppTemplate(name, payload)),
-	deleteTemplate: name => dispatch(deleteAppTemplate(name)),
+	deleteTemplate: (name) => dispatch(deleteAppTemplate(name)),
 	validateTemplate: (payload, name) => dispatch(validateAppTemplate(payload, name)),
 });
 

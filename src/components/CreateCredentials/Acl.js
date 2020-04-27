@@ -7,7 +7,7 @@ import { FieldControl } from 'react-reactive-form';
 class Acl extends React.PureComponent {
 	constructor(props) {
 		super(props);
-		this.dataSource = props.control.controls.map(groupCtrl => ({
+		this.dataSource = props.control.controls.map((groupCtrl) => ({
 			key: groupCtrl.get('acl').value,
 			Tag: () => (
 				<FieldControl

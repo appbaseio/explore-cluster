@@ -25,7 +25,7 @@ const ListItemWrapper = ({ item }) => {
 			)}
 			<ExpandCollapse previewHeight="200px" expandText="Show more">
 				<Row className="row" gutter={8}>
-					{Object.keys(rest).map(key => (
+					{Object.keys(rest).map((key) => (
 						<React.Fragment key={key}>
 							<Col md={10}>{key}</Col>
 							<Col md={1} className="text-center">
@@ -90,7 +90,7 @@ const ListView = ({ result }) => (
 					}
 					return (
 						<React.Fragment>
-							{data.map(item => (
+							{data.map((item) => (
 								<ListItem key={item._id} item={item} />
 							))}
 							{result.pagination ||

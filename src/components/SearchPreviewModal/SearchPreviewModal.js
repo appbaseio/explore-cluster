@@ -21,7 +21,7 @@ class SearchPreviewModal extends React.Component {
 	};
 
 	toggleVisibilty = () => {
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			visible: !prevState.visible,
 		}));
 	};

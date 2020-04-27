@@ -28,8 +28,8 @@ class ErrorPage extends React.Component {
 		this.setState({
 			error: true,
 		});
-		Sentry.withScope(scope => {
-			Object.keys(errorInfo).forEach(key => {
+		Sentry.withScope((scope) => {
+			Object.keys(errorInfo).forEach((key) => {
 				scope.setExtra(key, errorInfo[key]);
 			});
 			Sentry.captureException(error);

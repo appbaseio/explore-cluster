@@ -33,17 +33,17 @@ class QueryView extends React.Component {
 	}
 
 	toggleExecutionStatus = () => {
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			isExecuting: !prevState.isExecuting,
 		}));
 	};
 
-	handleEditor = value => {
+	handleEditor = (value) => {
 		const isValid = isValidJSON(value);
 		if (isValid) {
 			const parsedQuery = JSON.parse(value);
 			const isNotValidId = parsedQuery.some(
-				item =>
+				(item) =>
 					!(item.id === 'search' || item.id === 'result' || item.id.startsWith('list')),
 			);
 
@@ -73,7 +73,7 @@ class QueryView extends React.Component {
 		this.toggleExecutionStatus();
 		this.appbaseRef
 			.reactiveSearchv3(parsedQuery)
-			.then(res => {
+			.then((res) => {
 				this.setState({
 					response: JSON.stringify(res, null, 4),
 				});
@@ -82,7 +82,7 @@ class QueryView extends React.Component {
 				}
 				this.toggleExecutionStatus();
 			})
-			.catch(e => {
+			.catch((e) => {
 				this.toggleExecutionStatus();
 				message.error(e.message);
 				console.log(e);

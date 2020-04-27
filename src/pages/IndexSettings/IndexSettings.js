@@ -62,8 +62,8 @@ class IndexSettings extends React.Component {
 		}
 	}
 
-	handleModal = name => {
-		this.setState(prevState => ({
+	handleModal = (name) => {
+		this.setState((prevState) => ({
 			[name]: !prevState[name],
 		}));
 	};
@@ -112,7 +112,7 @@ class IndexSettings extends React.Component {
 			},
 			credentials,
 		})
-			.then(res => {
+			.then((res) => {
 				if (res.acknowledged) {
 					addApp({ [appName]: { ...get(apps, ['data', appName], {}), rep: replicas } });
 					message.success('Replicas updated successfully');
@@ -126,7 +126,7 @@ class IndexSettings extends React.Component {
 					isUpdating: false,
 				});
 			})
-			.catch(e => {
+			.catch((e) => {
 				notification.error({
 					message: 'Replicas updation Failed',
 					description: e.message || JSON.stringify(e),
@@ -151,7 +151,7 @@ class IndexSettings extends React.Component {
 		const { shards, replicas, esVersion } = this.state;
 		const type = getTypesFromMapping(mappings);
 		let appSettings = await getSettings(appName, credentials).then(
-			data => data[appName].settings,
+			(data) => data[appName].settings,
 		);
 
 		appSettings = getUpdatedSettings({ settings: appSettings, shards, replicas });
@@ -174,7 +174,7 @@ class IndexSettings extends React.Component {
 				});
 				message.success('Number of shards updated successfully');
 			})
-			.catch(err => {
+			.catch((err) => {
 				console.error(err);
 				notification.error({
 					description: JSON.stringify(err),
@@ -243,7 +243,7 @@ class IndexSettings extends React.Component {
 	}
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
 	const mappings = getRawMappingsByAppName(state) || null;
 
 	const { username, password } = get(state, 'user.data', {});
@@ -257,12 +257,12 @@ const mapStateToProps = state => {
 	};
 };
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	fetchMappings: (appName, credentials, url) =>
 		dispatch(getAppMappings(appName, credentials, url)),
-	updateCurrentApp: app => dispatch(setCurrentApp(app)),
-	addApp: app => dispatch(appendApp(app)),
-	deleteApp: appName => dispatch(removeAppData(appName)),
+	updateCurrentApp: (app) => dispatch(setCurrentApp(app)),
+	addApp: (app) => dispatch(appendApp(app)),
+	deleteApp: (appName) => dispatch(removeAppData(appName)),
 	fetchApps: () => dispatch(loadApps()),
 });
 

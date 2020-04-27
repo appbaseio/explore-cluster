@@ -15,7 +15,7 @@ class WhiteList extends React.Component {
 		};
 	}
 
-	handleSelectOption = value => {
+	handleSelectOption = (value) => {
 		this.setState(() => {
 			const { control } = this.props;
 			if (value && !control.value.includes(value)) {
@@ -30,13 +30,13 @@ class WhiteList extends React.Component {
 		});
 	};
 
-	handleOnChange = value => {
+	handleOnChange = (value) => {
 		this.setState({
 			text: value,
 		});
 	};
 
-	handleOnSearch = value => {
+	handleOnSearch = (value) => {
 		if (!(value && value.startsWith('**'))) {
 			this.setState({
 				text: value.trim(),
@@ -44,7 +44,7 @@ class WhiteList extends React.Component {
 		}
 	};
 
-	removeItem = item => {
+	removeItem = (item) => {
 		const { control } = this.props;
 		const { value } = control;
 		const index = value.indexOf(item);
@@ -114,7 +114,7 @@ class WhiteList extends React.Component {
 							/>
 						)}
 
-						{value.map(item => (
+						{value.map((item) => (
 							<Flex
 								key={item}
 								justifyContent="space-between"
@@ -163,7 +163,7 @@ class WhiteList extends React.Component {
 											</Flex>
 										</Select.Option>
 									) : (
-										Object.keys(Suggestions).map(k => {
+										Object.keys(Suggestions).map((k) => {
 											const suggestion = Suggestions[k];
 											if (text) {
 												const suggestionValue = `${suggestion.prefix}${text}${suggestion.suffix}`;
@@ -203,11 +203,11 @@ class WhiteList extends React.Component {
 									{...inputProps}
 									{...handler()}
 									value={text}
-									onChange={e => {
+									onChange={(e) => {
 										this.handleOnChange(e.target.value);
 									}}
 									onBlur={this.submitOnBlur}
-									onKeyPress={event => {
+									onKeyPress={(event) => {
 										if (event.key === 'Enter') {
 											this.submitOnBlur();
 										}

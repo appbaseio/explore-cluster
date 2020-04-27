@@ -94,7 +94,7 @@ class PaymentButton extends React.Component {
 			<Stripe
 				name={name}
 				amount={PRICE_BY_PLANS[plan] * 100}
-				token={token => handleToken(token, plan)}
+				token={(token) => handleToken(token, plan)}
 				disabled={isCurrentPlan}
 				stripeKey={STRIPE_KEY.LIVE}
 			>
@@ -134,7 +134,7 @@ PaymentButton.propTypes = {
 	subscriptionID: PropTypes.string,
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
 	const appPlan = getAppPlanByName(state);
 	return {
 		isPaid: get(appPlan, 'isPaid', false),

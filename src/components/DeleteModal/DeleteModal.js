@@ -8,12 +8,12 @@ class DeleteModal extends React.Component {
 	};
 
 	handleVisibility = () => {
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			isVisible: !prevState.isVisible,
 		}));
 	};
 
-	handleInput = e => {
+	handleInput = (e) => {
 		this.setState({
 			[e.target.name]: e.target.value,
 		});

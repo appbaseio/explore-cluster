@@ -3,10 +3,10 @@ import { Select } from 'antd';
 
 const { Option } = Select;
 
-const EquivalentSynonym = props => {
+const EquivalentSynonym = (props) => {
 	const { synonyms, onChange } = props;
 
-	const handleChange = value => {
+	const handleChange = (value) => {
 		onChange('synonyms', value);
 	};
 

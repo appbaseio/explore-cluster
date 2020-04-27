@@ -108,7 +108,7 @@ class QueryCard extends React.Component {
 		}
 	}
 
-	handleRuleStatus = value => {
+	handleRuleStatus = (value) => {
 		const { toggleRule, rule } = this.props;
 		toggleRule({
 			id: rule.id,
@@ -149,7 +149,7 @@ class QueryCard extends React.Component {
 						</p>
 					</Col>
 					<Col lg={7} md={12} sm={24}>
-						{get(rule, 'actions', []).map(action => (
+						{get(rule, 'actions', []).map((action) => (
 							<div key={action.type} className={section}>
 								<ActionView action={action} />
 							</div>
@@ -213,9 +213,9 @@ class QueryCard extends React.Component {
 	}
 }
 
-const mapDispatchToProps = dispatch => ({
-	removeRule: id => dispatch(deleteRule(id)),
-	toggleRule: rule => dispatch(toggleRuleStatus(rule)),
+const mapDispatchToProps = (dispatch) => ({
+	removeRule: (id) => dispatch(deleteRule(id)),
+	toggleRule: (rule) => dispatch(toggleRuleStatus(rule)),
 });
 
 export default connect(null, mapDispatchToProps)(QueryCard);

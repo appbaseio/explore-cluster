@@ -11,14 +11,14 @@ export const getSynonyms = ({ appName, credentials }) => {
 				'Content-Type': 'application/json',
 			},
 		})
-			.then(res => res.json())
-			.then(res => {
+			.then((res) => res.json())
+			.then((res) => {
 				if (res.error) {
 					reject(res.error);
 				}
 				resolve(res);
 			})
-			.catch(e => reject(e));
+			.catch((e) => reject(e));
 	});
 };
 
@@ -33,14 +33,14 @@ export const updateSynonyms = ({ appName, credentials, synonyms }) => {
 			},
 			body: JSON.stringify(synonyms),
 		})
-			.then(res => res.json())
-			.then(res => {
+			.then((res) => res.json())
+			.then((res) => {
 				if (res.error) {
 					reject(res.error);
 				}
 				resolve(res);
 			})
-			.catch(e => reject(e));
+			.catch((e) => reject(e));
 	});
 };
 
@@ -54,13 +54,13 @@ export const deleteSynonym = ({ id, credentials }) => {
 				'Content-Type': 'application/json',
 			},
 		})
-			.then(res => res.json())
-			.then(res => {
+			.then((res) => res.json())
+			.then((res) => {
 				if (res.error) {
 					reject(res.error);
 				}
 				resolve(res);
 			})
-			.catch(e => reject(e));
+			.catch((e) => reject(e));
 	});
 };

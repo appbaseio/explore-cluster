@@ -67,7 +67,7 @@ export class ReviewAndSave extends React.Component {
 				>
 					<DiffTable
 						object={difference}
-						parseDiff={field => ({
+						parseDiff={(field) => ({
 							setting: field,
 							value: {
 								old: get(oldValues, field),

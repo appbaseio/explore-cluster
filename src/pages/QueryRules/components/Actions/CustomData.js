@@ -10,7 +10,7 @@ class CustomData extends React.Component {
 		};
 	}
 
-	handleRequestDataChange = value => {
+	handleRequestDataChange = (value) => {
 		this.setState({ requestData: value });
 		try {
 			const parsedData = JSON.parse(value);

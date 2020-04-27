@@ -30,7 +30,7 @@ class HelpButton extends React.Component {
 		});
 	};
 
-	handleChange = e => {
+	handleChange = (e) => {
 		const { name, value } = e.target;
 		this.setState({
 			[name]: value,
@@ -70,8 +70,8 @@ class HelpButton extends React.Component {
 					}),
 				},
 			)
-				.then(res => res.json())
-				.then(data => {
+				.then((res) => res.json())
+				.then((data) => {
 					const displayMessage = data.inlineMessage
 						.replace('<p>', '')
 						.replace('</p>', '');
@@ -90,7 +90,7 @@ class HelpButton extends React.Component {
 		}
 	};
 
-	handleClick = e => {
+	handleClick = (e) => {
 		const { key } = e;
 		switch (key) {
 			case 'chat': {
@@ -188,7 +188,7 @@ class HelpButton extends React.Component {
 	}
 }
 
-const HelpChat = props =>
+const HelpChat = (props) =>
 	ReactDOM.createPortal(<HelpButton {...props} />, document.getElementById('help'));
 
 export default HelpChat;

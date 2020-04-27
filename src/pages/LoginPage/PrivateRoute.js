@@ -17,7 +17,7 @@ function getHelpChatParam() {
 const PrivateRoute = ({ component: Component, user, ...rest }) => (
 	<Route
 		{...rest}
-		render={props =>
+		render={(props) =>
 			user.data ? (
 				<React.Fragment>
 					<Component {...props} />

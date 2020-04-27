@@ -121,20 +121,20 @@ class RoleBaseAccess extends React.Component {
 		});
 	};
 
-	handleChange = e => {
+	handleChange = (e) => {
 		this.setState({
 			[e.target.name]: e.target.value,
 		});
 	};
 
-	handleRole = e => {
+	handleRole = (e) => {
 		this.setState({
 			[e.target.name]: e.target.value,
 		});
 	};
 
-	setLoading = id => {
-		this.setState(prevState => ({
+	setLoading = (id) => {
+		this.setState((prevState) => ({
 			loadingKey: {
 				...prevState.loadingKey,
 				[id]: prevState.loadingKey[id] ? !prevState.loadingKey[id] : true,
@@ -142,8 +142,8 @@ class RoleBaseAccess extends React.Component {
 		}));
 	};
 
-	showKey = id => {
-		this.setState(prevState => ({
+	showKey = (id) => {
+		this.setState((prevState) => ({
 			visibleKey: {
 				...prevState.visibleKey,
 				[id]: prevState.visibleKey[id] ? !prevState.visibleKey[id] : true,
@@ -151,7 +151,7 @@ class RoleBaseAccess extends React.Component {
 		}));
 	};
 
-	saveRole = async value => {
+	saveRole = async (value) => {
 		try {
 			this.setLoading(value.username);
 			const { fetchPermissions } = this.props;
@@ -293,21 +293,21 @@ class RoleBaseAccess extends React.Component {
 							<Skeleton />
 						) : (
 							<Table
-								rowKey={record => record.username || 'permissions'}
+								rowKey={(record) => record.username || 'permissions'}
 								dataSource={permissions}
 								locale={emptyData}
 							>
 								<Column
 									title="Description"
 									key="description"
-									render={value =>
+									render={(value) =>
 										(value && value.description) || 'No Description'
 									}
 								/>
 								<Column
 									title="Credentials"
 									key="credentials"
-									render={value => (
+									render={(value) => (
 										<div>
 											{visibleKey[`${value.username}`]
 												? `${value.username}:${value.password}`
@@ -336,7 +336,7 @@ class RoleBaseAccess extends React.Component {
 								<Column
 									title="Role"
 									key="role"
-									render={value => (
+									render={(value) => (
 										<Input
 											defaultValue={value && value.role}
 											name={value.username}
@@ -349,7 +349,7 @@ class RoleBaseAccess extends React.Component {
 								<Column
 									title=""
 									key="action"
-									render={value => (
+									render={(value) => (
 										<Button
 											disabled={
 												(this.state[`${value.username}`] || '') ===
@@ -378,7 +378,7 @@ class RoleBaseAccess extends React.Component {
 	}
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
 	const planState = getAppPlanByName(state);
 	const appPermissions = getAppPermissionsByName(state);
 
@@ -396,9 +396,9 @@ const mapStateToProps = state => {
 		roleKey: get(state, '$getAppPublicKey.results.role_key', ''),
 	};
 };
-const mapDispatchToProps = dispatch => ({
-	fetchPermissions: appName => dispatch(getPermission(appName)),
-	fetchPublicKey: appName => dispatch(getPublicKey(appName)),
+const mapDispatchToProps = (dispatch) => ({
+	fetchPermissions: (appName) => dispatch(getPermission(appName)),
+	fetchPublicKey: (appName) => dispatch(getPublicKey(appName)),
 	setKeyes: (appName, publicKey, roleKey) =>
 		dispatch(
 			updatePublicKey(appName, isBase64(publicKey) ? publicKey : btoa(publicKey), roleKey),

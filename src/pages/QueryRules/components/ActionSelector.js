@@ -63,7 +63,7 @@ class ActionSelector extends React.Component {
 		);
 	}
 
-	handleDropdown = value => {
+	handleDropdown = (value) => {
 		const { onChange } = this.props;
 
 		onChange({
@@ -84,7 +84,7 @@ class ActionSelector extends React.Component {
 	render() {
 		const { actions: selectedActions, error, condition } = this.props;
 		const optionsToShow = Object.keys(actions).filter(
-			action => !(selectedActions || []).find(item => item.type === action),
+			(action) => !(selectedActions || []).find((item) => item.type === action),
 		);
 		return (
 			<Card className={css([cardStyles, getErrorClass(error)])} hoverable>
@@ -96,7 +96,7 @@ class ActionSelector extends React.Component {
 						style={{ width: '100%' }}
 						value={undefined}
 					>
-						{optionsToShow.map(action => (
+						{optionsToShow.map((action) => (
 							<Option disabled={this.getDisabled(condition, action)} key={action}>
 								{actions[action].name}
 							</Option>

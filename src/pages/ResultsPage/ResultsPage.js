@@ -32,12 +32,12 @@ const bannerMessage = {
 	buttonText: 'Read Docs',
 };
 
-const getDisabled = value => {
+const getDisabled = (value) => {
 	if (Array.isArray(value)) return value[0] === '*';
 	return false;
 };
 
-const calculateValue = value => {
+const calculateValue = (value) => {
 	const index = value.indexOf('*');
 	if (index > -1) {
 		if (index === 0 && value.length !== 1) {
@@ -63,7 +63,7 @@ class ResultsPage extends React.Component {
 			getDefaultSettingsAction,
 			defaultSettings,
 		} = this.props;
-		getSettingsAction(appName).then(res => {
+		getSettingsAction(appName).then((res) => {
 			if (res && res.payload) {
 				this.setFormValues(res, getFieldDecorator, setFieldsValue);
 			}
@@ -72,7 +72,7 @@ class ResultsPage extends React.Component {
 		this.getMappings();
 	}
 
-	resetResultSettings = e => {
+	resetResultSettings = (e) => {
 		e.preventDefault();
 		const {
 			getDefaultSettingsAction,
@@ -82,7 +82,7 @@ class ResultsPage extends React.Component {
 		if (defaultSettings)
 			this.setFormValues({ payload: defaultSettings }, getFieldDecorator, setFieldsValue);
 		else
-			getDefaultSettingsAction().then(res => {
+			getDefaultSettingsAction().then((res) => {
 				if (res && res.payload) {
 					this.setFormValues(res, getFieldDecorator, setFieldsValue);
 				}
@@ -112,7 +112,7 @@ class ResultsPage extends React.Component {
 		});
 	};
 
-	registerFields = getFieldDecorator => {
+	registerFields = (getFieldDecorator) => {
 		getFieldDecorator('number_of_fragments');
 		getFieldDecorator('fragment_size');
 		getFieldDecorator('pre_tags');
@@ -120,14 +120,14 @@ class ResultsPage extends React.Component {
 		getFieldDecorator('highlightFields');
 	};
 
-	handleSubmit = e => {
+	handleSubmit = (e) => {
 		e.preventDefault();
 		const { form, updateSettingsAction, appName, settings } = this.props;
 		form.validateFields((err, values) => {
 			if (!err) {
 				const resultsPayload = this.getResultsPayload(values);
 				updateSettingsAction(appName, { ...settings, results: resultsPayload }).then(
-					res => {
+					(res) => {
 						if (res && res.error) {
 							notification.error({
 								message: 'Error',
@@ -150,7 +150,7 @@ class ResultsPage extends React.Component {
 		}
 	}
 
-	getResultsPayload = values => {
+	getResultsPayload = (values) => {
 		const { defaultSettings } = this.props;
 		const defaultHighlightOptions = get(defaultSettings, 'results.highlightOptions', {});
 		const { pre_tags, number_of_fragments, fragment_size } = values;
@@ -194,10 +194,10 @@ class ResultsPage extends React.Component {
 					tokenSeparators={[',']}
 					disabled={getDisabled(excludeFields)}
 					value={includeFields}
-					onChange={value => this.setState({ includeFields: calculateValue(value) })}
+					onChange={(value) => this.setState({ includeFields: calculateValue(value) })}
 				>
 					<Select.Option key="*">* (Include all fields)</Select.Option>
-					{(this.props.mappings || []).map(v => {
+					{(this.props.mappings || []).map((v) => {
 						if (!excludeFields.includes(v)) {
 							return (
 								<Select.Option key={v} title={v}>
@@ -226,10 +226,10 @@ class ResultsPage extends React.Component {
 					tokenSeparators={[',']}
 					disabled={getDisabled(includeFields)}
 					value={excludeFields}
-					onChange={value => this.setState({ excludeFields: calculateValue(value) })}
+					onChange={(value) => this.setState({ excludeFields: calculateValue(value) })}
 				>
 					<Select.Option key="*">* (Exclude all fields)</Select.Option>
-					{(this.props.mappings || []).map(v => {
+					{(this.props.mappings || []).map((v) => {
 						if (!includeFields.includes(v)) {
 							return (
 								<Select.Option key={v} title={v}>
@@ -264,7 +264,7 @@ class ResultsPage extends React.Component {
 						style={{ width: '100%' }}
 						tokenSeparators={[',']}
 					>
-						{(this.props.mappings || []).map(v => {
+						{(this.props.mappings || []).map((v) => {
 							return (
 								<Select.Option key={v} title={v}>
 									{v}
@@ -318,7 +318,7 @@ class ResultsPage extends React.Component {
 	);
 
 	toggleVisible = (isReset = false) => {
-		this.setState(prevState => ({ visible: !prevState.visible, isReset }));
+		this.setState((prevState) => ({ visible: !prevState.visible, isReset }));
 	};
 
 	revertChanges = (settings, getFieldDecorator, setFieldsValue) => {
@@ -432,7 +432,7 @@ class ResultsPage extends React.Component {
 								onRevert={() => {
 									this.revertChanges(settings, getFieldDecorator, setFieldsValue);
 								}}
-								onSave={e => {
+								onSave={(e) => {
 									this.handleSubmit(e);
 									this.toggleVisible();
 								}}
@@ -445,7 +445,7 @@ class ResultsPage extends React.Component {
 	}
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');
 	const mappings = getTraversedMappingsByAppName(state);
 	const parsedMappings = Array.isArray(mappings) ? mappings : [];
@@ -464,9 +464,9 @@ const mapStateToProps = state => {
 	};
 };
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
-	getSettingsAction: name => dispatch(getSettings(name)),
+	getSettingsAction: (name) => dispatch(getSettings(name)),
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
 	fetchMappings: (appName, credentials) => dispatch(getAppMappings(appName, credentials)),
 });

@@ -52,7 +52,7 @@ UpgradeBtnSidebar.propTypes = {
 	plan: PropTypes.string.isRequired,
 	link: PropTypes.string.isRequired,
 };
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	plan: get(getAppPlanByName(state), 'plan', 'free'),
 });
 export default connect(mapStateToProps)(UpgradeBtnSidebar);

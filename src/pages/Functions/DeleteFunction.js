@@ -29,7 +29,7 @@ function DeleteFunction({ name, deleteFunctions, loading }) {
 				Type the function name <span style={{ fontWeight: '600' }}>{name}</span> below to
 				delete this function. This action cannot be undone.
 				<Input
-					onChange={event => {
+					onChange={(event) => {
 						const { value } = event.target;
 						setDisabled(value !== name);
 					}}
@@ -40,8 +40,8 @@ function DeleteFunction({ name, deleteFunctions, loading }) {
 	);
 }
 
-const mapDispatchToProps = dispatch => ({
-	deleteFunctions: funcName => dispatch(deleteFunction(funcName)),
+const mapDispatchToProps = (dispatch) => ({
+	deleteFunctions: (funcName) => dispatch(deleteFunction(funcName)),
 });
 
 export default connect(null, mapDispatchToProps)(DeleteFunction);

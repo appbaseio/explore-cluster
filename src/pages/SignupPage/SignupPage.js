@@ -10,7 +10,7 @@ import { getURL } from '../../constants/config';
 import { container, card, githubBtn, googleBtn, gitlabBtn } from '../LoginPage/styles';
 import { checkbox } from './styles';
 
-const getSignupURL = provider => {
+const getSignupURL = (provider) => {
 	const ACC_API = getURL();
 	return `${ACC_API}/login/${provider}?next=${window.location.origin}`;
 };
@@ -21,12 +21,12 @@ class SignupPage extends React.Component {
 		hasSubscribed: false,
 	};
 
-	handleChange = e => {
+	handleChange = (e) => {
 		const {
 			target: { name: checkboxName },
 		} = e;
 
-		this.setState(state => ({
+		this.setState((state) => ({
 			...state,
 			[checkboxName]: !state[checkboxName],
 		}));

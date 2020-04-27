@@ -61,7 +61,7 @@ PopularResultsWrapper.propTypes = {
 	isGrowth: PropTypes.bool.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	plan: get(state, '$getAppPlan.results.plan'),
 	isGrowth: get(state, '$getAppPlan.results.isPaid'),
 });

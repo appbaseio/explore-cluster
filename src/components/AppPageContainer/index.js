@@ -86,8 +86,8 @@ const mapStateToProps = (state, ownProps) => {
 	};
 };
 
-const mapDispatchToProps = dispatch => ({
-	updateCurrentApp: appName => dispatch(setCurrentApp(appName, appName)),
+const mapDispatchToProps = (dispatch) => ({
+	updateCurrentApp: (appName) => dispatch(setCurrentApp(appName, appName)),
 	fetchClusterPlan: () => dispatch(getAppPlan()),
 });
 

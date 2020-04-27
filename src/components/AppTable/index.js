@@ -14,7 +14,7 @@ const tableStyle = css`
 	padding: 10px;
 `;
 
-const getFileSizeInBytes = size => {
+const getFileSizeInBytes = (size) => {
 	if (typeof size !== 'string') return size;
 	const sizeInt = size.match(/\d+/)[0];
 	if (size.includes('gb')) {
@@ -73,7 +73,7 @@ const columns = [
 	{
 		title: 'Health',
 		dataIndex: 'health',
-		render: text => (
+		render: (text) => (
 			<span
 				style={{
 					backgroundColor: text === 'green' ? 'limegreen' : text,
@@ -88,11 +88,11 @@ function AppTable({ apps, history, onCreateModalChange }) {
 	return (
 		<Table
 			className={tableStyle}
-			rowKey={record => record.index}
+			rowKey={(record) => record.index}
 			dataSource={apps}
 			columns={columns}
 			scroll={{ x: '74vw' }}
-			expandedRowRender={record => (
+			expandedRowRender={(record) => (
 				<AppActions
 					onExploreClick={() => {
 						history.push(`/app/${record.alias || record.index}/overview`);

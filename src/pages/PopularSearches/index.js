@@ -47,14 +47,14 @@ const PopularSearchesWrapper = ({ appName, plan, isPaidUser }) => (
 				</Container>
 			</React.Fragment>
 		) : (
-				<React.Fragment>
-					<Banner {...bannerMessagesAnalytics.free} />
-					<Overlay
-						src="/static/images/analytics/PopularSearches.png"
-						alt="popular searches"
-					/>
-				</React.Fragment>
-			)}
+			<React.Fragment>
+				<Banner {...bannerMessagesAnalytics.free} />
+				<Overlay
+					src="/static/images/analytics/PopularSearches.png"
+					alt="popular searches"
+				/>
+			</React.Fragment>
+		)}
 	</React.Fragment>
 );
 
@@ -64,7 +64,7 @@ PopularSearchesWrapper.propTypes = {
 	isPaidUser: PropTypes.bool.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	appName: get(state, '$getCurrentApp.name'),
 	plan: get(state, '$getAppPlan.results.plan'),
 	isPaidUser: get(state, '$getAppPlan.results.isPaid'),

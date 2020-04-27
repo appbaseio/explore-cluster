@@ -23,7 +23,7 @@ import { ARC_PLANS, PRICE_BY_PLANS } from '../../batteries/utils';
 import PaymentButton from './PaymentButton';
 
 const CheckList = ({ list }) =>
-	list.map(item => (
+	list.map((item) => (
 		<li key={item}>
 			<Check css={{ marginRight: '6px', fontWeight: 'strong' }} width="15" height="15" />{' '}
 			{item}
@@ -273,14 +273,14 @@ class PricingTable extends Component {
 		const isTesting = false; // SET true to test with test stripe keys
 		if (subscriptionID) {
 			// Update plan
-			createSubscription(null, plan, isTesting).then(response => {
+			createSubscription(null, plan, isTesting).then((response) => {
 				if (response && response.payload) {
 					fetchAppPlan();
 				}
 			});
 		} else {
 			// Create subscription
-			createSubscription(token, plan, isTesting).then(response => {
+			createSubscription(token, plan, isTesting).then((response) => {
 				if (response && response.payload) {
 					fetchAppPlan();
 				}
@@ -304,7 +304,7 @@ class PricingTable extends Component {
 
 	deleteSubscription = () => {
 		const { deleteSubscription } = this.props;
-		deleteSubscription().then(action => {
+		deleteSubscription().then((action) => {
 			const message = get(action, 'payload.message');
 			if (message) {
 				this.cancelConfirmBox();
@@ -321,7 +321,7 @@ class PricingTable extends Component {
 		const { deleteSubscription, fetchAppPlan } = this.props;
 		deleteSubscription({
 			otp: String(otp),
-		}).then(action => {
+		}).then((action) => {
 			const payload = get(action, 'payload');
 			if (payload) {
 				this.closeOtpModal();
@@ -342,7 +342,7 @@ class PricingTable extends Component {
 		this.setState({
 			resending: true,
 		});
-		deleteSubscription().then(action => {
+		deleteSubscription().then((action) => {
 			this.setState({
 				resending: false,
 			});
@@ -364,7 +364,7 @@ class PricingTable extends Component {
 		onToggleUnsubscribeModal();
 	};
 
-	getPlan = value => `$${value}`;
+	getPlan = (value) => `$${value}`;
 
 	render() {
 		const {
@@ -424,7 +424,7 @@ class PricingTable extends Component {
 								name="otp"
 								value={otp}
 								autoFocus
-								onChange={e => {
+								onChange={(e) => {
 									this.setState({
 										otp: e.target.value,
 									});
@@ -769,7 +769,7 @@ class PricingTable extends Component {
 						stripeName="Arc basic plan"
 						plan={ARC_PLANS.ARC_BASIC}
 						amount={PRICE_BY_PLANS[ARC_PLANS.ARC_BASIC] * 100}
-						token={token => this.handleToken(token, ARC_PLANS.ARC_BASIC)}
+						token={(token) => this.handleToken(token, ARC_PLANS.ARC_BASIC)}
 						stripeKey={this.stripeKey}
 						pricingList={[]}
 					>
@@ -808,7 +808,7 @@ class PricingTable extends Component {
 						price={this.getPlan(PRICE_BY_PLANS[ARC_PLANS.ARC_STANDARD])}
 						stripeName="Appbase.io Standard Plan"
 						amount={PRICE_BY_PLANS[ARC_PLANS.ARC_STANDARD] * 100}
-						token={token => this.handleToken(token, ARC_PLANS.ARC_STANDARD)}
+						token={(token) => this.handleToken(token, ARC_PLANS.ARC_STANDARD)}
 						stripeKey={this.stripeKey}
 						linkColor="inherit"
 						pricingList={[]}
@@ -850,7 +850,7 @@ class PricingTable extends Component {
 						price={this.getPlan(PRICE_BY_PLANS[ARC_PLANS.ARC_ENTERPRISE])}
 						stripeName="Arc enterprise plan"
 						amount={PRICE_BY_PLANS[ARC_PLANS.ARC_ENTERPRISE] * 100}
-						token={token => this.handleToken(token, ARC_PLANS.ARC_ENTERPRISE)}
+						token={(token) => this.handleToken(token, ARC_PLANS.ARC_ENTERPRISE)}
 						stripeKey={this.stripeKey}
 						linkColor="inherit"
 						pricingList={[]}
@@ -908,7 +908,7 @@ PricingTable.propTypes = {
 	errors: PropTypes.array.isRequired,
 	subscriptionID: PropTypes.string,
 };
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
 	const appPlan = getAppPlanByName(state);
 	return {
 		isSubmitting: get(state, '$deleteAppSubscription.isFetching'),
@@ -925,10 +925,10 @@ const mapStateToProps = state => {
 	};
 };
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	createSubscription: (plan, stripeToken, test) =>
 		dispatch(createAppSubscription(plan, stripeToken, test)),
-	deleteSubscription: payload => dispatch(deleteAppSubscription(payload)),
+	deleteSubscription: (payload) => dispatch(deleteAppSubscription(payload)),
 	fetchAppPlan: () => dispatch(getAppPlan()),
 });
 

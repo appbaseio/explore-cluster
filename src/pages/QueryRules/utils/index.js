@@ -34,9 +34,9 @@ const getValueFromExpression = (expression = '') => {
 		query: '',
 		queryValue: '',
 	};
-	const indexQuery = allQueries.find(query => query.includes('$index'));
-	const searchQuery = allQueries.find(query => query.includes('$query'));
-	const filterQuery = allQueries.find(query => query.includes('$filter'));
+	const indexQuery = allQueries.find((query) => query.includes('$index'));
+	const searchQuery = allQueries.find((query) => query.includes('$query'));
+	const filterQuery = allQueries.find((query) => query.includes('$filter'));
 	if (indexQuery) {
 		const isDoubleQuotePresent = indexQuery.includes(`"`);
 		value.selectedIndexes = indexQuery
@@ -98,7 +98,7 @@ const hasValuesChanged = (prevValue, nextValue, keys) => {
 	}
 
 	const keysChanged = keys.some(
-		key => JSON.stringify(get(prevValue, key)) !== JSON.stringify(get(nextValue, key)),
+		(key) => JSON.stringify(get(prevValue, key)) !== JSON.stringify(get(nextValue, key)),
 	);
 	return keysChanged;
 };

@@ -13,7 +13,7 @@ class Result extends React.Component {
 		view: 'list',
 	};
 
-	handleViewChange = e => {
+	handleViewChange = (e) => {
 		this.setState({
 			view: e.target.value,
 		});
@@ -41,9 +41,9 @@ class Result extends React.Component {
 												Query {rulesApplied.length > 1 ? 'rules' : 'rule'}{' '}
 												applied
 											</Typography.Text>
-											{rulesApplied.map(rule => {
+											{rulesApplied.map((rule) => {
 												const ruleInfo = (rules || []).find(
-													r => r.id === rule,
+													(r) => r.id === rule,
 												);
 
 												return (

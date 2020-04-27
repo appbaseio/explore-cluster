@@ -13,7 +13,7 @@ export function DiffTable({ object, parseDiff }) {
 				{
 					title: 'Setting',
 					dataIndex: 'setting',
-					render: text => (
+					render: (text) => (
 						<>
 							<div style={{ fontSize: 16, fontWeight: 600 }}>
 								{get(settingsMap, [text, 'title'], text)}

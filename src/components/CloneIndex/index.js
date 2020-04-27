@@ -22,7 +22,7 @@ const radioStyle = css`
 	line-height: 30px;
 `;
 
-const CloneIndex = props => {
+const CloneIndex = (props) => {
 	const { handleCancel, index, existingApps, history, tier, featureSearchRelevancy } = props;
 	const [destIndex, setDestIndex] = useState('');
 	const [action, setAction] = useState(['settings.mappings', 'data']);
@@ -43,7 +43,7 @@ const CloneIndex = props => {
 			return;
 		}
 		setLoading(true);
-		const actions = flatten(map(action, item => item.split('.')));
+		const actions = flatten(map(action, (item) => item.split('.')));
 		let hasSearchRelevancy;
 		if (actions.includes('search_relevancy')) {
 			hasSearchRelevancy = true;
@@ -62,7 +62,7 @@ const CloneIndex = props => {
 				addApp({ [destIndex]: {} });
 				history.push(`/app/${destIndex}/overview`);
 			})
-			.catch(e => {
+			.catch((e) => {
 				message.error(e.message);
 				resetValues();
 			});
@@ -150,16 +150,16 @@ CloneIndex.defaultProps = {
 	handleCancel: () => {},
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	existingApps: Object.keys(state.apps.data || {}),
 	tier: get(state, '$getAppPlan.results.tier'),
 	featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
 });
 
-const mapDispatchToProps = dispatch => ({
-	getSettingsAction: name => dispatch(getSettings(name)),
+const mapDispatchToProps = (dispatch) => ({
+	getSettingsAction: (name) => dispatch(getSettings(name)),
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
-	addApp: appName => dispatch(appendApp(appName)),
+	addApp: (appName) => dispatch(appendApp(appName)),
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(CloneIndex));

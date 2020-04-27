@@ -12,7 +12,7 @@ class InsightLink extends React.Component {
 	}
 
 	toggleLoader = () => {
-		this.setState(state => ({
+		this.setState((state) => ({
 			frameLoading: !state.frameLoading,
 		}));
 	};

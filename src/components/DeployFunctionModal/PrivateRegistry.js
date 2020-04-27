@@ -29,7 +29,7 @@ const PrivateRegistry = ({ registry, updateRegistry, error, success, loading }) 
 		} else setDidMount(true);
 	}, [error, success]);
 
-	const handleSubmit = async e => {
+	const handleSubmit = async (e) => {
 		e.preventDefault();
 		setLocalError({
 			email: !email,
@@ -37,7 +37,7 @@ const PrivateRegistry = ({ registry, updateRegistry, error, success, loading }) 
 			url: !url,
 			username: !username,
 		});
-		if ([email, password, url, username].some(item => !item)) return;
+		if ([email, password, url, username].some((item) => !item)) return;
 		updateRegistry({
 			username,
 			password,
@@ -47,7 +47,7 @@ const PrivateRegistry = ({ registry, updateRegistry, error, success, loading }) 
 	};
 	const handleInputRequired = handleInputClosure(setLocalError, localError);
 
-	const handleEmailChange = e => {
+	const handleEmailChange = (e) => {
 		const { value } = e.target;
 		const hasError = Validators.email({ value }) || {};
 		setEmail(value);
@@ -127,7 +127,7 @@ const PrivateRegistry = ({ registry, updateRegistry, error, success, loading }) 
 						</Row>
 						<Row style={{ marginTop: '16px' }}>
 							<Button
-								disabled={Object.values(localError).some(item => item)}
+								disabled={Object.values(localError).some((item) => item)}
 								onClick={handleSubmit}
 								loading={loading}
 								type="primary"
@@ -142,15 +142,15 @@ const PrivateRegistry = ({ registry, updateRegistry, error, success, loading }) 
 	);
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	registry: get(state, '$getAppRegistries'),
 	loading: get(state, '$getAppRegistries.updating'),
 	success: get(state, '$getAppRegistries.success'),
 	error: get(state, '$getAppRegistries.error'),
 });
 
-const mapDispatchToProps = dispatch => ({
-	updateRegistry: payload => dispatch(updatePrivateRegistry(payload)),
+const mapDispatchToProps = (dispatch) => ({
+	updateRegistry: (payload) => dispatch(updatePrivateRegistry(payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(PrivateRegistry);

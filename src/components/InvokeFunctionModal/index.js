@@ -129,7 +129,7 @@ const InvokeFunctionModal = ({
 		);
 	}
 
-	const handleRequestDataChange = value => {
+	const handleRequestDataChange = (value) => {
 		let isValid = true;
 		setRequestData(value);
 		try {
@@ -194,18 +194,15 @@ InvokeFunctionModal.defaultProps = {
 	invocationCount: 0,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	loading: get(state, '$getAppFunctions.isInvoking'),
 	error: get(state, '$getAppFunctions.error'),
 	success: get(state, '$getAppFunctions.success'),
 	invokeResults: get(state, '$getAppFunctions.invokeResults'),
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	invokeFunction: (name, payload) => dispatch(invokeFunction(name, payload)),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(InvokeFunctionModal);
+export default connect(mapStateToProps, mapDispatchToProps)(InvokeFunctionModal);

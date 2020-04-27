@@ -36,7 +36,7 @@ export const highlighter = css`
 	animation: grow 1s infinite ease;
 `;
 
-const Search = props => {
+const Search = (props) => {
 	const { app, search } = props;
 	return (
 		<Card>

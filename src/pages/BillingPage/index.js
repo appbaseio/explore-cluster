@@ -111,7 +111,7 @@ class Billing extends Component {
 	}
 
 	onShowUnsubscribeArcModal = () => {
-		this.setState(currentState => ({
+		this.setState((currentState) => ({
 			isShowingUnsubscribeArcModal: !currentState.isShowingUnsubscribeArcModal,
 		}));
 	};
@@ -336,7 +336,7 @@ Billing.propTypes = {
 	errors: PropTypes.array.isRequired,
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
 	const appPlan = getAppPlanByName(state);
 	return {
 		isFetchingPlan: get(state, '$getAppPlan.isFetching'),
@@ -354,9 +354,9 @@ const mapStateToProps = state => {
 	};
 };
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	fetchAppPlan: () => dispatch(getAppPlan()),
-	updatePayment: token => dispatch(updateAppPaymentMethod(token, 'APP')),
+	updatePayment: (token) => dispatch(updateAppPaymentMethod(token, 'APP')),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Billing);

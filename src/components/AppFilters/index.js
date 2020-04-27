@@ -37,17 +37,17 @@ function AppFilters({ apps, children, preferences, updatePreferences }) {
 	const setFilteredData = () => {
 		const dataToPonder = systemIndices
 			? apps
-			: apps.filter(dataItem => dataItem.index && dataItem.index[0] !== '.');
-		setData(dataToPonder.filter(dataItem => (dataItem.index || '').includes(searchTerm)));
+			: apps.filter((dataItem) => dataItem.index && dataItem.index[0] !== '.');
+		setData(dataToPonder.filter((dataItem) => (dataItem.index || '').includes(searchTerm)));
 	};
-	const handleInputChange = e => {
+	const handleInputChange = (e) => {
 		setSearchTerm(e.target.value);
 	};
-	const handleCheckboxChange = e => {
+	const handleCheckboxChange = (e) => {
 		setSystemIndices(e.target.checked);
 		updatePreferences({ showSystemIndices: e.target.checked });
 	};
-	const handleListToggle = checked => {
+	const handleListToggle = (checked) => {
 		setListView(checked);
 		updatePreferences({ showListView: checked });
 	};
@@ -76,7 +76,7 @@ function AppFilters({ apps, children, preferences, updatePreferences }) {
 					<Radio.Group
 						defaultValue={preferences.showListView ? 'list' : 'card'}
 						buttonStyle="solid"
-						onChange={e => handleListToggle(e.target.value === 'list')}
+						onChange={(e) => handleListToggle(e.target.value === 'list')}
 					>
 						<Tooltip title="Show as grid view" placement="topRight">
 							<Radio.Button value="card">
@@ -104,12 +104,12 @@ AppFilters.defaultProps = {
 	apps: [],
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	preferences: state.appsScreenPreferences,
 });
 
-const mapDispatchToProps = dispatch => ({
-	updatePreferences: payload => dispatch(updateAppScreenPreferences(payload)),
+const mapDispatchToProps = (dispatch) => ({
+	updatePreferences: (payload) => dispatch(updateAppScreenPreferences(payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AppFilters);

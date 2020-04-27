@@ -22,7 +22,7 @@ FullHeader.propTypes = {
 	user: object.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	user: state.user.data,
 });
 

@@ -334,7 +334,7 @@ class FunctionsPage extends React.Component {
 		});
 	};
 
-	handleCancel = modalKey => {
+	handleCancel = (modalKey) => {
 		this.setState({ [modalKey]: false });
 	};
 
@@ -346,7 +346,7 @@ class FunctionsPage extends React.Component {
 		}
 	};
 
-	onDragEnd = result => {
+	onDragEnd = (result) => {
 		if (!result.destination) return;
 		if (result.destination.index === result.source.index) {
 			return;
@@ -364,12 +364,12 @@ class FunctionsPage extends React.Component {
 	};
 
 	toggleVisibility = () => {
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			visible: !prevState.visible,
 		}));
 	};
 
-	onAppSelect = app => {
+	onAppSelect = (app) => {
 		this.setState({ app, visible: true });
 	};
 
@@ -378,7 +378,7 @@ class FunctionsPage extends React.Component {
 		const { deployModal, checking, healthError, notFoundError, visible, app } = this.state;
 		this.sortedDataSource = (functions || []).sort((a, b) => a.order - b.order);
 
-		const filteredApps = keys(apps).filter(app => !app.startsWith('.'));
+		const filteredApps = keys(apps).filter((app) => !app.startsWith('.'));
 
 		if (tier && !isValidPlan(tier, featureFunctions, features.FUNCTIONS)) {
 			return (
@@ -497,7 +497,7 @@ class FunctionsPage extends React.Component {
 					<BeautifulDnd
 						onDragStart={this.onDragStart}
 						onDragEnd={this.onDragEnd}
-						render={dropProvided => (
+						render={(dropProvided) => (
 							<div ref={dropProvided.innerRef}>
 								<List
 									locale={{
@@ -528,7 +528,7 @@ class FunctionsPage extends React.Component {
 											</div>
 										),
 									}}
-									rowKey={item => item.function.service}
+									rowKey={(item) => item.function.service}
 									itemLayout="vertical"
 									dataSource={this.sortedDataSource}
 									renderItem={(item, index) => (
@@ -536,7 +536,7 @@ class FunctionsPage extends React.Component {
 											key={item.function.service}
 											item={item}
 											index={index}
-											render={dragProvided => (
+											render={(dragProvided) => (
 												<div
 													className={listItemClass}
 													ref={dragProvided.innerRef}
@@ -592,7 +592,7 @@ class FunctionsPage extends React.Component {
 													>
 														<FunctionItem
 															item={item}
-															onChange={e =>
+															onChange={(e) =>
 																this.handleEnable(e, item)
 															}
 															getFunction={getFunction}
@@ -641,7 +641,7 @@ FunctionsPage.propTypes = {
 	appName: string.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	type: get(state, '$getAppPlan.results.billing_type'),
 	user: get(state, 'user', { data: {} }),
 	isLoading: get(state, '$getAppFunctions.isFetching'),
@@ -651,12 +651,12 @@ const mapStateToProps = state => ({
 	apps: get(state, 'apps.data'),
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	putFunctions: (appName, payload) => dispatch(updateFunctions(appName, payload)),
-	fetchFunctions: appName => dispatch(getFunctions(appName)),
+	fetchFunctions: (appName) => dispatch(getFunctions(appName)),
 	reorderFunctions: (source, destination) => dispatch(reorderFunction(source, destination)),
 	fetchRegistries: () => dispatch(getPrivateRegistry()),
-	getFunction: appName => dispatch(getSingleFunction(appName)),
+	getFunction: (appName) => dispatch(getSingleFunction(appName)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(FunctionsPage);

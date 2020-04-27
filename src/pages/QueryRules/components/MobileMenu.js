@@ -11,7 +11,7 @@ const menuStyle = css`
 	}
 `;
 
-const MobileMenu = props => {
+const MobileMenu = (props) => {
 	const { rule, removeRule, toggleRule } = props;
 	return (
 		<Dropdown
@@ -29,7 +29,7 @@ const MobileMenu = props => {
 					<Menu.Item key="2">
 						<Checkbox
 							checked={rule.enabled}
-							onChange={e => toggleRule({ id: rule.id, enabled: e.target.checked })}
+							onChange={(e) => toggleRule({ id: rule.id, enabled: e.target.checked })}
 						>
 							Rule Status
 						</Checkbox>

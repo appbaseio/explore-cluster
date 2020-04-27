@@ -34,7 +34,7 @@ class GetAPIEndpoint extends React.Component {
 			const { fetchPermissions } = props;
 			fetchPermissions();
 		}
-		props.fetchTemplate(props.templateId).then(action => {
+		props.fetchTemplate(props.templateId).then((action) => {
 			if (get(action, 'payload')) {
 				const value = get(action, 'payload');
 				const source = get(value, 'script.source');
@@ -188,7 +188,7 @@ GetAPIEndpoint.propTypes = {
 	fetchPermissions: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	isLoading:
 		get(state, '$getAppTemplate.isFetching', false) ||
 		get(state, '$getAppPermissions.isFetching', false),
@@ -196,9 +196,9 @@ const mapStateToProps = state => ({
 	appName: get(state, '$getCurrentApp.name'),
 });
 
-const mapDispatchToProps = dispatch => ({
-	fetchTemplate: id => dispatch(getAppTemplate(id)),
-	fetchPermissions: appName => dispatch(getPermission(appName)),
+const mapDispatchToProps = (dispatch) => ({
+	fetchTemplate: (id) => dispatch(getAppTemplate(id)),
+	fetchPermissions: (appName) => dispatch(getPermission(appName)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(GetAPIEndpoint);

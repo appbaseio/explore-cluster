@@ -40,7 +40,7 @@ class Permission extends React.Component {
 	}
 
 	handleViewClick = () => {
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			viewKey: !prevState.viewKey,
 		}));
 	};

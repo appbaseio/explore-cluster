@@ -103,17 +103,17 @@ class Synonyms extends React.Component {
 			appName,
 			credentials,
 		})
-			.then(res => {
+			.then((res) => {
 				this.setState({
 					synonyms: res || [],
 				});
 			})
-			.catch(e => {
+			.catch((e) => {
 				message.error(e.message);
 			});
 	};
 
-	handleDelete = async id => {
+	handleDelete = async (id) => {
 		const { credentials, appName } = this.props;
 		const { synonyms } = this.state;
 		const url = getURL();
@@ -121,11 +121,13 @@ class Synonyms extends React.Component {
 			isDeleting: id,
 		});
 		const settings = await getSettings(appName, credentials, url).then(
-			data => data[appName].settings,
+			(data) => data[appName].settings,
 		);
 
 		const mappings = await getMappings(appName, credentials, url);
-		const syonymsToBeSaved = synonyms.filter(syn => syn._id !== id).map(item => item.synonym);
+		const syonymsToBeSaved = synonyms
+			.filter((syn) => syn._id !== id)
+			.map((item) => item.synonym);
 		const synonymsAnalyzerSettings = getSynonymsAnalyzerSettings({
 			settings,
 			isSynonymsAnalyzerPresent: true,
@@ -142,10 +144,10 @@ class Synonyms extends React.Component {
 						isDeleting: null,
 					});
 					message.success('Successfully deleted synonym');
-					const filteredSynonyms = synonyms.filter(syn => syn._id !== id);
+					const filteredSynonyms = synonyms.filter((syn) => syn._id !== id);
 					this.handleUpdate(filteredSynonyms);
 				})
-				.catch(e => {
+				.catch((e) => {
 					this.setState({
 						isDeleting: null,
 					});
@@ -161,13 +163,13 @@ class Synonyms extends React.Component {
 			appName,
 		})
 			.then(updateBackend)
-			.catch(e => {
+			.catch((e) => {
 				this.toggleLoading();
 				message.error(e.message || 'Failed to delete synonyms');
 			});
 	};
 
-	handleUpdate = synonyms => {
+	handleUpdate = (synonyms) => {
 		this.setState({
 			key: Date.now(),
 			synonyms,
@@ -307,7 +309,6 @@ class Synonyms extends React.Component {
 			},
 		];
 
-
 		return (
 			<React.Fragment>
 				<Banner {...bannerMessage} />
@@ -386,7 +387,7 @@ class Synonyms extends React.Component {
 								render={({ loading, data }) => (
 									<Table
 										loading={loading}
-										rowKey={row => {
+										rowKey={(row) => {
 											return row._id;
 										}}
 										pagination={false}
@@ -407,7 +408,7 @@ class Synonyms extends React.Component {
 	}
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
 	const { username, password } = get(state, 'user.data', {});
 	return {
 		credentials: username ? `${username}:${password}` : null,

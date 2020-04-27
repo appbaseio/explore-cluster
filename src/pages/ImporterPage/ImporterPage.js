@@ -82,7 +82,7 @@ class ImporterPage extends React.Component {
 	}
 
 	togglePreparing = () => {
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			preparingApp: !prevState.preparingApp,
 		}));
 	};
@@ -205,7 +205,7 @@ ImporterPage.propTypes = {
 	credentials: string.isRequired,
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
 	const { username, password } = get(state, 'user.data', {});
 	return {
 		credentials: username ? `${username}:${password}` : '',

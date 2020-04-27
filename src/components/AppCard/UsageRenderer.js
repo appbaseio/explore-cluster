@@ -20,7 +20,7 @@ const UsageRenderer = ({ computedMetrics, plan }) => {
 							width={60}
 							type="circle"
 							percent={action}
-							format={percent => `${percent}%`}
+							format={(percent) => `${percent}%`}
 							status={action > 90 ? 'exception' : null}
 						/>
 					</Col>
@@ -42,7 +42,7 @@ const UsageRenderer = ({ computedMetrics, plan }) => {
 							width={60}
 							type="circle"
 							percent={record}
-							format={percent => `${percent}%`}
+							format={(percent) => `${percent}%`}
 							status={record > 90 ? 'exception' : null}
 						/>
 					</Col>

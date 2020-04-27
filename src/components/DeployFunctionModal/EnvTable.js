@@ -28,7 +28,7 @@ const EnvTable = ({ dataSource: data, setData }) => {
 			...data.slice(index + 1),
 		]);
 	};
-	const handleDelete = index => {
+	const handleDelete = (index) => {
 		setData([...data.slice(0, index), ...data.slice(index + 1)]);
 	};
 	return (
@@ -40,14 +40,14 @@ const EnvTable = ({ dataSource: data, setData }) => {
 						<Input
 							value={dataItem.key}
 							placeholder="Key"
-							onChange={e => handleItemChange(e, index, 'key')}
+							onChange={(e) => handleItemChange(e, index, 'key')}
 						/>
 					</Col>
 					<Col span={11}>
 						<Input
 							value={dataItem.value}
 							placeholder="Value"
-							onChange={e => handleItemChange(e, index, 'value')}
+							onChange={(e) => handleItemChange(e, index, 'value')}
 						/>
 					</Col>
 					{data.length > 1 && (
