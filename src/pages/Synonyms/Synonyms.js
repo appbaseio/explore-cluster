@@ -214,8 +214,6 @@ class Synonyms extends React.Component {
 					if (record.type === 'one-way') {
 						return (
 							<span className={expression}>
-								{value.split('=>')[1]}
-								<Icon className="light" type="arrow-right" />
 								<span>( </span>
 								{value
 									.split('=>')[0]
@@ -232,6 +230,8 @@ class Synonyms extends React.Component {
 										);
 									})}
 								<span> )</span>
+								<Icon className="light" type="arrow-right" />
+								{value.split('=>')[1]}
 							</span>
 						);
 					}
