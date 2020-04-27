@@ -42,10 +42,10 @@ TemplateResponse.propTypes = {
 	clearValidate: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	validateResult: get(state, '$validateAppTemplate.results'),
 });
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	clearValidate: () => dispatch(clearAppTemplate()),
 });
 

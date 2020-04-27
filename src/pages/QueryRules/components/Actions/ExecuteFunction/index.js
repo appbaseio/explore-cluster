@@ -11,11 +11,11 @@ class ExecuteFunction extends Component {
 		this.state = { activeKey: 'trigger', selected: props.value };
 	}
 
-	handleRadioChange = value => {
+	handleRadioChange = (value) => {
 		this.setState({ selected: value });
 	};
 
-	setActiveKey = activeKey => this.setState({ activeKey });
+	setActiveKey = (activeKey) => this.setState({ activeKey });
 
 	render() {
 		const { activeKey, selected } = this.state;

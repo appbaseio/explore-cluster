@@ -54,13 +54,13 @@ class SynonymsModal extends React.Component {
 	}
 
 	toggleLoading = () => {
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			isLoading: !prevState.isLoading,
 		}));
 	};
 
 	handleModal = () => {
-		this.setState(state => ({
+		this.setState((state) => ({
 			showModal: !state.showModal,
 		}));
 	};
@@ -75,7 +75,7 @@ class SynonymsModal extends React.Component {
 		});
 	};
 
-	handleType = type => {
+	handleType = (type) => {
 		this.setState({
 			type,
 		});
@@ -102,12 +102,12 @@ class SynonymsModal extends React.Component {
 
 		// TODO: We need to consider already exisiting synonyms
 		const indexSynonyms = id
-			? allSynonyms.filter(syn => syn._id !== id).map(item => item.synonym)
-			: allSynonyms.map(item => item.synonym);
+			? allSynonyms.filter((syn) => syn._id !== id).map((item) => item.synonym)
+			: allSynonyms.map((item) => item.synonym);
 
 		const parsedSynonyms = getParsedSynonyms({ type, alternatives, synonyms, searchTerm });
 		const settings = await getSettings(appName, credentials, url).then(
-			data => data[appName].settings,
+			(data) => data[appName].settings,
 		);
 
 		const isSynonymsAnalyzerPresent = hasSynonymsAnalyzer(settings);
@@ -135,16 +135,16 @@ class SynonymsModal extends React.Component {
 					? [{ synonym: parsedSynonyms, type, index: appName }]
 					: [{ _id: id, synonym: parsedSynonyms, type, index: appName }],
 			})
-				.then(res => {
+				.then((res) => {
 					this.toggleLoading();
 					this.handleModal();
 					const filteredSynonyms = id
-						? allSynonyms.filter(syn => syn._id !== id)
+						? allSynonyms.filter((syn) => syn._id !== id)
 						: allSynonyms;
 					handleSynonyms([...filteredSynonyms, ...res]);
 					message.success('Synonyms updated Successfully');
 				})
-				.catch(e => {
+				.catch((e) => {
 					this.toggleLoading();
 					message.error(e.message || 'Failed while updating synonyms');
 				});
@@ -158,7 +158,7 @@ class SynonymsModal extends React.Component {
 			appName,
 		})
 			.then(handleSaveData)
-			.catch(e => {
+			.catch((e) => {
 				this.toggleLoading();
 				message.error(e.message || 'Failed to update synonyms');
 			});
@@ -230,7 +230,7 @@ class SynonymsModal extends React.Component {
 	}
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
 	const { username, password } = get(state, 'user.data', {});
 	const url = getURL();
 	return {

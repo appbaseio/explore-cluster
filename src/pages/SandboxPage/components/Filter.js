@@ -5,11 +5,11 @@ import { get } from 'lodash';
 import { MultiList } from '@appbaseio/reactivesearch';
 import { settingsMap } from '../../../components/ReviewAndSave/helper';
 
-const Filter = props => {
+const Filter = (props) => {
 	const { app, aggs } = props;
 	return (
 		<React.Fragment>
-			{aggs.map(agg => (
+			{aggs.map((agg) => (
 				<Card key={agg.dataField}>
 					<MultiList
 						{...agg}

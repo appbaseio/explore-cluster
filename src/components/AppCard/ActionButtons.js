@@ -133,7 +133,7 @@ class ActionButtons extends React.Component {
 			<div
 				className="card-actions"
 				key={appName}
-				onClick={e => {
+				onClick={(e) => {
 					e.preventDefault();
 					e.stopPropagation();
 				}}

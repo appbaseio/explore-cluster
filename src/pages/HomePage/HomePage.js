@@ -54,7 +54,7 @@ class HomePage extends Component {
 	}
 
 	handleChange = () => {
-		this.setState(state => ({
+		this.setState((state) => ({
 			showModal: !state.showModal,
 		}));
 	};
@@ -180,12 +180,12 @@ HomePage.propTypes = {
 	fetchApps: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	user: get(state, 'user.data.username'),
 	apps: get(state, 'apps'),
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	fetchApps: () => dispatch(loadApps()),
 });
 

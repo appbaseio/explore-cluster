@@ -70,7 +70,7 @@ class CreateFunction extends React.Component {
 	};
 
 	handleToggle = () => {
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			visible: !prevState.visible,
 		}));
 	};

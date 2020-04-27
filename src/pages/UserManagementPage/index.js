@@ -48,7 +48,7 @@ const columns = [
 	},
 	{
 		title: 'Actions',
-		render: permission => <Permission {...permission} />,
+		render: (permission) => <Permission {...permission} />,
 		key: 'credentials',
 	},
 ];
@@ -63,7 +63,7 @@ class UserManagementPage extends React.Component {
 		this.refetchPermissions();
 	}
 
-	showForm = permissionInfo => {
+	showForm = (permissionInfo) => {
 		if (permissionInfo) {
 			this.setState({
 				showForm: true,
@@ -96,7 +96,7 @@ class UserManagementPage extends React.Component {
 		});
 	};
 
-	handleSubmit = form => {
+	handleSubmit = (form) => {
 		const { credentials, createUser, updateUser } = this.props;
 		const { currentPermissionInfo } = this.state;
 		// handle edit
@@ -131,7 +131,7 @@ class UserManagementPage extends React.Component {
 		}
 	};
 
-	deletePermission = username => {
+	deletePermission = (username) => {
 		const { credentials, deleteUser } = this.props;
 		deleteUser(credentials, username).then(({ payload }) => {
 			if (payload) {
@@ -185,12 +185,12 @@ class UserManagementPage extends React.Component {
 					/>
 					<Table
 						scroll={{ x: 900 }}
-						dataSource={users.map(user => ({
+						dataSource={users.map((user) => ({
 							permissionInfo: user,
 							deletePermission: this.deletePermission,
 							showForm: this.showForm,
 						}))}
-						rowKey={row =>
+						rowKey={(row) =>
 							`${get(row, 'permissionInfo.username')}:${get(
 								row,
 								'permissionInfo.password',
@@ -236,7 +236,7 @@ UserManagementPage.propTypes = {
 	isFetching: PropTypes.bool.isRequired,
 	users: PropTypes.array, // eslint-disable-line
 };
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
 	const { username, password } = get(state, 'user.data', {});
 	return {
 		credentials: username ? `${username}:${password}` : null,
@@ -245,8 +245,8 @@ const mapStateToProps = state => {
 		isAdmin: get(state, 'user.data.isAdmin'),
 	};
 };
-const mapDispatchToProps = dispatch => ({
-	fetchUsers: credentials => dispatch(getClusterUsers(credentials)),
+const mapDispatchToProps = (dispatch) => ({
+	fetchUsers: (credentials) => dispatch(getClusterUsers(credentials)),
 	createUser: (credentials, payload) => dispatch(createClusterUser(credentials, payload)),
 	deleteUser: (credentials, username) => dispatch(deleteClusterUser(credentials, username)),
 	updateUser: (credentials, username, payload) =>

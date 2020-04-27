@@ -44,7 +44,7 @@ export default class Introduction extends Component {
 		};
 	}
 
-	setError = e => {
+	setError = (e) => {
 		if (this.interval) clearInterval(this.interval);
 		this.setState(
 			{
@@ -85,7 +85,7 @@ export default class Introduction extends Component {
 			.then(() => {
 				appbaseHelpers.createURL(this.setURL);
 			})
-			.catch(e => {
+			.catch((e) => {
 				if (
 					e._bodyInit ===
 					'{"error":{"root_cause":[{"type":"parse_exception","reason":"request body is required"}],"type":"parse_exception","reason":"request body is required"},"status":400}'
@@ -116,7 +116,7 @@ export default class Introduction extends Component {
 		</div>
 	);
 
-	setURL = url => {
+	setURL = (url) => {
 		this.setState({
 			url,
 		});

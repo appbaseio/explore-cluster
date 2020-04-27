@@ -30,7 +30,7 @@ class Permission extends React.Component {
 	};
 
 	handleViewClick = () => {
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			viewKey: !prevState.viewKey,
 		}));
 	};
@@ -53,7 +53,7 @@ Permission.propTypes = {
 	password: string.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	isAdmin: get(state, 'user.data.isAdmin'),
 });
 

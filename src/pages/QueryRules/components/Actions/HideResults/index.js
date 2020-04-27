@@ -68,14 +68,16 @@ class HideResults extends Component {
 					<GlobalSearch
 						indexes={indexes}
 						onValueSelected={this.onHide}
-						dataFields={(dataFields || []).map(field => field.replace(/.keyword/g, ''))}
+						dataFields={(dataFields || []).map((field) =>
+							field.replace(/.keyword/g, ''),
+						)}
 						ref={this.globalSearchRef}
 						// onKeyDown={this.handleAdd}
 					/>
 				</ReactiveBase>
 				<div>
-					{hiddenResults.map(id => (
-						<Tag key={id} closable onClose={e => this.onClose(e, id)}>
+					{hiddenResults.map((id) => (
+						<Tag key={id} closable onClose={(e) => this.onClose(e, id)}>
 							{id}
 						</Tag>
 					))}

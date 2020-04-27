@@ -14,7 +14,7 @@ const generateQuery = ({ aggregations: filters, search, results, synonyms }) => 
 			  })
 			: [];
 
-	const filtersId = filtersData.map(filter => filter.id);
+	const filtersId = filtersData.map((filter) => filter.id);
 	const resultDataField = results.dataField || '_score';
 	const searchDataField = search.dataField || [];
 	const query = [
@@ -39,7 +39,7 @@ const generateQuery = ({ aggregations: filters, search, results, synonyms }) => 
 	return query;
 };
 
-const isValidJSON = value => {
+const isValidJSON = (value) => {
 	try {
 		const temp = JSON.parse(value);
 		if (temp && typeof temp === 'object') {

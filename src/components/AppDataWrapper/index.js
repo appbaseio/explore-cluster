@@ -40,7 +40,7 @@ function AppDataWrapper({ apps, onCreateModalChange }) {
 		if (data.length === 0) {
 			return <div className={noData}>{renderNoData(onCreateModalChange)}</div>;
 		}
-		return data.map(app => {
+		return data.map((app) => {
 			const title = (
 				<div
 					css={{

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Message = message => <div style={{ maxWidth: 220 }}>{message}</div>;
+const Message = (message) => <div style={{ maxWidth: 220 }}>{message}</div>;
 
 export const hoverMessage = Message(
 	`All appbase.io paid plans offer setting ACLs, rate limits per IP and advanced security
@@ -68,5 +68,5 @@ export const suggestionsMessages = {
 	indices: Message('Only selected indices will be considered to calculate the suggestions.'),
 };
 // eslint-disable-next-line
-export const getMessages = isUserManagement =>
+export const getMessages = (isUserManagement) =>
 	isUserManagement ? userManagementMessages : credentialsMessages;

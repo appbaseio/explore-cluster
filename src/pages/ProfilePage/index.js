@@ -133,7 +133,7 @@ class ProfilePage extends React.Component {
 													value={inputHandler.value || undefined}
 													placeholder="Select"
 												>
-													{useCaseOptions.map(i => (
+													{useCaseOptions.map((i) => (
 														<Option key={i} value={i}>
 															{i}
 														</Option>
@@ -161,7 +161,7 @@ class ProfilePage extends React.Component {
 													value={inputHandler.value || undefined}
 													placeholder="Select"
 												>
-													{deploymentOptions.map(i => (
+													{deploymentOptions.map((i) => (
 														<Option key={i} value={i}>
 															{i}
 														</Option>
@@ -250,7 +250,7 @@ class ProfilePage extends React.Component {
 		);
 	}
 }
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
 	const userData = get(state, '$getAppPlan.results.metadata');
 	const phoneInfo = get(userData, 'phone');
 	return {
@@ -264,14 +264,14 @@ const mapStateToProps = state => {
 		username: get(userData, 'name'),
 		countryCode: get(phoneInfo, 'length')
 			? get(
-					countryCodes.find(item => item.dial_code === phoneInfo.split('-')[0]),
+					countryCodes.find((item) => item.dial_code === phoneInfo.split('-')[0]),
 					'code',
 					'',
 			  )
 			: '',
 	};
 };
-const mapDispatchToProps = dispatch => ({
-	setUser: info => dispatch(updateUser(info)),
+const mapDispatchToProps = (dispatch) => ({
+	setUser: (info) => dispatch(updateUser(info)),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(ProfilePage);

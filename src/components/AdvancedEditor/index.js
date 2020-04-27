@@ -5,7 +5,7 @@ import { keys } from 'lodash';
 import '@appbaseio/react-filter-box/lib/react-filter-box.css';
 import { operatorsMap } from './helper';
 
-export const AdvancedEditor = props => {
+export const AdvancedEditor = (props) => {
 	const { autoCompleteHandler, onChange, onParseOk, query, onParseError } = props;
 	return (
 		<ReactFilterBox

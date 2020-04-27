@@ -21,12 +21,12 @@ class InstallPage extends React.Component {
 		}));
 	};
 
-	handleChange = e => {
+	handleChange = (e) => {
 		const {
 			target: { name: checkboxName },
 		} = e;
 
-		this.setState(state => ({
+		this.setState((state) => ({
 			...state,
 			[checkboxName]: !state[checkboxName],
 		}));

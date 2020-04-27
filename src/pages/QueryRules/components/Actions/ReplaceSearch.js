@@ -6,7 +6,7 @@ const ReplaceSearch = ({ value, onChange }) => {
 		<Input
 			placeholder="Enter the new search term"
 			value={value}
-			onChange={e => onChange(e.target.value)}
+			onChange={(e) => onChange(e.target.value)}
 		/>
 	);
 };

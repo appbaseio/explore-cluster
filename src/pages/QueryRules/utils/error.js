@@ -16,7 +16,7 @@ const errorDescription = css`
 	margin: 0 0 8px;
 `;
 
-const getErrorMessages = state => {
+const getErrorMessages = (state) => {
 	const {
 		actions,
 		name,
@@ -59,7 +59,7 @@ const getErrorMessages = state => {
 	}
 
 	if (actions.length) {
-		actions.forEach(item => {
+		actions.forEach((item) => {
 			if (hasError(item)) {
 				error[item.type] = {
 					hasError: true,
@@ -106,21 +106,21 @@ const getErrorMessages = state => {
 	return error;
 };
 
-const getErrorClass = errorValue => {
+const getErrorClass = (errorValue) => {
 	if (errorValue && errorValue.hasError) {
 		return borderError;
 	}
 	return '';
 };
 
-const getErrorMessage = errorValue => {
+const getErrorMessage = (errorValue) => {
 	if (errorValue && errorValue.hasError) {
 		return <p className={errorDescription}>{errorValue.description}</p>;
 	}
 	return null;
 };
 
-const getErrorCount = error => {
+const getErrorCount = (error) => {
 	const count = Object.keys(error).reduce(
 		(agg, item) => (error[item].hasError ? agg + 1 : agg),
 		0,

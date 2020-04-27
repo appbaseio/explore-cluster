@@ -46,7 +46,7 @@ class AppActions extends Component {
 					<Col
 						span={8}
 						className={cloneButton}
-						onClick={e => {
+						onClick={(e) => {
 							e.preventDefault();
 							this.handleCloneModal();
 						}}
@@ -57,7 +57,7 @@ class AppActions extends Component {
 					<Col
 						span={8}
 						className={deleteButton}
-						onClick={e => {
+						onClick={(e) => {
 							e.preventDefault();
 							this.handleDeleteModal();
 						}}

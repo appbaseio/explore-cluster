@@ -56,7 +56,7 @@ class Conditions extends React.Component {
 								/>
 							</label>
 							<Select
-								onChange={value => onDropdownChange('query', value)}
+								onChange={(value) => onDropdownChange('query', value)}
 								value={query}
 								style={{ width: '100%' }}
 							>
@@ -81,13 +81,13 @@ class Conditions extends React.Component {
 								<Info content="Select a filter field and value which needs to be set before triggering this rule." />
 							</label>
 							<Select
-								onChange={value => onDropdownChange('dataField', value)}
+								onChange={(value) => onDropdownChange('dataField', value)}
 								value={dataField}
 								className={dataField ? '' : getErrorClass(error)}
 								style={{ width: '100%' }}
 								showSearch
 							>
-								{dataFields.map(field => (
+								{dataFields.map((field) => (
 									<Option key={field}>{field.replace(/.keyword/g, '')}</Option>
 								))}
 							</Select>

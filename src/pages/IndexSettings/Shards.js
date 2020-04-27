@@ -49,7 +49,7 @@ const Shards = ({
 				max={100}
 				min={1}
 				value={+shards}
-				onChange={value => handleSlider('shards', value)}
+				onChange={(value) => handleSlider('shards', value)}
 			/>
 		</Modal>
 	</React.Fragment>

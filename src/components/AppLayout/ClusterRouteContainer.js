@@ -142,159 +142,171 @@ class ClusterRouteContainer extends React.Component {
 					<Route
 						exact
 						path="/cluster/overview"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={OverviewPage} />
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/search-templates"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={SearchTemplatesPage} />
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/query-suggestions"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={QuerySuggestionsPage} />
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/analytics/:tab?/:subTab?"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={AnalyticsPage} />
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/popular-searches"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={PopularSearches} />
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/credentials"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={CredentialsPage} />
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/user-management"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={UserManagementPage} />
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/popular-results"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={PopularResults} />
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/geo-distribution"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} cluster component={GeoDistributionPage} />
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/search-latency"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={SearchLatency} />
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/popular-filters"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={PopularFilters} />
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/request-logs/:tab?"
-						component={props => <AppPageContainer {...props} component={RequestLogs} />}
+						component={(props) => (
+							<AppPageContainer {...props} component={RequestLogs} />
+						)}
 					/>
 					<Route
 						exact
 						path="/cluster/requests-per-minute"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={RequestDistributionPage} />
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/no-results-searches"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={NoResultSearches} />
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/import"
-						render={props => <AppPageContainer {...props} component={ImporterPage} />}
+						render={(props) => <AppPageContainer {...props} component={ImporterPage} />}
 					/>
 
 					<Route
 						exact
 						path="/cluster/rules"
-						render={props => <AppPageContainer {...props} component={QueryRulesPage} />}
+						render={(props) => (
+							<AppPageContainer {...props} component={QueryRulesPage} />
+						)}
 					/>
 					<Route
 						exact
 						path="/cluster/rules/new"
-						render={props => <AppPageContainer {...props} component={QueryRulesForm} />}
+						render={(props) => (
+							<AppPageContainer {...props} component={QueryRulesForm} />
+						)}
 					/>
 
 					<Route
 						exact
 						path="/cluster/rules/:id"
-						render={props => <AppPageContainer {...props} component={QueryRulesForm} />}
+						render={(props) => (
+							<AppPageContainer {...props} component={QueryRulesForm} />
+						)}
 					/>
 					<Route
 						exact
 						path="/cluster/mappings"
-						render={props => <AppPageContainer {...props} component={MappingsPage} />}
+						render={(props) => <AppPageContainer {...props} component={MappingsPage} />}
 					/>
 					<Route
 						exact
 						path="/cluster/share-settings"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={ShareSettings} />
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/profile"
-						component={props => <AppPageContainer {...props} component={ProfilePage} />}
+						component={(props) => (
+							<AppPageContainer {...props} component={ProfilePage} />
+						)}
 					/>
 					<Route
 						exact
 						path="/cluster/billing"
-						component={props => <AppPageContainer {...props} component={BillingPage} />}
+						component={(props) => (
+							<AppPageContainer {...props} component={BillingPage} />
+						)}
 					/>
 					<Route
 						exact
 						path="/cluster/browse"
-						render={props => (
+						render={(props) => (
 							<AppPageContainer {...props} component={BrowserPage} isCluster />
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/search-preview"
-						render={props => <AppPageContainer {...props} component={SandboxPage} />}
+						render={(props) => <AppPageContainer {...props} component={SandboxPage} />}
 					/>
 					<Route
 						exact
 						path="/cluster/role-based-access"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={RoleBaseAccess} />
 						)}
 					/>
@@ -302,13 +314,13 @@ class ClusterRouteContainer extends React.Component {
 					<Route
 						exact
 						path="/cluster/functions"
-						component={props => <AppPageContainer {...props} component={Functions} />}
+						component={(props) => <AppPageContainer {...props} component={Functions} />}
 					/>
 
 					<Route
 						exact
 						path="/cluster/curated-insights"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={ClusterInsights} />
 						)}
 					/>

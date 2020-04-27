@@ -7,14 +7,14 @@ import Footer from '../components/Footer';
 export default class Search extends Component {
 	state = {
 		error: '',
-		selectedOption: this.props.facetFields.map(item => ({ label: item, value: item })) || [],
+		selectedOption: this.props.facetFields.map((item) => ({ label: item, value: item })) || [],
 	};
 
-	handleChange = selectedOption => {
+	handleChange = (selectedOption) => {
 		this.setState({ selectedOption });
 	};
 
-	setError = e => {
+	setError = (e) => {
 		if (this.interval) clearInterval(this.interval);
 		this.setState(
 			{
@@ -28,7 +28,7 @@ export default class Search extends Component {
 		);
 	};
 
-	handleChange = selectedOption => {
+	handleChange = (selectedOption) => {
 		if (!selectedOption.length) {
 			this.setError('There should be at least one field set for aggregation.');
 		} else {
@@ -36,7 +36,7 @@ export default class Search extends Component {
 				selectedOption,
 				error: '',
 			});
-			const values = selectedOption.map(item => item.value);
+			const values = selectedOption.map((item) => item.value);
 			this.props.setFacetFields(values);
 		}
 	};
@@ -48,7 +48,7 @@ export default class Search extends Component {
 		</div>
 	);
 
-	renderFacetInput = horizontal => (
+	renderFacetInput = (horizontal) => (
 		<div className={`search-field-container ${horizontal ? 'full-row' : ''}`}>
 			<div>
 				<h3>Set Aggregation Fields</h3>

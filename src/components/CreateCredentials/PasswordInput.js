@@ -40,7 +40,7 @@ class PasswordInput extends React.Component {
 	}
 
 	handleClick = () => {
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			visible: !prevState.visible,
 		}));
 	};
@@ -53,7 +53,7 @@ class PasswordInput extends React.Component {
 		return (
 			<Input
 				// eslint-disable-next-line
-				ref={c => (this.inputRef = c)}
+				ref={(c) => (this.inputRef = c)}
 				type={visible ? 'text' : 'password'}
 				addonAfter={this.Icon}
 				{...handler()}

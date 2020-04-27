@@ -17,7 +17,7 @@ class CloneRule extends React.Component {
 		cloneQueryRuleAction(rule, {
 			...omit(rule, 'order'),
 			name: `${rule.name} (cloned)`,
-		}).then(res => {
+		}).then((res) => {
 			if (res && res.error) {
 				notification.error({
 					message: 'Error',
@@ -56,7 +56,7 @@ class CloneRule extends React.Component {
 	}
 }
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	cloneQueryRuleAction: (rule, newRule) => dispatch(cloneQueryRule(rule, newRule)),
 });
 

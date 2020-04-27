@@ -6,7 +6,7 @@ const RemoveWord = ({ value = [], onChange }) => {
 		<Input
 			placeholder="Enter word(s) to remove"
 			value={value.join(' ')}
-			onChange={e => onChange(e.target.value.split(' '))}
+			onChange={(e) => onChange(e.target.value.split(' '))}
 		/>
 	);
 };

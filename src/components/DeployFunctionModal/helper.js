@@ -17,7 +17,7 @@ export const centerAligned = css`
 `;
 
 // TODO: remove once integrated with API
-export const later = (delay, value) => new Promise(resolve => setTimeout(resolve, delay, value));
+export const later = (delay, value) => new Promise((resolve) => setTimeout(resolve, delay, value));
 
 export function renderInputField({
 	globalError,
@@ -36,7 +36,7 @@ export function renderInputField({
 		>
 			<Input
 				value={fieldValue}
-				onChange={e => handleInputRequired(e, fieldName, setterFunc)}
+				onChange={(e) => handleInputRequired(e, fieldName, setterFunc)}
 				{...extraProps}
 			/>
 		</Form.Item>

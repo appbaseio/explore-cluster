@@ -28,7 +28,7 @@ export const colorBar = css`
 	margin: 6px 0;
 `;
 
-const renderItem = item => {
+const renderItem = (item) => {
 	switch (item) {
 		case 'pri':
 			return 'shards';
@@ -71,8 +71,8 @@ function StatsBox(props) {
 	} = props; // prettier-ignore
 	if (typeof data === 'object') {
 		cols = Object.keys(data)
-			.filter(item => !blackList.includes(item))
-			.map(item => (
+			.filter((item) => !blackList.includes(item))
+			.map((item) => (
 				<div>
 					<div className={stats}>{data[item]}</div>
 					<div className={titleStyles}>{renderItem(item)}</div>

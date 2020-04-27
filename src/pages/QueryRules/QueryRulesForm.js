@@ -196,7 +196,7 @@ class QueryRulesForm extends React.Component {
 		}
 		this.setState({ loading: true });
 		getClusterMappings()
-			.then(mappings => {
+			.then((mappings) => {
 				const [dataFields, fieldMap] = getDatafields(mappings, ['*']);
 				const [searchFields] = getDatafields(mappings, ['*'], true);
 				this.setState({
@@ -207,7 +207,7 @@ class QueryRulesForm extends React.Component {
 					loading: false,
 				});
 			})
-			.catch(e => {
+			.catch((e) => {
 				this.setState({ loading: false });
 				console.log(e);
 			});
@@ -266,13 +266,13 @@ class QueryRulesForm extends React.Component {
 		}
 	}
 
-	handleInput = e => {
+	handleInput = (e) => {
 		const { name, value } = e.target;
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			[name]: value,
 			actions:
 				name === 'condition'
-					? prevState.actions.filter(action => action.type !== 'replace_search_term')
+					? prevState.actions.filter((action) => action.type !== 'replace_search_term')
 					: prevState.actions,
 			error: {
 				...prevState.error,
@@ -289,18 +289,18 @@ class QueryRulesForm extends React.Component {
 		});
 	};
 
-	handleStatus = value => {
+	handleStatus = (value) => {
 		this.setState({
 			enabled: value,
 		});
 	};
 
-	handleIndex = selectedIndexes => {
+	handleIndex = (selectedIndexes) => {
 		const { mappings } = this.state;
 		const [dataFields] = getDatafields(mappings, selectedIndexes);
 		const [searchFields] = getDatafields(mappings, selectedIndexes, true);
 
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			editorKey: Date.now(),
 			selectedIndexes,
 			dataFields,
@@ -315,8 +315,8 @@ class QueryRulesForm extends React.Component {
 		}));
 	};
 
-	setActions = action => {
-		this.setState(prevState => ({
+	setActions = (action) => {
+		this.setState((prevState) => ({
 			actions: [...prevState.actions, action],
 			error: {
 				...prevState.error,
@@ -328,7 +328,7 @@ class QueryRulesForm extends React.Component {
 	};
 
 	updateActions = (actions, error) => {
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			actions,
 			error: {
 				...prevState.error,
@@ -339,7 +339,7 @@ class QueryRulesForm extends React.Component {
 
 	getErrorStatus = () => {
 		this.setState(
-			prevState => ({
+			(prevState) => ({
 				error: getErrorMessages(prevState),
 			}),
 			this.handleSave,
@@ -396,7 +396,7 @@ class QueryRulesForm extends React.Component {
 
 		if (!hasError) {
 			let selectedFunction;
-			actions = actions.map(action => {
+			actions = actions.map((action) => {
 				if (action.type === 'function') {
 					selectedFunction = pick(action.data, [
 						'enabled',
@@ -420,17 +420,17 @@ class QueryRulesForm extends React.Component {
 					...params,
 					id: rule.id,
 					enabled,
-				}).then(res => {
+				}).then((res) => {
 					const prevFunction = get(
-						unparsedRule.actions.find(rule => rule.type === 'function'),
+						unparsedRule.actions.find((rule) => rule.type === 'function'),
 						'data',
 					);
 					const newFunction = get(
-						actions.find(rule => rule.type === 'function'),
+						actions.find((rule) => rule.type === 'function'),
 						'data',
 					);
 					if (prevFunction !== newFunction && prevFunction) {
-						getSingleFunction(prevFunction).then(func => {
+						getSingleFunction(prevFunction).then((func) => {
 							updateFunction({
 								selectedFunction: func,
 								res,
@@ -449,7 +449,7 @@ class QueryRulesForm extends React.Component {
 						});
 				});
 			} else {
-				createRule(params).then(res => {
+				createRule(params).then((res) => {
 					updateFunction({
 						selectedFunction,
 						res,
@@ -480,14 +480,14 @@ class QueryRulesForm extends React.Component {
 
 		const { rule } = this.props;
 		if (rule) {
-			return keys.some(key => {
+			return keys.some((key) => {
 				return JSON.stringify(rule[key]) !== JSON.stringify(this.state[key]);
 			});
 		}
 		return false;
 	};
 
-	handleTime = date => {
+	handleTime = (date) => {
 		if (date.length) {
 			const [startDate, endDate] = date;
 			this.setState({
@@ -506,7 +506,7 @@ class QueryRulesForm extends React.Component {
 	onParseOk = () => {
 		const { rawQuery } = this.state;
 		if (!rawQuery) return;
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			advancedExpression: rawQuery,
 			expressionError: false,
 			error: {
@@ -523,10 +523,10 @@ class QueryRulesForm extends React.Component {
 	};
 
 	toggleAdvancedEditor = () => {
-		this.setState(prevState => ({ show_advance_editor: !prevState.show_advance_editor }));
+		this.setState((prevState) => ({ show_advance_editor: !prevState.show_advance_editor }));
 	};
 
-	handleExpression = raw => {
+	handleExpression = (raw) => {
 		if ((raw || '').trim() === '') {
 			const value = (raw || '').trim();
 			this.setState({
@@ -578,7 +578,7 @@ class QueryRulesForm extends React.Component {
 
 		this.customAutoComplete = new CustomAutoComplete(null, [
 			{ columnField: '$query', type: 'selection' },
-			...dataFields.map(dataField => ({
+			...dataFields.map((dataField) => ({
 				columnField: dataField.replace(/.keyword/g, ''),
 				type: 'selection',
 			})),
@@ -809,7 +809,7 @@ class QueryRulesForm extends React.Component {
 									}
 									onChange={this.handleTime}
 									style={{ width: '100%' }}
-									disabledDate={current => {
+									disabledDate={(current) => {
 										// Can not select days before today
 										const now = new Date();
 										now.setHours(0, 0, 0, 0);
@@ -928,7 +928,7 @@ const mapStateToProps = (state, props) => {
 	};
 
 	if (id) {
-		const ruleData = defaultState.rules.find(rule => rule.id === id) || {};
+		const ruleData = defaultState.rules.find((rule) => rule.id === id) || {};
 		const { type, timeframe } = ruleData.trigger || {};
 		ruleData.condition = type;
 		ruleData.timeframe = timeframe || null;
@@ -946,11 +946,11 @@ const mapStateToProps = (state, props) => {
 	return defaultState;
 };
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	fetchRules: () => dispatch(getRules()),
-	createRule: rule => dispatch(addQueryRule(rule)),
-	updateRule: rule => dispatch(putRule(rule)),
-	removeRule: id => dispatch(deleteRule(id)),
+	createRule: (rule) => dispatch(addQueryRule(rule)),
+	updateRule: (rule) => dispatch(putRule(rule)),
+	removeRule: (id) => dispatch(deleteRule(id)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(QueryRulesForm);

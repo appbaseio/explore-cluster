@@ -102,16 +102,16 @@ BrowserPage.propTypes = {
 	isCluster: bool,
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
 	const { username, password } = get(state, 'user.data', {});
 	return {
 		credentials: username ? `${username}:${password}` : '',
 	};
 };
 
-const mapDispatchToProps = dispatch => ({
-	updateCurrentApp: appName => dispatch(setCurrentApp(appName, appName)),
-	getPermission: appName => dispatch(getPermissionFromAppbase(appName)),
+const mapDispatchToProps = (dispatch) => ({
+	updateCurrentApp: (appName) => dispatch(setCurrentApp(appName, appName)),
+	getPermission: (appName) => dispatch(getPermissionFromAppbase(appName)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(BrowserPage);

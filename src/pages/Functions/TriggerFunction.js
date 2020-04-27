@@ -40,7 +40,7 @@ const columns = [
 	{
 		title: 'Example values',
 		dataIndex: 'example',
-		render: text => <b>{text}</b>,
+		render: (text) => <b>{text}</b>,
 	},
 ];
 const data = [
@@ -194,7 +194,7 @@ class TriggerFunction extends React.Component {
 	}
 
 	handleModal = () => {
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			isVisible: !prevState.isVisible,
 		}));
 	};
@@ -210,7 +210,7 @@ class TriggerFunction extends React.Component {
 				expression,
 			},
 			extraRequestPayload: parsedValue,
-		}).then(res => {
+		}).then((res) => {
 			if (res && res.error) {
 				notification.error({
 					message: 'Error',
@@ -223,13 +223,13 @@ class TriggerFunction extends React.Component {
 		});
 	};
 
-	handleChange = e => {
+	handleChange = (e) => {
 		this.setState({
 			[e.target.name]: e.target.value,
 		});
 	};
 
-	handleRequestChange = value => {
+	handleRequestChange = (value) => {
 		let isValid = true;
 		let parsedValue;
 		try {
@@ -372,7 +372,7 @@ class TriggerFunction extends React.Component {
 	}
 }
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	putFunctions: (appName, payload) => dispatch(updateFunctions(appName, payload, true)),
 });
 

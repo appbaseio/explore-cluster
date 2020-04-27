@@ -22,7 +22,7 @@ const DeployFunctionModal = ({
 	getFunction,
 }) => {
 	const oriEnvData = get(node, 'function.envVars', {});
-	const revEnvData = Object.keys(oriEnvData).map(key => ({
+	const revEnvData = Object.keys(oriEnvData).map((key) => ({
 		key,
 		value: oriEnvData[key],
 	}));
@@ -96,7 +96,7 @@ const DeployFunctionModal = ({
 				myInterval = setInterval(handleDeploymentCheck, 7000);
 			}
 		} else {
-			deployFunction(functionName, payload).then(res => {
+			deployFunction(functionName, payload).then((res) => {
 				if (!(res && res.error)) {
 					myInterval = setInterval(handleDeploymentCheck, 7000);
 				}
@@ -124,7 +124,7 @@ const DeployFunctionModal = ({
 				node={node}
 				dockerImage={dockerImage}
 				setDockerImage={setDockerImage}
-				onChange={e => setValue(e.target.value)}
+				onChange={(e) => setValue(e.target.value)}
 				value={radioValue}
 				setGlobalError={setGlobalError}
 			/>
@@ -143,16 +143,16 @@ DeployFunctionModal.defaultProps = {
 	handleCancel: () => {},
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	loading: get(state, '$getAppFunctions.isCreating'),
 	error: get(state, '$getAppFunctions.error'),
 	success: get(state, '$getAppFunctions.success'),
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	deployFunction: (name, payload) => dispatch(createFunction(name, payload)),
 	putFunctions: (appName, payload) => dispatch(updateFunctions(appName, payload)),
-	getFunction: appName => dispatch(getSingleFunction(appName)),
+	getFunction: (appName) => dispatch(getSingleFunction(appName)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DeployFunctionModal);

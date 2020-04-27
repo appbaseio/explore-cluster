@@ -17,7 +17,7 @@ class GlobalSearch extends PureComponent {
 		searchValue: '',
 	};
 
-	handleSearchValueChange = searchValue => {
+	handleSearchValueChange = (searchValue) => {
 		this.setState({
 			searchValue,
 		});

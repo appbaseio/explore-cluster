@@ -61,7 +61,7 @@ class LanguageSettings extends React.Component {
 		this.setState({ initiating: true });
 		const esVersion = getVersion() || (await getESVersion(appName, credentials));
 		this.setState({ esVersion });
-		getSettingsAction(appName).then(res => {
+		getSettingsAction(appName).then((res) => {
 			this.setState({ initiating: false });
 			if (res && res.payload) {
 				this.setFormValues(res, setFieldsValue);
@@ -82,7 +82,7 @@ class LanguageSettings extends React.Component {
 	};
 
 	toggleVisible = (isReset = false) => {
-		this.setState(prevState => ({ visible: !prevState.visible, isReset }));
+		this.setState((prevState) => ({ visible: !prevState.visible, isReset }));
 	};
 
 	getAnalyzerMappings = (res, getFieldValue) => {
@@ -91,7 +91,7 @@ class LanguageSettings extends React.Component {
 		return applyLanguageAnalyzers(analyzerMappings, this.getFallBackLanguage(getFieldValue));
 	};
 
-	handleSubmit = e => {
+	handleSubmit = (e) => {
 		e.preventDefault();
 		const {
 			form: { getFieldValue, validateFields },
@@ -103,7 +103,7 @@ class LanguageSettings extends React.Component {
 		} = this.props;
 		const ACC_API = getURL();
 		validateFields((err, values) => {
-			const handleReIndexError = reIndexErr => {
+			const handleReIndexError = (reIndexErr) => {
 				this.setState({ loading: false });
 				notification.error({
 					message: 'error',
@@ -123,7 +123,7 @@ class LanguageSettings extends React.Component {
 						fieldWeights,
 					},
 				})
-					.then(response => {
+					.then((response) => {
 						this.setState({ loading: false });
 						if (response && response.payload) {
 							message.success(`Language settings for ${appName} saved successfully`);
@@ -131,21 +131,21 @@ class LanguageSettings extends React.Component {
 							handleReIndexError(get(response, 'error'));
 						}
 					})
-					.catch(err2 => {
+					.catch((err2) => {
 						handleReIndexError(err2);
 					});
 			};
 
-			const reIndexAndUpdateSettings = async languagePayload => {
+			const reIndexAndUpdateSettings = async (languagePayload) => {
 				const { esVersion } = this.state;
 
 				const appSettings = await getAppSettings(appName, credentials).then(
-					data => data[appName].settings,
+					(data) => data[appName].settings,
 				);
 
 				this.setState({ loading: true });
 
-				fetchMappings(appName, credentials, ACC_API).then(res => {
+				fetchMappings(appName, credentials, ACC_API).then((res) => {
 					if (res && res.payload) {
 						const analyzerMappings = this.getAnalyzerMappings(res, getFieldValue);
 						const language = this.getFallBackLanguage(getFieldValue);
@@ -180,7 +180,7 @@ class LanguageSettings extends React.Component {
 							.then(() => {
 								handleReIndexSuccess(languagePayload, analyzerMappings);
 							})
-							.catch(reIndexErr => {
+							.catch((reIndexErr) => {
 								handleReIndexError(reIndexErr);
 							});
 					}
@@ -213,7 +213,7 @@ class LanguageSettings extends React.Component {
 				const fields = get(properties[key], 'fields', {});
 				if (fields.search || fields.autosuggest) {
 					const fieldIndex = get(settings, 'search.dataField', []).findIndex(
-						field => field === keyPath,
+						(field) => field === keyPath,
 					);
 					if (!dataFields.includes(`${keyPath}.lang`) && fieldIndex !== -1) {
 						dataFields.push(`${keyPath}.lang`);
@@ -231,13 +231,13 @@ class LanguageSettings extends React.Component {
 		applyDataFields(mappings);
 	};
 
-	getFallBackLanguage = getFieldValue => {
+	getFallBackLanguage = (getFieldValue) => {
 		let language = getFieldValue('language');
 		language = getLanguageFallback(language);
 		return language;
 	};
 
-	getLanguagePayload = values => {
+	getLanguagePayload = (values) => {
 		const languagePayload = pick(values, ['language', 'applyStopwords', 'normalizeDiacritics']);
 		const { customStopwords, stemmingExceptions } = values;
 		languagePayload.customStopwords = customStopwords
@@ -245,7 +245,7 @@ class LanguageSettings extends React.Component {
 					customStopwords
 						.trim()
 						.split(',')
-						.map(str => removeWhiteSpaces(str)),
+						.map((str) => removeWhiteSpaces(str)),
 			  )
 			: [];
 		languagePayload.stemmingExceptions = stemmingExceptions
@@ -253,13 +253,13 @@ class LanguageSettings extends React.Component {
 					stemmingExceptions
 						.trim()
 						.split(',')
-						.map(str => removeWhiteSpaces(str)),
+						.map((str) => removeWhiteSpaces(str)),
 			  )
 			: [];
 		return languagePayload;
 	};
 
-	resetLanguageSettings = e => {
+	resetLanguageSettings = (e) => {
 		e.preventDefault();
 		const {
 			getDefaultSettingsAction,
@@ -268,7 +268,7 @@ class LanguageSettings extends React.Component {
 		} = this.props;
 		if (defaultSettings) this.setFormValues({ payload: defaultSettings }, setFieldsValue);
 		else
-			getDefaultSettingsAction().then(res => {
+			getDefaultSettingsAction().then((res) => {
 				if (res && res.payload) {
 					this.setFormValues(res, setFieldsValue);
 				}
@@ -335,7 +335,7 @@ class LanguageSettings extends React.Component {
 									<LanguageDropdown
 										formStyle={{ paddingBottom: 0 }}
 										style={{ width: '20%', minWidth: '35%' }}
-										renderOption={lang => (
+										renderOption={(lang) => (
 											<Select.Option key={lang.value} value={lang.value}>
 												{lang.label}
 											</Select.Option>
@@ -426,7 +426,7 @@ class LanguageSettings extends React.Component {
 								onRevert={() => {
 									this.revertChanges(settings, setFieldsValue);
 								}}
-								onSave={e => {
+								onSave={(e) => {
 									this.handleSubmit(e);
 									this.toggleVisible();
 								}}
@@ -439,7 +439,7 @@ class LanguageSettings extends React.Component {
 	}
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');
 	const mappings = getRawMappingsByAppName(state) || null;
 
@@ -458,16 +458,16 @@ const mapStateToProps = state => {
 	};
 };
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
-	getSettingsAction: name => dispatch(getSettings(name)),
+	getSettingsAction: (name) => dispatch(getSettings(name)),
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
 	fetchMappings: (appName, credentials, url) =>
 		dispatch(getAppMappings(appName, credentials, url)),
-	deleteSettingsAction: name => dispatch(deleteSettings(name)),
-	updateCurrentApp: appName => dispatch(setCurrentApp(appName, appName)),
-	addApp: appName => dispatch(appendApp(appName)),
-	deleteApp: appName => dispatch(removeAppData(appName)),
+	deleteSettingsAction: (name) => dispatch(deleteSettings(name)),
+	updateCurrentApp: (appName) => dispatch(setCurrentApp(appName, appName)),
+	addApp: (appName) => dispatch(appendApp(appName)),
+	deleteApp: (appName) => dispatch(removeAppData(appName)),
 });
 
 const LanguageForm = Form.create({ name: 'language' })(LanguageSettings);

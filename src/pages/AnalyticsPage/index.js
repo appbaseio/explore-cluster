@@ -65,7 +65,7 @@ AnalyticsView.propTypes = {
 	plan: PropTypes.string.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	appName: get(state, '$getCurrentApp.name'),
 	plan: get(state, '$getAppPlan.results.plan'),
 	isPaidUser: get(state, '$getAppPlan.results.isPaid'),

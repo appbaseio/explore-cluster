@@ -51,7 +51,7 @@ class LoginPage extends Component {
 		}
 	};
 
-	onClusterURLBlur = event => {
+	onClusterURLBlur = (event) => {
 		const { value } = event.target;
 		if (!value) return;
 		const credObj = getURLCredentials(value) || {};
@@ -61,7 +61,7 @@ class LoginPage extends Component {
 		}
 	};
 
-	getURL = value => {
+	getURL = (value) => {
 		const credObj = getURLCredentials(value) || {};
 		const { url } = getURLParameters(value);
 		const originURL = value.split('@')[1];
@@ -145,7 +145,7 @@ const mapStateToProps = ({ user }) => ({
 	user,
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	loadArcUser: (u, p, url) => dispatch(loadUser(u, p, url)),
 });
 

@@ -98,7 +98,7 @@ class NewPricingCard extends Component {
 					/>
 				</PricingCardHeader>
 				<PricingList css={{ fontWeight: 700 }}>
-					{pricingList.map(list => (
+					{pricingList.map((list) => (
 						<li key={list}>{list}</li>
 					))}
 				</PricingList>

@@ -100,9 +100,9 @@ const getActiveMenu = (props, prevActiveSubMenu = []) => {
 		pathname = getParam('view') || '';
 	}
 
-	Object.keys(routes).some(route => {
+	Object.keys(routes).some((route) => {
 		if (routes[route].menu) {
-			const active = routes[route].menu.find(item => pathname === item.link);
+			const active = routes[route].menu.find((item) => pathname === item.link);
 
 			if (active) {
 				activeSubMenu = route;
@@ -214,13 +214,12 @@ class AppWrapper extends Component {
 
 		const route = match.params.route || '';
 
-
 		if (currentApp && appName !== currentApp) {
 			history.push(`/app/${currentApp}/${route}`);
 		}
 	}
 
-	handleSearchTerm = e => {
+	handleSearchTerm = (e) => {
 		this.setState({
 			value: e.target.value,
 		});
@@ -232,7 +231,7 @@ class AppWrapper extends Component {
 		});
 	};
 
-	handleSettings = async appName => {
+	handleSettings = async (appName) => {
 		const {
 			settings,
 			defaultSettings,
@@ -262,7 +261,7 @@ class AppWrapper extends Component {
 	};
 
 	onCollapse = () => {
-		this.setState(prevState => ({ collapsed: !prevState.collapsed }));
+		this.setState((prevState) => ({ collapsed: !prevState.collapsed }));
 	};
 
 	render() {
@@ -302,7 +301,7 @@ class AppWrapper extends Component {
 							width: '100%',
 							height: 'calc(100% - 102px)',
 						}}
-						onOpenChange={param => {
+						onOpenChange={(param) => {
 							this.setState({
 								activeSubMenu: param,
 							});
@@ -346,7 +345,7 @@ class AppWrapper extends Component {
 						)}
 
 						{!value &&
-							Object.keys(routes).map(route => {
+							Object.keys(routes).map((route) => {
 								if (routes[route].menu) {
 									const Title = (
 										<span>
@@ -356,7 +355,7 @@ class AppWrapper extends Component {
 									);
 									return (
 										<SubMenu key={route} title={Title}>
-											{routes[route].menu.map(item => (
+											{routes[route].menu.map((item) => (
 												<Menu.Item key={item.label}>
 													<WithRedirectTooltip
 														showTooltip={item.hasExactPath}
@@ -414,7 +413,7 @@ class AppWrapper extends Component {
 	}
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');
 	return {
 		currentApp: appName,
@@ -425,10 +424,10 @@ const mapStateToProps = state => {
 	};
 };
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	updateCurrentApp: (appName, appId) => dispatch(setCurrentApp(appName, appId)),
 	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
-	getSettingsAction: name => dispatch(getSettings(name)),
+	getSettingsAction: (name) => dispatch(getSettings(name)),
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
 });
 

@@ -13,7 +13,7 @@ class TestFunction extends Component {
 		parsedData: getPayload({}, true),
 	};
 
-	handleRequestDataChange = value => {
+	handleRequestDataChange = (value) => {
 		let isValid = true;
 		this.setState({ requestData: value });
 		try {

@@ -52,7 +52,7 @@ const Replicas = ({
 					marks={{ 0: '0', 1: '1', 2: '2' }}
 					max={totalNodes - 1}
 					value={+replicas}
-					onChange={value => handleSlider('replicas', value)}
+					onChange={(value) => handleSlider('replicas', value)}
 				/>
 			) : (
 				<Alert message="Cannot add any replicas to the index as you are running a single-node instance." />

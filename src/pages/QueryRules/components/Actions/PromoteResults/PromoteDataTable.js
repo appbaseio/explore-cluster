@@ -25,7 +25,7 @@ const overflow = { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'elli
 export function PromoteDataTable({ positionRender, dataRender, dataSource, actionRender }) {
 	return (
 		<Table
-			rowKey={record => get(record, 'doc._id')}
+			rowKey={(record) => get(record, 'doc._id')}
 			style={{ background: '#fff', maxHeight: 400, overflowY: 'scroll' }}
 			columns={[
 				{

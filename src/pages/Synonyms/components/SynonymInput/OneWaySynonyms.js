@@ -1,14 +1,14 @@
 import React from 'react';
 import { Input, Select } from 'antd';
 
-const OneWaySynonym = props => {
+const OneWaySynonym = (props) => {
 	const { searchTerm, alternatives, onChange } = props;
 
-	const handleInput = e => {
+	const handleInput = (e) => {
 		onChange('searchTerm', e.target.value);
 	};
 
-	const handleChange = value => {
+	const handleChange = (value) => {
 		onChange('alternatives', value);
 	};
 
