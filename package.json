@@ -9,16 +9,21 @@
 	"private": false,
 	"scripts": {
 		"start": "NODE_ENV=development webpack-dev-server --mode development --content-base . --history-api-fallback  --hot --inline --progress --colors --port 3333",
+		"lint": "eslint src --ignore-pattern src/batteries/**/*.js",
 		"build": "NODE_ENV=production node ./scripts/create-env.js && webpack --mode production",
 		"glow": "glow --watch",
 		"format": "prettier --write --use-tabs 'src/!(batteries*)**/**/*.js'",
 		"analyze": "source-map-explorer 'dist/*.js'"
 	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
+	},
 	"lint-staged": {
 		"./src/!(batteries*)**/*.js": [
-			"prettier --write",
-			"eslint",
-			"git add"
+			"yarn format",
+			"yarn lint"
 		]
 	},
 	"devDependencies": {
@@ -73,6 +78,8 @@
 		"dotenv": "^8.0.0",
 		"emotion": "^9.2.6",
 		"hex-rgb": "^3.0.0",
+		"husky": "^4.2.5",
+		"lint-staged": "^10.1.7",
 		"lodash": "^4.17.10",
 		"lzma": "^2.3.2",
 		"moment": "^2.22.2",

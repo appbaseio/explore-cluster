@@ -18,7 +18,6 @@ module.exports = {
 		indent: 0,
 		'no-tabs': 0,
 		'no-underscore-dangle': 0,
-		'react/prop-types': 0,
 		'react/jsx-indent': 0,
 		'react/jsx-indent-props': 0,
 		'react/jsx-filename-extension': 0,
