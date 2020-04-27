@@ -8,7 +8,7 @@ import { ReactiveBase } from '@appbaseio/reactivesearch';
 
 import Filter from './Filter';
 
-import { getSettings, getAppMappings, getRules } from '../../../batteries/modules/actions';
+import { getSettings, getAppMappings, getRules, clearSearchState } from '../../../batteries/modules/actions';
 import Search from './Search';
 import Result from './Result/index';
 import { generateQuery } from '../utils';
@@ -50,20 +50,13 @@ class SearchPreview extends React.Component {
 			fetchRules,
 			tier,
 			featureRules,
+			searchState,
 		} = this.props;
 
 		if (isValidPlan(tier, featureRules)) {
 			if (!rules) {
 				fetchRules();
 			}
-		}
-
-		if (!settings) {
-			fetchSearchSettings(app);
-		} else if (hasTestSettings) {
-			this.setState({
-				settings: generateQuery(testSettings),
-			});
 		}
 
 		if (mappings) {
@@ -76,6 +69,21 @@ class SearchPreview extends React.Component {
 			});
 		} else {
 			fetchMappings(app, credentials, url);
+		}
+
+		if (searchState) {
+			this.setState({
+				settings: searchState,
+			});
+			return;
+		}
+
+		if (!settings) {
+			fetchSearchSettings(app);
+		} else if (hasTestSettings) {
+			this.setState({
+				settings: generateQuery(testSettings),
+			});
 		}
 	}
 
@@ -90,6 +98,11 @@ class SearchPreview extends React.Component {
 				hasMappingsLoaded: true,
 			});
 		}
+	}
+
+	componentWillUnmount() {
+		const { clearState } = this.props;
+		clearState();
 	}
 
 	getSearchableMappings = (mappings) => {
@@ -111,11 +124,29 @@ class SearchPreview extends React.Component {
 	};
 
 	static getDerivedStateFromProps(props, state) {
+		if (props.searchState) {
+			const searchQuery = props.searchState.find((component) => component.id === 'search');
+			// If parsedState doesnt contains search dataField we prefill with all searchable mappings
+			if (!get(searchQuery, 'dataField', []).length && state.searchableMappings) {
+				return {
+					settings: [
+						...props.searchState.filter((component) => component.id !== 'search'),
+						{
+							...searchQuery,
+							dataField: Object.keys(state.searchableMappings),
+							fieldWeights: Object.values(state.searchableMappings),
+						},
+					],
+				};
+			}
+
+			return state;
+		}
+
 		if (!props.hasTestSettings && state && !state.settings && props.settings) {
 			if (
 				state.hasMappingsLoaded &&
 				props.mappings &&
-				props.settings &&
 				props.settings.search &&
 				props.settings.search.dataField &&
 				props.settings.search.dataField.length === 0
@@ -133,26 +164,6 @@ class SearchPreview extends React.Component {
 			}
 			return {
 				settings: generateQuery(props.settings),
-			};
-		}
-		if (
-			!props.hasTestSettings &&
-			state.hasMappingsLoaded &&
-			props.mappings &&
-			props.settings &&
-			props.settings.search &&
-			props.settings.search.dataField &&
-			props.settings.search.dataField.length === 0
-		) {
-			return {
-				settings: generateQuery({
-					...props.settings,
-					search: {
-						...props.settings.search,
-						dataField: Object.keys(state.searchableMappings),
-						fieldWeights: Object.values(state.searchableMappings),
-					},
-				}),
 			};
 		}
 
@@ -296,6 +307,7 @@ const mapStateToProps = (state, props) => {
 		url: getURL(),
 		rules: get(state, '$getAppRules.results'),
 		tier: get(state, '$getAppPlan.results.tier'),
+		searchState: get(state, '$getSearchState.parsedSearchState', null),
 		featureRules: get(state, '$getAppPlan.results.feature_rules', false),
 	};
 };
@@ -305,6 +317,7 @@ const mapDispatchToProps = (dispatch) => ({
 	fetchSearchSettings: (appName) => dispatch(getSettings(appName)),
 	fetchMappings: (appName, credentials, url) =>
 		dispatch(getAppMappings(appName, credentials, url)),
+	clearState: () => dispatch(clearSearchState()),
 });
 
 SearchPreview.propTypes = {
