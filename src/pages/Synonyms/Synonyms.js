@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Table, Icon, Button, message } from 'antd';
+import { Card, Table, Icon, Button, message, Popconfirm } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
@@ -16,7 +16,6 @@ import { getSynonyms, deleteSynonym } from './api';
 import { getURL } from '../../constants/config';
 import { getSettings, getMappings } from '../../batteries/utils/mappings';
 import { getSynonymsAnalyzerSettings, updateSynonymsSettings } from './utils';
-import DeleteModal from '../../components/DeleteModal/DeleteModal';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { SettingsFooter } from '../../components/SettingsFooter';
 import { isValidPlan } from '../../batteries/utils';
@@ -280,28 +279,21 @@ class Synonyms extends React.Component {
 									);
 								}}
 							/>
-							<DeleteModal
-								text={
-									<React.Fragment>
-										Type <strong>SYNONYM</strong> to confirm deletion.
-									</React.Fragment>
-								}
-								title="Delete Synonym"
-								value="SYNONYM"
-								name="SYNONYM"
-								onDelete={() => this.handleDelete(value)}
+
+							<Popconfirm
+								title="Are you sure you want to delete synonym？"
+								okText="Yes"
+								cancelText="No"
+								onConfirm={() => this.handleDelete(value)}
 							>
-								{({ handleModal }) => (
-									<Button
-										shape="circle-outline"
-										size="small"
-										loading={isDeleting === value}
-										type="danger"
-										onClick={handleModal}
-										icon="delete"
-									/>
-								)}
-							</DeleteModal>
+								<Button
+									shape="circle-outline"
+									size="small"
+									loading={isDeleting === value}
+									type="danger"
+									icon="delete"
+								/>
+							</Popconfirm>
 						</div>
 					);
 				},
@@ -364,6 +356,7 @@ class Synonyms extends React.Component {
 									refetch={this.fetchSynonym}
 									isAddModal
 									handleSynonyms={this.handleUpdate}
+									resetInputOnClose
 									renderButton={({ handleModal }) => {
 										return (
 											<Button onClick={handleModal} type="primary">

@@ -60,14 +60,35 @@ class SynonymsModal extends React.Component {
 	};
 
 	handleModal = () => {
-		this.setState((state) => ({
-			showModal: !state.showModal,
-		}));
+		this.setState(
+			(state) => ({
+				showModal: !state.showModal,
+			}),
+			() => {
+				const { showModal } = this.state;
+				if (!showModal) {
+					const { resetInputOnClose } = this.props;
+					if (resetInputOnClose) {
+						this.resetInput();
+					}
+				}
+			},
+		);
 	};
 
 	handleCloseModal = () => {
 		this.setState({
 			showModal: false,
+		});
+		const { resetInputOnClose } = this.props;
+
+		if (resetInputOnClose) {
+			this.resetInput();
+		}
+	};
+
+	resetInput = () => {
+		this.setState({
 			alternatives: [],
 			searchTerm: '',
 			synonyms: [],
@@ -193,7 +214,6 @@ class SynonymsModal extends React.Component {
 					visible={showModal}
 					onCancel={this.handleCloseModal}
 					onOk={this.handleSave}
-					destroyOnClose
 					okText={isAddModal ? 'Add' : 'Update'}
 					okButtonProps={{
 						loading: isLoading,
