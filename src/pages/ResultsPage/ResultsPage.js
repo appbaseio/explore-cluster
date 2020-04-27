@@ -448,6 +448,7 @@ class ResultsPage extends React.Component {
 const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');
 	const mappings = getTraversedMappingsByAppName(state);
+	// when elasticsearch v6, mappings is an object with values corresponding to _doc key
 	const parsedMappings = Array.isArray(mappings) ? mappings : get(mappings, '_doc', []);
 	const { username, password } = get(state, 'user.data', {});
 	return {
