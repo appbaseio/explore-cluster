@@ -127,8 +127,8 @@ class SynonymsModal extends React.Component {
 			: allSynonyms.map((item) => item.synonym);
 
 		const parsedSynonyms = getParsedSynonyms({ type, alternatives, synonyms, searchTerm });
-		const settings = await getSettings(appName, credentials, url).then(
-			(data) => data[appName].settings,
+		const settings = await getSettings(appName, credentials, url).then((data) =>
+			get(data, `${appName}.settings`, {}),
 		);
 
 		const isSynonymsAnalyzerPresent = hasSynonymsAnalyzer(settings);
