@@ -74,7 +74,7 @@ export const getSynonymsAnalyzerSettings = ({ settings, isSynonymsAnalyzerPresen
 				...get(settings, 'index.analysis.analyzer', {}),
 				synonyms: {
 					tokenizer: 'standard',
-					filter: ['synonym_graph', 'lowercase'],
+					filter: ['lowercase', 'synonym_graph'],
 				},
 			},
 		},
