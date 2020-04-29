@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Input, message } from 'antd';
+import { Input, message, Modal } from 'antd';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
@@ -7,6 +7,7 @@ import { deleteApp } from '../../utils';
 import { removeAppData } from '../../actions';
 import { deleteSettings } from '../../batteries/modules/actions';
 import { isValidPlan } from '../../batteries/utils';
+import { allowedTiers } from '../../utils/prop-types';
 
 class DeleteAppModal extends React.Component {
 	state = {
@@ -105,6 +106,15 @@ DeleteAppModal.propTypes = {
 	handleDeleteModal: PropTypes.func.isRequired,
 	handleRemoveApp: PropTypes.func.isRequired,
 	onDelete: PropTypes.func,
+	deleteSettingsAction: PropTypes.func.isRequired,
+	tier: allowedTiers,
+	index: PropTypes.string.isRequired,
+	featureSearchRelevancy: PropTypes.bool.isRequired,
+};
+
+DeleteAppModal.defaultProps = {
+	tier: undefined,
+	onDelete: () => {},
 };
 
 const mapStateToProps = (state) => ({

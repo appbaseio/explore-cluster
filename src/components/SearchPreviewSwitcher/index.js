@@ -34,7 +34,7 @@ const SearchPreviewSwitcher = ({ app, filteredApps, onCancel, onSelect, visible 
 );
 
 SearchPreviewSwitcher.propTypes = {
-	app: PropTypes.string.isRequired,
+	app: PropTypes.string,
 	filteredApps: PropTypes.array,
 	onCancel: PropTypes.func.isRequired,
 	onSelect: PropTypes.func.isRequired,
@@ -44,6 +44,7 @@ SearchPreviewSwitcher.propTypes = {
 SearchPreviewSwitcher.defaultProps = {
 	filteredApps: [],
 	visible: false,
+	app: undefined,
 };
 
 export default SearchPreviewSwitcher;

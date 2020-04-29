@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { get, keys } from 'lodash';
 import { css } from 'emotion';
 
-import { bool, func } from 'prop-types';
+import { bool, func, object } from 'prop-types';
 import Loader from '../../components/Loader';
 import AppHeader from '../../components/AppHeader';
 import Logo from '../../components/Logo';
@@ -258,7 +258,7 @@ class DashboardWrapper extends Component {
 
 	render() {
 		const { collapsed, showHeader, routes, activeSubMenu, activeMenuItem, value } = this.state;
-		const { apps, history } = this.props;
+		const { apps, history, match } = this.props;
 
 		const filteredApps = keys(apps).filter((app) => !app.startsWith('.'));
 
@@ -379,6 +379,8 @@ class DashboardWrapper extends Component {
 							big={collapsed}
 							minimal
 							showApp={false}
+							history={history}
+							match={match}
 						/>
 					)}
 					<Switch>
@@ -410,6 +412,7 @@ class DashboardWrapper extends Component {
 DashboardWrapper.defaultProps = {
 	isBillingEnabled: false,
 	isClusterPlanFetching: false,
+	apps: {},
 };
 
 DashboardWrapper.propTypes = {
@@ -417,6 +420,11 @@ DashboardWrapper.propTypes = {
 	fetchClusterPlan: func.isRequired,
 	isClusterPlanFetching: bool,
 	isClusterPlanFetched: bool.isRequired,
+	apps: object,
+	fetchApps: func.isRequired,
+	history: object.isRequired,
+	match: object.isRequired,
+	location: object.isRequired,
 };
 
 const mapStateToProps = (state) => ({

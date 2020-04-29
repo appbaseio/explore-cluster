@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { Button, Collapse, Form, Input, notification, Row, message } from 'antd';
 import { Validators } from 'react-reactive-form';
 import get from 'lodash/get';
@@ -140,6 +141,21 @@ const PrivateRegistry = ({ registry, updateRegistry, error, success, loading }) 
 			</Collapse>
 		</>
 	);
+};
+
+PrivateRegistry.propTypes = {
+	registry: PropTypes.object,
+	updateRegistry: PropTypes.func.isRequired,
+	error: PropTypes.string,
+	success: PropTypes.bool,
+	loading: PropTypes.bool,
+};
+
+PrivateRegistry.defaultProps = {
+	registry: {},
+	error: undefined,
+	success: false,
+	loading: false,
 };
 
 const mapStateToProps = (state) => ({

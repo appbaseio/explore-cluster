@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Row, Icon, Input, Checkbox, Tooltip, Radio } from 'antd';
+import { Checkbox, Icon, Input, Radio, Row, Tooltip } from 'antd';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { css } from 'emotion';
 import { updateAppScreenPreferences } from '../../actions';
+import { children as childrenProp } from '../../utils/prop-types';
 
 const commonFlex = css`
 	display: flex;
@@ -98,10 +99,15 @@ function AppFilters({ apps, children, preferences, updatePreferences }) {
 
 AppFilters.propTypes = {
 	apps: PropTypes.array,
+	children: PropTypes.oneOfType([childrenProp, PropTypes.func]),
+	preferences: PropTypes.object,
+	updatePreferences: PropTypes.func.isRequired,
 };
 
 AppFilters.defaultProps = {
 	apps: [],
+	children: null,
+	preferences: {},
 };
 
 const mapStateToProps = (state) => ({

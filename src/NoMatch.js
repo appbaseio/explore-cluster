@@ -15,6 +15,7 @@ const NoMatch = () => (
 		<h2>Page not found</h2>
 		<p>
 			Sorry, we couldn
+			{/* eslint-disable-next-line react/jsx-curly-brace-presence */}
 			{"'"}t find what you are looking for
 		</p>
 		<Button href="/" type="primary" size="large">

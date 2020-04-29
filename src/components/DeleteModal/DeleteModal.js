@@ -1,5 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Modal, Input, Typography } from 'antd';
+import { children as childrenProp } from '../../utils/prop-types';
 
 class DeleteModal extends React.Component {
 	state = {
@@ -65,5 +67,18 @@ class DeleteModal extends React.Component {
 		);
 	}
 }
+
+DeleteModal.propTypes = {
+	name: PropTypes.string.isRequired,
+	value: PropTypes.string.isRequired,
+	children: PropTypes.oneOfType([PropTypes.func, childrenProp]).isRequired,
+	onDelete: PropTypes.func.isRequired,
+	title: PropTypes.string.isRequired,
+	text: PropTypes.oneOf([PropTypes.string, PropTypes.node]),
+};
+
+DeleteModal.defaultProps = {
+	text: undefined,
+};
 
 export default DeleteModal;

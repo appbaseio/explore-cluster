@@ -197,6 +197,7 @@ ActionButtons.propTypes = {
 	appId: PropTypes.string.isRequired,
 	shared: PropTypes.bool, // eslint-disable-line
 	permissions: PropTypes.object, // eslint-disable-line
+	index: PropTypes.string.isRequired,
 };
 
 export default ActionButtons;

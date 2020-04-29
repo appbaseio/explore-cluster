@@ -5,7 +5,7 @@ import {
 	deploymentCheck,
 	handleInputClosure,
 } from '../../../../../components/DeployFunctionModal/helper';
-import { DeployFunctionForm } from '../../../../../components/DeployFunctionModal/DeployFunctionForm';
+import DeployFunctionForm from '../../../../../components/DeployFunctionModal/DeployFunctionForm';
 import { createFunction, getSingleFunction } from '../../../../../batteries/utils/app';
 import TestFunction from './TestFunction';
 

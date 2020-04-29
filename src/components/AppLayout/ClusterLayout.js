@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Layout } from 'antd';
 
 import AppHeader from '../AppHeader';
@@ -14,11 +15,24 @@ class ClusterLayout extends React.PureComponent {
 					overflowY: 'auto',
 				}}
 			>
-				{showHeader && <AppHeader big={collapsed} />}
+				{showHeader && <AppHeader big={collapsed} {...props} />}
 				<ClusterRouteContainer {...props} />
 			</Layout>
 		);
 	}
 }
+
+ClusterLayout.propTypes = {
+	collapsed: PropTypes.bool,
+	showHeader: PropTypes.bool,
+	history: PropTypes.object.isRequired,
+	match: PropTypes.object.isRequired,
+	location: PropTypes.object.isRequired,
+};
+
+ClusterLayout.defaultProps = {
+	collapsed: false,
+	showHeader: false,
+};
 
 export default ClusterLayout;
