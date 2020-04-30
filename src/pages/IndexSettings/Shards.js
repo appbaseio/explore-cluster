@@ -1,5 +1,7 @@
+/* eslint-disable camelcase */
 import React from 'react';
-import { Slider, Modal, Card, Button, InputNumber } from 'antd';
+import PropTypes from 'prop-types';
+import { Modal, Card, Button, InputNumber } from 'antd';
 import { cardTitle } from '../../batteries/components/Mappings/styles';
 
 const Shards = ({
@@ -54,5 +56,18 @@ const Shards = ({
 		</Modal>
 	</React.Fragment>
 );
+
+Shards.propTypes = {
+	shards: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+	allocated_shards: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+	updateShards: PropTypes.func.isRequired,
+	shardsModal: PropTypes.bool,
+	handleModal: PropTypes.func.isRequired,
+	handleSlider: PropTypes.func.isRequired,
+};
+
+Shards.defaultProps = {
+	shardsModal: false,
+};
 
 export default Shards;

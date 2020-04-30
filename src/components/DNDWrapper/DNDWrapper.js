@@ -63,7 +63,7 @@ DNDWrapper.propTypes = {
 	idKey: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 	items: PropTypes.array,
 	onDragEnd: PropTypes.func.isRequired,
-	children: PropTypes.oneOfType([PropTypes.func, childrenProp]).isRequired,
+	children: childrenProp.isRequired,
 };
 
 DNDWrapper.defaultProps = {

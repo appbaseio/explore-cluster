@@ -1,5 +1,5 @@
 import React from 'react';
-import { number } from 'prop-types';
+import { number, string } from 'prop-types';
 
 const Logo = ({ type, width }) => {
 	switch (type) {
@@ -16,10 +16,12 @@ const Logo = ({ type, width }) => {
 
 Logo.defaultProps = {
 	width: 140,
+	type: string,
 };
 
 Logo.propTypes = {
 	width: number,
+	type: undefined,
 };
 
 export default Logo;

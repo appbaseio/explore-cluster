@@ -11,7 +11,7 @@ import ExecuteFunction from './ExecuteFunction';
 import { getErrorMessage } from '../../utils/error';
 import { hasValuesChanged, toolTips } from '../../utils';
 import RemoveWord from './RemoveWord';
-import { Info } from '../../../../components/Info';
+import Info from '../../../../components/Info';
 
 const componentMappings = {
 	replace_search_term: ReplaceSearch,

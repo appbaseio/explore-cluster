@@ -2,7 +2,7 @@ import React from 'react';
 import { Select, Input, Row, Col } from 'antd';
 import { getErrorClass, getErrorMessage } from '../utils/error';
 import { hasValuesChanged } from '../utils';
-import { Info } from '../../../components/Info';
+import Info from '../../../components/Info';
 
 const { Option } = Select;
 

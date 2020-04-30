@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-curly-brace-presence */
 import React from 'react';
 import { Row, Col, Button } from 'antd';
 import { css } from 'react-emotion';

@@ -11,11 +11,11 @@ import {
 	putSettings,
 } from '../../batteries/modules/actions';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
-import { SettingsFooter } from '../../components/SettingsFooter';
+import SettingsFooter from '../../components/SettingsFooter';
 import { container, label } from './styles';
-import { ReviewAndSave } from '../../components/ReviewAndSave';
-import { SettingTooltip } from '../../components/SettingTooltip';
-import { settingsMap } from '../../components/ReviewAndSave/helper';
+import ReviewAndSave from '../../components/ReviewAndSave';
+import SettingTooltip from '../../components/SettingTooltip';
+import settingsMap from '../../components/ReviewAndSave/helper';
 import { getTraversedMappingsByAppName } from '../../batteries/modules/selectors';
 import { isEqual, isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import Select from 'react-select';
 
 import SearchApp from './SearchApp';
@@ -7,6 +8,7 @@ import Footer from '../components/Footer';
 export default class Search extends Component {
 	state = {
 		error: '',
+		// eslint-disable-next-line react/destructuring-assignment
 		selectedOption: this.props.facetFields.map((item) => ({ label: item, value: item })) || [],
 	};
 
@@ -37,48 +39,72 @@ export default class Search extends Component {
 				error: '',
 			});
 			const values = selectedOption.map((item) => item.value);
-			this.props.setFacetFields(values);
+			const { setFacetFields } = this.props;
+			setFacetFields(values);
 		}
 	};
 
-	renderSearchApp = () => (
-		<div>
-			{this.renderFacetInput(true)}
-			<SearchApp fields={this.props.searchFields} facets={this.props.facetFields} />
-		</div>
-	);
-
-	renderFacetInput = (horizontal) => (
-		<div className={`search-field-container ${horizontal ? 'full-row' : ''}`}>
+	renderSearchApp = () => {
+		const { searchFields, facetFields } = this.props;
+		return (
 			<div>
-				<h3>Set Aggregation Fields</h3>
-				<p>
-					Select the fields you want to set to be of Aggregation kind. They will be
-					updated dynamically in the UI.
-				</p>
+				{this.renderFacetInput(true)}
+				<SearchApp fields={searchFields} facets={facetFields} />
 			</div>
-			<div className="input-wrapper">
-				<Select
-					name="form-field-name"
-					value={this.state.selectedOption}
-					onChange={this.handleChange}
-					placeholder="Select aggregation fields"
-					isMulti
-					isClearable={false}
-					options={[
-						{ value: 'release_year', label: 'release_year' },
-						{ value: 'genres', label: 'genres' },
-						{ value: 'original_language', label: 'original_language' },
-					]}
-				/>
+		);
+	};
+
+	renderFacetInput = (horizontal) => {
+		const { error, selectedOption } = this.state;
+		return (
+			<div className={`search-field-container ${horizontal ? 'full-row' : ''}`}>
+				<div>
+					<h3>Set Aggregation Fields</h3>
+					<p>
+						Select the fields you want to set to be of Aggregation kind. They will be
+						updated dynamically in the UI.
+					</p>
+				</div>
+				<div className="input-wrapper">
+					<Select
+						name="form-field-name"
+						value={selectedOption}
+						onChange={this.handleChange}
+						placeholder="Select aggregation fields"
+						isMulti
+						isClearable={false}
+						options={[
+							{
+								value: 'release_year',
+								label: 'release_year',
+							},
+							{
+								value: 'genres',
+								label: 'genres',
+							},
+							{
+								value: 'original_language',
+								label: 'original_language',
+							},
+						]}
+					/>
+				</div>
+				{error && (
+					<p
+						style={{
+							marginTop: 15,
+							color: 'tomato',
+						}}
+					>
+						{error}
+					</p>
+				)}
 			</div>
-			{this.state.error && (
-				<p style={{ marginTop: 15, color: 'tomato' }}>{this.state.error}</p>
-			)}
-		</div>
-	);
+		);
+	};
 
 	render() {
+		const { nextScreen, app, previousScreen, facetFields } = this.props;
 		return (
 			<div>
 				<div className="wrapper">
@@ -99,11 +125,11 @@ export default class Search extends Component {
 								<strong>Aggregation</strong> fields.
 							</p>
 						</header>
-						{this.props.facetFields.length ? null : this.renderFacetInput()}
+						{facetFields.length ? null : this.renderFacetInput()}
 					</div>
 				</div>
 
-				{this.props.facetFields.length ? this.renderSearchApp() : null}
+				{facetFields.length ? this.renderSearchApp() : null}
 
 				{/* <Footer
 					nextScreen={this.props.nextScreen}
@@ -111,13 +137,29 @@ export default class Search extends Component {
 					disabled={!this.props.facetFields.length}
 				/> */}
 				<Footer
-					nextScreen={this.props.nextScreen}
-					previousScreen={this.props.previousScreen}
-					disabled={!this.props.facetFields.length}
+					nextScreen={nextScreen}
+					previousScreen={previousScreen}
+					disabled={!facetFields.length}
 					label="Finish"
-					app={this.props.app}
+					app={app}
 				/>
 			</div>
 		);
 	}
 }
+
+Search.propTypes = {
+	nextScreen: PropTypes.func,
+	app: PropTypes.string.isRequired,
+	previousScreen: PropTypes.func,
+	facetFields: PropTypes.array,
+	searchFields: PropTypes.array,
+	setFacetFields: PropTypes.func.isRequired,
+};
+
+Search.defaultProps = {
+	nextScreen: null,
+	previousScreen: null,
+	facetFields: [],
+	searchFields: [],
+};

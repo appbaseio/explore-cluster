@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { FUNCTIONS } from '../../../../../constants';
-import { InvokeFunctionBody } from '../../../../../components/InvokeFunctionModal/InvokeFunctionBody';
+import InvokeFunctionBody from '../../../../../components/InvokeFunctionModal/InvokeFunctionBody';
 import { invokeFunction } from '../../../../../batteries/utils/app';
 import { getPayload } from '../../../../../components/InvokeFunctionModal';
 

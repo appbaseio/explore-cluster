@@ -17,7 +17,7 @@ import { getURL } from '../../constants/config';
 import { getSettings, getMappings } from '../../batteries/utils/mappings';
 import { getSynonymsAnalyzerSettings, updateSynonymsSettings } from './utils';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
-import { SettingsFooter } from '../../components/SettingsFooter';
+import SettingsFooter from '../../components/SettingsFooter';
 import { isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 

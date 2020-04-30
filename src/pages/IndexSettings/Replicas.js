@@ -1,4 +1,6 @@
+/* eslint-disable camelcase */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Card, Button, Slider, Modal, Alert, Icon } from 'antd';
 import { cardTitle } from '../../batteries/components/Mappings/styles';
 
@@ -60,5 +62,21 @@ const Replicas = ({
 		</Modal>
 	</React.Fragment>
 );
+
+Replicas.propTypes = {
+	replicas: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+	totalNodes: PropTypes.number.isRequired,
+	allocated_replicas: PropTypes.number.isRequired,
+	updateReplicas: PropTypes.func.isRequired,
+	handleSlider: PropTypes.func.isRequired,
+	replicasModal: PropTypes.bool,
+	handleModal: PropTypes.func.isRequired,
+	loading: PropTypes.bool,
+};
+
+Replicas.defaultProps = {
+	replicasModal: false,
+	loading: false,
+};
 
 export default Replicas;

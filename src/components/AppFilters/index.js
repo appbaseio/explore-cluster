@@ -99,7 +99,7 @@ function AppFilters({ apps, children, preferences, updatePreferences }) {
 
 AppFilters.propTypes = {
 	apps: PropTypes.array,
-	children: PropTypes.oneOfType([childrenProp, PropTypes.func]),
+	children: childrenProp,
 	preferences: PropTypes.object,
 	updatePreferences: PropTypes.func.isRequired,
 };

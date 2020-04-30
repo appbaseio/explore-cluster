@@ -1,4 +1,6 @@
+/* eslint-disable camelcase */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Button, message, Popconfirm } from 'antd';
 import Stripe from 'react-stripe-checkout';
 import { connect } from 'react-redux';
@@ -161,6 +163,12 @@ class ClusterInsights extends React.Component {
 		);
 	}
 }
+
+ClusterInsights.propTypes = {
+	credentials: PropTypes.string.isRequired,
+};
+
+ClusterInsights.defaultProps = {};
 
 const mapStateToProps = (state) => {
 	const { username, password } = get(state, 'user.data', {});

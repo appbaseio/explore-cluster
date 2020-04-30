@@ -71,7 +71,7 @@ class DeleteModal extends React.Component {
 DeleteModal.propTypes = {
 	name: PropTypes.string.isRequired,
 	value: PropTypes.string.isRequired,
-	children: PropTypes.oneOfType([PropTypes.func, childrenProp]).isRequired,
+	children: childrenProp.isRequired,
 	onDelete: PropTypes.func.isRequired,
 	title: PropTypes.string.isRequired,
 	text: PropTypes.oneOf([PropTypes.string, PropTypes.node]),

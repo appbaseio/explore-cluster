@@ -19,11 +19,12 @@ import { input, modalHeading, radiobtn } from './styles';
 import { validateAppName, validationsList } from '../../utils/helper';
 
 import { createApp, resetCreatedApp } from '../../actions';
-import { LanguageDropdown } from '../../components/LanguageDropdown';
+import LanguageDropdown from '../../components/LanguageDropdown';
 import languages from '../../constants/language';
 import { getDefaultSettings, putSettings } from '../../batteries/modules/actions';
 import { getLanguageFallback } from '../../utils/language';
 import { isValidPlan } from '../../batteries/utils';
+import { allowedTiers } from '../../utils/prop-types';
 
 const RadioGroup = Radio.Group;
 
@@ -288,6 +289,19 @@ CreateAppModal.propTypes = {
 	handleModal: PropTypes.func.isRequired,
 	createdApp: PropTypes.object.isRequired,
 	resetApp: PropTypes.func.isRequired,
+	history: PropTypes.object.isRequired,
+	updateSettingsAction: PropTypes.func.isRequired,
+	defaultSettings: PropTypes.object,
+	getDefaultSettingsAction: PropTypes.func.isRequired,
+	handleCreateApp: PropTypes.func.isRequired,
+	tier: allowedTiers,
+	featureSearchRelevancy: PropTypes.bool,
+};
+
+CreateAppModal.defaultProps = {
+	defaultSettings: null,
+	tier: undefined,
+	featureSearchRelevancy: false,
 };
 
 const mapStateToProps = (state) => ({

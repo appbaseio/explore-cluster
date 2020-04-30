@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import { Icon, Layout, Menu, Input } from 'antd';
+import { Icon, Input, Layout, Menu } from 'antd';
 import { Link, Route, Switch } from 'react-router-dom';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
 import { get, keys } from 'lodash';
-import { css } from 'emotion';
 
 import { bool, func, object } from 'prop-types';
 import Loader from '../../components/Loader';
@@ -13,10 +12,11 @@ import Logo from '../../components/Logo';
 import { breakpoints } from '../../utils/media';
 import { getAppPlan } from '../../batteries/modules/actions';
 import { getParam, getParsedRoutes } from '../../utils';
-import { LabelTag } from '../../components/LabelTag';
-import { IndexSwitcher } from '../../components/IndexSwitcher';
+import LabelTag from '../../components/LabelTag';
+import IndexSwitcher from '../../components/IndexSwitcher';
 import { loadApps } from '../../actions';
 import SidebarAutocomplete from '../../components/SidebarAutocomplete';
+import searchInputStyle from './styles';
 
 const NoMatch = Loadable({
 	loader: () => import('../../NoMatch'),
@@ -144,18 +144,6 @@ const getActiveMenu = (props, prevActiveSubMenu = []) => {
 		activeMenuItem: [activeMenuItem],
 	};
 };
-
-export const searchInputStyle = css`
-	text-align: center;
-	padding: 10px 16px;
-	input {
-		opacity: 0.3;
-
-		&:focus {
-			opacity: 1;
-		}
-	}
-`;
 
 let url;
 

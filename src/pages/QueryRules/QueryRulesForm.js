@@ -34,7 +34,7 @@ import { getErrorClass, getErrorCount, getErrorMessage, getErrorMessages } from 
 import { addQueryRule, deleteRule, getRules, putRule } from '../../batteries/modules/actions/rules';
 
 import CloneRule from './components/CloneRule';
-import { Info } from '../../components/Info';
+import Info from '../../components/Info';
 import {
 	deleteQueryRuleInFunction,
 	getClusterMappings,

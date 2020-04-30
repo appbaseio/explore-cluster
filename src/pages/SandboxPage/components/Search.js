@@ -3,7 +3,7 @@ import { Card, Button, Icon, Row, Col, Tooltip } from 'antd';
 import { Link } from 'react-router-dom';
 import { DataSearch, SelectedFilters } from '@appbaseio/reactivesearch';
 import { css } from 'emotion';
-import { settingsMap } from '../../../components/ReviewAndSave/helper';
+import settingsMap from '../../../components/ReviewAndSave/helper';
 
 export const highlighter = css`
 	width: 6px;

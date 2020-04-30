@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { get } from 'lodash';
 import QueryView from './QueryView';
 import ListView from './ListView';
-import { settingsMap } from '../../../../components/ReviewAndSave/helper';
+import settingsMap from '../../../../components/ReviewAndSave/helper';
 import { ruleStyle } from './styles';
 
 class Result extends React.Component {
