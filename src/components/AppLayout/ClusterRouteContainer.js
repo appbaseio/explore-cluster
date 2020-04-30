@@ -5,11 +5,8 @@ import Loadable from 'react-loadable';
 import Loader from '../Loader';
 import AppPageContainer from '../AppPageContainer';
 import ErrorPage from '../../pages/ErrorPage';
+import ClusterAnalyticsRoutes from './ClusterAnalyticsRoutes';
 
-const AnalyticsPage = Loadable({
-	loader: () => import('../../pages/AnalyticsPage'),
-	loading: Loader,
-});
 const ProfilePage = Loadable({
 	loader: () => import('../../pages/ProfilePage'),
 	loading: Loader,
@@ -29,14 +26,6 @@ const QueryRulesPage = Loadable({
 
 const QueryRulesForm = Loadable({
 	loader: () => import('../../pages/QueryRules/QueryRulesForm'),
-	loading: Loader,
-});
-const GeoDistributionPage = Loadable({
-	loader: () => import('../../pages/GeoDistributionPage'),
-	loading: Loader,
-});
-const SearchLatency = Loadable({
-	loader: () => import('../../pages/SearchLatency'),
 	loading: Loader,
 });
 
@@ -85,36 +74,8 @@ const SandboxPage = Loadable({
 	loading: Loader,
 });
 
-const PopularSearches = Loadable({
-	loader: () => import('../../pages/PopularSearches'),
-	loading: Loader,
-});
-
-const PopularResults = Loadable({
-	loader: () => import('../../pages/PopularResults'),
-	loading: Loader,
-});
-
-const PopularFilters = Loadable({
-	loader: () => import('../../pages/PopularFilters'),
-	loading: Loader,
-});
-
-const NoResultSearches = Loadable({
-	loader: () => import('../../pages/NoResultSearches'),
-	loading: Loader,
-});
 const ShareSettings = Loadable({
 	loader: () => import('../../pages/ShareSettingsPage'),
-	loading: Loader,
-});
-
-const RequestLogs = Loadable({
-	loader: () => import('../../pages/RequestLogs'),
-	loading: Loader,
-});
-const RequestDistributionPage = Loadable({
-	loader: () => import('../../pages/RequestDistributionPage'),
 	loading: Loader,
 });
 
@@ -162,20 +123,6 @@ class ClusterRouteContainer extends React.Component {
 					/>
 					<Route
 						exact
-						path="/cluster/analytics/:tab?/:subTab?"
-						component={(props) => (
-							<AppPageContainer {...props} component={AnalyticsPage} />
-						)}
-					/>
-					<Route
-						exact
-						path="/cluster/popular-searches"
-						component={(props) => (
-							<AppPageContainer {...props} component={PopularSearches} />
-						)}
-					/>
-					<Route
-						exact
 						path="/cluster/credentials"
 						component={(props) => (
 							<AppPageContainer {...props} component={CredentialsPage} />
@@ -188,55 +135,7 @@ class ClusterRouteContainer extends React.Component {
 							<AppPageContainer {...props} component={UserManagementPage} />
 						)}
 					/>
-					<Route
-						exact
-						path="/cluster/popular-results"
-						component={(props) => (
-							<AppPageContainer {...props} component={PopularResults} />
-						)}
-					/>
-					<Route
-						exact
-						path="/cluster/geo-distribution"
-						component={(props) => (
-							<AppPageContainer {...props} cluster component={GeoDistributionPage} />
-						)}
-					/>
-					<Route
-						exact
-						path="/cluster/search-latency"
-						component={(props) => (
-							<AppPageContainer {...props} component={SearchLatency} />
-						)}
-					/>
-					<Route
-						exact
-						path="/cluster/popular-filters"
-						component={(props) => (
-							<AppPageContainer {...props} component={PopularFilters} />
-						)}
-					/>
-					<Route
-						exact
-						path="/cluster/request-logs/:tab?"
-						component={(props) => (
-							<AppPageContainer {...props} component={RequestLogs} />
-						)}
-					/>
-					<Route
-						exact
-						path="/cluster/requests-per-minute"
-						component={(props) => (
-							<AppPageContainer {...props} component={RequestDistributionPage} />
-						)}
-					/>
-					<Route
-						exact
-						path="/cluster/no-results-searches"
-						component={(props) => (
-							<AppPageContainer {...props} component={NoResultSearches} />
-						)}
-					/>
+
 					<Route
 						exact
 						path="/cluster/import"
@@ -324,6 +223,8 @@ class ClusterRouteContainer extends React.Component {
 							<AppPageContainer {...props} component={ClusterInsights} />
 						)}
 					/>
+
+					<ClusterAnalyticsRoutes />
 				</Switch>
 			</ErrorPage>
 		);
