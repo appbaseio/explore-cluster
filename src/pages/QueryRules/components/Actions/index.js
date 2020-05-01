@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Button, Card, Icon, Tooltip, Typography } from 'antd';
 import { css } from 'emotion';
 import DNDWrapper from '../../../../components/DNDWrapper';
@@ -300,5 +301,20 @@ class Actions extends React.Component {
 		);
 	}
 }
+
+Actions.propTypes = {
+	actions: PropTypes.array,
+	onChange: PropTypes.func.isRequired,
+	error: PropTypes.object,
+	indexes: PropTypes.array,
+	searchFields: PropTypes.array,
+};
+
+Actions.defaultProps = {
+	actions: [],
+	error: {},
+	indexes: [],
+	searchFields: [],
+};
 
 export default Actions;

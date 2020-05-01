@@ -1,4 +1,6 @@
+/* eslint-disable jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Select, Input, Row, Col } from 'antd';
 import { getErrorClass, getErrorMessage } from '../utils/error';
 import { hasValuesChanged } from '../utils';
@@ -107,5 +109,27 @@ class Conditions extends React.Component {
 		);
 	}
 }
+
+Conditions.propTypes = {
+	dataFields: PropTypes.array,
+	onChange: PropTypes.func.isRequired,
+	dataFieldValue: PropTypes.string,
+	dataField: PropTypes.string,
+	query: PropTypes.string,
+	queryValue: PropTypes.string,
+	onDropdownChange: PropTypes.func.isRequired,
+	error: PropTypes.object,
+	condition: PropTypes.string,
+};
+
+Conditions.defaultProps = {
+	dataFields: [],
+	dataFieldValue: undefined,
+	dataField: undefined,
+	query: undefined,
+	queryValue: undefined,
+	error: {},
+	condition: undefined,
+};
 
 export default Conditions;

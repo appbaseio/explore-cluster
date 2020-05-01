@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { FUNCTIONS } from '../../../../../constants';
 import InvokeFunctionBody from '../../../../../components/InvokeFunctionModal/InvokeFunctionBody';
 import { invokeFunction } from '../../../../../batteries/utils/app';
@@ -67,5 +68,9 @@ class TestFunction extends Component {
 		);
 	}
 }
+
+TestFunction.propTypes = {
+	functionName: PropTypes.string.isRequired,
+};
 
 export default TestFunction;

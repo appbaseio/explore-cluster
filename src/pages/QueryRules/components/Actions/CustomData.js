@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Ace from '../../../../batteries/components/SearchSandbox/containers/AceEditor';
 
 class CustomData extends React.Component {
@@ -49,5 +50,14 @@ class CustomData extends React.Component {
 		);
 	}
 }
+
+CustomData.propTypes = {
+	value: PropTypes.object,
+	onChange: PropTypes.func.isRequired,
+};
+
+CustomData.defaultProps = {
+	value: {},
+};
 
 export default CustomData;

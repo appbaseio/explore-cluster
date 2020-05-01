@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import PropTypes from 'prop-types';
 import { Button, notification, Result, Spin } from 'antd';
 import {
 	deploymentCheck,
@@ -103,5 +103,10 @@ class NewFunctionForm extends Component {
 		);
 	}
 }
+
+NewFunctionForm.propTypes = {
+	onChange: PropTypes.func.isRequired,
+	onSuccess: PropTypes.func.isRequired,
+};
 
 export default NewFunctionForm;
