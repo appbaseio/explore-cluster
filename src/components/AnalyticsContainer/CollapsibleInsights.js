@@ -71,88 +71,119 @@ const collapseStyles = css`
 	}
 `;
 
-const CollapsibleInsights = ({ insights }) => (
-	<Collapse className={collapseStyles} bordered accordion>
-		{insights.map((insight) => (
-			<Panel
-				showArrow={false}
-				header={
-					<div className="panel-header">
-						<div className="title">
-							<h6>{get(insight, 'insight.title')}</h6>
-							<Dropdown
-								trigger={['click']}
-								overlay={
-									<Menu
-										onClick={(e) => {
-											e.domEvent.stopPropagation();
-										}}
-									>
-										<Menu.Item key="1">
-											<Icon type="save" />
-											Save Insight
-										</Menu.Item>
-										<Menu.Item key="2">
-											<Icon type="check" />
-											Mark as Read
-										</Menu.Item>
-										<Menu.Item key="2">
-											<Icon type="delete" />
-											Delete
-										</Menu.Item>
-									</Menu>
-								}
-							>
-								<Button
-									onClick={(e) => {
-										e.stopPropagation();
-									}}
-									shape="circle"
-									size="small"
-									icon="more"
-									className="icon"
-								/>
-							</Dropdown>
-						</div>
-						{get(insight, 'insight.description') ? (
-							<p>{get(insight, 'insight.description')}</p>
-						) : null}
-					</div>
-				}
-				className="panel"
-				key={get(insight, 'insight.title')}
+class CollapsibleInsights extends React.Component {
+	state = {
+		openKey: '',
+	};
+
+	handleCollapseKey = (key) => {
+		const { openKey } = this.state;
+
+		if (openKey && key !== openKey) {
+			// we need to put request to update the status
+			console.log('Update Request', openKey);
+		}
+
+		this.setState({
+			openKey: key,
+		});
+	};
+
+	render() {
+		const { insights } = this.props;
+		return (
+			<Collapse
+				onChange={this.handleCollapseKey}
+				className={collapseStyles}
+				bordered
+				accordion
 			>
-				<h6 className="recommendation-title">Recommendations</h6>
-				<List
-					itemLayout="horizontal"
-					locale={{
-						emptyText: (
-							<Alert message="No Recommendations Found" type="warning" showIcon />
-						),
-					}}
-					dataSource={get(insight, 'insight.recommendations', [])}
-					renderItem={(recommendation) => (
-						<List.Item>
-							<Link
-								className="recommendation-link"
-								to={get(recommendation, 'short_link')}
-							>
-								<List.Item.Meta
-									title={
-										<div className="list-title">
-											<span>{get(recommendation, 'title', '')}</span>
-											<Icon className="icon" type="arrow-right" />
-										</div>
-									}
-									description={get(recommendation, 'description')}
-								/>
-							</Link>
-						</List.Item>
-					)}
-				/>
-			</Panel>
-		))}
-	</Collapse>
-);
+				{insights.map((insight) => (
+					<Panel
+						showArrow={false}
+						header={
+							<div className="panel-header">
+								<div className="title">
+									<h6>{get(insight, 'insight.title')}</h6>
+									<Dropdown
+										trigger={['click']}
+										overlay={
+											<Menu
+												onClick={(e) => {
+													e.domEvent.stopPropagation();
+												}}
+											>
+												<Menu.Item key="1">
+													<Icon type="saved" />
+													Save Insight
+												</Menu.Item>
+												<Menu.Item key="2">
+													<Icon type="read" />
+													Mark as Read
+												</Menu.Item>
+												<Menu.Item key="2">
+													<Icon type="delete" />
+													Delete
+												</Menu.Item>
+											</Menu>
+										}
+									>
+										<Button
+											onClick={(e) => {
+												e.stopPropagation();
+											}}
+											shape="circle"
+											size="small"
+											icon="more"
+											className="icon"
+										/>
+									</Dropdown>
+								</div>
+								{get(insight, 'insight.description') ? (
+									<p>{get(insight, 'insight.description')}</p>
+								) : null}
+							</div>
+						}
+						className="panel"
+						key={get(insight, 'id')}
+					>
+						<h6 className="recommendation-title">Recommendations</h6>
+						<List
+							itemLayout="horizontal"
+							locale={{
+								emptyText: (
+									<Alert
+										message="No Recommendations Found"
+										type="warning"
+										showIcon
+									/>
+								),
+							}}
+							dataSource={get(insight, 'insight.recommendations', [])}
+							renderItem={(recommendation) => (
+								<List.Item>
+									<Link
+										className="recommendation-link"
+										to={get(recommendation, 'short_link')}
+									>
+										<List.Item.Meta
+											title={
+												<div className="list-title">
+													<span>{get(recommendation, 'title', '')}</span>
+													<Icon className="icon" type="arrow-right" />
+												</div>
+											}
+											description={get(recommendation, 'description')}
+										/>
+									</Link>
+								</List.Item>
+							)}
+						/>
+					</Panel>
+				))}
+			</Collapse>
+		);
+	}
+}
 
 export default CollapsibleInsights;
