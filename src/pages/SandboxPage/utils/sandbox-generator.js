@@ -7,7 +7,7 @@ import babylon from 'prettier/parser-babel';
 const dependencies = {
 	react: '16.8.0',
 	'react-dom': '16.8.0',
-	'@appbaseio/reactivesearch': '3.8.0',
+	'@appbaseio/reactivesearch': '3.8.1',
 };
 
 const sandboxCodeFormat = (code) => {
