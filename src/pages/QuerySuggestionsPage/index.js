@@ -33,7 +33,7 @@ const bannerDetails = {
 	description: 'GUI to manage preferences for query suggestions.',
 	buttonText: 'Read more',
 	icon: 'pencil',
-	href: 'https://docs.appbase.io/docs/search/relevancy/#query-suggestions',
+	href: 'https://docs.appbase.io/docs/analytics/query-suggestions/',
 };
 
 const cardStyle = css`
