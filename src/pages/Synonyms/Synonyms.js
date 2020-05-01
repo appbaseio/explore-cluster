@@ -183,6 +183,7 @@ class Synonyms extends React.Component {
 		const bannerMessage = {
 			title: 'Manage Synonyms',
 			buttonText: 'Read Docs',
+			href: 'https://docs.appbase.io/docs/search/relevancy/#synonyms',
 		};
 
 		if (!isValidPlan(tier, featureSynonyms)) {
