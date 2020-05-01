@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Card, Button, Icon, Row, Col, Tooltip } from 'antd';
 import { Link } from 'react-router-dom';
 import { DataSearch, SelectedFilters } from '@appbaseio/reactivesearch';
@@ -81,6 +82,15 @@ const Search = (props) => {
 			</Row>
 		</Card>
 	);
+};
+
+Search.propTypes = {
+	search: PropTypes.object,
+	app: PropTypes.string.isRequired,
+};
+
+Search.defaultProps = {
+	search: {},
 };
 
 export default Search;

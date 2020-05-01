@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Card, Radio, Icon, Row, Button, Alert, Tooltip, Typography } from 'antd';
 import { StateProvider } from '@appbaseio/reactivesearch';
 import { Link } from 'react-router-dom';
@@ -109,5 +110,23 @@ class Result extends React.Component {
 		);
 	}
 }
+
+Result.propTypes = {
+	result: PropTypes.object,
+	app: PropTypes.string.isRequired,
+	credentials: PropTypes.string.isRequired,
+	url: PropTypes.string,
+	onChange: PropTypes.func,
+	query: PropTypes.object,
+	rules: PropTypes.array,
+};
+
+Result.defaultProps = {
+	result: {},
+	url: undefined,
+	onChange: null,
+	query: {},
+	results: [],
+};
 
 export default Result;

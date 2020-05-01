@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Card, Icon, Button, Tooltip } from 'antd';
 import { Link } from 'react-router-dom';
 import { get } from 'lodash';
@@ -36,6 +37,15 @@ const Filter = (props) => {
 			</Link>
 		</React.Fragment>
 	);
+};
+
+Filter.propTypes = {
+	aggs: PropTypes.array,
+	app: PropTypes.string.isRequired,
+};
+
+Filter.defaultProps = {
+	aggs: [],
 };
 
 export default Filter;

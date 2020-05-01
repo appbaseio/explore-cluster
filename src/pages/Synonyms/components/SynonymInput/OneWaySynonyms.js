@@ -1,4 +1,6 @@
+/* eslint-disable jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Input, Select } from 'antd';
 
 const OneWaySynonym = (props) => {
@@ -28,6 +30,17 @@ const OneWaySynonym = (props) => {
 			/>
 		</React.Fragment>
 	);
+};
+
+OneWaySynonym.propTypes = {
+	searchTerm: PropTypes.string,
+	alternatives: PropTypes.array,
+	onChange: PropTypes.func.isRequired,
+};
+
+OneWaySynonym.defaultProps = {
+	searchTerm: undefined,
+	alternatives: undefined,
 };
 
 export default OneWaySynonym;

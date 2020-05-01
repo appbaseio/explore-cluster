@@ -2,6 +2,7 @@ import React from 'react';
 import { Redirect, Route } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import HelpChat from '../../components/HelpChat';
+import { children } from '../../utils/prop-types';
 
 const AUTH_ROUTES = ['/login', '/signup', '/install', '/billing'];
 
@@ -33,7 +34,7 @@ const PrivateRoute = ({ component: Component, user, ...rest }) => (
 
 PrivateRoute.propTypes = {
 	user: PropTypes.object.isRequired,
-	component: PropTypes.node.isRequired,
+	component: children.isRequired,
 };
 
 export default PrivateRoute;
