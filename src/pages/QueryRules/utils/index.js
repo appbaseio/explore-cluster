@@ -108,7 +108,7 @@ const bannerDetails = {
 	description: 'Create "If this, then that" style query rules',
 	buttonText: 'Read More',
 	icon: 'pencil',
-	href: 'https://docs.appbase.io/docs/search/Rules/',
+	href: 'https://docs.appbase.io/docs/search/relevancy/#query-rules',
 };
 
 const toolTips = {

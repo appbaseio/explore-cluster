@@ -24,12 +24,13 @@ const bannerDetails = {
 	title: 'Result Settings',
 	buttonText: 'Read More',
 	icon: 'pencil',
-	href: 'https://docs.appbase.io/docs/search/Preview/',
+	href: 'https://docs.appbase.io/docs/search/relevancy/#result-settings',
 };
 
 const bannerMessage = {
 	title: 'Result Settings',
 	buttonText: 'Read Docs',
+	href: 'https://docs.appbase.io/docs/search/relevancy/#result-settings',
 };
 
 const getDisabled = (value) => {
@@ -348,7 +349,7 @@ class ResultsPage extends React.Component {
 		if (!isValidPlan(tier, featureSearchRelevancy)) {
 			return (
 				<React.Fragment>
-					<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
+					<Banner {...bannerDetails} />
 					<Overlay
 						style={{
 							maxWidth: '70%',

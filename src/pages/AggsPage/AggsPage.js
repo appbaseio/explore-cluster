@@ -48,12 +48,13 @@ const bannerDetails = {
 	title: 'Aggregation Settings',
 	buttonText: 'Read More',
 	icon: 'pencil',
-	href: 'https://docs.appbase.io/docs/search/Preview/',
+	href: 'https://docs.appbase.io/docs/search/relevancy/#aggregation-settings',
 };
 
 const bannerMessage = {
 	title: 'Aggregations Settings',
 	buttonText: 'Read Docs',
+	href: 'https://docs.appbase.io/docs/search/relevancy/#aggregation-settings',
 };
 
 const cardStyle = css`
@@ -417,7 +418,7 @@ class AggsPage extends React.Component {
 		if (!isValidPlan(tier, featureSearchRelevancy)) {
 			return (
 				<React.Fragment>
-					<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
+					<Banner {...bannerDetails} />
 					<Overlay
 						style={{
 							maxWidth: '70%',
