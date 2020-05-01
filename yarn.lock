@@ -86,7 +86,7 @@
     react-codemirror2 "^5.1.0"
     react-dom "^16.6.3"
 
-"@appbaseio/reactivecore@9.5.7":
+"@appbaseio/reactivecore@9.5.7", "@appbaseio/reactivecore@^9.5.7":
   version "9.5.7"
   resolved "https://registry.yarnpkg.com/@appbaseio/reactivecore/-/reactivecore-9.5.7.tgz#d9e11bc5167cd93df2274f5917c008ac459cab56"
   integrity sha512-R1r71lHeqQ0DJzIGhdKdxaC2N8NPOSfllhLLDSH35OjSS4ddocsEZ3ESD/XR6L7RqxFWje0xj01uJJNcbAA0ng==
@@ -96,16 +96,6 @@
     redux "^4.0.0"
     redux-thunk "^2.3.0"
     xdate "^0.8.2"
-
-"@appbaseio/reactivecore@^8.2.9":
-  version "8.2.17"
-  resolved "https://registry.yarnpkg.com/@appbaseio/reactivecore/-/reactivecore-8.2.17.tgz#9a77c2ab6211af5d80e93bfeaaac4a6bde39de50"
-  integrity sha512-GU+5i2IvhO5B7catvgO1RpGqFhDVwymdV1wNh18vdyuUsBQXTGz22iyZ1mRuKsyOWiE5yOe3BHm8BWQyC5t4dA==
-  dependencies:
-    cross-fetch "^3.0.4"
-    prop-types "^15.6.0"
-    redux "^4.0.0"
-    redux-thunk "^2.3.0"
 
 "@appbaseio/reactivesearch@^3.8.0":
   version "3.8.0"
