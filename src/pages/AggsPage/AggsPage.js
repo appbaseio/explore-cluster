@@ -448,6 +448,7 @@ class AggsPage extends React.Component {
 							showMappingInfo={false}
 							showCardWrapper={false}
 							hideSearchType
+							deleteLabel=" Remove from Aggs"
 							hideDelete
 							hideNoneTextType
 							hideDataType

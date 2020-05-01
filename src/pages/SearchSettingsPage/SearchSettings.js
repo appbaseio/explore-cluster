@@ -540,6 +540,7 @@ class SearchSettingsPage extends React.Component {
 						<Mappings
 							showSynonyms={false}
 							showShards={false}
+							deleteLabel=" Remove from Search"
 							ref={this.mappingsRef}
 							showReplicas={false}
 							showMappingInfo={false}
