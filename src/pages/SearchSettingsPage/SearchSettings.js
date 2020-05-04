@@ -1,4 +1,6 @@
+/* eslint-disable jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
 import { css } from 'emotion';
@@ -29,15 +31,16 @@ import Mappings from '../../batteries/components/Mappings/Mappings';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { getAggsMappings } from '../../batteries/utils/mappings';
-import { ReviewAndSave } from '../../components/ReviewAndSave';
-import { SettingsFooter } from '../../components/SettingsFooter';
+import ReviewAndSave from '../../components/ReviewAndSave';
+import SettingsFooter from '../../components/SettingsFooter';
 import { container } from '../ResultsPage/styles';
 import { getSubFields } from '../../utils';
-import { settingsMap } from '../../components/ReviewAndSave/helper';
+import settingsMap from '../../components/ReviewAndSave/helper';
 import { isEqual, isValidPlan } from '../../batteries/utils';
 import mappingUsecase from '../../batteries/utils/mappingUsecase';
 import Overlay from '../../components/Overlay';
 import { highlighter } from '../SandboxPage/components/Search';
+import { allowedTiers } from '../../utils/prop-types';
 
 const { Option } = Select;
 
@@ -773,6 +776,38 @@ class SearchSettingsPage extends React.Component {
 		);
 	}
 }
+
+SearchSettingsPage.propTypes = {
+	isUpdating: PropTypes.bool,
+	settings: PropTypes.object,
+	appName: PropTypes.string.isRequired,
+	resetState: PropTypes.object,
+	defaultSettings: PropTypes.object,
+	isLoading: PropTypes.bool,
+	tier: allowedTiers,
+	traversedMappings: PropTypes.array,
+	featureSearchRelevancy: PropTypes.bool,
+	credentials: PropTypes.string.isRequired,
+	fetchMappings: PropTypes.func.isRequired,
+	getSettingsAction: PropTypes.func.isRequired,
+	mappings: PropTypes.object,
+	isFetchingMapping: PropTypes.bool,
+	updateSettingsAction: PropTypes.func.isRequired,
+	getDefaultSettingsAction: PropTypes.func.isRequired,
+};
+
+SearchSettingsPage.defaultProps = {
+	isUpdating: false,
+	settings: null,
+	resetState: {},
+	defaultSettings: null,
+	isLoading: false,
+	tier: undefined,
+	traversedMappings: [],
+	featureSearchRelevancy: false,
+	mappings: null,
+	isFetchingMapping: false,
+};
 
 const mapStateToProps = (state) => {
 	const mappings = getRawMappingsByAppName(state) || null;

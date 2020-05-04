@@ -1,9 +1,10 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Card, Button, Icon, Row, Col, Tooltip } from 'antd';
 import { Link } from 'react-router-dom';
 import { DataSearch, SelectedFilters } from '@appbaseio/reactivesearch';
 import { css } from 'emotion';
-import { settingsMap } from '../../../components/ReviewAndSave/helper';
+import settingsMap from '../../../components/ReviewAndSave/helper';
 
 export const highlighter = css`
 	width: 6px;
@@ -59,7 +60,7 @@ const Search = (props) => {
 					)}
 					{search.dataField && search.dataField.length ? (
 						<DataSearch {...search} autosuggest componentId={search.id} />
-					): null}
+					) : null}
 				</Col>
 				<Col xs={4}>
 					<Link to={`/app/${app}/search`}>
@@ -80,6 +81,15 @@ const Search = (props) => {
 			</Row>
 		</Card>
 	);
+};
+
+Search.propTypes = {
+	search: PropTypes.object,
+	app: PropTypes.string.isRequired,
+};
+
+Search.defaultProps = {
+	search: {},
 };
 
 export default Search;

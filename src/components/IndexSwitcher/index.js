@@ -1,8 +1,9 @@
 import { Icon, Popconfirm, Select, Tooltip } from 'antd';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import React from 'react';
 import { css } from 'emotion';
-import { LabelTag } from '../LabelTag';
+import LabelTag from '../LabelTag';
 
 const popOverClass = css`
 	.ant-popover-buttons {
@@ -13,8 +14,7 @@ const popOverClass = css`
 	}
 `;
 
-// eslint-disable-next-line import/prefer-default-export
-export function IndexSwitcher({ item = {}, filteredApps = [], history, onSelect, renderItem }) {
+function IndexSwitcher({ item = {}, filteredApps = [], history, onSelect, renderItem }) {
 	if (filteredApps.length === 1 && item.link)
 		return (
 			<Link to={`/app/${filteredApps[0]}/${item.link}`}>
@@ -76,3 +76,21 @@ export function IndexSwitcher({ item = {}, filteredApps = [], history, onSelect,
 		</Popconfirm>
 	);
 }
+
+IndexSwitcher.propTypes = {
+	item: PropTypes.object,
+	filteredApps: PropTypes.array,
+	history: PropTypes.object,
+	onSelect: PropTypes.func,
+	renderItem: PropTypes.func,
+};
+
+IndexSwitcher.defaultProps = {
+	item: {},
+	filteredApps: [],
+	onSelect: null,
+	renderItem: null,
+	history: null,
+};
+
+export default IndexSwitcher;

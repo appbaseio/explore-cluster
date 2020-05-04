@@ -1,4 +1,6 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Icon } from 'antd';
 import parser from 'url-parser-lite';
 
@@ -35,29 +37,14 @@ export default class Introduction extends Component {
 	constructor(props) {
 		super(props);
 
+		const { url } = props;
 		this.state = {
 			status: 'Applying relevant settings...',
-			error: '',
 			loading: false,
-			url: props.url,
+			url,
 			layout: 0,
 		};
 	}
-
-	setError = (e) => {
-		if (this.interval) clearInterval(this.interval);
-		this.setState(
-			{
-				status: '',
-				error: e,
-			},
-			() => {
-				this.interval = setTimeout(() => {
-					this.setState({ error: '' });
-				}, 5000);
-			},
-		);
-	};
 
 	setMapping = () => {
 		this.setState({
@@ -120,7 +107,8 @@ export default class Introduction extends Component {
 		this.setState({
 			url,
 		});
-		this.props.setURL(url);
+		const { setURL } = this.props;
+		setURL(url);
 	};
 
 	nextLayout = () => {
@@ -213,9 +201,11 @@ export default class Introduction extends Component {
 	);
 
 	render() {
-		if (this.state.layout === 0) return this.renderImportContent();
+		const { url, loading, layout, status } = this.state;
+		const { nextScreen } = this.props;
 
-		const { url } = this.state;
+		if (layout === 0) return this.renderImportContent();
+
 		let iframeURL = null;
 		if (url) {
 			const config = JSON.parse(url);
@@ -233,16 +223,14 @@ export default class Introduction extends Component {
 					<div className="content">
 						<header className="vcenter">
 							<h2>Import data into your app</h2>
-							{this.state.url ? (
+							{url ? (
 								<p>Explore your imported dataset for the movies store.</p>
 							) : (
 								<p>We will import a dataset of 500 movies obtained from TMDB.</p>
 							)}
 						</header>
 
-						{this.state.url ? null : (
-							<div className="col-wrapper">{this.renderJSONBlock()}</div>
-						)}
+						{url ? null : <div className="col-wrapper">{this.renderJSONBlock()}</div>}
 					</div>
 				</div>
 				{iframeURL ? (
@@ -258,9 +246,9 @@ export default class Introduction extends Component {
 						/>
 					</div>
 				) : null}
-				<Loader show={this.state.loading} label={this.state.status} />
-				{this.state.url ? (
-					<Footer nextScreen={this.props.nextScreen} />
+				<Loader show={loading} label={status} />
+				{url ? (
+					<Footer nextScreen={nextScreen} />
 				) : (
 					<footer>
 						<div className="left-column" />
@@ -275,3 +263,14 @@ export default class Introduction extends Component {
 		);
 	}
 }
+
+Introduction.propTypes = {
+	setURL: PropTypes.func.isRequired,
+	nextScreen: PropTypes.func,
+	url: PropTypes.string,
+};
+
+Introduction.defaultProps = {
+	nextScreen: null,
+	url: undefined,
+};

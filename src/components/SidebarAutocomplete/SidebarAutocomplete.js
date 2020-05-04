@@ -1,9 +1,10 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { get } from 'lodash';
 import { List, Breadcrumb, Tag, Empty } from 'antd';
 import { css } from 'emotion';
-import { IndexSwitcher } from '../IndexSwitcher';
-import { WithRedirectTooltip } from '../../pages/AppWrapper/AppWrapper';
+import IndexSwitcher from '../IndexSwitcher';
+import WithRedirectTooltip from '../WithRedirectTooltip';
 
 const listStyle = css`
 	.ant-list-item {
@@ -56,6 +57,14 @@ const SearchItem = ({ item }) => {
 			<Breadcrumb.Item>{item.label || item.title}</Breadcrumb.Item>
 		</Breadcrumb>
 	);
+};
+
+SearchItem.propTypes = {
+	item: PropTypes.object,
+};
+
+SearchItem.defaultProps = {
+	item: {},
 };
 
 const SidebarAutocomplete = ({ routes, value, filteredApps, history, resetAutoComplete }) => {
@@ -137,6 +146,20 @@ const SidebarAutocomplete = ({ routes, value, filteredApps, history, resetAutoCo
 			)}
 		/>
 	);
+};
+
+SidebarAutocomplete.propTypes = {
+	routes: PropTypes.array,
+	value: PropTypes.string,
+	filteredApps: PropTypes.array,
+	history: PropTypes.object.isRequired,
+	resetAutoComplete: PropTypes.func.isRequired,
+};
+
+SidebarAutocomplete.defaultProps = {
+	routes: [],
+	value: '',
+	filteredApps: [],
 };
 
 export default React.memo(SidebarAutocomplete);

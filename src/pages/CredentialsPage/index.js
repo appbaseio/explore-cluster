@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import get from 'lodash/get';
 import { Card, Table, Tooltip, Button, Alert, Typography, Icon, Result } from 'antd';
 import { connect } from 'react-redux';
-import { string, func, bool, array } from 'prop-types';
+import { string, func, bool, array, object } from 'prop-types';
 import CreateCredentials from '../../components/CreateCredentials';
 import Container from '../../components/Container';
 import { getAppPermissionsByName } from '../../batteries/modules/selectors';
@@ -22,7 +22,8 @@ const columns = [
 	{
 		title: 'Type',
 		key: 'description',
-		render: ({ permissionInfo }) => (
+		// eslint-disable-next-line react/prop-types
+		render: ({ permissionInfo = {} }) => (
 			<span>
 				{permissionInfo.expired ? (
 					<Tooltip
@@ -293,6 +294,7 @@ Credentials.propTypes = {
 	isAdmin: bool.isRequired,
 	isLoading: bool,
 	errors: array.isRequired,
+	location: object.isRequired,
 };
 
 const mapStateToProps = (state) => {

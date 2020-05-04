@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 import { get } from 'lodash';
 import React from 'react';
 

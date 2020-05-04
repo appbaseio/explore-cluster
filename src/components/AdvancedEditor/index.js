@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign,prefer-destructuring */
 import React from 'react';
+import PropTypes from 'prop-types';
 import ReactFilterBox, { GridDataAutoCompleteHandler } from '@appbaseio/react-filter-box';
 import { keys } from 'lodash';
 import '@appbaseio/react-filter-box/lib/react-filter-box.css';
@@ -26,3 +27,19 @@ export class CustomAutoComplete extends GridDataAutoCompleteHandler {
 		return keys(operatorsMap);
 	}
 }
+
+AdvancedEditor.propTypes = {
+	autoCompleteHandler: PropTypes.object.isRequired,
+	onChange: PropTypes.func,
+	onParseOk: PropTypes.func,
+	query: PropTypes.string,
+	onParseError: PropTypes.func,
+};
+
+const noop = () => {};
+AdvancedEditor.defaultProps = {
+	onChange: noop,
+	onParseOk: noop,
+	query: '',
+	onParseError: noop,
+};

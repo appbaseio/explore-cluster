@@ -123,4 +123,4 @@ const settingsMap = {
 	},
 };
 
-export { settingsMap };
+export default settingsMap;

@@ -131,8 +131,8 @@ class Dashboard extends Component {
 		this.setState({
 			error: true,
 		});
-		Sentry.withScope(scope => {
-			Object.keys(errorInfo).forEach(key => {
+		Sentry.withScope((scope) => {
+			Object.keys(errorInfo).forEach((key) => {
 				scope.setExtra(key, errorInfo[key]);
 			});
 			Sentry.captureException(error);
@@ -218,7 +218,7 @@ const mapStateToProps = ({ user }) => ({
 	status: get(user, 'error.actual.status'),
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	loadArcUser: (u, p) => dispatch(loadUser(u, p)),
 });
 

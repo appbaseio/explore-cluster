@@ -10,6 +10,7 @@ import { validateAppName } from '../../utils/helper';
 import { getSettings, putSettings } from '../../batteries/modules/actions';
 import { appendApp } from '../../actions';
 import { isValidPlan } from '../../batteries/utils';
+import { allowedTiers } from '../../utils/prop-types';
 
 const centerAligned = css`
 	display: flex;
@@ -144,10 +145,19 @@ const CloneIndex = (props) => {
 CloneIndex.propTypes = {
 	index: PropTypes.string.isRequired,
 	handleCancel: PropTypes.func,
+	existingApps: PropTypes.array,
+	getSettingsAction: PropTypes.func.isRequired,
+	updateSettingsAction: PropTypes.func.isRequired,
+	addApp: PropTypes.func.isRequired,
+	history: PropTypes.object.isRequired,
+	tier: allowedTiers.isRequired,
+	featureSearchRelevancy: PropTypes.bool,
 };
 
 CloneIndex.defaultProps = {
 	handleCancel: () => {},
+	existingApps: [],
+	featureSearchRelevancy: false,
 };
 
 const mapStateToProps = (state) => ({

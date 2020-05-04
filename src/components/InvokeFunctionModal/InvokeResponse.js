@@ -1,10 +1,9 @@
-import { Row } from 'antd';
 import React from 'react';
+import PropTypes from 'prop-types';
+import { Row } from 'antd';
 import { modalHeading } from '../../pages/HomePage/styles';
 
-// eslint-disable-next-line import/prefer-default-export
-export function InvokeResponse({ responseData, status }) {
-	console.log('response data', responseData);
+function InvokeResponse({ responseData, status }) {
 	const { headers, ...rest } = responseData;
 	// ___headers___['X-Duration-Seconds']
 	return (
@@ -24,3 +23,15 @@ export function InvokeResponse({ responseData, status }) {
 		</>
 	);
 }
+
+InvokeResponse.propTypes = {
+	responseData: PropTypes.object,
+	status: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+};
+
+InvokeResponse.defaultProps = {
+	responseData: {},
+	status: null,
+};
+
+export default InvokeResponse;

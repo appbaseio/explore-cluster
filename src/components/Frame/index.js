@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 
 class Frame extends React.Component {
@@ -9,8 +10,10 @@ class Frame extends React.Component {
 	}
 
 	componentDidMount() {
+		// eslint-disable-next-line react/no-find-dom-node
 		const iframeNode = ReactDOM.findDOMNode(this.iframeRef.current);
-		iframeNode.addEventListener('load', this.props.onLoad);
+		const { onLoad } = this.props;
+		iframeNode.addEventListener('load', onLoad);
 	}
 
 	render() {
@@ -18,5 +21,12 @@ class Frame extends React.Component {
 		return <iframe ref={this.iframeRef} title={id} {...rest} />;
 	}
 }
+
+Frame.propTypes = {
+	id: PropTypes.string.isRequired,
+	onLoad: PropTypes.func.isRequired,
+};
+
+Frame.defaultProps = {};
 
 export default Frame;

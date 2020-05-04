@@ -1,15 +1,27 @@
+/* eslint-disable camelcase */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { ReactiveList } from '@appbaseio/reactivesearch';
 import ExpandCollapse from 'react-expand-collapse';
 import { Spin, Row, Col, Divider, Popover, Tag, Icon, Tooltip, Button } from 'antd';
 
 import { listItem } from './styles';
+import { children as childrenProp } from '../../../../utils/prop-types';
 
 const Container = ({ hasPagination, children }) => {
 	if (hasPagination) {
 		return children;
 	}
 	return <div id="result-container">{children}</div>;
+};
+
+Container.propTypes = {
+	hasPagination: PropTypes.bool,
+	children: childrenProp.isRequired,
+};
+
+Container.defaultProps = {
+	hasPagination: false,
 };
 
 const ListItemWrapper = ({ item }) => {
@@ -61,6 +73,14 @@ const ListItemWrapper = ({ item }) => {
 	);
 };
 
+ListItemWrapper.propTypes = {
+	item: PropTypes.object,
+};
+
+ListItemWrapper.defaultProps = {
+	item: {},
+};
+
 const renderLoadMore = ({ size, loadMore, data, loading }) => {
 	if (data.length < size) {
 		return null;
@@ -72,6 +92,19 @@ const renderLoadMore = ({ size, loadMore, data, loading }) => {
 			Load More
 		</Button>
 	);
+};
+
+renderLoadMore.propTypes = {
+	size: PropTypes.number,
+	loadMore: PropTypes.func.isRequired,
+	data: PropTypes.object,
+	loading: PropTypes.bool,
+};
+
+renderLoadMore.defaultProps = {
+	size: 0,
+	data: {},
+	loading: false,
 };
 
 const ListItem = React.memo(ListItemWrapper);
@@ -102,5 +135,13 @@ const ListView = ({ result }) => (
 		</Container>
 	</React.Fragment>
 );
+
+ListView.propTypes = {
+	result: PropTypes.object,
+};
+
+ListView.defaultProps = {
+	result: {},
+};
 
 export default ListView;

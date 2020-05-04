@@ -6,7 +6,6 @@ import get from 'lodash/get';
 import { setCurrentApp } from '../../batteries/modules/actions';
 import Loader from '../../components/Loader';
 import SearchPreview from './components/SearchPreview';
-import { getURL } from '../../constants/config';
 
 class SandboxPage extends Component {
 	componentDidUpdate(prevProps) {

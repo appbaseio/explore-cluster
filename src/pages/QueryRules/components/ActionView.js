@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { css } from 'emotion';
 import { Tag, Typography, Popover } from 'antd';
 import { hasValuesChanged } from '../utils';
@@ -114,5 +115,13 @@ class ActionView extends React.Component {
 		}
 	}
 }
+
+ActionView.propTypes = {
+	action: PropTypes.object,
+};
+
+ActionView.defaultProps = {
+	action: {},
+};
 
 export default ActionView;
