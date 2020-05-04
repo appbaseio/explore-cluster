@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Button, Checkbox, Dropdown, Icon, Menu, Typography } from 'antd';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
@@ -46,6 +47,16 @@ const MobileMenu = (props) => {
 			<Button shape="circle" icon="more" />
 		</Dropdown>
 	);
+};
+
+MobileMenu.propTypes = {
+	rule: PropTypes.object,
+	removeRule: PropTypes.func.isRequired,
+	toggleRule: PropTypes.func.isRequired,
+};
+
+MobileMenu.defaultProps = {
+	rule: {},
 };
 
 export default MobileMenu;

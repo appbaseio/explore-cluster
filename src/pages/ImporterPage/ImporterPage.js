@@ -2,7 +2,7 @@ import React, { Fragment } from 'react';
 import { Row, Col, Button, Icon, Skeleton, Alert } from 'antd';
 import { injectGlobal } from 'emotion';
 import { connect } from 'react-redux';
-import { string } from 'prop-types';
+import { string, object } from 'prop-types';
 import get from 'lodash/get';
 import Importer from '@appbaseio-confidential/importer';
 import applyClusterSettings from '@appbaseio-confidential/importer/lib/utils/applyClusterSettings';
@@ -17,6 +17,7 @@ import 'antd/es/divider/style/css';
 import 'antd/es/switch/style/css';
 import 'antd/es/modal/style/css';
 
+// eslint-disable-next-line no-unused-expressions
 injectGlobal`
 	.ant-layout-header{
 		background: white !important;
@@ -88,7 +89,7 @@ class ImporterPage extends React.Component {
 	};
 
 	render() {
-		const { appName, credentials, type, user } = this.props;
+		const { user } = this.props;
 
 		const { destinationParams, preparingApp } = this.state;
 		const isLocalES = destinationParams
@@ -202,7 +203,13 @@ class ImporterPage extends React.Component {
 
 ImporterPage.propTypes = {
 	appName: string.isRequired,
-	credentials: string.isRequired,
+	user: object,
+	type: string,
+};
+
+ImporterPage.defaultProps = {
+	user: {},
+	type: '',
 };
 
 const mapStateToProps = (state) => {

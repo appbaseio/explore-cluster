@@ -703,6 +703,8 @@ CreateCredentials.propTypes = {
 	plan: PropTypes.oneOf(['free', 'growth', 'bootstrap']).isRequired,
 	titleText: PropTypes.string,
 	isUserManagement: PropTypes.bool,
+	credentials: PropTypes.string.isRequired,
+	fetchMappings: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => {

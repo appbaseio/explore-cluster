@@ -1,5 +1,6 @@
-/* eslint-disable no-param-reassign,camelcase */
+/* eslint-disable no-param-reassign,camelcase,jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for,jsx-a11y/no-noninteractive-element-interactions */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -34,7 +35,7 @@ import { getErrorClass, getErrorCount, getErrorMessage, getErrorMessages } from 
 import { addQueryRule, deleteRule, getRules, putRule } from '../../batteries/modules/actions/rules';
 
 import CloneRule from './components/CloneRule';
-import { Info } from '../../components/Info';
+import Info from '../../components/Info';
 import {
 	deleteQueryRuleInFunction,
 	getClusterMappings,
@@ -53,6 +54,7 @@ import { isValidPlan } from '../../batteries/utils';
 
 import { AdvancedEditor, CustomAutoComplete } from '../../components/AdvancedEditor';
 import { getRawQuery, parseExpression } from '../../components/AdvancedEditor/helper';
+import { allowedTiers } from '../../utils/prop-types';
 
 const customReactFilter = css`
 	.react-filter-box {
@@ -138,6 +140,10 @@ function DocsLink({ url }) {
 		</a>
 	);
 }
+
+DocsLink.propTypes = {
+	url: PropTypes.string.isRequired,
+};
 
 class QueryRulesForm extends React.Component {
 	constructor(props) {
@@ -230,6 +236,7 @@ class QueryRulesForm extends React.Component {
 		if (isEditPage && prevProps.rule !== rule && !isUpdating) {
 			const { show_advance_editor } = rule;
 			const { rawQuery, indexes } = getRawQuery(show_advance_editor, unparsedRule);
+			// eslint-disable-next-line react/no-did-update-set-state
 			this.setState({
 				...rule,
 				rawQuery,
@@ -422,11 +429,11 @@ class QueryRulesForm extends React.Component {
 					enabled,
 				}).then((res) => {
 					const prevFunction = get(
-						unparsedRule.actions.find((rule) => rule.type === 'function'),
+						unparsedRule.actions.find((ruleObj) => ruleObj.type === 'function'),
 						'data',
 					);
 					const newFunction = get(
-						actions.find((rule) => rule.type === 'function'),
+						actions.find((ruleObj) => ruleObj.type === 'function'),
 						'data',
 					);
 					if (prevFunction !== newFunction && prevFunction) {
@@ -474,14 +481,15 @@ class QueryRulesForm extends React.Component {
 			'timeframe',
 		];
 
-		const { show_advance_editor } = this.state;
+		const { props, state } = this;
+		const { show_advance_editor } = state;
 
 		if (show_advance_editor) keys.push('advancedExpression');
 
-		const { rule } = this.props;
+		const { rule } = props;
 		if (rule) {
 			return keys.some((key) => {
-				return JSON.stringify(rule[key]) !== JSON.stringify(this.state[key]);
+				return JSON.stringify(rule[key]) !== JSON.stringify(state[key]);
 			});
 		}
 		return false;
@@ -561,7 +569,6 @@ class QueryRulesForm extends React.Component {
 			show_advance_editor,
 			rawQuery,
 			editorKey,
-			fieldMap,
 		} = this.state;
 		const {
 			isCreating,
@@ -578,8 +585,8 @@ class QueryRulesForm extends React.Component {
 
 		this.customAutoComplete = new CustomAutoComplete(null, [
 			{ columnField: '$query', type: 'selection' },
-			...dataFields.map((dataField) => ({
-				columnField: dataField.replace(/.keyword/g, ''),
+			...dataFields.map((field) => ({
+				columnField: field.replace(/.keyword/g, ''),
 				type: 'selection',
 			})),
 		]);
@@ -915,6 +922,42 @@ class QueryRulesForm extends React.Component {
 		);
 	}
 }
+
+QueryRulesForm.propTypes = {
+	isCreating: PropTypes.bool,
+	createError: PropTypes.object,
+	rule: PropTypes.object,
+	isUpdating: PropTypes.bool,
+	updateError: PropTypes.object,
+	deleteError: PropTypes.string,
+	isDeleting: PropTypes.bool,
+	history: PropTypes.object.isRequired,
+	unparsedRule: PropTypes.object,
+	rulesLoading: PropTypes.bool,
+	rules: PropTypes.array,
+	removeRule: PropTypes.func.isRequired,
+	tier: allowedTiers,
+	featureRules: PropTypes.bool,
+	createRule: PropTypes.func.isRequired,
+	updateRule: PropTypes.func.isRequired,
+	match: PropTypes.object.isRequired,
+	fetchRules: PropTypes.func.isRequired,
+};
+
+QueryRulesForm.defaultProps = {
+	isCreating: false,
+	createError: null,
+	rule: null,
+	isUpdating: false,
+	updateError: null,
+	deleteError: undefined,
+	isDeleting: false,
+	unparsedRule: null,
+	rulesLoading: false,
+	rules: null,
+	tier: undefined,
+	featureRules: false,
+};
 
 const mapStateToProps = (state, props) => {
 	const id = get(props.match, 'params.id');

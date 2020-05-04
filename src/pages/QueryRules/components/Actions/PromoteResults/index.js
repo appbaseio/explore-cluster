@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { ReactiveBase } from '@appbaseio/reactivesearch';
 import { notification } from 'antd';
 import { getURL } from '../../../../../constants/config';
@@ -119,5 +120,18 @@ class PromoteResults extends Component {
 		);
 	}
 }
+
+PromoteResults.propTypes = {
+	indexes: PropTypes.array,
+	dataFields: PropTypes.array,
+	value: PropTypes.array,
+	onChange: PropTypes.func.isRequired,
+};
+
+PromoteResults.defaultProps = {
+	indexes: [],
+	dataFields: [],
+	value: [],
+};
 
 export default PromoteResults;

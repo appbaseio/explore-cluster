@@ -1,9 +1,10 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Card, Button, Icon, Row, Col, Tooltip } from 'antd';
 import { Link } from 'react-router-dom';
 import { DataSearch, SelectedFilters } from '@appbaseio/reactivesearch';
 import { css } from 'emotion';
-import { settingsMap } from '../../../components/ReviewAndSave/helper';
+import settingsMap from '../../../components/ReviewAndSave/helper';
 
 export const highlighter = css`
 	width: 6px;
@@ -85,6 +86,17 @@ const Search = (props) => {
 			</Row>
 		</Card>
 	);
+};
+
+Search.propTypes = {
+	search: PropTypes.object,
+	app: PropTypes.string.isRequired,
+	handleValueChange: PropTypes.func,
+};
+
+Search.defaultProps = {
+	search: {},
+	handleValueChange: () => {},
 };
 
 export default Search;

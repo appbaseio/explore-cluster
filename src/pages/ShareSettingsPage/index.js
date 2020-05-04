@@ -164,6 +164,16 @@ ShareSettingsView.propTypes = {
 	success: PropTypes.bool.isRequired,
 	isLoading: PropTypes.bool.isRequired,
 	errors: PropTypes.array.isRequired,
+	fetchAppShare: PropTypes.func.isRequired,
+	appId: PropTypes.string.isRequired,
+	isPaidUser: PropTypes.bool,
+	sharedUsers: PropTypes.array,
+	handleEditPermission: PropTypes.func.isRequired,
+};
+
+ShareSettingsView.defaultProps = {
+	isPaidUser: false,
+	sharedUsers: [],
 };
 
 const mapStateToProps = (state) => ({

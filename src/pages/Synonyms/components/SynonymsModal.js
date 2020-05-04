@@ -1,4 +1,6 @@
+/* eslint-disable jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Modal, Select, Tooltip, Icon, message } from 'antd';
 import { get } from 'lodash';
 import { connect } from 'react-redux';
@@ -17,6 +19,7 @@ import {
 import { getURL } from '../../../constants/config';
 import { getSettings, getMappings } from '../../../batteries/utils/mappings';
 import { updateSynonyms } from '../api';
+import { children, synonymTypes } from '../../../utils/prop-types';
 
 const { Option } = Select;
 
@@ -251,6 +254,30 @@ class SynonymsModal extends React.Component {
 		);
 	}
 }
+
+SynonymsModal.propTypes = {
+	appName: PropTypes.string.isRequired,
+	credentials: PropTypes.string.isRequired,
+	url: PropTypes.string.isRequired,
+	indexSynonyms: PropTypes.array,
+	id: PropTypes.string,
+	isAddModal: PropTypes.bool,
+	handleSynonyms: PropTypes.func.isRequired,
+	renderButton: children,
+	resetInputOnClose: PropTypes.bool,
+	type: synonymTypes,
+	synonyms: PropTypes.array,
+};
+
+SynonymsModal.defaultProps = {
+	indexSynonyms: [],
+	id: undefined,
+	isAddModal: false,
+	renderButton: null,
+	resetInputOnClose: false,
+	type: 'equivalent',
+	synonyms: null,
+};
 
 const mapStateToProps = (state) => {
 	const { username, password } = get(state, 'user.data', {});

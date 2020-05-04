@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Button, Card, Col, Icon, message, Row, Switch, Tooltip, Typography } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
@@ -212,6 +213,21 @@ class QueryCard extends React.Component {
 		);
 	}
 }
+
+QueryCard.propTypes = {
+	rule: PropTypes.object,
+	dragProvided: PropTypes.object,
+	dragSnapshot: PropTypes.object,
+	removeRule: PropTypes.func.isRequired,
+	toggleRule: PropTypes.func.isRequired,
+	index: PropTypes.number.isRequired,
+};
+
+QueryCard.defaultProps = {
+	rule: {},
+	dragProvided: {},
+	dragSnapshot: {},
+};
 
 const mapDispatchToProps = (dispatch) => ({
 	removeRule: (id) => dispatch(deleteRule(id)),

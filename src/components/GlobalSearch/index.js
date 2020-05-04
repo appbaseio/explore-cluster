@@ -1,4 +1,5 @@
 import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 import { DataSearch } from '@appbaseio/reactivesearch';
 import { css } from 'react-emotion';
 import { Icon } from 'antd';
@@ -24,13 +25,7 @@ class GlobalSearch extends PureComponent {
 	};
 
 	render() {
-		const {
-			onSuggestionSelect,
-			className,
-			dataFields,
-			onKeyDown,
-			onValueSelected,
-		} = this.props;
+		const { className, dataFields, onKeyDown, onValueSelected } = this.props;
 		const { searchValue } = this.state;
 		return (
 			<div className={inputBox} css={{ position: 'relative' }}>
@@ -53,11 +48,6 @@ class GlobalSearch extends PureComponent {
 					}}
 					debounce={5}
 					showIcon={false}
-					onValueSelected={(value, cause, source) => {
-						if (onSuggestionSelect && cause === 'SUGGESTION_SELECT') {
-							onSuggestionSelect(value, cause, source);
-						}
-					}}
 					showDistinctSuggestions
 					onChange={this.handleSearchValueChange}
 					value={searchValue}
@@ -79,5 +69,19 @@ class GlobalSearch extends PureComponent {
 		);
 	}
 }
+
+GlobalSearch.propTypes = {
+	className: PropTypes.string,
+	dataFields: PropTypes.array.isRequired,
+	onKeyDown: PropTypes.func,
+	onValueSelected: PropTypes.func,
+};
+
+const noop = () => {};
+GlobalSearch.defaultProps = {
+	className: '',
+	onKeyDown: noop,
+	onValueSelected: noop,
+};
 
 export default GlobalSearch;

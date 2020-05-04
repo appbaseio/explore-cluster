@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { Icon, Input, Modal, Tooltip } from 'antd';
 import { connect } from 'react-redux';
 import { deleteFunction } from '../../batteries/modules/actions';
@@ -39,6 +40,16 @@ function DeleteFunction({ name, deleteFunctions, loading }) {
 		</>
 	);
 }
+
+DeleteFunction.propTypes = {
+	name: PropTypes.string.isRequired,
+	deleteFunctions: PropTypes.func.isRequired,
+	loading: PropTypes.bool,
+};
+
+DeleteFunction.defaultProps = {
+	loading: false,
+};
 
 const mapDispatchToProps = (dispatch) => ({
 	deleteFunctions: (funcName) => dispatch(deleteFunction(funcName)),

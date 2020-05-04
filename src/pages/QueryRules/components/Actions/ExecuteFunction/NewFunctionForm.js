@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-
+import PropTypes from 'prop-types';
 import { Button, notification, Result, Spin } from 'antd';
 import {
 	deploymentCheck,
 	handleInputClosure,
 } from '../../../../../components/DeployFunctionModal/helper';
-import { DeployFunctionForm } from '../../../../../components/DeployFunctionModal/DeployFunctionForm';
+import DeployFunctionForm from '../../../../../components/DeployFunctionModal/DeployFunctionForm';
 import { createFunction, getSingleFunction } from '../../../../../batteries/utils/app';
 import TestFunction from './TestFunction';
 
@@ -103,5 +103,10 @@ class NewFunctionForm extends Component {
 		);
 	}
 }
+
+NewFunctionForm.propTypes = {
+	onChange: PropTypes.func.isRequired,
+	onSuccess: PropTypes.func.isRequired,
+};
 
 export default NewFunctionForm;

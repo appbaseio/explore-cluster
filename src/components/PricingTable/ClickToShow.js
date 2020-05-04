@@ -59,3 +59,9 @@ ClickToShow.propTypes = {
 	label: string,
 	hideLabel: string,
 };
+
+ClickToShow.defaultProps = {
+	children: null,
+	label: 'All Features',
+	hideLabel: 'Hide Features',
+};

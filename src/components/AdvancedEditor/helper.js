@@ -249,9 +249,10 @@ export const getRawQuery = (showAdvancedEditor, unparsedRule) => {
 		const pattern = /'(.*?)'/;
 		indexes = rawQuery[0].match(pattern)[1].split(',');
 		if (rawQuery.length > 1) {
+			// eslint-disable-next-line prefer-destructuring
 			rawQuery = rawQuery[1];
 		} else {
-			rawQuery = rawQuery[0];
+			[rawQuery] = rawQuery;
 		}
 	}
 	return {

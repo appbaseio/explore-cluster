@@ -1,9 +1,10 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Card, Icon, Button, Tooltip } from 'antd';
 import { Link } from 'react-router-dom';
 import { get } from 'lodash';
 import { MultiList } from '@appbaseio/reactivesearch';
-import { settingsMap } from '../../../components/ReviewAndSave/helper';
+import settingsMap from '../../../components/ReviewAndSave/helper';
 
 const Filter = (props) => {
 	const { app, aggs, handleValueChange } = props;
@@ -37,6 +38,17 @@ const Filter = (props) => {
 			</Link>
 		</React.Fragment>
 	);
+};
+
+Filter.propTypes = {
+	aggs: PropTypes.array,
+	app: PropTypes.string.isRequired,
+	handleValueChange: PropTypes.func,
+};
+
+Filter.defaultProps = {
+	aggs: [],
+	handleValueChange: () => {},
 };
 
 export default Filter;

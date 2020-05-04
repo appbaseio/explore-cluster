@@ -1,7 +1,7 @@
 import React from 'react';
 import { Layout, Menu, Icon, Tooltip, Button, Row, Breadcrumb } from 'antd';
 import { Link } from 'react-router-dom';
-import { string, object, bool, number } from 'prop-types';
+import { string, object, bool, number, func } from 'prop-types';
 import { css } from 'react-emotion';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
@@ -132,12 +132,17 @@ AppHeader.propTypes = {
 	showApp: bool,
 	isUsingTrial: bool.isRequired,
 	daysLeft: number.isRequired,
+	history: object.isRequired,
+	match: object.isRequired,
+	collapsed: bool,
+	onToggle: func.isRequired,
 };
 
 AppHeader.defaultProps = {
 	showApp: true,
 	currentApp: null,
 	minimal: false,
+	collapsed: false,
 };
 
 const mapStateToProps = (state) => ({

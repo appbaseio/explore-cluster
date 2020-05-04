@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Col, Icon, Row } from 'antd';
 import { actionIcon, cloneButton, columnSeparator, deleteButton } from '../AppCard/styles';
 import DeleteAppModal from '../AppCard/DeleteAppModal';
@@ -79,5 +80,11 @@ class AppActions extends Component {
 		);
 	}
 }
+
+AppActions.propTypes = {
+	title: PropTypes.object.isRequired,
+	data: PropTypes.object.isRequired,
+	onExploreClick: PropTypes.func.isRequired,
+};
 
 export default AppActions;

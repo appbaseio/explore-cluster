@@ -1,10 +1,10 @@
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Col, Icon, Row, Table } from 'antd';
 import { get, keys } from 'lodash';
-import React from 'react';
-import { settingsMap } from './helper';
+import settingsMap from './helper';
 
-// eslint-disable-next-line import/prefer-default-export
-export function DiffTable({ object, parseDiff }) {
+function DiffTable({ object, parseDiff }) {
 	return (
 		<Table
 			rowKey="setting"
@@ -45,3 +45,15 @@ export function DiffTable({ object, parseDiff }) {
 		/>
 	);
 }
+
+DiffTable.propTypes = {
+	object: PropTypes.object,
+	parseDiff: PropTypes.func,
+};
+
+DiffTable.defaultProps = {
+	object: {},
+	parseDiff: () => {},
+};
+
+export default DiffTable;
