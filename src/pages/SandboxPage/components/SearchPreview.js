@@ -83,7 +83,7 @@ class SearchPreview extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { mappings, isFetchingMappings } = this.props;
+		const { mappings, isFetchingMappings, hasTestSettings, settings } = this.props;
 		/*
 			Update the searchable mappings state whenever there is a change in mappings.
 		*/
@@ -97,6 +97,17 @@ class SearchPreview extends React.Component {
 			// eslint-disable-next-line
 			this.setState({
 				searchableMappings,
+			});
+		}
+
+		/*
+			Once the Search Relevancy API gets resolves we need to populate the state
+		 	with the components query.
+		*/
+		if (!hasTestSettings && JSON.stringify(settings) !== JSON.stringify(prevProps.settings)) {
+			// eslint-disable-next-line
+			this.setState({
+				settings: generateQuery(settings),
 			});
 		}
 	}
@@ -120,6 +131,9 @@ class SearchPreview extends React.Component {
 	};
 
 	static getDerivedStateFromProps(props, state) {
+		const searchSettings =
+			state && state.settings ? state.settings.find((item) => item.id === 'search') : {};
+
 		/*
 			We need to prefill the datasearch with all searchable mappings
 			if the search relevancy API gives no fields.
@@ -127,17 +141,12 @@ class SearchPreview extends React.Component {
 			Firstly check if props.mappings has values resolved and than prefill
 			with all searchable mappings.
 		*/
-
-		const searchSettings =
-			state && state.settings ? state.settings.find((item) => item.id === 'search') : {};
-
 		if (
 			!props.hasTestSettings &&
 			!props.isFetchingMappings &&
 			props.mappings &&
 			state.settings &&
-			searchSettings.dataField &&
-			searchSettings.dataField.length === 0
+			get(searchSettings, 'dataField', []).length === 0
 		) {
 			return {
 				settings: generateQuery({
@@ -148,16 +157,6 @@ class SearchPreview extends React.Component {
 						fieldWeights: Object.values(state.searchableMappings),
 					},
 				}),
-			};
-		}
-
-		/*
-			Once the Search Relevancy API gets resolves we need to populate the state
-		 	with the components query.
-		*/
-		if (!props.hasTestSettings && state && !state.settings && props.settings) {
-			return {
-				settings: generateQuery(props.settings),
 			};
 		}
 
