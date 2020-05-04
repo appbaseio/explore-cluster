@@ -6,7 +6,7 @@ import { MultiList } from '@appbaseio/reactivesearch';
 import { settingsMap } from '../../../components/ReviewAndSave/helper';
 
 const Filter = (props) => {
-	const { app, aggs } = props;
+	const { app, aggs, handleValueChange } = props;
 	return (
 		<React.Fragment>
 			{aggs.map((agg) => (
@@ -20,6 +20,7 @@ const Filter = (props) => {
 								'',
 							)}`
 						}
+						onChange={(value) => handleValueChange(agg.id, value)}
 						componentId={agg.id}
 						loader="Loading Items"
 					/>

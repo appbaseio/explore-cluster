@@ -37,7 +37,7 @@ export const highlighter = css`
 `;
 
 const Search = (props) => {
-	const { app, search } = props;
+	const { app, search, handleValueChange } = props;
 	return (
 		<Card>
 			<Row type="flex" gutter={8} align="middle" justify="space-between">
@@ -58,8 +58,13 @@ const Search = (props) => {
 						</div>
 					)}
 					{search.dataField && search.dataField.length ? (
-						<DataSearch {...search} autosuggest componentId={search.id} />
-					): null}
+						<DataSearch
+							{...search}
+							autosuggest
+							onChange={(value) => handleValueChange(search.id, value)}
+							componentId={search.id}
+						/>
+					) : null}
 				</Col>
 				<Col xs={4}>
 					<Link to={`/app/${app}/search`}>

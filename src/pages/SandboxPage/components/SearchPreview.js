@@ -64,9 +64,9 @@ class SearchPreview extends React.Component {
 		*/
 		if (!settings) {
 			fetchSearchSettings(app);
-		} else if (hasTestSettings) {
+		} else {
 			this.setState({
-				settings: generateQuery(testSettings),
+				settings: generateQuery(hasTestSettings ? testSettings : settings),
 			});
 		}
 
@@ -199,6 +199,19 @@ class SearchPreview extends React.Component {
 		});
 	};
 
+	handleValueChange = (id, value) => {
+		this.setState(({ settings }) => ({
+			settings: settings.map((item) =>
+				item.id === id
+					? {
+							...item,
+							value,
+					  }
+					: item,
+			),
+		}));
+	};
+
 	generateCodeSandbox = () => {
 		const { settings } = this.state;
 		const { app, credentials, url } = this.props;
@@ -295,15 +308,25 @@ class SearchPreview extends React.Component {
 					}}
 				>
 					<Col md={6}>
-						<Filter app={app} aggs={aggregations} />
+						<Filter
+							handleValueChange={this.handleValueChange}
+							app={app}
+							aggs={aggregations}
+						/>
 					</Col>
 					<Col md={18}>
-						<Search app={app} search={search} />
+						<Search
+							handleValueChange={this.handleValueChange}
+							app={app}
+							search={search}
+						/>
 						<Result
 							result={result}
 							query={stateSettings}
 							app={app}
 							url={url}
+							toggleAnalytics={this.toggleAnalytics}
+							recordAnalytics={isAnalyticsEnabled}
 							rules={rules}
 							onChange={this.handleSettingsChange}
 							credentials={credentials}

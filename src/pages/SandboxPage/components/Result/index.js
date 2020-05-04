@@ -20,7 +20,17 @@ class Result extends React.Component {
 	};
 
 	render() {
-		const { result, app, credentials, url, onChange, query, rules } = this.props;
+		const {
+			result,
+			app,
+			credentials,
+			url,
+			onChange,
+			query,
+			rules,
+			recordAnalytics,
+			toggleAnalytics,
+		} = this.props;
 		const { view } = this.state;
 		return (
 			<Card>
@@ -99,8 +109,10 @@ class Result extends React.Component {
 				) : (
 					<QueryView
 						app={app}
+						recordAnalytics={recordAnalytics}
 						credentials={credentials}
 						url={url}
+						toggleAnalytics={toggleAnalytics}
 						query={query}
 						onChange={onChange}
 					/>

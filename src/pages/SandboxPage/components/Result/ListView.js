@@ -35,7 +35,11 @@ const ListItemWrapper = ({ item }) => {
 								<Popover
 									content={
 										typeof rest[key] === 'object' ? (
-											<pre>{JSON.stringify(rest[key], null, 4)}</pre>
+											<pre
+												dangerouslySetInnerHTML={{
+													__html: JSON.stringify(rest[key]) || 'N/A',
+												}}
+											/>
 										) : (
 											rest[key]
 										)
