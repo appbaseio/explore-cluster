@@ -122,14 +122,14 @@ class ActionSelector extends React.Component {
 }
 
 ActionSelector.propTypes = {
-	actions: PropTypes.object,
+	actions: PropTypes.array,
 	onChange: PropTypes.func.isRequired,
 	error: PropTypes.object,
 	condition: PropTypes.string,
 };
 
 ActionSelector.defaultProps = {
-	actions: {},
+	actions: [],
 	error: {},
 	condition: undefined,
 };

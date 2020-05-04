@@ -80,7 +80,7 @@ function IndexSwitcher({ item = {}, filteredApps = [], history, onSelect, render
 IndexSwitcher.propTypes = {
 	item: PropTypes.object,
 	filteredApps: PropTypes.array,
-	history: PropTypes.object.isRequired,
+	history: PropTypes.object,
 	onSelect: PropTypes.func,
 	renderItem: PropTypes.func,
 };
@@ -90,6 +90,7 @@ IndexSwitcher.defaultProps = {
 	filteredApps: [],
 	onSelect: null,
 	renderItem: null,
+	history: null,
 };
 
 export default IndexSwitcher;

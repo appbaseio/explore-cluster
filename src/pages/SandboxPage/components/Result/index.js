@@ -117,7 +117,7 @@ Result.propTypes = {
 	credentials: PropTypes.string.isRequired,
 	url: PropTypes.string,
 	onChange: PropTypes.func,
-	query: PropTypes.object,
+	query: PropTypes.array,
 	rules: PropTypes.array,
 };
 
@@ -125,8 +125,8 @@ Result.defaultProps = {
 	result: {},
 	url: undefined,
 	onChange: null,
-	query: {},
-	results: [],
+	query: [],
+	rules: [],
 };
 
 export default Result;

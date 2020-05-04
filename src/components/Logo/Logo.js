@@ -16,12 +16,12 @@ const Logo = ({ type, width }) => {
 
 Logo.defaultProps = {
 	width: 140,
-	type: string,
+	type: undefined,
 };
 
 Logo.propTypes = {
 	width: number,
-	type: undefined,
+	type: string,
 };
 
 export default Logo;

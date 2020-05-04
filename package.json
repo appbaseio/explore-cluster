@@ -18,12 +18,11 @@
 	},
 	"husky": {
 		"hooks": {
-			"pre-commit": "lint-staged"
+			"pre-commit": "lint-staged && yarn test"
 		}
 	},
 	"lint-staged": {
 		"./src/!(batteries*)**/*.js": [
-			"yarn test",
 			"yarn format",
 			"yarn lint"
 		]

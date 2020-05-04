@@ -8,4 +8,4 @@ export const children = PropTypes.oneOfType([
 	PropTypes.node,
 	PropTypes.func,
 ]);
-export const synonymTypes = PropTypes.oneOfType(['one-way', 'equivalent']);
+export const synonymTypes = PropTypes.oneOf(['one-way', 'equivalent']);

@@ -64,9 +64,9 @@ const Replicas = ({
 );
 
 Replicas.propTypes = {
-	replicas: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
-	totalNodes: PropTypes.number.isRequired,
-	allocated_replicas: PropTypes.number.isRequired,
+	replicas: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+	totalNodes: PropTypes.number,
+	allocated_replicas: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 	updateReplicas: PropTypes.func.isRequired,
 	handleSlider: PropTypes.func.isRequired,
 	replicasModal: PropTypes.bool,
@@ -77,6 +77,9 @@ Replicas.propTypes = {
 Replicas.defaultProps = {
 	replicasModal: false,
 	loading: false,
+	replicas: null,
+	totalNodes: undefined,
+	allocated_replicas: null,
 };
 
 export default Replicas;

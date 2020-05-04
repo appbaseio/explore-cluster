@@ -60,7 +60,7 @@ const Search = (props) => {
 					)}
 					{search.dataField && search.dataField.length ? (
 						<DataSearch {...search} autosuggest componentId={search.id} />
-					): null}
+					) : null}
 				</Col>
 				<Col xs={4}>
 					<Link to={`/app/${app}/search`}>

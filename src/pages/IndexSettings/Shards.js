@@ -58,8 +58,8 @@ const Shards = ({
 );
 
 Shards.propTypes = {
-	shards: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-	allocated_shards: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+	shards: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+	allocated_shards: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 	updateShards: PropTypes.func.isRequired,
 	shardsModal: PropTypes.bool,
 	handleModal: PropTypes.func.isRequired,
@@ -68,6 +68,8 @@ Shards.propTypes = {
 
 Shards.defaultProps = {
 	shardsModal: false,
+	shards: null,
+	allocated_shards: null,
 };
 
 export default Shards;
