@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Input } from 'antd';
 
 const RemoveWord = ({ value = [], onChange }) => {
@@ -9,6 +10,15 @@ const RemoveWord = ({ value = [], onChange }) => {
 			onChange={(e) => onChange(e.target.value.split(' '))}
 		/>
 	);
+};
+
+RemoveWord.propTypes = {
+	value: PropTypes.array,
+	onChange: PropTypes.func.isRequired,
+};
+
+RemoveWord.defaultProps = {
+	value: [],
 };
 
 export default RemoveWord;

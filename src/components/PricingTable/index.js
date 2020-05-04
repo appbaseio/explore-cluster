@@ -894,6 +894,7 @@ PricingTable.defaultProps = {
 	isArcStandard: false,
 	isArcEnterprise: false,
 	subscriptionID: '',
+	showUnsubscribeModal: false,
 };
 
 PricingTable.propTypes = {
@@ -907,6 +908,8 @@ PricingTable.propTypes = {
 	isArcEnterprise: PropTypes.bool,
 	errors: PropTypes.array.isRequired,
 	subscriptionID: PropTypes.string,
+	onToggleUnsubscribeModal: PropTypes.func.isRequired,
+	showUnsubscribeModal: PropTypes.bool,
 };
 const mapStateToProps = (state) => {
 	const appPlan = getAppPlanByName(state);

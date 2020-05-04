@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import { Icon, notification, Skeleton, Tooltip } from 'antd';
 import { fetchLogs } from '../../utils';
 
@@ -111,5 +112,15 @@ function Logs({ name, isOpen, toggleIsOpen }) {
 		</>
 	);
 }
+
+Logs.propTypes = {
+	name: PropTypes.string.isRequired,
+	isOpen: PropTypes.bool,
+	toggleIsOpen: PropTypes.func.isRequired,
+};
+
+Logs.defaultProps = {
+	isOpen: false,
+};
 
 export default Logs;

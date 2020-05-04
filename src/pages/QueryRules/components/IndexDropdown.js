@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Select } from 'antd';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
@@ -61,6 +62,20 @@ class IndexDropdown extends React.Component {
 		);
 	}
 }
+
+IndexDropdown.propTypes = {
+	apps: PropTypes.object,
+	fetchApps: PropTypes.func.isRequired,
+	selectedIndexes: PropTypes.array,
+	onChange: PropTypes.func.isRequired,
+	error: PropTypes.object,
+};
+
+IndexDropdown.defaultProps = {
+	apps: null,
+	selectedIndexes: [],
+	error: {},
+};
 
 const mapStateToProps = (state) => ({
 	apps: get(state, 'apps.data'),

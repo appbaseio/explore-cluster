@@ -1,5 +1,7 @@
 import React from 'react';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import PropTypes from 'prop-types';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { children as childrenProp } from '../../utils/prop-types';
 
 class DNDWrapper extends React.Component {
 	onDragStart = () => {
@@ -9,7 +11,7 @@ class DNDWrapper extends React.Component {
 	};
 
 	render() {
-		const { dropId, indexKey, idKey, items, onDragEnd } = this.props;
+		const { dropId, indexKey, idKey, items, onDragEnd, children } = this.props;
 		return (
 			<DragDropContext onDragStart={this.onDragStart} onDragEnd={onDragEnd}>
 				<Droppable droppableId={dropId}>
@@ -36,7 +38,7 @@ class DNDWrapper extends React.Component {
 												ref={dragProvided.innerRef}
 												{...dragProvided.draggableProps}
 											>
-												{this.props.children({
+												{children({
 													item,
 													dragProvided,
 													dragSnapshot,
@@ -54,5 +56,20 @@ class DNDWrapper extends React.Component {
 		);
 	}
 }
+
+DNDWrapper.propTypes = {
+	dropId: PropTypes.string.isRequired,
+	indexKey: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+	idKey: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+	items: PropTypes.array,
+	onDragEnd: PropTypes.func.isRequired,
+	children: childrenProp.isRequired,
+};
+
+DNDWrapper.defaultProps = {
+	indexKey: undefined,
+	idKey: undefined,
+	items: [],
+};
 
 export default DNDWrapper;

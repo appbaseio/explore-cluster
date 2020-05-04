@@ -1,4 +1,6 @@
+/* eslint-disable jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Col, Input, Row } from 'antd';
 
 const ReplaceWord = ({ value = [], onChange }) => {
@@ -22,6 +24,15 @@ const ReplaceWord = ({ value = [], onChange }) => {
 			</Col>
 		</Row>
 	);
+};
+
+ReplaceWord.propTypes = {
+	value: PropTypes.array,
+	onChange: PropTypes.func.isRequired,
+};
+
+ReplaceWord.defaultProps = {
+	value: [],
 };
 
 export default ReplaceWord;

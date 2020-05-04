@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Button, Icon, message, Typography } from 'antd';
 import Appbase from 'appbase-js';
 import { css } from 'emotion';
@@ -148,5 +149,19 @@ class QueryView extends React.Component {
 		);
 	}
 }
+
+QueryView.propTypes = {
+	query: PropTypes.object,
+	app: PropTypes.string.isRequired,
+	url: PropTypes.string,
+	credentials: PropTypes.string.isRequired,
+	onChange: PropTypes.func,
+};
+
+QueryView.defaultProps = {
+	query: {},
+	url: undefined,
+	onChange: null,
+};
 
 export default QueryView;

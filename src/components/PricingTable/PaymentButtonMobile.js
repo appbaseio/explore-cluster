@@ -103,6 +103,7 @@ class PaymentButtonMobile extends React.Component {
 				disabled={isCurrentPlan}
 				stripeKey={STRIPE_KEY.LIVE}
 			>
+				{/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
 				<Link css={{ color: linkColor }}>{this.text}</Link>
 			</Stripe>
 		);

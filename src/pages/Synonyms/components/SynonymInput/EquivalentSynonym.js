@@ -1,7 +1,7 @@
+/* eslint-disable jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Select } from 'antd';
-
-const { Option } = Select;
 
 const EquivalentSynonym = (props) => {
 	const { synonyms, onChange } = props;
@@ -23,6 +23,15 @@ const EquivalentSynonym = (props) => {
 			/>
 		</React.Fragment>
 	);
+};
+
+EquivalentSynonym.propTypes = {
+	synonyms: PropTypes.array,
+	onChange: PropTypes.func.isRequired,
+};
+
+EquivalentSynonym.defaultProps = {
+	synonyms: undefined,
 };
 
 export default EquivalentSynonym;

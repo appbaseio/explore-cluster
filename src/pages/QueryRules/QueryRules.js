@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 import { Affix, Button, Col, Icon, Layout, message, Result, Row } from 'antd';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
@@ -14,6 +15,7 @@ import Overlay from '../../components/Overlay';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { bannerDetails } from './utils';
 import SearchPreviewSwitcher from '../../components/SearchPreviewSwitcher';
+import { allowedTiers } from '../../utils/prop-types';
 
 const { Header } = Layout;
 
@@ -100,7 +102,7 @@ class QueryRules extends Component {
 			return <Loader />;
 		}
 
-		const filteredApps = keys(apps).filter((app) => !app.startsWith('.'));
+		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
 
 		return (
 			<Fragment>
@@ -216,6 +218,30 @@ class QueryRules extends Component {
 		);
 	}
 }
+
+QueryRules.propTypes = {
+	fetchRules: PropTypes.func.isRequired,
+	updateOrder: PropTypes.func.isRequired,
+	rules: PropTypes.array,
+	apps: PropTypes.object,
+	tier: allowedTiers,
+	featureRules: PropTypes.bool,
+	reordering: PropTypes.bool,
+	hasError: PropTypes.bool,
+	deleted: PropTypes.bool,
+	isLoading: PropTypes.bool,
+};
+
+QueryRules.defaultProps = {
+	rules: null,
+	tier: undefined,
+	featureRules: false,
+	reordering: false,
+	hasError: false,
+	deleted: false,
+	isLoading: false,
+	apps: {},
+};
 
 const mapStateToProps = (state) => ({
 	rules: get(state, '$getAppRules.results'),

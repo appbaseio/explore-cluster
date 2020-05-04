@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Button, Dropdown, Icon, Menu, Radio, Result, Skeleton, Table } from 'antd';
 import { get } from 'lodash';
 import { getFunctions } from '../../../../../batteries/utils/app';
@@ -14,6 +15,15 @@ function TriggerDropdown({ overlay, selectedOption }) {
 		</Dropdown>
 	);
 }
+
+TriggerDropdown.propTypes = {
+	overlay: PropTypes.node.isRequired,
+	selectedOption: PropTypes.object,
+};
+
+TriggerDropdown.defaultProps = {
+	selectedOption: {},
+};
 
 class SetFunctionTrigger extends Component {
 	state = { loading: false };
@@ -139,5 +149,17 @@ class SetFunctionTrigger extends Component {
 		);
 	}
 }
+
+SetFunctionTrigger.propTypes = {
+	selected: PropTypes.string,
+	handleRadioChange: PropTypes.func.isRequired,
+	onChange: PropTypes.func,
+	setActiveKey: PropTypes.func.isRequired,
+};
+
+SetFunctionTrigger.defaultProps = {
+	selected: undefined,
+	onChange: null,
+};
 
 export default SetFunctionTrigger;

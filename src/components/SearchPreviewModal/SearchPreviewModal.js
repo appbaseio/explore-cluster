@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Button, Modal, Tooltip } from 'antd';
 import { css } from 'emotion';
 
@@ -57,6 +58,12 @@ class SearchPreviewModal extends React.Component {
 		);
 	}
 }
+
+SearchPreviewModal.propTypes = {
+	app: PropTypes.string.isRequired,
+	searchPreviewProps: PropTypes.object,
+	buttonProps: PropTypes.object,
+};
 
 SearchPreviewModal.defaultProps = {
 	searchPreviewProps: {},

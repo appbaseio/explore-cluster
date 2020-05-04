@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import {
-	ReactiveBase,
 	DataSearch,
-	SelectedFilters,
-	MultiList,
-	ResultList,
-	ReactiveList,
 	DynamicRangeSlider,
+	MultiList,
+	ReactiveBase,
+	ReactiveList,
+	ResultList,
+	SelectedFilters,
 } from '@appbaseio/reactivesearch';
 
 import appbaseHelpers from '../utils/appbaseHelpers';
@@ -210,7 +211,8 @@ export default class SearchApp extends Component {
 	}
 
 	render() {
-		const fields = getFields(this.props.fields, ['', '.search']);
+		const { facets, fields: fieldsProp, ui } = this.props;
+		const fields = getFields(fieldsProp, ['', '.search']);
 		const SCALR_API = getURL();
 		return (
 			<ReactiveBase
@@ -255,11 +257,23 @@ export default class SearchApp extends Component {
 
 				<SelectedFilters style={{ marginTop: 20 }} />
 
-				<div className={this.props.facets && this.props.facets.length ? 'multi-col' : ''}>
-					<div className="left-col">{renderFilters(this.props.facets)}</div>
-					{renderCode(this.props.ui)}
+				<div className={facets && facets.length ? 'multi-col' : ''}>
+					<div className="left-col">{renderFilters(facets)}</div>
+					{renderCode(ui)}
 				</div>
 			</ReactiveBase>
 		);
 	}
 }
+
+SearchApp.propTypes = {
+	facets: PropTypes.array,
+	fields: PropTypes.array,
+	ui: PropTypes.string,
+};
+
+SearchApp.defaultProps = {
+	facets: [],
+	fields: [],
+	ui: undefined,
+};

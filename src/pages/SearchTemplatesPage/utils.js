@@ -27,4 +27,4 @@ export const getString = (value) => {
 };
 
 export const extractParams = (value = '') =>
-	(value.match(/{{\s*[\w\.]+\s*}}/g) || []).map((x) => x.match(/[\w\.]+/)[0]);
+	(value.match(/{{\s*[\w.]+\s*}}/g) || []).map((x) => x.match(/[\w.]+/)[0]);

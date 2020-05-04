@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Layout } from 'antd';
 
 import AppHeader from '../AppHeader';
@@ -31,5 +32,18 @@ class AppLayout extends React.PureComponent {
 		);
 	}
 }
+
+AppLayout.propTypes = {
+	collapsed: PropTypes.bool,
+	showHeader: PropTypes.bool,
+	match: PropTypes.object.isRequired,
+	history: PropTypes.object.isRequired,
+	onToggle: PropTypes.func.isRequired,
+};
+
+AppLayout.defaultProps = {
+	collapsed: false,
+	showHeader: false,
+};
 
 export default AppLayout;

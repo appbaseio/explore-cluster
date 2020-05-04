@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Card, Col, Icon, Row, Tag } from 'antd';
 import { css } from 'react-emotion';
 import { withRouter } from 'react-router-dom';
@@ -66,9 +67,7 @@ const noData = (
 
 function StatsBox(props) {
 	let cols = [];
-	const {
-		title, data, style, showDelete,
-	} = props; // prettier-ignore
+	const { title, data, style, showDelete } = props;
 	if (typeof data === 'object') {
 		cols = Object.keys(data)
 			.filter((item) => !blackList.includes(item))
@@ -150,5 +149,18 @@ function StatsBox(props) {
 		</Card>
 	);
 }
+
+StatsBox.propTypes = {
+	title: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
+	data: PropTypes.object.isRequired,
+	style: PropTypes.object,
+	showDelete: PropTypes.bool,
+	history: PropTypes.object.isRequired,
+};
+
+StatsBox.defaultProps = {
+	style: {},
+	showDelete: false,
+};
 
 export default withRouter(StatsBox);

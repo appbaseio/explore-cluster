@@ -1,8 +1,8 @@
-import { Tag } from 'antd';
 import React from 'react';
+import PropTypes from 'prop-types';
+import { Tag } from 'antd';
 
-// eslint-disable-next-line import/prefer-default-export
-export function LabelTag({ item, ...rest }) {
+function LabelTag({ item, ...rest }) {
 	const { label, tag } = item;
 	return (
 		<div {...rest}>
@@ -21,3 +21,13 @@ export function LabelTag({ item, ...rest }) {
 		</div>
 	);
 }
+
+LabelTag.propTypes = {
+	item: PropTypes.object,
+};
+
+LabelTag.defaultProps = {
+	item: {},
+};
+
+export default LabelTag;

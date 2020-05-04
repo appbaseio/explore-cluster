@@ -1,11 +1,11 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { get, isObject, keys, transform } from 'lodash';
 import { Button, Modal } from 'antd';
 import { isEqual } from '../../batteries/utils';
-import { DiffTable } from './DiffTable';
+import DiffTable from './DiffTable';
 
-// eslint-disable-next-line import/prefer-default-export
-export class ReviewAndSave extends React.Component {
+class ReviewAndSave extends React.Component {
 	difference = (object, base) => {
 		const changes = (obj, baseObj) =>
 			transform(obj, (result, value, key) => {
@@ -80,3 +80,26 @@ export class ReviewAndSave extends React.Component {
 		);
 	}
 }
+
+ReviewAndSave.propTypes = {
+	visible: PropTypes.bool,
+	onSave: PropTypes.func.isRequired,
+	onRevert: PropTypes.func.isRequired,
+	oldValues: PropTypes.object,
+	newValues: PropTypes.object,
+	buttonProps: PropTypes.object,
+	onClick: PropTypes.func.isRequired,
+	loading: PropTypes.bool,
+	isReset: PropTypes.bool,
+};
+
+ReviewAndSave.defaultProps = {
+	visible: false,
+	newValues: null,
+	oldValues: null,
+	buttonProps: {},
+	loading: false,
+	isReset: false,
+};
+
+export default ReviewAndSave;

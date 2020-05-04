@@ -1,11 +1,11 @@
 import { Radio, Row } from 'antd';
+import PropTypes from 'prop-types';
 import React from 'react';
 import { modalHeading } from '../../pages/HomePage/styles';
 import { renderInputField } from './helper';
 import PrivateRegistry from './PrivateRegistry';
 
-// eslint-disable-next-line import/prefer-default-export
-export function DeployFunctionForm(props) {
+function DeployFunctionForm(props) {
 	const {
 		functionName,
 		dockerImage,
@@ -67,3 +67,26 @@ export function DeployFunctionForm(props) {
 		</>
 	);
 }
+
+DeployFunctionForm.propTypes = {
+	functionName: PropTypes.string,
+	dockerImage: PropTypes.string,
+	setFunctionName: PropTypes.func.isRequired,
+	setDockerImage: PropTypes.func.isRequired,
+	value: PropTypes.string,
+	node: PropTypes.object,
+	setGlobalError: PropTypes.func.isRequired,
+	onChange: PropTypes.func.isRequired,
+	handleInputRequired: PropTypes.func.isRequired,
+	globalError: PropTypes.object,
+};
+
+DeployFunctionForm.defaultProps = {
+	functionName: undefined,
+	dockerImage: undefined,
+	value: undefined,
+	globalError: {},
+	node: null,
+};
+
+export default DeployFunctionForm;

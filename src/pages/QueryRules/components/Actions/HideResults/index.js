@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { ReactiveBase } from '@appbaseio/reactivesearch';
 import { notification, Tag } from 'antd';
 import { getURL } from '../../../../../constants/config';
@@ -87,8 +88,17 @@ class HideResults extends Component {
 	}
 }
 
+HideResults.propTypes = {
+	indexes: PropTypes.array,
+	dataFields: PropTypes.array,
+	value: PropTypes.array,
+	onChange: PropTypes.func.isRequired,
+};
+
 HideResults.defaultProps = {
-	hiddenResults: [],
+	indexes: [],
+	dataFields: [],
+	value: [],
 };
 
 export default HideResults;

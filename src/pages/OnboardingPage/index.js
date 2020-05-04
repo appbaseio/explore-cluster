@@ -1,5 +1,6 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { Component } from 'react';
-
+import PropTypes from 'prop-types';
 import Introduction from './screens/Introduction';
 import ImportData from './screens/ImportData';
 import AppbaseFeatures from './screens/AppbaseFeatures';
@@ -218,3 +219,7 @@ export default class Onboarding extends Component {
 		);
 	}
 }
+
+Onboarding.propTypes = {
+	history: PropTypes.object.isRequired,
+};

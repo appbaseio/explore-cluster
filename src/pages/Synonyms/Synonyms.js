@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Card, Table, Icon, Button, message, Popconfirm } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
@@ -17,9 +18,10 @@ import { getURL } from '../../constants/config';
 import { getSettings, getMappings } from '../../batteries/utils/mappings';
 import { getSynonymsAnalyzerSettings, updateSynonymsSettings } from './utils';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
-import { SettingsFooter } from '../../components/SettingsFooter';
+import SettingsFooter from '../../components/SettingsFooter';
 import { isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
+import { allowedTiers } from '../../utils/prop-types';
 
 const expression = css`
 	font-weight: 15px;
@@ -401,6 +403,18 @@ class Synonyms extends React.Component {
 		);
 	}
 }
+
+Synonyms.propTypes = {
+	appName: PropTypes.string.isRequired,
+	credentials: PropTypes.string.isRequired,
+	tier: allowedTiers,
+	featureSynonyms: PropTypes.bool,
+};
+
+Synonyms.defaultProps = {
+	tier: undefined,
+	featureSynonyms: false,
+};
 
 const mapStateToProps = (state) => {
 	const { username, password } = get(state, 'user.data', {});
