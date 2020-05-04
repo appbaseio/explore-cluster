@@ -13,7 +13,8 @@
 		"build": "NODE_ENV=production node ./scripts/create-env.js && webpack --mode production",
 		"glow": "glow --watch",
 		"format": "prettier --write --use-tabs 'src/!(batteries*)**/**/*.js'",
-		"analyze": "source-map-explorer 'dist/*.js'"
+		"analyze": "source-map-explorer 'dist/*.js'",
+		"test": "jest --config ./jest.config.json"
 	},
 	"husky": {
 		"hooks": {
@@ -22,6 +23,7 @@
 	},
 	"lint-staged": {
 		"./src/!(batteries*)**/*.js": [
+			"yarn test",
 			"yarn format",
 			"yarn lint"
 		]
@@ -45,6 +47,7 @@
 		"eslint-config-airbnb": "^17.1.0",
 		"eslint-config-prettier": "^6.9.0",
 		"eslint-plugin-import": "^2.14.0",
+		"eslint-plugin-jest": "^23.8.2",
 		"eslint-plugin-jsx-a11y": "^6.1.1",
 		"eslint-plugin-prettier": "^3.1.2",
 		"eslint-plugin-react": "^7.11.1",
@@ -52,8 +55,10 @@
 		"flow-bin": "^0.78.0",
 		"glow": "^1.2.2",
 		"html-webpack-plugin": "^4.0.1",
+		"jest": "^25.5.3",
 		"less": "^3.8.1",
 		"less-loader": "^4.1.0",
+		"linkinator": "^2.0.6",
 		"source-map-explorer": "^2.4.1",
 		"style-loader": "^0.22.1",
 		"webpack": "^4.16.5",
@@ -65,8 +70,8 @@
 		"@appbaseio/dejavu-browser": "^3.4.5",
 		"@appbaseio/designkit": "^0.9.1",
 		"@appbaseio/react-filter-box": "^3.3.2",
-		"@appbaseio/reactivecore": "^8.2.9",
-		"@appbaseio/reactivesearch": "^3.7.12",
+		"@appbaseio/reactivecore": "^9.5.7",
+		"@appbaseio/reactivesearch": "^3.8.1",
 		"@babel/plugin-proposal-class-properties": "^7.0.0-rc.1",
 		"@sentry/browser": "^4.2.1",
 		"@typeform/embed": "^0.14.1",

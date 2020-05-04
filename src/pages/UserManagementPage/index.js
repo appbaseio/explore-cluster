@@ -152,7 +152,7 @@ class UserManagementPage extends React.Component {
 					title="Manage Users"
 					extra={
 						<a
-							href="https://docs.appbase.io/security/UserManagement/"
+							href="https://docs.appbase.io/docs/security/user-management/"
 							target="_blank"
 							rel="noopener noreferrer"
 						>

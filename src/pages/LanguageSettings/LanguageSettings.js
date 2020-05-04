@@ -40,13 +40,14 @@ const bannerDetails = {
 	title: 'Language Settings',
 	buttonText: 'Read More',
 	icon: 'pencil',
-	href: 'https://docs.appbase.io/docs/search/Preview/',
+	href: 'https://docs.appbase.io/docs/search/relevancy/#language-settings',
 };
 
 const bannerMessage = {
 	title: 'Language Settings',
 	description: 'Language Settings let you apply a specific language for your search index.',
 	buttonText: 'Read Docs',
+	href: 'https://docs.appbase.io/docs/search/relevancy/#language-settings',
 };
 
 class LanguageSettings extends React.Component {
@@ -306,7 +307,7 @@ class LanguageSettings extends React.Component {
 		if (!isValidPlan(tier, featureSearchRelevancy)) {
 			return (
 				<React.Fragment>
-					<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
+					<Banner {...bannerDetails} />
 					<Overlay
 						style={{
 							maxWidth: '70%',

@@ -27,7 +27,7 @@ export const exampleConfig = [
 			alt: 'Import Data',
 			src: '/static/images/explainer/import_data.png',
 		},
-		href: 'https://docs.appbase.io/docs/data/Browser/#importing-data',
+		href: 'https://docs.appbase.io/docs/data/import/',
 	},
 	{
 		title: 'Manage Mappings',
@@ -36,7 +36,7 @@ export const exampleConfig = [
 			alt: 'Manage Mappings',
 			src: '/static/images/explainer/manage_mappings.png',
 		},
-		href: 'https://docs.appbase.io/docs/search/Mappings/',
+		href: 'https://docs.appbase.io/docs/data/mappings/',
 	},
 	{
 		title: 'Browse Data',
@@ -54,7 +54,7 @@ export const exampleConfig = [
 			alt: 'Search Preview',
 			src: '/static/images/explainer/search_preview.png',
 		},
-		href: 'https://docs.appbase.io/docs/search/Preview/',
+		href: 'https://docs.appbase.io/docs/search/relevancy/#test-search-relevancy',
 	},
 	{
 		title: 'Understand your Search ROI',

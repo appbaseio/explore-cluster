@@ -227,7 +227,7 @@ const bannerDetails = {
 	description: `Create "If this, then that" style functions to add your own custom search and security logic. Functions will be executed in the order in which they are listed. You can drag and drop a function to change the ordering sequence.`,
 	buttonText: 'Read more',
 	icon: 'pencil',
-	href: 'https://docs.appbase.io/docs/search/Functions/',
+	href: 'https://docs.appbase.io/docs/search/functions',
 };
 
 function FunctionItem({ item, onChange, getFunction }) {

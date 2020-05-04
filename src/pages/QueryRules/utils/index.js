@@ -109,7 +109,7 @@ const bannerDetails = {
 	description: 'Create "If this, then that" style query rules',
 	buttonText: 'Read More',
 	icon: 'pencil',
-	href: 'https://docs.appbase.io/docs/search/Rules/',
+	href: 'https://docs.appbase.io/docs/search/rules/',
 };
 
 const toolTips = {
@@ -119,7 +119,7 @@ const toolTips = {
 			<a
 				target="_blank"
 				rel="noopener noreferrer"
-				href="https://docs.appbase.io/docs/search/Rules/#promote-results"
+				href="https://docs.appbase.io/docs/search/rules/#promote-results"
 			>
 				Learn more
 			</a>
@@ -131,7 +131,7 @@ const toolTips = {
 			<a
 				target="_blank"
 				rel="noopener noreferrer"
-				href="https://docs.appbase.io/docs/search/Rules/#hide-results"
+				href="https://docs.appbase.io/docs/search/rules/#hide-results"
 			>
 				Learn more
 			</a>
@@ -143,7 +143,7 @@ const toolTips = {
 			<a
 				target="_blank"
 				rel="noopener noreferrer"
-				href="https://docs.appbase.io/docs/search/Rules/#replace-search-term"
+				href="https://docs.appbase.io/docs/search/rules/#replace-search-term"
 			>
 				Learn more
 			</a>
@@ -167,7 +167,7 @@ const toolTips = {
 			<a
 				target="_blank"
 				rel="noopener noreferrer"
-				href="https://docs.appbase.io/docs/search/Functions"
+				href="https://docs.appbase.io/docs/search/functions"
 			>
 				Learn more
 			</a>
@@ -179,7 +179,7 @@ const toolTips = {
 			<a
 				target="_blank"
 				rel="noopener noreferrer"
-				href="https://docs.appbase.io/docs/search/Rules/#remove-words"
+				href="https://docs.appbase.io/docs/search/rules/#remove-words"
 			>
 				Learn more
 			</a>
@@ -191,7 +191,7 @@ const toolTips = {
 			<a
 				target="_blank"
 				rel="noopener noreferrer"
-				href="https://docs.appbase.io/docs/search/Rules/#replace-words"
+				href="https://docs.appbase.io/docs/search/rules/#replace-words"
 			>
 				Learn more
 			</a>

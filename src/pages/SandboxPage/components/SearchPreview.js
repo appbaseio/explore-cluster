@@ -202,7 +202,7 @@ class SearchPreview extends React.Component {
 
 	render() {
 		const { settings, app, credentials, url, fetchingDefaultSettings, rules } = this.props;
-		const { settings: stateSettings, isAnalyticsEnabled } = this.state;
+		const { settings: stateSettings, isAnalyticsEnabled, hasMappingsLoaded } = this.state;
 
 		if (fetchingDefaultSettings) {
 			return (
@@ -215,9 +215,18 @@ class SearchPreview extends React.Component {
 
 		if (settings && settings.isFetching) {
 			return (
-				<div className={container}>
+				<div className={container} style={{ textAlign: 'center' }}>
 					<Spin />
 					<p>Fetching Settings</p>
+				</div>
+			);
+		}
+
+		if (!hasMappingsLoaded) {
+			return (
+				<div className={container} style={{ textAlign: 'center' }}>
+					<Spin />
+					<p>Fetching Mappings</p>
 				</div>
 			);
 		}

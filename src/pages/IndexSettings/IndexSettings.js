@@ -28,6 +28,7 @@ import { appendApp, loadApps, removeAppData } from '../../actions';
 const bannerMessage = {
 	title: 'Index Settings',
 	buttonText: 'Read Docs',
+	href: 'https://docs.appbase.io/docs/search/relevancy/#index-settings',
 };
 
 class IndexSettings extends React.Component {

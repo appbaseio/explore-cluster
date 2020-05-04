@@ -27,7 +27,7 @@ const bannerMessagesAnalytics = {
 		description:
 			'See our docs on how to track search, filters, click events, conversions and add your own custom events.',
 		buttonText: 'Read Docs',
-		href: 'https://docs.appbase.io/docs/analytics/Overview/#top-search-queries',
+		href: 'https://docs.appbase.io/docs/analytics/overview/#popular-searches',
 	},
 };
 

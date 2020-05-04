@@ -379,6 +379,16 @@ class AppWrapper extends Component {
 										</SubMenu>
 									);
 								}
+								if (routes[route].hasExactPath) {
+									return (
+										<Menu.Item key={route}>
+											<Link replace to={routes[route].link}>
+												<Icon type={routes[route].icon} />
+												<span>{route}</span>
+											</Link>
+										</Menu.Item>
+									);
+								}
 								return (
 									<Menu.Item key={route}>
 										<Link replace to={`/app/${appName}/${routes[route].link}`}>

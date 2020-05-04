@@ -130,8 +130,8 @@ class SynonymsModal extends React.Component {
 			: allSynonyms.map((item) => item.synonym);
 
 		const parsedSynonyms = getParsedSynonyms({ type, alternatives, synonyms, searchTerm });
-		const settings = await getSettings(appName, credentials, url).then(
-			(data) => data[appName].settings,
+		const settings = await getSettings(appName, credentials, url).then((data) =>
+			get(data, `${appName}.settings`, {}),
 		);
 
 		const isSynonymsAnalyzerPresent = hasSynonymsAnalyzer(settings);
@@ -139,12 +139,14 @@ class SynonymsModal extends React.Component {
 
 		// // check if all search field has the synonyms analyzer added
 		const hasSubfield = hasSynonymsSubFields(mappings);
-
 		// get the settings request body will add analyzer if not already present
 		const synonymsAnalyzerSettings = getSynonymsAnalyzerSettings({
 			settings,
 			isSynonymsAnalyzerPresent,
-			synonyms: [...indexSynonyms, parsedSynonyms],
+			synonyms: [
+				...indexSynonyms.map((item) => item.toLowerCase()),
+				parsedSynonyms.toLowerCase(),
+			],
 		});
 		if (!hasSubfield) {
 			// update all subfields for search
