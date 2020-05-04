@@ -232,6 +232,7 @@ class AppWrapper extends Component {
 	};
 
 	handleSettings = async (appName) => {
+		if (!appName) return;
 		const {
 			settings,
 			defaultSettings,
