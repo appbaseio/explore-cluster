@@ -127,15 +127,17 @@ class SearchPreview extends React.Component {
 			Firstly check if props.mappings has values resolved and than prefill
 			with all searchable mappings.
 		*/
+
+		const searchSettings =
+			state && state.settings ? state.settings.find((item) => item.id === 'search') : {};
+
 		if (
 			!props.hasTestSettings &&
 			!props.isFetchingMappings &&
 			props.mappings &&
 			state.settings &&
-			props.settings &&
-			props.settings.search &&
-			props.settings.search.dataField &&
-			props.settings.search.dataField.length === 0
+			searchSettings.dataField &&
+			searchSettings.dataField.length === 0
 		) {
 			return {
 				settings: generateQuery({
@@ -165,6 +167,7 @@ class SearchPreview extends React.Component {
 		*/
 		if (
 			!props.settings &&
+			!state.settings &&
 			state.searchableMappings &&
 			props.mappings &&
 			props.settingsErrorCode === 402
