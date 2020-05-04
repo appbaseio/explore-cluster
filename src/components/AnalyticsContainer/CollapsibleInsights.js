@@ -1,8 +1,10 @@
 import React from 'react';
-import { Collapse, Alert, List, Icon, Button, Dropdown, Menu } from 'antd';
+import { Collapse, Alert, List, Icon, Button, Dropdown, Menu, Empty } from 'antd';
 import { Link } from 'react-router-dom';
 import { get } from 'lodash';
+import { connect } from 'react-redux';
 import { css } from 'emotion';
+import { updateInsightStatus } from '../../batteries/modules/actions';
 
 const { Panel } = Collapse;
 
@@ -52,6 +54,11 @@ const collapseStyles = css`
 		transition: all 0.2s ease-out;
 	}
 
+	.report-btn {
+		font-size: 13px;
+		margin-top: 5px;
+	}
+
 	.panel:hover {
 		.title .icon {
 			transform: translateX(0px);
@@ -78,19 +85,58 @@ class CollapsibleInsights extends React.Component {
 
 	handleCollapseKey = (key) => {
 		const { openKey } = this.state;
+		const { updateInsight, type } = this.props;
 
-		if (openKey && key !== openKey) {
+		if (type !== 'insights') {
+			return;
+		}
+
+		if (openKey) {
 			// we need to put request to update the status
-			console.log('Update Request', openKey);
+			updateInsight({
+				id: openKey,
+				from: type,
+				to: 'read',
+			});
 		}
 
 		this.setState({
-			openKey: key,
+			openKey: key === openKey ? null : key,
+		});
+	};
+
+	handleClickContextMenu = (e, id) => {
+		const { openKey } = this.state;
+		const { updateInsight, type } = this.props;
+		let updateStatusTo = '';
+		switch (e.key) {
+			case 'delete':
+			case 'undo':
+				updateStatusTo = 'read';
+				break;
+			case 'saved':
+				updateStatusTo = 'saved';
+				break;
+			default: {
+				updateStatusTo = 'read';
+				break;
+			}
+		}
+
+		updateInsight({
+			from: type,
+			to: updateStatusTo,
+			id,
 		});
 	};
 
 	render() {
-		const { insights } = this.props;
+		const { insights, type } = this.props;
+
+		if (insights.length === 0) {
+			return <Empty />;
+		}
+
 		return (
 			<Collapse
 				onChange={this.handleCollapseKey}
@@ -111,17 +157,31 @@ class CollapsibleInsights extends React.Component {
 											<Menu
 												onClick={(e) => {
 													e.domEvent.stopPropagation();
+													this.handleClickContextMenu(
+														e,
+														get(insight, 'id'),
+													);
 												}}
 											>
-												<Menu.Item key="1">
-													<Icon type="saved" />
-													Save Insight
-												</Menu.Item>
-												<Menu.Item key="2">
-													<Icon type="read" />
-													Mark as Read
-												</Menu.Item>
-												<Menu.Item key="2">
+												{type === 'saved' ? null : (
+													<Menu.Item key="saved">
+														<Icon type="save" />
+														Save Insight
+													</Menu.Item>
+												)}
+												{type === 'saved' ? (
+													<Menu.Item key="undo">
+														<Icon type="save" />
+														Remove from Saved
+													</Menu.Item>
+												) : null}
+												{type === 'insights' ? (
+													<Menu.Item key="read">
+														<Icon type="read" />
+														Mark as Read
+													</Menu.Item>
+												) : null}
+												<Menu.Item key="delete">
 													<Icon type="delete" />
 													Delete
 												</Menu.Item>
@@ -161,21 +221,26 @@ class CollapsibleInsights extends React.Component {
 							}}
 							dataSource={get(insight, 'insight.recommendations', [])}
 							renderItem={(recommendation) => (
-								<List.Item>
-									<Link
-										className="recommendation-link"
-										to={get(recommendation, 'short_link')}
-									>
-										<List.Item.Meta
-											title={
-												<div className="list-title">
-													<span>{get(recommendation, 'title', '')}</span>
-													<Icon className="icon" type="arrow-right" />
+								<List.Item className="recommendation-link">
+									<List.Item.Meta
+										title={
+											<div className="list-title">
+												<span>{get(recommendation, 'title', '')}</span>
+											</div>
+										}
+										description={
+											<React.Fragment>
+												{get(recommendation, 'description')}
+												<div>
+													<Link to={get(recommendation, 'short_link')}>
+														<Button className="report-btn" size="small">
+															Go Report
+														</Button>
+													</Link>
 												</div>
-											}
-											description={get(recommendation, 'description')}
-										/>
-									</Link>
+											</React.Fragment>
+										}
+									/>
 								</List.Item>
 							)}
 						/>
@@ -186,4 +251,14 @@ class CollapsibleInsights extends React.Component {
 	}
 }
 
-export default CollapsibleInsights;
+const mapStateToProps = (state) => ({
+	isOpen: get(state, '$getInsightSidebar.isOpen', false),
+	appName: get(state, '$getCurrentApp.name'),
+	isFetching: get(state, '$getAppAnalyticsInsights.isFetching'),
+});
+
+const mapDispatchToProps = (dispatch) => ({
+	updateInsight: (data) => dispatch(updateInsightStatus(data)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(CollapsibleInsights);

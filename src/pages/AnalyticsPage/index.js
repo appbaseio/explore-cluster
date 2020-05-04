@@ -2,12 +2,10 @@ import React from 'react';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Button } from 'antd';
 import Container from '../../components/Container';
 import Overlay from '../../components/Overlay';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Analytics from '../../batteries/components/analytics';
-import { toggleInsightsSidebar } from '../../batteries/modules/actions';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -33,13 +31,12 @@ const bannerMessagesAnalytics = {
 	},
 };
 
-const AnalyticsView = ({ appName, isPaidUser, plan, toggleInsights }) => (
+const AnalyticsView = ({ appName, isPaidUser, plan }) => (
 	<React.Fragment>
 		{isPaidUser ? (
 			<React.Fragment>
 				{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
 				<Container>
-					<Button onClick={toggleInsights}>Toggle Insights</Button>
 					<Analytics
 						filterId="analytics_page"
 						displayReplaySearch
@@ -74,8 +71,4 @@ const mapStateToProps = (state) => ({
 	isPaidUser: get(state, '$getAppPlan.results.isPaid'),
 });
 
-const mapDispatchToProps = (dispatch) => ({
-	toggleInsights: () => dispatch(toggleInsightsSidebar()),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(AnalyticsView);
+export default connect(mapStateToProps)(AnalyticsView);

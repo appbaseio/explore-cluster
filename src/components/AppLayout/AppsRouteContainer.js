@@ -135,7 +135,6 @@ class RouteContainer extends React.Component {
 							/>
 						)}
 					/>
-					<AppsAnalyticsRoutes />
 					<Route
 						exact
 						path="/app/:appName/settings"
@@ -291,6 +290,8 @@ class RouteContainer extends React.Component {
 							/>
 						)}
 					/>
+
+					<AppsAnalyticsRoutes />
 				</Switch>
 			</ErrorPage>
 		);

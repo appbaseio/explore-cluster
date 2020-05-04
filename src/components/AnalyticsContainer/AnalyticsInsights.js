@@ -2,9 +2,8 @@ import React from 'react';
 import { get } from 'lodash';
 import { connect } from 'react-redux';
 import { css } from 'emotion';
-import { Tabs, Button, Skeleton } from 'antd';
+import { Tabs, Button, Skeleton, message } from 'antd';
 import CollapsibleInsights from './CollapsibleInsights';
-import { sampleData } from './sampledata';
 import { toggleInsightsSidebar, getAppAnalyticsInsights } from '../../batteries/modules/actions';
 import { getAppAnalyticsInsightsByName } from '../../batteries/modules/selectors';
 
@@ -52,17 +51,31 @@ const drawerClass = css`
 `;
 
 class AnalyticsInsights extends React.Component {
+	// TODO: Handle API Errors
 	componentDidUpdate(prevProps) {
 		// Fetch insights only when we open the drawer & dont over fetch if insights already exists
-		const { insights, isOpen, appName, getInsights } = this.props;
+		const { insights, isOpen, appName, getInsights, insightUpdates: updates } = this.props;
 		if ((prevProps.appName !== appName || !insights) && isOpen && prevProps.isOpen !== isOpen) {
 			getInsights(appName);
+		}
+
+		if (JSON.stringify(prevProps.updates) !== JSON.stringify(updates)) {
+			Object.keys(updates).forEach((id) => {
+				const { success, from, to, inProgress } = updates[id];
+				if (inProgress) {
+					return;
+				}
+				if (success) {
+					message.success(`${id} successfully transferred from ${from} to ${to}`);
+				} else {
+					message.error(`${id} transferred failed from ${from} to ${to}`);
+				}
+			});
 		}
 	}
 
 	render() {
 		const { isOpen, toggleSidebar, insights, isFetching } = this.props;
-
 		if (!insights && !isFetching) {
 			return null;
 		}
@@ -89,6 +102,7 @@ class AnalyticsInsights extends React.Component {
 			);
 		}
 
+		// TODO: Add Plan validationssss
 		return (
 			<div className={`${drawerClass} ${isOpen ? 'open' : ''}`}>
 				<div className="insights-header">
@@ -99,7 +113,10 @@ class AnalyticsInsights extends React.Component {
 					<Tabs style={{ padding: 10 }} defaultActiveKey="1">
 						{Object.keys(insights).map((insightType) => (
 							<TabPane tab={insightType.toLocaleUpperCase()} key={insightType}>
-								<CollapsibleInsights insights={sampleData[insightType]} />
+								<CollapsibleInsights
+									type={insightType}
+									insights={insights[insightType]}
+								/>
 							</TabPane>
 						))}
 					</Tabs>
@@ -109,12 +126,16 @@ class AnalyticsInsights extends React.Component {
 	}
 }
 
-const mapStateToProps = (state) => ({
-	isOpen: get(state, '$getInsightSidebar.isOpen', false),
-	appName: get(state, '$getCurrentApp.name'),
-	isFetching: get(state, '$getAppAnalyticsInsights.isFetching'),
-	insights: getAppAnalyticsInsightsByName(state),
-});
+const mapStateToProps = (state) => {
+	const appName = get(state, '$getCurrentApp.name');
+	return {
+		isOpen: get(state, '$getInsightSidebar.isOpen', false),
+		appName,
+		isFetching: get(state, '$getAppAnalyticsInsights.isFetching'),
+		insights: getAppAnalyticsInsightsByName(state),
+		insightUpdates: get(state, `$getAppAnalyticsInsights.updates`),
+	};
+};
 
 const mapDispatchToProps = (dispatch) => ({
 	toggleSidebar: () => dispatch(toggleInsightsSidebar()),
