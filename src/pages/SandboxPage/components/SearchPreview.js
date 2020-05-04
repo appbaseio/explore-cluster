@@ -13,7 +13,6 @@ import Search from './Search';
 import Result from './Result/index';
 import { generateQuery } from '../utils';
 import { getAggsMappings } from '../../../batteries/utils/mappings';
-import { getRawMappingsByAppName } from '../../../batteries/modules/selectors';
 import { getURL } from '../../../constants/config';
 import { getSubFields } from '../../../utils';
 import { isValidPlan } from '../../../batteries/utils';
@@ -31,7 +30,6 @@ class SearchPreview extends React.Component {
 	state = {
 		settings: null,
 		searchableMappings: [],
-		hasMappingsLoaded: false,
 		isAnalyticsEnabled: true,
 	};
 
@@ -52,12 +50,18 @@ class SearchPreview extends React.Component {
 			featureRules,
 		} = this.props;
 
+		/*
+			Fetch rules only if the user is on valid Plan.
+		*/
 		if (isValidPlan(tier, featureRules)) {
 			if (!rules) {
 				fetchRules();
 			}
 		}
 
+		/*
+			Fetch Settings ifnot present in redux store.
+		*/
 		if (!settings) {
 			fetchSearchSettings(app);
 		} else if (hasTestSettings) {
@@ -72,7 +76,6 @@ class SearchPreview extends React.Component {
 			// eslint-disable-next-line
 			this.setState({
 				searchableMappings,
-				hasMappingsLoaded: true,
 			});
 		} else {
 			fetchMappings(app, credentials, url);
@@ -80,14 +83,20 @@ class SearchPreview extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { mappings } = this.props;
-		if (mappings && JSON.stringify(prevProps.mappings) !== JSON.stringify(mappings)) {
+		const { mappings, isFetchingMappings } = this.props;
+		/*
+			Update the searchable mappings state whenever there is a change in mappings.
+		*/
+		if (
+			!isFetchingMappings &&
+			mappings &&
+			JSON.stringify(prevProps.mappings) !== JSON.stringify(mappings)
+		) {
 			const searchableMappings = this.getSearchableMappings(mappings);
 
 			// eslint-disable-next-line
 			this.setState({
 				searchableMappings,
-				hasMappingsLoaded: true,
 			});
 		}
 	}
@@ -111,34 +120,18 @@ class SearchPreview extends React.Component {
 	};
 
 	static getDerivedStateFromProps(props, state) {
-		if (!props.hasTestSettings && state && !state.settings && props.settings) {
-			if (
-				state.hasMappingsLoaded &&
-				props.mappings &&
-				props.settings &&
-				props.settings.search &&
-				props.settings.search.dataField &&
-				props.settings.search.dataField.length === 0
-			) {
-				return {
-					settings: generateQuery({
-						...props.settings,
-						search: {
-							...props.settings.search,
-							dataField: Object.keys(state.searchableMappings),
-							fieldWeights: Object.values(state.searchableMappings),
-						},
-					}),
-				};
-			}
-			return {
-				settings: generateQuery(props.settings),
-			};
-		}
+		/*
+			We need to prefill the datasearch with all searchable mappings
+			if the search relevancy API gives no fields.
+
+			Firstly check if props.mappings has values resolved and than prefill
+			with all searchable mappings.
+		*/
 		if (
 			!props.hasTestSettings &&
-			state.hasMappingsLoaded &&
+			!props.isFetchingMappings &&
 			props.mappings &&
+			state.settings &&
 			props.settings &&
 			props.settings.search &&
 			props.settings.search.dataField &&
@@ -156,6 +149,20 @@ class SearchPreview extends React.Component {
 			};
 		}
 
+		/*
+			Once the Search Relevancy API gets resolves we need to populate the state
+		 	with the components query.
+		*/
+		if (!props.hasTestSettings && state && !state.settings && props.settings) {
+			return {
+				settings: generateQuery(props.settings),
+			};
+		}
+
+		/*
+			To make search preview work even after SearchRelevancy API gives 402 error status code
+			we need to add the default Props to all the components.
+		*/
 		if (
 			!props.settings &&
 			state.searchableMappings &&
@@ -199,12 +206,21 @@ class SearchPreview extends React.Component {
 	};
 
 	render() {
-		const { settings, app, credentials, url, fetchingDefaultSettings, rules } = this.props;
-		const { settings: stateSettings, isAnalyticsEnabled, hasMappingsLoaded } = this.state;
+		const {
+			settings,
+			app,
+			credentials,
+			url,
+			fetchingDefaultSettings,
+			rules,
+			isFetchingMappings,
+			mappings,
+		} = this.props;
+		const { settings: stateSettings, isAnalyticsEnabled } = this.state;
 
 		if (fetchingDefaultSettings) {
 			return (
-				<div className={container}>
+				<div className={container} style={{ textAlign: 'center' }}>
 					<Spin />
 					<p>Fetching default Settings</p>
 				</div>
@@ -220,13 +236,17 @@ class SearchPreview extends React.Component {
 			);
 		}
 
-		if (!hasMappingsLoaded) {
+		if (isFetchingMappings) {
 			return (
 				<div className={container} style={{ textAlign: 'center' }}>
 					<Spin />
 					<p>Fetching Mappings</p>
 				</div>
 			);
+		}
+
+		if (isFetchingMappings && !mappings) {
+			return <Empty description="No data found" />;
 		}
 
 		if (!stateSettings) {
@@ -300,7 +320,8 @@ const mapStateToProps = (state, props) => {
 		settings: get(state.$getAppSettings, `settings.${props.app}`, defaultSettings),
 		settingsErrorCode: get(state.$getAppSettings, `error.actual.code`, null),
 		fetchingDefaultSettings: get(state.$getAppSettings, `default.loading`),
-		mappings: getRawMappingsByAppName(state) || null,
+		mappings: get(state, `$getAppMappings.rawMappings.${props.app}`, null),
+		isFetchingMappings: get(state, `$getAppMappings.isFetching`, false),
 		credentials: username ? `${username}:${password}` : null,
 		url: getURL(),
 		rules: get(state, '$getAppRules.results'),
