@@ -185,18 +185,14 @@ class AppWrapper extends Component {
 	}
 
 	componentDidMount() {
-		const { appName, loading } = this.state;
-		const { history, match, currentApp, settings } = this.props;
+		const { appName } = this.state;
+		const { history, match } = this.props;
 		const view = getParam('view') || '';
 
 		this.handleSettings(appName);
 
 		if (!match.params.appName && appName) {
 			history.push(`/app/${appName}/${view}`);
-		}
-
-		if (!settings && !loading) {
-			this.handleSettings(currentApp);
 		}
 	}
 
@@ -224,7 +220,6 @@ class AppWrapper extends Component {
 	};
 
 	handleSettings = async (appName) => {
-		if (!appName) return;
 		const {
 			settings,
 			defaultSettings,
