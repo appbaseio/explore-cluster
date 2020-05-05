@@ -48,11 +48,13 @@ const Replicas = ({
 			onCancel={() => handleModal('replicasModal')}
 		>
 			<h4>Move slider to change the number of replicas for your index.</h4>
-			{totalNodes - 1 > 0 ? (
+			{totalNodes - 1 > 0 || +allocated_replicas > totalNodes - 1 ? (
 				<Slider
 					step={1}
 					marks={{ 0: '0', 1: '1', 2: '2' }}
-					max={totalNodes - 1}
+					max={
+						+allocated_replicas > totalNodes - 1 ? +allocated_replicas : totalNodes - 1
+					}
 					value={+replicas}
 					onChange={(value) => handleSlider('replicas', value)}
 				/>
