@@ -37,7 +37,7 @@ const icon = css`
 		font-size: 20px;
 	`)};
 `;
-const Overlay = ({ src, alt, lockSectionStyle, ...props }) => (
+const Overlay = ({ src, alt, renderContent, lockSectionStyle, ...props }) => (
 	<div css={imgContainer} {...props}>
 		<div css={overlay}>
 			<div css={upgradePlan} style={lockSectionStyle}>
@@ -49,17 +49,19 @@ const Overlay = ({ src, alt, lockSectionStyle, ...props }) => (
 				</Button>
 			</div>
 		</div>
-		<img alt={alt} css={imgCls} src={src} />
+		{renderContent ? renderContent() : <img alt={alt} css={imgCls} src={src} />}
 	</div>
 );
 Overlay.defaultProps = {
 	alt: '',
 	lockSectionStyle: {},
+	renderContent: null,
 };
 Overlay.propTypes = {
 	src: PropTypes.string.isRequired,
 	alt: PropTypes.string,
 	lockSectionStyle: PropTypes.object,
+	renderContent: PropTypes.func,
 };
 
 export default Overlay;
