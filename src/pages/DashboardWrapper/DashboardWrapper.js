@@ -119,7 +119,7 @@ const getActiveMenu = (props, prevActiveSubMenu = []) => {
 	const routes = defaultRoutes;
 	Object.keys(routes).some((route) => {
 		if (routes[route].menu) {
-			const active = routes[route].menu.find((item) => pathname === item.link);
+			const active = routes[route].menu.find((item) => pathname.startsWith(item.link));
 
 			if (active) {
 				activeSubMenu = route;
