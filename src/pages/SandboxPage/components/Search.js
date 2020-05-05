@@ -64,6 +64,11 @@ const Search = (props) => {
 							autosuggest
 							onChange={(value) => handleValueChange(search.id, value)}
 							componentId={search.id}
+							onKeyDown={(e, triggerQuery) => {
+								if (e.key === 'Enter') {
+									triggerQuery();
+								}
+							}}
 						/>
 					) : null}
 				</Col>

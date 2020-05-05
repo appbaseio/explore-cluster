@@ -63,7 +63,6 @@ class QueryView extends React.Component {
 					null,
 					4,
 				),
-				response: null,
 				isValid: isValidJSON(JSON.stringify(query)),
 			});
 		}
