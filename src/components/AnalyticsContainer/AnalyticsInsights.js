@@ -2,13 +2,14 @@ import React from 'react';
 import { get } from 'lodash';
 import { connect } from 'react-redux';
 import { css } from 'emotion';
-import { Tabs, Button, message, Empty, List, Avatar } from 'antd';
+import { Tabs, Button, message } from 'antd';
 import CollapsibleInsights from './CollapsibleInsights';
 import { toggleInsightsSidebar, getAppAnalyticsInsights } from '../../batteries/modules/actions';
 import { getAppAnalyticsInsightsByName } from '../../batteries/modules/selectors';
 import Loader from '../Loader';
 import { isValidPlan } from '../../batteries/utils';
 import Overlay from '../Overlay';
+import sampleData from './sample-data';
 
 const { TabPane } = Tabs;
 
@@ -57,26 +58,46 @@ class AnalyticsInsights extends React.Component {
 	// TODO: Handle API Errors
 	componentDidUpdate(prevProps) {
 		// Fetch insights only when we open the drawer & dont over fetch if insights already exists
-		const { insights, isOpen, appName, getInsights, insightUpdates: updates } = this.props;
-		if ((prevProps.appName !== appName || !insights) && isOpen && prevProps.isOpen !== isOpen) {
-			getInsights(appName);
-		}
+		const {
+			insights,
+			isOpen,
+			appName,
+			getInsights,
+			insightUpdates: updates,
+			tier,
+			featureRules,
+			error,
+		} = this.props;
+		if (isValidPlan(tier, featureRules)) {
+			if (
+				(prevProps.appName !== appName || !insights) &&
+				isOpen &&
+				prevProps.isOpen !== isOpen
+			) {
+				getInsights(appName);
+			}
 
-		if (
-			prevProps.isOpen === isOpen &&
-			JSON.stringify(prevProps.insightUpdates) !== JSON.stringify(updates)
-		) {
-			Object.keys(updates).forEach((id) => {
-				const { success, from, to, inProgress } = updates[id];
-				if (inProgress) {
-					return;
-				}
-				if (success) {
-					message.success(`${id} successfully transferred from ${from} to ${to}`);
-				} else {
-					message.error(`${id} transferred failed from ${from} to ${to}`);
-				}
-			});
+			if (JSON.stringify(prevProps.error) !== JSON.stringify(error)) {
+				// TODO: Need to update with proper response
+				message.error('Something went wrong!');
+			}
+
+			if (
+				prevProps.isOpen === isOpen &&
+				JSON.stringify(prevProps.insightUpdates) !== JSON.stringify(updates)
+			) {
+				Object.keys(updates).forEach((id) => {
+					const { success, from, to, inProgress } = updates[id];
+					if (inProgress) {
+						return;
+					}
+					if (success) {
+						message.success(`${id} successfully transferred from ${from} to ${to}`);
+					} else {
+						message.error(`${id} transferred failed from ${from} to ${to}`);
+					}
+				});
+			}
 		}
 	}
 
@@ -98,57 +119,36 @@ class AnalyticsInsights extends React.Component {
 			);
 		}
 
-		const data = [
-			{
-				title: 'Ant Design Title 1',
-			},
-			{
-				title: 'Ant Design Title 2',
-			},
-			{
-				title: 'Ant Design Title 3',
-			},
-			{
-				title: 'Ant Design Title 4',
-			},
-		];
-		if (true) {
+		if (!isValidPlan(tier, featureRules)) {
 			return (
 				<div className={`${drawerClass} ${isOpen ? 'open' : ''}`}>
 					<div className="insights-header">
 						<h6>Actionable Analytics</h6>
 						<Button onClick={toggleSidebar} shape="circle" icon="close" />
 					</div>
-					<div className="insight-sidebar-content">
-						<React.Fragment>
-							<Overlay
-								lockSectionStyle={{ marginTop: '50%' }}
-								renderContent={() => (
-									<List
-										itemLayout="horizontal"
-										dataSource={data}
-										renderItem={(item) => (
-											<List.Item>
-												<List.Item.Meta
-													avatar={
-														<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
-													}
-													title={
-														<a href="https://ant.design">
-															{item.title}
-														</a>
-													}
-													description="Ant Design, a design language for background applications, is refined by Ant UED Team"
-												/>
-											</List.Item>
-										)}
-									/>
-								)}
-								src="https://i.imgur.com/WmzxSHs.png"
-								alt="Query Rules"
-							/>
-						</React.Fragment>
-					</div>
+					<Overlay
+						lockSectionStyle={{
+							transform: 'translateY(70%)',
+							marginTop: '50%',
+						}}
+						renderContent={() => (
+							<div className="insight-sidebar-content">
+								<Tabs defaultActiveKey="INSIGHTS" style={{ padding: 10 }}>
+									<TabPane key="INSIGHTS" tab="INSIGHTS">
+										<CollapsibleInsights
+											type="insights"
+											defaultOpen="no_results"
+											insights={sampleData}
+										/>
+									</TabPane>
+									<TabPane tab="SAVED" />
+									<TabPane tab="READ" />
+								</Tabs>
+							</div>
+						)}
+						src="https://i.imgur.com/WmzxSHs.png"
+						alt="Query Rules"
+					/>
 				</div>
 			);
 		}
@@ -182,6 +182,7 @@ const mapStateToProps = (state) => {
 		isOpen: get(state, '$getInsightSidebar.isOpen', false),
 		appName,
 		isFetching: get(state, '$getAppAnalyticsInsights.isFetching'),
+		error: get(state, '$getAppAnalyticsInsights.isFetching'),
 		insights: getAppAnalyticsInsightsByName(state),
 		insightUpdates: get(state, `$getAppAnalyticsInsights.updates`),
 		tier: get(state, '$getAppPlan.results.tier'),

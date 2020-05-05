@@ -131,7 +131,7 @@ class CollapsibleInsights extends React.Component {
 	};
 
 	render() {
-		const { insights, type } = this.props;
+		const { insights, type, defaultOpen } = this.props;
 
 		if (insights.length === 0) {
 			return <Empty />;
@@ -142,6 +142,7 @@ class CollapsibleInsights extends React.Component {
 				onChange={this.handleCollapseKey}
 				className={collapseStyles}
 				bordered
+				defaultActiveKey={defaultOpen}
 				accordion
 			>
 				{insights.map((insight) => (
