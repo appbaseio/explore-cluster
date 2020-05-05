@@ -3,7 +3,9 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import React from 'react';
 import { css } from 'emotion';
+import { connect } from 'react-redux';
 import LabelTag from '../LabelTag';
+import { setCurrentApp } from '../../batteries/modules/actions';
 
 const popOverClass = css`
 	.ant-popover-buttons {
@@ -14,7 +16,14 @@ const popOverClass = css`
 	}
 `;
 
-function IndexSwitcher({ item = {}, filteredApps = [], history, onSelect, renderItem }) {
+function IndexSwitcher({
+	item = {},
+	filteredApps = [],
+	history,
+	onSelect,
+	renderItem,
+	updateCurrentApp,
+}) {
 	if (filteredApps.length === 1 && item.link)
 		return (
 			<Link to={`/app/${filteredApps[0]}/${item.link}`}>
@@ -40,8 +49,12 @@ function IndexSwitcher({ item = {}, filteredApps = [], history, onSelect, render
 				placeholder="Search for an index."
 				style={{ minWidth: 180 }}
 				onSelect={(value) => {
+					// do not use updateCurrentApp here, since onSelect prop is used for `Test Search Relevancy` button
 					if (onSelect) onSelect(value);
-					else history.replace(`/app/${value}/${item.link}`);
+					else {
+						updateCurrentApp(value);
+						history.replace(`/app/${value}/${item.link}`);
+					}
 				}}
 				showSearch
 			>
@@ -83,6 +96,7 @@ IndexSwitcher.propTypes = {
 	history: PropTypes.object,
 	onSelect: PropTypes.func,
 	renderItem: PropTypes.func,
+	updateCurrentApp: PropTypes.func.isRequired,
 };
 
 IndexSwitcher.defaultProps = {
@@ -93,4 +107,8 @@ IndexSwitcher.defaultProps = {
 	history: null,
 };
 
-export default IndexSwitcher;
+const mapDispatchToProps = (dispatch) => ({
+	updateCurrentApp: (appName, appId) => dispatch(setCurrentApp(appName, appId)),
+});
+
+export default connect(null, mapDispatchToProps)(IndexSwitcher);
