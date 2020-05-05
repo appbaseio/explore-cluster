@@ -55,7 +55,6 @@ const drawerClass = css`
 `;
 
 class AnalyticsInsights extends React.Component {
-	// TODO: Handle API Errors
 	componentDidUpdate(prevProps) {
 		// Fetch insights only when we open the drawer & dont over fetch if insights already exists
 		const {
@@ -70,16 +69,15 @@ class AnalyticsInsights extends React.Component {
 		} = this.props;
 		if (isValidPlan(tier, featureRules)) {
 			if (
-				(prevProps.appName !== appName || !insights) &&
-				isOpen &&
-				prevProps.isOpen !== isOpen
+				prevProps.appName !== appName ||
+				(!insights && isOpen && prevProps.isOpen !== isOpen)
 			) {
 				getInsights(appName);
 			}
 
-			if (JSON.stringify(prevProps.error) !== JSON.stringify(error)) {
+			if (error && JSON.stringify(prevProps.error) !== JSON.stringify(error)) {
 				// TODO: Need to update with proper response
-				message.error('Something went wrong!');
+				message.error('Something went wrong while fetching the data!');
 			}
 
 			if (
@@ -99,6 +97,11 @@ class AnalyticsInsights extends React.Component {
 				});
 			}
 		}
+	}
+
+	componentWillUnmount() {
+		const { toggleSidebar } = this.props;
+		toggleSidebar();
 	}
 
 	render() {
@@ -161,14 +164,16 @@ class AnalyticsInsights extends React.Component {
 				</div>
 				<div className="insight-sidebar-content">
 					<Tabs style={{ padding: 10 }} defaultActiveKey="1">
-						{Object.keys(insights).map((insightType) => (
-							<TabPane tab={insightType.toLocaleUpperCase()} key={insightType}>
-								<CollapsibleInsights
-									type={insightType}
-									insights={insights[insightType]}
-								/>
-							</TabPane>
-						))}
+						{Object.keys(insights)
+							.filter((insight) => insight !== 'deleted')
+							.map((insightType) => (
+								<TabPane tab={insightType.toLocaleUpperCase()} key={insightType}>
+									<CollapsibleInsights
+										type={insightType}
+										insights={insights[insightType]}
+									/>
+								</TabPane>
+							))}
 					</Tabs>
 				</div>
 			</div>
@@ -182,8 +187,8 @@ const mapStateToProps = (state) => {
 		isOpen: get(state, '$getInsightSidebar.isOpen', false),
 		appName,
 		isFetching: get(state, '$getAppAnalyticsInsights.isFetching'),
-		error: get(state, '$getAppAnalyticsInsights.isFetching'),
-		insights: getAppAnalyticsInsightsByName(state),
+		error: get(state, '$getAppAnalyticsInsights.error'),
+		insights: get(state, `$getAppAnalyticsInsights.results.${appName}`),
 		insightUpdates: get(state, `$getAppAnalyticsInsights.updates`),
 		tier: get(state, '$getAppPlan.results.tier'),
 		featureRules: get(state, '$getAppPlan.results.feature_rules', false),

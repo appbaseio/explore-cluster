@@ -1,10 +1,11 @@
 import React from 'react';
-import { Collapse, Alert, List, Icon, Button, Dropdown, Menu, Empty } from 'antd';
-import { Link } from 'react-router-dom';
+import { Collapse, Alert, List, Icon, Button, Dropdown, Menu, Empty, Popconfirm } from 'antd';
+import { Link, withRouter } from 'react-router-dom';
 import { get } from 'lodash';
 import { connect } from 'react-redux';
 import { css } from 'emotion';
 import { updateInsightStatus } from '../../batteries/modules/actions';
+import { IndexSwitcher } from '../IndexSwitcher';
 
 const { Panel } = Collapse;
 
@@ -111,6 +112,8 @@ class CollapsibleInsights extends React.Component {
 		let updateStatusTo = '';
 		switch (e.key) {
 			case 'delete':
+				updateStatusTo = 'deleted';
+				break;
 			case 'undo':
 				updateStatusTo = 'read';
 				break;
@@ -128,6 +131,41 @@ class CollapsibleInsights extends React.Component {
 			to: updateStatusTo,
 			id,
 		});
+	};
+
+	renderRecommendationLink = (link) => {
+		const { appName, history, apps } = this.props;
+		if (window.location.pathname.startsWith('/app')) {
+			return (
+				<Link to={`/${link.replace(':index', appName)}`}>
+					<Button style={{ marginTop: 5 }} size="small">
+						Go to Report
+					</Button>
+				</Link>
+			);
+		}
+
+		if (window.location.pathname.startsWith('/cluster')) {
+			return (
+				<IndexSwitcher
+					filteredApps={apps}
+					history={history}
+					renderItem={(popConfirmProps) => {
+						return (
+							<div {...popConfirmProps}>
+								<Button style={{ marginTop: 5 }} size="small">
+									Go to Report
+								</Button>
+							</div>
+						);
+					}}
+					onSelect={(index) => {
+						history.push(`/${link.replace(':index', index)}`);
+					}}
+				/>
+			);
+		}
+		return null;
 	};
 
 	render() {
@@ -158,10 +196,12 @@ class CollapsibleInsights extends React.Component {
 											<Menu
 												onClick={(e) => {
 													e.domEvent.stopPropagation();
-													this.handleClickContextMenu(
-														e,
-														get(insight, 'id'),
-													);
+													if (e.key !== 'delete') {
+														this.handleClickContextMenu(
+															e,
+															get(insight, 'id'),
+														);
+													}
 												}}
 											>
 												{type === 'saved' ? null : (
@@ -182,9 +222,22 @@ class CollapsibleInsights extends React.Component {
 														Mark as Read
 													</Menu.Item>
 												) : null}
+
 												<Menu.Item key="delete">
-													<Icon type="delete" />
-													Delete
+													<Popconfirm
+														title="Are you sure delete this insight?"
+														okText="Yes"
+														cancelText="No"
+														onConfirm={() =>
+															this.handleClickContextMenu(
+																{ key: 'delete' },
+																get(insight, 'id'),
+															)
+														}
+													>
+														<Icon type="delete" />
+														Delete
+													</Popconfirm>
 												</Menu.Item>
 											</Menu>
 										}
@@ -232,13 +285,13 @@ class CollapsibleInsights extends React.Component {
 										description={
 											<React.Fragment>
 												{get(recommendation, 'description')}
-												<div>
-													<Link to={get(recommendation, 'short_link')}>
-														<Button className="report-btn" size="small">
-															Go Report
-														</Button>
-													</Link>
-												</div>
+												{get(recommendation, 'short_link') ? (
+													<div>
+														{this.renderRecommendationLink(
+															get(recommendation, 'short_link'),
+														)}
+													</div>
+												) : null}
 											</React.Fragment>
 										}
 									/>
@@ -255,6 +308,7 @@ class CollapsibleInsights extends React.Component {
 const mapStateToProps = (state) => ({
 	isOpen: get(state, '$getInsightSidebar.isOpen', false),
 	appName: get(state, '$getCurrentApp.name'),
+	apps: Object.keys(get(state, 'apps.data'), {}).filter((app) => !app.startsWith('.')),
 	isFetching: get(state, '$getAppAnalyticsInsights.isFetching'),
 });
 
@@ -262,4 +316,4 @@ const mapDispatchToProps = (dispatch) => ({
 	updateInsight: (data) => dispatch(updateInsightStatus(data)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(CollapsibleInsights);
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(CollapsibleInsights));
