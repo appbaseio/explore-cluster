@@ -370,7 +370,7 @@ class SearchSettingsPage extends React.Component {
 	};
 
 	handleUsecaseChange = (field, type, usecase) => {
-		const topLevelKey = +getVersion() >= 7 ? `properties` : `_doc`;
+		const topLevelKey = +getVersion()[0] >= 7 ? `properties` : `_doc`;
 		const address = field.startsWith(`${topLevelKey}.properties`)
 			? field.replace(`${topLevelKey}.properties`, 'properties')
 			: field;
