@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Row, Icon, Input, Checkbox, Tooltip, Radio } from 'antd';
+import { Button, Checkbox, Icon, Input, Radio, Row, Tooltip } from 'antd';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { css } from 'emotion';
-import { updateAppScreenPreferences } from '../../actions';
+import { loadApps, updateAppScreenPreferences } from '../../actions';
+import { children as childrenProp } from '../../utils/prop-types';
 
 const commonFlex = css`
 	display: flex;
@@ -28,7 +29,7 @@ const sysIndicesCheckbox = css`
 	}
 `;
 
-function AppFilters({ apps, children, preferences, updatePreferences }) {
+function AppFilters({ apps, children, preferences, updatePreferences, fetchApps }) {
 	const [data, setData] = useState([]);
 	const [systemIndices, setSystemIndices] = useState(preferences.showSystemIndices);
 	const [searchTerm, setSearchTerm] = useState('');
@@ -73,6 +74,9 @@ function AppFilters({ apps, children, preferences, updatePreferences }) {
 					</Checkbox>
 				</div>
 				<div>
+					<Tooltip title="Reload Indices">
+						<Button style={{ marginRight: 10 }} icon="redo" onClick={fetchApps} />
+					</Tooltip>
 					<Radio.Group
 						defaultValue={preferences.showListView ? 'list' : 'card'}
 						buttonStyle="solid"
@@ -98,10 +102,16 @@ function AppFilters({ apps, children, preferences, updatePreferences }) {
 
 AppFilters.propTypes = {
 	apps: PropTypes.array,
+	children: childrenProp,
+	preferences: PropTypes.object,
+	updatePreferences: PropTypes.func.isRequired,
+	fetchApps: PropTypes.func.isRequired,
 };
 
 AppFilters.defaultProps = {
 	apps: [],
+	children: null,
+	preferences: {},
 };
 
 const mapStateToProps = (state) => ({
@@ -110,6 +120,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
 	updatePreferences: (payload) => dispatch(updateAppScreenPreferences(payload)),
+	fetchApps: () => dispatch(loadApps()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AppFilters);

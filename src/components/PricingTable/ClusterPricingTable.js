@@ -60,7 +60,7 @@ const data = [
 		name: (
 			<RowContent>
 				<div>Search Relevancy</div>
-				<StyledLink href="https://docs.appbase.io/docs/search/Mappings/" target="_blank">
+				<StyledLink href="https://docs.appbase.io/docs/search/relevancy/" target="_blank">
 					Read more
 				</StyledLink>
 			</RowContent>
@@ -72,7 +72,10 @@ const data = [
 		name: (
 			<RowContent>
 				<div>Query Suggestions</div>
-				<StyledLink href="https://docs.appbase.io/docs/search/Mappings/" target="_blank">
+				<StyledLink
+					href="https://docs.appbase.io/docs/analytics/query-suggestions/"
+					target="_blank"
+				>
 					Read more
 				</StyledLink>
 			</RowContent>

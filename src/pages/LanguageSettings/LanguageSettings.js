@@ -1,5 +1,6 @@
-/* eslint-disable no-param-reassign */
+/* eslint-disable no-param-reassign,jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Card, Form, Input, message, notification, Select, Switch } from 'antd';
 
@@ -13,13 +14,13 @@ import {
 	setCurrentApp,
 } from '../../batteries/modules/actions';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
-import { SettingsFooter } from '../../components/SettingsFooter';
+import SettingsFooter from '../../components/SettingsFooter';
 import { container, label } from '../ResultsPage/styles';
-import { LanguageDropdown } from '../../components/LanguageDropdown';
+import LanguageDropdown from '../../components/LanguageDropdown';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import { getURL, getVersion } from '../../constants/config';
-import { ReviewAndSave } from '../../components/ReviewAndSave';
-import { SettingTooltip } from '../../components/SettingTooltip';
+import ReviewAndSave from '../../components/ReviewAndSave';
+import SettingTooltip from '../../components/SettingTooltip';
 import {
 	applyLanguageAnalyzers,
 	getESVersion,
@@ -31,20 +32,22 @@ import { buildLanguageAnalysis, getLanguageFallback } from '../../utils/language
 import { isEqual, isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import { appendApp, removeAppData } from '../../actions';
-import { settingsMap } from '../../components/ReviewAndSave/helper';
+import settingsMap from '../../components/ReviewAndSave/helper';
 import Loader from '../../components/Loader';
+import { allowedTiers } from '../../utils/prop-types';
 
 const bannerDetails = {
 	title: 'Language Settings',
 	buttonText: 'Read More',
 	icon: 'pencil',
-	href: 'https://docs.appbase.io/docs/search/Preview/',
+	href: 'https://docs.appbase.io/docs/search/relevancy/#language-settings',
 };
 
 const bannerMessage = {
 	title: 'Language Settings',
 	description: 'Language Settings let you apply a specific language for your search index.',
 	buttonText: 'Read Docs',
+	href: 'https://docs.appbase.io/docs/search/relevancy/#language-settings',
 };
 
 class LanguageSettings extends React.Component {
@@ -87,7 +90,8 @@ class LanguageSettings extends React.Component {
 
 	getAnalyzerMappings = (res, getFieldValue) => {
 		// avoid mutation
-		const analyzerMappings = cloneDeep(res.payload.properties);
+		const es6Mappings = get(res, 'payload._doc.properties');
+		const analyzerMappings = cloneDeep(res.payload.properties || es6Mappings);
 		return applyLanguageAnalyzers(analyzerMappings, this.getFallBackLanguage(getFieldValue));
 	};
 
@@ -304,7 +308,7 @@ class LanguageSettings extends React.Component {
 		if (!isValidPlan(tier, featureSearchRelevancy)) {
 			return (
 				<React.Fragment>
-					<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
+					<Banner {...bannerDetails} />
 					<Overlay
 						style={{
 							maxWidth: '70%',
@@ -456,6 +460,31 @@ const mapStateToProps = (state) => {
 		tier: get(state, '$getAppPlan.results.tier'),
 		featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
 	};
+};
+
+LanguageSettings.propTypes = {
+	appName: PropTypes.string.isRequired,
+	getSettingsAction: PropTypes.func.isRequired,
+	form: PropTypes.object.isRequired,
+	credentials: PropTypes.string.isRequired,
+	getDefaultSettingsAction: PropTypes.func.isRequired,
+	settings: PropTypes.object,
+	defaultSettings: PropTypes.object,
+	fetchMappings: PropTypes.func.isRequired,
+	updateSettingsAction: PropTypes.func.isRequired,
+	isUpdating: PropTypes.bool,
+	resetState: PropTypes.object,
+	tier: allowedTiers,
+	featureSearchRelevancy: PropTypes.bool,
+};
+
+LanguageSettings.defaultProps = {
+	settings: null,
+	defaultSettings: null,
+	isUpdating: false,
+	resetState: {},
+	tier: undefined,
+	featureSearchRelevancy: false,
 };
 
 const mapDispatchToProps = (dispatch) => ({

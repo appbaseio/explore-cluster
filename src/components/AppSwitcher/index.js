@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Select } from 'antd';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
@@ -60,6 +61,19 @@ class AppSwitcher extends React.Component {
 		);
 	}
 }
+
+AppSwitcher.propTypes = {
+	apps: PropTypes.object,
+	fetchApps: PropTypes.func.isRequired,
+	currentApp: PropTypes.string.isRequired,
+	history: PropTypes.object.isRequired,
+	updateCurrentApp: PropTypes.func.isRequired,
+	match: PropTypes.object.isRequired,
+};
+
+AppSwitcher.defaultProps = {
+	apps: {},
+};
 
 const mapStateToProps = (state) => ({
 	apps: get(state, 'apps.data'),

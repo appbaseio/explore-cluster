@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { css } from 'emotion';
 import { colorBar } from '../AppCard/StatsBox';
 import AppActions from '../AppActions';
-import { renderNoData } from '../AppDataWrapper';
+import NoData from '../NoData';
 
 const tableStyle = css`
 	background-color: white;
@@ -101,7 +101,7 @@ function AppTable({ apps, history, onCreateModalChange }) {
 				/>
 			)}
 			locale={{
-				emptyText: renderNoData(onCreateModalChange),
+				emptyText: NoData(onCreateModalChange),
 			}}
 		/>
 	);
@@ -110,10 +110,12 @@ function AppTable({ apps, history, onCreateModalChange }) {
 AppTable.propTypes = {
 	apps: PropTypes.array,
 	history: PropTypes.object.isRequired,
+	onCreateModalChange: PropTypes.func,
 };
 
 AppTable.defaultProps = {
 	apps: [],
+	onCreateModalChange: () => {},
 };
 
 export default withRouter(AppTable);

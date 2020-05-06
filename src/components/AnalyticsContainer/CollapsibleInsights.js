@@ -5,8 +5,9 @@ import { get } from 'lodash';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { updateInsightStatus } from '../../batteries/modules/actions';
-import { IndexSwitcher } from '../IndexSwitcher';
+
 import { collapseStyles } from './styles';
+import IndexSwitcher from '../IndexSwitcher';
 
 const { Panel } = Collapse;
 

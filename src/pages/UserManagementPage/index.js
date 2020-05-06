@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-curly-brace-presence */
 import React from 'react';
 import { connect } from 'react-redux';
 import { Card, Button, Table, Alert, Typography } from 'antd';
@@ -152,7 +153,7 @@ class UserManagementPage extends React.Component {
 					title="Manage Users"
 					extra={
 						<a
-							href="https://docs.appbase.io/security/UserManagement/"
+							href="https://docs.appbase.io/docs/security/user-management/"
 							target="_blank"
 							rel="noopener noreferrer"
 						>
@@ -168,7 +169,7 @@ class UserManagementPage extends React.Component {
 								<Paragraph>
 									A user added via user management will need to visit the below
 									URL and enter their username and password to have access to the
-									cluster's dashboard view.
+									cluster{"'"}s dashboard view.
 								</Paragraph>
 								<Paragraph
 									strong

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Loadable from 'react-loadable';
 import { Switch, Route } from 'react-router-dom';
 
@@ -297,5 +298,9 @@ class RouteContainer extends React.Component {
 		);
 	}
 }
+
+RouteContainer.propTypes = {
+	location: PropTypes.object.isRequired,
+};
 
 export default RouteContainer;

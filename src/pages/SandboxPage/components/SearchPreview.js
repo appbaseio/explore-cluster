@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Row, Col, Switch, Tooltip, Spin, Button, Icon, Empty } from 'antd';
@@ -18,6 +19,7 @@ import { getURL } from '../../../constants/config';
 import { getSubFields } from '../../../utils';
 import { isValidPlan } from '../../../batteries/utils';
 import generateSandboxURL from '../utils/sandbox-generator';
+import { allowedTiers } from '../../../utils/prop-types';
 
 const container = css`
 	padding: 16px;
@@ -200,7 +202,7 @@ class SearchPreview extends React.Component {
 
 	render() {
 		const { settings, app, credentials, url, fetchingDefaultSettings, rules } = this.props;
-		const { settings: stateSettings, isAnalyticsEnabled } = this.state;
+		const { settings: stateSettings, isAnalyticsEnabled, hasMappingsLoaded } = this.state;
 
 		if (fetchingDefaultSettings) {
 			return (
@@ -213,9 +215,18 @@ class SearchPreview extends React.Component {
 
 		if (settings && settings.isFetching) {
 			return (
-				<div className={container}>
+				<div className={container} style={{ textAlign: 'center' }}>
 					<Spin />
 					<p>Fetching Settings</p>
+				</div>
+			);
+		}
+
+		if (!hasMappingsLoaded) {
+			return (
+				<div className={container} style={{ textAlign: 'center' }}>
+					<Spin />
+					<p>Fetching Mappings</p>
 				</div>
 			);
 		}
@@ -311,6 +322,28 @@ SearchPreview.propTypes = {
 	app: PropTypes.string.isRequired,
 	credentials: PropTypes.string.isRequired,
 	url: PropTypes.string.isRequired,
+	settings: PropTypes.object,
+	fetchRules: PropTypes.func.isRequired,
+	fetchSearchSettings: PropTypes.func.isRequired,
+	fetchMappings: PropTypes.func.isRequired,
+	hasTestSettings: PropTypes.bool,
+	testSettings: PropTypes.object,
+	rules: PropTypes.array,
+	tier: allowedTiers,
+	featureRules: PropTypes.bool,
+	fetchingDefaultSettings: PropTypes.bool,
+	mappings: PropTypes.object,
+};
+
+SearchPreview.defaultProps = {
+	settings: null,
+	hasTestSettings: false,
+	testSettings: {},
+	rules: null,
+	tier: undefined,
+	featureRules: false,
+	fetchingDefaultSettings: false,
+	mappings: null,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchPreview);

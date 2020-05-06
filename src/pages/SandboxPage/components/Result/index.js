@@ -1,11 +1,12 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Card, Radio, Icon, Row, Button, Alert, Tooltip, Typography } from 'antd';
 import { StateProvider } from '@appbaseio/reactivesearch';
 import { Link } from 'react-router-dom';
 import { get } from 'lodash';
 import QueryView from './QueryView';
 import ListView from './ListView';
-import { settingsMap } from '../../../../components/ReviewAndSave/helper';
+import settingsMap from '../../../../components/ReviewAndSave/helper';
 import { ruleStyle } from './styles';
 
 class Result extends React.Component {
@@ -109,5 +110,23 @@ class Result extends React.Component {
 		);
 	}
 }
+
+Result.propTypes = {
+	result: PropTypes.object,
+	app: PropTypes.string.isRequired,
+	credentials: PropTypes.string.isRequired,
+	url: PropTypes.string,
+	onChange: PropTypes.func,
+	query: PropTypes.array,
+	rules: PropTypes.array,
+};
+
+Result.defaultProps = {
+	result: {},
+	url: undefined,
+	onChange: null,
+	query: [],
+	rules: [],
+};
 
 export default Result;

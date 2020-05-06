@@ -1,7 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Layout } from 'antd';
 import { connect } from 'react-redux';
-import PropTypes from 'prop-types';
 
 import AppHeader from '../AppHeader';
 import AppsRouteContainer from './AppsRouteContainer';
@@ -42,6 +42,16 @@ class AppLayout extends React.PureComponent {
 
 AppLayout.propTypes = {
 	clearApp: PropTypes.func.isRequired,
+	collapsed: PropTypes.bool,
+	showHeader: PropTypes.bool,
+	match: PropTypes.object.isRequired,
+	history: PropTypes.object.isRequired,
+	onToggle: PropTypes.func.isRequired,
+};
+
+AppLayout.defaultProps = {
+	collapsed: false,
+	showHeader: false,
 };
 
 const mapDispatchToProps = (dispatch) => ({

@@ -1,9 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Affix, Button } from 'antd';
 import SearchPreviewModal from '../SearchPreviewModal';
 
-// eslint-disable-next-line import/prefer-default-export
-export function SettingsFooter({
+function SettingsFooter({
 	loading,
 	resetState,
 	onReset,
@@ -40,6 +40,25 @@ export function SettingsFooter({
 	);
 }
 
+SettingsFooter.propTypes = {
+	searchPreviewModalProps: PropTypes.object,
+	loading: PropTypes.bool,
+	resetState: PropTypes.object,
+	onReset: PropTypes.func.isRequired,
+	reviewAndSave: PropTypes.func,
+	showSearchPreview: PropTypes.bool,
+	app: PropTypes.string,
+	showReset: PropTypes.bool,
+};
+
 SettingsFooter.defaultProps = {
 	searchPreviewModalProps: {},
+	loading: false,
+	resetState: {},
+	reviewAndSave: () => {},
+	showSearchPreview: false,
+	app: undefined,
+	showReset: true,
 };
+
+export default SettingsFooter;

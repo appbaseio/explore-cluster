@@ -1,4 +1,6 @@
+/* eslint-disable camelcase */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
 import { Card, notification, message } from 'antd';
@@ -26,6 +28,7 @@ import { appendApp, loadApps, removeAppData } from '../../actions';
 const bannerMessage = {
 	title: 'Index Settings',
 	buttonText: 'Read Docs',
+	href: 'https://docs.appbase.io/docs/search/relevancy/#index-settings',
 };
 
 class IndexSettings extends React.Component {
@@ -242,6 +245,23 @@ class IndexSettings extends React.Component {
 		);
 	}
 }
+
+IndexSettings.propTypes = {
+	appName: PropTypes.string.isRequired,
+	credentials: PropTypes.string.isRequired,
+	fetchMappings: PropTypes.func.isRequired,
+	mappings: PropTypes.object,
+	fetchApps: PropTypes.func.isRequired,
+	addApp: PropTypes.func.isRequired,
+	apps: PropTypes.object,
+	isFetchingMapping: PropTypes.bool,
+};
+
+IndexSettings.defaultProps = {
+	mappings: null,
+	apps: {},
+	isFetchingMapping: false,
+};
 
 const mapStateToProps = (state) => {
 	const mappings = getRawMappingsByAppName(state) || null;

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { css } from 'emotion';
 import { Card, Icon, Select } from 'antd';
 import { getErrorClass, getErrorMessage } from '../utils/error';
@@ -119,5 +120,18 @@ class ActionSelector extends React.Component {
 		);
 	}
 }
+
+ActionSelector.propTypes = {
+	actions: PropTypes.array,
+	onChange: PropTypes.func.isRequired,
+	error: PropTypes.object,
+	condition: PropTypes.string,
+};
+
+ActionSelector.defaultProps = {
+	actions: [],
+	error: {},
+	condition: undefined,
+};
 
 export default ActionSelector;

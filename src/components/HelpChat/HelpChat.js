@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { Button, Dropdown, Menu, Modal, Input, message } from 'antd';
 import { css } from 'emotion';
@@ -138,6 +139,7 @@ class HelpButton extends React.Component {
 					<h3 className={heading}>Get Support!</h3>
 				</Menu.Item>
 				<Menu.Item key="whats_new">
+					{/* eslint-disable-next-line react/jsx-curly-brace-presence */}
 					<p className={subHeading}>See what{`'`}s new ✨</p>
 				</Menu.Item>
 				<Menu.Item key="twitter">
@@ -187,6 +189,10 @@ class HelpButton extends React.Component {
 		);
 	}
 }
+
+HelpButton.propTypes = {
+	user: PropTypes.object.isRequired,
+};
 
 const HelpChat = (props) =>
 	ReactDOM.createPortal(<HelpButton {...props} />, document.getElementById('help'));

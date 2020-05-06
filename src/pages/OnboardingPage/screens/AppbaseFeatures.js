@@ -1,4 +1,6 @@
+/* eslint-disable jsx-a11y/anchor-is-valid,jsx-a11y/mouse-events-have-key-events */
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 import SearchApp from './SearchApp';
 import Footer from '../components/Footer';
@@ -39,43 +41,53 @@ export default class AppbaseFeatures extends Component {
 		appbaseHelpers.indexNewData();
 	};
 
-	renderIndexBlock = () => (
-		<div style={{ marginTop: 0 }} className="search-field-container full-row">
-			<div>
-				<h3>Streaming updates</h3>
-				<p>
-					We will add a new movie to our dataset. Once added, it will appear in realtime
-					in the existing results if it matches the search query.
-				</p>
-			</div>
-			<div
-				className="input-wrapper"
-				onMouseLeave={this.hideJSONBlock}
-				style={{ flexDirection: 'row-reverse', position: 'relative' }}
-			>
-				<a
-					className="button primary"
-					onMouseOver={this.showJSONBlock}
-					onClick={this.indexData}
-				>
-					Add New Movie
-				</a>
-
+	renderIndexBlock = () => {
+		const { showJSONBlock } = this.state;
+		return (
+			<div style={{ marginTop: 0 }} className="search-field-container full-row">
+				<div>
+					<h3>Streaming updates</h3>
+					<p>
+						We will add a new movie to our dataset. Once added, it will appear in
+						realtime in the existing results if it matches the search query.
+					</p>
+				</div>
 				<div
-					className={`code-block hoverable ${this.state.showJSONBlock ? 'show' : ''}`}
-					dangerouslySetInnerHTML={{ __html: jsonBlock }}
-				/>
-			</div>
-		</div>
-	);
+					className="input-wrapper"
+					onMouseLeave={this.hideJSONBlock}
+					style={{
+						flexDirection: 'row-reverse',
+						position: 'relative',
+					}}
+				>
+					<a
+						className="button primary"
+						onMouseOver={this.showJSONBlock}
+						onClick={this.indexData}
+					>
+						Add New Movie
+					</a>
 
-	renderSearchApp = () => (
-		<div>
-			<SearchApp fields={this.props.searchFields} facets={this.props.facetFields} />
-		</div>
-	);
+					<div
+						className={`code-block hoverable ${showJSONBlock ? 'show' : ''}`}
+						dangerouslySetInnerHTML={{ __html: jsonBlock }}
+					/>
+				</div>
+			</div>
+		);
+	};
+
+	renderSearchApp = () => {
+		const { searchFields, facetFields } = this.props;
+		return (
+			<div>
+				<SearchApp fields={searchFields} facets={facetFields} />
+			</div>
+		);
+	};
 
 	render() {
+		const { nextScreen, app, previousScreen } = this.props;
 		return (
 			<div>
 				<div className="wrapper">
@@ -98,12 +110,27 @@ export default class AppbaseFeatures extends Component {
 				{this.renderIndexBlock()}
 				{this.renderSearchApp()}
 				<Footer
-					nextScreen={this.props.nextScreen}
-					previousScreen={this.props.previousScreen}
+					nextScreen={nextScreen}
+					previousScreen={previousScreen}
 					label="Finish"
-					app={this.props.app}
+					app={app}
 				/>
 			</div>
 		);
 	}
 }
+
+AppbaseFeatures.propTypes = {
+	searchFields: PropTypes.array,
+	facetFields: PropTypes.array,
+	nextScreen: PropTypes.func,
+	app: PropTypes.string.isRequired,
+	previousScreen: PropTypes.func,
+};
+
+AppbaseFeatures.defaultProps = {
+	searchFields: [],
+	facetFields: [],
+	nextScreen: null,
+	previousScreen: null,
+};

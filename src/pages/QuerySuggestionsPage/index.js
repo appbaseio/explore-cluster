@@ -33,7 +33,7 @@ const bannerDetails = {
 	description: 'GUI to manage preferences for query suggestions.',
 	buttonText: 'Read more',
 	icon: 'pencil',
-	href: 'https://docs.appbase.io/docs/analytics/QuerySuggestions/',
+	href: 'https://docs.appbase.io/docs/analytics/query-suggestions/',
 };
 
 const cardStyle = css`
@@ -199,6 +199,7 @@ class QuerySuggestions extends React.Component {
 
 QuerySuggestions.defaultProps = {
 	preferences: {},
+	apps: {},
 };
 
 QuerySuggestions.propTypes = {
@@ -209,6 +210,7 @@ QuerySuggestions.propTypes = {
 	savePreferences: PropTypes.func.isRequired,
 	tier: PropTypes.string.isRequired,
 	featureSuggestions: PropTypes.bool.isRequired,
+	apps: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({

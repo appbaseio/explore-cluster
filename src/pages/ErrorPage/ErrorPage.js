@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Button, Icon } from 'antd';
 import { connect } from 'react-redux';
 import * as Sentry from '@sentry/browser';
@@ -78,6 +79,10 @@ class ErrorPage extends React.Component {
 		);
 	}
 }
+
+ErrorPage.propTypes = {
+	location: PropTypes.object.isRequired,
+};
 
 const mapStateToProps = ({ user }) => ({
 	user,

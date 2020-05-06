@@ -1,4 +1,5 @@
 import React, { Fragment, useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import {
 	Button,
 	Col,
@@ -13,7 +14,7 @@ import {
 	Affix,
 } from 'antd';
 import { connect } from 'react-redux';
-import { string } from 'prop-types';
+
 import get from 'lodash/get';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
@@ -42,6 +43,7 @@ import { getFunctionHealthCheck } from '../../utils';
 import { deploymentCheck } from '../../components/DeployFunctionModal/helper';
 import { mediaKey } from '../../utils/media';
 import SearchPreviewSwitcher from '../../components/SearchPreviewSwitcher';
+import { allowedTiers, children } from '../../utils/prop-types';
 
 const link = css`
 	font-size: 14px;
@@ -64,6 +66,16 @@ const IconText = ({ type, text }) => (
 	</span>
 );
 
+IconText.propTypes = {
+	type: PropTypes.string,
+	text: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+};
+
+IconText.defaultProps = {
+	type: undefined,
+	text: null,
+};
+
 function InvokeButton({ item }) {
 	const [visible, setVisible] = useState(false);
 	return (
@@ -85,6 +97,14 @@ function InvokeButton({ item }) {
 	);
 }
 
+InvokeButton.propTypes = {
+	item: PropTypes.object,
+};
+
+InvokeButton.defaultProps = {
+	item: {},
+};
+
 function BeautifulDnd({ onDragStart, onDragEnd, render }) {
 	return (
 		<DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
@@ -93,6 +113,12 @@ function BeautifulDnd({ onDragStart, onDragEnd, render }) {
 	);
 }
 
+BeautifulDnd.propTypes = {
+	onDragStart: PropTypes.func.isRequired,
+	onDragEnd: PropTypes.func.isRequired,
+	render: children.isRequired,
+};
+
 function DndDraggable({ index, render, item }) {
 	return (
 		<Draggable draggableId={item.function.service} index={index}>
@@ -100,6 +126,16 @@ function DndDraggable({ index, render, item }) {
 		</Draggable>
 	);
 }
+
+DndDraggable.propTypes = {
+	index: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+	render: children.isRequired,
+	item: PropTypes.object,
+};
+
+DndDraggable.defaultProps = {
+	item: {},
+};
 
 function UpdateFunction({ item }) {
 	const [visible, setVisible] = useState(false);
@@ -117,6 +153,14 @@ function UpdateFunction({ item }) {
 		</>
 	);
 }
+
+UpdateFunction.propTypes = {
+	item: PropTypes.object,
+};
+
+UpdateFunction.defaultProps = {
+	item: null,
+};
 
 function isQueryRuleAssociated(item) {
 	return (item.queryRules || []).length !== 0;
@@ -141,6 +185,15 @@ function Actions({ item, refetchFunction }) {
 		</React.Fragment>
 	);
 }
+
+Actions.propTypes = {
+	item: PropTypes.object,
+	refetchFunction: PropTypes.func.isRequired,
+};
+
+Actions.defaultProps = {
+	item: null,
+};
 
 function VerticalDivider() {
 	return (
@@ -174,7 +227,7 @@ const bannerDetails = {
 	description: `Create "If this, then that" style functions to add your own custom search and security logic. Functions will be executed in the order in which they are listed. You can drag and drop a function to change the ordering sequence.`,
 	buttonText: 'Read more',
 	icon: 'pencil',
-	href: 'https://docs.appbase.io/docs/search/Functions/',
+	href: 'https://docs.appbase.io/docs/search/functions',
 };
 
 function FunctionItem({ item, onChange, getFunction }) {
@@ -266,6 +319,16 @@ function FunctionItem({ item, onChange, getFunction }) {
 		/>
 	);
 }
+
+FunctionItem.propTypes = {
+	item: PropTypes.object,
+	onChange: PropTypes.func.isRequired,
+	getFunction: PropTypes.func.isRequired,
+};
+
+FunctionItem.defaultProps = {
+	item: {},
+};
 
 const listItemClass = css`
 	border-radius: 3px;
@@ -378,7 +441,7 @@ class FunctionsPage extends React.Component {
 		const { deployModal, checking, healthError, notFoundError, visible, app } = this.state;
 		this.sortedDataSource = (functions || []).sort((a, b) => a.order - b.order);
 
-		const filteredApps = keys(apps).filter((app) => !app.startsWith('.'));
+		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
 
 		if (tier && !isValidPlan(tier, featureFunctions, features.FUNCTIONS)) {
 			return (
@@ -638,7 +701,25 @@ class FunctionsPage extends React.Component {
 }
 
 FunctionsPage.propTypes = {
-	appName: string.isRequired,
+	appName: PropTypes.string.isRequired,
+	putFunctions: PropTypes.func.isRequired,
+	fetchFunctions: PropTypes.func.isRequired,
+	reorderFunctions: PropTypes.func.isRequired,
+	fetchRegistries: PropTypes.func.isRequired,
+	getFunction: PropTypes.func.isRequired,
+	isLoading: PropTypes.bool,
+	functions: PropTypes.array,
+	tier: allowedTiers,
+	apps: PropTypes.object,
+	featureFunctions: PropTypes.bool,
+};
+
+FunctionsPage.defaultProps = {
+	isLoading: false,
+	functions: [],
+	tier: undefined,
+	apps: {},
+	featureFunctions: false,
 };
 
 const mapStateToProps = (state) => ({

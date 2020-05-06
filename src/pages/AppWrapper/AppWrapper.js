@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { Layout, Menu, Icon, Tag, Tooltip, Input } from 'antd';
+import { Icon, Input, Layout, Menu, Tag } from 'antd';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import AppLayout from '../../components/AppLayout';
@@ -16,8 +17,10 @@ import { getParam, getParsedRoutes } from '../../utils';
 import { breakpoints } from '../../utils/media';
 import Loader from '../../components/Loader';
 import { isValidPlan } from '../../batteries/utils';
-import { searchInputStyle } from '../DashboardWrapper/DashboardWrapper';
 import SidebarAutocomplete from '../../components/SidebarAutocomplete';
+import { allowedTiers } from '../../utils/prop-types';
+import searchInputStyle from '../DashboardWrapper/styles';
+import WithRedirectTooltip from '../../components/WithRedirectTooltip';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
@@ -128,17 +131,6 @@ const getActiveMenu = (props, prevActiveSubMenu = []) => {
 	};
 };
 
-export const WithRedirectTooltip = ({ showTooltip, children }) => {
-	if (showTooltip) {
-		return (
-			<Tooltip placement="rightBottom" title="This will redirect you to the cluster view">
-				{children}
-			</Tooltip>
-		);
-	}
-	return children;
-};
-
 let url;
 class AppWrapper extends Component {
 	constructor(props) {
@@ -193,18 +185,14 @@ class AppWrapper extends Component {
 	}
 
 	componentDidMount() {
-		const { appName, loading } = this.state;
-		const { history, match, currentApp, settings } = this.props;
+		const { appName } = this.state;
+		const { history, match } = this.props;
 		const view = getParam('view') || '';
 
 		this.handleSettings(appName);
 
 		if (!match.params.appName && appName) {
 			history.push(`/app/${appName}/${view}`);
-		}
-
-		if (!settings && !loading) {
-			this.handleSettings(currentApp);
 		}
 	}
 
@@ -422,6 +410,26 @@ class AppWrapper extends Component {
 		);
 	}
 }
+
+AppWrapper.propTypes = {
+	currentApp: PropTypes.string.isRequired,
+	history: PropTypes.object.isRequired,
+	match: PropTypes.object.isRequired,
+	settings: PropTypes.object,
+	defaultSettings: PropTypes.object,
+	updateSettingsAction: PropTypes.func.isRequired,
+	getDefaultSettingsAction: PropTypes.func.isRequired,
+	getSettingsAction: PropTypes.func.isRequired,
+	tier: allowedTiers,
+	featureSearchRelevancy: PropTypes.bool,
+};
+
+AppWrapper.defaultProps = {
+	settings: null,
+	tier: undefined,
+	featureSearchRelevancy: false,
+	defaultSettings: null,
+};
 
 const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');

@@ -36,4 +36,10 @@ AppButton.propTypes = {
 	className: string,
 };
 
+AppButton.defaultProps = {
+	color: undefined,
+	backgroundColor: undefined,
+	className: undefined,
+};
+
 export default AppButton;

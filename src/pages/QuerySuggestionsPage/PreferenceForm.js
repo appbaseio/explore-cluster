@@ -78,6 +78,20 @@ const InputElement = ({ name, label, toolTipMessage, inputProps, placeholder }) 
 	/>
 );
 
+InputElement.propTypes = {
+	name: PropTypes.string.isRequired,
+	label: PropTypes.string.isRequired,
+	toolTipMessage: PropTypes.string,
+	inputProps: PropTypes.object,
+	placeholder: PropTypes.string,
+};
+
+InputElement.defaultProps = {
+	toolTipMessage: undefined,
+	inputProps: {},
+	placeholder: undefined,
+};
+
 class PreferenceForm extends React.Component {
 	state = { visible: false };
 
@@ -94,7 +108,7 @@ class PreferenceForm extends React.Component {
 	render() {
 		const { control, handleSaveTemplate, isLoading, indices, apps } = this.props;
 		const { visible, app } = this.state;
-		const filteredApps = keys(apps).filter((app) => !app.startsWith('.'));
+		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
 		return (
 			<FieldGroup
 				control={control}
@@ -281,6 +295,11 @@ PreferenceForm.propTypes = {
 	control: PropTypes.object.isRequired,
 	isLoading: PropTypes.bool.isRequired,
 	indices: PropTypes.array.isRequired,
+	apps: PropTypes.object,
+};
+
+PreferenceForm.defaultProps = {
+	apps: {},
 };
 
 const mapStateToProps = (state) => ({

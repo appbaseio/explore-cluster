@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Tabs } from 'antd';
 import SetFunctionTrigger from './SetFunctionTrigger';
 import NewFunctionForm from './NewFunctionForm';
@@ -45,5 +46,14 @@ class ExecuteFunction extends Component {
 		);
 	}
 }
+
+ExecuteFunction.propTypes = {
+	onChange: PropTypes.func.isRequired,
+	value: PropTypes.string,
+};
+
+ExecuteFunction.defaultProps = {
+	value: undefined,
+};
 
 export default ExecuteFunction;

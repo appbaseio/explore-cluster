@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { css } from 'react-emotion';
 import { Input } from 'antd';
 
@@ -61,5 +62,15 @@ class PasswordInput extends React.Component {
 		);
 	}
 }
+
+PasswordInput.propTypes = {
+	control: PropTypes.object,
+	isEditing: PropTypes.bool,
+};
+
+PasswordInput.defaultProps = {
+	control: {},
+	isEditing: false,
+};
 
 export default PasswordInput;

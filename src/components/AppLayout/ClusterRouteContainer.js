@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Switch, Route } from 'react-router-dom';
 import Loadable from 'react-loadable';
 
@@ -230,5 +231,11 @@ class ClusterRouteContainer extends React.Component {
 		);
 	}
 }
+
+ClusterRouteContainer.propTypes = {
+	history: PropTypes.object.isRequired,
+	match: PropTypes.object.isRequired,
+	location: PropTypes.object.isRequired,
+};
 
 export default ClusterRouteContainer;

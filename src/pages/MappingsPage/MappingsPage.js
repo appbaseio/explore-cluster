@@ -1,35 +1,19 @@
 import React, { Fragment } from 'react';
-import { Row, Col } from 'antd';
 import { string } from 'prop-types';
 
-import Header from '../../components/Header';
 import Mappings from '../../batteries/components/Mappings';
+import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
+
+const bannerMessage = {
+	title: 'Schema Settings',
+	buttonText: 'Read Docs',
+	description: 'View mappings, edit use-case and data types, add or delete fields',
+	href: 'https://docs.appbase.io/docs/search/relevancy/#schema',
+};
 
 const MappingsPage = ({ appName }) => (
 	<Fragment>
-		<Header compact>
-			<Row type="flex" justify="space-between" gutter={16}>
-				<Col lg={18}>
-					<h2>App Settings</h2>
-
-					<Row>
-						<Col lg={18}>
-							<p>
-								View mappings, edit use-case and data types, add or delete fields -{' '}
-								<a
-									href="https://docs.appbase.io/concepts/mappings.html"
-									target="_blank"
-									rel="noopener noreferrer"
-								>
-									learn more
-								</a>
-								.
-							</p>
-						</Col>
-					</Row>
-				</Col>
-			</Row>
-		</Header>
+		<Banner {...bannerMessage} />
 		<section>
 			<Mappings key={appName} appName={appName} appId={appName} />
 		</section>

@@ -1,4 +1,6 @@
+/* eslint-disable jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
 import { css } from 'emotion';
@@ -33,14 +35,15 @@ import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import { getAggsMappings } from '../../batteries/utils/mappings';
 import { dropdown } from '../../batteries/components/Mappings/styles';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
-import { SettingsFooter } from '../../components/SettingsFooter';
-import { ReviewAndSave } from '../../components/ReviewAndSave';
+import SettingsFooter from '../../components/SettingsFooter';
+import ReviewAndSave from '../../components/ReviewAndSave';
 import { container } from '../ResultsPage/styles';
 import { getSubFields } from '../../utils';
-import { settingsMap } from '../../components/ReviewAndSave/helper';
+import settingsMap from '../../components/ReviewAndSave/helper';
 import { isEqual, isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import { highlighter } from '../SandboxPage/components/Search';
+import { allowedTiers } from '../../utils/prop-types';
 
 const { Option } = Select;
 
@@ -48,12 +51,13 @@ const bannerDetails = {
 	title: 'Aggregation Settings',
 	buttonText: 'Read More',
 	icon: 'pencil',
-	href: 'https://docs.appbase.io/docs/search/Preview/',
+	href: 'https://docs.appbase.io/docs/search/relevancy/#aggregation-settings',
 };
 
 const bannerMessage = {
 	title: 'Aggregations Settings',
 	buttonText: 'Read Docs',
+	href: 'https://docs.appbase.io/docs/search/relevancy/#aggregation-settings',
 };
 
 const cardStyle = css`
@@ -417,7 +421,7 @@ class AggsPage extends React.Component {
 		if (!isValidPlan(tier, featureSearchRelevancy)) {
 			return (
 				<React.Fragment>
-					<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
+					<Banner {...bannerDetails} />
 					<Overlay
 						style={{
 							maxWidth: '70%',
@@ -447,6 +451,7 @@ class AggsPage extends React.Component {
 							showMappingInfo={false}
 							showCardWrapper={false}
 							hideSearchType
+							deleteLabel=" Remove from Aggs"
 							hideDelete
 							hideNoneTextType
 							hideDataType
@@ -691,6 +696,39 @@ class AggsPage extends React.Component {
 		);
 	}
 }
+
+AggsPage.propTypes = {
+	fetchMappings: PropTypes.func.isRequired,
+	getDefaultSettingsAction: PropTypes.func.isRequired,
+	getSettingsAction: PropTypes.func.isRequired,
+	updateSettingsAction: PropTypes.func.isRequired,
+	deleteSettingsAction: PropTypes.func.isRequired,
+	appName: PropTypes.string.isRequired,
+	credentials: PropTypes.string.isRequired,
+	isFetchingMapping: PropTypes.bool,
+	mappings: PropTypes.object,
+	settings: PropTypes.object,
+	defaultSettings: PropTypes.object,
+	isLoading: PropTypes.bool,
+	isUpdating: PropTypes.bool,
+	tier: allowedTiers,
+	resetState: PropTypes.object,
+	traversedMappings: PropTypes.array,
+	featureSearchRelevancy: PropTypes.bool,
+};
+
+AggsPage.defaultProps = {
+	isFetchingMapping: false,
+	mappings: null,
+	settings: null,
+	defaultSettings: null,
+	isLoading: false,
+	isUpdating: false,
+	tier: undefined,
+	resetState: {},
+	traversedMappings: [],
+	featureSearchRelevancy: false,
+};
 
 const mapStateToProps = (state) => {
 	const mappings = getRawMappingsByAppName(state) || null;

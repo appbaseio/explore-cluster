@@ -1,5 +1,8 @@
+/* eslint-disable jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Input, Select } from 'antd';
+import { hideDropdown } from './styles';
 
 const OneWaySynonym = (props) => {
 	const { searchTerm, alternatives, onChange } = props;
@@ -20,6 +23,7 @@ const OneWaySynonym = (props) => {
 			<label>Alternatives</label>
 			<Select
 				mode="tags"
+				dropdownClassName={hideDropdown}
 				style={{ width: '100%' }}
 				placeholder="Add comma separated alternatives"
 				value={alternatives}
@@ -28,6 +32,17 @@ const OneWaySynonym = (props) => {
 			/>
 		</React.Fragment>
 	);
+};
+
+OneWaySynonym.propTypes = {
+	searchTerm: PropTypes.string,
+	alternatives: PropTypes.array,
+	onChange: PropTypes.func.isRequired,
+};
+
+OneWaySynonym.defaultProps = {
+	searchTerm: undefined,
+	alternatives: undefined,
 };
 
 export default OneWaySynonym;

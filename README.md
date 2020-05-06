@@ -18,4 +18,7 @@ yarn
 yarn start
 ```
 
-Server will run on port `1357`.
+### Debugging
+If your tests are failing, do make sure your `localhost:3333` is up and running.
+
+Server will run on port `3333`.

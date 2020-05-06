@@ -1,7 +1,8 @@
+/* eslint-disable jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Select } from 'antd';
-
-const { Option } = Select;
+import { hideDropdown } from './styles';
 
 const EquivalentSynonym = (props) => {
 	const { synonyms, onChange } = props;
@@ -17,12 +18,22 @@ const EquivalentSynonym = (props) => {
 				mode="tags"
 				style={{ width: '100%' }}
 				value={synonyms}
+				dropdownClassName={hideDropdown}
 				placeholder="Add comma separated synonyms"
 				onChange={handleChange}
 				tokenSeparators={[',']}
 			/>
 		</React.Fragment>
 	);
+};
+
+EquivalentSynonym.propTypes = {
+	synonyms: PropTypes.array,
+	onChange: PropTypes.func.isRequired,
+};
+
+EquivalentSynonym.defaultProps = {
+	synonyms: undefined,
 };
 
 export default EquivalentSynonym;
