@@ -26,11 +26,11 @@ import {
 	getAppMappings,
 	deleteSettings,
 } from '../../batteries/modules/actions';
-import { getURL } from '../../constants/config';
+import { getURL, getVersion } from '../../constants/config';
 import Mappings from '../../batteries/components/Mappings/Mappings';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
-import { getAggsMappings, getESVersion } from '../../batteries/utils/mappings';
+import { getAggsMappings } from '../../batteries/utils/mappings';
 import ReviewAndSave from '../../components/ReviewAndSave';
 import SettingsFooter from '../../components/SettingsFooter';
 import { container } from '../ResultsPage/styles';
@@ -370,7 +370,7 @@ class SearchSettingsPage extends React.Component {
 	};
 
 	handleUsecaseChange = (field, type, usecase) => {
-		const topLevelKey = +getESVersion() >= 7 ? `properties` : `_doc`;
+		const topLevelKey = +getVersion() >= 7 ? `properties` : `_doc`;
 		const address = field.startsWith(`${topLevelKey}.properties`)
 			? field.replace(`${topLevelKey}.properties`, 'properties')
 			: field;
