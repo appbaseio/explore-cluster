@@ -118,7 +118,12 @@ class CollapsibleInsights extends React.Component {
 						header={
 							<div className="panel-header">
 								<div className="title">
-									<h6>{get(insight, 'insight.title')}</h6>
+									<div
+										className="insight-title"
+										dangerouslySetInnerHTML={{
+											__html: get(insight, 'insight.title'),
+										}}
+									/>
 									<Dropdown
 										trigger={['click']}
 										overlay={
@@ -191,7 +196,12 @@ class CollapsibleInsights extends React.Component {
 									</Dropdown>
 								</div>
 								{get(insight, 'insight.description') ? (
-									<p>{get(insight, 'insight.description')}</p>
+									<div
+										className="insight-description"
+										dangerouslySetInnerHTML={{
+											__html: get(insight, 'insight.description'),
+										}}
+									/>
 								) : null}
 							</div>
 						}
@@ -216,12 +226,24 @@ class CollapsibleInsights extends React.Component {
 									<List.Item.Meta
 										title={
 											<div className="list-title">
-												<span>{get(recommendation, 'title', '')}</span>
+												<span
+													dangerouslySetInnerHTML={{
+														__html: get(recommendation, 'title', ''),
+													}}
+												/>
 											</div>
 										}
 										description={
 											<React.Fragment>
-												{get(recommendation, 'description')}
+												<span
+													dangerouslySetInnerHTML={{
+														__html: get(
+															recommendation,
+															'description',
+															'',
+														),
+													}}
+												/>
 												{get(recommendation, 'short_link') ? (
 													<div>
 														{this.renderRecommendationLink(

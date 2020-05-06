@@ -46,14 +46,14 @@ export const collapseStyles = css`
 		border-radius: 0;
 	}
 
-	.panel-header h6 {
+	.panel-header .insight-title {
 		color: rgba(0, 0, 0, 0.85);
 		font-weight: 600;
 		margin: 0;
 		font-size: 15px;
 	}
 
-	.panel-header p {
+	.panel-header .insight-description {
 		color: rgba(0, 0, 0, 0.45);
 		font-size: 14px;
 		line-height: 18px;
