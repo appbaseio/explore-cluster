@@ -2,6 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Select } from 'antd';
+import { hideDropdown } from './styles';
 
 const EquivalentSynonym = (props) => {
 	const { synonyms, onChange } = props;
@@ -17,6 +18,7 @@ const EquivalentSynonym = (props) => {
 				mode="tags"
 				style={{ width: '100%' }}
 				value={synonyms}
+				dropdownClassName={hideDropdown}
 				placeholder="Add comma separated synonyms"
 				onChange={handleChange}
 				tokenSeparators={[',']}
