@@ -153,7 +153,7 @@ class AnalyticsInsights extends React.Component {
 			return (
 				<div className={`${drawerClass} ${isOpen ? 'open' : ''}`}>
 					<div className="insights-header">
-						<h6>Actionable Analytics</h6>
+						<h6>Actionable Insights</h6>
 						<Button onClick={toggleSidebar} shape="circle" icon="close" />
 					</div>
 					<Loader />
@@ -198,7 +198,7 @@ class AnalyticsInsights extends React.Component {
 		return (
 			<div className={`${drawerClass} ${isOpen ? 'open' : ''}`}>
 				<div className="insights-header">
-					<h6>Actionable Analytics</h6>
+					<h6>Actionable Insights</h6>
 					<Button onClick={toggleSidebar} shape="circle" icon="close" />
 				</div>
 				<div className="insight-sidebar-content">
