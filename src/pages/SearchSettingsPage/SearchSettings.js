@@ -26,7 +26,7 @@ import {
 	getAppMappings,
 	deleteSettings,
 } from '../../batteries/modules/actions';
-import { getURL } from '../../constants/config';
+import { getURL, getVersion } from '../../constants/config';
 import Mappings from '../../batteries/components/Mappings/Mappings';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
@@ -370,8 +370,9 @@ class SearchSettingsPage extends React.Component {
 	};
 
 	handleUsecaseChange = (field, type, usecase) => {
-		const address = field.startsWith('properties.properties')
-			? field.replace('properties.properties', 'properties')
+		const topLevelKey = +getVersion()[0] >= 7 ? `properties` : `_doc`;
+		const address = field.startsWith(`${topLevelKey}.properties`)
+			? field.replace(`${topLevelKey}.properties`, 'properties')
 			: field;
 		const parsedAddress = address.split('.').reduce((agg, key, index) => {
 			if (index % 2 !== 0) {

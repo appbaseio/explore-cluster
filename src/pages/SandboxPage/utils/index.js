@@ -10,6 +10,8 @@ const generateQuery = ({ aggregations: filters, search, results, synonyms }) => 
 						dataField: typeof filterField === 'string' ? [filterField] : filterField,
 						sortBy: filters.sortBy,
 						size: filters.size,
+						type: 'term',
+						value: [],
 					};
 			  })
 			: [];
@@ -33,6 +35,7 @@ const generateQuery = ({ aggregations: filters, search, results, synonyms }) => 
 			dataField: Array.isArray(searchDataField) ? searchDataField : [searchDataField],
 			fieldWeights: search.fieldWeights || [],
 			enableSynonyms: get(synonyms, 'enabled', true),
+			value: '',
 		},
 		...filtersData,
 	];
