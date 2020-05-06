@@ -90,7 +90,8 @@ class LanguageSettings extends React.Component {
 
 	getAnalyzerMappings = (res, getFieldValue) => {
 		// avoid mutation
-		const analyzerMappings = cloneDeep(res.payload.properties);
+		const es6Mappings = get(res, 'payload._doc.properties');
+		const analyzerMappings = cloneDeep(res.payload.properties || es6Mappings);
 		return applyLanguageAnalyzers(analyzerMappings, this.getFallBackLanguage(getFieldValue));
 	};
 
