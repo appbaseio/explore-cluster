@@ -3,81 +3,12 @@ import { Collapse, Alert, List, Icon, Button, Dropdown, Menu, Empty, Popconfirm 
 import { Link, withRouter } from 'react-router-dom';
 import { get } from 'lodash';
 import { connect } from 'react-redux';
-import { css } from 'emotion';
+import PropTypes from 'prop-types';
 import { updateInsightStatus } from '../../batteries/modules/actions';
 import { IndexSwitcher } from '../IndexSwitcher';
+import { collapseStyles } from './styles';
 
 const { Panel } = Collapse;
-
-const collapseStyles = css`
-	.ant-collapse {
-		border-radius: 0;
-	}
-
-	.panel-header h6 {
-		color: rgba(0, 0, 0, 0.85);
-		font-weight: 600;
-		margin: 0;
-		font-size: 15px;
-	}
-
-	.panel-header p {
-		color: rgba(0, 0, 0, 0.45);
-		font-size: 14px;
-		line-height: 18px;
-		margin: 0;
-		margin-top: 5px;
-	}
-
-	.recommendation-title {
-		color: rgba(0, 0, 0, 0.65);
-		font-weight: 600;
-		margin: 0;
-		font-size: 14px;
-	}
-
-	.recommendation-link {
-		width: 100%;
-		transition: all ease-in 0.2s;
-	}
-
-	.title,
-	.list-title {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-	}
-
-	.title .icon,
-	.list-title .icon {
-		transform: translateX(-10px);
-		opacity: 0;
-		transition: all 0.2s ease-out;
-	}
-
-	.report-btn {
-		font-size: 13px;
-		margin-top: 5px;
-	}
-
-	.panel:hover {
-		.title .icon {
-			transform: translateX(0px);
-			opacity: 1;
-		}
-	}
-
-	.recommendation-link:hover {
-		.ant-list-item-meta-title {
-			color: #1890ff;
-		}
-
-		.list-title .icon {
-			transform: translateX(0px);
-			opacity: 1;
-		}
-	}
-`;
 
 class CollapsibleInsights extends React.Component {
 	state = {
@@ -93,7 +24,6 @@ class CollapsibleInsights extends React.Component {
 		}
 
 		if (openKey) {
-			// we need to put request to update the status
 			updateInsight({
 				id: openKey,
 				from: type,
@@ -107,7 +37,6 @@ class CollapsibleInsights extends React.Component {
 	};
 
 	handleClickContextMenu = (e, id) => {
-		const { openKey } = this.state;
 		const { updateInsight, type } = this.props;
 		let updateStatusTo = '';
 		switch (e.key) {
@@ -148,7 +77,7 @@ class CollapsibleInsights extends React.Component {
 		if (window.location.pathname.startsWith('/cluster')) {
 			return (
 				<IndexSwitcher
-					filteredApps={apps}
+					filteredApps={Object.keys(apps).filter((app) => !app.startsWith('.'))}
 					history={history}
 					renderItem={(popConfirmProps) => {
 						return (
@@ -195,8 +124,16 @@ class CollapsibleInsights extends React.Component {
 										overlay={
 											<Menu
 												onClick={(e) => {
+													/*
+														To prevent bubbling of click event for Context Menu to work.
+													*/
 													e.domEvent.stopPropagation();
 													if (e.key !== 'delete') {
+														/*
+															Delete requires a PopConfirm component for
+															confirming the action so we dont want to send
+															API as soon as user click delete item.
+														*/
 														this.handleClickContextMenu(
 															e,
 															get(insight, 'id'),
@@ -305,10 +242,26 @@ class CollapsibleInsights extends React.Component {
 	}
 }
 
+CollapsibleInsights.defaultProps = {
+	apps: {},
+	defaultOpen: '',
+};
+
+CollapsibleInsights.propTypes = {
+	insights: PropTypes.array.isRequired,
+	appName: PropTypes.string.isRequired,
+	apps: PropTypes.object,
+	isFetching: PropTypes.bool.isRequired,
+	type: PropTypes.string.isRequired,
+	history: PropTypes.object.isRequired,
+	defaultOpen: PropTypes.string,
+	updateInsight: PropTypes.func.isRequired,
+};
+
 const mapStateToProps = (state) => ({
 	isOpen: get(state, '$getInsightSidebar.isOpen', false),
 	appName: get(state, '$getCurrentApp.name'),
-	apps: Object.keys(get(state, 'apps.data'), {}).filter((app) => !app.startsWith('.')),
+	apps: get(state, 'apps.data', {}),
 	isFetching: get(state, '$getAppAnalyticsInsights.isFetching'),
 });
 

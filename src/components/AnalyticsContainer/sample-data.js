@@ -2,21 +2,21 @@ const sampleData = [
 	{
 		id: 'no_results',
 		insight: {
-			title: 'There are {value} no result searches',
+			title: 'There are 54 no result searches',
 			description: 'This is the most important issue for a search engine to avoid.',
 			recommendations: [
 				{
 					title: 'Language Settings',
 					description:
 						"If you're using a specific language, make sure the language, stemming and stop words are configured in the Language menu.",
-					short_link: '/language',
+					short_link: 'app/:index/language',
 					long_link: '',
 				},
 				{
 					title: 'Search Settings',
 					description:
 						'Make sure all the searchable fields and typo tolerance setting is set correctly.',
-					short_link: '',
+					short_link: 'app/:index/search',
 					long_link: '',
 				},
 				{
@@ -38,7 +38,7 @@ const sampleData = [
 	{
 		id: 'low_clicks',
 		insight: {
-			title: 'Less than {value}% of your searches have a click',
+			title: 'Less than 65% of your searches have a click',
 			description: 'Search Relevancy needs fixing.',
 			recommendations: [
 				{

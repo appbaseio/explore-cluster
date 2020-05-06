@@ -1,6 +1,7 @@
 import React from 'react';
 import { get } from 'lodash';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import { css } from 'emotion';
 import AnalyticsInsights from './AnalyticsInsights';
 
@@ -20,6 +21,11 @@ const AnalyticsContainer = (props) => {
 			<AnalyticsInsights />
 		</div>
 	);
+};
+
+AnalyticsContainer.propTypes = {
+	isInsightsSidebarOpen: PropTypes.bool.isRequired,
+	children: PropTypes.node.isRequired,
 };
 
 const mapStateToProps = (state) => ({

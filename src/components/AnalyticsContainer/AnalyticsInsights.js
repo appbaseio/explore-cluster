@@ -1,62 +1,52 @@
 import React from 'react';
 import { get } from 'lodash';
 import { connect } from 'react-redux';
-import { css } from 'emotion';
-import { Tabs, Button, message } from 'antd';
+import { Tabs, Button, message, notification } from 'antd';
+import PropTypes from 'prop-types';
 import CollapsibleInsights from './CollapsibleInsights';
 import { toggleInsightsSidebar, getAppAnalyticsInsights } from '../../batteries/modules/actions';
-import { getAppAnalyticsInsightsByName } from '../../batteries/modules/selectors';
 import Loader from '../Loader';
 import { isValidPlan } from '../../batteries/utils';
 import Overlay from '../Overlay';
 import sampleData from './sample-data';
+import { getUrlParams } from '../../utils/helper';
+import { drawerClass } from './styles';
 
 const { TabPane } = Tabs;
 
-const drawerClass = css`
-	width: 0;
-	transition: all 0.2s ease;
-	right: 0;
-	top: 60px;
-	position: fixed;
-	height: calc(100vh - 60px);
-	border-left: 1px solid transparent;
-	box-sizing: border-box;
-	overflow-y: scroll;
-	background: #f5f5f5;
-	&.open {
-		box-shadow: -2px 0px 10px 0 rgba(0, 0, 0, 0.15);
-		width: 350px;
-	}
-
-	.insights-header {
-		display: flex;
-		padding: 16px;
-		background: #1890ff;
-		align-items: center;
-		justify-content: space-between;
-	}
-
-	.insights-header > h6 {
-		font-size: 16px;
-		color: white;
-		margin: 0;
-	}
-
-	.insight-sidebar-content {
-		opacity: 0;
-		transition: all ease 0.4s;
-		transition-delay: 0.2s;
-	}
-
-	&.open .insight-sidebar-content {
-		opacity: 1;
-	}
-`;
-
 class AnalyticsInsights extends React.Component {
+	defaultTabKey = 'insights';
+
+	openInsight = null;
+
+	componentDidMount() {
+		const urlParams = getUrlParams(window.location.search);
+		const { toggleSidebar, isOpen, getInsights, appName, insights } = this.props;
+
+		/*
+			Below logic is for fetching the insights when the user access through a
+			direct link to the insight id.
+
+			Direct Link Usage:
+			?insights-sidebar=true&insights-tab=read&insights-id=low_clicks
+		*/
+		if (!isOpen && get(urlParams, 'insights-sidebar') === 'true') {
+			toggleSidebar();
+			if (!insights) {
+				getInsights(appName);
+			}
+		}
+
+		if (get(urlParams, 'insights-tab')) {
+			this.defaultTabKey = get(urlParams, 'insights-tab');
+		}
+
+		if (get(urlParams, 'insights-id')) {
+			this.openInsight = get(urlParams, 'insights-id');
+		}
+	}
+
 	componentDidUpdate(prevProps) {
-		// Fetch insights only when we open the drawer & dont over fetch if insights already exists
 		const {
 			insights,
 			isOpen,
@@ -64,10 +54,15 @@ class AnalyticsInsights extends React.Component {
 			getInsights,
 			insightUpdates: updates,
 			tier,
-			featureRules,
+			featureInsights,
 			error,
 		} = this.props;
-		if (isValidPlan(tier, featureRules)) {
+		if (isValidPlan(tier, featureInsights)) {
+			/*
+				Refetch insights when -
+				1. there is a change in app.
+				2. When sidebar is toggled and insights doesnt exists.
+			*/
 			if (
 				prevProps.appName !== appName ||
 				(!insights && isOpen && prevProps.isOpen !== isOpen)
@@ -76,23 +71,66 @@ class AnalyticsInsights extends React.Component {
 			}
 
 			if (error && JSON.stringify(prevProps.error) !== JSON.stringify(error)) {
-				// TODO: Need to update with proper response
-				message.error('Something went wrong while fetching the data!');
+				notification.error({
+					message: 'Failed to fetch Insights',
+					description:
+						typeof error === 'string'
+							? error
+							: 'Something went wrong while fetching the data!',
+				});
 			}
 
 			if (
 				prevProps.isOpen === isOpen &&
 				JSON.stringify(prevProps.insightUpdates) !== JSON.stringify(updates)
 			) {
+				/*
+					Updates is an array which contains all the information of inProgress
+					requests and the completed requests which are not yet notified.
+
+					Only show updates when there is change in the array and when
+					the API has resolved ( track using inProgress )
+				*/
 				Object.keys(updates).forEach((id) => {
-					const { success, from, to, inProgress } = updates[id];
+					const { success, error: updateError, to, inProgress } = updates[id];
 					if (inProgress) {
 						return;
 					}
 					if (success) {
-						message.success(`${id} successfully transferred from ${from} to ${to}`);
+						switch (to) {
+							case 'saved':
+								message.success('Saved Insight successfully!');
+								break;
+							case 'deleted':
+								message.success('Deleted Insight successfully!');
+								break;
+							case 'read':
+								message.success('Marked Insight as Read');
+								break;
+							default:
+						}
 					} else {
-						message.error(`${id} transferred failed from ${from} to ${to}`);
+						switch (to) {
+							case 'saved':
+								notification.error({
+									message: 'Failed to save insight',
+									description: JSON.stringify(updateError),
+								});
+								break;
+							case 'deleted':
+								notification.error({
+									message: 'Failed to delete insight',
+									description: JSON.stringify(updateError),
+								});
+								break;
+							case 'read':
+								notification.error({
+									message: 'Cannot mark insight as Read',
+									description: JSON.stringify(updateError),
+								});
+								break;
+							default:
+						}
 					}
 				});
 			}
@@ -105,7 +143,7 @@ class AnalyticsInsights extends React.Component {
 	}
 
 	render() {
-		const { isOpen, toggleSidebar, insights, isFetching, tier, featureRules } = this.props;
+		const { isOpen, toggleSidebar, insights, isFetching, tier, featureInsights } = this.props;
 		if (!insights && !isFetching) {
 			return null;
 		}
@@ -122,11 +160,11 @@ class AnalyticsInsights extends React.Component {
 			);
 		}
 
-		if (!isValidPlan(tier, featureRules)) {
+		if (!isValidPlan(tier, featureInsights)) {
 			return (
 				<div className={`${drawerClass} ${isOpen ? 'open' : ''}`}>
 					<div className="insights-header">
-						<h6>Actionable Analytics</h6>
+						<h6>Actionable Insights</h6>
 						<Button onClick={toggleSidebar} shape="circle" icon="close" />
 					</div>
 					<Overlay
@@ -163,13 +201,14 @@ class AnalyticsInsights extends React.Component {
 					<Button onClick={toggleSidebar} shape="circle" icon="close" />
 				</div>
 				<div className="insight-sidebar-content">
-					<Tabs style={{ padding: 10 }} defaultActiveKey="1">
+					<Tabs style={{ padding: 10 }} defaultActiveKey={this.defaultTabKey}>
 						{Object.keys(insights)
 							.filter((insight) => insight !== 'deleted')
 							.map((insightType) => (
 								<TabPane tab={insightType.toLocaleUpperCase()} key={insightType}>
 									<CollapsibleInsights
 										type={insightType}
+										defaultOpen={this.openInsight}
 										insights={insights[insightType]}
 									/>
 								</TabPane>
@@ -181,6 +220,20 @@ class AnalyticsInsights extends React.Component {
 	}
 }
 
+AnalyticsInsights.propTypes = {
+	isOpen: PropTypes.bool.isRequired,
+	appName: PropTypes.string.isRequired,
+	isFetching: PropTypes.bool.isRequired,
+	insights: PropTypes.object.isRequired,
+	insightUpdates: PropTypes.array.isRequired,
+	tier: PropTypes.string.isRequired,
+	featureInsights: PropTypes.bool.isRequired,
+	error: PropTypes.string.isRequired,
+	// Actions
+	getInsights: PropTypes.func.isRequired,
+	toggleSidebar: PropTypes.func.isRequired,
+};
+
 const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');
 	return {
@@ -191,7 +244,7 @@ const mapStateToProps = (state) => {
 		insights: get(state, `$getAppAnalyticsInsights.results.${appName}`),
 		insightUpdates: get(state, `$getAppAnalyticsInsights.updates`),
 		tier: get(state, '$getAppPlan.results.tier'),
-		featureRules: get(state, '$getAppPlan.results.feature_rules', false),
+		featureInsights: get(state, '$getAppPlan.results.feature_custom_events', false),
 	};
 };
 
