@@ -11,6 +11,7 @@ import Overlay from '../Overlay';
 import sampleData from './sample-data';
 import { getUrlParams } from '../../utils/helper';
 import { drawerClass } from './styles';
+import { getAppAnalyticsInsightsByName } from '../../batteries/modules/selectors';
 
 const { TabPane } = Tabs;
 
@@ -235,13 +236,13 @@ AnalyticsInsights.propTypes = {
 };
 
 const mapStateToProps = (state) => {
-	const appName = get(state, '$getCurrentApp.name');
+	const appName = get(state, '$getCurrentApp.name', 'default');
 	return {
 		isOpen: get(state, '$getInsightSidebar.isOpen', false),
 		appName,
 		isFetching: get(state, '$getAppAnalyticsInsights.isFetching'),
 		error: get(state, '$getAppAnalyticsInsights.error'),
-		insights: get(state, `$getAppAnalyticsInsights.results.${appName}`),
+		insights: getAppAnalyticsInsightsByName(state),
 		insightUpdates: get(state, `$getAppAnalyticsInsights.updates`),
 		tier: get(state, '$getAppPlan.results.tier'),
 		featureInsights: get(state, '$getAppPlan.results.feature_custom_events', false),
