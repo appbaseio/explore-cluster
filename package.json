@@ -24,7 +24,8 @@
 	"lint-staged": {
 		"./src/!(batteries*)**/*.js": [
 			"prettier --write --use-tabs",
-			"eslint --fix"
+			"eslint --fix",
+			"git add"
 		]
 	},
 	"devDependencies": {
