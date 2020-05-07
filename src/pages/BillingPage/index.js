@@ -19,6 +19,7 @@ import { STRIPE_KEY } from '../../constants';
 import HostedArcBilling from '../../components/PricingTable/HostedArcBilling';
 import ClusterPricingTable from '../../components/PricingTable/ClusterPricingTable';
 import { PRICE_BY_PLANS, EFFECTIVE_PRICE_BY_PLANS } from '../../batteries/utils';
+import { getESVersion } from '../../batteries/utils/mappings';
 
 function numberWithCommas(x) {
 	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -48,9 +49,10 @@ class Billing extends Component {
 		isShowingUnsubscribeArcModal: false,
 	};
 
-	componentDidMount() {
-		const { isAppPlanFetched, fetchAppPlan } = this.props;
-		if (!isAppPlanFetched) {
+	async componentDidMount() {
+		const { isAppPlanFetched, fetchAppPlan, credentials } = this.props;
+		const esVersion = await getESVersion(null, credentials);
+		if (!isAppPlanFetched && esVersion > 5) {
 			fetchAppPlan();
 		}
 	}
@@ -334,10 +336,12 @@ Billing.propTypes = {
 	updatePayment: PropTypes.func.isRequired,
 	isLoading: PropTypes.bool.isRequired,
 	errors: PropTypes.array.isRequired,
+	credentials: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = (state) => {
 	const appPlan = getAppPlanByName(state);
+	const { username, password } = get(state, 'user.data', {});
 	return {
 		isFetchingPlan: get(state, '$getAppPlan.isFetching'),
 		isAppPlanFetched: !!getAppPlanByName(state),
@@ -351,6 +355,7 @@ const mapStateToProps = (state) => {
 		subscriptionID: get(appPlan, 'subscription_id'),
 		isLoading: get(state, '$updateAppPaymentMethod.isFetching'),
 		errors: [get(state, '$updateAppPaymentMethod.error')],
+		credentials: username ? `${username}:${password}` : null,
 	};
 };
 

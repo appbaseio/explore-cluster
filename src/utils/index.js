@@ -2,6 +2,7 @@ import { chain, get, includes, keys, values } from 'lodash';
 import { notification } from 'antd';
 import { getURL } from '../constants/config';
 import { getSingleFunction, updateFunctions } from '../batteries/utils/app';
+import { getESVersion } from '../batteries/utils/mappings';
 
 export async function getUser(username, password, url) {
 	const ACC_API = getURL();
@@ -75,7 +76,10 @@ const getAuthToken = () => {
 
 export async function getESIndices(authToken) {
 	const ACC_API = getURL();
-	const response = await fetch(`${ACC_API}/_aliasedindices`, {
+	const esVersion = await getESVersion(null, atob(authToken));
+	let url = `${ACC_API}/_aliasedindices`;
+	if (esVersion && esVersion < 6) url = `${ACC_API}/_cat/indices?format=json`;
+	const response = await fetch(url, {
 		method: 'GET',
 		headers: {
 			Authorization: `Basic ${authToken}`,
