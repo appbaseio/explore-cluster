@@ -19,17 +19,17 @@ import SidebarAutocomplete from '../../components/SidebarAutocomplete';
 import searchInputStyle from './styles';
 
 const NoMatch = Loadable({
-	loader: () => import('../../NoMatch'),
+	loader: () => import(/* webpackChunkName: "NoMatchPage" */ '../../NoMatch'),
 	loading: () => <div />,
 });
 
 const HomePage = Loadable({
-	loader: () => import('../HomePage'),
+	loader: () => import(/* webpackChunkName: "HomePage" */ '../HomePage'),
 	loading: Loader,
 });
 
 const ClusterLayout = Loadable({
-	loader: () => import('../../components/AppLayout/ClusterLayout'),
+	loader: () => import(/* webpackChunkName: "ClusterLayout" */ '../../components/AppLayout/ClusterLayout'),
 	loading: Loader,
 });
 

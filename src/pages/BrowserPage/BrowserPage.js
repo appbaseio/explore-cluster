@@ -24,7 +24,7 @@ injectGlobal`
 `;
 
 const DejavuComponent = Loadable({
-	loader: () => import('@appbaseio/dejavu-browser'),
+	loader: () => import(/* webpackChunkName: "DejavuComponent" */ '@appbaseio/dejavu-browser'),
 	loading: Loader,
 });
 

@@ -36,6 +36,18 @@ module.exports = {
 		filename: isProduction ? '[name].[contenthash].js' : '[name].js',
 		chunkFilename: '[name].[contenthash].bundle.js',
 	},
+	optimization: {
+		splitChunks: {
+			cacheGroups: {
+				// Splitting React into a different bundle
+				common: {
+					test: /[\\/]node_modules[\\/](react|react-dom|antd)[\\/]/,
+					name: 'common',
+					chunks: 'all',
+				},
+			},
+		},
+	},
 	plugins,
 	devtool: 'source-map',
 	module: {

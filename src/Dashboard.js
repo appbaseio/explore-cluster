@@ -22,12 +22,12 @@ Sentry.init({
 
 // routes
 const LoginPage = Loadable({
-	loader: () => import('./pages/LoginPage'),
+	loader: () => import(/* webpackChunkName: "LoginPage" */ './pages/LoginPage'),
 	loading: Loader,
 });
 
 const SignupPage = Loadable({
-	loader: () => import('./pages/SignupPage'),
+	loader: () => import(/* webpackChunkName: "SignupPage" */ './pages/SignupPage'),
 	loading: Loader,
 });
 

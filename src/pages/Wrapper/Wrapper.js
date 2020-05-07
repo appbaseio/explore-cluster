@@ -5,27 +5,27 @@ import Loadable from 'react-loadable';
 import Loader from '../../components/Loader';
 
 const AppWrapper = Loadable({
-	loader: () => import('../AppWrapper'),
+	loader: () => import(/* webpackChunkName: "AppWrapper" */ '../AppWrapper'),
 	loading: () => <div />,
 });
 
 const ProfilePage = Loadable({
-	loader: () => import('../ProfilePage'),
+	loader: () => import(/* webpackChunkName: "ProfilePage" */ '../ProfilePage'),
 	loading: Loader,
 });
 
 const DashboardWrapper = Loadable({
-	loader: () => import('../DashboardWrapper'),
+	loader: () => import(/* webpackChunkName: "DashboardWrapper" */ '../DashboardWrapper'),
 	loading: Loader,
 });
 
 const OnboardingPage = Loadable({
-	loader: () => import('../OnboardingPage'),
+	loader: () => import(/* webpackChunkName: "OnBoarding" */ '../OnboardingPage'),
 	loading: Loader,
 });
 
 const EndPage = Loadable({
-	loader: () => import('../OnboardingPage/EndScreen'),
+	loader: () => import(/* webpackChunkName: "EndScreenOnBoarding" */ '../OnboardingPage/EndScreen'),
 	loading: Loader,
 });
 
