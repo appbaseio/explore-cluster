@@ -20,6 +20,7 @@ import HostedArcBilling from '../../components/PricingTable/HostedArcBilling';
 import ClusterPricingTable from '../../components/PricingTable/ClusterPricingTable';
 import { PRICE_BY_PLANS, EFFECTIVE_PRICE_BY_PLANS } from '../../batteries/utils';
 import { getESVersion } from '../../batteries/utils/mappings';
+import { getVersion } from '../../constants/config';
 
 function numberWithCommas(x) {
 	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -51,8 +52,8 @@ class Billing extends Component {
 
 	async componentDidMount() {
 		const { isAppPlanFetched, fetchAppPlan, credentials } = this.props;
-		const esVersion = await getESVersion(null, credentials);
-		if (!isAppPlanFetched && esVersion > 5) {
+		const esVersion = getVersion() || (await getESVersion(null, credentials));
+		if (!isAppPlanFetched && esVersion.split('.')[0] > 5) {
 			fetchAppPlan();
 		}
 	}
