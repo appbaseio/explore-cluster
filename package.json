@@ -23,8 +23,8 @@
 	},
 	"lint-staged": {
 		"./src/!(batteries*)**/*.js": [
-			"yarn format",
-			"yarn lint"
+			"prettier --write --use-tabs",
+			"eslint --fix"
 		]
 	},
 	"devDependencies": {
