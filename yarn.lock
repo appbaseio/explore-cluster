@@ -74,10 +74,10 @@
     react-slick "^0.24.0"
     slick-carousel "^1.8.1"
 
-"@appbaseio/react-filter-box@^3.3.2":
-  version "3.3.2"
-  resolved "https://registry.yarnpkg.com/@appbaseio/react-filter-box/-/react-filter-box-3.3.2.tgz#b6abe16dbf4aba14b68d8e4a88f171136fe22423"
-  integrity sha512-QmheaI/tl1X2B2YbNocfZ/GU2p9TPvakqrJLj/h2d2Be57szSKJnuf6ZN/j0XrPJeFi4KVNsPPeiwLI5mGLHyg==
+"@appbaseio/react-filter-box@^3.4.1":
+  version "3.4.1"
+  resolved "https://registry.yarnpkg.com/@appbaseio/react-filter-box/-/react-filter-box-3.4.1.tgz#32938fce7d4902a1d2c5139f4b161d5f06589474"
+  integrity sha512-EvNZwHpsIqsx/I8P6d42thQokYAWjclS+RRstSNMMBqu1pOOHYMgS7/GJuxlLYCyiZ+uYiRrsr8jHlJ5r5bCvg==
   dependencies:
     codemirror "^5.42.0"
     lodash "^4.17.15"
