@@ -14,22 +14,24 @@ const toggleClass = css`
 `;
 
 const AnalyticsContainer = (props) => {
-	const { children, isInsightsSidebarOpen } = props;
+	const { children, isInsightsSidebarOpen, isFetchingPlan } = props;
 	return (
 		<div className={`${toggleClass} ${isInsightsSidebarOpen ? 'open' : ''}`}>
 			{children}
-			<AnalyticsInsights />
+			{isFetchingPlan ? null : <AnalyticsInsights />}
 		</div>
 	);
 };
 
 AnalyticsContainer.propTypes = {
 	isInsightsSidebarOpen: PropTypes.bool.isRequired,
+	isFetchingPlan: PropTypes.bool.isRequired,
 	children: PropTypes.node.isRequired,
 };
 
 const mapStateToProps = (state) => ({
 	isInsightsSidebarOpen: get(state, '$getAppAnalyticsInsights.isOpen', false),
+	isFetchingPlan: get(state, '$getAppPlan.isFetching', false),
 });
 
 export default connect(mapStateToProps)(AnalyticsContainer);

@@ -137,7 +137,6 @@ class AnalyticsInsights extends React.Component {
 
 	fetchInsights = (appName) => {
 		const { getInsights, tier, featureInsights, insights } = this.props;
-		console.log(insights);
 		// Call GET API only when the plan is valid and insights dont exist in redux store.
 		if (isValidPlan(tier, featureInsights) && !insights) {
 			getInsights(appName);
