@@ -154,7 +154,7 @@ class SearchPreview extends React.Component {
 				settings: generateQuery({
 					...props.settings,
 					search: {
-						...props.settings.search,
+						...get(props, 'settings.search', {}),
 						dataField: Object.keys(state.searchableMappings),
 						fieldWeights: Object.values(state.searchableMappings),
 					},
