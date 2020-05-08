@@ -27,8 +27,8 @@ class CollapsibleInsights extends React.Component {
 		if (openKey) {
 			updateInsight({
 				id: openKey,
-				from: type,
-				to: 'read',
+				currentStatus: type,
+				nextStatus: 'read',
 			});
 		}
 
@@ -57,8 +57,8 @@ class CollapsibleInsights extends React.Component {
 		}
 
 		updateInsight({
-			from: type,
-			to: updateStatusTo,
+			currentStatus: type,
+			nextStatus: updateStatusTo,
 			id,
 		});
 	};
@@ -282,7 +282,7 @@ CollapsibleInsights.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-	isOpen: get(state, '$getInsightSidebar.isOpen', false),
+	isOpen: get(state, '$getAppAnalyticsInsights.isOpen', false),
 	appName: get(state, '$getCurrentApp.name'),
 	apps: get(state, 'apps.data', {}),
 	isFetching: get(state, '$getAppAnalyticsInsights.isFetching'),

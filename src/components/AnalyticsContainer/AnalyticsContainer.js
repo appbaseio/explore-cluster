@@ -29,7 +29,7 @@ AnalyticsContainer.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-	isInsightsSidebarOpen: get(state, '$getInsightSidebar.isOpen', false),
+	isInsightsSidebarOpen: get(state, '$getAppAnalyticsInsights.isOpen', false),
 });
 
 export default connect(mapStateToProps)(AnalyticsContainer);

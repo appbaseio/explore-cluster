@@ -22,7 +22,10 @@ class AnalyticsInsights extends React.Component {
 
 	componentDidMount() {
 		const urlParams = getUrlParams(window.location.search);
-		const { toggleSidebar, isOpen, getInsights, appName, insights } = this.props;
+		const { toggleSidebar, isOpen, appName } = this.props;
+		if (isOpen) {
+			this.fetchInsights(appName);
+		}
 
 		/*
 			Below logic is for fetching the insights when the user access through a
@@ -33,9 +36,7 @@ class AnalyticsInsights extends React.Component {
 		*/
 		if (!isOpen && get(urlParams, 'insights-sidebar') === 'true') {
 			toggleSidebar();
-			if (!insights) {
-				getInsights(appName);
-			}
+			this.fetchInsights(appName);
 		}
 
 		if (get(urlParams, 'insights-tab')) {
@@ -48,93 +49,84 @@ class AnalyticsInsights extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const {
-			insights,
-			isOpen,
-			appName,
-			getInsights,
-			insightUpdates: updates,
-			tier,
-			featureInsights,
-			error,
-		} = this.props;
-		if (isValidPlan(tier, featureInsights)) {
-			/*
-				Refetch insights when -
-				1. there is a change in app.
-				2. When sidebar is toggled and insights doesnt exists.
-			*/
-			if (
-				prevProps.appName !== appName ||
-				(!insights && isOpen && prevProps.isOpen !== isOpen)
-			) {
-				getInsights(appName);
-			}
+		const { isOpen, appName, insightUpdates: updates, error } = this.props;
 
-			if (error && JSON.stringify(prevProps.error) !== JSON.stringify(error)) {
-				notification.error({
-					message: 'Failed to fetch Insights',
-					description:
-						typeof error === 'string'
-							? error
-							: 'Something went wrong while fetching the data!',
-				});
-			}
+		/*
+			Refetch insights when -
+			1. there is a change in app.
+			2. When sidebar is toggled and insights doesnt exists.
+		*/
 
-			if (
-				prevProps.isOpen === isOpen &&
-				JSON.stringify(prevProps.insightUpdates) !== JSON.stringify(updates)
-			) {
-				/*
-					Updates is an array which contains all the information of inProgress
-					requests and the completed requests which are not yet notified.
+		if (prevProps.appName !== appName || (isOpen && prevProps.isOpen !== isOpen)) {
+			this.fetchInsights(appName);
+		}
 
-					Only show updates when there is change in the array and when
-					the API has resolved ( track using inProgress )
-				*/
-				Object.keys(updates).forEach((id) => {
-					const { success, error: updateError, to, inProgress } = updates[id];
-					if (inProgress) {
-						return;
+		if (error && JSON.stringify(prevProps.error) !== JSON.stringify(error)) {
+			notification.error({
+				message: 'Failed to fetch Insights',
+				description: error.message || 'Something went wrong while fetching the data!',
+			});
+		}
+
+		/*
+			Updates is an array which contains all the information of inProgress
+			requests and the completed requests which are not yet notified.
+
+			Only show updates when there is change in the array and when
+			the API has resolved ( track using inProgress )
+		*/
+		if (
+			prevProps.isOpen === isOpen &&
+			JSON.stringify(prevProps.insightUpdates) !== JSON.stringify(updates)
+		) {
+			Object.keys(updates).forEach((id) => {
+				const { success, error: updateError, nextStatus, inProgress } = updates[id];
+				if (inProgress) {
+					return;
+				}
+				if (success) {
+					switch (nextStatus) {
+						case 'saved':
+							message.success('Saved Insight successfully!');
+							break;
+						case 'deleted':
+							message.success('Deleted Insight successfully!');
+							break;
+						case 'read':
+							message.success('Marked Insight as Read');
+							break;
+						default:
 					}
-					if (success) {
-						switch (to) {
-							case 'saved':
-								message.success('Saved Insight successfully!');
-								break;
-							case 'deleted':
-								message.success('Deleted Insight successfully!');
-								break;
-							case 'read':
-								message.success('Marked Insight as Read');
-								break;
-							default:
-						}
-					} else {
-						switch (to) {
-							case 'saved':
-								notification.error({
-									message: 'Failed to save insight',
-									description: JSON.stringify(updateError),
-								});
-								break;
-							case 'deleted':
-								notification.error({
-									message: 'Failed to delete insight',
-									description: JSON.stringify(updateError),
-								});
-								break;
-							case 'read':
-								notification.error({
-									message: 'Cannot mark insight as Read',
-									description: JSON.stringify(updateError),
-								});
-								break;
-							default:
-						}
+				} else {
+					switch (nextStatus) {
+						case 'saved':
+							notification.error({
+								message: 'Failed to save insight',
+								description:
+									updateError.message ||
+									'Something went wrong while updating the status!',
+							});
+							break;
+						case 'deleted':
+							notification.error({
+								message: 'Failed to delete insight',
+								description:
+									updateError.message ||
+									'Something went wrong while updating the status!',
+							});
+							break;
+						case 'read':
+							notification.error({
+								message: 'Failed to mark insight as Read',
+								description:
+									updateError.message ||
+									'Something went wrong while updating the status!',
+							});
+							break;
+						default:
 					}
-				});
-			}
+				}
+			});
 		}
 	}
 
@@ -142,6 +134,15 @@ class AnalyticsInsights extends React.Component {
 		const { toggleSidebar } = this.props;
 		toggleSidebar();
 	}
+
+	fetchInsights = (appName) => {
+		const { getInsights, tier, featureInsights, insights } = this.props;
+		console.log(insights);
+		// Call GET API only when the plan is valid and insights dont exist in redux store.
+		if (isValidPlan(tier, featureInsights) && !insights) {
+			getInsights(appName);
+		}
+	};
 
 	render() {
 		const { isOpen, toggleSidebar, insights, isFetching, tier, featureInsights } = this.props;
@@ -229,7 +230,7 @@ AnalyticsInsights.propTypes = {
 	insightUpdates: PropTypes.array.isRequired,
 	tier: PropTypes.string.isRequired,
 	featureInsights: PropTypes.bool.isRequired,
-	error: PropTypes.string.isRequired,
+	error: PropTypes.object.isRequired,
 	// Actions
 	getInsights: PropTypes.func.isRequired,
 	toggleSidebar: PropTypes.func.isRequired,
@@ -238,7 +239,7 @@ AnalyticsInsights.propTypes = {
 const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name', 'default');
 	return {
-		isOpen: get(state, '$getInsightSidebar.isOpen', false),
+		isOpen: get(state, '$getAppAnalyticsInsights.isOpen', false),
 		appName,
 		isFetching: get(state, '$getAppAnalyticsInsights.isFetching'),
 		error: get(state, '$getAppAnalyticsInsights.error'),
