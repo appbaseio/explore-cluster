@@ -268,11 +268,12 @@ class CollapsibleInsights extends React.Component {
 CollapsibleInsights.defaultProps = {
 	apps: {},
 	defaultOpen: '',
+	appName: '',
 };
 
 CollapsibleInsights.propTypes = {
 	insights: PropTypes.array.isRequired,
-	appName: PropTypes.string.isRequired,
+	appName: PropTypes.string,
 	apps: PropTypes.object,
 	isFetching: PropTypes.bool.isRequired,
 	type: PropTypes.string.isRequired,
