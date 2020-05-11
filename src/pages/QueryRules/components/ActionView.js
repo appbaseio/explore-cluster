@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { css } from 'emotion';
 import { Tag, Typography, Popover } from 'antd';
 import { hasValuesChanged } from '../utils';
@@ -32,7 +33,7 @@ class ActionView extends React.Component {
 				return action.data ? (
 					<React.Fragment>
 						<h4 className={subTitle}>Hide Result</h4>
-						{action.data.map(id => (
+						{action.data.map((id) => (
 							<Tag color="red" key={id}>
 								{id}
 							</Tag>
@@ -44,7 +45,7 @@ class ActionView extends React.Component {
 				return action.data ? (
 					<React.Fragment>
 						<h4 className={subTitle}>Promote Result</h4>
-						{action.data.map(item => (
+						{action.data.map((item) => (
 							<Tag color="blue" key={item.doc.id}>
 								{item.doc._id}
 							</Tag>
@@ -55,7 +56,7 @@ class ActionView extends React.Component {
 				return action.data ? (
 					<React.Fragment>
 						<h4 className={subTitle}>Add Filter</h4>
-						{Object.keys(action.data).map(filter => (
+						{Object.keys(action.data).map((filter) => (
 							<Typography.Text
 								key={filter}
 								style={{ display: 'block', margin: '2px 0' }}
@@ -91,7 +92,7 @@ class ActionView extends React.Component {
 				return action.data ? (
 					<React.Fragment>
 						<h4 className={subTitle}>Remove Search Words</h4>
-						{action.data.map(word => (
+						{action.data.map((word) => (
 							<Tag>{word}</Tag>
 						))}
 					</React.Fragment>
@@ -114,5 +115,13 @@ class ActionView extends React.Component {
 		}
 	}
 }
+
+ActionView.propTypes = {
+	action: PropTypes.object,
+};
+
+ActionView.defaultProps = {
+	action: {},
+};
 
 export default ActionView;

@@ -5,8 +5,8 @@ import { css } from 'emotion';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { FUNCTIONS } from '../../constants';
-import { invokeFunction } from '../../batteries/modules/actions';
-import { InvokeFunctionBody } from './InvokeFunctionBody';
+import { invokeFunction as invokeFunctionAction } from '../../batteries/modules/actions';
+import InvokeFunctionBody from './InvokeFunctionBody';
 
 const title = css`
 	display: flex;
@@ -98,7 +98,6 @@ export function getPayload(parsedData, executeBefore) {
 
 const InvokeFunctionModal = ({
 	functionName,
-	invocationCount,
 	handleCancel,
 	invokeFunction,
 	error,
@@ -117,7 +116,7 @@ const InvokeFunctionModal = ({
 	);
 	const [isValidJSON, setIsValidJSON] = useState(true);
 	const [status, setStatus] = useState();
-	const [roundTrip, setRoundTrip] = useState();
+	const [roundTrip] = useState();
 	const [responseData, setResponseData] = useState();
 	const [invokeState, setInvokeState] = useState(FUNCTIONS.NOT_INVOKED);
 	function getTitle() {
@@ -129,7 +128,7 @@ const InvokeFunctionModal = ({
 		);
 	}
 
-	const handleRequestDataChange = value => {
+	const handleRequestDataChange = (value) => {
 		let isValid = true;
 		setRequestData(value);
 		try {
@@ -185,27 +184,34 @@ const InvokeFunctionModal = ({
 InvokeFunctionModal.propTypes = {
 	functionName: PropTypes.string,
 	handleCancel: PropTypes.func,
-	invocationCount: PropTypes.number,
+	invokeFunction: PropTypes.func.isRequired,
+	error: PropTypes.object,
+	success: PropTypes.bool,
+	invokeResults: PropTypes.object.isRequired,
+	loading: PropTypes.bool,
+	initialRequestData: PropTypes.object,
+	executeBefore: PropTypes.bool,
 };
 
 InvokeFunctionModal.defaultProps = {
 	functionName: '',
 	handleCancel: () => {},
-	invocationCount: 0,
+	error: null,
+	success: false,
+	loading: false,
+	initialRequestData: {},
+	executeBefore: false,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	loading: get(state, '$getAppFunctions.isInvoking'),
 	error: get(state, '$getAppFunctions.error'),
 	success: get(state, '$getAppFunctions.success'),
 	invokeResults: get(state, '$getAppFunctions.invokeResults'),
 });
 
-const mapDispatchToProps = dispatch => ({
-	invokeFunction: (name, payload) => dispatch(invokeFunction(name, payload)),
+const mapDispatchToProps = (dispatch) => ({
+	invokeFunction: (name, payload) => dispatch(invokeFunctionAction(name, payload)),
 });
 
-export default connect(
-	mapStateToProps,
-	mapDispatchToProps,
-)(InvokeFunctionModal);
+export default connect(mapStateToProps, mapDispatchToProps)(InvokeFunctionModal);

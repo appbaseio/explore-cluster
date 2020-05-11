@@ -1,8 +1,10 @@
+import React from 'react';
+import PropTypes from 'prop-types';
 import { css } from 'emotion';
 import { Icon, InputNumber, Popover, Table } from 'antd';
-import React from 'react';
 import { get } from 'lodash';
 import JsonView from '../../../../../components/JsonView';
+import { children } from '../../../../../utils/prop-types';
 
 const popoverContent = css`
 	overflow-y: auto;
@@ -25,7 +27,7 @@ const overflow = { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'elli
 export function PromoteDataTable({ positionRender, dataRender, dataSource, actionRender }) {
 	return (
 		<Table
-			rowKey={record => get(record, 'doc._id')}
+			rowKey={(record) => get(record, 'doc._id')}
 			style={{ background: '#fff', maxHeight: 400, overflowY: 'scroll' }}
 			columns={[
 				{
@@ -67,6 +69,17 @@ export function PromoteDataTable({ positionRender, dataRender, dataSource, actio
 	);
 }
 
+PromoteDataTable.propTypes = {
+	positionRender: children.isRequired,
+	dataRender: children.isRequired,
+	actionRender: children.isRequired,
+	dataSource: PropTypes.array,
+};
+
+PromoteDataTable.defaultProps = {
+	dataSource: [],
+};
+
 export function PromotePosition({ value, onChange }) {
 	return (
 		<InputNumber
@@ -77,6 +90,11 @@ export function PromotePosition({ value, onChange }) {
 		/>
 	);
 }
+
+PromotePosition.propTypes = {
+	value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+	onChange: PropTypes.func.isRequired,
+};
 
 export function PromoteJSONView({ record }) {
 	return (
@@ -105,6 +123,14 @@ export function PromoteJSONView({ record }) {
 	);
 }
 
+PromoteJSONView.propTypes = {
+	record: PropTypes.object,
+};
+
+PromoteJSONView.defaultProps = {
+	record: {},
+};
+
 export function PromoteActions({ onClick }) {
 	return (
 		<Icon
@@ -117,3 +143,7 @@ export function PromoteActions({ onClick }) {
 		/>
 	);
 }
+
+PromoteActions.propTypes = {
+	onClick: PropTypes.func.isRequired,
+};

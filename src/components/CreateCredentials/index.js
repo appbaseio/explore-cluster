@@ -50,7 +50,7 @@ const modal = css`
 		border-color: tomato;
 	}
 `;
-const calculateValue = value => {
+const calculateValue = (value) => {
 	const index = value.indexOf('*');
 	if (index > -1) {
 		if (index === 0 && value.length !== 1) {
@@ -88,7 +88,7 @@ class CreateCredentials extends React.Component {
 					operationType: [Types.read, Validators.required],
 					categories: new FormArray(
 						getDefaultAclOptionsByPlan(props.plan).map(
-							acl =>
+							(acl) =>
 								new FormGroup({
 									acl: new FormControl(acl),
 									tag: new FormControl(true),
@@ -124,7 +124,7 @@ class CreateCredentials extends React.Component {
 			const opsHandler = this.form.get('operationType');
 			const categoriesHandler = this.form.get('categories');
 			if (adminHandler) {
-				adminHandler.valueChanges.subscribe(value => {
+				adminHandler.valueChanges.subscribe((value) => {
 					if (value) {
 						opsHandler.setValue(Types.admin);
 						categoriesHandler.setValue(defaultAclOptions);
@@ -142,7 +142,7 @@ class CreateCredentials extends React.Component {
 			if (!isUserManagement) {
 				const includeFieldsHandler = this.form.get('include_fields');
 				const excludeFieldsHandler = this.form.get('exclude_fields');
-				includeFieldsHandler.valueChanges.subscribe(value => {
+				includeFieldsHandler.valueChanges.subscribe((value) => {
 					if (value && value.includes('*')) {
 						excludeFieldsHandler.disable({ emitEvent: false });
 						excludeFieldsHandler.reset([]);
@@ -150,7 +150,7 @@ class CreateCredentials extends React.Component {
 						excludeFieldsHandler.enable({ emitEvent: false });
 					}
 				});
-				excludeFieldsHandler.valueChanges.subscribe(value => {
+				excludeFieldsHandler.valueChanges.subscribe((value) => {
 					if (value && value.includes('*')) {
 						includeFieldsHandler.disable({ emitEvent: false });
 						includeFieldsHandler.reset([]);
@@ -377,7 +377,7 @@ class CreateCredentials extends React.Component {
 														{...handler()}
 														css="label { font-weight: 100 }"
 													>
-														{Object.keys(Types).map(type => (
+														{Object.keys(Types).map((type) => (
 															<Radio key={type} value={Types[type]}>
 																{Types[type].description}
 															</Radio>
@@ -432,7 +432,7 @@ class CreateCredentials extends React.Component {
 									) : (
 										<FieldArray
 											name="categories"
-											render={control => (
+											render={(control) => (
 												<Grid
 													label="Categories"
 													toolTipMessage={Messages.categories}
@@ -465,7 +465,7 @@ class CreateCredentials extends React.Component {
 																tokenSeparators={[',']}
 																value={value}
 																{...inputHandler}
-																onChange={val => {
+																onChange={(val) => {
 																	inputHandler.onChange(
 																		calculateValue(val),
 																	);
@@ -485,7 +485,7 @@ class CreateCredentials extends React.Component {
 											/>
 											<FieldControl
 												name="referers"
-												render={control => (
+												render={(control) => (
 													<WhiteList
 														toolTipMessage={Messages.referers}
 														control={control}
@@ -493,7 +493,7 @@ class CreateCredentials extends React.Component {
 														defaultSuggestionValue="https://example.com/"
 														label="HTTP Referers"
 														defaultValue="*"
-														handleWarningMessage={defaultValue =>
+														handleWarningMessage={(defaultValue) =>
 															`Warning! You don't have the default value (${defaultValue}) as selected which means that only the selected referers will be considered as valid.`
 														}
 														inputProps={{
@@ -504,12 +504,12 @@ class CreateCredentials extends React.Component {
 											/>
 											<FieldControl
 												name="sources"
-												render={control => (
+												render={(control) => (
 													<WhiteList
 														control={control}
 														toolTipMessage={Messages.sources}
 														label="IP Sources"
-														handleWarningMessage={defaultValue =>
+														handleWarningMessage={(defaultValue) =>
 															`Warning! You don't have the default value (${defaultValue}) as selected which means that only the selected sources will be considered as valid.`
 														}
 														defaultValue="0.0.0.0/0"
@@ -546,7 +546,7 @@ class CreateCredentials extends React.Component {
 																	tokenSeparators={[',']}
 																	{...inputHandler}
 																	value={inputHandler.value || []}
-																	onChange={value => {
+																	onChange={(value) => {
 																		inputHandler.onChange(
 																			calculateValue(value),
 																		);
@@ -582,7 +582,7 @@ class CreateCredentials extends React.Component {
 																	style={{ width: '100%' }}
 																	{...inputHandler}
 																	value={inputHandler.value || []}
-																	onChange={value => {
+																	onChange={(value) => {
 																		inputHandler.onChange(
 																			calculateValue(value),
 																		);
@@ -703,9 +703,11 @@ CreateCredentials.propTypes = {
 	plan: PropTypes.oneOf(['free', 'growth', 'bootstrap']).isRequired,
 	titleText: PropTypes.string,
 	isUserManagement: PropTypes.bool,
+	credentials: PropTypes.string.isRequired,
+	fetchMappings: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
 	const mappings = getTraversedMappingsByAppName(state);
 	const appPermissions = getAppPermissionsByName(state);
 	return {
@@ -732,9 +734,9 @@ const mapStateToProps = state => {
 	};
 };
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	fetchMappings: (appName, credentials) => dispatch(getAppMappings(appName, credentials)),
-	fetchPermissions: appName => dispatch(getPermission(appName)),
+	fetchPermissions: (appName) => dispatch(getPermission(appName)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateCredentials);

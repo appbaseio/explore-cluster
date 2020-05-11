@@ -33,7 +33,7 @@ const bannerDetails = {
 	description: 'GUI to manage preferences for query suggestions.',
 	buttonText: 'Read more',
 	icon: 'pencil',
-	href: 'https://docs.appbase.io/docs/analytics/QuerySuggestions/',
+	href: 'https://docs.appbase.io/docs/analytics/query-suggestions/',
 };
 
 const cardStyle = css`
@@ -62,7 +62,7 @@ class QuerySuggestions extends React.Component {
 			indices: [['*']],
 		});
 		if (isValidPlan(props.tier, props.featureSuggestions)) {
-			props.getPreferences().then(action => {
+			props.getPreferences().then((action) => {
 				const payload = get(action, 'payload');
 				if (payload) {
 					this.form.patchValue({
@@ -87,8 +87,8 @@ class QuerySuggestions extends React.Component {
 					query: { match_all: {} },
 				}),
 			})
-				.then(res => res.json())
-				.then(res => {
+				.then((res) => res.json())
+				.then((res) => {
 					let total;
 					if (typeof get(res, 'hits.total') === 'object') {
 						total = get(res, 'hits.total.value');
@@ -100,7 +100,7 @@ class QuerySuggestions extends React.Component {
 						total,
 					});
 				})
-				.catch(err => console.error(err));
+				.catch((err) => console.error(err));
 		}
 	}
 
@@ -124,7 +124,7 @@ class QuerySuggestions extends React.Component {
 						? JSON.parse(this.form.value.external_suggestions)
 						: [],
 			};
-			savePreferences(payload).then(action => {
+			savePreferences(payload).then((action) => {
 				if (get(action, 'payload')) {
 					notification.success({
 						message: 'Query Suggestions preferences saved successfully.',
@@ -199,6 +199,7 @@ class QuerySuggestions extends React.Component {
 
 QuerySuggestions.defaultProps = {
 	preferences: {},
+	apps: {},
 };
 
 QuerySuggestions.propTypes = {
@@ -209,9 +210,10 @@ QuerySuggestions.propTypes = {
 	savePreferences: PropTypes.func.isRequired,
 	tier: PropTypes.string.isRequired,
 	featureSuggestions: PropTypes.bool.isRequired,
+	apps: PropTypes.object,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	preferences: get(state, '$getSuggestionsPreferences.results', {}),
 	apps: get(state, 'apps.data', {}),
 	tier: get(state, '$getAppPlan.results.tier'),
@@ -223,9 +225,9 @@ const mapStateToProps = state => ({
 	],
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	getPreferences: () => dispatch(getSuggestionsPreferences()),
-	savePreferences: payload => dispatch(saveSuggestionsPreferences(payload)),
+	savePreferences: (payload) => dispatch(saveSuggestionsPreferences(payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(QuerySuggestions);

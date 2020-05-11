@@ -1,4 +1,6 @@
+/* eslint-disable jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Modal, Select, Tooltip, Icon, message } from 'antd';
 import { get } from 'lodash';
 import { connect } from 'react-redux';
@@ -17,6 +19,7 @@ import {
 import { getURL } from '../../../constants/config';
 import { getSettings, getMappings } from '../../../batteries/utils/mappings';
 import { updateSynonyms } from '../api';
+import { children, synonymTypes } from '../../../utils/prop-types';
 
 const { Option } = Select;
 
@@ -54,20 +57,41 @@ class SynonymsModal extends React.Component {
 	}
 
 	toggleLoading = () => {
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			isLoading: !prevState.isLoading,
 		}));
 	};
 
 	handleModal = () => {
-		this.setState(state => ({
-			showModal: !state.showModal,
-		}));
+		this.setState(
+			(state) => ({
+				showModal: !state.showModal,
+			}),
+			() => {
+				const { showModal } = this.state;
+				if (!showModal) {
+					const { resetInputOnClose } = this.props;
+					if (resetInputOnClose) {
+						this.resetInput();
+					}
+				}
+			},
+		);
 	};
 
 	handleCloseModal = () => {
 		this.setState({
 			showModal: false,
+		});
+		const { resetInputOnClose } = this.props;
+
+		if (resetInputOnClose) {
+			this.resetInput();
+		}
+	};
+
+	resetInput = () => {
+		this.setState({
 			alternatives: [],
 			searchTerm: '',
 			synonyms: [],
@@ -75,7 +99,7 @@ class SynonymsModal extends React.Component {
 		});
 	};
 
-	handleType = type => {
+	handleType = (type) => {
 		this.setState({
 			type,
 		});
@@ -102,12 +126,12 @@ class SynonymsModal extends React.Component {
 
 		// TODO: We need to consider already exisiting synonyms
 		const indexSynonyms = id
-			? allSynonyms.filter(syn => syn._id !== id).map(item => item.synonym)
-			: allSynonyms.map(item => item.synonym);
+			? allSynonyms.filter((syn) => syn._id !== id).map((item) => item.synonym)
+			: allSynonyms.map((item) => item.synonym);
 
 		const parsedSynonyms = getParsedSynonyms({ type, alternatives, synonyms, searchTerm });
-		const settings = await getSettings(appName, credentials, url).then(
-			data => data[appName].settings,
+		const settings = await getSettings(appName, credentials, url).then((data) =>
+			get(data, `${appName}.settings`, {}),
 		);
 
 		const isSynonymsAnalyzerPresent = hasSynonymsAnalyzer(settings);
@@ -115,12 +139,14 @@ class SynonymsModal extends React.Component {
 
 		// // check if all search field has the synonyms analyzer added
 		const hasSubfield = hasSynonymsSubFields(mappings);
-
 		// get the settings request body will add analyzer if not already present
 		const synonymsAnalyzerSettings = getSynonymsAnalyzerSettings({
 			settings,
 			isSynonymsAnalyzerPresent,
-			synonyms: [...indexSynonyms, parsedSynonyms],
+			synonyms: [
+				...indexSynonyms.map((item) => item.toLowerCase()),
+				parsedSynonyms.toLowerCase(),
+			],
 		});
 		if (!hasSubfield) {
 			// update all subfields for search
@@ -135,16 +161,16 @@ class SynonymsModal extends React.Component {
 					? [{ synonym: parsedSynonyms, type, index: appName }]
 					: [{ _id: id, synonym: parsedSynonyms, type, index: appName }],
 			})
-				.then(res => {
+				.then((res) => {
 					this.toggleLoading();
 					this.handleModal();
 					const filteredSynonyms = id
-						? allSynonyms.filter(syn => syn._id !== id)
+						? allSynonyms.filter((syn) => syn._id !== id)
 						: allSynonyms;
 					handleSynonyms([...filteredSynonyms, ...res]);
 					message.success('Synonyms updated Successfully');
 				})
-				.catch(e => {
+				.catch((e) => {
 					this.toggleLoading();
 					message.error(e.message || 'Failed while updating synonyms');
 				});
@@ -158,7 +184,7 @@ class SynonymsModal extends React.Component {
 			appName,
 		})
 			.then(handleSaveData)
-			.catch(e => {
+			.catch((e) => {
 				this.toggleLoading();
 				message.error(e.message || 'Failed to update synonyms');
 			});
@@ -193,7 +219,6 @@ class SynonymsModal extends React.Component {
 					visible={showModal}
 					onCancel={this.handleCloseModal}
 					onOk={this.handleSave}
-					destroyOnClose
 					okText={isAddModal ? 'Add' : 'Update'}
 					okButtonProps={{
 						loading: isLoading,
@@ -230,7 +255,31 @@ class SynonymsModal extends React.Component {
 	}
 }
 
-const mapStateToProps = state => {
+SynonymsModal.propTypes = {
+	appName: PropTypes.string.isRequired,
+	credentials: PropTypes.string.isRequired,
+	url: PropTypes.string.isRequired,
+	indexSynonyms: PropTypes.array,
+	id: PropTypes.string,
+	isAddModal: PropTypes.bool,
+	handleSynonyms: PropTypes.func.isRequired,
+	renderButton: children,
+	resetInputOnClose: PropTypes.bool,
+	type: synonymTypes,
+	synonyms: PropTypes.array,
+};
+
+SynonymsModal.defaultProps = {
+	indexSynonyms: [],
+	id: undefined,
+	isAddModal: false,
+	renderButton: null,
+	resetInputOnClose: false,
+	type: 'equivalent',
+	synonyms: null,
+};
+
+const mapStateToProps = (state) => {
 	const { username, password } = get(state, 'user.data', {});
 	const url = getURL();
 	return {

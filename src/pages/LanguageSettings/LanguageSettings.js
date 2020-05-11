@@ -1,5 +1,6 @@
-/* eslint-disable no-param-reassign */
+/* eslint-disable no-param-reassign,jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Card, Form, Input, message, notification, Select, Switch } from 'antd';
 
@@ -13,13 +14,13 @@ import {
 	setCurrentApp,
 } from '../../batteries/modules/actions';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
-import { SettingsFooter } from '../../components/SettingsFooter';
+import SettingsFooter from '../../components/SettingsFooter';
 import { container, label } from '../ResultsPage/styles';
-import { LanguageDropdown } from '../../components/LanguageDropdown';
+import LanguageDropdown from '../../components/LanguageDropdown';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import { getURL, getVersion } from '../../constants/config';
-import { ReviewAndSave } from '../../components/ReviewAndSave';
-import { SettingTooltip } from '../../components/SettingTooltip';
+import ReviewAndSave from '../../components/ReviewAndSave';
+import SettingTooltip from '../../components/SettingTooltip';
 import {
 	applyLanguageAnalyzers,
 	getESVersion,
@@ -31,20 +32,22 @@ import { buildLanguageAnalysis, getLanguageFallback } from '../../utils/language
 import { isEqual, isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import { appendApp, removeAppData } from '../../actions';
-import { settingsMap } from '../../components/ReviewAndSave/helper';
+import settingsMap from '../../components/ReviewAndSave/helper';
 import Loader from '../../components/Loader';
+import { allowedTiers } from '../../utils/prop-types';
 
 const bannerDetails = {
 	title: 'Language Settings',
 	buttonText: 'Read More',
 	icon: 'pencil',
-	href: 'https://docs.appbase.io/docs/search/Preview/',
+	href: 'https://docs.appbase.io/docs/search/relevancy/#language-settings',
 };
 
 const bannerMessage = {
 	title: 'Language Settings',
 	description: 'Language Settings let you apply a specific language for your search index.',
 	buttonText: 'Read Docs',
+	href: 'https://docs.appbase.io/docs/search/relevancy/#language-settings',
 };
 
 class LanguageSettings extends React.Component {
@@ -61,7 +64,7 @@ class LanguageSettings extends React.Component {
 		this.setState({ initiating: true });
 		const esVersion = getVersion() || (await getESVersion(appName, credentials));
 		this.setState({ esVersion });
-		getSettingsAction(appName).then(res => {
+		getSettingsAction(appName).then((res) => {
 			this.setState({ initiating: false });
 			if (res && res.payload) {
 				this.setFormValues(res, setFieldsValue);
@@ -82,16 +85,17 @@ class LanguageSettings extends React.Component {
 	};
 
 	toggleVisible = (isReset = false) => {
-		this.setState(prevState => ({ visible: !prevState.visible, isReset }));
+		this.setState((prevState) => ({ visible: !prevState.visible, isReset }));
 	};
 
 	getAnalyzerMappings = (res, getFieldValue) => {
 		// avoid mutation
-		const analyzerMappings = cloneDeep(res.payload.properties);
+		const es6Mappings = get(res, 'payload._doc.properties');
+		const analyzerMappings = cloneDeep(res.payload.properties || es6Mappings);
 		return applyLanguageAnalyzers(analyzerMappings, this.getFallBackLanguage(getFieldValue));
 	};
 
-	handleSubmit = e => {
+	handleSubmit = (e) => {
 		e.preventDefault();
 		const {
 			form: { getFieldValue, validateFields },
@@ -103,7 +107,7 @@ class LanguageSettings extends React.Component {
 		} = this.props;
 		const ACC_API = getURL();
 		validateFields((err, values) => {
-			const handleReIndexError = reIndexErr => {
+			const handleReIndexError = (reIndexErr) => {
 				this.setState({ loading: false });
 				notification.error({
 					message: 'error',
@@ -123,7 +127,7 @@ class LanguageSettings extends React.Component {
 						fieldWeights,
 					},
 				})
-					.then(response => {
+					.then((response) => {
 						this.setState({ loading: false });
 						if (response && response.payload) {
 							message.success(`Language settings for ${appName} saved successfully`);
@@ -131,21 +135,21 @@ class LanguageSettings extends React.Component {
 							handleReIndexError(get(response, 'error'));
 						}
 					})
-					.catch(err2 => {
+					.catch((err2) => {
 						handleReIndexError(err2);
 					});
 			};
 
-			const reIndexAndUpdateSettings = async languagePayload => {
+			const reIndexAndUpdateSettings = async (languagePayload) => {
 				const { esVersion } = this.state;
 
 				const appSettings = await getAppSettings(appName, credentials).then(
-					data => data[appName].settings,
+					(data) => data[appName].settings,
 				);
 
 				this.setState({ loading: true });
 
-				fetchMappings(appName, credentials, ACC_API).then(res => {
+				fetchMappings(appName, credentials, ACC_API).then((res) => {
 					if (res && res.payload) {
 						const analyzerMappings = this.getAnalyzerMappings(res, getFieldValue);
 						const language = this.getFallBackLanguage(getFieldValue);
@@ -180,7 +184,7 @@ class LanguageSettings extends React.Component {
 							.then(() => {
 								handleReIndexSuccess(languagePayload, analyzerMappings);
 							})
-							.catch(reIndexErr => {
+							.catch((reIndexErr) => {
 								handleReIndexError(reIndexErr);
 							});
 					}
@@ -213,7 +217,7 @@ class LanguageSettings extends React.Component {
 				const fields = get(properties[key], 'fields', {});
 				if (fields.search || fields.autosuggest) {
 					const fieldIndex = get(settings, 'search.dataField', []).findIndex(
-						field => field === keyPath,
+						(field) => field === keyPath,
 					);
 					if (!dataFields.includes(`${keyPath}.lang`) && fieldIndex !== -1) {
 						dataFields.push(`${keyPath}.lang`);
@@ -231,13 +235,13 @@ class LanguageSettings extends React.Component {
 		applyDataFields(mappings);
 	};
 
-	getFallBackLanguage = getFieldValue => {
+	getFallBackLanguage = (getFieldValue) => {
 		let language = getFieldValue('language');
 		language = getLanguageFallback(language);
 		return language;
 	};
 
-	getLanguagePayload = values => {
+	getLanguagePayload = (values) => {
 		const languagePayload = pick(values, ['language', 'applyStopwords', 'normalizeDiacritics']);
 		const { customStopwords, stemmingExceptions } = values;
 		languagePayload.customStopwords = customStopwords
@@ -245,7 +249,7 @@ class LanguageSettings extends React.Component {
 					customStopwords
 						.trim()
 						.split(',')
-						.map(str => removeWhiteSpaces(str)),
+						.map((str) => removeWhiteSpaces(str)),
 			  )
 			: [];
 		languagePayload.stemmingExceptions = stemmingExceptions
@@ -253,13 +257,13 @@ class LanguageSettings extends React.Component {
 					stemmingExceptions
 						.trim()
 						.split(',')
-						.map(str => removeWhiteSpaces(str)),
+						.map((str) => removeWhiteSpaces(str)),
 			  )
 			: [];
 		return languagePayload;
 	};
 
-	resetLanguageSettings = e => {
+	resetLanguageSettings = (e) => {
 		e.preventDefault();
 		const {
 			getDefaultSettingsAction,
@@ -268,7 +272,7 @@ class LanguageSettings extends React.Component {
 		} = this.props;
 		if (defaultSettings) this.setFormValues({ payload: defaultSettings }, setFieldsValue);
 		else
-			getDefaultSettingsAction().then(res => {
+			getDefaultSettingsAction().then((res) => {
 				if (res && res.payload) {
 					this.setFormValues(res, setFieldsValue);
 				}
@@ -304,7 +308,7 @@ class LanguageSettings extends React.Component {
 		if (!isValidPlan(tier, featureSearchRelevancy)) {
 			return (
 				<React.Fragment>
-					<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
+					<Banner {...bannerDetails} />
 					<Overlay
 						style={{
 							maxWidth: '70%',
@@ -335,7 +339,7 @@ class LanguageSettings extends React.Component {
 									<LanguageDropdown
 										formStyle={{ paddingBottom: 0 }}
 										style={{ width: '20%', minWidth: '35%' }}
-										renderOption={lang => (
+										renderOption={(lang) => (
 											<Select.Option key={lang.value} value={lang.value}>
 												{lang.label}
 											</Select.Option>
@@ -426,7 +430,7 @@ class LanguageSettings extends React.Component {
 								onRevert={() => {
 									this.revertChanges(settings, setFieldsValue);
 								}}
-								onSave={e => {
+								onSave={(e) => {
 									this.handleSubmit(e);
 									this.toggleVisible();
 								}}
@@ -439,7 +443,7 @@ class LanguageSettings extends React.Component {
 	}
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');
 	const mappings = getRawMappingsByAppName(state) || null;
 
@@ -458,16 +462,41 @@ const mapStateToProps = state => {
 	};
 };
 
-const mapDispatchToProps = dispatch => ({
+LanguageSettings.propTypes = {
+	appName: PropTypes.string.isRequired,
+	getSettingsAction: PropTypes.func.isRequired,
+	form: PropTypes.object.isRequired,
+	credentials: PropTypes.string.isRequired,
+	getDefaultSettingsAction: PropTypes.func.isRequired,
+	settings: PropTypes.object,
+	defaultSettings: PropTypes.object,
+	fetchMappings: PropTypes.func.isRequired,
+	updateSettingsAction: PropTypes.func.isRequired,
+	isUpdating: PropTypes.bool,
+	resetState: PropTypes.object,
+	tier: allowedTiers,
+	featureSearchRelevancy: PropTypes.bool,
+};
+
+LanguageSettings.defaultProps = {
+	settings: null,
+	defaultSettings: null,
+	isUpdating: false,
+	resetState: {},
+	tier: undefined,
+	featureSearchRelevancy: false,
+};
+
+const mapDispatchToProps = (dispatch) => ({
 	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
-	getSettingsAction: name => dispatch(getSettings(name)),
+	getSettingsAction: (name) => dispatch(getSettings(name)),
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
 	fetchMappings: (appName, credentials, url) =>
 		dispatch(getAppMappings(appName, credentials, url)),
-	deleteSettingsAction: name => dispatch(deleteSettings(name)),
-	updateCurrentApp: appName => dispatch(setCurrentApp(appName, appName)),
-	addApp: appName => dispatch(appendApp(appName)),
-	deleteApp: appName => dispatch(removeAppData(appName)),
+	deleteSettingsAction: (name) => dispatch(deleteSettings(name)),
+	updateCurrentApp: (appName) => dispatch(setCurrentApp(appName, appName)),
+	addApp: (appName) => dispatch(appendApp(appName)),
+	deleteApp: (appName) => dispatch(removeAppData(appName)),
 });
 
 const LanguageForm = Form.create({ name: 'language' })(LanguageSettings);

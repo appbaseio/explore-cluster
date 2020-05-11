@@ -1,11 +1,12 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Card, Radio, Icon, Row, Button, Alert, Tooltip, Typography } from 'antd';
 import { StateProvider } from '@appbaseio/reactivesearch';
 import { Link } from 'react-router-dom';
 import { get } from 'lodash';
 import QueryView from './QueryView';
 import ListView from './ListView';
-import { settingsMap } from '../../../../components/ReviewAndSave/helper';
+import settingsMap from '../../../../components/ReviewAndSave/helper';
 import { ruleStyle } from './styles';
 
 class Result extends React.Component {
@@ -13,14 +14,24 @@ class Result extends React.Component {
 		view: 'list',
 	};
 
-	handleViewChange = e => {
+	handleViewChange = (e) => {
 		this.setState({
 			view: e.target.value,
 		});
 	};
 
 	render() {
-		const { result, app, credentials, url, onChange, query, rules } = this.props;
+		const {
+			result,
+			app,
+			credentials,
+			url,
+			onChange,
+			query,
+			rules,
+			recordAnalytics,
+			toggleAnalytics,
+		} = this.props;
 		const { view } = this.state;
 		return (
 			<Card>
@@ -41,9 +52,9 @@ class Result extends React.Component {
 												Query {rulesApplied.length > 1 ? 'rules' : 'rule'}{' '}
 												applied
 											</Typography.Text>
-											{rulesApplied.map(rule => {
+											{rulesApplied.map((rule) => {
 												const ruleInfo = (rules || []).find(
-													r => r.id === rule,
+													(r) => r.id === rule,
 												);
 
 												return (
@@ -99,8 +110,10 @@ class Result extends React.Component {
 				) : (
 					<QueryView
 						app={app}
+						recordAnalytics={recordAnalytics}
 						credentials={credentials}
 						url={url}
+						toggleAnalytics={toggleAnalytics}
 						query={query}
 						onChange={onChange}
 					/>
@@ -109,5 +122,27 @@ class Result extends React.Component {
 		);
 	}
 }
+
+Result.propTypes = {
+	result: PropTypes.object,
+	app: PropTypes.string.isRequired,
+	credentials: PropTypes.string.isRequired,
+	url: PropTypes.string,
+	onChange: PropTypes.func,
+	query: PropTypes.array,
+	rules: PropTypes.array,
+	toggleAnalytics: PropTypes.func,
+	recordAnalytics: PropTypes.bool,
+};
+
+Result.defaultProps = {
+	result: {},
+	url: undefined,
+	onChange: null,
+	query: [],
+	rules: [],
+	toggleAnalytics: () => {},
+	recordAnalytics: true,
+};
 
 export default Result;

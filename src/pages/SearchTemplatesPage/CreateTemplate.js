@@ -59,7 +59,7 @@ class CreateTemplate extends React.Component {
 		const editMode = !!props.templateId;
 		const nameControl = props.control.get('name');
 		if (editMode) {
-			props.fetchTemplate(props.templateId).then(action => {
+			props.fetchTemplate(props.templateId).then((action) => {
 				if (get(action, 'payload')) {
 					const source = get(action, 'payload.script.source');
 					const sourceStr = getString(source);
@@ -263,14 +263,14 @@ CreateTemplate.propTypes = {
 	handleSaveTemplate: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	isLoading: get(state, '$getAppTemplate.isFetching', false),
 	isSaving: get(state, '$saveAppTemplate.isFetching', false),
 	isValidating: get(state, '$validateAppTemplate.isFetching', false),
 });
 
-const mapDispatchToProps = dispatch => ({
-	fetchTemplate: id => dispatch(getAppTemplate(id)),
+const mapDispatchToProps = (dispatch) => ({
+	fetchTemplate: (id) => dispatch(getAppTemplate(id)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateTemplate);

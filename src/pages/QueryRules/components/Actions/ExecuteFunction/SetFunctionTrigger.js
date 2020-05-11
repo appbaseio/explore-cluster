@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Button, Dropdown, Icon, Menu, Radio, Result, Skeleton, Table } from 'antd';
 import { get } from 'lodash';
 import { getFunctions } from '../../../../../batteries/utils/app';
@@ -15,6 +16,15 @@ function TriggerDropdown({ overlay, selectedOption }) {
 	);
 }
 
+TriggerDropdown.propTypes = {
+	overlay: PropTypes.node.isRequired,
+	selectedOption: PropTypes.object,
+};
+
+TriggerDropdown.defaultProps = {
+	selectedOption: {},
+};
+
 class SetFunctionTrigger extends Component {
 	state = { loading: false };
 
@@ -22,7 +32,7 @@ class SetFunctionTrigger extends Component {
 		try {
 			this.setState({ loading: true });
 			const response = await getFunctions();
-			this.setState({ loading: false, functions: response.filter(func => func.enabled) });
+			this.setState({ loading: false, functions: response.filter((func) => func.enabled) });
 		} catch (e) {
 			console.error(e);
 			this.setState({ loading: false });
@@ -49,18 +59,18 @@ class SetFunctionTrigger extends Component {
 		);
 	};
 
-	handleChange = record => {
+	handleChange = (record) => {
 		const { handleRadioChange } = this.props;
 		this.handleUpdates(record);
 		handleRadioChange(record.function.service);
 	};
 
-	handleUpdates = record => {
+	handleUpdates = (record) => {
 		const { onChange, selected } = this.props;
 		const { functions } = this.state;
 		const functionName = record ? record.function.service : selected;
 		if (onChange) {
-			const selectedFunction = functions.find(obj => obj.function.service === functionName);
+			const selectedFunction = functions.find((obj) => obj.function.service === functionName);
 			onChange(selectedFunction);
 		}
 	};
@@ -87,7 +97,7 @@ class SetFunctionTrigger extends Component {
 		}
 		return (
 			<Table
-				rowKey={record => record.function.service}
+				rowKey={(record) => record.function.service}
 				columns={[
 					{
 						title: 'Function Name',
@@ -109,9 +119,9 @@ class SetFunctionTrigger extends Component {
 							];
 							const menu = (
 								<Menu>
-									{options.map(option => (
+									{options.map((option) => (
 										<Menu.Item
-											onClick={clickParam =>
+											onClick={(clickParam) =>
 												this.handleTriggerChange(clickParam, index)
 											}
 											key={option.value}
@@ -122,7 +132,7 @@ class SetFunctionTrigger extends Component {
 								</Menu>
 							);
 							const selectedOption = options.find(
-								option => option.value === get(record, 'trigger.executeBefore'),
+								(option) => option.value === get(record, 'trigger.executeBefore'),
 							);
 							return (
 								<TriggerDropdown
@@ -139,5 +149,17 @@ class SetFunctionTrigger extends Component {
 		);
 	}
 }
+
+SetFunctionTrigger.propTypes = {
+	selected: PropTypes.string,
+	handleRadioChange: PropTypes.func.isRequired,
+	onChange: PropTypes.func,
+	setActiveKey: PropTypes.func.isRequired,
+};
+
+SetFunctionTrigger.defaultProps = {
+	selected: undefined,
+	onChange: null,
+};
 
 export default SetFunctionTrigger;

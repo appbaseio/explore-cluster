@@ -27,7 +27,7 @@ const bannerMessagesAnalytics = {
 		description:
 			'See our docs on how to track search, filters, click events, conversions and add your own custom events.',
 		buttonText: 'Read Docs',
-		href: 'https://docs.appbase.io/docs/analytics/Overview/#top-search-queries',
+		href: 'https://docs.appbase.io/docs/analytics/overview/#popular-searches',
 	},
 };
 
@@ -47,14 +47,14 @@ const PopularSearchesWrapper = ({ appName, plan, isPaidUser }) => (
 				</Container>
 			</React.Fragment>
 		) : (
-				<React.Fragment>
-					<Banner {...bannerMessagesAnalytics.free} />
-					<Overlay
-						src="/static/images/analytics/PopularSearches.png"
-						alt="popular searches"
-					/>
-				</React.Fragment>
-			)}
+			<React.Fragment>
+				<Banner {...bannerMessagesAnalytics.free} />
+				<Overlay
+					src="/static/images/analytics/PopularSearches.png"
+					alt="popular searches"
+				/>
+			</React.Fragment>
+		)}
 	</React.Fragment>
 );
 
@@ -64,7 +64,7 @@ PopularSearchesWrapper.propTypes = {
 	isPaidUser: PropTypes.bool.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	appName: get(state, '$getCurrentApp.name'),
 	plan: get(state, '$getAppPlan.results.plan'),
 	isPaidUser: get(state, '$getAppPlan.results.isPaid'),

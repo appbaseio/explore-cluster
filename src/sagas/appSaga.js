@@ -3,7 +3,7 @@ import { APPS } from '../constants';
 import { getESIndices } from '../utils';
 import { loadAppsSuccess, loadAppsError } from '../actions';
 
-const getUser = state => state.user.data;
+const getUser = (state) => state.user.data;
 
 function* appWorker() {
 	try {

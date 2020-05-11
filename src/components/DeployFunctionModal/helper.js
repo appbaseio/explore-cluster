@@ -1,6 +1,7 @@
+import React from 'react';
+import PropTypes from 'prop-types';
 import { css } from 'emotion';
 import { Form, Input } from 'antd';
-import React from 'react';
 import { Validators } from 'react-reactive-form';
 
 export function isTrue(element) {
@@ -17,7 +18,7 @@ export const centerAligned = css`
 `;
 
 // TODO: remove once integrated with API
-export const later = (delay, value) => new Promise(resolve => setTimeout(resolve, delay, value));
+export const later = (delay, value) => new Promise((resolve) => setTimeout(resolve, delay, value));
 
 export function renderInputField({
 	globalError,
@@ -36,15 +37,32 @@ export function renderInputField({
 		>
 			<Input
 				value={fieldValue}
-				onChange={e => handleInputRequired(e, fieldName, setterFunc)}
+				onChange={(e) => handleInputRequired(e, fieldName, setterFunc)}
 				{...extraProps}
 			/>
 		</Form.Item>
 	);
 }
 
+renderInputField.propTypes = {
+	globalError: PropTypes.object,
+	fieldName: PropTypes.string.isRequired,
+	fieldValue: PropTypes.string,
+	handleInputRequired: PropTypes.func.isRequired,
+	setterFunc: PropTypes.func.isRequired,
+	extraProps: PropTypes.object,
+	errorMessage: PropTypes.string,
+};
+
+renderInputField.defaultProps = {
+	globalError: {},
+	fieldValue: undefined,
+	extraProps: {},
+	errorMessage: 'Field Required',
+};
+
 export function handleInputClosure(setGlobalError, globalError) {
-	const handleInputRequired = (e, fieldName, setterFunc) => {
+	return (e, fieldName, setterFunc) => {
 		const { value } = e.target;
 		const hasError = Validators.required({ value }) || {};
 		setterFunc(value);
@@ -53,7 +71,6 @@ export function handleInputClosure(setGlobalError, globalError) {
 			[fieldName]: hasError.required,
 		});
 	};
-	return handleInputRequired;
 }
 
 export async function deploymentCheck(getFunction, functionName, myInterval) {

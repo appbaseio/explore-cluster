@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {
 	Button,
 	Icon,
@@ -40,7 +41,7 @@ const columns = [
 	{
 		title: 'Example values',
 		dataIndex: 'example',
-		render: text => <b>{text}</b>,
+		render: (text) => <b>{text}</b>,
 	},
 ];
 const data = [
@@ -179,22 +180,23 @@ const expressionData = [
 class TriggerFunction extends React.Component {
 	constructor(props) {
 		super(props);
-		const executeBeforeVal = get(props.node, 'trigger.executeBefore');
+		const { node } = props;
+		const executeBeforeVal = get(node, 'trigger.executeBefore');
 		this.state = {
 			isVisible: false,
-			type: (props.node && props.node.trigger && props.node.trigger.type) || 'always',
+			type: (node && node.trigger && node.trigger.type) || 'always',
 			when:
 				// eslint-disable-next-line no-nested-ternary
 				executeBeforeVal !== undefined ? (executeBeforeVal ? 'before' : 'after') : 'before',
-			request: JSON.stringify(get(props.node, 'extraRequestPayload', {})),
-			expression: (props.node && props.node.trigger && props.node.trigger.expression) || '',
+			request: JSON.stringify(get(node, 'extraRequestPayload', {})),
+			expression: (node && node.trigger && node.trigger.expression) || '',
 			isValidJSON: true,
-			parsedValue: get(props.node, 'extraRequestPayload', {}),
+			parsedValue: get(node, 'extraRequestPayload', {}),
 		};
 	}
 
 	handleModal = () => {
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			isVisible: !prevState.isVisible,
 		}));
 	};
@@ -210,7 +212,7 @@ class TriggerFunction extends React.Component {
 				expression,
 			},
 			extraRequestPayload: parsedValue,
-		}).then(res => {
+		}).then((res) => {
 			if (res && res.error) {
 				notification.error({
 					message: 'Error',
@@ -223,13 +225,13 @@ class TriggerFunction extends React.Component {
 		});
 	};
 
-	handleChange = e => {
+	handleChange = (e) => {
 		this.setState({
 			[e.target.name]: e.target.value,
 		});
 	};
 
-	handleRequestChange = value => {
+	handleRequestChange = (value) => {
 		let isValid = true;
 		let parsedValue;
 		try {
@@ -372,7 +374,18 @@ class TriggerFunction extends React.Component {
 	}
 }
 
-const mapDispatchToProps = dispatch => ({
+TriggerFunction.propTypes = {
+	node: PropTypes.object,
+	putFunctions: PropTypes.func.isRequired,
+	isLoading: PropTypes.bool,
+};
+
+TriggerFunction.defaultProps = {
+	node: {},
+	isLoading: false,
+};
+
+const mapDispatchToProps = (dispatch) => ({
 	putFunctions: (appName, payload) => dispatch(updateFunctions(appName, payload, true)),
 });
 

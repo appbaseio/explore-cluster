@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { Layout, Menu, Icon, Tag, Tooltip, Input } from 'antd';
+import { Icon, Input, Layout, Menu, Tag } from 'antd';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import AppLayout from '../../components/AppLayout';
@@ -16,8 +17,10 @@ import { getParam, getParsedRoutes } from '../../utils';
 import { breakpoints } from '../../utils/media';
 import Loader from '../../components/Loader';
 import { isValidPlan } from '../../batteries/utils';
-import { searchInputStyle } from '../DashboardWrapper/DashboardWrapper';
 import SidebarAutocomplete from '../../components/SidebarAutocomplete';
+import { allowedTiers } from '../../utils/prop-types';
+import searchInputStyle from '../DashboardWrapper/styles';
+import WithRedirectTooltip from '../../components/WithRedirectTooltip';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
@@ -100,9 +103,9 @@ const getActiveMenu = (props, prevActiveSubMenu = []) => {
 		pathname = getParam('view') || '';
 	}
 
-	Object.keys(routes).some(route => {
+	Object.keys(routes).some((route) => {
 		if (routes[route].menu) {
-			const active = routes[route].menu.find(item => pathname === item.link);
+			const active = routes[route].menu.find((item) => pathname === item.link);
 
 			if (active) {
 				activeSubMenu = route;
@@ -126,17 +129,6 @@ const getActiveMenu = (props, prevActiveSubMenu = []) => {
 		activeSubMenu: [activeSubMenu, ...prevActiveSubMenu],
 		activeMenuItem: [activeMenuItem],
 	};
-};
-
-export const WithRedirectTooltip = ({ showTooltip, children }) => {
-	if (showTooltip) {
-		return (
-			<Tooltip placement="rightBottom" title="This will redirect you to the cluster view">
-				{children}
-			</Tooltip>
-		);
-	}
-	return children;
 };
 
 let url;
@@ -193,18 +185,14 @@ class AppWrapper extends Component {
 	}
 
 	componentDidMount() {
-		const { appName, loading } = this.state;
-		const { history, match, currentApp, settings } = this.props;
+		const { appName } = this.state;
+		const { history, match } = this.props;
 		const view = getParam('view') || '';
 
 		this.handleSettings(appName);
 
 		if (!match.params.appName && appName) {
 			history.push(`/app/${appName}/${view}`);
-		}
-
-		if (!settings && !loading) {
-			this.handleSettings(currentApp);
 		}
 	}
 
@@ -214,13 +202,12 @@ class AppWrapper extends Component {
 
 		const route = match.params.route || '';
 
-
 		if (currentApp && appName !== currentApp) {
 			history.push(`/app/${currentApp}/${route}`);
 		}
 	}
 
-	handleSearchTerm = e => {
+	handleSearchTerm = (e) => {
 		this.setState({
 			value: e.target.value,
 		});
@@ -232,7 +219,7 @@ class AppWrapper extends Component {
 		});
 	};
 
-	handleSettings = async appName => {
+	handleSettings = async (appName) => {
 		const {
 			settings,
 			defaultSettings,
@@ -262,7 +249,7 @@ class AppWrapper extends Component {
 	};
 
 	onCollapse = () => {
-		this.setState(prevState => ({ collapsed: !prevState.collapsed }));
+		this.setState((prevState) => ({ collapsed: !prevState.collapsed }));
 	};
 
 	render() {
@@ -302,7 +289,7 @@ class AppWrapper extends Component {
 							width: '100%',
 							height: 'calc(100% - 102px)',
 						}}
-						onOpenChange={param => {
+						onOpenChange={(param) => {
 							this.setState({
 								activeSubMenu: param,
 							});
@@ -346,7 +333,7 @@ class AppWrapper extends Component {
 						)}
 
 						{!value &&
-							Object.keys(routes).map(route => {
+							Object.keys(routes).map((route) => {
 								if (routes[route].menu) {
 									const Title = (
 										<span>
@@ -356,7 +343,7 @@ class AppWrapper extends Component {
 									);
 									return (
 										<SubMenu key={route} title={Title}>
-											{routes[route].menu.map(item => (
+											{routes[route].menu.map((item) => (
 												<Menu.Item key={item.label}>
 													<WithRedirectTooltip
 														showTooltip={item.hasExactPath}
@@ -388,6 +375,16 @@ class AppWrapper extends Component {
 										</SubMenu>
 									);
 								}
+								if (routes[route].hasExactPath) {
+									return (
+										<Menu.Item key={route}>
+											<Link replace to={routes[route].link}>
+												<Icon type={routes[route].icon} />
+												<span>{route}</span>
+											</Link>
+										</Menu.Item>
+									);
+								}
 								return (
 									<Menu.Item key={route}>
 										<Link replace to={`/app/${appName}/${routes[route].link}`}>
@@ -414,7 +411,27 @@ class AppWrapper extends Component {
 	}
 }
 
-const mapStateToProps = state => {
+AppWrapper.propTypes = {
+	currentApp: PropTypes.string.isRequired,
+	history: PropTypes.object.isRequired,
+	match: PropTypes.object.isRequired,
+	settings: PropTypes.object,
+	defaultSettings: PropTypes.object,
+	updateSettingsAction: PropTypes.func.isRequired,
+	getDefaultSettingsAction: PropTypes.func.isRequired,
+	getSettingsAction: PropTypes.func.isRequired,
+	tier: allowedTiers,
+	featureSearchRelevancy: PropTypes.bool,
+};
+
+AppWrapper.defaultProps = {
+	settings: null,
+	tier: undefined,
+	featureSearchRelevancy: false,
+	defaultSettings: null,
+};
+
+const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');
 	return {
 		currentApp: appName,
@@ -425,10 +442,10 @@ const mapStateToProps = state => {
 	};
 };
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	updateCurrentApp: (appName, appId) => dispatch(setCurrentApp(appName, appId)),
 	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
-	getSettingsAction: name => dispatch(getSettings(name)),
+	getSettingsAction: (name) => dispatch(getSettings(name)),
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
 });
 

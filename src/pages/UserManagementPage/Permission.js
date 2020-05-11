@@ -64,7 +64,7 @@ Permission.propTypes = {
 	deletePermission: func.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	isAdmin: get(state, 'user.data.isAdmin'),
 });
 

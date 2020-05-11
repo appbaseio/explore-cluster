@@ -1,22 +1,22 @@
 import React, { Component } from 'react';
-import { Icon, Layout, Menu, Input } from 'antd';
+import { Icon, Input, Layout, Menu } from 'antd';
 import { Link, Route, Switch } from 'react-router-dom';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
 import { get, keys } from 'lodash';
-import { css } from 'emotion';
 
-import { bool, func } from 'prop-types';
+import { bool, func, object } from 'prop-types';
 import Loader from '../../components/Loader';
 import AppHeader from '../../components/AppHeader';
 import Logo from '../../components/Logo';
 import { breakpoints } from '../../utils/media';
 import { getAppPlan } from '../../batteries/modules/actions';
 import { getParam, getParsedRoutes } from '../../utils';
-import { LabelTag } from '../../components/LabelTag';
-import { IndexSwitcher } from '../../components/IndexSwitcher';
+import LabelTag from '../../components/LabelTag';
+import IndexSwitcher from '../../components/IndexSwitcher';
 import { loadApps } from '../../actions';
 import SidebarAutocomplete from '../../components/SidebarAutocomplete';
+import searchInputStyle from './styles';
 
 const NoMatch = Loadable({
 	loader: () => import('../../NoMatch'),
@@ -119,7 +119,7 @@ const getActiveMenu = (props, prevActiveSubMenu = []) => {
 	const routes = defaultRoutes;
 	Object.keys(routes).some((route) => {
 		if (routes[route].menu) {
-			const active = routes[route].menu.find((item) => pathname === item.link);
+			const active = routes[route].menu.find((item) => pathname.startsWith(item.link));
 
 			if (active) {
 				activeSubMenu = route;
@@ -144,18 +144,6 @@ const getActiveMenu = (props, prevActiveSubMenu = []) => {
 		activeMenuItem: [activeMenuItem],
 	};
 };
-
-export const searchInputStyle = css`
-	text-align: center;
-	padding: 10px 16px;
-	input {
-		opacity: 0.3;
-
-		&:focus {
-			opacity: 1;
-		}
-	}
-`;
 
 let url;
 
@@ -258,7 +246,7 @@ class DashboardWrapper extends Component {
 
 	render() {
 		const { collapsed, showHeader, routes, activeSubMenu, activeMenuItem, value } = this.state;
-		const { apps, history } = this.props;
+		const { apps, history, match } = this.props;
 
 		const filteredApps = keys(apps).filter((app) => !app.startsWith('.'));
 
@@ -353,6 +341,16 @@ class DashboardWrapper extends Component {
 										</SubMenu>
 									);
 								}
+								if (routes[route].hasExactPath) {
+									return (
+										<Menu.Item key={route}>
+											<Link replace to={routes[route].link}>
+												<Icon type={routes[route].icon} />
+												<span>{route}</span>
+											</Link>
+										</Menu.Item>
+									);
+								}
 								return (
 									<Menu.Item key={route}>
 										<Link replace to={routes[route].link}>
@@ -379,6 +377,8 @@ class DashboardWrapper extends Component {
 							big={collapsed}
 							minimal
 							showApp={false}
+							history={history}
+							match={match}
 						/>
 					)}
 					<Switch>
@@ -410,6 +410,7 @@ class DashboardWrapper extends Component {
 DashboardWrapper.defaultProps = {
 	isBillingEnabled: false,
 	isClusterPlanFetching: false,
+	apps: {},
 };
 
 DashboardWrapper.propTypes = {
@@ -417,6 +418,11 @@ DashboardWrapper.propTypes = {
 	fetchClusterPlan: func.isRequired,
 	isClusterPlanFetching: bool,
 	isClusterPlanFetched: bool.isRequired,
+	apps: object,
+	fetchApps: func.isRequired,
+	history: object.isRequired,
+	match: object.isRequired,
+	location: object.isRequired,
 };
 
 const mapStateToProps = (state) => ({

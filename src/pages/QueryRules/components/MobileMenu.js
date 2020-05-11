@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Button, Checkbox, Dropdown, Icon, Menu, Typography } from 'antd';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
@@ -11,7 +12,7 @@ const menuStyle = css`
 	}
 `;
 
-const MobileMenu = props => {
+const MobileMenu = (props) => {
 	const { rule, removeRule, toggleRule } = props;
 	return (
 		<Dropdown
@@ -29,7 +30,7 @@ const MobileMenu = props => {
 					<Menu.Item key="2">
 						<Checkbox
 							checked={rule.enabled}
-							onChange={e => toggleRule({ id: rule.id, enabled: e.target.checked })}
+							onChange={(e) => toggleRule({ id: rule.id, enabled: e.target.checked })}
 						>
 							Rule Status
 						</Checkbox>
@@ -46,6 +47,16 @@ const MobileMenu = props => {
 			<Button shape="circle" icon="more" />
 		</Dropdown>
 	);
+};
+
+MobileMenu.propTypes = {
+	rule: PropTypes.object,
+	removeRule: PropTypes.func.isRequired,
+	toggleRule: PropTypes.func.isRequired,
+};
+
+MobileMenu.defaultProps = {
+	rule: {},
 };
 
 export default MobileMenu;

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Select } from 'antd';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
@@ -26,7 +27,7 @@ class AppSwitcher extends React.Component {
 		const { apps, currentApp, history, updateCurrentApp, match } = this.props;
 		const route = get(match, 'params.route');
 
-		const filteredApps = keys(apps).filter(app => !app.startsWith('.'));
+		const filteredApps = keys(apps).filter((app) => !app.startsWith('.'));
 
 		const sortedApps = (filteredApps || []).sort((a, b) => {
 			if (a < b) {
@@ -43,14 +44,14 @@ class AppSwitcher extends React.Component {
 					className={selectStyle}
 					value={currentApp}
 					style={{ minWidth: 180 }}
-					onSelect={appName => {
+					onSelect={(appName) => {
 						updateCurrentApp(appName);
 						history.replace(`/app/${appName}/${route || ''}`);
 					}}
 					showSearch
 					autoFocus
 				>
-					{sortedApps.map(app => (
+					{sortedApps.map((app) => (
 						<Select.Option key={app} value={app}>
 							{app}
 						</Select.Option>
@@ -61,11 +62,24 @@ class AppSwitcher extends React.Component {
 	}
 }
 
-const mapStateToProps = state => ({
+AppSwitcher.propTypes = {
+	apps: PropTypes.object,
+	fetchApps: PropTypes.func.isRequired,
+	currentApp: PropTypes.string.isRequired,
+	history: PropTypes.object.isRequired,
+	updateCurrentApp: PropTypes.func.isRequired,
+	match: PropTypes.object.isRequired,
+};
+
+AppSwitcher.defaultProps = {
+	apps: {},
+};
+
+const mapStateToProps = (state) => ({
 	apps: get(state, 'apps.data'),
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	updateCurrentApp: (appName, appId) => dispatch(setCurrentApp(appName, appId)),
 	fetchApps: () => dispatch(loadApps()),
 });

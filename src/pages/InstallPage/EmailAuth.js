@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Button, Input, message } from 'antd';
 import { Validators } from 'react-reactive-form';
 import { emailBtn, inputStyles, smallBtn } from './styles';
@@ -14,7 +15,7 @@ class EmailAuth extends React.Component {
 		otp: '',
 	};
 
-	handleInput = e => {
+	handleInput = (e) => {
 		const {
 			target: { name, value },
 		} = e;
@@ -194,5 +195,19 @@ class EmailAuth extends React.Component {
 		);
 	}
 }
+
+EmailAuth.propTypes = {
+	isEmailAuth: PropTypes.bool,
+	toggleEmailAuth: PropTypes.func,
+	authText: PropTypes.string,
+	disabled: PropTypes.bool,
+};
+
+EmailAuth.defaultProps = {
+	isEmailAuth: false,
+	toggleEmailAuth: () => {},
+	authText: '',
+	disabled: false,
+};
 
 export default EmailAuth;

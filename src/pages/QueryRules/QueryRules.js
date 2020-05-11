@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react';
+import PropTypes from 'prop-types';
 import { Affix, Button, Col, Icon, Layout, message, Result, Row } from 'antd';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
@@ -14,6 +15,7 @@ import Overlay from '../../components/Overlay';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { bannerDetails } from './utils';
 import SearchPreviewSwitcher from '../../components/SearchPreviewSwitcher';
+import { allowedTiers } from '../../utils/prop-types';
 
 const { Header } = Layout;
 
@@ -48,11 +50,11 @@ class QueryRules extends Component {
 		}
 	}
 
-	onDragEnd = result => {
+	onDragEnd = (result) => {
 		const { rules, updateOrder } = this.props;
 		if (result.source.index !== result.destination.index) {
-			const ruleToPromote = rules.find(rule => rule.order === result.source.index);
-			const ruleToDemote = rules.find(rule => rule.order === result.destination.index);
+			const ruleToPromote = rules.find((rule) => rule.order === result.source.index);
+			const ruleToDemote = rules.find((rule) => rule.order === result.destination.index);
 
 			updateOrder({
 				toBeDemoted: {
@@ -68,12 +70,12 @@ class QueryRules extends Component {
 	};
 
 	toggleVisibility = () => {
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			visible: !prevState.visible,
 		}));
 	};
 
-	onAppSelect = app => {
+	onAppSelect = (app) => {
 		this.setState({ app, visible: true });
 	};
 
@@ -100,7 +102,7 @@ class QueryRules extends Component {
 			return <Loader />;
 		}
 
-		const filteredApps = keys(apps).filter(app => !app.startsWith('.'));
+		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
 
 		return (
 			<Fragment>
@@ -217,7 +219,31 @@ class QueryRules extends Component {
 	}
 }
 
-const mapStateToProps = state => ({
+QueryRules.propTypes = {
+	fetchRules: PropTypes.func.isRequired,
+	updateOrder: PropTypes.func.isRequired,
+	rules: PropTypes.array,
+	apps: PropTypes.object,
+	tier: allowedTiers,
+	featureRules: PropTypes.bool,
+	reordering: PropTypes.bool,
+	hasError: PropTypes.bool,
+	deleted: PropTypes.bool,
+	isLoading: PropTypes.bool,
+};
+
+QueryRules.defaultProps = {
+	rules: null,
+	tier: undefined,
+	featureRules: false,
+	reordering: false,
+	hasError: false,
+	deleted: false,
+	isLoading: false,
+	apps: {},
+};
+
+const mapStateToProps = (state) => ({
 	rules: get(state, '$getAppRules.results'),
 	isLoading: get(state, '$getAppRules.isFetching'),
 	hasError: get(state, '$getAppRules.error'),
@@ -229,7 +255,7 @@ const mapStateToProps = state => ({
 	apps: get(state, 'apps.data'),
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	fetchRules: () => dispatch(getRules()),
 	updateOrder: ({ toBePromoted, toBeDemoted }) =>
 		dispatch(reorderRules({ toBePromoted, toBeDemoted })),

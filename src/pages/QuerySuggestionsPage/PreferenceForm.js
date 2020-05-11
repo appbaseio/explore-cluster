@@ -11,7 +11,7 @@ import Ace from '../../batteries/components/SearchSandbox/containers/AceEditor';
 import { suggestionsMessages as Messages } from '../../utils/messages';
 import SearchPreviewSwitcher from '../../components/SearchPreviewSwitcher';
 
-const calculateValue = value => {
+const calculateValue = (value) => {
 	const index = value.indexOf('*');
 	if (index > -1) {
 		if (index === 0 && value.length !== 1) {
@@ -78,23 +78,37 @@ const InputElement = ({ name, label, toolTipMessage, inputProps, placeholder }) 
 	/>
 );
 
+InputElement.propTypes = {
+	name: PropTypes.string.isRequired,
+	label: PropTypes.string.isRequired,
+	toolTipMessage: PropTypes.string,
+	inputProps: PropTypes.object,
+	placeholder: PropTypes.string,
+};
+
+InputElement.defaultProps = {
+	toolTipMessage: undefined,
+	inputProps: {},
+	placeholder: undefined,
+};
+
 class PreferenceForm extends React.Component {
 	state = { visible: false };
 
 	toggleVisibility = () => {
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			visible: !prevState.visible,
 		}));
 	};
 
-	onAppSelect = app => {
+	onAppSelect = (app) => {
 		this.setState({ app, visible: true });
 	};
 
 	render() {
 		const { control, handleSaveTemplate, isLoading, indices, apps } = this.props;
 		const { visible, app } = this.state;
-		const filteredApps = keys(apps).filter(app => !app.startsWith('.'));
+		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
 		return (
 			<FieldGroup
 				control={control}
@@ -135,12 +149,12 @@ class PreferenceForm extends React.Component {
 												tokenSeparators={[',']}
 												value={value}
 												{...inputHandler}
-												onChange={val => {
+												onChange={(val) => {
 													inputHandler.onChange(calculateValue(val));
 												}}
 											>
 												<Select.Option value="*">All (*)</Select.Option>
-												{indices.map(index => (
+												{indices.map((index) => (
 													<Select.Option key={index}>
 														{index}
 													</Select.Option>
@@ -281,9 +295,14 @@ PreferenceForm.propTypes = {
 	control: PropTypes.object.isRequired,
 	isLoading: PropTypes.bool.isRequired,
 	indices: PropTypes.array.isRequired,
+	apps: PropTypes.object,
 };
 
-const mapStateToProps = state => ({
+PreferenceForm.defaultProps = {
+	apps: {},
+};
+
+const mapStateToProps = (state) => ({
 	isLoading: get(state, '$saveSuggestionsPreferences.isFetching', false),
 	appName: get(state, '$getCurrentApp.name'),
 	apps: get(state, 'apps.data'),

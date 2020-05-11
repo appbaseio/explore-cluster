@@ -1,4 +1,6 @@
+/* eslint-disable camelcase */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Result, Button } from 'antd';
 import Frame from '../../../components/Frame';
 import Loader from '../../../components/Loader';
@@ -12,7 +14,7 @@ class InsightLink extends React.Component {
 	}
 
 	toggleLoader = () => {
-		this.setState(state => ({
+		this.setState((state) => ({
 			frameLoading: !state.frameLoading,
 		}));
 	};
@@ -67,5 +69,15 @@ class InsightLink extends React.Component {
 		);
 	}
 }
+
+InsightLink.propTypes = {
+	insight_link: PropTypes.string,
+	hasSubscribed: PropTypes.bool,
+};
+
+InsightLink.defaultProps = {
+	insight_link: undefined,
+	hasSubscribed: false,
+};
 
 export default InsightLink;

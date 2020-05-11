@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-curly-brace-presence */
 import React from 'react';
 import { connect } from 'react-redux';
 import { Card, Button, Table, Alert, Typography } from 'antd';
@@ -48,7 +49,7 @@ const columns = [
 	},
 	{
 		title: 'Actions',
-		render: permission => <Permission {...permission} />,
+		render: (permission) => <Permission {...permission} />,
 		key: 'credentials',
 	},
 ];
@@ -63,7 +64,7 @@ class UserManagementPage extends React.Component {
 		this.refetchPermissions();
 	}
 
-	showForm = permissionInfo => {
+	showForm = (permissionInfo) => {
 		if (permissionInfo) {
 			this.setState({
 				showForm: true,
@@ -96,7 +97,7 @@ class UserManagementPage extends React.Component {
 		});
 	};
 
-	handleSubmit = form => {
+	handleSubmit = (form) => {
 		const { credentials, createUser, updateUser } = this.props;
 		const { currentPermissionInfo } = this.state;
 		// handle edit
@@ -131,7 +132,7 @@ class UserManagementPage extends React.Component {
 		}
 	};
 
-	deletePermission = username => {
+	deletePermission = (username) => {
 		const { credentials, deleteUser } = this.props;
 		deleteUser(credentials, username).then(({ payload }) => {
 			if (payload) {
@@ -152,7 +153,7 @@ class UserManagementPage extends React.Component {
 					title="Manage Users"
 					extra={
 						<a
-							href="https://docs.appbase.io/security/UserManagement/"
+							href="https://docs.appbase.io/docs/security/user-management/"
 							target="_blank"
 							rel="noopener noreferrer"
 						>
@@ -168,7 +169,7 @@ class UserManagementPage extends React.Component {
 								<Paragraph>
 									A user added via user management will need to visit the below
 									URL and enter their username and password to have access to the
-									cluster's dashboard view.
+									cluster{"'"}s dashboard view.
 								</Paragraph>
 								<Paragraph
 									strong
@@ -185,12 +186,12 @@ class UserManagementPage extends React.Component {
 					/>
 					<Table
 						scroll={{ x: 900 }}
-						dataSource={users.map(user => ({
+						dataSource={users.map((user) => ({
 							permissionInfo: user,
 							deletePermission: this.deletePermission,
 							showForm: this.showForm,
 						}))}
-						rowKey={row =>
+						rowKey={(row) =>
 							`${get(row, 'permissionInfo.username')}:${get(
 								row,
 								'permissionInfo.password',
@@ -236,7 +237,7 @@ UserManagementPage.propTypes = {
 	isFetching: PropTypes.bool.isRequired,
 	users: PropTypes.array, // eslint-disable-line
 };
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
 	const { username, password } = get(state, 'user.data', {});
 	return {
 		credentials: username ? `${username}:${password}` : null,
@@ -245,8 +246,8 @@ const mapStateToProps = state => {
 		isAdmin: get(state, 'user.data.isAdmin'),
 	};
 };
-const mapDispatchToProps = dispatch => ({
-	fetchUsers: credentials => dispatch(getClusterUsers(credentials)),
+const mapDispatchToProps = (dispatch) => ({
+	fetchUsers: (credentials) => dispatch(getClusterUsers(credentials)),
 	createUser: (credentials, payload) => dispatch(createClusterUser(credentials, payload)),
 	deleteUser: (credentials, username) => dispatch(deleteClusterUser(credentials, username)),
 	updateUser: (credentials, username, payload) =>

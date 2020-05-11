@@ -10,11 +10,13 @@ const generateQuery = ({ aggregations: filters, search, results, synonyms }) => 
 						dataField: typeof filterField === 'string' ? [filterField] : filterField,
 						sortBy: filters.sortBy,
 						size: filters.size,
+						type: 'term',
+						value: [],
 					};
 			  })
 			: [];
 
-	const filtersId = filtersData.map(filter => filter.id);
+	const filtersId = filtersData.map((filter) => filter.id);
 	const resultDataField = results.dataField || '_score';
 	const searchDataField = search.dataField || [];
 	const query = [
@@ -33,13 +35,14 @@ const generateQuery = ({ aggregations: filters, search, results, synonyms }) => 
 			dataField: Array.isArray(searchDataField) ? searchDataField : [searchDataField],
 			fieldWeights: search.fieldWeights || [],
 			enableSynonyms: get(synonyms, 'enabled', true),
+			value: '',
 		},
 		...filtersData,
 	];
 	return query;
 };
 
-const isValidJSON = value => {
+const isValidJSON = (value) => {
 	try {
 		const temp = JSON.parse(value);
 		if (temp && typeof temp === 'object') {

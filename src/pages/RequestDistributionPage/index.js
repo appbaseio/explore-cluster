@@ -6,7 +6,6 @@ import Overlay from '../../components/Overlay';
 import Container from '../../components/Container';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import RequestDistribution from '../../batteries/components/analytics/components/RequestDistribution';
-import { getAppPlanByName } from '../../batteries/modules/selectors';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -65,7 +64,7 @@ RequestDistributionWrapper.propTypes = {
 	isGrowth: PropTypes.bool.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	plan: get(state, '$getAppPlan.results.plan'),
 	isGrowth: get(state, '$getAppPlan.results.isPaid'),
 });

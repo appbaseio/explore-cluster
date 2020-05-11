@@ -1,5 +1,6 @@
-/* eslint-disable camelcase */
+/* eslint-disable camelcase,no-param-reassign,jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Card, Form, Input, InputNumber, message, notification, Select, Switch } from 'antd';
 
@@ -11,33 +12,35 @@ import {
 	putSettings,
 } from '../../batteries/modules/actions';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
-import { SettingsFooter } from '../../components/SettingsFooter';
+import SettingsFooter from '../../components/SettingsFooter';
 import { container, label } from './styles';
-import { ReviewAndSave } from '../../components/ReviewAndSave';
-import { SettingTooltip } from '../../components/SettingTooltip';
-import { settingsMap } from '../../components/ReviewAndSave/helper';
+import ReviewAndSave from '../../components/ReviewAndSave';
+import SettingTooltip from '../../components/SettingTooltip';
+import settingsMap from '../../components/ReviewAndSave/helper';
 import { getTraversedMappingsByAppName } from '../../batteries/modules/selectors';
 import { isEqual, isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
+import { allowedTiers } from '../../utils/prop-types';
 
 const bannerDetails = {
 	title: 'Result Settings',
 	buttonText: 'Read More',
 	icon: 'pencil',
-	href: 'https://docs.appbase.io/docs/search/Preview/',
+	href: 'https://docs.appbase.io/docs/search/relevancy/#result-settings',
 };
 
 const bannerMessage = {
 	title: 'Result Settings',
 	buttonText: 'Read Docs',
+	href: 'https://docs.appbase.io/docs/search/relevancy/#result-settings',
 };
 
-const getDisabled = value => {
+const getDisabled = (value) => {
 	if (Array.isArray(value)) return value[0] === '*';
 	return false;
 };
 
-const calculateValue = value => {
+const calculateValue = (value) => {
 	const index = value.indexOf('*');
 	if (index > -1) {
 		if (index === 0 && value.length !== 1) {
@@ -63,7 +66,7 @@ class ResultsPage extends React.Component {
 			getDefaultSettingsAction,
 			defaultSettings,
 		} = this.props;
-		getSettingsAction(appName).then(res => {
+		getSettingsAction(appName).then((res) => {
 			if (res && res.payload) {
 				this.setFormValues(res, getFieldDecorator, setFieldsValue);
 			}
@@ -71,24 +74,6 @@ class ResultsPage extends React.Component {
 		if (!defaultSettings) getDefaultSettingsAction();
 		this.getMappings();
 	}
-
-	resetResultSettings = e => {
-		e.preventDefault();
-		const {
-			getDefaultSettingsAction,
-			form: { getFieldDecorator, setFieldsValue },
-			defaultSettings,
-		} = this.props;
-		if (defaultSettings)
-			this.setFormValues({ payload: defaultSettings }, getFieldDecorator, setFieldsValue);
-		else
-			getDefaultSettingsAction().then(res => {
-				if (res && res.payload) {
-					this.setFormValues(res, getFieldDecorator, setFieldsValue);
-				}
-			});
-		this.toggleVisible(true);
-	};
 
 	setFormValues = (res, getFieldDecorator, setFieldsValue) => {
 		const { results } = res.payload;
@@ -112,22 +97,22 @@ class ResultsPage extends React.Component {
 		});
 	};
 
-	registerFields = getFieldDecorator => {
-		getFieldDecorator('number_of_fragments');
-		getFieldDecorator('fragment_size');
-		getFieldDecorator('pre_tags');
-		getFieldDecorator('post_tags');
-		getFieldDecorator('highlightFields');
-	};
+	getMappings() {
+		const { appName, fetchMappings, credentials, mappings } = this.props;
+		if (credentials && get(mappings, 'length') === 0) {
+			// Fetch Mappings if permissions are present
+			fetchMappings(appName, credentials);
+		}
+	}
 
-	handleSubmit = e => {
+	handleSubmit = (e) => {
 		e.preventDefault();
 		const { form, updateSettingsAction, appName, settings } = this.props;
 		form.validateFields((err, values) => {
 			if (!err) {
 				const resultsPayload = this.getResultsPayload(values);
 				updateSettingsAction(appName, { ...settings, results: resultsPayload }).then(
-					res => {
+					(res) => {
 						if (res && res.error) {
 							notification.error({
 								message: 'Error',
@@ -142,15 +127,33 @@ class ResultsPage extends React.Component {
 		});
 	};
 
-	getMappings() {
-		const { appName, fetchMappings, credentials, mappings } = this.props;
-		if (credentials && get(mappings, 'length') === 0) {
-			// Fetch Mappings if permissions are present
-			fetchMappings(appName, credentials);
-		}
-	}
+	resetResultSettings = (e) => {
+		e.preventDefault();
+		const {
+			getDefaultSettingsAction,
+			form: { getFieldDecorator, setFieldsValue },
+			defaultSettings,
+		} = this.props;
+		if (defaultSettings)
+			this.setFormValues({ payload: defaultSettings }, getFieldDecorator, setFieldsValue);
+		else
+			getDefaultSettingsAction().then((res) => {
+				if (res && res.payload) {
+					this.setFormValues(res, getFieldDecorator, setFieldsValue);
+				}
+			});
+		this.toggleVisible(true);
+	};
 
-	getResultsPayload = values => {
+	registerFields = (getFieldDecorator) => {
+		getFieldDecorator('number_of_fragments');
+		getFieldDecorator('fragment_size');
+		getFieldDecorator('pre_tags');
+		getFieldDecorator('post_tags');
+		getFieldDecorator('highlightFields');
+	};
+
+	getResultsPayload = (values) => {
 		const { defaultSettings } = this.props;
 		const defaultHighlightOptions = get(defaultSettings, 'results.highlightOptions', {});
 		const { pre_tags, number_of_fragments, fragment_size } = values;
@@ -176,149 +179,169 @@ class ResultsPage extends React.Component {
 		return resultsPayload;
 	};
 
-	renderIncludeExclude = (excludeFields, includeFields) => (
-		<>
-			<Form.Item
-				label={
-					<>
-						{settingsMap.includeFields.title}
-						<SettingTooltip title={settingsMap.includeFields.description} />
-					</>
-				}
-			>
-				<Select
-					placeholder="Select one ore more fields"
-					mode="tags"
-					notFoundContent={null}
-					style={{ width: '100%' }}
-					tokenSeparators={[',']}
-					disabled={getDisabled(excludeFields)}
-					value={includeFields}
-					onChange={value => this.setState({ includeFields: calculateValue(value) })}
+	renderIncludeExclude = (excludeFields, includeFields) => {
+		const { mappings } = this.props;
+		return (
+			<>
+				<Form.Item
+					label={
+						<>
+							{settingsMap.includeFields.title}
+							<SettingTooltip title={settingsMap.includeFields.description} />
+						</>
+					}
 				>
-					<Select.Option key="*">* (Include all fields)</Select.Option>
-					{(this.props.mappings || []).map(v => {
-						if (!excludeFields.includes(v)) {
-							return (
-								<Select.Option key={v} title={v}>
-									{v}
-								</Select.Option>
-							);
+					<Select
+						placeholder="Select one ore more fields"
+						mode="tags"
+						notFoundContent={null}
+						style={{ width: '100%' }}
+						tokenSeparators={[',']}
+						disabled={getDisabled(excludeFields)}
+						value={includeFields}
+						onChange={(value) =>
+							this.setState({ includeFields: calculateValue(value) })
 						}
-						return null;
-					})}
-				</Select>
-			</Form.Item>
+					>
+						<Select.Option key="*">* (Include all fields)</Select.Option>
+						{(mappings || []).map((v) => {
+							if (!excludeFields.includes(v)) {
+								return (
+									<Select.Option key={v} title={v}>
+										{v}
+									</Select.Option>
+								);
+							}
+							return null;
+						})}
+					</Select>
+				</Form.Item>
 
-			<Form.Item
-				label={
-					<>
-						{settingsMap.excludeFields.title}
-						<SettingTooltip title={settingsMap.excludeFields.description} />
-					</>
-				}
-			>
-				<Select
-					placeholder="Select one or more fields"
-					mode="tags"
-					notFoundContent={null}
-					style={{ width: '100%' }}
-					tokenSeparators={[',']}
-					disabled={getDisabled(includeFields)}
-					value={excludeFields}
-					onChange={value => this.setState({ excludeFields: calculateValue(value) })}
+				<Form.Item
+					label={
+						<>
+							{settingsMap.excludeFields.title}
+							<SettingTooltip title={settingsMap.excludeFields.description} />
+						</>
+					}
 				>
-					<Select.Option key="*">* (Exclude all fields)</Select.Option>
-					{(this.props.mappings || []).map(v => {
-						if (!includeFields.includes(v)) {
-							return (
-								<Select.Option key={v} title={v}>
-									{v}
-								</Select.Option>
-							);
-						}
-						return null;
-					})}
-				</Select>
-			</Form.Item>
-		</>
-	);
-
-	renderHighlightFields = (getFieldDecorator, defaultSettings) => (
-		<>
-			<Form.Item
-				label={
-					<>
-						{settingsMap.highlightFields.title}
-						<SettingTooltip title={settingsMap.highlightFields.description} />
-					</>
-				}
-			>
-				{getFieldDecorator('highlightFields', {
-					initialValue: get(defaultSettings, 'results.highlightFields'),
-				})(
 					<Select
 						placeholder="Select one or more fields"
 						mode="tags"
 						notFoundContent={null}
 						style={{ width: '100%' }}
 						tokenSeparators={[',']}
+						disabled={getDisabled(includeFields)}
+						value={excludeFields}
+						onChange={(value) =>
+							this.setState({ excludeFields: calculateValue(value) })
+						}
 					>
-						{(this.props.mappings || []).map(v => {
-							return (
-								<Select.Option key={v} title={v}>
-									{v}
-								</Select.Option>
-							);
+						<Select.Option key="*">* (Exclude all fields)</Select.Option>
+						{(mappings || []).map((v) => {
+							if (!includeFields.includes(v)) {
+								return (
+									<Select.Option key={v} title={v}>
+										{v}
+									</Select.Option>
+								);
+							}
+							return null;
 						})}
-					</Select>,
-				)}
-			</Form.Item>
-			<Form.Item
-				label={
-					<>
-						{settingsMap.highlightTag.title}
-						<SettingTooltip title={settingsMap.highlightTag.description} />
-					</>
-				}
-			>
-				{getFieldDecorator('pre_tags', {
-					initialValue: get(defaultSettings, 'results.highlightOptions.pre_tags.0'),
-					rules: [{ pattern: /^<\w*>$/g, message: 'Please enter a valid tag' }],
-				})(<Input style={{ width: '17%' }} placeholder="<mark>" />)}
-			</Form.Item>
-			<Form.Item
-				label={
-					<>
-						{settingsMap.highlightFragment.title}
-						<SettingTooltip title={settingsMap.highlightFragment.description} />
-					</>
-				}
-			>
-				{getFieldDecorator('fragment_size', {
-					initialValue: get(defaultSettings, 'results.highlightOptions.fragment_size'),
-				})(<InputNumber style={{ width: '17%' }} placeholder="100" />)}
-			</Form.Item>
-			<Form.Item
-				label={
-					<>
-						{settingsMap.highlightTotalFragments.title}
-						<SettingTooltip title={settingsMap.highlightTotalFragments.description} />
-					</>
-				}
-			>
-				{getFieldDecorator('number_of_fragments', {
-					initialValue: get(
-						defaultSettings,
-						'results.highlightOptions.number_of_fragments',
-					),
-				})(<InputNumber style={{ width: '17%' }} placeholder="5" />)}
-			</Form.Item>
-		</>
-	);
+					</Select>
+				</Form.Item>
+			</>
+		);
+	};
+
+	renderHighlightFields = (getFieldDecorator, defaultSettings) => {
+		const { mappings } = this.props;
+		return (
+			<>
+				<Form.Item
+					label={
+						<>
+							{settingsMap.highlightFields.title}
+							<SettingTooltip title={settingsMap.highlightFields.description} />
+						</>
+					}
+				>
+					{getFieldDecorator('highlightFields', {
+						initialValue: get(defaultSettings, 'results.highlightFields'),
+					})(
+						<Select
+							placeholder="Select one or more fields"
+							mode="tags"
+							notFoundContent={null}
+							style={{ width: '100%' }}
+							tokenSeparators={[',']}
+						>
+							{(mappings || []).map((v) => {
+								return (
+									<Select.Option key={v} title={v}>
+										{v}
+									</Select.Option>
+								);
+							})}
+						</Select>,
+					)}
+				</Form.Item>
+				<Form.Item
+					label={
+						<>
+							{settingsMap.highlightTag.title}
+							<SettingTooltip title={settingsMap.highlightTag.description} />
+						</>
+					}
+				>
+					{getFieldDecorator('pre_tags', {
+						initialValue: get(defaultSettings, 'results.highlightOptions.pre_tags.0'),
+						rules: [
+							{
+								pattern: /^<\w*>$/g,
+								message: 'Please enter a valid tag',
+							},
+						],
+					})(<Input style={{ width: '17%' }} placeholder="<mark>" />)}
+				</Form.Item>
+				<Form.Item
+					label={
+						<>
+							{settingsMap.highlightFragment.title}
+							<SettingTooltip title={settingsMap.highlightFragment.description} />
+						</>
+					}
+				>
+					{getFieldDecorator('fragment_size', {
+						initialValue: get(
+							defaultSettings,
+							'results.highlightOptions.fragment_size',
+						),
+					})(<InputNumber style={{ width: '17%' }} placeholder="100" />)}
+				</Form.Item>
+				<Form.Item
+					label={
+						<>
+							{settingsMap.highlightTotalFragments.title}
+							<SettingTooltip
+								title={settingsMap.highlightTotalFragments.description}
+							/>
+						</>
+					}
+				>
+					{getFieldDecorator('number_of_fragments', {
+						initialValue: get(
+							defaultSettings,
+							'results.highlightOptions.number_of_fragments',
+						),
+					})(<InputNumber style={{ width: '17%' }} placeholder="5" />)}
+				</Form.Item>
+			</>
+		);
+	};
 
 	toggleVisible = (isReset = false) => {
-		this.setState(prevState => ({ visible: !prevState.visible, isReset }));
+		this.setState((prevState) => ({ visible: !prevState.visible, isReset }));
 	};
 
 	revertChanges = (settings, getFieldDecorator, setFieldsValue) => {
@@ -348,7 +371,7 @@ class ResultsPage extends React.Component {
 		if (!isValidPlan(tier, featureSearchRelevancy)) {
 			return (
 				<React.Fragment>
-					<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
+					<Banner {...bannerDetails} />
 					<Overlay
 						style={{
 							maxWidth: '70%',
@@ -432,7 +455,7 @@ class ResultsPage extends React.Component {
 								onRevert={() => {
 									this.revertChanges(settings, getFieldDecorator, setFieldsValue);
 								}}
-								onSave={e => {
+								onSave={(e) => {
 									this.handleSubmit(e);
 									this.toggleVisible();
 								}}
@@ -445,10 +468,38 @@ class ResultsPage extends React.Component {
 	}
 }
 
-const mapStateToProps = state => {
+ResultsPage.propTypes = {
+	form: PropTypes.object.isRequired,
+	isUpdating: PropTypes.bool,
+	resetState: PropTypes.object,
+	settings: PropTypes.object,
+	appName: PropTypes.string.isRequired,
+	defaultSettings: PropTypes.object,
+	tier: allowedTiers,
+	featureSearchRelevancy: PropTypes.bool,
+	getDefaultSettingsAction: PropTypes.func.isRequired,
+	getSettingsAction: PropTypes.func.isRequired,
+	updateSettingsAction: PropTypes.func.isRequired,
+	fetchMappings: PropTypes.func.isRequired,
+	credentials: PropTypes.string.isRequired,
+	mappings: PropTypes.array,
+};
+
+ResultsPage.defaultProps = {
+	isUpdating: false,
+	resetState: {},
+	settings: null,
+	defaultSettings: null,
+	tier: undefined,
+	featureSearchRelevancy: false,
+	mappings: [],
+};
+
+const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');
 	const mappings = getTraversedMappingsByAppName(state);
-	const parsedMappings = Array.isArray(mappings) ? mappings : [];
+	// when elasticsearch v6, mappings is an object with values corresponding to _doc key
+	const parsedMappings = Array.isArray(mappings) ? mappings : get(mappings, '_doc', []);
 	const { username, password } = get(state, 'user.data', {});
 	return {
 		appName,
@@ -464,9 +515,9 @@ const mapStateToProps = state => {
 	};
 };
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
-	getSettingsAction: name => dispatch(getSettings(name)),
+	getSettingsAction: (name) => dispatch(getSettings(name)),
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
 	fetchMappings: (appName, credentials) => dispatch(getAppMappings(appName, credentials)),
 });

@@ -1,10 +1,10 @@
 import React from 'react';
-import { Icon, Input, Select, Button, Alert } from 'antd';
+import { Alert, Button, Icon, Input, Select } from 'antd';
 import PropTypes from 'prop-types';
 import styles from './styles';
 import Grid from './Grid';
 import Flex from '../../batteries/components/shared/Flex';
-import { Suggestions, getSuggestionCode, ipValidator } from './utils';
+import { getSuggestionCode, ipValidator, Suggestions } from './utils';
 
 class WhiteList extends React.Component {
 	constructor(props) {
@@ -15,7 +15,7 @@ class WhiteList extends React.Component {
 		};
 	}
 
-	handleSelectOption = value => {
+	handleSelectOption = (value) => {
 		this.setState(() => {
 			const { control } = this.props;
 			if (value && !control.value.includes(value)) {
@@ -30,13 +30,13 @@ class WhiteList extends React.Component {
 		});
 	};
 
-	handleOnChange = value => {
+	handleOnChange = (value) => {
 		this.setState({
 			text: value,
 		});
 	};
 
-	handleOnSearch = value => {
+	handleOnSearch = (value) => {
 		if (!(value && value.startsWith('**'))) {
 			this.setState({
 				text: value.trim(),
@@ -44,7 +44,7 @@ class WhiteList extends React.Component {
 		}
 	};
 
-	removeItem = item => {
+	removeItem = (item) => {
 		const { control } = this.props;
 		const { value } = control;
 		const index = value.indexOf(item);
@@ -55,22 +55,24 @@ class WhiteList extends React.Component {
 	};
 
 	submitOnBlur = () => {
-		if (!this.props.control.value.includes(this.state.text)) {
-			if (ipValidator(this.state.text)) {
-				this.props.control.onChange([...this.props.control.value, this.state.text]);
+		const { control } = this.props;
+		const { text } = this.state;
+		if (!control.value.includes(text)) {
+			if (ipValidator(text)) {
+				control.onChange([...control.value, text]);
 				this.setState({
 					text: undefined,
 				});
-			} else if (this.state.text) {
-				this.props.control.setErrors({ invalidIP: true });
+			} else if (text) {
+				control.setErrors({ invalidIP: true });
 			} else {
-				this.props.control.setErrors(undefined);
+				control.setErrors(undefined);
 			}
 		} else {
 			this.setState({
 				text: undefined,
 			});
-			this.props.control.setErrors(undefined);
+			control.setErrors(undefined);
 		}
 	};
 
@@ -114,7 +116,7 @@ class WhiteList extends React.Component {
 							/>
 						)}
 
-						{value.map(item => (
+						{value.map((item) => (
 							<Flex
 								key={item}
 								justifyContent="space-between"
@@ -163,7 +165,7 @@ class WhiteList extends React.Component {
 											</Flex>
 										</Select.Option>
 									) : (
-										Object.keys(Suggestions).map(k => {
+										Object.keys(Suggestions).map((k) => {
 											const suggestion = Suggestions[k];
 											if (text) {
 												const suggestionValue = `${suggestion.prefix}${text}${suggestion.suffix}`;
@@ -203,11 +205,11 @@ class WhiteList extends React.Component {
 									{...inputProps}
 									{...handler()}
 									value={text}
-									onChange={e => {
+									onChange={(e) => {
 										this.handleOnChange(e.target.value);
 									}}
 									onBlur={this.submitOnBlur}
-									onKeyPress={event => {
+									onKeyPress={(event) => {
 										if (event.key === 'Enter') {
 											this.submitOnBlur();
 										}
@@ -225,11 +227,19 @@ class WhiteList extends React.Component {
 WhiteList.propTypes = {
 	handleWarningMessage: PropTypes.func,
 	defaultValue: PropTypes.string,
-	label: PropTypes.string,
-	toolTipMessage: PropTypes.any,
+	label: PropTypes.string.isRequired,
+	toolTipMessage: PropTypes.any.isRequired,
 	inputProps: PropTypes.object,
 	defaultSuggestionValue: PropTypes.string,
-	control: PropTypes.object,
-	type: PropTypes.oneOf(['dropdown']),
+	control: PropTypes.object.isRequired,
+	type: PropTypes.oneOf(['dropdown']).isRequired,
 };
+
+WhiteList.defaultProps = {
+	handleWarningMessage: () => {},
+	defaultValue: undefined,
+	inputProps: {},
+	defaultSuggestionValue: undefined,
+};
+
 export default WhiteList;

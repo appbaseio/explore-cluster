@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Button, Card, Icon, Tooltip, Typography } from 'antd';
 import { css } from 'emotion';
 import DNDWrapper from '../../../../components/DNDWrapper';
@@ -11,7 +12,7 @@ import ExecuteFunction from './ExecuteFunction';
 import { getErrorMessage } from '../../utils/error';
 import { hasValuesChanged, toolTips } from '../../utils';
 import RemoveWord from './RemoveWord';
-import { Info } from '../../../../components/Info';
+import Info from '../../../../components/Info';
 
 const componentMappings = {
 	replace_search_term: ReplaceSearch,
@@ -33,7 +34,7 @@ const actionMapping = {
 	replace_words: 'Replace Word',
 };
 
-const errorKeys = Object.keys(actionMapping).map(item => `error.${item}`);
+const errorKeys = Object.keys(actionMapping).map((item) => `error.${item}`);
 
 const cardStyles = css`
 	margin-bottom: 15px;
@@ -81,7 +82,7 @@ class Actions extends React.Component {
 		]);
 	}
 
-	onDragEnd = result => {
+	onDragEnd = (result) => {
 		if (result.source.index !== result.destination.index) {
 			const { actions: originalActions, onChange } = this.props;
 			const actions = JSON.parse(JSON.stringify(originalActions));
@@ -99,7 +100,7 @@ class Actions extends React.Component {
 		let actions = JSON.parse(JSON.stringify(originalActions));
 		switch (type) {
 			case 'replace_search_term': {
-				actions = actions.map(action => {
+				actions = actions.map((action) => {
 					if (action.type === 'replace_search_term') {
 						return {
 							...action,
@@ -111,7 +112,7 @@ class Actions extends React.Component {
 				break;
 			}
 			case 'custom_data': {
-				actions = actions.map(action => {
+				actions = actions.map((action) => {
 					if (action.type === 'custom_data') {
 						return {
 							...action,
@@ -123,7 +124,7 @@ class Actions extends React.Component {
 				break;
 			}
 			case 'promote_result': {
-				actions = actions.map(action => {
+				actions = actions.map((action) => {
 					if (action.type === 'promote_result') {
 						return {
 							...action,
@@ -135,7 +136,7 @@ class Actions extends React.Component {
 				break;
 			}
 			case 'hide_result': {
-				actions = actions.map(action => {
+				actions = actions.map((action) => {
 					if (action.type === 'hide_result') {
 						return {
 							...action,
@@ -147,7 +148,7 @@ class Actions extends React.Component {
 				break;
 			}
 			case 'function': {
-				actions = actions.map(action => {
+				actions = actions.map((action) => {
 					if (action.type === 'function') {
 						return {
 							...action,
@@ -159,7 +160,7 @@ class Actions extends React.Component {
 				break;
 			}
 			case 'remove_words': {
-				actions = actions.map(action => {
+				actions = actions.map((action) => {
 					if (action.type === 'remove_words') {
 						return {
 							...action,
@@ -171,7 +172,7 @@ class Actions extends React.Component {
 				break;
 			}
 			case 'replace_words': {
-				actions = actions.map(action => {
+				actions = actions.map((action) => {
 					if (action.type === 'replace_words') {
 						return {
 							...action,
@@ -192,7 +193,7 @@ class Actions extends React.Component {
 		});
 	};
 
-	renderComponent = item => {
+	renderComponent = (item) => {
 		const Component = componentMappings[item.type];
 		const getProps = () => {
 			const defaultProps = { value: item.data };
@@ -209,7 +210,7 @@ class Actions extends React.Component {
 		if (Component) {
 			return (
 				<Component
-					onChange={value => this.handleChange(item.type, value)}
+					onChange={(value) => this.handleChange(item.type, value)}
 					{...getProps()}
 				/>
 			);
@@ -217,10 +218,10 @@ class Actions extends React.Component {
 		return null;
 	};
 
-	deleteAction = type => {
+	deleteAction = (type) => {
 		const { actions: originalActions, onChange } = this.props;
 		const actions = JSON.parse(JSON.stringify(originalActions)).filter(
-			item => item.type !== type,
+			(item) => item.type !== type,
 		);
 
 		onChange(actions, {
@@ -300,5 +301,20 @@ class Actions extends React.Component {
 		);
 	}
 }
+
+Actions.propTypes = {
+	actions: PropTypes.array,
+	onChange: PropTypes.func.isRequired,
+	error: PropTypes.object,
+	indexes: PropTypes.array,
+	searchFields: PropTypes.array,
+};
+
+Actions.defaultProps = {
+	actions: [],
+	error: {},
+	indexes: [],
+	searchFields: [],
+};
 
 export default Actions;

@@ -25,8 +25,7 @@ const bannerMessagesAnalytics = {
 		title: 'No Result Searches',
 		description: 'Understand which user searches are yielding no results.',
 		buttonText: 'Read Docs',
-		href:
-			'https://docs.appbase.io/docs/analytics/Overview/#understand-content-gaps-with-no-results-queries',
+		href: 'https://docs.appbase.io/docs/analytics/overview/#identify-content-gaps',
 	},
 };
 
@@ -46,11 +45,11 @@ const NoResultSearchWrapper = ({ appName, plan, isPaidUser }) => (
 				</Container>
 			</React.Fragment>
 		) : (
-				<React.Fragment>
-					<Banner {...bannerMessagesAnalytics.free} />
-					<Overlay src="/static/images/analytics/NoResults.png" alt="no results searches" />
-				</React.Fragment>
-			)}
+			<React.Fragment>
+				<Banner {...bannerMessagesAnalytics.free} />
+				<Overlay src="/static/images/analytics/NoResults.png" alt="no results searches" />
+			</React.Fragment>
+		)}
 	</React.Fragment>
 );
 
@@ -60,7 +59,7 @@ NoResultSearchWrapper.propTypes = {
 	isPaidUser: PropTypes.bool.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	appName: get(state, '$getCurrentApp.name'),
 	plan: get(state, '$getAppPlan.results.plan'),
 	isPaidUser: get(state, '$getAppPlan.results.isPaid'),

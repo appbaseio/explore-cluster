@@ -27,17 +27,17 @@ export const getSynonymsState = ({ synonyms, type }) => {
 	return {};
 };
 
-export const hasSynonymsAnalyzer = settings => {
+export const hasSynonymsAnalyzer = (settings) => {
 	const synonymAnalyzer = get(settings, 'index.analysis.analyzer.synonym');
 
 	return !!synonymAnalyzer;
 };
 
-export const hasSynonymsSubFields = mappings => {
+export const hasSynonymsSubFields = (mappings) => {
 	const version = getVersion()[0];
 	const traversedMappings = getMappingsTree(mappings, +version);
 	const synonymNotPresent = Object.keys(traversedMappings).some(
-		mapping =>
+		(mapping) =>
 			traversedMappings[mapping] &&
 			traversedMappings[mapping].fields &&
 			traversedMappings[mapping].fields.includes('search') &&
@@ -74,7 +74,7 @@ export const getSynonymsAnalyzerSettings = ({ settings, isSynonymsAnalyzerPresen
 				...get(settings, 'index.analysis.analyzer', {}),
 				synonyms: {
 					tokenizer: 'standard',
-					filter: ['synonym_graph', 'lowercase'],
+					filter: ['lowercase', 'synonym_graph'],
 				},
 			},
 		},
@@ -156,7 +156,7 @@ export const updateMappingsProperties = ({ mappings: originalMapping, types }) =
 	return mapping;
 };
 
-export const getUpdatedSynonymsSubfields = mappings => {
+export const getUpdatedSynonymsSubfields = (mappings) => {
 	return updateMappingsProperties({ mappings, types: Object.keys(mappings) });
 };
 
@@ -214,7 +214,7 @@ export const updateSynonymsSettings = ({
 						acknowledged: true,
 					});
 				})
-				.catch(e => {
+				.catch((e) => {
 					reject(e.message || 'Failed while updating synonyms');
 				});
 		};
@@ -234,7 +234,7 @@ export const updateSynonymsSettings = ({
 						acknowledged: true,
 					});
 				})
-				.catch(e => {
+				.catch((e) => {
 					if (e.message === 'AWS') {
 						handleReindex();
 					} else {

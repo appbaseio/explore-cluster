@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { FUNCTIONS } from '../../../../../constants';
-import { InvokeFunctionBody } from '../../../../../components/InvokeFunctionModal/InvokeFunctionBody';
+import InvokeFunctionBody from '../../../../../components/InvokeFunctionModal/InvokeFunctionBody';
 import { invokeFunction } from '../../../../../batteries/utils/app';
 import { getPayload } from '../../../../../components/InvokeFunctionModal';
 
@@ -13,7 +14,7 @@ class TestFunction extends Component {
 		parsedData: getPayload({}, true),
 	};
 
-	handleRequestDataChange = value => {
+	handleRequestDataChange = (value) => {
 		let isValid = true;
 		this.setState({ requestData: value });
 		try {
@@ -67,5 +68,9 @@ class TestFunction extends Component {
 		);
 	}
 }
+
+TestFunction.propTypes = {
+	functionName: PropTypes.string.isRequired,
+};
 
 export default TestFunction;

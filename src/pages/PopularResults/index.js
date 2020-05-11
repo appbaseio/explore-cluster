@@ -26,7 +26,7 @@ const bannerMessagesAnalytics = {
 		title: 'Popular Results',
 		description: 'Understand how to make the most of the popular results analytics.',
 		buttonText: 'Read Docs',
-		href: 'https://docs.appbase.io/docs/analytics/Overview/#top-search-results',
+		href: 'https://docs.appbase.io/docs/analytics/overview/#popular-results',
 	},
 };
 
@@ -59,7 +59,7 @@ PopularResultsWrapper.propTypes = {
 	isGrowth: PropTypes.bool.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	appName: get(state, '$getCurrentApp.name'),
 	plan: get(state, '$getAppPlan.results.plan'),
 	isGrowth: get(state, '$getAppPlan.results.isPaid'),

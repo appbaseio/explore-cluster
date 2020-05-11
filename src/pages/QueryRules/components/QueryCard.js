@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Button, Card, Col, Icon, message, Row, Switch, Tooltip, Typography } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
@@ -108,7 +109,7 @@ class QueryCard extends React.Component {
 		}
 	}
 
-	handleRuleStatus = value => {
+	handleRuleStatus = (value) => {
 		const { toggleRule, rule } = this.props;
 		toggleRule({
 			id: rule.id,
@@ -149,7 +150,7 @@ class QueryCard extends React.Component {
 						</p>
 					</Col>
 					<Col lg={7} md={12} sm={24}>
-						{get(rule, 'actions', []).map(action => (
+						{get(rule, 'actions', []).map((action) => (
 							<div key={action.type} className={section}>
 								<ActionView action={action} />
 							</div>
@@ -213,9 +214,24 @@ class QueryCard extends React.Component {
 	}
 }
 
-const mapDispatchToProps = dispatch => ({
-	removeRule: id => dispatch(deleteRule(id)),
-	toggleRule: rule => dispatch(toggleRuleStatus(rule)),
+QueryCard.propTypes = {
+	rule: PropTypes.object,
+	dragProvided: PropTypes.object,
+	dragSnapshot: PropTypes.object,
+	removeRule: PropTypes.func.isRequired,
+	toggleRule: PropTypes.func.isRequired,
+	index: PropTypes.number.isRequired,
+};
+
+QueryCard.defaultProps = {
+	rule: {},
+	dragProvided: {},
+	dragSnapshot: {},
+};
+
+const mapDispatchToProps = (dispatch) => ({
+	removeRule: (id) => dispatch(deleteRule(id)),
+	toggleRule: (rule) => dispatch(toggleRuleStatus(rule)),
 });
 
 export default connect(null, mapDispatchToProps)(QueryCard);

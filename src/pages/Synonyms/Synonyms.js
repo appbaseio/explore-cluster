@@ -1,5 +1,6 @@
 import React from 'react';
-import { Card, Table, Icon, Button, message } from 'antd';
+import PropTypes from 'prop-types';
+import { Card, Table, Icon, Button, message, Popconfirm } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
@@ -16,11 +17,11 @@ import { getSynonyms, deleteSynonym } from './api';
 import { getURL } from '../../constants/config';
 import { getSettings, getMappings } from '../../batteries/utils/mappings';
 import { getSynonymsAnalyzerSettings, updateSynonymsSettings } from './utils';
-import DeleteModal from '../../components/DeleteModal/DeleteModal';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
-import { SettingsFooter } from '../../components/SettingsFooter';
+import SettingsFooter from '../../components/SettingsFooter';
 import { isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
+import { allowedTiers } from '../../utils/prop-types';
 
 const expression = css`
 	font-weight: 15px;
@@ -103,17 +104,17 @@ class Synonyms extends React.Component {
 			appName,
 			credentials,
 		})
-			.then(res => {
+			.then((res) => {
 				this.setState({
 					synonyms: res || [],
 				});
 			})
-			.catch(e => {
+			.catch((e) => {
 				message.error(e.message);
 			});
 	};
 
-	handleDelete = async id => {
+	handleDelete = async (id) => {
 		const { credentials, appName } = this.props;
 		const { synonyms } = this.state;
 		const url = getURL();
@@ -121,11 +122,13 @@ class Synonyms extends React.Component {
 			isDeleting: id,
 		});
 		const settings = await getSettings(appName, credentials, url).then(
-			data => data[appName].settings,
+			(data) => data[appName].settings,
 		);
 
 		const mappings = await getMappings(appName, credentials, url);
-		const syonymsToBeSaved = synonyms.filter(syn => syn._id !== id).map(item => item.synonym);
+		const syonymsToBeSaved = synonyms
+			.filter((syn) => syn._id !== id)
+			.map((item) => item.synonym);
 		const synonymsAnalyzerSettings = getSynonymsAnalyzerSettings({
 			settings,
 			isSynonymsAnalyzerPresent: true,
@@ -142,10 +145,10 @@ class Synonyms extends React.Component {
 						isDeleting: null,
 					});
 					message.success('Successfully deleted synonym');
-					const filteredSynonyms = synonyms.filter(syn => syn._id !== id);
+					const filteredSynonyms = synonyms.filter((syn) => syn._id !== id);
 					this.handleUpdate(filteredSynonyms);
 				})
-				.catch(e => {
+				.catch((e) => {
 					this.setState({
 						isDeleting: null,
 					});
@@ -161,13 +164,13 @@ class Synonyms extends React.Component {
 			appName,
 		})
 			.then(updateBackend)
-			.catch(e => {
+			.catch((e) => {
 				this.toggleLoading();
 				message.error(e.message || 'Failed to delete synonyms');
 			});
 	};
 
-	handleUpdate = synonyms => {
+	handleUpdate = (synonyms) => {
 		this.setState({
 			key: Date.now(),
 			synonyms,
@@ -182,6 +185,7 @@ class Synonyms extends React.Component {
 		const bannerMessage = {
 			title: 'Manage Synonyms',
 			buttonText: 'Read Docs',
+			href: 'https://docs.appbase.io/docs/search/relevancy/#synonyms',
 		};
 
 		if (!isValidPlan(tier, featureSynonyms)) {
@@ -213,8 +217,6 @@ class Synonyms extends React.Component {
 					if (record.type === 'one-way') {
 						return (
 							<span className={expression}>
-								{value.split('=>')[1]}
-								<Icon className="light" type="arrow-right" />
 								<span>( </span>
 								{value
 									.split('=>')[0]
@@ -231,6 +233,8 @@ class Synonyms extends React.Component {
 										);
 									})}
 								<span> )</span>
+								<Icon className="light" type="arrow-right" />
+								{value.split('=>')[1]}
 							</span>
 						);
 					}
@@ -278,35 +282,27 @@ class Synonyms extends React.Component {
 									);
 								}}
 							/>
-							<DeleteModal
-								text={
-									<React.Fragment>
-										Type <strong>SYNONYM</strong> to confirm deletion.
-									</React.Fragment>
-								}
-								title="Delete Synonym"
-								value="SYNONYM"
-								name="SYNONYM"
-								onDelete={() => this.handleDelete(value)}
+
+							<Popconfirm
+								title="Are you sure you want to delete synonym？"
+								okText="Yes"
+								cancelText="No"
+								onConfirm={() => this.handleDelete(value)}
 							>
-								{({ handleModal }) => (
-									<Button
-										shape="circle-outline"
-										size="small"
-										loading={isDeleting === value}
-										type="danger"
-										onClick={handleModal}
-										icon="delete"
-									/>
-								)}
-							</DeleteModal>
+								<Button
+									shape="circle-outline"
+									size="small"
+									loading={isDeleting === value}
+									type="danger"
+									icon="delete"
+								/>
+							</Popconfirm>
 						</div>
 					);
 				},
 				width: 100,
 			},
 		];
-
 
 		return (
 			<React.Fragment>
@@ -363,6 +359,7 @@ class Synonyms extends React.Component {
 									refetch={this.fetchSynonym}
 									isAddModal
 									handleSynonyms={this.handleUpdate}
+									resetInputOnClose
 									renderButton={({ handleModal }) => {
 										return (
 											<Button onClick={handleModal} type="primary">
@@ -386,7 +383,7 @@ class Synonyms extends React.Component {
 								render={({ loading, data }) => (
 									<Table
 										loading={loading}
-										rowKey={row => {
+										rowKey={(row) => {
 											return row._id;
 										}}
 										pagination={false}
@@ -407,7 +404,19 @@ class Synonyms extends React.Component {
 	}
 }
 
-const mapStateToProps = state => {
+Synonyms.propTypes = {
+	appName: PropTypes.string.isRequired,
+	credentials: PropTypes.string.isRequired,
+	tier: allowedTiers,
+	featureSynonyms: PropTypes.bool,
+};
+
+Synonyms.defaultProps = {
+	tier: undefined,
+	featureSynonyms: false,
+};
+
+const mapStateToProps = (state) => {
 	const { username, password } = get(state, 'user.data', {});
 	return {
 		credentials: username ? `${username}:${password}` : null,

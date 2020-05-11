@@ -9,6 +9,7 @@ module.exports = {
 		'plugin:prettier/recommended',
 		'prettier/react',
 		'prettier/standard',
+		'plugin:jest/recommended',
 	],
 	env: {
 		browser: true,
@@ -18,7 +19,6 @@ module.exports = {
 		indent: 0,
 		'no-tabs': 0,
 		'no-underscore-dangle': 0,
-		'react/prop-types': 0,
 		'react/jsx-indent': 0,
 		'react/jsx-indent-props': 0,
 		'react/jsx-filename-extension': 0,

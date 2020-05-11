@@ -1,4 +1,6 @@
+/* eslint-disable camelcase */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
 import { Card, notification, message } from 'antd';
@@ -26,6 +28,7 @@ import { appendApp, loadApps, removeAppData } from '../../actions';
 const bannerMessage = {
 	title: 'Index Settings',
 	buttonText: 'Read Docs',
+	href: 'https://docs.appbase.io/docs/search/relevancy/#index-settings',
 };
 
 class IndexSettings extends React.Component {
@@ -62,8 +65,8 @@ class IndexSettings extends React.Component {
 		}
 	}
 
-	handleModal = name => {
-		this.setState(prevState => ({
+	handleModal = (name) => {
+		this.setState((prevState) => ({
 			[name]: !prevState[name],
 		}));
 	};
@@ -112,7 +115,7 @@ class IndexSettings extends React.Component {
 			},
 			credentials,
 		})
-			.then(res => {
+			.then((res) => {
 				if (res.acknowledged) {
 					addApp({ [appName]: { ...get(apps, ['data', appName], {}), rep: replicas } });
 					message.success('Replicas updated successfully');
@@ -126,7 +129,7 @@ class IndexSettings extends React.Component {
 					isUpdating: false,
 				});
 			})
-			.catch(e => {
+			.catch((e) => {
 				notification.error({
 					message: 'Replicas updation Failed',
 					description: e.message || JSON.stringify(e),
@@ -151,7 +154,7 @@ class IndexSettings extends React.Component {
 		const { shards, replicas, esVersion } = this.state;
 		const type = getTypesFromMapping(mappings);
 		let appSettings = await getSettings(appName, credentials).then(
-			data => data[appName].settings,
+			(data) => data[appName].settings,
 		);
 
 		appSettings = getUpdatedSettings({ settings: appSettings, shards, replicas });
@@ -174,7 +177,7 @@ class IndexSettings extends React.Component {
 				});
 				message.success('Number of shards updated successfully');
 			})
-			.catch(err => {
+			.catch((err) => {
 				console.error(err);
 				notification.error({
 					description: JSON.stringify(err),
@@ -243,7 +246,24 @@ class IndexSettings extends React.Component {
 	}
 }
 
-const mapStateToProps = state => {
+IndexSettings.propTypes = {
+	appName: PropTypes.string.isRequired,
+	credentials: PropTypes.string.isRequired,
+	fetchMappings: PropTypes.func.isRequired,
+	mappings: PropTypes.object,
+	fetchApps: PropTypes.func.isRequired,
+	addApp: PropTypes.func.isRequired,
+	apps: PropTypes.object,
+	isFetchingMapping: PropTypes.bool,
+};
+
+IndexSettings.defaultProps = {
+	mappings: null,
+	apps: {},
+	isFetchingMapping: false,
+};
+
+const mapStateToProps = (state) => {
 	const mappings = getRawMappingsByAppName(state) || null;
 
 	const { username, password } = get(state, 'user.data', {});
@@ -257,12 +277,12 @@ const mapStateToProps = state => {
 	};
 };
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	fetchMappings: (appName, credentials, url) =>
 		dispatch(getAppMappings(appName, credentials, url)),
-	updateCurrentApp: app => dispatch(setCurrentApp(app)),
-	addApp: app => dispatch(appendApp(app)),
-	deleteApp: appName => dispatch(removeAppData(appName)),
+	updateCurrentApp: (app) => dispatch(setCurrentApp(app)),
+	addApp: (app) => dispatch(appendApp(app)),
+	deleteApp: (appName) => dispatch(removeAppData(appName)),
 	fetchApps: () => dispatch(loadApps()),
 });
 

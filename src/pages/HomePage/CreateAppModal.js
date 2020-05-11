@@ -19,11 +19,12 @@ import { input, modalHeading, radiobtn } from './styles';
 import { validateAppName, validationsList } from '../../utils/helper';
 
 import { createApp, resetCreatedApp } from '../../actions';
-import { LanguageDropdown } from '../../components/LanguageDropdown';
+import LanguageDropdown from '../../components/LanguageDropdown';
 import languages from '../../constants/language';
 import { getDefaultSettings, putSettings } from '../../batteries/modules/actions';
 import { getLanguageFallback } from '../../utils/language';
 import { isValidPlan } from '../../batteries/utils';
+import { allowedTiers } from '../../utils/prop-types';
 
 const RadioGroup = Radio.Group;
 
@@ -60,7 +61,7 @@ class CreateAppModal extends Component {
 		let { language } = this.state;
 		language = getLanguageFallback(language);
 
-		const updateSettings = async settings => {
+		const updateSettings = async (settings) => {
 			await updateSettingsAction(appName, {
 				...settings,
 				language: {
@@ -74,7 +75,7 @@ class CreateAppModal extends Component {
 			if (defaultSettings) {
 				await updateSettings(defaultSettings);
 			} else {
-				getDefaultSettingsAction().then(async res => {
+				getDefaultSettingsAction().then(async (res) => {
 					if (res && res.payload) {
 						await updateSettings(res.payload);
 					}
@@ -123,7 +124,7 @@ class CreateAppModal extends Component {
 		}
 	};
 
-	handleChange = e => {
+	handleChange = (e) => {
 		const {
 			target: { name, value },
 		} = e;
@@ -222,8 +223,8 @@ class CreateAppModal extends Component {
 					<LanguageDropdown
 						style={{ width: '100%' }}
 						value={language}
-						onSelect={value => this.setState({ language: value })}
-						renderOption={lang => (
+						onSelect={(value) => this.setState({ language: value })}
+						renderOption={(lang) => (
 							<Select.Option key={lang.value} value={lang.value}>
 								{lang.label}
 							</Select.Option>
@@ -239,7 +240,7 @@ class CreateAppModal extends Component {
 						style={{ width: '100%' }}
 						min={0}
 						step={1}
-						onChange={value => this.handleInputNumber('shards', value)}
+						onChange={(value) => this.handleInputNumber('shards', value)}
 						value={shards}
 					/>
 					<h3 style={{ marginTop: 20 }} className={modalHeading}>
@@ -252,7 +253,7 @@ class CreateAppModal extends Component {
 						min={0}
 						style={{ width: '100%' }}
 						step={1}
-						onChange={value => this.handleInputNumber('replicas', value)}
+						onChange={(value) => this.handleInputNumber('replicas', value)}
 						value={replicas}
 					/>
 					{createdApp && createdApp.error ? (
@@ -288,9 +289,22 @@ CreateAppModal.propTypes = {
 	handleModal: PropTypes.func.isRequired,
 	createdApp: PropTypes.object.isRequired,
 	resetApp: PropTypes.func.isRequired,
+	history: PropTypes.object.isRequired,
+	updateSettingsAction: PropTypes.func.isRequired,
+	defaultSettings: PropTypes.object,
+	getDefaultSettingsAction: PropTypes.func.isRequired,
+	handleCreateApp: PropTypes.func.isRequired,
+	tier: allowedTiers,
+	featureSearchRelevancy: PropTypes.bool,
 };
 
-const mapStateToProps = state => ({
+CreateAppModal.defaultProps = {
+	defaultSettings: null,
+	tier: undefined,
+	featureSearchRelevancy: false,
+};
+
+const mapStateToProps = (state) => ({
 	apps: state.apps,
 	appsMetrics: state.appsMetrics,
 	createdApp: state.createdApp,
@@ -299,8 +313,8 @@ const mapStateToProps = state => ({
 	featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
 });
 
-const mapDispatchToProps = dispatch => ({
-	handleCreateApp: options => dispatch(createApp(options)),
+const mapDispatchToProps = (dispatch) => ({
+	handleCreateApp: (options) => dispatch(createApp(options)),
 	resetApp: () => dispatch(resetCreatedApp()),
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
 	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),

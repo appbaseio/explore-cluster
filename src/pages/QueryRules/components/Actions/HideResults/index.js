@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { ReactiveBase } from '@appbaseio/reactivesearch';
 import { notification, Tag } from 'antd';
 import { getURL } from '../../../../../constants/config';
@@ -68,14 +69,16 @@ class HideResults extends Component {
 					<GlobalSearch
 						indexes={indexes}
 						onValueSelected={this.onHide}
-						dataFields={(dataFields || []).map(field => field.replace(/.keyword/g, ''))}
+						dataFields={(dataFields || []).map((field) =>
+							field.replace(/.keyword/g, ''),
+						)}
 						ref={this.globalSearchRef}
 						// onKeyDown={this.handleAdd}
 					/>
 				</ReactiveBase>
 				<div>
-					{hiddenResults.map(id => (
-						<Tag key={id} closable onClose={e => this.onClose(e, id)}>
+					{hiddenResults.map((id) => (
+						<Tag key={id} closable onClose={(e) => this.onClose(e, id)}>
 							{id}
 						</Tag>
 					))}
@@ -85,8 +88,17 @@ class HideResults extends Component {
 	}
 }
 
+HideResults.propTypes = {
+	indexes: PropTypes.array,
+	dataFields: PropTypes.array,
+	value: PropTypes.array,
+	onChange: PropTypes.func.isRequired,
+};
+
 HideResults.defaultProps = {
-	hiddenResults: [],
+	indexes: [],
+	dataFields: [],
+	value: [],
 };
 
 export default HideResults;

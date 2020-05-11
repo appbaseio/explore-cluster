@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Loadable from 'react-loadable';
 import { Switch, Route } from 'react-router-dom';
 
@@ -144,82 +145,84 @@ class RouteContainer extends React.Component {
 					<Route
 						exact
 						path="/app/:appName"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={OverviewPage} />
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/overview"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={OverviewPage} />
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/analytics/:tab?/:subTab?"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={AnalyticsPage} />
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/popular-searches"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={PopularSearches} />
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/requests-per-minute"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={RequestDistributionPage} />
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/credentials"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={CredentialsPage} />
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/popular-results"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={PopularResults} />
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/geo-distribution"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={GeoDistributionPage} />
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/search-latency"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={SearchLatency} />
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/popular-filters"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={PopularFilters} />
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/request-logs/:tab?"
-						component={props => <AppPageContainer {...props} component={RequestLogs} />}
+						component={(props) => (
+							<AppPageContainer {...props} component={RequestLogs} />
+						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/no-results-searches"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer
 								{...props}
 								shouldFetchAppInfo={false}
@@ -231,7 +234,7 @@ class RouteContainer extends React.Component {
 					<Route
 						exact
 						path="/app/:appName/import"
-						render={props => (
+						render={(props) => (
 							<AppPageContainer
 								{...props}
 								component={ImporterPage}
@@ -243,7 +246,7 @@ class RouteContainer extends React.Component {
 					<Route
 						exact
 						path="/app/:appName/settings"
-						render={props => (
+						render={(props) => (
 							<AppPageContainer
 								{...props}
 								component={MappingsPage}
@@ -254,19 +257,21 @@ class RouteContainer extends React.Component {
 					<Route
 						exact
 						path="/app/:appName/share-settings"
-						component={props => (
+						component={(props) => (
 							<AppPageContainer {...props} component={ShareSettings} />
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/billing"
-						component={props => <AppPageContainer {...props} component={BillingPage} />}
+						component={(props) => (
+							<AppPageContainer {...props} component={BillingPage} />
+						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/browse"
-						render={props => (
+						render={(props) => (
 							<AppPageContainer
 								{...props}
 								component={BrowserPage}
@@ -278,7 +283,7 @@ class RouteContainer extends React.Component {
 					<Route
 						exact
 						path="/app/:appName/query"
-						render={props => (
+						render={(props) => (
 							<AppPageContainer
 								{...props}
 								component={QueryExplorerPage}
@@ -290,7 +295,7 @@ class RouteContainer extends React.Component {
 					<Route
 						exact
 						path="/app/:appName/search-templates"
-						render={props => (
+						render={(props) => (
 							<AppPageContainer
 								{...props}
 								component={SearchTemplatesPage}
@@ -302,14 +307,14 @@ class RouteContainer extends React.Component {
 					<Route
 						exact
 						path="/app/:appName/query-suggestions"
-						render={props => (
+						render={(props) => (
 							<AppPageContainer {...props} component={QuerySuggestionsPage} />
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/search-preview"
-						render={props => (
+						render={(props) => (
 							<AppPageContainer
 								{...props}
 								component={SandboxPage}
@@ -322,7 +327,7 @@ class RouteContainer extends React.Component {
 					<Route
 						exact
 						path="/app/:appName/aggs"
-						render={props => (
+						render={(props) => (
 							<AppPageContainer
 								{...props}
 								component={AggsPage}
@@ -334,7 +339,7 @@ class RouteContainer extends React.Component {
 					<Route
 						exact
 						path="/app/:appName/results"
-						render={props => (
+						render={(props) => (
 							<AppPageContainer
 								{...props}
 								component={ResultsPage}
@@ -346,7 +351,7 @@ class RouteContainer extends React.Component {
 					<Route
 						exact
 						path="/app/:appName/index-settings"
-						render={props => (
+						render={(props) => (
 							<AppPageContainer
 								{...props}
 								component={IndexSettingsPage}
@@ -358,7 +363,7 @@ class RouteContainer extends React.Component {
 					<Route
 						exact
 						path="/app/:appName/languages"
-						render={props => (
+						render={(props) => (
 							<AppPageContainer
 								{...props}
 								component={LanguagePage}
@@ -371,7 +376,7 @@ class RouteContainer extends React.Component {
 					<Route
 						exact
 						path="/app/:appName/search"
-						render={props => (
+						render={(props) => (
 							<AppPageContainer
 								{...props}
 								component={SearchSettingsPage}
@@ -384,7 +389,7 @@ class RouteContainer extends React.Component {
 					<Route
 						exact
 						path="/app/:appName/synonyms"
-						render={props => (
+						render={(props) => (
 							<AppPageContainer
 								{...props}
 								component={SynonymsPage}
@@ -398,5 +403,9 @@ class RouteContainer extends React.Component {
 		);
 	}
 }
+
+RouteContainer.propTypes = {
+	location: PropTypes.object.isRequired,
+};
 
 export default RouteContainer;

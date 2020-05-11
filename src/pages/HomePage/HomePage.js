@@ -8,7 +8,6 @@ import PropTypes from 'prop-types';
 
 import Header from '../../components/Header';
 import CreateAppModal from './CreateAppModal';
-import Loader from '../../components/Loader';
 
 import { loadApps } from '../../actions';
 import { mediaKey } from '../../utils/media';
@@ -54,19 +53,17 @@ class HomePage extends Component {
 	}
 
 	handleChange = () => {
-		this.setState(state => ({
+		this.setState((state) => ({
 			showModal: !state.showModal,
 		}));
 	};
 
 	renderApps = () => {
 		const { apps } = this.props;
-		if (apps.isFetching) return <Loader style={{ marginTop: 20 }} />;
-
 		const sortedApps = apps.data ? Object.keys(apps.data) : [];
 		return (
 			<Row css={{ padding: 30 }} gutter={20}>
-				{sortedApps.length ? null : (
+				{sortedApps.length || apps.isFetching ? null : (
 					<section
 						css={{
 							display: 'flex',
@@ -89,7 +86,11 @@ class HomePage extends Component {
 					</section>
 				)}
 
-				<AppDataWrapper apps={apps} onCreateModalChange={this.handleChange} />
+				<AppDataWrapper
+					apps={apps}
+					onCreateModalChange={this.handleChange}
+					isFetching={apps.isFetching}
+				/>
 			</Row>
 		);
 	};
@@ -180,12 +181,12 @@ HomePage.propTypes = {
 	fetchApps: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	user: get(state, 'user.data.username'),
 	apps: get(state, 'apps'),
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	fetchApps: () => dispatch(loadApps()),
 });
 

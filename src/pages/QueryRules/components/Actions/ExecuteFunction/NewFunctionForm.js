@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-
+import PropTypes from 'prop-types';
 import { Button, notification, Result, Spin } from 'antd';
 import {
 	deploymentCheck,
 	handleInputClosure,
 } from '../../../../../components/DeployFunctionModal/helper';
-import { DeployFunctionForm } from '../../../../../components/DeployFunctionModal/DeployFunctionForm';
+import DeployFunctionForm from '../../../../../components/DeployFunctionModal/DeployFunctionForm';
 import { createFunction, getSingleFunction } from '../../../../../batteries/utils/app';
 import TestFunction from './TestFunction';
 
@@ -16,9 +16,9 @@ class NewFunctionForm extends Component {
 		this.setState({ [key]: value });
 	};
 
-	setError = error => this.setState({ error });
+	setError = (error) => this.setState({ error });
 
-	handleSubmit = async e => {
+	handleSubmit = async (e) => {
 		e.preventDefault();
 		const { functionName, dockerImage } = this.state;
 		const { onSuccess, onChange } = this.props;
@@ -26,7 +26,7 @@ class NewFunctionForm extends Component {
 			functionName: !functionName,
 			dockerImage: !dockerImage,
 		});
-		if ([functionName, dockerImage].some(item => !item)) return;
+		if ([functionName, dockerImage].some((item) => !item)) return;
 		let myInterval = null;
 		const handleDeploymentCheck = async () => {
 			const res = await deploymentCheck(getSingleFunction, functionName, myInterval);
@@ -85,10 +85,10 @@ class NewFunctionForm extends Component {
 					setGlobalError={this.setError}
 					functionName={functionName}
 					handleInputRequired={handleInputRequired}
-					setFunctionName={value => this.setFormValue('functionName', value)}
+					setFunctionName={(value) => this.setFormValue('functionName', value)}
 					dockerImage={dockerImage}
-					setDockerImage={value => this.setFormValue('dockerImage', value)}
-					onChange={e => this.setFormValue('radioValue', e.target.value)}
+					setDockerImage={(value) => this.setFormValue('dockerImage', value)}
+					onChange={(e) => this.setFormValue('radioValue', e.target.value)}
 					value={radioValue || 'yes'}
 				/>
 				<Button
@@ -103,5 +103,10 @@ class NewFunctionForm extends Component {
 		);
 	}
 }
+
+NewFunctionForm.propTypes = {
+	onChange: PropTypes.func.isRequired,
+	onSuccess: PropTypes.func.isRequired,
+};
 
 export default NewFunctionForm;

@@ -1,12 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { Button, Col, Icon, Empty } from 'antd';
-import { Link } from 'react-router-dom';
+import { Col } from 'antd';
 import { css } from 'emotion';
 import AppCard from '../AppCard';
 import AppTable from '../AppTable';
 import AppFilters from '../AppFilters';
+import NoData from '../NoData';
+import Loader from '../Loader';
 
 const noData = css`
 	background-color: #ffffff;
@@ -17,30 +18,14 @@ const noData = css`
 	padding: 16px;
 `;
 
-export function renderNoData(onCreateModalChange) {
-	return (
-		<>
-			<Icon
-				type="exclamation-circle"
-				theme="outlined"
-				style={{
-					fontSize: 16,
-					marginBottom: 10,
-				}}
-			/>
-			<h4>No indices found</h4>
-			<Button onClick={onCreateModalChange}>Create a new index</Button>
-		</>
-	);
-}
-
-function AppDataWrapper({ apps, onCreateModalChange }) {
+function AppDataWrapper({ apps, onCreateModalChange, isFetching }) {
 	const renderData = (data, showListView) => {
+		if (isFetching) return <Loader style={{ marginTop: 40 }} />;
 		if (showListView) return <AppTable onCreateModalChange={onCreateModalChange} apps={data} />;
 		if (data.length === 0) {
-			return <div className={noData}>{renderNoData(onCreateModalChange)}</div>;
+			return <div className={noData}>{NoData(onCreateModalChange)}</div>;
 		}
-		return data.map(app => {
+		return data.map((app) => {
 			const title = (
 				<div
 					css={{
@@ -78,10 +63,14 @@ function AppDataWrapper({ apps, onCreateModalChange }) {
 
 AppDataWrapper.propTypes = {
 	apps: PropTypes.object,
+	onCreateModalChange: PropTypes.func,
+	isFetching: PropTypes.bool,
 };
 
 AppDataWrapper.defaultProps = {
 	apps: {},
+	onCreateModalChange: () => {},
+	isFetching: false,
 };
 
 export default AppDataWrapper;

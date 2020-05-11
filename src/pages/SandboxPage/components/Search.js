@@ -1,9 +1,10 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Card, Button, Icon, Row, Col, Tooltip } from 'antd';
 import { Link } from 'react-router-dom';
 import { DataSearch, SelectedFilters } from '@appbaseio/reactivesearch';
 import { css } from 'emotion';
-import { settingsMap } from '../../../components/ReviewAndSave/helper';
+import settingsMap from '../../../components/ReviewAndSave/helper';
 
 export const highlighter = css`
 	width: 6px;
@@ -36,8 +37,8 @@ export const highlighter = css`
 	animation: grow 1s infinite ease;
 `;
 
-const Search = props => {
-	const { app, search } = props;
+const Search = (props) => {
+	const { app, search, handleValueChange } = props;
 	return (
 		<Card>
 			<Row type="flex" gutter={8} align="middle" justify="space-between">
@@ -45,9 +46,6 @@ const Search = props => {
 					{search.dataField && search.dataField.length ? null : (
 						<div
 							style={{
-								position: 'absolute',
-								top: 0,
-								left: 0,
 								width: '100%',
 								height: '100%',
 								background: 'rgba(255,255,255,0.6)',
@@ -60,7 +58,19 @@ const Search = props => {
 							Set searchable fields to enable search.
 						</div>
 					)}
-					<DataSearch {...search} autosuggest componentId={search.id} />
+					{search.dataField && search.dataField.length ? (
+						<DataSearch
+							{...search}
+							autosuggest
+							onChange={(value) => handleValueChange(search.id, value)}
+							componentId={search.id}
+							onKeyDown={(e, triggerQuery) => {
+								if (e.key === 'Enter') {
+									triggerQuery();
+								}
+							}}
+						/>
+					) : null}
 				</Col>
 				<Col xs={4}>
 					<Link to={`/app/${app}/search`}>
@@ -81,6 +91,17 @@ const Search = props => {
 			</Row>
 		</Card>
 	);
+};
+
+Search.propTypes = {
+	search: PropTypes.object,
+	app: PropTypes.string.isRequired,
+	handleValueChange: PropTypes.func,
+};
+
+Search.defaultProps = {
+	search: {},
+	handleValueChange: () => {},
 };
 
 export default Search;

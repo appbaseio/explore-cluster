@@ -1,8 +1,10 @@
+/* eslint-disable jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Select, Input, Row, Col } from 'antd';
 import { getErrorClass, getErrorMessage } from '../utils/error';
 import { hasValuesChanged } from '../utils';
-import { Info } from '../../../components/Info';
+import Info from '../../../components/Info';
 
 const { Option } = Select;
 
@@ -56,7 +58,7 @@ class Conditions extends React.Component {
 								/>
 							</label>
 							<Select
-								onChange={value => onDropdownChange('query', value)}
+								onChange={(value) => onDropdownChange('query', value)}
 								value={query}
 								style={{ width: '100%' }}
 							>
@@ -81,13 +83,13 @@ class Conditions extends React.Component {
 								<Info content="Select a filter field and value which needs to be set before triggering this rule." />
 							</label>
 							<Select
-								onChange={value => onDropdownChange('dataField', value)}
+								onChange={(value) => onDropdownChange('dataField', value)}
 								value={dataField}
 								className={dataField ? '' : getErrorClass(error)}
 								style={{ width: '100%' }}
 								showSearch
 							>
-								{dataFields.map(field => (
+								{dataFields.map((field) => (
 									<Option key={field}>{field.replace(/.keyword/g, '')}</Option>
 								))}
 							</Select>
@@ -107,5 +109,27 @@ class Conditions extends React.Component {
 		);
 	}
 }
+
+Conditions.propTypes = {
+	dataFields: PropTypes.array,
+	onChange: PropTypes.func.isRequired,
+	dataFieldValue: PropTypes.string,
+	dataField: PropTypes.string,
+	query: PropTypes.string,
+	queryValue: PropTypes.string,
+	onDropdownChange: PropTypes.func.isRequired,
+	error: PropTypes.object,
+	condition: PropTypes.string,
+};
+
+Conditions.defaultProps = {
+	dataFields: [],
+	dataFieldValue: undefined,
+	dataField: undefined,
+	query: undefined,
+	queryValue: undefined,
+	error: {},
+	condition: undefined,
+};
 
 export default Conditions;

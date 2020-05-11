@@ -2,6 +2,7 @@ import { chain, get, includes, keys, values } from 'lodash';
 import { notification } from 'antd';
 import { getURL } from '../constants/config';
 import { getSingleFunction, updateFunctions } from '../batteries/utils/app';
+import { getESVersion } from '../batteries/utils/mappings';
 
 export async function getUser(username, password, url) {
 	const ACC_API = getURL();
@@ -45,12 +46,12 @@ export async function getUser(username, password, url) {
 			Authorization: `Basic ${authToken}`,
 		},
 	})
-		.then(es => es.json())
-		.then(esResponse => {
+		.then((es) => es.json())
+		.then((esResponse) => {
 			const version = get(esResponse, 'version.number');
 			sessionStorage.setItem('version', version);
 		})
-		.catch(e => {
+		.catch((e) => {
 			console.error('Error while fetching the ElasticSearch details');
 			console.error(e);
 		});
@@ -75,7 +76,10 @@ const getAuthToken = () => {
 
 export async function getESIndices(authToken) {
 	const ACC_API = getURL();
-	const response = await fetch(`${ACC_API}/_aliasedindices`, {
+	const esVersion = await getESVersion(null, atob(authToken));
+	let url = `${ACC_API}/_aliasedindices`;
+	if (esVersion && esVersion < 6) url = `${ACC_API}/_cat/indices?format=json`;
+	const response = await fetch(url, {
 		method: 'GET',
 		headers: {
 			Authorization: `Basic ${authToken}`,
@@ -87,7 +91,7 @@ export async function getESIndices(authToken) {
 	}
 
 	const indices = {};
-	data.forEach(item => {
+	data.forEach((item) => {
 		indices[item.alias || item.index] = item;
 	});
 
@@ -189,9 +193,9 @@ export const setRole = (username, role) =>
 				role,
 			}),
 		})
-			.then(res => res.json())
-			.then(data => resolve({ ...data, message: data.message }))
-			.catch(error => reject(error));
+			.then((res) => res.json())
+			.then((data) => resolve({ ...data, message: data.message }))
+			.catch((error) => reject(error));
 	});
 
 export async function cloneApp(source, destination, payload = {}) {
@@ -228,9 +232,9 @@ export const deleteRole = (appId, username) =>
 			},
 			body: JSON.stringify({}),
 		})
-			.then(res => res.json())
-			.then(data => resolve({ ...data.body, message: data.message }))
-			.catch(error => reject(error));
+			.then((res) => res.json())
+			.then((data) => resolve({ ...data.body, message: data.message }))
+			.catch((error) => reject(error));
 	});
 
 // set private registry
@@ -324,38 +328,32 @@ export async function getFunctionHealthCheck() {
 }
 
 // checks whether it is a valid URL
-export const isAbsoluteURL = str => /^[a-z][a-z0-9+.-]*:/.test(str);
+export const isAbsoluteURL = (str) => /^[a-z][a-z0-9+.-]*:/.test(str);
 
 // extract credentials from URL
-export const getURLCredentials = url => {
+export const getURLCredentials = (url) => {
 	if (!isAbsoluteURL(url) || !url.includes('@')) return null;
-	const credArr = chain(url)
-		.split('@')
-		.get(0)
-		.split('//')
-		.get(1)
-		.split(':')
-		.value();
+	const credArr = chain(url).split('@').get(0).split('//').get(1).split(':').value();
 	return { username: credArr[0], password: credArr[1] };
 };
 
 // remove trailing slashes from URL
-export const removeTrailingSlashes = url => url.replace(/\/+$/, '');
+export const removeTrailingSlashes = (url) => url.replace(/\/+$/, '');
 
 // get protocol from url
-export const getProtocol = url => {
+export const getProtocol = (url) => {
 	if (!isAbsoluteURL(url)) return;
 	return url.split('/')[0];
 };
 
 // https://{url}?search=xyz => {search: xyz}
-export const getURLParameters = url =>
+export const getURLParameters = (url) =>
 	(url.match(/([^?=&]+)(=([^&]*))/g) || []).reduce(
 		(a, v) => ((a[v.slice(0, v.indexOf('='))] = v.slice(v.indexOf('=') + 1)), a),
 		{},
 	);
 
-export const isEmpty = val => val == null || !(Object.keys(val) || val).length;
+export const isEmpty = (val) => val == null || !(Object.keys(val) || val).length;
 
 export async function getClusterMappings() {
 	const ACC_API = getURL();
@@ -392,8 +390,8 @@ export function getDatafields(mappings, indexes, isSearch = false) {
 	}
 
 	const dataFields = Object.keys(mappings)
-		.filter(index => !index.startsWith('.'))
-		.filter(index => hasAllIndex || indexes.includes(index))
+		.filter((index) => !index.startsWith('.'))
+		.filter((index) => hasAllIndex || indexes.includes(index))
 		.reduce((acc, key) => {
 			const { properties } = get(mappings[key], 'mappings._doc') || mappings[key].mappings;
 			const fieldTree = getFieldsTree(properties);
@@ -463,7 +461,7 @@ export function updateFunction({
 						description: `Function ${service} updated successfully.`,
 					});
 			})
-			.catch(e => {
+			.catch((e) => {
 				notification.error({
 					message: 'Error',
 					description: e,
@@ -474,13 +472,13 @@ export function updateFunction({
 
 export function getSelectedIndexes(selectedIndexes, mappings) {
 	if ((selectedIndexes || []).length === 0 || get(selectedIndexes, 0) === '*') {
-		return keys(mappings).filter(key => !key.startsWith('.'));
+		return keys(mappings).filter((key) => !key.startsWith('.'));
 	}
 	return selectedIndexes;
 }
 
 export async function handleQueryRuleDelete(rule, removeRule) {
-	const functionIndex = rule.actions.findIndex(item => item.type === 'function');
+	const functionIndex = rule.actions.findIndex((item) => item.type === 'function');
 	if (functionIndex !== -1) {
 		try {
 			const res = await getSingleFunction(rule.actions[functionIndex].data);
@@ -557,7 +555,7 @@ export function removeWhiteSpaces(str) {
 
 const getFieldsTree = (mappings = {}, prefix = null) => {
 	let tree = {};
-	Object.keys(mappings).forEach(key => {
+	Object.keys(mappings).forEach((key) => {
 		if (mappings[key].properties) {
 			tree = {
 				...tree,
@@ -579,13 +577,13 @@ const getFieldsTree = (mappings = {}, prefix = null) => {
 	return tree;
 };
 
-export const getParsedRoutes = routes =>
+export const getParsedRoutes = (routes) =>
 	Object.keys(routes).reduce((agg, route) => {
 		const routeItem = routes[route];
 		if (routeItem.menu) {
 			return [
 				...agg,
-				...routeItem.menu.map(item => ({
+				...routeItem.menu.map((item) => ({
 					...item,
 					title: route,
 					icon: routeItem.icon,

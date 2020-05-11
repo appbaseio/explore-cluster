@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { Button, Dropdown, Menu, Modal, Input, message } from 'antd';
 import { css } from 'emotion';
@@ -30,7 +31,7 @@ class HelpButton extends React.Component {
 		});
 	};
 
-	handleChange = e => {
+	handleChange = (e) => {
 		const { name, value } = e.target;
 		this.setState({
 			[name]: value,
@@ -70,8 +71,8 @@ class HelpButton extends React.Component {
 					}),
 				},
 			)
-				.then(res => res.json())
-				.then(data => {
+				.then((res) => res.json())
+				.then((data) => {
 					const displayMessage = data.inlineMessage
 						.replace('<p>', '')
 						.replace('</p>', '');
@@ -90,7 +91,7 @@ class HelpButton extends React.Component {
 		}
 	};
 
-	handleClick = e => {
+	handleClick = (e) => {
 		const { key } = e;
 		switch (key) {
 			case 'chat': {
@@ -138,6 +139,7 @@ class HelpButton extends React.Component {
 					<h3 className={heading}>Get Support!</h3>
 				</Menu.Item>
 				<Menu.Item key="whats_new">
+					{/* eslint-disable-next-line react/jsx-curly-brace-presence */}
 					<p className={subHeading}>See what{`'`}s new ✨</p>
 				</Menu.Item>
 				<Menu.Item key="twitter">
@@ -188,7 +190,11 @@ class HelpButton extends React.Component {
 	}
 }
 
-const HelpChat = props =>
+HelpButton.propTypes = {
+	user: PropTypes.object.isRequired,
+};
+
+const HelpChat = (props) =>
 	ReactDOM.createPortal(<HelpButton {...props} />, document.getElementById('help'));
 
 export default HelpChat;

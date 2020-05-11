@@ -10,6 +10,7 @@ import { validateAppName } from '../../utils/helper';
 import { getSettings, putSettings } from '../../batteries/modules/actions';
 import { appendApp } from '../../actions';
 import { isValidPlan } from '../../batteries/utils';
+import { allowedTiers } from '../../utils/prop-types';
 
 const centerAligned = css`
 	display: flex;
@@ -22,7 +23,7 @@ const radioStyle = css`
 	line-height: 30px;
 `;
 
-const CloneIndex = props => {
+const CloneIndex = (props) => {
 	const { handleCancel, index, existingApps, history, tier, featureSearchRelevancy } = props;
 	const [destIndex, setDestIndex] = useState('');
 	const [action, setAction] = useState(['settings.mappings', 'data']);
@@ -43,7 +44,7 @@ const CloneIndex = props => {
 			return;
 		}
 		setLoading(true);
-		const actions = flatten(map(action, item => item.split('.')));
+		const actions = flatten(map(action, (item) => item.split('.')));
 		let hasSearchRelevancy;
 		if (actions.includes('search_relevancy')) {
 			hasSearchRelevancy = true;
@@ -62,7 +63,7 @@ const CloneIndex = props => {
 				addApp({ [destIndex]: {} });
 				history.push(`/app/${destIndex}/overview`);
 			})
-			.catch(e => {
+			.catch((e) => {
 				message.error(e.message);
 				resetValues();
 			});
@@ -144,22 +145,31 @@ const CloneIndex = props => {
 CloneIndex.propTypes = {
 	index: PropTypes.string.isRequired,
 	handleCancel: PropTypes.func,
+	existingApps: PropTypes.array,
+	getSettingsAction: PropTypes.func.isRequired,
+	updateSettingsAction: PropTypes.func.isRequired,
+	addApp: PropTypes.func.isRequired,
+	history: PropTypes.object.isRequired,
+	tier: allowedTiers.isRequired,
+	featureSearchRelevancy: PropTypes.bool,
 };
 
 CloneIndex.defaultProps = {
 	handleCancel: () => {},
+	existingApps: [],
+	featureSearchRelevancy: false,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	existingApps: Object.keys(state.apps.data || {}),
 	tier: get(state, '$getAppPlan.results.tier'),
 	featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
 });
 
-const mapDispatchToProps = dispatch => ({
-	getSettingsAction: name => dispatch(getSettings(name)),
+const mapDispatchToProps = (dispatch) => ({
+	getSettingsAction: (name) => dispatch(getSettings(name)),
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
-	addApp: appName => dispatch(appendApp(appName)),
+	addApp: (appName) => dispatch(appendApp(appName)),
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(CloneIndex));

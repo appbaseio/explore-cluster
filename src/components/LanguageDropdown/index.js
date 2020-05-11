@@ -1,5 +1,6 @@
-import { Form, Select } from 'antd';
 import React from 'react';
+import PropTypes from 'prop-types';
+import { Form, Select } from 'antd';
 import { languages } from '../../constants/es-languages';
 
 const fallback = {
@@ -10,8 +11,7 @@ const fallback = {
 	ukranian: 'Needs ukranian analyzer installed.',
 };
 
-// eslint-disable-next-line import/prefer-default-export
-export class LanguageDropdown extends React.PureComponent {
+class LanguageDropdown extends React.PureComponent {
 	render() {
 		const { renderOption, value, formStyle, ...rest } = this.props;
 		return (
@@ -27,3 +27,16 @@ export class LanguageDropdown extends React.PureComponent {
 		);
 	}
 }
+
+LanguageDropdown.propTypes = {
+	renderOption: PropTypes.func.isRequired,
+	value: PropTypes.string,
+	formStyle: PropTypes.object,
+};
+
+LanguageDropdown.defaultProps = {
+	value: undefined,
+	formStyle: {},
+};
+
+export default LanguageDropdown;

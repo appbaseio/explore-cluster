@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Input, message } from 'antd';
+import { Input, message, Modal } from 'antd';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { get } from 'lodash';
@@ -7,6 +7,7 @@ import { deleteApp } from '../../utils';
 import { removeAppData } from '../../actions';
 import { deleteSettings } from '../../batteries/modules/actions';
 import { isValidPlan } from '../../batteries/utils';
+import { allowedTiers } from '../../utils/prop-types';
 
 class DeleteAppModal extends React.Component {
 	state = {
@@ -47,7 +48,7 @@ class DeleteAppModal extends React.Component {
 					deleteAppName: '',
 				});
 			})
-			.catch(e => {
+			.catch((e) => {
 				message.error(e.message);
 				this.setState({
 					loading: false,
@@ -56,7 +57,7 @@ class DeleteAppModal extends React.Component {
 			});
 	};
 
-	handleInputChange = e => {
+	handleInputChange = (e) => {
 		const { name, value } = e.target;
 		this.setState({
 			[name]: value,
@@ -73,7 +74,7 @@ class DeleteAppModal extends React.Component {
 		}
 
 		return (
-			<div onClick={e => e.preventDefault()}>
+			<div onClick={(e) => e.preventDefault()}>
 				<Modal
 					visible={deleteModal}
 					onOk={this.handleDelete}
@@ -105,16 +106,25 @@ DeleteAppModal.propTypes = {
 	handleDeleteModal: PropTypes.func.isRequired,
 	handleRemoveApp: PropTypes.func.isRequired,
 	onDelete: PropTypes.func,
+	deleteSettingsAction: PropTypes.func.isRequired,
+	tier: allowedTiers,
+	index: PropTypes.string.isRequired,
+	featureSearchRelevancy: PropTypes.bool.isRequired,
 };
 
-const mapStateToProps = state => ({
+DeleteAppModal.defaultProps = {
+	tier: undefined,
+	onDelete: () => {},
+};
+
+const mapStateToProps = (state) => ({
 	tier: get(state, '$getAppPlan.results.tier'),
 	featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
 });
 
-const mapDispatchToProps = dispatch => ({
-	handleRemoveApp: options => dispatch(removeAppData(options)),
-	deleteSettingsAction: name => dispatch(deleteSettings(name)),
+const mapDispatchToProps = (dispatch) => ({
+	handleRemoveApp: (options) => dispatch(removeAppData(options)),
+	deleteSettingsAction: (name) => dispatch(deleteSettings(name)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DeleteAppModal);

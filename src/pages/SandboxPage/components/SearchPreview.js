@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Row, Col, Switch, Tooltip, Spin, Button, Icon, Empty } from 'antd';
@@ -8,16 +9,21 @@ import { ReactiveBase } from '@appbaseio/reactivesearch';
 
 import Filter from './Filter';
 
-import { getSettings, getAppMappings, getRules, clearSearchState } from '../../../batteries/modules/actions';
+import {
+	getSettings,
+	getAppMappings,
+	getRules,
+	clearSearchState,
+} from '../../../batteries/modules/actions';
 import Search from './Search';
 import Result from './Result/index';
 import { generateQuery } from '../utils';
 import { getAggsMappings } from '../../../batteries/utils/mappings';
-import { getRawMappingsByAppName } from '../../../batteries/modules/selectors';
 import { getURL } from '../../../constants/config';
 import { getSubFields } from '../../../utils';
 import { isValidPlan } from '../../../batteries/utils';
 import generateSandboxURL from '../utils/sandbox-generator';
+import { allowedTiers } from '../../../utils/prop-types';
 
 const container = css`
 	padding: 16px;
@@ -31,7 +37,6 @@ class SearchPreview extends React.Component {
 	state = {
 		settings: null,
 		searchableMappings: [],
-		hasMappingsLoaded: false,
 		isAnalyticsEnabled: true,
 	};
 
@@ -53,10 +58,24 @@ class SearchPreview extends React.Component {
 			searchState,
 		} = this.props;
 
+		/*
+			Fetch rules only if the user is on valid Plan.
+		*/
 		if (isValidPlan(tier, featureRules)) {
 			if (!rules) {
 				fetchRules();
 			}
+		}
+
+		/*
+			Fetch Settings ifnot present in redux store.
+		*/
+		if (!settings) {
+			fetchSearchSettings(app);
+		} else {
+			this.setState({
+				settings: generateQuery(hasTestSettings ? testSettings : settings),
+			});
 		}
 
 		if (mappings) {
@@ -65,7 +84,6 @@ class SearchPreview extends React.Component {
 			// eslint-disable-next-line
 			this.setState({
 				searchableMappings,
-				hasMappingsLoaded: true,
 			});
 		} else {
 			fetchMappings(app, credentials, url);
@@ -88,14 +106,31 @@ class SearchPreview extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { mappings } = this.props;
-		if (mappings && JSON.stringify(prevProps.mappings) !== JSON.stringify(mappings)) {
+		const { mappings, isFetchingMappings, hasTestSettings, settings } = this.props;
+		/*
+			Update the searchable mappings state whenever there is a change in mappings.
+		*/
+		if (
+			!isFetchingMappings &&
+			mappings &&
+			JSON.stringify(prevProps.mappings) !== JSON.stringify(mappings)
+		) {
 			const searchableMappings = this.getSearchableMappings(mappings);
 
 			// eslint-disable-next-line
 			this.setState({
 				searchableMappings,
-				hasMappingsLoaded: true,
+			});
+		}
+
+		/*
+			Once the Search Relevancy API gets resolves we need to populate the state
+		 	with the components query.
+		*/
+		if (!hasTestSettings && JSON.stringify(settings) !== JSON.stringify(prevProps.settings)) {
+			// eslint-disable-next-line
+			this.setState({
+				settings: generateQuery(settings),
 			});
 		}
 	}
@@ -124,13 +159,20 @@ class SearchPreview extends React.Component {
 	};
 
 	static getDerivedStateFromProps(props, state) {
-		if (props.searchState) {
-			const searchQuery = props.searchState.find((component) => component.id === 'search');
+		const searchSettings =
+			state && state.settings ? state.settings.find((item) => item.id === 'search') : {};
+
+		if (props.searchState && state.searchableMappings) {
+			const searchQuery = get(props, 'searchState', []).find(
+				(component) => component.id === 'search',
+			);
 			// If parsedState doesnt contains search dataField we prefill with all searchable mappings
 			if (!get(searchQuery, 'dataField', []).length && state.searchableMappings) {
 				return {
 					settings: [
-						...props.searchState.filter((component) => component.id !== 'search'),
+						...get(props, 'searchState', []).filter(
+							(component) => component.id !== 'search',
+						),
 						{
 							...searchQuery,
 							dataField: Object.keys(state.searchableMappings),
@@ -143,32 +185,39 @@ class SearchPreview extends React.Component {
 			return state;
 		}
 
-		if (!props.hasTestSettings && state && !state.settings && props.settings) {
-			if (
-				state.hasMappingsLoaded &&
-				props.mappings &&
-				props.settings.search &&
-				props.settings.search.dataField &&
-				props.settings.search.dataField.length === 0
-			) {
-				return {
-					settings: generateQuery({
-						...props.settings,
-						search: {
-							...props.settings.search,
-							dataField: Object.keys(state.searchableMappings),
-							fieldWeights: Object.values(state.searchableMappings),
-						},
-					}),
-				};
-			}
+		/*
+			We need to prefill the datasearch with all searchable mappings
+			if the search relevancy API gives no fields.
+
+			Firstly check if props.mappings has values resolved and than prefill
+			with all searchable mappings.
+		*/
+		if (
+			!props.hasTestSettings &&
+			!props.isFetchingMappings &&
+			props.mappings &&
+			state.settings &&
+			get(searchSettings, 'dataField', []).length === 0
+		) {
 			return {
-				settings: generateQuery(props.settings),
+				settings: generateQuery({
+					...props.settings,
+					search: {
+						...get(props, 'settings.search', {}),
+						dataField: Object.keys(state.searchableMappings),
+						fieldWeights: Object.values(state.searchableMappings),
+					},
+				}),
 			};
 		}
 
+		/*
+			To make search preview work even after SearchRelevancy API gives 402 error status code
+			we need to add the default Props to all the components.
+		*/
 		if (
 			!props.settings &&
+			!state.settings &&
 			state.searchableMappings &&
 			props.mappings &&
 			props.settingsErrorCode === 402
@@ -201,6 +250,19 @@ class SearchPreview extends React.Component {
 		});
 	};
 
+	handleValueChange = (id, value) => {
+		this.setState(({ settings }) => ({
+			settings: settings.map((item) =>
+				item.id === id
+					? {
+							...item,
+							value,
+					  }
+					: item,
+			),
+		}));
+	};
+
 	generateCodeSandbox = () => {
 		const { settings } = this.state;
 		const { app, credentials, url } = this.props;
@@ -210,12 +272,21 @@ class SearchPreview extends React.Component {
 	};
 
 	render() {
-		const { settings, app, credentials, url, fetchingDefaultSettings, rules } = this.props;
+		const {
+			settings,
+			app,
+			credentials,
+			url,
+			fetchingDefaultSettings,
+			rules,
+			isFetchingMappings,
+			mappings,
+		} = this.props;
 		const { settings: stateSettings, isAnalyticsEnabled } = this.state;
 
 		if (fetchingDefaultSettings) {
 			return (
-				<div className={container}>
+				<div className={container} style={{ textAlign: 'center' }}>
 					<Spin />
 					<p>Fetching default Settings</p>
 				</div>
@@ -224,11 +295,24 @@ class SearchPreview extends React.Component {
 
 		if (settings && settings.isFetching) {
 			return (
-				<div className={container}>
+				<div className={container} style={{ textAlign: 'center' }}>
 					<Spin />
 					<p>Fetching Settings</p>
 				</div>
 			);
+		}
+
+		if (isFetchingMappings) {
+			return (
+				<div className={container} style={{ textAlign: 'center' }}>
+					<Spin />
+					<p>Fetching Mappings</p>
+				</div>
+			);
+		}
+
+		if (isFetchingMappings && !mappings) {
+			return <Empty description="No data found" />;
 		}
 
 		if (!stateSettings) {
@@ -275,15 +359,25 @@ class SearchPreview extends React.Component {
 					}}
 				>
 					<Col md={6}>
-						<Filter app={app} aggs={aggregations} />
+						<Filter
+							handleValueChange={this.handleValueChange}
+							app={app}
+							aggs={aggregations}
+						/>
 					</Col>
 					<Col md={18}>
-						<Search app={app} search={search} />
+						<Search
+							handleValueChange={this.handleValueChange}
+							app={app}
+							search={search}
+						/>
 						<Result
 							result={result}
 							query={stateSettings}
 							app={app}
 							url={url}
+							toggleAnalytics={this.toggleAnalytics}
+							recordAnalytics={isAnalyticsEnabled}
 							rules={rules}
 							onChange={this.handleSettingsChange}
 							credentials={credentials}
@@ -302,7 +396,8 @@ const mapStateToProps = (state, props) => {
 		settings: get(state.$getAppSettings, `settings.${props.app}`, defaultSettings),
 		settingsErrorCode: get(state.$getAppSettings, `error.actual.code`, null),
 		fetchingDefaultSettings: get(state.$getAppSettings, `default.loading`),
-		mappings: getRawMappingsByAppName(state) || null,
+		mappings: get(state, `$getAppMappings.rawMappings.${props.app}`, null),
+		isFetchingMappings: get(state, `$getAppMappings.isFetching`, false),
 		credentials: username ? `${username}:${password}` : null,
 		url: getURL(),
 		rules: get(state, '$getAppRules.results'),
@@ -324,6 +419,30 @@ SearchPreview.propTypes = {
 	app: PropTypes.string.isRequired,
 	credentials: PropTypes.string.isRequired,
 	url: PropTypes.string.isRequired,
+	settings: PropTypes.object,
+	fetchRules: PropTypes.func.isRequired,
+	fetchSearchSettings: PropTypes.func.isRequired,
+	fetchMappings: PropTypes.func.isRequired,
+	hasTestSettings: PropTypes.bool,
+	testSettings: PropTypes.object,
+	rules: PropTypes.array,
+	tier: allowedTiers,
+	featureRules: PropTypes.bool,
+	fetchingDefaultSettings: PropTypes.bool,
+	isFetchingMappings: PropTypes.bool,
+	mappings: PropTypes.object,
+};
+
+SearchPreview.defaultProps = {
+	settings: null,
+	hasTestSettings: false,
+	testSettings: {},
+	rules: null,
+	tier: undefined,
+	featureRules: false,
+	fetchingDefaultSettings: false,
+	isFetchingMappings: false,
+	mappings: null,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchPreview);

@@ -1,5 +1,7 @@
+/* eslint-disable jsx-a11y/no-autofocus,jsx-a11y/anchor-is-valid */
 import React, { Component } from 'react';
-import { notification, List } from 'antd';
+import PropTypes from 'prop-types';
+import { List, notification } from 'antd';
 import Footer from '../components/Footer';
 
 import appbaseHelpers from '../utils/appbaseHelpers';
@@ -14,11 +16,12 @@ export default class Introduction extends Component {
 		this.state = {
 			status: '',
 			error: '',
+			// eslint-disable-next-line react/no-unused-state
 			appId,
 		};
 	}
 
-	setError = e => {
+	setError = (e) => {
 		if (this.interval) clearInterval(this.interval);
 		this.setState(
 			{
@@ -55,7 +58,7 @@ export default class Introduction extends Component {
 						bordered={false}
 						size="small"
 						dataSource={validationsList}
-						renderItem={item => <List.Item>{item}</List.Item>}
+						renderItem={(item) => <List.Item>{item}</List.Item>}
 					/>
 				),
 				duration: 10,
@@ -64,21 +67,23 @@ export default class Introduction extends Component {
 		} else {
 			appbaseHelpers
 				.createApp(value)
-				.then(res => res.json())
-				.then(res => {
+				.then((res) => res.json())
+				.then((res) => {
 					if (res.index) {
 						app = {
 							appName: value,
 							id: value,
 						};
 						appbaseHelpers.updateApp(app);
-						this.props.setAppName(value);
+						const { nextScreen, setAppName } = this.props;
+						setAppName(value);
 
 						this.setState(
 							{
+								// eslint-disable-next-line react/no-unused-state
 								appId: value,
 							},
-							this.props.nextScreen,
+							nextScreen,
 						);
 					} else {
 						this.setError(
@@ -87,7 +92,7 @@ export default class Introduction extends Component {
 						this.input.focus();
 					}
 				})
-				.catch(e => {
+				.catch(() => {
 					this.setError(
 						'Some error occurred. Please try again with a different app name.',
 					);
@@ -95,34 +100,40 @@ export default class Introduction extends Component {
 		}
 	};
 
-	renderAppInput = () => (
-		<div className="search-field-container small" style={{ marginLeft: 0 }}>
-			<div>
-				<h3>Pick a unique app name</h3>
-				<p>Get started by creating an app which will serve as your elasticsearch index.</p>
+	renderAppInput = () => {
+		const { error, status } = this.state;
+		return (
+			<div className="search-field-container small" style={{ marginLeft: 0 }}>
+				<div>
+					<h3>Pick a unique app name</h3>
+					<p>
+						Get started by creating an app which will serve as your elasticsearch index.
+					</p>
+				</div>
+				<div className="input-wrapper">
+					<input
+						autoFocus
+						className="input"
+						ref={(ref) => {
+							this.input = ref;
+						}}
+						type="text"
+					/>
+					<a
+						className={`button primary ${status ? 'disabled' : ''}`}
+						onClick={this.createApp}
+					>
+						Submit
+					</a>
+				</div>
+				{status && <p>{status}</p>}
+				{error && <p style={{ color: 'tomato' }}>{error}</p>}
 			</div>
-			<div className="input-wrapper">
-				<input
-					autoFocus
-					className="input"
-					ref={ref => {
-						this.input = ref;
-					}}
-					type="text"
-				/>
-				<a
-					className={`button primary ${this.state.status ? 'disabled' : ''}`}
-					onClick={this.createApp}
-				>
-					Submit
-				</a>
-			</div>
-			{this.state.status && <p>{this.state.status}</p>}
-			{this.state.error && <p style={{ color: 'tomato' }}>{this.state.error}</p>}
-		</div>
-	);
+		);
+	};
 
 	render() {
+		const { nextScreen } = this.props;
 		return (
 			<div>
 				<div className="wrapper">
@@ -156,8 +167,17 @@ export default class Introduction extends Component {
 						</div>
 					</div>
 				</div>
-				<Footer nextScreen={this.props.nextScreen} disabled />
+				<Footer nextScreen={nextScreen} disabled />
 			</div>
 		);
 	}
 }
+
+Introduction.propTypes = {
+	nextScreen: PropTypes.func,
+	setAppName: PropTypes.func.isRequired,
+};
+
+Introduction.defaultProps = {
+	nextScreen: null,
+};

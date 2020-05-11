@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { ReactiveBase } from '@appbaseio/reactivesearch';
 import { notification } from 'antd';
 import { getURL } from '../../../../../constants/config';
@@ -33,7 +34,7 @@ class PromoteResults extends Component {
 		// eslint-disable-next-line no-unused-vars
 		const [selectedSuggestion, _, suggestionSource] = value;
 		if (!selectedSuggestion) return;
-		if (dataSource.findIndex(item => item.doc._id === suggestionSource._id) > -1) {
+		if (dataSource.findIndex((item) => item.doc._id === suggestionSource._id) > -1) {
 			notification.info({
 				message: 'Promote Result',
 				description: `${selectedSuggestion} is already promoted.`,
@@ -63,7 +64,7 @@ class PromoteResults extends Component {
 		);
 	};
 
-	handleDelete = index => {
+	handleDelete = (index) => {
 		const { dataSource } = this.state;
 		this.setState(
 			{
@@ -93,7 +94,9 @@ class PromoteResults extends Component {
 					<GlobalSearch
 						indexes={indexes}
 						onValueSelected={this.handleAdd}
-						dataFields={(dataFields || []).map(field => field.replace(/.keyword/g, ''))}
+						dataFields={(dataFields || []).map((field) =>
+							field.replace(/.keyword/g, ''),
+						)}
 						ref={this.globalSearchRef}
 						// onKeyDown={this.handleAdd}
 					/>
@@ -102,7 +105,7 @@ class PromoteResults extends Component {
 					positionRender={(text, record, index) => (
 						<PromotePosition
 							value={text}
-							onChange={value => {
+							onChange={(value) => {
 								this.handleItemChange(value, index, 'position');
 							}}
 						/>
@@ -117,5 +120,18 @@ class PromoteResults extends Component {
 		);
 	}
 }
+
+PromoteResults.propTypes = {
+	indexes: PropTypes.array,
+	dataFields: PropTypes.array,
+	value: PropTypes.array,
+	onChange: PropTypes.func.isRequired,
+};
+
+PromoteResults.defaultProps = {
+	indexes: [],
+	dataFields: [],
+	value: [],
+};
 
 export default PromoteResults;

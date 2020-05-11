@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import {
-	ReactiveBase,
 	DataSearch,
-	SelectedFilters,
-	MultiList,
-	ResultList,
-	ReactiveList,
 	DynamicRangeSlider,
+	MultiList,
+	ReactiveBase,
+	ReactiveList,
+	ResultList,
+	SelectedFilters,
 } from '@appbaseio/reactivesearch';
 
 import appbaseHelpers from '../utils/appbaseHelpers';
@@ -14,9 +15,9 @@ import { getURL } from '../../../constants/config';
 
 const { ResultListWrapper } = ReactiveList;
 
-const renderFilters = fields => {
+const renderFilters = (fields) => {
 	if (fields && fields.length) {
-		return fields.map(field => {
+		return fields.map((field) => {
 			switch (field) {
 				case 'genres': {
 					return (
@@ -79,15 +80,15 @@ const renderFilters = fields => {
 
 const getFields = (fields, suffix) => {
 	let newFields = [];
-	fields.forEach(item => {
-		suffix.forEach(str => {
+	fields.forEach((item) => {
+		suffix.forEach((str) => {
 			newFields = [...newFields, `${item}${str}`];
 		});
 	});
 	return newFields;
 };
 
-const getWeights = fields => {
+const getWeights = (fields) => {
 	const weights = {
 		original_title: 10,
 		'original_title.raw': 10,
@@ -100,7 +101,7 @@ const getWeights = fields => {
 		'overview.search': 1,
 	};
 
-	return fields.map(item => weights[item]);
+	return fields.map((item) => weights[item]);
 };
 
 const renderResultList = () => (
@@ -121,7 +122,7 @@ const renderResultList = () => (
 	>
 		{({ data }) => (
 			<ResultListWrapper>
-				{data.map(item => (
+				{data.map((item) => (
 					<ResultList key={item._id}>
 						<ResultList.Image src={item.poster_path} />
 						<ResultList.Content>
@@ -168,7 +169,7 @@ const renderJSONList = () => (
 			and: ['search', 'genres', 'original_language', 'release_year'],
 		}}
 		size={4}
-		renderItem={res => (
+		renderItem={(res) => (
 			<pre
 				key={res._id}
 				style={{
@@ -191,7 +192,7 @@ const renderJSONList = () => (
 	/>
 );
 
-const renderCode = lib => {
+const renderCode = (lib) => {
 	switch (lib) {
 		case 'react':
 			return renderResultList();
@@ -210,7 +211,8 @@ export default class SearchApp extends Component {
 	}
 
 	render() {
-		const fields = getFields(this.props.fields, ['', '.search']);
+		const { facets, fields: fieldsProp, ui } = this.props;
+		const fields = getFields(fieldsProp, ['', '.search']);
 		const SCALR_API = getURL();
 		return (
 			<ReactiveBase
@@ -255,11 +257,23 @@ export default class SearchApp extends Component {
 
 				<SelectedFilters style={{ marginTop: 20 }} />
 
-				<div className={this.props.facets && this.props.facets.length ? 'multi-col' : ''}>
-					<div className="left-col">{renderFilters(this.props.facets)}</div>
-					{renderCode(this.props.ui)}
+				<div className={facets && facets.length ? 'multi-col' : ''}>
+					<div className="left-col">{renderFilters(facets)}</div>
+					{renderCode(ui)}
 				</div>
 			</ReactiveBase>
 		);
 	}
 }
+
+SearchApp.propTypes = {
+	facets: PropTypes.array,
+	fields: PropTypes.array,
+	ui: PropTypes.string,
+};
+
+SearchApp.defaultProps = {
+	facets: [],
+	fields: [],
+	ui: undefined,
+};

@@ -28,7 +28,7 @@ const bannerMessagesAnalytics = {
 		description:
 			'Understand where you search traffic is coming from. Learn how to make the most of geo distribution insights.',
 		buttonText: 'Read Docs',
-		href: 'https://docs.appbase.io/docs/analytics/Overview/#geo-distribution',
+		href: 'https://docs.appbase.io/docs/analytics/overview/#geography-visualization',
 	},
 };
 
@@ -61,7 +61,7 @@ PopularResultsWrapper.propTypes = {
 	isGrowth: PropTypes.bool.isRequired,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	plan: get(state, '$getAppPlan.results.plan'),
 	isGrowth: get(state, '$getAppPlan.results.isPaid'),
 });

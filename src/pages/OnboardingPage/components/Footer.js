@@ -1,4 +1,6 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Icon } from 'antd';
 
 const Footer = ({ previousScreen, disabled, app, label, nextScreen }) => (
@@ -26,7 +28,7 @@ const Footer = ({ previousScreen, disabled, app, label, nextScreen }) => (
 				<a
 					className={`button has-icon ${disabled ? 'disabled' : ''}`}
 					onClick={() => {
-						!disabled && nextScreen();
+						if (!disabled) nextScreen();
 					}}
 				>
 					{label || 'Next'} &nbsp; <Icon type="right" theme="outlined" />
@@ -35,5 +37,20 @@ const Footer = ({ previousScreen, disabled, app, label, nextScreen }) => (
 		</div>
 	</footer>
 );
+
+Footer.propTypes = {
+	previousScreen: PropTypes.func,
+	disabled: PropTypes.bool,
+	app: PropTypes.string.isRequired,
+	label: PropTypes.string,
+	nextScreen: PropTypes.func,
+};
+
+Footer.defaultProps = {
+	previousScreen: null,
+	disabled: false,
+	label: 'Next',
+	nextScreen: () => {},
+};
 
 export default Footer;

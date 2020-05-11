@@ -1,6 +1,8 @@
+/* eslint-disable react/jsx-curly-brace-presence */
 import React from 'react';
+import PropTypes from 'prop-types';
 import get from 'lodash/get';
-import { Card, Input, Form, Button, Icon, Table, Skeleton, notification, Popover } from 'antd';
+import { Button, Card, Form, Icon, Input, notification, Popover, Skeleton, Table } from 'antd';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
@@ -121,20 +123,20 @@ class RoleBaseAccess extends React.Component {
 		});
 	};
 
-	handleChange = e => {
+	handleChange = (e) => {
 		this.setState({
 			[e.target.name]: e.target.value,
 		});
 	};
 
-	handleRole = e => {
+	handleRole = (e) => {
 		this.setState({
 			[e.target.name]: e.target.value,
 		});
 	};
 
-	setLoading = id => {
-		this.setState(prevState => ({
+	setLoading = (id) => {
+		this.setState((prevState) => ({
 			loadingKey: {
 				...prevState.loadingKey,
 				[id]: prevState.loadingKey[id] ? !prevState.loadingKey[id] : true,
@@ -142,8 +144,8 @@ class RoleBaseAccess extends React.Component {
 		}));
 	};
 
-	showKey = id => {
-		this.setState(prevState => ({
+	showKey = (id) => {
+		this.setState((prevState) => ({
 			visibleKey: {
 				...prevState.visibleKey,
 				[id]: prevState.visibleKey[id] ? !prevState.visibleKey[id] : true,
@@ -151,11 +153,12 @@ class RoleBaseAccess extends React.Component {
 		}));
 	};
 
-	saveRole = async value => {
+	saveRole = async (value) => {
+		const { props, setLoading, state } = this;
 		try {
-			this.setLoading(value.username);
-			const { fetchPermissions } = this.props;
-			const role = this.state && this.state[value.username];
+			setLoading(value.username);
+			const { fetchPermissions } = props;
+			const role = state && state[value.username];
 			const response = await setRole(value.username, role);
 			if (response.result === 'updated') {
 				notification.success({ message: 'Role Updated Successfully.' });
@@ -164,33 +167,32 @@ class RoleBaseAccess extends React.Component {
 			}
 
 			fetchPermissions();
-			this.setLoading(value.username);
+			setLoading(value.username);
 		} catch (e) {
-			this.setLoading(value.username);
+			setLoading(value.username);
 			notification.error({ message: e.message });
 		}
 	};
 
 	handleSave = () => {
 		const { publicKey, roleKey } = this.state;
-		const { setKeyes, appName } = this.props;
+		const { setKeys, appName } = this.props;
 		let newRoleKey = roleKey;
 
 		if (!newRoleKey) {
 			newRoleKey = 'role';
 		}
-		setKeyes(appName, publicKey, newRoleKey);
+		setKeys(appName, publicKey, newRoleKey);
 	};
 
 	render() {
 		const {
-			plan,
 			permissions,
 			isPermissionsLoading,
 			isPublicKeyLoading,
 			publicKey: currentPublicKey,
 			roleKey: currentRoleKey,
-			updatingKeyes,
+			updatingKeys,
 		} = this.props;
 		const {
 			roleKey, publicKey, loadingKey, visibleKey,
@@ -199,7 +201,7 @@ class RoleBaseAccess extends React.Component {
 		const emptyData = {
 			emptyText: (
 				<p>
-					You don't have any API credentials currently. Create one{' '}
+					You don{"'"}t have any API credentials currently. Create one{' '}
 					<Link to="/cluster/credentials">now</Link>.
 				</p>
 			),
@@ -277,7 +279,7 @@ class RoleBaseAccess extends React.Component {
 										type="primary"
 										onClick={this.handleSave}
 									>
-										<Icon type={updatingKeyes ? 'loading' : 'save'} />
+										<Icon type={updatingKeys ? 'loading' : 'save'} />
 										Save
 									</Button>
 								</Form.Item>
@@ -293,21 +295,21 @@ class RoleBaseAccess extends React.Component {
 							<Skeleton />
 						) : (
 							<Table
-								rowKey={record => record.username || 'permissions'}
+								rowKey={(record) => record.username || 'permissions'}
 								dataSource={permissions}
 								locale={emptyData}
 							>
 								<Column
 									title="Description"
 									key="description"
-									render={value =>
+									render={(value) =>
 										(value && value.description) || 'No Description'
 									}
 								/>
 								<Column
 									title="Credentials"
 									key="credentials"
-									render={value => (
+									render={(value) => (
 										<div>
 											{visibleKey[`${value.username}`]
 												? `${value.username}:${value.password}`
@@ -336,7 +338,7 @@ class RoleBaseAccess extends React.Component {
 								<Column
 									title="Role"
 									key="role"
-									render={value => (
+									render={(value) => (
 										<Input
 											defaultValue={value && value.role}
 											name={value.username}
@@ -349,25 +351,28 @@ class RoleBaseAccess extends React.Component {
 								<Column
 									title=""
 									key="action"
-									render={value => (
-										<Button
-											disabled={
-												(this.state[`${value.username}`] || '') ===
-												value.role
-											}
-											onClick={() => this.saveRole(value)}
-											type="primary"
-										>
-											<Icon
-												type={
-													loadingKey && loadingKey[value.username]
-														? 'loading'
-														: 'save'
+									render={(value) => {
+										const { saveRole: saveRoleFunc, state } = this;
+										return (
+											<Button
+												disabled={
+													(state[`${value.username}`] || '') ===
+													value.role
 												}
-											/>
-											Save
-										</Button>
-									)}
+												onClick={() => saveRoleFunc(value)}
+												type="primary"
+											>
+												<Icon
+													type={
+														loadingKey && loadingKey[value.username]
+															? 'loading'
+															: 'save'
+													}
+												/>
+												Save
+											</Button>
+										);
+									}}
 								/>
 							</Table>
 						)}
@@ -378,7 +383,35 @@ class RoleBaseAccess extends React.Component {
 	}
 }
 
-const mapStateToProps = state => {
+RoleBaseAccess.propTypes = {
+	publicKey: PropTypes.string,
+	roleKey: PropTypes.string,
+	updatedKey: PropTypes.string,
+	fetchPublicKey: PropTypes.func.isRequired,
+	appName: PropTypes.string.isRequired,
+	isPublicKeyLoading: PropTypes.bool,
+	updateKeyError: PropTypes.string,
+	publicKeyError: PropTypes.string,
+	setKeys: PropTypes.func.isRequired,
+	permissions: PropTypes.array,
+	isPermissionsLoading: PropTypes.bool,
+	updatingKeys: PropTypes.bool,
+	fetchPermissions: PropTypes.func.isRequired,
+};
+
+RoleBaseAccess.defaultProps = {
+	publicKey: '',
+	roleKey: '',
+	updatedKey: '',
+	isPublicKeyLoading: false,
+	updateKeyError: '',
+	publicKeyError: '',
+	permissions: [],
+	isPermissionsLoading: false,
+	updatingKeys: false,
+};
+
+const mapStateToProps = (state) => {
 	const planState = getAppPlanByName(state);
 	const appPermissions = getAppPermissionsByName(state);
 
@@ -392,14 +425,14 @@ const mapStateToProps = state => {
 		publicKeyError: get(state, '$getAppPublicKey.error.actual.error', ''),
 		updateKeyError: get(state, '$updateAppPublicKey.error.actual.error', ''),
 		updatedKey: get(state, '$updateAppPublicKey.results', ''),
-		updatingKeyes: get(state, '$updateAppPublicKey.isFetching'),
+		updatingKeys: get(state, '$updateAppPublicKey.isFetching'),
 		roleKey: get(state, '$getAppPublicKey.results.role_key', ''),
 	};
 };
-const mapDispatchToProps = dispatch => ({
-	fetchPermissions: appName => dispatch(getPermission(appName)),
-	fetchPublicKey: appName => dispatch(getPublicKey(appName)),
-	setKeyes: (appName, publicKey, roleKey) =>
+const mapDispatchToProps = (dispatch) => ({
+	fetchPermissions: (appName) => dispatch(getPermission(appName)),
+	fetchPublicKey: (appName) => dispatch(getPublicKey(appName)),
+	setKeys: (appName, publicKey, roleKey) =>
 		dispatch(
 			updatePublicKey(appName, isBase64(publicKey) ? publicKey : btoa(publicKey), roleKey),
 		),

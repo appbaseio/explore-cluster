@@ -1,4 +1,6 @@
+/* eslint-disable jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
 import { css } from 'emotion';
@@ -33,14 +35,15 @@ import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import { getAggsMappings } from '../../batteries/utils/mappings';
 import { dropdown } from '../../batteries/components/Mappings/styles';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
-import { SettingsFooter } from '../../components/SettingsFooter';
-import { ReviewAndSave } from '../../components/ReviewAndSave';
+import SettingsFooter from '../../components/SettingsFooter';
+import ReviewAndSave from '../../components/ReviewAndSave';
 import { container } from '../ResultsPage/styles';
 import { getSubFields } from '../../utils';
-import { settingsMap } from '../../components/ReviewAndSave/helper';
+import settingsMap from '../../components/ReviewAndSave/helper';
 import { isEqual, isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import { highlighter } from '../SandboxPage/components/Search';
+import { allowedTiers } from '../../utils/prop-types';
 
 const { Option } = Select;
 
@@ -48,12 +51,13 @@ const bannerDetails = {
 	title: 'Aggregation Settings',
 	buttonText: 'Read More',
 	icon: 'pencil',
-	href: 'https://docs.appbase.io/docs/search/Preview/',
+	href: 'https://docs.appbase.io/docs/search/relevancy/#aggregation-settings',
 };
 
 const bannerMessage = {
 	title: 'Aggregations Settings',
 	buttonText: 'Read Docs',
+	href: 'https://docs.appbase.io/docs/search/relevancy/#aggregation-settings',
 };
 
 const cardStyle = css`
@@ -154,13 +158,13 @@ class AggsPage extends React.Component {
 	}
 
 	toggleVisible = (isReset = false) => {
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			visible: !prevState.visible,
 			isReset,
 		}));
 	};
 
-	initData = settings => {
+	initData = (settings) => {
 		this.setState({
 			count: settings.aggregations.size,
 			sort: settings.aggregations.sortBy,
@@ -169,13 +173,13 @@ class AggsPage extends React.Component {
 		});
 	};
 
-	getSearchableMappings = mappings => {
+	getSearchableMappings = (mappings) => {
 		const aggsResponse = getAggsMappings(mappings, true);
 		const parsedMappings = Array.isArray(aggsResponse)
 			? aggsResponse
 			: Object.keys(aggsResponse);
 		const originalSearchableFields = parsedMappings.filter(
-			mapping =>
+			(mapping) =>
 				mapping.fieldType === 'text' &&
 				(mapping.usecase === 'search' || mapping.usecase === 'searchaggs'),
 		);
@@ -198,11 +202,11 @@ class AggsPage extends React.Component {
 		);
 		const searchableMappings = parsedMappings
 			.filter(
-				mapping =>
+				(mapping) =>
 					mapping.usecase === 'search' ||
 					(mapping.usecase === 'none' && mapping.fieldType === 'text'),
 			)
-			.map(mapping => ({
+			.map((mapping) => ({
 				_address: `${mapping.type}.${mapping.address.split('.').join('.properties.')}`,
 				address: mapping.address,
 				fields: mapping.fields,
@@ -214,7 +218,7 @@ class AggsPage extends React.Component {
 		return searchableMappings;
 	};
 
-	handleMappingChange = mappings => {
+	handleMappingChange = (mappings) => {
 		const searchableMappings = this.getSearchableMappings(mappings);
 		const { dataField } = this.state;
 
@@ -225,18 +229,18 @@ class AggsPage extends React.Component {
 
 		const mappingAddresses = searchableMappings
 			? searchableMappings
-					.map(mapping => mapping.address)
+					.map((mapping) => mapping.address)
 					.reduce((agg, item) => [...agg, item, `${item}.keyword`], [])
 			: [];
 		const aggFields = ['keyword'];
 
-		const fieldsTobeDeleteFromState = Object.keys(dataField).filter(item =>
+		const fieldsTobeDeleteFromState = Object.keys(dataField).filter((item) =>
 			mappingAddresses.includes(item),
 		);
 
 		if (fieldsTobeDeleteFromState && fieldsTobeDeleteFromState.length) {
 			const subFields = fieldsTobeDeleteFromState.reduce((agg, item) => {
-				return [...agg, item, ...aggFields.map(sf => `${item}.${sf}`)];
+				return [...agg, item, ...aggFields.map((sf) => `${item}.${sf}`)];
 			}, []);
 
 			const updatedFields = Object.keys(dataField).reduce((agg, item) => {
@@ -263,10 +267,10 @@ class AggsPage extends React.Component {
 		});
 	};
 
-	handleAddField = value => {
+	handleAddField = (value) => {
 		if (get(this.mappingsRef, 'current.wrappedInstance', null)) {
 			const { searchableMappings } = this.state;
-			const mapping = searchableMappings.find(item => item._address === value);
+			const mapping = searchableMappings.find((item) => item._address === value);
 
 			const esVersion = get(this.mappingsRef, 'current.wrappedInstance.state.esVersion');
 			const setMapping = get(this.mappingsRef, 'current.wrappedInstance.setMapping');
@@ -281,7 +285,7 @@ class AggsPage extends React.Component {
 
 				if (mapping) {
 					const parsedAddress = `${mapping.address}.keyword`;
-					this.setState(state => ({
+					this.setState((state) => ({
 						dataField: {
 							...state.dataField,
 							[parsedAddress]: 'term',
@@ -292,7 +296,7 @@ class AggsPage extends React.Component {
 		}
 	};
 
-	hasKeyword = settings => {
+	hasKeyword = (settings) => {
 		if (settings && settings.type === 'keyword') {
 			return true;
 		}
@@ -304,7 +308,7 @@ class AggsPage extends React.Component {
 	};
 
 	handleAggType = ({ address, value }) => {
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			dataField: { ...prevState.dataField, [address]: value },
 		}));
 	};
@@ -329,7 +333,7 @@ class AggsPage extends React.Component {
 				includeNullValues: includeNullValue,
 			},
 		})
-			.then(res => {
+			.then((res) => {
 				if (res && res.error) {
 					notification.error({
 						message: 'Failed to save Aggregation Settings',
@@ -343,7 +347,7 @@ class AggsPage extends React.Component {
 					}
 				}
 			})
-			.catch(e => {
+			.catch((e) => {
 				notification.error({
 					message: 'Failed to save Aggregation Settings',
 					description: e.message,
@@ -369,7 +373,7 @@ class AggsPage extends React.Component {
 		const { getDefaultSettingsAction, defaultSettings } = this.props;
 		if (defaultSettings) this.initData(defaultSettings);
 		else
-			getDefaultSettingsAction().then(res => {
+			getDefaultSettingsAction().then((res) => {
 				if (res && res.payload) {
 					this.initData(res.payload);
 				}
@@ -417,7 +421,7 @@ class AggsPage extends React.Component {
 		if (!isValidPlan(tier, featureSearchRelevancy)) {
 			return (
 				<React.Fragment>
-					<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
+					<Banner {...bannerDetails} />
 					<Overlay
 						style={{
 							maxWidth: '70%',
@@ -447,6 +451,7 @@ class AggsPage extends React.Component {
 							showMappingInfo={false}
 							showCardWrapper={false}
 							hideSearchType
+							deleteLabel=" Remove from Aggs"
 							hideDelete
 							hideNoneTextType
 							hideDataType
@@ -495,14 +500,14 @@ class AggsPage extends React.Component {
 										: parsedAddress;
 									const menu = (
 										<Menu
-											onClick={e =>
+											onClick={(e) =>
 												this.handleAggType({
 													address: aggKey,
 													value: e.key,
 												})
 											}
 										>
-											{options.map(option => (
+											{options.map((option) => (
 												<Menu.Item key={option.toLowerCase()}>
 													{option}
 												</Menu.Item>
@@ -546,7 +551,7 @@ class AggsPage extends React.Component {
 															.indexOf(input.toLowerCase()) >= 0
 													}
 												>
-													{searchableMappings.map(mapping => (
+													{searchableMappings.map((mapping) => (
 														<Option
 															key={mapping._address}
 															value={mapping._address}
@@ -574,7 +579,7 @@ class AggsPage extends React.Component {
 							</Tooltip>
 						</label>
 						<InputNumber
-							onChange={value => this.handleChange('count', value)}
+							onChange={(value) => this.handleChange('count', value)}
 							value={count}
 							min={1}
 							placeholder="Enter default aggs size"
@@ -591,13 +596,13 @@ class AggsPage extends React.Component {
 							value={sort}
 							optionFilterProp="children"
 							style={{ minWidth: 200, marginBottom: '15px' }}
-							onChange={value => this.handleChange('sort', value)}
+							onChange={(value) => this.handleChange('sort', value)}
 							filterOption={(input, option) =>
 								option.props.children.toLowerCase().indexOf(input.toLowerCase()) >=
 								0
 							}
 						>
-							{sortOptions.map(sortOption => (
+							{sortOptions.map((sortOption) => (
 								<Option key={sortOption.value} value={sortOption.value}>
 									{sortOption.name}
 								</Option>
@@ -611,7 +616,7 @@ class AggsPage extends React.Component {
 						</label>
 						<Switch
 							checked={includeNullValue}
-							onChange={value => this.handleChange('includeNullValue', value)}
+							onChange={(value) => this.handleChange('includeNullValue', value)}
 						/>
 					</Card>
 					<SettingsFooter
@@ -692,7 +697,40 @@ class AggsPage extends React.Component {
 	}
 }
 
-const mapStateToProps = state => {
+AggsPage.propTypes = {
+	fetchMappings: PropTypes.func.isRequired,
+	getDefaultSettingsAction: PropTypes.func.isRequired,
+	getSettingsAction: PropTypes.func.isRequired,
+	updateSettingsAction: PropTypes.func.isRequired,
+	deleteSettingsAction: PropTypes.func.isRequired,
+	appName: PropTypes.string.isRequired,
+	credentials: PropTypes.string.isRequired,
+	isFetchingMapping: PropTypes.bool,
+	mappings: PropTypes.object,
+	settings: PropTypes.object,
+	defaultSettings: PropTypes.object,
+	isLoading: PropTypes.bool,
+	isUpdating: PropTypes.bool,
+	tier: allowedTiers,
+	resetState: PropTypes.object,
+	traversedMappings: PropTypes.array,
+	featureSearchRelevancy: PropTypes.bool,
+};
+
+AggsPage.defaultProps = {
+	isFetchingMapping: false,
+	mappings: null,
+	settings: null,
+	defaultSettings: null,
+	isLoading: false,
+	isUpdating: false,
+	tier: undefined,
+	resetState: {},
+	traversedMappings: [],
+	featureSearchRelevancy: false,
+};
+
+const mapStateToProps = (state) => {
 	const mappings = getRawMappingsByAppName(state) || null;
 	const defaultSettings = get(state.$getAppSettings, `defaultSettings`);
 	const errorCode = get(state, '$getAppSettings.error.actual.code');
@@ -715,13 +753,13 @@ const mapStateToProps = state => {
 	};
 };
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	fetchMappings: (appName, credentials, url) =>
 		dispatch(getAppMappings(appName, credentials, url)),
 	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
-	getSettingsAction: name => dispatch(getSettings(name)),
+	getSettingsAction: (name) => dispatch(getSettings(name)),
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
-	deleteSettingsAction: name => dispatch(deleteSettings(name)),
+	deleteSettingsAction: (name) => dispatch(deleteSettings(name)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AggsPage);

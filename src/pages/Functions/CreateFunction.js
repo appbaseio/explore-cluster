@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Modal, Button, Collapse, Icon, Typography } from 'antd';
 import { withRouter } from 'react-router-dom';
 import { css } from 'emotion';
@@ -45,6 +46,10 @@ const Code = ({ text }) => (
 	</Paragraph>
 );
 
+Code.propTypes = {
+	text: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
+};
+
 const PanelHeader = ({ icon, text, title }) => (
 	<div className={headerStyle}>
 		<div className="content">
@@ -60,6 +65,18 @@ const PanelHeader = ({ icon, text, title }) => (
 	</div>
 );
 
+PanelHeader.propTypes = {
+	icon: PropTypes.string,
+	text: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+	title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+};
+
+PanelHeader.defaultProps = {
+	icon: null,
+	text: null,
+	title: null,
+};
+
 class CreateFunction extends React.Component {
 	state = { visible: false };
 
@@ -70,7 +87,7 @@ class CreateFunction extends React.Component {
 	};
 
 	handleToggle = () => {
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			visible: !prevState.visible,
 		}));
 	};

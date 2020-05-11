@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Ace from '../../../../batteries/components/SearchSandbox/containers/AceEditor';
 
 class CustomData extends React.Component {
@@ -10,7 +11,7 @@ class CustomData extends React.Component {
 		};
 	}
 
-	handleRequestDataChange = value => {
+	handleRequestDataChange = (value) => {
 		this.setState({ requestData: value });
 		try {
 			const parsedData = JSON.parse(value);
@@ -49,5 +50,14 @@ class CustomData extends React.Component {
 		);
 	}
 }
+
+CustomData.propTypes = {
+	value: PropTypes.object,
+	onChange: PropTypes.func.isRequired,
+};
+
+CustomData.defaultProps = {
+	value: {},
+};
 
 export default CustomData;

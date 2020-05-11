@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import { Tabs } from 'antd';
 import SetFunctionTrigger from './SetFunctionTrigger';
 import NewFunctionForm from './NewFunctionForm';
@@ -11,11 +12,11 @@ class ExecuteFunction extends Component {
 		this.state = { activeKey: 'trigger', selected: props.value };
 	}
 
-	handleRadioChange = value => {
+	handleRadioChange = (value) => {
 		this.setState({ selected: value });
 	};
 
-	setActiveKey = activeKey => this.setState({ activeKey });
+	setActiveKey = (activeKey) => this.setState({ activeKey });
 
 	render() {
 		const { activeKey, selected } = this.state;
@@ -45,5 +46,14 @@ class ExecuteFunction extends Component {
 		);
 	}
 }
+
+ExecuteFunction.propTypes = {
+	onChange: PropTypes.func.isRequired,
+	value: PropTypes.string,
+};
+
+ExecuteFunction.defaultProps = {
+	value: undefined,
+};
 
 export default ExecuteFunction;

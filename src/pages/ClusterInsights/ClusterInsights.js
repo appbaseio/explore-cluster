@@ -1,4 +1,6 @@
+/* eslint-disable camelcase */
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Button, message, Popconfirm } from 'antd';
 import Stripe from 'react-stripe-checkout';
 import { connect } from 'react-redux';
@@ -24,8 +26,8 @@ class ClusterInsights extends React.Component {
 		this.fetchInsights();
 	}
 
-	toggleLoading = key => {
-		this.setState(state => ({
+	toggleLoading = (key) => {
+		this.setState((state) => ({
 			[key]: !state[key],
 		}));
 	};
@@ -34,29 +36,29 @@ class ClusterInsights extends React.Component {
 		const { credentials } = this.props;
 		this.toggleLoading('fetchingSubscription');
 		getSubscription(credentials)
-			.then(res => {
+			.then((res) => {
 				this.setState({
 					hasSubscribed: res.has_subscribed,
 					insight_link: res.insight_link,
 				});
 				this.toggleLoading('fetchingSubscription');
 			})
-			.catch(e => {
+			.catch((e) => {
 				message.error(e.message);
 				this.toggleLoading('fetchingSubscription');
 			});
 	};
 
-	handleToken = token => {
+	handleToken = (token) => {
 		this.toggleLoading('updatingSubscription');
 		const { credentials } = this.props;
 		updateSubscription({ token, credentials })
-			.then(res => {
+			.then((res) => {
 				message.success(res.message);
 				this.toggleLoading('updatingSubscription');
 				this.fetchInsights();
 			})
-			.catch(e => {
+			.catch((e) => {
 				message.error(e.message);
 				this.toggleLoading('updatingSubscription');
 			});
@@ -66,12 +68,12 @@ class ClusterInsights extends React.Component {
 		this.toggleLoading('deletingSubscription');
 		const { credentials } = this.props;
 		deleteSubscription(credentials)
-			.then(res => {
+			.then((res) => {
 				message.success(res.message);
 				this.toggleLoading('deletingSubscription');
 				this.fetchInsights();
 			})
-			.catch(e => {
+			.catch((e) => {
 				message.error(e.message);
 				this.toggleLoading('deletingSubscription');
 			});
@@ -90,13 +92,14 @@ class ClusterInsights extends React.Component {
 				<Banner
 					title="Curated Insights"
 					description="Curated Insights are weekly search insights delievered by the appbase.io team."
+					href="https://docs.appbase.io/docs/analytics/curated-insights/"
 					showButton={false}
 					renderButtons={() => (
 						<React.Fragment>
 							<Button
 								size="large"
 								target="_blank"
-								href="https://docs.appbase.io"
+								href="https://docs.appbase.io/docs/analytics/curated-insights/"
 								type="primary"
 								ghost
 							>
@@ -162,7 +165,13 @@ class ClusterInsights extends React.Component {
 	}
 }
 
-const mapStateToProps = state => {
+ClusterInsights.propTypes = {
+	credentials: PropTypes.string.isRequired,
+};
+
+ClusterInsights.defaultProps = {};
+
+const mapStateToProps = (state) => {
 	const { username, password } = get(state, 'user.data', {});
 	return {
 		credentials: `${username}:${password}`,

@@ -85,7 +85,7 @@ class ShareSettingsView extends React.Component {
 		});
 	};
 
-	handleSubmit = form => {
+	handleSubmit = (form) => {
 		const { appId, shareApp, handleEditPermission } = this.props;
 		const { selectedSettings } = this.state;
 		const requestPayload = { ...form.value.operationType, ...form.value };
@@ -97,7 +97,7 @@ class ShareSettingsView extends React.Component {
 		}
 	};
 
-	handleEdit = setting => {
+	handleEdit = (setting) => {
 		this.setState({
 			showForm: true,
 			selectedSettings: setting,
@@ -125,11 +125,11 @@ class ShareSettingsView extends React.Component {
 						>
 							<Table
 								scroll={{ x: 700 }}
-								dataSource={sharedUsers.map(user => ({
+								dataSource={sharedUsers.map((user) => ({
 									settingInfo: user,
 									handleEdit: this.handleEdit,
 								}))}
-								rowKey={row =>
+								rowKey={(row) =>
 									`${get(row, 'settingInfo.username')}:${get(
 										row,
 										'settingInfo.password',
@@ -164,9 +164,19 @@ ShareSettingsView.propTypes = {
 	success: PropTypes.bool.isRequired,
 	isLoading: PropTypes.bool.isRequired,
 	errors: PropTypes.array.isRequired,
+	fetchAppShare: PropTypes.func.isRequired,
+	appId: PropTypes.string.isRequired,
+	isPaidUser: PropTypes.bool,
+	sharedUsers: PropTypes.array,
+	handleEditPermission: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = state => ({
+ShareSettingsView.defaultProps = {
+	isPaidUser: false,
+	sharedUsers: [],
+};
+
+const mapStateToProps = (state) => ({
 	isPaidUser: get(getAppPlanByName(state), 'isPaid'),
 	appId: get(state, '$getCurrentApp.id'),
 	isLoading: get(state, '$getSharedApp.isFetching'),
@@ -174,8 +184,8 @@ const mapStateToProps = state => ({
 	sharedUsers: get(state, '$getSharedApp.results', []),
 	success: get(state, '$createAppShare.success') || get(state, '$updateAppPermission.success'),
 });
-const mapDispatchToProps = dispatch => ({
-	fetchAppShare: appId => dispatch(getSharedApp(appId)),
+const mapDispatchToProps = (dispatch) => ({
+	fetchAppShare: (appId) => dispatch(getSharedApp(appId)),
 	shareApp: (appId, payload) => dispatch(createAppShare(appId, payload)),
 	handleEditPermission: (appId, username, payload) =>
 		dispatch(updatePermission(appId, username, payload)),

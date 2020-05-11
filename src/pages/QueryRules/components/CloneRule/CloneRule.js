@@ -1,23 +1,17 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Button, Icon, message, notification, Typography } from 'antd';
 import { connect } from 'react-redux';
 import { omit, get } from 'lodash';
 import { cloneQueryRule } from '../../../../batteries/modules/actions';
 
 class CloneRule extends React.Component {
-	static defaultProps = {
-		isMobile: false,
-		ghost: false,
-		buttonStyle: {},
-		buttonSize: 'default',
-	};
-
 	handleClone = () => {
 		const { cloneQueryRuleAction, rule } = this.props;
 		cloneQueryRuleAction(rule, {
 			...omit(rule, 'order'),
 			name: `${rule.name} (cloned)`,
-		}).then(res => {
+		}).then((res) => {
 			if (res && res.error) {
 				notification.error({
 					message: 'Error',
@@ -56,7 +50,24 @@ class CloneRule extends React.Component {
 	}
 }
 
-const mapDispatchToProps = dispatch => ({
+CloneRule.propTypes = {
+	rule: PropTypes.object,
+	isMobile: PropTypes.bool,
+	ghost: PropTypes.bool,
+	buttonStyle: PropTypes.object,
+	buttonSize: PropTypes.string,
+	cloneQueryRuleAction: PropTypes.func.isRequired,
+};
+
+CloneRule.defaultProps = {
+	rule: {},
+	isMobile: false,
+	ghost: false,
+	buttonStyle: {},
+	buttonSize: 'default',
+};
+
+const mapDispatchToProps = (dispatch) => ({
 	cloneQueryRuleAction: (rule, newRule) => dispatch(cloneQueryRule(rule, newRule)),
 });
 

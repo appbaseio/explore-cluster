@@ -1,7 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Button, Icon, message, Typography } from 'antd';
 import Appbase from 'appbase-js';
 import { css } from 'emotion';
+import { get } from 'lodash';
 
 import AceEditor from '../../../../batteries/components/SearchSandbox/containers/AceEditor';
 
@@ -17,7 +19,7 @@ const headingStyle = css`
 class QueryView extends React.Component {
 	constructor(props) {
 		super(props);
-		const { query, app, url, credentials } = props;
+		const { query, app, url, credentials, recordAnalytics } = props;
 		this.appbaseRef = Appbase({
 			app,
 			url,
@@ -25,25 +27,65 @@ class QueryView extends React.Component {
 		});
 
 		this.state = {
-			query: JSON.stringify(query, null, 4),
+			query: JSON.stringify(
+				{
+					query,
+					settings: {
+						recordAnalytics,
+						enableQueryRules: true,
+					},
+				},
+				null,
+				4,
+			),
 			isValid: isValidJSON(JSON.stringify(query)),
 			isExecuting: false,
 			response: null,
 		};
 	}
 
+	componentDidUpdate(prevProps) {
+		const { query, recordAnalytics } = this.props;
+		if (
+			JSON.stringify(query) !== JSON.stringify(prevProps.query) ||
+			recordAnalytics !== prevProps.recordAnalytics
+		) {
+			// eslint-disable-next-line
+			this.setState({
+				query: JSON.stringify(
+					{
+						query,
+						settings: {
+							recordAnalytics,
+							enableQueryRules: true,
+						},
+					},
+					null,
+					4,
+				),
+				isValid: isValidJSON(JSON.stringify(query)),
+			});
+		}
+	}
+
 	toggleExecutionStatus = () => {
-		this.setState(prevState => ({
+		this.setState((prevState) => ({
 			isExecuting: !prevState.isExecuting,
 		}));
 	};
 
-	handleEditor = value => {
+	handleEditor = (value) => {
 		const isValid = isValidJSON(value);
 		if (isValid) {
 			const parsedQuery = JSON.parse(value);
-			const isNotValidId = parsedQuery.some(
-				item =>
+
+			if (!Array.isArray(get(parsedQuery, 'query'))) {
+				console.error('Cannot execute with empty query.');
+				return;
+			}
+
+			const isNotValidId = parsedQuery.query.some(
+				(item) =>
 					!(item.id === 'search' || item.id === 'result' || item.id.startsWith('list')),
 			);
 
@@ -67,22 +109,25 @@ class QueryView extends React.Component {
 
 	runQuery = () => {
 		const { query } = this.state;
-		const { onChange } = this.props;
+		const { onChange, toggleAnalytics } = this.props;
 
 		const parsedQuery = JSON.parse(query);
 		this.toggleExecutionStatus();
 		this.appbaseRef
-			.reactiveSearchv3(parsedQuery)
-			.then(res => {
+			.reactiveSearchv3(parsedQuery.query, {
+				...get(parsedQuery, 'settings', {}),
+			})
+			.then((res) => {
 				this.setState({
 					response: JSON.stringify(res, null, 4),
 				});
 				if (onChange) {
-					onChange(parsedQuery);
+					onChange(parsedQuery.query);
+					toggleAnalytics(!!parsedQuery.settings.recordAnalytics);
 				}
 				this.toggleExecutionStatus();
 			})
-			.catch(e => {
+			.catch((e) => {
 				this.toggleExecutionStatus();
 				message.error(e.message);
 				console.log(e);
@@ -148,5 +193,23 @@ class QueryView extends React.Component {
 		);
 	}
 }
+
+QueryView.propTypes = {
+	query: PropTypes.object,
+	app: PropTypes.string.isRequired,
+	url: PropTypes.string,
+	credentials: PropTypes.string.isRequired,
+	onChange: PropTypes.func,
+	toggleAnalytics: PropTypes.func,
+	recordAnalytics: PropTypes.bool,
+};
+
+QueryView.defaultProps = {
+	query: {},
+	url: undefined,
+	onChange: null,
+	toggleAnalytics: () => {},
+	recordAnalytics: true,
+};
 
 export default QueryView;

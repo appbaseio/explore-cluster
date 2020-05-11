@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Card, Col, Icon, Row, Tag } from 'antd';
 import { css } from 'react-emotion';
 import { withRouter } from 'react-router-dom';
@@ -28,7 +29,7 @@ export const colorBar = css`
 	margin: 6px 0;
 `;
 
-const renderItem = item => {
+const renderItem = (item) => {
 	switch (item) {
 		case 'pri':
 			return 'shards';
@@ -66,13 +67,11 @@ const noData = (
 
 function StatsBox(props) {
 	let cols = [];
-	const {
-		title, data, style, showDelete,
-	} = props; // prettier-ignore
+	const { title, data, style, showDelete } = props;
 	if (typeof data === 'object') {
 		cols = Object.keys(data)
-			.filter(item => !blackList.includes(item))
-			.map(item => (
+			.filter((item) => !blackList.includes(item))
+			.map((item) => (
 				<div>
 					<div className={stats}>{data[item]}</div>
 					<div className={titleStyles}>{renderItem(item)}</div>
@@ -150,5 +149,18 @@ function StatsBox(props) {
 		</Card>
 	);
 }
+
+StatsBox.propTypes = {
+	title: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
+	data: PropTypes.object.isRequired,
+	style: PropTypes.object,
+	showDelete: PropTypes.bool,
+	history: PropTypes.object.isRequired,
+};
+
+StatsBox.defaultProps = {
+	style: {},
+	showDelete: false,
+};
 
 export default withRouter(StatsBox);

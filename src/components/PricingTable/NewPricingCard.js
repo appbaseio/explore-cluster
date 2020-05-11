@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { array, node, string, func } from 'prop-types';
+import { array, node, string, func, bool } from 'prop-types';
 import styled, { css } from 'react-emotion';
 import { media } from '../../utils/media';
 import ClickToShow from './ClickToShow';
@@ -68,9 +68,7 @@ class NewPricingCard extends Component {
 			children,
 			linkColor,
 			stripeName,
-			amount,
 			token,
-			stripeKey,
 			isCurrentPlan,
 			buttonText,
 			onClickButton,
@@ -98,7 +96,7 @@ class NewPricingCard extends Component {
 					/>
 				</PricingCardHeader>
 				<PricingList css={{ fontWeight: 700 }}>
-					{pricingList.map(list => (
+					{pricingList.map((list) => (
 						<li key={list}>{list}</li>
 					))}
 				</PricingList>
@@ -123,6 +121,7 @@ NewPricingCard.defaultProps = {
 	children: undefined,
 	onClickButton: undefined,
 	buttonText: 'Subscribe',
+	isCurrentPlan: false,
 };
 NewPricingCard.propTypes = {
 	price: string,
@@ -135,5 +134,8 @@ NewPricingCard.propTypes = {
 	children: node,
 	buttonText: string,
 	onClickButton: func,
+	stripeName: string.isRequired,
+	token: func.isRequired,
+	isCurrentPlan: bool,
 };
 export default NewPricingCard;

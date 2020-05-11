@@ -1,13 +1,15 @@
 import React from 'react';
-import { Table, Checkbox, Input } from 'antd';
 import PropTypes from 'prop-types';
+import { Table, Checkbox, Input } from 'antd';
+import { get } from 'lodash';
+
 import { FieldControl } from 'react-reactive-form';
 
 // Custom acls tabular view
 class Acl extends React.PureComponent {
 	constructor(props) {
 		super(props);
-		this.dataSource = props.control.controls.map(groupCtrl => ({
+		this.dataSource = get(props, 'control.controls', []).map((groupCtrl) => ({
 			key: groupCtrl.get('acl').value,
 			Tag: () => (
 				<FieldControl
@@ -68,10 +70,12 @@ class Acl extends React.PureComponent {
 
 Acl.defaultProps = {
 	isRateLimitPresent: true,
+	control: PropTypes.object,
 };
 
 Acl.propTypes = {
 	isRateLimitPresent: PropTypes.bool,
+	control: {},
 };
 
 export default Acl;

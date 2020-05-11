@@ -1,7 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Layout } from 'antd';
 
 import { mediaKey } from '../../utils/media';
+import { children as childrenProp } from '../../utils/prop-types';
 
 const { Header } = Layout;
 
@@ -33,5 +35,15 @@ const WhiteHeader = ({ children, compact, ...props }) => (
 		</div>
 	</Header>
 );
+
+WhiteHeader.propTypes = {
+	children: childrenProp,
+	compact: PropTypes.bool,
+};
+
+WhiteHeader.defaultProps = {
+	children: null,
+	compact: false,
+};
 
 export default WhiteHeader;

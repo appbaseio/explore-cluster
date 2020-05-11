@@ -59,6 +59,8 @@ AppPageContainer.defaultProps = {
 	isError: undefined,
 	appName: '',
 	shouldFetchUserPlan: true,
+	isFetchingApps: false,
+	apps: {},
 };
 
 AppPageContainer.propTypes = {
@@ -71,6 +73,8 @@ AppPageContainer.propTypes = {
 	fetchClusterPlan: PropTypes.func.isRequired,
 	isClusterPlanFetching: PropTypes.bool,
 	isClusterPlanFetched: PropTypes.bool.isRequired,
+	isFetchingApps: PropTypes.bool,
+	apps: PropTypes.object,
 };
 
 const mapStateToProps = (state, ownProps) => {
@@ -86,8 +90,8 @@ const mapStateToProps = (state, ownProps) => {
 	};
 };
 
-const mapDispatchToProps = dispatch => ({
-	updateCurrentApp: appName => dispatch(setCurrentApp(appName, appName)),
+const mapDispatchToProps = (dispatch) => ({
+	updateCurrentApp: (appName) => dispatch(setCurrentApp(appName, appName)),
 	fetchClusterPlan: () => dispatch(getAppPlan()),
 });
 

@@ -1,5 +1,6 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { Component } from 'react';
-
+import PropTypes from 'prop-types';
 import Introduction from './screens/Introduction';
 import ImportData from './screens/ImportData';
 import AppbaseFeatures from './screens/AppbaseFeatures';
@@ -29,7 +30,7 @@ export default class Onboarding extends Component {
 	};
 
 	nextScreen = () => {
-		this.setState(state => {
+		this.setState((state) => {
 			const currentScreen =
 				state.currentScreen + 1 < state.totalScreen
 					? state.currentScreen + 1
@@ -44,7 +45,7 @@ export default class Onboarding extends Component {
 	};
 
 	previousScreen = () => {
-		this.setState(state => {
+		this.setState((state) => {
 			const currentScreen =
 				state.currentScreen - 1 >= 0 ? state.currentScreen - 1 : state.currentScreen;
 
@@ -59,8 +60,8 @@ export default class Onboarding extends Component {
 		});
 	};
 
-	setScreen = currentScreen => {
-		this.setState(state => ({
+	setScreen = (currentScreen) => {
+		this.setState((state) => ({
 			...state,
 			currentScreen:
 				currentScreen <= state.thresholdScreen ? currentScreen : state.currentScreen,
@@ -73,25 +74,25 @@ export default class Onboarding extends Component {
 		});
 	};
 
-	setURL = url => {
+	setURL = (url) => {
 		this.setState({
 			url,
 		});
 	};
 
-	setSearchFields = searchFields => {
+	setSearchFields = (searchFields) => {
 		this.setState({
 			searchFields,
 		});
 	};
 
-	setFacetFields = facetFields => {
+	setFacetFields = (facetFields) => {
 		this.setState({
 			facetFields,
 		});
 	};
 
-	setAppName = newApp => {
+	setAppName = (newApp) => {
 		this.setState({
 			newApp,
 		});
@@ -218,3 +219,7 @@ export default class Onboarding extends Component {
 		);
 	}
 }
+
+Onboarding.propTypes = {
+	history: PropTypes.object.isRequired,
+};

@@ -9,7 +9,7 @@ import {
 	getSingleFunction,
 	updateFunctions,
 } from '../../batteries/modules/actions';
-import { DeployFunctionForm } from './DeployFunctionForm';
+import DeployFunctionForm from './DeployFunctionForm';
 
 const DeployFunctionModal = ({
 	node,
@@ -21,19 +21,11 @@ const DeployFunctionModal = ({
 	putFunctions,
 	getFunction,
 }) => {
-	const oriEnvData = get(node, 'function.envVars', {});
-	const revEnvData = Object.keys(oriEnvData).map(key => ({
-		key,
-		value: oriEnvData[key],
-	}));
 	const [didMount, setDidMount] = useState(false);
 	const [radioValue, setValue] = useState(get(node, 'function.secrets') ? 'no' : 'yes');
 	const [functionName, setFunctionName] = useState(get(node, 'function.service'));
 	const [dockerImage, setDockerImage] = useState(get(node, 'function.image'));
 	const [globalError, setGlobalError] = useState({});
-	const [envDataSource, setEnvData] = useState(
-		revEnvData.length === 0 ? [{ key: '', value: '' }] : revEnvData,
-	);
 
 	const handleInputRequired = handleInputClosure(setGlobalError, globalError);
 
@@ -70,14 +62,8 @@ const DeployFunctionModal = ({
 		function handleDeploymentCheck() {
 			deploymentCheck(getFunction, functionName, myInterval);
 		}
-		const parsedEnvData = envDataSource.reduce((objAcc, envSource) => {
-			const { key, value } = envSource;
-			if (key && value) objAcc[key] = value;
-			return objAcc;
-		}, {});
 		const payload = {
 			image: dockerImage,
-			envVars: parsedEnvData,
 			secrets: radioValue === 'no' ? ['registry'] : undefined,
 		};
 		if (node) {
@@ -96,7 +82,7 @@ const DeployFunctionModal = ({
 				myInterval = setInterval(handleDeploymentCheck, 7000);
 			}
 		} else {
-			deployFunction(functionName, payload).then(res => {
+			deployFunction(functionName, payload).then((res) => {
 				if (!(res && res.error)) {
 					myInterval = setInterval(handleDeploymentCheck, 7000);
 				}
@@ -124,7 +110,7 @@ const DeployFunctionModal = ({
 				node={node}
 				dockerImage={dockerImage}
 				setDockerImage={setDockerImage}
-				onChange={e => setValue(e.target.value)}
+				onChange={(e) => setValue(e.target.value)}
 				value={radioValue}
 				setGlobalError={setGlobalError}
 			/>
@@ -134,25 +120,33 @@ const DeployFunctionModal = ({
 
 DeployFunctionModal.propTypes = {
 	handleCancel: PropTypes.func,
+	node: PropTypes.object,
+	deployFunction: PropTypes.func.isRequired,
+	putFunctions: PropTypes.func.isRequired,
+	getFunction: PropTypes.func.isRequired,
+	loading: PropTypes.bool,
+	error: PropTypes.string,
+	success: PropTypes.bool,
 };
 
 DeployFunctionModal.defaultProps = {
-	dockerImg: '',
-	funcName: '',
-	envData: [],
+	node: null,
 	handleCancel: () => {},
+	loading: false,
+	error: undefined,
+	success: false,
 };
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
 	loading: get(state, '$getAppFunctions.isCreating'),
 	error: get(state, '$getAppFunctions.error'),
 	success: get(state, '$getAppFunctions.success'),
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	deployFunction: (name, payload) => dispatch(createFunction(name, payload)),
 	putFunctions: (appName, payload) => dispatch(updateFunctions(appName, payload)),
-	getFunction: appName => dispatch(getSingleFunction(appName)),
+	getFunction: (appName) => dispatch(getSingleFunction(appName)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DeployFunctionModal);

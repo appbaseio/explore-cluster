@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Select } from 'antd';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
@@ -22,13 +23,13 @@ class IndexDropdown extends React.Component {
 		return hasValuesChanged(this.props, nextProps, ['apps', 'error', 'selectedIndexes']);
 	}
 
-	handleChange = values => {
+	handleChange = (values) => {
 		const { onChange, selectedIndexes } = this.props;
 		const isAllIndex = selectedIndexes.includes('*');
 		const isSelectingAllIndex = values.includes('*');
 
 		if (isAllIndex) {
-			onChange(values.filter(index => index !== '*'));
+			onChange(values.filter((index) => index !== '*'));
 		} else if (isSelectingAllIndex) {
 			onChange(['*']);
 		} else {
@@ -43,7 +44,7 @@ class IndexDropdown extends React.Component {
 			return null;
 		}
 
-		const filteredApps = Object.keys(apps).filter(app => !app.startsWith('.'));
+		const filteredApps = Object.keys(apps).filter((app) => !app.startsWith('.'));
 		return (
 			<Select
 				mode="multiple"
@@ -54,7 +55,7 @@ class IndexDropdown extends React.Component {
 				onChange={this.handleChange}
 			>
 				<Option key="*">* (Include all index)</Option>
-				{filteredApps.map(app => (
+				{filteredApps.map((app) => (
 					<Option key={app}>{app}</Option>
 				))}
 			</Select>
@@ -62,11 +63,25 @@ class IndexDropdown extends React.Component {
 	}
 }
 
-const mapStateToProps = state => ({
+IndexDropdown.propTypes = {
+	apps: PropTypes.object,
+	fetchApps: PropTypes.func.isRequired,
+	selectedIndexes: PropTypes.array,
+	onChange: PropTypes.func.isRequired,
+	error: PropTypes.object,
+};
+
+IndexDropdown.defaultProps = {
+	apps: null,
+	selectedIndexes: [],
+	error: {},
+};
+
+const mapStateToProps = (state) => ({
 	apps: get(state, 'apps.data'),
 });
 
-const mapDispatchToProps = dispatch => ({
+const mapDispatchToProps = (dispatch) => ({
 	fetchApps: () => dispatch(loadApps()),
 });
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { css } from 'emotion';
 import { Card, Icon, Select } from 'antd';
 import { getErrorClass, getErrorMessage } from '../utils/error';
@@ -63,7 +64,7 @@ class ActionSelector extends React.Component {
 		);
 	}
 
-	handleDropdown = value => {
+	handleDropdown = (value) => {
 		const { onChange } = this.props;
 
 		onChange({
@@ -84,7 +85,7 @@ class ActionSelector extends React.Component {
 	render() {
 		const { actions: selectedActions, error, condition } = this.props;
 		const optionsToShow = Object.keys(actions).filter(
-			action => !(selectedActions || []).find(item => item.type === action),
+			(action) => !(selectedActions || []).find((item) => item.type === action),
 		);
 		return (
 			<Card className={css([cardStyles, getErrorClass(error)])} hoverable>
@@ -96,7 +97,7 @@ class ActionSelector extends React.Component {
 						style={{ width: '100%' }}
 						value={undefined}
 					>
-						{optionsToShow.map(action => (
+						{optionsToShow.map((action) => (
 							<Option disabled={this.getDisabled(condition, action)} key={action}>
 								{actions[action].name}
 							</Option>
@@ -119,5 +120,18 @@ class ActionSelector extends React.Component {
 		);
 	}
 }
+
+ActionSelector.propTypes = {
+	actions: PropTypes.array,
+	onChange: PropTypes.func.isRequired,
+	error: PropTypes.object,
+	condition: PropTypes.string,
+};
+
+ActionSelector.defaultProps = {
+	actions: [],
+	error: {},
+	condition: undefined,
+};
 
 export default ActionSelector;
