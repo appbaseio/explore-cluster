@@ -68,10 +68,14 @@ class SearchPreview extends React.Component {
 		}
 
 		/*
-			Fetch Settings ifnot present in redux store.
+			Fetch Settings if not present in redux store.
 		*/
 		if (!settings) {
 			fetchSearchSettings(app);
+		} else if (searchState) {
+			this.setState({
+				settings: searchState,
+			});
 		} else {
 			this.setState({
 				settings: generateQuery(hasTestSettings ? testSettings : settings),
@@ -87,21 +91,6 @@ class SearchPreview extends React.Component {
 			});
 		} else {
 			fetchMappings(app, credentials, url);
-		}
-
-		if (searchState) {
-			this.setState({
-				settings: searchState,
-			});
-			return;
-		}
-
-		if (!settings) {
-			fetchSearchSettings(app);
-		} else if (hasTestSettings) {
-			this.setState({
-				settings: generateQuery(testSettings),
-			});
 		}
 	}
 
@@ -431,6 +420,8 @@ SearchPreview.propTypes = {
 	fetchingDefaultSettings: PropTypes.bool,
 	isFetchingMappings: PropTypes.bool,
 	mappings: PropTypes.object,
+	searchState: PropTypes.object,
+	clearState: PropTypes.func,
 };
 
 SearchPreview.defaultProps = {
@@ -443,6 +434,8 @@ SearchPreview.defaultProps = {
 	fetchingDefaultSettings: false,
 	isFetchingMappings: false,
 	mappings: null,
+	searchState: null,
+	clearState: () => {},
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchPreview);
