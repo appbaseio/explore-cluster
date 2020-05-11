@@ -24,9 +24,15 @@ export const drawerClass = css`
 		justify-content: space-between;
 	}
 
-	.insights-header > h6 {
+	.insights-header > div > h6 {
 		font-size: 16px;
 		color: white;
+		margin: 0;
+	}
+
+	.insights-header > div > p {
+		font-size: 14px;
+		color: #fafafa;
 		margin: 0;
 	}
 

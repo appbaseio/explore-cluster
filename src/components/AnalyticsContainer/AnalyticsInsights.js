@@ -1,7 +1,7 @@
 import React from 'react';
 import { get } from 'lodash';
 import { connect } from 'react-redux';
-import { Tabs, Button, message, notification } from 'antd';
+import { Tabs, Button, message, notification, Result } from 'antd';
 import PropTypes from 'prop-types';
 import CollapsibleInsights from './CollapsibleInsights';
 import { toggleInsightsSidebar, getAppAnalyticsInsights } from '../../batteries/modules/actions';
@@ -12,6 +12,7 @@ import sampleData from './sample-data';
 import { getUrlParams } from '../../utils/helper';
 import { drawerClass } from './styles';
 import { getAppAnalyticsInsightsByName } from '../../batteries/modules/selectors';
+import { getMonthRange } from './utils';
 
 const { TabPane } = Tabs;
 
@@ -19,6 +20,10 @@ class AnalyticsInsights extends React.Component {
 	defaultTabKey = 'insights';
 
 	openInsight = null;
+
+	range = getMonthRange();
+
+	noDataText = `You don't have significant data to generate insights from for duration: ${this.range}`;
 
 	componentDidMount() {
 		const urlParams = getUrlParams(window.location.search);
@@ -143,19 +148,35 @@ class AnalyticsInsights extends React.Component {
 		}
 	};
 
+	renderInsightHeader = () => {
+		const { toggleSidebar } = this.props;
+		return (
+			<React.Fragment>
+				<div>
+					<h6>Actionable Insights</h6>
+					<p>{this.range}</p>
+				</div>
+				<Button onClick={toggleSidebar} shape="circle" icon="close" />
+			</React.Fragment>
+		);
+	};
+
 	render() {
-		const { isOpen, toggleSidebar, insights, isFetching, tier, featureInsights } = this.props;
+		const { isOpen, insights, isFetching, tier, featureInsights } = this.props;
+
 		if (!insights && !isFetching) {
-			return null;
+			return (
+				<div className={`${drawerClass} ${isOpen ? 'open' : ''}`}>
+					<div className="insights-header">{this.renderInsightHeader()}</div>
+					<Result status="404" subTitle={this.noDataText} />
+				</div>
+			);
 		}
 
 		if (isFetching) {
 			return (
 				<div className={`${drawerClass} ${isOpen ? 'open' : ''}`}>
-					<div className="insights-header">
-						<h6>Actionable Insights</h6>
-						<Button onClick={toggleSidebar} shape="circle" icon="close" />
-					</div>
+					<div className="insights-header">{this.renderInsightHeader()}</div>
 					<Loader />
 				</div>
 			);
@@ -164,10 +185,7 @@ class AnalyticsInsights extends React.Component {
 		if (!isValidPlan(tier, featureInsights)) {
 			return (
 				<div className={`${drawerClass} ${isOpen ? 'open' : ''}`}>
-					<div className="insights-header">
-						<h6>Actionable Insights</h6>
-						<Button onClick={toggleSidebar} shape="circle" icon="close" />
-					</div>
+					<div className="insights-header">{this.renderInsightHeader()}</div>
 					<Overlay
 						lockSectionStyle={{
 							transform: 'translateY(70%)',
@@ -197,10 +215,7 @@ class AnalyticsInsights extends React.Component {
 
 		return (
 			<div className={`${drawerClass} ${isOpen ? 'open' : ''}`}>
-				<div className="insights-header">
-					<h6>Actionable Insights</h6>
-					<Button onClick={toggleSidebar} shape="circle" icon="close" />
-				</div>
+				<div className="insights-header">{this.renderInsightHeader()}</div>
 				<div className="insight-sidebar-content">
 					<Tabs style={{ padding: 10 }} defaultActiveKey={this.defaultTabKey}>
 						{Object.keys(insights)
@@ -211,6 +226,8 @@ class AnalyticsInsights extends React.Component {
 										type={insightType}
 										defaultOpen={this.openInsight}
 										insights={insights[insightType]}
+										noDataText={this.noDataText}
+										range={this.range}
 									/>
 								</TabPane>
 							))}
@@ -221,15 +238,22 @@ class AnalyticsInsights extends React.Component {
 	}
 }
 
+AnalyticsInsights.defaultProps = {
+	insightUpdates: [],
+	insights: null,
+	appName: '',
+	error: null,
+};
+
 AnalyticsInsights.propTypes = {
 	isOpen: PropTypes.bool.isRequired,
-	appName: PropTypes.string.isRequired,
+	appName: PropTypes.string,
 	isFetching: PropTypes.bool.isRequired,
-	insights: PropTypes.object.isRequired,
-	insightUpdates: PropTypes.array.isRequired,
+	insights: PropTypes.object,
+	insightUpdates: PropTypes.array,
 	tier: PropTypes.string.isRequired,
 	featureInsights: PropTypes.bool.isRequired,
-	error: PropTypes.object.isRequired,
+	error: PropTypes.object,
 	// Actions
 	getInsights: PropTypes.func.isRequired,
 	toggleSidebar: PropTypes.func.isRequired,

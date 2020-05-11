@@ -98,11 +98,40 @@ class CollapsibleInsights extends React.Component {
 		return null;
 	};
 
+	renderViewAllLink = (id) => {
+		const { appName } = this.props;
+
+		if (id !== 'no_results' && id !== 'popular_searches') {
+			return null;
+		}
+		const isClusterView = window.location.pathname.startsWith('/cluster');
+		let redirectLink = '';
+		let label = '';
+		if (id === 'no_results') {
+			redirectLink = isClusterView
+				? '/cluster/no-results-searches/'
+				: `/app/${appName}/no-result-searches`;
+			label = 'No Results Searches';
+		}
+		if (id === 'popular_searches') {
+			redirectLink = isClusterView
+				? '/cluster/popular-searches/'
+				: `/app/${appName}/popular-searches`;
+			label = 'Popular Searches';
+		}
+
+		return (
+			<Link style={{ marginBottom: 5 }} to={redirectLink}>
+				View all {label}
+			</Link>
+		);
+	};
+
 	render() {
-		const { insights, type, defaultOpen } = this.props;
+		const { insights, type, defaultOpen, noDataText } = this.props;
 
 		if (insights.length === 0) {
-			return <Empty />;
+			return <Empty description={noDataText} />;
 		}
 
 		return (
@@ -209,6 +238,7 @@ class CollapsibleInsights extends React.Component {
 						className="panel"
 						key={get(insight, 'id')}
 					>
+						{this.renderViewAllLink(get(insight, 'id'))}
 						<h6 className="recommendation-title">Recommendations</h6>
 						<List
 							itemLayout="horizontal"
@@ -269,22 +299,25 @@ CollapsibleInsights.defaultProps = {
 	apps: {},
 	defaultOpen: '',
 	appName: '',
+	noDataText: '',
+	insights: [],
 };
 
 CollapsibleInsights.propTypes = {
-	insights: PropTypes.array.isRequired,
+	insights: PropTypes.array,
 	appName: PropTypes.string,
 	apps: PropTypes.object,
 	isFetching: PropTypes.bool.isRequired,
 	type: PropTypes.string.isRequired,
 	history: PropTypes.object.isRequired,
+	noDataText: PropTypes.string,
 	defaultOpen: PropTypes.string,
 	updateInsight: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
 	isOpen: get(state, '$getAppAnalyticsInsights.isOpen', false),
-	appName: get(state, '$getCurrentApp.name'),
+	appName: get(state, '$getCurrentApp.name', 'default'),
 	apps: get(state, 'apps.data', {}),
 	isFetching: get(state, '$getAppAnalyticsInsights.isFetching'),
 });
