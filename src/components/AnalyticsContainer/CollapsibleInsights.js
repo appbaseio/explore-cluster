@@ -63,14 +63,26 @@ class CollapsibleInsights extends React.Component {
 		});
 	};
 
-	renderRecommendationLink = (link) => {
+	renderRedirectLink = (link, showAsLink) => {
 		const { appName, history, apps } = this.props;
+
+		if (!link) {
+			return null;
+		}
+
 		if (window.location.pathname.startsWith('/app')) {
 			return (
-				<Link to={`/${link.replace(':index', appName)}`}>
-					<Button style={{ marginTop: 5 }} size="small">
-						Go to Report
-					</Button>
+				<Link
+					style={showAsLink ? { marginBottom: 8, display: 'block' } : {}}
+					to={`/${link.replace(':index', appName)}`}
+				>
+					{showAsLink ? (
+						'View All'
+					) : (
+						<Button style={{ marginTop: 5 }} size="small">
+							Go to Report
+						</Button>
+					)}
 				</Link>
 			);
 		}
@@ -83,9 +95,21 @@ class CollapsibleInsights extends React.Component {
 					renderItem={(popConfirmProps) => {
 						return (
 							<div {...popConfirmProps}>
-								<Button style={{ marginTop: 5 }} size="small">
-									Go to Report
-								</Button>
+								{showAsLink ? (
+									<div
+										style={{
+											cursor: 'pointer',
+											color: '#1890ff',
+											marginBottom: 8,
+										}}
+									>
+										View All
+									</div>
+								) : (
+									<Button style={{ marginTop: 5 }} size="small">
+										Go to Report
+									</Button>
+								)}
 							</div>
 						);
 					}}
@@ -96,35 +120,6 @@ class CollapsibleInsights extends React.Component {
 			);
 		}
 		return null;
-	};
-
-	renderViewAllLink = (id) => {
-		const { appName } = this.props;
-
-		if (id !== 'no_results' && id !== 'popular_searches') {
-			return null;
-		}
-		const isClusterView = window.location.pathname.startsWith('/cluster');
-		let redirectLink = '';
-		let label = '';
-		if (id === 'no_results') {
-			redirectLink = isClusterView
-				? '/cluster/no-results-searches/'
-				: `/app/${appName}/no-result-searches`;
-			label = 'No Results Searches';
-		}
-		if (id === 'popular_searches') {
-			redirectLink = isClusterView
-				? '/cluster/popular-searches/'
-				: `/app/${appName}/popular-searches`;
-			label = 'Popular Searches';
-		}
-
-		return (
-			<Link style={{ marginBottom: 5 }} to={redirectLink}>
-				View all {label}
-			</Link>
-		);
 	};
 
 	render() {
@@ -238,7 +233,7 @@ class CollapsibleInsights extends React.Component {
 						className="panel"
 						key={get(insight, 'id')}
 					>
-						{this.renderViewAllLink(get(insight, 'id'))}
+						{this.renderRedirectLink(get(insight, 'insight.short_link'), true)}
 						<h6 className="recommendation-title">Recommendations</h6>
 						<List
 							itemLayout="horizontal"
@@ -277,7 +272,7 @@ class CollapsibleInsights extends React.Component {
 												/>
 												{get(recommendation, 'short_link') ? (
 													<div>
-														{this.renderRecommendationLink(
+														{this.renderRedirectLink(
 															get(recommendation, 'short_link'),
 														)}
 													</div>
