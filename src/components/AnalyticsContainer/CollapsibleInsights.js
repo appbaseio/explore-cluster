@@ -135,7 +135,7 @@ class CollapsibleInsights extends React.Component {
 		const { insights, type, defaultOpen, noDataText } = this.props;
 
 		if (insights.length === 0) {
-			return <Empty description={noDataText} />;
+			return <Empty description={type === 'insights' ? noDataText : 'No Data'} />;
 		}
 
 		return (
