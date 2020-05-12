@@ -8,8 +8,8 @@ const generateQuery = ({ aggregations: filters, search, results, synonyms }) => 
 					return {
 						id: `list-${index}`,
 						dataField: typeof filterField === 'string' ? [filterField] : filterField,
-						sortBy: filters.sortBy,
-						size: filters.size,
+						sortBy: get(filters, 'sortBy', 'asc'),
+						size: get(filters, 'size', 10),
 						type: 'term',
 						value: [],
 					};
@@ -17,8 +17,8 @@ const generateQuery = ({ aggregations: filters, search, results, synonyms }) => 
 			: [];
 
 	const filtersId = filtersData.map((filter) => filter.id);
-	const resultDataField = results.dataField || '_score';
-	const searchDataField = search.dataField || [];
+	const resultDataField = get(results, 'dataField', '_score');
+	const searchDataField = get(search, 'dataField', []);
 	const query = [
 		{
 			...results,
@@ -26,14 +26,14 @@ const generateQuery = ({ aggregations: filters, search, results, synonyms }) => 
 			react: {
 				and: ['search', ...filtersId],
 			},
-			size: results.size || 10,
+			size: get(results, 'size', 10),
 			dataField: Array.isArray(resultDataField) ? resultDataField : [resultDataField],
 		},
 		{
 			...search,
 			id: 'search',
 			dataField: Array.isArray(searchDataField) ? searchDataField : [searchDataField],
-			fieldWeights: search.fieldWeights || [],
+			fieldWeights: get(search, 'fieldWeights', []),
 			enableSynonyms: get(synonyms, 'enabled', true),
 			value: '',
 		},
