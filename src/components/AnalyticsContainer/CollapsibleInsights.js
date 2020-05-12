@@ -123,7 +123,7 @@ class CollapsibleInsights extends React.Component {
 						);
 					}}
 					onSelect={(index) => {
-						history.push(`/${link.replace(':index', index)}`);
+						history.push(`/${link.replace(':index', index)}${queryParam}`);
 					}}
 				/>
 			);
