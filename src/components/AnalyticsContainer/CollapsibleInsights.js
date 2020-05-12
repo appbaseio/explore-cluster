@@ -2,6 +2,7 @@ import React from 'react';
 import { Collapse, Alert, List, Icon, Button, Dropdown, Menu, Empty, Popconfirm } from 'antd';
 import { Link, withRouter } from 'react-router-dom';
 import { get } from 'lodash';
+import moment from 'moment';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { updateInsightStatus } from '../../batteries/modules/actions';
@@ -70,11 +71,19 @@ class CollapsibleInsights extends React.Component {
 			return null;
 		}
 
+		let queryParam = '';
+
+		if (showAsLink) {
+			const startDate = moment().subtract(1, 'months').startOf('month').format('YYYY/MM/DD');
+			const endDate = moment().subtract(1, 'months').endOf('month').format('YYYY/MM/DD');
+			queryParam = `?from=${startDate}&to=${endDate}`;
+		}
+
 		if (window.location.pathname.startsWith('/app')) {
 			return (
 				<Link
 					style={showAsLink ? { marginBottom: 8, display: 'block' } : {}}
-					to={`/${link.replace(':index', appName)}`}
+					to={`/${link.replace(':index', appName)}${queryParam}`}
 				>
 					{showAsLink ? (
 						'View All'

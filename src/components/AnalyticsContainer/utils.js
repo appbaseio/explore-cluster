@@ -1,8 +1,12 @@
+import moment from 'moment';
+
 export const getMonthRange = () => {
-	const currentDate = new Date();
-	const previousMonthLastDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 0);
-	const previousMonth = getMonth(currentDate.getMonth());
-	return `1 ${previousMonth} - ${previousMonthLastDate.getDate()} ${previousMonth}`;
+	const startDate = moment().subtract(1, 'months').startOf('month').format('DD');
+	const endDate = moment().subtract(1, 'months').endOf('month').format('DD');
+	const month = moment().subtract(1, 'months').endOf('month').format('MM');
+
+	const previousMonth = getMonth(+month);
+	return `${startDate} - ${endDate} ${previousMonth}`;
 };
 
 export const getMonth = (month) => {

@@ -23,7 +23,7 @@ class AnalyticsInsights extends React.Component {
 
 	range = getMonthRange();
 
-	noDataText = `You don't have significant data to generate insights from for duration: ${this.range}`;
+	noDataText = `You don't have significant data to generate insights for duration: ${this.range}`;
 
 	componentDidMount() {
 		const urlParams = getUrlParams(window.location.search);
@@ -136,8 +136,10 @@ class AnalyticsInsights extends React.Component {
 	}
 
 	componentWillUnmount() {
-		const { toggleSidebar } = this.props;
-		toggleSidebar();
+		const { toggleSidebar, isOpen } = this.props;
+		if (isOpen) {
+			toggleSidebar();
+		}
 	}
 
 	fetchInsights = (appName) => {
