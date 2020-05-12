@@ -121,6 +121,10 @@ const settingsMap = {
 	synonyms: {
 		description: 'Enable synonyms for better searching across similar words',
 	},
+	queryFormat: {
+		title: 'Query Format',
+		description: `or returns all the results matching any of the search query text's parameters.On the other hand with and, only returns the results matching all of the search query text's parameters.`,
+	},
 };
 
 export default settingsMap;

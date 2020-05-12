@@ -12,6 +12,7 @@ const generateQuery = ({ aggregations: filters, search, results, synonyms }) => 
 						size: filters.size,
 						type: 'term',
 						value: [],
+						queryFormat: get(filters, 'queryFormat', 'or'),
 					};
 			  })
 			: [];
