@@ -7,7 +7,7 @@ import { MultiList } from '@appbaseio/reactivesearch';
 import settingsMap from '../../../components/ReviewAndSave/helper';
 
 const Filter = (props) => {
-	const { app, aggs, handleValueChange } = props;
+	const { app, aggs, handleValueChange, handleModal } = props;
 	return (
 		<React.Fragment>
 			{aggs.map((agg) => (
@@ -28,7 +28,10 @@ const Filter = (props) => {
 				</Card>
 			))}
 
-			<Link to={`/app/${app}/aggs`}>
+			<Link
+				onClick={window.location.pathname === `/app/${app}/aggs` ? handleModal : null}
+				to={`/app/${app}/aggs`}
+			>
 				<Tooltip title={settingsMap.set_aggs.description}>
 					<Button style={{ marginTop: 8 }} block type="primary">
 						<Icon type="edit" />
@@ -44,11 +47,13 @@ Filter.propTypes = {
 	aggs: PropTypes.array,
 	app: PropTypes.string.isRequired,
 	handleValueChange: PropTypes.func,
+	handleModal: PropTypes.func,
 };
 
 Filter.defaultProps = {
 	aggs: [],
 	handleValueChange: () => {},
+	handleModal: () => {},
 };
 
 export default Filter;

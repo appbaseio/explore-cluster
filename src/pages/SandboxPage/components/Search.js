@@ -38,7 +38,7 @@ export const highlighter = css`
 `;
 
 const Search = (props) => {
-	const { app, search, handleValueChange } = props;
+	const { app, search, handleValueChange, handleModal } = props;
 	return (
 		<Card>
 			<Row type="flex" gutter={8} align="middle" justify="space-between">
@@ -73,7 +73,12 @@ const Search = (props) => {
 					) : null}
 				</Col>
 				<Col xs={4}>
-					<Link to={`/app/${app}/search`}>
+					<Link
+						onClick={
+							window.location.pathname === `/app/${app}/search` ? handleModal : null
+						}
+						to={`/app/${app}/search`}
+					>
 						<Tooltip title={settingsMap.set_search.description}>
 							<Button size="large" ghost type="primary">
 								<Icon type="edit" />
@@ -97,11 +102,13 @@ Search.propTypes = {
 	search: PropTypes.object,
 	app: PropTypes.string.isRequired,
 	handleValueChange: PropTypes.func,
+	handleModal: PropTypes.func,
 };
 
 Search.defaultProps = {
 	search: {},
 	handleValueChange: () => {},
+	handleModal: () => {},
 };
 
 export default Search;

@@ -6,29 +6,14 @@ import { Switch, Route } from 'react-router-dom';
 import Loader from '../Loader';
 import AppPageContainer from '../AppPageContainer';
 import ErrorPage from '../../pages/ErrorPage';
+import AppsAnalyticsRoutes from './AppsAnalyticsRoutes';
 
-const AnalyticsPage = Loadable({
-	loader: () => import('../../pages/AnalyticsPage'),
-	loading: Loader,
-});
 const SearchTemplatesPage = Loadable({
 	loader: () => import('../../pages/SearchTemplatesPage'),
 	loading: Loader,
 });
 const QuerySuggestionsPage = Loadable({
 	loader: () => import('../../pages/QuerySuggestionsPage'),
-	loading: Loader,
-});
-const RequestDistributionPage = Loadable({
-	loader: () => import('../../pages/RequestDistributionPage'),
-	loading: Loader,
-});
-const GeoDistributionPage = Loadable({
-	loader: () => import('../../pages/GeoDistributionPage'),
-	loading: Loader,
-});
-const SearchLatency = Loadable({
-	loader: () => import('../../pages/SearchLatency'),
 	loading: Loader,
 });
 
@@ -72,32 +57,8 @@ const SandboxPage = Loadable({
 	loading: Loader,
 });
 
-const PopularSearches = Loadable({
-	loader: () => import('../../pages/PopularSearches'),
-	loading: Loader,
-});
-
-const PopularResults = Loadable({
-	loader: () => import('../../pages/PopularResults'),
-	loading: Loader,
-});
-
-const PopularFilters = Loadable({
-	loader: () => import('../../pages/PopularFilters'),
-	loading: Loader,
-});
-
-const NoResultSearches = Loadable({
-	loader: () => import('../../pages/NoResultSearches'),
-	loading: Loader,
-});
 const ShareSettings = Loadable({
 	loader: () => import('../../pages/ShareSettingsPage'),
-	loading: Loader,
-});
-
-const RequestLogs = Loadable({
-	loader: () => import('../../pages/RequestLogs'),
 	loading: Loader,
 });
 
@@ -135,7 +96,12 @@ class RouteContainer extends React.Component {
 	shouldComponentUpdate(nextProps) {
 		const { location } = this.props;
 
-		return nextProps && nextProps.location && nextProps.location.pathname !== location.pathname;
+		return (
+			(nextProps &&
+				nextProps.location &&
+				nextProps.location.pathname !== location.pathname) ||
+			(nextProps && nextProps.location && nextProps.location.search !== location.search)
+		);
 	}
 
 	render() {
@@ -158,77 +124,9 @@ class RouteContainer extends React.Component {
 					/>
 					<Route
 						exact
-						path="/app/:appName/analytics/:tab?/:subTab?"
-						component={(props) => (
-							<AppPageContainer {...props} component={AnalyticsPage} />
-						)}
-					/>
-					<Route
-						exact
-						path="/app/:appName/popular-searches"
-						component={(props) => (
-							<AppPageContainer {...props} component={PopularSearches} />
-						)}
-					/>
-					<Route
-						exact
-						path="/app/:appName/requests-per-minute"
-						component={(props) => (
-							<AppPageContainer {...props} component={RequestDistributionPage} />
-						)}
-					/>
-					<Route
-						exact
 						path="/app/:appName/credentials"
 						component={(props) => (
 							<AppPageContainer {...props} component={CredentialsPage} />
-						)}
-					/>
-					<Route
-						exact
-						path="/app/:appName/popular-results"
-						component={(props) => (
-							<AppPageContainer {...props} component={PopularResults} />
-						)}
-					/>
-					<Route
-						exact
-						path="/app/:appName/geo-distribution"
-						component={(props) => (
-							<AppPageContainer {...props} component={GeoDistributionPage} />
-						)}
-					/>
-					<Route
-						exact
-						path="/app/:appName/search-latency"
-						component={(props) => (
-							<AppPageContainer {...props} component={SearchLatency} />
-						)}
-					/>
-					<Route
-						exact
-						path="/app/:appName/popular-filters"
-						component={(props) => (
-							<AppPageContainer {...props} component={PopularFilters} />
-						)}
-					/>
-					<Route
-						exact
-						path="/app/:appName/request-logs/:tab?"
-						component={(props) => (
-							<AppPageContainer {...props} component={RequestLogs} />
-						)}
-					/>
-					<Route
-						exact
-						path="/app/:appName/no-results-searches"
-						component={(props) => (
-							<AppPageContainer
-								{...props}
-								shouldFetchAppInfo={false}
-								shouldFetchAppPlan={false}
-								component={NoResultSearches}
-							/>
 						)}
 					/>
 					<Route
@@ -398,6 +296,8 @@ class RouteContainer extends React.Component {
 							/>
 						)}
 					/>
+
+					<AppsAnalyticsRoutes />
 				</Switch>
 			</ErrorPage>
 		);

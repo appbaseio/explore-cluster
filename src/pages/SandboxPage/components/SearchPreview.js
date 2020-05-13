@@ -270,6 +270,7 @@ class SearchPreview extends React.Component {
 			rules,
 			isFetchingMappings,
 			mappings,
+			handleModal,
 		} = this.props;
 		const { settings: stateSettings, isAnalyticsEnabled } = this.state;
 
@@ -352,6 +353,7 @@ class SearchPreview extends React.Component {
 							handleValueChange={this.handleValueChange}
 							app={app}
 							aggs={aggregations}
+							handleModal={handleModal}
 						/>
 					</Col>
 					<Col md={18}>
@@ -359,6 +361,7 @@ class SearchPreview extends React.Component {
 							handleValueChange={this.handleValueChange}
 							app={app}
 							search={search}
+							handleModal={handleModal}
 						/>
 						<Result
 							result={result}
@@ -422,6 +425,7 @@ SearchPreview.propTypes = {
 	mappings: PropTypes.object,
 	searchState: PropTypes.object,
 	clearState: PropTypes.func,
+	handleModal: PropTypes.func,
 };
 
 SearchPreview.defaultProps = {
@@ -436,6 +440,7 @@ SearchPreview.defaultProps = {
 	mappings: null,
 	searchState: null,
 	clearState: () => {},
+	handleModal: () => {},
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchPreview);

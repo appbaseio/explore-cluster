@@ -35,11 +35,20 @@ class Dashboard extends Component {
 	state = {
 		error: false,
 		isLoading: true,
+		redirectLocation: null,
 	};
 
 	componentDidMount() {
 		const { loadArcUser } = this.props;
-		const params = new URLSearchParams(window.location.search);
+		const { pathname, search } = window.location;
+
+		if (pathname !== '/login' && pathname !== '/' && search) {
+			this.setState({
+				redirectLocation: `${pathname}${search}`,
+			});
+		}
+
+		const params = new URLSearchParams(search);
 		if (params.has('showProfile')) {
 			const showProfile = params.get('showProfile');
 			sessionStorage.setItem('showProfile', showProfile);
@@ -127,6 +136,12 @@ class Dashboard extends Component {
 		}
 	}
 
+	resetLocation = () => {
+		this.setState({
+			redirectLocation: null,
+		});
+	};
+
 	componentDidCatch(error, errorInfo) {
 		this.setState({
 			error: true,
@@ -141,7 +156,7 @@ class Dashboard extends Component {
 
 	render() {
 		const { user } = this.props;
-		const { error, isLoading } = this.state;
+		const { error, isLoading, redirectLocation } = this.state;
 
 		if (user.isLoading || isLoading) {
 			return <Loader />;
@@ -193,7 +208,16 @@ class Dashboard extends Component {
 					<Route exact path="/install" component={InstallPage} />
 					<Route exact path="/login" component={LoginPage} />
 					<Route exact path="/signup" component={SignupPage} />
-					<PrivateRoute user={user} component={Wrapper} />
+					<PrivateRoute
+						user={user}
+						component={(props) => (
+							<Wrapper
+								{...props}
+								resetLocation={this.resetLocation}
+								redirectLocation={redirectLocation}
+							/>
+						)}
+					/>
 				</Fragment>
 			</Router>
 		);

@@ -70,4 +70,5 @@ const mapStateToProps = (state) => ({
 	plan: get(state, '$getAppPlan.results.plan'),
 	isPaidUser: get(state, '$getAppPlan.results.isPaid'),
 });
+
 export default connect(mapStateToProps)(AnalyticsView);

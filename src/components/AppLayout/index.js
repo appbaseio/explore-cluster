@@ -1,11 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Layout } from 'antd';
+import { connect } from 'react-redux';
 
 import AppHeader from '../AppHeader';
 import AppsRouteContainer from './AppsRouteContainer';
+import { clearCurrentApp } from '../../batteries/modules/actions';
 
 class AppLayout extends React.PureComponent {
+	componentWillUnmount() {
+		const { clearApp } = this.props;
+		clearApp();
+	}
+
 	render() {
 		const { collapsed, showHeader, match, history, onToggle, ...props } = this.props;
 		return (
@@ -34,6 +41,7 @@ class AppLayout extends React.PureComponent {
 }
 
 AppLayout.propTypes = {
+	clearApp: PropTypes.func.isRequired,
 	collapsed: PropTypes.bool,
 	showHeader: PropTypes.bool,
 	match: PropTypes.object.isRequired,
@@ -46,4 +54,8 @@ AppLayout.defaultProps = {
 	showHeader: false,
 };
 
-export default AppLayout;
+const mapDispatchToProps = (dispatch) => ({
+	clearApp: () => dispatch(clearCurrentApp()),
+});
+
+export default connect(null, mapDispatchToProps)(AppLayout);
