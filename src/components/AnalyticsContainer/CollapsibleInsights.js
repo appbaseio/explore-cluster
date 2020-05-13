@@ -132,10 +132,17 @@ class CollapsibleInsights extends React.Component {
 	};
 
 	render() {
-		const { insights, type, defaultOpen, noDataText } = this.props;
+		const {
+			insights,
+			type,
+			defaultOpen,
+			noDataText,
+			noDataPresent,
+			insightUpdates,
+		} = this.props;
 
 		if (insights.length === 0) {
-			return <Empty description={type === 'insights' ? noDataText : 'No Data'} />;
+			return <Empty description={noDataPresent ? noDataText : 'No Data'} />;
 		}
 
 		return (
@@ -201,7 +208,7 @@ class CollapsibleInsights extends React.Component {
 
 												<Menu.Item key="delete">
 													<Popconfirm
-														title="Are you sure delete this insight?"
+														title="Are you sure to delete this insight?"
 														okText="Yes"
 														cancelText="No"
 														onConfirm={() =>
@@ -239,7 +246,11 @@ class CollapsibleInsights extends React.Component {
 								) : null}
 							</div>
 						}
-						className="panel"
+						className={`panel ${
+							get(insightUpdates, `${get(insight, 'id')}.inProgress`, false)
+								? 'in-progress'
+								: ''
+						}`}
 						key={get(insight, 'id')}
 					>
 						{this.renderRedirectLink(get(insight, 'insight.short_link'), true)}
@@ -305,6 +316,8 @@ CollapsibleInsights.defaultProps = {
 	appName: '',
 	noDataText: '',
 	insights: [],
+	noDataPresent: false,
+	insightUpdates: null,
 };
 
 CollapsibleInsights.propTypes = {
@@ -317,6 +330,8 @@ CollapsibleInsights.propTypes = {
 	noDataText: PropTypes.string,
 	defaultOpen: PropTypes.string,
 	updateInsight: PropTypes.func.isRequired,
+	noDataPresent: PropTypes.bool,
+	insightUpdates: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
@@ -324,6 +339,7 @@ const mapStateToProps = (state) => ({
 	appName: get(state, '$getCurrentApp.name', 'default'),
 	apps: get(state, 'apps.data', {}),
 	isFetching: get(state, '$getAppAnalyticsInsights.isFetching'),
+	insightUpdates: get(state, `$getAppAnalyticsInsights.updates`),
 });
 
 const mapDispatchToProps = (dispatch) => ({

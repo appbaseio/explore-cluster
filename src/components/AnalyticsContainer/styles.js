@@ -98,11 +98,20 @@ export const collapseStyles = css`
 		margin-top: 5px;
 	}
 
+	.panel {
+		transition: all ease 0.2s;
+	}
+
 	.panel:hover {
 		.title .icon {
 			transform: translateX(0px);
 			opacity: 1;
 		}
+	}
+
+	.panel.in-progress {
+		opacity: 0.4;
+		pointer-events: none;
 	}
 
 	.recommendation-link:hover {

@@ -96,7 +96,12 @@ class RouteContainer extends React.Component {
 	shouldComponentUpdate(nextProps) {
 		const { location } = this.props;
 
-		return nextProps && nextProps.location && nextProps.location.pathname !== location.pathname;
+		return (
+			(nextProps &&
+				nextProps.location &&
+				nextProps.location.pathname !== location.pathname) ||
+			(nextProps && nextProps.location && nextProps.location.search !== location.search)
+		);
 	}
 
 	render() {

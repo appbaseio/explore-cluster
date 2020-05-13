@@ -82,6 +82,7 @@ class AnalyticsInsights extends React.Component {
 		*/
 		if (
 			prevProps.isOpen === isOpen &&
+			updates &&
 			JSON.stringify(prevProps.insightUpdates) !== JSON.stringify(updates)
 		) {
 			Object.keys(updates).forEach((id) => {
@@ -215,6 +216,10 @@ class AnalyticsInsights extends React.Component {
 			);
 		}
 
+		const insightItems = Object.keys(insights).reduce((agg, insight) => {
+			return agg + get(insights, `${insight}.length`, 0);
+		}, 0);
+
 		return (
 			<div className={`${drawerClass} ${isOpen ? 'open' : ''}`}>
 				<div className="insights-header">{this.renderInsightHeader()}</div>
@@ -226,6 +231,7 @@ class AnalyticsInsights extends React.Component {
 								<TabPane tab={insightType.toLocaleUpperCase()} key={insightType}>
 									<CollapsibleInsights
 										type={insightType}
+										noDataPresent={!insightItems}
 										defaultOpen={this.openInsight}
 										insights={insights[insightType]}
 										noDataText={this.noDataText}
@@ -241,7 +247,7 @@ class AnalyticsInsights extends React.Component {
 }
 
 AnalyticsInsights.defaultProps = {
-	insightUpdates: [],
+	insightUpdates: null,
 	insights: null,
 	appName: '',
 	error: null,
@@ -252,7 +258,7 @@ AnalyticsInsights.propTypes = {
 	appName: PropTypes.string,
 	isFetching: PropTypes.bool.isRequired,
 	insights: PropTypes.object,
-	insightUpdates: PropTypes.array,
+	insightUpdates: PropTypes.object,
 	tier: PropTypes.string.isRequired,
 	featureInsights: PropTypes.bool.isRequired,
 	error: PropTypes.object,
