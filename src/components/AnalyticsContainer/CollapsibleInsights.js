@@ -64,7 +64,7 @@ class CollapsibleInsights extends React.Component {
 		});
 	};
 
-	renderRedirectLink = (link, showAsLink) => {
+	renderRedirectLink = ({ title, link, showAsLink = false }) => {
 		const { appName, history, apps } = this.props;
 
 		if (!link) {
@@ -86,10 +86,10 @@ class CollapsibleInsights extends React.Component {
 					to={`/${link.replace(':index', appName)}${queryParam}`}
 				>
 					{showAsLink ? (
-						'View All'
+						'Go to Report'
 					) : (
 						<Button style={{ marginTop: 5 }} size="small">
-							Go to Report
+							{title}
 						</Button>
 					)}
 				</Link>
@@ -112,11 +112,11 @@ class CollapsibleInsights extends React.Component {
 											marginBottom: 8,
 										}}
 									>
-										View All
+										Go to Report
 									</div>
 								) : (
 									<Button style={{ marginTop: 5 }} size="small">
-										Go to Report
+										{title}
 									</Button>
 								)}
 							</div>
@@ -253,7 +253,10 @@ class CollapsibleInsights extends React.Component {
 						}`}
 						key={get(insight, 'id')}
 					>
-						{this.renderRedirectLink(get(insight, 'insight.short_link'), true)}
+						{this.renderRedirectLink({
+							link: get(insight, 'insight.short_link'),
+							showAsLink: true,
+						})}
 						<h6 className="recommendation-title">Recommendations</h6>
 						<List
 							itemLayout="horizontal"
@@ -292,9 +295,14 @@ class CollapsibleInsights extends React.Component {
 												/>
 												{get(recommendation, 'short_link') ? (
 													<div>
-														{this.renderRedirectLink(
-															get(recommendation, 'short_link'),
-														)}
+														{this.renderRedirectLink({
+															link: get(recommendation, 'short_link'),
+															title: `Set ${get(
+																recommendation,
+																'title',
+																'',
+															)}`,
+														})}
 													</div>
 												) : null}
 											</React.Fragment>
