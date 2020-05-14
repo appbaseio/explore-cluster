@@ -62,6 +62,7 @@ const Search = (props) => {
 						<DataSearch
 							{...search}
 							autosuggest
+							value={search ? search.value || search.defaultValue || '' : ''}
 							onChange={(value) => handleValueChange(search.id, value)}
 							componentId={search.id}
 							onKeyDown={(e, triggerQuery) => {

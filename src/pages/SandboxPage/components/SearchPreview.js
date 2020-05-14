@@ -36,8 +36,9 @@ const container = css`
 class SearchPreview extends React.Component {
 	state = {
 		settings: null,
-		searchableMappings: [],
+		searchableMappings: null,
 		isAnalyticsEnabled: true,
+		isParsedStateApplied: false,
 	};
 
 	componentDidMount() {
@@ -155,9 +156,16 @@ class SearchPreview extends React.Component {
 			const searchQuery = get(props, 'searchState', []).find(
 				(component) => component.id === 'search',
 			);
+
 			// If parsedState doesnt contains search dataField we prefill with all searchable mappings
-			if (!get(searchQuery, 'dataField', []).length && state.searchableMappings) {
+			if (
+				!state.isParsedStateApplied &&
+				get(searchQuery, 'dataField.length', 0) === 0 &&
+				state.searchableMappings &&
+				Object.keys(state.searchableMappings).length > 0
+			) {
 				return {
+					isParsedStateApplied: true,
 					settings: [
 						...get(props, 'searchState', []).filter(
 							(component) => component.id !== 'search',
@@ -185,6 +193,8 @@ class SearchPreview extends React.Component {
 			!props.hasTestSettings &&
 			!props.isFetchingMappings &&
 			props.mappings &&
+			state.searchableMappings &&
+			Object.keys(state.searchableMappings).length > 0 &&
 			state.settings &&
 			get(searchSettings, 'dataField', []).length === 0
 		) {
@@ -208,6 +218,7 @@ class SearchPreview extends React.Component {
 			!props.settings &&
 			!state.settings &&
 			state.searchableMappings &&
+			Object.keys(state.searchableMappings).length > 0 &&
 			props.mappings &&
 			props.settingsErrorCode === 402
 		) {
