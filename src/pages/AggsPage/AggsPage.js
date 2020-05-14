@@ -20,6 +20,7 @@ import {
 	message,
 	Tooltip,
 	Skeleton,
+	Radio,
 } from 'antd';
 
 import {
@@ -90,6 +91,7 @@ class AggsPage extends React.Component {
 		includeNullValue: false,
 		isDirty: false,
 		visible: false,
+		queryFormat: 'or',
 	};
 
 	searchableMappings = {};
@@ -166,10 +168,11 @@ class AggsPage extends React.Component {
 
 	initData = (settings) => {
 		this.setState({
-			count: settings.aggregations.size,
-			sort: settings.aggregations.sortBy,
-			includeNullValue: settings.aggregations.includeNullValues,
-			dataField: settings.aggregations.dataField,
+			count: get(settings, 'aggregations.size'),
+			sort: get(settings, 'aggregations.sortBy'),
+			includeNullValue: get(settings, 'aggregations.includeNullValues'),
+			dataField: get(settings, 'aggregations.dataField'),
+			queryFormat: get(settings, 'aggregations.queryFormat', 'or'),
 		});
 	};
 
@@ -320,7 +323,7 @@ class AggsPage extends React.Component {
 	};
 
 	handleSave = () => {
-		const { isDirty, dataField, sort, count, includeNullValue } = this.state;
+		const { isDirty, dataField, sort, count, includeNullValue, queryFormat } = this.state;
 		const { updateSettingsAction, appName, settings } = this.props;
 
 		updateSettingsAction(appName, {
@@ -331,6 +334,7 @@ class AggsPage extends React.Component {
 				size: count,
 				sortBy: sort,
 				includeNullValues: includeNullValue,
+				queryFormat,
 			},
 		})
 			.then((res) => {
@@ -389,6 +393,12 @@ class AggsPage extends React.Component {
 		}
 	};
 
+	handleQueryFormat = (e) => {
+		this.setState({
+			queryFormat: e.target.value,
+		});
+	};
+
 	render() {
 		const {
 			searchableMappings,
@@ -399,6 +409,7 @@ class AggsPage extends React.Component {
 			visible,
 			isReset,
 			isDirty,
+			queryFormat,
 		} = this.state;
 		const {
 			isUpdating,
@@ -573,6 +584,20 @@ class AggsPage extends React.Component {
 					</Card>
 					<Card className={cardStyle}>
 						<label>
+							Query Format
+							<Tooltip title={settingsMap.queryFormat.description}>
+								<Icon style={{ marginLeft: 5 }} type="info-circle" />
+							</Tooltip>
+						</label>
+						<Radio.Group
+							style={{ display: 'flex', marginBottom: 8 }}
+							onChange={this.handleQueryFormat}
+							value={queryFormat}
+						>
+							<Radio value="or">OR</Radio>
+							<Radio value="and">AND</Radio>
+						</Radio.Group>
+						<label>
 							Default Size For Aggregations{' '}
 							<Tooltip title={settingsMap.agg_size.description}>
 								<Icon type="info-circle" />
@@ -657,6 +682,7 @@ class AggsPage extends React.Component {
 										sortBy: sort,
 										includeNullValues: includeNullValue,
 										dataField,
+										queryFormat,
 									},
 								},
 								hasTestSettings: true,
@@ -680,6 +706,7 @@ class AggsPage extends React.Component {
 									sortBy: sort,
 									includeNullValues: includeNullValue,
 									dataField,
+									queryFormat,
 								}}
 								onClick={() => this.toggleVisible(false)}
 								visible={visible}

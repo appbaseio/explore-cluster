@@ -1,3 +1,5 @@
+import React from 'react';
+
 const settingsMap = {
 	size: {
 		title: 'Page Size',
@@ -120,6 +122,30 @@ const settingsMap = {
 	},
 	synonyms: {
 		description: 'Enable synonyms for better searching across similar words',
+	},
+	queryFormat: {
+		title: 'Query Format',
+		description: (
+			<React.Fragment>
+				<p style={{ fontSize: 15 }}>
+					Sets the query format, can be <strong>or</strong> or <strong>and</strong>.
+					Defaults to <strong>or</strong>.
+				</p>
+				<ul>
+					<li>
+						<strong>or</strong> returns all the results matching any of the search query
+						text&apos;s parameters. For example, searching for &quot;bat man&quot; with
+						or will return all the results matching either &quot;bat&quot; or
+						&quot;man&quot;.
+					</li>
+					<li>
+						On the other hand with <strong>and</strong>, only results matching both
+						&quot;bat&quot; and &quot;man&quot; will be returned. It returns the results
+						matching all of the search query text&apos;s parameters.
+					</li>
+				</ul>
+			</React.Fragment>
+		),
 	},
 };
 

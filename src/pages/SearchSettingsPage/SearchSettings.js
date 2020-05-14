@@ -17,6 +17,7 @@ import {
 	message,
 	Tooltip,
 	Skeleton,
+	Radio,
 } from 'antd';
 
 import {
@@ -78,6 +79,7 @@ class SearchSettingsPage extends React.Component {
 		hasTypoTolerance: false,
 		isDirty: false,
 		visible: false,
+		queryFormat: 'or',
 		enableSynonyms: false,
 	};
 
@@ -160,6 +162,7 @@ class SearchSettingsPage extends React.Component {
 			typoTolerance: get(settings, 'search.fuzziness'),
 			hasTypoTolerance: !!get(settings, 'search.fuzziness', false),
 			hasSearchOperators: get(settings, 'search.searchOperators', false),
+			queryFormat: get(settings, 'search.queryFormat', 'or'),
 			dataField,
 			enableSynonyms: get(settings, 'synonyms.enabled'),
 		});
@@ -298,6 +301,7 @@ class SearchSettingsPage extends React.Component {
 			hasTypoTolerance,
 			enableSynonyms,
 			hasSearchOperators,
+			queryFormat,
 		} = this.state;
 		const { updateSettingsAction, appName, settings } = this.props;
 
@@ -309,6 +313,7 @@ class SearchSettingsPage extends React.Component {
 				dataField: Object.keys(dataField),
 				fieldWeights: Object.values(dataField),
 				searchOperators: hasSearchOperators,
+				queryFormat,
 			},
 			synonyms: {
 				enabled: enableSynonyms,
@@ -462,6 +467,12 @@ class SearchSettingsPage extends React.Component {
 		}
 	};
 
+	handleQueryFormat = (e) => {
+		this.setState({
+			queryFormat: e.target.value,
+		});
+	};
+
 	render() {
 		const {
 			dataField,
@@ -473,6 +484,7 @@ class SearchSettingsPage extends React.Component {
 			isReset,
 			enableSynonyms,
 			isDirty,
+			queryFormat,
 		} = this.state;
 		const {
 			isUpdating,
@@ -657,6 +669,20 @@ class SearchSettingsPage extends React.Component {
 					</Card>
 					<Card className={cardStyle}>
 						<label>
+							Query Format
+							<Tooltip title={settingsMap.queryFormat.description}>
+								<Icon style={{ marginLeft: 5 }} type="info-circle" />
+							</Tooltip>
+						</label>
+						<Radio.Group
+							style={{ display: 'flex', marginBottom: 8 }}
+							onChange={this.handleQueryFormat}
+							value={queryFormat}
+						>
+							<Radio value="or">OR</Radio>
+							<Radio value="and">AND</Radio>
+						</Radio.Group>
+						<label>
 							{settingsMap.searchOperators.title}{' '}
 							<Tooltip title={settingsMap.searchOperators.description}>
 								<Icon type="info-circle" />
@@ -732,6 +758,7 @@ class SearchSettingsPage extends React.Component {
 										searchOperators: hasSearchOperators,
 										dataField: Object.keys(dataField),
 										fieldWeights: Object.values(dataField),
+										queryFormat,
 									},
 								},
 								hasTestSettings: Object.keys(dataField).length > 0,
@@ -754,6 +781,7 @@ class SearchSettingsPage extends React.Component {
 									dataField: Object.keys(sortedSavedDataField),
 									fieldWeights: Object.values(sortedSavedDataField),
 									synonyms: get(settings, 'synonyms.enabled'),
+									queryFormat: get(settings, 'search.queryFormat'),
 								}}
 								newValues={{
 									fuzziness: hasTypoTolerance ? typoTolerance : 0,
@@ -761,6 +789,7 @@ class SearchSettingsPage extends React.Component {
 									dataField: Object.keys(sortedDataField),
 									fieldWeights: Object.values(sortedDataField),
 									synonyms: enableSynonyms,
+									queryFormat,
 								}}
 								onClick={() => this.toggleVisible(false)}
 								visible={visible}
