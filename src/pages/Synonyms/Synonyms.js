@@ -1,22 +1,28 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Card, Table, Icon, Button, message, Popconfirm } from 'antd';
+import { Button, Card, Icon, message, Modal, Popconfirm, Table, Upload } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
 import {
+	DataSearch,
 	ReactiveBase,
 	ReactiveList,
 	SingleDropdownList,
-	DataSearch,
 } from '@appbaseio/reactivesearch';
 
 import { container } from '../ResultsPage/styles';
 import SynonymsModal from './components/SynonymsModal';
-import { getSynonyms, deleteSynonym } from './api';
+import { deleteSynonym, getSynonyms, updateSynonyms } from './api';
 import { getURL } from '../../constants/config';
-import { getSettings, getMappings } from '../../batteries/utils/mappings';
-import { getSynonymsAnalyzerSettings, updateSynonymsSettings } from './utils';
+import { getMappings, getSettings } from '../../batteries/utils/mappings';
+import {
+	getSynonymsAnalyzerSettings,
+	getUpdatedSynonymsSubfields,
+	hasSynonymsAnalyzer,
+	hasSynonymsSubFields,
+	updateSynonymsSettings,
+} from './utils';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import SettingsFooter from '../../components/SettingsFooter';
 import { isValidPlan } from '../../batteries/utils';
@@ -88,10 +94,18 @@ const search = css`
 	}
 `;
 
+const uploadClass = css`
+	.avatar-uploader > .ant-upload {
+		width: 100%;
+		height: 128px;
+	}
+`;
+
 class Synonyms extends React.Component {
 	state = {
 		synonyms: [],
 		key: Date.now(),
+		uploadVisible: false,
 	};
 
 	componentDidMount() {
@@ -170,6 +184,68 @@ class Synonyms extends React.Component {
 			});
 	};
 
+	handleSave = async (newSynonyms) => {
+		this.setState({ uploading: true });
+		const { appName, credentials, url } = this.props;
+		const { synonyms: allSynonyms } = this.state;
+
+		const indexSynonyms = allSynonyms.map((item) => item.synonym);
+
+		const settings = await getSettings(appName, credentials, url).then((data) =>
+			get(data, `${appName}.settings`, {}),
+		);
+
+		const isSynonymsAnalyzerPresent = hasSynonymsAnalyzer(settings);
+		let mappings = await getMappings(appName, credentials, url);
+
+		// // check if all search field has the synonyms analyzer added
+		const hasSubfield = hasSynonymsSubFields(mappings);
+		// get the settings request body will add analyzer if not already present
+		const synonymsAnalyzerSettings = getSynonymsAnalyzerSettings({
+			settings,
+			isSynonymsAnalyzerPresent,
+			synonyms: [
+				...indexSynonyms.map((item) => item.toLowerCase()),
+				...newSynonyms.map((item) => (item.synonym || '').toLowerCase()),
+			],
+		});
+		if (!hasSubfield) {
+			// update all subfields for search
+			mappings = getUpdatedSynonymsSubfields(mappings);
+		}
+
+		const handleSaveData = () => {
+			updateSynonyms({
+				appName,
+				credentials,
+				synonyms: newSynonyms.map((synonym) => ({ ...synonym, index: appName })),
+			})
+				.then((res) => {
+					this.setState({ uploading: false });
+					this.toggleUploadVisibility();
+					this.handleUpdate([...allSynonyms, ...res]);
+					message.success('Synonyms uploaded successfully');
+				})
+				.catch((e) => {
+					this.setState({ uploading: false });
+					message.error(e.message || 'Failed while updating synonyms');
+				});
+		};
+
+		updateSynonymsSettings({
+			needReindex: !hasSubfield,
+			mappings,
+			settings: synonymsAnalyzerSettings,
+			credentials,
+			appName,
+		})
+			.then(handleSaveData)
+			.catch((e) => {
+				this.setState({ uploading: false });
+				message.error(e.message || 'Failed to update synonyms');
+			});
+	};
+
 	handleUpdate = (synonyms) => {
 		this.setState({
 			key: Date.now(),
@@ -177,8 +253,59 @@ class Synonyms extends React.Component {
 		});
 	};
 
+	toggleUploadVisibility = () => {
+		this.setState((prevState) => ({
+			uploadVisible: !prevState.uploadVisible,
+		}));
+	};
+
+	beforeUpload = (file, fileList) => {
+		console.log('file type', file);
+		const isCsvOrJson = file.type === 'text/csv' || file.type === 'application/json';
+		if (!isCsvOrJson) {
+			message.error('You can only upload CSV/JSON file!');
+		}
+		const isLt5M = file.size / 1024 / 1024 < 5;
+		if (!isLt5M) {
+			message.error('File must smaller than 5MB!');
+		}
+		const fileValid = isCsvOrJson && isLt5M;
+		if (fileValid) {
+			this.setState({ file, fileList });
+			return true;
+		}
+		return false;
+	};
+
+	handleUpload = () => {
+		const { file } = this.state;
+		if (!file) return;
+		const reader = new FileReader();
+		reader.readAsBinaryString(file);
+		reader.onloadend = (res) => {
+			const out = get(res, 'target.result');
+			console.log('output', out);
+			if (file.type === 'application/json') {
+				const synonymsPayload = JSON.parse(out || '{}');
+				this.handleSave(synonymsPayload);
+			}
+		};
+	};
+
+	onRemove = (file) => {
+		this.setState((prevState) => {
+			const index = prevState.fileList.indexOf(file);
+			const newFileList = prevState.fileList.slice();
+			newFileList.splice(index, 1);
+			return {
+				fileList: newFileList,
+				file: null,
+			};
+		});
+	};
+
 	render() {
-		const { synonyms, isDeleting, key } = this.state;
+		const { synonyms, isDeleting, key, uploadVisible, fileList, file, uploading } = this.state;
 		const { credentials, appName, tier, featureSynonyms } = this.props;
 		const url = getURL();
 
@@ -354,20 +481,28 @@ class Synonyms extends React.Component {
 										componentId="search"
 									/>
 								</div>
-								<SynonymsModal
-									indexSynonyms={synonyms || []}
-									refetch={this.fetchSynonym}
-									isAddModal
-									handleSynonyms={this.handleUpdate}
-									resetInputOnClose
-									renderButton={({ handleModal }) => {
-										return (
-											<Button onClick={handleModal} type="primary">
-												Add Synonyms
-											</Button>
-										);
-									}}
-								/>
+								<div>
+									<Button
+										onClick={this.toggleUploadVisibility}
+										style={{ marginRight: 5 }}
+									>
+										Upload Synonyms
+									</Button>
+									<SynonymsModal
+										indexSynonyms={synonyms || []}
+										refetch={this.fetchSynonym}
+										isAddModal
+										handleSynonyms={this.handleUpdate}
+										resetInputOnClose
+										renderButton={({ handleModal }) => {
+											return (
+												<Button onClick={handleModal} type="primary">
+													Add Synonyms
+												</Button>
+											);
+										}}
+									/>
+								</div>
 							</div>
 							<ReactiveList
 								componentId="result"
@@ -399,6 +534,32 @@ class Synonyms extends React.Component {
 						<SettingsFooter app={appName} showReset={false} showSearchPreview />
 					) : null}
 				</div>
+				{uploadVisible && (
+					<Modal
+						onCancel={this.toggleUploadVisibility}
+						title={`Upload synonyms to index "${appName}"`}
+						visible
+						className={uploadClass}
+						onOk={this.handleUpload}
+						confirmLoading={uploading}
+						okText="Upload Synonyms"
+					>
+						<Upload
+							listType={file ? 'text' : 'picture-card'}
+							className="avatar-uploader"
+							fileList={fileList}
+							beforeUpload={this.beforeUpload}
+							onRemove={this.onRemove}
+						>
+							{!file ? (
+								<div>
+									<Icon type="plus" />
+									<div className="ant-upload-text">Choose File</div>
+								</div>
+							) : null}
+						</Upload>
+					</Modal>
+				)}
 			</React.Fragment>
 		);
 	}
@@ -409,6 +570,7 @@ Synonyms.propTypes = {
 	credentials: PropTypes.string.isRequired,
 	tier: allowedTiers,
 	featureSynonyms: PropTypes.bool,
+	url: PropTypes.string.isRequired,
 };
 
 Synonyms.defaultProps = {
@@ -418,7 +580,10 @@ Synonyms.defaultProps = {
 
 const mapStateToProps = (state) => {
 	const { username, password } = get(state, 'user.data', {});
+	const url = getURL();
 	return {
+		appName: get(state, '$getCurrentApp.name'),
+		url,
 		credentials: username ? `${username}:${password}` : null,
 		tier: get(state, '$getAppPlan.results.tier'),
 		featureSynonyms: get(state, '$getAppPlan.results.feature_search_relevancy', false),
