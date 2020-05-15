@@ -221,7 +221,7 @@ class Synonyms extends React.Component {
 				synonyms: newSynonyms.map((synonym) => ({ ...synonym, index: appName })),
 			})
 				.then((res) => {
-					this.setState({ uploading: false });
+					this.setState({ uploading: false, file: null, fileList: null });
 					this.toggleUploadVisibility();
 					this.handleUpdate([...allSynonyms, ...res]);
 					message.success('Synonyms uploaded successfully');
