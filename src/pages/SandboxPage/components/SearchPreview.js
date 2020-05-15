@@ -36,7 +36,7 @@ const container = css`
 class SearchPreview extends React.Component {
 	state = {
 		settings: null,
-		searchableMappings: null,
+		searchableMappings: {},
 		isAnalyticsEnabled: true,
 		isParsedStateApplied: false,
 	};
@@ -71,12 +71,12 @@ class SearchPreview extends React.Component {
 		/*
 			Fetch Settings if not present in redux store.
 		*/
-		if (!settings) {
-			fetchSearchSettings(app);
-		} else if (searchState) {
+		if (searchState) {
 			this.setState({
 				settings: searchState,
 			});
+		} else if (!settings) {
+			fetchSearchSettings(app);
 		} else {
 			this.setState({
 				settings: generateQuery(hasTestSettings ? testSettings : settings),
@@ -96,7 +96,7 @@ class SearchPreview extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { mappings, isFetchingMappings, hasTestSettings, settings } = this.props;
+		const { mappings, isFetchingMappings, hasTestSettings, settings, searchState } = this.props;
 		/*
 			Update the searchable mappings state whenever there is a change in mappings.
 		*/
@@ -117,7 +117,11 @@ class SearchPreview extends React.Component {
 			Once the Search Relevancy API gets resolves we need to populate the state
 		 	with the components query.
 		*/
-		if (!hasTestSettings && JSON.stringify(settings) !== JSON.stringify(prevProps.settings)) {
+		if (
+			!hasTestSettings &&
+			!searchState &&
+			JSON.stringify(settings) !== JSON.stringify(prevProps.settings)
+		) {
 			// eslint-disable-next-line
 			this.setState({
 				settings: generateQuery(settings),
@@ -152,11 +156,10 @@ class SearchPreview extends React.Component {
 		const searchSettings =
 			state && state.settings ? state.settings.find((item) => item.id === 'search') : {};
 
-		if (props.searchState && state.searchableMappings) {
+		if (props.searchState) {
 			const searchQuery = get(props, 'searchState', []).find(
 				(component) => component.id === 'search',
 			);
-
 			// If parsedState doesnt contains search dataField we prefill with all searchable mappings
 			if (
 				!state.isParsedStateApplied &&
