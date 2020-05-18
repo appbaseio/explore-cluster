@@ -39,7 +39,7 @@ const AnalyticsView = ({ appName, isPaidUser, plan }) => (
 				<Container>
 					<Analytics
 						filterId="analytics_page"
-						displayReplaySearch
+						displayReplaySearch={window.location.pathname.startsWith('/app')}
 						chartWidth={window.innerWidth - 400}
 						appName={appName}
 					/>
