@@ -89,7 +89,7 @@ class UploadSynonymsModal extends React.Component {
 						marginBottom: 13,
 					}}
 				>
-					Supported formats <b>(max. 5 MB)</b> :
+					Supported formats <b>(max. 10 MB)</b> :
 					<br />
 					<b>JSON</b>: containing either a single object or an array of objects
 					<br />

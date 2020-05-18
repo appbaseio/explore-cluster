@@ -258,11 +258,11 @@ class Synonyms extends React.Component {
 		if (!isCsvOrJson) {
 			message.error('You can only upload CSV/JSON file!');
 		}
-		const isLt5M = file.size / 1024 / 1024 < 5;
-		if (!isLt5M) {
-			message.error('File must smaller than 5MB!');
+		const isLt10M = file.size / 1024 / 1024 < 10;
+		if (!isLt10M) {
+			message.error('File must smaller than 10MB!');
 		}
-		const fileValid = isCsvOrJson && isLt5M;
+		const fileValid = isCsvOrJson && isLt10M;
 		if (fileValid) {
 			this.setState({ file, fileList });
 			return true;
