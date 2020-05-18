@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Card, Icon, message, Modal, Popconfirm, Table, Upload } from 'antd';
+import { Button, Card, Icon, message, Popconfirm, Table } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
@@ -28,6 +28,7 @@ import SettingsFooter from '../../components/SettingsFooter';
 import { isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import { allowedTiers } from '../../utils/prop-types';
+import UploadSynonymsModal from './components/UploadSynonymsModal';
 
 const expression = css`
 	font-weight: 15px;
@@ -91,13 +92,6 @@ const search = css`
 			flex-direction: column;
 			align-items: flex-start;
 		}
-	}
-`;
-
-const uploadClass = css`
-	.avatar-uploader > .ant-upload {
-		width: 100%;
-		height: 128px;
 	}
 `;
 
@@ -284,9 +278,19 @@ class Synonyms extends React.Component {
 		reader.readAsBinaryString(file);
 		reader.onloadend = (res) => {
 			const out = get(res, 'target.result');
-			console.log('output', out);
 			if (file.type === 'application/json') {
 				const synonymsPayload = JSON.parse(out || '{}');
+				this.handleSave(synonymsPayload);
+			} else {
+				let synonymsPayload = (out || '').split('\n').filter(Boolean);
+				synonymsPayload = synonymsPayload.map((synonym) => {
+					if ((synonym || '').includes('=>'))
+						return {
+							type: 'one-way',
+							synonym,
+						};
+					return { type: 'equivalent', synonym };
+				});
 				this.handleSave(synonymsPayload);
 			}
 		};
@@ -535,30 +539,16 @@ class Synonyms extends React.Component {
 					) : null}
 				</div>
 				{uploadVisible && (
-					<Modal
+					<UploadSynonymsModal
 						onCancel={this.toggleUploadVisibility}
-						title={`Upload synonyms to index "${appName}"`}
-						visible
-						className={uploadClass}
+						appName={appName}
 						onOk={this.handleUpload}
 						confirmLoading={uploading}
-						okText="Upload Synonyms"
-					>
-						<Upload
-							listType={file ? 'text' : 'picture-card'}
-							className="avatar-uploader"
-							fileList={fileList}
-							beforeUpload={this.beforeUpload}
-							onRemove={this.onRemove}
-						>
-							{!file ? (
-								<div>
-									<Icon type="plus" />
-									<div className="ant-upload-text">Choose File</div>
-								</div>
-							) : null}
-						</Upload>
-					</Modal>
+						file={file}
+						fileList={fileList}
+						beforeUpload={this.beforeUpload}
+						onRemove={this.onRemove}
+					/>
 				)}
 			</React.Fragment>
 		);
