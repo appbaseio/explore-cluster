@@ -254,7 +254,6 @@ class Synonyms extends React.Component {
 	};
 
 	beforeUpload = (file, fileList) => {
-		console.log('file type', file);
 		const isCsvOrJson = file.type === 'text/csv' || file.type === 'application/json';
 		if (!isCsvOrJson) {
 			message.error('You can only upload CSV/JSON file!');

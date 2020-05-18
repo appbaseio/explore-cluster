@@ -96,6 +96,7 @@ class UploadSynonymsModal extends React.Component {
 					<b>CSV (synonyms only)</b>: comma separated
 				</Card>
 				<Upload
+					accept=".json,.csv"
 					listType={file ? 'text' : 'picture-card'}
 					className="avatar-uploader"
 					fileList={fileList}
