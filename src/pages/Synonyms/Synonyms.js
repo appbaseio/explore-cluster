@@ -260,7 +260,7 @@ class Synonyms extends React.Component {
 		}
 		const isLt10M = file.size / 1024 / 1024 < 10;
 		if (!isLt10M) {
-			message.error('File must smaller than 10MB!');
+			message.error('Max file size allowed is 10MB');
 		}
 		const fileValid = isCsvOrJson && isLt10M;
 		if (fileValid) {
