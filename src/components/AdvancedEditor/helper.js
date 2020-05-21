@@ -59,11 +59,11 @@ const parseOperator = (query = '', operator, fieldMap = {}) => {
 		'g',
 	);
 	const filterRegexDataField = new RegExp(
-		`(?![$query ])("([.#@\\w()\\-:/ ]*)")[ ]+${operator}[ ]+([^" ]\\w*)`,
+		`(?![$query ])("([.#@\\w()\\-:/ ]*)")[ ]+${operator}[ ]+([^" ][\\w-._]*)`,
 		'g',
 	);
 	const filterRegexDataFieldDoubleQuotes = new RegExp(
-		`(?![$query ])("([.#@\\w()\\-:/ ]*)")[ ]+${operator}[ ]+("[\\w ]*")`,
+		`(?![$query ])("([.#@\\w()\\-:/ ]*)")[ ]+${operator}[ ]+("[\\w-._ ]*")`,
 		'g',
 	);
 	const numberRegex = new RegExp(`(?![$query ])([.#@\\w]*) ${operator} (\\d+)`, 'g');
@@ -158,17 +158,20 @@ export const parseExpression = (query = '', fieldMap = {}) => {
  3. category.name == 'hello'
 */
 const unParseOperator = (query = '', operator) => {
-	const filterRegexBackend = new RegExp(`\\$filter.([\\w.]*)[ ]+${operator}[ ]+'(\\w*)'`, 'g');
+	const filterRegexBackend = new RegExp(
+		`\\$filter.([\\w.]*)[ ]+${operator}[ ]+'([\\w-_.]*)'`,
+		'g',
+	);
 	const filterRegexBackendDoubleQuotes = new RegExp(
-		`\\$filter.([\\w.]*)[ ]+${operator}[ ]+"([\\w ]*)"`,
+		`\\$filter.([\\w.]*)[ ]+${operator}[ ]+"([\\w-_. ]*)"`,
 		'g',
 	);
 	const dataFieldBackend = new RegExp(
-		`\\$filter\\["([\\w.()\\-:/ ]*)"][ ]+${operator}[ ]+'(\\w*)'`,
+		`\\$filter\\["([\\w.()\\-:/ ]*)"][ ]+${operator}[ ]+'([\\w-_.]*)'`,
 		'g',
 	);
 	const dataFieldBackendDoubleQuotes = new RegExp(
-		`\\$filter\\["([\\w.()\\-:/ ]*)"][ ]+${operator}[ ]+"([\\w ]*)"`,
+		`\\$filter\\["([\\w.()\\-:/ ]*)"][ ]+${operator}[ ]+"([\\w-_. ]*)"`,
 		'g',
 	);
 	const numberRegex = new RegExp(`\\$filter.([\\w.]*) ${operator} (\\d)+`, 'g');
