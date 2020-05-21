@@ -23,7 +23,8 @@ const applyFilterRegex = (filterRegex, query = '', fieldMap = {}) => {
 	// eslint-disable-next-line no-cond-assign
 	while ((matches = filterRegex.exec(query))) {
 		if (fieldMap[matches[1]]) {
-			query = query.replace(matches[1], fieldMap[matches[1]]);
+			const newField = matches[0].replace(matches[1], fieldMap[matches[1]]);
+			query = query.replace(matches[0], newField);
 		}
 	}
 	return query;
