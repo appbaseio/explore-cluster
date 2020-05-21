@@ -12,9 +12,6 @@ import { loadUser } from './actions';
 import Loader from './components/Loader';
 import Logo from './components/Logo';
 import PrivateRoute from './pages/LoginPage/PrivateRoute';
-import Wrapper from './pages/Wrapper';
-import BillingPage from './pages/BillingPage';
-import InstallPage from './pages/InstallPage';
 
 Sentry.init({
 	dsn: 'https://8e07fb23ba8f46d8a730e65496bb7f00@sentry.io/58038',
@@ -28,6 +25,21 @@ const LoginPage = Loadable({
 
 const SignupPage = Loadable({
 	loader: () => import('./pages/SignupPage'),
+	loading: Loader,
+});
+
+const BillingPage = Loadable({
+	loader: () => import('./pages/BillingPage'),
+	loading: Loader,
+});
+
+const InstallPage = Loadable({
+	loader: () => import('./pages/InstallPage'),
+	loading: Loader,
+});
+
+const Wrapper = Loadable({
+	loader: () => import('./pages/Wrapper'),
 	loading: Loader,
 });
 
