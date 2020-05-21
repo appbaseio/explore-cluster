@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Button, Card, Icon, message, Popconfirm, Table } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
-import { get } from 'lodash';
+import { chunk, get, flatten } from 'lodash';
 import {
 	DataSearch,
 	ReactiveBase,
@@ -209,15 +209,23 @@ class Synonyms extends React.Component {
 		}
 
 		const handleSaveData = () => {
-			updateSynonyms({
-				appName,
-				credentials,
-				synonyms: newSynonyms.map((synonym) => ({ ...synonym, index: appName })),
-			})
+			const chunkedData = chunk(newSynonyms, 100000);
+			Promise.all(
+				chunkedData.map((chunkSynonyms) =>
+					updateSynonyms({
+						appName,
+						credentials,
+						synonyms: chunkSynonyms.map((synonym) => ({
+							...synonym,
+							index: appName,
+						})),
+					}),
+				),
+			)
 				.then((res) => {
 					this.setState({ uploading: false, file: null, fileList: null });
 					this.toggleUploadVisibility();
-					this.handleUpdate([...allSynonyms, ...res]);
+					this.handleUpdate([...allSynonyms, ...flatten(res)]);
 					message.success('Synonyms uploaded successfully');
 				})
 				.catch((e) => {
