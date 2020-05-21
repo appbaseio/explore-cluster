@@ -452,9 +452,7 @@ class HostedArcBilling extends Component {
 				<Table className={hideOnLarge}>
 					<thead>
 						<tr colSpan="1">
-							<td>
-								<Tooltip title="hey bro" />
-							</td>
+							<td />
 							<td>
 								<Title>BASIC PLAN</Title>
 								<Price>
@@ -491,101 +489,516 @@ class HostedArcBilling extends Component {
 					</thead>
 					<tbody>
 						<tr className={HeadingTr}>
-							<td>Security</td>
+							<td>
+								Developer Experience
+								<small>Tools to enhance your ElasticSearch experience.</small>
+							</td>
 							<td />
 							<td />
 							<td />
 						</tr>
 						<tr>
 							<td>
-								<Tooltip
-									placement="rightTop"
-									title="Encrypt and Serve all search data over HTTPS."
-								>
-									TLS Security
-								</Tooltip>
+								<span data-tip="GUI and CLI based import tools for CSV, JSON, ElasticSearch, SQL, MongoDB based data sources.">
+									Data Import
+								</span>
 							</td>
 							<td>
-								<Check />
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+								Up to 1 GB / import
 							</td>
 							<td>
-								<Check />
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+								Up to 1 GB / import
 							</td>
 							<td>
-								<Check />
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+								No limits
 							</td>
 						</tr>
 						<tr>
 							<td>
-								<Tooltip
-									placement="rightTop"
-									title="Create and Manage Users. Set Admin, categories, ACLs, operations, index access patterns."
-								>
-									User Management
-								</Tooltip>
+								<span data-tip="Categorized API logs of all incoming requests and responses.Useful for auditing and debugging purposes.">
+									API Logs
+								</span>
 							</td>
-							<td>REST API + Dashboard UI</td>
-							<td>REST API + Dashboard UI</td>
-							<td>REST API + Dashboard UI</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+								Up to 10,000 logs
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+								Up to 10,000 logs
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+								Up to 1,000,000 logs
+							</td>
 						</tr>
 						<tr>
 							<td>
-								<Tooltip
-									placement="rightTop"
-									title="Login selective access to Arc's dashboard management features."
-								>
-									Team Collaboration
-								</Tooltip>
+								<span data-tip="Perform CRUD operations on your ElasticSearch data visually.">
+									Data Browser
+								</span>
 							</td>
-							<td>Dashboard UI</td>
-							<td>Dashboard UI</td>
-							<td>Dashboard UI</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅
+								</span>
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅
+								</span>
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅
+								</span>
+							</td>
 						</tr>
 						<tr>
 							<td>
-								<Tooltip
-									placement="rightTop"
-									title="Set Granular ACLs, time to live, IP based Rate Limits, Restrict by IP Sources and HTTP Referrers."
-								>
-									Permission Management
-								</Tooltip>
+								<span data-tip="Build and test search relevancy with no code. Export code.">
+									Search Preview
+								</span>
 							</td>
-							<td>REST API + Dashboard UI</td>
-							<td>REST API + Dashboard UI</td>
-							<td>REST API + Dashboard UI</td>
-						</tr>
-						<tr>
 							<td>
-								<Tooltip
-									placement="rightTop"
-									title="Authorize users via JWTs instead of exposing Basic Auth credentials, create user roles and map them to permissions."
-								>
-									Role Based Access Control
-								</Tooltip>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅
+								</span>
 							</td>
-							<td>REST API + Dashboard UI</td>
-							<td>REST API + Dashboard UI</td>
-							<td>REST API + Dashboard UI</td>
-						</tr>
-						<tr>
 							<td>
-								<Tooltip
-									placement="rightTop"
-									title="Create secure endpoints that can prevent script injection."
-								>
-									Search Templates
-								</Tooltip>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅
+								</span>
 							</td>
-							<td>REST API + Dashboard UI</td>
-							<td>REST API + Dashboard UI</td>
-							<td>REST API + Dashboard UI</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅
+								</span>
+							</td>
 						</tr>
 						<tr className={HeadingTr}>
 							<td>
 								Actionable Analytics
 								<small>
-									Popular Searches, No Result Searches, Popular Filters and
-									Results, Click and Conversion Tracking
+									See search, clicks, conversions stats. Drill down. Get
+									actionable insights.
+								</small>
+							</td>
+							<td />
+							<td />
+							<td />
+						</tr>
+						<tr>
+							<td>
+								<span data-tip="Search Analytics UIs show search analytics data: popular searches, no results searches, popular filters, popular results.">
+									Search Analytics
+								</span>
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+								Up to 30 days
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+								Up to 30 days
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+								Up to 90 days
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span data-tip="Click Analytics UIs show click analytics data in addition to the search analytics data.">
+									Click Analytics
+								</span>
+							</td>
+							<td>-</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+								Up to 30 days
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+								Up to 90 days
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span data-tip="A query suggestions index is populated daily based on the end-user data.">
+									Query Suggestions
+								</span>
+							</td>
+							<td>-</td>
+							<td>-</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span data-tip="Actionable insights to improve search engagement and performance.">
+									Search Insights
+								</span>
+							</td>
+							<td>-</td>
+							<td>-</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span data-tip="Track any custom events important to you and filter by them across all APIs and via dashboard UIs.">
+									Custom Events
+								</span>
+							</td>
+							<td>-</td>
+							<td>-</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span data-tip="Access the search and click analytics data via REST APIs.">
+									Analytics API
+								</span>
+							</td>
+							<td>-</td>
+							<td>-</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+						</tr>
+						<tr className={HeadingTr}>
+							<td>
+								Search Relevancy
+								<small>
+									Configure search relevancy via a control plane and APIs.
+								</small>
+							</td>
+							<td />
+							<td />
+							<td />
+						</tr>
+						<tr>
+							<td>
+								<span data-tip="Index your search data in over 39 languages, set stop words and stemming settings.">
+									Language Settings
+								</span>
+							</td>
+							<td>-</td>
+							<td>-</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span data-tip="Set and update search fields, weights, typo tolerance settings and more via dashboard in realtime.">
+									Search Settings
+								</span>
+							</td>
+							<td>-</td>
+							<td>-</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span data-tip="Set and update global aggregation settings via dashboard in realtime.">
+									Aggregation Settings
+								</span>
+							</td>
+							<td>-</td>
+							<td>-</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span data-tip="Set and update global result settings via dashboard in realtime.">
+									Result Settings
+								</span>
+							</td>
+							<td>-</td>
+							<td>-</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span data-tip="Set or update shards and replica settings for your search indexes.">
+									Index Settings
+								</span>
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span data-tip="Add/update/delete fields, use-case and data types within your search schema.">
+									Schema
+								</span>
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span data-tip="Create and manage synonyms via dashboard. Have them reflected in search in realtime.">
+									Synonyms
+								</span>
+							</td>
+							<td>-</td>
+							<td>-</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span data-tip="Extend search relevancy with query rules tailored to your business use-case.">
+									Query Rules
+								</span>
+							</td>
+							<td>-</td>
+							<td>-</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span data-tip="Extend search behavior with user-defined functions.">
+									Functions
+								</span>
+							</td>
+							<td>-</td>
+							<td>-</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span data-tip="Perform search relevancy actions via REST APIs">
+									Search Relevancy API
+								</span>
+							</td>
+							<td>-</td>
+							<td>-</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+						</tr>
+						<tr className={HeadingTr}>
+							<td>
+								Access Control
+								<small>
+									Set fine-grained access control policies for your search.
+								</small>
+							</td>
+							<td />
+							<td />
+							<td />
+						</tr>
+						<tr>
+							<td>
+								<span data-tip="Encrypt and serve all requests over HTTPS.">
+									TLS Security
+								</span>
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span data-tip="Create and manage dashboard access for your team via user management portal.">
+									User Management
+								</span>
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span data-tip="Set granular ACLs, time to live, IP based rate limits, and restrict access by IP sources and HTTP Referers.">
+									API Credentials
+								</span>
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span data-tip="Integrate with identity providers via SSO. Authorize your users via JWTs instead of exposing Basic Auth credentials.">
+									Role Based Access Control
+								</span>
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<span data-tip="Create secure template based REST endpoints via dashboard to prevent DSL injections.">
+									Search Templates
+								</span>
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+							<td>
+								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
+									✅{' '}
+								</span>{' '}
+							</td>
+						</tr>
+						<tr className={HeadingTr}>
+							<td>
+								Curated Insights
+								<small>
+									Get curated insights on your search engagement and performance
+									from our team.
 								</small>
 							</td>
 							<td />
@@ -596,95 +1009,14 @@ class HostedArcBilling extends Component {
 							<td>
 								<Tooltip
 									placement="rightTop"
-									title="Categorized request logs of all incoming requests, and responses.Useful for auditing / debugging"
+									title="Get dedicated onsite support with 1-day SLAs."
 								>
-									Request Logs
+									Curated Insights
 								</Tooltip>
 							</td>
-							<td>REST API + Dashboard UI</td>
-							<td>REST API + Dashboard UI</td>
-							<td>REST API + Dashboard UI</td>
-						</tr>
-						<tr>
-							<td>
-								<Tooltip
-									placement="rightTop"
-									title="An enhanced suggestions index auto-populated daily based on the analytics data."
-								>
-									Enhanced Suggestions
-								</Tooltip>
-							</td>
-							<td>-</td>
-							<td>-</td>
-							<td>-</td>
-						</tr>
-						<tr className={HeadingTr}>
-							<td>Developer Experience</td>
-							<td />
-							<td />
-							<td />
-						</tr>
-						<tr>
-							<td>
-								<Tooltip
-									placement="rightTop"
-									title="Edit Mappings (aka search schema) on the fly."
-								>
-									Editable Mappings
-								</Tooltip>
-							</td>
-							<td>REST API + Dashboard UI</td>
-							<td>REST API + Dashboard UI</td>
-							<td>REST API + Dashboard UI</td>
-						</tr>
-						<tr>
-							<td>
-								<Tooltip placement="rightTop" title="Create and Manage synonyms.">
-									Synonyms
-								</Tooltip>
-							</td>
-							<td>Dashboard UI</td>
-							<td>Dashboard UI</td>
-							<td>Dashboard UI</td>
-						</tr>
-						<tr>
-							<td>
-								<Tooltip
-									placement="rightTop"
-									title="Visually build and test search relevancy, and export code."
-								>
-									Search Preview
-								</Tooltip>
-							</td>
-							<td>Dashboard UI</td>
-							<td>Dashboard UI</td>
-							<td>Dashboard UI</td>
-						</tr>
-						<tr>
-							<td>
-								<Tooltip
-									placement="rightTop"
-									title="Import, Search, Create and Edit Data visually."
-								>
-									Data Browser
-								</Tooltip>
-							</td>
-							<td>Dashboard UI</td>
-							<td>Dashboard UI</td>
-							<td>Dashboard UI</td>
-						</tr>
-						<tr>
-							<td>
-								<Tooltip
-									placement="rightTop"
-									title="Promote Results, Hide Results based on incoming search queries."
-								>
-									Query Rules
-								</Tooltip>
-							</td>
-							<td>REST API + Dashboard UI</td>
-							<td>REST API + Dashboard UI</td>
-							<td>REST API + Dashboard UI</td>
+							<td>Can be added</td>
+							<td>Can be added</td>
+							<td>Can be added</td>
 						</tr>
 						<tr className={HeadingTr}>
 							<td>
@@ -778,30 +1110,37 @@ class HostedArcBilling extends Component {
 						pricingList={[]}
 						subscriptionID={subscriptionID}
 					>
-						<ListCaption>Security</ListCaption>
+						<ListCaption style={{ color: theme.colors.footer }}>
+							Developer Experience
+						</ListCaption>
+						<CheckList
+							list={['Data Import', 'API Logs', 'Data Browser', 'Search Preview']}
+						/>
+						<ListCaption style={{ color: theme.colors.footer }}>
+							Actionable Analytics
+						</ListCaption>
+						<CheckList list={['Search Analytics', 'Click Analytics']} />
+						<ListCaption style={{ color: theme.colors.footer }}>
+							Search Relevancy
+						</ListCaption>
+						<CheckList list={['Index Settings', 'Schema']} />
+						<ListCaption style={{ color: theme.colors.footer }}>Security</ListCaption>
 						<CheckList
 							list={[
 								'TLS Security',
 								'User Management',
-								'Team Collaboration',
-								'Pemissions Management',
+								'API Credentials',
 								'Role Based Access Control',
 								'Search Templates',
 							]}
 						/>
-						<ListCaption>Actionable Analytics</ListCaption>
-						<CheckList list={['Request Logs', 'Enhanced Suggestions']} />
-						<ListCaption>Developer Experience</ListCaption>
-						<CheckList
-							list={[
-								'Editable Mappings',
-								'Search Preview',
-								'Synonyms',
-								'Query Rules',
-								'Data Browser',
-							]}
-						/>
-						<ListCaption>Support and Guidance</ListCaption>
+						<ListCaption style={{ color: theme.colors.footer }}>
+							Curated Insights
+						</ListCaption>
+						<CheckList list={['Curated insights can be added']} />
+						<ListCaption style={{ color: theme.colors.footer }}>
+							Support and Guidance
+						</ListCaption>
 						<CheckList list={['Premium support can be added']} />
 					</NewPricingCard>
 					<NewPricingCard
@@ -820,30 +1159,37 @@ class HostedArcBilling extends Component {
 						buttonText={isArcStandard ? 'Unsubscribe' : undefined}
 						onClickButton={isArcStandard ? this.showConfirmBox : undefined}
 					>
-						<ListCaption>Security</ListCaption>
+						<ListCaption style={{ color: theme.colors.footer }}>
+							Developer Experience
+						</ListCaption>
+						<CheckList
+							list={['Data Import', 'API Logs', 'Data Browser', 'Search Preview']}
+						/>
+						<ListCaption style={{ color: theme.colors.footer }}>
+							Actionable Analytics
+						</ListCaption>
+						<CheckList list={['Search Analytics', 'Click Analytics']} />
+						<ListCaption style={{ color: theme.colors.footer }}>
+							Search Relevancy
+						</ListCaption>
+						<CheckList list={['Index Settings', 'Schema']} />
+						<ListCaption style={{ color: theme.colors.footer }}>Security</ListCaption>
 						<CheckList
 							list={[
 								'TLS Security',
 								'User Management',
-								'Team Collaboration',
-								'Pemissions Management',
+								'API Credentials',
 								'Role Based Access Control',
 								'Search Templates',
 							]}
 						/>
-						<ListCaption>Actionable Analytics</ListCaption>
-						<CheckList list={['Request Logs', 'Enhanced Suggestions']} />
-						<ListCaption>Developer Experience</ListCaption>
-						<CheckList
-							list={[
-								'Editable Mappings',
-								'Search Preview',
-								'Synonyms',
-								'Query Rules',
-								'Data Browser',
-							]}
-						/>
-						<ListCaption>Support and Guidance</ListCaption>
+						<ListCaption style={{ color: theme.colors.footer }}>
+							Curated Insights
+						</ListCaption>
+						<CheckList list={['Curated insights can be added']} />
+						<ListCaption style={{ color: theme.colors.footer }}>
+							Support and Guidance
+						</ListCaption>
 						<CheckList list={['Premium support can be added']} />
 					</NewPricingCard>
 					<NewPricingCard
@@ -862,31 +1208,60 @@ class HostedArcBilling extends Component {
 						buttonText={isArcEnterprise ? 'Unsubscribe' : undefined}
 						onClickButton={isArcEnterprise ? this.showConfirmBox : undefined}
 					>
-						<ListCaption>Security</ListCaption>
+						<ListCaption style={{ color: theme.colors.footer }}>
+							Developer Experience
+						</ListCaption>
+						<CheckList
+							list={['Data Import', 'API Logs', 'Data Browser', 'Search Preview']}
+						/>
+						<ListCaption style={{ color: theme.colors.footer }}>
+							Actionable Analytics
+						</ListCaption>
+						<CheckList
+							list={[
+								'Search Analytics',
+								'Click Analytics',
+								'Query Suggestions',
+								'Search Insights',
+								'Custom Events',
+								'Analytics API',
+							]}
+						/>
+						<ListCaption style={{ color: theme.colors.footer }}>
+							Search Relevancy
+						</ListCaption>
+						<CheckList
+							list={[
+								'Language Settings',
+								'Search Settings',
+								'Aggregation Settings',
+								'Result Settings',
+								'Index Settings',
+								'Schema',
+								'Synonyms',
+								'Query Rules',
+								'Functions',
+								'Search Relevancy API',
+							]}
+						/>
+						<ListCaption style={{ color: theme.colors.footer }}>Security</ListCaption>
 						<CheckList
 							list={[
 								'TLS Security',
 								'User Management',
-								'Team Collaboration',
-								'Pemissions Management',
+								'API Credentials',
 								'Role Based Access Control',
 								'Search Templates',
 							]}
 						/>
-						<ListCaption>Actionable Analytics</ListCaption>
-						<CheckList list={['Request Logs', 'Enhanced Suggestions']} />
-						<ListCaption>Developer Experience</ListCaption>
-						<CheckList
-							list={[
-								'Editable Mappings',
-								'Search Preview',
-								'Synonyms',
-								'Query Rules',
-								'Data Browser',
-							]}
-						/>
-						<ListCaption>Support and Guidance</ListCaption>
-						<CheckList list={['Premium support Included']} />
+						<ListCaption style={{ color: theme.colors.footer }}>
+							Curated Insights
+						</ListCaption>
+						<CheckList list={['Curated insights can be added']} />
+						<ListCaption style={{ color: theme.colors.footer }}>
+							Support and Guidance
+						</ListCaption>
+						<CheckList list={['Premium support can be added']} />
 					</NewPricingCard>
 				</div>
 			</React.Fragment>
