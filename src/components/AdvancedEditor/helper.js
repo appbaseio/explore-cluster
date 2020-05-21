@@ -148,6 +148,7 @@ export const parseExpression = (query = '', fieldMap = {}) => {
 	query = query.replace(negationRegexDataFieldDoubleQuotes, 'not ($1 $3 $4)');
 	query = query.replace(/\bAND\b/g, 'and');
 	query = query.replace(/\bOR\b/g, 'or');
+	query = query.replace(/"/g, "'");
 	return query;
 };
 
@@ -232,6 +233,7 @@ function unParseCustomOperator(query = '', customOperator) {
  OUT: $query == hello AND category.name == "foo bar"
 */
 export const unParseExpression = (query = '') => {
+	query = query.replace(/'/g, `"`);
 	const antiNegationRegex = new RegExp(
 		`not \\("([.#@\\w\\-)(:/ ]*)" (\\w*) ([\\w"-._ ]*)\\)`,
 		'g',
