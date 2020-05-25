@@ -7,9 +7,12 @@
 		<title>Dashboard | appbase.io</title>
 
 		<link rel="shortcut icon" href="/static/images/favicon.ico" />
+		<link rel="dns-prefetch" href="//fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
 		<link
-			href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"
-			rel="stylesheet"
+			href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700&display=swap"
+			rel="preload"
+			as="font"
 		/>
 		<style media="screen">
 			#help {
@@ -55,47 +58,6 @@
 				r.src = t + h._hjSettings.hjid + j + h._hjSettings.hjsv;
 				a.appendChild(r);
 			})(window, document, 'https://static.hotjar.com/c/hotjar-', '.js?sv=');
-		</script>
-
-		<script>
-			const APP_ID = 'f9514ssx';
-			(function() {
-				const w = window;
-				const ic = w.Intercom;
-				if (typeof ic === 'function') {
-					ic('reattach_activator');
-					ic('update', w.intercomSettings);
-				} else {
-					const d = document;
-					var i = function() {
-						i.c(arguments);
-					};
-					i.q = [];
-					i.c = function(args) {
-						i.q.push(args);
-					};
-					w.Intercom = i;
-					const l = function() {
-						const s = d.createElement('script');
-						s.type = 'text/javascript';
-						s.async = true;
-						s.src = 'https://widget.intercom.io/widget/' + 'f9514ssx';
-						const x = d.getElementsByTagName('script')[0];
-						x.parentNode.insertBefore(s, x);
-					};
-					if (w.attachEvent) {
-						w.attachEvent('onload', l);
-					} else {
-						w.addEventListener('load', l, false);
-					}
-				}
-			})();
-			window.intercomSettings = {
-				app_id: APP_ID,
-				alignment: 'right',
-				custom_launcher_selector: '.open_intercom',
-				hide_default_launcher: true,
-			};
 		</script>
 	</body>
 </html>
