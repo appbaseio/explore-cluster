@@ -53,6 +53,7 @@ module.exports = {
 					test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
 					name: 'vendor',
 					chunks: 'all',
+					reuseExistingChunk: true,
 				},
 			},
 		},

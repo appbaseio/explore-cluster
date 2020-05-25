@@ -10,7 +10,7 @@
 	"scripts": {
 		"start": "NODE_ENV=development webpack-dev-server --mode development --content-base . --history-api-fallback  --hot --inline --progress --colors --port 3333",
 		"lint": "eslint --cache .",
-		"build": "NODE_ENV=production node ./scripts/create-env.js && webpack --mode production",
+		"build": "NODE_ENV=production node ./scripts/create-env.js && node --max_old_space_size=4096 ./node_modules/webpack/bin/webpack.js --mode production",
 		"glow": "glow --watch",
 		"format": "prettier --write --use-tabs 'src/!(batteries*)**/**/*.js'",
 		"analyze": "source-map-explorer 'dist/*.js'",
