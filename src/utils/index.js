@@ -598,3 +598,49 @@ export const getParsedRoutes = (routes) =>
 			},
 		];
 	}, []);
+
+export function addIntercomScript() {
+	const scriptElem = document.createElement('script');
+
+	const scriptContent = document.createTextNode(`const APP_ID = 'f9514ssx';
+		(function() {
+			const w = window;
+			const ic = w.Intercom;
+			if (typeof ic === 'function') {
+				ic('reattach_activator');
+				ic('update', w.intercomSettings);
+			} else {
+				const d = document;
+				var i = function() {
+					i.c(arguments);
+				};
+				i.q = [];
+				i.c = function(args) {
+					i.q.push(args);
+				};
+				w.Intercom = i;
+				const l = function() {
+					const s = d.createElement('script');
+					s.type = 'text/javascript';
+					s.async = true;
+					s.src = 'https://widget.intercom.io/widget/' + 'f9514ssx';
+					const x = d.getElementsByTagName('script')[0];
+					x.parentNode.insertBefore(s, x);
+				};
+				if (w.attachEvent) {
+					w.attachEvent('onload', l);
+				} else {
+					w.addEventListener('load', l, false);
+				}
+			}
+		})();
+		window.intercomSettings = {
+			app_id: APP_ID,
+			alignment: 'right',
+			custom_launcher_selector: '.open_intercom',
+			hide_default_launcher: true,
+		};`);
+
+	scriptElem.appendChild(scriptContent);
+	document.body.appendChild(scriptElem);
+}
