@@ -103,12 +103,12 @@ class UploadSynonymsModal extends React.Component {
 					beforeUpload={beforeUpload}
 					onRemove={onRemove}
 				>
-					{!file ? (
+					{file ? null : (
 						<div>
 							<Icon type="plus" />
 							<div className="ant-upload-text">Choose File</div>
 						</div>
-					) : null}
+					)}
 				</Upload>
 				<Card
 					tabList={tabListNoTitle}

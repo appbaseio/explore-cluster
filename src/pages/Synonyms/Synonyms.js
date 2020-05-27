@@ -11,6 +11,7 @@ import {
 	SingleDropdownList,
 } from '@appbaseio/reactivesearch';
 
+import Loadable from 'react-loadable';
 import { container } from '../ResultsPage/styles';
 import SynonymsModal from './components/SynonymsModal';
 import { deleteSynonym, getSynonyms, updateSynonyms } from './api';
@@ -18,9 +19,7 @@ import { getURL } from '../../constants/config';
 import { getMappings, getSettings } from '../../batteries/utils/mappings';
 import {
 	getSynonymsAnalyzerSettings,
-	getUpdatedSynonymsSubfields,
-	hasSynonymsAnalyzer,
-	hasSynonymsSubFields,
+	parseSynonymsAnalyzer,
 	updateSynonymsSettings,
 } from './utils';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
@@ -28,7 +27,13 @@ import SettingsFooter from '../../components/SettingsFooter';
 import { isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import { allowedTiers } from '../../utils/prop-types';
-import UploadSynonymsModal from './components/UploadSynonymsModal';
+import Loader from '../../components/Loader';
+
+const UploadSynonymsModal = Loadable({
+	loader: () =>
+		import(/* webpackChunkName: "UploadSynonymsModal" */ './components/UploadSynonymsModal'),
+	loading: Loader,
+});
 
 const expression = css`
 	font-weight: 15px;
@@ -94,6 +99,8 @@ const search = css`
 		}
 	}
 `;
+
+const chunkSize = 100000;
 
 class Synonyms extends React.Component {
 	state = {
@@ -185,31 +192,18 @@ class Synonyms extends React.Component {
 
 		const indexSynonyms = allSynonyms.map((item) => item.synonym);
 
-		const settings = await getSettings(appName, credentials, url).then((data) =>
-			get(data, `${appName}.settings`, {}),
-		);
-
-		const isSynonymsAnalyzerPresent = hasSynonymsAnalyzer(settings);
-		let mappings = await getMappings(appName, credentials, url);
-
-		// // check if all search field has the synonyms analyzer added
-		const hasSubfield = hasSynonymsSubFields(mappings);
-		// get the settings request body will add analyzer if not already present
-		const synonymsAnalyzerSettings = getSynonymsAnalyzerSettings({
-			settings,
-			isSynonymsAnalyzerPresent,
+		const { mappings, hasSubfield, synonymsAnalyzerSettings } = await parseSynonymsAnalyzer({
+			appName,
+			credentials,
+			url,
 			synonyms: [
 				...indexSynonyms.map((item) => item.toLowerCase()),
 				...newSynonyms.map((item) => (item.synonym || '').toLowerCase()),
 			],
 		});
-		if (!hasSubfield) {
-			// update all subfields for search
-			mappings = getUpdatedSynonymsSubfields(mappings);
-		}
 
 		const handleSaveData = () => {
-			const chunkedData = chunk(newSynonyms, 100000);
+			const chunkedData = chunk(newSynonyms, chunkSize);
 			Promise.all(
 				chunkedData.map((chunkSynonyms) =>
 					updateSynonyms({
