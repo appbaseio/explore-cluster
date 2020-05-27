@@ -11,10 +11,6 @@ import * as Sentry from '@sentry/browser';
 import { loadUser } from './actions';
 import Loader from './components/Loader';
 import Logo from './components/Logo';
-import PrivateRoute from './pages/LoginPage/PrivateRoute';
-import Wrapper from './pages/Wrapper';
-import BillingPage from './pages/BillingPage';
-import InstallPage from './pages/InstallPage';
 
 Sentry.init({
 	dsn: 'https://8e07fb23ba8f46d8a730e65496bb7f00@sentry.io/58038',
@@ -22,12 +18,32 @@ Sentry.init({
 
 // routes
 const LoginPage = Loadable({
-	loader: () => import('./pages/LoginPage'),
+	loader: () => import(/* webpackChunkName: "LoginPage" */ './pages/LoginPage'),
 	loading: Loader,
 });
 
 const SignupPage = Loadable({
-	loader: () => import('./pages/SignupPage'),
+	loader: () => import(/* webpackChunkName: "SignupPage" */ './pages/SignupPage'),
+	loading: Loader,
+});
+
+const BillingPage = Loadable({
+	loader: () => import(/* webpackChunkName: "BillingPage" */ './pages/BillingPage'),
+	loading: Loader,
+});
+
+const InstallPage = Loadable({
+	loader: () => import(/* webpackChunkName: "InstallPage" */ './pages/InstallPage'),
+	loading: Loader,
+});
+
+const Wrapper = Loadable({
+	loader: () => import(/* webpackChunkName: "WrapperComponent" */ './pages/Wrapper'),
+	loading: Loader,
+});
+
+const PrivateRoute = Loadable({
+	loader: () => import(/* webpackChunkName: "PrivateRoute" */ './pages/LoginPage/PrivateRoute'),
 	loading: Loader,
 });
 
