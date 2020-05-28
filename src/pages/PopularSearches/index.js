@@ -39,7 +39,7 @@ const PopularSearchesWrapper = ({ appName, plan, isPaidUser }) => (
 				<Container>
 					<PopularSearches
 						filterId="popular_searches_page"
-						displayReplaySearch
+						displayReplaySearch={window.location.pathname.startsWith('/app')}
 						displayQueryRule
 						appName={appName}
 						plan={plan}
