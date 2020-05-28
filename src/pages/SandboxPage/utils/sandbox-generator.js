@@ -3,6 +3,7 @@ import { getParameters } from 'codesandbox/lib/api/define';
 import reactElementToJSXString from 'react-element-to-jsx-string';
 import prettier from 'prettier/standalone';
 import babylon from 'prettier/parser-babel';
+import { get } from 'lodash';
 
 const dependencies = {
 	react: '16.8.0',
@@ -99,6 +100,7 @@ const styles = `body {
 
 .filter {
 	min-width: 250px;
+	margin-top: 10px;
 }
 
 pre {
@@ -114,8 +116,15 @@ pre {
 }
 `;
 
-const generateResultCode = ({ id: resultId, ...resultProps }) => {
-	return reactElementToJSXString(<div {...resultProps} componentId={resultId} renderItem />)
+const generateResultCode = ({ id: resultId, dataField, ...resultProps }) => {
+	return reactElementToJSXString(
+		<div
+			{...resultProps}
+			componentId={resultId}
+			dataField={(dataField && dataField[0]) || '_score'}
+			renderItem
+		/>,
+	)
 		.replace('div', 'ReactiveList')
 		.replace(
 			'renderItem',
@@ -127,16 +136,26 @@ const generateResultCode = ({ id: resultId, ...resultProps }) => {
 		);
 };
 
-const generateSearchCode = ({ id: searchId, ...searchProps }) => {
-	return reactElementToJSXString(<div componentId={searchId} {...searchProps} />, {
-		showFunctions: false,
-	}).replace('div', 'DataSearch');
+const generateSearchCode = ({ id: searchId, value, ...searchProps }) => {
+	return reactElementToJSXString(
+		<div {...searchProps} componentId={searchId} defaultValue={value || ''} />,
+		{
+			showFunctions: false,
+		},
+	).replace('div', 'DataSearch');
 };
 
 const generateFiltersCode = (filtersWithProps) => {
-	return filtersWithProps.reduce((agg, { id, ...filter }) => {
+	return filtersWithProps.reduce((agg, { id, value, type, dataField, ...filter }) => {
 		const listCode = reactElementToJSXString(
-			<div {...filter} className="filter" componentId={id} />,
+			<div
+				{...filter}
+				defaultValue={value || []}
+				dataField={get(dataField, '[0]', '')}
+				className="filter"
+				title={get(dataField, '[0]', '').replace('.keyword', '')}
+				componentId={id}
+			/>,
 			{
 				showFunctions: false,
 			},
@@ -205,7 +224,6 @@ const generateSandboxURL = ({ settings, app, credentials, url }) => {
 		{},
 	);
 
-	console.log(files);
 	const parameters = getParameters({
 		files,
 	});

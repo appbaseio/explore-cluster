@@ -21,6 +21,7 @@ const Filter = (props) => {
 								'',
 							)}`
 						}
+						dataField={get(agg, 'dataField[0]')}
 						onChange={(value) => handleValueChange(agg.id, value)}
 						componentId={agg.id}
 						loader="Loading Items"

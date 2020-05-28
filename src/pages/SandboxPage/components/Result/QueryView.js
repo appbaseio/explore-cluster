@@ -195,7 +195,7 @@ class QueryView extends React.Component {
 }
 
 QueryView.propTypes = {
-	query: PropTypes.object,
+	query: PropTypes.array,
 	app: PropTypes.string.isRequired,
 	url: PropTypes.string,
 	credentials: PropTypes.string.isRequired,
@@ -205,7 +205,7 @@ QueryView.propTypes = {
 };
 
 QueryView.defaultProps = {
-	query: {},
+	query: [],
 	url: undefined,
 	onChange: null,
 	toggleAnalytics: () => {},

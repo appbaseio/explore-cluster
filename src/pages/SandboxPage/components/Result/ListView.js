@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { ReactiveList } from '@appbaseio/reactivesearch';
 import ExpandCollapse from 'react-expand-collapse';
 import { Spin, Row, Col, Divider, Popover, Tag, Icon, Tooltip, Button } from 'antd';
+import { get } from 'lodash';
 
 import { listItem } from './styles';
 import { children as childrenProp } from '../../../../utils/prop-types';
@@ -118,6 +119,7 @@ const ListView = ({ result }) => (
 		<Container hasPagination={result.pagination}>
 			<ReactiveList
 				{...result}
+				dataField={get(result, 'dataField[0]', '_score')}
 				scrollTarget="result-container"
 				style={{ margin: '12px 0' }}
 				componentId={result.id}
