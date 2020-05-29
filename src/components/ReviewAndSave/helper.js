@@ -48,7 +48,7 @@ const settingsMap = {
 		description: 'Enable or disable application of default stopwords. Enabled by default.',
 	},
 	customStopwords: {
-		title: 'Apply Custom Stopwords',
+		title: 'Set Custom Stopwords',
 		description:
 			'Set comma separated stopwords to be ignored during the language specifc analysis process.',
 	},
