@@ -378,25 +378,30 @@ class QueryRulesForm extends React.Component {
 
 		const hasError = !!Object.keys(error).length;
 
+		const suffixExpression = `and ${parseExpression(advancedExpression, fieldMap)}`;
+
+		function getExpression() {
+			return show_advance_editor
+				? `'${(selectedIndexes || []).join(',')}' in $index ${
+						advancedExpression ? suffixExpression : ''
+				  }`
+				: getExpressionFromValue({
+						selectedIndexes,
+						dataFieldValue,
+						dataField,
+						query,
+						queryValue,
+						condition,
+				  });
+		}
+
 		const params = {
 			name,
 			description,
 			show_advance_editor,
 			trigger: {
 				type: condition,
-				expression: show_advance_editor
-					? `'${selectedIndexes.join(',')}' in $index and ${parseExpression(
-							advancedExpression,
-							fieldMap,
-					  )}`
-					: getExpressionFromValue({
-							selectedIndexes,
-							dataFieldValue,
-							dataField,
-							query,
-							queryValue,
-							condition,
-					  }),
+				expression: condition === 'always' ? '' : getExpression(),
 				timeframe,
 			},
 		};
