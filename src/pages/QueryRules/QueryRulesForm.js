@@ -744,29 +744,31 @@ class QueryRulesForm extends React.Component {
 									<Radio value="filter">Set Condition</Radio>
 									<Radio value="always">Always Trigger</Radio>
 								</Radio.Group>
-								<div style={{ marginBottom: 15 }}>
-									<label>
-										Index to apply rule to
-										<Info content="Select the index or indices to apply the rule to." />
-									</label>
-									{getErrorMessage(error.selectedIndexes)}
-									<IndexDropdown
-										selectedIndexes={selectedIndexes}
-										error={error && error.selectedIndexes}
-										onChange={this.handleIndex}
-									/>
-								</div>
 								{condition === 'filter' && (
-									<label
-										style={{
-											marginBottom: 15,
-											color: '#1890ff',
-											cursor: 'pointer',
-										}}
-										onClick={this.toggleAdvancedEditor}
-									>
-										{show_advance_editor ? 'Hide' : 'Show'} Advanced Editor
-									</label>
+									<>
+										<div style={{ marginBottom: 15 }}>
+											<label>
+												Index to apply rule to
+												<Info content="Select the index or indices to apply the rule to." />
+											</label>
+											{getErrorMessage(error.selectedIndexes)}
+											<IndexDropdown
+												selectedIndexes={selectedIndexes}
+												error={error && error.selectedIndexes}
+												onChange={this.handleIndex}
+											/>
+										</div>
+										<label
+											style={{
+												marginBottom: 15,
+												color: '#1890ff',
+												cursor: 'pointer',
+											}}
+											onClick={this.toggleAdvancedEditor}
+										>
+											{show_advance_editor ? 'Hide' : 'Show'} Advanced Editor
+										</label>
+									</>
 								)}
 								{!show_advance_editor && (
 									<>
