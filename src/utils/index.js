@@ -600,9 +600,14 @@ export const getParsedRoutes = (routes) =>
 	}, []);
 
 export function addIntercomScript() {
+	console.log(window.Intercom);
+	if (window.Intercom) {
+		// Dont add the script again if Intercom instance exists already.
+		return;
+	}
 	const scriptElem = document.createElement('script');
 
-	const scriptContent = document.createTextNode(`const APP_ID = 'f9514ssx';
+	const scriptContent = document.createTextNode(`
 		(function() {
 			const w = window;
 			const ic = w.Intercom;
@@ -635,7 +640,7 @@ export function addIntercomScript() {
 			}
 		})();
 		window.intercomSettings = {
-			app_id: APP_ID,
+			app_id: 'f9514ssx',
 			alignment: 'right',
 			custom_launcher_selector: '.open_intercom',
 			hide_default_launcher: true,
