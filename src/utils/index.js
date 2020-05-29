@@ -600,7 +600,6 @@ export const getParsedRoutes = (routes) =>
 	}, []);
 
 export function addIntercomScript() {
-	console.log(window.Intercom);
 	if (window.Intercom) {
 		// Dont add the script again if Intercom instance exists already.
 		return;
