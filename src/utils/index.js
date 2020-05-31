@@ -519,7 +519,7 @@ export function getReIndexedName(appName) {
 export function getSubFields({ fields, weight, address }) {
 	if (fields) {
 		const subFields = Object.keys(fields).reduce((agg, field) => {
-			if (field === 'search' || field === 'autosuggest') {
+			if (field === 'search') {
 				return {
 					...agg,
 					[`${address}.${field}`]: weight ? 1 : 0,
