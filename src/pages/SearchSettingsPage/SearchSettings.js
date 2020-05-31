@@ -679,8 +679,8 @@ class SearchSettingsPage extends React.Component {
 							onChange={this.handleQueryFormat}
 							value={queryFormat}
 						>
-							<Radio value="or">OR</Radio>
-							<Radio value="and">AND</Radio>
+							<Radio value="or">Or</Radio>
+							<Radio value="and">And</Radio>
 						</Radio.Group>
 						<label>
 							{settingsMap.searchOperators.title}{' '}
