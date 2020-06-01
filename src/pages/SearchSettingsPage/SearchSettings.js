@@ -71,6 +71,19 @@ const cardStyle = css`
 	}
 `;
 
+const removeSubFields = (dataField) => {
+	const searchSubFields = ['search', 'english', 'lang', 'autosuggest', 'keyword', 'synonyms'];
+	return Object.keys(dataField)
+		.filter((field) => !searchSubFields.some((subField) => field.includes(subField)))
+		.reduce(
+			(agg, item) => ({
+				...agg,
+				[item]: dataField[item],
+			}),
+			{},
+		);
+};
+
 class SearchSettingsPage extends React.Component {
 	state = {
 		aggsMappings: [],
@@ -543,6 +556,10 @@ class SearchSettingsPage extends React.Component {
 			'search',
 			{},
 		);
+
+		const oldFieldKeyes = removeSubFields(sortedSavedDataField);
+		const newFieldKeyes = removeSubFields(sortedDataField);
+
 		return (
 			<React.Fragment>
 				<Banner {...bannerMessage} />
@@ -790,6 +807,20 @@ class SearchSettingsPage extends React.Component {
 									fieldWeights: Object.values(sortedDataField),
 									synonyms: enableSynonyms,
 									queryFormat,
+								}}
+								renderField={({ value, type, record }) => {
+									const fieldName = get(record, 'setting', '').toLowerCase();
+									if (fieldName === 'datafield') {
+										return type === 'old'
+											? JSON.stringify(Object.keys(oldFieldKeyes), null, 2)
+											: JSON.stringify(Object.keys(newFieldKeyes), null, 2);
+									}
+									if (fieldName === 'fieldweights') {
+										return type === 'old'
+											? JSON.stringify(Object.values(oldFieldKeyes), null, 2)
+											: JSON.stringify(Object.values(newFieldKeyes), null, 2);
+									}
+									return JSON.stringify(value, null, 2);
 								}}
 								onClick={() => this.toggleVisible(false)}
 								visible={visible}
