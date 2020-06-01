@@ -12,6 +12,9 @@ const selectStyle = css`
 	.ant-select-selection {
 		border: none;
 	}
+	.ant-select-selection-selected-value {
+		max-width: 92%;
+	}
 `;
 
 class AppSwitcher extends React.Component {
