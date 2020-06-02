@@ -161,7 +161,7 @@ class QueryRulesForm extends React.Component {
 			// filter state
 			dataField: '',
 			dataFieldValue: '',
-			query: 'matches',
+			query: '==',
 			queryValue: '',
 
 			timeframe: null,

@@ -62,7 +62,7 @@ class Conditions extends React.Component {
 								value={query}
 								style={{ width: '100%' }}
 							>
-								<Option value="matches">Query is</Option>
+								<Option value="==">Query is</Option>
 								<Option value="contains">Query contains</Option>
 								<Option value="startsWith">Query starts with</Option>
 								<Option value="endsWith">Query ends with </Option>
