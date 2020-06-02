@@ -43,6 +43,10 @@ const actions = {
 		name: 'Replace Word',
 		data: {},
 	},
+	add_filter: {
+		name: 'Add Filter',
+		data: {},
+	},
 };
 
 class ActionSelector extends React.Component {
