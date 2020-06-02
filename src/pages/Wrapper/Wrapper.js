@@ -4,7 +4,6 @@ import Loadable from 'react-loadable';
 import PropTypes from 'prop-types';
 
 import Loader from '../../components/Loader';
-import { addIntercomScript } from '../../utils';
 
 const AppWrapper = Loadable({
 	loader: () => import(/* webpackChunkName: "AppWrapper" */ '../AppWrapper'),
@@ -38,7 +37,6 @@ class Wrapper extends React.Component {
 			history.push(redirectLocation);
 			resetLocation();
 		}
-		addIntercomScript();
 	}
 
 	render() {
