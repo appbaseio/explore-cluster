@@ -59,6 +59,17 @@ const getErrorMessages = (state) => {
 		return Object.keys(item.data).length === 0;
 	}
 
+	function getObjectEmptyKeyes(obj) {
+		if (!obj) return true;
+
+		const invalidKeyes = Object.keys(obj).filter((key) => {
+			const noValidValuePresent = hasError({ data: obj[key] });
+			return !!noValidValuePresent;
+		});
+
+		return invalidKeyes;
+	}
+
 	if (actions.length) {
 		actions.forEach((item) => {
 			if (hasError(item)) {
@@ -66,6 +77,23 @@ const getErrorMessages = (state) => {
 					hasError: true,
 					description: 'Value cannot be empty',
 				};
+			}
+		});
+	}
+
+	if (actions.length) {
+		actions.forEach((item) => {
+			if (item.type === 'add_filter' && !hasError(item)) {
+				const keyesWithNoValue = getObjectEmptyKeyes(item.data);
+
+				if (keyesWithNoValue && keyesWithNoValue.length > 0) {
+					error[item.type] = {
+						hasError: true,
+						description: `${keyesWithNoValue
+							.map((key) => key.replace('.keyword', ''))
+							.join(', ')} cannot be empty`,
+					};
+				}
 			}
 		});
 	}

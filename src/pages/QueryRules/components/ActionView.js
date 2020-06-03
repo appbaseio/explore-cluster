@@ -61,7 +61,7 @@ class ActionView extends React.Component {
 								key={filter}
 								style={{ display: 'block', margin: '2px 0' }}
 							>
-								<strong>{filter}: </strong> {action.data[filter]}
+								<strong>{filter}: </strong> {action.data[filter].toString()}
 								<br />
 							</Typography.Text>
 						))}
