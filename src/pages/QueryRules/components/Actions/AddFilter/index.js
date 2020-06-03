@@ -91,7 +91,7 @@ class AddFilter extends React.Component {
 					<Select
 						mode="tags"
 						style={{ width: '100%' }}
-						value={value[item]}
+						value={value[item] || []}
 						dropdownClassName={hideDropdown}
 						placeholder="Add comma separated synonyms"
 						onChange={(dropdownValue) => this.handleDropdown(item, dropdownValue)}
