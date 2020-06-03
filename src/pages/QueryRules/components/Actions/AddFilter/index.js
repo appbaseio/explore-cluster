@@ -1,5 +1,5 @@
 import React from 'react';
-import { Col, Select, Input, Row, Button } from 'antd';
+import { Col, Select, Row, Button } from 'antd';
 import { css } from 'emotion';
 import PropTypes from 'prop-types';
 
@@ -42,28 +42,6 @@ class AddFilter extends React.Component {
 		onChange(finalValue);
 	};
 
-	handleInput = (name, inputValue) => {
-		const { value, onChange } = this.props;
-
-		let parsedValue = inputValue;
-
-		try {
-			parsedValue = JSON.parse(inputValue);
-		} catch {
-			parsedValue = inputValue;
-		}
-		onChange({
-			...value,
-			[name]:
-				typeof parsedValue === 'string' && parsedValue.includes(',')
-					? parsedValue
-							.split(',')
-							.map((item) => item.trim())
-							.filter(Boolean)
-					: parsedValue,
-		});
-	};
-
 	deleteItem = (item) => {
 		const {
 			value: { [item]: deletedItem, ...rest },
@@ -75,7 +53,20 @@ class AddFilter extends React.Component {
 
 	handleDropdown = (name, dropdownValue) => {
 		const { onChange, value } = this.props;
-		onChange({ ...value, [name]: dropdownValue.map((item) => item.trim()) });
+		const parsedValues = dropdownValue
+			.map((item) => {
+				let parsedValue = item;
+
+				try {
+					parsedValue = JSON.parse(item);
+				} catch {
+					parsedValue = item;
+				}
+
+				return typeof parsedValue === 'string' ? parsedValue.trim() : parsedValue;
+			})
+			.filter(Boolean);
+		onChange({ ...value, [name]: parsedValues });
 	};
 
 	renderRow = (item, index) => {
@@ -97,24 +88,15 @@ class AddFilter extends React.Component {
 					</Select>
 				</Col>
 				<Col md={11}>
-					{Array.isArray(value[item]) ? (
-						<Select
-							mode="tags"
-							style={{ width: '100%' }}
-							value={value[item]}
-							dropdownClassName={hideDropdown}
-							placeholder="Add comma separated synonyms"
-							onChange={(dropdownValue) => this.handleDropdown(item, dropdownValue)}
-							tokenSeparators={[',']}
-						/>
-					) : (
-						<Input
-							name={item}
-							style={{ margin: 0 }}
-							onChange={(e) => this.handleInput(item, e.target.value)}
-							value={value[item].toString()}
-						/>
-					)}
+					<Select
+						mode="tags"
+						style={{ width: '100%' }}
+						value={value[item]}
+						dropdownClassName={hideDropdown}
+						placeholder="Add comma separated synonyms"
+						onChange={(dropdownValue) => this.handleDropdown(item, dropdownValue)}
+						tokenSeparators={[',']}
+					/>
 				</Col>
 				<Col md={2}>
 					<Button
