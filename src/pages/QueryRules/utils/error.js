@@ -63,8 +63,11 @@ const getErrorMessages = (state) => {
 		if (!obj) return true;
 
 		const invalidKeyes = Object.keys(obj).filter((key) => {
-			const noValidValuePresent = hasError({ data: obj[key] });
-			return !!noValidValuePresent;
+			const value = obj[key];
+			if (Array.isArray(value)) return !value.length;
+
+			if (value) return false;
+			return true;
 		});
 
 		return invalidKeyes;
