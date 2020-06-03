@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import React from 'react';
 import { css } from 'emotion';
+import get from 'lodash/get';
 
 export const borderError = css`
 	border-color: #f5222d;
@@ -62,6 +63,13 @@ const getErrorMessages = (state) => {
 	if (actions.length) {
 		actions.forEach((item) => {
 			if (hasError(item)) {
+				error[item.type] = {
+					hasError: true,
+					description: 'Value cannot be empty',
+				};
+			}
+
+			if (item.type === 'search_settings' && get(item, 'data.dataField', []).length === 0) {
 				error[item.type] = {
 					hasError: true,
 					description: 'Value cannot be empty',

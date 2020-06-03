@@ -43,6 +43,13 @@ const actions = {
 		name: 'Replace Word',
 		data: {},
 	},
+	search_settings: {
+		name: 'Search Settings',
+		data: {
+			dataField: [],
+			fieldWeights: [],
+		},
+	},
 };
 
 class ActionSelector extends React.Component {

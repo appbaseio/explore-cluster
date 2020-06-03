@@ -110,6 +110,17 @@ class ActionView extends React.Component {
 						</Tag>
 					</React.Fragment>
 				) : null;
+			case 'search_settings':
+				return (
+					action.data && (
+						<React.Fragment>
+							<h4 className={subTitle}>Search Settings</h4>
+							<Popover content={<pre>{JSON.stringify(action.data, null, 4)}</pre>}>
+								<Tag color="gold">{`{...}`}</Tag>
+							</Popover>
+						</React.Fragment>
+					)
+				);
 			default:
 				return null;
 		}

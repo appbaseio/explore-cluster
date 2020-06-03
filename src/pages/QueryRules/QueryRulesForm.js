@@ -177,6 +177,8 @@ class QueryRulesForm extends React.Component {
 			dataFields: [],
 			isEditPage: !!hasId,
 
+			subFieldsMap: {},
+
 			error: {},
 			loading: false,
 			editorKey: Date.now(),
@@ -203,13 +205,14 @@ class QueryRulesForm extends React.Component {
 		this.setState({ loading: true });
 		getClusterMappings()
 			.then((mappings) => {
-				const [dataFields, fieldMap] = getDatafields(mappings, ['*']);
+				const [dataFields, fieldMap, subFieldsMap] = getDatafields(mappings, ['*']);
 				const [searchFields] = getDatafields(mappings, ['*'], true);
 				this.setState({
 					mappings,
 					dataFields,
 					searchFields,
 					fieldMap,
+					subFieldsMap,
 					loading: false,
 				});
 			})
@@ -569,6 +572,7 @@ class QueryRulesForm extends React.Component {
 			show_advance_editor,
 			rawQuery,
 			editorKey,
+			subFieldsMap,
 		} = this.state;
 		const {
 			isCreating,
@@ -848,6 +852,7 @@ class QueryRulesForm extends React.Component {
 									actions={actions}
 									onChange={this.updateActions}
 									error={error}
+									subFieldsMap={subFieldsMap}
 								/>
 								<ActionSelector
 									error={error && error.actions}
