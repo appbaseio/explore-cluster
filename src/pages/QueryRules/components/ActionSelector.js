@@ -50,6 +50,10 @@ const actions = {
 			fieldWeights: [],
 		},
 	},
+	add_filter: {
+		name: 'Add Filter',
+		data: {},
+	},
 };
 
 class ActionSelector extends React.Component {

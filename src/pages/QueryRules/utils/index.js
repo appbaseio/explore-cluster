@@ -197,6 +197,18 @@ const toolTips = {
 			</a>
 		</>
 	),
+	add_filter: (
+		<>
+			Add filter{' '}
+			<a
+				target="_blank"
+				rel="noopener noreferrer"
+				href="https://docs.appbase.io/docs/search/rules/#add_filter"
+			>
+				Learn more
+			</a>
+		</>
+	),
 };
 
 export { getParsedRule, getExpressionFromValue, hasValuesChanged, bannerDetails, toolTips };
