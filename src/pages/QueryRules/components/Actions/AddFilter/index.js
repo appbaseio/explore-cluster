@@ -11,19 +11,17 @@ const hideDropdown = css`
 	}
 `;
 
-class AddFilter extends React.Component {
-	addNewFilter = () => {
-		const { aggsFields, onChange, value } = this.props;
+const AddFilter = (props) => {
+	const { aggsFields, onChange, value } = props;
 
+	const addNewFilter = () => {
 		onChange({
 			...value,
 			[aggsFields[0]]: '',
 		});
 	};
 
-	handleDropdownValue = (dropdownValue, index) => {
-		const { value, onChange } = this.props;
-
+	const handleDropdownValue = (dropdownValue, index) => {
 		const finalValue = Object.keys(value)
 			.map((item, valueIndex) => {
 				if (valueIndex === index) {
@@ -42,17 +40,15 @@ class AddFilter extends React.Component {
 		onChange(finalValue);
 	};
 
-	deleteItem = (item) => {
+	const deleteItem = (item) => {
 		const {
 			value: { [item]: deletedItem, ...rest },
-			onChange,
-		} = this.props;
+		} = props;
 
 		onChange(rest);
 	};
 
-	handleDropdown = (name, dropdownValue) => {
-		const { onChange, value } = this.props;
+	const handleDropdown = (name, dropdownValue) => {
 		const parsedValues = dropdownValue
 			.map((item) => {
 				let parsedValue = item;
@@ -69,14 +65,13 @@ class AddFilter extends React.Component {
 		onChange({ ...value, [name]: parsedValues });
 	};
 
-	renderRow = (item, index) => {
-		const { aggsFields, value } = this.props;
+	const renderRow = (item, index) => {
 		const currentSelectedField = item.replace(/.keyword/g, '');
 		return (
 			<Row style={{ marginBottom: 8 }} gutter={[8, 0]}>
 				<Col md={11}>
 					<Select
-						onChange={(dropdownValue) => this.handleDropdownValue(dropdownValue, index)}
+						onChange={(dropdownValue) => handleDropdownValue(dropdownValue, index)}
 						value={currentSelectedField}
 						style={{ width: '100%' }}
 						showSearch
@@ -94,7 +89,7 @@ class AddFilter extends React.Component {
 						value={value[item] || []}
 						dropdownClassName={hideDropdown}
 						placeholder="Add comma separated synonyms"
-						onChange={(dropdownValue) => this.handleDropdown(item, dropdownValue)}
+						onChange={(dropdownValue) => handleDropdown(item, dropdownValue)}
 						tokenSeparators={[',']}
 					/>
 				</Col>
@@ -105,7 +100,7 @@ class AddFilter extends React.Component {
 						shape="circle"
 						ghost
 						type="danger"
-						onClick={() => this.deleteItem(item)}
+						onClick={() => deleteItem(item)}
 						icon="close"
 					/>
 				</Col>
@@ -113,21 +108,18 @@ class AddFilter extends React.Component {
 		);
 	};
 
-	render() {
-		const { value, aggsFields } = this.props;
-		return (
-			<React.Fragment>
-				{Object.keys(value).map((item, index) => (
-					<React.Fragment key={item}>{this.renderRow(item, index)}</React.Fragment>
-				))}
+	return (
+		<React.Fragment>
+			{Object.keys(value).map((item, index) => (
+				<React.Fragment key={item}>{renderRow(item, index)}</React.Fragment>
+			))}
 
-				<Button disabled={aggsFields.length === 0} onClick={this.addNewFilter}>
-					Add Filter
-				</Button>
-			</React.Fragment>
-		);
-	}
-}
+			<Button disabled={aggsFields.length === 0} onClick={addNewFilter}>
+				Add Filter
+			</Button>
+		</React.Fragment>
+	);
+};
 
 AddFilter.defaultProps = {
 	aggsFields: [],
