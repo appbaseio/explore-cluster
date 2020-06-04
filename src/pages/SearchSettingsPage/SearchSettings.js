@@ -18,6 +18,7 @@ import {
 	Tooltip,
 	Skeleton,
 	Radio,
+	Typography,
 } from 'antd';
 
 import {
@@ -74,7 +75,7 @@ const cardStyle = css`
 const removeSubFields = (dataField) => {
 	const searchSubFields = ['search', 'english', 'lang', 'autosuggest', 'keyword', 'synonyms'];
 	return Object.keys(dataField)
-		.filter((field) => !searchSubFields.some((subField) => field.includes(subField)))
+		.filter((field) => !searchSubFields.some((subField) => field.endsWith(`.${subField}`)))
 		.reduce(
 			(agg, item) => ({
 				...agg,
@@ -94,6 +95,11 @@ class SearchSettingsPage extends React.Component {
 		visible: false,
 		queryFormat: 'or',
 		enableSynonyms: false,
+		changedFields: {
+			new: {},
+			old: {},
+		},
+		changedFieldWeights: {},
 	};
 
 	noUseCaseMappings = [];
@@ -293,6 +299,10 @@ class SearchSettingsPage extends React.Component {
 	handleSearchWeight = ({ address, value, settings }) => {
 		const fields = getSubFields({ fields: settings.fields, weight: value, address });
 		this.setState((prevState) => ({
+			changedFieldWeights: {
+				...prevState.changedFieldWeights,
+				[address]: value,
+			},
 			dataField: {
 				...prevState.dataField,
 				...fields,
@@ -387,7 +397,7 @@ class SearchSettingsPage extends React.Component {
 		reIndex();
 	};
 
-	handleUsecaseChange = (field, type, usecase) => {
+	handleUsecaseChange = (field, type, usecase, currentUsecase) => {
 		const topLevelKey = +getVersion()[0] >= 7 ? `properties` : `_doc`;
 		const address = field.startsWith(`${topLevelKey}.properties`)
 			? field.replace(`${topLevelKey}.properties`, 'properties')
@@ -400,6 +410,20 @@ class SearchSettingsPage extends React.Component {
 		}, '');
 		const { dataField } = this.state;
 		const fieldChanged = parsedAddress;
+
+		this.setState((prevState) => ({
+			changedFields: {
+				...prevState.changedFields,
+				new: {
+					...prevState.changedFields.new,
+					[parsedAddress]: usecase,
+				},
+				old: {
+					...prevState.changedFields.old,
+					[parsedAddress]: currentUsecase,
+				},
+			},
+		}));
 
 		if (usecase === 'aggs' || usecase === 'none') {
 			const searchSubFields = [
@@ -498,6 +522,8 @@ class SearchSettingsPage extends React.Component {
 			enableSynonyms,
 			isDirty,
 			queryFormat,
+			changedFieldWeights,
+			changedFields,
 		} = this.state;
 		const {
 			isUpdating,
@@ -811,14 +837,66 @@ class SearchSettingsPage extends React.Component {
 								renderField={({ value, type, record }) => {
 									const fieldName = get(record, 'setting', '').toLowerCase();
 									if (fieldName === 'datafield') {
-										return type === 'old'
-											? JSON.stringify(Object.keys(oldFieldKeyes), null, 2)
-											: JSON.stringify(Object.keys(newFieldKeyes), null, 2);
+										if (JSON.stringify(oldFieldKeyes) === JSON.stringify({})) {
+											return type === 'old'
+												? JSON.stringify(
+														Object.keys(oldFieldKeyes),
+														null,
+														2,
+												  )
+												: JSON.stringify(
+														Object.keys(newFieldKeyes),
+														null,
+														2,
+												  );
+										}
+
+										return Object.keys(changedFields[type]).map((field) => (
+											<Typography.Paragraph>
+												{field}:{' '}
+												<strong>{changedFields[type][field]}</strong>
+											</Typography.Paragraph>
+										));
 									}
 									if (fieldName === 'fieldweights') {
-										return type === 'old'
-											? JSON.stringify(Object.values(oldFieldKeyes), null, 2)
-											: JSON.stringify(Object.values(newFieldKeyes), null, 2);
+										if (JSON.stringify(oldFieldKeyes) === JSON.stringify({})) {
+											return type === 'old'
+												? JSON.stringify(
+														Object.values(oldFieldKeyes),
+														null,
+														2,
+												  )
+												: JSON.stringify(
+														Object.values(newFieldKeyes),
+														null,
+														2,
+												  );
+										}
+
+										if (JSON.stringify(changedFieldWeights) === '{}') {
+											return Object.keys(changedFields[type]).map((field) => (
+												<Typography.Paragraph>
+													{field}:{' '}
+													<strong>
+														{changedFields[type][field].includes(
+															'search',
+														)
+															? newFieldKeyes[field] || 1
+															: 0}
+													</strong>
+												</Typography.Paragraph>
+											));
+										}
+										return Object.keys(changedFieldWeights).map((field) => (
+											<Typography.Paragraph>
+												{field}:{' '}
+												<strong>
+													{type === 'old'
+														? oldFieldKeyes[field]
+														: changedFieldWeights[field]}
+												</strong>
+											</Typography.Paragraph>
+										));
 									}
 									return JSON.stringify(value, null, 2);
 								}}

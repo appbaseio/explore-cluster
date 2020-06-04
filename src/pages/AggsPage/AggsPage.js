@@ -21,6 +21,7 @@ import {
 	Tooltip,
 	Skeleton,
 	Radio,
+	Typography,
 } from 'antd';
 
 import {
@@ -30,7 +31,7 @@ import {
 	getSettings,
 	deleteSettings,
 } from '../../batteries/modules/actions';
-import { getURL } from '../../constants/config';
+import { getURL, getVersion } from '../../constants/config';
 import Mappings from '../../batteries/components/Mappings/Mappings';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import { getAggsMappings } from '../../batteries/utils/mappings';
@@ -82,6 +83,24 @@ const cardStyle = css`
 	}
 `;
 
+const getChangedKeys = (oldObj, newObj) => {
+	if (!oldObj && !newObj) {
+		return [];
+	}
+
+	if (!oldObj) {
+		return Object.keys(newObj);
+	}
+
+	if (!newObj) {
+		return Object.keys(oldObj);
+	}
+	const modifiedKeys = Object.keys(newObj).filter((item) => oldObj[item] !== newObj[item]);
+	const deletedKeys = Object.keys(oldObj).filter((item) => !newObj[item]);
+
+	return [...new Set([...modifiedKeys, ...deletedKeys])];
+};
+
 class AggsPage extends React.Component {
 	state = {
 		searchableMappings: [],
@@ -92,6 +111,10 @@ class AggsPage extends React.Component {
 		isDirty: false,
 		visible: false,
 		queryFormat: 'or',
+		changedSubFields: {
+			old: {},
+			new: {},
+		},
 	};
 
 	searchableMappings = {};
@@ -399,6 +422,33 @@ class AggsPage extends React.Component {
 		});
 	};
 
+	handleUsecaseChange = (field, type, usecase, currentUsecase) => {
+		const topLevelKey = +getVersion()[0] >= 7 ? `properties` : `_doc`;
+		const address = field.startsWith(`${topLevelKey}.properties`)
+			? field.replace(`${topLevelKey}.properties`, 'properties')
+			: field;
+		const parsedAddress = address.split('.').reduce((agg, key, index) => {
+			if (index % 2 !== 0) {
+				return agg ? `${agg}.${key}` : key;
+			}
+			return agg;
+		}, '');
+
+		this.setState((prevState) => ({
+			changedSubFields: {
+				...prevState.changedSubFields,
+				new: {
+					...prevState.changedSubFields.new,
+					[parsedAddress]: usecase,
+				},
+				old: {
+					...prevState.changedSubFields.old,
+					[parsedAddress]: currentUsecase,
+				},
+			},
+		}));
+	};
+
 	render() {
 		const {
 			searchableMappings,
@@ -410,6 +460,7 @@ class AggsPage extends React.Component {
 			isReset,
 			isDirty,
 			queryFormat,
+			changedSubFields,
 		} = this.state;
 		const {
 			isUpdating,
@@ -443,6 +494,8 @@ class AggsPage extends React.Component {
 				</React.Fragment>
 			);
 		}
+
+		const changedDataFields = getChangedKeys(restSavedAggs.dataField, dataField);
 
 		return (
 			<React.Fragment>
@@ -487,6 +540,7 @@ class AggsPage extends React.Component {
 							hidePropertiesType
 							onChange={this.handleMappingChange}
 							onDeleteField={this.handleDeleteField}
+							onUsecaseChange={this.handleUsecaseChange}
 							column={{
 								title: (
 									<React.Fragment>
@@ -700,6 +754,7 @@ class AggsPage extends React.Component {
 								oldValues={{
 									...restSavedAggs,
 									agg_size: savedSize,
+									mappings: changedSubFields.old,
 								}}
 								newValues={{
 									agg_size: count,
@@ -707,6 +762,33 @@ class AggsPage extends React.Component {
 									includeNullValues: includeNullValue,
 									dataField,
 									queryFormat,
+									mappings: changedSubFields.new,
+								}}
+								renderField={({ value, type, record }) => {
+									const fieldName = get(record, 'setting', '').toLowerCase();
+
+									if (fieldName === 'datafield') {
+										return changedDataFields.map((field) => (
+											<Typography.Paragraph key={field}>
+												{field.replace('.keyword', '')}:{' '}
+												<strong>
+													{type === 'old'
+														? get(restSavedAggs, `dataField.${field}`)
+														: dataField[field]}
+												</strong>
+											</Typography.Paragraph>
+										));
+									}
+
+									if (fieldName === 'mappings') {
+										return Object.keys(changedSubFields[type]).map((field) => (
+											<Typography.Paragraph>
+												{field}:{' '}
+												<strong>{changedSubFields[type][field]}</strong>
+											</Typography.Paragraph>
+										));
+									}
+									return JSON.stringify(value, null, 2);
 								}}
 								onClick={() => this.toggleVisible(false)}
 								visible={visible}
