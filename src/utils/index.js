@@ -372,7 +372,7 @@ export async function getClusterMappings() {
 	return mappings;
 }
 
-export function getDatafields(mappings, indexes, isSearch = false) {
+export function getDatafields({ mappings, indexes, isSearch = false, isAggs = false }) {
 	const hasAllIndex = indexes.includes('*');
 	let fieldMap = {};
 
@@ -403,7 +403,7 @@ export function getDatafields(mappings, indexes, isSearch = false) {
 					if (type === 'text' || type === 'string') {
 						if (includes(fields, 'keyword')) {
 							acc[field] = `${field}.keyword`;
-						} else {
+						} else if (!isAggs) {
 							acc[field] = field;
 						}
 					}
