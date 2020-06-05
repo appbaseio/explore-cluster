@@ -81,11 +81,6 @@ const getErrorMessages = (state) => {
 					description: 'Value cannot be empty',
 				};
 			}
-		});
-	}
-
-	if (actions.length) {
-		actions.forEach((item) => {
 			if (item.type === 'add_filter' && !hasError(item)) {
 				const keysWithNoValue = getObjectEmptyKeys(item.data);
 
@@ -95,6 +90,17 @@ const getErrorMessages = (state) => {
 						description: `${keysWithNoValue
 							.map((key) => key.replace('.keyword', ''))
 							.join(', ')} cannot be empty`,
+					};
+				}
+			}
+			if (item.type === 'replace_words' && !hasError(item)) {
+				const keysWithNoValue = getObjectEmptyKeys(item.data);
+				if (keysWithNoValue && keysWithNoValue.length > 0) {
+					error[item.type] = {
+						hasError: true,
+						description: `${
+							keysWithNoValue.filter(Boolean).join(', ').trim() || 'Inputs'
+						} cannot be empty`,
 					};
 				}
 			}
