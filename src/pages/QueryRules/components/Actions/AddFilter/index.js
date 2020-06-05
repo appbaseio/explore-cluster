@@ -88,12 +88,11 @@ const AddFilter = (props) => {
 						style={{ width: '100%' }}
 						value={value[item] || []}
 						dropdownClassName={hideDropdown}
-						placeholder="Add comma separated synonyms"
+						placeholder="Press enter to add more values"
 						onChange={(dropdownValue) => handleDropdown(item, dropdownValue)}
-						tokenSeparators={[',']}
 					/>
 				</Col>
-				<Col md={2}>
+				<Col style={{ display: 'flex', justifyContent: 'flex-end' }} md={2}>
 					<Button
 						style={{ marginTop: 3 }}
 						size="small"
