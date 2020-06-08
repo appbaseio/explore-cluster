@@ -598,3 +598,18 @@ export const getParsedRoutes = (routes) =>
 			},
 		];
 	}, []);
+
+export const validateQueryString = (queryString) =>
+	new Promise((resolve, reject) => {
+		const ACC_API = getURL();
+		const authToken = getAuthToken();
+		fetch(`${ACC_API}/_validate/query?q=${queryString}`, {
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Basic ${authToken}`,
+			},
+		})
+			.then((res) => res.json())
+			.then((data) => resolve(data))
+			.catch((error) => reject(error));
+	});
