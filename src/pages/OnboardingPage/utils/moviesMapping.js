@@ -6,7 +6,7 @@ export default {
 				autosuggest: {
 					type: 'text',
 					analyzer: 'autosuggest_analyzer',
-					search_analyzer: 'simple',
+					search_analyzer: 'standard',
 				},
 				keyword: {
 					type: 'keyword',
@@ -14,7 +14,7 @@ export default {
 				search: {
 					type: 'text',
 					analyzer: 'ngram_analyzer',
-					search_analyzer: 'simple',
+					search_analyzer: 'standard',
 				},
 			},
 			analyzer: 'standard',
@@ -25,7 +25,7 @@ export default {
 				autosuggest: {
 					type: 'text',
 					analyzer: 'autosuggest_analyzer',
-					search_analyzer: 'simple',
+					search_analyzer: 'standard',
 				},
 				keyword: {
 					type: 'keyword',
@@ -39,7 +39,7 @@ export default {
 				autosuggest: {
 					type: 'text',
 					analyzer: 'autosuggest_analyzer',
-					search_analyzer: 'simple',
+					search_analyzer: 'standard',
 				},
 				keyword: {
 					type: 'keyword',
@@ -47,7 +47,7 @@ export default {
 				search: {
 					type: 'text',
 					analyzer: 'ngram_analyzer',
-					search_analyzer: 'simple',
+					search_analyzer: 'standard',
 				},
 			},
 			analyzer: 'standard',
@@ -58,7 +58,7 @@ export default {
 				autosuggest: {
 					type: 'text',
 					analyzer: 'autosuggest_analyzer',
-					search_analyzer: 'simple',
+					search_analyzer: 'standard',
 				},
 				keyword: {
 					type: 'keyword',
@@ -66,7 +66,7 @@ export default {
 				search: {
 					type: 'text',
 					analyzer: 'ngram_analyzer',
-					search_analyzer: 'simple',
+					search_analyzer: 'standard',
 				},
 			},
 			analyzer: 'standard',
@@ -77,7 +77,7 @@ export default {
 				autosuggest: {
 					type: 'text',
 					analyzer: 'autosuggest_analyzer',
-					search_analyzer: 'simple',
+					search_analyzer: 'standard',
 				},
 				keyword: {
 					type: 'keyword',
@@ -94,7 +94,7 @@ export default {
 				autosuggest: {
 					type: 'text',
 					analyzer: 'autosuggest_analyzer',
-					search_analyzer: 'simple',
+					search_analyzer: 'standard',
 				},
 				keyword: {
 					type: 'keyword',
@@ -102,7 +102,7 @@ export default {
 				search: {
 					type: 'text',
 					analyzer: 'ngram_analyzer',
-					search_analyzer: 'simple',
+					search_analyzer: 'standard',
 				},
 			},
 			analyzer: 'standard',

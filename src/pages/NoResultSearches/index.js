@@ -37,7 +37,7 @@ const NoResultSearchWrapper = ({ appName, plan, isPaidUser }) => (
 				<Container>
 					<NoResultSearch
 						filterId="no_results_page"
-						displayReplaySearch
+						displayReplaySearch={window.location.pathname.startsWith('/app')}
 						displayQueryRule
 						appName={appName}
 						plan={plan}

@@ -372,7 +372,7 @@ export async function getClusterMappings() {
 	return mappings;
 }
 
-export function getDatafields(mappings, indexes, isSearch = false) {
+export function getDatafields({ mappings, indexes, isSearch = false, isAggs = false }) {
 	const hasAllIndex = indexes.includes('*');
 	let fieldMap = {};
 
@@ -403,7 +403,7 @@ export function getDatafields(mappings, indexes, isSearch = false) {
 					if (type === 'text' || type === 'string') {
 						if (includes(fields, 'keyword')) {
 							acc[field] = `${field}.keyword`;
-						} else {
+						} else if (!isAggs) {
 							acc[field] = field;
 						}
 					}
@@ -519,7 +519,7 @@ export function getReIndexedName(appName) {
 export function getSubFields({ fields, weight, address }) {
 	if (fields) {
 		const subFields = Object.keys(fields).reduce((agg, field) => {
-			if (field === 'search' || field === 'autosuggest') {
+			if (field === 'search') {
 				return {
 					...agg,
 					[`${address}.${field}`]: weight ? 1 : 0,
@@ -598,49 +598,3 @@ export const getParsedRoutes = (routes) =>
 			},
 		];
 	}, []);
-
-export function addIntercomScript() {
-	const scriptElem = document.createElement('script');
-
-	const scriptContent = document.createTextNode(`const APP_ID = 'f9514ssx';
-		(function() {
-			const w = window;
-			const ic = w.Intercom;
-			if (typeof ic === 'function') {
-				ic('reattach_activator');
-				ic('update', w.intercomSettings);
-			} else {
-				const d = document;
-				var i = function() {
-					i.c(arguments);
-				};
-				i.q = [];
-				i.c = function(args) {
-					i.q.push(args);
-				};
-				w.Intercom = i;
-				const l = function() {
-					const s = d.createElement('script');
-					s.type = 'text/javascript';
-					s.async = true;
-					s.src = 'https://widget.intercom.io/widget/' + 'f9514ssx';
-					const x = d.getElementsByTagName('script')[0];
-					x.parentNode.insertBefore(s, x);
-				};
-				if (w.attachEvent) {
-					w.attachEvent('onload', l);
-				} else {
-					w.addEventListener('load', l, false);
-				}
-			}
-		})();
-		window.intercomSettings = {
-			app_id: APP_ID,
-			alignment: 'right',
-			custom_launcher_selector: '.open_intercom',
-			hide_default_launcher: true,
-		};`);
-
-	scriptElem.appendChild(scriptContent);
-	document.body.appendChild(scriptElem);
-}

@@ -37,13 +37,36 @@ export const highlighter = css`
 	animation: grow 1s infinite ease;
 `;
 
+const searchStyle = css`
+	.suggestions {
+		z-index: 5;
+	}
+`;
+
 const Search = (props) => {
 	const { app, search, handleValueChange, handleModal } = props;
 	return (
 		<Card>
 			<Row type="flex" gutter={8} align="middle" justify="space-between">
 				<Col xs={20}>
-					{search.dataField && search.dataField.length ? null : (
+					{search.dataField && search.dataField.length ? (
+						<DataSearch
+							{...search}
+							autosuggest
+							value={search ? search.value || search.defaultValue || '' : ''}
+							onChange={(value) => handleValueChange(search.id, value)}
+							componentId={search.id}
+							innerClass={{
+								list: 'suggestions',
+							}}
+							className={searchStyle}
+							onKeyDown={(e, triggerQuery) => {
+								if (e.key === 'Enter') {
+									triggerQuery();
+								}
+							}}
+						/>
+					) : (
 						<div
 							style={{
 								width: '100%',
@@ -58,19 +81,6 @@ const Search = (props) => {
 							Set searchable fields to enable search.
 						</div>
 					)}
-					{search.dataField && search.dataField.length ? (
-						<DataSearch
-							{...search}
-							autosuggest
-							onChange={(value) => handleValueChange(search.id, value)}
-							componentId={search.id}
-							onKeyDown={(e, triggerQuery) => {
-								if (e.key === 'Enter') {
-									triggerQuery();
-								}
-							}}
-						/>
-					) : null}
 				</Col>
 				<Col xs={4}>
 					<Link
