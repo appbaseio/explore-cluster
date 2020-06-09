@@ -101,13 +101,24 @@ class ActionView extends React.Component {
 				return action.data ? (
 					<React.Fragment>
 						<h4 className={subTitle}>Replace Search Words</h4>
-						<Tag>
-							<Text delete>{action.data.word}</Text>
-						</Tag>
-						with{' '}
-						<Tag style={{ marginLeft: 5 }}>
-							<Text>{action.data.replaceWith}</Text>
-						</Tag>
+						{Object.keys(action.data).map((word) => (
+							<div key={word}>
+								<Tag>
+									<Text delete>{word}</Text>
+								</Tag>
+								with{' '}
+								<Tag style={{ marginLeft: 5 }}>
+									<Text>{action.data[word]}</Text>
+								</Tag>
+							</div>
+						))}
+					</React.Fragment>
+				) : null;
+			case 'replace_search_query':
+				return action.data ? (
+					<React.Fragment>
+						<h4 className={subTitle}>Replace Search Query</h4>
+						<Tag color="geekblue">{action.data}</Tag>
 					</React.Fragment>
 				) : null;
 			default:
