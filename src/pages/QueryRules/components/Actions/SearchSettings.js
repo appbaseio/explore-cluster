@@ -11,7 +11,10 @@ const { Option } = Select;
  * @param {object} obj
  * @param {string} key
  */
-const removeKeyesFromObject = (obj, key) => {
+const removeKeysFromObject = (obj = {}, key) => {
+	if (!key) {
+		return obj;
+	}
 	return Object.keys(obj)
 		.filter((objKey) => !objKey.includes(key.replace('.keyword')))
 		.reduce(
@@ -45,8 +48,8 @@ class SearchSettings extends React.Component {
 		const { searchFields, subFieldsMap } = this.props;
 		const { parsedValue } = this.state;
 
-		const searchFieldToBeAdded = searchFields[0].replace('.keyword', '');
-		const subFieldsPresent = subFieldsMap[searchFieldToBeAdded];
+		const searchFieldToBeAdded = get(searchFields, '[0]', '').replace('.keyword', '');
+		const subFieldsPresent = get(subFieldsMap, searchFieldToBeAdded, []);
 
 		const fields = getSubFields({
 			fields: subFieldsPresent,
@@ -60,7 +63,7 @@ class SearchSettings extends React.Component {
 		});
 	};
 
-	handleSaveFields = (fields) => {
+	handleSaveFields = (fields = {}) => {
 		const { onChange } = this.props;
 
 		onChange({
@@ -73,7 +76,7 @@ class SearchSettings extends React.Component {
 		const { subFieldsMap } = this.props;
 		const { parsedValue } = this.state;
 		const currentWeight = parsedValue[oldDropdownValue];
-		const filteredFields = removeKeyesFromObject(parsedValue, oldDropdownValue);
+		const filteredFields = removeKeysFromObject(parsedValue, oldDropdownValue);
 
 		const searchFieldToBeAdded = dropdownValue.replace('.keyword', '');
 		const subFieldsPresent = subFieldsMap[searchFieldToBeAdded];
@@ -92,7 +95,7 @@ class SearchSettings extends React.Component {
 
 	deleteItem = (item) => {
 		const { parsedValue } = this.state;
-		const filteredFields = removeKeyesFromObject(parsedValue, item);
+		const filteredFields = removeKeysFromObject(parsedValue, item);
 		this.handleSaveFields(filteredFields);
 	};
 
@@ -105,7 +108,7 @@ class SearchSettings extends React.Component {
 		const fields = getSubFields({
 			fields: subFieldsPresent,
 			address: searchFieldToBeAdded,
-			weight,
+			weight: weight || 0,
 		});
 
 		this.handleSaveFields({ ...parsedValue, ...fields });
@@ -135,7 +138,7 @@ class SearchSettings extends React.Component {
 					<InputNumber
 						value={parsedValue[item]}
 						style={{ width: '100%' }}
-						min={1}
+						min={0}
 						onChange={(weight) => this.handleFieldWeight(item, weight)}
 					/>
 				</Col>
