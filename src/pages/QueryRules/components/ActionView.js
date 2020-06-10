@@ -114,6 +114,13 @@ class ActionView extends React.Component {
 						))}
 					</React.Fragment>
 				) : null;
+			case 'replace_search_query':
+				return action.data ? (
+					<React.Fragment>
+						<h4 className={subTitle}>Replace Search Query</h4>
+						<Tag color="geekblue">{action.data}</Tag>
+					</React.Fragment>
+				) : null;
 			default:
 				return null;
 		}
