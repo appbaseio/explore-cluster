@@ -3,6 +3,7 @@ import { notification } from 'antd';
 import { getURL } from '../constants/config';
 import { getSingleFunction, updateFunctions } from '../batteries/utils/app';
 import { getESVersion } from '../batteries/utils/mappings';
+import { doGet } from '../batteries/utils/requestService';
 
 export async function getUser(username, password, url) {
 	const ACC_API = getURL();
@@ -599,17 +600,7 @@ export const getParsedRoutes = (routes) =>
 		];
 	}, []);
 
-export const validateQueryString = (queryString) =>
-	new Promise((resolve, reject) => {
-		const ACC_API = getURL();
-		const authToken = getAuthToken();
-		fetch(`${ACC_API}/_validate/query?q=${queryString}`, {
-			headers: {
-				'Content-Type': 'application/json',
-				Authorization: `Basic ${authToken}`,
-			},
-		})
-			.then((res) => res.json())
-			.then((data) => resolve(data))
-			.catch((error) => reject(error));
-	});
+export const validateQueryString = (queryString) => {
+	const ACC_API = getURL();
+	return doGet(`${ACC_API}/_validate/query?q=${queryString}`);
+};
