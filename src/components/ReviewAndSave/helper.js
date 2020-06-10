@@ -123,6 +123,10 @@ const settingsMap = {
 	synonyms: {
 		description: 'Enable synonyms for better searching across similar words',
 	},
+	queryString: {
+		title: 'Enable Query String',
+		description: 'Enable query string',
+	},
 	queryFormat: {
 		title: 'Query Format',
 		description: (
