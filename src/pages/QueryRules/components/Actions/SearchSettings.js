@@ -108,7 +108,7 @@ class SearchSettings extends React.Component {
 		const fields = getSubFields({
 			fields: subFieldsPresent,
 			address: searchFieldToBeAdded,
-			weight: weight || 0,
+			weight: weight || 1,
 		});
 
 		this.handleSaveFields({ ...parsedValue, ...fields });
@@ -138,7 +138,7 @@ class SearchSettings extends React.Component {
 					<InputNumber
 						value={parsedValue[item]}
 						style={{ width: '100%' }}
-						min={0}
+						min={1}
 						onChange={(weight) => this.handleFieldWeight(item, weight)}
 					/>
 				</Col>

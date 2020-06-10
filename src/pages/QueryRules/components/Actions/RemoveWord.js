@@ -1,13 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Input } from 'antd';
+import { Select } from 'antd';
+import { css } from 'emotion';
+
+const hideDropdown = css`
+	&.ant-select-dropdown {
+		display: none;
+	}
+`;
 
 const RemoveWord = ({ value = [], onChange }) => {
 	return (
-		<Input
-			placeholder="Enter word(s) to remove"
-			value={value.join(' ')}
-			onChange={(e) => onChange(e.target.value.split(' '))}
+		<Select
+			mode="tags"
+			style={{ width: '100%' }}
+			value={value}
+			placeholder="Press enter to add multiple words"
+			dropdownClassName={hideDropdown}
+			onChange={onChange}
 		/>
 	);
 };

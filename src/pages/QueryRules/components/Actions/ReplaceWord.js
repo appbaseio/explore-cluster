@@ -1,38 +1,100 @@
 /* eslint-disable jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Col, Input, Row } from 'antd';
+import { Col, Input, Row, Button } from 'antd';
 
-const ReplaceWord = ({ value = [], onChange }) => {
+const ReplaceWord = ({ value = {}, onChange }) => {
+	const handleWordReplacer = (replacer, word) => {
+		const newValue = Object.keys(value).reduce(
+			(agg, item) => ({
+				...agg,
+				[item]: item === word ? replacer : value[item],
+			}),
+			{},
+		);
+		onChange(newValue);
+	};
+
+	const handleWord = (word, index) => {
+		const newValue = Object.keys(value)
+			.map((wordValue, wordIndex) => {
+				if (wordIndex === index) {
+					return word;
+				}
+				return wordValue;
+			})
+			.reduce(
+				(agg, item) => ({
+					...agg,
+					[item]: value[item] || '',
+				}),
+				{},
+			);
+
+		onChange(newValue);
+	};
+
+	const addWord = () => {
+		onChange({
+			...value,
+			'': '',
+		});
+	};
+
+	const deleteWord = (word) => {
+		const { [word]: deletedWord, ...rest } = value;
+		onChange(rest);
+	};
 	return (
-		<Row gutter={22}>
-			<Col span={12}>
-				<label>Word to Replace</label>
-				<Input
-					value={value.word}
-					onChange={(e) => onChange({ ...value, word: e.target.value })}
-					placeholder="Enter a word"
-				/>
-			</Col>
-			<Col span={12}>
-				<label>New word</label>
-				<Input
-					value={value.replaceWith}
-					onChange={(e) => onChange({ ...value, replaceWith: e.target.value })}
-					placeholder="Enter a replacement"
-				/>
-			</Col>
-		</Row>
+		<React.Fragment>
+			{Object.keys(value).map((word, index) => (
+				<Row gutter={8} key={word || '_new_word'}>
+					<Col span={12}>
+						<Input
+							defaultValue={word}
+							onBlur={(e) => handleWord(e.target.value, index)}
+							placeholder="Enter word"
+						/>
+					</Col>
+					<Col span={10}>
+						<Input
+							value={value[word]}
+							placeholder="Enter replace term"
+							onChange={(e) => handleWordReplacer(e.target.value, word)}
+						/>
+					</Col>
+					<Col
+						style={{
+							display: 'flex',
+							justifyContent: 'flex-end',
+							alignItems: 'center',
+						}}
+						span={2}
+					>
+						<Button
+							shape="circle"
+							ghost
+							size="small"
+							type="danger"
+							icon="close"
+							style={{ marginTop: 3 }}
+							onClick={() => deleteWord(word)}
+						/>
+					</Col>
+				</Row>
+			))}
+			<Button onClick={addWord}>Add Word</Button>
+		</React.Fragment>
 	);
 };
 
 ReplaceWord.propTypes = {
-	value: PropTypes.array,
+	value: PropTypes.object,
 	onChange: PropTypes.func.isRequired,
 };
 
 ReplaceWord.defaultProps = {
-	value: [],
+	value: {},
 };
 
 export default ReplaceWord;
