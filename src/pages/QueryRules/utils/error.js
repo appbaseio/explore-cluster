@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import React from 'react';
 import { css } from 'emotion';
+import get from 'lodash/get';
 
 export const borderError = css`
 	border-color: #f5222d;
@@ -29,6 +30,7 @@ const getErrorMessages = (state) => {
 		show_advance_editor,
 		advancedExpression,
 		expressionError,
+		error: currentErrorState,
 	} = state;
 	const error = {};
 
@@ -59,6 +61,20 @@ const getErrorMessages = (state) => {
 		return Object.keys(item.data).length === 0;
 	}
 
+	function getObjectEmptyKeys(obj) {
+		if (!obj) return true;
+
+		const invalidKeys = Object.keys(obj).filter((key) => {
+			const value = obj[key];
+			if (Array.isArray(value)) return !value.length;
+
+			if (value) return false;
+			return true;
+		});
+
+		return invalidKeys;
+	}
+
 	if (actions.length) {
 		actions.forEach((item) => {
 			if (hasError(item)) {
@@ -66,6 +82,35 @@ const getErrorMessages = (state) => {
 					hasError: true,
 					description: 'Value cannot be empty',
 				};
+			}
+			if (item.type === 'add_filter' && !hasError(item)) {
+				const keysWithNoValue = getObjectEmptyKeys(item.data);
+
+				if (keysWithNoValue && keysWithNoValue.length > 0) {
+					error[item.type] = {
+						hasError: true,
+						description: `${keysWithNoValue
+							.map((key) => key.replace('.keyword', ''))
+							.join(', ')} cannot be empty`,
+					};
+				}
+			}
+			if (item.type === 'replace_words' && !hasError(item)) {
+				const keysWithNoValue = getObjectEmptyKeys(item.data);
+				if (keysWithNoValue && keysWithNoValue.length > 0) {
+					error[item.type] = {
+						hasError: true,
+						description: `${
+							keysWithNoValue.filter(Boolean).join(', ').trim() || 'Inputs'
+						} cannot be empty`,
+					};
+				}
+			}
+			if (
+				item.type === 'replace_search_query' &&
+				get(currentErrorState, 'replace_search_query.hasError')
+			) {
+				error[item.type] = currentErrorState[item.type];
 			}
 		});
 	}

@@ -149,6 +149,8 @@ export const parseExpression = (query = '', fieldMap = {}) => {
 	query = query.replace(/\bAND\b/g, 'and');
 	query = query.replace(/\bOR\b/g, 'or');
 	query = query.replace(/"/g, "'");
+	// Replace all backslashes to double back slashes
+	query = query.replace(/\\/g, '\\\\');
 	return query;
 };
 
@@ -234,6 +236,7 @@ function unParseCustomOperator(query = '', customOperator) {
 */
 export const unParseExpression = (query = '') => {
 	query = query.replace(/'/g, `"`);
+	query = query.replace(/\\\\/g, '\\');
 	const antiNegationRegex = new RegExp(
 		`not \\("([.#@\\w\\-)(:/ ]*)" (\\w*) ([\\w"-._ ]*)\\)`,
 		'g',
