@@ -161,7 +161,7 @@ class QueryRulesForm extends React.Component {
 			// filter state
 			dataField: '',
 			dataFieldValue: '',
-			query: 'matches',
+			query: '==',
 			queryValue: '',
 
 			timeframe: null,
@@ -175,6 +175,8 @@ class QueryRulesForm extends React.Component {
 			// internal state
 			mappings: [],
 			dataFields: [],
+			aggsFields: [],
+			searchFields: [],
 			isEditPage: !!hasId,
 
 			error: {},
@@ -203,12 +205,23 @@ class QueryRulesForm extends React.Component {
 		this.setState({ loading: true });
 		getClusterMappings()
 			.then((mappings) => {
-				const [dataFields, fieldMap] = getDatafields(mappings, ['*']);
-				const [searchFields] = getDatafields(mappings, ['*'], true);
+				const { selectedIndexes } = this.state;
+				const [dataFields, fieldMap] = getDatafields({ mappings, indexes: ['*'] });
+				const [searchFields] = getDatafields({
+					mappings,
+					indexes: selectedIndexes,
+					isSearch: true,
+				});
+				const [aggsFields] = getDatafields({
+					mappings,
+					indexes: selectedIndexes,
+					isAggs: true,
+				});
 				this.setState({
 					mappings,
 					dataFields,
 					searchFields,
+					aggsFields,
 					fieldMap,
 					loading: false,
 				});
@@ -304,14 +317,24 @@ class QueryRulesForm extends React.Component {
 
 	handleIndex = (selectedIndexes) => {
 		const { mappings } = this.state;
-		const [dataFields] = getDatafields(mappings, selectedIndexes);
-		const [searchFields] = getDatafields(mappings, selectedIndexes, true);
+		const [dataFields] = getDatafields({ mappings, indexes: selectedIndexes });
+		const [searchFields] = getDatafields({
+			mappings,
+			indexes: selectedIndexes,
+			isSearch: true,
+		});
+		const [aggsFields] = getDatafields({
+			mappings,
+			indexes: selectedIndexes,
+			isAggs: true,
+		});
 
 		this.setState((prevState) => ({
 			editorKey: Date.now(),
 			selectedIndexes,
 			dataFields,
 			searchFields,
+			aggsFields,
 			dataField: dataFields[0] || '',
 			error: {
 				...prevState.error,
@@ -555,6 +578,7 @@ class QueryRulesForm extends React.Component {
 			dataFields,
 			searchFields,
 			dataField,
+			aggsFields,
 			dataFieldValue,
 			query,
 			queryValue,
@@ -844,6 +868,7 @@ class QueryRulesForm extends React.Component {
 								<Actions
 									dataFields={dataFields}
 									searchFields={searchFields}
+									aggsFields={aggsFields}
 									indexes={getSelectedIndexes(selectedIndexes, mappings)}
 									actions={actions}
 									onChange={this.updateActions}
