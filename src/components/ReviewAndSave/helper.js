@@ -125,7 +125,14 @@ const settingsMap = {
 	},
 	queryString: {
 		title: 'Enable Query String',
-		description: 'Enable query string',
+		description: (
+			<React.Fragment>
+				<p style={{ fontSize: 15 }}>
+					If set to <strong>true</strong> than it allows you to create a complex search
+					that includes wildcard characters, searches across multiple fields, and more.
+				</p>
+			</React.Fragment>
+		),
 	},
 	queryFormat: {
 		title: 'Query Format',
