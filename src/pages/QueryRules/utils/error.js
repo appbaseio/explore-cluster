@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import React from 'react';
 import { css } from 'emotion';
+import get from 'lodash/get';
 
 export const borderError = css`
 	border-color: #f5222d;
@@ -29,6 +30,7 @@ const getErrorMessages = (state) => {
 		show_advance_editor,
 		advancedExpression,
 		expressionError,
+		error: currentErrorState,
 	} = state;
 	const error = {};
 
@@ -81,11 +83,6 @@ const getErrorMessages = (state) => {
 					description: 'Value cannot be empty',
 				};
 			}
-		});
-	}
-
-	if (actions.length) {
-		actions.forEach((item) => {
 			if (item.type === 'add_filter' && !hasError(item)) {
 				const keysWithNoValue = getObjectEmptyKeys(item.data);
 
@@ -97,6 +94,23 @@ const getErrorMessages = (state) => {
 							.join(', ')} cannot be empty`,
 					};
 				}
+			}
+			if (item.type === 'replace_words' && !hasError(item)) {
+				const keysWithNoValue = getObjectEmptyKeys(item.data);
+				if (keysWithNoValue && keysWithNoValue.length > 0) {
+					error[item.type] = {
+						hasError: true,
+						description: `${
+							keysWithNoValue.filter(Boolean).join(', ').trim() || 'Inputs'
+						} cannot be empty`,
+					};
+				}
+			}
+			if (
+				item.type === 'replace_search_query' &&
+				get(currentErrorState, 'replace_search_query.hasError')
+			) {
+				error[item.type] = currentErrorState[item.type];
 			}
 		});
 	}

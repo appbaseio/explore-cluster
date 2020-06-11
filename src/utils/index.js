@@ -3,6 +3,7 @@ import { notification } from 'antd';
 import { getURL } from '../constants/config';
 import { getSingleFunction, updateFunctions } from '../batteries/utils/app';
 import { getESVersion } from '../batteries/utils/mappings';
+import { doGet } from '../batteries/utils/requestService';
 
 export async function getUser(username, password, url) {
 	const ACC_API = getURL();
@@ -598,3 +599,8 @@ export const getParsedRoutes = (routes) =>
 			},
 		];
 	}, []);
+
+export const validateQueryString = (queryString) => {
+	const ACC_API = getURL();
+	return doGet(`${ACC_API}/_validate/query?q=${queryString}`);
+};
