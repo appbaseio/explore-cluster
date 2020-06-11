@@ -54,6 +54,10 @@ const actions = {
 		name: 'Add Filter',
 		data: {},
 	},
+	replace_search_query: {
+		name: 'Replace Search Query',
+		data: '',
+	},
 };
 
 class ActionSelector extends React.Component {

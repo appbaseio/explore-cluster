@@ -30,6 +30,7 @@ const getErrorMessages = (state) => {
 		show_advance_editor,
 		advancedExpression,
 		expressionError,
+		error: currentErrorState,
 	} = state;
 	const error = {};
 
@@ -112,6 +113,12 @@ const getErrorMessages = (state) => {
 						} cannot be empty`,
 					};
 				}
+			}
+			if (
+				item.type === 'replace_search_query' &&
+				get(currentErrorState, 'replace_search_query.hasError')
+			) {
+				error[item.type] = currentErrorState[item.type];
 			}
 		});
 	}

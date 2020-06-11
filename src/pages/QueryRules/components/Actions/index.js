@@ -17,6 +17,7 @@ import Info from '../../../../components/Info';
 import SearchSettings from './SearchSettings';
 import { removeSubFields } from '../../../../utils';
 import AddFilter from './AddFilter';
+import ReplaceSearchQuery from './ReplaceSearchQuery';
 
 const componentMappings = {
 	replace_search_term: ReplaceSearch,
@@ -28,6 +29,7 @@ const componentMappings = {
 	replace_words: ReplaceWord,
 	search_settings: SearchSettings,
 	add_filter: AddFilter,
+	replace_search_query: ReplaceSearchQuery,
 };
 
 const actionMapping = {
@@ -40,6 +42,7 @@ const actionMapping = {
 	replace_words: 'Replace Word',
 	search_settings: 'Set Search Settings',
 	add_filter: 'Add Filter',
+	replace_search_query: 'Replace Search Query',
 };
 
 const errorKeys = Object.keys(actionMapping).map((item) => `error.${item}`);
@@ -103,7 +106,7 @@ class Actions extends React.Component {
 		}
 	};
 
-	handleChange = (type, value) => {
+	handleChange = (type, value, errorObj = {}) => {
 		const { actions: originalActions, onChange } = this.props;
 		let actions = JSON.parse(JSON.stringify(originalActions));
 
@@ -120,6 +123,7 @@ class Actions extends React.Component {
 		onChange(actions, {
 			[type]: {
 				hasError: false,
+				...errorObj,
 			},
 		});
 	};
@@ -164,7 +168,7 @@ class Actions extends React.Component {
 		if (Component) {
 			return (
 				<Component
-					onChange={(value) => this.handleChange(item.type, value)}
+					onChange={(value, errorObj) => this.handleChange(item.type, value, errorObj)}
 					{...getProps()}
 				/>
 			);
