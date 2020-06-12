@@ -376,6 +376,7 @@ export async function getClusterMappings() {
 export function getDatafields({ mappings, indexes, isSearch = false, isAggs = false }) {
 	const hasAllIndex = indexes.includes('*');
 	let fieldMap = {};
+	let subFieldsMap = {};
 
 	function filtered(properties, property) {
 		if (isSearch)
@@ -408,13 +409,17 @@ export function getDatafields({ mappings, indexes, isSearch = false, isAggs = fa
 							acc[field] = field;
 						}
 					}
+					subFieldsMap[field] = fields;
 				};
 
 				if (isSearch) {
 					setKeyWordField(type, fields);
 				} else {
 					if (type === 'text' || type === 'string') setKeyWordField(type, fields);
-					else acc[field] = field;
+					else {
+						acc[field] = field;
+						subFieldsMap[field] = fields;
+					}
 				}
 				return acc;
 			}, {});
@@ -422,7 +427,7 @@ export function getDatafields({ mappings, indexes, isSearch = false, isAggs = fa
 			return [...acc, ...values(nestedDataFields)];
 		}, []);
 
-	return [[...new Set(dataFields)], fieldMap];
+	return [[...new Set(dataFields)], fieldMap, subFieldsMap];
 }
 
 function updateQueryRules(selectedFunction, res) {
@@ -519,7 +524,8 @@ export function getReIndexedName(appName) {
 
 export function getSubFields({ fields, weight, address }) {
 	if (fields) {
-		const subFields = Object.keys(fields).reduce((agg, field) => {
+		const fieldsToMap = Array.isArray(fields) ? fields : Object.keys(fields);
+		const subFields = fieldsToMap.reduce((agg, field) => {
 			if (field === 'search') {
 				return {
 					...agg,
@@ -599,6 +605,26 @@ export const getParsedRoutes = (routes) =>
 			},
 		];
 	}, []);
+
+export const removeSubFields = (dataField) => {
+	const searchSubFields = ['search', 'english', 'lang', 'autosuggest', 'keyword', 'synonyms'];
+	const fieldsToMap = Array.isArray(dataField) ? dataField : Object.keys(dataField);
+	const parsedFields = fieldsToMap.filter(
+		(field) => !searchSubFields.some((subField) => field.endsWith(`.${subField}`)),
+	);
+
+	if (Array.isArray(dataField)) {
+		return parsedFields;
+	}
+
+	return parsedFields.reduce(
+		(agg, item) => ({
+			...agg,
+			[item]: dataField[item],
+		}),
+		{},
+	);
+};
 
 export const validateQueryString = (queryString) => {
 	const ACC_API = getURL();

@@ -43,6 +43,13 @@ const actions = {
 		name: 'Replace Word',
 		data: {},
 	},
+	search_settings: {
+		name: 'Search Settings',
+		data: {
+			dataField: [],
+			fieldWeights: [],
+		},
+	},
 	add_filter: {
 		name: 'Add Filter',
 		data: {},
