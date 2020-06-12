@@ -81,6 +81,7 @@ class SearchSettingsPage extends React.Component {
 		visible: false,
 		queryFormat: 'or',
 		enableSynonyms: false,
+		queryString: false,
 	};
 
 	noUseCaseMappings = [];
@@ -165,6 +166,7 @@ class SearchSettingsPage extends React.Component {
 			queryFormat: get(settings, 'search.queryFormat', 'or'),
 			dataField,
 			enableSynonyms: get(settings, 'synonyms.enabled'),
+			queryString: get(settings, 'search.queryString'),
 		});
 	};
 
@@ -303,6 +305,7 @@ class SearchSettingsPage extends React.Component {
 			enableSynonyms,
 			hasSearchOperators,
 			queryFormat,
+			queryString,
 		} = this.state;
 		const { updateSettingsAction, appName, settings } = this.props;
 
@@ -314,6 +317,7 @@ class SearchSettingsPage extends React.Component {
 				dataField: Object.keys(dataField),
 				fieldWeights: Object.values(dataField),
 				searchOperators: hasSearchOperators,
+				queryString,
 				queryFormat,
 			},
 			synonyms: {
@@ -486,6 +490,7 @@ class SearchSettingsPage extends React.Component {
 			enableSynonyms,
 			isDirty,
 			queryFormat,
+			queryString,
 		} = this.state;
 		const {
 			isUpdating,
@@ -695,6 +700,17 @@ class SearchSettingsPage extends React.Component {
 						/>
 
 						<label>
+							{settingsMap.queryString.title}{' '}
+							<Tooltip title={settingsMap.queryString.description}>
+								<Icon type="info-circle" />
+							</Tooltip>
+						</label>
+						<Switch
+							checked={queryString}
+							onChange={(value) => this.handleChange('queryString', value)}
+						/>
+
+						<label>
 							{settingsMap.enableTypoTolerance.title}{' '}
 							<Tooltip title={settingsMap.enableTypoTolerance.description}>
 								<Icon type="info-circle" />
@@ -759,6 +775,7 @@ class SearchSettingsPage extends React.Component {
 										searchOperators: hasSearchOperators,
 										dataField: Object.keys(dataField),
 										fieldWeights: Object.values(dataField),
+										queryString,
 										queryFormat,
 									},
 								},
@@ -791,6 +808,7 @@ class SearchSettingsPage extends React.Component {
 									fieldWeights: Object.values(sortedDataField),
 									synonyms: enableSynonyms,
 									queryFormat,
+									queryString,
 								}}
 								onClick={() => this.toggleVisible(false)}
 								visible={visible}
