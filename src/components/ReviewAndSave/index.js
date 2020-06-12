@@ -31,6 +31,7 @@ class ReviewAndSave extends React.Component {
 			oldValues,
 			loading,
 			isReset,
+			renderField,
 		} = this.props;
 		const difference = this.difference(oldValues, newValues);
 		const isDifferent = keys(difference).length > 0;
@@ -74,6 +75,7 @@ class ReviewAndSave extends React.Component {
 								new: get(newValues, field),
 							},
 						})}
+						renderField={renderField}
 					/>
 				</Modal>
 			</>
@@ -91,6 +93,7 @@ ReviewAndSave.propTypes = {
 	onClick: PropTypes.func.isRequired,
 	loading: PropTypes.bool,
 	isReset: PropTypes.bool,
+	renderField: PropTypes.func,
 };
 
 ReviewAndSave.defaultProps = {
@@ -100,6 +103,7 @@ ReviewAndSave.defaultProps = {
 	buttonProps: {},
 	loading: false,
 	isReset: false,
+	renderField: null,
 };
 
 export default ReviewAndSave;
