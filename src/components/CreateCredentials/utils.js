@@ -167,7 +167,9 @@ const getCategories = (value) => {
 			tag: get(value, 'categories', []).includes(category),
 		};
 		if (value.limits) {
-			obj.rateLimit = value.limits[`${category}_limit`];
+			obj.rateLimit = value.limits[`${category}_limit`] || defaultRateLimits[category];
+		} else {
+			obj.rateLimit = defaultRateLimits[category];
 		}
 		categories.push(obj);
 	});

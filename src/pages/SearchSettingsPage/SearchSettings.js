@@ -100,6 +100,7 @@ class SearchSettingsPage extends React.Component {
 			old: {},
 		},
 		changedFieldWeights: {},
+		queryString: false,
 	};
 
 	noUseCaseMappings = [];
@@ -184,6 +185,7 @@ class SearchSettingsPage extends React.Component {
 			queryFormat: get(settings, 'search.queryFormat', 'or'),
 			dataField,
 			enableSynonyms: get(settings, 'synonyms.enabled'),
+			queryString: get(settings, 'search.queryString'),
 		});
 	};
 
@@ -233,8 +235,9 @@ class SearchSettingsPage extends React.Component {
 			? parsedMappings
 					.filter(
 						(mapping) =>
-							mapping.fieldType === 'text' &&
-							(mapping.usecase === 'none' || mapping.usecase === 'aggs'),
+							mapping.fieldType === 'keyword' ||
+							(mapping.fieldType === 'text' &&
+								(mapping.usecase === 'none' || mapping.usecase === 'aggs')),
 					)
 					.map((mapping) => ({
 						_address: `${mapping.type}.${mapping.address
@@ -325,6 +328,7 @@ class SearchSettingsPage extends React.Component {
 			enableSynonyms,
 			hasSearchOperators,
 			queryFormat,
+			queryString,
 		} = this.state;
 		const { updateSettingsAction, appName, settings } = this.props;
 
@@ -336,6 +340,7 @@ class SearchSettingsPage extends React.Component {
 				dataField: Object.keys(dataField),
 				fieldWeights: Object.values(dataField),
 				searchOperators: hasSearchOperators,
+				queryString,
 				queryFormat,
 			},
 			synonyms: {
@@ -524,6 +529,7 @@ class SearchSettingsPage extends React.Component {
 			queryFormat,
 			changedFieldWeights,
 			changedFields,
+			queryString,
 		} = this.state;
 		const {
 			isUpdating,
@@ -737,6 +743,17 @@ class SearchSettingsPage extends React.Component {
 						/>
 
 						<label>
+							{settingsMap.queryString.title}{' '}
+							<Tooltip title={settingsMap.queryString.description}>
+								<Icon type="info-circle" />
+							</Tooltip>
+						</label>
+						<Switch
+							checked={queryString}
+							onChange={(value) => this.handleChange('queryString', value)}
+						/>
+
+						<label>
 							{settingsMap.enableTypoTolerance.title}{' '}
 							<Tooltip title={settingsMap.enableTypoTolerance.description}>
 								<Icon type="info-circle" />
@@ -801,6 +818,7 @@ class SearchSettingsPage extends React.Component {
 										searchOperators: hasSearchOperators,
 										dataField: Object.keys(dataField),
 										fieldWeights: Object.values(dataField),
+										queryString,
 										queryFormat,
 									},
 								},
@@ -833,6 +851,7 @@ class SearchSettingsPage extends React.Component {
 									fieldWeights: Object.values(sortedDataField),
 									synonyms: enableSynonyms,
 									queryFormat,
+									queryString,
 								}}
 								renderField={({ value, type, record }) => {
 									const fieldName = get(record, 'setting', '').toLowerCase();

@@ -123,6 +123,24 @@ const settingsMap = {
 	synonyms: {
 		description: 'Enable synonyms for better searching across similar words',
 	},
+	queryString: {
+		title: 'Enable Query String',
+		description: (
+			<React.Fragment>
+				<p style={{ fontSize: 15 }}>
+					If set to <strong>true</strong> than it allows you to create a complex search
+					that includes wildcard characters, searches across multiple fields, and more.{' '}
+					<a
+						href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						Learn More.
+					</a>
+				</p>
+			</React.Fragment>
+		),
+	},
 	queryFormat: {
 		title: 'Query Format',
 		description: (

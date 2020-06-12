@@ -83,6 +83,14 @@ const getErrorMessages = (state) => {
 					description: 'Value cannot be empty',
 				};
 			}
+
+			if (item.type === 'search_settings' && get(item, 'data.dataField', []).length === 0) {
+				error[item.type] = {
+					hasError: true,
+					description: 'Value cannot be empty',
+				};
+			}
+
 			if (item.type === 'add_filter' && !hasError(item)) {
 				const keysWithNoValue = getObjectEmptyKeys(item.data);
 
