@@ -214,8 +214,9 @@ class SearchSettingsPage extends React.Component {
 			? parsedMappings
 					.filter(
 						(mapping) =>
-							mapping.fieldType === 'text' &&
-							(mapping.usecase === 'none' || mapping.usecase === 'aggs'),
+							mapping.fieldType === 'keyword' ||
+							(mapping.fieldType === 'text' &&
+								(mapping.usecase === 'none' || mapping.usecase === 'aggs')),
 					)
 					.map((mapping) => ({
 						_address: `${mapping.type}.${mapping.address
