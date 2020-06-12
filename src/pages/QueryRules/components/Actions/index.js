@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Card, Icon, Tooltip, Typography } from 'antd';
 import { css } from 'emotion';
+import get from 'lodash/get';
 import DNDWrapper from '../../../../components/DNDWrapper';
 import CustomData from './CustomData';
 import ReplaceSearch from './ReplaceSearch';
@@ -13,7 +14,10 @@ import { getErrorMessage } from '../../utils/error';
 import { hasValuesChanged, toolTips } from '../../utils';
 import RemoveWord from './RemoveWord';
 import Info from '../../../../components/Info';
+import SearchSettings from './SearchSettings';
+import { removeSubFields } from '../../../../utils';
 import AddFilter from './AddFilter';
+import ReplaceSearchQuery from './ReplaceSearchQuery';
 
 const componentMappings = {
 	replace_search_term: ReplaceSearch,
@@ -23,7 +27,9 @@ const componentMappings = {
 	function: ExecuteFunction,
 	remove_words: RemoveWord,
 	replace_words: ReplaceWord,
+	search_settings: SearchSettings,
 	add_filter: AddFilter,
+	replace_search_query: ReplaceSearchQuery,
 };
 
 const actionMapping = {
@@ -34,7 +40,9 @@ const actionMapping = {
 	function: 'f(x) Apply Function',
 	remove_words: 'Remove Word(s)',
 	replace_words: 'Replace Word',
+	search_settings: 'Set Search Settings',
 	add_filter: 'Add Filter',
+	replace_search_query: 'Replace Search Query',
 };
 
 const errorKeys = Object.keys(actionMapping).map((item) => `error.${item}`);
@@ -98,7 +106,7 @@ class Actions extends React.Component {
 		}
 	};
 
-	handleChange = (type, value) => {
+	handleChange = (type, value, errorObj = {}) => {
 		const { actions: originalActions, onChange } = this.props;
 		let actions = JSON.parse(JSON.stringify(originalActions));
 
@@ -115,6 +123,7 @@ class Actions extends React.Component {
 		onChange(actions, {
 			[type]: {
 				hasError: false,
+				...errorObj,
 			},
 		});
 	};
@@ -123,7 +132,7 @@ class Actions extends React.Component {
 		const Component = componentMappings[item.type];
 		const getProps = () => {
 			const defaultProps = { value: item.data };
-			const { indexes, searchFields, aggsFields } = this.props;
+			const { indexes, searchFields, aggsFields, subFieldsMap } = this.props;
 			if (item.type === 'promote_result' || item.type === 'hide_result') {
 				return {
 					...defaultProps,
@@ -132,6 +141,20 @@ class Actions extends React.Component {
 				};
 			}
 
+			if (item.type === 'search_settings') {
+				const excludeFields = removeSubFields(get(item, 'data.dataField'));
+
+				// Remove already selected fields from dropdown.
+				const fieldsToShow = searchFields.filter(
+					(field) => !excludeFields.includes(field.replace('.keyword', '')),
+				);
+
+				return {
+					...defaultProps,
+					searchFields: fieldsToShow,
+					subFieldsMap,
+				};
+			}
 			if (item.type === 'add_filter') {
 				return {
 					...defaultProps,
@@ -145,7 +168,7 @@ class Actions extends React.Component {
 		if (Component) {
 			return (
 				<Component
-					onChange={(value) => this.handleChange(item.type, value)}
+					onChange={(value, errorObj) => this.handleChange(item.type, value, errorObj)}
 					{...getProps()}
 				/>
 			);
@@ -243,6 +266,7 @@ Actions.propTypes = {
 	error: PropTypes.object,
 	indexes: PropTypes.array,
 	searchFields: PropTypes.array,
+	subFieldsMap: PropTypes.object,
 	aggsFields: PropTypes.array,
 };
 
@@ -251,6 +275,7 @@ Actions.defaultProps = {
 	error: {},
 	indexes: [],
 	searchFields: [],
+	subFieldsMap: {},
 	aggsFields: [],
 };
 
