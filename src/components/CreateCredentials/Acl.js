@@ -24,7 +24,7 @@ class Acl extends React.PureComponent {
 						render={({ handler, invalid }) => (
 							<Input
 								className={invalid ? 'input-error' : null}
-								min="0"
+								min="1"
 								type="number"
 								{...handler()}
 							/>
