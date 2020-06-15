@@ -199,7 +199,8 @@ const toolTips = {
 	),
 	add_filter: (
 		<>
-			Add filter{' '}
+			Allows you to define the term filters that will get applied on the search type of
+			queries.{' '}
 			<a
 				target="_blank"
 				rel="noopener noreferrer"
@@ -224,6 +225,18 @@ const toolTips = {
 				target="_blank"
 				rel="noopener noreferrer"
 				href="https://docs.appbase.io/docs/search/rules/#replace-search-query"
+			>
+				Learn more
+			</a>
+		</>
+	),
+	search_settings: (
+		<>
+			Define the dataField and fieldWeights for your search type of queries.{' '}
+			<a
+				target="_blank"
+				rel="noopener noreferrer"
+				href="https://docs.appbase.io/docs/search/rules/#search-settings"
 			>
 				Learn more
 			</a>
