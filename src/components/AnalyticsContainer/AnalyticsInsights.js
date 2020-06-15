@@ -93,13 +93,13 @@ class AnalyticsInsights extends React.Component {
 				if (success) {
 					switch (nextStatus) {
 						case 'saved':
-							message.success('Saved Insight successfully!');
+							message.success('Saved insight successfully!');
 							break;
 						case 'deleted':
-							message.success('Deleted Insight successfully!');
+							message.success('Deleted insight successfully!');
 							break;
 						case 'read':
-							message.success('Marked Insight as Read');
+							message.success('Marked insight as read');
 							break;
 						default:
 					}
@@ -123,7 +123,7 @@ class AnalyticsInsights extends React.Component {
 							break;
 						case 'read':
 							notification.error({
-								message: 'Failed to mark insight as Read',
+								message: 'Failed to mark insight as read',
 								description:
 									updateError.message ||
 									'Something went wrong while updating the status!',
