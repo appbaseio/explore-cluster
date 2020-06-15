@@ -259,9 +259,9 @@ export const unParseExpression = (query = '') => {
 
 // unparses expression and returns index and expression from the two combined
 export const getRawQuery = (showAdvancedEditor, unparsedRule) => {
-	let rawQuery;
+	let rawQuery = '';
 	let indexes;
-	if (showAdvancedEditor) {
+	if (showAdvancedEditor && get(unparsedRule, 'trigger.type') === 'filter') {
 		rawQuery = get(unparsedRule, 'trigger.expression', '');
 		rawQuery = rawQuery.split('in $index and ');
 		const pattern = /'(.*?)'/;
@@ -270,7 +270,7 @@ export const getRawQuery = (showAdvancedEditor, unparsedRule) => {
 			// eslint-disable-next-line prefer-destructuring
 			rawQuery = rawQuery[1];
 		} else {
-			[rawQuery] = rawQuery;
+			rawQuery = '';
 		}
 	}
 	return {
