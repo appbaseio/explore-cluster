@@ -209,6 +209,26 @@ const toolTips = {
 			</a>
 		</>
 	),
+	replace_search_query: (
+		<>
+			Modify the whole query by using the{' '}
+			<a
+				target="_blank"
+				rel="noopener noreferrer"
+				href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html"
+			>
+				ElasticSearch Query String
+			</a>{' '}
+			syntax.{' '}
+			<a
+				target="_blank"
+				rel="noopener noreferrer"
+				href="https://docs.appbase.io/docs/search/rules/#replace-search-query"
+			>
+				Learn more
+			</a>
+		</>
+	),
 };
 
 export { getParsedRule, getExpressionFromValue, hasValuesChanged, bannerDetails, toolTips };

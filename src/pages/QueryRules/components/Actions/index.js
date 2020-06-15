@@ -39,7 +39,7 @@ const actionMapping = {
 	custom_data: 'Return Custom Data',
 	function: 'f(x) Apply Function',
 	remove_words: 'Remove Word(s)',
-	replace_words: 'Replace Word',
+	replace_words: 'Replace Word(s)',
 	search_settings: 'Set Search Settings',
 	add_filter: 'Add Filter',
 	replace_search_query: 'Replace Search Query',

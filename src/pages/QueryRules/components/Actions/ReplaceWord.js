@@ -48,7 +48,9 @@ const ReplaceWord = ({ value = {}, onChange }) => {
 	return (
 		<React.Fragment>
 			{Object.keys(value).map((word, index) => (
-				<Row gutter={8} key={word || '_new_word'}>
+				// We want the key to be same on the next re-render which will help us keep the focus of keybpard
+				// eslint-disable-next-line react/no-array-index-key
+				<Row gutter={8} key={`input_${index}`}>
 					<Col span={12}>
 						<Input
 							defaultValue={word}
