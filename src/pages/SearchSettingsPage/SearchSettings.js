@@ -809,6 +809,7 @@ class SearchSettingsPage extends React.Component {
 						resetState={resetState}
 						onReset={this.resetToDefault}
 						showSearchPreview
+						showCopySettings
 						searchPreviewModalProps={{
 							searchPreviewProps: {
 								testSettings: {

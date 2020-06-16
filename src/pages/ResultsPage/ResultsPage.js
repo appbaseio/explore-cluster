@@ -428,6 +428,7 @@ class ResultsPage extends React.Component {
 						loading={isUpdating}
 						resetState={resetState}
 						showSearchPreview
+						showCopySettings
 						app={appName}
 						showReset={
 							!isEqual(get(settings, 'results'), get(defaultSettings, 'results'))

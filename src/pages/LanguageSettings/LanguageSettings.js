@@ -403,6 +403,7 @@ class LanguageSettings extends React.Component {
 					<SettingsFooter
 						loading={isUpdating || loading}
 						resetState={resetState}
+						showCopySettings
 						showSearchPreview
 						app={appName}
 						searchPreviewModalProps={{

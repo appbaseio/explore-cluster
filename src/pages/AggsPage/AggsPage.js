@@ -701,6 +701,7 @@ class AggsPage extends React.Component {
 					<SettingsFooter
 						loading={isUpdating}
 						resetState={resetState}
+						showCopySettings
 						onReset={this.resetToDefault}
 						showReset={
 							!isEqual(
