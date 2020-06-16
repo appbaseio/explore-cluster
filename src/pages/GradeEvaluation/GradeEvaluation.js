@@ -199,7 +199,7 @@ class GradeEvaluation extends React.Component {
 			{
 				title: 'Term',
 				key: 'term',
-				render: (query) => query,
+				render: (query) => query || '<empty_query>',
 				fixed: 'left',
 				width: 150,
 			},

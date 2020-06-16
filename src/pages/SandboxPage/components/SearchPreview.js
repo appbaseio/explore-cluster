@@ -39,6 +39,7 @@ class SearchPreview extends React.Component {
 		searchableMappings: {},
 		isAnalyticsEnabled: true,
 		isParsedStateApplied: false,
+		isGradingEnabled: false,
 	};
 
 	componentDidMount() {
@@ -253,6 +254,12 @@ class SearchPreview extends React.Component {
 		});
 	};
 
+	toggleGrading = (value) => {
+		this.setState({
+			isGradingEnabled: value,
+		});
+	};
+
 	handleValueChange = (id, value) => {
 		this.setState(({ settings }) => ({
 			settings: settings.map((item) =>
@@ -286,7 +293,7 @@ class SearchPreview extends React.Component {
 			mappings,
 			handleModal,
 		} = this.props;
-		const { settings: stateSettings, isAnalyticsEnabled } = this.state;
+		const { settings: stateSettings, isAnalyticsEnabled, isGradingEnabled } = this.state;
 
 		if (fetchingDefaultSettings) {
 			return (
@@ -340,9 +347,20 @@ class SearchPreview extends React.Component {
 									Record Analytics
 									<Switch
 										checked={isAnalyticsEnabled}
-										style={{ marginLeft: 5 }}
+										style={{ marginLeft: 5, marginRight: 10 }}
 										onChange={this.toggleAnalytics}
 										id="analytics"
+									/>
+								</label>
+							</Tooltip>
+							<Tooltip title="Enable Grading to grade search results">
+								<label htmlFor="grading">
+									Grade Search
+									<Switch
+										checked={isGradingEnabled}
+										style={{ marginLeft: 5 }}
+										onChange={this.toggleGrading}
+										id="grading"
 									/>
 								</label>
 							</Tooltip>
@@ -382,11 +400,13 @@ class SearchPreview extends React.Component {
 							query={stateSettings}
 							app={app}
 							url={url}
+							searchTerm={get(search, 'value')}
 							toggleAnalytics={this.toggleAnalytics}
 							recordAnalytics={isAnalyticsEnabled}
 							rules={rules}
 							onChange={this.handleSettingsChange}
 							credentials={credentials}
+							isGradingEnabled={isGradingEnabled}
 						/>
 					</Col>
 				</ReactiveBase>
