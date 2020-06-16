@@ -181,7 +181,7 @@ class GradeEvaluation extends React.Component {
 		}
 
 		const { selectedIndices } = this.state;
-		const tableData = metrics ? Object.keys(metrics) : [];
+		const searchTerms = metrics ? Object.keys(metrics) : [];
 		const indicesColumns = selectedIndices.map((index) => ({
 			title: (
 				<div className="table-column">
@@ -218,7 +218,10 @@ class GradeEvaluation extends React.Component {
 								scroll={{ x: 1200 }}
 								className={tableStyle}
 								columns={tableColumns}
-								dataSource={tableData}
+								dataSource={searchTerms}
+								locale={{
+									emptyText: <Empty description="No metrics data available" />,
+								}}
 							/>
 						</Card>
 					</Spin>
