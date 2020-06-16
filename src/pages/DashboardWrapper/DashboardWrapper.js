@@ -76,6 +76,7 @@ const defaultRoutes = {
 			{ label: 'Query Suggestions', link: '/cluster/query-suggestions', tag: 'Beta' },
 			{ label: 'Query Rules', link: '/cluster/rules', tag: 'Beta' },
 			{ label: 'Functions', link: '/cluster/functions', tag: 'Beta' },
+			{ label: 'Grade Evaluation', link: '/cluster/grade-evaluation', tag: 'Beta' },
 		],
 	},
 	'Curated Insights': {
