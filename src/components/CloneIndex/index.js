@@ -75,13 +75,21 @@ const CloneIndex = (props) => {
 		setExists(existingApps.includes(e.target.value));
 	}
 
+	const featureSearchRelevance = isValidPlan(tier, featureSearchRelevancy);
+
 	const searchRelevancyCheckbox = (
 		<Checkbox
-			disabled={!isValidPlan(tier, featureSearchRelevancy)}
+			disabled={!featureSearchRelevance}
 			className={radioStyle}
 			value="search_relevancy"
 		>
 			Copy Search Relevancy Settings
+		</Checkbox>
+	);
+
+	const copySynoynmsCheckbox = (
+		<Checkbox disabled={!featureSearchRelevance} className={radioStyle} value="synonyms">
+			Copy Synonyms
 		</Checkbox>
 	);
 
@@ -128,12 +136,22 @@ const CloneIndex = (props) => {
 							Copy Index Data
 						</Checkbox>
 					</div>
+
 					<div>
-						{isValidPlan(tier, featureSearchRelevancy) ? (
+						{featureSearchRelevance ? (
 							searchRelevancyCheckbox
 						) : (
 							<Tooltip title="This feature is only available on selected plans.">
 								{searchRelevancyCheckbox}
+							</Tooltip>
+						)}
+					</div>
+					<div>
+						{featureSearchRelevance ? (
+							copySynoynmsCheckbox
+						) : (
+							<Tooltip title="This feature is only available on selected plans.">
+								{copySynoynmsCheckbox}
 							</Tooltip>
 						)}
 					</div>
