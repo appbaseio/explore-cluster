@@ -161,9 +161,9 @@ class RoleBaseAccess extends React.Component {
 			const role = state && state[value.username];
 			const response = await setRole(value.username, role);
 			if (response.result === 'updated') {
-				notification.success({ message: 'Role Updated Successfully.' });
+				notification.success({ message: 'Role updated successfully.' });
 			} else {
-				notification.error({ message: 'Something went wrong while updating the Role.' });
+				notification.error({ message: 'Something went wrong while updating the role.' });
 			}
 
 			fetchPermissions();
