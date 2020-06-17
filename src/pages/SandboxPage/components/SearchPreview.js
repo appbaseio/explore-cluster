@@ -357,7 +357,7 @@ class SearchPreview extends React.Component {
 									/>
 								</label>
 							</Tooltip>
-							<Tooltip title="Enable Grading to grade search results">
+							<Tooltip title="Toggle to enable (or disable) grading of search results.">
 								<label htmlFor="grading">
 									Grade Search
 									<Switch
