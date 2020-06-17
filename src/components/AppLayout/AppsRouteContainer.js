@@ -95,7 +95,6 @@ const IndexSettingsPage = Loadable({
 class RouteContainer extends React.Component {
 	shouldComponentUpdate(nextProps) {
 		const { location } = this.props;
-
 		return (
 			(nextProps &&
 				nextProps.location &&

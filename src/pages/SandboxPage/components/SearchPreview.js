@@ -132,7 +132,11 @@ class SearchPreview extends React.Component {
 
 	componentWillUnmount() {
 		const { clearState } = this.props;
-		clearState();
+		const { settings } = this.state;
+
+		if (settings) {
+			clearState();
+		}
 	}
 
 	getSearchableMappings = (mappings) => {

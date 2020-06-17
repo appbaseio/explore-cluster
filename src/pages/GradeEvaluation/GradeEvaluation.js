@@ -1,11 +1,22 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Card, Spin, Select, Table, Icon, Typography, Empty, notification } from 'antd';
+import {
+	Card,
+	Spin,
+	Select,
+	Table,
+	Icon,
+	Typography,
+	Empty,
+	notification,
+	Button,
+	Tooltip,
+} from 'antd';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { getAppGradeMetrics } from '../../batteries/modules/actions';
+import { getAppGradeMetrics, setSearchState } from '../../batteries/modules/actions';
 import { isValidPlan } from '../../batteries/utils';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Container from '../../components/Container';
@@ -52,9 +63,20 @@ const tableStyle = css`
 			transition: all ease 0.2s;
 		}
 	}
+	.replay-button {
+		margin-left: 5px;
+		transform: scale(0);
+		transition: all ease 0.2s;
+	}
 
 	th:hover {
 		.table-column > a {
+			transform: scale(1);
+		}
+	}
+
+	td:hover {
+		.replay-button {
 			transform: scale(1);
 		}
 	}
@@ -117,7 +139,12 @@ class GradeEvaluation extends React.Component {
 		if (!isFetchingApps && apps) {
 			return (
 				<div style={{ position: 'relative', marginBottom: 20 }}>
-					<Typography.Text strong>Select Index</Typography.Text>
+					<Typography.Text strong>
+						Select Index
+						<Tooltip title="Select index to add in comparison table">
+							<Icon style={{ marginLeft: 5 }} type="info-circle" />
+						</Tooltip>
+					</Typography.Text>
 					<Select
 						showSearch
 						mode="multiple"
@@ -141,6 +168,22 @@ class GradeEvaluation extends React.Component {
 		}
 
 		return null;
+	};
+
+	handleSearchPreview = (query, index) => {
+		const { history, saveState } = this.props;
+
+		saveState({
+			query: [
+				{
+					id: 'search',
+					value: query,
+					dataField: [],
+				},
+			],
+		});
+
+		history.push(`/app/${index}/search-preview`);
 	};
 
 	render() {
@@ -192,7 +235,20 @@ class GradeEvaluation extends React.Component {
 				</div>
 			),
 			key: index,
-			render: (query) => get(metrics, `${query}.${index}`, 0),
+			render: (query) => (
+				<React.Fragment>
+					{get(metrics, `${query}.${index}`, 0)}
+					<Tooltip title="Test with search preview">
+						<Button
+							size="small"
+							shape="circle-outline"
+							icon="redo"
+							className="replay-button"
+							onClick={() => this.handleSearchPreview(query, index)}
+						/>
+					</Tooltip>
+				</React.Fragment>
+			),
 		}));
 
 		const tableColumns = [
@@ -251,6 +307,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => ({
 	getMetrics: () => dispatch(getAppGradeMetrics()),
+	saveState: (state) => dispatch(setSearchState(state)),
 });
 
 GradeEvaluation.defaultProps = {
@@ -271,6 +328,8 @@ GradeEvaluation.propTypes = {
 	isFetching: PropTypes.bool.isRequired,
 	error: PropTypes.object,
 	getMetrics: PropTypes.func.isRequired,
+	history: PropTypes.object.isRequired,
+	saveState: PropTypes.func.isRequired,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(GradeEvaluation);
