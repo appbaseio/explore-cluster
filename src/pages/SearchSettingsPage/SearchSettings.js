@@ -737,26 +737,17 @@ class SearchSettingsPage extends React.Component {
 					</Card>
 					<Card className={cardStyle}>
 						<label>
-							Query Format
-							<Tooltip title={settingsMap.queryFormat.description}>
+							Query Type
+							<Tooltip title={settingsMap.queryType.description}>
 								<Icon style={{ marginLeft: 5 }} type="info-circle" />
 							</Tooltip>
 						</label>
 						<Radio.Group
 							style={{ display: 'flex', marginBottom: 8 }}
-							onChange={this.handleQueryFormat}
-							value={queryFormat}
-						>
-							<Radio value="or">Or</Radio>
-							<Radio value="and">And</Radio>
-						</Radio.Group>
-						<label>Query Type</label>
-						<Radio.Group
-							style={{ display: 'flex', marginBottom: 8 }}
 							onChange={(e) => this.handleChange('queryType', e.target.value)}
 							value={queryType}
 						>
-							<Radio value="default">Reactivesearch (default)</Radio>
+							<Radio value="default">ReactiveSearch</Radio>
 							<Radio value="queryString">
 								{settingsMap.queryString.title}{' '}
 								<Tooltip title={settingsMap.queryString.description}>
@@ -769,6 +760,20 @@ class SearchSettingsPage extends React.Component {
 									<Icon type="info-circle" />
 								</Tooltip>
 							</Radio>
+						</Radio.Group>
+						<label>
+							Query Format
+							<Tooltip title={settingsMap.queryFormat.description}>
+								<Icon style={{ marginLeft: 5 }} type="info-circle" />
+							</Tooltip>
+						</label>
+						<Radio.Group
+							style={{ display: 'flex', marginBottom: 8 }}
+							onChange={this.handleQueryFormat}
+							value={queryFormat}
+						>
+							<Radio value="or">Or</Radio>
+							<Radio value="and">And</Radio>
 						</Radio.Group>
 						<label>
 							{settingsMap.enableTypoTolerance.title}{' '}

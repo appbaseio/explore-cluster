@@ -167,6 +167,8 @@ const settingsMap = {
 	},
 	queryType: {
 		title: 'Query Type',
+		description:
+			'Query type determines the query DSL to be used. It defaults to ReactiveSearch.',
 	},
 };
 
