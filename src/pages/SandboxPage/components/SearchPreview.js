@@ -37,9 +37,13 @@ class SearchPreview extends React.Component {
 	state = {
 		settings: null,
 		searchableMappings: {},
-		isAnalyticsEnabled: true,
+		isAnalyticsEnabled: localStorage.getItem('enableAnalytics')
+			? localStorage.getItem('enableAnalytics') === 'true'
+			: true,
 		isParsedStateApplied: false,
-		isGradingEnabled: false,
+		isGradingEnabled: localStorage.getItem('enableGrading')
+			? localStorage.getItem('enableGrading') === 'true'
+			: false,
 	};
 
 	componentDidMount() {
@@ -253,12 +257,14 @@ class SearchPreview extends React.Component {
 	};
 
 	toggleAnalytics = (value) => {
+		localStorage.setItem('enableAnalytics', JSON.stringify(value));
 		this.setState({
 			isAnalyticsEnabled: value,
 		});
 	};
 
 	toggleGrading = (value) => {
+		localStorage.setItem('enableGrading', JSON.stringify(value));
 		this.setState({
 			isGradingEnabled: value,
 		});

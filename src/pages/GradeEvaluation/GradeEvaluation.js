@@ -112,8 +112,8 @@ class GradeEvaluation extends React.Component {
 	}
 
 	fetchMetrics = () => {
-		const { getMetrics, tier, featureGrade, metrics } = this.props;
-		if (isValidPlan(tier, featureGrade) && !metrics) {
+		const { getMetrics, tier, featureGrade } = this.props;
+		if (isValidPlan(tier, featureGrade)) {
 			getMetrics();
 		}
 	};
@@ -165,6 +165,8 @@ class GradeEvaluation extends React.Component {
 
 	handleSearchPreview = (query, index) => {
 		const { history, saveState } = this.props;
+
+		localStorage.setItem('enableGrading', 'true');
 
 		saveState({
 			query: [

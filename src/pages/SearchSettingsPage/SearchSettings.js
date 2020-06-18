@@ -355,7 +355,13 @@ class SearchSettingsPage extends React.Component {
 					});
 				} else {
 					message.success(`Search settings for ${appName} saved successfully`);
-
+					this.setState({
+						changedFields: {
+							new: {},
+							old: {},
+						},
+						changedFieldWeights: {},
+					});
 					if (isDirty) {
 						this.reIndex();
 					}
@@ -839,7 +845,7 @@ class SearchSettingsPage extends React.Component {
 								isReset={isReset}
 								oldValues={{
 									...rest,
-									dataField: Object.keys(sortedSavedDataField),
+									dataField: changedFields.old,
 									fieldWeights: Object.values(sortedSavedDataField),
 									synonyms: get(settings, 'synonyms.enabled'),
 									queryFormat: get(settings, 'search.queryFormat'),
@@ -847,7 +853,7 @@ class SearchSettingsPage extends React.Component {
 								newValues={{
 									fuzziness: hasTypoTolerance ? typoTolerance : 0,
 									searchOperators: hasSearchOperators,
-									dataField: Object.keys(sortedDataField),
+									dataField: changedFields.new,
 									fieldWeights: Object.values(sortedDataField),
 									synonyms: enableSynonyms,
 									queryFormat,
@@ -870,12 +876,16 @@ class SearchSettingsPage extends React.Component {
 												  );
 										}
 
-										return Object.keys(changedFields[type]).map((field) => (
-											<Typography.Paragraph>
-												{field}:{' '}
-												<strong>{changedFields[type][field]}</strong>
-											</Typography.Paragraph>
-										));
+										return Object.keys(get(changedFields, type, {})).map(
+											(field) => (
+												<Typography.Paragraph>
+													{field}:{' '}
+													<strong>
+														{get(changedFields, `${type}.${field}`, '')}
+													</strong>
+												</Typography.Paragraph>
+											),
+										);
 									}
 									if (fieldName === 'fieldweights') {
 										if (JSON.stringify(oldFieldKeyes) === JSON.stringify({})) {
@@ -893,18 +903,22 @@ class SearchSettingsPage extends React.Component {
 										}
 
 										if (JSON.stringify(changedFieldWeights) === '{}') {
-											return Object.keys(changedFields[type]).map((field) => (
-												<Typography.Paragraph>
-													{field}:{' '}
-													<strong>
-														{changedFields[type][field].includes(
-															'search',
-														)
-															? newFieldKeyes[field] || 1
-															: 0}
-													</strong>
-												</Typography.Paragraph>
-											));
+											return Object.keys(get(changedFields, type, {})).map(
+												(field) => (
+													<Typography.Paragraph>
+														{field}:{' '}
+														<strong>
+															{get(
+																changedFields,
+																`${type}.${field}`,
+																[],
+															).includes('search')
+																? newFieldKeyes[field] || 1
+																: 0}
+														</strong>
+													</Typography.Paragraph>
+												),
+											);
 										}
 										return Object.keys(changedFieldWeights).map((field) => (
 											<Typography.Paragraph>
