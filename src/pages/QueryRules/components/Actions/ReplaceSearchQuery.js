@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Spin } from 'antd';
+import { Input } from 'antd';
 import PropTypes from 'prop-types';
 import { validateQueryString } from '../../../../utils';
 
@@ -7,11 +7,10 @@ class ReplaceSearchQuery extends React.Component {
 	constructor(props) {
 		super(props);
 
-		const { value } = props;
-
 		this.state = {
-			value,
 			isVerifying: false,
+			isValid: false,
+			value: props.value,
 		};
 	}
 
@@ -22,6 +21,7 @@ class ReplaceSearchQuery extends React.Component {
 		this.setState({
 			value,
 		});
+		this.handleValidate(e);
 	};
 
 	toggleVerification = () => {
@@ -47,14 +47,23 @@ class ReplaceSearchQuery extends React.Component {
 			const queryStringResponse = await validateQueryString(value);
 			if (queryStringResponse.valid) {
 				onChange(value);
+				this.setState({
+					isValid: true,
+				});
 			} else {
 				onChange(value, {
 					hasError: true,
 					description: 'Invalid query string',
 				});
+				this.setState({
+					isValid: false,
+				});
 			}
 		} catch (_e) {
 			console.error(_e);
+			this.setState({
+				isValid: false,
+			});
 			onChange(value, {
 				hasError: true,
 				description: 'Invalid query string',
@@ -64,17 +73,27 @@ class ReplaceSearchQuery extends React.Component {
 	};
 
 	render() {
-		const { value, isVerifying } = this.state;
+		const { value, isVerifying, isValid } = this.state;
 		return (
 			<React.Fragment>
-				<Spin spinning={isVerifying}>
-					<Input
-						placeholder="Enter query string"
-						value={value}
-						onChange={this.handleInput}
-						onBlur={this.handleValidate}
-					/>
-				</Spin>
+				{value && !isVerifying && isValid ? (
+					<span
+						style={{
+							color: '#1890ff',
+							fontSize: 13,
+							marginBottom: 8,
+							display: 'inline-block',
+						}}
+					>
+						Query string is valid!
+					</span>
+				) : null}
+				{isVerifying ? (
+					<span style={{ marginBottom: 8, fontSize: 13, display: 'inline-block' }}>
+						Verifying query string!
+					</span>
+				) : null}
+				<Input placeholder="Enter query string" value={value} onChange={this.handleInput} />
 			</React.Fragment>
 		);
 	}
