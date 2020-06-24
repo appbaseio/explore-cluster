@@ -526,16 +526,39 @@ export function getSubFields({ fields, weight, address }) {
 	if (fields) {
 		const fieldsToMap = Array.isArray(fields) ? fields : Object.keys(fields);
 		const subFields = fieldsToMap.reduce((agg, field) => {
-			if (field === 'search') {
-				return {
-					...agg,
-					[`${address}.${field}`]: weight ? 1 : 0,
-				};
+			switch (field) {
+				case 'autosuggest':
+				case 'lang':
+					return {
+						...agg,
+						[`${address}.${field}`]: weight ? weight * 0.9 : 0,
+					};
+				case 'synonyms':
+					return {
+						...agg,
+						[`${address}.${field}`]: weight ? weight * 0.7 : 0,
+					};
+				case 'delimiter':
+					return {
+						...agg,
+						[`${address}.${field}`]: weight ? weight * 0.4 : 0,
+					};
+				case 'search':
+					return {
+						...agg,
+						[`${address}.${field}`]: weight ? weight * 0.1 : 0,
+					};
+				case 'keyword':
+					return {
+						...agg,
+						[`${address}.${field}`]: weight ? weight : 0,
+					};
+				default:
+					return {
+						...agg,
+						[`${address}.${field}`]: weight,
+					};
 			}
-			return {
-				...agg,
-				[`${address}.${field}`]: weight,
-			};
 		}, {});
 
 		return { [address]: weight, ...subFields };
@@ -606,11 +629,20 @@ export const getParsedRoutes = (routes) =>
 		];
 	}, []);
 
+export const reservedSearchSubFields = [
+	'search',
+	'english',
+	'lang',
+	'autosuggest',
+	'keyword',
+	'synonyms',
+	'delimiter',
+];
+
 export const removeSubFields = (dataField) => {
-	const searchSubFields = ['search', 'english', 'lang', 'autosuggest', 'keyword', 'synonyms'];
 	const fieldsToMap = Array.isArray(dataField) ? dataField : Object.keys(dataField);
 	const parsedFields = fieldsToMap.filter(
-		(field) => !searchSubFields.some((subField) => field.endsWith(`.${subField}`)),
+		(field) => !reservedSearchSubFields.some((subField) => field.endsWith(`.${subField}`)),
 	);
 
 	if (Array.isArray(dataField)) {

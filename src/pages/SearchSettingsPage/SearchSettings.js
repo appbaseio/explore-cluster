@@ -36,7 +36,7 @@ import { getAggsMappings } from '../../batteries/utils/mappings';
 import ReviewAndSave from '../../components/ReviewAndSave';
 import SettingsFooter from '../../components/SettingsFooter';
 import { container } from '../ResultsPage/styles';
-import { getSubFields } from '../../utils';
+import { getSubFields, reservedSearchSubFields, removeSubFields } from '../../utils';
 import settingsMap from '../../components/ReviewAndSave/helper';
 import { isEqual, isValidPlan } from '../../batteries/utils';
 import mappingUsecase from '../../batteries/utils/mappingUsecase';
@@ -71,19 +71,6 @@ const cardStyle = css`
 		margin-bottom: 15px;
 	}
 `;
-
-const removeSubFields = (dataField) => {
-	const searchSubFields = ['search', 'english', 'lang', 'autosuggest', 'keyword', 'synonyms'];
-	return Object.keys(dataField)
-		.filter((field) => !searchSubFields.some((subField) => field.endsWith(`.${subField}`)))
-		.reduce(
-			(agg, item) => ({
-				...agg,
-				[item]: dataField[item],
-			}),
-			{},
-		);
-};
 
 class SearchSettingsPage extends React.Component {
 	state = {
@@ -447,18 +434,9 @@ class SearchSettingsPage extends React.Component {
 		}));
 
 		if (usecase === 'aggs' || usecase === 'none') {
-			const searchSubFields = [
-				'search',
-				'english',
-				'lang',
-				'autosuggest',
-				'keyword',
-				'synonyms',
-			];
-
 			const subFields = [
 				fieldChanged,
-				...searchSubFields.map((item) => `${fieldChanged}.${item}`),
+				...reservedSearchSubFields.map((item) => `${fieldChanged}.${item}`),
 			];
 
 			const updatedFields = Object.keys(dataField).reduce((agg, item) => {
