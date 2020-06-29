@@ -919,8 +919,8 @@ class SearchSettingsPage extends React.Component {
 												{field}:{' '}
 												<strong>
 													{type === 'old'
-														? oldFieldKeyes[field]
-														: changedFieldWeights[field]}
+														? get(oldFieldKeyes, field)
+														: get(changedFieldWeights, field)}
 												</strong>
 											</Typography.Paragraph>
 										));
