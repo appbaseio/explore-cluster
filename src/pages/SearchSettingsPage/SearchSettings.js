@@ -870,12 +870,16 @@ class SearchSettingsPage extends React.Component {
 												  );
 										}
 
-										return Object.keys(changedFields[type]).map((field) => (
-											<Typography.Paragraph>
-												{field}:{' '}
-												<strong>{changedFields[type][field]}</strong>
-											</Typography.Paragraph>
-										));
+										return Object.keys(get(changedFields, type, {})).map(
+											(field) => (
+												<Typography.Paragraph>
+													{field}:{' '}
+													<strong>
+														{get(changedFields, `${type}.${field}`)}
+													</strong>
+												</Typography.Paragraph>
+											),
+										);
 									}
 									if (fieldName === 'fieldweights') {
 										if (JSON.stringify(oldFieldKeyes) === JSON.stringify({})) {
@@ -893,26 +897,30 @@ class SearchSettingsPage extends React.Component {
 										}
 
 										if (JSON.stringify(changedFieldWeights) === '{}') {
-											return Object.keys(changedFields[type]).map((field) => (
-												<Typography.Paragraph>
-													{field}:{' '}
-													<strong>
-														{changedFields[type][field].includes(
-															'search',
-														)
-															? newFieldKeyes[field] || 1
-															: 0}
-													</strong>
-												</Typography.Paragraph>
-											));
+											return Object.keys(get(changedFields, type, {})).map(
+												(field) => (
+													<Typography.Paragraph>
+														{field}:{' '}
+														<strong>
+															{get(
+																changedFields,
+																`${type}.${field}`,
+																[],
+															).includes('search')
+																? get(newFieldKeyes, field) || 1
+																: 0}
+														</strong>
+													</Typography.Paragraph>
+												),
+											);
 										}
 										return Object.keys(changedFieldWeights).map((field) => (
 											<Typography.Paragraph>
 												{field}:{' '}
 												<strong>
 													{type === 'old'
-														? oldFieldKeyes[field]
-														: changedFieldWeights[field]}
+														? get(oldFieldKeyes, field)
+														: get(changedFieldWeights, field)}
 												</strong>
 											</Typography.Paragraph>
 										));
