@@ -878,7 +878,7 @@ class SearchSettingsPage extends React.Component {
 								isReset={isReset}
 								oldValues={{
 									...rest,
-									dataField: Object.keys(sortedSavedDataField),
+									dataField: get(changedFields, 'old', {}),
 									fieldWeights: Object.values(sortedSavedDataField),
 									synonyms: get(settings, 'synonyms.enabled'),
 									queryFormat: get(settings, 'search.queryFormat'),
@@ -886,7 +886,7 @@ class SearchSettingsPage extends React.Component {
 								}}
 								newValues={{
 									fuzziness: hasTypoTolerance ? typoTolerance : 0,
-									dataField: Object.keys(sortedDataField),
+									dataField: get(changedFields, 'new', {}),
 									fieldWeights: Object.values(sortedDataField),
 									synonyms: enableSynonyms,
 									queryFormat,
