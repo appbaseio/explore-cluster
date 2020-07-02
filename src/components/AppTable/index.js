@@ -2,6 +2,7 @@ import React from 'react';
 import { Table } from 'antd';
 import { Link, withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import get from 'lodash/get';
 import { css } from 'emotion';
 import { colorBar } from '../AppCard/StatsBox';
 import AppActions from '../AppActions';
@@ -34,13 +35,15 @@ const columns = [
 		title: 'Name',
 		dataIndex: 'index',
 		render: (text, record) => (
-			<Link to={`/app/${record.alias || record.index}/overview`}>
-				{record.alias || record.index}
+			<Link to={`/app/${get(record, 'alias') || get(record, 'index')}/overview`}>
+				{get(record, 'alias') || get(record, 'index')}
 			</Link>
 		),
 		sorter: (a, b) => {
-			if ((a.alias || a.index) < (b.alias || b.index)) return -1;
-			if ((a.alias || a.index) < (b.alias || b.index)) return 1;
+			if ((get(a, 'alias') || get(a, 'index')) < (get(b, 'alias') || get(b, 'index')))
+				return -1;
+			if ((get(a, 'alias') || get(a, 'index')) < (get(b, 'alias') || get(b, 'index')))
+				return 1;
 			return 0;
 		},
 		defaultSortOrder: 'ascend',
@@ -95,7 +98,9 @@ function AppTable({ apps, history, onCreateModalChange }) {
 			expandedRowRender={(record) => (
 				<AppActions
 					onExploreClick={() => {
-						history.push(`/app/${record.alias || record.index}/overview`);
+						history.push(
+							`/app/${get(record, 'alias') || get(record, 'index')}/overview`,
+						);
 					}}
 					data={record}
 				/>

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Col, Icon, Row } from 'antd';
+import get from 'lodash/get';
 import { actionIcon, cloneButton, columnSeparator, deleteButton } from '../AppCard/styles';
 import DeleteAppModal from '../AppCard/DeleteAppModal';
 import CloneIndex from '../CloneIndex';
@@ -68,13 +69,16 @@ class AppActions extends Component {
 					</Col>
 				</Row>
 				<DeleteAppModal
-					appName={data.alias || data.index}
-					index={data.index}
+					appName={get(data, 'alias') || get(data, 'index')}
+					index={get(data, 'index')}
 					deleteModal={deleteModal}
 					handleDeleteModal={this.handleDeleteModal}
 				/>
 				{cloneModal && (
-					<CloneIndex handleCancel={this.handleCancel} index={data.alias || data.index} />
+					<CloneIndex
+						handleCancel={this.handleCancel}
+						index={get(data, 'alias') || get(data, 'index')}
+					/>
 				)}
 			</div>
 		);

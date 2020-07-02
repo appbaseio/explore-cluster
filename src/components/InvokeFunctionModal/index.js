@@ -150,8 +150,8 @@ const InvokeFunctionModal = ({
 				setResponseData(invokeResults);
 				setStatus(200);
 			} else if (error) {
-				setResponseData(error.message);
-				setStatus(error.actual.code);
+				setResponseData(get(error, 'message'));
+				setStatus(get(error, 'actual.code'));
 			}
 			setInvokeState(FUNCTIONS.INVOKED);
 		} else setDidMount(true);

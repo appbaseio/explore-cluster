@@ -9,11 +9,11 @@ class ReviewAndSave extends React.Component {
 	difference = (object, base) => {
 		const changes = (obj, baseObj) =>
 			transform(obj, (result, value, key) => {
-				if (!isEqual(value, baseObj[key])) {
+				if (!isEqual(value, get(baseObj, key))) {
 					// eslint-disable-next-line no-param-reassign
 					result[key] =
-						isObject(value) && isObject(baseObj[key])
-							? changes(value, baseObj[key])
+						isObject(value) && isObject(get(baseObj, key))
+							? changes(value, get(baseObj, key))
 							: value;
 				}
 			});

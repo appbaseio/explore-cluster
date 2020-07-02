@@ -22,7 +22,7 @@ const applyFilterRegex = (filterRegex, query = '', fieldMap = {}) => {
 	let matches = [];
 	// eslint-disable-next-line no-cond-assign
 	while ((matches = filterRegex.exec(query))) {
-		if (fieldMap[matches[1]]) {
+		if (fieldMap && matches && matches.length >= 1 && fieldMap[matches[1]]) {
 			const newField = matches[0].replace(matches[1], fieldMap[matches[1]]);
 			query = query.replace(matches[0], newField);
 		}
@@ -36,7 +36,7 @@ const applyFilterRegexDataField = (filterRegex, query = '', fieldMap = {}) => {
 	let matches = [];
 	// eslint-disable-next-line no-cond-assign
 	while ((matches = filterRegex.exec(query))) {
-		if (fieldMap[matches[2]]) {
+		if (fieldMap && matches && matches.length >= 2 && fieldMap[matches[2]]) {
 			query = query.replace(matches[2], fieldMap[matches[2]]);
 		}
 	}
@@ -266,7 +266,7 @@ export const getRawQuery = (showAdvancedEditor, unparsedRule) => {
 		rawQuery = rawQuery.split('in $index and ');
 		const pattern = /'(.*?)'/;
 		indexes = rawQuery[0].match(pattern)[1].split(',');
-		if (rawQuery.length > 1) {
+		if (rawQuery && rawQuery.length > 1) {
 			// eslint-disable-next-line prefer-destructuring
 			rawQuery = rawQuery[1];
 		} else {

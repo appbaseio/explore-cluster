@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Card, Col, Icon, Row, Tag } from 'antd';
 import { css } from 'react-emotion';
 import { withRouter } from 'react-router-dom';
+import get from 'lodash/get';
 import { cardActions } from './styles';
 import AppActions from '../AppActions';
 
@@ -73,7 +74,7 @@ function StatsBox(props) {
 			.filter((item) => !blackList.includes(item))
 			.map((item) => (
 				<div>
-					<div className={stats}>{data[item]}</div>
+					<div className={stats}>{get(data, item)}</div>
 					<div className={titleStyles}>{renderItem(item)}</div>
 				</div>
 			));
@@ -82,17 +83,18 @@ function StatsBox(props) {
 	const cardTitle = (
 		<div
 			onClick={() => {
-				props.history.push(`/app/${data.alias || data.index}/overview`);
+				props.history.push(`/app/${get(data, 'alias') || get(data, 'index')}/overview`);
 			}}
 			css={flex}
 		>
 			<span css={flex}>
 				{title} &nbsp;&nbsp;
-				<Tag>{data.status}</Tag>
+				<Tag>{get(data, 'status')}</Tag>
 			</span>
 			<span
 				style={{
-					backgroundColor: data.health === 'green' ? 'limegreen' : data.health,
+					backgroundColor:
+						get(data, 'health') === 'green' ? 'limegreen' : get(data, 'health'),
 				}}
 				className={colorBar}
 			/>
@@ -112,7 +114,7 @@ function StatsBox(props) {
 		>
 			<Row
 				onClick={() => {
-					props.history.push(`/app/${data.alias || data.index}/overview`);
+					props.history.push(`/app/${get(data, 'alias') || get(data, 'index')}/overview`);
 				}}
 				gutter={8}
 			>
@@ -139,7 +141,9 @@ function StatsBox(props) {
 
 					<AppActions
 						onExploreClick={() => {
-							props.history.push(`/app/${data.alias || data.index}/overview`);
+							props.history.push(
+								`/app/${get(data, 'alias') || get(data, 'index')}/overview`,
+							);
 						}}
 						title={title}
 						data={data}

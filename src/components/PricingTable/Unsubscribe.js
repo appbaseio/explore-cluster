@@ -15,7 +15,7 @@ class Unsubscribe extends Component {
 
 	embedTypescriptWidget = () => {
 		this.setState({ typeFormStep: TYPE_FORM.LOADED });
-		if (this.myRef.current) {
+		if (this.myRef && this.myRef.current) {
 			typeformEmbed.makeWidget(
 				this.myRef.current,
 				'https://siddharth31.typeform.com/to/QEktta',
