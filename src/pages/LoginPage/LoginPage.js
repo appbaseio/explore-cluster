@@ -24,7 +24,7 @@ class LoginPage extends Component {
 	}
 
 	componentDidMount() {
-		if (this.url && this.url.current) {
+		if (this.url && this.url.current && this.url.current.input) {
 			const urlValue = getURL() || '';
 			this.url.current.input.value = urlValue;
 			const credObj = getURLCredentials(urlValue) || {};
@@ -34,7 +34,7 @@ class LoginPage extends Component {
 	}
 
 	setCredentials(credObj) {
-		if (this.username && this.username.current)
+		if (this.username && this.username.current && this.username.current.input)
 			this.username.current.input.value = credObj.username || '';
 		if (this.password && this.password.current)
 			this.password.current.input.value = credObj.password || '';
@@ -42,12 +42,14 @@ class LoginPage extends Component {
 
 	login = () => {
 		const { loadArcUser } = this.props;
-		const username = this.username.current.input.value.trim();
-		const password = this.password.current.input.value;
-		const url = this.url.current.input.value;
+		if (this.url && this.url.current && this.url.current.input) {
+			const username = this.username.current.input.value.trim();
+			const password = this.password.current.input.value;
+			const url = this.url.current.input.value;
 
-		if (username && password) {
-			loadArcUser(username, password, url);
+			if (username && password) {
+				loadArcUser(username, password, url);
+			}
 		}
 	};
 

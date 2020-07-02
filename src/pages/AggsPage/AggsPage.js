@@ -368,7 +368,12 @@ class AggsPage extends React.Component {
 					});
 				} else {
 					message.success(`Aggregation settings for ${appName} saved successfully`);
-
+					this.setState({
+						changedSubFields: {
+							old: {},
+							new: {},
+						},
+					});
 					if (isDirty) {
 						this.reIndex();
 					}
@@ -522,7 +527,11 @@ class AggsPage extends React.Component {
 							hideGeoType
 							isMappingsView={false}
 							renderMappingInfo={() => {
-								if (searchableMappings.length === traversedMappings.length) {
+								if (
+									searchableMappings &&
+									traversedMappings &&
+									searchableMappings.length === traversedMappings.length
+								) {
 									return (
 										<p
 											style={{
@@ -582,7 +591,7 @@ class AggsPage extends React.Component {
 									return (
 										<Dropdown overlay={menu}>
 											<Button className={dropdown}>
-												{dataField[aggKey] || 'Select Type'}
+												{get(dataField, aggKey) || 'Select Type'}
 												<Icon type="down" />
 											</Button>
 										</Dropdown>
@@ -625,8 +634,10 @@ class AggsPage extends React.Component {
 														</Option>
 													))}
 												</Select>
-												{searchableMappings.length ===
-												traversedMappings.length ? (
+												{searchableMappings &&
+												traversedMappings &&
+												searchableMappings.length ===
+													traversedMappings.length ? (
 													<span className={highlighter} />
 												) : null}
 											</Col>
@@ -754,7 +765,7 @@ class AggsPage extends React.Component {
 								oldValues={{
 									...restSavedAggs,
 									agg_size: savedSize,
-									mappings: changedSubFields.old,
+									mappings: get(changedSubFields, 'old'),
 								}}
 								newValues={{
 									agg_size: count,
@@ -762,7 +773,7 @@ class AggsPage extends React.Component {
 									includeNullValues: includeNullValue,
 									dataField,
 									queryFormat,
-									mappings: changedSubFields.new,
+									mappings: get(changedSubFields, 'new'),
 								}}
 								renderField={({ value, type, record }) => {
 									const fieldName = get(record, 'setting', '').toLowerCase();
@@ -781,12 +792,16 @@ class AggsPage extends React.Component {
 									}
 
 									if (fieldName === 'mappings') {
-										return Object.keys(changedSubFields[type]).map((field) => (
-											<Typography.Paragraph>
-												{field}:{' '}
-												<strong>{changedSubFields[type][field]}</strong>
-											</Typography.Paragraph>
-										));
+										return Object.keys(get(changedSubFields, type, {})).map(
+											(field) => (
+												<Typography.Paragraph>
+													{field}:{' '}
+													<strong>
+														{get(changedSubFields, `${type}.${field}`)}
+													</strong>
+												</Typography.Paragraph>
+											),
+										);
 									}
 									return JSON.stringify(value, null, 2);
 								}}
