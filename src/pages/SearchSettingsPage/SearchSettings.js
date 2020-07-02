@@ -397,10 +397,16 @@ class SearchSettingsPage extends React.Component {
 					});
 				} else {
 					message.success(`Search settings for ${appName} saved successfully`);
-
 					if (isDirty) {
 						this.reIndex();
 					}
+					this.setState({
+						changedFields: {
+							new: {},
+							old: {},
+						},
+						changedFieldWeights: {},
+					});
 				}
 			})
 			.catch((e) => {
