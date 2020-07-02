@@ -196,7 +196,8 @@ class SearchSettingsPage extends React.Component {
 	getDataFields = (settings) => {
 		const { mappings } = this.props;
 		let searchableFields = settings.search.dataField;
-		if (searchableFields.length === 0 && mappings) {
+
+		if (mappings) {
 			const aggsResponse = getAggsMappings(mappings, true);
 			const parsedMappings = Array.isArray(aggsResponse)
 				? aggsResponse
@@ -207,15 +208,53 @@ class SearchSettingsPage extends React.Component {
 					mapping.fieldType === 'text' &&
 					(mapping.usecase === 'search' || mapping.usecase === 'searchaggs'),
 			);
+			if (searchableFields.length === 0) {
+				searchableFields = originalSearchableFields.reduce((agg, item) => {
+					return [
+						...agg,
+						...Object.keys(
+							getSubFields({ address: item.address, weight: 1, fields: item.fields }),
+						),
+					];
+				}, []);
+			}
 
-			searchableFields = originalSearchableFields.reduce((agg, item) => {
-				return [
-					...agg,
-					...Object.keys(
-						getSubFields({ address: item.address, weight: 1, fields: item.fields }),
+			const onlyTopLevelFields = removeSubFields(searchableFields);
+			if (onlyTopLevelFields.length < originalSearchableFields.length) {
+				const changedFields = originalSearchableFields.filter(
+					(field) => !onlyTopLevelFields.includes(get(field, 'address')),
+				);
+				const allFields = originalSearchableFields.reduce((agg, item) => {
+					return [
+						...agg,
+						...Object.keys(
+							getSubFields({ address: item.address, weight: 1, fields: item.fields }),
+						),
+					];
+				}, []);
+
+				searchableFields = [...allFields, ...searchableFields];
+
+				this.setState({
+					changedFieldWeights: changedFields.reduce(
+						(agg, item) => ({
+							...agg,
+							[get(item, 'address')]: 1,
+						}),
+						{},
 					),
-				];
-			}, []);
+					changedFields: {
+						new: changedFields.reduce(
+							(agg, item) => ({
+								...agg,
+								[get(item, 'address')]: get(item, 'usecase'),
+							}),
+							{},
+						),
+						old: {},
+					},
+				});
+			}
 		}
 
 		return searchableFields.reduce(
@@ -358,10 +397,16 @@ class SearchSettingsPage extends React.Component {
 					});
 				} else {
 					message.success(`Search settings for ${appName} saved successfully`);
-
 					if (isDirty) {
 						this.reIndex();
 					}
+					this.setState({
+						changedFields: {
+							new: {},
+							old: {},
+						},
+						changedFieldWeights: {},
+					});
 				}
 			})
 			.catch((e) => {
@@ -839,7 +884,7 @@ class SearchSettingsPage extends React.Component {
 								isReset={isReset}
 								oldValues={{
 									...rest,
-									dataField: Object.keys(sortedSavedDataField),
+									dataField: get(changedFields, 'old', {}),
 									fieldWeights: Object.values(sortedSavedDataField),
 									synonyms: get(settings, 'synonyms.enabled'),
 									queryFormat: get(settings, 'search.queryFormat'),
@@ -847,7 +892,7 @@ class SearchSettingsPage extends React.Component {
 								}}
 								newValues={{
 									fuzziness: hasTypoTolerance ? typoTolerance : 0,
-									dataField: Object.keys(sortedDataField),
+									dataField: get(changedFields, 'new', {}),
 									fieldWeights: Object.values(sortedDataField),
 									synonyms: enableSynonyms,
 									queryFormat,
