@@ -55,7 +55,7 @@ function AppDataWrapper({ apps, onCreateModalChange, isFetching }) {
 		});
 	};
 	return (
-		<AppFilters apps={Object.values(get(apps, 'data', {}))}>
+		<AppFilters apps={Object.values(apps.data || {})}>
 			{(filteredData, showListView) => renderData(filteredData, showListView)}
 		</AppFilters>
 	);
