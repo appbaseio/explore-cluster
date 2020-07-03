@@ -411,19 +411,13 @@ class FunctionsPage extends React.Component {
 
 	onDragEnd = (result) => {
 		if (!result.destination) return;
-		if (
-			result &&
-			result.destination &&
-			result.source &&
-			result.destination.index === result.source.index
-		) {
+		if (get(result, 'destination.index') === get(result, 'source.index')) {
 			return;
 		}
 		const functions = this.sortedDataSource;
 		const { reorderFunctions } = this.props;
 		const { source, destination } = result;
-		const sourceOrder =
-			functions && source.index && functions[source.index] && functions[source.index].order;
+		const sourceOrder = get(functions, `${get(source, 'index')}`, {}).order;
 		const updatedSource = {
 			...functions[source.index],
 			order: functions[destination.index].order,

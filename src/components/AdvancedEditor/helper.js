@@ -22,7 +22,7 @@ const applyFilterRegex = (filterRegex, query = '', fieldMap = {}) => {
 	let matches = [];
 	// eslint-disable-next-line no-cond-assign
 	while ((matches = filterRegex.exec(query))) {
-		if (fieldMap && matches && matches.length >= 1 && fieldMap[matches[1]]) {
+		if (get(fieldMap, get(matches, '[1]'))) {
 			const newField = matches[0].replace(matches[1], fieldMap[matches[1]]);
 			query = query.replace(matches[0], newField);
 		}
@@ -36,7 +36,7 @@ const applyFilterRegexDataField = (filterRegex, query = '', fieldMap = {}) => {
 	let matches = [];
 	// eslint-disable-next-line no-cond-assign
 	while ((matches = filterRegex.exec(query))) {
-		if (fieldMap && matches && matches.length >= 2 && fieldMap[matches[2]]) {
+		if (get(fieldMap, get(matches, '[2]'))) {
 			query = query.replace(matches[2], fieldMap[matches[2]]);
 		}
 	}
