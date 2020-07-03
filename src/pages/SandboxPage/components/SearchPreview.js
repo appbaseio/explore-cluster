@@ -24,6 +24,7 @@ import { getSubFields } from '../../../utils';
 import { isValidPlan } from '../../../batteries/utils';
 import generateSandboxURL from '../utils/sandbox-generator';
 import { allowedTiers } from '../../../utils/prop-types';
+import ErrorToaster from '../../../components/ErrorToaster';
 
 const container = css`
 	padding: 16px;
@@ -363,31 +364,40 @@ class SearchPreview extends React.Component {
 					}}
 				>
 					<Col md={6}>
-						<Filter
-							handleValueChange={this.handleValueChange}
-							app={app}
-							aggs={aggregations}
-							handleModal={handleModal}
-						/>
+						<ErrorToaster>
+							<Filter
+								handleValueChange={this.handleValueChange}
+								app={app}
+								aggs={aggregations}
+								handleModal={handleModal}
+							/>
+						</ErrorToaster>
 					</Col>
 					<Col md={18}>
-						<Search
-							handleValueChange={this.handleValueChange}
-							app={app}
-							search={search}
-							handleModal={handleModal}
-						/>
-						<Result
-							result={result}
-							query={stateSettings}
-							app={app}
-							url={url}
-							toggleAnalytics={this.toggleAnalytics}
-							recordAnalytics={isAnalyticsEnabled}
-							rules={rules}
-							onChange={this.handleSettingsChange}
-							credentials={credentials}
-						/>
+						<ErrorToaster
+							inline
+							title="Something went wrong while displaying Search UI"
+						>
+							<Search
+								handleValueChange={this.handleValueChange}
+								app={app}
+								search={search}
+								handleModal={handleModal}
+							/>
+						</ErrorToaster>
+						<ErrorToaster>
+							<Result
+								result={result}
+								query={stateSettings}
+								app={app}
+								url={url}
+								toggleAnalytics={this.toggleAnalytics}
+								recordAnalytics={isAnalyticsEnabled}
+								rules={rules}
+								onChange={this.handleSettingsChange}
+								credentials={credentials}
+							/>
+						</ErrorToaster>
 					</Col>
 				</ReactiveBase>
 			</Row>

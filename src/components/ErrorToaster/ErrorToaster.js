@@ -30,7 +30,7 @@ class ErrorToaster extends React.Component {
 
 	render() {
 		const { hasError } = this.state;
-		const { children, inline, placeholder } = this.props;
+		const { children, inline, placeholder, title } = this.props;
 
 		if (hasError && placeholder) {
 			return placeholder({
@@ -44,7 +44,7 @@ class ErrorToaster extends React.Component {
 					message={
 						<React.Fragment>
 							<span style={{ display: 'inline-block', marginRight: 5 }}>
-								Something went wrong.
+								{title || 'Something went wrong.'}
 							</span>
 							<Button size="small" type="primary" onClick={this.toggleError}>
 								<Icon type="reload" />
@@ -64,8 +64,12 @@ class ErrorToaster extends React.Component {
 						icon={<Icon twoToneColor="#fa541c" type="alert" theme="twoTone" />}
 						title={
 							<React.Fragment>
-								<h4 style={{ fontWeight: 600 }}>Something went wrong!</h4>
-								<p>Our team has been notified about this.</p>
+								{title || (
+									<React.Fragment>
+										<h4 style={{ fontWeight: 600 }}>Something went wrong!</h4>
+										<p>Our team has been notified about this.</p>
+									</React.Fragment>
+								)}
 							</React.Fragment>
 						}
 						extra={
@@ -92,12 +96,18 @@ class ErrorToaster extends React.Component {
 ErrorToaster.propTypes = {
 	inline: PropTypes.bool,
 	placeholder: PropTypes.func,
+	title: PropTypes.oneOfType([
+		PropTypes.arrayOf(PropTypes.node),
+		PropTypes.node,
+		PropTypes.string,
+	]),
 	children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
 };
 
 ErrorToaster.defaultProps = {
 	inline: false,
 	placeholder: null,
+	title: '',
 };
 
 export default ErrorToaster;

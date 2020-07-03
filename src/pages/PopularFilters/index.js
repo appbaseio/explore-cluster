@@ -6,6 +6,7 @@ import Overlay from '../../components/Overlay';
 import Container from '../../components/Container';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import PopularFilters from '../../batteries/components/analytics/components/PopularFilters';
+import ErrorToaster from '../../components/ErrorToaster';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -36,12 +37,14 @@ const PopularFiltersWrapper = ({ appName, plan, isGrowth }) => (
 			<React.Fragment>
 				{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
 				<Container>
-					<PopularFilters
-						filterId="popular_filters_page"
-						displayReplaySearch={window.location.pathname.startsWith('/app')}
-						appName={appName}
-						plan={plan}
-					/>
+					<ErrorToaster>
+						<PopularFilters
+							filterId="popular_filters_page"
+							displayReplaySearch={window.location.pathname.startsWith('/app')}
+							appName={appName}
+							plan={plan}
+						/>
+					</ErrorToaster>
 				</Container>
 			</React.Fragment>
 		) : (

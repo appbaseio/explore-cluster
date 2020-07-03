@@ -17,6 +17,7 @@ import {
 } from '../../batteries/modules/actions';
 import Container from '../../components/Container';
 import { getURL } from '../../constants/config';
+import ErrorToaster from '../../components/ErrorToaster';
 
 const { Paragraph } = Typography;
 const tableCls = css`
@@ -184,22 +185,24 @@ class UserManagementPage extends React.Component {
 						type="info"
 						css={{ marginBottom: 20 }}
 					/>
-					<Table
-						scroll={{ x: 900 }}
-						dataSource={users.map((user) => ({
-							permissionInfo: user,
-							deletePermission: this.deletePermission,
-							showForm: this.showForm,
-						}))}
-						rowKey={(row) =>
-							`${get(row, 'permissionInfo.username')}:${get(
-								row,
-								'permissionInfo.password',
-							)}`
-						}
-						columns={columns}
-						css={tableCls}
-					/>
+					<ErrorToaster inline>
+						<Table
+							scroll={{ x: 900 }}
+							dataSource={users.map((user) => ({
+								permissionInfo: user,
+								deletePermission: this.deletePermission,
+								showForm: this.showForm,
+							}))}
+							rowKey={(row) =>
+								`${get(row, 'permissionInfo.username')}:${get(
+									row,
+									'permissionInfo.password',
+								)}`
+							}
+							columns={columns}
+							css={tableCls}
+						/>
+					</ErrorToaster>
 				</Card>
 
 				<Button
@@ -212,15 +215,17 @@ class UserManagementPage extends React.Component {
 					Create User
 				</Button>
 				{showForm && (
-					<CredentialsForm
-						handleCancel={this.handleCancel}
-						isUserManagement
-						show={showForm}
-						saveButtonText={!currentPermissionInfo ? 'Create' : 'Save'}
-						onSubmit={this.handleSubmit}
-						initialValues={currentPermissionInfo}
-						titleText={!currentPermissionInfo ? 'Create User' : 'Edit User'}
-					/>
+					<ErrorToaster inline>
+						<CredentialsForm
+							handleCancel={this.handleCancel}
+							isUserManagement
+							show={showForm}
+							saveButtonText={!currentPermissionInfo ? 'Create' : 'Save'}
+							onSubmit={this.handleSubmit}
+							initialValues={currentPermissionInfo}
+							titleText={!currentPermissionInfo ? 'Create User' : 'Edit User'}
+						/>
+					</ErrorToaster>
 				)}
 			</Container>
 		);

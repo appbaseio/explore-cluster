@@ -144,7 +144,6 @@ class CollapsibleInsights extends React.Component {
 		if (insights.length === 0) {
 			return <Empty description={noDataPresent ? noDataText : 'No Data'} />;
 		}
-
 		return (
 			<Collapse
 				onChange={this.handleCollapseKey}

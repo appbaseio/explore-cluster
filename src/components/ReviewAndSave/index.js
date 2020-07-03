@@ -4,6 +4,7 @@ import { get, isObject, keys, transform } from 'lodash';
 import { Button, Modal } from 'antd';
 import { isEqual } from '../../batteries/utils';
 import DiffTable from './DiffTable';
+import ErrorToaster from '../ErrorToaster';
 
 class ReviewAndSave extends React.Component {
 	difference = (object, base) => {
@@ -66,17 +67,19 @@ class ReviewAndSave extends React.Component {
 					width={1000}
 					footer={isReset ? footer[1] : footer}
 				>
-					<DiffTable
-						object={difference}
-						parseDiff={(field) => ({
-							setting: field,
-							value: {
-								old: get(oldValues, field),
-								new: get(newValues, field),
-							},
-						})}
-						renderField={renderField}
-					/>
+					<ErrorToaster>
+						<DiffTable
+							object={difference}
+							parseDiff={(field) => ({
+								setting: field,
+								value: {
+									old: get(oldValues, field),
+									new: get(newValues, field),
+								},
+							})}
+							renderField={renderField}
+						/>
+					</ErrorToaster>
 				</Modal>
 			</>
 		);

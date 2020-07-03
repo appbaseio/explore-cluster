@@ -12,6 +12,7 @@ import CreateAppModal from './CreateAppModal';
 import { loadApps } from '../../actions';
 import { mediaKey } from '../../utils/media';
 import AppDataWrapper from '../../components/AppDataWrapper';
+import ErrorToaster from '../../components/ErrorToaster';
 
 const link = css`
 	font-size: 16px;
@@ -86,11 +87,13 @@ class HomePage extends Component {
 					</section>
 				)}
 
-				<AppDataWrapper
-					apps={apps}
-					onCreateModalChange={this.handleChange}
-					isFetching={apps.isFetching}
-				/>
+				<ErrorToaster>
+					<AppDataWrapper
+						apps={apps}
+						onCreateModalChange={this.handleChange}
+						isFetching={apps.isFetching}
+					/>
+				</ErrorToaster>
 			</Row>
 		);
 	};

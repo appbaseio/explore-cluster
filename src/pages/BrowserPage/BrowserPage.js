@@ -12,6 +12,7 @@ import {
 } from '../../batteries/modules/actions';
 
 import Loader from '../../components/Loader';
+import ErrorToaster from '../../components/ErrorToaster';
 import { getURL } from '../../constants/config';
 
 /* eslint-disable */
@@ -73,15 +74,17 @@ class BrowserPage extends Component {
 			>
 				{credentials ? (
 					<div>
-						<DejavuComponent
-							app={dejavu.appname}
-							url={dejavu.url}
-							credentials={credentials}
-							URLParams={false}
-							showHeaders={false}
-							forceReconnect
-							hasCloneApp={false}
-						/>
+						<ErrorToaster>
+							<DejavuComponent
+								app={dejavu.appname}
+								url={dejavu.url}
+								credentials={credentials}
+								URLParams={false}
+								showHeaders={false}
+								forceReconnect
+								hasCloneApp={false}
+							/>
+						</ErrorToaster>
 					</div>
 				) : (
 					<Loader />

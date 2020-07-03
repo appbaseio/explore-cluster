@@ -7,6 +7,7 @@ import Container from '../../components/Container';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 
 import GeoDistributionPage from '../../batteries/components/analytics/components/GeoDistribution';
+import ErrorToaster from '../../components/ErrorToaster';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -38,7 +39,9 @@ const PopularResultsWrapper = ({ plan, isGrowth }) => (
 			<React.Fragment>
 				{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
 				<Container>
-					<GeoDistributionPage filterId="geo_distribution_page" />
+					<ErrorToaster>
+						<GeoDistributionPage filterId="geo_distribution_page" />
+					</ErrorToaster>
 				</Container>
 			</React.Fragment>
 		) : (

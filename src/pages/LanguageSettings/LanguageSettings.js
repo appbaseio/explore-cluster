@@ -35,6 +35,7 @@ import { appendApp, removeAppData } from '../../actions';
 import settingsMap from '../../components/ReviewAndSave/helper';
 import Loader from '../../components/Loader';
 import { allowedTiers } from '../../utils/prop-types';
+import ErrorToaster from '../../components/ErrorToaster';
 
 const bannerDetails = {
 	title: 'Language Settings',
@@ -326,77 +327,83 @@ class LanguageSettings extends React.Component {
 				<div className={container}>
 					<Form layout="vertical" className={`${label} ant-card-body-padding-bottom-0`}>
 						<Card>
-							<Form.Item
-								style={{ paddingBottom: 0 }}
-								label={
-									<>
-										{settingsMap.language.title}
-										<SettingTooltip title={settingsMap.language.description} />
-									</>
-								}
-							>
-								{getFieldDecorator('language')(
-									<LanguageDropdown
-										formStyle={{ paddingBottom: 0 }}
-										style={{ width: '20%', minWidth: '35%' }}
-										renderOption={(lang) => (
-											<Select.Option key={lang.value} value={lang.value}>
-												{lang.label}
-											</Select.Option>
-										)}
-									/>,
-								)}
-							</Form.Item>
-							<div style={{ paddingBottom: 32 }}>
-								<label>{settingsMap.applyStopwords.title}</label>
-								<SettingTooltip title={settingsMap.applyStopwords.description} />
-								<div style={{ marginTop: 5 }}>
-									{getFieldDecorator('applyStopwords', {
-										valuePropName: 'checked',
-									})(<Switch />)}
+							<ErrorToaster>
+								<Form.Item
+									style={{ paddingBottom: 0 }}
+									label={
+										<>
+											{settingsMap.language.title}
+											<SettingTooltip
+												title={settingsMap.language.description}
+											/>
+										</>
+									}
+								>
+									{getFieldDecorator('language')(
+										<LanguageDropdown
+											formStyle={{ paddingBottom: 0 }}
+											style={{ width: '20%', minWidth: '35%' }}
+											renderOption={(lang) => (
+												<Select.Option key={lang.value} value={lang.value}>
+													{lang.label}
+												</Select.Option>
+											)}
+										/>,
+									)}
+								</Form.Item>
+								<div style={{ paddingBottom: 32 }}>
+									<label>{settingsMap.applyStopwords.title}</label>
+									<SettingTooltip
+										title={settingsMap.applyStopwords.description}
+									/>
+									<div style={{ marginTop: 5 }}>
+										{getFieldDecorator('applyStopwords', {
+											valuePropName: 'checked',
+										})(<Switch />)}
+									</div>
 								</div>
-							</div>
 
-							<Form.Item
-								label={
-									<>
-										{settingsMap.customStopwords.title}
-										<SettingTooltip
-											title={settingsMap.customStopwords.description}
-										/>
-									</>
-								}
-							>
-								{getFieldDecorator('customStopwords')(
-									<Input.TextArea placeholder="Add comma separated stopwords" />,
-								)}
-							</Form.Item>
+								<Form.Item
+									label={
+										<>
+											{settingsMap.customStopwords.title}
+											<SettingTooltip
+												title={settingsMap.customStopwords.description}
+											/>
+										</>
+									}
+								>
+									{getFieldDecorator('customStopwords')(
+										<Input.TextArea placeholder="Add comma separated stopwords" />,
+									)}
+								</Form.Item>
 
-							<Form.Item
-								label={
-									<>
-										{settingsMap.stemmingExceptions.title}
-										<SettingTooltip
-											title={settingsMap.stemmingExceptions.description}
-										/>
-									</>
-								}
-							>
-								{getFieldDecorator('stemmingExceptions')(
-									<Input.TextArea placeholder="Add comma separated words to avoid stemming on" />,
-								)}
-							</Form.Item>
-							<div style={{ paddingBottom: 32 }}>
-								<label>{settingsMap.normalizeDiacritics.title}</label>
-								<SettingTooltip
-									title={settingsMap.normalizeDiacritics.description}
-								/>
-								<div style={{ marginTop: 5 }}>
-									{getFieldDecorator('normalizeDiacritics', {
-										valuePropName: 'checked',
-									})(<Switch />)}
+								<Form.Item
+									label={
+										<>
+											{settingsMap.stemmingExceptions.title}
+											<SettingTooltip
+												title={settingsMap.stemmingExceptions.description}
+											/>
+										</>
+									}
+								>
+									{getFieldDecorator('stemmingExceptions')(
+										<Input.TextArea placeholder="Add comma separated words to avoid stemming on" />,
+									)}
+								</Form.Item>
+								<div style={{ paddingBottom: 32 }}>
+									<label>{settingsMap.normalizeDiacritics.title}</label>
+									<SettingTooltip
+										title={settingsMap.normalizeDiacritics.description}
+									/>
+									<div style={{ marginTop: 5 }}>
+										{getFieldDecorator('normalizeDiacritics', {
+											valuePropName: 'checked',
+										})(<Switch />)}
+									</div>
 								</div>
-							</div>
+							</ErrorToaster>
 						</Card>
 					</Form>
 

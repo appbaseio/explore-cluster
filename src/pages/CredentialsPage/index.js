@@ -17,6 +17,7 @@ import {
 import Loader from '../../batteries/components/shared/Loader/Spinner';
 import { getURL } from '../../constants/config';
 import DeleteAppModal from '../../components/AppCard/DeleteAppModal';
+import ErrorToaster from '../../components/ErrorToaster';
 
 const columns = [
 	{
@@ -205,35 +206,39 @@ class Credentials extends Component {
 						type="info"
 						css={{ marginBottom: 20 }}
 					/>
-					<Table
-						scroll={{ x: 700 }}
-						dataSource={permissions.map((permission) => ({
-							permissionInfo: permission,
-							deletePermission: this.deletePermission,
-							showForm: this.showForm,
-						}))}
-						rowKey={(row) =>
-							`${get(row, 'permissionInfo.username')}${get(
-								row,
-								'permissionInfo.password',
-							)}`
-						}
-						columns={columns}
-						css="tr:hover td {
-							background: transparent;
-						}"
-					/>
+					<ErrorToaster inline>
+						<Table
+							scroll={{ x: 700 }}
+							dataSource={permissions.map((permission) => ({
+								permissionInfo: permission,
+								deletePermission: this.deletePermission,
+								showForm: this.showForm,
+							}))}
+							rowKey={(row) =>
+								`${get(row, 'permissionInfo.username')}${get(
+									row,
+									'permissionInfo.password',
+								)}`
+							}
+							columns={columns}
+							css="tr:hover td {
+								background: transparent;
+							}"
+						/>
+					</ErrorToaster>
 				</Card>
 				{showCredForm && (
-					<CreateCredentials
-						disabled={!isOwner}
-						titleText={!isOwner ? 'Credentials Details' : undefined}
-						onSubmit={this.handleSubmit}
-						show={showCredForm}
-						handleCancel={this.handleCancel}
-						mappings={mappings}
-						initialValues={currentPermissionInfo}
-					/>
+					<ErrorToaster inline>
+						<CreateCredentials
+							disabled={!isOwner}
+							titleText={!isOwner ? 'Credentials Details' : undefined}
+							onSubmit={this.handleSubmit}
+							show={showCredForm}
+							handleCancel={this.handleCancel}
+							mappings={mappings}
+							initialValues={currentPermissionInfo}
+						/>
+					</ErrorToaster>
 				)}
 				{isOwner && (
 					<Button

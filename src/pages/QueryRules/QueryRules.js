@@ -16,6 +16,7 @@ import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { bannerDetails } from './utils';
 import SearchPreviewSwitcher from '../../components/SearchPreviewSwitcher';
 import { allowedTiers } from '../../utils/prop-types';
+import ErrorToaster from '../../components/ErrorToaster';
 
 const { Header } = Layout;
 
@@ -161,22 +162,24 @@ class QueryRules extends Component {
 				</Header>
 				<div className={container}>
 					{rules && rules.length ? (
-						<DNDWrapper
-							onDragEnd={this.onDragEnd}
-							items={rules.sort((a, b) => a.order - b.order)}
-							dropId="RULES"
-							indexKey="order"
-							idKey="id"
-						>
-							{({ item, dragProvided, dragSnapshot, index }) => (
-								<QueryCard
-									dragProvided={dragProvided}
-									dragSnapshot={dragSnapshot}
-									rule={item}
-									index={index}
-								/>
-							)}
-						</DNDWrapper>
+						<ErrorToaster>
+							<DNDWrapper
+								onDragEnd={this.onDragEnd}
+								items={rules.sort((a, b) => a.order - b.order)}
+								dropId="RULES"
+								indexKey="order"
+								idKey="id"
+							>
+								{({ item, dragProvided, dragSnapshot, index }) => (
+									<QueryCard
+										dragProvided={dragProvided}
+										dragSnapshot={dragSnapshot}
+										rule={item}
+										index={index}
+									/>
+								)}
+							</DNDWrapper>
+						</ErrorToaster>
 					) : (
 						<Result
 							title="No Rules Present"

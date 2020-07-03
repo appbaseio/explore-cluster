@@ -24,6 +24,7 @@ import Replicas from './Replicas';
 import Shards from './Shards';
 import Loader from '../../batteries/components/shared/Loader';
 import { appendApp, loadApps, removeAppData } from '../../actions';
+import ErrorToaster from '../../components/ErrorToaster';
 
 const bannerMessage = {
 	title: 'Index Settings',
@@ -221,25 +222,29 @@ class IndexSettings extends React.Component {
 
 				<Loader show={isReindexing} message="Re-indexing your data... Please wait!" />
 				<div className={container}>
-					<Shards
-						handleSlider={this.handleSlider}
-						updateShards={this.updateShards}
-						handleModal={this.handleModal}
-						shardsModal={shardsModal}
-						shards={shards}
-						allocated_shards={allocated_shards}
-					/>
+					<ErrorToaster>
+						<Shards
+							handleSlider={this.handleSlider}
+							updateShards={this.updateShards}
+							handleModal={this.handleModal}
+							shardsModal={shardsModal}
+							shards={shards}
+							allocated_shards={allocated_shards}
+						/>
+					</ErrorToaster>
 
-					<Replicas
-						handleSlider={this.handleSlider}
-						updateReplicas={this.updateReplicas}
-						handleModal={this.handleModal}
-						replicasModal={replicasModal}
-						totalNodes={totalNodes}
-						replicas={replicas}
-						loading={isUpdating}
-						allocated_replicas={allocated_replicas}
-					/>
+					<ErrorToaster>
+						<Replicas
+							handleSlider={this.handleSlider}
+							updateReplicas={this.updateReplicas}
+							handleModal={this.handleModal}
+							replicasModal={replicasModal}
+							totalNodes={totalNodes}
+							replicas={replicas}
+							loading={isUpdating}
+							allocated_replicas={allocated_replicas}
+						/>
+					</ErrorToaster>
 				</div>
 			</React.Fragment>
 		);

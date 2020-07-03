@@ -6,6 +6,7 @@ import Overlay from '../../components/Overlay';
 import Container from '../../components/Container';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import RequestDistribution from '../../batteries/components/analytics/components/RequestDistribution';
+import ErrorToaster from '../../components/ErrorToaster';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -37,7 +38,9 @@ const RequestDistributionWrapper = ({ plan, isGrowth }) => (
 			<React.Fragment>
 				{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
 				<Container>
-					<RequestDistribution filterId="request_distribution_page" />
+					<ErrorToaster>
+						<RequestDistribution filterId="request_distribution_page" />
+					</ErrorToaster>
 				</Container>
 			</React.Fragment>
 		) : (

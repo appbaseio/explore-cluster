@@ -28,6 +28,7 @@ import { isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import { allowedTiers } from '../../utils/prop-types';
 import Loader from '../../components/Loader';
+import ErrorToaster from '../../components/ErrorToaster';
 
 const UploadSynonymsModal = Loadable({
 	loader: () =>
@@ -540,16 +541,18 @@ class Synonyms extends React.Component {
 					) : null}
 				</div>
 				{uploadVisible && (
-					<UploadSynonymsModal
-						onCancel={this.toggleUploadVisibility}
-						appName={appName}
-						onOk={this.handleUpload}
-						confirmLoading={uploading}
-						file={file}
-						fileList={fileList}
-						beforeUpload={this.beforeUpload}
-						onRemove={this.onRemove}
-					/>
+					<ErrorToaster>
+						<UploadSynonymsModal
+							onCancel={this.toggleUploadVisibility}
+							appName={appName}
+							onOk={this.handleUpload}
+							confirmLoading={uploading}
+							file={file}
+							fileList={fileList}
+							beforeUpload={this.beforeUpload}
+							onRemove={this.onRemove}
+						/>
+					</ErrorToaster>
 				)}
 			</React.Fragment>
 		);

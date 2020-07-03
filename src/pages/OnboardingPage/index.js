@@ -8,6 +8,7 @@ import Search from './screens/Search';
 import Facets from './screens/Facets';
 
 import { onboardingStyles } from './styles';
+import ErrorToaster from '../../components/ErrorToaster';
 
 const screens = {
 	0: Introduction,
@@ -213,7 +214,9 @@ export default class Onboarding extends Component {
 					<button type="button" className="skip-link" onClick={this.skipTutorial}>
 						&#10005; &nbsp; Skip Tutorial
 					</button>
-					<div className="container">{this.renderCurrentScreen()}</div>
+					<ErrorToaster>
+						<div className="container">{this.renderCurrentScreen()}</div>
+					</ErrorToaster>
 				</div>
 			</div>
 		);

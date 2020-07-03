@@ -43,6 +43,7 @@ import mappingUsecase from '../../batteries/utils/mappingUsecase';
 import Overlay from '../../components/Overlay';
 import { highlighter } from '../SandboxPage/components/Search';
 import { allowedTiers } from '../../utils/prop-types';
+import ErrorToaster from '../../components/ErrorToaster';
 
 const { Option } = Select;
 
@@ -599,119 +600,121 @@ class SearchSettingsPage extends React.Component {
 						</Card>
 					) : null}
 					<Card>
-						<Mappings
-							showSynonyms={false}
-							showShards={false}
-							deleteLabel=" Remove from Search"
-							ref={this.mappingsRef}
-							showReplicas={false}
-							showMappingInfo={false}
-							showCardWrapper={false}
-							hideAggsType
-							hideNoType
-							hideDelete
-							onUsecaseChange={this.handleUsecaseChange}
-							hideDataType
-							isMappingsView={false}
-							renderMappingInfo={() => {
-								if (
-									aggsMappings.length + this.noUseCaseMappings.length ===
-									traversedMappings.length
-								) {
-									return (
-										<p
-											style={{
-												color: '#999',
-												textAlign: 'center',
-												margin: 0,
-											}}
-										>
-											Add searchable fields from dropdown.
-										</p>
-									);
+						<ErrorToaster>
+							<Mappings
+								showSynonyms={false}
+								showShards={false}
+								deleteLabel=" Remove from Search"
+								ref={this.mappingsRef}
+								showReplicas={false}
+								showMappingInfo={false}
+								showCardWrapper={false}
+								hideAggsType
+								hideNoType
+								hideDelete
+								onUsecaseChange={this.handleUsecaseChange}
+								hideDataType
+								isMappingsView={false}
+								renderMappingInfo={() => {
+									if (
+										aggsMappings.length + this.noUseCaseMappings.length ===
+										traversedMappings.length
+									) {
+										return (
+											<p
+												style={{
+													color: '#999',
+													textAlign: 'center',
+													margin: 0,
+												}}
+											>
+												Add searchable fields from dropdown.
+											</p>
+										);
+									}
+									return null;
+								}}
+								hidePropertiesType
+								onChange={this.handleMappingChange}
+								onDeleteField={this.handleDeleteField}
+								column={{
+									title: (
+										<React.Fragment>
+											{settingsMap.field_weight.title}
+											<Tooltip title={settingsMap.field_weight.description}>
+												<span style={{ marginLeft: 5 }}>
+													<Icon type="info-circle" />
+												</span>
+											</Tooltip>
+										</React.Fragment>
+									),
+									render: ({ address, settings: mappingSettings }) => {
+										const parsedAddress = address.replace(/properties./g, '');
+										return (
+											<InputNumber
+												min={0}
+												style={{ minWidth: 150, marginLeft: 12 }}
+												value={dataField[parsedAddress]}
+												onChange={(value) =>
+													this.handleSearchWeight({
+														address: parsedAddress,
+														value,
+														settings: mappingSettings,
+													})
+												}
+												placeholder="Enter field weight"
+											/>
+										);
+									},
+								}}
+								renderFooter={() =>
+									aggsMappings.length ? (
+										<Affix offsetBottom={73}>
+											<Row
+												style={{
+													padding: 10,
+													border: '1px solid #e8e8e8',
+													background: 'white',
+													width: '100%',
+												}}
+												type="flex"
+												justify="space-between"
+											>
+												<Col>
+													<Select
+														key={aggsMappings.length}
+														showSearch
+														placeholder="Add new search field"
+														optionFilterProp="children"
+														style={{ minWidth: 200 }}
+														onChange={this.handleAddField}
+														filterOption={(input, option) =>
+															option.props.children
+																.toLowerCase()
+																.indexOf(input.toLowerCase()) >= 0
+														}
+													>
+														{aggsMappings.map((mapping) => (
+															<Option
+																key={mapping._address}
+																value={mapping._address}
+															>
+																{mapping.address}
+															</Option>
+														))}
+													</Select>
+													{aggsMappings.length +
+														this.noUseCaseMappings.length ===
+													traversedMappings.length ? (
+														<span className={highlighter} />
+													) : null}
+												</Col>
+											</Row>
+										</Affix>
+									) : null
 								}
-								return null;
-							}}
-							hidePropertiesType
-							onChange={this.handleMappingChange}
-							onDeleteField={this.handleDeleteField}
-							column={{
-								title: (
-									<React.Fragment>
-										{settingsMap.field_weight.title}
-										<Tooltip title={settingsMap.field_weight.description}>
-											<span style={{ marginLeft: 5 }}>
-												<Icon type="info-circle" />
-											</span>
-										</Tooltip>
-									</React.Fragment>
-								),
-								render: ({ address, settings: mappingSettings }) => {
-									const parsedAddress = address.replace(/properties./g, '');
-									return (
-										<InputNumber
-											min={0}
-											style={{ minWidth: 150, marginLeft: 12 }}
-											value={dataField[parsedAddress]}
-											onChange={(value) =>
-												this.handleSearchWeight({
-													address: parsedAddress,
-													value,
-													settings: mappingSettings,
-												})
-											}
-											placeholder="Enter field weight"
-										/>
-									);
-								},
-							}}
-							renderFooter={() =>
-								aggsMappings.length ? (
-									<Affix offsetBottom={73}>
-										<Row
-											style={{
-												padding: 10,
-												border: '1px solid #e8e8e8',
-												background: 'white',
-												width: '100%',
-											}}
-											type="flex"
-											justify="space-between"
-										>
-											<Col>
-												<Select
-													key={aggsMappings.length}
-													showSearch
-													placeholder="Add new search field"
-													optionFilterProp="children"
-													style={{ minWidth: 200 }}
-													onChange={this.handleAddField}
-													filterOption={(input, option) =>
-														option.props.children
-															.toLowerCase()
-															.indexOf(input.toLowerCase()) >= 0
-													}
-												>
-													{aggsMappings.map((mapping) => (
-														<Option
-															key={mapping._address}
-															value={mapping._address}
-														>
-															{mapping.address}
-														</Option>
-													))}
-												</Select>
-												{aggsMappings.length +
-													this.noUseCaseMappings.length ===
-												traversedMappings.length ? (
-													<span className={highlighter} />
-												) : null}
-											</Col>
-										</Row>
-									</Affix>
-								) : null
-							}
-						/>
+							/>
+						</ErrorToaster>
 					</Card>
 					<Card className={cardStyle}>
 						<label>

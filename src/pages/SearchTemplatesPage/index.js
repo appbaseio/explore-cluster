@@ -19,6 +19,7 @@ import Actions from './Actions';
 import CreateTemplate from './CreateTemplate';
 import GetAPIEndpoint from './GetAPIEndpoint';
 import { jsonValidator } from './utils';
+import ErrorToaster from '../../components/ErrorToaster';
 
 const columns = [
 	{
@@ -258,19 +259,23 @@ class SearchTemplates extends React.Component {
 						</Card>
 					)}
 					{(createMode || editMode) && (
-						<CreateTemplate
-							handleValidateTemplate={() => this.handleValidateTemplate()}
-							handleSaveTemplate={this.handleSaveTemplate}
-							control={this.form}
-							templateId={currentTemplate}
-						/>
+						<ErrorToaster inline>
+							<CreateTemplate
+								handleValidateTemplate={() => this.handleValidateTemplate()}
+								handleSaveTemplate={this.handleSaveTemplate}
+								control={this.form}
+								templateId={currentTemplate}
+							/>
+						</ErrorToaster>
 					)}
 					{copyEndpoint && (
-						<GetAPIEndpoint
-							templateId={currentTemplate}
-							visible={copyEndpoint}
-							handleCancel={this.togglecopyEndpoint}
-						/>
+						<ErrorToaster inline>
+							<GetAPIEndpoint
+								templateId={currentTemplate}
+								visible={copyEndpoint}
+								handleCancel={this.togglecopyEndpoint}
+							/>
+						</ErrorToaster>
 					)}
 				</Container>
 			</React.Fragment>

@@ -3,6 +3,7 @@ import { string } from 'prop-types';
 
 import Mappings from '../../batteries/components/Mappings';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
+import ErrorToaster from '../../components/ErrorToaster';
 
 const bannerMessage = {
 	title: 'Schema Settings',
@@ -15,7 +16,9 @@ const MappingsPage = ({ appName }) => (
 	<Fragment>
 		<Banner {...bannerMessage} />
 		<section>
-			<Mappings key={appName} appName={appName} appId={appName} />
+			<ErrorToaster>
+				<Mappings key={appName} appName={appName} appId={appName} />
+			</ErrorToaster>
 		</section>
 	</Fragment>
 );
