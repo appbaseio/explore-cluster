@@ -53,8 +53,8 @@ const emptyStyle = css`
 const SearchItem = ({ item }) => {
 	return (
 		<Breadcrumb separator=">">
-			{item.label && <Breadcrumb.Item>{item.title}</Breadcrumb.Item>}
-			<Breadcrumb.Item>{item.label || item.title}</Breadcrumb.Item>
+			{item.label && <Breadcrumb.Item>{get(item, 'title')}</Breadcrumb.Item>}
+			<Breadcrumb.Item>{get(item, 'label') || get(item, 'title')}</Breadcrumb.Item>
 		</Breadcrumb>
 	);
 };

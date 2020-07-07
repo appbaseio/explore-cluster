@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-curly-brace-presence */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-
+import get from 'lodash/get';
 import { Button, Modal } from 'antd';
 import * as typeformEmbed from '@typeform/embed';
 import { TYPE_FORM } from '../../constants';
@@ -15,7 +15,7 @@ class Unsubscribe extends Component {
 
 	embedTypescriptWidget = () => {
 		this.setState({ typeFormStep: TYPE_FORM.LOADED });
-		if (this.myRef.current) {
+		if (get(this, 'myRef.current')) {
 			typeformEmbed.makeWidget(
 				this.myRef.current,
 				'https://siddharth31.typeform.com/to/QEktta',

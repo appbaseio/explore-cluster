@@ -368,7 +368,7 @@ export async function getClusterMappings() {
 	});
 	const mappings = await response.json();
 	if (response.status >= 400) {
-		throw data.error.message;
+		throw get(data, 'error.message');
 	}
 	return mappings;
 }
@@ -379,15 +379,15 @@ export function getDatafields({ mappings, indexes, isSearch = false, isAggs = fa
 	let subFieldsMap = {};
 
 	function filtered(properties, property) {
-		if (isSearch)
-			return properties[property].type === 'string' || properties[property].type === 'text';
+		const propertyType = get(properties, `${property}.type`);
+		if (isSearch) return propertyType === 'string' || propertyType === 'text';
 		return (
-			properties[property].type === 'string' ||
-			properties[property].type === 'text' ||
-			properties[property].type === 'integer' ||
-			properties[property].type === 'long' ||
-			properties[property].type === 'bool' ||
-			properties[property].type === 'float'
+			propertyType === 'string' ||
+			propertyType === 'text' ||
+			propertyType === 'integer' ||
+			propertyType === 'long' ||
+			propertyType === 'bool' ||
+			propertyType === 'float'
 		);
 	}
 
@@ -447,9 +447,10 @@ export function updateFunction({
 	selectedFunction,
 	res,
 	updateQueryFn = updateQueryRules,
-	description = `Updating function ${get(selectedFunction, 'function.service')} with ${
-		res.payload.name
-	} rule`,
+	description = `Updating function ${get(selectedFunction, 'function.service')} with ${get(
+		res,
+		'payload.name',
+	)} rule`,
 }) {
 	if (selectedFunction && get(selectedFunction, 'function.service')) {
 		updateQueryFn(selectedFunction, res);
@@ -484,7 +485,7 @@ export function getSelectedIndexes(selectedIndexes, mappings) {
 }
 
 export async function handleQueryRuleDelete(rule, removeRule) {
-	const functionIndex = rule.actions.findIndex((item) => item.type === 'function');
+	const functionIndex = get(rule, 'actions', []).findIndex((item) => item.type === 'function');
 	if (functionIndex !== -1) {
 		try {
 			const res = await getSingleFunction(rule.actions[functionIndex].data);
@@ -526,16 +527,39 @@ export function getSubFields({ fields, weight, address }) {
 	if (fields) {
 		const fieldsToMap = Array.isArray(fields) ? fields : Object.keys(fields);
 		const subFields = fieldsToMap.reduce((agg, field) => {
-			if (field === 'search') {
-				return {
-					...agg,
-					[`${address}.${field}`]: weight ? 1 : 0,
-				};
+			switch (field) {
+				case 'autosuggest':
+				case 'lang':
+					return {
+						...agg,
+						[`${address}.${field}`]: weight ? weight * 0.9 : 0,
+					};
+				case 'synonyms':
+					return {
+						...agg,
+						[`${address}.${field}`]: weight ? weight * 0.7 : 0,
+					};
+				case 'delimiter':
+					return {
+						...agg,
+						[`${address}.${field}`]: weight ? weight * 0.4 : 0,
+					};
+				case 'search':
+					return {
+						...agg,
+						[`${address}.${field}`]: weight ? weight * 0.1 : 0,
+					};
+				case 'keyword':
+					return {
+						...agg,
+						[`${address}.${field}`]: weight ? weight : 0,
+					};
+				default:
+					return {
+						...agg,
+						[`${address}.${field}`]: weight,
+					};
 			}
-			return {
-				...agg,
-				[`${address}.${field}`]: weight,
-			};
 		}, {});
 
 		return { [address]: weight, ...subFields };
@@ -606,11 +630,20 @@ export const getParsedRoutes = (routes) =>
 		];
 	}, []);
 
+export const reservedSearchSubFields = [
+	'search',
+	'english',
+	'lang',
+	'autosuggest',
+	'keyword',
+	'synonyms',
+	'delimiter',
+];
+
 export const removeSubFields = (dataField) => {
-	const searchSubFields = ['search', 'english', 'lang', 'autosuggest', 'keyword', 'synonyms'];
 	const fieldsToMap = Array.isArray(dataField) ? dataField : Object.keys(dataField);
 	const parsedFields = fieldsToMap.filter(
-		(field) => !searchSubFields.some((subField) => field.endsWith(`.${subField}`)),
+		(field) => !reservedSearchSubFields.some((subField) => field.endsWith(`.${subField}`)),
 	);
 
 	if (Array.isArray(dataField)) {

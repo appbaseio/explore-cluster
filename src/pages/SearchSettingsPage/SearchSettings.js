@@ -36,7 +36,7 @@ import { getAggsMappings } from '../../batteries/utils/mappings';
 import ReviewAndSave from '../../components/ReviewAndSave';
 import SettingsFooter from '../../components/SettingsFooter';
 import { container } from '../ResultsPage/styles';
-import { getSubFields } from '../../utils';
+import { getSubFields, reservedSearchSubFields, removeSubFields } from '../../utils';
 import settingsMap from '../../components/ReviewAndSave/helper';
 import { isEqual, isValidPlan } from '../../batteries/utils';
 import mappingUsecase from '../../batteries/utils/mappingUsecase';
@@ -72,24 +72,10 @@ const cardStyle = css`
 	}
 `;
 
-const removeSubFields = (dataField) => {
-	const searchSubFields = ['search', 'english', 'lang', 'autosuggest', 'keyword', 'synonyms'];
-	return Object.keys(dataField)
-		.filter((field) => !searchSubFields.some((subField) => field.endsWith(`.${subField}`)))
-		.reduce(
-			(agg, item) => ({
-				...agg,
-				[item]: dataField[item],
-			}),
-			{},
-		);
-};
-
 class SearchSettingsPage extends React.Component {
 	state = {
 		aggsMappings: [],
 		dataField: {},
-		hasSearchOperators: false,
 		hasTypoTolerance: false,
 		isDirty: false,
 		visible: false,
@@ -100,7 +86,7 @@ class SearchSettingsPage extends React.Component {
 			old: {},
 		},
 		changedFieldWeights: {},
-		queryString: false,
+		queryType: 'default',
 	};
 
 	noUseCaseMappings = [];
@@ -177,22 +163,41 @@ class SearchSettingsPage extends React.Component {
 
 	initData = (settings) => {
 		const dataField = settings && settings.search ? this.getDataFields(settings) : {};
+		const hasSearchOperators = get(settings, 'search.searchOperators', false);
+		const hasQueryString = get(settings, 'search.queryString', false);
+
+		const queryType = this.getQueryType({
+			queryString: hasQueryString,
+			searchOperators: hasSearchOperators,
+		});
 
 		this.setState({
 			typoTolerance: get(settings, 'search.fuzziness'),
 			hasTypoTolerance: !!get(settings, 'search.fuzziness', false),
-			hasSearchOperators: get(settings, 'search.searchOperators', false),
 			queryFormat: get(settings, 'search.queryFormat', 'or'),
 			dataField,
 			enableSynonyms: get(settings, 'synonyms.enabled'),
-			queryString: get(settings, 'search.queryString'),
+			queryType,
 		});
+	};
+
+	getQueryType = ({ queryString, searchOperators }) => {
+		if (queryString) {
+			return 'queryString';
+		}
+
+		if (searchOperators) {
+			return 'searchOperators';
+		}
+
+		return 'default';
 	};
 
 	getDataFields = (settings) => {
 		const { mappings } = this.props;
 		let searchableFields = settings.search.dataField;
-		if (searchableFields.length === 0 && mappings) {
+
+		if (mappings) {
 			const aggsResponse = getAggsMappings(mappings, true);
 			const parsedMappings = Array.isArray(aggsResponse)
 				? aggsResponse
@@ -203,15 +208,53 @@ class SearchSettingsPage extends React.Component {
 					mapping.fieldType === 'text' &&
 					(mapping.usecase === 'search' || mapping.usecase === 'searchaggs'),
 			);
+			if (searchableFields.length === 0) {
+				searchableFields = originalSearchableFields.reduce((agg, item) => {
+					return [
+						...agg,
+						...Object.keys(
+							getSubFields({ address: item.address, weight: 1, fields: item.fields }),
+						),
+					];
+				}, []);
+			}
 
-			searchableFields = originalSearchableFields.reduce((agg, item) => {
-				return [
-					...agg,
-					...Object.keys(
-						getSubFields({ address: item.address, weight: 1, fields: item.fields }),
+			const onlyTopLevelFields = removeSubFields(searchableFields);
+			if (onlyTopLevelFields.length < originalSearchableFields.length) {
+				const changedFields = originalSearchableFields.filter(
+					(field) => !onlyTopLevelFields.includes(get(field, 'address')),
+				);
+				const allFields = originalSearchableFields.reduce((agg, item) => {
+					return [
+						...agg,
+						...Object.keys(
+							getSubFields({ address: item.address, weight: 1, fields: item.fields }),
+						),
+					];
+				}, []);
+
+				searchableFields = [...allFields, ...searchableFields];
+
+				this.setState({
+					changedFieldWeights: changedFields.reduce(
+						(agg, item) => ({
+							...agg,
+							[get(item, 'address')]: 1,
+						}),
+						{},
 					),
-				];
-			}, []);
+					changedFields: {
+						new: changedFields.reduce(
+							(agg, item) => ({
+								...agg,
+								[get(item, 'address')]: get(item, 'usecase'),
+							}),
+							{},
+						),
+						old: {},
+					},
+				});
+			}
 		}
 
 		return searchableFields.reduce(
@@ -326,9 +369,8 @@ class SearchSettingsPage extends React.Component {
 			typoTolerance,
 			hasTypoTolerance,
 			enableSynonyms,
-			hasSearchOperators,
 			queryFormat,
-			queryString,
+			queryType,
 		} = this.state;
 		const { updateSettingsAction, appName, settings } = this.props;
 
@@ -339,8 +381,8 @@ class SearchSettingsPage extends React.Component {
 				fuzziness: hasTypoTolerance ? typoTolerance : 0,
 				dataField: Object.keys(dataField),
 				fieldWeights: Object.values(dataField),
-				searchOperators: hasSearchOperators,
-				queryString,
+				searchOperators: queryType === 'searchOperators',
+				queryString: queryType === 'queryString',
 				queryFormat,
 			},
 			synonyms: {
@@ -365,6 +407,13 @@ class SearchSettingsPage extends React.Component {
 					if (isDirty) {
 						this.reIndex();
 					}
+					this.setState({
+						changedFields: {
+							new: {},
+							old: {},
+						},
+						changedFieldWeights: {},
+					});
 				}
 			})
 			.catch((e) => {
@@ -437,18 +486,9 @@ class SearchSettingsPage extends React.Component {
 		}));
 
 		if (usecase === 'aggs' || usecase === 'none') {
-			const searchSubFields = [
-				'search',
-				'english',
-				'lang',
-				'autosuggest',
-				'keyword',
-				'synonyms',
-			];
-
 			const subFields = [
 				fieldChanged,
-				...searchSubFields.map((item) => `${fieldChanged}.${item}`),
+				...reservedSearchSubFields.map((item) => `${fieldChanged}.${item}`),
 			];
 
 			const updatedFields = Object.keys(dataField).reduce((agg, item) => {
@@ -525,7 +565,6 @@ class SearchSettingsPage extends React.Component {
 		const {
 			dataField,
 			aggsMappings,
-			hasSearchOperators,
 			hasTypoTolerance,
 			typoTolerance,
 			visible,
@@ -535,7 +574,7 @@ class SearchSettingsPage extends React.Component {
 			queryFormat,
 			changedFieldWeights,
 			changedFields,
-			queryString,
+			queryType,
 		} = this.state;
 		const {
 			isUpdating,
@@ -589,11 +628,15 @@ class SearchSettingsPage extends React.Component {
 				};
 			}, {});
 
-		const { dataField: savedField, fieldWeights: savedWeight, ...rest } = get(
-			settings,
-			'search',
-			{},
-		);
+		const {
+			dataField: savedField,
+			fieldWeights: savedWeight,
+			queryString,
+			searchOperators,
+			...rest
+		} = get(settings, 'search', {});
+
+		const savedQueryType = this.getQueryType({ queryString, searchOperators });
 
 		const oldFieldKeyes = removeSubFields(sortedSavedDataField);
 		const newFieldKeyes = removeSubFields(sortedDataField);
@@ -724,6 +767,31 @@ class SearchSettingsPage extends React.Component {
 					</Card>
 					<Card className={cardStyle}>
 						<label>
+							Query Type
+							<Tooltip title={settingsMap.queryType.description}>
+								<Icon style={{ marginLeft: 5 }} type="info-circle" />
+							</Tooltip>
+						</label>
+						<Radio.Group
+							style={{ display: 'flex', marginBottom: 8 }}
+							onChange={(e) => this.handleChange('queryType', e.target.value)}
+							value={queryType}
+						>
+							<Radio value="default">ReactiveSearch</Radio>
+							<Radio value="queryString">
+								{settingsMap.queryString.title}{' '}
+								<Tooltip title={settingsMap.queryString.description}>
+									<Icon type="info-circle" />
+								</Tooltip>
+							</Radio>
+							<Radio value="searchOperators">
+								{settingsMap.searchOperators.title}{' '}
+								<Tooltip title={settingsMap.searchOperators.description}>
+									<Icon type="info-circle" />
+								</Tooltip>
+							</Radio>
+						</Radio.Group>
+						<label>
 							Query Format
 							<Tooltip title={settingsMap.queryFormat.description}>
 								<Icon style={{ marginLeft: 5 }} type="info-circle" />
@@ -737,28 +805,6 @@ class SearchSettingsPage extends React.Component {
 							<Radio value="or">Or</Radio>
 							<Radio value="and">And</Radio>
 						</Radio.Group>
-						<label>
-							{settingsMap.searchOperators.title}{' '}
-							<Tooltip title={settingsMap.searchOperators.description}>
-								<Icon type="info-circle" />
-							</Tooltip>
-						</label>
-						<Switch
-							checked={hasSearchOperators}
-							onChange={(value) => this.handleChange('hasSearchOperators', value)}
-						/>
-
-						<label>
-							{settingsMap.queryString.title}{' '}
-							<Tooltip title={settingsMap.queryString.description}>
-								<Icon type="info-circle" />
-							</Tooltip>
-						</label>
-						<Switch
-							checked={queryString}
-							onChange={(value) => this.handleChange('queryString', value)}
-						/>
-
 						<label>
 							{settingsMap.enableTypoTolerance.title}{' '}
 							<Tooltip title={settingsMap.enableTypoTolerance.description}>
@@ -821,10 +867,10 @@ class SearchSettingsPage extends React.Component {
 									...(settings || {}),
 									search: {
 										fuzziness: hasTypoTolerance ? typoTolerance : 0,
-										searchOperators: hasSearchOperators,
+										searchOperators: queryType === 'searchOperators',
 										dataField: Object.keys(dataField),
 										fieldWeights: Object.values(dataField),
-										queryString,
+										queryString: queryType === 'queryString',
 										queryFormat,
 									},
 								},
@@ -845,21 +891,21 @@ class SearchSettingsPage extends React.Component {
 								isReset={isReset}
 								oldValues={{
 									...rest,
-									dataField: changedFields.old,
+									dataField: get(changedFields, 'old', {}),
 									fieldWeights: Object.values(sortedSavedDataField),
 									synonyms: get(settings, 'synonyms.enabled'),
 									queryFormat: get(settings, 'search.queryFormat'),
+									queryType: savedQueryType,
 								}}
 								newValues={{
 									fuzziness: hasTypoTolerance ? typoTolerance : 0,
-									searchOperators: hasSearchOperators,
-									dataField: changedFields.new,
+									dataField: get(changedFields, 'new', {}),
 									fieldWeights: Object.values(sortedDataField),
 									synonyms: enableSynonyms,
 									queryFormat,
-									queryString,
+									queryType,
 								}}
-								renderField={({ value, type, record }) => {
+								renderField={({ type, record }) => {
 									const fieldName = get(record, 'setting', '').toLowerCase();
 									if (fieldName === 'datafield') {
 										if (JSON.stringify(oldFieldKeyes) === JSON.stringify({})) {
@@ -913,7 +959,7 @@ class SearchSettingsPage extends React.Component {
 																`${type}.${field}`,
 																[],
 															).includes('search')
-																? newFieldKeyes[field] || 1
+																? get(newFieldKeyes, field) || 1
 																: 0}
 														</strong>
 													</Typography.Paragraph>
@@ -925,13 +971,13 @@ class SearchSettingsPage extends React.Component {
 												{field}:{' '}
 												<strong>
 													{type === 'old'
-														? oldFieldKeyes[field]
-														: changedFieldWeights[field]}
+														? get(oldFieldKeyes, field)
+														: get(changedFieldWeights, field)}
 												</strong>
 											</Typography.Paragraph>
 										));
 									}
-									return JSON.stringify(value, null, 2);
+									return JSON.stringify(get(record, `value.${type}`), null, 2);
 								}}
 								onClick={() => this.toggleVisible(false)}
 								visible={visible}

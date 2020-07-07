@@ -38,8 +38,8 @@ class ClusterInsights extends React.Component {
 		getSubscription(credentials)
 			.then((res) => {
 				this.setState({
-					hasSubscribed: res.has_subscribed,
-					insight_link: res.insight_link,
+					hasSubscribed: get(res, 'has_subscribed'),
+					insight_link: get(res, 'insight_link'),
 				});
 				this.toggleLoading('fetchingSubscription');
 			})

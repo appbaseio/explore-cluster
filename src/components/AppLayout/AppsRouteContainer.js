@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Loadable from 'react-loadable';
 import { Switch, Route } from 'react-router-dom';
-
+import get from 'lodash/get';
 import Loader from '../Loader';
 import AppPageContainer from '../AppPageContainer';
 import ErrorPage from '../../pages/ErrorPage';
@@ -96,10 +96,8 @@ class RouteContainer extends React.Component {
 	shouldComponentUpdate(nextProps) {
 		const { location } = this.props;
 		return (
-			(nextProps &&
-				nextProps.location &&
-				nextProps.location.pathname !== location.pathname) ||
-			(nextProps && nextProps.location && nextProps.location.search !== location.search)
+			get(nextProps, 'location.pathname') !== get(location, 'pathname') ||
+			get(nextProps, 'location.search') !== get(location, 'search')
 		);
 	}
 

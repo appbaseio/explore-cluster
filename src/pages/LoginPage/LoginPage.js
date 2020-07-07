@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { Card, Button, Icon, Input } from 'antd';
 import { Redirect, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import get from 'lodash/get';
 import { loadUser } from '../../actions';
 import LoginContainer from '../../components/LoginContainer';
 import { container, card, gitlabBtn } from './styles';
@@ -24,7 +25,7 @@ class LoginPage extends Component {
 	}
 
 	componentDidMount() {
-		if (this.url && this.url.current) {
+		if (get(this, 'url.current.input')) {
 			const urlValue = getURL() || '';
 			this.url.current.input.value = urlValue;
 			const credObj = getURLCredentials(urlValue) || {};
@@ -34,7 +35,7 @@ class LoginPage extends Component {
 	}
 
 	setCredentials(credObj) {
-		if (this.username && this.username.current)
+		if (get(this, 'username.current.input'))
 			this.username.current.input.value = credObj.username || '';
 		if (this.password && this.password.current)
 			this.password.current.input.value = credObj.password || '';
@@ -42,11 +43,11 @@ class LoginPage extends Component {
 
 	login = () => {
 		const { loadArcUser } = this.props;
-		const username = this.username.current.input.value.trim();
-		const password = this.password.current.input.value;
-		const url = this.url.current.input.value;
+		const username = get(this, 'username.current.input.value', '').trim();
+		const password = get(this, 'password.current.input.value');
+		const url = get(this, 'url.current.input.value');
 
-		if (username && password) {
+		if (username && password && url) {
 			loadArcUser(username, password, url);
 		}
 	};
@@ -55,7 +56,7 @@ class LoginPage extends Component {
 		const { value } = event.target;
 		if (!value) return;
 		const credObj = getURLCredentials(value) || {};
-		if (this.url && this.url.current) this.url.current.input.value = this.getURL(value);
+		if (get(this, 'url.current')) this.url.current.input.value = this.getURL(value);
 		if (!isEmpty(credObj)) {
 			this.setCredentials(credObj);
 		}

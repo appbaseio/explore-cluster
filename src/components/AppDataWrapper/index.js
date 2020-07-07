@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-
+import get from 'lodash/get';
 import { Col } from 'antd';
 import { css } from 'emotion';
 import AppCard from '../AppCard';
@@ -35,20 +35,20 @@ function AppDataWrapper({ apps, onCreateModalChange, isFetching }) {
 						alignItems: 'center',
 					}}
 				>
-					{app.alias || app.index}
+					{get(app, 'alias') || get(app, 'index')}
 				</div>
 			);
 
 			return (
 				<Col
 					style={{ paddingLeft: '10px', paddingRight: '10px' }}
-					key={app.index}
+					key={get(app, 'index')}
 					lg={8}
 					md={12}
 					sm={24}
 				>
 					<div css={{ marginBottom: 20, display: 'block', cursor: 'pointer' }}>
-						<AppCard key={app.index} title={title} data={app} />
+						<AppCard key={get(app, 'index')} title={title} data={app} />
 					</div>
 				</Col>
 			);

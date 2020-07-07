@@ -52,7 +52,7 @@ class QueryRules extends Component {
 
 	onDragEnd = (result) => {
 		const { rules, updateOrder } = this.props;
-		if (result.source.index !== result.destination.index) {
+		if (get(result, 'source.index') !== get(result, 'destination.index')) {
 			const ruleToPromote = rules.find((rule) => rule.order === result.source.index);
 			const ruleToDemote = rules.find((rule) => rule.order === result.destination.index);
 
