@@ -1,5 +1,6 @@
 import React from 'react';
 import { object } from 'prop-types';
+import get from 'lodash/get';
 import { Menu, Avatar, Dropdown, Icon } from 'antd';
 import { css } from 'react-emotion';
 import { media } from '../../utils/media';
@@ -37,7 +38,7 @@ const UserMenu = ({ user }) => (
 		<div style={{ cursor: 'pointer' }}>
 			<Avatar icon="user" />
 			&nbsp;&nbsp;
-			{user ? user.username : 'Loading...'}
+			{get(user, 'username', 'Loading...')}
 			&nbsp;&nbsp;
 			<Icon type="down" />
 		</div>

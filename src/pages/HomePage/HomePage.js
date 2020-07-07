@@ -62,7 +62,7 @@ class HomePage extends Component {
 
 	renderApps = () => {
 		const { apps } = this.props;
-		const sortedApps = apps.data ? Object.keys(apps.data) : [];
+		const sortedApps = apps && apps.data ? Object.keys(apps.data) : [];
 		return (
 			<Row css={{ padding: 30 }} gutter={20}>
 				{sortedApps.length || apps.isFetching ? null : (

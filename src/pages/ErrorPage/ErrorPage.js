@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Icon } from 'antd';
+import get from 'lodash/get';
 import { connect } from 'react-redux';
 import * as Sentry from '@sentry/browser';
 
@@ -17,7 +18,7 @@ class ErrorPage extends React.Component {
 		const {
 			location: { pathname }, // eslint-disable-line
 		} = this.props;
-		if (prevProps.location.pathname !== pathname) {
+		if (get(prevProps, 'location.pathname') !== pathname) {
 			// eslint-disable-next-line
 			this.setState({
 				error: false,

@@ -31,28 +31,40 @@ const headingCls = css({
 	},
 });
 
-const AppbaseUsers = ({ className, style, title }) => (
+const AppbaseUsers = ({ className, style, title, imageStyle }) => (
 	<React.Fragment>
 		{title && <h2 css={headingCls}>{title}</h2>}
 		<div className={cx(styles, className)} style={style}>
-			<img src="/static/images/testimonials/aerial.png" alt="Aerial" />
-			<img src="/static/images/testimonials/kwiat.png" alt="Kwiat" />
-			<img src="/static/images/testimonials/inquisit.png" alt="Inquisit" />
-			<img src="/static/images/testimonials/lyearn.png" alt="Lyearn" />
-			<img src="/static/images/testimonials/shopelect.png" alt="Shopelect" />
-			<img src="/static/images/testimonials/rumbleon.png" alt="Rumbleon" />
-			<img src="/static/images/testimonials/munivisor.png" alt="Munivisor" />
+			<img src="/static/images/testimonials/aerial.png" style={imageStyle} alt="Aerial" />
+			<img src="/static/images/testimonials/kwiat.png" style={imageStyle} alt="Kwiat" />
+			<img src="/static/images/testimonials/inquisit.png" style={imageStyle} alt="Inquisit" />
+			<img src="/static/images/testimonials/lyearn.png" style={imageStyle} alt="Lyearn" />
+			<img
+				src="/static/images/testimonials/shopelect.png"
+				style={imageStyle}
+				alt="Shopelect"
+			/>
+			<img src="/static/images/testimonials/rumbleon.png" style={imageStyle} alt="Rumbleon" />
+			<img
+				src="/static/images/testimonials/munivisor.png"
+				style={imageStyle}
+				alt="Munivisor"
+			/>
 		</div>
 	</React.Fragment>
 );
 
 AppbaseUsers.propTypes = {
-	/*eslint-disable */
 	className: string,
 	style: object,
-	title: string,
+	title: string.isRequired,
 	imageStyle: object,
-	/* eslint-enable */
+};
+
+AppbaseUsers.defaultProps = {
+	className: '',
+	style: {},
+	imageStyle: {},
 };
 
 export default AppbaseUsers;

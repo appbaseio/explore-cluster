@@ -25,7 +25,7 @@ import { getDefaultSettings, putSettings } from '../../batteries/modules/actions
 import { getLanguageFallback } from '../../utils/language';
 import { isValidPlan } from '../../batteries/utils';
 import { allowedTiers } from '../../utils/prop-types';
-import ErrorToaster from '../../components/ErrorToaster';
+import { withErrorToaster } from '../../components/ErrorToaster/ErrorToaster';
 
 const RadioGroup = Radio.Group;
 
@@ -180,111 +180,106 @@ class CreateAppModal extends Component {
 				onCancel={this.handleCancel}
 				width={600}
 			>
-				<ErrorToaster>
-					<div>
-						<Row type="flex" justify="space-between" align="middle">
-							<h3 style={{ marginTop: 0 }} className={modalHeading}>
-								Index Name
-							</h3>
-							<Popover
-								placement="right"
-								content={(
+				<div>
+					<Row type="flex" justify="space-between" align="middle">
+						<h3 style={{ marginTop: 0 }} className={modalHeading}>
+							Index Name
+						</h3>
+						<Popover
+							placement="right"
+							content={(
 								<List
 									size="small"
 									dataSource={validationsList}
 									renderItem={item => <List.Item>{item}</List.Item>}
 								/>
 							)} // prettier-ignore
-								title="Index name validations"
-								trigger="click"
-								visible={validationPopOver}
-							>
-								<Icon type="info-circle" onClick={this.handleValidationPopOver} />
-							</Popover>
-						</Row>
-						<p css={{ fontSize: 14, margin: '-4px 0 8px 0', lineHeight: '20px' }}>
-							Index names are unique across the cluster and should use lowercase
-							alphabets. Click
-							<span
-								style={{ color: '#1890ff' }}
-								onClick={this.handleValidationPopOver}
-							>
-								{' '}
-								here
-							</span>{' '}
-							to see more rules.
-						</p>
-						<Input
-							autoComplete="new-appname"
-							placeholder="Enter a unique index name"
-							name="appName"
-							className={input}
-							onChange={this.handleChange}
-							value={appName}
-						/>
-						<h3 style={{ marginTop: 20 }} className={modalHeading}>
-							Select Language
-						</h3>
-						<LanguageDropdown
-							style={{ width: '100%' }}
-							value={language}
-							onSelect={(value) => this.setState({ language: value })}
-							renderOption={(lang) => (
-								<Select.Option key={lang.value} value={lang.value}>
-									{lang.label}
-								</Select.Option>
-							)}
-						/>
-						<h3 style={{ marginTop: 20 }} className={modalHeading}>
-							Shards
-						</h3>
-						<InputNumber
-							placeholder="Enter number of shards"
-							name="shards"
-							max={100}
-							style={{ width: '100%' }}
-							min={0}
-							step={1}
-							onChange={(value) => this.handleInputNumber('shards', value)}
-							value={shards}
-						/>
-						<h3 style={{ marginTop: 20 }} className={modalHeading}>
-							Replicas
-						</h3>
-						<InputNumber
-							placeholder="Enter number of replicas"
-							name="replicas"
-							max={2}
-							min={0}
-							style={{ width: '100%' }}
-							step={1}
-							onChange={(value) => this.handleInputNumber('replicas', value)}
-							value={replicas}
-						/>
-						{createdApp && createdApp.error ? (
-							<div css={{ color: 'tomato', marginTop: 8 }}>
-								{createdApp.error.actual.message}
-							</div>
-						) : null}
-					</div>
+							title="Index name validations"
+							trigger="click"
+							visible={validationPopOver}
+						>
+							<Icon type="info-circle" onClick={this.handleValidationPopOver} />
+						</Popover>
+					</Row>
+					<p css={{ fontSize: 14, margin: '-4px 0 8px 0', lineHeight: '20px' }}>
+						Index names are unique across the cluster and should use lowercase
+						alphabets. Click
+						<span style={{ color: '#1890ff' }} onClick={this.handleValidationPopOver}>
+							{' '}
+							here
+						</span>{' '}
+						to see more rules.
+					</p>
+					<Input
+						autoComplete="new-appname"
+						placeholder="Enter a unique index name"
+						name="appName"
+						className={input}
+						onChange={this.handleChange}
+						value={appName}
+					/>
+					<h3 style={{ marginTop: 20 }} className={modalHeading}>
+						Select Language
+					</h3>
+					<LanguageDropdown
+						style={{ width: '100%' }}
+						value={language}
+						onSelect={(value) => this.setState({ language: value })}
+						renderOption={(lang) => (
+							<Select.Option key={lang.value} value={lang.value}>
+								{lang.label}
+							</Select.Option>
+						)}
+					/>
+					<h3 style={{ marginTop: 20 }} className={modalHeading}>
+						Shards
+					</h3>
+					<InputNumber
+						placeholder="Enter number of shards"
+						name="shards"
+						max={100}
+						style={{ width: '100%' }}
+						min={0}
+						step={1}
+						onChange={(value) => this.handleInputNumber('shards', value)}
+						value={shards}
+					/>
+					<h3 style={{ marginTop: 20 }} className={modalHeading}>
+						Replicas
+					</h3>
+					<InputNumber
+						placeholder="Enter number of replicas"
+						name="replicas"
+						max={2}
+						min={0}
+						style={{ width: '100%' }}
+						step={1}
+						onChange={(value) => this.handleInputNumber('replicas', value)}
+						value={replicas}
+					/>
+					{createdApp && createdApp.error ? (
+						<div css={{ color: 'tomato', marginTop: 8 }}>
+							{get(createdApp, 'error.actual.message')}
+						</div>
+					) : null}
+				</div>
 
-					<div>
-						<h3 className={modalHeading}>
-							Do you have a JSON or CSV dataset to import into this index?
-						</h3>
-						<RadioGroup value={hasJSON} name="hasJSON" onChange={this.handleChange}>
-							<Radio className={radiobtn} value>
-								Yes
-							</Radio>
-							<Radio className={radiobtn} value={false}>
-								No
-							</Radio>
-							<Radio className={radiobtn} value="sample">
-								Load Sample Data
-							</Radio>
-						</RadioGroup>
-					</div>
-				</ErrorToaster>
+				<div>
+					<h3 className={modalHeading}>
+						Do you have a JSON or CSV dataset to import into this index?
+					</h3>
+					<RadioGroup value={hasJSON} name="hasJSON" onChange={this.handleChange}>
+						<Radio className={radiobtn} value>
+							Yes
+						</Radio>
+						<Radio className={radiobtn} value={false}>
+							No
+						</Radio>
+						<Radio className={radiobtn} value="sample">
+							Load Sample Data
+						</Radio>
+					</RadioGroup>
+				</div>
 			</Modal>
 		);
 	}
@@ -311,9 +306,9 @@ CreateAppModal.defaultProps = {
 };
 
 const mapStateToProps = (state) => ({
-	apps: state.apps,
-	appsMetrics: state.appsMetrics,
-	createdApp: state.createdApp,
+	apps: get(state, 'apps'),
+	appsMetrics: get(state, 'appsMetrics'),
+	createdApp: get(state, 'createdApp'),
 	defaultSettings: get(state, '$getAppSettings.defaultSettings'),
 	tier: get(state, '$getAppPlan.results.tier'),
 	featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
@@ -326,4 +321,4 @@ const mapDispatchToProps = (dispatch) => ({
 	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(CreateAppModal);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(CreateAppModal));

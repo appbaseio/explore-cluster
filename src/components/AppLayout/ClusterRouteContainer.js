@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Switch, Route } from 'react-router-dom';
 import Loadable from 'react-loadable';
-
+import get from 'lodash/get';
 import Loader from '../Loader';
 import AppPageContainer from '../AppPageContainer';
 import ErrorPage from '../../pages/ErrorPage';
@@ -93,12 +93,9 @@ const ClusterInsights = Loadable({
 class ClusterRouteContainer extends React.Component {
 	shouldComponentUpdate(nextProps) {
 		const { location } = this.props;
-
 		return (
-			(nextProps &&
-				nextProps.location &&
-				nextProps.location.pathname !== location.pathname) ||
-			(nextProps && nextProps.location && nextProps.location.search !== location.search)
+			get(nextProps, 'location.pathname') !== get(location, 'pathname') ||
+			get(nextProps, 'location.search') !== get(location, 'search')
 		);
 	}
 

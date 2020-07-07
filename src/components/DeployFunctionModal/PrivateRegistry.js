@@ -11,10 +11,10 @@ import { isAbsoluteURL } from '../../utils';
 
 const PrivateRegistry = ({ registry, updateRegistry, error, success, loading }) => {
 	const [didMount, setDidMount] = useState(false);
-	const [username, setUserName] = useState(registry.username);
-	const [password, setPassword] = useState(registry.password);
-	const [email, setEmail] = useState(registry.email);
-	const [url, setURL] = useState(registry.registry_url);
+	const [username, setUserName] = useState(get(registry, 'username'));
+	const [password, setPassword] = useState(get(registry, 'password'));
+	const [email, setEmail] = useState(get(registry, 'email'));
+	const [url, setURL] = useState(get(registry, 'registry_url'));
 	const [localError, setLocalError] = useState({});
 
 	useEffect(() => {

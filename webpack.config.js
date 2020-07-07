@@ -6,6 +6,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 
 require('dotenv').config();
 
@@ -19,6 +20,7 @@ const plugins = [
 	}),
 	new CopyWebpackPlugin([{ from: 'static', to: 'static' }, '_redirects']),
 	new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+	new HardSourceWebpackPlugin(),
 ];
 
 if (!isProduction) {
@@ -65,6 +67,9 @@ module.exports = {
 				exclude: /node_modules/,
 				use: {
 					loader: 'babel-loader',
+					options: {
+						cacheDirectory: true,
+					},
 				},
 			},
 			{
