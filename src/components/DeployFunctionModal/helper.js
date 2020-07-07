@@ -78,7 +78,7 @@ export async function deploymentCheck(getFunction, functionName, myInterval) {
 	try {
 		const res = await getFunction(functionName);
 		if (res) {
-			const { deploymentStatus } = get(res, 'payload') ? get(res, 'payload') : res;
+			const { deploymentStatus } = get(res, 'payload', res);
 			if (deploymentStatus === 'active' || deploymentStatus === 'failed') {
 				clearInterval(myInterval);
 			}
