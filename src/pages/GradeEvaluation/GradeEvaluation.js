@@ -12,6 +12,8 @@ import {
 	notification,
 	Button,
 	Tooltip,
+	message,
+	Pagination,
 } from 'antd';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
@@ -79,6 +81,7 @@ class GradeEvaluation extends React.Component {
 	state = {
 		selectedIndices: [],
 		hasUserIndices: false,
+		currentPage: 1,
 	};
 
 	componentDidMount() {
@@ -113,15 +116,38 @@ class GradeEvaluation extends React.Component {
 
 	fetchMetrics = () => {
 		const { getMetrics, tier, featureGrade } = this.props;
-		if (isValidPlan(tier, featureGrade)) {
-			getMetrics();
+		const { selectedIndices, currentPage } = this.state;
+
+		if (
+			selectedIndices.length !== 0 &&
+			selectedIndices.length <= 5 &&
+			isValidPlan(tier, featureGrade)
+		) {
+			getMetrics(selectedIndices, currentPage);
 		}
 	};
 
 	onSelectedIndices = (indices) => {
-		this.setState({
-			selectedIndices: indices,
-		});
+		if (indices.length > 5) {
+			message.warning('Cannot compare more than 5 indices!');
+			return;
+		}
+		this.setState(
+			{
+				selectedIndices: indices,
+				currentPage: 1,
+			},
+			this.fetchMetrics,
+		);
+	};
+
+	onPageChange = (page) => {
+		this.setState(
+			{
+				currentPage: page,
+			},
+			this.fetchMetrics,
+		);
 	};
 
 	renderIndexDropdown = () => {
@@ -145,6 +171,7 @@ class GradeEvaluation extends React.Component {
 						placeholder="Select a Index for comparison"
 						optionFilterProp="children"
 						onChange={this.onSelectedIndices}
+						value={selectedIndices}
 						filterOption={(input, option) =>
 							option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
 						}
@@ -189,14 +216,17 @@ class GradeEvaluation extends React.Component {
 			isFetchingApps,
 			metrics,
 			isPaidUser,
+			tier,
+			featureGrade,
+			totalMetrics,
 		} = this.props;
-		const { hasUserIndices } = this.state;
+		const { hasUserIndices, currentPage } = this.state;
 
 		if (isFetchingPlan) {
 			return <Loader />;
 		}
 
-		if (!isPaidUser) {
+		if (!isPaidUser || !isValidPlan(tier, featureGrade)) {
 			return (
 				<React.Fragment>
 					<Banner {...bannerMessages.free} />
@@ -261,7 +291,7 @@ class GradeEvaluation extends React.Component {
 			<React.Fragment>
 				{bannerMessages[plan] && <Banner {...bannerMessages[plan]} />}
 				<Container>
-					<Spin spinning={isFetching || isFetchingApps}>
+					<Spin spinning={isFetchingApps}>
 						<Card title="Grade Metrics">
 							{this.renderIndexDropdown()}
 							<Table
@@ -269,11 +299,21 @@ class GradeEvaluation extends React.Component {
 								scroll={{ x: 1200 }}
 								className={tableStyle}
 								columns={tableColumns}
+								pagination={false}
+								loading={isFetching}
 								dataSource={searchTerms}
 								locale={{
 									emptyText: <Empty description="No metrics data available" />,
 								}}
 							/>
+							{totalMetrics ? (
+								<Pagination
+									style={{ marginTop: 10 }}
+									current={currentPage}
+									total={totalMetrics}
+									onChange={this.onPageChange}
+								/>
+							) : null}
 						</Card>
 					</Spin>
 				</Container>
@@ -287,21 +327,22 @@ const mapStateToProps = (state) => {
 		// Plan details
 		tier: get(state, '$getAppPlan.results.tier'),
 		isFetchingPlan: get(state, '$getAppPlan.isFetching', false),
-		featureGrade: get(state, '$getAppPlan.results.feature_search_grader', true),
+		featureGrade: get(state, '$getAppPlan.results.feature_search_grader'),
 		isPaidUser: get(state, '$getAppPlan.results.isPaid'),
 		plan: get(state, '$getAppPlan.results.plan'),
 		// Apps Details
 		isFetchingApps: get(state, 'apps.isFetching', false),
 		apps: get(state, 'apps.data', null),
 		// Metrics Details
-		metrics: get(state, '$getAppGradeMetrics.results', null),
+		metrics: get(state, '$getAppGradeMetrics.results.metrics', null),
+		totalMetrics: get(state, '$getAppGradeMetrics.results.total', 0),
 		isFetching: get(state, '$getAppGradeMetrics.isFetching', null),
 		error: get(state, '$getAppGradeMetrics.error', null),
 	};
 };
 
 const mapDispatchToProps = (dispatch) => ({
-	getMetrics: () => dispatch(getAppGradeMetrics()),
+	getMetrics: (indices, page) => dispatch(getAppGradeMetrics(indices, page)),
 	saveState: (state) => dispatch(setSearchState(state)),
 });
 
@@ -309,6 +350,7 @@ GradeEvaluation.defaultProps = {
 	apps: {},
 	metrics: {},
 	error: null,
+	totalMetrics: 0,
 };
 
 GradeEvaluation.propTypes = {
@@ -320,6 +362,7 @@ GradeEvaluation.propTypes = {
 	isFetchingApps: PropTypes.bool.isRequired,
 	apps: PropTypes.object,
 	metrics: PropTypes.object,
+	totalMetrics: PropTypes.number,
 	isFetching: PropTypes.bool.isRequired,
 	error: PropTypes.object,
 	getMetrics: PropTypes.func.isRequired,

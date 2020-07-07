@@ -4,19 +4,21 @@ import { connect } from 'react-redux';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import { recordGrade } from '../../utils';
+import { allowedTiers } from '../../../../utils/prop-types';
+import { isValidPlan } from '../../../../batteries/utils';
 
-const items = new Array(10).fill(1).map((item, index) => index + 1);
+const items = Array.from({ length: 10 }, (_, index) => index + 1);
 
-const Grading = ({ id, searchTerm, appName }) => {
+const Grading = ({ id, searchTerm, appName, tier, featureGrade, value }) => {
 	const handleGrade = (e) => {
 		const {
-			target: { value },
+			target: { value: grade },
 		} = e;
 
 		recordGrade({
 			id,
 			query: searchTerm,
-			grade: value,
+			grade,
 			index: appName,
 		})
 			.then((res) => message.success(res.message))
@@ -29,7 +31,13 @@ const Grading = ({ id, searchTerm, appName }) => {
 			<Typography.Text strong style={{ marginRight: 5 }}>
 				Grade this result
 			</Typography.Text>
-			<Radio.Group size="small" onChange={handleGrade}>
+			<Radio.Group
+				defaultValue={value}
+				key={value}
+				size="small"
+				disabled={!isValidPlan(tier, featureGrade)}
+				onChange={handleGrade}
+			>
 				{items.map((item) => (
 					<Radio.Button value={item}>{item}</Radio.Button>
 				))}
@@ -42,6 +50,8 @@ const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name', 'default');
 	return {
 		appName,
+		tier: get(state, '$getAppPlan.results.tier'),
+		featureGrade: get(state, '$getAppPlan.results.feature_search_grader'),
 	};
 };
 
@@ -49,10 +59,15 @@ Grading.propTypes = {
 	appName: PropTypes.string.isRequired,
 	id: PropTypes.string.isRequired,
 	searchTerm: PropTypes.string,
+	tier: allowedTiers.isRequired,
+	featureGrade: PropTypes.bool,
+	value: PropTypes.number,
 };
 
 Grading.defaultProps = {
 	searchTerm: '',
+	featureGrade: false,
+	value: null,
 };
 
 export default connect(mapStateToProps, null)(Grading);

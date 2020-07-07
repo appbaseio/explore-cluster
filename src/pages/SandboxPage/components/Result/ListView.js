@@ -26,7 +26,7 @@ Container.defaultProps = {
 	hasPagination: false,
 };
 
-const ListItemWrapper = ({ item, isGradingEnabled, searchTerm }) => {
+const ListItemWrapper = ({ item, isGradingEnabled, searchTerm, queryGrades }) => {
 	const { _promoted, _click_id, _index, highlight, index, ...rest } = item;
 	return (
 		<div className={listItem}>
@@ -75,7 +75,9 @@ const ListItemWrapper = ({ item, isGradingEnabled, searchTerm }) => {
 				</Row>
 			</ExpandCollapse>
 
-			{isGradingEnabled ? <Grading id={item._id} searchTerm={searchTerm} /> : null}
+			{isGradingEnabled ? (
+				<Grading id={item._id} value={get(queryGrades, item._id)} searchTerm={searchTerm} />
+			) : null}
 			<Divider />
 		</div>
 	);
@@ -85,12 +87,14 @@ ListItemWrapper.propTypes = {
 	isGradingEnabled: PropTypes.bool,
 	item: PropTypes.object,
 	searchTerm: PropTypes.string,
+	queryGrades: PropTypes.object,
 };
 
 ListItemWrapper.defaultProps = {
 	item: {},
 	isGradingEnabled: false,
 	searchTerm: '',
+	queryGrades: {},
 };
 
 const renderLoadMore = ({ size, loadMore, data, loading }) => {
@@ -121,7 +125,7 @@ renderLoadMore.defaultProps = {
 
 const ListItem = React.memo(ListItemWrapper);
 
-const ListView = ({ result, isGradingEnabled, searchTerm }) => (
+const ListView = ({ result, isGradingEnabled, searchTerm, queryGrades }) => (
 	<React.Fragment>
 		<Container hasPagination={result.pagination}>
 			<ReactiveList
@@ -141,6 +145,7 @@ const ListView = ({ result, isGradingEnabled, searchTerm }) => (
 									<ListItem
 										key={item._id}
 										item={item}
+										queryGrades={queryGrades}
 										isGradingEnabled={isGradingEnabled}
 										searchTerm={searchTerm}
 									/>
@@ -160,10 +165,12 @@ ListView.propTypes = {
 	result: PropTypes.object,
 	isGradingEnabled: PropTypes.bool,
 	searchTerm: PropTypes.string,
+	queryGrades: PropTypes.object,
 };
 
 ListView.defaultProps = {
 	result: {},
+	queryGrades: {},
 	isGradingEnabled: false,
 	searchTerm: '',
 };

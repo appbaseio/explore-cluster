@@ -33,6 +33,7 @@ class Result extends React.Component {
 			toggleAnalytics,
 			isGradingEnabled,
 			searchTerm,
+			queryGrades,
 		} = this.props;
 		const { view } = this.state;
 		return (
@@ -112,6 +113,7 @@ class Result extends React.Component {
 						isGradingEnabled={isGradingEnabled}
 						searchTerm={searchTerm}
 						result={result}
+						queryGrades={queryGrades}
 					/>
 				) : (
 					<QueryView
@@ -141,6 +143,7 @@ Result.propTypes = {
 	recordAnalytics: PropTypes.bool,
 	isGradingEnabled: PropTypes.bool,
 	searchTerm: PropTypes.string,
+	queryGrades: PropTypes.object,
 };
 
 Result.defaultProps = {
@@ -153,6 +156,7 @@ Result.defaultProps = {
 	recordAnalytics: true,
 	isGradingEnabled: false,
 	searchTerm: '',
+	queryGrades: {},
 };
 
 export default Result;
