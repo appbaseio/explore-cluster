@@ -147,8 +147,8 @@ AppHeader.defaultProps = {
 
 const mapStateToProps = (state) => ({
 	currentApp: get(state, '$getCurrentApp.name'),
-	user: state.user.data,
-	isUsingTrial: get(state, '$getAppPlan.results.trial') || false,
+	user: get(state, `user.data`),
+	isUsingTrial: get(state, '$getAppPlan.results.trial', false),
 	daysLeft: get(state, '$getAppPlan.results.daysLeft', 0),
 });
 

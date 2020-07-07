@@ -86,7 +86,11 @@ class AnalyticsInsights extends React.Component {
 			JSON.stringify(prevProps.insightUpdates) !== JSON.stringify(updates)
 		) {
 			Object.keys(updates).forEach((id) => {
-				const { success, error: updateError, nextStatus, inProgress } = updates[id];
+				const { success, error: updateError, nextStatus, inProgress } = get(
+					updates,
+					id,
+					{},
+				);
 				if (inProgress) {
 					return;
 				}

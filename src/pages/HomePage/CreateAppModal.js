@@ -258,7 +258,7 @@ class CreateAppModal extends Component {
 					/>
 					{createdApp && createdApp.error ? (
 						<div css={{ color: 'tomato', marginTop: 8 }}>
-							{createdApp.error.actual.message}
+							{get(createdApp, 'error.actual.message')}
 						</div>
 					) : null}
 				</div>
@@ -305,9 +305,9 @@ CreateAppModal.defaultProps = {
 };
 
 const mapStateToProps = (state) => ({
-	apps: state.apps,
-	appsMetrics: state.appsMetrics,
-	createdApp: state.createdApp,
+	apps: get(state, 'apps'),
+	appsMetrics: get(state, 'appsMetrics'),
+	createdApp: get(state, 'createdApp'),
 	defaultSettings: get(state, '$getAppSettings.defaultSettings'),
 	tier: get(state, '$getAppPlan.results.tier'),
 	featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),

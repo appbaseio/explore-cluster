@@ -139,7 +139,9 @@ class RoleBaseAccess extends React.Component {
 		this.setState((prevState) => ({
 			loadingKey: {
 				...prevState.loadingKey,
-				[id]: prevState.loadingKey[id] ? !prevState.loadingKey[id] : true,
+				[id]: get(prevState, `loadingKey.${id}`)
+					? !get(prevState, `loadingKey.${id}`)
+					: true,
 			},
 		}));
 	};
@@ -148,7 +150,9 @@ class RoleBaseAccess extends React.Component {
 		this.setState((prevState) => ({
 			visibleKey: {
 				...prevState.visibleKey,
-				[id]: prevState.visibleKey[id] ? !prevState.visibleKey[id] : true,
+				[id]: get(prevState, `visibleKey.${id}`)
+					? !get(prevState, `visibleKey.${id}`)
+					: true,
 			},
 		}));
 	};

@@ -91,7 +91,7 @@ class LanguageSettings extends React.Component {
 	getAnalyzerMappings = (res, getFieldValue) => {
 		// avoid mutation
 		const es6Mappings = get(res, 'payload._doc.properties');
-		const analyzerMappings = cloneDeep(res.payload.properties || es6Mappings);
+		const analyzerMappings = cloneDeep(get(res, 'payload.properties') || es6Mappings);
 		return applyLanguageAnalyzers(analyzerMappings, this.getFallBackLanguage(getFieldValue));
 	};
 
@@ -204,12 +204,15 @@ class LanguageSettings extends React.Component {
 			Object.keys(properties).reduce((agg, key) => {
 				if (level === 0) keyPath += `${key}`;
 				else keyPath += `.${key}`;
-				if (properties[key].properties) {
+				if (get(properties, `${key}.properties`)) {
 					return {
 						...agg,
 						[key]: {
 							...properties[key],
-							properties: applyDataFields(properties[key].properties, level + 1),
+							properties: applyDataFields(
+								get(properties, `${key}.properties`),
+								level + 1,
+							),
 						},
 					};
 				}

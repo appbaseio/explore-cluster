@@ -390,7 +390,7 @@ class FunctionsPage extends React.Component {
 	handleEnable = (isChecked, node) => {
 		if (!node) return;
 		const { putFunctions } = this.props;
-		putFunctions(node.function.service, {
+		putFunctions(get(node, 'function.service'), {
 			...node,
 			enabled: isChecked,
 			deploymentStatus: isChecked ? 'in_progress' : 'disabled',
@@ -411,13 +411,13 @@ class FunctionsPage extends React.Component {
 
 	onDragEnd = (result) => {
 		if (!result.destination) return;
-		if (result.destination.index === result.source.index) {
+		if (get(result, 'destination.index') === get(result, 'source.index')) {
 			return;
 		}
 		const functions = this.sortedDataSource;
 		const { reorderFunctions } = this.props;
 		const { source, destination } = result;
-		const sourceOrder = functions[source.index].order;
+		const sourceOrder = get(functions, `${get(source, 'index')}`, {}).order;
 		const updatedSource = {
 			...functions[source.index],
 			order: functions[destination.index].order,
@@ -596,7 +596,7 @@ class FunctionsPage extends React.Component {
 									dataSource={this.sortedDataSource}
 									renderItem={(item, index) => (
 										<DndDraggable
-											key={item.function.service}
+											key={get(item, 'function.service')}
 											item={item}
 											index={index}
 											render={(dragProvided) => (

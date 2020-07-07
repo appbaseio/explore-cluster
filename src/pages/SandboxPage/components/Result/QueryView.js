@@ -123,7 +123,7 @@ class QueryView extends React.Component {
 				});
 				if (onChange) {
 					onChange(parsedQuery.query);
-					toggleAnalytics(!!parsedQuery.settings.recordAnalytics);
+					toggleAnalytics(!!get(parsedQuery, 'settings.recordAnalytics'));
 				}
 				this.toggleExecutionStatus();
 			})
