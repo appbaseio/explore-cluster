@@ -15,6 +15,7 @@ import { setRole } from '../../utils';
 import { isBase64 } from '../../utils/helper';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import ErrorToaster from '../../components/ErrorToaster';
+import { withErrorToaster } from '../../components/ErrorToaster/ErrorToaster';
 
 const { Column } = Table;
 
@@ -443,4 +444,4 @@ const mapDispatchToProps = (dispatch) => ({
 		),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(RoleBaseAccess);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(RoleBaseAccess));

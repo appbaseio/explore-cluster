@@ -13,6 +13,7 @@ import { STRIPE_KEY } from '../../constants';
 import InsightLink from './components/InsightLink';
 import Loader from '../../components/Loader';
 import ErrorToaster from '../../components/ErrorToaster';
+import { withErrorToaster } from '../../components/ErrorToaster/ErrorToaster';
 
 class ClusterInsights extends React.Component {
 	state = {
@@ -184,4 +185,4 @@ const mapStateToProps = (state) => {
 	};
 };
 
-export default connect(mapStateToProps)(ClusterInsights);
+export default withErrorToaster(connect(mapStateToProps)(ClusterInsights));

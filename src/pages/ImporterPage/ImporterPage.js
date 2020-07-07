@@ -18,6 +18,7 @@ import 'antd/es/divider/style/css';
 import 'antd/es/switch/style/css';
 import 'antd/es/modal/style/css';
 import 'antd/es/card/style/css';
+import { withErrorToaster } from '../../components/ErrorToaster/ErrorToaster';
 
 // eslint-disable-next-line no-unused-expressions
 injectGlobal`
@@ -225,4 +226,4 @@ const mapStateToProps = (state) => {
 	};
 };
 
-export default connect(mapStateToProps)(ImporterPage);
+export default withErrorToaster(connect(mapStateToProps)(ImporterPage));

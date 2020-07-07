@@ -1,5 +1,5 @@
 import React from 'react';
-import { Result, Icon, Button, notification, Alert } from 'antd';
+import { Result, Icon, Button, Alert } from 'antd';
 import * as Sentry from '@sentry/browser';
 import PropTypes from 'prop-types';
 
@@ -21,10 +21,6 @@ class ErrorToaster extends React.Component {
 				scope.setExtra(key, errorInfo[key]);
 			});
 			Sentry.captureException(error);
-		});
-		notification.error({
-			message: 'Sorry for the inconvenience.',
-			description: JSON.stringify(error.message),
 		});
 	}
 
@@ -92,6 +88,21 @@ class ErrorToaster extends React.Component {
 		return <React.Fragment>{children}</React.Fragment>;
 	}
 }
+
+export const withErrorToaster = (Component, ...rest) => {
+	const WrappedComponent = (props) => {
+		return (
+			<ErrorToaster {...rest}>
+				<Component {...props} />
+			</ErrorToaster>
+		);
+	};
+
+	const name = Component.displayName || Component.name || 'Unknown';
+	WrappedComponent.displayName = `withErrorToaster(${name})`;
+
+	return WrappedComponent;
+};
 
 ErrorToaster.propTypes = {
 	inline: PropTypes.bool,

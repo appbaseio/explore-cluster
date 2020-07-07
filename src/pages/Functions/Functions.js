@@ -45,6 +45,7 @@ import { mediaKey } from '../../utils/media';
 import SearchPreviewSwitcher from '../../components/SearchPreviewSwitcher';
 import { allowedTiers, children } from '../../utils/prop-types';
 import ErrorToaster from '../../components/ErrorToaster';
+import { withErrorToaster } from '../../components/ErrorToaster/ErrorToaster';
 
 const link = css`
 	font-size: 14px;
@@ -748,4 +749,4 @@ const mapDispatchToProps = (dispatch) => ({
 	getFunction: (appName) => dispatch(getSingleFunction(appName)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(FunctionsPage);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(FunctionsPage));

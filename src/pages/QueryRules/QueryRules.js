@@ -17,6 +17,7 @@ import { bannerDetails } from './utils';
 import SearchPreviewSwitcher from '../../components/SearchPreviewSwitcher';
 import { allowedTiers } from '../../utils/prop-types';
 import ErrorToaster from '../../components/ErrorToaster';
+import { withErrorToaster } from '../../components/ErrorToaster/ErrorToaster';
 
 const { Header } = Layout;
 
@@ -264,4 +265,4 @@ const mapDispatchToProps = (dispatch) => ({
 		dispatch(reorderRules({ toBePromoted, toBeDemoted })),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(QueryRules);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(QueryRules));

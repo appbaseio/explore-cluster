@@ -25,6 +25,7 @@ import Shards from './Shards';
 import Loader from '../../batteries/components/shared/Loader';
 import { appendApp, loadApps, removeAppData } from '../../actions';
 import ErrorToaster from '../../components/ErrorToaster';
+import { withErrorToaster } from '../../components/ErrorToaster/ErrorToaster';
 
 const bannerMessage = {
 	title: 'Index Settings',
@@ -291,4 +292,4 @@ const mapDispatchToProps = (dispatch) => ({
 	fetchApps: () => dispatch(loadApps()),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(IndexSettings);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(IndexSettings));

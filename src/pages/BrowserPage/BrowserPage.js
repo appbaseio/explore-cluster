@@ -12,7 +12,6 @@ import {
 } from '../../batteries/modules/actions';
 
 import Loader from '../../components/Loader';
-import ErrorToaster from '../../components/ErrorToaster';
 import { getURL } from '../../constants/config';
 
 /* eslint-disable */
@@ -74,17 +73,15 @@ class BrowserPage extends Component {
 			>
 				{credentials ? (
 					<div>
-						<ErrorToaster>
-							<DejavuComponent
-								app={dejavu.appname}
-								url={dejavu.url}
-								credentials={credentials}
-								URLParams={false}
-								showHeaders={false}
-								forceReconnect
-								hasCloneApp={false}
-							/>
-						</ErrorToaster>
+						<DejavuComponent
+							app={dejavu.appname}
+							url={dejavu.url}
+							credentials={credentials}
+							URLParams={false}
+							showHeaders={false}
+							forceReconnect
+							hasCloneApp={false}
+						/>
 					</div>
 				) : (
 					<Loader />
@@ -117,4 +114,4 @@ const mapDispatchToProps = (dispatch) => ({
 	getPermission: (appName) => dispatch(getPermissionFromAppbase(appName)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(BrowserPage);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(BrowserPage));

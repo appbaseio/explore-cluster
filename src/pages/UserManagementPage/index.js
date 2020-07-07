@@ -18,6 +18,7 @@ import {
 import Container from '../../components/Container';
 import { getURL } from '../../constants/config';
 import ErrorToaster from '../../components/ErrorToaster';
+import { withErrorToaster } from '../../components/ErrorToaster/ErrorToaster';
 
 const { Paragraph } = Typography;
 const tableCls = css`
@@ -259,4 +260,4 @@ const mapDispatchToProps = (dispatch) => ({
 		dispatch(updateClusterUser(credentials, username, payload)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserManagementPage);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(UserManagementPage));

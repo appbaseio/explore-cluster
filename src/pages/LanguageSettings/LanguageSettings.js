@@ -36,6 +36,7 @@ import settingsMap from '../../components/ReviewAndSave/helper';
 import Loader from '../../components/Loader';
 import { allowedTiers } from '../../utils/prop-types';
 import ErrorToaster from '../../components/ErrorToaster';
+import { withErrorToaster } from '../../components/ErrorToaster/ErrorToaster';
 
 const bannerDetails = {
 	title: 'Language Settings',
@@ -508,4 +509,4 @@ const mapDispatchToProps = (dispatch) => ({
 
 const LanguageForm = Form.create({ name: 'language' })(LanguageSettings);
 
-export default connect(mapStateToProps, mapDispatchToProps)(LanguageForm);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(LanguageForm));

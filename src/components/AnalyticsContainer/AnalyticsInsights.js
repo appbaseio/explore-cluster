@@ -14,6 +14,7 @@ import { drawerClass } from './styles';
 import { getAppAnalyticsInsightsByName } from '../../batteries/modules/selectors';
 import { getMonthRange } from './utils';
 import ErrorToaster from '../ErrorToaster';
+import { withErrorToaster } from '../ErrorToaster/ErrorToaster';
 
 const { TabPane } = Tabs;
 
@@ -292,4 +293,4 @@ const mapDispatchToProps = (dispatch) => ({
 	getInsights: (name) => dispatch(getAppAnalyticsInsights(name)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(AnalyticsInsights);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(AnalyticsInsights));

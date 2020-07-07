@@ -22,6 +22,7 @@ import { isEqual, isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import { allowedTiers } from '../../utils/prop-types';
 import ErrorToaster from '../../components/ErrorToaster';
+import { withErrorToaster } from '../../components/ErrorToaster/ErrorToaster';
 
 const bannerDetails = {
 	title: 'Result Settings',
@@ -527,4 +528,4 @@ const mapDispatchToProps = (dispatch) => ({
 
 const ResultsForm = Form.create({ name: 'results' })(ResultsPage);
 
-export default connect(mapStateToProps, mapDispatchToProps)(ResultsForm);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(ResultsForm));

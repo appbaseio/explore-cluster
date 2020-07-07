@@ -13,6 +13,7 @@ import { loadApps } from '../../actions';
 import { mediaKey } from '../../utils/media';
 import AppDataWrapper from '../../components/AppDataWrapper';
 import ErrorToaster from '../../components/ErrorToaster';
+import { withErrorToaster } from '../../components/ErrorToaster/ErrorToaster';
 
 const link = css`
 	font-size: 16px;
@@ -193,4 +194,4 @@ const mapDispatchToProps = (dispatch) => ({
 	fetchApps: () => dispatch(loadApps()),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(HomePage);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(HomePage));

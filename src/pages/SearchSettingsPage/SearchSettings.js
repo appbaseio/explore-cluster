@@ -44,6 +44,7 @@ import Overlay from '../../components/Overlay';
 import { highlighter } from '../SandboxPage/components/Search';
 import { allowedTiers } from '../../utils/prop-types';
 import ErrorToaster from '../../components/ErrorToaster';
+import { withErrorToaster } from '../../components/ErrorToaster/ErrorToaster';
 
 const { Option } = Select;
 
@@ -1011,4 +1012,4 @@ const mapDispatchToProps = (dispatch) => ({
 	deleteSettingsAction: (name) => dispatch(deleteSettings(name)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(SearchSettingsPage);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(SearchSettingsPage));

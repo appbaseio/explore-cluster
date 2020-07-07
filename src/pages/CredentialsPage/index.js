@@ -18,6 +18,7 @@ import Loader from '../../batteries/components/shared/Loader/Spinner';
 import { getURL } from '../../constants/config';
 import DeleteAppModal from '../../components/AppCard/DeleteAppModal';
 import ErrorToaster from '../../components/ErrorToaster';
+import { withErrorToaster } from '../../components/ErrorToaster/ErrorToaster';
 
 const columns = [
 	{
@@ -333,4 +334,4 @@ const mapDispatchToProps = (dispatch) => ({
 		dispatch(updatePermission(appName, username, payload)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Credentials);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(Credentials));

@@ -25,6 +25,7 @@ import { isValidPlan } from '../../../batteries/utils';
 import generateSandboxURL from '../utils/sandbox-generator';
 import { allowedTiers } from '../../../utils/prop-types';
 import ErrorToaster from '../../../components/ErrorToaster';
+import { withErrorToaster } from '../../../components/ErrorToaster/ErrorToaster';
 
 const container = css`
 	padding: 16px;
@@ -467,4 +468,4 @@ SearchPreview.defaultProps = {
 	handleModal: () => {},
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(SearchPreview);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(SearchPreview));
