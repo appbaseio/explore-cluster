@@ -43,14 +43,12 @@ class LoginPage extends Component {
 
 	login = () => {
 		const { loadArcUser } = this.props;
-		if (get(this, 'url.current.input')) {
-			const username = get(this, 'username.current.input.value', '').trim();
-			const password = get(this, 'password.current.input.value');
-			const url = get(this, 'url.current.input.value');
+		const username = get(this, 'username.current.input.value', '').trim();
+		const password = get(this, 'password.current.input.value');
+		const url = get(this, 'url.current.input.value');
 
-			if (username && password) {
-				loadArcUser(username, password, url);
-			}
+		if (username && password && url) {
+			loadArcUser(username, password, url);
 		}
 	};
 
