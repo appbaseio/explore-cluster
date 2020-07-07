@@ -176,9 +176,9 @@ class SearchPreview extends React.Component {
 		const searchSettings =
 			state && state.settings ? state.settings.find((item) => item.id === 'search') : {};
 		const isGradingAllowed = isValidPlan(props.tier, props.featureGrade);
-		if (state.isGradingEnabled !== isGradingAllowed) {
+		if (!isGradingAllowed && state.isGradingEnabled) {
 			return {
-				isGradingEnabled: isGradingAllowed,
+				isGradingEnabled: false,
 			};
 		}
 
