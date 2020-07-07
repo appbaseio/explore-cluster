@@ -87,6 +87,10 @@ ListItemWrapper.defaultProps = {
 };
 
 const renderLoadMore = ({ size, loadMore, data, loading }) => {
+	if (!data || data.length % size !== 0) {
+		return null;
+	}
+
 	if (data.length < size) {
 		return null;
 	}
@@ -133,7 +137,12 @@ const ListView = ({ result }) => (
 								<ListItem key={item._id} item={item} />
 							))}
 							{result.pagination ||
-								renderLoadMore({ loading, loadMore, data, size: result.size })}
+								renderLoadMore({
+									loading,
+									loadMore,
+									data,
+									size: get(result, 'size', 10),
+								})}
 						</React.Fragment>
 					);
 				}}
