@@ -90,6 +90,11 @@ const ClusterInsights = Loadable({
 	loading: Loader,
 });
 
+const GradeEvaluation = Loadable({
+	loader: () => import('../../pages/GradeEvaluation'),
+	loading: Loader,
+});
+
 class ClusterRouteContainer extends React.Component {
 	shouldComponentUpdate(nextProps) {
 		const { location } = this.props;
@@ -224,6 +229,14 @@ class ClusterRouteContainer extends React.Component {
 						path="/cluster/curated-insights"
 						component={(props) => (
 							<AppPageContainer {...props} component={ClusterInsights} />
+						)}
+					/>
+
+					<Route
+						exact
+						path="/cluster/grade-evaluation"
+						component={(props) => (
+							<AppPageContainer {...props} component={GradeEvaluation} />
 						)}
 					/>
 

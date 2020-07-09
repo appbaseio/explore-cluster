@@ -64,6 +64,12 @@ const routes = {
 			{ label: 'Synonyms', link: 'synonyms', tag: 'Beta' },
 			{ label: 'Query Suggestions', link: 'query-suggestions', tag: 'Beta' },
 			{ label: 'Query Rules', link: '/cluster/rules', tag: 'Beta', hasExactPath: true },
+			{
+				label: 'Grade Evaluation',
+				link: '/cluster/grade-evaluation',
+				tag: 'Beta',
+				hasExactPath: true,
+			},
 			{ label: 'Functions', link: '/cluster/functions', tag: 'Beta', hasExactPath: true },
 		],
 	},

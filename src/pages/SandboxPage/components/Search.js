@@ -44,7 +44,7 @@ const searchStyle = css`
 `;
 
 const Search = (props) => {
-	const { app, search, handleValueChange, handleModal } = props;
+	const { app, search, handleValueChange, handleModal, onValueChange } = props;
 	return (
 		<Card>
 			<Row type="flex" gutter={8} align="middle" justify="space-between">
@@ -65,6 +65,7 @@ const Search = (props) => {
 									triggerQuery();
 								}
 							}}
+							onValueSelected={onValueChange}
 						/>
 					) : (
 						<div
@@ -113,6 +114,7 @@ Search.propTypes = {
 	app: PropTypes.string.isRequired,
 	handleValueChange: PropTypes.func,
 	handleModal: PropTypes.func,
+	onValueChange: PropTypes.func.isRequired,
 };
 
 Search.defaultProps = {

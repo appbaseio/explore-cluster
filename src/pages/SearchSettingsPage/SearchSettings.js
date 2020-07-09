@@ -397,6 +397,13 @@ class SearchSettingsPage extends React.Component {
 					});
 				} else {
 					message.success(`Search settings for ${appName} saved successfully`);
+					this.setState({
+						changedFields: {
+							new: {},
+							old: {},
+						},
+						changedFieldWeights: {},
+					});
 					if (isDirty) {
 						this.reIndex();
 					}
@@ -920,7 +927,7 @@ class SearchSettingsPage extends React.Component {
 												<Typography.Paragraph>
 													{field}:{' '}
 													<strong>
-														{get(changedFields, `${type}.${field}`)}
+														{get(changedFields, `${type}.${field}`, '')}
 													</strong>
 												</Typography.Paragraph>
 											),

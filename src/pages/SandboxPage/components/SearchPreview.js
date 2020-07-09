@@ -17,7 +17,7 @@ import {
 } from '../../../batteries/modules/actions';
 import Search from './Search';
 import Result from './Result/index';
-import { generateQuery } from '../utils';
+import { generateQuery, getQueryGrades } from '../utils';
 import { getAggsMappings } from '../../../batteries/utils/mappings';
 import { getURL } from '../../../constants/config';
 import { getSubFields } from '../../../utils';
@@ -37,8 +37,14 @@ class SearchPreview extends React.Component {
 	state = {
 		settings: null,
 		searchableMappings: {},
-		isAnalyticsEnabled: true,
+		isAnalyticsEnabled: localStorage.getItem('enableAnalytics')
+			? localStorage.getItem('enableAnalytics') === 'true'
+			: true,
 		isParsedStateApplied: false,
+		isGradingEnabled: localStorage.getItem('enableGrading')
+			? localStorage.getItem('enableGrading') === 'true'
+			: false,
+		queryGrades: {},
 	};
 
 	componentDidMount() {
@@ -56,6 +62,7 @@ class SearchPreview extends React.Component {
 			fetchRules,
 			tier,
 			featureRules,
+			featureGrade,
 			searchState,
 		} = this.props;
 
@@ -66,6 +73,15 @@ class SearchPreview extends React.Component {
 			if (!rules) {
 				fetchRules();
 			}
+		}
+
+		/*
+			Update Grading to be false if not a valid plan.
+		*/
+		if (isValidPlan(tier, featureGrade)) {
+			this.setQueryGrades('');
+		} else {
+			this.toggleGrading(false);
 		}
 
 		/*
@@ -131,7 +147,11 @@ class SearchPreview extends React.Component {
 
 	componentWillUnmount() {
 		const { clearState } = this.props;
-		clearState();
+		const { settings } = this.state;
+
+		if (settings) {
+			clearState();
+		}
 	}
 
 	getSearchableMappings = (mappings) => {
@@ -155,6 +175,12 @@ class SearchPreview extends React.Component {
 	static getDerivedStateFromProps(props, state) {
 		const searchSettings =
 			state && state.settings ? state.settings.find((item) => item.id === 'search') : {};
+		const isGradingAllowed = isValidPlan(props.tier, props.featureGrade);
+		if (!isGradingAllowed && state.isGradingEnabled) {
+			return {
+				isGradingEnabled: false,
+			};
+		}
 
 		if (props.searchState) {
 			const searchQuery = get(props, 'searchState', []).find(
@@ -248,8 +274,16 @@ class SearchPreview extends React.Component {
 	};
 
 	toggleAnalytics = (value) => {
+		localStorage.setItem('enableAnalytics', JSON.stringify(value));
 		this.setState({
 			isAnalyticsEnabled: value,
+		});
+	};
+
+	toggleGrading = (value) => {
+		localStorage.setItem('enableGrading', JSON.stringify(value));
+		this.setState({
+			isGradingEnabled: value,
 		});
 	};
 
@@ -274,6 +308,14 @@ class SearchPreview extends React.Component {
 		window.open(codesandboxURL, '_blank');
 	};
 
+	setQueryGrades = (query) => {
+		getQueryGrades({ query }).then((res) => {
+			this.setState({
+				queryGrades: res,
+			});
+		});
+	};
+
 	render() {
 		const {
 			settings,
@@ -285,8 +327,16 @@ class SearchPreview extends React.Component {
 			isFetchingMappings,
 			mappings,
 			handleModal,
+			tier,
+			featureGrade,
 		} = this.props;
-		const { settings: stateSettings, isAnalyticsEnabled } = this.state;
+		const {
+			settings: stateSettings,
+			isAnalyticsEnabled,
+			isGradingEnabled,
+			queryGrades,
+		} = this.state;
+		const isGradingAllowed = isValidPlan(tier, featureGrade);
 
 		if (fetchingDefaultSettings) {
 			return (
@@ -340,9 +390,27 @@ class SearchPreview extends React.Component {
 									Record Analytics
 									<Switch
 										checked={isAnalyticsEnabled}
-										style={{ marginLeft: 5 }}
+										style={{ marginLeft: 5, marginRight: 10 }}
 										onChange={this.toggleAnalytics}
 										id="analytics"
+									/>
+								</label>
+							</Tooltip>
+							<Tooltip
+								title={
+									isGradingAllowed
+										? 'Toggle to enable (or disable) grading of search results.'
+										: 'This feature is not available for the current plan, please upgrade to a higher plan.'
+								}
+							>
+								<label htmlFor="grading">
+									Grade Search
+									<Switch
+										checked={isGradingEnabled}
+										disabled={!isGradingAllowed}
+										style={{ marginLeft: 5 }}
+										onChange={this.toggleGrading}
+										id="grading"
 									/>
 								</label>
 							</Tooltip>
@@ -374,6 +442,7 @@ class SearchPreview extends React.Component {
 						<Search
 							handleValueChange={this.handleValueChange}
 							app={app}
+							onValueChange={this.setQueryGrades}
 							search={search}
 							handleModal={handleModal}
 						/>
@@ -381,12 +450,15 @@ class SearchPreview extends React.Component {
 							result={result}
 							query={stateSettings}
 							app={app}
+							queryGrades={get(queryGrades, 'docs', {})}
 							url={url}
+							searchTerm={get(search, 'value')}
 							toggleAnalytics={this.toggleAnalytics}
 							recordAnalytics={isAnalyticsEnabled}
 							rules={rules}
 							onChange={this.handleSettingsChange}
 							credentials={credentials}
+							isGradingEnabled={isGradingEnabled}
 						/>
 					</Col>
 				</ReactiveBase>
@@ -408,6 +480,7 @@ const mapStateToProps = (state, props) => {
 		url: getURL(),
 		rules: get(state, '$getAppRules.results'),
 		tier: get(state, '$getAppPlan.results.tier'),
+		featureGrade: get(state, '$getAppPlan.results.feature_search_grader'),
 		searchState: get(state, '$getSearchState.parsedSearchState', null),
 		featureRules: get(state, '$getAppPlan.results.feature_rules', false),
 	};
@@ -434,6 +507,7 @@ SearchPreview.propTypes = {
 	rules: PropTypes.array,
 	tier: allowedTiers,
 	featureRules: PropTypes.bool,
+	featureGrade: PropTypes.bool,
 	fetchingDefaultSettings: PropTypes.bool,
 	isFetchingMappings: PropTypes.bool,
 	mappings: PropTypes.object,
@@ -449,6 +523,7 @@ SearchPreview.defaultProps = {
 	rules: null,
 	tier: undefined,
 	featureRules: false,
+	featureGrade: false,
 	fetchingDefaultSettings: false,
 	isFetchingMappings: false,
 	mappings: null,

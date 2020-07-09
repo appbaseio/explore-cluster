@@ -8,6 +8,7 @@ import { get } from 'lodash';
 
 import { listItem } from './styles';
 import { children as childrenProp } from '../../../../utils/prop-types';
+import Grading from './Grading';
 
 const Container = ({ hasPagination, children }) => {
 	if (hasPagination) {
@@ -25,7 +26,7 @@ Container.defaultProps = {
 	hasPagination: false,
 };
 
-const ListItemWrapper = ({ item }) => {
+const ListItemWrapper = ({ item, isGradingEnabled, searchTerm, queryGrades }) => {
 	const { _promoted, _click_id, _index, highlight, index, ...rest } = item;
 	return (
 		<div className={listItem}>
@@ -73,17 +74,27 @@ const ListItemWrapper = ({ item }) => {
 					))}
 				</Row>
 			</ExpandCollapse>
+
+			{isGradingEnabled ? (
+				<Grading id={item._id} value={get(queryGrades, item._id)} searchTerm={searchTerm} />
+			) : null}
 			<Divider />
 		</div>
 	);
 };
 
 ListItemWrapper.propTypes = {
+	isGradingEnabled: PropTypes.bool,
 	item: PropTypes.object,
+	searchTerm: PropTypes.string,
+	queryGrades: PropTypes.object,
 };
 
 ListItemWrapper.defaultProps = {
 	item: {},
+	isGradingEnabled: false,
+	searchTerm: '',
+	queryGrades: {},
 };
 
 const renderLoadMore = ({ size, loadMore, data, loading }) => {
@@ -118,7 +129,7 @@ renderLoadMore.defaultProps = {
 
 const ListItem = React.memo(ListItemWrapper);
 
-const ListView = ({ result }) => (
+const ListView = ({ result, isGradingEnabled, searchTerm, queryGrades }) => (
 	<React.Fragment>
 		<Container hasPagination={result.pagination}>
 			<ReactiveList
@@ -134,7 +145,15 @@ const ListView = ({ result }) => (
 					return (
 						<React.Fragment>
 							{data.map((item) => (
-								<ListItem key={item._id} item={item} />
+								<React.Fragment>
+									<ListItem
+										key={item._id}
+										item={item}
+										queryGrades={queryGrades}
+										isGradingEnabled={isGradingEnabled}
+										searchTerm={searchTerm}
+									/>
+								</React.Fragment>
 							))}
 							{result.pagination ||
 								renderLoadMore({
@@ -153,10 +172,16 @@ const ListView = ({ result }) => (
 
 ListView.propTypes = {
 	result: PropTypes.object,
+	isGradingEnabled: PropTypes.bool,
+	searchTerm: PropTypes.string,
+	queryGrades: PropTypes.object,
 };
 
 ListView.defaultProps = {
 	result: {},
+	queryGrades: {},
+	isGradingEnabled: false,
+	searchTerm: '',
 };
 
 export default ListView;
