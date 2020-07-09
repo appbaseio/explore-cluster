@@ -153,7 +153,7 @@ export const aclOptionsLabel = {
 	reactivesearch: 'Reactive Search',
 	rules: 'Rules',
 	templates: 'Templates',
-	suggestions: 'Suggestions',
+	suggestions: 'Query Suggestions',
 	functions: 'Functions',
 	searchrelevancy: 'Search Relevancy',
 	synonyms: 'Synonyms',
