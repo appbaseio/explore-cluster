@@ -14,6 +14,7 @@ import {
 	Tooltip,
 	message,
 	Pagination,
+	Alert,
 } from 'antd';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
@@ -181,7 +182,7 @@ class GradeEvaluation extends React.Component {
 						))}
 					</Select>
 					{selectedIndices.length === 0 ? (
-						<HighLighter title="Add index for Comparison" />
+						<HighLighter title="Select index for Comparison" />
 					) : null}
 				</div>
 			);
@@ -294,19 +295,29 @@ class GradeEvaluation extends React.Component {
 					<Spin spinning={isFetchingApps}>
 						<Card title="Grade Metrics">
 							{this.renderIndexDropdown()}
-							<Table
-								rowKey={(query) => query}
-								scroll={{ x: 1200 }}
-								className={tableStyle}
-								columns={tableColumns}
-								pagination={false}
-								loading={isFetching}
-								dataSource={searchTerms}
-								locale={{
-									emptyText: <Empty description="No metrics data available" />,
-								}}
-							/>
-							{totalMetrics ? (
+							{selectedIndices.length > 0 ? (
+								<Table
+									rowKey={(query) => query}
+									scroll={{ x: 1200 }}
+									className={tableStyle}
+									columns={tableColumns}
+									pagination={false}
+									loading={isFetching}
+									dataSource={searchTerms}
+									locale={{
+										emptyText: (
+											<Empty description="No metrics data available" />
+										),
+									}}
+								/>
+							) : (
+								<Alert
+									type="warning"
+									showIcon
+									message="Select indices to compare"
+								/>
+							)}
+							{selectedIndices.length > 0 && totalMetrics ? (
 								<Pagination
 									style={{ marginTop: 10 }}
 									current={currentPage}
