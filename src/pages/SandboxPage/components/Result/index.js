@@ -31,6 +31,9 @@ class Result extends React.Component {
 			rules,
 			recordAnalytics,
 			toggleAnalytics,
+			isGradingEnabled,
+			searchTerm,
+			queryGrades,
 		} = this.props;
 		const { view } = this.state;
 		return (
@@ -106,7 +109,12 @@ class Result extends React.Component {
 					</Radio.Group>
 				</Row>
 				{view === 'list' ? (
-					<ListView result={result} />
+					<ListView
+						isGradingEnabled={isGradingEnabled}
+						searchTerm={searchTerm}
+						result={result}
+						queryGrades={queryGrades}
+					/>
 				) : (
 					<QueryView
 						app={app}
@@ -133,6 +141,9 @@ Result.propTypes = {
 	rules: PropTypes.array,
 	toggleAnalytics: PropTypes.func,
 	recordAnalytics: PropTypes.bool,
+	isGradingEnabled: PropTypes.bool,
+	searchTerm: PropTypes.string,
+	queryGrades: PropTypes.object,
 };
 
 Result.defaultProps = {
@@ -143,6 +154,9 @@ Result.defaultProps = {
 	rules: [],
 	toggleAnalytics: () => {},
 	recordAnalytics: true,
+	isGradingEnabled: false,
+	searchTerm: '',
+	queryGrades: {},
 };
 
 export default Result;

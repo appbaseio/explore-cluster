@@ -342,7 +342,7 @@ Billing.propTypes = {
 
 const mapStateToProps = (state) => {
 	const appPlan = getAppPlanByName(state);
-	const { username, password } = get(state, 'user.data', {});
+	const { username, password } = get(state, 'user.data') || {};
 	return {
 		isFetchingPlan: get(state, '$getAppPlan.isFetching'),
 		isAppPlanFetched: !!getAppPlanByName(state),
@@ -356,7 +356,7 @@ const mapStateToProps = (state) => {
 		subscriptionID: get(appPlan, 'subscription_id'),
 		isLoading: get(state, '$updateAppPaymentMethod.isFetching'),
 		errors: [get(state, '$updateAppPaymentMethod.error')],
-		credentials: username ? `${username}:${password}` : null,
+		credentials: username && password ? `${username}:${password}` : null,
 	};
 };
 

@@ -6,7 +6,6 @@ import Container from '../../components/Container';
 import Overlay from '../../components/Overlay';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import SearchPerformance from '../../batteries/components/analytics/components/SearchLatency';
-import ErrorToaster from '../../components/ErrorToaster';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -38,9 +37,7 @@ const SearchLatencyWrapper = ({ plan, isGrowth }) => (
 			<React.Fragment>
 				{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
 				<Container>
-					<ErrorToaster>
-						<SearchPerformance filterId="search_latency_page" />
-					</ErrorToaster>
+					<SearchPerformance filterId="search_latency_page" />
 				</Container>
 			</React.Fragment>
 		) : (

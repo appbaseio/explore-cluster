@@ -98,11 +98,18 @@ export const defaultRateLimits = {
 	streams: 10,
 	rules: 10,
 	reactivesearch: 10,
+	templates: 10,
+	suggestions: 10,
+	functions: 10,
+	searchrelevancy: 10,
+	synonyms: 10,
+	searchgrader: 10,
 };
 // Acl options
 export const aclOptions = [
 	'docs',
 	'search',
+	'reactivesearch',
 	'indices',
 	'cat',
 	'clusters',
@@ -112,7 +119,12 @@ export const aclOptions = [
 	'analytics',
 	'streams',
 	'rules',
-	'reactivesearch',
+	'suggestions',
+	'functions',
+	'searchgrader',
+	'searchrelevancy',
+	'synonyms',
+	'templates',
 ];
 // Default Selected Acl
 export const defaultAclOptions = aclOptions;
@@ -128,18 +140,24 @@ export const getAclOptionsByPlan = () => aclOptions;
 export const getDefaultAclOptionsByPlan = () => aclOptions;
 // Acl options label
 export const aclOptionsLabel = {
-	docs: 'docs',
-	search: 'search',
-	indices: 'indices',
-	cat: 'cat',
-	clusters: 'clusters',
-	misc: 'misc',
-	user: 'user',
-	permission: 'permission',
-	analytics: 'analytics',
-	streams: 'streams',
-	reactivesearch: 'reactivesearch',
-	rules: 'rules',
+	docs: 'Docs',
+	search: 'Search',
+	indices: 'Indices',
+	cat: 'Cat',
+	clusters: 'Clusters',
+	misc: 'Misc',
+	user: 'User',
+	permission: 'Permission',
+	analytics: 'Analytics',
+	streams: 'Streams',
+	reactivesearch: 'Reactive Search',
+	rules: 'Rules',
+	templates: 'Templates',
+	suggestions: 'Query Suggestions',
+	functions: 'Functions',
+	searchrelevancy: 'Search Relevancy',
+	synonyms: 'Synonyms',
+	searchgrader: 'Search Grader',
 };
 
 const filterCategories = (value) => {

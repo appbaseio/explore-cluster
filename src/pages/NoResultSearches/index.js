@@ -6,7 +6,6 @@ import Overlay from '../../components/Overlay';
 import Container from '../../components/Container';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import NoResultSearch from '../../batteries/components/analytics/components/NoResultsSearch';
-import ErrorToaster from '../../components/ErrorToaster';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -36,14 +35,12 @@ const NoResultSearchWrapper = ({ appName, plan, isPaidUser }) => (
 			<React.Fragment>
 				{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
 				<Container>
-					<ErrorToaster>
-						<NoResultSearch
-							filterId="no_results_page"
-							displayReplaySearch={window.location.pathname.startsWith('/app')}
-							appName={appName}
-							plan={plan}
-						/>
-					</ErrorToaster>
+					<NoResultSearch
+						filterId="no_results_page"
+						displayReplaySearch={window.location.pathname.startsWith('/app')}
+						appName={appName}
+						plan={plan}
+					/>
 				</Container>
 			</React.Fragment>
 		) : (

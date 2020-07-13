@@ -6,7 +6,6 @@ import Overlay from '../../components/Overlay';
 import Container from '../../components/Container';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import RequestLogs from '../../batteries/components/analytics/components/RequestLogs';
-import ErrorToaster from '../../components/ErrorToaster';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -37,9 +36,7 @@ const RequestLogsWrapper = ({ appName, plan, isPaidUser }) => (
 			<React.Fragment>
 				{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
 				<Container>
-					<ErrorToaster>
-						<RequestLogs appName={appName} />
-					</ErrorToaster>
+					<RequestLogs appName={appName} />
 				</Container>
 			</React.Fragment>
 		) : (

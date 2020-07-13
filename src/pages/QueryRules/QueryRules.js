@@ -48,7 +48,7 @@ class QueryRules extends Component {
 		}
 
 		if (prevProps.deleted !== deleted) {
-			message.success('Deleted Item successfully');
+			message.success('Deleted item successfully');
 		}
 	}
 
