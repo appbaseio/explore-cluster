@@ -57,4 +57,4 @@ Filter.defaultProps = {
 	handleModal: () => {},
 };
 
-export default Filter;
+export default React.memo(Filter);

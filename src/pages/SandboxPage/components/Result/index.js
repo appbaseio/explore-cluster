@@ -14,6 +14,20 @@ class Result extends React.Component {
 		view: 'list',
 	};
 
+	shouldComponentUpdate(nextProps, nextState) {
+		const { result, app, rules } = this.props;
+		const { view } = this.state;
+		if (
+			JSON.stringify(result) === JSON.stringify(nextProps.result) &&
+			app === nextProps.app &&
+			view === nextState.view &&
+			JSON.stringify(rules) === JSON.stringify(nextProps.rules)
+		) {
+			return false;
+		}
+		return true;
+	}
+
 	handleViewChange = (e) => {
 		this.setState({
 			view: e.target.value,
@@ -21,20 +35,7 @@ class Result extends React.Component {
 	};
 
 	render() {
-		const {
-			result,
-			app,
-			credentials,
-			url,
-			onChange,
-			query,
-			rules,
-			recordAnalytics,
-			toggleAnalytics,
-			isGradingEnabled,
-			searchTerm,
-			queryGrades,
-		} = this.props;
+		const { result, app, rules } = this.props;
 		const { view } = this.state;
 		return (
 			<Card>
@@ -108,24 +109,7 @@ class Result extends React.Component {
 						</Radio.Button>
 					</Radio.Group>
 				</Row>
-				{view === 'list' ? (
-					<ListView
-						isGradingEnabled={isGradingEnabled}
-						searchTerm={searchTerm}
-						result={result}
-						queryGrades={queryGrades}
-					/>
-				) : (
-					<QueryView
-						app={app}
-						recordAnalytics={recordAnalytics}
-						credentials={credentials}
-						url={url}
-						toggleAnalytics={toggleAnalytics}
-						query={query}
-						onChange={onChange}
-					/>
-				)}
+				{view === 'list' ? <ListView result={result} /> : <QueryView />}
 			</Card>
 		);
 	}
@@ -134,29 +118,12 @@ class Result extends React.Component {
 Result.propTypes = {
 	result: PropTypes.object,
 	app: PropTypes.string.isRequired,
-	credentials: PropTypes.string.isRequired,
-	url: PropTypes.string,
-	onChange: PropTypes.func,
-	query: PropTypes.array,
 	rules: PropTypes.array,
-	toggleAnalytics: PropTypes.func,
-	recordAnalytics: PropTypes.bool,
-	isGradingEnabled: PropTypes.bool,
-	searchTerm: PropTypes.string,
-	queryGrades: PropTypes.object,
 };
 
 Result.defaultProps = {
 	result: {},
-	url: undefined,
-	onChange: null,
-	query: [],
 	rules: [],
-	toggleAnalytics: () => {},
-	recordAnalytics: true,
-	isGradingEnabled: false,
-	searchTerm: '',
-	queryGrades: {},
 };
 
 export default Result;

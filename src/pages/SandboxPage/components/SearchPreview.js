@@ -24,6 +24,7 @@ import { getSubFields } from '../../../utils';
 import { isValidPlan } from '../../../batteries/utils';
 import generateSandboxURL from '../utils/sandbox-generator';
 import { allowedTiers } from '../../../utils/prop-types';
+import SandboxContext from './SandboxContext';
 
 const container = css`
 	padding: 16px;
@@ -446,20 +447,23 @@ class SearchPreview extends React.Component {
 							search={search}
 							handleModal={handleModal}
 						/>
-						<Result
-							result={result}
-							query={stateSettings}
-							app={app}
-							queryGrades={get(queryGrades, 'docs', {})}
-							url={url}
-							searchTerm={get(search, 'value')}
-							toggleAnalytics={this.toggleAnalytics}
-							recordAnalytics={isAnalyticsEnabled}
-							rules={rules}
-							onChange={this.handleSettingsChange}
-							credentials={credentials}
-							isGradingEnabled={isGradingEnabled}
-						/>
+
+						<SandboxContext.Provider
+							value={{
+								app,
+								credentials,
+								url,
+								queryGrades: get(queryGrades, 'docs', {}),
+								recordAnalytics: isAnalyticsEnabled,
+								isGradingEnabled,
+								searchTerm: get(search, 'value', get(search, 'defaultValue')),
+								query: stateSettings,
+								toggleAnalytics: this.toggleAnalytics,
+								onSettingsChange: this.handleSettingsChange,
+							}}
+						>
+							<Result result={result} app={app} rules={rules} />
+						</SandboxContext.Provider>
 					</Col>
 				</ReactiveBase>
 			</Row>
