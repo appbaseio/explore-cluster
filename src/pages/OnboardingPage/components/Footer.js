@@ -7,16 +7,10 @@ const Footer = ({ previousScreen, disabled, app, label, nextScreen }) => (
 	<footer>
 		<div className="left-column">
 			{previousScreen ? (
-				<a
-					className="button has-icon"
-					style={{ padding: '0 24px 0 16px' }}
-					onClick={previousScreen}
-				>
+				<a className="button has-icon" style={{ marginRight: 16 }} onClick={previousScreen}>
 					<Icon type="left" theme="outlined" /> &nbsp; Previous
 				</a>
 			) : null}
-		</div>
-		<div className="right-column">
 			{label === 'Finish' ? (
 				<a
 					className={`button has-icon ${disabled ? 'disabled' : ''}`}
