@@ -80,7 +80,9 @@ class SearchPreview extends React.Component {
 			Update Grading to be false if not a valid plan.
 		*/
 		if (isValidPlan(tier, featureGrade)) {
-			this.setQueryGrades('');
+			const search = (searchState || []).find((component) => component.id === 'search');
+			const searchValue = get(search, 'value', get(search, 'defaultValue', ''));
+			this.setQueryGrades(searchValue);
 		} else {
 			this.toggleGrading(false);
 		}

@@ -148,16 +148,16 @@ class ListView extends React.Component {
 						scrollTarget="result-container"
 						style={{ margin: '12px 0' }}
 						componentId={result.id}
-						render={({ data, loading, loadMore }) => {
+						render={({ data, loading, loadMore, triggerAnalytics }) => {
 							if (loading && (!data || !data.length)) {
 								return <Spin />;
 							}
 							return (
 								<React.Fragment>
 									{data.map((item) => (
-										<React.Fragment>
+										<div onClick={() => triggerAnalytics(item._click_id)}>
 											<ListItem key={item._id} item={item} />
-										</React.Fragment>
+										</div>
 									))}
 									{result.pagination ||
 										renderLoadMore({
