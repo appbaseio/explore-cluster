@@ -190,8 +190,7 @@ export default class Introduction extends Component {
 				</div>
 			</div>
 			<footer>
-				<div className="left-column" />
-				<div className="right-column">
+				<div className="left-column">
 					<a className="button has-icon" onClick={this.nextLayout}>
 						Next &nbsp; <Icon type="right" theme="outlined" />
 					</a>
@@ -251,8 +250,7 @@ export default class Introduction extends Component {
 					<Footer nextScreen={nextScreen} />
 				) : (
 					<footer>
-						<div className="left-column" />
-						<div className="right-column">
+						<div className="left-column">
 							<a onClick={this.setMapping} className="primary button big">
 								Import Movies Dataset
 							</a>
