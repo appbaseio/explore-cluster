@@ -115,6 +115,10 @@ export const getAppCount = (appStats, plan) => {
 };
 
 export const validateAppName = (name) => {
+	// Contains uppercase letter
+	if (name !== name.toLowerCase()) {
+		return false;
+	}
 	const symbolsToCheck = /[\s#&*'"\\|,<>\/?]/; //eslint-disable-line
 	const nameCharacters = name.split('');
 	const startsWith =
