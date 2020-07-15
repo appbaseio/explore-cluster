@@ -39,19 +39,6 @@ const routes = {
 			{ label: 'Search Preview', link: 'search-preview', tag: 'Beta' },
 		],
 	},
-	Analytics: {
-		icon: 'line-chart',
-		menu: [
-			{ label: 'Overview', link: 'analytics' },
-			{ label: 'Popular Searches', link: 'popular-searches' },
-			{ label: 'No Result Searches', link: 'no-results-searches' },
-			{ label: 'Popular Filters', link: 'popular-filters' },
-			{ label: 'Popular Results', link: 'popular-results' },
-			{ label: 'Geo Distribution', link: 'geo-distribution' },
-			{ label: 'Requests Per Minute', link: 'requests-per-minute' },
-			{ label: 'Search Latency', link: 'search-latency' },
-		],
-	},
 	'Search Relevancy': {
 		icon: 'search',
 		menu: [
@@ -71,6 +58,19 @@ const routes = {
 				hasExactPath: true,
 			},
 			{ label: 'Functions', link: '/cluster/functions', tag: 'Beta', hasExactPath: true },
+		],
+	},
+	Analytics: {
+		icon: 'line-chart',
+		menu: [
+			{ label: 'Overview', link: 'analytics' },
+			{ label: 'Popular Searches', link: 'popular-searches' },
+			{ label: 'No Result Searches', link: 'no-results-searches' },
+			{ label: 'Popular Filters', link: 'popular-filters' },
+			{ label: 'Popular Results', link: 'popular-results' },
+			{ label: 'Geo Distribution', link: 'geo-distribution' },
+			{ label: 'Requests Per Minute', link: 'requests-per-minute' },
+			{ label: 'Search Latency', link: 'search-latency' },
 		],
 	},
 	'Curated Insights': {
