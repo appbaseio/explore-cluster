@@ -36,7 +36,12 @@ import { getAggsMappings } from '../../batteries/utils/mappings';
 import ReviewAndSave from '../../components/ReviewAndSave';
 import SettingsFooter from '../../components/SettingsFooter';
 import { container } from '../ResultsPage/styles';
-import { getSubFields, reservedSearchSubFields, removeSubFields } from '../../utils';
+import {
+	getSubFields,
+	reservedSearchSubFields,
+	removeSubFields,
+	getFieldWeight,
+} from '../../utils';
 import settingsMap from '../../components/ReviewAndSave/helper';
 import { isEqual, isValidPlan } from '../../batteries/utils';
 import mappingUsecase from '../../batteries/utils/mappingUsecase';
@@ -260,7 +265,11 @@ class SearchSettingsPage extends React.Component {
 		return searchableFields.reduce(
 			(agg, field, index) => ({
 				...agg,
-				[field]: get(settings, `search.fieldWeights.${index}`, 1),
+				[field]: get(
+					settings,
+					`search.fieldWeights.${index}`,
+					getFieldWeight((field || '').split('.').pop(), 1),
+				),
 			}),
 			{},
 		);
