@@ -352,7 +352,7 @@ class PricingTable extends Component {
 					otp: '',
 				});
 				notification.success({
-					title: 'OTP sent successfully',
+					title: 'Activation code sent successfully',
 					message,
 				});
 			}
@@ -420,7 +420,7 @@ class PricingTable extends Component {
 					<div style={{ margin: '20px 0px' }}>
 						<Flex>
 							<Input
-								addonBefore="Enter OTP"
+								addonBefore="Enter Activation code"
 								name="otp"
 								value={otp}
 								autoFocus

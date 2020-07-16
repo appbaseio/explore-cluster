@@ -138,7 +138,7 @@ class EmailAuth extends React.Component {
 				{showOtp ? (
 					<React.Fragment>
 						<Input
-							placeholder="Enter OTP"
+							placeholder="Enter Activation code"
 							name="otp"
 							onChange={this.handleInput}
 							value={otp}
@@ -154,7 +154,7 @@ class EmailAuth extends React.Component {
 							className={emailBtn}
 							block
 						>
-							Verify OTP
+							Verify Activation Code
 						</Button>
 						<Flex flexDirection="column" alignItems="flex-end">
 							<Button
@@ -165,7 +165,7 @@ class EmailAuth extends React.Component {
 								className={smallBtn}
 								type="link"
 							>
-								{isLoading ? 'Sending ...' : 'Resend OTP'}
+								{isLoading ? 'Sending ...' : 'Resend Activation code'}
 							</Button>
 							<Button
 								type="link"
@@ -188,7 +188,7 @@ class EmailAuth extends React.Component {
 						type="primary"
 						block
 					>
-						{isEmailAuth ? 'Receive OTP' : authText}
+						{isEmailAuth ? 'Receive Activation Code' : authText}
 					</Button>
 				)}
 			</React.Fragment>
