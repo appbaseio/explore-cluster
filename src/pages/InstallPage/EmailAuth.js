@@ -92,7 +92,7 @@ class EmailAuth extends React.Component {
 				this.toggleVerifyLoading();
 			} else {
 				message.success(
-					'We have sent you the Arc installation instructions in the e-mail.',
+					'We have sent you the appbase.io self-host installation instructions in the e-mail.',
 				);
 				this.toggleVerifyLoading();
 				setTimeout(() => {

@@ -1043,7 +1043,7 @@ class PricingTable extends Component {
 							<td />
 							<td>
 								<PaymentButton
-									name="Arc Basic Plan"
+									name="Appbase.io Basic Plan"
 									plan={ARC_PLANS.ARC_BASIC}
 									isCurrentPlan={isArcBasic}
 									handleToken={this.handleToken}
@@ -1053,7 +1053,7 @@ class PricingTable extends Component {
 							</td>
 							<td>
 								<PaymentButton
-									name="Arc Standard Plan"
+									name="Appbase.io Standard Plan"
 									plan={ARC_PLANS.ARC_STANDARD}
 									isCurrentPlan={isArcStandard}
 									handleToken={this.handleToken}
@@ -1067,7 +1067,7 @@ class PricingTable extends Component {
 							</td>
 							<td>
 								<PaymentButton
-									name="Arc Enterprise Plan"
+									name="Appbase.io Enterprise Plan"
 									plan={ARC_PLANS.ARC_ENTERPRISE}
 									isCurrentPlan={isArcEnterprise}
 									handleToken={this.handleToken}
@@ -1101,7 +1101,7 @@ class PricingTable extends Component {
 						buttonText={isArcBasic ? 'Unsubscribe' : undefined}
 						onClickButton={onToggleUnsubscribeModal}
 						price={this.getPlan(PRICE_BY_PLANS[ARC_PLANS.ARC_BASIC])}
-						stripeName="Arc basic plan"
+						stripeName="Appbase.io basic plan"
 						plan={ARC_PLANS.ARC_BASIC}
 						amount={PRICE_BY_PLANS[ARC_PLANS.ARC_BASIC] * 100}
 						token={(token) => this.handleToken(token, ARC_PLANS.ARC_BASIC)}
@@ -1197,7 +1197,7 @@ class PricingTable extends Component {
 						plan={ARC_PLANS.ARC_ENTERPRISE}
 						isCurrentPlan={isArcEnterprise}
 						price={this.getPlan(PRICE_BY_PLANS[ARC_PLANS.ARC_ENTERPRISE])}
-						stripeName="Arc enterprise plan"
+						stripeName="Appbase.io enterprise plan"
 						amount={PRICE_BY_PLANS[ARC_PLANS.ARC_ENTERPRISE] * 100}
 						token={(token) => this.handleToken(token, ARC_PLANS.ARC_ENTERPRISE)}
 						stripeKey={this.stripeKey}

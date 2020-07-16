@@ -213,7 +213,7 @@ export async function cloneApp(source, destination, payload = {}) {
 	if (response.status >= 400) {
 		if (response.status === 400 || response.status === 406) {
 			throw new Error(
-				'You need to upgrade Arc (appbase.io) to v7.11.0 or above to take advantage of this feature.',
+				'You need to upgrade appbase.io to v7.11.0 or above to take advantage of this feature.',
 			);
 		}
 		throw new Error('An error occurred while cloning the index. Please try again.');

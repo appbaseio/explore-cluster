@@ -259,7 +259,7 @@ class Billing extends Component {
 										cluster detail view
 									</a>{' '}
 									to unsubscribe from your current plan. You will lose access to
-									Arc APIs and dashboard views after doing this.
+									appbase.io APIs and dashboard views after doing this.
 								</p>
 							</Panel>
 						</Collapse>
