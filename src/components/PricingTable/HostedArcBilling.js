@@ -352,7 +352,7 @@ class HostedArcBilling extends Component {
 					otp: '',
 				});
 				notification.success({
-					title: 'OTP sent successfully',
+					title: 'Activation code sent successfully',
 					message,
 				});
 			}
@@ -426,7 +426,7 @@ class HostedArcBilling extends Component {
 					<div style={{ margin: '20px 0px' }}>
 						<Flex>
 							<Input
-								addonBefore="Enter OTP"
+								addonBefore="Enter Activation code"
 								name="otp"
 								value={otp}
 								autoFocus
@@ -460,7 +460,7 @@ class HostedArcBilling extends Component {
 									<br />
 									<small style={{ fontWeight: 700 }}>/month</small>
 								</Price>
-								<Caption>Works with 1 ElasticSearch node</Caption>
+								<Caption>Works with 1 Elasticsearch node</Caption>
 							</td>
 							<td>
 								<Title>STANDARD PLAN</Title>
@@ -470,7 +470,7 @@ class HostedArcBilling extends Component {
 									<small style={{ fontWeight: 700 }}>/month</small>
 								</Price>
 								<Caption style={{ color: 'white' }}>
-									Works with upto 3 ElasticSearch nodes.
+									Works with upto 3 Elasticsearch nodes.
 								</Caption>
 							</td>
 
@@ -482,7 +482,7 @@ class HostedArcBilling extends Component {
 									<small style={{ fontWeight: 700 }}>/month</small>
 								</Price>
 								<Caption style={{ color: 'white' }}>
-									Works with upto 10 ElasticSearch nodes.
+									Works with upto 10 Elasticsearch nodes.
 								</Caption>
 							</td>
 						</tr>
@@ -491,7 +491,7 @@ class HostedArcBilling extends Component {
 						<tr className={HeadingTr}>
 							<td>
 								Developer Experience
-								<small>Tools to enhance your ElasticSearch experience.</small>
+								<small>Tools to enhance your Elasticsearch experience.</small>
 							</td>
 							<td />
 							<td />
@@ -499,7 +499,7 @@ class HostedArcBilling extends Component {
 						</tr>
 						<tr>
 							<td>
-								<span data-tip="GUI and CLI based import tools for CSV, JSON, ElasticSearch, SQL, MongoDB based data sources.">
+								<span data-tip="GUI and CLI based import tools for CSV, JSON, Elasticsearch, SQL, MongoDB based data sources.">
 									Data Import
 								</span>
 							</td>
@@ -549,7 +549,7 @@ class HostedArcBilling extends Component {
 						</tr>
 						<tr>
 							<td>
-								<span data-tip="Perform CRUD operations on your ElasticSearch data visually.">
+								<span data-tip="Perform CRUD operations on your Elasticsearch data visually.">
 									Data Browser
 								</span>
 							</td>
@@ -1046,7 +1046,7 @@ class HostedArcBilling extends Component {
 							<td />
 							<td>
 								<PaymentButton
-									name="Arc Basic Plan"
+									name="Appbase.io Basic Plan"
 									plan={ARC_PLANS.HOSTED_ARC_BASIC}
 									disabled={isArcBasic}
 									isCurrentPlan={isArcBasic}
@@ -1056,7 +1056,7 @@ class HostedArcBilling extends Component {
 							</td>
 							<td>
 								<PaymentButton
-									name="Arc Standard Plan"
+									name="Appbase.io Standard Plan"
 									plan={ARC_PLANS.HOSTED_ARC_STANDARD}
 									disabled={isArcStandard}
 									isCurrentPlan={isArcStandard}
@@ -1070,7 +1070,7 @@ class HostedArcBilling extends Component {
 							</td>
 							<td>
 								<PaymentButton
-									name="Arc Enterprise Plan"
+									name="Appbase.io Enterprise Plan"
 									plan={ARC_PLANS.HOSTED_ARC_ENTERPRISE}
 									disabled={isArcEnterprise}
 									isCurrentPlan={isArcEnterprise}
@@ -1102,7 +1102,7 @@ class HostedArcBilling extends Component {
 						isCurrentPlan={isArcBasic}
 						buttonText={isArcBasic ? 'Current Plan' : undefined}
 						price={this.getPlan(PRICE_BY_PLANS[ARC_PLANS.HOSTED_ARC_BASIC])}
-						stripeName="Arc basic plan"
+						stripeName="Appbase.io basic plan"
 						plan={ARC_PLANS.HOSTED_ARC_BASIC}
 						amount={PRICE_BY_PLANS[ARC_PLANS.HOSTED_ARC_BASIC] * 100}
 						token={(token) => this.handleToken(token, ARC_PLANS.HOSTED_ARC_BASIC)}
@@ -1199,7 +1199,7 @@ class HostedArcBilling extends Component {
 						plan={ARC_PLANS.HOSTED_ARC_ENTERPRISE}
 						isCurrentPlan={isArcEnterprise}
 						price={this.getPlan(PRICE_BY_PLANS[ARC_PLANS.HOSTED_ARC_ENTERPRISE])}
-						stripeName="Arc enterprise plan"
+						stripeName="Appbase.io enterprise plan"
 						amount={PRICE_BY_PLANS[ARC_PLANS.HOSTED_ARC_ENTERPRISE] * 100}
 						token={(token) => this.handleToken(token, ARC_PLANS.HOSTED_ARC_ENTERPRISE)}
 						stripeKey={this.stripeKey}
