@@ -456,7 +456,7 @@ class PricingTable extends Component {
 									<br />
 									<small style={{ fontWeight: 700 }}>/month</small>
 								</Price>
-								<Caption>Works with 1 ElasticSearch node</Caption>
+								<Caption>Works with 1 Elasticsearch node</Caption>
 							</td>
 							<td>
 								<Title>STANDARD PLAN</Title>
@@ -466,7 +466,7 @@ class PricingTable extends Component {
 									<small style={{ fontWeight: 700 }}>/month</small>
 								</Price>
 								<Caption style={{ color: 'white' }}>
-									Works with upto 3 ElasticSearch nodes.
+									Works with upto 3 Elasticsearch nodes.
 								</Caption>
 							</td>
 
@@ -478,7 +478,7 @@ class PricingTable extends Component {
 									<small style={{ fontWeight: 700 }}>/month</small>
 								</Price>
 								<Caption style={{ color: 'white' }}>
-									Works with upto 10 ElasticSearch nodes.
+									Works with upto 10 Elasticsearch nodes.
 								</Caption>
 							</td>
 						</tr>
@@ -487,7 +487,7 @@ class PricingTable extends Component {
 						<tr className={HeadingTr}>
 							<td>
 								Developer Experience
-								<small>Tools to enhance your ElasticSearch experience.</small>
+								<small>Tools to enhance your Elasticsearch experience.</small>
 							</td>
 							<td />
 							<td />
@@ -495,7 +495,7 @@ class PricingTable extends Component {
 						</tr>
 						<tr>
 							<td>
-								<span data-tip="GUI and CLI based import tools for CSV, JSON, ElasticSearch, SQL, MongoDB based data sources.">
+								<span data-tip="GUI and CLI based import tools for CSV, JSON, Elasticsearch, SQL, MongoDB based data sources.">
 									Data Import
 								</span>
 							</td>
@@ -545,7 +545,7 @@ class PricingTable extends Component {
 						</tr>
 						<tr>
 							<td>
-								<span data-tip="Perform CRUD operations on your ElasticSearch data visually.">
+								<span data-tip="Perform CRUD operations on your Elasticsearch data visually.">
 									Data Browser
 								</span>
 							</td>

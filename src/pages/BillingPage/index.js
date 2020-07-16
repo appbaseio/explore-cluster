@@ -187,7 +187,7 @@ class Billing extends Component {
 											marginTop: '-35px',
 										}}
 										gridRatio={0.4}
-										label={<h3 css={heading}>Total ElasticSearch Nodes</h3>}
+										label={<h3 css={heading}>Total Elasticsearch Nodes</h3>}
 										component={nodeCount}
 									/>
 								</Flex>

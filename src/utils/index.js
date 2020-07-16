@@ -53,7 +53,7 @@ export async function getUser(username, password, url) {
 			sessionStorage.setItem('version', version);
 		})
 		.catch((e) => {
-			console.error('Error while fetching the ElasticSearch details');
+			console.error('Error while fetching the Elasticsearch details');
 			console.error(e);
 		});
 

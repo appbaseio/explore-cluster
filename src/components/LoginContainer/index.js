@@ -14,7 +14,7 @@ const LoginContainer = ({ children }) => (
 				<h2 className="title">
 					<mark>
 						Give <span className="highlight">superpowers</span> to your
-						&nbsp;ElasticSearch cluster!
+						&nbsp;Elasticsearch cluster!
 					</mark>
 				</h2>
 				<p>

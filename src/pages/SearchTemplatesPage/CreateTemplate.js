@@ -22,7 +22,7 @@ const main = css`
 
 const queryMessage = () => (
 	<div style={{ width: 500 }}>
-		Query is a templatized ElasticSearch query that should be passed in the following format.
+		Query is a templatized Elasticsearch query that should be passed in the following format.
 		<br />
 		<br />
 		<pre>

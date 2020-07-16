@@ -217,7 +217,7 @@ const toolTips = {
 				rel="noopener noreferrer"
 				href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html"
 			>
-				ElasticSearch Query String
+				Elasticsearch Query String
 			</a>{' '}
 			syntax.{' '}
 			<a
