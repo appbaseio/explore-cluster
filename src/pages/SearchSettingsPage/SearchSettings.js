@@ -921,7 +921,7 @@ class SearchSettingsPage extends React.Component {
 											type="warning"
 											showIcon
 											style={{ marginBottom: 10 }}
-											description="Re-indexing required for applying below changes."
+											description="Re-indexing is required for applying below changes."
 										/>
 									) : null
 								}
