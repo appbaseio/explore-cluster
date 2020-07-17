@@ -19,6 +19,7 @@ import {
 	Skeleton,
 	Radio,
 	Typography,
+	Alert,
 } from 'antd';
 
 import {
@@ -914,6 +915,16 @@ class SearchSettingsPage extends React.Component {
 									queryFormat,
 									queryType,
 								}}
+								renderContent={() =>
+									isDirty ? (
+										<Alert
+											type="warning"
+											showIcon
+											style={{ marginBottom: 10 }}
+											description="Re-indexing required for applying below changes."
+										/>
+									) : null
+								}
 								renderField={({ type, record }) => {
 									const fieldName = get(record, 'setting', '').toLowerCase();
 									if (fieldName === 'datafield') {

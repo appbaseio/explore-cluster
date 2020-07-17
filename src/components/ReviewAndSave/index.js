@@ -32,6 +32,7 @@ class ReviewAndSave extends React.Component {
 			loading,
 			isReset,
 			renderField,
+			renderContent,
 		} = this.props;
 		const difference = this.difference(oldValues, newValues);
 		const isDifferent = keys(difference).length > 0;
@@ -66,6 +67,7 @@ class ReviewAndSave extends React.Component {
 					width={1000}
 					footer={isReset ? footer[1] : footer}
 				>
+					{renderContent ? renderContent() : null}
 					<DiffTable
 						object={difference}
 						parseDiff={(field) => ({
@@ -94,6 +96,7 @@ ReviewAndSave.propTypes = {
 	loading: PropTypes.bool,
 	isReset: PropTypes.bool,
 	renderField: PropTypes.func,
+	renderContent: PropTypes.func,
 };
 
 ReviewAndSave.defaultProps = {
@@ -104,6 +107,7 @@ ReviewAndSave.defaultProps = {
 	loading: false,
 	isReset: false,
 	renderField: null,
+	renderContent: null,
 };
 
 export default ReviewAndSave;
