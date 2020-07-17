@@ -34,7 +34,7 @@ class ListItem extends React.Component {
 
 	render() {
 		const { item } = this.props;
-		const { _promoted, _click_id, _index, highlight, index, ...rest } = item;
+		const { _promoted, _click_id, _index, highlight, _type, index, ...rest } = item;
 		return (
 			<div className={listItem}>
 				{_promoted && (
