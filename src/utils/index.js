@@ -636,7 +636,7 @@ export const removeSubFields = (dataField) => {
 	);
 
 	if (Array.isArray(dataField)) {
-		return parsedFields;
+		return [...new Set(parsedFields)];
 	}
 
 	return parsedFields.reduce(
@@ -646,6 +646,22 @@ export const removeSubFields = (dataField) => {
 		}),
 		{},
 	);
+};
+
+export const changedSubFields = (old_fields, new_fields) => {
+	const differentKeys = new_fields.filter((field) => !old_fields.includes(field));
+
+	return differentKeys.reduce((agg, key) => {
+		const lastKey = key.split('.').pop();
+		let fieldName = key;
+		reservedSearchSubFields.forEach((subField) => {
+			fieldName = fieldName.replace(`.${subField}`, '');
+		});
+		return {
+			...agg,
+			[fieldName]: `${agg[fieldName] ? `${agg[fieldName]} ,` : ''}${lastKey}`,
+		};
+	}, {});
 };
 
 export const validateQueryString = (queryString) => {
