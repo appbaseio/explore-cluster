@@ -41,6 +41,7 @@ import {
 	reservedSearchSubFields,
 	removeSubFields,
 	getFieldWeight,
+	changedSubFields,
 } from '../../utils';
 import settingsMap from '../../components/ReviewAndSave/helper';
 import { isEqual, isValidPlan } from '../../batteries/utils';
@@ -200,7 +201,14 @@ class SearchSettingsPage extends React.Component {
 
 	getDataFields = (settings) => {
 		const { mappings } = this.props;
-		let searchableFields = settings.search.dataField;
+		let searchableFields = get(settings, 'search.dataField', []);
+
+		const fields = searchableFields.reduce((agg, item, index) => {
+			return {
+				...agg,
+				[item]: get(settings, `search.fieldWeights.${index}`),
+			};
+		}, {});
 
 		if (mappings) {
 			const aggsResponse = getAggsMappings(mappings, true);
@@ -218,61 +226,79 @@ class SearchSettingsPage extends React.Component {
 					return [
 						...agg,
 						...Object.keys(
-							getSubFields({ address: item.address, weight: 1, fields: item.fields }),
+							getSubFields({
+								address: item.address,
+								weight: 1,
+								fields: item.fields,
+							}),
 						),
 					];
 				}, []);
 			}
 
 			const onlyTopLevelFields = removeSubFields(searchableFields);
-			if (onlyTopLevelFields.length < originalSearchableFields.length) {
-				const changedFields = originalSearchableFields.filter(
-					(field) => !onlyTopLevelFields.includes(get(field, 'address')),
-				);
-				const allFields = originalSearchableFields.reduce((agg, item) => {
-					return [
+			const changedFields = originalSearchableFields.filter(
+				(field) => !onlyTopLevelFields.includes(get(field, 'address')),
+			);
+			const allFields = originalSearchableFields.reduce((agg, item) => {
+				return [
+					...agg,
+					...Object.keys(
+						getSubFields({
+							address: item.address,
+							weight: 1,
+							fields: item.fields,
+						}),
+					),
+				];
+			}, []);
+
+			searchableFields = [...new Set([...allFields, ...searchableFields])];
+
+			this.setState({
+				changedFieldWeights: changedFields.reduce(
+					(agg, item) => ({
 						...agg,
-						...Object.keys(
-							getSubFields({ address: item.address, weight: 1, fields: item.fields }),
-						),
-					];
-				}, []);
-
-				searchableFields = [...allFields, ...searchableFields];
-
-				this.setState({
-					changedFieldWeights: changedFields.reduce(
+						[get(item, 'address')]: 1,
+					}),
+					{},
+				),
+				changedFields: {
+					new: changedFields.reduce(
 						(agg, item) => ({
 							...agg,
-							[get(item, 'address')]: 1,
+							[get(item, 'address')]: get(item, 'usecase'),
 						}),
 						{},
 					),
-					changedFields: {
-						new: changedFields.reduce(
-							(agg, item) => ({
-								...agg,
-								[get(item, 'address')]: get(item, 'usecase'),
-							}),
-							{},
-						),
-						old: {},
-					},
-				});
+					old: {},
+				},
+			});
+
+			if (
+				changedFields.length === 0 &&
+				searchableFields.length > settings.search.dataField.length
+			) {
+				if (
+					removeSubFields(searchableFields).length ===
+					removeSubFields(settings.search.dataField).length
+				) {
+					this.setState({
+						changedFields: {
+							new: changedSubFields(settings.search.dataField, searchableFields),
+							old: {},
+						},
+					});
+				}
 			}
 		}
 
-		return searchableFields.reduce(
-			(agg, field, index) => ({
+		return searchableFields.reduce((agg, field) => {
+			return {
 				...agg,
-				[field]: get(
-					settings,
-					`search.fieldWeights.${index}`,
-					getFieldWeight((field || '').split('.').pop(), 1),
-				),
-			}),
-			{},
-		);
+				[field]: get(fields, field, getFieldWeight((field || '').split('.').pop(), 1)),
+			};
+		}, {});
 	};
 
 	getAggsMappings = (mappings) => {
@@ -381,7 +407,7 @@ class SearchSettingsPage extends React.Component {
 			queryFormat,
 			queryType,
 		} = this.state;
-		const { updateSettingsAction, appName, settings } = this.props;
+		const { updateSettingsAction, appName, settings, getSettingsAction } = this.props;
 
 		updateSettingsAction(appName, {
 			...settings,
@@ -406,6 +432,7 @@ class SearchSettingsPage extends React.Component {
 					});
 				} else {
 					message.success(`Search settings for ${appName} saved successfully`);
+					getSettingsAction(appName);
 					this.setState({
 						changedFields: {
 							new: {},
@@ -449,13 +476,33 @@ class SearchSettingsPage extends React.Component {
 		}
 	};
 
+	resetFields = (settings) => {
+		const hasSearchOperators = get(settings, 'search.searchOperators', false);
+		const hasQueryString = get(settings, 'search.queryString', false);
+
+		const queryType = this.getQueryType({
+			queryString: hasQueryString,
+			searchOperators: hasSearchOperators,
+		});
+
+		this.setState({
+			typoTolerance: get(settings, 'search.fuzziness'),
+			hasTypoTolerance: !!get(settings, 'search.fuzziness', false),
+			queryFormat: get(settings, 'search.queryFormat', 'or'),
+			dataField: {},
+			enableSynonyms: get(settings, 'synonyms.enabled'),
+			queryType,
+		});
+	};
+
 	resetToDefault = () => {
 		const { getDefaultSettingsAction, defaultSettings } = this.props;
-		if (defaultSettings) this.initData(defaultSettings);
+
+		if (defaultSettings) this.resetFields(defaultSettings);
 		else
 			getDefaultSettingsAction().then((res) => {
 				if (res && res.payload) {
-					this.initData(res.payload);
+					this.resetFields(res.payload);
 				}
 			});
 		this.toggleVisible(true);
@@ -943,6 +990,15 @@ class SearchSettingsPage extends React.Component {
 										);
 									}
 									if (fieldName === 'fieldweights') {
+										if (isReset) {
+											return type === 'old'
+												? JSON.stringify(
+														Object.values(oldFieldKeyes),
+														null,
+														2,
+												  )
+												: '[]';
+										}
 										if (JSON.stringify(oldFieldKeyes) === JSON.stringify({})) {
 											return type === 'old'
 												? JSON.stringify(
@@ -963,13 +1019,9 @@ class SearchSettingsPage extends React.Component {
 													<Typography.Paragraph>
 														{field}:{' '}
 														<strong>
-															{get(
-																changedFields,
-																`${type}.${field}`,
-																[],
-															).includes('search')
-																? get(newFieldKeyes, field) || 1
-																: 0}
+															{type === 'old'
+																? get(newFieldKeyes, field, 0)
+																: get(oldFieldKeyes, field, 0)}
 														</strong>
 													</Typography.Paragraph>
 												),
