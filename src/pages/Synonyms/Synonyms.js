@@ -510,7 +510,7 @@ class Synonyms extends React.Component {
 								</div>
 							</div>
 							<ReactiveList
-								componentId="result"
+								componentId={`result-${key}`}
 								renderResultStats={() => null}
 								key={key}
 								loader={<div />}
