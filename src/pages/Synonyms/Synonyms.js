@@ -28,7 +28,7 @@ import { isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import { allowedTiers } from '../../utils/prop-types';
 import Loader from '../../components/Loader';
-import ErrorToaster from '../../components/ErrorToaster';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 
 const UploadSynonymsModal = Loadable({
 	loader: () =>

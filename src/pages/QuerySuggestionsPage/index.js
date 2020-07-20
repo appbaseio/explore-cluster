@@ -20,7 +20,7 @@ import Overlay from '../../components/Overlay';
 import { getURL } from '../../constants/config';
 import { getAuthToken } from '../../batteries/components/analytics/utils';
 import Flex from '../../batteries/components/shared/Flex';
-import ErrorToaster from '../../components/ErrorToaster';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 
 const main = css`
 	.actionBtn {

@@ -6,7 +6,7 @@ import Overlay from '../../components/Overlay';
 import Container from '../../components/Container';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import RequestDistribution from '../../batteries/components/analytics/components/RequestDistribution';
-import ErrorToaster from '../../components/ErrorToaster';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 
 const bannerMessagesAnalytics = {
 	free: {

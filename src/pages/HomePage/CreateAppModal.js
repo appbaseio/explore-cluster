@@ -25,7 +25,7 @@ import { getDefaultSettings, putSettings } from '../../batteries/modules/actions
 import { getLanguageFallback } from '../../utils/language';
 import { isValidPlan } from '../../batteries/utils';
 import { allowedTiers } from '../../utils/prop-types';
-import { withErrorToaster } from '../../components/ErrorToaster/ErrorToaster';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 const RadioGroup = Radio.Group;
 

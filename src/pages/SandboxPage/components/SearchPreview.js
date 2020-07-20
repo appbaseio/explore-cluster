@@ -24,8 +24,8 @@ import { getSubFields } from '../../../utils';
 import { isValidPlan } from '../../../batteries/utils';
 import generateSandboxURL from '../utils/sandbox-generator';
 import { allowedTiers } from '../../../utils/prop-types';
-import ErrorToaster from '../../../components/ErrorToaster';
-import { withErrorToaster } from '../../../components/ErrorToaster/ErrorToaster';
+import ErrorToaster from '../../../batteries/components/shared/ErrorToaster';
+import { withErrorToaster } from '../../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 const container = css`
 	padding: 16px;

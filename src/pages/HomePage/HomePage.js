@@ -12,8 +12,8 @@ import CreateAppModal from './CreateAppModal';
 import { loadApps } from '../../actions';
 import { mediaKey } from '../../utils/media';
 import AppDataWrapper from '../../components/AppDataWrapper';
-import ErrorToaster from '../../components/ErrorToaster';
-import { withErrorToaster } from '../../components/ErrorToaster/ErrorToaster';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 const link = css`
 	font-size: 16px;

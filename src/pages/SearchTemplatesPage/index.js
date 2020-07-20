@@ -19,7 +19,7 @@ import Actions from './Actions';
 import CreateTemplate from './CreateTemplate';
 import GetAPIEndpoint from './GetAPIEndpoint';
 import { jsonValidator } from './utils';
-import ErrorToaster from '../../components/ErrorToaster';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 
 const columns = [
 	{

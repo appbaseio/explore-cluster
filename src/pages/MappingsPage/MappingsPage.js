@@ -3,7 +3,7 @@ import { string } from 'prop-types';
 
 import Mappings from '../../batteries/components/Mappings';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
-import ErrorToaster from '../../components/ErrorToaster';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 
 const bannerMessage = {
 	title: 'Schema Settings',

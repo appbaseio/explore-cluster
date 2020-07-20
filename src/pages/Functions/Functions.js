@@ -44,8 +44,8 @@ import { deploymentCheck } from '../../components/DeployFunctionModal/helper';
 import { mediaKey } from '../../utils/media';
 import SearchPreviewSwitcher from '../../components/SearchPreviewSwitcher';
 import { allowedTiers, children } from '../../utils/prop-types';
-import ErrorToaster from '../../components/ErrorToaster';
-import { withErrorToaster } from '../../components/ErrorToaster/ErrorToaster';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 const link = css`
 	font-size: 14px;

@@ -55,7 +55,7 @@ import { isValidPlan } from '../../batteries/utils';
 import { AdvancedEditor, CustomAutoComplete } from '../../components/AdvancedEditor';
 import { getRawQuery, parseExpression } from '../../components/AdvancedEditor/helper';
 import { allowedTiers } from '../../utils/prop-types';
-import ErrorToaster from '../../components/ErrorToaster';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 
 const customReactFilter = css`
 	.react-filter-box {

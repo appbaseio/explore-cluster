@@ -24,8 +24,8 @@ import Replicas from './Replicas';
 import Shards from './Shards';
 import Loader from '../../batteries/components/shared/Loader';
 import { appendApp, loadApps, removeAppData } from '../../actions';
-import ErrorToaster from '../../components/ErrorToaster';
-import { withErrorToaster } from '../../components/ErrorToaster/ErrorToaster';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 const bannerMessage = {
 	title: 'Index Settings',

@@ -8,7 +8,7 @@ import Importer from '@appbaseio-confidential/importer';
 import applyClusterSettings from '@appbaseio-confidential/importer/lib/utils/applyClusterSettings';
 
 import Header from '../../components/Header';
-import ErrorToaster from '../../components/ErrorToaster';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { getUrlParams } from '../../utils/helper';
 
 // Adding this style for Importer components because we dont import styles with Importer Library
@@ -18,7 +18,7 @@ import 'antd/es/divider/style/css';
 import 'antd/es/switch/style/css';
 import 'antd/es/modal/style/css';
 import 'antd/es/card/style/css';
-import { withErrorToaster } from '../../components/ErrorToaster/ErrorToaster';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 // eslint-disable-next-line no-unused-expressions
 injectGlobal`

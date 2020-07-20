@@ -5,7 +5,7 @@ import { List, Breadcrumb, Tag, Empty } from 'antd';
 import { css } from 'emotion';
 import IndexSwitcher from '../IndexSwitcher';
 import WithRedirectTooltip from '../WithRedirectTooltip';
-import ErrorToaster from '../ErrorToaster';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 
 const listStyle = css`
 	.ant-list-item {

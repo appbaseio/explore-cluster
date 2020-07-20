@@ -16,8 +16,8 @@ import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { bannerDetails } from './utils';
 import SearchPreviewSwitcher from '../../components/SearchPreviewSwitcher';
 import { allowedTiers } from '../../utils/prop-types';
-import ErrorToaster from '../../components/ErrorToaster';
-import { withErrorToaster } from '../../components/ErrorToaster/ErrorToaster';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 const { Header } = Layout;
 

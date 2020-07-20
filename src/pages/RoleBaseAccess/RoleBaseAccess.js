@@ -14,8 +14,8 @@ import { getPermission, getPublicKey, updatePublicKey } from '../../batteries/mo
 import { setRole } from '../../utils';
 import { isBase64 } from '../../utils/helper';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
-import ErrorToaster from '../../components/ErrorToaster';
-import { withErrorToaster } from '../../components/ErrorToaster/ErrorToaster';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 const { Column } = Table;
 

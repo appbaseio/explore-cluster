@@ -35,8 +35,8 @@ import { appendApp, removeAppData } from '../../actions';
 import settingsMap from '../../components/ReviewAndSave/helper';
 import Loader from '../../components/Loader';
 import { allowedTiers } from '../../utils/prop-types';
-import ErrorToaster from '../../components/ErrorToaster';
-import { withErrorToaster } from '../../components/ErrorToaster/ErrorToaster';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 const bannerDetails = {
 	title: 'Language Settings',

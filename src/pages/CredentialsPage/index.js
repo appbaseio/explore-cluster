@@ -17,8 +17,8 @@ import {
 import Loader from '../../batteries/components/shared/Loader/Spinner';
 import { getURL } from '../../constants/config';
 import DeleteAppModal from '../../components/AppCard/DeleteAppModal';
-import ErrorToaster from '../../components/ErrorToaster';
-import { withErrorToaster } from '../../components/ErrorToaster/ErrorToaster';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 const columns = [
 	{

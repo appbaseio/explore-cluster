@@ -46,8 +46,8 @@ import { isEqual, isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import { highlighter } from '../SandboxPage/components/Search';
 import { allowedTiers } from '../../utils/prop-types';
-import ErrorToaster from '../../components/ErrorToaster';
-import { withErrorToaster } from '../../components/ErrorToaster/ErrorToaster';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 const { Option } = Select;
 

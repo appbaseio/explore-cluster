@@ -17,8 +17,8 @@ import {
 } from '../../batteries/modules/actions';
 import Container from '../../components/Container';
 import { getURL } from '../../constants/config';
-import ErrorToaster from '../../components/ErrorToaster';
-import { withErrorToaster } from '../../components/ErrorToaster/ErrorToaster';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 const { Paragraph } = Typography;
 const tableCls = css`

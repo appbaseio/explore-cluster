@@ -12,8 +12,8 @@ import { getSubscription, updateSubscription, deleteSubscription } from './api';
 import { STRIPE_KEY } from '../../constants';
 import InsightLink from './components/InsightLink';
 import Loader from '../../components/Loader';
-import ErrorToaster from '../../components/ErrorToaster';
-import { withErrorToaster } from '../../components/ErrorToaster/ErrorToaster';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 class ClusterInsights extends React.Component {
 	state = {

@@ -16,7 +16,7 @@ import {
 import { getURL } from '../../../constants/config';
 import { updateSynonyms } from '../api';
 import { children, synonymTypes } from '../../../utils/prop-types';
-import ErrorToaster from '../../../components/ErrorToaster';
+import ErrorToaster from '../../../batteries/components/shared/ErrorToaster';
 
 const { Option } = Select;
 

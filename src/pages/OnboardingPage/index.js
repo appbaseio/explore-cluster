@@ -8,7 +8,7 @@ import Search from './screens/Search';
 import Facets from './screens/Facets';
 
 import { onboardingStyles } from './styles';
-import ErrorToaster from '../../components/ErrorToaster';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 
 const screens = {
 	0: Introduction,

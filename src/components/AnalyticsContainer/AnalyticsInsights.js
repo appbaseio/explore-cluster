@@ -13,8 +13,8 @@ import { getUrlParams } from '../../utils/helper';
 import { drawerClass } from './styles';
 import { getAppAnalyticsInsightsByName } from '../../batteries/modules/selectors';
 import { getMonthRange } from './utils';
-import ErrorToaster from '../ErrorToaster';
-import { withErrorToaster } from '../ErrorToaster/ErrorToaster';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 const { TabPane } = Tabs;
 

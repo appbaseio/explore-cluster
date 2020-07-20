@@ -4,7 +4,7 @@ import { get, isObject, keys, transform } from 'lodash';
 import { Button, Modal } from 'antd';
 import { isEqual } from '../../batteries/utils';
 import DiffTable from './DiffTable';
-import { withErrorToaster } from '../ErrorToaster/ErrorToaster';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 class ReviewAndSave extends React.Component {
 	difference = (object, base) => {
