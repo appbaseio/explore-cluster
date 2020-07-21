@@ -99,7 +99,7 @@ class CollapsibleInsights extends React.Component {
 		if (window.location.pathname.startsWith('/cluster')) {
 			return (
 				<IndexSwitcher
-					filteredApps={apps && Object.keys(apps).filter((app) => !app.startsWith('.'))}
+					filteredApps={Object.keys(apps || {}).filter((app) => !app.startsWith('.'))}
 					history={history}
 					renderItem={(popConfirmProps) => {
 						return (
@@ -156,6 +156,7 @@ class CollapsibleInsights extends React.Component {
 				{insights.map((insight) => (
 					<Panel
 						showArrow={false}
+						id={get(insight, 'id')}
 						header={
 							<div className="panel-header">
 								<div className="title">
