@@ -99,7 +99,7 @@ class CollapsibleInsights extends React.Component {
 		if (window.location.pathname.startsWith('/cluster')) {
 			return (
 				<IndexSwitcher
-					filteredApps={Object.keys(apps).filter((app) => !app.startsWith('.'))}
+					filteredApps={apps && Object.keys(apps).filter((app) => !app.startsWith('.'))}
 					history={history}
 					renderItem={(popConfirmProps) => {
 						return (
