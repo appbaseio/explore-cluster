@@ -26,6 +26,7 @@ import generateSandboxURL from '../utils/sandbox-generator';
 import { allowedTiers } from '../../../utils/prop-types';
 import ErrorToaster from '../../../batteries/components/shared/ErrorToaster';
 import { withErrorToaster } from '../../../batteries/components/shared/ErrorToaster/ErrorToaster';
+import SandboxContext from './SandboxContext';
 
 const container = css`
 	padding: 16px;
@@ -81,7 +82,9 @@ class SearchPreview extends React.Component {
 			Update Grading to be false if not a valid plan.
 		*/
 		if (isValidPlan(tier, featureGrade)) {
-			this.setQueryGrades('');
+			const search = (searchState || []).find((component) => component.id === 'search');
+			const searchValue = get(search, 'value', get(search, 'defaultValue', ''));
+			this.setQueryGrades(searchValue);
 		} else {
 			this.toggleGrading(false);
 		}
@@ -456,20 +459,22 @@ class SearchPreview extends React.Component {
 							/>
 						</ErrorToaster>
 						<ErrorToaster>
-							<Result
-								result={result}
-								query={stateSettings}
-								app={app}
-								queryGrades={get(queryGrades, 'docs', {})}
-								url={url}
-								searchTerm={get(search, 'value')}
-								toggleAnalytics={this.toggleAnalytics}
-								recordAnalytics={isAnalyticsEnabled}
-								rules={rules}
-								onChange={this.handleSettingsChange}
-								credentials={credentials}
-								isGradingEnabled={isGradingEnabled}
-							/>
+							<SandboxContext.Provider
+								value={{
+									app,
+									credentials,
+									url,
+									queryGrades: get(queryGrades, 'docs', {}),
+									recordAnalytics: isAnalyticsEnabled,
+									isGradingEnabled,
+									searchTerm: get(search, 'value', get(search, 'defaultValue')),
+									query: stateSettings,
+									toggleAnalytics: this.toggleAnalytics,
+									onSettingsChange: this.handleSettingsChange,
+								}}
+							>
+								<Result result={result} app={app} rules={rules} />
+							</SandboxContext.Provider>
 						</ErrorToaster>
 					</Col>
 				</ReactiveBase>

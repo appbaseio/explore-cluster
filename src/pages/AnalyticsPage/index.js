@@ -6,7 +6,6 @@ import Container from '../../components/Container';
 import Overlay from '../../components/Overlay';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Analytics from '../../batteries/components/analytics';
-import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -38,14 +37,12 @@ const AnalyticsView = ({ appName, isPaidUser, plan }) => (
 			<React.Fragment>
 				{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
 				<Container>
-					<ErrorToaster>
-						<Analytics
-							filterId="analytics_page"
-							displayReplaySearch={window.location.pathname.startsWith('/app')}
-							chartWidth={window.innerWidth - 400}
-							appName={appName}
-						/>
-					</ErrorToaster>
+					<Analytics
+						filterId="analytics_page"
+						displayReplaySearch={window.location.pathname.startsWith('/app')}
+						chartWidth={window.innerWidth - 400}
+						appName={appName}
+					/>
 				</Container>
 			</React.Fragment>
 		) : (

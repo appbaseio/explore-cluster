@@ -127,7 +127,7 @@ class LoginPage extends Component {
 								letterSpacing: '0.02rem',
 							}}
 						>
-							Install A New Arc Instance
+							Install a new appbase.io instance
 							<Icon type="arrow-right" />
 						</Button>
 					</Link>

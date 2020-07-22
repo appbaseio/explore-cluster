@@ -72,7 +72,7 @@
 		"@appbaseio/designkit": "^0.9.1",
 		"@appbaseio/react-filter-box": "^3.4.1",
 		"@appbaseio/reactivecore": "^9.5.7",
-		"@appbaseio/reactivesearch": "^3.8.1",
+		"@appbaseio/reactivesearch": "^3.11.7",
 		"@babel/plugin-proposal-class-properties": "^7.0.0-rc.1",
 		"@sentry/browser": "^4.2.1",
 		"@typeform/embed": "^0.14.1",

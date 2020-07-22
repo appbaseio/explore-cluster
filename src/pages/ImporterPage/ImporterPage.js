@@ -121,7 +121,7 @@ class ImporterPage extends React.Component {
 							<Row>
 								<Col lg={18}>
 									<p>
-										Bring data from JSON/CSV/ElasticSearch/SQL sources into
+										Bring data from JSON/CSV/Elasticsearch/SQL sources into
 										appbase.io via GUI.
 										<br />
 										<br />

@@ -189,6 +189,7 @@ const onboardingStyles = css`
 		align-items: center;
 		.left-column {
 			text-align: left;
+			display: flex;
 		}
 		.right-column {
 			text-align: right;

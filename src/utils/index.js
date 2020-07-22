@@ -53,7 +53,7 @@ export async function getUser(username, password, url) {
 			sessionStorage.setItem('version', version);
 		})
 		.catch((e) => {
-			console.error('Error while fetching the ElasticSearch details');
+			console.error('Error while fetching the Elasticsearch details');
 			console.error(e);
 		});
 
@@ -213,7 +213,7 @@ export async function cloneApp(source, destination, payload = {}) {
 	if (response.status >= 400) {
 		if (response.status === 400 || response.status === 406) {
 			throw new Error(
-				'You need to upgrade Arc (appbase.io) to v7.11.0 or above to take advantage of this feature.',
+				'You need to upgrade appbase.io to v7.11.0 or above to take advantage of this feature.',
 			);
 		}
 		throw new Error('An error occurred while cloning the index. Please try again.');
@@ -527,39 +527,10 @@ export function getSubFields({ fields, weight, address }) {
 	if (fields) {
 		const fieldsToMap = Array.isArray(fields) ? fields : Object.keys(fields);
 		const subFields = fieldsToMap.reduce((agg, field) => {
-			switch (field) {
-				case 'autosuggest':
-				case 'lang':
-					return {
-						...agg,
-						[`${address}.${field}`]: weight ? weight * 0.9 : 0,
-					};
-				case 'synonyms':
-					return {
-						...agg,
-						[`${address}.${field}`]: weight ? weight * 0.7 : 0,
-					};
-				case 'delimiter':
-					return {
-						...agg,
-						[`${address}.${field}`]: weight ? weight * 0.4 : 0,
-					};
-				case 'search':
-					return {
-						...agg,
-						[`${address}.${field}`]: weight ? weight * 0.1 : 0,
-					};
-				case 'keyword':
-					return {
-						...agg,
-						[`${address}.${field}`]: weight ? weight : 0,
-					};
-				default:
-					return {
-						...agg,
-						[`${address}.${field}`]: weight,
-					};
-			}
+			return {
+				...agg,
+				[`${address}.${field}`]: getFieldWeight(field, weight),
+			};
 		}, {});
 
 		return { [address]: weight, ...subFields };
@@ -567,6 +538,24 @@ export function getSubFields({ fields, weight, address }) {
 
 	return { [address]: weight };
 }
+
+export const getFieldWeight = (field, weight) => {
+	switch (field) {
+		case 'autosuggest':
+		case 'lang':
+			return weight ? weight * 0.9 : 0;
+		case 'synonyms':
+			return weight ? weight * 0.7 : 0;
+		case 'delimiter':
+			return weight ? weight * 0.4 : 0;
+		case 'search':
+			return weight ? weight * 0.1 : 0;
+		case 'keyword':
+			return weight ? weight : 0;
+		default:
+			return weight;
+	}
+};
 
 function ltrim(str) {
 	if (!str) return str;
@@ -647,7 +636,7 @@ export const removeSubFields = (dataField) => {
 	);
 
 	if (Array.isArray(dataField)) {
-		return parsedFields;
+		return [...new Set(parsedFields)];
 	}
 
 	return parsedFields.reduce(
@@ -657,6 +646,22 @@ export const removeSubFields = (dataField) => {
 		}),
 		{},
 	);
+};
+
+export const changedSubFields = (old_fields, new_fields) => {
+	const differentKeys = new_fields.filter((field) => !old_fields.includes(field));
+
+	return differentKeys.reduce((agg, key) => {
+		const lastKey = key.split('.').pop();
+		let fieldName = key;
+		reservedSearchSubFields.forEach((subField) => {
+			fieldName = fieldName.replace(`.${subField}`, '');
+		});
+		return {
+			...agg,
+			[fieldName]: `${agg[fieldName] ? `${agg[fieldName]} ,` : ''}${lastKey}`,
+		};
+	}, {});
 };
 
 export const validateQueryString = (queryString) => {

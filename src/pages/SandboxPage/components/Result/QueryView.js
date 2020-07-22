@@ -8,6 +8,7 @@ import { get } from 'lodash';
 import AceEditor from '../../../../batteries/components/SearchSandbox/containers/AceEditor';
 
 import { isValidJSON } from '../../utils';
+import SandboxContext from '../SandboxContext';
 
 const headingStyle = css`
 	font-size: 16px;
@@ -212,4 +213,30 @@ QueryView.defaultProps = {
 	recordAnalytics: true,
 };
 
-export default QueryView;
+const QueryViewWrapper = () => {
+	return (
+		<SandboxContext.Consumer>
+			{({
+				query,
+				onSettingsChange: onChange,
+				toggleAnalytics,
+				recordAnalytics,
+				url,
+				app,
+				credentials,
+			}) => (
+				<QueryView
+					query={query}
+					onChange={onChange}
+					toggleAnalytics={toggleAnalytics}
+					recordAnalytics={recordAnalytics}
+					app={app}
+					url={url}
+					credentials={credentials}
+				/>
+			)}
+		</SandboxContext.Consumer>
+	);
+};
+
+export default QueryViewWrapper;
