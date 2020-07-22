@@ -166,7 +166,7 @@ class SearchLatencyWrapper extends React.Component {
 	}
 }
 SearchLatencyWrapper.defaultProps = {
-	filters: {},
+	filters: undefined,
 };
 SearchLatencyWrapper.propTypes = {
 	plan: PropTypes.string.isRequired,
@@ -179,6 +179,6 @@ const mapStateToProps = (state) => ({
 	plan: get(state, '$getAppPlan.results.plan'),
 	isGrowth: get(state, '$getAppPlan.results.isPaid'),
 	searchLatency: get(getAppSearchLatencyByName(state), 'latencies', []),
-	filters: get(state, `$getSelectedFilters.${filterId}`, {}),
+	filters: get(state, `$getSelectedFilters.${filterId}`),
 });
 export default connect(mapStateToProps)(SearchLatencyWrapper);
