@@ -4,6 +4,7 @@ import { get, isObject, keys, transform } from 'lodash';
 import { Button, Modal } from 'antd';
 import { isEqual } from '../../batteries/utils';
 import DiffTable from './DiffTable';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 class ReviewAndSave extends React.Component {
 	difference = (object, base) => {
@@ -106,4 +107,4 @@ ReviewAndSave.defaultProps = {
 	renderField: null,
 };
 
-export default ReviewAndSave;
+export default withErrorToaster(ReviewAndSave);

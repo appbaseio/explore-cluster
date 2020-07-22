@@ -24,6 +24,8 @@ import { getSubFields } from '../../../utils';
 import { isValidPlan } from '../../../batteries/utils';
 import generateSandboxURL from '../utils/sandbox-generator';
 import { allowedTiers } from '../../../utils/prop-types';
+import ErrorToaster from '../../../batteries/components/shared/ErrorToaster';
+import { withErrorToaster } from '../../../batteries/components/shared/ErrorToaster/ErrorToaster';
 import SandboxContext from './SandboxContext';
 
 const container = css`
@@ -434,38 +436,46 @@ class SearchPreview extends React.Component {
 					}}
 				>
 					<Col md={6}>
-						<Filter
-							handleValueChange={this.handleValueChange}
-							app={app}
-							aggs={aggregations}
-							handleModal={handleModal}
-						/>
+						<ErrorToaster>
+							<Filter
+								handleValueChange={this.handleValueChange}
+								app={app}
+								aggs={aggregations}
+								handleModal={handleModal}
+							/>
+						</ErrorToaster>
 					</Col>
 					<Col md={18}>
-						<Search
-							handleValueChange={this.handleValueChange}
-							app={app}
-							onValueChange={this.setQueryGrades}
-							search={search}
-							handleModal={handleModal}
-						/>
-
-						<SandboxContext.Provider
-							value={{
-								app,
-								credentials,
-								url,
-								queryGrades: get(queryGrades, 'docs', {}),
-								recordAnalytics: isAnalyticsEnabled,
-								isGradingEnabled,
-								searchTerm: get(search, 'value', get(search, 'defaultValue')),
-								query: stateSettings,
-								toggleAnalytics: this.toggleAnalytics,
-								onSettingsChange: this.handleSettingsChange,
-							}}
+						<ErrorToaster
+							inline
+							title="Something went wrong while displaying Search UI"
 						>
-							<Result result={result} app={app} rules={rules} />
-						</SandboxContext.Provider>
+							<Search
+								handleValueChange={this.handleValueChange}
+								app={app}
+								onValueChange={this.setQueryGrades}
+								search={search}
+								handleModal={handleModal}
+							/>
+						</ErrorToaster>
+						<ErrorToaster>
+							<SandboxContext.Provider
+								value={{
+									app,
+									credentials,
+									url,
+									queryGrades: get(queryGrades, 'docs', {}),
+									recordAnalytics: isAnalyticsEnabled,
+									isGradingEnabled,
+									searchTerm: get(search, 'value', get(search, 'defaultValue')),
+									query: stateSettings,
+									toggleAnalytics: this.toggleAnalytics,
+									onSettingsChange: this.handleSettingsChange,
+								}}
+							>
+								<Result result={result} app={app} rules={rules} />
+							</SandboxContext.Provider>
+						</ErrorToaster>
 					</Col>
 				</ReactiveBase>
 			</Row>
@@ -538,4 +548,4 @@ SearchPreview.defaultProps = {
 	handleModal: () => {},
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(SearchPreview);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(SearchPreview));

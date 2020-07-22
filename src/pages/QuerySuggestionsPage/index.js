@@ -20,6 +20,7 @@ import Overlay from '../../components/Overlay';
 import { getURL } from '../../constants/config';
 import { getAuthToken } from '../../batteries/components/analytics/utils';
 import Flex from '../../batteries/components/shared/Flex';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 
 const main = css`
 	.actionBtn {
@@ -186,11 +187,13 @@ class QuerySuggestions extends React.Component {
 							</Flex>
 						</Card>
 					)}
-					<PreferenceForm
-						indices={indices}
-						handleSaveTemplate={this.handleSaveTemplate}
-						control={this.form}
-					/>
+					<ErrorToaster>
+						<PreferenceForm
+							indices={indices}
+							handleSaveTemplate={this.handleSaveTemplate}
+							control={this.form}
+						/>
+					</ErrorToaster>
 				</Container>
 			</React.Fragment>
 		);

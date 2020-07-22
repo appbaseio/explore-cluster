@@ -46,6 +46,8 @@ import { isEqual, isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import { highlighter } from '../SandboxPage/components/Search';
 import { allowedTiers } from '../../utils/prop-types';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 const { Option } = Select;
 
@@ -512,140 +514,142 @@ class AggsPage extends React.Component {
 						</Card>
 					) : null}
 					<Card>
-						<Mappings
-							showSynonyms={false}
-							showShards={false}
-							ref={this.mappingsRef}
-							showReplicas={false}
-							showMappingInfo={false}
-							showCardWrapper={false}
-							hideSearchType
-							deleteLabel=" Remove from Aggs"
-							hideDelete
-							hideNoneTextType
-							hideDataType
-							hideGeoType
-							isMappingsView={false}
-							renderMappingInfo={() => {
-								if (
-									searchableMappings &&
-									traversedMappings &&
-									searchableMappings.length === traversedMappings.length
-								) {
-									return (
-										<p
-											style={{
-												color: '#999',
-												margin: 0,
-												textAlign: 'center',
-											}}
-										>
-											Add aggregation fields from dropdown.
-										</p>
-									);
-								}
-								return null;
-							}}
-							hidePropertiesType
-							onChange={this.handleMappingChange}
-							onDeleteField={this.handleDeleteField}
-							onUsecaseChange={this.handleUsecaseChange}
-							column={{
-								title: (
-									<React.Fragment>
-										{settingsMap.agg_type.title}
-										<Tooltip title={settingsMap.agg_type.description}>
-											<span style={{ marginLeft: 5 }}>
-												<Icon type="info-circle" />
-											</span>
-										</Tooltip>
-									</React.Fragment>
-								),
-								render: ({ address, settings: mappingSettings }) => {
-									const hasKeyword = this.hasKeyword(mappingSettings);
-									let options = ['Term', 'Range'];
-									if (hasKeyword) {
-										options = ['Term'];
+						<ErrorToaster>
+							<Mappings
+								showSynonyms={false}
+								showShards={false}
+								ref={this.mappingsRef}
+								showReplicas={false}
+								showMappingInfo={false}
+								showCardWrapper={false}
+								hideSearchType
+								deleteLabel=" Remove from Aggs"
+								hideDelete
+								hideNoneTextType
+								hideDataType
+								hideGeoType
+								isMappingsView={false}
+								renderMappingInfo={() => {
+									if (
+										searchableMappings &&
+										traversedMappings &&
+										searchableMappings.length === traversedMappings.length
+									) {
+										return (
+											<p
+												style={{
+													color: '#999',
+													margin: 0,
+													textAlign: 'center',
+												}}
+											>
+												Add aggregation fields from dropdown.
+											</p>
+										);
 									}
+									return null;
+								}}
+								hidePropertiesType
+								onChange={this.handleMappingChange}
+								onDeleteField={this.handleDeleteField}
+								onUsecaseChange={this.handleUsecaseChange}
+								column={{
+									title: (
+										<React.Fragment>
+											{settingsMap.agg_type.title}
+											<Tooltip title={settingsMap.agg_type.description}>
+												<span style={{ marginLeft: 5 }}>
+													<Icon type="info-circle" />
+												</span>
+											</Tooltip>
+										</React.Fragment>
+									),
+									render: ({ address, settings: mappingSettings }) => {
+										const hasKeyword = this.hasKeyword(mappingSettings);
+										let options = ['Term', 'Range'];
+										if (hasKeyword) {
+											options = ['Term'];
+										}
 
-									const parsedAddress = address.replace(/properties./g, '');
-									const aggKey = hasKeyword
-										? `${parsedAddress}.keyword`
-										: parsedAddress;
-									const menu = (
-										<Menu
-											onClick={(e) =>
-												this.handleAggType({
-													address: aggKey,
-													value: e.key,
-												})
-											}
-										>
-											{options.map((option) => (
-												<Menu.Item key={option.toLowerCase()}>
-													{option}
-												</Menu.Item>
-											))}
-										</Menu>
-									);
-									return (
-										<Dropdown overlay={menu}>
-											<Button className={dropdown}>
-												{get(dataField, aggKey) || 'Select Type'}
-												<Icon type="down" />
-											</Button>
-										</Dropdown>
-									);
-								},
-							}}
-							renderFooter={() =>
-								searchableMappings.length ? (
-									<Affix offsetBottom={73}>
-										<Row
-											style={{
-												padding: 10,
-												border: '1px solid #e8e8e8',
-												background: 'white',
-												width: '100%',
-											}}
-											type="flex"
-											justify="space-between"
-										>
-											<Col>
-												<Select
-													key={searchableMappings.length}
-													showSearch
-													placeholder="Add new aggregation field"
-													optionFilterProp="children"
-													style={{ minWidth: 200 }}
-													onChange={this.handleAddField}
-													filterOption={(input, option) =>
-														option.props.children
-															.toLowerCase()
-															.indexOf(input.toLowerCase()) >= 0
-													}
-												>
-													{searchableMappings.map((mapping) => (
-														<Option
-															key={mapping._address}
-															value={mapping._address}
-														>
-															{mapping.address}
-														</Option>
-													))}
-												</Select>
-												{searchableMappings &&
-												traversedMappings &&
-												searchableMappings.length ===
-													traversedMappings.length ? (
-													<span className={highlighter} />
-												) : null}
-											</Col>
-										</Row>
-									</Affix>
-								) : null
-							}
-						/>
+										const parsedAddress = address.replace(/properties./g, '');
+										const aggKey = hasKeyword
+											? `${parsedAddress}.keyword`
+											: parsedAddress;
+										const menu = (
+											<Menu
+												onClick={(e) =>
+													this.handleAggType({
+														address: aggKey,
+														value: e.key,
+													})
+												}
+											>
+												{options.map((option) => (
+													<Menu.Item key={option.toLowerCase()}>
+														{option}
+													</Menu.Item>
+												))}
+											</Menu>
+										);
+										return (
+											<Dropdown overlay={menu}>
+												<Button className={dropdown}>
+													{get(dataField, aggKey) || 'Select Type'}
+													<Icon type="down" />
+												</Button>
+											</Dropdown>
+										);
+									},
+								}}
+								renderFooter={() =>
+									searchableMappings.length ? (
+										<Affix offsetBottom={73}>
+											<Row
+												style={{
+													padding: 10,
+													border: '1px solid #e8e8e8',
+													background: 'white',
+													width: '100%',
+												}}
+												type="flex"
+												justify="space-between"
+											>
+												<Col>
+													<Select
+														key={searchableMappings.length}
+														showSearch
+														placeholder="Add new aggregation field"
+														optionFilterProp="children"
+														style={{ minWidth: 200 }}
+														onChange={this.handleAddField}
+														filterOption={(input, option) =>
+															option.props.children
+																.toLowerCase()
+																.indexOf(input.toLowerCase()) >= 0
+														}
+													>
+														{searchableMappings.map((mapping) => (
+															<Option
+																key={mapping._address}
+																value={mapping._address}
+															>
+																{mapping.address}
+															</Option>
+														))}
+													</Select>
+													{searchableMappings &&
+													traversedMappings &&
+													searchableMappings.length ===
+														traversedMappings.length ? (
+														<span className={highlighter} />
+													) : null}
+												</Col>
+											</Row>
+										</Affix>
+									) : null
+								}
+							/>
+						</ErrorToaster>
 					</Card>
 					<Card className={cardStyle}>
 						<label>
@@ -886,4 +890,4 @@ const mapDispatchToProps = (dispatch) => ({
 	deleteSettingsAction: (name) => dispatch(deleteSettings(name)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(AggsPage);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(AggsPage));
