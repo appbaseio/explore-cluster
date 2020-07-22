@@ -99,14 +99,61 @@ const styles = `body {
 }
 
 .filter {
-	min-width: 250px;
-	margin-top: 10px;
+  min-width: 250px;
+  margin-top: 10px;
 }
 
-pre {
+.item {
   background: #f0f0f0;
   padding: 10px;
   width: 100%;
+  margin: 10px 0;
+}
+
+.item-key {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px;
+}
+
+.item-key > span {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Tooltip container */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltip .tooltiptext {
+  visibility: hidden;
+  background-color: black;
+  color: #fff;
+  border-radius: 6px;
+
+  position: absolute;
+  z-index: 1;
+  top: -5px;
+  right: 105%;
+  max-width: 450px;
+  min-width: 320px;
+  padding: 10px;
+  overflow-x: scroll;
+}
+
+pre {
+  background: black;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltiptext {
+  visibility: visible;
 }
 
 @media (max-width: 768px) {
@@ -130,8 +177,35 @@ const generateResultCode = ({ id: resultId, dataField, ...resultProps }) => {
 			'renderItem',
 			`
 	renderItem={item => {
+		const { _promoted, _click_id, _index, highlight, _type, index, ...rest } = item;
+
 		// Change to update the UI
-		return <pre key={item._id}>{JSON.stringify(item, null, 4)}</pre>
+		return (
+			<div className="item" key={rest._id}>
+				{Object.keys(rest).map((key) => (
+					<div className="item-key">
+						<span>{key}</span>
+						{typeof rest[key] === 'object' ? (
+							<div class="tooltip">
+								{'{...}'}
+								<span
+									class="tooltiptext"
+									dangerouslySetInnerHTML={{
+										__html: JSON.stringify(rest[key], null, 2) || 'N/A',
+									}}
+								/>
+							</div>
+						) : (
+							<span
+								dangerouslySetInnerHTML={{
+									__html: JSON.stringify(rest[key]) || 'N/A',
+								}}
+							/>
+						)}
+					</div>
+				))}
+			</div>
+		);
 	}}`,
 		);
 };
