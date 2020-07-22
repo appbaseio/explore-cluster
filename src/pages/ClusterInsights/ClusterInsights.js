@@ -12,6 +12,8 @@ import { getSubscription, updateSubscription, deleteSubscription } from './api';
 import { STRIPE_KEY } from '../../constants';
 import InsightLink from './components/InsightLink';
 import Loader from '../../components/Loader';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 class ClusterInsights extends React.Component {
 	state = {
@@ -157,7 +159,12 @@ class ClusterInsights extends React.Component {
 					</div>
 				) : (
 					<div className={container}>
-						<InsightLink hasSubscribed={hasSubscribed} insight_link={insight_link} />
+						<ErrorToaster>
+							<InsightLink
+								hasSubscribed={hasSubscribed}
+								insight_link={insight_link}
+							/>
+						</ErrorToaster>
 					</div>
 				)}
 			</React.Fragment>
@@ -178,4 +185,4 @@ const mapStateToProps = (state) => {
 	};
 };
 
-export default connect(mapStateToProps)(ClusterInsights);
+export default withErrorToaster(connect(mapStateToProps)(ClusterInsights));

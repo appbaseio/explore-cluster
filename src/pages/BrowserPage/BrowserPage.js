@@ -114,4 +114,4 @@ const mapDispatchToProps = (dispatch) => ({
 	getPermission: (appName) => dispatch(getPermissionFromAppbase(appName)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(BrowserPage);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(BrowserPage));

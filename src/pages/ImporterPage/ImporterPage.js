@@ -8,6 +8,7 @@ import Importer from '@appbaseio-confidential/importer';
 import applyClusterSettings from '@appbaseio-confidential/importer/lib/utils/applyClusterSettings';
 
 import Header from '../../components/Header';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { getUrlParams } from '../../utils/helper';
 
 // Adding this style for Importer components because we dont import styles with Importer Library
@@ -16,6 +17,8 @@ import 'antd/es/select/style/css';
 import 'antd/es/divider/style/css';
 import 'antd/es/switch/style/css';
 import 'antd/es/modal/style/css';
+import 'antd/es/card/style/css';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 // eslint-disable-next-line no-unused-expressions
 injectGlobal`
@@ -176,26 +179,28 @@ class ImporterPage extends React.Component {
 						</Col>
 					</Row>
 				</Header>
-				<section>
-					{preparingApp ? (
-						<div style={{ maxWidth: '80%', margin: '20px auto' }}>
-							<h2>Preparing app for Import. This may take few seconds.</h2>
-							<Skeleton active />
-						</div>
-					) : (
-						<Importer
-							initSource={sourceParams}
-							initUser={
-								user && user.data && user.data.email
-									? user
-									: { data: { email: 'user@arc.appbase.io' } }
-							}
-							arc
-							embed
-							initDestination={destinationParams}
-						/>
-					)}
-				</section>
+				<ErrorToaster>
+					<section>
+						{preparingApp ? (
+							<div style={{ maxWidth: '80%', margin: '20px auto' }}>
+								<h2>Preparing app for Import. This may take few seconds.</h2>
+								<Skeleton active />
+							</div>
+						) : (
+							<Importer
+								initSource={sourceParams}
+								initUser={
+									user && user.data && user.data.email
+										? user
+										: { data: { email: 'user@arc.appbase.io' } }
+								}
+								arc
+								embed
+								initDestination={destinationParams}
+							/>
+						)}
+					</section>
+				</ErrorToaster>
 			</Fragment>
 		);
 	}
@@ -221,4 +226,4 @@ const mapStateToProps = (state) => {
 	};
 };
 
-export default connect(mapStateToProps)(ImporterPage);
+export default withErrorToaster(connect(mapStateToProps)(ImporterPage));
