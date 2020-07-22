@@ -8,6 +8,7 @@ import { get } from 'lodash';
 import AceEditor from '../../../../batteries/components/SearchSandbox/containers/AceEditor';
 
 import { isValidJSON } from '../../utils';
+import SandboxContext from '../SandboxContext';
 
 const headingStyle = css`
 	font-size: 16px;
@@ -123,7 +124,7 @@ class QueryView extends React.Component {
 				});
 				if (onChange) {
 					onChange(parsedQuery.query);
-					toggleAnalytics(!!parsedQuery.settings.recordAnalytics);
+					toggleAnalytics(!!get(parsedQuery, 'settings.recordAnalytics'));
 				}
 				this.toggleExecutionStatus();
 			})
@@ -195,7 +196,7 @@ class QueryView extends React.Component {
 }
 
 QueryView.propTypes = {
-	query: PropTypes.object,
+	query: PropTypes.array,
 	app: PropTypes.string.isRequired,
 	url: PropTypes.string,
 	credentials: PropTypes.string.isRequired,
@@ -205,11 +206,37 @@ QueryView.propTypes = {
 };
 
 QueryView.defaultProps = {
-	query: {},
+	query: [],
 	url: undefined,
 	onChange: null,
 	toggleAnalytics: () => {},
 	recordAnalytics: true,
 };
 
-export default QueryView;
+const QueryViewWrapper = () => {
+	return (
+		<SandboxContext.Consumer>
+			{({
+				query,
+				onSettingsChange: onChange,
+				toggleAnalytics,
+				recordAnalytics,
+				url,
+				app,
+				credentials,
+			}) => (
+				<QueryView
+					query={query}
+					onChange={onChange}
+					toggleAnalytics={toggleAnalytics}
+					recordAnalytics={recordAnalytics}
+					app={app}
+					url={url}
+					credentials={credentials}
+				/>
+			)}
+		</SandboxContext.Consumer>
+	);
+};
+
+export default QueryViewWrapper;

@@ -4,7 +4,7 @@ import { Col, Icon, Row, Table } from 'antd';
 import { get, keys } from 'lodash';
 import settingsMap from './helper';
 
-function DiffTable({ object, parseDiff }) {
+function DiffTable({ object, parseDiff, renderField }) {
 	return (
 		<Table
 			rowKey="setting"
@@ -31,11 +31,27 @@ function DiffTable({ object, parseDiff }) {
 						const { value } = record;
 						return (
 							<Row gutter={22}>
-								<Col span={11}>{JSON.stringify(get(value, 'old'), null, 2)}</Col>
+								<Col span={11}>
+									{renderField
+										? renderField({
+												value: get(value, 'old'),
+												type: 'old',
+												record,
+										  })
+										: JSON.stringify(get(value, 'old'), null, 2)}
+								</Col>
 								<Col span={2}>
 									<Icon type="arrow-right" />
 								</Col>
-								<Col span={11}>{JSON.stringify(get(value, 'new'), null, 2)}</Col>
+								<Col span={11}>
+									{renderField
+										? renderField({
+												field: get(value, 'new'),
+												type: 'new',
+												record,
+										  })
+										: JSON.stringify(get(value, 'new'), null, 2)}
+								</Col>
 							</Row>
 						);
 					},
@@ -49,11 +65,13 @@ function DiffTable({ object, parseDiff }) {
 DiffTable.propTypes = {
 	object: PropTypes.object,
 	parseDiff: PropTypes.func,
+	renderField: PropTypes.func,
 };
 
 DiffTable.defaultProps = {
 	object: {},
 	parseDiff: () => {},
+	renderField: null,
 };
 
 export default DiffTable;

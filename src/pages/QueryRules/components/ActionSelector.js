@@ -36,12 +36,27 @@ const actions = {
 		checkHealth: true,
 	},
 	remove_words: {
-		name: 'Remove Word',
+		name: 'Remove Word(s)',
 		data: [],
 	},
 	replace_words: {
-		name: 'Replace Word',
+		name: 'Replace Word(s)',
 		data: {},
+	},
+	search_settings: {
+		name: 'Search Settings',
+		data: {
+			dataField: [],
+			fieldWeights: [],
+		},
+	},
+	add_filter: {
+		name: 'Add Filter',
+		data: {},
+	},
+	replace_search_query: {
+		name: 'Replace Search Query',
+		data: '',
 	},
 };
 

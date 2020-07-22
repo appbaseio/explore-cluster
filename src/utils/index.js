@@ -2,6 +2,8 @@ import { chain, get, includes, keys, values } from 'lodash';
 import { notification } from 'antd';
 import { getURL } from '../constants/config';
 import { getSingleFunction, updateFunctions } from '../batteries/utils/app';
+import { getESVersion } from '../batteries/utils/mappings';
+import { doGet } from '../batteries/utils/requestService';
 
 export async function getUser(username, password, url) {
 	const ACC_API = getURL();
@@ -51,7 +53,7 @@ export async function getUser(username, password, url) {
 			sessionStorage.setItem('version', version);
 		})
 		.catch((e) => {
-			console.error('Error while fetching the ElasticSearch details');
+			console.error('Error while fetching the Elasticsearch details');
 			console.error(e);
 		});
 
@@ -75,7 +77,10 @@ const getAuthToken = () => {
 
 export async function getESIndices(authToken) {
 	const ACC_API = getURL();
-	const response = await fetch(`${ACC_API}/_aliasedindices`, {
+	const esVersion = await getESVersion(null, atob(authToken));
+	let url = `${ACC_API}/_aliasedindices`;
+	if (esVersion && esVersion < 6) url = `${ACC_API}/_cat/indices?format=json`;
+	const response = await fetch(url, {
 		method: 'GET',
 		headers: {
 			Authorization: `Basic ${authToken}`,
@@ -208,7 +213,7 @@ export async function cloneApp(source, destination, payload = {}) {
 	if (response.status >= 400) {
 		if (response.status === 400 || response.status === 406) {
 			throw new Error(
-				'You need to upgrade Arc (appbase.io) to v7.11.0 or above to take advantage of this feature.',
+				'You need to upgrade appbase.io to v7.11.0 or above to take advantage of this feature.',
 			);
 		}
 		throw new Error('An error occurred while cloning the index. Please try again.');
@@ -363,25 +368,26 @@ export async function getClusterMappings() {
 	});
 	const mappings = await response.json();
 	if (response.status >= 400) {
-		throw data.error.message;
+		throw get(data, 'error.message');
 	}
 	return mappings;
 }
 
-export function getDatafields(mappings, indexes, isSearch = false) {
+export function getDatafields({ mappings, indexes, isSearch = false, isAggs = false }) {
 	const hasAllIndex = indexes.includes('*');
 	let fieldMap = {};
+	let subFieldsMap = {};
 
 	function filtered(properties, property) {
-		if (isSearch)
-			return properties[property].type === 'string' || properties[property].type === 'text';
+		const propertyType = get(properties, `${property}.type`);
+		if (isSearch) return propertyType === 'string' || propertyType === 'text';
 		return (
-			properties[property].type === 'string' ||
-			properties[property].type === 'text' ||
-			properties[property].type === 'integer' ||
-			properties[property].type === 'long' ||
-			properties[property].type === 'bool' ||
-			properties[property].type === 'float'
+			propertyType === 'string' ||
+			propertyType === 'text' ||
+			propertyType === 'integer' ||
+			propertyType === 'long' ||
+			propertyType === 'bool' ||
+			propertyType === 'float'
 		);
 	}
 
@@ -399,17 +405,21 @@ export function getDatafields(mappings, indexes, isSearch = false) {
 					if (type === 'text' || type === 'string') {
 						if (includes(fields, 'keyword')) {
 							acc[field] = `${field}.keyword`;
-						} else {
+						} else if (!isAggs) {
 							acc[field] = field;
 						}
 					}
+					subFieldsMap[field] = fields;
 				};
 
 				if (isSearch) {
 					setKeyWordField(type, fields);
 				} else {
 					if (type === 'text' || type === 'string') setKeyWordField(type, fields);
-					else acc[field] = field;
+					else {
+						acc[field] = field;
+						subFieldsMap[field] = fields;
+					}
 				}
 				return acc;
 			}, {});
@@ -417,7 +427,7 @@ export function getDatafields(mappings, indexes, isSearch = false) {
 			return [...acc, ...values(nestedDataFields)];
 		}, []);
 
-	return [[...new Set(dataFields)], fieldMap];
+	return [[...new Set(dataFields)], fieldMap, subFieldsMap];
 }
 
 function updateQueryRules(selectedFunction, res) {
@@ -437,9 +447,10 @@ export function updateFunction({
 	selectedFunction,
 	res,
 	updateQueryFn = updateQueryRules,
-	description = `Updating function ${get(selectedFunction, 'function.service')} with ${
-		res.payload.name
-	} rule`,
+	description = `Updating function ${get(selectedFunction, 'function.service')} with ${get(
+		res,
+		'payload.name',
+	)} rule`,
 }) {
 	if (selectedFunction && get(selectedFunction, 'function.service')) {
 		updateQueryFn(selectedFunction, res);
@@ -474,7 +485,7 @@ export function getSelectedIndexes(selectedIndexes, mappings) {
 }
 
 export async function handleQueryRuleDelete(rule, removeRule) {
-	const functionIndex = rule.actions.findIndex((item) => item.type === 'function');
+	const functionIndex = get(rule, 'actions', []).findIndex((item) => item.type === 'function');
 	if (functionIndex !== -1) {
 		try {
 			const res = await getSingleFunction(rule.actions[functionIndex].data);
@@ -514,16 +525,11 @@ export function getReIndexedName(appName) {
 
 export function getSubFields({ fields, weight, address }) {
 	if (fields) {
-		const subFields = Object.keys(fields).reduce((agg, field) => {
-			if (field === 'search' || field === 'autosuggest') {
-				return {
-					...agg,
-					[`${address}.${field}`]: weight ? 1 : 0,
-				};
-			}
+		const fieldsToMap = Array.isArray(fields) ? fields : Object.keys(fields);
+		const subFields = fieldsToMap.reduce((agg, field) => {
 			return {
 				...agg,
-				[`${address}.${field}`]: weight,
+				[`${address}.${field}`]: getFieldWeight(field, weight),
 			};
 		}, {});
 
@@ -532,6 +538,24 @@ export function getSubFields({ fields, weight, address }) {
 
 	return { [address]: weight };
 }
+
+export const getFieldWeight = (field, weight) => {
+	switch (field) {
+		case 'autosuggest':
+		case 'lang':
+			return weight ? weight * 0.9 : 0;
+		case 'synonyms':
+			return weight ? weight * 0.7 : 0;
+		case 'delimiter':
+			return weight ? weight * 0.4 : 0;
+		case 'search':
+			return weight ? weight * 0.1 : 0;
+		case 'keyword':
+			return weight ? weight : 0;
+		default:
+			return weight;
+	}
+};
 
 function ltrim(str) {
 	if (!str) return str;
@@ -594,3 +618,53 @@ export const getParsedRoutes = (routes) =>
 			},
 		];
 	}, []);
+
+export const reservedSearchSubFields = [
+	'search',
+	'english',
+	'lang',
+	'autosuggest',
+	'keyword',
+	'synonyms',
+	'delimiter',
+];
+
+export const removeSubFields = (dataField) => {
+	const fieldsToMap = Array.isArray(dataField) ? dataField : Object.keys(dataField);
+	const parsedFields = fieldsToMap.filter(
+		(field) => !reservedSearchSubFields.some((subField) => field.endsWith(`.${subField}`)),
+	);
+
+	if (Array.isArray(dataField)) {
+		return [...new Set(parsedFields)];
+	}
+
+	return parsedFields.reduce(
+		(agg, item) => ({
+			...agg,
+			[item]: dataField[item],
+		}),
+		{},
+	);
+};
+
+export const changedSubFields = (old_fields, new_fields) => {
+	const differentKeys = new_fields.filter((field) => !old_fields.includes(field));
+
+	return differentKeys.reduce((agg, key) => {
+		const lastKey = key.split('.').pop();
+		let fieldName = key;
+		reservedSearchSubFields.forEach((subField) => {
+			fieldName = fieldName.replace(`.${subField}`, '');
+		});
+		return {
+			...agg,
+			[fieldName]: `${agg[fieldName] ? `${agg[fieldName]} ,` : ''}${lastKey}`,
+		};
+	}, {});
+};
+
+export const validateQueryString = (queryString) => {
+	const ACC_API = getURL();
+	return doGet(`${ACC_API}/_validate/query?q=${queryString}`);
+};

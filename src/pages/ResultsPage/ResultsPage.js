@@ -21,6 +21,8 @@ import { getTraversedMappingsByAppName } from '../../batteries/modules/selectors
 import { isEqual, isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import { allowedTiers } from '../../utils/prop-types';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 const bannerDetails = {
 	title: 'Result Settings',
@@ -388,40 +390,42 @@ class ResultsPage extends React.Component {
 				<Banner {...bannerMessage} />
 				<div className={container}>
 					<Form layout="vertical" className={`${label} ant-card-body-padding-bottom-0`}>
-						<Card>
-							<Form.Item
-								label={
-									<>
-										{settingsMap.size.title}
-										<SettingTooltip title={settingsMap.size.description} />
-									</>
-								}
-							>
-								{getFieldDecorator('size')(
-									<InputNumber
-										style={{ width: '15%' }}
-										placeholder="Enter page size"
-										min={0}
-										max={1000}
-									/>,
-								)}
-							</Form.Item>
-						</Card>
+						<ErrorToaster>
+							<Card>
+								<Form.Item
+									label={
+										<>
+											{settingsMap.size.title}
+											<SettingTooltip title={settingsMap.size.description} />
+										</>
+									}
+								>
+									{getFieldDecorator('size')(
+										<InputNumber
+											style={{ width: '15%' }}
+											placeholder="Enter page size"
+											min={0}
+											max={1000}
+										/>,
+									)}
+								</Form.Item>
+							</Card>
 
-						<Card style={{ marginTop: 20 }} title="Fields To Return">
-							{this.renderIncludeExclude(excludeFields, includeFields)}
-						</Card>
-						<Card style={{ marginTop: 20 }} title="Result Highlight Settings">
-							<div style={{ paddingBottom: 32 }}>
-								<label style={{ marginRight: 10 }}>Enable Highlighting</label>
-								{getFieldDecorator('highlight', { valuePropName: 'checked' })(
-									<Switch />,
-								)}
-							</div>
+							<Card style={{ marginTop: 20 }} title="Fields To Return">
+								{this.renderIncludeExclude(excludeFields, includeFields)}
+							</Card>
+							<Card style={{ marginTop: 20 }} title="Result Highlight Settings">
+								<div style={{ paddingBottom: 32 }}>
+									<label style={{ marginRight: 10 }}>Enable Highlighting</label>
+									{getFieldDecorator('highlight', { valuePropName: 'checked' })(
+										<Switch />,
+									)}
+								</div>
 
-							{getFieldValue('highlight') &&
-								this.renderHighlightFields(getFieldDecorator, defaultSettings)}
-						</Card>
+								{getFieldValue('highlight') &&
+									this.renderHighlightFields(getFieldDecorator, defaultSettings)}
+							</Card>
+						</ErrorToaster>
 					</Form>
 
 					<SettingsFooter
@@ -524,4 +528,4 @@ const mapDispatchToProps = (dispatch) => ({
 
 const ResultsForm = Form.create({ name: 'results' })(ResultsPage);
 
-export default connect(mapStateToProps, mapDispatchToProps)(ResultsForm);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(ResultsForm));

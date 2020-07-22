@@ -12,6 +12,8 @@ import CreateAppModal from './CreateAppModal';
 import { loadApps } from '../../actions';
 import { mediaKey } from '../../utils/media';
 import AppDataWrapper from '../../components/AppDataWrapper';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 const link = css`
 	font-size: 16px;
@@ -60,7 +62,7 @@ class HomePage extends Component {
 
 	renderApps = () => {
 		const { apps } = this.props;
-		const sortedApps = apps.data ? Object.keys(apps.data) : [];
+		const sortedApps = apps && apps.data ? Object.keys(apps.data) : [];
 		return (
 			<Row css={{ padding: 30 }} gutter={20}>
 				{sortedApps.length || apps.isFetching ? null : (
@@ -86,11 +88,13 @@ class HomePage extends Component {
 					</section>
 				)}
 
-				<AppDataWrapper
-					apps={apps}
-					onCreateModalChange={this.handleChange}
-					isFetching={apps.isFetching}
-				/>
+				<ErrorToaster>
+					<AppDataWrapper
+						apps={apps}
+						onCreateModalChange={this.handleChange}
+						isFetching={apps.isFetching}
+					/>
+				</ErrorToaster>
 			</Row>
 		);
 	};
@@ -190,4 +194,4 @@ const mapDispatchToProps = (dispatch) => ({
 	fetchApps: () => dispatch(loadApps()),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(HomePage);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(HomePage));

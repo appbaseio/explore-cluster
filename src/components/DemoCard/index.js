@@ -16,9 +16,8 @@ const demoCard = css`
 
 const DemoCards = ({ cardConfig }) => (
 	<Flex css="flex-wrap: wrap;" justifyContent="space-between">
-		{cardConfig.map((config, index) => (
-			// eslint-disable-next-line
-			<div key={index} css={demoCard}>
+		{cardConfig.map((config) => (
+			<div key={config.title} css={demoCard}>
 				<DemoCard
 					title={config.title}
 					description={config.description}

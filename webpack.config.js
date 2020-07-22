@@ -1,8 +1,12 @@
 const path = require('path');
+const webpack = require('webpack');
+
 const SentryPlugin = require('@sentry/webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 
 require('dotenv').config();
 
@@ -15,7 +19,13 @@ const plugins = [
 		filename: 'index.html',
 	}),
 	new CopyWebpackPlugin([{ from: 'static', to: 'static' }, '_redirects']),
+	new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+	new HardSourceWebpackPlugin(),
 ];
+
+if (!isProduction) {
+	plugins.push(new BundleAnalyzerPlugin());
+}
 
 if (isProduction && !!process.env.SENTRY_TOKEN) {
 	plugins.push(
@@ -50,6 +60,18 @@ module.exports = {
 	},
 	plugins,
 	devtool: 'source-map',
+	optimization: {
+		splitChunks: {
+			cacheGroups: {
+				vendor: {
+					test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+					name: 'vendor',
+					chunks: 'all',
+					reuseExistingChunk: true,
+				},
+			},
+		},
+	},
 	module: {
 		rules: [
 			{
@@ -57,6 +79,9 @@ module.exports = {
 				exclude: /node_modules/,
 				use: {
 					loader: 'babel-loader',
+					options: {
+						cacheDirectory: true,
+					},
 				},
 			},
 			{

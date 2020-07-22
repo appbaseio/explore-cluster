@@ -92,7 +92,9 @@ class CreateCredentials extends React.Component {
 								new FormGroup({
 									acl: new FormControl(acl),
 									tag: new FormControl(true),
-									rateLimit: new FormControl(defaultRateLimits[acl], isNegative),
+									rateLimit: new FormControl(defaultRateLimits[acl], [
+										Validators.min(1),
+									]),
 								}),
 						),
 					),

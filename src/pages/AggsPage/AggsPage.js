@@ -20,6 +20,8 @@ import {
 	message,
 	Tooltip,
 	Skeleton,
+	Radio,
+	Typography,
 } from 'antd';
 
 import {
@@ -29,7 +31,7 @@ import {
 	getSettings,
 	deleteSettings,
 } from '../../batteries/modules/actions';
-import { getURL } from '../../constants/config';
+import { getURL, getVersion } from '../../constants/config';
 import Mappings from '../../batteries/components/Mappings/Mappings';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import { getAggsMappings } from '../../batteries/utils/mappings';
@@ -44,6 +46,8 @@ import { isEqual, isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import { highlighter } from '../SandboxPage/components/Search';
 import { allowedTiers } from '../../utils/prop-types';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 const { Option } = Select;
 
@@ -81,6 +85,24 @@ const cardStyle = css`
 	}
 `;
 
+const getChangedKeys = (oldObj, newObj) => {
+	if (!oldObj && !newObj) {
+		return [];
+	}
+
+	if (!oldObj) {
+		return Object.keys(newObj);
+	}
+
+	if (!newObj) {
+		return Object.keys(oldObj);
+	}
+	const modifiedKeys = Object.keys(newObj).filter((item) => oldObj[item] !== newObj[item]);
+	const deletedKeys = Object.keys(oldObj).filter((item) => !newObj[item]);
+
+	return [...new Set([...modifiedKeys, ...deletedKeys])];
+};
+
 class AggsPage extends React.Component {
 	state = {
 		searchableMappings: [],
@@ -90,6 +112,11 @@ class AggsPage extends React.Component {
 		includeNullValue: false,
 		isDirty: false,
 		visible: false,
+		queryFormat: 'or',
+		changedSubFields: {
+			old: {},
+			new: {},
+		},
 	};
 
 	searchableMappings = {};
@@ -166,10 +193,11 @@ class AggsPage extends React.Component {
 
 	initData = (settings) => {
 		this.setState({
-			count: settings.aggregations.size,
-			sort: settings.aggregations.sortBy,
-			includeNullValue: settings.aggregations.includeNullValues,
-			dataField: settings.aggregations.dataField,
+			count: get(settings, 'aggregations.size'),
+			sort: get(settings, 'aggregations.sortBy'),
+			includeNullValue: get(settings, 'aggregations.includeNullValues'),
+			dataField: get(settings, 'aggregations.dataField'),
+			queryFormat: get(settings, 'aggregations.queryFormat', 'or'),
 		});
 	};
 
@@ -320,7 +348,7 @@ class AggsPage extends React.Component {
 	};
 
 	handleSave = () => {
-		const { isDirty, dataField, sort, count, includeNullValue } = this.state;
+		const { isDirty, dataField, sort, count, includeNullValue, queryFormat } = this.state;
 		const { updateSettingsAction, appName, settings } = this.props;
 
 		updateSettingsAction(appName, {
@@ -331,6 +359,7 @@ class AggsPage extends React.Component {
 				size: count,
 				sortBy: sort,
 				includeNullValues: includeNullValue,
+				queryFormat,
 			},
 		})
 			.then((res) => {
@@ -341,7 +370,12 @@ class AggsPage extends React.Component {
 					});
 				} else {
 					message.success(`Aggregation settings for ${appName} saved successfully`);
-
+					this.setState({
+						changedSubFields: {
+							old: {},
+							new: {},
+						},
+					});
 					if (isDirty) {
 						this.reIndex();
 					}
@@ -389,6 +423,39 @@ class AggsPage extends React.Component {
 		}
 	};
 
+	handleQueryFormat = (e) => {
+		this.setState({
+			queryFormat: e.target.value,
+		});
+	};
+
+	handleUsecaseChange = (field, type, usecase, currentUsecase) => {
+		const topLevelKey = +getVersion()[0] >= 7 ? `properties` : `_doc`;
+		const address = field.startsWith(`${topLevelKey}.properties`)
+			? field.replace(`${topLevelKey}.properties`, 'properties')
+			: field;
+		const parsedAddress = address.split('.').reduce((agg, key, index) => {
+			if (index % 2 !== 0) {
+				return agg ? `${agg}.${key}` : key;
+			}
+			return agg;
+		}, '');
+
+		this.setState((prevState) => ({
+			changedSubFields: {
+				...prevState.changedSubFields,
+				new: {
+					...prevState.changedSubFields.new,
+					[parsedAddress]: usecase,
+				},
+				old: {
+					...prevState.changedSubFields.old,
+					[parsedAddress]: currentUsecase,
+				},
+			},
+		}));
+	};
+
 	render() {
 		const {
 			searchableMappings,
@@ -399,6 +466,8 @@ class AggsPage extends React.Component {
 			visible,
 			isReset,
 			isDirty,
+			queryFormat,
+			changedSubFields,
 		} = this.state;
 		const {
 			isUpdating,
@@ -433,6 +502,8 @@ class AggsPage extends React.Component {
 			);
 		}
 
+		const changedDataFields = getChangedKeys(restSavedAggs.dataField, dataField);
+
 		return (
 			<React.Fragment>
 				<Banner {...bannerMessage} />
@@ -443,135 +514,158 @@ class AggsPage extends React.Component {
 						</Card>
 					) : null}
 					<Card>
-						<Mappings
-							showSynonyms={false}
-							showShards={false}
-							ref={this.mappingsRef}
-							showReplicas={false}
-							showMappingInfo={false}
-							showCardWrapper={false}
-							hideSearchType
-							deleteLabel=" Remove from Aggs"
-							hideDelete
-							hideNoneTextType
-							hideDataType
-							hideGeoType
-							isMappingsView={false}
-							renderMappingInfo={() => {
-								if (searchableMappings.length === traversedMappings.length) {
-									return (
-										<p
-											style={{
-												color: '#999',
-												margin: 0,
-												textAlign: 'center',
-											}}
-										>
-											Add aggregation fields from dropdown.
-										</p>
-									);
-								}
-								return null;
-							}}
-							hidePropertiesType
-							onChange={this.handleMappingChange}
-							onDeleteField={this.handleDeleteField}
-							column={{
-								title: (
-									<React.Fragment>
-										{settingsMap.agg_type.title}
-										<Tooltip title={settingsMap.agg_type.description}>
-											<span style={{ marginLeft: 5 }}>
-												<Icon type="info-circle" />
-											</span>
-										</Tooltip>
-									</React.Fragment>
-								),
-								render: ({ address, settings: mappingSettings }) => {
-									const hasKeyword = this.hasKeyword(mappingSettings);
-									let options = ['Term', 'Range'];
-									if (hasKeyword) {
-										options = ['Term'];
+						<ErrorToaster>
+							<Mappings
+								showSynonyms={false}
+								showShards={false}
+								ref={this.mappingsRef}
+								showReplicas={false}
+								showMappingInfo={false}
+								showCardWrapper={false}
+								hideSearchType
+								deleteLabel=" Remove from Aggs"
+								hideDelete
+								hideNoneTextType
+								hideDataType
+								hideGeoType
+								isMappingsView={false}
+								renderMappingInfo={() => {
+									if (
+										searchableMappings &&
+										traversedMappings &&
+										searchableMappings.length === traversedMappings.length
+									) {
+										return (
+											<p
+												style={{
+													color: '#999',
+													margin: 0,
+													textAlign: 'center',
+												}}
+											>
+												Add aggregation fields from dropdown.
+											</p>
+										);
 									}
+									return null;
+								}}
+								hidePropertiesType
+								onChange={this.handleMappingChange}
+								onDeleteField={this.handleDeleteField}
+								onUsecaseChange={this.handleUsecaseChange}
+								column={{
+									title: (
+										<React.Fragment>
+											{settingsMap.agg_type.title}
+											<Tooltip title={settingsMap.agg_type.description}>
+												<span style={{ marginLeft: 5 }}>
+													<Icon type="info-circle" />
+												</span>
+											</Tooltip>
+										</React.Fragment>
+									),
+									render: ({ address, settings: mappingSettings }) => {
+										const hasKeyword = this.hasKeyword(mappingSettings);
+										let options = ['Term', 'Range'];
+										if (hasKeyword) {
+											options = ['Term'];
+										}
 
-									const parsedAddress = address.replace(/properties./g, '');
-									const aggKey = hasKeyword
-										? `${parsedAddress}.keyword`
-										: parsedAddress;
-									const menu = (
-										<Menu
-											onClick={(e) =>
-												this.handleAggType({
-													address: aggKey,
-													value: e.key,
-												})
-											}
-										>
-											{options.map((option) => (
-												<Menu.Item key={option.toLowerCase()}>
-													{option}
-												</Menu.Item>
-											))}
-										</Menu>
-									);
-									return (
-										<Dropdown overlay={menu}>
-											<Button className={dropdown}>
-												{dataField[aggKey] || 'Select Type'}
-												<Icon type="down" />
-											</Button>
-										</Dropdown>
-									);
-								},
-							}}
-							renderFooter={() =>
-								searchableMappings.length ? (
-									<Affix offsetBottom={73}>
-										<Row
-											style={{
-												padding: 10,
-												border: '1px solid #e8e8e8',
-												background: 'white',
-												width: '100%',
-											}}
-											type="flex"
-											justify="space-between"
-										>
-											<Col>
-												<Select
-													key={searchableMappings.length}
-													showSearch
-													placeholder="Add new aggregation field"
-													optionFilterProp="children"
-													style={{ minWidth: 200 }}
-													onChange={this.handleAddField}
-													filterOption={(input, option) =>
-														option.props.children
-															.toLowerCase()
-															.indexOf(input.toLowerCase()) >= 0
-													}
-												>
-													{searchableMappings.map((mapping) => (
-														<Option
-															key={mapping._address}
-															value={mapping._address}
-														>
-															{mapping.address}
-														</Option>
-													))}
-												</Select>
-												{searchableMappings.length ===
-												traversedMappings.length ? (
-													<span className={highlighter} />
-												) : null}
-											</Col>
-										</Row>
-									</Affix>
-								) : null
-							}
-						/>
+										const parsedAddress = address.replace(/properties./g, '');
+										const aggKey = hasKeyword
+											? `${parsedAddress}.keyword`
+											: parsedAddress;
+										const menu = (
+											<Menu
+												onClick={(e) =>
+													this.handleAggType({
+														address: aggKey,
+														value: e.key,
+													})
+												}
+											>
+												{options.map((option) => (
+													<Menu.Item key={option.toLowerCase()}>
+														{option}
+													</Menu.Item>
+												))}
+											</Menu>
+										);
+										return (
+											<Dropdown overlay={menu}>
+												<Button className={dropdown}>
+													{get(dataField, aggKey) || 'Select Type'}
+													<Icon type="down" />
+												</Button>
+											</Dropdown>
+										);
+									},
+								}}
+								renderFooter={() =>
+									searchableMappings.length ? (
+										<Affix offsetBottom={73}>
+											<Row
+												style={{
+													padding: 10,
+													border: '1px solid #e8e8e8',
+													background: 'white',
+													width: '100%',
+												}}
+												type="flex"
+												justify="space-between"
+											>
+												<Col>
+													<Select
+														key={searchableMappings.length}
+														showSearch
+														placeholder="Add new aggregation field"
+														optionFilterProp="children"
+														style={{ minWidth: 200 }}
+														onChange={this.handleAddField}
+														filterOption={(input, option) =>
+															option.props.children
+																.toLowerCase()
+																.indexOf(input.toLowerCase()) >= 0
+														}
+													>
+														{searchableMappings.map((mapping) => (
+															<Option
+																key={mapping._address}
+																value={mapping._address}
+															>
+																{mapping.address}
+															</Option>
+														))}
+													</Select>
+													{searchableMappings &&
+													traversedMappings &&
+													searchableMappings.length ===
+														traversedMappings.length ? (
+														<span className={highlighter} />
+													) : null}
+												</Col>
+											</Row>
+										</Affix>
+									) : null
+								}
+							/>
+						</ErrorToaster>
 					</Card>
 					<Card className={cardStyle}>
+						<label>
+							Query Format
+							<Tooltip title={settingsMap.queryFormat.description}>
+								<Icon style={{ marginLeft: 5 }} type="info-circle" />
+							</Tooltip>
+						</label>
+						<Radio.Group
+							style={{ display: 'flex', marginBottom: 8 }}
+							onChange={this.handleQueryFormat}
+							value={queryFormat}
+						>
+							<Radio value="or">Or</Radio>
+							<Radio value="and">And</Radio>
+						</Radio.Group>
 						<label>
 							Default Size For Aggregations{' '}
 							<Tooltip title={settingsMap.agg_size.description}>
@@ -657,6 +751,7 @@ class AggsPage extends React.Component {
 										sortBy: sort,
 										includeNullValues: includeNullValue,
 										dataField,
+										queryFormat,
 									},
 								},
 								hasTestSettings: true,
@@ -674,12 +769,45 @@ class AggsPage extends React.Component {
 								oldValues={{
 									...restSavedAggs,
 									agg_size: savedSize,
+									mappings: get(changedSubFields, 'old'),
 								}}
 								newValues={{
 									agg_size: count,
 									sortBy: sort,
 									includeNullValues: includeNullValue,
 									dataField,
+									queryFormat,
+									mappings: get(changedSubFields, 'new'),
+								}}
+								renderField={({ value, type, record }) => {
+									const fieldName = get(record, 'setting', '').toLowerCase();
+
+									if (fieldName === 'datafield') {
+										return changedDataFields.map((field) => (
+											<Typography.Paragraph key={field}>
+												{field.replace('.keyword', '')}:{' '}
+												<strong>
+													{type === 'old'
+														? get(restSavedAggs, `dataField.${field}`)
+														: dataField[field]}
+												</strong>
+											</Typography.Paragraph>
+										));
+									}
+
+									if (fieldName === 'mappings') {
+										return Object.keys(get(changedSubFields, type, {})).map(
+											(field) => (
+												<Typography.Paragraph>
+													{field}:{' '}
+													<strong>
+														{get(changedSubFields, `${type}.${field}`)}
+													</strong>
+												</Typography.Paragraph>
+											),
+										);
+									}
+									return JSON.stringify(value, null, 2);
 								}}
 								onClick={() => this.toggleVisible(false)}
 								visible={visible}
@@ -762,4 +890,4 @@ const mapDispatchToProps = (dispatch) => ({
 	deleteSettingsAction: (name) => dispatch(deleteSettings(name)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(AggsPage);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(AggsPage));

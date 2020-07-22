@@ -1,25 +1,22 @@
 /* eslint-disable jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Modal, Select, Tooltip, Icon, message } from 'antd';
+import { Icon, message, Modal, Select, Tooltip } from 'antd';
 import { get } from 'lodash';
 import { connect } from 'react-redux';
 import { css } from 'emotion';
 
 import SynonymInput from './SynonymInput';
 import {
-	getSynonymsState,
-	hasSynonymsAnalyzer,
-	hasSynonymsSubFields,
-	getSynonymsAnalyzerSettings,
 	getParsedSynonyms,
-	getUpdatedSynonymsSubfields,
+	getSynonymsState,
+	parseSynonymsAnalyzer,
 	updateSynonymsSettings,
 } from '../utils';
 import { getURL } from '../../../constants/config';
-import { getSettings, getMappings } from '../../../batteries/utils/mappings';
 import { updateSynonyms } from '../api';
 import { children, synonymTypes } from '../../../utils/prop-types';
+import ErrorToaster from '../../../batteries/components/shared/ErrorToaster';
 
 const { Option } = Select;
 
@@ -130,28 +127,15 @@ class SynonymsModal extends React.Component {
 			: allSynonyms.map((item) => item.synonym);
 
 		const parsedSynonyms = getParsedSynonyms({ type, alternatives, synonyms, searchTerm });
-		const settings = await getSettings(appName, credentials, url).then((data) =>
-			get(data, `${appName}.settings`, {}),
-		);
-
-		const isSynonymsAnalyzerPresent = hasSynonymsAnalyzer(settings);
-		let mappings = await getMappings(appName, credentials, url);
-
-		// // check if all search field has the synonyms analyzer added
-		const hasSubfield = hasSynonymsSubFields(mappings);
-		// get the settings request body will add analyzer if not already present
-		const synonymsAnalyzerSettings = getSynonymsAnalyzerSettings({
-			settings,
-			isSynonymsAnalyzerPresent,
+		const { mappings, hasSubfield, synonymsAnalyzerSettings } = await parseSynonymsAnalyzer({
+			appName,
+			credentials,
+			url,
 			synonyms: [
 				...indexSynonyms.map((item) => item.toLowerCase()),
 				parsedSynonyms.toLowerCase(),
 			],
 		});
-		if (!hasSubfield) {
-			// update all subfields for search
-			mappings = getUpdatedSynonymsSubfields(mappings);
-		}
 
 		const handleSaveData = () => {
 			updateSynonyms({
@@ -225,30 +209,32 @@ class SynonymsModal extends React.Component {
 						disabled: this.getValidation(),
 					}}
 				>
-					<div className={formStyle}>
-						<label>
-							Select Type{' '}
-							<Tooltip title="Synonym type info">
-								<Icon type="info-circle" />
-							</Tooltip>
-						</label>
-						<Select
-							placeholder="Select synonym type"
-							style={{ width: '100%' }}
-							onChange={this.handleType}
-							value={type}
-						>
-							<Option value="one-way">One Way Synonym</Option>
-							<Option value="equivalent">Equivalent Synonym</Option>
-						</Select>
-						<SynonymInput
-							type={type}
-							synonyms={synonyms}
-							searchTerm={searchTerm}
-							alternatives={alternatives}
-							onChange={this.handleChange}
-						/>
-					</div>
+					<ErrorToaster>
+						<div className={formStyle}>
+							<label>
+								Select Type{' '}
+								<Tooltip title="Synonym type info">
+									<Icon type="info-circle" />
+								</Tooltip>
+							</label>
+							<Select
+								placeholder="Select synonym type"
+								style={{ width: '100%' }}
+								onChange={this.handleType}
+								value={type}
+							>
+								<Option value="one-way">One Way Synonym</Option>
+								<Option value="equivalent">Equivalent Synonym</Option>
+							</Select>
+							<SynonymInput
+								type={type}
+								synonyms={synonyms}
+								searchTerm={searchTerm}
+								alternatives={alternatives}
+								onChange={this.handleChange}
+							/>
+						</div>
+					</ErrorToaster>
 				</Modal>
 			</React.Fragment>
 		);

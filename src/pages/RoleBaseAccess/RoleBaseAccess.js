@@ -14,6 +14,8 @@ import { getPermission, getPublicKey, updatePublicKey } from '../../batteries/mo
 import { setRole } from '../../utils';
 import { isBase64 } from '../../utils/helper';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 const { Column } = Table;
 
@@ -139,7 +141,9 @@ class RoleBaseAccess extends React.Component {
 		this.setState((prevState) => ({
 			loadingKey: {
 				...prevState.loadingKey,
-				[id]: prevState.loadingKey[id] ? !prevState.loadingKey[id] : true,
+				[id]: get(prevState, `loadingKey.${id}`)
+					? !get(prevState, `loadingKey.${id}`)
+					: true,
 			},
 		}));
 	};
@@ -148,7 +152,9 @@ class RoleBaseAccess extends React.Component {
 		this.setState((prevState) => ({
 			visibleKey: {
 				...prevState.visibleKey,
-				[id]: prevState.visibleKey[id] ? !prevState.visibleKey[id] : true,
+				[id]: get(prevState, `visibleKey.${id}`)
+					? !get(prevState, `visibleKey.${id}`)
+					: true,
 			},
 		}));
 	};
@@ -161,9 +167,9 @@ class RoleBaseAccess extends React.Component {
 			const role = state && state[value.username];
 			const response = await setRole(value.username, role);
 			if (response.result === 'updated') {
-				notification.success({ message: 'Role Updated Successfully.' });
+				notification.success({ message: 'Role updated successfully.' });
 			} else {
-				notification.error({ message: 'Something went wrong while updating the Role.' });
+				notification.error({ message: 'Something went wrong while updating the role.' });
 			}
 
 			fetchPermissions();
@@ -223,67 +229,69 @@ class RoleBaseAccess extends React.Component {
 						{isPublicKeyLoading ? (
 							<Skeleton />
 						) : (
-							<Form layout="vertical" className={formLabelStyle}>
-								<Form.Item label="Public Key" style={labelMargin}>
-									<Input.TextArea
-										name="publicKey"
-										autosize={{ minRows: 3 }}
-										value={publicKey}
-										placeholder="Enter Public Key"
-										onChange={this.handleChange}
-									/>
-								</Form.Item>
-								<Form.Item
-									label={
-										<Popover
-											content={
-												<>
-													Key in JWT Object that helps
-													<br /> in asserting the role information.{' '}
-													<a
-														href="https://docs.appbase.io/docs/security/Role/"
-														target="_blank"
-														rel="noopener noreferrer"
-													>
-														Read More
-													</a>
-													<br />
-													<img
-														src="https://www.dropbox.com/s/lnjpfglm4wt89q9/Screenshot%202020-02-10%2011.32.01.png?raw=1"
-														alt="role info"
-														style={{
-															height: 100,
-														}}
-													/>
-												</>
-											}
-										>
-											Role Claim <Icon type="question-circle" />
-										</Popover>
-									}
-									style={labelMargin}
-								>
-									<Input
-										placeholder="Enter the key name in your JWT token that will contain the role value"
-										value={roleKey || 'role'}
-										onChange={this.handleChange}
-										name="roleKey"
-									/>
-								</Form.Item>
-								<Form.Item style={labelMargin}>
-									<Button
-										disabled={
-											currentRoleKey === roleKey &&
-											currentPublicKey === publicKey
+							<ErrorToaster>
+								<Form layout="vertical" className={formLabelStyle}>
+									<Form.Item label="Public Key" style={labelMargin}>
+										<Input.TextArea
+											name="publicKey"
+											autosize={{ minRows: 3 }}
+											value={publicKey}
+											placeholder="Enter Public Key"
+											onChange={this.handleChange}
+										/>
+									</Form.Item>
+									<Form.Item
+										label={
+											<Popover
+												content={
+													<>
+														Key in JWT Object that helps
+														<br /> in asserting the role information.{' '}
+														<a
+															href="https://docs.appbase.io/docs/security/Role/"
+															target="_blank"
+															rel="noopener noreferrer"
+														>
+															Read More
+														</a>
+														<br />
+														<img
+															src="https://www.dropbox.com/s/lnjpfglm4wt89q9/Screenshot%202020-02-10%2011.32.01.png?raw=1"
+															alt="role info"
+															style={{
+																height: 100,
+															}}
+														/>
+													</>
+												}
+											>
+												Role Claim <Icon type="question-circle" />
+											</Popover>
 										}
-										type="primary"
-										onClick={this.handleSave}
+										style={labelMargin}
 									>
-										<Icon type={updatingKeys ? 'loading' : 'save'} />
-										Save
-									</Button>
-								</Form.Item>
-							</Form>
+										<Input
+											placeholder="Enter the key name in your JWT token that will contain the role value"
+											value={roleKey || 'role'}
+											onChange={this.handleChange}
+											name="roleKey"
+										/>
+									</Form.Item>
+									<Form.Item style={labelMargin}>
+										<Button
+											disabled={
+												currentRoleKey === roleKey &&
+												currentPublicKey === publicKey
+											}
+											type="primary"
+											onClick={this.handleSave}
+										>
+											<Icon type={updatingKeys ? 'loading' : 'save'} />
+											Save
+										</Button>
+									</Form.Item>
+								</Form>
+							</ErrorToaster>
 						)}
 					</Card>
 					<Card title="Map Roles to API Credentials" style={{ marginTop: 20 }}>
@@ -294,87 +302,89 @@ class RoleBaseAccess extends React.Component {
 						{isPermissionsLoading ? (
 							<Skeleton />
 						) : (
-							<Table
-								rowKey={(record) => record.username || 'permissions'}
-								dataSource={permissions}
-								locale={emptyData}
-							>
-								<Column
-									title="Description"
-									key="description"
-									render={(value) =>
-										(value && value.description) || 'No Description'
-									}
-								/>
-								<Column
-									title="Credentials"
-									key="credentials"
-									render={(value) => (
-										<div>
-											{visibleKey[`${value.username}`]
-												? `${value.username}:${value.password}`
-												: '#####################################'}
-											<Button
-												style={{
-													marginLeft: 8,
-													border: 0,
-													background: 'transparent',
-												}}
-												type="normal"
-												onClick={() => this.showKey(value.username)}
-											>
-												<Icon
-													type={
-														visibleKey[`${value.username}`]
-															? 'eye-invisible'
-															: 'eye'
-													}
-												/>
-											</Button>
-										</div>
-									)}
-								/>
+							<ErrorToaster>
+								<Table
+									rowKey={(record) => record.username || 'permissions'}
+									dataSource={permissions}
+									locale={emptyData}
+								>
+									<Column
+										title="Description"
+										key="description"
+										render={(value) =>
+											(value && value.description) || 'No Description'
+										}
+									/>
+									<Column
+										title="Credentials"
+										key="credentials"
+										render={(value) => (
+											<div>
+												{visibleKey[`${value.username}`]
+													? `${value.username}:${value.password}`
+													: '#####################################'}
+												<Button
+													style={{
+														marginLeft: 8,
+														border: 0,
+														background: 'transparent',
+													}}
+													type="normal"
+													onClick={() => this.showKey(value.username)}
+												>
+													<Icon
+														type={
+															visibleKey[`${value.username}`]
+																? 'eye-invisible'
+																: 'eye'
+														}
+													/>
+												</Button>
+											</div>
+										)}
+									/>
 
-								<Column
-									title="Role"
-									key="role"
-									render={(value) => (
-										<Input
-											defaultValue={value && value.role}
-											name={value.username}
-											onChange={this.handleRole}
-											placeholder="Define Role"
-										/>
-									)}
-								/>
+									<Column
+										title="Role"
+										key="role"
+										render={(value) => (
+											<Input
+												defaultValue={value && value.role}
+												name={value.username}
+												onChange={this.handleRole}
+												placeholder="Define Role"
+											/>
+										)}
+									/>
 
-								<Column
-									title=""
-									key="action"
-									render={(value) => {
-										const { saveRole: saveRoleFunc, state } = this;
-										return (
-											<Button
-												disabled={
-													(state[`${value.username}`] || '') ===
-													value.role
-												}
-												onClick={() => saveRoleFunc(value)}
-												type="primary"
-											>
-												<Icon
-													type={
-														loadingKey && loadingKey[value.username]
-															? 'loading'
-															: 'save'
+									<Column
+										title=""
+										key="action"
+										render={(value) => {
+											const { saveRole: saveRoleFunc, state } = this;
+											return (
+												<Button
+													disabled={
+														(state[`${value.username}`] || '') ===
+														value.role
 													}
-												/>
-												Save
-											</Button>
-										);
-									}}
-								/>
-							</Table>
+													onClick={() => saveRoleFunc(value)}
+													type="primary"
+												>
+													<Icon
+														type={
+															loadingKey && loadingKey[value.username]
+																? 'loading'
+																: 'save'
+														}
+													/>
+													Save
+												</Button>
+											);
+										}}
+									/>
+								</Table>
+							</ErrorToaster>
 						)}
 					</Card>
 				</Container>
@@ -438,4 +448,4 @@ const mapDispatchToProps = (dispatch) => ({
 		),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(RoleBaseAccess);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(RoleBaseAccess));

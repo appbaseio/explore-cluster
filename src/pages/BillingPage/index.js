@@ -19,6 +19,8 @@ import { STRIPE_KEY } from '../../constants';
 import HostedArcBilling from '../../components/PricingTable/HostedArcBilling';
 import ClusterPricingTable from '../../components/PricingTable/ClusterPricingTable';
 import { PRICE_BY_PLANS, EFFECTIVE_PRICE_BY_PLANS } from '../../batteries/utils';
+import { getESVersion } from '../../batteries/utils/mappings';
+import { getVersion } from '../../constants/config';
 
 function numberWithCommas(x) {
 	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -48,9 +50,10 @@ class Billing extends Component {
 		isShowingUnsubscribeArcModal: false,
 	};
 
-	componentDidMount() {
-		const { isAppPlanFetched, fetchAppPlan } = this.props;
-		if (!isAppPlanFetched) {
+	async componentDidMount() {
+		const { isAppPlanFetched, fetchAppPlan, credentials } = this.props;
+		const esVersion = getVersion() || (await getESVersion(null, credentials));
+		if (!isAppPlanFetched && esVersion.split('.')[0] > 5) {
 			fetchAppPlan();
 		}
 	}
@@ -184,7 +187,7 @@ class Billing extends Component {
 											marginTop: '-35px',
 										}}
 										gridRatio={0.4}
-										label={<h3 css={heading}>Total ElasticSearch Nodes</h3>}
+										label={<h3 css={heading}>Total Elasticsearch Nodes</h3>}
 										component={nodeCount}
 									/>
 								</Flex>
@@ -256,7 +259,7 @@ class Billing extends Component {
 										cluster detail view
 									</a>{' '}
 									to unsubscribe from your current plan. You will lose access to
-									Arc APIs and dashboard views after doing this.
+									appbase.io APIs and dashboard views after doing this.
 								</p>
 							</Panel>
 						</Collapse>
@@ -334,10 +337,12 @@ Billing.propTypes = {
 	updatePayment: PropTypes.func.isRequired,
 	isLoading: PropTypes.bool.isRequired,
 	errors: PropTypes.array.isRequired,
+	credentials: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = (state) => {
 	const appPlan = getAppPlanByName(state);
+	const { username, password } = get(state, 'user.data') || {};
 	return {
 		isFetchingPlan: get(state, '$getAppPlan.isFetching'),
 		isAppPlanFetched: !!getAppPlanByName(state),
@@ -351,6 +356,7 @@ const mapStateToProps = (state) => {
 		subscriptionID: get(appPlan, 'subscription_id'),
 		isLoading: get(state, '$updateAppPaymentMethod.isFetching'),
 		errors: [get(state, '$updateAppPaymentMethod.error')],
+		credentials: username && password ? `${username}:${password}` : null,
 	};
 };
 

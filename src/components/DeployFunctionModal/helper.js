@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { css } from 'emotion';
 import { Form, Input } from 'antd';
 import { Validators } from 'react-reactive-form';
+import get from 'lodash/get';
 
 export function isTrue(element) {
 	return element;
@@ -31,8 +32,8 @@ export function renderInputField({
 }) {
 	return (
 		<Form.Item
-			validateStatus={globalError[fieldName] ? 'error' : null}
-			help={globalError[fieldName] ? errorMessage : ''}
+			validateStatus={get(globalError, fieldName) ? 'error' : null}
+			help={get(globalError, fieldName) ? errorMessage : ''}
 			style={{ marginBottom: 0 }}
 		>
 			<Input
@@ -77,7 +78,7 @@ export async function deploymentCheck(getFunction, functionName, myInterval) {
 	try {
 		const res = await getFunction(functionName);
 		if (res) {
-			const { deploymentStatus } = res.payload ? res.payload : res;
+			const { deploymentStatus } = get(res, 'payload', res);
 			if (deploymentStatus === 'active' || deploymentStatus === 'failed') {
 				clearInterval(myInterval);
 			}

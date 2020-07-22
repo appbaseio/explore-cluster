@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Table, Checkbox, Input } from 'antd';
 import { get } from 'lodash';
-
 import { FieldControl } from 'react-reactive-form';
+import { aclOptionsLabel } from './utils';
 
 // Custom acls tabular view
 class Acl extends React.PureComponent {
@@ -24,7 +24,7 @@ class Acl extends React.PureComponent {
 						render={({ handler, invalid }) => (
 							<Input
 								className={invalid ? 'input-error' : null}
-								min="0"
+								min="1"
 								type="number"
 								{...handler()}
 							/>
@@ -37,6 +37,7 @@ class Acl extends React.PureComponent {
 			{
 				title: 'Category',
 				dataIndex: 'key',
+				render: (item) => aclOptionsLabel[item],
 				key: 'key',
 			},
 			{

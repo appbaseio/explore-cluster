@@ -1,4 +1,6 @@
 import { get } from 'lodash';
+import { doPost, doGet } from '../../../batteries/utils/requestService';
+import { getURL } from '../../../constants/config';
 
 const generateQuery = ({ aggregations: filters, search, results, synonyms }) => {
 	const filtersData =
@@ -8,17 +10,18 @@ const generateQuery = ({ aggregations: filters, search, results, synonyms }) => 
 					return {
 						id: `list-${index}`,
 						dataField: typeof filterField === 'string' ? [filterField] : filterField,
-						sortBy: filters.sortBy,
-						size: filters.size,
+						sortBy: get(filters, 'sortBy', 'asc'),
+						size: get(filters, 'size', 10),
 						type: 'term',
 						value: [],
+						queryFormat: get(filters, 'queryFormat', 'or'),
 					};
 			  })
 			: [];
 
 	const filtersId = filtersData.map((filter) => filter.id);
-	const resultDataField = results.dataField || '_score';
-	const searchDataField = search.dataField || [];
+	const resultDataField = get(results, 'dataField', '_score');
+	const searchDataField = get(search, 'dataField', []);
 	const query = [
 		{
 			...results,
@@ -26,14 +29,14 @@ const generateQuery = ({ aggregations: filters, search, results, synonyms }) => 
 			react: {
 				and: ['search', ...filtersId],
 			},
-			size: results.size || 10,
+			size: get(results, 'size', 10),
 			dataField: Array.isArray(resultDataField) ? resultDataField : [resultDataField],
 		},
 		{
 			...search,
 			id: 'search',
 			dataField: Array.isArray(searchDataField) ? searchDataField : [searchDataField],
-			fieldWeights: search.fieldWeights || [],
+			fieldWeights: get(search, 'fieldWeights', []),
 			enableSynonyms: get(synonyms, 'enabled', true),
 			value: '',
 		},
@@ -71,4 +74,18 @@ const flatObject = (obj, path = '') => {
 	}, {});
 };
 
-export { isValidJSON, generateQuery, flatObject };
+const recordGrade = ({ index, id, grade, query }) => {
+	const ACC_API = getURL();
+	return doPost(`${ACC_API}/_grade/${index}/${id}`, {
+		query,
+		grade,
+	});
+};
+
+const getQueryGrades = ({ query }) => {
+	const ACC_API = getURL();
+	const finalQuery = query || 'empty_query';
+	return doGet(`${ACC_API}/_grade/${finalQuery}`);
+};
+
+export { isValidJSON, generateQuery, flatObject, recordGrade, getQueryGrades };

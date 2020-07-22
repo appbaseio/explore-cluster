@@ -1,11 +1,13 @@
 import { get } from 'lodash';
-import { getVersion, getURL } from '../../../constants/config';
+import { getURL, getVersion } from '../../../constants/config';
 import {
-	getMappingsTree,
 	closeIndex,
-	updateSettings,
+	getMappings,
+	getMappingsTree,
+	getSettings,
 	openIndex,
 	reIndex,
+	updateSettings,
 } from '../../../batteries/utils/mappings';
 
 export const getSynonymsState = ({ synonyms, type }) => {
@@ -244,3 +246,30 @@ export const updateSynonymsSettings = ({
 		}
 	});
 };
+
+export async function parseSynonymsAnalyzer({ appName, credentials, url, synonyms }) {
+	const settings = await getSettings(appName, credentials, url).then((data) =>
+		get(data, `${appName}.settings`, {}),
+	);
+
+	const isSynonymsAnalyzerPresent = hasSynonymsAnalyzer(settings);
+	let mappings = await getMappings(appName, credentials, url);
+
+	// // check if all search field has the synonyms analyzer added
+	const hasSubfield = hasSynonymsSubFields(mappings);
+	// get the settings request body will add analyzer if not already present
+	const synonymsAnalyzerSettings = getSynonymsAnalyzerSettings({
+		settings,
+		isSynonymsAnalyzerPresent,
+		synonyms,
+	});
+	if (!hasSubfield) {
+		// update all subfields for search
+		mappings = getUpdatedSynonymsSubfields(mappings);
+	}
+	return {
+		mappings,
+		hasSubfield,
+		synonymsAnalyzerSettings,
+	};
+}

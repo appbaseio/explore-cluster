@@ -2,15 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Switch, Route } from 'react-router-dom';
 import Loadable from 'react-loadable';
-
+import get from 'lodash/get';
 import Loader from '../Loader';
 import AppPageContainer from '../AppPageContainer';
 import ErrorPage from '../../pages/ErrorPage';
+import ClusterAnalyticsRoutes from './ClusterAnalyticsRoutes';
 
-const AnalyticsPage = Loadable({
-	loader: () => import(/* webpackChunkName: "AnalyticsPage" */ '../../pages/AnalyticsPage'),
-	loading: Loader,
-});
 const ProfilePage = Loadable({
 	loader: () => import(/* webpackChunkName: "ProfilePage" */ '../../pages/ProfilePage'),
 	loading: Loader,
@@ -33,15 +30,6 @@ const QueryRulesPage = Loadable({
 const QueryRulesForm = Loadable({
 	loader: () =>
 		import(/* webpackChunkName: "QueryRulesForm" */ '../../pages/QueryRules/QueryRulesForm'),
-	loading: Loader,
-});
-const GeoDistributionPage = Loadable({
-	loader: () =>
-		import(/* webpackChunkName: "GeoDistributionPage" */ '../../pages/GeoDistributionPage'),
-	loading: Loader,
-});
-const SearchLatency = Loadable({
-	loader: () => import(/* webpackChunkName: "SearchLatency" */ '../../pages/SearchLatency'),
 	loading: Loader,
 });
 
@@ -91,40 +79,9 @@ const SandboxPage = Loadable({
 	loading: Loader,
 });
 
-const PopularSearches = Loadable({
-	loader: () => import(/* webpackChunkName: "PopularSearches" */ '../../pages/PopularSearches'),
-	loading: Loader,
-});
-
-const PopularResults = Loadable({
-	loader: () => import(/* webpackChunkName: "PopularResults" */ '../../pages/PopularResults'),
-	loading: Loader,
-});
-
-const PopularFilters = Loadable({
-	loader: () => import(/* webpackChunkName: "PopularFilters" */ '../../pages/PopularFilters'),
-	loading: Loader,
-});
-
-const NoResultSearches = Loadable({
-	loader: () => import(/* webpackChunkName: "NoResultSearches" */ '../../pages/NoResultSearches'),
-	loading: Loader,
-});
 const ShareSettings = Loadable({
 	loader: () =>
 		import(/* webpackChunkName: "ShareSettingsPage" */ '../../pages/ShareSettingsPage'),
-	loading: Loader,
-});
-
-const RequestLogs = Loadable({
-	loader: () => import(/* webpackChunkName: "RequestLogs" */ '../../pages/RequestLogs'),
-	loading: Loader,
-});
-const RequestDistributionPage = Loadable({
-	loader: () =>
-		import(
-			/* webpackChunkName: "RequestDistributionPage" */ '../../pages/RequestDistributionPage'
-		),
 	loading: Loader,
 });
 
@@ -138,11 +95,18 @@ const ClusterInsights = Loadable({
 	loading: Loader,
 });
 
+const GradeEvaluation = Loadable({
+	loader: () => import('../../pages/GradeEvaluation'),
+	loading: Loader,
+});
+
 class ClusterRouteContainer extends React.Component {
 	shouldComponentUpdate(nextProps) {
 		const { location } = this.props;
-
-		return nextProps && nextProps.location && nextProps.location.pathname !== location.pathname;
+		return (
+			get(nextProps, 'location.pathname') !== get(location, 'pathname') ||
+			get(nextProps, 'location.search') !== get(location, 'search')
+		);
 	}
 
 	render() {
@@ -172,20 +136,6 @@ class ClusterRouteContainer extends React.Component {
 					/>
 					<Route
 						exact
-						path="/cluster/analytics/:tab?/:subTab?"
-						component={(props) => (
-							<AppPageContainer {...props} component={AnalyticsPage} />
-						)}
-					/>
-					<Route
-						exact
-						path="/cluster/popular-searches"
-						component={(props) => (
-							<AppPageContainer {...props} component={PopularSearches} />
-						)}
-					/>
-					<Route
-						exact
 						path="/cluster/credentials"
 						component={(props) => (
 							<AppPageContainer {...props} component={CredentialsPage} />
@@ -198,55 +148,7 @@ class ClusterRouteContainer extends React.Component {
 							<AppPageContainer {...props} component={UserManagementPage} />
 						)}
 					/>
-					<Route
-						exact
-						path="/cluster/popular-results"
-						component={(props) => (
-							<AppPageContainer {...props} component={PopularResults} />
-						)}
-					/>
-					<Route
-						exact
-						path="/cluster/geo-distribution"
-						component={(props) => (
-							<AppPageContainer {...props} cluster component={GeoDistributionPage} />
-						)}
-					/>
-					<Route
-						exact
-						path="/cluster/search-latency"
-						component={(props) => (
-							<AppPageContainer {...props} component={SearchLatency} />
-						)}
-					/>
-					<Route
-						exact
-						path="/cluster/popular-filters"
-						component={(props) => (
-							<AppPageContainer {...props} component={PopularFilters} />
-						)}
-					/>
-					<Route
-						exact
-						path="/cluster/request-logs/:tab?"
-						component={(props) => (
-							<AppPageContainer {...props} component={RequestLogs} />
-						)}
-					/>
-					<Route
-						exact
-						path="/cluster/requests-per-minute"
-						component={(props) => (
-							<AppPageContainer {...props} component={RequestDistributionPage} />
-						)}
-					/>
-					<Route
-						exact
-						path="/cluster/no-results-searches"
-						component={(props) => (
-							<AppPageContainer {...props} component={NoResultSearches} />
-						)}
-					/>
+
 					<Route
 						exact
 						path="/cluster/import"
@@ -334,6 +236,16 @@ class ClusterRouteContainer extends React.Component {
 							<AppPageContainer {...props} component={ClusterInsights} />
 						)}
 					/>
+
+					<Route
+						exact
+						path="/cluster/grade-evaluation"
+						component={(props) => (
+							<AppPageContainer {...props} component={GradeEvaluation} />
+						)}
+					/>
+
+					<ClusterAnalyticsRoutes />
 				</Switch>
 			</ErrorPage>
 		);

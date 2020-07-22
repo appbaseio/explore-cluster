@@ -41,7 +41,7 @@ const Shards = ({
 				<a
 					target="_blank"
 					rel="noopener noreferrer"
-					href="https://docs.appbase.io/docs/search/Mappings/#manage-shards"
+					href="https://docs.appbase.io/docs/search/relevancy/#index-settings"
 				>
 					here
 				</a>

@@ -115,7 +115,7 @@ const bannerDetails = {
 const toolTips = {
 	promote_result: (
 		<>
-			Promote a result and show it at a specific position within the search results.{' '}
+			Promote a document and show it at a specific position within the search results.{' '}
 			<a
 				target="_blank"
 				rel="noopener noreferrer"
@@ -127,7 +127,7 @@ const toolTips = {
 	),
 	hide_result: (
 		<>
-			Hide a document from search results.{' '}
+			Hide document(s) from search results.{' '}
 			<a
 				target="_blank"
 				rel="noopener noreferrer"
@@ -139,7 +139,7 @@ const toolTips = {
 	),
 	replace_search_term: (
 		<>
-			Replace the whole search term with another search term.{' '}
+			Replace an end-user provided search term with a specified search term.{' '}
 			<a
 				target="_blank"
 				rel="noopener noreferrer"
@@ -151,7 +151,7 @@ const toolTips = {
 	),
 	custom_data: (
 		<>
-			Add extra JSON data to be returned with your search results.{' '}
+			Add extra JSON data to be returned with the search results.{' '}
 			<a
 				target="_blank"
 				rel="noopener noreferrer"
@@ -163,7 +163,7 @@ const toolTips = {
 	),
 	function: (
 		<>
-			Add a custom function to make changed without any limitations.{' '}
+			Add a user-defined function to pre or post-process when trigger conditions are met.{' '}
 			<a
 				target="_blank"
 				rel="noopener noreferrer"
@@ -175,7 +175,7 @@ const toolTips = {
 	),
 	remove_words: (
 		<>
-			Remove a word(s) from the search term.{' '}
+			Remove specified word(s) from the end-user provided search term.{' '}
 			<a
 				target="_blank"
 				rel="noopener noreferrer"
@@ -187,11 +187,55 @@ const toolTips = {
 	),
 	replace_words: (
 		<>
-			Replace all the instances of a word in the applied search term.{' '}
+			Replace all the instances of the specified word(s) in the end-user provided search term.{' '}
 			<a
 				target="_blank"
 				rel="noopener noreferrer"
 				href="https://docs.appbase.io/docs/search/rules/#replace-words"
+			>
+				Learn more
+			</a>
+		</>
+	),
+	add_filter: (
+		<>
+			Add one or more term queries (aka filters) to the incoming search query.{' '}
+			<a
+				target="_blank"
+				rel="noopener noreferrer"
+				href="https://docs.appbase.io/docs/search/rules/#add_filter"
+			>
+				Learn more
+			</a>
+		</>
+	),
+	replace_search_query: (
+		<>
+			Modify the whole query by using the{' '}
+			<a
+				target="_blank"
+				rel="noopener noreferrer"
+				href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html"
+			>
+				Elasticsearch Query String
+			</a>{' '}
+			syntax.{' '}
+			<a
+				target="_blank"
+				rel="noopener noreferrer"
+				href="https://docs.appbase.io/docs/search/rules/#replace-search-query"
+			>
+				Learn more
+			</a>
+		</>
+	),
+	search_settings: (
+		<>
+			Set data field(s) and field weight(s) to be applied to the search query.{' '}
+			<a
+				target="_blank"
+				rel="noopener noreferrer"
+				href="https://docs.appbase.io/docs/search/rules/#search-settings"
 			>
 				Learn more
 			</a>

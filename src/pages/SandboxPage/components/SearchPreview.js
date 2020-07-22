@@ -9,16 +9,24 @@ import { ReactiveBase } from '@appbaseio/reactivesearch';
 
 import Filter from './Filter';
 
-import { getSettings, getAppMappings, getRules } from '../../../batteries/modules/actions';
+import {
+	getSettings,
+	getAppMappings,
+	getRules,
+	clearSearchState,
+} from '../../../batteries/modules/actions';
 import Search from './Search';
 import Result from './Result/index';
-import { generateQuery } from '../utils';
+import { generateQuery, getQueryGrades } from '../utils';
 import { getAggsMappings } from '../../../batteries/utils/mappings';
 import { getURL } from '../../../constants/config';
 import { getSubFields } from '../../../utils';
 import { isValidPlan } from '../../../batteries/utils';
 import generateSandboxURL from '../utils/sandbox-generator';
 import { allowedTiers } from '../../../utils/prop-types';
+import ErrorToaster from '../../../batteries/components/shared/ErrorToaster';
+import { withErrorToaster } from '../../../batteries/components/shared/ErrorToaster/ErrorToaster';
+import SandboxContext from './SandboxContext';
 
 const container = css`
 	padding: 16px;
@@ -31,8 +39,15 @@ const container = css`
 class SearchPreview extends React.Component {
 	state = {
 		settings: null,
-		searchableMappings: [],
-		isAnalyticsEnabled: true,
+		searchableMappings: {},
+		isAnalyticsEnabled: localStorage.getItem('enableAnalytics')
+			? localStorage.getItem('enableAnalytics') === 'true'
+			: true,
+		isParsedStateApplied: false,
+		isGradingEnabled: localStorage.getItem('enableGrading')
+			? localStorage.getItem('enableGrading') === 'true'
+			: false,
+		queryGrades: {},
 	};
 
 	componentDidMount() {
@@ -50,6 +65,8 @@ class SearchPreview extends React.Component {
 			fetchRules,
 			tier,
 			featureRules,
+			featureGrade,
+			searchState,
 		} = this.props;
 
 		/*
@@ -62,9 +79,24 @@ class SearchPreview extends React.Component {
 		}
 
 		/*
-			Fetch Settings ifnot present in redux store.
+			Update Grading to be false if not a valid plan.
 		*/
-		if (!settings) {
+		if (isValidPlan(tier, featureGrade)) {
+			const search = (searchState || []).find((component) => component.id === 'search');
+			const searchValue = get(search, 'value', get(search, 'defaultValue', ''));
+			this.setQueryGrades(searchValue);
+		} else {
+			this.toggleGrading(false);
+		}
+
+		/*
+			Fetch Settings if not present in redux store.
+		*/
+		if (searchState) {
+			this.setState({
+				settings: searchState,
+			});
+		} else if (!settings) {
 			fetchSearchSettings(app);
 		} else {
 			this.setState({
@@ -85,7 +117,7 @@ class SearchPreview extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { mappings, isFetchingMappings, hasTestSettings, settings } = this.props;
+		const { mappings, isFetchingMappings, hasTestSettings, settings, searchState } = this.props;
 		/*
 			Update the searchable mappings state whenever there is a change in mappings.
 		*/
@@ -106,11 +138,24 @@ class SearchPreview extends React.Component {
 			Once the Search Relevancy API gets resolves we need to populate the state
 		 	with the components query.
 		*/
-		if (!hasTestSettings && JSON.stringify(settings) !== JSON.stringify(prevProps.settings)) {
+		if (
+			!hasTestSettings &&
+			!searchState &&
+			JSON.stringify(settings) !== JSON.stringify(prevProps.settings)
+		) {
 			// eslint-disable-next-line
 			this.setState({
 				settings: generateQuery(settings),
 			});
+		}
+	}
+
+	componentWillUnmount() {
+		const { clearState } = this.props;
+		const { settings } = this.state;
+
+		if (settings) {
+			clearState();
 		}
 	}
 
@@ -135,6 +180,41 @@ class SearchPreview extends React.Component {
 	static getDerivedStateFromProps(props, state) {
 		const searchSettings =
 			state && state.settings ? state.settings.find((item) => item.id === 'search') : {};
+		const isGradingAllowed = isValidPlan(props.tier, props.featureGrade);
+		if (!isGradingAllowed && state.isGradingEnabled) {
+			return {
+				isGradingEnabled: false,
+			};
+		}
+
+		if (props.searchState) {
+			const searchQuery = get(props, 'searchState', []).find(
+				(component) => component.id === 'search',
+			);
+			// If parsedState doesnt contains search dataField we prefill with all searchable mappings
+			if (
+				!state.isParsedStateApplied &&
+				get(searchQuery, 'dataField.length', 0) === 0 &&
+				state.searchableMappings &&
+				Object.keys(state.searchableMappings).length > 0
+			) {
+				return {
+					isParsedStateApplied: true,
+					settings: [
+						...get(props, 'searchState', []).filter(
+							(component) => component.id !== 'search',
+						),
+						{
+							...searchQuery,
+							dataField: Object.keys(state.searchableMappings),
+							fieldWeights: Object.values(state.searchableMappings),
+						},
+					],
+				};
+			}
+
+			return state;
+		}
 
 		/*
 			We need to prefill the datasearch with all searchable mappings
@@ -147,6 +227,8 @@ class SearchPreview extends React.Component {
 			!props.hasTestSettings &&
 			!props.isFetchingMappings &&
 			props.mappings &&
+			state.searchableMappings &&
+			Object.keys(state.searchableMappings).length > 0 &&
 			state.settings &&
 			get(searchSettings, 'dataField', []).length === 0
 		) {
@@ -154,7 +236,7 @@ class SearchPreview extends React.Component {
 				settings: generateQuery({
 					...props.settings,
 					search: {
-						...props.settings.search,
+						...get(props, 'settings.search', {}),
 						dataField: Object.keys(state.searchableMappings),
 						fieldWeights: Object.values(state.searchableMappings),
 					},
@@ -170,6 +252,7 @@ class SearchPreview extends React.Component {
 			!props.settings &&
 			!state.settings &&
 			state.searchableMappings &&
+			Object.keys(state.searchableMappings).length > 0 &&
 			props.mappings &&
 			props.settingsErrorCode === 402
 		) {
@@ -196,8 +279,16 @@ class SearchPreview extends React.Component {
 	};
 
 	toggleAnalytics = (value) => {
+		localStorage.setItem('enableAnalytics', JSON.stringify(value));
 		this.setState({
 			isAnalyticsEnabled: value,
+		});
+	};
+
+	toggleGrading = (value) => {
+		localStorage.setItem('enableGrading', JSON.stringify(value));
+		this.setState({
+			isGradingEnabled: value,
 		});
 	};
 
@@ -222,6 +313,14 @@ class SearchPreview extends React.Component {
 		window.open(codesandboxURL, '_blank');
 	};
 
+	setQueryGrades = (query) => {
+		getQueryGrades({ query }).then((res) => {
+			this.setState({
+				queryGrades: res,
+			});
+		});
+	};
+
 	render() {
 		const {
 			settings,
@@ -232,8 +331,17 @@ class SearchPreview extends React.Component {
 			rules,
 			isFetchingMappings,
 			mappings,
+			handleModal,
+			tier,
+			featureGrade,
 		} = this.props;
-		const { settings: stateSettings, isAnalyticsEnabled } = this.state;
+		const {
+			settings: stateSettings,
+			isAnalyticsEnabled,
+			isGradingEnabled,
+			queryGrades,
+		} = this.state;
+		const isGradingAllowed = isValidPlan(tier, featureGrade);
 
 		if (fetchingDefaultSettings) {
 			return (
@@ -287,9 +395,27 @@ class SearchPreview extends React.Component {
 									Record Analytics
 									<Switch
 										checked={isAnalyticsEnabled}
-										style={{ marginLeft: 5 }}
+										style={{ marginLeft: 5, marginRight: 10 }}
 										onChange={this.toggleAnalytics}
 										id="analytics"
+									/>
+								</label>
+							</Tooltip>
+							<Tooltip
+								title={
+									isGradingAllowed
+										? 'Toggle to enable (or disable) grading of search results.'
+										: 'This feature is not available for the current plan, please upgrade to a higher plan.'
+								}
+							>
+								<label htmlFor="grading">
+									Grade Search
+									<Switch
+										checked={isGradingEnabled}
+										disabled={!isGradingAllowed}
+										style={{ marginLeft: 5 }}
+										onChange={this.toggleGrading}
+										id="grading"
 									/>
 								</label>
 							</Tooltip>
@@ -310,29 +436,46 @@ class SearchPreview extends React.Component {
 					}}
 				>
 					<Col md={6}>
-						<Filter
-							handleValueChange={this.handleValueChange}
-							app={app}
-							aggs={aggregations}
-						/>
+						<ErrorToaster>
+							<Filter
+								handleValueChange={this.handleValueChange}
+								app={app}
+								aggs={aggregations}
+								handleModal={handleModal}
+							/>
+						</ErrorToaster>
 					</Col>
 					<Col md={18}>
-						<Search
-							handleValueChange={this.handleValueChange}
-							app={app}
-							search={search}
-						/>
-						<Result
-							result={result}
-							query={stateSettings}
-							app={app}
-							url={url}
-							toggleAnalytics={this.toggleAnalytics}
-							recordAnalytics={isAnalyticsEnabled}
-							rules={rules}
-							onChange={this.handleSettingsChange}
-							credentials={credentials}
-						/>
+						<ErrorToaster
+							inline
+							title="Something went wrong while displaying Search UI"
+						>
+							<Search
+								handleValueChange={this.handleValueChange}
+								app={app}
+								onValueChange={this.setQueryGrades}
+								search={search}
+								handleModal={handleModal}
+							/>
+						</ErrorToaster>
+						<ErrorToaster>
+							<SandboxContext.Provider
+								value={{
+									app,
+									credentials,
+									url,
+									queryGrades: get(queryGrades, 'docs', {}),
+									recordAnalytics: isAnalyticsEnabled,
+									isGradingEnabled,
+									searchTerm: get(search, 'value', get(search, 'defaultValue')),
+									query: stateSettings,
+									toggleAnalytics: this.toggleAnalytics,
+									onSettingsChange: this.handleSettingsChange,
+								}}
+							>
+								<Result result={result} app={app} rules={rules} />
+							</SandboxContext.Provider>
+						</ErrorToaster>
 					</Col>
 				</ReactiveBase>
 			</Row>
@@ -353,6 +496,8 @@ const mapStateToProps = (state, props) => {
 		url: getURL(),
 		rules: get(state, '$getAppRules.results'),
 		tier: get(state, '$getAppPlan.results.tier'),
+		featureGrade: get(state, '$getAppPlan.results.feature_search_grader'),
+		searchState: get(state, '$getSearchState.parsedSearchState', null),
 		featureRules: get(state, '$getAppPlan.results.feature_rules', false),
 	};
 };
@@ -362,6 +507,7 @@ const mapDispatchToProps = (dispatch) => ({
 	fetchSearchSettings: (appName) => dispatch(getSettings(appName)),
 	fetchMappings: (appName, credentials, url) =>
 		dispatch(getAppMappings(appName, credentials, url)),
+	clearState: () => dispatch(clearSearchState()),
 });
 
 SearchPreview.propTypes = {
@@ -377,9 +523,13 @@ SearchPreview.propTypes = {
 	rules: PropTypes.array,
 	tier: allowedTiers,
 	featureRules: PropTypes.bool,
+	featureGrade: PropTypes.bool,
 	fetchingDefaultSettings: PropTypes.bool,
 	isFetchingMappings: PropTypes.bool,
 	mappings: PropTypes.object,
+	searchState: PropTypes.object,
+	clearState: PropTypes.func,
+	handleModal: PropTypes.func,
 };
 
 SearchPreview.defaultProps = {
@@ -389,9 +539,13 @@ SearchPreview.defaultProps = {
 	rules: null,
 	tier: undefined,
 	featureRules: false,
+	featureGrade: false,
 	fetchingDefaultSettings: false,
 	isFetchingMappings: false,
 	mappings: null,
+	searchState: null,
+	clearState: () => {},
+	handleModal: () => {},
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(SearchPreview);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(SearchPreview));

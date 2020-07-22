@@ -1,7 +1,7 @@
 /* eslint-disable react/jsx-curly-brace-presence */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-
+import get from 'lodash/get';
 import { Button, Modal } from 'antd';
 import * as typeformEmbed from '@typeform/embed';
 import { TYPE_FORM } from '../../constants';
@@ -15,7 +15,7 @@ class Unsubscribe extends Component {
 
 	embedTypescriptWidget = () => {
 		this.setState({ typeFormStep: TYPE_FORM.LOADED });
-		if (this.myRef.current) {
+		if (get(this, 'myRef.current')) {
 			typeformEmbed.makeWidget(
 				this.myRef.current,
 				'https://siddharth31.typeform.com/to/QEktta',
@@ -77,7 +77,7 @@ class Unsubscribe extends Component {
 						<p>
 							We{"'"}re sorry to see you go. Are you sure you want to unsubscribe from
 							the current plan? Canceling the subscription would make the dashboard
-							GUI and Arc endpoints inaccessible within 24 hours.
+							GUI and appbase.io endpoints inaccessible within 24 hours.
 							<br />
 							<br />
 							<p>You{"'"}ll be asked for a one question feedback survey.</p>

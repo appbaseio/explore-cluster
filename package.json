@@ -10,7 +10,7 @@
 	"scripts": {
 		"start": "NODE_ENV=development webpack-dev-server --mode development --content-base . --history-api-fallback  --hot --inline --progress --colors --port 3333",
 		"lint": "eslint --cache .",
-		"build": "NODE_ENV=production node ./scripts/create-env.js && webpack --mode production",
+		"build": "NODE_ENV=production node ./scripts/create-env.js && node --max_old_space_size=4096 ./node_modules/webpack/bin/webpack.js --mode production --progress",
 		"glow": "glow --watch",
 		"format": "prettier --write --use-tabs 'src/!(batteries*)**/**/*.js'",
 		"analyze": "source-map-explorer 'dist/*.js'",
@@ -23,8 +23,8 @@
 	},
 	"lint-staged": {
 		"./src/!(batteries*)**/*.js": [
-			"yarn format",
-			"yarn lint"
+			"prettier --write --use-tabs",
+			"eslint --fix"
 		]
 	},
 	"devDependencies": {
@@ -53,6 +53,7 @@
 		"file-loader": "^2.0.0",
 		"flow-bin": "^0.78.0",
 		"glow": "^1.2.2",
+		"hard-source-webpack-plugin": "^0.13.1",
 		"html-webpack-plugin": "^4.0.1",
 		"jest": "^25.5.3",
 		"less": "^3.8.1",
@@ -61,6 +62,7 @@
 		"source-map-explorer": "^2.4.1",
 		"style-loader": "^0.22.1",
 		"webpack": "^4.16.5",
+		"webpack-bundle-analyzer": "^3.8.0",
 		"webpack-cli": "^3.1.0",
 		"webpack-dev-server": "^3.1.5"
 	},
@@ -68,9 +70,9 @@
 		"@appbaseio-confidential/importer": "git+https://1dc0d0fc07f05943afdde9bdb85b7aa438a0ce3b:x-oauth-basic@github.com/appbaseio-confidential/importer#importer/lib",
 		"@appbaseio/dejavu-browser": "^3.4.5",
 		"@appbaseio/designkit": "^0.9.1",
-		"@appbaseio/react-filter-box": "^3.3.2",
+		"@appbaseio/react-filter-box": "^3.4.1",
 		"@appbaseio/reactivecore": "^9.5.7",
-		"@appbaseio/reactivesearch": "^3.8.1",
+		"@appbaseio/reactivesearch": "^3.11.7",
 		"@babel/plugin-proposal-class-properties": "^7.0.0-rc.1",
 		"@sentry/browser": "^4.2.1",
 		"@typeform/embed": "^0.14.1",

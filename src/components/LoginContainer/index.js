@@ -14,13 +14,12 @@ const LoginContainer = ({ children }) => (
 				<h2 className="title">
 					<mark>
 						Give <span className="highlight">superpowers</span> to your
-						&nbsp;ElasticSearch cluster!
+						&nbsp;Elasticsearch cluster!
 					</mark>
 				</h2>
 				<p>
-					Arc helps you with building the best search experience while you focus on
-					serving your users. It can be used with appbase.io clusters or your own
-					ElasticSearch cluster.
+					appbase.io enables you to build the best relevant search experiences for web and
+					mobile. You can deploy it on cloud or host it yourself.
 				</p>
 				<div className="signup_description">
 					<ul className="signup_benefits">
@@ -41,23 +40,20 @@ const LoginContainer = ({ children }) => (
 						<li>
 							<Icon type="check" className="icon" />
 							<span>
-								Browse data, edit mappings, build search visually, and create query
-								rules
+								Browse data, edit schema, build relevant search visually, and apply
+								query rules to extend the search engine.
 							</span>
 						</li>
 						<li>
 							<Icon type="check" className="icon" />
 							<span>
-								Get actionable analytics to improve content and increase your search
-								ROI
+								Get actionable analytics to understand and improve the search ROI
+								impact on your business
 							</span>
 						</li>
 						<li>
 							<Icon type="check" className="icon" />
-							<span>
-								Get best-in-class security with read/write permissions, granular
-								ACLs and more
-							</span>
+							<span>Setup access control for search that works out of the box</span>
 						</li>
 					</ul>
 				</div>

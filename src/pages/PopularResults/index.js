@@ -38,7 +38,7 @@ const PopularResultsWrapper = ({ appName, plan, isGrowth }) => (
 				<Container>
 					<PopularResults
 						filterId="popular_results_page"
-						displayReplaySearch
+						displayReplaySearch={window.location.pathname.startsWith('/app')}
 						appName={appName}
 						plan={plan}
 					/>

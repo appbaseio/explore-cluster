@@ -61,7 +61,11 @@ class SearchPreviewModal extends React.Component {
 					destroyOnClose
 					visible={visible}
 				>
-					<SearchPreview app={app} {...searchPreviewProps} />
+					<SearchPreview
+						app={app}
+						{...searchPreviewProps}
+						handleModal={this.toggleVisibilty}
+					/>
 				</Modal>
 			</React.Fragment>
 		);

@@ -1,3 +1,5 @@
+import React from 'react';
+
 const settingsMap = {
 	size: {
 		title: 'Page Size',
@@ -46,7 +48,7 @@ const settingsMap = {
 		description: 'Enable or disable application of default stopwords. Enabled by default.',
 	},
 	customStopwords: {
-		title: 'Apply Custom Stopwords',
+		title: 'Set Custom Stopwords',
 		description:
 			'Set comma separated stopwords to be ignored during the language specifc analysis process.',
 	},
@@ -120,6 +122,53 @@ const settingsMap = {
 	},
 	synonyms: {
 		description: 'Enable synonyms for better searching across similar words',
+	},
+	queryString: {
+		title: 'Query String',
+		description: (
+			<React.Fragment>
+				<p style={{ fontSize: 15 }}>
+					If set to <strong>true</strong> than it allows you to create a complex search
+					that includes wildcard characters, searches across multiple fields, and more.{' '}
+					<a
+						href="https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						Learn More.
+					</a>
+				</p>
+			</React.Fragment>
+		),
+	},
+	queryFormat: {
+		title: 'Query Format',
+		description: (
+			<React.Fragment>
+				<p style={{ fontSize: 15 }}>
+					Sets the query format, can be <strong>or</strong> or <strong>and</strong>.
+					Defaults to <strong>or</strong>.
+				</p>
+				<ul>
+					<li>
+						<strong>or</strong> returns all the results matching any of the search query
+						text&apos;s parameters. For example, searching for &quot;bat man&quot; with
+						or will return all the results matching either &quot;bat&quot; or
+						&quot;man&quot;.
+					</li>
+					<li>
+						On the other hand with <strong>and</strong>, only results matching both
+						&quot;bat&quot; and &quot;man&quot; will be returned. It returns the results
+						matching all of the search query text&apos;s parameters.
+					</li>
+				</ul>
+			</React.Fragment>
+		),
+	},
+	queryType: {
+		title: 'Query Type',
+		description:
+			'Query type determines the query DSL to be used. It defaults to ReactiveSearch.',
 	},
 };
 

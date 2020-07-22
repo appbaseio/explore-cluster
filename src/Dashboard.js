@@ -11,10 +11,6 @@ import * as Sentry from '@sentry/browser';
 import { loadUser } from './actions';
 import Loader from './components/Loader';
 import Logo from './components/Logo';
-import PrivateRoute from './pages/LoginPage/PrivateRoute';
-import Wrapper from './pages/Wrapper';
-import BillingPage from './pages/BillingPage';
-import InstallPage from './pages/InstallPage';
 
 Sentry.init({
 	dsn: 'https://8e07fb23ba8f46d8a730e65496bb7f00@sentry.io/58038',
@@ -31,15 +27,44 @@ const SignupPage = Loadable({
 	loading: Loader,
 });
 
+const BillingPage = Loadable({
+	loader: () => import(/* webpackChunkName: "BillingPage" */ './pages/BillingPage'),
+	loading: Loader,
+});
+
+const InstallPage = Loadable({
+	loader: () => import(/* webpackChunkName: "InstallPage" */ './pages/InstallPage'),
+	loading: Loader,
+});
+
+const Wrapper = Loadable({
+	loader: () => import(/* webpackChunkName: "WrapperComponent" */ './pages/Wrapper'),
+	loading: Loader,
+});
+
+const PrivateRoute = Loadable({
+	loader: () => import(/* webpackChunkName: "PrivateRoute" */ './pages/LoginPage/PrivateRoute'),
+	loading: Loader,
+});
+
 class Dashboard extends Component {
 	state = {
 		error: false,
 		isLoading: true,
+		redirectLocation: null,
 	};
 
 	componentDidMount() {
 		const { loadArcUser } = this.props;
-		const params = new URLSearchParams(window.location.search);
+		const { pathname, search } = window.location;
+
+		if (pathname !== '/login' && pathname !== '/' && search) {
+			this.setState({
+				redirectLocation: `${pathname}${search}`,
+			});
+		}
+
+		const params = new URLSearchParams(search);
 		if (params.has('showProfile')) {
 			const showProfile = params.get('showProfile');
 			sessionStorage.setItem('showProfile', showProfile);
@@ -111,14 +136,14 @@ class Dashboard extends Component {
 						title: error.message,
 						content: (
 							<p>
-								Are you using a valid Arc ID? If so, please subscribe to a paid plan
-								to continue using Arc. It takes up to 1 hour for the billing change
-								to get reflected. If you have subscribed and continue to see this
-								message, reach out to us at{' '}
-								<a href="mailto:support@appbase.io">support@appbase.io</a>.
+								Are you using a valid appbase.io ID? Subscribe to a plan to continue
+								accessing appbase.io. It can take up to 1 hour for a payment made to
+								get reflected. Reach out to us at{' '}
+								<a href="mailto:support@appbase.io">support@appbase.io</a> for any
+								questions.
 							</p>
 						),
-						okText: 'Go to billing',
+						okText: 'See Subscription Plans',
 						onOk: () => {
 							window.location = '/billing';
 						},
@@ -126,6 +151,12 @@ class Dashboard extends Component {
 			);
 		}
 	}
+
+	resetLocation = () => {
+		this.setState({
+			redirectLocation: null,
+		});
+	};
 
 	componentDidCatch(error, errorInfo) {
 		this.setState({
@@ -141,7 +172,7 @@ class Dashboard extends Component {
 
 	render() {
 		const { user } = this.props;
-		const { error, isLoading } = this.state;
+		const { error, isLoading, redirectLocation } = this.state;
 
 		if (user.isLoading || isLoading) {
 			return <Loader />;
@@ -193,7 +224,16 @@ class Dashboard extends Component {
 					<Route exact path="/install" component={InstallPage} />
 					<Route exact path="/login" component={LoginPage} />
 					<Route exact path="/signup" component={SignupPage} />
-					<PrivateRoute user={user} component={Wrapper} />
+					<PrivateRoute
+						user={user}
+						component={(props) => (
+							<Wrapper
+								{...props}
+								resetLocation={this.resetLocation}
+								redirectLocation={redirectLocation}
+							/>
+						)}
+					/>
 				</Fragment>
 			</Router>
 		);

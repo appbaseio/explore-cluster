@@ -55,6 +55,7 @@ import { isValidPlan } from '../../batteries/utils';
 import { AdvancedEditor, CustomAutoComplete } from '../../components/AdvancedEditor';
 import { getRawQuery, parseExpression } from '../../components/AdvancedEditor/helper';
 import { allowedTiers } from '../../utils/prop-types';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 
 const customReactFilter = css`
 	.react-filter-box {
@@ -161,7 +162,7 @@ class QueryRulesForm extends React.Component {
 			// filter state
 			dataField: '',
 			dataFieldValue: '',
-			query: 'matches',
+			query: '==',
 			queryValue: '',
 
 			timeframe: null,
@@ -175,7 +176,11 @@ class QueryRulesForm extends React.Component {
 			// internal state
 			mappings: [],
 			dataFields: [],
+			aggsFields: [],
+			searchFields: [],
 			isEditPage: !!hasId,
+
+			subFieldsMap: {},
 
 			error: {},
 			loading: false,
@@ -203,13 +208,28 @@ class QueryRulesForm extends React.Component {
 		this.setState({ loading: true });
 		getClusterMappings()
 			.then((mappings) => {
-				const [dataFields, fieldMap] = getDatafields(mappings, ['*']);
-				const [searchFields] = getDatafields(mappings, ['*'], true);
+				const { selectedIndexes } = this.state;
+				const [dataFields, fieldMap, subFieldsMap] = getDatafields({
+					mappings,
+					indexes: ['*'],
+				});
+				const [searchFields] = getDatafields({
+					mappings,
+					indexes: selectedIndexes,
+					isSearch: true,
+				});
+				const [aggsFields] = getDatafields({
+					mappings,
+					indexes: selectedIndexes,
+					isAggs: true,
+				});
 				this.setState({
 					mappings,
 					dataFields,
 					searchFields,
+					aggsFields,
 					fieldMap,
+					subFieldsMap,
 					loading: false,
 				});
 			})
@@ -304,14 +324,24 @@ class QueryRulesForm extends React.Component {
 
 	handleIndex = (selectedIndexes) => {
 		const { mappings } = this.state;
-		const [dataFields] = getDatafields(mappings, selectedIndexes);
-		const [searchFields] = getDatafields(mappings, selectedIndexes, true);
+		const [dataFields] = getDatafields({ mappings, indexes: selectedIndexes });
+		const [searchFields] = getDatafields({
+			mappings,
+			indexes: selectedIndexes,
+			isSearch: true,
+		});
+		const [aggsFields] = getDatafields({
+			mappings,
+			indexes: selectedIndexes,
+			isAggs: true,
+		});
 
 		this.setState((prevState) => ({
 			editorKey: Date.now(),
 			selectedIndexes,
 			dataFields,
 			searchFields,
+			aggsFields,
 			dataField: dataFields[0] || '',
 			error: {
 				...prevState.error,
@@ -378,25 +408,30 @@ class QueryRulesForm extends React.Component {
 
 		const hasError = !!Object.keys(error).length;
 
+		const suffixExpression = `and ${parseExpression(advancedExpression, fieldMap)}`;
+
+		function getExpression() {
+			return show_advance_editor
+				? `'${(selectedIndexes || []).join(',')}' in $index ${
+						advancedExpression ? suffixExpression : ''
+				  }`
+				: getExpressionFromValue({
+						selectedIndexes,
+						dataFieldValue,
+						dataField,
+						query,
+						queryValue,
+						condition,
+				  });
+		}
+
 		const params = {
 			name,
 			description,
 			show_advance_editor,
 			trigger: {
 				type: condition,
-				expression: show_advance_editor
-					? `'${selectedIndexes.join(',')}' in $index and ${parseExpression(
-							advancedExpression,
-							fieldMap,
-					  )}`
-					: getExpressionFromValue({
-							selectedIndexes,
-							dataFieldValue,
-							dataField,
-							query,
-							queryValue,
-							condition,
-					  }),
+				expression: condition === 'always' ? '' : getExpression(),
 				timeframe,
 			},
 		};
@@ -555,6 +590,7 @@ class QueryRulesForm extends React.Component {
 			dataFields,
 			searchFields,
 			dataField,
+			aggsFields,
 			dataFieldValue,
 			query,
 			queryValue,
@@ -569,6 +605,7 @@ class QueryRulesForm extends React.Component {
 			show_advance_editor,
 			rawQuery,
 			editorKey,
+			subFieldsMap,
 		} = this.state;
 		const {
 			isCreating,
@@ -739,32 +776,34 @@ class QueryRulesForm extends React.Component {
 									<Radio value="filter">Set Condition</Radio>
 									<Radio value="always">Always Trigger</Radio>
 								</Radio.Group>
-								<div style={{ marginBottom: 15 }}>
-									<label>
-										Index to apply rule to
-										<Info content="Select the index or indices to apply the rule to." />
-									</label>
-									{getErrorMessage(error.selectedIndexes)}
-									<IndexDropdown
-										selectedIndexes={selectedIndexes}
-										error={error && error.selectedIndexes}
-										onChange={this.handleIndex}
-									/>
-								</div>
 								{condition === 'filter' && (
-									<label
-										style={{
-											marginBottom: 15,
-											color: '#1890ff',
-											cursor: 'pointer',
-										}}
-										onClick={this.toggleAdvancedEditor}
-									>
-										{show_advance_editor ? 'Hide' : 'Show'} Advanced Editor
-									</label>
+									<>
+										<div style={{ marginBottom: 15 }}>
+											<label>
+												Index to apply rule to
+												<Info content="Select the index or indices to apply the rule to." />
+											</label>
+											{getErrorMessage(error.selectedIndexes)}
+											<IndexDropdown
+												selectedIndexes={selectedIndexes}
+												error={error && error.selectedIndexes}
+												onChange={this.handleIndex}
+											/>
+										</div>
+										<label
+											style={{
+												marginBottom: 15,
+												color: '#1890ff',
+												cursor: 'pointer',
+											}}
+											onClick={this.toggleAdvancedEditor}
+										>
+											{show_advance_editor ? 'Hide' : 'Show'} Advanced Editor
+										</label>
+									</>
 								)}
 								{!show_advance_editor && (
-									<>
+									<ErrorToaster inline>
 										<Conditions
 											onChange={this.handleInput}
 											error={error.condition}
@@ -776,7 +815,7 @@ class QueryRulesForm extends React.Component {
 											onDropdownChange={this.handleDropdown}
 											queryValue={queryValue}
 										/>
-									</>
+									</ErrorToaster>
 								)}
 								{show_advance_editor && condition === 'filter' && (
 									<div className={customReactFilter}>
@@ -787,14 +826,16 @@ class QueryRulesForm extends React.Component {
 											/>
 										</label>
 										{getErrorMessage(error.condition)}
-										<AdvancedEditor
-											key={editorKey}
-											query={rawQuery}
-											onChange={this.handleExpression}
-											autoCompleteHandler={this.customAutoComplete}
-											onParseOk={this.onParseOk}
-											onParseError={this.onParseError}
-										/>
+										<ErrorToaster inline>
+											<AdvancedEditor
+												key={editorKey}
+												query={rawQuery}
+												onChange={this.handleExpression}
+												autoCompleteHandler={this.customAutoComplete}
+												onParseOk={this.onParseOk}
+												onParseError={this.onParseError}
+											/>
+										</ErrorToaster>
 									</div>
 								)}
 
@@ -841,20 +882,26 @@ class QueryRulesForm extends React.Component {
 							</Col>
 
 							<Col md={12} sm={24}>
-								<Actions
-									dataFields={dataFields}
-									searchFields={searchFields}
-									indexes={getSelectedIndexes(selectedIndexes, mappings)}
-									actions={actions}
-									onChange={this.updateActions}
-									error={error}
-								/>
-								<ActionSelector
-									error={error && error.actions}
-									actions={actions}
-									condition={condition}
-									onChange={this.setActions}
-								/>
+								<ErrorToaster inline>
+									<Actions
+										dataFields={dataFields}
+										searchFields={searchFields}
+										aggsFields={aggsFields}
+										indexes={getSelectedIndexes(selectedIndexes, mappings)}
+										actions={actions}
+										onChange={this.updateActions}
+										error={error}
+										subFieldsMap={subFieldsMap}
+									/>
+								</ErrorToaster>
+								<ErrorToaster inline>
+									<ActionSelector
+										error={error && error.actions}
+										actions={actions}
+										condition={condition}
+										onChange={this.setActions}
+									/>
+								</ErrorToaster>
 							</Col>
 						</Row>
 					</section>

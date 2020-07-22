@@ -4,16 +4,17 @@ import { get, isObject, keys, transform } from 'lodash';
 import { Button, Modal } from 'antd';
 import { isEqual } from '../../batteries/utils';
 import DiffTable from './DiffTable';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 class ReviewAndSave extends React.Component {
 	difference = (object, base) => {
 		const changes = (obj, baseObj) =>
 			transform(obj, (result, value, key) => {
-				if (!isEqual(value, baseObj[key])) {
+				if (!isEqual(value, get(baseObj, key))) {
 					// eslint-disable-next-line no-param-reassign
 					result[key] =
-						isObject(value) && isObject(baseObj[key])
-							? changes(value, baseObj[key])
+						isObject(value) && isObject(get(baseObj, key))
+							? changes(value, get(baseObj, key))
 							: value;
 				}
 			});
@@ -31,6 +32,7 @@ class ReviewAndSave extends React.Component {
 			oldValues,
 			loading,
 			isReset,
+			renderField,
 		} = this.props;
 		const difference = this.difference(oldValues, newValues);
 		const isDifferent = keys(difference).length > 0;
@@ -74,6 +76,7 @@ class ReviewAndSave extends React.Component {
 								new: get(newValues, field),
 							},
 						})}
+						renderField={renderField}
 					/>
 				</Modal>
 			</>
@@ -91,6 +94,7 @@ ReviewAndSave.propTypes = {
 	onClick: PropTypes.func.isRequired,
 	loading: PropTypes.bool,
 	isReset: PropTypes.bool,
+	renderField: PropTypes.func,
 };
 
 ReviewAndSave.defaultProps = {
@@ -100,6 +104,7 @@ ReviewAndSave.defaultProps = {
 	buttonProps: {},
 	loading: false,
 	isReset: false,
+	renderField: null,
 };
 
-export default ReviewAndSave;
+export default withErrorToaster(ReviewAndSave);

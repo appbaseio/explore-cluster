@@ -29,7 +29,8 @@ const HomePage = Loadable({
 });
 
 const ClusterLayout = Loadable({
-	loader: () => import(/* webpackChunkName: "ClusterLayout" */ '../../components/AppLayout/ClusterLayout'),
+	loader: () =>
+		import(/* webpackChunkName: "ClusterLayout" */ '../../components/AppLayout/ClusterLayout'),
 	loading: Loader,
 });
 
@@ -50,19 +51,6 @@ const defaultRoutes = {
 			{ label: 'Search Preview', link: 'search-preview', tag: 'Beta', openIndexMenu: true },
 		],
 	},
-	Analytics: {
-		icon: 'line-chart',
-		menu: [
-			{ label: 'Overview', link: '/cluster/analytics' },
-			{ label: 'Popular Searches', link: '/cluster/popular-searches' },
-			{ label: 'No Result Searches', link: '/cluster/no-results-searches' },
-			{ label: 'Popular Filters', link: '/cluster/popular-filters' },
-			{ label: 'Popular Results', link: '/cluster/popular-results' },
-			{ label: 'Geo Distribution', link: '/cluster/geo-distribution' },
-			{ label: 'Requests Per Minute', link: '/cluster/requests-per-minute' },
-			{ label: 'Search Latency', link: '/cluster/search-latency' },
-		],
-	},
 	'Search Relevancy': {
 		icon: 'search',
 		menu: [
@@ -76,6 +64,20 @@ const defaultRoutes = {
 			{ label: 'Query Suggestions', link: '/cluster/query-suggestions', tag: 'Beta' },
 			{ label: 'Query Rules', link: '/cluster/rules', tag: 'Beta' },
 			{ label: 'Functions', link: '/cluster/functions', tag: 'Beta' },
+			{ label: 'Grade Evaluation', link: '/cluster/grade-evaluation', tag: 'Beta' },
+		],
+	},
+	Analytics: {
+		icon: 'line-chart',
+		menu: [
+			{ label: 'Overview', link: '/cluster/analytics' },
+			{ label: 'Popular Searches', link: '/cluster/popular-searches' },
+			{ label: 'No Result Searches', link: '/cluster/no-results-searches' },
+			{ label: 'Popular Filters', link: '/cluster/popular-filters' },
+			{ label: 'Popular Results', link: '/cluster/popular-results' },
+			{ label: 'Geo Distribution', link: '/cluster/geo-distribution' },
+			{ label: 'Requests Per Minute', link: '/cluster/requests-per-minute' },
+			{ label: 'Search Latency', link: '/cluster/search-latency' },
 		],
 	},
 	'Curated Insights': {
