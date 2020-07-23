@@ -64,6 +64,8 @@ import {
 	SelectedFilters,
 } from '@appbaseio/reactivesearch';
 import './styles.css';
+import Expand from './Expand';
+import Tooltip from './Tooltip';
 
 const App = () => {
 	return (
@@ -86,13 +88,13 @@ export default App;
 	`;
 };
 
-const styles = `body {
+const styles = (hasFilters) => `body {
   margin: 0;
 }
 
 .app {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: ${hasFilters ? '0.3fr 1fr' : '1fr'};
   overflow: hidden;
   grid-gap: 15px;
   padding: 10px;
@@ -104,10 +106,12 @@ const styles = `body {
 }
 
 .item {
-  background: #f0f0f0;
   padding: 10px;
   width: 100%;
-  margin: 10px 0;
+  margin: 10px 0 0;
+  background: #eaeaea;
+  position: relative;
+  transition: all ease 0.2s;
 }
 
 .item-key {
@@ -116,12 +120,39 @@ const styles = `body {
   padding: 4px;
 }
 
-.item-key > span {
+.item-key .value {
   max-width: 200px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+pre {
+  background: black;
+  max-width: 300px;
+  overflow: scroll;
+}
+
+/******* EXPAND-COLLAPSE STYLES *******/
+.collapse {
+  overflow: hidden;
+  max-height: 200px;
+}
+
+.expand-button-container button {
+  margin: 10px;
+  color: #1890ff;
+  border: 0;
+  background: inherit;
+  cursor: pointer;
+}
+
+.expand-button-container {
+  width: 100%;
+  background: linear-gradient(180deg, #eaeaea, rgba(255, 255, 255, 0.8));
+}
+
+/******* TOOLTIP STYLES *******/
 
 /* Tooltip container */
 .tooltip {
@@ -142,13 +173,9 @@ const styles = `body {
   top: -5px;
   right: 105%;
   max-width: 450px;
-  min-width: 320px;
+  min-width: fit-content;
   padding: 10px;
   overflow-x: scroll;
-}
-
-pre {
-  background: black;
 }
 
 /* Show the tooltip text when you mouse over the tooltip container */
@@ -161,6 +188,77 @@ pre {
     grid-template-columns: auto;
   }
 }
+`;
+
+const Tooltip = `import React from "react"; const Tooltip = ({ title, children, code }) => {
+  return (
+    <div class="tooltip">
+      {children}
+      <span
+        class="tooltiptext"
+        dangerouslySetInnerHTML={{
+          __html: code ? \`<pre>\${title}</pre>\` : title
+        }}
+      />
+    </div>
+  );
+};
+
+export default Tooltip;`;
+
+const Expand = `import React from "react";
+
+class Expand extends React.Component {
+  state = { collapsed: false, hasOverflow: false };
+  currentRef = React.createRef();
+
+  componentDidMount() {
+    if (this.currentRef && this.currentRef.current) {
+      const currentHeight = this.currentRef.current.getBoundingClientRect()
+        .height;
+
+      if (currentHeight > 200) {
+        this.setState({
+          hasOverflow: true,
+          collapsed: true
+        });
+      }
+    }
+  }
+
+  toggleCollapse = () => {
+    this.setState(state => ({
+      collapsed: !state.collapsed
+    }));
+  };
+
+  render() {
+    const { className, children } = this.props;
+    const { hasOverflow, collapsed } = this.state;
+    return (
+      <React.Fragment>
+        <div
+          ref={this.currentRef}
+          className={\`\${className} \${
+            hasOverflow && collapsed ? "collapse" : ""
+          }\`}
+        >
+          {children}
+        </div>
+        {hasOverflow ? (
+          <div className="expand-button-container">
+            <button onClick={this.toggleCollapse}>
+              {collapsed ? "Show more..." : "Collapse"}
+            </button>
+          </div>
+        ) : null}
+      </React.Fragment>
+    );
+  }
+}
+
+export default Expand;
+
 `;
 
 const generateResultCode = ({ id: resultId, dataField, ...resultProps }) => {
@@ -181,30 +279,27 @@ const generateResultCode = ({ id: resultId, dataField, ...resultProps }) => {
 
 		// Change to update the UI
 		return (
-			<div className="item" key={rest._id}>
-				{Object.keys(rest).map((key) => (
-					<div className="item-key">
-						<span>{key}</span>
-						{typeof rest[key] === 'object' ? (
-							<div class="tooltip">
-								{'{...}'}
-								<span
-									class="tooltiptext"
-									dangerouslySetInnerHTML={{
-										__html: JSON.stringify(rest[key], null, 2) || 'N/A',
-									}}
-								/>
-							</div>
-						) : (
-							<span
-								dangerouslySetInnerHTML={{
-									__html: JSON.stringify(rest[key]) || 'N/A',
-								}}
-							/>
-						)}
-					</div>
+			<Expand className="item" key={rest._id}>
+				{Object.keys(rest).map(key => (
+				<div className="item-key">
+					<span>{key}</span>
+					<Tooltip
+					code={typeof rest[key] === "object"}
+					title={JSON.stringify(rest[key], null, 2) || "N/A"}
+					>
+					<div
+						className="value"
+						dangerouslySetInnerHTML={{
+						__html:
+							typeof rest[key] === "object"
+							? "{...}"
+							: JSON.stringify(rest[key]) || "N/A"
+						}}
+					/>
+					</Tooltip>
+				</div>
 				))}
-			</div>
+			</Expand>
 		);
 	}}`,
 		);
@@ -220,6 +315,10 @@ const generateSearchCode = ({ id: searchId, value, ...searchProps }) => {
 };
 
 const generateFiltersCode = (filtersWithProps) => {
+	if (filtersWithProps.length === 0) {
+		return '';
+	}
+
 	return filtersWithProps.reduce((agg, { id, value, type, dataField, ...filter }) => {
 		const listCode = reactElementToJSXString(
 			<div
@@ -260,6 +359,8 @@ const generateSandboxURL = ({ settings, app, credentials, url }) => {
 		'src/index.js': {
 			content: index,
 		},
+		'src/Expand.js': { content: Expand },
+		'src/Tooltip.js': { content: Tooltip },
 		'src/App.js': {
 			content: generateAppCode({
 				searchCode,
@@ -270,7 +371,7 @@ const generateSandboxURL = ({ settings, app, credentials, url }) => {
 				url,
 			}),
 		},
-		'src/styles.css': { content: styles },
+		'src/styles.css': { content: styles(filtersWithProps.length) },
 		'package.json': {
 			content: {
 				name: 'ReactiveSearch Starter',
@@ -290,9 +391,10 @@ const generateSandboxURL = ({ settings, app, credentials, url }) => {
 		(agg, item) => ({
 			...agg,
 			[item]: {
-				content: item.endsWith('.js')
-					? sandboxCodeFormat(unFormattedFiles[item].content)
-					: unFormattedFiles[item].content,
+				content:
+					item === 'src/App.js'
+						? sandboxCodeFormat(unFormattedFiles[item].content)
+						: unFormattedFiles[item].content,
 			},
 		}),
 		{},
