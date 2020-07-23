@@ -96,7 +96,7 @@ const ClusterInsights = Loadable({
 });
 
 const GradeEvaluation = Loadable({
-	loader: () => import('../../pages/GradeEvaluation'),
+	loader: () => import(/* webpackChunkName: "GradeEvaluation" */ '../../pages/GradeEvaluation'),
 	loading: Loader,
 });
 

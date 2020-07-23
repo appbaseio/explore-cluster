@@ -7,47 +7,49 @@ import AppPageContainer from '../AppPageContainer';
 import Loader from '../Loader';
 
 const PopularResults = Loadable({
-	loader: () => import('../../pages/PopularResults'),
+	loader: () => import(/* webpackChunkName: "PopularResults" */ '../../pages/PopularResults'),
 	loading: Loader,
 });
 
 const AnalyticsPage = Loadable({
-	loader: () => import('../../pages/AnalyticsPage'),
+	loader: () => import(/* webpackChunkName: "AnalyticsPage" */ '../../pages/AnalyticsPage'),
 	loading: Loader,
 });
 
 const PopularFilters = Loadable({
-	loader: () => import('../../pages/PopularFilters'),
+	loader: () => import(/* webpackChunkName: "PopularFilters" */ '../../pages/PopularFilters'),
 	loading: Loader,
 });
 
 const NoResultSearches = Loadable({
-	loader: () => import('../../pages/NoResultSearches'),
+	loader: () => import(/* webpackChunkName: "NoResultSearches" */ '../../pages/NoResultSearches'),
 	loading: Loader,
 });
 
 const RequestLogs = Loadable({
-	loader: () => import('../../pages/RequestLogs'),
+	loader: () => import(/* webpackChunkName: "RequestLogs" */ '../../pages/RequestLogs'),
 	loading: Loader,
 });
 
 const RequestDistributionPage = Loadable({
-	loader: () => import('../../pages/RequestDistributionPage'),
+	loader: () =>
+		import(/* webpackChunkName: "RequestDistribution" */ '../../pages/RequestDistributionPage'),
 	loading: Loader,
 });
 
 const GeoDistributionPage = Loadable({
-	loader: () => import('../../pages/GeoDistributionPage'),
+	loader: () =>
+		import(/* webpackChunkName: "GeoDistribution" */ '../../pages/GeoDistributionPage'),
 	loading: Loader,
 });
 
 const SearchLatency = Loadable({
-	loader: () => import('../../pages/SearchLatency'),
+	loader: () => import(/* webpackChunkName: "SearchLatency" */ '../../pages/SearchLatency'),
 	loading: Loader,
 });
 
 const PopularSearches = Loadable({
-	loader: () => import('../../pages/PopularSearches'),
+	loader: () => import(/* webpackChunkName: "PopularSearches" */ '../../pages/PopularSearches'),
 	loading: Loader,
 });
 
