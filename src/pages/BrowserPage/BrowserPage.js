@@ -13,6 +13,7 @@ import {
 
 import Loader from '../../components/Loader';
 import { getURL } from '../../constants/config';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 /* eslint-disable */
 injectGlobal`
