@@ -95,6 +95,7 @@ class SearchSettingsPage extends React.Component {
 		},
 		changedFieldWeights: {},
 		queryType: 'default',
+		enableNgram: true,
 	};
 
 	noUseCaseMappings = [];
@@ -186,6 +187,7 @@ class SearchSettingsPage extends React.Component {
 			dataField,
 			enableSynonyms: get(settings, 'synonyms.enabled'),
 			queryType,
+			enableNgram: get(settings, 'indexSettings.enableNgram', true),
 		});
 	};
 
@@ -399,6 +401,35 @@ class SearchSettingsPage extends React.Component {
 		});
 	};
 
+	updateSubFields = ({ dataField, enableNgram }) => {
+		if (enableNgram) {
+			const fields = removeSubFields(Object.keys(dataField));
+			const allSearchFields = fields.reduce(
+				(agg, field) => ({
+					...agg,
+					[`${field}.search`]: getFieldWeight('search', get(dataField, field, 1)),
+				}),
+				{},
+			);
+			return {
+				...dataField,
+				...allSearchFields,
+			};
+		}
+
+		return Object.keys(dataField).reduce(
+			(agg, field) => ({
+				...agg,
+				...(field.endsWith('.search')
+					? {}
+					: {
+							[field]: get(dataField, field, 1),
+					  }),
+			}),
+			{},
+		);
+	};
+
 	handleSave = () => {
 		const {
 			isDirty,
@@ -408,19 +439,29 @@ class SearchSettingsPage extends React.Component {
 			enableSynonyms,
 			queryFormat,
 			queryType,
+			enableNgram,
 		} = this.state;
 		const { updateSettingsAction, appName, settings, getSettingsAction } = this.props;
+		const savedNGramValue = get(settings, 'indexSettings.enableNgram', true);
+		const hasNgramChanged = enableNgram !== savedNGramValue;
+		let updatedFields = dataField;
+		if (hasNgramChanged) {
+			updatedFields = this.updateSubFields({ dataField, enableNgram });
+		}
 
 		updateSettingsAction(appName, {
 			...settings,
 			search: {
 				...get(settings, 'search', {}),
 				fuzziness: hasTypoTolerance ? typoTolerance : 0,
-				dataField: Object.keys(dataField),
-				fieldWeights: Object.values(dataField),
+				dataField: Object.keys(updatedFields),
+				fieldWeights: Object.values(updatedFields),
 				searchOperators: queryType === 'searchOperators',
 				queryString: queryType === 'queryString',
 				queryFormat,
+			},
+			indexSettings: {
+				enableNgram,
 			},
 			synonyms: {
 				enabled: enableSynonyms,
@@ -442,7 +483,7 @@ class SearchSettingsPage extends React.Component {
 						},
 						changedFieldWeights: {},
 					});
-					if (isDirty) {
+					if (enableNgram !== savedNGramValue || isDirty) {
 						this.reIndex();
 					}
 					this.setState({
@@ -633,6 +674,7 @@ class SearchSettingsPage extends React.Component {
 			changedFieldWeights,
 			changedFields,
 			queryType,
+			enableNgram,
 		} = this.state;
 		const {
 			isUpdating,
@@ -720,6 +762,7 @@ class SearchSettingsPage extends React.Component {
 								showCardWrapper={false}
 								hideAggsType
 								hideNoType
+								forceNgram={enableNgram}
 								hideDelete
 								onUsecaseChange={this.handleUsecaseChange}
 								hideDataType
@@ -915,6 +958,17 @@ class SearchSettingsPage extends React.Component {
 							checked={enableSynonyms}
 							onChange={(value) => this.handleChange('enableSynonyms', value)}
 						/>
+
+						<label>
+							{settingsMap.enableNgram.title}{' '}
+							<Tooltip title={settingsMap.enableNgram.description}>
+								<Icon type="info-circle" />
+							</Tooltip>
+						</label>
+						<Switch
+							checked={enableNgram}
+							onChange={(value) => this.handleChange('enableNgram', value)}
+						/>
 					</Card>
 					<SettingsFooter
 						loading={isUpdating}
@@ -956,6 +1010,7 @@ class SearchSettingsPage extends React.Component {
 									synonyms: get(settings, 'synonyms.enabled'),
 									queryFormat: get(settings, 'search.queryFormat'),
 									queryType: savedQueryType,
+									enableNgram: get(settings, 'indexSettings.enableNgram'),
 								}}
 								newValues={{
 									fuzziness: hasTypoTolerance ? typoTolerance : 0,
@@ -964,6 +1019,7 @@ class SearchSettingsPage extends React.Component {
 									synonyms: enableSynonyms,
 									queryFormat,
 									queryType,
+									enableNgram,
 								}}
 								renderField={({ type, record }) => {
 									const fieldName = get(record, 'setting', '').toLowerCase();
