@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styled, { css } from 'react-emotion';
 import { node, string } from 'prop-types';
-import { ChevronDown, ChevronUp } from 'react-feather';
+import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import { media } from '../../utils/media';
 
 const BlankLink = styled('a')`
@@ -37,7 +37,7 @@ export default class ClickToShow extends Component {
 							this.setState({ visible: false });
 						}}
 					>
-						{hideLabel} <ChevronUp width="18" height="18" />
+						{hideLabel} <UpOutlined width="18" height="18" />
 					</BlankLink>{' '}
 				</React.Fragment>
 			);
@@ -48,7 +48,7 @@ export default class ClickToShow extends Component {
 					this.setState({ visible: true });
 				}}
 			>
-				{label} <ChevronDown width="18" height="18" />
+				{label} <DownOutlined width="18" height="18" />
 			</BlankLink>
 		);
 	}
