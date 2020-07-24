@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import styled, { css } from 'react-emotion';
-import { Check } from 'react-feather';
+import { CheckOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import { Tooltip, Modal, Button, Input, notification } from 'antd';
 import get from 'lodash/get';
@@ -25,7 +25,11 @@ import PaymentButton from './PaymentButton';
 const CheckList = ({ list }) =>
 	list.map((item) => (
 		<li key={item}>
-			<Check css={{ marginRight: '6px', fontWeight: 'strong' }} width="15" height="15" />{' '}
+			<CheckOutlined
+				css={{ marginRight: '6px', fontWeight: 'strong' }}
+				width="15"
+				height="15"
+			/>{' '}
 			{item}
 		</li>
 	));
