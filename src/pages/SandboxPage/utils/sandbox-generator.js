@@ -1,26 +1,12 @@
 import React from 'react';
 import { getParameters } from 'codesandbox/lib/api/define';
 import reactElementToJSXString from 'react-element-to-jsx-string';
-import prettier from 'prettier/standalone';
-import babylon from 'prettier/parser-babel';
 import { get } from 'lodash';
 
 const dependencies = {
 	react: '16.8.0',
 	'react-dom': '16.8.0',
 	'@appbaseio/reactivesearch': '3.8.1',
-};
-
-const sandboxCodeFormat = (code) => {
-	return prettier.format(code, {
-		parser: 'babel',
-		plugins: [babylon],
-		tabWidth: 4,
-		useTabs: true,
-		semi: true,
-		singleQuote: true,
-		printWidth: 100,
-	});
 };
 
 const html = `<!DOCTYPE html>
@@ -391,10 +377,7 @@ const generateSandboxURL = ({ settings, app, credentials, url }) => {
 		(agg, item) => ({
 			...agg,
 			[item]: {
-				content:
-					item === 'src/App.js'
-						? sandboxCodeFormat(unFormattedFiles[item].content)
-						: unFormattedFiles[item].content,
+				content: unFormattedFiles[item].content,
 			},
 		}),
 		{},
