@@ -2,10 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { css } from 'react-emotion';
 import { Input } from 'antd';
-
-const EyeIcon = require('react-feather/dist/icons/eye').default;
-const EditIcon = require('react-feather/dist/icons/edit').default;
-const EyeOffIcon = require('react-feather/dist/icons/eye-off').default;
+import { EyeInvisibleOutlined, EyeOutlined, EditOutlined } from '@ant-design/icons';
 
 const iconBtn = css`
 	cursor: pointer;
@@ -24,20 +21,19 @@ class PasswordInput extends React.Component {
 		const { visible } = this.state;
 		if (pristine && isEditing) {
 			return (
-				<EditIcon
-					css={iconBtn}
+				<EditOutlined
+					className={iconBtn}
 					onClick={() => {
 						reset();
 						this.inputRef.focus();
 					}}
-					size={14}
 				/>
 			);
 		}
 		if (visible) {
-			return <EyeIcon css={iconBtn} onClick={this.handleClick} size={14} />;
+			return <EyeOutlined className={iconBtn} onClick={this.handleClick} />;
 		}
-		return <EyeOffIcon css={iconBtn} onClick={this.handleClick} size={14} />;
+		return <EyeInvisibleOutlined className={iconBtn} onClick={this.handleClick} />;
 	}
 
 	handleClick = () => {
