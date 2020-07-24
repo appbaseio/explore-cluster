@@ -14,7 +14,7 @@ import {
 } from 'antd';
 import PropTypes from 'prop-types';
 
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { input, modalHeading, radiobtn } from './styles';
 import { validateAppName, validationsList } from '../../utils/helper';
 

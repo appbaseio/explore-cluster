@@ -2,7 +2,7 @@ import React from 'react';
 import { Input, message, Modal } from 'antd';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { deleteApp } from '../../utils';
 import { removeAppData } from '../../actions';
 import { deleteSettings } from '../../batteries/modules/actions';

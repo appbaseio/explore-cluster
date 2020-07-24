@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { ReactiveList } from '@appbaseio/reactivesearch';
 import ExpandCollapse from 'react-expand-collapse';
 import { Spin, Row, Col, Divider, Popover, Tag, Icon, Tooltip, Button } from 'antd';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 import { listItem } from './styles';
 import { children as childrenProp } from '../../../../utils/prop-types';

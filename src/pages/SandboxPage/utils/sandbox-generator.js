@@ -3,7 +3,7 @@ import { getParameters } from 'codesandbox/lib/api/define';
 import reactElementToJSXString from 'react-element-to-jsx-string';
 import prettier from 'prettier/standalone';
 import babylon from 'prettier/parser-babel';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 const dependencies = {
 	react: '16.8.0',

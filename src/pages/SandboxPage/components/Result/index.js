@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Card, Radio, Icon, Row, Button, Alert, Tooltip, Typography } from 'antd';
 import { StateProvider } from '@appbaseio/reactivesearch';
 import { Link } from 'react-router-dom';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import QueryView from './QueryView';
 import ListView from './ListView';
 import settingsMap from '../../../../components/ReviewAndSave/helper';

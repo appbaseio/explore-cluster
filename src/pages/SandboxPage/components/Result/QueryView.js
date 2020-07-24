@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Button, Icon, message, Typography } from 'antd';
 import Appbase from 'appbase-js';
 import { css } from 'emotion';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 import AceEditor from '../../../../batteries/components/SearchSandbox/containers/AceEditor';
 

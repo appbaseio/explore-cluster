@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Row, Col, Switch, Tooltip, Spin, Button, Icon, Empty } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { ReactiveBase } from '@appbaseio/reactivesearch';
 
 import Filter from './Filter';
