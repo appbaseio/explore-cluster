@@ -1,16 +1,58 @@
 import React from 'react';
 import Stripe from 'react-stripe-checkout';
-import { Modal } from 'antd';
+import { Modal, Button } from 'antd';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import AppButton from './AppButton';
+import { css } from 'emotion';
 import theme from './theme';
 import { MESSAGES } from './utils';
 import { getAppPlanByName } from '../../batteries/modules/selectors';
 import { STRIPE_KEY } from '../../constants';
 import { PRICE_BY_PLANS } from '../../batteries/utils';
+import { shade } from '../../utils/media';
 
+const styles = (color, backgroundColor) =>
+	css(
+		backgroundColor && {
+			backgroundColor,
+			'&:hover, &:focus, &:active': {
+				backgroundColor: shade(backgroundColor, -0.1),
+				color,
+				border: 0,
+				boxShadow: '0 6px 6px 0 rgba(0,0,0,.1)',
+			},
+		},
+		color && {
+			color,
+		},
+		{
+			whiteSpace: 'nowrap',
+			marginTop: 40,
+			textTransform: 'uppercase',
+			fontFamily:
+				'Open Sans,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Noto Sans,Ubuntu,Droid Sans,Helvetica Neue,sans-serif',
+			fontWeight: 600,
+			height: 44,
+			fontSize: '1rem',
+			width: 160,
+			outline: 'none',
+			letterSpacing: '0.01rem',
+			textDecoration: 'none',
+			padding: '0 25px',
+			lineHeight: '1rem',
+			boxShadow: '0 3px 3px 0 rgba(0,0,0,0.1)',
+			transition: 'all .3s ease',
+			userSelect: 'none',
+			cursor: 'pointer',
+			borderRadius: 3,
+			border: 0,
+			alignItems: 'center',
+			boxSizing: 'border-box',
+			webkitFontSmoothing: 'antialiased',
+			textRendering: 'optimizeLegibility',
+		},
+	);
 class PaymentButton extends React.Component {
 	state = { visible: false };
 
@@ -59,23 +101,17 @@ class PaymentButton extends React.Component {
 			btnProps,
 			handleUnsubscribe,
 		} = this.props;
+		const { color, backgroundColor } = btnProps;
 		if (subscriptionID) {
 			return (
 				<React.Fragment>
-					<AppButton
+					<Button
 						disabled={this.shouldDisableButton}
-						uppercase
-						big
-						bold
-						shadow
-						color={theme.colors.accentText}
-						backgroundColor={theme.colors.accent}
 						onClick={isCurrentPlan ? handleUnsubscribe : this.showModal}
-						css={{ marginTop: 40 }}
-						{...btnProps}
+						css={styles(color, backgroundColor)}
 					>
 						{this.text}
-					</AppButton>
+					</Button>
 					<Modal
 						title="Update plan"
 						visible={visible}
@@ -98,18 +134,7 @@ class PaymentButton extends React.Component {
 				disabled={isCurrentPlan}
 				stripeKey={STRIPE_KEY.LIVE}
 			>
-				<AppButton
-					uppercase
-					big
-					bold
-					shadow
-					color={theme.colors.accentText}
-					backgroundColor={theme.colors.accent}
-					css={{ marginTop: 40 }}
-					{...btnProps}
-				>
-					{this.text}
-				</AppButton>
+				<Button css={styles(color, backgroundColor)}>{this.text}</Button>
 			</Stripe>
 		);
 	}
@@ -120,7 +145,10 @@ PaymentButton.defaultProps = {
 	subscriptionID: '',
 	isPaid: false,
 	handleUnsubscribe: undefined,
-	btnProps: null,
+	btnProps: {
+		color: theme.colors.accentText,
+		backgroundColor: theme.colors.accent,
+	},
 };
 
 PaymentButton.propTypes = {
