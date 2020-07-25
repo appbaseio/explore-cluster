@@ -71,7 +71,6 @@
 		"@ant-design/icons": "^4.2.1",
 		"@appbaseio-confidential/importer": "git+https://1dc0d0fc07f05943afdde9bdb85b7aa438a0ce3b:x-oauth-basic@github.com/appbaseio-confidential/importer#importer/lib",
 		"@appbaseio/dejavu-browser": "^3.4.5",
-		"@appbaseio/designkit": "^0.9.1",
 		"@appbaseio/react-filter-box": "^3.4.1",
 		"@appbaseio/reactivecore": "^9.5.7",
 		"@appbaseio/reactivesearch": "^3.11.7",
