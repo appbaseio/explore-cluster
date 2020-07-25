@@ -30,8 +30,6 @@ const styles = (color, backgroundColor) =>
 			whiteSpace: 'nowrap',
 			marginTop: 40,
 			textTransform: 'uppercase',
-			fontFamily:
-				'Open Sans,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Noto Sans,Ubuntu,Droid Sans,Helvetica Neue,sans-serif',
 			fontWeight: 600,
 			height: 44,
 			fontSize: '1rem',
