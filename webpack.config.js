@@ -50,11 +50,6 @@ module.exports = {
 		splitChunks: {
 			cacheGroups: {
 				// Splitting React into a different bundle
-				common: {
-					test: /[\\/]node_modules[\\/](react|react-dom|antd)[\\/]/,
-					name: 'common',
-					chunks: 'all',
-				},
 				vendor: {
 					test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
 					name: 'vendor',
