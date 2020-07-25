@@ -48,7 +48,7 @@ export default class ClickToShow extends Component {
 					this.setState({ visible: true });
 				}}
 			>
-				{label} <Icon tyoe="down" width="18" height="18" />
+				{label} <Icon type="down" width="18" height="18" />
 			</BlankLink>
 		);
 	}
