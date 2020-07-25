@@ -21,15 +21,6 @@ const plugins = [
 	'@babel/plugin-proposal-class-properties',
 	'syntax-dynamic-import',
 	['import', { libraryName: 'antd', libraryDirectory: 'es', style: true }],
-	[
-		'import',
-		{
-			libraryName: '@ant-design/icons',
-			libraryDirectory: '',
-			camel2DashComponentName: false,
-		},
-		'@ant-design/icons',
-	],
 ];
 
 module.exports = { presets, plugins };
