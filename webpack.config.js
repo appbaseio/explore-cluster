@@ -55,14 +55,6 @@ module.exports = {
 					name: 'common',
 					chunks: 'all',
 				},
-			},
-		},
-	},
-	plugins,
-	devtool: 'source-map',
-	optimization: {
-		splitChunks: {
-			cacheGroups: {
 				vendor: {
 					test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
 					name: 'vendor',
@@ -72,6 +64,8 @@ module.exports = {
 			},
 		},
 	},
+	plugins,
+	devtool: 'source-map',
 	module: {
 		rules: [
 			{
