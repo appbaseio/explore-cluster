@@ -25,8 +25,8 @@ const plugins = [
 		'import',
 		{
 			libraryName: '@ant-design/icons',
-			libraryDirectory: '', // defaults to 'lib'
-			camel2DashComponentName: false, // defaults to true
+			libraryDirectory: '',
+			camel2DashComponentName: false,
 		},
 		'@ant-design/icons',
 	],
