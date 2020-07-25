@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import styled, { css } from 'react-emotion';
 import { connect } from 'react-redux';
-import { Tooltip, Modal, Button, Input, notification } from 'antd';
+import { Tooltip, Modal, Button, Input, notification, Icon } from 'antd';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
-import { CheckOutlined } from '@ant-design/icons';
 import Loader from '../../batteries/components/shared/Loader';
 import NewPricingCard from './NewPricingCard';
 import theme from './theme';
@@ -25,7 +24,8 @@ import PaymentButton from './PaymentButton';
 const CheckList = ({ list }) =>
 	list.map((item) => (
 		<li key={item}>
-			<CheckOutlined
+			<Icon
+				type="check"
 				css={{ marginRight: '6px', fontWeight: 'strong' }}
 				width="15"
 				height="15"

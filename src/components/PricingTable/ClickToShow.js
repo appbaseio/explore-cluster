@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styled, { css } from 'react-emotion';
 import { node, string } from 'prop-types';
-import { DownOutlined, UpOutlined } from '@ant-design/icons';
+import { Icon } from 'antd';
 import { media } from '../../utils/media';
 
 const BlankLink = styled('a')`
@@ -37,7 +37,7 @@ export default class ClickToShow extends Component {
 							this.setState({ visible: false });
 						}}
 					>
-						{hideLabel} <UpOutlined width="18" height="18" />
+						{hideLabel} <Icon type="up" width="18" height="18" />
 					</BlankLink>{' '}
 				</React.Fragment>
 			);
@@ -48,7 +48,7 @@ export default class ClickToShow extends Component {
 					this.setState({ visible: true });
 				}}
 			>
-				{label} <DownOutlined width="18" height="18" />
+				{label} <Icon tyoe="down" width="18" height="18" />
 			</BlankLink>
 		);
 	}
