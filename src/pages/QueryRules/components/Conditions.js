@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Select, Input, Row, Col } from 'antd';
+import { Select, Input, Row, Col, Button } from 'antd';
 import { getErrorClass, getErrorMessage } from '../utils/error';
 import { hasValuesChanged } from '../utils';
 import Info from '../../../components/Info';
@@ -93,6 +93,21 @@ class Conditions extends React.Component {
 									<Option key={field}>{field.replace(/.keyword/g, '')}</Option>
 								))}
 							</Select>
+							{dataField ? (
+								<Button
+									style={{
+										margin: '4px 0',
+										padding: 0,
+										border: 0,
+										color: '#1890ff',
+									}}
+									ghost
+									size="small"
+									onClick={() => onDropdownChange('dataField', '')}
+								>
+									Clear Field
+								</Button>
+							) : null}
 						</Col>
 						<Col md={12} sm={24}>
 							<label>Value</label>
