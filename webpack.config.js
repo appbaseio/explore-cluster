@@ -25,11 +25,11 @@ const plugins = [
 	new CopyWebpackPlugin([{ from: 'static', to: 'static' }, '_redirects']),
 	new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
 	new HardSourceWebpackPlugin(),
-	// new MiniCssExtractPlugin({
-	// 	filename: isProduction ? '[name].[contenthash:8].css' : '[name].css',
-	// 	chunkFilename: isProduction ? '[name].[contenthash:8].css' : '[name].bundle.css',
-	// 	ignoreOrder: true,
-	// }),
+	new MiniCssExtractPlugin({
+		filename: isProduction ? '[name].[contenthash:8].css' : '[name].css',
+		chunkFilename: isProduction ? '[name].[contenthash:8].css' : '[name].bundle.css',
+		ignoreOrder: true,
+	}),
 ];
 
 if (!isProduction) {
@@ -112,12 +112,7 @@ module.exports = {
 			{
 				test: /\.less$/,
 				use: [
-					{
-						loader: 'style-loader',
-						options: {
-							insertAt: 'top',
-						},
-					},
+					MiniCssExtractPlugin.loader,
 					{ loader: 'css-loader' },
 					{
 						loader: 'less-loader',
@@ -133,7 +128,7 @@ module.exports = {
 			},
 			{
 				test: /\.css$/,
-				use: ['style-loader', 'css-loader'],
+				use: [MiniCssExtractPlugin.loader, 'css-loader'],
 			},
 			{
 				test: /\.(ttf|eot|svg|png)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
