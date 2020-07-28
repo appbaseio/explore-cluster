@@ -9,6 +9,7 @@ import SearchPerformance from '../../batteries/components/analytics/components/S
 import RequestLogs from '../../batteries/components/analytics/components/RequestLogs';
 import { getUrlParams } from '../../batteries/utils/helpers';
 import { getAppSearchLatencyByName } from '../../batteries/modules/selectors';
+import VersionController from '../../batteries/components/shared/VersionController';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -99,6 +100,17 @@ class SearchLatencyWrapper extends React.Component {
 			minLatency = get(filteredLatency, '[0].key');
 			maxLatency = get(filteredLatency[filteredLatency.length - 1], 'key');
 		}
+		const title = (
+			<span>
+				Search Request Details for{' '}
+				<b>
+					{startLatency !== undefined ? startLatency : minLatency}
+					ms
+				</b>{' '}
+				- <b>{endLatency !== undefined ? endLatency : maxLatency}</b>
+				ms interval
+			</span>
+		);
 		return (
 			<React.Fragment>
 				{isGrowth ? (
@@ -118,31 +130,18 @@ class SearchLatencyWrapper extends React.Component {
 									position: 'relative',
 								}}
 							>
-								<RequestLogs
-									title={
-										<span>
-											Search Request Details for{' '}
-											<b>
-												{startLatency !== undefined
-													? startLatency
-													: minLatency}
-												ms
-											</b>{' '}
-											-{' '}
-											<b>
-												{endLatency !== undefined ? endLatency : maxLatency}
-											</b>
-											ms interval
-										</span>
-									}
-									hideRefreshButton
-									displayFilter={false}
-									displaySearchLogs
-									startLatency={startLatency}
-									endLatency={endLatency}
-									startDate={get(filters, 'from')}
-									endDate={get(filters, 'to')}
-								/>
+								<VersionController title={title} version="7.30.0">
+									<RequestLogs
+										title={title}
+										hideRefreshButton
+										displayFilter={false}
+										displaySearchLogs
+										startLatency={startLatency}
+										endLatency={endLatency}
+										startDate={get(filters, 'from')}
+										endDate={get(filters, 'to')}
+									/>
+								</VersionController>
 							</div>
 						</Container>
 					</React.Fragment>
