@@ -50,19 +50,6 @@ module.exports = {
 		splitChunks: {
 			cacheGroups: {
 				// Splitting React into a different bundle
-				common: {
-					test: /[\\/]node_modules[\\/](react|react-dom|antd)[\\/]/,
-					name: 'common',
-					chunks: 'all',
-				},
-			},
-		},
-	},
-	plugins,
-	devtool: 'source-map',
-	optimization: {
-		splitChunks: {
-			cacheGroups: {
 				vendor: {
 					test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
 					name: 'vendor',
@@ -72,6 +59,8 @@ module.exports = {
 			},
 		},
 	},
+	plugins,
+	devtool: 'source-map',
 	module: {
 		rules: [
 			{
