@@ -28,6 +28,7 @@ const plugins = [
 	new MiniCssExtractPlugin({
 		filename: isProduction ? '[name].[contenthash:8].css' : '[name].css',
 		chunkFilename: isProduction ? '[name].[contenthash:8].css' : '[name].bundle.css',
+		ignoreOrder: true,
 	}),
 ];
 
