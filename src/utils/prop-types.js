@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { values } from 'lodash';
+import values from 'lodash/values';
 import { ARC_PLANS, CLUSTER_PLANS } from '../batteries/utils';
 
 export const allowedTiers = PropTypes.oneOf([...values(ARC_PLANS), ...values(CLUSTER_PLANS)]);

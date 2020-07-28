@@ -2,13 +2,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { ReactiveList } from '@appbaseio/reactivesearch';
-import ExpandCollapse from 'react-expand-collapse';
 import { Spin, Row, Col, Divider, Popover, Tag, Icon, Tooltip, Button } from 'antd';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 import { listItem } from './styles';
 import { children as childrenProp } from '../../../../utils/prop-types';
 import Grading from './Grading';
+import Expand from './Expand';
 
 const Container = ({ hasPagination, children }) => {
 	if (hasPagination) {
@@ -44,7 +44,7 @@ class ListItem extends React.Component {
 						</Tag>
 					</Tooltip>
 				)}
-				<ExpandCollapse previewHeight="200px" key={item._id} expandText="Show more">
+				<Expand>
 					<Row className="row" gutter={8}>
 						{Object.keys(rest).map((key) => (
 							<React.Fragment key={key}>
@@ -84,7 +84,7 @@ class ListItem extends React.Component {
 							</React.Fragment>
 						))}
 					</Row>
-				</ExpandCollapse>
+				</Expand>
 
 				<Grading id={item._id} />
 				<Divider />

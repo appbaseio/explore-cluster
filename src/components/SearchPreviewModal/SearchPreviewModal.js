@@ -1,9 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Modal, Tooltip } from 'antd';
-import { css } from 'emotion';
 
-import SearchPreview from '../../pages/SandboxPage/components/SearchPreview';
+import Loadable from 'react-loadable';
+import { css } from 'emotion';
+import Loader from '../Loader';
+
+const SearchPreview = Loadable({
+	loader: () =>
+		import(
+			/* webpackChunkName: "SearchPreviewComponent" */ '../../pages/SandboxPage/components/SearchPreview'
+		),
+	loading: Loader,
+});
 
 export const modalStyles = css`
 	&.ant-modal {

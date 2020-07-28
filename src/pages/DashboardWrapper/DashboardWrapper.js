@@ -3,7 +3,8 @@ import { Icon, Input, Layout, Menu } from 'antd';
 import { Link, Route, Switch } from 'react-router-dom';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
-import { get, keys } from 'lodash';
+import get from 'lodash/get';
+import keys from 'lodash/keys';
 
 import { bool, func, object } from 'prop-types';
 import Loader from '../../components/Loader';
@@ -19,17 +20,18 @@ import SidebarAutocomplete from '../../components/SidebarAutocomplete';
 import searchInputStyle from './styles';
 
 const NoMatch = Loadable({
-	loader: () => import('../../NoMatch'),
+	loader: () => import(/* webpackChunkName: "NoMatchPage" */ '../../NoMatch'),
 	loading: () => <div />,
 });
 
 const HomePage = Loadable({
-	loader: () => import('../HomePage'),
+	loader: () => import(/* webpackChunkName: "HomePage" */ '../HomePage'),
 	loading: Loader,
 });
 
 const ClusterLayout = Loadable({
-	loader: () => import('../../components/AppLayout/ClusterLayout'),
+	loader: () =>
+		import(/* webpackChunkName: "ClusterLayout" */ '../../components/AppLayout/ClusterLayout'),
 	loading: Loader,
 });
 

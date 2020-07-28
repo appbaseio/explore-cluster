@@ -3,7 +3,9 @@ import PropTypes from 'prop-types';
 import { Button, Card, Icon, message, Popconfirm, Table } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
-import { chunk, get, flatten } from 'lodash';
+import chunk from 'lodash/chunk';
+import get from 'lodash/get';
+import flatten from 'lodash/flatten';
 import {
 	DataSearch,
 	ReactiveBase,

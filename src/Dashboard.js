@@ -136,8 +136,11 @@ class Dashboard extends Component {
 						title: error.message,
 						content: (
 							<p>
-								Are you using a valid appbase.io ID? Subscribe to a plan to continue accessing appbase.io. It can take up to 1 hour for a payment made to get reflected. Reach out to us at{' '}
-								<a href="mailto:support@appbase.io">support@appbase.io</a> for any questions.
+								Are you using a valid appbase.io ID? Subscribe to a plan to continue
+								accessing appbase.io. It can take up to 1 hour for a payment made to
+								get reflected. Reach out to us at{' '}
+								<a href="mailto:support@appbase.io">support@appbase.io</a> for any
+								questions.
 							</p>
 						),
 						okText: 'See Subscription Plans',

@@ -4,7 +4,9 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Card, Form, Input, InputNumber, message, notification, Select, Switch } from 'antd';
 
-import { get, isEmpty, pick } from 'lodash';
+import get from 'lodash/get';
+import isEmpty from 'lodash/isEmpty';
+import pick from 'lodash/pick';
 import {
 	getAppMappings,
 	getDefaultSettings,

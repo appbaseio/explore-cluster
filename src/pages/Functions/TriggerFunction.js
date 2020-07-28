@@ -14,7 +14,8 @@ import {
 } from 'antd';
 import { connect } from 'react-redux';
 import { css } from 'emotion';
-import { get, pick } from 'lodash';
+import get from 'lodash/get';
+import pick from 'lodash/pick';
 import TextArea from 'antd/lib/input/TextArea';
 import { updateFunctions } from '../../batteries/modules/actions';
 import Ace from '../../batteries/components/SearchSandbox/containers/AceEditor';

@@ -5,7 +5,7 @@ import { css } from 'emotion';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import { get } from 'lodash';
+import get from 'lodash/get';
 import ActionView from './ActionView';
 import MobileMenu from './MobileMenu';
 import { deleteRule, toggleRuleStatus } from '../../../batteries/modules/actions';

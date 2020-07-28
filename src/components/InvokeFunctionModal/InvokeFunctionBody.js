@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Row, Skeleton } from 'antd';
-import { values } from 'lodash';
+import values from 'lodash/values';
 import { modalHeading } from '../../pages/HomePage/styles';
 import Ace from '../../batteries/components/SearchSandbox/containers/AceEditor';
 import { FUNCTIONS } from '../../constants';

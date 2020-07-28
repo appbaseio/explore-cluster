@@ -9,86 +9,90 @@ import ErrorPage from '../../pages/ErrorPage';
 import AppsAnalyticsRoutes from './AppsAnalyticsRoutes';
 
 const SearchTemplatesPage = Loadable({
-	loader: () => import('../../pages/SearchTemplatesPage'),
+	loader: () =>
+		import(/* webpackChunkName: "SearchTemplatesPage" */ '../../pages/SearchTemplatesPage'),
 	loading: Loader,
 });
 const QuerySuggestionsPage = Loadable({
-	loader: () => import('../../pages/QuerySuggestionsPage'),
+	loader: () =>
+		import(/* webpackChunkName: "QuerySuggestionsPage" */ '../../pages/QuerySuggestionsPage'),
 	loading: Loader,
 });
 
 const BillingPage = Loadable({
-	loader: () => import('../../pages/BillingPage'),
+	loader: () => import(/* webpackChunkName: "BillingPage" */ '../../pages/BillingPage'),
 	loading: Loader,
 });
 
 const CredentialsPage = Loadable({
-	loader: () => import('../../pages/CredentialsPage'),
+	loader: () => import(/* webpackChunkName: "CredentialsPage" */ '../../pages/CredentialsPage'),
 	loading: Loader,
 });
 
 const OverviewPage = Loadable({
-	loader: () => import('../../pages/OverviewPage'),
+	loader: () => import(/* webpackChunkName: "OverviewPage" */ '../../pages/OverviewPage'),
 	loading: Loader,
 });
 
 const ImporterPage = Loadable({
-	loader: () => import('../../pages/ImporterPage'),
+	loader: () => import(/* webpackChunkName: "ImporterPage" */ '../../pages/ImporterPage'),
 	loading: Loader,
 });
 
 const MappingsPage = Loadable({
-	loader: () => import('../../pages/MappingsPage'),
+	loader: () => import(/* webpackChunkName: "MappingsPage" */ '../../pages/MappingsPage'),
 	loading: Loader,
 });
 
 const BrowserPage = Loadable({
-	loader: () => import('../../pages/BrowserPage'),
+	loader: () => import(/* webpackChunkName: "BrowserPage" */ '../../pages/BrowserPage'),
 	loading: Loader,
 });
 
 const SynonymsPage = Loadable({
-	loader: () => import('../../pages/Synonyms'),
+	loader: () => import(/* webpackChunkName: "Synonyms" */ '../../pages/Synonyms'),
 	loading: Loader,
 });
 
 const SandboxPage = Loadable({
-	loader: () => import('../../pages/SandboxPage'),
+	loader: () => import(/* webpackChunkName: "SandboxPage" */ '../../pages/SandboxPage'),
 	loading: Loader,
 });
 
 const ShareSettings = Loadable({
-	loader: () => import('../../pages/ShareSettingsPage'),
+	loader: () =>
+		import(/* webpackChunkName: "ShareSettingsPage" */ '../../pages/ShareSettingsPage'),
 	loading: Loader,
 });
 
 const QueryExplorerPage = Loadable({
-	loader: () => import('../../pages/QueryExplorer'),
+	loader: () => import(/* webpackChunkName: "QueryExplorer" */ '../../pages/QueryExplorer'),
 	loading: Loader,
 });
 
 const AggsPage = Loadable({
-	loader: () => import('../../pages/AggsPage'),
+	loader: () => import(/* webpackChunkName: "AggsPage" */ '../../pages/AggsPage'),
 	loading: Loader,
 });
 
 const ResultsPage = Loadable({
-	loader: () => import('../../pages/ResultsPage'),
+	loader: () => import(/* webpackChunkName: "ResultsPage" */ '../../pages/ResultsPage'),
 	loading: Loader,
 });
 
 const LanguagePage = Loadable({
-	loader: () => import('../../pages/LanguageSettings'),
+	loader: () => import(/* webpackChunkName: "LanguageSettings" */ '../../pages/LanguageSettings'),
 	loading: Loader,
 });
 
 const SearchSettingsPage = Loadable({
-	loader: () => import('../../pages/SearchSettingsPage'),
+	loader: () =>
+		import(/* webpackChunkName: "SearchSettingsPage" */ '../../pages/SearchSettingsPage'),
 	loading: Loader,
 });
 
 const IndexSettingsPage = Loadable({
-	loader: () => import('../../pages/IndexSettings'),
+	loader: () => import(/* webpackChunkName: "IndexSettings" */ '../../pages/IndexSettings'),
 	loading: Loader,
 });
 

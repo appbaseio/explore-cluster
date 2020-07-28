@@ -9,89 +9,94 @@ import ErrorPage from '../../pages/ErrorPage';
 import ClusterAnalyticsRoutes from './ClusterAnalyticsRoutes';
 
 const ProfilePage = Loadable({
-	loader: () => import('../../pages/ProfilePage'),
+	loader: () => import(/* webpackChunkName: "ProfilePage" */ '../../pages/ProfilePage'),
 	loading: Loader,
 });
 const SearchTemplatesPage = Loadable({
-	loader: () => import('../../pages/SearchTemplatesPage'),
+	loader: () =>
+		import(/* webpackChunkName: "SearchTemplatesPage" */ '../../pages/SearchTemplatesPage'),
 	loading: Loader,
 });
 const QuerySuggestionsPage = Loadable({
-	loader: () => import('../../pages/QuerySuggestionsPage'),
+	loader: () =>
+		import(/* webpackChunkName: "QuerySuggestionsPage" */ '../../pages/QuerySuggestionsPage'),
 	loading: Loader,
 });
 const QueryRulesPage = Loadable({
-	loader: () => import('../../pages/QueryRules'),
+	loader: () => import(/* webpackChunkName: "QueryRules" */ '../../pages/QueryRules'),
 	loading: Loader,
 });
 
 const QueryRulesForm = Loadable({
-	loader: () => import('../../pages/QueryRules/QueryRulesForm'),
+	loader: () =>
+		import(/* webpackChunkName: "QueryRulesForm" */ '../../pages/QueryRules/QueryRulesForm'),
 	loading: Loader,
 });
 
 const BillingPage = Loadable({
-	loader: () => import('../../pages/BillingPage'),
+	loader: () => import(/* webpackChunkName: "BillingPage" */ '../../pages/BillingPage'),
 	loading: Loader,
 });
 
 const Functions = Loadable({
-	loader: () => import('../../pages/Functions'),
+	loader: () => import(/* webpackChunkName: "Functions" */ '../../pages/Functions'),
 	loading: Loader,
 });
 
 const CredentialsPage = Loadable({
-	loader: () => import('../../pages/CredentialsPage'),
+	loader: () => import(/* webpackChunkName: "CredentialsPage" */ '../../pages/CredentialsPage'),
 	loading: Loader,
 });
 
 const UserManagementPage = Loadable({
-	loader: () => import('../../pages/UserManagementPage'),
+	loader: () =>
+		import(/* webpackChunkName: "UserManagementPage" */ '../../pages/UserManagementPage'),
 	loading: Loader,
 });
 
 const OverviewPage = Loadable({
-	loader: () => import('../../pages/OverviewPage'),
+	loader: () => import(/* webpackChunkName: "OverviewPage" */ '../../pages/OverviewPage'),
 	loading: Loader,
 });
 
 const ImporterPage = Loadable({
-	loader: () => import('../../pages/ImporterPage'),
+	loader: () => import(/* webpackChunkName: "ImporterPage" */ '../../pages/ImporterPage'),
 	loading: Loader,
 });
 
 const MappingsPage = Loadable({
-	loader: () => import('../../pages/MappingsPage'),
+	loader: () => import(/* webpackChunkName: "MappingsPage" */ '../../pages/MappingsPage'),
 	loading: Loader,
 });
 
 const BrowserPage = Loadable({
-	loader: () => import('../../pages/BrowserPage'),
+	loader: () => import(/* webpackChunkName: "BrowserPage" */ '../../pages/BrowserPage'),
 	loading: Loader,
 });
 
 const SandboxPage = Loadable({
-	loader: () => import('../../pages/SandboxPage'),
+	loader: () => import(/* webpackChunkName: "SandboxPage" */ '../../pages/SandboxPage'),
 	loading: Loader,
 });
 
 const ShareSettings = Loadable({
-	loader: () => import('../../pages/ShareSettingsPage'),
+	loader: () =>
+		import(/* webpackChunkName: "ShareSettingsPage" */ '../../pages/ShareSettingsPage'),
 	loading: Loader,
 });
 
 const RoleBaseAccess = Loadable({
-	loader: () => import('../../pages/RoleBaseAccess'),
+	loader: () => import(/* webpackChunkName: "RoleBaseAccess" */ '../../pages/RoleBaseAccess'),
 	loading: Loader,
 });
 
 const ClusterInsights = Loadable({
-	loader: () => import('../../pages/ClusterInsights'),
+	loader: () => import(/* webpackChunkName: "ClusterInsights" */ '../../pages/ClusterInsights'),
 	loading: Loader,
 });
 
 const GradeEvaluation = Loadable({
-	loader: () => import('../../pages/GradeEvaluation'),
+	loader: () => import(/* webpackChunkName: "GradeEvaluation" */ '../../pages/GradeEvaluation'),
 	loading: Loader,
 });
 

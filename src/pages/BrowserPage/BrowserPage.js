@@ -13,6 +13,7 @@ import {
 
 import Loader from '../../components/Loader';
 import { getURL } from '../../constants/config';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 /* eslint-disable */
 injectGlobal`
@@ -24,7 +25,7 @@ injectGlobal`
 `;
 
 const DejavuComponent = Loadable({
-	loader: () => import('@appbaseio/dejavu-browser'),
+	loader: () => import(/* webpackChunkName: "DejavuComponent" */ '@appbaseio/dejavu-browser'),
 	loading: Loader,
 });
 

@@ -1,6 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get, isObject, keys, transform } from 'lodash';
+import get from 'lodash/get';
+import isObject from 'lodash/isObject';
+import keys from 'lodash/keys';
+import transform from 'lodash/transform';
 import { Button, Modal } from 'antd';
 import { isEqual } from '../../batteries/utils';
 import DiffTable from './DiffTable';
