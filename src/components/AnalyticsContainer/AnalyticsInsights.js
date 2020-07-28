@@ -1,5 +1,5 @@
 import React from 'react';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { Tabs, Button, message, notification, Result } from 'antd';
 import PropTypes from 'prop-types';

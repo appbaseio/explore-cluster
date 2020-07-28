@@ -1,4 +1,8 @@
-import { chain, get, includes, keys, values } from 'lodash';
+import chain from 'lodash/chain';
+import get from 'lodash/get';
+import includes from 'lodash/includes';
+import keys from 'lodash/keys';
+import values from 'lodash/values';
 import { notification } from 'antd';
 import { getURL } from '../constants/config';
 import { getSingleFunction, updateFunctions } from '../batteries/utils/app';

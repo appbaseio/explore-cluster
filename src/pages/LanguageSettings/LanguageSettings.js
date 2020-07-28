@@ -4,7 +4,12 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Card, Form, Input, message, notification, Select, Switch } from 'antd';
 
-import { cloneDeep, compact, get, omit, omitBy, pick } from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
+import compact from 'lodash/compact';
+import get from 'lodash/get';
+import omit from 'lodash/omit';
+import omitBy from 'lodash/omitBy';
+import pick from 'lodash/pick';
 import {
 	deleteSettings,
 	getAppMappings,

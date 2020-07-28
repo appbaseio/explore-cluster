@@ -20,7 +20,7 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
-import { keys } from 'lodash';
+import keys from 'lodash/keys';
 import Loader from '../../components/Loader';
 import Header from '../../components/Header';
 import {

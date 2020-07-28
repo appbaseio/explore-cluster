@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { List, Breadcrumb, Tag, Empty } from 'antd';
 import { css } from 'emotion';
 import IndexSwitcher from '../IndexSwitcher';
