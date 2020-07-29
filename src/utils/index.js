@@ -1,4 +1,3 @@
-import chain from 'lodash/chain';
 import get from 'lodash/get';
 import includes from 'lodash/includes';
 import keys from 'lodash/keys';
@@ -338,7 +337,7 @@ export const isAbsoluteURL = (str) => /^[a-z][a-z0-9+.-]*:/.test(str);
 // extract credentials from URL
 export const getURLCredentials = (url) => {
 	if (!isAbsoluteURL(url) || !url.includes('@')) return null;
-	const credArr = chain(url).split('@').get(0).split('//').get(1).split(':').value();
+	const credArr = ((url.split('@')[0] || '').split('//')[1] || '').split(':');
 	return { username: credArr[0], password: credArr[1] };
 };
 
