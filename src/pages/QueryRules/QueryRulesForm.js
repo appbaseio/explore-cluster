@@ -4,7 +4,8 @@ import PropTypes from 'prop-types';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { get, pick } from 'lodash';
+import get from 'lodash/get';
+import pick from 'lodash/pick';
 import {
 	Affix,
 	Alert,
@@ -55,6 +56,7 @@ import { isValidPlan } from '../../batteries/utils';
 import { AdvancedEditor, CustomAutoComplete } from '../../components/AdvancedEditor';
 import { getRawQuery, parseExpression } from '../../components/AdvancedEditor/helper';
 import { allowedTiers } from '../../utils/prop-types';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 
 const customReactFilter = css`
 	.react-filter-box {
@@ -802,7 +804,7 @@ class QueryRulesForm extends React.Component {
 									</>
 								)}
 								{!show_advance_editor && (
-									<>
+									<ErrorToaster inline>
 										<Conditions
 											onChange={this.handleInput}
 											error={error.condition}
@@ -814,7 +816,7 @@ class QueryRulesForm extends React.Component {
 											onDropdownChange={this.handleDropdown}
 											queryValue={queryValue}
 										/>
-									</>
+									</ErrorToaster>
 								)}
 								{show_advance_editor && condition === 'filter' && (
 									<div className={customReactFilter}>
@@ -825,14 +827,16 @@ class QueryRulesForm extends React.Component {
 											/>
 										</label>
 										{getErrorMessage(error.condition)}
-										<AdvancedEditor
-											key={editorKey}
-											query={rawQuery}
-											onChange={this.handleExpression}
-											autoCompleteHandler={this.customAutoComplete}
-											onParseOk={this.onParseOk}
-											onParseError={this.onParseError}
-										/>
+										<ErrorToaster inline>
+											<AdvancedEditor
+												key={editorKey}
+												query={rawQuery}
+												onChange={this.handleExpression}
+												autoCompleteHandler={this.customAutoComplete}
+												onParseOk={this.onParseOk}
+												onParseError={this.onParseError}
+											/>
+										</ErrorToaster>
 									</div>
 								)}
 
@@ -879,22 +883,26 @@ class QueryRulesForm extends React.Component {
 							</Col>
 
 							<Col md={12} sm={24}>
-								<Actions
-									dataFields={dataFields}
-									searchFields={searchFields}
-									aggsFields={aggsFields}
-									indexes={getSelectedIndexes(selectedIndexes, mappings)}
-									actions={actions}
-									onChange={this.updateActions}
-									error={error}
-									subFieldsMap={subFieldsMap}
-								/>
-								<ActionSelector
-									error={error && error.actions}
-									actions={actions}
-									condition={condition}
-									onChange={this.setActions}
-								/>
+								<ErrorToaster inline>
+									<Actions
+										dataFields={dataFields}
+										searchFields={searchFields}
+										aggsFields={aggsFields}
+										indexes={getSelectedIndexes(selectedIndexes, mappings)}
+										actions={actions}
+										onChange={this.updateActions}
+										error={error}
+										subFieldsMap={subFieldsMap}
+									/>
+								</ErrorToaster>
+								<ErrorToaster inline>
+									<ActionSelector
+										error={error && error.actions}
+										actions={actions}
+										condition={condition}
+										onChange={this.setActions}
+									/>
+								</ErrorToaster>
 							</Col>
 						</Row>
 					</section>

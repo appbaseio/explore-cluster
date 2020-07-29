@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Col, Icon, Row, Table } from 'antd';
-import { get, keys } from 'lodash';
+import get from 'lodash/get';
+import keys from 'lodash/keys';
 import settingsMap from './helper';
 
 function DiffTable({ object, parseDiff, renderField }) {

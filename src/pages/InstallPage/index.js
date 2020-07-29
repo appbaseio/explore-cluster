@@ -50,7 +50,7 @@ class InstallPage extends React.Component {
 						}}
 						bordered={false}
 					>
-						<h2>Install A New Arc Instance</h2>
+						<h2>Install a new appbase.io instance</h2>
 
 						<section style={{ marginBottom: 20 }}>
 							<Checkbox
@@ -65,8 +65,8 @@ class InstallPage extends React.Component {
 										paddingLeft: 5,
 									}}
 								>
-									By creating an arc instance, you agree to our Terms of Service
-									and Privacy Policy.
+									By creating an appbase.io instance, you agree to our Terms of
+									Service and Privacy Policy.
 								</div>
 							</Checkbox>
 							<Checkbox
@@ -81,8 +81,8 @@ class InstallPage extends React.Component {
 										paddingLeft: 5,
 									}}
 								>
-									Yes, I would like to receive a monthly e-mail on Appbase
-									products, use-cases and promotions via e-mail.
+									Yes, I would like to receive a monthly digest e-mail on
+									appbase.io products, use cases and open-source updates.
 								</div>
 							</Checkbox>
 						</section>
@@ -107,7 +107,7 @@ class InstallPage extends React.Component {
 								letterSpacing: '0.02rem',
 							}}
 						>
-							Already installed Arc? &nbsp; Sign in here
+							Already installed appbase.io? &nbsp; Sign in here
 							<Icon type="arrow-right" />
 						</Button>
 					</Link>

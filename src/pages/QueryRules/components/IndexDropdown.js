@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Select } from 'antd';
 import { connect } from 'react-redux';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 import { loadApps } from '../../../actions';
 import { getErrorClass } from '../utils/error';

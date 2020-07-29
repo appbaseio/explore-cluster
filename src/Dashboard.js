@@ -136,14 +136,14 @@ class Dashboard extends Component {
 						title: error.message,
 						content: (
 							<p>
-								Are you using a valid Arc ID? If so, please subscribe to a paid plan
-								to continue using Arc. It takes up to 1 hour for the billing change
-								to get reflected. If you have subscribed and continue to see this
-								message, reach out to us at{' '}
-								<a href="mailto:support@appbase.io">support@appbase.io</a>.
+								Are you using a valid appbase.io ID? Subscribe to a plan to continue
+								accessing appbase.io. It can take up to 1 hour for a payment made to
+								get reflected. Reach out to us at{' '}
+								<a href="mailto:support@appbase.io">support@appbase.io</a> for any
+								questions.
 							</p>
 						),
-						okText: 'Go to billing',
+						okText: 'See Subscription Plans',
 						onOk: () => {
 							window.location = '/billing';
 						},

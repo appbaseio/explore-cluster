@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { doPost, doGet } from '../../../batteries/utils/requestService';
 import { getURL } from '../../../constants/config';
 

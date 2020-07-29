@@ -1,4 +1,7 @@
-import { chain, get, includes, keys, values } from 'lodash';
+import get from 'lodash/get';
+import includes from 'lodash/includes';
+import keys from 'lodash/keys';
+import values from 'lodash/values';
 import { notification } from 'antd';
 import { getURL } from '../constants/config';
 import { getSingleFunction, updateFunctions } from '../batteries/utils/app';
@@ -53,7 +56,7 @@ export async function getUser(username, password, url) {
 			sessionStorage.setItem('version', version);
 		})
 		.catch((e) => {
-			console.error('Error while fetching the ElasticSearch details');
+			console.error('Error while fetching the Elasticsearch details');
 			console.error(e);
 		});
 
@@ -213,7 +216,7 @@ export async function cloneApp(source, destination, payload = {}) {
 	if (response.status >= 400) {
 		if (response.status === 400 || response.status === 406) {
 			throw new Error(
-				'You need to upgrade Arc (appbase.io) to v7.11.0 or above to take advantage of this feature.',
+				'You need to upgrade appbase.io to v7.11.0 or above to take advantage of this feature.',
 			);
 		}
 		throw new Error('An error occurred while cloning the index. Please try again.');
@@ -334,7 +337,7 @@ export const isAbsoluteURL = (str) => /^[a-z][a-z0-9+.-]*:/.test(str);
 // extract credentials from URL
 export const getURLCredentials = (url) => {
 	if (!isAbsoluteURL(url) || !url.includes('@')) return null;
-	const credArr = chain(url).split('@').get(0).split('//').get(1).split(':').value();
+	const credArr = ((url.split('@')[0] || '').split('//')[1] || '').split(':');
 	return { username: credArr[0], password: credArr[1] };
 };
 
@@ -636,7 +639,7 @@ export const removeSubFields = (dataField) => {
 	);
 
 	if (Array.isArray(dataField)) {
-		return parsedFields;
+		return [...new Set(parsedFields)];
 	}
 
 	return parsedFields.reduce(
@@ -646,6 +649,22 @@ export const removeSubFields = (dataField) => {
 		}),
 		{},
 	);
+};
+
+export const changedSubFields = (old_fields, new_fields) => {
+	const differentKeys = new_fields.filter((field) => !old_fields.includes(field));
+
+	return differentKeys.reduce((agg, key) => {
+		const lastKey = key.split('.').pop();
+		let fieldName = key;
+		reservedSearchSubFields.forEach((subField) => {
+			fieldName = fieldName.replace(`.${subField}`, '');
+		});
+		return {
+			...agg,
+			[fieldName]: `${agg[fieldName] ? `${agg[fieldName]} ,` : ''}${lastKey}`,
+		};
+	}, {});
 };
 
 export const validateQueryString = (queryString) => {

@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { getURL, getVersion } from '../../../constants/config';
 import {
 	closeIndex,

@@ -14,7 +14,7 @@ import {
 } from 'antd';
 import PropTypes from 'prop-types';
 
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { input, modalHeading, radiobtn } from './styles';
 import { validateAppName, validationsList } from '../../utils/helper';
 
@@ -25,6 +25,7 @@ import { getDefaultSettings, putSettings } from '../../batteries/modules/actions
 import { getLanguageFallback } from '../../utils/language';
 import { isValidPlan } from '../../batteries/utils';
 import { allowedTiers } from '../../utils/prop-types';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 const RadioGroup = Radio.Group;
 
@@ -320,4 +321,4 @@ const mapDispatchToProps = (dispatch) => ({
 	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(CreateAppModal);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(CreateAppModal));

@@ -187,7 +187,7 @@ class Billing extends Component {
 											marginTop: '-35px',
 										}}
 										gridRatio={0.4}
-										label={<h3 css={heading}>Total ElasticSearch Nodes</h3>}
+										label={<h3 css={heading}>Total Elasticsearch Nodes</h3>}
 										component={nodeCount}
 									/>
 								</Flex>
@@ -259,7 +259,7 @@ class Billing extends Component {
 										cluster detail view
 									</a>{' '}
 									to unsubscribe from your current plan. You will lose access to
-									Arc APIs and dashboard views after doing this.
+									appbase.io APIs and dashboard views after doing this.
 								</p>
 							</Panel>
 						</Collapse>

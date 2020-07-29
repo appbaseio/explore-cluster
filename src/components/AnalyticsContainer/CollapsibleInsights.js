@@ -1,7 +1,7 @@
 import React from 'react';
 import { Collapse, Alert, List, Icon, Button, Dropdown, Menu, Empty, Popconfirm } from 'antd';
 import { Link, withRouter } from 'react-router-dom';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import moment from 'moment';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -99,7 +99,7 @@ class CollapsibleInsights extends React.Component {
 		if (window.location.pathname.startsWith('/cluster')) {
 			return (
 				<IndexSwitcher
-					filteredApps={Object.keys(apps).filter((app) => !app.startsWith('.'))}
+					filteredApps={Object.keys(apps || {}).filter((app) => !app.startsWith('.'))}
 					history={history}
 					renderItem={(popConfirmProps) => {
 						return (
@@ -144,7 +144,6 @@ class CollapsibleInsights extends React.Component {
 		if (insights.length === 0) {
 			return <Empty description={noDataPresent ? noDataText : 'No Data'} />;
 		}
-
 		return (
 			<Collapse
 				onChange={this.handleCollapseKey}
@@ -156,6 +155,7 @@ class CollapsibleInsights extends React.Component {
 				{insights.map((insight) => (
 					<Panel
 						showArrow={false}
+						id={get(insight, 'id')}
 						header={
 							<div className="panel-header">
 								<div className="title">

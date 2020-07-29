@@ -12,7 +12,7 @@ import Container from '../../components/Container';
 import Flex from '../../batteries/components/shared/Flex';
 import Banner from '../../components/Banner/Header';
 import countryCodes from '../../utils/countryCodes';
-import { displayErrors } from '../../batteries/utils/heplers';
+import { displayErrors } from '../../batteries/utils/helpers';
 
 const formCls = css`
 	margin: auto;

@@ -1,15 +1,9 @@
 import React from 'react';
-import { Button, Popconfirm, Tooltip, notification } from 'antd';
+import { Button, Popconfirm, Tooltip, notification, Icon } from 'antd';
 import { css } from 'react-emotion';
 import { object, func } from 'prop-types';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import Flex from '../../batteries/components/shared/Flex';
-
-const EyeIcon = require('react-feather/dist/icons/eye').default;
-const EyeOffIcon = require('react-feather/dist/icons/eye-off').default;
-const CopyIcon = require('react-feather/dist/icons/copy').default;
-const EditIcon = require('react-feather/dist/icons/edit').default;
-const DeleteIcon = require('react-feather/dist/icons/trash-2').default;
 
 const main = css`
 	.ant-btn {
@@ -81,13 +75,13 @@ class Permission extends React.Component {
 							title={viewKey ? 'Hide credentials' : 'View credentials'}
 						>
 							<Button onClick={this.handleViewClick} type="normal">
-								{viewKey ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}
+								{viewKey ? <Icon type="eye-invisible" /> : <Icon type="eye" />}
 							</Button>
 						</Tooltip>
 						<CopyToClipboard text={this.key} onCopy={this.handleCopyCred}>
 							<Tooltip placement="topLeft" title="Copy To Clipboard">
 								<Button type="normal">
-									<CopyIcon size={16} />
+									<Icon type="copy" />
 								</Button>
 							</Tooltip>
 						</CopyToClipboard>
@@ -97,7 +91,7 @@ class Permission extends React.Component {
 								onClick={this.handleEditCred}
 								type="normal"
 							>
-								<EditIcon size={16} />
+								<Icon type="edit" />
 							</Button>
 						</Tooltip>
 					</Flex>
@@ -109,7 +103,7 @@ class Permission extends React.Component {
 					cancelText="No"
 				>
 					<Button type="danger">
-						<DeleteIcon size={16} />
+						<Icon type="delete" />
 					</Button>
 				</Popconfirm>
 			</Flex>
