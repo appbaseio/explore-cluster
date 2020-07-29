@@ -71,6 +71,8 @@ class CollapsibleInsights extends React.Component {
 			return null;
 		}
 
+		const linkWithSwitcher = ['languages', 'search', 'synonyms', 'results', 'index-settings'];
+		const hasIndexSwitcher = linkWithSwitcher.find((item) => link.endsWith(`/${item}`));
 		let queryParam = '';
 
 		if (showAsLink) {
@@ -79,24 +81,7 @@ class CollapsibleInsights extends React.Component {
 			queryParam = `?from=${startDate}&to=${endDate}`;
 		}
 
-		if (window.location.pathname.startsWith('/app')) {
-			return (
-				<Link
-					style={showAsLink ? { marginBottom: 8, display: 'block' } : {}}
-					to={`/${link.replace(':index', appName)}${queryParam}`}
-				>
-					{showAsLink ? (
-						'Go to Report'
-					) : (
-						<Button style={{ marginTop: 5 }} size="small">
-							{title}
-						</Button>
-					)}
-				</Link>
-			);
-		}
-
-		if (window.location.pathname.startsWith('/cluster')) {
+		if (hasIndexSwitcher) {
 			return (
 				<IndexSwitcher
 					filteredApps={Object.keys(apps || {}).filter((app) => !app.startsWith('.'))}
@@ -128,6 +113,42 @@ class CollapsibleInsights extends React.Component {
 				/>
 			);
 		}
+
+		if (window.location.pathname.startsWith('/cluster')) {
+			const subPath = link.split('/').pop();
+			return (
+				<Link
+					style={showAsLink ? { marginBottom: 8, display: 'block' } : {}}
+					to={`/cluster/${subPath}${queryParam}`}
+				>
+					{showAsLink ? (
+						'Go to Report'
+					) : (
+						<Button style={{ marginTop: 5 }} size="small">
+							{title}
+						</Button>
+					)}
+				</Link>
+			);
+		}
+
+		if (window.location.pathname.startsWith('/app')) {
+			return (
+				<Link
+					style={showAsLink ? { marginBottom: 8, display: 'block' } : {}}
+					to={`/${link.replace(':index', appName)}${queryParam}`}
+				>
+					{showAsLink ? (
+						'Go to Report'
+					) : (
+						<Button style={{ marginTop: 5 }} size="small">
+							{title}
+						</Button>
+					)}
+				</Link>
+			);
+		}
+
 		return null;
 	};
 
