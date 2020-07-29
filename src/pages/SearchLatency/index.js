@@ -107,8 +107,10 @@ class SearchLatencyWrapper extends React.Component {
 					{startLatency !== undefined ? startLatency : minLatency}
 					ms
 				</b>{' '}
-				- <b>{endLatency !== undefined ? endLatency : maxLatency}</b>
-				ms interval
+				- <b>{endLatency !== undefined ? endLatency : maxLatency}
+					ms
+				</b>{' '}
+				interval
 			</span>
 		);
 		return (
