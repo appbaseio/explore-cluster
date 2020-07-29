@@ -164,7 +164,7 @@ class Credentials extends Component {
 	};
 
 	render() {
-		const { showCredForm, currentPermissionInfo, mappings, deleteModal } = this.state;
+		const { showCredForm, currentPermissionInfo, deleteModal } = this.state;
 		const { isLoading, permissions, isOwner, location, appName, appId, isAdmin } = this.props;
 		if (isLoading) {
 			return <Loader />;
@@ -229,17 +229,16 @@ class Credentials extends Component {
 					</ErrorToaster>
 				</Card>
 				{showCredForm && (
-					<ErrorToaster inline>
-						<CreateCredentials
-							disabled={!isOwner}
-							titleText={!isOwner ? 'Credentials Details' : undefined}
-							onSubmit={this.handleSubmit}
-							show={showCredForm}
-							handleCancel={this.handleCancel}
-							mappings={mappings}
-							initialValues={currentPermissionInfo}
-						/>
-					</ErrorToaster>
+					// <ErrorToaster inline>
+					<CreateCredentials
+						disabled={!isOwner}
+						titleText={!isOwner ? 'Credentials Details' : undefined}
+						onSubmit={this.handleSubmit}
+						show={showCredForm}
+						handleCancel={this.handleCancel}
+						initialValues={currentPermissionInfo}
+					/>
+					// </ErrorToaster>
 				)}
 				{isOwner && (
 					<Button
@@ -334,4 +333,5 @@ const mapDispatchToProps = (dispatch) => ({
 		dispatch(updatePermission(appName, username, payload)),
 });
 
-export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(Credentials));
+export default connect(mapStateToProps, mapDispatchToProps)(Credentials);
+// export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(Credentials));

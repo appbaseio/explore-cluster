@@ -117,7 +117,10 @@ class CreateCredentials extends React.Component {
 	}
 
 	componentDidMount() {
-		const { disabled, initialValues, isUserManagement } = this.props;
+		const { disabled, initialValues, isUserManagement, appbaseCredentials } = this.props;
+		if (appbaseCredentials) {
+			this.getMappings();
+		}
 		if (disabled) {
 			this.form.disable();
 		} else {
@@ -170,10 +173,7 @@ class CreateCredentials extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { errors, credentials } = this.props;
-		if (credentials && credentials !== prevProps.credentials) {
-			// this.getMappings();
-		}
+		const { errors } = this.props;
 		displayErrors(errors, prevProps.errors);
 	}
 
@@ -199,11 +199,10 @@ class CreateCredentials extends React.Component {
 	}
 
 	getMappings() {
-		const { appName, fetchMappings, credentials } = this.props;
-		if (credentials) {
+		const { appName, fetchMappings, appbaseCredentials } = this.props;
+		if (appbaseCredentials) {
 			// Fetch Mappings if permissions are present
-			const { username, password } = credentials;
-			fetchMappings(appName, `${username}:${password}`);
+			fetchMappings(appName, appbaseCredentials);
 		}
 	}
 
@@ -235,6 +234,7 @@ class CreateCredentials extends React.Component {
 			saveButtonText,
 			isLoadingMappings,
 			isUserManagement,
+			mappings,
 		} = this.props;
 		const Messages = getMessages(isUserManagement);
 		return (
@@ -531,6 +531,9 @@ class CreateCredentials extends React.Component {
 												name="include_fields"
 												render={({ handler }) => {
 													const inputHandler = handler();
+													const excludedFields = this.form.get(
+														'exclude_fields',
+													).value;
 													return (
 														<Grid
 															label={
@@ -557,6 +560,23 @@ class CreateCredentials extends React.Component {
 																	<Option key="*">
 																		* (Include all fields)
 																	</Option>
+																	{mappings.map((v) => {
+																		if (
+																			!excludedFields.includes(
+																				v,
+																			)
+																		) {
+																			return (
+																				<Option
+																					key={v}
+																					title={v}
+																				>
+																					{v}
+																				</Option>
+																			);
+																		}
+																		return null;
+																	})}
 																</Select>
 															}
 														/>
@@ -568,6 +588,9 @@ class CreateCredentials extends React.Component {
 												name="exclude_fields"
 												render={({ handler }) => {
 													const inputHandler = handler();
+													const includedFields = this.form.get(
+														'include_fields',
+													).value;
 													return (
 														<Grid
 															label={
@@ -593,6 +616,20 @@ class CreateCredentials extends React.Component {
 																	<Option key="*">
 																		* (Exclude all fields)
 																	</Option>
+																	{mappings.map((v) => {
+																		if (
+																			!includedFields.includes(
+																				v,
+																			)
+																		) {
+																			return (
+																				<Option key={v}>
+																					{v}
+																				</Option>
+																			);
+																		}
+																		return null;
+																	})}
 																</Select>
 															}
 														/>
@@ -675,6 +712,7 @@ CreateCredentials.defaultProps = {
 	permissions: undefined,
 	titleText: undefined,
 	isUserManagement: false,
+	mappings: [],
 };
 CreateCredentials.propTypes = {
 	isPaidUser: PropTypes.bool,
@@ -705,21 +743,23 @@ CreateCredentials.propTypes = {
 	plan: PropTypes.oneOf(['free', 'growth', 'bootstrap']).isRequired,
 	titleText: PropTypes.string,
 	isUserManagement: PropTypes.bool,
-	credentials: PropTypes.string.isRequired,
+	appbaseCredentials: PropTypes.string.isRequired,
 	fetchMappings: PropTypes.func.isRequired,
+	mappings: PropTypes.array,
 };
 
 const mapStateToProps = (state) => {
 	const mappings = getTraversedMappingsByAppName(state);
 	const appPermissions = getAppPermissionsByName(state);
+	const { username, password } = get(state, 'user.data', {});
 	return {
+		appbaseCredentials: username ? `${username}:${password}` : null,
 		isPaidUser: true,
 		appName: get(state, '$getCurrentApp.name'),
 		mappings: mappings || [],
 		isPermissionPresent: !!appPermissions,
 		isLoadingMappings:
 			get(state, '$getAppMappings.isFetching') || get(state, '$getAppPermissions.isFetching'),
-		credentials: get(appPermissions, 'credentials.credentials'),
 		plan: 'growth',
 		isSubmitting:
 			get(state, '$createAppPermission.isFetching') ||
