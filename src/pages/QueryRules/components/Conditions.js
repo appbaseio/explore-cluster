@@ -93,7 +93,7 @@ class Conditions extends React.Component {
 									<Option key={field}>{field.replace(/.keyword/g, '')}</Option>
 								))}
 							</Select>
-							{dataField ? (
+							{dataField || dataFieldValue ? (
 								<Button
 									style={{
 										margin: '4px 0',
@@ -103,7 +103,10 @@ class Conditions extends React.Component {
 									}}
 									ghost
 									size="small"
-									onClick={() => onDropdownChange('dataField', '')}
+									onClick={() => {
+										onDropdownChange('dataField', '');
+										onDropdownChange('dataFieldValue', '');
+									}}
 								>
 									Clear Field
 								</Button>
