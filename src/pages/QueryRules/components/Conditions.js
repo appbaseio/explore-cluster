@@ -108,7 +108,7 @@ class Conditions extends React.Component {
 										onDropdownChange('dataFieldValue', '');
 									}}
 								>
-									Clear Field
+									Clear Filter
 								</Button>
 							) : null}
 						</Col>
