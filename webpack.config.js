@@ -24,7 +24,6 @@ const plugins = [
 	}),
 	new CopyWebpackPlugin([{ from: 'static', to: 'static' }, '_redirects']),
 	new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-	new HardSourceWebpackPlugin(),
 	new MiniCssExtractPlugin({
 		filename: isProduction ? '[name].[contenthash:8].css' : '[name].css',
 		chunkFilename: isProduction ? '[name].[contenthash:8].css' : '[name].bundle.css',
@@ -66,6 +65,7 @@ if (isProduction && !!process.env.SENTRY_TOKEN) {
 			minRatio: 0.8,
 		}),
 	);
+	plugins.push(new HardSourceWebpackPlugin());
 }
 
 module.exports = {
