@@ -545,7 +545,7 @@ class CreateCredentials extends React.Component {
 															component={
 																<Select
 																	placeholder="Select field value"
-																	mode="tags"
+																	mode="multiple"
 																	notFoundContent={null}
 																	style={{ width: '100%' }}
 																	tokenSeparators={[',']}
@@ -562,9 +562,9 @@ class CreateCredentials extends React.Component {
 																	</Option>
 																	{mappings.map((v) => {
 																		if (
-																			!excludedFields.includes(
-																				v,
-																			)
+																			!(
+																				excludedFields || []
+																			).includes(v)
 																		) {
 																			return (
 																				<Option
@@ -602,7 +602,7 @@ class CreateCredentials extends React.Component {
 															component={
 																<Select
 																	placeholder="Select field value"
-																	mode="tags"
+																	mode="multiple"
 																	notFoundContent={null}
 																	style={{ width: '100%' }}
 																	{...inputHandler}
@@ -618,9 +618,9 @@ class CreateCredentials extends React.Component {
 																	</Option>
 																	{mappings.map((v) => {
 																		if (
-																			!includedFields.includes(
-																				v,
-																			)
+																			!(
+																				includedFields || []
+																			).includes(v)
 																		) {
 																			return (
 																				<Option key={v}>

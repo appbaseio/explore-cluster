@@ -229,16 +229,16 @@ class Credentials extends Component {
 					</ErrorToaster>
 				</Card>
 				{showCredForm && (
-					// <ErrorToaster inline>
-					<CreateCredentials
-						disabled={!isOwner}
-						titleText={!isOwner ? 'Credentials Details' : undefined}
-						onSubmit={this.handleSubmit}
-						show={showCredForm}
-						handleCancel={this.handleCancel}
-						initialValues={currentPermissionInfo}
-					/>
-					// </ErrorToaster>
+					<ErrorToaster inline>
+						<CreateCredentials
+							disabled={!isOwner}
+							titleText={!isOwner ? 'Credentials Details' : undefined}
+							onSubmit={this.handleSubmit}
+							show={showCredForm}
+							handleCancel={this.handleCancel}
+							initialValues={currentPermissionInfo}
+						/>
+					</ErrorToaster>
 				)}
 				{isOwner && (
 					<Button
@@ -333,5 +333,4 @@ const mapDispatchToProps = (dispatch) => ({
 		dispatch(updatePermission(appName, username, payload)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Credentials);
-// export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(Credentials));
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(Credentials));
