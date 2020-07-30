@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Card, Form, Input, message, notification, Select, Switch } from 'antd';
+import { Card, Form, Input, message, notification, Select, Switch, Alert } from 'antd';
 
 import cloneDeep from 'lodash/cloneDeep';
 import compact from 'lodash/compact';
@@ -446,6 +446,14 @@ class LanguageSettings extends React.Component {
 								onRevert={() => {
 									this.revertChanges(settings, setFieldsValue);
 								}}
+								renderContent={() => (
+									<Alert
+										type="warning"
+										showIcon
+										style={{ marginBottom: 10 }}
+										description="Re-indexing is required for applying below changes."
+									/>
+								)}
 								onSave={(e) => {
 									this.handleSubmit(e);
 									this.toggleVisible();
