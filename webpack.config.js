@@ -7,6 +7,10 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
+const TerserJSPlugin = require('terser-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const CompressionPlugin = require('compression-webpack-plugin');
 
 require('dotenv').config();
 
@@ -20,7 +24,11 @@ const plugins = [
 	}),
 	new CopyWebpackPlugin([{ from: 'static', to: 'static' }, '_redirects']),
 	new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-	new HardSourceWebpackPlugin(),
+	new MiniCssExtractPlugin({
+		filename: isProduction ? '[name].[contenthash:8].css' : '[name].css',
+		chunkFilename: isProduction ? '[name].[contenthash:8].css' : '[name].bundle.css',
+		ignoreOrder: true,
+	}),
 ];
 
 if (!isProduction) {
@@ -36,6 +44,28 @@ if (isProduction && !!process.env.SENTRY_TOKEN) {
 			debug: true,
 		}),
 	);
+	plugins.push(
+		new CompressionPlugin({
+			filename: '[path].gz[query]',
+			algorithm: 'gzip',
+			test: /\.js$|\.css$|\.html$/,
+			threshold: 10240,
+			minRatio: 0.8,
+		}),
+	);
+	plugins.push(
+		new CompressionPlugin({
+			filename: '[path].br[query]',
+			algorithm: 'brotliCompress',
+			test: /\.(js|css|html|svg)$/,
+			compressionOptions: {
+				level: 11,
+			},
+			threshold: 10240,
+			minRatio: 0.8,
+		}),
+	);
+	plugins.push(new HardSourceWebpackPlugin());
 }
 
 module.exports = {
@@ -46,25 +76,18 @@ module.exports = {
 		filename: isProduction ? '[name].[contenthash].js' : '[name].js',
 		chunkFilename: '[name].[contenthash].bundle.js',
 	},
-	optimization: {
-		splitChunks: {
-			cacheGroups: {
-				// Splitting React into a different bundle
-				common: {
-					test: /[\\/]node_modules[\\/](react|react-dom|antd)[\\/]/,
-					name: 'common',
-					chunks: 'all',
-				},
-			},
-		},
-	},
 	plugins,
 	devtool: 'source-map',
 	optimization: {
+		moduleIds: 'hashed',
+		runtimeChunk: {
+			name: 'manifest',
+		},
+		minimizer: [new TerserJSPlugin({}), new OptimizeCSSAssetsPlugin({})],
 		splitChunks: {
 			cacheGroups: {
 				vendor: {
-					test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+					test: /[\\/]node_modules[\\/](react|react-dom|antd)[\\/]/,
 					name: 'vendor',
 					chunks: 'all',
 					reuseExistingChunk: true,
@@ -72,6 +95,8 @@ module.exports = {
 			},
 		},
 	},
+	plugins,
+	devtool: 'source-map',
 	module: {
 		rules: [
 			{
@@ -87,12 +112,7 @@ module.exports = {
 			{
 				test: /\.less$/,
 				use: [
-					{
-						loader: 'style-loader',
-						options: {
-							insertAt: 'top',
-						},
-					},
+					MiniCssExtractPlugin.loader,
 					{ loader: 'css-loader' },
 					{
 						loader: 'less-loader',
@@ -108,7 +128,7 @@ module.exports = {
 			},
 			{
 				test: /\.css$/,
-				use: ['style-loader', 'css-loader'],
+				use: [MiniCssExtractPlugin.loader, 'css-loader'],
 			},
 			{
 				test: /\.(ttf|eot|svg|png)(\?v=[0-9]\.[0-9]\.[0-9])?$/,

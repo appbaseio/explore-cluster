@@ -1,5 +1,8 @@
 /* eslint-disable no-param-reassign */
-import { get, invert, keys, values } from 'lodash';
+import get from 'lodash/get';
+import invert from 'lodash/invert';
+import keys from 'lodash/keys';
+import values from 'lodash/values';
 
 // list of operators supported by advanced editor
 export const operatorsMap = {

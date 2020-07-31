@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { css } from 'emotion';
 import { Icon, InputNumber, Popover, Table } from 'antd';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import JsonView from '../../../../../components/JsonView';
 import { children } from '../../../../../utils/prop-types';
 

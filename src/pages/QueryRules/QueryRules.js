@@ -4,7 +4,8 @@ import { Affix, Button, Col, Icon, Layout, message, Result, Row } from 'antd';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { get, keys } from 'lodash';
+import get from 'lodash/get';
+import keys from 'lodash/keys';
 
 import QueryCard from './components/QueryCard';
 import { getRules, reorderRules } from '../../batteries/modules/actions';

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Table, Checkbox, Input } from 'antd';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { FieldControl } from 'react-reactive-form';
 import { aclOptionsLabel } from './utils';
 

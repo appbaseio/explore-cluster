@@ -235,6 +235,7 @@ class CreateCredentials extends React.Component {
 			saveButtonText,
 			isLoadingMappings,
 			isUserManagement,
+			indices,
 		} = this.props;
 		const Messages = getMessages(isUserManagement);
 		return (
@@ -461,8 +462,8 @@ class CreateCredentials extends React.Component {
 														toolTipMessage={Messages.indices}
 														component={
 															<Select
-																placeholder="Enter indices"
-																mode="tags"
+																placeholder="Select indices"
+																mode="multiple"
 																style={{ width: '100%' }}
 																tokenSeparators={[',']}
 																value={value}
@@ -472,7 +473,20 @@ class CreateCredentials extends React.Component {
 																		calculateValue(val),
 																	);
 																}}
-															/>
+															>
+																<Option key="*">
+																	* (Include all indices)
+																</Option>
+																{(indices || [])
+																	.filter(
+																		(i) => !i.startsWith('.'),
+																	)
+																	.map((index) => (
+																		<Select.Option key={index}>
+																			{index}
+																		</Select.Option>
+																	))}
+															</Select>
 														}
 													/>
 												);
@@ -675,6 +689,7 @@ CreateCredentials.defaultProps = {
 	permissions: undefined,
 	titleText: undefined,
 	isUserManagement: false,
+	indices: [],
 };
 CreateCredentials.propTypes = {
 	isPaidUser: PropTypes.bool,
@@ -707,16 +722,19 @@ CreateCredentials.propTypes = {
 	isUserManagement: PropTypes.bool,
 	credentials: PropTypes.string.isRequired,
 	fetchMappings: PropTypes.func.isRequired,
+	indices: PropTypes.array,
 };
 
 const mapStateToProps = (state) => {
 	const mappings = getTraversedMappingsByAppName(state);
 	const appPermissions = getAppPermissionsByName(state);
+	const indices = get(state, 'apps.data');
 	return {
 		isPaidUser: true,
 		appName: get(state, '$getCurrentApp.name'),
 		mappings: mappings || [],
 		isPermissionPresent: !!appPermissions,
+		indices: Object.keys(indices || {}),
 		isLoadingMappings:
 			get(state, '$getAppMappings.isFetching') || get(state, '$getAppPermissions.isFetching'),
 		credentials: get(appPermissions, 'credentials.credentials'),

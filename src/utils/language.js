@@ -1,4 +1,6 @@
-import { cloneDeep, get, omit } from 'lodash';
+import get from 'lodash/get';
+import cloneDeep from 'lodash/cloneDeep';
+import omit from 'lodash/omit';
 import languages from '../constants/language';
 
 export function buildLanguageAnalysis(language, languagePayload) {

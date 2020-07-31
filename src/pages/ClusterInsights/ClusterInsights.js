@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { Button, message, Popconfirm } from 'antd';
 import Stripe from 'react-stripe-checkout';
 import { connect } from 'react-redux';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { container } from '../ResultsPage/styles';

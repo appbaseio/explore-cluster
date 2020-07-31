@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { css } from 'emotion';
 import {
 	Card,
@@ -19,6 +19,7 @@ import {
 	Skeleton,
 	Radio,
 	Typography,
+	Alert,
 } from 'antd';
 
 import {
@@ -1021,6 +1022,16 @@ class SearchSettingsPage extends React.Component {
 									queryType,
 									enableNgram,
 								}}
+								renderContent={() =>
+									isDirty ? (
+										<Alert
+											type="warning"
+											showIcon
+											style={{ marginBottom: 10 }}
+											description="Re-indexing is required for applying below changes."
+										/>
+									) : null
+								}
 								renderField={({ type, record }) => {
 									const fieldName = get(record, 'setting', '').toLowerCase();
 									if (fieldName === 'datafield') {

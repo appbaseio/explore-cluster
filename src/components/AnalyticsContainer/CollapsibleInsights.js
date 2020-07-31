@@ -1,7 +1,7 @@
 import React from 'react';
 import { Collapse, Alert, List, Icon, Button, Dropdown, Menu, Empty, Popconfirm } from 'antd';
 import { Link, withRouter } from 'react-router-dom';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import moment from 'moment';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';

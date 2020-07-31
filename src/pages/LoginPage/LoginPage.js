@@ -91,7 +91,7 @@ class LoginPage extends Component {
 							onPressEnter={this.onClusterURLBlur}
 						/>
 						<Input
-							css={{
+							style={{
 								margin: '6px 0',
 							}}
 							ref={this.username}
@@ -100,7 +100,7 @@ class LoginPage extends Component {
 							placeholder="Username"
 						/>
 						<Input
-							css={{
+							style={{
 								margin: '0 0 6px 0',
 							}}
 							ref={this.password}
@@ -118,7 +118,7 @@ class LoginPage extends Component {
 						<Button
 							size="large"
 							ghost
-							css={{
+							style={{
 								border: 0,
 								boxShadow: 'none',
 								color: '#424242',
