@@ -235,6 +235,7 @@ class CreateCredentials extends React.Component {
 			isLoadingMappings,
 			isUserManagement,
 			mappings,
+			indices,
 		} = this.props;
 		const Messages = getMessages(isUserManagement);
 		return (
@@ -461,8 +462,8 @@ class CreateCredentials extends React.Component {
 														toolTipMessage={Messages.indices}
 														component={
 															<Select
-																placeholder="Enter indices"
-																mode="tags"
+																placeholder="Select indices"
+																mode="multiple"
 																style={{ width: '100%' }}
 																tokenSeparators={[',']}
 																value={value}
@@ -472,7 +473,20 @@ class CreateCredentials extends React.Component {
 																		calculateValue(val),
 																	);
 																}}
-															/>
+															>
+																<Option key="*">
+																	* (Include all indices)
+																</Option>
+																{(indices || [])
+																	.filter(
+																		(i) => !i.startsWith('.'),
+																	)
+																	.map((index) => (
+																		<Select.Option key={index}>
+																			{index}
+																		</Select.Option>
+																	))}
+															</Select>
 														}
 													/>
 												);
@@ -560,23 +574,64 @@ class CreateCredentials extends React.Component {
 																	<Option key="*">
 																		* (Include all fields)
 																	</Option>
-																	{mappings.map((v) => {
-																		if (
-																			!(
-																				excludedFields || []
-																			).includes(v)
-																		) {
-																			return (
-																				<Option
-																					key={v}
-																					title={v}
-																				>
-																					{v}
-																				</Option>
-																			);
-																		}
-																		return null;
-																	})}
+																	{!this.isApp
+																		? mappings.map((v) => {
+																				if (
+																					!(
+																						excludedFields ||
+																						[]
+																					).includes(v)
+																				) {
+																					return (
+																						<Option
+																							key={v}
+																							title={
+																								v
+																							}
+																						>
+																							{v}
+																						</Option>
+																					);
+																				}
+																				return null;
+																		  })
+																		: Object.keys(mappings).map(
+																				(i) =>
+																					mappings[i].map(
+																						(v) => {
+																							if (
+																								!excludedFields.includes(
+																									v,
+																								)
+																							) {
+																								return (
+																									<Option
+																										key={
+																											v
+																										}
+																										title={
+																											v
+																										}
+																									>
+																										{
+																											v
+																										}
+																										<span
+																											css={
+																												styles.fieldBadge
+																											}
+																										>
+																											{
+																												i
+																											}
+																										</span>
+																									</Option>
+																								);
+																							}
+																							return null;
+																						},
+																					),
+																		  )}
 																</Select>
 															}
 														/>
@@ -713,6 +768,7 @@ CreateCredentials.defaultProps = {
 	titleText: undefined,
 	isUserManagement: false,
 	mappings: [],
+	indices: [],
 };
 CreateCredentials.propTypes = {
 	isPaidUser: PropTypes.bool,
@@ -745,19 +801,25 @@ CreateCredentials.propTypes = {
 	isUserManagement: PropTypes.bool,
 	appbaseCredentials: PropTypes.string.isRequired,
 	fetchMappings: PropTypes.func.isRequired,
-	mappings: PropTypes.array,
+	mappings: PropTypes.oneOfType([
+		PropTypes.array,
+		PropTypes.object, // at cluster level
+	]),
+	indices: PropTypes.array,
 };
 
 const mapStateToProps = (state) => {
 	const mappings = getTraversedMappingsByAppName(state);
 	const appPermissions = getAppPermissionsByName(state);
 	const { username, password } = get(state, 'user.data', {});
+	const indices = get(state, 'apps.data');
 	return {
 		appbaseCredentials: username ? `${username}:${password}` : null,
 		isPaidUser: true,
 		appName: get(state, '$getCurrentApp.name'),
 		mappings: mappings || [],
 		isPermissionPresent: !!appPermissions,
+		indices: Object.keys(indices || {}),
 		isLoadingMappings:
 			get(state, '$getAppMappings.isFetching') || get(state, '$getAppPermissions.isFetching'),
 		plan: 'growth',
