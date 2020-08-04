@@ -561,7 +561,9 @@ class CreateCredentials extends React.Component {
 																	placeholder="Select field value"
 																	mode="multiple"
 																	notFoundContent={null}
-																	style={{ width: '100%' }}
+																	style={{
+																		width: '100%',
+																	}}
 																	tokenSeparators={[',']}
 																	{...inputHandler}
 																	value={inputHandler.value || []}
@@ -574,7 +576,7 @@ class CreateCredentials extends React.Component {
 																	<Option key="*">
 																		* (Include all fields)
 																	</Option>
-																	{!this.isApp
+																	{this.isApp
 																		? mappings.map((v) => {
 																				if (
 																					!(
@@ -600,13 +602,20 @@ class CreateCredentials extends React.Component {
 																					mappings[i].map(
 																						(v) => {
 																							if (
-																								!excludedFields.includes(
+																								!(
+																									excludedFields ||
+																									[]
+																								).includes(
 																									v,
 																								)
 																							) {
 																								return (
 																									<Option
 																										key={
+																											v +
+																											i
+																										}
+																										value={
 																											v
 																										}
 																										title={
@@ -671,7 +680,7 @@ class CreateCredentials extends React.Component {
 																	<Option key="*">
 																		* (Exclude all fields)
 																	</Option>
-																	{!this.isApp
+																	{this.isApp
 																		? mappings.map((v) => {
 																				if (
 																					!(
@@ -697,13 +706,17 @@ class CreateCredentials extends React.Component {
 																					mappings[i].map(
 																						(v) => {
 																							if (
-																								!includedFields.includes(
+																								!(
+																									includedFields ||
+																									[]
+																								).includes(
 																									v,
 																								)
 																							) {
 																								return (
 																									<Option
 																										key={
+																											i +
 																											v
 																										}
 																										title={
