@@ -671,20 +671,64 @@ class CreateCredentials extends React.Component {
 																	<Option key="*">
 																		* (Exclude all fields)
 																	</Option>
-																	{mappings.map((v) => {
-																		if (
-																			!(
-																				includedFields || []
-																			).includes(v)
-																		) {
-																			return (
-																				<Option key={v}>
-																					{v}
-																				</Option>
-																			);
-																		}
-																		return null;
-																	})}
+																	{!this.isApp
+																		? mappings.map((v) => {
+																				if (
+																					!(
+																						includedFields ||
+																						[]
+																					).includes(v)
+																				) {
+																					return (
+																						<Option
+																							key={v}
+																							title={
+																								v
+																							}
+																						>
+																							{v}
+																						</Option>
+																					);
+																				}
+																				return null;
+																		  })
+																		: Object.keys(mappings).map(
+																				(i) =>
+																					mappings[i].map(
+																						(v) => {
+																							if (
+																								!includedFields.includes(
+																									v,
+																								)
+																							) {
+																								return (
+																									<Option
+																										key={
+																											v
+																										}
+																										title={
+																											v
+																										}
+																									>
+																										{
+																											v
+																										}
+																										<span
+																											css={
+																												styles.fieldBadge
+																											}
+																										>
+																											{
+																												i
+																											}
+																										</span>
+																									</Option>
+																								);
+																							}
+																							return null;
+																						},
+																					),
+																		  )}
 																</Select>
 															}
 														/>
