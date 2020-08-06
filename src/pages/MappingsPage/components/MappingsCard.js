@@ -15,9 +15,14 @@ const MappingsCard = ({ getMappings, setMapping, usecase, children }) => {
 			}
 			extra={
 				<React.Fragment>
-					<Tooltip title="Fetch new Mappings">
-						<Button style={{ marginRight: 8 }} onClick={getMappings}>
+					<Tooltip title="Fetch latest Mappings">
+						<Button
+							ghost
+							style={{ marginRight: 8, color: '#1890ff' }}
+							onClick={getMappings}
+						>
 							<Icon type="reload" />
+							Reload Mappings
 						</Button>
 					</Tooltip>
 					<NewField onAddField={setMapping} fields={Object.keys(usecase || {})} />
