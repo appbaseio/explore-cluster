@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Button, Modal, notification, Affix, Row, Skeleton, Alert } from 'antd';
+import { Button, Modal, notification, Affix, Row, Skeleton, Alert, Empty } from 'antd';
 import omit from 'lodash/omit';
 import PropTypes from 'prop-types';
 
@@ -218,9 +218,18 @@ class Mappings extends React.Component {
 		});
 	};
 
-	renderMapping = ({ usecase, type, path = '', rawMappings }) => {
+	renderMapping = ({ usecase, type, path = '', rawMappings, init = false }) => {
 		if (!usecase) {
 			return null;
+		}
+
+		if (init && Object.keys(usecase).length === 0) {
+			return (
+				<Empty
+					image={Empty.PRESENTED_IMAGE_SIMPLE}
+					description={<span>No Mappings Present</span>}
+				/>
+			);
 		}
 
 		return Object.keys(usecase).map((field) => {
@@ -336,6 +345,7 @@ class Mappings extends React.Component {
 							usecase,
 							type,
 							rawMappings,
+							init: true,
 						})}
 					</Row>
 					<Loader show={isReindexing} message="Re-indexing your data... Please wait!" />
