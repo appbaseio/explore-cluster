@@ -3,6 +3,7 @@ import { Card, Tooltip, Icon, Button } from 'antd';
 import PropTypes from 'prop-types';
 import { cardTitle } from './styles';
 import NewField from './NewField';
+import HeaderRow from './HeaderRow';
 
 const MappingsCard = ({ getMappings, setMapping, usecase, children }) => {
 	return (
@@ -29,6 +30,7 @@ const MappingsCard = ({ getMappings, setMapping, usecase, children }) => {
 				</React.Fragment>
 			}
 		>
+			<HeaderRow />
 			{children}
 		</Card>
 	);

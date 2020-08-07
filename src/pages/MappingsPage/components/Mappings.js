@@ -25,7 +25,6 @@ import SearchPreviewModal from '../../../components/SearchPreviewModal';
 import { footerStyles, row, container } from './styles';
 import ObjectField from './ObjectField';
 import FieldRow from './FieldRow';
-import HeaderRow from './HeaderRow';
 import MappingsCard from './MappingsCard';
 
 // TODO: Add support for synonyms, language and search fields. Recursively update the fields.
@@ -303,7 +302,6 @@ class Mappings extends React.Component {
 						usecase={{}}
 						setMapping={this.setMapping}
 					>
-						<HeaderRow />
 						<Skeleton />
 					</MappingsCard>
 				</div>
@@ -318,7 +316,6 @@ class Mappings extends React.Component {
 						usecase={{}}
 						setMapping={this.setMapping}
 					>
-						<HeaderRow />
 						<Row>
 							<Alert
 								type="error"
@@ -336,10 +333,9 @@ class Mappings extends React.Component {
 			<div className={container}>
 				<MappingsCard
 					getMappings={this.getMappings}
-					usecase={{}}
+					usecase={usecase}
 					setMapping={this.setMapping}
 				>
-					<HeaderRow />
 					<Row className={row}>
 						{this.renderMapping({
 							usecase,
@@ -348,8 +344,8 @@ class Mappings extends React.Component {
 							init: true,
 						})}
 					</Row>
-					<Loader show={isReindexing} message="Re-indexing your data... Please wait!" />
 				</MappingsCard>
+				<Loader show={isReindexing} message="Re-indexing your data... Please wait!" />
 				<Affix offsetBottom={0}>
 					<div className={footerStyles}>
 						<SearchPreviewModal app={appName} />
