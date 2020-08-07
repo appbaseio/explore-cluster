@@ -56,9 +56,12 @@ const PopularSearchesWrapper = ({ appName, plan, isPaidUser }) => (
 		)}
 	</React.Fragment>
 );
+PopularSearchesWrapper.defaultProps = {
+	appName: undefined,
+};
 
 PopularSearchesWrapper.propTypes = {
-	appName: PropTypes.string.isRequired,
+	appName: PropTypes.string,
 	plan: PropTypes.string.isRequired,
 	isPaidUser: PropTypes.bool.isRequired,
 };
