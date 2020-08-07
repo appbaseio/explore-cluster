@@ -25,7 +25,6 @@ import SearchPreviewModal from '../../../components/SearchPreviewModal';
 import { footerStyles, row, container } from './styles';
 import ObjectField from './ObjectField';
 import FieldRow from './FieldRow';
-import HeaderRow from './HeaderRow';
 import MappingsCard from './MappingsCard';
 
 // TODO: Add support for synonyms, language and search fields. Recursively update the fields.
@@ -53,7 +52,7 @@ class Mappings extends React.Component {
 	};
 
 	componentDidMount() {
-		const { mappings, appName, fetchSearchSettings } = this.props;
+		const { mappings, appName, fetchSearchSettings, searchRelevancy } = this.props;
 
 		if (mappings) {
 			this.init(mappings);
@@ -61,7 +60,7 @@ class Mappings extends React.Component {
 			this.getMappings();
 		}
 
-		fetchSearchSettings(appName);
+		if (!searchRelevancy) fetchSearchSettings(appName);
 	}
 
 	componentDidUpdate(prevProps) {
@@ -219,6 +218,7 @@ class Mappings extends React.Component {
 	};
 
 	renderMapping = ({ usecase, type, path = '', rawMappings, init = false }) => {
+		const { hideAggsFields, hideSearchFields, hideTypeColumn, renderColumn } = this.props;
 		if (!usecase) {
 			return null;
 		}
@@ -260,6 +260,10 @@ class Mappings extends React.Component {
 					path={`${path}${field}`}
 					setMapping={this.setMapping}
 					onDelete={this.handleDelete}
+					hideAggsFields={hideAggsFields}
+					hideSearchFields={hideSearchFields}
+					hideTypeColumn={hideTypeColumn}
+					renderColumn={renderColumn}
 				/>
 			);
 			// return (
@@ -289,7 +293,7 @@ class Mappings extends React.Component {
 	};
 
 	render() {
-		const { isFetchingMapping, error, appName } = this.props;
+		const { isFetchingMapping, error, appName, hideCardTitle } = this.props;
 		const { usecase, type, isReindexing, rawMappings } = this.state;
 		const hasMappingsChanged =
 			JSON.stringify(usecase) !== JSON.stringify(this.originalMappingsUsecase) ||
@@ -301,9 +305,9 @@ class Mappings extends React.Component {
 					<MappingsCard
 						getMappings={this.getMappings}
 						usecase={{}}
+						hideCardTitle={hideCardTitle}
 						setMapping={this.setMapping}
 					>
-						<HeaderRow />
 						<Skeleton />
 					</MappingsCard>
 				</div>
@@ -316,9 +320,9 @@ class Mappings extends React.Component {
 					<MappingsCard
 						getMappings={this.getMappings}
 						usecase={{}}
+						hideCardTitle={hideCardTitle}
 						setMapping={this.setMapping}
 					>
-						<HeaderRow />
 						<Row>
 							<Alert
 								type="error"
@@ -336,10 +340,10 @@ class Mappings extends React.Component {
 			<div className={container}>
 				<MappingsCard
 					getMappings={this.getMappings}
-					usecase={{}}
+					usecase={usecase}
+					hideCardTitle={hideCardTitle}
 					setMapping={this.setMapping}
 				>
-					<HeaderRow />
 					<Row className={row}>
 						{this.renderMapping({
 							usecase,
@@ -387,6 +391,14 @@ Mappings.propTypes = {
 	enableNgram: PropTypes.bool,
 	enableSynonyms: PropTypes.bool,
 	language: PropTypes.string,
+	searchRelevancy: PropTypes.object,
+	// Search & Aggs Settings specific Props
+	hideCardTitle: PropTypes.bool,
+	hideAggsFields: PropTypes.bool,
+	hideSearchFields: PropTypes.bool,
+	hideTypeColumn: PropTypes.bool,
+	renderColumn: PropTypes.func,
+	// Actions
 	fetchMappings: PropTypes.func.isRequired,
 	fetchSearchSettings: PropTypes.func.isRequired,
 };
@@ -398,15 +410,29 @@ Mappings.defaultProps = {
 	enableNgram: true,
 	enableSynonyms: true,
 	language: 'universal',
+	searchRelevancy: null,
+	// Search & Aggs Settings specific Props
+	hideCardTitle: false,
+	hideAggsFields: false,
+	hideSearchFields: false,
+	hideTypeColumn: false,
+	renderColumn: null,
 };
 
 const mapStateToProps = (state, props) => {
 	const { appName } = props;
 	const { username, password } = get(state, 'user.data', {});
-	const defaultSettings = get(state.$getAppSettings, `defaultSettings`);
+	const defaultSettings = get(state, `$getAppSettings.defaultSettings`);
+	const errorCode = get(state, '$getAppSettings.error.actual.code');
+	const defaultSearchSettings = errorCode === 404 ? defaultSettings : null;
 	return {
 		appName,
 		mappings: getRawMappingsByAppName(state) || null,
+		searchRelevancy: get(
+			state,
+			['$getAppSettings', 'settings', appName],
+			defaultSearchSettings,
+		),
 		isFetchingMapping: get(state, '$getAppMappings.isFetching'),
 		error: get(state, '$getAppMappings.error', null),
 		credentials: username ? `${username}:${password}` : null,

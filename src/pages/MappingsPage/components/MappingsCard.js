@@ -3,15 +3,18 @@ import { Card, Tooltip, Icon, Button } from 'antd';
 import PropTypes from 'prop-types';
 import { cardTitle } from './styles';
 import NewField from './NewField';
+import HeaderRow from './HeaderRow';
 
-const MappingsCard = ({ getMappings, setMapping, usecase, children }) => {
+const MappingsCard = ({ getMappings, setMapping, usecase, children, hideCardTitle }) => {
 	return (
 		<Card
 			title={
-				<div className={cardTitle}>
-					<h4>Manage Mappings</h4>
-					<p>Add new fields or change the types of existing ones.</p>
-				</div>
+				hideCardTitle ? null : (
+					<div className={cardTitle}>
+						<h4>Manage Mappings</h4>
+						<p>Add new fields or change the types of existing ones.</p>
+					</div>
+				)
 			}
 			extra={
 				<React.Fragment>
@@ -29,6 +32,7 @@ const MappingsCard = ({ getMappings, setMapping, usecase, children }) => {
 				</React.Fragment>
 			}
 		>
+			<HeaderRow />
 			{children}
 		</Card>
 	);
@@ -36,10 +40,12 @@ const MappingsCard = ({ getMappings, setMapping, usecase, children }) => {
 
 MappingsCard.defaultProps = {
 	usecase: {},
+	hideCardTitle: false,
 };
 
 MappingsCard.propTypes = {
 	usecase: PropTypes.object,
+	hideCardTitle: PropTypes.bool,
 	getMappings: PropTypes.func.isRequired,
 	setMapping: PropTypes.func.isRequired,
 	children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,

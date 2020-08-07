@@ -109,7 +109,17 @@ class NewField extends React.Component {
 										: {}
 								}
 							/>
-							{fieldNameError || null}
+							{fieldNameError ? (
+								<span
+									style={{
+										color: '#f5222d',
+										margin: '5px 0',
+										display: 'inline-block',
+									}}
+								>
+									{fieldNameError}
+								</span>
+							) : null}
 						</Col>
 						{fieldType === 'text' ? (
 							<Col md={5}>

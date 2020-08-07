@@ -1,3 +1,3 @@
-import SearchSettings from './SearchSettings';
+import SearchSettings from './NewSearchSettingsPage';
 
 export default SearchSettings;

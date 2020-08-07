@@ -6,7 +6,27 @@ import TypeDropdown from './TypeDropdown';
 import { fieldRow } from './styles';
 import MappingsTypeIcon from './MappingsTypeIcon';
 
-const FieldRow = ({ path, field, usecase, type, mapping, onDelete, setMapping }) => {
+const FieldRow = ({
+	path,
+	field,
+	usecase,
+	type,
+	mapping,
+	hideAggsFields,
+	hideSearchFields,
+	hideTypeColumn,
+	renderColumn,
+	onDelete,
+	setMapping,
+}) => {
+	if (hideAggsFields && (usecase === 'aggs' || type !== 'text')) {
+		return null;
+	}
+
+	if (hideSearchFields && usecase === 'search') {
+		return null;
+	}
+
 	return (
 		<Row type="flex" justify="space-between" className={fieldRow}>
 			<Col>
@@ -37,14 +57,23 @@ const FieldRow = ({ path, field, usecase, type, mapping, onDelete, setMapping })
 							path={path}
 						/>
 					</Col>
-					<Col xs={type === 'text' ? 12 : 24}>
-						<TypeDropdown
-							value={type}
-							usecase={usecase}
-							onTypeChange={setMapping}
-							path={path}
-						/>
-					</Col>
+					{hideTypeColumn ? null : (
+						<Col xs={type === 'text' ? 12 : 24}>
+							<TypeDropdown
+								value={type}
+								usecase={usecase}
+								onTypeChange={setMapping}
+								path={path}
+							/>
+						</Col>
+					)}
+					{renderColumn ? (
+						<Col xs={12}>
+							{renderColumn({
+								path,
+							})}
+						</Col>
+					) : null}
 				</Row>
 			</Col>
 		</Row>
@@ -53,6 +82,11 @@ const FieldRow = ({ path, field, usecase, type, mapping, onDelete, setMapping })
 
 FieldRow.defaultProps = {
 	mapping: {},
+	// Search & Aggs Settings specific Props
+	hideSearchFields: false,
+	hideAggsFields: false,
+	hideTypeColumn: false,
+	renderColumn: null,
 };
 
 FieldRow.propTypes = {
@@ -60,9 +94,15 @@ FieldRow.propTypes = {
 	path: PropTypes.string.isRequired,
 	usecase: PropTypes.string.isRequired,
 	type: PropTypes.string.isRequired,
+	mapping: PropTypes.object,
+	// Search & Aggs Settings specific Props
+	hideSearchFields: PropTypes.bool,
+	hideAggsFields: PropTypes.bool,
+	hideTypeColumn: PropTypes.bool,
+	renderColumn: PropTypes.func,
+	// Actions
 	onDelete: PropTypes.func.isRequired,
 	setMapping: PropTypes.func.isRequired,
-	mapping: PropTypes.object,
 };
 
 export default FieldRow;
