@@ -71,6 +71,7 @@ const FieldRow = ({
 						<Col xs={12}>
 							{renderColumn({
 								path,
+								mapping,
 							})}
 						</Col>
 					) : null}

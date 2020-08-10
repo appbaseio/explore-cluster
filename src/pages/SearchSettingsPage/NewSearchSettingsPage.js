@@ -1,6 +1,7 @@
 import React from 'react';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
+import { InputNumber } from 'antd';
 import {
 	getDefaultSettings,
 	putSettings,
@@ -8,9 +9,22 @@ import {
 	getSettings as getSearchRelevancy,
 } from '../../batteries/modules/actions';
 import Mappings from '../MappingsPage/components/Mappings';
-import { InputNumber } from 'antd';
+import { getFieldWeight, getSubFields } from '../../utils';
 
 class SearchSettings extends React.Component {
+	state = {
+		fieldWithWeights: {},
+		fuzziness: 0,
+		queryFormat: 'or',
+		queryString: false,
+		searchOperators: false,
+		enableNGram: true,
+		hasLanguage: true,
+		enableSynonyms: true,
+	};
+
+	mappingsRef = React.createRef();
+
 	componentDidMount() {
 		const {
 			appName,
@@ -40,11 +54,55 @@ class SearchSettings extends React.Component {
 	}
 
 	init = (settings) => {
-		console.log(settings);
+		const searchSettings = get(settings, 'search', {});
+
+		const fields = get(searchSettings, 'dataField', []);
+		const weights = get(searchSettings, 'fieldWeights', []);
+
+		const fieldWithWeights = fields.reduce((agg, item, index) => {
+			return {
+				...agg,
+				[item]: get(weights, index, getFieldWeight(item.split('.').pop(), 1)),
+			};
+		}, {});
+
+		this.setState({
+			fuzziness: get(searchSettings, 'fuzziness'),
+			queryFormat: get(searchSettings, 'queryFormat'),
+			queryString: get(searchSettings, 'queryString'),
+			searchOperators: get(searchSettings, 'searchOperators'),
+			fieldWithWeights,
+			enableNGram: get(settings, 'indexSettings.enableNGram', true),
+			hasLanguage: !!get(settings, 'language.language'),
+			enableSynonyms: get(settings, 'synonyms.enabled', true),
+		});
+	};
+
+	handleFieldWeight = ({ field, weight, mapping }) => {
+		const { enableNGram, hasLanguage, enableSynonyms } = this.state;
+		const fields = getSubFields({
+			fields: get(mapping, 'fields'),
+			weight,
+			address: field,
+			skipSearch: enableNGram,
+			skipLang: !hasLanguage,
+			skipSynonyms: !enableSynonyms,
+		});
+		this.setState((state) => ({
+			fieldWithWeights: {
+				...state.fieldWithWeights,
+				...fields,
+			},
+		}));
+	};
+
+	handleMappingChange = () => {
+		console.log('Change Detected', this.mappingsRef);
 	};
 
 	render() {
 		const { isLoading, appName } = this.props;
+		const { fieldWithWeights } = this.state;
 		if (isLoading) return 'Loading Search Settings...';
 		return (
 			<div>
@@ -53,9 +111,20 @@ class SearchSettings extends React.Component {
 					hideCardTitle
 					hideAggsFields
 					hideTypeColumn
-					renderColumn={({ path }) => (
+					onChange={this.handleMappingChange}
+					ref={this.mappingsRef}
+					renderColumn={({ path, mapping }) => (
 						<div style={{ width: 150 }}>
-							<InputNumber />
+							<InputNumber
+								value={fieldWithWeights[path]}
+								onChange={(value) => {
+									this.handleFieldWeight({
+										weight: value,
+										field: path,
+										mapping,
+									});
+								}}
+							/>
 						</div>
 					)}
 				/>

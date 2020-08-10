@@ -63,10 +63,15 @@ class Mappings extends React.Component {
 		if (!searchRelevancy) fetchSearchSettings(appName);
 	}
 
-	componentDidUpdate(prevProps) {
-		const { mappings } = this.props;
+	componentDidUpdate(prevProps, prevState) {
+		const { mappings, onChange } = this.props;
+		const { usecase } = this.state;
 		if (JSON.stringify(mappings) !== JSON.stringify(prevProps.mappings)) {
 			this.init(mappings);
+		}
+
+		if (onChange && JSON.stringify(usecase) !== JSON.stringify(prevState.usecase)) {
+			onChange();
 		}
 	}
 
@@ -78,17 +83,25 @@ class Mappings extends React.Component {
 	};
 
 	init = (mappings) => {
+		const { onChange } = this.props;
 		const { usecase, flattenType, flattenUsecase, type } = getMappingsInfo(mappings);
 		this.flattenType = flattenType;
 		this.flattenUsecase = flattenUsecase;
 		this.originalMappingsUsecase = usecase;
 		this.originalMappingsType = type;
 		// eslint-disable-next-line
-		this.setState({
-			usecase,
-			type,
-			rawMappings: mappings,
-		});
+		this.setState(
+			{
+				usecase,
+				type,
+				rawMappings: mappings,
+			},
+			() => {
+				if (onChange) {
+					onChange();
+				}
+			},
+		);
 	};
 
 	setMapping = ({ usecase, path, type }) => {
@@ -398,6 +411,7 @@ Mappings.propTypes = {
 	hideSearchFields: PropTypes.bool,
 	hideTypeColumn: PropTypes.bool,
 	renderColumn: PropTypes.func,
+	onChange: PropTypes.func,
 	// Actions
 	fetchMappings: PropTypes.func.isRequired,
 	fetchSearchSettings: PropTypes.func.isRequired,
@@ -417,6 +431,7 @@ Mappings.defaultProps = {
 	hideSearchFields: false,
 	hideTypeColumn: false,
 	renderColumn: null,
+	onChange: null,
 };
 
 const mapStateToProps = (state, props) => {
