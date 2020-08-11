@@ -6,7 +6,7 @@ import get from 'lodash/get';
 const dependencies = {
 	react: '16.8.0',
 	'react-dom': '16.8.0',
-	'@appbaseio/reactivesearch': '3.8.1',
+	'@appbaseio/reactivesearch': 'latest',
 };
 
 const html = `<!DOCTYPE html>
