@@ -93,6 +93,7 @@ const PopularSearchesWrapper = ({ appName, plan, isPaidUser }) => (
 													)}
 													appName={appName}
 													plan={plan}
+													displaySummaryStats
 												/>
 											)}
 										/>

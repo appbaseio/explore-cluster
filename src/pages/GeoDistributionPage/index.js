@@ -38,7 +38,7 @@ const PopularResultsWrapper = ({ plan, isGrowth }) => (
 			<React.Fragment>
 				{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
 				<Container>
-					<GeoDistributionPage filterId="geo_distribution_page" />
+					<GeoDistributionPage displaySummaryStats filterId="geo_distribution_page" />
 				</Container>
 			</React.Fragment>
 		) : (
