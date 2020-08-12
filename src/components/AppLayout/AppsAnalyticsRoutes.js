@@ -3,6 +3,7 @@ import { Route } from 'react-router-dom';
 import Loadable from 'react-loadable';
 import AnalyticsContainer from '../AnalyticsContainer';
 import AppPageContainer from '../AppPageContainer';
+import PopularSearches from '../../pages/PopularSearches';
 
 import Loader from '../Loader';
 
@@ -23,11 +24,6 @@ const GeoDistributionPage = Loadable({
 });
 const SearchLatency = Loadable({
 	loader: () => import(/* webpackChunkName: "SearchLatency" */ '../../pages/SearchLatency'),
-	loading: Loader,
-});
-
-const PopularSearches = Loadable({
-	loader: () => import(/* webpackChunkName: "PopularSearches" */ '../../pages/PopularSearches'),
 	loading: Loader,
 });
 
@@ -59,7 +55,6 @@ const AppsAnalyticsRoutes = () => (
 			component={(props) => <AppPageContainer {...props} component={AnalyticsPage} />}
 		/>
 		<Route
-			exact
 			path="/app/:appName/popular-searches"
 			component={(props) => <AppPageContainer {...props} component={PopularSearches} />}
 		/>
