@@ -170,6 +170,11 @@ const settingsMap = {
 		description:
 			'Query type determines the query DSL to be used. It defaults to ReactiveSearch.',
 	},
+	enableNgram: {
+		title: 'Enable N gram',
+		description:
+			'appbase.io adds an n-grams tokenizer to enable partial infix matching of search terms, but this comes with a substantial storage increase. By disabling n-grams, you can make significant storage savings.',
+	},
 };
 
 export default settingsMap;

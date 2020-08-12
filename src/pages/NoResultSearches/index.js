@@ -40,6 +40,7 @@ const NoResultSearchWrapper = ({ appName, plan, isPaidUser }) => (
 						displayReplaySearch={window.location.pathname.startsWith('/app')}
 						appName={appName}
 						plan={plan}
+						displaySummaryStats
 					/>
 				</Container>
 			</React.Fragment>
