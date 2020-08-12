@@ -107,7 +107,9 @@ class SearchLatencyWrapper extends React.Component {
 					{startLatency !== undefined ? startLatency : minLatency}
 					ms
 				</b>{' '}
-				- <b>{endLatency !== undefined ? endLatency : maxLatency}
+				-{' '}
+				<b>
+					{endLatency !== undefined ? endLatency : maxLatency}
 					ms
 				</b>{' '}
 				interval
@@ -125,6 +127,7 @@ class SearchLatencyWrapper extends React.Component {
 								style={{ height: 506 }}
 								filterId={filterId}
 								onClickBar={this.handleClickBar}
+								displaySummaryStats
 							/>
 							<div
 								style={{
