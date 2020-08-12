@@ -28,9 +28,6 @@ import ObjectField from './ObjectField';
 import FieldRow from './FieldRow';
 import MappingsCard from './MappingsCard';
 
-// TODO: Add support for synonyms, language and search fields. Recursively update the fields.
-// Track from CDU and recursively traverse mappings to update Fields
-
 // TODO Next: Use in Search Settings
 // TODO Next: Use in Aggs Settings
 
