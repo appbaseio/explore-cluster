@@ -15,7 +15,7 @@ const bannerMessage = {
 const MappingsPage = ({ appName }) => (
 	<Fragment>
 		<Banner {...bannerMessage} />
-		<section>
+		<section style={{ padding: 50 }}>
 			<ErrorToaster>
 				<Mappings key={appName} appName={appName} />
 			</ErrorToaster>

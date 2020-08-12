@@ -11,6 +11,7 @@ import {
 	updateMapping,
 	deleteMappingField,
 	getMappingsByPath,
+	updateSubFields,
 } from './utils/mappings';
 import { getURL, getVersion } from '../../../constants/config';
 import Loader from '../../../batteries/components/shared/Loader';
@@ -22,7 +23,7 @@ import { getRawMappingsByAppName } from '../../../batteries/modules/selectors';
 import { getSettings, reIndex } from '../../../batteries/utils/mappings';
 import SearchPreviewModal from '../../../components/SearchPreviewModal';
 
-import { footerStyles, row, container } from './styles';
+import { footerStyles, row } from './styles';
 import ObjectField from './ObjectField';
 import FieldRow from './FieldRow';
 import MappingsCard from './MappingsCard';
@@ -64,13 +65,21 @@ class Mappings extends React.Component {
 	}
 
 	componentDidUpdate(prevProps, prevState) {
-		const { mappings, onChange } = this.props;
-		const { usecase } = this.state;
+		const { mappings, onChange, enableSynonyms, enableNgram, language } = this.props;
+		const { rawMappings } = this.state;
 		if (JSON.stringify(mappings) !== JSON.stringify(prevProps.mappings)) {
 			this.init(mappings);
 		}
 
-		if (onChange && JSON.stringify(usecase) !== JSON.stringify(prevState.usecase)) {
+		if (
+			enableNgram !== prevProps.enableNgram ||
+			enableSynonyms !== prevProps.enableSynonyms ||
+			language !== prevProps.language
+		) {
+			this.updateFields();
+		}
+
+		if (onChange && JSON.stringify(rawMappings) !== JSON.stringify(prevState.rawMappings)) {
 			onChange();
 		}
 	}
@@ -83,8 +92,13 @@ class Mappings extends React.Component {
 	};
 
 	init = (mappings) => {
-		const { onChange } = this.props;
-		const { usecase, flattenType, flattenUsecase, type } = getMappingsInfo(mappings);
+		const { onChange, enableNgram, enableSynonyms, language } = this.props;
+		const { usecase, flattenType, flattenUsecase, type } = getMappingsInfo({
+			mappings,
+			enableNgram,
+			enableSynonyms,
+			language,
+		});
 		this.flattenType = flattenType;
 		this.flattenUsecase = flattenUsecase;
 		this.originalMappingsUsecase = usecase;
@@ -144,6 +158,21 @@ class Mappings extends React.Component {
 			rawMappings: updatedMappings,
 			usecase: updatedUsecase,
 			type: updatedType,
+		});
+	};
+
+	updateFields = () => {
+		const { mappings, enableSynonyms, enableNgram, language } = this.props;
+
+		const updatedMappings = updateSubFields({
+			mappings,
+			enableSynonyms,
+			enableNgram,
+			language,
+		});
+
+		this.setState({
+			rawMappings: updatedMappings,
 		});
 	};
 
@@ -279,34 +308,11 @@ class Mappings extends React.Component {
 					renderColumn={renderColumn}
 				/>
 			);
-			// return (
-			// 	<div key={field}>
-			// 		Field is {field}, mapping is{' '}
-			// 		<UsecaseDropdown
-			// 			value={usecase[field]}
-			// 			type={type[field]}
-			// 			onUsecaseChange={this.setMapping}
-			// 			path={`${path}${field}`}
-			// 		/>{' '}
-			// 		and type is{' '}
-			// 		<TypeDropdown
-			// 			value={type[field]}
-			// 			usecase={usecase[field]}
-			// 			onTypeChange={this.setMapping}
-			// 			path={`${path}${field}`}
-			// 		/>
-			// 		<Button
-			// 			icon="delete"
-			// 			shape="circle-outline"
-			// 			onClick={() => this.handleDelete(`${path}${field}`)}
-			// 		/>
-			// 	</div>
-			// );
 		});
 	};
 
 	render() {
-		const { isFetchingMapping, error, appName, hideCardTitle } = this.props;
+		const { isFetchingMapping, error, appName, hideCardTitle, hideFooter } = this.props;
 		const { usecase, type, isReindexing, rawMappings } = this.state;
 		const hasMappingsChanged =
 			JSON.stringify(usecase) !== JSON.stringify(this.originalMappingsUsecase) ||
@@ -314,43 +320,37 @@ class Mappings extends React.Component {
 
 		if (isFetchingMapping) {
 			return (
-				<div className={container}>
-					<MappingsCard
-						getMappings={this.getMappings}
-						usecase={{}}
-						hideCardTitle={hideCardTitle}
-						setMapping={this.setMapping}
-					>
-						<Skeleton />
-					</MappingsCard>
-				</div>
+				<MappingsCard
+					getMappings={this.getMappings}
+					usecase={{}}
+					hideCardTitle={hideCardTitle}
+					setMapping={this.setMapping}
+				>
+					<Skeleton />
+				</MappingsCard>
 			);
 		}
 
 		if (error) {
 			return (
-				<div className={container}>
-					<MappingsCard
-						getMappings={this.getMappings}
-						usecase={{}}
-						hideCardTitle={hideCardTitle}
-						setMapping={this.setMapping}
-					>
-						<Row>
-							<Alert
-								type="error"
-								message={
-									error.message || <pre>{JSON.stringify(error, null, 4)}</pre>
-								}
-							/>
-						</Row>
-					</MappingsCard>
-				</div>
+				<MappingsCard
+					getMappings={this.getMappings}
+					usecase={{}}
+					hideCardTitle={hideCardTitle}
+					setMapping={this.setMapping}
+				>
+					<Row>
+						<Alert
+							type="error"
+							message={error.message || <pre>{JSON.stringify(error, null, 4)}</pre>}
+						/>
+					</Row>
+				</MappingsCard>
 			);
 		}
 
 		return (
-			<div className={container}>
+			<React.Fragment>
 				<MappingsCard
 					getMappings={this.getMappings}
 					usecase={usecase}
@@ -367,30 +367,32 @@ class Mappings extends React.Component {
 					</Row>
 					<Loader show={isReindexing} message="Re-indexing your data... Please wait!" />
 				</MappingsCard>
-				<Affix offsetBottom={0}>
-					<div className={footerStyles}>
-						<SearchPreviewModal app={appName} />
-						<div>
-							<Button
-								type="primary"
-								size="large"
-								style={{ margin: '0 10px' }}
-								onClick={this.handleReindex}
-								disabled={!hasMappingsChanged}
-							>
-								Confirm Mapping Changes
-							</Button>
-							<Button
-								size="large"
-								disabled={!hasMappingsChanged}
-								onClick={this.cancelChanges}
-							>
-								Cancel
-							</Button>
+				{hideFooter ? null : (
+					<Affix offsetBottom={0}>
+						<div className={footerStyles}>
+							<SearchPreviewModal app={appName} />
+							<div>
+								<Button
+									type="primary"
+									size="large"
+									style={{ margin: '0 10px' }}
+									onClick={this.handleReindex}
+									disabled={!hasMappingsChanged}
+								>
+									Confirm Mapping Changes
+								</Button>
+								<Button
+									size="large"
+									disabled={!hasMappingsChanged}
+									onClick={this.cancelChanges}
+								>
+									Cancel
+								</Button>
+							</div>
 						</div>
-					</div>
-				</Affix>
-			</div>
+					</Affix>
+				)}
+			</React.Fragment>
 		);
 	}
 }
@@ -412,6 +414,7 @@ Mappings.propTypes = {
 	hideTypeColumn: PropTypes.bool,
 	renderColumn: PropTypes.func,
 	onChange: PropTypes.func,
+	hideFooter: PropTypes.bool,
 	// Actions
 	fetchMappings: PropTypes.func.isRequired,
 	fetchSearchSettings: PropTypes.func.isRequired,
@@ -430,6 +433,7 @@ Mappings.defaultProps = {
 	hideAggsFields: false,
 	hideSearchFields: false,
 	hideTypeColumn: false,
+	hideFooter: false,
 	renderColumn: null,
 	onChange: null,
 };
@@ -481,4 +485,4 @@ const mapDispatchToProps = (dispatch) => ({
 	fetchSearchSettings: (name) => dispatch(getSearchSettings(name)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Mappings);
+export default connect(mapStateToProps, mapDispatchToProps, null, { withRef: true })(Mappings);

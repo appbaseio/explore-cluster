@@ -19,7 +19,7 @@ const FieldRow = ({
 	onDelete,
 	setMapping,
 }) => {
-	if (hideAggsFields && (usecase === 'aggs' || type !== 'text')) {
+	if (hideAggsFields && (usecase === 'none' || usecase === 'aggs' || type !== 'text')) {
 		return null;
 	}
 

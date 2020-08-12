@@ -4,8 +4,19 @@ import { getVersion } from '../../../../constants/config';
 import mappingUsecase from '../../../../batteries/utils/mappingUsecase';
 import { flatObject } from '.';
 
-export const getMappingsInfo = (originalMappings) => {
-	const mappings = JSON.parse(JSON.stringify(originalMappings));
+export const getMappingsInfo = ({
+	mappings: originalMappings,
+	enableNgram,
+	enableSynonyms,
+	language,
+}) => {
+	const mappings = updateSubFields({
+		mappings: originalMappings,
+		enableNgram,
+		enableSynonyms,
+		language,
+	});
+	console.log(mappings);
 	const ES_VERSION = getVersion();
 
 	if (!ES_VERSION) {
@@ -89,44 +100,56 @@ const _getUsecase = (fields) => {
 	return 'none';
 };
 
+const _getFieldsByRelevancy = ({ enableNgram, enableSynonyms, language, fields, type }) => {
+	const languageField = {
+		type: 'text',
+		analyzer: language,
+	};
+	const synonymsField = {
+		analyzer: 'synonyms',
+		type: 'text',
+	};
+
+	const extraFields = {
+		...(type === 'text' && enableSynonyms
+			? {
+					synonyms: synonymsField,
+			  }
+			: {}),
+		...(type === 'text' && language
+			? {
+					lang: languageField,
+			  }
+			: {}),
+	};
+
+	const updatedFields = {
+		...(fields
+			? {
+					...fields,
+					...extraFields,
+			  }
+			: { ...extraFields }),
+	};
+
+	if (enableNgram && fields.search) {
+		delete updatedFields.search;
+	}
+
+	return updatedFields;
+};
+
 const _updateNestedMapping = ({ mapping, type, usecase, fields, currentIndex, settings }) => {
 	if (fields.length === currentIndex + 1) {
 		const { enableNgram, enableSynonyms, language } = settings;
 
-		const languageField = {
-			type: 'text',
-			analyzer: language,
-		};
-		const synonymsField = {
-			analyzer: 'synonyms',
-			type: 'text',
-		};
-
-		const extraFields = {
-			...(type === 'text' && enableSynonyms
-				? {
-						synonyms: synonymsField,
-				  }
-				: {}),
-			...(type === 'text' && language
-				? {
-						lang: languageField,
-				  }
-				: {}),
-		};
-
-		const updatedFields = {
-			...(get(mappingUsecase, `${usecase}.fields`)
-				? {
-						...get(mappingUsecase, `${usecase}.fields`),
-						...extraFields,
-				  }
-				: { ...extraFields }),
-		};
-
-		if (enableNgram && usecase.includes('search')) {
-			delete updatedFields.search;
-		}
+		const updatedFields = _getFieldsByRelevancy({
+			enableSynonyms,
+			enableNgram,
+			language,
+			fields: get(mappingUsecase, `${usecase}.fields`),
+			type,
+		});
 
 		return {
 			...mapping,
@@ -248,4 +271,75 @@ export const getMappingsByPath = ({ mappings, path }) => {
 	}
 	const updatedPath = path.split('.').join('.properties.');
 	return get(mappings, `${TOP_FIELD}.${updatedPath}`);
+};
+
+export const updateSubFields = ({
+	mappings: originalMappings,
+	enableSynonyms,
+	enableNgram,
+	language,
+}) => {
+	const mappings = JSON.parse(JSON.stringify(originalMappings));
+	const ES_VERSION = getVersion();
+
+	let TOP_FIELD = '';
+
+	if (+ES_VERSION[0] >= 6) {
+		TOP_FIELD = '_doc.properties';
+	}
+
+	if (+ES_VERSION[0] >= 7) {
+		TOP_FIELD = 'properties';
+	}
+
+	if (!get(mappings, TOP_FIELD, null)) {
+		return mappings;
+	}
+	const mappingFields = Object.keys(get(mappings, TOP_FIELD, {}));
+
+	const updatedMappings = mappingFields.reduce((agg, field) => {
+		if (get(mappings, `properties.${field}.properties`, null)) {
+			return {
+				...agg,
+				properties: {
+					...agg.properties,
+					[field]: updateSubFields({
+						mappings: get(mappings, `properties.${field}`, {}),
+						enableSynonyms,
+						enableNgram,
+						language,
+					}),
+				},
+			};
+		}
+
+		return {
+			...agg,
+			properties: {
+				...agg.properties,
+				[field]: {
+					...get(mappings, `properties.${field}`, {}),
+					fields: {
+						..._getFieldsByRelevancy({
+							enableSynonyms,
+							enableNgram,
+							language,
+							type: get(mappings, `properties.${field}.type`),
+							fields: get(mappings, `properties.${field}.fields`, {}),
+						}),
+					},
+				},
+			},
+		};
+	}, mappings);
+
+	if (+ES_VERSION[0] >= 6 && +ES_VERSION[0] < 7) {
+		return {
+			_doc: {
+				...updatedMappings,
+			},
+		};
+	}
+
+	return { ...updatedMappings };
 };
