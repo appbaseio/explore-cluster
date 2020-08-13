@@ -1,14 +1,17 @@
-## What is this PR for?
+## Describe the change in this PR?
+* _Brief description of feature / bug fix that this PR do._
+* _Link to Notion card / Github issue_
 
-* Brief description of feature / bug fix that this PR do.
-* Link to Notion card / Github issue
+## How has this PR tested? Provide relevant screenshots
+* _Share the steps that you have followed to test this PR._
+* _Add loom video / gif / screenshot_
 
-## How have you tested this PR?
+## Impact pages list
+* _List the pages that this PR can affect._
+* _If it is global change, try to add any side effects that it could have_
 
-* Share the steps that you have followed to test this PR.
-* Add loom video / gif / screenshot
-
-## What pages it affects
-
-* List the pages that this PR can affect.
-* If it is global change, try to add any side effects that it could have
+## PR Checklist
+- [ ] Cypress tests passing locally
+- [ ] Sanity testing (Includes variable/Indentation etc..)
+- [ ] Adequate unit tests added
+- [ ] Base branch is `dev`
