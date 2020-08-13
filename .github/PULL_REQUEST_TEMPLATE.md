@@ -11,7 +11,7 @@
 * _If it is global change, try to add any side effects that it could have_
 
 ## PR Checklist
-- [ ] Cypress tests passing locally
+- [ ] Cypress tests passing locally `yarn cypress:run`
 - [ ] Sanity testing (Includes variable/Indentation etc..)
 - [ ] Adequate unit tests added
 - [ ] Base branch is `dev`
