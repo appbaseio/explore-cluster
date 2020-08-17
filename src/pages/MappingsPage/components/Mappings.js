@@ -27,9 +27,6 @@ import ObjectField from './ObjectField';
 import FieldRow from './FieldRow';
 import MappingsCard from './MappingsCard';
 
-// TODO: Add support for synonyms, language and search fields. Recursively update the fields.
-// Track from CDU and recursively traverse mappings to update Fields
-
 // TODO Next: Use in Search Settings
 // TODO Next: Use in Aggs Settings
 
@@ -240,8 +237,8 @@ class Mappings extends React.Component {
 						onDelete={this.handleDelete}
 					>
 						{this.renderMapping({
-							usecase: usecase[field],
-							type: type[field],
+							usecase: get(usecase, field),
+							type: get(type, field),
 							path: `${path}${field}.`,
 							rawMappings,
 						})}
@@ -253,37 +250,14 @@ class Mappings extends React.Component {
 				<FieldRow
 					key={field}
 					field={field}
-					usecase={usecase[field]}
-					type={type[field]}
+					usecase={get(usecase, field)}
+					type={get(type, field)}
 					mapping={getMappingsByPath({ mappings: rawMappings, path: `${path}${field}` })}
 					path={`${path}${field}`}
 					setMapping={this.setMapping}
 					onDelete={this.handleDelete}
 				/>
 			);
-			// return (
-			// 	<div key={field}>
-			// 		Field is {field}, mapping is{' '}
-			// 		<UsecaseDropdown
-			// 			value={usecase[field]}
-			// 			type={type[field]}
-			// 			onUsecaseChange={this.setMapping}
-			// 			path={`${path}${field}`}
-			// 		/>{' '}
-			// 		and type is{' '}
-			// 		<TypeDropdown
-			// 			value={type[field]}
-			// 			usecase={usecase[field]}
-			// 			onTypeChange={this.setMapping}
-			// 			path={`${path}${field}`}
-			// 		/>
-			// 		<Button
-			// 			icon="delete"
-			// 			shape="circle-outline"
-			// 			onClick={() => this.handleDelete(`${path}${field}`)}
-			// 		/>
-			// 	</div>
-			// );
 		});
 	};
 
@@ -297,11 +271,7 @@ class Mappings extends React.Component {
 		if (isFetchingMapping) {
 			return (
 				<div className={container}>
-					<MappingsCard
-						getMappings={this.getMappings}
-						usecase={{}}
-						setMapping={this.setMapping}
-					>
+					<MappingsCard getMappings={this.getMappings} setMapping={this.setMapping}>
 						<Skeleton />
 					</MappingsCard>
 				</div>
@@ -311,11 +281,7 @@ class Mappings extends React.Component {
 		if (error) {
 			return (
 				<div className={container}>
-					<MappingsCard
-						getMappings={this.getMappings}
-						usecase={{}}
-						setMapping={this.setMapping}
-					>
+					<MappingsCard getMappings={this.getMappings} setMapping={this.setMapping}>
 						<Row>
 							<Alert
 								type="error"
