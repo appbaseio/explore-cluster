@@ -343,7 +343,7 @@ class QueryRulesForm extends React.Component {
 			dataFields,
 			searchFields,
 			aggsFields,
-			dataField: dataFields[0] || '',
+			dataField: dataFields.includes(prevState.dataField) ? prevState.dataField : '',
 			error: {
 				...prevState.error,
 				selectedIndexes: {
