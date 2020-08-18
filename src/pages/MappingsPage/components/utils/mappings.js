@@ -1,8 +1,9 @@
 import get from 'lodash/get';
 import omit from 'lodash/omit';
-import { getVersion } from '../../../../constants/config';
+import { getVersion, getURL } from '../../../../constants/config';
 import mappingUsecase from '../../../../batteries/utils/mappingUsecase';
 import { flatObject } from '.';
+import { getAuthHeaders } from '../../../../batteries/utils/mappings';
 
 export const getMappingsInfo = ({
 	mappings: originalMappings,
@@ -16,7 +17,6 @@ export const getMappingsInfo = ({
 		enableSynonyms,
 		language,
 	});
-	console.log(mappings);
 	const ES_VERSION = getVersion();
 
 	if (!ES_VERSION) {
@@ -93,14 +93,19 @@ const _getUsecase = (fields) => {
 	const hasAggsFlag = _hasAggs(fields);
 	let hasSearchFlag = 0;
 	if (fields.search || fields.autosuggest || fields.delimiter) hasSearchFlag = 1;
-
 	if (hasAggsFlag && hasSearchFlag) return 'searchaggs';
 	if (!hasAggsFlag && hasSearchFlag) return 'search';
 	if (hasAggsFlag && !hasSearchFlag) return 'aggs';
 	return 'none';
 };
 
-const _getFieldsByRelevancy = ({ enableNgram, enableSynonyms, language, fields, type }) => {
+const _getFieldsByRelevancy = ({
+	enableNgram,
+	enableSynonyms,
+	language,
+	fields: originalFields,
+	type,
+}) => {
 	const languageField = {
 		type: 'text',
 		analyzer: language,
@@ -109,6 +114,8 @@ const _getFieldsByRelevancy = ({ enableNgram, enableSynonyms, language, fields, 
 		analyzer: 'synonyms',
 		type: 'text',
 	};
+
+	const { synonyms, ...fields } = originalFields;
 
 	const extraFields = {
 		...(type === 'text' && enableSynonyms
@@ -123,7 +130,7 @@ const _getFieldsByRelevancy = ({ enableNgram, enableSynonyms, language, fields, 
 			: {}),
 	};
 
-	const updatedFields = {
+	let updatedFields = {
 		...(fields
 			? {
 					...fields,
@@ -132,8 +139,20 @@ const _getFieldsByRelevancy = ({ enableNgram, enableSynonyms, language, fields, 
 			: { ...extraFields }),
 	};
 
-	if (enableNgram && fields.search) {
+	if (enableNgram) {
 		delete updatedFields.search;
+	} else if (type === 'text') {
+		if (_getUsecase(updatedFields).includes('search') && !updatedFields.search) {
+			updatedFields = {
+				...updatedFields,
+				search: {
+					type: 'text',
+					index: 'true',
+					analyzer: 'ngram_analyzer',
+					search_analyzer: 'standard',
+				},
+			};
+		}
 	}
 
 	return updatedFields;
@@ -331,7 +350,7 @@ export const updateSubFields = ({
 				},
 			},
 		};
-	}, mappings);
+	}, {});
 
 	if (+ES_VERSION[0] >= 6 && +ES_VERSION[0] < 7) {
 		return {
@@ -343,3 +362,42 @@ export const updateSubFields = ({
 
 	return { ...updatedMappings };
 };
+
+export function reIndex({ mappings, appName, version, credentials, settings }) {
+	const body = {
+		mappings,
+		settings,
+		es_version: version,
+	};
+
+	return new Promise((resolve, reject) => {
+		const ACC_API = getURL();
+		fetch(`${ACC_API}/_reindex/${appName}`, {
+			method: 'POST',
+			headers: {
+				...getAuthHeaders(credentials),
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(body),
+		})
+			.then((res) => {
+				if (res.status === 504) {
+					resolve('~100');
+				}
+				return res;
+			})
+			.then((res) => res.json())
+			.then((data) => {
+				if (data.error) {
+					reject(data.error);
+				}
+				if (data.code >= 400) {
+					reject(data.message);
+				}
+				resolve(data);
+			})
+			.catch((e) => {
+				reject(e);
+			});
+	});
+}

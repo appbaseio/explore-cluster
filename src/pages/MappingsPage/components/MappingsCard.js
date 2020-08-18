@@ -5,7 +5,7 @@ import { cardTitle } from './styles';
 import NewField from './NewField';
 import HeaderRow from './HeaderRow';
 
-const MappingsCard = ({ getMappings, setMapping, usecase, children, hideCardTitle }) => {
+const MappingsCard = ({ getMappings, setMapping, usecase, children, hideCardTitle, cardProps }) => {
 	return (
 		<Card
 			title={
@@ -31,6 +31,7 @@ const MappingsCard = ({ getMappings, setMapping, usecase, children, hideCardTitl
 					<NewField onAddField={setMapping} fields={Object.keys(usecase || {})} />
 				</React.Fragment>
 			}
+			{...cardProps}
 		>
 			<HeaderRow />
 			{children}
@@ -41,6 +42,7 @@ const MappingsCard = ({ getMappings, setMapping, usecase, children, hideCardTitl
 MappingsCard.defaultProps = {
 	usecase: {},
 	hideCardTitle: false,
+	cardProps: {},
 };
 
 MappingsCard.propTypes = {
@@ -49,6 +51,7 @@ MappingsCard.propTypes = {
 	getMappings: PropTypes.func.isRequired,
 	setMapping: PropTypes.func.isRequired,
 	children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
+	cardProps: PropTypes.object,
 };
 
 export default MappingsCard;

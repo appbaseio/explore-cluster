@@ -12,6 +12,7 @@ import {
 	deleteMappingField,
 	getMappingsByPath,
 	updateSubFields,
+	reIndex,
 } from './utils/mappings';
 import { getURL, getVersion } from '../../../constants/config';
 import Loader from '../../../batteries/components/shared/Loader';
@@ -20,7 +21,7 @@ import {
 	getSettings as getSearchSettings,
 } from '../../../batteries/modules/actions';
 import { getRawMappingsByAppName } from '../../../batteries/modules/selectors';
-import { getSettings, reIndex } from '../../../batteries/utils/mappings';
+import { getSettings } from '../../../batteries/utils/mappings';
 import SearchPreviewModal from '../../../components/SearchPreviewModal';
 
 import { footerStyles, row } from './styles';
@@ -28,7 +29,6 @@ import ObjectField from './ObjectField';
 import FieldRow from './FieldRow';
 import MappingsCard from './MappingsCard';
 
-// TODO Next: Use in Search Settings
 // TODO Next: Use in Aggs Settings
 
 class Mappings extends React.Component {
@@ -41,6 +41,8 @@ class Mappings extends React.Component {
 	originalMappingsUsecase = null;
 
 	originalMappingsType = null;
+
+	originalFlattenUsecase = null;
 
 	state = {
 		usecase: {},
@@ -89,7 +91,7 @@ class Mappings extends React.Component {
 	};
 
 	init = (mappings) => {
-		const { onChange, enableNgram, enableSynonyms, language } = this.props;
+		const { enableNgram, enableSynonyms, language } = this.props;
 		const { usecase, flattenType, flattenUsecase, type } = getMappingsInfo({
 			mappings,
 			enableNgram,
@@ -98,6 +100,7 @@ class Mappings extends React.Component {
 		});
 		this.flattenType = flattenType;
 		this.flattenUsecase = flattenUsecase;
+		this.originalFlattenUsecase = flattenUsecase;
 		this.originalMappingsUsecase = usecase;
 		this.originalMappingsType = type;
 		// eslint-disable-next-line
@@ -107,11 +110,7 @@ class Mappings extends React.Component {
 				type,
 				rawMappings: mappings,
 			},
-			() => {
-				if (onChange) {
-					onChange();
-				}
-			},
+			this.updateFields,
 		);
 	};
 
@@ -167,7 +166,6 @@ class Mappings extends React.Component {
 			enableNgram,
 			language,
 		});
-
 		this.setState({
 			rawMappings: updatedMappings,
 		});
@@ -189,7 +187,7 @@ class Mappings extends React.Component {
 	};
 
 	handleReindex = async () => {
-		const { appName, credentials, enableNgram } = this.props;
+		const { appName, credentials } = this.props;
 		const { rawMappings } = this.state;
 
 		this.setState({
@@ -203,15 +201,14 @@ class Mappings extends React.Component {
 		const startTime = Date.now();
 		reIndex({
 			mappings: rawMappings,
-			appId: appName,
+			appName,
 			version: getVersion(),
 			credentials,
 			settings: {
 				analysis: {
-					...get(appSettings, 'analysis'),
+					...get(appSettings, 'index.analysis'),
 				},
 			},
-			enableNgram,
 		})
 			.then(this.onSuccessfulReindex)
 			.catch((err) => {
@@ -280,8 +277,8 @@ class Mappings extends React.Component {
 						onDelete={this.handleDelete}
 					>
 						{this.renderMapping({
-							usecase: usecase[field],
-							type: type[field],
+							usecase: get(usecase, field),
+							type: get(type, field),
 							path: `${path}${field}.`,
 							rawMappings,
 						})}
@@ -293,8 +290,8 @@ class Mappings extends React.Component {
 				<FieldRow
 					key={field}
 					field={field}
-					usecase={usecase[field]}
-					type={type[field]}
+					usecase={get(usecase, field)}
+					type={get(type, field)}
 					mapping={getMappingsByPath({ mappings: rawMappings, path: `${path}${field}` })}
 					path={`${path}${field}`}
 					setMapping={this.setMapping}
@@ -309,7 +306,7 @@ class Mappings extends React.Component {
 	};
 
 	render() {
-		const { isFetchingMapping, error, appName, hideCardTitle, hideFooter } = this.props;
+		const { isFetchingMapping, error, appName, hideCardTitle, hideFooter,cardProps } = this.props;
 		const { usecase, type, isReindexing, rawMappings } = this.state;
 		const hasMappingsChanged =
 			JSON.stringify(usecase) !== JSON.stringify(this.originalMappingsUsecase) ||
@@ -319,9 +316,9 @@ class Mappings extends React.Component {
 			return (
 				<MappingsCard
 					getMappings={this.getMappings}
-					usecase={{}}
 					hideCardTitle={hideCardTitle}
 					setMapping={this.setMapping}
+					cardProps={cardProps}
 				>
 					<Skeleton />
 				</MappingsCard>
@@ -332,9 +329,9 @@ class Mappings extends React.Component {
 			return (
 				<MappingsCard
 					getMappings={this.getMappings}
-					usecase={{}}
 					hideCardTitle={hideCardTitle}
 					setMapping={this.setMapping}
+					cardProps={cardProps}
 				>
 					<Row>
 						<Alert
@@ -353,6 +350,7 @@ class Mappings extends React.Component {
 					usecase={usecase}
 					hideCardTitle={hideCardTitle}
 					setMapping={this.setMapping}
+					cardProps={cardProps}
 				>
 					<Row className={row}>
 						{this.renderMapping({
@@ -362,8 +360,8 @@ class Mappings extends React.Component {
 							init: true,
 						})}
 					</Row>
-					<Loader show={isReindexing} message="Re-indexing your data... Please wait!" />
 				</MappingsCard>
+				<Loader show={isReindexing} message="Re-indexing your data... Please wait!" />
 				{hideFooter ? null : (
 					<Affix offsetBottom={0}>
 						<div className={footerStyles}>
@@ -412,6 +410,7 @@ Mappings.propTypes = {
 	renderColumn: PropTypes.func,
 	onChange: PropTypes.func,
 	hideFooter: PropTypes.bool,
+	cardProps: PropTypes.object,
 	// Actions
 	fetchMappings: PropTypes.func.isRequired,
 	fetchSearchSettings: PropTypes.func.isRequired,
@@ -431,6 +430,7 @@ Mappings.defaultProps = {
 	hideSearchFields: false,
 	hideTypeColumn: false,
 	hideFooter: false,
+	cardProps: {},
 	renderColumn: null,
 	onChange: null,
 };

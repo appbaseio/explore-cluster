@@ -17,12 +17,13 @@ class FieldsWeight extends React.Component {
 	mappingsRef = React.createRef();
 
 	componentDidMount() {
-		// pass the ref value from here.
+		const { onInit } = this.props;
+		onInit({ ref: this.mappingsRef });
 	}
 
 	handleFieldWeight = ({ field, weight, mapping }) => {
 		const {
-			enableNGram,
+			enableNgram,
 			hasLanguage,
 			enableSynonyms,
 			onFieldsUpdate,
@@ -32,7 +33,7 @@ class FieldsWeight extends React.Component {
 			fields: get(mapping, 'fields'),
 			weight,
 			address: field,
-			skipSearch: enableNGram,
+			skipSearch: enableNgram,
 			skipLang: !hasLanguage,
 			skipSynonyms: !enableSynonyms,
 		});
@@ -55,7 +56,7 @@ class FieldsWeight extends React.Component {
 		const types = get(this, 'mappingsRef.current.wrappedInstance.flattenType', {});
 		const mappings = get(this, 'mappingsRef.current.wrappedInstance.state.rawMappings', {});
 		const {
-			enableNGram,
+			enableNgram,
 			hasLanguage,
 			enableSynonyms,
 			fieldWeights,
@@ -96,7 +97,7 @@ class FieldsWeight extends React.Component {
 					),
 					weight: get(fieldWeights, field, 1),
 					address: field,
-					skipSearch: enableNGram,
+					skipSearch: enableNgram,
 					skipLang: !hasLanguage,
 					skipSynonyms: !enableSynonyms,
 				}),
@@ -120,7 +121,7 @@ class FieldsWeight extends React.Component {
 	};
 
 	render() {
-		const { appName, fieldWeights, enableSynonyms, enableNGram } = this.props;
+		const { appName, fieldWeights, enableSynonyms, enableNgram } = this.props;
 		const { aggsFields } = this.state;
 		return (
 			<div>
@@ -130,9 +131,23 @@ class FieldsWeight extends React.Component {
 					hideAggsFields
 					hideTypeColumn
 					hideFooter
-					forceNgram={enableNGram}
+					forceNgram={enableNgram}
 					forceSynonyms={enableSynonyms}
 					onChange={this.handleMappingChange}
+					cardProps={{
+						bodyStyle: {
+							padding: '24px 0 0',
+						},
+						headStyle: {
+							padding: 0,
+							border: 0,
+							display: 'flex',
+						},
+						style: {
+							padding: 0,
+						},
+						bordered: false,
+					}}
 					ref={this.mappingsRef}
 					renderColumn={({ path, mapping }) => (
 						<div style={{ width: 150 }}>
@@ -150,7 +165,7 @@ class FieldsWeight extends React.Component {
 					)}
 				/>
 				{aggsFields.length > 0 ? (
-					<div style={{ position: 'relative' }}>
+					<div style={{ position: 'relative', display: 'inline-block' }}>
 						<Select
 							key={aggsFields.length}
 							style={{ width: 150 }}
