@@ -1,11 +1,31 @@
 import React from 'react';
 import get from 'lodash/get';
+import { Breadcrumb } from 'antd';
 import PropTypes from 'prop-types';
+import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
+import { Route, Switch, Link } from 'react-router-dom';
 import Overlay from '../../components/Overlay';
 import Container from '../../components/Container';
+import Filter from '../../batteries/components/analytics/components/Filter';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
-import PopularSearches from '../../batteries/components/analytics/components/PopularSearches';
+import Loader from '../../components/Loader';
+
+const QueryOverview = Loadable({
+	loader: () =>
+		import(
+			/* webpackChunkName: "PopularSearches" */ '../../batteries/components/analytics/components/QueryOverview'
+		),
+	loading: Loader,
+});
+
+const PopularSearches = Loadable({
+	loader: () =>
+		import(
+			/* webpackChunkName: "PopularSearches" */ '../../batteries/components/analytics/components/PopularSearches'
+		),
+	loading: Loader,
+});
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -31,17 +51,67 @@ const bannerMessagesAnalytics = {
 	},
 };
 
+const filterId = 'popular_searches_page';
+
 const PopularSearchesWrapper = ({ appName, plan, isPaidUser }) => (
 	<React.Fragment>
 		{isPaidUser ? (
 			<React.Fragment>
 				{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
 				<Container>
-					<PopularSearches
-						filterId="popular_searches_page"
-						displayReplaySearch={window.location.pathname.startsWith('/app')}
-						appName={appName}
-						plan={plan}
+					<Filter filterId={filterId} />
+					<Route
+						component={({ match }) => {
+							const splitedURL = window.location.href.split('query-overview/');
+							return (
+								<React.Fragment>
+									{window.location.href.includes('query-overview') ? (
+										<Breadcrumb
+											style={{
+												marginBottom: 20,
+											}}
+										>
+											<Breadcrumb.Item>
+												<Link to={`${match.url}`}>Popular Searches</Link>
+											</Breadcrumb.Item>
+											<Breadcrumb.Item>
+												{splitedURL && splitedURL[1]
+													? decodeURIComponent(splitedURL[1])
+													: '<empty_query>'}
+											</Breadcrumb.Item>
+										</Breadcrumb>
+									) : null}
+									<Switch>
+										<Route
+											exact
+											path={match.path}
+											component={() => (
+												<PopularSearches
+													filterId={filterId}
+													displayReplaySearch={window.location.pathname.startsWith(
+														'/app',
+													)}
+													appName={appName}
+													plan={plan}
+													displaySummaryStats
+												/>
+											)}
+										/>
+										<Route
+											exact
+											path={`${match.path}/query-overview/:query`}
+											component={(props) => (
+												<QueryOverview
+													{...props}
+													query={get(props, 'match.params.query')}
+													filterId={filterId}
+												/>
+											)}
+										/>
+									</Switch>
+								</React.Fragment>
+							);
+						}}
 					/>
 				</Container>
 			</React.Fragment>
@@ -56,9 +126,12 @@ const PopularSearchesWrapper = ({ appName, plan, isPaidUser }) => (
 		)}
 	</React.Fragment>
 );
+PopularSearchesWrapper.defaultProps = {
+	appName: undefined,
+};
 
 PopularSearchesWrapper.propTypes = {
-	appName: PropTypes.string.isRequired,
+	appName: PropTypes.string,
 	plan: PropTypes.string.isRequired,
 	isPaidUser: PropTypes.bool.isRequired,
 };

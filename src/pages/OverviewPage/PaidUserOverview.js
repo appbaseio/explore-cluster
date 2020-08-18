@@ -12,7 +12,7 @@ import { getAppAnalyticsByName } from '../../batteries/modules/selectors';
 import { exampleConfig } from '../../constants/config';
 import { loadApps } from '../../actions';
 import { getAppAnalytics } from '../../batteries/modules/actions';
-import { getFilteredResults } from '../../batteries/utils/heplers';
+import { getFilteredResults } from '../../batteries/utils/helpers';
 import StatsBox from '../../components/AppCard/StatsBox';
 import Searches from '../../batteries/components/analytics/components/Searches';
 import RequestLogs from '../../batteries/components/analytics/components/RequestLogs';

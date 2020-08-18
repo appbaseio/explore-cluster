@@ -3,6 +3,7 @@ import Loadable from 'react-loadable';
 import { Route } from 'react-router-dom';
 import AnalyticsContainer from '../AnalyticsContainer';
 import AppPageContainer from '../AppPageContainer';
+import PopularSearches from '../../pages/PopularSearches';
 
 import Loader from '../Loader';
 
@@ -48,11 +49,6 @@ const SearchLatency = Loadable({
 	loading: Loader,
 });
 
-const PopularSearches = Loadable({
-	loader: () => import(/* webpackChunkName: "PopularSearches" */ '../../pages/PopularSearches'),
-	loading: Loader,
-});
-
 const ClusterAnalyticsRoutes = () => (
 	<AnalyticsContainer>
 		<Route
@@ -61,7 +57,6 @@ const ClusterAnalyticsRoutes = () => (
 			component={(props) => <AppPageContainer {...props} component={AnalyticsPage} />}
 		/>
 		<Route
-			exact
 			path="/cluster/popular-searches"
 			component={(props) => <AppPageContainer {...props} component={PopularSearches} />}
 		/>

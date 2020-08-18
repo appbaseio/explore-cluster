@@ -1,5 +1,5 @@
 /* eslint-disable prefer-destructuring */
-import { get } from 'lodash';
+import get from 'lodash/get';
 import React from 'react';
 
 const getParsedRule = (rule = {}) => {

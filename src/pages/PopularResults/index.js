@@ -41,6 +41,7 @@ const PopularResultsWrapper = ({ appName, plan, isGrowth }) => (
 						displayReplaySearch={window.location.pathname.startsWith('/app')}
 						appName={appName}
 						plan={plan}
+						displaySummaryStats
 					/>
 				</Container>
 			</React.Fragment>

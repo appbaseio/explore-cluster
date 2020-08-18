@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { css } from 'emotion';
 import {
 	Card,
@@ -22,6 +22,7 @@ import {
 	Skeleton,
 	Radio,
 	Typography,
+	Alert,
 } from 'antd';
 
 import {
@@ -771,6 +772,16 @@ class AggsPage extends React.Component {
 									agg_size: savedSize,
 									mappings: get(changedSubFields, 'old'),
 								}}
+								renderContent={() =>
+									isDirty ? (
+										<Alert
+											type="warning"
+											showIcon
+											style={{ marginBottom: 10 }}
+											description="Re-indexing is required for applying below changes."
+										/>
+									) : null
+								}
 								newValues={{
 									agg_size: count,
 									sortBy: sort,

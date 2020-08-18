@@ -78,7 +78,7 @@ const routes = {
 		link: '/cluster/curated-insights',
 		hasExactPath: true,
 	},
-	Security: {
+	'Access Control': {
 		icon: 'key',
 		menu: [
 			{ label: 'API Credentials', link: 'credentials' },

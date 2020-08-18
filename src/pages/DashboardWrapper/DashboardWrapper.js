@@ -3,7 +3,8 @@ import { Icon, Input, Layout, Menu } from 'antd';
 import { Link, Route, Switch } from 'react-router-dom';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
-import { get, keys } from 'lodash';
+import get from 'lodash/get';
+import keys from 'lodash/keys';
 
 import { bool, func, object } from 'prop-types';
 import Loader from '../../components/Loader';
@@ -84,7 +85,7 @@ const defaultRoutes = {
 		icon: 'rise',
 		link: '/cluster/curated-insights',
 	},
-	Security: {
+	'Access Control': {
 		icon: 'key',
 		menu: [
 			{ label: 'API Credentials', link: '/cluster/credentials' },

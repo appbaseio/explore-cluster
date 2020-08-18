@@ -4,7 +4,8 @@ import PropTypes from 'prop-types';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { get, pick } from 'lodash';
+import get from 'lodash/get';
+import pick from 'lodash/pick';
 import {
 	Affix,
 	Alert,
@@ -342,7 +343,7 @@ class QueryRulesForm extends React.Component {
 			dataFields,
 			searchFields,
 			aggsFields,
-			dataField: dataFields[0] || '',
+			dataField: dataFields.includes(prevState.dataField) ? prevState.dataField : '',
 			error: {
 				...prevState.error,
 				selectedIndexes: {
