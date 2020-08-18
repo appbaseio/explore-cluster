@@ -2,6 +2,7 @@ import { Icon, Popconfirm, Select, Tooltip } from 'antd';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import React from 'react';
+import get from 'lodash/get';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
 import LabelTag from '../LabelTag';
@@ -23,6 +24,7 @@ function IndexSwitcher({
 	onSelect,
 	renderItem,
 	updateCurrentApp,
+	isAppsLoading,
 }) {
 	if (filteredApps.length === 1 && item.link)
 		return (
@@ -42,6 +44,7 @@ function IndexSwitcher({
 	});
 
 	function getTitle() {
+		if (isAppsLoading) return <div style={{ margin: 4 }}>Loading...</div>;
 		if (filteredApps.length === 0)
 			return <div style={{ margin: 4 }}>Please create an index to get started.</div>;
 		return (
@@ -97,6 +100,7 @@ IndexSwitcher.propTypes = {
 	onSelect: PropTypes.func,
 	renderItem: PropTypes.func,
 	updateCurrentApp: PropTypes.func.isRequired,
+	isAppsLoading: PropTypes.bool,
 };
 
 IndexSwitcher.defaultProps = {
@@ -105,10 +109,15 @@ IndexSwitcher.defaultProps = {
 	onSelect: null,
 	renderItem: null,
 	history: null,
+	isAppsLoading: false,
 };
+
+const mapStateToProps = (state) => ({
+	isAppsLoading: get(state, 'apps.isFetching'),
+});
 
 const mapDispatchToProps = (dispatch) => ({
 	updateCurrentApp: (appName, appId) => dispatch(setCurrentApp(appName, appId)),
 });
 
-export default connect(null, mapDispatchToProps)(IndexSwitcher);
+export default connect(mapStateToProps, mapDispatchToProps)(IndexSwitcher);
