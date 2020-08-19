@@ -2,6 +2,7 @@ import React from 'react';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { InputNumber, Select } from 'antd';
+import PropTypes from 'prop-types';
 import HighLighter from '../../../components/HighLighter';
 import Mappings from '../../MappingsPage/components/Mappings';
 import { getSubFields } from '../../../utils';
@@ -9,7 +10,7 @@ import { getMappingsByPath } from '../../MappingsPage/components/utils/mappings'
 
 const { Option } = Select;
 
-class FieldsWeight extends React.Component {
+class FieldsWeight extends React.PureComponent {
 	state = {
 		aggsFields: [],
 	};
@@ -127,16 +128,9 @@ class FieldsWeight extends React.Component {
 			<div>
 				<Mappings
 					appName={appName}
-					hideCardTitle
-					hideAggsFields
-					hideTypeColumn
-					hideFooter
-					forceNgram={enableNgram}
-					forceSynonyms={enableSynonyms}
-					onChange={this.handleMappingChange}
 					cardProps={{
 						bodyStyle: {
-							padding: '24px 0 0',
+							padding: 0,
 						},
 						headStyle: {
 							padding: 0,
@@ -148,11 +142,33 @@ class FieldsWeight extends React.Component {
 						},
 						bordered: false,
 					}}
+					headerRowProps={{
+						rightItems: [
+							{
+								title: 'Use case',
+								info:
+									'We detect the appropriate analyzers and mappings here representing the usecase - search or aggregations.',
+							},
+							{
+								title: 'Field Weight',
+								info:
+									'Set the search weight to boost query matches against this field. Higher weight fields imply a higher boost.',
+							},
+						],
+					}}
+					hideAggsFields
+					hideCardTitle
+					hideFooter
+					hideTypeColumn
+					forceNgram={enableNgram}
+					forceSynonyms={enableSynonyms}
+					onChange={this.handleMappingChange}
 					ref={this.mappingsRef}
 					renderColumn={({ path, mapping }) => (
 						<div style={{ width: 150 }}>
 							<InputNumber
 								value={fieldWeights[path]}
+								min={0}
 								onChange={(value) => {
 									this.handleFieldWeight({
 										weight: value,
@@ -187,6 +203,16 @@ class FieldsWeight extends React.Component {
 		);
 	}
 }
+
+FieldsWeight.propTypes = {
+	appName: PropTypes.string.isRequired,
+	enableNgram: PropTypes.bool.isRequired,
+	enableSynonyms: PropTypes.bool.isRequired,
+	fieldWeights: PropTypes.object.isRequired,
+	hasLanguage: PropTypes.bool.isRequired,
+	onFieldsUpdate: PropTypes.func.isRequired,
+	onInit: PropTypes.func.isRequired,
+};
 
 const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');

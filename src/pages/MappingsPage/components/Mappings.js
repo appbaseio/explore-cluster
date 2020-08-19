@@ -38,6 +38,8 @@ class Mappings extends React.Component {
 
 	flattenUsecase = null;
 
+	originalMappings = null;
+
 	originalMappingsUsecase = null;
 
 	originalMappingsType = null;
@@ -103,6 +105,7 @@ class Mappings extends React.Component {
 		this.originalFlattenUsecase = flattenUsecase;
 		this.originalMappingsUsecase = usecase;
 		this.originalMappingsType = type;
+		this.originalMappings = mappings;
 		// eslint-disable-next-line
 		this.setState(
 			{
@@ -246,6 +249,9 @@ class Mappings extends React.Component {
 
 	cancelChanges = () => {
 		const { mappings } = this.props;
+		this.flattenUsecase = this.originalMappingsUsecase;
+		this.flattenType = this.originalMappingsType;
+
 		this.setState({
 			rawMappings: mappings,
 			usecase: this.originalMappingsUsecase,
@@ -306,20 +312,31 @@ class Mappings extends React.Component {
 	};
 
 	render() {
-		const { isFetchingMapping, error, appName, hideCardTitle, hideFooter,cardProps } = this.props;
+		const {
+			isFetchingMapping,
+			error,
+			appName,
+			hideCardTitle,
+			hideFooter,
+			cardProps,
+			headerRowProps,
+		} = this.props;
 		const { usecase, type, isReindexing, rawMappings } = this.state;
 		const hasMappingsChanged =
 			JSON.stringify(usecase) !== JSON.stringify(this.originalMappingsUsecase) ||
 			JSON.stringify(type) !== JSON.stringify(this.originalMappingsType);
 
+		const mappingCardProps = {
+			getMappings: this.getMappings,
+			hideCardTitle,
+			setMapping: this.setMapping,
+			cardProps,
+			headerRowProps,
+		};
+
 		if (isFetchingMapping) {
 			return (
-				<MappingsCard
-					getMappings={this.getMappings}
-					hideCardTitle={hideCardTitle}
-					setMapping={this.setMapping}
-					cardProps={cardProps}
-				>
+				<MappingsCard {...mappingCardProps}>
 					<Skeleton />
 				</MappingsCard>
 			);
@@ -327,12 +344,7 @@ class Mappings extends React.Component {
 
 		if (error) {
 			return (
-				<MappingsCard
-					getMappings={this.getMappings}
-					hideCardTitle={hideCardTitle}
-					setMapping={this.setMapping}
-					cardProps={cardProps}
-				>
+				<MappingsCard {...mappingCardProps}>
 					<Row>
 						<Alert
 							type="error"
@@ -345,13 +357,7 @@ class Mappings extends React.Component {
 
 		return (
 			<React.Fragment>
-				<MappingsCard
-					getMappings={this.getMappings}
-					usecase={usecase}
-					hideCardTitle={hideCardTitle}
-					setMapping={this.setMapping}
-					cardProps={cardProps}
-				>
+				<MappingsCard {...mappingCardProps} usecase={usecase}>
 					<Row className={row}>
 						{this.renderMapping({
 							usecase,
@@ -411,6 +417,7 @@ Mappings.propTypes = {
 	onChange: PropTypes.func,
 	hideFooter: PropTypes.bool,
 	cardProps: PropTypes.object,
+	headerRowProps: PropTypes.object,
 	// Actions
 	fetchMappings: PropTypes.func.isRequired,
 	fetchSearchSettings: PropTypes.func.isRequired,
@@ -431,6 +438,7 @@ Mappings.defaultProps = {
 	hideTypeColumn: false,
 	hideFooter: false,
 	cardProps: {},
+	headerRowProps: {},
 	renderColumn: null,
 	onChange: null,
 };

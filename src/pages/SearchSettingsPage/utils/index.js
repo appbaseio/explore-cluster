@@ -48,7 +48,7 @@ export const getDiffForFields = ({
 	const diffUsecase = _getDiffKeys({
 		saved: savedUsecase,
 		current: currentUsecase,
-		defaultValue: 'deleted',
+		defaultValue: '-',
 	});
 
 	return {

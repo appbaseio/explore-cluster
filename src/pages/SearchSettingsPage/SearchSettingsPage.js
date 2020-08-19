@@ -1,7 +1,8 @@
 import React from 'react';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
-import { notification, message, Alert, Card, Divider } from 'antd';
+import { notification, message, Alert, Card, Divider, Skeleton } from 'antd';
+import PropTypes from 'prop-types';
 import {
 	getDefaultSettings,
 	putSettings,
@@ -12,11 +13,22 @@ import { getFieldWeight } from '../../utils';
 import FieldsWeight from './components/FieldsWeight';
 import settingsMap from '../../components/ReviewAndSave/helper';
 import SettingsOptions from './components/SettingsOptions';
-import { isEqual } from '../../batteries/utils';
+import { isEqual, isValidPlan } from '../../batteries/utils';
 import ReviewAndSave from '../../components/ReviewAndSave';
 import SettingsFooter from '../../components/SettingsFooter';
 import { getDiffForFields } from './utils';
 import { container } from '../ResultsPage/styles';
+import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
+import Overlay from '../../components/Overlay';
+import { allowedTiers } from '../../utils/prop-types';
+
+const bannerDetails = {
+	title: 'Search Settings',
+	buttonText: 'Read More',
+	description: 'Search Settings allow you to control your search query settings.',
+	icon: 'pencil',
+	href: 'https://docs.appbase.io/docs/search/relevancy/#search-settings',
+};
 
 class SearchSettings extends React.Component {
 	state = {
@@ -29,7 +41,7 @@ class SearchSettings extends React.Component {
 		hasLanguage: true,
 		enableSynonyms: true,
 		reviewAndSaveModal: false,
-		resetToDefaultModal: false,
+		isReset: false,
 	};
 
 	_mappingsRef = null;
@@ -74,10 +86,6 @@ class SearchSettings extends React.Component {
 		});
 	};
 
-	handleMappingsRef = ({ ref }) => {
-		this._mappingsRef = ref;
-	};
-
 	handleSave = () => {
 		const {
 			fieldWeights,
@@ -89,6 +97,8 @@ class SearchSettings extends React.Component {
 			enableNgram,
 		} = this.state;
 		const { updateSettingsAction, appName, settings, getSettingsAction } = this.props;
+
+		this.toggleReviewSaveVisible();
 		updateSettingsAction(appName, {
 			...settings,
 			search: {
@@ -107,15 +117,13 @@ class SearchSettings extends React.Component {
 				enabled: enableSynonyms,
 			},
 		})
-			.then((res) => {
+			.then(async (res) => {
 				if (res && res.error) {
 					notification.error({
 						message: 'Failed to save Search Settings',
 						description: get(res, 'error.message'),
 					});
 				} else {
-					message.success(`Search settings for ${appName} saved successfully`);
-					getSettingsAction(appName);
 					if (
 						JSON.stringify(
 							get(this, '_mappingsRef.current.wrappedInstance.state.rawMappings', {}),
@@ -128,9 +136,10 @@ class SearchSettings extends React.Component {
 							this,
 							'_mappingsRef.current.wrappedInstance.handleReindex',
 						);
-
-						reIndex();
+						await reIndex();
 					}
+					getSettingsAction(appName);
+					message.success(`Search settings for ${appName} saved successfully`);
 				}
 			})
 			.catch((e) => {
@@ -183,6 +192,8 @@ class SearchSettings extends React.Component {
 			enableNgram: get(settings, 'indexSettings.enableNgram', true),
 			hasLanguage: !!get(settings, 'language.language'),
 			enableSynonyms: get(settings, 'synonyms.enabled', true),
+			reviewAndSaveModal: false,
+			isReset: false,
 		});
 	};
 
@@ -192,31 +203,35 @@ class SearchSettings extends React.Component {
 		}));
 	};
 
-	toggleDefaultSettingsModal = () => {
+	toggleReset = () => {
 		this.setState((prevState) => ({
-			resetToDefaultModal: !prevState.resetToDefaultModal,
+			isReset: !prevState.isReset,
 		}));
 	};
 
 	resetChanges = () => {
 		const cancelChanges = get(this, '_mappingsRef.current.wrappedInstance.cancelChanges');
 		const { settings } = this.props;
-		this.init(settings);
 		cancelChanges();
-		this.toggleReviewSaveVisible();
+		this.init(settings);
 	};
 
 	resetToDefault = () => {
 		const { getDefaultSettingsAction, defaultSettings } = this.props;
 
-		if (defaultSettings) this.resetFields(defaultSettings);
+		if (defaultSettings) this.init(defaultSettings);
 		else
 			getDefaultSettingsAction().then((res) => {
 				if (res && res.payload) {
-					this.resetFields(res.payload);
+					this.init(res.payload);
 				}
 			});
-		this.toggleDefaultSettingsModal();
+		this.toggleReset();
+		this.toggleReviewSaveVisible();
+	};
+
+	setMappingsRef = ({ ref }) => {
+		this._mappingsRef = ref;
 	};
 
 	render() {
@@ -227,6 +242,8 @@ class SearchSettings extends React.Component {
 			appName,
 			settings,
 			defaultSettings,
+			tier,
+			featureSearchRelevancy,
 		} = this.props;
 		const {
 			fieldWeights,
@@ -238,16 +255,38 @@ class SearchSettings extends React.Component {
 			hasFuzziness,
 			fuzziness,
 			reviewAndSaveModal,
-			resetToDefaultModal,
+			isReset,
 		} = this.state;
 
-		const isDirty =
+		if (isLoading) {
+			return (
+				<React.Fragment>
+					<Banner {...bannerDetails} />
+					<Skeleton />
+				</React.Fragment>
+			);
+		}
+
+		if (!isValidPlan(tier, featureSearchRelevancy)) {
+			return (
+				<React.Fragment>
+					<Banner {...bannerDetails} />
+					<Overlay
+						style={{
+							maxWidth: '70%',
+						}}
+						src="https://i.imgur.com/8ENnHVv.png"
+						alt="Search Settings"
+					/>
+				</React.Fragment>
+			);
+		}
+
+		const hasMappingsChanged =
 			JSON.stringify(
 				get(this, '_mappingsRef.current.wrappedInstance.state.rawMappings', {}),
 			) !==
-			JSON.stringify(
-				get(this, '_mappingsRef.current.wrappedInstance.originalMappingsUsecase', {}),
-			);
+			JSON.stringify(get(this, '_mappingsRef.current.wrappedInstance.originalMappings', {}));
 
 		const originalMappings = get(
 			this,
@@ -269,105 +308,135 @@ class SearchSettings extends React.Component {
 			currentUsecase: currentMappings,
 		});
 
-		if (isLoading) return 'Loading Search Settings...';
-
 		return (
-			<div className={container}>
-				<Card>
-					<FieldsWeight
-						onFieldsUpdate={this.handleFieldsUpdate}
-						enableNgram={enableNgram}
-						enableSynonyms={enableSynonyms}
-						hasLanguage={hasLanguage}
-						onInit={this.handleMappingsRef}
-						fieldWeights={fieldWeights}
-					/>
-					<Divider />
-					<SettingsOptions
-						handleChange={this.handleChange}
-						queryType={queryType}
-						queryFormat={queryFormat}
-						hasFuzziness={hasFuzziness}
-						fuzziness={fuzziness}
-						enableSynonyms={enableSynonyms}
-						enableNgram={enableNgram}
-					/>
-				</Card>
-				<SettingsFooter
-					loading={isUpdating}
-					resetState={resetState}
-					onReset={this.resetToDefault}
-					showSearchPreview
-					searchPreviewModalProps={{
-						searchPreviewProps: {
-							testSettings: {
-								...(settings || {}),
-								search: {
-									fuzziness: hasFuzziness ? fuzziness : 0,
-									searchOperators: queryType === 'searchOperators',
-									dataField: Object.keys(fieldWeights),
-									fieldWeights: Object.values(fieldWeights),
-									queryString: queryType === 'queryString',
-									queryFormat,
-								},
-							},
-							hasTestSettings: Object.keys(fieldWeights).length > 0,
-						},
-						buttonProps: {
-							showTooltip: isDirty,
-							tooltip: settingsMap.disable_search_settings.description,
-						},
-					}}
-					app={appName}
-					showReset={!isEqual(get(settings, 'search'), get(defaultSettings, 'search'))}
-					reviewAndSave={() => (
-						<ReviewAndSave
-							loading={isUpdating}
-							isReset={resetToDefaultModal}
-							oldValues={{
-								dataField: get(diffUsecase, 'old', {}),
-								fieldWeights: get(diffWeights, 'old', {}),
-								synonyms: get(settings, 'synonyms.enabled'),
-								queryFormat: get(settings, 'search.queryFormat'),
-								queryType: this.getQueryType({
-									queryString: get(settings, 'search.queryString'),
-									searchOperators: get(settings, 'search.searchOperators'),
-								}),
-								enableNgram: get(settings, 'indexSettings.enableNgram'),
-							}}
-							newValues={{
-								fuzziness: hasFuzziness ? fuzziness : 0,
-								dataField: get(diffUsecase, 'new', {}),
-								fieldWeights: get(diffWeights, 'new', {}),
-								synonyms: enableSynonyms,
-								queryFormat,
-								queryType,
-								enableNgram,
-							}}
-							renderContent={() =>
-								isDirty ? (
-									<Alert
-										type="warning"
-										showIcon
-										style={{ marginBottom: 10 }}
-										description="Re-indexing is required for applying below changes."
-									/>
-								) : null
-							}
-							onClick={this.toggleReviewSaveVisible}
-							visible={reviewAndSaveModal}
-							onRevert={this.resetChanges}
-							onSave={() => {
-								this.handleSave();
-								this.toggleVisible();
-							}}
+			<React.Fragment>
+				<Banner {...bannerDetails} />
+				<div className={container}>
+					<Card>
+						<FieldsWeight
+							onFieldsUpdate={this.handleFieldsUpdate}
+							enableNgram={enableNgram}
+							enableSynonyms={enableSynonyms}
+							hasLanguage={hasLanguage}
+							onInit={this.setMappingsRef}
+							fieldWeights={fieldWeights}
 						/>
-					)}
-				/>
-			</div>
+						<Divider />
+						<SettingsOptions
+							handleChange={this.handleChange}
+							queryType={queryType}
+							queryFormat={queryFormat}
+							hasFuzziness={hasFuzziness}
+							fuzziness={fuzziness}
+							enableSynonyms={enableSynonyms}
+							enableNgram={enableNgram}
+						/>
+					</Card>
+					<SettingsFooter
+						loading={isUpdating}
+						resetState={resetState}
+						onReset={this.resetToDefault}
+						showSearchPreview
+						searchPreviewModalProps={{
+							searchPreviewProps: {
+								testSettings: {
+									...(settings || {}),
+									search: {
+										fuzziness: hasFuzziness ? fuzziness : 0,
+										searchOperators: queryType === 'searchOperators',
+										dataField: Object.keys(fieldWeights),
+										fieldWeights: Object.values(fieldWeights),
+										queryString: queryType === 'queryString',
+										queryFormat,
+									},
+								},
+								hasTestSettings: Object.keys(fieldWeights).length > 0,
+							},
+							buttonProps: {
+								showTooltip: hasMappingsChanged,
+								tooltip: settingsMap.disable_search_settings.description,
+							},
+						}}
+						app={appName}
+						showReset={
+							!isEqual(get(settings, 'search'), get(defaultSettings, 'search'))
+						}
+						reviewAndSave={() => (
+							<ReviewAndSave
+								loading={isUpdating}
+								isReset={isReset}
+								oldValues={{
+									dataField: get(diffUsecase, 'old', {}),
+									fieldWeights: get(diffWeights, 'old', {}),
+									synonyms: get(settings, 'synonyms.enabled'),
+									queryFormat: get(settings, 'search.queryFormat'),
+									queryType: this.getQueryType({
+										queryString: get(settings, 'search.queryString'),
+										searchOperators: get(settings, 'search.searchOperators'),
+									}),
+									enableNgram: get(settings, 'indexSettings.enableNgram'),
+								}}
+								newValues={{
+									fuzziness: hasFuzziness ? fuzziness : 0,
+									dataField: get(diffUsecase, 'new', {}),
+									fieldWeights: get(diffWeights, 'new', {}),
+									synonyms: enableSynonyms,
+									queryFormat,
+									queryType,
+									enableNgram,
+								}}
+								renderContent={() =>
+									hasMappingsChanged ? (
+										<Alert
+											type="warning"
+											showIcon
+											style={{ marginBottom: 10 }}
+											description="Re-indexing is required for applying below changes."
+										/>
+									) : null
+								}
+								onClick={this.toggleReviewSaveVisible}
+								visible={reviewAndSaveModal}
+								onRevert={this.resetChanges}
+								onSave={() => {
+									this.handleSave();
+									this.toggleReviewSaveVisible();
+								}}
+							/>
+						)}
+					/>
+				</div>
+			</React.Fragment>
 		);
 	}
 }
+
+SearchSettings.propTypes = {
+	appName: PropTypes.string.isRequired,
+	credentials: PropTypes.string.isRequired,
+	defaultSettings: PropTypes.object,
+	isLoading: PropTypes.bool,
+	isUpdating: PropTypes.bool,
+	resetState: PropTypes.object,
+	settings: PropTypes.object,
+	tier: allowedTiers,
+
+	featureSearchRelevancy: PropTypes.bool,
+	fetchMappings: PropTypes.func.isRequired,
+	getDefaultSettingsAction: PropTypes.func.isRequired,
+	getSettingsAction: PropTypes.func.isRequired,
+	updateSettingsAction: PropTypes.func.isRequired,
+};
+
+SearchSettings.defaultProps = {
+	isUpdating: false,
+	settings: null,
+	resetState: {},
+	defaultSettings: null,
+	isLoading: false,
+	tier: undefined,
+	featureSearchRelevancy: false,
+};
 
 const mapStateToProps = (state) => {
 	const defaultSettings = get(state.$getAppSettings, `defaultSettings`);

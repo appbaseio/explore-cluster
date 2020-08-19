@@ -1,6 +1,7 @@
 import React from 'react';
 import { Switch, Tooltip, Icon, Radio, Select } from 'antd';
-import {css} from 'emotion';
+import { css } from 'emotion';
+import PropTypes from 'prop-types';
 import settingsMap from '../../../components/ReviewAndSave/helper';
 
 const { Option } = Select;
@@ -20,12 +21,12 @@ const optionContainer = css`
 
 const SettingsOptions = ({
 	handleChange,
-	queryType,
-	queryFormat,
 	hasFuzziness,
-	fuzziness,
-	enableSynonyms,
 	enableNgram,
+	enableSynonyms,
+	fuzziness,
+	queryFormat,
+	queryType,
 }) => (
 	<div className={optionContainer}>
 		<h6>
@@ -122,5 +123,15 @@ const SettingsOptions = ({
 		<Switch checked={enableNgram} onChange={(value) => handleChange('enableNgram', value)} />
 	</div>
 );
+
+SettingsOptions.propTypes = {
+	handleChange: PropTypes.func.isRequired,
+	hasFuzziness: PropTypes.bool.isRequired,
+	enableNgram: PropTypes.bool.isRequired,
+	enableSynonyms: PropTypes.bool.isRequired,
+	fuzziness: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+	queryFormat: PropTypes.string.isRequired,
+	queryType: PropTypes.string.isRequired,
+};
 
 export default SettingsOptions;

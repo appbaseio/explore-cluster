@@ -5,7 +5,15 @@ import { cardTitle } from './styles';
 import NewField from './NewField';
 import HeaderRow from './HeaderRow';
 
-const MappingsCard = ({ getMappings, setMapping, usecase, children, hideCardTitle, cardProps }) => {
+const MappingsCard = ({
+	getMappings,
+	setMapping,
+	usecase,
+	children,
+	hideCardTitle,
+	cardProps,
+	headerRowProps,
+}) => {
 	return (
 		<Card
 			title={
@@ -33,16 +41,17 @@ const MappingsCard = ({ getMappings, setMapping, usecase, children, hideCardTitl
 			}
 			{...cardProps}
 		>
-			<HeaderRow />
+			<HeaderRow {...headerRowProps} />
 			{children}
 		</Card>
 	);
 };
 
 MappingsCard.defaultProps = {
-	usecase: {},
-	hideCardTitle: false,
 	cardProps: {},
+	hideCardTitle: false,
+	headerRowProps: {},
+	usecase: {},
 };
 
 MappingsCard.propTypes = {
@@ -52,6 +61,7 @@ MappingsCard.propTypes = {
 	setMapping: PropTypes.func.isRequired,
 	children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
 	cardProps: PropTypes.object,
+	headerRowProps: PropTypes.object,
 };
 
 export default MappingsCard;
