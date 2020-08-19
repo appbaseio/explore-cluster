@@ -262,7 +262,9 @@ class SearchSettings extends React.Component {
 			return (
 				<React.Fragment>
 					<Banner {...bannerDetails} />
-					<Skeleton />
+					<div className={container}>
+						<Skeleton />
+					</div>
 				</React.Fragment>
 			);
 		}
