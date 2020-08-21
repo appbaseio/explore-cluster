@@ -29,8 +29,6 @@ import ObjectField from './ObjectField';
 import FieldRow from './FieldRow';
 import MappingsCard from './MappingsCard';
 
-// TODO Next: Use in Aggs Settings
-
 class Mappings extends React.Component {
 	URL = getURL();
 
@@ -101,10 +99,13 @@ class Mappings extends React.Component {
 			language,
 		});
 		this.flattenType = flattenType;
+		this.originalFlattenMappingsType = flattenType;
+		this.originalMappingsType = type;
+
 		this.flattenUsecase = flattenUsecase;
 		this.originalFlattenUsecase = flattenUsecase;
 		this.originalMappingsUsecase = usecase;
-		this.originalMappingsType = type;
+
 		this.originalMappings = mappings;
 		// eslint-disable-next-line
 		this.setState(
@@ -249,8 +250,8 @@ class Mappings extends React.Component {
 
 	cancelChanges = () => {
 		const { mappings } = this.props;
-		this.flattenUsecase = this.originalMappingsUsecase;
-		this.flattenType = this.originalMappingsType;
+		this.flattenUsecase = this.originalFlattenUsecase;
+		this.flattenType = this.originalFlattenMappingsType;
 
 		this.setState({
 			rawMappings: mappings,

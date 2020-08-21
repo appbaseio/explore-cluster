@@ -1,3 +1,3 @@
-import AggsPage from './NewAggsPage';
+import AggsPage from './AggsPage';
 
 export default AggsPage;
