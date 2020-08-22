@@ -165,6 +165,9 @@ class CreateCredentials extends React.Component {
 		if (initialValues) {
 			this.form.patchValue(
 				mapValuesToForm(JSON.parse(JSON.stringify(initialValues)), !isUserManagement),
+				{
+					emitEvent: false,
+				},
 			);
 		}
 	}
