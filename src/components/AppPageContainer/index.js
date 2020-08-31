@@ -45,7 +45,7 @@ class AppPageContainer extends Component {
 							index to access the page.
 						</p>
 					}
-					extra={<AppSwitcher preserveButtonStyle currentApp="Select a Index" />}
+					extra={<AppSwitcher preserveButtonStyle currentApp="Select an index" />}
 				/>
 			);
 		}
