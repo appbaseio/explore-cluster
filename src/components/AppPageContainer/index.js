@@ -41,8 +41,8 @@ class AppPageContainer extends Component {
 					title="Invalid Index"
 					subTitle={
 						<p>
-							You are trying to access a invalid index. Please select a existing index
-							to access the page.
+							You are trying to access an invalid index. Please select an existing
+							index to access the page.
 						</p>
 					}
 					extra={<AppSwitcher preserveButtonStyle currentApp="Select a Index" />}
