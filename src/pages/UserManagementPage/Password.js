@@ -24,7 +24,7 @@ const container = css`
 	width: 370px;
 `;
 
-class Permission extends React.Component {
+class Password extends React.Component {
 	state = {
 		viewKey: false,
 	};
@@ -49,7 +49,7 @@ class Permission extends React.Component {
 	}
 }
 
-Permission.propTypes = {
+Password.propTypes = {
 	password: string.isRequired,
 };
 
@@ -57,4 +57,4 @@ const mapStateToProps = (state) => ({
 	isAdmin: get(state, 'user.data.isAdmin'),
 });
 
-export default connect(mapStateToProps)(Permission);
+export default connect(mapStateToProps)(Password);
