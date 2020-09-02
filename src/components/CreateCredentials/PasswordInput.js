@@ -21,11 +21,16 @@ class PasswordInput extends React.Component {
 		if (pristine && isEditing) {
 			return (
 				<Icon
-					type="eye"
+					type="edit"
 					className={iconBtn}
 					onClick={() => {
+						// Enable the input
+						// object method destructuring won't work
+						// eslint-disable-next-line
+						this.props.control.enable();
+						// Reset the password input
 						reset();
-						this.inputRef.focus();
+						setTimeout(() => this.inputRef.focus(), 0);
 					}}
 				/>
 			);

@@ -165,7 +165,15 @@ class CreateCredentials extends React.Component {
 		if (initialValues) {
 			this.form.patchValue(
 				mapValuesToForm(JSON.parse(JSON.stringify(initialValues)), !isUserManagement),
+				{
+					emitEvent: false,
+				},
 			);
+			// Disable the password handler to avoid re-setting the password in patch request
+			if (isUserManagement) {
+				const categoriesHandler = this.form.get('password');
+				categoriesHandler.disable();
+			}
 		}
 	}
 
