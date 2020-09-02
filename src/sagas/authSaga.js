@@ -6,11 +6,11 @@ import { setUser, loadApps, setUserError } from '../actions';
 
 function* authWorker(username, password, url) {
 	try {
-		const user = yield call(getUser, username, password, url);
-
 		sessionStorage.setItem('url', url);
 		sessionStorage.setItem('username', username);
 		sessionStorage.setItem('password', password);
+		const user = yield call(getUser, username, password, url);
+
 		sessionStorage.setItem('authToken', user.authToken);
 		sessionStorage.setItem('isAdmin', user.isAdmin);
 		yield put(setUser(user));
