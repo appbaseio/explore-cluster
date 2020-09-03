@@ -224,6 +224,25 @@ class CreateCredentials extends React.Component {
 		return !!initialValues;
 	}
 
+	// To get the filtered mappings be selected index
+	get getFilteredMappings() {
+		const { mappings } = this.props;
+		const indicesHandler = this.form.get('indices');
+		const indices = indicesHandler.value;
+		if (indices && Array.isArray(indices)) {
+			if (indices.length === 1 && indices[0] === '*') {
+				return mappings;
+			}
+			const filteredMappings = {};
+
+			indices.forEach((index) => {
+				filteredMappings[index] = mappings[index];
+			});
+			return filteredMappings;
+		}
+		return mappings;
+	}
+
 	handleSubmit = () => {
 		const { onSubmit, isUserManagement } = this.props;
 		this.form.mappedValues = JSON.parse(
@@ -605,49 +624,49 @@ class CreateCredentials extends React.Component {
 																				}
 																				return null;
 																		  })
-																		: Object.keys(mappings).map(
-																				(i) =>
-																					mappings[i].map(
-																						(v) => {
-																							if (
-																								!(
-																									excludedFields ||
-																									[]
-																								).includes(
-																									v,
-																								)
-																							) {
-																								return (
-																									<Option
-																										key={
-																											v +
-																											i
-																										}
-																										value={
-																											v
-																										}
-																										title={
-																											v
-																										}
-																									>
-																										{
-																											v
-																										}
-																										<span
-																											css={
-																												styles.fieldBadge
-																											}
-																										>
-																											{
-																												i
-																											}
-																										</span>
-																									</Option>
-																								);
-																							}
-																							return null;
-																						},
-																					),
+																		: Object.keys(
+																				this
+																					.getFilteredMappings,
+																		  ).map((i) =>
+																				this.getFilteredMappings[
+																					i
+																				].map((v) => {
+																					if (
+																						!(
+																							excludedFields ||
+																							[]
+																						).includes(
+																							v,
+																						)
+																					) {
+																						return (
+																							<Option
+																								key={
+																									v +
+																									i
+																								}
+																								value={
+																									v
+																								}
+																								title={
+																									v
+																								}
+																							>
+																								{v}
+																								<span
+																									css={
+																										styles.fieldBadge
+																									}
+																								>
+																									{
+																										i
+																									}
+																								</span>
+																							</Option>
+																						);
+																					}
+																					return null;
+																				}),
 																		  )}
 																</Select>
 															}
@@ -709,46 +728,46 @@ class CreateCredentials extends React.Component {
 																				}
 																				return null;
 																		  })
-																		: Object.keys(mappings).map(
-																				(i) =>
-																					mappings[i].map(
-																						(v) => {
-																							if (
-																								!(
-																									includedFields ||
-																									[]
-																								).includes(
-																									v,
-																								)
-																							) {
-																								return (
-																									<Option
-																										key={
-																											i +
-																											v
-																										}
-																										title={
-																											v
-																										}
-																									>
-																										{
-																											v
-																										}
-																										<span
-																											css={
-																												styles.fieldBadge
-																											}
-																										>
-																											{
-																												i
-																											}
-																										</span>
-																									</Option>
-																								);
-																							}
-																							return null;
-																						},
-																					),
+																		: Object.keys(
+																				this
+																					.getFilteredMappings,
+																		  ).map((i) =>
+																				this.getFilteredMappings[
+																					i
+																				].map((v) => {
+																					if (
+																						!(
+																							includedFields ||
+																							[]
+																						).includes(
+																							v,
+																						)
+																					) {
+																						return (
+																							<Option
+																								key={
+																									i +
+																									v
+																								}
+																								title={
+																									v
+																								}
+																							>
+																								{v}
+																								<span
+																									css={
+																										styles.fieldBadge
+																									}
+																								>
+																									{
+																										i
+																									}
+																								</span>
+																							</Option>
+																						);
+																					}
+																					return null;
+																				}),
 																		  )}
 																</Select>
 															}
