@@ -127,6 +127,7 @@ class SearchLatencyWrapper extends React.Component {
 								style={{ height: 506 }}
 								filterId={filterId}
 								onClickBar={this.handleClickBar}
+								displaySummaryStats
 							/>
 							<div
 								style={{

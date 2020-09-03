@@ -37,7 +37,7 @@ const RequestDistributionWrapper = ({ plan, isGrowth }) => (
 			<React.Fragment>
 				{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
 				<Container>
-					<RequestDistribution filterId="request_distribution_page" />
+					<RequestDistribution displaySummaryStats filterId="request_distribution_page" />
 				</Container>
 			</React.Fragment>
 		) : (
