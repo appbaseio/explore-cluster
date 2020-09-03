@@ -1,10 +1,26 @@
 import React, { useState } from 'react';
-import { Checkbox, Col, Form, Icon, Input, message, Modal, notification, Row, Tooltip } from 'antd';
+import {
+	Checkbox,
+	Col,
+	Form,
+	Icon,
+	Input,
+	message,
+	Modal,
+	notification,
+	Row,
+	Tooltip,
+	List,
+} from 'antd';
 import { css } from 'emotion';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import { flatten, get, isEmpty, map } from 'lodash';
+import flatten from 'lodash/flatten';
+import get from 'lodash/get';
+import isEmpty from 'lodash/isEmpty';
+import map from 'lodash/map';
+import { validationsList } from '@appbaseio-confidential/importer/lib/utils';
 import { cloneApp } from '../../utils';
 import { validateAppName } from '../../utils/helper';
 import { getSettings, putSettings, setCurrentApp } from '../../batteries/modules/actions';
@@ -40,6 +56,13 @@ const CloneIndex = (props) => {
 		if (!isValid) {
 			notification.error({
 				message: 'Invalid Index Name',
+				description: (
+					<List
+						size="small"
+						dataSource={validationsList}
+						renderItem={(item) => <List.Item>{item}</List.Item>}
+					/>
+				),
 			});
 			return;
 		}

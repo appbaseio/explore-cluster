@@ -14,7 +14,8 @@ import {
 } from 'antd';
 import { connect } from 'react-redux';
 import { css } from 'emotion';
-import { get, pick } from 'lodash';
+import get from 'lodash/get';
+import pick from 'lodash/pick';
 import TextArea from 'antd/lib/input/TextArea';
 import { updateFunctions } from '../../batteries/modules/actions';
 import Ace from '../../batteries/components/SearchSandbox/containers/AceEditor';
@@ -184,12 +185,12 @@ class TriggerFunction extends React.Component {
 		const executeBeforeVal = get(node, 'trigger.executeBefore');
 		this.state = {
 			isVisible: false,
-			type: (node && node.trigger && node.trigger.type) || 'always',
+			type: get(node, 'trigger.type', 'always'),
 			when:
 				// eslint-disable-next-line no-nested-ternary
 				executeBeforeVal !== undefined ? (executeBeforeVal ? 'before' : 'after') : 'before',
 			request: JSON.stringify(get(node, 'extraRequestPayload', {})),
-			expression: (node && node.trigger && node.trigger.expression) || '',
+			expression: get(node, 'trigger.expression', ''),
 			isValidJSON: true,
 			parsedValue: get(node, 'extraRequestPayload', {}),
 		};
@@ -204,7 +205,7 @@ class TriggerFunction extends React.Component {
 	handleSave = () => {
 		const { putFunctions, node } = this.props;
 		const { type, when, expression, parsedValue } = this.state;
-		putFunctions(node.function.service, {
+		putFunctions(get(node, 'function.service'), {
 			...pick(node, ['enabled', 'order', 'function']),
 			trigger: {
 				type,
@@ -216,10 +217,10 @@ class TriggerFunction extends React.Component {
 			if (res && res.error) {
 				notification.error({
 					message: 'Error',
-					description: res.error.message,
+					description: get(res, 'error.message'),
 				});
 			} else {
-				message.success(`${node.function.service} updated successfully`);
+				message.success(`${get(node, 'function.service')} updated successfully`);
 				this.handleModal();
 			}
 		});

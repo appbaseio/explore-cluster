@@ -1,5 +1,5 @@
 import React from 'react';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { Tabs, Button, message, notification, Result } from 'antd';
 import PropTypes from 'prop-types';
@@ -13,6 +13,8 @@ import { getUrlParams } from '../../utils/helper';
 import { drawerClass } from './styles';
 import { getAppAnalyticsInsightsByName } from '../../batteries/modules/selectors';
 import { getMonthRange } from './utils';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 const { TabPane } = Tabs;
 
@@ -86,7 +88,11 @@ class AnalyticsInsights extends React.Component {
 			JSON.stringify(prevProps.insightUpdates) !== JSON.stringify(updates)
 		) {
 			Object.keys(updates).forEach((id) => {
-				const { success, error: updateError, nextStatus, inProgress } = updates[id];
+				const { success, error: updateError, nextStatus, inProgress } = get(
+					updates,
+					id,
+					{},
+				);
 				if (inProgress) {
 					return;
 				}
@@ -224,22 +230,27 @@ class AnalyticsInsights extends React.Component {
 			<div className={`${drawerClass} ${isOpen ? 'open' : ''}`}>
 				<div className="insights-header">{this.renderInsightHeader()}</div>
 				<div className="insight-sidebar-content">
-					<Tabs style={{ padding: 10 }} defaultActiveKey={this.defaultTabKey}>
-						{Object.keys(insights)
-							.filter((insight) => insight !== 'deleted')
-							.map((insightType) => (
-								<TabPane tab={insightType.toLocaleUpperCase()} key={insightType}>
-									<CollapsibleInsights
-										type={insightType}
-										noDataPresent={!insightItems}
-										defaultOpen={this.openInsight}
-										insights={insights[insightType]}
-										noDataText={this.noDataText}
-										range={this.range}
-									/>
-								</TabPane>
-							))}
-					</Tabs>
+					<ErrorToaster>
+						<Tabs style={{ padding: 10 }} defaultActiveKey={this.defaultTabKey}>
+							{Object.keys(insights)
+								.filter((insight) => insight !== 'deleted')
+								.map((insightType) => (
+									<TabPane
+										tab={insightType.toLocaleUpperCase()}
+										key={insightType}
+									>
+										<CollapsibleInsights
+											type={insightType}
+											noDataPresent={!insightItems}
+											defaultOpen={this.openInsight}
+											insights={insights[insightType]}
+											noDataText={this.noDataText}
+											range={this.range}
+										/>
+									</TabPane>
+								))}
+						</Tabs>
+					</ErrorToaster>
 				</div>
 			</div>
 		);
@@ -286,4 +297,4 @@ const mapDispatchToProps = (dispatch) => ({
 	getInsights: (name) => dispatch(getAppAnalyticsInsights(name)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(AnalyticsInsights);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(AnalyticsInsights));

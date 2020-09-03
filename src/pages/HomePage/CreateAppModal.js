@@ -14,7 +14,7 @@ import {
 } from 'antd';
 import PropTypes from 'prop-types';
 
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { input, modalHeading, radiobtn } from './styles';
 import { validateAppName, validationsList } from '../../utils/helper';
 
@@ -25,6 +25,7 @@ import { getDefaultSettings, putSettings } from '../../batteries/modules/actions
 import { getLanguageFallback } from '../../utils/language';
 import { isValidPlan } from '../../batteries/utils';
 import { allowedTiers } from '../../utils/prop-types';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 const RadioGroup = Radio.Group;
 
@@ -258,7 +259,7 @@ class CreateAppModal extends Component {
 					/>
 					{createdApp && createdApp.error ? (
 						<div css={{ color: 'tomato', marginTop: 8 }}>
-							{createdApp.error.actual.message}
+							{get(createdApp, 'error.actual.message')}
 						</div>
 					) : null}
 				</div>
@@ -305,9 +306,9 @@ CreateAppModal.defaultProps = {
 };
 
 const mapStateToProps = (state) => ({
-	apps: state.apps,
-	appsMetrics: state.appsMetrics,
-	createdApp: state.createdApp,
+	apps: get(state, 'apps'),
+	appsMetrics: get(state, 'appsMetrics'),
+	createdApp: get(state, 'createdApp'),
 	defaultSettings: get(state, '$getAppSettings.defaultSettings'),
 	tier: get(state, '$getAppPlan.results.tier'),
 	featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
@@ -320,4 +321,4 @@ const mapDispatchToProps = (dispatch) => ({
 	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(CreateAppModal);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(CreateAppModal));

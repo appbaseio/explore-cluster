@@ -3,7 +3,9 @@ import PropTypes from 'prop-types';
 import { Button, Card, Icon, message, Popconfirm, Table } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
-import { chunk, get, flatten } from 'lodash';
+import chunk from 'lodash/chunk';
+import get from 'lodash/get';
+import flatten from 'lodash/flatten';
 import {
 	DataSearch,
 	ReactiveBase,
@@ -28,6 +30,7 @@ import { isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import { allowedTiers } from '../../utils/prop-types';
 import Loader from '../../components/Loader';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 
 const UploadSynonymsModal = Loadable({
 	loader: () =>
@@ -510,7 +513,7 @@ class Synonyms extends React.Component {
 								</div>
 							</div>
 							<ReactiveList
-								componentId="result"
+								componentId={`result-${key}`}
 								renderResultStats={() => null}
 								key={key}
 								loader={<div />}
@@ -545,16 +548,18 @@ class Synonyms extends React.Component {
 					) : null}
 				</div>
 				{uploadVisible && (
-					<UploadSynonymsModal
-						onCancel={this.toggleUploadVisibility}
-						appName={appName}
-						onOk={this.handleUpload}
-						confirmLoading={uploading}
-						file={file}
-						fileList={fileList}
-						beforeUpload={this.beforeUpload}
-						onRemove={this.onRemove}
-					/>
+					<ErrorToaster>
+						<UploadSynonymsModal
+							onCancel={this.toggleUploadVisibility}
+							appName={appName}
+							onOk={this.handleUpload}
+							confirmLoading={uploading}
+							file={file}
+							fileList={fileList}
+							beforeUpload={this.beforeUpload}
+							onRemove={this.onRemove}
+						/>
+					</ErrorToaster>
 				)}
 			</React.Fragment>
 		);

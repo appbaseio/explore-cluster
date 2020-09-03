@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Icon, message, notification, Typography } from 'antd';
 import { connect } from 'react-redux';
-import { omit, get } from 'lodash';
+import omit from 'lodash/omit';
+import get from 'lodash/get';
 import { cloneQueryRule } from '../../../../batteries/modules/actions';
 
 class CloneRule extends React.Component {

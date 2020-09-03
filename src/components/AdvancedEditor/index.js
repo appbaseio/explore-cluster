@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ReactFilterBox, { GridDataAutoCompleteHandler } from '@appbaseio/react-filter-box';
-import { keys } from 'lodash';
+import keys from 'lodash/keys';
 import '@appbaseio/react-filter-box/lib/react-filter-box.css';
 import { operatorsMap } from './helper';
 

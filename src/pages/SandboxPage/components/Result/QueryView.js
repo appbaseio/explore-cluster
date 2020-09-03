@@ -3,11 +3,12 @@ import PropTypes from 'prop-types';
 import { Button, Icon, message, Typography } from 'antd';
 import Appbase from 'appbase-js';
 import { css } from 'emotion';
-import { get } from 'lodash';
+import get from 'lodash/get';
 
 import AceEditor from '../../../../batteries/components/SearchSandbox/containers/AceEditor';
 
 import { isValidJSON } from '../../utils';
+import SandboxContext from '../SandboxContext';
 
 const headingStyle = css`
 	font-size: 16px;
@@ -123,7 +124,7 @@ class QueryView extends React.Component {
 				});
 				if (onChange) {
 					onChange(parsedQuery.query);
-					toggleAnalytics(!!parsedQuery.settings.recordAnalytics);
+					toggleAnalytics(!!get(parsedQuery, 'settings.recordAnalytics'));
 				}
 				this.toggleExecutionStatus();
 			})
@@ -212,4 +213,30 @@ QueryView.defaultProps = {
 	recordAnalytics: true,
 };
 
-export default QueryView;
+const QueryViewWrapper = () => {
+	return (
+		<SandboxContext.Consumer>
+			{({
+				query,
+				onSettingsChange: onChange,
+				toggleAnalytics,
+				recordAnalytics,
+				url,
+				app,
+				credentials,
+			}) => (
+				<QueryView
+					query={query}
+					onChange={onChange}
+					toggleAnalytics={toggleAnalytics}
+					recordAnalytics={recordAnalytics}
+					app={app}
+					url={url}
+					credentials={credentials}
+				/>
+			)}
+		</SandboxContext.Consumer>
+	);
+};
+
+export default QueryViewWrapper;

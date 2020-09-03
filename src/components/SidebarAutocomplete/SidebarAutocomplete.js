@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { List, Breadcrumb, Tag, Empty } from 'antd';
 import { css } from 'emotion';
 import IndexSwitcher from '../IndexSwitcher';
 import WithRedirectTooltip from '../WithRedirectTooltip';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 
 const listStyle = css`
 	.ant-list-item {
@@ -53,8 +54,8 @@ const emptyStyle = css`
 const SearchItem = ({ item }) => {
 	return (
 		<Breadcrumb separator=">">
-			{item.label && <Breadcrumb.Item>{item.title}</Breadcrumb.Item>}
-			<Breadcrumb.Item>{item.label || item.title}</Breadcrumb.Item>
+			{item.label && <Breadcrumb.Item>{get(item, 'title')}</Breadcrumb.Item>}
+			<Breadcrumb.Item>{get(item, 'label') || get(item, 'title')}</Breadcrumb.Item>
 		</Breadcrumb>
 	);
 };
@@ -92,59 +93,61 @@ const SidebarAutocomplete = ({ routes, value, filteredApps, history, resetAutoCo
 	}
 
 	return (
-		<List
-			itemLayout="horizontal"
-			dataSource={filteredMenus}
-			className={listStyle}
-			renderItem={(item) => (
-				<WithRedirectTooltip showTooltip={item.hasExactPath}>
-					<List.Item onClick={() => handleListClick(item)} key={item.label}>
-						<List.Item.Meta
-							title={
-								item.openIndexMenu ? (
-									<IndexSwitcher
-										filteredApps={filteredApps}
-										history={history}
-										renderItem={(popConfirmProps) => {
-											return (
-												<div {...popConfirmProps}>
-													<SearchItem item={item} />
-													{item.tag ? (
-														<Tag
-															style={{
-																fontSize: 10,
-															}}
-															color="#002140"
-														>
-															{item.tag}
-														</Tag>
-													) : null}
-												</div>
-											);
-										}}
-										item={item}
-									/>
-								) : (
-									<SearchItem item={item} />
-								)
-							}
-							description={
-								!item.openIndexMenu && item.tag ? (
-									<Tag
-										style={{
-											fontSize: 10,
-										}}
-										color="#002140"
-									>
-										{item.tag}
-									</Tag>
-								) : null
-							}
-						/>
-					</List.Item>
-				</WithRedirectTooltip>
-			)}
-		/>
+		<ErrorToaster>
+			<List
+				itemLayout="horizontal"
+				dataSource={filteredMenus}
+				className={listStyle}
+				renderItem={(item) => (
+					<WithRedirectTooltip showTooltip={item.hasExactPath}>
+						<List.Item onClick={() => handleListClick(item)} key={item.label}>
+							<List.Item.Meta
+								title={
+									item.openIndexMenu ? (
+										<IndexSwitcher
+											filteredApps={filteredApps}
+											history={history}
+											renderItem={(popConfirmProps) => {
+												return (
+													<div {...popConfirmProps}>
+														<SearchItem item={item} />
+														{item.tag ? (
+															<Tag
+																style={{
+																	fontSize: 10,
+																}}
+																color="#002140"
+															>
+																{item.tag}
+															</Tag>
+														) : null}
+													</div>
+												);
+											}}
+											item={item}
+										/>
+									) : (
+										<SearchItem item={item} />
+									)
+								}
+								description={
+									!item.openIndexMenu && item.tag ? (
+										<Tag
+											style={{
+												fontSize: 10,
+											}}
+											color="#002140"
+										>
+											{item.tag}
+										</Tag>
+									) : null
+								}
+							/>
+						</List.Item>
+					</WithRedirectTooltip>
+				)}
+			/>
+		</ErrorToaster>
 	);
 };
 

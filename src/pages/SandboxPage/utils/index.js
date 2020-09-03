@@ -1,4 +1,6 @@
-import { get } from 'lodash';
+import get from 'lodash/get';
+import { doPost, doGet } from '../../../batteries/utils/requestService';
+import { getURL } from '../../../constants/config';
 
 const generateQuery = ({ aggregations: filters, search, results, synonyms }) => {
 	const filtersData =
@@ -72,4 +74,18 @@ const flatObject = (obj, path = '') => {
 	}, {});
 };
 
-export { isValidJSON, generateQuery, flatObject };
+const recordGrade = ({ index, id, grade, query }) => {
+	const ACC_API = getURL();
+	return doPost(`${ACC_API}/_grade/${index}/${id}`, {
+		query,
+		grade,
+	});
+};
+
+const getQueryGrades = ({ query }) => {
+	const ACC_API = getURL();
+	const finalQuery = query || 'empty_query';
+	return doGet(`${ACC_API}/_grade/${finalQuery}`);
+};
+
+export { isValidJSON, generateQuery, flatObject, recordGrade, getQueryGrades };

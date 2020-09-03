@@ -17,6 +17,8 @@ import {
 } from '../../batteries/modules/actions';
 import Container from '../../components/Container';
 import { getURL } from '../../constants/config';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 const { Paragraph } = Typography;
 const tableCls = css`
@@ -174,32 +176,34 @@ class UserManagementPage extends React.Component {
 								<Paragraph
 									strong
 									copyable={{
-										text: `https://arc-dashboard.appbase.io?url=${getURL()}`,
+										text: `https://dash.appbase.io?url=${getURL()}`,
 									}}
 								>
-									{`https://arc-dashboard.appbase.io?url=${getURL()}`}
+									{`https://dash.appbase.io?url=${getURL()}`}
 								</Paragraph>
 							</React.Fragment>
 						}
 						type="info"
 						css={{ marginBottom: 20 }}
 					/>
-					<Table
-						scroll={{ x: 900 }}
-						dataSource={users.map((user) => ({
-							permissionInfo: user,
-							deletePermission: this.deletePermission,
-							showForm: this.showForm,
-						}))}
-						rowKey={(row) =>
-							`${get(row, 'permissionInfo.username')}:${get(
-								row,
-								'permissionInfo.password',
-							)}`
-						}
-						columns={columns}
-						css={tableCls}
-					/>
+					<ErrorToaster inline>
+						<Table
+							scroll={{ x: 900 }}
+							dataSource={users.map((user) => ({
+								permissionInfo: user,
+								deletePermission: this.deletePermission,
+								showForm: this.showForm,
+							}))}
+							rowKey={(row) =>
+								`${get(row, 'permissionInfo.username')}:${get(
+									row,
+									'permissionInfo.password',
+								)}`
+							}
+							columns={columns}
+							css={tableCls}
+						/>
+					</ErrorToaster>
 				</Card>
 
 				<Button
@@ -212,15 +216,17 @@ class UserManagementPage extends React.Component {
 					Create User
 				</Button>
 				{showForm && (
-					<CredentialsForm
-						handleCancel={this.handleCancel}
-						isUserManagement
-						show={showForm}
-						saveButtonText={!currentPermissionInfo ? 'Create' : 'Save'}
-						onSubmit={this.handleSubmit}
-						initialValues={currentPermissionInfo}
-						titleText={!currentPermissionInfo ? 'Create User' : 'Edit User'}
-					/>
+					<ErrorToaster inline>
+						<CredentialsForm
+							handleCancel={this.handleCancel}
+							isUserManagement
+							show={showForm}
+							saveButtonText={!currentPermissionInfo ? 'Create' : 'Save'}
+							onSubmit={this.handleSubmit}
+							initialValues={currentPermissionInfo}
+							titleText={!currentPermissionInfo ? 'Create User' : 'Edit User'}
+						/>
+					</ErrorToaster>
 				)}
 			</Container>
 		);
@@ -254,4 +260,4 @@ const mapDispatchToProps = (dispatch) => ({
 		dispatch(updateClusterUser(credentials, username, payload)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserManagementPage);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(UserManagementPage));

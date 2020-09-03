@@ -5,7 +5,7 @@ import { Input, Select, Button, Affix, Checkbox } from 'antd';
 import { css } from 'react-emotion';
 import PropTypes from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
-import { keys } from 'lodash';
+import keys from 'lodash/keys';
 import Grid from '../../components/CreateCredentials/Grid';
 import Ace from '../../batteries/components/SearchSandbox/containers/AceEditor';
 import { suggestionsMessages as Messages } from '../../utils/messages';

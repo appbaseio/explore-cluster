@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Icon, message, Modal, Select, Tooltip } from 'antd';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { css } from 'emotion';
 
@@ -16,6 +16,7 @@ import {
 import { getURL } from '../../../constants/config';
 import { updateSynonyms } from '../api';
 import { children, synonymTypes } from '../../../utils/prop-types';
+import ErrorToaster from '../../../batteries/components/shared/ErrorToaster';
 
 const { Option } = Select;
 
@@ -208,30 +209,32 @@ class SynonymsModal extends React.Component {
 						disabled: this.getValidation(),
 					}}
 				>
-					<div className={formStyle}>
-						<label>
-							Select Type{' '}
-							<Tooltip title="Synonym type info">
-								<Icon type="info-circle" />
-							</Tooltip>
-						</label>
-						<Select
-							placeholder="Select synonym type"
-							style={{ width: '100%' }}
-							onChange={this.handleType}
-							value={type}
-						>
-							<Option value="one-way">One Way Synonym</Option>
-							<Option value="equivalent">Equivalent Synonym</Option>
-						</Select>
-						<SynonymInput
-							type={type}
-							synonyms={synonyms}
-							searchTerm={searchTerm}
-							alternatives={alternatives}
-							onChange={this.handleChange}
-						/>
-					</div>
+					<ErrorToaster>
+						<div className={formStyle}>
+							<label>
+								Select Type{' '}
+								<Tooltip title="Synonym type info">
+									<Icon type="info-circle" />
+								</Tooltip>
+							</label>
+							<Select
+								placeholder="Select synonym type"
+								style={{ width: '100%' }}
+								onChange={this.handleType}
+								value={type}
+							>
+								<Option value="one-way">One Way Synonym</Option>
+								<Option value="equivalent">Equivalent Synonym</Option>
+							</Select>
+							<SynonymInput
+								type={type}
+								synonyms={synonyms}
+								searchTerm={searchTerm}
+								alternatives={alternatives}
+								onChange={this.handleChange}
+							/>
+						</div>
+					</ErrorToaster>
 				</Modal>
 			</React.Fragment>
 		);

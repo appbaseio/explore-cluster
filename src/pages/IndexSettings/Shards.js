@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Modal, Card, Button, InputNumber } from 'antd';
+import { Modal, Card, Button, InputNumber, Alert } from 'antd';
 import { cardTitle } from '../../batteries/components/Mappings/styles';
 
 const Shards = ({
@@ -41,12 +41,19 @@ const Shards = ({
 				<a
 					target="_blank"
 					rel="noopener noreferrer"
-					href="https://docs.appbase.io/docs/search/Mappings/#manage-shards"
+					href="https://docs.appbase.io/docs/search/relevancy/#index-settings"
 				>
 					here
 				</a>
 				.
 			</h4>
+			{+allocated_shards !== +shards ? (
+				<Alert
+					type="warning"
+					style={{ marginBottom: 10 }}
+					description="Re-indexing is required for applying shards changes."
+				/>
+			) : null}
 			<InputNumber
 				max={100}
 				min={1}

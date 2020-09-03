@@ -124,7 +124,7 @@ const settingsMap = {
 		description: 'Enable synonyms for better searching across similar words',
 	},
 	queryString: {
-		title: 'Enable Query String',
+		title: 'Query String',
 		description: (
 			<React.Fragment>
 				<p style={{ fontSize: 15 }}>
@@ -164,6 +164,16 @@ const settingsMap = {
 				</ul>
 			</React.Fragment>
 		),
+	},
+	queryType: {
+		title: 'Query Type',
+		description:
+			'Query type determines the query DSL to be used. It defaults to ReactiveSearch.',
+	},
+	enableNgram: {
+		title: 'Enable N gram',
+		description:
+			'appbase.io adds an n-grams tokenizer to enable partial infix matching of search terms, but this comes with a substantial storage increase. By disabling n-grams, you can make significant storage savings.',
 	},
 };
 

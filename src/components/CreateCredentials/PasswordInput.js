@@ -1,11 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { css } from 'react-emotion';
-import { Input } from 'antd';
-
-const EyeIcon = require('react-feather/dist/icons/eye').default;
-const EditIcon = require('react-feather/dist/icons/edit').default;
-const EyeOffIcon = require('react-feather/dist/icons/eye-off').default;
+import { Input, Icon } from 'antd';
 
 const iconBtn = css`
 	cursor: pointer;
@@ -24,20 +20,25 @@ class PasswordInput extends React.Component {
 		const { visible } = this.state;
 		if (pristine && isEditing) {
 			return (
-				<EditIcon
-					css={iconBtn}
+				<Icon
+					type="edit"
+					className={iconBtn}
 					onClick={() => {
+						// Enable the input
+						// object method destructuring won't work
+						// eslint-disable-next-line
+						this.props.control.enable();
+						// Reset the password input
 						reset();
-						this.inputRef.focus();
+						setTimeout(() => this.inputRef.focus(), 0);
 					}}
-					size={14}
 				/>
 			);
 		}
 		if (visible) {
-			return <EyeIcon css={iconBtn} onClick={this.handleClick} size={14} />;
+			return <Icon type="eye" className={iconBtn} onClick={this.handleClick} />;
 		}
-		return <EyeOffIcon css={iconBtn} onClick={this.handleClick} size={14} />;
+		return <Icon type="eye-invisible" className={iconBtn} onClick={this.handleClick} />;
 	}
 
 	handleClick = () => {

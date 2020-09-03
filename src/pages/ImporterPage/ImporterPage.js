@@ -5,9 +5,9 @@ import { connect } from 'react-redux';
 import { string, object } from 'prop-types';
 import get from 'lodash/get';
 import Importer from '@appbaseio-confidential/importer';
-import applyClusterSettings from '@appbaseio-confidential/importer/lib/utils/applyClusterSettings';
 
 import Header from '../../components/Header';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { getUrlParams } from '../../utils/helper';
 
 // Adding this style for Importer components because we dont import styles with Importer Library
@@ -16,6 +16,9 @@ import 'antd/es/select/style/css';
 import 'antd/es/divider/style/css';
 import 'antd/es/switch/style/css';
 import 'antd/es/modal/style/css';
+import 'antd/es/card/style/css';
+
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 // eslint-disable-next-line no-unused-expressions
 injectGlobal`
@@ -34,7 +37,7 @@ class ImporterPage extends React.Component {
 		destinationParams: null,
 	};
 
-	async componentDidMount() {
+	componentDidMount() {
 		const { type, appName: index } = this.props;
 		const cluster = sessionStorage.getItem('cluster') || '';
 		const { host, protocol } = new URL(sessionStorage.getItem('url'));
@@ -43,43 +46,30 @@ class ImporterPage extends React.Component {
 		const uri = `${protocol}//${username}:${password}@${host}`;
 
 		if (type === 'cluster') {
-			try {
-				if (index) {
-					const parameters = await applyClusterSettings(cluster, index);
-					this.setState({
-						destinationParams: parameters,
-					});
-				} else {
-					this.setState({
-						destinationParams: {
-							index,
-							cluster,
-							type: 'AppbaseCluster',
-							uri: `${uri}/${index}`,
-							tier: 'paid',
-							url: uri,
-						},
-					});
-				}
-			} catch (e) {
-				console.error(e);
-			}
-			this.togglePreparing();
-		} else {
-			const parameters = {
-				type: 'AppbaseCluster',
-				clusterType: 'self-hosted',
-				index,
-				cluster: uri || '',
-				uri: index ? `${uri}/${index}` : uri,
-				tier: 'paid',
-				url: uri,
-			};
 			this.setState({
-				destinationParams: parameters,
+				destinationParams: {
+					index,
+					cluster,
+					type: 'AppbaseCluster',
+					uri: `${uri}/${index}`,
+					tier: 'paid',
+					url: uri,
+				},
 			});
-			this.togglePreparing();
+		} else {
+			this.setState({
+				destinationParams: {
+					type: 'AppbaseCluster',
+					clusterType: 'self-hosted',
+					index,
+					cluster: uri || '',
+					uri: index ? `${uri}/${index}` : uri,
+					tier: 'paid',
+					url: uri,
+				},
+			});
 		}
+		this.togglePreparing();
 	}
 
 	togglePreparing = () => {
@@ -118,7 +108,7 @@ class ImporterPage extends React.Component {
 							<Row>
 								<Col lg={18}>
 									<p>
-										Bring data from JSON/CSV/ElasticSearch/SQL sources into
+										Bring data from JSON/CSV/Elasticsearch/SQL sources into
 										appbase.io via GUI.
 										<br />
 										<br />
@@ -176,26 +166,28 @@ class ImporterPage extends React.Component {
 						</Col>
 					</Row>
 				</Header>
-				<section>
-					{preparingApp ? (
-						<div style={{ maxWidth: '80%', margin: '20px auto' }}>
-							<h2>Preparing app for Import. This may take few seconds.</h2>
-							<Skeleton active />
-						</div>
-					) : (
-						<Importer
-							initSource={sourceParams}
-							initUser={
-								user && user.data && user.data.email
-									? user
-									: { data: { email: 'user@arc.appbase.io' } }
-							}
-							arc
-							embed
-							initDestination={destinationParams}
-						/>
-					)}
-				</section>
+				<ErrorToaster>
+					<section>
+						{preparingApp ? (
+							<div style={{ maxWidth: '80%', margin: '20px auto' }}>
+								<h2>Preparing app for Import. This may take few seconds.</h2>
+								<Skeleton active />
+							</div>
+						) : (
+							<Importer
+								initSource={sourceParams}
+								initUser={
+									user && user.data && user.data.email
+										? user
+										: { data: { email: 'user@arc.appbase.io' } }
+								}
+								arc
+								embed
+								initDestination={destinationParams}
+							/>
+						)}
+					</section>
+				</ErrorToaster>
 			</Fragment>
 		);
 	}
@@ -221,4 +213,4 @@ const mapStateToProps = (state) => {
 	};
 };
 
-export default connect(mapStateToProps)(ImporterPage);
+export default withErrorToaster(connect(mapStateToProps)(ImporterPage));

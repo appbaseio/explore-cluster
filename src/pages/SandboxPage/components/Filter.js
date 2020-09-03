@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Card, Icon, Button, Tooltip } from 'antd';
 import { Link } from 'react-router-dom';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { MultiList } from '@appbaseio/reactivesearch';
 import settingsMap from '../../../components/ReviewAndSave/helper';
 
@@ -57,4 +57,4 @@ Filter.defaultProps = {
 	handleModal: () => {},
 };
 
-export default Filter;
+export default React.memo(Filter);

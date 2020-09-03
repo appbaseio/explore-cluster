@@ -4,7 +4,8 @@ import { Affix, Button, Col, Icon, Layout, message, Result, Row } from 'antd';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { get, keys } from 'lodash';
+import get from 'lodash/get';
+import keys from 'lodash/keys';
 
 import QueryCard from './components/QueryCard';
 import { getRules, reorderRules } from '../../batteries/modules/actions';
@@ -16,6 +17,8 @@ import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { bannerDetails } from './utils';
 import SearchPreviewSwitcher from '../../components/SearchPreviewSwitcher';
 import { allowedTiers } from '../../utils/prop-types';
+import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 const { Header } = Layout;
 
@@ -46,13 +49,13 @@ class QueryRules extends Component {
 		}
 
 		if (prevProps.deleted !== deleted) {
-			message.success('Deleted Item successfully');
+			message.success('Deleted item successfully');
 		}
 	}
 
 	onDragEnd = (result) => {
 		const { rules, updateOrder } = this.props;
-		if (result.source.index !== result.destination.index) {
+		if (get(result, 'source.index') !== get(result, 'destination.index')) {
 			const ruleToPromote = rules.find((rule) => rule.order === result.source.index);
 			const ruleToDemote = rules.find((rule) => rule.order === result.destination.index);
 
@@ -161,22 +164,24 @@ class QueryRules extends Component {
 				</Header>
 				<div className={container}>
 					{rules && rules.length ? (
-						<DNDWrapper
-							onDragEnd={this.onDragEnd}
-							items={rules.sort((a, b) => a.order - b.order)}
-							dropId="RULES"
-							indexKey="order"
-							idKey="id"
-						>
-							{({ item, dragProvided, dragSnapshot, index }) => (
-								<QueryCard
-									dragProvided={dragProvided}
-									dragSnapshot={dragSnapshot}
-									rule={item}
-									index={index}
-								/>
-							)}
-						</DNDWrapper>
+						<ErrorToaster>
+							<DNDWrapper
+								onDragEnd={this.onDragEnd}
+								items={rules.sort((a, b) => a.order - b.order)}
+								dropId="RULES"
+								indexKey="order"
+								idKey="id"
+							>
+								{({ item, dragProvided, dragSnapshot, index }) => (
+									<QueryCard
+										dragProvided={dragProvided}
+										dragSnapshot={dragSnapshot}
+										rule={item}
+										index={index}
+									/>
+								)}
+							</DNDWrapper>
+						</ErrorToaster>
 					) : (
 						<Result
 							title="No Rules Present"
@@ -261,4 +266,4 @@ const mapDispatchToProps = (dispatch) => ({
 		dispatch(reorderRules({ toBePromoted, toBeDemoted })),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(QueryRules);
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(QueryRules));
