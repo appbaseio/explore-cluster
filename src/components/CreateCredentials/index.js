@@ -597,6 +597,7 @@ class CreateCredentials extends React.Component {
 													const excludedFields = this.form.get(
 														'exclude_fields',
 													).value;
+													const uniqueMappings = {};
 													return (
 														<Grid
 															label={
@@ -652,6 +653,17 @@ class CreateCredentials extends React.Component {
 																				filteredMappings[
 																					i
 																				].map((v) => {
+																					// duplicate keys cause re-rendering issues
+																					if (
+																						uniqueMappings[
+																							v
+																						]
+																					) {
+																						return null;
+																					}
+																					uniqueMappings[
+																						v
+																					] = true;
 																					if (
 																						!(
 																							excludedFields ||
@@ -703,6 +715,7 @@ class CreateCredentials extends React.Component {
 													const includedFields = this.form.get(
 														'include_fields',
 													).value;
+													const uniqueMappings = {};
 													return (
 														<Grid
 															label={
@@ -755,6 +768,17 @@ class CreateCredentials extends React.Component {
 																				filteredMappings[
 																					i
 																				].map((v) => {
+																					// duplicate keys cause re-rendering issues
+																					if (
+																						uniqueMappings[
+																							v
+																						]
+																					) {
+																						return null;
+																					}
+																					uniqueMappings[
+																						v
+																					] = true;
 																					if (
 																						!(
 																							includedFields ||
