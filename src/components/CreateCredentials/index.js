@@ -675,8 +675,7 @@ class CreateCredentials extends React.Component {
 																						return (
 																							<Option
 																								key={
-																									v +
-																									i
+																									v
 																								}
 																								value={
 																									v
@@ -790,7 +789,6 @@ class CreateCredentials extends React.Component {
 																						return (
 																							<Option
 																								key={
-																									i +
 																									v
 																								}
 																								title={
