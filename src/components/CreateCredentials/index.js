@@ -70,6 +70,9 @@ class CreateCredentials extends React.Component {
 		this.isApp = !window.location.pathname.startsWith(
 			props.isUserManagement ? '/cluster/user-management' : '/cluster/credentials',
 		);
+		this.state = {
+			filteredMappings: {},
+		};
 
 		this.form = props.isUserManagement
 			? FormBuilder.group({
@@ -121,10 +124,18 @@ class CreateCredentials extends React.Component {
 		if (appbaseCredentials) {
 			this.getMappings();
 		}
+		const indicesHandler = this.form.get('indices');
+		if (!this.isApp) {
+			indicesHandler.valueChanges.subscribe((indices) => {
+				const { mappings } = this.props;
+				this.setState({
+					filteredMappings: this.getFilteredMappings(mappings, indices),
+				});
+			});
+		}
 		if (disabled) {
 			this.form.disable();
 		} else {
-			const indicesHandler = this.form.get('indices');
 			const adminHandler = this.form.get('isAdmin');
 			const opsHandler = this.form.get('operationType');
 			const categoriesHandler = this.form.get('categories');
@@ -181,8 +192,15 @@ class CreateCredentials extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { errors } = this.props;
+		const { errors, mappings } = this.props;
 		displayErrors(errors, prevProps.errors);
+		if (!this.isApp && mappings !== prevProps.mappings) {
+			const indices = this.form.get('indices') ? this.form.get('indices').value : [];
+			// eslint-disable-next-line
+			this.setState({
+				filteredMappings: this.getFilteredMappings(mappings, indices),
+			});
+		}
 	}
 
 	componentWillUnmount() {
@@ -206,6 +224,23 @@ class CreateCredentials extends React.Component {
 		categoriesHandler.valueChanges.unsubscribe();
 	}
 
+	getFilteredMappings = (mappings = {}, indices) => {
+		const filteredMappings = {};
+		if (Array.isArray(mappings)) {
+			return filteredMappings;
+		}
+		if (indices && Array.isArray(indices)) {
+			if (indices.length === 1 && indices[0] === '*') {
+				return mappings;
+			}
+			indices.forEach((index) => {
+				filteredMappings[index] = mappings[index];
+			});
+			return filteredMappings;
+		}
+		return mappings;
+	};
+
 	getMappings() {
 		const { appName, fetchMappings, appbaseCredentials } = this.props;
 		if (appbaseCredentials) {
@@ -222,25 +257,6 @@ class CreateCredentials extends React.Component {
 	get isEditing() {
 		const { initialValues } = this.props;
 		return !!initialValues;
-	}
-
-	// To get the filtered mappings be selected index
-	get getFilteredMappings() {
-		const { mappings } = this.props;
-		const indicesHandler = this.form.get('indices');
-		const indices = indicesHandler.value;
-		if (indices && Array.isArray(indices)) {
-			if (indices.length === 1 && indices[0] === '*') {
-				return mappings;
-			}
-			const filteredMappings = {};
-
-			indices.forEach((index) => {
-				filteredMappings[index] = mappings[index];
-			});
-			return filteredMappings;
-		}
-		return mappings;
 	}
 
 	handleSubmit = () => {
@@ -264,6 +280,7 @@ class CreateCredentials extends React.Component {
 			mappings,
 			indices,
 		} = this.props;
+		const { filteredMappings } = this.state;
 		const Messages = getMessages(isUserManagement);
 		return (
 			<FieldGroup
@@ -476,50 +493,6 @@ class CreateCredentials extends React.Component {
 											)}
 										/>
 									)}
-									{this.isApp ? null : (
-										<FieldControl
-											strict={false}
-											name="indices"
-											render={({ handler }) => {
-												const inputHandler = handler();
-												const { value } = this.form.get('indices');
-												return (
-													<Grid
-														label="Indices"
-														toolTipMessage={Messages.indices}
-														component={
-															<Select
-																placeholder="Select indices"
-																mode="multiple"
-																style={{ width: '100%' }}
-																tokenSeparators={[',']}
-																value={value}
-																{...inputHandler}
-																onChange={(val) => {
-																	inputHandler.onChange(
-																		calculateValue(val),
-																	);
-																}}
-															>
-																<Option key="*">
-																	* (Include all indices)
-																</Option>
-																{(indices || [])
-																	.filter(
-																		(i) => !i.startsWith('.'),
-																	)
-																	.map((index) => (
-																		<Select.Option key={index}>
-																			{index}
-																		</Select.Option>
-																	))}
-															</Select>
-														}
-													/>
-												);
-											}}
-										/>
-									)}
 									{!isUserManagement && (
 										<React.Fragment>
 											<Grid
@@ -563,6 +536,55 @@ class CreateCredentials extends React.Component {
 													/>
 												)}
 											/>
+											{this.isApp ? null : (
+												<FieldControl
+													strict={false}
+													name="indices"
+													render={({ handler }) => {
+														const inputHandler = handler();
+														const { value } = this.form.get('indices');
+														return (
+															<Grid
+																label="Indices"
+																toolTipMessage={Messages.indices}
+																component={
+																	<Select
+																		placeholder="Select indices"
+																		mode="multiple"
+																		style={{ width: '100%' }}
+																		tokenSeparators={[',']}
+																		value={value}
+																		{...inputHandler}
+																		onChange={(val) => {
+																			inputHandler.onChange(
+																				calculateValue(val),
+																			);
+																		}}
+																	>
+																		<Option key="*">
+																			* (Include all indices)
+																		</Option>
+																		{(indices || [])
+																			.filter(
+																				(i) =>
+																					!i.startsWith(
+																						'.',
+																					),
+																			)
+																			.map((index) => (
+																				<Select.Option
+																					key={index}
+																				>
+																					{index}
+																				</Select.Option>
+																			))}
+																	</Select>
+																}
+															/>
+														);
+													}}
+												/>
+											)}
 											<Grid
 												label="Fields Filtering"
 												toolTipMessage={Messages.fieldFiltering}
@@ -625,10 +647,9 @@ class CreateCredentials extends React.Component {
 																				return null;
 																		  })
 																		: Object.keys(
-																				this
-																					.getFilteredMappings,
+																				filteredMappings,
 																		  ).map((i) =>
-																				this.getFilteredMappings[
+																				filteredMappings[
 																					i
 																				].map((v) => {
 																					if (
@@ -729,10 +750,9 @@ class CreateCredentials extends React.Component {
 																				return null;
 																		  })
 																		: Object.keys(
-																				this
-																					.getFilteredMappings,
+																				filteredMappings,
 																		  ).map((i) =>
-																				this.getFilteredMappings[
+																				filteredMappings[
 																					i
 																				].map((v) => {
 																					if (
