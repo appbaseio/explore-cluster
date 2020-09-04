@@ -1,5 +1,6 @@
 import React from 'react';
 import { Select } from 'antd';
+import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import types from './utils/conversionMap';
 import { capitalizeFirstLetter } from './utils';
@@ -19,7 +20,7 @@ const TypeDropdown = ({ value, onTypeChange, path, usecase }) => {
 				})
 			}
 		>
-			{types[value].map((type) => (
+			{get(types, value, []).map((type) => (
 				<Option key={type} value={type}>
 					{capitalizeFirstLetter(type)}
 				</Option>
