@@ -7,7 +7,12 @@ const Footer = ({ previousScreen, disabled, app, label, nextScreen }) => (
 	<footer>
 		<div className="left-column">
 			{previousScreen ? (
-				<a className="button has-icon" style={{ marginRight: 16 }} onClick={previousScreen}>
+				<a
+					className="button has-icon"
+					style={{ marginRight: 16 }}
+					onClick={previousScreen}
+					data-cy="goto-previous-step"
+				>
 					<Icon type="left" theme="outlined" /> &nbsp; Previous
 				</a>
 			) : null}
@@ -15,6 +20,7 @@ const Footer = ({ previousScreen, disabled, app, label, nextScreen }) => (
 				<a
 					className={`button has-icon ${disabled ? 'disabled' : ''}`}
 					href={`/tutorial/finish?app=${app}`}
+					data-cy="finish-tutorial"
 				>
 					Finish &nbsp; <Icon type="right" theme="outlined" />
 				</a>
@@ -24,6 +30,7 @@ const Footer = ({ previousScreen, disabled, app, label, nextScreen }) => (
 					onClick={() => {
 						if (!disabled) nextScreen();
 					}}
+					data-cy="goto-next-step"
 				>
 					{label || 'Next'} &nbsp; <Icon type="right" theme="outlined" />
 				</a>

@@ -29,6 +29,7 @@ function SettingsFooter({
 							size="large"
 							loading={resetState.loading}
 							disabled={loading}
+							data-cy="reset-to-default"
 						>
 							Reset To Default Settings
 						</Button>

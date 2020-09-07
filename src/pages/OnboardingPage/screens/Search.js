@@ -64,7 +64,7 @@ export default class Search extends Component {
 						the UI.
 					</p>
 				</div>
-				<div className="input-wrapper">
+				<div className="input-wrapper" data-cy="searchable-field-option">
 					<Select
 						name="form-field-name"
 						value={selectedOption}
@@ -72,6 +72,8 @@ export default class Search extends Component {
 						placeholder="Select fields"
 						isMulti
 						isClearable={false}
+						inputId="searchable-fields"
+						data-cy="search-field"
 						options={[
 							{
 								value: 'original_title',

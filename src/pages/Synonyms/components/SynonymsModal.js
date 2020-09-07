@@ -207,6 +207,7 @@ class SynonymsModal extends React.Component {
 					okButtonProps={{
 						loading: isLoading,
 						disabled: this.getValidation(),
+						'data-cy': 'confirm-synonyms',
 					}}
 				>
 					<ErrorToaster>

@@ -1,0 +1,19 @@
+{
+	"projectId": "71v699",
+	"env": {
+		"arc-dashboard": {
+			"PROD": {
+				"base_url": "https://arc-dashboard.appbase.io",
+				"username": "REDACTED_USERNAME",
+				"password": "REDACTED_PASSWORD",
+				"app_url": "https://appbase-demo-ansible-abxiydt-arc.searchbase.io/"
+			},
+			"DEV": {
+				"base_url": "localhost:3333",
+				"username": "REDACTED_USERNAME",
+				"password": "REDACTED_PASSWORD",
+				"app_url": "https://appbase-demo-ansible-abxiydt-arc.searchbase.io/"
+			}
+		}
+	}
+}

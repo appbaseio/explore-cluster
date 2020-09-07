@@ -64,3 +64,8 @@ dist
 
 # sentry
 .sentryclirc
+
+
+# cypress
+cypress/videos
+cypress/screenshots
