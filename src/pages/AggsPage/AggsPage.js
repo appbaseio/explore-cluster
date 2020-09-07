@@ -674,6 +674,7 @@ class AggsPage extends React.Component {
 							</Tooltip>
 						</label>
 						<InputNumber
+							data-cy="default-aggregation-size"
 							onChange={(value) => this.handleChange('count', value)}
 							value={count}
 							min={1}
@@ -710,6 +711,7 @@ class AggsPage extends React.Component {
 							</Tooltip>
 						</label>
 						<Switch
+							data-cy="include-null-values"
 							checked={includeNullValue}
 							onChange={(value) => this.handleChange('includeNullValue', value)}
 						/>

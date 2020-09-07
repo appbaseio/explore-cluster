@@ -957,6 +957,7 @@ class SearchSettingsPage extends React.Component {
 						</label>
 						<Switch
 							checked={enableSynonyms}
+							data-cy="toggle-synonyms"
 							onChange={(value) => this.handleChange('enableSynonyms', value)}
 						/>
 
@@ -968,6 +969,7 @@ class SearchSettingsPage extends React.Component {
 						</label>
 						<Switch
 							checked={enableNgram}
+							data-cy="toggle-ngram"
 							onChange={(value) => this.handleChange('enableNgram', value)}
 						/>
 					</Card>

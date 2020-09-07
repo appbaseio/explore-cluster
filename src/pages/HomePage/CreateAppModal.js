@@ -174,7 +174,10 @@ class CreateAppModal extends Component {
 				visible={showModal}
 				onOk={this.handleOk}
 				destroyOnClose
-				okButtonProps={{ loading: createdApp.isLoading }}
+				okButtonProps={{
+					loading: createdApp.isLoading,
+					'data-cy': 'create-new-index',
+				}}
 				okText="Create Index"
 				title="Create Index"
 				onCancel={this.handleCancel}
@@ -215,6 +218,7 @@ class CreateAppModal extends Component {
 						placeholder="Enter a unique index name"
 						name="appName"
 						className={input}
+						data-cy="new-index-name"
 						onChange={this.handleChange}
 						value={appName}
 					/>

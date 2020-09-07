@@ -65,13 +65,14 @@ export default class Search extends Component {
 						updated dynamically in the UI.
 					</p>
 				</div>
-				<div className="input-wrapper">
+				<div className="input-wrapper" data-cy="aggregation-fields">
 					<Select
 						name="form-field-name"
 						value={selectedOption}
 						onChange={this.handleChange}
 						placeholder="Select aggregation fields"
 						isMulti
+						inputId="searchable-aggergation-field"
 						isClearable={false}
 						options={[
 							{
