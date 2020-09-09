@@ -5,6 +5,9 @@ import UsecaseDropdown from './UsecaseDropdown';
 import TypeDropdown from './TypeDropdown';
 import { fieldRow } from './styles';
 import MappingsTypeIcon from './MappingsTypeIcon';
+import conversionMap from './utils/conversionMap';
+
+const ALLOWED_AGGS_MAPPING = Object.keys(conversionMap);
 
 const FieldRow = ({
 	path,
@@ -24,6 +27,14 @@ const FieldRow = ({
 	}
 
 	if (hideSearchFields && usecase === 'search') {
+		return null;
+	}
+
+	if (hideSearchFields && !ALLOWED_AGGS_MAPPING.includes(type)) {
+		/*
+			hideSearchFields denotes that we only want to display aggs mappings and we
+			dont want aggs to have unsupported type like rank_feature, rank_features, etc.
+		*/
 		return null;
 	}
 

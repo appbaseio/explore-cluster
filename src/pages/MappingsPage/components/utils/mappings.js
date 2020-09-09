@@ -158,7 +158,13 @@ const _getFieldsByRelevancy = ({
 	return updatedFields;
 };
 
+const MAPPING_TYPE_WITH_NO_FIELDS = ['rank_feature', 'rank_features'];
+
 const _updateNestedMapping = ({ mapping, type, usecase, fields, currentIndex, settings }) => {
+	if (MAPPING_TYPE_WITH_NO_FIELDS.includes(type)) {
+		return mapping;
+	}
+
 	if (fields.length === currentIndex + 1) {
 		const { enableNgram, enableSynonyms, language } = settings;
 
