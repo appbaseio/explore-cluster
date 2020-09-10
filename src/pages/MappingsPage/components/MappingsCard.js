@@ -5,14 +5,24 @@ import { cardTitle } from './styles';
 import NewField from './NewField';
 import HeaderRow from './HeaderRow';
 
-const MappingsCard = ({ getMappings, setMapping, usecase, children }) => {
+const MappingsCard = ({
+	getMappings,
+	setMapping,
+	usecase,
+	children,
+	hideCardTitle,
+	cardProps,
+	headerRowProps,
+}) => {
 	return (
 		<Card
 			title={
-				<div className={cardTitle}>
-					<h4>Manage Mappings</h4>
-					<p>Add new fields or change the types of existing ones.</p>
-				</div>
+				hideCardTitle ? null : (
+					<div className={cardTitle}>
+						<h4>Manage Mappings</h4>
+						<p>Add new fields or change the types of existing ones.</p>
+					</div>
+				)
 			}
 			extra={
 				<React.Fragment>
@@ -29,22 +39,29 @@ const MappingsCard = ({ getMappings, setMapping, usecase, children }) => {
 					<NewField onAddField={setMapping} fields={Object.keys(usecase || {})} />
 				</React.Fragment>
 			}
+			{...cardProps}
 		>
-			<HeaderRow />
+			<HeaderRow {...headerRowProps} />
 			{children}
 		</Card>
 	);
 };
 
 MappingsCard.defaultProps = {
+	cardProps: {},
+	hideCardTitle: false,
+	headerRowProps: {},
 	usecase: {},
 };
 
 MappingsCard.propTypes = {
 	usecase: PropTypes.object,
+	hideCardTitle: PropTypes.bool,
 	getMappings: PropTypes.func.isRequired,
 	setMapping: PropTypes.func.isRequired,
 	children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
+	cardProps: PropTypes.object,
+	headerRowProps: PropTypes.object,
 };
 
 export default MappingsCard;

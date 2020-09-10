@@ -74,10 +74,6 @@ export const fieldRow = css`
 	${deleteRow};
 `;
 
-export const container = css`
-	padding: 50px;
-`;
-
 export const headerRow = css`
 	font-weight: 600;
 	p {

@@ -1,11 +1,22 @@
 import get from 'lodash/get';
 import omit from 'lodash/omit';
-import { getVersion } from '../../../../constants/config';
+import { getVersion, getURL } from '../../../../constants/config';
 import mappingUsecase from '../../../../batteries/utils/mappingUsecase';
 import { flatObject } from '.';
+import { getAuthHeaders } from '../../../../batteries/utils/mappings';
 
-export const getMappingsInfo = (originalMappings) => {
-	const mappings = JSON.parse(JSON.stringify(originalMappings));
+export const getMappingsInfo = ({
+	mappings: originalMappings,
+	enableNgram,
+	enableSynonyms,
+	language,
+}) => {
+	const mappings = updateSubFields({
+		mappings: originalMappings,
+		enableNgram,
+		enableSynonyms,
+		language,
+	});
 	const ES_VERSION = getVersion();
 
 	if (!ES_VERSION) {
@@ -82,11 +93,69 @@ const _getUsecase = (fields) => {
 	const hasAggsFlag = _hasAggs(fields);
 	let hasSearchFlag = 0;
 	if (fields.search || fields.autosuggest || fields.delimiter) hasSearchFlag = 1;
-
 	if (hasAggsFlag && hasSearchFlag) return 'searchaggs';
 	if (!hasAggsFlag && hasSearchFlag) return 'search';
 	if (hasAggsFlag && !hasSearchFlag) return 'aggs';
 	return 'none';
+};
+
+const _getFieldsByRelevancy = ({
+	enableNgram,
+	enableSynonyms,
+	language,
+	fields: originalFields,
+	type,
+}) => {
+	const languageField = {
+		type: 'text',
+		analyzer: language,
+	};
+	const synonymsField = {
+		analyzer: 'synonyms',
+		type: 'text',
+	};
+
+	const { synonyms, ...fields } = originalFields;
+
+	const extraFields = {
+		...(type === 'text' && enableSynonyms
+			? {
+					synonyms: synonymsField,
+			  }
+			: {}),
+		...(type === 'text' && language
+			? {
+					lang: languageField,
+			  }
+			: {}),
+	};
+
+	let updatedFields = {
+		...(fields
+			? {
+					...fields,
+					...extraFields,
+			  }
+			: { ...extraFields }),
+	};
+
+	if (enableNgram) {
+		delete updatedFields.search;
+	} else if (type === 'text') {
+		if (_getUsecase(updatedFields).includes('search') && !updatedFields.search) {
+			updatedFields = {
+				...updatedFields,
+				search: {
+					type: 'text',
+					index: 'true',
+					analyzer: 'ngram_analyzer',
+					search_analyzer: 'standard',
+				},
+			};
+		}
+	}
+
+	return updatedFields;
 };
 
 const MAPPING_TYPE_WITH_NO_FIELDS = ['rank_feature', 'rank_features'];
@@ -99,40 +168,13 @@ const _updateNestedMapping = ({ mapping, type, usecase, fields, currentIndex, se
 	if (fields.length === currentIndex + 1) {
 		const { enableNgram, enableSynonyms, language } = settings;
 
-		const languageField = {
-			type: 'text',
-			analyzer: language,
-		};
-		const synonymsField = {
-			analyzer: 'synonyms',
-			type: 'text',
-		};
-
-		const extraFields = {
-			...(type === 'text' && enableSynonyms
-				? {
-						synonyms: synonymsField,
-				  }
-				: {}),
-			...(type === 'text' && language
-				? {
-						lang: languageField,
-				  }
-				: {}),
-		};
-
-		const updatedFields = {
-			...(get(mappingUsecase, `${usecase}.fields`)
-				? {
-						...get(mappingUsecase, `${usecase}.fields`),
-						...extraFields,
-				  }
-				: { ...extraFields }),
-		};
-
-		if (enableNgram && usecase.includes('search')) {
-			delete updatedFields.search;
-		}
+		const updatedFields = _getFieldsByRelevancy({
+			enableSynonyms,
+			enableNgram,
+			language,
+			fields: get(mappingUsecase, `${usecase}.fields`),
+			type,
+		});
 
 		return {
 			...mapping,
@@ -255,3 +297,113 @@ export const getMappingsByPath = ({ mappings, path }) => {
 	const updatedPath = path.split('.').join('.properties.');
 	return get(mappings, `${TOP_FIELD}.${updatedPath}`);
 };
+
+export const updateSubFields = ({
+	mappings: originalMappings,
+	enableSynonyms,
+	enableNgram,
+	language,
+}) => {
+	const mappings = JSON.parse(JSON.stringify(originalMappings));
+	const ES_VERSION = getVersion();
+
+	let TOP_FIELD = '';
+
+	if (+ES_VERSION[0] >= 6) {
+		TOP_FIELD = '_doc.properties';
+	}
+
+	if (+ES_VERSION[0] >= 7) {
+		TOP_FIELD = 'properties';
+	}
+
+	if (!get(mappings, TOP_FIELD, null)) {
+		return mappings;
+	}
+	const mappingFields = Object.keys(get(mappings, TOP_FIELD, {}));
+
+	const updatedMappings = mappingFields.reduce((agg, field) => {
+		if (get(mappings, `properties.${field}.properties`, null)) {
+			return {
+				...agg,
+				properties: {
+					...agg.properties,
+					[field]: updateSubFields({
+						mappings: get(mappings, `properties.${field}`, {}),
+						enableSynonyms,
+						enableNgram,
+						language,
+					}),
+				},
+			};
+		}
+
+		return {
+			...agg,
+			properties: {
+				...agg.properties,
+				[field]: {
+					...get(mappings, `properties.${field}`, {}),
+					fields: {
+						..._getFieldsByRelevancy({
+							enableSynonyms,
+							enableNgram,
+							language,
+							type: get(mappings, `properties.${field}.type`),
+							fields: get(mappings, `properties.${field}.fields`, {}),
+						}),
+					},
+				},
+			},
+		};
+	}, {});
+
+	if (+ES_VERSION[0] >= 6 && +ES_VERSION[0] < 7) {
+		return {
+			_doc: {
+				...updatedMappings,
+			},
+		};
+	}
+
+	return { ...updatedMappings };
+};
+
+export function reIndex({ mappings, appName, version, credentials, settings }) {
+	const body = {
+		mappings,
+		settings,
+		es_version: version,
+	};
+
+	return new Promise((resolve, reject) => {
+		const ACC_API = getURL();
+		fetch(`${ACC_API}/_reindex/${appName}`, {
+			method: 'POST',
+			headers: {
+				...getAuthHeaders(credentials),
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(body),
+		})
+			.then((res) => {
+				if (res.status === 504) {
+					resolve('~100');
+				}
+				return res;
+			})
+			.then((res) => res.json())
+			.then((data) => {
+				if (data.error) {
+					reject(data.error);
+				}
+				if (data.code >= 400) {
+					reject(data.message);
+				}
+				resolve(data);
+			})
+			.catch((e) => {
+				reject(e);
+			});
+	});
+}

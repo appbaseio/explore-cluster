@@ -11,6 +11,8 @@ import {
 	updateMapping,
 	deleteMappingField,
 	getMappingsByPath,
+	updateSubFields,
+	reIndex,
 } from './utils/mappings';
 import { getURL, getVersion } from '../../../constants/config';
 import Loader from '../../../batteries/components/shared/Loader';
@@ -19,16 +21,13 @@ import {
 	getSettings as getSearchSettings,
 } from '../../../batteries/modules/actions';
 import { getRawMappingsByAppName } from '../../../batteries/modules/selectors';
-import { getSettings, reIndex } from '../../../batteries/utils/mappings';
+import { getSettings } from '../../../batteries/utils/mappings';
 import SearchPreviewModal from '../../../components/SearchPreviewModal';
 
-import { footerStyles, row, container } from './styles';
+import { footerStyles, row } from './styles';
 import ObjectField from './ObjectField';
 import FieldRow from './FieldRow';
 import MappingsCard from './MappingsCard';
-
-// TODO Next: Use in Search Settings
-// TODO Next: Use in Aggs Settings
 
 class Mappings extends React.Component {
 	URL = getURL();
@@ -37,9 +36,13 @@ class Mappings extends React.Component {
 
 	flattenUsecase = null;
 
+	originalMappings = null;
+
 	originalMappingsUsecase = null;
 
 	originalMappingsType = null;
+
+	originalFlattenUsecase = null;
 
 	state = {
 		usecase: {},
@@ -49,7 +52,7 @@ class Mappings extends React.Component {
 	};
 
 	componentDidMount() {
-		const { mappings, appName, fetchSearchSettings } = this.props;
+		const { mappings, appName, fetchSearchSettings, searchRelevancy } = this.props;
 
 		if (mappings) {
 			this.init(mappings);
@@ -57,13 +60,26 @@ class Mappings extends React.Component {
 			this.getMappings();
 		}
 
-		fetchSearchSettings(appName);
+		if (!searchRelevancy) fetchSearchSettings(appName);
 	}
 
-	componentDidUpdate(prevProps) {
-		const { mappings } = this.props;
+	componentDidUpdate(prevProps, prevState) {
+		const { mappings, onChange, enableSynonyms, enableNgram, language } = this.props;
+		const { rawMappings } = this.state;
 		if (JSON.stringify(mappings) !== JSON.stringify(prevProps.mappings)) {
 			this.init(mappings);
+		}
+
+		if (
+			enableNgram !== prevProps.enableNgram ||
+			enableSynonyms !== prevProps.enableSynonyms ||
+			language !== prevProps.language
+		) {
+			this.updateFields();
+		}
+
+		if (onChange && JSON.stringify(rawMappings) !== JSON.stringify(prevState.rawMappings)) {
+			onChange();
 		}
 	}
 
@@ -75,17 +91,31 @@ class Mappings extends React.Component {
 	};
 
 	init = (mappings) => {
-		const { usecase, flattenType, flattenUsecase, type } = getMappingsInfo(mappings);
-		this.flattenType = flattenType;
-		this.flattenUsecase = flattenUsecase;
-		this.originalMappingsUsecase = usecase;
-		this.originalMappingsType = type;
-		// eslint-disable-next-line
-		this.setState({
-			usecase,
-			type,
-			rawMappings: mappings,
+		const { enableNgram, enableSynonyms, language } = this.props;
+		const { usecase, flattenType, flattenUsecase, type } = getMappingsInfo({
+			mappings,
+			enableNgram,
+			enableSynonyms,
+			language,
 		});
+		this.flattenType = flattenType;
+		this.originalFlattenMappingsType = flattenType;
+		this.originalMappingsType = type;
+
+		this.flattenUsecase = flattenUsecase;
+		this.originalFlattenUsecase = flattenUsecase;
+		this.originalMappingsUsecase = usecase;
+
+		this.originalMappings = mappings;
+		// eslint-disable-next-line
+		this.setState(
+			{
+				usecase,
+				type,
+				rawMappings: mappings,
+			},
+			this.updateFields,
+		);
 	};
 
 	setMapping = ({ usecase, path, type }) => {
@@ -131,6 +161,20 @@ class Mappings extends React.Component {
 		});
 	};
 
+	updateFields = () => {
+		const { mappings, enableSynonyms, enableNgram, language } = this.props;
+
+		const updatedMappings = updateSubFields({
+			mappings,
+			enableSynonyms,
+			enableNgram,
+			language,
+		});
+		this.setState({
+			rawMappings: updatedMappings,
+		});
+	};
+
 	handleDelete = (path) => {
 		const { usecase, type, rawMappings } = this.state;
 		this.flattenType = omit(this.flattenType, path);
@@ -147,7 +191,7 @@ class Mappings extends React.Component {
 	};
 
 	handleReindex = async () => {
-		const { appName, credentials, enableNgram } = this.props;
+		const { appName, credentials } = this.props;
 		const { rawMappings } = this.state;
 
 		this.setState({
@@ -161,15 +205,14 @@ class Mappings extends React.Component {
 		const startTime = Date.now();
 		reIndex({
 			mappings: rawMappings,
-			appId: appName,
+			appName,
 			version: getVersion(),
 			credentials,
 			settings: {
 				analysis: {
-					...get(appSettings, 'analysis'),
+					...get(appSettings, 'index.analysis'),
 				},
 			},
-			enableNgram,
 		})
 			.then(this.onSuccessfulReindex)
 			.catch((err) => {
@@ -207,6 +250,9 @@ class Mappings extends React.Component {
 
 	cancelChanges = () => {
 		const { mappings } = this.props;
+		this.flattenUsecase = this.originalFlattenUsecase;
+		this.flattenType = this.originalFlattenMappingsType;
+
 		this.setState({
 			rawMappings: mappings,
 			usecase: this.originalMappingsUsecase,
@@ -215,6 +261,7 @@ class Mappings extends React.Component {
 	};
 
 	renderMapping = ({ usecase, type, path = '', rawMappings, init = false }) => {
+		const { hideAggsFields, hideSearchFields, hideTypeColumn, renderColumn } = this.props;
 		if (!usecase) {
 			return null;
 		}
@@ -256,52 +303,62 @@ class Mappings extends React.Component {
 					path={`${path}${field}`}
 					setMapping={this.setMapping}
 					onDelete={this.handleDelete}
+					hideAggsFields={hideAggsFields}
+					hideSearchFields={hideSearchFields}
+					hideTypeColumn={hideTypeColumn}
+					renderColumn={renderColumn}
 				/>
 			);
 		});
 	};
 
 	render() {
-		const { isFetchingMapping, error, appName } = this.props;
+		const {
+			isFetchingMapping,
+			error,
+			appName,
+			hideCardTitle,
+			hideFooter,
+			cardProps,
+			headerRowProps,
+		} = this.props;
 		const { usecase, type, isReindexing, rawMappings } = this.state;
 		const hasMappingsChanged =
 			JSON.stringify(usecase) !== JSON.stringify(this.originalMappingsUsecase) ||
 			JSON.stringify(type) !== JSON.stringify(this.originalMappingsType);
 
+		const mappingCardProps = {
+			getMappings: this.getMappings,
+			hideCardTitle,
+			setMapping: this.setMapping,
+			cardProps,
+			headerRowProps,
+		};
+
 		if (isFetchingMapping) {
 			return (
-				<div className={container}>
-					<MappingsCard getMappings={this.getMappings} setMapping={this.setMapping}>
-						<Skeleton />
-					</MappingsCard>
-				</div>
+				<MappingsCard {...mappingCardProps}>
+					<Skeleton />
+				</MappingsCard>
 			);
 		}
 
 		if (error) {
 			return (
-				<div className={container}>
-					<MappingsCard getMappings={this.getMappings} setMapping={this.setMapping}>
-						<Row>
-							<Alert
-								type="error"
-								message={
-									error.message || <pre>{JSON.stringify(error, null, 4)}</pre>
-								}
-							/>
-						</Row>
-					</MappingsCard>
-				</div>
+				<MappingsCard {...mappingCardProps}>
+					<Row>
+						<Alert
+							type="error"
+							message={error.message || <pre>{JSON.stringify(error, null, 4)}</pre>}
+						/>
+					</Row>
+				</MappingsCard>
 			);
 		}
 
 		return (
-			<div className={container}>
-				<MappingsCard
-					getMappings={this.getMappings}
-					usecase={usecase}
-					setMapping={this.setMapping}
-				>
+			<React.Fragment>
+				<MappingsCard {...mappingCardProps} usecase={usecase}>
 					<Row className={row}>
 						{this.renderMapping({
 							usecase,
@@ -312,30 +369,32 @@ class Mappings extends React.Component {
 					</Row>
 				</MappingsCard>
 				<Loader show={isReindexing} message="Re-indexing your data... Please wait!" />
-				<Affix offsetBottom={0}>
-					<div className={footerStyles}>
-						<SearchPreviewModal app={appName} />
-						<div>
-							<Button
-								type="primary"
-								size="large"
-								style={{ margin: '0 10px' }}
-								onClick={this.handleReindex}
-								disabled={!hasMappingsChanged}
-							>
-								Confirm Mapping Changes
-							</Button>
-							<Button
-								size="large"
-								disabled={!hasMappingsChanged}
-								onClick={this.cancelChanges}
-							>
-								Cancel
-							</Button>
+				{hideFooter ? null : (
+					<Affix offsetBottom={0}>
+						<div className={footerStyles}>
+							<SearchPreviewModal app={appName} />
+							<div>
+								<Button
+									type="primary"
+									size="large"
+									style={{ margin: '0 10px' }}
+									onClick={this.handleReindex}
+									disabled={!hasMappingsChanged}
+								>
+									Confirm Mapping Changes
+								</Button>
+								<Button
+									size="large"
+									disabled={!hasMappingsChanged}
+									onClick={this.cancelChanges}
+								>
+									Cancel
+								</Button>
+							</div>
 						</div>
-					</div>
-				</Affix>
-			</div>
+					</Affix>
+				)}
+			</React.Fragment>
 		);
 	}
 }
@@ -349,6 +408,18 @@ Mappings.propTypes = {
 	enableNgram: PropTypes.bool,
 	enableSynonyms: PropTypes.bool,
 	language: PropTypes.string,
+	searchRelevancy: PropTypes.object,
+	// Search & Aggs Settings specific Props
+	hideCardTitle: PropTypes.bool,
+	hideAggsFields: PropTypes.bool,
+	hideSearchFields: PropTypes.bool,
+	hideTypeColumn: PropTypes.bool,
+	renderColumn: PropTypes.func,
+	onChange: PropTypes.func,
+	hideFooter: PropTypes.bool,
+	cardProps: PropTypes.object,
+	headerRowProps: PropTypes.object,
+	// Actions
 	fetchMappings: PropTypes.func.isRequired,
 	fetchSearchSettings: PropTypes.func.isRequired,
 };
@@ -360,15 +431,33 @@ Mappings.defaultProps = {
 	enableNgram: true,
 	enableSynonyms: true,
 	language: 'universal',
+	searchRelevancy: null,
+	// Search & Aggs Settings specific Props
+	hideCardTitle: false,
+	hideAggsFields: false,
+	hideSearchFields: false,
+	hideTypeColumn: false,
+	hideFooter: false,
+	cardProps: {},
+	headerRowProps: {},
+	renderColumn: null,
+	onChange: null,
 };
 
 const mapStateToProps = (state, props) => {
 	const { appName } = props;
 	const { username, password } = get(state, 'user.data', {});
-	const defaultSettings = get(state.$getAppSettings, `defaultSettings`);
+	const defaultSettings = get(state, `$getAppSettings.defaultSettings`);
+	const errorCode = get(state, '$getAppSettings.error.actual.code');
+	const defaultSearchSettings = errorCode === 404 ? defaultSettings : null;
 	return {
 		appName,
 		mappings: getRawMappingsByAppName(state) || null,
+		searchRelevancy: get(
+			state,
+			['$getAppSettings', 'settings', appName],
+			defaultSearchSettings,
+		),
 		isFetchingMapping: get(state, '$getAppMappings.isFetching'),
 		error: get(state, '$getAppMappings.error', null),
 		credentials: username ? `${username}:${password}` : null,
@@ -402,4 +491,4 @@ const mapDispatchToProps = (dispatch) => ({
 	fetchSearchSettings: (name) => dispatch(getSearchSettings(name)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Mappings);
+export default connect(mapStateToProps, mapDispatchToProps, null, { withRef: true })(Mappings);
