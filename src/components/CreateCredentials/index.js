@@ -70,6 +70,9 @@ class CreateCredentials extends React.Component {
 		this.isApp = !window.location.pathname.startsWith(
 			props.isUserManagement ? '/cluster/user-management' : '/cluster/credentials',
 		);
+		this.state = {
+			filteredMappings: {},
+		};
 
 		this.form = props.isUserManagement
 			? FormBuilder.group({
@@ -117,11 +120,22 @@ class CreateCredentials extends React.Component {
 	}
 
 	componentDidMount() {
-		const { disabled, initialValues, isUserManagement } = this.props;
+		const { disabled, initialValues, isUserManagement, appbaseCredentials } = this.props;
+		if (appbaseCredentials) {
+			this.getMappings();
+		}
+		const indicesHandler = this.form.get('indices');
+		if (!this.isApp) {
+			indicesHandler.valueChanges.subscribe((indices) => {
+				const { mappings } = this.props;
+				this.setState({
+					filteredMappings: this.getFilteredMappings(mappings, indices),
+				});
+			});
+		}
 		if (disabled) {
 			this.form.disable();
 		} else {
-			const indicesHandler = this.form.get('indices');
 			const adminHandler = this.form.get('isAdmin');
 			const opsHandler = this.form.get('operationType');
 			const categoriesHandler = this.form.get('categories');
@@ -165,16 +179,28 @@ class CreateCredentials extends React.Component {
 		if (initialValues) {
 			this.form.patchValue(
 				mapValuesToForm(JSON.parse(JSON.stringify(initialValues)), !isUserManagement),
+				{
+					emitEvent: !isUserManagement,
+				},
 			);
+			// Disable the password handler to avoid re-setting the password in patch request
+			if (isUserManagement) {
+				const categoriesHandler = this.form.get('password');
+				categoriesHandler.disable();
+			}
 		}
 	}
 
 	componentDidUpdate(prevProps) {
-		const { errors, credentials } = this.props;
-		if (credentials && credentials !== prevProps.credentials) {
-			// this.getMappings();
-		}
+		const { errors, mappings } = this.props;
 		displayErrors(errors, prevProps.errors);
+		if (!this.isApp && mappings !== prevProps.mappings) {
+			const indices = this.form.get('indices') ? this.form.get('indices').value : [];
+			// eslint-disable-next-line
+			this.setState({
+				filteredMappings: this.getFilteredMappings(mappings, indices),
+			});
+		}
 	}
 
 	componentWillUnmount() {
@@ -198,12 +224,28 @@ class CreateCredentials extends React.Component {
 		categoriesHandler.valueChanges.unsubscribe();
 	}
 
+	getFilteredMappings = (mappings = {}, indices) => {
+		const filteredMappings = {};
+		if (Array.isArray(mappings)) {
+			return filteredMappings;
+		}
+		if (indices && Array.isArray(indices)) {
+			if (indices.length === 1 && indices[0] === '*') {
+				return mappings;
+			}
+			indices.forEach((index) => {
+				filteredMappings[index] = mappings[index];
+			});
+			return filteredMappings;
+		}
+		return mappings;
+	};
+
 	getMappings() {
-		const { appName, fetchMappings, credentials } = this.props;
-		if (credentials) {
+		const { appName, fetchMappings, appbaseCredentials } = this.props;
+		if (appbaseCredentials) {
 			// Fetch Mappings if permissions are present
-			const { username, password } = credentials;
-			fetchMappings(appName, `${username}:${password}`);
+			fetchMappings(appName, appbaseCredentials);
 		}
 	}
 
@@ -235,8 +277,10 @@ class CreateCredentials extends React.Component {
 			saveButtonText,
 			isLoadingMappings,
 			isUserManagement,
+			mappings,
 			indices,
 		} = this.props;
+		const { filteredMappings } = this.state;
 		const Messages = getMessages(isUserManagement);
 		return (
 			<FieldGroup
@@ -449,50 +493,6 @@ class CreateCredentials extends React.Component {
 											)}
 										/>
 									)}
-									{this.isApp ? null : (
-										<FieldControl
-											strict={false}
-											name="indices"
-											render={({ handler }) => {
-												const inputHandler = handler();
-												const { value } = this.form.get('indices');
-												return (
-													<Grid
-														label="Indices"
-														toolTipMessage={Messages.indices}
-														component={
-															<Select
-																placeholder="Select indices"
-																mode="multiple"
-																style={{ width: '100%' }}
-																tokenSeparators={[',']}
-																value={value}
-																{...inputHandler}
-																onChange={(val) => {
-																	inputHandler.onChange(
-																		calculateValue(val),
-																	);
-																}}
-															>
-																<Option key="*">
-																	* (Include all indices)
-																</Option>
-																{(indices || [])
-																	.filter(
-																		(i) => !i.startsWith('.'),
-																	)
-																	.map((index) => (
-																		<Select.Option key={index}>
-																			{index}
-																		</Select.Option>
-																	))}
-															</Select>
-														}
-													/>
-												);
-											}}
-										/>
-									)}
 									{!isUserManagement && (
 										<React.Fragment>
 											<Grid
@@ -536,6 +536,55 @@ class CreateCredentials extends React.Component {
 													/>
 												)}
 											/>
+											{this.isApp ? null : (
+												<FieldControl
+													strict={false}
+													name="indices"
+													render={({ handler }) => {
+														const inputHandler = handler();
+														const { value } = this.form.get('indices');
+														return (
+															<Grid
+																label="Indices"
+																toolTipMessage={Messages.indices}
+																component={
+																	<Select
+																		placeholder="Select indices"
+																		mode="multiple"
+																		style={{ width: '100%' }}
+																		tokenSeparators={[',']}
+																		value={value}
+																		{...inputHandler}
+																		onChange={(val) => {
+																			inputHandler.onChange(
+																				calculateValue(val),
+																			);
+																		}}
+																	>
+																		<Option key="*">
+																			* (Include all indices)
+																		</Option>
+																		{(indices || [])
+																			.filter(
+																				(i) =>
+																					!i.startsWith(
+																						'.',
+																					),
+																			)
+																			.map((index) => (
+																				<Select.Option
+																					key={index}
+																				>
+																					{index}
+																				</Select.Option>
+																			))}
+																	</Select>
+																}
+															/>
+														);
+													}}
+												/>
+											)}
 											<Grid
 												label="Fields Filtering"
 												toolTipMessage={Messages.fieldFiltering}
@@ -545,6 +594,10 @@ class CreateCredentials extends React.Component {
 												name="include_fields"
 												render={({ handler }) => {
 													const inputHandler = handler();
+													const excludedFields = this.form.get(
+														'exclude_fields',
+													).value;
+													const uniqueMappings = {};
 													return (
 														<Grid
 															label={
@@ -556,9 +609,11 @@ class CreateCredentials extends React.Component {
 															component={
 																<Select
 																	placeholder="Select field value"
-																	mode="tags"
+																	mode="multiple"
 																	notFoundContent={null}
-																	style={{ width: '100%' }}
+																	style={{
+																		width: '100%',
+																	}}
 																	tokenSeparators={[',']}
 																	{...inputHandler}
 																	value={inputHandler.value || []}
@@ -571,6 +626,80 @@ class CreateCredentials extends React.Component {
 																	<Option key="*">
 																		* (Include all fields)
 																	</Option>
+																	{this.isApp
+																		? mappings.map((v) => {
+																				if (
+																					!(
+																						excludedFields ||
+																						[]
+																					).includes(v)
+																				) {
+																					return (
+																						<Option
+																							key={v}
+																							title={
+																								v
+																							}
+																						>
+																							{v}
+																						</Option>
+																					);
+																				}
+																				return null;
+																		  })
+																		: Object.keys(
+																				filteredMappings,
+																		  ).map((i) =>
+																				filteredMappings[
+																					i
+																				].map((v) => {
+																					// duplicate keys cause re-rendering issues
+																					if (
+																						uniqueMappings[
+																							v
+																						]
+																					) {
+																						return null;
+																					}
+																					uniqueMappings[
+																						v
+																					] = true;
+																					if (
+																						!(
+																							excludedFields ||
+																							[]
+																						).includes(
+																							v,
+																						)
+																					) {
+																						return (
+																							<Option
+																								key={
+																									v
+																								}
+																								value={
+																									v
+																								}
+																								title={
+																									v
+																								}
+																							>
+																								{v}
+																								<span
+																									css={
+																										styles.fieldBadge
+																									}
+																								>
+																									{
+																										i
+																									}
+																								</span>
+																							</Option>
+																						);
+																					}
+																					return null;
+																				}),
+																		  )}
 																</Select>
 															}
 														/>
@@ -582,6 +711,10 @@ class CreateCredentials extends React.Component {
 												name="exclude_fields"
 												render={({ handler }) => {
 													const inputHandler = handler();
+													const includedFields = this.form.get(
+														'include_fields',
+													).value;
+													const uniqueMappings = {};
 													return (
 														<Grid
 															label={
@@ -593,7 +726,7 @@ class CreateCredentials extends React.Component {
 															component={
 																<Select
 																	placeholder="Select field value"
-																	mode="tags"
+																	mode="multiple"
 																	notFoundContent={null}
 																	style={{ width: '100%' }}
 																	{...inputHandler}
@@ -607,6 +740,77 @@ class CreateCredentials extends React.Component {
 																	<Option key="*">
 																		* (Exclude all fields)
 																	</Option>
+																	{this.isApp
+																		? mappings.map((v) => {
+																				if (
+																					!(
+																						includedFields ||
+																						[]
+																					).includes(v)
+																				) {
+																					return (
+																						<Option
+																							key={v}
+																							title={
+																								v
+																							}
+																						>
+																							{v}
+																						</Option>
+																					);
+																				}
+																				return null;
+																		  })
+																		: Object.keys(
+																				filteredMappings,
+																		  ).map((i) =>
+																				filteredMappings[
+																					i
+																				].map((v) => {
+																					// duplicate keys cause re-rendering issues
+																					if (
+																						uniqueMappings[
+																							v
+																						]
+																					) {
+																						return null;
+																					}
+																					uniqueMappings[
+																						v
+																					] = true;
+																					if (
+																						!(
+																							includedFields ||
+																							[]
+																						).includes(
+																							v,
+																						)
+																					) {
+																						return (
+																							<Option
+																								key={
+																									v
+																								}
+																								title={
+																									v
+																								}
+																							>
+																								{v}
+																								<span
+																									css={
+																										styles.fieldBadge
+																									}
+																								>
+																									{
+																										i
+																									}
+																								</span>
+																							</Option>
+																						);
+																					}
+																					return null;
+																				}),
+																		  )}
 																</Select>
 															}
 														/>
@@ -689,6 +893,7 @@ CreateCredentials.defaultProps = {
 	permissions: undefined,
 	titleText: undefined,
 	isUserManagement: false,
+	mappings: [],
 	indices: [],
 };
 CreateCredentials.propTypes = {
@@ -720,16 +925,22 @@ CreateCredentials.propTypes = {
 	plan: PropTypes.oneOf(['free', 'growth', 'bootstrap']).isRequired,
 	titleText: PropTypes.string,
 	isUserManagement: PropTypes.bool,
-	credentials: PropTypes.string.isRequired,
+	appbaseCredentials: PropTypes.string.isRequired,
 	fetchMappings: PropTypes.func.isRequired,
+	mappings: PropTypes.oneOfType([
+		PropTypes.array,
+		PropTypes.object, // at cluster level
+	]),
 	indices: PropTypes.array,
 };
 
 const mapStateToProps = (state) => {
 	const mappings = getTraversedMappingsByAppName(state);
 	const appPermissions = getAppPermissionsByName(state);
+	const { username, password } = get(state, 'user.data', {});
 	const indices = get(state, 'apps.data');
 	return {
+		appbaseCredentials: username ? `${username}:${password}` : null,
 		isPaidUser: true,
 		appName: get(state, '$getCurrentApp.name'),
 		mappings: mappings || [],
@@ -737,7 +948,6 @@ const mapStateToProps = (state) => {
 		indices: Object.keys(indices || {}),
 		isLoadingMappings:
 			get(state, '$getAppMappings.isFetching') || get(state, '$getAppPermissions.isFetching'),
-		credentials: get(appPermissions, 'credentials.credentials'),
 		plan: 'growth',
 		isSubmitting:
 			get(state, '$createAppPermission.isFetching') ||

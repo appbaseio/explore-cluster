@@ -176,10 +176,10 @@ class UserManagementPage extends React.Component {
 								<Paragraph
 									strong
 									copyable={{
-										text: `https://arc-dashboard.appbase.io?url=${getURL()}`,
+										text: `https://dash.appbase.io?url=${getURL()}`,
 									}}
 								>
-									{`https://arc-dashboard.appbase.io?url=${getURL()}`}
+									{`https://dash.appbase.io?url=${getURL()}`}
 								</Paragraph>
 							</React.Fragment>
 						}

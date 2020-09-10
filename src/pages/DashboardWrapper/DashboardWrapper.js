@@ -85,7 +85,7 @@ const defaultRoutes = {
 		icon: 'rise',
 		link: '/cluster/curated-insights',
 	},
-	Security: {
+	'Access Control': {
 		icon: 'key',
 		menu: [
 			{ label: 'API Credentials', link: '/cluster/credentials' },

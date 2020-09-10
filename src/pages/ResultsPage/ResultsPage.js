@@ -203,6 +203,7 @@ class ResultsPage extends React.Component {
 						tokenSeparators={[',']}
 						disabled={getDisabled(excludeFields)}
 						value={includeFields}
+						data-cy="include-fields"
 						onChange={(value) =>
 							this.setState({ includeFields: calculateValue(value) })
 						}
@@ -240,6 +241,7 @@ class ResultsPage extends React.Component {
 						onChange={(value) =>
 							this.setState({ excludeFields: calculateValue(value) })
 						}
+						data-cy="exclude-fields"
 					>
 						<Select.Option key="*">* (Exclude all fields)</Select.Option>
 						{(mappings || []).map((v) => {
@@ -408,6 +410,7 @@ class ResultsPage extends React.Component {
 											placeholder="Enter page size"
 											min={0}
 											max={1000}
+											data-cy="result-page-size"
 										/>,
 									)}
 								</Form.Item>
@@ -420,7 +423,7 @@ class ResultsPage extends React.Component {
 								<div style={{ paddingBottom: 32 }}>
 									<label style={{ marginRight: 10 }}>Enable Highlighting</label>
 									{getFieldDecorator('highlight', { valuePropName: 'checked' })(
-										<Switch />,
+										<Switch data-cy="enable-highlight" />,
 									)}
 								</div>
 
