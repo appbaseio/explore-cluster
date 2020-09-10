@@ -123,7 +123,7 @@ const renderResultList = () => (
 		{({ data }) => (
 			<ResultListWrapper>
 				{data.map((item) => (
-					<ResultList key={item._id}>
+					<ResultList key={item._id} id={item._id}>
 						<ResultList.Image src={item.poster_path} />
 						<ResultList.Content>
 							<ResultList.Title

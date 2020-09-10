@@ -504,7 +504,11 @@ class Synonyms extends React.Component {
 										resetInputOnClose
 										renderButton={({ handleModal }) => {
 											return (
-												<Button onClick={handleModal} type="primary">
+												<Button
+													onClick={handleModal}
+													type="primary"
+													data-cy="add-synonyms"
+												>
 													Add Synonyms
 												</Button>
 											);

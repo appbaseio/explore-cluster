@@ -5,7 +5,7 @@ const Loader = ({ show, label }) => {
 	if (!show) return null;
 
 	return (
-		<div className="loader">
+		<div className="loader" data-cy="loader">
 			<p>{label}</p>
 		</div>
 	);

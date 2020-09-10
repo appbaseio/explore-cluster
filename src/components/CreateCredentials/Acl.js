@@ -71,12 +71,12 @@ class Acl extends React.PureComponent {
 
 Acl.defaultProps = {
 	isRateLimitPresent: true,
-	control: PropTypes.object,
+	control: {},
 };
 
 Acl.propTypes = {
 	isRateLimitPresent: PropTypes.bool,
-	control: {},
+	control: PropTypes.object,
 };
 
 export default Acl;

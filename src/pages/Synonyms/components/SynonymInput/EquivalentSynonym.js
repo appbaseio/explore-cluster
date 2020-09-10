@@ -22,6 +22,7 @@ const EquivalentSynonym = (props) => {
 				placeholder="Add comma separated synonyms"
 				onChange={handleChange}
 				tokenSeparators={[',']}
+				data-cy="synonyms-input"
 			/>
 		</React.Fragment>
 	);

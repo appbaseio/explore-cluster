@@ -44,7 +44,7 @@ class ReviewAndSave extends React.Component {
 			<Button key="back" onClick={onRevert}>
 				Revert Changes
 			</Button>,
-			<Button key="submit" type="primary" onClick={onSave}>
+			<Button key="submit" type="primary" onClick={onSave} data-cy="review-and-save">
 				{isReset ? 'Reset To Default Settings' : 'Review and Save'}
 			</Button>,
 		];
@@ -58,6 +58,7 @@ class ReviewAndSave extends React.Component {
 					loading={loading}
 					disabled={!isDifferent}
 					{...buttonProps}
+					data-cy="initiate-search-setting-change-request"
 				>
 					Review and Save
 				</Button>

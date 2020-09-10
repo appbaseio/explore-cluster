@@ -164,7 +164,7 @@ class Credentials extends Component {
 	};
 
 	render() {
-		const { showCredForm, currentPermissionInfo, mappings, deleteModal } = this.state;
+		const { showCredForm, currentPermissionInfo, deleteModal } = this.state;
 		const { isLoading, permissions, isOwner, location, appName, appId, isAdmin } = this.props;
 		if (isLoading) {
 			return <Loader />;
@@ -236,7 +236,6 @@ class Credentials extends Component {
 							onSubmit={this.handleSubmit}
 							show={showCredForm}
 							handleCancel={this.handleCancel}
-							mappings={mappings}
 							initialValues={currentPermissionInfo}
 						/>
 					</ErrorToaster>

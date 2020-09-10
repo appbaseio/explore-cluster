@@ -526,15 +526,29 @@ export function getReIndexedName(appName) {
 	return newName;
 }
 
-export function getSubFields({ fields, weight, address }) {
+export function getSubFields({
+	fields,
+	weight,
+	address,
+	skipSearch = false,
+	skipSynonyms = false,
+	skipLang = false,
+}) {
 	if (fields) {
 		const fieldsToMap = Array.isArray(fields) ? fields : Object.keys(fields);
-		const subFields = fieldsToMap.reduce((agg, field) => {
-			return {
-				...agg,
-				[`${address}.${field}`]: getFieldWeight(field, weight),
-			};
-		}, {});
+		const subFields = fieldsToMap
+			.filter((field) => {
+				if (skipSearch && field === 'search') return false;
+				if (skipSynonyms && field === 'synonyms') return false;
+				if (skipLang && field === 'lang') return false;
+				return true;
+			})
+			.reduce((agg, field) => {
+				return {
+					...agg,
+					[`${address}.${field}`]: getFieldWeight(field, weight),
+				};
+			}, {});
 
 		return { [address]: weight, ...subFields };
 	}

@@ -113,7 +113,7 @@ class HomePage extends Component {
 					<Header>
 						<Row type="flex" justify="space-between" gutter={16}>
 							<Col lg={18}>
-								<h2>Howdy, welcome to your dashboard!</h2>
+								<h2 data-cy="welcome-message">Howdy, welcome to your dashboard!</h2>
 
 								<Row>
 									<Col lg={18}>
@@ -161,6 +161,7 @@ class HomePage extends Component {
 									type="primary"
 									block
 									onClick={this.handleChange}
+									data-cy="initialize-new-index-creation"
 								>
 									<Icon type="plus" /> Create a new index
 								</Button>
