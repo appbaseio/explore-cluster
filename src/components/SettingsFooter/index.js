@@ -2,43 +2,76 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Affix, Button } from 'antd';
 import SearchPreviewModal from '../SearchPreviewModal';
+import CloneIndex from '../CloneIndex';
 
-function SettingsFooter({
-	loading,
-	resetState,
-	onReset,
-	reviewAndSave = () => {},
-	showSearchPreview,
-	searchPreviewModalProps,
-	app,
-	showReset = true,
-}) {
-	return (
-		<Affix offsetBottom={0}>
-			<div className="flex space-between card-footer">
-				{app && showSearchPreview ? (
-					<SearchPreviewModal {...searchPreviewModalProps} app={app} />
-				) : (
-					<div />
-				)}
-				<div>
-					{showReset && (
-						<Button
-							onClick={onReset}
-							style={{ marginRight: 10 }}
-							size="large"
-							loading={resetState.loading}
-							disabled={loading}
-							data-cy="reset-to-default"
-						>
-							Reset To Default Settings
-						</Button>
-					)}
-					{reviewAndSave()}
+class SettingsFooter extends React.Component {
+	state = {
+		copySettingsModal: false,
+	};
+
+	toggleCopySettingsModal = () => {
+		this.setState((state) => ({
+			copySettingsModal: !state.copySettingsModal,
+		}));
+	};
+
+	render() {
+		const {
+			loading,
+			resetState,
+			onReset,
+			reviewAndSave = () => {},
+			showSearchPreview,
+			searchPreviewModalProps,
+			app,
+			showCopySettings,
+			showReset,
+		} = this.props;
+
+		const { copySettingsModal } = this.state;
+		return (
+			<Affix offsetBottom={0}>
+				<div className="flex space-between card-footer">
+					<div>
+						{app && showSearchPreview ? (
+							<SearchPreviewModal {...searchPreviewModalProps} app={app} />
+						) : null}
+						{app && showCopySettings ? (
+							<React.Fragment>
+								<Button
+									onClick={this.toggleCopySettingsModal}
+									style={{ marginLeft: 10 }}
+									size="large"
+								>
+									Copy Search Settings
+								</Button>
+								{copySettingsModal ? (
+									<CloneIndex
+										handleCancel={this.toggleCopySettingsModal}
+										index={app}
+									/>
+								) : null}
+							</React.Fragment>
+						) : null}
+					</div>
+					<div>
+						{showReset && (
+							<Button
+								onClick={onReset}
+								style={{ marginRight: 10 }}
+								size="large"
+								loading={resetState.loading}
+								disabled={loading}
+							>
+								Reset To Default Settings
+							</Button>
+						)}
+						{reviewAndSave()}
+					</div>
 				</div>
-			</div>
-		</Affix>
-	);
+			</Affix>
+		);
+	}
 }
 
 SettingsFooter.propTypes = {
@@ -50,6 +83,7 @@ SettingsFooter.propTypes = {
 	showSearchPreview: PropTypes.bool,
 	app: PropTypes.string,
 	showReset: PropTypes.bool,
+	showCopySettings: PropTypes.bool,
 };
 
 SettingsFooter.defaultProps = {
@@ -60,6 +94,7 @@ SettingsFooter.defaultProps = {
 	showSearchPreview: false,
 	app: undefined,
 	showReset: true,
+	showCopySettings: false,
 };
 
 export default SettingsFooter;

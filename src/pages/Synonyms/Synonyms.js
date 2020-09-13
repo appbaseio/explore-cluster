@@ -543,7 +543,12 @@ class Synonyms extends React.Component {
 						</ReactiveBase>
 					</Card>
 					{synonyms.length > 0 ? (
-						<SettingsFooter app={appName} showReset={false} showSearchPreview />
+						<SettingsFooter
+							showCopySettings
+							app={appName}
+							showReset={false}
+							showSearchPreview
+						/>
 					) : null}
 				</div>
 				{uploadVisible && (
