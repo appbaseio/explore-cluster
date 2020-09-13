@@ -8,6 +8,7 @@ import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 const bannerMessage = {
 	title: 'Schema Settings',
 	buttonText: 'Read Docs',
+	videoLink: 'https://youtu.be/ejk2wybEwoc',
 	description: 'View mappings, edit use-case and data types, add or delete fields',
 	href: 'https://docs.appbase.io/docs/search/relevancy/#schema',
 };

@@ -46,6 +46,7 @@ import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster
 const bannerDetails = {
 	title: 'Language Settings',
 	buttonText: 'Read More',
+	videoLink: 'https://youtu.be/wx8ac4IkTas',
 	icon: 'pencil',
 	href: 'https://docs.appbase.io/docs/search/relevancy/#language-settings',
 };
@@ -54,6 +55,7 @@ const bannerMessage = {
 	title: 'Language Settings',
 	description: 'Language Settings let you apply a specific language for your search index.',
 	buttonText: 'Read Docs',
+	videoLink: 'https://youtu.be/wx8ac4IkTas',
 	href: 'https://docs.appbase.io/docs/search/relevancy/#language-settings',
 };
 

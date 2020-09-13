@@ -29,12 +29,18 @@ import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster
 const bannerDetails = {
 	title: 'Result Settings',
 	buttonText: 'Read More',
+	description:
+		'Result settings allow you to control the page size, fields returned, and highlighting settings.',
+	videoLink: 'https://youtu.be/EtqBS6egIfU',
 	icon: 'pencil',
 	href: 'https://docs.appbase.io/docs/search/relevancy/#result-settings',
 };
 
 const bannerMessage = {
 	title: 'Result Settings',
+	videoLink: 'https://youtu.be/EtqBS6egIfU',
+	description:
+		'Result settings allow you to control the page size, fields returned, and highlighting settings.',
 	buttonText: 'Read Docs',
 	href: 'https://docs.appbase.io/docs/search/relevancy/#result-settings',
 };

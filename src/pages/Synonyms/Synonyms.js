@@ -320,6 +320,7 @@ class Synonyms extends React.Component {
 		const bannerMessage = {
 			title: 'Manage Synonyms',
 			buttonText: 'Read Docs',
+			videoLink: 'https://youtu.be/FA6knNSaChA',
 			href: 'https://docs.appbase.io/docs/search/relevancy/#synonyms',
 		};
 
