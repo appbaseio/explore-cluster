@@ -13,12 +13,14 @@ const bannerMessagesAnalytics = {
 		description:
 			'Get a paid plan to see actionable analytics on search volume, popular searches, no results, track clicks and conversions.',
 		buttonText: 'Upgrade Now',
+		videoLink: 'https://youtu.be/o3ewnIrVE3o',
 		href: 'billing',
 	},
 	bootstrap: {
 		title: 'Get richer analytics on clicks and conversions',
 		description:
 			'By upgrading to the Growth plan, you can track clicks and conversions, get a 30-day retention on analytics along with being able to view actionable analytics on popular filters, popular results, search latency and geo distribution.',
+		videoLink: 'https://youtu.be/cjGSWj9LehM',
 		buttonText: 'Upgrade To Growth',
 		href: 'billing',
 	},
@@ -27,6 +29,7 @@ const bannerMessagesAnalytics = {
 		description:
 			'See our docs on how to track search, filters, click events, conversions and add your own custom events.',
 		buttonText: 'Read Docs',
+		videoLink: 'https://youtu.be/cjGSWj9LehM',
 		href: 'https://docs.appbase.io/docs/analytics/Overview/#getting-insights-from-analytics',
 	},
 };

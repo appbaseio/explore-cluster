@@ -185,13 +185,23 @@ class Credentials extends Component {
 				<Card
 					title="Credentials"
 					extra={
-						<a
-							href="https://docs.appbase.io/docs/security/Credentials/"
-							rel="noopener noreferrer"
-							target="_blank"
-						>
-							Read Docs
-						</a>
+						<div style={{ textAlign: 'center' }}>
+							<a
+								href="https://docs.appbase.io/docs/security/Credentials/"
+								rel="noopener noreferrer"
+								target="_blank"
+							>
+								Read Docs
+							</a>
+							<br />
+							<a
+								href="https://youtu.be/Jp7HU17ld9g"
+								rel="noopener noreferrer"
+								target="_blank"
+							>
+								Watch Video
+							</a>
+						</div>
 					}
 				>
 					<h4>Host URL for this cluster:</h4>

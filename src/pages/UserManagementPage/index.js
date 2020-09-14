@@ -154,13 +154,23 @@ class UserManagementPage extends React.Component {
 				<Card
 					title="Manage Users"
 					extra={
-						<a
-							href="https://docs.appbase.io/docs/security/user-management/"
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							Read Docs
-						</a>
+						<div style={{ textAlign: 'center' }}>
+							<a
+								href="https://docs.appbase.io/docs/security/user-management/"
+								rel="noopener noreferrer"
+								target="_blank"
+							>
+								Read Docs
+							</a>
+							<br />
+							<a
+								href="https://youtu.be/gyvK0b4c4e0"
+								rel="noopener noreferrer"
+								target="_blank"
+							>
+								Watch Video
+							</a>
+						</div>
 					}
 				>
 					<Paragraph strong>Login URL for this cluster:</Paragraph>
