@@ -317,6 +317,7 @@ class SearchSettings extends React.Component {
 				<div className={container}>
 					<Card>
 						<FieldsWeight
+							hideCardTitle
 							onFieldsUpdate={this.handleFieldsUpdate}
 							enableNgram={enableNgram}
 							enableSynonyms={enableSynonyms}

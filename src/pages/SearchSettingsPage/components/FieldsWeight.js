@@ -122,11 +122,12 @@ class FieldsWeight extends React.PureComponent {
 	};
 
 	render() {
-		const { appName, fieldWeights, enableSynonyms, enableNgram } = this.props;
+		const { appName, fieldWeights, enableSynonyms, enableNgram, ...rest } = this.props;
 		const { aggsFields } = this.state;
 		return (
 			<div>
 				<Mappings
+					{...rest}
 					appName={appName}
 					cardProps={{
 						bodyStyle: {
