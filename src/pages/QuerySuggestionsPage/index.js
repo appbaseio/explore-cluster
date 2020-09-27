@@ -30,11 +30,12 @@ const main = css`
 `;
 
 const bannerDetails = {
-	title: 'Query Suggestions',
-	description: 'GUI to manage preferences for query suggestions.',
+	title: 'Popular Suggestions',
+	description:
+		'GUI to manage preferences for popular suggestions. Popular suggestions are stored in the .suggestions index by appbase.io based on the analytics data of what end users are searching for.',
 	buttonText: 'Read more',
 	icon: 'pencil',
-	href: 'https://docs.appbase.io/docs/analytics/query-suggestions/',
+	href: 'https://docs.appbase.io/docs/analytics/popular-suggestions/',
 };
 
 const cardStyle = css`
@@ -128,7 +129,7 @@ class QuerySuggestions extends React.Component {
 			savePreferences(payload).then((action) => {
 				if (get(action, 'payload')) {
 					notification.success({
-						message: 'Query Suggestions preferences saved successfully.',
+						message: 'Popular Suggestions preferences saved successfully.',
 					});
 					getPreferences();
 				}
@@ -169,7 +170,7 @@ class QuerySuggestions extends React.Component {
 							<Flex justifyContent="space-between" style={{ alignItems: 'center' }}>
 								<Flex>
 									<Alert
-										message={`Last synced ${total} query suggestions at ${moment(
+										message={`Last synced ${total} popular suggestions at ${moment(
 											preferences.last_synced_time * 1000,
 										).format('MMM DD, YYYY hh:mm A')}.`}
 										type="info"
