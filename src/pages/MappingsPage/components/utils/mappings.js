@@ -115,7 +115,7 @@ const _getFieldsByRelevancy = ({
 		type: 'text',
 	};
 
-	const { synonyms, ...fields } = originalFields;
+	const { ...fields } = originalFields;
 
 	const extraFields = {
 		...(type === 'text' && enableSynonyms

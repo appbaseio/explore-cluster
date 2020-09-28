@@ -36,7 +36,9 @@ const MappingsCard = ({
 							Reload Mappings
 						</Button>
 					</Tooltip>
-					<NewField onAddField={setMapping} fields={Object.keys(usecase || {})} />
+					{!hideCardTitle ? (
+						<NewField onAddField={setMapping} fields={Object.keys(usecase || {})} />
+					) : null}
 				</React.Fragment>
 			}
 			{...cardProps}
