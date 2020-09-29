@@ -7,6 +7,7 @@ import HighLighter from '../../../components/HighLighter';
 import Mappings from '../../MappingsPage/components/Mappings';
 import { getSubFields } from '../../../utils';
 import { getMappingsByPath } from '../../MappingsPage/components/utils/mappings';
+import { VIEWS } from '../../../constants/props';
 
 const { Option } = Select;
 
@@ -157,6 +158,7 @@ class FieldsWeight extends React.PureComponent {
 							},
 						],
 					}}
+					view={VIEWS.SEARCH}
 					hideAggsFields
 					hideCardTitle
 					hideFooter
@@ -185,8 +187,8 @@ class FieldsWeight extends React.PureComponent {
 					<div style={{ position: 'relative', display: 'inline-block' }}>
 						<Select
 							key={aggsFields.length}
-							style={{ width: 150 }}
-							placeholder="Update to search field"
+							style={{ width: 460 }}
+							placeholder="Add aggregation fields from schema "
 							onChange={this.updateToSearchField}
 						>
 							{aggsFields.map((field) => (

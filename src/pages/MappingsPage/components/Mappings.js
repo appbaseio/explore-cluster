@@ -23,7 +23,7 @@ import {
 import { getRawMappingsByAppName } from '../../../batteries/modules/selectors';
 import { getSettings } from '../../../batteries/utils/mappings';
 import SearchPreviewModal from '../../../components/SearchPreviewModal';
-
+import { VIEWS } from '../../../constants/props';
 import { footerStyles, row } from './styles';
 import ObjectField from './ObjectField';
 import FieldRow from './FieldRow';
@@ -261,7 +261,7 @@ class Mappings extends React.Component {
 	};
 
 	renderMapping = ({ usecase, type, path = '', rawMappings, init = false }) => {
-		const { hideAggsFields, hideSearchFields, hideTypeColumn, renderColumn } = this.props;
+		const { hideTypeColumn, renderColumn, view } = this.props;
 		if (!usecase) {
 			return null;
 		}
@@ -295,6 +295,7 @@ class Mappings extends React.Component {
 
 			return (
 				<FieldRow
+					view={view}
 					key={field}
 					field={field}
 					usecase={get(usecase, field)}
@@ -303,8 +304,6 @@ class Mappings extends React.Component {
 					path={`${path}${field}`}
 					setMapping={this.setMapping}
 					onDelete={this.handleDelete}
-					hideAggsFields={hideAggsFields}
-					hideSearchFields={hideSearchFields}
 					hideTypeColumn={hideTypeColumn}
 					renderColumn={renderColumn}
 				/>
@@ -411,14 +410,13 @@ Mappings.propTypes = {
 	searchRelevancy: PropTypes.object,
 	// Search & Aggs Settings specific Props
 	hideCardTitle: PropTypes.bool,
-	hideAggsFields: PropTypes.bool,
-	hideSearchFields: PropTypes.bool,
 	hideTypeColumn: PropTypes.bool,
 	renderColumn: PropTypes.func,
 	onChange: PropTypes.func,
 	hideFooter: PropTypes.bool,
 	cardProps: PropTypes.object,
 	headerRowProps: PropTypes.object,
+	view: PropTypes.string,
 	// Actions
 	fetchMappings: PropTypes.func.isRequired,
 	fetchSearchSettings: PropTypes.func.isRequired,
@@ -434,14 +432,13 @@ Mappings.defaultProps = {
 	searchRelevancy: null,
 	// Search & Aggs Settings specific Props
 	hideCardTitle: false,
-	hideAggsFields: false,
-	hideSearchFields: false,
 	hideTypeColumn: false,
 	hideFooter: false,
 	cardProps: {},
 	headerRowProps: {},
 	renderColumn: null,
 	onChange: null,
+	view: VIEWS.SCHEMA,
 };
 
 const mapStateToProps = (state, props) => {

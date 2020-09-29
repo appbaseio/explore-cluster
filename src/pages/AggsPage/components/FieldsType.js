@@ -7,6 +7,7 @@ import Mappings from '../../MappingsPage/components/Mappings';
 import { hasKeyword } from '../utils';
 import { getSubFields } from '../../../utils';
 import { getMappingsByPath } from '../../MappingsPage/components/utils/mappings';
+import { VIEWS } from '../../../constants/props';
 
 const { Option } = Select;
 
@@ -99,6 +100,7 @@ class FieldsType extends React.Component {
 			<React.Fragment>
 				<Mappings
 					appName={appName}
+					view={VIEWS.AGGREGATION}
 					cardProps={{
 						bodyStyle: {
 							padding: 0,
