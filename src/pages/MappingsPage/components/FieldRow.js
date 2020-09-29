@@ -26,7 +26,7 @@ const FieldRow = ({
 		return null;
 	}
 
-	if (hideSearchFields && usecase === 'search') {
+	if (hideSearchFields && (usecase === 'search' || usecase === 'none')) {
 		return null;
 	}
 
