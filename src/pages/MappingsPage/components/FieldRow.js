@@ -16,7 +16,6 @@ const FieldRow = ({
 	usecase,
 	type,
 	mapping,
-	hideTypeColumn,
 	renderColumn,
 	onDelete,
 	setMapping,
@@ -68,7 +67,7 @@ const FieldRow = ({
 							path={path}
 						/>
 					</Col>
-					{hideTypeColumn ? null : (
+					{view === VIEWS.SCHEMA && (
 						<Col xs={type === 'text' ? 12 : 24}>
 							<TypeDropdown
 								value={type}
@@ -95,7 +94,6 @@ const FieldRow = ({
 FieldRow.defaultProps = {
 	mapping: {},
 	// Search & Aggs Settings specific Props
-	hideTypeColumn: false,
 	renderColumn: null,
 	view: VIEWS.SCHEMA,
 };
@@ -107,7 +105,6 @@ FieldRow.propTypes = {
 	type: PropTypes.string.isRequired,
 	mapping: PropTypes.object,
 	// Search & Aggs Settings specific Props
-	hideTypeColumn: PropTypes.bool,
 	renderColumn: PropTypes.func,
 	view: PropTypes.string,
 	// Actions

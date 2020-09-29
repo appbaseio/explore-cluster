@@ -418,7 +418,6 @@ class SearchSettings extends React.Component {
 
 SearchSettings.propTypes = {
 	appName: PropTypes.string.isRequired,
-	credentials: PropTypes.string.isRequired,
 	defaultSettings: PropTypes.object,
 	isLoading: PropTypes.bool,
 	isUpdating: PropTypes.bool,
@@ -427,7 +426,6 @@ SearchSettings.propTypes = {
 	tier: allowedTiers,
 
 	featureSearchRelevancy: PropTypes.bool,
-	fetchMappings: PropTypes.func.isRequired,
 	getDefaultSettingsAction: PropTypes.func.isRequired,
 	getSettingsAction: PropTypes.func.isRequired,
 	updateSettingsAction: PropTypes.func.isRequired,

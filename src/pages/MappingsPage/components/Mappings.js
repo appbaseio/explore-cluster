@@ -271,7 +271,7 @@ class Mappings extends React.Component {
 	};
 
 	renderMapping = ({ usecase, type, path = '', rawMappings, init = false }) => {
-		const { hideTypeColumn, renderColumn, view } = this.props;
+		const { renderColumn, view } = this.props;
 		if (!usecase) {
 			return null;
 		}
@@ -292,6 +292,7 @@ class Mappings extends React.Component {
 						path={`${path}${field}`}
 						field={field}
 						onDelete={this.handleDelete}
+						view={view}
 					>
 						{this.renderMapping({
 							usecase: get(usecase, field),
@@ -314,7 +315,6 @@ class Mappings extends React.Component {
 					path={`${path}${field}`}
 					setMapping={this.setMapping}
 					onDelete={this.handleDelete}
-					hideTypeColumn={hideTypeColumn}
 					renderColumn={renderColumn}
 				/>
 			);
@@ -422,7 +422,6 @@ Mappings.propTypes = {
 	searchRelevancy: PropTypes.object,
 	// Search & Aggs Settings specific Props
 	hideCardTitle: PropTypes.bool,
-	hideTypeColumn: PropTypes.bool,
 	renderColumn: PropTypes.func,
 	onChange: PropTypes.func,
 	onRemove: PropTypes.func,
@@ -445,7 +444,6 @@ Mappings.defaultProps = {
 	searchRelevancy: null,
 	// Search & Aggs Settings specific Props
 	hideCardTitle: false,
-	hideTypeColumn: false,
 	hideFooter: false,
 	cardProps: {},
 	headerRowProps: {},

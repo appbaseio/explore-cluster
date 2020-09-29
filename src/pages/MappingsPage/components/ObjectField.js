@@ -17,6 +17,7 @@ class ObjectField extends React.Component {
 	render() {
 		const { children, field, path, onDelete } = this.props;
 		const { isCollapsed } = this.state;
+
 		return (
 			<Row className={row}>
 				<Col xs={24}>
