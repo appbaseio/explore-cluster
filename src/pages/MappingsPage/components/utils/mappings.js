@@ -258,8 +258,8 @@ export const deleteMappingField = ({ originalMapping, path }) => {
 		TOP_FIELD = 'properties';
 	}
 
-	const updatedPath = path.split('.').join('.properties.');
-	const updatedMappings = omit(get(mapping, TOP_FIELD), updatedPath);
+	const deletedPath = path.split('.').join('.properties.');
+	const updatedMappings = omit(get(mapping, TOP_FIELD), deletedPath);
 
 	if (+ES_VERSION[0] >= 6 && +ES_VERSION[0] < 7) {
 		return {
@@ -272,8 +272,11 @@ export const deleteMappingField = ({ originalMapping, path }) => {
 	}
 
 	return {
-		[TOP_FIELD]: {
-			...updatedMappings,
+		deletedPath,
+		mappings: {
+			[TOP_FIELD]: {
+				...updatedMappings,
+			},
 		},
 	};
 };
@@ -369,12 +372,16 @@ export const updateSubFields = ({
 	return { ...updatedMappings };
 };
 
-export function reIndex({ mappings, appName, version, credentials, settings }) {
+export function reIndex({ mappings, appName, version, credentials, settings, excludeFields }) {
 	const body = {
 		mappings,
 		settings,
 		es_version: version,
 	};
+
+	if (excludeFields && excludeFields.length) {
+		body.exclude_fields = excludeFields;
+	}
 
 	return new Promise((resolve, reject) => {
 		const ACC_API = getURL();

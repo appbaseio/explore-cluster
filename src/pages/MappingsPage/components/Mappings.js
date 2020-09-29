@@ -50,6 +50,7 @@ class Mappings extends React.Component {
 		type: {},
 		rawMappings: null,
 		isReindexing: false,
+		deletedPaths: [],
 	};
 
 	componentDidMount() {
@@ -184,26 +185,27 @@ class Mappings extends React.Component {
 			onRemove(path);
 			return;
 		}
-		const { usecase, type, rawMappings } = this.state;
+		const { usecase, type, rawMappings, deletedPaths } = this.state;
 		this.flattenType = omit(this.flattenType, path);
 		this.flattenUsecase = omit(this.flattenUsecase, path);
 
 		const updatedUsecase = omit(usecase, path);
 		const updatedType = omit(type, path);
-		const updatedMappings = deleteMappingField({
+		const { deletedPath, mappings: _updatedMappings } = deleteMappingField({
 			originalMapping: rawMappings,
 			path,
 		});
 		this.setState({
 			usecase: updatedUsecase,
 			type: updatedType,
-			rawMappings: updatedMappings,
+			rawMappings: _updatedMappings,
+			deletedPaths: [...deletedPaths, deletedPath],
 		});
 	};
 
 	handleReindex = async () => {
 		const { appName, credentials } = this.props;
-		const { rawMappings } = this.state;
+		const { rawMappings, deletedPaths } = this.state;
 
 		this.setState({
 			isReindexing: true,
@@ -214,11 +216,13 @@ class Mappings extends React.Component {
 		);
 
 		const startTime = Date.now();
+
 		reIndex({
 			mappings: rawMappings,
 			appName,
 			version: getVersion(),
 			credentials,
+			excludeFields: deletedPaths,
 			settings: {
 				analysis: {
 					...get(appSettings, 'index.analysis'),
@@ -237,6 +241,7 @@ class Mappings extends React.Component {
 	onSuccessfulReindex = () => {
 		this.setState({
 			isReindexing: false,
+			deletedPaths: [],
 		});
 		this.getMappings();
 	};
