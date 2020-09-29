@@ -139,9 +139,6 @@ class FieldsType extends React.Component {
 							},
 						],
 					}}
-					hideSearchFields
-					hideCardTitle
-					hideFooter
 					onChange={this.handleMappingChange}
 					ref={this.mappingsRef}
 					renderColumn={({ path, mapping }) => (

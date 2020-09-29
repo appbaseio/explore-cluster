@@ -322,16 +322,7 @@ class Mappings extends React.Component {
 	};
 
 	render() {
-		const {
-			isFetchingMapping,
-			error,
-			appName,
-			hideCardTitle,
-			hideFooter,
-			cardProps,
-			headerRowProps,
-			view,
-		} = this.props;
+		const { isFetchingMapping, error, appName, cardProps, headerRowProps, view } = this.props;
 		const { usecase, type, isReindexing, rawMappings } = this.state;
 		const hasMappingsChanged =
 			JSON.stringify(usecase) !== JSON.stringify(this.originalMappingsUsecase) ||
@@ -339,7 +330,6 @@ class Mappings extends React.Component {
 
 		const mappingCardProps = {
 			getMappings: this.getMappings,
-			hideCardTitle,
 			setMapping: this.setMapping,
 			cardProps,
 			headerRowProps,
@@ -380,7 +370,7 @@ class Mappings extends React.Component {
 					</Row>
 				</MappingsCard>
 				<Loader show={isReindexing} message="Re-indexing your data... Please wait!" />
-				{hideFooter ? null : (
+				{view === VIEWS.SCHEMA && (
 					<Affix offsetBottom={0}>
 						<div className={footerStyles}>
 							<SearchPreviewModal app={appName} />
@@ -421,11 +411,9 @@ Mappings.propTypes = {
 	language: PropTypes.string,
 	searchRelevancy: PropTypes.object,
 	// Search & Aggs Settings specific Props
-	hideCardTitle: PropTypes.bool,
 	renderColumn: PropTypes.func,
 	onChange: PropTypes.func,
 	onRemove: PropTypes.func,
-	hideFooter: PropTypes.bool,
 	cardProps: PropTypes.object,
 	headerRowProps: PropTypes.object,
 	view: PropTypes.string,
@@ -443,8 +431,6 @@ Mappings.defaultProps = {
 	language: 'universal',
 	searchRelevancy: null,
 	// Search & Aggs Settings specific Props
-	hideCardTitle: false,
-	hideFooter: false,
 	cardProps: {},
 	headerRowProps: {},
 	renderColumn: null,

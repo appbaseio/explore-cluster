@@ -169,9 +169,6 @@ class FieldsWeight extends React.PureComponent {
 						],
 					}}
 					view={VIEWS.SEARCH}
-					hideAggsFields
-					hideCardTitle
-					hideFooter
 					forceNgram={enableNgram}
 					forceSynonyms={enableSynonyms}
 					onChange={this.handleMappingChange}
