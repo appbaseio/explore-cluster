@@ -176,7 +176,7 @@ class FieldsWeight extends React.PureComponent {
 					renderColumn={({ path, mapping }) => (
 						<div style={{ width: 150 }}>
 							<InputNumber
-								value={fieldWeights[path]}
+								value={fieldWeights[path] || 1}
 								min={0}
 								onChange={(value) => {
 									this.handleFieldWeight({

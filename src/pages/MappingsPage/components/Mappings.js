@@ -30,8 +30,6 @@ import MappingsCard from './MappingsCard';
 import conversionMap from './utils/conversionMap';
 import { VIEWS } from '../../../constants/props';
 
-const ALLOWED_AGGS_MAPPING = Object.keys(conversionMap);
-
 class Mappings extends React.Component {
 	URL = getURL();
 
@@ -289,26 +287,29 @@ class Mappings extends React.Component {
 		}
 
 		return Object.keys(usecase).map((field) => {
-			if (typeof usecase[field] === 'object') {
+			const usecaseVal = get(usecase, field);
+			const typeVal = get(type, field);
+			const isObj = typeof usecaseVal === 'object';
+
+			if (isObj) {
 				return (
 					<ObjectField
-						key={usecase[field]}
+						key={field}
 						path={`${path}${field}`}
 						field={field}
 						onDelete={this.handleDelete}
 						view={view}
 					>
 						{this.renderMapping({
-							usecase: get(usecase, field),
-							type: get(type, field),
+							usecase: usecaseVal,
+							type: typeVal,
 							path: `${path}${field}.`,
 							rawMappings,
 						})}
 					</ObjectField>
 				);
 			}
-			const usecaseVal = get(usecase, field);
-			const typeVal = get(type, field);
+
 			if (
 				view === VIEWS.SEARCH &&
 				(usecaseVal === 'none' || usecaseVal === 'aggs' || typeVal !== 'text')
@@ -316,21 +317,18 @@ class Mappings extends React.Component {
 				return null;
 			}
 
-			if (view === VIEWS.AGGREGATION && (usecaseVal === 'search' || usecaseVal === 'none')) {
+			if (view === VIEWS.AGGREGATION && !conversionMap[typeVal]) {
 				return null;
 			}
 
-			if (view === VIEWS.AGGREGATION && !ALLOWED_AGGS_MAPPING.includes(typeVal)) {
-				/*
-					dont want aggs to have unsupported type like rank_feature, rank_features, etc.
-				*/
+			if (view === VIEWS.AGGREGATION && usecaseVal === 'none' && typeVal === 'text') {
 				return null;
 			}
 
 			return (
 				<FieldRow
 					view={view}
-					key={field}
+					key={`${path}${field}`}
 					field={field}
 					usecase={usecaseVal}
 					type={typeVal}
