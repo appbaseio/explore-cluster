@@ -176,13 +176,23 @@ class Mappings extends React.Component {
 	};
 
 	handleDelete = (path) => {
+		// for aggs and search view we don't actually need to delete field from data set
+		// but change as per the context
+		const { onRemove } = this.props;
+		if (onRemove) {
+			onRemove(path);
+			return;
+		}
 		const { usecase, type, rawMappings } = this.state;
 		this.flattenType = omit(this.flattenType, path);
 		this.flattenUsecase = omit(this.flattenUsecase, path);
 
 		const updatedUsecase = omit(usecase, path);
 		const updatedType = omit(type, path);
-		const updatedMappings = deleteMappingField({ originalMapping: rawMappings, path });
+		const updatedMappings = deleteMappingField({
+			originalMapping: rawMappings,
+			path,
+		});
 		this.setState({
 			usecase: updatedUsecase,
 			type: updatedType,
@@ -320,6 +330,7 @@ class Mappings extends React.Component {
 			hideFooter,
 			cardProps,
 			headerRowProps,
+			view,
 		} = this.props;
 		const { usecase, type, isReindexing, rawMappings } = this.state;
 		const hasMappingsChanged =
@@ -332,6 +343,7 @@ class Mappings extends React.Component {
 			setMapping: this.setMapping,
 			cardProps,
 			headerRowProps,
+			view,
 		};
 
 		if (isFetchingMapping) {
@@ -413,6 +425,7 @@ Mappings.propTypes = {
 	hideTypeColumn: PropTypes.bool,
 	renderColumn: PropTypes.func,
 	onChange: PropTypes.func,
+	onRemove: PropTypes.func,
 	hideFooter: PropTypes.bool,
 	cardProps: PropTypes.object,
 	headerRowProps: PropTypes.object,
@@ -438,6 +451,7 @@ Mappings.defaultProps = {
 	headerRowProps: {},
 	renderColumn: null,
 	onChange: null,
+	onRemove: null,
 	view: VIEWS.SCHEMA,
 };
 

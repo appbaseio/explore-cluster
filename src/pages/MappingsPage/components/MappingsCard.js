@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { cardTitle } from './styles';
 import NewField from './NewField';
 import HeaderRow from './HeaderRow';
+import { VIEWS } from '../../../constants/props';
 
 const MappingsCard = ({
 	getMappings,
@@ -13,6 +14,7 @@ const MappingsCard = ({
 	hideCardTitle,
 	cardProps,
 	headerRowProps,
+	view,
 }) => {
 	return (
 		<Card
@@ -36,7 +38,7 @@ const MappingsCard = ({
 							Reload Mappings
 						</Button>
 					</Tooltip>
-					{!hideCardTitle ? (
+					{!view === VIEWS.SCHEMA ? (
 						<NewField onAddField={setMapping} fields={Object.keys(usecase || {})} />
 					) : null}
 				</React.Fragment>
@@ -54,6 +56,7 @@ MappingsCard.defaultProps = {
 	hideCardTitle: false,
 	headerRowProps: {},
 	usecase: {},
+	view: VIEWS.SCHEMA,
 };
 
 MappingsCard.propTypes = {
@@ -64,6 +67,7 @@ MappingsCard.propTypes = {
 	children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node]).isRequired,
 	cardProps: PropTypes.object,
 	headerRowProps: PropTypes.object,
+	view: PropTypes.string,
 };
 
 export default MappingsCard;

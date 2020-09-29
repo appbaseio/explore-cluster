@@ -92,6 +92,16 @@ class FieldsType extends React.Component {
 		});
 	};
 
+	// ref to older version: https://github.com/appbaseio-confidential/arc-dashboard/blob/72869b13cf6daf78af7d91eafc480c6894a4f36c/src/pages/AggsPage/AggsPage.js#L418
+	handleRemoveFromSearch = (field) => {
+		const updateMapping = get(this, 'mappingsRef.current.wrappedInstance.setMapping');
+		updateMapping({
+			usecase: 'none',
+			path: field,
+			type: 'text',
+		});
+	};
+
 	render() {
 		const { appName, fieldTypes } = this.props;
 		const { searchFields } = this.state;
@@ -155,6 +165,7 @@ class FieldsType extends React.Component {
 							{hasKeyword(mapping) ? null : <Option value="range">Range</Option>}
 						</Select>
 					)}
+					onRemove={this.handleRemoveFromSearch}
 				/>
 				{searchFields.length > 0 ? (
 					<div style={{ position: 'relative', display: 'inline-block' }}>

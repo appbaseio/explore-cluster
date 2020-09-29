@@ -382,7 +382,7 @@ AggsPage.propTypes = {
 	tier: allowedTiers,
 
 	featureSearchRelevancy: PropTypes.bool,
-	fetchMappings: PropTypes.func.isRequired,
+	fetchMappings: PropTypes.func,
 	getDefaultSettingsAction: PropTypes.func.isRequired,
 	getSettingsAction: PropTypes.func.isRequired,
 	updateSettingsAction: PropTypes.func.isRequired,
@@ -396,6 +396,7 @@ AggsPage.defaultProps = {
 	isLoading: false,
 	tier: undefined,
 	featureSearchRelevancy: false,
+	fetchMappings: null,
 };
 
 const mapStateToProps = (state) => {

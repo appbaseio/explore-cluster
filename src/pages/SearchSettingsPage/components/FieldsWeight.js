@@ -122,6 +122,16 @@ class FieldsWeight extends React.PureComponent {
 		});
 	};
 
+	// ref to older version: https://github.com/appbaseio-confidential/arc-dashboard/blob/72869b13cf6daf78af7d91eafc480c6894a4f36c/src/pages/SearchSettingsPage/SearchSettings.js#L473
+	handleRemoveFromSearch = (field) => {
+		const updateMapping = get(this, 'mappingsRef.current.wrappedInstance.setMapping');
+		updateMapping({
+			usecase: 'aggs',
+			path: field,
+			type: 'text',
+		});
+	};
+
 	render() {
 		const { appName, fieldWeights, enableSynonyms, enableNgram, ...rest } = this.props;
 		const { aggsFields } = this.state;
@@ -182,13 +192,14 @@ class FieldsWeight extends React.PureComponent {
 							/>
 						</div>
 					)}
+					onRemove={this.handleRemoveFromSearch}
 				/>
 				{aggsFields.length > 0 ? (
 					<div style={{ position: 'relative', display: 'inline-block' }}>
 						<Select
 							key={aggsFields.length}
-							style={{ width: 460 }}
-							placeholder="Add aggregation fields from schema "
+							style={{ width: 300 }}
+							placeholder="Add search fields from schema "
 							onChange={this.updateToSearchField}
 						>
 							{aggsFields.map((field) => (
