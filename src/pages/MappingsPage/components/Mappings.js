@@ -23,11 +23,14 @@ import {
 import { getRawMappingsByAppName } from '../../../batteries/modules/selectors';
 import { getSettings } from '../../../batteries/utils/mappings';
 import SearchPreviewModal from '../../../components/SearchPreviewModal';
-import { VIEWS } from '../../../constants/props';
 import { footerStyles, row } from './styles';
 import ObjectField from './ObjectField';
 import FieldRow from './FieldRow';
 import MappingsCard from './MappingsCard';
+import conversionMap from './utils/conversionMap';
+import { VIEWS } from '../../../constants/props';
+
+const ALLOWED_AGGS_MAPPING = Object.keys(conversionMap);
 
 class Mappings extends React.Component {
 	URL = getURL();
@@ -289,6 +292,7 @@ class Mappings extends React.Component {
 			if (typeof usecase[field] === 'object') {
 				return (
 					<ObjectField
+						key={usecase[field]}
 						path={`${path}${field}`}
 						field={field}
 						onDelete={this.handleDelete}
@@ -303,14 +307,33 @@ class Mappings extends React.Component {
 					</ObjectField>
 				);
 			}
+			const usecaseVal = get(usecase, field);
+			const typeVal = get(type, field);
+			if (
+				view === VIEWS.SEARCH &&
+				(usecaseVal === 'none' || usecaseVal === 'aggs' || typeVal !== 'text')
+			) {
+				return null;
+			}
+
+			if (view === VIEWS.AGGREGATION && (usecaseVal === 'search' || usecaseVal === 'none')) {
+				return null;
+			}
+
+			if (view === VIEWS.AGGREGATION && !ALLOWED_AGGS_MAPPING.includes(typeVal)) {
+				/*
+					dont want aggs to have unsupported type like rank_feature, rank_features, etc.
+				*/
+				return null;
+			}
 
 			return (
 				<FieldRow
 					view={view}
 					key={field}
 					field={field}
-					usecase={get(usecase, field)}
-					type={get(type, field)}
+					usecase={usecaseVal}
+					type={typeVal}
 					mapping={getMappingsByPath({ mappings: rawMappings, path: `${path}${field}` })}
 					path={`${path}${field}`}
 					setMapping={this.setMapping}

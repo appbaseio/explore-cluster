@@ -18,6 +18,10 @@ class ObjectField extends React.Component {
 		const { children, field, path, onDelete } = this.props;
 		const { isCollapsed } = this.state;
 
+		// when all the children are null don't render object header
+		if (!children.filter((i) => i).length) {
+			return null;
+		}
 		return (
 			<Row className={row}>
 				<Col xs={24}>

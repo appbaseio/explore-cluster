@@ -5,10 +5,7 @@ import UsecaseDropdown from './UsecaseDropdown';
 import TypeDropdown from './TypeDropdown';
 import { fieldRow } from './styles';
 import MappingsTypeIcon from './MappingsTypeIcon';
-import conversionMap from './utils/conversionMap';
 import { VIEWS } from '../../../constants/props';
-
-const ALLOWED_AGGS_MAPPING = Object.keys(conversionMap);
 
 const FieldRow = ({
 	path,
@@ -21,21 +18,6 @@ const FieldRow = ({
 	setMapping,
 	view,
 }) => {
-	if (view === VIEWS.SEARCH && (usecase === 'none' || usecase === 'aggs' || type !== 'text')) {
-		return null;
-	}
-
-	if (view === VIEWS.AGGREGATION && (usecase === 'search' || usecase === 'none')) {
-		return null;
-	}
-
-	if (view === VIEWS.AGGREGATION && !ALLOWED_AGGS_MAPPING.includes(type)) {
-		/*
-			dont want aggs to have unsupported type like rank_feature, rank_features, etc.
-		*/
-		return null;
-	}
-
 	return (
 		<Row type="flex" justify="space-between" className={fieldRow}>
 			<Col>
