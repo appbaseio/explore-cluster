@@ -28,7 +28,7 @@ export const flatObject = (originalObject, path = '') => {
 	return Object.keys(clonedObject).reduce((agg, key) => {
 		const parsedKey =
 			typeof clonedObject[key] === 'object'
-				? flatObject(clonedObject[key], `${key}.`)
+				? flatObject(clonedObject[key], `${path}${key}.`)
 				: { [`${path}${key}`]: clonedObject[key] };
 		return {
 			...agg,

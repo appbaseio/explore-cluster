@@ -125,11 +125,25 @@ class FieldsWeight extends React.PureComponent {
 	// ref to older version: https://github.com/appbaseio-confidential/arc-dashboard/blob/72869b13cf6daf78af7d91eafc480c6894a4f36c/src/pages/SearchSettingsPage/SearchSettings.js#L473
 	handleRemoveFromSearch = (field) => {
 		const updateMapping = get(this, 'mappingsRef.current.wrappedInstance.setMapping');
-		updateMapping({
-			usecase: 'aggs',
-			path: field,
-			type: 'text',
-		});
+		const useCases = get(this, 'mappingsRef.current.wrappedInstance.flattenUsecase', {});
+		const nestedFields = Object.keys(useCases).filter((i) => i.indexOf(`${field}.`) > -1);
+		if (nestedFields.length) {
+			nestedFields.forEach((i) => {
+				if (useCases[i] === 'search' || useCases[i] === 'searchaggs') {
+					updateMapping({
+						usecase: 'aggs',
+						path: i,
+						type: 'text',
+					});
+				}
+			});
+		} else {
+			updateMapping({
+				usecase: 'aggs',
+				path: field,
+				type: 'text',
+			});
+		}
 	};
 
 	render() {

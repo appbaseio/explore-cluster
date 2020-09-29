@@ -326,7 +326,10 @@ class Mappings extends React.Component {
 				return null;
 			}
 
-			if (view === VIEWS.AGGREGATION && usecaseVal === 'none' && typeVal === 'text') {
+			if (
+				view === VIEWS.AGGREGATION &&
+				((usecaseVal === 'none' && typeVal === 'text') || usecaseVal === 'search')
+			) {
 				return null;
 			}
 

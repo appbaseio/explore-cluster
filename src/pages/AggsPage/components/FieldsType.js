@@ -167,8 +167,8 @@ class FieldsType extends React.Component {
 					<div style={{ position: 'relative', display: 'inline-block' }}>
 						<Select
 							key={searchFields.length}
-							style={{ width: 150 }}
-							placeholder="Update to search field"
+							style={{ width: 300 }}
+							placeholder="Add aggregation fields from schema"
 							onChange={this.updateToAggsField}
 						>
 							{searchFields.map((field) => (
