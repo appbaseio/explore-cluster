@@ -226,7 +226,6 @@ export const updateMapping = ({ originalMapping, type, usecase, path, settings }
 		currentIndex: 0,
 		settings,
 	});
-
 	if (+ES_VERSION[0] >= 6 && +ES_VERSION[0] < 7) {
 		return {
 			_doc: {
@@ -340,22 +339,24 @@ export const updateSubFields = ({
 				},
 			};
 		}
-
+		const type = get(mappings, `properties.${field}.type`);
 		return {
 			...agg,
 			properties: {
 				...agg.properties,
 				[field]: {
 					...get(mappings, `properties.${field}`, {}),
-					fields: {
-						..._getFieldsByRelevancy({
-							enableSynonyms,
-							enableNgram,
-							language,
-							type: get(mappings, `properties.${field}.type`),
-							fields: get(mappings, `properties.${field}.fields`, {}),
-						}),
-					},
+					...(!MAPPING_TYPE_WITH_NO_FIELDS.includes(type) && {
+						fields: {
+							..._getFieldsByRelevancy({
+								enableSynonyms,
+								enableNgram,
+								language,
+								type,
+								fields: get(mappings, `properties.${field}.fields`, {}),
+							}),
+						},
+					}),
 				},
 			},
 		};
