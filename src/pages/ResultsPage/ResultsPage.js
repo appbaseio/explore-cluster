@@ -29,12 +29,18 @@ import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster
 const bannerDetails = {
 	title: 'Result Settings',
 	buttonText: 'Read More',
+	description:
+		'Result settings allow you to control the page size, fields returned, and highlighting settings.',
+	videoLink: 'https://youtu.be/EtqBS6egIfU',
 	icon: 'pencil',
 	href: 'https://docs.appbase.io/docs/search/relevancy/#result-settings',
 };
 
 const bannerMessage = {
 	title: 'Result Settings',
+	videoLink: 'https://youtu.be/EtqBS6egIfU',
+	description:
+		'Result settings allow you to control the page size, fields returned, and highlighting settings.',
 	buttonText: 'Read Docs',
 	href: 'https://docs.appbase.io/docs/search/relevancy/#result-settings',
 };
@@ -203,6 +209,7 @@ class ResultsPage extends React.Component {
 						tokenSeparators={[',']}
 						disabled={getDisabled(excludeFields)}
 						value={includeFields}
+						data-cy="include-fields"
 						onChange={(value) =>
 							this.setState({ includeFields: calculateValue(value) })
 						}
@@ -240,6 +247,7 @@ class ResultsPage extends React.Component {
 						onChange={(value) =>
 							this.setState({ excludeFields: calculateValue(value) })
 						}
+						data-cy="exclude-fields"
 					>
 						<Select.Option key="*">* (Exclude all fields)</Select.Option>
 						{(mappings || []).map((v) => {
@@ -408,6 +416,7 @@ class ResultsPage extends React.Component {
 											placeholder="Enter page size"
 											min={0}
 											max={1000}
+											data-cy="result-page-size"
 										/>,
 									)}
 								</Form.Item>
@@ -420,7 +429,7 @@ class ResultsPage extends React.Component {
 								<div style={{ paddingBottom: 32 }}>
 									<label style={{ marginRight: 10 }}>Enable Highlighting</label>
 									{getFieldDecorator('highlight', { valuePropName: 'checked' })(
-										<Switch />,
+										<Switch data-cy="enable-highlight" />,
 									)}
 								</div>
 
@@ -434,6 +443,7 @@ class ResultsPage extends React.Component {
 						loading={isUpdating}
 						resetState={resetState}
 						showSearchPreview
+						showCopySettings
 						app={appName}
 						showReset={
 							!isEqual(get(settings, 'results'), get(defaultSettings, 'results'))

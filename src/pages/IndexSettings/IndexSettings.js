@@ -31,6 +31,7 @@ const bannerMessage = {
 	title: 'Index Settings',
 	buttonText: 'Read Docs',
 	href: 'https://docs.appbase.io/docs/search/relevancy/#index-settings',
+	videoLink: 'https://youtu.be/oRIsIHkTN9Y',
 };
 
 class IndexSettings extends React.Component {

@@ -23,7 +23,7 @@ import map from 'lodash/map';
 import { validationsList } from '@appbaseio-confidential/importer/lib/utils';
 import { cloneApp } from '../../utils';
 import { validateAppName } from '../../utils/helper';
-import { getSettings, putSettings } from '../../batteries/modules/actions';
+import { getSettings, putSettings, setCurrentApp } from '../../batteries/modules/actions';
 import { appendApp } from '../../actions';
 import { isValidPlan } from '../../batteries/utils';
 import { allowedTiers } from '../../utils/prop-types';
@@ -74,7 +74,7 @@ const CloneIndex = (props) => {
 		}
 		cloneApp(index, destIndex, { action: actions })
 			.then(async () => {
-				const { getSettingsAction, updateSettingsAction, addApp } = props;
+				const { getSettingsAction, updateSettingsAction, addApp, updateCurrentApp } = props;
 				if (hasSearchRelevancy && isValidPlan(tier, featureSearchRelevancy)) {
 					const res = await getSettingsAction(index);
 					if (res && res.payload) {
@@ -84,7 +84,8 @@ const CloneIndex = (props) => {
 				message.success(`${destIndex} successfully cloned from ${index}`);
 				resetValues();
 				addApp({ [destIndex]: {} });
-				history.push(`/app/${destIndex}/overview`);
+				updateCurrentApp(destIndex);
+				history.replace(`/app/${destIndex}/overview`);
 			})
 			.catch((e) => {
 				message.error(e.message);
@@ -97,13 +98,21 @@ const CloneIndex = (props) => {
 		setExists(existingApps.includes(e.target.value));
 	}
 
+	const featureSearchRelevance = isValidPlan(tier, featureSearchRelevancy);
+
 	const searchRelevancyCheckbox = (
 		<Checkbox
-			disabled={!isValidPlan(tier, featureSearchRelevancy)}
+			disabled={!featureSearchRelevance}
 			className={radioStyle}
 			value="search_relevancy"
 		>
 			Copy Search Relevancy Settings
+		</Checkbox>
+	);
+
+	const copySynoynmsCheckbox = (
+		<Checkbox disabled={!featureSearchRelevance} className={radioStyle} value="synonyms">
+			Copy Synonyms
 		</Checkbox>
 	);
 
@@ -150,12 +159,22 @@ const CloneIndex = (props) => {
 							Copy Index Data
 						</Checkbox>
 					</div>
+
 					<div>
-						{isValidPlan(tier, featureSearchRelevancy) ? (
+						{featureSearchRelevance ? (
 							searchRelevancyCheckbox
 						) : (
 							<Tooltip title="This feature is only available on selected plans.">
 								{searchRelevancyCheckbox}
+							</Tooltip>
+						)}
+					</div>
+					<div>
+						{featureSearchRelevance ? (
+							copySynoynmsCheckbox
+						) : (
+							<Tooltip title="This feature is only available on selected plans.">
+								{copySynoynmsCheckbox}
 							</Tooltip>
 						)}
 					</div>
@@ -175,6 +194,7 @@ CloneIndex.propTypes = {
 	history: PropTypes.object.isRequired,
 	tier: allowedTiers.isRequired,
 	featureSearchRelevancy: PropTypes.bool,
+	updateCurrentApp: PropTypes.func.isRequired,
 };
 
 CloneIndex.defaultProps = {
@@ -193,6 +213,7 @@ const mapDispatchToProps = (dispatch) => ({
 	getSettingsAction: (name) => dispatch(getSettings(name)),
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
 	addApp: (appName) => dispatch(appendApp(appName)),
+	updateCurrentApp: (appName) => dispatch(setCurrentApp(appName)),
 });
 
 export default withRouter(connect(mapStateToProps, mapDispatchToProps)(CloneIndex));

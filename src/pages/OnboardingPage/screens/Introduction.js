@@ -113,6 +113,7 @@ export default class Introduction extends Component {
 				<div className="input-wrapper">
 					<input
 						autoFocus
+						data-cy="index-name"
 						className="input"
 						ref={(ref) => {
 							this.input = ref;
@@ -122,6 +123,7 @@ export default class Introduction extends Component {
 					<a
 						className={`button primary ${status ? 'disabled' : ''}`}
 						onClick={this.createApp}
+						data-cy="submit-index-name"
 					>
 						Submit
 					</a>

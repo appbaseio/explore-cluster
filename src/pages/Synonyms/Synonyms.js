@@ -320,6 +320,7 @@ class Synonyms extends React.Component {
 		const bannerMessage = {
 			title: 'Manage Synonyms',
 			buttonText: 'Read Docs',
+			videoLink: 'https://youtu.be/FA6knNSaChA',
 			href: 'https://docs.appbase.io/docs/search/relevancy/#synonyms',
 		};
 
@@ -504,7 +505,11 @@ class Synonyms extends React.Component {
 										resetInputOnClose
 										renderButton={({ handleModal }) => {
 											return (
-												<Button onClick={handleModal} type="primary">
+												<Button
+													onClick={handleModal}
+													type="primary"
+													data-cy="add-synonyms"
+												>
 													Add Synonyms
 												</Button>
 											);
@@ -539,7 +544,12 @@ class Synonyms extends React.Component {
 						</ReactiveBase>
 					</Card>
 					{synonyms.length > 0 ? (
-						<SettingsFooter app={appName} showReset={false} showSearchPreview />
+						<SettingsFooter
+							showCopySettings
+							app={appName}
+							showReset={false}
+							showSearchPreview
+						/>
 					) : null}
 				</div>
 				{uploadVisible && (

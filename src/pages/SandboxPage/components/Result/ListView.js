@@ -155,7 +155,10 @@ class ListView extends React.Component {
 							return (
 								<React.Fragment>
 									{data.map((item) => (
-										<div onClick={() => triggerAnalytics(item._click_id)}>
+										<div
+											id={item._id}
+											onClick={() => triggerAnalytics(item._click_id)}
+										>
 											<ListItem key={item._id} item={item} />
 										</div>
 									))}

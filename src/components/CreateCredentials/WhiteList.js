@@ -232,13 +232,14 @@ WhiteList.propTypes = {
 	inputProps: PropTypes.object,
 	defaultSuggestionValue: PropTypes.string,
 	control: PropTypes.object.isRequired,
-	type: PropTypes.oneOf(['dropdown']).isRequired,
+	type: PropTypes.oneOf(['dropdown']),
 };
 
 WhiteList.defaultProps = {
 	handleWarningMessage: () => {},
 	defaultValue: undefined,
 	inputProps: {},
+	type: undefined,
 	defaultSuggestionValue: undefined,
 };
 

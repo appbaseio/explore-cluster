@@ -1,13 +1,14 @@
 import React, { Fragment } from 'react';
 import { string } from 'prop-types';
 
-import Mappings from '../../batteries/components/Mappings';
+import Mappings from './components/Mappings';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 
 const bannerMessage = {
 	title: 'Schema Settings',
 	buttonText: 'Read Docs',
+	videoLink: 'https://youtu.be/ejk2wybEwoc',
 	description: 'View mappings, edit use-case and data types, add or delete fields',
 	href: 'https://docs.appbase.io/docs/search/relevancy/#schema',
 };
@@ -15,9 +16,9 @@ const bannerMessage = {
 const MappingsPage = ({ appName }) => (
 	<Fragment>
 		<Banner {...bannerMessage} />
-		<section>
+		<section style={{ padding: 50 }}>
 			<ErrorToaster>
-				<Mappings key={appName} appName={appName} appId={appName} />
+				<Mappings key={appName} appName={appName} />
 			</ErrorToaster>
 		</section>
 	</Fragment>

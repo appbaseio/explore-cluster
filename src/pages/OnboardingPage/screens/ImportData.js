@@ -191,7 +191,11 @@ export default class Introduction extends Component {
 			</div>
 			<footer>
 				<div className="left-column">
-					<a className="button has-icon" onClick={this.nextLayout}>
+					<a
+						className="button has-icon"
+						data-cy="submit-data-import"
+						onClick={this.nextLayout}
+					>
 						Next &nbsp; <Icon type="right" theme="outlined" />
 					</a>
 				</div>
@@ -251,7 +255,11 @@ export default class Introduction extends Component {
 				) : (
 					<footer>
 						<div className="left-column">
-							<a onClick={this.setMapping} className="primary button big">
+							<a
+								onClick={this.setMapping}
+								data-cy="submit-data"
+								className="primary button big"
+							>
 								Import Movies Dataset
 							</a>
 						</div>

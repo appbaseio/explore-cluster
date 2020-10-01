@@ -1,158 +1,64 @@
-/* eslint-disable jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
-import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { css } from 'emotion';
+import { Skeleton, Card, Divider, notification, message, Alert } from 'antd';
+import PropTypes from 'prop-types';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 import {
-	Card,
-	Select,
-	Affix,
-	Row,
-	Button,
-	Col,
-	Dropdown,
-	Icon,
-	Menu,
-	InputNumber,
-	Switch,
-	notification,
-	message,
-	Tooltip,
-	Skeleton,
-	Radio,
-	Typography,
-	Alert,
-} from 'antd';
-
-import {
-	getAppMappings,
-	putSettings,
 	getDefaultSettings,
 	getSettings,
+	putSettings,
 	deleteSettings,
 } from '../../batteries/modules/actions';
-import { getURL, getVersion } from '../../constants/config';
-import Mappings from '../../batteries/components/Mappings/Mappings';
-import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
-import { getAggsMappings } from '../../batteries/utils/mappings';
-import { dropdown } from '../../batteries/components/Mappings/styles';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
-import SettingsFooter from '../../components/SettingsFooter';
-import ReviewAndSave from '../../components/ReviewAndSave';
-import { container } from '../ResultsPage/styles';
-import { getSubFields } from '../../utils';
-import settingsMap from '../../components/ReviewAndSave/helper';
-import { isEqual, isValidPlan } from '../../batteries/utils';
+import { isValidPlan, isEqual } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
-import { highlighter } from '../SandboxPage/components/Search';
+import { container } from '../ResultsPage/styles';
+import FieldsType from './components/FieldsType';
+import SettingsOptions from './components/SettingsOptions';
+import settingsMap from '../../components/ReviewAndSave/helper';
+import { getDiffKeys } from './utils';
+import ReviewAndSave from '../../components/ReviewAndSave';
+import SettingsFooter from '../../components/SettingsFooter';
 import { allowedTiers } from '../../utils/prop-types';
-import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
-import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
-
-const { Option } = Select;
 
 const bannerDetails = {
 	title: 'Aggregation Settings',
+	description:
+		'Aggregation Settings allows you to set the fields that should be used for aggregations (aka search facets).',
 	buttonText: 'Read More',
+	videoLink: 'https://youtu.be/bNhju-9mDR0',
 	icon: 'pencil',
 	href: 'https://docs.appbase.io/docs/search/relevancy/#aggregation-settings',
 };
 
-const bannerMessage = {
-	title: 'Aggregations Settings',
-	buttonText: 'Read Docs',
-	href: 'https://docs.appbase.io/docs/search/relevancy/#aggregation-settings',
-};
-
-const cardStyle = css`
-	label {
-		display: block;
-		font-weight: 500;
-		margin-bottom: 5px;
-		color: rgba(0, 0, 0, 0.85);
-	}
-
-	.input {
-		margin-bottom: 15px;
-		min-width: 200px;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-
-	.input.no-bottom {
-		margin-bottom: 0;
-	}
-`;
-
-const getChangedKeys = (oldObj, newObj) => {
-	if (!oldObj && !newObj) {
-		return [];
-	}
-
-	if (!oldObj) {
-		return Object.keys(newObj);
-	}
-
-	if (!newObj) {
-		return Object.keys(oldObj);
-	}
-	const modifiedKeys = Object.keys(newObj).filter((item) => oldObj[item] !== newObj[item]);
-	const deletedKeys = Object.keys(oldObj).filter((item) => !newObj[item]);
-
-	return [...new Set([...modifiedKeys, ...deletedKeys])];
-};
-
 class AggsPage extends React.Component {
 	state = {
-		searchableMappings: [],
-		dataField: {},
-		count: '',
-		sort: undefined,
+		fieldTypes: {},
+		count: 10,
+		sort: 'count',
 		includeNullValue: false,
-		isDirty: false,
-		visible: false,
 		queryFormat: 'or',
-		changedSubFields: {
-			old: {},
-			new: {},
-		},
+		reviewAndSaveModal: false,
+		isReset: false,
+		searchFields: [],
 	};
 
-	searchableMappings = {};
-
-	mappingsRef = React.createRef(null);
+	_mappingsRef = null;
 
 	componentDidMount() {
 		const {
 			appName,
-			credentials,
-			fetchMappings,
 			getSettingsAction,
-			isFetchingMapping,
-			mappings,
 			settings,
 			getDefaultSettingsAction,
 			defaultSettings,
 		} = this.props;
-		const url = getURL();
 
 		if (settings) {
-			this.initData(settings);
+			this.init(settings);
 		} else {
 			getSettingsAction(appName);
-		}
-
-		if (!mappings && !isFetchingMapping) {
-			fetchMappings(appName, credentials, url);
-		} else if (mappings) {
-			const searchableMappings = this.getSearchableMappings(mappings);
-
-			// eslint-disable-next-line
-			this.setState({
-				searchableMappings,
-			});
 		}
 
 		if (!defaultSettings) {
@@ -161,186 +67,24 @@ class AggsPage extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { mappings, settings, isLoading } = this.props;
-		if (mappings && JSON.stringify(prevProps.mappings) !== JSON.stringify(mappings)) {
-			const searchableMappings = this.getSearchableMappings(mappings);
+		const { settings, isLoading } = this.props;
 
-			// eslint-disable-next-line
-			this.setState({
-				searchableMappings,
-			});
-		}
-
-		if (
-			prevProps.isLoading !== isLoading &&
-			!isLoading &&
-			settings &&
-			JSON.stringify(prevProps.settings) !== JSON.stringify(settings)
-		) {
-			this.initData(settings);
-		}
-
-		if (prevProps.isLoading !== isLoading && !isLoading && settings && settings.aggregations) {
-			this.initData(settings);
+		if (!isLoading && JSON.stringify(settings) !== JSON.stringify(prevProps.settings)) {
+			this.init(settings);
 		}
 	}
 
-	toggleVisible = (isReset = false) => {
-		this.setState((prevState) => ({
-			visible: !prevState.visible,
-			isReset,
-		}));
-	};
-
-	initData = (settings) => {
-		this.setState({
-			count: get(settings, 'aggregations.size'),
-			sort: get(settings, 'aggregations.sortBy'),
-			includeNullValue: get(settings, 'aggregations.includeNullValues'),
-			dataField: get(settings, 'aggregations.dataField'),
-			queryFormat: get(settings, 'aggregations.queryFormat', 'or'),
-		});
-	};
-
-	getSearchableMappings = (mappings) => {
-		const aggsResponse = getAggsMappings(mappings, true);
-		const parsedMappings = Array.isArray(aggsResponse)
-			? aggsResponse
-			: Object.keys(aggsResponse);
-		const originalSearchableFields = parsedMappings.filter(
-			(mapping) =>
-				mapping.fieldType === 'text' &&
-				(mapping.usecase === 'search' || mapping.usecase === 'searchaggs'),
-		);
-
-		const searchableFields = originalSearchableFields.reduce((agg, item) => {
-			return [
-				...agg,
-				...Object.keys(
-					getSubFields({ address: item.address, weight: 1, fields: item.fields }),
-				),
-			];
-		}, []);
-
-		this.searchableMappings = searchableFields.reduce(
-			(agg, field) => ({
-				...agg,
-				[field]: 1,
-			}),
+	get hasMappingsChanged() {
+		const savedUsecase = get(
+			this,
+			'_mappingsRef.current.wrappedInstance.originalFlattenUsecase',
 			{},
 		);
-		const searchableMappings = parsedMappings
-			.filter(
-				(mapping) =>
-					mapping.usecase === 'search' ||
-					(mapping.usecase === 'none' && mapping.fieldType === 'text'),
-			)
-			.map((mapping) => ({
-				_address: `${mapping.type}.${mapping.address.split('.').join('.properties.')}`,
-				address: mapping.address,
-				fields: mapping.fields,
-				type: mapping.type,
-				usecase: mapping.usecase,
-				fieldType: mapping.fieldType,
-			}));
 
-		return searchableMappings;
-	};
+		const currentUsecase = get(this, '_mappingsRef.current.wrappedInstance.flattenUsecase', {});
 
-	handleMappingChange = (mappings) => {
-		const searchableMappings = this.getSearchableMappings(mappings);
-		const { dataField } = this.state;
-
-		let isDirty = false;
-		if (get(this.mappingsRef, 'current.wrappedInstance', null)) {
-			isDirty = get(this.mappingsRef, 'current.wrappedInstance.state.dirty');
-		}
-
-		const mappingAddresses = searchableMappings
-			? searchableMappings
-					.map((mapping) => mapping.address)
-					.reduce((agg, item) => [...agg, item, `${item}.keyword`], [])
-			: [];
-		const aggFields = ['keyword'];
-
-		const fieldsTobeDeleteFromState = Object.keys(dataField).filter((item) =>
-			mappingAddresses.includes(item),
-		);
-
-		if (fieldsTobeDeleteFromState && fieldsTobeDeleteFromState.length) {
-			const subFields = fieldsTobeDeleteFromState.reduce((agg, item) => {
-				return [...agg, item, ...aggFields.map((sf) => `${item}.${sf}`)];
-			}, []);
-
-			const updatedFields = Object.keys(dataField).reduce((agg, item) => {
-				if (subFields.includes(item)) {
-					return agg;
-				}
-				return {
-					...agg,
-					[item]: dataField[item],
-				};
-			}, {});
-
-			this.setState({
-				dataField: updatedFields,
-				searchableMappings,
-				isDirty,
-			});
-			return;
-		}
-
-		this.setState({
-			searchableMappings,
-			isDirty,
-		});
-	};
-
-	handleAddField = (value) => {
-		if (get(this.mappingsRef, 'current.wrappedInstance', null)) {
-			const { searchableMappings } = this.state;
-			const mapping = searchableMappings.find((item) => item._address === value);
-
-			const esVersion = get(this.mappingsRef, 'current.wrappedInstance.state.esVersion');
-			const setMapping = get(this.mappingsRef, 'current.wrappedInstance.setMapping');
-
-			if (esVersion && setMapping) {
-				const address =
-					+esVersion > 6
-						? `properties.${value}`
-						: value.replace('_doc.', '_doc.properties.');
-
-				setMapping(address, 'text', 'searchaggs');
-
-				if (mapping) {
-					const parsedAddress = `${mapping.address}.keyword`;
-					this.setState((state) => ({
-						dataField: {
-							...state.dataField,
-							[parsedAddress]: 'term',
-						},
-					}));
-				}
-			}
-		}
-	};
-
-	hasKeyword = (settings) => {
-		if (settings && settings.type === 'keyword') {
-			return true;
-		}
-		if (get(settings, 'fields.keyword.type', '') === 'keyword') {
-			return true;
-		}
-
-		return false;
-	};
-
-	handleAggType = ({ address, value }) => {
-		this.setState((prevState) => ({
-			dataField: { ...prevState.dataField, [address]: value },
-		}));
-	};
+		return JSON.stringify(savedUsecase) !== JSON.stringify(currentUsecase);
+	}
 
 	handleChange = (name, value) => {
 		this.setState({
@@ -349,37 +93,36 @@ class AggsPage extends React.Component {
 	};
 
 	handleSave = () => {
-		const { isDirty, dataField, sort, count, includeNullValue, queryFormat } = this.state;
+		const { fieldTypes, sort, count, includeNullValue, queryFormat } = this.state;
 		const { updateSettingsAction, appName, settings } = this.props;
 
+		this.toggleReviewSaveVisible();
 		updateSettingsAction(appName, {
 			...settings,
 			aggregations: {
 				...get(settings, 'aggregations', {}),
-				dataField,
+				dataField: fieldTypes,
 				size: count,
 				sortBy: sort,
 				includeNullValues: includeNullValue,
 				queryFormat,
 			},
 		})
-			.then((res) => {
+			.then(async (res) => {
 				if (res && res.error) {
 					notification.error({
 						message: 'Failed to save Aggregation Settings',
 						description: res.error.message,
 					});
 				} else {
-					message.success(`Aggregation settings for ${appName} saved successfully`);
-					this.setState({
-						changedSubFields: {
-							old: {},
-							new: {},
-						},
-					});
-					if (isDirty) {
-						this.reIndex();
+					if (this.hasMappingsChanged) {
+						const reIndex = get(
+							this,
+							'_mappingsRef.current.wrappedInstance.handleReindex',
+						);
+						await reIndex();
 					}
+					message.success(`Aggregation settings for ${appName} saved successfully`);
 				}
 			})
 			.catch((e) => {
@@ -390,103 +133,101 @@ class AggsPage extends React.Component {
 			});
 	};
 
-	reIndex = async () => {
-		const reIndex = get(this.mappingsRef, 'current.wrappedInstance.reIndex');
+	handleTypesUpdate = (fieldTypes) => {
+		this.setState({
+			fieldTypes,
+		});
+	};
 
-		reIndex();
+	init = (settings) => {
+		this.setState({
+			count: get(settings, 'aggregations.size'),
+			sort: get(settings, 'aggregations.sortBy'),
+			includeNullValue: get(settings, 'aggregations.includeNullValues'),
+			fieldTypes: get(settings, 'aggregations.dataField'),
+			queryFormat: get(settings, 'aggregations.queryFormat', 'or'),
+			reviewAndSaveModal: false,
+			isReset: false,
+		});
+	};
+
+	toggleReviewSaveVisible = () => {
+		this.setState((prevState) => ({
+			reviewAndSaveModal: !prevState.reviewAndSaveModal,
+		}));
+	};
+
+	toggleReset = () => {
+		this.setState((prevState) => ({
+			isReset: !prevState.isReset,
+		}));
 	};
 
 	resetChanges = () => {
-		const cancelChanges = get(this.mappingsRef, 'current.wrappedInstance.cancelChanges');
+		const cancelChanges = get(this, '_mappingsRef.current.wrappedInstance.cancelChanges');
 		const { settings } = this.props;
-		this.initData(settings);
-		this.toggleVisible();
 		cancelChanges();
+		this.init(settings);
 	};
 
 	resetToDefault = () => {
 		const { getDefaultSettingsAction, defaultSettings } = this.props;
-		if (defaultSettings) this.initData(defaultSettings);
+
+		if (defaultSettings) this.init(defaultSettings);
 		else
 			getDefaultSettingsAction().then((res) => {
 				if (res && res.payload) {
-					this.initData(res.payload);
+					this.init(res.payload);
 				}
 			});
-		this.toggleVisible(true);
+		this.toggleReset();
+		this.toggleReviewSaveVisible();
 	};
 
-	handleDeleteField = ({ address }) => {
-		const setMapping = get(this.mappingsRef, 'current.wrappedInstance.setMapping');
-
-		if (setMapping) {
-			setMapping(address, 'text', 'search');
-		}
+	setMappingsRef = ({ ref }) => {
+		this._mappingsRef = ref;
 	};
 
-	handleQueryFormat = (e) => {
+	setSearchFields = (searchFields) => {
 		this.setState({
-			queryFormat: e.target.value,
+			searchFields,
 		});
-	};
-
-	handleUsecaseChange = (field, type, usecase, currentUsecase) => {
-		const topLevelKey = +getVersion()[0] >= 7 ? `properties` : `_doc`;
-		const address = field.startsWith(`${topLevelKey}.properties`)
-			? field.replace(`${topLevelKey}.properties`, 'properties')
-			: field;
-		const parsedAddress = address.split('.').reduce((agg, key, index) => {
-			if (index % 2 !== 0) {
-				return agg ? `${agg}.${key}` : key;
-			}
-			return agg;
-		}, '');
-
-		this.setState((prevState) => ({
-			changedSubFields: {
-				...prevState.changedSubFields,
-				new: {
-					...prevState.changedSubFields.new,
-					[parsedAddress]: usecase,
-				},
-				old: {
-					...prevState.changedSubFields.old,
-					[parsedAddress]: currentUsecase,
-				},
-			},
-		}));
 	};
 
 	render() {
 		const {
-			searchableMappings,
-			dataField,
-			sort,
-			count,
-			includeNullValue,
-			visible,
-			isReset,
-			isDirty,
-			queryFormat,
-			changedSubFields,
-		} = this.state;
-		const {
-			isUpdating,
-			settings,
-			resetState,
-			appName,
 			isLoading,
-			defaultSettings,
 			tier,
-			traversedMappings,
 			featureSearchRelevancy,
+			settings,
+			isUpdating,
+			resetState,
+			defaultSettings,
+			appName,
 		} = this.props;
-		const sortOptions = [
-			{ name: 'Count', value: 'count' },
-			{ name: 'Ascending', value: 'asc' },
-			{ name: 'Descending', value: 'desc' },
-		];
-		const { size: savedSize, ...restSavedAggs } = get(settings, 'aggregations', {});
+		const {
+			fieldTypes,
+			count,
+			queryFormat,
+			includeNullValue,
+			sort,
+			reviewAndSaveModal,
+			isReset,
+			searchFields,
+		} = this.state;
+
+		if (isLoading) {
+			return (
+				<React.Fragment>
+					<Banner {...bannerDetails} />
+					<div className={container}>
+						<Card>
+							<Skeleton />
+						</Card>
+					</div>
+				</React.Fragment>
+			);
+		}
 
 		if (!isValidPlan(tier, featureSearchRelevancy)) {
 			return (
@@ -496,234 +237,58 @@ class AggsPage extends React.Component {
 						style={{
 							maxWidth: '70%',
 						}}
-						src="https://i.imgur.com/XcUicGH.png"
-						alt="Aggregation Settings"
+						src="https://i.imgur.com/8ENnHVv.png"
+						alt="Search Settings"
 					/>
 				</React.Fragment>
 			);
 		}
 
-		const changedDataFields = getChangedKeys(restSavedAggs.dataField, dataField);
+		const savedUsecase = get(
+			this,
+			'_mappingsRef.current.wrappedInstance.originalFlattenUsecase',
+			{},
+		);
+
+		const currentUsecase = get(this, '_mappingsRef.current.wrappedInstance.flattenUsecase', {});
+
+		const mappingsDiff = getDiffKeys({
+			saved: savedUsecase,
+			current: currentUsecase,
+			defaultValue: '-',
+		});
+
+		const typesDiff = getDiffKeys({
+			saved: get(settings, 'aggregations.dataField'),
+			current: fieldTypes,
+			defaultValue: '-',
+		});
 
 		return (
 			<React.Fragment>
-				<Banner {...bannerMessage} />
+				<Banner {...bannerDetails} />
 				<div className={container}>
-					{isLoading ? (
-						<Card>
-							<Skeleton />
-						</Card>
-					) : null}
 					<Card>
-						<ErrorToaster>
-							<Mappings
-								showSynonyms={false}
-								showShards={false}
-								ref={this.mappingsRef}
-								showReplicas={false}
-								showMappingInfo={false}
-								showCardWrapper={false}
-								hideSearchType
-								deleteLabel=" Remove from Aggs"
-								hideDelete
-								hideNoneTextType
-								hideDataType
-								hideGeoType
-								isMappingsView={false}
-								renderMappingInfo={() => {
-									if (
-										searchableMappings &&
-										traversedMappings &&
-										searchableMappings.length === traversedMappings.length
-									) {
-										return (
-											<p
-												style={{
-													color: '#999',
-													margin: 0,
-													textAlign: 'center',
-												}}
-											>
-												Add aggregation fields from dropdown.
-											</p>
-										);
-									}
-									return null;
-								}}
-								hidePropertiesType
-								onChange={this.handleMappingChange}
-								onDeleteField={this.handleDeleteField}
-								onUsecaseChange={this.handleUsecaseChange}
-								column={{
-									title: (
-										<React.Fragment>
-											{settingsMap.agg_type.title}
-											<Tooltip title={settingsMap.agg_type.description}>
-												<span style={{ marginLeft: 5 }}>
-													<Icon type="info-circle" />
-												</span>
-											</Tooltip>
-										</React.Fragment>
-									),
-									render: ({ address, settings: mappingSettings }) => {
-										const hasKeyword = this.hasKeyword(mappingSettings);
-										let options = ['Term', 'Range'];
-										if (hasKeyword) {
-											options = ['Term'];
-										}
-
-										const parsedAddress = address.replace(/properties./g, '');
-										const aggKey = hasKeyword
-											? `${parsedAddress}.keyword`
-											: parsedAddress;
-										const menu = (
-											<Menu
-												onClick={(e) =>
-													this.handleAggType({
-														address: aggKey,
-														value: e.key,
-													})
-												}
-											>
-												{options.map((option) => (
-													<Menu.Item key={option.toLowerCase()}>
-														{option}
-													</Menu.Item>
-												))}
-											</Menu>
-										);
-										return (
-											<Dropdown overlay={menu}>
-												<Button className={dropdown}>
-													{get(dataField, aggKey) || 'Select Type'}
-													<Icon type="down" />
-												</Button>
-											</Dropdown>
-										);
-									},
-								}}
-								renderFooter={() =>
-									searchableMappings.length ? (
-										<Affix offsetBottom={73}>
-											<Row
-												style={{
-													padding: 10,
-													border: '1px solid #e8e8e8',
-													background: 'white',
-													width: '100%',
-												}}
-												type="flex"
-												justify="space-between"
-											>
-												<Col>
-													<Select
-														key={searchableMappings.length}
-														showSearch
-														placeholder="Add new aggregation field"
-														optionFilterProp="children"
-														style={{ minWidth: 200 }}
-														onChange={this.handleAddField}
-														filterOption={(input, option) =>
-															option.props.children
-																.toLowerCase()
-																.indexOf(input.toLowerCase()) >= 0
-														}
-													>
-														{searchableMappings.map((mapping) => (
-															<Option
-																key={mapping._address}
-																value={mapping._address}
-															>
-																{mapping.address}
-															</Option>
-														))}
-													</Select>
-													{searchableMappings &&
-													traversedMappings &&
-													searchableMappings.length ===
-														traversedMappings.length ? (
-														<span className={highlighter} />
-													) : null}
-												</Col>
-											</Row>
-										</Affix>
-									) : null
-								}
-							/>
-						</ErrorToaster>
-					</Card>
-					<Card className={cardStyle}>
-						<label>
-							Query Format
-							<Tooltip title={settingsMap.queryFormat.description}>
-								<Icon style={{ marginLeft: 5 }} type="info-circle" />
-							</Tooltip>
-						</label>
-						<Radio.Group
-							style={{ display: 'flex', marginBottom: 8 }}
-							onChange={this.handleQueryFormat}
-							value={queryFormat}
-						>
-							<Radio value="or">Or</Radio>
-							<Radio value="and">And</Radio>
-						</Radio.Group>
-						<label>
-							Default Size For Aggregations{' '}
-							<Tooltip title={settingsMap.agg_size.description}>
-								<Icon type="info-circle" />
-							</Tooltip>
-						</label>
-						<InputNumber
-							onChange={(value) => this.handleChange('count', value)}
-							value={count}
-							min={1}
-							placeholder="Enter default aggs size"
-							className="input"
+						<FieldsType
+							fieldTypes={fieldTypes}
+							onFieldsUpdate={this.handleTypesUpdate}
+							onInit={this.setMappingsRef}
+							setSearchFields={this.setSearchFields}
 						/>
-						<label>
-							Default Sort{' '}
-							<Tooltip title={settingsMap.sortBy.description}>
-								<Icon type="info-circle" />
-							</Tooltip>
-						</label>
-						<Select
-							placeholder="Select default Sort"
-							value={sort}
-							optionFilterProp="children"
-							style={{ minWidth: 200, marginBottom: '15px' }}
-							onChange={(value) => this.handleChange('sort', value)}
-							filterOption={(input, option) =>
-								option.props.children.toLowerCase().indexOf(input.toLowerCase()) >=
-								0
-							}
-						>
-							{sortOptions.map((sortOption) => (
-								<Option key={sortOption.value} value={sortOption.value}>
-									{sortOption.name}
-								</Option>
-							))}
-						</Select>
-						<label>
-							Include Null Values{' '}
-							<Tooltip title={settingsMap.includeNullValues.description}>
-								<Icon type="info-circle" />
-							</Tooltip>
-						</label>
-						<Switch
-							checked={includeNullValue}
-							onChange={(value) => this.handleChange('includeNullValue', value)}
+						<Divider />
+						<SettingsOptions
+							handleChange={this.handleChange}
+							sort={sort}
+							includeNullValue={includeNullValue}
+							count={count}
+							queryFormat={queryFormat}
 						/>
 					</Card>
 					<SettingsFooter
 						loading={isUpdating}
 						resetState={resetState}
+						showCopySettings
 						onReset={this.resetToDefault}
-						showReset={
-							!isEqual(
-								get(settings, 'aggregations'),
-								get(defaultSettings, 'aggregations'),
-							)
-						}
 						showSearchPreview
 						searchPreviewModalProps={{
 							searchPreviewProps: {
@@ -731,49 +296,60 @@ class AggsPage extends React.Component {
 									...(settings || {}),
 									search: {
 										...get(settings, 'search', {}),
-										dataField:
-											settings &&
-											settings.search &&
-											settings.search.dataField &&
-											settings.search.dataField.length > 0
-												? settings.search.dataField
-												: Object.keys(this.searchableMappings),
-
-										fieldWeights:
-											settings &&
-											settings.search &&
-											settings.search.dataField &&
-											settings.search.dataField.length > 0
-												? settings.search.fieldWeights
-												: Object.values(this.searchableMappings),
+										dataField: get(settings, 'search.dataField.length')
+											? get(settings, 'search.dataField', {})
+											: Object.keys(searchFields),
+										fieldWeights: get(settings, 'search.fieldWeights.length')
+											? get(settings, 'search.fieldWeights', {})
+											: Object.values(searchFields),
 									},
 									aggregations: {
 										size: count,
 										sortBy: sort,
 										includeNullValues: includeNullValue,
-										dataField,
+										dataField: fieldTypes,
 										queryFormat,
 									},
 								},
 								hasTestSettings: true,
 							},
 							buttonProps: {
-								showTooltip: isDirty,
+								showTooltip: this.hasMappingsChanged,
 								tooltip: settingsMap.disable_search_settings.description,
 							},
 						}}
 						app={appName}
+						showReset={
+							!isEqual(
+								get(settings, 'aggregations'),
+								get(defaultSettings, 'aggregations'),
+							)
+						}
 						reviewAndSave={() => (
 							<ReviewAndSave
 								loading={isUpdating}
 								isReset={isReset}
 								oldValues={{
-									...restSavedAggs,
-									agg_size: savedSize,
-									mappings: get(changedSubFields, 'old'),
+									agg_size: get(settings, 'aggregations.size'),
+									sortBy: get(settings, 'aggregations.sortBy'),
+									includeNullValues: get(
+										settings,
+										'aggregations.includeNullValues',
+									),
+									dataField: get(typesDiff, 'old'),
+									queryFormat: get(settings, 'aggregations.queryFormat', 'or'),
+									mappings: get(mappingsDiff, 'old', {}),
+								}}
+								newValues={{
+									agg_size: count,
+									sortBy: sort,
+									includeNullValues: includeNullValue,
+									dataField: get(typesDiff, 'new'),
+									queryFormat,
+									mappings: get(mappingsDiff, 'new', {}),
 								}}
 								renderContent={() =>
-									isDirty ? (
+									this.hasMappingsChanged ? (
 										<Alert
 											type="warning"
 											showIcon
@@ -782,51 +358,10 @@ class AggsPage extends React.Component {
 										/>
 									) : null
 								}
-								newValues={{
-									agg_size: count,
-									sortBy: sort,
-									includeNullValues: includeNullValue,
-									dataField,
-									queryFormat,
-									mappings: get(changedSubFields, 'new'),
-								}}
-								renderField={({ value, type, record }) => {
-									const fieldName = get(record, 'setting', '').toLowerCase();
-
-									if (fieldName === 'datafield') {
-										return changedDataFields.map((field) => (
-											<Typography.Paragraph key={field}>
-												{field.replace('.keyword', '')}:{' '}
-												<strong>
-													{type === 'old'
-														? get(restSavedAggs, `dataField.${field}`)
-														: dataField[field]}
-												</strong>
-											</Typography.Paragraph>
-										));
-									}
-
-									if (fieldName === 'mappings') {
-										return Object.keys(get(changedSubFields, type, {})).map(
-											(field) => (
-												<Typography.Paragraph>
-													{field}:{' '}
-													<strong>
-														{get(changedSubFields, `${type}.${field}`)}
-													</strong>
-												</Typography.Paragraph>
-											),
-										);
-									}
-									return JSON.stringify(value, null, 2);
-								}}
-								onClick={() => this.toggleVisible(false)}
-								visible={visible}
+								onClick={this.toggleReviewSaveVisible}
+								visible={reviewAndSaveModal}
 								onRevert={this.resetChanges}
-								onSave={() => {
-									this.handleSave();
-									this.toggleVisible();
-								}}
+								onSave={this.handleSave}
 							/>
 						)}
 					/>
@@ -837,68 +372,52 @@ class AggsPage extends React.Component {
 }
 
 AggsPage.propTypes = {
-	fetchMappings: PropTypes.func.isRequired,
-	getDefaultSettingsAction: PropTypes.func.isRequired,
-	getSettingsAction: PropTypes.func.isRequired,
-	updateSettingsAction: PropTypes.func.isRequired,
-	deleteSettingsAction: PropTypes.func.isRequired,
 	appName: PropTypes.string.isRequired,
-	credentials: PropTypes.string.isRequired,
-	isFetchingMapping: PropTypes.bool,
-	mappings: PropTypes.object,
-	settings: PropTypes.object,
 	defaultSettings: PropTypes.object,
 	isLoading: PropTypes.bool,
 	isUpdating: PropTypes.bool,
-	tier: allowedTiers,
 	resetState: PropTypes.object,
-	traversedMappings: PropTypes.array,
+	settings: PropTypes.object,
+	tier: allowedTiers,
+
 	featureSearchRelevancy: PropTypes.bool,
+	getDefaultSettingsAction: PropTypes.func.isRequired,
+	getSettingsAction: PropTypes.func.isRequired,
+	updateSettingsAction: PropTypes.func.isRequired,
 };
 
 AggsPage.defaultProps = {
-	isFetchingMapping: false,
-	mappings: null,
+	isUpdating: false,
 	settings: null,
+	resetState: {},
 	defaultSettings: null,
 	isLoading: false,
-	isUpdating: false,
 	tier: undefined,
-	resetState: {},
-	traversedMappings: [],
 	featureSearchRelevancy: false,
 };
 
 const mapStateToProps = (state) => {
-	const mappings = getRawMappingsByAppName(state) || null;
 	const defaultSettings = get(state.$getAppSettings, `defaultSettings`);
 	const errorCode = get(state, '$getAppSettings.error.actual.code');
 	const defaultSearchSettings = errorCode === 404 ? defaultSettings : null;
-	const { username, password } = get(state, 'user.data', {});
 	const appName = get(state, '$getCurrentApp.name');
 	return {
-		isLoading: get(state, '$getAppSettings.isFetching'),
-		settings: get(state, ['$getAppSettings', 'settings', appName], defaultSearchSettings),
-		isUpdating: get(state, '$getAppSettings.isUpdating'),
-		resetState: get(state, '$getAppSettings.default', {}),
-		credentials: username ? `${username}:${password}` : null,
-		mappings,
-		traversedMappings: get(state, `$getAppMappings.traversedMappings.${appName}`, []),
-		isFetchingMapping: get(state, '$getAppMappings.isFetching'),
 		appName,
 		defaultSettings,
-		tier: get(state, '$getAppPlan.results.tier'),
 		featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
+		isLoading: get(state, '$getAppSettings.isFetching'),
+		isUpdating: get(state, '$getAppSettings.isUpdating'),
+		resetState: get(state, '$getAppSettings.default', {}),
+		settings: get(state, ['$getAppSettings', 'settings', appName], defaultSearchSettings),
+		tier: get(state, '$getAppPlan.results.tier'),
 	};
 };
 
 const mapDispatchToProps = (dispatch) => ({
-	fetchMappings: (appName, credentials, url) =>
-		dispatch(getAppMappings(appName, credentials, url)),
+	deleteSettingsAction: (name) => dispatch(deleteSettings(name)),
 	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
 	getSettingsAction: (name) => dispatch(getSettings(name)),
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
-	deleteSettingsAction: (name) => dispatch(deleteSettings(name)),
 });
 
 export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(AggsPage));

@@ -211,7 +211,12 @@ export default class Onboarding extends Component {
 					</ul>
 				</div>
 				<div className="right">
-					<button type="button" className="skip-link" onClick={this.skipTutorial}>
+					<button
+						type="button"
+						className="skip-link"
+						onClick={this.skipTutorial}
+						data-cy="skip-tutorial"
+					>
 						&#10005; &nbsp; Skip Tutorial
 					</button>
 					<ErrorToaster>

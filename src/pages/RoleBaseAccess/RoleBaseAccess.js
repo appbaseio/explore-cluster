@@ -34,6 +34,7 @@ const bannerMessage = {
 	title: 'Role Based Access',
 	description: 'Setup Role Based Access Control to secure your app.',
 	buttonText: 'Read Docs',
+	videoLink: 'https://youtu.be/G49bXB8aqFI',
 };
 
 class RoleBaseAccess extends React.Component {
