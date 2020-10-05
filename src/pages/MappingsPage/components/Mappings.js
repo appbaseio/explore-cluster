@@ -23,11 +23,12 @@ import {
 import { getRawMappingsByAppName } from '../../../batteries/modules/selectors';
 import { getSettings } from '../../../batteries/utils/mappings';
 import SearchPreviewModal from '../../../components/SearchPreviewModal';
-
 import { footerStyles, row } from './styles';
 import ObjectField from './ObjectField';
 import FieldRow from './FieldRow';
 import MappingsCard from './MappingsCard';
+import conversionMap from './utils/conversionMap';
+import { VIEWS } from '../../../constants/props';
 
 class Mappings extends React.Component {
 	URL = getURL();
@@ -49,6 +50,7 @@ class Mappings extends React.Component {
 		type: {},
 		rawMappings: null,
 		isReindexing: false,
+		deletedPaths: [],
 	};
 
 	componentDidMount() {
@@ -176,23 +178,34 @@ class Mappings extends React.Component {
 	};
 
 	handleDelete = (path) => {
-		const { usecase, type, rawMappings } = this.state;
+		// for aggs and search view we don't actually need to delete field from data set
+		// but change as per the context
+		const { onRemove } = this.props;
+		if (onRemove) {
+			onRemove(path);
+			return;
+		}
+		const { usecase, type, rawMappings, deletedPaths } = this.state;
 		this.flattenType = omit(this.flattenType, path);
 		this.flattenUsecase = omit(this.flattenUsecase, path);
 
 		const updatedUsecase = omit(usecase, path);
 		const updatedType = omit(type, path);
-		const updatedMappings = deleteMappingField({ originalMapping: rawMappings, path });
+		const { deletedPath, mappings: _updatedMappings } = deleteMappingField({
+			originalMapping: rawMappings,
+			path,
+		});
 		this.setState({
 			usecase: updatedUsecase,
 			type: updatedType,
-			rawMappings: updatedMappings,
+			rawMappings: _updatedMappings,
+			deletedPaths: [...deletedPaths, deletedPath],
 		});
 	};
 
 	handleReindex = async () => {
 		const { appName, credentials } = this.props;
-		const { rawMappings } = this.state;
+		const { rawMappings, deletedPaths } = this.state;
 
 		this.setState({
 			isReindexing: true,
@@ -203,11 +216,13 @@ class Mappings extends React.Component {
 		);
 
 		const startTime = Date.now();
+
 		reIndex({
 			mappings: rawMappings,
 			appName,
 			version: getVersion(),
 			credentials,
+			excludeFields: deletedPaths,
 			settings: {
 				analysis: {
 					...get(appSettings, 'index.analysis'),
@@ -226,6 +241,7 @@ class Mappings extends React.Component {
 	onSuccessfulReindex = () => {
 		this.setState({
 			isReindexing: false,
+			deletedPaths: [],
 		});
 		this.getMappings();
 	};
@@ -261,7 +277,7 @@ class Mappings extends React.Component {
 	};
 
 	renderMapping = ({ usecase, type, path = '', rawMappings, init = false }) => {
-		const { hideAggsFields, hideSearchFields, hideTypeColumn, renderColumn } = this.props;
+		const { renderColumn, view } = this.props;
 		if (!usecase) {
 			return null;
 		}
@@ -276,16 +292,22 @@ class Mappings extends React.Component {
 		}
 
 		return Object.keys(usecase).map((field) => {
-			if (typeof usecase[field] === 'object') {
+			const usecaseVal = get(usecase, field);
+			const typeVal = get(type, field);
+			const isObj = typeof usecaseVal === 'object';
+
+			if (isObj) {
 				return (
 					<ObjectField
+						key={field}
 						path={`${path}${field}`}
 						field={field}
 						onDelete={this.handleDelete}
+						view={view}
 					>
 						{this.renderMapping({
-							usecase: get(usecase, field),
-							type: get(type, field),
+							usecase: usecaseVal,
+							type: typeVal,
 							path: `${path}${field}.`,
 							rawMappings,
 						})}
@@ -293,19 +315,35 @@ class Mappings extends React.Component {
 				);
 			}
 
+			if (
+				view === VIEWS.SEARCH &&
+				(usecaseVal === 'none' || usecaseVal === 'aggs' || typeVal !== 'text')
+			) {
+				return null;
+			}
+
+			if (view === VIEWS.AGGREGATION && !conversionMap[typeVal]) {
+				return null;
+			}
+
+			if (
+				view === VIEWS.AGGREGATION &&
+				((usecaseVal === 'none' && typeVal === 'text') || usecaseVal === 'search')
+			) {
+				return null;
+			}
+
 			return (
 				<FieldRow
-					key={field}
+					view={view}
+					key={`${path}${field}`}
 					field={field}
-					usecase={get(usecase, field)}
-					type={get(type, field)}
+					usecase={usecaseVal}
+					type={typeVal}
 					mapping={getMappingsByPath({ mappings: rawMappings, path: `${path}${field}` })}
 					path={`${path}${field}`}
 					setMapping={this.setMapping}
 					onDelete={this.handleDelete}
-					hideAggsFields={hideAggsFields}
-					hideSearchFields={hideSearchFields}
-					hideTypeColumn={hideTypeColumn}
 					renderColumn={renderColumn}
 				/>
 			);
@@ -313,15 +351,7 @@ class Mappings extends React.Component {
 	};
 
 	render() {
-		const {
-			isFetchingMapping,
-			error,
-			appName,
-			hideCardTitle,
-			hideFooter,
-			cardProps,
-			headerRowProps,
-		} = this.props;
+		const { isFetchingMapping, error, appName, cardProps, headerRowProps, view } = this.props;
 		const { usecase, type, isReindexing, rawMappings } = this.state;
 		const hasMappingsChanged =
 			JSON.stringify(usecase) !== JSON.stringify(this.originalMappingsUsecase) ||
@@ -329,10 +359,10 @@ class Mappings extends React.Component {
 
 		const mappingCardProps = {
 			getMappings: this.getMappings,
-			hideCardTitle,
 			setMapping: this.setMapping,
 			cardProps,
 			headerRowProps,
+			view,
 		};
 
 		if (isFetchingMapping) {
@@ -369,7 +399,7 @@ class Mappings extends React.Component {
 					</Row>
 				</MappingsCard>
 				<Loader show={isReindexing} message="Re-indexing your data... Please wait!" />
-				{hideFooter ? null : (
+				{view === VIEWS.SCHEMA && (
 					<Affix offsetBottom={0}>
 						<div className={footerStyles}>
 							<SearchPreviewModal app={appName} />
@@ -410,15 +440,12 @@ Mappings.propTypes = {
 	language: PropTypes.string,
 	searchRelevancy: PropTypes.object,
 	// Search & Aggs Settings specific Props
-	hideCardTitle: PropTypes.bool,
-	hideAggsFields: PropTypes.bool,
-	hideSearchFields: PropTypes.bool,
-	hideTypeColumn: PropTypes.bool,
 	renderColumn: PropTypes.func,
 	onChange: PropTypes.func,
-	hideFooter: PropTypes.bool,
+	onRemove: PropTypes.func,
 	cardProps: PropTypes.object,
 	headerRowProps: PropTypes.object,
+	view: PropTypes.string,
 	// Actions
 	fetchMappings: PropTypes.func.isRequired,
 	fetchSearchSettings: PropTypes.func.isRequired,
@@ -433,15 +460,12 @@ Mappings.defaultProps = {
 	language: 'universal',
 	searchRelevancy: null,
 	// Search & Aggs Settings specific Props
-	hideCardTitle: false,
-	hideAggsFields: false,
-	hideSearchFields: false,
-	hideTypeColumn: false,
-	hideFooter: false,
 	cardProps: {},
 	headerRowProps: {},
 	renderColumn: null,
 	onChange: null,
+	onRemove: null,
+	view: VIEWS.SCHEMA,
 };
 
 const mapStateToProps = (state, props) => {

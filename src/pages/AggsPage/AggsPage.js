@@ -373,7 +373,6 @@ class AggsPage extends React.Component {
 
 AggsPage.propTypes = {
 	appName: PropTypes.string.isRequired,
-	credentials: PropTypes.string.isRequired,
 	defaultSettings: PropTypes.object,
 	isLoading: PropTypes.bool,
 	isUpdating: PropTypes.bool,
@@ -382,7 +381,6 @@ AggsPage.propTypes = {
 	tier: allowedTiers,
 
 	featureSearchRelevancy: PropTypes.bool,
-	fetchMappings: PropTypes.func.isRequired,
 	getDefaultSettingsAction: PropTypes.func.isRequired,
 	getSettingsAction: PropTypes.func.isRequired,
 	updateSettingsAction: PropTypes.func.isRequired,
@@ -402,11 +400,9 @@ const mapStateToProps = (state) => {
 	const defaultSettings = get(state.$getAppSettings, `defaultSettings`);
 	const errorCode = get(state, '$getAppSettings.error.actual.code');
 	const defaultSearchSettings = errorCode === 404 ? defaultSettings : null;
-	const { username, password } = get(state, 'user.data', {});
 	const appName = get(state, '$getCurrentApp.name');
 	return {
 		appName,
-		credentials: username ? `${username}:${password}` : null,
 		defaultSettings,
 		featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
 		isLoading: get(state, '$getAppSettings.isFetching'),

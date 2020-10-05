@@ -7,6 +7,7 @@ import Mappings from '../../MappingsPage/components/Mappings';
 import { hasKeyword } from '../utils';
 import { getSubFields } from '../../../utils';
 import { getMappingsByPath } from '../../MappingsPage/components/utils/mappings';
+import { VIEWS } from '../../../constants/props';
 
 const { Option } = Select;
 
@@ -91,6 +92,16 @@ class FieldsType extends React.Component {
 		});
 	};
 
+	// ref to older version: https://github.com/appbaseio-confidential/arc-dashboard/blob/72869b13cf6daf78af7d91eafc480c6894a4f36c/src/pages/AggsPage/AggsPage.js#L418
+	handleRemoveFromSearch = (field) => {
+		const updateMapping = get(this, 'mappingsRef.current.wrappedInstance.setMapping');
+		updateMapping({
+			usecase: 'none',
+			path: field,
+			type: 'text',
+		});
+	};
+
 	render() {
 		const { appName, fieldTypes } = this.props;
 		const { searchFields } = this.state;
@@ -99,6 +110,7 @@ class FieldsType extends React.Component {
 			<React.Fragment>
 				<Mappings
 					appName={appName}
+					view={VIEWS.AGGREGATION}
 					cardProps={{
 						bodyStyle: {
 							padding: 0,
@@ -127,10 +139,6 @@ class FieldsType extends React.Component {
 							},
 						],
 					}}
-					hideSearchFields
-					hideCardTitle
-					hideFooter
-					hideTypeColumn
 					onChange={this.handleMappingChange}
 					ref={this.mappingsRef}
 					renderColumn={({ path, mapping }) => (
@@ -153,13 +161,14 @@ class FieldsType extends React.Component {
 							{hasKeyword(mapping) ? null : <Option value="range">Range</Option>}
 						</Select>
 					)}
+					onRemove={this.handleRemoveFromSearch}
 				/>
 				{searchFields.length > 0 ? (
 					<div style={{ position: 'relative', display: 'inline-block' }}>
 						<Select
 							key={searchFields.length}
-							style={{ width: 150 }}
-							placeholder="Update to search field"
+							style={{ width: 300 }}
+							placeholder="Add aggregation fields from schema"
 							onChange={this.updateToAggsField}
 						>
 							{searchFields.map((field) => (

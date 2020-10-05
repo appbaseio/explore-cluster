@@ -37,7 +37,6 @@ class SearchSettings extends React.Component {
 		fuzziness: 0,
 		queryFormat: 'or',
 		queryType: 'default',
-		hasFuzziness: false,
 		enableNgram: true,
 		hasLanguage: true,
 		enableSynonyms: true,
@@ -91,7 +90,6 @@ class SearchSettings extends React.Component {
 		const {
 			fieldWeights,
 			fuzziness,
-			hasFuzziness,
 			enableSynonyms,
 			queryFormat,
 			queryType,
@@ -104,7 +102,7 @@ class SearchSettings extends React.Component {
 			...settings,
 			search: {
 				...get(settings, 'search', {}),
-				fuzziness: hasFuzziness ? fuzziness : 0,
+				fuzziness,
 				dataField: Object.keys(fieldWeights),
 				fieldWeights: Object.values(fieldWeights),
 				searchOperators: queryType === 'searchOperators',
@@ -186,7 +184,6 @@ class SearchSettings extends React.Component {
 
 		this.setState({
 			fuzziness: get(searchSettings, 'fuzziness'),
-			hasFuzziness: !!get(searchSettings, 'fuzziness'),
 			queryFormat: get(searchSettings, 'queryFormat'),
 			queryType,
 			fieldWeights,
@@ -253,7 +250,6 @@ class SearchSettings extends React.Component {
 			hasLanguage,
 			queryFormat,
 			queryType,
-			hasFuzziness,
 			fuzziness,
 			reviewAndSaveModal,
 			isReset,
@@ -329,7 +325,6 @@ class SearchSettings extends React.Component {
 							handleChange={this.handleChange}
 							queryType={queryType}
 							queryFormat={queryFormat}
-							hasFuzziness={hasFuzziness}
 							fuzziness={fuzziness}
 							enableSynonyms={enableSynonyms}
 							enableNgram={enableNgram}
@@ -346,7 +341,7 @@ class SearchSettings extends React.Component {
 								testSettings: {
 									...(settings || {}),
 									search: {
-										fuzziness: hasFuzziness ? fuzziness : 0,
+										fuzziness,
 										searchOperators: queryType === 'searchOperators',
 										dataField: Object.keys(fieldWeights),
 										fieldWeights: Object.values(fieldWeights),
@@ -370,6 +365,7 @@ class SearchSettings extends React.Component {
 								loading={isUpdating}
 								isReset={isReset}
 								oldValues={{
+									fuzziness: get(settings, 'search.fuzziness'),
 									dataField: get(diffUsecase, 'old', {}),
 									fieldWeights: get(diffWeights, 'old', {}),
 									synonyms: get(settings, 'synonyms.enabled'),
@@ -381,7 +377,7 @@ class SearchSettings extends React.Component {
 									enableNgram: get(settings, 'indexSettings.enableNgram'),
 								}}
 								newValues={{
-									fuzziness: hasFuzziness ? fuzziness : 0,
+									fuzziness,
 									dataField: get(diffUsecase, 'new', {}),
 									fieldWeights: get(diffWeights, 'new', {}),
 									synonyms: enableSynonyms,
@@ -417,7 +413,6 @@ class SearchSettings extends React.Component {
 
 SearchSettings.propTypes = {
 	appName: PropTypes.string.isRequired,
-	credentials: PropTypes.string.isRequired,
 	defaultSettings: PropTypes.object,
 	isLoading: PropTypes.bool,
 	isUpdating: PropTypes.bool,
@@ -426,7 +421,6 @@ SearchSettings.propTypes = {
 	tier: allowedTiers,
 
 	featureSearchRelevancy: PropTypes.bool,
-	fetchMappings: PropTypes.func.isRequired,
 	getDefaultSettingsAction: PropTypes.func.isRequired,
 	getSettingsAction: PropTypes.func.isRequired,
 	updateSettingsAction: PropTypes.func.isRequired,

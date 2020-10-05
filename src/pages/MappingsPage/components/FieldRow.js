@@ -5,9 +5,7 @@ import UsecaseDropdown from './UsecaseDropdown';
 import TypeDropdown from './TypeDropdown';
 import { fieldRow } from './styles';
 import MappingsTypeIcon from './MappingsTypeIcon';
-import conversionMap from './utils/conversionMap';
-
-const ALLOWED_AGGS_MAPPING = Object.keys(conversionMap);
+import { VIEWS } from '../../../constants/props';
 
 const FieldRow = ({
 	path,
@@ -15,33 +13,15 @@ const FieldRow = ({
 	usecase,
 	type,
 	mapping,
-	hideAggsFields,
-	hideSearchFields,
-	hideTypeColumn,
 	renderColumn,
 	onDelete,
 	setMapping,
+	view,
 }) => {
-	if (hideAggsFields && (usecase === 'none' || usecase === 'aggs' || type !== 'text')) {
-		return null;
-	}
-
-	if (hideSearchFields && usecase === 'search') {
-		return null;
-	}
-
-	if (hideSearchFields && !ALLOWED_AGGS_MAPPING.includes(type)) {
-		/*
-			hideSearchFields denotes that we only want to display aggs mappings and we
-			dont want aggs to have unsupported type like rank_feature, rank_features, etc.
-		*/
-		return null;
-	}
-
 	return (
 		<Row type="flex" justify="space-between" className={fieldRow}>
 			<Col>
-				<p>
+				<div>
 					<Popover content={<pre>{JSON.stringify(mapping, null, 2)}</pre>}>
 						<div className="mappings-icon">
 							<MappingsTypeIcon type={type} />
@@ -54,9 +34,10 @@ const FieldRow = ({
 						size="small"
 						onClick={() => onDelete(path)}
 					>
-						<Icon type="delete" /> Delete
+						<Icon type="delete" />{' '}
+						{view === VIEWS.SCHEMA ? 'Remove field' : `Remove from ${view}`}
 					</Button>
-				</p>
+				</div>
 			</Col>
 			<Col>
 				<Row gutter={16}>
@@ -68,7 +49,7 @@ const FieldRow = ({
 							path={path}
 						/>
 					</Col>
-					{hideTypeColumn ? null : (
+					{view === VIEWS.SCHEMA && (
 						<Col xs={type === 'text' ? 12 : 24}>
 							<TypeDropdown
 								value={type}
@@ -95,10 +76,8 @@ const FieldRow = ({
 FieldRow.defaultProps = {
 	mapping: {},
 	// Search & Aggs Settings specific Props
-	hideSearchFields: false,
-	hideAggsFields: false,
-	hideTypeColumn: false,
 	renderColumn: null,
+	view: VIEWS.SCHEMA,
 };
 
 FieldRow.propTypes = {
@@ -108,10 +87,8 @@ FieldRow.propTypes = {
 	type: PropTypes.string.isRequired,
 	mapping: PropTypes.object,
 	// Search & Aggs Settings specific Props
-	hideSearchFields: PropTypes.bool,
-	hideAggsFields: PropTypes.bool,
-	hideTypeColumn: PropTypes.bool,
 	renderColumn: PropTypes.func,
+	view: PropTypes.string,
 	// Actions
 	onDelete: PropTypes.func.isRequired,
 	setMapping: PropTypes.func.isRequired,

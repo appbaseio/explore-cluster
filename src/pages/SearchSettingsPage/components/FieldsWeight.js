@@ -7,6 +7,7 @@ import HighLighter from '../../../components/HighLighter';
 import Mappings from '../../MappingsPage/components/Mappings';
 import { getSubFields } from '../../../utils';
 import { getMappingsByPath } from '../../MappingsPage/components/utils/mappings';
+import { VIEWS } from '../../../constants/props';
 
 const { Option } = Select;
 
@@ -121,12 +122,37 @@ class FieldsWeight extends React.PureComponent {
 		});
 	};
 
+	// ref to older version: https://github.com/appbaseio-confidential/arc-dashboard/blob/72869b13cf6daf78af7d91eafc480c6894a4f36c/src/pages/SearchSettingsPage/SearchSettings.js#L473
+	handleRemoveFromSearch = (field) => {
+		const updateMapping = get(this, 'mappingsRef.current.wrappedInstance.setMapping');
+		const useCases = get(this, 'mappingsRef.current.wrappedInstance.flattenUsecase', {});
+		const nestedFields = Object.keys(useCases).filter((i) => i.indexOf(`${field}.`) > -1);
+		if (nestedFields.length) {
+			nestedFields.forEach((i) => {
+				if (useCases[i] === 'search' || useCases[i] === 'searchaggs') {
+					updateMapping({
+						usecase: 'aggs',
+						path: i,
+						type: 'text',
+					});
+				}
+			});
+		} else {
+			updateMapping({
+				usecase: 'aggs',
+				path: field,
+				type: 'text',
+			});
+		}
+	};
+
 	render() {
-		const { appName, fieldWeights, enableSynonyms, enableNgram } = this.props;
+		const { appName, fieldWeights, enableSynonyms, enableNgram, ...rest } = this.props;
 		const { aggsFields } = this.state;
 		return (
 			<div>
 				<Mappings
+					{...rest}
 					appName={appName}
 					cardProps={{
 						bodyStyle: {
@@ -156,10 +182,7 @@ class FieldsWeight extends React.PureComponent {
 							},
 						],
 					}}
-					hideAggsFields
-					hideCardTitle
-					hideFooter
-					hideTypeColumn
+					view={VIEWS.SEARCH}
 					forceNgram={enableNgram}
 					forceSynonyms={enableSynonyms}
 					onChange={this.handleMappingChange}
@@ -167,7 +190,7 @@ class FieldsWeight extends React.PureComponent {
 					renderColumn={({ path, mapping }) => (
 						<div style={{ width: 150 }}>
 							<InputNumber
-								value={fieldWeights[path]}
+								value={fieldWeights[path] || 1}
 								min={0}
 								onChange={(value) => {
 									this.handleFieldWeight({
@@ -179,13 +202,14 @@ class FieldsWeight extends React.PureComponent {
 							/>
 						</div>
 					)}
+					onRemove={this.handleRemoveFromSearch}
 				/>
 				{aggsFields.length > 0 ? (
 					<div style={{ position: 'relative', display: 'inline-block' }}>
 						<Select
 							key={aggsFields.length}
-							style={{ width: 150 }}
-							placeholder="Update to search field"
+							style={{ width: 300 }}
+							placeholder="Add search fields from schema "
 							onChange={this.updateToSearchField}
 						>
 							{aggsFields.map((field) => (
