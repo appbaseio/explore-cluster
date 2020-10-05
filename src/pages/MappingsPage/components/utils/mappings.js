@@ -56,7 +56,7 @@ const _getMappingsUsecase = (mappings) => {
 			...agg,
 			[item]: get(mappings, `${item}.properties`)
 				? { ..._getMappingsUsecase(get(mappings, `${item}.properties`)) }
-				: _getUsecase(get(mappings, `${item}.fields`)),
+				: _getUsecase(get(mappings, `${item}.fields`), get(mappings, `${item}.type`)),
 		};
 	}, {});
 };
@@ -73,28 +73,29 @@ const _getMappingsType = (mappings) => {
 };
 
 const _hasAggs = (field) => {
-	if (!field) return false;
-	let hasAggsFlag = false;
-	Object.keys(field).forEach((subField) => {
-		if (
+	// this means its of non text type and has aggs
+	if (!field) return true;
+
+	// for text type check if .keyword exists
+	const hasAggsFlag = Object.keys(field).some(
+		(subField) =>
 			field[subField].type === 'keyword' ||
-			(field[subField].type === 'string' && field[subField].index === 'not_analyzed') // for ES2
-		) {
-			hasAggsFlag = true;
-		}
-	});
+			(field[subField].type === 'string' && field[subField].index === 'not_analyzed'),
+	);
 	return hasAggsFlag;
 };
 
-const _getUsecase = (fields) => {
-	if (!fields) {
+const _getUsecase = (fields, type) => {
+	if (!fields && type === 'text') {
 		return 'none';
 	}
 	const hasAggsFlag = _hasAggs(fields);
 	let hasSearchFlag = 0;
-	if (fields.search || fields.autosuggest || fields.delimiter) hasSearchFlag = 1;
-	if (hasAggsFlag && hasSearchFlag) return 'searchaggs';
-	if (!hasAggsFlag && hasSearchFlag) return 'search';
+	if (type === 'text') {
+		if (fields.search || fields.autosuggest || fields.delimiter) hasSearchFlag = 1;
+		if (hasAggsFlag && hasSearchFlag) return 'searchaggs';
+		if (!hasAggsFlag && hasSearchFlag) return 'search';
+	}
 	if (hasAggsFlag && !hasSearchFlag) return 'aggs';
 	return 'none';
 };
@@ -142,7 +143,7 @@ const _getFieldsByRelevancy = ({
 	if (enableNgram) {
 		delete updatedFields.search;
 	} else if (type === 'text') {
-		if (_getUsecase(updatedFields).includes('search') && !updatedFields.search) {
+		if (_getUsecase(updatedFields, type).includes('search') && !updatedFields.search) {
 			updatedFields = {
 				...updatedFields,
 				search: {

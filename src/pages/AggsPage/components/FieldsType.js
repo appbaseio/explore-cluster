@@ -13,6 +13,8 @@ const { Option } = Select;
 
 class FieldsType extends React.Component {
 	state = {
+		// this are fields for which aggs type (Term / Range) is not yet set
+		// aggsFields: [],
 		searchFields: [],
 	};
 
@@ -23,7 +25,17 @@ class FieldsType extends React.Component {
 		if (onInit) {
 			onInit({ ref: this.mappingsRef });
 		}
+		this.setPossibleAggsField();
 	}
+
+	componentDidUpdate() {
+		this.setPossibleAggsField();
+	}
+
+	setPossibleAggsField = () => {
+		const searchRelevancy = get(this, 'mappingsRef.current', {});
+		console.log('searchRelevancy', searchRelevancy);
+	};
 
 	handleMappingChange = () => {
 		const { setSearchFields } = this.props;
@@ -105,6 +117,7 @@ class FieldsType extends React.Component {
 	render() {
 		const { appName, fieldTypes } = this.props;
 		const { searchFields } = this.state;
+		console.log(this.mappingsRef);
 
 		return (
 			<React.Fragment>

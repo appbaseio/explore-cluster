@@ -55,7 +55,6 @@ class Mappings extends React.Component {
 
 	componentDidMount() {
 		const { mappings, appName, fetchSearchSettings, searchRelevancy } = this.props;
-
 		if (mappings) {
 			this.init(mappings);
 		} else {
@@ -277,7 +276,7 @@ class Mappings extends React.Component {
 	};
 
 	renderMapping = ({ usecase, type, path = '', rawMappings, init = false }) => {
-		const { renderColumn, view } = this.props;
+		const { renderColumn, view, searchRelevancy } = this.props;
 		if (!usecase) {
 			return null;
 		}
@@ -295,6 +294,7 @@ class Mappings extends React.Component {
 			const usecaseVal = get(usecase, field);
 			const typeVal = get(type, field);
 			const isObj = typeof usecaseVal === 'object';
+			const agssDataFields = get(searchRelevancy, `aggregations.dataField`, {});
 
 			if (isObj) {
 				return (
@@ -328,7 +328,13 @@ class Mappings extends React.Component {
 
 			if (
 				view === VIEWS.AGGREGATION &&
-				((usecaseVal === 'none' && typeVal === 'text') || usecaseVal === 'search')
+				(usecaseVal === 'none' ||
+					usecaseVal === 'search' ||
+					!get(
+						agssDataFields,
+						`${path}${field}${typeVal === 'text' ? '.keyword' : ''}`,
+						null,
+					))
 			) {
 				return null;
 			}

@@ -134,6 +134,7 @@ class AggsPage extends React.Component {
 	};
 
 	handleTypesUpdate = (fieldTypes) => {
+		console.log(fieldTypes);
 		this.setState({
 			fieldTypes,
 		});
