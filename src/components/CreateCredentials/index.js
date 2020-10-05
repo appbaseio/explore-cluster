@@ -277,9 +277,10 @@ class CreateCredentials extends React.Component {
 			saveButtonText,
 			isLoadingMappings,
 			isUserManagement,
-			mappings,
 			indices,
+			mappings: rawMappings,
 		} = this.props;
+		const mappings = Array.isArray(rawMappings) ? rawMappings : [];
 		const { filteredMappings } = this.state;
 		const Messages = getMessages(isUserManagement);
 		return (
@@ -943,7 +944,7 @@ const mapStateToProps = (state) => {
 		appbaseCredentials: username ? `${username}:${password}` : null,
 		isPaidUser: true,
 		appName: get(state, '$getCurrentApp.name'),
-		mappings: mappings || [],
+		mappings,
 		isPermissionPresent: !!appPermissions,
 		indices: Object.keys(indices || {}),
 		isLoadingMappings:
