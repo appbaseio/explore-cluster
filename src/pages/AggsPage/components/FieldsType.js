@@ -1,5 +1,6 @@
 import React from 'react';
 import get from 'lodash/get';
+import isEqual from 'lodash/isEqual';
 import { Select } from 'antd';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -14,8 +15,7 @@ const { Option } = Select;
 class FieldsType extends React.Component {
 	state = {
 		// this are fields for which aggs type (Term / Range) is not yet set
-		// aggsFields: [],
-		searchFields: [],
+		aggsFields: [],
 	};
 
 	mappingsRef = React.createRef();
@@ -33,14 +33,37 @@ class FieldsType extends React.Component {
 	}
 
 	setPossibleAggsField = () => {
-		const searchRelevancy = get(this, 'mappingsRef.current', {});
-		console.log('searchRelevancy', searchRelevancy);
+		const { fieldTypes } = this.props;
+		const usecases = get(this, 'mappingsRef.current.wrappedInstance.flattenUsecase', null);
+		const types = get(this, 'mappingsRef.current.wrappedInstance.flattenType', null);
+
+		if (fieldTypes && usecases && types) {
+			const newAggsFields = Object.keys(types).reduce((agg, field) => {
+				if (types[field] === 'text') {
+					if (usecases[field] !== 'search' && !fieldTypes[`${field}.keyword`]) {
+						return [...agg, field];
+					}
+
+					return [...agg];
+				}
+				return [...agg, field];
+			}, []);
+			const { aggsFields } = this.state;
+
+			if (!isEqual(newAggsFields.sort(), aggsFields)) {
+				this.setState({ aggsFields: newAggsFields });
+			}
+		}
 	};
 
 	handleMappingChange = () => {
 		const { setSearchFields } = this.props;
 		const usecases = get(this, 'mappingsRef.current.wrappedInstance.flattenUsecase', {});
-		const mappings = get(this, 'mappingsRef.current.wrappedInstance.state.rawMappings', {});
+		const mappings = get(
+			this,
+			'mappingsRef.current.wrappedInstance.state.originalFlattenMappingsType',
+			{},
+		);
 
 		const onlySearchFields = Object.keys(usecases).filter(
 			(field) => usecases[field] === 'search',
@@ -116,8 +139,7 @@ class FieldsType extends React.Component {
 
 	render() {
 		const { appName, fieldTypes } = this.props;
-		const { searchFields } = this.state;
-		console.log(this.mappingsRef);
+		const { aggsFields } = this.state;
 
 		return (
 			<React.Fragment>
@@ -176,15 +198,15 @@ class FieldsType extends React.Component {
 					)}
 					onRemove={this.handleRemoveFromSearch}
 				/>
-				{searchFields.length > 0 ? (
+				{aggsFields.length > 0 ? (
 					<div style={{ position: 'relative', display: 'inline-block' }}>
 						<Select
-							key={searchFields.length}
+							key={aggsFields.length}
 							style={{ width: 300 }}
 							placeholder="Add aggregation fields from schema"
 							onChange={this.updateToAggsField}
 						>
-							{searchFields.map((field) => (
+							{aggsFields.map((field) => (
 								<Option key={field} value={field}>
 									{field}
 								</Option>
@@ -207,6 +229,7 @@ FieldsType.propTypes = {
 
 const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');
+
 	return {
 		isLoading: get(state, '$getAppSettings.isFetching'),
 		appName,

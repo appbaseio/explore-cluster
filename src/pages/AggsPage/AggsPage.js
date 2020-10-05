@@ -42,6 +42,8 @@ class AggsPage extends React.Component {
 		reviewAndSaveModal: false,
 		isReset: false,
 		searchFields: [],
+		// this are fields for which aggs type (Term / Range) is not yet set
+		aggsFields: [],
 	};
 
 	_mappingsRef = null;
@@ -134,7 +136,6 @@ class AggsPage extends React.Component {
 	};
 
 	handleTypesUpdate = (fieldTypes) => {
-		console.log(fieldTypes);
 		this.setState({
 			fieldTypes,
 		});
