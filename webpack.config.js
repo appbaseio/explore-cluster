@@ -31,9 +31,9 @@ const plugins = [
 	}),
 ];
 
-if (!isProduction) {
-	plugins.push(new BundleAnalyzerPlugin());
-}
+// if (!isProduction) {
+// 	plugins.push(new BundleAnalyzerPlugin());
+// }
 
 if (isProduction && !!process.env.SENTRY_TOKEN) {
 	plugins.push(
