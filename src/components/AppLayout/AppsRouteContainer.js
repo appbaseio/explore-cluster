@@ -205,7 +205,7 @@ class RouteContainer extends React.Component {
 					/>
 					<Route
 						exact
-						path="/app/:appName/query-suggestions"
+						path="/app/:appName/popular-suggestions"
 						render={(props) => (
 							<AppPageContainer {...props} component={QuerySuggestionsPage} />
 						)}
