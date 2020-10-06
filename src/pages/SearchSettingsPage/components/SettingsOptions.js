@@ -21,7 +21,6 @@ const optionContainer = css`
 
 const SettingsOptions = ({
 	handleChange,
-	hasFuzziness,
 	enableNgram,
 	enableSynonyms,
 	fuzziness,
@@ -42,13 +41,13 @@ const SettingsOptions = ({
 		>
 			<Radio value="default">ReactiveSearch</Radio>
 			<Radio value="queryString">
-				{settingsMap.queryString.title}{' '}
+				{settingsMap.queryString.title}
 				<Tooltip title={settingsMap.queryString.description}>
 					<Icon type="info-circle" />
 				</Tooltip>
 			</Radio>
 			<Radio value="searchOperators">
-				{settingsMap.searchOperators.title}{' '}
+				{settingsMap.searchOperators.title}
 				<Tooltip title={settingsMap.searchOperators.description}>
 					<Icon type="info-circle" />
 				</Tooltip>
@@ -69,30 +68,37 @@ const SettingsOptions = ({
 			<Radio value="and">And</Radio>
 		</Radio.Group>
 		<h6>
-			{settingsMap.enableTypoTolerance.title}{' '}
+			{settingsMap.enableTypoTolerance.title}
 			<Tooltip title={settingsMap.enableTypoTolerance.description}>
 				<Icon type="info-circle" />
 			</Tooltip>
 		</h6>
-		<Switch checked={hasFuzziness} onChange={(value) => handleChange('hasFuzziness', value)} />
+		<Switch
+			checked={Boolean(fuzziness)}
+			onChange={(value) => {
+				if (value) {
+					handleChange('fuzziness', TOLERANCE_OPTIONS[0]);
+				} else {
+					handleChange('fuzziness', 0);
+				}
+			}}
+		/>
 
-		{hasFuzziness && (
+		{Boolean(fuzziness) && (
 			<React.Fragment>
 				<h6>
-					{settingsMap.typoToleranceValue.title}{' '}
+					{settingsMap.typoToleranceValue.title}
 					<Tooltip title={settingsMap.typoToleranceValue.description}>
 						<Icon type="info-circle" />
 					</Tooltip>
 				</h6>
 				<Select
 					placeholder="Select typo tolerance"
-					value={fuzziness}
-					optionFilterProp="children"
+					value={fuzziness || TOLERANCE_OPTIONS[0]}
 					style={{ minWidth: 120 }}
-					onChange={(value) => handleChange('fuzziness', value)}
-					filterOption={(input, option) =>
-						option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-					}
+					onChange={(value) => {
+						handleChange('fuzziness', value);
+					}}
 				>
 					{TOLERANCE_OPTIONS.map((option) => (
 						<Option key={option} value={option}>
@@ -104,7 +110,7 @@ const SettingsOptions = ({
 		)}
 
 		<h6>
-			Enable Synonyms{' '}
+			Enable Synonyms
 			<Tooltip title={settingsMap.synonyms.description}>
 				<Icon type="info-circle" />
 			</Tooltip>
@@ -115,7 +121,7 @@ const SettingsOptions = ({
 		/>
 
 		<h6>
-			{settingsMap.enableNgram.title}{' '}
+			{settingsMap.enableNgram.title}
 			<Tooltip title={settingsMap.enableNgram.description}>
 				<Icon type="info-circle" />
 			</Tooltip>
@@ -126,7 +132,6 @@ const SettingsOptions = ({
 
 SettingsOptions.propTypes = {
 	handleChange: PropTypes.func.isRequired,
-	hasFuzziness: PropTypes.bool.isRequired,
 	enableNgram: PropTypes.bool.isRequired,
 	enableSynonyms: PropTypes.bool.isRequired,
 	fuzziness: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,

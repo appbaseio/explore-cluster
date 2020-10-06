@@ -129,7 +129,7 @@ class ClusterRouteContainer extends React.Component {
 					/>
 					<Route
 						exact
-						path="/cluster/query-suggestions"
+						path="/cluster/popular-suggestions"
 						component={(props) => (
 							<AppPageContainer {...props} component={QuerySuggestionsPage} />
 						)}

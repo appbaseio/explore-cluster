@@ -62,7 +62,7 @@ const defaultRoutes = {
 			{ label: 'Index Settings', link: 'index-settings', tag: 'Beta', openIndexMenu: true },
 			{ label: 'Schema', link: 'settings', tag: 'Beta', openIndexMenu: true },
 			{ label: 'Synonyms', link: 'synonyms', tag: 'Beta', openIndexMenu: true },
-			{ label: 'Query Suggestions', link: '/cluster/query-suggestions', tag: 'Beta' },
+			{ label: 'Popular Suggestions', link: '/cluster/popular-suggestions', tag: 'Beta' },
 			{ label: 'Query Rules', link: '/cluster/rules', tag: 'Beta' },
 			{ label: 'Functions', link: '/cluster/functions', tag: 'Beta' },
 			{ label: 'Grade Evaluation', link: '/cluster/grade-evaluation', tag: 'Beta' },

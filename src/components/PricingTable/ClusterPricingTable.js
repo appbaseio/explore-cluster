@@ -71,9 +71,9 @@ const data = [
 		key: '3',
 		name: (
 			<RowContent>
-				<div>Query Suggestions</div>
+				<div>Popular Suggestions</div>
 				<StyledLink
-					href="https://docs.appbase.io/docs/analytics/query-suggestions/"
+					href="https://docs.appbase.io/docs/analytics/popular-suggestions/"
 					target="_blank"
 				>
 					Read more

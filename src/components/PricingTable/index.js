@@ -650,8 +650,8 @@ class PricingTable extends Component {
 						</tr>
 						<tr>
 							<td>
-								<span data-tip="A query suggestions index is populated daily based on the end-user data.">
-									Query Suggestions
+								<span data-tip="A popular suggestions index is populated daily based on what end users are searching for.">
+									Popular Suggestions
 								</span>
 							</td>
 							<td>-</td>
@@ -1223,7 +1223,7 @@ class PricingTable extends Component {
 							list={[
 								'Search Analytics',
 								'Click Analytics',
-								'Query Suggestions',
+								'Popular Suggestions',
 								'Search Insights',
 								'Custom Events',
 								'Analytics API',
