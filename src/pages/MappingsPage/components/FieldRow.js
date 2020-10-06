@@ -41,14 +41,16 @@ const FieldRow = ({
 			</Col>
 			<Col>
 				<Row gutter={16}>
-					<Col xs={type === 'text' ? 12 : 0}>
-						<UsecaseDropdown
-							value={usecase}
-							type={type}
-							onUsecaseChange={setMapping}
-							path={path}
-						/>
-					</Col>
+					{view === VIEWS.SCHEMA && (
+						<Col xs={type === 'text' ? 12 : 0}>
+							<UsecaseDropdown
+								value={usecase}
+								type={type}
+								onUsecaseChange={setMapping}
+								path={path}
+							/>
+						</Col>
+					)}
 					{view === VIEWS.SCHEMA && (
 						<Col xs={type === 'text' ? 12 : 24}>
 							<TypeDropdown

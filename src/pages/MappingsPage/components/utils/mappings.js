@@ -74,7 +74,7 @@ const _getMappingsType = (mappings) => {
 
 const _hasAggs = (field) => {
 	// this means its of non text type and has aggs
-	if (!field) return true;
+	if (!field || !Object.keys(field).length) return true;
 
 	// for text type check if .keyword exists
 	const hasAggsFlag = Object.keys(field).some(
@@ -86,7 +86,7 @@ const _hasAggs = (field) => {
 };
 
 const _getUsecase = (fields, type) => {
-	if (!fields && type === 'text') {
+	if ((!fields || !Object.keys(fields).length) && type === 'text') {
 		return 'none';
 	}
 	const hasAggsFlag = _hasAggs(fields);

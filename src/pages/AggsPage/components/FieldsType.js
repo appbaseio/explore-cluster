@@ -6,8 +6,6 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Mappings from '../../MappingsPage/components/Mappings';
 import { hasKeyword } from '../utils';
-import { getSubFields } from '../../../utils';
-import { getMappingsByPath } from '../../MappingsPage/components/utils/mappings';
 import { VIEWS } from '../../../constants/props';
 
 const { Option } = Select;
@@ -37,64 +35,28 @@ class FieldsType extends React.Component {
 		const usecases = get(this, 'mappingsRef.current.wrappedInstance.flattenUsecase', null);
 		const types = get(this, 'mappingsRef.current.wrappedInstance.flattenType', null);
 
-		if (fieldTypes && usecases && types) {
+		if (usecases && types) {
 			const newAggsFields = Object.keys(types).reduce((agg, field) => {
 				if (types[field] === 'text') {
-					if (usecases[field] !== 'search' && !fieldTypes[`${field}.keyword`]) {
+					if (
+						usecases[field] !== 'search' &&
+						!get(fieldTypes, `${field}.keyword`, null)
+					) {
 						return [...agg, field];
 					}
 
 					return [...agg];
 				}
-				return [...agg, field];
+				if (!get(fieldTypes, `${field}`, null)) {
+					return [...agg, field];
+				}
+				return [...agg];
 			}, []);
 			const { aggsFields } = this.state;
-
 			if (!isEqual(newAggsFields.sort(), aggsFields)) {
 				this.setState({ aggsFields: newAggsFields });
 			}
 		}
-	};
-
-	handleMappingChange = () => {
-		const { setSearchFields } = this.props;
-		const usecases = get(this, 'mappingsRef.current.wrappedInstance.flattenUsecase', {});
-		const mappings = get(
-			this,
-			'mappingsRef.current.wrappedInstance.state.originalFlattenMappingsType',
-			{},
-		);
-
-		const onlySearchFields = Object.keys(usecases).filter(
-			(field) => usecases[field] === 'search',
-		);
-		const searchFields = Object.keys(usecases).filter((field) =>
-			usecases[field].includes('search'),
-		);
-
-		const allSearchableFields = searchFields.reduce((agg, field) => {
-			return {
-				...agg,
-				...getSubFields({
-					fields: get(
-						getMappingsByPath({
-							mappings,
-							path: field,
-						}),
-						'fields',
-						{},
-					),
-					weight: 1,
-					address: field,
-				}),
-			};
-		}, {});
-
-		setSearchFields(allSearchableFields);
-
-		this.setState({
-			searchFields: onlySearchFields,
-		});
 	};
 
 	handleFieldType = ({ path, type }) => {
@@ -119,33 +81,44 @@ class FieldsType extends React.Component {
 	};
 
 	updateToAggsField = (field) => {
-		const updateMapping = get(this, 'mappingsRef.current.wrappedInstance.setMapping');
-		updateMapping({
-			usecase: 'searchaggs',
-			path: field,
-			type: 'text',
+		const { onFieldsUpdate, fieldTypes } = this.props;
+		const types = get(this, 'mappingsRef.current.wrappedInstance.flattenType', null);
+		const aggType = 'term';
+		let path = `${field}`;
+		if (get(types, field) === 'text') {
+			path = `${path}.keyword`;
+		}
+		onFieldsUpdate({
+			...fieldTypes,
+			[path]: aggType,
 		});
 	};
 
-	// ref to older version: https://github.com/appbaseio-confidential/arc-dashboard/blob/72869b13cf6daf78af7d91eafc480c6894a4f36c/src/pages/AggsPage/AggsPage.js#L418
-	handleRemoveFromSearch = (field) => {
-		const updateMapping = get(this, 'mappingsRef.current.wrappedInstance.setMapping');
-		updateMapping({
-			usecase: 'none',
-			path: field,
-			type: 'text',
+	handleRemoveFromAggs = (field) => {
+		const { onFieldsUpdate, fieldTypes } = this.props;
+		const types = get(this, 'mappingsRef.current.wrappedInstance.flattenType', null);
+		let path = `${field}`;
+		if (get(types, field) === 'text') {
+			path = `${path}.keyword`;
+		}
+
+		const newFieldTypes = { ...fieldTypes };
+		delete newFieldTypes[path];
+
+		onFieldsUpdate({
+			...newFieldTypes,
 		});
 	};
 
 	render() {
 		const { appName, fieldTypes } = this.props;
 		const { aggsFields } = this.state;
-
 		return (
 			<React.Fragment>
 				<Mappings
 					appName={appName}
 					view={VIEWS.AGGREGATION}
+					fieldTypes={fieldTypes}
 					cardProps={{
 						bodyStyle: {
 							padding: 0,
@@ -163,22 +136,16 @@ class FieldsType extends React.Component {
 					headerRowProps={{
 						rightItems: [
 							{
-								title: 'Use case',
-								info:
-									'We detect the appropriate analyzers and mappings here representing the usecase - search or aggregations.',
-							},
-							{
 								title: 'Aggregation Type',
 								info:
 									'Set the aggregation type for the fields. Only fields with their type set appear in the "Test Search Relevancy" UI view.',
 							},
 						],
 					}}
-					onChange={this.handleMappingChange}
+					onChange={() => {}}
 					ref={this.mappingsRef}
 					renderColumn={({ path, mapping }) => (
 						<Select
-							allowClear
 							value={get(
 								fieldTypes,
 								`${path}${hasKeyword(mapping) ? '.keyword' : ''}`,
@@ -196,7 +163,7 @@ class FieldsType extends React.Component {
 							{hasKeyword(mapping) ? null : <Option value="range">Range</Option>}
 						</Select>
 					)}
-					onRemove={this.handleRemoveFromSearch}
+					onRemove={this.handleRemoveFromAggs}
 				/>
 				{aggsFields.length > 0 ? (
 					<div style={{ position: 'relative', display: 'inline-block' }}>
@@ -223,7 +190,6 @@ FieldsType.propTypes = {
 	appName: PropTypes.string.isRequired,
 	fieldTypes: PropTypes.object.isRequired,
 	onFieldsUpdate: PropTypes.func.isRequired,
-	setSearchFields: PropTypes.func.isRequired,
 	onInit: PropTypes.func.isRequired,
 };
 
