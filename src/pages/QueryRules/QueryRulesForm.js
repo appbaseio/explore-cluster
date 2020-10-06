@@ -7,7 +7,6 @@ import { connect } from 'react-redux';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import {
-	Affix,
 	Alert,
 	Button,
 	Card,
@@ -609,6 +608,7 @@ class QueryRulesForm extends React.Component {
 			subFieldsMap,
 		} = this.state;
 		const {
+			collapsed,
 			isCreating,
 			rulesLoading,
 			isUpdating,
@@ -907,8 +907,19 @@ class QueryRulesForm extends React.Component {
 						</Row>
 					</section>
 				</Card>
-				<Affix offsetBottom={0}>
-					<div className={`${isEditPage ? 'space-between' : ''} card-footer`}>
+				<div
+					style={{
+						position: 'fixed',
+						overflow: 'hidden',
+						bottom: 0,
+						left: collapsed ? 80 : 260,
+						right: 0,
+					}}
+				>
+					<div
+						className={`${isEditPage ? 'space-between' : ''} card-footer`}
+						style={{ paddingLeft: 50, paddingRight: 60 }}
+					>
 						{isEditPage ? (
 							<div>
 								<CloneRule
@@ -965,7 +976,7 @@ class QueryRulesForm extends React.Component {
 							</Button>
 						</div>
 					</div>
-				</Affix>
+				</div>
 			</div>
 		);
 	}
@@ -990,6 +1001,7 @@ QueryRulesForm.propTypes = {
 	updateRule: PropTypes.func.isRequired,
 	match: PropTypes.object.isRequired,
 	fetchRules: PropTypes.func.isRequired,
+	collapsed: PropTypes.bool.isRequired,
 };
 
 QueryRulesForm.defaultProps = {
@@ -1031,6 +1043,7 @@ const mapStateToProps = (state, props) => {
 			updateError: get(ruleData, 'update.error'),
 			isDeleting: get(ruleData, 'isDeleting'),
 			deleteError: get(ruleData, 'deleteError'),
+			collapsed: get(state, 'sideBarCollapsed'),
 		};
 	}
 

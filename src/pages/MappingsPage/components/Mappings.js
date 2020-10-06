@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Button, Modal, notification, Affix, Row, Skeleton, Alert, Empty } from 'antd';
+import { Button, Modal, notification, Row, Skeleton, Alert, Empty } from 'antd';
 import omit from 'lodash/omit';
 import PropTypes from 'prop-types';
 
@@ -362,7 +362,15 @@ class Mappings extends React.Component {
 	};
 
 	render() {
-		const { isFetchingMapping, error, appName, cardProps, headerRowProps, view } = this.props;
+		const {
+			collapsed,
+			isFetchingMapping,
+			error,
+			appName,
+			cardProps,
+			headerRowProps,
+			view,
+		} = this.props;
 		const { usecase, type, isReindexing, rawMappings } = this.state;
 		const hasMappingsChanged =
 			JSON.stringify(usecase) !== JSON.stringify(this.originalMappingsUsecase) ||
@@ -411,7 +419,15 @@ class Mappings extends React.Component {
 				</MappingsCard>
 				<Loader show={isReindexing} message="Re-indexing your data... Please wait!" />
 				{view === VIEWS.SCHEMA && (
-					<Affix offsetBottom={0}>
+					<div
+						style={{
+							position: 'fixed',
+							overflow: 'hidden',
+							bottom: 0,
+							left: collapsed ? 80 : 260,
+							right: 0,
+						}}
+					>
 						<div className={footerStyles}>
 							<SearchPreviewModal app={appName} />
 							<div>
@@ -433,7 +449,7 @@ class Mappings extends React.Component {
 								</Button>
 							</div>
 						</div>
-					</Affix>
+					</div>
 				)}
 			</React.Fragment>
 		);
@@ -462,6 +478,7 @@ Mappings.propTypes = {
 	// Actions
 	fetchMappings: PropTypes.func.isRequired,
 	fetchSearchSettings: PropTypes.func.isRequired,
+	collapsed: PropTypes.bool.isRequired,
 };
 
 Mappings.defaultProps = {
@@ -491,6 +508,7 @@ const mapStateToProps = (state, props) => {
 	const defaultSearchSettings = errorCode === 404 ? defaultSettings : null;
 	return {
 		appName,
+		collapsed: get(state, 'sideBarCollapsed'),
 		mappings: getRawMappingsByAppName(state) || null,
 		searchRelevancy: get(
 			state,

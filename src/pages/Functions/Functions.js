@@ -1,18 +1,6 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import {
-	Button,
-	Col,
-	Divider,
-	Icon,
-	List,
-	Popover,
-	Result,
-	Row,
-	Switch,
-	Tooltip,
-	Affix,
-} from 'antd';
+import { Button, Col, Divider, Icon, List, Popover, Result, Row, Switch, Tooltip } from 'antd';
 import { connect } from 'react-redux';
 
 import get from 'lodash/get';
@@ -440,7 +428,15 @@ class FunctionsPage extends React.Component {
 	};
 
 	render() {
-		const { isLoading, functions, tier, getFunction, apps, featureFunctions } = this.props;
+		const {
+			collapsed,
+			isLoading,
+			functions,
+			tier,
+			getFunction,
+			apps,
+			featureFunctions,
+		} = this.props;
 		const { deployModal, checking, healthError, notFoundError, visible, app } = this.state;
 		this.sortedDataSource = (functions || []).sort((a, b) => a.order - b.order);
 
@@ -678,12 +674,20 @@ class FunctionsPage extends React.Component {
 							)}
 						/>
 					</ErrorToaster>
-					<Affix offsetBottom={0}>
+					<div
+						style={{
+							position: 'fixed',
+							overflow: 'hidden',
+							bottom: 0,
+							left: collapsed ? 80 : 260,
+							right: 0,
+						}}
+					>
 						<div
 							style={{
 								display: 'flex',
 								justifyContent: 'space-between',
-								padding: 20,
+								padding: '20px 50px',
 								background: 'white',
 								border: '1px solid #e8e8e8',
 								boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.15)',
@@ -697,7 +701,7 @@ class FunctionsPage extends React.Component {
 								app={app}
 							/>
 						</div>
-					</Affix>
+					</div>
 				</section>
 
 				{deployModal && (
@@ -720,6 +724,7 @@ FunctionsPage.propTypes = {
 	tier: allowedTiers,
 	apps: PropTypes.object,
 	featureFunctions: PropTypes.bool,
+	collapsed: PropTypes.bool.isRequired,
 };
 
 FunctionsPage.defaultProps = {
@@ -738,6 +743,7 @@ const mapStateToProps = (state) => ({
 	tier: get(state, '$getAppPlan.results.tier'),
 	featureFunctions: get(state, '$getAppPlan.results.feature_functions', false),
 	apps: get(state, 'apps.data'),
+	collapsed: get(state, 'sideBarCollapsed'),
 });
 
 const mapDispatchToProps = (dispatch) => ({
