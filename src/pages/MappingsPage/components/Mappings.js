@@ -277,11 +277,8 @@ class Mappings extends React.Component {
 
 	renderMapping = ({ usecase, type, path = '', rawMappings, init = false }) => {
 		const { renderColumn, view, fieldTypes } = this.props;
-		if (!usecase) {
-			return null;
-		}
 
-		if (init && Object.keys(usecase).length === 0) {
+		if (init && (!usecase || Object.keys(usecase).length === 0)) {
 			return (
 				<Empty
 					image={Empty.PRESENTED_IMAGE_SIMPLE}
