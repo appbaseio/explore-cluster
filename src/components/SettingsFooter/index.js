@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Affix, Button } from 'antd';
+import { Button } from 'antd';
+import get from 'lodash/get';
+import { connect } from 'react-redux';
 import SearchPreviewModal from '../SearchPreviewModal';
 import CloneIndex from '../CloneIndex';
 
@@ -26,12 +28,24 @@ class SettingsFooter extends React.Component {
 			app,
 			showCopySettings,
 			showReset,
+			collapsed,
 		} = this.props;
 
 		const { copySettingsModal } = this.state;
 		return (
-			<Affix offsetBottom={0}>
-				<div className="flex space-between card-footer">
+			<div
+				style={{
+					position: 'fixed',
+					overflow: 'hidden',
+					bottom: 0,
+					left: collapsed ? 80 : 260,
+					right: 0,
+				}}
+			>
+				<div
+					className="flex space-between card-footer"
+					style={{ paddingLeft: 50, paddingRight: 50 }}
+				>
 					<div>
 						{app && showSearchPreview ? (
 							<SearchPreviewModal {...searchPreviewModalProps} app={app} />
@@ -69,7 +83,7 @@ class SettingsFooter extends React.Component {
 						{reviewAndSave()}
 					</div>
 				</div>
-			</Affix>
+			</div>
 		);
 	}
 }
@@ -84,6 +98,7 @@ SettingsFooter.propTypes = {
 	app: PropTypes.string,
 	showReset: PropTypes.bool,
 	showCopySettings: PropTypes.bool,
+	collapsed: PropTypes.bool.isRequired,
 };
 
 SettingsFooter.defaultProps = {
@@ -97,4 +112,8 @@ SettingsFooter.defaultProps = {
 	showCopySettings: false,
 };
 
-export default SettingsFooter;
+const mapStateToProps = (state) => ({
+	collapsed: get(state, 'sideBarCollapsed'),
+});
+
+export default connect(mapStateToProps)(SettingsFooter);

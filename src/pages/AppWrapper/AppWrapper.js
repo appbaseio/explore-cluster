@@ -14,6 +14,7 @@ import {
 import Logo from '../../components/Logo';
 
 import { getParam, getParsedRoutes } from '../../utils';
+import { setIsSidebarCollapsed } from '../../actions';
 import { breakpoints } from '../../utils/media';
 import Loader from '../../components/Loader';
 import { isValidPlan } from '../../batteries/utils';
@@ -152,11 +153,9 @@ class AppWrapper extends Component {
 			console.log(e);
 		}
 
-		const collapsed = window.innerWidth <= breakpoints.medium;
 		const getActiveMenuData = getActiveMenu(props);
 
 		this.state = {
-			collapsed,
 			showHeader,
 			appName: props.match.params.appName, // eslint-disable-line
 			value: '',
@@ -192,7 +191,7 @@ class AppWrapper extends Component {
 
 	componentDidMount() {
 		const { appName } = this.state;
-		const { history, match } = this.props;
+		const { history, match, setIsCollapsed } = this.props;
 		const view = getParam('view') || '';
 
 		this.handleSettings(appName);
@@ -200,6 +199,9 @@ class AppWrapper extends Component {
 		if (!match.params.appName && appName) {
 			history.push(`/app/${appName}/${view}`);
 		}
+
+		const collapsed = window.innerWidth <= breakpoints.medium;
+		setIsCollapsed(collapsed);
 	}
 
 	componentDidUpdate() {
@@ -255,21 +257,14 @@ class AppWrapper extends Component {
 	};
 
 	onCollapse = () => {
-		this.setState((prevState) => ({ collapsed: !prevState.collapsed }));
+		const { setIsCollapsed, collapsed } = this.props;
+		setIsCollapsed(!collapsed);
 	};
 
 	render() {
-		const {
-			collapsed,
-			showHeader,
-			appName,
-			activeSubMenu,
-			activeMenuItem,
-			loading,
-			value,
-		} = this.state;
+		const { showHeader, appName, activeSubMenu, activeMenuItem, loading, value } = this.state;
 
-		const { history } = this.props;
+		const { history, collapsed } = this.props;
 
 		return (
 			<Layout>
@@ -428,6 +423,8 @@ AppWrapper.propTypes = {
 	getSettingsAction: PropTypes.func.isRequired,
 	tier: allowedTiers,
 	featureSearchRelevancy: PropTypes.bool,
+	setIsCollapsed: PropTypes.func.isRequired,
+	collapsed: PropTypes.bool.isRequired,
 };
 
 AppWrapper.defaultProps = {
@@ -445,6 +442,7 @@ const mapStateToProps = (state) => {
 		settings: get(state, ['$getAppSettings', 'settings', appName]),
 		tier: get(state, '$getAppPlan.results.tier'),
 		featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
+		collapsed: get(state, 'sideBarCollapsed'),
 	};
 };
 
@@ -453,6 +451,7 @@ const mapDispatchToProps = (dispatch) => ({
 	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
 	getSettingsAction: (name) => dispatch(getSettings(name)),
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
+	setIsCollapsed: (collapsed) => dispatch(setIsSidebarCollapsed(collapsed)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AppWrapper);

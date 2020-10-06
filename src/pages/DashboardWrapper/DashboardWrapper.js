@@ -15,7 +15,7 @@ import { getAppPlan } from '../../batteries/modules/actions';
 import { getParam, getParsedRoutes } from '../../utils';
 import LabelTag from '../../components/LabelTag';
 import IndexSwitcher from '../../components/IndexSwitcher';
-import { loadApps } from '../../actions';
+import { loadApps, setIsSidebarCollapsed } from '../../actions';
 import SidebarAutocomplete from '../../components/SidebarAutocomplete';
 import searchInputStyle from './styles';
 
@@ -154,7 +154,6 @@ class DashboardWrapper extends Component {
 	constructor(props) {
 		super(props);
 
-		const collapsed = window.innerWidth <= breakpoints.medium;
 		let showHeader = true;
 		try {
 			const header = JSON.parse(sessionStorage.getItem('header'));
@@ -166,7 +165,6 @@ class DashboardWrapper extends Component {
 		}
 		const getActiveMenuData = getActiveMenu(props);
 		this.state = {
-			collapsed,
 			appName: props.match.params.appName, // eslint-disable-line
 
 			showHeader,
@@ -208,6 +206,7 @@ class DashboardWrapper extends Component {
 			isClusterPlanFetching,
 			apps,
 			fetchApps,
+			setIsCollapsed,
 		} = this.props;
 		if (!isClusterPlanFetching && !isClusterPlanFetched) {
 			fetchClusterPlan();
@@ -216,6 +215,9 @@ class DashboardWrapper extends Component {
 		if (!apps) {
 			fetchApps();
 		}
+
+		const collapsed = window.innerWidth <= breakpoints.medium;
+		setIsCollapsed(collapsed);
 	}
 
 	componentDidUpdate(prevProps) {
@@ -244,12 +246,13 @@ class DashboardWrapper extends Component {
 	};
 
 	onCollapse = () => {
-		this.setState((prevState) => ({ collapsed: !prevState.collapsed }));
+		const { setIsCollapsed, collapsed } = this.props;
+		setIsCollapsed(!collapsed);
 	};
 
 	render() {
-		const { collapsed, showHeader, routes, activeSubMenu, activeMenuItem, value } = this.state;
-		const { apps, history, match } = this.props;
+		const { showHeader, routes, activeSubMenu, activeMenuItem, value } = this.state;
+		const { apps, history, match, collapsed } = this.props;
 
 		const filteredApps = keys(apps).filter((app) => !app.startsWith('.'));
 
@@ -426,6 +429,8 @@ DashboardWrapper.propTypes = {
 	history: object.isRequired,
 	match: object.isRequired,
 	location: object.isRequired,
+	collapsed: bool.isRequired,
+	setIsCollapsed: func.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -433,11 +438,13 @@ const mapStateToProps = (state) => ({
 	isClusterPlanFetched: get(state, '$getAppPlan.success'),
 	isClusterPlanFetching: get(state, '$getAppPlan.isFetching', false),
 	apps: get(state, 'apps.data'),
+	collapsed: get(state, 'sideBarCollapsed'),
 });
 
 const mapDispatchToProps = (dispatch) => ({
 	fetchClusterPlan: () => dispatch(getAppPlan()),
 	fetchApps: () => dispatch(loadApps()),
+	setIsCollapsed: (collapsed) => dispatch(setIsSidebarCollapsed(collapsed)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DashboardWrapper);

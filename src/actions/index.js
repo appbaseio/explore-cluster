@@ -1,5 +1,5 @@
 // @flow
-import { USER, APPS, CREATE_APP, APP_SCREEN_PREFERENCES } from '../constants';
+import { USER, APPS, CREATE_APP, APP_SCREEN_PREFERENCES, SIDE_BAR } from '../constants';
 import { createAction } from '../batteries/modules/actions/utils';
 
 export function loadUser(username: string, password: string, url?: string): Object {
@@ -73,4 +73,11 @@ export function removeAppData(options: Object): Object {
 
 export function updateAppScreenPreferences(payload: Object): Object {
 	return { type: APP_SCREEN_PREFERENCES.UPDATE_PREFERENCES, payload };
+}
+
+export function setIsSidebarCollapsed(isCollapsed) {
+	return {
+		type: SIDE_BAR.SET_COLLAPSED,
+		isCollapsed,
+	};
 }

@@ -4,6 +4,7 @@ import appsMetricsReducer from './appsMetricsReducer';
 import appsOwnersReducer from './appsOwnersReducer';
 import createAppReducer from './createAppReducer';
 import appsScreenPreferences from './appsScreenPreferences';
+import sideBarCollapsedReducer from './sideBarCollapsedReducer';
 
 export default {
 	user: userReducer,
@@ -12,4 +13,5 @@ export default {
 	appsOwners: appsOwnersReducer,
 	createdApp: createAppReducer,
 	appsScreenPreferences,
+	sideBarCollapsed: sideBarCollapsedReducer,
 };
