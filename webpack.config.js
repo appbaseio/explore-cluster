@@ -5,7 +5,7 @@ const SentryPlugin = require('@sentry/webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+// const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 const TerserJSPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -31,9 +31,10 @@ const plugins = [
 	}),
 ];
 
-if (!isProduction) {
-	plugins.push(new BundleAnalyzerPlugin());
-}
+// enable only when you want to analyze bundles
+// if (!isProduction) {
+// 	plugins.push(new BundleAnalyzerPlugin());
+// }
 
 if (isProduction && !!process.env.SENTRY_TOKEN) {
 	plugins.push(
@@ -95,8 +96,6 @@ module.exports = {
 			},
 		},
 	},
-	plugins,
-	devtool: 'source-map',
 	module: {
 		rules: [
 			{

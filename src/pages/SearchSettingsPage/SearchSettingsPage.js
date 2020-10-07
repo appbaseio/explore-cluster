@@ -16,6 +16,7 @@ import SettingsOptions from './components/SettingsOptions';
 import { isEqual, isValidPlan } from '../../batteries/utils';
 import ReviewAndSave from '../../components/ReviewAndSave';
 import SettingsFooter from '../../components/SettingsFooter';
+import ReIndexWrapper from '../../components/ReIndexWrapper';
 import { getDiffForFields } from './utils';
 import { container } from '../ResultsPage/styles';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
@@ -86,7 +87,7 @@ class SearchSettings extends React.Component {
 		});
 	};
 
-	handleSave = () => {
+	handleSave = (refetchReIndexingData) => {
 		const {
 			fieldWeights,
 			fuzziness,
@@ -135,7 +136,7 @@ class SearchSettings extends React.Component {
 							this,
 							'_mappingsRef.current.wrappedInstance.handleReindex',
 						);
-						await reIndex();
+						await reIndex(refetchReIndexingData);
 					}
 					getSettingsAction(appName);
 					message.success(`Search settings for ${appName} saved successfully`);
@@ -308,7 +309,7 @@ class SearchSettings extends React.Component {
 		});
 
 		return (
-			<React.Fragment>
+			<div>
 				<Banner {...bannerDetails} />
 				<div className={container}>
 					<Card>
@@ -330,83 +331,93 @@ class SearchSettings extends React.Component {
 							enableNgram={enableNgram}
 						/>
 					</Card>
-					<SettingsFooter
-						loading={isUpdating}
-						resetState={resetState}
-						onReset={this.resetToDefault}
-						showSearchPreview
-						showCopySettings
-						searchPreviewModalProps={{
-							searchPreviewProps: {
-								testSettings: {
-									...(settings || {}),
-									search: {
-										fuzziness,
-										searchOperators: queryType === 'searchOperators',
-										dataField: Object.keys(fieldWeights),
-										fieldWeights: Object.values(fieldWeights),
-										queryString: queryType === 'queryString',
-										queryFormat,
-									},
-								},
-								hasTestSettings: Object.keys(fieldWeights).length > 0,
-							},
-							buttonProps: {
-								showTooltip: hasMappingsChanged,
-								tooltip: settingsMap.disable_search_settings.description,
-							},
-						}}
-						app={appName}
-						showReset={
-							!isEqual(get(settings, 'search'), get(defaultSettings, 'search'))
-						}
-						reviewAndSave={() => (
-							<ReviewAndSave
+					<ReIndexWrapper appName={appName}>
+						{({ refetch }) => (
+							<SettingsFooter
 								loading={isUpdating}
-								isReset={isReset}
-								oldValues={{
-									fuzziness: get(settings, 'search.fuzziness'),
-									dataField: get(diffUsecase, 'old', {}),
-									fieldWeights: get(diffWeights, 'old', {}),
-									synonyms: get(settings, 'synonyms.enabled'),
-									queryFormat: get(settings, 'search.queryFormat'),
-									queryType: this.getQueryType({
-										queryString: get(settings, 'search.queryString'),
-										searchOperators: get(settings, 'search.searchOperators'),
-									}),
-									enableNgram: get(settings, 'indexSettings.enableNgram'),
+								resetState={resetState}
+								onReset={this.resetToDefault}
+								showSearchPreview
+								showCopySettings
+								searchPreviewModalProps={{
+									searchPreviewProps: {
+										testSettings: {
+											...(settings || {}),
+											search: {
+												fuzziness,
+												searchOperators: queryType === 'searchOperators',
+												dataField: Object.keys(fieldWeights),
+												fieldWeights: Object.values(fieldWeights),
+												queryString: queryType === 'queryString',
+												queryFormat,
+											},
+										},
+										hasTestSettings: Object.keys(fieldWeights).length > 0,
+									},
+									buttonProps: {
+										showTooltip: hasMappingsChanged,
+										tooltip: settingsMap.disable_search_settings.description,
+									},
 								}}
-								newValues={{
-									fuzziness,
-									dataField: get(diffUsecase, 'new', {}),
-									fieldWeights: get(diffWeights, 'new', {}),
-									synonyms: enableSynonyms,
-									queryFormat,
-									queryType,
-									enableNgram,
-								}}
-								renderContent={() =>
-									hasMappingsChanged ? (
-										<Alert
-											type="warning"
-											showIcon
-											style={{ marginBottom: 10 }}
-											description="Re-indexing is required for applying below changes."
-										/>
-									) : null
+								app={appName}
+								showReset={
+									!isEqual(
+										get(settings, 'search'),
+										get(defaultSettings, 'search'),
+									)
 								}
-								onClick={this.toggleReviewSaveVisible}
-								visible={reviewAndSaveModal}
-								onRevert={this.resetChanges}
-								onSave={() => {
-									this.handleSave();
-									this.toggleReviewSaveVisible();
-								}}
+								reviewAndSave={() => (
+									<ReviewAndSave
+										loading={isUpdating}
+										isReset={isReset}
+										oldValues={{
+											fuzziness: get(settings, 'search.fuzziness'),
+											dataField: get(diffUsecase, 'old', {}),
+											fieldWeights: get(diffWeights, 'old', {}),
+											synonyms: get(settings, 'synonyms.enabled'),
+											queryFormat: get(settings, 'search.queryFormat'),
+											queryType: this.getQueryType({
+												queryString: get(settings, 'search.queryString'),
+												searchOperators: get(
+													settings,
+													'search.searchOperators',
+												),
+											}),
+											enableNgram: get(settings, 'indexSettings.enableNgram'),
+										}}
+										newValues={{
+											fuzziness,
+											dataField: get(diffUsecase, 'new', {}),
+											fieldWeights: get(diffWeights, 'new', {}),
+											synonyms: enableSynonyms,
+											queryFormat,
+											queryType,
+											enableNgram,
+										}}
+										renderContent={() =>
+											hasMappingsChanged ? (
+												<Alert
+													type="warning"
+													showIcon
+													style={{ marginBottom: 10 }}
+													description="Re-indexing is required for applying below changes."
+												/>
+											) : null
+										}
+										onClick={this.toggleReviewSaveVisible}
+										visible={reviewAndSaveModal}
+										onRevert={this.resetChanges}
+										onSave={() => {
+											this.handleSave(refetch);
+											this.toggleReviewSaveVisible();
+										}}
+									/>
+								)}
 							/>
 						)}
-					/>
+					</ReIndexWrapper>
 				</div>
-			</React.Fragment>
+			</div>
 		);
 	}
 }
@@ -441,6 +452,7 @@ const mapStateToProps = (state) => {
 	const errorCode = get(state, '$getAppSettings.error.actual.code');
 	const defaultSearchSettings = errorCode === 404 ? defaultSettings : null;
 	const appName = get(state, '$getCurrentApp.name');
+
 	return {
 		isLoading: get(state, '$getAppSettings.isFetching'),
 		settings: get(state, ['$getAppSettings', 'settings', appName], defaultSearchSettings),
