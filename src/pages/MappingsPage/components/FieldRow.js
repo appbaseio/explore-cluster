@@ -41,7 +41,7 @@ const FieldRow = ({
 			</Col>
 			<Col>
 				<Row gutter={16}>
-					{view !== VIEWS.AGGREGATION && (
+					{view === VIEWS.SCHEMA && (
 						<Col xs={type === 'text' ? 12 : 0}>
 							<UsecaseDropdown
 								value={usecase}

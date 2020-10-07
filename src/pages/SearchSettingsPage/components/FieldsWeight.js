@@ -171,11 +171,6 @@ class FieldsWeight extends React.PureComponent {
 					headerRowProps={{
 						rightItems: [
 							{
-								title: 'Use case',
-								info:
-									'We detect the appropriate analyzers and mappings here representing the usecase - search or aggregations.',
-							},
-							{
 								title: 'Field Weight',
 								info:
 									'Set the search weight to boost query matches against this field. Higher weight fields imply a higher boost.',
