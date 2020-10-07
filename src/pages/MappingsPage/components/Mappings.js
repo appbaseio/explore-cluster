@@ -28,6 +28,7 @@ import ObjectField from './ObjectField';
 import FieldRow from './FieldRow';
 import MappingsCard from './MappingsCard';
 import conversionMap from './utils/conversionMap';
+import ReIndexWrapper from '../../../components/ReIndexWrapper';
 import { VIEWS } from '../../../constants/props';
 
 class Mappings extends React.Component {
@@ -203,7 +204,7 @@ class Mappings extends React.Component {
 		});
 	};
 
-	handleReindex = async () => {
+	handleReindex = async (refetchReIndexingInfo) => {
 		const { appName, credentials } = this.props;
 		const { rawMappings, deletedPaths } = this.state;
 
@@ -217,7 +218,7 @@ class Mappings extends React.Component {
 
 		const startTime = Date.now();
 
-		reIndex({
+		const reIndexPromise = reIndex({
 			mappings: rawMappings,
 			appName,
 			version: getVersion(),
@@ -228,14 +229,20 @@ class Mappings extends React.Component {
 					...get(appSettings, 'index.analysis'),
 				},
 			},
-		})
-			.then(this.onSuccessfulReindex)
-			.catch((err) => {
-				this.onFailedReindex({
-					error: err,
-					startTime,
-				});
+		});
+
+		if (refetchReIndexingInfo) {
+			setTimeout(() => {
+				refetchReIndexingInfo();
+			}, 500);
+		}
+
+		reIndexPromise.then(this.onSuccessfulReindex).catch((err) => {
+			this.onFailedReindex({
+				error: err,
+				startTime,
 			});
+		});
 	};
 
 	onSuccessfulReindex = () => {
@@ -247,6 +254,7 @@ class Mappings extends React.Component {
 	};
 
 	onFailedReindex = ({ startTime, error }) => {
+		console.error('Error while re-indexing', error);
 		const currentTime = Date.now();
 		this.setState({
 			isReindexing: false,
@@ -254,12 +262,14 @@ class Mappings extends React.Component {
 		if (currentTime - startTime >= 60000) {
 			Modal.confirm({
 				title: 'Re-indexing Progress',
-				content: 'Reindexing is still in progress.',
+				content:
+					'Reindexing is in progress, please wait till the current process is completed!',
 			});
 		} else {
 			notification.error({
 				message: 'Reindexing error',
-				description: error.message || JSON.stringify(error, null, 4),
+				description:
+					'Reindexing is in progress, please wait till the current process is completed!',
 			});
 		}
 	};
@@ -387,7 +397,7 @@ class Mappings extends React.Component {
 		}
 
 		return (
-			<React.Fragment>
+			<>
 				<MappingsCard {...mappingCardProps} usecase={usecase}>
 					<Row className={row}>
 						{this.renderMapping({
@@ -400,31 +410,35 @@ class Mappings extends React.Component {
 				</MappingsCard>
 				<Loader show={isReindexing} message="Re-indexing your data... Please wait!" />
 				{view === VIEWS.SCHEMA && (
-					<Affix offsetBottom={0}>
-						<div className={footerStyles}>
-							<SearchPreviewModal app={appName} />
-							<div>
-								<Button
-									type="primary"
-									size="large"
-									style={{ margin: '0 10px' }}
-									onClick={this.handleReindex}
-									disabled={!hasMappingsChanged}
-								>
-									Confirm Mapping Changes
-								</Button>
-								<Button
-									size="large"
-									disabled={!hasMappingsChanged}
-									onClick={this.cancelChanges}
-								>
-									Cancel
-								</Button>
-							</div>
-						</div>
-					</Affix>
+					<ReIndexWrapper appName={appName}>
+						{({ refetch }) => (
+							<Affix offsetBottom={0}>
+								<div className={footerStyles}>
+									<SearchPreviewModal app={appName} />
+									<div>
+										<Button
+											type="primary"
+											size="large"
+											style={{ margin: '0 10px' }}
+											onClick={() => this.handleReindex(refetch)}
+											disabled={!hasMappingsChanged}
+										>
+											Confirm Mapping Changes
+										</Button>
+										<Button
+											size="large"
+											disabled={!hasMappingsChanged}
+											onClick={this.cancelChanges}
+										>
+											Cancel
+										</Button>
+									</div>
+								</div>
+							</Affix>
+						)}
+					</ReIndexWrapper>
 				)}
-			</React.Fragment>
+			</>
 		);
 	}
 }
