@@ -88,7 +88,7 @@ const ReIndexWrapper = ({ children, appName }) => {
 											{fetchState.data.originalDocCount}
 										</b>{' '}
 										documents have been indexed. Once the documents are
-										re-indexed, it may take a while till the shards are
+										re-indexed, it may take a while for the shards to be
 										re-assigned. Changes you make will be saved but won&apos;t
 										be deployed till the re-indexing process is completed.
 									</span>
