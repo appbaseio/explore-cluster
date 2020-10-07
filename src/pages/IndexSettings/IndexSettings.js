@@ -196,7 +196,8 @@ class IndexSettings extends React.Component {
 			.catch((err) => {
 				console.error(err);
 				notification.error({
-					description: JSON.stringify(err),
+					description:
+						'Reindexing is in progress, please wait till the current process is completed!',
 					message: 'Reindexing Failed',
 				});
 				this.setState({

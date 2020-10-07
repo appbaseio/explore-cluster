@@ -118,10 +118,12 @@ class LanguageSettings extends React.Component {
 		const ACC_API = getURL();
 		validateFields((err, values) => {
 			const handleReIndexError = (reIndexErr) => {
+				console.error(reIndexErr);
 				this.setState({ loading: false });
 				notification.error({
-					message: 'error',
-					description: reIndexErr.message,
+					message: 'Reindexing Failed',
+					description:
+						'Reindexing is in progress, please wait till the current process is completed!',
 				});
 			};
 			const handleReIndexSuccess = (languagePayload, mappings) => {

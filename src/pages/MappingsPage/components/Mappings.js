@@ -254,6 +254,7 @@ class Mappings extends React.Component {
 	};
 
 	onFailedReindex = ({ startTime, error }) => {
+		console.error('Error while re-indexing', error);
 		const currentTime = Date.now();
 		this.setState({
 			isReindexing: false,
@@ -261,12 +262,14 @@ class Mappings extends React.Component {
 		if (currentTime - startTime >= 60000) {
 			Modal.confirm({
 				title: 'Re-indexing Progress',
-				content: 'Reindexing is still in progress.',
+				content:
+					'Reindexing is in progress, please wait till the current process is completed!',
 			});
 		} else {
 			notification.error({
 				message: 'Reindexing error',
-				description: error.message || JSON.stringify(error, null, 4),
+				description:
+					'Reindexing is in progress, please wait till the current process is completed!',
 			});
 		}
 	};
