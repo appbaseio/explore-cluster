@@ -85,6 +85,13 @@ const defaultRoutes = {
 		icon: 'rise',
 		link: '/cluster/curated-insights',
 	},
+	Integrations: {
+		icon: 'control',
+		link: 'integrations',
+		tag: 'Beta',
+		label: 'Integrations',
+		openIndexMenu: true,
+	},
 	'Access Control': {
 		icon: 'key',
 		menu: [
@@ -354,12 +361,27 @@ class DashboardWrapper extends Component {
 										</Menu.Item>
 									);
 								}
+
 								return (
 									<Menu.Item key={route}>
-										<Link replace to={routes[route].link}>
-											<Icon type={routes[route].icon} />
-											<span>{route}</span>
-										</Link>
+										{routes[route].openIndexMenu ? (
+											<IndexSwitcher
+												item={routes[route]}
+												filteredApps={filteredApps}
+												history={history}
+												renderItem={() => (
+													<div>
+														<Icon type={routes[route].icon} />
+														<span>{route}</span>
+													</div>
+												)}
+											/>
+										) : (
+											<Link replace to={routes[route].link}>
+												<Icon type={routes[route].icon} />
+												<span>{route}</span>
+											</Link>
+										)}
 									</Menu.Item>
 								);
 							})}

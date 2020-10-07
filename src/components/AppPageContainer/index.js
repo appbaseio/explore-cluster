@@ -58,7 +58,6 @@ AppPageContainer.defaultProps = {
 	isClusterPlanFetching: false,
 	isError: undefined,
 	appName: '',
-	shouldFetchUserPlan: true,
 	isFetchingApps: false,
 	apps: {},
 };
@@ -67,7 +66,6 @@ AppPageContainer.propTypes = {
 	isLoading: PropTypes.bool,
 	appName: PropTypes.string,
 	isError: PropTypes.any,
-	shouldFetchUserPlan: PropTypes.bool,
 	component: PropTypes.func.isRequired,
 	updateCurrentApp: PropTypes.func.isRequired,
 	fetchClusterPlan: PropTypes.func.isRequired,

@@ -78,6 +78,12 @@ const routes = {
 		link: '/cluster/curated-insights',
 		hasExactPath: true,
 	},
+	Integrations: {
+		icon: 'control',
+		link: 'integrations',
+		hasExactPath: true,
+		tag: 'Beta',
+	},
 	'Access Control': {
 		icon: 'key',
 		menu: [
