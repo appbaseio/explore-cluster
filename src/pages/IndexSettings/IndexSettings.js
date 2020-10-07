@@ -26,6 +26,7 @@ import Loader from '../../batteries/components/shared/Loader';
 import { appendApp, loadApps, removeAppData } from '../../actions';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
+import ReIndexWrapper from '../../components/ReIndexWrapper';
 
 const bannerMessage = {
 	title: 'Index Settings',
@@ -143,16 +144,16 @@ class IndexSettings extends React.Component {
 			});
 	};
 
-	updateShards = () => {
+	updateShards = (refetchReIndexingInfo) => {
 		this.handleModal('shardsModal');
 
 		this.setState({
 			isReindexing: true,
 		});
-		this.reIndex();
+		this.reIndex(refetchReIndexingInfo);
 	};
 
-	reIndex = async () => {
+	reIndex = async (refetchReIndexingInfo) => {
 		const { appName, credentials, mappings, addApp, apps } = this.props;
 		const { shards, replicas, esVersion } = this.state;
 		const type = getTypesFromMapping(mappings);
@@ -162,7 +163,7 @@ class IndexSettings extends React.Component {
 
 		appSettings = getUpdatedSettings({ settings: appSettings, shards, replicas });
 
-		reIndex({
+		const reIndexPromise = reIndex({
 			mappings,
 			appId: appName,
 			excludeFields: [],
@@ -170,13 +171,25 @@ class IndexSettings extends React.Component {
 			esVersion,
 			credentials,
 			settings: appSettings,
-		})
+		});
+
+		if (refetchReIndexingInfo) {
+			setTimeout(() => {
+				refetchReIndexingInfo();
+			}, 500);
+		}
+
+		reIndexPromise
 			.then(() => {
 				this.setState({
 					isReindexing: false,
 				});
 				addApp({
-					[appName]: { ...get(apps, ['data', appName], {}), pri: shards, rep: replicas },
+					[appName]: {
+						...get(apps, ['data', appName], {}),
+						pri: shards,
+						rep: replicas,
+					},
 				});
 				message.success('Number of shards updated successfully');
 			})
@@ -204,7 +217,7 @@ class IndexSettings extends React.Component {
 			isUpdating,
 		} = this.state;
 		const { allocated_replicas, allocated_shards } = this;
-		const { isFetchingMapping } = this.props;
+		const { isFetchingMapping, appName } = this.props;
 
 		if (isFetchingMapping) {
 			return (
@@ -219,36 +232,43 @@ class IndexSettings extends React.Component {
 		}
 
 		return (
-			<React.Fragment>
-				<Banner {...bannerMessage} />
+			<ReIndexWrapper appName={appName}>
+				{({ refetch }) => (
+					<React.Fragment>
+						<Banner {...bannerMessage} />
 
-				<Loader show={isReindexing} message="Re-indexing your data... Please wait!" />
-				<div className={container}>
-					<ErrorToaster>
-						<Shards
-							handleSlider={this.handleSlider}
-							updateShards={this.updateShards}
-							handleModal={this.handleModal}
-							shardsModal={shardsModal}
-							shards={shards}
-							allocated_shards={allocated_shards}
+						<Loader
+							show={isReindexing}
+							message="Re-indexing your data... Please wait!"
 						/>
-					</ErrorToaster>
+						<div className={container}>
+							<ErrorToaster>
+								<Shards
+									handleSlider={this.handleSlider}
+									updateShards={() => this.updateShards(refetch)}
+									handleModal={this.handleModal}
+									shardsModal={shardsModal}
+									shards={shards}
+									allocated_shards={allocated_shards}
+								/>
+							</ErrorToaster>
 
-					<ErrorToaster>
-						<Replicas
-							handleSlider={this.handleSlider}
-							updateReplicas={this.updateReplicas}
-							handleModal={this.handleModal}
-							replicasModal={replicasModal}
-							totalNodes={totalNodes}
-							replicas={replicas}
-							loading={isUpdating}
-							allocated_replicas={allocated_replicas}
-						/>
-					</ErrorToaster>
-				</div>
-			</React.Fragment>
+							<ErrorToaster>
+								<Replicas
+									handleSlider={this.handleSlider}
+									updateReplicas={this.updateReplicas}
+									handleModal={this.handleModal}
+									replicasModal={replicasModal}
+									totalNodes={totalNodes}
+									replicas={replicas}
+									loading={isUpdating}
+									allocated_replicas={allocated_replicas}
+								/>
+							</ErrorToaster>
+						</div>
+					</React.Fragment>
+				)}
+			</ReIndexWrapper>
 		);
 	}
 }
