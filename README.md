@@ -12,7 +12,7 @@ git submodule update --recursive --remote
 
 # checkout to arc branch on batteries
 cd src/batteries
-git checkout fetch origin
+git fetch origin
 git checkout arc
 
 ```
