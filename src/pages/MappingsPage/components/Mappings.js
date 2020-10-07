@@ -506,6 +506,7 @@ const mapStateToProps = (state, props) => {
 	const defaultSettings = get(state, `$getAppSettings.defaultSettings`);
 	const errorCode = get(state, '$getAppSettings.error.actual.code');
 	const defaultSearchSettings = errorCode === 404 ? defaultSettings : null;
+
 	return {
 		appName,
 		collapsed: get(state, 'sideBarCollapsed'),

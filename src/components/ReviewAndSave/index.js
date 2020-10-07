@@ -9,7 +9,7 @@ import { isEqual } from '../../batteries/utils';
 import DiffTable from './DiffTable';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
-class ReviewAndSave extends React.Component {
+class ReviewAndSave extends React.PureComponent {
 	difference = (object, base) => {
 		const changes = (obj, baseObj) =>
 			transform(obj, (result, value, key) => {
@@ -45,7 +45,7 @@ class ReviewAndSave extends React.Component {
 				Revert Changes
 			</Button>,
 			<Button key="submit" type="primary" onClick={onSave} data-cy="review-and-save">
-				{isReset ? 'Reset To Default Settings' : 'Review and Save'}
+				{isReset ? 'Reset To Default Settings' : 'Review and Deploy'}
 			</Button>,
 		];
 		return (
@@ -60,7 +60,7 @@ class ReviewAndSave extends React.Component {
 					{...buttonProps}
 					data-cy="initiate-search-setting-change-request"
 				>
-					Review and Save
+					Review and Deploy
 				</Button>
 				<Modal
 					title={isReset ? 'Reset To Default Settings' : 'Review Settings Before Saving'}
