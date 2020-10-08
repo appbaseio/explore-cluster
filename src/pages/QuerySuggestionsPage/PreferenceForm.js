@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Input, Select, Button, Checkbox } from 'antd';
+import { Input, Select, Button, Affix, Checkbox } from 'antd';
 import { css } from 'react-emotion';
 import PropTypes from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
@@ -106,7 +106,7 @@ class PreferenceForm extends React.Component {
 	};
 
 	render() {
-		const { control, handleSaveTemplate, isLoading, indices, apps, collapsed } = this.props;
+		const { control, handleSaveTemplate, isLoading, indices, apps } = this.props;
 		const { visible, app } = this.state;
 		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
 		return (
@@ -256,26 +256,13 @@ class PreferenceForm extends React.Component {
 								);
 							}}
 						/>
-						<devicePixelRatio
-							style={{
-								position: 'fixed',
-								overflow: 'hidden',
-								bottom: 0,
-								left: collapsed ? 80 : 260,
-								right: 0,
-								zIndex: 10,
-								border: '1px solid #e8e8e8',
-								background: 'white',
-							}}
-						>
+						<Affix offsetBottom={0}>
 							<div
 								style={{
 									display: 'flex',
 									justifyContent: 'space-between',
-									padding: '20px 50px',
+									padding: 20,
 									background: 'white',
-									width: 800,
-									margin: '0 auto',
 								}}
 							>
 								<SearchPreviewSwitcher
@@ -295,7 +282,7 @@ class PreferenceForm extends React.Component {
 									Save
 								</Button>
 							</div>
-						</devicePixelRatio>
+						</Affix>
 					</div>
 				)}
 			/>
@@ -309,7 +296,6 @@ PreferenceForm.propTypes = {
 	isLoading: PropTypes.bool.isRequired,
 	indices: PropTypes.array.isRequired,
 	apps: PropTypes.object,
-	collapsed: PropTypes.bool.isRequired,
 };
 
 PreferenceForm.defaultProps = {
@@ -320,6 +306,5 @@ const mapStateToProps = (state) => ({
 	isLoading: get(state, '$saveSuggestionsPreferences.isFetching', false),
 	appName: get(state, '$getCurrentApp.name'),
 	apps: get(state, 'apps.data'),
-	collapsed: get(state, 'sideBarCollapsed'),
 });
 export default connect(mapStateToProps, null)(PreferenceForm);

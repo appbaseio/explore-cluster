@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import {
+	Affix,
 	Alert,
 	Button,
 	Card,
@@ -83,7 +84,6 @@ const link = css`
 	i {
 		margin-right: 4px;
 	}
-
 	${mediaKey.small} {
 		display: block;
 		line-height: 48px;
@@ -93,21 +93,17 @@ const link = css`
 const container = css`
 	padding: 50px;
 	position: relative;
-
 	.space-between {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 	}
-
 	.flex-end {
 		justify-content: flex-end;
 	}
-
 	.flex {
 		display: flex;
 	}
-
 	.card-footer {
 		width: 100%;
 		padding: 20px;
@@ -608,7 +604,6 @@ class QueryRulesForm extends React.Component {
 			subFieldsMap,
 		} = this.state;
 		const {
-			collapsed,
 			isCreating,
 			rulesLoading,
 			isUpdating,
@@ -907,19 +902,8 @@ class QueryRulesForm extends React.Component {
 						</Row>
 					</section>
 				</Card>
-				<div
-					style={{
-						position: 'fixed',
-						overflow: 'hidden',
-						bottom: 0,
-						left: collapsed ? 80 : 260,
-						right: 0,
-					}}
-				>
-					<div
-						className={`${isEditPage ? 'space-between' : ''} card-footer`}
-						style={{ paddingLeft: 50, paddingRight: 60 }}
-					>
+				<Affix offsetBottom={0}>
+					<div className={`${isEditPage ? 'space-between' : ''} card-footer`}>
 						{isEditPage ? (
 							<div>
 								<CloneRule
@@ -976,7 +960,7 @@ class QueryRulesForm extends React.Component {
 							</Button>
 						</div>
 					</div>
-				</div>
+				</Affix>
 			</div>
 		);
 	}
@@ -1001,7 +985,6 @@ QueryRulesForm.propTypes = {
 	updateRule: PropTypes.func.isRequired,
 	match: PropTypes.object.isRequired,
 	fetchRules: PropTypes.func.isRequired,
-	collapsed: PropTypes.bool.isRequired,
 };
 
 QueryRulesForm.defaultProps = {
@@ -1043,7 +1026,6 @@ const mapStateToProps = (state, props) => {
 			updateError: get(ruleData, 'update.error'),
 			isDeleting: get(ruleData, 'isDeleting'),
 			deleteError: get(ruleData, 'deleteError'),
-			collapsed: get(state, 'sideBarCollapsed'),
 		};
 	}
 

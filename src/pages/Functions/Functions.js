@@ -1,6 +1,18 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Col, Divider, Icon, List, Popover, Result, Row, Switch, Tooltip } from 'antd';
+import {
+	Button,
+	Col,
+	Divider,
+	Icon,
+	List,
+	Popover,
+	Result,
+	Row,
+	Switch,
+	Tooltip,
+	Affix,
+} from 'antd';
 import { connect } from 'react-redux';
 
 import get from 'lodash/get';
@@ -42,7 +54,6 @@ const link = css`
 	i {
 		margin-right: 4px;
 	}
-
 	${mediaKey.small} {
 		display: block;
 		line-height: 48px;
@@ -330,7 +341,6 @@ const listItemClass = css`
 	position: relative;
 	display: flex;
 	justify-content: space-between;
-
 	.showOnHover {
 		display: none;
 	}
@@ -428,15 +438,7 @@ class FunctionsPage extends React.Component {
 	};
 
 	render() {
-		const {
-			collapsed,
-			isLoading,
-			functions,
-			tier,
-			getFunction,
-			apps,
-			featureFunctions,
-		} = this.props;
+		const { isLoading, functions, tier, getFunction, apps, featureFunctions } = this.props;
 		const { deployModal, checking, healthError, notFoundError, visible, app } = this.state;
 		this.sortedDataSource = (functions || []).sort((a, b) => a.order - b.order);
 
@@ -674,20 +676,12 @@ class FunctionsPage extends React.Component {
 							)}
 						/>
 					</ErrorToaster>
-					<div
-						style={{
-							position: 'fixed',
-							overflow: 'hidden',
-							bottom: 0,
-							left: collapsed ? 80 : 260,
-							right: 0,
-						}}
-					>
+					<Affix offsetBottom={0}>
 						<div
 							style={{
 								display: 'flex',
 								justifyContent: 'space-between',
-								padding: '20px 50px',
+								padding: 20,
 								background: 'white',
 								border: '1px solid #e8e8e8',
 								boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.15)',
@@ -701,7 +695,7 @@ class FunctionsPage extends React.Component {
 								app={app}
 							/>
 						</div>
-					</div>
+					</Affix>
 				</section>
 
 				{deployModal && (
@@ -724,7 +718,6 @@ FunctionsPage.propTypes = {
 	tier: allowedTiers,
 	apps: PropTypes.object,
 	featureFunctions: PropTypes.bool,
-	collapsed: PropTypes.bool.isRequired,
 };
 
 FunctionsPage.defaultProps = {
@@ -743,7 +736,6 @@ const mapStateToProps = (state) => ({
 	tier: get(state, '$getAppPlan.results.tier'),
 	featureFunctions: get(state, '$getAppPlan.results.feature_functions', false),
 	apps: get(state, 'apps.data'),
-	collapsed: get(state, 'sideBarCollapsed'),
 });
 
 const mapDispatchToProps = (dispatch) => ({
