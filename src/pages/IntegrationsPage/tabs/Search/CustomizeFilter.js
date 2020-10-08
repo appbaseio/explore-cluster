@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Modal, Input, Form } from 'antd';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
+import DataFieldSelector from '../../../../components/Form/DataFieldSelector';
 
 class CustomizeFilter extends React.Component {
 	state = {
@@ -41,10 +42,10 @@ class CustomizeFilter extends React.Component {
 						{() => (
 							<Form>
 								<FieldControl name="dataField">
-									{({ disabled, handler }) =>
-										disabled ? null : (
+									{(control) =>
+										control.disabled ? null : (
 											<Form.Item label="DataField">
-												<Input {...handler()} />
+												<DataFieldSelector control={control} />
 											</Form.Item>
 										)
 									}

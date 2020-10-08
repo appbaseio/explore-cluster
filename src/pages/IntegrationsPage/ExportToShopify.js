@@ -1,9 +1,9 @@
 import React from 'react';
-import { func } from 'prop-types';
+import { func, object } from 'prop-types';
 import { Button, message, Modal } from 'antd';
 import { css } from 'emotion';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { BaseURL, BaseCSSURL } from '../../utils';
+import { getInstallationScript } from './utils';
 
 const stepsStyles = css`
 	li {
@@ -15,13 +15,11 @@ const stepsStyles = css`
 const copyToClipboard = () => {
 	message.success('Copied to clipboard', 5);
 };
-const ExportToShopify = ({ preferences }) => {
-	const installationScript = `
-<script>var PREFERENCES=${JSON.stringify(JSON.stringify(preferences()))};</script>
-<div id="reactivesearch-shopify-1"></div>
-<link rel="stylesheet" href=${BaseCSSURL}>
-<script src=${BaseURL}></script>
-        `;
+
+const ExportToShopify = ({ control, preferences }) => {
+	// Override user credentials to API credentials selected by user
+	const credentials = control.get('credentials') ? control.get('credentials').value : undefined;
+	const installationScript = getInstallationScript(preferences(), credentials);
 	const toggleModal = () => {
 		Modal.info({
 			title: 'Installation Instructions',
@@ -35,7 +33,7 @@ const ExportToShopify = ({ preferences }) => {
 					<ol>
 						<li>Go to admin</li>
 						<li>
-							Go to your current theme under "Online Store".
+							Go to your current theme under `&quot;`Online Store`&quot;`.
 							<img
 								css={{ margin: '5px 0', width: '100%' }}
 								src="https://i.imgur.com/WCMv2Rc.png"
@@ -43,8 +41,8 @@ const ExportToShopify = ({ preferences }) => {
 							/>
 						</li>
 						<li>
-							In the right panel for you current theme, go to the ' Actions '
-							dropdown.
+							In the right panel for you current theme, go to the
+							`&apos;`Actions`&apos;` dropdown.
 						</li>
 						<li>
 							Select Edit Code
@@ -95,7 +93,7 @@ const ExportToShopify = ({ preferences }) => {
 	return (
 		<React.Fragment>
 			<h2>Installation</h2>
-			In order to add the appbase.io e-commerce plugin to your store you can embed the
+			In order to add the appbase.io e-commerce plugin to your shopify store you can embed the
 			following code in your required template file. This file can be different depending on
 			your current theme. For example, it could be{' '}
 			<b>
@@ -144,6 +142,7 @@ const ExportToShopify = ({ preferences }) => {
 
 ExportToShopify.propTypes = {
 	preferences: func.isRequired,
+	control: object.isRequired,
 };
 
 export default ExportToShopify;

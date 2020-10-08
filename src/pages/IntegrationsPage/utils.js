@@ -1,4 +1,5 @@
 import React from 'react';
+import get from 'lodash/get';
 import { css } from 'emotion';
 
 // eslint-disable-next-line
@@ -191,6 +192,21 @@ export const currencies = [
 
 export const BaseURL = 'https://appbase-ecomm.netlify.app/static/js/main.js';
 export const BaseCSSURL = 'https://appbase-ecomm.netlify.app/static/css/main.css';
+
+export const getInstallationScript = (preferences = {}, credentials) => `
+<script>var PREFERENCES=${JSON.stringify(
+	JSON.stringify({
+		...preferences,
+		appbaseSettings: {
+			...get(preferences, 'appbaseSettings'),
+			credentials,
+		},
+	}),
+)};</script>
+<div id="reactivesearch-shopify-1"></div>
+<link rel="stylesheet" href=${BaseCSSURL}>
+<script src=${BaseURL}></script>
+        `;
 
 export const validateURL = (control) => {
 	if (control && control.value) {

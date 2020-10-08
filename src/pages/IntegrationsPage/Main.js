@@ -1,15 +1,15 @@
 import React from 'react';
 import get from 'lodash/get';
 import { string } from 'prop-types';
-import { FormBuilder } from 'react-reactive-form';
-import { Tabs, Button, Affix } from 'antd';
+import { FormBuilder, Validators } from 'react-reactive-form';
+import { Tabs, Affix } from 'antd';
 import { connect } from 'react-redux';
 import LayoutTab from './tabs/Layout';
 import SearchTab from './tabs/Search';
-import ExportTab from './tabs/Export';
 import { container } from '../ResultsPage/styles';
 import { FormContext, validateURL } from './utils';
 import PreviewModal from './PreviewModal';
+import ExportModal from './ExportModal';
 
 const { TabPane } = Tabs;
 
@@ -32,6 +32,11 @@ class Main extends React.Component {
 		customCss: '',
 		showPopularSearches: false,
 		showSelectedFilters: true,
+		resultTitle: undefined,
+		resultDescription: undefined,
+		resultPrice: undefined,
+		resultImage: undefined,
+		resultHandle: undefined,
 		storeInfo: FormBuilder.group({
 			locale: 'en',
 			currency: 'USD',
@@ -75,6 +80,10 @@ class Main extends React.Component {
 				customize: getFilterConfigurationForm(),
 			}),
 		}),
+		exportSettings: FormBuilder.group({
+			credentials: [undefined, Validators.required],
+			type: 'other',
+		}),
 	});
 
 	getPreferences = () => {
@@ -109,6 +118,13 @@ class Main extends React.Component {
 				url: sessionStorage.getItem('url'),
 			},
 			resultSettings: {
+				fields: {
+					title: get(formValue, 'resultTitle'),
+					description: get(formValue, 'resultDescription'),
+					price: get(formValue, 'resultPrice'),
+					image: get(formValue, 'resultImage'),
+					handle: get(formValue, 'resultHandle'),
+				},
 				customMessages: {
 					resultStats: get(formValue, 'customMessages.resultStats'),
 					noResults: get(formValue, 'customMessages.noResultItem'),
@@ -125,6 +141,13 @@ class Main extends React.Component {
 				searchButton: {
 					icon: get(formValue, 'customMessages.searchIcon'),
 					text: get(formValue, 'customMessages.searchText'),
+				},
+				fields: {
+					title: get(formValue, 'resultTitle'),
+					description: get(formValue, 'resultDescription'),
+					price: get(formValue, 'resultPrice'),
+					image: get(formValue, 'resultImage'),
+					handle: get(formValue, 'resultHandle'),
 				},
 				rsConfig: {},
 			},
@@ -204,6 +227,7 @@ class Main extends React.Component {
 						: []),
 				],
 			},
+			exportType: get(formValue, 'exportSettings.type'),
 		};
 	};
 
@@ -221,9 +245,6 @@ class Main extends React.Component {
 						<TabPane tab="Search Settings" key="2">
 							<SearchTab />
 						</TabPane>
-						<TabPane tab="Export Settings" key="3">
-							<ExportTab preferences={this.getPreferences} />
-						</TabPane>
 					</Tabs>
 					<Affix
 						offsetBottom={0}
@@ -235,7 +256,7 @@ class Main extends React.Component {
 					>
 						<div className="flex space-between card-footer">
 							<div>
-								<Button size="large">Export Code</Button>
+								<ExportModal preferences={this.getPreferences} />
 							</div>
 							<div>
 								<PreviewModal preferences={this.getPreferences} />
