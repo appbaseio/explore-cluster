@@ -42,7 +42,6 @@ class AggsPage extends React.Component {
 		queryFormat: 'or',
 		reviewAndSaveModal: false,
 		isReset: false,
-		searchFields: [],
 	};
 
 	_mappingsRef = null;
@@ -189,12 +188,6 @@ class AggsPage extends React.Component {
 		this._mappingsRef = ref;
 	};
 
-	setSearchFields = (searchFields) => {
-		this.setState({
-			searchFields,
-		});
-	};
-
 	render() {
 		const {
 			isLoading,
@@ -214,7 +207,6 @@ class AggsPage extends React.Component {
 			sort,
 			reviewAndSaveModal,
 			isReset,
-			searchFields,
 		} = this.state;
 
 		if (isLoading) {
@@ -274,7 +266,6 @@ class AggsPage extends React.Component {
 							fieldTypes={fieldTypes}
 							onFieldsUpdate={this.handleTypesUpdate}
 							onInit={this.setMappingsRef}
-							setSearchFields={this.setSearchFields}
 						/>
 						<Divider />
 						<SettingsOptions
@@ -299,15 +290,6 @@ class AggsPage extends React.Component {
 											...(settings || {}),
 											search: {
 												...get(settings, 'search', {}),
-												dataField: get(settings, 'search.dataField.length')
-													? get(settings, 'search.dataField', {})
-													: Object.keys(searchFields),
-												fieldWeights: get(
-													settings,
-													'search.fieldWeights.length',
-												)
-													? get(settings, 'search.fieldWeights', {})
-													: Object.values(searchFields),
 											},
 											aggregations: {
 												size: count,

@@ -89,8 +89,8 @@ const ReIndexWrapper = ({ children, appName }) => {
 										</b>{' '}
 										documents have been indexed. Once the documents are
 										re-indexed, it may take a while for the shards to be
-										reassigned. Changes you make will be saved but won&apos;t
-										be deployed till the re-indexing process is completed.
+										reassigned. Changes you make will be saved but won&apos;t be
+										deployed till the re-indexing process is completed.
 									</span>
 								)}
 							</Col>

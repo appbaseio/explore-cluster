@@ -56,7 +56,6 @@ class Mappings extends React.Component {
 
 	componentDidMount() {
 		const { mappings, appName, fetchSearchSettings, searchRelevancy } = this.props;
-
 		if (mappings) {
 			this.init(mappings);
 		} else {
@@ -287,16 +286,22 @@ class Mappings extends React.Component {
 	};
 
 	renderMapping = ({ usecase, type, path = '', rawMappings, init = false }) => {
-		const { renderColumn, view } = this.props;
-		if (!usecase) {
-			return null;
-		}
+		const { renderColumn, view, fieldTypes } = this.props;
 
-		if (init && Object.keys(usecase).length === 0) {
+		if (init && (!usecase || Object.keys(usecase).length === 0)) {
 			return (
 				<Empty
 					image={Empty.PRESENTED_IMAGE_SIMPLE}
 					description={<span>No Mappings Present</span>}
+				/>
+			);
+		}
+
+		if (view === VIEWS.AGGREGATION && !Object.keys(fieldTypes).length) {
+			return (
+				<Empty
+					image={Empty.PRESENTED_IMAGE_SIMPLE}
+					description={<span>Please add aggregation fields from the dropdown below</span>}
 				/>
 			);
 		}
@@ -338,7 +343,13 @@ class Mappings extends React.Component {
 
 			if (
 				view === VIEWS.AGGREGATION &&
-				((usecaseVal === 'none' && typeVal === 'text') || usecaseVal === 'search')
+				(usecaseVal === 'none' ||
+					usecaseVal === 'search' ||
+					!get(
+						fieldTypes,
+						`${path}${field}${typeVal === 'text' ? '.keyword' : ''}`,
+						null,
+					))
 			) {
 				return null;
 			}
@@ -460,6 +471,8 @@ Mappings.propTypes = {
 	cardProps: PropTypes.object,
 	headerRowProps: PropTypes.object,
 	view: PropTypes.string,
+	// required by aggs view
+	fieldTypes: PropTypes.object,
 	// Actions
 	fetchMappings: PropTypes.func.isRequired,
 	fetchSearchSettings: PropTypes.func.isRequired,
@@ -480,6 +493,8 @@ Mappings.defaultProps = {
 	onChange: null,
 	onRemove: null,
 	view: VIEWS.SCHEMA,
+	// required by aggs view
+	fieldTypes: {},
 };
 
 const mapStateToProps = (state, props) => {
