@@ -33,8 +33,8 @@ const checkReIndexing = async (indexName) => {
 			});
 
 			return {
-				originalDocCount: get(filteredData[0], 'docs.count'),
-				currentDocCount: get(filteredData[1], 'docs.count'),
+				originalDocCount: get(filteredData[0], 'docs.count', 0),
+				currentDocCount: get(filteredData[1], 'docs.count', 0),
 			};
 		}
 
