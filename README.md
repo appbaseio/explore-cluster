@@ -9,6 +9,12 @@ After cloning this repo, sync the (batteries) submodule via:
 ```
 git submodule init
 git submodule update --recursive --remote
+
+# checkout to arc branch on batteries
+cd src/batteries
+git fetch origin
+git checkout arc
+
 ```
 
 ### Installation and development

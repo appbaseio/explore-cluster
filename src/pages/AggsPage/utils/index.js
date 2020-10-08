@@ -1,9 +1,6 @@
 import get from 'lodash/get';
 
 export const hasKeyword = (fieldMappings) => {
-	if (get(fieldMappings, 'type') === 'keyword') {
-		return true;
-	}
 	if (get(fieldMappings, 'fields.keyword.type', '') === 'keyword') {
 		return true;
 	}

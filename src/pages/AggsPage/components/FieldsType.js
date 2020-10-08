@@ -5,6 +5,7 @@ import { Select } from 'antd';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Mappings from '../../MappingsPage/components/Mappings';
+import conversionMap from '../../MappingsPage/components/utils/conversionMap';
 import { hasKeyword } from '../utils';
 import { VIEWS } from '../../../constants/props';
 
@@ -40,6 +41,7 @@ class FieldsType extends React.Component {
 				if (types[field] === 'text') {
 					if (
 						usecases[field] !== 'search' &&
+						usecases[field] !== 'none' &&
 						!get(fieldTypes, `${field}.keyword`, null)
 					) {
 						return [...agg, field];
@@ -47,7 +49,8 @@ class FieldsType extends React.Component {
 
 					return [...agg];
 				}
-				if (!get(fieldTypes, `${field}`, null)) {
+
+				if (!get(fieldTypes, `${field}`, null) && conversionMap[types[field]]) {
 					return [...agg, field];
 				}
 				return [...agg];
@@ -88,6 +91,7 @@ class FieldsType extends React.Component {
 		if (get(types, field) === 'text') {
 			path = `${path}.keyword`;
 		}
+
 		onFieldsUpdate({
 			...fieldTypes,
 			[path]: aggType,

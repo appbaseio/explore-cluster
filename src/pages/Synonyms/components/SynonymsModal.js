@@ -118,6 +118,7 @@ class SynonymsModal extends React.Component {
 			id,
 			isAddModal,
 			handleSynonyms,
+			refetchReIndexingInfo,
 		} = this.props;
 		const { type, alternatives, synonyms, searchTerm } = this.state;
 
@@ -166,6 +167,7 @@ class SynonymsModal extends React.Component {
 			settings: synonymsAnalyzerSettings,
 			credentials,
 			appName,
+			refetchReIndexingInfo,
 		})
 			.then(handleSaveData)
 			.catch((e) => {
@@ -254,6 +256,7 @@ SynonymsModal.propTypes = {
 	resetInputOnClose: PropTypes.bool,
 	type: synonymTypes,
 	synonyms: PropTypes.array,
+	refetchReIndexingInfo: PropTypes.func.isRequired,
 };
 
 SynonymsModal.defaultProps = {

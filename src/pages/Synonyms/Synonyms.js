@@ -31,6 +31,7 @@ import Overlay from '../../components/Overlay';
 import { allowedTiers } from '../../utils/prop-types';
 import Loader from '../../components/Loader';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import ReIndexWrapper from '../../components/ReIndexWrapper';
 
 const UploadSynonymsModal = Loadable({
 	loader: () =>
@@ -74,7 +75,7 @@ const search = css`
 		border-radius: 0;
 
 		input {
-			border-radius: 0 4px 4px 0;
+			border-radius: 4px;
 		}
 
 		> div > div > div {
@@ -132,7 +133,7 @@ class Synonyms extends React.Component {
 			});
 	};
 
-	handleDelete = async (id) => {
+	handleDelete = async (id, refetchReIndexingInfo) => {
 		const { credentials, appName } = this.props;
 		const { synonyms } = this.state;
 		const url = getURL();
@@ -180,6 +181,7 @@ class Synonyms extends React.Component {
 			settings: synonymsAnalyzerSettings,
 			credentials,
 			appName,
+			refetchReIndexingInfo,
 		})
 			.then(updateBackend)
 			.catch((e) => {
@@ -188,7 +190,7 @@ class Synonyms extends React.Component {
 			});
 	};
 
-	handleSave = async (newSynonyms) => {
+	handleSave = async (newSynonyms, refetchReIndexingInfo) => {
 		this.setState({ uploading: true });
 		const { appName, credentials, url } = this.props;
 		const { synonyms: allSynonyms } = this.state;
@@ -237,6 +239,7 @@ class Synonyms extends React.Component {
 			settings: synonymsAnalyzerSettings,
 			credentials,
 			appName,
+			refetchReIndexingInfo,
 		})
 			.then(handleSaveData)
 			.catch((e) => {
@@ -275,7 +278,7 @@ class Synonyms extends React.Component {
 		return false;
 	};
 
-	handleUpload = () => {
+	handleUpload = (refetchReIndexingInfo) => {
 		const { file } = this.state;
 		if (!file) return;
 		const reader = new FileReader();
@@ -284,7 +287,7 @@ class Synonyms extends React.Component {
 			const out = get(res, 'target.result');
 			if (file.type === 'application/json') {
 				const synonymsPayload = JSON.parse(out || '{}');
-				this.handleSave(synonymsPayload);
+				this.handleSave(synonymsPayload, refetchReIndexingInfo);
 			} else {
 				let synonymsPayload = (out || '').split('\n').filter(Boolean);
 				synonymsPayload = synonymsPayload.map((synonym) => {
@@ -295,7 +298,7 @@ class Synonyms extends React.Component {
 						};
 					return { type: 'equivalent', synonym };
 				});
-				this.handleSave(synonymsPayload);
+				this.handleSave(synonymsPayload, refetchReIndexingInfo);
 			}
 		};
 	};
@@ -339,234 +342,278 @@ class Synonyms extends React.Component {
 			);
 		}
 
-		const columns = [
-			{
-				title: 'Type',
-				dataIndex: 'type',
-				key: 'type',
-			},
-			{
-				title: 'Synonym',
-				dataIndex: 'synonym',
-				key: 'synonym',
-				render: (value, record) => {
-					if (record.type === 'one-way') {
-						return (
-							<span className={expression}>
-								<span>( </span>
-								{value
-									.split('=>')[0]
-									.split(',')
-									.map((item, index) => {
-										if (index === value.split('=>')[0].split(',').length - 1) {
-											return item;
-										}
-										return (
-											<React.Fragment>
-												{item}
-												<span className="light">OR</span>
-											</React.Fragment>
-										);
-									})}
-								<span> )</span>
-								<Icon className="light" type="arrow-right" />
-								{value.split('=>')[1]}
-							</span>
-						);
-					}
-
-					return (
-						<span className={expression}>
-							{value.split(',').map((item, index) => {
-								if (index === value.split(',').length - 1) {
-									return item;
-								}
-								return (
-									<React.Fragment>
-										{item}
-										<Icon type="swap" className="light" />
-									</React.Fragment>
-								);
-							})}
-						</span>
-					);
-				},
-			},
-			{
-				title: 'Action',
-				dataIndex: '_id',
-				key: 'id',
-				render: (value, record) => {
-					return (
-						<div>
-							<SynonymsModal
-								type={record.type}
-								indexSynonyms={synonyms}
-								id={record._id}
-								refetch={this.fetchSynonym}
-								synonyms={record.synonym || []}
-								handleSynonyms={this.handleUpdate}
-								renderButton={({ handleModal }) => {
-									return (
-										<Button
-											shape="circle-outline"
-											size="small"
-											icon="edit"
-											onClick={handleModal}
-											style={{ marginRight: 5 }}
-										/>
-									);
-								}}
-							/>
-
-							<Popconfirm
-								title="Are you sure you want to delete synonym？"
-								okText="Yes"
-								cancelText="No"
-								onConfirm={() => this.handleDelete(value)}
-							>
-								<Button
-									shape="circle-outline"
-									size="small"
-									loading={isDeleting === value}
-									type="danger"
-									icon="delete"
-								/>
-							</Popconfirm>
-						</div>
-					);
-				},
-				width: 100,
-			},
-		];
-
 		return (
-			<React.Fragment>
-				<Banner {...bannerMessage} />
-				<div className={container}>
-					<Card>
-						<ReactiveBase
-							theme={{
-								colors: {
-									primaryColor: '#1890ff',
-									textColor: 'rgba(0,0,0,.65)',
-								},
-							}}
-							app=".synonyms"
-							credentials={credentials}
-							url={url}
-						>
-							<div className={search}>
-								<div>
-									<SingleDropdownList
-										className="hide"
-										componentId="index"
-										defaultValue={appName}
-										dataField="index.keyword"
-									/>
-									<SingleDropdownList
-										className="filter"
-										componentId="type"
-										dataField="type.keyword"
-										selectAllLabel="All Synonyms"
-										placeholder="Select a Type"
-										react={{ and: ['index'] }}
-									/>
-									<DataSearch
-										innerClass={{
-											input: 'ant-input',
+			<ReIndexWrapper appName={appName}>
+				{({ refetch }) => (
+					<React.Fragment>
+						<Banner {...bannerMessage} />
+						<div className={container}>
+							<Card>
+								<ReactiveBase
+									theme={{
+										colors: {
+											primaryColor: '#1890ff',
+											textColor: 'rgba(0,0,0,.65)',
+										},
+									}}
+									app=".synonyms"
+									credentials={credentials}
+									url={url}
+								>
+									<div className={search}>
+										<div>
+											<SingleDropdownList
+												className="hide"
+												componentId="index"
+												defaultValue={appName}
+												dataField="index.keyword"
+											/>
+											<SingleDropdownList
+												className="filter"
+												componentId="type"
+												dataField="type.keyword"
+												selectAllLabel="All Synonyms"
+												placeholder="Select a Type"
+												react={{ and: ['index'] }}
+											/>
+											<DataSearch
+												innerClass={{
+													input: 'ant-input',
+												}}
+												placeholder="Search synonym"
+												className="search"
+												icon={<Icon type="search" />}
+												dataField={[
+													'synonym',
+													'synonym.autosuggest',
+													'synonym.keyword',
+													'synonym.lang',
+													'synonym.search',
+												]}
+												react={{ and: ['index'] }}
+												componentId="search"
+											/>
+										</div>
+										<div>
+											<Button
+												onClick={this.toggleUploadVisibility}
+												style={{ marginRight: 5 }}
+											>
+												Upload Synonyms
+											</Button>
+											<SynonymsModal
+												indexSynonyms={synonyms || []}
+												refetch={this.fetchSynonym}
+												isAddModal
+												handleSynonyms={this.handleUpdate}
+												resetInputOnClose
+												refetchReIndexingInfo={refetch}
+												renderButton={({ handleModal }) => {
+													return (
+														<Button
+															onClick={handleModal}
+															type="primary"
+															data-cy="add-synonyms"
+														>
+															Add Synonyms
+														</Button>
+													);
+												}}
+											/>
+										</div>
+									</div>
+									<ReactiveList
+										componentId={`result-${key}`}
+										renderResultStats={() => null}
+										key={key}
+										loader={<div />}
+										pagination
+										dataField="_score"
+										react={{
+											and: ['search', 'type', 'index'],
 										}}
-										placeholder="Search synonym"
-										className="search"
-										icon={<Icon type="search" />}
-										dataField={[
-											'synonym',
-											'synonym.autosuggest',
-											'synonym.keyword',
-											'synonym.lang',
-											'synonym.search',
-										]}
-										react={{ and: ['index'] }}
-										componentId="search"
+										renderNoResults={() => null}
+										render={({ loading, data }) => (
+											<Table
+												loading={loading}
+												rowKey={(row) => {
+													return row._id;
+												}}
+												pagination={false}
+												bordered={false}
+												dataSource={data}
+												columns={[
+													{
+														title: 'Type',
+														dataIndex: 'type',
+														key: 'type',
+													},
+													{
+														title: 'Synonym',
+														dataIndex: 'synonym',
+														key: 'synonym',
+														render: (value, record) => {
+															if (record.type === 'one-way') {
+																return (
+																	<span className={expression}>
+																		<span>( </span>
+																		{value
+																			.split('=>')[0]
+																			.split(',')
+																			.map((item, index) => {
+																				if (
+																					index ===
+																					value
+																						.split(
+																							'=>',
+																						)[0]
+																						.split(',')
+																						.length -
+																						1
+																				) {
+																					return item;
+																				}
+																				return (
+																					<React.Fragment>
+																						{item}
+																						<span className="light">
+																							OR
+																						</span>
+																					</React.Fragment>
+																				);
+																			})}
+																		<span> )</span>
+																		<Icon
+																			className="light"
+																			type="arrow-right"
+																		/>
+																		{value.split('=>')[1]}
+																	</span>
+																);
+															}
+
+															return (
+																<span className={expression}>
+																	{value
+																		.split(',')
+																		.map((item, index) => {
+																			if (
+																				index ===
+																				value.split(',')
+																					.length -
+																					1
+																			) {
+																				return item;
+																			}
+																			return (
+																				<React.Fragment>
+																					{item}
+																					<Icon
+																						type="swap"
+																						className="light"
+																					/>
+																				</React.Fragment>
+																			);
+																		})}
+																</span>
+															);
+														},
+													},
+													{
+														title: 'Action',
+														dataIndex: '_id',
+														key: 'id',
+														render: (value, record) => {
+															return (
+																<div>
+																	<SynonymsModal
+																		type={record.type}
+																		indexSynonyms={synonyms}
+																		id={record._id}
+																		refetch={this.fetchSynonym}
+																		synonyms={
+																			record.synonym || []
+																		}
+																		handleSynonyms={
+																			this.handleUpdate
+																		}
+																		renderButton={({
+																			handleModal,
+																		}) => {
+																			return (
+																				<Button
+																					shape="circle-outline"
+																					size="small"
+																					icon="edit"
+																					onClick={
+																						handleModal
+																					}
+																					style={{
+																						marginRight: 5,
+																					}}
+																				/>
+																			);
+																		}}
+																	/>
+
+																	<Popconfirm
+																		title="Are you sure you want to delete synonym？"
+																		okText="Yes"
+																		cancelText="No"
+																		onConfirm={() =>
+																			this.handleDelete(
+																				value,
+																				refetch,
+																			)
+																		}
+																	>
+																		<Button
+																			shape="circle-outline"
+																			size="small"
+																			loading={
+																				isDeleting === value
+																			}
+																			type="danger"
+																			icon="delete"
+																		/>
+																	</Popconfirm>
+																</div>
+															);
+														},
+														width: 100,
+													},
+												]}
+											/>
+										)}
 									/>
-								</div>
-								<div>
-									<Button
-										onClick={this.toggleUploadVisibility}
-										style={{ marginRight: 5 }}
-									>
-										Upload Synonyms
-									</Button>
-									<SynonymsModal
-										indexSynonyms={synonyms || []}
-										refetch={this.fetchSynonym}
-										isAddModal
-										handleSynonyms={this.handleUpdate}
-										resetInputOnClose
-										renderButton={({ handleModal }) => {
-											return (
-												<Button
-													onClick={handleModal}
-													type="primary"
-													data-cy="add-synonyms"
-												>
-													Add Synonyms
-												</Button>
-											);
-										}}
-									/>
-								</div>
-							</div>
-							<ReactiveList
-								componentId={`result-${key}`}
-								renderResultStats={() => null}
-								key={key}
-								loader={<div />}
-								pagination
-								dataField="_score"
-								react={{
-									and: ['search', 'type', 'index'],
-								}}
-								renderNoResults={() => null}
-								render={({ loading, data }) => (
-									<Table
-										loading={loading}
-										rowKey={(row) => {
-											return row._id;
-										}}
-										pagination={false}
-										bordered={false}
-										dataSource={data}
-										columns={columns}
-									/>
-								)}
-							/>
-						</ReactiveBase>
-					</Card>
-					{synonyms.length > 0 ? (
-						<SettingsFooter
-							showCopySettings
-							app={appName}
-							showReset={false}
-							showSearchPreview
-						/>
-					) : null}
-				</div>
-				{uploadVisible && (
-					<ErrorToaster>
-						<UploadSynonymsModal
-							onCancel={this.toggleUploadVisibility}
-							appName={appName}
-							onOk={this.handleUpload}
-							confirmLoading={uploading}
-							file={file}
-							fileList={fileList}
-							beforeUpload={this.beforeUpload}
-							onRemove={this.onRemove}
-						/>
-					</ErrorToaster>
+								</ReactiveBase>
+							</Card>
+							{synonyms.length > 0 ? (
+								<SettingsFooter
+									showCopySettings
+									app={appName}
+									showReset={false}
+									showSearchPreview
+								/>
+							) : null}
+						</div>
+						{uploadVisible && (
+							<ErrorToaster>
+								<UploadSynonymsModal
+									onCancel={this.toggleUploadVisibility}
+									appName={appName}
+									onOk={() => this.handleUpload(refetch)}
+									confirmLoading={uploading}
+									file={file}
+									fileList={fileList}
+									beforeUpload={this.beforeUpload}
+									onRemove={this.onRemove}
+								/>
+							</ErrorToaster>
+						)}
+					</React.Fragment>
 				)}
-			</React.Fragment>
+			</ReIndexWrapper>
 		);
 	}
 }
