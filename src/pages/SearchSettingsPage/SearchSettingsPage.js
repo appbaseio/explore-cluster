@@ -8,6 +8,7 @@ import {
 	putSettings,
 	deleteSettings,
 	getSettings as getSearchRelevancy,
+	setLocalRelevancyState,
 } from '../../batteries/modules/actions';
 import { getFieldWeight } from '../../utils';
 import FieldsWeight from './components/FieldsWeight';
@@ -34,13 +35,6 @@ const bannerDetails = {
 
 class SearchSettings extends React.Component {
 	state = {
-		fieldWeights: {},
-		fuzziness: 0,
-		queryFormat: 'or',
-		queryType: 'default',
-		enableNgram: true,
-		hasLanguage: true,
-		enableSynonyms: true,
 		reviewAndSaveModal: false,
 		isReset: false,
 	};
@@ -54,9 +48,10 @@ class SearchSettings extends React.Component {
 			settings,
 			getDefaultSettingsAction,
 			defaultSettings,
+			localRelevancy,
 		} = this.props;
 
-		if (settings) {
+		if (settings && !get(localRelevancy, appName)) {
 			this.init(settings);
 		} else {
 			getSettingsAction(appName);
@@ -76,18 +71,44 @@ class SearchSettings extends React.Component {
 	}
 
 	handleChange = (name, value) => {
-		this.setState({
-			[name]: value,
+		// this.setState({
+		// 	[name]: value,
+		// });
+
+		const { localRelevancy, updateLocalRelevancy, appName } = this.props;
+		updateLocalRelevancy(appName, {
+			...get(localRelevancy, appName),
+			search: {
+				...get(localRelevancy, `${appName}.search`, {}),
+				[name]: value,
+			},
 		});
 	};
 
 	handleFieldsUpdate = (fieldWeights) => {
-		this.setState({
-			fieldWeights,
+		// this.setState({
+		// 	fieldWeights,
+		// });
+
+		const { localRelevancy, updateLocalRelevancy, appName } = this.props;
+		updateLocalRelevancy(appName, {
+			...get(localRelevancy, appName),
+			search: {
+				...get(localRelevancy, `${appName}.search`, {}),
+				fieldWeights,
+			},
 		});
 	};
 
 	handleSave = (refetchReIndexingData) => {
+		const {
+			localRelevancy,
+			updateSettingsAction,
+			appName,
+			settings,
+			getSettingsAction,
+		} = this.props;
+
 		const {
 			fieldWeights,
 			fuzziness,
@@ -95,8 +116,7 @@ class SearchSettings extends React.Component {
 			queryFormat,
 			queryType,
 			enableNgram,
-		} = this.state;
-		const { updateSettingsAction, appName, settings, getSettingsAction } = this.props;
+		} = get(localRelevancy, `${appName}.search`);
 
 		this.toggleReviewSaveVisible();
 		updateSettingsAction(appName, {
@@ -163,6 +183,7 @@ class SearchSettings extends React.Component {
 	};
 
 	init = (settings) => {
+		const { appName, updateLocalRelevancy } = this.props;
 		const searchSettings = get(settings, 'search', {});
 
 		const fields = get(searchSettings, 'dataField', []);
@@ -183,14 +204,27 @@ class SearchSettings extends React.Component {
 			searchOperators: hasSearchOperators,
 		});
 
+		updateLocalRelevancy(appName, {
+			...settings,
+			search: {
+				...get(settings, 'search', {}),
+				fuzziness: get(searchSettings, 'fuzziness'),
+				queryFormat: get(searchSettings, 'queryFormat'),
+				queryType,
+				fieldWeights,
+				enableNgram: get(settings, 'indexSettings.enableNgram', true),
+				hasLanguage: !!get(settings, 'language.language'),
+				enableSynonyms: get(settings, 'synonyms.enabled', true),
+			},
+		});
 		this.setState({
-			fuzziness: get(searchSettings, 'fuzziness'),
-			queryFormat: get(searchSettings, 'queryFormat'),
-			queryType,
-			fieldWeights,
-			enableNgram: get(settings, 'indexSettings.enableNgram', true),
-			hasLanguage: !!get(settings, 'language.language'),
-			enableSynonyms: get(settings, 'synonyms.enabled', true),
+			// fuzziness: get(searchSettings, 'fuzziness'),
+			// queryFormat: get(searchSettings, 'queryFormat'),
+			// queryType,
+			// fieldWeights,
+			// enableNgram: get(settings, 'indexSettings.enableNgram', true),
+			// hasLanguage: !!get(settings, 'language.language'),
+			// enableSynonyms: get(settings, 'synonyms.enabled', true),
 			reviewAndSaveModal: false,
 			isReset: false,
 		});
@@ -218,13 +252,15 @@ class SearchSettings extends React.Component {
 	resetToDefault = () => {
 		const { getDefaultSettingsAction, defaultSettings } = this.props;
 
-		if (defaultSettings) this.init(defaultSettings);
-		else
+		if (defaultSettings) {
+			this.init(defaultSettings);
+		} else {
 			getDefaultSettingsAction().then((res) => {
 				if (res && res.payload) {
 					this.init(res.payload);
 				}
 			});
+		}
 		this.toggleReset();
 		this.toggleReviewSaveVisible();
 	};
@@ -243,20 +279,11 @@ class SearchSettings extends React.Component {
 			defaultSettings,
 			tier,
 			featureSearchRelevancy,
+			localRelevancy,
 		} = this.props;
-		const {
-			fieldWeights,
-			enableNgram,
-			enableSynonyms,
-			hasLanguage,
-			queryFormat,
-			queryType,
-			fuzziness,
-			reviewAndSaveModal,
-			isReset,
-		} = this.state;
+		const { reviewAndSaveModal, isReset } = this.state;
 
-		if (isLoading) {
+		if (isLoading || !localRelevancy || !get(localRelevancy, `${appName}.search`, null)) {
 			return (
 				<React.Fragment>
 					<Banner {...bannerDetails} />
@@ -300,6 +327,16 @@ class SearchSettings extends React.Component {
 			{},
 		);
 
+		const {
+			fieldWeights,
+			fuzziness,
+			enableSynonyms,
+			queryFormat,
+			queryType,
+			enableNgram,
+			hasLanguage,
+		} = get(localRelevancy, `${appName}.search`);
+
 		const { diffUsecase, diffWeights } = getDiffForFields({
 			currentFieldWithWeights: fieldWeights,
 			savedDataField: get(settings, 'search.dataField', []),
@@ -314,11 +351,11 @@ class SearchSettings extends React.Component {
 				<div className={container}>
 					<Card>
 						<FieldsWeight
-							onFieldsUpdate={this.handleFieldsUpdate}
 							enableNgram={enableNgram}
 							enableSynonyms={enableSynonyms}
 							hasLanguage={hasLanguage}
 							onInit={this.setMappingsRef}
+							onFieldsUpdate={this.handleFieldsUpdate}
 							fieldWeights={fieldWeights}
 						/>
 						<Divider />
@@ -435,6 +472,8 @@ SearchSettings.propTypes = {
 	getDefaultSettingsAction: PropTypes.func.isRequired,
 	getSettingsAction: PropTypes.func.isRequired,
 	updateSettingsAction: PropTypes.func.isRequired,
+	updateLocalRelevancy: PropTypes.func.isRequired,
+	localRelevancy: PropTypes.object.isRequired,
 };
 
 SearchSettings.defaultProps = {
@@ -452,7 +491,7 @@ const mapStateToProps = (state) => {
 	const errorCode = get(state, '$getAppSettings.error.actual.code');
 	const defaultSearchSettings = errorCode === 404 ? defaultSettings : null;
 	const appName = get(state, '$getCurrentApp.name');
-
+	const localRelevancy = get(state, `$localRelevancy`);
 	return {
 		isLoading: get(state, '$getAppSettings.isFetching'),
 		settings: get(state, ['$getAppSettings', 'settings', appName], defaultSearchSettings),
@@ -462,6 +501,7 @@ const mapStateToProps = (state) => {
 		resetState: get(state, '$getAppSettings.default', {}),
 		tier: get(state, '$getAppPlan.results.tier'),
 		featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
+		localRelevancy,
 	};
 };
 
@@ -470,6 +510,7 @@ const mapDispatchToProps = (dispatch) => ({
 	getSettingsAction: (name) => dispatch(getSearchRelevancy(name)),
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
 	deleteSettingsAction: (name) => dispatch(deleteSettings(name)),
+	updateLocalRelevancy: (name, data) => dispatch(setLocalRelevancyState(name, data)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchSettings);
