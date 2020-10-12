@@ -8,6 +8,7 @@ import LayoutTab from './tabs/Layout';
 import SearchTab from './tabs/Search';
 import { container } from '../ResultsPage/styles';
 import { FormContext, validateURL } from './utils';
+import { getURL } from '../../constants/config';
 import PreviewModal from './PreviewModal';
 import ExportModal from './ExportModal';
 
@@ -81,6 +82,22 @@ class Main extends React.Component {
 			type: 'other',
 		}),
 	});
+
+	componentDidMount() {
+		// sync form values
+		const preferences = localStorage.getItem(this.storeKey, this.form.value);
+		if (preferences) {
+			try {
+				this.form.patchValue(JSON.parse(preferences));
+			} catch (e) {
+				console.warn('Error while syncing the preferences', e);
+			}
+		}
+	}
+
+	componentWillUnmount() {
+		localStorage.setItem(this.storeKey, JSON.stringify(this.form.value));
+	}
 
 	getPreferences = () => {
 		const { index } = this.props;
@@ -226,6 +243,11 @@ class Main extends React.Component {
 			exportType: get(formValue, 'exportSettings.type'),
 		};
 	};
+
+	get storeKey() {
+		const { index } = this.props;
+		return `${index}__${getURL()}`;
+	}
 
 	render() {
 		return (
