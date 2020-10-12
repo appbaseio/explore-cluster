@@ -29,12 +29,7 @@ const IntegrationsPage = ({ tier, featureEcommerce }) => {
 			</React.Fragment>
 		);
 	}
-	return (
-		<React.Fragment>
-			<Banner {...bannerDetails} />
-			<Main />
-		</React.Fragment>
-	);
+	return <Main />;
 };
 
 IntegrationsPage.defaultProps = {
