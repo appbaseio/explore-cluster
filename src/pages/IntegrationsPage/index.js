@@ -4,17 +4,17 @@ import { connect } from 'react-redux';
 import { bool, string } from 'prop-types';
 // import { isValidPlan } from '../../batteries/utils';
 // import Overlay from '../../components/Overlay';
-import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
+// import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Main from './Main';
 // TODO: Update details
 // TODO: Update docs links
-const bannerDetails = {
-	title: 'Integrations',
-	description: 'GUI to manage preferences for appbase.io integrations.',
-	buttonText: 'Read more',
-	icon: 'pencil',
-	href: 'https://docs.appbase.io/docs/integrations/',
-};
+// const bannerDetails = {
+// 	title: 'Integrations',
+// 	description: 'GUI to manage preferences for appbase.io integrations.',
+// 	buttonText: 'Read more',
+// 	icon: 'pencil',
+// 	href: 'https://docs.appbase.io/docs/integrations/',
+// };
 
 const IntegrationsPage = ({ tier, featureEcommerce }) => {
 	// TODO: Enable plan validation after BE changes with update image
@@ -35,7 +35,7 @@ const IntegrationsPage = ({ tier, featureEcommerce }) => {
 	// }
 	return (
 		<React.Fragment>
-			<Banner {...bannerDetails} />
+			{/* <Banner {...bannerDetails} /> */}
 			<Main />
 		</React.Fragment>
 	);

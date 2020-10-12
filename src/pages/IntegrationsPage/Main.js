@@ -11,6 +11,7 @@ import { FormContext, validateURL } from './utils';
 import { getURL } from '../../constants/config';
 import PreviewModal from './PreviewModal';
 import ExportModal from './ExportModal';
+import SyncStatus from './SyncStatus';
 
 const { TabPane } = Tabs;
 
@@ -258,6 +259,7 @@ class Main extends React.Component {
 	render() {
 		return (
 			<FormContext.Provider value={this.form}>
+				<SyncStatus form={this.form} />
 				<div
 					style={{ backgroundColor: '#fff', padding: '10px 20px' }}
 					className={container}
