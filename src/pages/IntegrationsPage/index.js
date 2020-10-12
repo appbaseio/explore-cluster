@@ -9,7 +9,8 @@ import Main from './Main';
 
 const bannerDetails = {
 	title: 'Integrations',
-	description: 'GUI to manage preferences for appbase.io integrations.',
+	description:
+		'Build a WYSIWG storefront search preview that can be installed with your favorite E-Commerce platform.',
 	icon: 'pencil',
 };
 
