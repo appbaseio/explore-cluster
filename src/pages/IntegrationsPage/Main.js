@@ -84,6 +84,7 @@ class Main extends React.Component {
 	});
 
 	componentDidMount() {
+		window.addEventListener('beforeunload', this.storePreferences);
 		// sync form values
 		const preferences = localStorage.getItem(this.storeKey, this.form.value);
 		if (preferences) {
@@ -96,8 +97,18 @@ class Main extends React.Component {
 	}
 
 	componentWillUnmount() {
-		localStorage.setItem(this.storeKey, JSON.stringify(this.form.value));
+		this.storePreferences();
+		window.removeEventListener('beforeunload', this.storePreferences);
 	}
+
+	get storeKey() {
+		const { index } = this.props;
+		return `${index}__${getURL()}`;
+	}
+
+	storePreferences = () => {
+		localStorage.setItem(this.storeKey, JSON.stringify(this.form.value));
+	};
 
 	getPreferences = () => {
 		const { index } = this.props;
@@ -243,11 +254,6 @@ class Main extends React.Component {
 			exportType: get(formValue, 'exportSettings.type'),
 		};
 	};
-
-	get storeKey() {
-		const { index } = this.props;
-		return `${index}__${getURL()}`;
-	}
 
 	render() {
 		return (
