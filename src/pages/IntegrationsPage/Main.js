@@ -65,15 +65,11 @@ class Main extends React.Component {
 			}),
 			color: FormBuilder.group({
 				enabled: false,
-				customize: getFilterConfigurationForm({
-					dataField: { value: '', disabled: true },
-				}),
+				customize: getFilterConfigurationForm(),
 			}),
 			size: FormBuilder.group({
 				enabled: false,
-				customize: getFilterConfigurationForm({
-					dataField: { value: '', disabled: true },
-				}),
+				customize: getFilterConfigurationForm(),
 			}),
 			price: FormBuilder.group({
 				enabled: false,

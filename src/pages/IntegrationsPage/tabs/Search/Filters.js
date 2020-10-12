@@ -11,12 +11,12 @@ export const defaultSettings = [
 	},
 	{
 		id: 'size',
-		label: 'Show a size filter (only works with Shopify apps)',
+		label: 'Show a size filter',
 		value: false,
 	},
 	{
 		id: 'color',
-		label: 'Show a color filter (only works with Shopify apps)',
+		label: 'Show a color filter',
 		value: false,
 	},
 	{

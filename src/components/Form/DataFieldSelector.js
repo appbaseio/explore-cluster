@@ -40,16 +40,25 @@ class DataFieldSelector extends React.Component {
 		if (control || name) {
 			return (
 				<FieldControl strict={false} name={name} control={control}>
-					{({ handler }) => (
-						<Select {...selectProps} {...handler()} onFocus={this.getMappings}>
-							{this.renderOptions()}
-						</Select>
-					)}
+					{({ handler }) => {
+						const inputHandler = handler();
+						return (
+							<Select
+								placeholder="Select field"
+								{...selectProps}
+								{...inputHandler}
+								value={inputHandler.value ? inputHandler.value : undefined}
+								onFocus={this.getMappings}
+							>
+								{this.renderOptions()}
+							</Select>
+						);
+					}}
 				</FieldControl>
 			);
 		}
 		return (
-			<Select {...selectProps} onFocus={this.getMappings}>
+			<Select placeholder="Select field" {...selectProps} onFocus={this.getMappings}>
 				{this.renderOptions()}
 			</Select>
 		);
