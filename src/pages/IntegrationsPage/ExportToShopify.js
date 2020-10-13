@@ -33,7 +33,7 @@ const ExportToShopify = ({ control, preferences }) => {
 					<ol>
 						<li>Go to admin</li>
 						<li>
-							Go to your current theme under `&quot;`Online Store`&quot;`.
+							Go to your current theme under &quot;Online Store&quot;.
 							<img
 								css={{ margin: '5px 0', width: '100%' }}
 								src="https://i.imgur.com/WCMv2Rc.png"
@@ -41,8 +41,8 @@ const ExportToShopify = ({ control, preferences }) => {
 							/>
 						</li>
 						<li>
-							In the right panel for you current theme, go to the
-							`&apos;`Actions`&apos;` dropdown.
+							In the right panel for you current theme, go to the &quot;Actions&quot;
+							dropdown.
 						</li>
 						<li>
 							Select Edit Code
@@ -64,16 +64,18 @@ const ExportToShopify = ({ control, preferences }) => {
 									marginBottom: 25,
 								}}
 							>
-								<Button
-									icon="copy"
-									shape="circle"
-									css={{
-										position: 'absolute',
-										right: 10,
-										top: 10,
-									}}
-									onClick={copyToClipboard}
-								/>
+								<CopyToClipboard text={installationScript} onCopy={copyToClipboard}>
+									<Button
+										icon="copy"
+										shape="circle"
+										css={{
+											position: 'absolute',
+											right: 10,
+											top: 10,
+										}}
+									/>
+								</CopyToClipboard>
+
 								<pre
 									css={{
 										background: '#eee',
