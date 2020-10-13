@@ -7,7 +7,7 @@ export default {
 	float: ['integer', 'double', 'text'],
 	double: ['integer', 'float', 'text'],
 
-	keyword: ['text'],
+	keyword: ['text', 'integer', 'long', 'float', 'double', 'date', 'boolean'],
 
 	date: ['text'],
 	geo_point: ['text'],

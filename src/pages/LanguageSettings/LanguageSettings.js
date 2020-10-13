@@ -42,6 +42,7 @@ import Loader from '../../components/Loader';
 import { allowedTiers } from '../../utils/prop-types';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
+import ReIndexWrapper from '../../components/ReIndexWrapper';
 
 const bannerDetails = {
 	title: 'Language Settings',
@@ -104,7 +105,7 @@ class LanguageSettings extends React.Component {
 		return applyLanguageAnalyzers(analyzerMappings, this.getFallBackLanguage(getFieldValue));
 	};
 
-	handleSubmit = (e) => {
+	handleSubmit = (e, refetchReIndexingInfo) => {
 		e.preventDefault();
 		const {
 			form: { getFieldValue, validateFields },
@@ -117,10 +118,12 @@ class LanguageSettings extends React.Component {
 		const ACC_API = getURL();
 		validateFields((err, values) => {
 			const handleReIndexError = (reIndexErr) => {
+				console.error(reIndexErr);
 				this.setState({ loading: false });
 				notification.error({
-					message: 'error',
-					description: reIndexErr.message,
+					message: 'Reindexing Failed',
+					description:
+						'Reindexing is in progress, please wait till the current process is completed!',
 				});
 			};
 			const handleReIndexSuccess = (languagePayload, mappings) => {
@@ -165,7 +168,7 @@ class LanguageSettings extends React.Component {
 						const analysis = buildLanguageAnalysis(language, languagePayload);
 						const { analyzer, filter } = get(appSettings, 'index.analysis', {});
 						const { analyzer: analyzerNew, filter: filterNew } = analysis || {};
-						reIndex({
+						const reIndexPromise = reIndex({
 							mappings: { properties: analyzerMappings },
 							appId: appName,
 							version: esVersion,
@@ -189,7 +192,15 @@ class LanguageSettings extends React.Component {
 									},
 								},
 							},
-						})
+						});
+
+						if (refetchReIndexingInfo) {
+							setTimeout(() => {
+								refetchReIndexingInfo();
+							}, 500);
+						}
+
+						reIndexPromise
 							.then(() => {
 								handleReIndexSuccess(languagePayload, analyzerMappings);
 							})
@@ -417,53 +428,59 @@ class LanguageSettings extends React.Component {
 							</ErrorToaster>
 						</Card>
 					</Form>
-
-					<SettingsFooter
-						loading={isUpdating || loading}
-						resetState={resetState}
-						showCopySettings
-						showSearchPreview
-						app={appName}
-						searchPreviewModalProps={{
-							buttonProps: {
-								showTooltip: !isEqual(
-									this.getLanguagePayload(getFieldsValue()),
-									get(settings, 'language'),
-								),
-								tooltip: settingsMap.disable_search_settings.description,
-							},
-						}}
-						onReset={this.resetLanguageSettings}
-						saveText="Apply Settings And Re-index"
-						showReset={
-							!isEqual(get(settings, 'language'), get(defaultSettings, 'language'))
-						}
-						reviewAndSave={() => (
-							<ReviewAndSave
+					<ReIndexWrapper appName={appName}>
+						{({ refetch }) => (
+							<SettingsFooter
 								loading={isUpdating || loading}
-								isReset={isReset}
-								oldValues={get(settings, 'language')}
-								newValues={this.getLanguagePayload(getFieldsValue())}
-								onClick={() => this.toggleVisible(false)}
-								visible={visible}
-								onRevert={() => {
-									this.revertChanges(settings, setFieldsValue);
+								resetState={resetState}
+								showCopySettings
+								showSearchPreview
+								app={appName}
+								searchPreviewModalProps={{
+									buttonProps: {
+										showTooltip: !isEqual(
+											this.getLanguagePayload(getFieldsValue()),
+											get(settings, 'language'),
+										),
+										tooltip: settingsMap.disable_search_settings.description,
+									},
 								}}
-								renderContent={() => (
-									<Alert
-										type="warning"
-										showIcon
-										style={{ marginBottom: 10 }}
-										description="Re-indexing is required for applying below changes."
+								onReset={this.resetLanguageSettings}
+								saveText="Apply Settings And Re-index"
+								showReset={
+									!isEqual(
+										get(settings, 'language'),
+										get(defaultSettings, 'language'),
+									)
+								}
+								reviewAndSave={() => (
+									<ReviewAndSave
+										loading={isUpdating || loading}
+										isReset={isReset}
+										oldValues={get(settings, 'language')}
+										newValues={this.getLanguagePayload(getFieldsValue())}
+										onClick={() => this.toggleVisible(false)}
+										visible={visible}
+										onRevert={() => {
+											this.revertChanges(settings, setFieldsValue);
+										}}
+										renderContent={() => (
+											<Alert
+												type="warning"
+												showIcon
+												style={{ marginBottom: 10 }}
+												description="Re-indexing is required for applying below changes."
+											/>
+										)}
+										onSave={(e) => {
+											this.handleSubmit(e, refetch);
+											this.toggleVisible();
+										}}
 									/>
 								)}
-								onSave={(e) => {
-									this.handleSubmit(e);
-									this.toggleVisible();
-								}}
 							/>
 						)}
-					/>
+					</ReIndexWrapper>
 				</div>
 			</>
 		);

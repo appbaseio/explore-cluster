@@ -198,19 +198,26 @@ export const updateSynonymsSettings = ({
 	credentials,
 	mappings,
 	needReindex,
+	refetchReIndexingInfo,
 }) => {
 	const version = +getVersion()[0];
 	const url = getURL();
 
 	return new Promise((resolve, reject) => {
 		const handleReindex = () => {
-			reIndex({
+			const reIndexPromise = reIndex({
 				mappings,
 				settings,
 				appId: appName,
 				version,
 				credentials,
-			})
+			});
+			if (refetchReIndexingInfo) {
+				setTimeout(() => {
+					refetchReIndexingInfo();
+				}, 500);
+			}
+			reIndexPromise
 				.then(() => {
 					resolve({
 						acknowledged: true,

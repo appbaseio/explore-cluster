@@ -69,13 +69,13 @@ const sampleData = [
 					long_link: '',
 				},
 				{
-					title: 'Query suggestions',
+					title: 'Popular suggestions',
 					description: '',
 					short_link: '',
 					long_link: '',
 				},
 				{
-					title: 'Tune Query suggestions',
+					title: 'Tune Popular suggestions',
 					description: '',
 					short_link: '',
 					long_link: '',

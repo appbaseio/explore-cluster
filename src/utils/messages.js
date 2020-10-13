@@ -53,7 +53,7 @@ export const credentialsMessages = {
 	ipLimit: Message('Set a per hour ratelimit on API calls per IP address.'),
 };
 
-// Messages for query suggestions
+// Messages for popular suggestions
 export const suggestionsMessages = {
 	blacklist: Message('A list of queries which can be marked as blacklist.'),
 	external_suggestions: Message('Define your custom suggestions.'),

@@ -20,6 +20,7 @@ import settingsMap from '../../components/ReviewAndSave/helper';
 import { getDiffKeys } from './utils';
 import ReviewAndSave from '../../components/ReviewAndSave';
 import SettingsFooter from '../../components/SettingsFooter';
+import ReIndexWrapper from '../../components/ReIndexWrapper';
 import { allowedTiers } from '../../utils/prop-types';
 
 const bannerDetails = {
@@ -41,7 +42,6 @@ class AggsPage extends React.Component {
 		queryFormat: 'or',
 		reviewAndSaveModal: false,
 		isReset: false,
-		searchFields: [],
 	};
 
 	_mappingsRef = null;
@@ -92,7 +92,7 @@ class AggsPage extends React.Component {
 		});
 	};
 
-	handleSave = () => {
+	handleSave = (refetchReIndexingData) => {
 		const { fieldTypes, sort, count, includeNullValue, queryFormat } = this.state;
 		const { updateSettingsAction, appName, settings } = this.props;
 
@@ -120,7 +120,7 @@ class AggsPage extends React.Component {
 							this,
 							'_mappingsRef.current.wrappedInstance.handleReindex',
 						);
-						await reIndex();
+						await reIndex(refetchReIndexingData);
 					}
 					message.success(`Aggregation settings for ${appName} saved successfully`);
 				}
@@ -188,12 +188,6 @@ class AggsPage extends React.Component {
 		this._mappingsRef = ref;
 	};
 
-	setSearchFields = (searchFields) => {
-		this.setState({
-			searchFields,
-		});
-	};
-
 	render() {
 		const {
 			isLoading,
@@ -213,7 +207,6 @@ class AggsPage extends React.Component {
 			sort,
 			reviewAndSaveModal,
 			isReset,
-			searchFields,
 		} = this.state;
 
 		if (isLoading) {
@@ -273,7 +266,6 @@ class AggsPage extends React.Component {
 							fieldTypes={fieldTypes}
 							onFieldsUpdate={this.handleTypesUpdate}
 							onInit={this.setMappingsRef}
-							setSearchFields={this.setSearchFields}
 						/>
 						<Divider />
 						<SettingsOptions
@@ -284,87 +276,89 @@ class AggsPage extends React.Component {
 							queryFormat={queryFormat}
 						/>
 					</Card>
-					<SettingsFooter
-						loading={isUpdating}
-						resetState={resetState}
-						showCopySettings
-						onReset={this.resetToDefault}
-						showSearchPreview
-						searchPreviewModalProps={{
-							searchPreviewProps: {
-								testSettings: {
-									...(settings || {}),
-									search: {
-										...get(settings, 'search', {}),
-										dataField: get(settings, 'search.dataField.length')
-											? get(settings, 'search.dataField', {})
-											: Object.keys(searchFields),
-										fieldWeights: get(settings, 'search.fieldWeights.length')
-											? get(settings, 'search.fieldWeights', {})
-											: Object.values(searchFields),
-									},
-									aggregations: {
-										size: count,
-										sortBy: sort,
-										includeNullValues: includeNullValue,
-										dataField: fieldTypes,
-										queryFormat,
-									},
-								},
-								hasTestSettings: true,
-							},
-							buttonProps: {
-								showTooltip: this.hasMappingsChanged,
-								tooltip: settingsMap.disable_search_settings.description,
-							},
-						}}
-						app={appName}
-						showReset={
-							!isEqual(
-								get(settings, 'aggregations'),
-								get(defaultSettings, 'aggregations'),
-							)
-						}
-						reviewAndSave={() => (
-							<ReviewAndSave
+					<ReIndexWrapper appName={appName}>
+						{({ refetch }) => (
+							<SettingsFooter
 								loading={isUpdating}
-								isReset={isReset}
-								oldValues={{
-									agg_size: get(settings, 'aggregations.size'),
-									sortBy: get(settings, 'aggregations.sortBy'),
-									includeNullValues: get(
-										settings,
-										'aggregations.includeNullValues',
-									),
-									dataField: get(typesDiff, 'old'),
-									queryFormat: get(settings, 'aggregations.queryFormat', 'or'),
-									mappings: get(mappingsDiff, 'old', {}),
+								resetState={resetState}
+								showCopySettings
+								onReset={this.resetToDefault}
+								showSearchPreview
+								searchPreviewModalProps={{
+									searchPreviewProps: {
+										testSettings: {
+											...(settings || {}),
+											search: {
+												...get(settings, 'search', {}),
+											},
+											aggregations: {
+												size: count,
+												sortBy: sort,
+												includeNullValues: includeNullValue,
+												dataField: fieldTypes,
+												queryFormat,
+											},
+										},
+										hasTestSettings: true,
+									},
+									buttonProps: {
+										showTooltip: this.hasMappingsChanged,
+										tooltip: settingsMap.disable_search_settings.description,
+									},
 								}}
-								newValues={{
-									agg_size: count,
-									sortBy: sort,
-									includeNullValues: includeNullValue,
-									dataField: get(typesDiff, 'new'),
-									queryFormat,
-									mappings: get(mappingsDiff, 'new', {}),
-								}}
-								renderContent={() =>
-									this.hasMappingsChanged ? (
-										<Alert
-											type="warning"
-											showIcon
-											style={{ marginBottom: 10 }}
-											description="Re-indexing is required for applying below changes."
-										/>
-									) : null
+								app={appName}
+								showReset={
+									!isEqual(
+										get(settings, 'aggregations'),
+										get(defaultSettings, 'aggregations'),
+									)
 								}
-								onClick={this.toggleReviewSaveVisible}
-								visible={reviewAndSaveModal}
-								onRevert={this.resetChanges}
-								onSave={this.handleSave}
+								reviewAndSave={() => (
+									<ReviewAndSave
+										loading={isUpdating}
+										isReset={isReset}
+										oldValues={{
+											agg_size: get(settings, 'aggregations.size'),
+											sortBy: get(settings, 'aggregations.sortBy'),
+											includeNullValues: get(
+												settings,
+												'aggregations.includeNullValues',
+											),
+											dataField: get(typesDiff, 'old'),
+											queryFormat: get(
+												settings,
+												'aggregations.queryFormat',
+												'or',
+											),
+											mappings: get(mappingsDiff, 'old', {}),
+										}}
+										newValues={{
+											agg_size: count,
+											sortBy: sort,
+											includeNullValues: includeNullValue,
+											dataField: get(typesDiff, 'new'),
+											queryFormat,
+											mappings: get(mappingsDiff, 'new', {}),
+										}}
+										renderContent={() =>
+											this.hasMappingsChanged ? (
+												<Alert
+													type="warning"
+													showIcon
+													style={{ marginBottom: 10 }}
+													description="Re-indexing is required for applying below changes."
+												/>
+											) : null
+										}
+										onClick={this.toggleReviewSaveVisible}
+										visible={reviewAndSaveModal}
+										onRevert={this.resetChanges}
+										onSave={() => this.handleSave(refetch)}
+									/>
+								)}
 							/>
 						)}
-					/>
+					</ReIndexWrapper>
 				</div>
 			</React.Fragment>
 		);
