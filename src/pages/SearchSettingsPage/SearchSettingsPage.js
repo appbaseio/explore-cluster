@@ -71,10 +71,6 @@ class SearchSettings extends React.Component {
 	}
 
 	handleChange = (name, value) => {
-		// this.setState({
-		// 	[name]: value,
-		// });
-
 		const { localRelevancy, updateLocalRelevancy, appName } = this.props;
 		updateLocalRelevancy(appName, {
 			...get(localRelevancy, appName),
@@ -86,10 +82,6 @@ class SearchSettings extends React.Component {
 	};
 
 	handleFieldsUpdate = (fieldWeights) => {
-		// this.setState({
-		// 	fieldWeights,
-		// });
-
 		const { localRelevancy, updateLocalRelevancy, appName } = this.props;
 		updateLocalRelevancy(appName, {
 			...get(localRelevancy, appName),
@@ -144,6 +136,7 @@ class SearchSettings extends React.Component {
 						description: get(res, 'error.message'),
 					});
 				} else {
+					console.log('reshere', res);
 					if (
 						JSON.stringify(
 							get(this, '_mappingsRef.current.wrappedInstance.state.rawMappings', {}),
@@ -218,13 +211,6 @@ class SearchSettings extends React.Component {
 			},
 		});
 		this.setState({
-			// fuzziness: get(searchSettings, 'fuzziness'),
-			// queryFormat: get(searchSettings, 'queryFormat'),
-			// queryType,
-			// fieldWeights,
-			// enableNgram: get(settings, 'indexSettings.enableNgram', true),
-			// hasLanguage: !!get(settings, 'language.language'),
-			// enableSynonyms: get(settings, 'synonyms.enabled', true),
 			reviewAndSaveModal: false,
 			isReset: false,
 		});

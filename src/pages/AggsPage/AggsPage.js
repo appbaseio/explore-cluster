@@ -9,6 +9,7 @@ import {
 	getSettings,
 	putSettings,
 	deleteSettings,
+	setLocalRelevancyState,
 } from '../../batteries/modules/actions';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { isValidPlan, isEqual } from '../../batteries/utils';
@@ -35,11 +36,11 @@ const bannerDetails = {
 
 class AggsPage extends React.Component {
 	state = {
-		fieldTypes: {},
-		count: 10,
-		sort: 'count',
-		includeNullValue: false,
-		queryFormat: 'or',
+		// fieldTypes: {},
+		// count: 10,
+		// sort: 'count',
+		// includeNullValue: false,
+		// queryFormat: 'or',
 		reviewAndSaveModal: false,
 		isReset: false,
 	};
@@ -53,9 +54,10 @@ class AggsPage extends React.Component {
 			settings,
 			getDefaultSettingsAction,
 			defaultSettings,
+			localRelevancy,
 		} = this.props;
 
-		if (settings) {
+		if (settings && !get(localRelevancy, appName)) {
 			this.init(settings);
 		} else {
 			getSettingsAction(appName);
@@ -140,12 +142,20 @@ class AggsPage extends React.Component {
 	};
 
 	init = (settings) => {
+		const { appName, updateLocalRelevancy } = this.props;
+		updateLocalRelevancy(appName, {
+			...settings,
+			aggregations: {
+				...get(settings, 'aggregations', {}),
+				count: get(settings, 'aggregations.size'),
+				sort: get(settings, 'aggregations.sortBy'),
+				includeNullValue: get(settings, 'aggregations.includeNullValues'),
+				fieldTypes: get(settings, 'aggregations.dataField'),
+				queryFormat: get(settings, 'aggregations.queryFormat', 'or'),
+			},
+		});
+
 		this.setState({
-			count: get(settings, 'aggregations.size'),
-			sort: get(settings, 'aggregations.sortBy'),
-			includeNullValue: get(settings, 'aggregations.includeNullValues'),
-			fieldTypes: get(settings, 'aggregations.dataField'),
-			queryFormat: get(settings, 'aggregations.queryFormat', 'or'),
 			reviewAndSaveModal: false,
 			isReset: false,
 		});
@@ -378,6 +388,8 @@ AggsPage.propTypes = {
 	getDefaultSettingsAction: PropTypes.func.isRequired,
 	getSettingsAction: PropTypes.func.isRequired,
 	updateSettingsAction: PropTypes.func.isRequired,
+	updateLocalRelevancy: PropTypes.func.isRequired,
+	localRelevancy: PropTypes.object.isRequired,
 };
 
 AggsPage.defaultProps = {
@@ -395,6 +407,7 @@ const mapStateToProps = (state) => {
 	const errorCode = get(state, '$getAppSettings.error.actual.code');
 	const defaultSearchSettings = errorCode === 404 ? defaultSettings : null;
 	const appName = get(state, '$getCurrentApp.name');
+	const localRelevancy = get(state, `$localRelevancy`);
 	return {
 		appName,
 		defaultSettings,
@@ -404,6 +417,7 @@ const mapStateToProps = (state) => {
 		resetState: get(state, '$getAppSettings.default', {}),
 		settings: get(state, ['$getAppSettings', 'settings', appName], defaultSearchSettings),
 		tier: get(state, '$getAppPlan.results.tier'),
+		localRelevancy,
 	};
 };
 
@@ -412,6 +426,7 @@ const mapDispatchToProps = (dispatch) => ({
 	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
 	getSettingsAction: (name) => dispatch(getSettings(name)),
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
+	updateLocalRelevancy: (name, data) => dispatch(setLocalRelevancyState(name, data)),
 });
 
 export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(AggsPage));
