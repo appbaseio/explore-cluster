@@ -14,6 +14,7 @@ import { mediaKey } from '../../utils/media';
 import AppDataWrapper from '../../components/AppDataWrapper';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
+import { hasClusterEditAccess } from '../../utils';
 
 const link = css`
 	font-size: 16px;
@@ -60,7 +61,7 @@ class HomePage extends Component {
 		}));
 	};
 
-	renderApps = () => {
+	renderApps = (canEdit) => {
 		const { apps } = this.props;
 		const sortedApps = apps && apps.data ? Object.keys(apps.data) : [];
 		return (
@@ -81,10 +82,12 @@ class HomePage extends Component {
 							style={{ fontSize: 34, marginBottom: 10 }}
 						/>
 						<h2>No indices found</h2>
-						<p>
-							Create an index or try out the{' '}
-							<Link to="/tutorial">interactive tutorial</Link> to get started
-						</p>
+						{canEdit && (
+							<p>
+								Create an index or try out the{' '}
+								<Link to="/tutorial">interactive tutorial</Link> to get started
+							</p>
+						)}
 					</section>
 				)}
 
@@ -101,7 +104,8 @@ class HomePage extends Component {
 
 	render() {
 		const { showModal } = this.state;
-		const { history } = this.props;
+		const { history, allowedActions } = this.props;
+		const canEdit = hasClusterEditAccess(allowedActions);
 
 		return (
 			<Fragment>
@@ -124,9 +128,11 @@ class HomePage extends Component {
 									</Col>
 								</Row>
 
-								<Link to="/tutorial" className={link}>
-									Interactive Tutorial <Icon type="book" />
-								</Link>
+								{canEdit && (
+									<Link to="/tutorial" className={link}>
+										Interactive Tutorial <Icon type="book" />
+									</Link>
+								)}
 								<a
 									href="https://docs.appbase.io/docs/data/Import/"
 									className={link}
@@ -156,25 +162,29 @@ class HomePage extends Component {
 									},
 								}}
 							>
-								<Button
-									size="large"
-									type="primary"
-									block
-									onClick={this.handleChange}
-									data-cy="initialize-new-index-creation"
-								>
-									<Icon type="plus" /> Create a new index
-								</Button>
+								{canEdit && (
+									<Button
+										size="large"
+										type="primary"
+										block
+										onClick={this.handleChange}
+										data-cy="initialize-new-index-creation"
+									>
+										<Icon type="plus" /> Create a new index
+									</Button>
+								)}
 							</Col>
 						</Row>
 					</Header>
 					{this.renderApps()}
 				</Layout>
-				<CreateAppModal
-					history={history}
-					handleModal={this.handleChange}
-					showModal={showModal}
-				/>
+				{canEdit && (
+					<CreateAppModal
+						history={history}
+						handleModal={this.handleChange}
+						showModal={showModal}
+					/>
+				)}
 			</Fragment>
 		);
 	}
@@ -184,11 +194,13 @@ HomePage.propTypes = {
 	apps: PropTypes.object.isRequired,
 	history: PropTypes.object.isRequired,
 	fetchApps: PropTypes.func.isRequired,
+	allowedActions: PropTypes.array.isRequired,
 };
 
 const mapStateToProps = (state) => ({
 	user: get(state, 'user.data.username'),
 	apps: get(state, 'apps'),
+	allowedActions: get(state, 'user.data.allowedActions'),
 });
 
 const mapDispatchToProps = (dispatch) => ({

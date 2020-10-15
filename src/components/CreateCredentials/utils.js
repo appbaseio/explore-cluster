@@ -2,6 +2,7 @@ import isEqual from 'lodash/isEqual';
 import sortBy from 'lodash/sortBy';
 import get from 'lodash/get';
 import filter from 'lodash/filter';
+import { getDefaultAllowedActions } from '../../utils/allowedActions';
 
 export const Suggestions = {
 	1: {
@@ -209,7 +210,7 @@ export const getOperationType = (value) => {
 
 export const mapFormToValues = (value, hasLimits) => {
 	const filteredCategories = filterCategories(value);
-	return {
+	const submitValues = {
 		indices: value.indices,
 		description: value.description,
 		ops: value.operationType && value.operationType.ops,
@@ -223,8 +224,14 @@ export const mapFormToValues = (value, hasLimits) => {
 		is_admin: value.isAdmin,
 		include_fields: value.include_fields,
 		exclude_fields: value.exclude_fields,
+		allowed_actions: value.allowedActions,
 		categories: hasLimits ? filteredCategories.categories : value.categories,
 	};
+
+	if (value.isAdmin) {
+		delete submitValues.allowed_actions;
+	}
+	return submitValues;
 };
 
 export const mapValuesToForm = (value, hasLimits) => ({
@@ -234,5 +241,6 @@ export const mapValuesToForm = (value, hasLimits) => ({
 	ttl: parseInt(value.ttl, 10),
 	isAdmin: value.is_admin,
 	indices: value.indices ? filter(value.indices, (o) => o !== '') : undefined,
+	allowedActions: value.allowed_actions || getDefaultAllowedActions(value.is_admin),
 	...(hasLimits && { categories: getCategories(value) }),
 });

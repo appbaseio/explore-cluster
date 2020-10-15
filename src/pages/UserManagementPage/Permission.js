@@ -2,9 +2,10 @@ import React from 'react';
 import { Button, Popconfirm, Tooltip } from 'antd';
 import { css } from 'react-emotion';
 import { connect } from 'react-redux';
-import { object, func, bool } from 'prop-types';
+import { object, func, array } from 'prop-types';
 import get from 'lodash/get';
 import Flex from '../../batteries/components/shared/Flex';
+import { ALLOWED_ACTIONS } from '../../constants';
 
 const container = css`
 	padding-right: 10px;
@@ -27,14 +28,18 @@ class Permission extends React.Component {
 	};
 
 	render() {
-		const { isAdmin } = this.props;
-		const disabled = !isAdmin;
+		const { allowedActions } = this.props;
+		const hasEditAccess = allowedActions.includes(ALLOWED_ACTIONS.USER_MANAGEMENT);
 		return (
 			<Flex alignItems="center">
 				<Flex justifyContent="space-between" alignItems="center" css={container}>
 					<Flex>
 						<Tooltip placement="topLeft" title="Edit User">
-							<Button disabled={disabled} onClick={this.handleEditCred} type="normal">
+							<Button
+								disabled={!hasEditAccess}
+								onClick={this.handleEditCred}
+								type="normal"
+							>
 								Update
 							</Button>
 						</Tooltip>
@@ -47,7 +52,7 @@ class Permission extends React.Component {
 						okText="Yes"
 						cancelText="No"
 					>
-						<Button disabled={disabled} type="danger">
+						<Button disabled={!hasEditAccess} type="danger">
 							Delete
 						</Button>
 					</Popconfirm>
@@ -59,13 +64,13 @@ class Permission extends React.Component {
 
 Permission.propTypes = {
 	permissionInfo: object.isRequired,
-	isAdmin: bool.isRequired,
 	showForm: func.isRequired,
 	deletePermission: func.isRequired,
+	allowedActions: array.isRequired,
 };
 
 const mapStateToProps = (state) => ({
-	isAdmin: get(state, 'user.data.isAdmin'),
+	allowedActions: get(state, 'user.data.allowedActions'),
 });
 
 export default connect(mapStateToProps)(Permission);

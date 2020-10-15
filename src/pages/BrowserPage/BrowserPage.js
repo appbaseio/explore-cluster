@@ -75,7 +75,7 @@ class BrowserPage extends Component {
 				{credentials ? (
 					<div>
 						<DejavuComponent
-							app={dejavu.appname}
+							app={dejavu.appname || '*'}
 							url={dejavu.url}
 							credentials={credentials}
 							URLParams={false}

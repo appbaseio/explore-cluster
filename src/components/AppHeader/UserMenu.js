@@ -21,6 +21,7 @@ const handleLogout = () => {
 	sessionStorage.removeItem('username');
 	sessionStorage.removeItem('password');
 	sessionStorage.removeItem('isAdmin');
+	sessionStorage.removeItem('allowedActions');
 	window.location.href = '/';
 };
 

@@ -88,7 +88,6 @@ class Search extends React.Component {
 	render() {
 		const { app, search, handleModal, onValueChange } = this.props;
 		const { value } = this.state;
-		console.log(value);
 		return (
 			<Card>
 				<Row type="flex" gutter={8} align="middle" justify="space-between">

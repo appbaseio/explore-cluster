@@ -8,9 +8,11 @@ import get from 'lodash/get';
 import URLSearchParams from '@ungap/url-search-params';
 import * as Sentry from '@sentry/browser';
 
-import { loadUser } from './actions';
+import { loadUser, setAppRoutes, setClusterRoutes } from './actions';
+import { getAuthorizedViews } from './utils';
 import Loader from './components/Loader';
 import Logo from './components/Logo';
+import { APP_ROUTES, CLUSTER_ROUTES } from './constants/routes';
 
 Sentry.init({
 	dsn: 'https://8e07fb23ba8f46d8a730e65496bb7f00@sentry.io/58038',
@@ -124,7 +126,12 @@ class Dashboard extends Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { error, status } = this.props;
+		const { error, status, user, updateAppRoutes, updateClusterRoutes } = this.props;
+		const allowedActions = get(user, 'data.allowedActions', []);
+		if (allowedActions.length) {
+			updateAppRoutes(getAuthorizedViews(APP_ROUTES, allowedActions));
+			updateClusterRoutes(getAuthorizedViews(CLUSTER_ROUTES, allowedActions));
+		}
 		if (status === 402 && error && error !== prevProps.error) {
 			// eslint-disable-next-line
 			this.setState(
@@ -248,6 +255,8 @@ Dashboard.propTypes = {
 	loadArcUser: PropTypes.func.isRequired,
 	status: PropTypes.number,
 	error: PropTypes.any,
+	updateAppRoutes: PropTypes.func.isRequired,
+	updateClusterRoutes: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = ({ user }) => ({
@@ -258,6 +267,8 @@ const mapStateToProps = ({ user }) => ({
 
 const mapDispatchToProps = (dispatch) => ({
 	loadArcUser: (u, p) => dispatch(loadUser(u, p)),
+	updateAppRoutes: (routes) => dispatch(setAppRoutes(routes)),
+	updateClusterRoutes: (routes) => dispatch(setClusterRoutes(routes)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Dashboard);
