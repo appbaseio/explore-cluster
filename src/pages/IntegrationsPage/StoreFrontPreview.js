@@ -30,7 +30,7 @@ class StoreFrontPreview extends React.Component {
 	render() {
 		const { loading } = this.state;
 		return (
-			<div style={{ height: 'calc(100vh - 200px)' }}>
+			<div>
 				<link rel="stylesheet" type="text/css" href={BaseCSSURL} />
 				<div openwithmodal="false" id="reactivesearch-shopify-1" />
 				{loading ? <Loader /> : null}

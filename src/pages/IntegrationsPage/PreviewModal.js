@@ -8,14 +8,13 @@ const modalStyles = css`
 	top: 0 !important;
 	height: 100vh;
 	padding-bottom: 0 !important;
-	overflow-y: hidden;
+	overflow-y: scroll;
 	.ant-modal {
 		top: 0;
 	}
 	.ant-modal-content {
 		border-radius: 0;
 		min-height: 100%;
-		overflow-y: scroll;
 	}
 	@media (max-width: 767px) {
 		margin: 0 !important;

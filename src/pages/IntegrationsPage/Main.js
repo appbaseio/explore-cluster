@@ -40,7 +40,6 @@ class Main extends React.Component {
 		resultImage: undefined,
 		resultHandle: undefined,
 		storeInfo: FormBuilder.group({
-			locale: 'en',
 			currency: 'USD',
 		}),
 		customMessages: FormBuilder.group(
@@ -130,7 +129,6 @@ class Main extends React.Component {
 				},
 			},
 			globalSettings: {
-				locale: get(formValue, 'storeInfo.locale'),
 				currency: get(formValue, 'storeInfo.currency'),
 				showSelectedFilters: get(formValue, 'showSelectedFilters'),
 				customCss: get(formValue, 'customCss'),
