@@ -3,6 +3,7 @@ import { FieldGroup } from 'react-reactive-form';
 import { Tabs } from 'antd';
 import { FormContext, verticalTab } from '../../utils';
 import Search from './Search';
+import Results from './Results';
 import Filters from './Filters';
 import CustomMessages from './CustomMessages';
 
@@ -18,7 +19,10 @@ const SearchSettings = () => {
 			<TabPane tab="Filters" key="2">
 				<FieldGroup control={form} render={() => <Filters />} />
 			</TabPane>
-			<TabPane tab="Custom Messages" key="3">
+			<TabPane tab="Results" key="3">
+				<FieldGroup control={form} render={() => <Results />} />
+			</TabPane>
+			<TabPane tab="Custom Messages" key="4">
 				<FieldGroup control={form} render={() => <CustomMessages />} />
 			</TabPane>
 		</Tabs>
