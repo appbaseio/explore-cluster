@@ -188,7 +188,7 @@ class CreateCredentials extends React.Component {
 			if (get(initialValues, 'is_admin')) {
 				const allowedActionsHandler = this.form.get('allowedActions');
 				if (allowedActionsHandler) {
-					allowedActionsHandler.setValue(Object.values(ALLOWED_ACTIONS));
+					allowedActionsHandler.disable();
 				}
 				if (indicesHandler) {
 					indicesHandler.disable();
@@ -307,7 +307,7 @@ class CreateCredentials extends React.Component {
 			<FieldGroup
 				strict={false}
 				control={this.form}
-				render={({ invalid }) => (
+				render={({ invalid, pristine }) => (
 					<Modal
 						style={{
 							width: '600px',
@@ -322,7 +322,7 @@ class CreateCredentials extends React.Component {
 										</Button>,
 										<Button
 											loading={isSubmitting}
-											disabled={invalid}
+											disabled={invalid || pristine}
 											key="submit"
 											type="primary"
 											onClick={this.handleSubmit}
