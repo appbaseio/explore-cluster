@@ -33,7 +33,7 @@ const ExportToShopify = ({ control, preferences }) => {
 					<ol>
 						<li>Go to admin</li>
 						<li>
-							Go to your current theme under &quot;Online Store&quot;.
+							Go to your current theme under <b>Online Store</b>.
 							<img
 								css={{ margin: '5px 0', width: '100%' }}
 								src="https://i.imgur.com/WCMv2Rc.png"
@@ -41,7 +41,7 @@ const ExportToShopify = ({ control, preferences }) => {
 							/>
 						</li>
 						<li>
-							In the right panel for you current theme, go to the &quot;Actions&quot;
+							In the right panel for you current theme, go to the <b>Actions</b>{' '}
 							dropdown.
 						</li>
 						<li>

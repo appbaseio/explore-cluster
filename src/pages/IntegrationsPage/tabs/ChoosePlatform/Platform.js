@@ -1,26 +1,28 @@
 import React from 'react';
-
 import { Radio } from 'antd';
 import { FieldControl, FieldGroup } from 'react-reactive-form';
 
-const ChoosePlatform = () => (
+const Platform = () => (
 	<div>
 		<h2>Choose E-Commerce Platform</h2>
+		<p>Choosing an E-Commerce Platform provides specific installation steps</p>
 		<FieldGroup name="exportSettings">
 			{() => (
-				<React.Fragment>
+				<div>
 					<FieldControl name="type">
 						{({ handler }) => (
 							<Radio.Group {...handler()}>
 								<Radio value="shopify">Shopify</Radio>
-								<Radio value="other">Other</Radio>
+								<Radio value="other">
+									Other (Wordpress, Magento, Big Commerce, others)
+								</Radio>
 							</Radio.Group>
 						)}
 					</FieldControl>
-				</React.Fragment>
+				</div>
 			)}
 		</FieldGroup>
 	</div>
 );
 
-export default ChoosePlatform;
+export default Platform;

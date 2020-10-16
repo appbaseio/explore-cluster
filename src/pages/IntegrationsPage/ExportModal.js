@@ -85,6 +85,18 @@ class ExportModal extends React.Component {
 											placeholder: 'Enter API credentials',
 										}}
 									/>
+									API credentials allow secure access to the appbase.io clusters.
+									Check docs at{' '}
+									<a
+										target="blank"
+										href="https://docs.appbase.io/docs/security/credentials/"
+									>
+										here
+									</a>
+									. <br />
+									You can get the API credentials from{' '}
+									<a href="credentials">API Credentials</a> page under{' '}
+									<strong>Access Control</strong>.
 								</Form>
 							)}
 						</Modal>

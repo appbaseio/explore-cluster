@@ -11,17 +11,17 @@ export const defaultSettings = [
 	},
 	{
 		id: 'size',
-		label: 'Show a size filter',
+		label: 'Show size filter',
 		value: false,
 	},
 	{
 		id: 'color',
-		label: 'Show a color filter',
+		label: 'Show color filter',
 		value: false,
 	},
 	{
 		id: 'price',
-		label: 'Show a price range filter',
+		label: 'Show price range filter',
 		value: false,
 	},
 ];

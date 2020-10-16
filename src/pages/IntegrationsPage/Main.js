@@ -6,6 +6,7 @@ import { Tabs, Affix } from 'antd';
 import { connect } from 'react-redux';
 import LayoutTab from './tabs/Layout';
 import SearchTab from './tabs/Search';
+import ChoosePlatformTab from './tabs/ChoosePlatform';
 import { container } from '../ResultsPage/styles';
 import { FormContext, validateURL } from './utils';
 import { getURL } from '../../constants/config';
@@ -102,7 +103,9 @@ class Main extends React.Component {
 	}
 
 	storePreferences = () => {
-		localStorage.setItem(this.storeKey, JSON.stringify(this.form.value));
+		if (this.form.valid) {
+			localStorage.setItem(this.storeKey, JSON.stringify(this.form.value));
+		}
 	};
 
 	getPreferences = () => {
@@ -258,10 +261,13 @@ class Main extends React.Component {
 					className={container}
 				>
 					<Tabs defaultActiveKey="1" style={{ minHeight: 500 }}>
-						<TabPane tab="Layout and Design" key="1">
+						<TabPane tab="E-Commerce Platform" key="1">
+							<ChoosePlatformTab />
+						</TabPane>
+						<TabPane tab="Layout and Design" key="2">
 							<LayoutTab />
 						</TabPane>
-						<TabPane tab="Search Settings" key="2">
+						<TabPane tab="Search Settings" key="3">
 							<SearchTab />
 						</TabPane>
 					</Tabs>
