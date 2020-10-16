@@ -42,21 +42,16 @@ class Main extends React.Component {
 		storeInfo: FormBuilder.group({
 			currency: 'USD',
 		}),
-		customMessages: FormBuilder.group(
-			{
-				resultStats: '[count] products found in [time] ms',
-				noFilterItem: 'No items Found',
-				noResultItem: 'No Results Found!',
-				noSuggestion: 'No suggestions found for <mark>[term]</mark>',
-				fetchingSuggestion: 'Loading Suggestions',
-				fetchingFilterOptions: 'Fetching Options',
-				searchText: 'Click here to search',
-				searchIcon: ['', validateURL],
-			},
-			{
-				updateOn: 'submit',
-			},
-		),
+		customMessages: FormBuilder.group({
+			resultStats: '[count] products found in [time] ms',
+			noFilterItem: 'No items Found',
+			noResultItem: 'No Results Found!',
+			noSuggestion: 'No suggestions found for <mark>[term]</mark>',
+			fetchingSuggestion: 'Loading Suggestions',
+			fetchingFilterOptions: 'Fetching Options',
+			searchText: 'Click here to search',
+			searchIcon: ['', validateURL],
+		}),
 		staticFilters: FormBuilder.group({
 			collections: FormBuilder.group({
 				enabled: false,
