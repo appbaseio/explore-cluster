@@ -16,6 +16,7 @@ import { getFilteredResults } from '../../batteries/utils/helpers';
 import StatsBox from '../../components/AppCard/StatsBox';
 import Searches from '../../batteries/components/analytics/components/Searches';
 import RequestLogs from '../../batteries/components/analytics/components/RequestLogs';
+import { ALLOWED_ACTIONS } from '../../constants';
 
 const main = css`
 	${mediaKey.small} {
@@ -71,7 +72,9 @@ class PaidUserOverview extends React.Component {
 			appName,
 			searchVolume,
 			stats,
+			allowedActions,
 		} = this.props;
+		const hasAnalytics = allowedActions.includes(ALLOWED_ACTIONS.ANALYTICS);
 		return (
 			<Container>
 				<Flex css={main} justifyContent="space-between">
@@ -88,32 +91,38 @@ class PaidUserOverview extends React.Component {
 							data={stats}
 						/>
 					</div>
-					<SearchVolumeChart
-						width={
-							window.innerWidth > 670
-								? window.innerWidth - 690
-								: window.innerWidth - 150
-						}
-						height={210}
-						data={searchVolume}
-					/>
+					{hasAnalytics && (
+						<SearchVolumeChart
+							width={
+								window.innerWidth > 670
+									? window.innerWidth - 690
+									: window.innerWidth - 150
+							}
+							height={210}
+							data={searchVolume}
+						/>
+					)}
 				</Flex>
 				<Flex css={results}>
 					<div css={searchCls}>
-						<Searches
-							css="height: 100%"
-							href="popular-searches"
-							dataSource={getFilteredResults(popularSearches)}
-							title="Popular Searches"
-						/>
+						{hasAnalytics && (
+							<Searches
+								css="height: 100%"
+								href="popular-searches"
+								dataSource={getFilteredResults(popularSearches)}
+								title="Popular Searches"
+							/>
+						)}
 					</div>
 					<div css={noResultsCls}>
-						<Searches
-							css="height: 100%"
-							href="no-results-searches"
-							dataSource={getFilteredResults(noResults)}
-							title="No Result Searches"
-						/>
+						{hasAnalytics && (
+							<Searches
+								css="height: 100%"
+								href="no-results-searches"
+								dataSource={getFilteredResults(noResults)}
+								title="No Result Searches"
+							/>
+						)}
 					</div>
 				</Flex>
 				<div css="margin-top: 20px">
@@ -137,6 +146,7 @@ PaidUserOverview.propTypes = {
 	noResults: PropTypes.array,
 	stats: PropTypes.object.isRequired,
 	fetchApps: PropTypes.func.isRequired,
+	allowedActions: PropTypes.array.isRequired,
 };
 const mapStateToProps = (state) => {
 	const analyticsArr = getAppAnalyticsByName(state) || [];
@@ -156,6 +166,7 @@ const mapStateToProps = (state) => {
 		popularSearches: get(analytics, 'popular_searches'),
 		noResults: get(analytics, 'no_results_searches'),
 		searchVolume: get(analytics, 'search_histogram'),
+		allowedActions: get(state, 'user.data.allowedActions'),
 	};
 };
 const mapDispatchToProps = (dispatch) => ({

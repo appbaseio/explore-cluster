@@ -1,5 +1,5 @@
 // @flow
-import { USER, APPS, CREATE_APP, APP_SCREEN_PREFERENCES } from '../constants';
+import { USER, APPS, CREATE_APP, APP_SCREEN_PREFERENCES, ROUTES_ACTION } from '../constants';
 import { createAction } from '../batteries/modules/actions/utils';
 
 export function loadUser(username: string, password: string, url?: string): Object {
@@ -73,4 +73,12 @@ export function removeAppData(options: Object): Object {
 
 export function updateAppScreenPreferences(payload: Object): Object {
 	return { type: APP_SCREEN_PREFERENCES.UPDATE_PREFERENCES, payload };
+}
+
+export function setAppRoutes(payload: Object): Object {
+	return { type: ROUTES_ACTION.SET_APP_ROUTES, payload };
+}
+
+export function setClusterRoutes(payload: Object): Object {
+	return { type: ROUTES_ACTION.SET_CLUSTER_ROUTES, payload };
 }

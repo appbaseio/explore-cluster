@@ -19,6 +19,7 @@ export const userManagementMessages = {
 		`Depending on the selection, the user can perform read-only, write-only or both read and
 			write operations.`,
 	),
+	allowedActions: Message('Set the scope of actions that a user can perform'),
 	categories: Message('Authorize API access to only selected operations.'),
 };
 // Messages for api credentials form

@@ -1,9 +1,15 @@
 import React from 'react';
 import Loadable from 'react-loadable';
 import { Route } from 'react-router-dom';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import get from 'lodash/get';
+import isEqual from 'lodash/isEqual';
 import AnalyticsContainer from '../AnalyticsContainer';
 import AppPageContainer from '../AppPageContainer';
 import PopularSearches from '../../pages/PopularSearches';
+import UnauthorizedPage from '../../pages/UnauthorizedPage';
+import { getAuthorizedRoutes } from '../../utils';
 
 import Loader from '../Loader';
 
@@ -49,57 +55,154 @@ const SearchLatency = Loadable({
 	loading: Loader,
 });
 
-const ClusterAnalyticsRoutes = () => (
-	<AnalyticsContainer>
-		<Route
-			exact
-			path="/cluster/analytics/:tab?/:subTab?"
-			component={(props) => <AppPageContainer {...props} component={AnalyticsPage} />}
-		/>
-		<Route
-			path="/cluster/popular-searches"
-			component={(props) => <AppPageContainer {...props} component={PopularSearches} />}
-		/>
-		<Route
-			exact
-			path="/cluster/popular-results"
-			component={(props) => <AppPageContainer {...props} component={PopularResults} />}
-		/>
-		<Route
-			exact
-			path="/cluster/geo-distribution"
-			component={(props) => (
-				<AppPageContainer {...props} cluster component={GeoDistributionPage} />
-			)}
-		/>
-		<Route
-			exact
-			path="/cluster/search-latency"
-			component={(props) => <AppPageContainer {...props} component={SearchLatency} />}
-		/>
-		<Route
-			exact
-			path="/cluster/popular-filters"
-			component={(props) => <AppPageContainer {...props} component={PopularFilters} />}
-		/>
-		<Route
-			exact
-			path="/cluster/request-logs/:tab?"
-			component={(props) => <AppPageContainer {...props} component={RequestLogs} />}
-		/>
-		<Route
-			exact
-			path="/cluster/requests-per-minute"
-			component={(props) => (
-				<AppPageContainer {...props} component={RequestDistributionPage} />
-			)}
-		/>
-		<Route
-			exact
-			path="/cluster/no-results-searches"
-			component={(props) => <AppPageContainer {...props} component={NoResultSearches} />}
-		/>
-	</AnalyticsContainer>
-);
+class ClusterAnalyticsRoutes extends React.Component {
+	shouldComponentUpdate(nextProps) {
+		const { location, allowedRoutes } = this.props;
+		return (
+			get(nextProps, 'location.pathname') !== get(location, 'pathname') ||
+			get(nextProps, 'location.search') !== get(location, 'search') ||
+			!isEqual(get(nextProps, 'allowedRoutes'), allowedRoutes)
+		);
+	}
 
-export default ClusterAnalyticsRoutes;
+	render() {
+		const { allowedRoutes } = this.props;
+		return (
+			<AnalyticsContainer>
+				<Route
+					exact
+					path="/cluster/analytics/:tab?/:subTab?"
+					component={(props) => (
+						<>
+							{get(allowedRoutes, '/cluster/analytics') ? (
+								<AppPageContainer {...props} component={AnalyticsPage} />
+							) : (
+								<UnauthorizedPage />
+							)}
+						</>
+					)}
+				/>
+				<Route
+					path="/cluster/popular-searches"
+					component={(props) => (
+						<>
+							{get(allowedRoutes, '/cluster/popular-searches') ? (
+								<AppPageContainer {...props} component={PopularSearches} />
+							) : (
+								<UnauthorizedPage />
+							)}
+						</>
+					)}
+				/>
+				<Route
+					exact
+					path="/cluster/popular-results"
+					component={(props) => (
+						<>
+							{get(allowedRoutes, '/cluster/popular-results') ? (
+								<AppPageContainer {...props} component={PopularResults} />
+							) : (
+								<UnauthorizedPage />
+							)}
+						</>
+					)}
+				/>
+				<Route
+					exact
+					path="/cluster/geo-distribution"
+					component={(props) => (
+						<>
+							{get(allowedRoutes, '/cluster/geo-distribution') ? (
+								<AppPageContainer {...props} component={GeoDistributionPage} />
+							) : (
+								<UnauthorizedPage />
+							)}
+						</>
+					)}
+				/>
+				<Route
+					exact
+					path="/cluster/search-latency"
+					component={(props) => (
+						<>
+							{get(allowedRoutes, '/cluster/search-latency') ? (
+								<AppPageContainer {...props} component={SearchLatency} />
+							) : (
+								<UnauthorizedPage />
+							)}
+						</>
+					)}
+				/>
+				<Route
+					exact
+					path="/cluster/popular-filters"
+					component={(props) => (
+						<>
+							{get(allowedRoutes, '/cluster/popular-filters') ? (
+								<AppPageContainer {...props} component={PopularFilters} />
+							) : (
+								<UnauthorizedPage />
+							)}
+						</>
+					)}
+				/>
+				<Route
+					exact
+					path="/cluster/request-logs/:tab?"
+					component={(props) => (
+						<>
+							{get(allowedRoutes, '/cluster/request-logs') ? (
+								<AppPageContainer {...props} component={RequestLogs} />
+							) : (
+								<UnauthorizedPage />
+							)}
+						</>
+					)}
+				/>
+				<Route
+					exact
+					path="/cluster/requests-per-minute"
+					component={(props) => (
+						<>
+							{get(allowedRoutes, '/cluster/requests-per-minute') ? (
+								<AppPageContainer {...props} component={RequestDistributionPage} />
+							) : (
+								<UnauthorizedPage />
+							)}
+						</>
+					)}
+				/>
+				<Route
+					exact
+					path="/cluster/no-results-searches"
+					component={(props) => (
+						<>
+							{get(allowedRoutes, '/cluster/no-results-searches') ? (
+								<AppPageContainer {...props} component={NoResultSearches} />
+							) : (
+								<UnauthorizedPage />
+							)}
+						</>
+					)}
+				/>
+			</AnalyticsContainer>
+		);
+	}
+}
+
+// const ClusterAnalyticsRoutes = ({ allowedRoutes }) => {
+
+// };
+
+ClusterAnalyticsRoutes.propTypes = {
+	allowedRoutes: PropTypes.object.isRequired,
+	location: PropTypes.object.isRequired,
+};
+
+const mapStateToProps = (state) => {
+	return {
+		allowedRoutes: getAuthorizedRoutes(get(state, 'clusterRoutes')),
+	};
+};
+
+export default connect(mapStateToProps)(ClusterAnalyticsRoutes);

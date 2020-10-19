@@ -2,9 +2,11 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Col, Icon, Row } from 'antd';
 import get from 'lodash/get';
+import { connect } from 'react-redux';
 import { actionIcon, cloneButton, columnSeparator, deleteButton } from '../AppCard/styles';
 import DeleteAppModal from '../AppCard/DeleteAppModal';
 import CloneIndex from '../CloneIndex';
+import { hasClusterEditAccess } from '../../utils';
 
 class AppActions extends Component {
 	state = {
@@ -31,8 +33,9 @@ class AppActions extends Component {
 	};
 
 	render() {
-		const { title, data, onExploreClick } = this.props;
+		const { allowedActions, title, data, onExploreClick } = this.props;
 		const { deleteModal, cloneModal } = this.state;
+		const canEdit = hasClusterEditAccess(allowedActions);
 		return (
 			<div className="card-actions" key={title}>
 				<Row type="flex">
@@ -45,36 +48,42 @@ class AppActions extends Component {
 						<Icon className={actionIcon} type="thunderbolt" />
 						Explore
 					</Col>
-					<Col
-						span={8}
-						className={cloneButton}
-						onClick={(e) => {
-							e.preventDefault();
-							this.handleCloneModal();
-						}}
-					>
-						<Icon className={actionIcon} type="copy" />
-						Clone Index
-					</Col>
-					<Col
-						span={8}
-						className={deleteButton}
-						onClick={(e) => {
-							e.preventDefault();
-							this.handleDeleteModal();
-						}}
-					>
-						<Icon className={actionIcon} type="delete" />
-						Delete Index
-					</Col>
+					{canEdit && (
+						<Col
+							span={8}
+							className={cloneButton}
+							onClick={(e) => {
+								e.preventDefault();
+								this.handleCloneModal();
+							}}
+						>
+							<Icon className={actionIcon} type="copy" />
+							Clone Index
+						</Col>
+					)}
+					{canEdit && (
+						<Col
+							span={8}
+							className={deleteButton}
+							onClick={(e) => {
+								e.preventDefault();
+								this.handleDeleteModal();
+							}}
+						>
+							<Icon className={actionIcon} type="delete" />
+							Delete Index
+						</Col>
+					)}
 				</Row>
-				<DeleteAppModal
-					appName={get(data, 'alias') || get(data, 'index')}
-					index={get(data, 'index')}
-					deleteModal={deleteModal}
-					handleDeleteModal={this.handleDeleteModal}
-				/>
-				{cloneModal && (
+				{canEdit && (
+					<DeleteAppModal
+						appName={get(data, 'alias') || get(data, 'index')}
+						index={get(data, 'index')}
+						deleteModal={deleteModal}
+						handleDeleteModal={this.handleDeleteModal}
+					/>
+				)}
+				{canEdit && cloneModal && (
 					<CloneIndex
 						handleCancel={this.handleCancel}
 						index={get(data, 'alias') || get(data, 'index')}
@@ -86,9 +95,13 @@ class AppActions extends Component {
 }
 
 AppActions.propTypes = {
-	title: PropTypes.object.isRequired,
+	title: PropTypes.oneOfType([PropTypes.string, PropTypes.object]).isRequired,
 	data: PropTypes.object.isRequired,
 	onExploreClick: PropTypes.func.isRequired,
+	allowedActions: PropTypes.array.isRequired,
 };
 
-export default AppActions;
+const mapStateToProps = (state) => ({
+	allowedActions: get(state, 'user.data.allowedActions'),
+});
+export default connect(mapStateToProps)(AppActions);

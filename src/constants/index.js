@@ -45,4 +45,30 @@ const FUNCTIONS = {
 	INVOKED: 2,
 };
 
-export { USER, APPS, CREATE_APP, STRIPE_KEY, TYPE_FORM, APP_SCREEN_PREFERENCES, FUNCTIONS };
+const ALLOWED_ACTIONS = {
+	DEVELOP: 'develop',
+	ANALYTICS: 'analytics',
+	CURATED_INSIGHTS: 'curated-insights',
+	SEARCH_RELEVANCY: 'search-relevancy',
+	ACCESS_CONTROL: 'access-control',
+	USER_MANAGEMENT: 'user-management',
+	BILLING: 'billing',
+	DOWNTIME_ALERTS: 'downtime-alerts',
+};
+
+const ROUTES_ACTION = {
+	SET_APP_ROUTES: 'SET_APP_ROUTES',
+	SET_CLUSTER_ROUTES: 'SET_CLUSTER_ROUTES',
+};
+
+export {
+	USER,
+	APPS,
+	CREATE_APP,
+	STRIPE_KEY,
+	TYPE_FORM,
+	APP_SCREEN_PREFERENCES,
+	FUNCTIONS,
+	ALLOWED_ACTIONS,
+	ROUTES_ACTION,
+};

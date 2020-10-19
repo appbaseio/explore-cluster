@@ -1,12 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 import Loadable from 'react-loadable';
+import { connect } from 'react-redux';
 import get from 'lodash/get';
+import isEqual from 'lodash/isEqual';
 import Loader from '../Loader';
 import AppPageContainer from '../AppPageContainer';
 import ErrorPage from '../../pages/ErrorPage';
 import ClusterAnalyticsRoutes from './ClusterAnalyticsRoutes';
+import UnauthorizedPage from '../../pages/UnauthorizedPage';
+import { getAuthorizedRoutes } from '../../utils';
 
 const ProfilePage = Loadable({
 	loader: () => import(/* webpackChunkName: "ProfilePage" */ '../../pages/ProfilePage'),
@@ -107,14 +111,17 @@ const GradeEvaluation = Loadable({
 
 class ClusterRouteContainer extends React.Component {
 	shouldComponentUpdate(nextProps) {
-		const { location } = this.props;
+		const { location, allowedRoutes } = this.props;
 		return (
 			get(nextProps, 'location.pathname') !== get(location, 'pathname') ||
-			get(nextProps, 'location.search') !== get(location, 'search')
+			get(nextProps, 'location.search') !== get(location, 'search') ||
+			!isEqual(get(nextProps, 'allowedRoutes'), allowedRoutes)
 		);
 	}
 
 	render() {
+		const { allowedRoutes } = this.props;
+
 		return (
 			<ErrorPage {...this.props}>
 				<Switch>
@@ -122,56 +129,106 @@ class ClusterRouteContainer extends React.Component {
 						exact
 						path="/cluster/overview"
 						component={(props) => (
-							<AppPageContainer {...props} component={OverviewPage} />
+							<>
+								{get(allowedRoutes, '/') ? (
+									<AppPageContainer {...props} component={OverviewPage} />
+								) : (
+									<Redirect to={Object.keys(allowedRoutes)[0]} />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/search-templates"
 						component={(props) => (
-							<AppPageContainer {...props} component={SearchTemplatesPage} />
+							<>
+								{get(allowedRoutes, '/cluster/search-templates') ? (
+									<AppPageContainer {...props} component={SearchTemplatesPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/popular-suggestions"
 						component={(props) => (
-							<AppPageContainer {...props} component={QuerySuggestionsPage} />
+							<>
+								{get(allowedRoutes, '/cluster/popular-suggestions') ? (
+									<AppPageContainer {...props} component={QuerySuggestionsPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/credentials"
 						component={(props) => (
-							<AppPageContainer {...props} component={CredentialsPage} />
+							<>
+								{get(allowedRoutes, '/cluster/credentials') ? (
+									<AppPageContainer {...props} component={CredentialsPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/user-management"
 						component={(props) => (
-							<AppPageContainer {...props} component={UserManagementPage} />
+							<>
+								{get(allowedRoutes, '/cluster/user-management') ? (
+									<AppPageContainer {...props} component={UserManagementPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 
 					<Route
 						exact
 						path="/cluster/import"
-						render={(props) => <AppPageContainer {...props} component={ImporterPage} />}
+						render={(props) => (
+							<>
+								{get(allowedRoutes, '/cluster/import') ? (
+									<AppPageContainer {...props} component={ImporterPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
+						)}
 					/>
 
 					<Route
 						exact
 						path="/cluster/rules"
 						render={(props) => (
-							<AppPageContainer {...props} component={QueryRulesPage} />
+							<>
+								{get(allowedRoutes, '/cluster/rules') ? (
+									<AppPageContainer {...props} component={QueryRulesPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/rules/new"
 						render={(props) => (
-							<AppPageContainer {...props} component={QueryRulesForm} />
+							<>
+								{get(allowedRoutes, '/cluster/rules') ? (
+									<AppPageContainer {...props} component={QueryRulesForm} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 
@@ -179,46 +236,92 @@ class ClusterRouteContainer extends React.Component {
 						exact
 						path="/cluster/rules/:id"
 						render={(props) => (
-							<AppPageContainer {...props} component={QueryRulesForm} />
+							<>
+								{get(allowedRoutes, '/cluster/rules') ? (
+									<AppPageContainer {...props} component={QueryRulesForm} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/mappings"
-						render={(props) => <AppPageContainer {...props} component={MappingsPage} />}
+						render={(props) => (
+							<>
+								{get(allowedRoutes, '/cluster/mappings') ? (
+									<AppPageContainer {...props} component={MappingsPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
+						)}
 					/>
 					<Route
 						exact
 						path="/cluster/share-settings"
 						component={(props) => (
-							<AppPageContainer {...props} component={ShareSettings} />
+							<>
+								{get(allowedRoutes, '/cluster/share-settings') ? (
+									<AppPageContainer {...props} component={ShareSettings} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/profile"
 						component={(props) => (
-							<AppPageContainer {...props} component={ProfilePage} />
+							<>
+								{get(allowedRoutes, '/cluster/profile') ? (
+									<AppPageContainer {...props} component={ProfilePage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/billing"
 						component={(props) => (
-							<AppPageContainer {...props} component={BillingPage} />
+							<>
+								{get(allowedRoutes, '/cluster/billing') ? (
+									<AppPageContainer {...props} component={BillingPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/browse"
-						render={(props) => (
-							<AppPageContainer {...props} component={BrowserPage} isCluster />
+						component={(props) => (
+							<>
+								{get(allowedRoutes, '/cluster/browse') ? (
+									<AppPageContainer {...props} component={BrowserPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/search-preview"
-						render={(props) => <AppPageContainer {...props} component={SandboxPage} />}
+						component={(props) => (
+							<>
+								{get(allowedRoutes, '/cluster/search-preview') ? (
+									<AppPageContainer {...props} component={SandboxPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
+						)}
 					/>
 					<Route
 						exact
@@ -231,21 +334,41 @@ class ClusterRouteContainer extends React.Component {
 						exact
 						path="/cluster/role-based-access"
 						component={(props) => (
-							<AppPageContainer {...props} component={RoleBaseAccess} />
+							<>
+								{get(allowedRoutes, '/cluster/role-based-access') ? (
+									<AppPageContainer {...props} component={RoleBaseAccess} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 
 					<Route
 						exact
 						path="/cluster/functions"
-						component={(props) => <AppPageContainer {...props} component={Functions} />}
+						component={(props) => (
+							<>
+								{get(allowedRoutes, '/cluster/functions') ? (
+									<AppPageContainer {...props} component={Functions} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
+						)}
 					/>
 
 					<Route
 						exact
 						path="/cluster/curated-insights"
 						component={(props) => (
-							<AppPageContainer {...props} component={ClusterInsights} />
+							<>
+								{get(allowedRoutes, '/cluster/curated-insights') ? (
+									<AppPageContainer {...props} component={ClusterInsights} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 
@@ -253,7 +376,13 @@ class ClusterRouteContainer extends React.Component {
 						exact
 						path="/cluster/grade-evaluation"
 						component={(props) => (
-							<AppPageContainer {...props} component={GradeEvaluation} />
+							<>
+								{get(allowedRoutes, '/cluster/grade-evaluation') ? (
+									<AppPageContainer {...props} component={GradeEvaluation} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 
@@ -268,6 +397,13 @@ ClusterRouteContainer.propTypes = {
 	history: PropTypes.object.isRequired,
 	match: PropTypes.object.isRequired,
 	location: PropTypes.object.isRequired,
+	allowedRoutes: PropTypes.object.isRequired,
 };
 
-export default ClusterRouteContainer;
+const mapStateToProps = (state) => {
+	return {
+		allowedRoutes: getAuthorizedRoutes(get(state, 'clusterRoutes')),
+	};
+};
+
+export default connect(mapStateToProps)(ClusterRouteContainer);

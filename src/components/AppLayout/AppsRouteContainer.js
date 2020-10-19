@@ -2,11 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Loadable from 'react-loadable';
 import { Switch, Route } from 'react-router-dom';
+import { connect } from 'react-redux';
 import get from 'lodash/get';
+import isEqual from 'lodash/isEqual';
 import Loader from '../Loader';
 import AppPageContainer from '../AppPageContainer';
 import ErrorPage from '../../pages/ErrorPage';
 import AppsAnalyticsRoutes from './AppsAnalyticsRoutes';
+import UnauthorizedPage from '../../pages/UnauthorizedPage';
+import { getAuthorizedRoutes } from '../../utils';
+import { ALLOWED_ACTIONS } from '../../constants';
 
 const SearchTemplatesPage = Loadable({
 	loader: () =>
@@ -103,14 +108,17 @@ const IndexSettingsPage = Loadable({
 
 class RouteContainer extends React.Component {
 	shouldComponentUpdate(nextProps) {
-		const { location } = this.props;
+		const { location, allowedRoutes } = this.props;
 		return (
 			get(nextProps, 'location.pathname') !== get(location, 'pathname') ||
-			get(nextProps, 'location.search') !== get(location, 'search')
+			get(nextProps, 'location.search') !== get(location, 'search') ||
+			!isEqual(get(nextProps, 'allowedRoutes'), allowedRoutes)
 		);
 	}
 
 	render() {
+		const { allowedRoutes, allowedActions } = this.props;
+		const hasSearchRelevancy = allowedActions.includes(ALLOWED_ACTIONS.SEARCH_RELEVANCY);
 		return (
 			<ErrorPage {...this.props}>
 				<Switch>
@@ -118,113 +126,185 @@ class RouteContainer extends React.Component {
 						exact
 						path="/app/:appName"
 						component={(props) => (
-							<AppPageContainer {...props} component={OverviewPage} />
+							<>
+								{get(allowedRoutes, '/') ? (
+									<AppPageContainer {...props} component={OverviewPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/overview"
 						component={(props) => (
-							<AppPageContainer {...props} component={OverviewPage} />
+							<>
+								{get(allowedRoutes, '/') ? (
+									<AppPageContainer {...props} component={OverviewPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/credentials"
 						component={(props) => (
-							<AppPageContainer {...props} component={CredentialsPage} />
+							<>
+								{get(allowedRoutes, 'credentials') ? (
+									<AppPageContainer {...props} component={CredentialsPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/import"
 						render={(props) => (
-							<AppPageContainer
-								{...props}
-								component={ImporterPage}
-								shouldFetchAppInfo={false}
-								shouldFetchAppPlan={false}
-							/>
+							<>
+								{get(allowedRoutes, 'import') ? (
+									<AppPageContainer
+										{...props}
+										component={ImporterPage}
+										shouldFetchAppInfo={false}
+										shouldFetchAppPlan={false}
+									/>
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/settings"
 						render={(props) => (
-							<AppPageContainer
-								{...props}
-								component={MappingsPage}
-								shouldFetchAppInfo={false}
-							/>
+							<>
+								{get(allowedRoutes, 'settings') ? (
+									<AppPageContainer
+										{...props}
+										component={MappingsPage}
+										shouldFetchAppInfo={false}
+									/>
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/share-settings"
 						component={(props) => (
-							<AppPageContainer {...props} component={ShareSettings} />
+							<>
+								{get(allowedRoutes, 'share-settings') ? (
+									<AppPageContainer {...props} component={ShareSettings} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/billing"
 						component={(props) => (
-							<AppPageContainer {...props} component={BillingPage} />
+							<>
+								{get(allowedRoutes, 'billing') ? (
+									<AppPageContainer {...props} component={BillingPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/browse"
 						render={(props) => (
-							<AppPageContainer
-								{...props}
-								component={BrowserPage}
-								shouldFetchAppInfo={false}
-								shouldFetchAppPlan={false}
-							/>
+							<>
+								{get(allowedRoutes, 'browse') ? (
+									<AppPageContainer
+										{...props}
+										component={BrowserPage}
+										shouldFetchAppInfo={false}
+										shouldFetchAppPlan={false}
+									/>
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/query"
 						render={(props) => (
-							<AppPageContainer
-								{...props}
-								component={QueryExplorerPage}
-								shouldFetchAppInfo={false}
-								shouldFetchAppPlan={false}
-							/>
+							<>
+								{get(allowedRoutes, 'query') ? (
+									<AppPageContainer
+										{...props}
+										component={QueryExplorerPage}
+										shouldFetchAppInfo={false}
+										shouldFetchAppPlan={false}
+									/>
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/search-templates"
 						render={(props) => (
-							<AppPageContainer
-								{...props}
-								component={SearchTemplatesPage}
-								shouldFetchAppInfo={false}
-								shouldFetchAppPlan={false}
-							/>
+							<>
+								{get(allowedRoutes, 'search-templates') ? (
+									<AppPageContainer
+										{...props}
+										component={SearchTemplatesPage}
+										shouldFetchAppInfo={false}
+										shouldFetchAppPlan={false}
+									/>
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/popular-suggestions"
 						render={(props) => (
-							<AppPageContainer {...props} component={QuerySuggestionsPage} />
+							<>
+								{get(allowedRoutes, 'popular-suggestions') ? (
+									<AppPageContainer {...props} component={QuerySuggestionsPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/search-preview"
 						render={(props) => (
-							<AppPageContainer
-								{...props}
-								component={SandboxPage}
-								shouldFetchAppInfo={false}
-								shouldFetchAppPlan={false}
-							/>
+							<>
+								{get(allowedRoutes, 'search-preview') && hasSearchRelevancy ? (
+									<AppPageContainer
+										{...props}
+										component={SandboxPage}
+										shouldFetchAppInfo={false}
+										shouldFetchAppPlan={false}
+									/>
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
@@ -239,48 +319,72 @@ class RouteContainer extends React.Component {
 						exact
 						path="/app/:appName/aggs"
 						render={(props) => (
-							<AppPageContainer
-								{...props}
-								component={AggsPage}
-								shouldFetchAppInfo={false}
-								shouldFetchAppPlan={false}
-							/>
+							<>
+								{get(allowedRoutes, 'aggs') ? (
+									<AppPageContainer
+										{...props}
+										component={AggsPage}
+										shouldFetchAppInfo={false}
+										shouldFetchAppPlan={false}
+									/>
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/results"
 						render={(props) => (
-							<AppPageContainer
-								{...props}
-								component={ResultsPage}
-								shouldFetchAppInfo={false}
-								shouldFetchAppPlan={false}
-							/>
+							<>
+								{get(allowedRoutes, 'results') ? (
+									<AppPageContainer
+										{...props}
+										component={ResultsPage}
+										shouldFetchAppInfo={false}
+										shouldFetchAppPlan={false}
+									/>
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/index-settings"
 						render={(props) => (
-							<AppPageContainer
-								{...props}
-								component={IndexSettingsPage}
-								shouldFetchAppInfo={false}
-								shouldFetchAppPlan={false}
-							/>
+							<>
+								{get(allowedRoutes, 'index-settings') ? (
+									<AppPageContainer
+										{...props}
+										component={IndexSettingsPage}
+										shouldFetchAppInfo={false}
+										shouldFetchAppPlan={false}
+									/>
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/app/:appName/languages"
 						render={(props) => (
-							<AppPageContainer
-								{...props}
-								component={LanguagePage}
-								shouldFetchAppInfo={false}
-								shouldFetchAppPlan={false}
-							/>
+							<>
+								{get(allowedRoutes, 'languages') ? (
+									<AppPageContainer
+										{...props}
+										component={LanguagePage}
+										shouldFetchAppInfo={false}
+										shouldFetchAppPlan={false}
+									/>
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 
@@ -288,12 +392,18 @@ class RouteContainer extends React.Component {
 						exact
 						path="/app/:appName/search"
 						render={(props) => (
-							<AppPageContainer
-								{...props}
-								component={SearchSettingsPage}
-								shouldFetchAppInfo={false}
-								shouldFetchAppPlan={false}
-							/>
+							<>
+								{get(allowedRoutes, 'search') ? (
+									<AppPageContainer
+										{...props}
+										component={SearchSettingsPage}
+										shouldFetchAppInfo={false}
+										shouldFetchAppPlan={false}
+									/>
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 
@@ -301,12 +411,18 @@ class RouteContainer extends React.Component {
 						exact
 						path="/app/:appName/synonyms"
 						render={(props) => (
-							<AppPageContainer
-								{...props}
-								component={SynonymsPage}
-								shouldFetchAppInfo={false}
-								shouldFetchAppPlan={false}
-							/>
+							<>
+								{get(allowedRoutes, 'synonyms') ? (
+									<AppPageContainer
+										{...props}
+										component={SynonymsPage}
+										shouldFetchAppInfo={false}
+										shouldFetchAppPlan={false}
+									/>
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 
@@ -319,6 +435,15 @@ class RouteContainer extends React.Component {
 
 RouteContainer.propTypes = {
 	location: PropTypes.object.isRequired,
+	allowedRoutes: PropTypes.object.isRequired,
+	allowedActions: PropTypes.array.isRequired,
 };
 
-export default RouteContainer;
+const mapStateToProps = (state) => {
+	return {
+		allowedRoutes: getAuthorizedRoutes(get(state, 'appRoutes')),
+		allowedActions: get(state, 'user.data.allowedActions'),
+	};
+};
+
+export default connect(mapStateToProps)(RouteContainer);
