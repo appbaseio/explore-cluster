@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { css } from 'emotion';
-import { Icon, Modal, Input, Radio, Tooltip, Button, Select, Checkbox } from 'antd';
+import { Icon, Modal, Input, Radio, Tooltip, Button, Select, Switch } from 'antd';
 import {
 	FieldArray,
 	FormBuilder,
@@ -26,6 +26,7 @@ import {
 	getTraversedMappingsByAppName,
 	getAppPermissionsByName,
 } from '../../batteries/modules/selectors';
+import { CLUSTER_PLANS } from '../../batteries/utils';
 import {
 	Types,
 	getDefaultAclOptionsByPlan,
@@ -34,11 +35,12 @@ import {
 	defaultRateLimits,
 	mapFormToValues,
 	mapValuesToForm,
-	defaultAclOptions,
 } from './utils';
 import Acl from './Acl';
 import WhiteList from './WhiteList';
 import PasswordInput from './PasswordInput';
+import { ALLOWED_ACTIONS } from '../../constants';
+import SwitchGroup from '../SwitchGroup';
 
 const { Option } = Select;
 
@@ -62,7 +64,6 @@ const calculateValue = (value) => {
 	return value;
 };
 
-const CheckboxGroup = Checkbox.Group;
 class CreateCredentials extends React.Component {
 	constructor(props) {
 		super(props);
@@ -80,11 +81,10 @@ class CreateCredentials extends React.Component {
 					password: ['', Validators.required],
 					email: [undefined, Validators.email],
 					isAdmin: [false],
-					operationType: [Types.read],
-					categories: [defaultAclOptions],
 					indices: this.isApp
 						? [{ value: [props.appName], disabled: false }]
 						: [{ value: ['*'], disabled: false }],
+					allowedActions: [[], Validators.required],
 			  })
 			: FormBuilder.group({
 					description: '',
@@ -137,21 +137,17 @@ class CreateCredentials extends React.Component {
 			this.form.disable();
 		} else {
 			const adminHandler = this.form.get('isAdmin');
-			const opsHandler = this.form.get('operationType');
-			const categoriesHandler = this.form.get('categories');
+			const allowedActionsHandler = this.form.get('allowedActions');
 			if (adminHandler) {
 				adminHandler.valueChanges.subscribe((value) => {
 					if (value) {
-						opsHandler.setValue(Types.admin);
-						categoriesHandler.setValue(defaultAclOptions);
-						opsHandler.disable();
-						categoriesHandler.disable();
-						indicesHandler.disable();
-					} else {
-						opsHandler.setValue(Types.read);
-						opsHandler.enable();
-						categoriesHandler.enable();
-						indicesHandler.enable();
+						if (allowedActionsHandler) {
+							allowedActionsHandler.setValue(Object.values(ALLOWED_ACTIONS));
+							allowedActionsHandler.disable();
+						}
+					} else if (allowedActionsHandler) {
+						allowedActionsHandler.setValue([]);
+						allowedActionsHandler.enable();
 					}
 				});
 			}
@@ -185,8 +181,18 @@ class CreateCredentials extends React.Component {
 			);
 			// Disable the password handler to avoid re-setting the password in patch request
 			if (isUserManagement) {
-				const categoriesHandler = this.form.get('password');
-				categoriesHandler.disable();
+				const passwordHandler = this.form.get('password');
+				passwordHandler.disable();
+			}
+
+			if (get(initialValues, 'is_admin')) {
+				const allowedActionsHandler = this.form.get('allowedActions');
+				if (allowedActionsHandler) {
+					allowedActionsHandler.disable();
+				}
+				if (indicesHandler) {
+					indicesHandler.disable();
+				}
 			}
 		}
 	}
@@ -221,7 +227,9 @@ class CreateCredentials extends React.Component {
 		if (excludeFieldsHandler) {
 			excludeFieldsHandler.valueChanges.unsubscribe();
 		}
-		categoriesHandler.valueChanges.unsubscribe();
+		if (categoriesHandler) {
+			categoriesHandler.valueChanges.unsubscribe();
+		}
 	}
 
 	getFilteredMappings = (mappings = {}, indices) => {
@@ -264,6 +272,7 @@ class CreateCredentials extends React.Component {
 		this.form.mappedValues = JSON.parse(
 			JSON.stringify(mapFormToValues(this.form.value, !isUserManagement)),
 		);
+
 		onSubmit(this.form, get(this.props, 'initialValues.username'));
 	};
 
@@ -278,16 +287,27 @@ class CreateCredentials extends React.Component {
 			isLoadingMappings,
 			isUserManagement,
 			indices,
+			arcPlan,
 			mappings: rawMappings,
 		} = this.props;
 		const mappings = Array.isArray(rawMappings) ? rawMappings : [];
 		const { filteredMappings } = this.state;
 		const Messages = getMessages(isUserManagement);
+		const isClusterPlan = Object.values(CLUSTER_PLANS).includes(arcPlan);
+		// don't show downtime alerts in case of hosted / self hosted arc
+		const actionOptions = isClusterPlan
+			? Object.values(ALLOWED_ACTIONS).map((i) => ({
+					value: i,
+					label: i.split('-').join(' '),
+			  }))
+			: Object.values(ALLOWED_ACTIONS)
+					.filter((i) => i !== ALLOWED_ACTIONS.DOWNTIME_ALERTS)
+					.map((i) => ({ value: i, label: i.split('-').join(' ') }));
 		return (
 			<FieldGroup
 				strict={false}
 				control={this.form}
-				render={({ invalid }) => (
+				render={({ invalid, pristine }) => (
 					<Modal
 						style={{
 							width: '600px',
@@ -302,7 +322,7 @@ class CreateCredentials extends React.Component {
 										</Button>,
 										<Button
 											loading={isSubmitting}
-											disabled={invalid}
+											disabled={invalid || pristine}
 											key="submit"
 											type="primary"
 											onClick={this.handleSubmit}
@@ -364,19 +384,6 @@ class CreateCredentials extends React.Component {
 											/>
 											<FieldControl
 												strict={false}
-												control={this.form.get('isAdmin')}
-												render={({ handler }) => (
-													<Grid
-														label="Admin"
-														toolTipMessage={Messages.admin}
-														component={
-															<Checkbox {...handler('checkbox')} />
-														}
-													/>
-												)}
-											/>
-											<FieldControl
-												strict={false}
 												control={this.form.get('email')}
 												render={({ handler }) => (
 													<Grid
@@ -385,6 +392,36 @@ class CreateCredentials extends React.Component {
 														component={
 															<Input
 																placeholder="Enter email"
+																{...handler()}
+															/>
+														}
+													/>
+												)}
+											/>
+											<FieldControl
+												strict={false}
+												control={this.form.get('isAdmin')}
+												render={({ handler }) => (
+													<Grid
+														label="Admin"
+														toolTipMessage={Messages.admin}
+														component={
+															<Switch {...handler('checkbox')} />
+														}
+													/>
+												)}
+											/>
+
+											<FieldControl
+												strict={false}
+												control={this.form.get('allowedActions')}
+												render={({ handler }) => (
+													<Grid
+														label="Scopes"
+														toolTipMessage={Messages.allowedActions}
+														component={
+															<SwitchGroup
+																options={actionOptions}
 																{...handler()}
 															/>
 														}
@@ -414,27 +451,32 @@ class CreateCredentials extends React.Component {
 											)}
 										/>
 									)}
-									<FieldControl
-										name="operationType"
-										render={({ handler }) => (
-											<Grid
-												label="Access Type"
-												toolTipMessage={Messages.operationType}
-												component={
-													<Radio.Group
-														{...handler()}
-														css="label { font-weight: 100 }"
-													>
-														{Object.keys(Types).map((type) => (
-															<Radio key={type} value={Types[type]}>
-																{Types[type].description}
-															</Radio>
-														))}
-													</Radio.Group>
-												}
-											/>
-										)}
-									/>
+									{!isUserManagement && (
+										<FieldControl
+											name="operationType"
+											render={({ handler }) => (
+												<Grid
+													label="Access Type"
+													toolTipMessage={Messages.operationType}
+													component={
+														<Radio.Group
+															{...handler()}
+															css="label { font-weight: 100 }"
+														>
+															{Object.keys(Types).map((type) => (
+																<Radio
+																	key={type}
+																	value={Types[type]}
+																>
+																	{Types[type].description}
+																</Radio>
+															))}
+														</Radio.Group>
+													}
+												/>
+											)}
+										/>
+									)}
 									{!isPaidUser && (
 										<div css={styles.overlay}>
 											<div css={styles.upgradePlan}>
@@ -460,24 +502,7 @@ class CreateCredentials extends React.Component {
 											</div>
 										</div>
 									)}
-									{isUserManagement ? (
-										<FieldControl
-											name="categories"
-											render={({ handler }) => (
-												<Grid
-													label="Categories"
-													toolTipMessage={Messages.categories}
-													component={
-														<CheckboxGroup
-															css="label { font-weight: 100 }"
-															options={defaultAclOptions}
-															{...handler()}
-														/>
-													}
-												/>
-											)}
-										/>
-									) : (
+									{!isUserManagement && (
 										<FieldArray
 											name="categories"
 											render={(control) => (
@@ -933,6 +958,7 @@ CreateCredentials.propTypes = {
 		PropTypes.object, // at cluster level
 	]),
 	indices: PropTypes.array,
+	arcPlan: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = (state) => {
@@ -950,6 +976,7 @@ const mapStateToProps = (state) => {
 		isLoadingMappings:
 			get(state, '$getAppMappings.isFetching') || get(state, '$getAppPermissions.isFetching'),
 		plan: 'growth',
+		arcPlan: get(state, '$getAppPlan.results.tier'),
 		isSubmitting:
 			get(state, '$createAppPermission.isFetching') ||
 			get(state, '$updateAppPermission.isFetching') ||

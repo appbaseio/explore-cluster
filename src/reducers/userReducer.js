@@ -1,10 +1,12 @@
 // @flow
 import { USER } from '../constants';
+import { getDefaultAllowedActions } from '../utils/allowedActions';
 
 const defaultUsername = sessionStorage.getItem('username');
 const defaultPassword = sessionStorage.getItem('password');
 const defaultToken = sessionStorage.getItem('authToken');
 const defaultIsAdmin = sessionStorage.getItem('isAdmin');
+const defaultAllowedActions = sessionStorage.getItem('allowedActions');
 
 const defaultUserData =
 	defaultUsername && defaultPassword && defaultToken
@@ -13,6 +15,9 @@ const defaultUserData =
 				password: defaultPassword,
 				authToken: defaultToken,
 				isAdmin: Boolean(defaultIsAdmin),
+				allowedActions: defaultAllowedActions
+					? defaultAllowedActions.split(',')
+					: getDefaultAllowedActions(Boolean(defaultIsAdmin)),
 		  } // eslint-disable-line
 		: null;
 

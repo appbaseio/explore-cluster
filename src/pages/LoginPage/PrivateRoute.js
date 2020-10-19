@@ -7,7 +7,7 @@ import { children } from '../../utils/prop-types';
 const AUTH_ROUTES = ['/login', '/signup', '/install', '/billing'];
 
 function getHelpChatParam() {
-	const storedValue = sessionStorage.showHelpChat;
+	const storedValue = sessionStorage.getItem('showHelpChat');
 
 	if (storedValue) {
 		return JSON.parse(storedValue);

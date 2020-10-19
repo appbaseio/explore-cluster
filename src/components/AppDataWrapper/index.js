@@ -23,7 +23,11 @@ function AppDataWrapper({ apps, onCreateModalChange, isFetching }) {
 		if (isFetching) return <Loader style={{ marginTop: 40 }} />;
 		if (showListView) return <AppTable onCreateModalChange={onCreateModalChange} apps={data} />;
 		if (data.length === 0) {
-			return <div className={noData}>{NoData(onCreateModalChange)}</div>;
+			return (
+				<div className={noData}>
+					<NoData onCreateModalChange={onCreateModalChange} />
+				</div>
+			);
 		}
 		return data.map((app) => {
 			const title = (

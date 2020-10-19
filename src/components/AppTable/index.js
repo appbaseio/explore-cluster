@@ -102,11 +102,12 @@ function AppTable({ apps, history, onCreateModalChange }) {
 							`/app/${get(record, 'alias') || get(record, 'index')}/overview`,
 						);
 					}}
+					title={get(record, 'alias') || get(record, 'index')}
 					data={record}
 				/>
 			)}
 			locale={{
-				emptyText: NoData(onCreateModalChange),
+				emptyText: <NoData onCreateModalChange={onCreateModalChange} />,
 			}}
 		/>
 	);

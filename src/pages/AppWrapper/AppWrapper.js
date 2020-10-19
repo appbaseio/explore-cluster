@@ -26,82 +26,7 @@ import WithRedirectTooltip from '../../components/WithRedirectTooltip';
 const { Sider } = Layout;
 const { SubMenu } = Menu;
 
-const routes = {
-	'App Overview': {
-		icon: 'home',
-		link: '',
-	},
-	Develop: {
-		icon: 'dashboard',
-		menu: [
-			{ label: 'Import Data', link: 'import' },
-			{ label: 'Browse Data', link: 'browse' },
-			{ label: 'Request Logs', link: 'request-logs' },
-			{ label: 'Search Preview', link: 'search-preview', tag: 'Beta' },
-		],
-	},
-	'Search Relevancy': {
-		icon: 'search',
-		menu: [
-			{ label: 'Language Settings', link: 'languages', tag: 'Beta' },
-			{ label: 'Search Settings', link: 'search', tag: 'Beta' },
-			{ label: 'Aggregation Settings', link: 'aggs', tag: 'Beta' },
-			{ label: 'Result Settings', link: 'results', tag: 'Beta' },
-			{ label: 'Index Settings', link: 'index-settings', tag: 'Beta' },
-			{ label: 'Schema', link: 'settings', tag: 'Beta' },
-			{ label: 'Synonyms', link: 'synonyms', tag: 'Beta' },
-			{ label: 'Popular Suggestions', link: 'popular-suggestions', tag: 'Beta' },
-			{ label: 'Query Rules', link: '/cluster/rules', tag: 'Beta', hasExactPath: true },
-			{ label: 'Functions', link: '/cluster/functions', tag: 'Beta', hasExactPath: true },
-			{
-				label: 'Grade Evaluation',
-				link: '/cluster/grade-evaluation',
-				tag: 'Beta',
-				hasExactPath: true,
-			},
-		],
-	},
-	Analytics: {
-		icon: 'line-chart',
-		menu: [
-			{ label: 'Overview', link: 'analytics' },
-			{ label: 'Popular Searches', link: 'popular-searches' },
-			{ label: 'No Result Searches', link: 'no-results-searches' },
-			{ label: 'Popular Filters', link: 'popular-filters' },
-			{ label: 'Popular Results', link: 'popular-results' },
-			{ label: 'Geo Distribution', link: 'geo-distribution' },
-			{ label: 'Requests Per Minute', link: 'requests-per-minute' },
-			{ label: 'Search Latency', link: 'search-latency' },
-		],
-	},
-	'Curated Insights': {
-		icon: 'rise',
-		link: '/cluster/curated-insights',
-		hasExactPath: true,
-	},
-	'Access Control': {
-		icon: 'key',
-		menu: [
-			{ label: 'API Credentials', link: 'credentials' },
-			{ label: 'User Management', link: '/cluster/user-management', hasExactPath: true },
-			{
-				label: 'Role Based Access',
-				link: '/cluster/role-based-access',
-				tag: 'Beta',
-				hasExactPath: true,
-			},
-			{ label: 'Search Templates', link: 'search-templates', tag: 'Beta' },
-		],
-	},
-	Billing: {
-		icon: 'credit-card',
-		link: 'billing',
-	},
-};
-
-const parsedRoutes = getParsedRoutes(routes);
-
-const getActiveMenu = (props, prevActiveSubMenu = []) => {
+const getActiveMenu = (props, prevActiveSubMenu = [], routes = {}) => {
 	let activeSubMenu = 'App Overview';
 	let activeMenuItem = 'App Overview';
 	let { route: pathname } = props.match.params; // eslint-disable-line
@@ -167,9 +92,10 @@ class AppWrapper extends Component {
 		const { appName } = props.match.params;
 		const { currentApp } = props;
 		let setActiveMenu = null;
+		const { routes } = props;
 		if (props.match.url !== url) {
 			setActiveMenu = {
-				...getActiveMenu(props, state.activeSubMenu),
+				...getActiveMenu(props, state.activeSubMenu, routes),
 				url: props.match.url,
 			};
 		}
@@ -264,7 +190,7 @@ class AppWrapper extends Component {
 	render() {
 		const { showHeader, appName, activeSubMenu, activeMenuItem, loading, value } = this.state;
 
-		const { history, collapsed } = this.props;
+		const { history, collapsed, routes } = this.props;
 
 		return (
 			<Layout>
@@ -327,7 +253,7 @@ class AppWrapper extends Component {
 						{value && (
 							<SidebarAutocomplete
 								history={history}
-								routes={parsedRoutes}
+								routes={getParsedRoutes(routes)}
 								value={value}
 								resetAutoComplete={this.resetSearch}
 							/>
@@ -425,6 +351,7 @@ AppWrapper.propTypes = {
 	featureSearchRelevancy: PropTypes.bool,
 	setIsCollapsed: PropTypes.func.isRequired,
 	collapsed: PropTypes.bool.isRequired,
+	routes: PropTypes.object.isRequired,
 };
 
 AppWrapper.defaultProps = {
@@ -443,6 +370,7 @@ const mapStateToProps = (state) => {
 		tier: get(state, '$getAppPlan.results.tier'),
 		featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
 		collapsed: get(state, 'sideBarCollapsed'),
+		routes: get(state, 'appRoutes'),
 	};
 };
 

@@ -1,5 +1,12 @@
 // @flow
-import { USER, APPS, CREATE_APP, APP_SCREEN_PREFERENCES, SIDE_BAR } from '../constants';
+import {
+	USER,
+	APPS,
+	CREATE_APP,
+	APP_SCREEN_PREFERENCES,
+	SIDE_BAR,
+	ROUTES_ACTION,
+} from '../constants';
 import { createAction } from '../batteries/modules/actions/utils';
 
 export function loadUser(username: string, password: string, url?: string): Object {
@@ -80,4 +87,12 @@ export function setIsSidebarCollapsed(isCollapsed) {
 		type: SIDE_BAR.SET_COLLAPSED,
 		isCollapsed,
 	};
+}
+
+export function setAppRoutes(payload: Object): Object {
+	return { type: ROUTES_ACTION.SET_APP_ROUTES, payload };
+}
+
+export function setClusterRoutes(payload: Object): Object {
+	return { type: ROUTES_ACTION.SET_CLUSTER_ROUTES, payload };
 }

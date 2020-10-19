@@ -19,6 +19,8 @@ import Container from '../../components/Container';
 import { getURL } from '../../constants/config';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
+import { ALLOWED_ACTIONS } from '../../constants';
+import { compareVersion } from '../../utils';
 
 const { Paragraph } = Typography;
 const tableCls = css`
@@ -144,8 +146,10 @@ class UserManagementPage extends React.Component {
 	};
 
 	render() {
-		const { users, isFetching, isAdmin } = this.props;
+		const { users, isFetching, allowedActions, version } = this.props;
 		const { showForm, currentPermissionInfo } = this.state;
+		const hasEditAccess = allowedActions.includes(ALLOWED_ACTIONS.USER_MANAGEMENT);
+
 		if (isFetching) {
 			return <Loader />;
 		}
@@ -174,6 +178,14 @@ class UserManagementPage extends React.Component {
 					}
 				>
 					<Paragraph strong>Login URL for this cluster:</Paragraph>
+					{compareVersion(version, '7.33.0') === -1 && (
+						<Alert
+							type="warning"
+							message="Upgrade appbase.io to v7.33.0 or above for using the new user management features"
+							showIcon
+							style={{ marginBottom: 10 }}
+						/>
+					)}
 					<Alert
 						showIcon
 						message={
@@ -218,7 +230,7 @@ class UserManagementPage extends React.Component {
 
 				<Button
 					style={{ marginTop: 10 }}
-					disabled={!isAdmin}
+					disabled={!hasEditAccess}
 					onClick={this.handleShow}
 					size="large"
 					type="primary"
@@ -247,11 +259,12 @@ UserManagementPage.propTypes = {
 	credentials: PropTypes.string.isRequired,
 	createUser: PropTypes.func.isRequired,
 	updateUser: PropTypes.func.isRequired,
-	isAdmin: PropTypes.bool.isRequired,
 	deleteUser: PropTypes.func.isRequired,
 	fetchUsers: PropTypes.func.isRequired,
 	isFetching: PropTypes.bool.isRequired,
 	users: PropTypes.array, // eslint-disable-line
+	allowedActions: PropTypes.array.isRequired,
+	version: PropTypes.string.isRequired,
 };
 const mapStateToProps = (state) => {
 	const { username, password } = get(state, 'user.data', {});
@@ -259,7 +272,8 @@ const mapStateToProps = (state) => {
 		credentials: username ? `${username}:${password}` : null,
 		users: get(state, '$getClusterUsers.results', []),
 		isFetching: get(state, '$getClusterUsers.isFetching', false),
-		isAdmin: get(state, 'user.data.isAdmin'),
+		allowedActions: get(state, 'user.data.allowedActions'),
+		version: get(state, '$getAppPlan.results.version'),
 	};
 };
 const mapDispatchToProps = (dispatch) => ({

@@ -7,6 +7,8 @@ import { getURL } from '../constants/config';
 import { getSingleFunction, updateFunctions } from '../batteries/utils/app';
 import { getESVersion } from '../batteries/utils/mappings';
 import { doGet } from '../batteries/utils/requestService';
+import { getDefaultAllowedActions } from './allowedActions';
+import { ALLOWED_ACTIONS } from '../constants';
 
 export async function getUser(username, password, url) {
 	const ACC_API = getURL();
@@ -65,6 +67,7 @@ export async function getUser(username, password, url) {
 		password,
 		authToken,
 		isAdmin: data.is_admin,
+		allowedActions: data.allowed_actions || getDefaultAllowedActions(data.is_admin),
 	};
 }
 
@@ -614,7 +617,7 @@ const getFieldsTree = (mappings = {}, prefix = null) => {
 	return tree;
 };
 
-export const getParsedRoutes = (routes) =>
+export const getParsedRoutes = (routes = {}) =>
 	Object.keys(routes).reduce((agg, route) => {
 		const routeItem = routes[route];
 		if (routeItem.menu) {
@@ -684,4 +687,61 @@ export const changedSubFields = (old_fields, new_fields) => {
 export const validateQueryString = (queryString) => {
 	const ACC_API = getURL();
 	return doGet(`${ACC_API}/_validate/query?q=${queryString}`);
+};
+
+export const getAuthorizedViews = (routes = {}, allowedActions = []) => {
+	// over page is showed only if user has develop, analytics or search relevancy access
+	const hasOverviewPageAccess = allowedActions.some(
+		(i) =>
+			i === ALLOWED_ACTIONS.DEVELOP ||
+			i === ALLOWED_ACTIONS.ANALYTICS ||
+			i === ALLOWED_ACTIONS.SEARCH_RELEVANCY,
+	);
+
+	return Object.keys(routes)
+		.filter(
+			(r) =>
+				(hasOverviewPageAccess && !get(routes, `${r}.action`)) ||
+				allowedActions.includes(get(routes, `${r}.action`)),
+		)
+		.reduce((res, key) => {
+			return {
+				...res,
+				[key]: { ...routes[key] },
+			};
+		}, {});
+};
+
+// this function takes in parsedRoutes which are already parsed through getAuthorizedViews
+// hence it would always have authorized list of routes and we don't need to match against allowedActions
+export const getAuthorizedRoutes = (routes = {}) => {
+	const parsedRoutes = getParsedRoutes(routes);
+	return parsedRoutes.reduce((agg, i) => ({ ...agg, [i.link || '/']: i }), {});
+};
+
+export const hasClusterEditAccess = (allowedActions = []) =>
+	allowedActions.some(
+		(i) => i === ALLOWED_ACTIONS.DEVELOP || i === ALLOWED_ACTIONS.SEARCH_RELEVANCY,
+	);
+
+// Return -1 if versionA < versionB
+// Return 0 if versionA === versionB
+// Return 1 if versionA > versionB
+export const compareVersion = (versionA = '0.0.0', versionB = '0.0.0') => {
+	if (versionA === versionB) {
+		return 0;
+	}
+
+	const versionASplit = versionA.split('.');
+	const versionBSplit = versionB.split('.');
+
+	const majorMinorA = Number(`${versionASplit[0]}.${versionASplit[1]}`);
+	const majorMinorB = Number(`${versionBSplit[0]}.${versionBSplit[1]}`);
+	const patchA = Number(versionASplit[2]);
+	const patchB = Number(versionBSplit[2]);
+	if (majorMinorA > majorMinorB || (majorMinorA === majorMinorB && patchA > patchB)) {
+		return 1;
+	}
+
+	return -1;
 };
