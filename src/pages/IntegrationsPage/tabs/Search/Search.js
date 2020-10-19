@@ -8,7 +8,9 @@ const Search = () => (
 			Set search query settings such as fields to search on, weights to apply, typo tolerance,
 			whether to enable synonyms from the Search Relevancy views.
 		</p>
-		<Button type="primary">Configure Search Settings</Button>
+		<Button href="search" type="primary">
+			Configure Search Settings
+		</Button>
 	</div>
 );
 
