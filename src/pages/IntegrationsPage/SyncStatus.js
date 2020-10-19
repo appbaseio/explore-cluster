@@ -91,14 +91,14 @@ class SyncStatus extends React.Component {
 							<h3>
 								{' '}
 								Number of Products: <strong>{products}</strong>
+								<span
+									style={{
+										marginLeft: 20,
+									}}
+								>
+									Number of Collections: <strong>{collections}</strong>
+								</span>
 							</h3>
-							<h3>
-								{' '}
-								Number of Collections: <strong>{collections}</strong>
-							</h3>
-							<Button target="blank" href={this.resyncURL} icon="reload">
-								Resync
-							</Button>
 						</div>
 					) : (
 						<div>
@@ -109,6 +109,19 @@ class SyncStatus extends React.Component {
 						</div>
 					)}
 					<div>
+						{this.isShopify ? (
+							<Button
+								style={{
+									marginRight: 15,
+								}}
+								target="blank"
+								href={this.resyncURL}
+								icon="reload"
+							>
+								Resync
+							</Button>
+						) : null}
+
 						<Button href="browse" type="primary">
 							Browse Data
 						</Button>

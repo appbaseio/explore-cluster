@@ -14,6 +14,14 @@ const bannerDetails = {
 	icon: 'pencil',
 };
 
+const bannerDetailsPaid = {
+	title: 'Integrations',
+	description:
+		'Build a WYSIWG storefront search preview that can be installed with your favorite E-Commerce platform.',
+	buttonText: 'Read Docs',
+	href: 'https://docs.appbase.io/docs/integrations',
+};
+
 const IntegrationsPage = ({ tier, featureEcommerce }) => {
 	if (!isValidPlan(tier, featureEcommerce)) {
 		return (
@@ -29,7 +37,12 @@ const IntegrationsPage = ({ tier, featureEcommerce }) => {
 			</React.Fragment>
 		);
 	}
-	return <Main />;
+	return (
+		<>
+			<Banner {...bannerDetailsPaid} />
+			<Main />
+		</>
+	);
 };
 
 IntegrationsPage.defaultProps = {

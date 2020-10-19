@@ -103,9 +103,7 @@ class Main extends React.Component {
 	}
 
 	storePreferences = () => {
-		if (this.form.valid) {
-			localStorage.setItem(this.storeKey, JSON.stringify(this.form.value));
-		}
+		localStorage.setItem(this.storeKey, JSON.stringify(this.form.value));
 	};
 
 	getPreferences = () => {
