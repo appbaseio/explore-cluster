@@ -118,9 +118,10 @@ class AppWrapper extends Component {
 
 	componentDidMount() {
 		const { appName } = this.state;
-		const { history, match } = this.props;
+		const { history, match, updateCurrentApp } = this.props;
 		const view = getParam('view') || '';
 
+		updateCurrentApp(appName);
 		this.handleSettings(appName);
 
 		if (!match.params.appName && appName) {
@@ -195,7 +196,8 @@ class AppWrapper extends Component {
 			value,
 		} = this.state;
 
-		const { history, routes } = this.props;
+		const { history, routes, currentApp } = this.props;
+		if (!currentApp) return null;
 
 		return (
 			<Layout>
@@ -344,7 +346,7 @@ class AppWrapper extends Component {
 }
 
 AppWrapper.propTypes = {
-	currentApp: PropTypes.string.isRequired,
+	currentApp: PropTypes.string,
 	history: PropTypes.object.isRequired,
 	match: PropTypes.object.isRequired,
 	settings: PropTypes.object,
@@ -355,6 +357,7 @@ AppWrapper.propTypes = {
 	tier: allowedTiers,
 	featureSearchRelevancy: PropTypes.bool,
 	routes: PropTypes.object.isRequired,
+	updateCurrentApp: PropTypes.func.isRequired,
 };
 
 AppWrapper.defaultProps = {
@@ -362,6 +365,7 @@ AppWrapper.defaultProps = {
 	tier: undefined,
 	featureSearchRelevancy: false,
 	defaultSettings: null,
+	currentApp: null,
 };
 
 const mapStateToProps = (state) => {
