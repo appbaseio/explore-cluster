@@ -2,8 +2,8 @@ import React from 'react';
 import { Button, Modal, Row, Col, Input, Select } from 'antd';
 import PropTypes from 'prop-types';
 
-import conversionMap from './utils/conversionMap';
-import usecases from './utils/usecases';
+import conversionMap from '../../../utils/conversionMap';
+import usecases from '../../../utils/usecases';
 
 const { Option } = Select;
 

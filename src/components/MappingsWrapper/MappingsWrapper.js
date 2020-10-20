@@ -3,10 +3,20 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 
-import { getMappingsInfo, updateSubFields, reIndex } from './utils/mappings';
+import {
+	getMappingsInfo,
+	updateSubFields,
+	reIndex,
+	updateMapping,
+	updateObjectNestedProperty,
+} from '../../utils/mappings';
 import { getVersion } from '../../constants/config';
 import { getSettings } from '../../batteries/utils/mappings';
-import { getAppMappings, getSettings as getSearchSettings } from '../../batteries/modules/actions';
+import {
+	getAppMappings,
+	getSettings as getSearchSettings,
+	setLocalMappingState,
+} from '../../batteries/modules/actions';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 
 class MappingsWrapper extends React.Component {
@@ -22,9 +32,9 @@ class MappingsWrapper extends React.Component {
 	};
 
 	componentDidMount() {
-		const { mappings, searchRelevancy } = this.props;
-		if (mappings) {
-			this.init(mappings);
+		const { mappings, searchRelevancy, localMapping } = this.props;
+		if (localMapping || mappings) {
+			this.init(localMapping || mappings);
 		} else {
 			this.getMappings();
 		}
@@ -93,8 +103,9 @@ class MappingsWrapper extends React.Component {
 	};
 
 	getMappings = () => {
-		const { appName, credentials, fetchMappings } = this.props;
+		const { appName, credentials, fetchMappings, updateLocalMappingState } = this.props;
 		if (credentials && appName) {
+			updateLocalMappingState(appName, null);
 			fetchMappings(appName, credentials, this.URL);
 		}
 	};
@@ -163,8 +174,69 @@ class MappingsWrapper extends React.Component {
 		});
 	};
 
+	setMapping = ({ path, type: fieldType, usecase: fieldUseCase }) => {
+		const { usecase, type, mappings, flattenUsecase, flattenType } = this.state;
+
+		const {
+			enableNgram,
+			enableSynonyms,
+			language,
+			appName,
+			updateLocalMappingState,
+		} = this.props;
+		const updatedMappings = updateMapping({
+			originalMapping: mappings,
+			usecase: fieldUseCase,
+			path,
+			type: fieldType,
+			settings: {
+				enableNgram,
+				enableSynonyms,
+				language,
+			},
+		});
+		const updatedUsecase = updateObjectNestedProperty({
+			obj: usecase,
+			fields: path.split('.'),
+			value: fieldUseCase,
+		});
+
+		const updatedType = updateObjectNestedProperty({
+			obj: type,
+			fields: path.split('.'),
+			value: fieldType,
+		});
+
+		const updatedFlattenUsecase = {
+			...flattenUsecase,
+			[path]: usecase,
+		};
+
+		const updatedFlattenType = {
+			...flattenType,
+			[path]: type,
+		};
+
+		updateLocalMappingState(appName, updatedMappings);
+
+		this.updateState({
+			mappings: updatedMappings,
+			usecase: updatedUsecase,
+			type: updatedType,
+			flattenType: updatedFlattenType,
+			flattenUsecase: updatedFlattenUsecase,
+		});
+	};
+
 	render() {
-		const { children, error, isFetchingMapping, isFetchingSetting, appName } = this.props;
+		const {
+			children,
+			error,
+			isFetchingMapping,
+			isFetchingSetting,
+			appName,
+			localMapping,
+		} = this.props;
 		const { usecase, type, originalType, originalUseCase } = this.state;
 		const hasMappingsChanged =
 			JSON.stringify(type) !== JSON.stringify(originalType) ||
@@ -179,11 +251,13 @@ class MappingsWrapper extends React.Component {
 					isFetchingMapping,
 					isFetchingSetting,
 					hasMappingsChanged,
+					localMapping,
 					reloadMappings: this.getMappings,
 					reloadSettings: this.getSettings,
 					updateState: this.updateState,
 					cancelChanges: this.cancelChanges,
 					handleReindex: this.handleReindex,
+					setMapping: this.setMapping,
 				})}
 			</div>
 		);
@@ -205,6 +279,8 @@ MappingsWrapper.propTypes = {
 	isFetchingMapping: PropTypes.bool.isRequired,
 	isFetchingSetting: PropTypes.bool.isRequired,
 	error: PropTypes.object,
+	localMapping: PropTypes.object,
+	updateLocalMappingState: PropTypes.func.isRequired,
 };
 
 MappingsWrapper.defaultProps = {
@@ -214,6 +290,7 @@ MappingsWrapper.defaultProps = {
 	enableSynonyms: true,
 	language: 'universal',
 	error: null,
+	localMapping: null,
 };
 
 const mapStateToProps = (state, props) => {
@@ -236,6 +313,7 @@ const mapStateToProps = (state, props) => {
 		isFetchingMapping: get(state, '$getAppMappings.isFetching', false),
 		isFetchingSetting: get(state, '$getAppSettings.isFetching', false),
 		error: get(state, '$getAppMappings.error', null),
+		localMapping: get(state, `$getLocalMapping.${appName}`, null),
 		enableNgram:
 			props.forceNgram !== undefined
 				? props.forceNgram
@@ -264,6 +342,7 @@ const mapDispatchToProps = (dispatch) => ({
 	fetchMappings: (appName, credentials, url) =>
 		dispatch(getAppMappings(appName, credentials, url)),
 	fetchSearchSettings: (name) => dispatch(getSearchSettings(name)),
+	updateLocalMappingState: (appName, data) => dispatch(setLocalMappingState(appName, data)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(MappingsWrapper);

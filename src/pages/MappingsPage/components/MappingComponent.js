@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Tooltip, Button, Icon, Skeleton, Row, Alert, Empty } from 'antd';
+import { Card, Tooltip, Button, Icon, Skeleton, Row, Alert, Empty, Col } from 'antd';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
@@ -10,11 +10,29 @@ import FieldRow from './FieldRow';
 import ObjectField from './ObjectField';
 import ReIndexWrapper from '../../../components/ReIndexWrapper';
 import SearchPreviewModal from '../../../components/SearchPreviewModal';
-import { footerStyles } from './styles';
+import { footerStyles, headerRow } from './styles';
 
-import { getMappingsByPath, deleteMappingField, updateMapping } from './utils/mappings';
-import { updateObjectNestedProperty } from './utils';
+import { getMappingsByPath, deleteMappingField } from '../../../utils/mappings';
 import { VIEWS } from '../../../constants/props';
+
+const mappingHeaderLeft = [
+	{
+		title: 'Field Name',
+		info: 'Names of the fields and nested-fields are represented with relative indentation.',
+	},
+];
+
+const mappingHeaderRight = [
+	{
+		title: 'Use case',
+		info:
+			'We detect the appropriate analyzers and mappings here representing the usecase - search or aggregations.',
+	},
+	{
+		title: 'Data Type',
+		info: 'Type of data in the corresponding field.',
+	},
+];
 
 class MappingComponent extends React.Component {
 	handleDelete = ({
@@ -45,62 +63,6 @@ class MappingComponent extends React.Component {
 		});
 	};
 
-	setMapping = ({
-		usecase,
-		type,
-		mappings,
-		enableNgram,
-		enableSynonyms,
-		language,
-		flattenUsecase,
-		flattenType,
-		updateState,
-		path,
-		fieldType,
-		fieldUseCase,
-	}) => {
-		const updatedMappings = updateMapping({
-			originalMapping: mappings,
-			usecase: fieldUseCase,
-			path,
-			type: fieldType,
-			settings: {
-				enableNgram,
-				enableSynonyms,
-				language,
-			},
-		});
-		const updatedUsecase = updateObjectNestedProperty({
-			obj: usecase,
-			fields: path.split('.'),
-			value: fieldUseCase,
-		});
-
-		const updatedType = updateObjectNestedProperty({
-			obj: type,
-			fields: path.split('.'),
-			value: fieldType,
-		});
-
-		const updatedFlattenUsecase = {
-			...flattenUsecase,
-			[path]: usecase,
-		};
-
-		const updatedFlattenType = {
-			...flattenType,
-			[path]: type,
-		};
-
-		updateState({
-			mappings: updatedMappings,
-			usecase: updatedUsecase,
-			type: updatedType,
-			flattenType: updatedFlattenType,
-			flattenUsecase: updatedFlattenUsecase,
-		});
-	};
-
 	renderMapping = ({
 		// initialUseCase & initialType are passed to handle the delete field, otherwise usecase/type value can change with recursive iteration
 		usecase,
@@ -110,6 +72,7 @@ class MappingComponent extends React.Component {
 		mappings,
 		path = '',
 		init = false,
+		setMapping,
 		...rest
 	}) => {
 		if (init && (!usecase || Object.keys(usecase).length === 0)) {
@@ -137,6 +100,7 @@ class MappingComponent extends React.Component {
 								usecase: initialUseCase,
 								path: deletePath,
 								type: initialType,
+								mappings,
 								...rest,
 							})
 						}
@@ -165,14 +129,10 @@ class MappingComponent extends React.Component {
 					mapping={getMappingsByPath({ mappings, path: `${path}${field}` })}
 					path={`${path}${field}`}
 					setMapping={({ type: fieldType, path: fieldPath, usecase: fieldUseCase }) =>
-						this.setMapping({
-							fieldType,
-							fieldUseCase,
+						setMapping({
+							type: fieldType,
+							usecase: fieldUseCase,
 							path: fieldPath,
-							usecase: initialUseCase,
-							type: initialType,
-							mappings,
-							...rest,
 						})
 					}
 					onDelete={(deletePath) =>
@@ -204,6 +164,7 @@ class MappingComponent extends React.Component {
 					usecase,
 					type,
 					appName,
+					setMapping,
 					...rest
 				}) => (
 					<div>
@@ -244,13 +205,10 @@ class MappingComponent extends React.Component {
 												path,
 												usecase: fieldUseCase,
 											}) =>
-												this.setMapping({
-													fieldType,
-													fieldUseCase,
+												setMapping({
+													type: fieldType,
+													usecase: fieldUseCase,
 													path,
-													usecase,
-													type,
-													...rest,
 												})
 											}
 											fields={Object.keys(usecase || {})}
@@ -263,12 +221,43 @@ class MappingComponent extends React.Component {
 										<Skeleton />
 									) : (
 										<>
+											<Row
+												type="flex"
+												className={headerRow}
+												justify="space-between"
+											>
+												<Col>
+													{mappingHeaderLeft.map((item) => (
+														<p key={item.title}>
+															{item.title}
+															<Tooltip title={item.info}>
+																<Icon type="info-circle" />
+															</Tooltip>
+														</p>
+													))}
+												</Col>
+												<Col>
+													<Row gutter={8}>
+														{mappingHeaderRight.map((item) => (
+															<Col key={item.title} xs={12}>
+																<p style={{ width: 155 }}>
+																	{item.title}
+																	<Tooltip title={item.info}>
+																		<Icon type="info-circle" />
+																	</Tooltip>
+																</p>
+															</Col>
+														))}
+													</Row>
+												</Col>
+											</Row>
 											{this.renderMapping({
 												initialUseCase: usecase,
 												initialType: type,
 												usecase,
 												type,
 												init: true,
+												setMapping,
 												...rest,
 											})}
 										</>
