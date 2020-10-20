@@ -29,6 +29,18 @@ const bannerDetails = {
 	href: 'https://docs.appbase.io/docs/search/relevancy/#search-settings',
 };
 
+const getqueryFormat = ({ queryString, searchOperators }) => {
+	if (queryString) {
+		return 'queryString';
+	}
+
+	if (searchOperators) {
+		return 'searchOperators';
+	}
+
+	return 'default';
+};
+
 class SearchSettingsPage extends React.Component {
 	componentDidMount() {
 		const {
@@ -61,25 +73,40 @@ class SearchSettingsPage extends React.Component {
 
 	handleChange = (name, value) => {
 		const { localRelevancy, updateLocalRelevancy, appName } = this.props;
-		updateLocalRelevancy(appName, {
-			...get(localRelevancy, appName),
-			search: {
-				...get(localRelevancy, `${appName}.search`, {}),
-				[name]: value,
-			},
-		});
-	};
-
-	getQueryType = ({ queryString, searchOperators }) => {
-		if (queryString) {
-			return 'queryString';
+		if (name === 'enableSynonyms') {
+			updateLocalRelevancy(appName, {
+				...get(localRelevancy, appName),
+				synonyms: {
+					...get(localRelevancy, `${appName}.synonyms`, {}),
+					enabled: value,
+				},
+			});
+		} else if (name === 'enableNgram') {
+			updateLocalRelevancy(appName, {
+				...get(localRelevancy, appName),
+				indexSettings: {
+					...get(localRelevancy, `${appName}.indexSettings`, {}),
+					enableNgram: value,
+				},
+			});
+		} else if (name === 'queryType') {
+			updateLocalRelevancy(appName, {
+				...get(localRelevancy, appName),
+				search: {
+					...get(localRelevancy, `${appName}.search`, {}),
+					queryString: value === 'queryString',
+					searchOperators: value === 'searchOperators',
+				},
+			});
+		} else {
+			updateLocalRelevancy(appName, {
+				...get(localRelevancy, appName),
+				search: {
+					...get(localRelevancy, `${appName}.search`, {}),
+					[name]: value,
+				},
+			});
 		}
-
-		if (searchOperators) {
-			return 'searchOperators';
-		}
-
-		return 'default';
 	};
 
 	init = (settings) => {
@@ -96,25 +123,21 @@ class SearchSettingsPage extends React.Component {
 			};
 		}, {});
 
-		const hasSearchOperators = get(settings, 'search.searchOperators', false);
-		const hasQueryString = get(settings, 'search.queryString', false);
-
-		const queryType = this.getQueryType({
-			queryString: hasQueryString,
-			searchOperators: hasSearchOperators,
-		});
-
 		updateLocalRelevancy(appName, {
 			...settings,
 			search: {
 				...get(settings, 'search', {}),
 				fuzziness: get(searchSettings, 'fuzziness'),
 				queryFormat: get(searchSettings, 'queryFormat'),
-				queryType,
 				fieldWeights,
+			},
+			indexSettings: {
+				...get(settings, 'indexSettings', {}),
 				enableNgram: get(settings, 'indexSettings.enableNgram', true),
-				hasLanguage: !!get(settings, 'language.language'),
-				enableSynonyms: get(settings, 'synonyms.enabled', true),
+			},
+			synonyms: {
+				...get(settings, 'synonyms', {}),
+				enabled: get(settings, 'synonyms.enabled', true),
 			},
 		});
 	};
@@ -199,14 +222,13 @@ class SearchSettingsPage extends React.Component {
 			);
 		}
 
-		const {
-			fieldWeights,
-			fuzziness,
-			enableSynonyms,
-			queryFormat,
-			queryType,
-			enableNgram,
-		} = get(localRelevancy, `${appName}.search`);
+		const { fieldWeights, fuzziness, queryFormat, queryString, searchOperators } = get(
+			localRelevancy,
+			`${appName}.search`,
+		);
+
+		const { enableNgram } = get(localRelevancy, `${appName}.indexSettings`);
+		const { enabled: enableSynonyms } = get(localRelevancy, `${appName}.synonyms`);
 
 		return (
 			<div>
@@ -221,11 +243,11 @@ class SearchSettingsPage extends React.Component {
 						<Divider />
 						<SettingsOptions
 							handleChange={this.handleChange}
-							queryType={queryType}
 							queryFormat={queryFormat}
 							fuzziness={fuzziness}
 							enableSynonyms={enableSynonyms}
 							enableNgram={enableNgram}
+							queryType={getqueryFormat({ queryString, searchOperators })}
 						/>
 					</Card>
 				</div>

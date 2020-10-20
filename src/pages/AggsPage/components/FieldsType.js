@@ -5,7 +5,7 @@ import { Select } from 'antd';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Mappings from '../../MappingsPage/components/MappingComponent';
-import conversionMap from '../../MappingsPage/components/utils/conversionMap';
+import conversionMap from '../../../utils/conversionMap';
 import { hasKeyword } from '../utils';
 import { VIEWS } from '../../../constants/props';
 

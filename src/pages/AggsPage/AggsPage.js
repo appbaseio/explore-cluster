@@ -1,28 +1,25 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import get from 'lodash/get';
-import { Skeleton, Card, Divider, notification, message, Alert } from 'antd';
 import PropTypes from 'prop-types';
-import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
+import get from 'lodash/get';
+import { connect } from 'react-redux';
+import { Card, Divider, Skeleton } from 'antd';
 import {
 	getDefaultSettings,
-	getSettings,
 	putSettings,
 	deleteSettings,
+	getSettings,
 	setLocalRelevancyState,
 } from '../../batteries/modules/actions';
-import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
-import { isValidPlan, isEqual } from '../../batteries/utils';
-import Overlay from '../../components/Overlay';
-import { container } from '../ResultsPage/styles';
-import FieldsType from './components/FieldsType';
-import SettingsOptions from './components/SettingsOptions';
-import settingsMap from '../../components/ReviewAndSave/helper';
-import { getDiffKeys } from './utils';
-import ReviewAndSave from '../../components/ReviewAndSave';
-import SettingsFooter from '../../components/SettingsFooter';
-import ReIndexWrapper from '../../components/ReIndexWrapper';
+import { getFieldWeight, getSubFields } from '../../utils';
 import { allowedTiers } from '../../utils/prop-types';
+import { isValidPlan } from '../../batteries/utils';
+import { container } from '../ResultsPage/styles';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
+
+import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
+import Overlay from '../../components/Overlay';
+import SettingsOptions from './components/SettingsOptions';
+import FieldsType from './components/FieldsType';
 
 const bannerDetails = {
 	title: 'Aggregation Settings',
@@ -35,18 +32,6 @@ const bannerDetails = {
 };
 
 class AggsPage extends React.Component {
-	state = {
-		fieldTypes: {},
-		// count: 10,
-		// sort: 'count',
-		// includeNullValue: false,
-		// queryFormat: 'or',
-		reviewAndSaveModal: false,
-		isReset: false,
-	};
-
-	_mappingsRef = null;
-
 	componentDidMount() {
 		const {
 			appName,
@@ -76,150 +61,41 @@ class AggsPage extends React.Component {
 		}
 	}
 
-	get hasMappingsChanged() {
-		const savedUsecase = get(
-			this,
-			'_mappingsRef.current.wrappedInstance.originalFlattenUsecase',
-			{},
-		);
-
-		const currentUsecase = get(this, '_mappingsRef.current.wrappedInstance.flattenUsecase', {});
-
-		return JSON.stringify(savedUsecase) !== JSON.stringify(currentUsecase);
-	}
-
-	handleChange = (name, value) => {
-		this.setState({
-			[name]: value,
-		});
-	};
-
-	handleSave = (refetchReIndexingData) => {
-		const { fieldTypes, sort, count, includeNullValue, queryFormat } = this.state;
-		const { updateSettingsAction, appName, settings } = this.props;
-
-		this.toggleReviewSaveVisible();
-		updateSettingsAction(appName, {
-			...settings,
-			aggregations: {
-				...get(settings, 'aggregations', {}),
-				dataField: fieldTypes,
-				size: count,
-				sortBy: sort,
-				includeNullValues: includeNullValue,
-				queryFormat,
-			},
-		})
-			.then(async (res) => {
-				if (res && res.error) {
-					notification.error({
-						message: 'Failed to save Aggregation Settings',
-						description: res.error.message,
-					});
-				} else {
-					if (this.hasMappingsChanged) {
-						const reIndex = get(
-							this,
-							'_mappingsRef.current.wrappedInstance.handleReindex',
-						);
-						await reIndex(refetchReIndexingData);
-					}
-					message.success(`Aggregation settings for ${appName} saved successfully`);
-				}
-			})
-			.catch((e) => {
-				notification.error({
-					message: 'Failed to save Aggregation Settings',
-					description: e.message,
-				});
-			});
-	};
-
-	handleTypesUpdate = (fieldTypes) => {
-		this.setState({
-			fieldTypes,
-		});
-	};
-
 	init = (settings) => {
 		const { appName, updateLocalRelevancy } = this.props;
 		updateLocalRelevancy(appName, {
 			...settings,
 			aggregations: {
 				...get(settings, 'aggregations', {}),
-				count: get(settings, 'aggregations.size'),
-				sort: get(settings, 'aggregations.sortBy'),
-				includeNullValue: get(settings, 'aggregations.includeNullValues'),
-				fieldTypes: get(settings, 'aggregations.dataField'),
+				size: get(settings, 'aggregations.size'),
+				sortBy: get(settings, 'aggregations.sortBy'),
+				includeNullValues: get(settings, 'aggregations.includeNullValues'),
+				dataField: get(settings, 'aggregations.dataField'),
 				queryFormat: get(settings, 'aggregations.queryFormat', 'or'),
 			},
 		});
+	};
 
-		this.setState({
-			reviewAndSaveModal: false,
-			isReset: false,
+	handleChange = (name, value) => {
+		const { localRelevancy, updateLocalRelevancy, appName } = this.props;
+		updateLocalRelevancy(appName, {
+			...get(localRelevancy, appName),
+			aggregations: {
+				...get(localRelevancy, `${appName}.aggregations`, {}),
+				[name]: value,
+			},
 		});
 	};
 
-	toggleReviewSaveVisible = () => {
-		this.setState((prevState) => ({
-			reviewAndSaveModal: !prevState.reviewAndSaveModal,
-		}));
-	};
-
-	toggleReset = () => {
-		this.setState((prevState) => ({
-			isReset: !prevState.isReset,
-		}));
-	};
-
-	resetChanges = () => {
-		const cancelChanges = get(this, '_mappingsRef.current.wrappedInstance.cancelChanges');
-		const { settings } = this.props;
-		cancelChanges();
-		this.init(settings);
-	};
-
-	resetToDefault = () => {
-		const { getDefaultSettingsAction, defaultSettings } = this.props;
-
-		if (defaultSettings) this.init(defaultSettings);
-		else
-			getDefaultSettingsAction().then((res) => {
-				if (res && res.payload) {
-					this.init(res.payload);
-				}
-			});
-		this.toggleReset();
-		this.toggleReviewSaveVisible();
-	};
-
-	setMappingsRef = ({ ref }) => {
-		this._mappingsRef = ref;
-	};
-
 	render() {
-		const {
-			isLoading,
-			tier,
-			featureSearchRelevancy,
-			settings,
-			isUpdating,
-			resetState,
-			defaultSettings,
-			appName,
-			localRelevancy,
-		} = this.props;
-		const { reviewAndSaveModal, isReset, fieldTypes } = this.state;
+		const { isLoading, appName, tier, featureSearchRelevancy, localRelevancy } = this.props;
 
 		if (isLoading || !localRelevancy || !get(localRelevancy, `${appName}.aggregations`, null)) {
 			return (
 				<React.Fragment>
 					<Banner {...bannerDetails} />
 					<div className={container}>
-						<Card>
-							<Skeleton />
-						</Card>
+						<Skeleton />
 					</div>
 				</React.Fragment>
 			);
@@ -240,135 +116,28 @@ class AggsPage extends React.Component {
 			);
 		}
 
-		const savedUsecase = get(
-			this,
-			'_mappingsRef.current.wrappedInstance.originalFlattenUsecase',
-			{},
-		);
-
-		const currentUsecase = get(this, '_mappingsRef.current.wrappedInstance.flattenUsecase', {});
-		const { sort, includeNullValue, count, queryFormat } = get(
+		console.log('////', get(localRelevancy, `${appName}.aggregations`));
+		const { sortBy, includeNullValues, size, queryFormat } = get(
 			localRelevancy,
 			`${appName}.aggregations`,
 		);
-		const mappingsDiff = getDiffKeys({
-			saved: savedUsecase,
-			current: currentUsecase,
-			defaultValue: '-',
-		});
-
-		const typesDiff = getDiffKeys({
-			saved: get(settings, 'aggregations.dataField'),
-			current: fieldTypes,
-			defaultValue: '-',
-		});
-
-		console.log(fieldTypes);
 
 		return (
-			<React.Fragment>
+			<>
 				<Banner {...bannerDetails} />
 				<div className={container}>
 					<Card>
-						<FieldsType
-							fieldTypes={fieldTypes}
-							onFieldsUpdate={this.handleTypesUpdate}
-							onInit={this.setMappingsRef}
-						/>
 						<Divider />
 						<SettingsOptions
 							handleChange={this.handleChange}
-							sort={sort}
-							includeNullValue={includeNullValue}
-							count={count}
+							sortBy={sortBy}
+							includeNullValues={includeNullValues}
+							size={size}
 							queryFormat={queryFormat}
 						/>
 					</Card>
-					<ReIndexWrapper appName={appName}>
-						{({ refetch }) => (
-							<SettingsFooter
-								loading={isUpdating}
-								resetState={resetState}
-								showCopySettings
-								onReset={this.resetToDefault}
-								showSearchPreview
-								searchPreviewModalProps={{
-									searchPreviewProps: {
-										testSettings: {
-											...(settings || {}),
-											search: {
-												...get(settings, 'search', {}),
-											},
-											aggregations: {
-												size: count,
-												sortBy: sort,
-												includeNullValues: includeNullValue,
-												dataField: fieldTypes,
-												queryFormat,
-											},
-										},
-										hasTestSettings: true,
-									},
-									buttonProps: {
-										showTooltip: this.hasMappingsChanged,
-										tooltip: settingsMap.disable_search_settings.description,
-									},
-								}}
-								app={appName}
-								showReset={
-									!isEqual(
-										get(settings, 'aggregations'),
-										get(defaultSettings, 'aggregations'),
-									)
-								}
-								reviewAndSave={() => (
-									<ReviewAndSave
-										loading={isUpdating}
-										isReset={isReset}
-										oldValues={{
-											agg_size: get(settings, 'aggregations.size'),
-											sortBy: get(settings, 'aggregations.sortBy'),
-											includeNullValues: get(
-												settings,
-												'aggregations.includeNullValues',
-											),
-											dataField: get(typesDiff, 'old'),
-											queryFormat: get(
-												settings,
-												'aggregations.queryFormat',
-												'or',
-											),
-											mappings: get(mappingsDiff, 'old', {}),
-										}}
-										newValues={{
-											agg_size: count,
-											sortBy: sort,
-											includeNullValues: includeNullValue,
-											dataField: get(typesDiff, 'new'),
-											queryFormat,
-											mappings: get(mappingsDiff, 'new', {}),
-										}}
-										renderContent={() =>
-											this.hasMappingsChanged ? (
-												<Alert
-													type="warning"
-													showIcon
-													style={{ marginBottom: 10 }}
-													description="Re-indexing is required for applying below changes."
-												/>
-											) : null
-										}
-										onClick={this.toggleReviewSaveVisible}
-										visible={reviewAndSaveModal}
-										onRevert={this.resetChanges}
-										onSave={() => this.handleSave(refetch)}
-									/>
-								)}
-							/>
-						)}
-					</ReIndexWrapper>
 				</div>
-			</React.Fragment>
+			</>
 		);
 	}
 }

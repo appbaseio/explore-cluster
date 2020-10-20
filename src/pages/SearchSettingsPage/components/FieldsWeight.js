@@ -192,7 +192,7 @@ const FieldWeights = ({ handleFieldWeights, handleDelete, fieldWeights }) => {
 FieldWeights.propTypes = {
 	handleFieldWeights: PropTypes.func.isRequired,
 	handleDelete: PropTypes.func.isRequired,
-	fieldWeights: PropTypes.object.isRequired,
+	fieldWeights: PropTypes.oneOfType([PropTypes.object, PropTypes.array]).isRequired,
 };
 
 export default FieldWeights;
