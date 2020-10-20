@@ -424,7 +424,7 @@ class RouteContainer extends React.Component {
 RouteContainer.propTypes = {
 	location: PropTypes.object.isRequired,
 	allowedRoutes: PropTypes.object.isRequired,
-	allowedActions: PropTypes.object.isRequired,
+	allowedActions: PropTypes.array.isRequired,
 };
 
 const mapStateToProps = (state) => {
