@@ -4,7 +4,7 @@ import isEqual from 'lodash/isEqual';
 import { Select } from 'antd';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import Mappings from '../../MappingsPage/components/Mappings';
+import Mappings from '../../MappingsPage/components/MappingComponent';
 import conversionMap from '../../MappingsPage/components/utils/conversionMap';
 import { hasKeyword } from '../utils';
 import { VIEWS } from '../../../constants/props';
@@ -35,10 +35,11 @@ class FieldsType extends React.Component {
 		const { fieldTypes } = this.props;
 		const usecases = get(this, 'mappingsRef.current.wrappedInstance.flattenUsecase', null);
 		const types = get(this, 'mappingsRef.current.wrappedInstance.flattenType', null);
-
+		console.log(types);
 		if (usecases && types) {
 			const newAggsFields = Object.keys(types).reduce((agg, field) => {
 				if (types[field] === 'text') {
+					console.log(field, usecases[field], fieldTypes);
 					if (
 						usecases[field] !== 'search' &&
 						usecases[field] !== 'none' &&
@@ -56,6 +57,8 @@ class FieldsType extends React.Component {
 				return [...agg];
 			}, []);
 			const { aggsFields } = this.state;
+			console.log('aggsFields', aggsFields);
+			console.log('newAggsFields', newAggsFields);
 			if (!isEqual(newAggsFields.sort(), aggsFields)) {
 				this.setState({ aggsFields: newAggsFields });
 			}
@@ -172,6 +175,7 @@ class FieldsType extends React.Component {
 				{aggsFields.length > 0 ? (
 					<div style={{ position: 'relative', display: 'inline-block' }}>
 						<Select
+							showSearch
 							key={aggsFields.length}
 							style={{ width: 300 }}
 							placeholder="Add aggregation fields from schema"

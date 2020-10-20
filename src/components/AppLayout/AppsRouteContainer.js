@@ -176,10 +176,10 @@ class RouteContainer extends React.Component {
 					/>
 					<Route
 						exact
-						path="/app/:appName/settings"
+						path="/app/:appName/schema"
 						render={(props) => (
 							<>
-								{get(allowedRoutes, 'settings') ? (
+								{get(allowedRoutes, 'schema') ? (
 									<AppPageContainer
 										{...props}
 										component={MappingsPage}

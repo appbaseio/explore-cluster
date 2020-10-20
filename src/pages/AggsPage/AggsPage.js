@@ -36,7 +36,7 @@ const bannerDetails = {
 
 class AggsPage extends React.Component {
 	state = {
-		// fieldTypes: {},
+		fieldTypes: {},
 		// count: 10,
 		// sort: 'count',
 		// includeNullValue: false,
@@ -208,18 +208,11 @@ class AggsPage extends React.Component {
 			resetState,
 			defaultSettings,
 			appName,
+			localRelevancy,
 		} = this.props;
-		const {
-			fieldTypes,
-			count,
-			queryFormat,
-			includeNullValue,
-			sort,
-			reviewAndSaveModal,
-			isReset,
-		} = this.state;
+		const { reviewAndSaveModal, isReset, fieldTypes } = this.state;
 
-		if (isLoading) {
+		if (isLoading || !localRelevancy || !get(localRelevancy, `${appName}.aggregations`, null)) {
 			return (
 				<React.Fragment>
 					<Banner {...bannerDetails} />
@@ -254,7 +247,10 @@ class AggsPage extends React.Component {
 		);
 
 		const currentUsecase = get(this, '_mappingsRef.current.wrappedInstance.flattenUsecase', {});
-
+		const { sort, includeNullValue, count, queryFormat } = get(
+			localRelevancy,
+			`${appName}.aggregations`,
+		);
 		const mappingsDiff = getDiffKeys({
 			saved: savedUsecase,
 			current: currentUsecase,
@@ -266,6 +262,8 @@ class AggsPage extends React.Component {
 			current: fieldTypes,
 			defaultValue: '-',
 		});
+
+		console.log(fieldTypes);
 
 		return (
 			<React.Fragment>
@@ -389,10 +387,11 @@ AggsPage.propTypes = {
 	getSettingsAction: PropTypes.func.isRequired,
 	updateSettingsAction: PropTypes.func.isRequired,
 	updateLocalRelevancy: PropTypes.func.isRequired,
-	localRelevancy: PropTypes.object.isRequired,
+	localRelevancy: PropTypes.object,
 };
 
 AggsPage.defaultProps = {
+	localRelevancy: null,
 	isUpdating: false,
 	settings: null,
 	resetState: {},
@@ -407,7 +406,7 @@ const mapStateToProps = (state) => {
 	const errorCode = get(state, '$getAppSettings.error.actual.code');
 	const defaultSearchSettings = errorCode === 404 ? defaultSettings : null;
 	const appName = get(state, '$getCurrentApp.name');
-	const localRelevancy = get(state, `$localRelevancy`);
+	const localRelevancy = get(state, `$getLocalRelevancy`);
 	return {
 		appName,
 		defaultSettings,

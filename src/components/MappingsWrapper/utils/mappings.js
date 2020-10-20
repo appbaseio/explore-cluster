@@ -1,9 +1,9 @@
 import get from 'lodash/get';
 import omit from 'lodash/omit';
-import { getVersion, getURL } from '../../../../constants/config';
-import mappingUsecase from '../../../../batteries/utils/mappingUsecase';
+import { getVersion, getURL } from '../../../constants/config';
+import mappingUsecase from '../../../batteries/utils/mappingUsecase';
 import { flatObject } from '.';
-import { getAuthHeaders } from '../../../../batteries/utils/mappings';
+import { getAuthHeaders } from '../../../batteries/utils/mappings';
 
 export const getMappingsInfo = ({
 	mappings: originalMappings,
@@ -259,7 +259,6 @@ export const deleteMappingField = ({ originalMapping, path }) => {
 	}
 
 	const deletedPath = path.split('.').join('.properties.');
-	console.log(deletedPath);
 	const updatedMappings = omit(get(mapping, TOP_FIELD), deletedPath);
 
 	if (+ES_VERSION[0] >= 6 && +ES_VERSION[0] < 7) {

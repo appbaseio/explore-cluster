@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { InputNumber, Select } from 'antd';
 import PropTypes from 'prop-types';
 import HighLighter from '../../../components/HighLighter';
-import Mappings from '../../MappingsPage/components/Mappings';
+import Mappings from '../../MappingsPage/components/MappingComponent';
 import { getSubFields } from '../../../utils';
 import { getMappingsByPath } from '../../MappingsPage/components/utils/mappings';
 import { VIEWS } from '../../../constants/props';

@@ -459,7 +459,7 @@ SearchSettings.propTypes = {
 	getSettingsAction: PropTypes.func.isRequired,
 	updateSettingsAction: PropTypes.func.isRequired,
 	updateLocalRelevancy: PropTypes.func.isRequired,
-	localRelevancy: PropTypes.object.isRequired,
+	localRelevancy: PropTypes.object,
 };
 
 SearchSettings.defaultProps = {
@@ -470,6 +470,7 @@ SearchSettings.defaultProps = {
 	isLoading: false,
 	tier: undefined,
 	featureSearchRelevancy: false,
+	localRelevancy: null,
 };
 
 const mapStateToProps = (state) => {
@@ -477,7 +478,7 @@ const mapStateToProps = (state) => {
 	const errorCode = get(state, '$getAppSettings.error.actual.code');
 	const defaultSearchSettings = errorCode === 404 ? defaultSettings : null;
 	const appName = get(state, '$getCurrentApp.name');
-	const localRelevancy = get(state, `$localRelevancy`);
+	const localRelevancy = get(state, `$getLocalRelevancy`);
 	return {
 		isLoading: get(state, '$getAppSettings.isFetching'),
 		settings: get(state, ['$getAppSettings', 'settings', appName], defaultSearchSettings),
