@@ -166,8 +166,42 @@ class LanguageSettings extends React.Component {
 						const analyzerMappings = this.getAnalyzerMappings(res, getFieldValue);
 						const language = this.getFallBackLanguage(getFieldValue);
 						const analysis = buildLanguageAnalysis(language, languagePayload);
+
 						const { analyzer, filter } = get(appSettings, 'index.analysis', {});
 						const { analyzer: analyzerNew, filter: filterNew } = analysis || {};
+						let updatedAnalyzer = {
+							...omit(analyzer, [
+								get(settings, 'language.language'),
+								'standard_asciifolding',
+							]),
+							...analyzerNew,
+						};
+
+						if (languagePayload.normalizeDiacritics) {
+							updatedAnalyzer = Object.keys(updatedAnalyzer).reduce((obj, a) => {
+								const { filter: analyzerFilter } = updatedAnalyzer[a];
+								let stopIndex = filter.findIndex((f) => f.includes('_stop'));
+								if (stopIndex === -1) stopIndex = 0;
+								analyzerFilter.splice(stopIndex, 0, 'asciifolding');
+								return {
+									...obj,
+									[a]: { ...updatedAnalyzer[a], filter: analyzerFilter },
+								};
+							}, {});
+						} else {
+							updatedAnalyzer = Object.keys(updatedAnalyzer).reduce((obj, a) => {
+								const { filter: analyzerFilter } = updatedAnalyzer[a];
+								return {
+									...obj,
+									[a]: {
+										...updatedAnalyzer[a],
+										filter: analyzerFilter.filter((i) => i !== 'asciifolding'),
+									},
+								};
+							}, {});
+						}
+
+						console.log(updatedAnalyzer);
 						const reIndexPromise = reIndex({
 							mappings: { properties: analyzerMappings },
 							appId: appName,
@@ -175,13 +209,7 @@ class LanguageSettings extends React.Component {
 							credentials,
 							settings: {
 								analysis: {
-									analyzer: {
-										...omit(analyzer, [
-											get(settings, 'language.language'),
-											'standard_asciifolding',
-										]),
-										...analyzerNew,
-									},
+									analyzer: updatedAnalyzer,
 									filter: {
 										...omitBy(filter, (key, value) =>
 											(value || '').startsWith(
