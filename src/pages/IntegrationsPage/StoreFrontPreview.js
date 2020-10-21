@@ -32,7 +32,7 @@ class StoreFrontPreview extends React.Component {
 		return (
 			<div>
 				<link rel="stylesheet" type="text/css" href={BaseCSSURL} />
-				<div openwithmodal="false" id="reactivesearch-shopify-1" />
+				<div openwithmodal="false" ispreview="false" id="reactivesearch-shopify-1" />
 				{loading ? <Loader /> : null}
 			</div>
 		);
