@@ -38,12 +38,6 @@ export function buildLanguageAnalysis(language, languagePayload) {
 			if (language === 'universal') filter.push(`${language}_keywords`);
 			else filter.splice(filter.length - 1, 0, `${language}_keywords`);
 		}
-		if (languagePayload.normalizeDiacritics) {
-			const { filter } = analysis.analyzer[language];
-			let stopIndex = filter.findIndex((f) => f.includes('_stop'));
-			if (stopIndex === -1) stopIndex = 0;
-			filter.splice(stopIndex, 0, 'asciifolding');
-		}
 	}
 	return analysis;
 }
