@@ -189,6 +189,7 @@ class LanguageSettings extends React.Component {
 									...obj,
 									[a]: {
 										...updatedAnalyzer[a],
+										// save the unique values of filter
 										filter: analyzerFilter.filter(
 											(v, i, x) => x.indexOf(v) === i,
 										),
