@@ -8,7 +8,7 @@ import LayoutTab from './tabs/Layout';
 import SearchTab from './tabs/Search';
 import ChoosePlatformTab from './tabs/ChoosePlatform';
 import { container } from '../ResultsPage/styles';
-import { FormContext, validateURL } from './utils';
+import { FormContext, validateURL, shopifyDefaultFields } from './utils';
 import { getURL } from '../../constants/config';
 import PreviewModal from './PreviewModal';
 import ExportModal from './ExportModal';
@@ -90,6 +90,34 @@ class Main extends React.Component {
 				console.warn('Error while syncing the preferences', e);
 			}
 		}
+		// Registering the subscriber after patching the initial values to avoid resetting the set fields in preferences
+		this.form.get('exportSettings.type').valueChanges.subscribe((value) => {
+			if (value === 'shopify') {
+				// Populate the default fields
+				this.form.patchValue({
+					resultTitle: shopifyDefaultFields.title,
+					resultDescription: shopifyDefaultFields.description,
+					resultPrice: shopifyDefaultFields.price,
+					resultImage: shopifyDefaultFields.image,
+					resultHandle: shopifyDefaultFields.handle,
+				});
+				const colorFilter = this.form.get('staticFilters.color.customize.dataField');
+				colorFilter.patchValue(shopifyDefaultFields.color);
+				const sizeFilter = this.form.get('staticFilters.size.customize.dataField');
+				sizeFilter.patchValue(shopifyDefaultFields.size);
+				const priceFilter = this.form.get('staticFilters.price.customize.dataField');
+				priceFilter.patchValue(shopifyDefaultFields.price);
+			} else {
+				// Clear the default fields
+				this.form.patchValue({
+					resultTitle: undefined,
+					resultDescription: undefined,
+					resultPrice: undefined,
+					resultImage: undefined,
+					resultHandle: undefined,
+				});
+			}
+		});
 	}
 
 	componentWillUnmount() {
