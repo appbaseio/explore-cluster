@@ -10,7 +10,6 @@ import {
 	getSettings,
 	setLocalRelevancyState,
 } from '../../batteries/modules/actions';
-import { getFieldWeight, getSubFields } from '../../utils';
 import { allowedTiers } from '../../utils/prop-types';
 import { isValidPlan } from '../../batteries/utils';
 import { container } from '../ResultsPage/styles';
@@ -87,6 +86,31 @@ class AggsPage extends React.Component {
 		});
 	};
 
+	handleFieldType = ({ path, type, flattenType }) => {
+		const { localRelevancy, appName } = this.props;
+		const { dataField } = get(localRelevancy, `${appName}.aggregations`);
+		const pathVal = get(flattenType, path) === 'text' ? `${path}.keyword` : path;
+
+		this.handleChange('dataField', { ...dataField, [pathVal]: type });
+	};
+
+	updateToAggsField = ({ path, flattenType }) => {
+		const { localRelevancy, appName } = this.props;
+		const { dataField } = get(localRelevancy, `${appName}.aggregations`);
+		const pathVal = get(flattenType, path) === 'text' ? `${path}.keyword` : path;
+
+		const aggType = 'term';
+		this.handleChange('dataField', { ...dataField, [pathVal]: aggType });
+	};
+
+	handleRemoveFromAggs = ({ path, flattenType }) => {
+		const { localRelevancy, appName } = this.props;
+		const { dataField } = get(localRelevancy, `${appName}.aggregations`);
+		const pathVal = get(flattenType, path) === 'text' ? `${path}.keyword` : path;
+		delete dataField[pathVal];
+		this.handleChange('dataField', { ...dataField });
+	};
+
 	render() {
 		const { isLoading, appName, tier, featureSearchRelevancy, localRelevancy } = this.props;
 
@@ -115,9 +139,7 @@ class AggsPage extends React.Component {
 				</React.Fragment>
 			);
 		}
-
-		console.log('////', get(localRelevancy, `${appName}.aggregations`));
-		const { sortBy, includeNullValues, size, queryFormat } = get(
+		const { sortBy, includeNullValues, size, queryFormat, dataField } = get(
 			localRelevancy,
 			`${appName}.aggregations`,
 		);
@@ -127,6 +149,12 @@ class AggsPage extends React.Component {
 				<Banner {...bannerDetails} />
 				<div className={container}>
 					<Card>
+						<FieldsType
+							fieldTypes={dataField}
+							handleDelete={this.handleRemoveFromAggs}
+							handleFieldType={this.handleFieldType}
+							updateToAggsField={this.updateToAggsField}
+						/>
 						<Divider />
 						<SettingsOptions
 							handleChange={this.handleChange}

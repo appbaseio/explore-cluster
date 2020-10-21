@@ -454,3 +454,11 @@ export const flatObject = (originalObject, path = '') => {
 		};
 	}, {});
 };
+
+export const hasKeyword = (fieldMappings) => {
+	if (get(fieldMappings, 'fields.keyword.type', '') === 'keyword') {
+		return true;
+	}
+
+	return false;
+};
