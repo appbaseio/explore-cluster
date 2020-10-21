@@ -180,7 +180,9 @@ class LanguageSettings extends React.Component {
 						if (languagePayload.normalizeDiacritics) {
 							updatedAnalyzer = Object.keys(updatedAnalyzer).reduce((obj, a) => {
 								const { filter: analyzerFilter } = updatedAnalyzer[a];
-								let stopIndex = filter.findIndex((f) => f.includes('_stop'));
+								let stopIndex = analyzerFilter.findIndex((f) =>
+									f.includes('_stop'),
+								);
 								if (stopIndex === -1) stopIndex = 0;
 								analyzerFilter.splice(stopIndex, 0, 'asciifolding');
 								return {
