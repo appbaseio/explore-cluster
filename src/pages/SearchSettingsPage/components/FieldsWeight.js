@@ -2,7 +2,7 @@ import React from 'react';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import { css } from 'react-emotion';
-import { Skeleton, Button, Icon, Tooltip, Empty, Row, Col, InputNumber } from 'antd';
+import { Skeleton, Button, Icon, Tooltip, Empty, Row, Col, InputNumber, Select } from 'antd';
 import MappingWrapper from '../../../components/MappingsWrapper';
 import FieldRow from '../../MappingsPage/components/FieldRow';
 import ObjectField from '../../MappingsPage/components/ObjectField';
@@ -36,7 +36,9 @@ const mappingHeaderRight = [
 	},
 ];
 
-const FieldWeights = ({ handleFieldWeights, handleDelete, fieldWeights }) => {
+const { Option } = Select;
+
+const FieldWeights = ({ handleFieldWeights, handleDelete, fieldWeights, updateToSearchField }) => {
 	const renderMapping = ({
 		// initialUseCase & initialType are passed to handle the delete field, otherwise usecase/type value can change with recursive iteration
 		usecase,
@@ -128,9 +130,35 @@ const FieldWeights = ({ handleFieldWeights, handleDelete, fieldWeights }) => {
 			);
 		});
 	};
+
+	const getAggsField = ({ flattenUsecase: usecases, flattenType: types }) => {
+		if (usecases && types) {
+			const newAggsFields = Object.keys(types).reduce((agg, field) => {
+				if (usecases[field] === 'aggs' || usecases[field] === 'none') {
+					return [...agg, field];
+				}
+				return [...agg];
+			}, []);
+
+			return newAggsFields;
+		}
+
+		return [];
+	};
+
 	return (
 		<MappingWrapper>
-			{({ usecase, type, reloadMappings, isFetchingMapping, isFetchingSetting, ...rest }) => (
+			{({
+				usecase,
+				type,
+				reloadMappings,
+				isFetchingMapping,
+				isFetchingSetting,
+				flattenType,
+				flattenUsecase,
+				setMapping,
+				...rest
+			}) => (
 				<React.Fragment>
 					<Tooltip title="Fetch latest Mappings">
 						<Button
@@ -178,11 +206,33 @@ const FieldWeights = ({ handleFieldWeights, handleDelete, fieldWeights }) => {
 									usecase,
 									type,
 									init: true,
+									flattenUsecase,
+									flattenType,
+									setMapping,
 									...rest,
 								})}
 							</>
 						)}
 					</div>
+					{getAggsField({ flattenType, flattenUsecase }).length > 0 ? (
+						<div style={{ position: 'relative', display: 'inline-block' }}>
+							<Select
+								showSearch
+								style={{ width: 300 }}
+								placeholder="Add search fields from schema "
+								value={undefined}
+								onChange={(field) => {
+									updateToSearchField({ field, setMapping });
+								}}
+							>
+								{getAggsField({ flattenType, flattenUsecase }).map((field) => (
+									<Option key={field} value={field}>
+										{field}
+									</Option>
+								))}
+							</Select>
+						</div>
+					) : null}
 				</React.Fragment>
 			)}
 		</MappingWrapper>
@@ -193,6 +243,7 @@ FieldWeights.propTypes = {
 	handleFieldWeights: PropTypes.func.isRequired,
 	handleDelete: PropTypes.func.isRequired,
 	fieldWeights: PropTypes.oneOfType([PropTypes.object, PropTypes.array]).isRequired,
+	updateToSearchField: PropTypes.func.isRequired,
 };
 
 export default FieldWeights;

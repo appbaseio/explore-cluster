@@ -129,11 +129,13 @@ class MappingComponent extends React.Component {
 					mapping={getMappingsByPath({ mappings, path: `${path}${field}` })}
 					path={`${path}${field}`}
 					setMapping={({ type: fieldType, path: fieldPath, usecase: fieldUseCase }) =>
-						setMapping({
-							type: fieldType,
-							usecase: fieldUseCase,
-							path: fieldPath,
-						})
+						setMapping([
+							{
+								type: fieldType,
+								usecase: fieldUseCase,
+								path: fieldPath,
+							},
+						])
 					}
 					onDelete={(deletePath) =>
 						this.handleDelete({
@@ -205,11 +207,13 @@ class MappingComponent extends React.Component {
 												path,
 												usecase: fieldUseCase,
 											}) =>
-												setMapping({
-													type: fieldType,
-													usecase: fieldUseCase,
-													path,
-												})
+												setMapping([
+													{
+														type: fieldType,
+														usecase: fieldUseCase,
+														path,
+													},
+												])
 											}
 											fields={Object.keys(usecase || {})}
 										/>

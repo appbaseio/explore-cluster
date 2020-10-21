@@ -196,6 +196,16 @@ class SearchSettingsPage extends React.Component {
 		}
 	};
 
+	updateToSearchField = ({ field, setMapping }) => {
+		setMapping([
+			{
+				usecase: 'searchaggs',
+				path: field,
+				type: 'text',
+			},
+		]);
+	};
+
 	render() {
 		const { isLoading, appName, tier, featureSearchRelevancy, localRelevancy } = this.props;
 
@@ -242,6 +252,7 @@ class SearchSettingsPage extends React.Component {
 							fieldWeights={fieldWeights}
 							handleFieldWeights={this.handleFieldWeights}
 							handleDelete={this.handleRemoveFromSearch}
+							updateToSearchField={this.updateToSearchField}
 						/>
 						<Divider />
 						<SettingsOptions

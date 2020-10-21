@@ -175,7 +175,6 @@ class MappingsWrapper extends React.Component {
 	};
 
 	setMapping = (data) => {
-		console.log(data);
 		const { usecase, type, mappings, flattenUsecase, flattenType } = this.state;
 
 		const {
@@ -203,7 +202,6 @@ class MappingsWrapper extends React.Component {
 					language,
 				},
 			});
-			console.log(path, updatedMappings);
 
 			updatedUsecase = updateObjectNestedProperty({
 				obj: usecase,
@@ -226,8 +224,6 @@ class MappingsWrapper extends React.Component {
 				[path]: type,
 			};
 		});
-
-		console.log('updated', updatedMappings);
 
 		updateLocalMappingState(appName, updatedMappings);
 
