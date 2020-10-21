@@ -171,25 +171,28 @@ class SearchSettingsPage extends React.Component {
 
 	// ref to older version: https://github.com/appbaseio-confidential/arc-dashboard/blob/72869b13cf6daf78af7d91eafc480c6894a4f36c/src/pages/SearchSettingsPage/SearchSettings.js#L473
 	handleRemoveFromSearch = ({ setMapping, field, flattenUsecase }) => {
-		console.log(field, flattenUsecase);
 		const nestedFields = Object.keys(flattenUsecase).filter((i) => i.indexOf(`${field}.`) > -1);
-		console.log(nestedFields);
+
 		if (nestedFields.length) {
-			nestedFields.forEach((i) => {
+			const newMappings = nestedFields.map((i) => {
 				if (flattenUsecase[i] === 'search' || flattenUsecase[i] === 'searchaggs') {
-					setMapping({
+					return {
 						usecase: 'aggs',
 						path: i,
 						type: 'text',
-					});
+					};
 				}
+				return null;
 			});
+			setMapping(newMappings.filter((i) => Boolean(i)));
 		} else {
-			setMapping({
-				usecase: 'aggs',
-				path: field,
-				type: 'text',
-			});
+			setMapping([
+				{
+					usecase: 'aggs',
+					path: field,
+					type: 'text',
+				},
+			]);
 		}
 	};
 

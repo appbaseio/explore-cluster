@@ -205,6 +205,7 @@ const _updateNestedMapping = ({ mapping, type, usecase, fields, currentIndex, se
 };
 
 export const updateMapping = ({ originalMapping, type, usecase, path, settings }) => {
+	console.log(path);
 	const mapping = JSON.parse(JSON.stringify(originalMapping));
 
 	const ES_VERSION = getVersion();

@@ -174,7 +174,8 @@ class MappingsWrapper extends React.Component {
 		});
 	};
 
-	setMapping = ({ path, type: fieldType, usecase: fieldUseCase }) => {
+	setMapping = (data) => {
+		console.log(data);
 		const { usecase, type, mappings, flattenUsecase, flattenType } = this.state;
 
 		const {
@@ -184,38 +185,49 @@ class MappingsWrapper extends React.Component {
 			appName,
 			updateLocalMappingState,
 		} = this.props;
-		const updatedMappings = updateMapping({
-			originalMapping: mappings,
-			usecase: fieldUseCase,
-			path,
-			type: fieldType,
-			settings: {
-				enableNgram,
-				enableSynonyms,
-				language,
-			},
-		});
-		const updatedUsecase = updateObjectNestedProperty({
-			obj: usecase,
-			fields: path.split('.'),
-			value: fieldUseCase,
+		let updatedMappings = null;
+		let updatedUsecase = null;
+		let updatedType = null;
+		let updatedFlattenUsecase = null;
+		let updatedFlattenType = null;
+		data.forEach((item) => {
+			const { path, type: fieldType, usecase: fieldUseCase } = item;
+			updatedMappings = updateMapping({
+				originalMapping: mappings,
+				usecase: fieldUseCase,
+				path,
+				type: fieldType,
+				settings: {
+					enableNgram,
+					enableSynonyms,
+					language,
+				},
+			});
+			console.log(path, updatedMappings);
+
+			updatedUsecase = updateObjectNestedProperty({
+				obj: usecase,
+				fields: path.split('.'),
+				value: fieldUseCase,
+			});
+			updatedType = updateObjectNestedProperty({
+				obj: type,
+				fields: path.split('.'),
+				value: fieldType,
+			});
+
+			updatedFlattenUsecase = {
+				...flattenUsecase,
+				[path]: usecase,
+			};
+
+			updatedFlattenType = {
+				...flattenType,
+				[path]: type,
+			};
 		});
 
-		const updatedType = updateObjectNestedProperty({
-			obj: type,
-			fields: path.split('.'),
-			value: fieldType,
-		});
-
-		const updatedFlattenUsecase = {
-			...flattenUsecase,
-			[path]: usecase,
-		};
-
-		const updatedFlattenType = {
-			...flattenType,
-			[path]: type,
-		};
+		console.log('updated', updatedMappings);
 
 		updateLocalMappingState(appName, updatedMappings);
 
