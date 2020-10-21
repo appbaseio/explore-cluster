@@ -229,6 +229,7 @@ class MappingComponent extends React.Component {
 												type="flex"
 												className={headerRow}
 												justify="space-between"
+												style={{ padding: '0 15px' }}
 											>
 												<Col>
 													{mappingHeaderLeft.map((item) => (
@@ -255,15 +256,25 @@ class MappingComponent extends React.Component {
 													</Row>
 												</Col>
 											</Row>
-											{this.renderMapping({
-												initialUseCase: usecase,
-												initialType: type,
-												usecase,
-												type,
-												init: true,
-												setMapping,
-												...rest,
-											})}
+											<div
+												style={{
+													boxSizing: 'border-box',
+													backgroundColor: 'rgba(0, 0, 0, 0.02)',
+													margin: '15px 0px',
+													padding: '15px',
+													border: '1px solid rgba(0, 0, 0, 0.05)',
+												}}
+											>
+												{this.renderMapping({
+													initialUseCase: usecase,
+													initialType: type,
+													usecase,
+													type,
+													init: true,
+													setMapping,
+													...rest,
+												})}
+											</div>
 										</>
 									)}
 								</>

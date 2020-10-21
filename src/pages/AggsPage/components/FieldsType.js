@@ -2,7 +2,7 @@ import React from 'react';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import { css } from 'react-emotion';
-import { Skeleton, Button, Icon, Tooltip, Empty, Row, Col, Select } from 'antd';
+import { Skeleton, Icon, Tooltip, Empty, Row, Col, Select } from 'antd';
 import MappingWrapper from '../../../components/MappingsWrapper';
 import FieldRow from '../../MappingsPage/components/FieldRow';
 import ObjectField from '../../MappingsPage/components/ObjectField';
@@ -87,7 +87,7 @@ const FieldType = ({ handleFieldType, handleDelete, fieldTypes, updateToAggsFiel
 								...rest,
 							})
 						}
-						view={VIEWS.SEARCH}
+						view={VIEWS.AGGREGATION}
 					>
 						{renderMapping({
 							usecase: usecaseVal,
@@ -115,7 +115,7 @@ const FieldType = ({ handleFieldType, handleDelete, fieldTypes, updateToAggsFiel
 
 			return (
 				<FieldRow
-					view={VIEWS.SEARCH}
+					view={VIEWS.AGGREGATION}
 					key={`${path}${field}`}
 					field={field}
 					usecase={usecaseVal}
@@ -189,62 +189,69 @@ const FieldType = ({ handleFieldType, handleDelete, fieldTypes, updateToAggsFiel
 				flattenType,
 				usecase,
 				type,
-				reloadMappings,
 				isFetchingMapping,
 				isFetchingSetting,
 				...rest
 			}) => (
 				<React.Fragment>
-					<Tooltip title="Fetch latest Mappings">
-						<Button
-							style={{ marginRight: 8, color: '#1890ff' }}
-							onClick={reloadMappings}
-						>
-							<Icon type="reload" />
-							Reload Mappings
-						</Button>
-					</Tooltip>
-					<div style={{ marginTop: 20 }}>
+					<div>
 						{isFetchingSetting || isFetchingMapping ? (
 							<Skeleton />
 						) : (
 							<>
-								<Row type="flex" className={headerRow} justify="space-between">
-									<Col>
-										{mappingHeaderLeft.map((item) => (
-											<p key={item.title}>
-												{item.title}
-												<Tooltip title={item.info}>
-													<Icon type="info-circle" />
-												</Tooltip>
-											</p>
-										))}
-									</Col>
-									<Col>
-										<Row gutter={8}>
-											{mappingHeaderRight.map((item) => (
-												<Col key={item.title} xs={12}>
-													<p style={{ width: 155 }}>
-														{item.title}
-														<Tooltip title={item.info}>
-															<Icon type="info-circle" />
-														</Tooltip>
-													</p>
-												</Col>
+								{Boolean(Object.keys(fieldTypes).length) && (
+									<Row
+										type="flex"
+										className={headerRow}
+										justify="space-between"
+										style={{ padding: '0px 15px' }}
+									>
+										<Col>
+											{mappingHeaderLeft.map((item) => (
+												<p key={item.title}>
+													{item.title}
+													<Tooltip title={item.info}>
+														<Icon type="info-circle" />
+													</Tooltip>
+												</p>
 											))}
-										</Row>
-									</Col>
-								</Row>
-								{renderMapping({
-									initialUseCase: usecase,
-									initialType: type,
-									usecase,
-									type,
-									flattenType,
-									flattenUsecase,
-									init: true,
-									...rest,
-								})}
+										</Col>
+										<Col>
+											<Row gutter={8}>
+												{mappingHeaderRight.map((item) => (
+													<Col key={item.title} xs={12}>
+														<p style={{ width: 155 }}>
+															{item.title}
+															<Tooltip title={item.info}>
+																<Icon type="info-circle" />
+															</Tooltip>
+														</p>
+													</Col>
+												))}
+											</Row>
+										</Col>
+									</Row>
+								)}
+								<div
+									style={{
+										boxSizing: 'border-box',
+										backgroundColor: 'rgba(0, 0, 0, 0.02)',
+										margin: '15px 0px',
+										padding: '15px',
+										border: '1px solid rgba(0, 0, 0, 0.05)',
+									}}
+								>
+									{renderMapping({
+										initialUseCase: usecase,
+										initialType: type,
+										usecase,
+										type,
+										flattenType,
+										flattenUsecase,
+										init: true,
+										...rest,
+									})}
+								</div>
 							</>
 						)}
 					</div>

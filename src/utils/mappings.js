@@ -205,7 +205,6 @@ const _updateNestedMapping = ({ mapping, type, usecase, fields, currentIndex, se
 };
 
 export const updateMapping = ({ originalMapping, type, usecase, path, settings }) => {
-	console.log(path);
 	const mapping = JSON.parse(JSON.stringify(originalMapping));
 
 	const ES_VERSION = getVersion();
@@ -259,7 +258,6 @@ export const deleteMappingField = ({ originalMapping, path }) => {
 	}
 
 	const deletedPath = path.split('.').join('.properties.');
-	console.log(deletedPath);
 	const updatedMappings = omit(get(mapping, TOP_FIELD), deletedPath);
 
 	if (+ES_VERSION[0] >= 6 && +ES_VERSION[0] < 7) {

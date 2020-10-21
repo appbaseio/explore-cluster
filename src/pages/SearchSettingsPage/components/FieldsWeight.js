@@ -174,43 +174,62 @@ const FieldWeights = ({ handleFieldWeights, handleDelete, fieldWeights, updateTo
 							<Skeleton />
 						) : (
 							<>
-								<Row type="flex" className={headerRow} justify="space-between">
-									<Col>
-										{mappingHeaderLeft.map((item) => (
-											<p key={item.title}>
-												{item.title}
-												<Tooltip title={item.info}>
-													<Icon type="info-circle" />
-												</Tooltip>
-											</p>
-										))}
-									</Col>
-									<Col>
-										<Row gutter={8}>
-											{mappingHeaderRight.map((item) => (
-												<Col key={item.title} xs={12}>
-													<p style={{ width: 155 }}>
-														{item.title}
-														<Tooltip title={item.info}>
-															<Icon type="info-circle" />
-														</Tooltip>
-													</p>
-												</Col>
+								{Boolean(
+									fieldWeights.length || Object.keys(fieldWeights).length,
+								) && (
+									<Row
+										type="flex"
+										className={headerRow}
+										justify="space-between"
+										style={{ padding: '0 15px' }}
+									>
+										<Col>
+											{mappingHeaderLeft.map((item) => (
+												<p key={item.title}>
+													{item.title}
+													<Tooltip title={item.info}>
+														<Icon type="info-circle" />
+													</Tooltip>
+												</p>
 											))}
-										</Row>
-									</Col>
-								</Row>
-								{renderMapping({
-									initialUseCase: usecase,
-									initialType: type,
-									usecase,
-									type,
-									init: true,
-									flattenUsecase,
-									flattenType,
-									setMapping,
-									...rest,
-								})}
+										</Col>
+										<Col>
+											<Row gutter={8}>
+												{mappingHeaderRight.map((item) => (
+													<Col key={item.title} xs={12}>
+														<p style={{ width: 155 }}>
+															{item.title}
+															<Tooltip title={item.info}>
+																<Icon type="info-circle" />
+															</Tooltip>
+														</p>
+													</Col>
+												))}
+											</Row>
+										</Col>
+									</Row>
+								)}
+								<div
+									style={{
+										boxSizing: 'border-box',
+										backgroundColor: 'rgba(0, 0, 0, 0.02)',
+										margin: '15px 0px',
+										padding: '15px',
+										border: '1px solid rgba(0, 0, 0, 0.05)',
+									}}
+								>
+									{renderMapping({
+										initialUseCase: usecase,
+										initialType: type,
+										usecase,
+										type,
+										init: true,
+										flattenUsecase,
+										flattenType,
+										setMapping,
+										...rest,
+									})}
+								</div>
 							</>
 						)}
 					</div>
