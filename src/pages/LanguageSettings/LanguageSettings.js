@@ -187,7 +187,12 @@ class LanguageSettings extends React.Component {
 								analyzerFilter.splice(stopIndex, 0, 'asciifolding');
 								return {
 									...obj,
-									[a]: { ...updatedAnalyzer[a], filter: analyzerFilter },
+									[a]: {
+										...updatedAnalyzer[a],
+										filter: analyzerFilter.filter(
+											(v, i, x) => x.indexOf(v) === i,
+										),
+									},
 								};
 							}, {});
 						} else {
@@ -202,8 +207,6 @@ class LanguageSettings extends React.Component {
 								};
 							}, {});
 						}
-
-						console.log(updatedAnalyzer);
 						const reIndexPromise = reIndex({
 							mappings: { properties: analyzerMappings },
 							appId: appName,
