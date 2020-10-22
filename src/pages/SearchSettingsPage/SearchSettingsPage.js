@@ -45,6 +45,20 @@ const getqueryFormat = ({ queryString, searchOperators }) => {
 	return 'default';
 };
 
+const fieldLastIndexMap = (dataFields = [], fieldWeights = []) => {
+	const map = {};
+	const subFields = ['.autosuggest', '.search', '.synonyms', '.delimiter', '.keyword', '.lang'];
+	dataFields.forEach((i, index) => {
+		const hasSubfield = subFields.some((s) => i.includes(s));
+
+		if (!hasSubfield && !map[i]) {
+			map[i] = fieldWeights[index];
+		}
+	});
+
+	return map;
+};
+
 class SearchSettingsPage extends React.Component {
 	componentDidMount() {
 		const {
@@ -77,17 +91,71 @@ class SearchSettingsPage extends React.Component {
 
 	handleChange = (name, value) => {
 		const { localRelevancy, updateLocalRelevancy, appName } = this.props;
+		const searchSettings = get(localRelevancy, `${appName}.search`);
+		let updatedDataField = [...get(searchSettings, 'dataField')];
+		let updatedFieldWeights = [...get(searchSettings, 'fieldWeights')];
 		if (name === 'enableSynonyms') {
+			if (value) {
+				// add fields
+				const map = fieldLastIndexMap(updatedDataField, updatedFieldWeights);
+				console.log(map);
+				updatedDataField = [
+					...updatedDataField,
+					...Object.keys(map).map((i) => `${i}.synonyms`),
+				];
+				updatedFieldWeights = [
+					...updatedFieldWeights,
+					...Object.values(map).map((i) => i * 0.7),
+				];
+			} else {
+				const indices = [];
+				updatedDataField = updatedDataField.filter((item, i) => {
+					if (item.indexOf('.synonyms') > -1) {
+						indices.push(i);
+						return false;
+					}
+					return true;
+				});
+				updatedFieldWeights = updatedFieldWeights.filter((w, i) => {
+					return indices.indexOf(i) === -1;
+				});
+			}
+
 			updateLocalRelevancy(appName, {
 				...get(localRelevancy, appName),
+				search: {
+					...searchSettings,
+					dataField: updatedDataField,
+					fieldWeights: updatedFieldWeights,
+				},
 				synonyms: {
 					...get(localRelevancy, `${appName}.synonyms`, {}),
 					enabled: value,
 				},
 			});
 		} else if (name === 'enableNgram') {
+			if (value) {
+				// cannot enableNgram until re-indexing takes place
+			} else {
+				const indices = [];
+				updatedDataField = updatedDataField.filter((item, i) => {
+					if (item.indexOf('.search') > -1) {
+						indices.push(i);
+						return false;
+					}
+					return true;
+				});
+				updatedFieldWeights = updatedFieldWeights.filter((w, i) => {
+					return indices.indexOf(i) === -1;
+				});
+			}
 			updateLocalRelevancy(appName, {
 				...get(localRelevancy, appName),
+				search: {
+					...searchSettings,
+					dataField: updatedDataField,
+					fieldWeights: updatedFieldWeights,
+				},
 				indexSettings: {
 					...get(localRelevancy, `${appName}.indexSettings`, {}),
 					enableNgram: value,
