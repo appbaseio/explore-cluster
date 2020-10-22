@@ -213,7 +213,7 @@ class Main extends React.Component {
 										noResults: get(formValue, 'customMessages.noFilterItem'),
 									},
 									rsConfig: {
-										...get(formValue, 'staticFilters.collection.customize'),
+										...get(formValue, 'staticFilters.collections.customize'),
 									},
 								},
 						  ]
