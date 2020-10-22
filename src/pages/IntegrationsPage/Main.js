@@ -92,6 +92,9 @@ class Main extends React.Component {
 		}
 		// Registering the subscriber after patching the initial values to avoid resetting the set fields in preferences
 		this.form.get('exportSettings.type').valueChanges.subscribe((value) => {
+			const colorFilter = this.form.get('staticFilters.color.customize.dataField');
+			const sizeFilter = this.form.get('staticFilters.size.customize.dataField');
+			const priceFilter = this.form.get('staticFilters.price.customize.dataField');
 			if (value === 'shopify') {
 				// Populate the default fields
 				this.form.patchValue({
@@ -101,11 +104,9 @@ class Main extends React.Component {
 					resultImage: shopifyDefaultFields.image,
 					resultHandle: shopifyDefaultFields.handle,
 				});
-				const colorFilter = this.form.get('staticFilters.color.customize.dataField');
+
 				colorFilter.patchValue(shopifyDefaultFields.color);
-				const sizeFilter = this.form.get('staticFilters.size.customize.dataField');
 				sizeFilter.patchValue(shopifyDefaultFields.size);
-				const priceFilter = this.form.get('staticFilters.price.customize.dataField');
 				priceFilter.patchValue(shopifyDefaultFields.price);
 			} else {
 				// Clear the default fields
@@ -116,6 +117,9 @@ class Main extends React.Component {
 					resultImage: undefined,
 					resultHandle: undefined,
 				});
+				colorFilter.patchValue(undefined);
+				sizeFilter.patchValue(undefined);
+				priceFilter.patchValue(undefined);
 			}
 		});
 	}
