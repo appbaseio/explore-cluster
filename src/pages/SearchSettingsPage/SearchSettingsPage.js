@@ -126,18 +126,8 @@ class SearchSettingsPage extends React.Component {
 		updateLocalRelevancy(appName, {
 			...settings,
 			search: {
-				...get(settings, 'search', {}),
-				fuzziness: get(searchSettings, 'fuzziness'),
-				queryFormat: get(searchSettings, 'queryFormat'),
+				...searchSettings,
 				fieldWeights,
-			},
-			indexSettings: {
-				...get(settings, 'indexSettings', {}),
-				enableNgram: get(settings, 'indexSettings.enableNgram', true),
-			},
-			synonyms: {
-				...get(settings, 'synonyms', {}),
-				enabled: get(settings, 'synonyms.enabled', true),
 			},
 		});
 	};

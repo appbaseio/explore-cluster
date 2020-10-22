@@ -64,14 +64,6 @@ class AggsPage extends React.Component {
 		const { appName, updateLocalRelevancy } = this.props;
 		updateLocalRelevancy(appName, {
 			...settings,
-			aggregations: {
-				...get(settings, 'aggregations', {}),
-				size: get(settings, 'aggregations.size'),
-				sortBy: get(settings, 'aggregations.sortBy'),
-				includeNullValues: get(settings, 'aggregations.includeNullValues'),
-				dataField: get(settings, 'aggregations.dataField'),
-				queryFormat: get(settings, 'aggregations.queryFormat', 'or'),
-			},
 		});
 	};
 

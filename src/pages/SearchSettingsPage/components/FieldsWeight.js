@@ -174,41 +174,37 @@ const FieldWeights = ({ handleFieldWeights, handleDelete, fieldWeights, updateTo
 							<Skeleton />
 						) : (
 							<>
-								{Boolean(
-									fieldWeights.length || Object.keys(fieldWeights).length,
-								) && (
-									<Row
-										type="flex"
-										className={headerRow}
-										justify="space-between"
-										style={{ padding: '0 15px' }}
-									>
-										<Col>
-											{mappingHeaderLeft.map((item) => (
-												<p key={item.title}>
-													{item.title}
-													<Tooltip title={item.info}>
-														<Icon type="info-circle" />
-													</Tooltip>
-												</p>
+								<Row
+									type="flex"
+									className={headerRow}
+									justify="space-between"
+									style={{ padding: '0 15px' }}
+								>
+									<Col>
+										{mappingHeaderLeft.map((item) => (
+											<p key={item.title}>
+												{item.title}
+												<Tooltip title={item.info}>
+													<Icon type="info-circle" />
+												</Tooltip>
+											</p>
+										))}
+									</Col>
+									<Col>
+										<Row gutter={8}>
+											{mappingHeaderRight.map((item) => (
+												<Col key={item.title} xs={12}>
+													<p style={{ width: 155 }}>
+														{item.title}
+														<Tooltip title={item.info}>
+															<Icon type="info-circle" />
+														</Tooltip>
+													</p>
+												</Col>
 											))}
-										</Col>
-										<Col>
-											<Row gutter={8}>
-												{mappingHeaderRight.map((item) => (
-													<Col key={item.title} xs={12}>
-														<p style={{ width: 155 }}>
-															{item.title}
-															<Tooltip title={item.info}>
-																<Icon type="info-circle" />
-															</Tooltip>
-														</p>
-													</Col>
-												))}
-											</Row>
-										</Col>
-									</Row>
-								)}
+										</Row>
+									</Col>
+								</Row>
 								<div
 									style={{
 										boxSizing: 'border-box',
