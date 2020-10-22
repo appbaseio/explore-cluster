@@ -23,6 +23,7 @@ import Overlay from '../../components/Overlay';
 import { appendApp, removeAppData } from '../../actions';
 import settingsMap from '../../components/ReviewAndSave/helper';
 import { allowedTiers } from '../../utils/prop-types';
+import { removeWhiteSpaces } from '../../utils';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 import { languages } from '../../constants/es-languages';
@@ -89,7 +90,7 @@ class LanguageSettings extends React.Component {
 		let value = val;
 
 		if (key === 'customStopwords' || key === 'stemmingExceptions') {
-			value = val.split(',').map((i) => i.trim());
+			value = val.split(',').map((i) => removeWhiteSpaces(i));
 		}
 		updateLocalRelevancy(appName, {
 			...get(localRelevancy, appName),
