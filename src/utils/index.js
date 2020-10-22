@@ -529,6 +529,24 @@ export function getReIndexedName(appName) {
 	return newName;
 }
 
+export const getFieldWeight = (field, weight) => {
+	switch (field) {
+		case 'autosuggest':
+		case 'lang':
+			return weight ? weight * 0.9 : 0;
+		case 'synonyms':
+			return weight ? weight * 0.7 : 0;
+		case 'delimiter':
+			return weight ? weight * 0.4 : 0;
+		case 'search':
+			return weight ? weight * 0.1 : 0;
+		case 'keyword':
+			return weight ? weight : 0;
+		default:
+			return weight;
+	}
+};
+
 export function getSubFields({
 	fields,
 	weight,
@@ -558,24 +576,6 @@ export function getSubFields({
 
 	return { [address]: weight };
 }
-
-export const getFieldWeight = (field, weight) => {
-	switch (field) {
-		case 'autosuggest':
-		case 'lang':
-			return weight ? weight * 0.9 : 0;
-		case 'synonyms':
-			return weight ? weight * 0.7 : 0;
-		case 'delimiter':
-			return weight ? weight * 0.4 : 0;
-		case 'search':
-			return weight ? weight * 0.1 : 0;
-		case 'keyword':
-			return weight ? weight : 0;
-		default:
-			return weight;
-	}
-};
 
 function ltrim(str) {
 	if (!str) return str;

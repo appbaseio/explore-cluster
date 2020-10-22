@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import get from 'lodash/get';
+
 import { connect } from 'react-redux';
-import { Card, Divider, Skeleton } from 'antd';
+import { Card, Divider, Skeleton, Button, Tooltip, Icon } from 'antd';
 import {
 	getDefaultSettings,
 	putSettings,
@@ -10,7 +11,7 @@ import {
 	getSettings as getSearchRelevancy,
 	setLocalRelevancyState,
 } from '../../batteries/modules/actions';
-import { getFieldWeight, getSubFields } from '../../utils';
+import { getSubFields } from '../../utils';
 import { allowedTiers } from '../../utils/prop-types';
 import { isValidPlan } from '../../batteries/utils';
 import { container } from '../ResultsPage/styles';
@@ -19,6 +20,7 @@ import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Overlay from '../../components/Overlay';
 import SettingsOptions from './components/SettingsOptions';
 import FieldWeights from './components/FieldsWeight';
+import MappingWrapper from '../../components/MappingsWrapper';
 
 const bannerDetails = {
 	title: 'Search Settings',
@@ -111,38 +113,22 @@ class SearchSettingsPage extends React.Component {
 
 	init = (settings) => {
 		const { appName, updateLocalRelevancy } = this.props;
-		const searchSettings = get(settings, 'search', {});
 
-		const fields = get(searchSettings, 'dataField', []);
-		const weights = get(searchSettings, 'fieldWeights', []);
-
-		const fieldWeights = fields.reduce((agg, item, index) => {
-			return {
-				...agg,
-				[item]: get(weights, index, getFieldWeight(item.split('.').pop(), 1)),
-			};
-		}, {});
-
-		updateLocalRelevancy(appName, {
-			...settings,
-			search: {
-				...searchSettings,
-				fieldWeights,
-			},
-		});
+		updateLocalRelevancy(appName, { ...settings });
 	};
 
 	handleFieldWeights = ({ field, weight, mapping }) => {
 		const { localRelevancy, appName, updateLocalRelevancy } = this.props;
-		const { fieldWeights, enableSynonyms, enableNgram, hasLanguage } = get(
-			localRelevancy,
-			`${appName}.search`,
-		);
+		const { dataField, fieldWeights, hasLanguage } = get(localRelevancy, `${appName}.search`);
+
+		const { enableNgram } = get(localRelevancy, `${appName}.indexSettings`);
+		const { enabled: enableSynonyms } = get(localRelevancy, `${appName}.synonyms`);
+
 		const updatedFields = getSubFields({
 			fields: get(mapping, 'fields'),
 			weight,
 			address: field,
-			skipSearch: enableNgram,
+			skipSearch: !enableNgram,
 			skipLang: !hasLanguage,
 			skipSynonyms: !enableSynonyms,
 		});
@@ -151,20 +137,23 @@ class SearchSettingsPage extends React.Component {
 			...get(localRelevancy, appName),
 			search: {
 				...get(localRelevancy, `${appName}.search`, {}),
-				fieldWeights: {
-					...fieldWeights,
-					...updatedFields,
-				},
+				dataField: Object.keys(updatedFields),
+				fieldWeights: Object.values(updatedFields),
 			},
 		});
 	};
 
 	// ref to older version: https://github.com/appbaseio-confidential/arc-dashboard/blob/72869b13cf6daf78af7d91eafc480c6894a4f36c/src/pages/SearchSettingsPage/SearchSettings.js#L473
-	handleRemoveFromSearch = ({ setMapping, field, flattenUsecase }) => {
-		const nestedFields = Object.keys(flattenUsecase).filter((i) => i.indexOf(`${field}.`) > -1);
+	handleRemoveFromSearch = ({ setMapping, field, flattenUsecase, mapping }) => {
+		const { appName, localRelevancy, updateLocalRelevancy } = this.props;
+		const { fieldWeights, hasLanguage, dataField } = get(localRelevancy, `${appName}.search`);
 
+		const { enableNgram } = get(localRelevancy, `${appName}.indexSettings`);
+		const { enabled: enableSynonyms } = get(localRelevancy, `${appName}.synonyms`);
+		const nestedFields = Object.keys(flattenUsecase).filter((i) => i.indexOf(`${field}.`) > -1);
+		let newMappings = [];
 		if (nestedFields.length) {
-			const newMappings = nestedFields.map((i) => {
+			newMappings = nestedFields.map((i) => {
 				if (flattenUsecase[i] === 'search' || flattenUsecase[i] === 'searchaggs') {
 					return {
 						usecase: 'aggs',
@@ -174,19 +163,71 @@ class SearchSettingsPage extends React.Component {
 				}
 				return null;
 			});
-			setMapping(newMappings.filter((i) => Boolean(i)));
+			newMappings = newMappings.filter((i) => Boolean(i));
 		} else {
-			setMapping([
+			newMappings = [
 				{
 					usecase: 'aggs',
 					path: field,
 					type: 'text',
 				},
-			]);
+			];
 		}
+
+		const fields = nestedFields.length ? nestedFields : [field];
+
+		console.log(fields);
+
+		const fiedsWithSubFields = fields.reduce((agg, f) => {
+			const subFields = getSubFields({
+				fields: get(mapping, 'fields'),
+				weight: 1,
+				address: f,
+				skipSearch: !enableNgram,
+				skipLang: !hasLanguage,
+				skipSynonyms: !enableSynonyms,
+			});
+			return {
+				...agg,
+				...subFields,
+			};
+		}, {});
+
+		console.log(fiedsWithSubFields);
+
+		const fieldNames = Object.keys(fiedsWithSubFields);
+
+		console.log(fieldNames);
+		let updatedDataField = [...dataField];
+		const updatedFieldWeights = [...fieldWeights];
+
+		updatedDataField = updatedDataField.filter((f, i) => {
+			if (fieldNames.includes(f)) {
+				updatedFieldWeights.splice(i, 1);
+				return false;
+			}
+
+			return true;
+		});
+
+		updateLocalRelevancy(appName, {
+			...get(localRelevancy, appName),
+			search: {
+				...get(localRelevancy, `${appName}.search`, {}),
+				dataField: updatedDataField,
+				fieldWeights: updatedFieldWeights,
+			},
+		});
+		setMapping(newMappings);
+		// remove all this fields from dataField + fieldWeights
 	};
 
-	updateToSearchField = ({ field, setMapping }) => {
+	updateToSearchField = ({ field, setMapping, mapping }) => {
+		const { localRelevancy, appName, updateLocalRelevancy } = this.props;
+		const { fieldWeights, hasLanguage, dataField } = get(localRelevancy, `${appName}.search`);
+		const { enableNgram } = get(localRelevancy, `${appName}.indexSettings`);
+		const { enabled: enableSynonyms } = get(localRelevancy, `${appName}.synonyms`);
+
 		setMapping([
 			{
 				usecase: 'searchaggs',
@@ -194,6 +235,25 @@ class SearchSettingsPage extends React.Component {
 				type: 'text',
 			},
 		]);
+
+		// add to dataField & fieldWeights
+		const newFields = getSubFields({
+			fields: get(mapping, 'fields'),
+			weight: 0,
+			address: field,
+			skipSearch: !enableNgram,
+			skipLang: !hasLanguage,
+			skipSynonyms: !enableSynonyms,
+		});
+
+		updateLocalRelevancy(appName, {
+			...get(localRelevancy, appName),
+			search: {
+				...get(localRelevancy, `${appName}.search`, {}),
+				dataField: [...dataField, ...Object.keys(newFields)],
+				fieldWeights: [...fieldWeights, ...Object.values(newFields)],
+			},
+		});
 	};
 
 	render() {
@@ -225,10 +285,14 @@ class SearchSettingsPage extends React.Component {
 			);
 		}
 
-		const { fieldWeights, fuzziness, queryFormat, queryString, searchOperators } = get(
-			localRelevancy,
-			`${appName}.search`,
-		);
+		const {
+			dataField,
+			fieldWeights,
+			fuzziness,
+			queryFormat,
+			queryString,
+			searchOperators,
+		} = get(localRelevancy, `${appName}.search`);
 
 		const { enableNgram } = get(localRelevancy, `${appName}.indexSettings`);
 		const { enabled: enableSynonyms } = get(localRelevancy, `${appName}.synonyms`);
@@ -238,12 +302,37 @@ class SearchSettingsPage extends React.Component {
 				<Banner {...bannerDetails} />
 				<div className={container}>
 					<Card>
-						<FieldWeights
-							fieldWeights={fieldWeights}
-							handleFieldWeights={this.handleFieldWeights}
-							handleDelete={this.handleRemoveFromSearch}
-							updateToSearchField={this.updateToSearchField}
-						/>
+						<MappingWrapper>
+							{(mappingWrapperProps) => (
+								<>
+									<Tooltip title="Fetch latest Mappings">
+										<Button
+											style={{ marginRight: 8, color: '#1890ff' }}
+											onClick={mappingWrapperProps.reloadMappings}
+										>
+											<Icon type="reload" />
+											Reload Mappings
+										</Button>
+									</Tooltip>
+									<div style={{ marginTop: 20 }}>
+										{get(mappingWrapperProps, 'isFetchingSetting') ||
+										get(mappingWrapperProps, 'isFetchingMapping') ? (
+											<Skeleton />
+										) : (
+											<FieldWeights
+												fieldWeights={fieldWeights}
+												dataField={dataField}
+												handleFieldWeights={this.handleFieldWeights}
+												handleDelete={this.handleRemoveFromSearch}
+												updateToSearchField={this.updateToSearchField}
+												mappingWrapperProps={mappingWrapperProps}
+											/>
+										)}
+									</div>
+								</>
+							)}
+						</MappingWrapper>
+
 						<Divider />
 						<SettingsOptions
 							handleChange={this.handleChange}
