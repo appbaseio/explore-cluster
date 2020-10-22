@@ -61,12 +61,7 @@ class SettingsFooter extends React.Component {
 							) : null}
 						</React.Fragment>
 					</div>
-					<div style={{ display: 'flex', alignItems: 'center' }}>
-						<ReviewAndSave />
-						<Button style={{ marginRight: 10 }} size="large">
-							Reset To Default Settings
-						</Button>
-					</div>
+					<ReviewAndSave />
 				</div>
 			</div>
 		);
