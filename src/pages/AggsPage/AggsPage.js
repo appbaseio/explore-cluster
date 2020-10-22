@@ -19,6 +19,7 @@ import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Overlay from '../../components/Overlay';
 import SettingsOptions from './components/SettingsOptions';
 import FieldsType from './components/FieldsType';
+import SettingsFooter from '../../components/SettingsFooter';
 
 const bannerDetails = {
 	title: 'Aggregation Settings',
@@ -156,6 +157,7 @@ class AggsPage extends React.Component {
 							queryFormat={queryFormat}
 						/>
 					</Card>
+					<SettingsFooter />
 				</div>
 			</>
 		);

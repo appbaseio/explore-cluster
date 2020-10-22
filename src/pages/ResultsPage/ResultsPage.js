@@ -23,6 +23,7 @@ import Overlay from '../../components/Overlay';
 import { allowedTiers } from '../../utils/prop-types';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
+import SettingsFooter from '../../components/SettingsFooter';
 
 const bannerDetails = {
 	title: 'Result Settings',
@@ -414,6 +415,7 @@ class ResultsPage extends React.Component {
 								)}
 							</Card>
 						</ErrorToaster>
+						<SettingsFooter />
 					</Form>
 				</div>
 			</>

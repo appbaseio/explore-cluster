@@ -27,6 +27,7 @@ import { removeWhiteSpaces } from '../../utils';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 import { languages } from '../../constants/es-languages';
+import SettingsFooter from '../../components/SettingsFooter';
 
 const fallback = {
 	chinese: 'Needs smartcn analyzer installed.',
@@ -249,6 +250,7 @@ class LanguageSettings extends React.Component {
 							</ErrorToaster>
 						</Card>
 					</Form>
+					<SettingsFooter />
 				</div>
 			</>
 		);

@@ -22,6 +22,7 @@ import Overlay from '../../components/Overlay';
 import SettingsOptions from './components/SettingsOptions';
 import FieldWeights from './components/FieldsWeight';
 import MappingWrapper from '../../components/MappingsWrapper';
+import SettingsFooter from '../../components/SettingsFooter';
 
 const bannerDetails = {
 	title: 'Search Settings',
@@ -349,6 +350,7 @@ class SearchSettingsPage extends React.Component {
 							queryType={getqueryFormat({ queryString, searchOperators })}
 						/>
 					</Card>
+					<SettingsFooter />
 				</div>
 			</div>
 		);
