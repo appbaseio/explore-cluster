@@ -177,7 +177,10 @@ class Main extends React.Component {
 					noResults: get(formValue, 'customMessages.noResultItem'),
 				},
 				showDescription: true,
-				rsConfig: {},
+				rsConfig: {
+					pagination: get(formValue, 'showPagination'),
+					infiniteScroll: get(formValue, 'showInfiniteScroll'),
+				},
 			},
 			searchSettings: {
 				showPopularSearches: get(formValue, 'showPopularSearches'),
