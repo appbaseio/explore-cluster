@@ -1,8 +1,7 @@
 import React from 'react';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
-import connect from 'react-redux';
-import isEqual from 'lodash/isEqual';
+import { connect } from 'react-redux';
 import { css } from 'react-emotion';
 import { Icon, Tooltip, Empty, Row, Col, InputNumber, Select } from 'antd';
 import { getSubFields } from '../../../utils';
@@ -41,31 +40,33 @@ const mappingHeaderRight = [
 
 const { Option } = Select;
 
+const getFieldWeightMap = ({ fieldWeights, dataField }) => {
+	const fieldWeightMap = dataField.reduce((agg, field, index) => {
+		return {
+			...agg,
+			[field]: fieldWeights[index],
+		};
+	}, {});
+	return fieldWeightMap;
+};
 class FieldWeights extends React.Component {
 	state = {
 		aggs: [],
-		fieldWeightMap: {},
 	};
 
 	componentDidMount() {
-		console.log('mounting again...');
-		// updateWeights for searchable fields
+		// updateWeights for searchable fields initially
+		// this will show fields in the UI with weight 1 if the no data fields are set!
+		this.updateFieldWeights();
 
 		// get aggsFields
 		this.getAggsField();
 
 		// save initial field weights if empty
-		this.convertFieldWeight();
 	}
 
-	componentDidUpdate(prevProps) {
-		const { fieldWeights, dataField } = this.props;
-		if (
-			!isEqual(fieldWeights, prevProps.fieldWeights) ||
-			!isEqual(dataField, prevProps.dataField)
-		) {
-			this.convertFieldWeight();
-		}
+	componentDidUpdate() {
+		this.updateFieldWeights();
 	}
 
 	updateFieldWeights = () => {
@@ -77,32 +78,43 @@ class FieldWeights extends React.Component {
 			localRelevancy,
 			updateLocalRelevancy,
 		} = this.props;
-		if (!fieldWeights.length || !dataField.length) {
-			const {
-				flattenUsecase,
-				mappings,
-				enableNgram,
-				enableSynonyms,
-				hasLanguage,
-			} = mappingWrapperProps;
+		const {
+			flattenUsecase,
+			mappings,
+			isFetchingMapping,
+			isFetchingSetting,
+		} = mappingWrapperProps;
+		if (
+			(!fieldWeights.length || !dataField.length) &&
+			!isFetchingMapping &&
+			!isFetchingSetting &&
+			flattenUsecase
+		) {
 			const fieldDataTuple = Object.keys(flattenUsecase).reduce(
 				(agg, item) => {
 					if (
 						flattenUsecase[item] === 'search' ||
 						flattenUsecase[item] === 'searchaggs'
 					) {
+						const { enableNgram } = get(localRelevancy, `${appName}.indexSettings`);
+						const { enabled: enableSynonyms } = get(
+							localRelevancy,
+							`${appName}.synonyms`,
+						);
+						const { language } = get(localRelevancy, `${appName}.language`);
+
 						const fields = getSubFields({
-							fields: get(mappings, 'fields'),
+							fields: get(getMappingsByPath({ mappings, path: item }), 'fields'),
 							weight: 1,
 							address: item,
 							skipSearch: !enableNgram,
-							skipLang: !hasLanguage,
+							skipLang: !language,
 							skipSynonyms: !enableSynonyms,
 						});
 
 						return [
-							[...agg[0], Object.keys(fields)],
-							[...agg[1], Object.values(fields)],
+							[...agg[0], ...Object.keys(fields)],
+							[...agg[1], ...Object.values(fields)],
 						];
 					}
 
@@ -120,19 +132,6 @@ class FieldWeights extends React.Component {
 				},
 			});
 		}
-	};
-
-	convertFieldWeight = () => {
-		const { fieldWeights, dataField } = this.props;
-		const fieldWeightMap = dataField.reduce((agg, field, index) => {
-			return {
-				...agg,
-				[field]: fieldWeights[index],
-			};
-		}, {});
-		this.setState({
-			fieldWeightMap,
-		});
 	};
 
 	getAggsField = () => {
@@ -155,12 +154,13 @@ class FieldWeights extends React.Component {
 		usecase,
 		type,
 		mappings,
+		fieldWeightMap,
 		path = '',
 		init = false,
 	}) => {
 		const { mappingWrapperProps, handleDelete, handleFieldWeights } = this.props;
 		const { flattenUsecase, setMapping } = mappingWrapperProps;
-		const { fieldWeightMap } = this.state;
+
 		if (init && (!usecase || Object.keys(usecase).length === 0)) {
 			return (
 				<Empty
@@ -186,6 +186,7 @@ class FieldWeights extends React.Component {
 								field: deletePath,
 								setMapping,
 								flattenUsecase,
+								mappings,
 							})
 						}
 						view={VIEWS.SEARCH}
@@ -195,6 +196,7 @@ class FieldWeights extends React.Component {
 							type: typeVal,
 							path: `${path}${field}.`,
 							mappings,
+							fieldWeightMap,
 						})}
 					</ObjectField>
 				);
@@ -234,7 +236,7 @@ class FieldWeights extends React.Component {
 							field: deletePath,
 							setMapping,
 							flattenUsecase,
-							mapping: mappings,
+							mappings,
 						})
 					}
 				/>
@@ -244,8 +246,9 @@ class FieldWeights extends React.Component {
 
 	render() {
 		const { aggs } = this.state;
-		const { mappingWrapperProps, updateToSearchField } = this.props;
+		const { mappingWrapperProps, updateToSearchField, fieldWeights, dataField } = this.props;
 		const { usecase, type, mappings, setMapping } = mappingWrapperProps;
+		const fieldWeightMap = getFieldWeightMap({ fieldWeights, dataField });
 		return (
 			<React.Fragment>
 				<div>
@@ -295,6 +298,7 @@ class FieldWeights extends React.Component {
 								type,
 								init: true,
 								mappings,
+								fieldWeightMap,
 							})}
 						</div>
 					</>

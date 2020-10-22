@@ -13,6 +13,7 @@ import {
 } from '../../batteries/modules/actions';
 import { getSubFields } from '../../utils';
 import { allowedTiers } from '../../utils/prop-types';
+import { getMappingsByPath } from '../../utils/mappings';
 import { isValidPlan } from '../../batteries/utils';
 import { container } from '../ResultsPage/styles';
 
@@ -119,38 +120,43 @@ class SearchSettingsPage extends React.Component {
 
 	handleFieldWeights = ({ field, weight, mapping }) => {
 		const { localRelevancy, appName, updateLocalRelevancy } = this.props;
-		const { dataField, fieldWeights, hasLanguage } = get(localRelevancy, `${appName}.search`);
+		const { dataField, fieldWeights } = get(localRelevancy, `${appName}.search`);
 
 		const { enableNgram } = get(localRelevancy, `${appName}.indexSettings`);
 		const { enabled: enableSynonyms } = get(localRelevancy, `${appName}.synonyms`);
-
+		const { language } = get(localRelevancy, `${appName}.language`);
 		const updatedFields = getSubFields({
 			fields: get(mapping, 'fields'),
 			weight,
 			address: field,
 			skipSearch: !enableNgram,
-			skipLang: !hasLanguage,
+			skipLang: !language,
 			skipSynonyms: !enableSynonyms,
+		});
+		const updatedDataFields = Object.keys(updatedFields);
+		updatedDataFields.forEach((item) => {
+			const fieldIndex = dataField.findIndex((x) => x === item);
+			fieldWeights[fieldIndex] = updatedFields[item];
 		});
 
 		updateLocalRelevancy(appName, {
 			...get(localRelevancy, appName),
 			search: {
 				...get(localRelevancy, `${appName}.search`, {}),
-				dataField: Object.keys(updatedFields),
-				fieldWeights: Object.values(updatedFields),
+				fieldWeights,
 			},
 		});
 	};
 
 	// ref to older version: https://github.com/appbaseio-confidential/arc-dashboard/blob/72869b13cf6daf78af7d91eafc480c6894a4f36c/src/pages/SearchSettingsPage/SearchSettings.js#L473
-	handleRemoveFromSearch = ({ setMapping, field, flattenUsecase, mapping }) => {
+	handleRemoveFromSearch = ({ setMapping, field, flattenUsecase, mappings }) => {
 		const { appName, localRelevancy, updateLocalRelevancy } = this.props;
-		const { fieldWeights, hasLanguage, dataField } = get(localRelevancy, `${appName}.search`);
+		const { fieldWeights, dataField } = get(localRelevancy, `${appName}.search`);
 
 		const { enableNgram } = get(localRelevancy, `${appName}.indexSettings`);
 		const { enabled: enableSynonyms } = get(localRelevancy, `${appName}.synonyms`);
 		const nestedFields = Object.keys(flattenUsecase).filter((i) => i.indexOf(`${field}.`) > -1);
+		const { language } = get(localRelevancy, `${appName}.language`);
 		let newMappings = [];
 		if (nestedFields.length) {
 			newMappings = nestedFields.map((i) => {
@@ -176,15 +182,13 @@ class SearchSettingsPage extends React.Component {
 
 		const fields = nestedFields.length ? nestedFields : [field];
 
-		console.log(fields);
-
 		const fiedsWithSubFields = fields.reduce((agg, f) => {
 			const subFields = getSubFields({
-				fields: get(mapping, 'fields'),
+				fields: get(getMappingsByPath({ mappings, path: f }), 'fields'),
 				weight: 1,
 				address: f,
 				skipSearch: !enableNgram,
-				skipLang: !hasLanguage,
+				skipLang: !language,
 				skipSynonyms: !enableSynonyms,
 			});
 			return {
@@ -193,21 +197,22 @@ class SearchSettingsPage extends React.Component {
 			};
 		}, {});
 
-		console.log(fiedsWithSubFields);
-
 		const fieldNames = Object.keys(fiedsWithSubFields);
 
-		console.log(fieldNames);
 		let updatedDataField = [...dataField];
-		const updatedFieldWeights = [...fieldWeights];
-
+		let updatedFieldWeights = [...fieldWeights];
+		const indices = [];
 		updatedDataField = updatedDataField.filter((f, i) => {
 			if (fieldNames.includes(f)) {
-				updatedFieldWeights.splice(i, 1);
+				indices.push(i);
 				return false;
 			}
 
 			return true;
+		});
+
+		updatedFieldWeights = updatedFieldWeights.filter((w, i) => {
+			return indices.indexOf(i) === -1;
 		});
 
 		updateLocalRelevancy(appName, {
@@ -224,9 +229,10 @@ class SearchSettingsPage extends React.Component {
 
 	updateToSearchField = ({ field, setMapping, mapping }) => {
 		const { localRelevancy, appName, updateLocalRelevancy } = this.props;
-		const { fieldWeights, hasLanguage, dataField } = get(localRelevancy, `${appName}.search`);
+		const { fieldWeights, dataField } = get(localRelevancy, `${appName}.search`);
 		const { enableNgram } = get(localRelevancy, `${appName}.indexSettings`);
 		const { enabled: enableSynonyms } = get(localRelevancy, `${appName}.synonyms`);
+		const { language } = get(localRelevancy, `${appName}.language`);
 
 		setMapping([
 			{
@@ -238,11 +244,11 @@ class SearchSettingsPage extends React.Component {
 
 		// add to dataField & fieldWeights
 		const newFields = getSubFields({
-			fields: get(mapping, 'fields'),
+			fields: get(mapping, `${field}.fields`),
 			weight: 0,
 			address: field,
 			skipSearch: !enableNgram,
-			skipLang: !hasLanguage,
+			skipLang: !language,
 			skipSynonyms: !enableSynonyms,
 		});
 

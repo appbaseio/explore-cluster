@@ -28,7 +28,6 @@ class MappingsWrapper extends React.Component {
 		flattenUsecase: null,
 		deletedPaths: [],
 		originalType: null,
-		originalUseCase: null,
 	};
 
 	componentDidMount() {
