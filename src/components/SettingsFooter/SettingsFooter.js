@@ -4,14 +4,23 @@ import { Button } from 'antd';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import SearchPreviewModal from '../SearchPreviewModal';
-// import CloneIndex from '../CloneIndex';
+import CloneIndex from '../CloneIndex';
 import ReviewAndSave from '../ReviewAndSave';
 
 class SettingsFooter extends React.Component {
-	componentDidMount() {}
+	state = {
+		copySettingsModal: false,
+	};
+
+	toggleCopySettingsModal = () => {
+		this.setState((state) => ({
+			copySettingsModal: !state.copySettingsModal,
+		}));
+	};
 
 	render() {
 		const { appName, collapsed, localRelevancy } = this.props;
+		const { copySettingsModal } = this.state;
 		return (
 			<div
 				style={{
@@ -36,6 +45,21 @@ class SettingsFooter extends React.Component {
 								}}
 							/>
 						)}
+						<React.Fragment>
+							<Button
+								onClick={this.toggleCopySettingsModal}
+								style={{ marginLeft: 10 }}
+								size="large"
+							>
+								Copy Search Settings
+							</Button>
+							{copySettingsModal ? (
+								<CloneIndex
+									handleCancel={this.toggleCopySettingsModal}
+									index={appName}
+								/>
+							) : null}
+						</React.Fragment>
 					</div>
 					<div style={{ display: 'flex', alignItems: 'center' }}>
 						<ReviewAndSave />
