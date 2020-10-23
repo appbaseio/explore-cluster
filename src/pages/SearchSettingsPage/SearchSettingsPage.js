@@ -71,7 +71,7 @@ class SearchSettingsPage extends React.Component {
 		} = this.props;
 
 		if (settings && !get(localRelevancy, appName)) {
-			this.init(settings);
+			this.init({ ...settings });
 		} else {
 			getSettingsAction(appName);
 		}
@@ -85,7 +85,8 @@ class SearchSettingsPage extends React.Component {
 		const { settings, isLoading } = this.props;
 
 		if (!isLoading && JSON.stringify(settings) !== JSON.stringify(prevProps.settings)) {
-			this.init(settings);
+			this.init({ ...settings });
+			console.log('setting from here....');
 		}
 	}
 
@@ -98,7 +99,6 @@ class SearchSettingsPage extends React.Component {
 			if (value) {
 				// add fields
 				const map = fieldLastIndexMap(updatedDataField, updatedFieldWeights);
-				console.log(map);
 				updatedDataField = [
 					...updatedDataField,
 					...Object.keys(map).map((i) => `${i}.synonyms`),
@@ -183,14 +183,15 @@ class SearchSettingsPage extends React.Component {
 
 	init = (settings) => {
 		const { appName, updateLocalRelevancy } = this.props;
-
-		updateLocalRelevancy(appName, { ...settings });
+		updateLocalRelevancy(appName, {
+			...settings,
+		});
 	};
 
 	handleFieldWeights = ({ field, weight, mapping }) => {
 		const { localRelevancy, appName, updateLocalRelevancy } = this.props;
-		const { dataField, fieldWeights } = get(localRelevancy, `${appName}.search`);
-
+		const dataField = [...get(localRelevancy, `${appName}.search.dataField`)];
+		const fieldWeights = [...get(localRelevancy, `${appName}.search.fieldWeights`)];
 		const { enableNgram } = get(localRelevancy, `${appName}.indexSettings`);
 		const { enabled: enableSynonyms } = get(localRelevancy, `${appName}.synonyms`);
 		const { language } = get(localRelevancy, `${appName}.language`);
@@ -212,7 +213,7 @@ class SearchSettingsPage extends React.Component {
 			...get(localRelevancy, appName),
 			search: {
 				...get(localRelevancy, `${appName}.search`, {}),
-				fieldWeights,
+				fieldWeights: [...fieldWeights],
 			},
 		});
 	};
@@ -360,14 +361,10 @@ class SearchSettingsPage extends React.Component {
 			);
 		}
 
-		const {
-			dataField,
-			fieldWeights,
-			fuzziness,
-			queryFormat,
-			queryString,
-			searchOperators,
-		} = get(localRelevancy, `${appName}.search`);
+		const { fuzziness, queryFormat, queryString, searchOperators } = get(
+			localRelevancy,
+			`${appName}.search`,
+		);
 
 		const { enableNgram } = get(localRelevancy, `${appName}.indexSettings`);
 		const { enabled: enableSynonyms } = get(localRelevancy, `${appName}.synonyms`);
@@ -395,8 +392,6 @@ class SearchSettingsPage extends React.Component {
 											<Skeleton />
 										) : (
 											<FieldWeights
-												fieldWeights={fieldWeights}
-												dataField={dataField}
 												handleFieldWeights={this.handleFieldWeights}
 												handleDelete={this.handleRemoveFromSearch}
 												updateToSearchField={this.updateToSearchField}

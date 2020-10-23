@@ -72,7 +72,7 @@ class ResultsPage extends React.Component {
 			localRelevancy,
 		} = this.props;
 		if (settings && !get(localRelevancy, appName)) {
-			this.init(settings);
+			this.init({ ...settings });
 		} else {
 			getSettingsAction(appName);
 		}
@@ -84,7 +84,7 @@ class ResultsPage extends React.Component {
 		const { settings, isLoading } = this.props;
 
 		if (!isLoading && JSON.stringify(settings) !== JSON.stringify(prevProps.settings)) {
-			this.init(settings);
+			this.init({ ...settings });
 		}
 	}
 

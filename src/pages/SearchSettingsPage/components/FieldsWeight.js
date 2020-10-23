@@ -61,8 +61,6 @@ class FieldWeights extends React.Component {
 
 		// get aggsFields
 		this.getAggsField();
-
-		// save initial field weights if empty
 	}
 
 	componentDidUpdate() {
@@ -70,20 +68,14 @@ class FieldWeights extends React.Component {
 	}
 
 	updateFieldWeights = () => {
-		const {
-			fieldWeights,
-			dataField,
-			mappingWrapperProps,
-			appName,
-			localRelevancy,
-			updateLocalRelevancy,
-		} = this.props;
+		const { mappingWrapperProps, appName, localRelevancy, updateLocalRelevancy } = this.props;
 		const {
 			flattenUsecase,
 			mappings,
 			isFetchingMapping,
 			isFetchingSetting,
 		} = mappingWrapperProps;
+		const { dataField, fieldWeights } = get(localRelevancy, `${appName}.search`);
 		if (
 			(!fieldWeights.length || !dataField.length) &&
 			!isFetchingMapping &&
@@ -246,8 +238,9 @@ class FieldWeights extends React.Component {
 
 	render() {
 		const { aggs } = this.state;
-		const { mappingWrapperProps, updateToSearchField, fieldWeights, dataField } = this.props;
+		const { mappingWrapperProps, updateToSearchField, appName, localRelevancy } = this.props;
 		const { usecase, type, mappings, setMapping } = mappingWrapperProps;
+		const { dataField, fieldWeights } = get(localRelevancy, `${appName}.search`);
 		const fieldWeightMap = getFieldWeightMap({ fieldWeights, dataField });
 		return (
 			<React.Fragment>
@@ -330,8 +323,6 @@ class FieldWeights extends React.Component {
 FieldWeights.propTypes = {
 	handleFieldWeights: PropTypes.func.isRequired,
 	handleDelete: PropTypes.func.isRequired,
-	fieldWeights: PropTypes.array.isRequired,
-	dataField: PropTypes.array.isRequired,
 	updateToSearchField: PropTypes.func.isRequired,
 	mappingWrapperProps: PropTypes.object.isRequired,
 	appName: PropTypes.string.isRequired,

@@ -1,3 +1,14 @@
+/**
+ * conditions in which mapping change should be called
+ * 1. enable / disable ngrams should re-index with/without .search field
+ * 2. change in number of searchable fields, because this could change the mapping
+ * 3. language change
+ *
+ * conditions in which setting change should be called
+ * 1. enable / disable diacricts should add / remove `asciifolding` filter from analyzer filters
+ * 2. language change with stop words / stemming exceptions
+ */
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -5,6 +16,8 @@ import { Button, Modal } from 'antd';
 import get from 'lodash/get';
 import { diff } from 'jsondiffpatch';
 import styled from 'react-emotion';
+
+import DiffList from './DiffList';
 
 const Badge = styled.span`
 	background: #f5222d;
@@ -28,7 +41,7 @@ const getDiffData = (oldObj, newObj) => {
 	}
 	const topLevelFields = Object.keys(diffData);
 
-	const counter = topLevelFields.reduce((agg, item) => {
+	const diffCount = topLevelFields.reduce((agg, item) => {
 		const data = diffData[item];
 		const count =
 			agg +
@@ -39,34 +52,13 @@ const getDiffData = (oldObj, newObj) => {
 		return count;
 	}, 0);
 
-	return [counter, diffData];
+	return [diffCount, diffData];
 };
 
 class ReviewAndSave extends React.Component {
 	state = {
 		isOpen: false,
-		diffCount: 0,
-		diffState: {},
 		resetting: false,
-	};
-
-	componentDidMount() {
-		// calculate the diff
-		const { localRelevancy } = this.props;
-		this.updateDiff(localRelevancy);
-	}
-
-	componentDidUpdate(prevProps) {
-		const { localRelevancy } = this.props;
-		if (JSON.stringify(localRelevancy) !== JSON.stringify(prevProps.localRelevancy)) {
-			this.updateDiff(localRelevancy);
-		}
-	}
-
-	updateDiff = () => {
-		const { settings, localRelevancy } = this.props;
-		const [counter, diffData] = getDiffData(settings, localRelevancy);
-		this.setState({ diffCount: counter, diffState: diffData });
 	};
 
 	showModal = () => {
@@ -95,8 +87,13 @@ class ReviewAndSave extends React.Component {
 	};
 
 	render() {
-		const { diffCount, isOpen, diffState, resetting } = this.state;
-		const { defaultSettings } = this.props;
+		const { isOpen, resetting } = this.state;
+		const { defaultSettings, settings, localRelevancy, appName } = this.props;
+		const [diffCount, diffData] = resetting
+			? getDiffData(settings, defaultSettings)
+			: getDiffData(settings, get(localRelevancy, `${appName}`));
+
+		console.log('here....', settings, localRelevancy);
 
 		return (
 			<>
@@ -117,6 +114,7 @@ class ReviewAndSave extends React.Component {
 						style={{ marginRight: 10 }}
 						size="large"
 						onClick={this.onResetToDefault}
+						disabled={!diffCount}
 					>
 						Reset To Default Settings
 					</Button>
@@ -127,10 +125,13 @@ class ReviewAndSave extends React.Component {
 						resetting ? 'Reset To Default Settings' : 'Review Settings Before Deploying'
 					}
 					onOk={() => {}}
+					width={1000}
+					style={{
+						top: 20,
+					}}
 					onCancel={this.handleCancel}
 				>
-					{JSON.stringify(defaultSettings)}
-					{JSON.stringify(diffState)}
+					{isOpen && <DiffList diff={diffData} />}
 				</Modal>
 			</>
 		);
@@ -141,6 +142,7 @@ ReviewAndSave.propTypes = {
 	localRelevancy: PropTypes.object.isRequired,
 	settings: PropTypes.object.isRequired,
 	defaultSettings: PropTypes.object,
+	appName: PropTypes.string.isRequired,
 };
 
 ReviewAndSave.defaultProps = {
@@ -149,11 +151,11 @@ ReviewAndSave.defaultProps = {
 
 const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');
-	const localRelevancy = get(state, `$getLocalRelevancy.${appName}`);
+	const localRelevancy = get(state, `$getLocalRelevancy`);
 	const defaultSettings = get(state, `$getAppSettings.defaultSettings`);
-	console.log(defaultSettings);
 	const settings = get(state, ['$getAppSettings', 'settings', appName], defaultSettings);
 	return {
+		appName,
 		localRelevancy,
 		settings,
 		defaultSettings,

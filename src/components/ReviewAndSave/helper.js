@@ -1,5 +1,14 @@
 import React from 'react';
 
+export const relevancyTitles = {
+	language: 'Language Settings',
+	search: 'Search Settings',
+	indexSettings: 'Index Settings',
+	aggregations: 'Aggregation Settings',
+	results: 'Result Settings',
+	synonyms: 'Synonyms Settings',
+};
+
 const settingsMap = {
 	size: {
 		title: 'Page Size',

@@ -65,7 +65,7 @@ class LanguageSettings extends React.Component {
 		} = this.props;
 
 		if (settings && !get(localRelevancy, appName)) {
-			this.init(settings);
+			this.init({ ...settings });
 		} else {
 			getSettingsAction(appName);
 		}
@@ -77,7 +77,7 @@ class LanguageSettings extends React.Component {
 		const { settings, isLoading } = this.props;
 
 		if (!isLoading && JSON.stringify(settings) !== JSON.stringify(prevProps.settings)) {
-			this.init(settings);
+			this.init({ ...settings });
 		}
 	}
 
