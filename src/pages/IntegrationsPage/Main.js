@@ -52,6 +52,9 @@ class Main extends React.Component {
 			searchIcon: ['', validateURL],
 		}),
 		staticFilters: FormBuilder.group({
+			productType: getFilterConfigurationForm({
+				dataField: { value: '', disabled: true },
+			}),
 			collections: getFilterConfigurationForm({
 				dataField: { value: '', disabled: true },
 			}),
@@ -207,6 +210,24 @@ class Main extends React.Component {
 			},
 			facetSettings: {
 				staticFacets: [
+					...(get(formValue, 'staticFilters.productType.enabled')
+						? [
+								{
+									name: 'productType',
+									isCollapsible: true,
+									customMessages: {
+										loading: get(
+											formValue,
+											'customMessages.fetchingFilterOptions',
+										),
+										noResults: get(formValue, 'customMessages.noFilterItem'),
+									},
+									rsConfig: {
+										...get(formValue, 'staticFilters.productType.customize'),
+									},
+								},
+						  ]
+						: []),
 					...(get(formValue, 'staticFilters.collections.enabled')
 						? [
 								{

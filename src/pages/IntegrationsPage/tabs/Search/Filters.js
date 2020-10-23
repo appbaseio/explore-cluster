@@ -7,6 +7,11 @@ import DynamicFilters from './DynamicFilters';
 
 export const defaultSettings = [
 	{
+		id: 'productType',
+		label: 'Show product type filter (only works with Shopify apps)',
+		value: false,
+	},
+	{
 		id: 'collections',
 		label: 'Show collections filter (only works with Shopify apps)',
 		value: false,
