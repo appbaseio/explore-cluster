@@ -204,10 +204,32 @@ export const getInstallationScript = (preferences = {}, credentials) => `
 		},
 	}),
 )};</script>
-<div id="reactivesearch-shopify-1"></div>
+<div id="reactivesearch-shopify-1" ${
+	preferences.openWithModal ? `openWithModal="false"` : ''
+}></div>
 <link rel="stylesheet" href=${BaseCSSURL}>
 <script src=${BaseURL}></script>
-        `;
+		`;
+
+export const getInstallationHeadScript = (preferences = {}, credentials) => `
+<script>var PREFERENCES=${JSON.stringify(
+	JSON.stringify({
+		...preferences,
+		appbaseSettings: {
+			...get(preferences, 'appbaseSettings'),
+			credentials,
+		},
+	}),
+)};</script>
+<link rel="stylesheet" href=${BaseCSSURL}>
+		`;
+
+export const getInstallationBodyScript = (preferences = {}) => `
+<div id="reactivesearch-shopify-1" ${
+	preferences.openWithModal ? `openWithModal="false"` : ''
+}></div>
+<script src=${BaseURL}></script>
+		`;
 
 export const validateURL = (control) => {
 	if (control && control.value) {

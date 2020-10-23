@@ -65,6 +65,7 @@ class Main extends React.Component {
 		dynamicFilters: FormBuilder.array([]),
 		exportSettings: FormBuilder.group({
 			credentials: [undefined, Validators.required],
+			openWithModal: false,
 			type: 'other',
 		}),
 	});
@@ -319,6 +320,7 @@ class Main extends React.Component {
 					})),
 			},
 			exportType: get(formValue, 'exportSettings.type'),
+			openWithModal: get(formValue, 'exportSettings.openWithModal'),
 		};
 	};
 

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Button, Modal, Form } from 'antd';
-import { FieldGroup } from 'react-reactive-form';
+import { Button, Modal, Form, Switch } from 'antd';
+import { FieldGroup, FieldControl } from 'react-reactive-form';
 import { func } from 'prop-types';
 import ExportToShopify from './ExportToShopify';
 import ExportToOther from './ExportToOther';
@@ -97,6 +97,43 @@ class ExportModal extends React.Component {
 									You can get the API credentials from{' '}
 									<a href="credentials">API Credentials</a> page under{' '}
 									<strong>Access Control</strong>.
+									<FieldControl name="openWithModal">
+										{({ handler, value }) => (
+											<>
+												<Form.Item
+													label="The search will appear with a CTA button. Do you instead
+										want to show the search view directly?"
+												>
+													<Switch {...handler('checkbox')} />
+												</Form.Item>
+
+												{!value ? (
+													<>
+														<div>
+															By default, the above CTA is relatively
+															positioned. Place it in your DOM next to
+															the element where you want it to appear.
+															If you wish it to position it
+															absolutely, add a style attribute. For
+															example, the following snippet positions
+															it to the top left.
+														</div>
+														<div>
+															<pre
+																css={{
+																	background: '#eee',
+																	padding: '20px 20px',
+																	margin: '20px 0',
+																}}
+															>
+																{`<div id="reactivesearch-shopify-1" style="position:absolute;top:10px;left:10px;" />`}
+															</pre>
+														</div>
+													</>
+												) : null}
+											</>
+										)}
+									</FieldControl>
 								</Form>
 							)}
 						</Modal>
