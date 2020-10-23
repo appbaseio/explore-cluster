@@ -86,7 +86,6 @@ class SearchSettingsPage extends React.Component {
 
 		if (!isLoading && JSON.stringify(settings) !== JSON.stringify(prevProps.settings)) {
 			this.init({ ...settings });
-			console.log('setting from here....');
 		}
 	}
 

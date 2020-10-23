@@ -28,6 +28,7 @@ class MappingsWrapper extends React.Component {
 		flattenUsecase: null,
 		deletedPaths: [],
 		originalType: null,
+		originalUseCas: null,
 	};
 
 	componentDidMount() {
@@ -244,15 +245,31 @@ class MappingsWrapper extends React.Component {
 			appName,
 			localMapping,
 		} = this.props;
-		const { usecase, type, originalType, originalUseCase } = this.state;
+		const {
+			usecase,
+			mappings,
+			type,
+			flattenType,
+			flattenUsecase,
+			deletedPaths,
+			originalType,
+			originalUseCase,
+		} = this.state;
 		const hasMappingsChanged =
 			JSON.stringify(type) !== JSON.stringify(originalType) ||
 			JSON.stringify(usecase) !== JSON.stringify(originalUseCase);
 
 		return (
-			<div>
+			<div key={Date.now()}>
 				{children({
-					...this.state,
+					usecase,
+					mappings,
+					type,
+					flattenType,
+					flattenUsecase,
+					deletedPaths,
+					originalType,
+					originalUseCase,
 					error,
 					appName,
 					isFetchingMapping,
