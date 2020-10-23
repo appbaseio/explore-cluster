@@ -15,11 +15,6 @@ export const defaultSettings = [
 		value: true,
 	},
 	{
-		id: 'showInfiniteScroll',
-		label: 'Show infinite scroll',
-		value: true,
-	},
-	{
 		id: 'showPagination',
 		label: 'Show pagination',
 		value: false,

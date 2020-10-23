@@ -186,7 +186,7 @@ class Main extends React.Component {
 				showDescription: true,
 				rsConfig: {
 					pagination: get(formValue, 'showPagination'),
-					infiniteScroll: get(formValue, 'showInfiniteScroll'),
+					infiniteScroll: !get(formValue, 'showPagination'),
 				},
 			},
 			searchSettings: {
