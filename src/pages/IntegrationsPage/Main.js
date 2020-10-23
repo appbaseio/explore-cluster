@@ -8,21 +8,19 @@ import LayoutTab from './tabs/Layout';
 import SearchTab from './tabs/Search';
 import ChoosePlatformTab from './tabs/ChoosePlatform';
 import { container } from '../ResultsPage/styles';
-import { FormContext, validateURL, shopifyDefaultFields } from './utils';
+import {
+	FormContext,
+	validateURL,
+	shopifyDefaultFields,
+	getFilterConfigurationForm,
+	getDynamicFilterKey,
+} from './utils';
 import { getURL } from '../../constants/config';
 import PreviewModal from './PreviewModal';
 import ExportModal from './ExportModal';
 import SyncStatus from './SyncStatus';
 
 const { TabPane } = Tabs;
-
-const getFilterConfigurationForm = (customFields) => {
-	return FormBuilder.group({
-		title: undefined,
-		dataField: undefined,
-		...customFields,
-	});
-};
 
 class Main extends React.Component {
 	form = FormBuilder.group({
@@ -54,25 +52,14 @@ class Main extends React.Component {
 			searchIcon: ['', validateURL],
 		}),
 		staticFilters: FormBuilder.group({
-			collections: FormBuilder.group({
-				enabled: false,
-				customize: getFilterConfigurationForm({
-					dataField: { value: '', disabled: true },
-				}),
+			collections: getFilterConfigurationForm({
+				dataField: { value: '', disabled: true },
 			}),
-			color: FormBuilder.group({
-				enabled: false,
-				customize: getFilterConfigurationForm(),
-			}),
-			size: FormBuilder.group({
-				enabled: false,
-				customize: getFilterConfigurationForm(),
-			}),
-			price: FormBuilder.group({
-				enabled: false,
-				customize: getFilterConfigurationForm(),
-			}),
+			color: getFilterConfigurationForm(),
+			size: getFilterConfigurationForm(),
+			price: getFilterConfigurationForm(),
 		}),
+		dynamicFilters: FormBuilder.array([]),
 		exportSettings: FormBuilder.group({
 			credentials: [undefined, Validators.required],
 			type: 'other',
@@ -85,7 +72,20 @@ class Main extends React.Component {
 		const preferences = localStorage.getItem(this.storeKey, this.form.value);
 		if (preferences) {
 			try {
-				this.form.patchValue(JSON.parse(preferences));
+				const parsedPreferences = JSON.parse(preferences);
+				// Add controls for dynamic filters
+				if (get(parsedPreferences, 'dynamicFilters')) {
+					const dynamicFilterControl = this.form.get('dynamicFilters');
+					get(parsedPreferences, 'dynamicFilters').forEach(() => {
+						const control = getFilterConfigurationForm(null, true);
+						control.meta = {
+							key: getDynamicFilterKey(control),
+						};
+						dynamicFilterControl.push(control);
+					});
+				}
+				// Patch form value
+				this.form.patchValue(parsedPreferences);
 			} catch (e) {
 				console.warn('Error while syncing the preferences', e);
 			}
@@ -280,6 +280,22 @@ class Main extends React.Component {
 						  ]
 						: []),
 				],
+				dynamicFacets: get(formValue, 'dynamicFilters', [])
+					.filter((facet) => facet.enabled)
+					.map((filter, filterIndex) => ({
+						customMessages: {
+							loading: get(formValue, 'customMessages.fetchingFilterOptions'),
+							noResults: get(formValue, 'customMessages.noFilterItem'),
+						},
+						rsConfig: {
+							componentId: `${get(filter, 'customize.title', '').replace(
+								' ',
+								'_',
+							)}_${filterIndex}`,
+							...filter.customize,
+							filterLabel: get(filter, 'customize.title'),
+						},
+					})),
 			},
 			exportType: get(formValue, 'exportSettings.type'),
 		};

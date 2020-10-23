@@ -1,5 +1,6 @@
 import React from 'react';
 import get from 'lodash/get';
+import { FormBuilder, Validators } from 'react-reactive-form';
 import { css } from 'emotion';
 
 // eslint-disable-next-line
@@ -226,6 +227,21 @@ export const validateURL = (control) => {
 		}
 	}
 	return null;
+};
+
+export const getFilterConfigurationForm = (customFields = {}, isDynamicFilter = false) => {
+	return FormBuilder.group({
+		enabled: false,
+		customize: FormBuilder.group({
+			title: isDynamicFilter ? [undefined, Validators.required] : undefined,
+			dataField: isDynamicFilter ? [undefined, Validators.required] : undefined,
+			...customFields,
+		}),
+	});
+};
+
+export const getDynamicFilterKey = (pre = 'dynamic-filter-control') => {
+	return `${pre}_${new Date().getTime()}`;
 };
 
 export const shopifyDefaultFields = {
