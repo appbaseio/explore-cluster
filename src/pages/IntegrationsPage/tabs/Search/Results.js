@@ -16,7 +16,10 @@ export const defaultSettings = [
 	},
 	{
 		id: 'showPagination',
-		label: 'Show pagination',
+		label: (value) =>
+			value
+				? 'Pagination is enabled. Toggle to use an infinite scroll'
+				: 'Infinite scroll is enabled. Toggle to use pagination',
 		value: false,
 	},
 	{
@@ -92,7 +95,13 @@ const Results = () => (
 									: [<Switch checked={value} onChange={onChange} />]
 							}
 						>
-							<Item.Meta title={item.label} />
+							<Item.Meta
+								title={
+									typeof item.label === 'function'
+										? item.label(value)
+										: item.label
+								}
+							/>
 						</Item>
 					)}
 				</FieldControl>
