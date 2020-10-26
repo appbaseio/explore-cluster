@@ -224,11 +224,14 @@ export const getInstallationHeadScript = (preferences = {}, credentials) => `
 <link rel="stylesheet" href=${BaseCSSURL}>
 		`;
 
-export const getInstallationBodyScript = (preferences = {}) => `
-<div id="reactivesearch-shopify-1" ${
-	preferences.openWithModal ? `openWithModal="false"` : ''
-}></div>
+export const getInstallationBodyScript = () => `
 <script src=${BaseURL}></script>
+		`;
+
+export const getCTAScript = (preferences = {}) => `
+<div id="reactivesearch-shopify-1"${
+	preferences.openWithModal ? ` openWithModal="false"` : ''
+}></div>
 		`;
 
 export const validateURL = (control) => {
