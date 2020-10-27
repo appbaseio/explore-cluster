@@ -22,7 +22,7 @@ class StoreFrontPreview extends React.Component {
 		const { preferences } = this.props;
 		const div = this.iframeRef.current.contentDocument.createElement('div');
 		div.id = 'reactivesearch-shopify-1';
-		div.setAttribute('openwithmodal', false);
+		div.setAttribute('openaspage', true);
 		div.setAttribute('ispreview', true);
 		// Set preferences
 		this.iframeRef.current.contentWindow.PREFERENCES = JSON.stringify(preferences());
@@ -82,6 +82,7 @@ class StoreFrontPreview extends React.Component {
 				</Button>
 				<iframe
 					title="iframe-preview"
+					id="iframe-preview"
 					ref={this.iframeRef}
 					frameBorder="0"
 					style={{

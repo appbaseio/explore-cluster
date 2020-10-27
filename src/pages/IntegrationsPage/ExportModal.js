@@ -113,7 +113,7 @@ class ExportModal extends React.Component {
 										<strong>Access Control</strong>.
 									</div>
 
-									<FieldControl name="openWithModal">
+									<FieldControl name="openAsPage">
 										{({ handler }) => (
 											<>
 												<Form.Item

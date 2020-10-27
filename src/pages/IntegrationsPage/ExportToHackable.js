@@ -10,7 +10,7 @@ const copyToClipboard = () => {
 };
 
 const ctaDiv = `<div id="reactivesearch-shopify"></div>`;
-const ctaChange = `<div id="reactivesearch-shopify" openWithModal="false"></div>`;
+const ctaChange = `<div id="reactivesearch-shopify" openAsPage="true"></div>`;
 
 const ExportToHackable = ({ control, preferences }) => {
 	// Override user credentials to API credentials selected by user
@@ -69,7 +69,7 @@ const ExportToHackable = ({ control, preferences }) => {
 			</div>
 			<FieldGroup control={control}>
 				{() => (
-					<FieldControl name="openWithModal">
+					<FieldControl name="openAsPage">
 						{({ value }) =>
 							!value ? (
 								<div>

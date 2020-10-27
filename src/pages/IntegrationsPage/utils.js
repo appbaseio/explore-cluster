@@ -204,9 +204,7 @@ export const getInstallationScript = (preferences = {}, credentials) => `
 		},
 	}),
 )};</script>
-<div id="reactivesearch-shopify-1" ${
-	preferences.openWithModal ? `openWithModal="false"` : ''
-}></div>
+<div id="reactivesearch-shopify-1" ${preferences.openAsPage ? `openAsPage="true"` : ''}></div>
 <link rel="stylesheet" href=${BaseCSSURL}>
 <script src=${BaseURL}></script>
 		`;
@@ -229,9 +227,7 @@ export const getInstallationBodyScript = () => `
 		`;
 
 export const getCTAScript = (preferences = {}) => `
-<div id="reactivesearch-shopify-1"${
-	preferences.openWithModal ? ` openWithModal="false"` : ''
-}></div>
+<div id="reactivesearch-shopify-1"${preferences.openAsPage ? ` openAsPage="true"` : ''}></div>
 		`;
 
 export const getCSBScript = (preferences = {}, credentials) => `

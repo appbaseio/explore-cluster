@@ -91,7 +91,7 @@ const ExportToShopify = ({ control, preferences }) => {
 						</li>
 						<FieldGroup control={control}>
 							{() => (
-								<FieldControl name="openWithModal">
+								<FieldControl name="openAsPage">
 									{({ value }) =>
 										!value ? (
 											<li>

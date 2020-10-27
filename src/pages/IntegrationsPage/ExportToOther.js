@@ -84,7 +84,7 @@ const ExportToOther = ({ control, preferences }) => {
 			</div>
 			<FieldGroup control={control}>
 				{() => (
-					<FieldControl name="openWithModal">
+					<FieldControl name="openAsPage">
 						{({ value }) => (
 							<>
 								<div>

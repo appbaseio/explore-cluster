@@ -66,7 +66,7 @@ class Main extends React.Component {
 		exportSettings: FormBuilder.group({
 			exportAs: 'embed',
 			credentials: [undefined, Validators.required],
-			openWithModal: false,
+			openAsPage: false,
 			type: 'other',
 		}),
 	});
@@ -321,7 +321,7 @@ class Main extends React.Component {
 					})),
 			},
 			exportType: get(formValue, 'exportSettings.type'),
-			openWithModal: get(formValue, 'exportSettings.openWithModal'),
+			openAsPage: get(formValue, 'exportSettings.openAsPage'),
 		};
 	};
 
