@@ -5,7 +5,6 @@ import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import keys from 'lodash/keys';
-
 import { bool, func, object } from 'prop-types';
 import Loader from '../../components/Loader';
 import AppHeader from '../../components/AppHeader';
@@ -293,12 +292,27 @@ class DashboardWrapper extends Component {
 										</Menu.Item>
 									);
 								}
+
 								return (
 									<Menu.Item key={route}>
-										<Link replace to={routes[route].link}>
-											<Icon type={routes[route].icon} />
-											<span>{route}</span>
-										</Link>
+										{routes[route].openIndexMenu ? (
+											<IndexSwitcher
+												item={routes[route]}
+												filteredApps={filteredApps}
+												history={history}
+												renderItem={() => (
+													<div>
+														<Icon type={routes[route].icon} />
+														<span>{route}</span>
+													</div>
+												)}
+											/>
+										) : (
+											<Link replace to={routes[route].link}>
+												<Icon type={routes[route].icon} />
+												<span>{route}</span>
+											</Link>
+										)}
 									</Menu.Item>
 								);
 							})}
