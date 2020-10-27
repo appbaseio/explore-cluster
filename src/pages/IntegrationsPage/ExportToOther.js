@@ -14,7 +14,7 @@ const ExportToOther = ({ control, preferences }) => {
 	const credentials = control.get('credentials') ? control.get('credentials').value : undefined;
 	const installationHeadScript = getInstallationHeadScript(preferences(), credentials);
 	const installationBodyScript = getInstallationBodyScript(preferences());
-	const ctaScript = getCTAScript();
+	const ctaScript = getCTAScript(preferences());
 	return (
 		<React.Fragment>
 			<h2>Installation</h2>

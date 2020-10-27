@@ -1,0 +1,176 @@
+import React from 'react';
+import { func, object } from 'prop-types';
+import { Button, message } from 'antd';
+import { FieldControl, FieldGroup } from 'react-reactive-form';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { getCSBScript } from './utils';
+
+const copyToClipboard = () => {
+	message.success('Copied to clipboard', 5);
+};
+
+const ctaDiv = `<div id="reactivesearch-shopify"></div>`;
+const ctaChange = `<div id="reactivesearch-shopify" openWithModal="false"></div>`;
+
+const ExportToHackable = ({ control, preferences }) => {
+	// Override user credentials to API credentials selected by user
+	const credentials = control.get('credentials') ? control.get('credentials').value : undefined;
+	const installationHeadScript = getCSBScript(preferences(), credentials);
+	const ctaScript = `<div id="reactivesearch-shopify"></div>`;
+	return (
+		<React.Fragment>
+			<h2>Export to Codesandbox</h2>
+			<div
+				css={{
+					position: 'relative',
+					marginBottom: 25,
+				}}
+			>
+				Open code sandbox{' '}
+				<a
+					target="blank"
+					href="https://codesandbox.io/s/github/appbaseio/reactivesearch-shopify-plugin/tree/export-to-csb?file=/public/index.html"
+				>
+					link
+				</a>
+			</div>
+			<div>
+				Add this snippet within the <strong>head</strong> tag of <strong>index.html</strong>{' '}
+				to apply the preferences. You may need to reload the sandbox 1-2 times to take it
+				effect.
+			</div>
+			<div
+				css={{
+					position: 'relative',
+					marginBottom: 25,
+				}}
+			>
+				<CopyToClipboard text={installationHeadScript} onCopy={copyToClipboard}>
+					<Button
+						icon="copy"
+						shape="circle"
+						css={{
+							position: 'absolute',
+							right: 10,
+							top: 10,
+						}}
+					/>
+				</CopyToClipboard>
+
+				<pre
+					css={{
+						background: '#eee',
+						padding: '0 20px',
+						margin: '20px 0',
+					}}
+				>
+					{installationHeadScript}
+				</pre>
+			</div>
+			<FieldGroup control={control}>
+				{() => (
+					<FieldControl name="openWithModal">
+						{({ value }) =>
+							!value ? (
+								<div>
+									<div>
+										The following snippet in <strong>index.html</strong>{' '}
+										controls the positioning of the search CTA.
+									</div>
+
+									<div
+										css={{
+											position: 'relative',
+											marginBottom: 25,
+										}}
+									>
+										<CopyToClipboard text={ctaScript} onCopy={copyToClipboard}>
+											<Button
+												icon="copy"
+												shape="circle"
+												css={{
+													position: 'absolute',
+													right: 10,
+													top: 10,
+												}}
+											/>
+										</CopyToClipboard>
+										<div>
+											<pre
+												css={{
+													background: '#eee',
+													padding: '20px 20px',
+													margin: '20px 0',
+												}}
+											>
+												{ctaScript}
+											</pre>
+										</div>
+									</div>
+									<div>
+										By default, the above CTA is relatively positioned. If you
+										wish it to position it absolutely, add a style attribute.
+										For example, the following snippet positions it to the top
+										left.
+									</div>
+									<div>
+										<pre
+											css={{
+												background: '#eee',
+												padding: '20px 20px',
+												margin: '20px 0',
+											}}
+										>
+											{`<div id="reactivesearch-shopify" style="position:absolute;top:10px;left:10px;" />`}
+										</pre>
+									</div>
+								</div>
+							) : (
+								<div>
+									Replace the following snippet <strong>{ctaDiv}</strong> in{' '}
+									<strong>index.html</strong> to
+									<div
+										css={{
+											position: 'relative',
+											marginBottom: 25,
+										}}
+									>
+										<CopyToClipboard text={ctaChange} onCopy={copyToClipboard}>
+											<Button
+												icon="copy"
+												shape="circle"
+												css={{
+													position: 'absolute',
+													right: 10,
+													top: 10,
+												}}
+											/>
+										</CopyToClipboard>
+										<div>
+											<pre
+												css={{
+													background: '#eee',
+													padding: '20px 20px',
+													margin: '20px 0',
+												}}
+											>
+												{ctaChange}
+											</pre>
+										</div>
+									</div>
+								</div>
+							)
+						}
+					</FieldControl>
+				)}
+			</FieldGroup>
+		</React.Fragment>
+	);
+};
+
+ExportToHackable.propTypes = {
+	preferences: func.isRequired,
+	control: object.isRequired,
+};
+
+export default ExportToHackable;

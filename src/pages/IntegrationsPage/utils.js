@@ -234,6 +234,18 @@ export const getCTAScript = (preferences = {}) => `
 }></div>
 		`;
 
+export const getCSBScript = (preferences = {}, credentials) => `
+<script>var PREFERENCES=${JSON.stringify(
+	JSON.stringify({
+		...preferences,
+		appbaseSettings: {
+			...get(preferences, 'appbaseSettings'),
+			credentials,
+		},
+	}),
+)};</script>
+		`;
+
 export const validateURL = (control) => {
 	if (control && control.value) {
 		try {

@@ -1,9 +1,11 @@
 import React from 'react';
-import { Button, Modal, Form, Switch } from 'antd';
+import { Button, Modal, Form, Switch, Radio } from 'antd';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import { func } from 'prop-types';
+import get from 'lodash/get';
 import ExportToShopify from './ExportToShopify';
 import ExportToOther from './ExportToOther';
+import ExportToHackable from './ExportToHackable';
 import TextInput from '../../components/Form/Input';
 import { FormContext } from './utils';
 
@@ -13,13 +15,15 @@ class ExportModal extends React.Component {
 		showInstruction: false,
 	};
 
-	getComponentByValue(value) {
+	getComponentByValue(exportSettingsControl) {
 		const { preferences } = this.props;
-		const { get } = this.context;
-		if (value === 'shopify') {
-			return <ExportToShopify control={get('exportSettings')} preferences={preferences} />;
+		if (get(exportSettingsControl, 'value.exportAs') === 'hackable') {
+			return <ExportToHackable control={exportSettingsControl} preferences={preferences} />;
 		}
-		return <ExportToOther control={get('exportSettings')} preferences={preferences} />;
+		if (get(exportSettingsControl, 'value.type') === 'shopify') {
+			return <ExportToShopify control={exportSettingsControl} preferences={preferences} />;
+		}
+		return <ExportToOther control={exportSettingsControl} preferences={preferences} />;
 	}
 
 	showModal = () => {
@@ -53,9 +57,10 @@ class ExportModal extends React.Component {
 
 	render() {
 		const { visible, showInstruction } = this.state;
-		const { get } = this.context;
+		const { get: getControl } = this.context;
+		const exportSettingsControl = getControl('exportSettings');
 		return (
-			<FieldGroup strict={false} control={get('exportSettings')}>
+			<FieldGroup strict={false} control={exportSettingsControl}>
 				{({ invalid }) => (
 					<React.Fragment>
 						<Modal
@@ -71,13 +76,21 @@ class ExportModal extends React.Component {
 							width="calc(100% - 100px)"
 						>
 							{showInstruction ? (
-								this.getComponentByValue(
-									get('exportSettings.type')
-										? get('exportSettings.type').value
-										: '',
-								)
+								this.getComponentByValue(exportSettingsControl)
 							) : (
-								<Form>
+								<Form colon={false}>
+									<FieldControl name="exportAs">
+										{({ handler }) => (
+											<Form.Item label="Select export mode">
+												<Radio.Group {...handler()}>
+													<Radio value="embed">Embed Mode</Radio>
+													<Radio value="hackable">
+														Hackable Mode (Export as CodeSandbox)
+													</Radio>
+												</Radio.Group>
+											</Form.Item>
+										)}
+									</FieldControl>
 									<TextInput
 										name="credentials"
 										label="API Credentials"
@@ -85,18 +98,21 @@ class ExportModal extends React.Component {
 											placeholder: 'Enter API credentials',
 										}}
 									/>
-									API credentials allow secure access to the appbase.io clusters.
-									Check docs at{' '}
-									<a
-										target="blank"
-										href="https://docs.appbase.io/docs/security/credentials/"
-									>
-										here
-									</a>
-									. <br />
-									You can get the API credentials from{' '}
-									<a href="credentials">API Credentials</a> page under{' '}
-									<strong>Access Control</strong>.
+									<div style={{ marginBottom: 24 }}>
+										API credentials allow secure access to the appbase.io
+										clusters. Check docs at{' '}
+										<a
+											target="blank"
+											href="https://docs.appbase.io/docs/security/credentials/"
+										>
+											here
+										</a>
+										. <br />
+										You can get the API credentials from{' '}
+										<a href="credentials">API Credentials</a> page under{' '}
+										<strong>Access Control</strong>.
+									</div>
+
 									<FieldControl name="openWithModal">
 										{({ handler }) => (
 											<>

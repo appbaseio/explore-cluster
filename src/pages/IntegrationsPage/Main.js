@@ -64,6 +64,7 @@ class Main extends React.Component {
 		}),
 		dynamicFilters: FormBuilder.array([]),
 		exportSettings: FormBuilder.group({
+			exportAs: 'embed',
 			credentials: [undefined, Validators.required],
 			openWithModal: false,
 			type: 'other',
