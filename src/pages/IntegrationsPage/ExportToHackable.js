@@ -19,25 +19,24 @@ const ExportToHackable = ({ control, preferences }) => {
 	const ctaScript = `<div id="reactivesearch-shopify"></div>`;
 	return (
 		<React.Fragment>
-			<h2>Export to Codesandbox</h2>
+			<h2>Export to CodeSandbox</h2>
 			<div
 				css={{
 					position: 'relative',
 					marginBottom: 25,
 				}}
 			>
-				Open code sandbox{' '}
+				Open the CodeSandbox{' '}
 				<a
 					target="blank"
 					href="https://codesandbox.io/s/github/appbaseio/reactivesearch-shopify-plugin/tree/export-to-csb?file=/public/index.html"
 				>
-					link
-				</a>
+					link here
+				</a>.
 			</div>
 			<div>
-				Add this snippet within the <strong>head</strong> tag of <strong>index.html</strong>{' '}
-				to apply the preferences. You may need to reload the sandbox 1-2 times to take it
-				effect.
+				Add this snippet within the <strong>head</strong> tag of the <strong>index.html</strong>{' '}file
+				to apply the preferences.
 			</div>
 			<div
 				css={{
@@ -158,6 +157,7 @@ const ExportToHackable = ({ control, preferences }) => {
 											</pre>
 										</div>
 									</div>
+									<strong>Note:</strong> After applying the changes, save and reload the CodeSandbox to have them take effect.
 								</div>
 							)
 						}
