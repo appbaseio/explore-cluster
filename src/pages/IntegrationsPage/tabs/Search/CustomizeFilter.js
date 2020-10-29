@@ -51,7 +51,7 @@ class CustomizeFilter extends React.Component {
 				>
 					{({ pristine, invalid }) => (
 						<Modal
-							title="Customize Filter"
+							title="Set A Custom Filter"
 							visible={visible}
 							onOk={this.handleOk}
 							onCancel={this.handleCancel}

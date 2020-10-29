@@ -49,7 +49,7 @@ const CustomMessages = () => (
 								<strong>Search Icon</strong>
 								<Input
 									name="searchIcon"
-									placeholder="Enter URL for loading a custom search icon."
+									placeholder="Enter URL for loading a custom search icon"
 									css={{ marginTop: 5 }}
 									{...handler()}
 								/>
@@ -66,7 +66,7 @@ const CustomMessages = () => (
 						name="fetchingSuggestion"
 						render={({ handler }) => (
 							<div>
-								<strong>Suggestion Loading</strong>
+								<strong>Suggestions Loading</strong>
 								<br />
 								Shows while the suggestions are being fetched.
 								<br />
