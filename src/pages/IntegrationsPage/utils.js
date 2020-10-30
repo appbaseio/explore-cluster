@@ -206,7 +206,7 @@ export const getInstallationScript = (preferences = {}, credentials) => `
 )};</script>
 <div id="reactivesearch-shopify-1" ${preferences.openAsPage ? `openAsPage="true"` : ''}></div>
 <link rel="stylesheet" href=${BaseCSSURL}>
-<script src=${BaseURL}></script>
+<script defer src=${BaseURL}></script>
 		`;
 
 export const getInstallationHeadScript = (preferences = {}, credentials) => `
@@ -223,7 +223,7 @@ export const getInstallationHeadScript = (preferences = {}, credentials) => `
 		`;
 
 export const getInstallationBodyScript = () => `
-<script src=${BaseURL}></script>
+<script defer src=${BaseURL}></script>
 		`;
 
 export const getCTAScript = (preferences = {}) => `
