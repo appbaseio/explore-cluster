@@ -78,7 +78,7 @@
 		"webpack-dev-server": "^3.1.5"
 	},
 	"dependencies": {
-		"@appbaseio-confidential/importer": "git+https://1dc0d0fc07f05943afdde9bdb85b7aa438a0ce3b:x-oauth-basic@github.com/appbaseio-confidential/importer#importer/lib",
+		"@appbaseio-confidential/importer": "git+https://1dc0d0fc07f05943afdde9bdb85b7aa438a0ce3b:x-oauth-basic@github.com/appbaseio-confidential/importer#master",
 		"@appbaseio/dejavu-browser": "^3.4.7",
 		"@appbaseio/react-filter-box": "^3.4.1",
 		"@appbaseio/reactivecore": "^9.5.7",
@@ -107,6 +107,7 @@
 		"react-ace": "^6.1.4",
 		"react-animated-number": "^0.4.4",
 		"react-beautiful-dnd": "^12.2.0",
+		"react-color": "^2.18.1",
 		"react-copy-to-clipboard": "^5.0.1",
 		"react-dom": "^16.4.2",
 		"react-element-to-jsx-string": "^14.0.1",
