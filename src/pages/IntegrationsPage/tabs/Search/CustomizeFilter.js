@@ -1,6 +1,6 @@
 import React from 'react';
-import { Button, Modal, Form } from 'antd';
-import { string, object, func } from 'prop-types';
+import { Button, Modal, Switch, Form, Select } from 'antd';
+import { string, object, func, bool } from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import DataFieldSelector from '../../../../components/Form/DataFieldSelector';
 import TextInput from '../../../../components/Form/Input';
@@ -38,7 +38,7 @@ class CustomizeFilter extends React.Component {
 
 	render() {
 		const { visible } = this.state;
-		const { buttonLabel, control, buttonProps } = this.props;
+		const { buttonLabel, control, buttonProps, disableListOptions } = this.props;
 		return (
 			<React.Fragment>
 				<Button {...buttonProps} onClick={this.showModal}>
@@ -70,7 +70,7 @@ class CustomizeFilter extends React.Component {
 								</Button>,
 							]}
 						>
-							<Form>
+							<Form colon={false}>
 								<FieldControl name="dataField">
 									{(formControl) =>
 										formControl.disabled ? null : (
@@ -80,15 +80,100 @@ class CustomizeFilter extends React.Component {
 										)
 									}
 								</FieldControl>
-								<Form.Item>
-									<TextInput
-										name="title"
-										label="Title"
-										inputProps={{
-											placeholder: 'Enter title',
-										}}
-									/>
-								</Form.Item>
+								<TextInput
+									name="title"
+									label="Title"
+									inputProps={{
+										placeholder: 'Enter title',
+									}}
+								/>
+
+								{!disableListOptions ? (
+									<>
+										<TextInput
+											name="size"
+											label="Size"
+											inputProps={{
+												placeholder: 'Enter size',
+												type: 'number',
+											}}
+										/>
+										<FieldControl strict={false} name="queryFormat">
+											{({ handler }) => (
+												<Form.Item label="Query Format">
+													<Select {...handler()}>
+														<Select.Option key="or">Or</Select.Option>
+														<Select.Option key="and">And</Select.Option>
+													</Select>
+												</Form.Item>
+											)}
+										</FieldControl>
+										<FieldControl name="sortBy">
+											{({ handler }) => (
+												<Form.Item label="Sort By">
+													<Select {...handler()}>
+														<Select.Option key="count">
+															Count
+														</Select.Option>
+														<Select.Option key="asc">Asc</Select.Option>
+														<Select.Option key="desc">
+															Desc
+														</Select.Option>
+													</Select>
+												</Form.Item>
+											)}
+										</FieldControl>
+										<FieldControl name="showCount">
+											{({ handler }) => (
+												<Form.Item label="Show Count">
+													<Switch {...handler('checkbox')} />
+												</Form.Item>
+											)}
+										</FieldControl>
+										<FieldControl name="showCheckbox">
+											{({ handler }) => (
+												<Form.Item label="Show Checkbox">
+													<Switch {...handler('checkbox')} />
+												</Form.Item>
+											)}
+										</FieldControl>
+										<FieldControl name="showSearch">
+											{({ handler }) => (
+												<Form.Item label="Show Search">
+													<Switch {...handler('checkbox')} />
+												</Form.Item>
+											)}
+										</FieldControl>
+										<FieldControl name="showMissing">
+											{({ handler }) => (
+												<Form.Item label="Show Missing">
+													<Switch {...handler('checkbox')} />
+												</Form.Item>
+											)}
+										</FieldControl>
+										<TextInput
+											name="missingLabel"
+											label="Missing Label"
+											inputProps={{
+												placeholder: 'Enter missing label',
+											}}
+										/>
+										<TextInput
+											name="filterLabel"
+											label="Filter Label"
+											inputProps={{
+												placeholder: 'Enter filter label',
+											}}
+										/>
+										<TextInput
+											name="selectAllLabel"
+											label="Select All Label"
+											inputProps={{
+												placeholder: 'Enter label for select all option',
+											}}
+										/>
+									</>
+								) : null}
 							</Form>
 						</Modal>
 					)}
@@ -100,6 +185,7 @@ class CustomizeFilter extends React.Component {
 
 CustomizeFilter.defaultProps = {
 	buttonLabel: 'Customize',
+	disableListOptions: false,
 	control: null,
 	onSave: null,
 	onCancel: null,
@@ -107,6 +193,7 @@ CustomizeFilter.defaultProps = {
 };
 CustomizeFilter.propTypes = {
 	buttonLabel: string,
+	disableListOptions: bool,
 	buttonProps: object,
 	control: object,
 	onSave: func,

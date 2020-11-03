@@ -3,8 +3,8 @@ import { string, object } from 'prop-types';
 import { FieldControl } from 'react-reactive-form';
 import { Input, Form } from 'antd';
 
-const TextInput = ({ name, label, inputProps }) => (
-	<FieldControl name={name}>
+const TextInput = ({ name, control, label, inputProps }) => (
+	<FieldControl name={name} control={control}>
 		{({ touched, invalid, handler }) => (
 			<Form.Item label={label || name}>
 				<Input
@@ -25,12 +25,14 @@ const TextInput = ({ name, label, inputProps }) => (
 
 TextInput.defaultProps = {
 	label: '',
+	control: null,
 	inputProps: null,
 };
 
 TextInput.propTypes = {
 	name: string.isRequired,
 	inputProps: object,
+	control: object,
 	label: string,
 };
 
