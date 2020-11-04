@@ -234,6 +234,7 @@ class MappingsWrapper extends React.Component {
 			flattenType: updatedFlattenType,
 			flattenUsecase: updatedFlattenUsecase,
 		});
+		return updatedMappings;
 	};
 
 	render() {

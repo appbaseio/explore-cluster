@@ -100,8 +100,13 @@ class AggsPage extends React.Component {
 		const { localRelevancy, appName } = this.props;
 		const { dataField } = get(localRelevancy, `${appName}.aggregations`);
 		const pathVal = get(flattenType, path) === 'text' ? `${path}.keyword` : path;
-		delete dataField[pathVal];
-		this.handleChange('dataField', { ...dataField });
+
+		const clone = {
+			...dataField,
+		};
+
+		delete clone[pathVal];
+		this.handleChange('dataField', clone);
 	};
 
 	render() {

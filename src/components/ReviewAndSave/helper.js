@@ -73,6 +73,19 @@ const settingsMap = {
 		title: 'Field Weights',
 		description: 'Search weight for the database fields.',
 	},
+	number_of_fragments: {
+		title: 'Number of Fragments',
+		description:
+			'Maximum number of fragments to return. If set to 0, no fragments are returned.',
+	},
+	fragment_size: {
+		title: 'Highlight Fragment Size',
+		description: `The size of the highlighted fragment in characters`,
+	},
+	highlight_tag: {
+		title: 'Highlight Tag',
+		description: `Highlight tag that should be returned, e.g. <mark> or <em>`,
+	},
 	dataField: {
 		title: 'DataField',
 		description: 'Database field(s) to be queried against.',
@@ -131,6 +144,11 @@ const settingsMap = {
 	},
 	synonyms: {
 		description: 'Enable synonyms for better searching across similar words',
+	},
+	fuzziness: {
+		title: 'Typo Tolerance',
+		description:
+			'Set the maximum typo tolerance of characters to handle per word. Value can be set to auto, or can be specific value like 1 or 2.',
 	},
 	queryString: {
 		title: 'Query String',

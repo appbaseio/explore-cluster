@@ -19,6 +19,8 @@ import styled from 'react-emotion';
 
 import DiffList from './DiffList';
 
+import { getPossibleSubFields } from '../../utils';
+
 const Badge = styled.span`
 	background: #f5222d;
 	color: #fff;
@@ -39,6 +41,267 @@ const getDiffData = (oldObj, newObj) => {
 	if (!diffData) {
 		return [0, {}];
 	}
+
+	const subFields = getPossibleSubFields();
+	if (diffData.search && diffData.search.fieldWeights && !diffData.search.dataField) {
+		// handle only field weight change
+		const { dataField, fieldWeights } = get(newObj, 'search');
+		const { fieldWeights: olderWeight } = get(oldObj, 'search');
+		const newFieldWeights = dataField.reduce((agg, item, index) => {
+			const hasSubfield = subFields.some((s) => item.includes(s));
+			let dataToReturn = [...agg];
+			if (!hasSubfield && olderWeight[index] !== fieldWeights[index]) {
+				dataToReturn = [
+					...dataToReturn,
+					{ field: item, oldWeight: olderWeight[index], newWeight: fieldWeights[index] },
+				];
+			}
+
+			return dataToReturn;
+		}, []);
+		diffData.search.fieldWeights = newFieldWeights;
+	}
+
+	if (diffData.search && diffData.search.dataField && diffData.search.fieldWeights) {
+		// handle adding | removing of new field
+
+		// get the fields to be removed
+		// key with _[indexNumber] means removed field
+		// key with [indexNumber] means added field
+		const { dataField, fieldWeights } = get(newObj, 'search');
+		const { fieldWeights: olderWeight } = get(oldObj, 'search');
+		const newDataFields = Object.keys(diffData.search.dataField).reduce((agg, i) => {
+			const fieldName = get(diffData, `search.dataField[${i}][0]`);
+			const hasSubfield = subFields.some((s) => fieldName.includes(s));
+			let newData = [...agg];
+			if (!hasSubfield && i !== '_t') {
+				// removed field
+				const isDeleted = i[0] === '_';
+				const index = isDeleted ? Number(i.split('_')[1]) : Number(i);
+
+				newData = [
+					...newData,
+					{
+						field: fieldName,
+						index: Number(i),
+						isDeleted: false,
+						oldWeight: isDeleted ? olderWeight[index] : 'NA',
+						newWeight: isDeleted
+							? 'NA'
+							: get(diffData, `search.fieldWeights[${i}][0]`, 1), // always first index holds the value
+					},
+				];
+			}
+			return newData;
+		}, []);
+
+		// handle only field weight change along with dataField add/remove
+		const newFieldWeights = dataField.reduce((agg, item, index) => {
+			const hasSubfield = subFields.some((s) => item.includes(s));
+			const isPartOfDataField = newDataFields.find((i) => i.index === index);
+			let dataToReturn = [...agg];
+			if (!hasSubfield && olderWeight[index] !== fieldWeights[index] && !isPartOfDataField) {
+				dataToReturn = [
+					...dataToReturn,
+					{ field: item, oldWeight: olderWeight[index], newWeight: fieldWeights[index] },
+				];
+			}
+
+			return dataToReturn;
+		}, []);
+
+		diffData.search.dataField = [...newDataFields];
+		if (newFieldWeights.length) {
+			diffData.search.fieldWeights = [...newFieldWeights];
+		} else {
+			delete diffData.search.fieldWeights;
+		}
+	}
+
+	if (diffData.aggregations && diffData.aggregations.dataField) {
+		const newDataFields = Object.keys(diffData.aggregations.dataField).reduce((agg, i) => {
+			// deleted field is of pattern [fieldName, number, number]
+			const fieldVal = get(diffData, `aggregations.dataField`)[i];
+			const isDeleted = fieldVal.length === 3;
+
+			const newData = [
+				...agg,
+				{
+					field: i.split('.keyword')[0], // just to ignore `.keyword` in field name
+					isDeleted,
+					oldAgg: get(fieldVal, 0, 'NA'),
+					newAgg: isDeleted ? 'NA' : get(fieldVal, 1, 'NA'),
+				},
+			];
+
+			return newData;
+		}, []);
+		diffData.aggregations.dataField = newDataFields;
+	}
+
+	if (get(diffData, 'results.highlightFields')) {
+		diffData.results.highlightFields = Object.keys(
+			get(diffData, 'results.highlightFields'),
+		).reduce(
+			(agg, key) => {
+				let [deletedFields, addedFields] = agg;
+				deletedFields = deletedFields.split(', ').filter((i) => i.trim());
+				addedFields = addedFields.split(', ').filter((i) => i.trim());
+				if (key !== '_t') {
+					// key name starting with _ indicates it is deleted key
+					if (key[0] === '_') {
+						deletedFields = [
+							...deletedFields,
+							get(diffData, `results.highlightFields`)[key][0],
+						];
+					} else {
+						addedFields = [
+							...addedFields,
+							get(diffData, `results.highlightFields`)[key][0],
+						];
+					}
+				}
+
+				return [deletedFields.join(', '), addedFields.join(', ')];
+			},
+			['', ''],
+		);
+	}
+
+	if (get(diffData, 'results.includeFields')) {
+		diffData.results.includeFields = Object.keys(get(diffData, 'results.includeFields')).reduce(
+			(agg, key) => {
+				let [deletedFields, addedFields] = agg;
+				deletedFields = deletedFields.split(', ').filter((i) => i.trim());
+				addedFields = addedFields.split(', ').filter((i) => i.trim());
+				if (key !== '_t') {
+					// key name starting with _ indicates it is deleted key
+					if (key[0] === '_') {
+						deletedFields = [
+							...deletedFields,
+							get(diffData, `results.includeFields`)[key][0],
+						];
+					} else {
+						addedFields = [
+							...addedFields,
+							get(diffData, `results.includeFields`)[key][0],
+						];
+					}
+				}
+
+				return [deletedFields.join(', '), addedFields.join(', ')];
+			},
+			['', ''],
+		);
+	}
+
+	if (get(diffData, 'results.excludeFields')) {
+		diffData.results.excludeFields = Object.keys(get(diffData, 'results.excludeFields')).reduce(
+			(agg, key) => {
+				let [deletedFields, addedFields] = agg;
+				deletedFields = deletedFields.split(', ').filter((i) => i.trim());
+				addedFields = addedFields.split(', ').filter((i) => i.trim());
+				if (key !== '_t') {
+					// key name starting with _ indicates it is deleted key
+					if (key[0] === '_') {
+						deletedFields = [
+							...deletedFields,
+							get(diffData, `results.excludeFields`)[key][0],
+						];
+					} else {
+						addedFields = [
+							...addedFields,
+							get(diffData, `results.excludeFields`)[key][0],
+						];
+					}
+				}
+
+				return [deletedFields.join(', '), addedFields.join(', ')];
+			},
+			['', ''],
+		);
+	}
+
+	if (get(diffData, 'results.highlightOptions')) {
+		diffData.results = {
+			...get(diffData, 'results'),
+			...get(diffData, 'results.highlightOptions'),
+		};
+		delete diffData.results.highlightOptions;
+	}
+
+	if (get(diffData, 'results.pre_tags') && get(diffData, 'results.post_tags')) {
+		diffData.results.highlight_tag = [
+			get(diffData, 'results.pre_tags._0[0]'),
+			get(diffData, 'results.pre_tags.0[0]'),
+		];
+		delete diffData.results.post_tags;
+		delete diffData.results.pre_tags;
+	}
+
+	if (diffData.synonyms) {
+		// there is only one key if synonym config i.e. enabled or disabled
+		diffData.synonyms = diffData.synonyms.enabled;
+	}
+
+	if (get(diffData, 'language.stemmingExceptions')) {
+		diffData.language.stemmingExceptions = Object.keys(
+			get(diffData, 'language.stemmingExceptions'),
+		).reduce(
+			(agg, key) => {
+				let [deletedFields, addedFields] = agg;
+				deletedFields = deletedFields.split(', ').filter((i) => i.trim());
+				addedFields = addedFields.split(', ').filter((i) => i.trim());
+				if (key !== '_t') {
+					// key name starting with _ indicates it is deleted key
+					if (key[0] === '_') {
+						deletedFields = [
+							...deletedFields,
+							get(diffData, `language.stemmingExceptions`)[key][0],
+						];
+					} else {
+						addedFields = [
+							...addedFields,
+							get(diffData, `language.stemmingExceptions`)[key][0],
+						];
+					}
+				}
+
+				return [deletedFields.join(', '), addedFields.join(', ')];
+			},
+			['', ''],
+		);
+	}
+
+	if (get(diffData, 'language.customStopwords')) {
+		diffData.language.customStopwords = Object.keys(
+			get(diffData, 'language.customStopwords'),
+		).reduce(
+			(agg, key) => {
+				let [deletedFields, addedFields] = agg;
+				deletedFields = deletedFields.split(', ').filter((i) => i.trim());
+				addedFields = addedFields.split(', ').filter((i) => i.trim());
+				if (key !== '_t') {
+					// key name starting with _ indicates it is deleted key
+					if (key[0] === '_') {
+						deletedFields = [
+							...deletedFields,
+							get(diffData, `language.customStopwords`)[key][0],
+						];
+					} else {
+						addedFields = [
+							...addedFields,
+							get(diffData, `language.customStopwords`)[key][0],
+						];
+					}
+				}
+
+				return [deletedFields.join(', '), addedFields.join(', ')];
+			},
+			['', ''],
+		);
+	}
+
 	const topLevelFields = Object.keys(diffData);
 
 	const diffCount = topLevelFields.reduce((agg, item) => {
@@ -92,8 +355,6 @@ class ReviewAndSave extends React.Component {
 		const [diffCount, diffData] = resetting
 			? getDiffData(settings, defaultSettings)
 			: getDiffData(settings, get(localRelevancy, `${appName}`));
-
-		console.log('here....', settings, localRelevancy);
 
 		return (
 			<>

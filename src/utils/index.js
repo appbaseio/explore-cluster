@@ -547,6 +547,10 @@ export const getFieldWeight = (field, weight) => {
 	}
 };
 
+export const getPossibleSubFields = () => {
+	return ['.autosuggest', '.search', '.synonyms', '.delimiter', '.keyword', '.lang'];
+};
+
 export function getSubFields({
 	fields,
 	weight,

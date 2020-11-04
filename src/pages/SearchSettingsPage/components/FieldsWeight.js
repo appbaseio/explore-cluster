@@ -238,7 +238,7 @@ class FieldWeights extends React.Component {
 
 	render() {
 		const { aggs } = this.state;
-		const { mappingWrapperProps, updateToSearchField, appName, localRelevancy } = this.props;
+		const { mappingWrapperProps, handleAddSearchField, appName, localRelevancy } = this.props;
 		const { usecase, type, mappings, setMapping } = mappingWrapperProps;
 		const { dataField, fieldWeights } = get(localRelevancy, `${appName}.search`);
 		const fieldWeightMap = getFieldWeightMap({ fieldWeights, dataField });
@@ -304,7 +304,7 @@ class FieldWeights extends React.Component {
 							placeholder="Add search fields from schema "
 							value={undefined}
 							onChange={(field) => {
-								updateToSearchField({ field, setMapping, mapping: mappings });
+								handleAddSearchField({ field, setMapping });
 							}}
 						>
 							{aggs.map((field) => (
@@ -323,7 +323,7 @@ class FieldWeights extends React.Component {
 FieldWeights.propTypes = {
 	handleFieldWeights: PropTypes.func.isRequired,
 	handleDelete: PropTypes.func.isRequired,
-	updateToSearchField: PropTypes.func.isRequired,
+	handleAddSearchField: PropTypes.func.isRequired,
 	mappingWrapperProps: PropTypes.object.isRequired,
 	appName: PropTypes.string.isRequired,
 	localRelevancy: PropTypes.object.isRequired,

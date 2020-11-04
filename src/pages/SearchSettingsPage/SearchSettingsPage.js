@@ -11,7 +11,7 @@ import {
 	getSettings as getSearchRelevancy,
 	setLocalRelevancyState,
 } from '../../batteries/modules/actions';
-import { getSubFields } from '../../utils';
+import { getSubFields, getPossibleSubFields } from '../../utils';
 import { allowedTiers } from '../../utils/prop-types';
 import { getMappingsByPath } from '../../utils/mappings';
 import { isValidPlan } from '../../batteries/utils';
@@ -47,7 +47,7 @@ const getqueryFormat = ({ queryString, searchOperators }) => {
 
 const fieldLastIndexMap = (dataFields = [], fieldWeights = []) => {
 	const map = {};
-	const subFields = ['.autosuggest', '.search', '.synonyms', '.delimiter', '.keyword', '.lang'];
+	const subFields = getPossibleSubFields();
 	dataFields.forEach((i, index) => {
 		const hasSubfield = subFields.some((s) => i.includes(s));
 
@@ -296,14 +296,14 @@ class SearchSettingsPage extends React.Component {
 		// remove all this fields from dataField + fieldWeights
 	};
 
-	updateToSearchField = ({ field, setMapping, mapping }) => {
+	handleAddSearchField = ({ field, setMapping }) => {
 		const { localRelevancy, appName, updateLocalRelevancy } = this.props;
 		const { fieldWeights, dataField } = get(localRelevancy, `${appName}.search`);
 		const { enableNgram } = get(localRelevancy, `${appName}.indexSettings`);
 		const { enabled: enableSynonyms } = get(localRelevancy, `${appName}.synonyms`);
 		const { language } = get(localRelevancy, `${appName}.language`);
 
-		setMapping([
+		const updatedMappings = setMapping([
 			{
 				usecase: 'searchaggs',
 				path: field,
@@ -313,8 +313,8 @@ class SearchSettingsPage extends React.Component {
 
 		// add to dataField & fieldWeights
 		const newFields = getSubFields({
-			fields: get(mapping, `${field}.fields`),
-			weight: 0,
+			fields: get(getMappingsByPath({ mappings: updatedMappings, path: field }), 'fields'),
+			weight: 1,
 			address: field,
 			skipSearch: !enableNgram,
 			skipLang: !language,
@@ -393,7 +393,7 @@ class SearchSettingsPage extends React.Component {
 											<FieldWeights
 												handleFieldWeights={this.handleFieldWeights}
 												handleDelete={this.handleRemoveFromSearch}
-												updateToSearchField={this.updateToSearchField}
+												handleAddSearchField={this.handleAddSearchField}
 												mappingWrapperProps={mappingWrapperProps}
 											/>
 										)}
