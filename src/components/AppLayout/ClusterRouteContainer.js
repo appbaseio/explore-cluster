@@ -83,6 +83,11 @@ const SandboxPage = Loadable({
 	loading: Loader,
 });
 
+const IntegrationsPage = Loadable({
+	loader: () => import(/* webpackChunkName: "IntegrationsPage" */ '../../pages/IntegrationsPage'),
+	loading: Loader,
+});
+
 const ShareSettings = Loadable({
 	loader: () =>
 		import(/* webpackChunkName: "ShareSettingsPage" */ '../../pages/ShareSettingsPage'),
@@ -316,6 +321,13 @@ class ClusterRouteContainer extends React.Component {
 									<UnauthorizedPage />
 								)}
 							</>
+						)}
+					/>
+					<Route
+						exact
+						path="/cluster/integrations"
+						render={(props) => (
+							<AppPageContainer {...props} component={IntegrationsPage} />
 						)}
 					/>
 					<Route

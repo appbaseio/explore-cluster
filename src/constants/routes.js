@@ -67,6 +67,12 @@ export const APP_ROUTES = {
 		hasExactPath: true,
 		action: ALLOWED_ACTIONS.CURATED_INSIGHTS,
 	},
+	'UI Integrations': {
+		icon: 'control',
+		link: 'integrations',
+		hasExactPath: true,
+		tag: 'Beta',
+	},
 	'Access Control': {
 		icon: 'key',
 		action: ALLOWED_ACTIONS.ACCESS_CONTROL,
@@ -168,6 +174,13 @@ export const CLUSTER_ROUTES = {
 		icon: 'rise',
 		action: ALLOWED_ACTIONS.CURATED_INSIGHTS,
 		link: '/cluster/curated-insights',
+	},
+	'UI Integrations': {
+		icon: 'control',
+		link: 'integrations',
+		tag: 'Beta',
+		label: 'UI Integrations',
+		openIndexMenu: true,
 	},
 	'Access Control': {
 		icon: 'key',
