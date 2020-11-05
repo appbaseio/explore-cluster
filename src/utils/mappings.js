@@ -139,9 +139,9 @@ const _getFieldsByRelevancy = ({
 			: { ...extraFields }),
 	};
 
-	if (enableNgram) {
+	if (!enableNgram) {
 		delete updatedFields.search;
-	} else if (type === 'text') {
+	} else if (type === 'text' && enableNgram) {
 		if (_getUsecase(updatedFields, type).includes('search') && !updatedFields.search) {
 			updatedFields = {
 				...updatedFields,

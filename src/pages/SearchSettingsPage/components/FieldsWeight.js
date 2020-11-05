@@ -4,12 +4,10 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { css } from 'react-emotion';
 import { Icon, Tooltip, Empty, Row, Col, InputNumber, Select } from 'antd';
-import { getSubFields } from '../../../utils';
 import FieldRow from '../../MappingsPage/components/FieldRow';
 import ObjectField from '../../MappingsPage/components/ObjectField';
 import { VIEWS } from '../../../constants/props';
-import { getMappingsByPath } from '../../../utils/mappings';
-import { setLocalRelevancyState } from '../../../batteries/modules/actions';
+import { getMappingsByPath, getMappingsInfo } from '../../../utils/mappings';
 
 const headerRow = css`
 	font-weight: 600;
@@ -49,6 +47,7 @@ const getFieldWeightMap = ({ fieldWeights, dataField }) => {
 	}, {});
 	return fieldWeightMap;
 };
+
 class FieldWeights extends React.Component {
 	state = {
 		aggs: [],
@@ -57,81 +56,34 @@ class FieldWeights extends React.Component {
 	componentDidMount() {
 		// updateWeights for searchable fields initially
 		// this will show fields in the UI with weight 1 if the no data fields are set!
-		this.updateFieldWeights();
 
 		// get aggsFields
 		this.getAggsField();
 	}
 
-	componentDidUpdate() {
-		this.updateFieldWeights();
-	}
-
-	updateFieldWeights = () => {
-		const { mappingWrapperProps, appName, localRelevancy, updateLocalRelevancy } = this.props;
-		const {
-			flattenUsecase,
-			mappings,
-			isFetchingMapping,
-			isFetchingSetting,
-		} = mappingWrapperProps;
-		const { dataField, fieldWeights } = get(localRelevancy, `${appName}.search`);
-		if (
-			(!fieldWeights.length || !dataField.length) &&
-			!isFetchingMapping &&
-			!isFetchingSetting &&
-			flattenUsecase
-		) {
-			const fieldDataTuple = Object.keys(flattenUsecase).reduce(
-				(agg, item) => {
-					if (
-						flattenUsecase[item] === 'search' ||
-						flattenUsecase[item] === 'searchaggs'
-					) {
-						const { enableNgram } = get(localRelevancy, `${appName}.indexSettings`);
-						const { enabled: enableSynonyms } = get(
-							localRelevancy,
-							`${appName}.synonyms`,
-						);
-						const { language } = get(localRelevancy, `${appName}.language`);
-
-						const fields = getSubFields({
-							fields: get(getMappingsByPath({ mappings, path: item }), 'fields'),
-							weight: 1,
-							address: item,
-							skipSearch: !enableNgram,
-							skipLang: !language,
-							skipSynonyms: !enableSynonyms,
-						});
-
-						return [
-							[...agg[0], ...Object.keys(fields)],
-							[...agg[1], ...Object.values(fields)],
-						];
-					}
-
-					return agg;
-				},
-				[[], []],
-			);
-
-			updateLocalRelevancy(appName, {
-				...get(localRelevancy, appName),
-				search: {
-					...get(localRelevancy, `${appName}.search`, {}),
-					dataField: fieldDataTuple[0],
-					fieldWeights: fieldDataTuple[1],
-				},
-			});
-		}
-	};
-
 	getAggsField = () => {
-		const { mappingWrapperProps } = this.props;
+		const { mappingWrapperProps, localMapping, localRelevancy } = this.props;
 		const { flattenUsecase: usecases, flattenType: types } = mappingWrapperProps;
-		if (usecases && types) {
-			const newAggsFields = Object.keys(types).reduce((agg, field) => {
-				if (usecases[field] === 'aggs' || usecases[field] === 'none') {
+		let typeData = types;
+		let useCaseData = usecases;
+
+		if (localMapping) {
+			const synonymsSettings = get(localRelevancy, 'synonyms');
+			const indexSettings = get(localRelevancy, 'indexSettings');
+			const languageSettings = get(localRelevancy, 'language');
+			const { flattenType, flattenUsecase } = getMappingsInfo({
+				mappings: localMapping,
+				enableNgram: indexSettings.enableNgram,
+				enableSynonyms: synonymsSettings.enabled,
+				language: languageSettings.language,
+			});
+			typeData = flattenType;
+			useCaseData = flattenUsecase;
+		}
+
+		if (useCaseData && typeData) {
+			const newAggsFields = Object.keys(typeData).reduce((agg, field) => {
+				if (useCaseData[field] === 'aggs' || useCaseData[field] === 'none') {
 					return [...agg, field];
 				}
 				return [...agg];
@@ -238,10 +190,11 @@ class FieldWeights extends React.Component {
 
 	render() {
 		const { aggs } = this.state;
-		const { mappingWrapperProps, handleAddSearchField, appName, localRelevancy } = this.props;
+		const { mappingWrapperProps, handleAddSearchField, localRelevancy } = this.props;
 		const { usecase, type, mappings, setMapping } = mappingWrapperProps;
-		const { dataField, fieldWeights } = get(localRelevancy, `${appName}.search`);
+		const { dataField, fieldWeights } = get(localRelevancy, `search`);
 		const fieldWeightMap = getFieldWeightMap({ fieldWeights, dataField });
+
 		return (
 			<React.Fragment>
 				<div>
@@ -325,22 +278,23 @@ FieldWeights.propTypes = {
 	handleDelete: PropTypes.func.isRequired,
 	handleAddSearchField: PropTypes.func.isRequired,
 	mappingWrapperProps: PropTypes.object.isRequired,
-	appName: PropTypes.string.isRequired,
 	localRelevancy: PropTypes.object.isRequired,
-	updateLocalRelevancy: PropTypes.func.isRequired,
+	localMapping: PropTypes.object,
+};
+
+FieldWeights.defaultProps = {
+	localMapping: null,
 };
 
 const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');
-	const localRelevancy = get(state, `$getLocalRelevancy`);
+	const localRelevancy = get(state, `$getLocalRelevancy.${appName}`);
+	const localMapping = get(state, `$getLocalMapping.${appName}`);
 	return {
 		appName,
 		localRelevancy,
+		localMapping,
 	};
 };
 
-const mapDispatchToProps = (dispatch) => ({
-	updateLocalRelevancy: (name, data) => dispatch(setLocalRelevancyState(name, data)),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(FieldWeights);
+export default connect(mapStateToProps)(FieldWeights);

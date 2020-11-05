@@ -12,7 +12,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Button, Modal } from 'antd';
+import { Button, Modal, notification } from 'antd';
 import get from 'lodash/get';
 import { diff } from 'jsondiffpatch';
 import styled from 'react-emotion';
@@ -20,6 +20,8 @@ import styled from 'react-emotion';
 import DiffList from './DiffList';
 
 import { getPossibleSubFields } from '../../utils';
+import { putSettings } from '../../batteries/modules/actions';
+import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 
 const Badge = styled.span`
 	background: #f5222d;
@@ -43,7 +45,7 @@ const getDiffData = (oldObj, newObj) => {
 	}
 
 	const subFields = getPossibleSubFields();
-	if (diffData.search && diffData.search.fieldWeights && !diffData.search.dataField) {
+	if (get(diffData, 'search.fieldWeights', null) && !get(diffData, 'search.dataField', null)) {
 		// handle only field weight change
 		const { dataField, fieldWeights } = get(newObj, 'search');
 		const { fieldWeights: olderWeight } = get(oldObj, 'search');
@@ -62,7 +64,7 @@ const getDiffData = (oldObj, newObj) => {
 		diffData.search.fieldWeights = newFieldWeights;
 	}
 
-	if (diffData.search && diffData.search.dataField && diffData.search.fieldWeights) {
+	if (get(diffData, 'search.dataField', null) && get(diffData, 'search.fieldWeights', null)) {
 		// handle adding | removing of new field
 
 		// get the fields to be removed
@@ -118,19 +120,19 @@ const getDiffData = (oldObj, newObj) => {
 		}
 	}
 
-	if (diffData.aggregations && diffData.aggregations.dataField) {
+	if (get(diffData, 'aggregations.dataField', null)) {
 		const newDataFields = Object.keys(diffData.aggregations.dataField).reduce((agg, i) => {
 			// deleted field is of pattern [fieldName, number, number]
 			const fieldVal = get(diffData, `aggregations.dataField`)[i];
 			const isDeleted = fieldVal.length === 3;
-
+			const isOlderField = fieldVal.length === 2;
 			const newData = [
 				...agg,
 				{
 					field: i.split('.keyword')[0], // just to ignore `.keyword` in field name
 					isDeleted,
-					oldAgg: get(fieldVal, 0, 'NA'),
-					newAgg: isDeleted ? 'NA' : get(fieldVal, 1, 'NA'),
+					oldAgg: isDeleted || isOlderField ? get(fieldVal, 0, 'NA') : `NA`,
+					newAgg: isDeleted ? 'NA' : get(fieldVal, 1, get(fieldVal, 0, 'NA')),
 				},
 			];
 
@@ -321,7 +323,8 @@ const getDiffData = (oldObj, newObj) => {
 class ReviewAndSave extends React.Component {
 	state = {
 		isOpen: false,
-		resetting: false,
+		isResetting: false,
+		isSaving: false,
 	};
 
 	showModal = () => {
@@ -336,25 +339,66 @@ class ReviewAndSave extends React.Component {
 				isOpen: false,
 			},
 			() => {
-				this.setState({ resetting: false });
+				this.setState({ isResetting: false });
 			},
 		);
 	};
 
 	onResetToDefault = () => {
-		this.setState({ resetting: true }, () => {
+		this.setState({ isResetting: true }, () => {
 			this.setState({
 				isOpen: true,
 			});
 		});
 	};
 
+	handleSave = () => {
+		this.setState({
+			isSaving: true,
+		});
+
+		const {
+			updateSettingsAction,
+			localRelevancy: newSettings,
+			appName,
+			settings: oldSettings,
+			localMapping,
+			mappings,
+		} = this.props;
+
+		console.log('old settings', oldSettings, localMapping, mappings);
+
+		updateSettingsAction(appName, newSettings)
+			.then(async (res) => {
+				if (res && res.error) {
+					notification.error({
+						message: 'Failed to save Search Settings',
+						description: get(res, 'error.message'),
+					});
+				} else {
+					// decide if re-indexing is required based on language, index and search settings
+					/**
+					 * 1. Enable/disable ngrams should remove .search fields from the mapping
+					 * 2. Language change should trigger setting change + mapping change
+					 * 3. Remove of search field / add of new search field should trigger mapping change
+					 */
+					notification.success(`Search settings for ${appName} saved successfully`);
+				}
+			})
+			.catch((e) => {
+				notification.error({
+					message: 'Failed to save Search Settings',
+					description: e.message,
+				});
+			});
+	};
+
 	render() {
-		const { isOpen, resetting } = this.state;
-		const { defaultSettings, settings, localRelevancy, appName } = this.props;
-		const [diffCount, diffData] = resetting
+		const { isOpen, isResetting, isSaving } = this.state;
+		const { defaultSettings, settings, localRelevancy } = this.props;
+		const [diffCount, diffData] = isResetting
 			? getDiffData(settings, defaultSettings)
-			: getDiffData(settings, get(localRelevancy, `${appName}`));
+			: getDiffData(settings, localRelevancy);
 
 		return (
 			<>
@@ -375,7 +419,7 @@ class ReviewAndSave extends React.Component {
 						style={{ marginRight: 10 }}
 						size="large"
 						onClick={this.onResetToDefault}
-						disabled={!diffCount}
+						disabled={isResetting && !diffCount}
 					>
 						Reset To Default Settings
 					</Button>
@@ -383,13 +427,17 @@ class ReviewAndSave extends React.Component {
 				<Modal
 					visible={isOpen}
 					title={
-						resetting ? 'Reset To Default Settings' : 'Review Settings Before Deploying'
+						isResetting
+							? 'Reset To Default Settings'
+							: 'Review Settings Before Deploying'
 					}
 					onOk={() => {}}
 					width={1000}
 					style={{
 						top: 20,
 					}}
+					okText="Review and Save"
+					confirmLoading={isSaving}
 					onCancel={this.handleCancel}
 				>
 					{isOpen && <DiffList diff={diffData} />}
@@ -404,15 +452,21 @@ ReviewAndSave.propTypes = {
 	settings: PropTypes.object.isRequired,
 	defaultSettings: PropTypes.object,
 	appName: PropTypes.string.isRequired,
+	updateSettingsAction: PropTypes.func.isRequired,
+	localMapping: PropTypes.object,
+	mappings: PropTypes.object,
 };
 
 ReviewAndSave.defaultProps = {
 	defaultSettings: {},
+	localMapping: null,
+	mappings: null,
 };
 
 const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');
-	const localRelevancy = get(state, `$getLocalRelevancy`);
+	const localRelevancy = get(state, `$getLocalRelevancy.${appName}`);
+	const localMapping = get(state, `$getLocalMapping.${appName}`);
 	const defaultSettings = get(state, `$getAppSettings.defaultSettings`);
 	const settings = get(state, ['$getAppSettings', 'settings', appName], defaultSettings);
 	return {
@@ -420,7 +474,13 @@ const mapStateToProps = (state) => {
 		localRelevancy,
 		settings,
 		defaultSettings,
+		localMapping,
+		mappings: getRawMappingsByAppName(state) || null,
 	};
 };
 
-export default connect(mapStateToProps)(ReviewAndSave);
+const mapDispatchToProps = (dispatch) => ({
+	updateSettingsAction: (appName, payload) => dispatch(putSettings(appName, payload)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(ReviewAndSave);

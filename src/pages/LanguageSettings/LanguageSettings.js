@@ -64,7 +64,7 @@ class LanguageSettings extends React.Component {
 			localRelevancy,
 		} = this.props;
 
-		if (settings && !get(localRelevancy, appName)) {
+		if (settings && !localRelevancy) {
 			this.init({ ...settings });
 		} else {
 			getSettingsAction(appName);
@@ -94,18 +94,18 @@ class LanguageSettings extends React.Component {
 			value = val.split(',').map((i) => removeWhiteSpaces(i));
 		}
 		updateLocalRelevancy(appName, {
-			...get(localRelevancy, appName),
+			...localRelevancy,
 			language: {
-				...get(localRelevancy, `${appName}.language`),
+				...get(localRelevancy, `language`),
 				[key]: value,
 			},
 		});
 	};
 
 	render() {
-		const { isLoading, localRelevancy, tier, appName, featureSearchRelevancy } = this.props;
+		const { isLoading, localRelevancy, tier, featureSearchRelevancy } = this.props;
 
-		if (isLoading || !localRelevancy || !get(localRelevancy, `${appName}.results`, null)) {
+		if (isLoading || !localRelevancy || !get(localRelevancy, `language`, null)) {
 			return (
 				<Card>
 					<Banner {...bannerDetails} />
@@ -137,7 +137,7 @@ class LanguageSettings extends React.Component {
 			language,
 			normalizeDiacritics,
 			stemmingExceptions,
-		} = get(localRelevancy, `${appName}.language`);
+		} = get(localRelevancy, `language`);
 
 		return (
 			<>
@@ -261,7 +261,7 @@ const mapStateToProps = (state) => {
 	const mappings = getRawMappingsByAppName(state) || null;
 
 	const { username, password } = get(state, 'user.data', {});
-	const localRelevancy = get(state, `$getLocalRelevancy`);
+	const localRelevancy = get(state, `$getLocalRelevancy.${appName}`, null);
 	return {
 		appName,
 		isLoading: get(state, '$getAppSettings.isFetching'),

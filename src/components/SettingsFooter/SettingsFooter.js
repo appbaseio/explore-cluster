@@ -40,7 +40,7 @@ class SettingsFooter extends React.Component {
 							<SearchPreviewModal
 								app={appName}
 								searchPreviewProps={{
-									testSettings: get(localRelevancy, appName),
+									testSettings: localRelevancy,
 									hasTestSettings: true,
 								}}
 							/>
@@ -80,7 +80,7 @@ SettingsFooter.defaultProps = {
 
 const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');
-	const localRelevancy = get(state, `$getLocalRelevancy`);
+	const localRelevancy = get(state, `$getLocalRelevancy.${appName}`);
 	const collapsed = get(state, 'sideBarCollapsed');
 	return {
 		appName,

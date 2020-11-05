@@ -42,7 +42,7 @@ class AggsPage extends React.Component {
 			localRelevancy,
 		} = this.props;
 
-		if (settings && !get(localRelevancy, appName)) {
+		if (settings && !localRelevancy) {
 			this.init({ ...settings });
 		} else {
 			getSettingsAction(appName);
@@ -71,25 +71,25 @@ class AggsPage extends React.Component {
 	handleChange = (name, value) => {
 		const { localRelevancy, updateLocalRelevancy, appName } = this.props;
 		updateLocalRelevancy(appName, {
-			...get(localRelevancy, appName),
+			...localRelevancy,
 			aggregations: {
-				...get(localRelevancy, `${appName}.aggregations`, {}),
+				...get(localRelevancy, `aggregations`, {}),
 				[name]: value,
 			},
 		});
 	};
 
 	handleFieldType = ({ path, type, flattenType }) => {
-		const { localRelevancy, appName } = this.props;
-		const { dataField } = get(localRelevancy, `${appName}.aggregations`);
+		const { localRelevancy } = this.props;
+		const { dataField } = get(localRelevancy, `aggregations`);
 		const pathVal = get(flattenType, path) === 'text' ? `${path}.keyword` : path;
 
 		this.handleChange('dataField', { ...dataField, [pathVal]: type });
 	};
 
 	updateToAggsField = ({ path, flattenType }) => {
-		const { localRelevancy, appName } = this.props;
-		const { dataField } = get(localRelevancy, `${appName}.aggregations`);
+		const { localRelevancy } = this.props;
+		const { dataField } = get(localRelevancy, `aggregations`);
 		const pathVal = get(flattenType, path) === 'text' ? `${path}.keyword` : path;
 
 		const aggType = 'term';
@@ -97,8 +97,8 @@ class AggsPage extends React.Component {
 	};
 
 	handleRemoveFromAggs = ({ path, flattenType }) => {
-		const { localRelevancy, appName } = this.props;
-		const { dataField } = get(localRelevancy, `${appName}.aggregations`);
+		const { localRelevancy } = this.props;
+		const { dataField } = get(localRelevancy, `aggregations`);
 		const pathVal = get(flattenType, path) === 'text' ? `${path}.keyword` : path;
 
 		const clone = {
@@ -110,9 +110,9 @@ class AggsPage extends React.Component {
 	};
 
 	render() {
-		const { isLoading, appName, tier, featureSearchRelevancy, localRelevancy } = this.props;
+		const { isLoading, tier, featureSearchRelevancy, localRelevancy } = this.props;
 
-		if (isLoading || !localRelevancy || !get(localRelevancy, `${appName}.aggregations`, null)) {
+		if (isLoading || !localRelevancy || !get(localRelevancy, `aggregations`, null)) {
 			return (
 				<React.Fragment>
 					<Banner {...bannerDetails} />
@@ -139,7 +139,7 @@ class AggsPage extends React.Component {
 		}
 		const { sortBy, includeNullValues, size, queryFormat, dataField } = get(
 			localRelevancy,
-			`${appName}.aggregations`,
+			`aggregations`,
 		);
 
 		return (
@@ -202,7 +202,7 @@ const mapStateToProps = (state) => {
 	const errorCode = get(state, '$getAppSettings.error.actual.code');
 	const defaultSearchSettings = errorCode === 404 ? defaultSettings : null;
 	const appName = get(state, '$getCurrentApp.name');
-	const localRelevancy = get(state, `$getLocalRelevancy`);
+	const localRelevancy = get(state, `$getLocalRelevancy.${appName}`, null);
 	return {
 		appName,
 		defaultSettings,

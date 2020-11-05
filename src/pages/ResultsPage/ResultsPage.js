@@ -71,7 +71,7 @@ class ResultsPage extends React.Component {
 			settings,
 			localRelevancy,
 		} = this.props;
-		if (settings && !get(localRelevancy, appName)) {
+		if (settings && !localRelevancy) {
 			this.init({ ...settings });
 		} else {
 			getSettingsAction(appName);
@@ -104,9 +104,9 @@ class ResultsPage extends React.Component {
 	handleChange = (key, val) => {
 		const { appName, localRelevancy, updateLocalRelevancy } = this.props;
 		updateLocalRelevancy(appName, {
-			...get(localRelevancy, appName),
+			...localRelevancy,
 			results: {
-				...get(localRelevancy, `${appName}.results`),
+				...get(localRelevancy, `results`),
 				[key]: val,
 			},
 		});
@@ -122,11 +122,11 @@ class ResultsPage extends React.Component {
 			data.post_tags = [post_tags];
 		}
 		updateLocalRelevancy(appName, {
-			...get(localRelevancy, appName),
+			...localRelevancy,
 			results: {
-				...get(localRelevancy, `${appName}.results`),
+				...get(localRelevancy, `results`),
 				highlightOptions: {
-					...get(localRelevancy, `${appName}.results.highlightOptions`),
+					...get(localRelevancy, `results.highlightOptions`),
 					...data,
 				},
 			},
@@ -134,16 +134,9 @@ class ResultsPage extends React.Component {
 	};
 
 	render() {
-		const {
-			appName,
-			tier,
-			featureSearchRelevancy,
-			localRelevancy,
-			isLoading,
-			mappings,
-		} = this.props;
+		const { tier, featureSearchRelevancy, localRelevancy, isLoading, mappings } = this.props;
 
-		if (isLoading || !localRelevancy || !get(localRelevancy, `${appName}.results`, null)) {
+		if (isLoading || !localRelevancy || !get(localRelevancy, `results`, null)) {
 			return (
 				<Card>
 					<Banner {...bannerDetails} />
@@ -175,7 +168,7 @@ class ResultsPage extends React.Component {
 			highlightOptions,
 			includeFields,
 			size,
-		} = get(localRelevancy, `${appName}.results`);
+		} = get(localRelevancy, `results`);
 
 		return (
 			<>
@@ -460,7 +453,7 @@ const mapStateToProps = (state) => {
 	// when elasticsearch v6, mappings is an object with values corresponding to _doc key
 	const parsedMappings = Array.isArray(mappings) ? mappings : get(mappings, '_doc', []);
 	const { username, password } = get(state, 'user.data', {});
-	const localRelevancy = get(state, `$getLocalRelevancy`);
+	const localRelevancy = get(state, `$getLocalRelevancy.${appName}`, null);
 	return {
 		appName,
 		mappings: isEmpty(parsedMappings) ? [] : parsedMappings,

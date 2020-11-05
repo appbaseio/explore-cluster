@@ -134,7 +134,7 @@ const DiffList = ({ diff }) => {
 													key={item.title}
 													pagination={false}
 													size="small"
-													rowKey="key"
+													rowKey="field"
 													dataSource={item.data}
 													style={{
 														height: 300,
@@ -202,7 +202,7 @@ const DiffList = ({ diff }) => {
 														key={item.title}
 														pagination={false}
 														size="small"
-														rowKey="key"
+														rowKey="field"
 														dataSource={item.data}
 														columns={[
 															{
@@ -224,7 +224,7 @@ const DiffList = ({ diff }) => {
 																		) : (
 																			<span>
 																				{field}&nbsp;
-																				{fieldData.newAgg ===
+																				{fieldData.oldAgg ===
 																					'NA' && (
 																					<Tag color="green">
 																						new
