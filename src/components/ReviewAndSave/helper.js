@@ -82,6 +82,10 @@ const settingsMap = {
 		title: 'Highlight Fragment Size',
 		description: `The size of the highlighted fragment in characters`,
 	},
+	enableSynonyms: {
+		title: `Synonyms`,
+		description: `Enable/Disable synonyms for better searching across similar words`,
+	},
 	highlight_tag: {
 		title: 'Highlight Tag',
 		description: `Highlight tag that should be returned, e.g. <mark> or <em>`,

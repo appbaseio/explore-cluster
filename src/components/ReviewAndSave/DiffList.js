@@ -157,9 +157,12 @@ const DiffList = ({ diff }) => {
 																	) : (
 																		<span>
 																			{field}&nbsp;
-																			<Tag color="green">
-																				new
-																			</Tag>
+																			{fieldData.newWeight !==
+																				'NA' && (
+																				<Tag color="green">
+																					new
+																				</Tag>
+																			)}
 																		</span>
 																	)}
 																</>

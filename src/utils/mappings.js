@@ -460,3 +460,92 @@ export const hasKeyword = (fieldMappings) => {
 
 	return false;
 };
+
+export const applyNgramMapping = (mappings, isNgramEnabled) => {
+	const updatedMappings = Object.keys(mappings).reduce((agg, field) => {
+		const fieldVal = { ...get(mappings, field) };
+		let updatedData = { ...agg };
+		if (get(fieldVal, 'properties', null)) {
+			// recursive call the function
+			updatedData = {
+				...updatedData,
+				[field]: {
+					properties: applyNgramMapping(get(fieldVal, 'properties'), isNgramEnabled),
+				},
+			};
+		} else if (get(fieldVal, 'type') === 'text') {
+			if (!isNgramEnabled && get(fieldVal, 'fields.search', null)) {
+				// remove the .search field
+				delete fieldVal.fields.search;
+				updatedData = {
+					...updatedData,
+					[field]: {
+						...fieldVal,
+					},
+				};
+			}
+
+			if (isNgramEnabled && !get(fieldVal, 'fields.search', null)) {
+				// add the .search field
+				updatedData = {
+					...updatedData,
+					[field]: {
+						...fieldVal,
+						fields: {
+							...get(fieldVal, 'fields'),
+							search: {
+								analyzer: 'ngram_analyzer',
+								search_analyzer: 'standard',
+								type: 'text',
+							},
+						},
+					},
+				};
+			}
+		}
+
+		return updatedData;
+	}, {});
+
+	return updatedMappings;
+};
+
+export const applyLanguageMapping = (mappings, language) => {
+	const lang = {
+		type: 'text',
+		analyzer: language,
+	};
+	const synonyms = {
+		analyzer: 'synonyms',
+		type: 'text',
+	};
+	const updatedMappings = Object.keys(mappings).reduce((agg, field) => {
+		const fieldVal = { ...get(mappings, field) };
+		let updatedData = { ...agg };
+		if (get(fieldVal, 'properties', null)) {
+			// recursive call the function
+			updatedData = {
+				...updatedData,
+				[field]: {
+					properties: applyNgramMapping(get(fieldVal, 'properties'), language),
+				},
+			};
+		} else if (get(fieldVal, 'type') === 'text') {
+			updatedData = {
+				...updatedData,
+				[field]: {
+					...fieldVal,
+					fields: {
+						...get(fieldVal, 'fields'),
+						lang,
+						synonyms,
+					},
+				},
+			};
+		}
+
+		return updatedData;
+	}, {});
+
+	return updatedMappings;
+};

@@ -14,14 +14,25 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Button, Modal, notification } from 'antd';
 import get from 'lodash/get';
+import omit from 'lodash/omit';
+import omitBy from 'lodash/omitBy';
 import { diff } from 'jsondiffpatch';
 import styled from 'react-emotion';
 
 import DiffList from './DiffList';
+import ReIndexWrapper from '../ReIndexWrapper';
 
 import { getPossibleSubFields } from '../../utils';
-import { putSettings } from '../../batteries/modules/actions';
+import { applyNgramMapping, applyLanguageMapping } from '../../utils/mappings';
+import { putSettings, getAppMappings, setLocalMappingState } from '../../batteries/modules/actions';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
+import { buildLanguageAnalysis, getLanguageFallback } from '../../utils/language';
+import {
+	getESVersion,
+	getSettings as getAppSettings,
+	reIndex,
+} from '../../batteries/utils/mappings';
+import { getURL, getVersion } from '../../constants/config';
 
 const Badge = styled.span`
 	background: #f5222d;
@@ -39,7 +50,7 @@ const Badge = styled.span`
 `;
 
 const getDiffData = (oldObj, newObj) => {
-	const diffData = diff(oldObj, newObj);
+	let diffData = diff({ ...oldObj }, { ...newObj });
 	if (!diffData) {
 		return [0, {}];
 	}
@@ -47,6 +58,7 @@ const getDiffData = (oldObj, newObj) => {
 	const subFields = getPossibleSubFields();
 	if (get(diffData, 'search.fieldWeights', null) && !get(diffData, 'search.dataField', null)) {
 		// handle only field weight change
+
 		const { dataField, fieldWeights } = get(newObj, 'search');
 		const { fieldWeights: olderWeight } = get(oldObj, 'search');
 		const newFieldWeights = dataField.reduce((agg, item, index) => {
@@ -61,7 +73,13 @@ const getDiffData = (oldObj, newObj) => {
 
 			return dataToReturn;
 		}, []);
-		diffData.search.fieldWeights = newFieldWeights;
+		diffData = {
+			...diffData,
+			search: {
+				...diffData.search,
+				fieldWeights: newFieldWeights,
+			},
+		};
 	}
 
 	if (get(diffData, 'search.dataField', null) && get(diffData, 'search.fieldWeights', null)) {
@@ -71,7 +89,8 @@ const getDiffData = (oldObj, newObj) => {
 		// key with _[indexNumber] means removed field
 		// key with [indexNumber] means added field
 		const { dataField, fieldWeights } = get(newObj, 'search');
-		const { fieldWeights: olderWeight } = get(oldObj, 'search');
+		const { dataField: olderDataFields, fieldWeights: olderWeights } = get(oldObj, 'search');
+
 		const newDataFields = Object.keys(diffData.search.dataField).reduce((agg, i) => {
 			const fieldName = get(diffData, `search.dataField[${i}][0]`);
 			const hasSubfield = subFields.some((s) => fieldName.includes(s));
@@ -85,9 +104,9 @@ const getDiffData = (oldObj, newObj) => {
 					...newData,
 					{
 						field: fieldName,
-						index: Number(i),
-						isDeleted: false,
-						oldWeight: isDeleted ? olderWeight[index] : 'NA',
+						index,
+						isDeleted,
+						oldWeight: isDeleted ? olderWeights[index] : 'NA',
 						newWeight: isDeleted
 							? 'NA'
 							: get(diffData, `search.fieldWeights[${i}][0]`, 1), // always first index holds the value
@@ -101,21 +120,35 @@ const getDiffData = (oldObj, newObj) => {
 		const newFieldWeights = dataField.reduce((agg, item, index) => {
 			const hasSubfield = subFields.some((s) => item.includes(s));
 			const isPartOfDataField = newDataFields.find((i) => i.index === index);
+			const oldWeight = olderWeights[olderDataFields.findIndex((x) => x === item)];
+			const newWeight = fieldWeights[index];
 			let dataToReturn = [...agg];
-			if (!hasSubfield && olderWeight[index] !== fieldWeights[index] && !isPartOfDataField) {
+			if (!hasSubfield && oldWeight !== newWeight && !isPartOfDataField) {
 				dataToReturn = [
 					...dataToReturn,
-					{ field: item, oldWeight: olderWeight[index], newWeight: fieldWeights[index] },
+					{
+						field: item,
+						oldWeight,
+						newWeight,
+					},
 				];
 			}
 
 			return dataToReturn;
 		}, []);
+		diffData = {
+			...diffData,
+			search: {
+				...diffData.search,
+				fieldWeights: newFieldWeights,
+				dataField: newDataFields,
+			},
+		};
 
-		diffData.search.dataField = [...newDataFields];
-		if (newFieldWeights.length) {
-			diffData.search.fieldWeights = [...newFieldWeights];
-		} else {
+		if (!newDataFields.length) {
+			delete diffData.search.dataField;
+		}
+		if (!newFieldWeights.length) {
 			delete diffData.search.fieldWeights;
 		}
 	}
@@ -138,13 +171,17 @@ const getDiffData = (oldObj, newObj) => {
 
 			return newData;
 		}, []);
-		diffData.aggregations.dataField = newDataFields;
+		diffData = {
+			...diffData,
+			aggregations: {
+				...diffData.aggregations,
+				dataField: newDataFields,
+			},
+		};
 	}
 
 	if (get(diffData, 'results.highlightFields')) {
-		diffData.results.highlightFields = Object.keys(
-			get(diffData, 'results.highlightFields'),
-		).reduce(
+		const newHighlightFields = Object.keys(get(diffData, 'results.highlightFields')).reduce(
 			(agg, key) => {
 				let [deletedFields, addedFields] = agg;
 				deletedFields = deletedFields.split(', ').filter((i) => i.trim());
@@ -168,10 +205,18 @@ const getDiffData = (oldObj, newObj) => {
 			},
 			['', ''],
 		);
+
+		diffData = {
+			...diffData,
+			results: {
+				...diffData.results,
+				highlightFields: newHighlightFields,
+			},
+		};
 	}
 
 	if (get(diffData, 'results.includeFields')) {
-		diffData.results.includeFields = Object.keys(get(diffData, 'results.includeFields')).reduce(
+		const newIncludeFields = Object.keys(get(diffData, 'results.includeFields')).reduce(
 			(agg, key) => {
 				let [deletedFields, addedFields] = agg;
 				deletedFields = deletedFields.split(', ').filter((i) => i.trim());
@@ -195,10 +240,17 @@ const getDiffData = (oldObj, newObj) => {
 			},
 			['', ''],
 		);
+		diffData = {
+			...diffData,
+			results: {
+				...diffData.results,
+				includeFields: newIncludeFields,
+			},
+		};
 	}
 
 	if (get(diffData, 'results.excludeFields')) {
-		diffData.results.excludeFields = Object.keys(get(diffData, 'results.excludeFields')).reduce(
+		const newExcludeFields = Object.keys(get(diffData, 'results.excludeFields')).reduce(
 			(agg, key) => {
 				let [deletedFields, addedFields] = agg;
 				deletedFields = deletedFields.split(', ').filter((i) => i.trim());
@@ -222,28 +274,55 @@ const getDiffData = (oldObj, newObj) => {
 			},
 			['', ''],
 		);
+
+		diffData = {
+			...diffData,
+			results: {
+				...diffData.results,
+				excludeFields: newExcludeFields,
+			},
+		};
 	}
 
 	if (get(diffData, 'results.highlightOptions')) {
-		diffData.results = {
-			...get(diffData, 'results'),
-			...get(diffData, 'results.highlightOptions'),
+		diffData = {
+			...diffData,
+			results: {
+				...get(diffData, 'results'),
+				...get(diffData, 'results.highlightOptions'),
+			},
 		};
 		delete diffData.results.highlightOptions;
 	}
 
 	if (get(diffData, 'results.pre_tags') && get(diffData, 'results.post_tags')) {
-		diffData.results.highlight_tag = [
+		const newHighlightTags = [
 			get(diffData, 'results.pre_tags._0[0]'),
 			get(diffData, 'results.pre_tags.0[0]'),
 		];
 		delete diffData.results.post_tags;
 		delete diffData.results.pre_tags;
+		diffData = {
+			...diffData,
+			results: {
+				...diffData.results,
+				highlightTags: newHighlightTags,
+			},
+		};
 	}
 
-	if (diffData.synonyms) {
-		// there is only one key if synonym config i.e. enabled or disabled
-		diffData.synonyms = diffData.synonyms.enabled;
+	if (get(diffData, 'synonyms', null)) {
+		// there is only one key if synonym config i.e. enabled: true/false
+		// putting it as part of search settings because we render it search settings
+		diffData = {
+			...diffData,
+			search: {
+				...get(diffData, 'search', {}),
+				enableSynonyms: diffData.synonyms.enabled,
+			},
+		};
+
+		delete diffData.synonyms;
 	}
 
 	if (get(diffData, 'language.stemmingExceptions')) {
@@ -310,8 +389,8 @@ const getDiffData = (oldObj, newObj) => {
 		const data = diffData[item];
 		const count =
 			agg +
-			Object.keys(data).reduce((sum, i) => {
-				return i === 'highlightOptions' ? sum + Object.keys(data[i]).length : sum + 1;
+			Object.keys(data).reduce((sum) => {
+				return sum + 1;
 			}, 0);
 
 		return count;
@@ -334,14 +413,10 @@ class ReviewAndSave extends React.Component {
 	};
 
 	handleCancel = () => {
-		this.setState(
-			{
-				isOpen: false,
-			},
-			() => {
-				this.setState({ isResetting: false });
-			},
-		);
+		this.setState({
+			isOpen: false,
+			isResetting: false,
+		});
 	};
 
 	onResetToDefault = () => {
@@ -352,97 +427,270 @@ class ReviewAndSave extends React.Component {
 		});
 	};
 
-	handleSave = () => {
+	handleSave = async (refetchStats) => {
 		this.setState({
 			isSaving: true,
 		});
-
+		const { isResetting } = this.state;
 		const {
 			updateSettingsAction,
-			localRelevancy: newSettings,
+			localRelevancy: currentSettings,
 			appName,
 			settings: oldSettings,
 			localMapping,
 			mappings,
+			credentials,
+			updateLocalMappingState,
+			fetchMappings,
+			defaultSettings,
 		} = this.props;
 
-		console.log('old settings', oldSettings, localMapping, mappings);
+		const newSettings = isResetting ? defaultSettings : currentSettings;
 
-		updateSettingsAction(appName, newSettings)
-			.then(async (res) => {
-				if (res && res.error) {
-					notification.error({
-						message: 'Failed to save Search Settings',
-						description: get(res, 'error.message'),
-					});
-				} else {
-					// decide if re-indexing is required based on language, index and search settings
-					/**
-					 * 1. Enable/disable ngrams should remove .search fields from the mapping
-					 * 2. Language change should trigger setting change + mapping change
-					 * 3. Remove of search field / add of new search field should trigger mapping change
-					 */
-					notification.success(`Search settings for ${appName} saved successfully`);
-				}
-			})
-			.catch((e) => {
+		let updatedMappings = {
+			...(localMapping || mappings),
+		};
+
+		if (!updatedMappings || !Object.keys(updatedMappings).length) {
+			const mappingRes = await fetchMappings(appName, credentials, getURL());
+			updatedMappings = get(mappingRes, 'payload');
+		}
+
+		let updatedSettings = {};
+		let shouldUpdateSettings = false;
+		let shouldReIndex = false;
+
+		// decide if re-indexing is required based on language, index and search settings
+		/**
+		 * 1. If localMapping exists then data should be re-indexed as it indicated change in subfields for a some of the fields
+		 * 2. Enable/disable ngrams should add/remove .search fields from the mapping
+		 * 3. Language change should trigger setting (analyzer) change + mapping change
+		 */
+
+		if (localMapping) {
+			shouldReIndex = true;
+		}
+
+		if (
+			get(newSettings, 'indexSettings.enableNgram') !==
+			get(oldSettings, 'indexSettings.enableNgram')
+		) {
+			const isNgramEnabled = get(newSettings, 'indexSettings.enableNgram');
+			shouldReIndex = true;
+			updatedMappings = {
+				properties: applyNgramMapping(get(updatedMappings, 'properties'), isNgramEnabled),
+			};
+		}
+
+		if (
+			JSON.stringify(get(newSettings, 'language')) !==
+			JSON.stringify(get(oldSettings, 'language'))
+		) {
+			shouldReIndex = true;
+			shouldUpdateSettings = true;
+			updatedSettings = await getAppSettings(appName, credentials).then(
+				(data) => data[appName].settings,
+			);
+			const newLangSettings = get(newSettings, 'language');
+			const language = getLanguageFallback(get(newLangSettings, 'language'));
+			const analysis = buildLanguageAnalysis(language, newLangSettings);
+
+			const { analyzer, filter } = get(updatedSettings, 'index.analysis', {});
+			const { analyzer: analyzerNew, filter: filterNew } = analysis || {};
+
+			let updatedAnalyzer = {
+				...omit(analyzer, [newLangSettings, 'standard_asciifolding']),
+				...analyzerNew,
+			};
+
+			if (newLangSettings.normalizeDiacritics) {
+				updatedAnalyzer = Object.keys(updatedAnalyzer).reduce((obj, a) => {
+					const { filter: analyzerFilter } = updatedAnalyzer[a];
+					// asciifolding should appear before [x]_stop word filter
+					// inorder to do that find that index and splice before it
+					let stopIndex = analyzerFilter.findIndex((f) => f.includes('_stop'));
+					if (stopIndex === -1) stopIndex = 0;
+					analyzerFilter.splice(stopIndex, 0, 'asciifolding');
+					return {
+						...obj,
+						[a]: {
+							...updatedAnalyzer[a],
+							// save the unique values of filter
+							filter: analyzerFilter.filter((v, i, x) => x.indexOf(v) === i),
+						},
+					};
+				}, {});
+			} else {
+				updatedAnalyzer = Object.keys(updatedAnalyzer).reduce((obj, a) => {
+					const { filter: analyzerFilter } = updatedAnalyzer[a];
+					return {
+						...obj,
+						[a]: {
+							...updatedAnalyzer[a],
+							filter: analyzerFilter.filter((i) => i !== 'asciifolding'),
+						},
+					};
+				}, {});
+			}
+
+			updatedMappings = {
+				properties: applyLanguageMapping(get(updatedMappings, 'properties'), language),
+			};
+
+			updatedSettings = {
+				analysis: {
+					analyzer: updatedAnalyzer,
+					filter: {
+						...omitBy(filter, (key, value) =>
+							(value || '').startsWith(get(newSettings, 'language.language')),
+						),
+						...filterNew,
+					},
+				},
+			};
+		}
+
+		try {
+			// convert field weights to float otherwise it can fail indexing data in ES
+			const settingsData = {
+				...newSettings,
+				search: {
+					...newSettings.search,
+					fieldWeights: newSettings.search.fieldWeights.map((i) =>
+						parseFloat(i).toFixed(1),
+					),
+				},
+			};
+
+			const savedSettings = await updateSettingsAction(appName, settingsData);
+			if (savedSettings && savedSettings.error) {
 				notification.error({
 					message: 'Failed to save Search Settings',
-					description: e.message,
+					description: get(savedSettings, 'error.message'),
 				});
+			} else {
+				notification.success({
+					message: `Search relevancy for ${appName} saved successfully`,
+					description: ``,
+				});
+			}
+
+			this.setState({
+				isSaving: false,
+				isOpen: false,
+				isResetting: false,
 			});
+
+			if (shouldReIndex) {
+				const esVersion = getVersion() || (await getESVersion(appName, credentials));
+
+				const reIndexingData = {
+					mappings:
+						parseInt(esVersion[0], 10) === 6
+							? { _doc: updatedMappings }
+							: updatedMappings,
+					appId: appName,
+					version: esVersion,
+					credentials,
+				};
+
+				if (shouldUpdateSettings) {
+					reIndexingData.settings = updatedSettings;
+				}
+				const reIndexPromise = reIndex(reIndexingData);
+
+				if (refetchStats) {
+					setTimeout(() => {
+						refetchStats();
+					}, 500);
+				}
+
+				reIndexPromise
+					.then(() => {
+						// set localMapping to null
+
+						if (credentials && appName) {
+							updateLocalMappingState(appName, null);
+							fetchMappings(appName, credentials, this.URL);
+						}
+					})
+					.catch((reIndexErr) => {
+						console.error('Re-indexing error = ', reIndexErr);
+						this.setState({ isSaving: false });
+
+						notification.error({
+							message: 'Reindexing Failed',
+							description:
+								'Reindexing is in progress, please wait till the current process is completed!',
+						});
+					});
+			}
+		} catch (err) {
+			this.setState({
+				isSaving: false,
+			});
+			notification.error({
+				message: 'Failed to save Search Settings',
+				description: err.message,
+			});
+		}
 	};
 
 	render() {
 		const { isOpen, isResetting, isSaving } = this.state;
-		const { defaultSettings, settings, localRelevancy } = this.props;
+		const { defaultSettings, settings, localRelevancy, appName } = this.props;
 		const [diffCount, diffData] = isResetting
 			? getDiffData(settings, defaultSettings)
 			: getDiffData(settings, localRelevancy);
 
 		return (
-			<>
-				<div style={{ display: 'flex', alignItems: 'center' }}>
-					<div style={{ position: 'relative' }}>
-						{diffCount > 0 && <Badge>{diffCount}</Badge>}
-						<Button
-							style={{ marginRight: 10 }}
-							size="large"
-							type="primary"
-							disabled={!diffCount}
-							onClick={this.showModal}
+			<ReIndexWrapper appName={appName}>
+				{({ refetch }) => (
+					<>
+						<div style={{ display: 'flex', alignItems: 'center' }}>
+							<Button
+								style={{ marginRight: 10 }}
+								size="large"
+								onClick={this.onResetToDefault}
+								disabled={isResetting && !diffCount}
+							>
+								Reset To Default Settings
+							</Button>
+							<div style={{ position: 'relative' }}>
+								{diffCount > 0 && !isResetting && <Badge>{diffCount}</Badge>}
+								<Button
+									style={{ marginRight: 10 }}
+									size="large"
+									type="primary"
+									disabled={!diffCount || isResetting}
+									onClick={this.showModal}
+								>
+									Reive and Deploy
+								</Button>
+							</div>
+						</div>
+						<Modal
+							visible={isOpen}
+							title={
+								isResetting
+									? 'Reset To Default Settings'
+									: 'Review Settings Before Deploying'
+							}
+							onOk={() => this.handleSave(refetch)}
+							width={1000}
+							style={{
+								top: 20,
+							}}
+							destroyOnClose
+							okText="Review and Save"
+							confirmLoading={isSaving}
+							onCancel={this.handleCancel}
 						>
-							Reive and Deploy
-						</Button>
-					</div>
-					<Button
-						style={{ marginRight: 10 }}
-						size="large"
-						onClick={this.onResetToDefault}
-						disabled={isResetting && !diffCount}
-					>
-						Reset To Default Settings
-					</Button>
-				</div>
-				<Modal
-					visible={isOpen}
-					title={
-						isResetting
-							? 'Reset To Default Settings'
-							: 'Review Settings Before Deploying'
-					}
-					onOk={() => {}}
-					width={1000}
-					style={{
-						top: 20,
-					}}
-					okText="Review and Save"
-					confirmLoading={isSaving}
-					onCancel={this.handleCancel}
-				>
-					{isOpen && <DiffList diff={diffData} />}
-				</Modal>
-			</>
+							{isOpen && <DiffList diff={diffData} />}
+						</Modal>
+					</>
+				)}
+			</ReIndexWrapper>
 		);
 	}
 }
@@ -455,6 +703,9 @@ ReviewAndSave.propTypes = {
 	updateSettingsAction: PropTypes.func.isRequired,
 	localMapping: PropTypes.object,
 	mappings: PropTypes.object,
+	credentials: PropTypes.string.isRequired,
+	fetchMappings: PropTypes.func.isRequired,
+	updateLocalMappingState: PropTypes.func.isRequired,
 };
 
 ReviewAndSave.defaultProps = {
@@ -469,6 +720,7 @@ const mapStateToProps = (state) => {
 	const localMapping = get(state, `$getLocalMapping.${appName}`);
 	const defaultSettings = get(state, `$getAppSettings.defaultSettings`);
 	const settings = get(state, ['$getAppSettings', 'settings', appName], defaultSettings);
+	const { username, password } = get(state, 'user.data', {});
 	return {
 		appName,
 		localRelevancy,
@@ -476,11 +728,15 @@ const mapStateToProps = (state) => {
 		defaultSettings,
 		localMapping,
 		mappings: getRawMappingsByAppName(state) || null,
+		credentials: username ? `${username}:${password}` : null,
 	};
 };
 
 const mapDispatchToProps = (dispatch) => ({
 	updateSettingsAction: (appName, payload) => dispatch(putSettings(appName, payload)),
+	fetchMappings: (appName, credentials, url) =>
+		dispatch(getAppMappings(appName, credentials, url)),
+	updateLocalMappingState: (appName, data) => dispatch(setLocalMappingState(appName, data)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ReviewAndSave);
