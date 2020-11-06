@@ -529,21 +529,22 @@ export function getReIndexedName(appName) {
 	return newName;
 }
 
-export const getFieldWeight = (field, weight) => {
+export const getFieldWeight = (field, weightData) => {
+	const weight = Number(weightData);
 	switch (field) {
 		case 'autosuggest':
 		case 'lang':
-			return weight ? weight * 0.9 : 0;
+			return (weight ? weight * 0.9 : 0).toFixed(1);
 		case 'synonyms':
-			return weight ? weight * 0.7 : 0;
+			return (weight ? weight * 0.7 : 0).toFixed(1);
 		case 'delimiter':
-			return weight ? weight * 0.4 : 0;
+			return (weight ? weight * 0.4 : 0).toFixed(1);
 		case 'search':
-			return weight ? weight * 0.1 : 0;
+			return (weight ? weight * 0.1 : 0).toFixed(1);
 		case 'keyword':
-			return weight ? weight : 0;
+			return (weight ? weight : 0).toFixed(1);
 		default:
-			return weight;
+			return weight.toFixed(1);
 	}
 };
 

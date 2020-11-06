@@ -40,7 +40,17 @@ class SettingsFooter extends React.Component {
 							<SearchPreviewModal
 								app={appName}
 								searchPreviewProps={{
-									testSettings: localRelevancy,
+									testSettings: {
+										...localRelevancy,
+										search: {
+											...localRelevancy.search,
+											fieldWeights: get(
+												localRelevancy,
+												'search.fieldWeights',
+												[],
+											).map((i) => Number(i)),
+										},
+									},
 									hasTestSettings: true,
 								}}
 							/>

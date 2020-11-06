@@ -207,7 +207,9 @@ class SearchPreview extends React.Component {
 						{
 							...searchQuery,
 							dataField: Object.keys(state.searchableMappings),
-							fieldWeights: Object.values(state.searchableMappings),
+							fieldWeights: Object.values(state.searchableMappings).map((i) =>
+								Number(i),
+							),
 						},
 					],
 				};
@@ -238,7 +240,7 @@ class SearchPreview extends React.Component {
 					search: {
 						...get(props, 'settings.search', {}),
 						dataField: Object.keys(state.searchableMappings),
-						fieldWeights: Object.values(state.searchableMappings),
+						fieldWeights: Object.values(state.searchableMappings).map((i) => Number(i)),
 					},
 				}),
 			};
@@ -260,7 +262,7 @@ class SearchPreview extends React.Component {
 				settings: generateQuery({
 					search: {
 						dataField: Object.keys(state.searchableMappings),
-						fieldWeights: Object.values(state.searchableMappings),
+						fieldWeights: Object.values(state.searchableMappings).map((i) => Number(i)),
 					},
 					results: {
 						dataField: '_score',
@@ -341,6 +343,7 @@ class SearchPreview extends React.Component {
 			isGradingEnabled,
 			queryGrades,
 		} = this.state;
+
 		const isGradingAllowed = isValidPlan(tier, featureGrade);
 
 		if (fetchingDefaultSettings) {

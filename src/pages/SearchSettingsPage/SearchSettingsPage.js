@@ -298,7 +298,7 @@ class SearchSettingsPage extends React.Component {
 		const { language } = get(localRelevancy, `language`);
 		const updatedFields = getSubFields({
 			fields: get(mapping, 'fields'),
-			weight,
+			weight: Number(weight).toFixed(1),
 			address: field,
 			skipSearch: enableNgram === false,
 			skipLang: !language,

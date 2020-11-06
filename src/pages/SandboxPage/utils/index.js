@@ -36,7 +36,7 @@ const generateQuery = ({ aggregations: filters, search, results, synonyms }) => 
 			...search,
 			id: 'search',
 			dataField: Array.isArray(searchDataField) ? searchDataField : [searchDataField],
-			fieldWeights: get(search, 'fieldWeights', []),
+			fieldWeights: get(search, 'fieldWeights', []).map((i) => Number(i)),
 			enableSynonyms: get(synonyms, 'enabled', true),
 			value: '',
 		},
