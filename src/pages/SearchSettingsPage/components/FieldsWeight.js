@@ -63,6 +63,8 @@ class FieldWeights extends React.Component {
 		let typeData = types;
 		let useCaseData = usecases;
 
+		const dataField = get(localRelevancy, 'search.dataField', []);
+
 		if (localMapping) {
 			const synonymsSettings = get(localRelevancy, 'synonyms');
 			const indexSettings = get(localRelevancy, 'indexSettings');
@@ -78,14 +80,19 @@ class FieldWeights extends React.Component {
 		}
 
 		if (useCaseData && typeData) {
-			const newAggsFields = Object.keys(typeData).reduce((agg, field) => {
-				if (useCaseData[field] === 'aggs' || useCaseData[field] === 'none') {
+			const newNonSearchableFields = Object.keys(typeData).reduce((agg, field) => {
+				const isExistingField = dataField.some((x) => x === field);
+				if (
+					useCaseData[field] === 'aggs' ||
+					useCaseData[field] === 'none' ||
+					isExistingField === false
+				) {
 					return [...agg, field];
 				}
 				return [...agg];
 			}, []);
 
-			this.setState({ nonSearchableFields: newAggsFields });
+			this.setState({ nonSearchableFields: newNonSearchableFields });
 		}
 	};
 
@@ -98,7 +105,12 @@ class FieldWeights extends React.Component {
 		path = '',
 		init = false,
 	}) => {
-		const { mappingWrapperProps, handleDelete, handleFieldWeights } = this.props;
+		const {
+			mappingWrapperProps,
+			handleDelete,
+			handleFieldWeights,
+			localRelevancy,
+		} = this.props;
 		const { flattenUsecase, setMapping } = mappingWrapperProps;
 
 		if (init && (!usecase || Object.keys(usecase).length === 0)) {
@@ -109,6 +121,8 @@ class FieldWeights extends React.Component {
 				/>
 			);
 		}
+
+		const dataField = get(localRelevancy, 'search.dataField', []);
 
 		return Object.keys(usecase).map((field) => {
 			const usecaseVal = get(usecase, field);
@@ -142,7 +156,13 @@ class FieldWeights extends React.Component {
 				);
 			}
 
-			if (usecaseVal === 'none' || usecaseVal === 'aggs' || typeVal !== 'text') {
+			const isExistingField = dataField.some((x) => x === `${path}${field}`);
+			if (
+				usecaseVal === 'none' ||
+				usecaseVal === 'aggs' ||
+				typeVal !== 'text' ||
+				isExistingField === false
+			) {
 				return null;
 			}
 
