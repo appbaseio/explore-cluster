@@ -576,10 +576,10 @@ export function getSubFields({
 				};
 			}, {});
 
-		return { [address]: weight, ...subFields };
+		return { [address]: weight.toFixed(1), ...subFields };
 	}
 
-	return { [address]: weight };
+	return { [address]: weight.toFixed(1) };
 }
 
 function ltrim(str) {
