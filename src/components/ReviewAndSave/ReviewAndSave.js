@@ -490,9 +490,6 @@ class ReviewAndSave extends React.Component {
 		} = this.props;
 
 		let newSettings = isResetting ? defaultSettings : currentSettings;
-		if (isResetting) {
-			updateLocalRelevancyState(defaultSettings);
-		}
 
 		let updatedMappings = {
 			...(localMapping || mappings),
@@ -624,6 +621,9 @@ class ReviewAndSave extends React.Component {
 			};
 
 			const savedSettings = await updateSettingsAction(appName, settingsData);
+			if (isResetting) {
+				updateLocalRelevancyState(defaultSettings);
+			}
 			if (savedSettings && savedSettings.error) {
 				notification.error({
 					message: 'Failed to save Search Settings',

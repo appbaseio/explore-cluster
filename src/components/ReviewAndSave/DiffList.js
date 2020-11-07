@@ -7,7 +7,7 @@ import relevancyItemTitles, { relevancyTitles } from './helper';
 import Flex from '../../batteries/components/shared/Flex';
 
 const DiffList = ({ diff }) => {
-	if (!diff) {
+	if (!diff || !Object.keys(diff || {}).length) {
 		return (
 			<Empty
 				image={Empty.PRESENTED_IMAGE_SIMPLE}
