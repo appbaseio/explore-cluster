@@ -249,6 +249,7 @@ class MappingsWrapper extends React.Component {
 			deletedPaths,
 			originalType,
 			originalUseCase,
+			isReindexing,
 		} = this.state;
 		const hasMappingsChanged =
 			JSON.stringify(type) !== JSON.stringify(originalType) ||
@@ -269,6 +270,7 @@ class MappingsWrapper extends React.Component {
 					appName,
 					isFetchingMapping,
 					isFetchingSetting,
+					isReindexing,
 					hasMappingsChanged,
 					localMapping,
 					reloadMappings: this.getMappings,

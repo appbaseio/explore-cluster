@@ -158,6 +158,7 @@ class MappingComponent extends React.Component {
 				{({
 					isFetchingMapping,
 					isFetchingSetting,
+					isReindexing,
 					error,
 					reloadMappings,
 					hasMappingsChanged,
@@ -302,6 +303,7 @@ class MappingComponent extends React.Component {
 												disabled={
 													isFetchingMapping ||
 													isFetchingSetting ||
+													isReindexing ||
 													!hasMappingsChanged
 												}
 											>
@@ -312,6 +314,7 @@ class MappingComponent extends React.Component {
 												disabled={
 													isFetchingMapping ||
 													isFetchingSetting ||
+													isReindexing ||
 													!hasMappingsChanged
 												}
 												onClick={cancelChanges}
