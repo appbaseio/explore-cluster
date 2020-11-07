@@ -3,6 +3,7 @@ import omit from 'lodash/omit';
 import { getVersion, getURL } from '../constants/config';
 import mappingUsecase from '../batteries/utils/mappingUsecase';
 import { getAuthHeaders } from '../batteries/utils/mappings';
+import { getPossibleSubFields } from '.';
 
 export const getMappingsInfo = ({
 	mappings: originalMappings,
@@ -508,6 +509,24 @@ export const applyNgramMapping = (mappings, isNgramEnabled) => {
 	}, {});
 
 	return updatedMappings;
+};
+
+export const applyNgramDataFields = (dataFields) => {
+	const subFields = getPossibleSubFields();
+	const dataFieldsWithoutSubFields = dataFields.filter(
+		(i) => !subFields.some((s) => i.includes(s)),
+	);
+
+	// returns a tuple [ngramSearchFields, ngramSearchFieldsWeights]
+	return dataFieldsWithoutSubFields.reduce(
+		(agg, item) => {
+			return [
+				[...agg[0], `${item}.search`],
+				[...agg[1], 0.1],
+			];
+		},
+		[[], []],
+	);
 };
 
 export const applyLanguageMapping = (mappings, language) => {

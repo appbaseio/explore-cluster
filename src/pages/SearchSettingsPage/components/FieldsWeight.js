@@ -50,18 +50,14 @@ const getFieldWeightMap = ({ fieldWeights, dataField }) => {
 
 class FieldWeights extends React.Component {
 	state = {
-		aggs: [],
+		nonSearchableFields: [],
 	};
 
 	componentDidMount() {
-		// updateWeights for searchable fields initially
-		// this will show fields in the UI with weight 1 if the no data fields are set!
-
-		// get aggsFields
-		this.getAggsField();
+		this.getNonSearchableField();
 	}
 
-	getAggsField = () => {
+	getNonSearchableField = () => {
 		const { mappingWrapperProps, localMapping, localRelevancy } = this.props;
 		const { flattenUsecase: usecases, flattenType: types } = mappingWrapperProps;
 		let typeData = types;
@@ -89,7 +85,7 @@ class FieldWeights extends React.Component {
 				return [...agg];
 			}, []);
 
-			this.setState({ aggs: newAggsFields });
+			this.setState({ nonSearchableFields: newAggsFields });
 		}
 	};
 
@@ -189,7 +185,7 @@ class FieldWeights extends React.Component {
 	};
 
 	render() {
-		const { aggs } = this.state;
+		const { nonSearchableFields } = this.state;
 		const { mappingWrapperProps, handleAddSearchField, localRelevancy } = this.props;
 		const { usecase, type, mappings, setMapping } = mappingWrapperProps;
 		const { dataField, fieldWeights } = get(localRelevancy, `search`);
@@ -249,7 +245,7 @@ class FieldWeights extends React.Component {
 						</div>
 					</>
 				</div>
-				{aggs.length > 0 ? (
+				{nonSearchableFields.length > 0 ? (
 					<div style={{ position: 'relative', display: 'inline-block' }}>
 						<Select
 							showSearch
@@ -260,7 +256,7 @@ class FieldWeights extends React.Component {
 								handleAddSearchField({ field, setMapping });
 							}}
 						>
-							{aggs.map((field) => (
+							{nonSearchableFields.map((field) => (
 								<Option key={field} value={field}>
 									{field}
 								</Option>

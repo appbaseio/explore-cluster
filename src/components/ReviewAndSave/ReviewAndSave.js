@@ -23,8 +23,17 @@ import DiffList from './DiffList';
 import ReIndexWrapper from '../ReIndexWrapper';
 
 import { getPossibleSubFields } from '../../utils';
-import { applyNgramMapping, applyLanguageMapping } from '../../utils/mappings';
-import { putSettings, getAppMappings, setLocalMappingState } from '../../batteries/modules/actions';
+import {
+	applyNgramMapping,
+	applyLanguageMapping,
+	applyNgramDataFields,
+} from '../../utils/mappings';
+import {
+	putSettings,
+	getAppMappings,
+	setLocalMappingState,
+	setLocalRelevancyState,
+} from '../../batteries/modules/actions';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import { buildLanguageAnalysis, getLanguageFallback } from '../../utils/language';
 import {
@@ -93,9 +102,10 @@ const getDiffData = (oldObj, newObj) => {
 
 		const newDataFields = Object.keys(diffData.search.dataField).reduce((agg, i) => {
 			const fieldName = get(diffData, `search.dataField[${i}][0]`);
-			const hasSubfield = subFields.some((s) => fieldName.includes(s));
+			const hasSubfield = subFields.some((s) => !fieldName || fieldName.includes(s));
 			let newData = [...agg];
-			if (!hasSubfield && i !== '_t') {
+
+			if (!hasSubfield && fieldName && i !== '_t') {
 				// removed field
 				const isDeleted = i[0] === '_';
 				const index = isDeleted ? Number(i.split('_')[1]) : Number(i);
@@ -180,7 +190,7 @@ const getDiffData = (oldObj, newObj) => {
 		};
 	}
 
-	if (get(diffData, 'results.highlightFields')) {
+	if (get(diffData, 'results.highlightFields', null)) {
 		const newHighlightFields = Object.keys(get(diffData, 'results.highlightFields')).reduce(
 			(agg, key) => {
 				let [deletedFields, addedFields] = agg;
@@ -215,7 +225,7 @@ const getDiffData = (oldObj, newObj) => {
 		};
 	}
 
-	if (get(diffData, 'results.includeFields')) {
+	if (get(diffData, 'results.includeFields', null)) {
 		const newIncludeFields = Object.keys(get(diffData, 'results.includeFields')).reduce(
 			(agg, key) => {
 				let [deletedFields, addedFields] = agg;
@@ -249,7 +259,7 @@ const getDiffData = (oldObj, newObj) => {
 		};
 	}
 
-	if (get(diffData, 'results.excludeFields')) {
+	if (get(diffData, 'results.excludeFields', null)) {
 		const newExcludeFields = Object.keys(get(diffData, 'results.excludeFields')).reduce(
 			(agg, key) => {
 				let [deletedFields, addedFields] = agg;
@@ -284,7 +294,7 @@ const getDiffData = (oldObj, newObj) => {
 		};
 	}
 
-	if (get(diffData, 'results.highlightOptions')) {
+	if (get(diffData, 'results.highlightOptions', null)) {
 		diffData = {
 			...diffData,
 			results: {
@@ -295,7 +305,7 @@ const getDiffData = (oldObj, newObj) => {
 		delete diffData.results.highlightOptions;
 	}
 
-	if (get(diffData, 'results.pre_tags') && get(diffData, 'results.post_tags')) {
+	if (get(diffData, 'results.pre_tags', null) && get(diffData, 'results.post_tags', null)) {
 		const newHighlightTags = [
 			get(diffData, 'results.pre_tags._0[0]'),
 			get(diffData, 'results.pre_tags.0[0]'),
@@ -325,7 +335,7 @@ const getDiffData = (oldObj, newObj) => {
 		delete diffData.synonyms;
 	}
 
-	if (get(diffData, 'language.stemmingExceptions')) {
+	if (get(diffData, 'language.stemmingExceptions', null)) {
 		diffData.language.stemmingExceptions = Object.keys(
 			get(diffData, 'language.stemmingExceptions'),
 		).reduce(
@@ -354,7 +364,7 @@ const getDiffData = (oldObj, newObj) => {
 		);
 	}
 
-	if (get(diffData, 'language.customStopwords')) {
+	if (get(diffData, 'language.customStopwords', null)) {
 		diffData.language.customStopwords = Object.keys(
 			get(diffData, 'language.customStopwords'),
 		).reduce(
@@ -383,13 +393,25 @@ const getDiffData = (oldObj, newObj) => {
 		);
 	}
 
-	const topLevelFields = Object.keys(diffData);
+	// filter empty fields
+	diffData = Object.keys(diffData).reduce((agg, item) => {
+		if (Object.keys(diffData[item]).length) {
+			return {
+				...agg,
+				[item]: {
+					...diffData[item],
+				},
+			};
+		}
+		return agg;
+	}, {});
 
+	const topLevelFields = Object.keys(diffData);
 	const diffCount = topLevelFields.reduce((agg, item) => {
 		const data = diffData[item];
 		const count =
 			agg +
-			Object.keys(data).reduce((sum) => {
+			Object.keys(data || {}).reduce((sum) => {
 				return sum + 1;
 			}, 0);
 
@@ -464,9 +486,13 @@ class ReviewAndSave extends React.Component {
 			updateLocalMappingState,
 			fetchMappings,
 			defaultSettings,
+			updateLocalRelevancyState,
 		} = this.props;
 
-		const newSettings = isResetting ? defaultSettings : currentSettings;
+		let newSettings = isResetting ? defaultSettings : currentSettings;
+		if (isResetting) {
+			updateLocalRelevancyState(defaultSettings);
+		}
 
 		let updatedMappings = {
 			...(localMapping || mappings),
@@ -497,6 +523,25 @@ class ReviewAndSave extends React.Component {
 			updatedMappings = {
 				properties: applyNgramMapping(get(updatedMappings, 'properties'), isNgramEnabled),
 			};
+
+			// if ngram is enabled .search field should be added before saving as it requires re-indexing of data
+			if (get(newSettings, 'indexSettings.enableNgram')) {
+				const currentDataFields = get(newSettings, 'search.dataField');
+				const [ngramDataFields, ngramFieldWeights] = applyNgramDataFields(
+					currentDataFields,
+				);
+				newSettings = {
+					...newSettings,
+					search: {
+						...get(newSettings, 'search'),
+						dataField: [...currentDataFields, ...ngramDataFields],
+						fieldWeights: [
+							...get(newSettings, 'search.fieldWeights'),
+							...ngramFieldWeights,
+						],
+					},
+				};
+			}
 		}
 
 		if (
@@ -737,6 +782,7 @@ ReviewAndSave.propTypes = {
 	credentials: PropTypes.string.isRequired,
 	fetchMappings: PropTypes.func.isRequired,
 	updateLocalMappingState: PropTypes.func.isRequired,
+	updateLocalRelevancyState: PropTypes.func.isRequired,
 };
 
 ReviewAndSave.defaultProps = {
@@ -768,6 +814,7 @@ const mapDispatchToProps = (dispatch) => ({
 	fetchMappings: (appName, credentials, url) =>
 		dispatch(getAppMappings(appName, credentials, url)),
 	updateLocalMappingState: (appName, data) => dispatch(setLocalMappingState(appName, data)),
+	updateLocalRelevancyState: (appName, data) => dispatch(setLocalRelevancyState(appName, data)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ReviewAndSave);

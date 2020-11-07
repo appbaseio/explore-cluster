@@ -144,7 +144,6 @@ class SearchSettingsPage extends React.Component {
 						const { enabled: enableSynonyms } = get(localRelevancy, `synonyms`);
 						const { language } = get(localRelevancy, `language`);
 						const fieldIndex = updatedDataField.findIndex((x) => x === item);
-
 						const fields = getSubFields({
 							fields: get(
 								getMappingsByPath({
@@ -208,11 +207,12 @@ class SearchSettingsPage extends React.Component {
 		updateLocalRelevancy(appName, {
 			...settings,
 		});
-		// for initial field weight change
-		this.updateFieldWeights(settings);
+
+		// initialFieldWeights for searchable fields initially if the no search fields are set!
+		this.initialFieldWeights(settings);
 	};
 
-	updateFieldWeights = (settings) => {
+	initialFieldWeights = (settings) => {
 		const {
 			isLoading,
 			isFetchingMapping,

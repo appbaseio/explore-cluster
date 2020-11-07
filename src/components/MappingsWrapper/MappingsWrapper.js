@@ -177,13 +177,7 @@ class MappingsWrapper extends React.Component {
 	setMapping = (data) => {
 		const { usecase, type, mappings, flattenUsecase, flattenType } = this.state;
 
-		const {
-			enableNgram,
-			enableSynonyms,
-			language,
-			appName,
-			updateLocalMappingState,
-		} = this.props;
+		const { enableNgram, language, appName, updateLocalMappingState } = this.props;
 		let updatedMappings = null;
 		let updatedUsecase = null;
 		let updatedType = null;
@@ -198,7 +192,7 @@ class MappingsWrapper extends React.Component {
 				type: fieldType,
 				settings: {
 					enableNgram,
-					enableSynonyms,
+					enableSynonyms: true,
 					language,
 				},
 			});
