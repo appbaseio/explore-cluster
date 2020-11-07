@@ -12,7 +12,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Button, Modal, notification } from 'antd';
+import { Button, Modal, notification, Alert } from 'antd';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
 import omitBy from 'lodash/omitBy';
@@ -399,6 +399,27 @@ const getDiffData = (oldObj, newObj) => {
 	return [diffCount, diffData];
 };
 
+const shouldReIndex = (localMapping, oldSettings, newSettings) => {
+	if (localMapping) {
+		return true;
+	}
+
+	if (
+		get(newSettings, 'indexSettings.enableNgram') !==
+		get(oldSettings, 'indexSettings.enableNgram')
+	) {
+		return true;
+	}
+
+	if (
+		JSON.stringify(get(newSettings, 'language')) !==
+		JSON.stringify(get(oldSettings, 'language'))
+	) {
+		return true;
+	}
+	return false;
+};
+
 class ReviewAndSave extends React.Component {
 	state = {
 		isOpen: false,
@@ -458,7 +479,7 @@ class ReviewAndSave extends React.Component {
 
 		let updatedSettings = {};
 		let shouldUpdateSettings = false;
-		let shouldReIndex = false;
+		const hasToReIndex = shouldReIndex(localMapping, oldSettings, newSettings);
 
 		// decide if re-indexing is required based on language, index and search settings
 		/**
@@ -467,16 +488,12 @@ class ReviewAndSave extends React.Component {
 		 * 3. Language change should trigger setting (analyzer) change + mapping change
 		 */
 
-		if (localMapping) {
-			shouldReIndex = true;
-		}
-
 		if (
 			get(newSettings, 'indexSettings.enableNgram') !==
 			get(oldSettings, 'indexSettings.enableNgram')
 		) {
 			const isNgramEnabled = get(newSettings, 'indexSettings.enableNgram');
-			shouldReIndex = true;
+
 			updatedMappings = {
 				properties: applyNgramMapping(get(updatedMappings, 'properties'), isNgramEnabled),
 			};
@@ -486,7 +503,6 @@ class ReviewAndSave extends React.Component {
 			JSON.stringify(get(newSettings, 'language')) !==
 			JSON.stringify(get(oldSettings, 'language'))
 		) {
-			shouldReIndex = true;
 			shouldUpdateSettings = true;
 			updatedSettings = await getAppSettings(appName, credentials).then(
 				(data) => data[appName].settings,
@@ -581,7 +597,7 @@ class ReviewAndSave extends React.Component {
 				isResetting: false,
 			});
 
-			if (shouldReIndex) {
+			if (hasToReIndex) {
 				const esVersion = getVersion() || (await getESVersion(appName, credentials));
 
 				const reIndexingData = {
@@ -638,10 +654,13 @@ class ReviewAndSave extends React.Component {
 
 	render() {
 		const { isOpen, isResetting, isSaving } = this.state;
-		const { defaultSettings, settings, localRelevancy, appName } = this.props;
+		const { defaultSettings, settings, localRelevancy, appName, localMapping } = this.props;
 		const [diffCount, diffData] = isResetting
 			? getDiffData(settings, defaultSettings)
 			: getDiffData(settings, localRelevancy);
+		const renderShouldReIndex =
+			isOpen &&
+			shouldReIndex(localMapping, settings, isResetting ? defaultSettings : localRelevancy);
 
 		return (
 			<ReIndexWrapper appName={appName}>
@@ -686,7 +705,19 @@ class ReviewAndSave extends React.Component {
 							confirmLoading={isSaving}
 							onCancel={this.handleCancel}
 						>
-							{isOpen && <DiffList diff={diffData} />}
+							<>
+								{renderShouldReIndex && (
+									<Alert
+										type="warning"
+										showIcon
+										message="Re-indexing is required for applying below changes."
+										style={{
+											marginBottom: 10,
+										}}
+									/>
+								)}
+								{isOpen && <DiffList diff={diffData} />}
+							</>
 						</Modal>
 					</>
 				)}
