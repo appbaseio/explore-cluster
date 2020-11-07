@@ -622,7 +622,7 @@ class ReviewAndSave extends React.Component {
 
 			const savedSettings = await updateSettingsAction(appName, settingsData);
 			if (isResetting) {
-				updateLocalRelevancyState(defaultSettings);
+				updateLocalRelevancyState(appName, defaultSettings);
 			}
 			if (savedSettings && savedSettings.error) {
 				notification.error({
