@@ -61,7 +61,7 @@ export const suggestionsMessages = {
 	min_count: Message('Min value of count for the suggestions.'),
 	min_hits: Message('Define the minimum number of results that must present for a suggestion.'),
 	min_chars: Message(
-		'Define the minimum number of characters that must present for a suggestion.',
+		'Define the minimum number of characters that must be present for a suggestion.',
 	),
 	transform_diacritics: Message(
 		'If enabled then Appbase will transform(strip) the diacritics before populating the suggestions. For an example, "Crème Brulée" becomes "Creme Brulee".',
