@@ -69,13 +69,13 @@ class SearchSettingsPage extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { settings, isLoading, mappings } = this.props;
+		const { settings, mappings, localRelevancy } = this.props;
+
 		if (
-			!isLoading &&
-			(isLoading !== prevProps.isLoading ||
-				JSON.stringify(mappings) !== JSON.stringify(prevProps.mappings))
+			JSON.stringify(settings) !== JSON.stringify(prevProps.settings) ||
+			JSON.stringify(mappings) !== JSON.stringify(prevProps.mappings)
 		) {
-			this.init({ ...settings });
+			this.init({ ...(localRelevancy || settings) });
 		}
 	}
 
@@ -203,17 +203,20 @@ class SearchSettingsPage extends React.Component {
 	};
 
 	init = (settings) => {
-		const { appName, updateLocalRelevancy } = this.props;
-		updateLocalRelevancy(appName, {
-			...settings,
-		});
+		const { appName, updateLocalRelevancy, localRelevancy } = this.props;
+		if (!localRelevancy) {
+			updateLocalRelevancy(appName, {
+				...settings,
+			});
+		}
 
 		// initialFieldWeights for searchable fields initially if the no search fields are set!
-		this.initialFieldWeights(settings);
+		this.initialFieldWeights();
 	};
 
-	initialFieldWeights = (settings) => {
+	initialFieldWeights = () => {
 		const {
+			settings,
 			isLoading,
 			isFetchingMapping,
 			appName,
@@ -230,11 +233,11 @@ class SearchSettingsPage extends React.Component {
 			enableSynonyms: synonymsSettings.enabled,
 			language: languageSettings.language,
 		});
+
 		const { dataField, fieldWeights } = get(settings, `search`);
 		const hasSearchFields = flattenUsecase
 			? Object.values(flattenUsecase).some((i) => i === 'search' || 'searchaggs')
 			: false;
-
 		if (
 			!fieldWeights.length &&
 			!dataField.length &&

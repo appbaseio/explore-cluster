@@ -161,7 +161,7 @@ class FieldWeights extends React.Component {
 				usecaseVal === 'none' ||
 				usecaseVal === 'aggs' ||
 				typeVal !== 'text' ||
-				isExistingField === false
+				(dataField.length > 0 && isExistingField === false)
 			) {
 				return null;
 			}

@@ -62,10 +62,12 @@ class AggsPage extends React.Component {
 	}
 
 	init = (settings) => {
-		const { appName, updateLocalRelevancy } = this.props;
-		updateLocalRelevancy(appName, {
-			...settings,
-		});
+		const { appName, updateLocalRelevancy, localRelevancy } = this.props;
+		if (!localRelevancy) {
+			updateLocalRelevancy(appName, {
+				...settings,
+			});
+		}
 	};
 
 	handleChange = (name, value) => {
