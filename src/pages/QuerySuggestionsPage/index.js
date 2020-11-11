@@ -60,6 +60,7 @@ class QuerySuggestions extends React.Component {
 			min_count: [1, [Validators.required, Validators.min(0), Validators.max(1000)]],
 			min_hits: [5, [Validators.required, Validators.min(0)]],
 			number_of_days: [30, [Validators.required, Validators.min(1), Validators.max(365)]],
+			min_chars: [3, [Validators.required, Validators.min(1)]],
 			transform_diacritics: false,
 			indices: [['*']],
 		});
@@ -73,6 +74,7 @@ class QuerySuggestions extends React.Component {
 						min_count: parseInt(payload.min_count, 10),
 						min_hits: parseInt(payload.min_hits, 10),
 						number_of_days: parseInt(payload.number_of_days, 10),
+						min_chars: parseInt(payload.min_chars, 10) || 3,
 						indices: payload.indices || ['*'],
 						transform_diacritics: payload.transform_diacritics,
 					});
@@ -120,6 +122,7 @@ class QuerySuggestions extends React.Component {
 				min_count: Number(this.form.value.min_count),
 				min_hits: Number(this.form.value.min_hits),
 				number_of_days: Number(this.form.value.number_of_days),
+				min_chars: Number(this.form.value.min_chars),
 				external_suggestions:
 					this.form.value.external_suggestions &&
 					typeof this.form.value.external_suggestions === 'string'

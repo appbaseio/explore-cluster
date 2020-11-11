@@ -14,6 +14,8 @@ import {
 	shopifyDefaultFields,
 	getFilterConfigurationForm,
 	getDynamicFilterKey,
+	getMultiListProps,
+	getPriceFilterConfigurationForm,
 } from './utils';
 import { getURL } from '../../constants/config';
 import PreviewModal from './PreviewModal';
@@ -60,7 +62,7 @@ class Main extends React.Component {
 			}),
 			color: getFilterConfigurationForm(),
 			size: getFilterConfigurationForm(),
-			price: getFilterConfigurationForm(),
+			price: getPriceFilterConfigurationForm(),
 		}),
 		dynamicFilters: FormBuilder.array([]),
 		exportSettings: FormBuilder.group({
@@ -225,7 +227,9 @@ class Main extends React.Component {
 										noResults: get(formValue, 'customMessages.noFilterItem'),
 									},
 									rsConfig: {
-										...get(formValue, 'staticFilters.productType.customize'),
+										...getMultiListProps(
+											get(formValue, 'staticFilters.productType.customize'),
+										),
 									},
 								},
 						  ]
@@ -243,7 +247,9 @@ class Main extends React.Component {
 										noResults: get(formValue, 'customMessages.noFilterItem'),
 									},
 									rsConfig: {
-										...get(formValue, 'staticFilters.collections.customize'),
+										...getMultiListProps(
+											get(formValue, 'staticFilters.collections.customize'),
+										),
 									},
 								},
 						  ]
@@ -261,7 +267,9 @@ class Main extends React.Component {
 										noResults: get(formValue, 'customMessages.noFilterItem'),
 									},
 									rsConfig: {
-										...get(formValue, 'staticFilters.color.customize'),
+										...getMultiListProps(
+											get(formValue, 'staticFilters.color.customize'),
+										),
 									},
 								},
 						  ]
@@ -279,7 +287,9 @@ class Main extends React.Component {
 										noResults: get(formValue, 'customMessages.noFilterItem'),
 									},
 									rsConfig: {
-										...get(formValue, 'staticFilters.size.customize'),
+										...getMultiListProps(
+											get(formValue, 'staticFilters.size.customize'),
+										),
 									},
 								},
 						  ]
@@ -297,7 +307,9 @@ class Main extends React.Component {
 										noResults: get(formValue, 'customMessages.noFilterItem'),
 									},
 									rsConfig: {
-										...get(formValue, 'staticFilters.price.customize'),
+										...getMultiListProps(
+											get(formValue, 'staticFilters.price.customize'),
+										),
 									},
 								},
 						  ]
@@ -315,8 +327,8 @@ class Main extends React.Component {
 								' ',
 								'_',
 							)}_${filterIndex}`,
-							...filter.customize,
 							filterLabel: get(filter, 'customize.title'),
+							...getMultiListProps(filter.customize),
 						},
 					})),
 			},

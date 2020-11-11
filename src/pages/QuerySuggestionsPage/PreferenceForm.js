@@ -133,6 +133,12 @@ class PreferenceForm extends React.Component {
 							placeholder="Enter min hits"
 							toolTipMessage={Messages.min_hits}
 						/>
+						<InputElement
+							name="min_chars"
+							label="Min Characters"
+							placeholder="Enter min characters"
+							toolTipMessage={Messages.min_chars}
+						/>
 						<FieldControl
 							name="indices"
 							render={({ handler, value }) => {
