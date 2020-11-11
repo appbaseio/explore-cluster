@@ -298,8 +298,8 @@ export const getDynamicFilterKey = (pre = 'dynamic-filter-control') => {
 };
 
 export const shopifyDefaultFields = {
-	size: 'variants.option1',
-	color: 'variants.option2',
+	size: 'variants.option1.keyword',
+	color: 'variants.option2.keyword',
 	price: 'variants.price',
 	title: 'title',
 	image: 'image.src',

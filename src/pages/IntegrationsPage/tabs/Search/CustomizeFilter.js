@@ -75,7 +75,10 @@ class CustomizeFilter extends React.Component {
 									{(formControl) =>
 										formControl.disabled ? null : (
 											<Form.Item label="DataField">
-												<DataFieldSelector control={formControl} />
+												<DataFieldSelector
+													isAggFields
+													control={formControl}
+												/>
 											</Form.Item>
 										)
 									}

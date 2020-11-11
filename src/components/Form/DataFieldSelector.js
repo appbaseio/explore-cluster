@@ -1,11 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Select } from 'antd';
-import { string, arrayOf, func, bool, object } from 'prop-types';
+import { string, func, bool, object } from 'prop-types';
 import get from 'lodash/get';
 import { FieldControl } from 'react-reactive-form';
 import { getAppMappings } from '../../batteries/modules/actions';
-import { getTraversedMappingsByAppName } from '../../batteries/modules/selectors';
+import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
+import { traverseMapping } from '../../batteries/utils/mappings';
 
 class DataFieldSelector extends React.Component {
 	getMappings = () => {
@@ -16,11 +17,13 @@ class DataFieldSelector extends React.Component {
 	};
 
 	renderOptions() {
-		const { mappings } = this.props;
-		const calcMappings = Array.isArray(mappings) ? mappings : [];
+		const { mappings, isAggFields } = this.props;
+		const traversedMappings = traverseMapping(mappings || {}, undefined, isAggFields);
+		const calcMappings = Array.isArray(traversedMappings) ? traversedMappings : [];
 		return calcMappings.map((v) => (
 			<Select.Option key={v} title={v}>
-				{v}
+				{/* Hide the keyword suffix */}
+				{v.split('.keyword')[0]}
 			</Select.Option>
 		));
 	}
@@ -69,6 +72,7 @@ DataFieldSelector.defaultProps = {
 	control: null,
 	name: undefined,
 	loading: false,
+	isAggFields: false,
 };
 
 DataFieldSelector.propTypes = {
@@ -78,11 +82,12 @@ DataFieldSelector.propTypes = {
 	name: string,
 	loading: bool,
 	control: object,
-	mappings: arrayOf(string),
+	mappings: object,
+	isAggFields: bool,
 };
 
 const mapStateToProps = (state) => {
-	const mappings = getTraversedMappingsByAppName(state);
+	const mappings = getRawMappingsByAppName(state);
 	const { username, password } = get(state, 'user.data', {});
 	const index = get(state, '$getCurrentApp.name');
 	return {
