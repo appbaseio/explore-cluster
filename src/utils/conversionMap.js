@@ -13,4 +13,7 @@ export default {
 	geo_point: ['text'],
 	geo_shape: ['text'],
 	boolean: ['text'],
+
+	rank_feature: ['text', 'integer', 'long', 'float', 'double'],
+	rank_features: ['object'],
 };

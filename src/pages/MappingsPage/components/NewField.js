@@ -4,10 +4,14 @@ import PropTypes from 'prop-types';
 
 import conversionMap from '../../../utils/conversionMap';
 import usecases from '../../../utils/usecases';
+import { getVersion } from '../../../constants/config';
 
 const { Option } = Select;
-
-const types = Object.keys(conversionMap).filter((key) => key !== 'object');
+const version = parseInt(getVersion()[0], 10);
+const types = Object.keys(conversionMap).filter(
+	(key) =>
+		key !== 'object' || (version < 7 && (key !== 'rank_features' || key !== 'rank_feature')),
+);
 
 class NewField extends React.Component {
 	defaultValues = {
