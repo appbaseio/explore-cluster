@@ -78,7 +78,7 @@ class AppWrapper extends Component {
 		}
 
 		const collapsed = window.innerWidth <= breakpoints.medium;
-		const getActiveMenuData = getActiveMenu(props);
+		const getActiveMenuData = getActiveMenu(props, undefined, props.routes);
 
 		this.state = {
 			collapsed,

@@ -55,7 +55,6 @@ const getActiveMenu = (props, prevActiveSubMenu = [], routes = {}) => {
 	if (!pathname) {
 		pathname = getParam('view') || '';
 	}
-
 	Object.keys(routes).some((route) => {
 		if (routes[route].menu) {
 			const active = routes[route].menu.find((item) => pathname.startsWith(item.link));
@@ -100,7 +99,7 @@ class DashboardWrapper extends Component {
 		} catch (e) {
 			console.log(e);
 		}
-		const getActiveMenuData = getActiveMenu(props);
+		const getActiveMenuData = getActiveMenu(props, undefined, props.routes);
 		const { routes } = props;
 		this.state = {
 			collapsed,

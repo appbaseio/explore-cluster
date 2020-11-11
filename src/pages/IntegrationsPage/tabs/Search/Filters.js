@@ -29,6 +29,7 @@ export const defaultSettings = [
 	{
 		id: 'price',
 		label: 'Show price range filter',
+		disableListOptions: true,
 		value: false,
 	},
 ];
@@ -37,7 +38,7 @@ const { Item } = List;
 
 const Filters = () => (
 	<>
-		<FieldGroup name="staticFilters">
+		<FieldGroup strict={false} name="staticFilters">
 			{() => (
 				<Form layout="inline">
 					<List
@@ -53,7 +54,9 @@ const Filters = () => (
 													<Switch checked={value} onChange={onChange} />
 												)}
 											</FieldControl>,
-											<CustomizeFilter />,
+											<CustomizeFilter
+												disableListOptions={item.disableListOptions}
+											/>,
 										]}
 									>
 										<Item.Meta title={item.label} />
