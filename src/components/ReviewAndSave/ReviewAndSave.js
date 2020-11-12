@@ -181,7 +181,6 @@ const getDiffData = (oldObj, newObj) => {
 				const newFunctionValue = isDeleted
 					? ''
 					: Object.keys(newRankFeatures[key][newFunction]).reduce((cum, k) => {
-							console.log({ [k]: newRankFeatures[key][newFunction][k] });
 							return [...cum, `${k} : ${newRankFeatures[key][newFunction][k]}`];
 					  }, []);
 				return [
@@ -777,7 +776,7 @@ class ReviewAndSave extends React.Component {
 		const renderShouldReIndex =
 			isOpen &&
 			shouldReIndex(localMapping, settings, isResetting ? defaultSettings : localRelevancy);
-		console.log({ diffData });
+
 		return (
 			<ReIndexWrapper appName={appName}>
 				{({ refetch }) => (
