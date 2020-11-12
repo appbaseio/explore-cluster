@@ -47,7 +47,7 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 		(key) => flattenType[key] === `rank_feature` || flattenType[key] === `rank_features`,
 	);
 
-	const relevancyRankFields = get(localRelevancy, `search.rank_feature`, {});
+	const relevancyRankFields = get(localRelevancy, `search.rankFeature`, {});
 	const relevancyRankFieldNames = Object.keys(relevancyRankFields);
 	const fieldsToShowInDropDown = rankFields.filter(
 		(field) => !relevancyRankFieldNames.includes(field),
@@ -62,8 +62,8 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 			...localRelevancy,
 			search: {
 				...get(localRelevancy, 'search', {}),
-				rank_feature: {
-					...get(localRelevancy, 'search.rank_feature', {}),
+				rankFeature: {
+					...get(localRelevancy, 'search.rankFeature', {}),
 					[field]: {
 						saturation: { pivot: 1 },
 					},
@@ -74,7 +74,7 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 
 	const handleRemoveRankField = (fieldPath) => {
 		const nestedFields = rankFields.filter((field) => field.indexOf(`${fieldPath}.`) > -1);
-		const rankFeatures = { ...get(localRelevancy, 'search.rank_feature', {}) };
+		const rankFeatures = { ...get(localRelevancy, 'search.rankFeature', {}) };
 		if (!nestedFields.length) {
 			// just remove single field
 			delete rankFeatures[fieldPath];
@@ -90,7 +90,7 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 			...localRelevancy,
 			search: {
 				...get(localRelevancy, 'search', {}),
-				rank_feature: {
+				rankFeature: {
 					...rankFeatures,
 				},
 			},
@@ -118,8 +118,8 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 			...localRelevancy,
 			search: {
 				...get(localRelevancy, 'search', {}),
-				rank_feature: {
-					...get(localRelevancy, 'search.rank_feature', {}),
+				rankFeature: {
+					...get(localRelevancy, 'search.rankFeature', {}),
 					[field]: {
 						[functionName]: functionDefaultValue,
 					},
@@ -133,11 +133,11 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 			...localRelevancy,
 			search: {
 				...get(localRelevancy, 'search', {}),
-				rank_feature: {
-					...get(localRelevancy, 'search.rank_feature', {}),
+				rankFeature: {
+					...get(localRelevancy, 'search.rankFeature', {}),
 					[field]: {
 						[functionName]: {
-							...get(localRelevancy, `search.rank_feature`)[field][functionName],
+							...get(localRelevancy, `search.rankFeature`)[field][functionName],
 							[param]: val,
 						},
 					},

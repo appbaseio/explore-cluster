@@ -18,7 +18,7 @@ const DiffList = ({ diff }) => {
 
 	return (
 		<div style={{ maxHeight: '72vh', overflow: 'auto' }}>
-			<Collapse defaultActiveKey={[Object.keys(diff)[0]]}>
+			<Collapse defaultActiveKey={Object.keys(diff)}>
 				{Object.keys(diff).map((setting) => (
 					<Collapse.Panel
 						key={setting}
@@ -60,15 +60,7 @@ const DiffList = ({ diff }) => {
 															dataIndex: 'oldWeight',
 															key: 'oldWeight',
 															render: (ow) => (
-																<Tag
-																	color="volcano"
-																	style={{
-																		textDecoration:
-																			'line-through',
-																	}}
-																>
-																	{ow}
-																</Tag>
+																<Tag color="volcano">{ow}</Tag>
 															),
 														},
 														{
@@ -84,7 +76,8 @@ const DiffList = ({ diff }) => {
 											)}
 											{item.data.length === 2 &&
 												item.title !== 'dataField' &&
-												item.title !== 'fieldWeights' && (
+												item.title !== 'fieldWeights' &&
+												item.title !== 'rankFeature' && (
 													<Table
 														bordered
 														key={item.title}
@@ -104,13 +97,7 @@ const DiffList = ({ diff }) => {
 																key: 'oldVal',
 																dataIndex: 'oldVal',
 																render: (ov) => (
-																	<Tag
-																		color="volcano"
-																		style={{
-																			textDecoration:
-																				'line-through',
-																		}}
-																	>
+																	<Tag color="volcano">
 																		{ov.toString()}
 																	</Tag>
 																),
@@ -128,6 +115,69 @@ const DiffList = ({ diff }) => {
 														]}
 													/>
 												)}
+											{item.title === 'rankFeature' && setting === 'search' && (
+												<Table
+													bordered
+													key={item.title}
+													pagination={false}
+													size="small"
+													rowKey="field"
+													dataSource={item.data}
+													style={{
+														height: 300,
+														overflow: 'auto',
+													}}
+													columns={[
+														{
+															title: 'Field',
+															key: 'field',
+															dataIndex: 'field',
+															render: (field, fieldData) => (
+																<>
+																	{get(fieldData, 'isDeleted') ? (
+																		<span>
+																			{field}&nbsp;
+																			<Tag color="red">
+																				deleted
+																			</Tag>
+																		</span>
+																	) : (
+																		<span>
+																			{field}&nbsp;
+																			{fieldData.oldValue ===
+																				'N/A' && (
+																				<Tag color="green">
+																					new
+																				</Tag>
+																			)}
+																		</span>
+																	)}
+																</>
+															),
+														},
+														{
+															title: 'Old Function',
+															key: 'oldValue',
+															dataIndex: 'oldValue',
+															render: (ov) => (
+																<Tag color="volcano">
+																	{ov.toString()}
+																</Tag>
+															),
+														},
+														{
+															title: 'New Function',
+															key: 'newValue',
+															dataIndex: 'newValue',
+															render: (nv) => (
+																<Tag color="green">
+																	{nv.toString()}
+																</Tag>
+															),
+														},
+													]}
+												/>
+											)}
 											{item.title === 'dataField' && setting === 'search' && (
 												<Table
 													bordered
@@ -157,7 +207,7 @@ const DiffList = ({ diff }) => {
 																	) : (
 																		<span>
 																			{field}&nbsp;
-																			{fieldData.newWeight !==
+																			{fieldData.oldWeight ===
 																				'N/A' && (
 																				<Tag color="green">
 																					new
@@ -173,13 +223,7 @@ const DiffList = ({ diff }) => {
 															key: 'oldWeight',
 															dataIndex: 'oldWeight',
 															render: (ov) => (
-																<Tag
-																	color="volcano"
-																	style={{
-																		textDecoration:
-																			'line-through',
-																	}}
-																>
+																<Tag color="volcano">
 																	{ov.toString()}
 																</Tag>
 															),
@@ -243,13 +287,7 @@ const DiffList = ({ diff }) => {
 																key: 'oldAgg',
 																dataIndex: 'oldAgg',
 																render: (ov) => (
-																	<Tag
-																		color="volcano"
-																		style={{
-																			textDecoration:
-																				'line-through',
-																		}}
-																	>
+																	<Tag color="volcano">
 																		{ov.toString()}
 																	</Tag>
 																),

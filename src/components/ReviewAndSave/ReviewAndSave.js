@@ -163,6 +163,60 @@ const getDiffData = (oldObj, newObj) => {
 		}
 	}
 
+	if (get(diffData, 'search.rankFeature', null)) {
+		const newRankFeatures = get(newObj, 'search.rankFeature', {});
+		const oldRankFeatures = get(oldObj, 'search.rankFeature', {});
+		const updatedRankFeature = Object.keys(get(diffData, 'search.rankFeature')).reduce(
+			(agg, key) => {
+				const isDeleted = Boolean(oldRankFeatures[key]) && !newRankFeatures[key];
+				const isNew = !oldRankFeatures[key] && Boolean(newRankFeatures[key]);
+				const oldFunction = isNew ? '' : Object.keys(oldRankFeatures[key])[0];
+				const oldFunctionValue = isNew
+					? ''
+					: Object.keys(oldRankFeatures[key][oldFunction]).reduce(
+							(cum, k) => [...cum, `${k} : ${oldRankFeatures[key][oldFunction][k]}`],
+							[],
+					  );
+				const newFunction = isDeleted ? '' : Object.keys(newRankFeatures[key])[0];
+				const newFunctionValue = isDeleted
+					? ''
+					: Object.keys(newRankFeatures[key][newFunction]).reduce((cum, k) => {
+							console.log({ [k]: newRankFeatures[key][newFunction][k] });
+							return [...cum, `${k} : ${newRankFeatures[key][newFunction][k]}`];
+					  }, []);
+				return [
+					...agg,
+					{
+						field: key,
+						isDeleted,
+						oldValue: isNew ? 'N/A' : `${oldFunction} (${oldFunctionValue.join(', ')})`,
+						newValue: isDeleted
+							? 'N/A'
+							: `${newFunction} (${newFunctionValue.join(', ')})`,
+					},
+				];
+			},
+			[],
+		);
+		diffData = {
+			...diffData,
+			search: {
+				...diffData.search,
+				rankFeature: updatedRankFeature,
+			},
+		};
+	}
+
+	if ('enableNgram' in get(diffData, 'indexSettings', {})) {
+		diffData = {
+			...diffData,
+			search: {
+				...get(diffData, 'search'),
+				enableNgram: get(diffData, 'indexSettings.enableNgram'),
+			},
+		};
+	}
+
 	if (get(diffData, 'aggregations.dataField', null)) {
 		const newDataFields = Object.keys(diffData.aggregations.dataField).reduce((agg, i) => {
 			// deleted field is of pattern [fieldName, number, number]
@@ -401,6 +455,23 @@ const getDiffData = (oldObj, newObj) => {
 				[item]: {
 					...diffData[item],
 				},
+			};
+		}
+		return agg;
+	}, {});
+
+	diffData = {
+		language: get(diffData, 'language', {}),
+		search: get(diffData, 'search', {}),
+		aggregations: get(diffData, 'aggregation', {}),
+		results: get(diffData, 'result', {}),
+	};
+
+	diffData = Object.keys(diffData).reduce((agg, i) => {
+		if (Object.keys(diffData[i]).length) {
+			return {
+				...agg,
+				[i]: diffData[i],
 			};
 		}
 		return agg;
@@ -706,7 +777,7 @@ class ReviewAndSave extends React.Component {
 		const renderShouldReIndex =
 			isOpen &&
 			shouldReIndex(localMapping, settings, isResetting ? defaultSettings : localRelevancy);
-
+		console.log({ diffData });
 		return (
 			<ReIndexWrapper appName={appName}>
 				{({ refetch }) => (
@@ -729,7 +800,7 @@ class ReviewAndSave extends React.Component {
 									disabled={!diffCount || isResetting}
 									onClick={this.showModal}
 								>
-									Reive and Deploy
+									Review and Deploy
 								</Button>
 							</div>
 						</div>
