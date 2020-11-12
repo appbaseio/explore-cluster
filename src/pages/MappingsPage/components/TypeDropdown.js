@@ -12,15 +12,16 @@ const TypeDropdown = ({ value, onTypeChange, path, usecase }) => {
 		<Select
 			value={value}
 			style={{ width: 150, textTransform: 'capitalize' }}
-			onChange={(selected) =>
+			onChange={(selected) => {
+				console.log({ selected });
 				onTypeChange({
 					type: selected,
 					path,
 					usecase: selected === 'text' ? usecase : 'none',
-				})
-			}
+				});
+			}}
 		>
-			{get(types, value, []).map((type) => (
+			{get(types, value, ['text']).map((type) => (
 				<Option key={type} value={type}>
 					{capitalizeFirstLetter(type)}
 				</Option>
