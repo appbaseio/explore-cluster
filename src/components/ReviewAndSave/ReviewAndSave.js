@@ -244,105 +244,42 @@ const getDiffData = (oldObj, newObj) => {
 	}
 
 	if (get(diffData, 'results.highlightFields', null)) {
-		const newHighlightFields = Object.keys(get(diffData, 'results.highlightFields')).reduce(
-			(agg, key) => {
-				let [deletedFields, addedFields] = agg;
-				deletedFields = deletedFields.split(', ').filter((i) => i.trim());
-				addedFields = addedFields.split(', ').filter((i) => i.trim());
-				if (key !== '_t') {
-					// key name starting with _ indicates it is deleted key
-					if (key[0] === '_') {
-						deletedFields = [
-							...deletedFields,
-							get(diffData, `results.highlightFields`)[key][0],
-						];
-					} else {
-						addedFields = [
-							...addedFields,
-							get(diffData, `results.highlightFields`)[key][0],
-						];
-					}
-				}
-
-				return [deletedFields.join(', '), addedFields.join(', ')];
-			},
-			['', ''],
-		);
+		const newVal = get(newObj, 'results.highlightFields', []);
+		const oldVal = get(oldObj, 'results.highlightFields', []);
 
 		diffData = {
 			...diffData,
 			results: {
 				...diffData.results,
-				highlightFields: newHighlightFields,
+				highlightFields: [oldVal.join(', '), newVal.join(', ')],
 			},
 		};
 	}
 
 	if (get(diffData, 'results.includeFields', null)) {
-		const newIncludeFields = Object.keys(get(diffData, 'results.includeFields')).reduce(
-			(agg, key) => {
-				let [deletedFields, addedFields] = agg;
-				deletedFields = deletedFields.split(', ').filter((i) => i.trim());
-				addedFields = addedFields.split(', ').filter((i) => i.trim());
-				if (key !== '_t') {
-					// key name starting with _ indicates it is deleted key
-					if (key[0] === '_') {
-						deletedFields = [
-							...deletedFields,
-							get(diffData, `results.includeFields`)[key][0],
-						];
-					} else {
-						addedFields = [
-							...addedFields,
-							get(diffData, `results.includeFields`)[key][0],
-						];
-					}
-				}
-
-				return [deletedFields.join(', '), addedFields.join(', ')];
-			},
-			['', ''],
-		);
+		const newVal = get(newObj, 'results.includeFields', []);
+		const oldVal = get(oldObj, 'results.includeFields', []);
+		console.log({ newVal, oldVal });
 		diffData = {
 			...diffData,
 			results: {
 				...diffData.results,
-				includeFields: newIncludeFields,
+				includeFields: [oldVal.join(', '), newVal.join(', ')],
 			},
 		};
+
+		console.log(diffData);
 	}
 
 	if (get(diffData, 'results.excludeFields', null)) {
-		const newExcludeFields = Object.keys(get(diffData, 'results.excludeFields')).reduce(
-			(agg, key) => {
-				let [deletedFields, addedFields] = agg;
-				deletedFields = deletedFields.split(', ').filter((i) => i.trim());
-				addedFields = addedFields.split(', ').filter((i) => i.trim());
-				if (key !== '_t') {
-					// key name starting with _ indicates it is deleted key
-					if (key[0] === '_') {
-						deletedFields = [
-							...deletedFields,
-							get(diffData, `results.excludeFields`)[key][0],
-						];
-					} else {
-						addedFields = [
-							...addedFields,
-							get(diffData, `results.excludeFields`)[key][0],
-						];
-					}
-				}
-
-				return [deletedFields.join(', '), addedFields.join(', ')];
-			},
-			['', ''],
-		);
+		const newVal = get(newObj, 'results.excludeFields', []);
+		const oldVal = get(oldObj, 'results.excludeFields', []);
 
 		diffData = {
 			...diffData,
 			results: {
 				...diffData.results,
-				excludeFields: newExcludeFields,
+				excludeFields: [oldVal.join(', '), newVal.join(', ')],
 			},
 		};
 	}
@@ -389,62 +326,37 @@ const getDiffData = (oldObj, newObj) => {
 	}
 
 	if (get(diffData, 'language.stemmingExceptions', null)) {
-		diffData.language.stemmingExceptions = Object.keys(
-			get(diffData, 'language.stemmingExceptions'),
-		).reduce(
-			(agg, key) => {
-				let [deletedFields, addedFields] = agg;
-				deletedFields = deletedFields.split(', ').filter((i) => i.trim());
-				addedFields = addedFields.split(', ').filter((i) => i.trim());
-				if (key !== '_t') {
-					// key name starting with _ indicates it is deleted key
-					if (key[0] === '_') {
-						deletedFields = [
-							...deletedFields,
-							get(diffData, `language.stemmingExceptions`)[key][0],
-						];
-					} else {
-						addedFields = [
-							...addedFields,
-							get(diffData, `language.stemmingExceptions`)[key][0],
-						];
-					}
-				}
+		const newVal = get(newObj, 'language.stemmingExceptions', []);
+		const oldVal = get(oldObj, 'language.stemmingExceptions', []);
 
-				return [deletedFields.join(', '), addedFields.join(', ')];
+		diffData = {
+			...diffData,
+			language: {
+				...diffData.language,
+				stemmingExceptions: [oldVal.join(', '), newVal.join(', ')],
 			},
-			['', ''],
-		);
+		};
 	}
 
 	if (get(diffData, 'language.customStopwords', null)) {
-		diffData.language.customStopwords = Object.keys(
-			get(diffData, 'language.customStopwords'),
-		).reduce(
-			(agg, key) => {
-				let [deletedFields, addedFields] = agg;
-				deletedFields = deletedFields.split(', ').filter((i) => i.trim());
-				addedFields = addedFields.split(', ').filter((i) => i.trim());
-				if (key !== '_t') {
-					// key name starting with _ indicates it is deleted key
-					if (key[0] === '_') {
-						deletedFields = [
-							...deletedFields,
-							get(diffData, `language.customStopwords`)[key][0],
-						];
-					} else {
-						addedFields = [
-							...addedFields,
-							get(diffData, `language.customStopwords`)[key][0],
-						];
-					}
-				}
+		const newVal = get(newObj, 'language.customStopwords', []);
+		const oldVal = get(oldObj, 'language.customStopwords', []);
 
-				return [deletedFields.join(', '), addedFields.join(', ')];
+		diffData = {
+			...diffData,
+			language: {
+				...diffData.language,
+				customStopwords: [oldVal.join(', '), newVal.join(', ')],
 			},
-			['', ''],
-		);
+		};
 	}
+
+	diffData = {
+		language: get(diffData, 'language', {}),
+		search: get(diffData, 'search', {}),
+		aggregations: get(diffData, 'aggregations', {}),
+		results: get(diffData, 'results', {}),
+	};
 
 	// filter empty fields
 	diffData = Object.keys(diffData).reduce((agg, item) => {
@@ -454,23 +366,6 @@ const getDiffData = (oldObj, newObj) => {
 				[item]: {
 					...diffData[item],
 				},
-			};
-		}
-		return agg;
-	}, {});
-
-	diffData = {
-		language: get(diffData, 'language', {}),
-		search: get(diffData, 'search', {}),
-		aggregations: get(diffData, 'aggregation', {}),
-		results: get(diffData, 'result', {}),
-	};
-
-	diffData = Object.keys(diffData).reduce((agg, i) => {
-		if (Object.keys(diffData[i]).length) {
-			return {
-				...agg,
-				[i]: diffData[i],
 			};
 		}
 		return agg;
@@ -487,7 +382,7 @@ const getDiffData = (oldObj, newObj) => {
 
 		return count;
 	}, 0);
-
+	console.log(diffData);
 	return [diffCount, diffData];
 };
 
