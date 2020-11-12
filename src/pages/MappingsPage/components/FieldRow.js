@@ -62,12 +62,12 @@ const FieldRow = ({
 						</Col>
 					)}
 					{renderColumn ? (
-						<Col xs={12}>
+						<div style={{ paddingRight: 15 }}>
 							{renderColumn({
 								path,
 								mapping,
 							})}
-						</Col>
+						</div>
 					) : null}
 				</Row>
 			</Col>

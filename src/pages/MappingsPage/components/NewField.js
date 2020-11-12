@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import conversionMap from '../../../utils/conversionMap';
 import usecases from '../../../utils/usecases';
 import { getVersion } from '../../../constants/config';
+import { capitalizeFirstLetter } from '../../../utils/helper';
 
 const { Option } = Select;
 const version = parseInt(getVersion()[0], 10);
@@ -142,13 +143,13 @@ class NewField extends React.Component {
 						) : null}
 						<Col md={5}>
 							<Select
-								style={{ width: '100%' }}
+								style={{ width: '100%', textTransform: 'capitalize' }}
 								value={fieldType}
 								onChange={this.handleType}
 							>
 								{types.map((type) => (
 									<Option key={type} value={type}>
-										{type}
+										{capitalizeFirstLetter(type)}
 									</Option>
 								))}
 							</Select>

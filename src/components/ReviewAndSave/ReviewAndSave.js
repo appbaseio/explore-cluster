@@ -116,9 +116,9 @@ const getDiffData = (oldObj, newObj) => {
 						field: fieldName,
 						index,
 						isDeleted,
-						oldWeight: isDeleted ? olderWeights[index] : 'NA',
+						oldWeight: isDeleted ? olderWeights[index] : 'N/A',
 						newWeight: isDeleted
-							? 'NA'
+							? 'N/A'
 							: get(diffData, `search.fieldWeights[${i}][0]`, 1), // always first index holds the value
 					},
 				];
@@ -174,8 +174,8 @@ const getDiffData = (oldObj, newObj) => {
 				{
 					field: i.split('.keyword')[0], // just to ignore `.keyword` in field name
 					isDeleted,
-					oldAgg: isDeleted || isOlderField ? get(fieldVal, 0, 'NA') : `NA`,
-					newAgg: isDeleted ? 'NA' : get(fieldVal, 1, get(fieldVal, 0, 'NA')),
+					oldAgg: isDeleted || isOlderField ? get(fieldVal, 0, 'N/A') : 'NA',
+					newAgg: isDeleted ? 'N/A' : get(fieldVal, 1, get(fieldVal, 0, 'N/A')),
 				},
 			];
 

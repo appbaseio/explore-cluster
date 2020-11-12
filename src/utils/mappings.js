@@ -162,15 +162,6 @@ const _getFieldsByRelevancy = ({
 const MAPPING_TYPE_WITH_NO_FIELDS = ['rank_feature', 'rank_features'];
 
 const _updateNestedMapping = ({ mapping, type, usecase, fields, currentIndex, settings }) => {
-	if (MAPPING_TYPE_WITH_NO_FIELDS.includes(type)) {
-		return {
-			...mapping,
-			[`${fields[currentIndex]}`]: {
-				type,
-			},
-		};
-	}
-
 	if (fields.length === currentIndex + 1) {
 		const { enableNgram, enableSynonyms, language } = settings;
 
@@ -181,14 +172,18 @@ const _updateNestedMapping = ({ mapping, type, usecase, fields, currentIndex, se
 			fields: get(mappingUsecase, `${usecase}.fields`),
 			type,
 		});
+		const data = {
+			...mappingUsecase[usecase],
+			fields: updatedFields,
+			type,
+		};
 
+		if (MAPPING_TYPE_WITH_NO_FIELDS.includes(type)) {
+			delete data.fields;
+		}
 		return {
 			...mapping,
-			[`${fields[currentIndex]}`]: {
-				...mappingUsecase[usecase],
-				fields: updatedFields,
-				type,
-			},
+			[`${fields[currentIndex]}`]: data,
 		};
 	}
 

@@ -82,6 +82,9 @@ class FieldWeights extends React.Component {
 		if (useCaseData && typeData) {
 			const newNonSearchableFields = Object.keys(typeData).reduce((agg, field) => {
 				const isExistingField = dataField.some((x) => x === field);
+				if (typeData[field] === 'rank_feature' || typeData[field] === 'rank_features') {
+					return [...agg];
+				}
 				if (
 					useCaseData[field] === 'aggs' ||
 					useCaseData[field] === 'none' ||
