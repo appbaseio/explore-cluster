@@ -166,37 +166,36 @@ const getDiffData = (oldObj, newObj) => {
 	if (get(diffData, 'search.rankFeature', null)) {
 		const newRankFeatures = get(newObj, 'search.rankFeature', {});
 		const oldRankFeatures = get(oldObj, 'search.rankFeature', {});
-		const updatedRankFeature = Object.keys(get(diffData, 'search.rankFeature')).reduce(
-			(agg, key) => {
-				const isDeleted = Boolean(oldRankFeatures[key]) && !newRankFeatures[key];
-				const isNew = !oldRankFeatures[key] && Boolean(newRankFeatures[key]);
-				const oldFunction = isNew ? '' : Object.keys(oldRankFeatures[key])[0];
-				const oldFunctionValue = isNew
-					? ''
-					: Object.keys(oldRankFeatures[key][oldFunction]).reduce(
-							(cum, k) => [...cum, `${k} : ${oldRankFeatures[key][oldFunction][k]}`],
-							[],
-					  );
-				const newFunction = isDeleted ? '' : Object.keys(newRankFeatures[key])[0];
-				const newFunctionValue = isDeleted
-					? ''
-					: Object.keys(newRankFeatures[key][newFunction]).reduce((cum, k) => {
-							return [...cum, `${k} : ${newRankFeatures[key][newFunction][k]}`];
-					  }, []);
-				return [
-					...agg,
-					{
-						field: key,
-						isDeleted,
-						oldValue: isNew ? 'N/A' : `${oldFunction} (${oldFunctionValue.join(', ')})`,
-						newValue: isDeleted
-							? 'N/A'
-							: `${newFunction} (${newFunctionValue.join(', ')})`,
-					},
-				];
-			},
-			[],
-		);
+
+		const updatedRankFeature = Object.keys(
+			get(diffData, 'search.rankFeature.0', get(diffData, 'search.rankFeature', {})),
+		).reduce((agg, key) => {
+			const isDeleted = Boolean(oldRankFeatures[key]) && !newRankFeatures[key];
+			const isNew = !oldRankFeatures[key] && Boolean(newRankFeatures[key]);
+			const oldFunction = isNew ? '' : Object.keys(oldRankFeatures[key])[0];
+			const oldFunctionValue = isNew
+				? ''
+				: Object.keys(oldRankFeatures[key][oldFunction]).reduce(
+						(cum, k) => [...cum, `${k} : ${oldRankFeatures[key][oldFunction][k]}`],
+						[],
+				  );
+
+			const newFunction = isDeleted ? '' : Object.keys(newRankFeatures[key])[0];
+			const newFunctionValue = isDeleted
+				? ''
+				: Object.keys(newRankFeatures[key][newFunction]).reduce((cum, k) => {
+						return [...cum, `${k} : ${newRankFeatures[key][newFunction][k]}`];
+				  }, []);
+			return [
+				...agg,
+				{
+					field: key,
+					isDeleted,
+					oldValue: isNew ? 'N/A' : `${oldFunction} (${oldFunctionValue.join(', ')})`,
+					newValue: isDeleted ? 'N/A' : `${newFunction} (${newFunctionValue.join(', ')})`,
+				},
+			];
+		}, []);
 		diffData = {
 			...diffData,
 			search: {
@@ -259,7 +258,6 @@ const getDiffData = (oldObj, newObj) => {
 	if (get(diffData, 'results.includeFields', null)) {
 		const newVal = get(newObj, 'results.includeFields', []);
 		const oldVal = get(oldObj, 'results.includeFields', []);
-		console.log({ newVal, oldVal });
 		diffData = {
 			...diffData,
 			results: {
@@ -267,8 +265,6 @@ const getDiffData = (oldObj, newObj) => {
 				includeFields: [oldVal.join(', '), newVal.join(', ')],
 			},
 		};
-
-		console.log(diffData);
 	}
 
 	if (get(diffData, 'results.excludeFields', null)) {
@@ -382,7 +378,6 @@ const getDiffData = (oldObj, newObj) => {
 
 		return count;
 	}, 0);
-	console.log(diffData);
 	return [diffCount, diffData];
 };
 
