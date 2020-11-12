@@ -203,9 +203,16 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 										width: 170,
 										marginRight: hasSigmoidField ? 110 : 0,
 									}}
-									onChange={(val) =>
-										handleParamChange(fieldPath, functionName, 'pivot', val)
-									}
+									onChange={(val) => {
+										if (val && typeof val === 'number') {
+											handleParamChange(
+												fieldPath,
+												functionName,
+												'pivot',
+												val,
+											);
+										}
+									}}
 								/>
 							)}
 							{functionName === FUNCTIONS.LOG && (
@@ -217,14 +224,16 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 										width: 170,
 										marginRight: hasSigmoidField ? 110 : 0,
 									}}
-									onChange={(val) =>
-										handleParamChange(
-											fieldPath,
-											functionName,
-											'scaling_factor',
-											val,
-										)
-									}
+									onChange={(val) => {
+										if (val && typeof val === 'number') {
+											handleParamChange(
+												fieldPath,
+												functionName,
+												'scaling_factor',
+												val,
+											);
+										}
+									}}
 								/>
 							)}
 							{functionName === FUNCTIONS.SIGMOID && (
@@ -233,9 +242,16 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 										value={get(functionValue, 'pivot')}
 										style={{ marginLeft: 10, width: 170 }}
 										min={1}
-										onChange={(val) =>
-											handleParamChange(fieldPath, functionName, 'pivot', val)
-										}
+										onChange={(val) => {
+											if (val && typeof val === 'number') {
+												handleParamChange(
+													fieldPath,
+													functionName,
+													'pivot',
+													val,
+												);
+											}
+										}}
 									/>
 									<InputNumber
 										value={get(functionValue, 'exponent')}
@@ -243,14 +259,16 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 										min={0.5}
 										max={1}
 										step={0.1}
-										onChange={(val) =>
-											handleParamChange(
-												fieldPath,
-												functionName,
-												'exponent',
-												val,
-											)
-										}
+										onChange={(val) => {
+											if (val && typeof val === 'number') {
+												handleParamChange(
+													fieldPath,
+													functionName,
+													'exponent',
+													val,
+												);
+											}
+										}}
 									/>
 								</>
 							)}

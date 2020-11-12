@@ -111,8 +111,8 @@ class FieldWeights extends React.Component {
 		const {
 			mappingWrapperProps,
 			handleDelete,
-			handleFieldWeights,
 			localRelevancy,
+			handleFieldWeights,
 		} = this.props;
 		const { flattenUsecase, setMapping } = mappingWrapperProps;
 
@@ -183,13 +183,19 @@ class FieldWeights extends React.Component {
 						<div style={{ width: 150 }}>
 							<InputNumber
 								value={fieldWeightMap[fieldPath] || 1}
-								min={0}
+								min={1}
+								ref={(input) => {
+									this[fieldPath] = input;
+								}}
+								step={0.5}
 								onChange={(value) => {
-									handleFieldWeights({
-										weight: value,
-										field: fieldPath,
-										mapping,
-									});
+									if (value && typeof value === 'number') {
+										handleFieldWeights({
+											weight: value,
+											field: fieldPath,
+											mapping,
+										});
+									}
 								}}
 							/>
 						</div>
