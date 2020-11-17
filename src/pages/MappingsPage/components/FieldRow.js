@@ -1,4 +1,5 @@
 import React from 'react';
+import get from 'lodash/get';
 import { Button, Row, Col, Icon, Popover, Input } from 'antd';
 import PropTypes from 'prop-types';
 import UsecaseDropdown from './UsecaseDropdown';
@@ -6,8 +7,6 @@ import TypeDropdown from './TypeDropdown';
 import { fieldRow } from './styles';
 import MappingsTypeIcon from './MappingsTypeIcon';
 import { VIEWS } from '../../../constants/props';
-
-const fieldNameInput = React.createRef();
 
 const FieldRow = ({
 	path,
@@ -22,6 +21,7 @@ const FieldRow = ({
 	isFieldNameEditable,
 	onFieldNameChange,
 }) => {
+	const [fieldName, setFieldName] = React.useState(path);
 	return (
 		<Row type="flex" justify="space-between" className={fieldRow}>
 			<Col>
@@ -33,16 +33,16 @@ const FieldRow = ({
 					</Popover>
 					{isFieldNameEditable ? (
 						<Input
-							value={field}
+							defaultValue={path}
 							onChange={(e) => {
-								onFieldNameChange(e);
-								setTimeout(() => {
-									fieldNameInput.current.focus();
-								});
+								const val = get(e, 'target.value');
+								if (val) {
+									setFieldName(val);
+								}
 							}}
+							onBlur={() => onFieldNameChange(path, fieldName)}
 							placeholder="field name"
 							style={{ width: 200 }}
-							ref={fieldNameInput}
 						/>
 					) : (
 						field

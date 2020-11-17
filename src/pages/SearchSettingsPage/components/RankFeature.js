@@ -11,6 +11,7 @@ import { setLocalRelevancyState } from '../../../batteries/modules/actions';
 import FieldRow from '../../MappingsPage/components/FieldRow';
 import { VIEWS } from '../../../constants/props';
 import Flex from '../../../batteries/components/shared/Flex';
+import { renameObjectKey } from '../../../utils';
 
 const FUNCTIONS = {
 	SATURATION: 'saturation',
@@ -159,20 +160,20 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 	const handleFieldNameChange = (oldFieldName, newFieldName) => {
 		const rankFeature = get(localRelevancy, 'search.rankFeature', {});
 
-		const newRankFeature = {
-			...rankFeature,
-			[newFieldName]: {
-				...rankFeature[oldFieldName],
-			},
-		};
+		// const newRankFeature = {
+		// 	...rankFeature,
+		// 	[newFieldName]: {
+		// 		...rankFeature[oldFieldName],
+		// 	},
+		// };
 
-		delete newRankFeature[oldFieldName];
+		// delete newRankFeature[oldFieldName];
 
 		updateLocalRelevancy(appName, {
 			...localRelevancy,
 			search: {
 				...get(localRelevancy, 'search', {}),
-				rankFeature: { ...newRankFeature },
+				rankFeature: { ...renameObjectKey(rankFeature, oldFieldName, newFieldName) },
 			},
 		});
 	};
@@ -193,9 +194,7 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 					path={`${field}`}
 					setMapping={() => {}}
 					isFieldNameEditable
-					onFieldNameChange={(e) => {
-						handleFieldNameChange(field, e.target.value);
-					}}
+					onFieldNameChange={handleFieldNameChange}
 					renderColumn={({ path: fieldPath }) => (
 						<Flex key={fieldPath}>
 							<InputNumber
