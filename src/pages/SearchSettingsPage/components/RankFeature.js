@@ -167,11 +167,12 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 		};
 
 		delete newRankFeature[oldFieldName];
+
 		updateLocalRelevancy(appName, {
 			...localRelevancy,
 			search: {
 				...get(localRelevancy, 'search', {}),
-				rankFeature: { ...rankFeature },
+				rankFeature: { ...newRankFeature },
 			},
 		});
 	};

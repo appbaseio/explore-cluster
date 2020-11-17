@@ -215,7 +215,7 @@ class MappingsWrapper extends React.Component {
 
 			updatedFlattenType = {
 				...flattenType,
-				[path]: type,
+				[path]: fieldType,
 			};
 		});
 

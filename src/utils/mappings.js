@@ -258,8 +258,7 @@ export const deleteMappingField = ({ originalMapping, path }) => {
 		TOP_FIELD = 'properties';
 	}
 
-	const deletedPath = path.split('.').join('.properties.');
-	const updatedMappings = omit(get(mapping, TOP_FIELD), deletedPath);
+	const updatedMappings = omit(get(mapping, TOP_FIELD), path);
 
 	if (+ES_VERSION[0] >= 6 && +ES_VERSION[0] < 7) {
 		return {
@@ -272,7 +271,7 @@ export const deleteMappingField = ({ originalMapping, path }) => {
 	}
 
 	return {
-		deletedPath,
+		deletedPath: path,
 		mappings: {
 			[TOP_FIELD]: {
 				...updatedMappings,
