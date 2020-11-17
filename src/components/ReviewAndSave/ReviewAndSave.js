@@ -172,7 +172,9 @@ const getDiffData = (oldObj, newObj) => {
 		).reduce((agg, key) => {
 			const isDeleted = Boolean(oldRankFeatures[key]) && !newRankFeatures[key];
 			const isNew = !oldRankFeatures[key] && Boolean(newRankFeatures[key]);
-			const oldFunction = isNew ? '' : Object.keys(oldRankFeatures[key])[0];
+			const oldFunction = isNew
+				? ''
+				: Object.keys(oldRankFeatures[key]).find((x) => x !== 'boost');
 			const oldFunctionValue = isNew
 				? ''
 				: Object.keys(oldRankFeatures[key][oldFunction]).reduce(
@@ -180,7 +182,9 @@ const getDiffData = (oldObj, newObj) => {
 						[],
 				  );
 
-			const newFunction = isDeleted ? '' : Object.keys(newRankFeatures[key])[0];
+			const newFunction = isDeleted
+				? ''
+				: Object.keys(newRankFeatures[key]).find((x) => x !== 'boost');
 			const newFunctionValue = isDeleted
 				? ''
 				: Object.keys(newRankFeatures[key][newFunction]).reduce((cum, k) => {
@@ -191,8 +195,16 @@ const getDiffData = (oldObj, newObj) => {
 				{
 					field: key,
 					isDeleted,
-					oldValue: isNew ? 'N/A' : `${oldFunction} (${oldFunctionValue.join(', ')})`,
-					newValue: isDeleted ? 'N/A' : `${newFunction} (${newFunctionValue.join(', ')})`,
+					oldValue: isNew
+						? 'N/A'
+						: `${oldFunction} (${
+								oldFunctionValue.join(', ').trim() || 'default'
+						  }), boost(${oldRankFeatures[key].boost})`,
+					newValue: isDeleted
+						? 'N/A'
+						: `${newFunction} (${
+								newFunctionValue.join(', ').trim() || 'default'
+						  }), boost(${newRankFeatures[key].boost})`,
 				},
 			];
 		}, []);
