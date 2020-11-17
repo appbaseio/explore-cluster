@@ -9,9 +9,7 @@ import VersionController from '../../../batteries/components/shared/VersionContr
 import { getVersion } from '../../../constants/config';
 import { setLocalRelevancyState } from '../../../batteries/modules/actions';
 import FieldRow from '../../MappingsPage/components/FieldRow';
-import ObjectField from '../../MappingsPage/components/ObjectField';
 import { VIEWS } from '../../../constants/props';
-import { unflattenObject } from '../../../utils';
 import Flex from '../../../batteries/components/shared/Flex';
 
 const FUNCTIONS = {
@@ -44,14 +42,11 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 	const flattenType = get(mappingWrapperProps, 'flattenType', null) || {};
 
 	const rankFields = Object.keys(flattenType).filter(
-		(key) => flattenType[key] === `rank_feature` || flattenType[key] === `rank_features`,
+		(key) => flattenType[key] === `rank_feature` || flattenType[key] === 'rank_features',
 	);
 
 	const relevancyRankFields = get(localRelevancy, `search.rankFeature`, {});
 	const relevancyRankFieldNames = Object.keys(relevancyRankFields);
-	const fieldsToShowInDropDown = rankFields.filter(
-		(field) => !relevancyRankFieldNames.includes(field),
-	);
 
 	const hasSigmoidField = Object.keys(relevancyRankFields).some((field) =>
 		Boolean(relevancyRankFields[field].sigmoid),
@@ -65,7 +60,8 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 				rankFeature: {
 					...get(localRelevancy, 'search.rankFeature', {}),
 					[field]: {
-						saturation: { pivot: 1 },
+						saturation: {},
+						boost: 1,
 					},
 				},
 			},
@@ -98,9 +94,7 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 	};
 
 	const handleFunctionChange = (field, functionName) => {
-		let functionDefaultValue = {
-			pivot: 1,
-		};
+		let functionDefaultValue = {};
 
 		if (functionName === FUNCTIONS.LOG) {
 			functionDefaultValue = {
@@ -110,7 +104,6 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 
 		if (functionName === FUNCTIONS.SIGMOID) {
 			functionDefaultValue = {
-				pivot: 1,
 				exponent: 0.5,
 			};
 		}
@@ -122,6 +115,7 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 					...get(localRelevancy, 'search.rankFeature', {}),
 					[field]: {
 						[functionName]: functionDefaultValue,
+						boost: 1,
 					},
 				},
 			},
@@ -138,7 +132,7 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 					[field]: {
 						[functionName]: {
 							...get(localRelevancy, `search.rankFeature`)[field][functionName],
-							[param]: val,
+							[param]: Math.abs(val).toFixed(1),
 						},
 					},
 				},
@@ -146,47 +140,79 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 		});
 	};
 
-	const unflattenRelevancyFields = unflattenObject(relevancyRankFields);
+	const handleBoostChange = (field, val) => {
+		updateLocalRelevancy(appName, {
+			...localRelevancy,
+			search: {
+				...get(localRelevancy, 'search', {}),
+				rankFeature: {
+					...get(localRelevancy, 'search.rankFeature', {}),
+					[field]: {
+						...get(localRelevancy, `search.rankFeature`)[field],
+						boost: val,
+					},
+				},
+			},
+		});
+	};
 
-	const renderFields = (unflattenRankFields = unflattenRelevancyFields, path = '') => {
-		return Object.keys(unflattenRankFields).map((field) => {
-			const isObject = Object.keys(unflattenRankFields[field]).some(
-				(i) => !Object.values(FUNCTIONS).includes(i),
-			);
+	const handleFieldNameChange = (oldFieldName, newFieldName) => {
+		const rankFeature = get(localRelevancy, 'search.rankFeature', {});
 
-			if (isObject) {
-				return (
-					<ObjectField
-						key={field}
-						path={`${path}${field}`}
-						field={field}
-						onDelete={(deletePath) => handleRemoveRankField(deletePath)}
-						view={VIEWS.RANK_FEATURE}
-					>
-						{renderFields(unflattenRankFields[field], `${path}${field}.`)}
-					</ObjectField>
-				);
-			}
+		const newRankFeature = {
+			...rankFeature,
+			[newFieldName]: {
+				...rankFeature[oldFieldName],
+			},
+		};
 
-			const functionName = Object.keys(unflattenRankFields[field])[0];
-			const functionValue = get(unflattenRankFields, `${field}.${functionName}`);
+		delete newRankFeature[oldFieldName];
+		updateLocalRelevancy(appName, {
+			...localRelevancy,
+			search: {
+				...get(localRelevancy, 'search', {}),
+				rankFeature: { ...rankFeature },
+			},
+		});
+	};
+
+	const renderFields = () => {
+		return Object.keys(relevancyRankFields).map((field) => {
+			const functionName = Object.keys(relevancyRankFields[field]).find((i) => i !== 'boost');
+			const functionValue = relevancyRankFields[field][functionName];
 
 			return (
 				<FieldRow
-					key={`${path}${field}`}
+					key={`${field}`}
 					field={field}
 					usecase="none"
 					view={VIEWS.RANK_FEATURE}
-					type={flattenType[`${path}${field}`]}
-					mapping={{ type: flattenType[`${path}${field}`] }}
-					path={`${path}${field}`}
+					type="rank_feature"
+					mapping={{ type: flattenType[`${field}`] }}
+					path={`${field}`}
 					setMapping={() => {}}
+					isFieldNameEditable
+					onFieldNameChange={(e) => {
+						handleFieldNameChange(field, e.target.value);
+					}}
 					renderColumn={({ path: fieldPath }) => (
 						<Flex key={fieldPath}>
+							<InputNumber
+								key={`boost-${field}`}
+								value={relevancyRankFields[field].boost || 1}
+								style={{ marginLeft: 10, width: 100 }}
+								min={0}
+								step={0.1}
+								onChange={(val) => {
+									if (val && typeof val === 'number') {
+										handleBoostChange(field, val);
+									}
+								}}
+							/>
 							<Select
 								value={functionName}
 								onChange={(fn) => handleFunctionChange(fieldPath, fn)}
-								style={{ width: 150 }}
+								style={{ width: 150, marginLeft: 10 }}
 							>
 								<Select.Option value={FUNCTIONS.SATURATION}>
 									Saturation
@@ -196,13 +222,15 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 							</Select>
 							{functionName === FUNCTIONS.SATURATION && (
 								<InputNumber
+									key={`${functionName}-pivot-${field}`}
 									value={get(functionValue, 'pivot')}
 									min={1}
 									style={{
 										marginLeft: 10,
-										width: 170,
+										width: 100,
 										marginRight: hasSigmoidField ? 110 : 0,
 									}}
+									placeholder="default"
 									onChange={(val) => {
 										if (val && typeof val === 'number') {
 											handleParamChange(
@@ -219,9 +247,10 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 								<InputNumber
 									value={get(functionValue, 'scaling_factor')}
 									min={1}
+									key={`${functionName}-scaling_factor-${field}`}
 									style={{
 										marginLeft: 10,
-										width: 170,
+										width: 100,
 										marginRight: hasSigmoidField ? 110 : 0,
 									}}
 									onChange={(val) => {
@@ -240,8 +269,10 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 								<>
 									<InputNumber
 										value={get(functionValue, 'pivot')}
-										style={{ marginLeft: 10, width: 170 }}
+										style={{ marginLeft: 10, width: 100 }}
 										min={1}
+										key={`${functionName}-pivot-${field}`}
+										placeholder="default"
 										onChange={(val) => {
 											if (val && typeof val === 'number') {
 												handleParamChange(
@@ -258,6 +289,7 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 										style={{ marginLeft: 10, width: 100 }}
 										min={0.5}
 										max={1}
+										key={`${functionName}-exponent-${field}`}
 										step={0.1}
 										onChange={(val) => {
 											if (val && typeof val === 'number') {
@@ -334,15 +366,21 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 												</Tooltip>
 											</p>
 											<Flex>
-												<p style={{ width: 150 }}>
+												<p style={{ width: 100 }}>
+													Boost
+													<Tooltip title="Floating point number used to decrease or increase relevance scores.">
+														<Icon type="info-circle" />
+													</Tooltip>
+												</p>
+												<p style={{ width: 150, marginLeft: 10 }}>
 													Function
 													<Tooltip title="Ranking function to be used for query">
 														<Icon type="info-circle" />
 													</Tooltip>
 												</p>
-												<p style={{ width: 170, marginLeft: 10 }}>
+												<p style={{ width: 100, marginLeft: 10 }}>
 													Pivot / Scaling Factor
-													<Tooltip title="You can set pivot value for saturation / sigmoid function. For log function you can set scaling factor value">
+													<Tooltip title="Pivot value is applicable for saturation and sigmoid functions. Scaling facotr value is applicable for log function.">
 														<Icon type="info-circle" />
 													</Tooltip>
 												</p>
@@ -360,7 +398,7 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 									</Card>
 								)}
 								<br />
-								{fieldsToShowInDropDown.length > 0 && (
+								{rankFields.length > 0 && (
 									<div style={{ position: 'relative', display: 'inline-block' }}>
 										<Select
 											showSearch
@@ -369,7 +407,7 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 											value={undefined}
 											onChange={handleFieldChange}
 										>
-											{fieldsToShowInDropDown.map((field) => (
+											{rankFields.map((field) => (
 												<Select.Option key={field} value={field}>
 													{field}
 												</Select.Option>

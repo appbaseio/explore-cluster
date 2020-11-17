@@ -1,11 +1,13 @@
 import React from 'react';
-import { Button, Row, Col, Icon, Popover } from 'antd';
+import { Button, Row, Col, Icon, Popover, Input } from 'antd';
 import PropTypes from 'prop-types';
 import UsecaseDropdown from './UsecaseDropdown';
 import TypeDropdown from './TypeDropdown';
 import { fieldRow } from './styles';
 import MappingsTypeIcon from './MappingsTypeIcon';
 import { VIEWS } from '../../../constants/props';
+
+const fieldNameInput = React.createRef();
 
 const FieldRow = ({
 	path,
@@ -17,6 +19,8 @@ const FieldRow = ({
 	onDelete,
 	setMapping,
 	view,
+	isFieldNameEditable,
+	onFieldNameChange,
 }) => {
 	return (
 		<Row type="flex" justify="space-between" className={fieldRow}>
@@ -27,7 +31,22 @@ const FieldRow = ({
 							<MappingsTypeIcon type={type} />
 						</div>
 					</Popover>
-					{field}
+					{isFieldNameEditable ? (
+						<Input
+							value={field}
+							onChange={(e) => {
+								onFieldNameChange(e);
+								setTimeout(() => {
+									fieldNameInput.current.focus();
+								}, 100);
+							}}
+							placeholder="field name"
+							style={{ width: 200 }}
+							ref={fieldNameInput}
+						/>
+					) : (
+						field
+					)}
 					<Button
 						className="delete-btn"
 						type="danger"
@@ -80,6 +99,8 @@ FieldRow.defaultProps = {
 	// Search & Aggs Settings specific Props
 	renderColumn: null,
 	view: VIEWS.SCHEMA,
+	isFieldNameEditable: false,
+	onFieldNameChange: () => {},
 };
 
 FieldRow.propTypes = {
@@ -94,6 +115,8 @@ FieldRow.propTypes = {
 	// Actions
 	onDelete: PropTypes.func.isRequired,
 	setMapping: PropTypes.func.isRequired,
+	isFieldNameEditable: PropTypes.bool,
+	onFieldNameChange: PropTypes.func,
 };
 
 export default FieldRow;
