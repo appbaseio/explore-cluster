@@ -36,7 +36,9 @@ const FieldRow = ({
 							value={field}
 							onChange={(e) => {
 								onFieldNameChange(e);
-								fieldNameInput.current.focus();
+								setTimeout(() => {
+									fieldNameInput.current.focus();
+								});
 							}}
 							placeholder="field name"
 							style={{ width: 200 }}
