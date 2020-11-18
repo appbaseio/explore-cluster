@@ -22,7 +22,7 @@ import styled from 'react-emotion';
 import DiffList from './DiffList';
 import ReIndexWrapper from '../ReIndexWrapper';
 
-import { getPossibleSubFields } from '../../utils';
+// import { getPossibleSubFields } from '../../utils';
 import {
 	applyNgramMapping,
 	applyLanguageMapping,
@@ -64,7 +64,7 @@ const getDiffData = (oldObj, newObj) => {
 		return [0, {}];
 	}
 
-	const subFields = getPossibleSubFields();
+	// const subFields = getPossibleSubFields();
 	if (get(diffData, 'search.fieldWeights', null) && !get(diffData, 'search.dataField', null)) {
 		// handle only field weight change
 
@@ -102,10 +102,10 @@ const getDiffData = (oldObj, newObj) => {
 
 		const newDataFields = Object.keys(diffData.search.dataField).reduce((agg, i) => {
 			const fieldName = get(diffData, `search.dataField[${i}][0]`);
-			const hasSubfield = subFields.some((s) => !fieldName || fieldName.includes(s));
+			// const hasSubfield = subFields.some((s) => !fieldName || fieldName.includes(s));
 			let newData = [...agg];
 
-			if (!hasSubfield && fieldName && i !== '_t') {
+			if (fieldName && i !== '_t') {
 				// removed field
 				const isDeleted = i[0] === '_';
 				const index = isDeleted ? Number(i.split('_')[1]) : Number(i);
@@ -128,12 +128,12 @@ const getDiffData = (oldObj, newObj) => {
 
 		// handle only field weight change along with dataField add/remove
 		const newFieldWeights = dataField.reduce((agg, item, index) => {
-			const hasSubfield = subFields.some((s) => item.includes(s));
+			// const hasSubfield = subFields.some((s) => item.includes(s));
 			const isPartOfDataField = newDataFields.find((i) => i.index === index);
 			const oldWeight = olderWeights[olderDataFields.findIndex((x) => x === item)];
 			const newWeight = fieldWeights[index];
 			let dataToReturn = [...agg];
-			if (!hasSubfield && oldWeight !== newWeight && !isPartOfDataField) {
+			if (oldWeight !== newWeight && !isPartOfDataField) {
 				dataToReturn = [
 					...dataToReturn,
 					{
