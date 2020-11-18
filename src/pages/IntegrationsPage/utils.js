@@ -268,7 +268,27 @@ export const getFilterConfigurationForm = (customFields = {}, isDynamicFilter = 
 		customize: FormBuilder.group({
 			title: isDynamicFilter ? [undefined, Validators.required] : undefined,
 			dataField: isDynamicFilter ? [undefined, Validators.required] : undefined,
+			size: undefined,
+			queryFormat: 'or',
+			sortBy: 'count',
+			filterLabel: undefined,
+			showCount: true,
+			showCheckbox: true,
+			showSearch: true,
+			showMissing: false,
+			missingLabel: undefined,
+			selectAllLabel: undefined,
 			...customFields,
+		}),
+	});
+};
+
+export const getPriceFilterConfigurationForm = () => {
+	return FormBuilder.group({
+		enabled: false,
+		customize: FormBuilder.group({
+			title: undefined,
+			dataField: undefined,
 		}),
 	});
 };
@@ -278,11 +298,16 @@ export const getDynamicFilterKey = (pre = 'dynamic-filter-control') => {
 };
 
 export const shopifyDefaultFields = {
-	size: 'variants.option1',
-	color: 'variants.option2',
+	size: 'variants.option1.keyword',
+	color: 'variants.option2.keyword',
 	price: 'variants.price',
 	title: 'title',
 	image: 'image.src',
 	description: 'body_html',
 	handle: 'handle',
 };
+
+export const getMultiListProps = (values) => ({
+	...values,
+	size: Number.isNaN(parseInt(values.size, 10)) ? undefined : parseInt(values.size, 10),
+});
