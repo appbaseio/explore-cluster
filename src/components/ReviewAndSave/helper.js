@@ -18,6 +18,10 @@ const settingsMap = {
 		title: 'Include Fields',
 		description: 'Fields to include in the search results',
 	},
+	rankFeature: {
+		title: 'Boost search relevancy',
+		description: 'Using the rank feature you can boost the search relevancy',
+	},
 	excludeFields: {
 		title: 'Exclude Fields',
 		description: 'Fields to exclude from the search results',

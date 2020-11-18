@@ -4,4 +4,5 @@ export const VIEWS = {
 	AGGREGATION: 'aggregation',
 	SEARCH: 'search',
 	SCHEMA: 'schema',
+	RANK_FEATURE: 'rank feature',
 };

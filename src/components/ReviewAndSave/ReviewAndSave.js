@@ -116,9 +116,9 @@ const getDiffData = (oldObj, newObj) => {
 						field: fieldName,
 						index,
 						isDeleted,
-						oldWeight: isDeleted ? olderWeights[index] : 'NA',
+						oldWeight: isDeleted ? olderWeights[index] : 'N/A',
 						newWeight: isDeleted
-							? 'NA'
+							? 'N/A'
 							: get(diffData, `search.fieldWeights[${i}][0]`, 1), // always first index holds the value
 					},
 				];
@@ -163,6 +163,70 @@ const getDiffData = (oldObj, newObj) => {
 		}
 	}
 
+	if (get(diffData, 'search.rankFeature', null)) {
+		const newRankFeatures = get(newObj, 'search.rankFeature', {});
+		const oldRankFeatures = get(oldObj, 'search.rankFeature', {});
+
+		const updatedRankFeature = Object.keys(
+			get(diffData, 'search.rankFeature.0', get(diffData, 'search.rankFeature', {})),
+		).reduce((agg, key) => {
+			const isDeleted = Boolean(oldRankFeatures[key]) && !newRankFeatures[key];
+			const isNew = !oldRankFeatures[key] && Boolean(newRankFeatures[key]);
+			const oldFunction = isNew
+				? ''
+				: Object.keys(oldRankFeatures[key]).find((x) => x !== 'boost');
+			const oldFunctionValue = isNew
+				? ''
+				: Object.keys(oldRankFeatures[key][oldFunction]).reduce(
+						(cum, k) => [...cum, `${k} : ${oldRankFeatures[key][oldFunction][k]}`],
+						[],
+				  );
+
+			const newFunction = isDeleted
+				? ''
+				: Object.keys(newRankFeatures[key]).find((x) => x !== 'boost');
+			const newFunctionValue = isDeleted
+				? ''
+				: Object.keys(newRankFeatures[key][newFunction]).reduce((cum, k) => {
+						return [...cum, `${k} : ${newRankFeatures[key][newFunction][k]}`];
+				  }, []);
+			return [
+				...agg,
+				{
+					field: key,
+					isDeleted,
+					oldValue: isNew
+						? 'N/A'
+						: `${oldFunction} (${
+								oldFunctionValue.join(', ').trim() || 'default'
+						  }), boost(${oldRankFeatures[key].boost})`,
+					newValue: isDeleted
+						? 'N/A'
+						: `${newFunction} (${
+								newFunctionValue.join(', ').trim() || 'default'
+						  }), boost(${newRankFeatures[key].boost})`,
+				},
+			];
+		}, []);
+		diffData = {
+			...diffData,
+			search: {
+				...diffData.search,
+				rankFeature: updatedRankFeature,
+			},
+		};
+	}
+
+	if ('enableNgram' in get(diffData, 'indexSettings', {})) {
+		diffData = {
+			...diffData,
+			search: {
+				...get(diffData, 'search'),
+				enableNgram: get(diffData, 'indexSettings.enableNgram'),
+			},
+		};
+	}
+
 	if (get(diffData, 'aggregations.dataField', null)) {
 		const newDataFields = Object.keys(diffData.aggregations.dataField).reduce((agg, i) => {
 			// deleted field is of pattern [fieldName, number, number]
@@ -174,8 +238,8 @@ const getDiffData = (oldObj, newObj) => {
 				{
 					field: i.split('.keyword')[0], // just to ignore `.keyword` in field name
 					isDeleted,
-					oldAgg: isDeleted || isOlderField ? get(fieldVal, 0, 'NA') : `NA`,
-					newAgg: isDeleted ? 'NA' : get(fieldVal, 1, get(fieldVal, 0, 'NA')),
+					oldAgg: isDeleted || isOlderField ? get(fieldVal, 0, 'N/A') : 'NA',
+					newAgg: isDeleted ? 'N/A' : get(fieldVal, 1, get(fieldVal, 0, 'N/A')),
 				},
 			];
 
@@ -191,105 +255,39 @@ const getDiffData = (oldObj, newObj) => {
 	}
 
 	if (get(diffData, 'results.highlightFields', null)) {
-		const newHighlightFields = Object.keys(get(diffData, 'results.highlightFields')).reduce(
-			(agg, key) => {
-				let [deletedFields, addedFields] = agg;
-				deletedFields = deletedFields.split(', ').filter((i) => i.trim());
-				addedFields = addedFields.split(', ').filter((i) => i.trim());
-				if (key !== '_t') {
-					// key name starting with _ indicates it is deleted key
-					if (key[0] === '_') {
-						deletedFields = [
-							...deletedFields,
-							get(diffData, `results.highlightFields`)[key][0],
-						];
-					} else {
-						addedFields = [
-							...addedFields,
-							get(diffData, `results.highlightFields`)[key][0],
-						];
-					}
-				}
-
-				return [deletedFields.join(', '), addedFields.join(', ')];
-			},
-			['', ''],
-		);
+		const newVal = get(newObj, 'results.highlightFields', []);
+		const oldVal = get(oldObj, 'results.highlightFields', []);
 
 		diffData = {
 			...diffData,
 			results: {
 				...diffData.results,
-				highlightFields: newHighlightFields,
+				highlightFields: [oldVal.join(', '), newVal.join(', ')],
 			},
 		};
 	}
 
 	if (get(diffData, 'results.includeFields', null)) {
-		const newIncludeFields = Object.keys(get(diffData, 'results.includeFields')).reduce(
-			(agg, key) => {
-				let [deletedFields, addedFields] = agg;
-				deletedFields = deletedFields.split(', ').filter((i) => i.trim());
-				addedFields = addedFields.split(', ').filter((i) => i.trim());
-				if (key !== '_t') {
-					// key name starting with _ indicates it is deleted key
-					if (key[0] === '_') {
-						deletedFields = [
-							...deletedFields,
-							get(diffData, `results.includeFields`)[key][0],
-						];
-					} else {
-						addedFields = [
-							...addedFields,
-							get(diffData, `results.includeFields`)[key][0],
-						];
-					}
-				}
-
-				return [deletedFields.join(', '), addedFields.join(', ')];
-			},
-			['', ''],
-		);
+		const newVal = get(newObj, 'results.includeFields', []);
+		const oldVal = get(oldObj, 'results.includeFields', []);
 		diffData = {
 			...diffData,
 			results: {
 				...diffData.results,
-				includeFields: newIncludeFields,
+				includeFields: [oldVal.join(', '), newVal.join(', ')],
 			},
 		};
 	}
 
 	if (get(diffData, 'results.excludeFields', null)) {
-		const newExcludeFields = Object.keys(get(diffData, 'results.excludeFields')).reduce(
-			(agg, key) => {
-				let [deletedFields, addedFields] = agg;
-				deletedFields = deletedFields.split(', ').filter((i) => i.trim());
-				addedFields = addedFields.split(', ').filter((i) => i.trim());
-				if (key !== '_t') {
-					// key name starting with _ indicates it is deleted key
-					if (key[0] === '_') {
-						deletedFields = [
-							...deletedFields,
-							get(diffData, `results.excludeFields`)[key][0],
-						];
-					} else {
-						addedFields = [
-							...addedFields,
-							get(diffData, `results.excludeFields`)[key][0],
-						];
-					}
-				}
-
-				return [deletedFields.join(', '), addedFields.join(', ')];
-			},
-			['', ''],
-		);
+		const newVal = get(newObj, 'results.excludeFields', []);
+		const oldVal = get(oldObj, 'results.excludeFields', []);
 
 		diffData = {
 			...diffData,
 			results: {
 				...diffData.results,
-				excludeFields: newExcludeFields,
+				excludeFields: [oldVal.join(', '), newVal.join(', ')],
 			},
 		};
 	}
@@ -336,62 +334,37 @@ const getDiffData = (oldObj, newObj) => {
 	}
 
 	if (get(diffData, 'language.stemmingExceptions', null)) {
-		diffData.language.stemmingExceptions = Object.keys(
-			get(diffData, 'language.stemmingExceptions'),
-		).reduce(
-			(agg, key) => {
-				let [deletedFields, addedFields] = agg;
-				deletedFields = deletedFields.split(', ').filter((i) => i.trim());
-				addedFields = addedFields.split(', ').filter((i) => i.trim());
-				if (key !== '_t') {
-					// key name starting with _ indicates it is deleted key
-					if (key[0] === '_') {
-						deletedFields = [
-							...deletedFields,
-							get(diffData, `language.stemmingExceptions`)[key][0],
-						];
-					} else {
-						addedFields = [
-							...addedFields,
-							get(diffData, `language.stemmingExceptions`)[key][0],
-						];
-					}
-				}
+		const newVal = get(newObj, 'language.stemmingExceptions', []);
+		const oldVal = get(oldObj, 'language.stemmingExceptions', []);
 
-				return [deletedFields.join(', '), addedFields.join(', ')];
+		diffData = {
+			...diffData,
+			language: {
+				...diffData.language,
+				stemmingExceptions: [oldVal.join(', '), newVal.join(', ')],
 			},
-			['', ''],
-		);
+		};
 	}
 
 	if (get(diffData, 'language.customStopwords', null)) {
-		diffData.language.customStopwords = Object.keys(
-			get(diffData, 'language.customStopwords'),
-		).reduce(
-			(agg, key) => {
-				let [deletedFields, addedFields] = agg;
-				deletedFields = deletedFields.split(', ').filter((i) => i.trim());
-				addedFields = addedFields.split(', ').filter((i) => i.trim());
-				if (key !== '_t') {
-					// key name starting with _ indicates it is deleted key
-					if (key[0] === '_') {
-						deletedFields = [
-							...deletedFields,
-							get(diffData, `language.customStopwords`)[key][0],
-						];
-					} else {
-						addedFields = [
-							...addedFields,
-							get(diffData, `language.customStopwords`)[key][0],
-						];
-					}
-				}
+		const newVal = get(newObj, 'language.customStopwords', []);
+		const oldVal = get(oldObj, 'language.customStopwords', []);
 
-				return [deletedFields.join(', '), addedFields.join(', ')];
+		diffData = {
+			...diffData,
+			language: {
+				...diffData.language,
+				customStopwords: [oldVal.join(', '), newVal.join(', ')],
 			},
-			['', ''],
-		);
+		};
 	}
+
+	diffData = {
+		language: get(diffData, 'language', {}),
+		search: get(diffData, 'search', {}),
+		aggregations: get(diffData, 'aggregations', {}),
+		results: get(diffData, 'results', {}),
+	};
 
 	// filter empty fields
 	diffData = Object.keys(diffData).reduce((agg, item) => {
@@ -417,7 +390,6 @@ const getDiffData = (oldObj, newObj) => {
 
 		return count;
 	}, 0);
-
 	return [diffCount, diffData];
 };
 
@@ -729,7 +701,7 @@ class ReviewAndSave extends React.Component {
 									disabled={!diffCount || isResetting}
 									onClick={this.showModal}
 								>
-									Reive and Deploy
+									Review and Deploy
 								</Button>
 							</div>
 						</div>

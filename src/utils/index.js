@@ -1,4 +1,5 @@
 import get from 'lodash/get';
+import set from 'lodash/set';
 import includes from 'lodash/includes';
 import keys from 'lodash/keys';
 import values from 'lodash/values';
@@ -749,4 +750,23 @@ export const compareVersion = (versionA = '0.0.0', versionB = '0.0.0') => {
 	}
 
 	return -1;
+};
+
+export const unflattenObject = (flatObj) =>
+	Object.keys(flatObj).reduce((agg, key) => set(agg, key, flatObj[key]), {});
+
+export const renameObjectKey = (oldObj, oldName, newName) => {
+	const newObj = {};
+
+	Object.keys(oldObj).forEach((key) => {
+		const value = oldObj[key];
+
+		if (key === oldName) {
+			newObj[newName] = value;
+		} else {
+			newObj[key] = value;
+		}
+	});
+
+	return newObj;
 };

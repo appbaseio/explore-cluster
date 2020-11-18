@@ -23,6 +23,7 @@ import SettingsOptions from './components/SettingsOptions';
 import FieldWeights from './components/FieldsWeight';
 import MappingWrapper from '../../components/MappingsWrapper';
 import SettingsFooter from '../../components/SettingsFooter';
+import RankFeature from './components/RankFeature';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 
 const bannerDetails = {
@@ -224,6 +225,7 @@ class SearchSettingsPage extends React.Component {
 			updateLocalRelevancy,
 			mappings,
 		} = this.props;
+
 		const synonymsSettings = get(settings, 'synonyms');
 		const indexSettings = get(settings, 'indexSettings');
 		const languageSettings = get(settings, 'language');
@@ -251,9 +253,12 @@ class SearchSettingsPage extends React.Component {
 						flattenUsecase[item] === 'search' ||
 						flattenUsecase[item] === 'searchaggs'
 					) {
-						const { enableNgram } = get(localRelevancy, `indexSettings`);
-						const { enabled: enableSynonyms } = get(localRelevancy, `synonyms`);
-						const { language } = get(localRelevancy, `language`);
+						const { enableNgram } = get(localRelevancy || settings, `indexSettings`);
+						const { enabled: enableSynonyms } = get(
+							localRelevancy || settings,
+							`synonyms`,
+						);
+						const { language } = get(localRelevancy || settings, `language`);
 
 						const fields = getSubFields({
 							fields: get(
@@ -282,9 +287,9 @@ class SearchSettingsPage extends React.Component {
 			);
 
 			updateLocalRelevancy(appName, {
-				...localRelevancy,
+				...(localRelevancy || settings),
 				search: {
-					...get(localRelevancy, `search`, {}),
+					...get(localRelevancy || settings, `search`, {}),
 					dataField: fieldDataTuple[0],
 					fieldWeights: fieldDataTuple[1],
 				},
@@ -502,6 +507,15 @@ class SearchSettingsPage extends React.Component {
 											/>
 										)}
 									</div>
+									<Divider />
+									{!get(mappingWrapperProps, 'isFetchingSetting') &&
+										!get(mappingWrapperProps, 'isFetchingMapping') &&
+										localRelevancy && (
+											<RankFeature
+												mappingWrapperProps={mappingWrapperProps}
+											/>
+										)}
+
 									<Divider />
 									<SettingsOptions
 										handleChange={(name, value) =>

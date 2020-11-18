@@ -162,10 +162,6 @@ const _getFieldsByRelevancy = ({
 const MAPPING_TYPE_WITH_NO_FIELDS = ['rank_feature', 'rank_features'];
 
 const _updateNestedMapping = ({ mapping, type, usecase, fields, currentIndex, settings }) => {
-	if (MAPPING_TYPE_WITH_NO_FIELDS.includes(type)) {
-		return mapping;
-	}
-
 	if (fields.length === currentIndex + 1) {
 		const { enableNgram, enableSynonyms, language } = settings;
 
@@ -176,14 +172,18 @@ const _updateNestedMapping = ({ mapping, type, usecase, fields, currentIndex, se
 			fields: get(mappingUsecase, `${usecase}.fields`),
 			type,
 		});
+		const data = {
+			...mappingUsecase[usecase],
+			fields: updatedFields,
+			type,
+		};
 
+		if (MAPPING_TYPE_WITH_NO_FIELDS.includes(type)) {
+			delete data.fields;
+		}
 		return {
 			...mapping,
-			[`${fields[currentIndex]}`]: {
-				...mappingUsecase[usecase],
-				fields: updatedFields,
-				type,
-			},
+			[`${fields[currentIndex]}`]: data,
 		};
 	}
 
@@ -258,8 +258,7 @@ export const deleteMappingField = ({ originalMapping, path }) => {
 		TOP_FIELD = 'properties';
 	}
 
-	const deletedPath = path.split('.').join('.properties.');
-	const updatedMappings = omit(get(mapping, TOP_FIELD), deletedPath);
+	const updatedMappings = omit(get(mapping, TOP_FIELD), path);
 
 	if (+ES_VERSION[0] >= 6 && +ES_VERSION[0] < 7) {
 		return {
@@ -272,7 +271,7 @@ export const deleteMappingField = ({ originalMapping, path }) => {
 	}
 
 	return {
-		deletedPath,
+		deletedPath: path,
 		mappings: {
 			[TOP_FIELD]: {
 				...updatedMappings,
