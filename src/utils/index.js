@@ -9,7 +9,7 @@ import { getSingleFunction, updateFunctions } from '../batteries/utils/app';
 import { getESVersion } from '../batteries/utils/mappings';
 import { doGet } from '../batteries/utils/requestService';
 import { getDefaultAllowedActions } from './allowedActions';
-import { ALLOWED_ACTIONS } from '../constants';
+import { ALLOWED_ACTIONS, SUB_FIELDS } from '../constants';
 
 export async function getUser(username, password, url) {
 	const ACC_API = getURL();
@@ -533,16 +533,16 @@ export function getReIndexedName(appName) {
 export const getFieldWeight = (field, weightData) => {
 	const weight = Number(weightData);
 	switch (field) {
-		case 'autosuggest':
-		case 'lang':
+		case SUB_FIELDS.AUTOSUGGEST:
+		case SUB_FIELDS.LANGUAGE:
 			return (weight ? weight * 0.9 : 0).toFixed(1);
-		case 'synonyms':
+		case SUB_FIELDS.SYNONYMS:
 			return (weight ? weight * 0.7 : 0).toFixed(1);
-		case 'delimiter':
+		case SUB_FIELDS.DELIMITER:
 			return (weight ? weight * 0.4 : 0).toFixed(1);
-		case 'search':
+		case SUB_FIELDS.SEARCH:
 			return (weight ? weight * 0.1 : 0).toFixed(1);
-		case 'keyword':
+		case SUB_FIELDS.KEYWORD:
 			return (weight ? weight : 0).toFixed(1);
 		default:
 			return weight.toFixed(1);
@@ -550,7 +550,7 @@ export const getFieldWeight = (field, weightData) => {
 };
 
 export const getPossibleSubFields = () => {
-	return ['.autosuggest', '.delimiter', '.keyword', '.lang', '.search', '.synonyms'];
+	return Object.values(SUB_FIELDS);
 };
 
 export function getSubFields({

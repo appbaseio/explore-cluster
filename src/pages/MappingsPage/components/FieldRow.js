@@ -20,6 +20,9 @@ const FieldRow = ({
 	view,
 	isFieldNameEditable,
 	onFieldNameChange,
+	showAdvanceOption,
+	isAdvanceOption,
+	onAdvanceStateChange,
 }) => {
 	const [fieldName, setFieldName] = React.useState(path);
 	return (
@@ -46,6 +49,17 @@ const FieldRow = ({
 						/>
 					) : (
 						field
+					)}
+					{showAdvanceOption && (
+						<Button
+							className="advance-btn"
+							type="primary"
+							size="small"
+							onClick={() => onAdvanceStateChange(path, !isAdvanceOption)}
+						>
+							{isAdvanceOption ? <Icon type="minus" /> : <Icon type="plus" />}
+							Advance
+						</Button>
 					)}
 					<Button
 						className="delete-btn"
@@ -101,6 +115,9 @@ FieldRow.defaultProps = {
 	view: VIEWS.SCHEMA,
 	isFieldNameEditable: false,
 	onFieldNameChange: () => {},
+	showAdvanceOption: false,
+	isAdvanceOption: false,
+	onAdvanceStateChange: () => {},
 };
 
 FieldRow.propTypes = {
@@ -117,6 +134,9 @@ FieldRow.propTypes = {
 	setMapping: PropTypes.func.isRequired,
 	isFieldNameEditable: PropTypes.bool,
 	onFieldNameChange: PropTypes.func,
+	showAdvanceOption: PropTypes.bool,
+	isAdvanceOption: PropTypes.bool,
+	onAdvanceStateChange: PropTypes.func,
 };
 
 export default FieldRow;

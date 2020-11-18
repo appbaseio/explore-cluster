@@ -3,7 +3,7 @@ import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { css } from 'react-emotion';
-import { Icon, Tooltip, Empty, Row, Col, InputNumber, Select } from 'antd';
+import { Icon, Tooltip, Empty, Row, Col, InputNumber, Select, Card } from 'antd';
 import FieldRow from '../../MappingsPage/components/FieldRow';
 import ObjectField from '../../MappingsPage/components/ObjectField';
 import { VIEWS } from '../../../constants/props';
@@ -51,6 +51,7 @@ const getFieldWeightMap = ({ fieldWeights, dataField }) => {
 class FieldWeights extends React.Component {
 	state = {
 		nonSearchableFields: [],
+		advanceState: {},
 	};
 
 	componentDidMount() {
@@ -99,6 +100,15 @@ class FieldWeights extends React.Component {
 		}
 	};
 
+	handleAdvanceStateChange = (path, isShowingAdvanceOption) => {
+		this.setState({
+			advanceState: {
+				...get(this, 'state.advanceState'),
+				[path]: isShowingAdvanceOption,
+			},
+		});
+	};
+
 	renderMapping = ({
 		// initialUseCase & initialType are passed to handle the delete field, otherwise usecase/type value can change with recursive iteration
 		usecase,
@@ -114,6 +124,7 @@ class FieldWeights extends React.Component {
 			localRelevancy,
 			handleFieldWeights,
 		} = this.props;
+		const { advanceState } = this.state;
 		const { flattenUsecase, setMapping } = mappingWrapperProps;
 
 		if (init && (!usecase || Object.keys(usecase).length === 0)) {
@@ -168,47 +179,61 @@ class FieldWeights extends React.Component {
 			) {
 				return null;
 			}
-
+			console.log(`mappings...`, mappings);
 			return (
-				<FieldRow
-					view={VIEWS.SEARCH}
-					key={`${path}${field}`}
-					field={field}
-					usecase={usecaseVal}
-					type={typeVal}
-					mapping={getMappingsByPath({ mappings, path: `${path}${field}` })}
-					path={`${path}${field}`}
-					setMapping={() => {}}
-					renderColumn={({ path: fieldPath, mapping }) => (
-						<div style={{ width: 150 }}>
-							<InputNumber
-								value={fieldWeightMap[fieldPath] || 1}
-								min={1}
-								ref={(input) => {
-									this[fieldPath] = input;
-								}}
-								step={0.5}
-								onChange={(value) => {
-									if (value && typeof value === 'number') {
-										handleFieldWeights({
-											weight: value,
-											field: fieldPath,
-											mapping,
-										});
-									}
-								}}
-							/>
-						</div>
+				<>
+					<FieldRow
+						view={VIEWS.SEARCH}
+						key={`${path}${field}`}
+						field={field}
+						usecase={usecaseVal}
+						type={typeVal}
+						mapping={getMappingsByPath({ mappings, path: `${path}${field}` })}
+						path={`${path}${field}`}
+						setMapping={() => {}}
+						showAdvanceOption
+						isAdvanceOption={advanceState[`${path}${field}`] || false}
+						onAdvanceStateChange={this.handleAdvanceStateChange}
+						renderColumn={({ path: fieldPath, mapping }) => (
+							<div style={{ width: 150 }}>
+								<InputNumber
+									value={fieldWeightMap[fieldPath] || 1}
+									min={1}
+									ref={(input) => {
+										this[fieldPath] = input;
+									}}
+									step={0.5}
+									onChange={(value) => {
+										if (value && typeof value === 'number') {
+											handleFieldWeights({
+												weight: value,
+												field: fieldPath,
+												mapping,
+											});
+										}
+									}}
+								/>
+							</div>
+						)}
+						onDelete={(deletePath) =>
+							handleDelete({
+								field: deletePath,
+								setMapping,
+								flattenUsecase,
+								mappings,
+							})
+						}
+					/>
+					{advanceState[`${path}${field}`] && (
+						<Card>
+							<p style={{ fontWeight: 'normal' }}>
+								Reducing the ways to search a field can improve search latency. By
+								default, all are enabled. You can also set the individual weights to
+								have a better control on the search relevancy.
+							</p>
+						</Card>
 					)}
-					onDelete={(deletePath) =>
-						handleDelete({
-							field: deletePath,
-							setMapping,
-							flattenUsecase,
-							mappings,
-						})
-					}
-				/>
+				</>
 			);
 		});
 	};

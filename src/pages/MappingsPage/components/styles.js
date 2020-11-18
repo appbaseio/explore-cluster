@@ -27,6 +27,14 @@ export const row = css`
 `;
 
 export const deleteRow = css`
+	.advance-btn {
+		margin-left: 8px;
+		background: transparent;
+		color: dodgerblue;
+		border: 0;
+		box-shadow: none;
+		margin-right: 8px;
+	}
 	.delete-btn {
 		margin-left: 8px;
 		transform: scale(0);
