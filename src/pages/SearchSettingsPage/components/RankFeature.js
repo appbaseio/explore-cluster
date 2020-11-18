@@ -380,7 +380,7 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 												</p>
 												<p style={{ width: 100, marginLeft: 10 }}>
 													Pivot / Scaling Factor
-													<Tooltip title="Pivot value is applicable for saturation and sigmoid functions. Scaling facotr value is applicable for log function.">
+													<Tooltip title="Pivot value is applicable for saturation and sigmoid functions. Scaling factor value is applicable for log function.">
 														<Icon type="info-circle" />
 													</Tooltip>
 												</p>
