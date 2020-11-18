@@ -1,6 +1,6 @@
 export default {
 	text: ['integer', 'long', 'float', 'double', 'date', 'boolean', 'rank_feature'],
-	object: ['rank_features'],
+	object: [],
 
 	integer: ['float', 'long', 'text', 'rank_feature'],
 	long: ['integer', 'text', 'float', 'rank_feature'],
@@ -15,5 +15,5 @@ export default {
 	boolean: ['text'],
 
 	rank_feature: ['text', 'integer', 'long', 'float', 'double'],
-	rank_features: ['object'],
+	rank_features: [],
 };
