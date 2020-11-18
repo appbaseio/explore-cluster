@@ -3,11 +3,15 @@ import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { css } from 'react-emotion';
-import { Icon, Tooltip, Empty, Row, Col, InputNumber, Select, Card } from 'antd';
+import { Icon, Tooltip, Empty, Row, Col, InputNumber, Select, Card, Switch } from 'antd';
 import FieldRow from '../../MappingsPage/components/FieldRow';
 import ObjectField from '../../MappingsPage/components/ObjectField';
 import { VIEWS } from '../../../constants/props';
-import { getMappingsByPath, getMappingsInfo } from '../../../utils/mappings';
+import { getMappingsByPath, getMappingsInfo, getValidSubFields } from '../../../utils/mappings';
+import Flex from '../../../batteries/components/shared/Flex';
+import { SUB_FIELDS } from '../../../constants';
+import { setLocalRelevancyState, setAdvanceSearchState } from '../../../batteries/modules/actions';
+import { getFieldWeight as getSubFieldWeight } from '../../../utils';
 
 const headerRow = css`
 	font-weight: 600;
@@ -36,6 +40,23 @@ const mappingHeaderRight = [
 	},
 ];
 
+const fieldInfo = {
+	[SUB_FIELDS.KEYWORD]: `Searches on the exact value of the field. You typically want to enable this and provide it the highest weight.`,
+	[SUB_FIELDS.AUTOSUGGEST]: `Searches on the prefix value of the field. Enable this when you want users to do an autocomplete/suggestions search on the field. You should set a relatively lower weight for it.`,
+	[SUB_FIELDS.SEARCH]: `Searches on an infix value of the field. Enable this when you want users to be able to find results by entering partial values. You should set a relatively lower weight for it.`,
+	[SUB_FIELDS.LANGUAGE]: `Searches on the language analyzed value (as set in language settings) for the field. You should set a relatively moderate weight for it.`,
+	[SUB_FIELDS.SYNONYMS]: `Enable this when you want users to be able to find results when searching for synonym pairs as set in the Synonyms view. You should set a relatively lower weight for it.`,
+	[SUB_FIELDS.DELIMITER]: `Searches for values with non-alphanumeric characters effectively. Enable this if you have those values for the field. You should set a relatively moderate weight for it. `,
+};
+
+const getFieldWeight = (dataFields, fieldWeights, fieldName) => {
+	const index = dataFields.findIndex((i) => i === fieldName);
+	if (index) {
+		return fieldWeights[index];
+	}
+	return null;
+};
+
 const { Option } = Select;
 
 const getFieldWeightMap = ({ fieldWeights, dataField }) => {
@@ -51,7 +72,6 @@ const getFieldWeightMap = ({ fieldWeights, dataField }) => {
 class FieldWeights extends React.Component {
 	state = {
 		nonSearchableFields: [],
-		advanceState: {},
 	};
 
 	componentDidMount() {
@@ -101,10 +121,56 @@ class FieldWeights extends React.Component {
 	};
 
 	handleAdvanceStateChange = (path, isShowingAdvanceOption) => {
-		this.setState({
-			advanceState: {
-				...get(this, 'state.advanceState'),
-				[path]: isShowingAdvanceOption,
+		const { appName, updateAdvanceSearchState } = this.props;
+		updateAdvanceSearchState(`${appName}_${path}`, isShowingAdvanceOption);
+	};
+
+	handleSubFieldToggle = (fieldPath, isEnabled, originalField, subField) => {
+		const { localRelevancy, updateLocalRelevancy, appName } = this.props;
+		let dataField = get(localRelevancy, 'search.dataField');
+		let fieldWeights = get(localRelevancy, 'search.fieldWeights');
+		if (isEnabled) {
+			const originalFieldIndex = dataField.findIndex((f) => f === originalField);
+			const originalFieldWeight = fieldWeights[originalFieldIndex];
+			const fieldWeight = getSubFieldWeight(subField, originalFieldWeight);
+			dataField = [...dataField, fieldPath];
+			fieldWeights = [...fieldWeights, fieldWeight];
+		} else {
+			const fieldIndex = dataField.findIndex((f) => f === fieldPath);
+			if (fieldIndex) {
+				dataField = [...dataField.slice(0, fieldIndex), ...dataField.slice(fieldIndex + 1)];
+				fieldWeights = [
+					...fieldWeights.slice(0, fieldIndex),
+					...fieldWeights.slice(fieldIndex + 1),
+				];
+			}
+		}
+
+		updateLocalRelevancy(appName, {
+			...localRelevancy,
+			search: {
+				...get(localRelevancy, 'search'),
+				dataField,
+				fieldWeights,
+			},
+		});
+	};
+
+	handleSubFieldWeightChange = (fieldPath, val) => {
+		const { localRelevancy, updateLocalRelevancy, appName } = this.props;
+		const dataField = get(localRelevancy, 'search.dataField');
+		let fieldWeights = get(localRelevancy, 'search.fieldWeights');
+		const fieldIndex = dataField.findIndex((f) => f === fieldPath);
+		fieldWeights = [
+			...fieldWeights.slice(0, fieldIndex),
+			val,
+			...fieldWeights.slice(fieldIndex + 1),
+		];
+		updateLocalRelevancy(appName, {
+			...localRelevancy,
+			search: {
+				...get(localRelevancy, 'search'),
+				fieldWeights,
 			},
 		});
 	};
@@ -123,9 +189,12 @@ class FieldWeights extends React.Component {
 			handleDelete,
 			localRelevancy,
 			handleFieldWeights,
+			advanceSearchState,
+			appName,
 		} = this.props;
-		const { advanceState } = this.state;
 		const { flattenUsecase, setMapping } = mappingWrapperProps;
+		const synonymsSettings = get(localRelevancy, 'synonyms');
+		const indexSettings = get(localRelevancy, 'indexSettings');
 
 		if (init && (!usecase || Object.keys(usecase).length === 0)) {
 			return (
@@ -179,35 +248,41 @@ class FieldWeights extends React.Component {
 			) {
 				return null;
 			}
-			console.log(`mappings...`, mappings);
+			const fieldMapping = getMappingsByPath({ mappings, path: `${path}${field}` });
+			const validSubFields = getValidSubFields({
+				fieldMapping,
+				enableNgram: indexSettings.enableNgram,
+				enableSynonyms: synonymsSettings.enabled,
+			});
+			const dataFields = get(localRelevancy, `search.dataField`);
+			const weights = get(localRelevancy, `search.fieldWeights`);
+			const fieldPath = `${path}${field}`;
+
 			return (
 				<>
 					<FieldRow
 						view={VIEWS.SEARCH}
-						key={`${path}${field}`}
+						key={fieldPath}
 						field={field}
 						usecase={usecaseVal}
 						type={typeVal}
-						mapping={getMappingsByPath({ mappings, path: `${path}${field}` })}
-						path={`${path}${field}`}
+						mapping={getMappingsByPath({ mappings, path: fieldPath })}
+						path={fieldPath}
 						setMapping={() => {}}
 						showAdvanceOption
-						isAdvanceOption={advanceState[`${path}${field}`] || false}
+						isAdvanceOption={advanceSearchState[`${appName}_${fieldPath}`] || false}
 						onAdvanceStateChange={this.handleAdvanceStateChange}
-						renderColumn={({ path: fieldPath, mapping }) => (
+						renderColumn={({ path: fp, mapping }) => (
 							<div style={{ width: 150 }}>
 								<InputNumber
-									value={fieldWeightMap[fieldPath] || 1}
+									value={fieldWeightMap[fp] || 1}
 									min={1}
-									ref={(input) => {
-										this[fieldPath] = input;
-									}}
 									step={0.5}
 									onChange={(value) => {
 										if (value && typeof value === 'number') {
 											handleFieldWeights({
 												weight: value,
-												field: fieldPath,
+												field: fp,
 												mapping,
 											});
 										}
@@ -224,13 +299,64 @@ class FieldWeights extends React.Component {
 							})
 						}
 					/>
-					{advanceState[`${path}${field}`] && (
+					{advanceSearchState[`${appName}_${fieldPath}`] && (
 						<Card>
 							<p style={{ fontWeight: 'normal' }}>
 								Reducing the ways to search a field can improve search latency. By
 								default, all are enabled. You can also set the individual weights to
 								have a better control on the search relevancy.
 							</p>
+							{validSubFields.map((sf) => {
+								const fw = getFieldWeight(
+									dataFields,
+									weights,
+									`${fieldPath}.${sf}`,
+								);
+
+								const isDisabled = fw === null || fw === undefined;
+
+								return (
+									<Flex
+										key={`${path}${field}sf-${sf}`}
+										style={{ marginBottom: 10 }}
+										alignItems="center"
+									>
+										<div style={{ marginRight: 10, width: 100 }}>
+											{sf === `lang` ? `language` : sf}&nbsp;
+											<Tooltip title={fieldInfo[sf]}>
+												<Icon type="info-circle" />
+											</Tooltip>
+										</div>
+										<Switch
+											style={{ marginRight: 10 }}
+											checked={isDisabled === false}
+											onChange={(val) =>
+												this.handleSubFieldToggle(
+													`${fieldPath}.${sf}`,
+													val,
+													fieldPath,
+													sf,
+												)
+											}
+										/>
+										<InputNumber
+											style={{ width: 100 }}
+											value={fw}
+											step={0.1}
+											min={0.1}
+											disabled={isDisabled}
+											onChange={(value) => {
+												if (value && typeof value === 'number') {
+													this.handleSubFieldWeightChange(
+														`${fieldPath}.${sf}`,
+														value,
+													);
+												}
+											}}
+										/>
+									</Flex>
+								);
+							})}
 						</Card>
 					)}
 				</>
@@ -330,6 +456,10 @@ FieldWeights.propTypes = {
 	mappingWrapperProps: PropTypes.object.isRequired,
 	localRelevancy: PropTypes.object.isRequired,
 	localMapping: PropTypes.object,
+	updateLocalRelevancy: PropTypes.func.isRequired,
+	appName: PropTypes.string.isRequired,
+	advanceSearchState: PropTypes.object.isRequired,
+	updateAdvanceSearchState: PropTypes.func.isRequired,
 };
 
 FieldWeights.defaultProps = {
@@ -340,11 +470,19 @@ const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');
 	const localRelevancy = get(state, `$getLocalRelevancy.${appName}`);
 	const localMapping = get(state, `$getLocalMapping.${appName}`);
+	const advanceSearchState = get(state, `$getAdvanceSearchState`);
 	return {
 		appName,
 		localRelevancy,
 		localMapping,
+		advanceSearchState,
 	};
 };
 
-export default connect(mapStateToProps)(FieldWeights);
+const mapDispatchToProps = (dispatch) => ({
+	updateLocalRelevancy: (name, data) => dispatch(setLocalRelevancyState(name, data)),
+	updateAdvanceSearchState: (fieldName, state) =>
+		dispatch(setAdvanceSearchState(fieldName, state)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(FieldWeights);

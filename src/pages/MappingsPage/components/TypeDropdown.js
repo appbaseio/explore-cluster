@@ -13,7 +13,6 @@ const TypeDropdown = ({ value, onTypeChange, path, usecase }) => {
 			value={value}
 			style={{ width: 150, textTransform: 'capitalize' }}
 			onChange={(selected) => {
-				console.log({ selected });
 				onTypeChange({
 					type: selected,
 					path,

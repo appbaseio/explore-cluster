@@ -4,6 +4,7 @@ import { getVersion, getURL } from '../constants/config';
 import mappingUsecase from '../batteries/utils/mappingUsecase';
 import { getAuthHeaders } from '../batteries/utils/mappings';
 import { getPossibleSubFields } from '.';
+import { SUB_FIELDS } from '../constants';
 
 export const getMappingsInfo = ({
 	mappings: originalMappings,
@@ -566,4 +567,23 @@ export const applyLanguageMapping = (mappings, language) => {
 	}, {});
 
 	return updatedMappings;
+};
+
+export const getValidSubFields = ({ fieldMapping, enableNgram, enableSynonyms }) => {
+	const possibleSubFields = Object.values(SUB_FIELDS).filter((field) => {
+		if (field === SUB_FIELDS.SEARCH && !enableNgram) {
+			return false;
+		}
+
+		if (field === SUB_FIELDS.SYNONYMS && !enableSynonyms) {
+			return false;
+		}
+		if (field in fieldMapping.fields) {
+			return true;
+		}
+
+		return false;
+	});
+
+	return possibleSubFields;
 };

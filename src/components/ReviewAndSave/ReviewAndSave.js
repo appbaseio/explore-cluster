@@ -71,9 +71,9 @@ const getDiffData = (oldObj, newObj) => {
 		const { dataField, fieldWeights } = get(newObj, 'search');
 		const { fieldWeights: olderWeight } = get(oldObj, 'search');
 		const newFieldWeights = dataField.reduce((agg, item, index) => {
-			const hasSubfield = subFields.some((s) => item.includes(s));
+			// const hasSubfield = subFields.some((s) => item.includes(s));
 			let dataToReturn = [...agg];
-			if (!hasSubfield && olderWeight[index] !== fieldWeights[index]) {
+			if (olderWeight[index] !== fieldWeights[index]) {
 				dataToReturn = [
 					...dataToReturn,
 					{ field: item, oldWeight: olderWeight[index], newWeight: fieldWeights[index] },

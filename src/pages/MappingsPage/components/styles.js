@@ -30,6 +30,7 @@ export const deleteRow = css`
 	.advance-btn {
 		margin-left: 8px;
 		background: transparent;
+		transform: scale(0);
 		color: dodgerblue;
 		border: 0;
 		box-shadow: none;
@@ -51,6 +52,9 @@ export const deleteRow = css`
 
 	&:hover {
 		.delete-btn {
+			transform: scale(1);
+		}
+		.advance-btn {
 			transform: scale(1);
 		}
 	}
