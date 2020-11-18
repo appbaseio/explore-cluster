@@ -24,7 +24,7 @@ const optionContainer = css`
 	}
 `;
 
-const SettingsOptions = ({ handleChange, sort, count, includeNullValue, queryFormat }) => (
+const SettingsOptions = ({ handleChange, sortBy, size, includeNullValues, queryFormat }) => (
 	<div className={optionContainer}>
 		<h6>
 			Query Format
@@ -47,8 +47,8 @@ const SettingsOptions = ({ handleChange, sort, count, includeNullValue, queryFor
 			</Tooltip>
 		</h6>
 		<InputNumber
-			onChange={(value) => handleChange('count', value)}
-			value={count}
+			onChange={(value) => handleChange('size', value)}
+			value={size}
 			min={1}
 			placeholder="Enter default aggs size"
 			className="input"
@@ -61,10 +61,10 @@ const SettingsOptions = ({ handleChange, sort, count, includeNullValue, queryFor
 		</h6>
 		<Select
 			placeholder="Select default Sort"
-			value={sort}
+			value={sortBy}
 			optionFilterProp="children"
 			style={{ minWidth: 200 }}
-			onChange={(value) => handleChange('sort', value)}
+			onChange={(value) => handleChange('sortBy', value)}
 			filterOption={(input, option) =>
 				option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
 			}
@@ -82,18 +82,18 @@ const SettingsOptions = ({ handleChange, sort, count, includeNullValue, queryFor
 			</Tooltip>
 		</h6>
 		<Switch
-			checked={includeNullValue}
-			onChange={(value) => handleChange('includeNullValue', value)}
+			checked={includeNullValues}
+			onChange={(value) => handleChange('includeNullValues', value)}
 		/>
 	</div>
 );
 
 SettingsOptions.propTypes = {
 	handleChange: PropTypes.func.isRequired,
-	count: PropTypes.number.isRequired,
-	sort: PropTypes.string.isRequired,
+	size: PropTypes.number.isRequired,
+	sortBy: PropTypes.string.isRequired,
 	queryFormat: PropTypes.string.isRequired,
-	includeNullValue: PropTypes.bool.isRequired,
+	includeNullValues: PropTypes.bool.isRequired,
 };
 
 export default SettingsOptions;

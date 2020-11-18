@@ -45,6 +45,10 @@ const FUNCTIONS = {
 	INVOKED: 2,
 };
 
+const SIDE_BAR = {
+	SET_COLLAPSED: 'SET_COLLAPSED',
+};
+
 const ALLOWED_ACTIONS = {
 	DEVELOP: 'develop',
 	ANALYTICS: 'analytics',
@@ -71,4 +75,5 @@ export {
 	FUNCTIONS,
 	ALLOWED_ACTIONS,
 	ROUTES_ACTION,
+	SIDE_BAR,
 };

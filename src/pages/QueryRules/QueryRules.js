@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Affix, Button, Col, Icon, Layout, message, Result, Row } from 'antd';
+import { Button, Col, Icon, Layout, message, Result, Row } from 'antd';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -83,7 +83,7 @@ class QueryRules extends Component {
 	};
 
 	render() {
-		const { rules, isLoading, tier, featureRules, apps } = this.props;
+		const { collapsed, rules, isLoading, tier, featureRules, apps } = this.props;
 		const { visible, app } = this.state;
 
 		if (!isValidPlan(tier, featureRules)) {
@@ -197,12 +197,20 @@ class QueryRules extends Component {
 						/>
 					)}
 					{rules && rules.length > 0 ? (
-						<Affix offsetBottom={0}>
+						<div
+							style={{
+								position: 'fixed',
+								overflow: 'hidden',
+								bottom: 0,
+								left: collapsed ? 80 : 260,
+								right: 0,
+							}}
+						>
 							<div
 								style={{
 									display: 'flex',
 									justifyContent: 'space-between',
-									padding: 20,
+									padding: '20px 50px',
 									background: 'white',
 									border: '1px solid #e8e8e8',
 									boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.15)',
@@ -216,7 +224,7 @@ class QueryRules extends Component {
 									app={app}
 								/>
 							</div>
-						</Affix>
+						</div>
 					) : null}
 				</div>
 			</Fragment>
@@ -235,6 +243,7 @@ QueryRules.propTypes = {
 	hasError: PropTypes.bool,
 	deleted: PropTypes.bool,
 	isLoading: PropTypes.bool,
+	collapsed: PropTypes.bool.isRequired,
 };
 
 QueryRules.defaultProps = {
@@ -258,6 +267,7 @@ const mapStateToProps = (state) => ({
 	appName: get(state, '$getCurrentApp.name'),
 	featureRules: get(state, '$getAppPlan.results.feature_rules', false),
 	apps: get(state, 'apps.data'),
+	collapsed: get(state, 'sideBarCollapsed'),
 });
 
 const mapDispatchToProps = (dispatch) => ({

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Select } from 'antd';
 import PropTypes from 'prop-types';
-import usecases from './utils/usecases';
+import usecases from '../../../utils/usecases';
 
 const { Option } = Select;
 

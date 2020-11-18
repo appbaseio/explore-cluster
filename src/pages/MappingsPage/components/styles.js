@@ -1,9 +1,10 @@
 import { css } from 'emotion';
 
 export const footerStyles = css`
-	padding: 15px;
+	padding: 15px 60px;
 	background: white;
 	box-shadow: 0 -2px 5px 0 rgba(0, 0, 0, 0.15);
+	border-top: 1px solid #e8e8e8;
 	text-align: right;
 	display: flex;
 	justify-content: space-between;

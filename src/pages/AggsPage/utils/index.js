@@ -1,13 +1,5 @@
 import get from 'lodash/get';
 
-export const hasKeyword = (fieldMappings) => {
-	if (get(fieldMappings, 'fields.keyword.type', '') === 'keyword') {
-		return true;
-	}
-
-	return false;
-};
-
 export const getDiffKeys = ({ saved, current, defaultValue }) => {
 	const allKeys = [...Object.keys(saved || {}), ...Object.keys(current || {})];
 	return allKeys

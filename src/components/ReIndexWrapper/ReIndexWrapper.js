@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Alert, Row, Col } from 'antd';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import get from 'lodash/get';
 
 import getReIndexingData from '../../utils/reindex';
 
-const ReIndexWrapper = ({ children, appName }) => {
+const ReIndexWrapper = ({ children, appName, collapsed }) => {
 	const [fetchState, setFetchState] = useState({
 		loading: true,
 		data: null,
@@ -69,9 +71,7 @@ const ReIndexWrapper = ({ children, appName }) => {
 					css={{
 						position: 'fixed',
 						top: 60,
-						// TODO when upcoming PR for global review is merged add following
-						// collapsed ? 80 : 260
-						left: 260,
+						left: collapsed ? 80 : 260,
 						right: 0,
 						zIndex: 100,
 					}}
@@ -122,6 +122,11 @@ const ReIndexWrapper = ({ children, appName }) => {
 ReIndexWrapper.propTypes = {
 	appName: PropTypes.string.isRequired,
 	children: PropTypes.func.isRequired,
+	collapsed: PropTypes.bool.isRequired,
 };
 
-export default ReIndexWrapper;
+const mapStateToProps = (state) => ({
+	collapsed: get(state, 'sideBarCollapsed'),
+});
+
+export default connect(mapStateToProps)(ReIndexWrapper);

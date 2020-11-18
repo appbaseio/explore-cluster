@@ -1,249 +1,325 @@
 import React from 'react';
 import get from 'lodash/get';
-import { connect } from 'react-redux';
-import { InputNumber, Select } from 'antd';
 import PropTypes from 'prop-types';
-import HighLighter from '../../../components/HighLighter';
-import Mappings from '../../MappingsPage/components/Mappings';
-import { getSubFields } from '../../../utils';
-import { getMappingsByPath } from '../../MappingsPage/components/utils/mappings';
+import { connect } from 'react-redux';
+import { css } from 'react-emotion';
+import { Icon, Tooltip, Empty, Row, Col, InputNumber, Select } from 'antd';
+import FieldRow from '../../MappingsPage/components/FieldRow';
+import ObjectField from '../../MappingsPage/components/ObjectField';
 import { VIEWS } from '../../../constants/props';
+import { getMappingsByPath, getMappingsInfo } from '../../../utils/mappings';
+
+const headerRow = css`
+	font-weight: 600;
+	p {
+		font-size: 14px;
+		margin: 0;
+	}
+
+	i {
+		margin-left: 5px;
+	}
+`;
+
+const mappingHeaderLeft = [
+	{
+		title: 'Field Name',
+		info: 'Names of the fields and nested-fields are represented with relative indentation.',
+	},
+];
+
+const mappingHeaderRight = [
+	{
+		title: 'Field Weight',
+		info:
+			'Set the search weight to boost query matches against this field. Higher weight fields imply a higher boost.',
+	},
+];
 
 const { Option } = Select;
 
-class FieldsWeight extends React.PureComponent {
-	state = {
-		aggsFields: [],
-	};
+const getFieldWeightMap = ({ fieldWeights, dataField }) => {
+	const fieldWeightMap = dataField.reduce((agg, field, index) => {
+		return {
+			...agg,
+			[field]: fieldWeights[index],
+		};
+	}, {});
+	return fieldWeightMap;
+};
 
-	mappingsRef = React.createRef();
+class FieldWeights extends React.Component {
+	state = {
+		nonSearchableFields: [],
+	};
 
 	componentDidMount() {
-		const { onInit } = this.props;
-		onInit({ ref: this.mappingsRef });
+		this.getNonSearchableField();
 	}
 
-	handleFieldWeight = ({ field, weight, mapping }) => {
-		const {
-			enableNgram,
-			hasLanguage,
-			enableSynonyms,
-			onFieldsUpdate,
-			fieldWeights,
-		} = this.props;
-		const updatedFields = getSubFields({
-			fields: get(mapping, 'fields'),
-			weight,
-			address: field,
-			skipSearch: enableNgram,
-			skipLang: !hasLanguage,
-			skipSynonyms: !enableSynonyms,
-		});
+	getNonSearchableField = () => {
+		const { mappingWrapperProps, localMapping, localRelevancy } = this.props;
+		const { flattenUsecase: usecases, flattenType: types } = mappingWrapperProps;
+		let typeData = types;
+		let useCaseData = usecases;
 
-		onFieldsUpdate({
-			...fieldWeights,
-			...updatedFields,
-		});
-	};
+		const dataField = get(localRelevancy, 'search.dataField', []);
 
-	/**
-	 * Traverse all mapping nested fields and updates the state with
-	 * aggregation fields available and update the fields with weights
-	 * and sub-fields.
-	 *
-	 * @memberof SearchSettings
-	 */
-	handleMappingChange = () => {
-		const usecases = get(this, 'mappingsRef.current.wrappedInstance.flattenUsecase', {});
-		const types = get(this, 'mappingsRef.current.wrappedInstance.flattenType', {});
-		const mappings = get(this, 'mappingsRef.current.wrappedInstance.state.rawMappings', {});
-		const {
-			enableNgram,
-			hasLanguage,
-			enableSynonyms,
-			fieldWeights,
-			onFieldsUpdate,
-		} = this.props;
+		if (localMapping) {
+			const synonymsSettings = get(localRelevancy, 'synonyms');
+			const indexSettings = get(localRelevancy, 'indexSettings');
+			const languageSettings = get(localRelevancy, 'language');
+			const { flattenType, flattenUsecase } = getMappingsInfo({
+				mappings: localMapping,
+				enableNgram: indexSettings.enableNgram,
+				enableSynonyms: synonymsSettings.enabled,
+				language: languageSettings.language,
+			});
+			typeData = flattenType;
+			useCaseData = flattenUsecase;
+		}
 
-		/**
-		 * Only text and keyword type can be converted to search
-		 */
-		const aggsFields = Object.keys(usecases).filter(
-			(field) =>
-				types[field] === 'keyword' ||
-				(types[field] === 'text' &&
-					(usecases[field] === 'aggs' || usecases[field] === 'none')),
-		);
-
-		/**
-		 * All fields with usecase search and search aggs
-		 */
-		const searchFields = Object.keys(usecases).filter((field) =>
-			usecases[field].includes('search'),
-		);
-
-		/**
-		 * Map over all searchable fields and make sure each field is assigned a field weight.
-		 */
-		const allFieldsWithWeights = searchFields.reduce((agg, field) => {
-			return {
-				...agg,
-				...getSubFields({
-					fields: get(
-						getMappingsByPath({
-							mappings,
-							path: field,
-						}),
-						'fields',
-						{},
-					),
-					weight: get(fieldWeights, field, 1),
-					address: field,
-					skipSearch: enableNgram,
-					skipLang: !hasLanguage,
-					skipSynonyms: !enableSynonyms,
-				}),
-			};
-		}, {});
-
-		this.setState({
-			aggsFields,
-		});
-
-		onFieldsUpdate(allFieldsWithWeights);
-	};
-
-	updateToSearchField = (field) => {
-		const updateMapping = get(this, 'mappingsRef.current.wrappedInstance.setMapping');
-		updateMapping({
-			usecase: 'searchaggs',
-			path: field,
-			type: 'text',
-		});
-	};
-
-	// ref to older version: https://github.com/appbaseio-confidential/arc-dashboard/blob/72869b13cf6daf78af7d91eafc480c6894a4f36c/src/pages/SearchSettingsPage/SearchSettings.js#L473
-	handleRemoveFromSearch = (field) => {
-		const updateMapping = get(this, 'mappingsRef.current.wrappedInstance.setMapping');
-		const useCases = get(this, 'mappingsRef.current.wrappedInstance.flattenUsecase', {});
-		const nestedFields = Object.keys(useCases).filter((i) => i.indexOf(`${field}.`) > -1);
-		if (nestedFields.length) {
-			nestedFields.forEach((i) => {
-				if (useCases[i] === 'search' || useCases[i] === 'searchaggs') {
-					updateMapping({
-						usecase: 'aggs',
-						path: i,
-						type: 'text',
-					});
+		if (useCaseData && typeData) {
+			const newNonSearchableFields = Object.keys(typeData).reduce((agg, field) => {
+				const isExistingField = dataField.some((x) => x === field);
+				if (typeData[field] === 'rank_feature' || typeData[field] === 'rank_features') {
+					return [...agg];
 				}
-			});
-		} else {
-			updateMapping({
-				usecase: 'aggs',
-				path: field,
-				type: 'text',
-			});
+				if (
+					useCaseData[field] === 'aggs' ||
+					useCaseData[field] === 'none' ||
+					isExistingField === false
+				) {
+					return [...agg, field];
+				}
+				return [...agg];
+			}, []);
+
+			this.setState({ nonSearchableFields: newNonSearchableFields });
 		}
 	};
 
-	render() {
-		const { appName, fieldWeights, enableSynonyms, enableNgram, ...rest } = this.props;
-		const { aggsFields } = this.state;
-		return (
-			<div>
-				<Mappings
-					{...rest}
-					appName={appName}
-					cardProps={{
-						bodyStyle: {
-							padding: 0,
-						},
-						headStyle: {
-							padding: 0,
-							border: 0,
-							display: 'flex',
-						},
-						style: {
-							padding: 0,
-						},
-						bordered: false,
-					}}
-					headerRowProps={{
-						rightItems: [
-							{
-								title: 'Use case',
-								info:
-									'We detect the appropriate analyzers and mappings here representing the usecase - search or aggregations.',
-							},
-							{
-								title: 'Field Weight',
-								info:
-									'Set the search weight to boost query matches against this field. Higher weight fields imply a higher boost.',
-							},
-						],
-					}}
+	renderMapping = ({
+		// initialUseCase & initialType are passed to handle the delete field, otherwise usecase/type value can change with recursive iteration
+		usecase,
+		type,
+		mappings,
+		fieldWeightMap,
+		path = '',
+		init = false,
+	}) => {
+		const {
+			mappingWrapperProps,
+			handleDelete,
+			localRelevancy,
+			handleFieldWeights,
+		} = this.props;
+		const { flattenUsecase, setMapping } = mappingWrapperProps;
+
+		if (init && (!usecase || Object.keys(usecase).length === 0)) {
+			return (
+				<Empty
+					image={Empty.PRESENTED_IMAGE_SIMPLE}
+					description={<span>No Mappings Present</span>}
+				/>
+			);
+		}
+
+		const dataField = get(localRelevancy, 'search.dataField', []);
+
+		return Object.keys(usecase).map((field) => {
+			const usecaseVal = get(usecase, field);
+			const typeVal = get(type, field);
+			const isObj = typeof usecaseVal === 'object';
+
+			if (isObj) {
+				return (
+					<ObjectField
+						key={field}
+						path={`${path}${field}`}
+						field={field}
+						onDelete={(deletePath) =>
+							handleDelete({
+								field: deletePath,
+								setMapping,
+								flattenUsecase,
+								mappings,
+							})
+						}
+						view={VIEWS.SEARCH}
+					>
+						{this.renderMapping({
+							usecase: usecaseVal,
+							type: typeVal,
+							path: `${path}${field}.`,
+							mappings,
+							fieldWeightMap,
+						})}
+					</ObjectField>
+				);
+			}
+
+			const isExistingField = dataField.some((x) => x === `${path}${field}`);
+			if (
+				usecaseVal === 'none' ||
+				usecaseVal === 'aggs' ||
+				typeVal !== 'text' ||
+				(dataField.length > 0 && isExistingField === false)
+			) {
+				return null;
+			}
+
+			return (
+				<FieldRow
 					view={VIEWS.SEARCH}
-					forceNgram={enableNgram}
-					forceSynonyms={enableSynonyms}
-					onChange={this.handleMappingChange}
-					ref={this.mappingsRef}
-					renderColumn={({ path, mapping }) => (
+					key={`${path}${field}`}
+					field={field}
+					usecase={usecaseVal}
+					type={typeVal}
+					mapping={getMappingsByPath({ mappings, path: `${path}${field}` })}
+					path={`${path}${field}`}
+					setMapping={() => {}}
+					renderColumn={({ path: fieldPath, mapping }) => (
 						<div style={{ width: 150 }}>
 							<InputNumber
-								value={fieldWeights[path] || 1}
-								min={0}
+								value={fieldWeightMap[fieldPath] || 1}
+								min={1}
+								ref={(input) => {
+									this[fieldPath] = input;
+								}}
+								step={0.5}
 								onChange={(value) => {
-									this.handleFieldWeight({
-										weight: value,
-										field: path,
-										mapping,
-									});
+									if (value && typeof value === 'number') {
+										handleFieldWeights({
+											weight: value,
+											field: fieldPath,
+											mapping,
+										});
+									}
 								}}
 							/>
 						</div>
 					)}
-					onRemove={this.handleRemoveFromSearch}
+					onDelete={(deletePath) =>
+						handleDelete({
+							field: deletePath,
+							setMapping,
+							flattenUsecase,
+							mappings,
+						})
+					}
 				/>
-				{aggsFields.length > 0 ? (
+			);
+		});
+	};
+
+	render() {
+		const { nonSearchableFields } = this.state;
+		const { mappingWrapperProps, handleAddSearchField, localRelevancy } = this.props;
+		const { usecase, type, mappings, setMapping } = mappingWrapperProps;
+		const { dataField, fieldWeights } = get(localRelevancy, `search`);
+		const fieldWeightMap = getFieldWeightMap({ fieldWeights, dataField });
+
+		return (
+			<React.Fragment>
+				<div>
+					<>
+						<Row
+							type="flex"
+							className={headerRow}
+							justify="space-between"
+							style={{ padding: '0 15px' }}
+						>
+							<Col>
+								{mappingHeaderLeft.map((item) => (
+									<p key={item.title}>
+										{item.title}
+										<Tooltip title={item.info}>
+											<Icon type="info-circle" />
+										</Tooltip>
+									</p>
+								))}
+							</Col>
+							<Col>
+								<Row gutter={8}>
+									{mappingHeaderRight.map((item) => (
+										<Col key={item.title} xs={12}>
+											<p style={{ width: 155 }}>
+												{item.title}
+												<Tooltip title={item.info}>
+													<Icon type="info-circle" />
+												</Tooltip>
+											</p>
+										</Col>
+									))}
+								</Row>
+							</Col>
+						</Row>
+						<div
+							style={{
+								boxSizing: 'border-box',
+								backgroundColor: 'rgba(0, 0, 0, 0.02)',
+								margin: '15px 0px',
+								padding: '15px',
+								border: '1px solid rgba(0, 0, 0, 0.05)',
+							}}
+						>
+							{this.renderMapping({
+								usecase,
+								type,
+								init: true,
+								mappings,
+								fieldWeightMap,
+							})}
+						</div>
+					</>
+				</div>
+				{nonSearchableFields.length > 0 ? (
 					<div style={{ position: 'relative', display: 'inline-block' }}>
 						<Select
-							key={aggsFields.length}
+							showSearch
 							style={{ width: 300 }}
 							placeholder="Add search fields from schema "
-							onChange={this.updateToSearchField}
+							value={undefined}
+							onChange={(field) => {
+								handleAddSearchField({ field, setMapping });
+							}}
 						>
-							{aggsFields.map((field) => (
+							{nonSearchableFields.map((field) => (
 								<Option key={field} value={field}>
 									{field}
 								</Option>
 							))}
 						</Select>
-						{Object.keys(fieldWeights).length === 0 ? (
-							<HighLighter title="Update to search fields" />
-						) : null}
 					</div>
 				) : null}
-			</div>
+			</React.Fragment>
 		);
 	}
 }
 
-FieldsWeight.propTypes = {
-	appName: PropTypes.string.isRequired,
-	enableNgram: PropTypes.bool.isRequired,
-	enableSynonyms: PropTypes.bool.isRequired,
-	fieldWeights: PropTypes.object.isRequired,
-	hasLanguage: PropTypes.bool.isRequired,
-	onFieldsUpdate: PropTypes.func.isRequired,
-	onInit: PropTypes.func.isRequired,
+FieldWeights.propTypes = {
+	handleFieldWeights: PropTypes.func.isRequired,
+	handleDelete: PropTypes.func.isRequired,
+	handleAddSearchField: PropTypes.func.isRequired,
+	mappingWrapperProps: PropTypes.object.isRequired,
+	localRelevancy: PropTypes.object.isRequired,
+	localMapping: PropTypes.object,
+};
+
+FieldWeights.defaultProps = {
+	localMapping: null,
 };
 
 const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');
+	const localRelevancy = get(state, `$getLocalRelevancy.${appName}`);
+	const localMapping = get(state, `$getLocalMapping.${appName}`);
 	return {
-		isLoading: get(state, '$getAppSettings.isFetching'),
 		appName,
+		localRelevancy,
+		localMapping,
 	};
 };
 
-export default connect(mapStateToProps, null)(FieldsWeight);
+export default connect(mapStateToProps)(FieldWeights);

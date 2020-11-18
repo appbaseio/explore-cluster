@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button, Row, Col, Icon, Popover } from 'antd';
+import get from 'lodash/get';
+import { Button, Row, Col, Icon, Popover, Input } from 'antd';
 import PropTypes from 'prop-types';
 import UsecaseDropdown from './UsecaseDropdown';
 import TypeDropdown from './TypeDropdown';
@@ -17,7 +18,10 @@ const FieldRow = ({
 	onDelete,
 	setMapping,
 	view,
+	isFieldNameEditable,
+	onFieldNameChange,
 }) => {
+	const [fieldName, setFieldName] = React.useState(path);
 	return (
 		<Row type="flex" justify="space-between" className={fieldRow}>
 			<Col>
@@ -27,7 +31,22 @@ const FieldRow = ({
 							<MappingsTypeIcon type={type} />
 						</div>
 					</Popover>
-					{field}
+					{isFieldNameEditable ? (
+						<Input
+							defaultValue={path}
+							onChange={(e) => {
+								const val = get(e, 'target.value');
+								if (val) {
+									setFieldName(val);
+								}
+							}}
+							onBlur={() => onFieldNameChange(path, fieldName)}
+							placeholder="field name"
+							style={{ width: 200 }}
+						/>
+					) : (
+						field
+					)}
 					<Button
 						className="delete-btn"
 						type="danger"
@@ -41,7 +60,7 @@ const FieldRow = ({
 			</Col>
 			<Col>
 				<Row gutter={16}>
-					{view !== VIEWS.AGGREGATION && (
+					{view === VIEWS.SCHEMA && (
 						<Col xs={type === 'text' ? 12 : 0}>
 							<UsecaseDropdown
 								value={usecase}
@@ -62,12 +81,12 @@ const FieldRow = ({
 						</Col>
 					)}
 					{renderColumn ? (
-						<Col xs={12}>
+						<div style={{ paddingRight: 15 }}>
 							{renderColumn({
 								path,
 								mapping,
 							})}
-						</Col>
+						</div>
 					) : null}
 				</Row>
 			</Col>
@@ -80,6 +99,8 @@ FieldRow.defaultProps = {
 	// Search & Aggs Settings specific Props
 	renderColumn: null,
 	view: VIEWS.SCHEMA,
+	isFieldNameEditable: false,
+	onFieldNameChange: () => {},
 };
 
 FieldRow.propTypes = {
@@ -94,6 +115,8 @@ FieldRow.propTypes = {
 	// Actions
 	onDelete: PropTypes.func.isRequired,
 	setMapping: PropTypes.func.isRequired,
+	isFieldNameEditable: PropTypes.bool,
+	onFieldNameChange: PropTypes.func,
 };
 
 export default FieldRow;

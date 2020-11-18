@@ -1,27 +1,30 @@
 import React from 'react';
-import get from 'lodash/get';
-import { connect } from 'react-redux';
-import { notification, message, Alert, Card, Divider, Skeleton } from 'antd';
 import PropTypes from 'prop-types';
+import get from 'lodash/get';
+
+import { connect } from 'react-redux';
+import { Card, Divider, Skeleton, Button, Tooltip, Icon } from 'antd';
 import {
 	getDefaultSettings,
 	putSettings,
 	deleteSettings,
 	getSettings as getSearchRelevancy,
+	setLocalRelevancyState,
 } from '../../batteries/modules/actions';
-import { getFieldWeight } from '../../utils';
-import FieldsWeight from './components/FieldsWeight';
-import settingsMap from '../../components/ReviewAndSave/helper';
-import SettingsOptions from './components/SettingsOptions';
-import { isEqual, isValidPlan } from '../../batteries/utils';
-import ReviewAndSave from '../../components/ReviewAndSave';
-import SettingsFooter from '../../components/SettingsFooter';
-import ReIndexWrapper from '../../components/ReIndexWrapper';
-import { getDiffForFields } from './utils';
+import { getSubFields } from '../../utils';
+import { allowedTiers } from '../../utils/prop-types';
+import { getMappingsByPath, getMappingsInfo } from '../../utils/mappings';
+import { isValidPlan } from '../../batteries/utils';
 import { container } from '../ResultsPage/styles';
+
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Overlay from '../../components/Overlay';
-import { allowedTiers } from '../../utils/prop-types';
+import SettingsOptions from './components/SettingsOptions';
+import FieldWeights from './components/FieldsWeight';
+import MappingWrapper from '../../components/MappingsWrapper';
+import SettingsFooter from '../../components/SettingsFooter';
+import RankFeature from './components/RankFeature';
+import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 
 const bannerDetails = {
 	title: 'Search Settings',
@@ -32,21 +35,19 @@ const bannerDetails = {
 	href: 'https://docs.appbase.io/docs/search/relevancy/#search-settings',
 };
 
-class SearchSettings extends React.Component {
-	state = {
-		fieldWeights: {},
-		fuzziness: 0,
-		queryFormat: 'or',
-		queryType: 'default',
-		enableNgram: true,
-		hasLanguage: true,
-		enableSynonyms: true,
-		reviewAndSaveModal: false,
-		isReset: false,
-	};
+const getqueryFormat = ({ queryString, searchOperators }) => {
+	if (queryString) {
+		return 'queryString';
+	}
 
-	_mappingsRef = null;
+	if (searchOperators) {
+		return 'searchOperators';
+	}
 
+	return 'default';
+};
+
+class SearchSettingsPage extends React.Component {
 	componentDidMount() {
 		const {
 			appName,
@@ -54,10 +55,11 @@ class SearchSettings extends React.Component {
 			settings,
 			getDefaultSettingsAction,
 			defaultSettings,
+			localRelevancy,
 		} = this.props;
 
-		if (settings) {
-			this.init(settings);
+		if (settings && !localRelevancy) {
+			this.init({ ...settings });
 		} else {
 			getSettingsAction(appName);
 		}
@@ -68,195 +70,380 @@ class SearchSettings extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { settings, isLoading } = this.props;
+		const { settings, mappings, localRelevancy } = this.props;
 
-		if (!isLoading && JSON.stringify(settings) !== JSON.stringify(prevProps.settings)) {
-			this.init(settings);
+		if (
+			JSON.stringify(settings) !== JSON.stringify(prevProps.settings) ||
+			JSON.stringify(mappings) !== JSON.stringify(prevProps.mappings)
+		) {
+			this.init({ ...(localRelevancy || settings) });
 		}
 	}
 
-	handleChange = (name, value) => {
-		this.setState({
-			[name]: value,
-		});
-	};
-
-	handleFieldsUpdate = (fieldWeights) => {
-		this.setState({
-			fieldWeights,
-		});
-	};
-
-	handleSave = (refetchReIndexingData) => {
-		const {
-			fieldWeights,
-			fuzziness,
-			enableSynonyms,
-			queryFormat,
-			queryType,
-			enableNgram,
-		} = this.state;
-		const { updateSettingsAction, appName, settings, getSettingsAction } = this.props;
-
-		this.toggleReviewSaveVisible();
-		updateSettingsAction(appName, {
-			...settings,
-			search: {
-				...get(settings, 'search', {}),
-				fuzziness,
-				dataField: Object.keys(fieldWeights),
-				fieldWeights: Object.values(fieldWeights),
-				searchOperators: queryType === 'searchOperators',
-				queryString: queryType === 'queryString',
-				queryFormat,
-			},
-			indexSettings: {
-				enableNgram,
-			},
-			synonyms: {
-				enabled: enableSynonyms,
-			},
-		})
-			.then(async (res) => {
-				if (res && res.error) {
-					notification.error({
-						message: 'Failed to save Search Settings',
-						description: get(res, 'error.message'),
-					});
-				} else {
+	handleChange = (name, value, mappingWrapperProps) => {
+		const { localRelevancy, updateLocalRelevancy, appName } = this.props;
+		const searchSettings = get(localRelevancy, `search`);
+		const updatedDataField = [...get(searchSettings, 'dataField')];
+		const updatedFieldWeights = [...get(searchSettings, 'fieldWeights')];
+		const { flattenUsecase, mappings } = mappingWrapperProps;
+		if (name === 'enableSynonyms') {
+			const [newDataFields, newFieldWeights] = Object.keys(flattenUsecase).reduce(
+				(agg, item) => {
 					if (
-						JSON.stringify(
-							get(this, '_mappingsRef.current.wrappedInstance.state.rawMappings', {}),
-						) !==
-						JSON.stringify(
-							get(this, '_mappingsRef.current.wrappedInstance.originalMappings', {}),
-						)
+						flattenUsecase[item] === 'search' ||
+						flattenUsecase[item] === 'searchaggs'
 					) {
-						const reIndex = get(
-							this,
-							'_mappingsRef.current.wrappedInstance.handleReindex',
-						);
-						await reIndex(refetchReIndexingData);
+						const { enableNgram } = get(localRelevancy, `indexSettings`);
+						const { language } = get(localRelevancy, `language`);
+						const fieldIndex = updatedDataField.findIndex((x) => x === item);
+
+						const fields = getSubFields({
+							fields: get(
+								getMappingsByPath({
+									mappings,
+									path: item,
+								}),
+								'fields',
+							),
+							weight: updatedFieldWeights[fieldIndex],
+							address: item,
+							skipSearch: enableNgram === false,
+							skipLang: !language,
+							skipSynonyms: value === false,
+						});
+
+						return [
+							[...agg[0], ...Object.keys(fields)],
+							[...agg[1], ...Object.values(fields)],
+						];
 					}
-					getSettingsAction(appName);
-					message.success(`Search settings for ${appName} saved successfully`);
-				}
-			})
-			.catch((e) => {
-				notification.error({
-					message: 'Failed to save Search Settings',
-					description: e.message,
-				});
+
+					return agg;
+				},
+				[[], []],
+			);
+
+			updateLocalRelevancy(appName, {
+				...localRelevancy,
+				search: {
+					...searchSettings,
+					dataField: newDataFields,
+					fieldWeights: newFieldWeights,
+				},
+				synonyms: {
+					...get(localRelevancy, `synonyms`, {}),
+					enabled: value,
+				},
 			});
-	};
+		} else if (name === 'enableNgram') {
+			const [newDataFields, newFieldWeights] = Object.keys(flattenUsecase).reduce(
+				(agg, item) => {
+					if (
+						flattenUsecase[item] === 'search' ||
+						flattenUsecase[item] === 'searchaggs'
+					) {
+						const { enabled: enableSynonyms } = get(localRelevancy, `synonyms`);
+						const { language } = get(localRelevancy, `language`);
+						const fieldIndex = updatedDataField.findIndex((x) => x === item);
+						const fields = getSubFields({
+							fields: get(
+								getMappingsByPath({
+									mappings,
+									path: item,
+								}),
+								'fields',
+							),
+							weight: updatedFieldWeights[fieldIndex],
+							address: item,
+							skipSearch: value === false,
+							skipLang: !language,
+							skipSynonyms: enableSynonyms === false,
+						});
 
-	getQueryType = ({ queryString, searchOperators }) => {
-		if (queryString) {
-			return 'queryString';
+						return [
+							[...agg[0], ...Object.keys(fields)],
+							[...agg[1], ...Object.values(fields)],
+						];
+					}
+
+					return agg;
+				},
+				[[], []],
+			);
+
+			updateLocalRelevancy(appName, {
+				...localRelevancy,
+				search: {
+					...searchSettings,
+					dataField: newDataFields,
+					fieldWeights: newFieldWeights,
+				},
+				indexSettings: {
+					...get(localRelevancy, `indexSettings`, {}),
+					enableNgram: value,
+				},
+			});
+		} else if (name === 'queryType') {
+			updateLocalRelevancy(appName, {
+				...localRelevancy,
+				search: {
+					...get(localRelevancy, `search`, {}),
+					queryString: value === 'queryString',
+					searchOperators: value === 'searchOperators',
+				},
+			});
+		} else {
+			updateLocalRelevancy(appName, {
+				...localRelevancy,
+				search: {
+					...get(localRelevancy, `search`, {}),
+					[name]: value,
+				},
+			});
 		}
-
-		if (searchOperators) {
-			return 'searchOperators';
-		}
-
-		return 'default';
 	};
 
 	init = (settings) => {
-		const searchSettings = get(settings, 'search', {});
+		const { appName, updateLocalRelevancy, localRelevancy } = this.props;
+		if (!localRelevancy) {
+			updateLocalRelevancy(appName, {
+				...settings,
+			});
+		}
 
-		const fields = get(searchSettings, 'dataField', []);
-		const weights = get(searchSettings, 'fieldWeights', []);
+		// initialFieldWeights for searchable fields initially if the no search fields are set!
+		this.initialFieldWeights();
+	};
 
-		const fieldWeights = fields.reduce((agg, item, index) => {
+	initialFieldWeights = () => {
+		const {
+			settings,
+			isLoading,
+			isFetchingMapping,
+			appName,
+			localRelevancy,
+			updateLocalRelevancy,
+			mappings,
+		} = this.props;
+
+		const synonymsSettings = get(settings, 'synonyms');
+		const indexSettings = get(settings, 'indexSettings');
+		const languageSettings = get(settings, 'language');
+		const { flattenUsecase } = getMappingsInfo({
+			mappings,
+			enableNgram: indexSettings.enableNgram,
+			enableSynonyms: synonymsSettings.enabled,
+			language: languageSettings.language,
+		});
+
+		const { dataField, fieldWeights } = get(settings, `search`);
+		const hasSearchFields = flattenUsecase
+			? Object.values(flattenUsecase).some((i) => i === 'search' || 'searchaggs')
+			: false;
+		if (
+			!fieldWeights.length &&
+			!dataField.length &&
+			!isFetchingMapping &&
+			!isLoading &&
+			hasSearchFields
+		) {
+			const fieldDataTuple = Object.keys(flattenUsecase).reduce(
+				(agg, item) => {
+					if (
+						flattenUsecase[item] === 'search' ||
+						flattenUsecase[item] === 'searchaggs'
+					) {
+						const { enableNgram } = get(localRelevancy || settings, `indexSettings`);
+						const { enabled: enableSynonyms } = get(
+							localRelevancy || settings,
+							`synonyms`,
+						);
+						const { language } = get(localRelevancy || settings, `language`);
+
+						const fields = getSubFields({
+							fields: get(
+								getMappingsByPath({
+									mappings,
+									path: item,
+								}),
+								'fields',
+							),
+							weight: 1,
+							address: item,
+							skipSearch: enableNgram === false,
+							skipLang: !language,
+							skipSynonyms: enableSynonyms === false,
+						});
+
+						return [
+							[...agg[0], ...Object.keys(fields)],
+							[...agg[1], ...Object.values(fields)],
+						];
+					}
+
+					return agg;
+				},
+				[[], []],
+			);
+
+			updateLocalRelevancy(appName, {
+				...(localRelevancy || settings),
+				search: {
+					...get(localRelevancy || settings, `search`, {}),
+					dataField: fieldDataTuple[0],
+					fieldWeights: fieldDataTuple[1],
+				},
+			});
+		}
+	};
+
+	handleFieldWeights = ({ field, weight, mapping }) => {
+		const { localRelevancy, appName, updateLocalRelevancy } = this.props;
+		const dataField = [...get(localRelevancy, `search.dataField`)];
+		const fieldWeights = [...get(localRelevancy, `search.fieldWeights`)];
+		const { enableNgram } = get(localRelevancy, `indexSettings`);
+		const { enabled: enableSynonyms } = get(localRelevancy, `synonyms`);
+		const { language } = get(localRelevancy, `language`);
+		const updatedFields = getSubFields({
+			fields: get(mapping, 'fields'),
+			weight: Number(weight).toFixed(1),
+			address: field,
+			skipSearch: enableNgram === false,
+			skipLang: !language,
+			skipSynonyms: enableSynonyms === false,
+		});
+		const updatedDataFields = Object.keys(updatedFields);
+		updatedDataFields.forEach((item) => {
+			const fieldIndex = dataField.findIndex((x) => x === item);
+			fieldWeights[fieldIndex] = updatedFields[item];
+		});
+
+		updateLocalRelevancy(appName, {
+			...localRelevancy,
+			search: {
+				...get(localRelevancy, `search`, {}),
+				fieldWeights: [...fieldWeights],
+			},
+		});
+	};
+
+	handleRemoveFromSearch = ({ setMapping, field, flattenUsecase, mappings }) => {
+		const { appName, localRelevancy, updateLocalRelevancy } = this.props;
+		const { fieldWeights, dataField } = get(localRelevancy, `search`);
+
+		const { enableNgram } = get(localRelevancy, `indexSettings`);
+		const { enabled: enableSynonyms } = get(localRelevancy, `synonyms`);
+		const nestedFields = Object.keys(flattenUsecase).filter((i) => i.indexOf(`${field}.`) > -1);
+		const { language } = get(localRelevancy, `language`);
+		let newMappings = [];
+		if (nestedFields.length) {
+			newMappings = nestedFields.map((i) => {
+				if (flattenUsecase[i] === 'search' || flattenUsecase[i] === 'searchaggs') {
+					return {
+						usecase: 'aggs',
+						path: i,
+						type: 'text',
+					};
+				}
+				return null;
+			});
+			newMappings = newMappings.filter((i) => Boolean(i));
+		} else {
+			newMappings = [
+				{
+					usecase: 'aggs',
+					path: field,
+					type: 'text',
+				},
+			];
+		}
+
+		const fields = nestedFields.length ? nestedFields : [field];
+
+		const fiedsWithSubFields = fields.reduce((agg, f) => {
+			const subFields = getSubFields({
+				fields: get(getMappingsByPath({ mappings, path: f }), 'fields'),
+				weight: 1,
+				address: f,
+				skipSearch: enableNgram === false,
+				skipLang: !language,
+				skipSynonyms: !enableSynonyms === false,
+			});
 			return {
 				...agg,
-				[item]: get(weights, index, getFieldWeight(item.split('.').pop(), 1)),
+				...subFields,
 			};
 		}, {});
 
-		const hasSearchOperators = get(settings, 'search.searchOperators', false);
-		const hasQueryString = get(settings, 'search.queryString', false);
+		const fieldNames = Object.keys(fiedsWithSubFields);
 
-		const queryType = this.getQueryType({
-			queryString: hasQueryString,
-			searchOperators: hasSearchOperators,
+		let updatedDataField = [...dataField];
+		let updatedFieldWeights = [...fieldWeights];
+		const indices = [];
+		updatedDataField = updatedDataField.filter((f, i) => {
+			if (fieldNames.includes(f)) {
+				indices.push(i);
+				return false;
+			}
+
+			return true;
 		});
 
-		this.setState({
-			fuzziness: get(searchSettings, 'fuzziness'),
-			queryFormat: get(searchSettings, 'queryFormat'),
-			queryType,
-			fieldWeights,
-			enableNgram: get(settings, 'indexSettings.enableNgram', true),
-			hasLanguage: !!get(settings, 'language.language'),
-			enableSynonyms: get(settings, 'synonyms.enabled', true),
-			reviewAndSaveModal: false,
-			isReset: false,
+		updatedFieldWeights = updatedFieldWeights.filter((w, i) => {
+			return indices.indexOf(i) === -1;
 		});
+
+		updateLocalRelevancy(appName, {
+			...localRelevancy,
+			search: {
+				...get(localRelevancy, `search`, {}),
+				dataField: updatedDataField,
+				fieldWeights: updatedFieldWeights,
+			},
+		});
+		setMapping(newMappings);
+		// remove all this fields from dataField + fieldWeights
 	};
 
-	toggleReviewSaveVisible = () => {
-		this.setState((prevState) => ({
-			reviewAndSaveModal: !prevState.reviewAndSaveModal,
-		}));
-	};
+	handleAddSearchField = ({ field, setMapping }) => {
+		const { localRelevancy, appName, updateLocalRelevancy } = this.props;
+		const { fieldWeights, dataField } = get(localRelevancy, `search`);
+		const { enableNgram } = get(localRelevancy, `indexSettings`);
+		const { enabled: enableSynonyms } = get(localRelevancy, `synonyms`);
+		const { language } = get(localRelevancy, `language`);
 
-	toggleReset = () => {
-		this.setState((prevState) => ({
-			isReset: !prevState.isReset,
-		}));
-	};
+		const updatedMappings = setMapping([
+			{
+				usecase: 'searchaggs',
+				path: field,
+				type: 'text',
+			},
+		]);
 
-	resetChanges = () => {
-		const cancelChanges = get(this, '_mappingsRef.current.wrappedInstance.cancelChanges');
-		const { settings } = this.props;
-		cancelChanges();
-		this.init(settings);
-	};
+		// add to dataField & fieldWeights
+		const newFields = getSubFields({
+			fields: get(getMappingsByPath({ mappings: updatedMappings, path: field }), 'fields'),
+			weight: 1,
+			address: field,
+			skipSearch: enableNgram === false,
+			skipLang: !language,
+			skipSynonyms: enableSynonyms === false,
+		});
 
-	resetToDefault = () => {
-		const { getDefaultSettingsAction, defaultSettings } = this.props;
-
-		if (defaultSettings) this.init(defaultSettings);
-		else
-			getDefaultSettingsAction().then((res) => {
-				if (res && res.payload) {
-					this.init(res.payload);
-				}
-			});
-		this.toggleReset();
-		this.toggleReviewSaveVisible();
-	};
-
-	setMappingsRef = ({ ref }) => {
-		this._mappingsRef = ref;
+		updateLocalRelevancy(appName, {
+			...localRelevancy,
+			search: {
+				...get(localRelevancy, `search`, {}),
+				dataField: [...dataField, ...Object.keys(newFields)],
+				fieldWeights: [...fieldWeights, ...Object.values(newFields)],
+			},
+		});
 	};
 
 	render() {
-		const {
-			isLoading,
-			isUpdating,
-			resetState,
-			appName,
-			settings,
-			defaultSettings,
-			tier,
-			featureSearchRelevancy,
-		} = this.props;
-		const {
-			fieldWeights,
-			enableNgram,
-			enableSynonyms,
-			hasLanguage,
-			queryFormat,
-			queryType,
-			fuzziness,
-			reviewAndSaveModal,
-			isReset,
-		} = this.state;
+		const { isLoading, tier, featureSearchRelevancy, localRelevancy } = this.props;
 
-		if (isLoading) {
+		if (isLoading || !localRelevancy || !get(localRelevancy, `search`, null)) {
 			return (
 				<React.Fragment>
 					<Banner {...bannerDetails} />
@@ -282,147 +469,76 @@ class SearchSettings extends React.Component {
 			);
 		}
 
-		const hasMappingsChanged =
-			JSON.stringify(
-				get(this, '_mappingsRef.current.wrappedInstance.state.rawMappings', {}),
-			) !==
-			JSON.stringify(get(this, '_mappingsRef.current.wrappedInstance.originalMappings', {}));
-
-		const originalMappings = get(
-			this,
-			'_mappingsRef.current.wrappedInstance.originalFlattenUsecase',
-			{},
+		const { fuzziness, queryFormat, queryString, searchOperators } = get(
+			localRelevancy,
+			`search`,
 		);
 
-		const currentMappings = get(
-			this,
-			'_mappingsRef.current.wrappedInstance.flattenUsecase',
-			{},
-		);
-
-		const { diffUsecase, diffWeights } = getDiffForFields({
-			currentFieldWithWeights: fieldWeights,
-			savedDataField: get(settings, 'search.dataField', []),
-			savedFieldWeight: get(settings, 'search.fieldWeights', []),
-			savedUsecase: originalMappings,
-			currentUsecase: currentMappings,
-		});
+		const { enableNgram } = get(localRelevancy, `indexSettings`);
+		const { enabled: enableSynonyms } = get(localRelevancy, `synonyms`);
 
 		return (
 			<div>
 				<Banner {...bannerDetails} />
 				<div className={container}>
 					<Card>
-						<FieldsWeight
-							onFieldsUpdate={this.handleFieldsUpdate}
-							enableNgram={enableNgram}
-							enableSynonyms={enableSynonyms}
-							hasLanguage={hasLanguage}
-							onInit={this.setMappingsRef}
-							fieldWeights={fieldWeights}
-						/>
-						<Divider />
-						<SettingsOptions
-							handleChange={this.handleChange}
-							queryType={queryType}
-							queryFormat={queryFormat}
-							fuzziness={fuzziness}
-							enableSynonyms={enableSynonyms}
-							enableNgram={enableNgram}
-						/>
-					</Card>
-					<ReIndexWrapper appName={appName}>
-						{({ refetch }) => (
-							<SettingsFooter
-								loading={isUpdating}
-								resetState={resetState}
-								onReset={this.resetToDefault}
-								showSearchPreview
-								showCopySettings
-								searchPreviewModalProps={{
-									searchPreviewProps: {
-										testSettings: {
-											...(settings || {}),
-											search: {
-												fuzziness,
-												searchOperators: queryType === 'searchOperators',
-												dataField: Object.keys(fieldWeights),
-												fieldWeights: Object.values(fieldWeights),
-												queryString: queryType === 'queryString',
-												queryFormat,
-											},
-										},
-										hasTestSettings: Object.keys(fieldWeights).length > 0,
-									},
-									buttonProps: {
-										showTooltip: hasMappingsChanged,
-										tooltip: settingsMap.disable_search_settings.description,
-									},
-								}}
-								app={appName}
-								showReset={
-									!isEqual(
-										get(settings, 'search'),
-										get(defaultSettings, 'search'),
-									)
-								}
-								reviewAndSave={() => (
-									<ReviewAndSave
-										loading={isUpdating}
-										isReset={isReset}
-										oldValues={{
-											fuzziness: get(settings, 'search.fuzziness'),
-											dataField: get(diffUsecase, 'old', {}),
-											fieldWeights: get(diffWeights, 'old', {}),
-											synonyms: get(settings, 'synonyms.enabled'),
-											queryFormat: get(settings, 'search.queryFormat'),
-											queryType: this.getQueryType({
-												queryString: get(settings, 'search.queryString'),
-												searchOperators: get(
-													settings,
-													'search.searchOperators',
-												),
-											}),
-											enableNgram: get(settings, 'indexSettings.enableNgram'),
-										}}
-										newValues={{
-											fuzziness,
-											dataField: get(diffUsecase, 'new', {}),
-											fieldWeights: get(diffWeights, 'new', {}),
-											synonyms: enableSynonyms,
-											queryFormat,
-											queryType,
-											enableNgram,
-										}}
-										renderContent={() =>
-											hasMappingsChanged ? (
-												<Alert
-													type="warning"
-													showIcon
-													style={{ marginBottom: 10 }}
-													description="Re-indexing is required for applying below changes."
-												/>
-											) : null
+						<MappingWrapper>
+							{(mappingWrapperProps) => (
+								<>
+									<Tooltip title="Fetch latest Mappings">
+										<Button
+											style={{ marginRight: 8, color: '#1890ff' }}
+											onClick={mappingWrapperProps.reloadMappings}
+										>
+											<Icon type="reload" />
+											Reload Mappings
+										</Button>
+									</Tooltip>
+									<div style={{ marginTop: 20 }}>
+										{get(mappingWrapperProps, 'isFetchingSetting') ||
+										get(mappingWrapperProps, 'isFetchingMapping') ? (
+											<Skeleton />
+										) : (
+											<FieldWeights
+												handleFieldWeights={this.handleFieldWeights}
+												handleDelete={this.handleRemoveFromSearch}
+												handleAddSearchField={this.handleAddSearchField}
+												mappingWrapperProps={mappingWrapperProps}
+											/>
+										)}
+									</div>
+									<Divider />
+									{!get(mappingWrapperProps, 'isFetchingSetting') &&
+										!get(mappingWrapperProps, 'isFetchingMapping') &&
+										localRelevancy && (
+											<RankFeature
+												mappingWrapperProps={mappingWrapperProps}
+											/>
+										)}
+
+									<Divider />
+									<SettingsOptions
+										handleChange={(name, value) =>
+											this.handleChange(name, value, mappingWrapperProps)
 										}
-										onClick={this.toggleReviewSaveVisible}
-										visible={reviewAndSaveModal}
-										onRevert={this.resetChanges}
-										onSave={() => {
-											this.handleSave(refetch);
-											this.toggleReviewSaveVisible();
-										}}
+										queryFormat={queryFormat}
+										fuzziness={fuzziness}
+										enableSynonyms={enableSynonyms}
+										enableNgram={enableNgram}
+										queryType={getqueryFormat({ queryString, searchOperators })}
 									/>
-								)}
-							/>
-						)}
-					</ReIndexWrapper>
+								</>
+							)}
+						</MappingWrapper>
+					</Card>
+					<SettingsFooter />
 				</div>
 			</div>
 		);
 	}
 }
 
-SearchSettings.propTypes = {
+SearchSettingsPage.propTypes = {
 	appName: PropTypes.string.isRequired,
 	defaultSettings: PropTypes.object,
 	isLoading: PropTypes.bool,
@@ -435,9 +551,13 @@ SearchSettings.propTypes = {
 	getDefaultSettingsAction: PropTypes.func.isRequired,
 	getSettingsAction: PropTypes.func.isRequired,
 	updateSettingsAction: PropTypes.func.isRequired,
+	updateLocalRelevancy: PropTypes.func.isRequired,
+	localRelevancy: PropTypes.object,
+	isFetchingMapping: PropTypes.bool.isRequired,
+	mappings: PropTypes.object,
 };
 
-SearchSettings.defaultProps = {
+SearchSettingsPage.defaultProps = {
 	isUpdating: false,
 	settings: null,
 	resetState: {},
@@ -445,6 +565,8 @@ SearchSettings.defaultProps = {
 	isLoading: false,
 	tier: undefined,
 	featureSearchRelevancy: false,
+	localRelevancy: null,
+	mappings: null,
 };
 
 const mapStateToProps = (state) => {
@@ -452,7 +574,7 @@ const mapStateToProps = (state) => {
 	const errorCode = get(state, '$getAppSettings.error.actual.code');
 	const defaultSearchSettings = errorCode === 404 ? defaultSettings : null;
 	const appName = get(state, '$getCurrentApp.name');
-
+	const localRelevancy = get(state, `$getLocalRelevancy.${appName}`, null);
 	return {
 		isLoading: get(state, '$getAppSettings.isFetching'),
 		settings: get(state, ['$getAppSettings', 'settings', appName], defaultSearchSettings),
@@ -462,6 +584,9 @@ const mapStateToProps = (state) => {
 		resetState: get(state, '$getAppSettings.default', {}),
 		tier: get(state, '$getAppPlan.results.tier'),
 		featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
+		isFetchingMapping: get(state, '$getAppMappings.isFetching', false),
+		localRelevancy,
+		mappings: getRawMappingsByAppName(state) || null,
 	};
 };
 
@@ -470,6 +595,7 @@ const mapDispatchToProps = (dispatch) => ({
 	getSettingsAction: (name) => dispatch(getSearchRelevancy(name)),
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
 	deleteSettingsAction: (name) => dispatch(deleteSettings(name)),
+	updateLocalRelevancy: (name, data) => dispatch(setLocalRelevancyState(name, data)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(SearchSettings);
+export default connect(mapStateToProps, mapDispatchToProps)(SearchSettingsPage);
