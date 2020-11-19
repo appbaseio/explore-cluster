@@ -155,8 +155,6 @@ class SearchSettingsPage extends React.Component {
 				newFieldWeights = newFieldWeights.filter((_, i) => !indices.includes(i));
 			}
 
-			console.log({ newDataFields, newFieldWeights });
-
 			updateLocalRelevancy(appName, {
 				...localRelevancy,
 				search: {
@@ -191,7 +189,7 @@ class SearchSettingsPage extends React.Component {
 
 	init = (settings) => {
 		const { appName, updateLocalRelevancy, localRelevancy } = this.props;
-		console.log(`called`, settings, localRelevancy);
+
 		if (!localRelevancy) {
 			updateLocalRelevancy(appName, {
 				...settings,
@@ -237,7 +235,7 @@ class SearchSettingsPage extends React.Component {
 			const { enableNgram } = get(localRelevancy || settings, `indexSettings`);
 			const { language } = get(localRelevancy || settings, `language`);
 			const { enabled: enableSynonyms } = get(localRelevancy || settings, `synonyms`);
-			console.log(`Updating from here....`, enableNgram);
+
 			const fieldDataTuple = Object.keys(flattenUsecase).reduce(
 				(agg, item) => {
 					if (

@@ -321,7 +321,7 @@ class FieldWeights extends React.Component {
 		const dataField = get(localRelevancy, 'search.dataField', []);
 		const fieldWeights = get(localRelevancy, 'search.fieldWeights', []);
 		const fieldWeightMap = { ...getSearchableFieldMap({ dataField, fieldWeights }) };
-		console.log({ fieldWeightMap });
+
 		return (
 			<React.Fragment>
 				<div>

@@ -592,7 +592,6 @@ export const getValidSubFields = ({ fieldMapping, enableNgram, enableSynonyms })
 };
 
 export const getSearchableFieldMap = ({ dataField, fieldWeights }) => {
-	console.log({ dataField, fieldWeights });
 	const subFieldMap = dataField.reduce((agg, field, index) => {
 		const hasSubField = Object.values(SUB_FIELDS).some((s) => field.indexOf(`.${s}`) > -1);
 		if (hasSubField) {
