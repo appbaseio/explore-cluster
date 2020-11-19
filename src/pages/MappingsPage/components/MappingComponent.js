@@ -54,7 +54,6 @@ class MappingComponent extends React.Component {
 			path,
 		});
 
-		console.log({ deletedPath });
 		updateState({
 			usecase: updatedUsecase,
 			type: updatedType,

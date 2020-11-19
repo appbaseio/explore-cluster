@@ -16,7 +16,7 @@ const types = Object.keys(conversionMap).filter(
 
 class NewField extends React.Component {
 	defaultValues = {
-		fieldUsecase: 'search',
+		fieldUsecase: 'searchaggs',
 		fieldName: '',
 		fieldType: 'text',
 		fieldNameError: false,
@@ -70,7 +70,7 @@ class NewField extends React.Component {
 		const { onAddField } = this.props;
 		const { fieldName, fieldType, fieldUsecase } = this.state;
 		this.handleVisible();
-		console.log({ fieldName, fieldType, fieldUsecase });
+
 		onAddField({
 			path: fieldName,
 			type: fieldType,
