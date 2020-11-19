@@ -54,7 +54,6 @@ const link = css`
 	i {
 		margin-right: 4px;
 	}
-
 	${mediaKey.small} {
 		display: block;
 		line-height: 48px;
@@ -342,7 +341,6 @@ const listItemClass = css`
 	position: relative;
 	display: flex;
 	justify-content: space-between;
-
 	.showOnHover {
 		display: none;
 	}

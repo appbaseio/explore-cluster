@@ -27,6 +27,11 @@ const MappingsTypeIcon = ({ type }) => {
 			return <div style={iconStyle}>{'{...}'}</div>;
 		case 'image':
 			return <Icon style={iconStyle} type="file-jpg" theme="outlined" />;
+
+		case 'rank_feature':
+		case 'rank_features':
+			return <Icon style={iconStyle} type="rise" theme="outlined" />;
+
 		default:
 			return <Icon style={iconStyle} type="file-unknown" theme="outlined" />;
 	}

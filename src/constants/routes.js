@@ -24,7 +24,7 @@ export const APP_ROUTES = {
 			{ label: 'Aggregation Settings', link: 'aggs', tag: 'Beta' },
 			{ label: 'Result Settings', link: 'results', tag: 'Beta' },
 			{ label: 'Index Settings', link: 'index-settings', tag: 'Beta' },
-			{ label: 'Schema', link: 'settings', tag: 'Beta' },
+			{ label: 'Schema', link: 'schema', tag: 'Beta' },
 			{ label: 'Synonyms', link: 'synonyms', tag: 'Beta' },
 			{ label: 'Popular Suggestions', link: 'popular-suggestions', tag: 'Beta' },
 			{
@@ -66,6 +66,12 @@ export const APP_ROUTES = {
 		link: '/cluster/curated-insights',
 		hasExactPath: true,
 		action: ALLOWED_ACTIONS.CURATED_INSIGHTS,
+	},
+	'UI Integrations': {
+		icon: 'control',
+		link: 'integrations',
+		hasExactPath: true,
+		tag: 'Beta',
 	},
 	'Access Control': {
 		icon: 'key',
@@ -138,7 +144,7 @@ export const CLUSTER_ROUTES = {
 				tag: 'Beta',
 				openIndexMenu: true,
 			},
-			{ label: 'Schema', link: 'settings', tag: 'Beta', openIndexMenu: true },
+			{ label: 'Schema', link: 'schema', tag: 'Beta', openIndexMenu: true },
 			{ label: 'Synonyms', link: 'synonyms', tag: 'Beta', openIndexMenu: true },
 			{
 				label: 'Popular Suggestions',
@@ -168,6 +174,13 @@ export const CLUSTER_ROUTES = {
 		icon: 'rise',
 		action: ALLOWED_ACTIONS.CURATED_INSIGHTS,
 		link: '/cluster/curated-insights',
+	},
+	'UI Integrations': {
+		icon: 'control',
+		link: 'integrations',
+		tag: 'Beta',
+		label: 'UI Integrations',
+		openIndexMenu: true,
 	},
 	'Access Control': {
 		icon: 'key',

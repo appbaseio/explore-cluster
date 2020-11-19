@@ -1,41 +1,161 @@
 import React from 'react';
 import get from 'lodash/get';
-import isEqual from 'lodash/isEqual';
-import { Select } from 'antd';
-import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import Mappings from '../../MappingsPage/components/Mappings';
-import conversionMap from '../../MappingsPage/components/utils/conversionMap';
-import { hasKeyword } from '../utils';
+import { css } from 'react-emotion';
+import { Skeleton, Icon, Tooltip, Empty, Row, Col, Select } from 'antd';
+import MappingWrapper from '../../../components/MappingsWrapper';
+import FieldRow from '../../MappingsPage/components/FieldRow';
+import ObjectField from '../../MappingsPage/components/ObjectField';
 import { VIEWS } from '../../../constants/props';
+import { getMappingsByPath, hasKeyword } from '../../../utils/mappings';
+import conversionMap from '../../../utils/conversionMap';
+
+const headerRow = css`
+	font-weight: 600;
+	p {
+		font-size: 14px;
+		margin: 0;
+	}
+
+	i {
+		margin-left: 5px;
+	}
+`;
+
+const mappingHeaderLeft = [
+	{
+		title: 'Field Name',
+		info: 'Names of the fields and nested-fields are represented with relative indentation.',
+	},
+];
+
+const mappingHeaderRight = [
+	{
+		title: 'Aggregation Type',
+		info:
+			'Set the aggregation type for the fields. Only fields with their type set appear in the "Test Search Relevancy" UI view.',
+	},
+];
 
 const { Option } = Select;
 
-class FieldsType extends React.Component {
-	state = {
-		// this are fields for which aggs type (Term / Range) is not yet set
-		aggsFields: [],
+const FieldType = ({ handleFieldType, handleDelete, fieldTypes, updateToAggsField }) => {
+	const renderMapping = ({
+		// initialUseCase & initialType are passed to handle the delete field, otherwise usecase/type value can change with recursive iteration
+		usecase,
+		type,
+		initialUseCase,
+		initialType,
+		mappings,
+		path = '',
+		init = false,
+		flattenType,
+		...rest
+	}) => {
+		if (init && (!usecase || Object.keys(usecase).length === 0)) {
+			return (
+				<Empty
+					image={Empty.PRESENTED_IMAGE_SIMPLE}
+					description={<span>No Mappings Present</span>}
+				/>
+			);
+		}
+
+		if (!Object.keys(fieldTypes).length) {
+			return (
+				<Empty
+					image={Empty.PRESENTED_IMAGE_SIMPLE}
+					description={<span>Please add aggregation fields from the dropdown below</span>}
+				/>
+			);
+		}
+
+		return Object.keys(usecase).map((field) => {
+			const usecaseVal = get(usecase, field);
+			const typeVal = get(type, field);
+			const isObj = typeof usecaseVal === 'object';
+
+			if (isObj) {
+				return (
+					<ObjectField
+						key={field}
+						path={`${path}${field}`}
+						field={field}
+						onDelete={(deletePath) =>
+							handleDelete({
+								field: deletePath,
+								...rest,
+							})
+						}
+						view={VIEWS.AGGREGATION}
+					>
+						{renderMapping({
+							usecase: usecaseVal,
+							type: typeVal,
+							path: `${path}${field}.`,
+							mappings,
+							initialUseCase,
+							initialType,
+							...rest,
+						})}
+					</ObjectField>
+				);
+			}
+
+			if (!conversionMap[typeVal]) {
+				return null;
+			}
+			if (
+				usecaseVal === 'none' ||
+				usecaseVal === 'search' ||
+				!get(fieldTypes, `${path}${field}${typeVal === 'text' ? '.keyword' : ''}`, null)
+			) {
+				return null;
+			}
+
+			return (
+				<FieldRow
+					view={VIEWS.AGGREGATION}
+					key={`${path}${field}`}
+					field={field}
+					usecase={usecaseVal}
+					type={typeVal}
+					mapping={getMappingsByPath({ mappings, path: `${path}${field}` })}
+					path={`${path}${field}`}
+					setMapping={() => {}}
+					renderColumn={({ path: fieldPath, mapping }) => (
+						<Select
+							value={get(
+								fieldTypes,
+								`${fieldPath}${hasKeyword(mapping) ? '.keyword' : ''}`,
+							)}
+							placeholder="Select Type"
+							style={{ width: 150 }}
+							onChange={(selected) =>
+								handleFieldType({
+									path: `${fieldPath}${hasKeyword(mapping) ? '.keyword' : ''}`,
+									type: selected,
+									flattenType,
+								})
+							}
+						>
+							<Option value="term">Term</Option>
+							{hasKeyword(mapping) ? null : <Option value="range">Range</Option>}
+						</Select>
+					)}
+					onDelete={(deletePath) =>
+						handleDelete({
+							path: deletePath,
+							flattenType,
+							...rest,
+						})
+					}
+				/>
+			);
+		});
 	};
 
-	mappingsRef = React.createRef();
-
-	componentDidMount() {
-		const { onInit } = this.props;
-		if (onInit) {
-			onInit({ ref: this.mappingsRef });
-		}
-		this.setPossibleAggsField();
-	}
-
-	componentDidUpdate() {
-		this.setPossibleAggsField();
-	}
-
-	setPossibleAggsField = () => {
-		const { fieldTypes } = this.props;
-		const usecases = get(this, 'mappingsRef.current.wrappedInstance.flattenUsecase', null);
-		const types = get(this, 'mappingsRef.current.wrappedInstance.flattenType', null);
-
+	const getAggsField = ({ flattenUsecase: usecases, flattenType: types }) => {
 		if (usecases && types) {
 			const newAggsFields = Object.keys(types).reduce((agg, field) => {
 				if (types[field] === 'text') {
@@ -55,155 +175,117 @@ class FieldsType extends React.Component {
 				}
 				return [...agg];
 			}, []);
-			const { aggsFields } = this.state;
-			if (!isEqual(newAggsFields.sort(), aggsFields)) {
-				this.setState({ aggsFields: newAggsFields });
-			}
-		}
-	};
 
-	handleFieldType = ({ path, type }) => {
-		const { onFieldsUpdate, fieldTypes } = this.props;
-		if (type) {
-			onFieldsUpdate({
-				...fieldTypes,
-				[path]: type,
-			});
-		} else {
-			const savedTypes = Object.keys(fieldTypes)
-				.filter((field) => field !== path)
-				.reduce(
-					(agg, field) => ({
-						...agg,
-						[field]: get(fieldTypes, field),
-					}),
-					{},
-				);
-			onFieldsUpdate(savedTypes);
-		}
-	};
-
-	updateToAggsField = (field) => {
-		const { onFieldsUpdate, fieldTypes } = this.props;
-		const types = get(this, 'mappingsRef.current.wrappedInstance.flattenType', null);
-		const aggType = 'term';
-		let path = `${field}`;
-		if (get(types, field) === 'text') {
-			path = `${path}.keyword`;
+			return newAggsFields;
 		}
 
-		onFieldsUpdate({
-			...fieldTypes,
-			[path]: aggType,
-		});
+		return [];
 	};
 
-	handleRemoveFromAggs = (field) => {
-		const { onFieldsUpdate, fieldTypes } = this.props;
-		const types = get(this, 'mappingsRef.current.wrappedInstance.flattenType', null);
-		let path = `${field}`;
-		if (get(types, field) === 'text') {
-			path = `${path}.keyword`;
-		}
-
-		const newFieldTypes = { ...fieldTypes };
-		delete newFieldTypes[path];
-
-		onFieldsUpdate({
-			...newFieldTypes,
-		});
-	};
-
-	render() {
-		const { appName, fieldTypes } = this.props;
-		const { aggsFields } = this.state;
-		return (
-			<React.Fragment>
-				<Mappings
-					appName={appName}
-					view={VIEWS.AGGREGATION}
-					fieldTypes={fieldTypes}
-					cardProps={{
-						bodyStyle: {
-							padding: 0,
-						},
-						headStyle: {
-							padding: 0,
-							border: 0,
-							display: 'flex',
-						},
-						style: {
-							padding: 0,
-						},
-						bordered: false,
-					}}
-					headerRowProps={{
-						rightItems: [
-							{
-								title: 'Aggregation Type',
-								info:
-									'Set the aggregation type for the fields. Only fields with their type set appear in the "Test Search Relevancy" UI view.',
-							},
-						],
-					}}
-					onChange={() => {}}
-					ref={this.mappingsRef}
-					renderColumn={({ path, mapping }) => (
-						<Select
-							value={get(
-								fieldTypes,
-								`${path}${hasKeyword(mapping) ? '.keyword' : ''}`,
-							)}
-							placeholder="Select Type"
-							style={{ width: 150 }}
-							onChange={(selected) =>
-								this.handleFieldType({
-									path: `${path}${hasKeyword(mapping) ? '.keyword' : ''}`,
-									type: selected,
-								})
-							}
-						>
-							<Option value="term">Term</Option>
-							{hasKeyword(mapping) ? null : <Option value="range">Range</Option>}
-						</Select>
-					)}
-					onRemove={this.handleRemoveFromAggs}
-				/>
-				{aggsFields.length > 0 ? (
-					<div style={{ position: 'relative', display: 'inline-block' }}>
-						<Select
-							key={aggsFields.length}
-							style={{ width: 300 }}
-							placeholder="Add aggregation fields from schema"
-							onChange={this.updateToAggsField}
-						>
-							{aggsFields.map((field) => (
-								<Option key={field} value={field}>
-									{field}
-								</Option>
-							))}
-						</Select>
+	return (
+		<MappingWrapper>
+			{({
+				flattenUsecase,
+				flattenType,
+				usecase,
+				type,
+				isFetchingMapping,
+				isFetchingSetting,
+				...rest
+			}) => (
+				<React.Fragment>
+					<div>
+						{isFetchingSetting || isFetchingMapping ? (
+							<Skeleton />
+						) : (
+							<>
+								{Boolean(Object.keys(fieldTypes).length) && (
+									<Row
+										type="flex"
+										className={headerRow}
+										justify="space-between"
+										style={{ padding: '0px 15px' }}
+									>
+										<Col>
+											{mappingHeaderLeft.map((item) => (
+												<p key={item.title}>
+													{item.title}
+													<Tooltip title={item.info}>
+														<Icon type="info-circle" />
+													</Tooltip>
+												</p>
+											))}
+										</Col>
+										<Col>
+											<Row gutter={8}>
+												{mappingHeaderRight.map((item) => (
+													<Col key={item.title} xs={12}>
+														<p style={{ width: 155 }}>
+															{item.title}
+															<Tooltip title={item.info}>
+																<Icon type="info-circle" />
+															</Tooltip>
+														</p>
+													</Col>
+												))}
+											</Row>
+										</Col>
+									</Row>
+								)}
+								<div
+									style={{
+										boxSizing: 'border-box',
+										backgroundColor: 'rgba(0, 0, 0, 0.02)',
+										margin: '15px 0px',
+										padding: '15px',
+										border: '1px solid rgba(0, 0, 0, 0.05)',
+									}}
+								>
+									{renderMapping({
+										initialUseCase: usecase,
+										initialType: type,
+										usecase,
+										type,
+										flattenType,
+										flattenUsecase,
+										init: true,
+										...rest,
+									})}
+								</div>
+							</>
+						)}
 					</div>
-				) : null}
-			</React.Fragment>
-		);
-	}
-}
-
-FieldsType.propTypes = {
-	appName: PropTypes.string.isRequired,
-	fieldTypes: PropTypes.object.isRequired,
-	onFieldsUpdate: PropTypes.func.isRequired,
-	onInit: PropTypes.func.isRequired,
+					<br />
+					{getAggsField({ flattenUsecase, flattenType }).length > 0 ? (
+						<div style={{ position: 'relative', display: 'inline-block' }}>
+							<Select
+								showSearch
+								style={{ width: 300 }}
+								placeholder="Add aggregation fields from schema"
+								value={undefined}
+								onChange={(field) =>
+									updateToAggsField({ path: field, flattenType })
+								}
+							>
+								{getAggsField({ flattenUsecase, flattenType }).map((field) => (
+									<Option key={field} value={field}>
+										{field}
+									</Option>
+								))}
+							</Select>
+						</div>
+					) : null}
+				</React.Fragment>
+			)}
+		</MappingWrapper>
+	);
 };
 
-const mapStateToProps = (state) => {
-	const appName = get(state, '$getCurrentApp.name');
-
-	return {
-		isLoading: get(state, '$getAppSettings.isFetching'),
-		appName,
-	};
+FieldType.propTypes = {
+	handleFieldType: PropTypes.func.isRequired,
+	handleDelete: PropTypes.func.isRequired,
+	updateToAggsField: PropTypes.func.isRequired,
+	fieldTypes: PropTypes.oneOfType([PropTypes.object, PropTypes.array]).isRequired,
 };
 
-export default connect(mapStateToProps, null)(FieldsType);
+export default FieldType;

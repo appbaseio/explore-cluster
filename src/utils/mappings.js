@@ -1,9 +1,10 @@
 import get from 'lodash/get';
 import omit from 'lodash/omit';
-import { getVersion, getURL } from '../../../../constants/config';
-import mappingUsecase from '../../../../batteries/utils/mappingUsecase';
-import { flatObject } from '.';
-import { getAuthHeaders } from '../../../../batteries/utils/mappings';
+import { getVersion, getURL } from '../constants/config';
+import mappingUsecase from '../batteries/utils/mappingUsecase';
+import { getAuthHeaders } from '../batteries/utils/mappings';
+import { getPossibleSubFields, unflattenObject } from '.';
+import { SUB_FIELDS } from '../constants';
 
 export const getMappingsInfo = ({
 	mappings: originalMappings,
@@ -140,9 +141,9 @@ const _getFieldsByRelevancy = ({
 			: { ...extraFields }),
 	};
 
-	if (enableNgram) {
+	if (!enableNgram) {
 		delete updatedFields.search;
-	} else if (type === 'text') {
+	} else if (type === 'text' && enableNgram) {
 		if (_getUsecase(updatedFields, type).includes('search') && !updatedFields.search) {
 			updatedFields = {
 				...updatedFields,
@@ -162,10 +163,6 @@ const _getFieldsByRelevancy = ({
 const MAPPING_TYPE_WITH_NO_FIELDS = ['rank_feature', 'rank_features'];
 
 const _updateNestedMapping = ({ mapping, type, usecase, fields, currentIndex, settings }) => {
-	if (MAPPING_TYPE_WITH_NO_FIELDS.includes(type)) {
-		return mapping;
-	}
-
 	if (fields.length === currentIndex + 1) {
 		const { enableNgram, enableSynonyms, language } = settings;
 
@@ -176,14 +173,18 @@ const _updateNestedMapping = ({ mapping, type, usecase, fields, currentIndex, se
 			fields: get(mappingUsecase, `${usecase}.fields`),
 			type,
 		});
+		const data = {
+			...mappingUsecase[usecase],
+			fields: updatedFields,
+			type,
+		};
 
+		if (MAPPING_TYPE_WITH_NO_FIELDS.includes(type)) {
+			delete data.fields;
+		}
 		return {
 			...mapping,
-			[`${fields[currentIndex]}`]: {
-				...mappingUsecase[usecase],
-				fields: updatedFields,
-				type,
-			},
+			[`${fields[currentIndex]}`]: data,
 		};
 	}
 
@@ -258,8 +259,7 @@ export const deleteMappingField = ({ originalMapping, path }) => {
 		TOP_FIELD = 'properties';
 	}
 
-	const deletedPath = path.split('.').join('.properties.');
-	const updatedMappings = omit(get(mapping, TOP_FIELD), deletedPath);
+	const updatedMappings = omit(get(mapping, TOP_FIELD), path);
 
 	if (+ES_VERSION[0] >= 6 && +ES_VERSION[0] < 7) {
 		return {
@@ -272,7 +272,7 @@ export const deleteMappingField = ({ originalMapping, path }) => {
 	}
 
 	return {
-		deletedPath,
+		deletedPath: path,
 		mappings: {
 			[TOP_FIELD]: {
 				...updatedMappings,
@@ -416,3 +416,203 @@ export function reIndex({ mappings, appName, version, credentials, settings, exc
 			});
 	});
 }
+
+export const updateObjectNestedProperty = ({ obj, value, fields, currentIndex = 0 }) => {
+	if (currentIndex + 1 === fields.length) {
+		return {
+			...obj,
+			[fields[currentIndex]]: value,
+		};
+	}
+
+	return {
+		...obj,
+		[fields[currentIndex]]: {
+			...get(obj, `${fields[currentIndex]}`),
+			...updateObjectNestedProperty({
+				obj: get(obj, `${fields[currentIndex]}`),
+				value,
+				fields,
+				currentIndex: currentIndex + 1,
+			}),
+		},
+	};
+};
+
+export const flatObject = (originalObject, path = '') => {
+	const clonedObject = JSON.parse(JSON.stringify(originalObject));
+
+	return Object.keys(clonedObject).reduce((agg, key) => {
+		const parsedKey =
+			typeof clonedObject[key] === 'object'
+				? flatObject(clonedObject[key], `${path}${key}.`)
+				: { [`${path}${key}`]: clonedObject[key] };
+		return {
+			...agg,
+			...parsedKey,
+		};
+	}, {});
+};
+
+export const hasKeyword = (fieldMappings) => {
+	if (get(fieldMappings, 'fields.keyword.type', '') === 'keyword') {
+		return true;
+	}
+
+	return false;
+};
+
+export const applyNgramMapping = (mappings, isNgramEnabled) => {
+	const updatedMappings = Object.keys(mappings).reduce((agg, field) => {
+		const fieldVal = { ...get(mappings, field) };
+		let updatedData = { ...agg };
+		if (get(fieldVal, 'properties', null)) {
+			// recursive call the function
+			updatedData = {
+				...updatedData,
+				[field]: {
+					properties: applyNgramMapping(get(fieldVal, 'properties'), isNgramEnabled),
+				},
+			};
+		} else if (get(fieldVal, 'type') === 'text') {
+			if (!isNgramEnabled && get(fieldVal, 'fields.search', null)) {
+				// remove the .search field
+				delete fieldVal.fields.search;
+				updatedData = {
+					...updatedData,
+					[field]: {
+						...fieldVal,
+					},
+				};
+			}
+
+			if (isNgramEnabled && !get(fieldVal, 'fields.search', null)) {
+				// add the .search field
+				updatedData = {
+					...updatedData,
+					[field]: {
+						...fieldVal,
+						fields: {
+							...get(fieldVal, 'fields'),
+							search: {
+								analyzer: 'ngram_analyzer',
+								search_analyzer: 'standard',
+								type: 'text',
+							},
+						},
+					},
+				};
+			}
+		}
+
+		return updatedData;
+	}, {});
+
+	return updatedMappings;
+};
+
+export const applyNgramDataFields = (dataFields) => {
+	const subFields = getPossibleSubFields();
+	const dataFieldsWithoutSubFields = dataFields.filter(
+		(i) => !subFields.some((s) => i.includes(s)),
+	);
+
+	// returns a tuple [ngramSearchFields, ngramSearchFieldsWeights]
+	return dataFieldsWithoutSubFields.reduce(
+		(agg, item) => {
+			return [
+				[...agg[0], `${item}.search`],
+				[...agg[1], 0.1],
+			];
+		},
+		[[], []],
+	);
+};
+
+export const applyLanguageMapping = (mappings, language) => {
+	const lang = {
+		type: 'text',
+		analyzer: language,
+	};
+	const synonyms = {
+		analyzer: 'synonyms',
+		type: 'text',
+	};
+	const updatedMappings = Object.keys(mappings).reduce((agg, field) => {
+		const fieldVal = { ...get(mappings, field) };
+		let updatedData = { ...agg };
+		if (get(fieldVal, 'properties', null)) {
+			// recursive call the function
+			updatedData = {
+				...updatedData,
+				[field]: {
+					properties: applyNgramMapping(get(fieldVal, 'properties'), language),
+				},
+			};
+		} else if (get(fieldVal, 'type') === 'text') {
+			updatedData = {
+				...updatedData,
+				[field]: {
+					...fieldVal,
+					fields: {
+						...get(fieldVal, 'fields'),
+						lang,
+						synonyms,
+					},
+				},
+			};
+		}
+
+		return updatedData;
+	}, {});
+
+	return updatedMappings;
+};
+
+export const getValidSubFields = ({ fieldMapping, enableNgram, enableSynonyms }) => {
+	const possibleSubFields = Object.values(SUB_FIELDS).filter((field) => {
+		if (field === SUB_FIELDS.SEARCH && !enableNgram) {
+			return false;
+		}
+
+		if (field === SUB_FIELDS.SYNONYMS && !enableSynonyms) {
+			return false;
+		}
+		if (field in fieldMapping.fields) {
+			return true;
+		}
+
+		return false;
+	});
+
+	return possibleSubFields;
+};
+
+export const getSearchableFieldMap = ({ dataField, fieldWeights }) => {
+	const subFieldMap = dataField.reduce((agg, field, index) => {
+		const hasSubField = Object.values(SUB_FIELDS).some((s) => field.indexOf(`.${s}`) > -1);
+		if (hasSubField) {
+			const originalField = field.split('.').slice(0, -1).join('.');
+			const subField = field.split('.').pop();
+			return {
+				...agg,
+				[originalField]: {
+					...(agg[originalField] || {}),
+					__fields__: {
+						...((agg[originalField] || {}).__fields__ || {}),
+						[subField]: fieldWeights[index],
+					},
+				},
+			};
+		}
+		return {
+			...agg,
+			[field]: {
+				__weight__: fieldWeights[index],
+				__fields__: {},
+			},
+		};
+	}, {});
+
+	return unflattenObject(subFieldMap);
+};

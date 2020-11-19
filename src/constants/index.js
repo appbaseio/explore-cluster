@@ -45,6 +45,10 @@ const FUNCTIONS = {
 	INVOKED: 2,
 };
 
+const SIDE_BAR = {
+	SET_COLLAPSED: 'SET_COLLAPSED',
+};
+
 const ALLOWED_ACTIONS = {
 	DEVELOP: 'develop',
 	ANALYTICS: 'analytics',
@@ -61,6 +65,15 @@ const ROUTES_ACTION = {
 	SET_CLUSTER_ROUTES: 'SET_CLUSTER_ROUTES',
 };
 
+const SUB_FIELDS = {
+	KEYWORD: 'keyword',
+	AUTOSUGGEST: 'autosuggest',
+	SEARCH: 'search',
+	LANGUAGE: 'lang',
+	SYNONYMS: 'synonyms',
+	DELIMITER: 'delimiter',
+};
+
 export {
 	USER,
 	APPS,
@@ -71,4 +84,6 @@ export {
 	FUNCTIONS,
 	ALLOWED_ACTIONS,
 	ROUTES_ACTION,
+	SIDE_BAR,
+	SUB_FIELDS,
 };

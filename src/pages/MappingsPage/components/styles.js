@@ -1,9 +1,10 @@
 import { css } from 'emotion';
 
 export const footerStyles = css`
-	padding: 15px;
+	padding: 15px 60px;
 	background: white;
 	box-shadow: 0 -2px 5px 0 rgba(0, 0, 0, 0.15);
+	border-top: 1px solid #e8e8e8;
 	text-align: right;
 	display: flex;
 	justify-content: space-between;
@@ -26,6 +27,15 @@ export const row = css`
 `;
 
 export const deleteRow = css`
+	.advance-btn {
+		margin-left: 8px;
+		background: transparent;
+		transform: scale(0);
+		color: dodgerblue;
+		border: 0;
+		box-shadow: none;
+		margin-right: 8px;
+	}
 	.delete-btn {
 		margin-left: 8px;
 		transform: scale(0);
@@ -44,6 +54,9 @@ export const deleteRow = css`
 		.delete-btn {
 			transform: scale(1);
 		}
+		.advance-btn {
+			transform: scale(1);
+		}
 	}
 `;
 
@@ -52,6 +65,7 @@ export const fieldRow = css`
 	box-sizing: border-box;
 	background-color: rgba(255, 255, 255, 0.8);
 	padding: 10px;
+	flex-wrap: nowrap !important;
 
 	p {
 		font-weight: normal;

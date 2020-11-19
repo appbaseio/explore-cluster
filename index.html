@@ -17,12 +17,35 @@
 			rel="stylesheet"
 		/>
 		<style media="screen">
+			html {
+				--scroll-bar: #d0d0d0;
+			}
+
 			#help {
 				position: fixed;
 				bottom: 15px;
 				right: 15px;
 				display: inline;
-				z-index: 2;
+				z-index: 100;
+			}
+
+			/* for browsers supporting webkit */
+			::-webkit-scrollbar {
+				width: 8px;
+				height: 8px;
+			}
+
+			::-webkit-scrollbar-track {
+				background: transparent;
+			}
+
+			::-webkit-scrollbar-thumb {
+				background: var(--scroll-bar);
+				border-radius: 8px;
+			}
+
+			::-webkit-scrollbar-button {
+				display: none;
 			}
 		</style>
 	</head>

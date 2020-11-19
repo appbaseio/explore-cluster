@@ -1,4 +1,5 @@
 import get from 'lodash/get';
+import set from 'lodash/set';
 import includes from 'lodash/includes';
 import keys from 'lodash/keys';
 import values from 'lodash/values';
@@ -8,7 +9,7 @@ import { getSingleFunction, updateFunctions } from '../batteries/utils/app';
 import { getESVersion } from '../batteries/utils/mappings';
 import { doGet } from '../batteries/utils/requestService';
 import { getDefaultAllowedActions } from './allowedActions';
-import { ALLOWED_ACTIONS } from '../constants';
+import { ALLOWED_ACTIONS, SUB_FIELDS } from '../constants';
 
 export async function getUser(username, password, url) {
 	const ACC_API = getURL();
@@ -529,6 +530,29 @@ export function getReIndexedName(appName) {
 	return newName;
 }
 
+export const getFieldWeight = (field, weightData) => {
+	const weight = Number(weightData);
+	switch (field) {
+		case SUB_FIELDS.AUTOSUGGEST:
+		case SUB_FIELDS.LANGUAGE:
+			return (weight ? weight * 0.9 : 0).toFixed(1);
+		case SUB_FIELDS.SYNONYMS:
+			return (weight ? weight * 0.7 : 0).toFixed(1);
+		case SUB_FIELDS.DELIMITER:
+			return (weight ? weight * 0.4 : 0).toFixed(1);
+		case SUB_FIELDS.SEARCH:
+			return (weight ? weight * 0.1 : 0).toFixed(1);
+		case SUB_FIELDS.KEYWORD:
+			return (weight ? weight : 0).toFixed(1);
+		default:
+			return weight.toFixed(1);
+	}
+};
+
+export const getPossibleSubFields = () => {
+	return Object.values(SUB_FIELDS);
+};
+
 export function getSubFields({
 	fields,
 	weight,
@@ -553,29 +577,11 @@ export function getSubFields({
 				};
 			}, {});
 
-		return { [address]: weight, ...subFields };
+		return { [address]: Number(weight).toFixed(1), ...subFields };
 	}
 
-	return { [address]: weight };
+	return { [address]: Number(weight).toFixed(1) };
 }
-
-export const getFieldWeight = (field, weight) => {
-	switch (field) {
-		case 'autosuggest':
-		case 'lang':
-			return weight ? weight * 0.9 : 0;
-		case 'synonyms':
-			return weight ? weight * 0.7 : 0;
-		case 'delimiter':
-			return weight ? weight * 0.4 : 0;
-		case 'search':
-			return weight ? weight * 0.1 : 0;
-		case 'keyword':
-			return weight ? weight : 0;
-		default:
-			return weight;
-	}
-};
 
 function ltrim(str) {
 	if (!str) return str;
@@ -744,4 +750,23 @@ export const compareVersion = (versionA = '0.0.0', versionB = '0.0.0') => {
 	}
 
 	return -1;
+};
+
+export const unflattenObject = (flatObj) =>
+	Object.keys(flatObj).reduce((agg, key) => set(agg, key, flatObj[key]), {});
+
+export const renameObjectKey = (oldObj, oldName, newName) => {
+	const newObj = {};
+
+	Object.keys(oldObj).forEach((key) => {
+		const value = oldObj[key];
+
+		if (key === oldName) {
+			newObj[newName] = value;
+		} else {
+			newObj[key] = value;
+		}
+	});
+
+	return newObj;
 };

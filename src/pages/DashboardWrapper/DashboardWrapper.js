@@ -5,7 +5,6 @@ import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import keys from 'lodash/keys';
-
 import { bool, func, object } from 'prop-types';
 import Loader from '../../components/Loader';
 import AppHeader from '../../components/AppHeader';
@@ -15,7 +14,7 @@ import { getAppPlan } from '../../batteries/modules/actions';
 import { getParam, getAuthorizedRoutes, getParsedRoutes } from '../../utils';
 import LabelTag from '../../components/LabelTag';
 import IndexSwitcher from '../../components/IndexSwitcher';
-import { loadApps } from '../../actions';
+import { loadApps, setIsSidebarCollapsed } from '../../actions';
 import SidebarAutocomplete from '../../components/SidebarAutocomplete';
 import searchInputStyle from './styles';
 import UnauthorizedPage from '../UnauthorizedPage';
@@ -56,7 +55,6 @@ const getActiveMenu = (props, prevActiveSubMenu = [], routes = {}) => {
 	if (!pathname) {
 		pathname = getParam('view') || '';
 	}
-
 	Object.keys(routes).some((route) => {
 		if (routes[route].menu) {
 			const active = routes[route].menu.find((item) => pathname.startsWith(item.link));
@@ -91,7 +89,6 @@ class DashboardWrapper extends Component {
 	constructor(props) {
 		super(props);
 
-		const collapsed = window.innerWidth <= breakpoints.medium;
 		let showHeader = true;
 		try {
 			const header = JSON.parse(sessionStorage.getItem('header'));
@@ -101,10 +98,9 @@ class DashboardWrapper extends Component {
 		} catch (e) {
 			console.log(e);
 		}
-		const getActiveMenuData = getActiveMenu(props);
+		const getActiveMenuData = getActiveMenu(props, undefined, props.routes);
 		const { routes } = props;
 		this.state = {
-			collapsed,
 			appName: props.match.params.appName, // eslint-disable-line
 
 			showHeader,
@@ -147,6 +143,7 @@ class DashboardWrapper extends Component {
 			isClusterPlanFetching,
 			apps,
 			fetchApps,
+			setIsCollapsed,
 		} = this.props;
 		if (!isClusterPlanFetching && !isClusterPlanFetched) {
 			fetchClusterPlan();
@@ -155,6 +152,9 @@ class DashboardWrapper extends Component {
 		if (!apps) {
 			fetchApps();
 		}
+
+		const collapsed = window.innerWidth <= breakpoints.medium;
+		setIsCollapsed(collapsed);
 	}
 
 	componentDidUpdate(prevProps) {
@@ -183,12 +183,13 @@ class DashboardWrapper extends Component {
 	};
 
 	onCollapse = () => {
-		this.setState((prevState) => ({ collapsed: !prevState.collapsed }));
+		const { setIsCollapsed, collapsed } = this.props;
+		setIsCollapsed(!collapsed);
 	};
 
 	render() {
-		const { collapsed, showHeader, routes, activeSubMenu, activeMenuItem, value } = this.state;
-		const { apps, history, match } = this.props;
+		const { showHeader, routes, activeSubMenu, activeMenuItem, value } = this.state;
+		const { apps, history, match, collapsed } = this.props;
 
 		const filteredApps = keys(apps).filter((app) => !app.startsWith('.'));
 		const allowedRoutes = getAuthorizedRoutes(routes);
@@ -293,12 +294,27 @@ class DashboardWrapper extends Component {
 										</Menu.Item>
 									);
 								}
+
 								return (
 									<Menu.Item key={route}>
-										<Link replace to={routes[route].link}>
-											<Icon type={routes[route].icon} />
-											<span>{route}</span>
-										</Link>
+										{routes[route].openIndexMenu ? (
+											<IndexSwitcher
+												item={routes[route]}
+												filteredApps={filteredApps}
+												history={history}
+												renderItem={() => (
+													<div>
+														<Icon type={routes[route].icon} />
+														<span>{route}</span>
+													</div>
+												)}
+											/>
+										) : (
+											<Link replace to={routes[route].link}>
+												<Icon type={routes[route].icon} />
+												<span>{route}</span>
+											</Link>
+										)}
 									</Menu.Item>
 								);
 							})}
@@ -375,6 +391,8 @@ DashboardWrapper.propTypes = {
 	history: object.isRequired,
 	match: object.isRequired,
 	location: object.isRequired,
+	collapsed: bool.isRequired,
+	setIsCollapsed: func.isRequired,
 	routes: object.isRequired,
 };
 
@@ -383,12 +401,14 @@ const mapStateToProps = (state) => ({
 	isClusterPlanFetched: get(state, '$getAppPlan.success'),
 	isClusterPlanFetching: get(state, '$getAppPlan.isFetching', false),
 	apps: get(state, 'apps.data'),
+	collapsed: get(state, 'sideBarCollapsed'),
 	routes: get(state, 'clusterRoutes'),
 });
 
 const mapDispatchToProps = (dispatch) => ({
 	fetchClusterPlan: () => dispatch(getAppPlan()),
 	fetchApps: () => dispatch(loadApps()),
+	setIsCollapsed: (collapsed) => dispatch(setIsSidebarCollapsed(collapsed)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(DashboardWrapper);

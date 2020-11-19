@@ -84,7 +84,6 @@ const link = css`
 	i {
 		margin-right: 4px;
 	}
-
 	${mediaKey.small} {
 		display: block;
 		line-height: 48px;
@@ -94,21 +93,17 @@ const link = css`
 const container = css`
 	padding: 50px;
 	position: relative;
-
 	.space-between {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 	}
-
 	.flex-end {
 		justify-content: flex-end;
 	}
-
 	.flex {
 		display: flex;
 	}
-
 	.card-footer {
 		width: 100%;
 		padding: 20px;

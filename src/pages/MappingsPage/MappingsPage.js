@@ -1,7 +1,6 @@
 import React, { Fragment } from 'react';
-import { string } from 'prop-types';
 
-import Mappings from './components/Mappings';
+import MappingComponent from './components/MappingComponent';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 
@@ -13,19 +12,17 @@ const bannerMessage = {
 	href: 'https://docs.appbase.io/docs/search/relevancy/#schema',
 };
 
-const MappingsPage = ({ appName }) => (
-	<Fragment>
-		<Banner {...bannerMessage} />
-		<section style={{ padding: 50 }}>
-			<ErrorToaster>
-				<Mappings key={appName} appName={appName} />
-			</ErrorToaster>
-		</section>
-	</Fragment>
-);
-
-MappingsPage.propTypes = {
-	appName: string.isRequired,
+const MappingsPage = () => {
+	return (
+		<Fragment>
+			<Banner {...bannerMessage} />
+			<section style={{ padding: 50 }}>
+				<ErrorToaster>
+					<MappingComponent />
+				</ErrorToaster>
+			</section>
+		</Fragment>
+	);
 };
 
 export default MappingsPage;
