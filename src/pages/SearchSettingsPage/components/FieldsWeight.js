@@ -301,9 +301,9 @@ class FieldWeights extends React.Component {
 					{advanceSearchState[`${appName}_${fieldPath}`] && (
 						<Card>
 							<p style={{ fontWeight: 'normal' }}>
-								Reducing the ways to search a field can improve search latency. By
-								default, all are enabled. You can also set the individual weights to
-								have a better control on the search relevancy.
+								Reducing the ways to search a field can improve search latency. You
+								can also set the individual weights to have a better control on the
+								search relevancy.
 							</p>
 							{validSubFields.map((sf) => {
 								const fw = getFieldWeight(
