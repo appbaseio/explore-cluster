@@ -10,16 +10,16 @@ import Main from './Main';
 const bannerDetails = {
 	title: 'UI Integrations',
 	description:
-		'Build a WYSIWG storefront search preview that can be installed with your favorite E-Commerce platform.',
+		'Build a WYSIWG storefront search preview that can be installed to your favorite E-Commerce platform.',
 	icon: 'pencil',
 };
 
 const bannerDetailsPaid = {
 	title: 'UI Integrations',
 	description:
-		'Build a WYSIWG storefront search preview that can be installed with your favorite E-Commerce platform.',
+		'Build a WYSIWG storefront search preview that can be installed to your favorite E-Commerce platform.',
 	buttonText: 'Read Docs',
-	href: 'https://docs.appbase.io/docs/integrations',
+	href: 'http://docs.appbase.io/docs/reactivesearch/ui-integrations/Overview',
 };
 
 const IntegrationsPage = ({ tier, featureEcommerce }) => {
