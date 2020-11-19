@@ -57,16 +57,6 @@ const fieldInfo = {
 
 const { Option } = Select;
 
-// const getFieldWeightMap = ({ fieldWeights, dataField }) => {
-// 	const fieldWeightMap = dataField.reduce((agg, field, index) => {
-// 		return {
-// 			...agg,
-// 			[field]: fieldWeights[index],
-// 		};
-// 	}, {});
-// 	return fieldWeightMap;
-// };
-
 class FieldWeights extends React.Component {
 	state = {
 		nonSearchableFields: [],
