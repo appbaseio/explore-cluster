@@ -520,10 +520,13 @@ export const applyNgramDataFields = (dataFields) => {
 	// returns a tuple [ngramSearchFields, ngramSearchFieldsWeights]
 	return dataFieldsWithoutSubFields.reduce(
 		(agg, item) => {
-			return [
-				[...agg[0], `${item}.search`],
-				[...agg[1], 0.1],
-			];
+			if (!dataFields.includes(`${item}.search`)) {
+				return [
+					[...agg[0], `${item}.search`],
+					[...agg[1], 0.1],
+				];
+			}
+			return agg;
 		},
 		[[], []],
 	);
@@ -589,11 +592,13 @@ export const getValidSubFields = ({ fieldMapping, enableNgram, enableSynonyms })
 };
 
 export const getSearchableFieldMap = ({ dataField, fieldWeights }) => {
+	console.log({ dataField, fieldWeights });
 	const subFieldMap = dataField.reduce((agg, field, index) => {
 		const hasSubField = Object.values(SUB_FIELDS).some((s) => field.indexOf(`.${s}`) > -1);
 		if (hasSubField) {
 			const originalField = field.split('.').slice(0, -1).join('.');
 			const subField = field.split('.').pop();
+
 			return {
 				...agg,
 				[originalField]: {
@@ -615,4 +620,18 @@ export const getSearchableFieldMap = ({ dataField, fieldWeights }) => {
 	}, {});
 
 	return unflattenObject(subFieldMap);
+};
+
+export const getTopLevelFields = ({ dataField }) => {
+	return dataField.reduce((agg, field, index) => {
+		const hasSubField = Object.values(SUB_FIELDS).some((s) => field.indexOf(`.${s}`) > -1);
+		if (!hasSubField) {
+			return {
+				...agg,
+				[field]: index,
+			};
+		}
+
+		return agg;
+	}, {});
 };

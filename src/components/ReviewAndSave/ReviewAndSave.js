@@ -64,6 +64,8 @@ const getDiffData = (oldObj, newObj) => {
 		return [0, {}];
 	}
 
+	console.log({ oldObj, newObj });
+
 	// const subFields = getPossibleSubFields();
 	if (get(diffData, 'search.fieldWeights', null) && !get(diffData, 'search.dataField', null)) {
 		// handle only field weight change
@@ -91,6 +93,8 @@ const getDiffData = (oldObj, newObj) => {
 		};
 	}
 
+	console.log(diffData);
+
 	if (get(diffData, 'search.dataField', null) && get(diffData, 'search.fieldWeights', null)) {
 		// handle adding | removing of new field
 
@@ -101,7 +105,7 @@ const getDiffData = (oldObj, newObj) => {
 		const { dataField: olderDataFields, fieldWeights: olderWeights } = get(oldObj, 'search');
 
 		const newDataFields = Object.keys(diffData.search.dataField).reduce((agg, i) => {
-			const fieldName = get(diffData, `search.dataField[${i}][0]`);
+			const fieldName = get(diffData, `search.dataField`)[i][0];
 			// const hasSubfield = subFields.some((s) => !fieldName || fieldName.includes(s));
 			let newData = [...agg];
 
@@ -119,7 +123,7 @@ const getDiffData = (oldObj, newObj) => {
 						oldWeight: isDeleted ? olderWeights[index] : 'N/A',
 						newWeight: isDeleted
 							? 'N/A'
-							: get(diffData, `search.fieldWeights[${i}][0]`, 1), // always first index holds the value
+							: get(diffData, `search.fieldWeights`, 1)[i][0], // always first index holds the value
 					},
 				];
 			}

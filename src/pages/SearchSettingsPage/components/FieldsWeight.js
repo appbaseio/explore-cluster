@@ -147,8 +147,9 @@ class FieldWeights extends React.Component {
 	handleSubFieldWeightChange = (fieldPath, val) => {
 		const { localRelevancy, updateLocalRelevancy, appName } = this.props;
 		const dataField = get(localRelevancy, 'search.dataField');
-		let fieldWeights = get(localRelevancy, 'search.fieldWeights');
+		let fieldWeights = [...get(localRelevancy, 'search.fieldWeights')];
 		const fieldIndex = dataField.findIndex((f) => f === fieldPath);
+
 		fieldWeights = [
 			...fieldWeights.slice(0, fieldIndex),
 			Number(val).toFixed(1),
@@ -214,6 +215,7 @@ class FieldWeights extends React.Component {
 				enableNgram: indexSettings.enableNgram,
 				enableSynonyms: synonymsSettings.enabled,
 			});
+
 			return (
 				<>
 					<FieldRow
@@ -318,8 +320,8 @@ class FieldWeights extends React.Component {
 
 		const dataField = get(localRelevancy, 'search.dataField', []);
 		const fieldWeights = get(localRelevancy, 'search.fieldWeights', []);
-		const fieldWeightMap = getSearchableFieldMap({ dataField, fieldWeights });
-
+		const fieldWeightMap = { ...getSearchableFieldMap({ dataField, fieldWeights }) };
+		console.log({ fieldWeightMap });
 		return (
 			<React.Fragment>
 				<div>
