@@ -12,6 +12,7 @@ import Flex from '../../../batteries/components/shared/Flex';
 import { SUB_FIELDS } from '../../../constants';
 import { setLocalRelevancyState, setAdvanceSearchState } from '../../../batteries/modules/actions';
 import { getFieldWeight as getSubFieldWeight } from '../../../utils';
+import NumberInput from './NumberInput';
 
 const headerRow = css`
 	font-weight: 600;
@@ -274,18 +275,16 @@ class FieldWeights extends React.Component {
 						onAdvanceStateChange={this.handleAdvanceStateChange}
 						renderColumn={({ path: fp, mapping }) => (
 							<div style={{ width: 150 }}>
-								<InputNumber
-									value={fieldWeightMap[fp] || 1}
+								<NumberInput
+									defaultValue={fieldWeightMap[fp] || 1}
 									min={1}
 									step={0.5}
-									onChange={(value) => {
-										if (value && typeof value === 'number') {
-											handleFieldWeights({
-												weight: value,
-												field: fp,
-												mapping,
-											});
-										}
+									onBlur={(value) => {
+										handleFieldWeights({
+											weight: value,
+											field: fp,
+											mapping,
+										});
 									}}
 								/>
 							</div>
