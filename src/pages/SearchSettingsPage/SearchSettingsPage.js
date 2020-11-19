@@ -327,61 +327,16 @@ class SearchSettingsPage extends React.Component {
 		});
 	};
 
-	handleRemoveFromSearch = ({ setMapping, field, flattenUsecase, mappings }) => {
+	handleRemoveFromSearch = (field) => {
 		const { appName, localRelevancy, updateLocalRelevancy } = this.props;
 		const { fieldWeights, dataField } = get(localRelevancy, `search`);
-
-		const { enableNgram } = get(localRelevancy, `indexSettings`);
-		const { enabled: enableSynonyms } = get(localRelevancy, `synonyms`);
-		const nestedFields = Object.keys(flattenUsecase).filter((i) => i.indexOf(`${field}.`) > -1);
-		const { language } = get(localRelevancy, `language`);
-		let newMappings = [];
-		if (nestedFields.length) {
-			newMappings = nestedFields.map((i) => {
-				if (flattenUsecase[i] === 'search' || flattenUsecase[i] === 'searchaggs') {
-					return {
-						usecase: 'aggs',
-						path: i,
-						type: 'text',
-					};
-				}
-				return null;
-			});
-			newMappings = newMappings.filter((i) => Boolean(i));
-		} else {
-			newMappings = [
-				{
-					usecase: 'aggs',
-					path: field,
-					type: 'text',
-				},
-			];
-		}
-
-		const fields = nestedFields.length ? nestedFields : [field];
-
-		const fiedsWithSubFields = fields.reduce((agg, f) => {
-			const subFields = getSubFields({
-				fields: get(getMappingsByPath({ mappings, path: f }), 'fields'),
-				weight: 1,
-				address: f,
-				skipSearch: enableNgram === false,
-				skipLang: !language,
-				skipSynonyms: !enableSynonyms === false,
-			});
-			return {
-				...agg,
-				...subFields,
-			};
-		}, {});
-
-		const fieldNames = Object.keys(fiedsWithSubFields);
+		const fields = [field, ...dataField.filter((i) => i.indexOf(`${field}.`) > -1)];
 
 		let updatedDataField = [...dataField];
 		let updatedFieldWeights = [...fieldWeights];
 		const indices = [];
 		updatedDataField = updatedDataField.filter((f, i) => {
-			if (fieldNames.includes(f)) {
+			if (fields.includes(f)) {
 				indices.push(i);
 				return false;
 			}
@@ -401,8 +356,6 @@ class SearchSettingsPage extends React.Component {
 				fieldWeights: updatedFieldWeights,
 			},
 		});
-		setMapping(newMappings);
-		// remove all this fields from dataField + fieldWeights
 	};
 
 	handleAddSearchField = ({ field, setMapping }) => {

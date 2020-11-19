@@ -7,7 +7,12 @@ import { Icon, Tooltip, Empty, Row, Col, Select, Card, Switch } from 'antd';
 import FieldRow from '../../MappingsPage/components/FieldRow';
 import ObjectField from '../../MappingsPage/components/ObjectField';
 import { VIEWS } from '../../../constants/props';
-import { getMappingsByPath, getMappingsInfo, getValidSubFields } from '../../../utils/mappings';
+import {
+	getMappingsByPath,
+	getMappingsInfo,
+	getValidSubFields,
+	getSearchableFieldMap,
+} from '../../../utils/mappings';
 import Flex from '../../../batteries/components/shared/Flex';
 import { SUB_FIELDS } from '../../../constants';
 import { setLocalRelevancyState, setAdvanceSearchState } from '../../../batteries/modules/actions';
@@ -50,25 +55,17 @@ const fieldInfo = {
 	[SUB_FIELDS.DELIMITER]: `Searches for values with non-alphanumeric characters effectively. Enable this if you have those values for the field. You should set a relatively moderate weight for it. `,
 };
 
-const getFieldWeight = (dataFields, fieldWeights, fieldName) => {
-	const index = dataFields.findIndex((i) => i === fieldName);
-	if (index) {
-		return fieldWeights[index];
-	}
-	return null;
-};
-
 const { Option } = Select;
 
-const getFieldWeightMap = ({ fieldWeights, dataField }) => {
-	const fieldWeightMap = dataField.reduce((agg, field, index) => {
-		return {
-			...agg,
-			[field]: fieldWeights[index],
-		};
-	}, {});
-	return fieldWeightMap;
-};
+// const getFieldWeightMap = ({ fieldWeights, dataField }) => {
+// 	const fieldWeightMap = dataField.reduce((agg, field, index) => {
+// 		return {
+// 			...agg,
+// 			[field]: fieldWeights[index],
+// 		};
+// 	}, {});
+// 	return fieldWeightMap;
+// };
 
 class FieldWeights extends React.Component {
 	state = {
@@ -176,97 +173,65 @@ class FieldWeights extends React.Component {
 		});
 	};
 
-	renderMapping = ({
-		// initialUseCase & initialType are passed to handle the delete field, otherwise usecase/type value can change with recursive iteration
-		usecase,
-		type,
-		mappings,
-		fieldWeightMap,
-		path = '',
-		init = false,
-	}) => {
+	renderFields = ({ path = '', mappings, fieldWeightMap = {}, dataField = [] }) => {
 		const {
-			mappingWrapperProps,
 			handleDelete,
 			localRelevancy,
 			handleFieldWeights,
 			advanceSearchState,
 			appName,
 		} = this.props;
-		const { flattenUsecase, setMapping } = mappingWrapperProps;
+
 		const synonymsSettings = get(localRelevancy, 'synonyms');
 		const indexSettings = get(localRelevancy, 'indexSettings');
 
-		if (init && (!usecase || Object.keys(usecase).length === 0)) {
+		if (!dataField.length) {
 			return (
 				<Empty
 					image={Empty.PRESENTED_IMAGE_SIMPLE}
-					description={<span>No Mappings Present</span>}
+					description={<span>No Search Fields Are Present</span>}
 				/>
 			);
 		}
 
-		const dataField = get(localRelevancy, 'search.dataField', []);
-
-		return Object.keys(usecase).map((field) => {
-			const usecaseVal = get(usecase, field);
-			const typeVal = get(type, field);
-			const isObj = typeof usecaseVal === 'object';
+		return Object.keys(fieldWeightMap).map((field) => {
+			const fieldPath = `${path}${field}`;
+			const isObj = !get(fieldWeightMap, `${field}.__fields__`, null);
 
 			if (isObj) {
 				return (
 					<ObjectField
 						key={field}
-						path={`${path}${field}`}
+						path={fieldPath}
 						field={field}
-						onDelete={(deletePath) =>
-							handleDelete({
-								field: deletePath,
-								setMapping,
-								flattenUsecase,
-								mappings,
-							})
-						}
+						onDelete={(deletePath) => handleDelete(deletePath)}
 						view={VIEWS.SEARCH}
 					>
-						{this.renderMapping({
-							usecase: usecaseVal,
-							type: typeVal,
-							path: `${path}${field}.`,
+						{this.renderFields({
+							path: `${fieldPath}.`,
 							mappings,
-							fieldWeightMap,
+							fieldWeightMap: get(fieldWeightMap, `${field}`),
+							dataField,
 						})}
 					</ObjectField>
 				);
 			}
 
-			const isExistingField = dataField.some((x) => x === `${path}${field}`);
-			if (
-				usecaseVal === 'none' ||
-				usecaseVal === 'aggs' ||
-				typeVal !== 'text' ||
-				(dataField.length > 0 && isExistingField === false)
-			) {
-				return null;
-			}
-			const fieldMapping = getMappingsByPath({ mappings, path: `${path}${field}` });
+			const fieldMapping = getMappingsByPath({ mappings, path: fieldPath });
+
 			const validSubFields = getValidSubFields({
 				fieldMapping,
 				enableNgram: indexSettings.enableNgram,
 				enableSynonyms: synonymsSettings.enabled,
 			});
-			const dataFields = get(localRelevancy, `search.dataField`);
-			const weights = get(localRelevancy, `search.fieldWeights`);
-			const fieldPath = `${path}${field}`;
-
 			return (
 				<>
 					<FieldRow
 						view={VIEWS.SEARCH}
 						key={fieldPath}
 						field={field}
-						usecase={usecaseVal}
-						type={typeVal}
+						usecase="searchaggs"
+						type="text"
 						mapping={getMappingsByPath({ mappings, path: fieldPath })}
 						path={fieldPath}
 						setMapping={() => {}}
@@ -276,7 +241,9 @@ class FieldWeights extends React.Component {
 						renderColumn={({ path: fp, mapping }) => (
 							<div style={{ width: 150 }}>
 								<NumberInput
-									defaultValue={fieldWeightMap[fp] || 1}
+									defaultValue={
+										get(fieldWeightMap, `${fieldPath}.__weight__`) || 1
+									}
 									min={1}
 									step={0.5}
 									onBlur={(value) => {
@@ -289,14 +256,7 @@ class FieldWeights extends React.Component {
 								/>
 							</div>
 						)}
-						onDelete={(deletePath) =>
-							handleDelete({
-								field: deletePath,
-								setMapping,
-								flattenUsecase,
-								mappings,
-							})
-						}
+						onDelete={(deletePath) => handleDelete(deletePath)}
 					/>
 					{advanceSearchState[`${appName}_${fieldPath}`] && (
 						<Card>
@@ -306,13 +266,13 @@ class FieldWeights extends React.Component {
 								search relevancy.
 							</p>
 							{validSubFields.map((sf) => {
-								const fw = getFieldWeight(
-									dataFields,
-									weights,
-									`${fieldPath}.${sf}`,
+								const subFieldWeight = get(
+									fieldWeightMap,
+									`${field}.__fields__.${sf}`,
+									null,
 								);
 
-								const isDisabled = fw === null || fw === undefined;
+								const isDisabled = subFieldWeight === null;
 
 								return (
 									<Flex
@@ -339,7 +299,7 @@ class FieldWeights extends React.Component {
 											}
 										/>
 										<NumberInput
-											defaultValue={fw}
+											defaultValue={subFieldWeight}
 											min={0.1}
 											step={0.1}
 											style={{ width: 100 }}
@@ -364,9 +324,11 @@ class FieldWeights extends React.Component {
 	render() {
 		const { nonSearchableFields } = this.state;
 		const { mappingWrapperProps, handleAddSearchField, localRelevancy } = this.props;
-		const { usecase, type, mappings, setMapping } = mappingWrapperProps;
-		const { dataField, fieldWeights } = get(localRelevancy, `search`);
-		const fieldWeightMap = getFieldWeightMap({ fieldWeights, dataField });
+		const { mappings, setMapping } = mappingWrapperProps;
+
+		const dataField = get(localRelevancy, 'search.dataField', []);
+		const fieldWeights = get(localRelevancy, 'search.fieldWeights', []);
+		const fieldWeightMap = getSearchableFieldMap({ dataField, fieldWeights });
 
 		return (
 			<React.Fragment>
@@ -412,13 +374,14 @@ class FieldWeights extends React.Component {
 								border: '1px solid rgba(0, 0, 0, 0.05)',
 							}}
 						>
-							{this.renderMapping({
-								usecase,
-								type,
-								init: true,
-								mappings,
-								fieldWeightMap,
-							})}
+							{mappings &&
+								this.renderFields({
+									mappings,
+									path: '',
+									init: true,
+									dataField,
+									fieldWeightMap,
+								})}
 						</div>
 					</>
 				</div>

@@ -3,7 +3,7 @@ import omit from 'lodash/omit';
 import { getVersion, getURL } from '../constants/config';
 import mappingUsecase from '../batteries/utils/mappingUsecase';
 import { getAuthHeaders } from '../batteries/utils/mappings';
-import { getPossibleSubFields } from '.';
+import { getPossibleSubFields, unflattenObject } from '.';
 import { SUB_FIELDS } from '../constants';
 
 export const getMappingsInfo = ({
@@ -586,4 +586,33 @@ export const getValidSubFields = ({ fieldMapping, enableNgram, enableSynonyms })
 	});
 
 	return possibleSubFields;
+};
+
+export const getSearchableFieldMap = ({ dataField, fieldWeights }) => {
+	const subFieldMap = dataField.reduce((agg, field, index) => {
+		const hasSubField = Object.values(SUB_FIELDS).some((s) => field.indexOf(`.${s}`) > -1);
+		if (hasSubField) {
+			const originalField = field.split('.').slice(0, -1).join('.');
+			const subField = field.split('.').pop();
+			return {
+				...agg,
+				[originalField]: {
+					...(agg[originalField] || {}),
+					__fields__: {
+						...((agg[originalField] || {}).__fields__ || {}),
+						[subField]: fieldWeights[index],
+					},
+				},
+			};
+		}
+		return {
+			...agg,
+			[field]: {
+				__weight__: fieldWeights[index],
+				__fields__: {},
+			},
+		};
+	}, {});
+
+	return unflattenObject(subFieldMap);
 };
