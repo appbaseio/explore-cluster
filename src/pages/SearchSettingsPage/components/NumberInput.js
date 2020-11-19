@@ -8,7 +8,7 @@ const NumberInput = ({ defaultValue, onBlur, ...rest }) => {
 	return (
 		<InputNumber
 			value={value}
-			onChange={onValueChange}
+			onChange={(val) => onValueChange(Math.abs(val))}
 			onBlur={() => onBlur(value)}
 			{...rest}
 		/>

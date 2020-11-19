@@ -238,7 +238,7 @@ class FieldWeights extends React.Component {
 									step={0.5}
 									onBlur={(value) => {
 										handleFieldWeights({
-											weight: value,
+											weight: Math.abs(value),
 											field: fp,
 											mapping,
 										});
