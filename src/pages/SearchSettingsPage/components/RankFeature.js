@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Tooltip, Icon, Card, Empty, Select, InputNumber } from 'antd';
+import { Tooltip, Icon, Card, Empty, Select } from 'antd';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { css } from 'emotion';
@@ -12,6 +12,7 @@ import FieldRow from '../../MappingsPage/components/FieldRow';
 import { VIEWS } from '../../../constants/props';
 import Flex from '../../../batteries/components/shared/Flex';
 import { renameObjectKey } from '../../../utils';
+import NumberInput from './NumberInput';
 
 const FUNCTIONS = {
 	SATURATION: 'saturation',
@@ -197,16 +198,14 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 					onFieldNameChange={handleFieldNameChange}
 					renderColumn={({ path: fieldPath }) => (
 						<Flex key={fieldPath}>
-							<InputNumber
+							<NumberInput
 								key={`boost-${field}`}
-								value={relevancyRankFields[field].boost || 1}
+								defaultValue={relevancyRankFields[field].boost || 1}
 								style={{ marginLeft: 10, width: 100 }}
 								min={0}
 								step={0.1}
-								onChange={(val) => {
-									if (val && typeof val === 'number') {
-										handleBoostChange(field, val);
-									}
+								onBlur={(val) => {
+									handleBoostChange(field, val);
 								}}
 							/>
 							<Select
@@ -221,9 +220,9 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 								<Select.Option value={FUNCTIONS.SIGMOID}>Sigmoid</Select.Option>
 							</Select>
 							{functionName === FUNCTIONS.SATURATION && (
-								<InputNumber
+								<NumberInput
 									key={`${functionName}-pivot-${field}`}
-									value={get(functionValue, 'pivot')}
+									defaultValue={get(functionValue, 'pivot')}
 									min={1}
 									style={{
 										marginLeft: 10,
@@ -231,21 +230,14 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 										marginRight: hasSigmoidField ? 110 : 0,
 									}}
 									placeholder="default"
-									onChange={(val) => {
-										if (val && typeof val === 'number') {
-											handleParamChange(
-												fieldPath,
-												functionName,
-												'pivot',
-												val,
-											);
-										}
+									onBlur={(val) => {
+										handleParamChange(fieldPath, functionName, 'pivot', val);
 									}}
 								/>
 							)}
 							{functionName === FUNCTIONS.LOG && (
-								<InputNumber
-									value={get(functionValue, 'scaling_factor')}
+								<NumberInput
+									defaultValue={get(functionValue, 'scaling_factor')}
 									min={1}
 									key={`${functionName}-scaling_factor-${field}`}
 									style={{
@@ -253,53 +245,47 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 										width: 100,
 										marginRight: hasSigmoidField ? 110 : 0,
 									}}
-									onChange={(val) => {
-										if (val && typeof val === 'number') {
-											handleParamChange(
-												fieldPath,
-												functionName,
-												'scaling_factor',
-												val,
-											);
-										}
+									onBlur={(val) => {
+										handleParamChange(
+											fieldPath,
+											functionName,
+											'scaling_factor',
+											val,
+										);
 									}}
 								/>
 							)}
 							{functionName === FUNCTIONS.SIGMOID && (
 								<>
-									<InputNumber
-										value={get(functionValue, 'pivot')}
+									<NumberInput
+										defaultValue={get(functionValue, 'pivot')}
 										style={{ marginLeft: 10, width: 100 }}
 										min={1}
 										key={`${functionName}-pivot-${field}`}
 										placeholder="default"
-										onChange={(val) => {
-											if (val && typeof val === 'number') {
-												handleParamChange(
-													fieldPath,
-													functionName,
-													'pivot',
-													val,
-												);
-											}
+										onBlur={(val) => {
+											handleParamChange(
+												fieldPath,
+												functionName,
+												'pivot',
+												val,
+											);
 										}}
 									/>
-									<InputNumber
-										value={get(functionValue, 'exponent')}
+									<NumberInput
+										defaultValue={get(functionValue, 'exponent')}
 										style={{ marginLeft: 10, width: 100 }}
 										min={0.5}
 										max={1}
 										key={`${functionName}-exponent-${field}`}
 										step={0.1}
-										onChange={(val) => {
-											if (val && typeof val === 'number') {
-												handleParamChange(
-													fieldPath,
-													functionName,
-													'exponent',
-													val,
-												);
-											}
+										onBlur={(val) => {
+											handleParamChange(
+												fieldPath,
+												functionName,
+												'exponent',
+												val,
+											);
 										}}
 									/>
 								</>
