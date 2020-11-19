@@ -90,8 +90,8 @@ class SearchSettingsPage extends React.Component {
 			const [newDataFields, newFieldWeights] = Object.keys(flattenUsecase).reduce(
 				(agg, item) => {
 					if (
-						flattenUsecase[item] === 'search' ||
-						flattenUsecase[item] === 'searchaggs'
+						updatedDataField.includes(item) &&
+						(flattenUsecase[item] === 'search' || flattenUsecase[item] === 'searchaggs')
 					) {
 						const { enableNgram } = get(localRelevancy, `indexSettings`);
 						const { language } = get(localRelevancy, `language`);
@@ -139,8 +139,8 @@ class SearchSettingsPage extends React.Component {
 			const [newDataFields, newFieldWeights] = Object.keys(flattenUsecase).reduce(
 				(agg, item) => {
 					if (
-						flattenUsecase[item] === 'search' ||
-						flattenUsecase[item] === 'searchaggs'
+						updatedDataField.includes(item) &&
+						(flattenUsecase[item] === 'search' || flattenUsecase[item] === 'searchaggs')
 					) {
 						const { enabled: enableSynonyms } = get(localRelevancy, `synonyms`);
 						const { language } = get(localRelevancy, `language`);
