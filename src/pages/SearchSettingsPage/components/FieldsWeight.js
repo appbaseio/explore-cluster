@@ -151,7 +151,7 @@ class FieldWeights extends React.Component {
 		const fieldIndex = dataField.findIndex((f) => f === fieldPath);
 		fieldWeights = [
 			...fieldWeights.slice(0, fieldIndex),
-			val,
+			Number(val).toFixed(1),
 			...fieldWeights.slice(fieldIndex + 1),
 		];
 		updateLocalRelevancy(appName, {
