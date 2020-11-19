@@ -3,7 +3,7 @@ import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { css } from 'react-emotion';
-import { Icon, Tooltip, Empty, Row, Col, InputNumber, Select, Card, Switch } from 'antd';
+import { Icon, Tooltip, Empty, Row, Col, Select, Card, Switch } from 'antd';
 import FieldRow from '../../MappingsPage/components/FieldRow';
 import ObjectField from '../../MappingsPage/components/ObjectField';
 import { VIEWS } from '../../../constants/props';
@@ -338,19 +338,17 @@ class FieldWeights extends React.Component {
 												)
 											}
 										/>
-										<InputNumber
-											style={{ width: 100 }}
-											value={fw}
-											step={0.1}
+										<NumberInput
+											defaultValue={fw}
 											min={0.1}
+											step={0.1}
+											style={{ width: 100 }}
 											disabled={isDisabled}
-											onChange={(value) => {
-												if (value && typeof value === 'number') {
-													this.handleSubFieldWeightChange(
-														`${fieldPath}.${sf}`,
-														value,
-													);
-												}
+											onBlur={(value) => {
+												this.handleSubFieldWeightChange(
+													`${fieldPath}.${sf}`,
+													value,
+												);
 											}}
 										/>
 									</Flex>
