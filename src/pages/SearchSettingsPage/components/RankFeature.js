@@ -344,7 +344,7 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 													select fields from the dropdown below to set
 													rank_feature function.{' '}
 													<a
-														href="https://docs.appbase.io"
+														href="https://docs.appbase.io/docs/search/relevancy/#relevance-tuning-with-rank-feature"
 														target="_blank"
 														rel="noreferrer"
 													>
@@ -424,7 +424,7 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 										<>
 											You don&apos;t have rank_feature mappings set.{' '}
 											<a
-												href="https://docs.appbase.io"
+												href="https://docs.appbase.io/docs/search/relevancy/#relevance-tuning-with-rank-feature"
 												target="_blank"
 												rel="noreferrer"
 											>

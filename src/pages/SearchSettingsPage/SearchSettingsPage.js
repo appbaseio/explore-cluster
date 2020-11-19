@@ -29,7 +29,7 @@ import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 const bannerDetails = {
 	title: 'Search Settings',
 	buttonText: 'Read More',
-	description: 'Search Settings allow you to control your search query settings.',
+	description: `Search Settings enables you to control search query and relevance settings.`,
 	icon: 'pencil',
 	videoLink: 'https://youtu.be/moxJ2ZB4owI',
 	href: 'https://docs.appbase.io/docs/search/relevancy/#search-settings',
