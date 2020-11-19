@@ -118,9 +118,11 @@ class AppWrapper extends Component {
 
 	componentDidMount() {
 		const { appName } = this.state;
-		const { history, match, setIsCollapsed } = this.props;
+		const { history, match, setIsCollapsed, updateCurrentApp } = this.props;
+
 		const view = getParam('view') || '';
 
+		updateCurrentApp(appName);
 		this.handleSettings(appName);
 
 		if (!match.params.appName && appName) {
@@ -190,9 +192,8 @@ class AppWrapper extends Component {
 
 	render() {
 		const { showHeader, appName, activeSubMenu, activeMenuItem, loading, value } = this.state;
-
-		const { history, collapsed, routes } = this.props;
-
+		const { history, collapsed, routes, currentApp } = this.props;
+		if (!currentApp) return null;
 		return (
 			<Layout>
 				<Sider
@@ -340,7 +341,7 @@ class AppWrapper extends Component {
 }
 
 AppWrapper.propTypes = {
-	currentApp: PropTypes.string.isRequired,
+	currentApp: PropTypes.string,
 	history: PropTypes.object.isRequired,
 	match: PropTypes.object.isRequired,
 	settings: PropTypes.object,
@@ -353,6 +354,7 @@ AppWrapper.propTypes = {
 	setIsCollapsed: PropTypes.func.isRequired,
 	collapsed: PropTypes.bool.isRequired,
 	routes: PropTypes.object.isRequired,
+	updateCurrentApp: PropTypes.func.isRequired,
 };
 
 AppWrapper.defaultProps = {
@@ -360,6 +362,7 @@ AppWrapper.defaultProps = {
 	tier: undefined,
 	featureSearchRelevancy: false,
 	defaultSettings: null,
+	currentApp: null,
 };
 
 const mapStateToProps = (state) => {
