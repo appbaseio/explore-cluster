@@ -64,8 +64,6 @@ const getDiffData = (oldObj, newObj) => {
 		return [0, {}];
 	}
 
-	console.log({ oldObj, newObj });
-
 	// const subFields = getPossibleSubFields();
 	if (get(diffData, 'search.fieldWeights', null) && !get(diffData, 'search.dataField', null)) {
 		// handle only field weight change
@@ -92,8 +90,6 @@ const getDiffData = (oldObj, newObj) => {
 			},
 		};
 	}
-
-	console.log(diffData);
 
 	if (get(diffData, 'search.dataField', null) && get(diffData, 'search.fieldWeights', null)) {
 		// handle adding | removing of new field
