@@ -65,6 +65,7 @@ export const fieldRow = css`
 	box-sizing: border-box;
 	background-color: rgba(255, 255, 255, 0.8);
 	padding: 10px;
+	flex-wrap: nowrap !important;
 
 	p {
 		font-weight: normal;

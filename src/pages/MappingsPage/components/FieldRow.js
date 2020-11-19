@@ -45,7 +45,7 @@ const FieldRow = ({
 							}}
 							onBlur={() => onFieldNameChange(path, fieldName)}
 							placeholder="field name"
-							style={{ width: 200 }}
+							style={{ width: 150 }}
 						/>
 					) : (
 						field
@@ -58,7 +58,7 @@ const FieldRow = ({
 							onClick={() => onAdvanceStateChange(path, !isAdvanceOption)}
 						>
 							{isAdvanceOption ? <Icon type="minus" /> : <Icon type="plus" />}
-							Advance
+							Advanced settings
 						</Button>
 					)}
 					<Button
