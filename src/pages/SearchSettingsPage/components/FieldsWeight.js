@@ -57,16 +57,6 @@ const fieldInfo = {
 
 const { Option } = Select;
 
-// const getFieldWeightMap = ({ fieldWeights, dataField }) => {
-// 	const fieldWeightMap = dataField.reduce((agg, field, index) => {
-// 		return {
-// 			...agg,
-// 			[field]: fieldWeights[index],
-// 		};
-// 	}, {});
-// 	return fieldWeightMap;
-// };
-
 class FieldWeights extends React.Component {
 	state = {
 		nonSearchableFields: [],
@@ -157,11 +147,12 @@ class FieldWeights extends React.Component {
 	handleSubFieldWeightChange = (fieldPath, val) => {
 		const { localRelevancy, updateLocalRelevancy, appName } = this.props;
 		const dataField = get(localRelevancy, 'search.dataField');
-		let fieldWeights = get(localRelevancy, 'search.fieldWeights');
+		let fieldWeights = [...get(localRelevancy, 'search.fieldWeights')];
 		const fieldIndex = dataField.findIndex((f) => f === fieldPath);
+
 		fieldWeights = [
 			...fieldWeights.slice(0, fieldIndex),
-			val,
+			Number(val).toFixed(1),
 			...fieldWeights.slice(fieldIndex + 1),
 		];
 		updateLocalRelevancy(appName, {
@@ -224,6 +215,7 @@ class FieldWeights extends React.Component {
 				enableNgram: indexSettings.enableNgram,
 				enableSynonyms: synonymsSettings.enabled,
 			});
+
 			return (
 				<>
 					<FieldRow
@@ -248,7 +240,7 @@ class FieldWeights extends React.Component {
 									step={0.5}
 									onBlur={(value) => {
 										handleFieldWeights({
-											weight: value,
+											weight: Math.abs(value),
 											field: fp,
 											mapping,
 										});
@@ -328,7 +320,7 @@ class FieldWeights extends React.Component {
 
 		const dataField = get(localRelevancy, 'search.dataField', []);
 		const fieldWeights = get(localRelevancy, 'search.fieldWeights', []);
-		const fieldWeightMap = getSearchableFieldMap({ dataField, fieldWeights });
+		const fieldWeightMap = { ...getSearchableFieldMap({ dataField, fieldWeights }) };
 
 		return (
 			<React.Fragment>

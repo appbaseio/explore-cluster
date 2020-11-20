@@ -166,12 +166,20 @@ class MappingsWrapper extends React.Component {
 			}, 500);
 		}
 
-		reIndexPromise.then(this.getMappings).catch((err) => {
-			this.onFailedReindex({
-				error: err,
-				startTime,
+		reIndexPromise
+			.then(() => {
+				this.setState({
+					isReindexing: false,
+					deletedPaths: [],
+				});
+				this.getMappings();
+			})
+			.catch((err) => {
+				this.onFailedReindex({
+					error: err,
+					startTime,
+				});
 			});
-		});
 	};
 
 	setMapping = (data) => {

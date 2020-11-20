@@ -101,25 +101,25 @@ const getDiffData = (oldObj, newObj) => {
 		const { dataField: olderDataFields, fieldWeights: olderWeights } = get(oldObj, 'search');
 
 		const newDataFields = Object.keys(diffData.search.dataField).reduce((agg, i) => {
-			const fieldName = get(diffData, `search.dataField[${i}][0]`);
+			const fieldName = get(diffData, `search.dataField`)[i][0];
+			const olderDataFieldIndex = olderDataFields.findIndex((f) => f === fieldName);
+			const newDataFieldIndex = dataField.findIndex((f) => f === fieldName);
+
 			// const hasSubfield = subFields.some((s) => !fieldName || fieldName.includes(s));
 			let newData = [...agg];
 
 			if (fieldName && i !== '_t') {
 				// removed field
 				const isDeleted = i[0] === '_';
-				const index = isDeleted ? Number(i.split('_')[1]) : Number(i);
 
 				newData = [
 					...newData,
 					{
 						field: fieldName,
-						index,
+						index: isDeleted ? olderDataFieldIndex : newDataFieldIndex,
 						isDeleted,
-						oldWeight: isDeleted ? olderWeights[index] : 'N/A',
-						newWeight: isDeleted
-							? 'N/A'
-							: get(diffData, `search.fieldWeights[${i}][0]`, 1), // always first index holds the value
+						oldWeight: isDeleted ? olderWeights[olderDataFieldIndex] || 'N/A' : 'N/A',
+						newWeight: isDeleted ? 'N/A' : fieldWeights[newDataFieldIndex] || 'N/A', // always first index holds the value
 					},
 				];
 			}
@@ -129,7 +129,7 @@ const getDiffData = (oldObj, newObj) => {
 		// handle only field weight change along with dataField add/remove
 		const newFieldWeights = dataField.reduce((agg, item, index) => {
 			// const hasSubfield = subFields.some((s) => item.includes(s));
-			const isPartOfDataField = newDataFields.find((i) => i.index === index);
+			const isPartOfDataField = newDataFields.some((i) => i.field === item);
 			const oldWeight = olderWeights[olderDataFields.findIndex((x) => x === item)];
 			const newWeight = fieldWeights[index];
 			let dataToReturn = [...agg];
@@ -230,7 +230,7 @@ const getDiffData = (oldObj, newObj) => {
 	if (get(diffData, 'aggregations.dataField', null)) {
 		const newDataFields = Object.keys(diffData.aggregations.dataField).reduce((agg, i) => {
 			// deleted field is of pattern [fieldName, number, number]
-			const fieldVal = get(diffData, `aggregations.dataField`)[i];
+			const fieldVal = get(diffData, `aggregations.dataField`, {})[i];
 			const isDeleted = fieldVal.length === 3;
 			const isOlderField = fieldVal.length === 2;
 			const newData = [
@@ -390,6 +390,7 @@ const getDiffData = (oldObj, newObj) => {
 
 		return count;
 	}, 0);
+
 	return [diffCount, diffData];
 };
 

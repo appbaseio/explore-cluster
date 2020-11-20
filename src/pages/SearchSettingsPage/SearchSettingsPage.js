@@ -11,9 +11,9 @@ import {
 	getSettings as getSearchRelevancy,
 	setLocalRelevancyState,
 } from '../../batteries/modules/actions';
-import { getSubFields } from '../../utils';
+import { getSubFields, getFieldWeight } from '../../utils';
 import { allowedTiers } from '../../utils/prop-types';
-import { getMappingsByPath, getMappingsInfo } from '../../utils/mappings';
+import { getMappingsByPath, getMappingsInfo, getTopLevelFields } from '../../utils/mappings';
 import { isValidPlan } from '../../batteries/utils';
 import { container } from '../ResultsPage/styles';
 
@@ -80,49 +80,39 @@ class SearchSettingsPage extends React.Component {
 		}
 	}
 
-	handleChange = (name, value, mappingWrapperProps) => {
+	handleChange = (name, value) => {
 		const { localRelevancy, updateLocalRelevancy, appName } = this.props;
 		const searchSettings = get(localRelevancy, `search`);
 		const updatedDataField = [...get(searchSettings, 'dataField')];
 		const updatedFieldWeights = [...get(searchSettings, 'fieldWeights')];
-		const { flattenUsecase, mappings } = mappingWrapperProps;
 		if (name === 'enableSynonyms') {
-			const [newDataFields, newFieldWeights] = Object.keys(flattenUsecase).reduce(
-				(agg, item) => {
-					if (
-						updatedDataField.includes(item) &&
-						(flattenUsecase[item] === 'search' || flattenUsecase[item] === 'searchaggs')
-					) {
-						const { enableNgram } = get(localRelevancy, `indexSettings`);
-						const { language } = get(localRelevancy, `language`);
-						const fieldIndex = updatedDataField.findIndex((x) => x === item);
+			let newDataFields = [...updatedDataField];
+			let newFieldWeights = [...updatedFieldWeights];
 
-						const fields = getSubFields({
-							fields: get(
-								getMappingsByPath({
-									mappings,
-									path: item,
-								}),
-								'fields',
-							),
-							weight: updatedFieldWeights[fieldIndex],
-							address: item,
-							skipSearch: enableNgram === false,
-							skipLang: !language,
-							skipSynonyms: value === false,
-						});
-
-						return [
-							[...agg[0], ...Object.keys(fields)],
-							[...agg[1], ...Object.values(fields)],
-						];
+			if (value) {
+				const topLevelFields = getTopLevelFields({ dataField: newDataFields });
+				Object.keys(topLevelFields).forEach((f) => {
+					const newField = `${f}.synonyms`;
+					if (!newDataFields.includes(newField)) {
+						newDataFields.push(newField);
+						newFieldWeights.push(
+							getFieldWeight('synonyms', updatedFieldWeights[topLevelFields[f]]),
+						);
+					}
+				});
+			} else {
+				const indices = [];
+				newDataFields = newDataFields.filter((f, i) => {
+					if (f.indexOf('.synonyms') > -1) {
+						indices.push(i);
+						return false;
 					}
 
-					return agg;
-				},
-				[[], []],
-			);
+					return true;
+				});
 
+				newFieldWeights = newFieldWeights.filter((_, i) => !indices.includes(i));
+			}
 			updateLocalRelevancy(appName, {
 				...localRelevancy,
 				search: {
@@ -136,40 +126,34 @@ class SearchSettingsPage extends React.Component {
 				},
 			});
 		} else if (name === 'enableNgram') {
-			const [newDataFields, newFieldWeights] = Object.keys(flattenUsecase).reduce(
-				(agg, item) => {
-					if (
-						updatedDataField.includes(item) &&
-						(flattenUsecase[item] === 'search' || flattenUsecase[item] === 'searchaggs')
-					) {
-						const { enabled: enableSynonyms } = get(localRelevancy, `synonyms`);
-						const { language } = get(localRelevancy, `language`);
-						const fieldIndex = updatedDataField.findIndex((x) => x === item);
-						const fields = getSubFields({
-							fields: get(
-								getMappingsByPath({
-									mappings,
-									path: item,
-								}),
-								'fields',
-							),
-							weight: updatedFieldWeights[fieldIndex],
-							address: item,
-							skipSearch: value === false,
-							skipLang: !language,
-							skipSynonyms: enableSynonyms === false,
-						});
+			let newDataFields = [...updatedDataField];
+			let newFieldWeights = [...updatedFieldWeights];
 
-						return [
-							[...agg[0], ...Object.keys(fields)],
-							[...agg[1], ...Object.values(fields)],
-						];
+			if (value) {
+				const topLevelFields = getTopLevelFields({ dataField: newDataFields });
+				Object.keys(topLevelFields).forEach((f) => {
+					const newField = `${f}.search`;
+
+					if (!newDataFields.includes(newField)) {
+						newDataFields.push(newField);
+						newFieldWeights.push(
+							getFieldWeight('search', updatedFieldWeights[topLevelFields[f]]),
+						);
+					}
+				});
+			} else {
+				const indices = [];
+				newDataFields = newDataFields.filter((f, i) => {
+					if (f.indexOf('.search') > -1) {
+						indices.push(i);
+						return false;
 					}
 
-					return agg;
-				},
-				[[], []],
-			);
+					return true;
+				});
+
+				newFieldWeights = newFieldWeights.filter((_, i) => !indices.includes(i));
+			}
 
 			updateLocalRelevancy(appName, {
 				...localRelevancy,
@@ -205,6 +189,7 @@ class SearchSettingsPage extends React.Component {
 
 	init = (settings) => {
 		const { appName, updateLocalRelevancy, localRelevancy } = this.props;
+
 		if (!localRelevancy) {
 			updateLocalRelevancy(appName, {
 				...settings,
@@ -247,19 +232,16 @@ class SearchSettingsPage extends React.Component {
 			!isLoading &&
 			hasSearchFields
 		) {
+			const { enableNgram } = get(localRelevancy || settings, `indexSettings`);
+			const { language } = get(localRelevancy || settings, `language`);
+			const { enabled: enableSynonyms } = get(localRelevancy || settings, `synonyms`);
+
 			const fieldDataTuple = Object.keys(flattenUsecase).reduce(
 				(agg, item) => {
 					if (
 						flattenUsecase[item] === 'search' ||
 						flattenUsecase[item] === 'searchaggs'
 					) {
-						const { enableNgram } = get(localRelevancy || settings, `indexSettings`);
-						const { enabled: enableSynonyms } = get(
-							localRelevancy || settings,
-							`synonyms`,
-						);
-						const { language } = get(localRelevancy || settings, `language`);
-
 						const fields = getSubFields({
 							fields: get(
 								getMappingsByPath({
@@ -472,7 +454,7 @@ class SearchSettingsPage extends React.Component {
 									<Divider />
 									<SettingsOptions
 										handleChange={(name, value) =>
-											this.handleChange(name, value, mappingWrapperProps)
+											this.handleChange(name, value)
 										}
 										queryFormat={queryFormat}
 										fuzziness={fuzziness}

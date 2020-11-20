@@ -153,192 +153,218 @@ class MappingComponent extends React.Component {
 	};
 
 	render() {
-		const { collapsed } = this.props;
+		const { collapsed, appName } = this.props;
 		return (
-			<MappingsWrapper>
-				{({
-					isFetchingMapping,
-					isFetchingSetting,
-					isReindexing,
-					error,
-					reloadMappings,
-					hasMappingsChanged,
-					cancelChanges,
-					handleReindex,
-					usecase,
-					type,
-					appName,
-					setMapping,
-					...rest
-				}) => (
-					<div>
-						{error ? (
-							<Row>
-								<Alert
-									type="error"
-									message={
-										error.message || <pre>{JSON.stringify(error, null, 4)}</pre>
-									}
-								/>
-							</Row>
-						) : (
-							<Card
-								title={
-									<div>
-										<h4>
-											<b>Manage Mappings</b>
-										</h4>
-										<p>Add new fields or change the types of existing ones.</p>
-									</div>
-								}
-								style={{ marginBottom: 30 }}
-								extra={
-									<React.Fragment>
-										<Tooltip title="Fetch latest Mappings">
-											<Button
-												style={{ marginRight: 8, color: '#1890ff' }}
-												onClick={reloadMappings}
-											>
-												<Icon type="reload" />
-												Reload Mappings
-											</Button>
-										</Tooltip>
-										<NewField
-											onAddField={({
-												type: fieldType,
-												path,
-												usecase: fieldUseCase,
-											}) =>
-												setMapping([
-													{
-														type: fieldType,
-														usecase: fieldUseCase,
-														path,
-													},
-												])
-											}
-											fields={Object.keys(usecase || {})}
-										/>
-									</React.Fragment>
-								}
-							>
-								<>
-									{isFetchingSetting || isFetchingMapping ? (
-										<Skeleton />
+			<>
+				<ReIndexWrapper appName={appName}>
+					{({ refetch }) => (
+						<MappingsWrapper>
+							{({
+								isFetchingMapping,
+								isFetchingSetting,
+								isReindexing,
+								error,
+								reloadMappings,
+								hasMappingsChanged,
+								cancelChanges,
+								handleReindex,
+								usecase,
+								type,
+								setMapping,
+								...rest
+							}) => (
+								<div>
+									{error ? (
+										<Row>
+											<Alert
+												type="error"
+												message={
+													error.message || (
+														<pre>{JSON.stringify(error, null, 4)}</pre>
+													)
+												}
+											/>
+										</Row>
 									) : (
-										<>
-											<Row
-												type="flex"
-												className={headerRow}
-												justify="space-between"
-												style={{ padding: '0 15px' }}
-											>
-												<Col>
-													{mappingHeaderLeft.map((item) => (
-														<p key={item.title}>
-															{item.title}
-															<Tooltip title={item.info}>
-																<Icon type="info-circle" />
-															</Tooltip>
-														</p>
-													))}
-												</Col>
-												<Col>
-													<Row gutter={8}>
-														{mappingHeaderRight.map((item) => (
-															<Col key={item.title} xs={12}>
-																<p style={{ width: 155 }}>
-																	{item.title}
-																	<Tooltip title={item.info}>
-																		<Icon type="info-circle" />
-																	</Tooltip>
-																</p>
+										<Card
+											title={
+												<div>
+													<h4>
+														<b>Manage Mappings</b>
+													</h4>
+													<p>
+														Add new fields or change the types of
+														existing ones.
+													</p>
+												</div>
+											}
+											style={{ marginBottom: 30 }}
+											extra={
+												<React.Fragment>
+													<Tooltip title="Fetch latest Mappings">
+														<Button
+															style={{
+																marginRight: 8,
+																color: '#1890ff',
+															}}
+															onClick={reloadMappings}
+														>
+															<Icon type="reload" />
+															Reload Mappings
+														</Button>
+													</Tooltip>
+													<NewField
+														onAddField={({
+															type: fieldType,
+															path,
+															usecase: fieldUseCase,
+														}) =>
+															setMapping([
+																{
+																	type: fieldType,
+																	usecase: fieldUseCase,
+																	path,
+																},
+															])
+														}
+														fields={Object.keys(usecase || {})}
+													/>
+												</React.Fragment>
+											}
+										>
+											<>
+												{isFetchingSetting || isFetchingMapping ? (
+													<Skeleton />
+												) : (
+													<>
+														<Row
+															type="flex"
+															className={headerRow}
+															justify="space-between"
+															style={{ padding: '0 15px' }}
+														>
+															<Col>
+																{mappingHeaderLeft.map((item) => (
+																	<p key={item.title}>
+																		{item.title}
+																		<Tooltip title={item.info}>
+																			<Icon type="info-circle" />
+																		</Tooltip>
+																	</p>
+																))}
 															</Col>
-														))}
-													</Row>
-												</Col>
-											</Row>
-											<div
-												style={{
-													boxSizing: 'border-box',
-													backgroundColor: 'rgba(0, 0, 0, 0.02)',
-													margin: '15px 0px',
-													padding: '15px',
-													border: '1px solid rgba(0, 0, 0, 0.05)',
-												}}
-											>
-												{this.renderMapping({
-													initialUseCase: usecase,
-													initialType: type,
-													usecase,
-													type,
-													init: true,
-													setMapping,
-													...rest,
-												})}
-											</div>
-										</>
+															<Col>
+																<Row gutter={8}>
+																	{mappingHeaderRight.map(
+																		(item) => (
+																			<Col
+																				key={item.title}
+																				xs={12}
+																			>
+																				<p
+																					style={{
+																						width: 155,
+																					}}
+																				>
+																					{item.title}
+																					<Tooltip
+																						title={
+																							item.info
+																						}
+																					>
+																						<Icon type="info-circle" />
+																					</Tooltip>
+																				</p>
+																			</Col>
+																		),
+																	)}
+																</Row>
+															</Col>
+														</Row>
+														<div
+															style={{
+																boxSizing: 'border-box',
+																backgroundColor:
+																	'rgba(0, 0, 0, 0.02)',
+																margin: '15px 0px',
+																padding: '15px',
+																border:
+																	'1px solid rgba(0, 0, 0, 0.05)',
+															}}
+														>
+															{this.renderMapping({
+																initialUseCase: usecase,
+																initialType: type,
+																usecase,
+																type,
+																init: true,
+																setMapping,
+																...rest,
+															})}
+														</div>
+													</>
+												)}
+											</>
+										</Card>
 									)}
-								</>
-							</Card>
-						)}
-						<ReIndexWrapper appName={appName}>
-							{({ refetch }) => (
-								<div
-									style={{
-										position: 'fixed',
-										overflow: 'hidden',
-										bottom: 0,
-										left: collapsed ? 80 : 260,
-										right: 0,
-									}}
-								>
-									<div className={footerStyles}>
-										<SearchPreviewModal app={appName} />
-										<div>
-											<Button
-												type="primary"
-												size="large"
-												style={{ margin: '0 10px' }}
-												onClick={() => handleReindex(refetch)}
-												disabled={
-													isFetchingMapping ||
-													isFetchingSetting ||
-													isReindexing ||
-													!hasMappingsChanged
-												}
-											>
-												Confirm Mapping Changes
-											</Button>
-											<Button
-												size="large"
-												disabled={
-													isFetchingMapping ||
-													isFetchingSetting ||
-													isReindexing ||
-													!hasMappingsChanged
-												}
-												onClick={cancelChanges}
-											>
-												Cancel
-											</Button>
+									<div
+										style={{
+											position: 'fixed',
+											overflow: 'hidden',
+											bottom: 0,
+											left: collapsed ? 80 : 260,
+											right: 0,
+										}}
+									>
+										<div className={footerStyles}>
+											<SearchPreviewModal app={appName} />
+											<div>
+												<Button
+													type="primary"
+													size="large"
+													style={{ margin: '0 10px' }}
+													onClick={() => handleReindex(refetch)}
+													disabled={
+														isFetchingMapping ||
+														isFetchingSetting ||
+														isReindexing ||
+														!hasMappingsChanged
+													}
+												>
+													Confirm Mapping Changes
+												</Button>
+												<Button
+													size="large"
+													disabled={
+														isFetchingMapping ||
+														isFetchingSetting ||
+														isReindexing ||
+														!hasMappingsChanged
+													}
+													onClick={cancelChanges}
+												>
+													Cancel
+												</Button>
+											</div>
 										</div>
 									</div>
 								</div>
 							)}
-						</ReIndexWrapper>
-					</div>
-				)}
-			</MappingsWrapper>
+						</MappingsWrapper>
+					)}
+				</ReIndexWrapper>
+			</>
 		);
 	}
 }
 
 MappingComponent.propTypes = {
 	collapsed: PropTypes.bool.isRequired,
+	appName: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = (state) => ({
+	appName: get(state, '$getCurrentApp.name'),
 	collapsed: get(state, 'sideBarCollapsed'),
 });
 
