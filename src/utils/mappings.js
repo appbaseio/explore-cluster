@@ -581,7 +581,7 @@ export const getValidSubFields = ({ fieldMapping, enableNgram, enableSynonyms })
 		if (field === SUB_FIELDS.SYNONYMS && !enableSynonyms) {
 			return false;
 		}
-		if (field in fieldMapping.fields) {
+		if (field in get(fieldMapping, 'fields', {})) {
 			return true;
 		}
 
