@@ -88,7 +88,7 @@
 		"@typeform/embed": "^0.14.1",
 		"@ungap/url-search-params": "^0.1.2",
 		"antd": "^3.18.2",
-		"appbase-js": "^4.0.2-beta.13",
+		"appbase-js": "^4.1.2",
 		"brace": "^0.11.1",
 		"codesandbox": "1.2.16",
 		"d3-scale": "^2.1.2",
