@@ -20,6 +20,7 @@ export const modalStyles = css`
 	}
 
 	.ant-modal-body {
+		min-height: 40vh;
 		max-height: 90vh;
 		overflow-y: scroll;
 	}
@@ -39,6 +40,7 @@ class SearchPreviewModal extends React.Component {
 	render() {
 		const { visible } = this.state;
 		const { app, searchPreviewProps, buttonProps } = this.props;
+
 		return (
 			<React.Fragment>
 				{buttonProps && buttonProps.showTooltip && buttonProps.tooltip ? (

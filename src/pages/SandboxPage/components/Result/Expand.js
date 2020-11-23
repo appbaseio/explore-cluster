@@ -29,13 +29,16 @@ class Expand extends React.Component {
 	render() {
 		const { className, children } = this.props;
 		const { hasOverflow, collapsed } = this.state;
+
 		return (
 			<React.Fragment>
 				<div
 					ref={this.currentRef}
 					className={`${className} ${hasOverflow && collapsed ? 'collapse' : ''}`}
 				>
-					{children}
+					{typeof children === 'function'
+						? children({ hasOverflow, collapsed })
+						: children}
 				</div>
 				{hasOverflow ? (
 					<div className="expand-button-container">
