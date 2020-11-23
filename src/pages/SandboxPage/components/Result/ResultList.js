@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Icon, Spin, Button } from 'antd';
-
+import isEqual from 'lodash/isEqual';
 import ListItem from './ListItem';
 
 const LoadMore = ({ size, loadMore, data, loading }) => {
@@ -34,25 +34,43 @@ LoadMore.defaultProps = {
 	loading: false,
 };
 
-const ResultList = ({ data, loading, loadMore, triggerAnalytics, pagination, size = 10 }) => {
-	if (loading && (!data || !data.length)) {
-		return <Spin />;
+class ResultList extends React.Component {
+	shouldComponentUpdate(nextProps) {
+		const { loading, data, pagination, size } = this.props;
+		if (
+			loading !== nextProps.loading ||
+			size !== nextProps.size ||
+			!isEqual(data, nextProps.data) ||
+			!isEqual(pagination, nextProps.pagination)
+		) {
+			return true;
+		}
+
+		return false;
 	}
 
-	return (
-		<>
-			{data.map((item) => (
-				<div key={item.id} onClick={() => triggerAnalytics(item._click_id)}>
-					<ListItem key={item.id} item={item} />
-				</div>
-			))}
+	render() {
+		const { data, loading, loadMore, triggerAnalytics, pagination, size } = this.props;
 
-			{pagination || (
-				<LoadMore loading={loading} loadMore={loadMore} data={data} size={size} />
-			)}
-		</>
-	);
-};
+		if (loading && (!data || !data.length)) {
+			return <Spin />;
+		}
+
+		return (
+			<>
+				{data.map((item) => (
+					<div key={item.id} onClick={() => triggerAnalytics(item._click_id)}>
+						<ListItem key={item.id} item={item} />
+					</div>
+				))}
+
+				{pagination || (
+					<LoadMore loading={loading} loadMore={loadMore} data={data} size={size} />
+				)}
+			</>
+		);
+	}
+}
 
 ResultList.propTypes = {
 	data: PropTypes.array,
