@@ -4,6 +4,7 @@ import { Icon, Spin, Button } from 'antd';
 import isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
 import ListItem from './ListItem';
+import Flex from '../../../../batteries/components/shared/Flex';
 
 const LoadMore = ({ size, loadMore, data, loading }) => {
 	if (!data || data.length % size !== 0) {
@@ -52,7 +53,11 @@ class ResultList extends React.Component {
 		const { data, loading, loadMore, triggerAnalytics, pagination, size } = this.props;
 
 		if (loading && (!data || !data.length)) {
-			return <Spin />;
+			return (
+				<Flex justifyContent="center" alignItems="center">
+					<Spin />
+				</Flex>
+			);
 		}
 
 		return (

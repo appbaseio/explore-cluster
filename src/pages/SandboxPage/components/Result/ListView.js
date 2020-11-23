@@ -39,6 +39,7 @@ class ListView extends React.Component {
 						scrollTarget="result-container"
 						style={{ margin: '12px 0' }}
 						componentId={result.id}
+						showLoader={false}
 						render={({ data, loading, loadMore, triggerAnalytics }) => {
 							return (
 								<ResultList
