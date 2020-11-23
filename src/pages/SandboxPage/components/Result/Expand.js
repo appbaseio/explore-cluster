@@ -35,7 +35,7 @@ class Expand extends React.Component {
 					ref={this.currentRef}
 					className={`${className} ${hasOverflow && collapsed ? 'collapse' : ''}`}
 				>
-					{children}
+					{children({ hasOverflow, collapsed })}
 				</div>
 				{hasOverflow ? (
 					<div className="expand-button-container">
