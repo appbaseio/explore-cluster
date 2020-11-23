@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Icon, Spin, Button } from 'antd';
 import isEqual from 'lodash/isEqual';
+import get from 'lodash/get';
 import ListItem from './ListItem';
 
 const LoadMore = ({ size, loadMore, data, loading }) => {
@@ -24,29 +25,27 @@ const LoadMore = ({ size, loadMore, data, loading }) => {
 LoadMore.propTypes = {
 	size: PropTypes.number,
 	loadMore: PropTypes.func.isRequired,
-	data: PropTypes.object,
+	data: PropTypes.array,
 	loading: PropTypes.bool,
 };
 
 LoadMore.defaultProps = {
 	size: 0,
-	data: {},
+	data: [],
 	loading: false,
 };
 
 class ResultList extends React.Component {
 	shouldComponentUpdate(nextProps) {
-		const { loading, data, pagination, size } = this.props;
-		if (
-			loading !== nextProps.loading ||
-			size !== nextProps.size ||
-			!isEqual(data, nextProps.data) ||
-			!isEqual(pagination, nextProps.pagination)
-		) {
-			return true;
-		}
-
-		return false;
+		return Object.keys(this.props).some((propName) => {
+			if (propName === 'data') {
+				return !isEqual(get(this, `props.${propName}`, []), get(nextProps, propName, []));
+			}
+			if (propName === 'pagination') {
+				return !isEqual(get(this, `props.${propName}`, {}), get(nextProps, propName, {}));
+			}
+			return get(this, `props.${propName}`) !== get(nextProps, propName);
+		});
 	}
 
 	render() {
