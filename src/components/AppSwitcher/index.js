@@ -50,7 +50,7 @@ class AppSwitcher extends React.Component {
 					style={{ minWidth: 180 }}
 					onSelect={(appName) => {
 						updateCurrentApp(appName);
-						history.replace(`/app/${appName}/${route || ''}`);
+						history.push(`/app/${appName}/${route || ''}`);
 					}}
 					showSearch
 					autoFocus
