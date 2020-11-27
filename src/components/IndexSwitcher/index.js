@@ -6,7 +6,6 @@ import get from 'lodash/get';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
 import LabelTag from '../LabelTag';
-import { setCurrentApp } from '../../batteries/modules/actions';
 
 const popOverClass = css`
 	.ant-popover-buttons {
@@ -23,7 +22,6 @@ function IndexSwitcher({
 	history,
 	onSelect,
 	renderItem,
-	updateCurrentApp,
 	isAppsLoading,
 }) {
 	if (filteredApps.length === 1 && item.link)
@@ -55,8 +53,7 @@ function IndexSwitcher({
 					// do not use updateCurrentApp here, since onSelect prop is used for `Test Search Relevancy` button
 					if (onSelect) onSelect(value);
 					else {
-						updateCurrentApp(value);
-						history.replace(`/app/${value}/${item.link}`);
+						history.push(`/app/${value}/${item.link}`);
 					}
 				}}
 				showSearch
@@ -99,7 +96,6 @@ IndexSwitcher.propTypes = {
 	history: PropTypes.object,
 	onSelect: PropTypes.func,
 	renderItem: PropTypes.func,
-	updateCurrentApp: PropTypes.func.isRequired,
 	isAppsLoading: PropTypes.bool,
 };
 
@@ -116,8 +112,4 @@ const mapStateToProps = (state) => ({
 	isAppsLoading: get(state, 'apps.isFetching'),
 });
 
-const mapDispatchToProps = (dispatch) => ({
-	updateCurrentApp: (appName, appId) => dispatch(setCurrentApp(appName, appId)),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(IndexSwitcher);
+export default connect(mapStateToProps)(IndexSwitcher);
