@@ -238,7 +238,7 @@ const getDiffData = (oldObj, newObj) => {
 				{
 					field: i.split('.keyword')[0], // just to ignore `.keyword` in field name
 					isDeleted,
-					oldAgg: isDeleted || isOlderField ? get(fieldVal, 0, 'N/A') : 'NA',
+					oldAgg: isDeleted || isOlderField ? get(fieldVal, 0, 'N/A') : 'N/A',
 					newAgg: isDeleted ? 'N/A' : get(fieldVal, 1, get(fieldVal, 0, 'N/A')),
 				},
 			];

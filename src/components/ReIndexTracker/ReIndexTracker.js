@@ -202,7 +202,8 @@ class ReIndexTracker extends React.Component {
 											>
 												<div>
 													Re-indexing has successfully completed for{' '}
-													{task.appName}. You may need to reload mappings to see the new changes reflected.
+													{task.appName}. You may need to reload mappings
+													to see the new changes reflected.
 												</div>
 												<Icon
 													type="close"
