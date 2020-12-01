@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Modal } from 'antd';
 import { css } from 'react-emotion';
-import { func } from 'prop-types';
+import { func, string } from 'prop-types';
 import StoreFrontPreview from './StoreFrontPreview';
 
 const modalStyles = css`
@@ -49,11 +49,11 @@ class PreviewModal extends React.Component {
 
 	render() {
 		const { visible } = this.state;
-		const { preferences } = this.props;
+		const { preferences, label } = this.props;
 		return (
 			<React.Fragment>
 				<Modal
-					title="StoreFront Preview"
+					title={label}
 					visible={visible}
 					okText="Save"
 					onOk={this.handleOk}
@@ -66,7 +66,7 @@ class PreviewModal extends React.Component {
 					<StoreFrontPreview preferences={preferences} />
 				</Modal>
 				<Button onClick={this.showModal} type="primary" size="large">
-					StoreFront Preview
+					{label}
 				</Button>
 			</React.Fragment>
 		);
@@ -75,6 +75,11 @@ class PreviewModal extends React.Component {
 
 PreviewModal.propTypes = {
 	preferences: func.isRequired,
+	label: string,
+};
+
+PreviewModal.defaultProps = {
+	label: 'StoreFront Preview',
 };
 
 export default PreviewModal;

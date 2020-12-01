@@ -58,6 +58,7 @@ const ALLOWED_ACTIONS = {
 	USER_MANAGEMENT: 'user-management',
 	BILLING: 'billing',
 	DOWNTIME_ALERTS: 'downtime-alerts',
+	UI_INTEGRATIONS: 'ui-integrations',
 };
 
 const ROUTES_ACTION = {

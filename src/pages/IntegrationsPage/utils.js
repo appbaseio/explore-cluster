@@ -293,6 +293,16 @@ export const getPriceFilterConfigurationForm = () => {
 	});
 };
 
+export const getRecommendationForm = (recommendationType) => {
+	return FormBuilder.group({
+		id: new Date().getTime(),
+		title: 'You might also like',
+		type: RecommendationTypes.MOST_POPULAR_PRODUCTS,
+		maxProducts: [15, Validators.min(1)],
+		...(recommendationType === RecommendationTypes.SIMILAR_PRODUCTS ? { dataField: '' } : null),
+	});
+};
+
 export const getDynamicFilterKey = (pre = 'dynamic-filter-control') => {
 	return `${pre}_${new Date().getTime()}`;
 };
@@ -311,3 +321,17 @@ export const getMultiListProps = (values) => ({
 	...values,
 	size: Number.isNaN(parseInt(values.size, 10)) ? undefined : parseInt(values.size, 10),
 });
+
+export const RecommendationTypes = {
+	MOST_POPULAR_PRODUCTS: 'most_popular',
+	MOST_RECENT: 'most_recent',
+	SIMILAR_PRODUCTS: 'similar',
+	FEATURED_PRODUCTS: 'featured',
+};
+
+export const RecommendationTypeLabels = {
+	[RecommendationTypes.MOST_POPULAR_PRODUCTS]: 'Most Popular Products',
+	[RecommendationTypes.MOST_RECENT]: 'Most Recent Products',
+	[RecommendationTypes.SIMILAR_PRODUCTS]: 'Similar to this Product',
+	[RecommendationTypes.FEATURED_PRODUCTS]: 'Featured Products',
+};

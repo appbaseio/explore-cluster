@@ -4,10 +4,10 @@ import { string } from 'prop-types';
 import { FormBuilder, Validators } from 'react-reactive-form';
 import { Tabs, Affix } from 'antd';
 import { connect } from 'react-redux';
-import LayoutTab from './tabs/Layout';
-import SearchTab from './tabs/Search';
-import ChoosePlatformTab from './tabs/ChoosePlatform';
-import { container } from '../ResultsPage/styles';
+import LayoutTab from '../tabs/Layout';
+import SearchTab from '../tabs/Search';
+import ChoosePlatformTab from '../tabs/ChoosePlatform';
+import { container } from '../../ResultsPage/styles';
 import {
 	FormContext,
 	validateURL,
@@ -16,11 +16,11 @@ import {
 	getDynamicFilterKey,
 	getMultiListProps,
 	getPriceFilterConfigurationForm,
-} from './utils';
-import { getURL } from '../../constants/config';
-import PreviewModal from './PreviewModal';
-import ExportModal from './ExportModal';
-import SyncStatus from './SyncStatus';
+} from '../utils';
+import { getURL } from '../../../constants/config';
+import PreviewModal from '../PreviewModal';
+import ExportModal from '../ExportModal';
+import SyncStatus from '../SyncStatus';
 
 const { TabPane } = Tabs;
 

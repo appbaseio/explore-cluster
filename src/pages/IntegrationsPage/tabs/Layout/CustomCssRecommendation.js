@@ -9,7 +9,7 @@ export const codeStyle = css`
 	padding: 0 10px;
 `;
 
-const CustomCss = () => (
+const CustomCssRecommendations = () => (
 	<FieldControl name="customCss">
 		{({ handler }) => (
 			<Row gutter={32}>
@@ -22,20 +22,8 @@ const CustomCss = () => (
 					</p>
 					<h3>Available Classes</h3>
 					<p>
-						<Tag>card</Tag>
-						Styles the individual product card you see.{' '}
-					</p>
-					<p>
-						<Tag>suggestion</Tag>
-						Styles the individual suggestion item.
-					</p>
-					<p>
-						<Tag>search</Tag>
-						Styles the search bar present on the top.
-					</p>
-					<p>
-						<Tag>filter</Tag>
-						Styles the filter present on the left side.
+						<Tag>product-card</Tag>
+						Styles the individual product recommendation card you see.{' '}
 					</p>
 					<div css={{ display: 'grid', gridGap: 10 }}>
 						<AceEditor
@@ -53,20 +41,8 @@ const CustomCss = () => (
 					<h3>Example</h3>
 					<pre className={codeStyle}>
 						{`
-.card {
+.product-card {
 	border: 2px double #e8e8e8;
-}
-
-.suggestion {
-	border-left: 1px solid blue;
-}
-
-.filter {
-	border-bottom: 2px solid green;
-}
-
-.search {
-	border: 1px dashed yellow;
 }
 `}
 					</pre>
@@ -76,6 +52,6 @@ const CustomCss = () => (
 	</FieldControl>
 );
 
-CustomCss.propTypes = {};
+CustomCssRecommendations.propTypes = {};
 
-export default CustomCss;
+export default CustomCssRecommendations;

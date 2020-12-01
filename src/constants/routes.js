@@ -69,8 +69,12 @@ export const APP_ROUTES = {
 	},
 	'UI Integrations': {
 		icon: 'control',
-		link: 'integrations',
-		hasExactPath: true,
+		// TODO: Integrate access control
+		// action: ALLOWED_ACTIONS.UI_INTEGRATIONS,
+		menu: [
+			{ label: 'Search', link: 'search-integrations' },
+			{ label: 'Recommendations', link: 'recommendations-integrations' },
+		],
 		tag: 'Beta',
 	},
 	'Access Control': {
@@ -177,10 +181,12 @@ export const CLUSTER_ROUTES = {
 	},
 	'UI Integrations': {
 		icon: 'control',
-		link: 'integrations',
+		// action: ALLOWED_ACTIONS.UI_INTEGRATIONS,
+		menu: [
+			{ label: 'Search', link: 'search-integrations', openIndexMenu: true },
+			{ label: 'Recommendations', link: 'recommendations-integrations', openIndexMenu: true },
+		],
 		tag: 'Beta',
-		label: 'UI Integrations',
-		openIndexMenu: true,
 	},
 	'Access Control': {
 		icon: 'key',
