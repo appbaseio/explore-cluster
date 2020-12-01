@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import get from 'lodash/get';
 import { Card, notification, message } from 'antd';
 
-import { getAppMappings, setCurrentApp } from '../../batteries/modules/actions';
+import { getAppMappings, setCurrentApp, addReIndexingTasks } from '../../batteries/modules/actions';
 import { getURL, getVersion } from '../../constants/config';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
@@ -154,7 +154,7 @@ class IndexSettings extends React.Component {
 	};
 
 	reIndex = async (refetchReIndexingInfo) => {
-		const { appName, credentials, mappings, addApp, apps } = this.props;
+		const { appName, credentials, mappings, addApp, apps, updateReIndexingTasks } = this.props;
 		const { shards, replicas, esVersion } = this.state;
 		const type = getTypesFromMapping(mappings);
 		let appSettings = await getSettings(appName, credentials).then(
@@ -180,10 +180,27 @@ class IndexSettings extends React.Component {
 		}
 
 		reIndexPromise
-			.then(() => {
+			.then((res) => {
 				this.setState({
 					isReindexing: false,
 				});
+				if (get(res, 'failures', []).length) {
+					get(res, 'failures', []).forEach((fail) => {
+						Notification.error({
+							message: 'Re-indexing failed',
+							description: fail.cause.reason,
+						});
+					});
+					return;
+				}
+				if (res.task) {
+					if (refetchReIndexingInfo) {
+						setTimeout(() => {
+							refetchReIndexingInfo();
+						}, 500);
+					}
+					updateReIndexingTasks(res.task);
+				}
 				addApp({
 					[appName]: {
 						...get(apps, ['data', appName], {}),
@@ -197,6 +214,7 @@ class IndexSettings extends React.Component {
 				console.error(err);
 				notification.error({
 					description:
+						err.message ||
 						'Reindexing is in progress, please wait till the current process is completed!',
 					message: 'Reindexing Failed',
 				});
@@ -283,6 +301,7 @@ IndexSettings.propTypes = {
 	addApp: PropTypes.func.isRequired,
 	apps: PropTypes.object,
 	isFetchingMapping: PropTypes.bool,
+	updateReIndexingTasks: PropTypes.func.isRequired,
 };
 
 IndexSettings.defaultProps = {
@@ -312,6 +331,7 @@ const mapDispatchToProps = (dispatch) => ({
 	addApp: (app) => dispatch(appendApp(app)),
 	deleteApp: (appName) => dispatch(removeAppData(appName)),
 	fetchApps: () => dispatch(loadApps()),
+	updateReIndexingTasks: (data) => dispatch(addReIndexingTasks(data)),
 });
 
 export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(IndexSettings));

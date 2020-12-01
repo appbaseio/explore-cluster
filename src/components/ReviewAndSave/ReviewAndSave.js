@@ -33,6 +33,7 @@ import {
 	getAppMappings,
 	setLocalMappingState,
 	setLocalRelevancyState,
+	addReIndexingTasks,
 } from '../../batteries/modules/actions';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import { buildLanguageAnalysis, getLanguageFallback } from '../../utils/language';
@@ -460,6 +461,7 @@ class ReviewAndSave extends React.Component {
 			fetchMappings,
 			defaultSettings,
 			updateLocalRelevancyState,
+			updateReIndexingTasks,
 		} = this.props;
 
 		let newSettings = isResetting ? defaultSettings : currentSettings;
@@ -633,16 +635,26 @@ class ReviewAndSave extends React.Component {
 				}
 				const reIndexPromise = reIndex(reIndexingData);
 
-				if (refetchStats) {
-					setTimeout(() => {
-						refetchStats();
-					}, 500);
-				}
-
 				reIndexPromise
-					.then(() => {
+					.then((res) => {
 						// set localMapping to null
-
+						if (get(res, 'failures', []).length) {
+							get(res, 'failures', []).forEach((fail) => {
+								Notification.error({
+									message: 'Re-indexing failed',
+									description: fail.cause.reason,
+								});
+							});
+							return;
+						}
+						if (res.task) {
+							if (refetchStats) {
+								setTimeout(() => {
+									refetchStats();
+								}, 500);
+							}
+							updateReIndexingTasks(res.task);
+						}
 						if (credentials && appName) {
 							updateLocalMappingState(appName, null);
 							fetchMappings(appName, credentials, this.URL);
@@ -655,7 +667,8 @@ class ReviewAndSave extends React.Component {
 						notification.error({
 							message: 'Reindexing Failed',
 							description:
-								'Reindexing is in progress, please wait till the current process is completed!',
+								reIndexErr.message ||
+								'Reindexing might be in progress, please wait till the current process is completed!',
 						});
 					});
 			}
@@ -756,6 +769,7 @@ ReviewAndSave.propTypes = {
 	fetchMappings: PropTypes.func.isRequired,
 	updateLocalMappingState: PropTypes.func.isRequired,
 	updateLocalRelevancyState: PropTypes.func.isRequired,
+	updateReIndexingTasks: PropTypes.func.isRequired,
 };
 
 ReviewAndSave.defaultProps = {
@@ -788,6 +802,7 @@ const mapDispatchToProps = (dispatch) => ({
 		dispatch(getAppMappings(appName, credentials, url)),
 	updateLocalMappingState: (appName, data) => dispatch(setLocalMappingState(appName, data)),
 	updateLocalRelevancyState: (appName, data) => dispatch(setLocalRelevancyState(appName, data)),
+	updateReIndexingTasks: (data) => dispatch(addReIndexingTasks(data)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ReviewAndSave);

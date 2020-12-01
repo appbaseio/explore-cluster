@@ -212,13 +212,16 @@ export const updateSynonymsSettings = ({
 				version,
 				credentials,
 			});
-			if (refetchReIndexingInfo) {
-				setTimeout(() => {
-					refetchReIndexingInfo();
-				}, 500);
-			}
+
 			reIndexPromise
-				.then(() => {
+				.then((res) => {
+					if (res.task) {
+						if (refetchReIndexingInfo) {
+							setTimeout(() => {
+								refetchReIndexingInfo();
+							}, 500);
+						}
+					}
 					resolve({
 						acknowledged: true,
 					});
