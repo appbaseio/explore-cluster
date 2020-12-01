@@ -7,12 +7,7 @@ import { connect } from 'react-redux';
 import { css } from 'emotion';
 
 import SynonymInput from './SynonymInput';
-import {
-	getParsedSynonyms,
-	getSynonymsState,
-	parseSynonymsAnalyzer,
-	updateSynonymsSettings,
-} from '../utils';
+import { getParsedSynonyms, getSynonymsState, parseSynonymsAnalyzer } from '../utils';
 import { getURL } from '../../../constants/config';
 import { updateSynonyms } from '../api';
 import { children, synonymTypes } from '../../../utils/prop-types';
@@ -118,7 +113,7 @@ class SynonymsModal extends React.Component {
 			id,
 			isAddModal,
 			handleSynonyms,
-			refetchReIndexingInfo,
+			updateSynonymsSettings,
 		} = this.props;
 		const { type, alternatives, synonyms, searchTerm } = this.state;
 
@@ -138,42 +133,30 @@ class SynonymsModal extends React.Component {
 			],
 		});
 
-		const handleSaveData = () => {
-			updateSynonyms({
+		try {
+			await updateSynonymsSettings({
+				needReindex: !hasSubfield,
+				mappings,
+				settings: synonymsAnalyzerSettings,
+				credentials,
+				appName,
+			});
+			const res = await updateSynonyms({
 				appName,
 				credentials,
 				synonyms: isAddModal
 					? [{ synonym: parsedSynonyms, type, index: appName }]
 					: [{ _id: id, synonym: parsedSynonyms, type, index: appName }],
-			})
-				.then((res) => {
-					this.toggleLoading();
-					this.handleModal();
-					const filteredSynonyms = id
-						? allSynonyms.filter((syn) => syn._id !== id)
-						: allSynonyms;
-					handleSynonyms([...filteredSynonyms, ...res]);
-					message.success('Synonyms updated Successfully');
-				})
-				.catch((e) => {
-					this.toggleLoading();
-					message.error(e.message || 'Failed while updating synonyms');
-				});
-		};
-
-		updateSynonymsSettings({
-			needReindex: !hasSubfield,
-			mappings,
-			settings: synonymsAnalyzerSettings,
-			credentials,
-			appName,
-			refetchReIndexingInfo,
-		})
-			.then(handleSaveData)
-			.catch((e) => {
-				this.toggleLoading();
-				message.error(e.message || 'Failed to update synonyms');
 			});
+			this.toggleLoading();
+			this.handleModal();
+			const filteredSynonyms = id ? allSynonyms.filter((syn) => syn._id !== id) : allSynonyms;
+			handleSynonyms([...filteredSynonyms, ...res]);
+			message.success('Synonyms updated Successfully');
+		} catch (err) {
+			this.toggleLoading();
+			message.error(err.message || 'Failed to update synonyms');
+		}
 	};
 
 	getValidation = () => {
@@ -256,7 +239,7 @@ SynonymsModal.propTypes = {
 	resetInputOnClose: PropTypes.bool,
 	type: synonymTypes,
 	synonyms: PropTypes.array,
-	refetchReIndexingInfo: PropTypes.func.isRequired,
+	updateSynonymsSettings: PropTypes.func.isRequired,
 };
 
 SynonymsModal.defaultProps = {

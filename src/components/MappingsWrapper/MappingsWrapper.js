@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Notification } from 'antd';
+import { message } from 'antd';
 
 import {
 	getMappingsInfo,
@@ -135,7 +135,7 @@ class MappingsWrapper extends React.Component {
 		});
 	};
 
-	handleReindex = async (refetchReIndexingInfo) => {
+	handleReindex = async () => {
 		const { appName, credentials, updateReIndexingTasks } = this.props;
 		const { mappings, deletedPaths } = this.state;
 
@@ -168,20 +168,14 @@ class MappingsWrapper extends React.Component {
 				});
 				if (get(res, 'failures', []).length) {
 					get(res, 'failures', []).forEach((fail) => {
-						Notification.error({
-							message: 'Re-indexing failed',
-							description: fail.cause.reason,
-						});
+						message.error(`Re-indexing failed: ${fail.cause.reason}`);
 					});
 					return;
 				}
 				if (res.task) {
-					if (refetchReIndexingInfo) {
-						setTimeout(() => {
-							refetchReIndexingInfo();
-						}, 500);
-					}
 					updateReIndexingTasks(res.task);
+				} else {
+					message.success(`Re-indexing completed successfully`);
 				}
 				this.getMappings();
 			})

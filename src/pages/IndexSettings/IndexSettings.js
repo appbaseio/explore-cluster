@@ -26,7 +26,6 @@ import Loader from '../../batteries/components/shared/Loader';
 import { appendApp, loadApps, removeAppData } from '../../actions';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
-import ReIndexWrapper from '../../components/ReIndexWrapper';
 
 const bannerMessage = {
 	title: 'Index Settings',
@@ -144,16 +143,16 @@ class IndexSettings extends React.Component {
 			});
 	};
 
-	updateShards = (refetchReIndexingInfo) => {
+	updateShards = () => {
 		this.handleModal('shardsModal');
 
 		this.setState({
 			isReindexing: true,
 		});
-		this.reIndex(refetchReIndexingInfo);
+		this.reIndex();
 	};
 
-	reIndex = async (refetchReIndexingInfo) => {
+	reIndex = async () => {
 		const { appName, credentials, mappings, addApp, apps, updateReIndexingTasks } = this.props;
 		const { shards, replicas, esVersion } = this.state;
 		const type = getTypesFromMapping(mappings);
@@ -173,12 +172,6 @@ class IndexSettings extends React.Component {
 			settings: appSettings,
 		});
 
-		if (refetchReIndexingInfo) {
-			setTimeout(() => {
-				refetchReIndexingInfo();
-			}, 500);
-		}
-
 		reIndexPromise
 			.then((res) => {
 				this.setState({
@@ -186,20 +179,14 @@ class IndexSettings extends React.Component {
 				});
 				if (get(res, 'failures', []).length) {
 					get(res, 'failures', []).forEach((fail) => {
-						Notification.error({
-							message: 'Re-indexing failed',
-							description: fail.cause.reason,
-						});
+						message.error(`Re-indexing failed: ${fail.cause.reason}`);
 					});
 					return;
 				}
 				if (res.task) {
-					if (refetchReIndexingInfo) {
-						setTimeout(() => {
-							refetchReIndexingInfo();
-						}, 500);
-					}
 					updateReIndexingTasks(res.task);
+				} else {
+					message.success('Number of shards updated successfully');
 				}
 				addApp({
 					[appName]: {
@@ -208,16 +195,10 @@ class IndexSettings extends React.Component {
 						rep: replicas,
 					},
 				});
-				message.success('Number of shards updated successfully');
 			})
 			.catch((err) => {
 				console.error(err);
-				notification.error({
-					description:
-						err.message ||
-						'Reindexing is in progress, please wait till the current process is completed!',
-					message: 'Reindexing Failed',
-				});
+				message.error(err.message || `Failed to update shards`);
 				this.setState({
 					isReindexing: false,
 					showError: true,
@@ -236,7 +217,7 @@ class IndexSettings extends React.Component {
 			isUpdating,
 		} = this.state;
 		const { allocated_replicas, allocated_shards } = this;
-		const { isFetchingMapping, appName } = this.props;
+		const { isFetchingMapping } = this.props;
 
 		if (isFetchingMapping) {
 			return (
@@ -251,43 +232,36 @@ class IndexSettings extends React.Component {
 		}
 
 		return (
-			<ReIndexWrapper appName={appName}>
-				{({ refetch }) => (
-					<React.Fragment>
-						<Banner {...bannerMessage} />
+			<React.Fragment>
+				<Banner {...bannerMessage} />
 
-						<Loader
-							show={isReindexing}
-							message="Re-indexing your data... Please wait!"
+				<Loader show={isReindexing} message="Re-indexing your data... Please wait!" />
+				<div className={container}>
+					<ErrorToaster>
+						<Shards
+							handleSlider={this.handleSlider}
+							updateShards={() => this.updateShards()}
+							handleModal={this.handleModal}
+							shardsModal={shardsModal}
+							shards={shards}
+							allocated_shards={allocated_shards}
 						/>
-						<div className={container}>
-							<ErrorToaster>
-								<Shards
-									handleSlider={this.handleSlider}
-									updateShards={() => this.updateShards(refetch)}
-									handleModal={this.handleModal}
-									shardsModal={shardsModal}
-									shards={shards}
-									allocated_shards={allocated_shards}
-								/>
-							</ErrorToaster>
+					</ErrorToaster>
 
-							<ErrorToaster>
-								<Replicas
-									handleSlider={this.handleSlider}
-									updateReplicas={this.updateReplicas}
-									handleModal={this.handleModal}
-									replicasModal={replicasModal}
-									totalNodes={totalNodes}
-									replicas={replicas}
-									loading={isUpdating}
-									allocated_replicas={allocated_replicas}
-								/>
-							</ErrorToaster>
-						</div>
-					</React.Fragment>
-				)}
-			</ReIndexWrapper>
+					<ErrorToaster>
+						<Replicas
+							handleSlider={this.handleSlider}
+							updateReplicas={this.updateReplicas}
+							handleModal={this.handleModal}
+							replicasModal={replicasModal}
+							totalNodes={totalNodes}
+							replicas={replicas}
+							loading={isUpdating}
+							allocated_replicas={allocated_replicas}
+						/>
+					</ErrorToaster>
+				</div>
+			</React.Fragment>
 		);
 	}
 }
