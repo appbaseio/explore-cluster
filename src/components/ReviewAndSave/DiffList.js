@@ -35,9 +35,20 @@ const DiffList = ({ diff }) => {
 										<div style={{ flex: 1 }}>
 											<h3>{get(relevancyItemTitles[item.title], 'title')}</h3>
 											<p>
-												{get(
-													relevancyItemTitles[item.title],
-													'description',
+												{item.title === 'dataField' ? (
+													<>
+														{setting === 'search' &&
+															`Index field(s) to be searched against`}
+														{setting === 'aggregations' &&
+															`Index field(s) to be aggregated against`}
+													</>
+												) : (
+													<>
+														{get(
+															relevancyItemTitles[item.title],
+															'description',
+														)}
+													</>
 												)}
 											</p>
 										</div>
@@ -138,7 +149,7 @@ const DiffList = ({ diff }) => {
 																		<span>
 																			{field}&nbsp;
 																			<Tag color="red">
-																				deleted
+																				removed
 																			</Tag>
 																		</span>
 																	) : (
@@ -201,7 +212,7 @@ const DiffList = ({ diff }) => {
 																		<span>
 																			{field}&nbsp;
 																			<Tag color="red">
-																				deleted
+																				removed
 																			</Tag>
 																		</span>
 																	) : (
@@ -265,7 +276,7 @@ const DiffList = ({ diff }) => {
 																			<span>
 																				{field}&nbsp;
 																				<Tag color="red">
-																					deleted
+																					removed
 																				</Tag>
 																			</span>
 																		) : (

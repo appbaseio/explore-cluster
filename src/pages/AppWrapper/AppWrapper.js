@@ -22,6 +22,7 @@ import SidebarAutocomplete from '../../components/SidebarAutocomplete';
 import { allowedTiers } from '../../utils/prop-types';
 import searchInputStyle from '../DashboardWrapper/styles';
 import WithRedirectTooltip from '../../components/WithRedirectTooltip';
+import ReIndexTracker from '../../components/ReIndexTracker';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
@@ -328,12 +329,15 @@ class AppWrapper extends Component {
 				{loading ? (
 					<Loader />
 				) : (
-					<AppLayout
-						showHeader={showHeader}
-						collapsed={collapsed}
-						{...this.props}
-						onToggle={this.onCollapse}
-					/>
+					<>
+						<ReIndexTracker />
+						<AppLayout
+							showHeader={showHeader}
+							collapsed={collapsed}
+							{...this.props}
+							onToggle={this.onCollapse}
+						/>
+					</>
 				)}
 			</Layout>
 		);
