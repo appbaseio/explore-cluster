@@ -12,7 +12,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Button, Modal, notification, Alert } from 'antd';
+import { Button, Modal, notification, message, Alert } from 'antd';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
 import omitBy from 'lodash/omitBy';
@@ -20,7 +20,6 @@ import { diff } from 'jsondiffpatch';
 import styled from 'react-emotion';
 
 import DiffList from './DiffList';
-import ReIndexWrapper from '../ReIndexWrapper';
 
 // import { getPossibleSubFields } from '../../utils';
 import {
@@ -33,6 +32,7 @@ import {
 	getAppMappings,
 	setLocalMappingState,
 	setLocalRelevancyState,
+	addReIndexingTasks,
 } from '../../batteries/modules/actions';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import { buildLanguageAnalysis, getLanguageFallback } from '../../utils/language';
@@ -238,7 +238,7 @@ const getDiffData = (oldObj, newObj) => {
 				{
 					field: i.split('.keyword')[0], // just to ignore `.keyword` in field name
 					isDeleted,
-					oldAgg: isDeleted || isOlderField ? get(fieldVal, 0, 'N/A') : 'NA',
+					oldAgg: isDeleted || isOlderField ? get(fieldVal, 0, 'N/A') : 'N/A',
 					newAgg: isDeleted ? 'N/A' : get(fieldVal, 1, get(fieldVal, 0, 'N/A')),
 				},
 			];
@@ -443,7 +443,7 @@ class ReviewAndSave extends React.Component {
 		});
 	};
 
-	handleSave = async (refetchStats) => {
+	handleSave = async () => {
 		this.setState({
 			isSaving: true,
 		});
@@ -460,6 +460,7 @@ class ReviewAndSave extends React.Component {
 			fetchMappings,
 			defaultSettings,
 			updateLocalRelevancyState,
+			updateReIndexingTasks,
 		} = this.props;
 
 		let newSettings = isResetting ? defaultSettings : currentSettings;
@@ -633,17 +634,18 @@ class ReviewAndSave extends React.Component {
 				}
 				const reIndexPromise = reIndex(reIndexingData);
 
-				if (refetchStats) {
-					setTimeout(() => {
-						refetchStats();
-					}, 500);
-				}
-
 				reIndexPromise
-					.then(() => {
-						// set localMapping to null
-
-						if (credentials && appName) {
+					.then((res) => {
+						if (get(res, 'failures', []).length) {
+							get(res, 'failures', []).forEach((fail) => {
+								message.error(`Re-indexing failed: ${fail.cause.reason}`);
+							});
+							return;
+						}
+						if (res.task) {
+							updateReIndexingTasks(res.task);
+						} else if (credentials && appName) {
+							message.success(`Re-indexing completed successfully`);
 							updateLocalMappingState(appName, null);
 							fetchMappings(appName, credentials, this.URL);
 						}
@@ -655,7 +657,8 @@ class ReviewAndSave extends React.Component {
 						notification.error({
 							message: 'Reindexing Failed',
 							description:
-								'Reindexing is in progress, please wait till the current process is completed!',
+								reIndexErr.message ||
+								'Reindexing might be in progress, please wait till the current process is completed!',
 						});
 					});
 			}
@@ -672,7 +675,7 @@ class ReviewAndSave extends React.Component {
 
 	render() {
 		const { isOpen, isResetting, isSaving } = this.state;
-		const { defaultSettings, settings, localRelevancy, appName, localMapping } = this.props;
+		const { defaultSettings, settings, localRelevancy, localMapping } = this.props;
 		const [diffCount, diffData] = isResetting
 			? getDiffData(settings, defaultSettings)
 			: getDiffData(settings, localRelevancy);
@@ -681,72 +684,68 @@ class ReviewAndSave extends React.Component {
 			shouldReIndex(localMapping, settings, isResetting ? defaultSettings : localRelevancy);
 
 		return (
-			<ReIndexWrapper appName={appName}>
-				{({ refetch }) => (
-					<>
-						<div style={{ display: 'flex', alignItems: 'center' }}>
-							<Button
-								style={{ marginRight: 10 }}
-								size="large"
-								onClick={this.onResetToDefault}
-								disabled={isResetting && !diffCount}
-							>
-								Reset To Default Settings
-							</Button>
-							<div style={{ position: 'relative' }}>
-								{diffCount > 0 && !isResetting && <Badge>{diffCount}</Badge>}
-								<Button
-									style={{ marginRight: 10 }}
-									size="large"
-									type="primary"
-									disabled={!diffCount || isResetting}
-									onClick={this.showModal}
-								>
-									Review and Deploy
-								</Button>
-							</div>
-						</div>
-						<Modal
-							visible={isOpen}
-							title={
-								isResetting
-									? 'Reset To Default Settings'
-									: 'Review Settings Before Deploying'
-							}
-							onOk={() => this.handleSave(refetch)}
-							width={1000}
-							style={{
-								top: 20,
-							}}
-							destroyOnClose
-							okText="Review and Save"
-							confirmLoading={isSaving}
-							onCancel={this.handleCancel}
+			<>
+				<div style={{ display: 'flex', alignItems: 'center' }}>
+					<Button
+						style={{ marginRight: 10 }}
+						size="large"
+						onClick={this.onResetToDefault}
+						disabled={isResetting && !diffCount}
+					>
+						Reset To Default Settings
+					</Button>
+					<div style={{ position: 'relative' }}>
+						{diffCount > 0 && !isResetting && <Badge>{diffCount}</Badge>}
+						<Button
+							style={{ marginRight: 10 }}
+							size="large"
+							type="primary"
+							disabled={!diffCount || isResetting}
+							onClick={this.showModal}
 						>
-							<>
-								{renderShouldReIndex && (
-									<Alert
-										type="warning"
-										showIcon
-										message="Re-indexing is required for applying below changes."
-										style={{
-											marginBottom: 10,
-										}}
-									/>
-								)}
-								{isOpen && <DiffList diff={diffData} />}
-							</>
-						</Modal>
+							Review and Deploy
+						</Button>
+					</div>
+				</div>
+				<Modal
+					visible={isOpen}
+					title={
+						isResetting
+							? 'Reset To Default Settings'
+							: 'Review Settings Before Deploying'
+					}
+					onOk={this.handleSave}
+					width={1000}
+					style={{
+						top: 20,
+					}}
+					destroyOnClose
+					okText="Review and Save"
+					confirmLoading={isSaving}
+					onCancel={this.handleCancel}
+				>
+					<>
+						{renderShouldReIndex && (
+							<Alert
+								type="warning"
+								showIcon
+								message="Re-indexing is required for applying below changes."
+								style={{
+									marginBottom: 10,
+								}}
+							/>
+						)}
+						{isOpen && <DiffList diff={diffData} />}
 					</>
-				)}
-			</ReIndexWrapper>
+				</Modal>
+			</>
 		);
 	}
 }
 
 ReviewAndSave.propTypes = {
-	localRelevancy: PropTypes.object.isRequired,
-	settings: PropTypes.object.isRequired,
+	localRelevancy: PropTypes.object,
+	settings: PropTypes.object,
 	defaultSettings: PropTypes.object,
 	appName: PropTypes.string.isRequired,
 	updateSettingsAction: PropTypes.func.isRequired,
@@ -756,12 +755,15 @@ ReviewAndSave.propTypes = {
 	fetchMappings: PropTypes.func.isRequired,
 	updateLocalMappingState: PropTypes.func.isRequired,
 	updateLocalRelevancyState: PropTypes.func.isRequired,
+	updateReIndexingTasks: PropTypes.func.isRequired,
 };
 
 ReviewAndSave.defaultProps = {
 	defaultSettings: {},
 	localMapping: null,
+	localRelevancy: null,
 	mappings: null,
+	settings: null,
 };
 
 const mapStateToProps = (state) => {
@@ -788,6 +790,7 @@ const mapDispatchToProps = (dispatch) => ({
 		dispatch(getAppMappings(appName, credentials, url)),
 	updateLocalMappingState: (appName, data) => dispatch(setLocalMappingState(appName, data)),
 	updateLocalRelevancyState: (appName, data) => dispatch(setLocalRelevancyState(appName, data)),
+	updateReIndexingTasks: (data) => dispatch(addReIndexingTasks(data)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ReviewAndSave);

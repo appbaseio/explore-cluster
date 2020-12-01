@@ -72,7 +72,7 @@ export async function getUser(username, password, url) {
 	};
 }
 
-const getAuthToken = () => {
+export const getAuthToken = () => {
 	let token = null;
 	try {
 		token = sessionStorage.getItem('authToken');

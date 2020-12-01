@@ -1,12 +1,11 @@
 import get from 'lodash/get';
-import { getURL, getVersion } from '../../../constants/config';
+import { getVersion } from '../../../constants/config';
 import {
 	closeIndex,
 	getMappings,
 	getMappingsTree,
 	getSettings,
 	openIndex,
-	reIndex,
 	updateSettings,
 } from '../../../batteries/utils/mappings';
 
@@ -190,68 +189,6 @@ export const applySynonymsSettings = async ({ appName, credentials, url, setting
 		console.log(e);
 		throw e;
 	}
-};
-
-export const updateSynonymsSettings = ({
-	appName,
-	settings,
-	credentials,
-	mappings,
-	needReindex,
-	refetchReIndexingInfo,
-}) => {
-	const version = +getVersion()[0];
-	const url = getURL();
-
-	return new Promise((resolve, reject) => {
-		const handleReindex = () => {
-			const reIndexPromise = reIndex({
-				mappings,
-				settings,
-				appId: appName,
-				version,
-				credentials,
-			});
-			if (refetchReIndexingInfo) {
-				setTimeout(() => {
-					refetchReIndexingInfo();
-				}, 500);
-			}
-			reIndexPromise
-				.then(() => {
-					resolve({
-						acknowledged: true,
-					});
-				})
-				.catch((e) => {
-					reject(e.message || 'Failed while updating synonyms');
-				});
-		};
-
-		if (needReindex) {
-			// we need to update mappings that's why reindex is required
-			handleReindex();
-		} else {
-			applySynonymsSettings({
-				appName,
-				credentials,
-				settings,
-				url,
-			})
-				.then(() => {
-					resolve({
-						acknowledged: true,
-					});
-				})
-				.catch((e) => {
-					if (e.message === 'AWS') {
-						handleReindex();
-					} else {
-						reject(e.message || 'Failed while applying settings.');
-					}
-				});
-		}
-	});
 };
 
 export async function parseSynonymsAnalyzer({ appName, credentials, url, synonyms }) {

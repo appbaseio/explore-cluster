@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
+import { message } from 'antd';
 
 import {
 	getMappingsInfo,
@@ -16,6 +17,7 @@ import {
 	getAppMappings,
 	getSettings as getSearchSettings,
 	setLocalMappingState,
+	addReIndexingTasks,
 } from '../../batteries/modules/actions';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 
@@ -133,8 +135,8 @@ class MappingsWrapper extends React.Component {
 		});
 	};
 
-	handleReindex = async (refetchReIndexingInfo) => {
-		const { appName, credentials } = this.props;
+	handleReindex = async () => {
+		const { appName, credentials, updateReIndexingTasks } = this.props;
 		const { mappings, deletedPaths } = this.state;
 
 		this.setState({
@@ -144,8 +146,6 @@ class MappingsWrapper extends React.Component {
 		const appSettings = await getSettings(appName, credentials).then((data) =>
 			get(data, `${appName}.settings`),
 		);
-
-		const startTime = Date.now();
 
 		const reIndexPromise = reIndex({
 			mappings,
@@ -160,24 +160,30 @@ class MappingsWrapper extends React.Component {
 			},
 		});
 
-		if (refetchReIndexingInfo) {
-			setTimeout(() => {
-				refetchReIndexingInfo();
-			}, 500);
-		}
-
 		reIndexPromise
-			.then(() => {
+			.then((res) => {
 				this.setState({
 					isReindexing: false,
 					deletedPaths: [],
 				});
+				if (get(res, 'failures', []).length) {
+					get(res, 'failures', []).forEach((fail) => {
+						message.error(`Re-indexing failed: ${fail.cause.reason}`);
+					});
+					return;
+				}
+				if (res.task) {
+					updateReIndexingTasks(res.task);
+				} else {
+					message.success(`Re-indexing completed successfully`);
+				}
 				this.getMappings();
 			})
 			.catch((err) => {
-				this.onFailedReindex({
-					error: err,
-					startTime,
+				console.log(err);
+				Notification.error({
+					message: 'Re-indexing failed',
+					description: err.message || '',
 				});
 			});
 	};
@@ -310,6 +316,7 @@ MappingsWrapper.propTypes = {
 	error: PropTypes.object,
 	localMapping: PropTypes.object,
 	updateLocalMappingState: PropTypes.func.isRequired,
+	updateReIndexingTasks: PropTypes.func.isRequired,
 };
 
 MappingsWrapper.defaultProps = {
@@ -372,6 +379,7 @@ const mapDispatchToProps = (dispatch) => ({
 		dispatch(getAppMappings(appName, credentials, url)),
 	fetchSearchSettings: (name) => dispatch(getSearchSettings(name)),
 	updateLocalMappingState: (appName, data) => dispatch(setLocalMappingState(appName, data)),
+	updateReIndexingTasks: (data) => dispatch(addReIndexingTasks(data)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(MappingsWrapper);
