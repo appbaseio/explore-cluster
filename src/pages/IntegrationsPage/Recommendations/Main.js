@@ -365,6 +365,7 @@ class Main extends React.Component {
 
 								<div>
 									<PreviewModal
+										isRecommendation
 										preferences={this.getPreferences}
 										label={isSettingsTabActive ? 'Settings Preview' : undefined}
 									/>
