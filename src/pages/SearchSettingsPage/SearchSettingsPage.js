@@ -424,6 +424,7 @@ class SearchSettingsPage extends React.Component {
 										<Button
 											style={{ marginRight: 8, color: '#1890ff' }}
 											onClick={mappingWrapperProps.reloadMappings}
+											data-cy="reload-mappings-button"
 										>
 											<Icon type="reload" />
 											Reload Mappings

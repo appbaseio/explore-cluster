@@ -82,7 +82,12 @@ class DeleteAppModal extends React.Component {
 					destroyOnClose
 					title="Confirm Delete"
 					okText="Delete"
-					okButtonProps={{ type: 'danger', disabled, loading }}
+					okButtonProps={{
+						type: 'danger',
+						disabled,
+						loading,
+						'data-cy': `delete-index-${appName}`,
+					}}
 				>
 					<p>
 						Type the index name <span style={{ fontWeight: '600' }}>{appName}</span>{' '}
@@ -93,6 +98,7 @@ class DeleteAppModal extends React.Component {
 						onChange={this.handleInputChange}
 						value={deleteAppName}
 						name="deleteAppName"
+						data-cy="delete-index-name"
 					/>
 				</Modal>
 			</div>

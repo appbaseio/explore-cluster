@@ -324,6 +324,7 @@ class ResultsPage extends React.Component {
 												onChange={(val) => {
 													this.handleChange('highlightFields', val);
 												}}
+												data-cy="highlight-fields"
 											>
 												{(mappings || []).map((v) => {
 													return (
@@ -404,6 +405,7 @@ class ResultsPage extends React.Component {
 														val,
 													);
 												}}
+												data-cy="highlight-fragments"
 											/>
 										</Form.Item>
 									</>

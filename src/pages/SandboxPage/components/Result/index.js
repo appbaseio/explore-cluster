@@ -103,7 +103,7 @@ class Result extends React.Component {
 							<Icon style={{ marginRight: 5 }} type="unordered-list" />
 							Results
 						</Radio.Button>
-						<Radio.Button value="query">
+						<Radio.Button value="query" data-cy="raw-request-button">
 							<Icon style={{ marginRight: 5 }} type="code" />
 							Raw
 						</Radio.Button>

@@ -69,6 +69,7 @@ class AppActions extends Component {
 								e.preventDefault();
 								this.handleDeleteModal();
 							}}
+							data-cy={`delete-app-${get(data, 'alias') || get(data, 'index')}`}
 						>
 							<Icon className={actionIcon} type="delete" />
 							Delete Index

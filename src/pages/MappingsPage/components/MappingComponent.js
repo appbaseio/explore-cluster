@@ -79,7 +79,7 @@ class MappingComponent extends React.Component {
 			return (
 				<Empty
 					image={Empty.PRESENTED_IMAGE_SIMPLE}
-					description={<span>No Mappings Present</span>}
+					description={<span data-cy="mappings-empty-field">No Mappings Present</span>}
 				/>
 			);
 		}
@@ -319,6 +319,7 @@ class MappingComponent extends React.Component {
 													isReindexing ||
 													!hasMappingsChanged
 												}
+												data-cy="confirm-mapping-button"
 											>
 												Confirm Mapping Changes
 											</Button>

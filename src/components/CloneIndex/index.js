@@ -124,7 +124,10 @@ const CloneIndex = (props) => {
 			onCancel={handleCancel}
 			okText="Clone"
 			confirmLoading={loading}
-			okButtonProps={{ disabled: !destIndex || exists || isEmpty(action) }}
+			okButtonProps={{
+				disabled: !destIndex || exists || isEmpty(action),
+				'data-cy': 'clone-button',
+			}}
 		>
 			<Row className={centerAligned}>
 				<Col style={{ marginBottom: exists ? '20px' : '1px' }} span={8}>
@@ -143,6 +146,7 @@ const CloneIndex = (props) => {
 							value={destIndex}
 							onChange={handleInputChange}
 							placeholder="Destination Index"
+							data-cy="destination-index-name"
 						/>
 					</Form.Item>
 				</Col>
@@ -160,7 +164,7 @@ const CloneIndex = (props) => {
 						</Checkbox>
 					</div>
 
-					<div>
+					<div data-cy="copy-search-relevancy-settings">
 						{featureSearchRelevance ? (
 							searchRelevancyCheckbox
 						) : (
@@ -169,7 +173,7 @@ const CloneIndex = (props) => {
 							</Tooltip>
 						)}
 					</div>
-					<div>
+					<div data-cy="copy-synonyms">
 						{featureSearchRelevance ? (
 							copySynoynmsCheckbox
 						) : (

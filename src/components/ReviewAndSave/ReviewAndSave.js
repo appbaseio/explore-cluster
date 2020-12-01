@@ -691,6 +691,7 @@ class ReviewAndSave extends React.Component {
 						size="large"
 						onClick={this.onResetToDefault}
 						disabled={isResetting && !diffCount}
+						data-cy="reset-default-button"
 					>
 						Reset To Default Settings
 					</Button>
@@ -702,6 +703,7 @@ class ReviewAndSave extends React.Component {
 							type="primary"
 							disabled={!diffCount || isResetting}
 							onClick={this.showModal}
+							data-cy="review-deploy-button"
 						>
 							Review and Deploy
 						</Button>
@@ -723,6 +725,9 @@ class ReviewAndSave extends React.Component {
 					okText="Review and Save"
 					confirmLoading={isSaving}
 					onCancel={this.handleCancel}
+					okButtonProps={{
+						'data-cy': 'review-save-button',
+					}}
 				>
 					<>
 						{renderShouldReIndex && (

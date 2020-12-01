@@ -180,7 +180,9 @@ class FieldWeights extends React.Component {
 			return (
 				<Empty
 					image={Empty.PRESENTED_IMAGE_SIMPLE}
-					description={<span>No Search Fields Are Present</span>}
+					description={
+						<span data-cy="search-empty-field">No Search Fields Are Present</span>
+					}
 				/>
 			);
 		}
@@ -245,6 +247,7 @@ class FieldWeights extends React.Component {
 											mapping,
 										});
 									}}
+									data-cy={`${field}-number-input`}
 								/>
 							</div>
 						)}
@@ -378,7 +381,10 @@ class FieldWeights extends React.Component {
 					</>
 				</div>
 				{nonSearchableFields.length > 0 ? (
-					<div style={{ position: 'relative', display: 'inline-block' }}>
+					<div
+						style={{ position: 'relative', display: 'inline-block' }}
+						data-cy="searchable-fields-dropdown"
+					>
 						<Select
 							showSearch
 							style={{ width: 300 }}

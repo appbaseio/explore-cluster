@@ -32,3 +32,5 @@ const options = {
 	],
 };
 require('cypress-terminal-report/src/installLogsCollector')(options);
+require('cypress-xpath');
+require('cypress-plugin-tab');

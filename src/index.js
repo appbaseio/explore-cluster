@@ -55,4 +55,9 @@ const App = () => (
 	</Content>
 );
 
+// expose store when run in Cypress
+if (window.Cypress) {
+	window.store = store;
+}
+
 ReactDOM.render(<App />, document.getElementById('root'));

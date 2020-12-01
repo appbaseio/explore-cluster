@@ -167,6 +167,7 @@ class LanguageSettings extends React.Component {
 										formStyle={{ paddingBottom: 0 }}
 										style={{ width: '20%', minWidth: '35%' }}
 										onChange={(val) => this.handleChange('language', val)}
+										data-cy="language-value"
 									>
 										{languages.map((lang) => (
 											<Select.Option key={lang.value} value={lang.value}>
@@ -186,7 +187,7 @@ class LanguageSettings extends React.Component {
 									}
 								>
 									<Switch
-										data-cy="enable-highlight"
+										data-cy="apply-stopwords-switch"
 										checked={applyStopwords}
 										onChange={(value) =>
 											this.handleChange('applyStopwords', value)
@@ -242,7 +243,7 @@ class LanguageSettings extends React.Component {
 									}
 								>
 									<Switch
-										data-cy="enable-highlight"
+										data-cy="normalize-diacritics-switch"
 										checked={normalizeDiacritics}
 										onChange={(value) =>
 											this.handleChange('normalizeDiacritics', value)
