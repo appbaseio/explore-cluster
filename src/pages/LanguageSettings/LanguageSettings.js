@@ -74,10 +74,19 @@ class LanguageSettings extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { settings, isLoading } = this.props;
+		const { settings, isLoading, defaultSettings, localRelevancy } = this.props;
 
 		if (!isLoading && JSON.stringify(settings) !== JSON.stringify(prevProps.settings)) {
 			this.init({ ...settings });
+		}
+
+		if (
+			!settings &&
+			!isLoading &&
+			!localRelevancy &&
+			JSON.stringify(defaultSettings) !== JSON.stringify(prevProps.defaultSettings)
+		) {
+			this.init({ ...defaultSettings });
 		}
 	}
 
@@ -107,17 +116,6 @@ class LanguageSettings extends React.Component {
 	render() {
 		const { isLoading, localRelevancy, tier, featureSearchRelevancy } = this.props;
 
-		if (isLoading || !localRelevancy || !get(localRelevancy, `language`, null)) {
-			return (
-				<Card>
-					<Banner {...bannerDetails} />
-					<div className={container}>
-						<Skeleton />
-					</div>
-				</Card>
-			);
-		}
-
 		if (!isValidPlan(tier, featureSearchRelevancy)) {
 			return (
 				<React.Fragment>
@@ -130,6 +128,17 @@ class LanguageSettings extends React.Component {
 						alt="Language Settings"
 					/>
 				</React.Fragment>
+			);
+		}
+
+		if (isLoading || !localRelevancy || !get(localRelevancy, `language`, null)) {
+			return (
+				<Card>
+					<Banner {...bannerDetails} />
+					<div className={container}>
+						<Skeleton />
+					</div>
+				</Card>
 			);
 		}
 

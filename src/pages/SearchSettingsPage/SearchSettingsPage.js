@@ -70,13 +70,22 @@ class SearchSettingsPage extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { settings, mappings, localRelevancy } = this.props;
+		const { settings, mappings, localRelevancy, isLoading, defaultSettings } = this.props;
 
 		if (
 			JSON.stringify(settings) !== JSON.stringify(prevProps.settings) ||
 			JSON.stringify(mappings) !== JSON.stringify(prevProps.mappings)
 		) {
 			this.init({ ...(localRelevancy || settings) });
+		}
+
+		if (
+			!settings &&
+			!localRelevancy &&
+			!isLoading &&
+			JSON.stringify(defaultSettings) !== JSON.stringify(prevProps.defaultSettings)
+		) {
+			this.init({ ...defaultSettings });
 		}
 	}
 
@@ -378,17 +387,6 @@ class SearchSettingsPage extends React.Component {
 	render() {
 		const { isLoading, tier, featureSearchRelevancy, localRelevancy } = this.props;
 
-		if (isLoading || !localRelevancy || !get(localRelevancy, `search`, null)) {
-			return (
-				<React.Fragment>
-					<Banner {...bannerDetails} />
-					<div className={container}>
-						<Skeleton />
-					</div>
-				</React.Fragment>
-			);
-		}
-
 		if (!isValidPlan(tier, featureSearchRelevancy)) {
 			return (
 				<React.Fragment>
@@ -400,6 +398,17 @@ class SearchSettingsPage extends React.Component {
 						src="https://i.imgur.com/8ENnHVv.png"
 						alt="Search Settings"
 					/>
+				</React.Fragment>
+			);
+		}
+
+		if (isLoading || !localRelevancy || !get(localRelevancy, `search`, null)) {
+			return (
+				<React.Fragment>
+					<Banner {...bannerDetails} />
+					<div className={container}>
+						<Skeleton />
+					</div>
 				</React.Fragment>
 			);
 		}
