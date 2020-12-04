@@ -305,8 +305,10 @@ class MappingComponent extends React.Component {
 										right: 0,
 									}}
 								>
-									<div className={footerStyles}>
-										<SearchPreviewModal app={appName} />
+									<div
+										className={footerStyles}
+										style={{ flexDirection: 'row-reverse' }}
+									>
 										<div>
 											<Button
 												type="primary"
@@ -341,6 +343,9 @@ class MappingComponent extends React.Component {
 							</div>
 						)}
 					</MappingsWrapper>
+					<div style={{ position: 'fixed', bottom: 15, left: collapsed ? 120 : 310 }}>
+						<SearchPreviewModal app={appName} />
+					</div>
 				</>
 			</>
 		);

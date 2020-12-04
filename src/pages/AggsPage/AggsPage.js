@@ -54,10 +54,19 @@ class AggsPage extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { settings, isLoading } = this.props;
+		const { settings, isLoading, defaultSettings, localRelevancy } = this.props;
 
 		if (!isLoading && JSON.stringify(settings) !== JSON.stringify(prevProps.settings)) {
 			this.init({ ...settings });
+		}
+
+		if (
+			!settings &&
+			!isLoading &&
+			!localRelevancy &&
+			JSON.stringify(defaultSettings) !== JSON.stringify(prevProps.defaultSettings)
+		) {
+			this.init({ ...defaultSettings });
 		}
 	}
 
@@ -114,17 +123,6 @@ class AggsPage extends React.Component {
 	render() {
 		const { isLoading, tier, featureSearchRelevancy, localRelevancy } = this.props;
 
-		if (isLoading || !localRelevancy || !get(localRelevancy, `aggregations`, null)) {
-			return (
-				<React.Fragment>
-					<Banner {...bannerDetails} />
-					<div className={container}>
-						<Skeleton />
-					</div>
-				</React.Fragment>
-			);
-		}
-
 		if (!isValidPlan(tier, featureSearchRelevancy)) {
 			return (
 				<React.Fragment>
@@ -139,6 +137,18 @@ class AggsPage extends React.Component {
 				</React.Fragment>
 			);
 		}
+
+		if (isLoading || !localRelevancy || !get(localRelevancy, `aggregations`, null)) {
+			return (
+				<React.Fragment>
+					<Banner {...bannerDetails} />
+					<div className={container}>
+						<Skeleton />
+					</div>
+				</React.Fragment>
+			);
+		}
+
 		const { sortBy, includeNullValues, size, queryFormat, dataField } = get(
 			localRelevancy,
 			`aggregations`,
@@ -201,8 +211,6 @@ AggsPage.defaultProps = {
 
 const mapStateToProps = (state) => {
 	const defaultSettings = get(state.$getAppSettings, `defaultSettings`);
-	const errorCode = get(state, '$getAppSettings.error.actual.code');
-	const defaultSearchSettings = errorCode === 404 ? defaultSettings : null;
 	const appName = get(state, '$getCurrentApp.name');
 	const localRelevancy = get(state, `$getLocalRelevancy.${appName}`, null);
 	return {
@@ -212,7 +220,7 @@ const mapStateToProps = (state) => {
 		isLoading: get(state, '$getAppSettings.isFetching'),
 		isUpdating: get(state, '$getAppSettings.isUpdating'),
 		resetState: get(state, '$getAppSettings.default', {}),
-		settings: get(state, ['$getAppSettings', 'settings', appName], defaultSearchSettings),
+		settings: get(state, ['$getAppSettings', 'settings', appName], null),
 		tier: get(state, '$getAppPlan.results.tier'),
 		localRelevancy,
 	};
