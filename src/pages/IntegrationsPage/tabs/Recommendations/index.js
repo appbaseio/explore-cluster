@@ -272,7 +272,7 @@ class Recommendations extends React.Component {
 
 									<DataFieldSelector
 										name="dataFieldSimilarTo"
-										isAggs
+										isAggFields
 										hideOnDisabled
 										wrapInsideForm
 										formItemProps={{
@@ -290,7 +290,6 @@ class Recommendations extends React.Component {
 									/>
 									<DataFieldSelector
 										name="dataFieldMostRecent"
-										isAggs
 										hideOnDisabled
 										wrapInsideForm
 										formItemProps={{
@@ -347,7 +346,7 @@ class Recommendations extends React.Component {
 															addonAfter: (
 																<DataFieldSelector
 																	name="productsPageUrlField"
-																	isAggs
+																	isAggFields
 																	controlProps={{
 																		// TODO: Set only for shopify apps
 																		formState: 'handle',
