@@ -325,7 +325,7 @@ class Recommendations extends React.Component {
 																<>
 																	Your products page handle is{' '}
 																	<strong>
-																		https://my-site.com/
+																		https://my-site.com
 																		{get(
 																			formValue,
 																			'productsPageUrlPrefix',
