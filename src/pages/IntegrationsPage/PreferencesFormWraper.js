@@ -352,7 +352,7 @@ class PreferencesFormWrapper extends React.Component {
 						productsPageUrl = `${get(
 							item,
 							'productsPageHandle.productsPageUrlPrefix',
-						)}${get(item, 'productsPageHandle.productsPageUrlField')}`;
+						)}{${get(item, 'productsPageHandle.productsPageUrlField')}}`;
 					}
 					return {
 						id: item.id,

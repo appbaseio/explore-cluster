@@ -335,7 +335,7 @@ export const getRecommendationForm = (recommendationType) => {
 				Validators.required,
 			],
 			productsPageUrlField: [
-				{ value: 'handle', disabled: !isProductsPageURLEnabled },
+				{ value: 'handle.keyword', disabled: !isProductsPageURLEnabled },
 				Validators.required,
 			],
 		}),

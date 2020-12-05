@@ -330,10 +330,13 @@ class Recommendations extends React.Component {
 																			formValue,
 																			'productsPageUrlPrefix',
 																		)}
-																		{get(
-																			formValue,
-																			'productsPageUrlField',
-																		)}
+																		{
+																			get(
+																				formValue,
+																				'productsPageUrlField',
+																				'',
+																			).split('.keyword')[0]
+																		}
 																	</strong>
 																</>
 															),
@@ -349,7 +352,7 @@ class Recommendations extends React.Component {
 																	isAggFields
 																	controlProps={{
 																		// TODO: Set only for shopify apps
-																		formState: 'handle',
+																		formState: 'handle.keyword',
 																		options: {
 																			validators:
 																				Validators.required,
