@@ -388,6 +388,7 @@ class SearchPreview extends React.Component {
 		const aggregations = stateSettings.filter((item) => item.id.startsWith('list'));
 		const search = stateSettings.find((item) => item.id === 'search');
 		const result = stateSettings.find((item) => item.id === 'result');
+
 		return (
 			<Row className={container} gutter={16}>
 				<Col xs={24}>

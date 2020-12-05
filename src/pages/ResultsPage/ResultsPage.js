@@ -81,10 +81,19 @@ class ResultsPage extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { settings, isLoading } = this.props;
+		const { settings, isLoading, localRelevancy, defaultSettings } = this.props;
 
 		if (!isLoading && JSON.stringify(settings) !== JSON.stringify(prevProps.settings)) {
 			this.init({ ...settings });
+		}
+
+		if (
+			!settings &&
+			!isLoading &&
+			!localRelevancy &&
+			JSON.stringify(defaultSettings) !== JSON.stringify(prevProps.defaultSettings)
+		) {
+			this.init({ ...defaultSettings });
 		}
 	}
 
@@ -138,17 +147,6 @@ class ResultsPage extends React.Component {
 	render() {
 		const { tier, featureSearchRelevancy, localRelevancy, isLoading, mappings } = this.props;
 
-		if (isLoading || !localRelevancy || !get(localRelevancy, `results`, null)) {
-			return (
-				<Card>
-					<Banner {...bannerDetails} />
-					<div className={container}>
-						<Skeleton />
-					</div>
-				</Card>
-			);
-		}
-
 		if (!isValidPlan(tier, featureSearchRelevancy)) {
 			return (
 				<Card>
@@ -163,6 +161,18 @@ class ResultsPage extends React.Component {
 				</Card>
 			);
 		}
+
+		if (isLoading || !localRelevancy || !get(localRelevancy, `results`, null)) {
+			return (
+				<Card>
+					<Banner {...bannerDetails} />
+					<div className={container}>
+						<Skeleton />
+					</div>
+				</Card>
+			);
+		}
+
 		const {
 			excludeFields,
 			highlightFields,
@@ -324,6 +334,7 @@ class ResultsPage extends React.Component {
 												onChange={(val) => {
 													this.handleChange('highlightFields', val);
 												}}
+												data-cy="highlight-fields"
 											>
 												{(mappings || []).map((v) => {
 													return (
@@ -404,6 +415,7 @@ class ResultsPage extends React.Component {
 														val,
 													);
 												}}
+												data-cy="highlight-fragments"
 											/>
 										</Form.Item>
 									</>

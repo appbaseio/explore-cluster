@@ -1,12 +1,11 @@
-let {
-	DEV: { base_url, username, password, app_url },
-} = Cypress.env('arc-dashboard');
+import generateName from '../utils/generateName';
+import { base_url, username, password, app_url, cluster } from '../utils/index';
 let TEST_URL = `${base_url}?url=${app_url}&username=${username}&password=${password}&cluster=appbase-demo-ansible&showHelpChat=false&showProfile=false`;
 let appName = '';
 
 describe('Interactive Tutorial', () => {
 	before(() => {
-		appName = Math.random(new Date().getTime()).toString(36).substring(5);
+		appName = generateName();
 	});
 	it('Should skip tutorial section and route to dashboard', () => {
 		cy.visit(TEST_URL, { timeout: 100000 })
@@ -28,7 +27,7 @@ describe('Interactive Tutorial', () => {
 			.url()
 			.should('include', '/tutorial')
 			.get('[data-cy=index-name]')
-			.type(`test-cypress-${appName}`)
+			.type(`${appName}`)
 			.get('[data-cy=submit-index-name]')
 			.click()
 			.get('[data-cy=submit-data-import]')
@@ -61,11 +60,26 @@ describe('Interactive Tutorial', () => {
 			.get('[data-cy=finish-tutorial]')
 			.click();
 	});
+
+	it('Should delete index', () => {
+		cy.visit(`${base_url}/`)
+			.wait(1000)
+			.get(`[data-cy=delete-app-${appName}]`)
+			.click({ multiple: true, force: true })
+			.wait(1000)
+			.get(`[data-cy=delete-index-name]`)
+			.click()
+			.type(`${appName}`)
+			.wait(1000)
+			.get(`[data-cy=delete-index-${appName}]`)
+			.click();
+	});
+
+	it('Should logout user', () => {
+		cy.get('[data-cy=logout-menu]').click().wait(1000).get('[data-cy=logout-button]').click();
+	});
+
 	after(() => {
-		base_url = undefined;
-		app_url = undefined;
-		username = undefined;
-		password = undefined;
 		TEST_URL = undefined;
 		appName = undefined;
 	});

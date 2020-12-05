@@ -82,7 +82,7 @@ class NewField extends React.Component {
 		const { isVisible, fieldName, fieldType, fieldUsecase, fieldNameError } = this.state;
 		return (
 			<React.Fragment>
-				<Button onClick={this.handleVisible} type="primary">
+				<Button onClick={this.handleVisible} type="primary" data-cy="new-field-button">
 					Add new field
 				</Button>
 				<Modal

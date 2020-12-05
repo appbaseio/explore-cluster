@@ -11,7 +11,10 @@ const Filter = (props) => {
 	return (
 		<React.Fragment>
 			{aggs.map((agg) => (
-				<Card key={agg.dataField}>
+				<Card
+					key={agg.dataField}
+					data-cy={`aggs-values-${get(agg, 'dataField[0]', '').replace('.keyword', '')}`}
+				>
 					<MultiList
 						{...agg}
 						title={get(agg, 'dataField[0]', '').replace('.keyword', '')}

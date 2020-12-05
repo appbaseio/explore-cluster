@@ -89,6 +89,7 @@ class LoginPage extends Component {
 							placeholder="Cluster URL"
 							onBlur={this.onClusterURLBlur}
 							onPressEnter={this.onClusterURLBlur}
+							data-cy="cluster-url"
 						/>
 						<Input
 							style={{
@@ -109,7 +110,13 @@ class LoginPage extends Component {
 							type="password"
 							placeholder="Password"
 						/>
-						<Button onClick={this.login} className={gitlabBtn} size="small" block>
+						<Button
+							onClick={this.login}
+							className={gitlabBtn}
+							size="small"
+							block
+							data-cy="signin-button"
+						>
 							Signin
 							<Icon type="arrow-right" />
 						</Button>

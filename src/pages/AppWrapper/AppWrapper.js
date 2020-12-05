@@ -274,7 +274,12 @@ class AppWrapper extends Component {
 									return (
 										<SubMenu key={route} title={Title}>
 											{routes[route].menu.map((item) => (
-												<Menu.Item key={item.label}>
+												<Menu.Item
+													key={item.label}
+													data-cy={`path-sub-${item.label
+														.split(' ')
+														.join('')}`}
+												>
 													<WithRedirectTooltip
 														showTooltip={item.hasExactPath}
 													>

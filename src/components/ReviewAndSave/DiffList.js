@@ -108,7 +108,14 @@ const DiffList = ({ diff }) => {
 																key: 'oldVal',
 																dataIndex: 'oldVal',
 																render: (ov) => (
-																	<Tag color="volcano">
+																	<Tag
+																		color="volcano"
+																		style={{
+																			textDecoration:
+																				'line-through',
+																		}}
+																		data-cy={`old-value-${item.title}-status`}
+																	>
 																		{ov.toString()}
 																	</Tag>
 																),
@@ -118,7 +125,10 @@ const DiffList = ({ diff }) => {
 																key: 'newVal',
 																dataIndex: 'newVal',
 																render: (nv) => (
-																	<Tag color="green">
+																	<Tag
+																		color="green"
+																		data-cy={`new-value-${item.title}-status`}
+																	>
 																		{nv.toString()}
 																	</Tag>
 																),
@@ -209,18 +219,28 @@ const DiffList = ({ diff }) => {
 															render: (field, fieldData) => (
 																<>
 																	{get(fieldData, 'isDeleted') ? (
-																		<span>
+																		<span
+																			data-cy={`search-field-${field}`}
+																		>
 																			{field}&nbsp;
-																			<Tag color="red">
+																			<Tag
+																				color="red"
+																				data-cy={`search-field-${field}-status`}
+																			>
 																				removed
 																			</Tag>
 																		</span>
 																	) : (
-																		<span>
+																		<span
+																			data-cy={`search-field-${field}`}
+																		>
 																			{field}&nbsp;
-																			{fieldData.oldWeight ===
-																				'N/A' && (
-																				<Tag color="green">
+																			{fieldData.newWeight !==
+																				'NA' && (
+																				<Tag
+																					color="green"
+																					data-cy={`search-field-${field}-status`}
+																				>
 																					new
 																				</Tag>
 																			)}
@@ -234,7 +254,10 @@ const DiffList = ({ diff }) => {
 															key: 'oldWeight',
 															dataIndex: 'oldWeight',
 															render: (ov) => (
-																<Tag color="volcano">
+																<Tag
+																	color="volcano"
+																	data-cy="old-weight"
+																>
 																	{ov.toString()}
 																</Tag>
 															),
@@ -244,7 +267,10 @@ const DiffList = ({ diff }) => {
 															key: 'newWeight',
 															dataIndex: 'newWeight',
 															render: (nv) => (
-																<Tag color="green">
+																<Tag
+																	color="green"
+																	data-cy="new-weight"
+																>
 																	{nv.toString()}
 																</Tag>
 															),
@@ -273,18 +299,28 @@ const DiffList = ({ diff }) => {
 																			fieldData,
 																			'isDeleted',
 																		) ? (
-																			<span>
+																			<span
+																				data-cy={`aggregation-field-${field}`}
+																			>
 																				{field}&nbsp;
-																				<Tag color="red">
+																				<Tag
+																					color="red"
+																					data-cy={`aggregation-field-${field}-status`}
+																				>
 																					removed
 																				</Tag>
 																			</span>
 																		) : (
-																			<span>
+																			<span
+																				data-cy={`aggregation-field-${field}`}
+																			>
 																				{field}&nbsp;
 																				{fieldData.oldAgg ===
-																					'N/A' && (
-																					<Tag color="green">
+																					'NA' && (
+																					<Tag
+																						color="green"
+																						data-cy={`aggregation-field-${field}-status`}
+																					>
 																						new
 																					</Tag>
 																				)}

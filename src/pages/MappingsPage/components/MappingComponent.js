@@ -79,7 +79,7 @@ class MappingComponent extends React.Component {
 			return (
 				<Empty
 					image={Empty.PRESENTED_IMAGE_SIMPLE}
-					description={<span>No Mappings Present</span>}
+					description={<span data-cy="mappings-empty-field">No Mappings Present</span>}
 				/>
 			);
 		}
@@ -305,8 +305,10 @@ class MappingComponent extends React.Component {
 										right: 0,
 									}}
 								>
-									<div className={footerStyles}>
-										<SearchPreviewModal app={appName} />
+									<div
+										className={footerStyles}
+										style={{ flexDirection: 'row-reverse' }}
+									>
 										<div>
 											<Button
 												type="primary"
@@ -319,6 +321,7 @@ class MappingComponent extends React.Component {
 													isReindexing ||
 													!hasMappingsChanged
 												}
+												data-cy="confirm-mapping-button"
 											>
 												Confirm Mapping Changes
 											</Button>
@@ -340,6 +343,9 @@ class MappingComponent extends React.Component {
 							</div>
 						)}
 					</MappingsWrapper>
+					<div style={{ position: 'fixed', bottom: 15, left: collapsed ? 120 : 310 }}>
+						<SearchPreviewModal app={appName} />
+					</div>
 				</>
 			</>
 		);

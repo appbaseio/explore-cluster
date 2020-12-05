@@ -28,9 +28,15 @@ const FieldRow = ({
 	return (
 		<Row type="flex" justify="space-between" className={fieldRow}>
 			<Col>
-				<div>
-					<Popover content={<pre>{JSON.stringify(mapping, null, 2)}</pre>}>
-						<div className="mappings-icon">
+				<div data-cy={`field-name-${field}`}>
+					<Popover
+						content={
+							<pre data-cy={`${field}-popover-content`}>
+								{JSON.stringify(mapping, null, 2)}
+							</pre>
+						}
+					>
+						<div className="mappings-icon" data-cy={`${field}-popover-icon`}>
 							<MappingsTypeIcon type={type} />
 						</div>
 					</Popover>
@@ -67,7 +73,7 @@ const FieldRow = ({
 						size="small"
 						onClick={() => onDelete(path)}
 					>
-						<Icon type="delete" />{' '}
+						<Icon type="delete" data-cy={`remove-field-${field}`} />{' '}
 						{view === VIEWS.SCHEMA ? 'Remove field' : `Remove from ${view}`}
 					</Button>
 				</div>
@@ -85,7 +91,7 @@ const FieldRow = ({
 						</Col>
 					)}
 					{view === VIEWS.SCHEMA && (
-						<Col xs={type === 'text' ? 12 : 24}>
+						<Col xs={type === 'text' ? 12 : 24} data-cy={`data-type-${field}`}>
 							<TypeDropdown
 								value={type}
 								usecase={usecase}

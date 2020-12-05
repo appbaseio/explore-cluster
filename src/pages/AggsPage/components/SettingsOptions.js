@@ -37,8 +37,12 @@ const SettingsOptions = ({ handleChange, sortBy, size, includeNullValues, queryF
 			onChange={(e) => handleChange('queryFormat', e.target.value)}
 			value={queryFormat}
 		>
-			<Radio value="or">Or</Radio>
-			<Radio value="and">And</Radio>
+			<Radio value="or" data-cy="query-format-or-radio">
+				Or
+			</Radio>
+			<Radio value="and" data-cy="query-format-and-radio">
+				And
+			</Radio>
 		</Radio.Group>
 		<h6>
 			Default Size For Aggregations{' '}

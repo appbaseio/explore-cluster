@@ -229,6 +229,7 @@ class CreateAppModal extends Component {
 						style={{ width: '100%' }}
 						value={language}
 						onSelect={(value) => this.setState({ language: value })}
+						data-cy="new-index-language"
 						renderOption={(lang) => (
 							<Select.Option key={lang.value} value={lang.value}>
 								{lang.label}
@@ -273,7 +274,7 @@ class CreateAppModal extends Component {
 						Do you have a JSON or CSV dataset to import into this index?
 					</h3>
 					<RadioGroup value={hasJSON} name="hasJSON" onChange={this.handleChange}>
-						<Radio className={radiobtn} value>
+						<Radio className={radiobtn} value data-cy="new-index-data-radio">
 							Yes
 						</Radio>
 						<Radio className={radiobtn} value={false}>

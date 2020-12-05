@@ -46,7 +46,7 @@ const SettingsOptions = ({
 					<Icon type="info-circle" />
 				</Tooltip>
 			</Radio>
-			<Radio value="searchOperators">
+			<Radio value="searchOperators" data-cy="search-operators-radio-button">
 				{settingsMap.searchOperators.title}
 				<Tooltip title={settingsMap.searchOperators.description}>
 					<Icon type="info-circle" />
@@ -65,7 +65,9 @@ const SettingsOptions = ({
 			value={queryFormat}
 		>
 			<Radio value="or">Or</Radio>
-			<Radio value="and">And</Radio>
+			<Radio value="and" data-cy="query-format-and-radio">
+				And
+			</Radio>
 		</Radio.Group>
 		<h6>
 			{settingsMap.enableTypoTolerance.title}
@@ -82,6 +84,7 @@ const SettingsOptions = ({
 					handleChange('fuzziness', 0);
 				}
 			}}
+			data-cy="typo-tolerance-switch"
 		/>
 
 		{Boolean(fuzziness) && (
@@ -118,6 +121,7 @@ const SettingsOptions = ({
 		<Switch
 			checked={enableSynonyms}
 			onChange={(value) => handleChange('enableSynonyms', value)}
+			data-cy="synonyms-switch"
 		/>
 
 		<h6>
@@ -126,7 +130,11 @@ const SettingsOptions = ({
 				<Icon type="info-circle" />
 			</Tooltip>
 		</h6>
-		<Switch checked={enableNgram} onChange={(value) => handleChange('enableNgram', value)} />
+		<Switch
+			checked={enableNgram}
+			onChange={(value) => handleChange('enableNgram', value)}
+			data-cy="ngram-switch"
+		/>
 	</div>
 );
 

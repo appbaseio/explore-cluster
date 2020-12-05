@@ -65,7 +65,11 @@ const FieldType = ({ handleFieldType, handleDelete, fieldTypes, updateToAggsFiel
 			return (
 				<Empty
 					image={Empty.PRESENTED_IMAGE_SIMPLE}
-					description={<span>Please add aggregation fields from the dropdown below</span>}
+					description={
+						<span data-cy="aggs-empty-field">
+							Please add aggregation fields from the dropdown below
+						</span>
+					}
 				/>
 			);
 		}
@@ -257,7 +261,10 @@ const FieldType = ({ handleFieldType, handleDelete, fieldTypes, updateToAggsFiel
 					</div>
 					<br />
 					{getAggsField({ flattenUsecase, flattenType }).length > 0 ? (
-						<div style={{ position: 'relative', display: 'inline-block' }}>
+						<div
+							style={{ position: 'relative', display: 'inline-block' }}
+							data-cy="aggregation-fields-dropdown"
+						>
 							<Select
 								showSearch
 								style={{ width: 300 }}

@@ -27,7 +27,7 @@ const handleLogout = () => {
 
 const menu = (
 	<Menu>
-		<Menu.Item onClick={handleLogout}>
+		<Menu.Item onClick={handleLogout} data-cy="logout-button">
 			<Icon type="poweroff" theme="outlined" />
 			Logout
 		</Menu.Item>
@@ -36,7 +36,7 @@ const menu = (
 
 const UserMenu = ({ user }) => (
 	<Dropdown overlay={menu} className={userMenu} trigger={['click']}>
-		<div style={{ cursor: 'pointer' }}>
+		<div style={{ cursor: 'pointer' }} data-cy="logout-menu">
 			<Avatar icon="user" />
 			&nbsp;&nbsp;
 			{get(user, 'username', 'Loading...')}
