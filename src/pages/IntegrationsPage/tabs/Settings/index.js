@@ -1,11 +1,17 @@
 import React, { useContext } from 'react';
 import { FieldControl, FieldGroup } from 'react-reactive-form';
 import { Form, Tabs, Select } from 'antd';
+import { css } from 'emotion';
 import ResultSettings from '../Search/Results';
 import TextInput from '../../../../components/Form/Input';
-import { FormContext } from '../../utils';
+import { FormContext, CtaActions } from '../../utils';
 import LayoutTab from '../Layout';
 
+const formItemStyle = css`
+	.ant-form-item-label {
+		text-align: left;
+	}
+`;
 const { TabPane } = Tabs;
 
 const Settings = () => {
@@ -15,11 +21,16 @@ const Settings = () => {
 			isRecommendation
 			defaultActiveKey="action-setting"
 			appendTabs={
-				<TabPane tab="Products" key="action-setting">
+				<TabPane tab="Product Card" key="action-setting">
 					<FieldGroup
 						control={form}
 						render={() => (
-							<Form colon={false}>
+							<Form
+								labelCol={{ span: 4 }}
+								wrapperCol={{ span: 14 }}
+								className={formItemStyle}
+								colon={false}
+							>
 								<TextInput
 									name="ctaTitle"
 									label="Title"
@@ -39,8 +50,11 @@ const Settings = () => {
 													maxWidth: 300,
 												}}
 											>
-												<Select.Option key="redirect_to_product">
+												<Select.Option key={CtaActions.REDIRECT_TO_PRODUCT}>
 													Open product detail view
+												</Select.Option>
+												<Select.Option key={CtaActions.NO_BUTTON}>
+													Do not show button
 												</Select.Option>
 											</Select>
 										)}

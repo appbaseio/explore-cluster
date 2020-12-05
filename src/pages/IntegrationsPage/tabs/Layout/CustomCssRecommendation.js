@@ -10,7 +10,7 @@ export const codeStyle = css`
 `;
 
 const CustomCssRecommendations = () => (
-	<FieldControl name="customCss">
+	<FieldControl name="customCssRecommendation">
 		{({ handler }) => (
 			<Row gutter={32}>
 				<h2>Custom CSS</h2>
@@ -20,10 +20,10 @@ const CustomCssRecommendations = () => (
 						control over the look and feel of the search and recommendations widgets.
 						You can see an example here.
 					</p>
-					<h3>Available Classes</h3>
+					<h3>Available Class</h3>
 					<p>
 						<Tag>product-card</Tag>
-						Styles the individual product recommendation card you see.{' '}
+						Styles an individual product recommendation card you see.{' '}
 					</p>
 					<div css={{ display: 'grid', gridGap: 10 }}>
 						<AceEditor

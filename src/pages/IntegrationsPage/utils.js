@@ -294,12 +294,29 @@ export const getPriceFilterConfigurationForm = () => {
 };
 
 export const getRecommendationForm = (recommendationType) => {
+	const isMostRecent = recommendationType === RecommendationTypes.MOST_RECENT;
+	const isSimilarTo = recommendationType === RecommendationTypes.SIMILAR_PRODUCTS;
+	const isProductsPageURLEnabled = recommendationType === RecommendationTypes.SIMILAR_PRODUCTS;
 	return FormBuilder.group({
 		id: new Date().getTime(),
 		title: 'You might also like',
 		type: RecommendationTypes.MOST_POPULAR_PRODUCTS,
 		maxProducts: [15, Validators.min(1)],
-		...(recommendationType === RecommendationTypes.SIMILAR_PRODUCTS ? { dataField: '' } : null),
+		dataFieldSimilarTo: [
+			{ value: isMostRecent ? 'created_at' : '', disabled: !isMostRecent },
+			Validators.required,
+		],
+		dataFieldMostRecent: [{ value: '', disabled: !isSimilarTo }, Validators.required],
+		productsPageHandle: FormBuilder.group({
+			productsPageUrlPrefix: [
+				{ value: '/products/', disabled: !isProductsPageURLEnabled },
+				Validators.required,
+			],
+			productsPageUrlField: [
+				{ value: 'handle', disabled: !isProductsPageURLEnabled },
+				Validators.required,
+			],
+		}),
 	});
 };
 
@@ -326,7 +343,7 @@ export const RecommendationTypes = {
 	MOST_POPULAR_PRODUCTS: 'most_popular',
 	MOST_RECENT: 'most_recent',
 	SIMILAR_PRODUCTS: 'similar',
-	FEATURED_PRODUCTS: 'featured',
+	// FEATURED_PRODUCTS: 'featured',
 };
 
 export const RecommendationTypeLabels = {
@@ -334,4 +351,30 @@ export const RecommendationTypeLabels = {
 	[RecommendationTypes.MOST_RECENT]: 'Most Recent Products',
 	[RecommendationTypes.SIMILAR_PRODUCTS]: 'Similar to this Product',
 	[RecommendationTypes.FEATURED_PRODUCTS]: 'Featured Products',
+};
+
+export const CtaActions = {
+	REDIRECT_TO_PRODUCT: 'redirect_to_product',
+	NO_BUTTON: 'no_button',
+};
+
+export const messages = {
+	productsPageURL: (
+		<span>
+			This input allows you to define the pattern for the products page URL. It helps us to
+			extract the product details and show the recommendations for that product. The first
+			input is to define the URL prefix and second input is to select the ES field that is
+			mapped to the product identification that you are using in your application.
+			<br />
+			For example, if your products page URL is
+			`https://mystore.shopify.com/products/adidas-shoes-black-2` then first input should be
+			`products/` and second input value should be the data field that has the product handle
+			value. In case if you are using query params i.e the URL looks like
+			`https://mystore.shopify.com/products?id=232323`then first input value must be
+			`products?id=`.
+		</span>
+	),
+	dataFieldSimilarProduct:
+		'Select the data field that should match with the current product on products page.',
+	dataFieldMostRecent: 'Select the timestamp field to sort the products.',
 };

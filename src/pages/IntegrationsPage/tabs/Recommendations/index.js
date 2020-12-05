@@ -1,16 +1,37 @@
 import React from 'react';
-import { FieldGroup, FieldArray, FieldControl } from 'react-reactive-form';
-import { Table, Button, Form, Select } from 'antd';
+import { FieldGroup, FieldArray, FieldControl, Validators } from 'react-reactive-form';
+import { Table, Button, Form, Select, Tooltip, Icon } from 'antd';
+import { css } from 'emotion';
+import { func } from 'prop-types';
 import get from 'lodash/get';
 import TextInput from '../../../../components/Form/Input';
 import DataFieldSelector from '../../../../components/Form/DataFieldSelector';
 import Flex from '../../../../batteries/components/shared/Flex';
+import PreviewModal from '../../PreviewModal';
+import ExportModal from '../../ExportModal';
 import {
 	FormContext,
 	getRecommendationForm,
 	RecommendationTypes,
 	RecommendationTypeLabels,
+	messages,
 } from '../../utils';
+
+const tableStyles = css`
+	tr {
+		.delete-icon {
+			transition: all ease 0.4s;
+			transform: rotateX(90deg);
+			opacity: 0;
+		}
+		&:hover {
+			.delete-icon {
+				transform: rotateX(0);
+				opacity: 1;
+			}
+		}
+	}
+`;
 
 class Recommendations extends React.Component {
 	state = {
@@ -30,20 +51,43 @@ class Recommendations extends React.Component {
 		},
 		{
 			title: 'Actions',
-			render: (item) => (
-				<Flex>
-					<Button onClick={() => this.handleEdit(item.id)}>Edit</Button>
-					<Button
-						style={{
-							marginLeft: 10,
-						}}
-						type="danger"
-						onClick={() => this.handleDelete(item.id)}
-					>
-						Delete
-					</Button>
-				</Flex>
-			),
+			render: (item) => {
+				const { getPreferences } = this.props;
+				const btnStyle = {
+					marginLeft: 10,
+				};
+				return (
+					<Flex>
+						<Button onClick={() => this.handleEdit(item.id)}>Edit</Button>
+						<PreviewModal
+							buttonProps={{
+								size: 'default',
+								type: 'default',
+								style: btnStyle,
+							}}
+							isRecommendation
+							widgetId={item.id}
+							preferences={getPreferences}
+						/>
+						<ExportModal
+							buttonProps={{
+								size: 'default',
+								style: btnStyle,
+							}}
+							widgetId={item.id}
+							preferences={getPreferences}
+						/>
+						<Button
+							style={btnStyle}
+							type="danger"
+							className="delete-icon"
+							onClick={() => this.handleDelete(item.id)}
+						>
+							Delete
+						</Button>
+					</Flex>
+				);
+			},
 		},
 	];
 
@@ -53,12 +97,56 @@ class Recommendations extends React.Component {
 	}
 
 	showForm = (id) => {
+		if (this.tempForm) {
+			this.tempForm.valueChanges.unsubscribe();
+		}
 		if (id) {
 			// get the control
 			this.tempForm = this.getControlById(id);
 		} else {
 			this.tempForm = getRecommendationForm();
 		}
+		const typeControl = this.tempForm.get('type');
+		typeControl.valueChanges.subscribe((value) => {
+			const dataFieldSimilarToControl = this.tempForm.get('dataFieldSimilarTo');
+			const dataFieldMostRecentControl = this.tempForm.get('dataFieldMostRecent');
+			const productsPageHandleControl = this.tempForm.get('productsPageHandle');
+			switch (value) {
+				case RecommendationTypes.SIMILAR_PRODUCTS:
+					dataFieldSimilarToControl.enable();
+					productsPageHandleControl.enable();
+					if (dataFieldMostRecentControl.enabled) {
+						dataFieldMostRecentControl.disable();
+					}
+					break;
+				case RecommendationTypes.MOST_RECENT:
+					if (dataFieldSimilarToControl.enabled) {
+						dataFieldSimilarToControl.disable();
+					}
+					if (productsPageHandleControl.enabled) {
+						productsPageHandleControl.disable();
+					}
+					if (!dataFieldMostRecentControl.value) {
+						dataFieldMostRecentControl.enable({ emitEvent: false });
+						// TODO: Only set value for shopify
+						dataFieldMostRecentControl.setValue('created_at');
+					} else {
+						dataFieldMostRecentControl.enable();
+						dataFieldMostRecentControl.stateChanges.next();
+					}
+					break;
+				default:
+					if (dataFieldMostRecentControl.enabled) {
+						dataFieldMostRecentControl.disable();
+					}
+					if (dataFieldSimilarToControl.enabled) {
+						dataFieldSimilarToControl.disable();
+					}
+					if (productsPageHandleControl.enabled) {
+						productsPageHandleControl.disable();
+					}
+			}
+		});
 		this.setState({
 			showForm: true,
 			isEditing: !!id,
@@ -133,16 +221,23 @@ class Recommendations extends React.Component {
 							>
 								Go back
 							</Button>
-							{!isEditing && (
-								<Button onClick={this.addControl} type="primary">
-									Save
-								</Button>
-							)}
 						</Flex>
 
 						<FieldGroup control={this.tempForm} strict={false}>
-							{() => (
-								<Form colon={false}>
+							{({ invalid }) => (
+								<Form
+									{...{
+										labelCol: {
+											xs: { span: 24 },
+											sm: { span: 8 },
+										},
+										wrapperCol: {
+											xs: { span: 24 },
+											sm: { span: 16 },
+										},
+									}}
+									// colon={false}
+								>
 									<TextInput
 										name="title"
 										label="Title"
@@ -173,26 +268,108 @@ class Recommendations extends React.Component {
 											)}
 										</FieldControl>
 									</Form.Item>
-									<FieldControl name="type">
-										{({ value }) => {
-											if (value === RecommendationTypes.SIMILAR_PRODUCTS) {
-												return (
-													<FieldControl name="dataField">
-														{(formControl) =>
-															formControl.disabled ? null : (
-																<Form.Item label="DataField">
-																	<DataFieldSelector
-																		control={formControl}
-																	/>
-																</Form.Item>
-															)
-														}
-													</FieldControl>
-												);
-											}
-											return null;
+
+									<DataFieldSelector
+										name="dataFieldSimilarTo"
+										isAggs
+										hideOnDisabled
+										wrapInsideForm
+										formItemProps={{
+											label: (
+												<span>
+													DataField&nbsp;
+													<Tooltip
+														title={messages.dataFieldSimilarProduct}
+													>
+														<Icon type="question-circle-o" />
+													</Tooltip>
+												</span>
+											),
 										}}
-									</FieldControl>
+									/>
+									<DataFieldSelector
+										name="dataFieldMostRecent"
+										isAggs
+										hideOnDisabled
+										wrapInsideForm
+										formItemProps={{
+											label: (
+												<span>
+													DataField&nbsp;
+													<Tooltip title={messages.dataFieldMostRecent}>
+														<Icon type="question-circle-o" />
+													</Tooltip>
+												</span>
+											),
+										}}
+									/>
+
+									<FieldGroup name="productsPageHandle">
+										{({ disabled, value: formValue }) =>
+											disabled ? null : (
+												<>
+													<TextInput
+														name="productsPageUrlPrefix"
+														label={
+															<span>
+																Products Page URL&nbsp;
+																<Tooltip
+																	title={messages.productsPageURL}
+																>
+																	<Icon type="question-circle-o" />
+																</Tooltip>
+															</span>
+														}
+														formItemProps={{
+															help: (
+																<>
+																	Your products page handle is{' '}
+																	<strong>
+																		https://my-site.com/
+																		{get(
+																			formValue,
+																			'productsPageUrlPrefix',
+																		)}
+																		{get(
+																			formValue,
+																			'productsPageUrlField',
+																		)}
+																	</strong>
+																</>
+															),
+														}}
+														inputProps={{
+															placeholder: 'Enter products page URL',
+															style: {
+																maxWidth: 500,
+															},
+															addonAfter: (
+																<DataFieldSelector
+																	name="productsPageUrlField"
+																	isAggs
+																	controlProps={{
+																		// TODO: Set only for shopify apps
+																		formState: 'handle',
+																		options: {
+																			validators:
+																				Validators.required,
+																		},
+																	}}
+																/>
+															),
+														}}
+														controlProps={{
+															formState: 'products/',
+															strict: false,
+															options: {
+																validators: Validators.required,
+															},
+														}}
+													/>
+												</>
+											)
+										}
+									</FieldGroup>
 									<TextInput
 										name="maxProducts"
 										label="Max Products count"
@@ -204,6 +381,17 @@ class Recommendations extends React.Component {
 											},
 										}}
 									/>
+									{!isEditing && (
+										<Flex justifyContent="center">
+											<Button
+												disabled={invalid}
+												onClick={this.addControl}
+												type="primary"
+											>
+												Save
+											</Button>
+										</Flex>
+									)}
 								</Form>
 							)}
 						</FieldGroup>
@@ -237,6 +425,10 @@ class Recommendations extends React.Component {
 										...control.value,
 									}))}
 									columns={this.columns}
+									className={tableStyles}
+									locale={{
+										emptyText: 'No recommendation found',
+									}}
 								/>
 							)}
 						</FieldArray>
@@ -246,5 +438,9 @@ class Recommendations extends React.Component {
 		);
 	}
 }
+
+Recommendations.propTypes = {
+	getPreferences: func.isRequired,
+};
 
 export default Recommendations;

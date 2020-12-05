@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Select } from 'antd';
+import { Select, Form } from 'antd';
 import { string, func, bool, object } from 'prop-types';
 import get from 'lodash/get';
 import { FieldControl } from 'react-reactive-form';
@@ -29,7 +29,15 @@ class DataFieldSelector extends React.Component {
 	}
 
 	render() {
-		const { loading, control, name } = this.props;
+		const {
+			loading,
+			control,
+			name,
+			controlProps,
+			hideOnDisabled,
+			wrapInsideForm,
+			formItemProps,
+		} = this.props;
 		const selectProps = {
 			placeholder: 'Select data field',
 			loading,
@@ -39,13 +47,17 @@ class DataFieldSelector extends React.Component {
 				width: 200,
 			},
 		};
+		const withFormItem = (child) => <Form.Item {...formItemProps}>{child}</Form.Item>;
 
 		if (control || name) {
 			return (
-				<FieldControl strict={false} name={name} control={control}>
-					{({ handler }) => {
+				<FieldControl strict={false} name={name} control={control} {...controlProps}>
+					{({ handler, disabled }) => {
 						const inputHandler = handler();
-						return (
+						if (hideOnDisabled && disabled) {
+							return null;
+						}
+						const child = (
 							<Select
 								placeholder="Select field"
 								{...selectProps}
@@ -56,6 +68,10 @@ class DataFieldSelector extends React.Component {
 								{this.renderOptions()}
 							</Select>
 						);
+						if (wrapInsideForm) {
+							return withFormItem(child);
+						}
+						return child;
 					}}
 				</FieldControl>
 			);
@@ -69,21 +85,29 @@ class DataFieldSelector extends React.Component {
 }
 DataFieldSelector.defaultProps = {
 	mappings: null,
+	controlProps: null,
 	control: null,
 	name: undefined,
 	loading: false,
 	isAggFields: false,
+	hideOnDisabled: false,
+	wrapInsideForm: false,
+	formItemProps: null,
 };
 
 DataFieldSelector.propTypes = {
 	appbaseCredentials: string.isRequired,
+	hideOnDisabled: bool,
 	index: string.isRequired,
 	fetchMappings: func.isRequired,
 	name: string,
 	loading: bool,
 	control: object,
+	controlProps: object,
 	mappings: object,
 	isAggFields: bool,
+	wrapInsideForm: bool,
+	formItemProps: object,
 };
 
 const mapStateToProps = (state) => {

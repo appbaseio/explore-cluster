@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Modal, Form, Switch, Radio } from 'antd';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
-import { func } from 'prop-types';
+import { func, object, number } from 'prop-types';
 import get from 'lodash/get';
 import ExportToShopify from './ExportToShopify';
 import ExportToOther from './ExportToOther';
@@ -57,6 +57,7 @@ class ExportModal extends React.Component {
 
 	render() {
 		const { visible, showInstruction } = this.state;
+		const { buttonProps } = this.props;
 		const { get: getControl } = this.context;
 		const exportSettingsControl = getControl('exportSettings');
 		return (
@@ -128,7 +129,7 @@ class ExportModal extends React.Component {
 								</Form>
 							)}
 						</Modal>
-						<Button onClick={this.showModal} size="large">
+						<Button onClick={this.showModal} size="large" {...buttonProps}>
 							Export Code
 						</Button>
 					</React.Fragment>
@@ -140,6 +141,13 @@ class ExportModal extends React.Component {
 
 ExportModal.propTypes = {
 	preferences: func.isRequired,
+	buttonProps: object,
+	widgetId: number,
+};
+
+ExportModal.defaultProps = {
+	buttonProps: null,
+	widgetId: undefined,
 };
 
 export default ExportModal;

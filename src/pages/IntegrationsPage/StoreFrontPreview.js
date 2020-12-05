@@ -1,5 +1,5 @@
 import React from 'react';
-import { func, bool } from 'prop-types';
+import { func, bool, number } from 'prop-types';
 import { Button, Icon } from 'antd';
 import Loader from '../../components/Loader';
 import { BaseURL, BaseCSSURL } from './utils';
@@ -19,11 +19,13 @@ class StoreFrontPreview extends React.Component {
 	}
 
 	onLoad = () => {
-		const { preferences, isRecommendation } = this.props;
+		const { preferences, isRecommendation, widgetId } = this.props;
 		const div = this.iframeRef.current.contentDocument.createElement('div');
 		if (isRecommendation) {
 			div.id = 'reactivesearch-shopify-product-recommendations';
-			// TODO: Set widget id
+			if (widgetId) {
+				div.setAttribute('widget-id', widgetId);
+			}
 		} else {
 			div.id = 'reactivesearch-shopify-1';
 			div.setAttribute('openaspage', true);
@@ -103,11 +105,13 @@ class StoreFrontPreview extends React.Component {
 }
 StoreFrontPreview.defaultProps = {
 	isRecommendation: false,
+	widgetId: undefined,
 };
 
 StoreFrontPreview.propTypes = {
 	preferences: func.isRequired,
 	isRecommendation: bool,
+	widgetId: number,
 };
 
 export default StoreFrontPreview;

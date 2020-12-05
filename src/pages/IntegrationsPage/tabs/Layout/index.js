@@ -15,9 +15,11 @@ const Layout = ({ defaultActiveKey, appendTabs, isRecommendation }) => {
 	return (
 		<Tabs defaultActiveKey={defaultActiveKey} tabPosition="left" className={verticalTab}>
 			{appendTabs}
-			<TabPane tab="Search Layout" key="search-layout">
-				<FieldGroup control={form} render={() => <SearchLayout />} />
-			</TabPane>
+			{!isRecommendation && (
+				<TabPane tab="Search Layout" key="search-layout">
+					<FieldGroup control={form} render={() => <SearchLayout />} />
+				</TabPane>
+			)}
 			<TabPane tab="Style Presets" key="style-presets">
 				<FieldGroup control={form} render={() => <StylePresets />} />
 			</TabPane>
