@@ -325,10 +325,10 @@ export const getRecommendationForm = (recommendationType) => {
 		type: RecommendationTypes.MOST_POPULAR_PRODUCTS,
 		maxProducts: [15, Validators.min(1)],
 		dataFieldSimilarTo: [
-			{ value: isMostRecent ? 'created_at' : '', disabled: !isMostRecent },
+			{ value: isMostRecent ? 'created_at' : '', disabled: !isSimilarTo },
 			Validators.required,
 		],
-		dataFieldMostRecent: [{ value: '', disabled: !isSimilarTo }, Validators.required],
+		dataFieldMostRecent: [{ value: '', disabled: !isMostRecent }, Validators.required],
 		productsPageHandle: FormBuilder.group({
 			productsPageUrlPrefix: [
 				{ value: '/products/', disabled: !isProductsPageURLEnabled },
