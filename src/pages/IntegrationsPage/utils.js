@@ -209,6 +209,23 @@ export const getInstallationScript = (preferences = {}, credentials) => `
 <script defer src=${BaseURL}></script>
 		`;
 
+export const getInstallationScriptRecommendation = (preferences = {}, credentials, widgetId) => `
+<script>var PREFERENCES=${JSON.stringify(
+	JSON.stringify({
+		...preferences,
+		appbaseSettings: {
+			...get(preferences, 'appbaseSettings'),
+			credentials,
+		},
+	}),
+)};</script>
+<div id="reactivesearch-shopify-product-recommendations-1" ${
+	widgetId ? `widget-id=${widgetId}` : ''
+}></div>
+<link rel="stylesheet" href=${BaseCSSURL}>
+<script defer src=${BaseURL}></script>
+		`;
+
 export const getInstallationHeadScript = (preferences = {}, credentials) => `
 <script>var PREFERENCES=${JSON.stringify(
 	JSON.stringify({
@@ -230,6 +247,11 @@ export const getCTAScript = (preferences = {}) => `
 <div id="reactivesearch-shopify-1"${preferences.openAsPage ? ` openAsPage="true"` : ''}></div>
 		`;
 
+export const getRecommendationScript = (widgetId) => `
+<div id="reactivesearch-shopify-product-recommendations-1" ${
+	widgetId ? `widget-id=${widgetId}` : ''
+}></div>
+		`;
 export const getCSBScript = (preferences = {}, credentials) => `
 <script>var PREFERENCES=${JSON.stringify(
 	JSON.stringify({

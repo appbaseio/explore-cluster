@@ -76,6 +76,7 @@ class Recommendations extends React.Component {
 							}}
 							widgetId={item.id}
 							preferences={getPreferences}
+							isRecommendation
 						/>
 						<Button
 							style={btnStyle}
