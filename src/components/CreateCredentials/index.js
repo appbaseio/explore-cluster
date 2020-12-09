@@ -238,10 +238,15 @@ class CreateCredentials extends React.Component {
 			return filteredMappings;
 		}
 		if (indices && Array.isArray(indices)) {
-			if (indices.length === 1 && indices[0] === '*') {
-				return mappings;
-			}
+			const compliedIndices = [];
 			indices.forEach((index) => {
+				Object.keys(mappings).forEach((originalIndex) => {
+					if (originalIndex.match(new RegExp(index.replace('*', '.*')))) {
+						compliedIndices.push(originalIndex);
+					}
+				});
+			});
+			compliedIndices.forEach((index) => {
 				filteredMappings[index] = mappings[index];
 			});
 			return filteredMappings;
@@ -576,7 +581,7 @@ class CreateCredentials extends React.Component {
 																component={
 																	<Select
 																		placeholder="Select indices"
-																		mode="multiple"
+																		mode="tags"
 																		style={{ width: '100%' }}
 																		tokenSeparators={[',']}
 																		value={value}
