@@ -67,7 +67,7 @@ export const APP_ROUTES = {
 		hasExactPath: true,
 		action: ALLOWED_ACTIONS.CURATED_INSIGHTS,
 	},
-	'UI Integrations': {
+	'UI Builder': {
 		icon: 'control',
 		// TODO: Integrate access control
 		// action: ALLOWED_ACTIONS.UI_INTEGRATIONS,
@@ -179,7 +179,7 @@ export const CLUSTER_ROUTES = {
 		action: ALLOWED_ACTIONS.CURATED_INSIGHTS,
 		link: '/cluster/curated-insights',
 	},
-	'UI Integrations': {
+	'UI Builder': {
 		icon: 'control',
 		// action: ALLOWED_ACTIONS.UI_INTEGRATIONS,
 		menu: [

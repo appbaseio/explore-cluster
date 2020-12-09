@@ -8,14 +8,14 @@ import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
 import Main from './Main';
 
 const bannerDetails = {
-	title: 'Recommendations UI Integrations',
+	title: 'Recommendations UI Builder',
 	description:
 		'Build a WYSIWG storefront search preview that can be installed to your favorite E-Commerce platform.',
 	icon: 'pencil',
 };
 
 const bannerDetailsPaid = {
-	title: 'Recommendations UI Integrations',
+	title: 'Recommendations UI Builder',
 	description:
 		'Build a WYSIWG storefront search preview that can be installed to your favorite E-Commerce platform.',
 	buttonText: 'Read Docs',
