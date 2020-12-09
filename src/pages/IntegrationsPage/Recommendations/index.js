@@ -10,16 +10,16 @@ import Main from './Main';
 const bannerDetails = {
 	title: 'Recommendations UI Builder',
 	description:
-		'Build a WYSIWG storefront search preview that can be installed to your favorite E-Commerce platform.',
+		'Build a WYSIWYG recommendations UI that can be installed to any E-Commerce platform or to your own site.',
 	icon: 'pencil',
 };
 
 const bannerDetailsPaid = {
 	title: 'Recommendations UI Builder',
 	description:
-		'Build a WYSIWG storefront search preview that can be installed to your favorite E-Commerce platform.',
+		'Build a WYSIWYG recommendations UI that can be installed to any E-Commerce platform or to your own site.',
 	buttonText: 'Read Docs',
-	href: 'http://docs.appbase.io/docs/reactivesearch/ui-integrations/Overview',
+	href: 'http://docs.appbase.io/docs/reactivesearch/ui-builder/recommendations/',
 };
 
 const RecommendationsIntegrationsPage = ({ tier, featureEcommerce }) => {
