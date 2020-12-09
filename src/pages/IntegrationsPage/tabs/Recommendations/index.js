@@ -67,6 +67,7 @@ class Recommendations extends React.Component {
 							}}
 							isRecommendation
 							widgetId={item.id}
+							label="Preview"
 							preferences={getPreferences}
 						/>
 						<ExportModal

@@ -320,14 +320,14 @@ class RouteContainer extends React.Component {
 					/>
 					<Route
 						exact
-						path="/app/:appName/search-integrations"
+						path="/app/:appName/search-builder"
 						render={(props) => (
 							<AppPageContainer {...props} component={SearchIntegrationsPage} />
 						)}
 					/>
 					<Route
 						exact
-						path="/app/:appName/recommendations-integrations"
+						path="/app/:appName/recommendations-builder"
 						render={(props) => (
 							<AppPageContainer
 								{...props}

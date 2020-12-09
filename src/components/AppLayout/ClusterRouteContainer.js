@@ -336,14 +336,14 @@ class ClusterRouteContainer extends React.Component {
 					/>
 					<Route
 						exact
-						path="/cluster/search-integrations"
+						path="/cluster/search-builder"
 						render={(props) => (
 							<AppPageContainer {...props} component={SearchIntegrationsPage} />
 						)}
 					/>
 					<Route
 						exact
-						path="/cluster/recommendations-integrations"
+						path="/cluster/recommendations-builder"
 						render={(props) => (
 							<AppPageContainer
 								{...props}

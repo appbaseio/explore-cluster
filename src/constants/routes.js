@@ -72,8 +72,8 @@ export const APP_ROUTES = {
 		// TODO: Integrate access control
 		// action: ALLOWED_ACTIONS.UI_INTEGRATIONS,
 		menu: [
-			{ label: 'Search', link: 'search-integrations' },
-			{ label: 'Recommendations', link: 'recommendations-integrations' },
+			{ label: 'Search', link: 'search-builder' },
+			{ label: 'Recommendations', link: 'recommendations-builder' },
 		],
 		tag: 'Beta',
 	},
@@ -183,8 +183,8 @@ export const CLUSTER_ROUTES = {
 		icon: 'control',
 		// action: ALLOWED_ACTIONS.UI_INTEGRATIONS,
 		menu: [
-			{ label: 'Search', link: 'search-integrations', openIndexMenu: true },
-			{ label: 'Recommendations', link: 'recommendations-integrations', openIndexMenu: true },
+			{ label: 'Search', link: 'search-builder', openIndexMenu: true },
+			{ label: 'Recommendations', link: 'recommendations-builder', openIndexMenu: true },
 		],
 		tag: 'Beta',
 	},
