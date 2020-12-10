@@ -41,7 +41,6 @@ class PreferencesFormWrapper extends React.Component {
 			noFilterItem: 'No items Found',
 			noResultItem: 'No Results Found!',
 			noSuggestion: 'No suggestions found for <mark>[term]</mark>',
-			fetchingSuggestion: 'Loading Suggestions',
 			fetchingFilterOptions: 'Fetching Options',
 			searchText: 'Click here to search',
 			searchIcon: ['', validateURL],
@@ -67,7 +66,6 @@ class PreferencesFormWrapper extends React.Component {
 		// Recommendation Specific controls
 		ctaTitle: 'View Product',
 		ctaAction: CtaActions.REDIRECT_TO_PRODUCT,
-		customCssRecommendation: '',
 		recommendations: FormBuilder.array([]),
 	});
 
@@ -157,6 +155,7 @@ class PreferencesFormWrapper extends React.Component {
 		return {
 			themeSettings: {
 				type: get(formValue, 'themeType'),
+				customCss: get(formValue, 'customCss'),
 				rsConfig: {
 					colors: {
 						primaryColor: get(formValue, 'primaryColor'),
@@ -172,7 +171,6 @@ class PreferencesFormWrapper extends React.Component {
 			globalSettings: {
 				currency: get(formValue, 'storeInfo.currency'),
 				showSelectedFilters: get(formValue, 'showSelectedFilters'),
-				customCss: get(formValue, 'customCss'),
 			},
 			appbaseSettings: {
 				index,
@@ -193,16 +191,13 @@ class PreferencesFormWrapper extends React.Component {
 					resultStats: get(formValue, 'customMessages.resultStats'),
 					noResults: get(formValue, 'customMessages.noResultItem'),
 				},
-				showDescription: true,
 				rsConfig: {
 					pagination: get(formValue, 'showPagination'),
 					infiniteScroll: !get(formValue, 'showPagination'),
 				},
 			},
 			searchSettings: {
-				showPopularSearches: get(formValue, 'showPopularSearches'),
 				customMessages: {
-					loading: get(formValue, 'customMessages.fetchingSuggestion'),
 					noResults: get(formValue, 'customMessages.noSuggestion'),
 				},
 				searchButton: {
@@ -216,7 +211,9 @@ class PreferencesFormWrapper extends React.Component {
 					image: get(formValue, 'resultImage'),
 					handle: get(formValue, 'resultHandle'),
 				},
-				rsConfig: {},
+				rsConfig: {
+					enablePopularSearches: get(formValue, 'showPopularSearches'),
+				},
 			},
 			facetSettings: {
 				staticFacets: [
@@ -341,7 +338,6 @@ class PreferencesFormWrapper extends React.Component {
 			recommendationSettings: {
 				ctaTitle: get(formValue, 'ctaTitle'),
 				ctaAction: get(formValue, 'ctaAction'),
-				customCssRecommendation: get(formValue, 'customCssRecommendation'),
 				recommendations: get(formValue, 'recommendations', []).map((item) => {
 					let dataField;
 					let productsPageUrl;
@@ -365,7 +361,6 @@ class PreferencesFormWrapper extends React.Component {
 				}),
 			},
 			exportType: get(formValue, 'exportSettings.type'),
-			openAsPage: get(formValue, 'exportSettings.openAsPage'),
 		};
 	};
 

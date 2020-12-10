@@ -10,7 +10,7 @@ export const codeStyle = css`
 `;
 
 const CustomCssRecommendations = () => (
-	<FieldControl name="customCssRecommendation">
+	<FieldControl name="customCss">
 		{({ handler }) => (
 			<Row gutter={32}>
 				<h2>Custom CSS</h2>
