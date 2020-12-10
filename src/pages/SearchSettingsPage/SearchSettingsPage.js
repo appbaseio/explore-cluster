@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import get from 'lodash/get';
 
 import { connect } from 'react-redux';
-import { Card, Divider, Skeleton, Button, Tooltip, Icon, Modal } from 'antd';
+import { Card, Divider, Skeleton, Button, Tooltip, Icon } from 'antd';
 import {
 	getDefaultSettings,
 	putSettings,
@@ -25,8 +25,6 @@ import MappingWrapper from '../../components/MappingsWrapper';
 import SettingsFooter from '../../components/SettingsFooter';
 import RankFeature from './components/RankFeature';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
-
-const { confirm } = Modal;
 
 const bannerDetails = {
 	title: 'Search Settings',
@@ -351,36 +349,6 @@ class SearchSettingsPage extends React.Component {
 		});
 	};
 
-	showConfirmRemoveFields = (removeFieldsFunction) => {
-		confirm({
-			title: 'Do you want to remove all the search fields?',
-			content:
-				'It is recommended to have multiple search fields to increase your search efficiency. If you click OK, please consider adding it manually from the dropdown below.',
-			onOk() {
-				removeFieldsFunction();
-			},
-		});
-	};
-
-	removeAllSearchableFields = () => {
-		const { appName, localRelevancy, updateLocalRelevancy } = this.props;
-		updateLocalRelevancy(appName, {
-			...localRelevancy,
-			search: {
-				...get(localRelevancy, `search`, {}),
-				dataField: [],
-				fieldWeights: [],
-			},
-		});
-	};
-
-	disableRemoveAllButton = () => {
-		const { localRelevancy } = this.props;
-		const { fieldWeights, dataField } = get(localRelevancy, `search`);
-		if (fieldWeights.length > 0 && dataField.length > 0) return false;
-		return true;
-	};
-
 	handleAddSearchField = ({ field, setMapping }) => {
 		const { localRelevancy, appName, updateLocalRelevancy } = this.props;
 		const { fieldWeights, dataField } = get(localRelevancy, `search`);
@@ -469,23 +437,6 @@ class SearchSettingsPage extends React.Component {
 										>
 											<Icon type="reload" />
 											Reload Mappings
-										</Button>
-									</Tooltip>
-									<Tooltip title="Clear all searchable fields">
-										<Button
-											style={{
-												marginRight: 8,
-												color: '#cf1322',
-											}}
-											onClick={() =>
-												this.showConfirmRemoveFields(
-													this.removeAllSearchableFields,
-												)
-											}
-											disabled={this.disableRemoveAllButton()}
-										>
-											<Icon type="delete" />
-											Remove All Fields
 										</Button>
 									</Tooltip>
 									<div style={{ marginTop: 20 }}>
