@@ -16,7 +16,7 @@ const defaultRecommendationScript = `<div id="reactivesearch-shopify-product-rec
 const ExportToHackable = ({ control, preferences, isRecommendation, widgetId }) => {
 	// Override user credentials to API credentials selected by user
 	const credentials = control.get('credentials') ? control.get('credentials').value : undefined;
-	const installationHeadScript = getCSBScript(preferences(), credentials);
+	const installationHeadScript = getCSBScript(preferences(), credentials, isRecommendation);
 	const ctaScript = `<div id="reactivesearch-shopify"></div>`;
 	const recommendationScript = getRecommendationScript(widgetId);
 	return (

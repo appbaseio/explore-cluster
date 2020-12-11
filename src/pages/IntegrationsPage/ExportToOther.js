@@ -17,7 +17,11 @@ const copyToClipboard = () => {
 const ExportToOther = ({ control, preferences, isRecommendation, widgetId }) => {
 	// Override user credentials to API credentials selected by user
 	const credentials = control.get('credentials') ? control.get('credentials').value : undefined;
-	const installationHeadScript = getInstallationHeadScript(preferences(), credentials);
+	const installationHeadScript = getInstallationHeadScript(
+		preferences(),
+		credentials,
+		isRecommendation,
+	);
 	const installationBodyScript = getInstallationBodyScript(preferences());
 	const recommendationScript = getRecommendationScript(widgetId);
 	const ctaScript = getCTAScript(preferences());

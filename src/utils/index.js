@@ -705,11 +705,16 @@ export const getAuthorizedViews = (routes = {}, allowedActions = []) => {
 	);
 
 	return Object.keys(routes)
-		.filter(
-			(r) =>
-				(hasOverviewPageAccess && !get(routes, `${r}.action`)) ||
-				allowedActions.includes(get(routes, `${r}.action`)),
-		)
+		.filter((r) => {
+			const routeAction = get(routes, `${r}.action`);
+			return (
+				(hasOverviewPageAccess && !routeAction) ||
+				allowedActions.includes(routeAction) ||
+				// Allow access to search relevancy if access control is search relevancy or overview
+				((routeAction === ALLOWED_ACTIONS.SEARCH_RELEVANCY || !routeAction) &&
+					allowedActions.includes(ALLOWED_ACTIONS.UI_BUILDER))
+			);
+		})
 		.reduce((res, key) => {
 			return {
 				...res,

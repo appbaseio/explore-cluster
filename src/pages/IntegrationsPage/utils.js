@@ -195,7 +195,7 @@ export const BaseURL = 'https://appbase-ecomm.netlify.app/static/js/main.js';
 export const BaseCSSURL = 'https://appbase-ecomm.netlify.app/static/css/main.css';
 
 export const getInstallationScript = (preferences = {}, credentials) => `
-<script>var PREFERENCES=${JSON.stringify(
+<script>var APPBASE_SEARCH_PREFERENCES=${JSON.stringify(
 	JSON.stringify({
 		...preferences,
 		appbaseSettings: {
@@ -205,12 +205,12 @@ export const getInstallationScript = (preferences = {}, credentials) => `
 	}),
 )};</script>
 <div id="reactivesearch-shopify-1" ${preferences.openAsPage ? `openAsPage="true"` : ''}></div>
-<link rel="stylesheet" href=${BaseCSSURL}>
-<script defer src=${BaseURL}></script>
+<link rel="stylesheet" href="${BaseCSSURL}">
+<script defer src="${BaseURL}"></script>
 		`;
 
 export const getInstallationScriptRecommendation = (preferences = {}, credentials, widgetId) => `
-<script>var PREFERENCES=${JSON.stringify(
+<script>var APPBASE_RECOMMENDATIONS_PREFERENCES=${JSON.stringify(
 	JSON.stringify({
 		...preferences,
 		appbaseSettings: {
@@ -220,14 +220,20 @@ export const getInstallationScriptRecommendation = (preferences = {}, credential
 	}),
 )};</script>
 <div id="reactivesearch-shopify-product-recommendations-1" ${
-	widgetId ? `widget-id=${widgetId}` : ''
+	widgetId ? `widget-id="${widgetId}"` : ''
 }></div>
-<link rel="stylesheet" href=${BaseCSSURL}>
-<script defer src=${BaseURL}></script>
+<link rel="stylesheet" href="${BaseCSSURL}">
+<script defer src="${BaseURL}"></script>
 		`;
 
-export const getInstallationHeadScript = (preferences = {}, credentials) => `
-<script>var PREFERENCES=${JSON.stringify(
+export const getInstallationHeadScript = (
+	preferences = {},
+	credentials,
+	isRecommendation = false,
+) => `
+<script>var ${
+	isRecommendation ? 'APPBASE_RECOMMENDATIONS_PREFERENCES' : 'APPBASE_SEARCH_PREFERENCES'
+}=${JSON.stringify(
 	JSON.stringify({
 		...preferences,
 		appbaseSettings: {
@@ -236,11 +242,11 @@ export const getInstallationHeadScript = (preferences = {}, credentials) => `
 		},
 	}),
 )};</script>
-<link rel="stylesheet" href=${BaseCSSURL}>
+<link rel="stylesheet" href="${BaseCSSURL}">
 		`;
 
 export const getInstallationBodyScript = () => `
-<script defer src=${BaseURL}></script>
+<script defer src="${BaseURL}"></script>
 		`;
 
 export const getCTAScript = (preferences = {}) => `
@@ -249,11 +255,13 @@ export const getCTAScript = (preferences = {}) => `
 
 export const getRecommendationScript = (widgetId) => `
 <div id="reactivesearch-shopify-product-recommendations-1" ${
-	widgetId ? `widget-id=${widgetId}` : ''
+	widgetId ? `widget-id="${widgetId}"` : ''
 }></div>
 		`;
-export const getCSBScript = (preferences = {}, credentials) => `
-<script>var PREFERENCES=${JSON.stringify(
+export const getCSBScript = (preferences = {}, credentials, isRecommendation = false) => `
+<script>var ${
+	isRecommendation ? 'APPBASE_RECOMMENDATIONS_PREFERENCES' : 'APPBASE_SEARCH_PREFERENCES'
+}=${JSON.stringify(
 	JSON.stringify({
 		...preferences,
 		appbaseSettings: {

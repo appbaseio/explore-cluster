@@ -69,8 +69,7 @@ export const APP_ROUTES = {
 	},
 	'UI Builder': {
 		icon: 'control',
-		// TODO: Integrate access control
-		// action: ALLOWED_ACTIONS.UI_INTEGRATIONS,
+		action: ALLOWED_ACTIONS.UI_BUILDER,
 		menu: [
 			{ label: 'Search', link: 'search-builder' },
 			{ label: 'Recommendations', link: 'recommendations-builder' },
@@ -181,7 +180,7 @@ export const CLUSTER_ROUTES = {
 	},
 	'UI Builder': {
 		icon: 'control',
-		// action: ALLOWED_ACTIONS.UI_INTEGRATIONS,
+		action: ALLOWED_ACTIONS.UI_BUILDER,
 		menu: [
 			{ label: 'Search', link: 'search-builder', openIndexMenu: true },
 			{ label: 'Recommendations', link: 'recommendations-builder', openIndexMenu: true },

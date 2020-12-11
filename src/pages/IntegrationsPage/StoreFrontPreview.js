@@ -32,7 +32,16 @@ class StoreFrontPreview extends React.Component {
 			div.setAttribute('ispreview', true);
 		}
 		// Set preferences
-		this.iframeRef.current.contentWindow.PREFERENCES = JSON.stringify(preferences());
+		if (isRecommendation) {
+			this.iframeRef.current.contentWindow.APPBASE_RECOMMENDATIONS_PREFERENCES = JSON.stringify(
+				preferences(),
+			);
+		} else {
+			this.iframeRef.current.contentWindow.APPBASE_SEARCH_PREFERENCES = JSON.stringify(
+				preferences(),
+			);
+		}
+
 		this.iframeRef.current.contentDocument.body.appendChild(div);
 		const link = this.iframeRef.current.contentDocument.createElement('link');
 		link.rel = 'stylesheet';
