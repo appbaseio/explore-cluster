@@ -1,5 +1,5 @@
 import React from 'react';
-import { func, object, bool, number } from 'prop-types';
+import { func, object, bool, number, oneOfType, string } from 'prop-types';
 import { Button, message } from 'antd';
 import { FieldControl, FieldGroup } from 'react-reactive-form';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -228,7 +228,7 @@ ExportToHackable.propTypes = {
 	preferences: func.isRequired,
 	control: object.isRequired,
 	isRecommendation: bool,
-	widgetId: number,
+	widgetId: oneOfType([number, string]),
 };
 
 export default ExportToHackable;

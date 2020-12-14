@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Modal, Form, Switch, Radio } from 'antd';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
-import { func, object, number, bool } from 'prop-types';
+import { func, object, number, bool, oneOfType, string } from 'prop-types';
 import get from 'lodash/get';
 import ExportToShopify from './ExportToShopify';
 import ExportToOther from './ExportToOther';
@@ -166,7 +166,7 @@ ExportModal.propTypes = {
 	preferences: func.isRequired,
 	isRecommendation: bool,
 	buttonProps: object,
-	widgetId: number,
+	widgetId: oneOfType([number, string]),
 };
 
 ExportModal.defaultProps = {

@@ -6,9 +6,9 @@ import HelpTab from '../tabs/Help';
 import ChoosePlatformTab from '../tabs/ChoosePlatform';
 import { container } from '../../ResultsPage/styles';
 import PreviewModal from '../PreviewModal';
-import ExportModal from '../ExportModal';
 import SyncStatus from '../SyncStatus';
 import PreferencesFormWrapper from '../PreferencesFormWraper';
+import SavePreferences from '../SavePreferences';
 
 const { TabPane } = Tabs;
 
@@ -16,8 +16,8 @@ const Main = () => {
 	const [activeTab, handleTabChange] = useState('1');
 	const isSettingsTabActive = activeTab === '3';
 	return (
-		<PreferencesFormWrapper>
-			{({ getPreferences, form }) => (
+		<PreferencesFormWrapper isRecommendation>
+			{({ getPreferences, getPreferencesPayload, form }) => (
 				<>
 					<SyncStatus form={form} />
 					<div
@@ -42,24 +42,18 @@ const Main = () => {
 								<HelpTab />
 							</TabPane>
 						</Tabs>
-						{/** TODO: SHOW MODAL BASED ON CONDITION */}
-						{isSettingsTabActive ? (
-							<Affix
-								offsetBottom={0}
-								style={{
-									backgroundColor: '#fff',
-									padding: '15px 10px',
-									width: 'calc(100% - 50px)',
-								}}
-							>
-								<div className="flex space-between card-footer">
-									<div>
-										{!isSettingsTabActive && (
-											<ExportModal preferences={getPreferences} />
-										)}
-									</div>
-
-									<div>
+						<Affix
+							offsetBottom={0}
+							style={{
+								backgroundColor: '#fff',
+								padding: '15px 10px',
+								width: 'calc(100% - 50px)',
+							}}
+						>
+							<div className="flex space-between card-footer">
+								<div />
+								<div>
+									{isSettingsTabActive && (
 										<PreviewModal
 											isRecommendation
 											preferences={getPreferences}
@@ -67,10 +61,15 @@ const Main = () => {
 												isSettingsTabActive ? 'Settings Preview' : undefined
 											}
 										/>
-									</div>
+									)}
+
+									<SavePreferences
+										isRecommendation
+										getPreferencesPayload={getPreferencesPayload}
+									/>
 								</div>
-							</Affix>
-						) : null}
+							</div>
+						</Affix>
 					</div>
 				</>
 			)}

@@ -29,13 +29,13 @@ class SyncStatus extends React.Component {
 	componentDidMount() {
 		const { form } = this.props;
 		const exportTypeHandler = form.get('exportSettings.type');
-		exportTypeHandler.valueChanges.subscribe((value) => {
-			const { exportType } = this.state;
-			if (exportType !== value)
-				this.setState({
-					exportType: value,
-				});
-		});
+		exportTypeHandler.valueChanges.subscribe(this.handleTypeChange);
+	}
+
+	componentWillUnmount() {
+		const { form } = this.props;
+		const exportTypeHandler = form.get('exportSettings.type');
+		exportTypeHandler.valueChanges.unsubscribe(this.handleTypeChange);
 	}
 
 	get resyncURL() {
@@ -47,6 +47,14 @@ class SyncStatus extends React.Component {
 		const { exportType } = this.state;
 		return exportType === 'shopify';
 	}
+
+	handleTypeChange = (value) => {
+		const { exportType } = this.state;
+		if (exportType !== value)
+			this.setState({
+				exportType: value,
+			});
+	};
 
 	fetchData = () => {
 		const { index } = this.props;

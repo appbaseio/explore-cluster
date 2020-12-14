@@ -1,6 +1,6 @@
 import React from 'react';
 import { FieldControl, FieldGroup } from 'react-reactive-form';
-import { func, object, bool, number } from 'prop-types';
+import { func, object, bool, number, oneOfType, string } from 'prop-types';
 import { Button, message } from 'antd';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import {
@@ -200,7 +200,7 @@ const ExportToOther = ({ control, preferences, isRecommendation, widgetId }) => 
 ExportToOther.propTypes = {
 	preferences: func.isRequired,
 	isRecommendation: bool,
-	widgetId: number,
+	widgetId: oneOfType([number, string]),
 	control: object.isRequired,
 };
 

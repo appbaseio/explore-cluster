@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Modal } from 'antd';
 import { css } from 'react-emotion';
-import { func, string, bool, object, number } from 'prop-types';
+import { func, string, bool, object, number, oneOfType } from 'prop-types';
 import StoreFrontPreview from './StoreFrontPreview';
 
 const modalStyles = css`
@@ -81,7 +81,7 @@ PreviewModal.propTypes = {
 	preferences: func.isRequired,
 	isRecommendation: bool,
 	label: string,
-	widgetId: number,
+	widgetId: oneOfType([number, string]),
 	buttonProps: object,
 };
 

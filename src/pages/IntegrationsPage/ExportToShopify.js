@@ -1,5 +1,5 @@
 import React from 'react';
-import { func, object, bool, number } from 'prop-types';
+import { func, object, bool, number, oneOfType, string } from 'prop-types';
 import { Button, message, Modal } from 'antd';
 import { FieldControl, FieldGroup } from 'react-reactive-form';
 import { css } from 'emotion';
@@ -223,7 +223,7 @@ ExportToShopify.propTypes = {
 	preferences: func.isRequired,
 	control: object.isRequired,
 	isRecommendation: bool,
-	widgetId: number,
+	widgetId: oneOfType([number, string]),
 };
 
 export default ExportToShopify;

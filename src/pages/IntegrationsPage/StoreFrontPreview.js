@@ -1,5 +1,5 @@
 import React from 'react';
-import { func, bool, number } from 'prop-types';
+import { func, bool, number, oneOfType, string } from 'prop-types';
 import { Button, Icon } from 'antd';
 import Loader from '../../components/Loader';
 import { BaseURL, BaseCSSURL } from './utils';
@@ -120,7 +120,7 @@ StoreFrontPreview.defaultProps = {
 StoreFrontPreview.propTypes = {
 	preferences: func.isRequired,
 	isRecommendation: bool,
-	widgetId: number,
+	widgetId: oneOfType([number, string]),
 };
 
 export default StoreFrontPreview;
