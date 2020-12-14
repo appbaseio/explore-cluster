@@ -319,6 +319,7 @@ export const getRecommendationForm = (recommendationType) => {
 	const isMostRecent = recommendationType === RecommendationTypes.MOST_RECENT;
 	const isSimilarTo = recommendationType === RecommendationTypes.SIMILAR_PRODUCTS;
 	const isProductsPageURLEnabled = recommendationType === RecommendationTypes.SIMILAR_PRODUCTS;
+	const isFeaturedProducts = recommendationType === RecommendationTypes.FEATURED_PRODUCTS;
 	return FormBuilder.group({
 		id: new Date().getTime(),
 		title: 'You might also like',
@@ -339,6 +340,7 @@ export const getRecommendationForm = (recommendationType) => {
 				Validators.required,
 			],
 		}),
+		docIds: [{ value: [], disabled: !isFeaturedProducts }, Validators.required],
 	});
 };
 
@@ -365,7 +367,7 @@ export const RecommendationTypes = {
 	MOST_POPULAR_PRODUCTS: 'most_popular',
 	MOST_RECENT: 'most_recent',
 	SIMILAR_PRODUCTS: 'similar',
-	// FEATURED_PRODUCTS: 'featured',
+	FEATURED_PRODUCTS: 'featured',
 };
 
 export const RecommendationTypeLabels = {
@@ -399,4 +401,5 @@ export const messages = {
 	dataFieldSimilarProduct:
 		'Select the data field that should match with the current product on products page.',
 	dataFieldMostRecent: 'Select the timestamp field to sort the products.',
+	featuredProducts: 'Select the products to be featured.',
 };

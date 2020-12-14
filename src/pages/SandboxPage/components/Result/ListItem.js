@@ -2,7 +2,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Tooltip, Row, Col, Divider, Popover, Tag, Icon } from 'antd';
+import { Tooltip, Row, Col, Divider, Popover, Tag, Icon, Button } from 'antd';
 
 import { listItem } from './styles';
 import Grading from './Grading';
@@ -17,13 +17,51 @@ const getObjKeys = ({ hasOverflow, collapsed, data }) => {
 };
 
 class ListItem extends React.Component {
-	shouldComponentUpdate(nextProps) {
-		const { item } = this.props;
-		return JSON.stringify(item) !== JSON.stringify(nextProps.item);
+	state = {
+		isPopoverVisible: false,
+		popoverContent: 'Add',
+	};
+
+	componentDidMount() {
+		const { value, item } = this.props;
+		if (value.includes(item._id)) this.setState({ popoverContent: 'Remove' });
 	}
 
-	render() {
+	shouldComponentUpdate(nextProps, nextState) {
 		const { item } = this.props;
+		const { popoverContent } = this.state;
+		return (
+			JSON.stringify(item) !== JSON.stringify(nextProps.item) ||
+			popoverContent !== nextState.popoverContent
+		);
+	}
+
+	hidePopover = () => {
+		this.setState({
+			isPopoverVisible: false,
+		});
+	};
+
+	openPopover = () => {
+		this.setState({
+			isPopoverVisible: true,
+		});
+	};
+
+	handleFeaturedContent = (itemId) => {
+		const { onChange } = this.props;
+		this.setState((prevState) => {
+			if (prevState.popoverContent === 'Add') {
+				return { ...prevState, popoverContent: 'Remove' };
+			}
+			return { ...prevState, popoverContent: 'Add' };
+		});
+		onChange(itemId);
+	};
+
+	render() {
+		const { item, showingFeaturedProducts } = this.props;
+		const { popoverContent } = this.state;
 		const { _promoted, _click_id, _index, highlight, _type, index, ...rest } = item;
 
 		return (
@@ -34,6 +72,30 @@ class ListItem extends React.Component {
 							<Icon type="star" />
 						</Tag>
 					</Tooltip>
+				)}
+				{showingFeaturedProducts && (
+					<Popover content={<h4>{`Click to ${popoverContent} item`}</h4>} trigger="hover">
+						{popoverContent === 'Add' ? (
+							<Button
+								type="primary"
+								ghost
+								style={{ float: 'right', width: 125 }}
+								onClick={() => this.handleFeaturedContent(item._id)}
+							>
+								Feature
+							</Button>
+						) : (
+							<Button
+								type="primary"
+								ghost
+								style={{ float: 'right', width: 125 }}
+								onClick={() => this.handleFeaturedContent(item._id)}
+							>
+								<Icon type="check" />
+								Featured
+							</Button>
+						)}
+					</Popover>
 				)}
 				<Expand>
 					{({ hasOverflow, collapsed }) => (
@@ -90,10 +152,16 @@ class ListItem extends React.Component {
 
 ListItem.propTypes = {
 	item: PropTypes.object,
+	showingFeaturedProducts: PropTypes.bool,
+	value: PropTypes.array,
+	onChange: PropTypes.func,
 };
 
 ListItem.defaultProps = {
 	item: {},
+	showingFeaturedProducts: false,
+	value: [],
+	onChange: () => {},
 };
 
 export default ListItem;

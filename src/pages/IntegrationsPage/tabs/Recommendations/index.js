@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { Fragment } from 'react';
+import PropTypes, { func } from 'prop-types';
 import { FieldGroup, FieldArray, FieldControl, Validators } from 'react-reactive-form';
-import { Table, Button, Form, Select, Tooltip, Icon } from 'antd';
+import { Table, Button, Form, Select, Tooltip, Icon, Modal, Typography } from 'antd';
 import { css } from 'emotion';
-import { func } from 'prop-types';
+
 import get from 'lodash/get';
+import Loadable from 'react-loadable';
+import { connect } from 'react-redux';
 import TextInput from '../../../../components/Form/Input';
 import DataFieldSelector from '../../../../components/Form/DataFieldSelector';
 import Flex from '../../../../batteries/components/shared/Flex';
@@ -16,6 +19,29 @@ import {
 	RecommendationTypeLabels,
 	messages,
 } from '../../utils';
+import Loader from '../../../../components/Loader';
+import { modalStyles } from '../../../../components/SearchPreviewModal/SearchPreviewModal';
+import { getRawMappingsByAppName } from '../../../../batteries/modules/selectors';
+import {
+	getDefaultSettings,
+	putSettings,
+	deleteSettings,
+	getSettings as getSearchRelevancy,
+	setLocalRelevancyState,
+} from '../../../../batteries/modules/actions';
+import { getMappingsByPath, getMappingsInfo } from '../../../../utils/mappings';
+import { getSubFields } from '../../../../utils';
+import { allowedTiers } from '../../../../utils/prop-types';
+
+const { Text } = Typography;
+
+const SearchPreview = Loadable({
+	loader: () =>
+		import(
+			/* webpackChunkName: "SearchPreviewComponent" */ '../../../SandboxPage/components/SearchPreview'
+		),
+	loading: Loader,
+});
 
 const tableStyles = css`
 	tr {
@@ -37,6 +63,7 @@ class Recommendations extends React.Component {
 	state = {
 		showForm: false,
 		isEditing: false,
+		showSearchPreview: false,
 	};
 
 	columns = [
@@ -92,6 +119,47 @@ class Recommendations extends React.Component {
 		},
 	];
 
+	componentDidMount() {
+		const {
+			appName,
+			getSettingsAction,
+			settings,
+			getDefaultSettingsAction,
+			defaultSettings,
+			localRelevancy,
+		} = this.props;
+
+		if (settings && !localRelevancy) {
+			this.init({ ...settings });
+		} else {
+			getSettingsAction(appName);
+		}
+
+		if (!defaultSettings) {
+			getDefaultSettingsAction();
+		}
+	}
+
+	componentDidUpdate(prevProps) {
+		const { settings, mappings, localRelevancy, isLoading, defaultSettings } = this.props;
+
+		if (
+			JSON.stringify(settings) !== JSON.stringify(prevProps.settings) ||
+			JSON.stringify(mappings) !== JSON.stringify(prevProps.mappings)
+		) {
+			this.init({ ...(localRelevancy || settings) });
+		}
+
+		if (
+			!settings &&
+			!localRelevancy &&
+			!isLoading &&
+			JSON.stringify(defaultSettings) !== JSON.stringify(prevProps.defaultSettings)
+		) {
+			this.init({ ...defaultSettings });
+		}
+	}
+
 	get recommendationControl() {
 		// eslint-disable-next-line
 		return this.context.get('recommendations');
@@ -112,12 +180,16 @@ class Recommendations extends React.Component {
 			const dataFieldSimilarToControl = this.tempForm.get('dataFieldSimilarTo');
 			const dataFieldMostRecentControl = this.tempForm.get('dataFieldMostRecent');
 			const productsPageHandleControl = this.tempForm.get('productsPageHandle');
+			const featuredProductsControl = this.tempForm.get('docIds');
 			switch (value) {
 				case RecommendationTypes.SIMILAR_PRODUCTS:
 					dataFieldSimilarToControl.enable();
 					productsPageHandleControl.enable();
 					if (dataFieldMostRecentControl.enabled) {
 						dataFieldMostRecentControl.disable();
+					}
+					if (featuredProductsControl.enabled) {
+						featuredProductsControl.disable();
 					}
 					break;
 				case RecommendationTypes.MOST_RECENT:
@@ -126,6 +198,9 @@ class Recommendations extends React.Component {
 					}
 					if (productsPageHandleControl.enabled) {
 						productsPageHandleControl.disable();
+					}
+					if (featuredProductsControl.enabled) {
+						featuredProductsControl.disable();
 					}
 					if (!dataFieldMostRecentControl.value) {
 						dataFieldMostRecentControl.enable({ emitEvent: false });
@@ -136,6 +211,18 @@ class Recommendations extends React.Component {
 						dataFieldMostRecentControl.stateChanges.next();
 					}
 					break;
+				case RecommendationTypes.FEATURED_PRODUCTS:
+					if (dataFieldSimilarToControl.enabled) {
+						dataFieldSimilarToControl.disable();
+					}
+					if (productsPageHandleControl.enabled) {
+						productsPageHandleControl.disable();
+					}
+					if (dataFieldMostRecentControl.enabled) {
+						dataFieldMostRecentControl.disable();
+					}
+					featuredProductsControl.enable();
+					break;
 				default:
 					if (dataFieldMostRecentControl.enabled) {
 						dataFieldMostRecentControl.disable();
@@ -145,6 +232,9 @@ class Recommendations extends React.Component {
 					}
 					if (productsPageHandleControl.enabled) {
 						productsPageHandleControl.disable();
+					}
+					if (featuredProductsControl.enabled) {
+						featuredProductsControl.disable();
 					}
 			}
 		});
@@ -190,10 +280,113 @@ class Recommendations extends React.Component {
 		}
 	};
 
+	toggleSearchPreview = () => {
+		this.setState((prevState) => {
+			return {
+				...prevState,
+				showSearchPreview: !prevState.showSearchPreview,
+			};
+		});
+	};
+
+	init = (settings) => {
+		const { appName, updateLocalRelevancy, localRelevancy } = this.props;
+
+		if (!localRelevancy) {
+			updateLocalRelevancy(appName, {
+				...settings,
+			});
+		}
+
+		// initialFieldWeights for searchable fields initially if the no search fields are set!
+		this.initialFieldWeights();
+	};
+
+	initialFieldWeights = () => {
+		const {
+			settings,
+			isLoading,
+			isFetchingMapping,
+			appName,
+			localRelevancy,
+			updateLocalRelevancy,
+			mappings,
+		} = this.props;
+
+		const synonymsSettings = get(settings, 'synonyms');
+		const indexSettings = get(settings, 'indexSettings');
+		const languageSettings = get(settings, 'language');
+		const { flattenUsecase } = getMappingsInfo({
+			mappings,
+			enableNgram: indexSettings.enableNgram,
+			enableSynonyms: synonymsSettings.enabled,
+			language: languageSettings.language,
+		});
+
+		const { dataField, fieldWeights } = get(settings, `search`);
+		const hasSearchFields = flattenUsecase
+			? Object.values(flattenUsecase).some((i) => i === 'search' || 'searchaggs')
+			: false;
+		if (
+			!fieldWeights.length &&
+			!dataField.length &&
+			!isFetchingMapping &&
+			!isLoading &&
+			hasSearchFields
+		) {
+			const { enableNgram } = get(localRelevancy || settings, `indexSettings`);
+			const { language } = get(localRelevancy || settings, `language`);
+			const { enabled: enableSynonyms } = get(localRelevancy || settings, `synonyms`);
+
+			const fieldDataTuple = Object.keys(flattenUsecase).reduce(
+				(agg, item) => {
+					if (
+						flattenUsecase[item] === 'search' ||
+						flattenUsecase[item] === 'searchaggs'
+					) {
+						const fields = getSubFields({
+							fields: get(
+								getMappingsByPath({
+									mappings,
+									path: item,
+								}),
+								'fields',
+							),
+							weight: 1,
+							address: item,
+							skipSearch: enableNgram === false,
+							skipLang: !language,
+							skipSynonyms: enableSynonyms === false,
+						});
+
+						return [
+							[...agg[0], ...Object.keys(fields)],
+							[...agg[1], ...Object.values(fields)],
+						];
+					}
+
+					return agg;
+				},
+				[[], []],
+			);
+
+			updateLocalRelevancy(appName, {
+				...(localRelevancy || settings),
+				search: {
+					...get(localRelevancy || settings, `search`, {}),
+					dataField: fieldDataTuple[0],
+					fieldWeights: fieldDataTuple[1],
+				},
+			});
+		}
+	};
+
 	static contextType = FormContext;
 
 	render() {
-		const { showForm, isEditing } = this.state;
+		const { showForm, isEditing, showSearchPreview } = this.state;
+		const { appName, localRelevancy } = this.props;
+
 		return (
 			<div>
 				{showForm ? (
@@ -303,6 +496,94 @@ class Recommendations extends React.Component {
 											),
 										}}
 									/>
+									<FieldControl strict={false} name="docIds">
+										{({ handler, disabled }) => {
+											const inputHandler = handler();
+											const { value, onChange } = inputHandler;
+											if (disabled) {
+												return null;
+											}
+											return (
+												<Form.Item
+													label={
+														<span>
+															Featured Products&nbsp;
+															<Tooltip
+																title={messages.featuredProducts}
+															>
+																<Icon type="question-circle-o" />
+															</Tooltip>
+														</span>
+													}
+												>
+													{value.length > 0 ? (
+														<Fragment>
+															<Button
+																onClick={this.toggleSearchPreview}
+																style={{ width: 300 }}
+															>
+																Add / Remove Products
+															</Button>
+															<br />
+															<Text type="secondary">{`Documents selected :  ${value.length}`}</Text>
+														</Fragment>
+													) : (
+														<Button
+															onClick={this.toggleSearchPreview}
+															style={{ width: 300 }}
+														>
+															Add Products
+														</Button>
+													)}
+													{showSearchPreview && (
+														<Modal
+															className={modalStyles}
+															visible={showSearchPreview}
+															onCancel={this.toggleSearchPreview}
+															footer={null}
+															destroyOnClose
+															width={1200}
+														>
+															<SearchPreview
+																app={appName}
+																testSettings={{
+																	...localRelevancy,
+																	search: {
+																		...localRelevancy.search,
+																		fieldWeights: get(
+																			localRelevancy,
+																			'search.fieldWeights',
+																			[],
+																		).map((i) => Number(i)),
+																	},
+																}}
+																{...inputHandler}
+																hasTestSettings
+																handleModal={
+																	this.toggleSearchPreview
+																}
+																showingFeaturedProducts
+																value={value}
+																onChange={(id) => {
+																	if (value.includes(id)) {
+																		onChange(
+																			value.filter(
+																				(itemId) =>
+																					itemId !== id,
+																			),
+																		);
+																	} else {
+																		value.push(id);
+																		onChange(value);
+																	}
+																}}
+															/>
+														</Modal>
+													)}
+												</Form.Item>
+											);
+										}}
+									</FieldControl>
 
 									<FieldGroup name="productsPageHandle">
 										{({ disabled, value: formValue }) =>
@@ -444,6 +725,63 @@ class Recommendations extends React.Component {
 
 Recommendations.propTypes = {
 	getPreferences: func.isRequired,
+	appName: PropTypes.string.isRequired,
+	defaultSettings: PropTypes.object,
+	isLoading: PropTypes.bool,
+	isUpdating: PropTypes.bool,
+	resetState: PropTypes.object,
+	settings: PropTypes.object,
+	tier: allowedTiers,
+	featureSearchRelevancy: PropTypes.bool,
+	getDefaultSettingsAction: PropTypes.func.isRequired,
+	getSettingsAction: PropTypes.func.isRequired,
+	updateSettingsAction: PropTypes.func.isRequired,
+	updateLocalRelevancy: PropTypes.func.isRequired,
+	localRelevancy: PropTypes.object,
+	isFetchingMapping: PropTypes.bool.isRequired,
+	mappings: PropTypes.object,
 };
 
-export default Recommendations;
+Recommendations.defaultProps = {
+	isUpdating: false,
+	settings: null,
+	resetState: {},
+	defaultSettings: null,
+	isLoading: false,
+	tier: undefined,
+	featureSearchRelevancy: false,
+	localRelevancy: null,
+	mappings: null,
+};
+
+const mapStateToProps = (state) => {
+	const defaultSettings = get(state.$getAppSettings, `defaultSettings`);
+	const errorCode = get(state, '$getAppSettings.error.actual.code');
+	const defaultSearchSettings = errorCode === 404 ? defaultSettings : null;
+	const appName = get(state, '$getCurrentApp.name');
+	const localRelevancy = get(state, `$getLocalRelevancy.${appName}`, null);
+
+	return {
+		isLoading: get(state, '$getAppSettings.isFetching'),
+		settings: get(state, ['$getAppSettings', 'settings', appName], defaultSearchSettings),
+		isUpdating: get(state, '$getAppSettings.isUpdating'),
+		defaultSettings: get(state, '$getAppSettings.defaultSettings'),
+		appName,
+		resetState: get(state, '$getAppSettings.default', {}),
+		tier: get(state, '$getAppPlan.results.tier'),
+		featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
+		isFetchingMapping: get(state, '$getAppMappings.isFetching', false),
+		localRelevancy,
+		mappings: getRawMappingsByAppName(state) || null,
+	};
+};
+
+const mapDispatchToProps = (dispatch) => ({
+	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
+	getSettingsAction: (name) => dispatch(getSearchRelevancy(name)),
+	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
+	deleteSettingsAction: (name) => dispatch(deleteSettings(name)),
+	updateLocalRelevancy: (name, data) => dispatch(setLocalRelevancyState(name, data)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Recommendations);

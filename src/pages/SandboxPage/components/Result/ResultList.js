@@ -50,7 +50,17 @@ class ResultList extends React.Component {
 	}
 
 	render() {
-		const { data, loading, loadMore, triggerAnalytics, pagination, size } = this.props;
+		const {
+			data,
+			loading,
+			loadMore,
+			triggerAnalytics,
+			pagination,
+			size,
+			showingFeaturedProducts,
+			onChange,
+			value,
+		} = this.props;
 
 		if (loading && (!data || !data.length)) {
 			return (
@@ -62,11 +72,19 @@ class ResultList extends React.Component {
 
 		return (
 			<>
-				{data.map((item) => (
-					<div key={item._id} onClick={() => triggerAnalytics(item._click_id)}>
-						<ListItem key={item.id} item={item} />
-					</div>
-				))}
+				{data.map((item) => {
+					return (
+						<div key={item._id} onClick={() => triggerAnalytics(item._click_id)}>
+							<ListItem
+								key={item.id}
+								item={item}
+								showingFeaturedProducts={showingFeaturedProducts}
+								value={value}
+								onChange={onChange}
+							/>
+						</div>
+					);
+				})}
 
 				{pagination || (
 					<LoadMore loading={loading} loadMore={loadMore} data={data} size={size} />
@@ -83,12 +101,18 @@ ResultList.propTypes = {
 	loading: PropTypes.bool.isRequired,
 	loadMore: PropTypes.func.isRequired,
 	triggerAnalytics: PropTypes.func.isRequired,
+	showingFeaturedProducts: PropTypes.bool,
+	onChange: PropTypes.func,
+	value: PropTypes.array,
 };
 
 ResultList.defaultProps = {
 	data: null,
 	pagination: null,
 	size: 10,
+	showingFeaturedProducts: false,
+	onChange: () => {},
+	value: [],
 };
 
 export default ResultList;
