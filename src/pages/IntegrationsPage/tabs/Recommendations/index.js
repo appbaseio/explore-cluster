@@ -525,7 +525,7 @@ class Recommendations extends React.Component {
 																Add / Remove Products
 															</Button>
 															<br />
-															<Text type="secondary">{`Documents selected :  ${value.length}`}</Text>
+															<Text type="secondary">{`Featured Documents :  ${value.length}`}</Text>
 														</Fragment>
 													) : (
 														<Button
