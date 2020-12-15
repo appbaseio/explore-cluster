@@ -57,7 +57,7 @@ class ResultList extends React.Component {
 			triggerAnalytics,
 			pagination,
 			size,
-			showingFeaturedProducts,
+			showFeaturedProducts,
 			onChange,
 			value,
 		} = this.props;
@@ -78,7 +78,7 @@ class ResultList extends React.Component {
 							<ListItem
 								key={item.id}
 								item={item}
-								showingFeaturedProducts={showingFeaturedProducts}
+								showFeaturedProducts={showFeaturedProducts}
 								value={value}
 								onChange={onChange}
 							/>
@@ -101,7 +101,7 @@ ResultList.propTypes = {
 	loading: PropTypes.bool.isRequired,
 	loadMore: PropTypes.func.isRequired,
 	triggerAnalytics: PropTypes.func.isRequired,
-	showingFeaturedProducts: PropTypes.bool,
+	showFeaturedProducts: PropTypes.bool,
 	onChange: PropTypes.func,
 	value: PropTypes.array,
 };
@@ -110,7 +110,7 @@ ResultList.defaultProps = {
 	data: null,
 	pagination: null,
 	size: 10,
-	showingFeaturedProducts: false,
+	showFeaturedProducts: false,
 	onChange: () => {},
 	value: [],
 };

@@ -336,7 +336,7 @@ class SearchPreview extends React.Component {
 			handleModal,
 			tier,
 			featureGrade,
-			showingFeaturedProducts,
+			showFeaturedProducts,
 			onChange,
 			value,
 		} = this.props;
@@ -395,7 +395,7 @@ class SearchPreview extends React.Component {
 		return (
 			<Row className={container} gutter={16}>
 				<Col xs={24}>
-					{!showingFeaturedProducts && (
+					{!showFeaturedProducts && (
 						<Row className="my-16" type="flex" align="middle" justify="space-between">
 							<div>
 								<Tooltip title="Toggle to record search and click analytics events from the search relevancy view.">
@@ -441,7 +441,7 @@ class SearchPreview extends React.Component {
 					credentials={credentials}
 					url={url}
 					appbaseConfig={{
-						recordAnalytics: showingFeaturedProducts ? false : isAnalyticsEnabled,
+						recordAnalytics: showFeaturedProducts ? false : isAnalyticsEnabled,
 					}}
 				>
 					<Col md={6}>
@@ -486,7 +486,7 @@ class SearchPreview extends React.Component {
 									result={result}
 									app={app}
 									rules={rules}
-									showingFeaturedProducts={showingFeaturedProducts}
+									showFeaturedProducts={showFeaturedProducts}
 									onChange={onChange}
 									value={value}
 								/>
@@ -546,7 +546,7 @@ SearchPreview.propTypes = {
 	searchState: PropTypes.object,
 	clearState: PropTypes.func,
 	handleModal: PropTypes.func,
-	showingFeaturedProducts: PropTypes.bool,
+	showFeaturedProducts: PropTypes.bool,
 	onChange: PropTypes.func,
 	value: PropTypes.array,
 };
@@ -563,7 +563,7 @@ SearchPreview.defaultProps = {
 	isFetchingMappings: false,
 	mappings: null,
 	searchState: null,
-	showingFeaturedProducts: false,
+	showFeaturedProducts: false,
 	clearState: () => {},
 	handleModal: () => {},
 	onChange: () => {},

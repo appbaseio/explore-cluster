@@ -499,7 +499,8 @@ class Recommendations extends React.Component {
 									<FieldControl strict={false} name="docIds">
 										{({ handler, disabled }) => {
 											const inputHandler = handler();
-											const { value, onChange } = inputHandler;
+											let { value } = inputHandler;
+											const { onChange } = inputHandler;
 											if (disabled) {
 												return null;
 											}
@@ -562,16 +563,16 @@ class Recommendations extends React.Component {
 																handleModal={
 																	this.toggleSearchPreview
 																}
-																showingFeaturedProducts
+																showFeaturedProducts
 																value={value}
 																onChange={(id) => {
 																	if (value.includes(id)) {
-																		onChange(
-																			value.filter(
-																				(itemId) =>
-																					itemId !== id,
-																			),
+																		const result = value.filter(
+																			(itemId) =>
+																				itemId !== id,
 																		);
+																		value = [...result];
+																		onChange(value);
 																	} else {
 																		value.push(id);
 																		onChange(value);

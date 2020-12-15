@@ -35,7 +35,7 @@ class Result extends React.Component {
 	};
 
 	render() {
-		const { result, app, rules, showingFeaturedProducts, onChange, value } = this.props;
+		const { result, app, rules, showFeaturedProducts, onChange, value } = this.props;
 		const { view } = this.state;
 		return (
 			<Card>
@@ -112,7 +112,7 @@ class Result extends React.Component {
 				{view === 'list' ? (
 					<ListView
 						result={result}
-						showingFeaturedProducts={showingFeaturedProducts}
+						showFeaturedProducts={showFeaturedProducts}
 						value={value}
 						onChange={onChange}
 					/>
@@ -128,7 +128,7 @@ Result.propTypes = {
 	result: PropTypes.object,
 	app: PropTypes.string.isRequired,
 	rules: PropTypes.array,
-	showingFeaturedProducts: PropTypes.bool,
+	showFeaturedProducts: PropTypes.bool,
 	onChange: PropTypes.func,
 	value: PropTypes.array,
 };
@@ -136,7 +136,7 @@ Result.propTypes = {
 Result.defaultProps = {
 	result: {},
 	rules: [],
-	showingFeaturedProducts: false,
+	showFeaturedProducts: false,
 	onChange: () => {},
 	value: [],
 };

@@ -29,7 +29,7 @@ class ListView extends React.Component {
 	}
 
 	render() {
-		const { result, showingFeaturedProducts, onChange, value } = this.props;
+		const { result, showFeaturedProducts, onChange, value } = this.props;
 		return (
 			<React.Fragment>
 				<Container hasPagination={result.pagination}>
@@ -49,7 +49,7 @@ class ListView extends React.Component {
 									triggerAnalytics={triggerAnalytics}
 									pagination={result.pagination}
 									size={get(result, 'size', 10)}
-									showingFeaturedProducts={showingFeaturedProducts}
+									showFeaturedProducts={showFeaturedProducts}
 									value={value}
 									onChange={onChange}
 								/>
@@ -64,14 +64,14 @@ class ListView extends React.Component {
 
 ListView.propTypes = {
 	result: PropTypes.object,
-	showingFeaturedProducts: PropTypes.bool,
+	showFeaturedProducts: PropTypes.bool,
 	onChange: PropTypes.func,
 	value: PropTypes.array,
 };
 
 ListView.defaultProps = {
 	result: {},
-	showingFeaturedProducts: false,
+	showFeaturedProducts: false,
 	onChange: () => {},
 	value: [],
 };

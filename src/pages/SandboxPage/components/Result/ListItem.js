@@ -60,7 +60,7 @@ class ListItem extends React.Component {
 	};
 
 	render() {
-		const { item, showingFeaturedProducts } = this.props;
+		const { item, showFeaturedProducts } = this.props;
 		const { popoverContent } = this.state;
 		const { _promoted, _click_id, _index, highlight, _type, index, ...rest } = item;
 
@@ -73,7 +73,7 @@ class ListItem extends React.Component {
 						</Tag>
 					</Tooltip>
 				)}
-				{showingFeaturedProducts && (
+				{showFeaturedProducts && (
 					<Popover content={<h4>{`Click to ${popoverContent} item`}</h4>} trigger="hover">
 						{popoverContent === 'Add' ? (
 							<Button
@@ -152,14 +152,14 @@ class ListItem extends React.Component {
 
 ListItem.propTypes = {
 	item: PropTypes.object,
-	showingFeaturedProducts: PropTypes.bool,
+	showFeaturedProducts: PropTypes.bool,
 	value: PropTypes.array,
 	onChange: PropTypes.func,
 };
 
 ListItem.defaultProps = {
 	item: {},
-	showingFeaturedProducts: false,
+	showFeaturedProducts: false,
 	value: [],
 	onChange: () => {},
 };
