@@ -108,42 +108,44 @@ class PreferencesFormWrapper extends React.Component {
 			const colorFilter = this.form.get('staticFilters.color.customize.dataField');
 			const sizeFilter = this.form.get('staticFilters.size.customize.dataField');
 			const priceFilter = this.form.get('staticFilters.price.customize.dataField');
-			if (value === 'shopify') {
-				// Populate the default fields
-				this.form.patchValue({
-					resultTitle: shopifyDefaultFields.title,
-					resultDescription: shopifyDefaultFields.description,
-					resultPrice: shopifyDefaultFields.price,
-					resultImage: shopifyDefaultFields.image,
-					resultHandle: shopifyDefaultFields.handle,
-				});
+			if (this.form.get('exportSettings.type').touched) {
+				if (value === 'shopify') {
+					// Populate the default fields
+					this.form.patchValue({
+						resultTitle: shopifyDefaultFields.title,
+						resultDescription: shopifyDefaultFields.description,
+						resultPrice: shopifyDefaultFields.price,
+						resultImage: shopifyDefaultFields.image,
+						resultHandle: shopifyDefaultFields.handle,
+					});
 
-				if (colorFilter) {
-					colorFilter.patchValue(shopifyDefaultFields.color);
-				}
-				if (sizeFilter) {
-					sizeFilter.patchValue(shopifyDefaultFields.size);
-				}
-				if (priceFilter) {
-					priceFilter.patchValue(shopifyDefaultFields.price);
-				}
-			} else {
-				// Clear the default fields
-				this.form.patchValue({
-					resultTitle: '',
-					resultDescription: '',
-					resultPrice: '',
-					resultImage: '',
-					resultHandle: '',
-				});
-				if (colorFilter) {
-					colorFilter.patchValue(undefined);
-				}
-				if (sizeFilter) {
-					sizeFilter.patchValue(undefined);
-				}
-				if (priceFilter) {
-					priceFilter.patchValue(undefined);
+					if (colorFilter) {
+						colorFilter.patchValue(shopifyDefaultFields.color);
+					}
+					if (sizeFilter) {
+						sizeFilter.patchValue(shopifyDefaultFields.size);
+					}
+					if (priceFilter) {
+						priceFilter.patchValue(shopifyDefaultFields.price);
+					}
+				} else {
+					// Clear the default fields
+					this.form.patchValue({
+						resultTitle: '',
+						resultDescription: '',
+						resultPrice: '',
+						resultImage: '',
+						resultHandle: '',
+					});
+					if (colorFilter) {
+						colorFilter.patchValue(undefined);
+					}
+					if (sizeFilter) {
+						sizeFilter.patchValue(undefined);
+					}
+					if (priceFilter) {
+						priceFilter.patchValue(undefined);
+					}
 				}
 			}
 		});
@@ -243,11 +245,14 @@ class PreferencesFormWrapper extends React.Component {
 							),
 							customCss: get(preferences, 'themeSettings.customCss'),
 							// result fields
-							resultTitle: get(preferences, 'resultSettings.resultTitle'),
-							resultDescription: get(preferences, 'resultSettings.resultDescription'),
-							resultPrice: get(preferences, 'resultSettings.resultPrice'),
-							resultImage: get(preferences, 'resultSettings.resultImage'),
-							resultHandle: get(preferences, 'resultSettings.resultHandle'),
+							resultTitle: get(preferences, 'resultSettings.fields.title'),
+							resultDescription: get(
+								preferences,
+								'resultSettings.fields.description',
+							),
+							resultPrice: get(preferences, 'resultSettings.fields.price'),
+							resultImage: get(preferences, 'resultSettings.fields.image'),
+							resultHandle: get(preferences, 'resultSettings.fields.handle'),
 							exportSettings: get(preferences, 'exportSettings'),
 							...(isRecommendation
 								? {

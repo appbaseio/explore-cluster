@@ -47,6 +47,11 @@ class SavePreferences extends React.Component {
 		}
 	}
 
+	componentWillUnmount() {
+		// eslint-disable-next-line
+		this.context.valueChanges.unsubscribe(this.handleChange);
+	}
+
 	handleChange = () => {
 		const { compareChange } = this;
 		const { hasChanged } = this.state;

@@ -52,7 +52,7 @@ class DataFieldSelector extends React.Component {
 		if (control || name) {
 			return (
 				<FieldControl strict={false} name={name} control={control} {...controlProps}>
-					{({ handler, disabled }) => {
+					{({ value, handler, disabled }) => {
 						const inputHandler = handler();
 						if (hideOnDisabled && disabled) {
 							return null;
@@ -63,6 +63,14 @@ class DataFieldSelector extends React.Component {
 								{...selectProps}
 								{...inputHandler}
 								value={inputHandler.value ? inputHandler.value : undefined}
+								onSelect={(val) => {
+									if (value === val) {
+										// To unselect
+										inputHandler.onChange(undefined);
+									} else {
+										inputHandler.onChange(val);
+									}
+								}}
 								onFocus={this.getMappings}
 							>
 								{this.renderOptions()}
