@@ -16,6 +16,7 @@ import {
 	defaultSearchPreferences,
 	getSearchPreferencesPayload,
 	getRecommendationPreferencesPayload,
+	RecommendationTypes,
 } from './utils';
 import {
 	getSearchPreferences,
@@ -267,7 +268,37 @@ class PreferencesFormWrapper extends React.Component {
 										recommendations: get(
 											preferences,
 											'recommendationSettings.recommendations',
-										),
+											[],
+										).map((i) => {
+											if (i.type === RecommendationTypes.SIMILAR_PRODUCTS) {
+												const splited = (i.productsPageUrl || '').split(
+													'{',
+												);
+												return {
+													id: i.id,
+													title: i.title,
+													type: i.type,
+													maxProducts: i.maxProducts,
+													dataFieldSimilarTo: i.dataField,
+													productsPageHandle: {
+														productsPageUrlPrefix: splited[0],
+														productsPageUrlField: (
+															splited[1] || ''
+														).replace('}', ''),
+													},
+												};
+											}
+											if (i.type === RecommendationTypes.MOST_RECENT) {
+												return {
+													id: i.id,
+													title: i.title,
+													type: i.type,
+													maxProducts: i.maxProducts,
+													dataFieldMostRecent: i.dataField,
+												};
+											}
+											return i;
+										}),
 								  }
 								: {
 										showPopularSearches: get(

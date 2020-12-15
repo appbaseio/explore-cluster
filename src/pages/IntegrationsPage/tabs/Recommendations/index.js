@@ -106,7 +106,11 @@ class Recommendations extends React.Component {
 			// get the control
 			this.tempForm = this.getControlById(id);
 		} else {
-			this.tempForm = getRecommendationForm();
+			this.tempForm = getRecommendationForm(
+				undefined,
+				// eslint-disable-next-line
+				this.context.get('exportSettings.type').value,
+			);
 		}
 		const typeControl = this.tempForm.get('type');
 		typeControl.valueChanges.subscribe((value) => {
@@ -306,8 +310,13 @@ class Recommendations extends React.Component {
 									/>
 
 									<FieldGroup name="productsPageHandle">
-										{({ disabled, value: formValue }) =>
-											disabled ? null : (
+										{({ disabled, value: formValue }) => {
+											const urlField = get(
+												formValue,
+												'productsPageUrlField',
+												'',
+											).split('.keyword')[0];
+											return disabled ? null : (
 												<>
 													<TextInput
 														name="productsPageUrlPrefix"
@@ -331,13 +340,9 @@ class Recommendations extends React.Component {
 																			formValue,
 																			'productsPageUrlPrefix',
 																		)}
-																		{
-																			get(
-																				formValue,
-																				'productsPageUrlField',
-																				'',
-																			).split('.keyword')[0]
-																		}
+																		{urlField
+																			? `\${${urlField}}`
+																			: ''}
 																	</strong>
 																</>
 															),
@@ -352,8 +357,6 @@ class Recommendations extends React.Component {
 																	name="productsPageUrlField"
 																	isAggFields
 																	controlProps={{
-																		// TODO: Set only for shopify apps
-																		formState: 'handle.keyword',
 																		options: {
 																			validators:
 																				Validators.required,
@@ -371,8 +374,8 @@ class Recommendations extends React.Component {
 														}}
 													/>
 												</>
-											)
-										}
+											);
+										}}
 									</FieldGroup>
 									<TextInput
 										name="maxProducts"

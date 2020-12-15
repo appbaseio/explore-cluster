@@ -1,6 +1,6 @@
 import React from 'react';
 import { Prompt } from 'react-router-dom';
-import { bool, func, object, string } from 'prop-types';
+import { arrayOf, bool, func, object, string } from 'prop-types';
 import { Button } from 'antd';
 import get from 'lodash/get';
 import isEqual from 'lodash/isEqual';
@@ -13,6 +13,8 @@ import {
 	getSearchPreferencesByName,
 	getRecommendationsPreferencesByName,
 } from '../../batteries/modules/selectors';
+import { displayErrors } from '../../batteries/utils/helpers';
+
 import {
 	FormContext,
 	getRecommendationPreferencesPayload,
@@ -38,7 +40,8 @@ class SavePreferences extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { searchPreferences, recommendationsPreferences } = this.props;
+		const { searchPreferences, recommendationsPreferences, errors } = this.props;
+		displayErrors(errors, prevProps.errors);
 		if (
 			searchPreferences !== prevProps.searchPreferences ||
 			recommendationsPreferences !== prevProps.recommendationsPreferences
@@ -131,6 +134,7 @@ SavePreferences.defaultProps = {
 	recommendationsPreferences: getRecommendationPreferencesPayload(
 		defaultRecommendationsPreferences,
 	),
+	errors: null,
 };
 
 SavePreferences.propTypes = {
@@ -143,6 +147,7 @@ SavePreferences.propTypes = {
 	getPreferencesPayload: func.isRequired,
 	searchPreferences: object,
 	recommendationsPreferences: object,
+	errors: arrayOf(string),
 };
 
 const mapStateToProps = (state, props) => ({
@@ -151,6 +156,9 @@ const mapStateToProps = (state, props) => ({
 	isLoading: props.isRecommendation
 		? get(state, '$saveRecommendationsPreferences.isFetching')
 		: get(state, '$saveSearchPreferences.isFetching'),
+	errors: props.isRecommendation
+		? [get(state, '$saveRecommendationsPreferences.error')]
+		: [get(state, '$saveSearchPreferences.error')],
 });
 
 const mapDispatchToProps = (dispatch) => ({

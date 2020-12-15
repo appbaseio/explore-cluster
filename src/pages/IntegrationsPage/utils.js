@@ -323,7 +323,7 @@ export const getPriceFilterConfigurationForm = () => {
 	});
 };
 
-export const getRecommendationForm = (recommendationType) => {
+export const getRecommendationForm = (recommendationType, exportType) => {
 	const isMostRecent = recommendationType === RecommendationTypes.MOST_RECENT;
 	const isSimilarTo = recommendationType === RecommendationTypes.SIMILAR_PRODUCTS;
 	const isProductsPageURLEnabled = recommendationType === RecommendationTypes.SIMILAR_PRODUCTS;
@@ -333,7 +333,10 @@ export const getRecommendationForm = (recommendationType) => {
 		type: RecommendationTypes.MOST_POPULAR_PRODUCTS,
 		maxProducts: [15, Validators.min(1)],
 		dataFieldSimilarTo: [
-			{ value: isMostRecent ? 'created_at' : '', disabled: !isSimilarTo },
+			{
+				value: isMostRecent && exportType === 'shopify' ? 'created_at' : '',
+				disabled: !isSimilarTo,
+			},
 			Validators.required,
 		],
 		dataFieldMostRecent: [{ value: '', disabled: !isMostRecent }, Validators.required],
@@ -343,7 +346,10 @@ export const getRecommendationForm = (recommendationType) => {
 				Validators.required,
 			],
 			productsPageUrlField: [
-				{ value: 'handle.keyword', disabled: !isProductsPageURLEnabled },
+				{
+					value: exportType === 'shopify' ? 'handle.keyword' : undefined,
+					disabled: !isProductsPageURLEnabled,
+				},
 				Validators.required,
 			],
 		}),
@@ -563,7 +569,7 @@ export const getRecommendationPreferencesPayload = (formValue) => {
 						type: item.type,
 						productsPageUrl,
 						dataField,
-						maxProducts: item.maxProducts,
+						maxProducts: Number(item.maxProducts),
 					};
 				}),
 			},
