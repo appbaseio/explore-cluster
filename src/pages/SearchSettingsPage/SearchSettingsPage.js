@@ -445,7 +445,7 @@ class SearchSettingsPage extends React.Component {
 			);
 		}
 
-		const { fuzziness, queryFormat, queryString, searchOperators } = get(
+		const { fuzziness, queryFormat, queryString, searchOperators, dataField } = get(
 			localRelevancy,
 			`search`,
 		);
@@ -471,23 +471,27 @@ class SearchSettingsPage extends React.Component {
 											Reload Mappings
 										</Button>
 									</Tooltip>
-									<Tooltip title="Clear all searchable fields">
-										<Button
-											style={{
-												marginRight: 8,
-												color: '#cf1322',
-											}}
-											onClick={() =>
-												this.showConfirmRemoveFields(
-													this.removeAllSearchableFields,
-												)
-											}
-											disabled={this.disableRemoveAllButton()}
-										>
-											<Icon type="delete" />
-											Remove All Fields
-										</Button>
-									</Tooltip>
+
+									{dataField && dataField.length > 0 && (
+										<Tooltip title="Clear all searchable fields">
+											<Button
+												style={{
+													marginRight: 8,
+													color: '#cf1322',
+												}}
+												onClick={() =>
+													this.showConfirmRemoveFields(
+														this.removeAllSearchableFields,
+													)
+												}
+												disabled={this.disableRemoveAllButton()}
+											>
+												<Icon type="delete" />
+												Remove All Fields
+											</Button>
+										</Tooltip>
+									)}
+
 									<div style={{ marginTop: 20 }}>
 										{get(mappingWrapperProps, 'isFetchingSetting') ||
 										get(mappingWrapperProps, 'isFetchingMapping') ? (
