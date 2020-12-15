@@ -16,52 +16,10 @@ const getObjKeys = ({ hasOverflow, collapsed, data }) => {
 	return slice;
 };
 
+// eslint-disable-next-line react/prefer-stateless-function
 class ListItem extends React.Component {
-	state = {
-		isPopoverVisible: false,
-		popoverContent: 'Add',
-	};
-
-	componentDidMount() {
-		const { value, item } = this.props;
-		if (value.includes(item._id)) this.setState({ popoverContent: 'Remove' });
-	}
-
-	shouldComponentUpdate(nextProps, nextState) {
-		const { item } = this.props;
-		const { popoverContent } = this.state;
-		return (
-			JSON.stringify(item) !== JSON.stringify(nextProps.item) ||
-			popoverContent !== nextState.popoverContent
-		);
-	}
-
-	hidePopover = () => {
-		this.setState({
-			isPopoverVisible: false,
-		});
-	};
-
-	openPopover = () => {
-		this.setState({
-			isPopoverVisible: true,
-		});
-	};
-
-	handleFeaturedContent = (itemId) => {
-		const { onChange } = this.props;
-		this.setState((prevState) => {
-			if (prevState.popoverContent === 'Add') {
-				return { ...prevState, popoverContent: 'Remove' };
-			}
-			return { ...prevState, popoverContent: 'Add' };
-		});
-		onChange(itemId);
-	};
-
 	render() {
-		const { item, showFeaturedProducts } = this.props;
-		const { popoverContent } = this.state;
+		const { item, showFeaturedProducts, onChange, value } = this.props;
 		const { _promoted, _click_id, _index, highlight, _type, index, ...rest } = item;
 
 		return (
@@ -74,27 +32,28 @@ class ListItem extends React.Component {
 					</Tooltip>
 				)}
 				{showFeaturedProducts && (
-					<Popover content={<h4>{`Click to ${popoverContent} item`}</h4>} trigger="hover">
-						{popoverContent === 'Add' ? (
-							<Button
-								type="primary"
-								ghost
-								style={{ float: 'right', width: 125 }}
-								onClick={() => this.handleFeaturedContent(item._id)}
-							>
-								Feature
-							</Button>
-						) : (
-							<Button
-								type="primary"
-								ghost
-								style={{ float: 'right', width: 125 }}
-								onClick={() => this.handleFeaturedContent(item._id)}
-							>
-								<Icon type="check" />
-								Featured
-							</Button>
-						)}
+					<Popover
+						content={
+							<h4>{`Click to ${
+								value.includes(item._id) ? 'Remove' : 'Add'
+							} item`}</h4>
+						}
+						trigger="hover"
+					>
+						<Button
+							type="primary"
+							ghost
+							style={{ float: 'right', width: 125 }}
+							onClick={() => onChange(item._id)}
+						>
+							{value.includes(item._id) ? (
+								<>
+									<Icon type="check" /> Featured
+								</>
+							) : (
+								'Feature'
+							)}
+						</Button>
 					</Popover>
 				)}
 				<Expand>

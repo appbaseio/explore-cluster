@@ -499,7 +499,7 @@ class Recommendations extends React.Component {
 									<FieldControl strict={false} name="docIds">
 										{({ handler, disabled }) => {
 											const inputHandler = handler();
-											let { value } = inputHandler;
+											const { value } = inputHandler;
 											const { onChange } = inputHandler;
 											if (disabled) {
 												return null;
@@ -567,11 +567,10 @@ class Recommendations extends React.Component {
 																value={value}
 																onChange={(id) => {
 																	if (value.includes(id)) {
-																		const result = value.filter(
-																			(itemId) =>
-																				itemId !== id,
+																		value.splice(
+																			value.indexOf(id),
+																			1,
 																		);
-																		value = [...result];
 																		onChange(value);
 																	} else {
 																		value.push(id);
