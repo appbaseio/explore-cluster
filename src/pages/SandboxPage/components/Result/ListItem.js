@@ -44,7 +44,9 @@ class ListItem extends React.Component {
 							type="primary"
 							ghost
 							style={{ float: 'right', width: 125 }}
-							onClick={() => onChange(item._id)}
+							onClick={() => {
+								onChange(item._id);
+							}}
 						>
 							{value.includes(item._id) ? (
 								<>
