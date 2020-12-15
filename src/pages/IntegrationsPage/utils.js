@@ -408,3 +408,311 @@ export const messages = {
 		'Select the data field that should match with the current product on products page.',
 	dataFieldMostRecent: 'Select the timestamp field to sort the products.',
 };
+
+export const defaultRecommendationsPreferences = {
+	themeType: 'classic',
+	primaryColor: '#0B6AFF',
+	primaryTextColor: '#fff',
+	textColor: '#424242',
+	titleColor: '#424242',
+	fontFamily: 'default',
+	customCss: '',
+	resultTitle: '',
+	resultDescription: '',
+	resultPrice: '',
+	resultImage: '',
+	resultHandle: '',
+	storeInfo: { currency: 'USD' },
+	exportSettings: { exportAs: 'embed', credentials: '', openAsPage: false, type: 'other' },
+	ctaTitle: 'View Product',
+	ctaAction: 'redirect_to_product',
+	recommendations: [],
+};
+
+export const defaultSearchPreferences = {
+	themeType: 'classic',
+	primaryColor: '#0B6AFF',
+	primaryTextColor: '#fff',
+	textColor: '#424242',
+	titleColor: '#424242',
+	fontFamily: 'default',
+	customCss: '',
+	resultTitle: '',
+	resultDescription: '',
+	resultPrice: '',
+	resultImage: '',
+	resultHandle: '',
+	storeInfo: { currency: 'USD' },
+	exportSettings: { exportAs: 'embed', credentials: '', openAsPage: false, type: 'other' },
+	showPopularSearches: false,
+	showSelectedFilters: true,
+	customMessages: {
+		resultStats: '[count] products found in [time] ms',
+		noFilterItem: 'No items Found',
+		noResultItem: 'No Results Found!',
+		noSuggestion: 'No suggestions found for <mark>[term]</mark>',
+		fetchingFilterOptions: 'Fetching Options',
+		searchText: 'Click here to search',
+		searchIcon: '',
+	},
+	staticFilters: {
+		productType: {
+			enabled: false,
+			customize: {
+				queryFormat: 'or',
+				sortBy: 'count',
+				showCount: true,
+				showCheckbox: true,
+				showSearch: true,
+				showMissing: false,
+			},
+		},
+		collections: {
+			enabled: false,
+			customize: {
+				queryFormat: 'or',
+				sortBy: 'count',
+				showCount: true,
+				showCheckbox: true,
+				showSearch: true,
+				showMissing: false,
+			},
+		},
+		color: {
+			enabled: false,
+			customize: {
+				queryFormat: 'or',
+				sortBy: 'count',
+				showCount: true,
+				showCheckbox: true,
+				showSearch: true,
+				showMissing: false,
+			},
+		},
+		size: {
+			enabled: false,
+			customize: {
+				queryFormat: 'or',
+				sortBy: 'count',
+				showCount: true,
+				showCheckbox: true,
+				showSearch: true,
+				showMissing: false,
+			},
+		},
+		price: { enabled: false, customize: {} },
+	},
+	dynamicFilters: [],
+};
+
+export const getRecommendationPreferencesPayload = (formValue) => {
+	return JSON.parse(
+		JSON.stringify({
+			themeSettings: {
+				type: get(formValue, 'themeType'),
+				customCss: get(formValue, 'customCss'),
+				rsConfig: {
+					colors: {
+						primaryColor: get(formValue, 'primaryColor'),
+						primaryTextColor: get(formValue, 'primaryTextColor'),
+						textColor: get(formValue, 'textColor'),
+						titleColor: get(formValue, 'titleColor'),
+					},
+					typography: {
+						fontFamily: get(formValue, 'fontFamily'),
+					},
+				},
+			},
+			globalSettings: {
+				currency: get(formValue, 'storeInfo.currency'),
+				showSelectedFilters: !!get(formValue, 'showSelectedFilters'),
+			},
+			exportSettings: get(formValue, 'exportSettings'),
+			resultSettings: {
+				fields: {
+					title: get(formValue, 'resultTitle'),
+					description: get(formValue, 'resultDescription'),
+					price: get(formValue, 'resultPrice'),
+					image: get(formValue, 'resultImage'),
+					handle: get(formValue, 'resultHandle'),
+				},
+				customMessages: {
+					resultStats: '',
+					noResults: '',
+				},
+				rsConfig: {},
+			},
+			recommendationSettings: {
+				ctaTitle: get(formValue, 'ctaTitle'),
+				ctaAction: get(formValue, 'ctaAction'),
+				recommendations: get(formValue, 'recommendations', []).map((item) => {
+					let dataField;
+					let productsPageUrl;
+					if (item.type === RecommendationTypes.MOST_RECENT) {
+						dataField = item.dataFieldMostRecent;
+					} else if (item.type === RecommendationTypes.SIMILAR_PRODUCTS) {
+						dataField = item.dataFieldSimilarTo;
+						productsPageUrl = `${get(
+							item,
+							'productsPageHandle.productsPageUrlPrefix',
+						)}{${get(item, 'productsPageHandle.productsPageUrlField')}}`;
+					}
+					return {
+						id: String(item.id),
+						title: item.title,
+						type: item.type,
+						productsPageUrl,
+						dataField,
+						maxProducts: item.maxProducts,
+					};
+				}),
+			},
+		}),
+	);
+};
+
+export const getSearchPreferencesPayload = (formValue) => {
+	return JSON.parse(
+		JSON.stringify({
+			themeSettings: {
+				type: get(formValue, 'themeType'),
+				customCss: get(formValue, 'customCss'),
+				rsConfig: {
+					colors: {
+						primaryColor: get(formValue, 'primaryColor'),
+						primaryTextColor: get(formValue, 'primaryTextColor'),
+						textColor: get(formValue, 'textColor'),
+						titleColor: get(formValue, 'titleColor'),
+					},
+					typography: {
+						fontFamily: get(formValue, 'fontFamily'),
+					},
+				},
+			},
+			globalSettings: {
+				currency: get(formValue, 'storeInfo.currency'),
+				showSelectedFilters: !!get(formValue, 'showSelectedFilters'),
+			},
+			exportSettings: get(formValue, 'exportSettings'),
+			resultSettings: {
+				fields: {
+					title: get(formValue, 'resultTitle'),
+					description: get(formValue, 'resultDescription'),
+					price: get(formValue, 'resultPrice'),
+					image: get(formValue, 'resultImage'),
+					handle: get(formValue, 'resultHandle'),
+				},
+				customMessages: {
+					resultStats: get(formValue, 'customMessages.resultStats'),
+					noResults: get(formValue, 'customMessages.noResultItem'),
+				},
+				rsConfig: {
+					pagination: !!get(formValue, 'showPagination'),
+					infiniteScroll: !get(formValue, 'showPagination'),
+				},
+			},
+			searchSettings: {
+				customMessages: {
+					noResults: get(formValue, 'customMessages.noSuggestion'),
+				},
+				searchButton: {
+					icon: get(formValue, 'customMessages.searchIcon'),
+					text: get(formValue, 'customMessages.searchText'),
+				},
+				fields: {
+					title: get(formValue, 'resultTitle'),
+					description: get(formValue, 'resultDescription'),
+					price: get(formValue, 'resultPrice'),
+					image: get(formValue, 'resultImage'),
+					handle: get(formValue, 'resultHandle'),
+				},
+				rsConfig: {
+					enablePopularSearches: get(formValue, 'showPopularSearches'),
+				},
+			},
+			facetSettings: {
+				staticFacets: [
+					{
+						name: 'productType',
+						enabled: get(formValue, 'staticFilters.productType.enabled'),
+						isCollapsible: true,
+						customMessages: {
+							loading: get(formValue, 'customMessages.fetchingFilterOptions'),
+							noResults: get(formValue, 'customMessages.noFilterItem'),
+						},
+						rsConfig: {
+							...getMultiListProps(
+								get(formValue, 'staticFilters.productType.customize'),
+							),
+						},
+					},
+					{
+						name: 'collection',
+						enabled: get(formValue, 'staticFilters.collections.enabled'),
+						isCollapsible: true,
+						customMessages: {
+							loading: get(formValue, 'customMessages.fetchingFilterOptions'),
+							noResults: get(formValue, 'customMessages.noFilterItem'),
+						},
+						rsConfig: {
+							...getMultiListProps(
+								get(formValue, 'staticFilters.collections.customize'),
+							),
+						},
+					},
+					{
+						name: 'color',
+						enabled: get(formValue, 'staticFilters.color.enabled'),
+						isCollapsible: true,
+						customMessages: {
+							loading: get(formValue, 'customMessages.fetchingFilterOptions'),
+							noResults: get(formValue, 'customMessages.noFilterItem'),
+						},
+						rsConfig: {
+							...getMultiListProps(get(formValue, 'staticFilters.color.customize')),
+						},
+					},
+					{
+						name: 'size',
+						enabled: get(formValue, 'staticFilters.size.enabled'),
+						isCollapsible: true,
+						customMessages: {
+							loading: get(formValue, 'customMessages.fetchingFilterOptions'),
+							noResults: get(formValue, 'customMessages.noFilterItem'),
+						},
+						rsConfig: {
+							...getMultiListProps(get(formValue, 'staticFilters.size.customize')),
+						},
+					},
+					{
+						name: 'price',
+						enabled: get(formValue, 'staticFilters.price.enabled'),
+						isCollapsible: true,
+						customMessages: {
+							loading: get(formValue, 'customMessages.fetchingFilterOptions'),
+							noResults: get(formValue, 'customMessages.noFilterItem'),
+						},
+						rsConfig: {
+							...getMultiListProps(get(formValue, 'staticFilters.price.customize')),
+						},
+					},
+				],
+				dynamicFacets: get(formValue, 'dynamicFilters', []).map((filter, filterIndex) => ({
+					enabled: filter.enabled,
+					customMessages: {
+						loading: get(formValue, 'customMessages.fetchingFilterOptions'),
+						noResults: get(formValue, 'customMessages.noFilterItem'),
+					},
+					rsConfig: {
+						componentId: `${get(filter, 'customize.title', '').replace(
+							' ',
+							'_',
+						)}_${filterIndex}`,
+						filterLabel: get(filter, 'customize.title'),
+						...getMultiListProps(filter.customize),
+					},
+				})),
+			},
+		}),
+	);
+};

@@ -9,6 +9,7 @@ import PreviewModal from '../PreviewModal';
 import SyncStatus from '../SyncStatus';
 import PreferencesFormWrapper from '../PreferencesFormWraper';
 import SavePreferences from '../SavePreferences';
+import ResetPreferences from '../ResetPreferences';
 
 const { TabPane } = Tabs;
 
@@ -62,7 +63,7 @@ const Main = () => {
 											}
 										/>
 									)}
-
+									<ResetPreferences isRecommendation />
 									<SavePreferences
 										isRecommendation
 										getPreferencesPayload={getPreferencesPayload}

@@ -9,11 +9,13 @@ import {
 	shopifyDefaultFields,
 	getFilterConfigurationForm,
 	getDynamicFilterKey,
-	getMultiListProps,
 	getPriceFilterConfigurationForm,
 	getRecommendationForm,
 	CtaActions,
-	RecommendationTypes,
+	defaultRecommendationsPreferences,
+	defaultSearchPreferences,
+	getSearchPreferencesPayload,
+	getRecommendationPreferencesPayload,
 } from './utils';
 import {
 	getSearchPreferences,
@@ -148,30 +150,30 @@ class PreferencesFormWrapper extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const {
-			isRecommendation,
-			searchPreferences,
-			recommendationsPreferences,
-			recommendationSuccess,
-			searchSuccess,
-		} = this.props;
+		const { isRecommendation, searchPreferences, recommendationsPreferences } = this.props;
 		let preferences;
 		if (isRecommendation) {
-			if (
-				recommendationSuccess !== prevProps.recommendationSuccess &&
-				prevProps.recommendationsPreferences !== recommendationsPreferences
-			) {
+			if (prevProps.recommendationsPreferences !== recommendationsPreferences) {
 				preferences = recommendationsPreferences;
 			}
-		} else if (
-			searchSuccess !== prevProps.searchSuccess &&
-			prevProps.searchPreferences !== searchPreferences
-		) {
+		} else if (prevProps.searchPreferences !== searchPreferences) {
 			preferences = searchPreferences;
 		}
+		const resetFormArrayControls = () => {
+			const dynamicFilterControl = this.form.get('dynamicFilters');
+			if (dynamicFilterControl) {
+				dynamicFilterControl.controls = [];
+			}
+			const recommendationsControl = this.form.get('recommendations');
+			if (recommendationsControl) {
+				recommendationsControl.controls = [];
+			}
+		};
 		// Sync form values
 		if (preferences) {
 			try {
+				// Reset dynamic controls
+				resetFormArrayControls();
 				// Add controls for dynamic filters
 				const dynamicFilterControl = this.form.get('dynamicFilters');
 				get(preferences, 'facetSettings.dynamicFacets', []).forEach(() => {
@@ -322,253 +324,9 @@ class PreferencesFormWrapper extends React.Component {
 	getPreferencesPayload = () => {
 		const { isRecommendation } = this.props;
 		const formValue = this.form.value;
-		return JSON.parse(
-			JSON.stringify({
-				themeSettings: {
-					type: get(formValue, 'themeType'),
-					customCss: get(formValue, 'customCss'),
-					rsConfig: {
-						colors: {
-							primaryColor: get(formValue, 'primaryColor'),
-							primaryTextColor: get(formValue, 'primaryTextColor'),
-							textColor: get(formValue, 'textColor'),
-							titleColor: get(formValue, 'titleColor'),
-						},
-						typography: {
-							fontFamily: get(formValue, 'fontFamily'),
-						},
-					},
-				},
-				globalSettings: {
-					currency: get(formValue, 'storeInfo.currency'),
-					showSelectedFilters: !!get(formValue, 'showSelectedFilters'),
-				},
-				exportSettings: get(formValue, 'exportSettings'),
-				resultSettings: {
-					fields: {
-						title: get(formValue, 'resultTitle'),
-						description: get(formValue, 'resultDescription'),
-						price: get(formValue, 'resultPrice'),
-						image: get(formValue, 'resultImage'),
-						handle: get(formValue, 'resultHandle'),
-					},
-					...(isRecommendation
-						? {
-								customMessages: {
-									resultStats: '',
-									noResults: '',
-								},
-								rsConfig: {},
-						  }
-						: {
-								customMessages: {
-									resultStats: get(formValue, 'customMessages.resultStats'),
-									noResults: get(formValue, 'customMessages.noResultItem'),
-								},
-								rsConfig: {
-									pagination: !!get(formValue, 'showPagination'),
-									infiniteScroll: !get(formValue, 'showPagination'),
-								},
-						  }),
-				},
-				...(isRecommendation
-					? {
-							recommendationSettings: {
-								ctaTitle: get(formValue, 'ctaTitle'),
-								ctaAction: get(formValue, 'ctaAction'),
-								recommendations: get(formValue, 'recommendations', []).map(
-									(item) => {
-										let dataField;
-										let productsPageUrl;
-										if (item.type === RecommendationTypes.MOST_RECENT) {
-											dataField = item.dataFieldMostRecent;
-										} else if (
-											item.type === RecommendationTypes.SIMILAR_PRODUCTS
-										) {
-											dataField = item.dataFieldSimilarTo;
-											productsPageUrl = `${get(
-												item,
-												'productsPageHandle.productsPageUrlPrefix',
-											)}{${get(
-												item,
-												'productsPageHandle.productsPageUrlField',
-											)}}`;
-										}
-										return {
-											id: String(item.id),
-											title: item.title,
-											type: item.type,
-											productsPageUrl,
-											dataField,
-											maxProducts: item.maxProducts,
-										};
-									},
-								),
-							},
-					  }
-					: {
-							searchSettings: {
-								customMessages: {
-									noResults: get(formValue, 'customMessages.noSuggestion'),
-								},
-								searchButton: {
-									icon: get(formValue, 'customMessages.searchIcon'),
-									text: get(formValue, 'customMessages.searchText'),
-								},
-								fields: {
-									title: get(formValue, 'resultTitle'),
-									description: get(formValue, 'resultDescription'),
-									price: get(formValue, 'resultPrice'),
-									image: get(formValue, 'resultImage'),
-									handle: get(formValue, 'resultHandle'),
-								},
-								rsConfig: {
-									enablePopularSearches: get(formValue, 'showPopularSearches'),
-								},
-							},
-							facetSettings: {
-								staticFacets: [
-									{
-										name: 'productType',
-										enabled: get(
-											formValue,
-											'staticFilters.productType.enabled',
-										),
-										isCollapsible: true,
-										customMessages: {
-											loading: get(
-												formValue,
-												'customMessages.fetchingFilterOptions',
-											),
-											noResults: get(
-												formValue,
-												'customMessages.noFilterItem',
-											),
-										},
-										rsConfig: {
-											...getMultiListProps(
-												get(
-													formValue,
-													'staticFilters.productType.customize',
-												),
-											),
-										},
-									},
-									{
-										name: 'collection',
-										enabled: get(
-											formValue,
-											'staticFilters.collections.enabled',
-										),
-										isCollapsible: true,
-										customMessages: {
-											loading: get(
-												formValue,
-												'customMessages.fetchingFilterOptions',
-											),
-											noResults: get(
-												formValue,
-												'customMessages.noFilterItem',
-											),
-										},
-										rsConfig: {
-											...getMultiListProps(
-												get(
-													formValue,
-													'staticFilters.collections.customize',
-												),
-											),
-										},
-									},
-									{
-										name: 'color',
-										enabled: get(formValue, 'staticFilters.color.enabled'),
-										isCollapsible: true,
-										customMessages: {
-											loading: get(
-												formValue,
-												'customMessages.fetchingFilterOptions',
-											),
-											noResults: get(
-												formValue,
-												'customMessages.noFilterItem',
-											),
-										},
-										rsConfig: {
-											...getMultiListProps(
-												get(formValue, 'staticFilters.color.customize'),
-											),
-										},
-									},
-									{
-										name: 'size',
-										enabled: get(formValue, 'staticFilters.size.enabled'),
-										isCollapsible: true,
-										customMessages: {
-											loading: get(
-												formValue,
-												'customMessages.fetchingFilterOptions',
-											),
-											noResults: get(
-												formValue,
-												'customMessages.noFilterItem',
-											),
-										},
-										rsConfig: {
-											...getMultiListProps(
-												get(formValue, 'staticFilters.size.customize'),
-											),
-										},
-									},
-									{
-										name: 'price',
-										enabled: get(formValue, 'staticFilters.price.enabled'),
-										isCollapsible: true,
-										customMessages: {
-											loading: get(
-												formValue,
-												'customMessages.fetchingFilterOptions',
-											),
-											noResults: get(
-												formValue,
-												'customMessages.noFilterItem',
-											),
-										},
-										rsConfig: {
-											...getMultiListProps(
-												get(formValue, 'staticFilters.price.customize'),
-											),
-										},
-									},
-								],
-								dynamicFacets: get(formValue, 'dynamicFilters', []).map(
-									(filter, filterIndex) => ({
-										enabled: filter.enabled,
-										customMessages: {
-											loading: get(
-												formValue,
-												'customMessages.fetchingFilterOptions',
-											),
-											noResults: get(
-												formValue,
-												'customMessages.noFilterItem',
-											),
-										},
-										rsConfig: {
-											componentId: `${get(
-												filter,
-												'customize.title',
-												'',
-											).replace(' ', '_')}_${filterIndex}`,
-											filterLabel: get(filter, 'customize.title'),
-											...getMultiListProps(filter.customize),
-										},
-									}),
-								),
-							},
-					  }),
-			}),
-		);
+		return isRecommendation
+			? getRecommendationPreferencesPayload(formValue)
+			: getSearchPreferencesPayload(formValue);
 	};
 
 	getPreferences = () => {
@@ -615,10 +373,10 @@ class PreferencesFormWrapper extends React.Component {
 PreferencesFormWrapper.defaultProps = {
 	isRecommendation: false,
 	isFetchingPreferences: false,
-	searchSuccess: false,
-	recommendationSuccess: false,
-	searchPreferences: {},
-	recommendationsPreferences: {},
+	searchPreferences: getSearchPreferencesPayload(defaultSearchPreferences),
+	recommendationsPreferences: getRecommendationPreferencesPayload(
+		defaultRecommendationsPreferences,
+	),
 };
 
 PreferencesFormWrapper.propTypes = {
@@ -628,8 +386,6 @@ PreferencesFormWrapper.propTypes = {
 	fetchRecommendationsPreferences: func.isRequired,
 	isRecommendation: bool,
 	isFetchingPreferences: bool,
-	searchSuccess: bool,
-	recommendationSuccess: bool,
 	searchPreferences: object,
 	recommendationsPreferences: object,
 };
@@ -639,8 +395,6 @@ const mapStateToProps = (state) => ({
 	isFetchingPreferences:
 		get(state, '$getSearchPreferences.isFetching') ||
 		get(state, '$getRecommendationsPreferences.isFetching'),
-	searchSuccess: get(state, '$getSearchPreferences.success'),
-	recommendationSuccess: get(state, '$getRecommendationsPreferences.success'),
 	searchPreferences: getSearchPreferencesByName(state),
 	recommendationsPreferences: getRecommendationsPreferencesByName(state),
 });

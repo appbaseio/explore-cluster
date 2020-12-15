@@ -13,7 +13,13 @@ import {
 	getSearchPreferencesByName,
 	getRecommendationsPreferencesByName,
 } from '../../batteries/modules/selectors';
-import { FormContext } from './utils';
+import {
+	FormContext,
+	getRecommendationPreferencesPayload,
+	getSearchPreferencesPayload,
+	defaultSearchPreferences,
+	defaultRecommendationsPreferences,
+} from './utils';
 
 class SavePreferences extends React.Component {
 	constructor(props) {
@@ -28,10 +34,7 @@ class SavePreferences extends React.Component {
 
 	componentDidMount() {
 		// eslint-disable-next-line
-		this.context.valueChanges.subscribe((VALUE) => {
-			console.log('VALUE GOT CHANGED', VALUE);
-			this.handleChange();
-		});
+		this.context.valueChanges.subscribe(this.handleChange);
 	}
 
 	componentDidUpdate(prevProps) {
@@ -119,8 +122,10 @@ SavePreferences.defaultProps = {
 	buttonProps: null,
 	isRecommendation: false,
 	isLoading: false,
-	searchPreferences: null,
-	recommendationsPreferences: null,
+	searchPreferences: getSearchPreferencesPayload(defaultSearchPreferences),
+	recommendationsPreferences: getRecommendationPreferencesPayload(
+		defaultRecommendationsPreferences,
+	),
 };
 
 SavePreferences.propTypes = {
@@ -135,12 +140,12 @@ SavePreferences.propTypes = {
 	recommendationsPreferences: object,
 };
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state, props) => ({
 	searchPreferences: getSearchPreferencesByName(state),
 	recommendationsPreferences: getRecommendationsPreferencesByName(state),
-	isLoading:
-		get(state, '$saveSearchPreferences.isFetching') ||
-		get(state, 'saveRecommendationsPreferences.isFetching'),
+	isLoading: props.isRecommendation
+		? get(state, '$saveRecommendationsPreferences.isFetching')
+		: get(state, '$saveSearchPreferences.isFetching'),
 });
 
 const mapDispatchToProps = (dispatch) => ({

@@ -9,6 +9,7 @@ import ExportModal from '../ExportModal';
 import SyncStatus from '../SyncStatus';
 import PreferencesFormWrapper from '../PreferencesFormWraper';
 import SavePreferences from '../SavePreferences';
+import ResetPreferences from '../ResetPreferences';
 
 const { TabPane } = Tabs;
 
@@ -46,6 +47,7 @@ const Main = () => (
 							</div>
 							<div>
 								<PreviewModal preferences={getPreferences} />
+								<ResetPreferences />
 								<SavePreferences getPreferencesPayload={getPreferencesPayload} />
 							</div>
 						</div>
