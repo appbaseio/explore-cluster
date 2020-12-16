@@ -1,8 +1,9 @@
 import React from 'react';
+import { func } from 'prop-types';
 import { FieldGroup, FieldArray, FieldControl, Validators } from 'react-reactive-form';
 import { Table, Button, Form, Select, Tooltip, Icon } from 'antd';
 import { css } from 'emotion';
-import { func } from 'prop-types';
+
 import get from 'lodash/get';
 import TextInput from '../../../../components/Form/Input';
 import DataFieldSelector from '../../../../components/Form/DataFieldSelector';
@@ -16,6 +17,7 @@ import {
 	RecommendationTypeLabels,
 	messages,
 } from '../../utils';
+import SearchPreviewWrapper from './SearchPreviewWrapper';
 
 const tableStyles = css`
 	tr {
@@ -117,12 +119,16 @@ class Recommendations extends React.Component {
 			const dataFieldSimilarToControl = this.tempForm.get('dataFieldSimilarTo');
 			const dataFieldMostRecentControl = this.tempForm.get('dataFieldMostRecent');
 			const productsPageHandleControl = this.tempForm.get('productsPageHandle');
+			const featuredProductsControl = this.tempForm.get('docIds');
 			switch (value) {
 				case RecommendationTypes.SIMILAR_PRODUCTS:
 					dataFieldSimilarToControl.enable();
 					productsPageHandleControl.enable();
 					if (dataFieldMostRecentControl.enabled) {
 						dataFieldMostRecentControl.disable();
+					}
+					if (featuredProductsControl.enabled) {
+						featuredProductsControl.disable();
 					}
 					break;
 				case RecommendationTypes.MOST_RECENT:
@@ -131,6 +137,9 @@ class Recommendations extends React.Component {
 					}
 					if (productsPageHandleControl.enabled) {
 						productsPageHandleControl.disable();
+					}
+					if (featuredProductsControl.enabled) {
+						featuredProductsControl.disable();
 					}
 					if (!dataFieldMostRecentControl.value) {
 						dataFieldMostRecentControl.enable({ emitEvent: false });
@@ -141,6 +150,18 @@ class Recommendations extends React.Component {
 						dataFieldMostRecentControl.stateChanges.next();
 					}
 					break;
+				case RecommendationTypes.FEATURED_PRODUCTS:
+					if (dataFieldSimilarToControl.enabled) {
+						dataFieldSimilarToControl.disable();
+					}
+					if (productsPageHandleControl.enabled) {
+						productsPageHandleControl.disable();
+					}
+					if (dataFieldMostRecentControl.enabled) {
+						dataFieldMostRecentControl.disable();
+					}
+					featuredProductsControl.enable();
+					break;
 				default:
 					if (dataFieldMostRecentControl.enabled) {
 						dataFieldMostRecentControl.disable();
@@ -150,6 +171,9 @@ class Recommendations extends React.Component {
 					}
 					if (productsPageHandleControl.enabled) {
 						productsPageHandleControl.disable();
+					}
+					if (featuredProductsControl.enabled) {
+						featuredProductsControl.disable();
 					}
 			}
 		});
@@ -199,6 +223,7 @@ class Recommendations extends React.Component {
 
 	render() {
 		const { showForm, isEditing } = this.state;
+
 		return (
 			<div>
 				{showForm ? (
@@ -308,6 +333,35 @@ class Recommendations extends React.Component {
 											),
 										}}
 									/>
+									<FieldControl strict={false} name="docIds">
+										{({ handler, disabled }) => {
+											const inputHandler = handler();
+											const { value } = inputHandler;
+											const { onChange } = inputHandler;
+											if (disabled) {
+												return null;
+											}
+											return (
+												<Form.Item
+													label={
+														<span>
+															Featured Products&nbsp;
+															<Tooltip
+																title={messages.featuredProducts}
+															>
+																<Icon type="question-circle-o" />
+															</Tooltip>
+														</span>
+													}
+												>
+													<SearchPreviewWrapper
+														value={value}
+														onChange={onChange}
+													/>
+												</Form.Item>
+											);
+										}}
+									</FieldControl>
 
 									<FieldGroup name="productsPageHandle">
 										{({ disabled, value: formValue }) => {
