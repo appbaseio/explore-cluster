@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Select, Form } from 'antd';
-import { string, func, bool, object } from 'prop-types';
+import { string, func, bool, object, element } from 'prop-types';
 import get from 'lodash/get';
 import { FieldControl } from 'react-reactive-form';
 import { getAppMappings } from '../../batteries/modules/actions';
@@ -22,7 +22,6 @@ class DataFieldSelector extends React.Component {
 		const calcMappings = Array.isArray(traversedMappings) ? traversedMappings : [];
 		return calcMappings.map((v) => (
 			<Select.Option key={v} title={v}>
-				{/* Hide the keyword suffix */}
 				{v.split('.keyword')[0]}
 			</Select.Option>
 		));
@@ -37,6 +36,7 @@ class DataFieldSelector extends React.Component {
 			hideOnDisabled,
 			wrapInsideForm,
 			formItemProps,
+			addOptions,
 		} = this.props;
 		const selectProps = {
 			placeholder: 'Select data field',
@@ -73,6 +73,7 @@ class DataFieldSelector extends React.Component {
 								}}
 								onFocus={this.getMappings}
 							>
+								{addOptions}
 								{this.renderOptions()}
 							</Select>
 						);
@@ -101,6 +102,7 @@ DataFieldSelector.defaultProps = {
 	hideOnDisabled: false,
 	wrapInsideForm: false,
 	formItemProps: null,
+	addOptions: null,
 };
 
 DataFieldSelector.propTypes = {
@@ -116,6 +118,7 @@ DataFieldSelector.propTypes = {
 	isAggFields: bool,
 	wrapInsideForm: bool,
 	formItemProps: object,
+	addOptions: element,
 };
 
 const mapStateToProps = (state) => {

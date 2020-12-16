@@ -356,6 +356,14 @@ class Recommendations extends React.Component {
 																<DataFieldSelector
 																	name="productsPageUrlField"
 																	isAggFields
+																	addOptions={
+																		<Select.Option
+																			key="_id"
+																			title="_id"
+																		>
+																			_id
+																		</Select.Option>
+																	}
 																	controlProps={{
 																		options: {
 																			validators:
