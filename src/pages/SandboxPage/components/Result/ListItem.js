@@ -35,7 +35,7 @@ class ListItem extends React.Component {
 					<Popover
 						content={
 							<h4>{`Click to ${
-								value.includes(item._id) ? 'Remove' : 'Add'
+								value && value.includes(item._id) ? 'Remove' : 'Add'
 							} item`}</h4>
 						}
 						trigger="hover"
@@ -48,7 +48,7 @@ class ListItem extends React.Component {
 								onChange(item._id);
 							}}
 						>
-							{value.includes(item._id) ? (
+							{value && value.includes(item._id) ? (
 								<>
 									<Icon type="check" /> Featured
 								</>

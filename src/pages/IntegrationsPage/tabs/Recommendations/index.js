@@ -1,5 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { func } from 'prop-types';
 import { FieldGroup, FieldArray, FieldControl, Validators } from 'react-reactive-form';
 import { Table, Button, Form, Select, Tooltip, Icon } from 'antd';
 import { css } from 'emotion';
@@ -39,7 +39,6 @@ class Recommendations extends React.Component {
 	state = {
 		showForm: false,
 		isEditing: false,
-		showSearchPreview: false,
 	};
 
 	columns = [
@@ -213,15 +212,6 @@ class Recommendations extends React.Component {
 		if (controlIndex !== undefined) {
 			this.recommendationControl.removeAt(controlIndex);
 		}
-	};
-
-	toggleSearchPreview = () => {
-		this.setState((prevState) => {
-			return {
-				...prevState,
-				showSearchPreview: !prevState.showSearchPreview,
-			};
-		});
 	};
 
 	static contextType = FormContext;
@@ -507,7 +497,7 @@ class Recommendations extends React.Component {
 }
 
 Recommendations.propTypes = {
-	getPreferences: PropTypes.func.isRequired,
+	getPreferences: func.isRequired,
 };
 
 export default Recommendations;
