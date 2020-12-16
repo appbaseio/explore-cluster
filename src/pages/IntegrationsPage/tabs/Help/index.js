@@ -6,7 +6,9 @@ const Help = () => (
 			paddingLeft: 15,
 		}}
 	>
-		Link to the docs
+		Read the{' '}
+		<a href="http://docs.appbase.io/docs/reactivesearch/ui-builder/recommendations/">docs</a> to
+		know more.
 	</div>
 );
 
