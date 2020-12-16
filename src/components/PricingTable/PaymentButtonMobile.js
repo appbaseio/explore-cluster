@@ -1,13 +1,11 @@
 import React from 'react';
-import Stripe from 'react-stripe-checkout';
 import { Modal } from 'antd';
 import PropTypes from 'prop-types';
 import get from 'lodash/get';
 import styled from 'react-emotion';
 import { connect } from 'react-redux';
+import StripeForm from '../StripeForms/StripeForm';
 import { getAppPlanByName } from '../../batteries/modules/selectors';
-
-import { STRIPE_KEY } from '../../constants';
 import { PRICE_BY_PLANS } from '../../batteries/utils';
 import { MESSAGES } from './utils';
 
@@ -96,16 +94,19 @@ class PaymentButtonMobile extends React.Component {
 			);
 		}
 		return (
-			<Stripe
-				name={name}
-				amount={PRICE_BY_PLANS[plan] * 100}
-				token={(token) => handleToken(token, plan)}
+			<StripeForm
+				mainTitle={name}
+				buttonTitle={`Pay $${PRICE_BY_PLANS[plan]}`}
+				actionType="Clicked-Payment-Button"
+				handleToken={handleToken}
+				plan={plan}
 				disabled={isCurrentPlan}
-				stripeKey={STRIPE_KEY.LIVE}
-			>
-				{/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-				<Link css={{ color: linkColor }}>{this.text}</Link>
-			</Stripe>
+				ActionComponent={(props) => (
+					<Link css={{ color: linkColor }} {...props}>
+						{this.text}
+					</Link>
+				)}
+			/>
 		);
 	}
 }

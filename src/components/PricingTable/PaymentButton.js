@@ -1,14 +1,13 @@
 import React from 'react';
-import Stripe from 'react-stripe-checkout';
 import { Modal, Button } from 'antd';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { css } from 'emotion';
+import StripeForm from '../StripeForms/StripeForm';
 import theme from './theme';
 import { MESSAGES } from './utils';
 import { getAppPlanByName } from '../../batteries/modules/selectors';
-import { STRIPE_KEY } from '../../constants';
 import { PRICE_BY_PLANS } from '../../batteries/utils';
 import { shade } from '../../utils/media';
 
@@ -125,15 +124,19 @@ class PaymentButton extends React.Component {
 			);
 		}
 		return (
-			<Stripe
-				name={name}
-				amount={PRICE_BY_PLANS[plan] * 100}
-				token={(token) => handleToken(token, plan)}
+			<StripeForm
+				mainTitle={name}
+				buttonTitle={`Pay $${PRICE_BY_PLANS[plan]}`}
+				actionType="Clicked-Payment-Button"
+				handleToken={handleToken}
+				plan={plan}
 				disabled={isCurrentPlan}
-				stripeKey={STRIPE_KEY.LIVE}
-			>
-				<Button css={styles(color, backgroundColor)}>{this.text}</Button>
-			</Stripe>
+				ActionComponent={(props) => (
+					<Button {...props} css={styles(color, backgroundColor)}>
+						{this.text}
+					</Button>
+				)}
+			/>
 		);
 	}
 }
