@@ -2,14 +2,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, message, Popconfirm } from 'antd';
-import Stripe from 'react-stripe-checkout';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-
+import StripeForm from '../../components/StripeForms/StripeForm';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { container } from '../ResultsPage/styles';
 import { getSubscription, updateSubscription, deleteSubscription } from './api';
-import { STRIPE_KEY } from '../../constants';
 import InsightLink from './components/InsightLink';
 import Loader from '../../components/Loader';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
@@ -133,22 +131,25 @@ class ClusterInsights extends React.Component {
 									</Button>
 								</Popconfirm>
 							) : (
-								<Stripe
-									name="Curated Insights"
-									amount={50000}
-									token={this.handleToken}
-									stripeKey={STRIPE_KEY.LIVE}
-								>
-									<Button
-										loading={fetchingSubscription || updatingSubscription}
-										style={{ marginBottom: 10 }}
-										size="large"
-										type="primary"
-										block
-									>
-										Subscribe Now
-									</Button>
-								</Stripe>
+								<StripeForm
+									mainTitle="Subscription"
+									buttonTitle="Pay $500.00"
+									actionType="Subscribe-Curated-Insights"
+									handleToken={this.handleToken}
+									loading={fetchingSubscription}
+									ActionComponent={(props) => (
+										<Button
+											loading={updatingSubscription}
+											style={{ marginBottom: 10 }}
+											size="large"
+											type="primary"
+											block
+											{...props}
+										>
+											Subscribe Now
+										</Button>
+									)}
+								/>
 							)}
 						</React.Fragment>
 					)}

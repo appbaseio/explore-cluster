@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import styled, { css } from 'react-emotion';
-import { Card, Row, Collapse } from 'antd';
+import { Card, Row, Collapse, message } from 'antd';
 import { connect } from 'react-redux';
-import Stripe from 'react-stripe-checkout';
+import StripeForm from '../../components/StripeForms/StripeForm';
 import Container from '../../components/Container';
 import BannerHeader from '../../components/Banner/Header';
 import PricingTable from '../../components/PricingTable';
@@ -12,15 +12,14 @@ import Grid from '../../components/CreateCredentials/Grid';
 import GlobalLoader from '../../batteries/components/shared/Loader/Spinner';
 import Flex from '../../batteries/components/shared/Flex';
 import { getAppPlanByName } from '../../batteries/modules/selectors';
-import { updateAppPaymentMethod, getAppPlan } from '../../batteries/modules/actions';
+import { getAppPlan } from '../../batteries/modules/actions';
 import Loader from '../../batteries/components/shared/Loader';
 import { displayErrors } from '../../utils/helper';
-import { STRIPE_KEY } from '../../constants';
 import HostedArcBilling from '../../components/PricingTable/HostedArcBilling';
 import ClusterPricingTable from '../../components/PricingTable/ClusterPricingTable';
 import { PRICE_BY_PLANS, EFFECTIVE_PRICE_BY_PLANS } from '../../batteries/utils';
-import { getESVersion } from '../../batteries/utils/mappings';
-import { getVersion } from '../../constants/config';
+import { getESVersion, getAuthHeaders } from '../../batteries/utils/mappings';
+import { getVersion, getURL } from '../../constants/config';
 
 function numberWithCommas(x) {
 	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -123,6 +122,27 @@ class Billing extends Component {
 		window.Intercom('show');
 	};
 
+	updatePaymentDetails = async (token) => {
+		const { credentials } = this.props;
+		try {
+			let response = await fetch(`${getURL()}/arc/payment`, {
+				method: 'PUT',
+				headers: {
+					...getAuthHeaders(credentials),
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					token,
+				}),
+			});
+			response = await response.text();
+			response = JSON.parse(response);
+			message.success(response.message);
+		} catch (err) {
+			message.error(err.message);
+		}
+	};
+
 	render() {
 		// prettier-ignore
 		const {
@@ -130,7 +150,6 @@ class Billing extends Component {
 			isOnTrial,
 			planValidity,
 			nodeCount,
-			updatePayment,
 			isLoading,
 			subscriptionID,
 			isPaid,
@@ -138,6 +157,7 @@ class Billing extends Component {
 			isClusterBilling,
 			isFetchingPlan,
 		} = this.props;
+
 		if (isFetchingPlan) {
 			return <GlobalLoader />;
 		}
@@ -218,13 +238,7 @@ class Billing extends Component {
 									/>
 								</Flex>
 							) : null}
-							<Stripe
-								stripeKey={STRIPE_KEY.LIVE}
-								panelLabel="Update Payment"
-								token={updatePayment}
-							>
-								<StyledLink>Update Payment Method</StyledLink>
-							</Stripe>
+							<StripeForm handleToken={this.updatePaymentDetails} />
 						</Row>
 					}
 				/>
@@ -334,7 +348,6 @@ Billing.propTypes = {
 	nodeCount: PropTypes.number,
 	isAppPlanFetched: PropTypes.bool,
 	isClusterBilling: PropTypes.bool.isRequired,
-	updatePayment: PropTypes.func.isRequired,
 	isLoading: PropTypes.bool.isRequired,
 	errors: PropTypes.array.isRequired,
 	credentials: PropTypes.string.isRequired,
@@ -362,7 +375,6 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => ({
 	fetchAppPlan: () => dispatch(getAppPlan()),
-	updatePayment: (token) => dispatch(updateAppPaymentMethod(token, 'APP')),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Billing);

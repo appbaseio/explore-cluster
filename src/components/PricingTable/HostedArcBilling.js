@@ -275,12 +275,17 @@ class HostedArcBilling extends Component {
 	handleToken = (token, plan) => {
 		const { createSubscription, fetchAppPlan, subscriptionID } = this.props;
 		const isTesting = false; // SET true to test with test stripe keys
+		// const isTesting = true; // comment for production
 		if (subscriptionID) {
 			// Update plan
 			createSubscription(null, plan, isTesting).then((response) => {
 				if (response && response.payload) {
 					fetchAppPlan();
 				}
+				notification.success({
+					title: 'Subscription created successfully',
+					message: response.payload.message,
+				});
 			});
 		} else {
 			// Create subscription
@@ -288,6 +293,10 @@ class HostedArcBilling extends Component {
 				if (response && response.payload) {
 					fetchAppPlan();
 				}
+				notification.success({
+					title: 'Subscription created successfully',
+					message: response.payload.message,
+				});
 			});
 		}
 	};
