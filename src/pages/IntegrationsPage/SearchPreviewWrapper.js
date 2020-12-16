@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Modal, Typography } from 'antd';
+import { Button, Modal, Typography, Tabs } from 'antd';
 import get from 'lodash/get';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
@@ -17,6 +17,7 @@ import { getMappingsByPath, getMappingsInfo } from '../../utils/mappings';
 import { getSubFields } from '../../utils';
 
 const { Text } = Typography;
+const { TabPane } = Tabs;
 
 const SearchPreview = Loadable({
 	loader: () =>
@@ -25,6 +26,10 @@ const SearchPreview = Loadable({
 		),
 	loading: Loader,
 });
+
+const handleTabChange = (key) => {
+	console.log('Tab chnaged ==>> ', key);
+};
 class SearchPreviewWrapper extends React.Component {
 	state = {
 		visible: false,
@@ -185,24 +190,33 @@ class SearchPreviewWrapper extends React.Component {
 		} = this.props;
 		const { visible } = this.state;
 		const component = () => (
-			<SearchPreview
-				app={appName}
-				testSettings={{
-					...localRelevancy,
-					search: {
-						...localRelevancy.search,
-						fieldWeights: get(localRelevancy, 'search.fieldWeights', []).map((i) =>
-							Number(i),
-						),
-					},
-				}}
-				hasTestSettings
-				handleModal={this.toggleVisibility}
-				showFeaturedProducts
-				selectButtonLabel={selectButtonLabel}
-				value={value}
-				onChange={onChange}
-			/>
+			<Tabs defaultActiveKey="1" onChange={handleTabChange}>
+				<TabPane tab="Browse Products" key="1">
+					<SearchPreview
+						app={appName}
+						testSettings={{
+							...localRelevancy,
+							search: {
+								...localRelevancy.search,
+								fieldWeights: get(
+									localRelevancy,
+									'search.fieldWeights',
+									[],
+								).map((i) => Number(i)),
+							},
+						}}
+						hasTestSettings
+						handleModal={this.toggleVisibility}
+						showFeaturedProducts
+						selectButtonLabel={selectButtonLabel}
+						value={value}
+						onChange={onChange}
+					/>
+				</TabPane>
+				<TabPane tab="Featured List" key="2">
+					List is empty!!
+				</TabPane>
+			</Tabs>
 		);
 		if (!openWithModal) {
 			if (!localRelevancy) {
