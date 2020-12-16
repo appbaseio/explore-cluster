@@ -19,7 +19,7 @@ const getObjKeys = ({ hasOverflow, collapsed, data }) => {
 // eslint-disable-next-line react/prefer-stateless-function
 class ListItem extends React.Component {
 	render() {
-		const { item, showFeaturedProducts, onChange, value } = this.props;
+		const { item, showFeaturedProducts, onChange, value, selectButtonLabel } = this.props;
 		const { _promoted, _click_id, _index, highlight, _type, index, ...rest } = item;
 
 		return (
@@ -45,7 +45,7 @@ class ListItem extends React.Component {
 							ghost
 							style={{ float: 'right', width: 125 }}
 							onClick={() => {
-								onChange(item._id);
+								onChange(item);
 							}}
 						>
 							{value && value.includes(item._id) ? (
@@ -53,7 +53,7 @@ class ListItem extends React.Component {
 									<Icon type="check" /> Featured
 								</>
 							) : (
-								'Feature'
+								selectButtonLabel
 							)}
 						</Button>
 					</Popover>
@@ -114,6 +114,7 @@ class ListItem extends React.Component {
 ListItem.propTypes = {
 	item: PropTypes.object,
 	showFeaturedProducts: PropTypes.bool,
+	selectButtonLabel: PropTypes.string,
 	value: PropTypes.array,
 	onChange: PropTypes.func,
 };
@@ -121,6 +122,7 @@ ListItem.propTypes = {
 ListItem.defaultProps = {
 	item: {},
 	showFeaturedProducts: false,
+	selectButtonLabel: 'Feature',
 	value: [],
 	onChange: () => {},
 };

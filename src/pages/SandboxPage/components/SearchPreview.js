@@ -339,6 +339,7 @@ class SearchPreview extends React.Component {
 			showFeaturedProducts,
 			onChange,
 			value,
+			selectButtonLabel,
 		} = this.props;
 		const {
 			settings: stateSettings,
@@ -487,6 +488,7 @@ class SearchPreview extends React.Component {
 									app={app}
 									rules={rules}
 									showFeaturedProducts={showFeaturedProducts}
+									selectButtonLabel={selectButtonLabel}
 									onChange={onChange}
 									value={value}
 								/>
@@ -549,6 +551,7 @@ SearchPreview.propTypes = {
 	showFeaturedProducts: PropTypes.bool,
 	onChange: PropTypes.func,
 	value: PropTypes.array,
+	selectButtonLabel: PropTypes.string,
 };
 
 SearchPreview.defaultProps = {
@@ -568,6 +571,7 @@ SearchPreview.defaultProps = {
 	handleModal: () => {},
 	onChange: () => {},
 	value: [],
+	selectButtonLabel: undefined,
 };
 
 export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(SearchPreview));

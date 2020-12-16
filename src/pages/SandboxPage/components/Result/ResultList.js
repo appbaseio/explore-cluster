@@ -58,6 +58,7 @@ class ResultList extends React.Component {
 			pagination,
 			size,
 			showFeaturedProducts,
+			selectButtonLabel,
 			onChange,
 			value,
 		} = this.props;
@@ -81,6 +82,7 @@ class ResultList extends React.Component {
 								showFeaturedProducts={showFeaturedProducts}
 								value={value}
 								onChange={onChange}
+								selectButtonLabel={selectButtonLabel}
 							/>
 						</div>
 					);
@@ -102,6 +104,7 @@ ResultList.propTypes = {
 	loadMore: PropTypes.func.isRequired,
 	triggerAnalytics: PropTypes.func.isRequired,
 	showFeaturedProducts: PropTypes.bool,
+	selectButtonLabel: PropTypes.string,
 	onChange: PropTypes.func,
 	value: PropTypes.array,
 };
@@ -111,6 +114,7 @@ ResultList.defaultProps = {
 	pagination: null,
 	size: 10,
 	showFeaturedProducts: false,
+	selectButtonLabel: undefined,
 	onChange: () => {},
 	value: [],
 };

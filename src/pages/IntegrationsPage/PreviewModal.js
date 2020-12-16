@@ -27,11 +27,13 @@ const modalStyles = css`
 class PreviewModal extends React.Component {
 	state = {
 		visible: false,
+		currentProduct: undefined,
 	};
 
 	showModal = () => {
 		this.setState({
 			visible: true,
+			currentProduct: undefined,
 		});
 	};
 
@@ -47,13 +49,33 @@ class PreviewModal extends React.Component {
 		});
 	};
 
+	handleProductSelection = () => {
+		this.setState({
+			currentProduct: true,
+		});
+	};
+
 	render() {
-		const { visible } = this.state;
-		const { preferences, label, isRecommendation, buttonProps, widgetId } = this.props;
+		const { visible, currentProduct } = this.state;
+		const {
+			preferences,
+			label,
+			isRecommendation,
+			buttonProps,
+			widgetId,
+			displayProductPicker,
+			similarToField,
+		} = this.props;
+		let title = label;
+		if (displayProductPicker) {
+			if (!currentProduct) {
+				title = 'Select a product to continue';
+			}
+		}
 		return (
 			<React.Fragment>
 				<Modal
-					title={label}
+					title={title}
 					visible={visible}
 					okText="Save"
 					onOk={this.handleOk}
@@ -67,6 +89,10 @@ class PreviewModal extends React.Component {
 						preferences={preferences}
 						isRecommendation={isRecommendation}
 						widgetId={widgetId}
+						displayProductPicker={displayProductPicker}
+						buttonProps={buttonProps}
+						similarToField={similarToField}
+						onSelectProduct={this.handleProductSelection}
 					/>
 				</Modal>
 				<Button onClick={this.showModal} type="primary" size="large" {...buttonProps}>
@@ -80,6 +106,8 @@ class PreviewModal extends React.Component {
 PreviewModal.propTypes = {
 	preferences: func.isRequired,
 	isRecommendation: bool,
+	displayProductPicker: bool,
+	similarToField: string,
 	label: string,
 	widgetId: oneOfType([number, string]),
 	buttonProps: object,
@@ -87,6 +115,8 @@ PreviewModal.propTypes = {
 
 PreviewModal.defaultProps = {
 	widgetId: undefined,
+	similarToField: undefined,
+	displayProductPicker: false,
 	isRecommendation: false,
 	label: 'StoreFront Preview',
 	buttonProps: null,

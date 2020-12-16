@@ -4,24 +4,24 @@ import { Button, Modal, Typography } from 'antd';
 import get from 'lodash/get';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
-import Loader from '../../../../components/Loader';
-import { modalStyles } from '../../../../components/SearchPreviewModal/SearchPreviewModal';
-import { getRawMappingsByAppName } from '../../../../batteries/modules/selectors';
+import Loader from '../../components/Loader';
+import { modalStyles } from '../../components/SearchPreviewModal/SearchPreviewModal';
+import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import {
 	getDefaultSettings,
 	deleteSettings,
 	getSettings as getSearchRelevancy,
 	setLocalRelevancyState,
-} from '../../../../batteries/modules/actions';
-import { getMappingsByPath, getMappingsInfo } from '../../../../utils/mappings';
-import { getSubFields } from '../../../../utils';
+} from '../../batteries/modules/actions';
+import { getMappingsByPath, getMappingsInfo } from '../../utils/mappings';
+import { getSubFields } from '../../utils';
 
 const { Text } = Typography;
 
 const SearchPreview = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "SearchPreviewComponent" */ '../../../SandboxPage/components/SearchPreview'
+			/* webpackChunkName: "SearchPreviewComponent" */ '../SandboxPage/components/SearchPreview'
 		),
 	loading: Loader,
 });
@@ -173,13 +173,47 @@ class SearchPreviewWrapper extends React.Component {
 	};
 
 	render() {
-		const { appName, value, onChange, localRelevancy } = this.props;
+		const {
+			appName,
+			value,
+			onChange,
+			localRelevancy,
+			label,
+			buttonProps,
+			selectButtonLabel,
+			openWithModal,
+		} = this.props;
 		const { visible } = this.state;
-
+		const component = () => (
+			<SearchPreview
+				app={appName}
+				testSettings={{
+					...localRelevancy,
+					search: {
+						...localRelevancy.search,
+						fieldWeights: get(localRelevancy, 'search.fieldWeights', []).map((i) =>
+							Number(i),
+						),
+					},
+				}}
+				hasTestSettings
+				handleModal={this.toggleVisibility}
+				showFeaturedProducts
+				selectButtonLabel={selectButtonLabel}
+				value={value}
+				onChange={onChange}
+			/>
+		);
+		if (!openWithModal) {
+			if (!localRelevancy) {
+				return <Loader />;
+			}
+			return component();
+		}
 		return (
 			<Fragment>
-				<Button onClick={this.toggleVisibility} style={{ width: 300 }}>
-					Manage Products
+				<Button onClick={this.toggleVisibility} style={{ width: 300 }} {...buttonProps}>
+					{label}
 				</Button>
 				<br />
 				{value.length > 0 && (
@@ -194,33 +228,7 @@ class SearchPreviewWrapper extends React.Component {
 						destroyOnClose
 						width={1200}
 					>
-						<SearchPreview
-							app={appName}
-							testSettings={{
-								...localRelevancy,
-								search: {
-									...localRelevancy.search,
-									fieldWeights: get(
-										localRelevancy,
-										'search.fieldWeights',
-										[],
-									).map((i) => Number(i)),
-								},
-							}}
-							hasTestSettings
-							handleModal={this.toggleVisibility}
-							showFeaturedProducts
-							value={value}
-							onChange={(id) => {
-								if (value.includes(id)) {
-									value.splice(value.indexOf(id), 1);
-									onChange([...value]);
-								} else {
-									value.push(id);
-									onChange([...value]);
-								}
-							}}
-						/>
+						{component()}
 					</Modal>
 				)}
 			</Fragment>
@@ -239,17 +247,25 @@ SearchPreviewWrapper.propTypes = {
 	localRelevancy: PropTypes.object,
 	isFetchingMapping: PropTypes.bool.isRequired,
 	mappings: PropTypes.object,
+	buttonProps: PropTypes.object,
 	value: PropTypes.array,
 	onChange: PropTypes.func,
+	label: PropTypes.string,
+	selectButtonLabel: PropTypes.string,
+	openWithModal: PropTypes.bool,
 };
 
 SearchPreviewWrapper.defaultProps = {
+	label: 'Manage Products',
 	settings: null,
 	defaultSettings: null,
+	buttonProps: null,
 	isLoading: false,
+	selectButtonLabel: undefined,
 	localRelevancy: null,
 	mappings: null,
 	value: [],
+	openWithModal: true,
 	onChange: () => {},
 };
 

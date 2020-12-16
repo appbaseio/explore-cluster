@@ -17,7 +17,7 @@ import {
 	RecommendationTypeLabels,
 	messages,
 } from '../../utils';
-import SearchPreviewWrapper from './SearchPreviewWrapper';
+import SearchPreviewWrapper from '../../SearchPreviewWrapper';
 
 const tableStyles = css`
 	tr {
@@ -70,6 +70,10 @@ class Recommendations extends React.Component {
 							isRecommendation
 							widgetId={item.id}
 							label="Preview"
+							displayProductPicker={
+								item.type === RecommendationTypes.SIMILAR_PRODUCTS
+							}
+							similarToField={get(item, 'productsPageHandle.productsPageUrlField')}
 							preferences={getPreferences}
 						/>
 						<ExportModal
@@ -356,7 +360,15 @@ class Recommendations extends React.Component {
 												>
 													<SearchPreviewWrapper
 														value={value}
-														onChange={onChange}
+														onChange={({ _id }) => {
+															if (value.includes(_id)) {
+																value.splice(value.indexOf(_id), 1);
+																onChange([...value]);
+															} else {
+																value.push(_id);
+																onChange([...value]);
+															}
+														}}
 													/>
 												</Form.Item>
 											);

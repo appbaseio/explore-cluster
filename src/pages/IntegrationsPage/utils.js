@@ -557,6 +557,7 @@ export const getRecommendationPreferencesPayload = (formValue) => {
 				recommendations: get(formValue, 'recommendations', []).map((item) => {
 					let dataField;
 					let productsPageUrl;
+					let docIds;
 					if (item.type === RecommendationTypes.MOST_RECENT) {
 						dataField = item.dataFieldMostRecent;
 					} else if (item.type === RecommendationTypes.SIMILAR_PRODUCTS) {
@@ -565,6 +566,8 @@ export const getRecommendationPreferencesPayload = (formValue) => {
 							item,
 							'productsPageHandle.productsPageUrlPrefix',
 						)}{${get(item, 'productsPageHandle.productsPageUrlField')}}`;
+					} else if (item.type === RecommendationTypes.FEATURED_PRODUCTS) {
+						({ docIds } = item);
 					}
 					return {
 						id: String(item.id),
@@ -573,6 +576,7 @@ export const getRecommendationPreferencesPayload = (formValue) => {
 						productsPageUrl,
 						dataField,
 						maxProducts: Number(item.maxProducts),
+						docIds,
 					};
 				}),
 			},
