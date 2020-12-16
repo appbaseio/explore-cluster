@@ -178,18 +178,12 @@ class SearchPreviewWrapper extends React.Component {
 
 		return (
 			<Fragment>
-				{value.length > 0 ? (
-					<Fragment>
-						<Button onClick={this.toggleVisibility} style={{ width: 300 }}>
-							Add / Remove Products
-						</Button>
-						<br />
-						<Text type="secondary">{`Featured Documents :  ${value.length}`}</Text>
-					</Fragment>
-				) : (
-					<Button onClick={this.toggleVisibility} style={{ width: 300 }}>
-						Add Products
-					</Button>
+				<Button onClick={this.toggleVisibility} style={{ width: 300 }}>
+					Manage Products
+				</Button>
+				<br />
+				{value.length > 0 && (
+					<Text type="secondary">{`Featured Products :  ${value.length}`}</Text>
 				)}
 				{visible && (
 					<Modal
