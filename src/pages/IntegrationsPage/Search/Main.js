@@ -43,10 +43,17 @@ const Main = () => (
 					>
 						<div className="flex space-between card-footer">
 							<div>
-								<ExportModal preferences={getPreferences} />
+								<PreviewModal preferences={getPreferences} />
+								<ExportModal
+									preferences={getPreferences}
+									buttonProps={{
+										style: {
+											marginLeft: 10,
+										},
+									}}
+								/>
 							</div>
 							<div>
-								<PreviewModal preferences={getPreferences} />
 								<ResetPreferences />
 								<SavePreferences getPreferencesPayload={getPreferencesPayload} />
 							</div>

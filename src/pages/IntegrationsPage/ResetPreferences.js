@@ -23,13 +23,12 @@ const ResetPreferences = ({ deletePreferences, isLoading }) => (
 	>
 		<Button
 			loading={isLoading}
-			type="danger"
 			size="large"
 			style={{
 				marginLeft: 10,
 			}}
 		>
-			Reset
+			Reset to Default Preferences
 		</Button>
 	</Popconfirm>
 );

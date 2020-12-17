@@ -9,9 +9,7 @@ const copyToClipboard = () => {
 	message.success('Copied to clipboard', 5);
 };
 
-const ctaDiv = `<div id="reactivesearch-shopify"></div>`;
 const ctaChange = `<div id="reactivesearch-shopify" openAsPage="true"></div>`;
-const defaultRecommendationScript = `<div id="reactivesearch-shopify-product-recommendations"></div>`;
 
 const ExportToHackable = ({ control, preferences, isRecommendation, widgetId }) => {
 	// Override user credentials to API credentials selected by user
@@ -75,8 +73,8 @@ const ExportToHackable = ({ control, preferences, isRecommendation, widgetId }) 
 			</div>
 			{isRecommendation ? (
 				<div>
-					Replace the following snippet <strong>{defaultRecommendationScript}</strong> in{' '}
-					<strong>index.html</strong> to
+					Add the following snippet into <strong>body</strong> tag of
+					<strong>index.html</strong> file.
 					<div
 						css={{
 							position: 'relative',
@@ -117,8 +115,8 @@ const ExportToHackable = ({ control, preferences, isRecommendation, widgetId }) 
 								!value ? (
 									<div>
 										<div>
-											The following snippet in <strong>index.html</strong>{' '}
-											controls the positioning of the search CTA.
+											Add the following snippet in <strong>index.html</strong>{' '}
+											that controls the positioning of the search CTA.
 										</div>
 
 										<div
@@ -173,8 +171,8 @@ const ExportToHackable = ({ control, preferences, isRecommendation, widgetId }) 
 									</div>
 								) : (
 									<div>
-										Replace the following snippet <strong>{ctaDiv}</strong> in{' '}
-										<strong>index.html</strong> to
+										Add the following snippet into <strong>body</strong> tag of
+										<strong>index.html</strong> file.
 										<div
 											css={{
 												position: 'relative',

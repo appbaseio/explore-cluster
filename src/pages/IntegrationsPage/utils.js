@@ -204,7 +204,9 @@ export const getInstallationScript = (preferences = {}, credentials) => `
 		},
 	}),
 )};</script>
-<div id="reactivesearch-shopify-1" ${preferences.openAsPage ? `openAsPage="true"` : ''}></div>
+<div id="reactivesearch-shopify-1" ${
+	get(preferences, 'exportSettings.openAsPage') ? `openAsPage="true"` : ''
+}></div>
 <link rel="stylesheet" href="${BaseCSSURL}">
 <script defer src="${BaseURL}"></script>
 		`;
@@ -250,7 +252,9 @@ export const getInstallationBodyScript = () => `
 		`;
 
 export const getCTAScript = (preferences = {}) => `
-<div id="reactivesearch-shopify-1"${preferences.openAsPage ? ` openAsPage="true"` : ''}></div>
+<div id="reactivesearch-shopify-1"${
+	get(preferences, 'exportSettings.openAsPage') ? ` openAsPage="true"` : ''
+}></div>
 		`;
 
 export const getRecommendationScript = (widgetId) => `
@@ -454,6 +458,7 @@ export const defaultSearchPreferences = {
 	storeInfo: { currency: 'USD' },
 	exportSettings: { exportAs: 'embed', credentials: '', openAsPage: false, type: 'other' },
 	showPopularSearches: false,
+	showPagination: false,
 	showSelectedFilters: true,
 	customMessages: {
 		resultStats: '[count] products found in [time] ms',

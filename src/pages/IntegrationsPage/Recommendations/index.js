@@ -34,7 +34,7 @@ const RecommendationsIntegrationsPage = ({ tier, featureEcommerce }) => {
 					lockSectionStyle={{
 						marginTop: '20%',
 					}}
-					src="https://i.imgur.com/sHVZWTq.png"
+					src="https://i.imgur.com/EUDyu6a.png"
 					alt="integrations"
 				/>
 			</React.Fragment>

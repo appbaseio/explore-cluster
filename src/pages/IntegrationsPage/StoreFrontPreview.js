@@ -20,7 +20,9 @@ class StoreFrontPreview extends React.Component {
 	componentDidMount() {
 		const { displayProductPicker } = this.props;
 		if (!displayProductPicker) {
-			this.iframeRef.current.addEventListener('load', this.onLoad);
+			if (this.iframeRef.current) {
+				this.onLoad();
+			}
 		}
 	}
 

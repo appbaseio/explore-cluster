@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Tabs, Affix } from 'antd';
 import SettingsTab from '../tabs/Settings';
 import RecommendationsTab from '../tabs/Recommendations';
-import HelpTab from '../tabs/Help';
 import ChoosePlatformTab from '../tabs/ChoosePlatform';
 import { container } from '../../ResultsPage/styles';
 import PreviewModal from '../PreviewModal';
@@ -39,9 +38,6 @@ const Main = () => {
 							<TabPane tab="Settings" key="3">
 								<SettingsTab />
 							</TabPane>
-							<TabPane tab="Help" key="4">
-								<HelpTab />
-							</TabPane>
 						</Tabs>
 						<Affix
 							offsetBottom={0}
@@ -52,17 +48,16 @@ const Main = () => {
 							}}
 						>
 							<div className="flex space-between card-footer">
-								<div />
 								<div>
 									{isSettingsTabActive && (
 										<PreviewModal
 											isRecommendation
 											preferences={getPreferences}
-											label={
-												isSettingsTabActive ? 'Settings Preview' : undefined
-											}
+											label="Settings Preview"
 										/>
 									)}
+								</div>
+								<div>
 									<ResetPreferences isRecommendation />
 									<SavePreferences
 										isRecommendation

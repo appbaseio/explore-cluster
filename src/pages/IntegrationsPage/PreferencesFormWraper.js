@@ -67,6 +67,7 @@ class PreferencesFormWrapper extends React.Component {
 						// Search specific controls
 						showPopularSearches: false,
 						showSelectedFilters: true,
+						showPagination: false,
 						customMessages: FormBuilder.group({
 							resultStats: '[count] products found in [time] ms',
 							noFilterItem: 'No items Found',
@@ -311,6 +312,10 @@ class PreferencesFormWrapper extends React.Component {
 										showSelectedFilters: get(
 											preferences,
 											'globalSettings.showSelectedFilters',
+										),
+										showPagination: !!get(
+											preferences,
+											'resultSettings.rsConfig.pagination',
 										),
 										customMessages: {
 											resultStats: get(
