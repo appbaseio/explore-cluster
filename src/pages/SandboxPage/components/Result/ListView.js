@@ -29,7 +29,14 @@ class ListView extends React.Component {
 	}
 
 	render() {
-		const { result, showFeaturedProducts, onChange, value, selectButtonLabel } = this.props;
+		const {
+			result,
+			showFeaturedProducts,
+			onChange,
+			value,
+			selectButtonLabel,
+			showFeaturedList,
+		} = this.props;
 		return (
 			<React.Fragment>
 				<Container hasPagination={result.pagination}>
@@ -53,6 +60,7 @@ class ListView extends React.Component {
 									selectButtonLabel={selectButtonLabel}
 									value={value}
 									onChange={onChange}
+									showFeaturedList={showFeaturedList}
 								/>
 							);
 						}}
@@ -69,6 +77,7 @@ ListView.propTypes = {
 	selectButtonLabel: PropTypes.string,
 	onChange: PropTypes.func,
 	value: PropTypes.array,
+	showFeaturedList: PropTypes.bool,
 };
 
 ListView.defaultProps = {
@@ -77,6 +86,7 @@ ListView.defaultProps = {
 	selectButtonLabel: undefined,
 	onChange: () => {},
 	value: [],
+	showFeaturedList: false,
 };
 
 export default ListView;

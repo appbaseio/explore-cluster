@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Modal, Typography, Tabs } from 'antd';
+import { Button, Modal, Typography, Tabs, Row, Col } from 'antd';
+import { css } from 'emotion';
 import get from 'lodash/get';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
@@ -21,6 +22,16 @@ import ListView from '../SandboxPage/components/Result/ListView';
 
 const { Text } = Typography;
 const { TabPane } = Tabs;
+
+const container = css`
+	padding: 16px;
+	padding-right: 50px;
+	padding-left: 50px;
+
+	.my-16 {
+		margin-bottom: 16px;
+	}
+`;
 
 const SearchPreview = Loadable({
 	loader: () =>
@@ -216,24 +227,30 @@ class SearchPreviewWrapper extends React.Component {
 					/>
 				</TabPane>
 				<TabPane tab="Featured List" key="2">
-					<ReactiveBase
-						app={appName}
-						enableAppbase
-						credentials={credentials}
-						url={url}
-						appbaseConfig={{
-							recordAnalytics: false,
-						}}
-					>
-						<ListView
-							// result={result}
-							result={{}}
-							showFeaturedProducts
-							selectButtonLabel={selectButtonLabel}
-							value={value}
-							onChange={onChange}
-						/>
-					</ReactiveBase>
+					<Row className={container} gutter={16}>
+						<Col xs={24}>
+							<ReactiveBase
+								app={appName}
+								enableAppbase
+								credentials={credentials}
+								url={url}
+								appbaseConfig={{
+									recordAnalytics: false,
+								}}
+							>
+								<ListView
+									result={{
+										id: 'resultList',
+									}}
+									showFeaturedProducts
+									selectButtonLabel={selectButtonLabel}
+									value={value}
+									onChange={onChange}
+									showFeaturedList
+								/>
+							</ReactiveBase>
+						</Col>
+					</Row>
 				</TabPane>
 			</Tabs>
 		);

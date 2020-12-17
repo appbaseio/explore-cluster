@@ -61,6 +61,7 @@ class ResultList extends React.Component {
 			selectButtonLabel,
 			onChange,
 			value,
+			showFeaturedList,
 		} = this.props;
 
 		if (loading && (!data || !data.length)) {
@@ -83,6 +84,7 @@ class ResultList extends React.Component {
 								value={value}
 								onChange={onChange}
 								selectButtonLabel={selectButtonLabel}
+								showFeaturedList={showFeaturedList}
 							/>
 						</div>
 					);
@@ -107,6 +109,7 @@ ResultList.propTypes = {
 	selectButtonLabel: PropTypes.string,
 	onChange: PropTypes.func,
 	value: PropTypes.array,
+	showFeaturedList: PropTypes.bool,
 };
 
 ResultList.defaultProps = {
@@ -117,6 +120,7 @@ ResultList.defaultProps = {
 	selectButtonLabel: undefined,
 	onChange: () => {},
 	value: [],
+	showFeaturedList: false,
 };
 
 export default ResultList;
