@@ -14,7 +14,7 @@ const defaultUserData =
 				username: defaultUsername,
 				password: defaultPassword,
 				authToken: defaultToken,
-				isAdmin: Boolean(defaultIsAdmin),
+				isAdmin: Boolean(JSON.parse(defaultIsAdmin)),
 				allowedActions: defaultAllowedActions
 					? defaultAllowedActions.split(',')
 					: getDefaultAllowedActions(Boolean(defaultIsAdmin)),
