@@ -29,12 +29,10 @@ const SearchPreview = Loadable({
 	loading: Loader,
 });
 
-const handleTabChange = (key) => {
-	console.log('Tab chnaged ==>> ', key);
-};
 class SearchPreviewWrapper extends React.Component {
 	state = {
 		visible: false,
+		showFeaturedList: false,
 	};
 
 	componentDidMount() {
@@ -77,6 +75,14 @@ class SearchPreviewWrapper extends React.Component {
 			this.init({ ...defaultSettings });
 		}
 	}
+
+	// handleTabChange = (key) => {
+	// 	if (key === '2') {
+	// 		this.setState({ showFeaturedList: true });
+	// 	} else {
+	// 		this.setState({ showFeaturedList: false });
+	// 	}
+	// };
 
 	init = (settings) => {
 		const { appName, updateLocalRelevancy, localRelevancy } = this.props;
@@ -192,7 +198,10 @@ class SearchPreviewWrapper extends React.Component {
 		} = this.props;
 		const { visible } = this.state;
 		const component = () => (
-			<Tabs defaultActiveKey="1" onChange={handleTabChange}>
+			<Tabs
+				defaultActiveKey="1"
+				// onChange={this.handleTabChange}
+			>
 				<TabPane tab="Browse Products" key="1">
 					<SearchPreview
 						app={appName}
@@ -216,26 +225,27 @@ class SearchPreviewWrapper extends React.Component {
 					/>
 				</TabPane>
 				<TabPane tab="Featured List" key="2">
-					List is empty!!
-					{/* <ReactiveBase
+					<SearchPreview
 						app={appName}
-						enableAppbase
-						credentials={credentials}
-						url={url}
-						appbaseConfig={{
-							recordAnalytics: false,
+						testSettings={{
+							...localRelevancy,
+							search: {
+								...localRelevancy.search,
+								fieldWeights: get(
+									localRelevancy,
+									'search.fieldWeights',
+									[],
+								).map((i) => Number(i)),
+							},
 						}}
-					>
-						<Result
-							result={result}
-							app={app}
-							rules={rules}
-							showFeaturedProducts={showFeaturedProducts}
-							selectButtonLabel={selectButtonLabel}
-							onChange={onChange}
-							value={value}
-						/>
-					</ReactiveBase> */}
+						hasTestSettings
+						handleModal={this.toggleVisibility}
+						showFeaturedProducts
+						selectButtonLabel={selectButtonLabel}
+						value={value}
+						onChange={onChange}
+						showFeaturedList
+					/>
 				</TabPane>
 			</Tabs>
 		);

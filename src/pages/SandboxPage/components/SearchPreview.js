@@ -340,7 +340,9 @@ class SearchPreview extends React.Component {
 			onChange,
 			value,
 			selectButtonLabel,
+			showFeaturedList,
 		} = this.props;
+
 		const {
 			settings: stateSettings,
 			isAnalyticsEnabled,
@@ -445,29 +447,33 @@ class SearchPreview extends React.Component {
 						recordAnalytics: showFeaturedProducts ? false : isAnalyticsEnabled,
 					}}
 				>
-					<Col md={6}>
-						<ErrorToaster>
-							<Filter
-								handleValueChange={this.handleValueChange}
-								app={app}
-								aggs={aggregations}
-								handleModal={handleModal}
-							/>
-						</ErrorToaster>
-					</Col>
-					<Col md={18}>
-						<ErrorToaster
-							inline
-							title="Something went wrong while displaying Search UI"
-						>
-							<Search
-								handleValueChange={this.handleValueChange}
-								app={app}
-								onValueChange={this.setQueryGrades}
-								search={search}
-								handleModal={handleModal}
-							/>
-						</ErrorToaster>
+					{!showFeaturedList && (
+						<Col md={6}>
+							<ErrorToaster>
+								<Filter
+									handleValueChange={this.handleValueChange}
+									app={app}
+									aggs={aggregations}
+									handleModal={handleModal}
+								/>
+							</ErrorToaster>
+						</Col>
+					)}
+					<Col md={showFeaturedList ? 24 : 18}>
+						{!showFeaturedList && (
+							<ErrorToaster
+								inline
+								title="Something went wrong while displaying Search UI"
+							>
+								<Search
+									handleValueChange={this.handleValueChange}
+									app={app}
+									onValueChange={this.setQueryGrades}
+									search={search}
+									handleModal={handleModal}
+								/>
+							</ErrorToaster>
+						)}
 						<ErrorToaster>
 							<SandboxContext.Provider
 								value={{
@@ -491,6 +497,7 @@ class SearchPreview extends React.Component {
 									selectButtonLabel={selectButtonLabel}
 									onChange={onChange}
 									value={value}
+									showFeaturedList={showFeaturedList}
 								/>
 							</SandboxContext.Provider>
 						</ErrorToaster>
@@ -552,6 +559,7 @@ SearchPreview.propTypes = {
 	onChange: PropTypes.func,
 	value: PropTypes.array,
 	selectButtonLabel: PropTypes.string,
+	showFeaturedList: PropTypes.bool,
 };
 
 SearchPreview.defaultProps = {
@@ -572,6 +580,7 @@ SearchPreview.defaultProps = {
 	onChange: () => {},
 	value: [],
 	selectButtonLabel: undefined,
+	showFeaturedList: false,
 };
 
 export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(SearchPreview));
