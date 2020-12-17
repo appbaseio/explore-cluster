@@ -4,6 +4,7 @@ import { Button, Modal, Typography, Tabs } from 'antd';
 import get from 'lodash/get';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
+import { ReactiveBase } from '@appbaseio/reactivesearch';
 import Loader from '../../components/Loader';
 import { modalStyles } from '../../components/SearchPreviewModal/SearchPreviewModal';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
@@ -15,6 +16,8 @@ import {
 } from '../../batteries/modules/actions';
 import { getMappingsByPath, getMappingsInfo } from '../../utils/mappings';
 import { getSubFields } from '../../utils';
+import { getURL } from '../../constants/config';
+import ListView from '../SandboxPage/components/Result/ListView';
 
 const { Text } = Typography;
 const { TabPane } = Tabs;
@@ -72,10 +75,6 @@ class SearchPreviewWrapper extends React.Component {
 			this.init({ ...defaultSettings });
 		}
 	}
-
-	// handleTabChange = (key) => {
-	// 	console.log(key);
-	// };
 
 	init = (settings) => {
 		const { appName, updateLocalRelevancy, localRelevancy } = this.props;
@@ -188,13 +187,12 @@ class SearchPreviewWrapper extends React.Component {
 			buttonProps,
 			selectButtonLabel,
 			openWithModal,
+			credentials,
+			url,
 		} = this.props;
 		const { visible } = this.state;
 		const component = () => (
-			<Tabs
-				defaultActiveKey="1"
-				// onChange={this.handleTabChange}
-			>
+			<Tabs defaultActiveKey="1">
 				<TabPane tab="Browse Products" key="1">
 					<SearchPreview
 						app={appName}
@@ -218,27 +216,24 @@ class SearchPreviewWrapper extends React.Component {
 					/>
 				</TabPane>
 				<TabPane tab="Featured List" key="2">
-					<SearchPreview
+					<ReactiveBase
 						app={appName}
-						testSettings={{
-							...localRelevancy,
-							search: {
-								...localRelevancy.search,
-								fieldWeights: get(
-									localRelevancy,
-									'search.fieldWeights',
-									[],
-								).map((i) => Number(i)),
-							},
+						enableAppbase
+						credentials={credentials}
+						url={url}
+						appbaseConfig={{
+							recordAnalytics: false,
 						}}
-						hasTestSettings
-						handleModal={this.toggleVisibility}
-						showFeaturedProducts
-						selectButtonLabel={selectButtonLabel}
-						value={value}
-						onChange={onChange}
-						showFeaturedList
-					/>
+					>
+						<ListView
+							// result={result}
+							result={{}}
+							showFeaturedProducts
+							selectButtonLabel={selectButtonLabel}
+							value={value}
+							onChange={onChange}
+						/>
+					</ReactiveBase>
 				</TabPane>
 			</Tabs>
 		);
@@ -291,6 +286,8 @@ SearchPreviewWrapper.propTypes = {
 	label: PropTypes.string,
 	selectButtonLabel: PropTypes.string,
 	openWithModal: PropTypes.bool,
+	credentials: PropTypes.string.isRequired,
+	url: PropTypes.string.isRequired,
 };
 
 SearchPreviewWrapper.defaultProps = {
@@ -313,6 +310,7 @@ const mapStateToProps = (state) => {
 	const defaultSearchSettings = errorCode === 404 ? defaultSettings : null;
 	const appName = get(state, '$getCurrentApp.name');
 	const localRelevancy = get(state, `$getLocalRelevancy.${appName}`, null);
+	const { username, password } = get(state, 'user.data') || {};
 
 	return {
 		isLoading: get(state, '$getAppSettings.isFetching'),
@@ -322,6 +320,8 @@ const mapStateToProps = (state) => {
 		isFetchingMapping: get(state, '$getAppMappings.isFetching', false),
 		localRelevancy,
 		mappings: getRawMappingsByAppName(state) || null,
+		credentials: username ? `${username}:${password}` : null,
+		url: getURL(),
 	};
 };
 
