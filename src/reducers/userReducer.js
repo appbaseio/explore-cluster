@@ -7,10 +7,10 @@ const defaultPassword = sessionStorage.getItem('password');
 const defaultToken = sessionStorage.getItem('authToken');
 const defaultAllowedActions = sessionStorage.getItem('allowedActions');
 
-let defaultIsAdmin = sessionStorage.getItem('isAdmin');
+let defaultIsAdmin = false;
 
 try {
-	defaultIsAdmin = Boolean(JSON.parse(defaultIsAdmin));
+	defaultIsAdmin = Boolean(JSON.parse(sessionStorage.getItem('isAdmin')));
 } catch (err) {
 	console.error(err);
 }
