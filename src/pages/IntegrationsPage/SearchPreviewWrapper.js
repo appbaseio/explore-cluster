@@ -15,8 +15,6 @@ import {
 } from '../../batteries/modules/actions';
 import { getMappingsByPath, getMappingsInfo } from '../../utils/mappings';
 import { getSubFields } from '../../utils';
-// import { ReactiveBase } from '@appbaseio/reactivesearch';
-// import { getURL } from '../../constants/config';
 
 const { Text } = Typography;
 const { TabPane } = Tabs;
@@ -32,7 +30,6 @@ const SearchPreview = Loadable({
 class SearchPreviewWrapper extends React.Component {
 	state = {
 		visible: false,
-		showFeaturedList: false,
 	};
 
 	componentDidMount() {
@@ -77,11 +74,7 @@ class SearchPreviewWrapper extends React.Component {
 	}
 
 	// handleTabChange = (key) => {
-	// 	if (key === '2') {
-	// 		this.setState({ showFeaturedList: true });
-	// 	} else {
-	// 		this.setState({ showFeaturedList: false });
-	// 	}
+	// 	console.log(key);
 	// };
 
 	init = (settings) => {
@@ -298,7 +291,6 @@ SearchPreviewWrapper.propTypes = {
 	label: PropTypes.string,
 	selectButtonLabel: PropTypes.string,
 	openWithModal: PropTypes.bool,
-	// credentials: PropTypes.string.isRequired,
 };
 
 SearchPreviewWrapper.defaultProps = {
@@ -316,7 +308,6 @@ SearchPreviewWrapper.defaultProps = {
 };
 
 const mapStateToProps = (state) => {
-	// const { username, password } = get(state, 'user.data', {});
 	const defaultSettings = get(state.$getAppSettings, `defaultSettings`);
 	const errorCode = get(state, '$getAppSettings.error.actual.code');
 	const defaultSearchSettings = errorCode === 404 ? defaultSettings : null;
@@ -331,8 +322,6 @@ const mapStateToProps = (state) => {
 		isFetchingMapping: get(state, '$getAppMappings.isFetching', false),
 		localRelevancy,
 		mappings: getRawMappingsByAppName(state) || null,
-		// credentials: username ? `${username}:${password}` : null,
-		// url: getURL(),
 	};
 };
 
