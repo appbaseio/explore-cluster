@@ -23,12 +23,10 @@ const tableStyles = css`
 	tr {
 		.delete-icon {
 			transition: all ease 0.4s;
-			transform: rotateX(90deg);
 			opacity: 0;
 		}
 		&:hover {
 			.delete-icon {
-				transform: rotateX(0);
 				opacity: 1;
 			}
 		}
@@ -87,7 +85,6 @@ class Recommendations extends React.Component {
 						/>
 						<Button
 							style={btnStyle}
-							type="danger"
 							className="delete-icon"
 							onClick={() => this.handleDelete(item.id)}
 						>
@@ -312,7 +309,7 @@ class Recommendations extends React.Component {
 										formItemProps={{
 											label: (
 												<span>
-													DataField&nbsp;
+													Similar to Field&nbsp;
 													<Tooltip
 														title={messages.dataFieldSimilarProduct}
 													>

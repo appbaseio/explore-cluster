@@ -42,8 +42,8 @@ class StoreFrontPreview extends React.Component {
 		} else {
 			div.id = 'reactivesearch-shopify-1';
 			div.setAttribute('openaspage', true);
-			div.setAttribute('ispreview', true);
 		}
+		div.setAttribute('isPreview', true);
 		// Set preferences
 		if (isRecommendation) {
 			this.iframeRef.current.contentWindow.APPBASE_RECOMMENDATIONS_PREFERENCES = JSON.stringify(

@@ -62,7 +62,11 @@ class DataFieldSelector extends React.Component {
 								placeholder="Select field"
 								{...selectProps}
 								{...inputHandler}
-								value={inputHandler.value ? inputHandler.value : undefined}
+								value={
+									inputHandler.value
+										? inputHandler.value.split('.keyword')[0]
+										: undefined
+								}
 								onSelect={(val) => {
 									if (value === val) {
 										// To unselect

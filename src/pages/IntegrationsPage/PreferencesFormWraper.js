@@ -255,6 +255,9 @@ class PreferencesFormWrapper extends React.Component {
 							resultImage: get(preferences, 'resultSettings.fields.image'),
 							resultHandle: get(preferences, 'resultSettings.fields.handle'),
 							exportSettings: get(preferences, 'exportSettings'),
+							storeInfo: {
+								currency: get(preferences, 'globalSettings.currency'),
+							},
 							...(isRecommendation
 								? {
 										ctaTitle: get(

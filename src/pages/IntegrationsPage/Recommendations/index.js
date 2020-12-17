@@ -29,9 +29,12 @@ const RecommendationsIntegrationsPage = ({ tier, featureEcommerce }) => {
 				<Banner {...bannerDetails} />
 				<Overlay
 					style={{
-						maxWidth: '70%',
+						maxWidth: '80%',
 					}}
-					src="https://i.imgur.com/ziZMrZm.png"
+					lockSectionStyle={{
+						marginTop: '20%',
+					}}
+					src="https://i.imgur.com/sHVZWTq.png"
 					alt="integrations"
 				/>
 			</React.Fragment>
