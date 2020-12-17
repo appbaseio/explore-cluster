@@ -8,18 +8,23 @@ const defaultToken = sessionStorage.getItem('authToken');
 const defaultIsAdmin = sessionStorage.getItem('isAdmin');
 const defaultAllowedActions = sessionStorage.getItem('allowedActions');
 
-const defaultUserData =
-	defaultUsername && defaultPassword && defaultToken
-		? {
-				username: defaultUsername,
-				password: defaultPassword,
-				authToken: defaultToken,
-				isAdmin: Boolean(JSON.parse(defaultIsAdmin)),
-				allowedActions: defaultAllowedActions
-					? defaultAllowedActions.split(',')
-					: getDefaultAllowedActions(Boolean(defaultIsAdmin)),
-		  } // eslint-disable-line
-		: null;
+let defaultUserData = null;
+try {
+	defaultUserData =
+		defaultUsername && defaultPassword && defaultToken
+			? {
+					username: defaultUsername,
+					password: defaultPassword,
+					authToken: defaultToken,
+					isAdmin: Boolean(JSON.parse(defaultIsAdmin)),
+					allowedActions: defaultAllowedActions
+						? defaultAllowedActions.split(',')
+						: getDefaultAllowedActions(Boolean(defaultIsAdmin)),
+			  } // eslint-disable-line
+			: null;
+} catch (err) {
+	console.error(err);
+}
 
 export default function userReducer(
 	state: Object = {
