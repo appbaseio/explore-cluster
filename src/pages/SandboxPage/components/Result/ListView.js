@@ -50,7 +50,7 @@ class ListView extends React.Component {
 										margin: '12px 0',
 										fontSize: '14px',
 										color: '#707070',
-										minHeight: '68vh',
+										minHeight: '64vh',
 								  }
 								: { margin: '12px 0' }
 						}
