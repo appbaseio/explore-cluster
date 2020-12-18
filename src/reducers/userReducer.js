@@ -5,8 +5,15 @@ import { getDefaultAllowedActions } from '../utils/allowedActions';
 const defaultUsername = sessionStorage.getItem('username');
 const defaultPassword = sessionStorage.getItem('password');
 const defaultToken = sessionStorage.getItem('authToken');
-const defaultIsAdmin = sessionStorage.getItem('isAdmin');
 const defaultAllowedActions = sessionStorage.getItem('allowedActions');
+
+let defaultIsAdmin = false;
+
+try {
+	defaultIsAdmin = Boolean(JSON.parse(sessionStorage.getItem('isAdmin')));
+} catch (err) {
+	console.error(err);
+}
 
 const defaultUserData =
 	defaultUsername && defaultPassword && defaultToken
@@ -14,10 +21,10 @@ const defaultUserData =
 				username: defaultUsername,
 				password: defaultPassword,
 				authToken: defaultToken,
-				isAdmin: Boolean(defaultIsAdmin),
+				isAdmin: defaultIsAdmin,
 				allowedActions: defaultAllowedActions
 					? defaultAllowedActions.split(',')
-					: getDefaultAllowedActions(Boolean(defaultIsAdmin)),
+					: getDefaultAllowedActions(defaultIsAdmin),
 		  } // eslint-disable-line
 		: null;
 
