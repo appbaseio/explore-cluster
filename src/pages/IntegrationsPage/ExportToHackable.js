@@ -73,7 +73,7 @@ const ExportToHackable = ({ control, preferences, isRecommendation, widgetId }) 
 			</div>
 			{isRecommendation ? (
 				<div>
-					Add the following snippet into <strong>body</strong> tag of
+					Add the following snippet into <strong>body</strong> tag of{' '}
 					<strong>index.html</strong> file.
 					<div
 						css={{
@@ -171,7 +171,7 @@ const ExportToHackable = ({ control, preferences, isRecommendation, widgetId }) 
 									</div>
 								) : (
 									<div>
-										Add the following snippet into <strong>body</strong> tag of
+										Add the following snippet into <strong>body</strong> tag of{' '}
 										<strong>index.html</strong> file.
 										<div
 											css={{
