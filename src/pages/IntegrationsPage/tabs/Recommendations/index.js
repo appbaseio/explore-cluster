@@ -366,6 +366,7 @@ class Recommendations extends React.Component {
 																onChange([...value]);
 															}
 														}}
+														showFeaturedProducts
 													/>
 												</Form.Item>
 											);

@@ -15,6 +15,8 @@ import {
 } from '../../batteries/modules/actions';
 import { getMappingsByPath, getMappingsInfo } from '../../utils/mappings';
 import { getSubFields } from '../../utils';
+import { getURL } from '../../constants/config';
+import FeaturedProductsWrapper from './FeaturedProductsWrapper';
 
 const { Text } = Typography;
 
@@ -25,6 +27,7 @@ const SearchPreview = Loadable({
 		),
 	loading: Loader,
 });
+
 class SearchPreviewWrapper extends React.Component {
 	state = {
 		visible: false,
@@ -182,28 +185,57 @@ class SearchPreviewWrapper extends React.Component {
 			buttonProps,
 			selectButtonLabel,
 			openWithModal,
+			credentials,
+			url,
+			showFeaturedProducts,
 		} = this.props;
 		const { visible } = this.state;
-		const component = () => (
-			<SearchPreview
-				app={appName}
-				testSettings={{
-					...localRelevancy,
-					search: {
-						...localRelevancy.search,
-						fieldWeights: get(localRelevancy, 'search.fieldWeights', []).map((i) =>
-							Number(i),
-						),
-					},
-				}}
-				hasTestSettings
-				handleModal={this.toggleVisibility}
-				showFeaturedProducts
-				selectButtonLabel={selectButtonLabel}
-				value={value}
-				onChange={onChange}
-			/>
-		);
+		const component = () => {
+			if (showFeaturedProducts) {
+				return (
+					<FeaturedProductsWrapper
+						appName={appName}
+						testSettings={{
+							...localRelevancy,
+							search: {
+								...localRelevancy.search,
+								fieldWeights: get(
+									localRelevancy,
+									'search.fieldWeights',
+									[],
+								).map((i) => Number(i)),
+							},
+						}}
+						toggleVisibility={this.toggleVisibility}
+						selectButtonLabel={selectButtonLabel}
+						value={value}
+						onChange={onChange}
+						credentials={credentials}
+						url={url}
+					/>
+				);
+			}
+			return (
+				<SearchPreview
+					app={appName}
+					testSettings={{
+						...localRelevancy,
+						search: {
+							...localRelevancy.search,
+							fieldWeights: get(localRelevancy, 'search.fieldWeights', []).map((i) =>
+								Number(i),
+							),
+						},
+					}}
+					hasTestSettings
+					handleModal={this.toggleVisibility}
+					showFeaturedProducts
+					selectButtonLabel={selectButtonLabel}
+					value={value}
+					onChange={onChange}
+				/>
+			);
+		};
 		if (!openWithModal) {
 			if (!localRelevancy) {
 				return <Loader />;
@@ -253,6 +285,9 @@ SearchPreviewWrapper.propTypes = {
 	label: PropTypes.string,
 	selectButtonLabel: PropTypes.string,
 	openWithModal: PropTypes.bool,
+	credentials: PropTypes.string.isRequired,
+	url: PropTypes.string.isRequired,
+	showFeaturedProducts: PropTypes.bool,
 };
 
 SearchPreviewWrapper.defaultProps = {
@@ -267,6 +302,7 @@ SearchPreviewWrapper.defaultProps = {
 	value: [],
 	openWithModal: true,
 	onChange: () => {},
+	showFeaturedProducts: false,
 };
 
 const mapStateToProps = (state) => {
@@ -275,6 +311,7 @@ const mapStateToProps = (state) => {
 	const defaultSearchSettings = errorCode === 404 ? defaultSettings : null;
 	const appName = get(state, '$getCurrentApp.name');
 	const localRelevancy = get(state, `$getLocalRelevancy.${appName}`, null);
+	const { username, password } = get(state, 'user.data') || {};
 
 	return {
 		isLoading: get(state, '$getAppSettings.isFetching'),
@@ -284,6 +321,8 @@ const mapStateToProps = (state) => {
 		isFetchingMapping: get(state, '$getAppMappings.isFetching', false),
 		localRelevancy,
 		mappings: getRawMappingsByAppName(state) || null,
+		credentials: username ? `${username}:${password}` : null,
+		url: getURL(),
 	};
 };
 

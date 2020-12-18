@@ -341,6 +341,7 @@ class SearchPreview extends React.Component {
 			value,
 			selectButtonLabel,
 		} = this.props;
+
 		const {
 			settings: stateSettings,
 			isAnalyticsEnabled,
@@ -468,6 +469,7 @@ class SearchPreview extends React.Component {
 								handleModal={handleModal}
 							/>
 						</ErrorToaster>
+
 						<ErrorToaster>
 							<SandboxContext.Provider
 								value={{
