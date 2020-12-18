@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Tabs, Row, Col } from 'antd';
 import { ReactiveBase } from '@appbaseio/reactivesearch';
@@ -33,6 +33,8 @@ const SearchPreview = Loadable({
 	loading: Loader,
 });
 
+const getKey = (value) => `featured_list__${JSON.stringify(value)}`;
+
 const FeaturedProductsWrapper = (props) => {
 	const {
 		appName,
@@ -44,8 +46,33 @@ const FeaturedProductsWrapper = (props) => {
 		credentials,
 		url,
 	} = props;
+	const [tabKey, changeKey] = useState(getKey(value));
+	const [defaultKey, changeDefaultKey] = useState('1');
+	useEffect(() => {
+		if (String(defaultKey) === String(2)) {
+			changeKey(getKey(value));
+		}
+	}, [defaultKey, value]);
+	const defaultQuery = () => {
+		return {
+			query: {
+				terms: {
+					_id: value,
+				},
+			},
+		};
+	};
 	return (
-		<Tabs defaultActiveKey="1">
+		<Tabs
+			onChange={(tab) => {
+				if (String(tab) === String(2)) {
+					changeKey(getKey(value));
+				}
+				changeDefaultKey(tab);
+			}}
+			key={tabKey}
+			defaultActiveKey={defaultKey}
+		>
 			<TabPane tab="Browse Products" key="1">
 				<SearchPreview
 					app={appName}
@@ -73,6 +100,7 @@ const FeaturedProductsWrapper = (props) => {
 							<ListView
 								result={{
 									id: 'resultList',
+									defaultQuery,
 								}}
 								showFeaturedProducts
 								selectButtonLabel={selectButtonLabel}
