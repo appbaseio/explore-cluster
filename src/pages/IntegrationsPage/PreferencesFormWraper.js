@@ -89,6 +89,13 @@ class PreferencesFormWrapper extends React.Component {
 							price: getPriceFilterConfigurationForm(),
 						}),
 						dynamicFilters: FormBuilder.array([]),
+						syncSettings: FormBuilder.group({
+							product_sync: [{ value: true, disabled: true }],
+							collection_sync: [{ value: true, disabled: true }],
+							collect_sync: [{ value: false, disabled: true }],
+							metafield_sync: [{ value: false, disabled: true }],
+							namedtags_sync: [{ value: false, disabled: true }],
+						}),
 				  }),
 		});
 	}
@@ -110,6 +117,16 @@ class PreferencesFormWrapper extends React.Component {
 			const colorFilter = this.form.get('staticFilters.color.customize.dataField');
 			const sizeFilter = this.form.get('staticFilters.size.customize.dataField');
 			const priceFilter = this.form.get('staticFilters.price.customize.dataField');
+			const syncSettingsControl = this.form.get('syncSettings');
+			if (this.form.get('exportSettings.type')) {
+				if (value === 'shopify') {
+					if (syncSettingsControl) {
+						syncSettingsControl.enable();
+					}
+				} else if (syncSettingsControl) {
+					syncSettingsControl.disable();
+				}
+			}
 			if (this.form.get('exportSettings.type').touched) {
 				if (value === 'shopify') {
 					// Populate the default fields
@@ -139,6 +156,7 @@ class PreferencesFormWrapper extends React.Component {
 						resultImage: '',
 						resultHandle: '',
 					});
+
 					if (colorFilter) {
 						colorFilter.patchValue(undefined);
 					}
@@ -317,6 +335,7 @@ class PreferencesFormWrapper extends React.Component {
 											preferences,
 											'resultSettings.rsConfig.pagination',
 										),
+										syncSettings: get(preferences, 'syncSettings'),
 										customMessages: {
 											resultStats: get(
 												preferences,

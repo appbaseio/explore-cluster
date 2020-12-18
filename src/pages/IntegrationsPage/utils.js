@@ -517,6 +517,13 @@ export const defaultSearchPreferences = {
 		price: { enabled: false, customize: {} },
 	},
 	dynamicFilters: [],
+	syncSettings: {
+		product_sync: true,
+		collection_sync: true,
+		collect_sync: false,
+		metafield_sync: false,
+		namedtags_sync: false,
+	},
 };
 
 export const getRecommendationPreferencesPayload = (formValue) => {
@@ -731,6 +738,10 @@ export const getSearchPreferencesPayload = (formValue) => {
 					},
 				})),
 			},
+			syncSettings:
+				get(formValue, 'exportSettings.type') === 'shopify'
+					? get(formValue, 'syncSettings')
+					: null,
 		}),
 	);
 };
