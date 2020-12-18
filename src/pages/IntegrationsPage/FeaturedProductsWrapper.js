@@ -10,9 +10,13 @@ import ListView from '../SandboxPage/components/Result/ListView';
 const { TabPane } = Tabs;
 
 const container = css`
+	width: 94%;
 	padding: 16px;
 	padding-right: 40px;
 	padding-left: 40px;
+	margin-top: 20px;
+	margin-right: 30px;
+	margin-left: 30px;
 	border-style: solid;
 	border-width: 0.5px;
 	border-color: #d2d2d2;
