@@ -1,11 +1,9 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Modal, Typography, Tabs, Row, Col } from 'antd';
-import { css } from 'emotion';
+import { Button, Modal, Typography } from 'antd';
 import get from 'lodash/get';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
-import { ReactiveBase } from '@appbaseio/reactivesearch';
 import Loader from '../../components/Loader';
 import { modalStyles } from '../../components/SearchPreviewModal/SearchPreviewModal';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
@@ -18,22 +16,9 @@ import {
 import { getMappingsByPath, getMappingsInfo } from '../../utils/mappings';
 import { getSubFields } from '../../utils';
 import { getURL } from '../../constants/config';
-import ListView from '../SandboxPage/components/Result/ListView';
+import FeaturedProductsWrapper from './FeaturedProductsWrapper';
 
 const { Text } = Typography;
-const { TabPane } = Tabs;
-
-const container = css`
-	padding: 16px;
-	padding-right: 40px;
-	padding-left: 40px;
-	border-style: solid;
-	border-width: 0.5px;
-	border-color: #d2d2d2;
-	.my-24 {
-		margin-bottom: 16px;
-	}
-`;
 
 const SearchPreview = Loadable({
 	loader: () =>
@@ -208,56 +193,26 @@ class SearchPreviewWrapper extends React.Component {
 		const component = () => {
 			if (showFeaturedProducts) {
 				return (
-					<Tabs defaultActiveKey="1">
-						<TabPane tab="Browse Products" key="1">
-							<SearchPreview
-								app={appName}
-								testSettings={{
-									...localRelevancy,
-									search: {
-										...localRelevancy.search,
-										fieldWeights: get(
-											localRelevancy,
-											'search.fieldWeights',
-											[],
-										).map((i) => Number(i)),
-									},
-								}}
-								hasTestSettings
-								handleModal={this.toggleVisibility}
-								showFeaturedProducts
-								selectButtonLabel={selectButtonLabel}
-								value={value}
-								onChange={onChange}
-							/>
-						</TabPane>
-						<TabPane tab="Featured List" key="2">
-							<Row className={container}>
-								<Col xs={24}>
-									<ReactiveBase
-										app={appName}
-										enableAppbase
-										credentials={credentials}
-										url={url}
-										appbaseConfig={{
-											recordAnalytics: false,
-										}}
-									>
-										<ListView
-											result={{
-												id: 'resultList',
-											}}
-											showFeaturedProducts
-											selectButtonLabel={selectButtonLabel}
-											value={value}
-											onChange={onChange}
-											showFeaturedList
-										/>
-									</ReactiveBase>
-								</Col>
-							</Row>
-						</TabPane>
-					</Tabs>
+					<FeaturedProductsWrapper
+						appName={appName}
+						testSettings={{
+							...localRelevancy,
+							search: {
+								...localRelevancy.search,
+								fieldWeights: get(
+									localRelevancy,
+									'search.fieldWeights',
+									[],
+								).map((i) => Number(i)),
+							},
+						}}
+						toggleVisibility={this.toggleVisibility}
+						selectButtonLabel={selectButtonLabel}
+						value={value}
+						onChange={onChange}
+						credentials={credentials}
+						url={url}
+					/>
 				);
 			}
 			return (
