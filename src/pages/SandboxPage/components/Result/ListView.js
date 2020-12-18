@@ -44,7 +44,11 @@ class ListView extends React.Component {
 						{...result}
 						dataField={get(result, 'dataField[0]', '_score')}
 						scrollTarget="result-container"
-						style={{ margin: '12px 0' }}
+						style={
+							showFeaturedList
+								? { margin: '12px 0', fontSize: '14px', color: '#707070' }
+								: { margin: '12px 0' }
+						}
 						componentId={result.id}
 						showLoader={false}
 						render={({ data, loading, loadMore, triggerAnalytics }) => {

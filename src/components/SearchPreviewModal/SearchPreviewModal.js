@@ -20,8 +20,7 @@ export const modalStyles = css`
 	}
 
 	.ant-modal-body {
-		min-height: 40vh;
-		max-height: 90vh;
+		height: 90vh;
 		overflow-y: scroll;
 	}
 `;

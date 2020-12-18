@@ -25,10 +25,12 @@ const { TabPane } = Tabs;
 
 const container = css`
 	padding: 16px;
-	padding-right: 50px;
-	padding-left: 50px;
-
-	.my-16 {
+	padding-right: 40px;
+	padding-left: 40px;
+	border-style: solid;
+	border-width: 0.5px;
+	border-color: #d2d2d2;
+	.my-24 {
 		margin-bottom: 16px;
 	}
 `;
@@ -200,60 +202,85 @@ class SearchPreviewWrapper extends React.Component {
 			openWithModal,
 			credentials,
 			url,
+			showFeaturedProducts,
 		} = this.props;
 		const { visible } = this.state;
-		const component = () => (
-			<Tabs defaultActiveKey="1">
-				<TabPane tab="Browse Products" key="1">
-					<SearchPreview
-						app={appName}
-						testSettings={{
-							...localRelevancy,
-							search: {
-								...localRelevancy.search,
-								fieldWeights: get(
-									localRelevancy,
-									'search.fieldWeights',
-									[],
-								).map((i) => Number(i)),
-							},
-						}}
-						hasTestSettings
-						handleModal={this.toggleVisibility}
-						showFeaturedProducts
-						selectButtonLabel={selectButtonLabel}
-						value={value}
-						onChange={onChange}
-					/>
-				</TabPane>
-				<TabPane tab="Featured List" key="2">
-					<Row className={container} gutter={16}>
-						<Col xs={24}>
-							<ReactiveBase
+		const component = () => {
+			if (showFeaturedProducts) {
+				return (
+					<Tabs defaultActiveKey="1">
+						<TabPane tab="Browse Products" key="1">
+							<SearchPreview
 								app={appName}
-								enableAppbase
-								credentials={credentials}
-								url={url}
-								appbaseConfig={{
-									recordAnalytics: false,
+								testSettings={{
+									...localRelevancy,
+									search: {
+										...localRelevancy.search,
+										fieldWeights: get(
+											localRelevancy,
+											'search.fieldWeights',
+											[],
+										).map((i) => Number(i)),
+									},
 								}}
-							>
-								<ListView
-									result={{
-										id: 'resultList',
-									}}
-									showFeaturedProducts
-									selectButtonLabel={selectButtonLabel}
-									value={value}
-									onChange={onChange}
-									showFeaturedList
-								/>
-							</ReactiveBase>
-						</Col>
-					</Row>
-				</TabPane>
-			</Tabs>
-		);
+								hasTestSettings
+								handleModal={this.toggleVisibility}
+								showFeaturedProducts
+								selectButtonLabel={selectButtonLabel}
+								value={value}
+								onChange={onChange}
+							/>
+						</TabPane>
+						<TabPane tab="Featured List" key="2">
+							<Row className={container}>
+								<Col xs={24}>
+									<ReactiveBase
+										app={appName}
+										enableAppbase
+										credentials={credentials}
+										url={url}
+										appbaseConfig={{
+											recordAnalytics: false,
+										}}
+									>
+										<ListView
+											result={{
+												id: 'resultList',
+											}}
+											showFeaturedProducts
+											selectButtonLabel={selectButtonLabel}
+											value={value}
+											onChange={onChange}
+											showFeaturedList
+										/>
+									</ReactiveBase>
+								</Col>
+							</Row>
+						</TabPane>
+					</Tabs>
+				);
+			}
+			return (
+				<SearchPreview
+					app={appName}
+					testSettings={{
+						...localRelevancy,
+						search: {
+							...localRelevancy.search,
+							fieldWeights: get(localRelevancy, 'search.fieldWeights', []).map((i) =>
+								Number(i),
+							),
+						},
+					}}
+					hasTestSettings
+					handleModal={this.toggleVisibility}
+					showFeaturedProducts
+					selectButtonLabel={selectButtonLabel}
+					value={value}
+					onChange={onChange}
+				/>
+			);
+		};
 		if (!openWithModal) {
 			if (!localRelevancy) {
 				return <Loader />;
@@ -305,6 +332,7 @@ SearchPreviewWrapper.propTypes = {
 	openWithModal: PropTypes.bool,
 	credentials: PropTypes.string.isRequired,
 	url: PropTypes.string.isRequired,
+	showFeaturedProducts: PropTypes.bool,
 };
 
 SearchPreviewWrapper.defaultProps = {
@@ -319,6 +347,7 @@ SearchPreviewWrapper.defaultProps = {
 	value: [],
 	openWithModal: true,
 	onChange: () => {},
+	showFeaturedProducts: false,
 };
 
 const mapStateToProps = (state) => {
