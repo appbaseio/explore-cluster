@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Select, Form } from 'antd';
+import { css } from 'emotion';
 import { string, func, bool, object, element } from 'prop-types';
 import get from 'lodash/get';
 import { FieldControl } from 'react-reactive-form';
@@ -8,6 +9,11 @@ import { getAppMappings } from '../../batteries/modules/actions';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import { traverseMapping } from '../../batteries/utils/mappings';
 
+const selectCls = css`
+	.ant-select-selection {
+		border-color: tomato;
+	}
+`;
 class DataFieldSelector extends React.Component {
 	getMappings = () => {
 		const { index, loading, fetchMappings, appbaseCredentials, mappings } = this.props;
@@ -52,13 +58,14 @@ class DataFieldSelector extends React.Component {
 		if (control || name) {
 			return (
 				<FieldControl strict={false} name={name} control={control} {...controlProps}>
-					{({ value, handler, disabled }) => {
+					{({ value, handler, disabled, touched, invalid }) => {
 						const inputHandler = handler();
 						if (hideOnDisabled && disabled) {
 							return null;
 						}
 						const child = (
 							<Select
+								className={touched && invalid ? selectCls : undefined}
 								placeholder="Select field"
 								{...selectProps}
 								{...inputHandler}

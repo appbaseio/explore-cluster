@@ -198,10 +198,10 @@ class PreferencesFormWrapper extends React.Component {
 				resetFormArrayControls();
 				// Add controls for dynamic filters
 				const dynamicFilterControl = this.form.get('dynamicFilters');
-				get(preferences, 'facetSettings.dynamicFacets', []).forEach(() => {
+				get(preferences, 'facetSettings.dynamicFacets', []).forEach((index) => {
 					const control = getFilterConfigurationForm(null, true);
 					control.meta = {
-						key: getDynamicFilterKey(control),
+						key: getDynamicFilterKey(index),
 					};
 					dynamicFilterControl.push(control);
 				});

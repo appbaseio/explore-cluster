@@ -1,9 +1,9 @@
 import React from 'react';
-import { func } from 'prop-types';
+import { connect } from 'react-redux';
+import { func, bool } from 'prop-types';
 import { FieldGroup, FieldArray, FieldControl, Validators } from 'react-reactive-form';
 import { Table, Button, Form, Select, Tooltip, Icon } from 'antd';
 import { css } from 'emotion';
-
 import get from 'lodash/get';
 import TextInput from '../../../../components/Form/Input';
 import DataFieldSelector from '../../../../components/Form/DataFieldSelector';
@@ -36,7 +36,6 @@ const tableStyles = css`
 class Recommendations extends React.Component {
 	state = {
 		showForm: false,
-		isEditing: false,
 	};
 
 	columns = [
@@ -96,6 +95,16 @@ class Recommendations extends React.Component {
 		},
 	];
 
+	componentDidUpdate(prevProps) {
+		const { isSuccess } = this.props;
+		const { showForm } = this.state;
+		// Close form after save
+		if (isSuccess && !prevProps.isSuccess && showForm) {
+			this.tempId = null;
+			this.closeForm();
+		}
+	}
+
 	get recommendationControl() {
 		// eslint-disable-next-line
 		return this.context.get('recommendations');
@@ -114,6 +123,8 @@ class Recommendations extends React.Component {
 				// eslint-disable-next-line
 				this.context.get('exportSettings.type').value,
 			);
+			this.tempId = get(this, 'tempForm.value.id');
+			this.recommendationControl.push(this.tempForm);
 		}
 		const typeControl = this.tempForm.get('type');
 		typeControl.valueChanges.subscribe((value) => {
@@ -180,14 +191,28 @@ class Recommendations extends React.Component {
 		});
 		this.setState({
 			showForm: true,
-			isEditing: !!id,
 		});
 	};
 
 	closeForm = () => {
+		// Remove unsaved form for new recommendation
+		if (this.tempId) {
+			let index;
+			(this.recommendationControl.controls || []).every((control, i) => {
+				if (get(control, 'value.id') === this.tempId) {
+					index = i;
+					return false;
+				}
+				return true;
+			});
+			if (index) {
+				// Remove control
+				this.recommendationControl.removeAt(index);
+			}
+		}
+		this.tempId = null;
 		this.setState({
 			showForm: false,
-			isEditing: false,
 		});
 	};
 
@@ -195,11 +220,6 @@ class Recommendations extends React.Component {
 		return (this.recommendationControl.controls || []).find(
 			(control) => get(control, 'value.id') === id,
 		);
-	};
-
-	addControl = () => {
-		this.recommendationControl.push(this.tempForm);
-		this.closeForm();
 	};
 
 	handleEdit = (id) => {
@@ -223,7 +243,7 @@ class Recommendations extends React.Component {
 	static contextType = FormContext;
 
 	render() {
-		const { showForm, isEditing } = this.state;
+		const { showForm } = this.state;
 
 		return (
 			<div>
@@ -256,7 +276,7 @@ class Recommendations extends React.Component {
 						</Flex>
 
 						<FieldGroup control={this.tempForm} strict={false}>
-							{({ invalid }) => (
+							{() => (
 								<Form
 									{...{
 										labelCol: {
@@ -460,17 +480,6 @@ class Recommendations extends React.Component {
 											},
 										}}
 									/>
-									{!isEditing && (
-										<Flex justifyContent="center">
-											<Button
-												disabled={invalid}
-												onClick={this.addControl}
-												type="primary"
-											>
-												Save
-											</Button>
-										</Flex>
-									)}
 								</Form>
 							)}
 						</FieldGroup>
@@ -499,10 +508,7 @@ class Recommendations extends React.Component {
 							{({ controls }) => (
 								<Table
 									rowKey={(item) => item.id}
-									dataSource={controls.map((control) => ({
-										id: get(control, 'meta.id'),
-										...control.value,
-									}))}
+									dataSource={controls.map((control) => control.value)}
 									columns={this.columns}
 									className={tableStyles}
 									locale={{
@@ -518,8 +524,17 @@ class Recommendations extends React.Component {
 	}
 }
 
-Recommendations.propTypes = {
-	getPreferences: func.isRequired,
+Recommendations.defaultProps = {
+	isSuccess: false,
 };
 
-export default Recommendations;
+Recommendations.propTypes = {
+	getPreferences: func.isRequired,
+	isSuccess: bool,
+};
+
+const mapStateToProps = (state) => ({
+	isSuccess: get(state, '$saveRecommendationsPreferences.success'),
+});
+
+export default connect(mapStateToProps, null)(Recommendations);
