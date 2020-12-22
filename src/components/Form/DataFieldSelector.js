@@ -1,13 +1,19 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Select } from 'antd';
-import { string, func, bool, object } from 'prop-types';
+import { Select, Form } from 'antd';
+import { css } from 'emotion';
+import { string, func, bool, object, element } from 'prop-types';
 import get from 'lodash/get';
 import { FieldControl } from 'react-reactive-form';
 import { getAppMappings } from '../../batteries/modules/actions';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import { traverseMapping } from '../../batteries/utils/mappings';
 
+const selectCls = css`
+	.ant-select-selection {
+		border-color: tomato;
+	}
+`;
 class DataFieldSelector extends React.Component {
 	getMappings = () => {
 		const { index, loading, fetchMappings, appbaseCredentials, mappings } = this.props;
@@ -22,14 +28,22 @@ class DataFieldSelector extends React.Component {
 		const calcMappings = Array.isArray(traversedMappings) ? traversedMappings : [];
 		return calcMappings.map((v) => (
 			<Select.Option key={v} title={v}>
-				{/* Hide the keyword suffix */}
 				{v.split('.keyword')[0]}
 			</Select.Option>
 		));
 	}
 
 	render() {
-		const { loading, control, name } = this.props;
+		const {
+			loading,
+			control,
+			name,
+			controlProps,
+			hideOnDisabled,
+			wrapInsideForm,
+			formItemProps,
+			addOptions,
+		} = this.props;
 		const selectProps = {
 			placeholder: 'Select data field',
 			loading,
@@ -39,23 +53,45 @@ class DataFieldSelector extends React.Component {
 				width: 200,
 			},
 		};
+		const withFormItem = (child) => <Form.Item {...formItemProps}>{child}</Form.Item>;
 
 		if (control || name) {
 			return (
-				<FieldControl strict={false} name={name} control={control}>
-					{({ handler }) => {
+				<FieldControl strict={false} name={name} control={control} {...controlProps}>
+					{({ value, handler, disabled, touched, invalid }) => {
 						const inputHandler = handler();
-						return (
+						if (hideOnDisabled && disabled) {
+							return null;
+						}
+						const child = (
 							<Select
+								className={touched && invalid ? selectCls : undefined}
 								placeholder="Select field"
 								{...selectProps}
 								{...inputHandler}
-								value={inputHandler.value ? inputHandler.value : undefined}
+								value={
+									inputHandler.value
+										? inputHandler.value.split('.keyword')[0]
+										: undefined
+								}
+								onSelect={(val) => {
+									if (value === val) {
+										// To unselect
+										inputHandler.onChange(undefined);
+									} else {
+										inputHandler.onChange(val);
+									}
+								}}
 								onFocus={this.getMappings}
 							>
+								{addOptions}
 								{this.renderOptions()}
 							</Select>
 						);
+						if (wrapInsideForm) {
+							return withFormItem(child);
+						}
+						return child;
 					}}
 				</FieldControl>
 			);
@@ -69,21 +105,31 @@ class DataFieldSelector extends React.Component {
 }
 DataFieldSelector.defaultProps = {
 	mappings: null,
+	controlProps: null,
 	control: null,
 	name: undefined,
 	loading: false,
 	isAggFields: false,
+	hideOnDisabled: false,
+	wrapInsideForm: false,
+	formItemProps: null,
+	addOptions: null,
 };
 
 DataFieldSelector.propTypes = {
 	appbaseCredentials: string.isRequired,
+	hideOnDisabled: bool,
 	index: string.isRequired,
 	fetchMappings: func.isRequired,
 	name: string,
 	loading: bool,
 	control: object,
+	controlProps: object,
 	mappings: object,
 	isAggFields: bool,
+	wrapInsideForm: bool,
+	formItemProps: object,
+	addOptions: element,
 };
 
 const mapStateToProps = (state) => {

@@ -195,7 +195,7 @@ export const BaseURL = 'https://appbase-ecomm.netlify.app/static/js/main.js';
 export const BaseCSSURL = 'https://appbase-ecomm.netlify.app/static/css/main.css';
 
 export const getInstallationScript = (preferences = {}, credentials) => `
-<script>var PREFERENCES=${JSON.stringify(
+<script>var APPBASE_SEARCH_PREFERENCES=${JSON.stringify(
 	JSON.stringify({
 		...preferences,
 		appbaseSettings: {
@@ -204,13 +204,15 @@ export const getInstallationScript = (preferences = {}, credentials) => `
 		},
 	}),
 )};</script>
-<div id="reactivesearch-shopify-1" ${preferences.openAsPage ? `openAsPage="true"` : ''}></div>
-<link rel="stylesheet" href=${BaseCSSURL}>
-<script defer src=${BaseURL}></script>
+<div id="reactivesearch-shopify-1" ${
+	get(preferences, 'exportSettings.openAsPage') ? `openAsPage="true"` : ''
+}></div>
+<link rel="stylesheet" href="${BaseCSSURL}">
+<script defer src="${BaseURL}"></script>
 		`;
 
-export const getInstallationHeadScript = (preferences = {}, credentials) => `
-<script>var PREFERENCES=${JSON.stringify(
+export const getInstallationScriptRecommendation = (preferences = {}, credentials, widgetId) => `
+<script>var APPBASE_RECOMMENDATIONS_PREFERENCES=${JSON.stringify(
 	JSON.stringify({
 		...preferences,
 		appbaseSettings: {
@@ -219,19 +221,51 @@ export const getInstallationHeadScript = (preferences = {}, credentials) => `
 		},
 	}),
 )};</script>
-<link rel="stylesheet" href=${BaseCSSURL}>
+<div id="reactivesearch-shopify-product-recommendations-1" ${
+	widgetId ? `widget-id="${widgetId}"` : ''
+}></div>
+<link rel="stylesheet" href="${BaseCSSURL}">
+<script defer src="${BaseURL}"></script>
+		`;
+
+export const getInstallationHeadScript = (
+	preferences = {},
+	credentials,
+	isRecommendation = false,
+) => `
+<script>var ${
+	isRecommendation ? 'APPBASE_RECOMMENDATIONS_PREFERENCES' : 'APPBASE_SEARCH_PREFERENCES'
+}=${JSON.stringify(
+	JSON.stringify({
+		...preferences,
+		appbaseSettings: {
+			...get(preferences, 'appbaseSettings'),
+			credentials,
+		},
+	}),
+)};</script>
+<link rel="stylesheet" href="${BaseCSSURL}">
 		`;
 
 export const getInstallationBodyScript = () => `
-<script defer src=${BaseURL}></script>
+<script defer src="${BaseURL}"></script>
 		`;
 
 export const getCTAScript = (preferences = {}) => `
-<div id="reactivesearch-shopify-1"${preferences.openAsPage ? ` openAsPage="true"` : ''}></div>
+<div id="reactivesearch-shopify-1"${
+	get(preferences, 'exportSettings.openAsPage') ? ` openAsPage="true"` : ''
+}></div>
 		`;
 
-export const getCSBScript = (preferences = {}, credentials) => `
-<script>var PREFERENCES=${JSON.stringify(
+export const getRecommendationScript = (widgetId) => `
+<div id="reactivesearch-shopify-product-recommendations-1" ${
+	widgetId ? `widget-id="${widgetId}"` : ''
+}></div>
+		`;
+export const getCSBScript = (preferences = {}, credentials, isRecommendation = false) => `
+<script>var ${
+	isRecommendation ? 'APPBASE_RECOMMENDATIONS_PREFERENCES' : 'APPBASE_SEARCH_PREFERENCES'
+}=${JSON.stringify(
 	JSON.stringify({
 		...preferences,
 		appbaseSettings: {
@@ -293,8 +327,43 @@ export const getPriceFilterConfigurationForm = () => {
 	});
 };
 
-export const getDynamicFilterKey = (pre = 'dynamic-filter-control') => {
-	return `${pre}_${new Date().getTime()}`;
+export const getRecommendationForm = (recommendationType, exportType) => {
+	const isMostRecent = recommendationType === RecommendationTypes.MOST_RECENT;
+	const isSimilarTo = recommendationType === RecommendationTypes.SIMILAR_PRODUCTS;
+	const isProductsPageURLEnabled = recommendationType === RecommendationTypes.SIMILAR_PRODUCTS;
+	const isFeaturedProducts = recommendationType === RecommendationTypes.FEATURED_PRODUCTS;
+	return FormBuilder.group({
+		id: new Date().getTime(),
+		title: 'You might also like',
+		type: RecommendationTypes.MOST_POPULAR_PRODUCTS,
+		maxProducts: [15, Validators.min(1)],
+		dataFieldSimilarTo: [
+			{
+				value: isMostRecent && exportType === 'shopify' ? 'created_at' : '',
+				disabled: !isSimilarTo,
+			},
+			Validators.required,
+		],
+		dataFieldMostRecent: [{ value: '', disabled: !isMostRecent }, Validators.required],
+		productsPageHandle: FormBuilder.group({
+			productsPageUrlPrefix: [
+				{ value: '/products/', disabled: !isProductsPageURLEnabled },
+				Validators.required,
+			],
+			productsPageUrlField: [
+				{
+					value: exportType === 'shopify' ? 'handle.keyword' : undefined,
+					disabled: !isProductsPageURLEnabled,
+				},
+				Validators.required,
+			],
+		}),
+		docIds: [{ value: [], disabled: !isFeaturedProducts }, Validators.required],
+	});
+};
+
+export const getDynamicFilterKey = (index) => {
+	return `dynamic-filter-control_${index}_${new Date().getTime()}`;
 };
 
 export const shopifyDefaultFields = {
@@ -311,3 +380,368 @@ export const getMultiListProps = (values) => ({
 	...values,
 	size: Number.isNaN(parseInt(values.size, 10)) ? undefined : parseInt(values.size, 10),
 });
+
+export const RecommendationTypes = {
+	MOST_POPULAR_PRODUCTS: 'most_popular',
+	MOST_RECENT: 'most_recent',
+	SIMILAR_PRODUCTS: 'similar',
+	FEATURED_PRODUCTS: 'featured',
+};
+
+export const RecommendationTypeLabels = {
+	[RecommendationTypes.MOST_POPULAR_PRODUCTS]: 'Most Popular Products',
+	[RecommendationTypes.MOST_RECENT]: 'Most Recent Products',
+	[RecommendationTypes.SIMILAR_PRODUCTS]: 'Similar to this Product',
+	[RecommendationTypes.FEATURED_PRODUCTS]: 'Featured Products',
+};
+
+export const CtaActions = {
+	REDIRECT_TO_PRODUCT: 'redirect_to_product',
+	NO_BUTTON: 'no_button',
+};
+
+export const messages = {
+	productsPageURL: (
+		<span>
+			This input allows you to define the pattern for the products page URL. It helps us to
+			extract the product details and show the recommendations for that product. The first
+			input is to define the URL prefix and second input is to select the ES field that is
+			mapped to the product identification that you are using in your application.
+			<br />
+			For example, if your products page URL is
+			`https://mystore.shopify.com/products/adidas-shoes-black-2` then first input should be
+			`products/` and second input value should be the data field that has the product handle
+			value. In case if you are using query params i.e the URL looks like
+			`https://mystore.shopify.com/products?id=232323`then first input value must be
+			`products?id=`.
+		</span>
+	),
+	dataFieldSimilarProduct:
+		'Select a field to display the similar products. For example, if you select `brand` and user is viewing the `Adidas Black Shoe` product that has `brand` value as `adidas` then appbase.io will show the products having `adidas` brand as recommendations.',
+	dataFieldMostRecent: 'Select the timestamp field to sort the products.',
+	featuredProducts: 'Select the products to be featured.',
+};
+
+export const defaultRecommendationsPreferences = {
+	themeType: 'classic',
+	primaryColor: '#0B6AFF',
+	primaryTextColor: '#fff',
+	textColor: '#424242',
+	titleColor: '#424242',
+	fontFamily: 'default',
+	customCss: '',
+	resultTitle: '',
+	resultDescription: '',
+	resultPrice: '',
+	resultImage: '',
+	resultHandle: '',
+	storeInfo: { currency: 'USD' },
+	exportSettings: { exportAs: 'embed', credentials: '', openAsPage: false, type: 'other' },
+	ctaTitle: 'View Product',
+	ctaAction: 'redirect_to_product',
+	recommendations: [],
+};
+
+export const defaultSearchPreferences = {
+	themeType: 'classic',
+	primaryColor: '#0B6AFF',
+	primaryTextColor: '#fff',
+	textColor: '#424242',
+	titleColor: '#424242',
+	fontFamily: 'default',
+	customCss: '',
+	resultTitle: '',
+	resultDescription: '',
+	resultPrice: '',
+	resultImage: '',
+	resultHandle: '',
+	storeInfo: { currency: 'USD' },
+	exportSettings: { exportAs: 'embed', credentials: '', openAsPage: false, type: 'other' },
+	showPopularSearches: false,
+	showPagination: false,
+	showSelectedFilters: true,
+	customMessages: {
+		resultStats: '[count] products found in [time] ms',
+		noFilterItem: 'No items Found',
+		noResultItem: 'No Results Found!',
+		noSuggestion: 'No suggestions found for <mark>[term]</mark>',
+		fetchingFilterOptions: 'Fetching Options',
+		searchText: 'Click here to search',
+		searchIcon: '',
+	},
+	staticFilters: {
+		productType: {
+			enabled: false,
+			customize: {
+				queryFormat: 'or',
+				sortBy: 'count',
+				showCount: true,
+				showCheckbox: true,
+				showSearch: true,
+				showMissing: false,
+			},
+		},
+		collections: {
+			enabled: false,
+			customize: {
+				queryFormat: 'or',
+				sortBy: 'count',
+				showCount: true,
+				showCheckbox: true,
+				showSearch: true,
+				showMissing: false,
+			},
+		},
+		color: {
+			enabled: false,
+			customize: {
+				queryFormat: 'or',
+				sortBy: 'count',
+				showCount: true,
+				showCheckbox: true,
+				showSearch: true,
+				showMissing: false,
+			},
+		},
+		size: {
+			enabled: false,
+			customize: {
+				queryFormat: 'or',
+				sortBy: 'count',
+				showCount: true,
+				showCheckbox: true,
+				showSearch: true,
+				showMissing: false,
+			},
+		},
+		price: { enabled: false, customize: {} },
+	},
+	dynamicFilters: [],
+	syncSettings: {
+		product_sync: true,
+		collection_sync: true,
+		collect_sync: false,
+		metafield_sync: false,
+		namedtags_sync: false,
+	},
+};
+
+export const getRecommendationPreferencesPayload = (formValue) => {
+	return JSON.parse(
+		JSON.stringify({
+			themeSettings: {
+				type: get(formValue, 'themeType'),
+				customCss: get(formValue, 'customCss'),
+				rsConfig: {
+					colors: {
+						primaryColor: get(formValue, 'primaryColor'),
+						primaryTextColor: get(formValue, 'primaryTextColor'),
+						textColor: get(formValue, 'textColor'),
+						titleColor: get(formValue, 'titleColor'),
+					},
+					typography: {
+						fontFamily: get(formValue, 'fontFamily'),
+					},
+				},
+			},
+			globalSettings: {
+				currency: get(formValue, 'storeInfo.currency'),
+				showSelectedFilters: !!get(formValue, 'showSelectedFilters'),
+			},
+			exportSettings: get(formValue, 'exportSettings'),
+			resultSettings: {
+				fields: {
+					title: get(formValue, 'resultTitle'),
+					description: get(formValue, 'resultDescription'),
+					price: get(formValue, 'resultPrice'),
+					image: get(formValue, 'resultImage'),
+					handle: get(formValue, 'resultHandle'),
+				},
+				customMessages: {
+					resultStats: '',
+					noResults: '',
+				},
+				rsConfig: {},
+			},
+			recommendationSettings: {
+				ctaTitle: get(formValue, 'ctaTitle'),
+				ctaAction: get(formValue, 'ctaAction'),
+				recommendations: get(formValue, 'recommendations', []).map((item) => {
+					let dataField;
+					let productsPageUrl;
+					let docIds;
+					if (item.type === RecommendationTypes.MOST_RECENT) {
+						dataField = item.dataFieldMostRecent;
+					} else if (item.type === RecommendationTypes.SIMILAR_PRODUCTS) {
+						dataField = item.dataFieldSimilarTo;
+						productsPageUrl = `${get(
+							item,
+							'productsPageHandle.productsPageUrlPrefix',
+						)}{${get(item, 'productsPageHandle.productsPageUrlField')}}`;
+					} else if (item.type === RecommendationTypes.FEATURED_PRODUCTS) {
+						({ docIds } = item);
+					}
+					return {
+						id: String(item.id),
+						title: item.title,
+						type: item.type,
+						productsPageUrl,
+						dataField,
+						maxProducts: Number(item.maxProducts),
+						docIds,
+					};
+				}),
+			},
+		}),
+	);
+};
+
+export const getSearchPreferencesPayload = (formValue) => {
+	return JSON.parse(
+		JSON.stringify({
+			themeSettings: {
+				type: get(formValue, 'themeType'),
+				customCss: get(formValue, 'customCss'),
+				rsConfig: {
+					colors: {
+						primaryColor: get(formValue, 'primaryColor'),
+						primaryTextColor: get(formValue, 'primaryTextColor'),
+						textColor: get(formValue, 'textColor'),
+						titleColor: get(formValue, 'titleColor'),
+					},
+					typography: {
+						fontFamily: get(formValue, 'fontFamily'),
+					},
+				},
+			},
+			globalSettings: {
+				currency: get(formValue, 'storeInfo.currency'),
+				showSelectedFilters: !!get(formValue, 'showSelectedFilters'),
+			},
+			exportSettings: get(formValue, 'exportSettings'),
+			resultSettings: {
+				fields: {
+					title: get(formValue, 'resultTitle'),
+					description: get(formValue, 'resultDescription'),
+					price: get(formValue, 'resultPrice'),
+					image: get(formValue, 'resultImage'),
+					handle: get(formValue, 'resultHandle'),
+				},
+				customMessages: {
+					resultStats: get(formValue, 'customMessages.resultStats'),
+					noResults: get(formValue, 'customMessages.noResultItem'),
+				},
+				rsConfig: {
+					pagination: !!get(formValue, 'showPagination'),
+					infiniteScroll: !get(formValue, 'showPagination'),
+				},
+			},
+			searchSettings: {
+				customMessages: {
+					noResults: get(formValue, 'customMessages.noSuggestion'),
+				},
+				searchButton: {
+					icon: get(formValue, 'customMessages.searchIcon'),
+					text: get(formValue, 'customMessages.searchText'),
+				},
+				fields: {
+					title: get(formValue, 'resultTitle'),
+					description: get(formValue, 'resultDescription'),
+					price: get(formValue, 'resultPrice'),
+					image: get(formValue, 'resultImage'),
+					handle: get(formValue, 'resultHandle'),
+				},
+				rsConfig: {
+					enablePopularSuggestions: get(formValue, 'showPopularSearches'),
+				},
+			},
+			facetSettings: {
+				staticFacets: [
+					{
+						name: 'productType',
+						enabled: get(formValue, 'staticFilters.productType.enabled'),
+						isCollapsible: true,
+						customMessages: {
+							loading: get(formValue, 'customMessages.fetchingFilterOptions'),
+							noResults: get(formValue, 'customMessages.noFilterItem'),
+						},
+						rsConfig: {
+							...getMultiListProps(
+								get(formValue, 'staticFilters.productType.customize'),
+							),
+						},
+					},
+					{
+						name: 'collection',
+						enabled: get(formValue, 'staticFilters.collections.enabled'),
+						isCollapsible: true,
+						customMessages: {
+							loading: get(formValue, 'customMessages.fetchingFilterOptions'),
+							noResults: get(formValue, 'customMessages.noFilterItem'),
+						},
+						rsConfig: {
+							...getMultiListProps(
+								get(formValue, 'staticFilters.collections.customize'),
+							),
+						},
+					},
+					{
+						name: 'color',
+						enabled: get(formValue, 'staticFilters.color.enabled'),
+						isCollapsible: true,
+						customMessages: {
+							loading: get(formValue, 'customMessages.fetchingFilterOptions'),
+							noResults: get(formValue, 'customMessages.noFilterItem'),
+						},
+						rsConfig: {
+							...getMultiListProps(get(formValue, 'staticFilters.color.customize')),
+						},
+					},
+					{
+						name: 'size',
+						enabled: get(formValue, 'staticFilters.size.enabled'),
+						isCollapsible: true,
+						customMessages: {
+							loading: get(formValue, 'customMessages.fetchingFilterOptions'),
+							noResults: get(formValue, 'customMessages.noFilterItem'),
+						},
+						rsConfig: {
+							...getMultiListProps(get(formValue, 'staticFilters.size.customize')),
+						},
+					},
+					{
+						name: 'price',
+						enabled: get(formValue, 'staticFilters.price.enabled'),
+						isCollapsible: true,
+						customMessages: {
+							loading: get(formValue, 'customMessages.fetchingFilterOptions'),
+							noResults: get(formValue, 'customMessages.noFilterItem'),
+						},
+						rsConfig: {
+							...getMultiListProps(get(formValue, 'staticFilters.price.customize')),
+						},
+					},
+				],
+				dynamicFacets: get(formValue, 'dynamicFilters', []).map((filter, filterIndex) => ({
+					enabled: filter.enabled,
+					customMessages: {
+						loading: get(formValue, 'customMessages.fetchingFilterOptions'),
+						noResults: get(formValue, 'customMessages.noFilterItem'),
+					},
+					rsConfig: {
+						componentId: `${get(filter, 'customize.title', '').replace(
+							' ',
+							'_',
+						)}_${filterIndex}`,
+						filterLabel: get(filter, 'customize.title'),
+						...getMultiListProps(filter.customize),
+					},
+				})),
+			},
+			syncSettings:
+				get(formValue, 'exportSettings.type') === 'shopify'
+					? get(formValue, 'syncSettings')
+					: null,
+		}),
+	);
+};

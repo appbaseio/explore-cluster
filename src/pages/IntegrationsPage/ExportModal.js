@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Modal, Form, Switch, Radio } from 'antd';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
-import { func } from 'prop-types';
+import { func, object, number, bool, oneOfType, string } from 'prop-types';
 import get from 'lodash/get';
 import ExportToShopify from './ExportToShopify';
 import ExportToOther from './ExportToOther';
@@ -16,14 +16,35 @@ class ExportModal extends React.Component {
 	};
 
 	getComponentByValue(exportSettingsControl) {
-		const { preferences } = this.props;
+		const { preferences, isRecommendation, widgetId } = this.props;
 		if (get(exportSettingsControl, 'value.exportAs') === 'hackable') {
-			return <ExportToHackable control={exportSettingsControl} preferences={preferences} />;
+			return (
+				<ExportToHackable
+					isRecommendation={isRecommendation}
+					widgetId={widgetId}
+					control={exportSettingsControl}
+					preferences={preferences}
+				/>
+			);
 		}
 		if (get(exportSettingsControl, 'value.type') === 'shopify') {
-			return <ExportToShopify control={exportSettingsControl} preferences={preferences} />;
+			return (
+				<ExportToShopify
+					isRecommendation={isRecommendation}
+					widgetId={widgetId}
+					control={exportSettingsControl}
+					preferences={preferences}
+				/>
+			);
 		}
-		return <ExportToOther control={exportSettingsControl} preferences={preferences} />;
+		return (
+			<ExportToOther
+				isRecommendation={isRecommendation}
+				widgetId={widgetId}
+				control={exportSettingsControl}
+				preferences={preferences}
+			/>
+		);
 	}
 
 	showModal = () => {
@@ -57,6 +78,7 @@ class ExportModal extends React.Component {
 
 	render() {
 		const { visible, showInstruction } = this.state;
+		const { buttonProps, isRecommendation } = this.props;
 		const { get: getControl } = this.context;
 		const exportSettingsControl = getControl('exportSettings');
 		return (
@@ -113,22 +135,24 @@ class ExportModal extends React.Component {
 										<strong>Access Control</strong>.
 									</div>
 
-									<FieldControl name="openAsPage">
-										{({ handler }) => (
-											<>
-												<Form.Item
-													label="The search will appear with a CTA button. Do you instead
+									{!isRecommendation && (
+										<FieldControl name="openAsPage">
+											{({ handler }) => (
+												<>
+													<Form.Item
+														label="The search will appear with a CTA button. Do you instead
 										want to show the search view directly?"
-												>
-													<Switch {...handler('checkbox')} />
-												</Form.Item>
-											</>
-										)}
-									</FieldControl>
+													>
+														<Switch {...handler('checkbox')} />
+													</Form.Item>
+												</>
+											)}
+										</FieldControl>
+									)}
 								</Form>
 							)}
 						</Modal>
-						<Button onClick={this.showModal} size="large">
+						<Button onClick={this.showModal} size="large" {...buttonProps}>
 							Export Code
 						</Button>
 					</React.Fragment>
@@ -140,6 +164,15 @@ class ExportModal extends React.Component {
 
 ExportModal.propTypes = {
 	preferences: func.isRequired,
+	isRecommendation: bool,
+	buttonProps: object,
+	widgetId: oneOfType([number, string]),
+};
+
+ExportModal.defaultProps = {
+	buttonProps: null,
+	isRecommendation: false,
+	widgetId: undefined,
 };
 
 export default ExportModal;

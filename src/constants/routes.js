@@ -67,10 +67,13 @@ export const APP_ROUTES = {
 		hasExactPath: true,
 		action: ALLOWED_ACTIONS.CURATED_INSIGHTS,
 	},
-	'UI Integrations': {
+	'UI Builder': {
 		icon: 'control',
-		link: 'integrations',
-		hasExactPath: true,
+		action: ALLOWED_ACTIONS.UI_BUILDER,
+		menu: [
+			{ label: 'Search', link: 'search-builder' },
+			{ label: 'Recommendations', link: 'recommendations-builder' },
+		],
 		tag: 'Beta',
 	},
 	'Access Control': {
@@ -175,12 +178,14 @@ export const CLUSTER_ROUTES = {
 		action: ALLOWED_ACTIONS.CURATED_INSIGHTS,
 		link: '/cluster/curated-insights',
 	},
-	'UI Integrations': {
+	'UI Builder': {
 		icon: 'control',
-		link: 'integrations',
+		action: ALLOWED_ACTIONS.UI_BUILDER,
+		menu: [
+			{ label: 'Search', link: 'search-builder', openIndexMenu: true },
+			{ label: 'Recommendations', link: 'recommendations-builder', openIndexMenu: true },
+		],
 		tag: 'Beta',
-		label: 'UI Integrations',
-		openIndexMenu: true,
 	},
 	'Access Control': {
 		icon: 'key',

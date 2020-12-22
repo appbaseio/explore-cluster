@@ -128,7 +128,8 @@ class Dashboard extends Component {
 	componentDidUpdate(prevProps) {
 		const { error, status, user, updateAppRoutes, updateClusterRoutes } = this.props;
 		const allowedActions = get(user, 'data.allowedActions', []);
-		if (allowedActions.length) {
+		const isAdmin = get(user, 'data.isAdmin', false);
+		if (!isAdmin && allowedActions.length) {
 			updateAppRoutes(getAuthorizedViews(APP_ROUTES, allowedActions));
 			updateClusterRoutes(getAuthorizedViews(CLUSTER_ROUTES, allowedActions));
 		}

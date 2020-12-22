@@ -83,8 +83,19 @@ const SandboxPage = Loadable({
 	loading: Loader,
 });
 
-const IntegrationsPage = Loadable({
-	loader: () => import(/* webpackChunkName: "IntegrationsPage" */ '../../pages/IntegrationsPage'),
+const SearchIntegrationsPage = Loadable({
+	loader: () =>
+		import(
+			/* webpackChunkName: "SearchIntegrationsPage" */ '../../pages/IntegrationsPage/Search'
+		),
+	loading: Loader,
+});
+
+const RecommendationsIntegrationsPage = Loadable({
+	loader: () =>
+		import(
+			/* webpackChunkName: "RecommendationsIntegrationsPage" */ '../../pages/IntegrationsPage/Recommendations'
+		),
 	loading: Loader,
 });
 
@@ -325,9 +336,19 @@ class ClusterRouteContainer extends React.Component {
 					/>
 					<Route
 						exact
-						path="/cluster/integrations"
+						path="/cluster/search-builder"
 						render={(props) => (
-							<AppPageContainer {...props} component={IntegrationsPage} />
+							<AppPageContainer {...props} component={SearchIntegrationsPage} />
+						)}
+					/>
+					<Route
+						exact
+						path="/cluster/recommendations-builder"
+						render={(props) => (
+							<AppPageContainer
+								{...props}
+								component={RecommendationsIntegrationsPage}
+							/>
 						)}
 					/>
 					<Route
