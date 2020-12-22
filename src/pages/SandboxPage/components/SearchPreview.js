@@ -336,7 +336,12 @@ class SearchPreview extends React.Component {
 			handleModal,
 			tier,
 			featureGrade,
+			showFeaturedProducts,
+			onChange,
+			value,
+			selectButtonLabel,
 		} = this.props;
+
 		const {
 			settings: stateSettings,
 			isAnalyticsEnabled,
@@ -392,43 +397,45 @@ class SearchPreview extends React.Component {
 		return (
 			<Row className={container} gutter={16}>
 				<Col xs={24}>
-					<Row className="my-16" type="flex" align="middle" justify="space-between">
-						<div>
-							<Tooltip title="Toggle to record search and click analytics events from the search relevancy view.">
-								<label htmlFor="analytics">
-									Record Analytics
-									<Switch
-										checked={isAnalyticsEnabled}
-										style={{ marginLeft: 5, marginRight: 10 }}
-										onChange={this.toggleAnalytics}
-										id="analytics"
-									/>
-								</label>
-							</Tooltip>
-							<Tooltip
-								title={
-									isGradingAllowed
-										? 'Toggle to enable (or disable) grading of search results.'
-										: 'This feature is not available for the current plan, please upgrade to a higher plan.'
-								}
-							>
-								<label htmlFor="grading">
-									Grade Search
-									<Switch
-										checked={isGradingEnabled}
-										disabled={!isGradingAllowed}
-										style={{ marginLeft: 5 }}
-										onChange={this.toggleGrading}
-										id="grading"
-									/>
-								</label>
-							</Tooltip>
-						</div>
-						<Button onClick={this.generateCodeSandbox} size="large" type="primary">
-							<Icon type="code-sandbox" />
-							Open in Codesandbox
-						</Button>
-					</Row>
+					{!showFeaturedProducts && (
+						<Row className="my-16" type="flex" align="middle" justify="space-between">
+							<div>
+								<Tooltip title="Toggle to record search and click analytics events from the search relevancy view.">
+									<label htmlFor="analytics">
+										Record Analytics
+										<Switch
+											checked={isAnalyticsEnabled}
+											style={{ marginLeft: 5, marginRight: 10 }}
+											onChange={this.toggleAnalytics}
+											id="analytics"
+										/>
+									</label>
+								</Tooltip>
+								<Tooltip
+									title={
+										isGradingAllowed
+											? 'Toggle to enable (or disable) grading of search results.'
+											: 'This feature is not available for the current plan, please upgrade to a higher plan.'
+									}
+								>
+									<label htmlFor="grading">
+										Grade Search
+										<Switch
+											checked={isGradingEnabled}
+											disabled={!isGradingAllowed}
+											style={{ marginLeft: 5 }}
+											onChange={this.toggleGrading}
+											id="grading"
+										/>
+									</label>
+								</Tooltip>
+							</div>
+							<Button onClick={this.generateCodeSandbox} size="large" type="primary">
+								<Icon type="code-sandbox" />
+								Open in Codesandbox
+							</Button>
+						</Row>
+					)}
 				</Col>
 				<ReactiveBase
 					app={app}
@@ -436,7 +443,7 @@ class SearchPreview extends React.Component {
 					credentials={credentials}
 					url={url}
 					appbaseConfig={{
-						recordAnalytics: isAnalyticsEnabled,
+						recordAnalytics: showFeaturedProducts ? false : isAnalyticsEnabled,
 					}}
 				>
 					<Col md={6}>
@@ -462,6 +469,7 @@ class SearchPreview extends React.Component {
 								handleModal={handleModal}
 							/>
 						</ErrorToaster>
+
 						<ErrorToaster>
 							<SandboxContext.Provider
 								value={{
@@ -477,7 +485,15 @@ class SearchPreview extends React.Component {
 									onSettingsChange: this.handleSettingsChange,
 								}}
 							>
-								<Result result={result} app={app} rules={rules} />
+								<Result
+									result={result}
+									app={app}
+									rules={rules}
+									showFeaturedProducts={showFeaturedProducts}
+									selectButtonLabel={selectButtonLabel}
+									onChange={onChange}
+									value={value}
+								/>
 							</SandboxContext.Provider>
 						</ErrorToaster>
 					</Col>
@@ -534,6 +550,10 @@ SearchPreview.propTypes = {
 	searchState: PropTypes.object,
 	clearState: PropTypes.func,
 	handleModal: PropTypes.func,
+	showFeaturedProducts: PropTypes.bool,
+	onChange: PropTypes.func,
+	value: PropTypes.array,
+	selectButtonLabel: PropTypes.string,
 };
 
 SearchPreview.defaultProps = {
@@ -548,8 +568,12 @@ SearchPreview.defaultProps = {
 	isFetchingMappings: false,
 	mappings: null,
 	searchState: null,
+	showFeaturedProducts: false,
 	clearState: () => {},
 	handleModal: () => {},
+	onChange: () => {},
+	value: [],
+	selectButtonLabel: undefined,
 };
 
 export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(SearchPreview));

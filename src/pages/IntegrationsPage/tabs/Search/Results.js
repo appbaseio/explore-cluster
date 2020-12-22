@@ -1,6 +1,7 @@
 import React from 'react';
 import { FieldControl } from 'react-reactive-form';
 import { Switch, Form, List } from 'antd';
+import { bool, array } from 'prop-types';
 import DataFieldSelector from '../../../../components/Form/DataFieldSelector';
 
 export const defaultSettings = [
@@ -80,10 +81,10 @@ const fieldSelectorIds = [
 
 const { Item } = List;
 
-const Results = () => (
-	<Form layout="inline">
+const Results = ({ withoutForm, dataSource }) => {
+	const component = () => (
 		<List
-			dataSource={defaultSettings}
+			dataSource={dataSource}
 			bordered
 			renderItem={(item) => (
 				<FieldControl name={item.id}>
@@ -107,7 +108,21 @@ const Results = () => (
 				</FieldControl>
 			)}
 		/>
-	</Form>
-);
+	);
+	if (withoutForm) {
+		return component();
+	}
+	return <Form layout="inline">{component()}</Form>;
+};
+
+Results.defaultProps = {
+	withoutForm: false,
+	dataSource: defaultSettings,
+};
+
+Results.propTypes = {
+	withoutForm: bool,
+	dataSource: array,
+};
 
 export default Results;

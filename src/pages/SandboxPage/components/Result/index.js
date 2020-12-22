@@ -35,7 +35,15 @@ class Result extends React.Component {
 	};
 
 	render() {
-		const { result, app, rules } = this.props;
+		const {
+			result,
+			app,
+			rules,
+			showFeaturedProducts,
+			onChange,
+			value,
+			selectButtonLabel,
+		} = this.props;
 		const { view } = this.state;
 		return (
 			<Card>
@@ -109,7 +117,17 @@ class Result extends React.Component {
 						</Radio.Button>
 					</Radio.Group>
 				</Row>
-				{view === 'list' ? <ListView result={result} /> : <QueryView />}
+				{view === 'list' ? (
+					<ListView
+						result={result}
+						showFeaturedProducts={showFeaturedProducts}
+						selectButtonLabel={selectButtonLabel}
+						value={value}
+						onChange={onChange}
+					/>
+				) : (
+					<QueryView />
+				)}
 			</Card>
 		);
 	}
@@ -119,11 +137,19 @@ Result.propTypes = {
 	result: PropTypes.object,
 	app: PropTypes.string.isRequired,
 	rules: PropTypes.array,
+	showFeaturedProducts: PropTypes.bool,
+	selectButtonLabel: PropTypes.string,
+	onChange: PropTypes.func,
+	value: PropTypes.array,
 };
 
 Result.defaultProps = {
 	result: {},
 	rules: [],
+	showFeaturedProducts: false,
+	selectButtonLabel: undefined,
+	onChange: () => {},
+	value: [],
 };
 
 export default Result;

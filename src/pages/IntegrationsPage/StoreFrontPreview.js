@@ -1,7 +1,9 @@
 import React from 'react';
-import { func } from 'prop-types';
-import { Button, Icon } from 'antd';
+import { func, bool, number, oneOfType, string } from 'prop-types';
+import { Button, Icon, notification } from 'antd';
+import get from 'lodash/get';
 import Loader from '../../components/Loader';
+import SearchPreviewWrapper from './SearchPreviewWrapper';
 import { BaseURL, BaseCSSURL } from './utils';
 
 class StoreFrontPreview extends React.Component {
@@ -9,23 +11,52 @@ class StoreFrontPreview extends React.Component {
 		super(props);
 		this.iframeRef = React.createRef(`iframe-preview`);
 		this.state = {
-			loading: true,
+			loading: !props.displayProductPicker,
 			isMobile: false,
+			currentProduct: '',
 		};
 	}
 
 	componentDidMount() {
-		this.iframeRef.current.addEventListener('load', this.onLoad);
+		const { displayProductPicker } = this.props;
+		if (!displayProductPicker) {
+			if (this.iframeRef.current) {
+				this.onLoad();
+			}
+		}
 	}
 
 	onLoad = () => {
-		const { preferences } = this.props;
+		const { preferences, isRecommendation, widgetId } = this.props;
+		const { currentProduct } = this.state;
 		const div = this.iframeRef.current.contentDocument.createElement('div');
-		div.id = 'reactivesearch-shopify-1';
-		div.setAttribute('openaspage', true);
-		div.setAttribute('ispreview', true);
+		this.setState({
+			loading: true,
+		});
+		if (isRecommendation) {
+			div.id = 'reactivesearch-shopify-product-recommendations';
+			if (widgetId) {
+				div.setAttribute('widget-id', widgetId);
+			}
+			if (currentProduct) {
+				div.setAttribute('current-product', currentProduct);
+			}
+		} else {
+			div.id = 'reactivesearch-shopify-1';
+			div.setAttribute('openaspage', true);
+		}
+		div.setAttribute('isPreview', true);
 		// Set preferences
-		this.iframeRef.current.contentWindow.PREFERENCES = JSON.stringify(preferences());
+		if (isRecommendation) {
+			this.iframeRef.current.contentWindow.APPBASE_RECOMMENDATIONS_PREFERENCES = JSON.stringify(
+				preferences(),
+			);
+		} else {
+			this.iframeRef.current.contentWindow.APPBASE_SEARCH_PREFERENCES = JSON.stringify(
+				preferences(),
+			);
+		}
+
 		this.iframeRef.current.contentDocument.body.appendChild(div);
 		const link = this.iframeRef.current.contentDocument.createElement('link');
 		link.rel = 'stylesheet';
@@ -54,8 +85,45 @@ class StoreFrontPreview extends React.Component {
 		}));
 	};
 
+	handleProductSelection = (item) => {
+		const { similarToField, onSelectProduct } = this.props;
+		let notifyError;
+		if (similarToField) {
+			const docId = get(item, `${similarToField.split('.keyword')[0]}`);
+			if (docId) {
+				this.setState(
+					{
+						currentProduct: docId,
+					},
+					() => {
+						this.onLoad();
+						if (onSelectProduct) {
+							onSelectProduct(item);
+						}
+					},
+				);
+			} else {
+				notifyError = true;
+			}
+		} else {
+			notifyError = true;
+		}
+		if (notifyError) {
+			notification.error({
+				message: 'Invalid Product Selection',
+				description:
+					'The selected product does not have the field value that matches with the product page url that you defined for the recommendation. Either change the field by editing the recommendation or select a different product.',
+			});
+		}
+	};
+
 	render() {
-		const { isMobile, loading } = this.state;
+		const { isMobile, loading, currentProduct } = this.state;
+		const { displayProductPicker } = this.props;
+		let showLayoutSwitcher = true;
+		if (displayProductPicker && !currentProduct) {
+			showLayoutSwitcher = false;
+		}
 		return (
 			<div
 				style={{
@@ -63,23 +131,33 @@ class StoreFrontPreview extends React.Component {
 				}}
 			>
 				{loading ? <Loader /> : null}
-				<Button
-					style={{
-						position: 'fixed',
-						top: 10,
-						left: '50%',
-						right: '50%',
-						zIndex: 5,
-					}}
-					onClick={this.handleViewChange}
-				>
-					<Icon
+				{showLayoutSwitcher && (
+					<Button
 						style={{
-							fontSize: 20,
+							position: 'fixed',
+							top: 10,
+							left: '50%',
+							right: '50%',
+							zIndex: 5,
 						}}
-						type={isMobile ? 'desktop' : 'mobile'}
+						onClick={this.handleViewChange}
+					>
+						<Icon
+							style={{
+								fontSize: 20,
+							}}
+							type={isMobile ? 'desktop' : 'mobile'}
+						/>
+					</Button>
+				)}
+				{displayProductPicker && !currentProduct && (
+					<SearchPreviewWrapper
+						openWithModal={false}
+						selectButtonLabel="Select Product"
+						value={currentProduct ? [currentProduct] : []}
+						onChange={this.handleProductSelection}
 					/>
-				</Button>
+				)}
 				<iframe
 					title="iframe-preview"
 					id="iframe-preview"
@@ -96,9 +174,21 @@ class StoreFrontPreview extends React.Component {
 		);
 	}
 }
+StoreFrontPreview.defaultProps = {
+	isRecommendation: false,
+	widgetId: undefined,
+	similarToField: undefined,
+	onSelectProduct: null,
+	displayProductPicker: false,
+};
 
 StoreFrontPreview.propTypes = {
 	preferences: func.isRequired,
+	onSelectProduct: func,
+	similarToField: string,
+	displayProductPicker: bool,
+	isRecommendation: bool,
+	widgetId: oneOfType([number, string]),
 };
 
 export default StoreFrontPreview;

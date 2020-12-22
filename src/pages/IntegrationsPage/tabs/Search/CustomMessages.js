@@ -62,27 +62,6 @@ const CustomMessages = () => (
 							</div>
 						)}
 					/>
-					<FieldControl
-						name="fetchingSuggestion"
-						render={({ handler }) => (
-							<div>
-								<strong>Suggestions Loading</strong>
-								<br />
-								Shows while the suggestions are being fetched.
-								<br />
-								<AceEditor
-									mode="html"
-									theme="monokai"
-									name="fetchingSuggestion"
-									placeholder="Fetching Suggestions"
-									style={{ marginTop: 5 }}
-									width="100%"
-									height="200px"
-									{...handler()}
-								/>
-							</div>
-						)}
-					/>
 
 					<FieldControl
 						name="noSuggestion"

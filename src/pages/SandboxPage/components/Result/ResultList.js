@@ -50,7 +50,19 @@ class ResultList extends React.Component {
 	}
 
 	render() {
-		const { data, loading, loadMore, triggerAnalytics, pagination, size } = this.props;
+		const {
+			data,
+			loading,
+			loadMore,
+			triggerAnalytics,
+			pagination,
+			size,
+			showFeaturedProducts,
+			selectButtonLabel,
+			onChange,
+			value,
+			showFeaturedList,
+		} = this.props;
 
 		if (loading && (!data || !data.length)) {
 			return (
@@ -62,15 +74,25 @@ class ResultList extends React.Component {
 
 		return (
 			<>
-				{data.map((item) => (
-					<div
-						id={item._id}
-						key={item._id}
-						onClick={() => triggerAnalytics(item._click_id)}
-					>
-						<ListItem key={item.id} item={item} />
-					</div>
-				))}
+				{data.map((item) => {
+					return (
+						<div
+							key={item._id}
+							id={item._id}
+							onClick={() => triggerAnalytics(item._click_id)}
+						>
+							<ListItem
+								key={item.id}
+								item={item}
+								showFeaturedProducts={showFeaturedProducts}
+								value={value}
+								onChange={onChange}
+								selectButtonLabel={selectButtonLabel}
+								showFeaturedList={showFeaturedList}
+							/>
+						</div>
+					);
+				})}
 
 				{pagination || (
 					<LoadMore loading={loading} loadMore={loadMore} data={data} size={size} />
@@ -87,12 +109,22 @@ ResultList.propTypes = {
 	loading: PropTypes.bool.isRequired,
 	loadMore: PropTypes.func.isRequired,
 	triggerAnalytics: PropTypes.func.isRequired,
+	showFeaturedProducts: PropTypes.bool,
+	selectButtonLabel: PropTypes.string,
+	onChange: PropTypes.func,
+	value: PropTypes.array,
+	showFeaturedList: PropTypes.bool,
 };
 
 ResultList.defaultProps = {
 	data: null,
 	pagination: null,
 	size: 10,
+	showFeaturedProducts: false,
+	selectButtonLabel: undefined,
+	onChange: () => {},
+	value: [],
+	showFeaturedList: false,
 };
 
 export default ResultList;

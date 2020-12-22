@@ -58,6 +58,19 @@ const ALLOWED_ACTIONS = {
 	USER_MANAGEMENT: 'user-management',
 	BILLING: 'billing',
 	DOWNTIME_ALERTS: 'downtime-alerts',
+	UI_BUILDER: 'uibuilder',
+};
+
+const ALLOWED_ACTIONS_LABELS = {
+	[ALLOWED_ACTIONS.DEVELOP]: 'Develop',
+	[ALLOWED_ACTIONS.ANALYTICS]: 'Analytics',
+	[ALLOWED_ACTIONS.CURATED_INSIGHTS]: 'Curated Insights',
+	[ALLOWED_ACTIONS.SEARCH_RELEVANCY]: 'Search Relevancy',
+	[ALLOWED_ACTIONS.ACCESS_CONTROL]: 'Access Control',
+	[ALLOWED_ACTIONS.USER_MANAGEMENT]: 'User Management',
+	[ALLOWED_ACTIONS.BILLING]: 'Billing',
+	[ALLOWED_ACTIONS.DOWNTIME_ALERTS]: 'Downtime Alerts',
+	[ALLOWED_ACTIONS.UI_BUILDER]: 'UI Builder',
 };
 
 const ROUTES_ACTION = {
@@ -86,4 +99,5 @@ export {
 	ROUTES_ACTION,
 	SIDE_BAR,
 	SUB_FIELDS,
+	ALLOWED_ACTIONS_LABELS,
 };

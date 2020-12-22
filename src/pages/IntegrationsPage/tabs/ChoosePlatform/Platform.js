@@ -10,8 +10,14 @@ const Platform = () => (
 			{() => (
 				<div>
 					<FieldControl name="type">
-						{({ handler }) => (
-							<Radio.Group {...handler()}>
+						{(control) => (
+							<Radio.Group
+								{...control.handler()}
+								onChange={(value) => {
+									control.markAsTouched();
+									control.handler().onChange(value);
+								}}
+							>
 								<Radio value="shopify">Shopify</Radio>
 								<Radio value="other">
 									Other (Wordpress, Magento, Big Commerce, others)

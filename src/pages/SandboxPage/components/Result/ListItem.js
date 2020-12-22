@@ -2,7 +2,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Tooltip, Row, Col, Divider, Popover, Tag, Icon } from 'antd';
+import { Tooltip, Row, Col, Divider, Popover, Tag, Icon, Button } from 'antd';
 
 import { listItem } from './styles';
 import Grading from './Grading';
@@ -16,14 +16,17 @@ const getObjKeys = ({ hasOverflow, collapsed, data }) => {
 	return slice;
 };
 
+// eslint-disable-next-line react/prefer-stateless-function
 class ListItem extends React.Component {
-	shouldComponentUpdate(nextProps) {
-		const { item } = this.props;
-		return JSON.stringify(item) !== JSON.stringify(nextProps.item);
-	}
-
 	render() {
-		const { item } = this.props;
+		const {
+			item,
+			showFeaturedProducts,
+			onChange,
+			value,
+			selectButtonLabel,
+			showFeaturedList,
+		} = this.props;
 		const { _promoted, _click_id, _index, highlight, _type, index, ...rest } = item;
 
 		return (
@@ -34,6 +37,33 @@ class ListItem extends React.Component {
 							<Icon type="star" />
 						</Tag>
 					</Tooltip>
+				)}
+				{showFeaturedProducts && (
+					<Popover
+						content={
+							<h4>{`Click to ${
+								value && value.includes(item._id) ? 'Remove' : 'Add'
+							} item`}</h4>
+						}
+						trigger="hover"
+					>
+						<Button
+							type="primary"
+							ghost
+							style={{ float: 'right', width: 125 }}
+							onClick={() => {
+								onChange(item);
+							}}
+						>
+							{value && value.includes(item._id) ? (
+								<>
+									<Icon type="check" /> Featured
+								</>
+							) : (
+								selectButtonLabel
+							)}
+						</Button>
+					</Popover>
 				)}
 				<Expand>
 					{({ hasOverflow, collapsed }) => (
@@ -81,7 +111,7 @@ class ListItem extends React.Component {
 					)}
 				</Expand>
 
-				<Grading id={item._id} />
+				{!showFeaturedList && <Grading id={item._id} />}
 				<Divider />
 			</div>
 		);
@@ -90,10 +120,20 @@ class ListItem extends React.Component {
 
 ListItem.propTypes = {
 	item: PropTypes.object,
+	showFeaturedProducts: PropTypes.bool,
+	selectButtonLabel: PropTypes.string,
+	value: PropTypes.array,
+	onChange: PropTypes.func,
+	showFeaturedList: PropTypes.bool,
 };
 
 ListItem.defaultProps = {
 	item: {},
+	showFeaturedProducts: false,
+	selectButtonLabel: 'Feature',
+	value: [],
+	onChange: () => {},
+	showFeaturedList: false,
 };
 
 export default ListItem;

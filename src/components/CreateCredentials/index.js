@@ -39,7 +39,7 @@ import {
 import Acl from './Acl';
 import WhiteList from './WhiteList';
 import PasswordInput from './PasswordInput';
-import { ALLOWED_ACTIONS } from '../../constants';
+import { ALLOWED_ACTIONS, ALLOWED_ACTIONS_LABELS } from '../../constants';
 import SwitchGroup from '../SwitchGroup';
 
 const { Option } = Select;
@@ -303,11 +303,11 @@ class CreateCredentials extends React.Component {
 		const actionOptions = isClusterPlan
 			? Object.values(ALLOWED_ACTIONS).map((i) => ({
 					value: i,
-					label: i.split('-').join(' '),
+					label: ALLOWED_ACTIONS_LABELS[i],
 			  }))
 			: Object.values(ALLOWED_ACTIONS)
 					.filter((i) => i !== ALLOWED_ACTIONS.DOWNTIME_ALERTS)
-					.map((i) => ({ value: i, label: i.split('-').join(' ') }));
+					.map((i) => ({ value: i, label: ALLOWED_ACTIONS_LABELS[i] }));
 		return (
 			<FieldGroup
 				strict={false}
