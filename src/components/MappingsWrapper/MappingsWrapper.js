@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { message } from 'antd';
+import { message, notification } from 'antd';
 
 import {
 	getMappingsInfo,
@@ -181,7 +181,7 @@ class MappingsWrapper extends React.Component {
 			})
 			.catch((err) => {
 				console.log(err);
-				Notification.error({
+				notification.error({
 					message: 'Re-indexing failed',
 					description: err.message || '',
 				});

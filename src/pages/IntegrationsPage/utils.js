@@ -362,8 +362,8 @@ export const getRecommendationForm = (recommendationType, exportType) => {
 	});
 };
 
-export const getDynamicFilterKey = (pre = 'dynamic-filter-control') => {
-	return `${pre}_${new Date().getTime()}`;
+export const getDynamicFilterKey = (index) => {
+	return `dynamic-filter-control_${index}_${new Date().getTime()}`;
 };
 
 export const shopifyDefaultFields = {
@@ -652,7 +652,7 @@ export const getSearchPreferencesPayload = (formValue) => {
 					handle: get(formValue, 'resultHandle'),
 				},
 				rsConfig: {
-					enablePopularSearches: get(formValue, 'showPopularSearches'),
+					enablePopularSuggestions: get(formValue, 'showPopularSearches'),
 				},
 			},
 			facetSettings: {
