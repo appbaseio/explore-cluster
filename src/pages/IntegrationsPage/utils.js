@@ -652,7 +652,7 @@ export const getSearchPreferencesPayload = (formValue) => {
 					handle: get(formValue, 'resultHandle'),
 				},
 				rsConfig: {
-					enablePopularSearches: get(formValue, 'showPopularSearches'),
+					enablePopularSuggestions: get(formValue, 'showPopularSearches'),
 				},
 			},
 			facetSettings: {

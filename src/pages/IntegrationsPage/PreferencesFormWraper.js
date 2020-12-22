@@ -325,7 +325,7 @@ class PreferencesFormWrapper extends React.Component {
 								: {
 										showPopularSearches: get(
 											preferences,
-											'searchSettings.rsConfig.enablePopularSearches',
+											'searchSettings.rsConfig.enablePopularSuggestions',
 										),
 										showSelectedFilters: get(
 											preferences,
