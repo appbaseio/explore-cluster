@@ -84,7 +84,7 @@
 		"@appbaseio/dejavu-browser": "^3.4.7",
 		"@appbaseio/react-filter-box": "^3.4.1",
 		"@appbaseio/reactivecore": "^9.5.7",
-		"@appbaseio/reactivesearch": "^3.12.4",
+		"@appbaseio/reactivesearch": "^3.13.2",
 		"@babel/plugin-proposal-class-properties": "^7.0.0-rc.1",
 		"@sentry/browser": "^5.24.1",
 		"@stripe/react-stripe-js": "^1.1.2",

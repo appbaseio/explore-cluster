@@ -63,7 +63,11 @@ class ResultList extends React.Component {
 		return (
 			<>
 				{data.map((item) => (
-					<div key={item._id} onClick={() => triggerAnalytics(item._click_id)}>
+					<div
+						id={item._id}
+						key={item._id}
+						onClick={() => triggerAnalytics(item._click_id)}
+					>
 						<ListItem key={item.id} item={item} />
 					</div>
 				))}
