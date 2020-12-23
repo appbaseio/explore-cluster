@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Modal } from 'antd';
 import { css } from 'react-emotion';
+import get from 'lodash/get';
 import { func, string, bool, object, number, oneOfType } from 'prop-types';
 import StoreFrontPreview from './StoreFrontPreview';
 
@@ -49,9 +50,9 @@ class PreviewModal extends React.Component {
 		});
 	};
 
-	handleProductSelection = () => {
+	handleProductSelection = (item) => {
 		this.setState({
-			currentProduct: true,
+			currentProduct: item,
 		});
 	};
 
@@ -70,6 +71,15 @@ class PreviewModal extends React.Component {
 		if (displayProductPicker) {
 			if (!currentProduct) {
 				title = 'Select a product to continue';
+			} else {
+				const productId = get(currentProduct, '_id');
+				if (productId) {
+					title = (
+						<span>
+							Preview based on <strong>{productId}</strong>
+						</span>
+					);
+				}
 			}
 		}
 		return (
