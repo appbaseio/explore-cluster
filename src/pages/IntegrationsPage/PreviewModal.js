@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Modal } from 'antd';
+import { Button, Modal, Popover } from 'antd';
 import { css } from 'react-emotion';
 import get from 'lodash/get';
 import { func, string, bool, object, number, oneOfType } from 'prop-types';
@@ -76,7 +76,29 @@ class PreviewModal extends React.Component {
 				if (productId) {
 					title = (
 						<span>
-							Preview based on <strong>{productId}</strong>
+							Preview for Similar To Recommendations based on{' '}
+							<Popover
+								content={
+									<pre
+										style={{
+											maxWidth: 400,
+											maxHeight: 600,
+										}}
+									>
+										{JSON.stringify(currentProduct, null, 2)}
+									</pre>
+								}
+								title="Product Details"
+							>
+								<Button
+									style={{
+										padding: 0,
+									}}
+									type="link"
+								>
+									{productId}
+								</Button>
+							</Popover>
 						</span>
 					);
 				}
