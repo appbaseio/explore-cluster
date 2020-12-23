@@ -17,9 +17,6 @@ const container = css`
 	margin-top: 20px;
 	margin-right: 30px;
 	margin-left: 30px;
-	border-style: solid;
-	border-width: 0.5px;
-	border-color: #d2d2d2;
 	.my-24 {
 		margin-bottom: 16px;
 	}
@@ -101,6 +98,38 @@ const FeaturedProductsWrapper = (props) => {
 								result={{
 									id: 'resultList',
 									defaultQuery,
+									renderResultStats(stats) {
+										return (
+											<div
+												style={{
+													marginBottom: '25px',
+													marginLeft: '-20px',
+													fontSize: 14,
+													color: '#999999',
+												}}
+											>
+												{`Found ${stats.numberOfResults} featured ${
+													stats.numberOfResults > 1
+														? 'products'
+														: 'product'
+												}`}
+											</div>
+										);
+									},
+									renderNoResults() {
+										return (
+											<div
+												style={{
+													marginLeft: '-20px',
+													fontSize: 14,
+													color: '#999999',
+												}}
+											>
+												No products are featured. Go to <strong>Browse Products</strong> to
+												feature some.
+											</div>
+										);
+									},
 								}}
 								showFeaturedProducts
 								selectButtonLabel={selectButtonLabel}

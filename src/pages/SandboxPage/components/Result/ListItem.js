@@ -39,31 +39,28 @@ class ListItem extends React.Component {
 					</Tooltip>
 				)}
 				{showFeaturedProducts && (
-					<Popover
-						content={
-							<h4>{`Click to ${
-								value && value.includes(item._id) ? 'Remove' : 'Add'
-							} item`}</h4>
-						}
-						trigger="hover"
+					<Button
+						type="primary"
+						ghost
+						onClick={() => {
+							onChange(item);
+						}}
+						style={{
+							zIndex: 1,
+							position: 'absolute',
+							top: '0%',
+							right: '0%',
+							width: 125,
+						}}
 					>
-						<Button
-							type="primary"
-							ghost
-							style={{ float: 'right', width: 125 }}
-							onClick={() => {
-								onChange(item);
-							}}
-						>
-							{value && value.includes(item._id) ? (
-								<>
-									<Icon type="check" /> Featured
-								</>
-							) : (
-								selectButtonLabel
-							)}
-						</Button>
-					</Popover>
+						{value && value.includes(item._id) ? (
+							<>
+								<Icon type="check" /> Featured
+							</>
+						) : (
+							selectButtonLabel
+						)}
+					</Button>
 				)}
 				<Expand>
 					{({ hasOverflow, collapsed }) => (
