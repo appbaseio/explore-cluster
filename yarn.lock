@@ -82,10 +82,10 @@
     react-codemirror2 "^5.1.0"
     react-dom "^16.6.3"
 
-"@appbaseio/reactivecore@9.6.19":
-  version "9.6.19"
-  resolved "https://registry.yarnpkg.com/@appbaseio/reactivecore/-/reactivecore-9.6.19.tgz#901d75cdee8f07d53f2be4ed4658f56e1ebbcaec"
-  integrity sha512-12lNCL3E+CK2bRPdlqJZKsl1HzZzD9GuxjtZq5wSGa0HHoWbT7C6btb57gL5kbUbhP8qB+fDYzGlRw6VuEDrsQ==
+"@appbaseio/reactivecore@9.7.0":
+  version "9.7.0"
+  resolved "https://registry.yarnpkg.com/@appbaseio/reactivecore/-/reactivecore-9.7.0.tgz#8ec5503d1378697f6bdb97cbb548390d9d417825"
+  integrity sha512-vjSe/bSN4jx/2GYFP57Tx0SWqnP3fU5WXv67EROQLal97ePBQYhdQxaWxPB7DZVKrihHzWKk9JTUObxuWOz+Gw==
   dependencies:
     cross-fetch "^3.0.4"
     prop-types "^15.6.0"
@@ -104,12 +104,12 @@
     redux-thunk "^2.3.0"
     xdate "^0.8.2"
 
-"@appbaseio/reactivesearch@^3.12.4":
-  version "3.12.4"
-  resolved "https://registry.yarnpkg.com/@appbaseio/reactivesearch/-/reactivesearch-3.12.4.tgz#6842c9f004c456d9850e822aab2b4ee1e320dae6"
-  integrity sha512-jvo5QNVf/vmrdvHRTrXuC2tvsy9d4X2FudkKKyScL3+7sLUz1PAPGnQfFYJ4z5qfVFsBvIG47t7p3oSQdwgZLA==
+"@appbaseio/reactivesearch@^3.13.2":
+  version "3.13.2"
+  resolved "https://registry.yarnpkg.com/@appbaseio/reactivesearch/-/reactivesearch-3.13.2.tgz#5cd272d89316ac674956565198968e3aa5cdecfd"
+  integrity sha512-lxVkigh6jBuUvAVBd4GyGu1EWME0Jg7DEvqP8kZFPABx8HKUoGoAxtxk3D0l7hc5RCn30wLbW+35tgyq6mHyMA==
   dependencies:
-    "@appbaseio/reactivecore" "9.6.19"
+    "@appbaseio/reactivecore" "9.7.0"
     "@emotion/core" "^10.0.28"
     "@emotion/styled" "^10.0.27"
     appbase-js "^4.1.0"
