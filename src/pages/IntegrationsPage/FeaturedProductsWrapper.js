@@ -112,7 +112,7 @@ const FeaturedProductsWrapper = (props) => {
 													stats.numberOfResults > 1
 														? 'products'
 														: 'product'
-												}.`}
+												}`}
 											</div>
 										);
 									},
