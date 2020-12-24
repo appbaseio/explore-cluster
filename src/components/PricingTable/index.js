@@ -19,7 +19,7 @@ import Flex from '../../batteries/components/shared/Flex';
 import Unsubscribe from './Unsubscribe';
 import { STRIPE_KEY } from '../../constants';
 import { ARC_PLANS, PRICE_BY_PLANS } from '../../batteries/utils';
-import PaymentButton from './PaymentButton';
+import PaymentButton, { styles as paymentButtonStyles } from './PaymentButton';
 
 const CheckList = ({ list }) =>
 	list.map((item) => (
@@ -387,6 +387,7 @@ class PricingTable extends Component {
 			subscriptionID,
 			showUnsubscribeModal,
 			onToggleUnsubscribeModal,
+			isOSS,
 		} = this.props;
 		if (isLoading) {
 			return <Loader show message="Updating Plan... Please wait!" />;
@@ -1046,42 +1047,90 @@ class PricingTable extends Component {
 						<tr>
 							<td />
 							<td>
-								<PaymentButton
-									name="Appbase.io Basic Plan"
-									plan={ARC_PLANS.ARC_BASIC}
-									isCurrentPlan={isArcBasic}
-									handleToken={this.handleToken}
-									subscriptionID={subscriptionID}
-									handleUnsubscribe={onToggleUnsubscribeModal}
-								/>
+								{!isOSS ? (
+									<PaymentButton
+										name="Appbase.io Basic Plan"
+										plan={ARC_PLANS.ARC_BASIC}
+										isCurrentPlan={isArcBasic}
+										handleToken={this.handleToken}
+										subscriptionID={subscriptionID}
+										handleUnsubscribe={onToggleUnsubscribeModal}
+									/>
+								) : (
+									<a
+										href="https://www.appbase.io/pricing"
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										<Button
+											css={paymentButtonStyles(
+												theme.colors.accentText,
+												theme.colors.accent,
+											)}
+										>
+											Subscribe
+										</Button>
+									</a>
+								)}
 							</td>
 							<td>
-								<PaymentButton
-									name="Appbase.io Standard Plan"
-									plan={ARC_PLANS.ARC_STANDARD}
-									isCurrentPlan={isArcStandard}
-									handleToken={this.handleToken}
-									subscriptionID={subscriptionID}
-									btnProps={{
-										color: '#FFFFFF',
-										backgroundColor: theme.badge.blue,
-									}}
-									handleUnsubscribe={onToggleUnsubscribeModal}
-								/>
+								{!isOSS ? (
+									<PaymentButton
+										name="Appbase.io Standard Plan"
+										plan={ARC_PLANS.ARC_STANDARD}
+										isCurrentPlan={isArcStandard}
+										handleToken={this.handleToken}
+										subscriptionID={subscriptionID}
+										btnProps={{
+											color: '#FFFFFF',
+											backgroundColor: theme.badge.blue,
+										}}
+										handleUnsubscribe={onToggleUnsubscribeModal}
+									/>
+								) : (
+									<a
+										href="https://www.appbase.io/pricing"
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										<Button
+											css={paymentButtonStyles('#FFFFFF', theme.badge.blue)}
+										>
+											Subscribe
+										</Button>
+									</a>
+								)}
 							</td>
 							<td>
-								<PaymentButton
-									name="Appbase.io Enterprise Plan"
-									plan={ARC_PLANS.ARC_ENTERPRISE}
-									isCurrentPlan={isArcEnterprise}
-									handleToken={this.handleToken}
-									subscriptionID={subscriptionID}
-									btnProps={{
-										color: '#FFFFFF',
-										backgroundColor: theme.badge.darkBlue,
-									}}
-									handleUnsubscribe={onToggleUnsubscribeModal}
-								/>
+								{!isOSS ? (
+									<PaymentButton
+										name="Appbase.io Enterprise Plan"
+										plan={ARC_PLANS.ARC_ENTERPRISE}
+										isCurrentPlan={isArcEnterprise}
+										handleToken={this.handleToken}
+										subscriptionID={subscriptionID}
+										btnProps={{
+											color: '#FFFFFF',
+											backgroundColor: theme.badge.darkBlue,
+										}}
+										handleUnsubscribe={onToggleUnsubscribeModal}
+									/>
+								) : (
+									<a
+										href="https://www.appbase.io/pricing"
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										<Button
+											css={paymentButtonStyles(
+												'#FFFFFF',
+												theme.badge.darkBlue,
+											)}
+										>
+											Subscribe
+										</Button>
+									</a>
+								)}
 							</td>
 						</tr>
 					</tfoot>
@@ -1277,6 +1326,7 @@ PricingTable.defaultProps = {
 	isArcEnterprise: false,
 	subscriptionID: '',
 	showUnsubscribeModal: false,
+	isOSS: false,
 };
 
 PricingTable.propTypes = {
@@ -1292,6 +1342,7 @@ PricingTable.propTypes = {
 	subscriptionID: PropTypes.string,
 	onToggleUnsubscribeModal: PropTypes.func.isRequired,
 	showUnsubscribeModal: PropTypes.bool,
+	isOSS: PropTypes.bool,
 };
 const mapStateToProps = (state) => {
 	const appPlan = getAppPlanByName(state);
