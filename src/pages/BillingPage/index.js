@@ -50,9 +50,11 @@ class Billing extends Component {
 	};
 
 	async componentDidMount() {
-		const { isAppPlanFetched, fetchAppPlan, credentials } = this.props;
+		const { isAppPlanFetched, fetchAppPlan, credentials, errors } = this.props;
 		const esVersion = getVersion() || (await getESVersion(null, credentials));
-		if (!isAppPlanFetched && esVersion.split('.')[0] > 5) {
+		// if there are already errors with plan api, don't try to fetch it again
+		// otherwise there is sideEffect with redux being updated and infinite call being made
+		if (!isAppPlanFetched && esVersion.split('.')[0] > 5 && !errors.length) {
 			fetchAppPlan();
 		}
 	}
@@ -63,8 +65,9 @@ class Billing extends Component {
 	}
 
 	get billingView() {
-		const { isHostedArc, isClusterBilling } = this.props;
+		const { isHostedArc, isClusterBilling, plan } = this.props;
 		const { isShowingUnsubscribeArcModal } = this.state;
+		const isOSS = plan === 'Free';
 		if (isClusterBilling) {
 			return (
 				<Card bodyStyle={{ padding: '20px 50px' }}>
@@ -104,6 +107,7 @@ class Billing extends Component {
 			<Container>
 				<Card bodyStyle={{ padding: 0 }}>
 					<PricingTable
+						isOSS={isOSS}
 						showUnsubscribeModal={isShowingUnsubscribeArcModal}
 						onToggleUnsubscribeModal={this.onShowUnsubscribeArcModal}
 					/>
@@ -164,7 +168,9 @@ class Billing extends Component {
 		if (isLoading) {
 			return <Loader show message="Updating Payment Method... Please wait!" />;
 		}
+
 		const isSelfHostedArc = !isHostedArc && !isClusterBilling;
+		const isOSS = plan === 'Free';
 		return (
 			<React.Fragment>
 				<BannerHeader
@@ -238,7 +244,21 @@ class Billing extends Component {
 									/>
 								</Flex>
 							) : null}
-							<StripeForm handleToken={this.updatePaymentDetails} />
+							{!isOSS ? (
+								<StripeForm handleToken={this.updatePaymentDetails} />
+							) : (
+								<p>
+									You are using OSS version of{' '}
+									<a
+										href="https://www.appbase.io/pricing"
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										Appbase.io{' '}
+									</a>
+									consider upgrading to paid version to access all the features.
+								</p>
+							)}
 						</Row>
 					}
 				/>

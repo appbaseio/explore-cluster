@@ -11,7 +11,7 @@ import { getAppPlanByName } from '../../batteries/modules/selectors';
 import { PRICE_BY_PLANS } from '../../batteries/utils';
 import { shade } from '../../utils/media';
 
-const styles = (color, backgroundColor) =>
+export const styles = (color, backgroundColor) =>
 	css(
 		backgroundColor && {
 			backgroundColor,
