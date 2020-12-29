@@ -15,8 +15,13 @@ export const defaultSettings = [
 		value: true,
 	},
 	{
-		id: 'collection_sync',
-		label: 'Sync Collections',
+		id: 'smartcollection_sync',
+		label: 'Sync Smart Collections',
+		value: true,
+	},
+	{
+		id: 'customcollection_sync',
+		label: 'Sync Custom Collections',
 		value: true,
 	},
 	{
