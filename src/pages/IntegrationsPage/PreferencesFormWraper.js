@@ -335,7 +335,7 @@ class PreferencesFormWrapper extends React.Component {
 											preferences,
 											'resultSettings.rsConfig.pagination',
 										),
-										syncSettings: get(preferences, 'syncSettings'),
+										syncSettings: get(preferences, 'syncSettings') || {},
 										customMessages: {
 											resultStats: get(
 												preferences,

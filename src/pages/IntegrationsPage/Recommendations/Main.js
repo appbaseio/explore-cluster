@@ -14,7 +14,9 @@ const { TabPane } = Tabs;
 
 const Main = () => {
 	const [activeTab, handleTabChange] = useState('1');
+	const [widgetInfo, handleWidgetInfo] = useState(false);
 	const isSettingsTabActive = activeTab === '3';
+	const isRecommendationsTabActive = activeTab === '2';
 	return (
 		<PreferencesFormWrapper isRecommendation>
 			{({ getPreferences, getPreferencesPayload, form }) => (
@@ -33,7 +35,10 @@ const Main = () => {
 								<ChoosePlatformTab />
 							</TabPane>
 							<TabPane tab="Recommendations UI" key="2">
-								<RecommendationsTab getPreferences={getPreferences} />
+								<RecommendationsTab
+									onChangeEdit={handleWidgetInfo}
+									getPreferences={getPreferences}
+								/>
 							</TabPane>
 							<TabPane tab="Settings" key="3">
 								<SettingsTab />
@@ -49,11 +54,13 @@ const Main = () => {
 						>
 							<div className="flex space-between card-footer">
 								<div>
-									{isSettingsTabActive && (
+									{((isRecommendationsTabActive && widgetInfo) ||
+										isSettingsTabActive) && (
 										<PreviewModal
 											isRecommendation
 											preferences={getPreferences}
 											label="Settings Preview"
+											{...widgetInfo}
 										/>
 									)}
 								</div>

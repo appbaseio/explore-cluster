@@ -1,6 +1,7 @@
 import React from 'react';
-import { Button, Modal } from 'antd';
+import { Button, Modal, Popover } from 'antd';
 import { css } from 'react-emotion';
+import get from 'lodash/get';
 import { func, string, bool, object, number, oneOfType } from 'prop-types';
 import StoreFrontPreview from './StoreFrontPreview';
 
@@ -49,9 +50,9 @@ class PreviewModal extends React.Component {
 		});
 	};
 
-	handleProductSelection = () => {
+	handleProductSelection = (item) => {
 		this.setState({
-			currentProduct: true,
+			currentProduct: item,
 		});
 	};
 
@@ -70,6 +71,37 @@ class PreviewModal extends React.Component {
 		if (displayProductPicker) {
 			if (!currentProduct) {
 				title = 'Select a product to continue';
+			} else {
+				const productId = get(currentProduct, '_id');
+				if (productId) {
+					title = (
+						<span>
+							Preview for Similar To Recommendations based on{' '}
+							<Popover
+								content={
+									<pre
+										style={{
+											maxWidth: 400,
+											maxHeight: 600,
+										}}
+									>
+										{JSON.stringify(currentProduct, null, 2)}
+									</pre>
+								}
+								title="Product Details"
+							>
+								<Button
+									style={{
+										padding: 0,
+									}}
+									type="link"
+								>
+									{productId}
+								</Button>
+							</Popover>
+						</span>
+					);
+				}
 			}
 		}
 		return (
