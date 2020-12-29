@@ -91,10 +91,11 @@ class PreferencesFormWrapper extends React.Component {
 						dynamicFilters: FormBuilder.array([]),
 						syncSettings: FormBuilder.group({
 							product_sync: [{ value: true, disabled: true }],
-							collection_sync: [{ value: true, disabled: true }],
-							collect_sync: [{ value: false, disabled: true }],
-							metafield_sync: [{ value: false, disabled: true }],
-							namedtags_sync: [{ value: false, disabled: true }],
+							smartcollection_sync: [{ value: true, disabled: true }],
+							customcollection_sync: [{ value: true, disabled: true }],
+							collect_sync: [{ value: false, disabled: false }],
+							metafield_sync: [{ value: false, disabled: false }],
+							namedtags_sync: [{ value: false, disabled: false }],
 						}),
 				  }),
 		});

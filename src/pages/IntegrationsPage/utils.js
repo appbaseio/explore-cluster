@@ -519,7 +519,8 @@ export const defaultSearchPreferences = {
 	dynamicFilters: [],
 	syncSettings: {
 		product_sync: true,
-		collection_sync: true,
+		smartcollection_sync: true,
+		customcollection_sync: true,
 		collect_sync: false,
 		metafield_sync: false,
 		namedtags_sync: false,
