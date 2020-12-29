@@ -55,9 +55,15 @@ class Recommendations extends React.Component {
 				const btnStyle = {
 					marginLeft: 10,
 				};
+				const previewProps = {
+					widgetId: item.id,
+					label: 'Preview',
+					displayProductPicker: item.type === RecommendationTypes.SIMILAR_PRODUCTS,
+					similarToField: get(item, 'productsPageHandle.productsPageUrlField'),
+				};
 				return (
 					<Flex>
-						<Button onClick={() => this.handleEdit(item.id)}>Edit</Button>
+						<Button onClick={() => this.handleEdit(item.id, previewProps)}>Edit</Button>
 						<PreviewModal
 							buttonProps={{
 								size: 'default',
@@ -65,13 +71,8 @@ class Recommendations extends React.Component {
 								style: btnStyle,
 							}}
 							isRecommendation
-							widgetId={item.id}
-							label="Preview"
-							displayProductPicker={
-								item.type === RecommendationTypes.SIMILAR_PRODUCTS
-							}
-							similarToField={get(item, 'productsPageHandle.productsPageUrlField')}
 							preferences={getPreferences}
+							{...previewProps}
 						/>
 						<ExportModal
 							buttonProps={{
@@ -110,7 +111,7 @@ class Recommendations extends React.Component {
 		return this.context.get('recommendations');
 	}
 
-	showForm = (id) => {
+	showForm = (id, previewProps) => {
 		if (this.tempForm) {
 			this.tempForm.valueChanges.unsubscribe();
 		}
@@ -189,9 +190,17 @@ class Recommendations extends React.Component {
 					}
 			}
 		});
-		this.setState({
-			showForm: true,
-		});
+		this.setState(
+			{
+				showForm: true,
+			},
+			() => {
+				const { onChangeEdit } = this.props;
+				if (previewProps && onChangeEdit) {
+					onChangeEdit(previewProps);
+				}
+			},
+		);
 	};
 
 	closeForm = () => {
@@ -211,6 +220,10 @@ class Recommendations extends React.Component {
 			}
 		}
 		this.tempId = null;
+		const { onChangeEdit } = this.props;
+		if (onChangeEdit) {
+			onChangeEdit(null);
+		}
 		this.setState({
 			showForm: false,
 		});
@@ -222,8 +235,8 @@ class Recommendations extends React.Component {
 		);
 	};
 
-	handleEdit = (id) => {
-		this.showForm(id);
+	handleEdit = (id, previewProps) => {
+		this.showForm(id, previewProps);
 	};
 
 	handleDelete = (id) => {
@@ -526,11 +539,13 @@ class Recommendations extends React.Component {
 
 Recommendations.defaultProps = {
 	isSuccess: false,
+	onChangeEdit: undefined,
 };
 
 Recommendations.propTypes = {
 	getPreferences: func.isRequired,
 	isSuccess: bool,
+	onChangeEdit: func,
 };
 
 const mapStateToProps = (state) => ({

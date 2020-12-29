@@ -31,86 +31,97 @@ class ListItem extends React.Component {
 
 		return (
 			<div className={listItem}>
-				{_promoted && (
-					<Tooltip title="Item promoted using Query Rules">
-						<Tag color="#faad14">
-							<Icon type="star" />
-						</Tag>
-					</Tooltip>
-				)}
-				{showFeaturedProducts && (
-					<Popover
-						content={
-							<h4>{`Click to ${
-								value && value.includes(item._id) ? 'Remove' : 'Add'
-							} item`}</h4>
-						}
-						trigger="hover"
-					>
-						<Button
-							type="primary"
-							ghost
-							style={{ float: 'right', width: 125 }}
-							onClick={() => {
-								onChange(item);
-							}}
-						>
-							{value && value.includes(item._id) ? (
+				<Row>
+					<Col xs={showFeaturedProducts ? 20 : 24}>
+						{_promoted && (
+							<Tooltip title="Item promoted using Query Rules">
+								<Tag color="#faad14">
+									<Icon type="star" />
+								</Tag>
+							</Tooltip>
+						)}
+						<Expand>
+							{({ hasOverflow, collapsed }) => (
 								<>
-									<Icon type="check" /> Featured
+									{getObjKeys({ hasOverflow, collapsed, data: rest }).map(
+										(key) => (
+											<Row
+												className="row"
+												gutter={8}
+												key={`${rest._id}_${key}`}
+											>
+												<Col md={10}>{key}</Col>
+												<Col md={1} className="text-center">
+													:
+												</Col>
+												<Col md={11} className="text-ellipsis">
+													<Popover
+														content={
+															typeof rest[key] === 'object' ? (
+																<pre
+																	dangerouslySetInnerHTML={{
+																		__html:
+																			JSON.stringify(
+																				rest[key],
+																			) || 'N/A',
+																	}}
+																/>
+															) : (
+																<span
+																	dangerouslySetInnerHTML={{
+																		__html:
+																			JSON.stringify(
+																				rest[key],
+																			) || 'N/A',
+																	}}
+																/>
+															)
+														}
+													>
+														{typeof rest[key] === 'object' ? (
+															JSON.stringify(rest[key])
+														) : (
+															<span
+																dangerouslySetInnerHTML={{
+																	__html:
+																		JSON.stringify(rest[key]) ||
+																		'N/A',
+																}}
+															/>
+														)}
+													</Popover>
+												</Col>
+											</Row>
+										),
+									)}
 								</>
-							) : (
-								selectButtonLabel
 							)}
-						</Button>
-					</Popover>
-				)}
-				<Expand>
-					{({ hasOverflow, collapsed }) => (
-						<>
-							{getObjKeys({ hasOverflow, collapsed, data: rest }).map((key) => (
-								<Row className="row" gutter={8} key={`${rest._id}_${key}`}>
-									<Col md={10}>{key}</Col>
-									<Col md={1} className="text-center">
-										:
-									</Col>
-									<Col md={11} className="text-ellipsis">
-										<Popover
-											content={
-												typeof rest[key] === 'object' ? (
-													<pre
-														dangerouslySetInnerHTML={{
-															__html:
-																JSON.stringify(rest[key]) || 'N/A',
-														}}
-													/>
-												) : (
-													<span
-														dangerouslySetInnerHTML={{
-															__html:
-																JSON.stringify(rest[key]) || 'N/A',
-														}}
-													/>
-												)
-											}
-										>
-											{typeof rest[key] === 'object' ? (
-												JSON.stringify(rest[key])
-											) : (
-												<span
-													dangerouslySetInnerHTML={{
-														__html: JSON.stringify(rest[key]) || 'N/A',
-													}}
-												/>
-											)}
-										</Popover>
-									</Col>
-								</Row>
-							))}
-						</>
+						</Expand>
+					</Col>
+					{showFeaturedProducts && (
+						<Col xs={4}>
+							<Button
+								type="primary"
+								ghost
+								onClick={() => {
+									onChange(item);
+								}}
+								style={{
+									float: 'right',
+									width: 125,
+								}}
+							>
+								{value && value.includes(item._id) ? (
+									<>
+										<Icon type="check" /> Featured
+									</>
+								) : (
+									selectButtonLabel
+								)}
+							</Button>
+						</Col>
 					)}
-				</Expand>
-
+				</Row>
 				{!showFeaturedList && <Grading id={item._id} />}
 				<Divider />
 			</div>
