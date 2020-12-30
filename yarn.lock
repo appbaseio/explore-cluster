@@ -37,7 +37,7 @@
 
 "@appbaseio-confidential/importer@git+https://1dc0d0fc07f05943afdde9bdb85b7aa438a0ce3b:x-oauth-basic@github.com/appbaseio-confidential/importer#master":
   version "2.0.0-alpha.1"
-  resolved "git+https://1dc0d0fc07f05943afdde9bdb85b7aa438a0ce3b:x-oauth-basic@github.com/appbaseio-confidential/importer#c3240b328e8ba0ea251b2d19ff492d9e9f1a2f7d"
+  resolved "git+https://1dc0d0fc07f05943afdde9bdb85b7aa438a0ce3b:x-oauth-basic@github.com/appbaseio-confidential/importer#a5f9ca5938c29ad8b5ffda7b821ffaa2500d579a"
   dependencies:
     antd "^3.18.2"
     appbase-js "^4.0.2-beta.11"

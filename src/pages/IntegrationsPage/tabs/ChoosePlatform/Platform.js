@@ -40,7 +40,7 @@ const Platform = ({ isRecommendation, index }) => (
 					disabled ? null : (
 						<div
 							style={{
-								marginTop: 15,
+								marginTop: 30,
 							}}
 						>
 							<p>Indexing Preferences</p>
