@@ -5,6 +5,14 @@ import { string, object } from 'prop-types';
 import { connect } from 'react-redux';
 import Flex from '../../batteries/components/shared/Flex';
 
+const getURL = () => {
+	const { host, protocol } = new URL(sessionStorage.getItem('url'));
+	const username = sessionStorage.getItem('username');
+	const password = sessionStorage.getItem('password');
+	const uri = `${protocol}//${username}:${password}@${host}`;
+	return uri;
+};
+
 class SyncStatus extends React.Component {
 	constructor(props) {
 		super(props);
@@ -28,6 +36,11 @@ class SyncStatus extends React.Component {
 		const { form } = this.props;
 		const exportTypeHandler = form.get('exportSettings.type');
 		exportTypeHandler.valueChanges.unsubscribe(this.handleTypeChange);
+	}
+
+	get resyncURL() {
+		const { index } = this.props;
+		return `https://shopify-sync.appbase.io/?index=${index}&url=${getURL()}`;
 	}
 
 	get isShopify() {
@@ -104,6 +117,19 @@ class SyncStatus extends React.Component {
 						</div>
 					)}
 					<div>
+						{this.isShopify ? (
+							<Button
+								style={{
+									marginRight: 15,
+								}}
+								target="blank"
+								href={this.resyncURL}
+								icon="reload"
+							>
+								Resync
+							</Button>
+						) : null}
+
 						<Button href="browse" type="primary">
 							Browse Data
 						</Button>
