@@ -4,42 +4,9 @@ import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { Switch, Radio, List, Button } from 'antd';
 import { FieldControl, FieldGroup } from 'react-reactive-form';
-import { getResyncURL } from '../../utils';
+import { getResyncURL, defaultSettings } from '../../utils';
 
 const { Item } = List;
-
-export const defaultSettings = [
-	{
-		id: 'product_sync',
-		label: 'Sync Products',
-		value: true,
-	},
-	{
-		id: 'smartcollection_sync',
-		label: 'Sync Smart Collections',
-		value: true,
-	},
-	{
-		id: 'customcollection_sync',
-		label: 'Sync Custom Collections',
-		value: true,
-	},
-	{
-		id: 'collect_sync',
-		label: 'Sync Product-Collections Relationship',
-		value: false,
-	},
-	{
-		id: 'metafield_sync',
-		label: 'Sync Metafields',
-		value: false,
-	},
-	{
-		id: 'namedtags_sync',
-		label: 'Sync Named Tags',
-		value: false,
-	},
-];
 
 const Platform = ({ isRecommendation, index }) => (
 	<div>

@@ -422,6 +422,39 @@ export const messages = {
 	featuredProducts: 'Select the products to be featured.',
 };
 
+export const defaultSettings = [
+	{
+		id: 'product_sync',
+		label: 'Sync Products',
+		value: true,
+	},
+	{
+		id: 'smartcollection_sync',
+		label: 'Sync Smart Collections',
+		value: true,
+	},
+	{
+		id: 'customcollection_sync',
+		label: 'Sync Custom Collections',
+		value: true,
+	},
+	{
+		id: 'collect_sync',
+		label: 'Sync Product-Collections Relationship',
+		value: false,
+	},
+	{
+		id: 'metafield_sync',
+		label: 'Sync Metafields',
+		value: false,
+	},
+	{
+		id: 'namedtags_sync',
+		label: 'Sync Named Tags',
+		value: false,
+	},
+];
+
 export const defaultRecommendationsPreferences = {
 	themeType: 'classic',
 	primaryColor: '#0B6AFF',
@@ -517,14 +550,7 @@ export const defaultSearchPreferences = {
 		price: { enabled: false, customize: {} },
 	},
 	dynamicFilters: [],
-	syncSettings: {
-		product_sync: true,
-		smartcollection_sync: true,
-		customcollection_sync: true,
-		collect_sync: false,
-		metafield_sync: false,
-		namedtags_sync: false,
-	},
+	syncSettings: defaultSettings.reduce((acc, item) => ({ ...acc, [item.id]: item.value }), {}),
 };
 
 export const getRecommendationPreferencesPayload = (formValue) => {
