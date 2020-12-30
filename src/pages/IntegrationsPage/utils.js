@@ -422,6 +422,39 @@ export const messages = {
 	featuredProducts: 'Select the products to be featured.',
 };
 
+export const defaultSettings = [
+	{
+		id: 'product_sync',
+		label: 'Sync Products',
+		value: true,
+	},
+	{
+		id: 'smartcollection_sync',
+		label: 'Sync Smart Collections',
+		value: true,
+	},
+	{
+		id: 'customcollection_sync',
+		label: 'Sync Custom Collections',
+		value: true,
+	},
+	{
+		id: 'collect_sync',
+		label: 'Sync Product-Collections Relationship',
+		value: false,
+	},
+	{
+		id: 'metafield_sync',
+		label: 'Sync Metafields',
+		value: false,
+	},
+	{
+		id: 'namedtags_sync',
+		label: 'Sync Named Tags',
+		value: false,
+	},
+];
+
 export const defaultRecommendationsPreferences = {
 	themeType: 'classic',
 	primaryColor: '#0B6AFF',
@@ -517,13 +550,7 @@ export const defaultSearchPreferences = {
 		price: { enabled: false, customize: {} },
 	},
 	dynamicFilters: [],
-	syncSettings: {
-		product_sync: true,
-		collection_sync: true,
-		collect_sync: false,
-		metafield_sync: false,
-		namedtags_sync: false,
-	},
+	syncSettings: defaultSettings.reduce((acc, item) => ({ ...acc, [item.id]: item.value }), {}),
 };
 
 export const getRecommendationPreferencesPayload = (formValue) => {
@@ -744,4 +771,22 @@ export const getSearchPreferencesPayload = (formValue) => {
 					: null,
 		}),
 	);
+};
+
+const getURL = () => {
+	const { host, protocol } = new URL(sessionStorage.getItem('url'));
+	const username = sessionStorage.getItem('username');
+	const password = sessionStorage.getItem('password');
+	const uri = `${protocol}//${username}:${password}@${host}`;
+	return uri;
+};
+
+export const getResyncURL = (index, params = {}) => {
+	const url = new URLSearchParams('');
+	url.set('index', index);
+	url.set('url', getURL());
+	Object.keys(params).forEach((i) => {
+		url.set(i, params[i]);
+	});
+	return `https://shopify-sync.appbase.io?${url.toString()}`;
 };

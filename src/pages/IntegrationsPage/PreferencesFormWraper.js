@@ -91,10 +91,11 @@ class PreferencesFormWrapper extends React.Component {
 						dynamicFilters: FormBuilder.array([]),
 						syncSettings: FormBuilder.group({
 							product_sync: [{ value: true, disabled: true }],
-							collection_sync: [{ value: true, disabled: true }],
-							collect_sync: [{ value: false, disabled: true }],
-							metafield_sync: [{ value: false, disabled: true }],
-							namedtags_sync: [{ value: false, disabled: true }],
+							smartcollection_sync: [{ value: true, disabled: true }],
+							customcollection_sync: [{ value: true, disabled: true }],
+							collect_sync: [{ value: false, disabled: false }],
+							metafield_sync: [{ value: false, disabled: false }],
+							namedtags_sync: [{ value: false, disabled: false }],
 						}),
 				  }),
 		});
@@ -118,12 +119,10 @@ class PreferencesFormWrapper extends React.Component {
 			const sizeFilter = this.form.get('staticFilters.size.customize.dataField');
 			const priceFilter = this.form.get('staticFilters.price.customize.dataField');
 			const syncSettingsControl = this.form.get('syncSettings');
-			if (this.form.get('exportSettings.type')) {
+			if (syncSettingsControl) {
 				if (value === 'shopify') {
-					if (syncSettingsControl) {
-						syncSettingsControl.enable();
-					}
-				} else if (syncSettingsControl) {
+					syncSettingsControl.enable();
+				} else {
 					syncSettingsControl.disable();
 				}
 			}
