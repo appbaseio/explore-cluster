@@ -519,7 +519,8 @@ export const defaultSearchPreferences = {
 	dynamicFilters: [],
 	syncSettings: {
 		product_sync: true,
-		collection_sync: true,
+		smartcollection_sync: true,
+		customcollection_sync: true,
 		collect_sync: false,
 		metafield_sync: false,
 		namedtags_sync: false,
@@ -744,4 +745,22 @@ export const getSearchPreferencesPayload = (formValue) => {
 					: null,
 		}),
 	);
+};
+
+const getURL = () => {
+	const { host, protocol } = new URL(sessionStorage.getItem('url'));
+	const username = sessionStorage.getItem('username');
+	const password = sessionStorage.getItem('password');
+	const uri = `${protocol}//${username}:${password}@${host}`;
+	return uri;
+};
+
+export const getResyncURL = (index, params = {}) => {
+	const url = new URLSearchParams('');
+	url.set('index', index);
+	url.set('url', getURL());
+	Object.keys(params).forEach((i) => {
+		url.set(i, params[i]);
+	});
+	return `https://shopify-sync.appbase.io?${url.toString()}`;
 };

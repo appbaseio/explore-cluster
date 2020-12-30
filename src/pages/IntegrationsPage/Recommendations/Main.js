@@ -32,7 +32,7 @@ const Main = () => {
 							style={{ minHeight: 500 }}
 						>
 							<TabPane tab="E-Commerce Platform" key="1">
-								<ChoosePlatformTab />
+								<ChoosePlatformTab isRecommendation />
 							</TabPane>
 							<TabPane tab="Recommendations UI" key="2">
 								<RecommendationsTab
