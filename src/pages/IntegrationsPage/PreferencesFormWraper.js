@@ -119,12 +119,10 @@ class PreferencesFormWrapper extends React.Component {
 			const sizeFilter = this.form.get('staticFilters.size.customize.dataField');
 			const priceFilter = this.form.get('staticFilters.price.customize.dataField');
 			const syncSettingsControl = this.form.get('syncSettings');
-			if (this.form.get('exportSettings.type')) {
+			if (syncSettingsControl) {
 				if (value === 'shopify') {
-					if (syncSettingsControl) {
-						syncSettingsControl.enable();
-					}
-				} else if (syncSettingsControl) {
+					syncSettingsControl.enable();
+				} else {
 					syncSettingsControl.disable();
 				}
 			}
