@@ -55,6 +55,11 @@ const SearchLatency = Loadable({
 	loading: Loader,
 });
 
+const MonitoringPage = Loadable({
+	loader: () => import(/* webpackChunkName: "SearchLatency" */ '../../pages/MonitoringPage'),
+	loading: Loader,
+});
+
 class ClusterAnalyticsRoutes extends React.Component {
 	shouldComponentUpdate(nextProps) {
 		const { location, allowedRoutes } = this.props;
@@ -182,6 +187,15 @@ class ClusterAnalyticsRoutes extends React.Component {
 							) : (
 								<UnauthorizedPage />
 							)}
+						</>
+					)}
+				/>
+				<Route
+					exact
+					path="/cluster/monitoring"
+					component={(props) => (
+						<>
+							<MonitoringPage {...props} />
 						</>
 					)}
 				/>

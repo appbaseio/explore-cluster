@@ -59,6 +59,7 @@ export const APP_ROUTES = {
 			{ label: 'Geo Distribution', link: 'geo-distribution' },
 			{ label: 'Requests Per Minute', link: 'requests-per-minute' },
 			{ label: 'Search Latency', link: 'search-latency' },
+			{ label: 'Monitoring', link: '/cluster/monitoring' },
 		],
 	},
 	'Curated Insights': {
@@ -171,6 +172,7 @@ export const CLUSTER_ROUTES = {
 			{ label: 'Geo Distribution', link: '/cluster/geo-distribution' },
 			{ label: 'Requests Per Minute', link: '/cluster/requests-per-minute' },
 			{ label: 'Search Latency', link: '/cluster/search-latency' },
+			{ label: 'Monitoring', link: '/cluster/monitoring' },
 		],
 	},
 	'Curated Insights': {
@@ -183,7 +185,11 @@ export const CLUSTER_ROUTES = {
 		action: ALLOWED_ACTIONS.UI_BUILDER,
 		menu: [
 			{ label: 'Search', link: 'search-builder', openIndexMenu: true },
-			{ label: 'Recommendations', link: 'recommendations-builder', openIndexMenu: true },
+			{
+				label: 'Recommendations',
+				link: 'recommendations-builder',
+				openIndexMenu: true,
+			},
 		],
 		tag: 'Beta',
 	},
