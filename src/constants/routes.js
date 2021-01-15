@@ -59,7 +59,7 @@ export const APP_ROUTES = {
 			{ label: 'Geo Distribution', link: 'geo-distribution' },
 			{ label: 'Requests Per Minute', link: 'requests-per-minute' },
 			{ label: 'Search Latency', link: 'search-latency' },
-			{ label: 'Monitoring', link: '/cluster/monitoring', hasExactPath: true },
+			{ label: 'Cluster Monitoring', link: '/cluster/monitoring', hasExactPath: true },
 		],
 	},
 	'Curated Insights': {
@@ -172,7 +172,7 @@ export const CLUSTER_ROUTES = {
 			{ label: 'Geo Distribution', link: '/cluster/geo-distribution' },
 			{ label: 'Requests Per Minute', link: '/cluster/requests-per-minute' },
 			{ label: 'Search Latency', link: '/cluster/search-latency' },
-			{ label: 'Monitoring', link: '/cluster/monitoring' },
+			{ label: 'Cluster Monitoring', link: '/cluster/monitoring' },
 		],
 	},
 	'Curated Insights': {
