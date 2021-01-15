@@ -113,6 +113,7 @@ class MappingComponent extends React.Component {
 							mappings,
 							initialUseCase,
 							initialType,
+							setMapping,
 							...rest,
 						})}
 					</ObjectField>
