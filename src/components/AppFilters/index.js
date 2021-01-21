@@ -38,7 +38,12 @@ function AppFilters({ apps, children, preferences, updatePreferences, fetchApps 
 	const setFilteredData = () => {
 		const dataToPonder = systemIndices
 			? apps
-			: apps.filter((dataItem) => dataItem.index && dataItem.index[0] !== '.');
+			: apps.filter(
+					(dataItem) =>
+						dataItem.index &&
+						dataItem.index[0] !== '.' &&
+						!dataItem.index.includes('metricbeat-'),
+			  );
 		setData(dataToPonder.filter((dataItem) => (dataItem.index || '').includes(searchTerm)));
 	};
 	const handleInputChange = (e) => {
