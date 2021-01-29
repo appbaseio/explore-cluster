@@ -32,7 +32,6 @@ import {
 	getDefaultAclOptionsByPlan,
 	isNegative,
 	isNegativeTTL,
-	defaultRateLimits,
 	mapFormToValues,
 	mapValuesToForm,
 } from './utils';
@@ -95,9 +94,7 @@ class CreateCredentials extends React.Component {
 								new FormGroup({
 									acl: new FormControl(acl),
 									tag: new FormControl(true),
-									rateLimit: new FormControl(defaultRateLimits[acl], [
-										Validators.min(1),
-									]),
+									rateLimit: new FormControl(undefined, [Validators.min(1)]),
 								}),
 						),
 					),
