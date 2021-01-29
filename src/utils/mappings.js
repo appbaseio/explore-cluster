@@ -160,8 +160,6 @@ const _getFieldsByRelevancy = ({
 	return updatedFields;
 };
 
-const MAPPING_TYPE_WITH_NO_FIELDS = ['rank_feature', 'rank_features'];
-
 const _updateNestedMapping = ({ mapping, type, usecase, fields, currentIndex, settings }) => {
 	if (fields.length === currentIndex + 1) {
 		const { enableNgram, enableSynonyms, language } = settings;
@@ -173,15 +171,20 @@ const _updateNestedMapping = ({ mapping, type, usecase, fields, currentIndex, se
 			fields: get(mappingUsecase, `${usecase}.fields`),
 			type,
 		});
-		const data = {
+
+		let data = {
 			...mappingUsecase[usecase],
 			fields: updatedFields,
 			type,
 		};
 
-		if (MAPPING_TYPE_WITH_NO_FIELDS.includes(type)) {
-			delete data.fields;
+		if (!Object.keys(updatedFields).length) {
+			data = {
+				...mappingUsecase[usecase],
+				type,
+			};
 		}
+
 		return {
 			...mapping,
 			[`${fields[currentIndex]}`]: data,
@@ -341,23 +344,23 @@ export const updateSubFields = ({
 			};
 		}
 		const type = get(mappings, `properties.${field}.type`);
+		const fields = {
+			..._getFieldsByRelevancy({
+				enableSynonyms,
+				enableNgram,
+				language,
+				type,
+				fields: get(mappings, `properties.${field}.fields`, {}),
+			}),
+		};
+
 		return {
 			...agg,
 			properties: {
 				...agg.properties,
 				[field]: {
 					...get(mappings, `properties.${field}`, {}),
-					...(!MAPPING_TYPE_WITH_NO_FIELDS.includes(type) && {
-						fields: {
-							..._getFieldsByRelevancy({
-								enableSynonyms,
-								enableNgram,
-								language,
-								type,
-								fields: get(mappings, `properties.${field}.fields`, {}),
-							}),
-						},
-					}),
+					...(Object.keys(fields).length ? { fields } : {}),
 				},
 			},
 		};
