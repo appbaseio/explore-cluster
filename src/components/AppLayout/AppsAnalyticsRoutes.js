@@ -59,6 +59,16 @@ const MonitoringPage = Loadable({
 	loading: Loader,
 });
 
+const RecentSearches = Loadable({
+	loader: () => import(/* webpackChunkName: "RecentSearches" */ '../../pages/RecentSearches'),
+	loading: Loader,
+});
+
+const RecentResults = Loadable({
+	loader: () => import(/* webpackChunkName: "RecentResults" */ '../../pages/RecentResults'),
+	loading: Loader,
+});
+
 class AppsAnalyticsRoutes extends React.Component {
 	shouldComponentUpdate(nextProps) {
 		const { location, allowedRoutes } = this.props;
@@ -188,6 +198,32 @@ class AppsAnalyticsRoutes extends React.Component {
 									shouldFetchAppPlan={false}
 									component={NoResultSearches}
 								/>
+							) : (
+								<UnauthorizedPage />
+							)}
+						</>
+					)}
+				/>
+				<Route
+					exact
+					path="/app/:appName/recent-searches"
+					component={(props) => (
+						<>
+							{get(allowedRoutes, 'recent-searches') ? (
+								<AppPageContainer {...props} component={RecentSearches} />
+							) : (
+								<UnauthorizedPage />
+							)}
+						</>
+					)}
+				/>
+				<Route
+					exact
+					path="/app/:appName/recent-results"
+					component={(props) => (
+						<>
+							{get(allowedRoutes, 'recent-results') ? (
+								<AppPageContainer {...props} component={RecentResults} />
 							) : (
 								<UnauthorizedPage />
 							)}
