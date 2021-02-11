@@ -13,7 +13,7 @@ const bannerMessagesAnalytics = {
 	free: {
 		title: 'Unlock the ROI impact of your search',
 		description:
-			'Get a paid plan to see actionable analytics on search volume, popular searches, no results, recent searches & results, track clicks and conversions.',
+			'Get a PRODUCTIOM_1 plan or above to see actionable analytics on recent searches and results.',
 		buttonText: 'Upgrade Now',
 		href: 'billing',
 	},
