@@ -13,7 +13,7 @@ const bannerMessagesAnalytics = {
 	free: {
 		title: 'Unlock the ROI impact of your search',
 		description:
-			'Get a production_1 plan or above to see actionable analytics on recent searches and results.',
+			'Get a Production or Enterprise plan to see actionable analytics on recent searches and results.',
 		buttonText: 'Upgrade Now',
 		href: 'billing',
 	},
@@ -21,7 +21,7 @@ const bannerMessagesAnalytics = {
 		title: 'Recent Results',
 		description: 'Understand how to make the most of the recent results analytics.',
 		buttonText: 'Read Docs',
-		href: 'https://docs.appbase.io/docs/analytics/overview/',
+		href: 'https://docs.appbase.io/docs/analytics/overview/#recent-results',
 	},
 };
 
