@@ -82,10 +82,10 @@
     react-codemirror2 "^5.1.0"
     react-dom "^16.6.3"
 
-"@appbaseio/reactivecore@9.7.0":
-  version "9.7.0"
-  resolved "https://registry.yarnpkg.com/@appbaseio/reactivecore/-/reactivecore-9.7.0.tgz#8ec5503d1378697f6bdb97cbb548390d9d417825"
-  integrity sha512-vjSe/bSN4jx/2GYFP57Tx0SWqnP3fU5WXv67EROQLal97ePBQYhdQxaWxPB7DZVKrihHzWKk9JTUObxuWOz+Gw==
+"@appbaseio/reactivecore@9.8.0":
+  version "9.8.0"
+  resolved "https://registry.yarnpkg.com/@appbaseio/reactivecore/-/reactivecore-9.8.0.tgz#43d12ddafa83121b577c201c59a34e5978952081"
+  integrity sha512-hu8cNIAfPzvtG4lIihemzFu1aOzaq35pO546CHPbgY0L27CYQW53M5G4l2jXZrBQ34MJXvoFZ75szLxMQ68RZg==
   dependencies:
     cross-fetch "^3.0.4"
     prop-types "^15.6.0"
@@ -93,23 +93,12 @@
     redux-thunk "^2.3.0"
     xdate "^0.8.2"
 
-"@appbaseio/reactivecore@^9.5.7":
-  version "9.6.24"
-  resolved "https://registry.yarnpkg.com/@appbaseio/reactivecore/-/reactivecore-9.6.24.tgz#910432b1cf339e405ca2851c4ea433d78425d696"
-  integrity sha512-tVbokX8PJXTt5/1PpMZRoab0XA4+DXYvTfTooA7whLCTB9Mm1nciHE0MrWYhhXIt7sRDuieTJxY7fP9rhevdNQ==
+"@appbaseio/reactivesearch@^3.14.0":
+  version "3.14.0"
+  resolved "https://registry.yarnpkg.com/@appbaseio/reactivesearch/-/reactivesearch-3.14.0.tgz#eb425925f55bee3e3286408ff90c8ee1a721d30a"
+  integrity sha512-St7tm49Em3QHTLz+QTRQTVnEuASiuVYGF1jR2IYLj2zjOZZDpy9JAOkPhZRlm8UQzASOAejp9vdczDJCWySpoQ==
   dependencies:
-    cross-fetch "^3.0.4"
-    prop-types "^15.6.0"
-    redux "^4.0.0"
-    redux-thunk "^2.3.0"
-    xdate "^0.8.2"
-
-"@appbaseio/reactivesearch@^3.13.2":
-  version "3.13.2"
-  resolved "https://registry.yarnpkg.com/@appbaseio/reactivesearch/-/reactivesearch-3.13.2.tgz#5cd272d89316ac674956565198968e3aa5cdecfd"
-  integrity sha512-lxVkigh6jBuUvAVBd4GyGu1EWME0Jg7DEvqP8kZFPABx8HKUoGoAxtxk3D0l7hc5RCn30wLbW+35tgyq6mHyMA==
-  dependencies:
-    "@appbaseio/reactivecore" "9.7.0"
+    "@appbaseio/reactivecore" "9.8.0"
     "@emotion/core" "^10.0.28"
     "@emotion/styled" "^10.0.27"
     appbase-js "^4.1.0"
@@ -1094,12 +1083,19 @@
     core-js-pure "^3.0.0"
     regenerator-runtime "^0.13.4"
 
-"@babel/runtime@^7.0.0", "@babel/runtime@^7.0.0-rc.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.10.2", "@babel/runtime@^7.11.2", "@babel/runtime@^7.12.1", "@babel/runtime@^7.3.1", "@babel/runtime@^7.5.5", "@babel/runtime@^7.7.2", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7":
+"@babel/runtime@^7.0.0", "@babel/runtime@^7.0.0-rc.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.10.2", "@babel/runtime@^7.11.2", "@babel/runtime@^7.12.1", "@babel/runtime@^7.5.5", "@babel/runtime@^7.7.2", "@babel/runtime@^7.8.4", "@babel/runtime@^7.8.7":
   version "7.12.5"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.12.5.tgz#410e7e487441e1b360c29be715d870d9b985882e"
   integrity sha512-plcc+hbExy3McchJCEQG3knOsuh3HH+Prx1P6cLIkET/0dLuQDEnrT+s27Axgc9bqfsmNUNHfscgMUdBpC9xfg==
   dependencies:
     regenerator-runtime "^0.13.4"
+
+"@babel/runtime@^7.3.1":
+  version "7.4.5"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.4.5.tgz#582bb531f5f9dc67d2fcb682979894f75e253f12"
+  integrity sha512-TuI4qpWZP6lGOGIuGWtp9sPluqYICmbk8T/1vpSysqJxRPkudh/ofFWyqdcMsDf2s7KvDL4/YHgKyvcS3g9CJQ==
+  dependencies:
+    regenerator-runtime "^0.13.2"
 
 "@babel/template@7.0.0-beta.44":
   version "7.0.0-beta.44"
@@ -11789,10 +11785,15 @@ react-intl-tel-input@^5.0.7:
     react-style-proptype "^3.0.0"
     underscore.deferred "^0.4.0"
 
-react-is@^16.12.0, react-is@^16.13.1, react-is@^16.6.0, react-is@^16.7.0, react-is@^16.8.1, react-is@^16.8.2:
+react-is@^16.12.0, react-is@^16.13.1, react-is@^16.6.0, react-is@^16.7.0:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
+
+react-is@^16.8.1, react-is@^16.8.2:
+  version "16.8.6"
+  resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.8.6.tgz#5bbc1e2d29141c9fbdfed456343fe2bc430a6a16"
+  integrity sha512-aUk3bHfZ2bRSVFFbbeVS4i+lNPZr3/WM5jT2J5omUVV1zzcs1nAaf3l51ctA5FFvCRbhrH0bdAsRRQddFJZPtA==
 
 react-joyride@2.0.0-15:
   version "2.0.0-15"
@@ -12220,6 +12221,11 @@ regenerator-runtime@^0.11.0:
   version "0.11.1"
   resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.11.1.tgz#be05ad7f9bf7d22e056f9726cee5017fbf19e2e9"
   integrity sha512-MguG95oij0fC3QV3URf4V2SDYGJhJnJGqvIIgdECeODCT98wSWDAJ94SSuVpYQUoTcGUIL6L4yNB7j1DFFHSBg==
+
+regenerator-runtime@^0.13.2:
+  version "0.13.2"
+  resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.13.2.tgz#32e59c9a6fb9b1a4aff09b4930ca2d4477343447"
+  integrity sha512-S/TQAZJO+D3m9xeN1WTI8dLKBBiRgXBlTJvbWjCThHWZj9EvHK70Ff50/tYj2J/fvBY6JtFVwRuazHN2E7M9BA==
 
 regenerator-runtime@^0.13.4:
   version "0.13.7"
@@ -14278,9 +14284,9 @@ url-parser-lite@^0.1.0:
   integrity sha512-k8eUA7I5qfH6c1ZI9CvdHEk+YH1KroX2ry+FF9k6yJBl7AmDWen2WI+xNzbCBAek6JEvgPBoHub4v8aZIM7Jqw==
 
 url-search-params-polyfill@^7.0.0:
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/url-search-params-polyfill/-/url-search-params-polyfill-7.0.1.tgz#b900cd9a0d9d2ff757d500135256f2344879cbff"
-  integrity sha512-bAw7L2E+jn9XHG5P9zrPnHdO0yJub4U+yXJOdpcpkr7OBd9T8oll4lUos0iSGRcDvfZoLUKfx9a6aNmIhJ4+mQ==
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/url-search-params-polyfill/-/url-search-params-polyfill-7.0.0.tgz#98b56ed29e67710588fdc3c361083b0f78303d95"
+  integrity sha512-0SEH3s+wCNbxEE/rWUalN004ICNi23Q74Ksc0gS2kG8EXnbayxGOrV97JdwnIVPKZ75Xk0hvKXvtIC4xReLMgg==
 
 url-search-params@^1.1.0:
   version "1.1.0"

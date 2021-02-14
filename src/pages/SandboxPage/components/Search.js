@@ -96,6 +96,7 @@ class Search extends React.Component {
 							<DataSearch
 								{...search}
 								autosuggest
+								enablePredictiveSuggestions
 								value={value}
 								onChange={this.handleChange}
 								componentId={search.id}
