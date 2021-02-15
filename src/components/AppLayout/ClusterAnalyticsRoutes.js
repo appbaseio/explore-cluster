@@ -60,6 +60,16 @@ const MonitoringPage = Loadable({
 	loading: Loader,
 });
 
+const RecentSearches = Loadable({
+	loader: () => import(/* webpackChunkName: "RecentSearches" */ '../../pages/RecentSearches'),
+	loading: Loader,
+});
+
+const RecentResults = Loadable({
+	loader: () => import(/* webpackChunkName: "RecentResults" */ '../../pages/RecentResults'),
+	loading: Loader,
+});
+
 class ClusterAnalyticsRoutes extends React.Component {
 	shouldComponentUpdate(nextProps) {
 		const { location, allowedRoutes } = this.props;
@@ -192,6 +202,32 @@ class ClusterAnalyticsRoutes extends React.Component {
 				/>
 				<Route
 					exact
+					path="/cluster/recent-searches"
+					component={(props) => (
+						<>
+							{get(allowedRoutes, '/cluster/recent-searches') ? (
+								<AppPageContainer {...props} component={RecentSearches} />
+							) : (
+								<UnauthorizedPage />
+							)}
+						</>
+					)}
+				/>
+				<Route
+					exact
+					path="/cluster/recent-results"
+					component={(props) => (
+						<>
+							{get(allowedRoutes, '/cluster/recent-results') ? (
+								<AppPageContainer {...props} component={RecentResults} />
+							) : (
+								<UnauthorizedPage />
+							)}
+						</>
+					)}
+				/>
+				<Route
+					exact
 					path="/cluster/monitoring"
 					component={(props) => (
 						<>
@@ -203,10 +239,6 @@ class ClusterAnalyticsRoutes extends React.Component {
 		);
 	}
 }
-
-// const ClusterAnalyticsRoutes = ({ allowedRoutes }) => {
-
-// };
 
 ClusterAnalyticsRoutes.propTypes = {
 	allowedRoutes: PropTypes.object.isRequired,
