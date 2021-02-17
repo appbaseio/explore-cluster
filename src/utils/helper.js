@@ -137,6 +137,15 @@ export const validationsList = [
 	'Cannot be . or ..',
 ];
 
+export const validateJSON = (value) => {
+	try {
+		JSON.parse(value);
+	} catch (e) {
+		return false;
+	}
+	return true;
+};
+
 export function getUrlParams(url) {
 	if (!url) {
 		return {};

@@ -16,7 +16,7 @@ import PropTypes from 'prop-types';
 
 import get from 'lodash/get';
 import { input, modalHeading, radiobtn } from './styles';
-import { validateAppName, validationsList } from '../../utils/helper';
+import { validateAppName, validationsList, validateJSON } from '../../utils/helper';
 
 import { createApp, resetCreatedApp } from '../../actions';
 import LanguageDropdown from '../../components/LanguageDropdown';
@@ -26,6 +26,7 @@ import { getLanguageFallback } from '../../utils/language';
 import { isValidPlan } from '../../batteries/utils';
 import { allowedTiers } from '../../utils/prop-types';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
+import Ace from '../../batteries/components/SearchSandbox/containers/AceEditor';
 
 const RadioGroup = Radio.Group;
 
@@ -38,6 +39,7 @@ class CreateAppModal extends Component {
 			validationPopOver: false,
 			shards: 1,
 			replicas: 0,
+			indexSettings: '',
 			language: 'universal',
 		};
 	}
@@ -98,13 +100,25 @@ class CreateAppModal extends Component {
 	};
 
 	handleOk = async () => {
-		const { appName, shards, replicas } = this.state;
+		const { appName, shards, replicas, indexSettings } = this.state;
 		const { handleCreateApp } = this.props;
 		let { language } = this.state;
 		language = getLanguageFallback(language);
+		// validate advanced settings
+		if (indexSettings) {
+			const isValidSettings = validateJSON(indexSettings);
+			if (!isValidSettings) {
+				notification.error({
+					message: 'Invalid Index settings',
+					description: 'Please use valid JSON value for index settings.',
+				});
+				return;
+			}
+		}
 		const options = {
 			appName,
 			settings: {
+				...(indexSettings ? JSON.parse(indexSettings) : null),
 				number_of_shards: shards,
 				number_of_replicas: replicas,
 				analysis: get(languages, [language, 'analysis']),
@@ -166,6 +180,7 @@ class CreateAppModal extends Component {
 			shards,
 			replicas,
 			language,
+			indexSettings,
 		} = this.state;
 		const { createdApp, showModal } = this.props;
 
@@ -219,6 +234,7 @@ class CreateAppModal extends Component {
 						name="appName"
 						className={input}
 						data-cy="new-index-name"
+						autoFocus
 						onChange={this.handleChange}
 						value={appName}
 					/>
@@ -261,6 +277,56 @@ class CreateAppModal extends Component {
 						step={1}
 						onChange={(value) => this.handleInputNumber('replicas', value)}
 						value={replicas}
+					/>
+					<Row type="flex" justify="space-between" align="middle">
+						<h3 style={{ marginTop: 20 }} className={modalHeading}>
+							Index Settings
+						</h3>
+						<Popover
+							placement="right"
+							content={
+								<span>
+									It allows to define additional index settings in JSON format.{' '}
+									<br />
+									You can check the available options at{' '}
+									<a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#index-modules-settings">
+										here
+									</a>
+									.
+								</span>
+							}
+							title="Index name validations"
+						>
+							<Icon type="info-circle" />
+						</Popover>
+					</Row>
+					<Ace
+						defaultValue=""
+						mode="json"
+						value={
+							typeof indexSettings === 'string'
+								? indexSettings
+								: JSON.stringify(indexSettings, 0, 2)
+						}
+						onChange={(value) => this.handleInputNumber('indexSettings', value)}
+						theme="monokai"
+						name="editor-JSON"
+						fontSize={16}
+						showPrintMargin
+						style={{
+							width: '100%',
+							maxWidth: 800,
+							maxHeight: 250,
+						}}
+						showGutter
+						highlightActiveLine
+						setOptions={{
+							showLineNumbers: true,
+							tabSize: 2,
+						}}
+						editorProps={{
+							$blockScrolling: true,
+						}}
 					/>
 					{createdApp && createdApp.error ? (
 						<div css={{ color: 'tomato', marginTop: 8 }}>
