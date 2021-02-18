@@ -6,6 +6,7 @@ import Container from '../../components/Container';
 import Overlay from '../../components/Overlay';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Analytics from '../../batteries/components/analytics';
+import { ANALYTICS_ROOT_FILTER_ID } from '../../batteries/components/analytics/utils';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -41,7 +42,7 @@ const AnalyticsView = ({ appName, isPaidUser, plan }) => (
 				{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
 				<Container>
 					<Analytics
-						filterId="analytics_page"
+						filterId={ANALYTICS_ROOT_FILTER_ID}
 						displayReplaySearch={window.location.pathname.startsWith('/app')}
 						chartWidth={window.innerWidth - 400}
 						appName={appName}
