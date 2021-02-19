@@ -6,6 +6,7 @@ import Overlay from '../../components/Overlay';
 import Container from '../../components/Container';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import RecentSearches from '../../batteries/components/analytics/components/RecentSearches';
+import FilterInitializer from '../../batteries/components/analytics/components/Filter/FilterInitializer';
 import { allowedTiers } from '../../utils/prop-types';
 import { isValidPlan } from '../../batteries/utils';
 
@@ -25,15 +26,19 @@ const bannerMessagesAnalytics = {
 	},
 };
 
+const filterId = 'recent_searches_page';
+
 const RecentSearchesWrapper = ({ appName, tier }) => (
 	<React.Fragment>
 		{isValidPlan(tier) ? (
-			<React.Fragment>
-				<Banner {...bannerMessagesAnalytics.paid} />
-				<Container>
-					<RecentSearches filterId="recent_searches_page" appName={appName} />
-				</Container>
-			</React.Fragment>
+			<FilterInitializer filterId={filterId}>
+				<React.Fragment>
+					<Banner {...bannerMessagesAnalytics.paid} />
+					<Container>
+						<RecentSearches filterId={filterId} appName={appName} />
+					</Container>
+				</React.Fragment>
+			</FilterInitializer>
 		) : (
 			<React.Fragment>
 				<Banner {...bannerMessagesAnalytics.free} />

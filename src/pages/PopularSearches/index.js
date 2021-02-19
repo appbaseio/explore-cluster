@@ -8,6 +8,7 @@ import { Route, Switch, Link } from 'react-router-dom';
 import Overlay from '../../components/Overlay';
 import Container from '../../components/Container';
 import Filter from '../../batteries/components/analytics/components/Filter';
+import FilterInitializer from '../../batteries/components/analytics/components/Filter/FilterInitializer';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Loader from '../../components/Loader';
 
@@ -56,65 +57,69 @@ const filterId = 'popular_searches_page';
 const PopularSearchesWrapper = ({ appName, plan, isPaidUser }) => (
 	<React.Fragment>
 		{isPaidUser ? (
-			<React.Fragment>
-				{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
-				<Container>
-					<Filter filterId={filterId} />
-					<Route
-						component={({ match }) => {
-							const splitedURL = window.location.href.split('query-overview/');
-							return (
-								<React.Fragment>
-									{window.location.href.includes('query-overview') ? (
-										<Breadcrumb
-											style={{
-												marginBottom: 20,
-											}}
-										>
-											<Breadcrumb.Item>
-												<Link to={`${match.url}`}>Popular Searches</Link>
-											</Breadcrumb.Item>
-											<Breadcrumb.Item>
-												{splitedURL && splitedURL[1]
-													? decodeURIComponent(splitedURL[1])
-													: '<empty_query>'}
-											</Breadcrumb.Item>
-										</Breadcrumb>
-									) : null}
-									<Switch>
-										<Route
-											exact
-											path={match.path}
-											component={() => (
-												<PopularSearches
-													filterId={filterId}
-													displayReplaySearch={window.location.pathname.startsWith(
-														'/app',
-													)}
-													appName={appName}
-													plan={plan}
-													displaySummaryStats
-												/>
-											)}
-										/>
-										<Route
-											exact
-											path={`${match.path}/query-overview/:query`}
-											component={(props) => (
-												<QueryOverview
-													{...props}
-													query={get(props, 'match.params.query')}
-													filterId={filterId}
-												/>
-											)}
-										/>
-									</Switch>
-								</React.Fragment>
-							);
-						}}
-					/>
-				</Container>
-			</React.Fragment>
+			<FilterInitializer filterId={filterId}>
+				<React.Fragment>
+					{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
+					<Container>
+						<Filter filterId={filterId} />
+						<Route
+							component={({ match }) => {
+								const splitedURL = window.location.href.split('query-overview/');
+								return (
+									<React.Fragment>
+										{window.location.href.includes('query-overview') ? (
+											<Breadcrumb
+												style={{
+													marginBottom: 20,
+												}}
+											>
+												<Breadcrumb.Item>
+													<Link to={`${match.url}`}>
+														Popular Searches
+													</Link>
+												</Breadcrumb.Item>
+												<Breadcrumb.Item>
+													{splitedURL && splitedURL[1]
+														? decodeURIComponent(splitedURL[1])
+														: '<empty_query>'}
+												</Breadcrumb.Item>
+											</Breadcrumb>
+										) : null}
+										<Switch>
+											<Route
+												exact
+												path={match.path}
+												component={() => (
+													<PopularSearches
+														filterId={filterId}
+														displayReplaySearch={window.location.pathname.startsWith(
+															'/app',
+														)}
+														appName={appName}
+														plan={plan}
+														displaySummaryStats
+													/>
+												)}
+											/>
+											<Route
+												exact
+												path={`${match.path}/query-overview/:query`}
+												component={(props) => (
+													<QueryOverview
+														{...props}
+														query={get(props, 'match.params.query')}
+														filterId={filterId}
+													/>
+												)}
+											/>
+										</Switch>
+									</React.Fragment>
+								);
+							}}
+						/>
+					</Container>
+				</React.Fragment>
+			</FilterInitializer>
 		) : (
 			<React.Fragment>
 				<Banner {...bannerMessagesAnalytics.free} />

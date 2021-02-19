@@ -10,6 +10,7 @@ import RequestLogs from '../../batteries/components/analytics/components/Request
 import { getUrlParams } from '../../batteries/utils/helpers';
 import { getAppSearchLatencyByName } from '../../batteries/modules/selectors';
 import VersionController from '../../batteries/components/shared/VersionController';
+import FilterInitializer from '../../batteries/components/analytics/components/Filter/FilterInitializer';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -118,38 +119,40 @@ class SearchLatencyWrapper extends React.Component {
 		return (
 			<React.Fragment>
 				{isGrowth ? (
-					<React.Fragment>
-						{bannerMessagesAnalytics[plan] && (
-							<Banner {...bannerMessagesAnalytics[plan]} />
-						)}
-						<Container>
-							<SearchPerformance
-								style={{ height: 506 }}
-								filterId={filterId}
-								onClickBar={this.handleClickBar}
-								displaySummaryStats
-							/>
-							<div
-								style={{
-									marginTop: 20,
-									position: 'relative',
-								}}
-							>
-								<VersionController title={title} version="7.30.0">
-									<RequestLogs
-										title={title}
-										hideRefreshButton
-										displayFilter={false}
-										displaySearchLogs
-										startLatency={startLatency}
-										endLatency={endLatency}
-										startDate={get(filters, 'from')}
-										endDate={get(filters, 'to')}
-									/>
-								</VersionController>
-							</div>
-						</Container>
-					</React.Fragment>
+					<FilterInitializer filterId={filterId}>
+						<React.Fragment>
+							{bannerMessagesAnalytics[plan] && (
+								<Banner {...bannerMessagesAnalytics[plan]} />
+							)}
+							<Container>
+								<SearchPerformance
+									style={{ height: 506 }}
+									filterId={filterId}
+									onClickBar={this.handleClickBar}
+									displaySummaryStats
+								/>
+								<div
+									style={{
+										marginTop: 20,
+										position: 'relative',
+									}}
+								>
+									<VersionController title={title} version="7.30.0">
+										<RequestLogs
+											title={title}
+											hideRefreshButton
+											displayFilter={false}
+											displaySearchLogs
+											startLatency={startLatency}
+											endLatency={endLatency}
+											startDate={get(filters, 'from')}
+											endDate={get(filters, 'to')}
+										/>
+									</VersionController>
+								</div>
+							</Container>
+						</React.Fragment>
+					</FilterInitializer>
 				) : (
 					<React.Fragment>
 						<Banner {...bannerMessagesAnalytics[plan]} />

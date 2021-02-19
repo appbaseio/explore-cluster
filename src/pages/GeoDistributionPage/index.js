@@ -5,7 +5,7 @@ import get from 'lodash/get';
 import Overlay from '../../components/Overlay';
 import Container from '../../components/Container';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
-
+import FilterInitializer from '../../batteries/components/analytics/components/Filter/FilterInitializer';
 import GeoDistributionPage from '../../batteries/components/analytics/components/GeoDistribution';
 
 const bannerMessagesAnalytics = {
@@ -32,15 +32,19 @@ const bannerMessagesAnalytics = {
 	},
 };
 
+const filterId = 'geo_distribution_page';
+
 const PopularResultsWrapper = ({ plan, isGrowth }) => (
 	<React.Fragment>
 		{isGrowth ? (
-			<React.Fragment>
-				{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
-				<Container>
-					<GeoDistributionPage displaySummaryStats filterId="geo_distribution_page" />
-				</Container>
-			</React.Fragment>
+			<FilterInitializer filterId={filterId}>
+				<React.Fragment>
+					{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
+					<Container>
+						<GeoDistributionPage displaySummaryStats filterId={filterId} />
+					</Container>
+				</React.Fragment>
+			</FilterInitializer>
 		) : (
 			<React.Fragment>
 				<Banner {...bannerMessagesAnalytics[plan]} />

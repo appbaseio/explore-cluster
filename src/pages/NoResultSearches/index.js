@@ -6,6 +6,7 @@ import Overlay from '../../components/Overlay';
 import Container from '../../components/Container';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import NoResultSearch from '../../batteries/components/analytics/components/NoResultsSearch';
+import FilterInitializer from '../../batteries/components/analytics/components/Filter/FilterInitializer';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -29,21 +30,25 @@ const bannerMessagesAnalytics = {
 	},
 };
 
+const filterId = 'no_results_page';
+
 const NoResultSearchWrapper = ({ appName, plan, isPaidUser }) => (
 	<React.Fragment>
 		{isPaidUser ? (
-			<React.Fragment>
-				{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
-				<Container>
-					<NoResultSearch
-						filterId="no_results_page"
-						displayReplaySearch={window.location.pathname.startsWith('/app')}
-						appName={appName}
-						plan={plan}
-						displaySummaryStats
-					/>
-				</Container>
-			</React.Fragment>
+			<FilterInitializer filterId={filterId}>
+				<React.Fragment>
+					{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
+					<Container>
+						<NoResultSearch
+							filterId={filterId}
+							displayReplaySearch={window.location.pathname.startsWith('/app')}
+							appName={appName}
+							plan={plan}
+							displaySummaryStats
+						/>
+					</Container>
+				</React.Fragment>
+			</FilterInitializer>
 		) : (
 			<React.Fragment>
 				<Banner {...bannerMessagesAnalytics.free} />

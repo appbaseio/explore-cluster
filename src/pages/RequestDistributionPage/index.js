@@ -6,6 +6,7 @@ import Overlay from '../../components/Overlay';
 import Container from '../../components/Container';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import RequestDistribution from '../../batteries/components/analytics/components/RequestDistribution';
+import FilterInitializer from '../../batteries/components/analytics/components/Filter/FilterInitializer';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -31,15 +32,18 @@ const bannerMessagesAnalytics = {
 	},
 };
 
+const filterId = 'request_distribution_page';
 const RequestDistributionWrapper = ({ plan, isGrowth }) => (
 	<React.Fragment>
 		{isGrowth ? (
-			<React.Fragment>
-				{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
-				<Container>
-					<RequestDistribution displaySummaryStats filterId="request_distribution_page" />
-				</Container>
-			</React.Fragment>
+			<FilterInitializer filterId={filterId}>
+				<React.Fragment>
+					{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
+					<Container>
+						<RequestDistribution displaySummaryStats filterId={filterId} />
+					</Container>
+				</React.Fragment>
+			</FilterInitializer>
 		) : (
 			<React.Fragment>
 				<Banner {...bannerMessagesAnalytics[plan]} />

@@ -6,6 +6,7 @@ import Overlay from '../../components/Overlay';
 import Container from '../../components/Container';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import PopularFilters from '../../batteries/components/analytics/components/PopularFilters';
+import FilterInitializer from '../../batteries/components/analytics/components/Filter/FilterInitializer';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -30,21 +31,24 @@ const bannerMessagesAnalytics = {
 	},
 };
 
+const filterId = 'popular_filters_page';
 const PopularFiltersWrapper = ({ appName, plan, isGrowth }) => (
 	<React.Fragment>
 		{isGrowth ? (
-			<React.Fragment>
-				{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
-				<Container>
-					<PopularFilters
-						filterId="popular_filters_page"
-						displayReplaySearch={window.location.pathname.startsWith('/app')}
-						appName={appName}
-						plan={plan}
-						displaySummaryStats
-					/>
-				</Container>
-			</React.Fragment>
+			<FilterInitializer filterId={filterId}>
+				<React.Fragment>
+					{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
+					<Container>
+						<PopularFilters
+							filterId={filterId}
+							displayReplaySearch={window.location.pathname.startsWith('/app')}
+							appName={appName}
+							plan={plan}
+							displaySummaryStats
+						/>
+					</Container>
+				</React.Fragment>
+			</FilterInitializer>
 		) : (
 			<React.Fragment>
 				<Banner {...bannerMessagesAnalytics[plan]} />
