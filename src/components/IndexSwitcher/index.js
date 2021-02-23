@@ -31,7 +31,8 @@ function IndexSwitcher({
 			</Link>
 		);
 
-	const sortedApps = filteredApps.sort((a, b) => {
+	const userApps = filteredApps.filter((index) => index && !index.includes('metricbeat-'));
+	const sortedApps = userApps.sort((a, b) => {
 		if (a < b) {
 			return -1;
 		}
@@ -40,10 +41,9 @@ function IndexSwitcher({
 		}
 		return 0;
 	});
-
 	function getTitle() {
 		if (isAppsLoading) return <div style={{ margin: 4 }}>Loading...</div>;
-		if (filteredApps.length === 0)
+		if (userApps.length === 0)
 			return <div style={{ margin: 4 }}>Please create an index to get started.</div>;
 		return (
 			<Select

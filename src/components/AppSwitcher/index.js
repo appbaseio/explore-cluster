@@ -33,7 +33,9 @@ class AppSwitcher extends React.Component {
 
 		const filteredApps = keys(apps).filter((app) => !app.startsWith('.'));
 
-		const sortedApps = (filteredApps || []).sort((a, b) => {
+		const userApps = filteredApps.filter((index) => index && !index.includes('metricbeat-'));
+
+		const sortedApps = (userApps || []).sort((a, b) => {
 			if (a < b) {
 				return -1;
 			}
@@ -42,6 +44,7 @@ class AppSwitcher extends React.Component {
 			}
 			return 0;
 		});
+
 		return (
 			<React.Fragment>
 				<Select
