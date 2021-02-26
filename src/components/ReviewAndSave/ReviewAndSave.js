@@ -651,6 +651,7 @@ class ReviewAndSave extends React.Component {
 						}
 					})
 					.catch((reIndexErr) => {
+						// eslint-disable-next-line no-console
 						console.error('Re-indexing error = ', reIndexErr);
 						this.setState({ isSaving: false });
 
@@ -696,12 +697,14 @@ class ReviewAndSave extends React.Component {
 						Reset To Default Settings
 					</Button>
 					<div style={{ position: 'relative' }}>
-						{diffCount > 0 && !isResetting && <Badge>{diffCount}</Badge>}
+						{diffCount > 0 && !isResetting && localRelevancy && (
+							<Badge>{diffCount}</Badge>
+						)}
 						<Button
 							style={{ marginRight: 10 }}
 							size="large"
 							type="primary"
-							disabled={!diffCount || isResetting}
+							disabled={!diffCount || isResetting || !localRelevancy}
 							onClick={this.showModal}
 							data-cy="review-deploy-button"
 						>
