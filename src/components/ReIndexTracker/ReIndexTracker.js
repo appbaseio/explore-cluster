@@ -103,7 +103,7 @@ class ReIndexTracker extends React.Component {
 	};
 
 	render() {
-		const { collapsed } = this.props;
+		const { collapsed, appName } = this.props;
 		const { tasks } = this.state;
 		return tasks.length ? (
 			<div
@@ -117,105 +117,108 @@ class ReIndexTracker extends React.Component {
 			>
 				{tasks.map((task, index) => (
 					<div key={task.taskId}>
-						{!task.completed ? (
-							<Alert
-								showIcon
-								type="warning"
-								css={{
-									marginBottom: 5,
-								}}
-								message={
-									<div
-										style={{
-											display: 'flex',
-											justifyContent: 'space-between',
-											flexWrap: 'nowrap',
-										}}
-									>
-										<div>
-											Re-indexing for <b>{task.appName}</b> is in progress,{' '}
-											<b>
-												{task.indexed}/{task.total}
-											</b>{' '}
-											documents have been indexed. Once the documents are
-											re-indexed, it may take a while for the shards to be
-											reassigned. Changes you make will be saved but
-											won&apos;t be deployed till the re-indexing process is
-											completed.
-										</div>
-										<Icon
-											type="close"
-											onClick={() => this.onClose(index)}
-											style={{ marginTop: 5 }}
-										/>
-									</div>
-								}
-							/>
-						) : (
-							<>
-								{task.failures.length ? (
-									<>
-										{task.failures.map((failure) => (
-											<Alert
-												showIcon
-												type="error"
-												key={get(failure, 'cause.reason')}
-												css={{
-													marginBottom: 5,
-												}}
-												message={
-													<div
-														style={{
-															display: 'flex',
-															justifyContent: 'space-between',
-															flexWrap: 'nowrap',
-														}}
-													>
-														<div>
-															Re-indexing failed for {task.appName}.{' '}
-															{get(failure, 'cause.reason')}
-														</div>
-														<Icon
-															type="close"
-															onClick={() => this.onClose(index)}
-															style={{ marginTop: 5 }}
-														/>
-													</div>
-												}
-											/>
-										))}
-									</>
-								) : (
-									<Alert
-										showIcon
-										type="success"
-										css={{
-											marginBottom: 5,
-										}}
-										message={
-											<div
-												style={{
-													display: 'flex',
-													justifyContent: 'space-between',
-													flexWrap: 'nowrap',
-												}}
-											>
-												<div>
-													Re-indexing has successfully completed for{' '}
-													{task.appName}. You may need to reload mappings
-													to see the new changes reflected.
-												</div>
-												<Icon
-													type="close"
-													onClick={() => this.onClose(index)}
-													style={{ marginTop: 5 }}
-												/>
+						{task.appName === appName &&
+							(!task.completed ? (
+								<Alert
+									showIcon
+									type="warning"
+									css={{
+										marginBottom: 5,
+									}}
+									message={
+										<div
+											style={{
+												display: 'flex',
+												justifyContent: 'space-between',
+												flexWrap: 'nowrap',
+											}}
+										>
+											<div>
+												Re-indexing for <b>{task.appName}</b> is in
+												progress,{' '}
+												<b>
+													{task.indexed}/{task.total}
+												</b>{' '}
+												documents have been indexed. Once the documents are
+												re-indexed, it may take a while for the shards to be
+												reassigned. Changes you make will be saved but
+												won&apos;t be deployed till the re-indexing process
+												is completed.
 											</div>
-										}
-									/>
-								)}
-							</>
-						)}
+											<Icon
+												type="close"
+												onClick={() => this.onClose(index)}
+												style={{ marginTop: 5 }}
+											/>
+										</div>
+									}
+								/>
+							) : (
+								<>
+									{task.failures.length ? (
+										<>
+											{task.failures.map((failure) => (
+												<Alert
+													showIcon
+													type="error"
+													key={get(failure, 'cause.reason')}
+													css={{
+														marginBottom: 5,
+													}}
+													message={
+														<div
+															style={{
+																display: 'flex',
+																justifyContent: 'space-between',
+																flexWrap: 'nowrap',
+															}}
+														>
+															<div>
+																Re-indexing failed for{' '}
+																{task.appName}.{' '}
+																{get(failure, 'cause.reason')}
+															</div>
+															<Icon
+																type="close"
+																onClick={() => this.onClose(index)}
+																style={{ marginTop: 5 }}
+															/>
+														</div>
+													}
+												/>
+											))}
+										</>
+									) : (
+										<Alert
+											showIcon
+											type="success"
+											css={{
+												marginBottom: 5,
+											}}
+											message={
+												<div
+													style={{
+														display: 'flex',
+														justifyContent: 'space-between',
+														flexWrap: 'nowrap',
+													}}
+												>
+													<div>
+														Re-indexing has successfully completed for{' '}
+														{task.appName}. You may need to reload
+														mappings to see the new changes reflected.
+													</div>
+													<Icon
+														type="close"
+														onClick={() => this.onClose(index)}
+														style={{ marginTop: 5 }}
+													/>
+												</div>
+											}
+										/>
+									)}
+								</>
+							))}
 					</div>
 				))}
 			</div>
@@ -227,11 +230,13 @@ ReIndexTracker.propTypes = {
 	reIndexingTasks: PropTypes.arrayOf(string).isRequired,
 	updateReIndexingTasks: PropTypes.func.isRequired,
 	collapsed: PropTypes.bool.isRequired,
+	appName: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = (state) => ({
 	reIndexingTasks: get(state, '$reIndexingTasks'),
 	collapsed: get(state, 'sideBarCollapsed'),
+	appName: get(state, '$getCurrentApp.name', 'default'),
 });
 
 const mapDispatchToProps = (dispatch) => ({
