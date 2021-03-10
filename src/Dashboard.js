@@ -60,8 +60,6 @@ class Dashboard extends Component {
 		const { loadArcUser } = this.props;
 		const { pathname, search } = window.location;
 
-		console.log('log ==>> ', window.dataLayer);
-
 		if (pathname !== '/login' && pathname !== '/' && search) {
 			this.setState({
 				redirectLocation: `${pathname}${search}`,
