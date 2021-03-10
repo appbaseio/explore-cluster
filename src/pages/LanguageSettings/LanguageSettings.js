@@ -28,6 +28,8 @@ import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 import { languages } from '../../constants/es-languages';
 import SettingsFooter from '../../components/SettingsFooter';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 const fallback = {
 	chinese: 'Needs smartcn analyzer installed.',
@@ -54,7 +56,20 @@ const bannerMessage = {
 };
 
 class LanguageSettings extends React.Component {
+	constructor(props) {
+		super(props);
+		this.startTime = moment();
+	}
+
 	componentDidMount() {
+		// triggering custom event for google analytics
+		event({
+			action: 'Language Settings',
+			category: 'Search Relevancy',
+			label: 'visit',
+			value: null,
+		});
+
 		const {
 			appName,
 			getSettingsAction,
@@ -88,6 +103,17 @@ class LanguageSettings extends React.Component {
 		) {
 			this.init({ ...defaultSettings });
 		}
+	}
+
+	componentWillUnmount() {
+		// Sends the timing event to Google Analytics.
+		timingEvent({
+			action: 'timing_complete',
+			category: 'Search Relevancy',
+			label: 'language-settings-time',
+			name: 'time',
+			value: this.startTime.fromNow(),
+		});
 	}
 
 	init = (settings) => {

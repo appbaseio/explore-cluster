@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import get from 'lodash/get';
 import { Breadcrumb } from 'antd';
 import PropTypes from 'prop-types';
@@ -11,6 +11,8 @@ import Filter from '../../batteries/components/analytics/components/Filter';
 import FilterInitializer from '../../batteries/components/analytics/components/Filter/FilterInitializer';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Loader from '../../components/Loader';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 const QueryOverview = Loadable({
 	loader: () =>
@@ -54,83 +56,110 @@ const bannerMessagesAnalytics = {
 
 const filterId = 'popular_searches_page';
 
-const PopularSearchesWrapper = ({ appName, plan, isPaidUser }) => (
-	<React.Fragment>
-		{isPaidUser ? (
-			<FilterInitializer filterId={filterId}>
+const PopularSearchesWrapper = ({ appName, plan, isPaidUser }) => {
+	useEffect(() => {
+		const startTime = moment();
+		// triggering custom event for google analytics
+		event({
+			action: 'Popular Searches',
+			category: 'Analytics',
+			label: 'visit',
+			value: null,
+		});
+
+		return () => {
+			// Sends the timing event to Google Analytics.
+			timingEvent({
+				action: 'timing_complete',
+				category: 'Analytics',
+				label: 'popular-searches-time',
+				name: 'time',
+				value: startTime.fromNow(),
+			});
+		};
+	}, []);
+	return (
+		<React.Fragment>
+			{isPaidUser ? (
+				<FilterInitializer filterId={filterId}>
+					<React.Fragment>
+						{bannerMessagesAnalytics[plan] && (
+							<Banner {...bannerMessagesAnalytics[plan]} />
+						)}
+						<Container>
+							<Filter filterId={filterId} />
+							<Route
+								component={({ match }) => {
+									const splitedURL = window.location.href.split(
+										'query-overview/',
+									);
+									return (
+										<React.Fragment>
+											{window.location.href.includes('query-overview') ? (
+												<Breadcrumb
+													style={{
+														marginBottom: 20,
+													}}
+												>
+													<Breadcrumb.Item>
+														<Link to={`${match.url}`}>
+															Popular Searches
+														</Link>
+													</Breadcrumb.Item>
+													<Breadcrumb.Item>
+														{splitedURL && splitedURL[1]
+															? decodeURIComponent(splitedURL[1])
+															: '<empty_query>'}
+													</Breadcrumb.Item>
+												</Breadcrumb>
+											) : null}
+											<Switch>
+												<Route
+													exact
+													path={match.path}
+													component={() => (
+														<PopularSearches
+															filterId={filterId}
+															displayReplaySearch={window.location.pathname.startsWith(
+																'/app',
+															)}
+															appName={appName}
+															plan={plan}
+															displaySummaryStats
+														/>
+													)}
+												/>
+												<Route
+													exact
+													path={`${match.path}/query-overview/:query`}
+													component={(props) => (
+														<QueryOverview
+															{...props}
+															query={get(props, 'match.params.query')}
+															filterId={filterId}
+														/>
+													)}
+												/>
+											</Switch>
+										</React.Fragment>
+									);
+								}}
+							/>
+						</Container>
+					</React.Fragment>
+				</FilterInitializer>
+			) : (
 				<React.Fragment>
-					{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
-					<Container>
-						<Filter filterId={filterId} />
-						<Route
-							component={({ match }) => {
-								const splitedURL = window.location.href.split('query-overview/');
-								return (
-									<React.Fragment>
-										{window.location.href.includes('query-overview') ? (
-											<Breadcrumb
-												style={{
-													marginBottom: 20,
-												}}
-											>
-												<Breadcrumb.Item>
-													<Link to={`${match.url}`}>
-														Popular Searches
-													</Link>
-												</Breadcrumb.Item>
-												<Breadcrumb.Item>
-													{splitedURL && splitedURL[1]
-														? decodeURIComponent(splitedURL[1])
-														: '<empty_query>'}
-												</Breadcrumb.Item>
-											</Breadcrumb>
-										) : null}
-										<Switch>
-											<Route
-												exact
-												path={match.path}
-												component={() => (
-													<PopularSearches
-														filterId={filterId}
-														displayReplaySearch={window.location.pathname.startsWith(
-															'/app',
-														)}
-														appName={appName}
-														plan={plan}
-														displaySummaryStats
-													/>
-												)}
-											/>
-											<Route
-												exact
-												path={`${match.path}/query-overview/:query`}
-												component={(props) => (
-													<QueryOverview
-														{...props}
-														query={get(props, 'match.params.query')}
-														filterId={filterId}
-													/>
-												)}
-											/>
-										</Switch>
-									</React.Fragment>
-								);
-							}}
-						/>
-					</Container>
+					<Banner {...bannerMessagesAnalytics.free} />
+					<Overlay
+						src="/static/images/analytics/PopularSearches.png"
+						alt="popular searches"
+					/>
 				</React.Fragment>
-			</FilterInitializer>
-		) : (
-			<React.Fragment>
-				<Banner {...bannerMessagesAnalytics.free} />
-				<Overlay
-					src="/static/images/analytics/PopularSearches.png"
-					alt="popular searches"
-				/>
-			</React.Fragment>
-		)}
-	</React.Fragment>
-);
+			)}
+		</React.Fragment>
+	);
+};
 PopularSearchesWrapper.defaultProps = {
 	appName: undefined,
 };

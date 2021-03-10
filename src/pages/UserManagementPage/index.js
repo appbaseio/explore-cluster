@@ -21,6 +21,8 @@ import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 import { ALLOWED_ACTIONS } from '../../constants';
 import { compareVersion } from '../../utils';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 const { Paragraph } = Typography;
 const tableCls = css`
@@ -59,13 +61,35 @@ const columns = [
 ];
 
 class UserManagementPage extends React.Component {
-	state = {
-		showForm: false,
-		currentPermissionInfo: undefined,
-	};
+	constructor(props) {
+		super(props);
+		this.startTime = moment();
+		this.state = {
+			showForm: false,
+			currentPermissionInfo: undefined,
+		};
+	}
 
 	componentDidMount() {
+		// triggering custom event for google analytics
+		event({
+			action: 'User Management',
+			category: 'User Management',
+			label: 'visit',
+			value: null,
+		});
 		this.refetchPermissions();
+	}
+
+	componentWillUnmount() {
+		// Sends the timing event to Google Analytics.
+		timingEvent({
+			action: 'timing_complete',
+			category: 'User Management',
+			label: 'user-management-time',
+			name: 'time',
+			value: this.startTime.fromNow(),
+		});
 	}
 
 	showForm = (permissionInfo) => {

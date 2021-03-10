@@ -5,6 +5,8 @@ import get from 'lodash/get';
 import Loadable from 'react-loadable';
 import { injectGlobal } from 'emotion';
 import URL from 'url-parser-lite';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 import {
 	setCurrentApp,
@@ -30,7 +32,18 @@ const DejavuComponent = Loadable({
 });
 
 class BrowserPage extends Component {
+	constructor(props) {
+		super(props);
+		this.startTime = moment();
+	}
 	componentDidMount() {
+		// triggering custom event for google analytics
+		event({
+			action: 'Browse Results',
+			category: 'Develop',
+			label: 'visit',
+			value: null,
+		});
 		const { credentials } = this.props;
 		if (!credentials) {
 			this.init();
@@ -42,6 +55,17 @@ class BrowserPage extends Component {
 		if (appName !== prevProps.appName) {
 			this.init();
 		}
+	}
+
+	componentWillUnmount() {
+		// Sends the timing event to Google Analytics.
+		timingEvent({
+			action: 'timing_complete',
+			category: 'Develop',
+			label: 'browse-results-time',
+			name: 'time',
+			value: this.startTime.fromNow(),
+		});
 	}
 
 	init() {

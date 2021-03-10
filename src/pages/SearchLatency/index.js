@@ -11,6 +11,8 @@ import { getUrlParams } from '../../batteries/utils/helpers';
 import { getAppSearchLatencyByName } from '../../batteries/modules/selectors';
 import VersionController from '../../batteries/components/shared/VersionController';
 import FilterInitializer from '../../batteries/components/analytics/components/Filter/FilterInitializer';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -46,9 +48,17 @@ class SearchLatencyWrapper extends React.Component {
 			startLatency: get(urlParams, 'start_latency'),
 			endLatency: get(urlParams, 'end_latency'),
 		};
+		this.startTime = moment();
 	}
 
 	componentDidMount() {
+		// triggering custom event for google analytics
+		event({
+			action: 'Search Latency',
+			category: 'Analytics',
+			label: 'visit',
+			value: null,
+		});
 		const urlParams = getUrlParams(window.location.search);
 		if (get(urlParams, 'redirect_to') === 'logs') {
 			this.scrollToLogs(true);
@@ -64,6 +74,17 @@ class SearchLatencyWrapper extends React.Component {
 				endLatency: undefined,
 			});
 		}
+	}
+
+	componentWillUnmount() {
+		// Sends the timing event to Google Analytics.
+		timingEvent({
+			action: 'timing_complete',
+			category: 'Analytics',
+			label: 'search-latency-time',
+			name: 'time',
+			value: this.startTime.fromNow(),
+		});
 	}
 
 	scrollToLogs = (isEnd = false) => {

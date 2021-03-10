@@ -46,6 +46,8 @@ import SearchPreviewSwitcher from '../../components/SearchPreviewSwitcher';
 import { allowedTiers, children } from '../../utils/prop-types';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 const link = css`
 	font-size: 14px;
@@ -353,14 +355,26 @@ const listItemClass = css`
 `;
 
 class FunctionsPage extends React.Component {
-	state = {
-		deployModal: false,
-		checking: false,
-		healthError: null,
-		notFoundError: null,
-	};
+	constructor(props) {
+		super(props);
+		this.startTime = moment();
+		this.state = {
+			deployModal: false,
+			checking: false,
+			healthError: null,
+			notFoundError: null,
+		};
+	}
 
 	async componentDidMount() {
+		// triggering custom event for google analytics
+		event({
+			action: 'Functions',
+			category: 'Search Relevancy',
+			label: 'visit',
+			value: null,
+		});
+
 		const { fetchFunctions, appName, fetchRegistries, tier, featureFunctions } = this.props;
 		try {
 			if (isValidPlan(tier, featureFunctions, features.FUNCTIONS)) {
@@ -381,6 +395,17 @@ class FunctionsPage extends React.Component {
 				this.setState({ checking: false, healthError: e.message });
 			}
 		}
+	}
+
+	componentWillUnmount() {
+		// Sends the timing event to Google Analytics.
+		timingEvent({
+			action: 'timing_complete',
+			category: 'Search Relevancy',
+			label: 'functions-time',
+			name: 'time',
+			value: this.startTime.fromNow(),
+		});
 	}
 
 	refetchFunction = () => {

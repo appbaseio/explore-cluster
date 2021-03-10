@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { bool, string } from 'prop-types';
@@ -6,6 +6,8 @@ import { isValidPlan } from '../../../batteries/utils';
 import Overlay from '../../../components/Overlay';
 import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
 import Main from './Main';
+import { event, timingEvent } from '../../../utils/gtag';
+import moment from '../../../utils/moment';
 
 const bannerDetails = {
 	title: 'Recommendations UI Builder',
@@ -23,6 +25,28 @@ const bannerDetailsPaid = {
 };
 
 const RecommendationsIntegrationsPage = ({ tier, featureEcommerce }) => {
+	useEffect(() => {
+		const startTime = moment();
+		// triggering custom event for google analytics
+		event({
+			action: 'Recommendations Builder',
+			category: 'UI Builder',
+			label: 'visit',
+			value: null,
+		});
+
+		return () => {
+			// Sends the timing event to Google Analytics.
+			timingEvent({
+				action: 'timing_complete',
+				category: 'UI Builder',
+				label: 'recommendations-builder-time',
+				name: 'time',
+				value: startTime.fromNow(),
+			});
+		};
+	}, []);
+
 	if (!isValidPlan(tier, featureEcommerce)) {
 		return (
 			<React.Fragment>

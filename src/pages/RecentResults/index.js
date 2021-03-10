@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -9,6 +9,8 @@ import RecentResults from '../../batteries/components/analytics/components/Recen
 import FilterInitializer from '../../batteries/components/analytics/components/Filter/FilterInitializer';
 import { allowedTiers } from '../../utils/prop-types';
 import { isValidPlan } from '../../batteries/utils';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -28,25 +30,51 @@ const bannerMessagesAnalytics = {
 
 const filterId = 'recent_results_page';
 
-const RecentResultsWrapper = ({ appName, tier }) => (
-	<React.Fragment>
-		{isValidPlan(tier) ? (
-			<FilterInitializer filterId={filterId}>
+const RecentResultsWrapper = ({ appName, tier }) => {
+	const startTime = moment();
+	useEffect(() => {
+		// triggering custom event for google analytics
+		event({
+			action: 'Recent Results',
+			category: 'Analytics',
+			label: 'visit',
+			value: null,
+		});
+
+		return () => {
+			// Sends the timing event to Google Analytics.
+			timingEvent({
+				action: 'timing_complete',
+				category: 'Analytics',
+				label: 'recent-results-time',
+				name: 'time',
+				value: startTime.fromNow(),
+			});
+		};
+	}, []);
+	return (
+		<React.Fragment>
+			{isValidPlan(tier) ? (
+				<FilterInitializer filterId={filterId}>
+					<React.Fragment>
+						<Banner {...bannerMessagesAnalytics.paid} />
+						<Container>
+							<RecentResults filterId={filterId} appName={appName} />
+						</Container>
+					</React.Fragment>
+				</FilterInitializer>
+			) : (
 				<React.Fragment>
-					<Banner {...bannerMessagesAnalytics.paid} />
-					<Container>
-						<RecentResults filterId={filterId} appName={appName} />
-					</Container>
+					<Banner {...bannerMessagesAnalytics.free} />
+					<Overlay
+						src="/static/images/analytics/RecentResults.png"
+						alt="recent results"
+					/>
 				</React.Fragment>
-			</FilterInitializer>
-		) : (
-			<React.Fragment>
-				<Banner {...bannerMessagesAnalytics.free} />
-				<Overlay src="/static/images/analytics/RecentResults.png" alt="recent results" />
-			</React.Fragment>
-		)}
-	</React.Fragment>
-);
+			)}
+		</React.Fragment>
+	);
+};
 
 RecentResultsWrapper.defaultProps = {
 	appName: undefined,

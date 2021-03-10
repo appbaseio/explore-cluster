@@ -28,6 +28,8 @@ import { allowedTiers } from '../../utils/prop-types';
 import Loader from '../../components/Loader';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { addReIndexingTasks } from '../../batteries/modules/actions';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 const UploadSynonymsModal = Loadable({
 	loader: () =>
@@ -103,14 +105,36 @@ const search = css`
 const chunkSize = 100000;
 
 class Synonyms extends React.Component {
-	state = {
-		synonyms: [],
-		key: Date.now(),
-		uploadVisible: false,
-	};
+	constructor(props) {
+		super(props);
+		this.startTime = moment();
+		this.state = {
+			synonyms: [],
+			key: Date.now(),
+			uploadVisible: false,
+		};
+	}
 
 	componentDidMount() {
+		// triggering custom event for google analytics
+		event({
+			action: 'Synonyms Settings',
+			category: 'Search Relevancy',
+			label: 'visit',
+			value: null,
+		});
 		this.fetchSynonym();
+	}
+
+	componentWillUnmount() {
+		// Sends the timing event to Google Analytics.
+		timingEvent({
+			action: 'timing_complete',
+			category: 'Search Relevancy',
+			label: 'synonyms-settings-time',
+			name: 'time',
+			value: this.startTime.fromNow(),
+		});
 	}
 
 	fetchSynonym = () => {

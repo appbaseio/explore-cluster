@@ -20,6 +20,8 @@ import Overlay from '../../components/Overlay';
 import SettingsOptions from './components/SettingsOptions';
 import FieldsType from './components/FieldsType';
 import SettingsFooter from '../../components/SettingsFooter';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 const bannerDetails = {
 	title: 'Aggregation Settings',
@@ -32,7 +34,20 @@ const bannerDetails = {
 };
 
 class AggsPage extends React.Component {
+	constructor(props) {
+		super(props);
+		this.startTime = moment();
+	}
+
 	componentDidMount() {
+		// triggering custom event for google analytics
+		event({
+			action: 'Aggregation Settings',
+			category: 'Search Relevancy',
+			label: 'visit',
+			value: null,
+		});
+
 		const {
 			appName,
 			getSettingsAction,
@@ -68,6 +83,17 @@ class AggsPage extends React.Component {
 		) {
 			this.init({ ...defaultSettings });
 		}
+	}
+
+	componentWillUnmount() {
+		// Sends the timing event to Google Analytics.
+		timingEvent({
+			action: 'timing_complete',
+			category: 'Search Relevancy',
+			label: 'aggregation-settings-time',
+			name: 'time',
+			value: this.startTime.fromNow(),
+		});
 	}
 
 	init = (settings) => {

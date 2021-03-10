@@ -26,6 +26,8 @@ import Loader from '../../batteries/components/shared/Loader';
 import { appendApp, loadApps, removeAppData } from '../../actions';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 const bannerMessage = {
 	title: 'Index Settings',
@@ -35,22 +37,32 @@ const bannerMessage = {
 };
 
 class IndexSettings extends React.Component {
-	state = {
-		shards: null,
-		replicas: null,
-		visible: false,
-		isReindexing: false,
-		isFetching: false,
-		shardsModal: false,
-		replicasModal: false,
-		isUpdating: false,
-	};
-
-	allocated_shards = null;
-
-	allocated_replicas = null;
+	constructor(props) {
+		super(props);
+		this.startTime = moment();
+		this.allocated_shards = null;
+		this.allocated_replicas = null;
+		this.state = {
+			shards: null,
+			replicas: null,
+			visible: false,
+			isReindexing: false,
+			isFetching: false,
+			shardsModal: false,
+			replicasModal: false,
+			isUpdating: false,
+		};
+	}
 
 	async componentDidMount() {
+		// triggering custom event for google analytics
+		event({
+			action: 'Index Settings',
+			category: 'Search Relevancy',
+			label: 'visit',
+			value: null,
+		});
+
 		const { appName, credentials, fetchMappings, mappings, fetchApps } = this.props;
 		const url = getURL();
 		this.initializeSettings();
@@ -66,6 +78,17 @@ class IndexSettings extends React.Component {
 		if (prevProps.appName !== appName) {
 			this.initializeSettings();
 		}
+	}
+
+	componentWillUnmount() {
+		// Sends the timing event to Google Analytics.
+		timingEvent({
+			action: 'timing_complete',
+			category: 'Search Relevancy',
+			label: 'index-settings-time',
+			name: 'time',
+			value: this.startTime.fromNow(),
+		});
 	}
 
 	handleModal = (name) => {

@@ -19,6 +19,8 @@ import SearchPreviewSwitcher from '../../components/SearchPreviewSwitcher';
 import { allowedTiers } from '../../utils/prop-types';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 const { Header } = Layout;
 
@@ -27,9 +29,21 @@ const container = css`
 `;
 
 class QueryRules extends Component {
-	state = { visible: false };
+	constructor(props) {
+		super(props);
+		this.startTime = moment();
+		this.state = { visible: false };
+	}
 
 	componentDidMount() {
+		// triggering custom event for google analytics
+		event({
+			action: 'Query Rules',
+			category: 'Search Relevancy',
+			label: 'visit',
+			value: null,
+		});
+
 		const { fetchRules, rules, tier, featureRules } = this.props;
 		if (isValidPlan(tier, featureRules)) {
 			if (!rules) {
@@ -51,6 +65,17 @@ class QueryRules extends Component {
 		if (prevProps.deleted !== deleted) {
 			message.success('Deleted item successfully');
 		}
+	}
+
+	componentWillUnmount() {
+		// Sends the timing event to Google Analytics.
+		timingEvent({
+			action: 'timing_complete',
+			category: 'Search Relevancy',
+			label: 'query-rules-time',
+			name: 'time',
+			value: this.startTime.fromNow(),
+		});
 	}
 
 	onDragEnd = (result) => {
