@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import moment from 'moment';
 import { connect } from 'react-redux';
 import { notification, Alert, Card, Button } from 'antd';
 import get from 'lodash/get';
@@ -21,6 +20,8 @@ import { getURL } from '../../constants/config';
 import { getAuthToken } from '../../batteries/components/analytics/utils';
 import Flex from '../../batteries/components/shared/Flex';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 const main = css`
 	.actionBtn {
@@ -50,6 +51,7 @@ const cardStyle = css`
 class QuerySuggestions extends React.Component {
 	constructor(props) {
 		super(props);
+		this.startTime = moment();
 		this.state = {
 			indices: props.apps ? Object.keys(props.apps).sort() : [],
 			total: undefined,
@@ -108,9 +110,30 @@ class QuerySuggestions extends React.Component {
 		}
 	}
 
+	componentDidMount() {
+		// triggering custom event for google analytics
+		event({
+			action: 'Popular Suggestions',
+			category: 'Search Relevancy',
+			label: 'visit',
+			value: null,
+		});
+	}
+
 	componentDidUpdate(prevProps) {
 		const { errors } = this.props;
 		displayErrors(errors, prevProps.errors, true);
+	}
+
+	componentWillUnmount() {
+		// Sends the timing event to Google Analytics.
+		timingEvent({
+			action: 'timing_complete',
+			category: 'Search Relevancy',
+			label: 'popular-suggestions-time',
+			name: 'time',
+			value: this.startTime.fromNow(),
+		});
 	}
 
 	handleSaveTemplate = () => {

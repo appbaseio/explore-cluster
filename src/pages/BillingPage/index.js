@@ -20,6 +20,8 @@ import ClusterPricingTable from '../../components/PricingTable/ClusterPricingTab
 import { PRICE_BY_PLANS, EFFECTIVE_PRICE_BY_PLANS } from '../../batteries/utils';
 import { getESVersion, getAuthHeaders } from '../../batteries/utils/mappings';
 import { getVersion, getURL } from '../../constants/config';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 function numberWithCommas(x) {
 	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -45,11 +47,22 @@ class Billing extends Component {
 		nodeCount: undefined,
 	};
 
-	state = {
-		isShowingUnsubscribeArcModal: false,
-	};
+	constructor(props) {
+		super(props);
+		this.startTime = moment();
+		this.state = {
+			isShowingUnsubscribeArcModal: false,
+		};
+	}
 
 	async componentDidMount() {
+		// triggering custom event for google analytics
+		event({
+			action: 'Billing',
+			category: 'Billing',
+			label: 'visit',
+			value: null,
+		});
 		const { isAppPlanFetched, fetchAppPlan, credentials, errors } = this.props;
 		const esVersion = getVersion() || (await getESVersion(null, credentials));
 		// if there are already errors with plan api, don't try to fetch it again
@@ -62,6 +75,17 @@ class Billing extends Component {
 	componentDidUpdate(prevProps) {
 		const { errors } = this.props;
 		displayErrors(errors, prevProps.errors, true);
+	}
+
+	componentWillUnmount() {
+		// Sends the timing event to Google Analytics.
+		timingEvent({
+			action: 'timing_complete',
+			category: 'Billing',
+			label: 'billing-time',
+			name: 'time',
+			value: this.startTime.fromNow(),
+		});
 	}
 
 	get billingView() {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
@@ -7,6 +7,8 @@ import Container from '../../components/Container';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import FilterInitializer from '../../batteries/components/analytics/components/Filter/FilterInitializer';
 import GeoDistributionPage from '../../batteries/components/analytics/components/GeoDistribution';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -34,31 +36,56 @@ const bannerMessagesAnalytics = {
 
 const filterId = 'geo_distribution_page';
 
-const PopularResultsWrapper = ({ plan, isGrowth }) => (
-	<React.Fragment>
-		{isGrowth ? (
-			<FilterInitializer filterId={filterId}>
+const PopularResultsWrapper = ({ plan, isGrowth }) => {
+	useEffect(() => {
+		const startTime = moment();
+		// triggering custom event for google analytics
+		event({
+			action: 'Geo Distribution',
+			category: 'Analytics',
+			label: 'visit',
+			value: null,
+		});
+
+		return () => {
+			// Sends the timing event to Google Analytics.
+			timingEvent({
+				action: 'timing_complete',
+				category: 'Analytics',
+				label: 'geo-distribution-time',
+				name: 'time',
+				value: startTime.fromNow(),
+			});
+		};
+	}, []);
+	return (
+		<React.Fragment>
+			{isGrowth ? (
+				<FilterInitializer filterId={filterId}>
+					<React.Fragment>
+						{bannerMessagesAnalytics[plan] && (
+							<Banner {...bannerMessagesAnalytics[plan]} />
+						)}
+						<Container>
+							<GeoDistributionPage displaySummaryStats filterId={filterId} />
+						</Container>
+					</React.Fragment>
+				</FilterInitializer>
+			) : (
 				<React.Fragment>
-					{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
-					<Container>
-						<GeoDistributionPage displaySummaryStats filterId={filterId} />
-					</Container>
+					<Banner {...bannerMessagesAnalytics[plan]} />
+					<Overlay
+						style={{
+							maxWidth: '70%',
+						}}
+						src="/static/images/analytics/GeoDistribution.png"
+						alt="analytics"
+					/>
 				</React.Fragment>
-			</FilterInitializer>
-		) : (
-			<React.Fragment>
-				<Banner {...bannerMessagesAnalytics[plan]} />
-				<Overlay
-					style={{
-						maxWidth: '70%',
-					}}
-					src="/static/images/analytics/GeoDistribution.png"
-					alt="analytics"
-				/>
-			</React.Fragment>
-		)}
-	</React.Fragment>
-);
+			)}
+		</React.Fragment>
+	);
+};
 
 PopularResultsWrapper.propTypes = {
 	plan: PropTypes.string.isRequired,

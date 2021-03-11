@@ -16,6 +16,8 @@ import { isBase64 } from '../../utils/helper';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 const { Column } = Table;
 
@@ -40,6 +42,7 @@ const bannerMessage = {
 class RoleBaseAccess extends React.Component {
 	constructor() {
 		super();
+		this.startTime = moment();
 		this.state = {
 			publicKey: '',
 			roleKey: '',
@@ -49,6 +52,13 @@ class RoleBaseAccess extends React.Component {
 	}
 
 	componentDidMount() {
+		// triggering custom event for google analytics
+		event({
+			action: 'Role Based Access',
+			category: 'Access Control',
+			label: 'visit',
+			value: null,
+		});
 		const {
  			 fetchPublicKey, appName, fetchPermissions,
 		} = this.props; // prettier-ignore
@@ -117,6 +127,17 @@ class RoleBaseAccess extends React.Component {
 					'Error while fetching the Public Key.',
 			});
 		}
+	}
+
+	componentWillUnmount() {
+		// Sends the timing event to Google Analytics.
+		timingEvent({
+			action: 'timing_complete',
+			category: 'Access Control',
+			label: 'role-based-access-time',
+			name: 'time',
+			value: this.startTime.fromNow(),
+		});
 	}
 
 	handleKeyes = ({ publicKey, roleKey }) => {

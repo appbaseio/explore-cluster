@@ -12,18 +12,42 @@ import InsightLink from './components/InsightLink';
 import Loader from '../../components/Loader';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 class ClusterInsights extends React.Component {
-	state = {
-		hasSubscribed: false,
-		updatingSubscription: false,
-		fetchingSubscription: false,
-		insight_link: null,
-		deletingSubscription: false,
-	};
+	constructor(props) {
+		super(props);
+		this.startTime = moment();
+		this.state = {
+			hasSubscribed: false,
+			updatingSubscription: false,
+			fetchingSubscription: false,
+			insight_link: null,
+			deletingSubscription: false,
+		};
+	}
 
 	componentDidMount() {
+		// triggering custom event for google analytics
+		event({
+			action: 'Insights',
+			category: 'Curated Insights',
+			label: 'visit',
+			value: null,
+		});
 		this.fetchInsights();
+	}
+
+	componentWillUnmount() {
+		// Sends the timing event to Google Analytics.
+		timingEvent({
+			action: 'timing_complete',
+			category: 'Curated Insights',
+			label: 'insights-time',
+			name: 'time',
+			value: this.startTime.fromNow(),
+		});
 	}
 
 	toggleLoading = (key) => {

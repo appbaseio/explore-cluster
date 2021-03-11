@@ -20,6 +20,7 @@ import { diff } from 'jsondiffpatch';
 import styled from 'react-emotion';
 
 import DiffList from './DiffList';
+import { getAnalyticsAction, event } from '../../utils/gtag';
 
 // import { getPossibleSubFields } from '../../utils';
 import {
@@ -463,6 +464,14 @@ class ReviewAndSave extends React.Component {
 			updateReIndexingTasks,
 		} = this.props;
 
+		// triggering custom event for google analytics
+		event({
+			action: getAnalyticsAction(),
+			category: 'Search Relevancy',
+			label: 'review&save',
+			value: null,
+		});
+
 		let newSettings = isResetting ? defaultSettings : currentSettings;
 
 		let updatedMappings = {
@@ -683,7 +692,6 @@ class ReviewAndSave extends React.Component {
 		const renderShouldReIndex =
 			isOpen &&
 			shouldReIndex(localMapping, settings, isResetting ? defaultSettings : localRelevancy);
-
 		return (
 			<>
 				<div style={{ display: 'flex', alignItems: 'center' }}>

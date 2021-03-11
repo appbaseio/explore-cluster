@@ -6,13 +6,41 @@ import get from 'lodash/get';
 import { setCurrentApp } from '../../batteries/modules/actions';
 import Loader from '../../components/Loader';
 import SearchPreview from './components/SearchPreview';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 class SandboxPage extends Component {
+	constructor(props) {
+		super(props);
+		this.startTime = moment();
+	}
+
+	componentDidMount() {
+		// triggering custom event for google analytics
+		event({
+			action: 'Search Preview',
+			category: 'Develop',
+			label: 'visit',
+			value: null,
+		});
+	}
+
 	componentDidUpdate(prevProps) {
 		const { appName } = this.props;
 		if (appName !== prevProps.appName) {
 			this.init();
 		}
+	}
+
+	componentWillUnmount() {
+		// Sends the timing event to Google Analytics.
+		timingEvent({
+			action: 'timing_complete',
+			category: 'Develop',
+			label: 'search-preview-time',
+			name: 'time',
+			value: this.startTime.fromNow(),
+		});
 	}
 
 	init() {

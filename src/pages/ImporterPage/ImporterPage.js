@@ -5,6 +5,8 @@ import { connect } from 'react-redux';
 import { string, object } from 'prop-types';
 import get from 'lodash/get';
 import Importer from '@appbaseio-confidential/importer';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 import Header from '../../components/Header';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
@@ -32,12 +34,23 @@ injectGlobal`
 `;
 
 class ImporterPage extends React.Component {
-	state = {
-		preparingApp: true,
-		destinationParams: null,
-	};
+	constructor(props) {
+		super(props);
+		this.startTime = moment();
+		this.state = {
+			preparingApp: true,
+			destinationParams: null,
+		};
+	}
 
 	componentDidMount() {
+		// triggering custom event for google analytics
+		event({
+			action: 'Importer',
+			category: 'Develop',
+			label: 'visit',
+			value: null,
+		});
 		const { type, appName: index } = this.props;
 		const cluster = sessionStorage.getItem('cluster') || '';
 		const { host, protocol } = new URL(sessionStorage.getItem('url'));
@@ -70,6 +83,17 @@ class ImporterPage extends React.Component {
 			});
 		}
 		this.togglePreparing();
+	}
+
+	componentWillUnmount() {
+		// Sends the timing event to Google Analytics.
+		timingEvent({
+			action: 'timing_complete',
+			category: 'Develop',
+			label: 'importer-time',
+			name: 'time',
+			value: this.startTime.fromNow(),
+		});
 	}
 
 	togglePreparing = () => {

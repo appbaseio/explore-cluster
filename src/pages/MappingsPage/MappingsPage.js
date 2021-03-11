@@ -1,8 +1,10 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect } from 'react';
 
 import MappingComponent from './components/MappingComponent';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 const bannerMessage = {
 	title: 'Schema Settings',
@@ -13,6 +15,28 @@ const bannerMessage = {
 };
 
 const MappingsPage = () => {
+	useEffect(() => {
+		const startTime = moment();
+		// triggering custom event for google analytics
+		event({
+			action: 'Schema Settings',
+			category: 'Search Relevancy',
+			label: 'visit',
+			value: null,
+		});
+
+		return () => {
+			// Sends the timing event to Google Analytics.
+			timingEvent({
+				action: 'timing_complete',
+				category: 'Search Relevancy',
+				label: 'schema-settings-time',
+				name: 'time',
+				value: startTime.fromNow(),
+			});
+		};
+	}, []);
+
 	return (
 		<Fragment>
 			<Banner {...bannerMessage} />

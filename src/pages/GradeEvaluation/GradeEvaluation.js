@@ -26,6 +26,8 @@ import Container from '../../components/Container';
 import HighLighter from '../../components/HighLighter';
 import Loader from '../../components/Loader';
 import Overlay from '../../components/Overlay';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 const { Option } = Select;
 
@@ -79,13 +81,25 @@ const tableStyle = css`
 `;
 
 class GradeEvaluation extends React.Component {
-	state = {
-		selectedIndices: [],
-		hasUserIndices: false,
-		currentPage: 1,
-	};
+	constructor(props) {
+		super(props);
+		this.startTime = moment();
+		this.state = {
+			selectedIndices: [],
+			hasUserIndices: false,
+			currentPage: 1,
+		};
+	}
 
 	componentDidMount() {
+		// triggering custom event for google analytics
+		event({
+			action: 'Grade Evaluation',
+			category: 'Search Relevancy',
+			label: 'visit',
+			value: null,
+		});
+
 		this.fetchMetrics();
 	}
 
@@ -113,6 +127,17 @@ class GradeEvaluation extends React.Component {
 			...state,
 			hasUserIndices: !!userIndices.length,
 		};
+	}
+
+	componentWillUnmount() {
+		// Sends the timing event to Google Analytics.
+		timingEvent({
+			action: 'timing_complete',
+			category: 'Search Relevancy',
+			label: 'grade-evaluation-time',
+			name: 'time',
+			value: this.startTime.fromNow(),
+		});
 	}
 
 	fetchMetrics = () => {

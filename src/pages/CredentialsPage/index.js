@@ -19,6 +19,8 @@ import { getURL } from '../../constants/config';
 import DeleteAppModal from '../../components/AppCard/DeleteAppModal';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 const columns = [
 	{
@@ -55,6 +57,7 @@ const columns = [
 class Credentials extends Component {
 	constructor(props) {
 		super(props);
+		this.startTime = moment();
 		this.state = {
 			showCredForm: false,
 			deleteModal: false,
@@ -63,6 +66,13 @@ class Credentials extends Component {
 	}
 
 	componentDidMount() {
+		// triggering custom event for google analytics
+		event({
+			action: 'API Credentials',
+			category: 'Access Control',
+			label: 'visit',
+			value: null,
+		});
 		const { isAdmin } = this.props;
 		if (isAdmin) {
 			this.refetchPermissions();
@@ -75,6 +85,17 @@ class Credentials extends Component {
 			this.initialize();
 		}
 		displayErrors(errors, prevProps.errors);
+	}
+
+	componentWillUnmount() {
+		// Sends the timing event to Google Analytics.
+		timingEvent({
+			action: 'timing_complete',
+			category: 'Access Control',
+			label: 'api-credentials-time',
+			name: 'time',
+			value: this.startTime.fromNow(),
+		});
 	}
 
 	handleDeleteModal = () => {

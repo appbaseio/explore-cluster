@@ -20,6 +20,8 @@ import CreateTemplate from './CreateTemplate';
 import GetAPIEndpoint from './GetAPIEndpoint';
 import { jsonValidator } from './utils';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 const columns = [
 	{
@@ -51,6 +53,7 @@ const main = css`
 class SearchTemplates extends React.Component {
 	constructor(props) {
 		super(props);
+		this.startTime = moment();
 		this.state = {
 			createMode: false,
 			editMode: false,
@@ -90,9 +93,30 @@ class SearchTemplates extends React.Component {
 		};
 	}
 
+	componentDidMount() {
+		// triggering custom event for google analytics
+		event({
+			action: 'Search Templates',
+			category: 'Access Control',
+			label: 'visit',
+			value: null,
+		});
+	}
+
 	componentDidUpdate(prevProps) {
 		const { errors } = this.props;
 		displayErrors(errors, prevProps.errors, true);
+	}
+
+	componentWillUnmount() {
+		// Sends the timing event to Google Analytics.
+		timingEvent({
+			action: 'timing_complete',
+			category: 'Access Control',
+			label: 'search-templates-time',
+			name: 'time',
+			value: this.startTime.fromNow(),
+		});
 	}
 
 	get bannerDetails() {

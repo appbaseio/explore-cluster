@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -7,6 +7,8 @@ import Overlay from '../../components/Overlay';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Analytics from '../../batteries/components/analytics';
 import { ANALYTICS_ROOT_FILTER_ID } from '../../batteries/components/analytics/utils';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -35,34 +37,57 @@ const bannerMessagesAnalytics = {
 	},
 };
 
-const AnalyticsView = ({ appName, isPaidUser, plan }) => (
-	<React.Fragment>
-		{isPaidUser ? (
-			<React.Fragment>
-				{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
-				<Container>
-					<Analytics
-						filterId={ANALYTICS_ROOT_FILTER_ID}
-						displayReplaySearch={window.location.pathname.startsWith('/app')}
-						chartWidth={window.innerWidth - 400}
-						appName={appName}
+const AnalyticsView = ({ appName, isPaidUser, plan }) => {
+	useEffect(() => {
+		const startTime = moment();
+		// triggering custom event for google analytics
+		event({
+			action: 'Overview',
+			category: 'Analytics',
+			label: 'visit',
+			value: null,
+		});
+
+		return () => {
+			// Sends the timing event to Google Analytics.
+			timingEvent({
+				action: 'timing_complete',
+				category: 'Analytics',
+				label: 'overview-time',
+				name: 'time',
+				value: startTime.fromNow(),
+			});
+		};
+	}, []);
+	return (
+		<React.Fragment>
+			{isPaidUser ? (
+				<React.Fragment>
+					{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
+					<Container>
+						<Analytics
+							filterId={ANALYTICS_ROOT_FILTER_ID}
+							displayReplaySearch={window.location.pathname.startsWith('/app')}
+							chartWidth={window.innerWidth - 400}
+							appName={appName}
+						/>
+					</Container>
+				</React.Fragment>
+			) : (
+				<React.Fragment>
+					<Banner {...bannerMessagesAnalytics.free} />
+					<Overlay
+						style={{
+							maxWidth: '70%',
+						}}
+						src="/static/images/analytics/Analytics.png"
+						alt="analytics"
 					/>
-				</Container>
-			</React.Fragment>
-		) : (
-			<React.Fragment>
-				<Banner {...bannerMessagesAnalytics.free} />
-				<Overlay
-					style={{
-						maxWidth: '70%',
-					}}
-					src="/static/images/analytics/Analytics.png"
-					alt="analytics"
-				/>
-			</React.Fragment>
-		)}
-	</React.Fragment>
-);
+				</React.Fragment>
+			)}
+		</React.Fragment>
+	);
+};
 AnalyticsView.propTypes = {
 	appName: PropTypes.string.isRequired,
 	isPaidUser: PropTypes.bool.isRequired,

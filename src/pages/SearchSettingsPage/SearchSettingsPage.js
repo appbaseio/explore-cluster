@@ -25,6 +25,8 @@ import MappingWrapper from '../../components/MappingsWrapper';
 import SettingsFooter from '../../components/SettingsFooter';
 import RankFeature from './components/RankFeature';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 const { confirm } = Modal;
 
@@ -50,7 +52,20 @@ const getqueryFormat = ({ queryString, searchOperators }) => {
 };
 
 class SearchSettingsPage extends React.Component {
+	constructor(props) {
+		super(props);
+		this.startTime = moment();
+	}
+
 	componentDidMount() {
+		// triggering custom event for google analytics
+		event({
+			action: 'Search Settings',
+			category: 'Search Relevancy',
+			label: 'visit',
+			value: null,
+		});
+
 		const {
 			appName,
 			getSettingsAction,
@@ -89,6 +104,17 @@ class SearchSettingsPage extends React.Component {
 		) {
 			this.init({ ...defaultSettings });
 		}
+	}
+
+	componentWillUnmount() {
+		// Sends the timing event to Google Analytics.
+		timingEvent({
+			action: 'timing_complete',
+			category: 'Search Relevancy',
+			label: 'search-settings-time',
+			name: 'time',
+			value: this.startTime.fromNow(),
+		});
 	}
 
 	handleChange = (name, value) => {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -7,6 +7,8 @@ import Container from '../../components/Container';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import PopularFilters from '../../batteries/components/analytics/components/PopularFilters';
 import FilterInitializer from '../../batteries/components/analytics/components/Filter/FilterInitializer';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -32,31 +34,59 @@ const bannerMessagesAnalytics = {
 };
 
 const filterId = 'popular_filters_page';
-const PopularFiltersWrapper = ({ appName, plan, isGrowth }) => (
-	<React.Fragment>
-		{isGrowth ? (
-			<FilterInitializer filterId={filterId}>
+const PopularFiltersWrapper = ({ appName, plan, isGrowth }) => {
+	useEffect(() => {
+		const startTime = moment();
+		// triggering custom event for google analytics
+		event({
+			action: 'Popular Filters',
+			category: 'Analytics',
+			label: 'visit',
+			value: null,
+		});
+
+		return () => {
+			// Sends the timing event to Google Analytics.
+			timingEvent({
+				action: 'timing_complete',
+				category: 'Analytics',
+				label: 'popular-filters-time',
+				name: 'time',
+				value: startTime.fromNow(),
+			});
+		};
+	}, []);
+	return (
+		<React.Fragment>
+			{isGrowth ? (
+				<FilterInitializer filterId={filterId}>
+					<React.Fragment>
+						{bannerMessagesAnalytics[plan] && (
+							<Banner {...bannerMessagesAnalytics[plan]} />
+						)}
+						<Container>
+							<PopularFilters
+								filterId={filterId}
+								displayReplaySearch={window.location.pathname.startsWith('/app')}
+								appName={appName}
+								plan={plan}
+								displaySummaryStats
+							/>
+						</Container>
+					</React.Fragment>
+				</FilterInitializer>
+			) : (
 				<React.Fragment>
-					{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
-					<Container>
-						<PopularFilters
-							filterId={filterId}
-							displayReplaySearch={window.location.pathname.startsWith('/app')}
-							appName={appName}
-							plan={plan}
-							displaySummaryStats
-						/>
-					</Container>
+					<Banner {...bannerMessagesAnalytics[plan]} />
+					<Overlay
+						src="/static/images/analytics/PopularFilters.png"
+						alt="popular filters"
+					/>
 				</React.Fragment>
-			</FilterInitializer>
-		) : (
-			<React.Fragment>
-				<Banner {...bannerMessagesAnalytics[plan]} />
-				<Overlay src="/static/images/analytics/PopularFilters.png" alt="popular filters" />
-			</React.Fragment>
-		)}
-	</React.Fragment>
-);
+			)}
+		</React.Fragment>
+	);
+};
 
 PopularFiltersWrapper.propTypes = {
 	appName: PropTypes.string.isRequired,

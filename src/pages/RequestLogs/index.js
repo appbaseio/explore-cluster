@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -6,6 +6,8 @@ import Overlay from '../../components/Overlay';
 import Container from '../../components/Container';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import RequestLogs from '../../batteries/components/analytics/components/RequestLogs';
+import { event, timingEvent } from '../../utils/gtag';
+import moment from '../../utils/moment';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -30,32 +32,54 @@ const bannerMessagesAnalytics = {
 	},
 };
 
-const RequestLogsWrapper = ({ appName, plan, isPaidUser }) => (
-	<React.Fragment>
-		{isPaidUser ? (
-			<React.Fragment>
-				{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
-				<Container>
-					<RequestLogs appName={appName} />
-				</Container>
-			</React.Fragment>
-		) : (
-			<React.Fragment>
-				<Banner {...bannerMessagesAnalytics.free} />
-				<Overlay
-					style={{
-						maxWidth: '100%',
-					}}
-					lockSectionStyle={{
-						marginTop: '10%',
-					}}
-					src="/static/images/analytics/LastOperations.png"
-					alt="request logs"
-				/>
-			</React.Fragment>
-		)}
-	</React.Fragment>
-);
+const RequestLogsWrapper = ({ appName, plan, isPaidUser }) => {
+	useEffect(() => {
+		const startTime = moment();
+		// triggering custom event for google analytics
+		event({
+			action: 'Request Logs',
+			category: 'Develop',
+			label: 'visit',
+			value: null,
+		});
+		return () => {
+			// Sends the timing event to Google Analytics.
+			timingEvent({
+				action: 'timing_complete',
+				category: 'Develop',
+				label: 'request-logs-time',
+				name: 'time',
+				value: startTime.fromNow(),
+			});
+		};
+	}, []);
+	return (
+		<React.Fragment>
+			{isPaidUser ? (
+				<React.Fragment>
+					{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
+					<Container>
+						<RequestLogs appName={appName} />
+					</Container>
+				</React.Fragment>
+			) : (
+				<React.Fragment>
+					<Banner {...bannerMessagesAnalytics.free} />
+					<Overlay
+						style={{
+							maxWidth: '100%',
+						}}
+						lockSectionStyle={{
+							marginTop: '10%',
+						}}
+						src="/static/images/analytics/LastOperations.png"
+						alt="request logs"
+					/>
+				</React.Fragment>
+			)}
+		</React.Fragment>
+	);
+};
 
 RequestLogsWrapper.propTypes = {
 	appName: PropTypes.string.isRequired,
