@@ -31,8 +31,7 @@ const bannerDetails = {
 	description: 'GUI to manage cache preferences for reactivesearch API',
 	buttonText: 'Read more',
 	icon: 'pencil',
-	// TODO: Update docs link
-	href: 'https://docs.appbase.io/docs/cache/',
+	href: 'https://docs.appbase.io/docs/speed/cache-management/',
 };
 
 class CachePreferences extends React.Component {
