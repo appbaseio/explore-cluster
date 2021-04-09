@@ -115,14 +115,24 @@ const PreferenceForm = ({ control, handleSaveTemplate, isLoading, apps }) => {
 					<InputElement
 						name="max_duration"
 						label="Cache Duration"
-						placeholder="Enter time duration in seconds"
 						toolTipMessage={Messages.max_duration}
+						inputProps={{
+							style: {
+								width: '200px',
+							},
+							addonAfter: 'Seconds',
+						}}
 					/>
 					<InputElement
 						name="max_size"
 						label="Memory Limit"
-						placeholder="Enter maximum memory limit in MB(s)"
 						toolTipMessage={Messages.max_size}
+						inputProps={{
+							style: {
+								width: '200px',
+							},
+							addonAfter: 'MB',
+						}}
 					/>
 					<FieldControl
 						name="indices"
