@@ -71,6 +71,16 @@ export const suggestionsMessages = {
 	),
 	indices: Message('Only selected indices will be considered to calculate the suggestions.'),
 };
+
+export const cacheMessages = {
+	max_duration: Message(
+		'The time to live for a cached request in seconds. The default value is 360s.',
+	),
+	max_size: Message(
+		'The memory limit for the cached requests in MB(s). The default value is 128MB.',
+	),
+	indices: Message('Only selected indices will be considered to be cached.'),
+};
 // eslint-disable-next-line
 export const getMessages = (isUserManagement) =>
 	isUserManagement ? userManagementMessages : credentialsMessages;
