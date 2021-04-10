@@ -23,7 +23,7 @@ import LanguageDropdown from '../../components/LanguageDropdown';
 import languages from '../../constants/language';
 import { getDefaultSettings, putSettings } from '../../batteries/modules/actions';
 import { getLanguageFallback } from '../../utils/language';
-import { isValidPlan } from '../../batteries/utils';
+import { features, isValidPlan } from '../../batteries/utils';
 import { allowedTiers } from '../../utils/prop-types';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 import Ace from '../../batteries/components/SearchSandbox/containers/AceEditor';
@@ -88,7 +88,8 @@ class CreateAppModal extends Component {
 
 		if (createdApp.data && createdApp.data.acknowledged) {
 			// restrict calling API if it's not a valid plan
-			if (isValidPlan(tier, featureSearchRelevancy)) await handleSettingsUpdate();
+			if (isValidPlan(tier, featureSearchRelevancy, features.SEARCH_RELEVANCY))
+				await handleSettingsUpdate();
 			if (hasJSON === 'sample') {
 				history.push(`app/${appName}/import?load-data=true`);
 			} else if (hasJSON) {

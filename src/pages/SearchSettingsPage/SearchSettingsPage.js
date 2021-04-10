@@ -14,7 +14,7 @@ import {
 import { getSubFields, getFieldWeight } from '../../utils';
 import { allowedTiers } from '../../utils/prop-types';
 import { getMappingsByPath, getMappingsInfo, getTopLevelFields } from '../../utils/mappings';
-import { isValidPlan } from '../../batteries/utils';
+import { features, isValidPlan } from '../../batteries/utils';
 import { container } from '../ResultsPage/styles';
 
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
@@ -445,7 +445,7 @@ class SearchSettingsPage extends React.Component {
 	render() {
 		const { isLoading, tier, featureSearchRelevancy, localRelevancy } = this.props;
 
-		if (!isValidPlan(tier, featureSearchRelevancy)) {
+		if (!isValidPlan(tier, featureSearchRelevancy, features.SEARCH_RELEVANCY)) {
 			return (
 				<React.Fragment>
 					<Banner {...bannerDetails} />
