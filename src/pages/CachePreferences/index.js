@@ -26,7 +26,7 @@ const main = css`
 `;
 
 const bannerDetails = {
-	title: 'Cache Management',
+	title: 'Build ⚡️ fast search for your end users with appbase.io cache',
 	// TODO: Uodate description @siddharth
 	description: 'GUI to manage cache preferences for reactivesearch API',
 	buttonText: 'Read more',
