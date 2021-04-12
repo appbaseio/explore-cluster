@@ -29,7 +29,7 @@ const bannerDetails = {
 	title: 'Build ⚡️ fast search for your end users with appbase.io cache',
 	// TODO: Uodate description @siddharth
 	description: 'Tailor appbase.io's caching preferences based on your search use-case',
-	buttonText: 'Read more',
+	buttonText: 'Read More',
 	icon: 'pencil',
 	href: 'https://docs.appbase.io/docs/speed/cache-management/',
 };
