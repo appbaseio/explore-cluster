@@ -46,7 +46,7 @@ const EvictCache = ({ isLoading, errors, handleEvictCache }) => {
 				}}
 			>
 				<h3>
-					Clear cached memory{' '}
+					Evict cache contents{' '}
 					<Tooltip
 						css="margin-left: 5px;color:#898989"
 						overlay="Evict Cache action allows you to delete the cached requests immediately to free up the memory."
