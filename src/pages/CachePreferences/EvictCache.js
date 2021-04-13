@@ -57,7 +57,7 @@ const EvictCache = ({ isLoading, errors, handleEvictCache }) => {
 				</h3>
 			</div>
 
-			<Button onClick={onEvictCache} loading={isLoading} type="primary">
+			<Button onClick={onEvictCache} loading={isLoading} type="danger">
 				Evict Cache
 			</Button>
 		</Card>

@@ -13,6 +13,7 @@ import { getCachePreferences, saveCachePreferences } from '../../batteries/modul
 import { isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import VersionController from '../../batteries/components/shared/VersionController';
 import PreferenceForm from './PreferenceForm';
 import EvictCache from './EvictCache';
 import { event, timingEvent } from '../../utils/gtag';
@@ -27,7 +28,6 @@ const main = css`
 
 const bannerDetails = {
 	title: 'Build ⚡️ fast search for your end users with appbase.io cache',
-	// TODO: Uodate description @siddharth
 	description: "Tailor appbase.io's caching preferences based on your search use-case",
 	buttonText: 'Read More',
 	icon: 'pencil',
@@ -126,7 +126,7 @@ class CachePreferences extends React.Component {
 						lockSectionStyle={{
 							marginTop: '20%',
 						}}
-						src="https://i.imgur.com/NbaxVy0.png"
+						src="https://i.imgur.com/gZLnGBl.png"
 						alt="cache preferences"
 					/>
 				</React.Fragment>
@@ -139,15 +139,19 @@ class CachePreferences extends React.Component {
 			<React.Fragment>
 				<Banner {...bannerDetails} />
 				<Container css={main}>
-					<ErrorToaster>
-						<EvictCache />
-					</ErrorToaster>
-					<ErrorToaster>
-						<PreferenceForm
-							handleSaveTemplate={this.handleSaveTemplate}
-							control={this.form}
-						/>
-					</ErrorToaster>
+					<VersionController version="7.42.0">
+						<>
+							<ErrorToaster>
+								<EvictCache />
+							</ErrorToaster>
+							<ErrorToaster>
+								<PreferenceForm
+									handleSaveTemplate={this.handleSaveTemplate}
+									control={this.form}
+								/>
+							</ErrorToaster>
+						</>
+					</VersionController>
 				</Container>
 			</React.Fragment>
 		);
