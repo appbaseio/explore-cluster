@@ -74,10 +74,10 @@ export const suggestionsMessages = {
 
 export const cacheMessages = {
 	max_duration: Message(
-		'The time to live for a cached request in seconds. The default value is 300s.',
+		'The time to live for a cached search query in seconds. The default value is 300s (i.e. 5 minutes).',
 	),
 	max_size: Message(
-		'The memory limit for the cached requests in MB(s). The default value is 128MB.',
+		'The max memory limit that is reserved for the entire cache. The default value is 128MB.',
 	),
 	indices: Message('Only selected indices will be considered to be cached.'),
 };
