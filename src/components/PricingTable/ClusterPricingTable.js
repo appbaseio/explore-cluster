@@ -86,6 +86,21 @@ const data = [
 		key: '4',
 		name: (
 			<RowContent>
+				<div>Speed Search with Cache</div>
+				<StyledLink
+					href="https://docs.appbase.io/docs/speed/cache-management/"
+					target="_blank"
+				>
+					Read more
+				</StyledLink>
+			</RowContent>
+		),
+		desc: 'Production-I tier and above.',
+	},
+	{
+		key: '5',
+		name: (
+			<RowContent>
 				<div>Query Rules</div>
 				<StyledLink href="https://docs.appbase.io/docs/search/Rules/" target="_blank">
 					Read more
@@ -95,7 +110,7 @@ const data = [
 		desc: 'Production-I tier and above.',
 	},
 	{
-		key: '5',
+		key: '6',
 		name: (
 			<RowContent>
 				<div>Functions</div>
