@@ -5,9 +5,7 @@ import styled, { css } from 'react-emotion';
 import { Card, Row, Collapse, message } from 'antd';
 import { connect } from 'react-redux';
 import StripeForm from '../../components/StripeForms/StripeForm';
-import Container from '../../components/Container';
 import BannerHeader from '../../components/Banner/Header';
-import PricingTable from '../../components/PricingTable';
 import Grid from '../../components/CreateCredentials/Grid';
 import GlobalLoader from '../../batteries/components/shared/Loader/Spinner';
 import Flex from '../../batteries/components/shared/Flex';
@@ -15,13 +13,13 @@ import { getAppPlanByName } from '../../batteries/modules/selectors';
 import { getAppPlan } from '../../batteries/modules/actions';
 import Loader from '../../batteries/components/shared/Loader';
 import { displayErrors } from '../../utils/helper';
-import HostedArcBilling from '../../components/PricingTable/HostedArcBilling';
 import ClusterPricingTable from '../../components/PricingTable/ClusterPricingTable';
 import { PRICE_BY_PLANS, EFFECTIVE_PRICE_BY_PLANS } from '../../batteries/utils';
 import { getESVersion, getAuthHeaders } from '../../batteries/utils/mappings';
 import { getVersion, getURL } from '../../constants/config';
 import { event, timingEvent } from '../../utils/gtag';
 import moment from '../../utils/moment';
+import BillingFrame from '../../components/PricingTable/BillingFrame';
 
 function numberWithCommas(x) {
 	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -89,9 +87,7 @@ class Billing extends Component {
 	}
 
 	get billingView() {
-		const { isHostedArc, isClusterBilling, plan } = this.props;
-		const { isShowingUnsubscribeArcModal } = this.state;
-		const isOSS = plan === 'Free';
+		const { isHostedArc, isClusterBilling } = this.props;
 		if (isClusterBilling) {
 			return (
 				<Card bodyStyle={{ padding: '20px 50px' }}>
@@ -120,23 +116,18 @@ class Billing extends Component {
 		}
 		if (isHostedArc) {
 			return (
-				<Container>
-					<Card bodyStyle={{ padding: 0 }}>
-						<HostedArcBilling />
-					</Card>
-				</Container>
+				<BillingFrame
+					id="softr-0bda9055-b056-42d5-8fe3-040a77024336-pricing-dashboard-bye"
+					url="https://www.appbase.io/embed/pages/0bda9055-b056-42d5-8fe3-040a77024336/blocks/pricing-dashboard-bye"
+				/>
 			);
 		}
+		// Self hosted Arc
 		return (
-			<Container>
-				<Card bodyStyle={{ padding: 0 }}>
-					<PricingTable
-						isOSS={isOSS}
-						showUnsubscribeModal={isShowingUnsubscribeArcModal}
-						onToggleUnsubscribeModal={this.onShowUnsubscribeArcModal}
-					/>
-				</Card>
-			</Container>
+			<BillingFrame
+				id="softr-bf3757e1-4c3b-4d90-97e6-ee9e66034603-pricing-dashboard-self-host"
+				url="https://www.appbase.io/embed/pages/bf3757e1-4c3b-4d90-97e6-ee9e66034603/blocks/pricing-dashboard-self-host"
+			/>
 		);
 	}
 

@@ -18,7 +18,7 @@ import { container, label } from './styles';
 import SettingTooltip from '../../components/SettingTooltip';
 import settingsMap from '../../components/ReviewAndSave/helper';
 import { getTraversedMappingsByAppName } from '../../batteries/modules/selectors';
-import { isValidPlan } from '../../batteries/utils';
+import { features, isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import { allowedTiers } from '../../utils/prop-types';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
@@ -173,7 +173,7 @@ class ResultsPage extends React.Component {
 	render() {
 		const { tier, featureSearchRelevancy, localRelevancy, isLoading, mappings } = this.props;
 
-		if (!isValidPlan(tier, featureSearchRelevancy)) {
+		if (!isValidPlan(tier, featureSearchRelevancy, features.SEARCH_RELEVANCY)) {
 			return (
 				<Card>
 					<Banner {...bannerDetails} />
