@@ -81,7 +81,7 @@ const InputElement = ({ name, label, toolTipMessage, inputProps, placeholder }) 
 InputElement.propTypes = {
 	name: PropTypes.string.isRequired,
 	label: PropTypes.string.isRequired,
-	toolTipMessage: PropTypes.string,
+	toolTipMessage: PropTypes.any,
 	inputProps: PropTypes.object,
 	placeholder: PropTypes.string,
 };
