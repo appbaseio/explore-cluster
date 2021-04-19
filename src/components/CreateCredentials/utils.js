@@ -105,6 +105,7 @@ export const defaultRateLimits = {
 	searchrelevancy: 10,
 	synonyms: 10,
 	searchgrader: 10,
+	cache: 10,
 };
 // Acl options
 export const aclOptions = [
@@ -126,6 +127,7 @@ export const aclOptions = [
 	'searchrelevancy',
 	'synonyms',
 	'templates',
+	'cache',
 ];
 // Default Selected Acl
 export const defaultAclOptions = aclOptions;
@@ -159,6 +161,7 @@ export const aclOptionsLabel = {
 	searchrelevancy: 'Search Relevancy',
 	synonyms: 'Synonyms',
 	searchgrader: 'Search Grader',
+	cache: 'Cache',
 };
 
 const filterCategories = (value) => {

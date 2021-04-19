@@ -26,6 +26,10 @@ const QuerySuggestionsPage = Loadable({
 		import(/* webpackChunkName: "QuerySuggestionsPage" */ '../../pages/QuerySuggestionsPage'),
 	loading: Loader,
 });
+const CachePreferences = Loadable({
+	loader: () => import(/* webpackChunkName: "CachePreferences" */ '../../pages/CachePreferences'),
+	loading: Loader,
+});
 const QueryRulesPage = Loadable({
 	loader: () => import(/* webpackChunkName: "QueryRules" */ '../../pages/QueryRules'),
 	loading: Loader,
@@ -169,6 +173,19 @@ class ClusterRouteContainer extends React.Component {
 							<>
 								{get(allowedRoutes, '/cluster/popular-suggestions') ? (
 									<AppPageContainer {...props} component={QuerySuggestionsPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
+						)}
+					/>
+					<Route
+						exact
+						path="/cluster/cache"
+						component={(props) => (
+							<>
+								{get(allowedRoutes, '/cluster/cache') ? (
+									<AppPageContainer {...props} component={CachePreferences} />
 								) : (
 									<UnauthorizedPage />
 								)}

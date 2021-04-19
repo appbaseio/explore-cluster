@@ -53,7 +53,11 @@ class QuerySuggestions extends React.Component {
 		super(props);
 		this.startTime = moment();
 		this.state = {
-			indices: props.apps ? Object.keys(props.apps).sort() : [],
+			indices: props.apps
+				? Object.keys(props.apps)
+						.sort()
+						.filter((i) => !i.startsWith('.'))
+				: [],
 			total: undefined,
 		};
 		this.form = FormBuilder.group({

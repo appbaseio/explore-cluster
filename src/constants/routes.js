@@ -64,6 +64,11 @@ export const APP_ROUTES = {
 			{ label: 'Cluster Monitoring', link: '/cluster/monitoring', hasExactPath: true },
 		],
 	},
+	Speed: {
+		icon: 'clock-circle',
+		action: ALLOWED_ACTIONS.SPEED,
+		menu: [{ label: 'Cache', link: '/cluster/cache', tag: 'Beta' }],
+	},
 	'Curated Insights': {
 		icon: 'rise',
 		link: '/cluster/curated-insights',
@@ -179,6 +184,11 @@ export const CLUSTER_ROUTES = {
 			{ label: 'Cluster Monitoring', link: '/cluster/monitoring' },
 		],
 	},
+	Speed: {
+		icon: 'clock-circle',
+		action: ALLOWED_ACTIONS.SPEED,
+		menu: [{ label: 'Cache', link: '/cluster/cache', tag: 'Beta' }],
+	},
 	'Curated Insights': {
 		icon: 'rise',
 		action: ALLOWED_ACTIONS.CURATED_INSIGHTS,
@@ -187,6 +197,7 @@ export const CLUSTER_ROUTES = {
 	'UI Builder': {
 		icon: 'control',
 		action: ALLOWED_ACTIONS.UI_BUILDER,
+		link: '/cluster/billing',
 		menu: [
 			{ label: 'Search', link: 'search-builder', openIndexMenu: true },
 			{
