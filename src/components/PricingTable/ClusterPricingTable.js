@@ -86,7 +86,7 @@ const data = [
 		key: '4',
 		name: (
 			<RowContent>
-				<div>Speed Search with Cache</div>
+				<div>⚡️ Fast search with appbase.io cache</div>
 				<StyledLink
 					href="https://docs.appbase.io/docs/speed/cache-management/"
 					target="_blank"
