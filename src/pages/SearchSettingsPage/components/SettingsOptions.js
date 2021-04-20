@@ -4,6 +4,7 @@ import { css } from 'emotion';
 import PropTypes from 'prop-types';
 import settingsMap from '../../../components/ReviewAndSave/helper';
 import DataFieldSelector from '../../../components/Form/DataFieldSelector';
+import VersionController from '../../../batteries/components/shared/VersionController';
 
 const { Option } = Select;
 const TOLERANCE_OPTIONS = ['AUTO', 1, 2];
@@ -77,33 +78,36 @@ const SettingsOptions = ({
 				<Icon style={{ marginLeft: 5 }} type="info-circle" />
 			</Tooltip>
 		</h6>
-		<DataFieldSelector
-			// only allow fields with `keyword` and `numeric` mappings
-			includeMappings={['keyword']}
-			// numeric fields https://www.elastic.co/guide/en/elasticsearch/reference/current/number.html
-			includeTypes={[
-				'long',
-				'integer',
-				'short',
-				'byte',
-				'double',
-				'float',
-				'half_float',
-				'scaled_float',
-				'unsigned_long',
-			]}
-			selectProps={{
-				value: distinctField ? distinctField.split('.keyword')[0] : undefined,
-				onSelect: (val) => {
-					if (distinctField === val) {
-						// To unselect
-						handleChange('distinctField', undefined);
-					} else {
-						handleChange('distinctField', val);
-					}
-				},
-			}}
-		/>
+		<VersionController version="7.42.0">
+			<DataFieldSelector
+				// only allow fields with `keyword` and `numeric` mappings
+				includeMappings={['keyword']}
+				// numeric fields https://www.elastic.co/guide/en/elasticsearch/reference/current/number.html
+				includeTypes={[
+					'long',
+					'integer',
+					'short',
+					'byte',
+					'double',
+					'float',
+					'half_float',
+					'scaled_float',
+					'unsigned_long',
+				]}
+				selectProps={{
+					value: distinctField ? distinctField.split('.keyword')[0] : undefined,
+					onSelect: (val) => {
+						if (distinctField === val) {
+							// To unselect
+							handleChange('distinctField', undefined);
+						} else {
+							handleChange('distinctField', val);
+						}
+					},
+				}}
+			/>
+		</VersionController>
+
 		<h6>
 			{settingsMap.enableTypoTolerance.title}
 			<Tooltip title={settingsMap.enableTypoTolerance.description}>
