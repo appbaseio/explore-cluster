@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Select, Form } from 'antd';
 import { css } from 'emotion';
-import { string, func, bool, object, element } from 'prop-types';
+import { string, func, bool, object, element, array } from 'prop-types';
 import get from 'lodash/get';
 import { FieldControl } from 'react-reactive-form';
 import { getAppMappings } from '../../batteries/modules/actions';
@@ -15,6 +15,34 @@ const selectCls = css`
 	}
 `;
 class DataFieldSelector extends React.Component {
+	constructor(props) {
+		super(props);
+		const { mappings, isAggFields, includeMappings, includeTypes } = props;
+		const traversedMappings = traverseMapping(mappings || {}, undefined, {
+			isAggFields,
+			includeMappings,
+			includeTypes,
+		});
+		this.state = {
+			traversedMappings: Array.isArray(traversedMappings) ? traversedMappings : [],
+		};
+	}
+
+	componentDidUpdate(prevProps) {
+		const { mappings, isAggFields, includeMappings, includeTypes } = this.props;
+		if (prevProps.mappings !== mappings) {
+			const traversedMappings = traverseMapping(mappings || {}, undefined, {
+				isAggFields,
+				includeMappings,
+				includeTypes,
+			});
+			// eslint-disable-next-line
+			this.setState({
+				traversedMappings: Array.isArray(traversedMappings) ? traversedMappings : [],
+			});
+		}
+	}
+
 	getMappings = () => {
 		const { index, loading, fetchMappings, appbaseCredentials, mappings } = this.props;
 		if (!loading && !mappings && appbaseCredentials) {
@@ -23,10 +51,8 @@ class DataFieldSelector extends React.Component {
 	};
 
 	renderOptions() {
-		const { mappings, isAggFields } = this.props;
-		const traversedMappings = traverseMapping(mappings || {}, undefined, isAggFields);
-		const calcMappings = Array.isArray(traversedMappings) ? traversedMappings : [];
-		return calcMappings.map((v) => (
+		const { traversedMappings } = this.state;
+		return traversedMappings.map((v) => (
 			<Select.Option key={v} title={v}>
 				{v.split('.keyword')[0]}
 			</Select.Option>
@@ -43,8 +69,9 @@ class DataFieldSelector extends React.Component {
 			wrapInsideForm,
 			formItemProps,
 			addOptions,
+			selectProps,
 		} = this.props;
-		const selectProps = {
+		const selectPropsCalculated = {
 			placeholder: 'Select data field',
 			loading,
 			showSearch: true,
@@ -52,6 +79,7 @@ class DataFieldSelector extends React.Component {
 			style: {
 				width: 200,
 			},
+			...selectProps,
 		};
 		const withFormItem = (child) => <Form.Item {...formItemProps}>{child}</Form.Item>;
 
@@ -67,7 +95,7 @@ class DataFieldSelector extends React.Component {
 							<Select
 								className={touched && invalid ? selectCls : undefined}
 								placeholder="Select field"
-								{...selectProps}
+								{...selectPropsCalculated}
 								{...inputHandler}
 								value={
 									inputHandler.value
@@ -97,7 +125,11 @@ class DataFieldSelector extends React.Component {
 			);
 		}
 		return (
-			<Select placeholder="Select field" {...selectProps} onFocus={this.getMappings}>
+			<Select
+				placeholder="Select field"
+				{...selectPropsCalculated}
+				onFocus={this.getMappings}
+			>
 				{this.renderOptions()}
 			</Select>
 		);
@@ -114,6 +146,9 @@ DataFieldSelector.defaultProps = {
 	wrapInsideForm: false,
 	formItemProps: null,
 	addOptions: null,
+	selectProps: null,
+	includeMappings: undefined,
+	includeTypes: undefined,
 };
 
 DataFieldSelector.propTypes = {
@@ -125,11 +160,14 @@ DataFieldSelector.propTypes = {
 	loading: bool,
 	control: object,
 	controlProps: object,
+	selectProps: object,
 	mappings: object,
 	isAggFields: bool,
 	wrapInsideForm: bool,
 	formItemProps: object,
 	addOptions: element,
+	includeMappings: array,
+	includeTypes: array,
 };
 
 const mapStateToProps = (state) => {

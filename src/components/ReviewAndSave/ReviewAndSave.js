@@ -218,6 +218,21 @@ const getDiffData = (oldObj, newObj) => {
 		};
 	}
 
+	if (get(diffData, 'search.distinctField', null)) {
+		const newDistinctField = get(newObj, 'search.distinctField', '');
+		const oldDistinctField = get(oldObj, 'search.distinctField', '');
+		diffData = {
+			...diffData,
+			search: {
+				...diffData.search,
+				distinctField: [
+					oldDistinctField.split('.keyword')[0],
+					newDistinctField.split('.keyword')[0],
+				],
+			},
+		};
+	}
+
 	if ('enableNgram' in get(diffData, 'indexSettings', {})) {
 		diffData = {
 			...diffData,

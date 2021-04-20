@@ -3,6 +3,7 @@ import { Switch, Tooltip, Icon, Radio, Select } from 'antd';
 import { css } from 'emotion';
 import PropTypes from 'prop-types';
 import settingsMap from '../../../components/ReviewAndSave/helper';
+import DataFieldSelector from '../../../components/Form/DataFieldSelector';
 
 const { Option } = Select;
 const TOLERANCE_OPTIONS = ['AUTO', 1, 2];
@@ -26,6 +27,7 @@ const SettingsOptions = ({
 	fuzziness,
 	queryFormat,
 	queryType,
+	distinctField,
 }) => (
 	<div className={optionContainer}>
 		<h6>
@@ -70,9 +72,42 @@ const SettingsOptions = ({
 			</Radio>
 		</Radio.Group>
 		<h6>
+			{settingsMap.distinctField.title}
+			<Tooltip title={settingsMap.distinctField.description}>
+				<Icon style={{ marginLeft: 5 }} type="info-circle" />
+			</Tooltip>
+		</h6>
+		<DataFieldSelector
+			// only allow fields with `keyword` and `numeric` mappings
+			includeMappings={['keyword']}
+			// numeric fields https://www.elastic.co/guide/en/elasticsearch/reference/current/number.html
+			includeTypes={[
+				'long',
+				'integer',
+				'short',
+				'byte',
+				'double',
+				'float',
+				'half_float',
+				'scaled_float',
+				'unsigned_long',
+			]}
+			selectProps={{
+				value: distinctField ? distinctField.split('.keyword')[0] : undefined,
+				onSelect: (val) => {
+					if (distinctField === val) {
+						// To unselect
+						handleChange('distinctField', undefined);
+					} else {
+						handleChange('distinctField', val);
+					}
+				},
+			}}
+		/>
+		<h6>
 			{settingsMap.enableTypoTolerance.title}
 			<Tooltip title={settingsMap.enableTypoTolerance.description}>
-				<Icon type="info-circle" />
+				<Icon style={{ marginLeft: 5 }} type="info-circle" />
 			</Tooltip>
 		</h6>
 		<Switch
@@ -92,7 +127,7 @@ const SettingsOptions = ({
 				<h6>
 					{settingsMap.typoToleranceValue.title}
 					<Tooltip title={settingsMap.typoToleranceValue.description}>
-						<Icon type="info-circle" />
+						<Icon style={{ marginLeft: 5 }} type="info-circle" />
 					</Tooltip>
 				</h6>
 				<Select
@@ -115,7 +150,7 @@ const SettingsOptions = ({
 		<h6>
 			Enable Synonyms
 			<Tooltip title={settingsMap.synonyms.description}>
-				<Icon type="info-circle" />
+				<Icon style={{ marginLeft: 5 }} type="info-circle" />
 			</Tooltip>
 		</h6>
 		<Switch
@@ -127,7 +162,7 @@ const SettingsOptions = ({
 		<h6>
 			{settingsMap.enableNgram.title}
 			<Tooltip title={settingsMap.enableNgram.description}>
-				<Icon type="info-circle" />
+				<Icon style={{ marginLeft: 5 }} type="info-circle" />
 			</Tooltip>
 		</h6>
 		<Switch
@@ -137,6 +172,9 @@ const SettingsOptions = ({
 		/>
 	</div>
 );
+SettingsOptions.defaultProps = {
+	distinctField: undefined,
+};
 
 SettingsOptions.propTypes = {
 	handleChange: PropTypes.func.isRequired,
@@ -145,6 +183,7 @@ SettingsOptions.propTypes = {
 	fuzziness: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
 	queryFormat: PropTypes.string.isRequired,
 	queryType: PropTypes.string.isRequired,
+	distinctField: PropTypes.string,
 };
 
 export default SettingsOptions;
