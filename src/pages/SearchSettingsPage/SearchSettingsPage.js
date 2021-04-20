@@ -471,10 +471,14 @@ class SearchSettingsPage extends React.Component {
 			);
 		}
 
-		const { fuzziness, queryFormat, queryString, searchOperators, dataField } = get(
-			localRelevancy,
-			`search`,
-		);
+		const {
+			fuzziness,
+			queryFormat,
+			queryString,
+			searchOperators,
+			dataField,
+			distinctField,
+		} = get(localRelevancy, `search`);
 
 		const { enableNgram } = get(localRelevancy, `indexSettings`);
 		const { enabled: enableSynonyms } = get(localRelevancy, `synonyms`);
@@ -549,6 +553,7 @@ class SearchSettingsPage extends React.Component {
 										fuzziness={fuzziness}
 										enableSynonyms={enableSynonyms}
 										enableNgram={enableNgram}
+										distinctField={distinctField}
 										queryType={getqueryFormat({ queryString, searchOperators })}
 									/>
 								</>

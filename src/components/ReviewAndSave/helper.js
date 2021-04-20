@@ -210,6 +210,26 @@ const settingsMap = {
 		description:
 			'appbase.io adds an n-grams tokenizer to enable partial infix matching of search terms, but this comes with a substantial storage increase. By disabling n-grams, you can make significant storage savings.',
 	},
+	distinctField: {
+		title: 'Distinct Field',
+		description: (
+			<>
+				<p style={{ fontSize: 15 }}>
+					This property returns only the distinct value documents for the specified field.
+					It is equivalent to the DISTINCT clause in SQL. It internally uses the collapse
+					feature of Elasticsearch. You can read more about it over{' '}
+					<a
+						href="https://docs.appbase.io/docs/search/reactivesearch-api/reference/#distinctfield"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						here
+					</a>
+					.
+				</p>
+			</>
+		),
+	},
 };
 
 export default settingsMap;
