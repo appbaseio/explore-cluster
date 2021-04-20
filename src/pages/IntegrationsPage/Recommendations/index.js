@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { bool, string } from 'prop-types';
-import { isValidPlan } from '../../../batteries/utils';
+import { features, isValidPlan } from '../../../batteries/utils';
 import Overlay from '../../../components/Overlay';
 import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
 import Main from './Main';
@@ -47,7 +47,7 @@ const RecommendationsIntegrationsPage = ({ tier, featureEcommerce }) => {
 		};
 	}, []);
 
-	if (!isValidPlan(tier, featureEcommerce)) {
+	if (!isValidPlan(tier, featureEcommerce, features.UI_BUILDER)) {
 		return (
 			<React.Fragment>
 				<Banner {...bannerDetails} />

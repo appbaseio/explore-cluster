@@ -25,7 +25,7 @@ import { cloneApp } from '../../utils';
 import { validateAppName } from '../../utils/helper';
 import { getSettings, putSettings, setCurrentApp } from '../../batteries/modules/actions';
 import { appendApp } from '../../actions';
-import { isValidPlan } from '../../batteries/utils';
+import { features, isValidPlan } from '../../batteries/utils';
 import { allowedTiers } from '../../utils/prop-types';
 
 const centerAligned = css`
@@ -75,7 +75,10 @@ const CloneIndex = (props) => {
 		cloneApp(index, destIndex, { action: actions })
 			.then(async () => {
 				const { getSettingsAction, updateSettingsAction, addApp, updateCurrentApp } = props;
-				if (hasSearchRelevancy && isValidPlan(tier, featureSearchRelevancy)) {
+				if (
+					hasSearchRelevancy &&
+					isValidPlan(tier, featureSearchRelevancy, features.SEARCH_RELEVANCY)
+				) {
 					const res = await getSettingsAction(index);
 					if (res && res.payload) {
 						await updateSettingsAction(destIndex, res.payload);
@@ -98,7 +101,11 @@ const CloneIndex = (props) => {
 		setExists(existingApps.includes(e.target.value));
 	}
 
-	const featureSearchRelevance = isValidPlan(tier, featureSearchRelevancy);
+	const featureSearchRelevance = isValidPlan(
+		tier,
+		featureSearchRelevancy,
+		features.SEARCH_RELEVANCY,
+	);
 
 	const searchRelevancyCheckbox = (
 		<Checkbox

@@ -17,7 +17,7 @@ import { getParam, getParsedRoutes } from '../../utils';
 import { setIsSidebarCollapsed } from '../../actions';
 import { breakpoints } from '../../utils/media';
 import Loader from '../../components/Loader';
-import { isValidPlan } from '../../batteries/utils';
+import { features, isValidPlan } from '../../batteries/utils';
 import SidebarAutocomplete from '../../components/SidebarAutocomplete';
 import { allowedTiers } from '../../utils/prop-types';
 import searchInputStyle from '../DashboardWrapper/styles';
@@ -168,7 +168,7 @@ class AppWrapper extends Component {
 			featureSearchRelevancy,
 		} = this.props;
 		// restrict calling API if it's not a valid plan
-		if (!isValidPlan(tier, featureSearchRelevancy)) return;
+		if (!isValidPlan(tier, featureSearchRelevancy, features.SEARCH_RELEVANCY)) return;
 		if (!settings) {
 			this.setState({ loading: true });
 			const settingsResponse = await getSettingsAction(appName);

@@ -65,7 +65,7 @@ export const APP_ROUTES = {
 		],
 	},
 	Speed: {
-		icon: 'clock-circle',
+		icon: 'thunderbolt',
 		action: ALLOWED_ACTIONS.SPEED,
 		menu: [{ label: 'Cache', link: '/cluster/cache', tag: 'Beta' }],
 	},
@@ -185,7 +185,7 @@ export const CLUSTER_ROUTES = {
 		],
 	},
 	Speed: {
-		icon: 'clock-circle',
+		icon: 'thunderbolt',
 		action: ALLOWED_ACTIONS.SPEED,
 		menu: [{ label: 'Cache', link: '/cluster/cache', tag: 'Beta' }],
 	},

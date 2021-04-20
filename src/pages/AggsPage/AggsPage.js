@@ -11,7 +11,7 @@ import {
 	setLocalRelevancyState,
 } from '../../batteries/modules/actions';
 import { allowedTiers } from '../../utils/prop-types';
-import { isValidPlan } from '../../batteries/utils';
+import { features, isValidPlan } from '../../batteries/utils';
 import { container } from '../ResultsPage/styles';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
@@ -149,7 +149,7 @@ class AggsPage extends React.Component {
 	render() {
 		const { isLoading, tier, featureSearchRelevancy, localRelevancy } = this.props;
 
-		if (!isValidPlan(tier, featureSearchRelevancy)) {
+		if (!isValidPlan(tier, featureSearchRelevancy, features.SEARCH_RELEVANCY)) {
 			return (
 				<React.Fragment>
 					<Banner {...bannerDetails} />

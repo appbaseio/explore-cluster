@@ -6,7 +6,7 @@ import get from 'lodash/get';
 import { deleteApp } from '../../utils';
 import { removeAppData } from '../../actions';
 import { deleteSettings } from '../../batteries/modules/actions';
-import { isValidPlan } from '../../batteries/utils';
+import { features, isValidPlan } from '../../batteries/utils';
 import { allowedTiers } from '../../utils/prop-types';
 
 class DeleteAppModal extends React.Component {
@@ -31,7 +31,7 @@ class DeleteAppModal extends React.Component {
 			loading: true,
 		});
 
-		if (isValidPlan(tier, featureSearchRelevancy)) {
+		if (isValidPlan(tier, featureSearchRelevancy, features.SEARCH_RELEVANCY)) {
 			await deleteSettingsAction(appName);
 		}
 

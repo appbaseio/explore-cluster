@@ -18,7 +18,7 @@ import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { container, label } from '../ResultsPage/styles';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import SettingTooltip from '../../components/SettingTooltip';
-import { isValidPlan } from '../../batteries/utils';
+import { features, isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import { appendApp, removeAppData } from '../../actions';
 import settingsMap from '../../components/ReviewAndSave/helper';
@@ -142,7 +142,7 @@ class LanguageSettings extends React.Component {
 	render() {
 		const { isLoading, localRelevancy, tier, featureSearchRelevancy } = this.props;
 
-		if (!isValidPlan(tier, featureSearchRelevancy)) {
+		if (!isValidPlan(tier, featureSearchRelevancy, features.SEARCH_RELEVANCY)) {
 			return (
 				<React.Fragment>
 					<Banner {...bannerDetails} />
