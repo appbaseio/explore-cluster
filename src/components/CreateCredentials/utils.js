@@ -3,6 +3,8 @@ import sortBy from 'lodash/sortBy';
 import get from 'lodash/get';
 import filter from 'lodash/filter';
 import { getDefaultAllowedActions } from '../../utils/allowedActions';
+import { versionCompare } from '../../batteries/utils/helpers';
+import { ALLOWED_ACTIONS } from '../../constants';
 
 export const Suggestions = {
 	1: {
@@ -127,20 +129,38 @@ export const aclOptions = [
 	'searchrelevancy',
 	'synonyms',
 	'templates',
-	'cache',
 ];
+// New categories to appbase version map
+const newCategories = {
+	cache: '7.42.0',
+};
 // Default Selected Acl
 export const defaultAclOptions = aclOptions;
-/**
- * To get acl options according to the users plan
- * @param {string} plan
- */
-export const getAclOptionsByPlan = () => aclOptions;
-/**
- * To get default selected acl options according to the users plan
- * @param {string} plan
- */
-export const getDefaultAclOptionsByPlan = () => aclOptions;
+
+export const getDefaultAclOptionsByVersion = (appbaseVersion) => {
+	const categories = aclOptions;
+	Object.keys(newCategories).forEach((category) => {
+		if (versionCompare(appbaseVersion, newCategories[category]) !== -1) {
+			categories.push(category);
+		}
+	});
+	return categories;
+};
+
+export const getAllowedActionsByVersion = (appbaseVersion) => {
+	const actions = { ...ALLOWED_ACTIONS };
+	// New scope to version map
+	const newScopes = {
+		SPEED: '7.42.0',
+	};
+	Object.keys(newScopes).forEach((action) => {
+		if (versionCompare(appbaseVersion, newScopes[action]) === -1) {
+			// remove scope
+			delete actions[action];
+		}
+	});
+	return actions;
+};
 // Acl options label
 export const aclOptionsLabel = {
 	docs: 'Docs',
