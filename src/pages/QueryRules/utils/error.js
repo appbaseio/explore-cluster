@@ -22,10 +22,7 @@ const getErrorMessages = (state) => {
 	const {
 		actions,
 		name,
-		queryValue,
-		dataFieldValue,
 		condition,
-		dataField,
 		selectedIndexes,
 		show_advance_editor,
 		expressionError,
@@ -123,29 +120,11 @@ const getErrorMessages = (state) => {
 	}
 
 	if (condition === 'filter') {
-		const isDataFieldsPresent = !!(dataField && dataFieldValue);
-		const isQueryPresent = !!queryValue;
 		if (show_advance_editor) {
 			if (expressionError) {
 				error.condition = {
 					hasError: true,
 					description: 'Invalid expression',
-				};
-			}
-		} else {
-			if (!isQueryPresent) {
-				if (!dataFieldValue || !dataField) {
-					error.condition = {
-						hasError: true,
-						description: 'Either dataField value or query is needed',
-					};
-				}
-			}
-
-			if (!isDataFieldsPresent && !queryValue) {
-				error.condition = {
-					hasError: true,
-					description: 'Either dataField value or query is needed',
 				};
 			}
 		}
