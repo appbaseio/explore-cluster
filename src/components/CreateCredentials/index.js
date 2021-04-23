@@ -29,16 +29,17 @@ import {
 import { CLUSTER_PLANS } from '../../batteries/utils';
 import {
 	Types,
-	getDefaultAclOptionsByPlan,
+	getDefaultAclOptionsByVersion,
 	isNegative,
 	isNegativeTTL,
 	mapFormToValues,
 	mapValuesToForm,
+	getAllowedActionsByVersion,
 } from './utils';
 import Acl from './Acl';
 import WhiteList from './WhiteList';
 import PasswordInput from './PasswordInput';
-import { ALLOWED_ACTIONS, ALLOWED_ACTIONS_LABELS } from '../../constants';
+import { ALLOWED_ACTIONS_LABELS } from '../../constants';
 import SwitchGroup from '../SwitchGroup';
 
 const { Option } = Select;
@@ -89,7 +90,7 @@ class CreateCredentials extends React.Component {
 					description: '',
 					operationType: [Types.read, Validators.required],
 					categories: new FormArray(
-						getDefaultAclOptionsByPlan(props.plan).map(
+						getDefaultAclOptionsByVersion(props.appbaseVersion).map(
 							(acl) =>
 								new FormGroup({
 									acl: new FormControl(acl),
@@ -117,7 +118,13 @@ class CreateCredentials extends React.Component {
 	}
 
 	componentDidMount() {
-		const { disabled, initialValues, isUserManagement, appbaseCredentials } = this.props;
+		const {
+			disabled,
+			initialValues,
+			isUserManagement,
+			appbaseCredentials,
+			appbaseVersion,
+		} = this.props;
 		if (appbaseCredentials) {
 			this.getMappings();
 		}
@@ -139,7 +146,9 @@ class CreateCredentials extends React.Component {
 				adminHandler.valueChanges.subscribe((value) => {
 					if (value) {
 						if (allowedActionsHandler) {
-							allowedActionsHandler.setValue(Object.values(ALLOWED_ACTIONS));
+							allowedActionsHandler.setValue(
+								Object.values(getAllowedActionsByVersion(appbaseVersion)),
+							);
 							allowedActionsHandler.disable();
 						}
 					} else if (allowedActionsHandler) {
@@ -291,19 +300,21 @@ class CreateCredentials extends React.Component {
 			indices,
 			arcPlan,
 			mappings: rawMappings,
+			appbaseVersion,
 		} = this.props;
 		const mappings = Array.isArray(rawMappings) ? rawMappings : [];
 		const { filteredMappings } = this.state;
 		const Messages = getMessages(isUserManagement);
 		const isClusterPlan = Object.values(CLUSTER_PLANS).includes(arcPlan);
+		const allowedActions = getAllowedActionsByVersion(appbaseVersion);
 		// don't show downtime alerts in case of hosted / self hosted arc
 		const actionOptions = isClusterPlan
-			? Object.values(ALLOWED_ACTIONS).map((i) => ({
+			? Object.values(allowedActions).map((i) => ({
 					value: i,
 					label: ALLOWED_ACTIONS_LABELS[i],
 			  }))
-			: Object.values(ALLOWED_ACTIONS)
-					.filter((i) => i !== ALLOWED_ACTIONS.DOWNTIME_ALERTS)
+			: Object.values(allowedActions)
+					.filter((i) => i !== allowedActions.DOWNTIME_ALERTS)
 					.map((i) => ({ value: i, label: ALLOWED_ACTIONS_LABELS[i] }));
 		return (
 			<FieldGroup
@@ -961,6 +972,7 @@ CreateCredentials.propTypes = {
 	]),
 	indices: PropTypes.array,
 	arcPlan: PropTypes.string.isRequired,
+	appbaseVersion: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = (state) => {
@@ -973,6 +985,7 @@ const mapStateToProps = (state) => {
 		isPaidUser: true,
 		appName: get(state, '$getCurrentApp.name'),
 		mappings,
+		appbaseVersion: get(state, '$getAppPlan.results.version'),
 		isPermissionPresent: !!appPermissions,
 		indices: Object.keys(indices || {}),
 		isLoadingMappings:
