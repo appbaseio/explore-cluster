@@ -85,8 +85,8 @@ const DiffList = ({ diff }) => {
 													]}
 												/>
 											)}
-											{Boolean(item.data) &&
-												item.data.length === 2 &&
+											{get(item, 'data', null) &&
+												get(item, 'data.length', 0) === 2 &&
 												item.title !== 'dataField' &&
 												item.title !== 'fieldWeights' &&
 												item.title !== 'rankFeature' && (
