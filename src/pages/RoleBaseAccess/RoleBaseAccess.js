@@ -71,8 +71,6 @@ class RoleBaseAccess extends React.Component {
 			publicKey,
 			roleKey,
 			updatedKey,
-			fetchPublicKey,
-			appName,
 			isPublicKeyLoading,
 			updateKeyError,
 			publicKeyError,
@@ -92,23 +90,23 @@ class RoleBaseAccess extends React.Component {
 			});
 		}
 
-		const isNewKeyEncoded = updatedKey && isBase64(updatedKey.public_key);
+		const isNewKeyEncoded = isBase64(get(updatedKey, 'public_key', ''));
 		const isOldKeyEncoded = isBase64(publicKey);
 
 		const oldKey = isOldKeyEncoded ? atob(publicKey) : publicKey;
 		const newKey = isNewKeyEncoded
-			? updatedKey && atob(updatedKey.public_key)
-			: updatedKey.public_key;
+			? atob(get(updatedKey, 'public_key', ''))
+			: get(updatedKey, 'public_key', '');
 
 		if (
-			updatedKey &&
 			!isPublicKeyLoading &&
-			(newKey !== oldKey || updatedKey.role_key !== roleKey)
+			((newKey !== oldKey && newKey !== '') ||
+				(get(updatedKey, 'role_key', '') !== roleKey &&
+					get(updatedKey, 'role_key', '') !== ''))
 		) {
 			notification.success({
-				message: updatedKey.message,
+				message: get(updatedKey, 'message', 'Data saved successfully'),
 			});
-			fetchPublicKey(appName);
 		}
 
 		if (updateKeyError && prevUpdateError !== updateKeyError) {
@@ -127,6 +125,7 @@ class RoleBaseAccess extends React.Component {
 					'Error while fetching the Public Key.',
 			});
 		}
+		// }
 	}
 
 	componentWillUnmount() {
@@ -256,7 +255,7 @@ class RoleBaseAccess extends React.Component {
 									<Form.Item label="Public Key" style={labelMargin}>
 										<Input.TextArea
 											name="publicKey"
-											autosize={{ minRows: 3 }}
+											autoSize={{ minRows: 3 }}
 											value={publicKey}
 											placeholder="Enter Public Key"
 											onChange={this.handleChange}
@@ -418,9 +417,9 @@ class RoleBaseAccess extends React.Component {
 RoleBaseAccess.propTypes = {
 	publicKey: PropTypes.string,
 	roleKey: PropTypes.string,
-	updatedKey: PropTypes.string,
+	updatedKey: PropTypes.object,
 	fetchPublicKey: PropTypes.func.isRequired,
-	appName: PropTypes.string.isRequired,
+	appName: PropTypes.string,
 	isPublicKeyLoading: PropTypes.bool,
 	updateKeyError: PropTypes.string,
 	publicKeyError: PropTypes.string,
@@ -434,7 +433,8 @@ RoleBaseAccess.propTypes = {
 RoleBaseAccess.defaultProps = {
 	publicKey: '',
 	roleKey: '',
-	updatedKey: '',
+	appName: '',
+	updatedKey: null,
 	isPublicKeyLoading: false,
 	updateKeyError: '',
 	publicKeyError: '',
@@ -456,7 +456,7 @@ const mapStateToProps = (state) => {
 		publicKey: atob(get(state, '$getAppPublicKey.results.public_key', '')),
 		publicKeyError: get(state, '$getAppPublicKey.error.actual.error', ''),
 		updateKeyError: get(state, '$updateAppPublicKey.error.actual.error', ''),
-		updatedKey: get(state, '$updateAppPublicKey.results', ''),
+		updatedKey: get(state, '$updateAppPublicKey.results', null),
 		updatingKeys: get(state, '$updateAppPublicKey.isFetching'),
 		roleKey: get(state, '$getAppPublicKey.results.role_key', ''),
 	};
