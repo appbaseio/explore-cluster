@@ -67,7 +67,7 @@ export const APP_ROUTES = {
 	Speed: {
 		icon: 'thunderbolt',
 		action: ALLOWED_ACTIONS.SPEED,
-		menu: [{ label: 'Cache', link: '/cluster/cache', tag: 'Beta' }],
+		menu: [{ label: 'Cache', link: '/cluster/cache', tag: 'Beta', hasExactPath: true }],
 	},
 	'Curated Insights': {
 		icon: 'rise',
