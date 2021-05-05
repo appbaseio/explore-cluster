@@ -25,7 +25,7 @@ class GlobalSearch extends PureComponent {
 	};
 
 	render() {
-		const { className, dataFields, onKeyDown, onValueSelected } = this.props;
+		const { className, dataFields, onKeyDown, onValueSelected, subprops } = this.props;
 		const { searchValue } = this.state;
 		return (
 			<div className={inputBox} css={{ position: 'relative' }}>
@@ -53,6 +53,7 @@ class GlobalSearch extends PureComponent {
 					value={searchValue}
 					onKeyDown={onKeyDown}
 					onValueSelected={onValueSelected}
+					{...subprops}
 				/>
 				<Icon
 					className="search-icon"
@@ -75,6 +76,7 @@ GlobalSearch.propTypes = {
 	dataFields: PropTypes.array.isRequired,
 	onKeyDown: PropTypes.func,
 	onValueSelected: PropTypes.func,
+	subprops: PropTypes.object,
 };
 
 const noop = () => {};
@@ -82,6 +84,7 @@ GlobalSearch.defaultProps = {
 	className: '',
 	onKeyDown: noop,
 	onValueSelected: noop,
+	subprops: {},
 };
 
 export default GlobalSearch;

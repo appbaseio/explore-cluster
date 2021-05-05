@@ -2,14 +2,10 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { ReactiveBase } from '@appbaseio/reactivesearch';
 import { notification } from 'antd';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { getURL } from '../../../../../constants/config';
 import GlobalSearch from '../../../../../components/GlobalSearch';
-import {
-	PromoteActions,
-	PromoteDataTable,
-	PromoteJSONView,
-	PromotePosition,
-} from './PromoteDataTable';
+import PromoteDataTable from './PromoteDataTable';
 
 class PromoteResults extends Component {
 	constructor(props) {
@@ -42,36 +38,49 @@ class PromoteResults extends Component {
 			this.clearSearch();
 			return;
 		}
-		const newData = [...dataSource, { position: 1, doc: suggestionSource }];
+		delete suggestionSource._score;
+		const newData = [
+			...dataSource,
+			{
+				position: dataSource.length + 1,
+				doc: { ...suggestionSource, _suggestion_display_value: selectedSuggestion },
+			},
+		];
 		this.setState({ dataSource: newData }, this.updateResults);
 		this.clearSearch();
 	};
 
-	handleItemChange = (value, index, field) => {
+	handleItemReOrder = (index) => {
+		const sourcePosition = index.source.index + 1;
+		const destinationPosition = index.destination.index + 1;
 		const { dataSource } = this.state;
-		this.setState(
-			{
-				dataSource: [
-					...dataSource.slice(0, index),
-					{
-						...dataSource[index],
-						[field]: value,
-					},
-					...dataSource.slice(index + 1),
-				],
-			},
-			this.updateResults,
-		);
+		const reshuffledData = dataSource.map((data) => {
+			if (data.position >= destinationPosition && data.position < sourcePosition) {
+				return { ...data, position: data.position + 1 };
+			}
+			if (data.position > sourcePosition && data.position <= destinationPosition) {
+				return { ...data, position: data.position - 1 };
+			}
+			if (data.position === sourcePosition) {
+				return { ...data, position: destinationPosition };
+			}
+			return data;
+		});
+		this.setState({ dataSource: reshuffledData }, this.updateResults);
 	};
 
-	handleDelete = (index) => {
+	handleDelete = (position) => {
 		const { dataSource } = this.state;
-		this.setState(
-			{
-				dataSource: [...dataSource.slice(0, index), ...dataSource.slice(index + 1)],
-			},
-			this.updateResults,
-		);
+		const updatedData = [];
+		dataSource.forEach((data) => {
+			if (data.position > position) {
+				updatedData.push({ ...data, position: data.position - 1 });
+			}
+			if (data.position < position) {
+				updatedData.push(data);
+			}
+		});
+		this.setState({ dataSource: updatedData }, this.updateResults);
 	};
 
 	clearSearch() {
@@ -90,6 +99,7 @@ class PromoteResults extends Component {
 					url={getURL()}
 					credentials={atob(sessionStorage.getItem('authToken'))}
 					style={{ marginBottom: 12 }}
+					enableAppbase
 				>
 					<GlobalSearch
 						indexes={indexes}
@@ -97,25 +107,31 @@ class PromoteResults extends Component {
 						dataFields={(dataFields || []).map((field) =>
 							field.replace(/.keyword/g, ''),
 						)}
+						subprops={{ enablePredictiveSuggestions: true }}
 						ref={this.globalSearchRef}
-						// onKeyDown={this.handleAdd}
 					/>
 				</ReactiveBase>
-				<PromoteDataTable
-					positionRender={(text, record, index) => (
-						<PromotePosition
-							value={text}
-							onChange={(value) => {
-								this.handleItemChange(value, index, 'position');
-							}}
-						/>
-					)}
-					dataRender={(text, record) => <PromoteJSONView record={record} />}
-					actionRender={(text, record, index) => (
-						<PromoteActions onClick={() => this.handleDelete(index)} />
-					)}
-					dataSource={dataSource}
-				/>
+				<DragDropContext onDragEnd={this.handleItemReOrder}>
+					<Droppable droppableId="droppable">
+						{(provided, snapshot) => (
+							<div
+								ref={provided.innerRef}
+								style={{
+									backgroundColor: snapshot.isDraggingOver
+										? 'transparent'
+										: 'transparent',
+								}}
+								{...provided.droppableProps}
+							>
+								<PromoteDataTable
+									handleDelete={this.handleDelete}
+									dataSource={dataSource}
+								/>
+								{provided.placeholder}
+							</div>
+						)}
+					</Droppable>
+				</DragDropContext>
 			</div>
 		);
 	}

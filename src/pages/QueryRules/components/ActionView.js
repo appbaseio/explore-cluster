@@ -19,22 +19,22 @@ class ActionView extends React.Component {
 	}
 
 	render() {
-		const { action } = this.props;
+		const { action, ruleId } = this.props;
 		const actionType = action.type;
 		switch (actionType) {
 			case 'replace_search_term':
 				return action.data ? (
-					<React.Fragment>
+					<React.Fragment key={ruleId}>
 						<h4 className={subTitle}>Replace Search Term</h4>
-						<Tag>{action.data}</Tag>
+						<Tag key={`${ruleId}-tag`}>{action.data}</Tag>
 					</React.Fragment>
 				) : null;
 			case 'hide_result':
 				return action.data ? (
-					<React.Fragment>
+					<React.Fragment key={ruleId}>
 						<h4 className={subTitle}>Hide Result</h4>
 						{action.data.map((id) => (
-							<Tag color="red" key={id}>
+							<Tag color="red" key={`${ruleId}-${id}`}>
 								{id}
 							</Tag>
 						))}
@@ -43,18 +43,18 @@ class ActionView extends React.Component {
 
 			case 'promote_result':
 				return action.data ? (
-					<React.Fragment>
+					<React.Fragment key={ruleId}>
 						<h4 className={subTitle}>Promote Result</h4>
 						{action.data.map((item) => (
-							<Tag color="blue" key={item.doc.id}>
-								{item.doc._id}
+							<Tag color="blue" key={`${ruleId}-${item.doc._id}`}>
+								{item.doc._suggestion_display_value || item.doc._id}
 							</Tag>
 						))}
 					</React.Fragment>
 				) : null;
 			case 'add_filter':
 				return action.data ? (
-					<React.Fragment>
+					<React.Fragment key={ruleId}>
 						<h4 className={subTitle}>Add Filter</h4>
 						{Object.keys(action.data).map((filter) => (
 							<Typography.Text
@@ -70,9 +70,11 @@ class ActionView extends React.Component {
 			case 'function':
 				return (
 					action.data && (
-						<React.Fragment>
+						<React.Fragment key={ruleId}>
 							<h4 className={subTitle}>Function</h4>
-							<Tag color="purple">{action.data}</Tag>
+							<Tag key={`${ruleId}-tag`} color="purple">
+								{action.data}
+							</Tag>
 						</React.Fragment>
 					)
 				);
@@ -80,34 +82,34 @@ class ActionView extends React.Component {
 			case 'custom_data':
 				return (
 					action.data && (
-						<React.Fragment>
+						<React.Fragment key={ruleId}>
 							<h4 className={subTitle}>Custom Data</h4>
 							<Popover content={<pre>{JSON.stringify(action.data, null, 4)}</pre>}>
-								<Tag color="green">{`{...}`}</Tag>
+								<Tag key={`${ruleId}-tag`} color="green">{`{...}`}</Tag>
 							</Popover>
 						</React.Fragment>
 					)
 				);
 			case 'remove_words':
 				return action.data ? (
-					<React.Fragment>
+					<React.Fragment key={ruleId}>
 						<h4 className={subTitle}>Remove Search Words</h4>
 						{action.data.map((word) => (
-							<Tag>{word}</Tag>
+							<Tag key={`${ruleId}-${word}`}>{word}</Tag>
 						))}
 					</React.Fragment>
 				) : null;
 			case 'replace_words':
 				return action.data ? (
-					<React.Fragment>
+					<React.Fragment key={ruleId}>
 						<h4 className={subTitle}>Replace Search Words</h4>
 						{Object.keys(action.data).map((word) => (
 							<div key={word}>
-								<Tag>
+								<Tag key={`${ruleId}-tag-delete-${word}`}>
 									<Text delete>{word}</Text>
 								</Tag>
 								with{' '}
-								<Tag style={{ marginLeft: 5 }}>
+								<Tag key={`${ruleId}-tag-${word}`} style={{ marginLeft: 5 }}>
 									<Text>{action.data[word]}</Text>
 								</Tag>
 							</div>
@@ -117,19 +119,21 @@ class ActionView extends React.Component {
 			case 'search_settings':
 				return (
 					action.data && (
-						<React.Fragment>
+						<React.Fragment key={ruleId}>
 							<h4 className={subTitle}>Search Settings</h4>
 							<Popover content={<pre>{JSON.stringify(action.data, null, 4)}</pre>}>
-								<Tag color="gold">{`{...}`}</Tag>
+								<Tag key={`${ruleId}-tag`} color="gold">{`{...}`}</Tag>
 							</Popover>
 						</React.Fragment>
 					)
 				);
 			case 'replace_search_query':
 				return action.data ? (
-					<React.Fragment>
+					<React.Fragment key={ruleId}>
 						<h4 className={subTitle}>Replace Search Query</h4>
-						<Tag color="geekblue">{action.data}</Tag>
+						<Tag key={`${ruleId}-tag`} color="geekblue">
+							{action.data}
+						</Tag>
 					</React.Fragment>
 				) : null;
 			default:
@@ -140,10 +144,12 @@ class ActionView extends React.Component {
 
 ActionView.propTypes = {
 	action: PropTypes.object,
+	ruleId: PropTypes.string,
 };
 
 ActionView.defaultProps = {
 	action: {},
+	ruleId: undefined,
 };
 
 export default ActionView;

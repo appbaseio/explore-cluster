@@ -36,6 +36,7 @@ class CustomData extends React.Component {
 				style={{
 					maxHeight: '250px',
 					width: '100%',
+					zIndex: '1',
 				}}
 				showGutter
 				highlightActiveLine

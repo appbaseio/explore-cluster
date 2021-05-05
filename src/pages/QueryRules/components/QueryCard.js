@@ -152,7 +152,7 @@ class QueryCard extends React.Component {
 					<Col lg={7} md={12} sm={24}>
 						{get(rule, 'actions', []).map((action) => (
 							<div key={action.type} className={section}>
-								<ActionView action={action} />
+								<ActionView action={action} ruleId={rule.id} />
 							</div>
 						))}
 					</Col>
