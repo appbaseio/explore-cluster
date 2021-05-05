@@ -47,7 +47,17 @@ const getValueFromExpression = (expression = '') => {
 
 	if (searchQuery) {
 		const isDoubleQuotePresent = searchQuery.includes(`"`);
-		value.queryValue = searchQuery.match(isDoubleQuotePresent ? doubleQuote : pattern)[1];
+		let queryValue;
+		if (
+			isDoubleQuotePresent &&
+			searchQuery.match(doubleQuote) &&
+			searchQuery.match(doubleQuote)[1]
+		) {
+			queryValue = searchQuery.match(doubleQuote)[1];
+		} else if (searchQuery.match(pattern)) {
+			queryValue = searchQuery.match(pattern)[1];
+		}
+		value.queryValue = queryValue;
 		value.query = searchQuery
 			.replace('$query', '')
 			.replace(`'${value.queryValue}'`, '')
@@ -56,9 +66,18 @@ const getValueFromExpression = (expression = '') => {
 	}
 
 	if (filterQuery) {
-		const isDoubleQuotePresent = filterQuery.includes(`"`);
-
-		value.dataFieldValue = filterQuery.match(isDoubleQuotePresent ? doubleQuote : pattern)[1];
+		const isDoubleQuotePresent = searchQuery.includes(`"`);
+		let dataFieldValue;
+		if (
+			isDoubleQuotePresent &&
+			filterQuery.match(doubleQuote) &&
+			filterQuery.match(doubleQuote)[1]
+		) {
+			dataFieldValue = filterQuery.match(doubleQuote)[1];
+		} else if (filterQuery.match(pattern)) {
+			dataFieldValue = filterQuery.match(pattern)[1];
+		}
+		value.dataFieldValue = dataFieldValue;
 		value.dataField = filterQuery
 			.replace('$filter.', '')
 			.replace('matches', '')
