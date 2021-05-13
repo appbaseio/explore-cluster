@@ -171,6 +171,7 @@ class QueryView extends React.Component {
 						<AceEditor
 							mode="json"
 							value={response}
+							theme="monokai"
 							readOnly
 							name="query-response"
 							fontSize={14}
