@@ -608,6 +608,9 @@ class CreateCredentials extends React.Component {
 																				(i) =>
 																					!i.startsWith(
 																						'.',
+																					) &&
+																					!i.startsWith(
+																						'metricbeat',
 																					),
 																			)
 																			.map((index) => (
