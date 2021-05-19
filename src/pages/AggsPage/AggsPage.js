@@ -238,7 +238,8 @@ AggsPage.defaultProps = {
 const mapStateToProps = (state) => {
 	const defaultSettings = get(state.$getAppSettings, `defaultSettings`);
 	const appName = get(state, '$getCurrentApp.name');
-	const localRelevancy = get(state, `$getLocalRelevancy.${appName}`, null);
+	const localRelevancy = get(state, ['$getLocalRelevancy', appName], null);
+
 	return {
 		appName,
 		defaultSettings,

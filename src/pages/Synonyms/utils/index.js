@@ -193,7 +193,7 @@ export const applySynonymsSettings = async ({ appName, credentials, url, setting
 
 export async function parseSynonymsAnalyzer({ appName, credentials, url, synonyms }) {
 	const settings = await getSettings(appName, credentials, url).then((data) =>
-		get(data, `${appName}.settings`, {}),
+		get(data, [appName, `settings`], {}),
 	);
 
 	const isSynonymsAnalyzerPresent = hasSynonymsAnalyzer(settings);

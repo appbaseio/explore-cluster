@@ -162,7 +162,7 @@ const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');
 	return {
 		appName,
-		stats: get(state, `apps.data['${appName}']`, {}),
+		stats: get(state, ['apps.data', appName], {}),
 		popularSearches: get(analytics, 'popular_searches'),
 		noResults: get(analytics, 'no_results_searches'),
 		searchVolume: get(analytics, 'search_histogram'),

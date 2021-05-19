@@ -426,8 +426,8 @@ FieldWeights.defaultProps = {
 
 const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');
-	const localRelevancy = get(state, `$getLocalRelevancy.${appName}`);
-	const localMapping = get(state, `$getLocalMapping.${appName}`);
+	const localRelevancy = get(state, ['$getLocalRelevancy', appName], null);
+	const localMapping = get(state, ['$getLocalMapping', appName], null);
 	const advanceSearchState = get(state, `$getAdvanceSearchState`);
 	return {
 		appName,
