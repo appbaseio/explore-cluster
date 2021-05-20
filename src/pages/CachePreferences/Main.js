@@ -9,18 +9,23 @@ import { displayErrors } from '../../utils/helper';
 import Loader from '../../batteries/components/shared/Loader/Spinner';
 import EvictCache from './EvictCache';
 import { isValidPlan } from '../../batteries/utils';
+import { versionCompare } from '../../batteries/utils/helpers';
 import { getCachePreferences, saveCachePreferences } from '../../batteries/modules/actions';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 
 class Main extends React.Component {
 	constructor(props) {
 		super(props);
+		let maxDuration = 60 * 60;
+		if (versionCompare(props.appbaseVersion, '7.43.1') !== -1) {
+			maxDuration = 24 * 60 * 60;
+		}
 		this.form = FormBuilder.group({
 			enable_cache: false,
-			// This property is in seconds. It should be in between 60s t0 3600s
+			// This property is in seconds. It should be in between 60s to 86400s (24h)
 			max_duration: [
 				5 * 60,
-				[Validators.required, Validators.min(60), Validators.max(60 * 60)],
+				[Validators.required, Validators.min(60), Validators.max(maxDuration)],
 			],
 			// This property is in MB. It should be in between 128MB to 4GB
 			max_size: [128, [Validators.required, Validators.min(128), Validators.max(4 * 1000)]],
@@ -102,10 +107,12 @@ Main.propTypes = {
 	savePreferences: PropTypes.func.isRequired,
 	tier: PropTypes.string.isRequired,
 	featureCache: PropTypes.bool.isRequired,
+	appbaseVersion: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = (state) => ({
 	preferences: get(state, '$getCachePreferences.results', {}),
+	appbaseVersion: get(state, '$getAppPlan.results.version'),
 	apps: get(state, 'apps.data', {}),
 	tier: get(state, '$getAppPlan.results.tier'),
 	featureCache: get(state, '$getAppPlan.results.feature_cache', false),
