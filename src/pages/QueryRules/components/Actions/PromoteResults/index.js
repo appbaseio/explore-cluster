@@ -92,10 +92,11 @@ class PromoteResults extends Component {
 	render() {
 		const { indexes, dataFields } = this.props;
 		const { dataSource } = this.state;
+		const app = indexes.join(',') || '*';
 		return (
 			<div>
 				<ReactiveBase
-					app={indexes.join(',') || '*'}
+					app={app}
 					url={getURL()}
 					credentials={atob(sessionStorage.getItem('authToken'))}
 					style={{ marginBottom: 12 }}
@@ -108,6 +109,7 @@ class PromoteResults extends Component {
 							field.replace(/.keyword/g, ''),
 						)}
 						subprops={{ enablePredictiveSuggestions: true }}
+						app={app}
 						ref={this.globalSearchRef}
 					/>
 				</ReactiveBase>
