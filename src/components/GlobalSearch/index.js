@@ -1,8 +1,11 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { DataSearch } from '@appbaseio/reactivesearch';
 import { css } from 'react-emotion';
 import { Icon } from 'antd';
+import get from 'lodash/get';
+import { getSettings as getSearchSettings } from '../../batteries/modules/actions';
 
 const inputBox = css`
 	&:hover,
@@ -24,14 +27,34 @@ class GlobalSearch extends PureComponent {
 		});
 	};
 
+	componentDidMount() {
+		const { app, getSettingsAction } = this.props;
+		if (app) {
+			getSettingsAction(app);
+		}
+	}
+
+	componentDidUpdate(prevProps) {
+		if (this.props.app != prevProps.app) {
+			const { app, getSettingsAction } = this.props;
+			getSettingsAction(app);
+		}
+	}
+
 	render() {
-		const { className, dataFields, onKeyDown, onValueSelected, subprops } = this.props;
+		const {
+			className,
+			dataFields,
+			onKeyDown,
+			onValueSelected,
+			subprops,
+			dataFieldSettings,
+		} = this.props;
 		const { searchValue } = this.state;
 		return (
 			<div className={inputBox} css={{ position: 'relative' }}>
 				<DataSearch
 					componentId="GlobalSearch"
-					dataField={dataFields}
 					innerClass={{
 						input: `ant-input ${css`
 							padding-left: 35px !important;
@@ -54,6 +77,12 @@ class GlobalSearch extends PureComponent {
 					onKeyDown={onKeyDown}
 					onValueSelected={onValueSelected}
 					{...subprops}
+					// Prioritize the data fields from search settings
+					dataField={
+						Array.isArray(dataFieldSettings) && dataFieldSettings.length
+							? undefined
+							: dataFields
+					}
 				/>
 				<Icon
 					className="search-icon"
@@ -76,6 +105,9 @@ GlobalSearch.propTypes = {
 	dataFields: PropTypes.array.isRequired,
 	onKeyDown: PropTypes.func,
 	onValueSelected: PropTypes.func,
+	getSettingsAction: PropTypes.func.isRequired,
+	app: PropTypes.string,
+	dataFieldSettings: PropTypes.array,
 	subprops: PropTypes.object,
 };
 
@@ -87,4 +119,18 @@ GlobalSearch.defaultProps = {
 	subprops: {},
 };
 
-export default GlobalSearch;
+const mapStateToProps = (state, props) => ({
+	dataFieldSettings: get(state, [
+		'$getAppSettings',
+		'settings',
+		props.app,
+		'search',
+		'dataField',
+	]),
+});
+
+const mapDispatchToProps = (dispatch) => ({
+	getSettingsAction: (name) => dispatch(getSearchSettings(name)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(GlobalSearch);
