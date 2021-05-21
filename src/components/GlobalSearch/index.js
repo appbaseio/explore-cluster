@@ -51,6 +51,7 @@ class GlobalSearch extends PureComponent {
 			dataFieldSettings,
 		} = this.props;
 		const { searchValue } = this.state;
+		const isFieldDefined = Array.isArray(dataFieldSettings) && dataFieldSettings.length;
 		return (
 			<div className={inputBox} css={{ position: 'relative' }}>
 				<DataSearch
@@ -78,11 +79,8 @@ class GlobalSearch extends PureComponent {
 					onValueSelected={onValueSelected}
 					{...subprops}
 					// Prioritize the data fields from search settings
-					dataField={
-						Array.isArray(dataFieldSettings) && dataFieldSettings.length
-							? undefined
-							: dataFields
-					}
+					dataField={isFieldDefined ? undefined : dataFields}
+					fieldWeights={isFieldDefined ? undefined : subprops.fieldWeights}
 				/>
 				<Icon
 					className="search-icon"
