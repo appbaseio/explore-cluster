@@ -58,10 +58,11 @@ class HideResults extends Component {
 	render() {
 		const { indexes, dataFields } = this.props;
 		const { hiddenResults } = this.state;
+		const app = indexes.join(',') || '*';
 		return (
 			<div>
 				<ReactiveBase
-					app={indexes.join(',') || '*'}
+					app={app}
 					url={getURL()}
 					credentials={atob(sessionStorage.getItem('authToken'))}
 					style={{ marginBottom: 12 }}
@@ -72,6 +73,7 @@ class HideResults extends Component {
 						dataFields={(dataFields || []).map((field) =>
 							field.replace(/.keyword/g, ''),
 						)}
+						app={app}
 						ref={this.globalSearchRef}
 						// onKeyDown={this.handleAdd}
 					/>

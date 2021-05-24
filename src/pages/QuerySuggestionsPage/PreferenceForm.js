@@ -160,11 +160,13 @@ class PreferenceForm extends React.Component {
 												}}
 											>
 												<Select.Option value="*">All (*)</Select.Option>
-												{indices.map((index) => (
-													<Select.Option key={index}>
-														{index}
-													</Select.Option>
-												))}
+												{indices
+													.filter((i) => !i.startsWith('metricbeat'))
+													.map((index) => (
+														<Select.Option key={index}>
+															{index}
+														</Select.Option>
+													))}
 											</Select>
 										}
 									/>

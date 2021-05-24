@@ -90,7 +90,8 @@ SettingsFooter.defaultProps = {
 
 const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');
-	const localRelevancy = get(state, `$getLocalRelevancy.${appName}`);
+	const localRelevancy = get(state, ['$getLocalRelevancy', appName], null);
+
 	const collapsed = get(state, 'sideBarCollapsed');
 	return {
 		appName,

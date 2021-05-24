@@ -144,7 +144,7 @@ class MappingsWrapper extends React.Component {
 		});
 
 		const appSettings = await getSettings(appName, credentials).then((data) =>
-			get(data, `${appName}.settings`),
+			get(data, [appName, `settings`]),
 		);
 
 		const reIndexPromise = reIndex({
@@ -349,7 +349,7 @@ const mapStateToProps = (state, props) => {
 		isFetchingMapping: get(state, '$getAppMappings.isFetching', false),
 		isFetchingSetting: get(state, '$getAppSettings.isFetching', false),
 		error: get(state, '$getAppMappings.error', null),
-		localMapping: get(state, `$getLocalMapping.${appName}`, null),
+		localMapping: get(state, [`$getLocalMapping`, appName], null),
 		enableNgram:
 			props.forceNgram !== undefined
 				? props.forceNgram
