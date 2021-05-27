@@ -130,6 +130,8 @@ class RouteContainer extends React.Component {
 	render() {
 		const { allowedRoutes, allowedActions } = this.props;
 		const hasSearchRelevancy = allowedActions.includes(ALLOWED_ACTIONS.SEARCH_RELEVANCY);
+		const hasUIBuilder = allowedActions.includes(ALLOWED_ACTIONS.UI_BUILDER);
+
 		return (
 			<ErrorPage {...this.props}>
 				<Switch>
@@ -305,7 +307,8 @@ class RouteContainer extends React.Component {
 						path="/app/:appName/search-preview"
 						render={(props) => (
 							<>
-								{get(allowedRoutes, 'search-preview') && hasSearchRelevancy ? (
+								{get(allowedRoutes, 'search-preview') &&
+								(hasSearchRelevancy || hasUIBuilder) ? (
 									<AppPageContainer
 										{...props}
 										component={SandboxPage}
