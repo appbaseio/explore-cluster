@@ -109,7 +109,7 @@ class CreateCredentials extends React.Component {
 						[Validators.required, isNegative],
 					],
 					ttl: [
-						{ value: 0, disabled: !props.isPaidUser },
+						{ value: -1, disabled: !props.isPaidUser },
 						[Validators.required, isNegativeTTL],
 					],
 					include_fields: [['*']],
@@ -608,6 +608,9 @@ class CreateCredentials extends React.Component {
 																				(i) =>
 																					!i.startsWith(
 																						'.',
+																					) &&
+																					!i.startsWith(
+																						'metricbeat',
 																					),
 																			)
 																			.map((index) => (

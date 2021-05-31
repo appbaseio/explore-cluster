@@ -493,7 +493,7 @@ const mapStateToProps = (state) => {
 	// when elasticsearch v6, mappings is an object with values corresponding to _doc key
 	const parsedMappings = Array.isArray(mappings) ? mappings : get(mappings, '_doc', []);
 	const { username, password } = get(state, 'user.data', {});
-	const localRelevancy = get(state, `$getLocalRelevancy.${appName}`, null);
+	const localRelevancy = get(state, ['$getLocalRelevancy', appName], null);
 	return {
 		appName,
 		mappings: isEmpty(parsedMappings) ? [] : parsedMappings,

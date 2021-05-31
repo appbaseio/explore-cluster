@@ -799,8 +799,8 @@ ReviewAndSave.defaultProps = {
 
 const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');
-	const localRelevancy = get(state, `$getLocalRelevancy.${appName}`);
-	const localMapping = get(state, `$getLocalMapping.${appName}`);
+	const localRelevancy = get(state, ['$getLocalRelevancy', appName], null);
+	const localMapping = get(state, ['$getLocalMapping', appName], null);
 	const defaultSettings = get(state, `$getAppSettings.defaultSettings`);
 	const settings = get(state, ['$getAppSettings', 'settings', appName], defaultSettings);
 	const { username, password } = get(state, 'user.data', {});

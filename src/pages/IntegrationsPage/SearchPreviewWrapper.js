@@ -310,7 +310,7 @@ const mapStateToProps = (state) => {
 	const errorCode = get(state, '$getAppSettings.error.actual.code');
 	const defaultSearchSettings = errorCode === 404 ? defaultSettings : null;
 	const appName = get(state, '$getCurrentApp.name');
-	const localRelevancy = get(state, `$getLocalRelevancy.${appName}`, null);
+	const localRelevancy = get(state, ['$getLocalRelevancy', appName], null);
 	const { username, password } = get(state, 'user.data') || {};
 
 	return {

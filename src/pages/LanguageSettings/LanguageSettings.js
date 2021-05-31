@@ -78,7 +78,6 @@ class LanguageSettings extends React.Component {
 			settings,
 			localRelevancy,
 		} = this.props;
-
 		if (settings && !localRelevancy) {
 			this.init({ ...settings });
 		} else {
@@ -156,7 +155,6 @@ class LanguageSettings extends React.Component {
 				</React.Fragment>
 			);
 		}
-
 		if (isLoading || !localRelevancy || !get(localRelevancy, `language`, null)) {
 			return (
 				<Card>
@@ -299,7 +297,7 @@ const mapStateToProps = (state) => {
 	const mappings = getRawMappingsByAppName(state) || null;
 
 	const { username, password } = get(state, 'user.data', {});
-	const localRelevancy = get(state, `$getLocalRelevancy.${appName}`, null);
+	const localRelevancy = get(state, ['$getLocalRelevancy', appName], null);
 	return {
 		appName,
 		isLoading: get(state, '$getAppSettings.isFetching'),

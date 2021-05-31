@@ -138,7 +138,7 @@ const newCategories = {
 export const defaultAclOptions = aclOptions;
 
 export const getDefaultAclOptionsByVersion = (appbaseVersion) => {
-	const categories = aclOptions;
+	const categories = [...aclOptions];
 	Object.keys(newCategories).forEach((category) => {
 		if (versionCompare(appbaseVersion, newCategories[category]) !== -1) {
 			categories.push(category);
