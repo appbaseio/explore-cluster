@@ -1,19 +1,18 @@
 export default {
-	text: ['integer', 'long', 'float', 'double', 'date', 'boolean', 'rank_feature'],
+	text: ['keyword', 'integer', 'long', 'float', 'double', 'date', 'boolean', 'rank_feature'],
+	keyword: ['text', 'integer', 'long', 'float', 'double', 'date', 'boolean', 'rank_feature'],
 	object: [],
 
-	integer: ['float', 'long', 'text', 'rank_feature'],
-	long: ['integer', 'text', 'float', 'rank_feature'],
-	float: ['integer', 'double', 'text', 'rank_feature'],
-	double: ['integer', 'float', 'text', 'rank_feature'],
+	integer: ['text', 'keyword', 'float', 'long', 'rank_feature'],
+	long: ['text', 'keyword', 'integer', 'float', 'rank_feature'],
+	float: ['text', 'keyword', 'integer', 'double', 'rank_feature'],
+	double: ['text', 'keyword', 'integer', 'float', 'rank_feature'],
 
-	keyword: ['text', 'integer', 'long', 'float', 'double', 'date', 'boolean', 'rank_feature'],
+	date: ['text', 'keyword'],
+	geo_point: ['text', 'keyword'],
+	geo_shape: ['text', 'keyword'],
+	boolean: ['text', 'keyword'],
 
-	date: ['text'],
-	geo_point: ['text'],
-	geo_shape: ['text'],
-	boolean: ['text'],
-
-	rank_feature: ['text', 'integer', 'long', 'float', 'double'],
+	rank_feature: ['text', 'keyword', 'integer', 'long', 'float', 'double'],
 	rank_features: [],
 };
