@@ -197,6 +197,7 @@ class MappingsWrapper extends React.Component {
 		let updatedType = null;
 		let updatedFlattenUsecase = null;
 		let updatedFlattenType = null;
+
 		data.forEach((item) => {
 			const { path, type: fieldType, usecase: fieldUseCase } = item;
 			updatedMappings = updateMapping({
