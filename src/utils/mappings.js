@@ -18,6 +18,7 @@ export const getMappingsInfo = ({
 		enableSynonyms,
 		language,
 	});
+
 	const ES_VERSION = getVersion();
 
 	if (!ES_VERSION) {
@@ -53,6 +54,10 @@ export const getMappingsInfo = ({
 
 const _getMappingsUsecase = (mappings) => {
 	return Object.keys(mappings).reduce((agg, item) => {
+		const type = get(mappings, `${item}.type`, ``);
+		if (type === 'nested') {
+			return agg;
+		}
 		return {
 			...agg,
 			[item]: get(mappings, `${item}.properties`)
@@ -64,6 +69,10 @@ const _getMappingsUsecase = (mappings) => {
 
 const _getMappingsType = (mappings) => {
 	return Object.keys(mappings).reduce((agg, item) => {
+		const type = get(mappings, `${item}.type`, ``);
+		if (type === 'nested') {
+			return agg;
+		}
 		return {
 			...agg,
 			[item]: get(mappings, `${item}.properties`)
@@ -329,9 +338,11 @@ export const updateSubFields = ({
 	const mappingFields = Object.keys(get(mappings, TOP_FIELD, {}));
 
 	const updatedMappings = mappingFields.reduce((agg, field) => {
-		if (get(mappings, `properties.${field}.properties`, null)) {
+		const type = get(mappings, `properties.${field}.type`);
+		if (get(mappings, `properties.${field}.properties`, null) && type !== 'nested') {
 			return {
 				...agg,
+
 				properties: {
 					...agg.properties,
 					[field]: updateSubFields({
@@ -343,7 +354,7 @@ export const updateSubFields = ({
 				},
 			};
 		}
-		const type = get(mappings, `properties.${field}.type`);
+
 		const fields = {
 			..._getFieldsByRelevancy({
 				enableSynonyms,
@@ -359,6 +370,7 @@ export const updateSubFields = ({
 			properties: {
 				...agg.properties,
 				[field]: {
+					type,
 					...get(mappings, `properties.${field}`, {}),
 					...(Object.keys(fields).length ? { fields } : {}),
 				},
@@ -469,15 +481,18 @@ export const applyNgramMapping = (mappings, isNgramEnabled) => {
 	const updatedMappings = Object.keys(mappings).reduce((agg, field) => {
 		const fieldVal = { ...get(mappings, field) };
 		let updatedData = { ...agg };
+		const type = get(fieldVal, 'type', ``);
 		if (get(fieldVal, 'properties', null)) {
 			// recursive call the function
+
 			updatedData = {
 				...updatedData,
 				[field]: {
+					type,
 					properties: applyNgramMapping(get(fieldVal, 'properties'), isNgramEnabled),
 				},
 			};
-		} else if (get(fieldVal, 'type') === 'text') {
+		} else if (type === 'text') {
 			if (!isNgramEnabled && get(fieldVal, 'fields.search', null)) {
 				// remove the .search field
 				delete fieldVal.fields.search;
@@ -547,15 +562,17 @@ export const applyLanguageMapping = (mappings, language) => {
 	const updatedMappings = Object.keys(mappings).reduce((agg, field) => {
 		const fieldVal = { ...get(mappings, field) };
 		let updatedData = { ...agg };
+		const type = get(fieldVal, 'type', ``);
 		if (get(fieldVal, 'properties', null)) {
 			// recursive call the function
 			updatedData = {
 				...updatedData,
 				[field]: {
+					type,
 					properties: applyNgramMapping(get(fieldVal, 'properties'), language),
 				},
 			};
-		} else if (get(fieldVal, 'type') === 'text') {
+		} else if (type === 'text') {
 			updatedData = {
 				...updatedData,
 				[field]: {
