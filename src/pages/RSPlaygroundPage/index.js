@@ -6,8 +6,12 @@ import { connect } from 'react-redux';
 import { getURL } from '../../constants/config';
 
 const RSPlaygroundPage = (props) => {
-	const { username, password } = props;
-	const rsURL = username && password ? `https:${username}:${password}@${getURL()}` : null;
+	const { username, password, currentIndexName } = props;
+	const rsHost = new URL(getURL()).host;
+	const rsURL =
+		username && password
+			? `https://${username}:${password}@${rsHost}/${currentIndexName}/_reactivesearch.v3`
+			: null;
 	return (
 		<section
 			style={{
@@ -28,17 +32,20 @@ const RSPlaygroundPage = (props) => {
 RSPlaygroundPage.propTypes = {
 	username: PropTypes.string,
 	password: PropTypes.string,
+	currentIndexName: PropTypes.string,
 };
 
 RSPlaygroundPage.defaultProps = {
 	username: '',
 	password: '',
+	currentIndexName: '',
 };
 
 const mapStateToProps = (state) => {
 	return {
 		username: get(state, 'user.data.username'),
 		password: get(state, 'user.data.password'),
+		currentIndexName: get(state, '$getCurrentApp.name'),
 	};
 };
 
