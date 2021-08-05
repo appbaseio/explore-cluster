@@ -124,6 +124,11 @@ const GradeEvaluation = Loadable({
 	loading: Loader,
 });
 
+const RSPlayground = Loadable({
+	loader: () => import(/* webpackChunkName: "RSPlaygroundPage" */ '../../pages/RSPlaygroundPage'),
+	loading: Loader,
+});
+
 class ClusterRouteContainer extends React.Component {
 	shouldComponentUpdate(nextProps) {
 		const { location, allowedRoutes } = this.props;
@@ -345,6 +350,19 @@ class ClusterRouteContainer extends React.Component {
 							<>
 								{get(allowedRoutes, '/cluster/search-preview') ? (
 									<AppPageContainer {...props} component={SandboxPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
+						)}
+					/>
+					<Route
+						exact
+						path="/cluster/rs-playground"
+						component={(props) => (
+							<>
+								{get(allowedRoutes, '/cluster/rs-playground') ? (
+									<AppPageContainer {...props} component={RSPlayground} />
 								) : (
 									<UnauthorizedPage />
 								)}
