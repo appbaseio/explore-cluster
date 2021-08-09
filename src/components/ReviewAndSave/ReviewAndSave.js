@@ -656,6 +656,7 @@ class ReviewAndSave extends React.Component {
 				if (shouldUpdateSettings) {
 					reIndexingData.settings = updatedSettings;
 				}
+
 				const reIndexPromise = reIndex(reIndexingData);
 
 				reIndexPromise

@@ -27,6 +27,7 @@ import { allowedTiers } from '../../../utils/prop-types';
 import ErrorToaster from '../../../batteries/components/shared/ErrorToaster';
 import { withErrorToaster } from '../../../batteries/components/shared/ErrorToaster/ErrorToaster';
 import SandboxContext from './SandboxContext';
+import { versionCompare } from '../../../batteries/utils/helpers';
 
 const container = css`
 	padding: 16px;
@@ -35,6 +36,23 @@ const container = css`
 		margin-bottom: 16px;
 	}
 `;
+
+const getDataFieldsWithWeights = (searchableMappings = {}, appbaseVersion) => {
+	// apply dataField new format for appbase version >= 7.47.0
+	const versionComparison = versionCompare(appbaseVersion, '7.47.0');
+	if ([0, 1].includes(versionComparison)) {
+		return {
+			dataField: Object.keys(searchableMappings).map((field) => ({
+				field,
+				weight: Number(searchableMappings[field]),
+			})),
+		};
+	}
+	return {
+		dataField: Object.keys(searchableMappings),
+		fieldWeights: Object.values(searchableMappings).map((i) => Number(i)),
+	};
+};
 
 class SearchPreview extends React.Component {
 	state = {
@@ -206,9 +224,9 @@ class SearchPreview extends React.Component {
 						),
 						{
 							...searchQuery,
-							dataField: Object.keys(state.searchableMappings),
-							fieldWeights: Object.values(state.searchableMappings).map((i) =>
-								Number(i),
+							...getDataFieldsWithWeights(
+								state.searchableMappings,
+								props.appbaseVersion,
 							),
 						},
 					],
@@ -239,8 +257,7 @@ class SearchPreview extends React.Component {
 					...props.settings,
 					search: {
 						...get(props, 'settings.search', {}),
-						dataField: Object.keys(state.searchableMappings),
-						fieldWeights: Object.values(state.searchableMappings).map((i) => Number(i)),
+						...getDataFieldsWithWeights(state.searchableMappings, props.appbaseVersion),
 					},
 				}),
 			};
@@ -261,8 +278,7 @@ class SearchPreview extends React.Component {
 			return {
 				settings: generateQuery({
 					search: {
-						dataField: Object.keys(state.searchableMappings),
-						fieldWeights: Object.values(state.searchableMappings).map((i) => Number(i)),
+						...getDataFieldsWithWeights(state.searchableMappings, props.appbaseVersion),
 					},
 					results: {
 						dataField: '_score',
@@ -519,6 +535,7 @@ const mapStateToProps = (state, props) => {
 		featureGrade: get(state, '$getAppPlan.results.feature_search_grader'),
 		searchState: get(state, '$getSearchState.parsedSearchState', null),
 		featureRules: get(state, '$getAppPlan.results.feature_rules', false),
+		appbaseVersion: get(state, '$getAppPlan.results.version'),
 	};
 };
 
@@ -554,6 +571,7 @@ SearchPreview.propTypes = {
 	onChange: PropTypes.func,
 	value: PropTypes.array,
 	selectButtonLabel: PropTypes.string,
+	appbaseVersion: PropTypes.string.isRequired, // eslint-disable-line
 };
 
 SearchPreview.defaultProps = {
