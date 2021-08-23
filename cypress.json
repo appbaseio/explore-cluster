@@ -17,5 +17,10 @@
 				"cluster": "appbase-demo-ansible-abxiydt-arc.searchbase.io"
 			}
 		}
-	}
+	},
+	"retries": {
+    "runMode": 3,
+    "openMode": 2
+  },
+  "chromeWebSecurity": false
 }

@@ -5,6 +5,9 @@ let indexName = '';
 
 describe('Searchable fields remove test flow', () => {
 	before(() => {
+		cy.window().then((win) => {
+			win.sessionStorage.clear();
+		});
 		indexName = generateName();
 	});
 
@@ -163,20 +166,19 @@ describe('Searchable fields remove test flow', () => {
 			.get('[data-cy=old-weight]')
 			.eq(21)
 			.should('contain', 'N/A');
+
+		cy.get('[data-cy=cancel-modal-button]').click();
 	});
 
 	it('Should delete index', () => {
-		cy.visit(`${base_url}/`)
-			.wait(1000)
-			.get(`[data-cy=delete-app-${indexName}]`)
-			.click({ multiple: true, force: true })
-			.wait(1000)
-			.get(`[data-cy=delete-index-name]`)
-			.click()
-			.type(`${indexName}`)
-			.wait(1000)
-			.get(`[data-cy=delete-index-${indexName}]`)
-			.click();
+		let credentials = btoa(`${username}:${password}`);
+		cy.request({
+			method: 'DELETE',
+			url: `${app_url}${indexName}`,
+			headers: {
+				Authorization: `Basic ${credentials}`,
+			},
+		});
 	});
 
 	it('Should logout user', () => {

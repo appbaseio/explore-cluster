@@ -5,6 +5,9 @@ let indexName = '';
 
 describe('Update field schema settings test flow', () => {
 	before(() => {
+		cy.window().then((win) => {
+			win.sessionStorage.clear();
+		});
 		indexName = generateName();
 	});
 
@@ -71,7 +74,7 @@ describe('Update field schema settings test flow', () => {
 	});
 
 	it('Should change the datatype of rating from text to integer', () => {
-		cy.get('[data-cy=data-type-rating]').click().type('{enter}{enter}').wait(5000);
+		cy.get('[data-cy=data-type-rating]').click().type('{enter}{downarrow}{enter}').wait(5000);
 	});
 
 	it('Should confirm the data type of rating is integer before confirm mapping', () => {
@@ -100,17 +103,14 @@ describe('Update field schema settings test flow', () => {
 	});
 
 	it('Should delete index', () => {
-		cy.visit(`${base_url}/`)
-			.wait(1000)
-			.get(`[data-cy=delete-app-${indexName}]`)
-			.click({ multiple: true, force: true })
-			.wait(1000)
-			.get(`[data-cy=delete-index-name]`)
-			.click()
-			.type(`${indexName}`)
-			.wait(1000)
-			.get(`[data-cy=delete-index-${indexName}]`)
-			.click();
+		let credentials = btoa(`${username}:${password}`);
+		cy.request({
+			method: 'DELETE',
+			url: `${app_url}${indexName}`,
+			headers: {
+				Authorization: `Basic ${credentials}`,
+			},
+		});
 	});
 
 	it('Should logout user', () => {

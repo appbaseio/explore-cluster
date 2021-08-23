@@ -5,6 +5,9 @@ let appName = '';
 
 describe('Interactive Tutorial', () => {
 	before(() => {
+		cy.window().then((win) => {
+			win.sessionStorage.clear();
+		});
 		appName = generateName();
 	});
 	it('Should skip tutorial section and route to dashboard', () => {
