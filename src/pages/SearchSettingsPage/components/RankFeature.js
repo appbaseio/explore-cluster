@@ -134,7 +134,7 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 					[field]: {
 						[functionName]: {
 							...get(localRelevancy, `search.rankFeature`)[field][functionName],
-							[param]: Math.abs(val).toFixed(1),
+							[param]: parseFloat(Math.abs(val).toFixed(1)),
 						},
 					},
 				},
@@ -231,7 +231,14 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 									}}
 									placeholder="default"
 									onBlur={(val) => {
-										handleParamChange(fieldPath, functionName, 'pivot', val);
+										if (val) {
+											handleParamChange(
+												fieldPath,
+												functionName,
+												'pivot',
+												val,
+											);
+										}
 									}}
 								/>
 							)}
@@ -264,12 +271,14 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 										key={`${functionName}-pivot-${field}`}
 										placeholder="default"
 										onBlur={(val) => {
-											handleParamChange(
-												fieldPath,
-												functionName,
-												'pivot',
-												val,
-											);
+											if (val) {
+												handleParamChange(
+													fieldPath,
+													functionName,
+													'pivot',
+													val,
+												);
+											}
 										}}
 									/>
 									<NumberInput
