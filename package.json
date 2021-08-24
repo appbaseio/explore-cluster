@@ -46,7 +46,7 @@
 		"compression-webpack-plugin": "^4.0.0",
 		"copy-webpack-plugin": "^5.1.1",
 		"css-loader": "^1.0.0",
-		"cypress": "^4.11.0",
+		"cypress": "^5.0.0",
 		"cypress-plugin-tab": "^1.0.5",
 		"cypress-terminal-report": "^1.4.1",
 		"cypress-xpath": "^1.6.1",

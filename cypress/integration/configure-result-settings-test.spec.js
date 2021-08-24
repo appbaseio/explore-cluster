@@ -5,6 +5,9 @@ let indexName = '';
 
 describe('Configure result settings without reindexing test flow', () => {
 	before(() => {
+		cy.window().then((win) => {
+			win.sessionStorage.clear();
+		});
 		indexName = generateName();
 	});
 
@@ -123,20 +126,18 @@ describe('Configure result settings without reindexing test flow', () => {
 			.should('contain', '5')
 			.get(`[data-cy=new-value-number_of_fragments-status]`)
 			.should('contain', '6');
+		cy.get('[data-cy=review-save-button]').click().wait(5000);
 	});
 
 	it('Should delete index', () => {
-		cy.visit(`${base_url}/`)
-			.wait(1000)
-			.get(`[data-cy=delete-app-${indexName}]`)
-			.click({ multiple: true, force: true })
-			.wait(1000)
-			.get(`[data-cy=delete-index-name]`)
-			.click()
-			.type(`${indexName}`)
-			.wait(1000)
-			.get(`[data-cy=delete-index-${indexName}]`)
-			.click();
+		let credentials = btoa(`${username}:${password}`);
+		cy.request({
+			method: 'DELETE',
+			url: `${app_url}${indexName}`,
+			headers: {
+				Authorization: `Basic ${credentials}`,
+			},
+		});
 	});
 
 	it('Should logout user', () => {

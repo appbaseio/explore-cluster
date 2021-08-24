@@ -5,6 +5,9 @@ let indexName = '';
 
 describe('Aggregation fields add test flow', () => {
 	before(() => {
+		cy.window().then((win) => {
+			win.sessionStorage.clear();
+		});
 		indexName = generateName();
 	});
 
@@ -104,17 +107,14 @@ describe('Aggregation fields add test flow', () => {
 	});
 
 	it('Should delete index', () => {
-		cy.visit(`${base_url}/`)
-			.wait(1000)
-			.get(`[data-cy=delete-app-${indexName}]`)
-			.click({ multiple: true, force: true })
-			.wait(1000)
-			.get(`[data-cy=delete-index-name]`)
-			.click()
-			.type(`${indexName}`)
-			.wait(1000)
-			.get(`[data-cy=delete-index-${indexName}]`)
-			.click();
+		let credentials = btoa(`${username}:${password}`);
+		cy.request({
+			method: 'DELETE',
+			url: `${app_url}${indexName}`,
+			headers: {
+				Authorization: `Basic ${credentials}`,
+			},
+		});
 	});
 
 	it('Should logout user', () => {

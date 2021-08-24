@@ -752,6 +752,7 @@ class ReviewAndSave extends React.Component {
 					okText="Review and Save"
 					confirmLoading={isSaving}
 					onCancel={this.handleCancel}
+					cancelButtonProps={{ 'data-cy': 'cancel-modal-button' }}
 					okButtonProps={{
 						'data-cy': 'review-save-button',
 					}}

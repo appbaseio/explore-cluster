@@ -6,6 +6,9 @@ let indexName = '',
 
 describe('Clone settings test flow', () => {
 	before(() => {
+		cy.window().then((win) => {
+			win.sessionStorage.clear();
+		});
 		indexName = generateName();
 		indexName2 = indexName + '-2';
 	});
@@ -147,28 +150,22 @@ describe('Clone settings test flow', () => {
 			.should('have.value', '4.0');
 	});
 
-	it('Should delete the indexs', () => {
-		cy.visit(`${base_url}/`)
-			.wait(1000)
-			.get(`[data-cy=delete-app-${indexName}]`)
-			.click({ multiple: true, force: true })
-			.wait(1000)
-			.get(`[data-cy=delete-index-name]`)
-			.click()
-			.type(`${indexName}`)
-			.wait(1000)
-			.get(`[data-cy=delete-index-${indexName}]`)
-			.click()
-			.wait(2000)
-			.get(`[data-cy=delete-app-${indexName2}]`)
-			.click({ multiple: true, force: true })
-			.wait(1000)
-			.get(`[data-cy=delete-index-name]`)
-			.click()
-			.type(`${indexName2}`)
-			.wait(1000)
-			.get(`[data-cy=delete-index-${indexName2}]`)
-			.click();
+	it('Should delete indices', () => {
+		let credentials = btoa(`${username}:${password}`);
+		cy.request({
+			method: 'DELETE',
+			url: `${app_url}${indexName}`,
+			headers: {
+				Authorization: `Basic ${credentials}`,
+			},
+		});
+		cy.request({
+			method: 'DELETE',
+			url: `${app_url}${indexName2}`,
+			headers: {
+				Authorization: `Basic ${credentials}`,
+			},
+		});
 	});
 
 	it('Should logout user', () => {
