@@ -74,14 +74,14 @@ class QueryView extends React.Component {
 		return (
 			<React.Fragment>
 				<Typography.Text className={headingStyle} strong>
-					Request Body
+					Raw Request
 				</Typography.Text>
 				<div
 					style={{
 						position: 'relative',
 						height: '500px',
 						width: '100%',
-						border: '1px solid black',
+						border: '1px solid #cccccc',
 					}}
 				>
 					<RSPlayground
