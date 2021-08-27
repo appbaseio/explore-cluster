@@ -13,7 +13,6 @@ export const APP_ROUTES = {
 			{ label: 'Browse Data', link: 'browse' },
 			{ label: 'Request Logs', link: 'request-logs' },
 			{ label: 'Search Preview', link: 'search-preview', tag: 'Beta' },
-			{ label: 'Reactive Search Playground', link: 'rs-playground' },
 		],
 	},
 	'Search Relevancy': {
@@ -130,7 +129,6 @@ export const CLUSTER_ROUTES = {
 				tag: 'Beta',
 				openIndexMenu: true,
 			},
-			{ label: 'Reactive Search Playground', link: 'rs-playground', openIndexMenu: true },
 		],
 	},
 	'Search Relevancy': {

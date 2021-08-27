@@ -44,11 +44,6 @@ const ImporterPage = Loadable({
 	loading: Loader,
 });
 
-const RSPlaygroundPage = Loadable({
-	loader: () => import(/* webpackChunkName: "RSPlaygroundPage" */ '../../pages/RSPlaygroundPage'),
-	loading: Loader,
-});
-
 const MappingsPage = Loadable({
 	loader: () => import(/* webpackChunkName: "MappingsPage" */ '../../pages/MappingsPage'),
 	loading: Loader,
@@ -188,24 +183,6 @@ class RouteContainer extends React.Component {
 									<AppPageContainer
 										{...props}
 										component={ImporterPage}
-										shouldFetchAppInfo={false}
-										shouldFetchAppPlan={false}
-									/>
-								) : (
-									<UnauthorizedPage />
-								)}
-							</>
-						)}
-					/>
-					<Route
-						exact
-						path="/app/:appName/rs-playground"
-						render={(props) => (
-							<>
-								{get(allowedRoutes, 'rs-playground') ? (
-									<AppPageContainer
-										{...props}
-										component={RSPlaygroundPage}
 										shouldFetchAppInfo={false}
 										shouldFetchAppPlan={false}
 									/>
