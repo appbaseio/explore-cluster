@@ -14,6 +14,13 @@ const headingStyle = css`
 	display: block;
 `;
 
+const playgroundContainerStyle = css`
+	position: relative;
+	height: 500px;
+	width: 100%;
+	border: 1px solid #cccccc;
+`;
+
 class QueryView extends React.Component {
 	constructor(props) {
 		super(props);
@@ -76,14 +83,7 @@ class QueryView extends React.Component {
 				<Typography.Text className={headingStyle} strong>
 					Raw Request
 				</Typography.Text>
-				<div
-					style={{
-						position: 'relative',
-						height: '500px',
-						width: '100%',
-						border: '1px solid #cccccc',
-					}}
-				>
+				<div className={playgroundContainerStyle}>
 					<RSPlayground
 						presets={{
 							editorPresets: {
@@ -96,6 +96,7 @@ class QueryView extends React.Component {
 								showHeaders: false,
 								showSettings: false,
 							},
+							showPlaygroundLink: true,
 						}}
 					/>
 				</div>

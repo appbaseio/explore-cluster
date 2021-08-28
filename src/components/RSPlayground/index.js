@@ -10,7 +10,7 @@ const RSPlayground = (props) => {
 	const rsHost = new URL(getURL()).host;
 	const rsURL =
 		username && password
-			? `http://${username}:${password}@${rsHost}/${currentIndexName}/_reactivesearch.v3`
+			? `${window.location.protocol}//${username}:${password}@${rsHost}/${currentIndexName}/_reactivesearch.v3`
 			: null;
 	return (
 		<Playground
