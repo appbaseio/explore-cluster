@@ -9,9 +9,10 @@ const RSPlayground = (props) => {
 	const { username, password, currentIndexName, presets } = props;
 	const fetchedURL = new URL(getURL());
 	const rsHost = fetchedURL.host;
+	const rsProtocol = fetchedURL.protocol;
 	const rsURL =
 		username && password
-			? `${rsHost.protocol}//${username}:${password}@${rsHost}/${currentIndexName}/_reactivesearch.v3`
+			? `${rsProtocol}//${username}:${password}@${rsHost}/${currentIndexName}/_reactivesearch.v3`
 			: null;
 	return (
 		<Playground
