@@ -7,10 +7,11 @@ import { getURL } from '../../constants/config';
 
 const RSPlayground = (props) => {
 	const { username, password, currentIndexName, presets } = props;
-	const rsHost = new URL(getURL()).host;
+	const fetchedURL = new URL(getURL());
+	const rsHost = fetchedURL.host;
 	const rsURL =
 		username && password
-			? `${window.location.protocol}//${username}:${password}@${rsHost}/${currentIndexName}/_reactivesearch.v3`
+			? `${rsHost.protocol}//${username}:${password}@${rsHost}/${currentIndexName}/_reactivesearch.v3`
 			: null;
 	return (
 		<Playground
