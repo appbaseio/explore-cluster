@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Card, Col, Icon, Row, Tag } from 'antd';
+import { Card, Col, Icon, Row, Tag, Tooltip } from 'antd';
 import { css } from 'react-emotion';
 import { withRouter } from 'react-router-dom';
 import get from 'lodash/get';
@@ -89,15 +89,19 @@ function StatsBox(props) {
 		>
 			<span css={flex}>
 				{title} &nbsp;&nbsp;
-				<Tag>{get(data, 'status')}</Tag>
+				<Tooltip title="Indicates whether the index is open or closed for API requests">
+					<Tag>{get(data, 'status')}</Tag>
+				</Tooltip>
 			</span>
-			<span
-				style={{
-					backgroundColor:
-						get(data, 'health') === 'green' ? 'limegreen' : get(data, 'health'),
-				}}
-				className={colorBar}
-			/>
+			<Tooltip title="Indicates the status of index health">
+				<span
+					style={{
+						backgroundColor:
+							get(data, 'health') === 'green' ? 'limegreen' : get(data, 'health'),
+					}}
+					className={colorBar}
+				/>
+			</Tooltip>
 		</div>
 	);
 

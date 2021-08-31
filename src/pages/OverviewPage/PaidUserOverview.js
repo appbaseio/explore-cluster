@@ -71,10 +71,11 @@ class PaidUserOverview extends React.Component {
 			noResults,
 			appName,
 			searchVolume,
-			stats,
 			allowedActions,
+			appsData,
 		} = this.props;
 		const hasAnalytics = allowedActions.includes(ALLOWED_ACTIONS.ANALYTICS);
+
 		return (
 			<Container>
 				<Flex css={main} justifyContent="space-between">
@@ -88,7 +89,7 @@ class PaidUserOverview extends React.Component {
 							}}
 							showDelete={false}
 							title="Overview"
-							data={stats}
+							data={appsData ? appsData[appName] : {}}
 						/>
 					</div>
 					{hasAnalytics && (
@@ -137,10 +138,12 @@ PaidUserOverview.defaultProps = {
 	searchVolume: [],
 	popularSearches: [],
 	noResults: [],
+	appsData: {},
 };
 PaidUserOverview.propTypes = {
 	fetchAppAnalytics: PropTypes.func.isRequired,
 	appName: PropTypes.string.isRequired,
+	appsData: PropTypes.object,
 	searchVolume: PropTypes.array,
 	popularSearches: PropTypes.array,
 	noResults: PropTypes.array,
@@ -162,6 +165,7 @@ const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');
 	return {
 		appName,
+		appsData: get(state, 'apps.data', {}),
 		stats: get(state, ['apps.data', appName], {}),
 		popularSearches: get(analytics, 'popular_searches'),
 		noResults: get(analytics, 'no_results_searches'),
