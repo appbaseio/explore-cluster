@@ -20,6 +20,7 @@ export const APP_ROUTES = {
 		action: ALLOWED_ACTIONS.SEARCH_RELEVANCY,
 		menu: [
 			{ label: 'Language Settings', link: 'languages', tag: 'Beta' },
+			{ label: 'Suggestion Settings', link: 'suggestions', tag: 'Beta' },
 			{ label: 'Search Settings', link: 'search', tag: 'Beta' },
 			{ label: 'Aggregation Settings', link: 'aggs', tag: 'Beta' },
 			{ label: 'Result Settings', link: 'results', tag: 'Beta' },
@@ -140,6 +141,11 @@ export const CLUSTER_ROUTES = {
 				link: 'languages',
 				tag: 'Beta',
 				openIndexMenu: true,
+			},
+			{
+				label: 'Suggestion Settings',
+				link: 'suggestions',
+				tag: 'Beta',
 			},
 			{ label: 'Search Settings', link: 'search', tag: 'Beta', openIndexMenu: true },
 			{
