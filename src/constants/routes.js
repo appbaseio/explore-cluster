@@ -13,6 +13,7 @@ export const APP_ROUTES = {
 			{ label: 'Browse Data', link: 'browse' },
 			{ label: 'Request Logs', link: 'request-logs' },
 			{ label: 'Search Preview', link: 'search-preview', tag: 'Beta' },
+			{ label: 'Stored Queries', link: 'stored-queries' },
 		],
 	},
 	'Search Relevancy': {
@@ -129,6 +130,7 @@ export const CLUSTER_ROUTES = {
 				tag: 'Beta',
 				openIndexMenu: true,
 			},
+			{ label: 'Stored Queries', link: '/cluster/stored-queries' },
 		],
 	},
 	'Search Relevancy': {

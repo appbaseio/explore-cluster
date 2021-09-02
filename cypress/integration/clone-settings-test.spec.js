@@ -18,13 +18,7 @@ describe('Clone settings test flow', () => {
 	});
 
 	it('Should login from cluster URL', () => {
-		cy.get('[data-cy=cluster-url]')
-			.clear()
-			.type(`https://${username}:${password}@${cluster}`)
-			.wait(1000)
-			.blur()
-			.wait(1000);
-		cy.get('[data-cy=signin-button]').click();
+		cy.loginUser(username, password, cluster);
 	});
 
 	it('Should create new index', () => {
@@ -169,7 +163,7 @@ describe('Clone settings test flow', () => {
 	});
 
 	it('Should logout user', () => {
-		cy.get('[data-cy=logout-menu]').click().wait(1000).get('[data-cy=logout-button]').click();
+		cy.logoutUser();
 	});
 
 	after(() => {
