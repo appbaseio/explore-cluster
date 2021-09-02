@@ -106,6 +106,12 @@ const LanguagePage = Loadable({
 	loading: Loader,
 });
 
+const SuggestionsPage = Loadable({
+	loader: () =>
+		import(/* webpackChunkName: "LanguageSettings" */ '../../pages/SuggestionSettings'),
+	loading: Loader,
+});
+
 const SearchSettingsPage = Loadable({
 	loader: () =>
 		import(/* webpackChunkName: "SearchSettingsPage" */ '../../pages/SearchSettingsPage'),
@@ -411,7 +417,24 @@ class RouteContainer extends React.Component {
 							</>
 						)}
 					/>
-
+					<Route
+						exact
+						path="/app/:appName/suggestions"
+						render={(props) => (
+							<>
+								{get(allowedRoutes, 'suggestions') ? (
+									<AppPageContainer
+										{...props}
+										component={SuggestionsPage}
+										shouldFetchAppInfo={false}
+										shouldFetchAppPlan={false}
+									/>
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
+						)}
+					/>
 					<Route
 						exact
 						path="/app/:appName/search"
