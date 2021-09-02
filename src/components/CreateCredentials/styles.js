@@ -21,7 +21,7 @@ export default {
 		width: 100%;
 	`,
 	description: css`
-		font-size: 12px,
+		font-size: 12px;
 		font-weight: 100;
 	`,
 	serachResultsCls: css`

@@ -14,6 +14,8 @@ import {
 } from 'react-reactive-form';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
+import result from 'lodash/result';
+import find from 'lodash/find';
 import styles from './styles';
 import Flex from '../../batteries/components/shared/Flex';
 import Loader from '../../batteries/components/shared/Loader/Spinner';
@@ -35,18 +37,21 @@ import {
 	mapFormToValues,
 	mapValuesToForm,
 	getAllowedActionsByVersion,
+	defaultRateLimits,
 } from './utils';
 import Acl from './Acl';
 import WhiteList from './WhiteList';
 import PasswordInput from './PasswordInput';
 import { ALLOWED_ACTIONS_LABELS } from '../../constants';
 import SwitchGroup from '../SwitchGroup';
+import RsApiRestrictions from './RsApiRestrictions';
+import { versionCompare } from '../../batteries/utils/helpers';
 
 const { Option } = Select;
 
 const modal = css`
 	.ant-modal-content {
-		width: 580px;
+		width: 100%;
 	}
 	.input-error {
 		border-color: tomato;
@@ -95,12 +100,25 @@ class CreateCredentials extends React.Component {
 								new FormGroup({
 									acl: new FormControl(acl),
 									tag: new FormControl(true),
-									rateLimit: new FormControl(undefined, [Validators.min(1)]),
+									rateLimit: new FormControl(defaultRateLimits[acl], [
+										Validators.min(1),
+									]),
 								}),
 						),
 					),
 					referers: [{ value: ['*'], disabled: false }],
 					sources: [{ value: ['0.0.0.0/0'], disabled: false }],
+					rsApiRestrictions: new FormGroup({
+						maxQuerySize: new FormControl(undefined, [
+							Validators.min(0),
+							Validators.max(10000),
+						]),
+						maxAggregationSize: new FormControl(undefined, [
+							Validators.min(0),
+							Validators.max(100000),
+						]),
+						allowDirectDSL: new FormControl(true),
+					}),
 					indices: this.isApp
 						? [{ value: [props.appName], disabled: false }]
 						: [{ value: ['*'], disabled: false }],
@@ -180,7 +198,11 @@ class CreateCredentials extends React.Component {
 		}
 		if (initialValues) {
 			this.form.patchValue(
-				mapValuesToForm(JSON.parse(JSON.stringify(initialValues)), !isUserManagement),
+				mapValuesToForm(
+					JSON.parse(JSON.stringify(initialValues)),
+					!isUserManagement,
+					appbaseVersion,
+				),
 				{
 					emitEvent: !isUserManagement,
 				},
@@ -219,6 +241,7 @@ class CreateCredentials extends React.Component {
 		const indicesHandler = this.form.get('indices');
 		const adminHandler = this.form.get('isAdmin');
 		const categoriesHandler = this.form.get('categories');
+		const rsApiRestrictionsHandler = this.form.get('rsApiRestrictions');
 		const includeFieldsHandler = this.form.get('include_fields');
 		const excludeFieldsHandler = this.form.get('exclude_fields');
 		if (indicesHandler) {
@@ -236,6 +259,9 @@ class CreateCredentials extends React.Component {
 		if (categoriesHandler) {
 			categoriesHandler.valueChanges.unsubscribe();
 		}
+		if (rsApiRestrictionsHandler) {
+			rsApiRestrictionsHandler.valueChanges.unsubscribe();
+		}
 	}
 
 	getFilteredMappings = (mappings = {}, indices) => {
@@ -247,13 +273,16 @@ class CreateCredentials extends React.Component {
 			const compliedIndices = [];
 			indices.forEach((index) => {
 				Object.keys(mappings).forEach((originalIndex) => {
-					if (originalIndex.match(new RegExp(index.replace('*', '.*')))) {
+					if (
+						originalIndex.match(new RegExp(index.replace('*', '.*'))) &&
+						!originalIndex.startsWith('metricbeat')
+					) {
 						compliedIndices.push(originalIndex);
 					}
 				});
 			});
 			compliedIndices.forEach((index) => {
-				filteredMappings[index] = mappings[index];
+				filteredMappings[index] = mappings[index].filter((field) => !field.includes('.'));
 			});
 			return filteredMappings;
 		}
@@ -279,12 +308,24 @@ class CreateCredentials extends React.Component {
 	}
 
 	handleSubmit = () => {
-		const { onSubmit, isUserManagement } = this.props;
+		const { onSubmit, isUserManagement, appbaseVersion } = this.props;
 		this.form.mappedValues = JSON.parse(
-			JSON.stringify(mapFormToValues(this.form.value, !isUserManagement)),
+			JSON.stringify(mapFormToValues(this.form.value, !isUserManagement, appbaseVersion)),
 		);
 
 		onSubmit(this.form, get(this.props, 'initialValues.username'));
+	};
+
+	shouldRenderRsApiRestrictions = () => {
+		const { appbaseVersion } = this.props;
+		return (
+			result(
+				find(this.form.get('categories').value, (obj) => {
+					return obj.acl === 'reactivesearch';
+				}),
+				'tag',
+			) && versionCompare(appbaseVersion, '7.48.1') !== -1
+		);
 	};
 
 	render() {
@@ -352,6 +393,7 @@ class CreateCredentials extends React.Component {
 						}
 						visible={show}
 						onCancel={handleCancel}
+						width="750px"
 					>
 						{isLoadingMappings ? (
 							<Loader style={{ marginTop: '-100px', marginBottom: '120px' }} />
@@ -627,6 +669,23 @@ class CreateCredentials extends React.Component {
 													}}
 												/>
 											)}
+
+											{this.shouldRenderRsApiRestrictions() && (
+												<>
+													<Grid
+														label={
+															<b>ReactiveSearch API Restrictions</b>
+														}
+														gridRatio={1}
+														toolTipMessage={Messages.rsApiRestrictions}
+													/>
+													<RsApiRestrictions
+														control={this.form.get('rsApiRestrictions')}
+														Messages={Messages}
+													/>
+												</>
+											)}
+
 											<Grid
 												label="Fields Filtering"
 												toolTipMessage={Messages.fieldFiltering}

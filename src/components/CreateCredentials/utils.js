@@ -2,6 +2,7 @@ import isEqual from 'lodash/isEqual';
 import sortBy from 'lodash/sortBy';
 import get from 'lodash/get';
 import filter from 'lodash/filter';
+import find from 'lodash/find';
 import { getDefaultAllowedActions } from '../../utils/allowedActions';
 import { versionCompare } from '../../batteries/utils/helpers';
 import { ALLOWED_ACTIONS } from '../../constants';
@@ -89,50 +90,57 @@ export const Types = {
 	},
 };
 export const defaultRateLimits = {
-	docs: 10,
+	// Search related categories:
+	reactivesearch: 10,
+	analytics: 10,
+	storedquery: 10,
+	// Elasticsearch endpoints related categories:
 	search: 10,
+	docs: 10,
 	indices: 10,
-	cat: 10,
 	clusters: 10,
+	cat: 10,
 	misc: 10,
+	// ReactiveSearch and appbase.io plugins related categories:
+	searchrelevancy: 10,
+	suggestions: 10,
+	rules: 10,
+	synonyms: 10,
 	user: 10,
 	permission: 10,
-	analytics: 10,
-	streams: 10,
-	rules: 10,
-	reactivesearch: 10,
-	templates: 10,
-	suggestions: 10,
-	functions: 10,
-	searchrelevancy: 10,
-	synonyms: 10,
-	searchgrader: 10,
+	logs: 10,
+	auth: 10,
+	uibuilder: 10,
+	// new categories
 	cache: 10,
 };
 // Acl options
 export const aclOptions = [
-	'docs',
-	'search',
+	// Search related categories:
 	'reactivesearch',
+	'analytics',
+	// Elasticsearch endpoints related categories:
+	'search',
+	'docs',
 	'indices',
-	'cat',
 	'clusters',
+	'cat',
 	'misc',
+	// ReactiveSearch and appbase.io plugins related categories:
+	'searchrelevancy',
+	'suggestions',
+	'rules',
+	'synonyms',
 	'user',
 	'permission',
-	'analytics',
-	'streams',
-	'rules',
-	'suggestions',
-	'functions',
-	'searchgrader',
-	'searchrelevancy',
-	'synonyms',
-	'templates',
+	'logs',
+	'auth',
+	'uibuilder',
 ];
 // New categories to appbase version map
 const newCategories = {
-	cache: '7.42.0',
+	cache: { version: '7.42.0', insertAfter: 'searchrelevancy' },
+	storedquery: { version: '7.48.1', insertAfter: 'analytics' },
 };
 // Default Selected Acl
 export const defaultAclOptions = aclOptions;
@@ -140,8 +148,14 @@ export const defaultAclOptions = aclOptions;
 export const getDefaultAclOptionsByVersion = (appbaseVersion) => {
 	const categories = [...aclOptions];
 	Object.keys(newCategories).forEach((category) => {
-		if (versionCompare(appbaseVersion, newCategories[category]) !== -1) {
-			categories.push(category);
+		if (versionCompare(appbaseVersion, newCategories[category].version) !== -1) {
+			const insertAtIndex =
+				newCategories[category].insertAtIndex !== undefined
+					? newCategories[category].insertAtIndex
+					: categories.findIndex(
+							(element) => element === newCategories[category].insertAfter,
+					  ) + 1;
+			categories.splice(insertAtIndex, 0, category);
 		}
 	});
 	return categories;
@@ -163,25 +177,60 @@ export const getAllowedActionsByVersion = (appbaseVersion) => {
 };
 // Acl options label
 export const aclOptionsLabel = {
-	docs: 'Docs',
+	// Search related categories:
+	reactivesearch: 'ReactiveSearch',
+	analytics: 'Analytics',
+	storedquery: 'Stored Queries',
+	// Elasticsearch endpoints related categories:
 	search: 'Search',
+	docs: 'Docs',
 	indices: 'Indices',
-	cat: 'Cat',
 	clusters: 'Clusters',
+	cat: 'Cat',
 	misc: 'Misc',
+	// ReactiveSearch and appbase.io plugins related categories:
+	searchrelevancy: 'Search Relevancy',
+	suggestions: 'Suggestions',
+	rules: 'Rules',
+	synonyms: 'Synonyms',
 	user: 'User',
 	permission: 'Permission',
-	analytics: 'Analytics',
-	streams: 'Streams',
-	reactivesearch: 'Reactive Search',
-	rules: 'Rules',
-	templates: 'Templates',
-	suggestions: 'Popular Suggestions',
-	functions: 'Functions',
-	searchrelevancy: 'Search Relevancy',
-	synonyms: 'Synonyms',
-	searchgrader: 'Search Grader',
+	logs: 'Logs',
+	auth: 'Auth',
+	uibuilder: 'UI Builder',
+	// new Categories
 	cache: 'Cache',
+};
+
+// Acl options Message
+export const aclOptionsMessage = {
+	// Search related categories:
+	reactivesearch:
+		'Query via the ReactiveSearch API, a declarative opensource API to query Elasticsearch',
+	analytics:
+		'Track analytics and impressions, typically used together with the ReactiveSearch API',
+	storedquery:
+		'Allow white-listed queries, think parameterized Elasticsearch DSL to be used directly or in conjunction with ReactiveSearch API',
+	// Elasticsearch endpoints related categories:
+	search:
+		'Allow searching via the Elasticsearch Query DSL using _search, _msearch and similar actions',
+	docs: 'Allow CRUD operations on documents such as create, index, update, get, and delete',
+	indices: 'Allow index specific actions such as settings, mappings, open, close',
+	clusters: 'All cluster specific actions such as cluster nodes, tasks, remote, cat',
+	cat: 'All cat actions specifcally',
+	misc: 'Actions such as script, get, ingest, and snapshot',
+	// ReactiveSearch and appbase.io plugins related categories:
+	searchrelevancy: 'Allow search relevancy related actions',
+	suggestions: 'Allow suggestions related actions',
+	rules: 'Allow query rules related actions',
+	synonyms: 'Allow synonyms related actions',
+	user: 'Allow user related actions',
+	permission: 'Allow API credentials (aka permissions) related actions',
+	logs: ' Allow log related actions',
+	auth: 'Allow getting / setting public keys (for JWT auth)',
+	uibuilder: 'Allow UI builder related actions',
+	// new Categories
+	cache: 'Allow cache related actions',
 };
 
 const filterCategories = (value) => {
@@ -201,12 +250,13 @@ const filterCategories = (value) => {
 	};
 };
 
-const getCategories = (value) => {
+const getCategories = (value, appbaseVersion) => {
+	const valueCategories = get(value, 'categories', []);
 	const categories = [];
-	aclOptions.forEach((category) => {
+	getDefaultAclOptionsByVersion(appbaseVersion).forEach((category) => {
 		const obj = {
 			acl: category,
-			tag: get(value, 'categories', []).includes(category),
+			tag: valueCategories.includes(category),
 		};
 		if (value.limits) {
 			obj.rateLimit = value.limits[`${category}_limit`] || defaultRateLimits[category];
@@ -231,8 +281,11 @@ export const getOperationType = (value) => {
 	return operationType;
 };
 
-export const mapFormToValues = (value, hasLimits) => {
+export const mapFormToValues = (value, hasLimits, appbaseVersion) => {
 	const filteredCategories = filterCategories(value);
+	const shouldIncludeReactiveSearchConfig =
+		find(value.categories, { acl: 'reactivesearch' })?.tag &&
+		versionCompare(appbaseVersion, '7.48.1') !== -1;
 	const submitValues = {
 		indices: value.indices,
 		description: value.description,
@@ -249,6 +302,13 @@ export const mapFormToValues = (value, hasLimits) => {
 		exclude_fields: value.exclude_fields,
 		allowed_actions: value.allowedActions,
 		categories: hasLimits ? filteredCategories.categories : value.categories,
+		...(shouldIncludeReactiveSearchConfig && {
+			reactivesearchConfig: {
+				maxSize: parseInt(value.rsApiRestrictions.maxQuerySize, 10),
+				maxAggregationSize: parseInt(value.rsApiRestrictions.maxAggregationSize, 10),
+				disableQueryDSL: !value.rsApiRestrictions.allowDirectDSL,
+			},
+		}),
 	};
 
 	if (value.isAdmin) {
@@ -257,7 +317,7 @@ export const mapFormToValues = (value, hasLimits) => {
 	return submitValues;
 };
 
-export const mapValuesToForm = (value, hasLimits) => ({
+export const mapValuesToForm = (value, hasLimits, appbaseVersion) => ({
 	...value,
 	operationType: value.is_admin ? Types.admin : getOperationType(value),
 	ip_limit: get(value, 'limits.ip_limit'),
@@ -265,5 +325,12 @@ export const mapValuesToForm = (value, hasLimits) => ({
 	isAdmin: value.is_admin,
 	indices: value.indices ? filter(value.indices, (o) => o !== '') : undefined,
 	allowedActions: value.allowed_actions || getDefaultAllowedActions(value.is_admin),
-	...(hasLimits && { categories: getCategories(value) }),
+	...(hasLimits && { categories: getCategories(value, appbaseVersion) }),
+	...(value.reactivesearchConfig && {
+		rsApiRestrictions: {
+			maxQuerySize: get(value, 'reactivesearchConfig.maxSize'),
+			maxAggregationSize: get(value, 'reactivesearchConfig.maxAggregationSize'),
+			allowDirectDSL: !get(value, 'reactivesearchConfig.disableQueryDSL'),
+		},
+	}),
 });
