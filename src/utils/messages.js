@@ -57,19 +57,42 @@ export const credentialsMessages = {
 // Messages for popular suggestions
 export const suggestionsMessages = {
 	blacklist: Message('A list of queries which can be marked as blacklist.'),
-	external_suggestions: Message('Define your custom suggestions.'),
-	min_count: Message('Min value of count for the suggestions.'),
-	min_hits: Message('Define the minimum number of results that must present for a suggestion.'),
+	externalSuggestions: Message('Define your custom suggestions.'),
+	minCount: Message('Min value of count for the suggestions.'),
+	minHits: Message('Define the minimum number of results that must present for a suggestion.'),
 	min_chars: Message(
 		'Define the minimum number of characters that must be present for a suggestion.',
 	),
-	transform_diacritics: Message(
+	transformDiacritics: Message(
 		'If enabled then Appbase will transform(strip) the diacritics before populating the suggestions. For an example, "Crème Brulée" becomes "Creme Brulee".',
 	),
-	number_of_days: Message(
+	numberOfDays: Message(
 		'Define the number of days after which you want to re-calculate the suggestions.',
 	),
+	size: Message('Maximum number of popular suggestions to be displayed.'),
 	indices: Message('Only selected indices will be considered to calculate the suggestions.'),
+	showDistinctSuggestions: Message(
+		'Show only up to 1 suggestion per document (i.e. record). If set to false, multiple suggestions can be shown when relevant (based on different matching fields) from the same document.',
+	),
+	enablePredictiveSuggestions: Message(
+		'Defaults to false. When set to true, it predicts the next relevant words from a fields value based on the search query typed by the user. When set to false (default), the entire fields value would be displayed.',
+	),
+	maxPredictedWords: Message('Maximum number of predicted words.'),
+	applyStopwords: Message(
+		'Enable or disable application of default stopwords. Enabled by default.',
+	),
+	customStopwords: Message(
+		'Set comma separated stopwords to be ignored during the language specifc analysis process.',
+	),
+	enableSynonyms: Message('Allow synonyms.'),
+	categoryField: Message(
+		'When specified, suggestions will show category specific suggestions based on the most frequent values based on this field.',
+	),
+	includeFields: Message('Fields to include in the search results.'),
+	excludeFields: Message('Fields to exclude from the search results'),
+	customQuery: Message(
+		'Specify a custom stored query to execute instead of the default suggestions query. This is an advanced setting.',
+	),
 };
 
 export const cacheMessages = {
