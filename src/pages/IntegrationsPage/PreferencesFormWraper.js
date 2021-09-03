@@ -66,8 +66,15 @@ class PreferencesFormWrapper extends React.Component {
 				: {
 						// Search specific controls
 						showPopularSearches: false,
+						showRecentSuggestions: false,
+						enableAutoSuggestions: true,
+						enableVoiceSearch: true,
+						enablePredictiveSuggestions: false,
+						enableSuggestionsHighlights: false,
 						showSelectedFilters: true,
 						showPagination: false,
+						showResultView: 'grid',
+						showResultViewSwitcher: true,
 						customMessages: FormBuilder.group({
 							resultStats: '[count] products found in [time] ms',
 							noFilterItem: 'No items Found',
@@ -168,6 +175,16 @@ class PreferencesFormWrapper extends React.Component {
 				}
 			}
 		});
+
+		this.form.get('enableAutoSuggestions').valueChanges.subscribe((value) => {
+			const autoSuggestionSettingsControl = this.form.get('autoSuggestionSettings');
+
+			if (value) {
+				autoSuggestionSettingsControl.enable();
+			} else {
+				autoSuggestionSettingsControl.disable();
+			}
+		});
 	}
 
 	componentDidUpdate(prevProps) {
@@ -197,8 +214,8 @@ class PreferencesFormWrapper extends React.Component {
 				resetFormArrayControls();
 				// Add controls for dynamic filters
 				const dynamicFilterControl = this.form.get('dynamicFilters');
-				get(preferences, 'facetSettings.dynamicFacets', []).forEach((index) => {
-					const control = getFilterConfigurationForm(null, true);
+				get(preferences, 'facetSettings.dynamicFacets', []).forEach((data, index) => {
+					const control = getFilterConfigurationForm(data.rsConfig, true);
 					control.meta = {
 						key: getDynamicFilterKey(index),
 					};
@@ -272,6 +289,8 @@ class PreferencesFormWrapper extends React.Component {
 							resultPrice: get(preferences, 'resultSettings.fields.price'),
 							resultImage: get(preferences, 'resultSettings.fields.image'),
 							resultHandle: get(preferences, 'resultSettings.fields.handle'),
+							showResultView: get(preferences, 'resultSettings.layout'),
+							showResultViewSwitcher: get(preferences, 'resultSettings.viewSwitcher'),
 							exportSettings: get(preferences, 'exportSettings'),
 							storeInfo: {
 								currency: get(preferences, 'globalSettings.currency'),
@@ -325,6 +344,27 @@ class PreferencesFormWrapper extends React.Component {
 										showPopularSearches: get(
 											preferences,
 											'searchSettings.rsConfig.enablePopularSuggestions',
+										),
+										// add search settings here - 'searchSettings.rsConfig.<KEY_NAME)>'
+										showRecentSuggestions: get(
+											preferences,
+											'searchSettings.rsConfig.showRecentSuggestions',
+										),
+										enablePredictiveSuggestions: get(
+											preferences,
+											'searchSettings.rsConfig.enablePredictiveSuggestions',
+										),
+										enableSuggestionsHighlights: get(
+											preferences,
+											'searchSettings.rsConfig.enableSuggestionsHighlights',
+										),
+										enableAutoSuggestions: get(
+											preferences,
+											'searchSettings.rsConfig.enableAutoSuggestions',
+										),
+										enableVoiceSearch: get(
+											preferences,
+											'searchSettings.rsConfig.enableVoiceSearch',
 										),
 										showSelectedFilters: get(
 											preferences,
