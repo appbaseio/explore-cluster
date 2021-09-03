@@ -1,6 +1,6 @@
 import React from 'react';
 import { FieldControl } from 'react-reactive-form';
-import { Switch, Form, List } from 'antd';
+import { Switch, Form, List, Radio } from 'antd';
 import { bool, array } from 'prop-types';
 import DataFieldSelector from '../../../../components/Form/DataFieldSelector';
 
@@ -13,6 +13,16 @@ export const defaultSettings = [
 	{
 		id: 'showSelectedFilters',
 		label: 'Show active filter tags',
+		value: true,
+	},
+	{
+		id: 'showResultView',
+		label: 'Show results as:',
+		value: true,
+	},
+	{
+		id: 'showResultViewSwitcher',
+		label: 'Show results view switcher',
 		value: true,
 	},
 	{
@@ -87,25 +97,50 @@ const Results = ({ withoutForm, dataSource }) => {
 			dataSource={dataSource}
 			bordered
 			renderItem={(item) => (
-				<FieldControl name={item.id}>
-					{({ value, onChange }) => (
-						<Item
-							actions={
-								fieldSelectorIds.includes(item.id)
-									? [<DataFieldSelector name={item.id} />]
-									: [<Switch checked={value} onChange={onChange} />]
-							}
-						>
-							<Item.Meta
-								title={
-									typeof item.label === 'function'
-										? item.label(value)
-										: item.label
-								}
-							/>
-						</Item>
+				<>
+					{item.id === 'showResultView' ? (
+						<FieldControl name={item.id}>
+							{(control) => (
+								<Item
+									actions={[
+										<Radio.Group
+											{...control.handler()}
+											onChange={(value) => {
+												control.markAsTouched();
+												control.handler().onChange(value);
+											}}
+										>
+											<Radio value="grid">Grid</Radio>
+											<Radio value="list">List</Radio>
+										</Radio.Group>,
+									]}
+								>
+									<Item.Meta title={item.label} />
+								</Item>
+							)}
+						</FieldControl>
+					) : (
+						<FieldControl name={item.id}>
+							{({ value, onChange }) => (
+								<Item
+									actions={
+										fieldSelectorIds.includes(item.id)
+											? [<DataFieldSelector name={item.id} />]
+											: [<Switch checked={value} onChange={onChange} />]
+									}
+								>
+									<Item.Meta
+										title={
+											typeof item.label === 'function'
+												? item.label(value)
+												: item.label
+										}
+									/>
+								</Item>
+							)}
+						</FieldControl>
 					)}
-				</FieldControl>
+				</>
 			)}
 		/>
 	);

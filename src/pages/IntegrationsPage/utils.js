@@ -298,7 +298,7 @@ export const validateURL = (control) => {
 
 export const getFilterConfigurationForm = (customFields = {}, isDynamicFilter = false) => {
 	return FormBuilder.group({
-		enabled: false,
+		enabled: true,
 		customize: FormBuilder.group({
 			title: isDynamicFilter ? [undefined, Validators.required] : undefined,
 			dataField: isDynamicFilter ? [undefined, Validators.required] : undefined,
@@ -662,6 +662,8 @@ export const getSearchPreferencesPayload = (formValue) => {
 					pagination: !!get(formValue, 'showPagination'),
 					infiniteScroll: !get(formValue, 'showPagination'),
 				},
+				layout: get(formValue, 'showResultView'),
+				viewSwitcher: get(formValue, 'showResultViewSwitcher'),
 			},
 			searchSettings: {
 				customMessages: {
@@ -679,7 +681,20 @@ export const getSearchPreferencesPayload = (formValue) => {
 					handle: get(formValue, 'resultHandle'),
 				},
 				rsConfig: {
-					enablePopularSuggestions: get(formValue, 'showPopularSearches'),
+					enableAutoSuggestions: get(formValue, 'enableAutoSuggestions'),
+					enablePopularSuggestions: get(
+						formValue,
+						'autoSuggestionSettings.showPopularSearches',
+					),
+					enableRecentSearches: get(
+						formValue,
+						'autoSuggestionSettings.showRecentSuggestions',
+					),
+					enableSuggestionsHighlights: get(
+						formValue,
+						'autoSuggestionSettings.enableSuggestionsHighlights',
+					),
+					enableVoiceSearch: get(formValue, 'enableVoiceSearch'),
 				},
 			},
 			facetSettings: {
