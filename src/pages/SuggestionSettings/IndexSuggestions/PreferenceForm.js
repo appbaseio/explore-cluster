@@ -1,15 +1,28 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Input, Select, Button, Affix, Switch, Popover, Icon } from 'antd';
+import { Input, Select, Button, Affix, Switch, Popover, Icon, Form } from 'antd';
 import { css } from 'react-emotion';
+import isEmpty from 'lodash/isEmpty';
 import PropTypes from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import keys from 'lodash/keys';
+import {
+	setLocalRelevancyState,
+	getAppMappings,
+	getDefaultSettings,
+	getSettings,
+	getAppStoredQueries,
+} from '../../../batteries/modules/actions';
+import { getTraversedMappingsByAppName } from '../../../batteries/modules/selectors';
 import Grid from '../../../components/CreateCredentials/Grid';
+import { removeWhiteSpaces } from '../../../utils';
 import { suggestionsMessages as Messages } from '../../../utils/messages';
 import SearchPreviewSwitcher from '../../../components/SearchPreviewSwitcher';
+import MappingWrapper from '../../../components/MappingsWrapper/MappingsWrapper';
+import SettingTooltip from '../../../components/SettingTooltip';
 import styles from '../styles';
+import conversionMap from '../../../utils/conversionMap';
 
 const calculateValue = (value) => {
 	const index = value.indexOf('*');
@@ -40,6 +53,12 @@ const modal = css`
 const content = (message) => {
 	return <div>{message}</div>;
 };
+
+const getDisabled = (value) => {
+	if (Array.isArray(value)) return value[0] === '*';
+	return false;
+};
+
 
 const InputElement = ({ name, label, toolTipMessage, inputProps, placeholder }) => (
 	<FieldControl
@@ -102,7 +121,30 @@ InputElement.defaultProps = {
 };
 
 class PreferenceForm extends React.Component {
-	state = { visible: false };
+	state = { visible: false, aggregationField: undefined, customQueryField: '' };
+
+
+
+	componentDidMount() {
+		const {
+			appName,
+			getSettingsAction,
+			getDefaultSettingsAction,
+			defaultSettings,
+			settings,
+			localRelevancy,
+			fetchStoredQueries,
+		} = this.props;
+
+		fetchStoredQueries();
+		if (settings && !localRelevancy) {
+			this.init({ ...settings });
+		} else {
+			getSettingsAction(appName);
+		}
+		if (!defaultSettings) getDefaultSettingsAction();
+		this.getMappings();
+	}
 
 	toggleVisibility = () => {
 		this.setState((prevState) => ({
@@ -114,10 +156,115 @@ class PreferenceForm extends React.Component {
 		this.setState({ app, visible: true });
 	};
 
+	handleChange = (key, val, dataKey) => {
+		const { appName, localRelevancy, updateLocalRelevancy } = this.props;
+		let value = val;
+		if(key === 'customStopwords') {
+			value = val.split(',').map((i) => removeWhiteSpaces(i));
+		}
+
+		if (localRelevancy) {
+			updateLocalRelevancy(appName, {
+				...localRelevancy,
+				[dataKey]: {
+					...get(localRelevancy, dataKey),
+					[key]: value,
+				},
+			});
+		}
+	};
+
+	handleAggregationsChange = (name, value) => {
+		const { localRelevancy, updateLocalRelevancy, appName } = this.props;
+		updateLocalRelevancy(appName, {
+			...localRelevancy,
+			aggregations: {
+				...get(localRelevancy, `aggregations`, {}),
+				[name]: value,
+			},
+		});
+	};
+
+	init = (settings) => {
+		const { appName, updateLocalRelevancy, localRelevancy } = this.props;
+		if (!localRelevancy) {
+			updateLocalRelevancy(appName, { ...settings });
+		}
+	};
+
+	getMappings() {
+		const { appName, fetchMappings, credentials, mappings } = this.props;
+		if (credentials && get(mappings, 'length') === 0) {
+			// Fetch Mappings if permissions are present
+			fetchMappings(appName, credentials);
+		}
+	}
+
+	updateToAggsField = ({ path, flattenType }) => {
+		const { localRelevancy } = this.props;
+		const { dataField } = get(localRelevancy, `aggregations`);
+		const pathVal = get(flattenType, path) === 'text' ? `${path}.keyword` : path;
+
+		const aggType = 'term';
+		this.setState({ aggregationField: path });
+		this.handleAggregationsChange('dataField', { ...dataField, [pathVal]: aggType });
+	};
+
+	getAggsField = ({ flattenUsecase: usecases, flattenType: types }) => {
+
+		const { localRelevancy } = this.props;
+		const { dataField } = get(localRelevancy, `aggregations`);
+
+		if (usecases && types) {
+			const newAggsFields = Object.keys(types).reduce((agg, field) => {
+				if (types[field] === 'text') {
+					if (
+						usecases[field] !== 'search' &&
+						usecases[field] !== 'none' &&
+						!get(dataField, `${field}.keyword`, null)
+					) {
+						return [...agg, field];
+					}
+
+					return [...agg];
+				}
+
+				if (!get(dataField, `${field}`, null) && conversionMap[types[field]]) {
+					return [...agg, field];
+				}
+				return [...agg];
+			}, []);
+
+			return newAggsFields;
+		}
+
+		return [];
+	};
+
+
 	render() {
-		const { control, handleSaveTemplate, isLoading, indices, apps } = this.props;
-		const { visible, app } = this.state;
+		const {
+			control,
+			handleSaveTemplate,
+			isLoading,
+			indices,
+			apps,
+			localRelevancy,
+			mappings,
+			appName,
+			appStoredQueries,
+		} = this.props;
+		const { visible, app, aggregationField, customQueryField } = this.state;
 		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
+
+		const {
+			excludeFields,
+			includeFields,
+		} = localRelevancy ? get(localRelevancy, 'results') : {};
+
+		const { customStopwords } = get(localRelevancy,'language', { customStopwords: [] });
+
+		console.log(appStoredQueries);
 		return (
 			<FieldGroup
 				control={control}
@@ -152,6 +299,8 @@ class PreferenceForm extends React.Component {
 												{...inputHandler}
 												onChange={(val) => {
 													inputHandler.onChange(calculateValue(val));
+													const { settings } = this.props;
+													this.init({ ...settings });
 												}}
 											>
 												<Select.Option value="*">All (*)</Select.Option>
@@ -233,19 +382,33 @@ class PreferenceForm extends React.Component {
 								/>
 							)}
 						/>
-						{/* <Input.TextArea
-							placeholder="Add comma separated stopwords"
-							value={customStopwords.join(', ')}
-							onChange={(e) =>
-								this.handleChange('customStopwords', e.target.value)
+						<Form.Item
+							label={
+								<p css={styles.labelContainer}>
+									Set Custom Stopwords
+									<Popover
+										content={content(Messages.customStopwords)}
+										css={styles.iconContainer}
+									>
+										<Icon type="info-circle" />
+									</Popover>
+								</p>
 							}
-						/> */}
-						<InputElement
+						>
+							<Input.TextArea
+								placeholder="Add comma separated stopwords"
+								value={customStopwords.join(', ')}
+								onChange={(e) =>
+									this.handleChange('customStopwords', e.target.value, 'language')
+								}
+							/>
+						</Form.Item>
+						{/* <InputElement
 							name="customStopwords"
 							label="Set Custom Stopwords"
 							placeholder="Add comma separated stopwords"
 							toolTipMessage={Messages.customStopwords}
-						/>
+						/> */}
 						<FieldControl
 							name="enableSynonyms"
 							render={({ handler }) => (
@@ -273,8 +436,189 @@ class PreferenceForm extends React.Component {
 							toolTipMessage={Messages.size}
 						/>
 
-						{/* customQuery */}
+						{/** Include Fields */}
+						<Form.Item
+							label={
+								<p css={styles.labelContainer}>
+									Include Fields
+									<Popover
+										content={content(Messages.includeFields)}
+										css={styles.iconContainer}
+									>
+										<Icon type="info-circle" />
+									</Popover>
+								</p>
+							}
+						>
+							<Select
+								placeholder="Select one ore more fields"
+								mode="tags"
+								notFoundContent={null}
+								style={{ width: '100%' }}
+								tokenSeparators={[',']}
+								disabled={getDisabled(excludeFields)}
+								value={includeFields}
+								data-cy="include-fields"
+								showSearch
+								onChange={(value) =>
+									this.handleChange(
+										'includeFields',
+										calculateValue(value),
+										'results'
+									)
+								}
+							>
+								<Select.Option key="*">
+									* (Include all fields)
+								</Select.Option>
+								{(mappings || []).map((v) => {
+									if (excludeFields && !excludeFields.includes(v)) {
+										return (
+											<Select.Option key={v} title={v}>
+												{v}
+											</Select.Option>
+										);
+									}
+									return null;
+								})}
+							</Select>
+						</Form.Item>
 
+						{/**  Exclude fields */}
+
+						<Form.Item
+							label={
+								<p css={styles.labelContainer}>
+									Exclude Fields
+									<Popover
+										content={content(Messages.exludeFields)}
+										css={styles.iconContainer}
+									>
+										<Icon type="info-circle" />
+									</Popover>
+								</p>
+							}
+						>
+							<Select
+								placeholder="Select one or more fields"
+								mode="tags"
+								notFoundContent={null}
+								style={{ width: '100%' }}
+								tokenSeparators={[',']}
+								disabled={getDisabled(includeFields)}
+								showSearch
+								value={excludeFields}
+								onChange={(value) =>
+									this.handleChange(
+										'excludeFields',
+										calculateValue(value),
+										'results'
+									)
+								}
+								data-cy="exclude-fields"
+							>
+								<Select.Option key="*">
+									* (Exclude all fields)
+								</Select.Option>
+								{(mappings || []).map((v) => {
+									if (includeFields && !includeFields.includes(v)) {
+										return (
+											<Select.Option key={v} title={v}>
+												{v}
+											</Select.Option>
+										);
+									}
+									return null;
+								})}
+							</Select>
+						</Form.Item>
+
+						{/** Category Field */}
+						<Form.Item
+							label={
+								<p css={styles.labelContainer}>
+									Category Fields
+									<Popover
+										content={content(Messages.categoryField)}
+										css={styles.iconContainer}
+									>
+										<Icon type="info-circle" />
+									</Popover>
+								</p>
+							}
+						>
+							<MappingWrapper>
+								{({
+									flattenUsecase,
+									flattenType,
+									...rest
+								}) => (
+									<React.Fragment>
+											{localRelevancy && this.getAggsField({ flattenUsecase, flattenType }).length > 0 ? (
+													<div
+														style={{ position: 'relative', display: 'inline-block' }}
+														data-cy="aggregation-fields-dropdown"
+													>
+														<Select
+															showSearch
+															style={{ width: 300 }}
+															placeholder="Add aggregation fields from schema"
+															value={aggregationField}
+															onChange={(field) => {
+																this.updateToAggsField({ path: field, flattenType })
+															}}
+														>
+															{this.getAggsField({ flattenUsecase, flattenType }).map((field) => (
+																<Select.Option key={field} value={field}>
+																	{field}
+																</Select.Option>
+															))}
+														</Select>
+													</div>
+												) : null}
+									</React.Fragment>
+								)}
+							</MappingWrapper>
+						</Form.Item>
+
+						{/* customQuery */}
+						<Form.Item
+							label={
+								<p css={styles.labelContainer}>
+									Custom Query
+									<Popover
+										content={content(Messages.customQuery)}
+										css={styles.iconContainer}
+									>
+										<Icon type="info-circle" />
+									</Popover>
+								</p>
+							}
+						>
+							<Select
+								placeholder="Select custom query"
+								mode="tags"
+								notFoundContent={null}
+								style={{ width: '100%' }}
+								tokenSeparators={[',']}
+								value={appStoredQueries}
+								onChange={(e) => {
+									console.log(e);
+									this.setState({ customQueryField: e});
+								}
+
+								}
+							>
+								{( appStoredQueries || []).map((v) => {
+									console.log(v)
+									return (
+										<Select.Option key={v.id} title={v.id}>
+											{v.id}
+										</Select.Option>
+									);
+								})}
+							</Select>
+						</Form.Item>
 						<Affix offsetBottom={0}>
 							<div
 								style={{
@@ -302,6 +646,10 @@ class PreferenceForm extends React.Component {
 								</Button>
 							</div>
 						</Affix>
+
+
+
+
 					</div>
 				)}
 			/>
@@ -314,17 +662,45 @@ PreferenceForm.propTypes = {
 	control: PropTypes.object.isRequired,
 	isLoading: PropTypes.bool.isRequired,
 	indices: PropTypes.array.isRequired,
+	getSettingsAction: PropTypes.func.isRequired,
+	getDefaultSettingsAction: PropTypes.func.isRequired,
+	appStoredQueries: PropTypes.array.isRequired,
+	fetchMappings: PropTypes.func.isRequired,
 	apps: PropTypes.object,
+	localRelevancy: null,
 };
 
 PreferenceForm.defaultProps = {
 	apps: {},
 };
 
-const mapStateToProps = (state) => ({
-	// mappings: getTraversedMappingsByAppName(state),
-	isLoading: get(state, '$saveSuggestionsPreferences.isFetching', false),
-	appName: get(state, '$getCurrentApp.name'),
-	apps: get(state, 'apps.data'),
+const mapStateToProps = (state) => {
+
+	const mappings = getTraversedMappingsByAppName(state);
+	const parsedMappings = Array.isArray(mappings) ? mappings : get(mappings, '_doc', []);
+	const appName = get(state, '$getCurrentApp.name');
+	const { username, password } = get(state, 'user.data', {});
+
+	return {
+			// mappings: getTraversedMappingsByAppName(state),
+		mappings: isEmpty(parsedMappings) ? [] : parsedMappings,
+		isLoading: get(state, '$saveSuggestionsPreferences.isFetching', false),
+		settings: get(state, ['$getAppSettings', 'settings', appName]),
+		appName,
+		apps: get(state, 'apps.data'),
+		credentials: `${username}:${password}`,
+		localRelevancy: get(state, ['$getLocalRelevancy', appName], null),
+		appStoredQueries: get(state, ['$getAppStoredQueries', 'results'], [])
+	};
+
+};
+
+const mapDispatchToProps = (dispatch) => ({
+	updateLocalRelevancy: (name, data) => dispatch(setLocalRelevancyState(name, data)),
+	getSettingsAction: (name) => dispatch(getSettings(name)),
+	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
+	fetchMappings: (appName, credentials) => dispatch(getAppMappings(appName, credentials)),
+	fetchStoredQueries: () => dispatch(getAppStoredQueries()),
 });
-export default connect(mapStateToProps, null)(PreferenceForm);
+
+export default connect(mapStateToProps, mapDispatchToProps)(PreferenceForm);

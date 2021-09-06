@@ -12,6 +12,7 @@ import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
 import {
 	getSuggestionsPreferences,
 	saveSuggestionsPreferences,
+	saveIndexSuggestionsPreferences
 } from '../../../batteries/modules/actions';
 import PreferenceForm from './PreferenceForm';
 import { isValidPlan } from '../../../batteries/utils';
@@ -80,17 +81,17 @@ class QuerySuggestions extends React.Component {
 				const payload = get(action, 'payload');
 				if (payload) {
 					this.form.patchValue({
-						applyStopwords: payload.applyStopwords,
+						applyStopwords: payload.applyStopwords || false,
 						customStopwords: payload.customStopwords || [],
 						maxPredictedWords: parseInt(payload.maxPredictedWords, 10) || 2,
 						customQuery: payload.customQuery,
 						includeFields: payload.includeFields || ['*'],
-						excludeFields: payload.excludeFields,
-						categoryField: payload.categoryField,
-						showDistinctSuggestions: payload.showDistinctSuggestions,
-						enablePredictiveSuggestions: payload.enablePredictiveSuggestions,
-						enableSynonyms: payload.enableSynonyms,
-						size: parseInt(payload.size, 10) || 3,
+						excludeFields: payload.excludeFields || [],
+						categoryField: payload.categoryField || [],
+						showDistinctSuggestions: payload.showDistinctSuggestions || false,
+						enablePredictiveSuggestions: payload.enablePredictiveSuggestions || false,
+						enableSynonyms: payload.enableSynonyms || false,
+						size: parseInt(payload.size, 10) || 0,
 						indices: payload.indices || { value: ['*'], disabled: false },
 					});
 				}
@@ -264,13 +265,13 @@ const mapStateToProps = (state) => ({
 	isLoading: get(state, '$getSuggestionsPreferences.isFetching', false),
 	errors: [
 		get(state, '$getSuggestionsPreferences.error'),
-		get(state, '$saveSuggestionsPreferences.error'),
+		get(state, '$saveIndexSuggestionsPreferences.error'),
 	],
 });
 
 const mapDispatchToProps = (dispatch) => ({
 	getPreferences: () => dispatch(getSuggestionsPreferences()),
-	savePreferences: (payload) => dispatch(saveSuggestionsPreferences(payload)),
+	savePreferences: (payload) => dispatch(saveIndexSuggestionsPreferences(payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(QuerySuggestions);

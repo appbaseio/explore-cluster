@@ -12,6 +12,7 @@ import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
 import {
 	getSuggestionsPreferences,
 	saveSuggestionsPreferences,
+	savePopularSuggestionsPreferences,
 } from '../../../batteries/modules/actions';
 import PreferenceForm from './PreferenceForm';
 import { isValidPlan } from '../../../batteries/utils';
@@ -79,9 +80,9 @@ class QuerySuggestions extends React.Component {
 					this.form.patchValue({
 						blacklist: payload.blacklist || [],
 						externalSuggestions: payload.externalSuggestions,
-						minCount: parseInt(payload.minCount, 10),
-						minHits: parseInt(payload.minHits, 10),
-						numberOfDays: parseInt(payload.numberOfDays, 10),
+						minCount: parseInt(payload.minCount, 10) || 0,
+						minHits: parseInt(payload.minHits, 10) || 0,
+						numberOfDays: parseInt(payload.numberOfDays, 10) || 0,
 						minCharacters: parseInt(payload.minCharacters, 10) || 3,
 						size: parseInt(payload.size, 10) || 3,
 						indices: payload.indices || ['*'],
@@ -160,6 +161,7 @@ class QuerySuggestions extends React.Component {
 						? JSON.parse(this.form.value.externalSuggestions)
 						: [],
 			};
+
 			savePreferences(payload).then((action) => {
 				if (get(action, 'payload')) {
 					notification.success({
@@ -169,6 +171,7 @@ class QuerySuggestions extends React.Component {
 				}
 			});
 		} catch (e) {
+			console.log(e);
 			notification.error({
 				message: e.message,
 			});
@@ -266,13 +269,18 @@ const mapStateToProps = (state) => ({
 	isLoading: get(state, '$getSuggestionsPreferences.isFetching', false),
 	errors: [
 		get(state, '$getSuggestionsPreferences.error'),
-		get(state, '$saveSuggestionsPreferences.error'),
+		get(state, '$savePopularSuggestionsPreferences.error'),
 	],
 });
 
-const mapDispatchToProps = (dispatch) => ({
-	getPreferences: () => dispatch(getSuggestionsPreferences()),
-	savePreferences: (payload) => dispatch(saveSuggestionsPreferences(payload)),
-});
+const mapDispatchToProps = (dispatch) => {
+	console.log(savePopularSuggestionsPreferences);
+
+	return {
+		getPreferences: () => dispatch(getSuggestionsPreferences()),
+		savePreferences: (payload) => dispatch(savePopularSuggestionsPreferences(payload)),
+	}
+
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(QuerySuggestions);

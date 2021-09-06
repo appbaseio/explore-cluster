@@ -12,6 +12,7 @@ import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
 import {
 	getSuggestionsPreferences,
 	saveSuggestionsPreferences,
+	saveRecentSuggestionsPreferences
 } from '../../../batteries/modules/actions';
 import PreferenceForm from './PreferenceForm';
 import { isValidPlan } from '../../../batteries/utils';
@@ -71,7 +72,7 @@ class QuerySuggestions extends React.Component {
 				const payload = get(action, 'payload');
 				if (payload) {
 					this.form.patchValue({
-						minHits: parseInt(payload.minHits, 10),
+						minHits: parseInt(payload.minHits, 10) || 0,
 						size: parseInt(payload.size, 10) || 3,
 						indices: payload.indices || ['*'],
 					});
@@ -246,13 +247,13 @@ const mapStateToProps = (state) => ({
 	isLoading: get(state, '$getSuggestionsPreferences.isFetching', false),
 	errors: [
 		get(state, '$getSuggestionsPreferences.error'),
-		get(state, '$saveSuggestionsPreferences.error'),
+		get(state, '$saveRecentSuggestionsPreferences.error'),
 	],
 });
 
 const mapDispatchToProps = (dispatch) => ({
 	getPreferences: () => dispatch(getSuggestionsPreferences()),
-	savePreferences: (payload) => dispatch(saveSuggestionsPreferences(payload)),
+	savePreferences: (payload) => dispatch(saveRecentSuggestionsPreferences(payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(QuerySuggestions);
