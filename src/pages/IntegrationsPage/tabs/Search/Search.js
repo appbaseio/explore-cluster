@@ -12,7 +12,7 @@ export const defaultSettings = [
 	},
 	{
 		id: 'enableVoiceSearch',
-		label: 'Enable voice search',
+		label: 'Enable Voice Search',
 		value: true,
 	},
 ];
