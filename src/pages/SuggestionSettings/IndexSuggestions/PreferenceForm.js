@@ -121,7 +121,7 @@ InputElement.defaultProps = {
 };
 
 class PreferenceForm extends React.Component {
-	state = { visible: false, aggregationField: undefined, customQueryField: '' };
+	state = { visible: false, aggregationField: undefined, customQueryField: undefined };
 
 
 
@@ -263,8 +263,6 @@ class PreferenceForm extends React.Component {
 		} = localRelevancy ? get(localRelevancy, 'results') : {};
 
 		const { customStopwords } = get(localRelevancy,'language', { customStopwords: [] });
-
-		console.log(appStoredQueries);
 		return (
 			<FieldGroup
 				control={control}
@@ -601,19 +599,17 @@ class PreferenceForm extends React.Component {
 								notFoundContent={null}
 								style={{ width: '100%' }}
 								tokenSeparators={[',']}
-								value={appStoredQueries}
+								value={customQueryField}
 								onChange={(e) => {
 									console.log(e);
-									this.setState({ customQueryField: e});
-								}
-
-								}
+									this.setState({customQueryField: e})
+								}}
 							>
 								{( appStoredQueries || []).map((v) => {
-									console.log(v)
 									return (
 										<Select.Option key={v.id} title={v.id}>
-											{v.id}
+											<div>{v.id}</div>
+											<div>{v.description}</div>
 										</Select.Option>
 									);
 								})}
