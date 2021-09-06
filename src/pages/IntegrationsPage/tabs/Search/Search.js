@@ -7,12 +7,12 @@ const { Item } = List;
 export const defaultSettings = [
 	{
 		id: 'enableAutoSuggestions',
-		label: 'Show Autosuggetions',
+		label: 'Show Autosuggestions',
 		value: true,
 	},
 	{
 		id: 'enableVoiceSearch',
-		label: 'Enable voice search',
+		label: 'Enable Voice Search',
 		value: true,
 	},
 ];
