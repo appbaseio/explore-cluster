@@ -7,7 +7,7 @@ const { Item } = List;
 export const defaultSettings = [
 	{
 		id: 'enableAutoSuggestions',
-		label: 'Show Autosuggetions',
+		label: 'Show Autosuggestions',
 		value: true,
 	},
 	{
