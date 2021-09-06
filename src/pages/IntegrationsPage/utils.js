@@ -681,7 +681,7 @@ export const getSearchPreferencesPayload = (formValue) => {
 					handle: get(formValue, 'resultHandle'),
 				},
 				rsConfig: {
-					enableAutoSuggestions: get(formValue, 'enableAutoSuggestions'),
+					autosuggest: get(formValue, 'enableAutoSuggestions'),
 					enablePopularSuggestions: get(
 						formValue,
 						'autoSuggestionSettings.showPopularSearches',
@@ -690,11 +690,8 @@ export const getSearchPreferencesPayload = (formValue) => {
 						formValue,
 						'autoSuggestionSettings.showRecentSuggestions',
 					),
-					enableSuggestionsHighlights: get(
-						formValue,
-						'autoSuggestionSettings.enableSuggestionsHighlights',
-					),
-					enableVoiceSearch: get(formValue, 'enableVoiceSearch'),
+					highlight: get(formValue, 'autoSuggestionSettings.enableSuggestionsHighlights'),
+					showVoiceSearch: get(formValue, 'enableVoiceSearch'),
 				},
 			},
 			facetSettings: {
