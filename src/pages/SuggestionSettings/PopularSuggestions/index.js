@@ -274,7 +274,6 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => {
-	console.log(savePopularSuggestionsPreferences);
 
 	return {
 		getPreferences: () => dispatch(getSuggestionsPreferences()),

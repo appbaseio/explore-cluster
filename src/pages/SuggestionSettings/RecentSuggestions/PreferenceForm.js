@@ -9,6 +9,7 @@ import keys from 'lodash/keys';
 import Grid from '../../../components/CreateCredentials/Grid';
 import { suggestionsMessages as Messages } from '../../../utils/messages';
 import SearchPreviewSwitcher from '../../../components/SearchPreviewSwitcher';
+import ReviewAndSave from '../../../components/ReviewAndSave';
 import styles from '../styles';
 
 const calculateValue = (value) => {
@@ -205,6 +206,7 @@ class PreferenceForm extends React.Component {
 								>
 									Save
 								</Button>
+								<ReviewAndSave />
 							</div>
 						</Affix>
 					</div>

@@ -20,9 +20,9 @@ import { removeWhiteSpaces } from '../../../utils';
 import { suggestionsMessages as Messages } from '../../../utils/messages';
 import SearchPreviewSwitcher from '../../../components/SearchPreviewSwitcher';
 import MappingWrapper from '../../../components/MappingsWrapper/MappingsWrapper';
-import SettingTooltip from '../../../components/SettingTooltip';
 import styles from '../styles';
 import conversionMap from '../../../utils/conversionMap';
+import ReviewAndSave from '../../../components/ReviewAndSave';
 
 const calculateValue = (value) => {
 	const index = value.indexOf('*');
@@ -121,7 +121,7 @@ InputElement.defaultProps = {
 };
 
 class PreferenceForm extends React.Component {
-	state = { visible: false, aggregationField: undefined, customQueryField: undefined };
+	state = { visible: false, aggregationField: undefined, customQueryField: '' };
 
 
 
@@ -549,38 +549,80 @@ class PreferenceForm extends React.Component {
 								{({
 									flattenUsecase,
 									flattenType,
-									...rest
+
 								}) => (
 									<React.Fragment>
-											{localRelevancy && this.getAggsField({ flattenUsecase, flattenType }).length > 0 ? (
-													<div
-														style={{ position: 'relative', display: 'inline-block' }}
-														data-cy="aggregation-fields-dropdown"
+										{localRelevancy && this.getAggsField({ flattenUsecase, flattenType }).length > 0 ? (
+												<div
+													style={{ position: 'relative', display: 'inline-block' }}
+													data-cy="aggregation-fields-dropdown"
+												>
+													<Select
+														showSearch
+														style={{ width: 300 }}
+														placeholder="Add aggregation fields from schema"
+														value={aggregationField}
+														onChange={(field) => {
+															this.updateToAggsField({ path: field, flattenType })
+														}}
 													>
-														<Select
-															showSearch
-															style={{ width: 300 }}
-															placeholder="Add aggregation fields from schema"
-															value={aggregationField}
-															onChange={(field) => {
-																this.updateToAggsField({ path: field, flattenType })
-															}}
-														>
-															{this.getAggsField({ flattenUsecase, flattenType }).map((field) => (
-																<Select.Option key={field} value={field}>
-																	{field}
-																</Select.Option>
-															))}
-														</Select>
-													</div>
-												) : null}
+														{this.getAggsField({ flattenUsecase, flattenType }).map((field) => (
+															<Select.Option key={field} value={field}>
+																{field}
+															</Select.Option>
+														))}
+													</Select>
+												</div>
+											) : null}
 									</React.Fragment>
 								)}
 							</MappingWrapper>
 						</Form.Item>
 
 						{/* customQuery */}
-						<Form.Item
+						<FieldControl
+							name="customQuery"
+							render={({ handler }) => {
+								const inputHandler = handler();
+
+								return (
+									<Grid
+										label={
+											<p css={styles.labelContainer}>
+												Custom Query
+												<Popover
+													content={content(Messages.customQuery)}
+													css={styles.iconContainer}
+												>
+													<Icon type="info-circle" />
+												</Popover>
+											</p>
+										}
+										component={
+											<Select
+												placeholder="Select Custom Query"
+												style={{ width: '100%' }}
+												value={customQueryField}
+												{...inputHandler}
+												onChange={(val) => {
+													this.setState({customQueryField: val})
+												}}
+											>
+												{( appStoredQueries || []).map((v) => {
+													return (
+														<Select.Option key={v.id} title={v.id}>
+															<div>{v.id}</div>
+															<div>{v.description}</div>
+														</Select.Option>
+													);
+												})}
+											</Select>
+										}
+									/>
+								);
+							}}
+						/>
+						{/* <Form.Item
 							label={
 								<p css={styles.labelContainer}>
 									Custom Query
@@ -595,7 +637,6 @@ class PreferenceForm extends React.Component {
 						>
 							<Select
 								placeholder="Select custom query"
-								mode="tags"
 								notFoundContent={null}
 								style={{ width: '100%' }}
 								tokenSeparators={[',']}
@@ -615,6 +656,7 @@ class PreferenceForm extends React.Component {
 								})}
 							</Select>
 						</Form.Item>
+						 */}
 						<Affix offsetBottom={0}>
 							<div
 								style={{
@@ -640,12 +682,9 @@ class PreferenceForm extends React.Component {
 								>
 									Save
 								</Button>
+								<ReviewAndSave />
 							</div>
 						</Affix>
-
-
-
-
 					</div>
 				)}
 			/>
@@ -664,6 +703,7 @@ PreferenceForm.propTypes = {
 	fetchMappings: PropTypes.func.isRequired,
 	apps: PropTypes.object,
 	localRelevancy: null,
+	appName: PropTypes.string,
 };
 
 PreferenceForm.defaultProps = {

@@ -11,6 +11,7 @@ import Ace from '../../../batteries/components/SearchSandbox/containers/AceEdito
 import { suggestionsMessages as Messages } from '../../../utils/messages';
 import SearchPreviewSwitcher from '../../../components/SearchPreviewSwitcher';
 import styles from '../styles';
+import ReviewAndSave from '../../../components/ReviewAndSave';
 
 const calculateValue = (value) => {
 	const index = value.indexOf('*');
@@ -341,6 +342,7 @@ class PreferenceForm extends React.Component {
 								>
 									Save
 								</Button>
+								<ReviewAndSave />
 							</div>
 						</Affix>
 					</div>
