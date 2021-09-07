@@ -59,7 +59,6 @@ const getDisabled = (value) => {
 	return false;
 };
 
-
 const InputElement = ({ name, label, toolTipMessage, inputProps, placeholder }) => (
 	<FieldControl
 		name={name}
@@ -123,8 +122,6 @@ InputElement.defaultProps = {
 class PreferenceForm extends React.Component {
 	state = { visible: false, aggregationField: undefined, customQueryField: '' };
 
-
-
 	componentDidMount() {
 		const {
 			appName,
@@ -159,7 +156,7 @@ class PreferenceForm extends React.Component {
 	handleChange = (key, val, dataKey) => {
 		const { appName, localRelevancy, updateLocalRelevancy } = this.props;
 		let value = val;
-		if(key === 'customStopwords') {
+		if (key === 'customStopwords') {
 			value = val.split(',').map((i) => removeWhiteSpaces(i));
 		}
 
@@ -211,7 +208,6 @@ class PreferenceForm extends React.Component {
 	};
 
 	getAggsField = ({ flattenUsecase: usecases, flattenType: types }) => {
-
 		const { localRelevancy } = this.props;
 		const { dataField } = get(localRelevancy, `aggregations`);
 
@@ -241,7 +237,6 @@ class PreferenceForm extends React.Component {
 		return [];
 	};
 
-
 	render() {
 		const {
 			control,
@@ -257,12 +252,12 @@ class PreferenceForm extends React.Component {
 		const { visible, app, aggregationField, customQueryField } = this.state;
 		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
 
-		const {
-			excludeFields,
-			includeFields,
-		} = localRelevancy ? get(localRelevancy, 'results') : {};
+		const { excludeFields, includeFields } = localRelevancy
+			? get(localRelevancy, 'indexSuggestions', { excludeFields: [], includeFields: [] })
+			: {};
 
-		const { customStopwords } = get(localRelevancy,'language', { customStopwords: [] });
+		const { customStopwords } = get(localRelevancy, 'language', { customStopwords: [] });
+
 		return (
 			<FieldGroup
 				control={control}
@@ -305,7 +300,8 @@ class PreferenceForm extends React.Component {
 												{indices
 													.filter((i) => !i.startsWith('metricbeat'))
 													.map((index) => (
-														<Select.Option key={index}>
+
+								<Select.Option key={index}>
 															{index}
 														</Select.Option>
 													))}
@@ -397,7 +393,7 @@ class PreferenceForm extends React.Component {
 								placeholder="Add comma separated stopwords"
 								value={customStopwords.join(', ')}
 								onChange={(e) =>
-									this.handleChange('customStopwords', e.target.value, 'language')
+									this.handleChange('customStopwords', e.target.value, 'indexSuggestions')
 								}
 							/>
 						</Form.Item>
@@ -462,13 +458,11 @@ class PreferenceForm extends React.Component {
 									this.handleChange(
 										'includeFields',
 										calculateValue(value),
-										'results'
+										'indexSuggestions',
 									)
 								}
 							>
-								<Select.Option key="*">
-									* (Include all fields)
-								</Select.Option>
+								<Select.Option key="*">* (Include all fields)</Select.Option>
 								{(mappings || []).map((v) => {
 									if (excludeFields && !excludeFields.includes(v)) {
 										return (
@@ -510,14 +504,12 @@ class PreferenceForm extends React.Component {
 									this.handleChange(
 										'excludeFields',
 										calculateValue(value),
-										'results'
+										'indexSuggestions',
 									)
 								}
 								data-cy="exclude-fields"
 							>
-								<Select.Option key="*">
-									* (Exclude all fields)
-								</Select.Option>
+								<Select.Option key="*">* (Exclude all fields)</Select.Option>
 								{(mappings || []).map((v) => {
 									if (includeFields && !includeFields.includes(v)) {
 										return (
@@ -546,34 +538,41 @@ class PreferenceForm extends React.Component {
 							}
 						>
 							<MappingWrapper>
-								{({
-									flattenUsecase,
-									flattenType,
-
-								}) => (
+								{({ flattenUsecase, flattenType }) => (
 									<React.Fragment>
-										{localRelevancy && this.getAggsField({ flattenUsecase, flattenType }).length > 0 ? (
-												<div
-													style={{ position: 'relative', display: 'inline-block' }}
-													data-cy="aggregation-fields-dropdown"
+										{localRelevancy &&
+										this.getAggsField({ flattenUsecase, flattenType }).length >
+											0 ? (
+											<div
+												style={{
+													position: 'relative',
+													display: 'inline-block',
+												}}
+												data-cy="aggregation-fields-dropdown"
+											>
+												<Select
+													showSearch
+													style={{ width: 300 }}
+													placeholder="Add aggregation fields from schema"
+													value={aggregationField}
+													onChange={(field) => {
+														this.updateToAggsField({
+															path: field,
+															flattenType,
+														});
+													}}
 												>
-													<Select
-														showSearch
-														style={{ width: 300 }}
-														placeholder="Add aggregation fields from schema"
-														value={aggregationField}
-														onChange={(field) => {
-															this.updateToAggsField({ path: field, flattenType })
-														}}
-													>
-														{this.getAggsField({ flattenUsecase, flattenType }).map((field) => (
-															<Select.Option key={field} value={field}>
-																{field}
-															</Select.Option>
-														))}
-													</Select>
-												</div>
-											) : null}
+													{this.getAggsField({
+														flattenUsecase,
+														flattenType,
+													}).map((field) => (
+														<Select.Option key={field} value={field}>
+															{field}
+														</Select.Option>
+													))}
+												</Select>
+											</div>
+										) : null}
 									</React.Fragment>
 								)}
 							</MappingWrapper>
@@ -605,10 +604,10 @@ class PreferenceForm extends React.Component {
 												value={customQueryField}
 												{...inputHandler}
 												onChange={(val) => {
-													this.setState({customQueryField: val})
+													this.setState({ customQueryField: val });
 												}}
 											>
-												{( appStoredQueries || []).map((v) => {
+												{(appStoredQueries || []).map((v) => {
 													return (
 														<Select.Option key={v.id} title={v.id}>
 															<div>{v.id}</div>
@@ -711,14 +710,13 @@ PreferenceForm.defaultProps = {
 };
 
 const mapStateToProps = (state) => {
-
 	const mappings = getTraversedMappingsByAppName(state);
 	const parsedMappings = Array.isArray(mappings) ? mappings : get(mappings, '_doc', []);
 	const appName = get(state, '$getCurrentApp.name');
 	const { username, password } = get(state, 'user.data', {});
 
 	return {
-			// mappings: getTraversedMappingsByAppName(state),
+		// mappings: getTraversedMappingsByAppName(state),
 		mappings: isEmpty(parsedMappings) ? [] : parsedMappings,
 		isLoading: get(state, '$saveSuggestionsPreferences.isFetching', false),
 		settings: get(state, ['$getAppSettings', 'settings', appName]),
@@ -726,9 +724,8 @@ const mapStateToProps = (state) => {
 		apps: get(state, 'apps.data'),
 		credentials: `${username}:${password}`,
 		localRelevancy: get(state, ['$getLocalRelevancy', appName], null),
-		appStoredQueries: get(state, ['$getAppStoredQueries', 'results'], [])
+		appStoredQueries: get(state, ['$getAppStoredQueries', 'results'], []),
 	};
-
 };
 
 const mapDispatchToProps = (dispatch) => ({

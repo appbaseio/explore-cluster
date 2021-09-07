@@ -274,12 +274,10 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => {
-
 	return {
 		getPreferences: () => dispatch(getSuggestionsPreferences()),
 		savePreferences: (payload) => dispatch(savePopularSuggestionsPreferences(payload)),
-	}
-
+	};
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(QuerySuggestions);
