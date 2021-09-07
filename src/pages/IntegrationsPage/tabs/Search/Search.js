@@ -11,7 +11,7 @@ export const defaultSettings = [
 		value: true,
 	},
 	{
-		id: 'enableVoiceSearch',
+		id: 'showVoiceSearch',
 		label: 'Enable Voice Search',
 		value: true,
 	},

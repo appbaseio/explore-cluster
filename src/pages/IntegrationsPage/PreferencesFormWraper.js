@@ -68,7 +68,7 @@ class PreferencesFormWrapper extends React.Component {
 						showPopularSearches: false,
 						showRecentSuggestions: false,
 						enableAutoSuggestions: true,
-						enableVoiceSearch: true,
+						showVoiceSearch: true,
 						enablePredictiveSuggestions: false,
 						enableSuggestionsHighlights: false,
 						showSelectedFilters: true,
@@ -120,12 +120,15 @@ class PreferencesFormWrapper extends React.Component {
 		} else {
 			fetchSearchPreferences();
 		}
+
 		// Registering the subscriber after patching the initial values to avoid resetting the set fields in preferences
 		this.form.get('exportSettings.type').valueChanges.subscribe((value) => {
 			const colorFilter = this.form.get('staticFilters.color.customize.dataField');
 			const sizeFilter = this.form.get('staticFilters.size.customize.dataField');
 			const priceFilter = this.form.get('staticFilters.price.customize.dataField');
+
 			const syncSettingsControl = this.form.get('syncSettings');
+
 			if (syncSettingsControl) {
 				if (value === 'shopify') {
 					syncSettingsControl.enable();
@@ -176,19 +179,21 @@ class PreferencesFormWrapper extends React.Component {
 			}
 		});
 
-		this.form.get('enableAutoSuggestions').valueChanges.subscribe((value) => {
-			const autoSuggestionSettingsControl = this.form.get('autoSuggestionSettings');
-
-			if (value) {
-				autoSuggestionSettingsControl.enable();
-			} else {
-				autoSuggestionSettingsControl.disable();
-			}
-		});
+		if (this.form.get('enableAutoSuggestions')) {
+			this.form.get('enableAutoSuggestions').valueChanges.subscribe((value) => {
+				const autoSuggestionSettingsControl = this.form.get('autoSuggestionSettings');
+				if (value) {
+					autoSuggestionSettingsControl.enable();
+				} else {
+					autoSuggestionSettingsControl.disable();
+				}
+			});
+		}
 	}
 
 	componentDidUpdate(prevProps) {
 		const { isRecommendation, searchPreferences, recommendationsPreferences } = this.props;
+
 		let preferences;
 		if (isRecommendation) {
 			if (prevProps.recommendationsPreferences !== recommendationsPreferences) {
@@ -207,6 +212,7 @@ class PreferencesFormWrapper extends React.Component {
 				recommendationsControl.controls = [];
 			}
 		};
+		console.log('pref', preferences);
 		// Sync form values
 		if (preferences) {
 			try {
@@ -257,9 +263,11 @@ class PreferencesFormWrapper extends React.Component {
 						fetchingFilterOptions,
 					};
 				};
+				console.log('reach', this.form);
 				// Patch form value
-				this.form.patchValue(
-					JSON.parse(
+
+				try {
+					const patchVar = JSON.parse(
 						JSON.stringify({
 							themeType: get(preferences, 'themeSettings.type'),
 							primaryColor: get(
@@ -289,14 +297,17 @@ class PreferencesFormWrapper extends React.Component {
 							resultPrice: get(preferences, 'resultSettings.fields.price'),
 							resultImage: get(preferences, 'resultSettings.fields.image'),
 							resultHandle: get(preferences, 'resultSettings.fields.handle'),
-							showResultView: get(preferences, 'resultSettings.layout'),
-							showResultViewSwitcher: get(preferences, 'resultSettings.viewSwitcher'),
 							exportSettings: get(preferences, 'exportSettings'),
 							storeInfo: {
 								currency: get(preferences, 'globalSettings.currency'),
 							},
 							...(isRecommendation
 								? {
+										showResultView: get(preferences, 'resultSettings.layout'),
+										showResultViewSwitcher: get(
+											preferences,
+											'resultSettings.viewSwitcher',
+										),
 										ctaTitle: get(
 											preferences,
 											'recommendationSettings.ctaTitle',
@@ -341,9 +352,17 @@ class PreferencesFormWrapper extends React.Component {
 										}),
 								  }
 								: {
+										enableAutoSuggestions: get(
+											preferences,
+											'searchSettings.rsConfig.autosuggest',
+										),
 										showPopularSearches: get(
 											preferences,
 											'searchSettings.rsConfig.enablePopularSuggestions',
+										),
+										showVoiceSearch: get(
+											preferences,
+											'searchSettings.rsConfig.showVoiceSearch',
 										),
 										// add search settings here - 'searchSettings.rsConfig.<KEY_NAME)>'
 										showRecentSuggestions: get(
@@ -356,15 +375,7 @@ class PreferencesFormWrapper extends React.Component {
 										),
 										enableSuggestionsHighlights: get(
 											preferences,
-											'searchSettings.rsConfig.enableSuggestionsHighlights',
-										),
-										enableAutoSuggestions: get(
-											preferences,
-											'searchSettings.rsConfig.enableAutoSuggestions',
-										),
-										enableVoiceSearch: get(
-											preferences,
-											'searchSettings.rsConfig.enableVoiceSearch',
+											'searchSettings.rsConfig.highlight',
 										),
 										showSelectedFilters: get(
 											preferences,
@@ -415,8 +426,14 @@ class PreferencesFormWrapper extends React.Component {
 										})),
 								  }),
 						}),
-					),
-				);
+					);
+					console.log('parsed patch', patchVar);
+					this.form.patchValue(patchVar);
+				} catch (e) {
+					console.error(e);
+				}
+
+				console.log('voice pref', this.form.get('showVoiceSearch').value);
 			} catch (e) {
 				console.warn('Error while syncing the preferences', e);
 			}

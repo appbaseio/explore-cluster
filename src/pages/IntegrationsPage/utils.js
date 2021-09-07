@@ -691,7 +691,7 @@ export const getSearchPreferencesPayload = (formValue) => {
 						'autoSuggestionSettings.showRecentSuggestions',
 					),
 					highlight: get(formValue, 'autoSuggestionSettings.enableSuggestionsHighlights'),
-					showVoiceSearch: get(formValue, 'enableVoiceSearch'),
+					showVoiceSearch: get(formValue, 'showVoiceSearch'),
 				},
 			},
 			facetSettings: {
