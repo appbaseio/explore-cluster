@@ -65,12 +65,14 @@ class PreferencesFormWrapper extends React.Component {
 				  }
 				: {
 						// Search specific controls
-						enablePopularSuggestions: false,
-						enableRecentSearches: false,
+						autoSuggestionSettings: FormBuilder.group({
+							enablePopularSuggestions: false,
+							enableRecentSearches: false,
+							highlight: false,
+						}),
 						autosuggest: true,
 						showVoiceSearch: true,
 						enablePredictiveSuggestions: false,
-						highlight: false,
 						showSelectedFilters: true,
 						showPagination: false,
 						layout: 'grid',
@@ -190,6 +192,9 @@ class PreferencesFormWrapper extends React.Component {
 					}
 				}
 			});
+			this.form.get('autoSuggestionSettings').valueChanges.subscribe((value) => {
+
+			})
 		}
 	}
 

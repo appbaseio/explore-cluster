@@ -490,7 +490,6 @@ export const defaultSearchPreferences = {
 	resultHandle: '',
 	storeInfo: { currency: 'USD' },
 	exportSettings: { exportAs: 'embed', credentials: '', openAsPage: false, type: 'other' },
-	enablePopularSuggestions: false,
 	showPagination: false,
 	showSelectedFilters: true,
 	customMessages: {
@@ -501,6 +500,11 @@ export const defaultSearchPreferences = {
 		fetchingFilterOptions: 'Fetching Options',
 		searchText: 'Click here to search',
 		searchIcon: '',
+	},
+	autoSuggestionSettings: {
+		enablePopularSuggestions: false,
+		enableRecentSearches: false,
+		highlight: false,
 	},
 	staticFilters: {
 		productType: {
