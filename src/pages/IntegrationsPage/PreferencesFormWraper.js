@@ -65,16 +65,16 @@ class PreferencesFormWrapper extends React.Component {
 				  }
 				: {
 						// Search specific controls
-						showPopularSearches: false,
-						showRecentSuggestions: false,
+						enablePopularSuggestions: false,
+						enableRecentSearches: false,
 						enableAutoSuggestions: true,
 						showVoiceSearch: true,
 						enablePredictiveSuggestions: false,
-						enableSuggestionsHighlights: false,
+						highlight: false,
 						showSelectedFilters: true,
 						showPagination: false,
-						showResultView: 'grid',
-						showResultViewSwitcher: true,
+						layout: 'grid',
+						viewSwitcher: true,
 						customMessages: FormBuilder.group({
 							resultStats: '[count] products found in [time] ms',
 							noFilterItem: 'No items Found',
@@ -305,8 +305,8 @@ class PreferencesFormWrapper extends React.Component {
 							},
 							...(isRecommendation
 								? {
-										showResultView: get(preferences, 'resultSettings.layout'),
-										showResultViewSwitcher: get(
+										layout: get(preferences, 'resultSettings.layout'),
+										viewSwitcher: get(
 											preferences,
 											'resultSettings.viewSwitcher',
 										),
@@ -358,7 +358,7 @@ class PreferencesFormWrapper extends React.Component {
 											preferences,
 											'searchSettings.rsConfig.autosuggest',
 										),
-										showPopularSearches: get(
+										enablePopularSuggestions: get(
 											preferences,
 											'searchSettings.rsConfig.enablePopularSuggestions',
 										),
@@ -367,15 +367,15 @@ class PreferencesFormWrapper extends React.Component {
 											'searchSettings.rsConfig.showVoiceSearch',
 										),
 										// add search settings here - 'searchSettings.rsConfig.<KEY_NAME)>'
-										showRecentSuggestions: get(
+										enableRecentSearches: get(
 											preferences,
-											'searchSettings.rsConfig.showRecentSuggestions',
+											'searchSettings.rsConfig.enableRecentSearches',
 										),
 										enablePredictiveSuggestions: get(
 											preferences,
 											'searchSettings.rsConfig.enablePredictiveSuggestions',
 										),
-										enableSuggestionsHighlights: get(
+										highlight: get(
 											preferences,
 											'searchSettings.rsConfig.highlight',
 										),

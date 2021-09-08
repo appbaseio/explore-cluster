@@ -19,17 +19,17 @@ export const defaultSettings = [
 
 export const suggestionSettings = [
 	{
-		id: 'showPopularSearches',
+		id: 'enablePopularSuggestions',
 		label: 'Show popular suggestions (based on analytics data)',
 		value: false,
 	},
 	{
-		id: 'showRecentSuggestions',
+		id: 'enableRecentSearches',
 		label: 'Show recent suggestions (based on analytics data)',
 		value: false,
 	},
 	{
-		id: 'enableSuggestionsHighlights',
+		id: 'highlight',
 		label: 'Enable suggestion highlights',
 		value: false,
 	},

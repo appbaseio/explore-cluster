@@ -6,7 +6,7 @@ import DataFieldSelector from '../../../../components/Form/DataFieldSelector';
 
 export const defaultSettings = [
 	{
-		id: 'showPopularSearches',
+		id: 'enablePopularSuggestions',
 		label: 'Show popular suggestions (users will see suggestions based on analytics data)',
 		value: false,
 	},
@@ -16,12 +16,12 @@ export const defaultSettings = [
 		value: true,
 	},
 	{
-		id: 'showResultView',
+		id: 'layout',
 		label: 'Show results as:',
 		value: true,
 	},
 	{
-		id: 'showResultViewSwitcher',
+		id: 'viewSwitcher',
 		label: 'Show results view switcher',
 		value: true,
 	},
@@ -98,7 +98,7 @@ const Results = ({ withoutForm, dataSource }) => {
 			bordered
 			renderItem={(item) => (
 				<>
-					{item.id === 'showResultView' ? (
+					{item.id === 'layout' ? (
 						<FieldControl name={item.id}>
 							{(control) => (
 								<Item
