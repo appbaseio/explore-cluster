@@ -177,20 +177,7 @@ class QuerySuggestions extends React.Component {
 	render() {
 		const { isLoading, preferences, tier, featureSuggestions, hide } = this.props;
 		const { indices, total } = this.state;
-		if (!isValidPlan(tier, featureSuggestions)) {
-			return (
-				<React.Fragment>
-					<Banner {...bannerDetails} />
-					<Overlay
-						style={{
-							maxWidth: '70%',
-						}}
-						src="https://i.imgur.com/c6P8eN8.png"
-						alt="analytics"
-					/>
-				</React.Fragment>
-			);
-		}
+
 		if (isLoading && !preferences) {
 			return <Loader />;
 		}
