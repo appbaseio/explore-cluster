@@ -15,7 +15,7 @@ const SearchSettings = () => {
 	useEffect(() => {
 		const autoSuggestionSettingsControl = form.get('autoSuggestionSettings');
 
-		if (form.value.enableAutoSuggestions) {
+		if (form.value.autosuggest) {
 			autoSuggestionSettingsControl.enable();
 		} else {
 			autoSuggestionSettingsControl.disable();

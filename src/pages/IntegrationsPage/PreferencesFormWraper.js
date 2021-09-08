@@ -67,7 +67,7 @@ class PreferencesFormWrapper extends React.Component {
 						// Search specific controls
 						enablePopularSuggestions: false,
 						enableRecentSearches: false,
-						enableAutoSuggestions: true,
+						autosuggest: true,
 						showVoiceSearch: true,
 						enablePredictiveSuggestions: false,
 						highlight: false,
@@ -179,8 +179,8 @@ class PreferencesFormWrapper extends React.Component {
 			}
 		});
 
-		if (this.form.get('enableAutoSuggestions')) {
-			this.form.get('enableAutoSuggestions').valueChanges.subscribe((value) => {
+		if (this.form.get('autosuggest')) {
+			this.form.get('autosuggest').valueChanges.subscribe((value) => {
 				const autoSuggestionSettingsControl = this.form.get('autoSuggestionSettings');
 				if (autoSuggestionSettingsControl) {
 					if (value) {
@@ -354,7 +354,7 @@ class PreferencesFormWrapper extends React.Component {
 										}),
 								  }
 								: {
-										enableAutoSuggestions: get(
+										autosuggest: get(
 											preferences,
 											'searchSettings.rsConfig.autosuggest',
 										),

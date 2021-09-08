@@ -6,7 +6,7 @@ const { Item } = List;
 
 export const defaultSettings = [
 	{
-		id: 'enableAutoSuggestions',
+		id: 'autosuggest',
 		label: 'Show Autosuggestions',
 		value: true,
 	},
@@ -50,7 +50,7 @@ const Search = () => (
 								</Item>
 							)}
 						</FieldControl>
-						{item.id === 'enableAutoSuggestions' && (
+						{item.id === 'autosuggest' && (
 							<FieldGroup name="autoSuggestionSettings">
 								{({ disabled }) => {
 									if (disabled || disabled === undefined) {

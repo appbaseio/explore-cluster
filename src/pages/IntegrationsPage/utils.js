@@ -681,7 +681,7 @@ export const getSearchPreferencesPayload = (formValue) => {
 					handle: get(formValue, 'resultHandle'),
 				},
 				rsConfig: {
-					autosuggest: get(formValue, 'enableAutoSuggestions'),
+					autosuggest: get(formValue, 'autosuggest'),
 					enablePopularSuggestions: get(
 						formValue,
 						'autoSuggestionSettings.enablePopularSuggestions',
