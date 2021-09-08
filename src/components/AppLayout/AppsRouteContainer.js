@@ -107,8 +107,7 @@ const LanguagePage = Loadable({
 });
 
 const SuggestionsPage = Loadable({
-	loader: () =>
-		import(/* webpackChunkName: "LanguageSettings" */ '../../pages/SuggestionSettings'),
+	loader: () => import(/* webpackChunkName: "LanguageSettings" */ '../../pages/SuggestionSettings'),
 	loading: Loader,
 });
 
