@@ -73,6 +73,7 @@ class PreferencesFormWrapper extends React.Component {
 						autosuggest: true,
 						showVoiceSearch: true,
 						enablePredictiveSuggestions: false,
+						enablePopularSuggestions: false,
 						showSelectedFilters: true,
 						showPagination: false,
 						layout: 'grid',
@@ -310,128 +311,136 @@ class PreferencesFormWrapper extends React.Component {
 							},
 							...(isRecommendation
 								? {
-										layout: get(preferences, 'resultSettings.layout'),
-										viewSwitcher: get(
-											preferences,
-											'resultSettings.viewSwitcher',
-										),
-										ctaTitle: get(
-											preferences,
-											'recommendationSettings.ctaTitle',
-										),
-										ctaAction: get(
-											preferences,
-											'recommendationSettings.ctaAction',
-										),
-										recommendations: get(
-											preferences,
-											'recommendationSettings.recommendations',
-											[],
-										).map((i) => {
-											if (i.type === RecommendationTypes.SIMILAR_PRODUCTS) {
-												const splited = (i.productsPageUrl || '').split(
-													'{',
-												);
-												return {
-													id: i.id,
-													title: i.title,
-													type: i.type,
-													maxProducts: i.maxProducts,
-													dataFieldSimilarTo: i.dataField,
-													productsPageHandle: {
-														productsPageUrlPrefix: splited[0],
-														productsPageUrlField: (
-															splited[1] || ''
-														).replace('}', ''),
-													},
-												};
-											}
-											if (i.type === RecommendationTypes.MOST_RECENT) {
-												return {
-													id: i.id,
-													title: i.title,
-													type: i.type,
-													maxProducts: i.maxProducts,
-													dataFieldMostRecent: i.dataField,
-												};
-											}
-											return i;
-										}),
+									ctaTitle: get(
+										preferences,
+										'recommendationSettings.ctaTitle',
+									),
+									ctaAction: get(
+										preferences,
+										'recommendationSettings.ctaAction',
+									),
+									recommendations: get(
+										preferences,
+										'recommendationSettings.recommendations',
+										[],
+									).map((i) => {
+										if (i.type === RecommendationTypes.SIMILAR_PRODUCTS) {
+											const splited = (i.productsPageUrl || '').split(
+												'{',
+											);
+											return {
+												id: i.id,
+												title: i.title,
+												type: i.type,
+												maxProducts: i.maxProducts,
+												dataFieldSimilarTo: i.dataField,
+												productsPageHandle: {
+													productsPageUrlPrefix: splited[0],
+													productsPageUrlField: (
+														splited[1] || ''
+													).replace('}', ''),
+												},
+											};
+										}
+										if (i.type === RecommendationTypes.MOST_RECENT) {
+											return {
+												id: i.id,
+												title: i.title,
+												type: i.type,
+												maxProducts: i.maxProducts,
+												dataFieldMostRecent: i.dataField,
+											};
+										}
+										return i;
+									}),
 								  }
 								: {
-										autosuggest: get(
+									autosuggest: get(
+										preferences,
+										'searchSettings.rsConfig.autosuggest',
+									),
+
+									showVoiceSearch: get(
+										preferences,
+										'searchSettings.rsConfig.showVoiceSearch',
+									),
+									enablePopularSuggestions: get(
+										preferences,
+										'searchSettings.rsConfig.enablePopularSuggestions',
+									),
+									enablePredictiveSuggestions: get(
+										preferences,
+										'searchSettings.rsConfig.enablePredictiveSuggestions',
+									),
+
+									showSelectedFilters: get(
+										preferences,
+										'globalSettings.showSelectedFilters',
+									),
+									showPagination: !!get(
+										preferences,
+										'resultSettings.rsConfig.pagination',
+									),
+									layout: get(preferences, 'resultSettings.layout'),
+									viewSwitcher: get(
+										preferences,
+										'resultSettings.viewSwitcher',
+									),
+									syncSettings: get(preferences, 'syncSettings') || {},
+									customMessages: {
+										resultStats: get(
 											preferences,
-											'searchSettings.rsConfig.autosuggest',
+											'resultSettings.customMessages.resultStats',
 										),
+										noResultItem: get(
+											preferences,
+											'resultSettings.customMessages.noResults',
+										),
+										noSuggestion: get(
+											preferences,
+											'searchSettings.customMessages.noResults',
+										),
+										searchText: get(
+											preferences,
+											'searchSettings.searchButton.text',
+										),
+										searchIcon: get(
+											preferences,
+											'searchSettings.searchButton.icon',
+										),
+										...getFilterMessages(),
+									},
+									autoSuggestionSettings: {
 										enablePopularSuggestions: get(
 											preferences,
 											'searchSettings.rsConfig.enablePopularSuggestions',
 										),
-										showVoiceSearch: get(
-											preferences,
-											'searchSettings.rsConfig.showVoiceSearch',
-										),
-										// add search settings here - 'searchSettings.rsConfig.<KEY_NAME)>'
 										enableRecentSearches: get(
 											preferences,
 											'searchSettings.rsConfig.enableRecentSearches',
-										),
-										enablePredictiveSuggestions: get(
-											preferences,
-											'searchSettings.rsConfig.enablePredictiveSuggestions',
 										),
 										highlight: get(
 											preferences,
 											'searchSettings.rsConfig.highlight',
 										),
-										showSelectedFilters: get(
-											preferences,
-											'globalSettings.showSelectedFilters',
-										),
-										showPagination: !!get(
-											preferences,
-											'resultSettings.rsConfig.pagination',
-										),
-										syncSettings: get(preferences, 'syncSettings') || {},
-										customMessages: {
-											resultStats: get(
-												preferences,
-												'resultSettings.customMessages.resultStats',
-											),
-											noResultItem: get(
-												preferences,
-												'resultSettings.customMessages.noResults',
-											),
-											noSuggestion: get(
-												preferences,
-												'searchSettings.customMessages.noResults',
-											),
-											searchText: get(
-												preferences,
-												'searchSettings.searchButton.text',
-											),
-											searchIcon: get(
-												preferences,
-												'searchSettings.searchButton.icon',
-											),
-											...getFilterMessages(),
-										},
-										staticFilters: {
-											productType: getStaticFilterFormValue('productType'),
-											collections: getStaticFilterFormValue('collection'),
-											color: getStaticFilterFormValue('color'),
-											size: getStaticFilterFormValue('size'),
-											price: getStaticFilterFormValue('price'),
-										},
-										dynamicFilters: get(
-											preferences,
-											'facetSettings.dynamicFacets',
-											[],
-										).map((facet) => ({
-											enabled: facet.enabled,
-											customize: get(facet, 'rsConfig'),
-										})),
-								  }),
+									},
+									staticFilters: {
+										productType: getStaticFilterFormValue('productType'),
+										collections: getStaticFilterFormValue('collection'),
+										color: getStaticFilterFormValue('color'),
+										size: getStaticFilterFormValue('size'),
+										price: getStaticFilterFormValue('price'),
+									},
+									dynamicFilters: get(
+										preferences,
+										'facetSettings.dynamicFacets',
+										[],
+									).map((facet) => ({
+										enabled: facet.enabled,
+										customize: get(facet, 'rsConfig'),
+									})),
+								}
+							),
 						}),
 					);
 					console.log('parsed patch', patchVar);
