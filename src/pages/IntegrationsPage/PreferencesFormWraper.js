@@ -182,10 +182,12 @@ class PreferencesFormWrapper extends React.Component {
 		if (this.form.get('enableAutoSuggestions')) {
 			this.form.get('enableAutoSuggestions').valueChanges.subscribe((value) => {
 				const autoSuggestionSettingsControl = this.form.get('autoSuggestionSettings');
-				if (value) {
-					autoSuggestionSettingsControl.enable();
-				} else {
-					autoSuggestionSettingsControl.disable();
+				if (autoSuggestionSettingsControl) {
+					if (value) {
+						autoSuggestionSettingsControl.enable();
+					} else {
+						autoSuggestionSettingsControl.disable();
+					}
 				}
 			});
 		}
