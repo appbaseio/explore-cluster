@@ -9,6 +9,15 @@ import IndexSuggestions from './IndexSuggestions';
 
 const { TabPane } = Tabs;
 
+const bannerDetails = {
+	title: 'Popular Suggestions',
+	description:
+		'GUI to manage preferences for popular suggestions. Popular suggestions are stored in the .suggestions index by appbase.io based on the analytics data of what end users are searching for.',
+	buttonText: 'Read more',
+	icon: 'pencil',
+	href: 'https://docs.appbase.io/docs/analytics/popular-suggestions/',
+};
+
 const SuggestionSettings = () => {
 	return (
 		<PreferencesFormWrapper>

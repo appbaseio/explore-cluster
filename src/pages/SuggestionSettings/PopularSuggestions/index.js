@@ -201,7 +201,7 @@ class QuerySuggestions extends React.Component {
 		return (
 			<React.Fragment>
 				<Container css={main}>
-					{total !== undefined && get(preferences, 'index') && !hide && (
+					{total !== undefined && get(preferences, 'index') && (
 						<>
 							<Banner {...bannerDetails} />
 							<Card className={cardStyle}>
