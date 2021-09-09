@@ -51,10 +51,10 @@
     url-search-params "^1.1.0"
     uuid "^3.3.2"
 
-"@appbaseio-confidential/reactivesearch-playground@^1.0.13-beta":
-  version "1.0.13-beta"
-  resolved "https://npm.pkg.github.com/download/@appbaseio-confidential/reactivesearch-playground/1.0.13-beta/121ffbe9c01a842c84a9a6d064cbc6b47442e6cf8e07729d9a339f84914d7a0d#73ca3ab220cfd1d23f9b0a31439461694dcc620c"
-  integrity sha512-FavGwxIedps4dQe3cfF9pFSye0cNuQbhaD4Hf8VMAqYnLI93XSpHSHVX0s1ppshJCp7nJpEHEdAoKKEzFFZjyw==
+"@appbaseio-confidential/reactivesearch-playground@^1.0.14-beta":
+  version "1.0.14-beta"
+  resolved "https://npm.pkg.github.com/download/@appbaseio-confidential/reactivesearch-playground/1.0.14-beta/aacac31a505f8ed9301c5bb3b3e3b170c0777b7c6a13564133dabdccbcb37576#23c44d593bd0c313ffb7ee4725fb5cdf152c043d"
+  integrity sha512-EdGVi339cs/o/P1JQmo+SUQv0Fz/mpityJhdrpyaSMttsxOZ6lk7ZFIzSqBT9prHQcBQ4veldRwXxoyNd6gMlQ==
   dependencies:
     "@monaco-editor/react" "^4.2.1"
     "@reduxjs/toolkit" "^1.6.0"
@@ -65,10 +65,10 @@
     redux-persist "^6.0.0"
     styled-components "^5.3.0"
 
-"@appbaseio/dejavu-browser@^3.4.7":
-  version "3.4.7"
-  resolved "https://registry.yarnpkg.com/@appbaseio/dejavu-browser/-/dejavu-browser-3.4.7.tgz#b5ac8dd697d35cc7e2e49340375c04ab75912783"
-  integrity sha512-T2PPQXnzPRsrQPDyf9igWhQzuYFJkVWYmZI9H+h7UtvXQVUSeW9S9zr1IAn4ByHDJzUltuFMjDpaKYounbTNrw==
+"@appbaseio/dejavu-browser@^3.5.2":
+  version "3.5.2"
+  resolved "https://registry.yarnpkg.com/@appbaseio/dejavu-browser/-/dejavu-browser-3.5.2.tgz#3ebe510a4ce3c42ce9766cfce0c9af20b3bebf32"
+  integrity sha512-0fmHPkEUzs07vcU0o0WkFyi02cUVEiBVI4RAlG36G9RHGyyIS1SgYXSignhfgXlugxRj3gWboZW2NIs2IszFuw==
   dependencies:
     "@divyanshu013/media" "^1.0.0"
     "@fortawesome/fontawesome-svg-core" "^1.2.27"
@@ -96,10 +96,10 @@
     react-codemirror2 "^5.1.0"
     react-dom "^16.6.3"
 
-"@appbaseio/reactivecore@9.11.11":
-  version "9.11.11"
-  resolved "https://registry.yarnpkg.com/@appbaseio/reactivecore/-/reactivecore-9.11.11.tgz#82697b02b46c72fff9e7a50f5f0a7cf3c9b0721b"
-  integrity sha512-aO0oALs9+k7cGc46yOi74izK1QT5kf+KHRZDq+4E4zhglzzK4f4X+kn+DrPjWSNNvWP9Bjsem0LdanA5cvN2qA==
+"@appbaseio/reactivecore@9.12.1":
+  version "9.12.1"
+  resolved "https://registry.yarnpkg.com/@appbaseio/reactivecore/-/reactivecore-9.12.1.tgz#e209459dfbb48ad65987d75fc0eb61c82edf0961"
+  integrity sha512-ZLb24K8RLwry4as/rk5PwDR7VPAQYYhdP9n7sZDWLjPO1HzQXckyz7CnzYgzdxt7NbLkarhCcYFYzpEZB6i7NA==
   dependencies:
     cross-fetch "^3.0.4"
     prop-types "^15.6.0"
@@ -107,12 +107,12 @@
     redux-thunk "^2.3.0"
     xdate "^0.8.2"
 
-"@appbaseio/reactivesearch@^3.21.0":
-  version "3.21.0"
-  resolved "https://registry.yarnpkg.com/@appbaseio/reactivesearch/-/reactivesearch-3.21.0.tgz#7e35dc28f0c024d739ca2e1c858bec3786f4fbaa"
-  integrity sha512-/2XB94k7ohabLezjOJcdbJ16gPVwsPOWB1Nrt3FBNHXAE0KEw2GdD9WEv47g3ku4Tybnmm8d388q4nprmIKv3g==
+"@appbaseio/reactivesearch@^3.23.1":
+  version "3.23.1"
+  resolved "https://registry.yarnpkg.com/@appbaseio/reactivesearch/-/reactivesearch-3.23.1.tgz#988ff312b99826aba0602f72133f4ee4ffcc6bb4"
+  integrity sha512-QhCA1XsIkErax6R1tpjEdlablJ79TRw1MB/GaAsoyz7/UtulqNAEwv+FhbTNY2uTwygM7a1CdM4UDjNazLZZtA==
   dependencies:
-    "@appbaseio/reactivecore" "9.11.11"
+    "@appbaseio/reactivecore" "9.12.1"
     "@emotion/core" "^10.0.28"
     "@emotion/styled" "^10.0.27"
     appbase-js "^4.1.5"
@@ -13976,7 +13976,7 @@ standalone-react-addons-pure-render-mixin@^0.1.1:
   resolved "https://registry.yarnpkg.com/standalone-react-addons-pure-render-mixin/-/standalone-react-addons-pure-render-mixin-0.1.1.tgz#3c7409f4c79c40de9ac72c616cf679a994f37551"
   integrity sha1-PHQJ9MecQN6axyxhbPZ5qZTzdVE=
 
-state-local@^1.0.6, state-local@^1.0.7:
+state-local@^1.0.6:
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/state-local/-/state-local-1.0.7.tgz#da50211d07f05748d53009bee46307a37db386d5"
   integrity sha512-HTEHMNieakEnoe33shBYcZ7NX83ACUjCu8c40iOGEZsngj9zRnkqS9j1pqQPXwobB0ZcVTk27REb7COQ0UR59w==
