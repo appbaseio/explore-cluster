@@ -268,7 +268,6 @@ class PreferenceForm extends React.Component {
 							name="indices"
 							render={({ handler, value }) => {
 								const inputHandler = handler();
-
 								return (
 									<Grid
 										label={
@@ -300,8 +299,7 @@ class PreferenceForm extends React.Component {
 												{indices
 													.filter((i) => !i.startsWith('metricbeat'))
 													.map((index) => (
-
-								<Select.Option key={index}>
+														<Select.Option key={index}>
 															{index}
 														</Select.Option>
 													))}

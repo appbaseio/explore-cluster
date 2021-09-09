@@ -153,6 +153,8 @@ class PreferenceForm extends React.Component {
 												{...inputHandler}
 												onChange={(val) => {
 													inputHandler.onChange(calculateValue(val));
+													// const { settings } = this.props;
+													// this.init({ ...settings });
 												}}
 											>
 												<Select.Option value="*">All (*)</Select.Option>
@@ -364,9 +366,15 @@ PreferenceForm.defaultProps = {
 	apps: {},
 };
 
-const mapStateToProps = (state) => ({
-	isLoading: get(state, '$saveSuggestionsPreferences.isFetching', false),
-	appName: get(state, '$getCurrentApp.name'),
-	apps: get(state, 'apps.data'),
-});
+const mapStateToProps = (state) => {
+	const appName = get(state, '$getCurrentApp.name');
+
+	return {
+		isLoading: get(state, '$saveSuggestionsPreferences.isFetching', false),
+		appName: get(state, '$getCurrentApp.name'),
+		apps: get(state, 'apps.data'),
+		settings: get(state, ['$getAppSettings', 'settings', appName]),
+	}
+
+};
 export default connect(mapStateToProps, null)(PreferenceForm);

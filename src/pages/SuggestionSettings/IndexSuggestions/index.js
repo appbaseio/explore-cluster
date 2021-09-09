@@ -10,7 +10,7 @@ import Loader from '../../../batteries/components/shared/Loader/Spinner';
 import Container from '../../../components/Container';
 import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
 import {
-	getSuggestionsPreferences,
+	getindexSuggestionsPreferences,
 	saveSuggestionsPreferences,
 	saveIndexSuggestionsPreferences
 } from '../../../batteries/modules/actions';
@@ -177,7 +177,7 @@ class QuerySuggestions extends React.Component {
 	render() {
 		const { isLoading, preferences, tier, featureSuggestions, hide } = this.props;
 		const { indices, total } = this.state;
-
+		// console.log("preferences:",preferences);
 		if (isLoading && !preferences) {
 			return <Loader />;
 		}
@@ -245,19 +245,19 @@ QuerySuggestions.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-	preferences: get(state, '$getSuggestionsPreferences.results', {}),
+	preferences: get(state, '$getindexSuggestionsPreferences.results', {}),
 	apps: get(state, 'apps.data', {}),
 	tier: get(state, '$getAppPlan.results.tier'),
 	featureSuggestions: get(state, '$getAppPlan.results.feature_suggestions', false),
-	isLoading: get(state, '$getSuggestionsPreferences.isFetching', false),
+	isLoading: get(state, '$getindexSuggestionsPreferences.isFetching', false),
 	errors: [
-		get(state, '$getSuggestionsPreferences.error'),
+		get(state, '$getindexSuggestionsPreferences.error'),
 		get(state, '$saveIndexSuggestionsPreferences.error'),
 	],
 });
 
 const mapDispatchToProps = (dispatch) => ({
-	getPreferences: () => dispatch(getSuggestionsPreferences()),
+	getPreferences: () => dispatch(getindexSuggestionsPreferences()),
 	savePreferences: (payload) => dispatch(saveIndexSuggestionsPreferences(payload)),
 });
 
