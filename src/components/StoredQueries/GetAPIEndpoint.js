@@ -9,7 +9,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { getAppStoredQuery, getPermission } from '../../batteries/modules/actions';
 import Loader from '../../batteries/components/shared/Loader/Spinner';
 import { jsonValidator, getString } from './utils';
-import Grid from '../../components/CreateCredentials/Grid';
+import Grid from '../CreateCredentials/Grid';
 import { getURL } from '../../constants/config';
 import Monaco from '../../batteries/components/SearchSandbox/containers/MonacoEditor';
 

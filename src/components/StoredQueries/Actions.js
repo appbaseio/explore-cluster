@@ -1,18 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Popconfirm } from 'antd';
+import { Button, Popconfirm, Row } from 'antd';
 import { css } from 'emotion';
 
-const btnCss = css`
-	margin-left: 10px;
+const rowContainer = css`
+	button:nth-child(1) {
+		margin-right: 5px;
+		margin-bottom: 5px;
+	}
+	button:nth-child(2) {
+		margin-right: 5px;
+		margin-bottom: 5px;
+	}
 `;
-
 const Actions = ({ handleEdit, handleRender, handleDelete }) => (
-	<div>
+	<Row css={rowContainer}>
 		<Button data-cy="sq-copy-curl" onClick={handleRender}>
 			Copy as cURL
 		</Button>
-		<Button data-cy="sq-edit" css={btnCss} onClick={handleEdit}>
+		<Button data-cy="sq-edit" onClick={handleEdit}>
 			Edit
 		</Button>
 		<Popconfirm
@@ -21,11 +27,11 @@ const Actions = ({ handleEdit, handleRender, handleDelete }) => (
 			okText="Yes"
 			cancelText="No"
 		>
-			<Button data-cy="sq-delete" type="danger" css={btnCss}>
+			<Button data-cy="sq-delete" type="danger">
 				Delete
 			</Button>
 		</Popconfirm>
-	</div>
+	</Row>
 );
 
 Actions.propTypes = {
