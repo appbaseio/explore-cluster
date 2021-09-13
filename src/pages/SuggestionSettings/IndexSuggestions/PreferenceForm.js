@@ -265,6 +265,7 @@ class PreferenceForm extends React.Component {
 			customStopwords,
 			size,
 			customQuery,
+			categoryField,
 		} = get(localRelevancy, 'indexSuggestions', {
 				excludeFields: [],
 				includeFields: [],
@@ -273,7 +274,9 @@ class PreferenceForm extends React.Component {
 				customStopwords: [],
 				size: 0,
 				customQuery: '',
+				categoryField: '',
 			});
+
 
 		return (
 			<FieldGroup
@@ -377,13 +380,14 @@ class PreferenceForm extends React.Component {
 								/>
 							)}
 						/>
-						{/* <FieldControl
+
+						<FieldControl
 							name="maxPredictedWords"
-							render={({ handler }) => (
+							render={({ handler, value }) => (
 								<Grid
 									label={
 										<p css={styles.labelContainer}>
-											Max Predicted Words
+											Min Characters
 											<Popover
 												content={content(
 													Messages.maxPredictedWords,
@@ -397,48 +401,17 @@ class PreferenceForm extends React.Component {
 									component={
 										<Input
 											type="number"
-											placeholder="Enter max predicted words"
-											{...handler()}
+											placeholder="Enter min count"
 											onChange={(e) => {
-												console.log(e)
 												this.handleChange('maxPredictedWords', e.target.value, 'indexSuggestions')
+												// handler.onChange(this.handleChange('numberOfDays', e.target.value, 'popularSuggestions'))
 											}}
 										/>
 									}
 								/>
 							)}
-						/> */}
-						<Form.Item
-							label={
-								<p css={styles.labelContainer}>
-									Max Predicted Words
-									<Popover
-										content={content(Messages.maxPredictedWords)}
-										css={styles.iconContainer}
-									>
-										<Icon type="info-circle" />
-									</Popover>
-								</p>
-							}
-						>
-							<Input
-								type="number"
-								placeholder="Enter max predicted words"
-								value={maxPredictedWords}
-								onChange={(e) =>
-									this.handleChange('maxPredictedWords', e.target.value, 'indexSuggestions')
-								}
-							/>
-						</Form.Item>
-						{/* <InputElement
-							name="maxPredictedWords"
-							label="Max Predicted Words"
-							placeholder="Enter max predicted words"
-							toolTipMessage={Messages.max_predicted_words}
-							onChange={val => {
-								this.handleChange('maxPredictedWords', val, 'indexSuggestions')
-							}}
-						/> */}
+						/>
+
 						<FieldControl
 							name="applyStopwords"
 							render={({ handler }) => (
@@ -465,33 +438,36 @@ class PreferenceForm extends React.Component {
 								/>
 							)}
 						/>
-						<Form.Item
-							label={
-								<p css={styles.labelContainer}>
-									Set Custom Stopwords
-									<Popover
-										content={content(Messages.customStopwords)}
-										css={styles.iconContainer}
-									>
-										<Icon type="info-circle" />
-									</Popover>
-								</p>
-							}
-						>
-							<Input.TextArea
-								placeholder="Add comma separated stopwords"
-								value={customStopwords.join(', ')}
-								onChange={(e) => {
-									this.handleChange('customStopwords', e.target.value, 'indexSuggestions')
-								}}
-							/>
-						</Form.Item>
-						{/* <InputElement
+						<FieldControl
 							name="customStopwords"
-							label="Set Custom Stopwords"
-							placeholder="Add comma separated stopwords"
-							toolTipMessage={Messages.customStopwords}
-						/> */}
+							render={({ handler, value }) => (
+								<Grid
+									label={
+										<p css={styles.labelContainer}>
+											Set Custom Stopwords
+											<Popover
+												content={content(
+													Messages.customStopwords,
+												)}
+												css={styles.iconContainer}
+											>
+												<Icon type="info-circle" />
+											</Popover>
+										</p>
+									}
+									component={
+										<Input
+											type="number"
+											placeholder="Enter min count"
+											onChange={(e) => {
+												this.handleChange('customStopwords', e.target.value, 'indexSuggestions')
+												// handler.onChange(this.handleChange('numberOfDays', e.target.value, 'popularSuggestions'))
+											}}
+										/>
+									}
+								/>
+							)}
+						/>
 						<FieldControl
 							name="enableSynonyms"
 							render={({ handler }) => (
@@ -518,130 +494,207 @@ class PreferenceForm extends React.Component {
 								/>
 							)}
 						/>
-						<Form.Item
-							label={
-								<p css={styles.labelContainer}>
-									Size
-									<Popover
-										content={content(Messages.size)}
-										css={styles.iconContainer}
-									>
-										<Icon type="info-circle" />
-									</Popover>
-								</p>
-							}
-						>
-							<Input
-								type="number"
-								placeholder="Enter size of index suggestions"
-								value={size}
-								onChange={(e) =>
-									this.handleChange('size', e.target.value, 'indexSuggestions')
-								}
-							/>
-						</Form.Item>
-						{/* <InputElement
+						<FieldControl
 							name="size"
-							label="Size"
-							placeholder="Enter size of index suggestions"
-							toolTipMessage={Messages.size}
-						/> */}
-
-						{/** Include Fields */}
-						<Form.Item
-							label={
-								<p css={styles.labelContainer}>
-									Include Fields
-									<Popover
-										content={content(Messages.includeFields)}
-										css={styles.iconContainer}
-									>
-										<Icon type="info-circle" />
-									</Popover>
-								</p>
-							}
-						>
-							<Select
-								placeholder="Select one ore more fields"
-								mode="tags"
-								notFoundContent={null}
-								style={{ width: '100%' }}
-								tokenSeparators={[',']}
-								disabled={getDisabled(excludeFields)}
-								value={includeFields}
-								data-cy="include-fields"
-								showSearch
-								onChange={(value) =>
-									this.handleChange(
-										'includeFields',
-										calculateValue(value),
-										'indexSuggestions',
-									)
-								}
-							>
-								<Select.Option key="*">* (Include all fields)</Select.Option>
-								{(mappings || []).map((v) => {
-									if (excludeFields && !excludeFields.includes(v)) {
-										return (
-											<Select.Option key={v} title={v}>
-												{v}
-											</Select.Option>
-										);
+							render={({ handler, value }) => (
+								<Grid
+									label={
+										<p css={styles.labelContainer}>
+											Size
+											<Popover
+												content={content(
+													Messages.size,
+												)}
+												css={styles.iconContainer}
+											>
+												<Icon type="info-circle" />
+											</Popover>
+										</p>
 									}
-									return null;
-								})}
-							</Select>
-						</Form.Item>
-
-						{/**  Exclude fields */}
-
-						<Form.Item
-							label={
-								<p css={styles.labelContainer}>
-									Exclude Fields
-									<Popover
-										content={content(Messages.exludeFields)}
-										css={styles.iconContainer}
-									>
-										<Icon type="info-circle" />
-									</Popover>
-								</p>
-							}
-						>
-							<Select
-								placeholder="Select one or more fields"
-								mode="tags"
-								notFoundContent={null}
-								style={{ width: '100%' }}
-								tokenSeparators={[',']}
-								disabled={getDisabled(includeFields)}
-								showSearch
-								value={excludeFields}
-								onChange={(value) =>
-									this.handleChange(
-										'excludeFields',
-										calculateValue(value),
-										'indexSuggestions',
-									)
-								}
-								data-cy="exclude-fields"
-							>
-								<Select.Option key="*">* (Exclude all fields)</Select.Option>
-								{(mappings || []).map((v) => {
-									if (includeFields && !includeFields.includes(v)) {
-										return (
-											<Select.Option key={v} title={v}>
-												{v}
-											</Select.Option>
-										);
+									component={
+										<Input
+											type="number"
+											placeholder="Enter min count"
+											onChange={(e) => {
+												this.handleChange('size', e.target.value, 'indexSuggestions')
+												// handler.onChange(this.handleChange('numberOfDays', e.target.value, 'popularSuggestions'))
+											}}
+										/>
 									}
-									return null;
-								})}
-							</Select>
-						</Form.Item>
+								/>
+							)}
+						/>
+						<FieldControl
+							name="includeFields"
+							render={({ handler }) => (
+								<Grid
+									label={
+										<p css={styles.labelContainer}>
+											Include Fields
+											<Popover
+												content={content(
+													Messages.includeFields,
+												)}
+												css={styles.iconContainer}
+											>
+												<Icon type="info-circle" />
+											</Popover>
+										</p>
+									}
+									component={
+										<Select
+											{...handler()}
+											placeholder="Select one ore more fields"
+											mode="tags"
+											notFoundContent={null}
+											style={{ width: '100%' }}
+											tokenSeparators={[',']}
+											disabled={getDisabled(excludeFields)}
+											data-cy="include-fields"
+											showSearch
+											onChange={(value) => {
+												this.handleChange(
+													'includeFields',
+													calculateValue(value),
+													'indexSuggestions',
+												);
+												handler().onChange(calculateValue(value));
+											}}
 
-						{/** Category Field */}
-						<Form.Item
+										>
+											<Select.Option key="*">* (Include all fields)</Select.Option>
+											{(mappings || []).map((v) => {
+												if (excludeFields && !excludeFields.includes(v)) {
+													return (
+														<Select.Option key={v} title={v}>
+															{v}
+														</Select.Option>
+													);
+												}
+												return null;
+											})}
+										</Select>
+									}
+								/>
+							)}
+						/>
+						<FieldControl
+							name="exludeFields"
+							render={({ handler }) => (
+								<Grid
+									label={
+										<p css={styles.labelContainer}>
+											Exclude Fields
+											<Popover
+												content={content(
+													Messages.exludeFields,
+												)}
+												css={styles.iconContainer}
+											>
+												<Icon type="info-circle" />
+											</Popover>
+										</p>
+									}
+									component={
+										<Select
+											{...handler()}
+											placeholder="Select one ore more fields"
+											mode="tags"
+											notFoundContent={null}
+											style={{ width: '100%' }}
+											tokenSeparators={[',']}
+											disabled={getDisabled(excludeFields)}
+											data-cy="exclude-fields"
+											showSearch
+											onChange={(value) => {
+												this.handleChange(
+													'exludeFields',
+													calculateValue(value),
+													'indexSuggestions',
+												);
+												handler().onChange(calculateValue(value));
+											}}
+
+										>
+											<Select.Option key="*">* (Exclude all fields)</Select.Option>
+												{(mappings || []).map((v) => {
+													if (includeFields && !includeFields.includes(v)) {
+														return (
+															<Select.Option key={v} title={v}>
+																{v}
+															</Select.Option>
+														);
+													}
+													return null;
+												})}
+											</Select>
+									}
+								/>
+							)}
+						/>
+						<FieldControl
+							name="categoryField"
+							render={({ handler, value }) => (
+								<Grid
+									label={
+										<p css={styles.labelContainer}>
+											Category Fields
+											<Popover
+												content={content(
+													Messages.categoryField,
+												)}
+												css={styles.iconContainer}
+											>
+												<Icon type="info-circle" />
+											</Popover>
+										</p>
+									}
+									component={
+										<MappingWrapper {...handler()}>
+											{({ flattenUsecase, flattenType }) => (
+												<React.Fragment>
+													{localRelevancy &&
+													this.getAggsField({ flattenUsecase, flattenType }).length >
+														0 ? (
+														<div
+															style={{
+																position: 'relative',
+																display: 'inline-block',
+															}}
+															data-cy="aggregation-fields-dropdown"
+														>
+															<Select
+																showSearch
+																style={{ width: 300 }}
+																value={value}
+																placeholder="Add aggregation fields from schema"
+																onChange={(field) => {
+																	this.updateToAggsField({
+																		path: field,
+																		flattenType,
+																	});
+																	handler().onChange(field);
+																}}
+															>
+																{this.getAggsField({
+																	flattenUsecase,
+																	flattenType,
+																}).map((field) => (
+																	<Select.Option key={field} value={field}>
+																		{field}
+																	</Select.Option>
+																))}
+															</Select>
+														</div>
+													) : null}
+												</React.Fragment>
+											)}
+										</MappingWrapper>
+									}
+								/>
+							)}
+						/>
+						{/* <Form.Item
 							label={
 								<p css={styles.labelContainer}>
 									Category Fields
@@ -693,12 +746,49 @@ class PreferenceForm extends React.Component {
 									</React.Fragment>
 								)}
 							</MappingWrapper>
-						</Form.Item>
+						</Form.Item> */}
 
 						{/* customQuery */}
+						{/* <Form.Item
+							label={
+								<p css={styles.labelContainer}>
+									Custom Query
+									<Popover
+										content={content(Messages.customQuery)}
+										css={styles.iconContainer}
+									>
+										<Icon type="info-circle" />
+									</Popover>
+								</p>
+							}
+						>
+							<Select
+								placeholder="Select Custom Query"
+								style={{ width: '100%' }}
+
+								value={customQuery}
+								optionLabelProp="label"
+
+								onChange={(val) => {
+									console.log(val);
+									// this.setState({ customQueryField: val });
+									this.handleChange('customQuery', val, 'indexSuggestions')
+								}}
+							>
+								{(appStoredQueries || []).map((v) => {
+									return (
+										<Select.Option key={v.id} label={v.id} value={v.id}>
+											<div>{v.id}</div>
+											<div>{v.description}</div>
+										</Select.Option>
+									);
+								})}
+							</Select>
+						</Form.Item> */}
+
 						<FieldControl
 							name="customQuery"
-							render={({ handler }) => {
+							render={({ handler, value }) => {
 								const inputHandler = handler();
 
 								return (
@@ -719,15 +809,15 @@ class PreferenceForm extends React.Component {
 												placeholder="Select Custom Query"
 												style={{ width: '100%' }}
 												{...inputHandler}
-												value={customQuery}
+												optionLabelProp="label"
 												onChange={(val) => {
-													this.setState({ customQueryField: val });
+													inputHandler.onChange(val);
 													this.handleChange('customQuery', val, 'indexSuggestions')
 												}}
 											>
 												{(appStoredQueries || []).map((v) => {
 													return (
-														<Select.Option key={v.id} title={v.id}>
+														<Select.Option key={v.id} label={v.id} value={v.id}>
 															<div>{v.id}</div>
 															<div>{v.description}</div>
 														</Select.Option>
@@ -739,41 +829,6 @@ class PreferenceForm extends React.Component {
 								);
 							}}
 						/>
-						{/* <Form.Item
-							label={
-								<p css={styles.labelContainer}>
-									Custom Query
-									<Popover
-										content={content(Messages.customQuery)}
-										css={styles.iconContainer}
-									>
-										<Icon type="info-circle" />
-									</Popover>
-								</p>
-							}
-						>
-							<Select
-								placeholder="Select custom query"
-								notFoundContent={null}
-								style={{ width: '100%' }}
-								tokenSeparators={[',']}
-								value={customQueryField}
-								onChange={(e) => {
-									console.log(e);
-									this.setState({customQueryField: e})
-								}}
-							>
-								{( appStoredQueries || []).map((v) => {
-									return (
-										<Select.Option key={v.id} title={v.id}>
-											<div>{v.id}</div>
-											<div>{v.description}</div>
-										</Select.Option>
-									);
-								})}
-							</Select>
-						</Form.Item>
-						 */}
 						<Affix offsetBottom={0}>
 							<div
 								style={{
@@ -821,10 +876,12 @@ PreferenceForm.propTypes = {
 	apps: PropTypes.object,
 	localRelevancy: null,
 	appName: PropTypes.string,
+	mappings: PropTypes.array,
 };
 
 PreferenceForm.defaultProps = {
 	apps: {},
+	mappings: []
 };
 
 const mapStateToProps = (state) => {

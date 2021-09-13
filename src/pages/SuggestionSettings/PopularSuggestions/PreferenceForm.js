@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import get from 'lodash/get';
 import { Input, Select, Button, Affix, Checkbox, Icon, Popover, Form } from 'antd';
 import { css } from 'react-emotion';
-import PropTypes from 'prop-types';
+import PropTypes, { number } from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import keys from 'lodash/keys';
 import Grid from '../../../components/CreateCredentials/Grid';
@@ -247,119 +247,126 @@ class PreferenceForm extends React.Component {
 								);
 							}}
 						/>
-						<Form.Item
-							label={
-								<p css={styles.labelContainer}>
-									Number of days
-									<Popover
-										content={content(Messages.numberOfDays)}
-										css={styles.iconContainer}
-									>
-										<Icon type="info-circle" />
-									</Popover>
-								</p>
-							}
-						>
-							<Input
-								type="number"
-								placeholder="Enter number of days"
-								value={numberOfDays}
-								onChange={(e) => {
-									console.log(e.target.value);
-									this.handleChange('numberOfDays', e.target.value, 'popularSuggestions')
-								}}
-							/>
-						</Form.Item>
-						{/* <InputElement
+						<FieldControl
 							name="numberOfDays"
-							label="Number of days"
-							placeholder="Enter number of days"
-							toolTipMessage={Messages.numberOfDays}
-						/> */}
-						<Form.Item
-							label={
-								<p css={styles.labelContainer}>
-									Min Count
-									<Popover
-										content={content(Messages.minCount)}
-										css={styles.iconContainer}
-									>
-										<Icon type="info-circle" />
-									</Popover>
-								</p>
-							}
-						>
-							<Input
-								type="number"
-								placeholder="Enter min count"
-								value={minCount}
-								onChange={(e) =>
-									this.handleChange('minCount', e.target.value, 'popularSuggestions')
-								}
-							/>
-						</Form.Item>
-						{/* <InputElement
+							render={({ handler, value }) => (
+								<Grid
+									label={
+										<p css={styles.labelContainer}>
+											Number of days
+											<Popover
+												content={content(
+													Messages.numberOfDays,
+												)}
+												css={styles.iconContainer}
+											>
+												<Icon type="info-circle" />
+											</Popover>
+										</p>
+									}
+									component={
+										<Input
+											type="number"
+											placeholder="Enter number of days"
+											onChange={(e) => {
+												this.handleChange('numberOfDays', e.target.value, 'popularSuggestions')
+												// handler.onChange(this.handleChange('numberOfDays', e.target.value, 'popularSuggestions'))
+											}}
+										/>
+									}
+								/>
+							)}
+						/>
+						<FieldControl
 							name="minCount"
-							label="Min Count"
-							placeholder="Enter min count"
-							toolTipMessage={Messages.minCount}
-						/> */}
-						<Form.Item
-							label={
-								<p css={styles.labelContainer}>
-									Min Hits
-									<Popover
-										content={content(Messages.minHits)}
-										css={styles.iconContainer}
-									>
-										<Icon type="info-circle" />
-									</Popover>
-								</p>
-							}
-						>
-							<Input
-								type="number"
-								placeholder="Enter min hits"
-								value={minHits}
-								onChange={(e) =>
-									this.handleChange('minHits', e.target.value, 'popularSuggestions')
-								}
-							/>
-						</Form.Item>
-						{/* <InputElement
+							render={({ handler, value }) => (
+								<Grid
+									label={
+										<p css={styles.labelContainer}>
+											Min Count
+											<Popover
+												content={content(
+													Messages.minCount,
+												)}
+												css={styles.iconContainer}
+											>
+												<Icon type="info-circle" />
+											</Popover>
+										</p>
+									}
+									component={
+										<Input
+											type="number"
+											placeholder="Enter min count"
+											onChange={(e) => {
+												this.handleChange('minCount', e.target.value, 'popularSuggestions')
+												// handler.onChange(this.handleChange('numberOfDays', e.target.value, 'popularSuggestions'))
+											}}
+										/>
+									}
+								/>
+							)}
+						/>
+						<FieldControl
 							name="minHits"
-							label="Min Hits"
-							placeholder="Enter min hits"
-							toolTipMessage={Messages.minHits}
-						/> */}
-						<Form.Item
-							label={
-								<p css={styles.labelContainer}>
-									Min Characters
-									<Popover
-										content={content(Messages.minCharacters)}
-										css={styles.iconContainer}
-									>
-										<Icon type="info-circle" />
-									</Popover>
-								</p>
-							}
-						>
-							<Input
-								type="number"
-								placeholder="Enter min characters"
-								value={minCharacters}
-								onChange={(e) =>
-									this.handleChange('minCharacters', e.target.value, 'popularSuggestions')
-								}
-							/>
-						</Form.Item>
-						{/* <InputElement
+							render={({ handler, value }) => (
+								<Grid
+									label={
+										<p css={styles.labelContainer}>
+											Min Hits
+											<Popover
+												content={content(
+													Messages.minHits,
+												)}
+												css={styles.iconContainer}
+											>
+												<Icon type="info-circle" />
+											</Popover>
+										</p>
+									}
+									component={
+										<Input
+											type="number"
+											placeholder="Enter min Hits"
+											onChange={(e) => {
+												this.handleChange('minHits', e.target.value, 'popularSuggestions')
+												// handler.onChange(this.handleChange('numberOfDays', e.target.value, 'popularSuggestions'))
+											}}
+										/>
+									}
+								/>
+							)}
+						/>
+						<FieldControl
 							name="minCharacters"
-							label="Min Characters"
-							placeholder="Enter min characters"
-							toolTipMessage={Messages.minCharacters}
-						/> */}
+							render={({ handler, value }) => (
+								<Grid
+									label={
+										<p css={styles.labelContainer}>
+											Min Characters
+											<Popover
+												content={content(
+													Messages.minCharacters,
+												)}
+												css={styles.iconContainer}
+											>
+												<Icon type="info-circle" />
+											</Popover>
+										</p>
+									}
+									component={
+										<Input
+											type="number"
+											placeholder="Enter min count"
+											onChange={(e) => {
+												this.handleChange('minCharacters', e.target.value, 'popularSuggestions')
+												// handler.onChange(this.handleChange('numberOfDays', e.target.value, 'popularSuggestions'))
+											}}
+										/>
+									}
+								/>
+							)}
+						/>
 						<FieldControl
 							name="transformDiacritics"
 							render={({ handler }) => (
@@ -390,64 +397,74 @@ class PreferenceForm extends React.Component {
 								/>
 							)}
 						/>
-						<Form.Item
-							label={
-								<p css={styles.labelContainer}>
-									Size
-									<Popover
-										content={content(Messages.size)}
-										css={styles.iconContainer}
-									>
-										<Icon type="info-circle" />
-									</Popover>
-								</p>
-							}
-						>
-							<Input
-								type="number"
-								placeholder="Enter size"
-								value={size}
-								onChange={(e) =>
-									this.handleChange('size', e.target.value, 'popularSuggestions')
-								}
-							/>
-						</Form.Item>
-						{/* <InputElement
+						<FieldControl
 							name="size"
-							label="Size"
-							placeholder="Enter size of popular suggestions"
-							toolTipMessage={Messages.size} */}
+							render={({ handler, value }) => (
+								<Grid
+									label={
+										<p css={styles.labelContainer}>
+											Size
+											<Popover
+												content={content(
+													Messages.size,
+												)}
+												css={styles.iconContainer}
+											>
+												<Icon type="info-circle" />
+											</Popover>
+										</p>
+									}
+									component={
+										<Input
+											type="number"
+											placeholder="Enter min count"
+											onChange={(e) => {
+												this.handleChange('size', e.target.value, 'popularSuggestions')
+												// handler.onChange(this.handleChange('numberOfDays', e.target.value, 'popularSuggestions'))
+											}}
+										/>
+									}
+								/>
+							)}
 						/>
-						<Form.Item
-							label={
-								<p css={styles.labelContainer}>
-									Blacklist
-									<Popover
-										content={content(Messages.blacklist)}
-										css={styles.iconContainer}
-									>
-										<Icon type="info-circle" />
-									</Popover>
-								</p>
-							}
-						>
-							<Select
-								placeholder="Enter blacklist queries"
-								mode="tags"
-								notFoundContent={null}
-								style={{ width: '100%' }}
-								tokenSeparators={[',']}
-								value={blacklist}
+						<FieldControl
+							name="blacklist"
+							render={({ handler, value }) => (
+								<Grid
+									label={
+										<p css={styles.labelContainer}>
+											Blacklist
+											<Popover
+												content={content(
+													Messages.blacklist,
+												)}
+												css={styles.iconContainer}
+											>
+												<Icon type="info-circle" />
+											</Popover>
+										</p>
+									}
+									component={
+										<Select
+											placeholder="Enter blacklist queries"
+											mode="tags"
+											notFoundContent={null}
+											style={{ width: '100%' }}
+											tokenSeparators={[',']}
 
-								onChange={(value) =>
-									this.handleChange(
-										'blacklist',
-										calculateValue(value),
-										'popularSuggestions',
-									)
-								}
-							/>
-						</Form.Item>
+
+											onChange={(value) =>
+												this.handleChange(
+													'blacklist',
+													calculateValue(value),
+													'popularSuggestions',
+												)
+											}
+										/>
+									}
+								/>
+							)}
+						/>
 
 						{/* <FieldControl
 							name="blacklist"
