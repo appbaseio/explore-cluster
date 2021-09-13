@@ -21,11 +21,7 @@ const SearchTemplatesPage = Loadable({
 		import(/* webpackChunkName: "SearchTemplatesPage" */ '../../pages/SearchTemplatesPage'),
 	loading: Loader,
 });
-const QuerySuggestionsPage = Loadable({
-	loader: () =>
-		import(/* webpackChunkName: "QuerySuggestionsPage" */ '../../pages/QuerySuggestionsPage'),
-	loading: Loader,
-});
+
 const CachePreferences = Loadable({
 	loader: () => import(/* webpackChunkName: "CachePreferences" */ '../../pages/CachePreferences'),
 	loading: Loader,
@@ -160,19 +156,6 @@ class ClusterRouteContainer extends React.Component {
 							<>
 								{get(allowedRoutes, '/cluster/search-templates') ? (
 									<AppPageContainer {...props} component={SearchTemplatesPage} />
-								) : (
-									<UnauthorizedPage />
-								)}
-							</>
-						)}
-					/>
-					<Route
-						exact
-						path="/cluster/popular-suggestions"
-						component={(props) => (
-							<>
-								{get(allowedRoutes, '/cluster/popular-suggestions') ? (
-									<AppPageContainer {...props} component={QuerySuggestionsPage} />
 								) : (
 									<UnauthorizedPage />
 								)}

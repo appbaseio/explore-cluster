@@ -18,11 +18,6 @@ const SearchTemplatesPage = Loadable({
 		import(/* webpackChunkName: "SearchTemplatesPage" */ '../../pages/SearchTemplatesPage'),
 	loading: Loader,
 });
-const QuerySuggestionsPage = Loadable({
-	loader: () =>
-		import(/* webpackChunkName: "QuerySuggestionsPage" */ '../../pages/QuerySuggestionsPage'),
-	loading: Loader,
-});
 
 const BillingPage = Loadable({
 	loader: () => import(/* webpackChunkName: "BillingPage" */ '../../pages/BillingPage'),
@@ -288,19 +283,6 @@ class RouteContainer extends React.Component {
 										shouldFetchAppInfo={false}
 										shouldFetchAppPlan={false}
 									/>
-								) : (
-									<UnauthorizedPage />
-								)}
-							</>
-						)}
-					/>
-					<Route
-						exact
-						path="/app/:appName/popular-suggestions"
-						render={(props) => (
-							<>
-								{get(allowedRoutes, 'popular-suggestions') ? (
-									<AppPageContainer {...props} component={QuerySuggestionsPage} />
 								) : (
 									<UnauthorizedPage />
 								)}
