@@ -96,6 +96,7 @@ const getExpressionFromValue = ({
 	queryValue,
 	selectedIndexes,
 	condition,
+	type,
 }) => {
 	let expression = `'${selectedIndexes.join(',')}' in $index`;
 
@@ -107,8 +108,11 @@ const getExpressionFromValue = ({
 		if (dataField && dataFieldValue) {
 			expression = `${expression} and $filter.${dataField} matches '${dataFieldValue}'`;
 		}
-	}
 
+		if (type?.length) {
+			expression = `${expression} and $type in ${JSON.stringify(type)}`;
+		}
+	}
 	return expression;
 };
 

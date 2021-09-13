@@ -12,6 +12,7 @@ import {
 	Button,
 	Card,
 	Col,
+	Checkbox,
 	DatePicker,
 	Divider,
 	Icon,
@@ -52,7 +53,6 @@ import Overlay from '../../components/Overlay';
 import { mediaKey } from '../../utils/media';
 import { getSingleFunction } from '../../batteries/utils/app';
 import { isValidPlan } from '../../batteries/utils';
-
 import { AdvancedEditor, CustomAutoComplete } from '../../components/AdvancedEditor';
 import { getRawQuery, parseExpression } from '../../components/AdvancedEditor/helper';
 import { allowedTiers } from '../../utils/prop-types';
@@ -142,6 +142,29 @@ DocsLink.propTypes = {
 	url: PropTypes.string.isRequired,
 };
 
+const searchTypeArr = [
+	{
+		label: 'Search',
+		value: 'search',
+	},
+	{
+		label: 'Suggestion',
+		value: 'suggestion',
+	},
+	{
+		label: 'Term',
+		value: 'term',
+	},
+	{
+		label: 'Range',
+		value: 'range',
+	},
+	{
+		label: 'Geo',
+		value: 'geo',
+	},
+];
+
 class QueryRulesForm extends React.Component {
 	constructor(props) {
 		super(props);
@@ -178,6 +201,7 @@ class QueryRulesForm extends React.Component {
 
 			subFieldsMap: {},
 
+			type: [],
 			error: {},
 			loading: false,
 			editorKey: Date.now(),
@@ -396,6 +420,7 @@ class QueryRulesForm extends React.Component {
 			show_advance_editor,
 			advancedExpression,
 			fieldMap,
+			type,
 		} = this.state;
 
 		let { actions } = this.state;
@@ -418,6 +443,7 @@ class QueryRulesForm extends React.Component {
 						query,
 						queryValue,
 						condition,
+						type,
 				  });
 		}
 
@@ -798,6 +824,26 @@ class QueryRulesForm extends React.Component {
 										</label>
 									</>
 								)}
+								<div className={formStyle}>
+									<label>Search Type</label>
+									{/* {
+										searchTypeArr.map((type) => (
+											<Checkbox
+												name='type'
+												onChange={{e => console.log(e.target.checked)}}
+											>{type.label}</Checkbox>
+										))
+									} */}
+									<Checkbox.Group
+										name="type"
+										options={searchTypeArr}
+										defaultValue={[]}
+										style={{ display: 'flex', flexWrap: 'wrap' }}
+										onChange={(data) => {
+											this.setState({ type: data });
+										}}
+									/>
+								</div>
 								{!show_advance_editor && (
 									<ErrorToaster inline>
 										<Conditions
@@ -813,6 +859,7 @@ class QueryRulesForm extends React.Component {
 										/>
 									</ErrorToaster>
 								)}
+
 								{show_advance_editor && condition === 'filter' && (
 									<div className={customReactFilter}>
 										<label>
