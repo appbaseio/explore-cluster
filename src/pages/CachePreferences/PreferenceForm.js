@@ -1,12 +1,13 @@
 import React, { useMemo } from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Input, Select, Button, Switch } from 'antd';
+import { Select, Button, Switch } from 'antd';
 import { css } from 'react-emotion';
 import PropTypes from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import Grid from '../../components/CreateCredentials/Grid';
 import { cacheMessages as Messages } from '../../utils/messages';
+import InputElement from '../../components/InputElement';
 
 const calculateValue = (value) => {
 	const index = value.indexOf('*');
@@ -34,60 +35,6 @@ const modal = css`
 		border-color: tomato;
 	}
 `;
-
-const InputElement = ({ name, label, toolTipMessage, inputProps, placeholder }) => (
-	<FieldControl
-		name={name}
-		render={({ handler, invalid, touched, hasError, getError }) => (
-			<Grid
-				label={label}
-				toolTipMessage={toolTipMessage}
-				component={
-					<div style={{ width: '100%' }}>
-						<div>
-							<Input
-								className={touched && invalid ? 'input-error' : null}
-								placeholder={placeholder}
-								type="number"
-								{...handler()}
-								{...inputProps}
-							/>
-						</div>
-
-						{touched && invalid && (
-							<div className="error">
-								{(hasError('required') &&
-									`Please enter ${label.toLowerCase()} value.`) ||
-									(hasError('min') &&
-										`Minimum allowed value for ${label.toLowerCase()} is ${
-											getError('min').min
-										}.`) ||
-									(hasError('max') &&
-										`Maximum allowed value for ${label.toLowerCase()} is ${
-											getError('max').max
-										}.`)}
-							</div>
-						)}
-					</div>
-				}
-			/>
-		)}
-	/>
-);
-
-InputElement.propTypes = {
-	name: PropTypes.string.isRequired,
-	label: PropTypes.string.isRequired,
-	toolTipMessage: PropTypes.any,
-	inputProps: PropTypes.object,
-	placeholder: PropTypes.string,
-};
-
-InputElement.defaultProps = {
-	toolTipMessage: undefined,
-	inputProps: {},
-	placeholder: undefined,
-};
 
 const PreferenceForm = ({ control, handleSaveTemplate, isLoading, apps }) => {
 	const indices = useMemo(

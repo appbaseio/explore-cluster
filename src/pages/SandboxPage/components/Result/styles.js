@@ -22,6 +22,7 @@ const listItem = css`
 	}
 
 	.collapse {
+		text-align: left;
 		overflow: hidden;
 		max-height: 200px;
 	}

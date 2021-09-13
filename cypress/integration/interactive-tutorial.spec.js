@@ -79,7 +79,7 @@ describe('Interactive Tutorial', () => {
 	});
 
 	it('Should logout user', () => {
-		cy.get('[data-cy=logout-menu]').click().wait(1000).get('[data-cy=logout-button]').click();
+		cy.logoutUser();
 	});
 
 	after(() => {

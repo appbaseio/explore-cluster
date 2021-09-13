@@ -83,6 +83,12 @@ const SandboxPage = Loadable({
 	loading: Loader,
 });
 
+const StoredQueriesPage = Loadable({
+	loader: () =>
+		import(/* webpackChunkName: "StoredQueriesPage" */ '../../pages/StoredQueriesPage'),
+	loading: Loader,
+});
+
 const SearchIntegrationsPage = Loadable({
 	loader: () =>
 		import(
@@ -328,6 +334,19 @@ class ClusterRouteContainer extends React.Component {
 							<>
 								{get(allowedRoutes, '/cluster/search-preview') ? (
 									<AppPageContainer {...props} component={SandboxPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
+						)}
+					/>
+					<Route
+						exact
+						path="/cluster/stored-queries"
+						render={(props) => (
+							<>
+								{get(allowedRoutes, '/cluster/stored-queries') ? (
+									<AppPageContainer {...props} component={StoredQueriesPage} />
 								) : (
 									<UnauthorizedPage />
 								)}
