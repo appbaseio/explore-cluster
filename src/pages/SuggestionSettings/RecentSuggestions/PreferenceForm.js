@@ -1,12 +1,15 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Input, Select, Button, Affix, Icon, Popover } from 'antd';
+import { Input, Select, Button, Affix, Icon, Popover, Form } from 'antd';
 import { css } from 'react-emotion';
 import PropTypes from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import keys from 'lodash/keys';
 import Grid from '../../../components/CreateCredentials/Grid';
+import {
+	setLocalRelevancyState,
+} from '../../../batteries/modules/actions';
 import { suggestionsMessages as Messages } from '../../../utils/messages';
 import SearchPreviewSwitcher from '../../../components/SearchPreviewSwitcher';
 import ReviewAndSave from '../../../components/ReviewAndSave';
@@ -116,28 +119,102 @@ class PreferenceForm extends React.Component {
 		this.setState({ app, visible: true });
 	};
 
+	handleChange = (key, value, dataKey) => {
+		const { appName, localRelevancy, updateLocalRelevancy } = this.props;
+		console.log(this.props)
+		if(localRelevancy) {
+			updateLocalRelevancy(appName, {
+				...localRelevancy,
+				[dataKey]: {
+					...get(localRelevancy, dataKey),
+					[key]: value,
+				},
+			});
+		}
+	};
+
 	render() {
-		const { control, handleSaveTemplate, isLoading, indices, apps } = this.props;
+		const { control, handleSaveTemplate, isLoading, apps,indices , localRelevancy } = this.props;
 		const { visible, app } = this.state;
 		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
+		const {
+			minHits,
+			size,
+		} = get(localRelevancy, 'recentSuggestions', {
+			minHits: 0,
+			size: 0,
+		});
+
 		return (
 			<FieldGroup
 				control={control}
 				strict={false}
 				render={({ pristine, invalid: invalidForm }) => (
 					<div css={modal}>
-						<InputElement
+						<Form.Item
+							label={
+								<p css={styles.labelContainer}>
+									Min Hits
+									<Popover
+										content={content(Messages.minHits)}
+										css={styles.iconContainer}
+									>
+										<Icon type="info-circle" />
+									</Popover>
+								</p>
+							}
+						>
+							<Input
+								type="number"
+								placeholder="Enter min hitss"
+								value={minHits}
+								onChange={(e) => {
+									console.log(e.target.value)
+									this.handleChange('minHits', e.target.value, 'recentSuggestions')
+								}}
+							/>
+						</Form.Item>
+						<Form.Item
+							label={
+								<p css={styles.labelContainer}>
+									Size
+									<Popover
+										content={content(Messages.size)}
+										css={styles.iconContainer}
+									>
+										<Icon type="info-circle" />
+									</Popover>
+								</p>
+							}
+						>
+							<Input
+								type="number"
+								placeholder="Enter size of recent suggestion"
+								value={size}
+								onChange={(e) => {
+									console.log(e.target.value)
+									this.handleChange('size', e.target.value, 'recentSuggestions')
+								}}
+							/>
+						</Form.Item>
+						{/* <InputElement
 							name="minHits"
 							label="Min Hits"
 							placeholder="Enter min hits"
 							toolTipMessage={Messages.minHits}
-						/>
-						<InputElement
+							onChange={(e) => {
+								this.handleChange('minHits', e.target.value);
+							}}
+						/> */}
+						{/* <InputElement
 							name="size"
 							label="Size"
 							placeholder="Enter size of popular suggestions"
 							toolTipMessage={Messages.size}
-						/>
+							onChange={(e) => {
+								this.handleChange('size', e.target.value);
+							}}
+						/> */}
 						<FieldControl
 							name="indices"
 							render={({ handler, value }) => {
@@ -165,6 +242,8 @@ class PreferenceForm extends React.Component {
 												{...inputHandler}
 												onChange={(val) => {
 													inputHandler.onChange(calculateValue(val));
+
+
 												}}
 											>
 												<Select.Option value="*">All (*)</Select.Option>
@@ -228,9 +307,18 @@ PreferenceForm.defaultProps = {
 	apps: {},
 };
 
-const mapStateToProps = (state) => ({
-	isLoading: get(state, '$saveSuggestionsPreferences.isFetching', false),
-	appName: get(state, '$getCurrentApp.name'),
-	apps: get(state, 'apps.data'),
+const mapStateToProps = (state) => {
+	const appName = get(state, '$getCurrentApp.name');
+	return {
+		isLoading: get(state, '$saveSuggestionsPreferences.isFetching', false),
+		appName,
+		apps: get(state, 'apps.data'),
+		localRelevancy: get(state, ['$getLocalRelevancy', appName], null),
+	}
+};
+
+const mapDispatchToProps = (dispatch) => ({
+	updateLocalRelevancy: (name, data) => dispatch(setLocalRelevancyState(name, data)),
 });
-export default connect(mapStateToProps, null)(PreferenceForm);
+
+export default connect(mapStateToProps, mapDispatchToProps)(PreferenceForm);

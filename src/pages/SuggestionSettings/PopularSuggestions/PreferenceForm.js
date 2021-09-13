@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Input, Select, Button, Affix, Checkbox, Icon, Popover } from 'antd';
+import { Input, Select, Button, Affix, Checkbox, Icon, Popover, Form } from 'antd';
 import { css } from 'react-emotion';
 import PropTypes from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
@@ -9,6 +9,9 @@ import keys from 'lodash/keys';
 import Grid from '../../../components/CreateCredentials/Grid';
 import Ace from '../../../batteries/components/SearchSandbox/containers/AceEditor';
 import { suggestionsMessages as Messages } from '../../../utils/messages';
+import {
+	setLocalRelevancyState,
+} from '../../../batteries/modules/actions';
 import SearchPreviewSwitcher from '../../../components/SearchPreviewSwitcher';
 import styles from '../styles';
 import ReviewAndSave from '../../../components/ReviewAndSave';
@@ -116,10 +119,45 @@ class PreferenceForm extends React.Component {
 		this.setState({ app, visible: true });
 	};
 
+	handleChange = (key, value, dataKey) => {
+		const { appName, localRelevancy, updateLocalRelevancy } = this.props;
+
+		if (localRelevancy) {
+			updateLocalRelevancy(appName, {
+				...localRelevancy,
+				[dataKey]: {
+					...get(localRelevancy, dataKey),
+					[key]: value,
+				},
+			});
+		}
+	};
+
 	render() {
-		const { control, handleSaveTemplate, isLoading, indices, apps } = this.props;
+		const { control, handleSaveTemplate, isLoading, indices, apps, localRelevancy } = this.props;
 		const { visible, app } = this.state;
 		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
+
+		const {
+			numberOfDays,
+			minCount,
+			minHits,
+			minCharacters,
+			transformDiacritics,
+			size,
+			blacklist,
+			externalSuggestions,
+		} = get(localRelevancy, 'popularSuggestions', {
+			numberOfDays: 0,
+			minCount: 0,
+			minHits: 0,
+			minCharacters: 0,
+			transformDiacritics: false,
+			size: 0,
+			blacklist: [],
+			externalSuggestions: '',
+		});
+
 		return (
 			<FieldGroup
 				control={control}
@@ -171,29 +209,118 @@ class PreferenceForm extends React.Component {
 								);
 							}}
 						/>
-						<InputElement
+						<Form.Item
+							label={
+								<p css={styles.labelContainer}>
+									Number of days
+									<Popover
+										content={content(Messages.numberOfDays)}
+										css={styles.iconContainer}
+									>
+										<Icon type="info-circle" />
+									</Popover>
+								</p>
+							}
+						>
+							<Input
+								type="number"
+								placeholder="Enter number of days"
+								value={numberOfDays}
+								onChange={(e) => {
+									console.log(e.target.value);
+									this.handleChange('numberOfDays', e.target.value, 'popularSuggestions')
+								}}
+							/>
+						</Form.Item>
+						{/* <InputElement
 							name="numberOfDays"
 							label="Number of days"
 							placeholder="Enter number of days"
 							toolTipMessage={Messages.numberOfDays}
-						/>
-						<InputElement
+						/> */}
+						<Form.Item
+							label={
+								<p css={styles.labelContainer}>
+									Min Count
+									<Popover
+										content={content(Messages.minCount)}
+										css={styles.iconContainer}
+									>
+										<Icon type="info-circle" />
+									</Popover>
+								</p>
+							}
+						>
+							<Input
+								type="number"
+								placeholder="Enter min count"
+								value={minCount}
+								onChange={(e) =>
+									this.handleChange('minCount', e.target.value, 'popularSuggestions')
+								}
+							/>
+						</Form.Item>
+						{/* <InputElement
 							name="minCount"
 							label="Min Count"
 							placeholder="Enter min count"
 							toolTipMessage={Messages.minCount}
-						/>
-						<InputElement
+						/> */}
+						<Form.Item
+							label={
+								<p css={styles.labelContainer}>
+									Min Hits
+									<Popover
+										content={content(Messages.minHits)}
+										css={styles.iconContainer}
+									>
+										<Icon type="info-circle" />
+									</Popover>
+								</p>
+							}
+						>
+							<Input
+								type="number"
+								placeholder="Enter min hits"
+								value={minHits}
+								onChange={(e) =>
+									this.handleChange('minHits', e.target.value, 'popularSuggestions')
+								}
+							/>
+						</Form.Item>
+						{/* <InputElement
 							name="minHits"
 							label="Min Hits"
 							placeholder="Enter min hits"
 							toolTipMessage={Messages.minHits}
-						/>
-						<InputElement
+						/> */}
+						<Form.Item
+							label={
+								<p css={styles.labelContainer}>
+									Min Characters
+									<Popover
+										content={content(Messages.minCharacters)}
+										css={styles.iconContainer}
+									>
+										<Icon type="info-circle" />
+									</Popover>
+								</p>
+							}
+						>
+							<Input
+								type="number"
+								placeholder="Enter min characters"
+								value={minCharacters}
+								onChange={(e) =>
+									this.handleChange('minCharacters', e.target.value, 'popularSuggestions')
+								}
+							/>
+						</Form.Item>
+						{/* <InputElement
 							name="minCharacters"
 							label="Min Characters"
 							placeholder="Enter min characters"
-							toolTipMessage={Messages.minCharacters}
+							toolTipMessage={Messages.minCharacters} */}
 						/>
 						<FieldControl
 							name="transformDiacritics"
@@ -213,20 +340,78 @@ class PreferenceForm extends React.Component {
 									component={
 										<div style={{ width: '100%' }}>
 											<div>
-												<Checkbox {...handler('checkbox')} />
+												<Checkbox
+													{...handler('checkbox')}
+													onChange={val => {
+														this.handleChange('transformDiacritics', val, 'popularSuggestions')
+													}}
+												/>
 											</div>
 										</div>
 									}
 								/>
 							)}
 						/>
-						<InputElement
+						<Form.Item
+							label={
+								<p css={styles.labelContainer}>
+									Size
+									<Popover
+										content={content(Messages.size)}
+										css={styles.iconContainer}
+									>
+										<Icon type="info-circle" />
+									</Popover>
+								</p>
+							}
+						>
+							<Input
+								type="number"
+								placeholder="Enter size"
+								value={size}
+								onChange={(e) =>
+									this.handleChange('size', e.target.value, 'popularSuggestions')
+								}
+							/>
+						</Form.Item>
+						{/* <InputElement
 							name="size"
 							label="Size"
 							placeholder="Enter size of popular suggestions"
-							toolTipMessage={Messages.size}
+							toolTipMessage={Messages.size} */}
 						/>
-						<FieldControl
+						<Form.Item
+							label={
+								<p css={styles.labelContainer}>
+									Blacklist
+									<Popover
+										content={content(Messages.blacklist)}
+										css={styles.iconContainer}
+									>
+										<Icon type="info-circle" />
+									</Popover>
+								</p>
+							}
+						>
+							<Select
+								placeholder="Enter blacklist queries"
+								mode="tags"
+								notFoundContent={null}
+								style={{ width: '100%' }}
+								tokenSeparators={[',']}
+								value={blacklist}
+
+								onChange={(value) =>
+									this.handleChange(
+										'blacklist',
+										calculateValue(value),
+										'popularSuggestions',
+									)
+								}
+							/>
+						</Form.Item>
+
+						{/* <FieldControl
 							name="blacklist"
 							render={({ handler }) => {
 								const inputHandler = handler();
@@ -256,7 +441,7 @@ class PreferenceForm extends React.Component {
 									/>
 								);
 							}}
-						/>
+						/> */}
 						<FieldControl
 							name="externalSuggestions"
 							render={({ handler }) => {
@@ -374,7 +559,12 @@ const mapStateToProps = (state) => {
 		appName: get(state, '$getCurrentApp.name'),
 		apps: get(state, 'apps.data'),
 		settings: get(state, ['$getAppSettings', 'settings', appName]),
+		localRelevancy: get(state, ['$getLocalRelevancy', appName], null),
 	}
-
 };
-export default connect(mapStateToProps, null)(PreferenceForm);
+
+const mapDispatchToProps = (dispatch) => ({
+	updateLocalRelevancy: (name, data) => dispatch(setLocalRelevancyState(name, data)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(PreferenceForm);
