@@ -60,7 +60,7 @@ export const suggestionsMessages = {
 	externalSuggestions: Message('Define your custom suggestions.'),
 	minCount: Message('Min value of count for the suggestions.'),
 	minHits: Message('Define the minimum number of results that must present for a suggestion.'),
-	min_chars: Message(
+	minCharacters: Message(
 		'Define the minimum number of characters that must be present for a suggestion.',
 	),
 	transformDiacritics: Message(
