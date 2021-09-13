@@ -824,40 +824,35 @@ class QueryRulesForm extends React.Component {
 										</label>
 									</>
 								)}
-								<div className={formStyle}>
-									<label>Search Type</label>
-									{/* {
-										searchTypeArr.map((type) => (
-											<Checkbox
-												name='type'
-												onChange={{e => console.log(e.target.checked)}}
-											>{type.label}</Checkbox>
-										))
-									} */}
-									<Checkbox.Group
-										name="type"
-										options={searchTypeArr}
-										defaultValue={[]}
-										style={{ display: 'flex', flexWrap: 'wrap' }}
-										onChange={(data) => {
-											this.setState({ type: data });
-										}}
-									/>
-								</div>
+
 								{!show_advance_editor && (
-									<ErrorToaster inline>
-										<Conditions
-											onChange={this.handleInput}
-											error={error.condition}
-											condition={condition}
-											dataFields={dataFields}
-											dataField={dataField}
-											dataFieldValue={dataFieldValue}
-											query={query}
-											onDropdownChange={this.handleDropdown}
-											queryValue={queryValue}
-										/>
-									</ErrorToaster>
+									<>
+										<div className={formStyle}>
+											<label>Search Type</label>
+											<Checkbox.Group
+												name="type"
+												options={searchTypeArr}
+												defaultValue={[]}
+												style={{ display: 'flex', flexWrap: 'wrap' }}
+												onChange={(data) => {
+													this.setState({ type: data });
+												}}
+											/>
+										</div>
+										<ErrorToaster inline>
+											<Conditions
+												onChange={this.handleInput}
+												error={error.condition}
+												condition={condition}
+												dataFields={dataFields}
+												dataField={dataField}
+												dataFieldValue={dataFieldValue}
+												query={query}
+												onDropdownChange={this.handleDropdown}
+												queryValue={queryValue}
+											/>
+										</ErrorToaster>
+									</>
 								)}
 
 								{show_advance_editor && condition === 'filter' && (
