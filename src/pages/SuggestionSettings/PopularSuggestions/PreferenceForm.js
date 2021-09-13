@@ -11,6 +11,9 @@ import Ace from '../../../batteries/components/SearchSandbox/containers/AceEdito
 import { suggestionsMessages as Messages } from '../../../utils/messages';
 import {
 	setLocalRelevancyState,
+	getAppMappings,
+	getSettings,
+	getDefaultSettings,
 } from '../../../batteries/modules/actions';
 import SearchPreviewSwitcher from '../../../components/SearchPreviewSwitcher';
 import styles from '../styles';
@@ -109,6 +112,27 @@ InputElement.defaultProps = {
 class PreferenceForm extends React.Component {
 	state = { visible: false };
 
+	componentDidMount() {
+		const {
+			settings,
+			localRelevancy,
+			defaultSettings,
+			getSettingsAction,
+			getDefaultSettingsAction,
+			appName,
+		} = this.props;
+
+		if (settings && !localRelevancy) {
+			this.init({ ...settings });
+		} else {
+			getSettingsAction(appName);
+		}
+
+		if (!defaultSettings) getDefaultSettingsAction();
+
+		this.getMappings();
+	}
+
 	toggleVisibility = () => {
 		this.setState((prevState) => ({
 			visible: !prevState.visible,
@@ -133,11 +157,25 @@ class PreferenceForm extends React.Component {
 		}
 	};
 
+	init = (settings) => {
+		const { appName, updateLocalRelevancy, localRelevancy } = this.props;
+		if (!localRelevancy) {
+			updateLocalRelevancy(appName, { ...settings });
+		}
+	};
+
+	getMappings() {
+		const { appName, fetchMappings, credentials, mappings } = this.props;
+		if (credentials && get(mappings, 'length') === 0) {
+			// Fetch Mappings if permissions are present
+			fetchMappings(appName, credentials);
+		}
+	}
+
 	render() {
 		const { control, handleSaveTemplate, isLoading, indices, apps, localRelevancy } = this.props;
 		const { visible, app } = this.state;
 		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
-
 		const {
 			numberOfDays,
 			minCount,
@@ -191,8 +229,8 @@ class PreferenceForm extends React.Component {
 												{...inputHandler}
 												onChange={(val) => {
 													inputHandler.onChange(calculateValue(val));
-													// const { settings } = this.props;
-													// this.init({ ...settings });
+													const { settings } = this.props;
+													this.init({ ...settings });
 												}}
 											>
 												<Select.Option value="*">All (*)</Select.Option>
@@ -320,8 +358,8 @@ class PreferenceForm extends React.Component {
 							name="minCharacters"
 							label="Min Characters"
 							placeholder="Enter min characters"
-							toolTipMessage={Messages.minCharacters} */}
-						/>
+							toolTipMessage={Messages.minCharacters}
+						/> */}
 						<FieldControl
 							name="transformDiacritics"
 							render={({ handler }) => (
@@ -341,9 +379,9 @@ class PreferenceForm extends React.Component {
 										<div style={{ width: '100%' }}>
 											<div>
 												<Checkbox
-													{...handler('checkbox')}
-													onChange={val => {
-														this.handleChange('transformDiacritics', val, 'popularSuggestions')
+													{...handler()}
+													onChange={event => {
+														this.handleChange('transformDiacritics', event.target.checked, 'popularSuggestions')
 													}}
 												/>
 											</div>
@@ -544,6 +582,7 @@ PreferenceForm.propTypes = {
 	control: PropTypes.object.isRequired,
 	isLoading: PropTypes.bool.isRequired,
 	indices: PropTypes.array.isRequired,
+	fetchMappings: PropTypes.func.isRequired,
 	apps: PropTypes.object,
 };
 
@@ -565,6 +604,9 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => ({
 	updateLocalRelevancy: (name, data) => dispatch(setLocalRelevancyState(name, data)),
+	fetchMappings: (appName, credentials) => dispatch(getAppMappings(appName, credentials)),
+	getSettingsAction: (name) => dispatch(getSettings(name)),
+	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(PreferenceForm);

@@ -10,7 +10,7 @@ import Loader from '../../../batteries/components/shared/Loader/Spinner';
 import Container from '../../../components/Container';
 import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
 import {
-	getindexSuggestionsPreferences,
+	getIndexSuggestionsPreferences,
 	saveSuggestionsPreferences,
 	saveIndexSuggestionsPreferences
 } from '../../../batteries/modules/actions';
@@ -76,6 +76,7 @@ class QuerySuggestions extends React.Component {
 			indices: [{ value: ['*'], disabled: false }],
 		});
 		if (isValidPlan(props.tier, props.featureSuggestions)) {
+			console.log(props.getPreferences);
 			props.getPreferences().then((action) => {
 				// prefilling
 				const payload = get(action, 'payload');
@@ -257,7 +258,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-	getPreferences: () => dispatch(getindexSuggestionsPreferences()),
+	getPreferences: () => dispatch(getIndexSuggestionsPreferences()),
 	savePreferences: (payload) => dispatch(saveIndexSuggestionsPreferences(payload)),
 });
 

@@ -59,10 +59,10 @@ const getDisabled = (value) => {
 	return false;
 };
 
-const InputElement = ({ name, label, toolTipMessage, inputProps, placeholder }) => (
+const InputElement = ({ name, label, toolTipMessage, inputProps, placeholder, onChange }) => (
 	<FieldControl
 		name={name}
-		render={({ handler, invalid, touched, hasError, getError }) => (
+		render={({ handler, invalid, touched, hasError, getError, value }) => (
 			<Grid
 				label={
 					<p css={styles.labelContainer}>
@@ -80,6 +80,10 @@ const InputElement = ({ name, label, toolTipMessage, inputProps, placeholder }) 
 								placeholder={placeholder}
 								type="number"
 								{...handler()}
+								value={value}
+								onChange={e => {
+									onChange(e.target.value);
+								}}
 								{...inputProps}
 							/>
 						</div>
@@ -204,7 +208,8 @@ class PreferenceForm extends React.Component {
 
 		const aggType = 'term';
 		this.setState({ aggregationField: path });
-		this.handleAggregationsChange('dataField', { ...dataField, [pathVal]: aggType });
+		// this.handleAggregationsChange('dataField', { ...dataField, [pathVal]: aggType });
+		this.handleChange('categoryField', path, 'indexSuggestions');
 	};
 
 	getAggsField = ({ flattenUsecase: usecases, flattenType: types }) => {
@@ -252,11 +257,23 @@ class PreferenceForm extends React.Component {
 		const { visible, app, aggregationField, customQueryField } = this.state;
 		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
 
-		const { excludeFields, includeFields } = localRelevancy
-			? get(localRelevancy, 'indexSuggestions', { excludeFields: [], includeFields: [] })
-			: {};
-
-		const { customStopwords } = get(localRelevancy, 'language', { customStopwords: [] });
+		const {
+			excludeFields,
+			includeFields,
+			showDistinctSuggestions,
+			maxPredictedWords,
+			customStopwords,
+			size,
+			customQuery,
+		} = get(localRelevancy, 'indexSuggestions', {
+				excludeFields: [],
+				includeFields: [],
+				showDistinctSuggestions: false,
+				maxPredictedWords: 0,
+				customStopwords: [],
+				size: 0,
+				customQuery: '',
+			});
 
 		return (
 			<FieldGroup
@@ -324,12 +341,18 @@ class PreferenceForm extends React.Component {
 											</Popover>
 										</p>
 									}
-									component={<Switch {...handler('checkbox')} />}
+									component={
+										<Switch
+											{...handler()}
+											onChange={val => {
+												this.handleChange('showDistinctSuggestions', val, 'indexSuggestions')
+											}}
+									/>}
 								/>
 							)}
 						/>
 						<FieldControl
-							name="enable_predictive_suggestions"
+							name="enablePredictiveSuggestions"
 							render={({ handler }) => (
 								<Grid
 									label={
@@ -345,16 +368,77 @@ class PreferenceForm extends React.Component {
 											</Popover>
 										</p>
 									}
-									component={<Switch {...handler('checkbox')} />}
+									component={<Switch
+										{...handler()}
+										onChange={val => {
+											this.handleChange('enablePredictiveSuggestions', val, 'indexSuggestions')
+										}}
+									/>}
 								/>
 							)}
 						/>
-						<InputElement
-							name="max_predicted_words"
+						{/* <FieldControl
+							name="maxPredictedWords"
+							render={({ handler }) => (
+								<Grid
+									label={
+										<p css={styles.labelContainer}>
+											Max Predicted Words
+											<Popover
+												content={content(
+													Messages.maxPredictedWords,
+												)}
+												css={styles.iconContainer}
+											>
+												<Icon type="info-circle" />
+											</Popover>
+										</p>
+									}
+									component={
+										<Input
+											type="number"
+											placeholder="Enter max predicted words"
+											{...handler()}
+											onChange={(e) => {
+												console.log(e)
+												this.handleChange('maxPredictedWords', e.target.value, 'indexSuggestions')
+											}}
+										/>
+									}
+								/>
+							)}
+						/> */}
+						<Form.Item
+							label={
+								<p css={styles.labelContainer}>
+									Max Predicted Words
+									<Popover
+										content={content(Messages.maxPredictedWords)}
+										css={styles.iconContainer}
+									>
+										<Icon type="info-circle" />
+									</Popover>
+								</p>
+							}
+						>
+							<Input
+								type="number"
+								placeholder="Enter max predicted words"
+								value={maxPredictedWords}
+								onChange={(e) =>
+									this.handleChange('maxPredictedWords', e.target.value, 'indexSuggestions')
+								}
+							/>
+						</Form.Item>
+						{/* <InputElement
+							name="maxPredictedWords"
 							label="Max Predicted Words"
 							placeholder="Enter max predicted words"
 							toolTipMessage={Messages.max_predicted_words}
-						/>
+							onChange={val => {
+								this.handleChange('maxPredictedWords', val, 'indexSuggestions')
+							}}
+						/> */}
 						<FieldControl
 							name="applyStopwords"
 							render={({ handler }) => (
@@ -370,7 +454,14 @@ class PreferenceForm extends React.Component {
 											</Popover>
 										</p>
 									}
-									component={<Switch {...handler('checkbox')} />}
+									component={
+									<Switch
+										{...handler()}
+										onChange={val => {
+											this.handleChange('applyStopwords', val, 'indexSuggestions')
+										}}
+									/>
+									}
 								/>
 							)}
 						/>
@@ -390,9 +481,9 @@ class PreferenceForm extends React.Component {
 							<Input.TextArea
 								placeholder="Add comma separated stopwords"
 								value={customStopwords.join(', ')}
-								onChange={(e) =>
+								onChange={(e) => {
 									this.handleChange('customStopwords', e.target.value, 'indexSuggestions')
-								}
+								}}
 							/>
 						</Form.Item>
 						{/* <InputElement
@@ -416,17 +507,45 @@ class PreferenceForm extends React.Component {
 											</Popover>
 										</p>
 									}
-									component={<Switch {...handler('checkbox')} />}
+									component={
+										<Switch
+											{...handler()}
+											onChange={val => {
+												this.handleChange('enableSynonyms', val, 'indexSuggestions')
+											}}
+										/>
+									}
 								/>
 							)}
 						/>
-						{/* Category Fields */}
-						<InputElement
+						<Form.Item
+							label={
+								<p css={styles.labelContainer}>
+									Size
+									<Popover
+										content={content(Messages.size)}
+										css={styles.iconContainer}
+									>
+										<Icon type="info-circle" />
+									</Popover>
+								</p>
+							}
+						>
+							<Input
+								type="number"
+								placeholder="Enter size of index suggestions"
+								value={size}
+								onChange={(e) =>
+									this.handleChange('size', e.target.value, 'indexSuggestions')
+								}
+							/>
+						</Form.Item>
+						{/* <InputElement
 							name="size"
 							label="Size"
 							placeholder="Enter size of index suggestions"
 							toolTipMessage={Messages.size}
-						/>
+						/> */}
 
 						{/** Include Fields */}
 						<Form.Item
@@ -599,10 +718,11 @@ class PreferenceForm extends React.Component {
 											<Select
 												placeholder="Select Custom Query"
 												style={{ width: '100%' }}
-												value={customQueryField}
 												{...inputHandler}
+												value={customQuery}
 												onChange={(val) => {
 													this.setState({ customQueryField: val });
+													this.handleChange('customQuery', val, 'indexSuggestions')
 												}}
 											>
 												{(appStoredQueries || []).map((v) => {

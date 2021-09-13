@@ -10,7 +10,7 @@ import Loader from '../../../batteries/components/shared/Loader/Spinner';
 import Container from '../../../components/Container';
 import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
 import {
-	getSuggestionsPreferences,
+	getPopularSuggestionsPreferences,
 	saveSuggestionsPreferences,
 	savePopularSuggestionsPreferences,
 } from '../../../batteries/modules/actions';
@@ -70,12 +70,13 @@ class QuerySuggestions extends React.Component {
 			minCharacters: [3, [Validators.required, Validators.min(1)]],
 			size: [3, [Validators.required, Validators.min(1), Validators.max(10)]],
 			transformDiacritics: false,
-			indices: [['*']],
+			indices: [{ value: ['*'], disabled: false }],
 		});
 		if (isValidPlan(props.tier, props.featureSuggestions)) {
 			props.getPreferences().then((action) => {
 				// prefilling
 				const payload = get(action, 'payload');
+				console.log(payload);
 				if (payload) {
 					this.form.patchValue({
 						blacklist: payload.blacklist || [],
@@ -85,7 +86,7 @@ class QuerySuggestions extends React.Component {
 						numberOfDays: parseInt(payload.numberOfDays, 10) || 0,
 						minCharacters: parseInt(payload.minCharacters, 10) || 3,
 						size: parseInt(payload.size, 10) || 3,
-						indices: payload.indices || ['*'],
+						indices: payload.indices || { value: ['*'], disabled: false },
 						transformDiacritics: payload.transformDiacritics,
 					});
 				}
@@ -262,7 +263,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => {
 	return {
-		getPreferences: () => dispatch(getSuggestionsPreferences()),
+		getPreferences: () => dispatch(getPopularSuggestionsPreferences()),
 		savePreferences: (payload) => dispatch(savePopularSuggestionsPreferences(payload)),
 	};
 };
