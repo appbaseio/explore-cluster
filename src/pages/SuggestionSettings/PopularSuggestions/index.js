@@ -250,13 +250,13 @@ QuerySuggestions.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-	preferences: get(state, '$getSuggestionsPreferences.results', {}),
+	preferences: get(state, '$getPopularSuggestionsPreferences.results', {}),
 	apps: get(state, 'apps.data', {}),
 	tier: get(state, '$getAppPlan.results.tier'),
 	featureSuggestions: get(state, '$getAppPlan.results.feature_suggestions', false),
-	isLoading: get(state, '$getSuggestionsPreferences.isFetching', false),
+	isLoading: get(state, '$getPopularSuggestionsPreferences.isFetching', false),
 	errors: [
-		get(state, '$getSuggestionsPreferences.error'),
+		get(state, '$getPopularSuggestionsPreferences.error'),
 		get(state, '$savePopularSuggestionsPreferences.error'),
 	],
 });

@@ -246,13 +246,13 @@ QuerySuggestions.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-	preferences: get(state, '$getindexSuggestionsPreferences.results', {}),
+	preferences: get(state, '$getIndexSuggestionsPreferences.results', {}),
 	apps: get(state, 'apps.data', {}),
 	tier: get(state, '$getAppPlan.results.tier'),
 	featureSuggestions: get(state, '$getAppPlan.results.feature_suggestions', false),
-	isLoading: get(state, '$getindexSuggestionsPreferences.isFetching', false),
+	isLoading: get(state, '$getIndexSuggestionsPreferences.isFetching', false),
 	errors: [
-		get(state, '$getindexSuggestionsPreferences.error'),
+		get(state, '$getIndexSuggestionsPreferences.error'),
 		get(state, '$saveIndexSuggestionsPreferences.error'),
 	],
 });

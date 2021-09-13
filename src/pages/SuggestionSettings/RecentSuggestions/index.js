@@ -10,7 +10,7 @@ import Loader from '../../../batteries/components/shared/Loader/Spinner';
 import Container from '../../../components/Container';
 import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
 import {
-	getSuggestionsPreferences,
+	getRecentSuggestionsPreferences,
 	saveSuggestionsPreferences,
 	saveRecentSuggestionsPreferences
 } from '../../../batteries/modules/actions';
@@ -227,19 +227,19 @@ QuerySuggestions.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-	preferences: get(state, '$getSuggestionsPreferences.results', {}),
+	preferences: get(state, '$getRecentSuggestionsPreferences.results', {}),
 	apps: get(state, 'apps.data', {}),
 	tier: get(state, '$getAppPlan.results.tier'),
 	featureSuggestions: get(state, '$getAppPlan.results.feature_suggestions', false),
-	isLoading: get(state, '$getSuggestionsPreferences.isFetching', false),
+	isLoading: get(state, '$getRecentSuggestionsPreferences.isFetching', false),
 	errors: [
-		get(state, '$getSuggestionsPreferences.error'),
+		get(state, '$getRecentSuggestionsPreferences.error'),
 		get(state, '$saveRecentSuggestionsPreferences.error'),
 	],
 });
 
 const mapDispatchToProps = (dispatch) => ({
-	getPreferences: () => dispatch(getSuggestionsPreferences()),
+	getPreferences: () => dispatch(getRecentSuggestionsPreferences()),
 	savePreferences: (payload) => dispatch(saveRecentSuggestionsPreferences(payload)),
 });
 
