@@ -205,6 +205,7 @@ class QueryRulesForm extends React.Component {
 			error: {},
 			loading: false,
 			editorKey: Date.now(),
+			isFormInvalid: false,
 		};
 	}
 
@@ -315,19 +316,27 @@ class QueryRulesForm extends React.Component {
 
 	handleInput = (e) => {
 		const { name, value } = e.target;
-		this.setState((prevState) => ({
-			[name]: value,
-			actions:
-				name === 'condition'
-					? prevState.actions.filter((action) => action.type !== 'replace_search_term')
-					: prevState.actions,
-			error: {
-				...prevState.error,
-				[name === 'dataFieldValue' || name === 'queryValue' ? 'condition' : name]: {
-					hasError: false,
+
+		this.setState(
+			(prevState) => ({
+				[name]: value,
+				actions:
+					name === 'condition'
+						? prevState.actions.filter(
+								(action) => action.type !== 'replace_search_term',
+						  )
+						: prevState.actions,
+				error: {
+					...prevState.error,
+					[name === 'dataFieldValue' || name === 'queryValue' ? 'condition' : name]: {
+						hasError: false,
+					},
 				},
+			}),
+			() => {
+				this.validateForm();
 			},
-		}));
+		);
 	};
 
 	handleDropdown = (name, value) => {
@@ -401,6 +410,20 @@ class QueryRulesForm extends React.Component {
 			}),
 			this.handleSave,
 		);
+	};
+
+	validateForm = () => {
+		const { type, queryValue, dataFieldValue } = this.state;
+		let isFormInvalid = false;
+
+		if (
+			(queryValue && !type.includes('suggestion') && !type.includes('search')) ||
+			(dataFieldValue && !type.includes('term'))
+		) {
+			isFormInvalid = true;
+		}
+
+		this.setState({ isFormInvalid });
 	};
 
 	handleSave = () => {
@@ -604,6 +627,12 @@ class QueryRulesForm extends React.Component {
 		}
 	};
 
+	handleTypeChange = (data) => {
+		this.setState({ type: data }, () => {
+			this.validateForm();
+		});
+	};
+
 	render() {
 		const {
 			condition,
@@ -628,7 +657,9 @@ class QueryRulesForm extends React.Component {
 			rawQuery,
 			editorKey,
 			subFieldsMap,
+			isFormInvalid,
 		} = this.state;
+
 		const {
 			isCreating,
 			rulesLoading,
@@ -834,9 +865,7 @@ class QueryRulesForm extends React.Component {
 												options={searchTypeArr}
 												defaultValue={[]}
 												style={{ display: 'flex', flexWrap: 'wrap' }}
-												onChange={(data) => {
-													this.setState({ type: data });
-												}}
+												onChange={this.handleTypeChange}
 											/>
 										</div>
 										<ErrorToaster inline>
@@ -992,7 +1021,7 @@ class QueryRulesForm extends React.Component {
 								/>
 							) : null}
 							<Button
-								disabled={isEditPage && !hasChanged}
+								disabled={(isEditPage && !hasChanged) || isFormInvalid}
 								size="large"
 								onClick={this.getErrorStatus}
 								type="primary"
