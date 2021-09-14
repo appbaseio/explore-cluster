@@ -96,7 +96,6 @@ export const APP_ROUTES = {
 				tag: 'Beta',
 				hasExactPath: true,
 			},
-			{ label: 'Search Templates', link: 'search-templates', tag: 'Beta' },
 		],
 	},
 	'User Management': {
@@ -216,7 +215,6 @@ export const CLUSTER_ROUTES = {
 		menu: [
 			{ label: 'API Credentials', link: '/cluster/credentials' },
 			{ label: 'Role Based Access', link: '/cluster/role-based-access', tag: 'Beta' },
-			{ label: 'Search Templates', link: '/cluster/search-templates', tag: 'Beta' },
 		],
 	},
 	'User Management': {

@@ -13,11 +13,6 @@ import UnauthorizedPage from '../../pages/UnauthorizedPage';
 import { getAuthorizedRoutes } from '../../utils';
 import { ALLOWED_ACTIONS } from '../../constants';
 
-const SearchTemplatesPage = Loadable({
-	loader: () =>
-		import(/* webpackChunkName: "SearchTemplatesPage" */ '../../pages/SearchTemplatesPage'),
-	loading: Loader,
-});
 const QuerySuggestionsPage = Loadable({
 	loader: () =>
 		import(/* webpackChunkName: "QuerySuggestionsPage" */ '../../pages/QuerySuggestionsPage'),
@@ -268,24 +263,6 @@ class RouteContainer extends React.Component {
 									<AppPageContainer
 										{...props}
 										component={QueryExplorerPage}
-										shouldFetchAppInfo={false}
-										shouldFetchAppPlan={false}
-									/>
-								) : (
-									<UnauthorizedPage />
-								)}
-							</>
-						)}
-					/>
-					<Route
-						exact
-						path="/app/:appName/search-templates"
-						render={(props) => (
-							<>
-								{get(allowedRoutes, 'search-templates') ? (
-									<AppPageContainer
-										{...props}
-										component={SearchTemplatesPage}
 										shouldFetchAppInfo={false}
 										shouldFetchAppPlan={false}
 									/>
