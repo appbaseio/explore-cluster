@@ -1,3 +1,49 @@
-import SandboxPage from './SandboxPage';
+import React from 'react';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import get from 'lodash/get';
+import SandboxComponent from './SandboxPage';
+import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
+import Overlay from '../../components/Overlay';
 
-export default SandboxPage;
+const bannerMessagesSandbox = {
+	free: {
+		title: 'Unlock the Search Preview',
+		description: 'Get a paid plan to see Search Preview.',
+		buttonText: 'Upgrade Now',
+		href: 'billing',
+	},
+};
+
+const SandboxPage = ({ isPaidUser, appName }) => {
+	return (
+		<React.Fragment>
+			{!isPaidUser ? (
+				<SandboxComponent appName={appName} />
+			) : (
+				<React.Fragment>
+					<Banner {...bannerMessagesSandbox.free} />
+					<Overlay
+						style={{
+							maxWidth: '70%',
+						}}
+						src="https://i.imgur.com/mgAHMsr.png"
+						alt="analytics"
+					/>
+				</React.Fragment>
+			)}
+		</React.Fragment>
+	);
+};
+
+SandboxPage.propTypes = {
+	appName: PropTypes.string.isRequired,
+	isPaidUser: PropTypes.bool.isRequired,
+};
+
+const mapStateToProps = (state) => ({
+	appName: get(state, '$getCurrentApp.name'),
+	isPaidUser: get(state, '$getAppPlan.results.isPaid'),
+});
+
+export default connect(mapStateToProps)(SandboxPage);
