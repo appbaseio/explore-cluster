@@ -18,7 +18,7 @@ const bannerMessagesSandbox = {
 const SandboxPage = ({ isPaidUser, appName }) => {
 	return (
 		<React.Fragment>
-			{!isPaidUser ? (
+			{isPaidUser ? (
 				<SandboxComponent appName={appName} />
 			) : (
 				<React.Fragment>
@@ -28,7 +28,7 @@ const SandboxPage = ({ isPaidUser, appName }) => {
 							maxWidth: '70%',
 						}}
 						src="https://i.imgur.com/mgAHMsr.png"
-						alt="analytics"
+						alt="search preview"
 					/>
 				</React.Fragment>
 			)}
