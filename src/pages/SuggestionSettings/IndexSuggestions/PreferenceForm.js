@@ -457,7 +457,6 @@ class PreferenceForm extends React.Component {
 									}
 									component={
 										<Input
-
 											placeholder="Enter min count"
 											onChange={(e) => {
 												this.handleChange('customStopwords', e.target.value, 'indexSuggestions')
