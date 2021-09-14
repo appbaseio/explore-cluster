@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Table, Checkbox, Input } from 'antd';
+import { Table, Checkbox, Input, Tooltip, Icon } from 'antd';
 import get from 'lodash/get';
 import { FieldControl } from 'react-reactive-form';
-import { aclOptionsLabel } from './utils';
+import { aclOptionsLabel, aclOptionsMessage } from './utils';
 
 // Custom acls tabular view
 class Acl extends React.PureComponent {
@@ -32,23 +32,33 @@ class Acl extends React.PureComponent {
 					/>
 				) : null,
 		}));
-
 		this.columns = [
 			{
 				title: 'Category',
 				dataIndex: 'key',
-				render: (item) => aclOptionsLabel[item],
+				render: (item) => (
+					<span>
+						{aclOptionsLabel[item]}
+						<Tooltip
+							css="margin-left: 5px;color:#898989"
+							overlay={aclOptionsMessage[item]}
+							placement="rightTop"
+						>
+							<Icon type="info-circle" theme="outlined" />
+						</Tooltip>
+					</span>
+				),
 				key: 'key',
 			},
 			{
-				title: 'Tags',
+				title: 'Enabled',
 				render: ({ Tag }) => <Tag />,
 				key: 'tags',
 			},
 		];
 		if (props.isRateLimitPresent) {
 			this.columns.push({
-				title: 'Rate Limit / sec (optional)',
+				title: 'Rate Limit / sec',
 				render: ({ RateLimit }) => <RateLimit />,
 				key: 'rate limit',
 			});
@@ -58,6 +68,7 @@ class Acl extends React.PureComponent {
 	render() {
 		return (
 			<Table
+				scroll={{ y: 200 }}
 				style={{
 					width: '100%',
 				}}

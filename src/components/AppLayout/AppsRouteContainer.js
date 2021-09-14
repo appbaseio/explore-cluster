@@ -67,6 +67,12 @@ const SearchIntegrationsPage = Loadable({
 	loading: Loader,
 });
 
+const StoredQueriesPage = Loadable({
+	loader: () =>
+		import(/* webpackChunkName: "StoredQueriesPage" */ '../../pages/StoredQueriesPage'),
+	loading: Loader,
+});
+
 const RecommendationsIntegrationsPage = Loadable({
 	loader: () =>
 		import(
@@ -299,6 +305,24 @@ class RouteContainer extends React.Component {
 									<AppPageContainer
 										{...props}
 										component={SandboxPage}
+										shouldFetchAppInfo={false}
+										shouldFetchAppPlan={false}
+									/>
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
+						)}
+					/>
+					<Route
+						exact
+						path="/app/:appName/stored-queries"
+						render={(props) => (
+							<>
+								{get(allowedRoutes, 'stored-queries') ? (
+									<AppPageContainer
+										{...props}
+										component={StoredQueriesPage}
 										shouldFetchAppInfo={false}
 										shouldFetchAppPlan={false}
 									/>

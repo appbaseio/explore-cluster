@@ -41,6 +41,25 @@ export const credentialsMessages = {
 		`Only selected IP ranges (in CIDR format) are authorized to call the API with this
 			credential.`,
 	),
+	rsApiRestrictions: Message('Apply additional search constraints to a ReactiveSearch API call.'),
+	maxQuerySize: Message(
+		<>
+			This restricts the max query hits to return per request. If an API requests more hits
+			than the limit set here, a <code>400</code> status code will be returned
+		</>,
+	),
+	maxAggregationSize: Message(
+		<>
+			This restricts the max term aggregation size to return per request. If an API requests
+			more hits than the limit set here, a <code>400</code> status code will be returned.
+		</>,
+	),
+	allowDirectDSL: Message(
+		<>
+			Allowing direct DSL queries (default) is a security risk. Consider disabling this and
+			using <code>Stored Queries</code> to whitelist the allowed queries instead.
+		</>,
+	),
 	indices: Message('Only selected indices are authorized to call the API with this credential.'),
 	fieldFiltering: Message(
 		'Restrict fields that are returned when performing a search operation.',

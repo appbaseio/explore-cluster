@@ -9,7 +9,6 @@ const modalStyles = css`
 	top: 0 !important;
 	height: 100vh;
 	padding-bottom: 0 !important;
-	overflow-y: scroll;
 	.ant-modal {
 		top: 0;
 	}
