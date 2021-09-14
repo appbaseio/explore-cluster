@@ -490,7 +490,6 @@ export const defaultSearchPreferences = {
 	resultHandle: '',
 	storeInfo: { currency: 'USD' },
 	exportSettings: { exportAs: 'embed', credentials: '', openAsPage: false, type: 'other' },
-	showPopularSearches: false,
 	showPagination: false,
 	showSelectedFilters: true,
 	customMessages: {
@@ -501,6 +500,11 @@ export const defaultSearchPreferences = {
 		fetchingFilterOptions: 'Fetching Options',
 		searchText: 'Click here to search',
 		searchIcon: '',
+	},
+	autoSuggestionSettings: {
+		enablePopularSuggestions: false,
+		enableRecentSearches: false,
+		highlight: false,
 	},
 	staticFilters: {
 		productType: {
@@ -662,8 +666,8 @@ export const getSearchPreferencesPayload = (formValue) => {
 					pagination: !!get(formValue, 'showPagination'),
 					infiniteScroll: !get(formValue, 'showPagination'),
 				},
-				layout: get(formValue, 'showResultView'),
-				viewSwitcher: get(formValue, 'showResultViewSwitcher'),
+				layout: get(formValue, 'layout'),
+				viewSwitcher: get(formValue, 'viewSwitcher'),
 			},
 			searchSettings: {
 				customMessages: {
@@ -681,17 +685,17 @@ export const getSearchPreferencesPayload = (formValue) => {
 					handle: get(formValue, 'resultHandle'),
 				},
 				rsConfig: {
-					autosuggest: get(formValue, 'enableAutoSuggestions'),
+					autosuggest: get(formValue, 'autosuggest'),
 					enablePopularSuggestions: get(
 						formValue,
-						'autoSuggestionSettings.showPopularSearches',
+						'autoSuggestionSettings.enablePopularSuggestions',
 					),
 					enableRecentSearches: get(
 						formValue,
-						'autoSuggestionSettings.showRecentSuggestions',
+						'autoSuggestionSettings.enableRecentSearches',
 					),
-					highlight: get(formValue, 'autoSuggestionSettings.enableSuggestionsHighlights'),
-					showVoiceSearch: get(formValue, 'enableVoiceSearch'),
+					highlight: get(formValue, 'autoSuggestionSettings.highlight'),
+					showVoiceSearch: get(formValue, 'showVoiceSearch'),
 				},
 			},
 			facetSettings: {

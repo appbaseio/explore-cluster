@@ -6,12 +6,12 @@ const { Item } = List;
 
 export const defaultSettings = [
 	{
-		id: 'enableAutoSuggestions',
+		id: 'autosuggest',
 		label: 'Show Autosuggestions',
 		value: true,
 	},
 	{
-		id: 'enableVoiceSearch',
+		id: 'showVoiceSearch',
 		label: 'Enable Voice Search',
 		value: true,
 	},
@@ -19,17 +19,17 @@ export const defaultSettings = [
 
 export const suggestionSettings = [
 	{
-		id: 'showPopularSearches',
+		id: 'enablePopularSuggestions',
 		label: 'Show popular suggestions (based on analytics data)',
 		value: false,
 	},
 	{
-		id: 'showRecentSuggestions',
+		id: 'enableRecentSearches',
 		label: 'Show recent suggestions (based on analytics data)',
 		value: false,
 	},
 	{
-		id: 'enableSuggestionsHighlights',
+		id: 'highlight',
 		label: 'Enable suggestion highlights',
 		value: false,
 	},
@@ -50,7 +50,7 @@ const Search = () => (
 								</Item>
 							)}
 						</FieldControl>
-						{item.id === 'enableAutoSuggestions' && (
+						{item.id === 'autosuggest' && (
 							<FieldGroup name="autoSuggestionSettings">
 								{({ disabled }) => {
 									if (disabled || disabled === undefined) {

@@ -65,16 +65,19 @@ class PreferencesFormWrapper extends React.Component {
 				  }
 				: {
 						// Search specific controls
-						showPopularSearches: false,
-						showRecentSuggestions: false,
-						enableAutoSuggestions: true,
-						enableVoiceSearch: true,
+						autoSuggestionSettings: FormBuilder.group({
+							enablePopularSuggestions: false,
+							enableRecentSearches: false,
+							highlight: false,
+						}),
+						autosuggest: true,
+						showVoiceSearch: true,
 						enablePredictiveSuggestions: false,
-						enableSuggestionsHighlights: false,
+						enablePopularSuggestions: false,
 						showSelectedFilters: true,
 						showPagination: false,
-						showResultView: 'grid',
-						showResultViewSwitcher: true,
+						layout: 'grid',
+						viewSwitcher: true,
 						customMessages: FormBuilder.group({
 							resultStats: '[count] products found in [time] ms',
 							noFilterItem: 'No items Found',
@@ -120,12 +123,15 @@ class PreferencesFormWrapper extends React.Component {
 		} else {
 			fetchSearchPreferences();
 		}
+
 		// Registering the subscriber after patching the initial values to avoid resetting the set fields in preferences
 		this.form.get('exportSettings.type').valueChanges.subscribe((value) => {
 			const colorFilter = this.form.get('staticFilters.color.customize.dataField');
 			const sizeFilter = this.form.get('staticFilters.size.customize.dataField');
 			const priceFilter = this.form.get('staticFilters.price.customize.dataField');
+
 			const syncSettingsControl = this.form.get('syncSettings');
+
 			if (syncSettingsControl) {
 				if (value === 'shopify') {
 					syncSettingsControl.enable();
@@ -176,19 +182,26 @@ class PreferencesFormWrapper extends React.Component {
 			}
 		});
 
-		this.form.get('enableAutoSuggestions').valueChanges.subscribe((value) => {
-			const autoSuggestionSettingsControl = this.form.get('autoSuggestionSettings');
+		if (this.form.get('autosuggest')) {
+			this.form.get('autosuggest').valueChanges.subscribe((value) => {
+				const autoSuggestionSettingsControl = this.form.get('autoSuggestionSettings');
+				if (autoSuggestionSettingsControl) {
+					if (value) {
+						autoSuggestionSettingsControl.enable();
+					} else {
+						autoSuggestionSettingsControl.disable();
+					}
+				}
+			});
+			this.form.get('autoSuggestionSettings').valueChanges.subscribe((value) => {
 
-			if (value) {
-				autoSuggestionSettingsControl.enable();
-			} else {
-				autoSuggestionSettingsControl.disable();
-			}
-		});
+			})
+		}
 	}
 
 	componentDidUpdate(prevProps) {
 		const { isRecommendation, searchPreferences, recommendationsPreferences } = this.props;
+
 		let preferences;
 		if (isRecommendation) {
 			if (prevProps.recommendationsPreferences !== recommendationsPreferences) {
@@ -207,6 +220,7 @@ class PreferencesFormWrapper extends React.Component {
 				recommendationsControl.controls = [];
 			}
 		};
+		console.log('pref', preferences);
 		// Sync form values
 		if (preferences) {
 			try {
@@ -257,9 +271,11 @@ class PreferencesFormWrapper extends React.Component {
 						fetchingFilterOptions,
 					};
 				};
+				console.log('reach', this.form);
 				// Patch form value
-				this.form.patchValue(
-					JSON.parse(
+
+				try {
+					const patchVar = JSON.parse(
 						JSON.stringify({
 							themeType: get(preferences, 'themeSettings.type'),
 							primaryColor: get(
@@ -289,134 +305,151 @@ class PreferencesFormWrapper extends React.Component {
 							resultPrice: get(preferences, 'resultSettings.fields.price'),
 							resultImage: get(preferences, 'resultSettings.fields.image'),
 							resultHandle: get(preferences, 'resultSettings.fields.handle'),
-							showResultView: get(preferences, 'resultSettings.layout'),
-							showResultViewSwitcher: get(preferences, 'resultSettings.viewSwitcher'),
 							exportSettings: get(preferences, 'exportSettings'),
 							storeInfo: {
 								currency: get(preferences, 'globalSettings.currency'),
 							},
 							...(isRecommendation
 								? {
-										ctaTitle: get(
-											preferences,
-											'recommendationSettings.ctaTitle',
-										),
-										ctaAction: get(
-											preferences,
-											'recommendationSettings.ctaAction',
-										),
-										recommendations: get(
-											preferences,
-											'recommendationSettings.recommendations',
-											[],
-										).map((i) => {
-											if (i.type === RecommendationTypes.SIMILAR_PRODUCTS) {
-												const splited = (i.productsPageUrl || '').split(
-													'{',
-												);
-												return {
-													id: i.id,
-													title: i.title,
-													type: i.type,
-													maxProducts: i.maxProducts,
-													dataFieldSimilarTo: i.dataField,
-													productsPageHandle: {
-														productsPageUrlPrefix: splited[0],
-														productsPageUrlField: (
-															splited[1] || ''
-														).replace('}', ''),
-													},
-												};
-											}
-											if (i.type === RecommendationTypes.MOST_RECENT) {
-												return {
-													id: i.id,
-													title: i.title,
-													type: i.type,
-													maxProducts: i.maxProducts,
-													dataFieldMostRecent: i.dataField,
-												};
-											}
-											return i;
-										}),
+									ctaTitle: get(
+										preferences,
+										'recommendationSettings.ctaTitle',
+									),
+									ctaAction: get(
+										preferences,
+										'recommendationSettings.ctaAction',
+									),
+									recommendations: get(
+										preferences,
+										'recommendationSettings.recommendations',
+										[],
+									).map((i) => {
+										if (i.type === RecommendationTypes.SIMILAR_PRODUCTS) {
+											const splited = (i.productsPageUrl || '').split(
+												'{',
+											);
+											return {
+												id: i.id,
+												title: i.title,
+												type: i.type,
+												maxProducts: i.maxProducts,
+												dataFieldSimilarTo: i.dataField,
+												productsPageHandle: {
+													productsPageUrlPrefix: splited[0],
+													productsPageUrlField: (
+														splited[1] || ''
+													).replace('}', ''),
+												},
+											};
+										}
+										if (i.type === RecommendationTypes.MOST_RECENT) {
+											return {
+												id: i.id,
+												title: i.title,
+												type: i.type,
+												maxProducts: i.maxProducts,
+												dataFieldMostRecent: i.dataField,
+											};
+										}
+										return i;
+									}),
 								  }
 								: {
-										showPopularSearches: get(
+									autosuggest: get(
+										preferences,
+										'searchSettings.rsConfig.autosuggest',
+									),
+
+									showVoiceSearch: get(
+										preferences,
+										'searchSettings.rsConfig.showVoiceSearch',
+									),
+									enablePopularSuggestions: get(
+										preferences,
+										'searchSettings.rsConfig.enablePopularSuggestions',
+									),
+									enablePredictiveSuggestions: get(
+										preferences,
+										'searchSettings.rsConfig.enablePredictiveSuggestions',
+									),
+
+									showSelectedFilters: get(
+										preferences,
+										'globalSettings.showSelectedFilters',
+									),
+									showPagination: !!get(
+										preferences,
+										'resultSettings.rsConfig.pagination',
+									),
+									layout: get(preferences, 'resultSettings.layout'),
+									viewSwitcher: get(
+										preferences,
+										'resultSettings.viewSwitcher',
+									),
+									syncSettings: get(preferences, 'syncSettings') || {},
+									customMessages: {
+										resultStats: get(
+											preferences,
+											'resultSettings.customMessages.resultStats',
+										),
+										noResultItem: get(
+											preferences,
+											'resultSettings.customMessages.noResults',
+										),
+										noSuggestion: get(
+											preferences,
+											'searchSettings.customMessages.noResults',
+										),
+										searchText: get(
+											preferences,
+											'searchSettings.searchButton.text',
+										),
+										searchIcon: get(
+											preferences,
+											'searchSettings.searchButton.icon',
+										),
+										...getFilterMessages(),
+									},
+									autoSuggestionSettings: {
+										enablePopularSuggestions: get(
 											preferences,
 											'searchSettings.rsConfig.enablePopularSuggestions',
 										),
-										// add search settings here - 'searchSettings.rsConfig.<KEY_NAME)>'
-										showRecentSuggestions: get(
+										enableRecentSearches: get(
 											preferences,
-											'searchSettings.rsConfig.showRecentSuggestions',
+											'searchSettings.rsConfig.enableRecentSearches',
 										),
-										enablePredictiveSuggestions: get(
+										highlight: get(
 											preferences,
-											'searchSettings.rsConfig.enablePredictiveSuggestions',
+											'searchSettings.rsConfig.highlight',
 										),
-										enableSuggestionsHighlights: get(
-											preferences,
-											'searchSettings.rsConfig.enableSuggestionsHighlights',
-										),
-										enableAutoSuggestions: get(
-											preferences,
-											'searchSettings.rsConfig.enableAutoSuggestions',
-										),
-										enableVoiceSearch: get(
-											preferences,
-											'searchSettings.rsConfig.enableVoiceSearch',
-										),
-										showSelectedFilters: get(
-											preferences,
-											'globalSettings.showSelectedFilters',
-										),
-										showPagination: !!get(
-											preferences,
-											'resultSettings.rsConfig.pagination',
-										),
-										syncSettings: get(preferences, 'syncSettings') || {},
-										customMessages: {
-											resultStats: get(
-												preferences,
-												'resultSettings.customMessages.resultStats',
-											),
-											noResultItem: get(
-												preferences,
-												'resultSettings.customMessages.noResults',
-											),
-											noSuggestion: get(
-												preferences,
-												'searchSettings.customMessages.noResults',
-											),
-											searchText: get(
-												preferences,
-												'searchSettings.searchButton.text',
-											),
-											searchIcon: get(
-												preferences,
-												'searchSettings.searchButton.icon',
-											),
-											...getFilterMessages(),
-										},
-										staticFilters: {
-											productType: getStaticFilterFormValue('productType'),
-											collections: getStaticFilterFormValue('collection'),
-											color: getStaticFilterFormValue('color'),
-											size: getStaticFilterFormValue('size'),
-											price: getStaticFilterFormValue('price'),
-										},
-										dynamicFilters: get(
-											preferences,
-											'facetSettings.dynamicFacets',
-											[],
-										).map((facet) => ({
-											enabled: facet.enabled,
-											customize: get(facet, 'rsConfig'),
-										})),
-								  }),
+									},
+									staticFilters: {
+										productType: getStaticFilterFormValue('productType'),
+										collections: getStaticFilterFormValue('collection'),
+										color: getStaticFilterFormValue('color'),
+										size: getStaticFilterFormValue('size'),
+										price: getStaticFilterFormValue('price'),
+									},
+									dynamicFilters: get(
+										preferences,
+										'facetSettings.dynamicFacets',
+										[],
+									).map((facet) => ({
+										enabled: facet.enabled,
+										customize: get(facet, 'rsConfig'),
+									})),
+								}
+							),
 						}),
-					),
-				);
+					);
+					console.log('parsed patch', patchVar);
+					this.form.patchValue(patchVar);
+				} catch (e) {
+					console.error(e);
+				}
+
+				console.log('voice pref', this.form.get('showVoiceSearch').value);
 			} catch (e) {
 				console.warn('Error while syncing the preferences', e);
 			}
