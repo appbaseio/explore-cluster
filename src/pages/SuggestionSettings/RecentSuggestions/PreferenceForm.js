@@ -170,11 +170,15 @@ class PreferenceForm extends React.Component {
 									}
 									component={
 										<Input
+											data-cy="recent-suggestions-min-hits"
+											{...handler()}
 											type="number"
+											defaultValue={value}
+											value={value}
 											placeholder="Enter min Hits"
 											onChange={(e) => {
 												this.handleChange('minHits', e.target.value, 'recentSuggestions')
-												// handler.onChange(this.handleChange('numberOfDays', e.target.value, 'popularSuggestions'))
+												handler().onChange(e.target.value);
 											}}
 										/>
 									}
@@ -200,11 +204,15 @@ class PreferenceForm extends React.Component {
 									}
 									component={
 										<Input
+											data-cy="recent-suggestions-size"
+											{...handler()}
+											defaultValue={value}
+											value={value}
 											type="number"
 											placeholder="Enter min count"
 											onChange={(e) => {
 												this.handleChange('size', e.target.value, 'recentSuggestions')
-												// handler.onChange(this.handleChange('numberOfDays', e.target.value, 'popularSuggestions'))
+												handler().onChange(e.target.value);
 											}}
 										/>
 									}
@@ -231,6 +239,7 @@ class PreferenceForm extends React.Component {
 										}
 										component={
 											<Select
+												data-cy="recent-suggestions-indices"
 												placeholder="Enter indices"
 												mode="tags"
 												style={{ width: '100%' }}
@@ -239,7 +248,6 @@ class PreferenceForm extends React.Component {
 												{...inputHandler}
 												onChange={(val) => {
 													inputHandler.onChange(calculateValue(val));
-
 
 												}}
 											>
@@ -274,6 +282,7 @@ class PreferenceForm extends React.Component {
 									app={app}
 								/>
 								<Button
+									data-cy="recent-suggestions-save"
 									onClick={handleSaveTemplate}
 									size="large"
 									type="primary"

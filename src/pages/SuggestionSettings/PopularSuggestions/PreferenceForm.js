@@ -221,6 +221,7 @@ class PreferenceForm extends React.Component {
 										}
 										component={
 											<Select
+												data-cy="popular-suggestions-indices"
 												placeholder="Enter indices"
 												mode="tags"
 												style={{ width: '100%' }}
@@ -266,11 +267,15 @@ class PreferenceForm extends React.Component {
 									}
 									component={
 										<Input
+											data-cy="number-of-days"
+											{...handler()}
+											defaultValue={value}
+											value={value}
 											type="number"
 											placeholder="Enter number of days"
 											onChange={(e) => {
 												this.handleChange('numberOfDays', e.target.value, 'popularSuggestions')
-												// handler.onChange(this.handleChange('numberOfDays', e.target.value, 'popularSuggestions'))
+												handler().onChange(e.target.value);
 											}}
 										/>
 									}
@@ -296,11 +301,15 @@ class PreferenceForm extends React.Component {
 									}
 									component={
 										<Input
+											data-cy="min-count"
+											{...handler()}
+											defaultValue={value}
+											value={value}
 											type="number"
 											placeholder="Enter min count"
 											onChange={(e) => {
 												this.handleChange('minCount', e.target.value, 'popularSuggestions')
-												// handler.onChange(this.handleChange('numberOfDays', e.target.value, 'popularSuggestions'))
+												handler().onChange(e.target.value);
 											}}
 										/>
 									}
@@ -326,11 +335,15 @@ class PreferenceForm extends React.Component {
 									}
 									component={
 										<Input
+											data-cy="popular-suggestions-min-hits"
+											{...handler()}
+											defaultValue={value}
+											value={value}
 											type="number"
 											placeholder="Enter min Hits"
 											onChange={(e) => {
 												this.handleChange('minHits', e.target.value, 'popularSuggestions')
-												// handler.onChange(this.handleChange('numberOfDays', e.target.value, 'popularSuggestions'))
+												handler().onChange(e.target.value);
 											}}
 										/>
 									}
@@ -356,11 +369,15 @@ class PreferenceForm extends React.Component {
 									}
 									component={
 										<Input
+											data-cy="min-characters"
+											{...handler()}
+											defaultValue={value}
+											value={value}
 											type="number"
 											placeholder="Enter min count"
 											onChange={(e) => {
 												this.handleChange('minCharacters', e.target.value, 'popularSuggestions')
-												// handler.onChange(this.handleChange('numberOfDays', e.target.value, 'popularSuggestions'))
+												handler().onChange(e.target.value);
 											}}
 										/>
 									}
@@ -369,7 +386,7 @@ class PreferenceForm extends React.Component {
 						/>
 						<FieldControl
 							name="transformDiacritics"
-							render={({ handler }) => (
+							render={({ handler, value }) => (
 								<Grid
 									label={
 										<p css={styles.labelContainer}>
@@ -386,9 +403,13 @@ class PreferenceForm extends React.Component {
 										<div style={{ width: '100%' }}>
 											<div>
 												<Checkbox
+													data-cy="transform-diacritics"
 													{...handler()}
+													defaultChecked={value}
+													checked={value}
 													onChange={event => {
 														this.handleChange('transformDiacritics', event.target.checked, 'popularSuggestions')
+														handler().onChange(event.target.value);
 													}}
 												/>
 											</div>
@@ -416,11 +437,15 @@ class PreferenceForm extends React.Component {
 									}
 									component={
 										<Input
+											data-cy="popular-suggestions-size"
+											{...handler()}
+											defaultValue={value}
+											value={value}
 											type="number"
-											placeholder="Enter min count"
+											placeholder="Enter size"
 											onChange={(e) => {
 												this.handleChange('size', e.target.value, 'popularSuggestions')
-												// handler.onChange(this.handleChange('numberOfDays', e.target.value, 'popularSuggestions'))
+												handler().onChange(e.target.value);
 											}}
 										/>
 									}
@@ -446,13 +471,15 @@ class PreferenceForm extends React.Component {
 									}
 									component={
 										<Select
+											data-cy="blacklist"
+											{...handler()}
+											defaultValue={value}
+											value={value}
 											placeholder="Enter blacklist queries"
 											mode="tags"
 											notFoundContent={null}
 											style={{ width: '100%' }}
 											tokenSeparators={[',']}
-
-
 											onChange={(value) =>
 												this.handleChange(
 													'blacklist',
@@ -466,41 +493,11 @@ class PreferenceForm extends React.Component {
 							)}
 						/>
 
-						{/* <FieldControl
-							name="blacklist"
-							render={({ handler }) => {
-								const inputHandler = handler();
-								return (
-									<Grid
-										label={
-											<p css={styles.labelContainer}>
-												Blacklist
-												<Popover
-													content={content(Messages.blacklist)}
-													css={styles.iconContainer}
-												>
-													<Icon type="info-circle" />
-												</Popover>
-											</p>
-										}
-										component={
-											<Select
-												placeholder="Enter blacklist queries"
-												mode="tags"
-												notFoundContent={null}
-												style={{ width: '100%' }}
-												tokenSeparators={[',']}
-												{...inputHandler}
-											/>
-										}
-									/>
-								);
-							}}
-						/> */}
 						<FieldControl
 							name="externalSuggestions"
-							render={({ handler }) => {
+							render={({ handler,value }) => {
 								const inputHandler = handler();
+								console.log("ace:", inputHandler);
 								return (
 									<Grid
 										// toolTipMessage={queryMessage}
@@ -526,7 +523,13 @@ class PreferenceForm extends React.Component {
 										}
 										component={
 											<Ace
-												defaultValue=""
+												data-cy="external-suggestions"
+												{...handler()}
+												defaultValue={
+													typeof inputHandler.value === 'string'
+														? inputHandler.value
+														: JSON.stringify(inputHandler.value, 0, 2)
+												}
 												mode="json"
 												value={
 													typeof inputHandler.value === 'string'
@@ -576,6 +579,7 @@ class PreferenceForm extends React.Component {
 									app={app}
 								/>
 								<Button
+									data-cy="popular-suggestions-save"
 									onClick={handleSaveTemplate}
 									size="large"
 									type="primary"
