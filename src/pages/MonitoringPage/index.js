@@ -7,8 +7,19 @@ import MonitoringContainer from '../../batteries/components/Monitoring/Monitorin
 import { getURL } from '../../constants/config';
 import { event, timingEvent } from '../../utils/gtag';
 import moment from '../../utils/moment';
+import Overlay from '../../components/Overlay';
+import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 
-const MonitoringPage = ({ username, password, plan }) => {
+const bannerMessagesMonitoring = {
+	free: {
+		title: 'Unlock Cluster Monitoring',
+		description: 'Get a paid plan to monitor your cluster.',
+		buttonText: 'Upgrade Now',
+		href: 'billing',
+	},
+};
+
+const MonitoringPage = ({ username, password, plan, isPaidUser }) => {
 	useEffect(() => {
 		const startTime = moment();
 		// triggering custom event for google analytics
@@ -34,13 +45,28 @@ const MonitoringPage = ({ username, password, plan }) => {
 		return null;
 	}
 	return (
-		<MonitoringContainer
-			plan={plan}
-			esURL={getURL()}
-			esUsername={username}
-			esPassword={password}
-			isAppbase
-		/>
+		<React.Fragment>
+			{isPaidUser ? (
+				<MonitoringContainer
+					plan={plan}
+					esURL={getURL()}
+					esUsername={username}
+					esPassword={password}
+					isAppbase
+				/>
+			) : (
+				<React.Fragment>
+					<Banner {...bannerMessagesMonitoring.free} />
+					<Overlay
+						style={{
+							maxWidth: '70%',
+						}}
+						src="https://i.imgur.com/ZNOr9t3.png"
+						alt="monitor cluster"
+					/>
+				</React.Fragment>
+			)}
+		</React.Fragment>
 	);
 };
 
@@ -50,6 +76,7 @@ const mapStateToProps = (state) => {
 		username,
 		password,
 		plan: get(state, '$getAppPlan.results.tier'),
+		isPaidUser: get(state, '$getAppPlan.results.isPaid'),
 	};
 };
 
@@ -57,6 +84,7 @@ MonitoringPage.propTypes = {
 	username: PropTypes.string.isRequired,
 	password: PropTypes.string.isRequired,
 	plan: PropTypes.string,
+	isPaidUser: PropTypes.bool.isRequired,
 };
 
 MonitoringPage.defaultProps = {

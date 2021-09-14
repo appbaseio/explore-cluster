@@ -9,7 +9,7 @@ import Overlay from '../../components/Overlay';
 const bannerMessagesSynonyms = {
 	free: {
 		title: 'Unlock Synonyms',
-		description: 'Get a paid plan to set Synonyms.',
+		description: 'Get a paid plan to use Synonyms.',
 		buttonText: 'Upgrade Now',
 		href: 'billing',
 	},
@@ -18,7 +18,7 @@ const bannerMessagesSynonyms = {
 const SynonymsPage = ({ isPaidUser }) => {
 	return (
 		<React.Fragment>
-			{!isPaidUser ? (
+			{isPaidUser ? (
 				<SynonymsComponent />
 			) : (
 				<React.Fragment>
