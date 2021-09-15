@@ -30,11 +30,6 @@ const actions = {
 		name: 'Return Custom Data',
 		data: '',
 	},
-	function: {
-		name: 'f(x) Apply Function',
-		data: '',
-		checkHealth: true,
-	},
 	remove_words: {
 		name: 'Remove Word(s)',
 		data: [],

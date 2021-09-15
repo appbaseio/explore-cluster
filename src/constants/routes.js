@@ -35,12 +35,6 @@ export const APP_ROUTES = {
 				hasExactPath: true,
 			},
 			{
-				label: 'Functions',
-				link: '/cluster/functions',
-				tag: 'Beta',
-				hasExactPath: true,
-			},
-			{
 				label: 'Grade Evaluation',
 				link: '/cluster/grade-evaluation',
 				tag: 'Beta',
@@ -165,7 +159,6 @@ export const CLUSTER_ROUTES = {
 				tag: 'Beta',
 			},
 			{ label: 'Query Rules', link: '/cluster/rules', tag: 'Beta' },
-			{ label: 'Functions', link: '/cluster/functions', tag: 'Beta' },
 			{ label: 'Grade Evaluation', link: '/cluster/grade-evaluation', tag: 'Beta' },
 		],
 	},
