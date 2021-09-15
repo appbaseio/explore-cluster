@@ -41,9 +41,6 @@ const MonitoringPage = ({ username, password, plan, isPaidUser }) => {
 			});
 		};
 	}, []);
-	if (!plan) {
-		return null;
-	}
 	return (
 		<React.Fragment>
 			{isPaidUser ? (
@@ -61,7 +58,7 @@ const MonitoringPage = ({ username, password, plan, isPaidUser }) => {
 						style={{
 							maxWidth: '70%',
 						}}
-						src="https://i.imgur.com/ZNOr9t3.png"
+						src="https://www.dropbox.com/s/nwqf21zsyp8lhui/Screenshot%202021-01-08%20at%207.10.35%20PM.png?raw=1"
 						alt="monitor cluster"
 					/>
 				</React.Fragment>
