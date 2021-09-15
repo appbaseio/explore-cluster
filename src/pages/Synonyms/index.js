@@ -5,6 +5,8 @@ import get from 'lodash/get';
 import SynonymsComponent from './Synonyms';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Overlay from '../../components/Overlay';
+import { isValidPlan } from '../../batteries/utils';
+import { allowedTiers } from '../../utils/prop-types';
 
 const bannerMessagesSynonyms = {
 	free: {
@@ -16,10 +18,10 @@ const bannerMessagesSynonyms = {
 	},
 };
 
-const SynonymsPage = ({ isPaidUser }) => {
+const SynonymsPage = ({ isPaidUser, tier, featureSynonyms }) => {
 	return (
 		<React.Fragment>
-			{!isPaidUser ? (
+			{isPaidUser && isValidPlan(tier, featureSynonyms) ? (
 				<SynonymsComponent />
 			) : (
 				<React.Fragment>
@@ -28,8 +30,8 @@ const SynonymsPage = ({ isPaidUser }) => {
 						style={{
 							maxWidth: '70%',
 						}}
-						src="https://i.imgur.com/x8UMoIz.png"
-						alt="manage synonyms"
+						src="https://i.imgur.com/fO0Zomn.png"
+						alt="Synonyms"
 					/>
 				</React.Fragment>
 			)}
@@ -37,12 +39,21 @@ const SynonymsPage = ({ isPaidUser }) => {
 	);
 };
 
+SynonymsPage.defaultProps = {
+	tier: undefined,
+	featureSynonyms: false,
+};
+
 SynonymsPage.propTypes = {
 	isPaidUser: PropTypes.bool.isRequired,
+	tier: allowedTiers,
+	featureSynonyms: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
 	isPaidUser: get(state, '$getAppPlan.results.isPaid'),
+	tier: get(state, '$getAppPlan.results.tier'),
+	featureSynonyms: get(state, '$getAppPlan.results.feature_search_relevancy', false),
 });
 
 export default connect(mapStateToProps)(SynonymsPage);

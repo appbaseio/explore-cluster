@@ -22,9 +22,6 @@ import { getMappings, getSettings, reIndex } from '../../batteries/utils/mapping
 import { getSynonymsAnalyzerSettings, parseSynonymsAnalyzer, applySynonymsSettings } from './utils';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import SettingsFooter from '../../components/SettingsFooter';
-import { isValidPlan } from '../../batteries/utils';
-import Overlay from '../../components/Overlay';
-import { allowedTiers } from '../../utils/prop-types';
 import Loader from '../../components/Loader';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { addReIndexingTasks } from '../../batteries/modules/actions';
@@ -375,7 +372,7 @@ class Synonyms extends React.Component {
 
 	render() {
 		const { synonyms, isDeleting, key, uploadVisible, fileList, file, uploading } = this.state;
-		const { credentials, appName, tier, featureSynonyms } = this.props;
+		const { credentials, appName } = this.props;
 		const url = getURL();
 
 		const bannerMessage = {
@@ -384,21 +381,6 @@ class Synonyms extends React.Component {
 			videoLink: 'https://youtu.be/FA6knNSaChA',
 			href: 'https://docs.appbase.io/docs/search/relevancy/#synonyms',
 		};
-
-		if (!isValidPlan(tier, featureSynonyms)) {
-			return (
-				<React.Fragment>
-					<Banner {...bannerMessage} />
-					<Overlay
-						style={{
-							maxWidth: '70%',
-						}}
-						src="https://i.imgur.com/fO0Zomn.png"
-						alt="Synonyms"
-					/>
-				</React.Fragment>
-			);
-		}
 
 		return (
 			<React.Fragment>
@@ -659,15 +641,8 @@ class Synonyms extends React.Component {
 Synonyms.propTypes = {
 	appName: PropTypes.string.isRequired,
 	credentials: PropTypes.string.isRequired,
-	tier: allowedTiers,
-	featureSynonyms: PropTypes.bool,
 	url: PropTypes.string.isRequired,
 	updateReIndexingTasks: PropTypes.func.isRequired,
-};
-
-Synonyms.defaultProps = {
-	tier: undefined,
-	featureSynonyms: false,
 };
 
 const mapStateToProps = (state) => {
@@ -677,8 +652,6 @@ const mapStateToProps = (state) => {
 		appName: get(state, '$getCurrentApp.name'),
 		url,
 		credentials: username ? `${username}:${password}` : null,
-		tier: get(state, '$getAppPlan.results.tier'),
-		featureSynonyms: get(state, '$getAppPlan.results.feature_search_relevancy', false),
 	};
 };
 
