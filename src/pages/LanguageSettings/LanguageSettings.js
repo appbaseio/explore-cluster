@@ -41,6 +41,7 @@ const fallback = {
 
 const bannerDetails = {
 	title: 'Language Settings',
+	description: 'Configure language settings to understand search intent.',
 	buttonText: 'Read More',
 	videoLink: 'https://youtu.be/wx8ac4IkTas',
 	icon: 'pencil',
