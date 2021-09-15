@@ -194,7 +194,7 @@ class PreferenceForm extends React.Component {
 											Size
 											<Popover
 												content={content(
-													Messages.size,
+													Messages.recent_size,
 												)}
 												css={styles.iconContainer}
 											>

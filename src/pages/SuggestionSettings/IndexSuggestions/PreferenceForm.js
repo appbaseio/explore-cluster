@@ -369,7 +369,7 @@ class PreferenceForm extends React.Component {
 											Enable Predictive Suggestions
 											<Popover
 												content={content(
-													Messages.enable_predictive_suggestions,
+													Messages.enablePredictiveSuggestions,
 												)}
 												css={styles.iconContainer}
 											>
@@ -534,7 +534,7 @@ class PreferenceForm extends React.Component {
 											Size
 											<Popover
 												content={content(
-													Messages.size,
+													Messages.index_size,
 												)}
 												css={styles.iconContainer}
 											>
@@ -622,7 +622,7 @@ class PreferenceForm extends React.Component {
 							)}
 						/>
 						<FieldControl
-							name="exludeFields"
+							name="excludeFields"
 							render={({ handler }) => (
 								<Grid
 									label={
@@ -630,7 +630,7 @@ class PreferenceForm extends React.Component {
 											Exclude Fields
 											<Popover
 												content={content(
-													Messages.exludeFields,
+													Messages.excludeFields,
 												)}
 												css={styles.iconContainer}
 											>

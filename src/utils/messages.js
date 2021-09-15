@@ -88,7 +88,9 @@ export const suggestionsMessages = {
 	numberOfDays: Message(
 		'Define the number of days after which you want to re-calculate the suggestions.',
 	),
-	size: Message('Maximum number of popular suggestions to be displayed.'),
+	popular_size: Message('Maximum number of popular suggestions to be displayed.'),
+	recent_size: Message('Maximum number of recent suggestions to be displayed.'),
+	index_size: Message('Maximum number of index suggestions to be displayed.'),
 	indices: Message('Only selected indices will be considered to calculate the suggestions.'),
 	showDistinctSuggestions: Message(
 		'Show only up to 1 suggestion per document (i.e. record). If set to false, multiple suggestions can be shown when relevant (based on different matching fields) from the same document.',
