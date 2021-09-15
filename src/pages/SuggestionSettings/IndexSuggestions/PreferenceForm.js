@@ -24,6 +24,7 @@ import styles from '../styles';
 import conversionMap from '../../../utils/conversionMap';
 import ReviewAndSave from '../../../components/ReviewAndSave';
 
+const gridRatio = '0.40';
 const calculateValue = (value) => {
 	const index = value.indexOf('*');
 	if (index > -1) {
@@ -324,6 +325,7 @@ class PreferenceForm extends React.Component {
 													))}
 											</Select>
 										}
+										gridRatio={gridRatio}
 									/>
 								);
 							}}
@@ -352,7 +354,9 @@ class PreferenceForm extends React.Component {
 												this.handleChange('showDistinctSuggestions', val, 'indexSuggestions')
 												handler().onChange(val);
 											}}
-									/>}
+										/>
+									}
+									gridRatio={gridRatio}
 								/>
 							)}
 						/>
@@ -382,6 +386,7 @@ class PreferenceForm extends React.Component {
 											handler().onChange(val);
 										}}
 									/>}
+									gridRatio={gridRatio}
 								/>
 							)}
 						/>
@@ -420,6 +425,7 @@ class PreferenceForm extends React.Component {
 												}}
 											/>
 										}
+										gridRatio={gridRatio}
 									/>
 								)
 							}}
@@ -451,6 +457,7 @@ class PreferenceForm extends React.Component {
 											}}
 										/>
 									}
+									gridRatio={gridRatio}
 								/>
 							)}
 						/>
@@ -484,6 +491,7 @@ class PreferenceForm extends React.Component {
 											}}
 										/>
 									}
+									gridRatio={gridRatio}
 								/>
 							)}
 						/>
@@ -513,6 +521,7 @@ class PreferenceForm extends React.Component {
 											}}
 										/>
 									}
+									gridRatio={gridRatio}
 								/>
 							)}
 						/>
@@ -547,6 +556,7 @@ class PreferenceForm extends React.Component {
 											}}
 										/>
 									}
+									gridRatio={gridRatio}
 								/>
 							)}
 						/>
@@ -607,6 +617,7 @@ class PreferenceForm extends React.Component {
 											})}
 										</Select>
 									}
+									gridRatio={gridRatio}
 								/>
 							)}
 						/>
@@ -661,6 +672,7 @@ class PreferenceForm extends React.Component {
 												})}
 											</Select>
 									}
+									gridRatio={gridRatio}
 								/>
 							)}
 						/>
@@ -723,6 +735,7 @@ class PreferenceForm extends React.Component {
 											)}
 										</MappingWrapper>
 									}
+									gridRatio={gridRatio}
 								/>
 							)}
 						/>
@@ -769,6 +782,7 @@ class PreferenceForm extends React.Component {
 												})}
 											</Select>
 										}
+										gridRatio={gridRatio}
 									/>
 								);
 							}}
