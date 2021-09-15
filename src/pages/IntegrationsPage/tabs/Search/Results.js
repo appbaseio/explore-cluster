@@ -6,11 +6,6 @@ import DataFieldSelector from '../../../../components/Form/DataFieldSelector';
 
 export const defaultSettings = [
 	{
-		id: 'enablePopularSuggestions',
-		label: 'Show popular suggestions (users will see suggestions based on analytics data)',
-		value: false,
-	},
-	{
 		id: 'showSelectedFilters',
 		label: 'Show active filter tags',
 		value: true,
