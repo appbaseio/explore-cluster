@@ -12,8 +12,8 @@ import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 
 const bannerMessagesMonitoring = {
 	free: {
-		title: 'Unlock Cluster Monitoring',
-		description: 'Get a paid plan to monitor your cluster.',
+		title: 'Cluster Monitoring',
+		description: 'Keep a pulse on the health and performance of your search cluster.',
 		buttonText: 'Upgrade Now',
 		href: 'billing',
 	},

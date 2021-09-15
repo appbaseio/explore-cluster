@@ -8,8 +8,8 @@ import Overlay from '../../components/Overlay';
 
 const bannerMessagesSandbox = {
 	free: {
-		title: 'Unlock the Search Preview',
-		description: 'Get a paid plan to see Search Preview.',
+		title: 'Search Preview',
+		description: 'Test search relevance visually.',
 		buttonText: 'Upgrade Now',
 		href: 'billing',
 	},
