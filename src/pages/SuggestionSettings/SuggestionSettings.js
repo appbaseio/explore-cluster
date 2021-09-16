@@ -19,7 +19,7 @@ const bannerDetails = {
 		'GUI to manage preferences for Suggestion Settings. Suggestion Settings are stored in the .suggestions index by appbase.io based on the analytics data of what end users are searching for.',
 	buttonText: 'Read more',
 	icon: 'pencil',
-	href: 'https://docs.appbase.io/docs/analytics/popular-suggestions/',
+	href: 'https://docs.appbase.io/docs/search/relevancy/#popular-suggestions',
 };
 
 const SuggestionSettings = ({ tier, featureSuggestions }) => {
