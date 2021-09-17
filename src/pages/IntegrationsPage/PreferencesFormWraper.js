@@ -381,7 +381,7 @@ class PreferencesFormWrapper extends React.Component {
 										preferences,
 										'resultSettings.rsConfig.pagination',
 									),
-									layout: get(preferences, 'resultSettings.layout'),
+									layout: get(preferences, 'resultSettings.layout') || 'grid',
 									viewSwitcher: get(
 										preferences,
 										'resultSettings.viewSwitcher',

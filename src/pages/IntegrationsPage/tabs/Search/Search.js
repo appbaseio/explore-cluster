@@ -91,6 +91,7 @@ const Search = () => (
 			whether to enable synonyms from the Search Relevancy views.
 		</p>
 		{/* toggles */}
+		<p style={{ fontWeight: '600' }}>⚠️ Without setting search fields, searchbox will not return any results.</p>
 		<Button href="search" type="primary">
 			Configure Search Settings
 		</Button>
