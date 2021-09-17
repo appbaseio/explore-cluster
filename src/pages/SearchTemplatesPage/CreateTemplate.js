@@ -126,7 +126,7 @@ class CreateTemplate extends React.Component {
 									onClick={handleValidateTemplate}
 									loading={isValidating}
 								>
-									Validate and Render
+									Render Query
 								</Button>
 								<Button
 									onClick={handleSaveTemplate}

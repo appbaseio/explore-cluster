@@ -28,3 +28,10 @@ export const getString = (value) => {
 
 export const extractParams = (value = '') =>
 	(value.match(/{{\s*[\w.]+\s*}}/g) || []).map((x) => x.match(/[\w.]+/)[0]);
+
+export const errorMessageTemplate = (property, action) => {
+	if (property === 'invalid json') {
+		return `Please enter a valid JSON query to ${action}.`;
+	}
+	return `Invalid query, The ${property} property is required to ${action} the query.`;
+};
