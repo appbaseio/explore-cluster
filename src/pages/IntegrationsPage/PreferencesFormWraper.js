@@ -129,9 +129,7 @@ class PreferencesFormWrapper extends React.Component {
 			const colorFilter = this.form.get('staticFilters.color.customize.dataField');
 			const sizeFilter = this.form.get('staticFilters.size.customize.dataField');
 			const priceFilter = this.form.get('staticFilters.price.customize.dataField');
-
 			const syncSettingsControl = this.form.get('syncSettings');
-
 			if (syncSettingsControl) {
 				if (value === 'shopify') {
 					syncSettingsControl.enable();
@@ -220,7 +218,6 @@ class PreferencesFormWrapper extends React.Component {
 				recommendationsControl.controls = [];
 			}
 		};
-		console.log('pref', preferences);
 		// Sync form values
 		if (preferences) {
 			try {
