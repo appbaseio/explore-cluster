@@ -855,33 +855,39 @@ class QueryRulesForm extends React.Component {
 										</label>
 									</>
 								)}
-
+								<div className={formStyle}>
+									<label>
+										Search Type
+										<Info content="SSelect the type of search query to trigger this rule on." />
+									</label>
+									<Checkbox.Group
+										name="type"
+										options={searchTypeArr}
+										defaultValue={[
+											'search',
+											'suggestion',
+											'term',
+											'range',
+											'geo',
+										]}
+										style={{ display: 'flex', flexWrap: 'wrap' }}
+										onChange={this.handleTypeChange}
+									/>
+								</div>
 								{!show_advance_editor && (
-									<>
-										<div className={formStyle}>
-											<label>Search Type</label>
-											<Checkbox.Group
-												name="type"
-												options={searchTypeArr}
-												defaultValue={[]}
-												style={{ display: 'flex', flexWrap: 'wrap' }}
-												onChange={this.handleTypeChange}
-											/>
-										</div>
-										<ErrorToaster inline>
-											<Conditions
-												onChange={this.handleInput}
-												error={error.condition}
-												condition={condition}
-												dataFields={dataFields}
-												dataField={dataField}
-												dataFieldValue={dataFieldValue}
-												query={query}
-												onDropdownChange={this.handleDropdown}
-												queryValue={queryValue}
-											/>
-										</ErrorToaster>
-									</>
+									<ErrorToaster inline>
+										<Conditions
+											onChange={this.handleInput}
+											error={error.condition}
+											condition={condition}
+											dataFields={dataFields}
+											dataField={dataField}
+											dataFieldValue={dataFieldValue}
+											query={query}
+											onDropdownChange={this.handleDropdown}
+											queryValue={queryValue}
+										/>
+									</ErrorToaster>
 								)}
 
 								{show_advance_editor && condition === 'filter' && (
