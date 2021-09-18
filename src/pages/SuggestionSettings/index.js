@@ -1,0 +1,53 @@
+import React from 'react';
+import { Tabs } from 'antd';
+import { container } from '../ResultsPage/styles';
+import PreferencesFormWrapper from '../IntegrationsPage/PreferencesFormWraper';
+import SyncStatus from '../IntegrationsPage/SyncStatus';
+import PopularSuggestions from './PopularSuggestions/index';
+import RecentSuggestions from './RecentSuggestions';
+import IndexSuggestions from './IndexSuggestions';
+import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
+
+const { TabPane } = Tabs;
+
+const bannerDetails = {
+	title: 'Popular Suggestions',
+	description:
+		'GUI to manage preferences for popular suggestions. Popular suggestions are stored in the .suggestions index by appbase.io based on the analytics data of what end users are searching for.',
+	buttonText: 'Read more',
+	icon: 'pencil',
+	href: 'https://docs.appbase.io/docs/analytics/popular-suggestions/',
+};
+
+const SuggestionSettings = () => {
+	return (
+		<>
+		<Banner {...bannerDetails} />
+			<PreferencesFormWrapper>
+				{({ form }) => (
+					<>
+						<SyncStatus form={form} />
+						<div
+							style={{ backgroundColor: '#fff', padding: '10px 20px' }}
+							className={container}
+						>
+							<Tabs defaultActiveKey="1" style={{ minHeight: 500 }}>
+								<TabPane tab="Popular Suggestions" key="1">
+									<PopularSuggestions hide />
+								</TabPane>
+								<TabPane tab="Recent Suggestions" key="2">
+									<RecentSuggestions />
+								</TabPane>
+								<TabPane tab="Index Suggestions" key="3">
+									<IndexSuggestions />
+								</TabPane>
+							</Tabs>
+						</div>
+					</>
+				)}
+			</PreferencesFormWrapper>
+		</>
+	);
+};
+
+export default SuggestionSettings;
