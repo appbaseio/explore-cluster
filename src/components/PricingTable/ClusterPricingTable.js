@@ -86,7 +86,12 @@ const data = [
 		key: '4',
 		name: (
 			<RowContent>
-				<div>⚡️ Fast search with appbase.io cache</div>
+				<div>
+					<span role="img" aria-label="fast">
+						⚡️
+					</span>
+					Fast search with appbase.io cache
+				</div>
 				<StyledLink
 					href="https://docs.appbase.io/docs/speed/cache-management/"
 					target="_blank"
@@ -108,18 +113,6 @@ const data = [
 			</RowContent>
 		),
 		desc: 'Production-I tier and above.',
-	},
-	{
-		key: '6',
-		name: (
-			<RowContent>
-				<div>Functions</div>
-				<StyledLink href="https://docs.appbase.io/docs/search/Functions" target="_blank">
-					Read more
-				</StyledLink>
-			</RowContent>
-		),
-		desc: 'Production-II tier and above.',
 	},
 ];
 
