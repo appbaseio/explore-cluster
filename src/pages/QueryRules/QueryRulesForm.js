@@ -333,9 +333,9 @@ class QueryRulesForm extends React.Component {
 					},
 				},
 			}),
-			() => {
-				this.validateForm();
-			},
+			// () => {
+			// 	this.validateForm();
+			// },
 		);
 	};
 
@@ -628,9 +628,18 @@ class QueryRulesForm extends React.Component {
 	};
 
 	handleTypeChange = (data) => {
-		this.setState({ type: data }, () => {
-			this.validateForm();
-		});
+		if (!data.length) {
+			this.setState({
+				isFormInvalid: true,
+			});
+		} else {
+			this.setState({
+				isFormInvalid: false,
+			});
+		}
+		// this.setState({ type: data }, () => {
+		// 	this.validateForm();
+		// });
 	};
 
 	render() {
@@ -855,10 +864,20 @@ class QueryRulesForm extends React.Component {
 										</label>
 									</>
 								)}
-								<div className={formStyle}>
+								<div
+									className={formStyle}
+									style={{
+										border: isFormInvalid ? '1px solid red' : 'none',
+									}}
+								>
 									<label>
-										Search Type
-										<Info content="SSelect the type of search query to trigger this rule on." />
+										Search Type{' '}
+										{isFormInvalid && (
+											<div style={{ color: 'red' }}>
+												At least one search type should be selected.
+											</div>
+										)}
+										<Info content="Select the type of search query to trigger this rule on." />
 									</label>
 									<Checkbox.Group
 										name="type"
@@ -886,6 +905,7 @@ class QueryRulesForm extends React.Component {
 											query={query}
 											onDropdownChange={this.handleDropdown}
 											queryValue={queryValue}
+											isFormInvalid={isFormInvalid}
 										/>
 									</ErrorToaster>
 								)}
