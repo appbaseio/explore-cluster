@@ -201,11 +201,10 @@ class QueryRulesForm extends React.Component {
 
 			subFieldsMap: {},
 
-			type: [],
+			type: ['search', 'suggestion', 'geo', 'term', 'range'],
 			error: {},
 			loading: false,
 			editorKey: Date.now(),
-			isFormInvalid: false,
 		};
 	}
 
@@ -317,26 +316,20 @@ class QueryRulesForm extends React.Component {
 	handleInput = (e) => {
 		const { name, value } = e.target;
 
-		this.setState(
-			(prevState) => ({
-				[name]: value,
-				actions:
-					name === 'condition'
-						? prevState.actions.filter(
-								(action) => action.type !== 'replace_search_term',
-						  )
-						: prevState.actions,
-				error: {
-					...prevState.error,
-					[name === 'dataFieldValue' || name === 'queryValue' ? 'condition' : name]: {
-						hasError: false,
-					},
+		console.log(name, value);
+		this.setState((prevState) => ({
+			[name]: value,
+			actions:
+				name === 'condition'
+					? prevState.actions.filter((action) => action.type !== 'replace_search_term')
+					: prevState.actions,
+			error: {
+				...prevState.error,
+				[name === 'dataFieldValue' || name === 'queryValue' ? 'condition' : name]: {
+					hasError: false,
 				},
-			}),
-			// () => {
-			// 	this.validateForm();
-			// },
-		);
+			},
+		}));
 	};
 
 	handleDropdown = (name, value) => {
@@ -410,20 +403,6 @@ class QueryRulesForm extends React.Component {
 			}),
 			this.handleSave,
 		);
-	};
-
-	validateForm = () => {
-		const { type, queryValue, dataFieldValue } = this.state;
-		let isFormInvalid = false;
-
-		if (
-			(queryValue && !type.includes('suggestion') && !type.includes('search')) ||
-			(dataFieldValue && !type.includes('term'))
-		) {
-			isFormInvalid = true;
-		}
-
-		this.setState({ isFormInvalid });
 	};
 
 	handleSave = () => {
@@ -628,18 +607,16 @@ class QueryRulesForm extends React.Component {
 	};
 
 	handleTypeChange = (data) => {
-		if (!data.length) {
-			this.setState({
-				isFormInvalid: true,
-			});
-		} else {
-			this.setState({
-				isFormInvalid: false,
-			});
-		}
-		// this.setState({ type: data }, () => {
-		// 	this.validateForm();
-		// });
+		const { error } = this.state;
+
+		this.setState({
+			error: {
+				...error,
+				type: {
+					hasError: !data.length,
+				},
+			},
+		});
 	};
 
 	render() {
@@ -666,7 +643,6 @@ class QueryRulesForm extends React.Component {
 			rawQuery,
 			editorKey,
 			subFieldsMap,
-			isFormInvalid,
 		} = this.state;
 
 		const {
@@ -744,6 +720,7 @@ class QueryRulesForm extends React.Component {
 		if (isEditPage) {
 			hasChanged = this.getChangeStatus();
 		}
+
 		return (
 			<div className={container}>
 				<Link to="/cluster/rules">
@@ -867,8 +844,8 @@ class QueryRulesForm extends React.Component {
 								<div
 									className={formStyle}
 									style={{
-										border: isFormInvalid ? '1px solid red' : 'none',
-										padding: isFormInvalid ? '10px' : '10px',
+										border: error?.type?.hasError ? '1px solid red' : 'none',
+										padding: '10px',
 									}}
 								>
 									<div>
@@ -876,9 +853,9 @@ class QueryRulesForm extends React.Component {
 											Search Type{' '}
 											<Info content="Select the type of search query to trigger this rule on." />
 										</label>
-										{isFormInvalid && (
-											<div style={{ color: 'red' }}>
-												At least one search type should be selected.
+										{error?.type?.hasError && (
+											<div style={{ color: 'red', fontSize: 13 }}>
+												{error?.type?.description}
 											</div>
 										)}
 									</div>
@@ -894,14 +871,16 @@ class QueryRulesForm extends React.Component {
 											'geo',
 										]}
 										style={{ display: 'flex', flexWrap: 'wrap' }}
-										onChange={this.handleTypeChange}
+										onChange={(data) => {
+											this.setState({ type: data });
+										}}
 									/>
 								</div>
 								{!show_advance_editor && (
 									<ErrorToaster inline>
 										<Conditions
 											onChange={this.handleInput}
-											error={error.condition}
+											error={error}
 											condition={condition}
 											dataFields={dataFields}
 											dataField={dataField}
@@ -909,7 +888,6 @@ class QueryRulesForm extends React.Component {
 											query={query}
 											onDropdownChange={this.handleDropdown}
 											queryValue={queryValue}
-											isFormInvalid={isFormInvalid}
 										/>
 									</ErrorToaster>
 								)}
@@ -1051,7 +1029,7 @@ class QueryRulesForm extends React.Component {
 								/>
 							) : null}
 							<Button
-								disabled={(isEditPage && !hasChanged) || isFormInvalid}
+								disabled={isEditPage && !hasChanged}
 								size="large"
 								onClick={this.getErrorStatus}
 								type="primary"
