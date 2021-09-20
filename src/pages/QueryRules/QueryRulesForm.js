@@ -868,17 +868,21 @@ class QueryRulesForm extends React.Component {
 									className={formStyle}
 									style={{
 										border: isFormInvalid ? '1px solid red' : 'none',
+										padding: isFormInvalid ? '10px' : '10px',
 									}}
 								>
-									<label>
-										Search Type{' '}
+									<div>
+										<label>
+											Search Type{' '}
+											<Info content="Select the type of search query to trigger this rule on." />
+										</label>
 										{isFormInvalid && (
 											<div style={{ color: 'red' }}>
 												At least one search type should be selected.
 											</div>
 										)}
-										<Info content="Select the type of search query to trigger this rule on." />
-									</label>
+									</div>
+
 									<Checkbox.Group
 										name="type"
 										options={searchTypeArr}
