@@ -53,7 +53,6 @@ import Overlay from '../../components/Overlay';
 import { mediaKey } from '../../utils/media';
 import { getSingleFunction } from '../../batteries/utils/app';
 import { isValidPlan } from '../../batteries/utils';
-import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import { AdvancedEditor, CustomAutoComplete } from '../../components/AdvancedEditor';
 import { getRawQuery, parseExpression } from '../../components/AdvancedEditor/helper';
 import { allowedTiers } from '../../utils/prop-types';
@@ -206,37 +205,37 @@ class QueryRulesForm extends React.Component {
 		if (!Object.keys(mappings).length) {
 			this.setState({ loading: true });
 			getClusterMappings()
-			.then((mappingsData) => {
-				updateMappings(mappingsData);
-				const { selectedIndexes } = this.state;
-				const [dataFields, fieldMap, subFieldsMap] = getDatafields({
-					mappingsData,
-					indexes: ['*'],
+				.then((mappingsData) => {
+					updateMappings(mappingsData);
+					const { selectedIndexes } = this.state;
+					const [dataFields, fieldMap, subFieldsMap] = getDatafields({
+						mappingsData,
+						indexes: ['*'],
+					});
+					const [searchFields] = getDatafields({
+						mappingsData,
+						indexes: selectedIndexes,
+						isSearch: true,
+					});
+					const [aggsFields] = getDatafields({
+						mappingsData,
+						indexes: selectedIndexes,
+						isAggs: true,
+					});
+					this.setState({
+						mappings: mappingsData,
+						dataFields,
+						searchFields,
+						aggsFields,
+						fieldMap,
+						subFieldsMap,
+						loading: false,
+					});
+				})
+				.catch((e) => {
+					this.setState({ loading: false });
+					console.log(e);
 				});
-				const [searchFields] = getDatafields({
-					mappingsData,
-					indexes: selectedIndexes,
-					isSearch: true,
-				});
-				const [aggsFields] = getDatafields({
-					mappingsData,
-					indexes: selectedIndexes,
-					isAggs: true,
-				});
-				this.setState({
-					mappings: mappingsData,
-					dataFields,
-					searchFields,
-					aggsFields,
-					fieldMap,
-					subFieldsMap,
-					loading: false,
-				});
-			})
-			.catch((e) => {
-				this.setState({ loading: false });
-				console.log(e);
-			});
 		} else {
 			const { selectedIndexes } = this.state;
 			this.setState({ loading: true });
@@ -264,7 +263,6 @@ class QueryRulesForm extends React.Component {
 				loading: false,
 			});
 		}
-
 	}
 
 	componentDidUpdate(prevProps) {
@@ -318,12 +316,6 @@ class QueryRulesForm extends React.Component {
 				message.success('successfully deleted rule');
 				history.replace('/cluster/rules');
 			}
-		}
-	}
-
-	getMappings = () => {
-		if(!mappings) {
-			// function call
 		}
 	}
 
@@ -653,7 +645,6 @@ class QueryRulesForm extends React.Component {
 			tier,
 			featureRules,
 		} = this.props;
-
 		this.customAutoComplete = new CustomAutoComplete(null, [
 			{ columnField: '$query', type: 'selection' },
 			...dataFields.map((field) => ({
@@ -1023,6 +1014,8 @@ QueryRulesForm.propTypes = {
 	updateRule: PropTypes.func.isRequired,
 	match: PropTypes.object.isRequired,
 	fetchRules: PropTypes.func.isRequired,
+	mappings: PropTypes.object.isRequired,
+	updateMappings: PropTypes.func.isRequired,
 };
 
 QueryRulesForm.defaultProps = {
@@ -1052,7 +1045,6 @@ const mapStateToProps = (state, props) => {
 		mappings: get(state, '$allAppMappings'),
 	};
 
-
 	if (id) {
 		const ruleData = defaultState.rules.find((rule) => rule.id === id) || {};
 		const { type, timeframe } = ruleData.trigger || {};
@@ -1077,7 +1069,7 @@ const mapDispatchToProps = (dispatch) => ({
 	createRule: (rule) => dispatch(addQueryRule(rule)),
 	updateRule: (rule) => dispatch(putRule(rule)),
 	removeRule: (id) => dispatch(deleteRule(id)),
-	updateMappings: (data => dispatch(getMappings(data))),
+	updateMappings: (data) => dispatch(getMappings(data)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(QueryRulesForm);
