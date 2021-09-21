@@ -316,7 +316,6 @@ class QueryRulesForm extends React.Component {
 	handleInput = (e) => {
 		const { name, value } = e.target;
 
-		console.log(name, value);
 		this.setState((prevState) => ({
 			[name]: value,
 			actions:
@@ -437,7 +436,7 @@ class QueryRulesForm extends React.Component {
 			return show_advance_editor
 				? `'${(selectedIndexes || []).join(',')}' in $index ${
 						advancedExpression ? suffixExpression : ''
-				  }`
+				  } and $type in ${JSON.stringify(type)}`
 				: getExpressionFromValue({
 						selectedIndexes,
 						dataFieldValue,
@@ -829,6 +828,43 @@ class QueryRulesForm extends React.Component {
 												onChange={this.handleIndex}
 											/>
 										</div>
+										<div
+											className={formStyle}
+											style={{
+												border: error?.type?.hasError
+													? '1px solid red'
+													: 'none',
+												padding: '10px',
+											}}
+										>
+											<div>
+												<label>
+													Search Type{' '}
+													<Info content="Select the type of search query to trigger this rule on." />
+												</label>
+												{error?.type?.hasError && (
+													<div style={{ color: 'red', fontSize: 13 }}>
+														{error?.type?.description}
+													</div>
+												)}
+											</div>
+
+											<Checkbox.Group
+												name="type"
+												options={searchTypeArr}
+												defaultValue={[
+													'search',
+													'suggestion',
+													'term',
+													'range',
+													'geo',
+												]}
+												style={{ display: 'flex', flexWrap: 'wrap' }}
+												onChange={(data) => {
+													this.setState({ type: data });
+												}}
+											/>
+										</div>
 										<label
 											style={{
 												marginBottom: 15,
@@ -841,41 +877,7 @@ class QueryRulesForm extends React.Component {
 										</label>
 									</>
 								)}
-								<div
-									className={formStyle}
-									style={{
-										border: error?.type?.hasError ? '1px solid red' : 'none',
-										padding: '10px',
-									}}
-								>
-									<div>
-										<label>
-											Search Type{' '}
-											<Info content="Select the type of search query to trigger this rule on." />
-										</label>
-										{error?.type?.hasError && (
-											<div style={{ color: 'red', fontSize: 13 }}>
-												{error?.type?.description}
-											</div>
-										)}
-									</div>
 
-									<Checkbox.Group
-										name="type"
-										options={searchTypeArr}
-										defaultValue={[
-											'search',
-											'suggestion',
-											'term',
-											'range',
-											'geo',
-										]}
-										style={{ display: 'flex', flexWrap: 'wrap' }}
-										onChange={(data) => {
-											this.setState({ type: data });
-										}}
-									/>
-								</div>
 								{!show_advance_editor && (
 									<ErrorToaster inline>
 										<Conditions
