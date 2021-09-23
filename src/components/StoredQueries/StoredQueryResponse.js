@@ -34,7 +34,7 @@ class StoredQueryResponse extends React.Component {
 						<div data-cy="response-editor">
 							<Monaco
 								language="json"
-								value={JSON.stringify(result, 0, 2)}
+								value={JSON.stringify(result, 0, 4)}
 								theme="vs-dark"
 								options={{
 									cursorStyle: 'line',

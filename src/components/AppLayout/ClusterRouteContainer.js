@@ -41,11 +41,6 @@ const BillingPage = Loadable({
 	loading: Loader,
 });
 
-const Functions = Loadable({
-	loader: () => import(/* webpackChunkName: "Functions" */ '../../pages/Functions'),
-	loading: Loader,
-});
-
 const CredentialsPage = Loadable({
 	loader: () => import(/* webpackChunkName: "CredentialsPage" */ '../../pages/CredentialsPage'),
 	loading: Loader,
@@ -376,20 +371,6 @@ class ClusterRouteContainer extends React.Component {
 							<>
 								{get(allowedRoutes, '/cluster/role-based-access') ? (
 									<AppPageContainer {...props} component={RoleBaseAccess} />
-								) : (
-									<UnauthorizedPage />
-								)}
-							</>
-						)}
-					/>
-
-					<Route
-						exact
-						path="/cluster/functions"
-						component={(props) => (
-							<>
-								{get(allowedRoutes, '/cluster/functions') ? (
-									<AppPageContainer {...props} component={Functions} />
 								) : (
 									<UnauthorizedPage />
 								)}

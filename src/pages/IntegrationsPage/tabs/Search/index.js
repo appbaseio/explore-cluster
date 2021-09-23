@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { FieldGroup } from 'react-reactive-form';
 import { Tabs } from 'antd';
 import { FormContext, verticalTab } from '../../utils';
@@ -11,6 +11,17 @@ const { TabPane } = Tabs;
 
 const SearchSettings = () => {
 	const form = useContext(FormContext);
+
+	useEffect(() => {
+		const autoSuggestionSettingsControl = form.get('autoSuggestionSettings');
+
+		if (form.value.autosuggest) {
+			autoSuggestionSettingsControl.enable();
+		} else {
+			autoSuggestionSettingsControl.disable();
+		}
+	}, []);
+
 	return (
 		<Tabs defaultActiveKey="1" tabPosition="left" className={verticalTab}>
 			<TabPane tab="Search" key="1">

@@ -34,6 +34,7 @@ import Actions from './components/Actions';
 import { getErrorClass, getErrorCount, getErrorMessage, getErrorMessages } from './utils/error';
 
 import { addQueryRule, deleteRule, getRules, putRule } from '../../batteries/modules/actions/rules';
+import { getUsageStats } from '../../batteries/modules/actions';
 
 import CloneRule from './components/CloneRule';
 import Info from '../../components/Info';
@@ -185,12 +186,14 @@ class QueryRulesForm extends React.Component {
 	}
 
 	componentDidMount() {
-		const { rules, fetchRules, rule, unparsedRule } = this.props;
+		const { rules, fetchRules, rule, unparsedRule, fetchUsageStats, usageStats } = this.props;
 		const { isEditPage } = this.state;
 		if (!(rules && rules.length)) {
 			fetchRules();
 		}
-
+		if (!usageStats) {
+			fetchUsageStats();
+		}
 		if (isEditPage && rule) {
 			const { show_advance_editor } = rule;
 			const { rawQuery, indexes } = getRawQuery(show_advance_editor, unparsedRule);
@@ -288,6 +291,19 @@ class QueryRulesForm extends React.Component {
 			}
 		}
 	}
+
+	getAlertMessage = (hasChanged, isCreating, isUpdating, count) => {
+		let str = '';
+		if (!hasChanged && !(isCreating || isUpdating)) {
+			str += 'No Changes, ';
+		}
+		if (count > 0) {
+			str += `Used ${count} times in last 30 days`;
+		} else {
+			str += 'Not used in the last 30 days';
+		}
+		return str;
+	};
 
 	handleInput = (e) => {
 		const { name, value } = e.target;
@@ -614,6 +630,7 @@ class QueryRulesForm extends React.Component {
 			unparsedRule,
 			tier,
 			featureRules,
+			usageStats,
 		} = this.props;
 
 		this.customAutoComplete = new CustomAutoComplete(null, [
@@ -941,14 +958,19 @@ class QueryRulesForm extends React.Component {
 									showIcon
 								/>
 							) : null}
-							{isEditPage && !hasChanged && !(isCreating || isUpdating) ? (
+							{isEditPage && (
 								<Alert
 									style={{ marginRight: 10 }}
-									message="No Changes"
 									type="info"
 									showIcon
+									message={this.getAlertMessage(
+										hasChanged,
+										isCreating,
+										isUpdating,
+										usageStats[rule.id]?.count,
+									)}
 								/>
-							) : null}
+							)}
 							<Button
 								disabled={isEditPage && !hasChanged}
 								size="large"
@@ -985,6 +1007,8 @@ QueryRulesForm.propTypes = {
 	updateRule: PropTypes.func.isRequired,
 	match: PropTypes.object.isRequired,
 	fetchRules: PropTypes.func.isRequired,
+	fetchUsageStats: PropTypes.func.isRequired,
+	usageStats: PropTypes.object.isRequired,
 };
 
 QueryRulesForm.defaultProps = {
@@ -1011,6 +1035,7 @@ const mapStateToProps = (state, props) => {
 		rulesLoading: get(state, '$getAppRules.isFetching'),
 		tier: get(state, '$getAppPlan.results.tier'),
 		featureRules: get(state, '$getAppPlan.results.feature_rules', false),
+		usageStats: get(state, '$getUsageStats.results', {}),
 	};
 
 	if (id) {
@@ -1037,6 +1062,7 @@ const mapDispatchToProps = (dispatch) => ({
 	createRule: (rule) => dispatch(addQueryRule(rule)),
 	updateRule: (rule) => dispatch(putRule(rule)),
 	removeRule: (id) => dispatch(deleteRule(id)),
+	fetchUsageStats: () => dispatch(getUsageStats()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(QueryRulesForm);
