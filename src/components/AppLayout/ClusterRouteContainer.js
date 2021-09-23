@@ -126,6 +126,12 @@ const GradeEvaluation = Loadable({
 	loading: Loader,
 });
 
+const SuggestionsPage = Loadable({
+	loader: () =>
+		import(/* webpackChunkName: "LanguageSettings" */ '../../pages/SuggestionSettings'),
+	loading: Loader,
+});
+
 class ClusterRouteContainer extends React.Component {
 	shouldComponentUpdate(nextProps) {
 		const { location, allowedRoutes } = this.props;
@@ -221,7 +227,24 @@ class ClusterRouteContainer extends React.Component {
 							</>
 						)}
 					/>
-
+					<Route
+						exact
+						path="/cluster/suggestions"
+						render={(props) => (
+							<>
+								{get(allowedRoutes, 'suggestions') ? (
+									<AppPageContainer
+										{...props}
+										component={SuggestionsPage}
+										shouldFetchAppInfo={false}
+										shouldFetchAppPlan={false}
+									/>
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
+						)}
+					/>
 					<Route
 						exact
 						path="/cluster/rules"
