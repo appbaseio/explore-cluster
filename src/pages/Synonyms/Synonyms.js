@@ -72,10 +72,6 @@ const search = css`
 		input {
 			border-radius: 4px;
 		}
-
-		> div > div > div {
-			top: 11px;
-		}
 	}
 
 	@media (max-width: 768px) {
