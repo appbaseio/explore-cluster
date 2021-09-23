@@ -16,11 +16,6 @@ const ProfilePage = Loadable({
 	loader: () => import(/* webpackChunkName: "ProfilePage" */ '../../pages/ProfilePage'),
 	loading: Loader,
 });
-const SearchTemplatesPage = Loadable({
-	loader: () =>
-		import(/* webpackChunkName: "SearchTemplatesPage" */ '../../pages/SearchTemplatesPage'),
-	loading: Loader,
-});
 
 const CachePreferences = Loadable({
 	loader: () => import(/* webpackChunkName: "CachePreferences" */ '../../pages/CachePreferences'),
@@ -152,19 +147,6 @@ class ClusterRouteContainer extends React.Component {
 									<AppPageContainer {...props} component={OverviewPage} />
 								) : (
 									<Redirect to={Object.keys(allowedRoutes)[0]} />
-								)}
-							</>
-						)}
-					/>
-					<Route
-						exact
-						path="/cluster/search-templates"
-						component={(props) => (
-							<>
-								{get(allowedRoutes, '/cluster/search-templates') ? (
-									<AppPageContainer {...props} component={SearchTemplatesPage} />
-								) : (
-									<UnauthorizedPage />
 								)}
 							</>
 						)}
