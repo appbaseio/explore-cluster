@@ -13,12 +13,6 @@ import UnauthorizedPage from '../../pages/UnauthorizedPage';
 import { getAuthorizedRoutes } from '../../utils';
 import { ALLOWED_ACTIONS } from '../../constants';
 
-const SearchTemplatesPage = Loadable({
-	loader: () =>
-		import(/* webpackChunkName: "SearchTemplatesPage" */ '../../pages/SearchTemplatesPage'),
-	loading: Loader,
-});
-
 const BillingPage = Loadable({
 	loader: () => import(/* webpackChunkName: "BillingPage" */ '../../pages/BillingPage'),
 	loading: Loader,
@@ -272,24 +266,7 @@ class RouteContainer extends React.Component {
 							</>
 						)}
 					/>
-					<Route
-						exact
-						path="/app/:appName/search-templates"
-						render={(props) => (
-							<>
-								{get(allowedRoutes, 'search-templates') ? (
-									<AppPageContainer
-										{...props}
-										component={SearchTemplatesPage}
-										shouldFetchAppInfo={false}
-										shouldFetchAppPlan={false}
-									/>
-								) : (
-									<UnauthorizedPage />
-								)}
-							</>
-						)}
-					/>
+
 					<Route
 						exact
 						path="/app/:appName/search-preview"
@@ -363,6 +340,7 @@ class RouteContainer extends React.Component {
 							</>
 						)}
 					/>
+
 					<Route
 						exact
 						path="/app/:appName/results"
@@ -381,6 +359,7 @@ class RouteContainer extends React.Component {
 							</>
 						)}
 					/>
+
 					<Route
 						exact
 						path="/app/:appName/index-settings"
