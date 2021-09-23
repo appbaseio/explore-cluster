@@ -209,13 +209,8 @@ class ClusterRouteContainer extends React.Component {
 						path="/cluster/suggestions"
 						render={(props) => (
 							<>
-								{get(allowedRoutes, 'suggestions') ? (
-									<AppPageContainer
-										{...props}
-										component={SuggestionsPage}
-										shouldFetchAppInfo={false}
-										shouldFetchAppPlan={false}
-									/>
+								{get(allowedRoutes, '/cluster/suggestions') ? (
+									<AppPageContainer {...props} component={SuggestionsPage} />
 								) : (
 									<UnauthorizedPage />
 								)}

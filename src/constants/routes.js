@@ -147,11 +147,6 @@ export const CLUSTER_ROUTES = {
 				link: '/cluster/suggestions',
 				tag: 'Beta',
 			},
-			{
-				label: 'Suggestion Settings',
-				link: 'suggestions',
-				tag: 'Beta',
-			},
 			{ label: 'Search Settings', link: 'search', tag: 'Beta', openIndexMenu: true },
 			{
 				label: 'Aggregation Settings',
