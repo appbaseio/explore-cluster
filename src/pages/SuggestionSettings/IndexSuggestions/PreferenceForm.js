@@ -202,7 +202,7 @@ class PreferenceForm extends React.Component {
 		}
 	}
 
-	updateToAggsField = ({ path, flattenType }) => {
+	updateToAggsField = ({ field, path, flattenType }) => {
 		const { localRelevancy } = this.props;
 		const { dataField } = get(localRelevancy, `aggregations`);
 		const pathVal = get(flattenType, path) === 'text' ? `${path}.keyword` : path;
@@ -210,7 +210,7 @@ class PreferenceForm extends React.Component {
 		const aggType = 'term';
 		this.setState({ aggregationField: path });
 		// this.handleAggregationsChange('dataField', { ...dataField, [pathVal]: aggType });
-		this.handleChange('categoryField', path, 'indexSuggestions');
+		this.handleChange(field, path, 'indexSuggestions');
 	};
 
 	getAggsField = ({ flattenUsecase: usecases, flattenType: types }) => {
@@ -267,6 +267,7 @@ class PreferenceForm extends React.Component {
 			size,
 			customQuery,
 			categoryField,
+			url,
 		} = get(localRelevancy, 'indexSuggestions', {
 				excludeFields: [],
 				includeFields: [],
@@ -276,6 +277,7 @@ class PreferenceForm extends React.Component {
 				size: 0,
 				customQuery: '',
 				categoryField: '',
+				url: '',
 			});
 		return (
 			<FieldGroup
@@ -682,7 +684,7 @@ class PreferenceForm extends React.Component {
 								<Grid
 									label={
 										<p css={styles.labelContainer}>
-											Category Fields
+											Category Field
 											<Popover
 												content={content(
 													Messages.categoryField,
@@ -711,9 +713,10 @@ class PreferenceForm extends React.Component {
 																data-cy="category-field"
 																style={{ width: 300 }}
 																value={value}
-																placeholder="Add aggregation fields from schema"
+																placeholder="Add category fields from schema"
 																onChange={(field) => {
 																	this.updateToAggsField({
+																		field: 'categoryField',
 																		path: field,
 																		flattenType,
 																	});
@@ -739,7 +742,70 @@ class PreferenceForm extends React.Component {
 								/>
 							)}
 						/>
-
+						<FieldControl
+							name="url"
+							render={({ handler, value }) => (
+								<Grid
+									label={
+										<p css={styles.labelContainer}>
+											URL
+											<Popover
+												content={content(
+													Messages.url,
+												)}
+												css={styles.iconContainer}
+											>
+												<Icon type="info-circle" />
+											</Popover>
+										</p>
+									}
+									component={
+										<MappingWrapper {...handler()}>
+											{({ flattenUsecase, flattenType }) => (
+												<React.Fragment>
+													{localRelevancy &&
+													this.getAggsField({ flattenUsecase, flattenType }).length >
+														0 ? (
+														<div
+															style={{
+																position: 'relative',
+																display: 'inline-block',
+															}}
+														>
+															<Select
+																showSearch
+																data-cy="url-index-settings"
+																style={{ width: 300 }}
+																value={value}
+																placeholder="Add url from schema"
+																onChange={(field) => {
+																	this.updateToAggsField({
+																		field: 'url',
+																		path: field,
+																		flattenType,
+																	});
+																	handler().onChange(field);
+																}}
+															>
+																{this.getAggsField({
+																	flattenUsecase,
+																	flattenType,
+																}).map((field) => (
+																	<Select.Option key={field} value={field} data-cy={field}>
+																		{field}
+																	</Select.Option>
+																))}
+															</Select>
+														</div>
+													) : null}
+												</React.Fragment>
+											)}
+										</MappingWrapper>
+									}
+									gridRatio={gridRatio}
+								/>
+							)}
+						/>
 						<FieldControl
 							name="customQuery"
 							render={({ handler, value }) => {

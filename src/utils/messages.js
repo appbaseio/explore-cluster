@@ -109,6 +109,7 @@ export const suggestionsMessages = {
 	categoryField: Message(
 		'When specified, suggestions will show category specific suggestions based on the most frequent values based on this field.',
 	),
+	url: Message('When specified, suggestions will redirect to the URL value based on this field.'),
 	includeFields: Message('Fields to include in the search results.'),
 	excludeFields: Message('Fields to exclude from the search results'),
 	customQuery: Message(

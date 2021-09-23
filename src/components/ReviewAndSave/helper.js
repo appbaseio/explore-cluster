@@ -7,9 +7,9 @@ export const relevancyTitles = {
 	aggregations: 'Aggregation Settings',
 	results: 'Result Settings',
 	synonyms: 'Synonyms Settings',
-	popularSuggestions: 'Popular Suggestions',
-	recentSuggestions: 'Recent Suggestions',
-	indexSuggestions: 'Index Suggestions',
+	popularSuggestions: 'Suggestions Settings/ Popular Suggestions',
+	recentSuggestions: 'Suggestions Settings/ Recent Suggestions',
+	indexSuggestions: 'Suggestions Settings/ Index Suggestions',
 };
 
 const settingsMap = {
@@ -255,8 +255,12 @@ const settingsMap = {
 		description: 'Maximum number of popular suggestions to be displayed.',
 	},
 	categoryField: {
-		title: 'Category Fields',
+		title: 'Category Field',
 		description: 'When specified, suggestions will show category specific suggestions based on the most frequent values based on this field.',
+	},
+	url: {
+		title: 'URL',
+		description: 'When specified, suggestions will redirect to the URL value based on this field.',
 	},
 	customQuery: {
 		title: 'Custom Query',
