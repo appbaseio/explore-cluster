@@ -41,6 +41,7 @@ const fallback = {
 
 const bannerDetails = {
 	title: 'Language Settings',
+	description: 'Configure language settings to understand search intent.',
 	buttonText: 'Read More',
 	videoLink: 'https://youtu.be/wx8ac4IkTas',
 	icon: 'pencil',
@@ -49,7 +50,7 @@ const bannerDetails = {
 
 const bannerMessage = {
 	title: 'Language Settings',
-	description: 'Language Settings let you apply a specific language for your search index.',
+	description: 'Configure language settings to understand search intent.',
 	buttonText: 'Read Docs',
 	videoLink: 'https://youtu.be/wx8ac4IkTas',
 	href: 'https://docs.appbase.io/docs/search/relevancy/#language-settings',

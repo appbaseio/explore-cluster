@@ -9,7 +9,6 @@ import ReplaceSearch from './ReplaceSearch';
 import ReplaceWord from './ReplaceWord';
 import PromoteResults from './PromoteResults';
 import HideResults from './HideResults';
-import ExecuteFunction from './ExecuteFunction';
 import { getErrorMessage } from '../../utils/error';
 import { hasValuesChanged, toolTips } from '../../utils';
 import RemoveWord from './RemoveWord';
@@ -24,7 +23,6 @@ const componentMappings = {
 	custom_data: CustomData,
 	promote_result: PromoteResults,
 	hide_result: HideResults,
-	function: ExecuteFunction,
 	remove_words: RemoveWord,
 	replace_words: ReplaceWord,
 	search_settings: SearchSettings,
@@ -37,7 +35,6 @@ const actionMapping = {
 	hide_result: 'Hide Result',
 	replace_search_term: 'Replace Search Term',
 	custom_data: 'Return Custom Data',
-	function: 'f(x) Apply Function',
 	remove_words: 'Remove Word(s)',
 	replace_words: 'Replace Word(s)',
 	search_settings: 'Set Search Settings',

@@ -36,12 +36,6 @@ export const APP_ROUTES = {
 				hasExactPath: true,
 			},
 			{
-				label: 'Functions',
-				link: '/cluster/functions',
-				tag: 'Beta',
-				hasExactPath: true,
-			},
-			{
 				label: 'Grade Evaluation',
 				link: '/cluster/grade-evaluation',
 				tag: 'Beta',
@@ -97,7 +91,6 @@ export const APP_ROUTES = {
 				tag: 'Beta',
 				hasExactPath: true,
 			},
-			{ label: 'Search Templates', link: 'search-templates', tag: 'Beta' },
 		],
 	},
 	'User Management': {
@@ -171,7 +164,6 @@ export const CLUSTER_ROUTES = {
 				tag: 'Beta',
 			},
 			{ label: 'Query Rules', link: '/cluster/rules', tag: 'Beta' },
-			{ label: 'Functions', link: '/cluster/functions', tag: 'Beta' },
 			{ label: 'Grade Evaluation', link: '/cluster/grade-evaluation', tag: 'Beta' },
 		],
 	},
@@ -222,7 +214,6 @@ export const CLUSTER_ROUTES = {
 		menu: [
 			{ label: 'API Credentials', link: '/cluster/credentials' },
 			{ label: 'Role Based Access', link: '/cluster/role-based-access', tag: 'Beta' },
-			{ label: 'Search Templates', link: '/cluster/search-templates', tag: 'Beta' },
 		],
 	},
 	'User Management': {

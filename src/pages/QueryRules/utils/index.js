@@ -181,18 +181,6 @@ const toolTips = {
 			</a>
 		</>
 	),
-	function: (
-		<>
-			Add a user-defined function to pre or post-process when trigger conditions are met.{' '}
-			<a
-				target="_blank"
-				rel="noopener noreferrer"
-				href="https://docs.appbase.io/docs/search/functions"
-			>
-				Learn more
-			</a>
-		</>
-	),
 	remove_words: (
 		<>
 			Remove specified word(s) from the end-user provided search term.{' '}

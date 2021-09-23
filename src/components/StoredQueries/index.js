@@ -19,7 +19,7 @@ import {
 import Actions from './Actions';
 import CreateStoredQuery from './CreateStoredQuery';
 import GetAPIEndpoint from './GetAPIEndpoint';
-import { jsonValidator } from './utils';
+import { errorMessageTemplate, jsonValidator } from './utils';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { event, timingEvent } from '../../utils/gtag';
 import moment from '../../utils/moment';
@@ -87,7 +87,7 @@ class StoredQueries extends React.Component {
 			default: {
 				title: 'Stored Queries',
 				description:
-					'GUI to manage your stored queries. Use them as direct REST APIs or to extend ReactiveSearch API.',
+					'GUI to manage your stored queries. Use them as direct REST APIs or with ReactiveSearch API.',
 				buttonText: 'Create Stored Query',
 				icon: 'plus',
 				onClick: () => this.toggleCreateMode(),
@@ -231,10 +231,10 @@ class StoredQueries extends React.Component {
 		const { query, params, index: formIndexValue } = JSON.parse(getValue('query').value);
 		const description = getValue('description').value;
 		if (!query) {
-			throw new Error('Invalid query, The `query` property is required to save the query.');
+			throw new Error(errorMessageTemplate('query', 'save'));
 		}
 		if (!formIndexValue) {
-			throw new Error('Invalid query, The `index` property is required to save the query.');
+			throw new Error(errorMessageTemplate('index', 'save'));
 		}
 		return { index: formIndexValue || index || appName || '', id, query, params, description };
 	};
@@ -250,17 +250,13 @@ class StoredQueries extends React.Component {
 				return false;
 			}
 			if (!requestBody.params) {
-				throw new Error(
-					'Invalid query, The `params` property is required to validate the query.',
-				);
+				throw new Error(errorMessageTemplate('params', 'validate'));
 			}
 			if (!requestBody.query) {
-				throw new Error(
-					'Invalid query, The `query` property is required to validate the query.',
-				);
+				throw new Error(errorMessageTemplate('query', 'validate'));
 			}
 			if (!queryControl.valid) {
-				throw new Error('Please enter a valid JSON query to validate.');
+				throw new Error(errorMessageTemplate('invalid json', 'validate'));
 			}
 			return validateStoredQuery({
 				...requestBody,
@@ -271,7 +267,7 @@ class StoredQueries extends React.Component {
 						behavior: 'smooth',
 					});
 				}
-				return true; // signifies it's a valid query
+				return !get(action, 'error'); // signifies it's a valid/ invalid query
 			});
 		} catch (error) {
 			notification.error({
@@ -291,22 +287,16 @@ class StoredQueries extends React.Component {
 			const queryControl = this.form.get('query');
 			const requestBody = JSON.parse(query);
 			if (!requestBody.params) {
-				throw new Error(
-					'Invalid query, The `params` property is required to execute the query.',
-				);
+				throw new Error(errorMessageTemplate('params', 'execute'));
 			}
 			if (!requestBody.index) {
-				throw new Error(
-					'Invalid query, The `index` property is required to execute the query.',
-				);
+				throw new Error(errorMessageTemplate('index', 'execute'));
 			}
 			if (!requestBody.query) {
-				throw new Error(
-					'Invalid query, The `query` property is required to execute the query.',
-				);
+				throw new Error(errorMessageTemplate('query', 'execute'));
 			}
 			if (!queryControl.valid) {
-				throw new Error('Please enter a valid JSON query to execute.');
+				throw new Error(errorMessageTemplate('invalid json', 'execute'));
 			}
 			return executeStoredQuery({
 				...requestBody,
@@ -317,7 +307,7 @@ class StoredQueries extends React.Component {
 						behavior: 'smooth',
 					});
 				}
-				return true;
+				return !get(action, 'error'); // signifies it's a successful/ failed execution of query
 			});
 		} catch (error) {
 			notification.error({
