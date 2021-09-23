@@ -537,6 +537,7 @@ class QueryRulesForm extends React.Component {
 			'selectedIndexes',
 			'enabled',
 			'timeframe',
+			'type',
 		];
 
 		const { props, state } = this;
