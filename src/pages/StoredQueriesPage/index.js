@@ -10,6 +10,8 @@ import VersionController from '../../batteries/components/shared/VersionControll
 const bannerMessagesStoredQueries = {
 	free: {
 		title: 'Stored Queries',
+		description:
+			'GUI to manage your stored queries. Use them as direct REST APIs or with ReactiveSearch API.',
 		buttonText: 'Read More',
 		icon: 'pencil',
 		href: 'https://docs.appbase.io/docs/data/stored-queries/',
