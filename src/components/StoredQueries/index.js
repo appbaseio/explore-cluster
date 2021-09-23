@@ -87,7 +87,7 @@ class StoredQueries extends React.Component {
 			default: {
 				title: 'Stored Queries',
 				description:
-					'GUI to manage your stored queries. Use them as direct REST APIs or to extend ReactiveSearch API.',
+					'GUI to manage your stored queries. Use them as direct REST APIs or with ReactiveSearch API.',
 				buttonText: 'Create Stored Query',
 				icon: 'plus',
 				onClick: () => this.toggleCreateMode(),
