@@ -11,12 +11,10 @@ import Container from '../../../components/Container';
 import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
 import {
 	getIndexSuggestionsPreferences,
-	saveSuggestionsPreferences,
-	saveIndexSuggestionsPreferences
+	saveIndexSuggestionsPreferences,
 } from '../../../batteries/modules/actions';
 import PreferenceForm from './PreferenceForm';
 import { isValidPlan } from '../../../batteries/utils';
-import Overlay from '../../../components/Overlay';
 import { getURL } from '../../../constants/config';
 import { getAuthToken } from '../../../batteries/components/analytics/utils';
 import Flex from '../../../batteries/components/shared/Flex';
@@ -77,7 +75,6 @@ class QuerySuggestions extends React.Component {
 			indices: [{ value: ['*'], disabled: false }],
 		});
 		if (isValidPlan(props.tier, props.featureSuggestions)) {
-			console.log(props.getPreferences);
 			props.getPreferences().then((action) => {
 				// prefilling
 				const payload = get(action, 'payload');
@@ -178,9 +175,8 @@ class QuerySuggestions extends React.Component {
 	};
 
 	render() {
-		const { isLoading, preferences, tier, featureSuggestions, hide } = this.props;
+		const { isLoading, preferences, hide } = this.props;
 		const { indices, total } = this.state;
-		// console.log("preferences:",preferences);
 		if (isLoading && !preferences) {
 			return <Loader />;
 		}
@@ -265,3 +261,5 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(QuerySuggestions);
+
+// testing
