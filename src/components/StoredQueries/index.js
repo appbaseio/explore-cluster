@@ -41,6 +41,21 @@ const columns = [
 		},
 	},
 	{
+		title: 'Last Updated',
+		key: 'last-updated',
+		width: '35%',
+		render: (item) => {
+			/* eslint-disable camelcase */
+			const { created_at, updated_at } = { ...item };
+			const timestamp = updated_at ?? created_at;
+			return (
+				<Text disabled={!timestamp}>
+					{timestamp ? moment.unix(timestamp).format('ddd D MMM, hh:mm A') : 'NA'}{' '}
+				</Text>
+			);
+		},
+	},
+	{
 		title: 'Actions',
 		key: 'actions',
 		width: '35%',
