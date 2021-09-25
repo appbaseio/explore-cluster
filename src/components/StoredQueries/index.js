@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Table, Card, notification } from 'antd';
 import get from 'lodash/get';
+import orderBy from 'lodash/orderBy';
 import { FormBuilder, Validators } from 'react-reactive-form';
 import Text from 'antd/lib/typography/Text';
 import { displayErrors } from '../../utils/helper';
@@ -34,7 +35,7 @@ const columns = [
 	{
 		title: 'Description',
 		key: 'description',
-		width: '48%',
+		width: '32%',
 		render: (item) => {
 			const { description } = item;
 			return <Text disabled={!description}>{description || 'No description'}</Text>;
@@ -43,11 +44,11 @@ const columns = [
 	{
 		title: 'Last Updated',
 		key: 'last-updated',
-		width: '35%',
+		width: '17%',
 		render: (item) => {
 			/* eslint-disable camelcase */
 			const { created_at, updated_at } = { ...item };
-			const timestamp = updated_at ?? created_at;
+			const timestamp = updated_at || created_at;
 			return (
 				<Text disabled={!timestamp}>
 					{timestamp ? moment.unix(timestamp).format('ddd D MMM, hh:mm A') : 'NA'}{' '}
@@ -58,7 +59,7 @@ const columns = [
 	{
 		title: 'Actions',
 		key: 'actions',
-		width: '35%',
+		width: '32%',
 		render: (item) => {
 			const { handleRender, handleEdit, handleDelete, ...rest } = { ...item };
 			return (
@@ -385,7 +386,13 @@ class StoredQueries extends React.Component {
 									rowKey={({ id, index }) => `${id}${index}`}
 									dataSource={
 										Array.isArray(storedQueries) &&
-										storedQueries.map((item) => ({
+										orderBy(
+											storedQueries,
+											(a) => {
+												return a.updated_at || a.created_at || 0;
+											},
+											['desc'],
+										).map((item) => ({
 											handleDelete: this.handleDelete,
 											handleEdit: this.handleEdit,
 											handleRender: this.handleRender,
