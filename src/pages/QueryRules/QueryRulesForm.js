@@ -205,12 +205,16 @@ class QueryRulesForm extends React.Component {
 			error: {},
 			loading: false,
 			editorKey: Date.now(),
+			previewCount: 0,
 		};
 	}
 
 	componentDidMount() {
 		const { rules, fetchRules, rule, unparsedRule } = this.props;
 		const { isEditPage } = this.state;
+
+		this.fetchPreviewCount();
+
 		if (!(rules && rules.length)) {
 			fetchRules();
 		}
@@ -328,13 +332,13 @@ class QueryRulesForm extends React.Component {
 					hasError: false,
 				},
 			},
-		}));
+		}), this.fetchPreviewCount);
 	};
 
 	handleDropdown = (name, value) => {
 		this.setState({
 			[name]: value,
-		});
+		}, this.fetchPreviewCount);
 	};
 
 	handleStatus = (value) => {
@@ -370,7 +374,7 @@ class QueryRulesForm extends React.Component {
 					hasError: false,
 				},
 			},
-		}));
+		}), this.fetchPreviewCount);
 	};
 
 	setActions = (action) => {
@@ -619,6 +623,39 @@ class QueryRulesForm extends React.Component {
 		});
 	};
 
+	fetchPreviewCount = () => {
+		const { selectedIndexes, type, query, queryValue, dataField, dataFieldValue } = this.state;
+
+		const payload = {
+			query: [],
+		};
+
+		payload.query.push({
+			id: query,
+			type,
+			value: queryValue,
+		});
+
+		payload.query.push({
+			id: 'list-1',
+			dataField,
+			value: dataFieldValue,
+		});
+
+		fetch('url', {
+			method: 'POST',
+			headers: {
+
+			},
+			body: JSON.stringify(payload)
+		}).then(res => res.json())
+		.then(json => {
+			this.setState({ previewCount: res?.count });
+		})
+		// after response
+		// this.setState({ previewCount: res?.count });
+	};
+
 	render() {
 		const {
 			condition,
@@ -862,7 +899,7 @@ class QueryRulesForm extends React.Component {
 												]}
 												style={{ display: 'flex', flexWrap: 'wrap' }}
 												onChange={(data) => {
-													this.setState({ type: data });
+													this.setState({ type: data }, this.fetchPreviewCount);
 												}}
 											/>
 										</div>
