@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Table, Card, notification } from 'antd';
+import { Table, Card, notification, Alert } from 'antd';
 import get from 'lodash/get';
 import orderBy from 'lodash/orderBy';
 import { FormBuilder, Validators } from 'react-reactive-form';
@@ -14,6 +14,7 @@ import {
 	deleteAppStoredQuery,
 	executeAppStoredQuery,
 	getAppStoredQueries,
+	getStoredQueriesUsage,
 	saveAppStoredQuery,
 	validateAppStoredQuery,
 } from '../../batteries/modules/actions';
@@ -128,6 +129,8 @@ class StoredQueries extends React.Component {
 	}
 
 	componentDidMount() {
+		const { fetchStoredQueriesUsage } = this.props;
+		fetchStoredQueriesUsage();
 		// triggering custom event for google analytics
 		event({
 			action: 'Stored Queries',
@@ -360,7 +363,7 @@ class StoredQueries extends React.Component {
 
 	render() {
 		const { createMode, editMode, currentStoredQuery, copyEndpoint } = this.state;
-		const { isLoading, storedQueries, isDeleting } = this.props;
+		const { isLoading, storedQueries, isDeleting, storedQueriesUsage } = this.props;
 		const isDefault = !(createMode || editMode);
 		if (isLoading && !(Array.isArray(storedQueries) && storedQueries.length)) {
 			return <Loader />;
@@ -383,6 +386,7 @@ class StoredQueries extends React.Component {
 								}
 							>
 								<Table
+									css=".ant-table-row-cell-break-word{ border-bottom: none}tr.ant-table-expanded-row{background: white}"
 									rowKey={({ id, index }) => `${id}${index}`}
 									dataSource={
 										Array.isArray(storedQueries) &&
@@ -397,9 +401,25 @@ class StoredQueries extends React.Component {
 											handleEdit: this.handleEdit,
 											handleRender: this.handleRender,
 											...item,
+											usageCount: storedQueriesUsage[item.id]?.count,
 										}))
 									}
 									columns={columns}
+									defaultExpandAllRows
+									expandIcon={() => null}
+									expandIconAsCell={false}
+									expandedRowRender={(record) => (
+										<Alert
+											type="info"
+											showIcon
+											message={
+												record.usageCount > 0
+													? `Used ${record.usageCount}
+															 times in last 30 days`
+													: 'Not used in the last 30 days'
+											}
+										/>
+									)}
 								/>
 							</Card>
 						)}
@@ -443,10 +463,12 @@ StoredQueries.propTypes = {
 	executeStoredQuery: PropTypes.func.isRequired,
 	deleteStoredQuery: PropTypes.func.isRequired,
 	validateStoredQuery: PropTypes.func.isRequired,
+	fetchStoredQueriesUsage: PropTypes.func.isRequired,
 	storedQueries: PropTypes.array,
 	errors: PropTypes.array.isRequired,
 	appName: PropTypes.string,
 	plan: PropTypes.string.isRequired,
+	storedQueriesUsage: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -462,6 +484,7 @@ const mapStateToProps = (state) => ({
 		get(state, '$executeAppStoredQuery.error'),
 	],
 	appName: get(state, '$getCurrentApp.name'),
+	storedQueriesUsage: get(state, '$getAppStoredQueriesUsage.results', {}),
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -470,6 +493,7 @@ const mapDispatchToProps = (dispatch) => ({
 	saveStoredQuery: (id, payload) => dispatch(saveAppStoredQuery(id, payload)),
 	validateStoredQuery: (id, payload) => dispatch(validateAppStoredQuery(id, payload)),
 	executeStoredQuery: (id, payload) => dispatch(executeAppStoredQuery(id, payload)),
+	fetchStoredQueriesUsage: () => dispatch(getStoredQueriesUsage()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(StoredQueries);
