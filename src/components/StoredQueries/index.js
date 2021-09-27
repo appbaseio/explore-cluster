@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Table, Card, notification } from 'antd';
+import { Table, Card, notification, Alert } from 'antd';
 import get from 'lodash/get';
+import orderBy from 'lodash/orderBy';
 import { FormBuilder, Validators } from 'react-reactive-form';
 import Text from 'antd/lib/typography/Text';
 import { displayErrors } from '../../utils/helper';
@@ -13,6 +14,7 @@ import {
 	deleteAppStoredQuery,
 	executeAppStoredQuery,
 	getAppStoredQueries,
+	getStoredQueriesUsage,
 	saveAppStoredQuery,
 	validateAppStoredQuery,
 } from '../../batteries/modules/actions';
@@ -34,16 +36,31 @@ const columns = [
 	{
 		title: 'Description',
 		key: 'description',
-		width: '48%',
+		width: '32%',
 		render: (item) => {
 			const { description } = item;
 			return <Text disabled={!description}>{description || 'No description'}</Text>;
 		},
 	},
 	{
+		title: 'Last Updated',
+		key: 'last-updated',
+		width: '17%',
+		render: (item) => {
+			/* eslint-disable camelcase */
+			const { created_at, updated_at } = { ...item };
+			const timestamp = updated_at || created_at;
+			return (
+				<Text disabled={!timestamp}>
+					{timestamp ? moment.unix(timestamp).format('ddd D MMM, hh:mm A') : 'NA'}{' '}
+				</Text>
+			);
+		},
+	},
+	{
 		title: 'Actions',
 		key: 'actions',
-		width: '35%',
+		width: '32%',
 		render: (item) => {
 			const { handleRender, handleEdit, handleDelete, ...rest } = { ...item };
 			return (
@@ -112,6 +129,8 @@ class StoredQueries extends React.Component {
 	}
 
 	componentDidMount() {
+		const { fetchStoredQueriesUsage } = this.props;
+		fetchStoredQueriesUsage();
 		// triggering custom event for google analytics
 		event({
 			action: 'Stored Queries',
@@ -344,7 +363,7 @@ class StoredQueries extends React.Component {
 
 	render() {
 		const { createMode, editMode, currentStoredQuery, copyEndpoint } = this.state;
-		const { isLoading, storedQueries, isDeleting } = this.props;
+		const { isLoading, storedQueries, isDeleting, storedQueriesUsage } = this.props;
 		const isDefault = !(createMode || editMode);
 		if (isLoading && !(Array.isArray(storedQueries) && storedQueries.length)) {
 			return <Loader />;
@@ -367,17 +386,40 @@ class StoredQueries extends React.Component {
 								}
 							>
 								<Table
+									css=".ant-table-row-cell-break-word{ border-bottom: none}tr.ant-table-expanded-row{background: white}"
 									rowKey={({ id, index }) => `${id}${index}`}
 									dataSource={
 										Array.isArray(storedQueries) &&
-										storedQueries.map((item) => ({
+										orderBy(
+											storedQueries,
+											(a) => {
+												return a.updated_at || a.created_at || 0;
+											},
+											['desc'],
+										).map((item) => ({
 											handleDelete: this.handleDelete,
 											handleEdit: this.handleEdit,
 											handleRender: this.handleRender,
 											...item,
+											usageCount: storedQueriesUsage[item.id]?.count,
 										}))
 									}
 									columns={columns}
+									defaultExpandAllRows
+									expandIcon={() => null}
+									expandIconAsCell={false}
+									expandedRowRender={(record) => (
+										<Alert
+											type="info"
+											showIcon
+											message={
+												record.usageCount > 0
+													? `Used ${record.usageCount}
+															 times in last 30 days`
+													: 'Not used in the last 30 days'
+											}
+										/>
+									)}
 								/>
 							</Card>
 						)}
@@ -421,10 +463,12 @@ StoredQueries.propTypes = {
 	executeStoredQuery: PropTypes.func.isRequired,
 	deleteStoredQuery: PropTypes.func.isRequired,
 	validateStoredQuery: PropTypes.func.isRequired,
+	fetchStoredQueriesUsage: PropTypes.func.isRequired,
 	storedQueries: PropTypes.array,
 	errors: PropTypes.array.isRequired,
 	appName: PropTypes.string,
 	plan: PropTypes.string.isRequired,
+	storedQueriesUsage: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -440,6 +484,7 @@ const mapStateToProps = (state) => ({
 		get(state, '$executeAppStoredQuery.error'),
 	],
 	appName: get(state, '$getCurrentApp.name'),
+	storedQueriesUsage: get(state, '$getAppStoredQueriesUsage.results', {}),
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -448,6 +493,7 @@ const mapDispatchToProps = (dispatch) => ({
 	saveStoredQuery: (id, payload) => dispatch(saveAppStoredQuery(id, payload)),
 	validateStoredQuery: (id, payload) => dispatch(validateAppStoredQuery(id, payload)),
 	executeStoredQuery: (id, payload) => dispatch(executeAppStoredQuery(id, payload)),
+	fetchStoredQueriesUsage: () => dispatch(getStoredQueriesUsage()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(StoredQueries);
