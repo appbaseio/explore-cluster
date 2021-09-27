@@ -1,9 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Input, Select, Button, Affix, Checkbox, Icon, Popover, Form } from 'antd';
+import { Input, Select, Button, Affix, Checkbox, Icon, Popover } from 'antd';
 import { css } from 'react-emotion';
-import PropTypes, { number } from 'prop-types';
+import PropTypes from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import keys from 'lodash/keys';
 import Grid from '../../../components/CreateCredentials/Grid';
@@ -497,7 +497,6 @@ class PreferenceForm extends React.Component {
 							name="externalSuggestions"
 							render={({ handler,value }) => {
 								const inputHandler = handler();
-								console.log("ace:", inputHandler);
 								return (
 									<Grid
 										// toolTipMessage={queryMessage}

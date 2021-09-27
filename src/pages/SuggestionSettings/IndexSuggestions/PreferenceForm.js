@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Input, Select, Button, Affix, Switch, Popover, Icon, Form } from 'antd';
+import { Input, Select, Button, Affix, Switch, Popover, Icon } from 'antd';
 import { css } from 'react-emotion';
 import isEmpty from 'lodash/isEmpty';
 import PropTypes from 'prop-types';
@@ -116,6 +116,7 @@ InputElement.propTypes = {
 	toolTipMessage: PropTypes.any,
 	inputProps: PropTypes.object,
 	placeholder: PropTypes.string,
+	onChange: PropTypes.func.isRequired
 };
 
 InputElement.defaultProps = {
@@ -127,9 +128,11 @@ InputElement.defaultProps = {
 class PreferenceForm extends React.Component {
 	state = { visible: false, aggregationField: undefined, customQueryField: '' };
 
+
 	componentDidMount() {
 		const {
 			appName,
+			indices,
 			getSettingsAction,
 			getDefaultSettingsAction,
 			defaultSettings,
@@ -139,6 +142,9 @@ class PreferenceForm extends React.Component {
 		} = this.props;
 
 		fetchStoredQueries();
+		if(!appName) {
+			appName = indices.join(",")
+		}
 		if (settings && !localRelevancy) {
 			this.init({ ...settings });
 		} else {
@@ -148,18 +154,12 @@ class PreferenceForm extends React.Component {
 		this.getMappings();
 	}
 
-	toggleVisibility = () => {
-		this.setState((prevState) => ({
-			visible: !prevState.visible,
-		}));
-	};
-
 	onAppSelect = (app) => {
 		this.setState({ app, visible: true });
 	};
 
 	handleChange = (key, val, dataKey) => {
-		const { appName, localRelevancy, updateLocalRelevancy } = this.props;
+		const { appName, localRelevancy, updateLocalRelevancy, indices } = this.props;
 		let value = val;
 		if (key === 'customStopwords') {
 			value = val.split(',').map((i) => removeWhiteSpaces(i));
@@ -201,6 +201,12 @@ class PreferenceForm extends React.Component {
 			fetchMappings(appName, credentials);
 		}
 	}
+
+	toggleVisibility = () => {
+		this.setState((prevState) => ({
+			visible: !prevState.visible,
+		}));
+	};
 
 	updateToAggsField = ({ field, path, flattenType }) => {
 		const { localRelevancy } = this.props;
@@ -809,7 +815,6 @@ class PreferenceForm extends React.Component {
 						<FieldControl
 							name="customQuery"
 							render={({ handler, value }) => {
-								const inputHandler = handler();
 
 								return (
 									<Grid
@@ -902,11 +907,14 @@ PreferenceForm.propTypes = {
 	localRelevancy: null,
 	appName: PropTypes.string,
 	mappings: PropTypes.array,
+	defaultSettings: PropTypes.array,
+	fetchStoredQueries: PropTypes.func.isRequired,
 };
 
 PreferenceForm.defaultProps = {
 	apps: {},
-	mappings: []
+	mappings: [],
+	defaultSettings: [],
 };
 
 const mapStateToProps = (state) => {
