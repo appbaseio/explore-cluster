@@ -35,7 +35,7 @@ import Actions from './components/Actions';
 import { getErrorClass, getErrorCount, getErrorMessage, getErrorMessages } from './utils/error';
 import { getURL } from '../../constants/config';
 import { addQueryRule, deleteRule, getRules, putRule } from '../../batteries/modules/actions/rules';
-import SearchPreview from '../SandboxPage/components/SearchPreview';
+import PreviewPage from './PreviewPage';
 import CloneRule from './components/CloneRule';
 import Info from '../../components/Info';
 import {
@@ -170,6 +170,7 @@ class QueryRulesForm extends React.Component {
 		super(props);
 		const hasId = get(props.match, 'params.id');
 		this.state = {
+			visible: false,
 			// Rule Info
 			name: '',
 			description: '',
@@ -634,6 +635,18 @@ class QueryRulesForm extends React.Component {
 		});
 	};
 
+	handleReplaySearch = () => {
+		this.setState({
+			visible: true,
+		});
+	};
+
+	handleCancel = () => {
+		this.setState({
+			visible: false,
+		});
+	};
+
 	fetchPreviewCount = () => {
 		const {
 			selectedIndexes,
@@ -736,6 +749,7 @@ class QueryRulesForm extends React.Component {
 			featureRules,
 		} = this.props;
 
+		const { visible } = this.state;
 		this.customAutoComplete = new CustomAutoComplete(null, [
 			{ columnField: '$query', type: 'selection' },
 			...dataFields.map((field) => ({
@@ -875,34 +889,11 @@ class QueryRulesForm extends React.Component {
 										}}
 									>
 										<div>209 documents match</div>
-										<SearchPreview
-											app={selectedIndexes.join(',')}
-											// testSettings={{
-											// 	...localRelevancy,
-											// 	search: {
-											// 		...localRelevancy.search,
-											// 		fieldWeights: get(localRelevancy, 'search.fieldWeights', []).map((i) =>
-											// 			Number(i),
-											// 		),
-											// 	},
-											// }}
-											// hasTestSettings
-											// handleModal
-											// showFeaturedProducts
-											// selectButtonLabel={selectButtonLabel}
-											// value={value}
-											// onChange={onChange}
+										<PreviewPage
+											showModal={visible}
+											selectedIndexes={selectedIndexes}
+											handleCancel={this.handleCancel}
 										/>
-										{/* <PreviewModal
-											buttonProps={{
-												size: 'default',
-												type: 'default',
-												style: {background: '#6557f5',color: '#fff'},
-											}}
-											isRecommendation={false}
-											// preferences={getPreferences}
-											{...previewProps}
-										/> */}
 										<Button onClick={this.handleReplaySearch} type="primary">
 											Preview
 										</Button>
