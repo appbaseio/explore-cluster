@@ -402,7 +402,8 @@ export function getDatafields({ mappings, indexes, isSearch = false, isAggs = fa
 		.filter((index) => !index.startsWith('.'))
 		.filter((index) => hasAllIndex || indexes.includes(index))
 		.reduce((acc, key) => {
-			const { properties } = get(mappings[key], 'mappings._doc') || mappings[key].mappings;
+			const { properties } =
+				get(mappings[key], 'mappings._doc') || mappings[key].mappings || mappings[key];
 			const fieldTree = getFieldsTree(properties);
 			const nestedDataFields = keys(fieldTree).reduce((acc, field) => {
 				const fieldObj = fieldTree[field];
