@@ -33,7 +33,7 @@ import Conditions from './components/Conditions';
 import ActionSelector from './components/ActionSelector';
 import Actions from './components/Actions';
 import { getErrorClass, getErrorCount, getErrorMessage, getErrorMessages } from './utils/error';
-
+import { getURL } from '../../constants/config';
 import { addQueryRule, deleteRule, getRules, putRule } from '../../batteries/modules/actions/rules';
 
 import CloneRule from './components/CloneRule';
@@ -320,25 +320,33 @@ class QueryRulesForm extends React.Component {
 	handleInput = (e) => {
 		const { name, value } = e.target;
 
-		this.setState((prevState) => ({
-			[name]: value,
-			actions:
-				name === 'condition'
-					? prevState.actions.filter((action) => action.type !== 'replace_search_term')
-					: prevState.actions,
-			error: {
-				...prevState.error,
-				[name === 'dataFieldValue' || name === 'queryValue' ? 'condition' : name]: {
-					hasError: false,
+		this.setState(
+			(prevState) => ({
+				[name]: value,
+				actions:
+					name === 'condition'
+						? prevState.actions.filter(
+								(action) => action.type !== 'replace_search_term',
+						  )
+						: prevState.actions,
+				error: {
+					...prevState.error,
+					[name === 'dataFieldValue' || name === 'queryValue' ? 'condition' : name]: {
+						hasError: false,
+					},
 				},
-			},
-		}), this.fetchPreviewCount);
+			}),
+			this.fetchPreviewCount,
+		);
 	};
 
 	handleDropdown = (name, value) => {
-		this.setState({
-			[name]: value,
-		}, this.fetchPreviewCount);
+		this.setState(
+			{
+				[name]: value,
+			},
+			this.fetchPreviewCount,
+		);
 	};
 
 	handleStatus = (value) => {
@@ -361,20 +369,23 @@ class QueryRulesForm extends React.Component {
 			isAggs: true,
 		});
 
-		this.setState((prevState) => ({
-			editorKey: Date.now(),
-			selectedIndexes,
-			dataFields,
-			searchFields,
-			aggsFields,
-			dataField: dataFields.includes(prevState.dataField) ? prevState.dataField : '',
-			error: {
-				...prevState.error,
-				selectedIndexes: {
-					hasError: false,
+		this.setState(
+			(prevState) => ({
+				editorKey: Date.now(),
+				selectedIndexes,
+				dataFields,
+				searchFields,
+				aggsFields,
+				dataField: dataFields.includes(prevState.dataField) ? prevState.dataField : '',
+				error: {
+					...prevState.error,
+					selectedIndexes: {
+						hasError: false,
+					},
 				},
-			},
-		}), this.fetchPreviewCount);
+			}),
+			this.fetchPreviewCount,
+		);
 	};
 
 	setActions = (action) => {
@@ -624,36 +635,66 @@ class QueryRulesForm extends React.Component {
 	};
 
 	fetchPreviewCount = () => {
-		const { selectedIndexes, type, query, queryValue, dataField, dataFieldValue } = this.state;
-
+		const {
+			selectedIndexes,
+			queryValue,
+			dataField,
+			dataFieldValue,
+			name,
+			description,
+			show_advance_editor,
+			actions,
+		} = this.state;
+		const { username, password } = this.props;
+		const index = selectedIndexes.join(',');
+		const ACC_API = getURL();
 		const payload = {
 			query: [],
+			settings: {
+				recordAnalytics: true,
+				queryRule: {
+					name,
+					description,
+					show_advance_editor,
+					actions,
+				},
+			},
 		};
 
 		payload.query.push({
-			id: query,
-			type,
-			value: queryValue,
+			id: 'search',
+			type: 'search',
+			value: queryValue || '',
+			size: 10,
+			react: {},
 		});
 
-		payload.query.push({
-			id: 'list-1',
-			dataField,
-			value: dataFieldValue,
-		});
+		if (dataField || dataFieldValue) {
+			payload.query.push({
+				id: 'list-1',
+				type: 'term',
+				dataField,
+				value: dataFieldValue,
+				execute: true,
+			});
+			payload.query[0].react = { and: ['list-1'] };
+		}
 
-		fetch('url', {
+		fetch(`${ACC_API}/${index}/_reactivesearch`, {
 			method: 'POST',
 			headers: {
-
+				Authorization: `Basic ${btoa(`${username}:${password}`)}`,
+				'Content-Type': 'application/x-ndjson',
 			},
-			body: JSON.stringify(payload)
-		}).then(res => res.json())
-		.then(json => {
-			this.setState({ previewCount: res?.count });
+			body: JSON.stringify(payload),
 		})
-		// after response
-		// this.setState({ previewCount: res?.count });
+			.then((res) => res.json())
+			.then((json) => {
+				this.setState({ previewCount: json?.search?.hits.total.value });
+			})
+			.catch((err) => {
+				console.error(err);
+			});
 	};
 
 	render() {
@@ -899,7 +940,10 @@ class QueryRulesForm extends React.Component {
 												]}
 												style={{ display: 'flex', flexWrap: 'wrap' }}
 												onChange={(data) => {
-													this.setState({ type: data }, this.fetchPreviewCount);
+													this.setState(
+														{ type: data },
+														this.fetchPreviewCount,
+													);
 												}}
 											/>
 										</div>
@@ -1104,6 +1148,8 @@ QueryRulesForm.propTypes = {
 	updateRule: PropTypes.func.isRequired,
 	match: PropTypes.object.isRequired,
 	fetchRules: PropTypes.func.isRequired,
+	username: PropTypes.string.isRequired,
+	password: PropTypes.string.isRequired,
 };
 
 QueryRulesForm.defaultProps = {
@@ -1123,6 +1169,7 @@ QueryRulesForm.defaultProps = {
 
 const mapStateToProps = (state, props) => {
 	const id = get(props.match, 'params.id');
+	const { username, password } = get(state, 'user.data', {});
 	const defaultState = {
 		isCreating: get(state, '$getAppRules.create.isLoading'),
 		createError: get(state, '$getAppRules.create.error.actual'),
@@ -1145,6 +1192,8 @@ const mapStateToProps = (state, props) => {
 			updateError: get(ruleData, 'update.error'),
 			isDeleting: get(ruleData, 'isDeleting'),
 			deleteError: get(ruleData, 'deleteError'),
+			username,
+			password,
 		};
 	}
 
