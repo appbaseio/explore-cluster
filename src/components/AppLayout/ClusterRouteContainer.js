@@ -16,11 +16,6 @@ const ProfilePage = Loadable({
 	loader: () => import(/* webpackChunkName: "ProfilePage" */ '../../pages/ProfilePage'),
 	loading: Loader,
 });
-const SearchTemplatesPage = Loadable({
-	loader: () =>
-		import(/* webpackChunkName: "SearchTemplatesPage" */ '../../pages/SearchTemplatesPage'),
-	loading: Loader,
-});
 const QuerySuggestionsPage = Loadable({
 	loader: () =>
 		import(/* webpackChunkName: "QuerySuggestionsPage" */ '../../pages/QuerySuggestionsPage'),
@@ -43,11 +38,6 @@ const QueryRulesForm = Loadable({
 
 const BillingPage = Loadable({
 	loader: () => import(/* webpackChunkName: "BillingPage" */ '../../pages/BillingPage'),
-	loading: Loader,
-});
-
-const Functions = Loadable({
-	loader: () => import(/* webpackChunkName: "Functions" */ '../../pages/Functions'),
 	loading: Loader,
 });
 
@@ -155,19 +145,6 @@ class ClusterRouteContainer extends React.Component {
 									<AppPageContainer {...props} component={OverviewPage} />
 								) : (
 									<Redirect to={Object.keys(allowedRoutes)[0]} />
-								)}
-							</>
-						)}
-					/>
-					<Route
-						exact
-						path="/cluster/search-templates"
-						component={(props) => (
-							<>
-								{get(allowedRoutes, '/cluster/search-templates') ? (
-									<AppPageContainer {...props} component={SearchTemplatesPage} />
-								) : (
-									<UnauthorizedPage />
 								)}
 							</>
 						)}
@@ -394,20 +371,6 @@ class ClusterRouteContainer extends React.Component {
 							<>
 								{get(allowedRoutes, '/cluster/role-based-access') ? (
 									<AppPageContainer {...props} component={RoleBaseAccess} />
-								) : (
-									<UnauthorizedPage />
-								)}
-							</>
-						)}
-					/>
-
-					<Route
-						exact
-						path="/cluster/functions"
-						component={(props) => (
-							<>
-								{get(allowedRoutes, '/cluster/functions') ? (
-									<AppPageContainer {...props} component={Functions} />
 								) : (
 									<UnauthorizedPage />
 								)}

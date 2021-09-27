@@ -16,7 +16,7 @@ import ReviewChanges from './ReviewChanges';
 const main = css`
 	.error {
 		color: tomato;
-		margin-left: 15px;
+		margin-top: 8px;
 	}
 	.actionBtn {
 		position: absolute;
@@ -55,8 +55,19 @@ const main = css`
 	.query-validation-tag.ant-tag {
 		position: absolute;
 		right: 48px;
-		bottom: 25px;
 		margin: 0;
+		transform: translateY(-28px);
+	}
+	.actionBtn {
+		position: absolute;
+		right: 50px;
+	}
+
+	.actionBtn button {
+		margin: 2px 10px;
+	}
+	span {
+		white-space: nowrap;
 	}
 `;
 
@@ -134,8 +145,7 @@ class CreateStoredQuery extends React.Component {
 					  ),
 			},
 			updatedData: null,
-			isQueryValidated: undefined,
-			isQueryExecuted: false,
+			isQueryExecuted: undefined,
 		};
 		const editMode = !!props.storedQuery.id;
 		const idControl = props.control.get('id');
@@ -179,13 +189,14 @@ class CreateStoredQuery extends React.Component {
 		this.setState({ openReviewSave: false });
 	};
 
-	handleValidateAndRender = () => {
+	handleValidateAndRender = async () => {
 		const { clearStoredQueries, handleValidateStoredQuery } = this.props;
 		clearStoredQueries();
-		handleValidateStoredQuery();
-		this.setState({
-			queryResponseTitle: 'Rendered Query',
-		});
+		if (await handleValidateStoredQuery()) {
+			this.setState({
+				queryResponseTitle: 'Rendered Query',
+			});
+		}
 	};
 
 	handleExecute = async () => {
@@ -202,31 +213,21 @@ class CreateStoredQuery extends React.Component {
 	};
 
 	handleEditorValueChange = (value, queryControl) => {
-		const { isQueryExecuted, isQueryValidated } = this.state;
-		if (isQueryValidated || isQueryExecuted) {
+		const { isQueryExecuted } = this.state;
+		if (isQueryExecuted) {
 			this.setState({
-				isQueryValidated: undefined,
-				isQueryExecuted: false,
+				...(isQueryExecuted && { isQueryExecuted: undefined }),
 			});
 		}
 		queryControl.setValue(value);
 	};
 
-	handleQueryEditorOnBlur = async () => {
-		const { handleValidateStoredQuery } = this.props;
-		this.setState({
-			isQueryValidated: await handleValidateStoredQuery(true),
-			isQueryExecuted: false,
-		});
-	};
-
-	renderQueryValidityTag = (isQueryValidated) => {
-		if (typeof isQueryValidated !== 'boolean') {
+	renderQueryValidityTag = (tagValidator) => {
+		if (typeof tagValidator !== 'boolean') {
 			return null;
 		}
-
-		const tagText = isQueryValidated ? 'Valid Query' : 'Inavlid Query';
-		const tagColor = isQueryValidated ? 'green' : 'red';
+		const tagText = tagValidator ? 'Valid Query' : 'Inavlid Query';
+		const tagColor = tagValidator ? 'green' : 'red';
 
 		return (
 			<Tag className="query-validation-tag" color={tagColor}>
@@ -242,7 +243,6 @@ class CreateStoredQuery extends React.Component {
 			defaultData,
 			updatedData,
 			queryResponseTitle,
-			isQueryValidated,
 			isQueryExecuted,
 		} = this.state;
 		if (isLoading) {
@@ -271,7 +271,7 @@ class CreateStoredQuery extends React.Component {
 										loading={isValidating}
 										data-cy="sq-validate"
 									>
-										Validate and Render
+										Render Query
 									</Button>
 								</Tooltip>
 								<Tooltip
@@ -289,10 +289,7 @@ class CreateStoredQuery extends React.Component {
 								</Tooltip>
 
 								<Button
-									disabled={
-										getControl('query').invalid ||
-										(!isQueryExecuted && !isQueryValidated)
-									}
+									disabled={getControl('query').invalid || !isQueryExecuted}
 									onClick={this.handleReviewSave}
 									data-cy="sq-review-and-save"
 								>
@@ -323,7 +320,10 @@ class CreateStoredQuery extends React.Component {
 										}) => {
 											const isError = touched && invalidName;
 											return (
-												<Flex alignItems="center">
+												<Flex
+													flexDirection="column"
+													alignItems="flex-start"
+												>
 													<Input
 														style={{
 															...(isError && {
@@ -332,14 +332,14 @@ class CreateStoredQuery extends React.Component {
 														}}
 														{...handler()}
 														data-cy="stored-query-id"
-														placeholder="id of the stored query"
+														placeholder="your_unique_id"
 													/>
 													{isError && (
 														<span className="error">
 															{(hasError('required') &&
-																'Please enter Stored Query Id.') ||
+																'Enter an id for your stored query') ||
 																(hasError('pattern') &&
-																	'Stored Query Id can not have spaces or special characters.')}
+																	`Stored query id cannot use spaces and special characters.`)}
 														</span>
 													)}
 												</Flex>
@@ -379,7 +379,7 @@ class CreateStoredQuery extends React.Component {
 														}}
 														{...handler()}
 														data-cy="stored-query-description"
-														placeholder="brief description of the stored query"
+														placeholder="A human friendly 👦 👧 description for this stored query"
 													/>
 												</Flex>
 											);
@@ -387,6 +387,7 @@ class CreateStoredQuery extends React.Component {
 									/>
 								}
 							/>
+							{this.renderQueryValidityTag(isQueryExecuted)}
 							<Grid
 								toolTipMessage={queryMessage}
 								toolTipProps={{
@@ -415,7 +416,6 @@ class CreateStoredQuery extends React.Component {
 															control.controls.query,
 														)
 													}
-													onBlur={this.handleQueryEditorOnBlur}
 													theme="vs-dark"
 													options={{
 														cursorStyle: 'line',
@@ -438,7 +438,6 @@ class CreateStoredQuery extends React.Component {
 									/>
 								}
 							/>
-							{this.renderQueryValidityTag(isQueryValidated)}
 						</Card>
 						<StoredQueryResponse queryResponseTitle={queryResponseTitle} />
 						{openReviewSave && (

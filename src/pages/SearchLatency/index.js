@@ -16,9 +16,9 @@ import moment from '../../utils/moment';
 
 const bannerMessagesAnalytics = {
 	free: {
-		title: 'Unlock the ROI impact of your search',
+		title: 'Search Latency',
 		description:
-			'Get a paid plan to see actionable analytics on search volume, popular searches, no results, track clicks and conversions.',
+			'Understand the performance of your search. Learn how to make the most of search latency insights.',
 		buttonText: 'Upgrade Now',
 		href: 'billing',
 	},

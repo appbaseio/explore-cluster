@@ -34,8 +34,7 @@ import Actions from './components/Actions';
 import { getErrorClass, getErrorCount, getErrorMessage, getErrorMessages } from './utils/error';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import { addQueryRule, deleteRule, getRules, putRule } from '../../batteries/modules/actions/rules';
-// import { getMappings } from '../../batteries/modules/actions/rulesMapping';
-import { getAppMappings } from '../../batteries/modules/actions';
+import { getAppMappings, getUsageStats } from '../../batteries/modules/actions';
 import CloneRule from './components/CloneRule';
 import Info from '../../components/Info';
 import {
@@ -190,6 +189,8 @@ class QueryRulesForm extends React.Component {
 			rule,
 			unparsedRule,
 			mappings,
+			fetchUsageStats,
+			usageStats,
 			fetchMappings,
 			appbaseCredentials,
 			appName,
@@ -198,7 +199,9 @@ class QueryRulesForm extends React.Component {
 		if (!(rules && rules.length)) {
 			fetchRules();
 		}
-
+		if (!usageStats) {
+			fetchUsageStats();
+		}
 		if (isEditPage && rule) {
 			const { show_advance_editor } = rule;
 			const { rawQuery, indexes } = getRawQuery(show_advance_editor, unparsedRule);
@@ -304,6 +307,19 @@ class QueryRulesForm extends React.Component {
 			subFieldsMap,
 			loading: false,
 		});
+	};
+
+	getAlertMessage = (hasChanged, isCreating, isUpdating, count) => {
+		let str = '';
+		if (!hasChanged && !(isCreating || isUpdating)) {
+			str += 'No Changes, ';
+		}
+		if (count > 0) {
+			str += `Used ${count} times in last 30 days`;
+		} else {
+			str += 'Not used in the last 30 days';
+		}
+		return str;
 	};
 
 	handleInput = (e) => {
@@ -631,6 +647,7 @@ class QueryRulesForm extends React.Component {
 			unparsedRule,
 			tier,
 			featureRules,
+			usageStats,
 		} = this.props;
 		this.customAutoComplete = new CustomAutoComplete(null, [
 			{ columnField: '$query', type: 'selection' },
@@ -957,14 +974,19 @@ class QueryRulesForm extends React.Component {
 									showIcon
 								/>
 							) : null}
-							{isEditPage && !hasChanged && !(isCreating || isUpdating) ? (
+							{isEditPage && (
 								<Alert
 									style={{ marginRight: 10 }}
-									message="No Changes"
 									type="info"
 									showIcon
+									message={this.getAlertMessage(
+										hasChanged,
+										isCreating,
+										isUpdating,
+										usageStats[rule.id]?.count,
+									)}
 								/>
-							) : null}
+							)}
 							<Button
 								disabled={isEditPage && !hasChanged}
 								size="large"
@@ -1008,7 +1030,8 @@ QueryRulesForm.propTypes = {
 	]),
 	appbaseCredentials: PropTypes.string.isRequired,
 	appName: PropTypes.string,
-	// updateMappings: PropTypes.func.isRequired,
+	fetchUsageStats: PropTypes.func.isRequired,
+	usageStats: PropTypes.object.isRequired,
 };
 
 QueryRulesForm.defaultProps = {
@@ -1041,6 +1064,7 @@ const mapStateToProps = (state, props) => {
 		featureRules: get(state, '$getAppPlan.results.feature_rules', false),
 		appbaseCredentials: username ? `${username}:${password}` : null,
 		mappings,
+		usageStats: get(state, '$getUsageStats.results', {}),
 	};
 
 	if (id) {
@@ -1068,8 +1092,8 @@ const mapDispatchToProps = (dispatch) => ({
 	createRule: (rule) => dispatch(addQueryRule(rule)),
 	updateRule: (rule) => dispatch(putRule(rule)),
 	removeRule: (id) => dispatch(deleteRule(id)),
-	// updateMappings: (data) => dispatch(getMappings(data)),
 	fetchMappings: (appName, credentials) => dispatch(getAppMappings(appName, credentials)),
+	fetchUsageStats: () => dispatch(getUsageStats()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(QueryRulesForm);

@@ -298,7 +298,7 @@ export const validateURL = (control) => {
 
 export const getFilterConfigurationForm = (customFields = {}, isDynamicFilter = false) => {
 	return FormBuilder.group({
-		enabled: false,
+		enabled: true,
 		customize: FormBuilder.group({
 			title: isDynamicFilter ? [undefined, Validators.required] : undefined,
 			dataField: isDynamicFilter ? [undefined, Validators.required] : undefined,
@@ -490,7 +490,6 @@ export const defaultSearchPreferences = {
 	resultHandle: '',
 	storeInfo: { currency: 'USD' },
 	exportSettings: { exportAs: 'embed', credentials: '', openAsPage: false, type: 'other' },
-	showPopularSearches: false,
 	showPagination: false,
 	showSelectedFilters: true,
 	customMessages: {
@@ -501,6 +500,11 @@ export const defaultSearchPreferences = {
 		fetchingFilterOptions: 'Fetching Options',
 		searchText: 'Click here to search',
 		searchIcon: '',
+	},
+	autoSuggestionSettings: {
+		enablePopularSuggestions: false,
+		enableRecentSearches: false,
+		highlight: false,
 	},
 	staticFilters: {
 		productType: {
@@ -662,6 +666,8 @@ export const getSearchPreferencesPayload = (formValue) => {
 					pagination: !!get(formValue, 'showPagination'),
 					infiniteScroll: !get(formValue, 'showPagination'),
 				},
+				layout: get(formValue, 'layout'),
+				viewSwitcher: get(formValue, 'viewSwitcher'),
 			},
 			searchSettings: {
 				customMessages: {
@@ -679,7 +685,17 @@ export const getSearchPreferencesPayload = (formValue) => {
 					handle: get(formValue, 'resultHandle'),
 				},
 				rsConfig: {
-					enablePopularSuggestions: get(formValue, 'showPopularSearches'),
+					autosuggest: get(formValue, 'autosuggest'),
+					enablePopularSuggestions: get(
+						formValue,
+						'autoSuggestionSettings.enablePopularSuggestions',
+					),
+					enableRecentSearches: get(
+						formValue,
+						'autoSuggestionSettings.enableRecentSearches',
+					),
+					highlight: get(formValue, 'autoSuggestionSettings.highlight'),
+					showVoiceSearch: get(formValue, 'showVoiceSearch'),
 				},
 			},
 			facetSettings: {
