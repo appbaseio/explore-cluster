@@ -40,7 +40,6 @@ import CloneRule from './components/CloneRule';
 import Info from '../../components/Info';
 import {
 	deleteQueryRuleInFunction,
-	getClusterMappings,
 	getDatafields,
 	getSelectedIndexes,
 	handleQueryRuleDelete,
@@ -185,7 +184,16 @@ class QueryRulesForm extends React.Component {
 	}
 
 	componentDidMount() {
-		const { rules, fetchRules, rule, unparsedRule, mappings, fetchMappings, appbaseCredentials, appName } = this.props;
+		const {
+			rules,
+			fetchRules,
+			rule,
+			unparsedRule,
+			mappings,
+			fetchMappings,
+			appbaseCredentials,
+			appName,
+		} = this.props;
 		const { isEditPage } = this.state;
 		if (!(rules && rules.length)) {
 			fetchRules();
@@ -205,39 +213,6 @@ class QueryRulesForm extends React.Component {
 		if (!Object.keys(mappings).length) {
 			this.setState({ loading: true });
 			fetchMappings(appName, appbaseCredentials);
-			this.updateAppMappings();
-			// getClusterMappings()
-			// 	.then((mappingsData) => {
-			// 		updateMappings(mappingsData);
-			// 		const { selectedIndexes } = this.state;
-			// 		const [dataFields, fieldMap, subFieldsMap] = getDatafields({
-			// 			mappingsData,
-			// 			indexes: ['*'],
-			// 		});
-			// 		const [searchFields] = getDatafields({
-			// 			mappingsData,
-			// 			indexes: selectedIndexes,
-			// 			isSearch: true,
-			// 		});
-			// 		const [aggsFields] = getDatafields({
-			// 			mappingsData,
-			// 			indexes: selectedIndexes,
-			// 			isAggs: true,
-			// 		});
-			// 		this.setState({
-			// 			mappings: mappingsData,
-			// 			dataFields,
-			// 			searchFields,
-			// 			aggsFields,
-			// 			fieldMap,
-			// 			subFieldsMap,
-			// 			loading: false,
-			// 		});
-			// 	})
-			// 	.catch((e) => {
-			// 		this.setState({ loading: false });
-			// 		console.log(e);
-			// 	});
 		} else {
 			this.updateAppMappings();
 		}
@@ -254,11 +229,11 @@ class QueryRulesForm extends React.Component {
 			isDeleting,
 			history,
 			unparsedRule,
-			mappings
+			mappings,
 		} = this.props;
 		const { isEditPage } = this.state;
 
-		if (!prevProps.mappings && mappings) {
+		if (!Object.keys(prevProps.mappings).length && Object.keys(mappings).length) {
 			this.updateAppMappings();
 		}
 
@@ -329,7 +304,7 @@ class QueryRulesForm extends React.Component {
 			subFieldsMap,
 			loading: false,
 		});
-	}
+	};
 
 	handleInput = (e) => {
 		const { name, value } = e.target;
@@ -1049,7 +1024,7 @@ QueryRulesForm.defaultProps = {
 	rules: null,
 	tier: undefined,
 	featureRules: false,
-	mappings: [],
+	mappings: {},
 	appName: '',
 };
 

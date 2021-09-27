@@ -160,7 +160,6 @@ const FieldType = ({ handleFieldType, handleDelete, fieldTypes, updateToAggsFiel
 	};
 
 	const getAggsField = ({ flattenUsecase: usecases, flattenType: types }) => {
-		console.log("aggs:",usecases, types)
 		if (usecases && types) {
 			const newAggsFields = Object.keys(types).reduce((agg, field) => {
 				if (types[field] === 'text') {
