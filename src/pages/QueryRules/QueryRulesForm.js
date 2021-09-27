@@ -35,7 +35,7 @@ import Actions from './components/Actions';
 import { getErrorClass, getErrorCount, getErrorMessage, getErrorMessages } from './utils/error';
 import { getURL } from '../../constants/config';
 import { addQueryRule, deleteRule, getRules, putRule } from '../../batteries/modules/actions/rules';
-
+import SearchPreview from '../SandboxPage/components/SearchPreview';
 import CloneRule from './components/CloneRule';
 import Info from '../../components/Info';
 import {
@@ -861,6 +861,51 @@ class QueryRulesForm extends React.Component {
 									</div>
 									<div style={{ marginTop: 10 }}>
 										<DocsLink url="https://docs.appbase.io/docs/search/Rules/#configure-if-condition" />
+									</div>
+									{/* Preview */}
+									<div
+										style={{
+											border: '1px solid #e8e8e8',
+											borderStyle: 'dashed',
+											padding: 10,
+											margin: 10,
+											display: 'flex',
+											alignItems: 'center',
+											justifyContent: 'space-between',
+										}}
+									>
+										<div>209 documents match</div>
+										<SearchPreview
+											app={selectedIndexes.join(',')}
+											// testSettings={{
+											// 	...localRelevancy,
+											// 	search: {
+											// 		...localRelevancy.search,
+											// 		fieldWeights: get(localRelevancy, 'search.fieldWeights', []).map((i) =>
+											// 			Number(i),
+											// 		),
+											// 	},
+											// }}
+											// hasTestSettings
+											// handleModal
+											// showFeaturedProducts
+											// selectButtonLabel={selectButtonLabel}
+											// value={value}
+											// onChange={onChange}
+										/>
+										{/* <PreviewModal
+											buttonProps={{
+												size: 'default',
+												type: 'default',
+												style: {background: '#6557f5',color: '#fff'},
+											}}
+											isRecommendation={false}
+											// preferences={getPreferences}
+											{...previewProps}
+										/> */}
+										<Button onClick={this.handleReplaySearch} type="primary">
+											Preview
+										</Button>
 									</div>
 								</Typography.Text>
 							</Col>
