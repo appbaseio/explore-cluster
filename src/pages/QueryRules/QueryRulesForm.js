@@ -278,18 +278,24 @@ class QueryRulesForm extends React.Component {
 			history,
 			unparsedRule,
 		} = this.props;
+
 		const { isEditPage } = this.state;
 
 		if (isEditPage && prevProps.rule !== rule && !isUpdating) {
 			const { show_advance_editor } = rule;
 			const { rawQuery, indexes } = getRawQuery(show_advance_editor, unparsedRule);
 			// eslint-disable-next-line react/no-did-update-set-state
-			this.setState({
-				...rule,
-				rawQuery,
-				advancedExpression: rawQuery,
-				selectedIndexes: show_advance_editor ? indexes : rule.selectedIndexes,
-			});
+			this.setState(
+				{
+					...rule,
+					rawQuery,
+					advancedExpression: rawQuery,
+					selectedIndexes: show_advance_editor ? indexes : rule.selectedIndexes,
+				},
+				() => {
+					this.fetchPreviewCount();
+				},
+			); // call api here
 		}
 
 		if (!isEditPage && !isCreating && prevProps.isCreating !== isCreating) {
@@ -341,7 +347,8 @@ class QueryRulesForm extends React.Component {
 			}),
 			() => {
 				if (name === 'condition') {
-					this.fetchPreviewCount();
+					console.log(name, value);
+					this.fetchPreviewCount(value);
 				}
 			},
 		);
@@ -685,7 +692,7 @@ class QueryRulesForm extends React.Component {
 		saveState({});
 	};
 
-	fetchPreviewCount = () => {
+	fetchPreviewCount = (value = 'filter') => {
 		const {
 			selectedIndexes,
 			queryValue,
@@ -697,7 +704,7 @@ class QueryRulesForm extends React.Component {
 			actions,
 		} = this.state;
 		const { username, password } = this.props;
-		const index = selectedIndexes.join(',');
+		const index = selectedIndexes?.join(',');
 		const ACC_API = getURL();
 		const payload = {
 			query: [],
@@ -712,24 +719,31 @@ class QueryRulesForm extends React.Component {
 			},
 		};
 
-		payload.query.push({
-			id: 'search',
-			type: 'search',
-			value: queryValue || '',
-			size: 10,
-			react: {},
-		});
-
-		if (dataField || dataFieldValue) {
+		if (value === 'always') {
 			payload.query.push({
-				id: 'list-1',
-				type: 'term',
-				dataField,
-				value: dataFieldValue,
-				execute: true,
+				id: 'search',
 			});
-			payload.query[0].react = { and: ['list-1'] };
+		} else {
+			payload.query.push({
+				id: 'search',
+				type: 'search',
+				value: queryValue || '',
+				size: 10,
+				react: {},
+			});
+
+			if (dataField || dataFieldValue) {
+				payload.query.push({
+					id: 'list-1',
+					type: 'term',
+					dataField,
+					value: dataFieldValue,
+					execute: true,
+				});
+				payload.query[0].react = { and: ['list-1'] };
+			}
 		}
+
 		this.setState({ rulesPayload: payload });
 
 		fetch(`${ACC_API}/${index}/_reactivesearch`, {
