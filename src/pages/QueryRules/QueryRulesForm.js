@@ -320,11 +320,6 @@ class QueryRulesForm extends React.Component {
 		}
 	}
 
-	componentWillUnmount() {
-		const { saveState } = this.props;
-		saveState({});
-	}
-
 	handleInput = (e) => {
 		const { name, value } = e.target;
 
@@ -646,15 +641,30 @@ class QueryRulesForm extends React.Component {
 		});
 	};
 
+	excludeQueryRules = () => {
+		const { rulesPayload } = this.state;
+		const newRulesPayload = { ...rulesPayload };
+		delete newRulesPayload.settings.queryRule;
+		this.setState({ rulesPayload: newRulesPayload });
+	};
+
+	handleTabChange = (key) => {
+		const { rulesPayload } = this.state;
+		const { saveState } = this.props;
+		if (key === 1) {
+			this.excludeQueryRules();
+		}
+		saveState(rulesPayload);
+	};
+
 	handleReplaySearch = (type) => {
-		console.log('sample');
 		const { saveState, handleReplayClick } = this.props;
 		const { selectedIndexes, rulesPayload } = this.state;
-		const newRulesPayload = { ...rulesPayload };
+
 		if (type === 'preview') {
-			delete newRulesPayload.settings.queryRule;
-			this.setState({ rulesPayload: newRulesPayload });
+			this.excludeQueryRules();
 		}
+
 		saveState(rulesPayload);
 
 		if (handleReplayClick) {
@@ -668,9 +678,11 @@ class QueryRulesForm extends React.Component {
 	};
 
 	handleCancel = () => {
+		const { saveState } = this.props;
 		this.setState({
 			visible: false,
 		});
+		saveState({});
 	};
 
 	fetchPreviewCount = () => {
@@ -921,6 +933,7 @@ class QueryRulesForm extends React.Component {
 											showModal={visible}
 											selectedIndexes={selectedIndexes}
 											handleCancel={this.handleCancel}
+											onChange={this.handleTabChange}
 										/>
 										<Button
 											onClick={() => this.handleReplaySearch('preview')}

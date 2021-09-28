@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Modal, Tabs } from 'antd';
 import PropTypes from 'prop-types';
 import { css } from 'react-emotion';
+import { connect } from 'react-redux';
 import SearchPreview from '../SandboxPage/components/SearchPreview';
+import { setSearchState } from '../../batteries/modules/actions';
 
 const modalStyles = css`
 	top: 0 !important;
@@ -25,7 +27,7 @@ const modalStyles = css`
 
 const { TabPane } = Tabs;
 
-function PreviewPage({ showModal, handleCancel, selectedIndexes, previewType }) {
+function PreviewPage({ showModal, handleCancel, selectedIndexes, previewType, onChange }) {
 	const [visible, setVisible] = useState(false);
 
 	useEffect(() => {
@@ -48,7 +50,7 @@ function PreviewPage({ showModal, handleCancel, selectedIndexes, previewType }) 
 				{previewType === 'preview' ? (
 					<SearchPreview app={selectedIndexes.join(',')} />
 				) : (
-					<Tabs defaultActiveKey="1">
+					<Tabs defaultActiveKey="1" onChange={onChange}>
 						<TabPane tab="Without rule applied" key="1">
 							<SearchPreview app={selectedIndexes.join(',')} />
 						</TabPane>
@@ -67,6 +69,7 @@ PreviewPage.propTypes = {
 	handleCancel: PropTypes.func.isRequired,
 	selectedIndexes: PropTypes.array,
 	previewType: PropTypes.string,
+	onChange: PropTypes.func.isRequired,
 };
 
 PreviewPage.defaultProps = {
@@ -75,4 +78,8 @@ PreviewPage.defaultProps = {
 	previewType: 'preview',
 };
 
-export default PreviewPage;
+const mapDispatchToProps = (dispatch) => ({
+	saveState: (state) => dispatch(setSearchState(state)),
+});
+
+export default connect(null, mapDispatchToProps)(PreviewPage);
