@@ -170,7 +170,9 @@ class QueryRulesForm extends React.Component {
 		super(props);
 		const hasId = get(props.match, 'params.id');
 		this.state = {
-			visible: false,
+			viewPreview: false,
+			viewRuleEffect: false,
+			rulesPayload: {},
 			// Rule Info
 			name: '',
 			description: '',
@@ -213,8 +215,6 @@ class QueryRulesForm extends React.Component {
 	componentDidMount() {
 		const { rules, fetchRules, rule, unparsedRule } = this.props;
 		const { isEditPage } = this.state;
-
-		this.fetchPreviewCount();
 
 		if (!(rules && rules.length)) {
 			fetchRules();
@@ -262,6 +262,7 @@ class QueryRulesForm extends React.Component {
 				this.setState({ loading: false });
 				console.log(e);
 			});
+		this.fetchPreviewCount();
 	}
 
 	componentDidUpdate(prevProps) {
@@ -635,10 +636,16 @@ class QueryRulesForm extends React.Component {
 		});
 	};
 
-	handleReplaySearch = () => {
-		this.setState({
-			visible: true,
-		});
+	handleReplaySearch = (searchState) => {
+		const { saveState, history, appName, handleReplayClick } = this.props;
+		saveState(searchState);
+		if (handleReplayClick) {
+			handleReplayClick(appName);
+		} else {
+			this.setState({
+				visible: true,
+			});
+		}
 	};
 
 	handleCancel = () => {
@@ -671,6 +678,7 @@ class QueryRulesForm extends React.Component {
 					show_advance_editor,
 					actions,
 				},
+				enableQueryRules: false,
 			},
 		};
 
@@ -692,6 +700,7 @@ class QueryRulesForm extends React.Component {
 			});
 			payload.query[0].react = { and: ['list-1'] };
 		}
+		this.setState({rulesPayload: payload});
 
 		fetch(`${ACC_API}/${index}/_reactivesearch`, {
 			method: 'POST',
@@ -749,7 +758,7 @@ class QueryRulesForm extends React.Component {
 			featureRules,
 		} = this.props;
 
-		const { visible } = this.state;
+		const { visible, previewCount, rulesPayload } = this.state;
 		this.customAutoComplete = new CustomAutoComplete(null, [
 			{ columnField: '$query', type: 'selection' },
 			...dataFields.map((field) => ({
@@ -888,11 +897,12 @@ class QueryRulesForm extends React.Component {
 											justifyContent: 'space-between',
 										}}
 									>
-										<div>209 documents match</div>
+										<div>{previewCount} documents match</div>
 										<PreviewPage
 											showModal={visible}
 											selectedIndexes={selectedIndexes}
 											handleCancel={this.handleCancel}
+											rulesPayload={rulesPayload}
 										/>
 										<Button onClick={this.handleReplaySearch} type="primary">
 											Preview
@@ -1148,6 +1158,15 @@ class QueryRulesForm extends React.Component {
 									showIcon
 								/>
 							) : null}
+							<Button
+								onClick={this.handleRuleEffect}
+								type="primary"
+								ghost
+								size="large"
+								style={{ marginRight: 10 }}
+							>
+								Preview Rule Effect
+							</Button>
 							<Button
 								disabled={isEditPage && !hasChanged}
 								size="large"

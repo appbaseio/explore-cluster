@@ -38,7 +38,7 @@ function PreviewPage({ showModal, handleCancel, selectedIndexes, rulesPayload })
 			if(item.id === "search") {
 				newRulesPayload["search"] = item;
 			} else {
-				newRulesPayload["result"] = item;
+				newRulesPayload["aggregations"] = item;
 			}
 		})
 		setTestSetting(newRulesPayload);
@@ -59,7 +59,7 @@ function PreviewPage({ showModal, handleCancel, selectedIndexes, rulesPayload })
 			>
 				<SearchPreview
 					app={selectedIndexes.join(',')}
-					testSettings={testSettings}
+					testSettings={rulesPayload}
 					// testSettings={{
 					// 	...localRelevancy,
 					// 	search: {
