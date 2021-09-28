@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal } from 'antd';
+import { Modal, Tabs } from 'antd';
 import PropTypes from 'prop-types';
 import { css } from 'react-emotion';
 import SearchPreview from '../SandboxPage/components/SearchPreview';
@@ -23,26 +23,14 @@ const modalStyles = css`
 	}
 `;
 
-function PreviewPage({ showModal, handleCancel, selectedIndexes, rulesPayload }) {
+const { TabPane } = Tabs;
+
+function PreviewPage({ showModal, handleCancel, selectedIndexes, previewType }) {
 	const [visible, setVisible] = useState(false);
-	const [testSettings, setTestSetting] = useState({});
 
 	useEffect(() => {
 		setVisible(showModal);
-		setSettingsPayload();
 	}, [showModal]);
-
-	function setSettingsPayload() {
-		const newRulesPayload = {};
-		rulesPayload?.query?.map((item) => {
-			if(item.id === "search") {
-				newRulesPayload["search"] = item;
-			} else {
-				newRulesPayload["aggregations"] = item;
-			}
-		})
-		setTestSetting(newRulesPayload);
-	}
 
 	return (
 		<div>
@@ -57,25 +45,18 @@ function PreviewPage({ showModal, handleCancel, selectedIndexes, rulesPayload })
 				width="100%"
 				className={modalStyles}
 			>
-				<SearchPreview
-					app={selectedIndexes.join(',')}
-					testSettings={rulesPayload}
-					// testSettings={{
-					// 	...localRelevancy,
-					// 	search: {
-					// 		...localRelevancy.search,
-					// 		fieldWeights: get(localRelevancy, 'search.fieldWeights', []).map((i) =>
-					// 			Number(i),
-					// 		),
-					// 	},
-					// }}
-					hasTestSettings
-					// handleModal
-					// showFeaturedProducts
-					// selectButtonLabel={selectButtonLabel}
-					// value={value}
-					// onChange={onChange}
-				/>
+				{previewType === 'preview' ? (
+					<SearchPreview app={selectedIndexes.join(',')} />
+				) : (
+					<Tabs defaultActiveKey="1">
+						<TabPane tab="Without rule applied" key="1">
+							<SearchPreview app={selectedIndexes.join(',')} />
+						</TabPane>
+						<TabPane tab="With rule applied" key="2">
+							<SearchPreview app={selectedIndexes.join(',')} />
+						</TabPane>
+					</Tabs>
+				)}
 			</Modal>
 		</div>
 	);
@@ -85,13 +66,13 @@ PreviewPage.propTypes = {
 	showModal: PropTypes.bool,
 	handleCancel: PropTypes.func.isRequired,
 	selectedIndexes: PropTypes.array,
-	rulesPayload: PropTypes.object,
+	previewType: PropTypes.string,
 };
 
 PreviewPage.defaultProps = {
 	showModal: false,
 	selectedIndexes: ['*'],
-	rulesPayload: {}
+	previewType: 'preview',
 };
 
 export default PreviewPage;

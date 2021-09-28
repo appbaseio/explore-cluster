@@ -320,6 +320,11 @@ class QueryRulesForm extends React.Component {
 		}
 	}
 
+	componentWillUnmount() {
+		const { saveState } = this.props;
+		saveState({});
+	}
+
 	handleInput = (e) => {
 		const { name, value } = e.target;
 
@@ -339,7 +344,11 @@ class QueryRulesForm extends React.Component {
 					},
 				},
 			}),
-			this.fetchPreviewCount,
+			() => {
+				if (name === 'condition') {
+					this.fetchPreviewCount();
+				}
+			},
 		);
 	};
 
@@ -637,16 +646,23 @@ class QueryRulesForm extends React.Component {
 		});
 	};
 
-	handleReplaySearch = () => {
+	handleReplaySearch = (type) => {
+		console.log('sample');
 		const { saveState, handleReplayClick } = this.props;
 		const { selectedIndexes, rulesPayload } = this.state;
-
+		const newRulesPayload = { ...rulesPayload };
+		if (type === 'preview') {
+			delete newRulesPayload.settings.queryRule;
+			this.setState({ rulesPayload: newRulesPayload });
+		}
 		saveState(rulesPayload);
+
 		if (handleReplayClick) {
-			handleReplayClick(selectedIndexes.join(","));
+			handleReplayClick(selectedIndexes.join(','));
 		} else {
 			this.setState({
 				visible: true,
+				previewType: type,
 			});
 		}
 	};
@@ -674,7 +690,6 @@ class QueryRulesForm extends React.Component {
 		const payload = {
 			query: [],
 			settings: {
-				recordAnalytics: true,
 				queryRule: {
 					name,
 					description,
@@ -703,7 +718,7 @@ class QueryRulesForm extends React.Component {
 			});
 			payload.query[0].react = { and: ['list-1'] };
 		}
-		this.setState({rulesPayload: payload});
+		this.setState({ rulesPayload: payload });
 
 		fetch(`${ACC_API}/${index}/_reactivesearch`, {
 			method: 'POST',
@@ -761,7 +776,7 @@ class QueryRulesForm extends React.Component {
 			featureRules,
 		} = this.props;
 
-		const { visible, previewCount, rulesPayload } = this.state;
+		const { visible, previewCount, previewType } = this.state;
 		this.customAutoComplete = new CustomAutoComplete(null, [
 			{ columnField: '$query', type: 'selection' },
 			...dataFields.map((field) => ({
@@ -902,12 +917,15 @@ class QueryRulesForm extends React.Component {
 									>
 										<div>{previewCount} documents match</div>
 										<PreviewPage
+											previewType={previewType}
 											showModal={visible}
 											selectedIndexes={selectedIndexes}
 											handleCancel={this.handleCancel}
-											rulesPayload={rulesPayload}
 										/>
-										<Button onClick={this.handleReplaySearch} type="primary">
+										<Button
+											onClick={() => this.handleReplaySearch('preview')}
+											type="primary"
+										>
 											Preview
 										</Button>
 									</div>
@@ -1021,6 +1039,7 @@ class QueryRulesForm extends React.Component {
 											query={query}
 											onDropdownChange={this.handleDropdown}
 											queryValue={queryValue}
+											onBlur={this.fetchPreviewCount}
 										/>
 									</ErrorToaster>
 								)}
@@ -1162,7 +1181,7 @@ class QueryRulesForm extends React.Component {
 								/>
 							) : null}
 							<Button
-								onClick={this.handleRuleEffect}
+								onClick={() => this.handleReplaySearch('ruleEffectPreview')}
 								type="primary"
 								ghost
 								size="large"
@@ -1208,6 +1227,8 @@ QueryRulesForm.propTypes = {
 	fetchRules: PropTypes.func.isRequired,
 	username: PropTypes.string.isRequired,
 	password: PropTypes.string.isRequired,
+	handleReplayClick: PropTypes.func,
+	saveState: PropTypes.func.isRequired,
 };
 
 QueryRulesForm.defaultProps = {
@@ -1223,6 +1244,7 @@ QueryRulesForm.defaultProps = {
 	rules: null,
 	tier: undefined,
 	featureRules: false,
+	handleReplayClick: undefined,
 };
 
 const mapStateToProps = (state, props) => {
