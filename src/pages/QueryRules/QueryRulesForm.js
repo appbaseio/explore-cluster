@@ -637,11 +637,13 @@ class QueryRulesForm extends React.Component {
 		});
 	};
 
-	handleReplaySearch = (searchState) => {
-		const { saveState, history, appName, handleReplayClick } = this.props;
-		saveState(searchState);
+	handleReplaySearch = () => {
+		const { saveState, handleReplayClick } = this.props;
+		const { selectedIndexes, rulesPayload } = this.state;
+
+		saveState(rulesPayload);
 		if (handleReplayClick) {
-			handleReplayClick(appName);
+			handleReplayClick(selectedIndexes.join(","));
 		} else {
 			this.setState({
 				visible: true,
