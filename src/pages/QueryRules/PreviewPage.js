@@ -23,12 +23,26 @@ const modalStyles = css`
 	}
 `;
 
-function PreviewPage({ showModal, handleCancel, selectedIndexes }) {
+function PreviewPage({ showModal, handleCancel, selectedIndexes, rulesPayload }) {
 	const [visible, setVisible] = useState(false);
+	const [testSettings, setTestSetting] = useState({});
 
 	useEffect(() => {
 		setVisible(showModal);
+		setSettingsPayload();
 	}, [showModal]);
+
+	function setSettingsPayload() {
+		const newRulesPayload = {};
+		rulesPayload?.query?.map((item) => {
+			if(item.id === "search") {
+				newRulesPayload["search"] = item;
+			} else {
+				newRulesPayload["result"] = item;
+			}
+		})
+		setTestSetting(newRulesPayload);
+	}
 
 	return (
 		<div>
@@ -45,6 +59,7 @@ function PreviewPage({ showModal, handleCancel, selectedIndexes }) {
 			>
 				<SearchPreview
 					app={selectedIndexes.join(',')}
+					testSettings={testSettings}
 					// testSettings={{
 					// 	...localRelevancy,
 					// 	search: {
@@ -54,7 +69,7 @@ function PreviewPage({ showModal, handleCancel, selectedIndexes }) {
 					// 		),
 					// 	},
 					// }}
-					hasTestSettings={false}
+					hasTestSettings
 					// handleModal
 					// showFeaturedProducts
 					// selectButtonLabel={selectButtonLabel}
@@ -70,11 +85,13 @@ PreviewPage.propTypes = {
 	showModal: PropTypes.bool,
 	handleCancel: PropTypes.func.isRequired,
 	selectedIndexes: PropTypes.array,
+	rulesPayload: PropTypes.object,
 };
 
 PreviewPage.defaultProps = {
 	showModal: false,
 	selectedIndexes: ['*'],
+	rulesPayload: {}
 };
 
 export default PreviewPage;
