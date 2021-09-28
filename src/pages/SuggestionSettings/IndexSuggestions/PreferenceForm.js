@@ -14,7 +14,7 @@ import {
 	getSettings,
 	getAppStoredQueries,
 } from '../../../batteries/modules/actions';
-import { getRawMappingsByAppName, getTraversedMappingsByAppName } from '../../../batteries/modules/selectors';
+import { getTraversedMappingsByAppName } from '../../../batteries/modules/selectors';
 import Grid from '../../../components/CreateCredentials/Grid';
 import { removeWhiteSpaces } from '../../../utils';
 import { suggestionsMessages as Messages } from '../../../utils/messages';
@@ -116,7 +116,7 @@ InputElement.propTypes = {
 	toolTipMessage: PropTypes.any,
 	inputProps: PropTypes.object,
 	placeholder: PropTypes.string,
-	onChange: PropTypes.func.isRequired
+	onChange: PropTypes.func.isRequired,
 };
 
 InputElement.defaultProps = {
@@ -126,18 +126,11 @@ InputElement.defaultProps = {
 };
 
 class PreferenceForm extends React.Component {
-	state = {
-		visible: false,
-		aggregationField: undefined,
-		customQueryField: '',
-		categoryFields: [],
-	};
-
+	state = { visible: false, aggregationField: undefined, customQueryField: '' };
 
 	componentDidMount() {
 		const {
 			appName,
-			indices,
 			getSettingsAction,
 			getDefaultSettingsAction,
 			defaultSettings,
@@ -147,7 +140,6 @@ class PreferenceForm extends React.Component {
 		} = this.props;
 
 		fetchStoredQueries();
-
 		if (settings && !localRelevancy) {
 			this.init({ ...settings });
 		} else {
@@ -162,7 +154,7 @@ class PreferenceForm extends React.Component {
 	};
 
 	handleChange = (key, val, dataKey) => {
-		const { appName, localRelevancy, updateLocalRelevancy, indices } = this.props;
+		const { appName, localRelevancy, updateLocalRelevancy } = this.props;
 		let value = val;
 		if (key === 'customStopwords') {
 			value = val.split(',').map((i) => removeWhiteSpaces(i));
@@ -198,7 +190,7 @@ class PreferenceForm extends React.Component {
 	};
 
 	getMappings() {
-		const { fetchMappings, credentials, mappings, appName } = this.props;
+		const { appName, fetchMappings, credentials, mappings } = this.props;
 		if (credentials && get(mappings, 'length') === 0) {
 			// Fetch Mappings if permissions are present
 			fetchMappings(appName, credentials);
@@ -252,21 +244,6 @@ class PreferenceForm extends React.Component {
 		return [];
 	};
 
-	getSpecificRawMappings = (indices = []) => {
-
-		const { rawMappings } = this.props;
-		const  indexArr = [];
-		indices?.forEach(index => {
-			const properties = rawMappings ? rawMappings[index]?.properties : {};
-			Object.keys(properties).forEach(property => {
-				if (properties[property].type === 'keyword') {
-					indexArr.push(property);
-				}
-			});
-		});
-		this.setState({ categoryFields: [...new Set(indexArr)] });
-	};
-
 	render() {
 		const {
 			control,
@@ -279,7 +256,7 @@ class PreferenceForm extends React.Component {
 			appName,
 			appStoredQueries,
 		} = this.props;
-		const { visible, app, aggregationField, customQueryField, categoryFields } = this.state;
+		const { visible, app, aggregationField, customQueryField } = this.state;
 		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
 
 		const {
@@ -339,7 +316,6 @@ class PreferenceForm extends React.Component {
 													inputHandler.onChange(calculateValue(val));
 													const { settings } = this.props;
 													this.init({ ...settings });
-													this.getSpecificRawMappings(val);
 												}}
 											>
 												<Select.Option value="*">All (*)</Select.Option>
@@ -721,11 +697,12 @@ class PreferenceForm extends React.Component {
 										</p>
 									}
 									component={
-										<MappingWrapper {...handler()} appName="airbeds-test-app">
-											{({ flattenUsecase, flattenType }) => {
-												return (
+										<MappingWrapper {...handler()}>
+											{({ flattenUsecase, flattenType }) => (
 												<React.Fragment>
-													{/* {this.state.categoryFields.length > 0 ? ( */}
+													{localRelevancy &&
+													this.getAggsField({ flattenUsecase, flattenType }).length >
+														0 ? (
 														<div
 															style={{
 																position: 'relative',
@@ -747,21 +724,19 @@ class PreferenceForm extends React.Component {
 																	handler().onChange(field);
 																}}
 															>
-																{
-																	categoryFields?.map(field => {
-																		console.log(field, categoryFields, 'sdkfjbsdjhgbasjgfuiegfuyawegyf')
-																		return (
-																			<Select.Option key={field} value={field} data-cy={field}>
-																				{field}
-																			</Select.Option>
-																		)
-																	})
-																}
+																{this.getAggsField({
+																	flattenUsecase,
+																	flattenType,
+																}).map((field) => (
+																	<Select.Option key={field} value={field} data-cy={field}>
+																		{field}
+																	</Select.Option>
+																))}
 															</Select>
 														</div>
-													{/* ) : null} */}
+													) : null}
 												</React.Fragment>
-											)}}
+											)}
 										</MappingWrapper>
 									}
 									gridRatio={gridRatio}
@@ -929,6 +904,7 @@ PreferenceForm.propTypes = {
 	mappings: PropTypes.array,
 	defaultSettings: PropTypes.array,
 	fetchStoredQueries: PropTypes.func.isRequired,
+	credentials: PropTypes.string.isRequired,
 };
 
 PreferenceForm.defaultProps = {
@@ -939,7 +915,6 @@ PreferenceForm.defaultProps = {
 
 const mapStateToProps = (state) => {
 	const mappings = getTraversedMappingsByAppName(state);
-	const rawMappings = getRawMappingsByAppName(state);
 	const parsedMappings = Array.isArray(mappings) ? mappings : get(mappings, '_doc', []);
 	const appName = get(state, '$getCurrentApp.name');
 	const { username, password } = get(state, 'user.data', {});
@@ -947,7 +922,6 @@ const mapStateToProps = (state) => {
 	return {
 		// mappings: getTraversedMappingsByAppName(state),
 		mappings: isEmpty(parsedMappings) ? [] : parsedMappings,
-		rawMappings,
 		isLoading: get(state, '$saveSuggestionsPreferences.isFetching', false),
 		settings: get(state, ['$getAppSettings', 'settings', appName]),
 		appName,
