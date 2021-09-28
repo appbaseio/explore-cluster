@@ -55,6 +55,7 @@ import { getSingleFunction } from '../../batteries/utils/app';
 import { isValidPlan } from '../../batteries/utils';
 import { AdvancedEditor, CustomAutoComplete } from '../../components/AdvancedEditor';
 import { getRawQuery, parseExpression } from '../../components/AdvancedEditor/helper';
+import { setSearchState } from '../../batteries/modules/actions';
 import { allowedTiers } from '../../utils/prop-types';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 
@@ -1260,6 +1261,7 @@ const mapDispatchToProps = (dispatch) => ({
 	createRule: (rule) => dispatch(addQueryRule(rule)),
 	updateRule: (rule) => dispatch(putRule(rule)),
 	removeRule: (id) => dispatch(deleteRule(id)),
+	saveState: (state) => dispatch(setSearchState(state)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(QueryRulesForm);
