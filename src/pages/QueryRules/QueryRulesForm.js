@@ -648,11 +648,10 @@ class QueryRulesForm extends React.Component {
 	handleTabChange = (key) => {
 		// eslint-disable-next-line
 		if (key == 1) {
-			this.setState({ viewType: 'withoutRule' });
+			this.setState({ viewType: 'withoutRule' }, () => this.fetchPreviewCount('save'));
 		} else {
-			this.setState({ viewType: 'withRule' });
+			this.setState({ viewType: 'withRule' }, () => this.fetchPreviewCount('save'));
 		}
-		this.fetchPreviewCount('save');
 	};
 
 	handleReplaySearch = (type) => {
