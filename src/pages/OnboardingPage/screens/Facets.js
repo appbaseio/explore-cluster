@@ -76,16 +76,16 @@ export default class Search extends Component {
 						isClearable={false}
 						options={[
 							{
-								value: 'release_year',
-								label: 'release_year',
+								value: 'release_date',
+								label: 'release_date',
 							},
 							{
 								value: 'genres',
 								label: 'genres',
 							},
 							{
-								value: 'original_language',
-								label: 'original_language',
+								value: 'vote_avergae',
+								label: 'vote_average',
 							},
 						]}
 					/>

@@ -41,6 +41,8 @@ export default () => (
 								<h3>Learn how to build a web app</h3>
 								<p>appbase.io UI components for building data-driven web apps.</p>
 								<a
+									target="_blank"
+									rel="noreferrer"
 									className="button"
 									href="https://docs.appbase.io/docs/reactivesearch/v3/overview/quickstart/"
 								>
