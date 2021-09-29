@@ -50,7 +50,7 @@ function PreviewPage({ showModal, handleCancel, selectedIndexes, previewType, on
 				{previewType === 'preview' ? (
 					<SearchPreview app={selectedIndexes.join(',')} />
 				) : (
-					<Tabs defaultActiveKey="1" onChange={onChange}>
+					<Tabs defaultActiveKey="2" onChange={onChange}>
 						<TabPane tab="Without rule applied" key="1">
 							<SearchPreview app={selectedIndexes.join(',')} />
 						</TabPane>

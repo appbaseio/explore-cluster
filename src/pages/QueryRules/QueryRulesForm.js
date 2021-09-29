@@ -650,18 +650,23 @@ class QueryRulesForm extends React.Component {
 
 	excludeQueryRules = () => {
 		const { rulesPayload } = this.state;
+		const { saveState } = this.props;
 		const newRulesPayload = { ...rulesPayload };
 		delete newRulesPayload.settings.queryRule;
-		this.setState({ rulesPayload: newRulesPayload });
+		this.setState({ rulesPayload: newRulesPayload }, () => {
+			saveState(newRulesPayload);
+		});
 	};
 
 	handleTabChange = (key) => {
 		const { rulesPayload } = this.state;
 		const { saveState } = this.props;
-		if (key === 1) {
+		// eslint-disable-next-line
+		if (key == 1) {
 			this.excludeQueryRules();
+		} else {
+			saveState(rulesPayload);
 		}
-		saveState(rulesPayload);
 	};
 
 	handleReplaySearch = (type) => {
@@ -670,9 +675,9 @@ class QueryRulesForm extends React.Component {
 
 		if (type === 'preview') {
 			this.excludeQueryRules();
+		} else {
+			saveState(rulesPayload);
 		}
-
-		saveState(rulesPayload);
 
 		if (handleReplayClick) {
 			handleReplayClick(selectedIndexes.join(','));
@@ -737,7 +742,7 @@ class QueryRulesForm extends React.Component {
 					id: 'list-1',
 					type: 'term',
 					dataField,
-					value: dataFieldValue,
+					value: [dataFieldValue],
 					execute: true,
 				});
 				payload.query[0].react = { and: ['list-1'] };
