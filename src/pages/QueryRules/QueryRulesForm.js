@@ -291,7 +291,6 @@ class QueryRulesForm extends React.Component {
 					selectedIndexes: show_advance_editor ? indexes : rule.selectedIndexes,
 				},
 				() => {
-					console.log('changed', prevProps.rule !== rule);
 					this.fetchPreviewCount();
 				},
 			);
@@ -676,6 +675,7 @@ class QueryRulesForm extends React.Component {
 		const { saveState } = this.props;
 		this.setState({
 			visible: false,
+			viewType: 'withoutRule',
 		});
 		saveState({});
 	};
@@ -725,7 +725,7 @@ class QueryRulesForm extends React.Component {
 				payload.query[0].react = { and: ['list-1'] };
 			}
 		}
-		console.log(viewType);
+
 		if (viewType === 'withRule') {
 			payload.settings.queryRule = {
 				name,
