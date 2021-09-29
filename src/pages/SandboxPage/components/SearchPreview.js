@@ -564,7 +564,7 @@ SearchPreview.propTypes = {
 	fetchingDefaultSettings: PropTypes.bool,
 	isFetchingMappings: PropTypes.bool,
 	mappings: PropTypes.object,
-	searchState: PropTypes.object,
+	searchState: PropTypes.array,
 	clearState: PropTypes.func,
 	handleModal: PropTypes.func,
 	showFeaturedProducts: PropTypes.bool,

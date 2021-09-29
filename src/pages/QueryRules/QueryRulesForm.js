@@ -171,9 +171,7 @@ class QueryRulesForm extends React.Component {
 		super(props);
 		const hasId = get(props.match, 'params.id');
 		this.state = {
-			viewPreview: false,
-			viewRuleEffect: false,
-			rulesPayload: {},
+			viewType: 'withoutRule',
 			// Rule Info
 			name: '',
 			description: '',
@@ -293,9 +291,10 @@ class QueryRulesForm extends React.Component {
 					selectedIndexes: show_advance_editor ? indexes : rule.selectedIndexes,
 				},
 				() => {
+					console.log('changed', prevProps.rule !== rule);
 					this.fetchPreviewCount();
 				},
-			); // call api here
+			);
 		}
 
 		if (!isEditPage && !isCreating && prevProps.isCreating !== isCreating) {
@@ -347,8 +346,7 @@ class QueryRulesForm extends React.Component {
 			}),
 			() => {
 				if (name === 'condition') {
-					console.log(name, value);
-					this.fetchPreviewCount(value);
+					this.fetchPreviewCount();
 				}
 			},
 		);
@@ -648,36 +646,21 @@ class QueryRulesForm extends React.Component {
 		});
 	};
 
-	excludeQueryRules = () => {
-		const { rulesPayload } = this.state;
-		const { saveState } = this.props;
-		const newRulesPayload = { ...rulesPayload };
-		delete newRulesPayload.settings.queryRule;
-		this.setState({ rulesPayload: newRulesPayload }, () => {
-			saveState(newRulesPayload);
-		});
-	};
-
 	handleTabChange = (key) => {
-		const { rulesPayload } = this.state;
-		const { saveState } = this.props;
 		// eslint-disable-next-line
 		if (key == 1) {
-			this.excludeQueryRules();
+			this.setState({ viewType: 'withoutRule' });
 		} else {
-			saveState(rulesPayload);
+			this.setState({ viewType: 'withRule' });
 		}
+		this.fetchPreviewCount('save');
 	};
 
 	handleReplaySearch = (type) => {
-		const { saveState, handleReplayClick } = this.props;
-		const { selectedIndexes, rulesPayload } = this.state;
+		const { handleReplayClick } = this.props;
+		const { selectedIndexes } = this.state;
 
-		if (type === 'preview') {
-			this.excludeQueryRules();
-		} else {
-			saveState(rulesPayload);
-		}
+		this.fetchPreviewCount('save');
 
 		if (handleReplayClick) {
 			handleReplayClick(selectedIndexes.join(','));
@@ -697,7 +680,7 @@ class QueryRulesForm extends React.Component {
 		saveState({});
 	};
 
-	fetchPreviewCount = (value = 'filter') => {
+	fetchPreviewCount = (mode = 'none') => {
 		const {
 			selectedIndexes,
 			queryValue,
@@ -707,24 +690,18 @@ class QueryRulesForm extends React.Component {
 			description,
 			show_advance_editor,
 			actions,
+			condition,
+			viewType,
 		} = this.state;
-		const { username, password } = this.props;
+		const { username, password, saveState } = this.props;
 		const index = selectedIndexes?.join(',');
 		const ACC_API = getURL();
 		const payload = {
 			query: [],
-			settings: {
-				queryRule: {
-					name,
-					description,
-					show_advance_editor,
-					actions,
-				},
-				enableQueryRules: false,
-			},
+			settings: {},
 		};
 
-		if (value === 'always') {
+		if (condition === 'always') {
 			payload.query.push({
 				id: 'search',
 			});
@@ -748,9 +725,22 @@ class QueryRulesForm extends React.Component {
 				payload.query[0].react = { and: ['list-1'] };
 			}
 		}
+		console.log(viewType);
+		if (viewType === 'withRule') {
+			payload.settings.queryRule = {
+				name,
+				description,
+				show_advance_editor,
+				actions,
+			};
+		} else {
+			payload.settings.enableQueryRules = false;
+		}
 
-		this.setState({ rulesPayload: payload });
-
+		// this.setState({ rulesPayload: payload });
+		if (mode === 'save') {
+			saveState(payload);
+		}
 		fetch(`${ACC_API}/${index}/_reactivesearch`, {
 			method: 'POST',
 			headers: {
