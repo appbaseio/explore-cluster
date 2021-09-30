@@ -8,6 +8,7 @@ import settingsMap from '../../../components/ReviewAndSave/helper';
 
 const Filter = (props) => {
 	const { app, aggs, handleValueChange, handleModal } = props;
+
 	return (
 		<React.Fragment>
 			{aggs.map((agg) => (
@@ -24,7 +25,7 @@ const Filter = (props) => {
 								'',
 							)}`
 						}
-						dataField={get(agg, 'dataField[0]')}
+						dataField={Array.isArray(agg.dataField) ? agg.dataField[0] : agg.dataField}
 						onChange={(value) => handleValueChange(agg.id, value)}
 						componentId={agg.id}
 						loader="Loading Items"
