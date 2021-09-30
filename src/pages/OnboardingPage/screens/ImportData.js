@@ -77,7 +77,7 @@ export default class Introduction extends Component {
 			.then(appbaseHelpers.updateMapping)
 			.then(() => {
 				this.setState({
-					status: 'Indexing movies data of 500 records... Almost done!',
+					status: 'Indexing movies data of 10,000 records... Almost done!',
 				});
 			})
 			.then(appbaseHelpers.indexData)
@@ -246,7 +246,7 @@ export default class Introduction extends Component {
 							{url ? (
 								<p>Explore your imported dataset for the movies store.</p>
 							) : (
-								<p>We will import a dataset of 500 movies obtained from TMDB.</p>
+								<p>We will import a dataset of 10,000 movies obtained from TMDB.</p>
 							)}
 						</header>
 
