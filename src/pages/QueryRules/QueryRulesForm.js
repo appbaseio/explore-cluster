@@ -691,8 +691,10 @@ class QueryRulesForm extends React.Component {
 			actions,
 			condition,
 			viewType,
+			aggsFields
 		} = this.state;
 		const { username, password, saveState } = this.props;
+
 		const index = selectedIndexes?.join(',');
 		const ACC_API = getURL();
 		const payload = {
@@ -717,7 +719,7 @@ class QueryRulesForm extends React.Component {
 				payload.query.push({
 					id: 'list-1',
 					type: 'term',
-					dataField,
+					dataField: dataField,
 					value: [dataFieldValue],
 					execute: true,
 				});
@@ -738,6 +740,11 @@ class QueryRulesForm extends React.Component {
 
 		// this.setState({ rulesPayload: payload });
 		if (mode === 'save') {
+			// payload.query.forEach(elem => {
+			// 	if(elem.id.startsWith('list') && elem?.dataField) {
+			// 		elem.dataField = aggsFields.includes(`${dataField}.keyword`) ? `${dataField}.keyword` : dataField;
+			// 	}
+			// })
 			saveState(payload);
 		}
 		fetch(`${ACC_API}/${index}/_reactivesearch`, {
