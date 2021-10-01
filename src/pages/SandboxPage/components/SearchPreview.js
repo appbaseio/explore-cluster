@@ -17,7 +17,7 @@ import {
 } from '../../../batteries/modules/actions';
 import Search from './Search';
 import Result from './Result/index';
-import { generateQuery, getQueryGrades } from '../utils';
+import { generateQuery, getQueryGrades, transformQuery } from '../utils';
 import { getAggsMappings } from '../../../batteries/utils/mappings';
 import { getURL } from '../../../constants/config';
 import { getSubFields } from '../../../utils';
@@ -326,7 +326,8 @@ class SearchPreview extends React.Component {
 	generateCodeSandbox = () => {
 		const { settings } = this.state;
 		const { app, credentials, url } = this.props;
-		const codesandboxURL = generateSandboxURL({ settings, app, credentials, url });
+		transformQuery(settings)
+		const codesandboxURL = generateSandboxURL({ settings , app, credentials, url });
 
 		window.open(codesandboxURL, '_blank');
 	};

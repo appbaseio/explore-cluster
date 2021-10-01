@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Typography } from 'antd';
 import Appbase from 'appbase-js';
 import { css } from 'emotion';
-
+import { transformQuery } from '../../utils'
 import SandboxContext from '../SandboxContext';
 import RSPlayground from '../../../../components/RSPlayground';
 
@@ -78,7 +78,6 @@ class QueryView extends React.Component {
 
 	render() {
 		const { query } = this.state;
-		console.log("queery:", JSON.parse(query));
 		return (
 			<React.Fragment>
 				<Typography.Text className={headingStyle} strong>
@@ -121,30 +120,6 @@ QueryView.defaultProps = {
 };
 
 const QueryViewWrapper = () => {
-
-
-	const transformQuery = (query) => {
-
-		const queryArr = [...query];
-
-		const resultantMap = queryArr.forEach((query, index) => {
-			if (query.dataField && query.fieldWeights) {
-				const { dataField, fieldWeights } = query;
-				const result = [];
-
-				dataField?.map((field, index) => {
-					result.push({
-						field,
-						weight: fieldWeights[index],
-					});
-				});
-				queryArr[index].dataField = [...result];
-				delete queryArr[index].fieldWeights;
-			}
-		});
-
-		return { ...query, query: [...queryArr] };
-	};
 
 	return (
 		<SandboxContext.Consumer>
