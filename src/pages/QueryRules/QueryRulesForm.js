@@ -691,7 +691,7 @@ class QueryRulesForm extends React.Component {
 			actions,
 			condition,
 			viewType,
-			aggsFields
+			aggsFields,
 		} = this.state;
 		const { username, password, saveState } = this.props;
 
@@ -719,7 +719,9 @@ class QueryRulesForm extends React.Component {
 				payload.query.push({
 					id: 'list-1',
 					type: 'term',
-					dataField: dataField,
+					dataField: aggsFields.includes(`${dataField}.keyword`)
+						? `${dataField}.keyword`
+						: dataField,
 					value: [dataFieldValue],
 					execute: true,
 				});
@@ -738,13 +740,7 @@ class QueryRulesForm extends React.Component {
 			payload.settings.enableQueryRules = false;
 		}
 
-		// this.setState({ rulesPayload: payload });
 		if (mode === 'save') {
-			// payload.query.forEach(elem => {
-			// 	if(elem.id.startsWith('list') && elem?.dataField) {
-			// 		elem.dataField = aggsFields.includes(`${dataField}.keyword`) ? `${dataField}.keyword` : dataField;
-			// 	}
-			// })
 			saveState(payload);
 		}
 		fetch(`${ACC_API}/${index}/_reactivesearch`, {
