@@ -11,27 +11,32 @@ const Filter = (props) => {
 
 	return (
 		<React.Fragment>
-			{aggs.map((agg) => (
-				<Card
-					key={agg.dataField}
-					data-cy={`aggs-values-${get(agg, 'dataField[0]', '').replace('.keyword', '')}`}
-				>
-					<MultiList
-						{...agg}
-						title={get(agg, 'dataField[0]', '').replace('.keyword', '')}
-						renderNoResults={() =>
-							`No Data Found for ${get(agg, 'dataField[0]', '').replace(
-								'.keyword',
-								'',
-							)}`
-						}
-						dataField={Array.isArray(agg.dataField) ? agg.dataField[0] : agg.dataField}
-						onChange={(value) => handleValueChange(agg.id, value)}
-						componentId={agg.id}
-						loader="Loading Items"
-					/>
-				</Card>
-			))}
+			{aggs.map((agg) => {
+				const aggField = Array.isArray(agg.dataField) ? 'dataField[0]' : 'dataField';
+				return (
+					<Card
+						key={agg.dataField}
+						data-cy={`aggs-values-${get(agg, aggField, '').replace('.keyword', '')}`}
+					>
+						<MultiList
+							{...agg}
+							title={get(agg, aggField, '').replace('.keyword', '')}
+							renderNoResults={() =>
+								`No Data Found for ${get(agg, aggField, '').replace(
+									'.keyword',
+									'',
+								)}`
+							}
+							dataField={
+								Array.isArray(agg.dataField) ? agg.dataField[0] : agg.dataField
+							}
+							onChange={(value) => handleValueChange(agg.id, value)}
+							componentId={agg.id}
+							loader="Loading Items"
+						/>
+					</Card>
+				);
+			})}
 
 			<Link
 				onClick={window.location.pathname === `/app/${app}/aggs` ? handleModal : null}
