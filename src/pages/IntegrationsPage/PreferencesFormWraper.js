@@ -65,9 +65,19 @@ class PreferencesFormWrapper extends React.Component {
 				  }
 				: {
 						// Search specific controls
-						showPopularSearches: false,
+						autoSuggestionSettings: FormBuilder.group({
+							enablePopularSuggestions: false,
+							enableRecentSearches: false,
+							highlight: false,
+						}),
+						autosuggest: true,
+						showVoiceSearch: true,
+						enablePredictiveSuggestions: false,
+						enablePopularSuggestions: false,
 						showSelectedFilters: true,
 						showPagination: false,
+						layout: 'grid',
+						viewSwitcher: true,
 						customMessages: FormBuilder.group({
 							resultStats: '[count] products found in [time] ms',
 							noFilterItem: 'No items Found',
@@ -113,6 +123,7 @@ class PreferencesFormWrapper extends React.Component {
 		} else {
 			fetchSearchPreferences();
 		}
+
 		// Registering the subscriber after patching the initial values to avoid resetting the set fields in preferences
 		this.form.get('exportSettings.type').valueChanges.subscribe((value) => {
 			const colorFilter = this.form.get('staticFilters.color.customize.dataField');
@@ -168,10 +179,25 @@ class PreferencesFormWrapper extends React.Component {
 				}
 			}
 		});
+
+		if (this.form.get('autosuggest')) {
+			this.form.get('autosuggest').valueChanges.subscribe((value) => {
+				const autoSuggestionSettingsControl = this.form.get('autoSuggestionSettings');
+				if (autoSuggestionSettingsControl) {
+					if (value) {
+						autoSuggestionSettingsControl.enable();
+					} else {
+						autoSuggestionSettingsControl.disable();
+					}
+				}
+			});
+			this.form.get('autoSuggestionSettings').valueChanges.subscribe(() => {});
+		}
 	}
 
 	componentDidUpdate(prevProps) {
 		const { isRecommendation, searchPreferences, recommendationsPreferences } = this.props;
+
 		let preferences;
 		if (isRecommendation) {
 			if (prevProps.recommendationsPreferences !== recommendationsPreferences) {
@@ -197,8 +223,8 @@ class PreferencesFormWrapper extends React.Component {
 				resetFormArrayControls();
 				// Add controls for dynamic filters
 				const dynamicFilterControl = this.form.get('dynamicFilters');
-				get(preferences, 'facetSettings.dynamicFacets', []).forEach((index) => {
-					const control = getFilterConfigurationForm(null, true);
+				get(preferences, 'facetSettings.dynamicFacets', []).forEach((data, index) => {
+					const control = getFilterConfigurationForm(data.rsConfig, true);
 					control.meta = {
 						key: getDynamicFilterKey(index),
 					};
@@ -240,9 +266,11 @@ class PreferencesFormWrapper extends React.Component {
 						fetchingFilterOptions,
 					};
 				};
+				console.log('reach', this.form);
 				// Patch form value
-				this.form.patchValue(
-					JSON.parse(
+
+				try {
+					const patchVar = JSON.parse(
 						JSON.stringify({
 							themeType: get(preferences, 'themeSettings.type'),
 							primaryColor: get(
@@ -322,10 +350,24 @@ class PreferencesFormWrapper extends React.Component {
 										}),
 								  }
 								: {
-										showPopularSearches: get(
+										autosuggest: get(
+											preferences,
+											'searchSettings.rsConfig.autosuggest',
+										),
+
+										showVoiceSearch: get(
+											preferences,
+											'searchSettings.rsConfig.showVoiceSearch',
+										),
+										enablePopularSuggestions: get(
 											preferences,
 											'searchSettings.rsConfig.enablePopularSuggestions',
 										),
+										enablePredictiveSuggestions: get(
+											preferences,
+											'searchSettings.rsConfig.enablePredictiveSuggestions',
+										),
+
 										showSelectedFilters: get(
 											preferences,
 											'globalSettings.showSelectedFilters',
@@ -333,6 +375,11 @@ class PreferencesFormWrapper extends React.Component {
 										showPagination: !!get(
 											preferences,
 											'resultSettings.rsConfig.pagination',
+										),
+										layout: get(preferences, 'resultSettings.layout') || 'grid',
+										viewSwitcher: get(
+											preferences,
+											'resultSettings.viewSwitcher',
 										),
 										syncSettings: get(preferences, 'syncSettings') || {},
 										customMessages: {
@@ -358,6 +405,20 @@ class PreferencesFormWrapper extends React.Component {
 											),
 											...getFilterMessages(),
 										},
+										autoSuggestionSettings: {
+											enablePopularSuggestions: get(
+												preferences,
+												'searchSettings.rsConfig.enablePopularSuggestions',
+											),
+											enableRecentSearches: get(
+												preferences,
+												'searchSettings.rsConfig.enableRecentSearches',
+											),
+											highlight: get(
+												preferences,
+												'searchSettings.rsConfig.highlight',
+											),
+										},
 										staticFilters: {
 											productType: getStaticFilterFormValue('productType'),
 											collections: getStaticFilterFormValue('collection'),
@@ -375,8 +436,14 @@ class PreferencesFormWrapper extends React.Component {
 										})),
 								  }),
 						}),
-					),
-				);
+					);
+					console.log('parsed patch', patchVar);
+					this.form.patchValue(patchVar);
+				} catch (e) {
+					console.error(e);
+				}
+
+				console.log('voice pref', this.form.get('showVoiceSearch').value);
 			} catch (e) {
 				console.warn('Error while syncing the preferences', e);
 			}

@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Table, Card, notification } from 'antd';
+import { Table, Card, notification, Alert } from 'antd';
 import get from 'lodash/get';
+import orderBy from 'lodash/orderBy';
 import { FormBuilder, Validators } from 'react-reactive-form';
 import Text from 'antd/lib/typography/Text';
 import { displayErrors } from '../../utils/helper';
@@ -13,13 +14,14 @@ import {
 	deleteAppStoredQuery,
 	executeAppStoredQuery,
 	getAppStoredQueries,
+	getStoredQueriesUsage,
 	saveAppStoredQuery,
 	validateAppStoredQuery,
 } from '../../batteries/modules/actions';
 import Actions from './Actions';
 import CreateStoredQuery from './CreateStoredQuery';
 import GetAPIEndpoint from './GetAPIEndpoint';
-import { jsonValidator } from './utils';
+import { errorMessageTemplate, jsonValidator } from './utils';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { event, timingEvent } from '../../utils/gtag';
 import moment from '../../utils/moment';
@@ -34,16 +36,31 @@ const columns = [
 	{
 		title: 'Description',
 		key: 'description',
-		width: '48%',
+		width: '32%',
 		render: (item) => {
 			const { description } = item;
 			return <Text disabled={!description}>{description || 'No description'}</Text>;
 		},
 	},
 	{
+		title: 'Last Updated',
+		key: 'last-updated',
+		width: '17%',
+		render: (item) => {
+			/* eslint-disable camelcase */
+			const { created_at, updated_at } = { ...item };
+			const timestamp = updated_at || created_at;
+			return (
+				<Text disabled={!timestamp}>
+					{timestamp ? moment.unix(timestamp).format('ddd D MMM, hh:mm A') : 'NA'}{' '}
+				</Text>
+			);
+		},
+	},
+	{
 		title: 'Actions',
 		key: 'actions',
-		width: '35%',
+		width: '32%',
 		render: (item) => {
 			const { handleRender, handleEdit, handleDelete, ...rest } = { ...item };
 			return (
@@ -87,7 +104,7 @@ class StoredQueries extends React.Component {
 			default: {
 				title: 'Stored Queries',
 				description:
-					'GUI to manage your stored queries. Use them as direct REST APIs or to extend ReactiveSearch API.',
+					'GUI to manage your stored queries. Use them as direct REST APIs or with ReactiveSearch API.',
 				buttonText: 'Create Stored Query',
 				icon: 'plus',
 				onClick: () => this.toggleCreateMode(),
@@ -112,6 +129,8 @@ class StoredQueries extends React.Component {
 	}
 
 	componentDidMount() {
+		const { fetchStoredQueriesUsage } = this.props;
+		fetchStoredQueriesUsage();
 		// triggering custom event for google analytics
 		event({
 			action: 'Stored Queries',
@@ -231,10 +250,10 @@ class StoredQueries extends React.Component {
 		const { query, params, index: formIndexValue } = JSON.parse(getValue('query').value);
 		const description = getValue('description').value;
 		if (!query) {
-			throw new Error('Invalid query, The `query` property is required to save the query.');
+			throw new Error(errorMessageTemplate('query', 'save'));
 		}
 		if (!formIndexValue) {
-			throw new Error('Invalid query, The `index` property is required to save the query.');
+			throw new Error(errorMessageTemplate('index', 'save'));
 		}
 		return { index: formIndexValue || index || appName || '', id, query, params, description };
 	};
@@ -250,17 +269,13 @@ class StoredQueries extends React.Component {
 				return false;
 			}
 			if (!requestBody.params) {
-				throw new Error(
-					'Invalid query, The `params` property is required to validate the query.',
-				);
+				throw new Error(errorMessageTemplate('params', 'validate'));
 			}
 			if (!requestBody.query) {
-				throw new Error(
-					'Invalid query, The `query` property is required to validate the query.',
-				);
+				throw new Error(errorMessageTemplate('query', 'validate'));
 			}
 			if (!queryControl.valid) {
-				throw new Error('Please enter a valid JSON query to validate.');
+				throw new Error(errorMessageTemplate('invalid json', 'validate'));
 			}
 			return validateStoredQuery({
 				...requestBody,
@@ -271,7 +286,7 @@ class StoredQueries extends React.Component {
 						behavior: 'smooth',
 					});
 				}
-				return true; // signifies it's a valid query
+				return !get(action, 'error'); // signifies it's a valid/ invalid query
 			});
 		} catch (error) {
 			notification.error({
@@ -291,22 +306,16 @@ class StoredQueries extends React.Component {
 			const queryControl = this.form.get('query');
 			const requestBody = JSON.parse(query);
 			if (!requestBody.params) {
-				throw new Error(
-					'Invalid query, The `params` property is required to execute the query.',
-				);
+				throw new Error(errorMessageTemplate('params', 'execute'));
 			}
 			if (!requestBody.index) {
-				throw new Error(
-					'Invalid query, The `index` property is required to execute the query.',
-				);
+				throw new Error(errorMessageTemplate('index', 'execute'));
 			}
 			if (!requestBody.query) {
-				throw new Error(
-					'Invalid query, The `query` property is required to execute the query.',
-				);
+				throw new Error(errorMessageTemplate('query', 'execute'));
 			}
 			if (!queryControl.valid) {
-				throw new Error('Please enter a valid JSON query to execute.');
+				throw new Error(errorMessageTemplate('invalid json', 'execute'));
 			}
 			return executeStoredQuery({
 				...requestBody,
@@ -317,7 +326,7 @@ class StoredQueries extends React.Component {
 						behavior: 'smooth',
 					});
 				}
-				return true;
+				return !get(action, 'error'); // signifies it's a successful/ failed execution of query
 			});
 		} catch (error) {
 			notification.error({
@@ -354,7 +363,7 @@ class StoredQueries extends React.Component {
 
 	render() {
 		const { createMode, editMode, currentStoredQuery, copyEndpoint } = this.state;
-		const { isLoading, storedQueries, isDeleting } = this.props;
+		const { isLoading, storedQueries, isDeleting, storedQueriesUsage } = this.props;
 		const isDefault = !(createMode || editMode);
 		if (isLoading && !(Array.isArray(storedQueries) && storedQueries.length)) {
 			return <Loader />;
@@ -377,17 +386,40 @@ class StoredQueries extends React.Component {
 								}
 							>
 								<Table
+									css=".ant-table-row-cell-break-word{ border-bottom: none}tr.ant-table-expanded-row{background: white}"
 									rowKey={({ id, index }) => `${id}${index}`}
 									dataSource={
 										Array.isArray(storedQueries) &&
-										storedQueries.map((item) => ({
+										orderBy(
+											storedQueries,
+											(a) => {
+												return a.updated_at || a.created_at || 0;
+											},
+											['desc'],
+										).map((item) => ({
 											handleDelete: this.handleDelete,
 											handleEdit: this.handleEdit,
 											handleRender: this.handleRender,
 											...item,
+											usageCount: storedQueriesUsage[item.id]?.count,
 										}))
 									}
 									columns={columns}
+									defaultExpandAllRows
+									expandIcon={() => null}
+									expandIconAsCell={false}
+									expandedRowRender={(record) => (
+										<Alert
+											type="info"
+											showIcon
+											message={
+												record.usageCount > 0
+													? `Used ${record.usageCount}
+															 times in last 30 days`
+													: 'Not used in the last 30 days'
+											}
+										/>
+									)}
 								/>
 							</Card>
 						)}
@@ -431,10 +463,12 @@ StoredQueries.propTypes = {
 	executeStoredQuery: PropTypes.func.isRequired,
 	deleteStoredQuery: PropTypes.func.isRequired,
 	validateStoredQuery: PropTypes.func.isRequired,
+	fetchStoredQueriesUsage: PropTypes.func.isRequired,
 	storedQueries: PropTypes.array,
 	errors: PropTypes.array.isRequired,
 	appName: PropTypes.string,
 	plan: PropTypes.string.isRequired,
+	storedQueriesUsage: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -450,6 +484,7 @@ const mapStateToProps = (state) => ({
 		get(state, '$executeAppStoredQuery.error'),
 	],
 	appName: get(state, '$getCurrentApp.name'),
+	storedQueriesUsage: get(state, '$getAppStoredQueriesUsage.results', {}),
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -458,6 +493,7 @@ const mapDispatchToProps = (dispatch) => ({
 	saveStoredQuery: (id, payload) => dispatch(saveAppStoredQuery(id, payload)),
 	validateStoredQuery: (id, payload) => dispatch(validateAppStoredQuery(id, payload)),
 	executeStoredQuery: (id, payload) => dispatch(executeAppStoredQuery(id, payload)),
+	fetchStoredQueriesUsage: () => dispatch(getStoredQueriesUsage()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(StoredQueries);

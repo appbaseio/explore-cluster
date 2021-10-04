@@ -984,28 +984,6 @@ class HostedArcBilling extends Component {
 								</span>{' '}
 							</td>
 						</tr>
-						<tr>
-							<td>
-								<span data-tip="Create secure template based REST endpoints via dashboard to prevent DSL injections.">
-									Search Templates
-								</span>
-							</td>
-							<td>
-								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
-									✅{' '}
-								</span>{' '}
-							</td>
-							<td>
-								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
-									✅{' '}
-								</span>{' '}
-							</td>
-							<td>
-								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
-									✅{' '}
-								</span>{' '}
-							</td>
-						</tr>
 						<tr className={HeadingTr}>
 							<td>
 								Curated Insights
@@ -1144,7 +1122,6 @@ class HostedArcBilling extends Component {
 								'User Management',
 								'API Credentials',
 								'Role Based Access Control',
-								'Search Templates',
 							]}
 						/>
 						<ListCaption style={{ color: theme.colors.footer }}>
@@ -1193,7 +1170,6 @@ class HostedArcBilling extends Component {
 								'User Management',
 								'API Credentials',
 								'Role Based Access Control',
-								'Search Templates',
 							]}
 						/>
 						<ListCaption style={{ color: theme.colors.footer }}>
@@ -1264,7 +1240,6 @@ class HostedArcBilling extends Component {
 								'User Management',
 								'API Credentials',
 								'Role Based Access Control',
-								'Search Templates',
 							]}
 						/>
 						<ListCaption style={{ color: theme.colors.footer }}>
