@@ -92,6 +92,7 @@ class QueryCard extends React.Component {
 			'dragProvided',
 			'dragSnapshot',
 			'index',
+			'usageStatsCount',
 		]);
 	}
 
