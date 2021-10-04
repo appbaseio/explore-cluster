@@ -261,7 +261,7 @@ class QueryRulesForm extends React.Component {
 				this.setState({ loading: false });
 				console.log(e);
 			});
-		this.fetchPreviewCount();
+		// this.fetchPreviewCount();
 	}
 
 	componentDidUpdate(prevProps) {
