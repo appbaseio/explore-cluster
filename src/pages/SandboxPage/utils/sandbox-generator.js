@@ -2,6 +2,7 @@ import React from 'react';
 import { getParameters } from 'codesandbox/lib/api/define';
 import reactElementToJSXString from 'react-element-to-jsx-string';
 import get from 'lodash/get';
+import { transformQuery } from './index';
 
 const dependencies = {
 	react: '16.8.0',
@@ -328,9 +329,10 @@ const generateFiltersCode = (filtersWithProps) => {
 };
 
 const generateSandboxURL = ({ settings, app, credentials, url }) => {
-	const searchSettings = settings.find((setting) => setting.id === 'search');
-	const resultSettings = settings.find((setting) => setting.id === 'result');
-	const filtersWithProps = settings.filter(
+	const newSettings = transformQuery(settings);
+	const searchSettings = newSettings.find((setting) => setting.id === 'search');
+	const resultSettings = newSettings.find((setting) => setting.id === 'result');
+	const filtersWithProps = newSettings.filter(
 		(setting) => setting.id !== 'search' && setting.id !== 'result',
 	);
 
