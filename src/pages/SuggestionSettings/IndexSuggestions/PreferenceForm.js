@@ -60,73 +60,13 @@ const getDisabled = (value) => {
 	return false;
 };
 
-const InputElement = ({ name, label, toolTipMessage, inputProps, placeholder, onChange }) => (
-	<FieldControl
-		name={name}
-		render={({ handler, invalid, touched, hasError, getError, value }) => (
-			<Grid
-				label={
-					<p css={styles.labelContainer}>
-						{label}
-						<Popover content={content(toolTipMessage)} css={styles.iconContainer}>
-							<Icon type="info-circle" />
-						</Popover>
-					</p>
-				}
-				component={
-					<div style={{ width: '100%' }}>
-						<div>
-							<Input
-								className={touched && invalid ? 'input-error' : null}
-								placeholder={placeholder}
-								type="number"
-								{...handler()}
-								value={value}
-								onChange={e => {
-									onChange(e.target.value);
-								}}
-								{...inputProps}
-							/>
-						</div>
-
-						{touched && invalid && (
-							<div className="error">
-								{(hasError('required') &&
-									`Please enter ${label.toLowerCase()} value.`) ||
-									(hasError('min') &&
-										`Minimum allowed value for ${label.toLowerCase()} is ${
-											getError('min').min
-										}.`) ||
-									(hasError('max') &&
-										`Maximum allowed value for ${label.toLowerCase()} is ${
-											getError('max').max
-										}.`)}
-							</div>
-						)}
-					</div>
-				}
-			/>
-		)}
-	/>
-);
-
-InputElement.propTypes = {
-	name: PropTypes.string.isRequired,
-	label: PropTypes.string.isRequired,
-	toolTipMessage: PropTypes.any,
-	inputProps: PropTypes.object,
-	placeholder: PropTypes.string,
-	onChange: PropTypes.func.isRequired,
-};
-
-InputElement.defaultProps = {
-	toolTipMessage: undefined,
-	inputProps: {},
-	placeholder: undefined,
-};
-
 class PreferenceForm extends React.Component {
-	state = { visible: false, aggregationField: undefined, customQueryField: '' };
+	state = {
+		visible: false,
+		aggregationField: undefined,
+		customQueryField: '',
+		selectedIndices: [],
+	};
 
 	componentDidMount() {
 		const {
@@ -280,6 +220,13 @@ class PreferenceForm extends React.Component {
 				categoryField: '',
 				url: '',
 			});
+
+		let mappingsFromIndices = [];
+		this.state.selectedIndices?.map(index => {
+			console.log(mappings[index]);
+			mappingsFromIndices = [...mappingsFromIndices, ...mappings[index]];
+		});
+
 		return (
 			<FieldGroup
 				control={control}
@@ -314,13 +261,16 @@ class PreferenceForm extends React.Component {
 												{...inputHandler}
 												onChange={(val) => {
 													inputHandler.onChange(calculateValue(val));
-													const { settings } = this.props;
-													this.init({ ...settings });
+													this.setState({
+														selectedIndices: val,
+													});
+													// const { settings } = this.props;
+													// this.init({ ...settings });
 												}}
 											>
 												<Select.Option value="*">All (*)</Select.Option>
 												{indices
-													.filter((i) => !i.startsWith('metricbeat'))
+													.filter((i) => !i.startsWith('metricbeat') && !i.startsWith('.'))
 													.map((index) => (
 														<Select.Option key={index}>
 															{index}
@@ -604,7 +554,7 @@ class PreferenceForm extends React.Component {
 											<Select.Option
 												key="*"
 											>* (Include all fields)</Select.Option>
-											{(mappings || []).map((v) => {
+											{(mappingsFromIndices || []).map((v) => {
 												if (excludeFields && !excludeFields.includes(v)) {
 													return (
 														<Select.Option
@@ -663,7 +613,7 @@ class PreferenceForm extends React.Component {
 
 										>
 											<Select.Option key="*">* (Exclude all fields)</Select.Option>
-												{(mappings || []).map((v) => {
+												{(mappingsFromIndices || []).map((v) => {
 													if (includeFields && !includeFields.includes(v)) {
 														return (
 															<Select.Option key={v} title={v} data-cy={v}>
@@ -901,7 +851,10 @@ PreferenceForm.propTypes = {
 	apps: PropTypes.object,
 	localRelevancy: null,
 	appName: PropTypes.string,
-	mappings: PropTypes.array,
+	mappings: PropTypes.oneOfType([
+		PropTypes.array,
+		PropTypes.object, // at cluster level
+	]),
 	defaultSettings: PropTypes.array,
 	fetchStoredQueries: PropTypes.func.isRequired,
 	credentials: PropTypes.string.isRequired,
@@ -920,8 +873,8 @@ const mapStateToProps = (state) => {
 	const { username, password } = get(state, 'user.data', {});
 
 	return {
-		// mappings: getTraversedMappingsByAppName(state),
-		mappings: isEmpty(parsedMappings) ? [] : parsedMappings,
+		mappings: getTraversedMappingsByAppName(state),
+		// mappings: isEmpty(parsedMappings) ? [] : parsedMappings,
 		isLoading: get(state, '$saveSuggestionsPreferences.isFetching', false),
 		settings: get(state, ['$getAppSettings', 'settings', appName]),
 		appName,
