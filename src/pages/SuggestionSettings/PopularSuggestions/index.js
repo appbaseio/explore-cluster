@@ -76,7 +76,6 @@ class QuerySuggestions extends React.Component {
 			props.getPreferences().then((action) => {
 				// prefilling
 				const payload = get(action, 'payload');
-				console.log(payload);
 				if (payload) {
 					this.form.patchValue({
 						blacklist: payload.blacklist || [],
@@ -183,6 +182,7 @@ class QuerySuggestions extends React.Component {
 		const { isLoading, preferences, tier, featureSuggestions, hide } = this.props;
 		const { indices, total } = this.state;
 
+		console.log("indices-pop", indices);
 		if (isLoading && !preferences) {
 			return <Loader />;
 		}

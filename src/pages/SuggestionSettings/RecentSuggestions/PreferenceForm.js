@@ -121,7 +121,6 @@ class PreferenceForm extends React.Component {
 
 	handleChange = (key, value, dataKey) => {
 		const { appName, localRelevancy, updateLocalRelevancy } = this.props;
-		console.log(this.props)
 		if(localRelevancy) {
 			updateLocalRelevancy(appName, {
 				...localRelevancy,

@@ -49,68 +49,11 @@ const content = (message) => {
 	return <div>{message}</div>;
 };
 
-const InputElement = ({ name, label, toolTipMessage, inputProps, placeholder }) => (
-	<FieldControl
-		name={name}
-		render={({ handler, invalid, touched, hasError, getError }) => (
-			<Grid
-				label={
-					<p css={styles.labelContainer}>
-						{label}
-						<Popover content={content(toolTipMessage)} css={styles.iconContainer}>
-							<Icon type="info-circle" />
-						</Popover>
-					</p>
-				}
-				component={
-					<div style={{ width: '100%' }}>
-						<div>
-							<Input
-								className={touched && invalid ? 'input-error' : null}
-								placeholder={placeholder}
-								type="number"
-								{...handler()}
-								{...inputProps}
-							/>
-						</div>
-
-						{touched && invalid && (
-							<div className="error">
-								{(hasError('required') &&
-									`Please enter ${label.toLowerCase()} value.`) ||
-									(hasError('min') &&
-										`Minimum allowed value for ${label.toLowerCase()} is ${
-											getError('min').min
-										}.`) ||
-									(hasError('max') &&
-										`Maximum allowed value for ${label.toLowerCase()} is ${
-											getError('max').max
-										}.`)}
-							</div>
-						)}
-					</div>
-				}
-			/>
-		)}
-	/>
-);
-
-InputElement.propTypes = {
-	name: PropTypes.string.isRequired,
-	label: PropTypes.string.isRequired,
-	toolTipMessage: PropTypes.any,
-	inputProps: PropTypes.object,
-	placeholder: PropTypes.string,
-};
-
-InputElement.defaultProps = {
-	toolTipMessage: undefined,
-	inputProps: {},
-	placeholder: undefined,
-};
-
 class PreferenceForm extends React.Component {
-	state = { visible: false };
+	state = {
+		visible: false,
+		selectedIndices: [],
+	};
 
 	componentDidMount() {
 		const {
@@ -202,7 +145,58 @@ class PreferenceForm extends React.Component {
 				strict={false}
 				render={({ pristine, invalid: invalidForm }) => (
 					<div css={modal}>
-						<FieldControl
+						{/* <FieldControl
+							name="indices"
+							render={({ handler, value }) => {
+								const inputHandler = handler();
+								return (
+									<Grid
+										label={
+											<p css={styles.labelContainer}>
+												Indices
+												<Popover
+													content={content(Messages.indices)}
+													css={styles.iconContainer}
+												>
+													<Icon type="info-circle" />
+												</Popover>
+											</p>
+										}
+										component={
+											<Select
+												data-cy="popular-suggestions-indices"
+												placeholder="Enter indices"
+												mode="tags"
+												style={{ width: '100%' }}
+												tokenSeparators={[',']}
+												value={value}
+												{...inputHandler}
+												onChange={(val) => {
+													// console.log("indices:", val);
+													inputHandler.onChange(calculateValue(val));
+													this.setState({
+														selectedIndices: val,
+													});
+													// const { settings } = this.props;
+													// this.init({ ...settings });
+												}}
+											>
+												<Select.Option value="*">All (*)</Select.Option>
+												{indices
+													.filter((i) => !i.startsWith('metricbeat') && !i.startsWith('.'))
+													.map((index) => (
+														<Select.Option key={index}>
+															{index}
+														</Select.Option>
+													))}
+											</Select>
+										}
+										gridRatio={gridRatio}
+									/>
+								);
+							}}
+						/> */}
+						{/* <FieldControl
 							name="indices"
 							render={({ handler, value }) => {
 								const inputHandler = handler();
@@ -247,7 +241,7 @@ class PreferenceForm extends React.Component {
 									/>
 								);
 							}}
-						/>
+						/> */}
 						<FieldControl
 							name="numberOfDays"
 							render={({ handler, value }) => (
@@ -386,7 +380,8 @@ class PreferenceForm extends React.Component {
 						/>
 						<FieldControl
 							name="transformDiacritics"
-							render={({ handler, value }) => (
+							render={({ handler, value }) => {
+								return (
 								<Grid
 									label={
 										<p css={styles.labelContainer}>
@@ -409,14 +404,14 @@ class PreferenceForm extends React.Component {
 													checked={value}
 													onChange={event => {
 														this.handleChange('transformDiacritics', event.target.checked, 'popularSuggestions')
-														handler().onChange(event.target.value);
+														handler().onChange(event.target.checked);
 													}}
 												/>
 											</div>
 										</div>
 									}
 								/>
-							)}
+							)}}
 						/>
 						<FieldControl
 							name="size"

@@ -14,9 +14,9 @@ import {
 	getSettings,
 	getAppStoredQueries,
 } from '../../../batteries/modules/actions';
-import { getTraversedMappingsByAppName } from '../../../batteries/modules/selectors';
+import { getRawMappingsByAppName, getTraversedMappingsByAppName } from '../../../batteries/modules/selectors';
 import Grid from '../../../components/CreateCredentials/Grid';
-import { removeWhiteSpaces } from '../../../utils';
+import { removeWhiteSpaces, getDatafields } from '../../../utils';
 import { suggestionsMessages as Messages } from '../../../utils/messages';
 import SearchPreviewSwitcher from '../../../components/SearchPreviewSwitcher';
 import MappingWrapper from '../../../components/MappingsWrapper/MappingsWrapper';
@@ -66,6 +66,7 @@ class PreferenceForm extends React.Component {
 		aggregationField: undefined,
 		customQueryField: '',
 		selectedIndices: [],
+		aggregationFields: [],
 	};
 
 	componentDidMount() {
@@ -87,6 +88,13 @@ class PreferenceForm extends React.Component {
 		}
 		if (!defaultSettings) getDefaultSettingsAction();
 		this.getMappings();
+	}
+
+	componentDidUpdate(prevProps) {
+		const { rawMappings } = this.props;
+		if (rawMappings && prevProps.rawMappings !== rawMappings) {
+			this.getAggregationFields();
+		}
 	}
 
 	onAppSelect = (app) => {
@@ -128,6 +136,19 @@ class PreferenceForm extends React.Component {
 			updateLocalRelevancy(appName, { ...settings });
 		}
 	};
+
+	getAggregationFields = () => {
+		const { rawMappings } =  this.props
+		const { selectedIndices } = this.state;
+
+		const [aggsFields] = getDatafields({
+			mappings: rawMappings,
+			indexes: selectedIndices,
+			isAggs: true,
+		});
+		const newAggregationFields = aggsFields.filter(i => i.includes(".keyword"));
+		this.setState({aggregationFields: newAggregationFields});
+	}
 
 	getMappings() {
 		const { appName, fetchMappings, credentials, mappings } = this.props;
@@ -196,7 +217,7 @@ class PreferenceForm extends React.Component {
 			appName,
 			appStoredQueries,
 		} = this.props;
-		const { visible, app, aggregationField, customQueryField } = this.state;
+		const { visible, app, aggregationField, customQueryField, aggregationFields } = this.state;
 		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
 
 		const {
@@ -223,9 +244,11 @@ class PreferenceForm extends React.Component {
 
 		let mappingsFromIndices = [];
 		this.state.selectedIndices?.map(index => {
-			console.log(mappings[index]);
-			mappingsFromIndices = [...mappingsFromIndices, ...mappings[index]];
+			if(mappings[index]) {
+				mappingsFromIndices = [...mappingsFromIndices, ...mappings[index]];
+			}
 		});
+		let categoryFields = aggregationFields;
 
 		return (
 			<FieldGroup
@@ -260,12 +283,14 @@ class PreferenceForm extends React.Component {
 												value={value}
 												{...inputHandler}
 												onChange={(val) => {
+													console.log("indices:", val);
 													inputHandler.onChange(calculateValue(val));
 													this.setState({
 														selectedIndices: val,
 													});
 													// const { settings } = this.props;
 													// this.init({ ...settings });
+													this.getAggregationFields();
 												}}
 											>
 												<Select.Option value="*">All (*)</Select.Option>
@@ -647,53 +672,82 @@ class PreferenceForm extends React.Component {
 										</p>
 									}
 									component={
-										<MappingWrapper {...handler()}>
-											{({ flattenUsecase, flattenType }) => (
-												<React.Fragment>
-													{localRelevancy &&
-													this.getAggsField({ flattenUsecase, flattenType }).length >
-														0 ? (
-														<div
-															style={{
-																position: 'relative',
-																display: 'inline-block',
-															}}
-														>
-															<Select
-																showSearch
-																data-cy="category-field"
-																style={{ width: 300 }}
-																value={value}
-																placeholder="Add category fields from schema"
-																onChange={(field) => {
-																	this.updateToAggsField({
-																		field: 'categoryField',
-																		path: field,
-																		flattenType,
-																	});
-																	handler().onChange(field);
-																}}
-															>
-																{this.getAggsField({
-																	flattenUsecase,
-																	flattenType,
-																}).map((field) => (
-																	<Select.Option key={field} value={field} data-cy={field}>
-																		{field}
-																	</Select.Option>
-																))}
-															</Select>
-														</div>
-													) : null}
-												</React.Fragment>
-											)}
-										</MappingWrapper>
+										<Select
+											{...handler()}
+											placeholder="Add category fields from schema"
+
+											style={{ width: '100%' }}
+											data-cy="category-field"
+											showSearch
+											onChange={(value) => {
+												this.handleChange(
+													'categoryField',
+													calculateValue(value),
+													'indexSuggestions',
+												);
+												handler().onChange(calculateValue(value));
+											}}
+
+										>
+											{(categoryFields || []).map((v) => (
+												<Select.Option key={v} title={v} data-cy={v}>
+													{v.split('.keyword')[0]}
+												</Select.Option>
+
+											))}
+										</Select>
 									}
 									gridRatio={gridRatio}
 								/>
 							)}
 						/>
 						<FieldControl
+							name="url"
+							render={({ handler, value }) => (
+								<Grid
+									label={
+										<p css={styles.labelContainer}>
+											URL
+											<Popover
+												content={content(
+													Messages.url,
+												)}
+												css={styles.iconContainer}
+											>
+												<Icon type="info-circle" />
+											</Popover>
+										</p>
+									}
+									component={
+										<Select
+											{...handler()}
+											placeholder="Add URL field from schema"
+
+											style={{ width: '100%' }}
+											data-cy="url-index-setting"
+											showSearch
+											onChange={(value) => {
+												this.handleChange(
+													'url',
+													calculateValue(value),
+													'indexSuggestions',
+												);
+												handler().onChange(calculateValue(value));
+											}}
+										>
+											{(categoryFields || []).map((v) => (
+												<Select.Option key={v} title={v} data-cy={v}>
+													{v.split('.keyword')[0]}
+												</Select.Option>
+
+											))}
+										</Select>
+									}
+									gridRatio={gridRatio}
+								/>
+							)}
+						/>
+						{/* <FieldControl
 							name="url"
 							render={({ handler, value }) => (
 								<Grid
@@ -756,7 +810,7 @@ class PreferenceForm extends React.Component {
 									gridRatio={gridRatio}
 								/>
 							)}
-						/>
+						/> */}
 						<FieldControl
 							name="customQuery"
 							render={({ handler, value }) => {
@@ -868,12 +922,14 @@ PreferenceForm.defaultProps = {
 
 const mapStateToProps = (state) => {
 	const mappings = getTraversedMappingsByAppName(state);
+	const rawMappings = getRawMappingsByAppName(state);
 	const parsedMappings = Array.isArray(mappings) ? mappings : get(mappings, '_doc', []);
 	const appName = get(state, '$getCurrentApp.name');
 	const { username, password } = get(state, 'user.data', {});
 
 	return {
 		mappings: getTraversedMappingsByAppName(state),
+		rawMappings,
 		// mappings: isEmpty(parsedMappings) ? [] : parsedMappings,
 		isLoading: get(state, '$saveSuggestionsPreferences.isFetching', false),
 		settings: get(state, ['$getAppSettings', 'settings', appName]),

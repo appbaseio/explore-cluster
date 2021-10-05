@@ -42,7 +42,7 @@ const SuggestionSettings = ({ tier, featureSuggestions }) => {
 	return (
 		<>
 			<Banner {...bannerDetails} />
-			<PreferencesFormWrapper>
+			{/* <PreferencesFormWrapper>
 				{({ form }) => (
 					<>
 						<SyncStatus form={form} />
@@ -64,7 +64,23 @@ const SuggestionSettings = ({ tier, featureSuggestions }) => {
 						</div>
 					</>
 				)}
-			</PreferencesFormWrapper>
+			</PreferencesFormWrapper> */}
+			<div
+							style={{ backgroundColor: '#fff', padding: '10px 20px' }}
+							className={container}
+						>
+							<Tabs defaultActiveKey="1" style={{ minHeight: 500 }}>
+								<TabPane tab="Popular Suggestions" key="1">
+									<PopularSuggestions hide />
+								</TabPane>
+								<TabPane tab="Recent Suggestions" key="2">
+									<RecentSuggestions hide />
+								</TabPane>
+								<TabPane tab="Index Suggestions" key="3">
+									<IndexSuggestions hide/>
+								</TabPane>
+							</Tabs>
+						</div>
 		</>
 	);
 };
