@@ -84,7 +84,7 @@ export default class Search extends Component {
 								label: 'genres',
 							},
 							{
-								value: 'vote_avergae',
+								value: 'vote_average',
 								label: 'vote_average',
 							},
 						]}

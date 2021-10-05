@@ -89,6 +89,8 @@ export default () => (
 						<p>appbase.io UI components for building mobile apps.</p>
 						<a
 							className="button"
+							target="_blank"
+							rel="noreferrer"
 							href="https://docs.appbase.io/docs/reactivesearch/native/overview/QuickStart/"
 						>
 							Learn More
@@ -103,6 +105,8 @@ export default () => (
 						<p>appbase.io UI components for building realtime geolocation apps.</p>
 						<a
 							className="button"
+							target="_blank"
+							rel="noreferrer"
 							href="https://docs.appbase.io/docs/reactivesearch/v3/overview/reactivemaps/"
 						>
 							Learn More
@@ -117,10 +121,15 @@ export default () => (
 							alt="API"
 						/>
 						<p>
-							Get started with the APIs for indexing, querying and streaming data with
+							Get started with the APIs for indexing, querying and searching data with
 							appbase.
 						</p>
-						<a className="button" href="https://docs.appbase.io/api/examples/js/">
+						<a
+							className="button"
+							target="_blank"
+							rel="noreferrer"
+							href="https://docs.appbase.io/api/examples/js/"
+						>
 							Learn More
 						</a>
 					</div>
