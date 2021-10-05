@@ -32,15 +32,13 @@ import Conditions from './components/Conditions';
 import ActionSelector from './components/ActionSelector';
 import Actions from './components/Actions';
 import { getErrorClass, getErrorCount, getErrorMessage, getErrorMessages } from './utils/error';
-
+import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import { addQueryRule, deleteRule, getRules, putRule } from '../../batteries/modules/actions/rules';
-import { getUsageStats } from '../../batteries/modules/actions';
-
+import { getAppMappings, getUsageStats } from '../../batteries/modules/actions';
 import CloneRule from './components/CloneRule';
 import Info from '../../components/Info';
 import {
 	deleteQueryRuleInFunction,
-	getClusterMappings,
 	getDatafields,
 	getSelectedIndexes,
 	handleQueryRuleDelete,
@@ -53,7 +51,6 @@ import Overlay from '../../components/Overlay';
 import { mediaKey } from '../../utils/media';
 import { getSingleFunction } from '../../batteries/utils/app';
 import { isValidPlan } from '../../batteries/utils';
-
 import { AdvancedEditor, CustomAutoComplete } from '../../components/AdvancedEditor';
 import { getRawQuery, parseExpression } from '../../components/AdvancedEditor/helper';
 import { allowedTiers } from '../../utils/prop-types';
@@ -186,7 +183,18 @@ class QueryRulesForm extends React.Component {
 	}
 
 	componentDidMount() {
-		const { rules, fetchRules, rule, unparsedRule, fetchUsageStats, usageStats } = this.props;
+		const {
+			rules,
+			fetchRules,
+			rule,
+			unparsedRule,
+			mappings,
+			fetchUsageStats,
+			usageStats,
+			fetchMappings,
+			appbaseCredentials,
+			appName,
+		} = this.props;
 		const { isEditPage } = this.state;
 		if (!(rules && rules.length)) {
 			fetchRules();
@@ -204,38 +212,13 @@ class QueryRulesForm extends React.Component {
 				selectedIndexes: show_advance_editor ? indexes : rule.selectedIndexes,
 			});
 		}
-		this.setState({ loading: true });
-		getClusterMappings()
-			.then((mappings) => {
-				const { selectedIndexes } = this.state;
-				const [dataFields, fieldMap, subFieldsMap] = getDatafields({
-					mappings,
-					indexes: ['*'],
-				});
-				const [searchFields] = getDatafields({
-					mappings,
-					indexes: selectedIndexes,
-					isSearch: true,
-				});
-				const [aggsFields] = getDatafields({
-					mappings,
-					indexes: selectedIndexes,
-					isAggs: true,
-				});
-				this.setState({
-					mappings,
-					dataFields,
-					searchFields,
-					aggsFields,
-					fieldMap,
-					subFieldsMap,
-					loading: false,
-				});
-			})
-			.catch((e) => {
-				this.setState({ loading: false });
-				console.log(e);
-			});
+
+		if (!Object.keys(mappings).length) {
+			this.setState({ loading: true });
+			fetchMappings(appName, appbaseCredentials);
+		} else {
+			this.updateAppMappings();
+		}
 	}
 
 	componentDidUpdate(prevProps) {
@@ -249,8 +232,13 @@ class QueryRulesForm extends React.Component {
 			isDeleting,
 			history,
 			unparsedRule,
+			mappings,
 		} = this.props;
 		const { isEditPage } = this.state;
+
+		if (!Object.keys(prevProps.mappings).length && Object.keys(mappings).length) {
+			this.updateAppMappings();
+		}
 
 		if (isEditPage && prevProps.rule !== rule && !isUpdating) {
 			const { show_advance_editor } = rule;
@@ -291,6 +279,35 @@ class QueryRulesForm extends React.Component {
 			}
 		}
 	}
+
+	updateAppMappings = () => {
+		const { selectedIndexes } = this.state;
+		const { mappings } = this.props;
+		this.setState({ loading: true });
+		const [dataFields, fieldMap, subFieldsMap] = getDatafields({
+			mappings,
+			indexes: ['*'],
+		});
+		const [searchFields] = getDatafields({
+			mappings,
+			indexes: selectedIndexes,
+			isSearch: true,
+		});
+		const [aggsFields] = getDatafields({
+			mappings,
+			indexes: selectedIndexes,
+			isAggs: true,
+		});
+		this.setState({
+			mappings,
+			dataFields,
+			searchFields,
+			aggsFields,
+			fieldMap,
+			subFieldsMap,
+			loading: false,
+		});
+	};
 
 	getAlertMessage = (hasChanged, isCreating, isUpdating, count) => {
 		let str = '';
@@ -632,7 +649,6 @@ class QueryRulesForm extends React.Component {
 			featureRules,
 			usageStats,
 		} = this.props;
-
 		this.customAutoComplete = new CustomAutoComplete(null, [
 			{ columnField: '$query', type: 'selection' },
 			...dataFields.map((field) => ({
@@ -1007,6 +1023,13 @@ QueryRulesForm.propTypes = {
 	updateRule: PropTypes.func.isRequired,
 	match: PropTypes.object.isRequired,
 	fetchRules: PropTypes.func.isRequired,
+	fetchMappings: PropTypes.func.isRequired,
+	mappings: PropTypes.oneOfType([
+		PropTypes.array,
+		PropTypes.object, // at cluster level
+	]),
+	appbaseCredentials: PropTypes.string.isRequired,
+	appName: PropTypes.string,
 	fetchUsageStats: PropTypes.func.isRequired,
 	usageStats: PropTypes.object.isRequired,
 };
@@ -1024,10 +1047,14 @@ QueryRulesForm.defaultProps = {
 	rules: null,
 	tier: undefined,
 	featureRules: false,
+	mappings: {},
+	appName: '',
 };
 
 const mapStateToProps = (state, props) => {
 	const id = get(props.match, 'params.id');
+	const mappings = getRawMappingsByAppName(state);
+	const { username, password } = get(state, 'user.data', {});
 	const defaultState = {
 		isCreating: get(state, '$getAppRules.create.isLoading'),
 		createError: get(state, '$getAppRules.create.error.actual'),
@@ -1035,6 +1062,8 @@ const mapStateToProps = (state, props) => {
 		rulesLoading: get(state, '$getAppRules.isFetching'),
 		tier: get(state, '$getAppPlan.results.tier'),
 		featureRules: get(state, '$getAppPlan.results.feature_rules', false),
+		appbaseCredentials: username ? `${username}:${password}` : null,
+		mappings,
 		usageStats: get(state, '$getUsageStats.results', {}),
 	};
 
@@ -1051,6 +1080,7 @@ const mapStateToProps = (state, props) => {
 			updateError: get(ruleData, 'update.error'),
 			isDeleting: get(ruleData, 'isDeleting'),
 			deleteError: get(ruleData, 'deleteError'),
+			appName: get(state, '$getCurrentApp.name'),
 		};
 	}
 
@@ -1062,6 +1092,7 @@ const mapDispatchToProps = (dispatch) => ({
 	createRule: (rule) => dispatch(addQueryRule(rule)),
 	updateRule: (rule) => dispatch(putRule(rule)),
 	removeRule: (id) => dispatch(deleteRule(id)),
+	fetchMappings: (appName, credentials) => dispatch(getAppMappings(appName, credentials)),
 	fetchUsageStats: () => dispatch(getUsageStats()),
 });
 
