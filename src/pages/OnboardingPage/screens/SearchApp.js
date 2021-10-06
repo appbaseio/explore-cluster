@@ -8,6 +8,7 @@ import {
 	ReactiveList,
 	ResultList,
 	SelectedFilters,
+	DateRange,
 } from '@appbaseio/reactivesearch';
 
 import appbaseHelpers from '../utils/appbaseHelpers';
@@ -29,43 +30,43 @@ const renderFilters = (fields) => {
 							size={15}
 							sortBy="count"
 							react={{
-								and: ['search', 'original_language', 'release_year'],
+								and: ['search', 'vote_average', 'release_date'],
 							}}
 							showSearch={false}
 							filterLabel="Genres"
 						/>
 					);
 				}
-				case 'original_language': {
-					return (
-						<MultiList
-							key={field}
-							componentId={field}
-							dataField="original_language.keyword"
-							title="Language"
-							size={15}
-							sortBy="count"
-							react={{
-								and: ['search', 'genres', 'release_year'],
-							}}
-							showSearch={false}
-							filterLabel="Language"
-						/>
-					);
-				}
-				case 'release_year': {
+				case 'vote_average': {
 					return (
 						<DynamicRangeSlider
 							key={field}
 							componentId={field}
 							dataField={field}
-							title="Release Year"
+							title="Vote Average"
 							rangeLabels={(min, max) => ({
 								start: min,
 								end: max,
 							})}
 							react={{
-								and: ['search', 'genres', 'original_language'],
+								and: ['search', 'genres', 'release_date'],
+							}}
+						/>
+					);
+				}
+				case 'release_date': {
+					return (
+						<DateRange
+							key={field}
+							componentId={field}
+							dataField={field}
+							title="Release Date"
+							placeholder={{
+								start: 'Start Date',
+								end: 'End Date',
+							}}
+							react={{
+								and: ['search', 'genres', 'vote_average'],
 							}}
 						/>
 					);
@@ -93,6 +94,9 @@ const getWeights = (fields) => {
 		original_title: 10,
 		'original_title.raw': 10,
 		'original_title.search': 2,
+		title: 10,
+		'title.raw': 10,
+		'title.search': 2,
 		tagline: 5,
 		'tagline.raw': 5,
 		'tagline.search': 1,
@@ -124,7 +128,12 @@ const renderResultList = () => (
 			<ResultListWrapper>
 				{data.map((item) => (
 					<ResultList key={item._id} id={item._id}>
-						<ResultList.Image src={item.poster_path} />
+						<ResultList.Image
+							src={item.poster_path}
+							onError={(event) => {
+								event.target.src = 'https://www.houseoftara.com/shop/wp-content/uploads/2019/05/placeholder.jpg'; // eslint-disable-line
+							}}
+						/>
 						<ResultList.Content>
 							<ResultList.Title
 								dangerouslySetInnerHTML={{
