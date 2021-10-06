@@ -27,7 +27,8 @@ const jsonBlock = `
         "title": "Godzilla vs. Kong",
         "video": false,
         "vote_average": 7.9,
-        "vote_count": 7001
+        "vote_count": 7001,
+		"release_year": 2021,
     },
     {
         "adult": false,
@@ -43,7 +44,8 @@ const jsonBlock = `
         "title": "Mortal Kombat Legends: Battle of the Realms",
         "video": false,
         "vote_average": 8,
-        "vote_count": 138
+        "vote_count": 138,
+		"release_year": 2021,
     }
 ]
  </code>

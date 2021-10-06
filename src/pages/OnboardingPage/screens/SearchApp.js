@@ -8,7 +8,6 @@ import {
 	ReactiveList,
 	ResultList,
 	SelectedFilters,
-	DateRange,
 } from '@appbaseio/reactivesearch';
 
 import appbaseHelpers from '../utils/appbaseHelpers';
@@ -54,17 +53,17 @@ const renderFilters = (fields) => {
 						/>
 					);
 				}
-				case 'release_date': {
+				case 'release_year': {
 					return (
-						<DateRange
+						<DynamicRangeSlider
 							key={field}
 							componentId={field}
 							dataField={field}
-							title="Release Date"
-							placeholder={{
-								start: 'Start Date',
-								end: 'End Date',
-							}}
+							title="Release Year"
+							rangeLabels={(min, max) => ({
+								start: min,
+								end: max,
+							})}
 							react={{
 								and: ['search', 'genres', 'vote_average'],
 							}}
