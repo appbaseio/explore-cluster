@@ -18,6 +18,7 @@ const modalStyles = css`
 		min-height: 100%;
 		.ant-modal-body {
 			padding: 0;
+			overflow-x: hidden;
 		}
 	}
 	@media (max-width: 767px) {
