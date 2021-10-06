@@ -191,7 +191,6 @@ class PreferenceForm extends React.Component {
 													))}
 											</Select>
 										}
-										gridRatio={gridRatio}
 									/>
 								);
 							}}
@@ -296,7 +295,7 @@ class PreferenceForm extends React.Component {
 									component={
 										<Input
 											data-cy="min-count"
-											{...handler()}
+											// {...handler()}
 											defaultValue={value}
 											value={value}
 											type="number"

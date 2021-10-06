@@ -64,8 +64,8 @@ class QuerySuggestions extends React.Component {
 		this.form = FormBuilder.group({
 			blacklist: [[]],
 			externalSuggestions: null,
-			minCount: [1, [Validators.required, Validators.min(0), Validators.max(1000)]],
-			minHits: [5, [Validators.required, Validators.min(0)]],
+			minCount: [3, [Validators.required, Validators.min(0), Validators.max(1000)]],
+			minHits: [3, [Validators.required, Validators.min(0)]],
 			numberOfDays: [30, [Validators.required, Validators.min(1), Validators.max(365)]],
 			minCharacters: [3, [Validators.required, Validators.min(1)]],
 			size: [3, [Validators.required, Validators.min(1), Validators.max(10)]],
@@ -82,9 +82,9 @@ class QuerySuggestions extends React.Component {
 						externalSuggestions: payload.externalSuggestions,
 						minCount: parseInt(payload.minCount, 10) || 0,
 						minHits: parseInt(payload.minHits, 10) || 0,
-						numberOfDays: parseInt(payload.numberOfDays, 10) || 0,
-						minCharacters: parseInt(payload.minCharacters, 10) || 3,
-						size: parseInt(payload.size, 10) || 3,
+						numberOfDays: payload.numberOfDays || 0,
+						minCharacters: parseInt(payload.minCharacters, 10) || 0,
+						size: parseInt(payload.size, 10) || 0,
 						indices: payload.indices || { value: ['*'], disabled: false },
 						transformDiacritics: payload.transformDiacritics,
 					});
@@ -129,8 +129,15 @@ class QuerySuggestions extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { errors } = this.props;
+		const { errors, apps } = this.props;
 		displayErrors(errors, prevProps.errors, true);
+		if(prevProps.apps !== apps) {
+			this.setState({
+				indices: Object.keys(apps)
+						.sort()
+						.filter((i) => !i.startsWith('.') && !i.startsWith('metricbeat'))
+			})
+		}
 	}
 
 	componentWillUnmount() {
@@ -179,10 +186,9 @@ class QuerySuggestions extends React.Component {
 	};
 
 	render() {
-		const { isLoading, preferences, tier, featureSuggestions, hide } = this.props;
+		const { isLoading, preferences, tier, featureSuggestions, hide, apps } = this.props;
 		const { indices, total } = this.state;
 
-		console.log("indices-pop", indices);
 		if (isLoading && !preferences) {
 			return <Loader />;
 		}

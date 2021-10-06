@@ -71,7 +71,7 @@ class QuerySuggestions extends React.Component {
 			showDistinctSuggestions: false,
 			enablePredictiveSuggestions: false,
 			enableSynonyms: false,
-			size: [3, [Validators.required, Validators.min(1), Validators.max(10)]],
+			size: [5, [Validators.required, Validators.min(1), Validators.max(10)]],
 			indices: [{ value: ['*'], disabled: false }],
 		});
 		if (isValidPlan(props.tier, props.featureSuggestions)) {
@@ -91,7 +91,7 @@ class QuerySuggestions extends React.Component {
 						showDistinctSuggestions: payload.showDistinctSuggestions || false,
 						enablePredictiveSuggestions: payload.enablePredictiveSuggestions || false,
 						enableSynonyms: payload.enableSynonyms || false,
-						size: parseInt(payload.size, 10) || 0,
+						size: parseInt(payload.size, 10) || 5,
 						indices: payload.indices || { value: ['*'], disabled: false },
 					});
 				}

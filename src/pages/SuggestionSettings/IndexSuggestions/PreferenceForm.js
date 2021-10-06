@@ -217,6 +217,7 @@ class PreferenceForm extends React.Component {
 			appName,
 			appStoredQueries,
 		} = this.props;
+
 		const { visible, app, aggregationField, customQueryField, aggregationFields } = this.state;
 		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
 
@@ -256,7 +257,7 @@ class PreferenceForm extends React.Component {
 				strict={false}
 				render={({ pristine, invalid: invalidForm }) => (
 					<div css={modal}>
-						<FieldControl
+						{/* <FieldControl
 							name="indices"
 							render={({ handler, value }) => {
 								const inputHandler = handler();
@@ -306,7 +307,7 @@ class PreferenceForm extends React.Component {
 									/>
 								);
 							}}
-						/>
+						/> */}
 						<FieldControl
 							name="showDistinctSuggestions"
 							render={({ handler, value }) => (
@@ -746,70 +747,6 @@ class PreferenceForm extends React.Component {
 								/>
 							)}
 						/>
-						{/* <FieldControl
-							name="url"
-							render={({ handler, value }) => (
-								<Grid
-									label={
-										<p css={styles.labelContainer}>
-											URL
-											<Popover
-												content={content(
-													Messages.url,
-												)}
-												css={styles.iconContainer}
-											>
-												<Icon type="info-circle" />
-											</Popover>
-										</p>
-									}
-									component={
-										<MappingWrapper {...handler()}>
-											{({ flattenUsecase, flattenType }) => (
-												<React.Fragment>
-													{localRelevancy &&
-													this.getAggsField({ flattenUsecase, flattenType }).length >
-														0 ? (
-														<div
-															style={{
-																position: 'relative',
-																display: 'inline-block',
-															}}
-														>
-															<Select
-																showSearch
-																data-cy="url-index-settings"
-																style={{ width: 300 }}
-																value={value}
-																placeholder="Add url from schema"
-																onChange={(field) => {
-																	this.updateToAggsField({
-																		field: 'url',
-																		path: field,
-																		flattenType,
-																	});
-																	handler().onChange(field);
-																}}
-															>
-																{this.getAggsField({
-																	flattenUsecase,
-																	flattenType,
-																}).map((field) => (
-																	<Select.Option key={field} value={field} data-cy={field}>
-																		{field}
-																	</Select.Option>
-																))}
-															</Select>
-														</div>
-													) : null}
-												</React.Fragment>
-											)}
-										</MappingWrapper>
-									}
-									gridRatio={gridRatio}
-								/>
-							)}
-						/> */}
 						<FieldControl
 							name="customQuery"
 							render={({ handler, value }) => {
