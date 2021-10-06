@@ -28,7 +28,7 @@ const jsonBlock = `
         "video": false,
         "vote_average": 7.9,
         "vote_count": 7001,
-		"release_year": 2021,
+        "release_year": 2021,
     },
     {
         "adult": false,
@@ -45,7 +45,7 @@ const jsonBlock = `
         "video": false,
         "vote_average": 8,
         "vote_count": 138,
-		"release_year": 2021,
+        "release_year": 2021,
     }
 ]
  </code>
