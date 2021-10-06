@@ -36,7 +36,7 @@ import { getErrorClass, getErrorCount, getErrorMessage, getErrorMessages } from 
 import { getURL } from '../../constants/config';
 import { addQueryRule, deleteRule, getRules, putRule } from '../../batteries/modules/actions/rules';
 import PreviewPage from './PreviewPage';
-import { getUsageStats } from '../../batteries/modules/actions';
+import { getUsageStats, setSearchState } from '../../batteries/modules/actions';
 
 import CloneRule from './components/CloneRule';
 import Info from '../../components/Info';
@@ -57,7 +57,7 @@ import { getSingleFunction } from '../../batteries/utils/app';
 import { isValidPlan } from '../../batteries/utils';
 import { AdvancedEditor, CustomAutoComplete } from '../../components/AdvancedEditor';
 import { getRawQuery, parseExpression } from '../../components/AdvancedEditor/helper';
-import { setSearchState } from '../../batteries/modules/actions';
+
 import { allowedTiers } from '../../utils/prop-types';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 
@@ -716,7 +716,9 @@ class QueryRulesForm extends React.Component {
 		const ACC_API = getURL();
 		const payload = {
 			query: [],
-			settings: {},
+			settings: {
+				enableQueryRules: false,
+			},
 		};
 
 		if (condition === 'always') {
@@ -753,8 +755,6 @@ class QueryRulesForm extends React.Component {
 				show_advance_editor,
 				actions,
 			};
-		} else {
-			payload.settings.enableQueryRules = false;
 		}
 
 		if (mode === 'save') {
