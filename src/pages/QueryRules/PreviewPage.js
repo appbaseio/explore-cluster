@@ -37,7 +37,7 @@ function PreviewPage({ showModal, handleCancel, selectedIndexes, previewType, on
 	return (
 		<div>
 			<Modal
-				title="Preview"
+				title="Query Rules Preview"
 				visible={visible}
 				okText="Save"
 				onOk={handleCancel}
