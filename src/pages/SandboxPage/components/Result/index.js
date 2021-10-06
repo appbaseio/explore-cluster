@@ -43,6 +43,7 @@ class Result extends React.Component {
 			onChange,
 			value,
 			selectButtonLabel,
+			page,
 		} = this.props;
 		const { view } = this.state;
 		return (
@@ -98,14 +99,16 @@ class Result extends React.Component {
 					}}
 				/>
 				<Row type="flex" justify="space-between" align="middle">
-					<Link to={`/app/${app}/results/`}>
-						<Tooltip title={settingsMap.set_result.description}>
-							<Button ghost type="primary">
-								<Icon type="edit" />
-								{settingsMap.set_result.title}
-							</Button>
-						</Tooltip>
-					</Link>
+					{page !== 'rules' && (
+						<Link to={`/app/${app}/results/`}>
+							<Tooltip title={settingsMap.set_result.description}>
+								<Button ghost type="primary">
+									<Icon type="edit" />
+									{settingsMap.set_result.title}
+								</Button>
+							</Tooltip>
+						</Link>
+					)}
 					<Radio.Group value={view} onChange={this.handleViewChange}>
 						<Radio.Button value="list">
 							<Icon style={{ marginRight: 5 }} type="unordered-list" />
@@ -141,6 +144,7 @@ Result.propTypes = {
 	selectButtonLabel: PropTypes.string,
 	onChange: PropTypes.func,
 	value: PropTypes.array,
+	page: PropTypes.string,
 };
 
 Result.defaultProps = {
@@ -150,6 +154,7 @@ Result.defaultProps = {
 	selectButtonLabel: undefined,
 	onChange: () => {},
 	value: [],
+	page: '',
 };
 
 export default Result;

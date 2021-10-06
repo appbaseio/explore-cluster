@@ -7,7 +7,7 @@ import { MultiList } from '@appbaseio/reactivesearch';
 import settingsMap from '../../../components/ReviewAndSave/helper';
 
 const Filter = (props) => {
-	const { app, aggs, handleValueChange, handleModal } = props;
+	const { app, aggs, handleValueChange, handleModal, page } = props;
 
 	return (
 		<React.Fragment>
@@ -37,18 +37,19 @@ const Filter = (props) => {
 					</Card>
 				);
 			})}
-
-			<Link
-				onClick={window.location.pathname === `/app/${app}/aggs` ? handleModal : null}
-				to={`/app/${app}/aggs`}
-			>
-				<Tooltip title={settingsMap.set_aggs.description}>
-					<Button style={{ marginTop: 8 }} block type="primary">
-						<Icon type="edit" />
-						{settingsMap.set_aggs.title}
-					</Button>
-				</Tooltip>
-			</Link>
+			{page !== 'rules' && (
+				<Link
+					onClick={window.location.pathname === `/app/${app}/aggs` ? handleModal : null}
+					to={`/app/${app}/aggs`}
+				>
+					<Tooltip title={settingsMap.set_aggs.description}>
+						<Button style={{ marginTop: 8 }} block type="primary">
+							<Icon type="edit" />
+							{settingsMap.set_aggs.title}
+						</Button>
+					</Tooltip>
+				</Link>
+			)}
 		</React.Fragment>
 	);
 };
@@ -58,12 +59,14 @@ Filter.propTypes = {
 	app: PropTypes.string.isRequired,
 	handleValueChange: PropTypes.func,
 	handleModal: PropTypes.func,
+	page: PropTypes.string,
 };
 
 Filter.defaultProps = {
 	aggs: [],
 	handleValueChange: () => {},
 	handleModal: () => {},
+	page: '',
 };
 
 export default React.memo(Filter);

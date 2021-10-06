@@ -356,6 +356,7 @@ class SearchPreview extends React.Component {
 			onChange,
 			value,
 			selectButtonLabel,
+			page,
 		} = this.props;
 
 		const {
@@ -469,6 +470,7 @@ class SearchPreview extends React.Component {
 								app={app}
 								aggs={aggregations}
 								handleModal={handleModal}
+								page={page}
 							/>
 						</ErrorToaster>
 					</Col>
@@ -483,6 +485,7 @@ class SearchPreview extends React.Component {
 								onValueChange={this.setQueryGrades}
 								search={search}
 								handleModal={handleModal}
+								page={page}
 							/>
 						</ErrorToaster>
 
@@ -509,6 +512,7 @@ class SearchPreview extends React.Component {
 									selectButtonLabel={selectButtonLabel}
 									onChange={onChange}
 									value={value}
+									page={page}
 								/>
 							</SandboxContext.Provider>
 						</ErrorToaster>
@@ -572,6 +576,7 @@ SearchPreview.propTypes = {
 	value: PropTypes.array,
 	selectButtonLabel: PropTypes.string,
 	appbaseVersion: PropTypes.string.isRequired, // eslint-disable-line
+	page: PropTypes.string,
 };
 
 SearchPreview.defaultProps = {
@@ -592,6 +597,7 @@ SearchPreview.defaultProps = {
 	onChange: () => {},
 	value: [],
 	selectButtonLabel: undefined,
+	page: '',
 };
 
 export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(SearchPreview));

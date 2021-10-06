@@ -48,14 +48,14 @@ function PreviewPage({ showModal, handleCancel, selectedIndexes, previewType, on
 				className={modalStyles}
 			>
 				{previewType === 'preview' ? (
-					<SearchPreview app={selectedIndexes.join(',')} />
+					<SearchPreview app={selectedIndexes.join(',')} page="rules" />
 				) : (
 					<Tabs defaultActiveKey="1" onChange={onChange}>
 						<TabPane tab="Without rule applied" key="1">
-							<SearchPreview app={selectedIndexes.join(',')} />
+							<SearchPreview app={selectedIndexes.join(',')} page="rules" />
 						</TabPane>
 						<TabPane tab="With rule applied" key="2">
-							<SearchPreview app={selectedIndexes.join(',')} />
+							<SearchPreview app={selectedIndexes.join(',')} page="rules" />
 						</TabPane>
 					</Tabs>
 				)}
