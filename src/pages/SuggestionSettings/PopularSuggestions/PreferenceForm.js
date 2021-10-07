@@ -17,7 +17,7 @@ import {
 } from '../../../batteries/modules/actions';
 import SearchPreviewSwitcher from '../../../components/SearchPreviewSwitcher';
 import styles from '../styles';
-import ReviewAndSave from '../../../components/ReviewAndSave';
+import Footer from '../Footer';
 
 const calculateValue = (value) => {
 	const index = value.indexOf('*');
@@ -53,27 +53,33 @@ class PreferenceForm extends React.Component {
 	state = {
 		visible: false,
 		selectedIndices: [],
+		isUpdating: false,
+		popularSuggestions: {},
 	};
 
 	componentDidMount() {
-		const {
-			settings,
-			localRelevancy,
-			defaultSettings,
-			getSettingsAction,
-			getDefaultSettingsAction,
-			appName,
-		} = this.props;
+		// const {
+		// 	settings,
+		// 	localRelevancy,
+		// 	defaultSettings,
+		// 	getSettingsAction,
+		// 	getDefaultSettingsAction,
+		// 	appName,
+		// } = this.props;
 
-		if (settings && !localRelevancy) {
-			this.init({ ...settings });
-		} else {
-			getSettingsAction(appName);
-		}
+		// if (settings && !localRelevancy) {
+		// 	this.init({ ...settings });
+		// } else {
+		// 	getSettingsAction(appName);
+		// }
 
-		if (!defaultSettings) getDefaultSettingsAction();
+		// if (!defaultSettings) getDefaultSettingsAction();
 
+		const {control} = this.props;
 		this.getMappings();
+		this.setState({
+			popularSuggestions: control
+		})
 	}
 
 	toggleVisibility = () => {
@@ -87,17 +93,36 @@ class PreferenceForm extends React.Component {
 	};
 
 	handleChange = (key, value, dataKey) => {
-		const { appName, localRelevancy, updateLocalRelevancy } = this.props;
+		// const { appName, localRelevancy, updateLocalRelevancy } = this.props;
+		// const { selectedIndices } = this.state;
 
-		if (localRelevancy) {
-			updateLocalRelevancy(appName, {
-				...localRelevancy,
-				[dataKey]: {
-					...get(localRelevancy, dataKey),
-					[key]: value,
-				},
-			});
+		// selectedIndices.forEach((index) => {
+		// 	updateLocalRelevancy(index, {
+		// 		...localRelevancy,
+		// 		[dataKey]: {
+		// 			...get(localRelevancy, dataKey),
+		// 			[key]: value,
+		// 		},
+		// 	});
+		// })
+		// if (localRelevancy) {
+		// 	updateLocalRelevancy(appName, {
+		// 		...localRelevancy,
+		// 		[dataKey]: {
+		// 			...get(localRelevancy, dataKey),
+		// 			[key]: value,
+		// 		},
+		// 	});
+		// }
+		const { popularSuggestions } = this.state;
+		const newPopularSuggestions = {
+			...popularSuggestions,
+			[key]: value,
 		}
+		this.setState({
+			popularSuggestions: newPopularSuggestions
+		})
+
 	};
 
 	init = (settings) => {
@@ -117,41 +142,20 @@ class PreferenceForm extends React.Component {
 
 	render() {
 		const { control, handleSaveTemplate, isLoading, indices, apps, localRelevancy } = this.props;
-		const { visible, app } = this.state;
+		const { visible, app, isUpdating, popularSuggestions } = this.state;
 		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
-		const {
-			numberOfDays,
-			minCount,
-			minHits,
-			minCharacters,
-			transformDiacritics,
-			size,
-			blacklist,
-			externalSuggestions,
-		} = get(localRelevancy, 'popularSuggestions', {
-			numberOfDays: 0,
-			minCount: 0,
-			minHits: 0,
-			minCharacters: 0,
-			transformDiacritics: false,
-			size: 0,
-			blacklist: [],
-			externalSuggestions: '',
-		});
-
-		console.log(indices, "hgvhgvjiuhgj");
 
 		return (
 			<FieldGroup
 				control={control}
 				strict={false}
-				render={({ pristine, invalid: invalidForm }) => (
+				render={({ pristine, invalid: invalidForm }) => {
+					return (
 					<div css={modal}>
 						<FieldControl
 							name="indices"
 							render={({ handler, value }) => {
 								const inputHandler = handler();
-								console.log(value, "val");
 								return (
 									<Grid
 										label={
@@ -175,7 +179,6 @@ class PreferenceForm extends React.Component {
 												value={value}
 												{...inputHandler}
 												onChange={(val) => {
-													// console.log("indices:", val);
 													inputHandler.onChange(calculateValue(val));
 													this.setState({
 														selectedIndices: val,
@@ -197,52 +200,6 @@ class PreferenceForm extends React.Component {
 								);
 							}}
 						/>
-						{/* <FieldControl
-							name="indices"
-							render={({ handler, value }) => {
-								const inputHandler = handler();
-								return (
-									<Grid
-										label={
-											<p css={styles.labelContainer}>
-												Indices
-												<Popover
-													content={content(Messages.indices)}
-													css={styles.iconContainer}
-												>
-													<Icon type="info-circle" />
-												</Popover>
-											</p>
-										}
-										component={
-											<Select
-												data-cy="popular-suggestions-indices"
-												placeholder="Enter indices"
-												mode="tags"
-												style={{ width: '100%' }}
-												tokenSeparators={[',']}
-												value={value}
-												{...inputHandler}
-												onChange={(val) => {
-													inputHandler.onChange(calculateValue(val));
-													const { settings } = this.props;
-													this.init({ ...settings });
-												}}
-											>
-												<Select.Option value="*">All (*)</Select.Option>
-												{indices
-													.filter((i) => !i.startsWith('metricbeat'))
-													.map((index) => (
-														<Select.Option key={index}>
-															{index}
-														</Select.Option>
-													))}
-											</Select>
-										}
-									/>
-								);
-							}}
-						/> */}
 						<FieldControl
 							name="numberOfDays"
 							render={({ handler, value }) => (
@@ -583,11 +540,16 @@ class PreferenceForm extends React.Component {
 								>
 									Save
 								</Button>
-								<ReviewAndSave />
+								{/* <Footer
+									originalData={initialData}
+									tab='popular-suggestions'
+									changedData={popularSuggestions}
+								/> */}
 							</div>
 						</Affix>
 					</div>
-				)}
+				)
+			}}
 			/>
 		);
 	}
@@ -608,13 +570,12 @@ PreferenceForm.defaultProps = {
 
 const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');
-
 	return {
 		isLoading: get(state, '$saveSuggestionsPreferences.isFetching', false),
 		appName: get(state, '$getCurrentApp.name'),
 		apps: get(state, 'apps.data'),
 		settings: get(state, ['$getAppSettings', 'settings', appName]),
-		localRelevancy: get(state, ['$getLocalRelevancy', appName], null),
+		localRelevancy: get(state, ['$getLocalRelevancy'], null),
 	}
 };
 
