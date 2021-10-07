@@ -257,7 +257,7 @@ class PreferenceForm extends React.Component {
 				strict={false}
 				render={({ pristine, invalid: invalidForm }) => (
 					<div css={modal}>
-						{/* <FieldControl
+						<FieldControl
 							name="indices"
 							render={({ handler, value }) => {
 								const inputHandler = handler();
@@ -307,7 +307,7 @@ class PreferenceForm extends React.Component {
 									/>
 								);
 							}}
-						/> */}
+						/>
 						<FieldControl
 							name="showDistinctSuggestions"
 							render={({ handler, value }) => (

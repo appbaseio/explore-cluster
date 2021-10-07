@@ -139,16 +139,19 @@ class PreferenceForm extends React.Component {
 			externalSuggestions: '',
 		});
 
+		console.log(indices, "hgvhgvjiuhgj");
+
 		return (
 			<FieldGroup
 				control={control}
 				strict={false}
 				render={({ pristine, invalid: invalidForm }) => (
 					<div css={modal}>
-						{/* <FieldControl
+						<FieldControl
 							name="indices"
 							render={({ handler, value }) => {
 								const inputHandler = handler();
+								console.log(value, "val");
 								return (
 									<Grid
 										label={
@@ -183,7 +186,6 @@ class PreferenceForm extends React.Component {
 											>
 												<Select.Option value="*">All (*)</Select.Option>
 												{indices
-													.filter((i) => !i.startsWith('metricbeat') && !i.startsWith('.'))
 													.map((index) => (
 														<Select.Option key={index}>
 															{index}
@@ -194,7 +196,7 @@ class PreferenceForm extends React.Component {
 									/>
 								);
 							}}
-						/> */}
+						/>
 						{/* <FieldControl
 							name="indices"
 							render={({ handler, value }) => {

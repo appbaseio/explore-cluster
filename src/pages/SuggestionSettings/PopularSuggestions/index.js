@@ -57,7 +57,8 @@ class QuerySuggestions extends React.Component {
 			indices: props.apps
 				? Object.keys(props.apps)
 						.sort()
-						.filter((i) => !i.startsWith('.'))
+						.filter((i) => !i.startsWith('.') && !i.startsWith('metricbeat')
+						)
 				: [],
 			total: undefined,
 		};
@@ -70,7 +71,7 @@ class QuerySuggestions extends React.Component {
 			minCharacters: [3, [Validators.required, Validators.min(1)]],
 			size: [3, [Validators.required, Validators.min(1), Validators.max(10)]],
 			transformDiacritics: false,
-			indices: [{ value: ['*'], disabled: false }],
+			indices: [['*']],
 		});
 		if (isValidPlan(props.tier, props.featureSuggestions)) {
 			props.getPreferences().then((action) => {
@@ -85,7 +86,7 @@ class QuerySuggestions extends React.Component {
 						numberOfDays: payload.numberOfDays || 0,
 						minCharacters: parseInt(payload.minCharacters, 10) || 0,
 						size: parseInt(payload.size, 10) || 0,
-						indices: payload.indices || { value: ['*'], disabled: false },
+						indices: payload.indices || ['*'],
 						transformDiacritics: payload.transformDiacritics,
 					});
 				}

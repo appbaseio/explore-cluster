@@ -72,7 +72,7 @@ class QuerySuggestions extends React.Component {
 			enablePredictiveSuggestions: false,
 			enableSynonyms: false,
 			size: [5, [Validators.required, Validators.min(1), Validators.max(10)]],
-			indices: [{ value: ['*'], disabled: false }],
+			indices: [['*']],
 		});
 		if (isValidPlan(props.tier, props.featureSuggestions)) {
 			props.getPreferences().then((action) => {
@@ -92,7 +92,7 @@ class QuerySuggestions extends React.Component {
 						enablePredictiveSuggestions: payload.enablePredictiveSuggestions || false,
 						enableSynonyms: payload.enableSynonyms || false,
 						size: parseInt(payload.size, 10) || 5,
-						indices: payload.indices || { value: ['*'], disabled: false },
+						indices: payload.indices || ['*'],
 					});
 				}
 			});
