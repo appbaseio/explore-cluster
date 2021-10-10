@@ -2,12 +2,11 @@ import React from 'react';
 import { Tabs } from 'antd';
 import { connect } from 'react-redux';
 import { container } from '../ResultsPage/styles';
-import PreferencesFormWrapper from '../IntegrationsPage/PreferencesFormWraper';
-import SyncStatus from '../IntegrationsPage/SyncStatus';
 import PopularSuggestions from './PopularSuggestions/index';
 import RecentSuggestions from './RecentSuggestions';
 import IndexSuggestions from './IndexSuggestions';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
+import Overlay from '../../components/Overlay';
 import { isValidPlan } from '../../batteries/utils';
 import get from 'lodash/get';
 

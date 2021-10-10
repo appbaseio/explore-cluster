@@ -1,0 +1,199 @@
+import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import styled from 'react-emotion';
+import { Button, Modal } from 'antd';
+import get from 'lodash/get';
+import { diff } from 'jsondiffpatch';
+import DiffList from '../../components/ReviewAndSave/DiffList';
+
+const Badge = styled.span`
+     background: #f5222d;
+     color: #fff;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     position: absolute;
+     top: -10px;
+     right: 0px;
+     height: 25px;
+     width: 25px;
+     border-radius: 50%;
+     z-index: 100;
+ `;
+
+const ReviewAndSave = ({oldData, newData}) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [isResetting, setIsResetting] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+
+    useEffect(() => {
+        console.log("bhgbvhgv", oldData, newData);
+        setIsOpen(isResetting);
+    }, [isResetting]);
+
+    const showModal = () => {
+        setIsOpen(true);
+    };
+
+    const handleCancel = () => {
+        setIsOpen(false);
+        setIsResetting(false);
+    };
+
+    const onResetToDefault = () => {
+        setIsResetting(true)
+    };
+
+    const handleSave = () => {
+        setIsSaving(true);
+
+    }
+
+    const getDiffData = (oldObj, newObj) => {
+        console.log(oldObj, newObj, "faiusgdajsgdjsdkgaweiuydfaweiuygdfakuefgauywfguweagfuiywaegfiuy");
+        let diffData = diff({ ...oldObj }, { ...newObj });
+        if (!diffData) {
+            return [0, {}];
+        }
+
+        if (get(diffData, 'indexSuggestions.customStopwords', null)) {
+            const newVal = get(newObj, 'indexSuggestions.customStopwords', []);
+            const oldVal = get(oldObj, 'indexSuggestions.customStopwords', []);
+
+            diffData = {
+                ...diffData,
+                indexSuggestions: {
+                    ...diffData.indexSuggestions,
+                    customStopwords: [oldVal.join(', '), newVal.join(', ')],
+                },
+            };
+        }
+
+
+        if (get(diffData, 'indexSuggestions.includeFields', null)) {
+            const newVal = get(newObj, 'indexSuggestions.includeFields', []);
+            const oldVal = get(oldObj, 'indexSuggestions.includeFields', []);
+            diffData = {
+                ...diffData,
+                indexSuggestions: {
+                    ...diffData.indexSuggestions,
+                    includeFields: [oldVal.join(', '), newVal.join(', ')],
+                },
+            };
+        }
+
+        if (get(diffData, 'indexSuggestions.excludeFields', null)) {
+            const newVal = get(newObj, 'indexSuggestions.excludeFields', []);
+            const oldVal = get(oldObj, 'indexSuggestions.excludeFields', []);
+
+            diffData = {
+                ...diffData,
+                indexSuggestions: {
+                    ...diffData.indexSuggestions,
+                    excludeFields: [oldVal.join(', '), newVal.join(', ')],
+                },
+            };
+        }
+
+        if (get(diffData, 'popularSuggestions.blacklist', null)) {
+           const newVal = get(newObj, 'popularSuggestions.blacklist', []);
+           const oldVal = get(oldObj, 'popularSuggestions.blacklist', []);
+
+           diffData = {
+               ...diffData,
+               popularSuggestions: {
+                   ...diffData.popularSuggestions,
+                   blacklist: [oldVal.join(', '), newVal.join(', ')],
+               },
+           };
+       }
+
+       diffData = {
+            popularSuggestions: get(diffData, 'popularSuggestions', {}),
+            recentSuggestions: get(diffData, 'recentSuggestions', {}),
+            indexSuggestions: get(diffData, 'indexSuggestions', {}),
+        };
+
+        // filter empty fields
+        diffData = Object.keys(diffData).reduce((agg, item) => {
+            if (Object.keys(diffData[item]).length) {
+                return {
+                    ...agg,
+                    [item]: {
+                        ...diffData[item],
+                    },
+                };
+            }
+            return agg;
+        }, {});
+
+        const topLevelFields = Object.keys(diffData);
+        const diffCount = topLevelFields.reduce((agg, item) => {
+            const data = diffData[item];
+            const count =
+                agg +
+                Object.keys(data || {}).reduce((sum) => {
+                    return sum + 1;
+                }, 0);
+
+            return count;
+        }, 0);
+
+        return [diffCount, diffData];
+
+    }
+
+    const [diffCount, diffData] = getDiffData(oldData, newData);
+
+    return (
+        <div>
+            <div style={{ position: 'relative' }}>
+                {diffCount > 0 && (
+                    <Badge>{diffCount}</Badge>
+                )}
+                <Button
+                    style={{ marginRight: 10 }}
+                    size="large"
+                    type="primary"
+                    disabled={!diffCount }
+                    onClick={showModal}
+                    data-cy="review-deploy-suggestion-settings"
+                >
+                    Review and Deploy
+                </Button>
+            </div>
+            <Modal
+                visible={isOpen}
+                title={
+                    'Review Settings Before Deploying'
+                }
+                onOk={handleSave}
+                width={1000}
+                style={{
+                    top: 20,
+                }}
+                destroyOnClose
+                okText="Review and Save"
+                confirmLoading={isSaving}
+                onCancel={handleCancel}
+                cancelButtonProps={{ 'data-cy': 'cancel-modal-button' }}
+                okButtonProps={{
+                    'data-cy': 'review-save-button',
+                }}
+            >
+                <>
+                    {/* {isOpen && <DiffList diff={diffData} />} */}
+                </>
+            </Modal>
+        </div>
+
+
+    )
+}
+
+ReviewAndSave.propTypes = {
+    oldData: PropTypes.object.isRequired,
+    newData: PropTypes.object.isRequired,
+};
+
+export default ReviewAndSave;

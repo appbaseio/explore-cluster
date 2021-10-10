@@ -16,7 +16,6 @@ import {
 } from '../../../batteries/modules/actions';
 import PreferenceForm from './PreferenceForm';
 import { isValidPlan } from '../../../batteries/utils';
-import Overlay from '../../../components/Overlay';
 import { getURL } from '../../../constants/config';
 import { getAuthToken } from '../../../batteries/components/analytics/utils';
 import Flex from '../../../batteries/components/shared/Flex';
@@ -83,9 +82,9 @@ class QuerySuggestions extends React.Component {
 						externalSuggestions: payload.externalSuggestions,
 						minCount: parseInt(payload.minCount, 10) || 0,
 						minHits: parseInt(payload.minHits, 10) || 0,
-						numberOfDays: payload.numberOfDays || 0,
-						minCharacters: parseInt(payload.minCharacters, 10) || 0,
-						size: parseInt(payload.size, 10) || 0,
+						numberOfDays: payload.numberOfDays || 1,
+						minCharacters: parseInt(payload.minCharacters, 10) || 3,
+						size: parseInt(payload.size, 10) || 3,
 						indices: payload.indices || ['*'],
 						transformDiacritics: payload.transformDiacritics,
 					});
