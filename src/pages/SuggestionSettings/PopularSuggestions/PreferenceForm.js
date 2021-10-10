@@ -10,7 +10,6 @@ import Grid from '../../../components/CreateCredentials/Grid';
 import Ace from '../../../batteries/components/SearchSandbox/containers/AceEditor';
 import { suggestionsMessages as Messages } from '../../../utils/messages';
 import {
-	setLocalRelevancyState,
 	getAppMappings,
 	getSettings,
 	getDefaultSettings,
@@ -50,70 +49,41 @@ const content = (message) => {
 };
 
 class PreferenceForm extends React.Component {
-	state = {
-		visible: false,
-		selectedIndices: [],
-		isUpdating: false,
-		popularSuggestions: {},
-	};
-
-	componentDidMount() {
-		// const {
-		// 	settings,
-		// 	localRelevancy,
-		// 	defaultSettings,
-		// 	getSettingsAction,
-		// 	getDefaultSettingsAction,
-		// 	appName,
-		// } = this.props;
-
-		// if (settings && !localRelevancy) {
-		// 	this.init({ ...settings });
-		// } else {
-		// 	getSettingsAction(appName);
-		// }
-
-		// if (!defaultSettings) getDefaultSettingsAction();
-
-		const {initialData} = this.props;
-		this.getMappings();
-		this.setState({
-			popularSuggestions: initialData
-		})
+	constructor(props) {
+		super(props);
+		this.state = {
+			visible: false,
+			selectedIndices: [],
+			popularSuggestions: props.initialData,
+		};
 	}
 
-	toggleVisibility = () => {
-		this.setState((prevState) => ({
-			visible: !prevState.visible,
-		}));
-	};
+	componentDidMount() {
+		this.getMappings();
+	}
+
+	componentDidUpdate(prevProps) {
+		const { initialData } = this.props;
+		if (prevProps.initialData !== initialData) {
+			this.setState({
+				popularSuggestions: initialData
+			})
+		}
+	}
 
 	onAppSelect = (app) => {
 		this.setState({ app, visible: true });
 	};
 
-	handleChange = (key, value, dataKey) => {
-		// const { appName, localRelevancy, updateLocalRelevancy } = this.props;
-		// const { selectedIndices } = this.state;
+	getMappings() {
+		const { appName, fetchMappings, credentials, mappings } = this.props;
+		if (credentials && get(mappings, 'length') === 0) {
+			// Fetch Mappings if permissions are present
+			fetchMappings(appName, credentials);
+		}
+	}
 
-		// selectedIndices.forEach((index) => {
-		// 	updateLocalRelevancy(index, {
-		// 		...localRelevancy,
-		// 		[dataKey]: {
-		// 			...get(localRelevancy, dataKey),
-		// 			[key]: value,
-		// 		},
-		// 	});
-		// })
-		// if (localRelevancy) {
-		// 	updateLocalRelevancy(appName, {
-		// 		...localRelevancy,
-		// 		[dataKey]: {
-		// 			...get(localRelevancy, dataKey),
-		// 			[key]: value,
-		// 		},
-		// 	});
-		// }
+	handleChange = (key, value, dataKey) => {
 		const { popularSuggestions } = this.state;
 		const newPopularSuggestions = {
 			...popularSuggestions,
@@ -125,25 +95,16 @@ class PreferenceForm extends React.Component {
 
 	};
 
-	init = (settings) => {
-		const { appName, updateLocalRelevancy, localRelevancy } = this.props;
-		if (!localRelevancy) {
-			updateLocalRelevancy(appName, { ...settings });
-		}
+	toggleVisibility = () => {
+		this.setState((prevState) => ({
+			visible: !prevState.visible,
+		}));
 	};
 
-	getMappings() {
-		const { appName, fetchMappings, credentials, mappings } = this.props;
-		if (credentials && get(mappings, 'length') === 0) {
-			// Fetch Mappings if permissions are present
-			fetchMappings(appName, credentials);
-		}
-	}
-
 	render() {
-		const { control, handleSaveTemplate, isLoading, indices, apps, localRelevancy, initialData } = this.props;
-		const { visible, app, isUpdating, popularSuggestions } = this.state;
-		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
+		const { control, handleSaveTemplate, isLoading, indices, apps, initialData } = this.props;
+		const { visible, app, popularSuggestions } = this.state;
+		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.') && appName.startsWith('metricbeat'));
 
 		return (
 			<FieldGroup
@@ -183,8 +144,6 @@ class PreferenceForm extends React.Component {
 													this.setState({
 														selectedIndices: val,
 													});
-													// const { settings } = this.props;
-													// this.init({ ...settings });
 												}}
 											>
 												<Select.Option value="*">All (*)</Select.Option>
@@ -540,11 +499,11 @@ class PreferenceForm extends React.Component {
 								>
 									Save
 								</Button>
-								{/* <Footer
+								<Footer
 									originalData={initialData}
 									tab='popular-suggestions'
 									changedData={popularSuggestions}
-								/> */}
+								/>
 							</div>
 						</Affix>
 					</div>
@@ -562,10 +521,19 @@ PreferenceForm.propTypes = {
 	indices: PropTypes.array.isRequired,
 	fetchMappings: PropTypes.func.isRequired,
 	apps: PropTypes.object,
+	initialData: PropTypes.object.isRequired,
+	appName: PropTypes.string,
+	mappings: PropTypes.oneOfType([
+		PropTypes.array,
+		PropTypes.object, // at cluster level
+	]),
+	credentials: PropTypes.string.isRequired,
 };
 
 PreferenceForm.defaultProps = {
 	apps: {},
+	appName: undefined,
+	mappings: [],
 };
 
 const mapStateToProps = (state) => {
@@ -575,12 +543,10 @@ const mapStateToProps = (state) => {
 		appName: get(state, '$getCurrentApp.name'),
 		apps: get(state, 'apps.data'),
 		settings: get(state, ['$getAppSettings', 'settings', appName]),
-		localRelevancy: get(state, ['$getLocalRelevancy'], null),
 	}
 };
 
 const mapDispatchToProps = (dispatch) => ({
-	updateLocalRelevancy: (name, data) => dispatch(setLocalRelevancyState(name, data)),
 	fetchMappings: (appName, credentials) => dispatch(getAppMappings(appName, credentials)),
 	getSettingsAction: (name) => dispatch(getSettings(name)),
 	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Button } from 'antd';
 import ReviewAndSave from './ReviewAndSave';
 
 const Footer = ({originalData, tab, changedData}) => {
@@ -19,9 +18,8 @@ const Footer = ({originalData, tab, changedData}) => {
     useEffect(() => {
         const oldData = changeOriginalData();
         setOldObj({...oldData});
-        const newData = changeNewData();
-        setNewObj({...newData});
-    })
+        setNewObj({...oldObj});
+    },[])
 
     useEffect(() => {
         const data = changeNewData();

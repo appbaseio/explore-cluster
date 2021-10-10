@@ -27,7 +27,6 @@ const ReviewAndSave = ({oldData, newData}) => {
     const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
-        console.log("bhgbvhgv", oldData, newData);
         setIsOpen(isResetting);
     }, [isResetting]);
 
@@ -40,17 +39,12 @@ const ReviewAndSave = ({oldData, newData}) => {
         setIsResetting(false);
     };
 
-    const onResetToDefault = () => {
-        setIsResetting(true)
-    };
-
     const handleSave = () => {
         setIsSaving(true);
 
     }
 
     const getDiffData = (oldObj, newObj) => {
-        console.log(oldObj, newObj, "hgvbjkhgvcfvhjkhgv");
         let diffData = diff({ ...oldObj }, { ...newObj });
         if (!diffData) {
             return [0, {}];
@@ -144,7 +138,6 @@ const ReviewAndSave = ({oldData, newData}) => {
     }
 
     const [diffCount, diffData] = getDiffData(oldData, newData);
-
     return (
         <div>
             <div style={{ position: 'relative' }}>
