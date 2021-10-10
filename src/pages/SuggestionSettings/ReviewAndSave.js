@@ -50,7 +50,7 @@ const ReviewAndSave = ({oldData, newData}) => {
     }
 
     const getDiffData = (oldObj, newObj) => {
-        console.log(oldObj, newObj, "faiusgdajsgdjsdkgaweiuydfaweiuygdfakuefgauywfguweagfuiywaegfiuy");
+        console.log(oldObj, newObj, "hgvbjkhgvcfvhjkhgv");
         let diffData = diff({ ...oldObj }, { ...newObj });
         if (!diffData) {
             return [0, {}];
@@ -182,7 +182,7 @@ const ReviewAndSave = ({oldData, newData}) => {
                 }}
             >
                 <>
-                    {/* {isOpen && <DiffList diff={diffData} />} */}
+                    {isOpen && <DiffList diff={diffData} />}
                 </>
             </Modal>
         </div>

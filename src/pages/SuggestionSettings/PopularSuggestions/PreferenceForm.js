@@ -75,10 +75,10 @@ class PreferenceForm extends React.Component {
 
 		// if (!defaultSettings) getDefaultSettingsAction();
 
-		const {control} = this.props;
+		const {initialData} = this.props;
 		this.getMappings();
 		this.setState({
-			popularSuggestions: control
+			popularSuggestions: initialData
 		})
 	}
 
@@ -141,7 +141,7 @@ class PreferenceForm extends React.Component {
 	}
 
 	render() {
-		const { control, handleSaveTemplate, isLoading, indices, apps, localRelevancy } = this.props;
+		const { control, handleSaveTemplate, isLoading, indices, apps, localRelevancy, initialData } = this.props;
 		const { visible, app, isUpdating, popularSuggestions } = this.state;
 		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
 

@@ -48,6 +48,7 @@ const cardStyle = css`
 	}
 `;
 
+let initialData = {};
 class QuerySuggestions extends React.Component {
 	constructor(props) {
 		super(props);
@@ -79,15 +80,38 @@ class QuerySuggestions extends React.Component {
 				if (payload) {
 					this.form.patchValue({
 						blacklist: payload.blacklist || [],
-						externalSuggestions: payload.externalSuggestions,
+						externalSuggestions: payload.externalSuggestions || [],
 						minCount: parseInt(payload.minCount, 10) || 0,
 						minHits: parseInt(payload.minHits, 10) || 0,
-						numberOfDays: payload.numberOfDays || 1,
+						numberOfDays: payload.numberOfDays || 3,
 						minCharacters: parseInt(payload.minCharacters, 10) || 3,
 						size: parseInt(payload.size, 10) || 3,
 						indices: payload.indices || ['*'],
 						transformDiacritics: payload.transformDiacritics,
 					});
+					initialData ={
+						blacklist: payload.blacklist || [],
+						externalSuggestions: payload.externalSuggestions || [],
+						minCount: parseInt(payload.minCount, 10) || 0,
+						minHits: parseInt(payload.minHits, 10) || 0,
+						numberOfDays: payload.numberOfDays || 3,
+						minCharacters: parseInt(payload.minCharacters, 10) || 3,
+						size: parseInt(payload.size, 10) || 3,
+						indices: payload.indices || ['*'],
+						transformDiacritics: payload.transformDiacritics,
+					}
+				} else {
+					initialData = {
+						blacklist: [],
+						externalSuggestions: [],
+						minCount: 0,
+						minHits: 0,
+						numberOfDays: 3,
+						minCharacters:  3,
+						size: 3,
+						indices: ['*'],
+						transformDiacritics: false,
+					}
 				}
 			});
 			fetch(`${getURL()}/.suggestions/_search`, {
@@ -229,6 +253,7 @@ class QuerySuggestions extends React.Component {
 							indices={indices}
 							handleSaveTemplate={this.handleSaveTemplate}
 							control={this.form}
+							initialData={initialData}
 						/>
 					</ErrorToaster>
 				</Container>

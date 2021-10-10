@@ -17,11 +17,14 @@ const Footer = ({originalData, tab, changedData}) => {
     });
 
     useEffect(() => {
-        changeOriginalData();
-        changeNewData(changedData)
+        const oldData = changeOriginalData();
+        setOldObj({...oldData});
+        const newData = changeNewData();
+        setNewObj({...newData});
     })
+
     useEffect(() => {
-        const data = changeNewData(changedData);
+        const data = changeNewData();
         setNewObj({ ...data });
     }, [changedData]);
 
@@ -37,14 +40,14 @@ const Footer = ({originalData, tab, changedData}) => {
         return { ...newOldObj };
     }
 
-    function changeNewData(data) {
+    function changeNewData() {
         const setObj = {...newObj}
         if(tab === 'popular-suggestions') {
-            setObj.popularSuggestions = data;
+            setObj.popularSuggestions = changedData;
         } else if(tab === 'recent-suggestions') {
-            setObj.recentSuggestions = data;
+            setObj.recentSuggestions = changedData;
         } else {
-            setObj.indexSuggestions = data;
+            setObj.indexSuggestions = changedData;
         }
         return { ...setObj };
     }
