@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Typography } from 'antd';
 import Appbase from 'appbase-js';
 import { css } from 'emotion';
-
+import { transformQuery } from '../../utils'
 import SandboxContext from '../SandboxContext';
 import RSPlayground from '../../../../components/RSPlayground';
 
@@ -120,11 +120,12 @@ QueryView.defaultProps = {
 };
 
 const QueryViewWrapper = () => {
+
 	return (
 		<SandboxContext.Consumer>
 			{({ query, recordAnalytics, url, app, credentials }) => (
 				<QueryView
-					query={query}
+					query={transformQuery(query)}
 					recordAnalytics={recordAnalytics}
 					app={app}
 					url={url}
