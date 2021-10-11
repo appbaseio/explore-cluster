@@ -74,12 +74,6 @@ class PreferenceForm extends React.Component {
 		} = this.props;
 
 		fetchStoredQueries();
-		// if (settings && !localRelevancy) {
-		// 	this.init({ ...settings });
-		// } else {
-		// 	getSettingsAction(appName);
-		// }
-		// if (!defaultSettings) getDefaultSettingsAction();
 		this.getMappings();
 	}
 
@@ -108,6 +102,7 @@ class PreferenceForm extends React.Component {
 	}
 
 	handleChange = (key, val, dataKey) => {
+		console.log(key, val, "vguiougfchui");
 		let value = val;
 		if (key === 'customStopwords') {
 			value = val.split(',').map((i) => removeWhiteSpaces(i));
@@ -154,8 +149,20 @@ class PreferenceForm extends React.Component {
 			appStoredQueries,
 		} = this.props;
 
-		const { visible, app, aggregationField, customQueryField, aggregationFields, indexSuggestions, excludeFields } = this.state;
+
+		const { visible, app, aggregationField, customQueryField, aggregationFields, indexSuggestions } = this.state;
 		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
+		const {
+			excludeFields,
+			includeFields,
+			showDistinctSuggestions,
+			maxPredictedWords,
+			customStopwords,
+			size,
+			customQuery,
+			categoryField,
+			url,
+		} = indexSuggestions;
 
 		let mappingsFromIndices = [];
 		this.state.selectedIndices?.map(index => {
@@ -163,8 +170,8 @@ class PreferenceForm extends React.Component {
 				mappingsFromIndices = [...mappingsFromIndices, ...mappings[index]];
 			}
 		});
+		console.log(indexSuggestions, "indexSuggestions===");
 		let categoryFields = aggregationFields;
-
 		return (
 			<FieldGroup
 				control={control}
