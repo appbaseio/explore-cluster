@@ -266,13 +266,39 @@ class QueryRulesForm extends React.Component {
 			mappings,
 		} = this.props;
 
-		const { isEditPage } = this.state;
+		const {
+			isEditPage,
+			// actions,
+			// condition,
+			// dataField,
+			// dataFieldValue,
+			// description,
+			// enabled,
+			// name,
+			// query,
+			// queryValue,
+			// selectedIndexes,
+		} = this.state;
+
+		// const rule = {
+		// 	actions,
+		// 	condition,
+		// 	dataField,
+		// 	dataFieldValue,
+		// 	description,
+		// 	enabled,
+		// 	name,
+		// 	query,
+		// 	queryValue,
+		// 	selectedIndexes,
+		// }
 
 		if (!Object.keys(prevProps.mappings).length && Object.keys(mappings).length) {
 			this.updateAppMappings();
 		}
 
 		if (isEditPage && prevProps.rule !== rule && !isUpdating) {
+			console.log('rule:', rule);
 			const { show_advance_editor } = rule;
 			const { rawQuery, indexes } = getRawQuery(show_advance_editor, unparsedRule);
 			// eslint-disable-next-line react/no-did-update-set-state
@@ -361,7 +387,6 @@ class QueryRulesForm extends React.Component {
 
 	handleInput = (e) => {
 		const { name, value } = e.target;
-
 		this.setState(
 			(prevState) => ({
 				[name]: value,
@@ -387,11 +412,12 @@ class QueryRulesForm extends React.Component {
 	};
 
 	handleDropdown = (name, value) => {
+		console.log(name, value, 'yuiouyghvjuiuh');
 		this.setState(
 			{
 				[name]: value,
 			},
-			this.fetchPreviewCount,
+			() => this.fetchPreviewCount,
 		);
 	};
 
@@ -821,6 +847,7 @@ class QueryRulesForm extends React.Component {
 			subFieldsMap,
 		} = this.state;
 
+		console.log(dataFieldValue, 'render:');
 		const {
 			isCreating,
 			rulesLoading,
@@ -974,7 +1001,7 @@ class QueryRulesForm extends React.Component {
 											justifyContent: 'space-between',
 										}}
 									>
-										<div>{previewCount} documents match</div>
+										<div>{previewCount || 0} documents match</div>
 										<PreviewPage
 											previewType={previewType}
 											showModal={visible}
