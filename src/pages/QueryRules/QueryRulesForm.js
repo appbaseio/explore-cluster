@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { diff } from 'jsondiffpatch';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import {
@@ -297,7 +298,7 @@ class QueryRulesForm extends React.Component {
 			this.updateAppMappings();
 		}
 
-		if (isEditPage && prevProps.rule !== rule && !isUpdating) {
+		if (isEditPage && diff(prevProps.rule, rule) && !isUpdating) {
 			console.log('rule:', rule);
 			const { show_advance_editor } = rule;
 			const { rawQuery, indexes } = getRawQuery(show_advance_editor, unparsedRule);
@@ -412,7 +413,6 @@ class QueryRulesForm extends React.Component {
 	};
 
 	handleDropdown = (name, value) => {
-		console.log(name, value, 'yuiouyghvjuiuh');
 		this.setState(
 			{
 				[name]: value,
