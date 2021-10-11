@@ -259,7 +259,7 @@ class QuerySuggestions extends React.Component {
 					)}
 					<ErrorToaster>
 						{
-							Object.keys(this.state.initialData).length > 0 && (
+							Object.keys(initialData).length > 0 && (
 								<PreferenceForm
 									indices={indices}
 									handleSaveTemplate={this.handleSaveTemplate}

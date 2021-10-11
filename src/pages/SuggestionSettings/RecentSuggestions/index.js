@@ -11,12 +11,10 @@ import Container from '../../../components/Container';
 import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
 import {
 	getRecentSuggestionsPreferences,
-	saveSuggestionsPreferences,
 	saveRecentSuggestionsPreferences
 } from '../../../batteries/modules/actions';
 import PreferenceForm from './PreferenceForm';
 import { isValidPlan } from '../../../batteries/utils';
-import Overlay from '../../../components/Overlay';
 import { getURL } from '../../../constants/config';
 import { getAuthToken } from '../../../batteries/components/analytics/utils';
 import Flex from '../../../batteries/components/shared/Flex';
@@ -60,22 +58,52 @@ class QuerySuggestions extends React.Component {
 						.filter((i) => !i.startsWith('.'))
 				: [],
 			total: undefined,
+			initialData: {},
 		};
 		this.form = FormBuilder.group({
-			minHits: [5, [Validators.required, Validators.min(0)]],
-			size: [3, [Validators.required, Validators.min(1), Validators.max(10)]],
+			minHits: [0, [Validators.required, Validators.min(0)]],
+			size: [0, [Validators.required, Validators.min(0), Validators.max(10)]],
 			indices: [['*']],
 		});
-		if (isValidPlan(props.tier, props.featureSuggestions)) {
-			props.getPreferences().then((action) => {
+
+	}
+
+	componentDidMount() {
+		// triggering custom event for google analytics
+		event({
+			action: 'Popular Suggestions',
+			category: 'Search Relevancy',
+			label: 'visit',
+			value: null,
+		});
+
+		const {tier, featureSuggestions, getPreferences} = this.props;
+
+		if (isValidPlan(tier, featureSuggestions)) {
+			getPreferences().then((action) => {
 				// prefilling
 				const payload = get(action, 'payload');
 				if (payload) {
 					this.form.patchValue({
 						minHits: parseInt(payload.minHits, 10) || 0,
-						size: parseInt(payload.size, 10) || 3,
+						size: parseInt(payload.size, 10) || 0,
 						indices: payload.indices || ['*'],
 					});
+					this.setState({
+						initialData: {
+							minHits: parseInt(payload.minHits, 10) || 0,
+							size: parseInt(payload.size, 10) || 0,
+							indices: payload.indices || ['*'],
+						}
+					})
+				} else {
+					this.setState({
+						initialData: {
+							minHits: 0,
+							size: 0,
+							indices: ['*'],
+						}
+					})
 				}
 			});
 			fetch(`${getURL()}/.suggestions/_search`, {
@@ -104,16 +132,6 @@ class QuerySuggestions extends React.Component {
 				})
 				.catch((err) => console.error(err));
 		}
-	}
-
-	componentDidMount() {
-		// triggering custom event for google analytics
-		event({
-			action: 'Popular Suggestions',
-			category: 'Search Relevancy',
-			label: 'visit',
-			value: null,
-		});
 	}
 
 	componentDidUpdate(prevProps) {
@@ -158,7 +176,7 @@ class QuerySuggestions extends React.Component {
 
 	render() {
 		const { isLoading, preferences, tier, featureSuggestions, hide } = this.props;
-		const { indices, total } = this.state;
+		const { indices, total, initialData } = this.state;
 
 		if (isLoading && !preferences) {
 			return <Loader />;
@@ -196,11 +214,16 @@ class QuerySuggestions extends React.Component {
 						</>
 					)}
 					<ErrorToaster>
-						<PreferenceForm
-							indices={indices}
-							handleSaveTemplate={this.handleSaveTemplate}
-							control={this.form}
-						/>
+						{
+							Object.keys(initialData).length > 0 && (
+								<PreferenceForm
+									indices={indices}
+									handleSaveTemplate={this.handleSaveTemplate}
+									control={this.form}
+									initialData={initialData}
+								/>
+							)
+						}
 					</ErrorToaster>
 				</Container>
 			</React.Fragment>

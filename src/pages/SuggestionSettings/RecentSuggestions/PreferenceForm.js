@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Input, Select, Button, Affix, Icon, Popover, Form } from 'antd';
+import { Input, Select, Button, Affix, Icon, Popover } from 'antd';
 import { css } from 'react-emotion';
 import PropTypes from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
@@ -12,8 +12,8 @@ import {
 } from '../../../batteries/modules/actions';
 import { suggestionsMessages as Messages } from '../../../utils/messages';
 import SearchPreviewSwitcher from '../../../components/SearchPreviewSwitcher';
-import ReviewAndSave from '../../../components/ReviewAndSave';
 import styles from '../styles';
+import Footer from '../Footer';
 
 const calculateValue = (value) => {
 	const index = value.indexOf('*');
@@ -107,7 +107,37 @@ InputElement.defaultProps = {
 };
 
 class PreferenceForm extends React.Component {
-	state = { visible: false };
+	constructor(props) {
+		super(props);
+		this.state = {
+			visible: false ,
+			recentSuggestions: props.initialData,
+		};
+	}
+
+	componentDidUpdate(prevProps) {
+		const { initialData } = this.props;
+		if (prevProps.initialData !== initialData) {
+			this.setState({
+				recentSuggestions: initialData
+			})
+		}
+	}
+
+	onAppSelect = (app) => {
+		this.setState({ app, visible: true });
+	};
+
+	handleChange = (key, value, dataKey) => {
+		const { recentSuggestions } = this.state;
+		const newRecentSuggestions = {
+			...recentSuggestions,
+			[key]: value,
+		}
+		this.setState({
+			recentSuggestions: newRecentSuggestions
+		})
+	};
 
 	toggleVisibility = () => {
 		this.setState((prevState) => ({
@@ -115,34 +145,10 @@ class PreferenceForm extends React.Component {
 		}));
 	};
 
-	onAppSelect = (app) => {
-		this.setState({ app, visible: true });
-	};
-
-	handleChange = (key, value, dataKey) => {
-		const { appName, localRelevancy, updateLocalRelevancy } = this.props;
-		if(localRelevancy) {
-			updateLocalRelevancy(appName, {
-				...localRelevancy,
-				[dataKey]: {
-					...get(localRelevancy, dataKey),
-					[key]: value,
-				},
-			});
-		}
-	};
-
 	render() {
-		const { control, handleSaveTemplate, isLoading, apps,indices , localRelevancy } = this.props;
-		const { visible, app } = this.state;
+		const { control, handleSaveTemplate, isLoading, apps,indices , initialData } = this.props;
+		const { visible, app, recentSuggestions } = this.state;
 		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
-		const {
-			minHits,
-			size,
-		} = get(localRelevancy, 'recentSuggestions', {
-			minHits: 0,
-			size: 0,
-		});
 
 		return (
 			<FieldGroup
@@ -290,7 +296,11 @@ class PreferenceForm extends React.Component {
 								>
 									Save
 								</Button>
-								<ReviewAndSave />
+								<Footer
+									originalData={initialData}
+									tab='recent-suggestions'
+									changedData={recentSuggestions}
+								/>
 							</div>
 						</Affix>
 					</div>
@@ -306,6 +316,7 @@ PreferenceForm.propTypes = {
 	isLoading: PropTypes.bool.isRequired,
 	indices: PropTypes.array.isRequired,
 	apps: PropTypes.object,
+	initialData: PropTypes.object.isRequired,
 };
 
 PreferenceForm.defaultProps = {
