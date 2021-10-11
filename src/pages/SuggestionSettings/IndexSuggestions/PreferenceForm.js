@@ -170,7 +170,6 @@ class PreferenceForm extends React.Component {
 				mappingsFromIndices = [...mappingsFromIndices, ...mappings[index]];
 			}
 		});
-		console.log(indexSuggestions, "indexSuggestions===");
 		let categoryFields = aggregationFields;
 		return (
 			<FieldGroup

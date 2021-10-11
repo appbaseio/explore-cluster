@@ -138,6 +138,7 @@ const ReviewAndSave = ({oldData, newData}) => {
     }
 
     const [diffCount, diffData] = getDiffData(oldData, newData);
+    console.log("diffData:", diffData);
     return (
         <div>
             <div style={{ position: 'relative' }}>

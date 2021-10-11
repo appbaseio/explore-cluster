@@ -48,7 +48,6 @@ const cardStyle = css`
 	}
 `;
 
-let initialData = {};
 class QuerySuggestions extends React.Component {
 	constructor(props) {
 		super(props);
@@ -61,6 +60,7 @@ class QuerySuggestions extends React.Component {
 						)
 				: [],
 			total: undefined,
+			initialData: {},
 		};
 		this.form = FormBuilder.group({
 			blacklist: [[]],
@@ -73,8 +73,21 @@ class QuerySuggestions extends React.Component {
 			transformDiacritics: false,
 			indices: [['*']],
 		});
-		if (isValidPlan(props.tier, props.featureSuggestions)) {
-			props.getPreferences().then((action) => {
+	}
+
+	componentDidMount() {
+		// triggering custom event for google analytics
+		event({
+			action: 'Popular Suggestions',
+			category: 'Search Relevancy',
+			label: 'visit',
+			value: null,
+		});
+
+		const {tier, featureSuggestions, getPreferences} = this.props;
+
+		if (isValidPlan(tier, featureSuggestions)) {
+			getPreferences().then((action) => {
 				// prefilling
 				const payload = get(action, 'payload');
 				if (payload) {
@@ -89,29 +102,34 @@ class QuerySuggestions extends React.Component {
 						indices: payload.indices || ['*'],
 						transformDiacritics: payload.transformDiacritics,
 					});
-					initialData = {
-						blacklist: payload.blacklist || [],
-						externalSuggestions: payload.externalSuggestions || [],
-						minCount: parseInt(payload.minCount, 10) || 0,
-						minHits: parseInt(payload.minHits, 10) || 0,
-						numberOfDays: payload.numberOfDays || 1,
-						minCharacters: parseInt(payload.minCharacters, 10) || 0,
-						size: parseInt(payload.size, 10) || 0,
-						indices: payload.indices || ['*'],
-						transformDiacritics: payload.transformDiacritics,
-					}
+
+					this.setState({
+						initialData: {
+							blacklist: payload.blacklist || [],
+							externalSuggestions: payload.externalSuggestions || [],
+							minCount: parseInt(payload.minCount, 10) || 0,
+							minHits: parseInt(payload.minHits, 10) || 0,
+							numberOfDays: payload.numberOfDays || 1,
+							minCharacters: parseInt(payload.minCharacters, 10) || 0,
+							size: parseInt(payload.size, 10) || 0,
+							indices: payload.indices || ['*'],
+							transformDiacritics: payload.transformDiacritics,
+						}
+					});
 				} else {
-					initialData = {
-						blacklist: [],
-						externalSuggestions: [],
-						minCount: 0,
-						minHits: 0,
-						numberOfDays: 1,
-						minCharacters:  0,
-						size: 0,
-						indices: ['*'],
-						transformDiacritics: false,
-					}
+					this.setState({
+						initialData: {
+							blacklist: [],
+							externalSuggestions: [],
+							minCount: 0,
+							minHits: 0,
+							numberOfDays: 1,
+							minCharacters:  0,
+							size: 0,
+							indices: ['*'],
+							transformDiacritics: false,
+						}
+					});
 				}
 			});
 			fetch(`${getURL()}/.suggestions/_search`, {
@@ -140,16 +158,7 @@ class QuerySuggestions extends React.Component {
 				})
 				.catch((err) => console.error(err));
 		}
-	}
 
-	componentDidMount() {
-		// triggering custom event for google analytics
-		event({
-			action: 'Popular Suggestions',
-			category: 'Search Relevancy',
-			label: 'visit',
-			value: null,
-		});
 	}
 
 	componentDidUpdate(prevProps) {
@@ -211,7 +220,7 @@ class QuerySuggestions extends React.Component {
 
 	render() {
 		const { isLoading, preferences, tier, featureSuggestions, hide, apps } = this.props;
-		const { indices, total } = this.state;
+		const { indices, total, initialData } = this.state;
 
 		if (isLoading && !preferences) {
 			return <Loader />;
@@ -249,12 +258,17 @@ class QuerySuggestions extends React.Component {
 						</>
 					)}
 					<ErrorToaster>
-						<PreferenceForm
-							indices={indices}
-							handleSaveTemplate={this.handleSaveTemplate}
-							control={this.form}
-							initialData={initialData}
-						/>
+						{
+							Object.keys(this.state.initialData).length > 0 && (
+								<PreferenceForm
+									indices={indices}
+									handleSaveTemplate={this.handleSaveTemplate}
+									control={this.form}
+									initialData={initialData}
+								/>
+							)
+						}
+
 					</ErrorToaster>
 				</Container>
 			</React.Fragment>
