@@ -44,7 +44,9 @@ class IndexDropdown extends React.Component {
 			return null;
 		}
 
-		const filteredApps = Object.keys(apps).filter((app) => !app.startsWith('.'));
+		const filteredApps = Object.keys(apps).filter(
+			(app) => !app.startsWith('.') && !app.startsWith('metricbeat'),
+		);
 		return (
 			<Select
 				mode="multiple"

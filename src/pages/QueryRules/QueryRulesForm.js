@@ -36,13 +36,12 @@ import { getErrorClass, getErrorCount, getErrorMessage, getErrorMessages } from 
 import { getURL } from '../../constants/config';
 import { addQueryRule, deleteRule, getRules, putRule } from '../../batteries/modules/actions/rules';
 import PreviewPage from './PreviewPage';
-import { getUsageStats, setSearchState } from '../../batteries/modules/actions';
-
+import { getAppMappings, getUsageStats, setSearchState } from '../../batteries/modules/actions';
+import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import CloneRule from './components/CloneRule';
 import Info from '../../components/Info';
 import {
 	deleteQueryRuleInFunction,
-	getClusterMappings,
 	getDatafields,
 	getSelectedIndexes,
 	handleQueryRuleDelete,
@@ -214,7 +213,18 @@ class QueryRulesForm extends React.Component {
 	}
 
 	componentDidMount() {
-		const { rules, fetchRules, rule, unparsedRule, fetchUsageStats, usageStats } = this.props;
+		const {
+			rules,
+			fetchRules,
+			rule,
+			unparsedRule,
+			mappings,
+			fetchUsageStats,
+			usageStats,
+			fetchMappings,
+			appbaseCredentials,
+			appName,
+		} = this.props;
 		const { isEditPage } = this.state;
 
 		if (!(rules && rules.length)) {
@@ -233,39 +243,13 @@ class QueryRulesForm extends React.Component {
 				selectedIndexes: show_advance_editor ? indexes : rule.selectedIndexes,
 			});
 		}
-		this.setState({ loading: true });
-		getClusterMappings()
-			.then((mappings) => {
-				const { selectedIndexes } = this.state;
-				const [dataFields, fieldMap, subFieldsMap] = getDatafields({
-					mappings,
-					indexes: ['*'],
-				});
-				const [searchFields] = getDatafields({
-					mappings,
-					indexes: selectedIndexes,
-					isSearch: true,
-				});
-				const [aggsFields] = getDatafields({
-					mappings,
-					indexes: selectedIndexes,
-					isAggs: true,
-				});
-				this.setState({
-					mappings,
-					dataFields,
-					searchFields,
-					aggsFields,
-					fieldMap,
-					subFieldsMap,
-					loading: false,
-				});
-			})
-			.catch((e) => {
-				this.setState({ loading: false });
-				console.log(e);
-			});
-		// this.fetchPreviewCount();
+
+		if (!Object.keys(mappings).length) {
+			this.setState({ loading: true });
+			fetchMappings(appName, appbaseCredentials);
+		} else {
+			this.updateAppMappings();
+		}
 	}
 
 	componentDidUpdate(prevProps) {
@@ -279,9 +263,14 @@ class QueryRulesForm extends React.Component {
 			isDeleting,
 			history,
 			unparsedRule,
+			mappings,
 		} = this.props;
 
 		const { isEditPage } = this.state;
+
+		if (!Object.keys(prevProps.mappings).length && Object.keys(mappings).length) {
+			this.updateAppMappings();
+		}
 
 		if (isEditPage && prevProps.rule !== rule && !isUpdating) {
 			const { show_advance_editor } = rule;
@@ -327,6 +316,35 @@ class QueryRulesForm extends React.Component {
 			}
 		}
 	}
+
+	updateAppMappings = () => {
+		const { selectedIndexes } = this.state;
+		const { mappings } = this.props;
+		this.setState({ loading: true });
+		const [dataFields, fieldMap, subFieldsMap] = getDatafields({
+			mappings,
+			indexes: ['*'],
+		});
+		const [searchFields] = getDatafields({
+			mappings,
+			indexes: selectedIndexes,
+			isSearch: true,
+		});
+		const [aggsFields] = getDatafields({
+			mappings,
+			indexes: selectedIndexes,
+			isAggs: true,
+		});
+		this.setState({
+			mappings,
+			dataFields,
+			searchFields,
+			aggsFields,
+			fieldMap,
+			subFieldsMap,
+			loading: false,
+		});
+	};
 
 	getAlertMessage = (hasChanged, isCreating, isUpdating, count) => {
 		let str = '';
@@ -1272,10 +1290,18 @@ QueryRulesForm.propTypes = {
 	updateRule: PropTypes.func.isRequired,
 	match: PropTypes.object.isRequired,
 	fetchRules: PropTypes.func.isRequired,
+
 	username: PropTypes.string.isRequired,
 	password: PropTypes.string.isRequired,
 	handleReplayClick: PropTypes.func,
 	saveState: PropTypes.func.isRequired,
+	fetchMappings: PropTypes.func.isRequired,
+	mappings: PropTypes.oneOfType([
+		PropTypes.array,
+		PropTypes.object, // at cluster level
+	]),
+	appbaseCredentials: PropTypes.string.isRequired,
+	appName: PropTypes.string,
 	fetchUsageStats: PropTypes.func.isRequired,
 	usageStats: PropTypes.object.isRequired,
 };
@@ -1294,10 +1320,13 @@ QueryRulesForm.defaultProps = {
 	tier: undefined,
 	featureRules: false,
 	handleReplayClick: undefined,
+	mappings: {},
+	appName: '',
 };
 
 const mapStateToProps = (state, props) => {
 	const id = get(props.match, 'params.id');
+	const mappings = getRawMappingsByAppName(state);
 	const { username, password } = get(state, 'user.data', {});
 	const defaultState = {
 		isCreating: get(state, '$getAppRules.create.isLoading'),
@@ -1306,6 +1335,8 @@ const mapStateToProps = (state, props) => {
 		rulesLoading: get(state, '$getAppRules.isFetching'),
 		tier: get(state, '$getAppPlan.results.tier'),
 		featureRules: get(state, '$getAppPlan.results.feature_rules', false),
+		appbaseCredentials: username ? `${username}:${password}` : null,
+		mappings,
 		usageStats: get(state, '$getUsageStats.results', {}),
 	};
 
@@ -1324,6 +1355,7 @@ const mapStateToProps = (state, props) => {
 			deleteError: get(ruleData, 'deleteError'),
 			username,
 			password,
+			appName: get(state, '$getCurrentApp.name'),
 		};
 	}
 
@@ -1336,6 +1368,7 @@ const mapDispatchToProps = (dispatch) => ({
 	updateRule: (rule) => dispatch(putRule(rule)),
 	removeRule: (id) => dispatch(deleteRule(id)),
 	saveState: (state) => dispatch(setSearchState(state)),
+	fetchMappings: (appName, credentials) => dispatch(getAppMappings(appName, credentials)),
 	fetchUsageStats: () => dispatch(getUsageStats()),
 });
 

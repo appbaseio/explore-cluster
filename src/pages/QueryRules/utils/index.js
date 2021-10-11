@@ -66,7 +66,7 @@ const getValueFromExpression = (expression = '') => {
 	}
 
 	if (filterQuery) {
-		const isDoubleQuotePresent = searchQuery.includes(`"`);
+		const isDoubleQuotePresent = searchQuery?.includes(`"`);
 		let dataFieldValue;
 		if (
 			isDoubleQuotePresent &&
