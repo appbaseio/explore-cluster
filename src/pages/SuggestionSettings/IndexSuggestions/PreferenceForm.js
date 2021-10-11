@@ -3,15 +3,11 @@ import { connect } from 'react-redux';
 import get from 'lodash/get';
 import { Input, Select, Button, Affix, Switch, Popover, Icon } from 'antd';
 import { css } from 'react-emotion';
-import isEmpty from 'lodash/isEmpty';
 import PropTypes from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import keys from 'lodash/keys';
 import {
-	setLocalRelevancyState,
 	getAppMappings,
-	getDefaultSettings,
-	getSettings,
 	getAppStoredQueries,
 } from '../../../batteries/modules/actions';
 import { getRawMappingsByAppName, getTraversedMappingsByAppName } from '../../../batteries/modules/selectors';
@@ -19,9 +15,7 @@ import Grid from '../../../components/CreateCredentials/Grid';
 import { removeWhiteSpaces, getDatafields } from '../../../utils';
 import { suggestionsMessages as Messages } from '../../../utils/messages';
 import SearchPreviewSwitcher from '../../../components/SearchPreviewSwitcher';
-import MappingWrapper from '../../../components/MappingsWrapper/MappingsWrapper';
 import styles from '../styles';
-import conversionMap from '../../../utils/conversionMap';
 import ReviewAndSave from '../../../components/ReviewAndSave';
 
 const gridRatio = 0.40;
@@ -61,39 +55,43 @@ const getDisabled = (value) => {
 };
 
 class PreferenceForm extends React.Component {
-	state = {
-		visible: false,
-		aggregationField: undefined,
-		customQueryField: '',
-		selectedIndices: [],
-		aggregationFields: [],
-	};
+	constructor(props) {
+		super(props);
+		this.state = {
+			visible: false,
+			aggregationField: undefined,
+			customQueryField: '',
+			selectedIndices: [],
+			aggregationFields: [],
+			excludeFields: [],
+			indexSuggestions: props.initialData,
+		};
+	}
 
 	componentDidMount() {
 		const {
-			appName,
-			getSettingsAction,
-			getDefaultSettingsAction,
-			defaultSettings,
-			settings,
-			localRelevancy,
 			fetchStoredQueries,
 		} = this.props;
 
 		fetchStoredQueries();
-		if (settings && !localRelevancy) {
-			this.init({ ...settings });
-		} else {
-			getSettingsAction(appName);
-		}
-		if (!defaultSettings) getDefaultSettingsAction();
+		// if (settings && !localRelevancy) {
+		// 	this.init({ ...settings });
+		// } else {
+		// 	getSettingsAction(appName);
+		// }
+		// if (!defaultSettings) getDefaultSettingsAction();
 		this.getMappings();
 	}
 
 	componentDidUpdate(prevProps) {
-		const { rawMappings } = this.props;
+		const { rawMappings, initialData } = this.props;
 		if (rawMappings && prevProps.rawMappings !== rawMappings) {
 			this.getAggregationFields();
+		}
+		if (prevProps.initialData !== initialData) {
+			this.setState({
+				recentSuggestions: initialData
+			})
 		}
 	}
 
@@ -101,40 +99,33 @@ class PreferenceForm extends React.Component {
 		this.setState({ app, visible: true });
 	};
 
+	getMappings() {
+		const { appName, fetchMappings, credentials, mappings } = this.props;
+		if (credentials && get(mappings, 'length') === 0) {
+			// Fetch Mappings if permissions are present
+			fetchMappings(appName, credentials);
+		}
+	}
+
 	handleChange = (key, val, dataKey) => {
-		const { appName, localRelevancy, updateLocalRelevancy } = this.props;
 		let value = val;
 		if (key === 'customStopwords') {
 			value = val.split(',').map((i) => removeWhiteSpaces(i));
 		}
-
-		if (localRelevancy) {
-			updateLocalRelevancy(appName, {
-				...localRelevancy,
-				[dataKey]: {
-					...get(localRelevancy, dataKey),
-					[key]: value,
-				},
-			});
+		const { indexSuggestions } = this.state;
+		const newIndexSuggestions = {
+			...indexSuggestions,
+			[key]: value,
 		}
+		this.setState({
+			indexSuggestions: newIndexSuggestions
+		})
 	};
 
-	handleAggregationsChange = (name, value) => {
-		const { localRelevancy, updateLocalRelevancy, appName } = this.props;
-		updateLocalRelevancy(appName, {
-			...localRelevancy,
-			aggregations: {
-				...get(localRelevancy, `aggregations`, {}),
-				[name]: value,
-			},
-		});
-	};
-
-	init = (settings) => {
-		const { appName, updateLocalRelevancy, localRelevancy } = this.props;
-		if (!localRelevancy) {
-			updateLocalRelevancy(appName, { ...settings });
-		}
+	toggleVisibility = () => {
+		this.setState((prevState) => ({
+			visible: !prevState.visible,
+		}));
 	};
 
 	getAggregationFields = () => {
@@ -150,60 +141,6 @@ class PreferenceForm extends React.Component {
 		this.setState({aggregationFields: newAggregationFields});
 	}
 
-	getMappings() {
-		const { appName, fetchMappings, credentials, mappings } = this.props;
-		if (credentials && get(mappings, 'length') === 0) {
-			// Fetch Mappings if permissions are present
-			fetchMappings(appName, credentials);
-		}
-	}
-
-	toggleVisibility = () => {
-		this.setState((prevState) => ({
-			visible: !prevState.visible,
-		}));
-	};
-
-	updateToAggsField = ({ field, path, flattenType }) => {
-		const { localRelevancy } = this.props;
-		const { dataField } = get(localRelevancy, `aggregations`);
-		const pathVal = get(flattenType, path) === 'text' ? `${path}.keyword` : path;
-
-		const aggType = 'term';
-		this.setState({ aggregationField: path });
-		// this.handleAggregationsChange('dataField', { ...dataField, [pathVal]: aggType });
-		this.handleChange(field, path, 'indexSuggestions');
-	};
-
-	getAggsField = ({ flattenUsecase: usecases, flattenType: types }) => {
-		const { localRelevancy } = this.props;
-		const { dataField } = get(localRelevancy, `aggregations`);
-
-		if (usecases && types) {
-			const newAggsFields = Object.keys(types).reduce((agg, field) => {
-				if (types[field] === 'text') {
-					if (
-						usecases[field] !== 'search' &&
-						usecases[field] !== 'none' &&
-						!get(dataField, `${field}.keyword`, null)
-					) {
-						return [...agg, field];
-					}
-
-					return [...agg];
-				}
-
-				if (!get(dataField, `${field}`, null) && conversionMap[types[field]]) {
-					return [...agg, field];
-				}
-				return [...agg];
-			}, []);
-
-			return newAggsFields;
-		}
-
-		return [];
-	};
 
 	render() {
 		const {
@@ -212,36 +149,13 @@ class PreferenceForm extends React.Component {
 			isLoading,
 			indices,
 			apps,
-			localRelevancy,
+			initialData,
 			mappings,
-			appName,
 			appStoredQueries,
 		} = this.props;
 
-		const { visible, app, aggregationField, customQueryField, aggregationFields } = this.state;
+		const { visible, app, aggregationField, customQueryField, aggregationFields, indexSuggestions, excludeFields } = this.state;
 		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
-
-		const {
-			excludeFields,
-			includeFields,
-			showDistinctSuggestions,
-			maxPredictedWords,
-			customStopwords,
-			size,
-			customQuery,
-			categoryField,
-			url,
-		} = get(localRelevancy, 'indexSuggestions', {
-				excludeFields: [],
-				includeFields: [],
-				showDistinctSuggestions: true,
-				maxPredictedWords: 0,
-				customStopwords: [],
-				size: 0,
-				customQuery: '',
-				categoryField: '',
-				url: '',
-			});
 
 		let mappingsFromIndices = [];
 		this.state.selectedIndices?.map(index => {
@@ -288,8 +202,6 @@ class PreferenceForm extends React.Component {
 													this.setState({
 														selectedIndices: val,
 													});
-													// const { settings } = this.props;
-													// this.init({ ...settings });
 													this.getAggregationFields();
 												}}
 											>
@@ -329,6 +241,7 @@ class PreferenceForm extends React.Component {
 											checked={value}
 											{...handler()}
 											onChange={val => {
+												console.log(val, "distinct-toggle");
 												this.handleChange('showDistinctSuggestions', val, 'indexSuggestions')
 												handler().onChange(val);
 											}}
@@ -834,18 +747,19 @@ PreferenceForm.propTypes = {
 	control: PropTypes.object.isRequired,
 	isLoading: PropTypes.bool.isRequired,
 	indices: PropTypes.array.isRequired,
-	getSettingsAction: PropTypes.func.isRequired,
-	getDefaultSettingsAction: PropTypes.func.isRequired,
 	appStoredQueries: PropTypes.array.isRequired,
 	fetchMappings: PropTypes.func.isRequired,
 	apps: PropTypes.object,
-	localRelevancy: null,
+	initialData: PropTypes.object.isRequired,
 	appName: PropTypes.string,
 	mappings: PropTypes.oneOfType([
 		PropTypes.array,
 		PropTypes.object, // at cluster level
 	]),
-	defaultSettings: PropTypes.array,
+	rawMappings: PropTypes.oneOfType([
+		PropTypes.array,
+		PropTypes.object,
+	]),
 	fetchStoredQueries: PropTypes.func.isRequired,
 	credentials: PropTypes.string.isRequired,
 };
@@ -854,6 +768,7 @@ PreferenceForm.defaultProps = {
 	apps: {},
 	mappings: [],
 	defaultSettings: [],
+	rawMappings: [],
 };
 
 const mapStateToProps = (state) => {
@@ -866,21 +781,15 @@ const mapStateToProps = (state) => {
 	return {
 		mappings: getTraversedMappingsByAppName(state),
 		rawMappings,
-		// mappings: isEmpty(parsedMappings) ? [] : parsedMappings,
 		isLoading: get(state, '$saveSuggestionsPreferences.isFetching', false),
-		settings: get(state, ['$getAppSettings', 'settings', appName]),
 		appName,
 		apps: get(state, 'apps.data'),
 		credentials: `${username}:${password}`,
-		localRelevancy: get(state, ['$getLocalRelevancy', appName], null),
 		appStoredQueries: get(state, ['$getAppStoredQueries', 'results'], []),
 	};
 };
 
 const mapDispatchToProps = (dispatch) => ({
-	updateLocalRelevancy: (name, data) => dispatch(setLocalRelevancyState(name, data)),
-	getSettingsAction: (name) => dispatch(getSettings(name)),
-	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
 	fetchMappings: (appName, credentials) => dispatch(getAppMappings(appName, credentials)),
 	fetchStoredQueries: () => dispatch(getAppStoredQueries()),
 });

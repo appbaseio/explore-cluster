@@ -47,6 +47,7 @@ const cardStyle = css`
 	}
 `;
 
+let initialData = {};
 class QuerySuggestions extends React.Component {
 	constructor(props) {
 		super(props);
@@ -60,9 +61,9 @@ class QuerySuggestions extends React.Component {
 			total: undefined,
 		};
 		this.form = FormBuilder.group({
-			applyStopwords: true,
+			applyStopwords: false,
 			customStopwords: [],
-			maxPredictedWords: [2, [Validators.required, Validators.min(1)]],
+			maxPredictedWords: [0, [Validators.required, Validators.min(0)]],
 			customQuery: '',
 			includeFields: [['*']],
 			excludeFields: [{ value: [], disabled: true }],
@@ -71,7 +72,7 @@ class QuerySuggestions extends React.Component {
 			showDistinctSuggestions: false,
 			enablePredictiveSuggestions: false,
 			enableSynonyms: false,
-			size: [5, [Validators.required, Validators.min(1), Validators.max(10)]],
+			size: [0, [Validators.required, Validators.min(0), Validators.max(10)]],
 			indices: [['*']],
 		});
 		if (isValidPlan(props.tier, props.featureSuggestions)) {
@@ -82,7 +83,7 @@ class QuerySuggestions extends React.Component {
 					this.form.patchValue({
 						applyStopwords: payload.applyStopwords || false,
 						customStopwords: payload.customStopwords || [],
-						maxPredictedWords: parseInt(payload.maxPredictedWords, 10) || 2,
+						maxPredictedWords: parseInt(payload.maxPredictedWords, 10) || 0,
 						customQuery: payload.customQuery,
 						includeFields: payload.includeFields || ['*'],
 						excludeFields: payload.excludeFields || [],
@@ -91,9 +92,40 @@ class QuerySuggestions extends React.Component {
 						showDistinctSuggestions: payload.showDistinctSuggestions || false,
 						enablePredictiveSuggestions: payload.enablePredictiveSuggestions || false,
 						enableSynonyms: payload.enableSynonyms || false,
-						size: parseInt(payload.size, 10) || 5,
+						size: parseInt(payload.size, 10) || 0,
 						indices: payload.indices || ['*'],
 					});
+					initialData = {
+						applyStopwords: payload.applyStopwords || false,
+						customStopwords: payload.customStopwords || [],
+						maxPredictedWords: parseInt(payload.maxPredictedWords, 10) || 0,
+						customQuery: payload.customQuery,
+						includeFields: payload.includeFields || ['*'],
+						excludeFields: payload.excludeFields || [],
+						categoryField: payload.categoryField || [],
+						url: payload.url || [],
+						showDistinctSuggestions: payload.showDistinctSuggestions || false,
+						enablePredictiveSuggestions: payload.enablePredictiveSuggestions || false,
+						enableSynonyms: payload.enableSynonyms || false,
+						size: parseInt(payload.size, 10) || 0,
+						indices: payload.indices || ['*'],
+					}
+				} else {
+					initialData = {
+						applyStopwords: false,
+						customStopwords: [],
+						maxPredictedWords: 0,
+						customQuery: '',
+						includeFields: ['*'],
+						excludeFields:[],
+						categoryField: [],
+						url: [],
+						showDistinctSuggestions: false,
+						enablePredictiveSuggestions: false,
+						enableSynonyms: false,
+						size: 0,
+						indices: ['*'],
+					}
 				}
 			});
 			fetch(`${getURL()}/.suggestions/_search`, {
@@ -217,6 +249,7 @@ class QuerySuggestions extends React.Component {
 							indices={indices}
 							handleSaveTemplate={this.handleSaveTemplate}
 							control={this.form}
+							initialData={initialData}
 						/>
 					</ErrorToaster>
 				</Container>
