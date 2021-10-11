@@ -11,7 +11,6 @@ import Container from '../../../components/Container';
 import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
 import {
 	getPopularSuggestionsPreferences,
-	saveSuggestionsPreferences,
 	savePopularSuggestionsPreferences,
 } from '../../../batteries/modules/actions';
 import PreferenceForm from './PreferenceForm';
