@@ -22,7 +22,7 @@ describe('Recent Suggestion Settings add test flow', () => {
 	});
 
     it('Should Recent suggestion settings page URL', () => {
-        cy.visit(`${base_url}/app/${indexName}/suggestions`).wait(2000);
+        cy.visit(`${base_url}/cluster/suggestions`).wait(2000);
         cy.get('.ant-tabs-nav > :nth-child(1) > :nth-child(2)').click();
     });
 
@@ -36,7 +36,7 @@ describe('Recent Suggestion Settings add test flow', () => {
 
         cy.request({
             method: 'PUT',
-            url: `${app_url}_index_suggestions/preferences`,
+            url: `${app_url}_recent_suggestions/preferences`,
             headers: {
 				Authorization: `Basic ${credentials}`,
 				'Content-Type': 'application/json',

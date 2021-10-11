@@ -22,23 +22,26 @@ describe('Recent Suggestion Settings add test flow', () => {
 	});
 
     it('Should Recent suggestion settings page URL', () => {
-        cy.visit(`${base_url}/app/${indexName}/suggestions`).wait(2000);
+        cy.visit(`${base_url}/cluster/suggestions`).wait(2000);
         cy.get('.ant-tabs-nav > :nth-child(1) > :nth-child(2)').click();
     });
 
     it('Should Get Recent Suggestions Settings Form Data', () => {
-		const payload = {
-			"indices": ['airbeds-test-app'], // `index pattern` -> Supports a single index, comma separated indexes or wildcard indexes.
-			"minHits": 1,   // Only return recent suggestions if the hits returned are > 0.
-			"size": 5 // number input, [0, 100]
-		}
+		const url = "http://localhost:8000"
+        let credentials = btoa(`${username}:${password}`);
+        cy.request({
+            method: 'GET',
+            url: `${url}/_recent_suggestions/preferences`,
+            headers: {
+                Authorization: `Basic ${credentials}`
+            }
+        })
+        .then((payload) => {
+            console.log(payload,"jnkijnkio");
+            cy.wait(2000);
 
-		cy.wait(2000);
-
-		cy.get('[data-cy=recent-suggestions-min-hits]').should('have.value', payload.minHits);
-        cy.get('[data-cy=recent-suggestions-size]').should('have.value', payload.size);
-
-		// cy.get('[data-cy=popular-suggestions-indicest]').should('have.value', payload.indices);
-
+            cy.get('[data-cy=recent-suggestions-min-hits]').should('have.value', payload.body.minHits);
+        	cy.get('[data-cy=recent-suggestions-size]').should('have.value', payload.body.size);
+        })
     });
 });

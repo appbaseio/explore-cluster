@@ -21,7 +21,7 @@ describe('Index Suggestion Settings add test flow', () => {
 	});
 
     it('Should Index suggestion settings page URL', () => {
-        cy.visit(`${base_url}/app/${indexName}/suggestions`).wait(2000);
+        cy.visit(`${base_url}/cluster/suggestions`).wait(2000);
         cy.get('.ant-tabs-nav > :nth-child(1) > :nth-child(3)').click();
     });
 

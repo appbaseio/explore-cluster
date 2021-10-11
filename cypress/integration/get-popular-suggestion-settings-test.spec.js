@@ -22,33 +22,31 @@ describe('Popular Suggestion Settings add test flow', () => {
 	});
 
     it('Should Popular suggestion settings page URL', () => {
-        cy.visit(`${base_url}/app/${indexName}/suggestions`).wait(2000);
+        cy.visit(`${base_url}/cluster/suggestions`).wait(2000);
         cy.get('.ant-tabs-nav > :nth-child(1) > :nth-child(1)').click();
     });
 
     it('Should Get Popular Suggestions Settings Form Data', () => {
-
+        const url = "http://localhost:8000"
         let credentials = btoa(`${username}:${password}`);
-        const payload = {
-            "indices": ['airbeds-test-app'],
-            "numberOfDays": 2,
-            "minCount": 3,
-            "minHits": 3,
-            "minCharacters": 3,
-            "transformDiacritics": true,
-            "size": 5,
-            "blacklist": ['movie'],
-            "externalSuggestions": '[]',
-        };
+        cy.request({
+            method: 'GET',
+            url: `${url}/_popular_suggestions/preferences`,
+            headers: {
+                Authorization: `Basic ${credentials}`
+            }
+        })
+        .then((payload) => {
+            console.log(payload,"jnkijnkio");
+            cy.wait(2000);
 
-        cy.wait(2000);
+            cy.get('[data-cy=number-of-days]').should('have.value', payload.body.numberOfDays);
+            cy.get('[data-cy=min-count]').should('have.value', payload.body.minCount);
+            cy.get('[data-cy=popular-suggestions-min-hits]').should('have.value', payload.body.minHits);
+            cy.get('[data-cy=min-characters]').should('have.value', payload.body.minChars);
+            cy.get('[data-cy=transform-diacritics]').should('have.value', JSON.stringify(payload.body.transformDiacritics));
+            cy.get('[data-cy=popular-suggestions-size]').should('have.value', payload.body.size);
 
-        cy.get('[data-cy=number-of-days]').should('have.value', payload.numberOfDays);
-        cy.get('[data-cy=min-count]').should('have.value', payload.minCount);
-        cy.get('[data-cy=popular-suggestions-min-hits]').should('have.value', payload.minHits);
-        cy.get('[data-cy=min-characters]').should('have.value', payload.minCharacters);
-        cy.get('[data-cy=transform-diacritics]').should('be.checked');
-        cy.get('[data-cy=popular-suggestions-size]').should('have.value', payload.size);
-
+        })
     });
 });
