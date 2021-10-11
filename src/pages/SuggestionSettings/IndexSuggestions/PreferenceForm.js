@@ -59,12 +59,10 @@ class PreferenceForm extends React.Component {
 		super(props);
 		this.state = {
 			visible: false,
-			aggregationField: undefined,
-			customQueryField: '',
-			selectedIndices: [],
+			selectedIndices: props.indices,
 			aggregationFields: [],
-			excludeFields: [],
 			indexSuggestions: props.initialData,
+			isFetching: true,
 		};
 	}
 
@@ -82,9 +80,10 @@ class PreferenceForm extends React.Component {
 		if (rawMappings && prevProps.rawMappings !== rawMappings) {
 			this.getAggregationFields();
 		}
+
 		if (prevProps.initialData !== initialData) {
 			this.setState({
-				recentSuggestions: initialData
+				indexSuggestions: initialData
 			})
 		}
 	}
@@ -148,29 +147,26 @@ class PreferenceForm extends React.Component {
 			mappings,
 			appStoredQueries,
 		} = this.props;
-
-
-		const { visible, app, aggregationField, customQueryField, aggregationFields, indexSuggestions } = this.state;
-		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
 		const {
-			excludeFields,
-			includeFields,
-			showDistinctSuggestions,
-			maxPredictedWords,
-			customStopwords,
-			size,
-			customQuery,
-			categoryField,
-			url,
-		} = indexSuggestions;
-
+			visible,
+			app,
+			aggregationFields,
+			indexSuggestions,
+			selectedIndices,
+			isFetching
+		} = this.state;
 		let mappingsFromIndices = [];
-		this.state.selectedIndices?.map(index => {
+
+		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
+		selectedIndices?.map(index => {
 			if(mappings[index]) {
 				mappingsFromIndices = [...mappingsFromIndices, ...mappings[index]];
 			}
 		});
+
 		let categoryFields = aggregationFields;
+		let excludeFields = indexSuggestions?.excludeFields;
+		let includeFields = indexSuggestions?.includeFields;
 		return (
 			<FieldGroup
 				control={control}
@@ -477,6 +473,7 @@ class PreferenceForm extends React.Component {
 									component={
 										<Select
 											{...handler()}
+											loading={false}
 											placeholder="Select one ore more fields"
 											mode="tags"
 											notFoundContent={null}
@@ -498,11 +495,11 @@ class PreferenceForm extends React.Component {
 											<Select.Option
 												key="*"
 											>* (Include all fields)</Select.Option>
-											{(mappingsFromIndices || []).map((v) => {
+											{(mappingsFromIndices || []).map((v, idx) => {
 												if (excludeFields && !excludeFields.includes(v)) {
 													return (
 														<Select.Option
-															key={v}
+															key={`${v}-${idx}`}
 															title={v}
 															data-cy={v}
 														>
@@ -538,12 +535,13 @@ class PreferenceForm extends React.Component {
 									component={
 										<Select
 											{...handler()}
+											loading={false}
 											placeholder="Select one ore more fields"
 											mode="tags"
 											notFoundContent={null}
 											style={{ width: '100%' }}
 											tokenSeparators={[',']}
-											disabled={getDisabled(excludeFields)}
+											disabled={getDisabled(includeFields)}
 											data-cy="exclude-fields"
 											showSearch
 											onChange={(value) => {
@@ -557,10 +555,10 @@ class PreferenceForm extends React.Component {
 
 										>
 											<Select.Option key="*">* (Exclude all fields)</Select.Option>
-												{(mappingsFromIndices || []).map((v) => {
+												{(mappingsFromIndices || []).map((v, idx) => {
 													if (includeFields && !includeFields.includes(v)) {
 														return (
-															<Select.Option key={v} title={v} data-cy={v}>
+															<Select.Option key={`${v}-${idx}`} title={v} data-cy={v}>
 																{v}
 															</Select.Option>
 														);
@@ -594,7 +592,7 @@ class PreferenceForm extends React.Component {
 										<Select
 											{...handler()}
 											placeholder="Add category fields from schema"
-
+											loading={false}
 											style={{ width: '100%' }}
 											data-cy="category-field"
 											showSearch
@@ -608,8 +606,8 @@ class PreferenceForm extends React.Component {
 											}}
 
 										>
-											{(categoryFields || []).map((v) => (
-												<Select.Option key={v} title={v} data-cy={v}>
+											{(categoryFields || []).map((v,idx) => (
+												<Select.Option key={`${v}-${idx}`} title={v} data-cy={v}>
 													{v.split('.keyword')[0]}
 												</Select.Option>
 
@@ -641,7 +639,7 @@ class PreferenceForm extends React.Component {
 										<Select
 											{...handler()}
 											placeholder="Add URL field from schema"
-
+											loading={isFetching}
 											style={{ width: '100%' }}
 											data-cy="url-index-setting"
 											showSearch
@@ -777,19 +775,18 @@ PreferenceForm.propTypes = {
 PreferenceForm.defaultProps = {
 	apps: {},
 	mappings: [],
-	defaultSettings: [],
 	rawMappings: [],
+	appName: undefined,
 };
 
 const mapStateToProps = (state) => {
 	const mappings = getTraversedMappingsByAppName(state);
 	const rawMappings = getRawMappingsByAppName(state);
-	const parsedMappings = Array.isArray(mappings) ? mappings : get(mappings, '_doc', []);
 	const appName = get(state, '$getCurrentApp.name');
 	const { username, password } = get(state, 'user.data', {});
 
 	return {
-		mappings: getTraversedMappingsByAppName(state),
+		mappings,
 		rawMappings,
 		isLoading: get(state, '$saveSuggestionsPreferences.isFetching', false),
 		appName,
