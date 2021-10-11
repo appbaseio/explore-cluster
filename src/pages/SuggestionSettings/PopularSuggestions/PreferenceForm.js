@@ -53,7 +53,6 @@ class PreferenceForm extends React.Component {
 		super(props);
 		this.state = {
 			visible: false,
-			selectedIndices: [],
 			popularSuggestions: props.initialData,
 		};
 	}
@@ -141,9 +140,6 @@ class PreferenceForm extends React.Component {
 												{...inputHandler}
 												onChange={(val) => {
 													inputHandler.onChange(calculateValue(val));
-													this.setState({
-														selectedIndices: val,
-													});
 												}}
 											>
 												<Select.Option value="*">All (*)</Select.Option>
@@ -392,13 +388,14 @@ class PreferenceForm extends React.Component {
 											notFoundContent={null}
 											style={{ width: '100%' }}
 											tokenSeparators={[',']}
-											onChange={(value) =>
+											onChange={(value) => {
 												this.handleChange(
 													'blacklist',
 													calculateValue(value),
 													'popularSuggestions',
 												)
-											}
+												handler().onChange(value);
+											}}
 										/>
 									}
 								/>
