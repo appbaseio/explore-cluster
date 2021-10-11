@@ -39,13 +39,13 @@ describe('Index Suggestion Settings add test flow', () => {
             console.log(payload,"jnkijnkio");
             cy.wait(2000);
 
-            cy.get('[data-cy=show-distinct-suggestions]').should('have.value', payload.showDistinctSuggestions);
-			cy.get('[data-cy=enable-predictive-suggestions]').should('have.value', payload.enablePredictiveSuggestions);
-			cy.get('[data-cy=max-predicted-words]').should('have.value', payload.maxPredictedWords);
-			cy.get('[data-cy=apply-stopwords]').should('have.value', payload.applyStopwords);
-			cy.get('[data-cy=custom-stopwords]').should('have.value', payload.customStopwords.join(','));
-			cy.get('[data-cy=enable-synonyms]').should('have.value', payload.enableSynonyms);
-			cy.get('[data-cy=index-suggestions-size]').should('have.value', payload.size);
+            cy.get('[data-cy=show-distinct-suggestions]').should('have.value', payload.body.showDistinctSuggestions);
+			cy.get('[data-cy=enable-predictive-suggestions]').should('have.value', payload.body.enablePredictiveSuggestions);
+			cy.get('[data-cy=max-predicted-words]').should('have.value', payload.body.maxPredictedWords);
+			cy.get('[data-cy=apply-stopwords]').should('have.value', payload.body.applyStopwords);
+			cy.get('[data-cy=custom-stopwords]').should('have.value', payload.body.customStopwords.join(','));
+			cy.get('[data-cy=enable-synonyms]').should('have.value', payload.body.enableSynonyms);
+			cy.get('[data-cy=index-suggestions-size]').should('have.value', payload.body.size);
 
         })
 

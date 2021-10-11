@@ -37,11 +37,12 @@ describe('Popular Suggestion Settings add test flow', () => {
 
         // save button
         cy.get('[data-cy=popular-suggestions-save]').click();
+        const url = "http://localhost:8000"
         let credentials = btoa(`${username}:${password}`);
 
         cy.request({
             method: 'PUT',
-            url: `${app_url}_popular_suggestions/preferences`,
+            url: `${url}/_popular_suggestions/preferences`,
             headers: {
 				Authorization: `Basic ${credentials}`,
 				'Content-Type': 'application/json',
