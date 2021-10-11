@@ -16,7 +16,7 @@ import { removeWhiteSpaces, getDatafields } from '../../../utils';
 import { suggestionsMessages as Messages } from '../../../utils/messages';
 import SearchPreviewSwitcher from '../../../components/SearchPreviewSwitcher';
 import styles from '../styles';
-import ReviewAndSave from '../../../components/ReviewAndSave';
+import Footer from '../Footer';
 
 const gridRatio = 0.40;
 const calculateValue = (value) => {
@@ -732,7 +732,11 @@ class PreferenceForm extends React.Component {
 								>
 									Save
 								</Button>
-								<ReviewAndSave />
+								<Footer
+									originalData={initialData}
+									tab='popular-suggestions'
+									changedData={indexSuggestions}
+								/>
 							</div>
 						</Affix>
 					</div>
