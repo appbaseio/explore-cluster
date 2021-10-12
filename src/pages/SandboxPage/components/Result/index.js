@@ -10,9 +10,12 @@ import settingsMap from '../../../../components/ReviewAndSave/helper';
 import { ruleStyle } from './styles';
 
 class Result extends React.Component {
-	state = {
-		view: 'list',
-	};
+	constructor(props) {
+		super(props);
+		this.state = {
+			view: 'list',
+		};
+	}
 
 	shouldComponentUpdate(nextProps, nextState) {
 		const { result, app, rules } = this.props;
@@ -44,8 +47,14 @@ class Result extends React.Component {
 			value,
 			selectButtonLabel,
 			page,
+			// rules,
 		} = this.props;
 		const { view } = this.state;
+		let ruleData;
+		const id = window?.window.location.pathname.split('/')[3];
+		if (id) {
+			ruleData = rules.find((rule) => rule.id === id) || {};
+		}
 		return (
 			<Card>
 				<StateProvider
@@ -53,46 +62,89 @@ class Result extends React.Component {
 					componentIds={['result']}
 					render={({ searchState }) => {
 						const rulesApplied = get(searchState, 'result.settings.queryRules', []);
+						console.log(searchState, 'ghuijuhgvbjk');
 						if (rulesApplied.length) {
 							return (
-								<Alert
-									type="info"
-									icon="info"
-									style={{ margin: '0px 0 16px' }}
-									message={
-										<React.Fragment>
-											<Typography.Text>
-												Query {rulesApplied.length > 1 ? 'rules' : 'rule'}{' '}
-												applied
-											</Typography.Text>
-											{rulesApplied.map((rule) => {
-												const ruleInfo = (rules || []).find(
-													(r) => r.id === rule,
-												);
-
-												return (
+								<>
+									{page === 'rules' && id ? (
+										<Alert
+											type="info"
+											icon="info"
+											style={{ margin: '0px 0 16px' }}
+											message={
+												<React.Fragment>
+													<Typography.Text>
+														Query rule applied
+													</Typography.Text>
 													<div className={ruleStyle}>
 														<div>
-															<p className="name">{ruleInfo.name}</p>
+															<p className="name">{ruleData.name}</p>
 															<p className="expression">
-																{ruleInfo &&
-																	ruleInfo.trigger &&
-																	ruleInfo.trigger.expression}
+																{ruleData.trigger &&
+																	ruleData.trigger.expression}
 															</p>
 														</div>
 														<div>
-															<Link to={`/cluster/rules/${rule}`}>
+															<Link
+																to={`/cluster/rules/${ruleData.id}`}
+															>
 																<Button size="small">
 																	Edit Rule
 																</Button>
 															</Link>
 														</div>
 													</div>
-												);
-											})}
-										</React.Fragment>
-									}
-								/>
+												</React.Fragment>
+											}
+										/>
+									) : (
+										// <div>he</div>
+										<Alert
+											type="info"
+											icon="info"
+											style={{ margin: '0px 0 16px' }}
+											message={
+												<React.Fragment>
+													<Typography.Text>
+														Query{' '}
+														{rulesApplied.length > 1 ? 'rules' : 'rule'}{' '}
+														applied
+													</Typography.Text>
+													{rulesApplied.map((rule) => {
+														const ruleInfo = (rules || []).find(
+															(r) => r.id === rule,
+														);
+
+														return (
+															<div className={ruleStyle}>
+																<div>
+																	<p className="name">
+																		{ruleInfo.name}
+																	</p>
+																	<p className="expression">
+																		{ruleInfo &&
+																			ruleInfo.trigger &&
+																			ruleInfo.trigger
+																				.expression}
+																	</p>
+																</div>
+																<div>
+																	<Link
+																		to={`/cluster/rules/${rule}`}
+																	>
+																		<Button size="small">
+																			Edit Rule
+																		</Button>
+																	</Link>
+																</div>
+															</div>
+														);
+													})}
+												</React.Fragment>
+											}
+										/>
+									)}
+								</>
 							);
 						}
 						return null;
@@ -145,6 +197,7 @@ Result.propTypes = {
 	onChange: PropTypes.func,
 	value: PropTypes.array,
 	page: PropTypes.string,
+	// rules: PropTypes.string.isRequired,
 };
 
 Result.defaultProps = {
@@ -156,5 +209,13 @@ Result.defaultProps = {
 	value: [],
 	page: '',
 };
+
+// const mapStateToProps = (state, props) => {
+// 	return {
+// 		AppRules:  get(state, '$getSearchState.searchState.settings'),
+// 	}
+// };
+
+// export default connect(mapStateToProps, null)(Result);
 
 export default Result;

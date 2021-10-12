@@ -267,39 +267,13 @@ class QueryRulesForm extends React.Component {
 			mappings,
 		} = this.props;
 
-		const {
-			isEditPage,
-			// actions,
-			// condition,
-			// dataField,
-			// dataFieldValue,
-			// description,
-			// enabled,
-			// name,
-			// query,
-			// queryValue,
-			// selectedIndexes,
-		} = this.state;
-
-		// const rule = {
-		// 	actions,
-		// 	condition,
-		// 	dataField,
-		// 	dataFieldValue,
-		// 	description,
-		// 	enabled,
-		// 	name,
-		// 	query,
-		// 	queryValue,
-		// 	selectedIndexes,
-		// }
+		const { isEditPage } = this.state;
 
 		if (!Object.keys(prevProps.mappings).length && Object.keys(mappings).length) {
 			this.updateAppMappings();
 		}
 
 		if (isEditPage && diff(prevProps.rule, rule) && !isUpdating) {
-			console.log('rule:', rule);
 			const { show_advance_editor } = rule;
 			const { rawQuery, indexes } = getRawQuery(show_advance_editor, unparsedRule);
 			// eslint-disable-next-line react/no-did-update-set-state
@@ -314,6 +288,8 @@ class QueryRulesForm extends React.Component {
 					this.fetchPreviewCount();
 				},
 			);
+		} else if (isEditPage && prevProps.rule !== rule && !isUpdating) {
+			this.fetchPreviewCount();
 		}
 
 		if (!isEditPage && !isCreating && prevProps.isCreating !== isCreating) {
@@ -731,6 +707,10 @@ class QueryRulesForm extends React.Component {
 		}
 	};
 
+	numberWithCommas = (x) => {
+		return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+	};
+
 	handleCancel = () => {
 		const { saveState } = this.props;
 		this.setState({
@@ -847,7 +827,6 @@ class QueryRulesForm extends React.Component {
 			subFieldsMap,
 		} = this.state;
 
-		console.log(dataFieldValue, 'render:');
 		const {
 			isCreating,
 			rulesLoading,
@@ -1001,7 +980,10 @@ class QueryRulesForm extends React.Component {
 											justifyContent: 'space-between',
 										}}
 									>
-										<div>{previewCount || 0} documents match</div>
+										<div>
+											{this.numberWithCommas(previewCount || 0)} documents
+											match
+										</div>
 										<PreviewPage
 											previewType={previewType}
 											showModal={visible}

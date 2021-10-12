@@ -33,8 +33,6 @@ const getErrorMessages = (state) => {
 	} = state;
 	const error = {};
 
-	console.log(queryValue);
-
 	if (!name) {
 		error.name = {
 			hasError: true,
