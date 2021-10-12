@@ -54,7 +54,7 @@ class ReviewChanges extends React.Component {
 
 	renderDiffTables = () => {
 		const { diffData } = this.state;
-		const { defaultData = {}, updatedData = {} } = this.props;
+		const { defaultData = {}, updatedData = {}, storedQueriesUsage } = this.props;
 		const editMode = !!defaultData.id;
 		const query = {
 			title: 'Query',
@@ -169,13 +169,35 @@ class ReviewChanges extends React.Component {
 			}),
 			queryDiff,
 		].filter((item) => !!item);
-		return jsxArray.length ? (
-			jsxArray
-		) : (
-			<Empty
-				image={Empty.PRESENTED_IMAGE_SIMPLE}
-				description={<span>No change in stored query configuration</span>}
-			/>
+		return (
+			<>
+				<Card>
+					<div style={{ maxHeight: '56vh', overflow: 'auto' }}>
+						{jsxArray.length ? (
+							jsxArray
+						) : (
+							<Empty
+								image={Empty.PRESENTED_IMAGE_SIMPLE}
+								description={<span>No change in stored query configuration</span>}
+							/>
+						)}
+					</div>
+				</Card>
+				{!!editMode && jsxArray.length ? (
+					<Alert
+						style={{ margin: '1rem 0 ' }}
+						type="info"
+						showIcon
+						message={
+							storedQueriesUsage[defaultData.id]?.count > 0
+								? `Used ${
+										storedQueriesUsage[defaultData.id]?.count
+								  } times in last 30 days`
+								: 'Not used in the last 30 days'
+						}
+					/>
+				) : null}
+			</>
 		);
 	};
 
@@ -215,9 +237,7 @@ class ReviewChanges extends React.Component {
 							}}
 						/>
 					)}
-					<div style={{ maxHeight: '56vh', overflow: 'auto' }}>
-						<Card>{this.renderDiffTables()}</Card>
-					</div>
+					{this.renderDiffTables()}
 				</>
 			</Modal>
 		);
@@ -230,10 +250,12 @@ ReviewChanges.propTypes = {
 	handleCancel: PropTypes.func.isRequired,
 	handleSaveStoredQuery: PropTypes.func.isRequired,
 	isSaving: PropTypes.bool.isRequired,
+	storedQueriesUsage: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
 	isSaving: get(state, '$saveAppStoredQuery.isFetching', false),
+	storedQueriesUsage: get(state, '$getAppStoredQueriesUsage.results', {}),
 });
 
 export default connect(mapStateToProps)(ReviewChanges);

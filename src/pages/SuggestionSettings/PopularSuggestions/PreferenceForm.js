@@ -410,7 +410,6 @@ class PreferenceForm extends React.Component {
 								const inputHandler = handler();
 								return (
 									<Grid
-										// toolTipMessage={queryMessage}
 										toolTipProps={{
 											overlayClassName: css`
 												width: 500px;
