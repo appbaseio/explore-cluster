@@ -22,7 +22,7 @@ describe('Index Suggestion Settings add test flow', () => {
 
     it('Should Index suggestion settings page URL', () => {
         cy.visit(`${base_url}/cluster/suggestions`).wait(2000);
-        cy.get('.ant-tabs-nav > :nth-child(1) > :nth-child(2)').click();
+        cy.get('.ant-tabs-nav > :nth-child(1) > :nth-child(3)').click();
     });
 
     it('Should Get Index Suggestions Settings Form Data', () => {
@@ -38,13 +38,14 @@ describe('Index Suggestion Settings add test flow', () => {
         .then((payload) => {
             console.log(payload,"jnkijnkio");
             cy.wait(2000);
-
-            cy.get('[data-cy=show-distinct-suggestions]').should('have.value', payload.body.showDistinctSuggestions);
-			cy.get('[data-cy=enable-predictive-suggestions]').should('have.value', payload.body.enablePredictiveSuggestions);
+            // .invoke('val').should('deep.equal', ['CT', 'MA', 'VT'])
+            cy.get('[data-cy=index-suggestions-indices]').invoke('val').should('deep.equal', payload.body.indices);
+            cy.get('[data-cy=show-distinct-suggestions]').should('have.value', JSON.stringify(payload.body.showDistinctSuggestions));
+			cy.get('[data-cy=enable-predictive-suggestions]').should('have.value', JSON.stringify(payload.body.enablePredictiveSuggestions));
 			cy.get('[data-cy=max-predicted-words]').should('have.value', payload.body.maxPredictedWords);
-			cy.get('[data-cy=apply-stopwords]').should('have.value', payload.body.applyStopwords);
+			cy.get('[data-cy=apply-stopwords]').should('have.value', JSON.stringify(payload.body.applyStopwords));
 			cy.get('[data-cy=custom-stopwords]').should('have.value', payload.body.customStopwords.join(','));
-			cy.get('[data-cy=enable-synonyms]').should('have.value', payload.body.enableSynonyms);
+			cy.get('[data-cy=enable-synonyms]').should('have.value', JSON.stringify(payload.body.enableSynonyms));
 			cy.get('[data-cy=index-suggestions-size]').should('have.value', payload.body.size);
 
         })
