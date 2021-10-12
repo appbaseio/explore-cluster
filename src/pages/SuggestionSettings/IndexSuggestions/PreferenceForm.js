@@ -620,7 +620,7 @@ class PreferenceForm extends React.Component {
 							)}
 						/>
 						<FieldControl
-							name="url"
+							name="urlField"
 							render={({ handler, value }) => (
 								<Grid
 									label={
@@ -628,7 +628,7 @@ class PreferenceForm extends React.Component {
 											URL
 											<Popover
 												content={content(
-													Messages.url,
+													Messages.urlField,
 												)}
 												css={styles.iconContainer}
 											>
@@ -646,7 +646,7 @@ class PreferenceForm extends React.Component {
 											showSearch
 											onChange={(value) => {
 												this.handleChange(
-													'url',
+													'urlField',
 													calculateValue(value),
 													'indexSuggestions',
 												);

@@ -260,7 +260,7 @@ class PreferenceForm extends React.Component {
 							)}
 						/>
 						<FieldControl
-							name="minCharacters"
+							name="minChars"
 							render={({ handler, value }) => (
 								<Grid
 									label={
@@ -268,7 +268,7 @@ class PreferenceForm extends React.Component {
 											Min Characters
 											<Popover
 												content={content(
-													Messages.minCharacters,
+													Messages.minChars,
 												)}
 												css={styles.iconContainer}
 											>
@@ -285,7 +285,7 @@ class PreferenceForm extends React.Component {
 											type="number"
 											placeholder="Enter min count"
 											onChange={(e) => {
-												this.handleChange('minCharacters', e.target.value, 'popularSuggestions')
+												this.handleChange('minChars', e.target.value, 'popularSuggestions')
 												handler().onChange(e.target.value);
 											}}
 										/>
