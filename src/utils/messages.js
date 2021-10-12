@@ -79,7 +79,7 @@ export const suggestionsMessages = {
 	externalSuggestions: Message('Define your custom suggestions.'),
 	minCount: Message('Min value of count for the suggestions.'),
 	minHits: Message('Define the minimum number of results that must present for a suggestion.'),
-	minCharacters: Message(
+	minChars: Message(
 		'Define the minimum number of characters that must be present for a suggestion.',
 	),
 	transformDiacritics: Message(
@@ -109,7 +109,9 @@ export const suggestionsMessages = {
 	categoryField: Message(
 		'When specified, suggestions will show category specific suggestions based on the most frequent values based on this field.',
 	),
-	url: Message('When specified, suggestions will redirect to the URL value based on this field.'),
+	urlField: Message(
+		'When specified, suggestions will redirect to the URL value based on this field.',
+	),
 	includeFields: Message('Fields to include in the search results.'),
 	excludeFields: Message('Fields to exclude from the search results'),
 	customQuery: Message(
