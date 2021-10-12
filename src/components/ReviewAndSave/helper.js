@@ -17,6 +17,10 @@ const settingsMap = {
 		title: 'Category Fields',
 		description: 'When specified, suggestions will show category specific suggestions based on the most frequent values based on this field.',
 	},
+	indices: {
+		title: 'Indices',
+		description: 'Only selected indices will be considered to calculate the suggestions.',
+	},
 	size: {
 		title: 'Page Size',
 		description: 'Number of results to show in a page',
