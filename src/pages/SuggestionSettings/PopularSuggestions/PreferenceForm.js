@@ -283,7 +283,7 @@ class PreferenceForm extends React.Component {
 											defaultValue={value}
 											value={value}
 											type="number"
-											placeholder="Enter min count"
+											placeholder="Enter min chars"
 											onChange={(e) => {
 												this.handleChange('minChars', e.target.value, 'popularSuggestions')
 												handler().onChange(e.target.value);

@@ -224,7 +224,40 @@ class PreferenceForm extends React.Component {
 								/>
 							)}
 						/>
-
+						<FieldControl
+							name="minChars"
+							render={({ handler, value }) => (
+								<Grid
+									label={
+										<p css={styles.labelContainer}>
+											Min Characters
+											<Popover
+												content={content(
+													Messages.minChars,
+												)}
+												css={styles.iconContainer}
+											>
+												<Icon type="info-circle" />
+											</Popover>
+										</p>
+									}
+									component={
+										<Input
+											data-cy="recent-suggestions-minChars"
+											{...handler()}
+											defaultValue={value}
+											value={value}
+											type="number"
+											placeholder="Enter min chars"
+											onChange={(e) => {
+												this.handleChange('minChars', e.target.value, 'recentSuggestions')
+												handler().onChange(e.target.value);
+											}}
+										/>
+									}
+								/>
+							)}
+						/>
 						<FieldControl
 							name="indices"
 							render={({ handler, value }) => {

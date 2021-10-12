@@ -123,7 +123,7 @@ class QuerySuggestions extends React.Component {
 							minCount: 0,
 							minHits: 0,
 							numberOfDays: 1,
-							minChars:  0,
+							minChars: 0,
 							size: 0,
 							indices: ['*'],
 							transformDiacritics: false,
@@ -218,7 +218,7 @@ class QuerySuggestions extends React.Component {
 	};
 
 	render() {
-		const { isLoading, preferences, tier, featureSuggestions, hide, apps } = this.props;
+		const { isLoading, preferences, hide, apps } = this.props;
 		const { indices, total, initialData } = this.state;
 
 		if (isLoading && !preferences) {

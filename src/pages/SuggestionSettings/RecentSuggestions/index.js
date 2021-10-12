@@ -63,6 +63,7 @@ class QuerySuggestions extends React.Component {
 		this.form = FormBuilder.group({
 			minHits: [0, [Validators.required, Validators.min(0)]],
 			size: [0, [Validators.required, Validators.min(0), Validators.max(10)]],
+			minChars: [0, [Validators.required, Validators.min(0), Validators.max(10)]],
 			indices: [['*']],
 		});
 
@@ -87,12 +88,14 @@ class QuerySuggestions extends React.Component {
 					this.form.patchValue({
 						minHits: parseInt(payload.minHits, 10) || 0,
 						size: parseInt(payload.size, 10) || 0,
+						minChars: parseInt(payload.minChars, 10) || 0,
 						indices: payload.indices || ['*'],
 					});
 					this.setState({
 						initialData: {
 							minHits: parseInt(payload.minHits, 10) || 0,
 							size: parseInt(payload.size, 10) || 0,
+							minChars: parseInt(payload.minChars, 10) || 0,
 							indices: payload.indices || ['*'],
 						}
 					})
@@ -101,6 +104,7 @@ class QuerySuggestions extends React.Component {
 						initialData: {
 							minHits: 0,
 							size: 0,
+							minChars: 0,
 							indices: ['*'],
 						}
 					})
@@ -158,6 +162,7 @@ class QuerySuggestions extends React.Component {
 				...this.form.value,
 				minHits: Number(this.form.value.minHits),
 				size: Number(this.form.value.size),
+				minChars: Number(this.form.value.minChars),
 			};
 			savePreferences(payload).then((action) => {
 				if (get(action, 'payload')) {
@@ -175,7 +180,7 @@ class QuerySuggestions extends React.Component {
 	};
 
 	render() {
-		const { isLoading, preferences, tier, featureSuggestions, hide } = this.props;
+		const { isLoading, preferences, hide } = this.props;
 		const { indices, total, initialData } = this.state;
 
 		if (isLoading && !preferences) {
