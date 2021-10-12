@@ -162,7 +162,7 @@ class QuerySuggestions extends React.Component {
 			savePreferences(payload).then((action) => {
 				if (get(action, 'payload')) {
 					notification.success({
-						message: 'Popular Suggestions preferences saved successfully.',
+						message: 'Recent Suggestions preferences saved successfully.',
 					});
 					getPreferences();
 				}

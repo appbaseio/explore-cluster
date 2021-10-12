@@ -63,6 +63,41 @@ const ReviewAndSave = ({oldData, newData}) => {
             };
         }
 
+        if (get(diffData, 'popularSuggestions.indices', null)) {
+            const newVal = get(newObj, 'popularSuggestions.indices', []);
+            const oldVal = get(oldObj, 'popularSuggestions.indices', []);
+            diffData = {
+                ...diffData,
+                popularSuggestions: {
+                    ...diffData.popularSuggestions,
+                    indices: [oldVal.join(', '), newVal.join(', ')],
+                },
+            };
+        }
+
+        if (get(diffData, 'recentSuggestions.indices', null)) {
+            const newVal = get(newObj, 'recentSuggestions.indices', []);
+            const oldVal = get(oldObj, 'recentSuggestions.indices', []);
+            diffData = {
+                ...diffData,
+                recentSuggestions: {
+                    ...diffData.recentSuggestions,
+                    indices: [oldVal.join(', '), newVal.join(', ')],
+                },
+            };
+        }
+
+        if (get(diffData, 'indexSuggestions.indices', null)) {
+            const newVal = get(newObj, 'indexSuggestions.indices', []);
+            const oldVal = get(oldObj, 'indexSuggestions.indices', []);
+            diffData = {
+                ...diffData,
+                indexSuggestions: {
+                    ...diffData.indexSuggestions,
+                    indices: [oldVal.join(', '), newVal.join(', ')],
+                },
+            };
+        }
 
         if (get(diffData, 'indexSuggestions.includeFields', null)) {
             const newVal = get(newObj, 'indexSuggestions.includeFields', []);

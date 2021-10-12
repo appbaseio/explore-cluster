@@ -200,6 +200,7 @@ class PreferenceForm extends React.Component {
 												value={value}
 												{...inputHandler}
 												onChange={(val) => {
+													this.handleChange('indices', val, 'indexSuggestions')
 													inputHandler.onChange(calculateValue(val));
 													this.setState({
 														selectedIndices: val,

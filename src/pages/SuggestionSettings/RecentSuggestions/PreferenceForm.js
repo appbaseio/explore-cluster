@@ -253,7 +253,7 @@ class PreferenceForm extends React.Component {
 												{...inputHandler}
 												onChange={(val) => {
 													inputHandler.onChange(calculateValue(val));
-
+													this.handleChange('indices', val, 'recentSuggestions')
 												}}
 											>
 												<Select.Option value="*">All (*)</Select.Option>
