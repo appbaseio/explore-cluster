@@ -123,7 +123,7 @@ export default class Search extends Component {
 							</p>
 							<p>
 								We will start by letting you set some
-								<strong>Aggregation</strong> fields.
+								<strong> Aggregation</strong> fields.
 							</p>
 						</header>
 						{facetFields.length ? null : this.renderFacetInput()}

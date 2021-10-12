@@ -126,43 +126,60 @@ const renderResultList = () => (
 		{({ data }) => (
 			<ResultListWrapper>
 				{data.map((item) => (
-					<ResultList key={item._id} id={item._id}>
-						<ResultList.Image
+					<div style={{display: 'flex', padding: 10, borderBottom: '1px solid rgb(239, 239, 239)'}}>
+						<img
+							style={{
+								height: 160,
+								width: 160,
+								objectFit: 'contain',
+							}}
 							src={item.poster_path}
+							alt={item.poster_path}
 							onError={(event) => {
-								event.target.src = 'https://www.houseoftara.com/shop/wp-content/uploads/2019/05/placeholder.jpg'; // eslint-disable-line
+								event.target.src = 'https://www.houseoftara.com/shop/wp-content/uploads/2019/05/placeholder.jpg'; // eslint-disable-line no-param-reassign
 							}}
 						/>
-						<ResultList.Content>
-							<ResultList.Title
-								dangerouslySetInnerHTML={{
-									__html: item.original_title,
-								}}
-							/>
-							<ResultList.Description>
-								<div>
-									<p
-										style={{ fontSize: '16px', lineHeight: '24px' }}
-										dangerouslySetInnerHTML={{ __html: item.tagline }}
-									/>
-									<p
-										style={{
-											color: '#888',
-											margin: '8px 0',
-											fontSize: '13px',
-											lineHeight: '18px',
-										}}
-										dangerouslySetInnerHTML={{ __html: item.overview }}
-									/>
+						<ResultList key={item._id} id={item._id}>
+
+							{/* <ResultList.Image
+
+							/> */}
+							<ResultList.Content>
+								<ResultList.Title
+									dangerouslySetInnerHTML={{
+										__html: item.original_title,
+									}}
+								/>
+								<ResultList.Description>
 									<div>
-										{item.genres ? (
-											<span className="tag">{item.genres}</span>
-										) : null}
+										<p
+											style={{ fontSize: '14px'}}
+											dangerouslySetInnerHTML={{ __html: item.release_year }}
+										/>
+										<p
+											style={{ fontSize: '16px', lineHeight: '24px' }}
+											dangerouslySetInnerHTML={{ __html: item.tagline }}
+										/>
+										<p
+											style={{
+												color: '#888',
+												margin: '8px 0',
+												fontSize: '13px',
+												lineHeight: '18px',
+											}}
+											dangerouslySetInnerHTML={{ __html: item.overview }}
+										/>
+										<div>
+											{item.genres ? (
+												<span className="tag">{item.genres.join(",")}</span>
+											) : null}
+										</div>
 									</div>
-								</div>
-							</ResultList.Description>
-						</ResultList.Content>
-					</ResultList>
+								</ResultList.Description>
+							</ResultList.Content>
+						</ResultList>
+
+					</div>
 				))}
 			</ResultListWrapper>
 		)}
