@@ -47,7 +47,7 @@ const SuggestionSettings = ({ tier, featureSuggestions }) => {
 			>
 				<Tabs defaultActiveKey="1" style={{ minHeight: 500 }}>
 					<TabPane tab="Popular Suggestions" key="1" data-cy="popular-suggestions-tab">
-						<PopularSuggestions hide />
+						<PopularSuggestions />
 					</TabPane>
 					<TabPane tab="Recent Suggestions" key="2" data-cy="recent-suggestions-tab">
 						<RecentSuggestions hide />

@@ -8,7 +8,6 @@ import { css } from 'emotion';
 import { displayErrors } from '../../../utils/helper';
 import Loader from '../../../batteries/components/shared/Loader/Spinner';
 import Container from '../../../components/Container';
-import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
 import {
 	getPopularSuggestionsPreferences,
 	savePopularSuggestionsPreferences,
@@ -28,15 +27,6 @@ const main = css`
 		right: 50px;
 	}
 `;
-
-const bannerDetails = {
-	title: 'Popular Suggestions',
-	description:
-		'GUI to manage preferences for popular suggestions. Popular suggestions are stored in the .suggestions index by appbase.io based on the analytics data of what end users are searching for.',
-	buttonText: 'Read more',
-	icon: 'pencil',
-	href: 'https://docs.appbase.io/docs/analytics/popular-suggestions/',
-};
 
 const cardStyle = css`
 	max-width: 800px;
@@ -218,18 +208,18 @@ class QuerySuggestions extends React.Component {
 	};
 
 	render() {
-		const { isLoading, preferences, hide, apps } = this.props;
+		const { isLoading, preferences, apps } = this.props;
 		const { indices, total, initialData } = this.state;
 
+		console.log(total, get(preferences, 'index'), "poppppppp");
 		if (isLoading && !preferences) {
 			return <Loader />;
 		}
 		return (
 			<React.Fragment>
 				<Container css={main}>
-					{total !== undefined && get(preferences, 'index') && !hide && (
+					{total !== undefined && (
 						<>
-							<Banner {...bannerDetails} />
 							<Card className={cardStyle}>
 								<Flex
 									justifyContent="space-between"
@@ -238,7 +228,7 @@ class QuerySuggestions extends React.Component {
 									<Flex>
 										<Alert
 											message={`Last synced ${total} popular suggestions at ${moment(
-												preferences.last_synced_time * 1000,
+												preferences?.lastSyncedTime * 1000,
 											).format('MMM DD, YYYY hh:mm A')}.`}
 											type="info"
 											showIcon
@@ -278,7 +268,6 @@ class QuerySuggestions extends React.Component {
 QuerySuggestions.defaultProps = {
 	preferences: {},
 	apps: {},
-	hide: false,
 };
 
 QuerySuggestions.propTypes = {
@@ -290,7 +279,6 @@ QuerySuggestions.propTypes = {
 	tier: PropTypes.string.isRequired,
 	featureSuggestions: PropTypes.bool.isRequired,
 	apps: PropTypes.object,
-	hide: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => ({
