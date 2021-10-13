@@ -16,7 +16,6 @@ const ProfilePage = Loadable({
 	loader: () => import(/* webpackChunkName: "ProfilePage" */ '../../pages/ProfilePage'),
 	loading: Loader,
 });
-
 const CachePreferences = Loadable({
 	loader: () => import(/* webpackChunkName: "CachePreferences" */ '../../pages/CachePreferences'),
 	loading: Loader,

@@ -266,7 +266,6 @@ class RouteContainer extends React.Component {
 							</>
 						)}
 					/>
-
 					<Route
 						exact
 						path="/app/:appName/search-preview"
@@ -340,7 +339,6 @@ class RouteContainer extends React.Component {
 							</>
 						)}
 					/>
-
 					<Route
 						exact
 						path="/app/:appName/results"
@@ -359,7 +357,6 @@ class RouteContainer extends React.Component {
 							</>
 						)}
 					/>
-
 					<Route
 						exact
 						path="/app/:appName/index-settings"
