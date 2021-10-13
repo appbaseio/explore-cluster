@@ -53,31 +53,11 @@ const renderFilters = (fields) => {
 								start: min,
 								end: max,
 							})}
-							react={{
-								and: [
-									'search',
-									'genres',
-									'release_year'
-								],
-							}}
 						/>
 					);
 				}
 				case 'release_year': {
 					return (
-						// <DynamicRangeSlider
-						// 	key={field}
-						// 	componentId={field}
-						// 	dataField={field}
-						// 	title="Release Year"
-						// 	rangeLabels={(min, max) => ({
-						// 		start: min,
-						// 		end: max,
-						// 	})}
-						// 	react={{
-						// 		and: ['search', 'genres', 'vote_average'],
-						// 	}}
-						// />
 						<RangeInput
 							componentId={field}
 							dataField={field}
@@ -87,13 +67,6 @@ const renderFilters = (fields) => {
 							range={{
 								start: 1950,
 								end: 2021,
-							}}
-							react={{
-								and: [
-									'search',
-									'genres',
-									'vote_average'
-								],
 							}}
 						/>
 					);
