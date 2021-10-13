@@ -8,6 +8,7 @@ import {
 	ReactiveList,
 	ResultList,
 	SelectedFilters,
+	RangeInput
 } from '@appbaseio/reactivesearch';
 
 import appbaseHelpers from '../utils/appbaseHelpers';
@@ -26,13 +27,17 @@ const renderFilters = (fields) => {
 							componentId={field}
 							dataField="genres.keyword"
 							title="Genres"
+							filterLabel="Genres"
 							size={15}
 							sortBy="count"
 							react={{
-								and: ['search', 'vote_average', 'release_date'],
+								and: [
+									'search',
+									'vote_average',
+									'release_year'
+								],
 							}}
 							showSearch={false}
-							filterLabel="Genres"
 						/>
 					);
 				}
@@ -43,29 +48,52 @@ const renderFilters = (fields) => {
 							componentId={field}
 							dataField={field}
 							title="Vote Average"
+							filterLabel="Vote Average"
 							rangeLabels={(min, max) => ({
 								start: min,
 								end: max,
 							})}
 							react={{
-								and: ['search', 'genres', 'release_date'],
+								and: [
+									'search',
+									'genres',
+									'release_year'
+								],
 							}}
 						/>
 					);
 				}
 				case 'release_year': {
 					return (
-						<DynamicRangeSlider
-							key={field}
+						// <DynamicRangeSlider
+						// 	key={field}
+						// 	componentId={field}
+						// 	dataField={field}
+						// 	title="Release Year"
+						// 	rangeLabels={(min, max) => ({
+						// 		start: min,
+						// 		end: max,
+						// 	})}
+						// 	react={{
+						// 		and: ['search', 'genres', 'vote_average'],
+						// 	}}
+						// />
+						<RangeInput
 							componentId={field}
 							dataField={field}
+							key={field}
 							title="Release Year"
-							rangeLabels={(min, max) => ({
-								start: min,
-								end: max,
-							})}
+							filterLabel="Release Year"
+							range={{
+								start: 1950,
+								end: 2021,
+							}}
 							react={{
-								and: ['search', 'genres', 'vote_average'],
+								and: [
+									'search',
+									'genres',
+									'vote_average'
+								],
 							}}
 						/>
 					);
@@ -112,7 +140,7 @@ const renderResultList = () => (
 		componentId="results"
 		dataField="name"
 		react={{
-			and: ['search', 'genres', 'original_language', 'release_year'],
+			and: ['search', 'genres', 'vote_average', 'release_year'],
 		}}
 		size={4}
 		className="right-col"

@@ -91,7 +91,7 @@ export default () => (
 							className="button"
 							target="_blank"
 							rel="noreferrer"
-							href="https://docs.appbase.io/docs/reactivesearch/native/overview/QuickStart/"
+							href="https://docs.appbase.io/docs/reactivesearch/react-native-searchbox/quickstart/"
 						>
 							Learn More
 						</a>
@@ -128,7 +128,7 @@ export default () => (
 							className="button"
 							target="_blank"
 							rel="noreferrer"
-							href="https://docs.appbase.io/api/examples/js/"
+							href="https://docs.appbase.io/api/examples/rest/"
 						>
 							Learn More
 						</a>
