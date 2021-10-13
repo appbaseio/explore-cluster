@@ -3,11 +3,17 @@ import PropTypes from 'prop-types';
 import { Card, Radio, Icon, Row, Button, Alert, Tooltip, Typography } from 'antd';
 import { StateProvider } from '@appbaseio/reactivesearch';
 import { Link } from 'react-router-dom';
+import { css } from 'emotion';
 import get from 'lodash/get';
 import QueryView from './QueryView';
 import ListView from './ListView';
 import settingsMap from '../../../../components/ReviewAndSave/helper';
 import { ruleStyle } from './styles';
+import ActionView from '../../../QueryRules/components/ActionView';
+
+const section = css`
+	margin-bottom: 10px;
+`;
 
 class Result extends React.Component {
 	constructor(props) {
@@ -37,6 +43,14 @@ class Result extends React.Component {
 		});
 	};
 
+	titleCase = (str) => {
+		let sentence = str. toLowerCase(). split("_");
+		for (let i = 0; i < sentence. length; i++) {
+		sentence[i] = sentence[i][0]. toUpperCase() + sentence[i]. slice(1);
+		}
+		return sentence. join(" ");
+	}
+
 	render() {
 		const {
 			result,
@@ -47,7 +61,7 @@ class Result extends React.Component {
 			value,
 			selectButtonLabel,
 			page,
-			// rules,
+			withRule,
 		} = this.props;
 		const { view } = this.state;
 		let ruleData;
@@ -55,6 +69,7 @@ class Result extends React.Component {
 		if (id) {
 			ruleData = rules.find((rule) => rule.id === id) || {};
 		}
+		console.log(ruleData, "===============");
 		return (
 			<Card>
 				<StateProvider
@@ -62,7 +77,6 @@ class Result extends React.Component {
 					componentIds={['result']}
 					render={({ searchState }) => {
 						const rulesApplied = get(searchState, 'result.settings.queryRules', []);
-						console.log(searchState, 'ghuijuhgvbjk');
 						if (rulesApplied.length) {
 							return (
 								<>
@@ -73,9 +87,9 @@ class Result extends React.Component {
 											style={{ margin: '0px 0 16px' }}
 											message={
 												<React.Fragment>
-													<Typography.Text>
+													{/* <Typography.Text>
 														Query rule applied
-													</Typography.Text>
+													</Typography.Text> */}
 													<div className={ruleStyle}>
 														<div>
 															<p className="name">{ruleData.name}</p>
@@ -84,15 +98,30 @@ class Result extends React.Component {
 																	ruleData.trigger.expression}
 															</p>
 														</div>
-														<div>
-															<Link
-																to={`/cluster/rules/${ruleData.id}`}
-															>
-																<Button size="small">
-																	Edit Rule
-																</Button>
-															</Link>
-														</div>
+														{
+															withRule && (
+																<div>
+																{get(ruleData, 'actions', []).map((action) => (
+																	<div key={action.type} className={section}>
+																		<ActionView action={action} ruleId={ruleData.id} />
+																	</div>
+																))}
+																</div>
+															)
+														}
+														{
+															page !== 'rules' && (
+																<div>
+																		<Link
+																		to={`/cluster/rules/${ruleData.id}`}
+																	>
+																		<Button size="small">
+																			Edit Rule
+																		</Button>
+																	</Link>
+																</div>
+															)
+														}
 													</div>
 												</React.Fragment>
 											}
@@ -197,7 +226,7 @@ Result.propTypes = {
 	onChange: PropTypes.func,
 	value: PropTypes.array,
 	page: PropTypes.string,
-	// rules: PropTypes.string.isRequired,
+	withRule: PropTypes.bool,
 };
 
 Result.defaultProps = {
@@ -208,6 +237,7 @@ Result.defaultProps = {
 	onChange: () => {},
 	value: [],
 	page: '',
+	withRule: false,
 };
 
 // const mapStateToProps = (state, props) => {

@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { diff } from 'jsondiffpatch';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import {
@@ -273,7 +272,7 @@ class QueryRulesForm extends React.Component {
 			this.updateAppMappings();
 		}
 
-		if (isEditPage && diff(prevProps.rule, rule) && !isUpdating) {
+		if (isEditPage && JSON.stringify(prevProps.rule) !== JSON.stringify(rule) && !isUpdating) {
 			const { show_advance_editor } = rule;
 			const { rawQuery, indexes } = getRawQuery(show_advance_editor, unparsedRule);
 			// eslint-disable-next-line react/no-did-update-set-state
@@ -288,8 +287,6 @@ class QueryRulesForm extends React.Component {
 					this.fetchPreviewCount();
 				},
 			);
-		} else if (isEditPage && prevProps.rule !== rule && !isUpdating) {
-			this.fetchPreviewCount();
 		}
 
 		if (!isEditPage && !isCreating && prevProps.isCreating !== isCreating) {
@@ -346,6 +343,11 @@ class QueryRulesForm extends React.Component {
 			fieldMap,
 			subFieldsMap,
 			loading: false,
+		}, () => {
+			if(aggsFields?.length) {
+				console.log("aggsFields:", aggsFields);
+				this.fetchPreviewCount();
+			}
 		});
 	};
 

@@ -357,6 +357,7 @@ class SearchPreview extends React.Component {
 			value,
 			selectButtonLabel,
 			page,
+			withRule,
 		} = this.props;
 
 		const {
@@ -462,6 +463,7 @@ class SearchPreview extends React.Component {
 					appbaseConfig={{
 						recordAnalytics: showFeaturedProducts ? false : isAnalyticsEnabled,
 					}}
+					// initialQueriesSyncTime={100}
 				>
 					<Col md={6}>
 						<ErrorToaster>
@@ -513,6 +515,7 @@ class SearchPreview extends React.Component {
 									onChange={onChange}
 									value={value}
 									page={page}
+									withRule={withRule}
 								/>
 							</SandboxContext.Provider>
 						</ErrorToaster>
@@ -577,6 +580,7 @@ SearchPreview.propTypes = {
 	selectButtonLabel: PropTypes.string,
 	appbaseVersion: PropTypes.string.isRequired, // eslint-disable-line
 	page: PropTypes.string,
+	withRule: PropTypes.bool,
 };
 
 SearchPreview.defaultProps = {
@@ -598,6 +602,7 @@ SearchPreview.defaultProps = {
 	value: [],
 	selectButtonLabel: undefined,
 	page: '',
+	withRule: false,
 };
 
 export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(SearchPreview));
