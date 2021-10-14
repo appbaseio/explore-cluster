@@ -26,6 +26,13 @@ describe('Index Suggestion Settings add test flow', () => {
     });
 
     it('Should Add Index Suggestions Settings Form Data', () => {
+
+        cy.get('[data-cy=index-suggestions-indices]').invoke('val', '');
+        cy.get('[data-cy=index-suggestions-indices]').click();
+        cy.get('[data-cy=airbeds-test-app]').click();
+        cy.get('[data-cy=indices-label]').click();
+        cy.wait(3000);
+
         cy.get('[data-cy=show-distinct-suggestions]').click();
         cy.get('[data-cy=enable-predictive-suggestions]').click();
         cy.get('[data-cy=max-predicted-words]').clear().type(2);
@@ -33,18 +40,22 @@ describe('Index Suggestion Settings add test flow', () => {
         cy.get('[data-cy=custom-stopwords]').clear().type("the,a");
         cy.get('[data-cy=enable-synonyms]').click();
         cy.get('[data-cy=index-suggestions-size]').clear().type(3);
-        // cy.get('[data-cy=include-fields]').select('bed_type');
+
         cy.get('[data-cy=include-fields]').click();
         cy.get('[data-cy=bed_type]').click();
         cy.get('[data-cy=include-fields-label]').click();
 
         cy.get('[data-cy=exclude-fields]').click();
-        cy.get('[data-cy=bathrooms]').click();
+        cy.get('[data-cy=bathrooms]').click({ force: true, multiple: true });
         cy.get('[data-cy=exclude-fields-label]').click();
 
         cy.get('[data-cy=category-field]').click();
         cy.get('[data-cy=bathrooms]').click({ force: true, multiple: true });
+        cy.get('[data-cy=categoryField-label]').click();
 
+        cy.get('[data-cy=url-index-setting]').click();
+        cy.get('[data-cy=bathrooms]').click({ force: true, multiple: true });
+        cy.get('[data-cy=url-label]').click();
 
         cy.wait(1000);
         // save button

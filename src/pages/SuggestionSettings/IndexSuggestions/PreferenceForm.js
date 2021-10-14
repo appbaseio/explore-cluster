@@ -165,8 +165,8 @@ class PreferenceForm extends React.Component {
 		});
 
 		let categoryFields = aggregationFields;
-		let excludeFields = indexSuggestions?.excludeFields;
-		let includeFields = indexSuggestions?.includeFields;
+		let excludeFields = [...new Set(indexSuggestions?.excludeFields)];
+		let includeFields = [...new Set(indexSuggestions?.includeFields)];
 		return (
 			<FieldGroup
 				control={control}
@@ -180,7 +180,7 @@ class PreferenceForm extends React.Component {
 								return (
 									<Grid
 										label={
-											<p css={styles.labelContainer}>
+											<p css={styles.labelContainer} data-cy="indices-label">
 												Indices
 												<Popover
 													content={content(Messages.indices)}
@@ -212,7 +212,7 @@ class PreferenceForm extends React.Component {
 												{indices
 													.filter((i) => !i.startsWith('metricbeat') && !i.startsWith('.'))
 													.map((index) => (
-														<Select.Option key={index}>
+														<Select.Option key={index} data-cy={index}>
 															{index}
 														</Select.Option>
 													))}
@@ -496,11 +496,11 @@ class PreferenceForm extends React.Component {
 											<Select.Option
 												key="*"
 											>* (Include all fields)</Select.Option>
-											{(mappingsFromIndices || []).map((v, idx) => {
+											{(mappingsFromIndices || []).map((v) => {
 												if (excludeFields && !excludeFields.includes(v)) {
 													return (
 														<Select.Option
-															key={`${v}-${idx}`}
+															key={v}
 															title={v}
 															data-cy={v}
 														>
@@ -556,10 +556,10 @@ class PreferenceForm extends React.Component {
 
 										>
 											<Select.Option key="*">* (Exclude all fields)</Select.Option>
-												{(mappingsFromIndices || []).map((v, idx) => {
+												{(mappingsFromIndices || []).map((v) => {
 													if (includeFields && !includeFields.includes(v)) {
 														return (
-															<Select.Option key={`${v}-${idx}`} title={v} data-cy={v}>
+															<Select.Option key={v} title={v} data-cy={v}>
 																{v}
 															</Select.Option>
 														);
@@ -577,7 +577,7 @@ class PreferenceForm extends React.Component {
 							render={({ handler, value }) => (
 								<Grid
 									label={
-										<p css={styles.labelContainer}>
+										<p css={styles.labelContainer} data-cy="categoryField-label">
 											Category Field
 											<Popover
 												content={content(
@@ -607,12 +607,14 @@ class PreferenceForm extends React.Component {
 											}}
 
 										>
-											{(categoryFields || []).map((v,idx) => (
-												<Select.Option key={`${v}-${idx}`} title={v} data-cy={v}>
-													{v.split('.keyword')[0]}
-												</Select.Option>
-
-											))}
+											{(categoryFields || []).map((v) => {
+												const val = v.split('.keyword')[0];
+												return (
+													<Select.Option key={val} title={val} data-cy={val}>
+														{val}
+													</Select.Option>
+												)
+											})}
 										</Select>
 									}
 									gridRatio={gridRatio}
@@ -624,7 +626,7 @@ class PreferenceForm extends React.Component {
 							render={({ handler, value }) => (
 								<Grid
 									label={
-										<p css={styles.labelContainer}>
+										<p css={styles.labelContainer} data-cy="url-label">
 											URL
 											<Popover
 												content={content(
@@ -653,12 +655,15 @@ class PreferenceForm extends React.Component {
 												handler().onChange(calculateValue(value));
 											}}
 										>
-											{(categoryFields || []).map((v) => (
-												<Select.Option key={v} title={v} data-cy={v}>
-													{v.split('.keyword')[0]}
-												</Select.Option>
+											{(categoryFields || []).map((v) => {
+												const val = v.split('.keyword')[0];
+												return (
+													<Select.Option key={val} title={val} data-cy={val}>
+														{val}
+													</Select.Option>
 
-											))}
+												)
+											})}
 										</Select>
 									}
 									gridRatio={gridRatio}
