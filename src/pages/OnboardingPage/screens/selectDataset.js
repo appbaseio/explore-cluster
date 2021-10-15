@@ -1,6 +1,11 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useState } from 'react';
 import Footer from '../components/Footer';
 import { Icon } from 'antd';
+import PropTypes from 'prop-types';
+import Loader from '../components/Loader';
+import parser from 'url-parser-lite';
+import appbaseHelpers from '../utils/appbaseHelpers';
 
 const datsetMappings = [
 	{
@@ -33,7 +38,7 @@ const datsetMappings = [
 ];
 
 function selectDataset({ nextScreen }) {
-	const [dataset, setDataSet] = useState('movie');
+	const [dataset, setDataSet] = useState('movies');
     const [layout, setLayout] = useState(0);
     const [url,saveUrl] = useState('');
     const [loading, setLoading] = useState('');
@@ -47,185 +52,189 @@ function selectDataset({ nextScreen }) {
         setLayout(1);
     }
 
-    // function setURL(url) {
-    //     saveUrl(url);
-    //     setURL(url);
-    // }
+    function setURL(url) {
+        saveUrl(url);
+        setURL(url);
+    }
 
-    // function hideLoader() {
-    //     setStatus('');
-    //     setLoading(false);
-    // }
+    function hideLoader() {
+        setStatus('');
+        setLoading(false);
+    }
 
-    // function renderJSONBlock() {
-    //     return (
-    //         <div>
-	// 		<p>Showing a sample JSON to be imported:</p>
-	// 		<div
-	// 			style={{ width: '650px' }}
-	// 			className="code-block"
-	// 			// dangerouslySetInnerHTML={{ __html: =====sample Data==== }}
-	// 		/>
-	// 	</div>
-    //     )
-    // }
+    function renderJSONBlock() {
+        return (
+            <div>
+			<p>Showing a sample JSON to be imported:</p>
+			<div
+				style={{ width: '650px' }}
+				className="code-block"
+				// dangerouslySetInnerHTML={{ __html: =====sample Data==== }}
+			/>
+		</div>
+        )
+    }
 
-    // function setMapping() {
-    //     setLoading(true);
-    //     appbaseHelpers
-	// 		.applyAnalyzers()
-	// 		.then(() => {
-    //             setStatus('Preparing the database configuration...')
-	// 		})
-	// 		.then(appbaseHelpers.updateMapping)
-	// 		.then(() => {
-    //             setStatus('Indexing === data of === records... Almost done!')
-	// 		})
-	// 		.then(appbaseHelpers.indexData)
-	// 		.then(() => {
-    //             setStatus('Loading data browser... Hang tight!')
-	// 		})
-	// 		.then(() => {
-	// 			appbaseHelpers.createURL(setURL);
-	// 		})
-	// 		.catch((e) => {
-	// 			if (
-	// 				e._bodyInit ===
-	// 				'{"error":{"root_cause":[{"type":"parse_exception","reason":"request body is required"}],"type":"parse_exception","reason":"request body is required"},"status":400}'
-	// 			) {
-	// 				appbaseHelpers.createURL(setURL);
-	// 			}
-	// 			console.log('@error-at-importing-data', e);
-	// 			console.log('@error-at-importing-data-response-type', typeof e);
-	// 			console.log('error', e);
-	// 		});
-    // }
+    function setMapping() {
+        setLoading(true);
+        appbaseHelpers
+			.applyAnalyzers()
+			.then(() => {
+                setStatus('Preparing the database configuration...')
+			})
+			.then(appbaseHelpers.updateMapping)
+			.then(() => {
+                setStatus('Indexing === data of === records... Almost done!')
+			})
+			.then(appbaseHelpers.indexData)
+			.then(() => {
+                setStatus('Loading data browser... Hang tight!')
+			})
+			.then(() => {
+				appbaseHelpers.createURL(setURL);
+			})
+			.catch((e) => {
+				if (
+					e._bodyInit ===
+					'{"error":{"root_cause":[{"type":"parse_exception","reason":"request body is required"}],"type":"parse_exception","reason":"request body is required"},"status":400}'
+				) {
+					appbaseHelpers.createURL(setURL);
+				}
+				console.log('@error-at-importing-data', e);
+				console.log('@error-at-importing-data-response-type', typeof e);
+				console.log('error', e);
+			});
+    }
 
-    // function sampleLayout() {
-    //     let iframeURL = null;
-	// 	if (url) {
-	// 		const config = JSON.parse(url);
-	// 		const { protocol, host, auth } = parser(config.url);
-	// 		const dejavuAddress = `${protocol}://${auth}@${host}`;
-	// 		iframeURL = `https://dejavu.appbase.io/?appname=${config.appname}&url=${dejavuAddress}&footer=false&sidebar=false&appswitcher=false&mode=edit&cloneApp=false&oldBanner=false`;
-	// 	}
+    function sampleLayout() {
+        let iframeURL = null;
+		if (url) {
+			const config = JSON.parse(url);
+			const { protocol, host, auth } = parser(config.url);
+			const dejavuAddress = `${protocol}://${auth}@${host}`;
+			iframeURL = `https://dejavu.appbase.io/?appname=${config.appname}&url=${dejavuAddress}&footer=false&sidebar=false&appswitcher=false&mode=edit&cloneApp=false&oldBanner=false`;
+		}
 
-    //     return (
-	// 		<div>
-	// 			<div className="wrapper">
-	// 				<div>
-	// 					<img src="/static/images/onboarding/Import.svg" alt="importing data" />
-	// 				</div>
-	// 				<div className="content">
-	// 					<header className="vcenter">
-	// 						<h2>Import data into your app</h2>
-	// 						{url ? (
-	// 							<p>Explore your imported dataset for the ==== store.</p>
-	// 						) : (
-	// 							<p>We will import a dataset of === movies obtained from TMDB.</p>
-	// 						)}
-	// 					</header>
+        return (
+			<div>
+				<div className="wrapper">
+					<div>
+						<img src="/static/images/onboarding/Import.svg" alt="importing data" />
+					</div>
+					<div className="content">
+						<header className="vcenter">
+							<h2>Import data into your app</h2>
+							{url ? (
+								<p>Explore your imported dataset for the ==== store.</p>
+							) : (
+								<p>We will import a dataset of === movies obtained from TMDB.</p>
+							)}
+						</header>
 
-	// 					{url ? null : <div className="col-wrapper">{this.renderJSONBlock()}</div>}
-	// 				</div>
-	// 			</div>
-	// 			{iframeURL ? (
-	// 				<div>
-	// 					<iframe
-	// 						height="600px"
-	// 						width="100%"
-	// 						title="dejavu"
-	// 						src={iframeURL}
-	// 						frameBorder="0"
-	// 						style={{ marginTop: '-10px' }}
-	// 						onLoad={this.hideLoader}
-	// 					/>
-	// 				</div>
-	// 			) : null}
-	// 			<Loader show={loading} label={status} />
-	// 			{url ? (
-	// 				<Footer nextScreen={nextScreen} />
-	// 			) : (
-	// 				<footer>
-	// 					<div className="left-column">
-	// 						<a
-	// 							onClick={this.setMapping}
-	// 							data-cy="submit-data"
-	// 							className="primary button big"
-	// 						>
-	// 							Import ==== Dataset
-	// 						</a>
-	// 					</div>
-	// 				</footer>
-	// 			)}
-	// 		</div>
-	// 	);
-    // }
+						{url ? null : <div className="col-wrapper">{renderJSONBlock()}</div>}
+					</div>
+				</div>
+				{iframeURL ? (
+					<div>
+						<iframe
+							height="600px"
+							width="100%"
+							title="dejavu"
+							src={iframeURL}
+							frameBorder="0"
+							style={{ marginTop: '-10px' }}
+							onLoad={this.hideLoader}
+						/>
+					</div>
+				) : null}
+				<Loader show={loading} label={status} />
+				{url ? (
+					<Footer nextScreen={nextScreen} />
+				) : (
+					<footer>
+						<div className="left-column">
+							<a
+								onClick={this.setMapping}
+								data-cy="submit-data"
+								className="primary button big"
+							>
+								Import ==== Dataset
+							</a>
+						</div>
+					</footer>
+				)}
+			</div>
+		);
+    }
 
 	return (
 		<div>
-			<div className="wrapper">
-				<div>
-					<img src="/static/images/onboarding/Create.svg" alt="create app" />
-				</div>
-				<div className="content">
-					<header>
-						<h2>Choose a sample dataset to import from</h2>
-						<p>
-							We will be using the appbase.io dashboard to import this dataset from.
-						</p>
-					</header>
-					<div>
-						{datsetMappings.map((data) => (
-							<div
-								style={{
-									width: '100%',
-									marginBottom: '15px',
-									display: 'flex',
-									background: 'white',
-									border: data.id === dataset ? '1px solid #1890ff' : 'none',
-									// background: '#e4f0fb
-								}}
-								onClick={() => handleSelect(data.id)}
-							>
-								<img
-									src={data.url}
-									alt={data.alt}
-									style={{ height: '150px', width: '150px' }}
-								/>
-								<div>
-									<h3>{data.name}</h3>
-									<p>{data.description}</p>
-								</div>
+			{
+				layout === 0 ? (
+					<div className="wrapper">
+						<div>
+							<img src="/static/images/onboarding/Create.svg" alt="create app" />
+						</div>
+						<div className="content">
+							<header>
+								<h2>Choose a sample dataset to import from</h2>
+								<p>
+									We will be using the appbase.io dashboard to import this dataset from.
+								</p>
+							</header>
+							<div>
+								{datsetMappings.map((data) => (
+									<div
+										style={{
+											width: '100%',
+											marginBottom: '15px',
+											display: 'flex',
+											background: 'white',
+											border: data.id === dataset ? '1px solid #1890ff' : 'none',
+											// background: '#e4f0fb
+										}}
+										onClick={() => handleSelect(data.id)}
+									>
+										<img
+											src={data.url}
+											alt={data.alt}
+											style={{ height: '150px', width: '150px' }}
+										/>
+										<div>
+											<h3>{data.name}</h3>
+											<p>{data.description}</p>
+										</div>
+									</div>
+								))}
 							</div>
-						))}
+						</div>
+						<footer>
+							<div className="left-column">
+								<a
+									className="button has-icon"
+									data-cy="submit-data-import"
+									onClick={handleLayout}
+								>
+									Next &nbsp; <Icon type="right" theme="outlined" />
+								</a>
+							</div>
+						</footer>
 					</div>
-				</div>
-			</div>
-			{/* <footer>
-				<div className="left-column">
-					<a
-						className="button has-icon"
-						data-cy="submit-data-import"
-						onClick={handleLayout}
-					>
-						Next &nbsp; <Icon type="right" theme="outlined" />
-					</a>
-				</div>
-			</footer> */}
+				) : sampleLayout()
+			}
 		</div>
 	);
 }
 
-// selectDataset.propTypes = {
-//     setURL: PropTypes.func.isRequired,
-// 	nextScreen: PropTypes.func,
-// 	url: PropTypes.string,
-// };
+selectDataset.propTypes = {
+    setURL: PropTypes.func.isRequired,
+	nextScreen: PropTypes.func,
+	url: PropTypes.string,
+};
 
-// selectDataset.defaultProps = {
-// 	nextScreen: null,
-// 	url: undefined,
-// };
+selectDataset.defaultProps = {
+	nextScreen: null,
+	url: undefined,
+};
 
 export default selectDataset;
