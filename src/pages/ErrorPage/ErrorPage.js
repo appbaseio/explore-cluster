@@ -89,7 +89,6 @@ class ErrorPage extends React.Component {
 					</Button>
 				</section>
 			</section>
-
 		) : (
 			children
 		);
