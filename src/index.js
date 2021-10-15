@@ -7,6 +7,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 
 import configureStore from './store';
 import Dashboard from './Dashboard';
+import * as Sentry from '@sentry/browser';
 
 import { mediaKey } from './utils/media';
 
@@ -59,5 +60,10 @@ const App = () => (
 if (window.Cypress) {
 	window.store = store;
 }
+
+Sentry.init({
+	dsn: "https://8e07fb23ba8f46d8a730e65496bb7f00@o27644.ingest.sentry.io/58038"
+});
+
 
 ReactDOM.render(<App />, document.getElementById('root'));
