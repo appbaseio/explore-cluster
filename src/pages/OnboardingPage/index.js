@@ -6,6 +6,7 @@ import ImportData from './screens/ImportData';
 import AppbaseFeatures from './screens/AppbaseFeatures';
 import Search from './screens/Search';
 import Facets from './screens/Facets';
+import selectDataset from './screens/selectDataset';
 
 import { onboardingStyles } from './styles';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
@@ -13,15 +14,16 @@ import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 const screens = {
 	0: Introduction,
 	1: ImportData,
-	2: Search,
-	3: Facets,
-	4: AppbaseFeatures,
+	2: selectDataset,
+	3: Search,
+	4: Facets,
+	5: AppbaseFeatures,
 };
 
 export default class Onboarding extends Component {
 	state = {
 		currentScreen: 0,
-		totalScreen: 5,
+		totalScreen: 6,
 		// eslint-disable-next-line
 		thresholdScreen: 0, // to maintain the max threshold reached by currentScreen
 		hasJSON: false,
@@ -181,12 +183,20 @@ export default class Onboarding extends Component {
 								className={currentScreen === 1 ? 'active' : null}
 								onClick={() => this.setScreen(1)}
 							>
-								Import data into your app
+								How to import data
 							</a>
 						</li>
 						<li>
 							<a
 								className={currentScreen === 2 ? 'active' : null}
+								onClick={() => this.setScreen(1)}
+							>
+								Choose your import dataset
+							</a>
+						</li>
+						<li>
+							<a
+								className={currentScreen === 3 ? 'active' : null}
 								onClick={() => this.setScreen(2)}
 							>
 								Set searchable fields
@@ -194,7 +204,7 @@ export default class Onboarding extends Component {
 						</li>
 						<li>
 							<a
-								className={currentScreen === 3 ? 'active' : null}
+								className={currentScreen === 4 ? 'active' : null}
 								onClick={() => this.setScreen(3)}
 							>
 								Set aggregation fields
