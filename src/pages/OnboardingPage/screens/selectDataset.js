@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Footer from '../components/Footer';
+import { Icon } from 'antd';
 
 const datsetMappings = [
 	{
@@ -33,10 +34,133 @@ const datsetMappings = [
 
 function selectDataset({ nextScreen }) {
 	const [dataset, setDataSet] = useState('movie');
+    const [layout, setLayout] = useState(0);
+    const [url,saveUrl] = useState('');
+    const [loading, setLoading] = useState('');
+    const [status, setStatus] = useState('Applying relevant settings...');
 
-	function handleSelect(id) {
+    function handleSelect(id) {
 		setDataSet(id);
 	}
+
+    function handleLayout() {
+        setLayout(1);
+    }
+
+    // function setURL(url) {
+    //     saveUrl(url);
+    //     setURL(url);
+    // }
+
+    // function hideLoader() {
+    //     setStatus('');
+    //     setLoading(false);
+    // }
+
+    // function renderJSONBlock() {
+    //     return (
+    //         <div>
+	// 		<p>Showing a sample JSON to be imported:</p>
+	// 		<div
+	// 			style={{ width: '650px' }}
+	// 			className="code-block"
+	// 			// dangerouslySetInnerHTML={{ __html: =====sample Data==== }}
+	// 		/>
+	// 	</div>
+    //     )
+    // }
+
+    // function setMapping() {
+    //     setLoading(true);
+    //     appbaseHelpers
+	// 		.applyAnalyzers()
+	// 		.then(() => {
+    //             setStatus('Preparing the database configuration...')
+	// 		})
+	// 		.then(appbaseHelpers.updateMapping)
+	// 		.then(() => {
+    //             setStatus('Indexing === data of === records... Almost done!')
+	// 		})
+	// 		.then(appbaseHelpers.indexData)
+	// 		.then(() => {
+    //             setStatus('Loading data browser... Hang tight!')
+	// 		})
+	// 		.then(() => {
+	// 			appbaseHelpers.createURL(setURL);
+	// 		})
+	// 		.catch((e) => {
+	// 			if (
+	// 				e._bodyInit ===
+	// 				'{"error":{"root_cause":[{"type":"parse_exception","reason":"request body is required"}],"type":"parse_exception","reason":"request body is required"},"status":400}'
+	// 			) {
+	// 				appbaseHelpers.createURL(setURL);
+	// 			}
+	// 			console.log('@error-at-importing-data', e);
+	// 			console.log('@error-at-importing-data-response-type', typeof e);
+	// 			console.log('error', e);
+	// 		});
+    // }
+
+    // function sampleLayout() {
+    //     let iframeURL = null;
+	// 	if (url) {
+	// 		const config = JSON.parse(url);
+	// 		const { protocol, host, auth } = parser(config.url);
+	// 		const dejavuAddress = `${protocol}://${auth}@${host}`;
+	// 		iframeURL = `https://dejavu.appbase.io/?appname=${config.appname}&url=${dejavuAddress}&footer=false&sidebar=false&appswitcher=false&mode=edit&cloneApp=false&oldBanner=false`;
+	// 	}
+
+    //     return (
+	// 		<div>
+	// 			<div className="wrapper">
+	// 				<div>
+	// 					<img src="/static/images/onboarding/Import.svg" alt="importing data" />
+	// 				</div>
+	// 				<div className="content">
+	// 					<header className="vcenter">
+	// 						<h2>Import data into your app</h2>
+	// 						{url ? (
+	// 							<p>Explore your imported dataset for the ==== store.</p>
+	// 						) : (
+	// 							<p>We will import a dataset of === movies obtained from TMDB.</p>
+	// 						)}
+	// 					</header>
+
+	// 					{url ? null : <div className="col-wrapper">{this.renderJSONBlock()}</div>}
+	// 				</div>
+	// 			</div>
+	// 			{iframeURL ? (
+	// 				<div>
+	// 					<iframe
+	// 						height="600px"
+	// 						width="100%"
+	// 						title="dejavu"
+	// 						src={iframeURL}
+	// 						frameBorder="0"
+	// 						style={{ marginTop: '-10px' }}
+	// 						onLoad={this.hideLoader}
+	// 					/>
+	// 				</div>
+	// 			) : null}
+	// 			<Loader show={loading} label={status} />
+	// 			{url ? (
+	// 				<Footer nextScreen={nextScreen} />
+	// 			) : (
+	// 				<footer>
+	// 					<div className="left-column">
+	// 						<a
+	// 							onClick={this.setMapping}
+	// 							data-cy="submit-data"
+	// 							className="primary button big"
+	// 						>
+	// 							Import ==== Dataset
+	// 						</a>
+	// 					</div>
+	// 				</footer>
+	// 			)}
+	// 		</div>
+	// 	);
+    // }
 
 	return (
 		<div>
@@ -78,9 +202,30 @@ function selectDataset({ nextScreen }) {
 					</div>
 				</div>
 			</div>
-			<Footer nextScreen={nextScreen} />
+			{/* <footer>
+				<div className="left-column">
+					<a
+						className="button has-icon"
+						data-cy="submit-data-import"
+						onClick={handleLayout}
+					>
+						Next &nbsp; <Icon type="right" theme="outlined" />
+					</a>
+				</div>
+			</footer> */}
 		</div>
 	);
 }
+
+// selectDataset.propTypes = {
+//     setURL: PropTypes.func.isRequired,
+// 	nextScreen: PropTypes.func,
+// 	url: PropTypes.string,
+// };
+
+// selectDataset.defaultProps = {
+// 	nextScreen: null,
+// 	url: undefined,
+// };
 
 export default selectDataset;

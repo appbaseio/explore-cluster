@@ -117,7 +117,9 @@ export default class Introduction extends Component {
 		});
 	};
 
-	renderImportContent = () => (
+	renderImportContent = () => {
+		const { nextScreen } = this.props;
+		return (
 		<div>
 			<div className="wrapper">
 				<div>
@@ -189,7 +191,7 @@ export default class Introduction extends Component {
 					</div>
 				</div>
 			</div>
-			<footer>
+			{/* <footer>
 				<div className="left-column">
 					<a
 						className="button has-icon"
@@ -199,9 +201,11 @@ export default class Introduction extends Component {
 						Next &nbsp; <Icon type="right" theme="outlined" />
 					</a>
 				</div>
-			</footer>
+			</footer> */}
+			<Footer nextScreen={nextScreen} />
 		</div>
-	);
+	)
+	}
 
 	render() {
 		const { url, loading, layout, status } = this.state;
