@@ -212,16 +212,6 @@ class Dashboard extends Component {
 							Back to Dashboard
 						</Button>
 						<Button
-							href="mailto:info@appbase.io"
-							target="_blank"
-							size="large"
-							type="danger"
-							css={{ marginLeft: '8' }}
-						>
-							<Icon type="info-circle" />
-							Report Bug
-						</Button>
-						<Button
 							size="large"
 							type="danger"
 							css={{ marginLeft: '8' }}
