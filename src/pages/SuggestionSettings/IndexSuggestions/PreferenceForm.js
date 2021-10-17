@@ -130,7 +130,6 @@ class PreferenceForm extends React.Component {
 		const { rawMappings } =  this.props
 		const { selectedIndices } = this.state;
 
-		console.log(selectedIndices, "ghujiojhgvgbhjkoijhgvgh");
 		const [aggsFields] = getDatafields({
 			mappings: rawMappings,
 			indexes: selectedIndices,
