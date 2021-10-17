@@ -66,7 +66,7 @@ class QuerySuggestions extends React.Component {
 			maxPredictedWords: [0, [Validators.required, Validators.min(0)]],
 			customQuery: '',
 			includeFields: [['*']],
-			excludeFields: [{ value: [], disabled: true }],
+			excludeFields: [[]],
 			urlField: '',
 			categoryField: '',
 			showDistinctSuggestions: false,
@@ -198,6 +198,7 @@ class QuerySuggestions extends React.Component {
 				maxPredictedWords: Number(this.form.value.maxPredictedWords),
 				size: Number(this.form.value.size),
 			};
+			console.log("formValue:", this.form.value);
 			savePreferences(payload).then((action) => {
 				if (get(action, 'payload')) {
 					notification.success({
@@ -216,6 +217,8 @@ class QuerySuggestions extends React.Component {
 	render() {
 		const { isLoading, preferences, hide } = this.props;
 		const { indices, total, initialData } = this.state;
+
+		console.log("indices:", indices);
 		if (isLoading && !preferences) {
 			return <Loader />;
 		}

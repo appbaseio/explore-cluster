@@ -160,6 +160,7 @@ class PreferenceForm extends React.Component {
 		} = this.state;
 		let mappingsFromIndices = [];
 
+
 		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
 		selectedIndices?.map(index => {
 			if(mappings[index]) {
