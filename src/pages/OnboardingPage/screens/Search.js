@@ -76,10 +76,6 @@ export default class Search extends Component {
 						data-cy="search-field"
 						options={[
 							{
-								value: 'title',
-								label: 'title',
-							},
-							{
 								value: 'original_title',
 								label: 'original_title',
 							},

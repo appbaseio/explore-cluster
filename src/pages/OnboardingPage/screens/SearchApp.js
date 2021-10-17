@@ -10,7 +10,7 @@ import {
 	SelectedFilters,
 	RangeInput
 } from '@appbaseio/reactivesearch';
-
+import { Tag, Icon } from 'antd';
 import appbaseHelpers from '../utils/appbaseHelpers';
 import { getURL } from '../../../constants/config';
 
@@ -49,6 +49,7 @@ const renderFilters = (fields) => {
 							dataField={field}
 							title="Vote Average"
 							filterLabel="Vote Average"
+							showHistogram
 							rangeLabels={(min, max) => ({
 								start: min,
 								end: max,
@@ -62,6 +63,7 @@ const renderFilters = (fields) => {
 							componentId={field}
 							dataField={field}
 							key={field}
+							showHistogram
 							title="Release Year"
 							filterLabel="Release Year"
 							range={{
@@ -141,10 +143,6 @@ const renderResultList = () => (
 							}}
 						/>
 						<ResultList key={item._id} id={item._id}>
-
-							{/* <ResultList.Image
-
-							/> */}
 							<ResultList.Content>
 								<ResultList.Title
 									dangerouslySetInnerHTML={{
@@ -153,14 +151,11 @@ const renderResultList = () => (
 								/>
 								<ResultList.Description>
 									<div>
-										<p
-											style={{ fontSize: '14px'}}
-											dangerouslySetInnerHTML={{ __html: item.release_year }}
-										/>
-										<p
-											style={{ fontSize: '16px', lineHeight: '24px' }}
-											dangerouslySetInnerHTML={{ __html: item.tagline }}
-										/>
+										<div style={{display: 'flex', color: '#424242'}}>
+											<p style={{fontWeight: '600', marginRight: 5}}>Release Year </p>
+											<p> {item.release_year}</p>
+											<p><Icon type="star" style={{ marginLeft: 40, marginRight: 3 }} theme="twoTone" /> {item.vote_average}/10</p>
+										</div>
 										<p
 											style={{
 												color: '#888',
@@ -171,9 +166,9 @@ const renderResultList = () => (
 											dangerouslySetInnerHTML={{ __html: item.overview }}
 										/>
 										<div>
-											{item.genres ? (
-												<span className="tag">{item.genres.join(",")}</span>
-											) : null}
+											{item.genres.map((genre) => (
+												<Tag>{genre}</Tag>
+											))}
 										</div>
 									</div>
 								</ResultList.Description>
