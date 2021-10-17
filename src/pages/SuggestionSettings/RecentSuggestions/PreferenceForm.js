@@ -265,7 +265,7 @@ class PreferenceForm extends React.Component {
 								return (
 									<Grid
 										label={
-											<p css={styles.labelContainer}>
+											<p css={styles.labelContainer} data-cy="indices-label">
 												Indices
 												<Popover
 													content={content(Messages.indices)}
@@ -293,7 +293,7 @@ class PreferenceForm extends React.Component {
 												{indices
 													.filter((i) => !i.startsWith('metricbeat'))
 													.map((index) => (
-														<Select.Option key={index}>
+														<Select.Option key={index} data-cy={index}>
 															{index}
 														</Select.Option>
 													))}

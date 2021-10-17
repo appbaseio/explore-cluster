@@ -29,6 +29,12 @@ describe('Recent Suggestion Settings add test flow', () => {
     it('Should Add Recent Suggestions Settings Form Data', () => {
         cy.get('[data-cy=recent-suggestions-min-hits]').clear().type(1);
         cy.get('[data-cy=recent-suggestions-size]').clear().type(3);
+        cy.get('[data-cy=recent-suggestions-minChars]').clear().type(4);
+
+        cy.get('[data-cy=recent-suggestions-indices]').invoke('val', '');
+        cy.get('[data-cy=recent-suggestions-indices]').click();
+        cy.get('[data-cy=airbeds-test-app]').click();
+        cy.get('[data-cy=indices-label]').click();
 
         // save button
         cy.get('[data-cy=recent-suggestions-save]').click();
