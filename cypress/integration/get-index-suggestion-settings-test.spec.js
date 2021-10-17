@@ -36,10 +36,13 @@ describe('Index Suggestion Settings add test flow', () => {
             }
         })
         .then((payload) => {
-            console.log(payload,"jnkijnkio");
-            cy.wait(2000);
-            // .invoke('val').should('deep.equal', ['CT', 'MA', 'VT'])
-            cy.get('[data-cy=index-suggestions-indices]').invoke('val').should('deep.equal', payload.body.indices);
+            cy.wait(3000);
+            cy.get('[data-cy=index-suggestions-indices] > div > ul > li').each(($el, index) => {
+                if (index < payload.body.indices.length - 1) {
+                    expect($el).to.have.text(payload.body.indices[index]);
+                }
+            });
+            // cy.get('[data-cy=index-suggestions-indices]').invoke('val').should('deep.equal', payload.body.indices);
             cy.get('[data-cy=show-distinct-suggestions]').should('have.value', JSON.stringify(payload.body.showDistinctSuggestions));
 			cy.get('[data-cy=enable-predictive-suggestions]').should('have.value', JSON.stringify(payload.body.enablePredictiveSuggestions));
 			cy.get('[data-cy=max-predicted-words]').should('have.value', payload.body.maxPredictedWords);
@@ -47,6 +50,21 @@ describe('Index Suggestion Settings add test flow', () => {
 			cy.get('[data-cy=custom-stopwords]').should('have.value', payload.body.customStopwords.join(','));
 			cy.get('[data-cy=enable-synonyms]').should('have.value', JSON.stringify(payload.body.enableSynonyms));
 			cy.get('[data-cy=index-suggestions-size]').should('have.value', payload.body.size);
+
+            cy.get('[data-cy=include-fields] > div > ul > li').each(($el, index) => {
+                if (index < payload.body.indices.length - 1) {
+                    expect($el).to.have.text(payload.body.includeFields[index]);
+                }
+            });
+
+            cy.get('[data-cy=exclude-fields] > div > ul > li').each(($el, index) => {
+                if (index < payload.body.indices.length - 1) {
+                    expect($el).to.have.text(payload.body.excludeFields[index]);
+                }
+            });
+
+            cy.get('[data-cy=category-field] > div > div.ant-select-selection-selected-value').should('have.text', payload.body.categoryField);
+            cy.get('[data-cy=url-index-setting] > div > div.ant-select-selection-selected-value').should('have.text', payload.body.urlField);
 
         })
 

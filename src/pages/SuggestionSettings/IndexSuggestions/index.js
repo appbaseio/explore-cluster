@@ -86,7 +86,7 @@ class QuerySuggestions extends React.Component {
 			value: null,
 		});
 
-		const {tier, featureSuggestions, getPreferences} = this.props;
+		const { tier, featureSuggestions, getPreferences } = this.props;
 
 		if (isValidPlan(tier, featureSuggestions)) {
 			getPreferences().then((action) => {
@@ -119,12 +119,13 @@ class QuerySuggestions extends React.Component {
 							categoryField: payload.categoryField || [],
 							urlField: payload.urlField || [],
 							showDistinctSuggestions: payload.showDistinctSuggestions || false,
-							enablePredictiveSuggestions: payload.enablePredictiveSuggestions || false,
+							enablePredictiveSuggestions:
+								payload.enablePredictiveSuggestions || false,
 							enableSynonyms: payload.enableSynonyms || false,
 							size: parseInt(payload.size, 10) || 0,
 							indices: payload.indices || ['*'],
-						}
-					})
+						},
+					});
 				} else {
 					this.setState({
 						initialData: {
@@ -133,7 +134,7 @@ class QuerySuggestions extends React.Component {
 							maxPredictedWords: 0,
 							customQuery: '',
 							includeFields: ['*'],
-							excludeFields:[],
+							excludeFields: [],
 							categoryField: [],
 							urlField: [],
 							showDistinctSuggestions: false,
@@ -141,8 +142,8 @@ class QuerySuggestions extends React.Component {
 							enableSynonyms: false,
 							size: 0,
 							indices: ['*'],
-						}
-					})
+						},
+					});
 				}
 			});
 			fetch(`${getURL()}/.suggestions/_search`, {
@@ -198,7 +199,7 @@ class QuerySuggestions extends React.Component {
 				maxPredictedWords: Number(this.form.value.maxPredictedWords),
 				size: Number(this.form.value.size),
 			};
-			console.log("formValue:", this.form.value);
+			console.log('formValue:', this.form.value);
 			savePreferences(payload).then((action) => {
 				if (get(action, 'payload')) {
 					notification.success({
@@ -218,7 +219,7 @@ class QuerySuggestions extends React.Component {
 		const { isLoading, preferences, hide } = this.props;
 		const { indices, total, initialData } = this.state;
 
-		console.log("indices:", indices);
+		// console.log("indices:", indices);
 		if (isLoading && !preferences) {
 			return <Loader />;
 		}
@@ -255,16 +256,14 @@ class QuerySuggestions extends React.Component {
 						</>
 					)}
 					<ErrorToaster>
-						{
-							Object.keys(initialData).length > 0 && (
-								<PreferenceForm
-									indices={indices}
-									handleSaveTemplate={this.handleSaveTemplate}
-									control={this.form}
-									initialData={initialData}
-								/>
-							)
-						}
+						{Object.keys(initialData).length > 0 && (
+							<PreferenceForm
+								indices={indices}
+								handleSaveTemplate={this.handleSaveTemplate}
+								control={this.form}
+								initialData={initialData}
+							/>
+						)}
 					</ErrorToaster>
 				</Container>
 			</React.Fragment>
