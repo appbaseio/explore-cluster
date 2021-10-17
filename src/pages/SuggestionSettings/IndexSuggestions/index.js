@@ -219,7 +219,6 @@ class QuerySuggestions extends React.Component {
 		const { isLoading, preferences, hide } = this.props;
 		const { indices, total, initialData } = this.state;
 
-		// console.log("indices:", indices);
 		if (isLoading && !preferences) {
 			return <Loader />;
 		}

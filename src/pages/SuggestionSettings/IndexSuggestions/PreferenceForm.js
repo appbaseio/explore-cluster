@@ -59,7 +59,7 @@ class PreferenceForm extends React.Component {
 		super(props);
 		this.state = {
 			visible: false,
-			selectedIndices: props.indices,
+			selectedIndices: props.initialData.indices || [],
 			aggregationFields: [],
 			indexSuggestions: props.initialData,
 			isFetchingMappings: props.isFetchingMappings,
@@ -87,7 +87,8 @@ class PreferenceForm extends React.Component {
 
 		if (prevProps.initialData !== initialData) {
 			this.setState({
-				indexSuggestions: initialData
+				indexSuggestions: initialData,
+				selectedIndices: initialData.indices,
 			})
 		}
 	}
@@ -129,6 +130,7 @@ class PreferenceForm extends React.Component {
 		const { rawMappings } =  this.props
 		const { selectedIndices } = this.state;
 
+		console.log(selectedIndices, "ghujiojhgvgbhjkoijhgvgh");
 		const [aggsFields] = getDatafields({
 			mappings: rawMappings,
 			indexes: selectedIndices,
