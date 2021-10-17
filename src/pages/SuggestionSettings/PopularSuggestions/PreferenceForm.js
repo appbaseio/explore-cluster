@@ -480,13 +480,13 @@ class PreferenceForm extends React.Component {
 									background: 'white',
 								}}
 							>
-								<SearchPreviewSwitcher
+								{/* <SearchPreviewSwitcher
 									filteredApps={filteredApps}
 									onSelect={this.onAppSelect}
 									onCancel={this.toggleVisibility}
 									visible={visible}
 									app={app}
-								/>
+								/> */}
 								<Button
 									data-cy="popular-suggestions-save"
 									onClick={handleSaveTemplate}
