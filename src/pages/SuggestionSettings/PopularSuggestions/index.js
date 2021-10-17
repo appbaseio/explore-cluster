@@ -208,10 +208,9 @@ class QuerySuggestions extends React.Component {
 	};
 
 	render() {
-		const { isLoading, preferences, apps } = this.props;
+		const { isLoading, preferences } = this.props;
 		const { indices, total, initialData } = this.state;
 
-		console.log(total, get(preferences, 'index'), "poppppppp");
 		if (isLoading && !preferences) {
 			return <Loader />;
 		}

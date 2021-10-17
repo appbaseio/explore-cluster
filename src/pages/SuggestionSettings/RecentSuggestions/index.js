@@ -72,7 +72,7 @@ class QuerySuggestions extends React.Component {
 	componentDidMount() {
 		// triggering custom event for google analytics
 		event({
-			action: 'Popular Suggestions',
+			action: 'Recent Suggestions',
 			category: 'Search Relevancy',
 			label: 'visit',
 			value: null,
@@ -148,7 +148,7 @@ class QuerySuggestions extends React.Component {
 		timingEvent({
 			action: 'timing_complete',
 			category: 'Search Relevancy',
-			label: 'popular-suggestions-time',
+			label: 'recent-suggestions-time',
 			name: 'time',
 			value: this.startTime.fromNow(),
 		});

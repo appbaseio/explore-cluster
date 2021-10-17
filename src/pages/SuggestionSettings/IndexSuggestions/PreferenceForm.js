@@ -62,7 +62,7 @@ class PreferenceForm extends React.Component {
 			selectedIndices: props.indices,
 			aggregationFields: [],
 			indexSuggestions: props.initialData,
-			isFetching: true,
+			isFetchingMappings: props.isFetchingMappings,
 		};
 	}
 
@@ -76,9 +76,13 @@ class PreferenceForm extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { rawMappings, initialData } = this.props;
+		const { rawMappings, initialData, isFetchingMappings } = this.props;
 		if (rawMappings && prevProps.rawMappings !== rawMappings) {
 			this.getAggregationFields();
+		}
+
+		if (isFetchingMappings !== prevProps.isFetchingMappings) {
+			this.setState({ isFetchingMappings });
 		}
 
 		if (prevProps.initialData !== initialData) {
@@ -101,7 +105,6 @@ class PreferenceForm extends React.Component {
 	}
 
 	handleChange = (key, val, dataKey) => {
-		console.log(key, val, "vguiougfchui");
 		let value = val;
 		if (key === 'customStopwords') {
 			value = val.split(',').map((i) => removeWhiteSpaces(i));
@@ -153,20 +156,24 @@ class PreferenceForm extends React.Component {
 			aggregationFields,
 			indexSuggestions,
 			selectedIndices,
-			isFetching
+			isFetchingMappings,
 		} = this.state;
 		let mappingsFromIndices = [];
 
 		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
 		selectedIndices?.map(index => {
 			if(mappings[index]) {
-				mappingsFromIndices = [...mappingsFromIndices, ...mappings[index]];
+				mappings[index].forEach((mapping) => {
+					if (!mappingsFromIndices.includes(mapping)) {
+						mappingsFromIndices.push(mapping);
+					}
+				});
 			}
 		});
 
 		let categoryFields = aggregationFields;
-		let excludeFields = [...new Set(indexSuggestions?.excludeFields)];
-		let includeFields = [...new Set(indexSuggestions?.includeFields)];
+		const { excludeFields, includeFields } = indexSuggestions;
+
 		return (
 			<FieldGroup
 				control={control}
@@ -547,7 +554,7 @@ class PreferenceForm extends React.Component {
 											showSearch
 											onChange={(value) => {
 												this.handleChange(
-													'exludeFields',
+													'excludeFields',
 													calculateValue(value),
 													'indexSuggestions',
 												);
@@ -593,7 +600,7 @@ class PreferenceForm extends React.Component {
 										<Select
 											{...handler()}
 											placeholder="Add category fields from schema"
-											loading={false}
+											loading={isFetchingMappings}
 											style={{ width: '100%' }}
 											data-cy="category-field"
 											showSearch
@@ -642,7 +649,7 @@ class PreferenceForm extends React.Component {
 										<Select
 											{...handler()}
 											placeholder="Add URL field from schema"
-											loading={isFetching}
+											loading={isFetchingMappings}
 											style={{ width: '100%' }}
 											data-cy="url-index-setting"
 											showSearch
@@ -744,7 +751,7 @@ class PreferenceForm extends React.Component {
 								</Button>
 								<Footer
 									originalData={initialData}
-									tab='popular-suggestions'
+									tab='index-suggestions'
 									changedData={indexSuggestions}
 								/>
 							</div>
@@ -776,6 +783,7 @@ PreferenceForm.propTypes = {
 	]),
 	fetchStoredQueries: PropTypes.func.isRequired,
 	credentials: PropTypes.string.isRequired,
+	isFetchingMappings: PropTypes.bool.isRequired,
 };
 
 PreferenceForm.defaultProps = {
@@ -795,6 +803,7 @@ const mapStateToProps = (state) => {
 		mappings,
 		rawMappings,
 		isLoading: get(state, '$saveSuggestionsPreferences.isFetching', false),
+		isFetchingMappings: get(state, '$getAppMappings.isFetching', false),
 		appName,
 		apps: get(state, 'apps.data'),
 		credentials: `${username}:${password}`,

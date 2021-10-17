@@ -99,6 +99,18 @@ const ReviewAndSave = ({oldData, newData}) => {
             };
         }
 
+        if (get(diffData, 'indexSuggestions.customQuery', null)) {
+            const newVal = get(newObj, 'indexSuggestions.customQuery', '');
+            const oldVal = get(oldObj, 'indexSuggestions.customQuery', '');
+            diffData = {
+                ...diffData,
+                indexSuggestions: {
+                    ...diffData.indexSuggestions,
+                    customQuery: [oldVal, newVal],
+                },
+            };
+        }
+
         if (get(diffData, 'indexSuggestions.includeFields', null)) {
             const newVal = get(newObj, 'indexSuggestions.includeFields', []);
             const oldVal = get(oldObj, 'indexSuggestions.includeFields', []);
