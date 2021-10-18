@@ -19,19 +19,18 @@ export default {
 			},
 			analyzer: 'standard',
 		},
-        adult: {
-            type: 'boolean',
-        },
-        id: {
-            type: 'text',
+		adult: {
+			type: 'boolean',
+		},
+		id: {
+			type: 'text',
 			fields: {
 				keyword: {
 					type: 'keyword',
 				},
 			},
 			analyzer: 'standard',
-
-        },
+		},
 		original_language: {
 			type: 'text',
 			fields: {
@@ -65,7 +64,7 @@ export default {
 			},
 			analyzer: 'standard',
 		},
-        title: {
+		title: {
 			type: 'text',
 			fields: {
 				autosuggest: {
@@ -115,17 +114,17 @@ export default {
 		release_date: {
 			type: 'date',
 		},
-    release_year: {
-      type: 'integer',
-    },
+		release_year: {
+			type: 'integer',
+		},
 		vote_average: {
-            type: 'double',
-        },
-        vote_count: {
-            type: 'integer'
-        },
-        popularity: {
-            type: 'double',
-        }
+			type: 'double',
+		},
+		vote_count: {
+			type: 'integer',
+		},
+		popularity: {
+			type: 'double',
+		},
 	},
 };
