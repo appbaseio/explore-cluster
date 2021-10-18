@@ -41,7 +41,7 @@ describe('Index Suggestion Settings add test flow', () => {
                     expect($el).to.have.text(payload.body.indices[index]);
                 }
             });
-            // cy.get('[data-cy=index-suggestions-indices]').invoke('val').should('deep.equal', payload.body.indices);
+
             cy.get('[data-cy=show-distinct-suggestions]').should('have.value', JSON.stringify(payload.body.showDistinctSuggestions));
 			cy.get('[data-cy=enable-predictive-suggestions]').should('have.value', JSON.stringify(payload.body.enablePredictiveSuggestions));
 			cy.get('[data-cy=max-predicted-words]').should('have.value', payload.body.maxPredictedWords);

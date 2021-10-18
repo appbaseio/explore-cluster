@@ -36,11 +36,17 @@ describe('Recent Suggestion Settings add test flow', () => {
             }
         })
         .then((payload) => {
-            console.log(payload,"jnkijnkio");
             cy.wait(2000);
 
             cy.get('[data-cy=recent-suggestions-min-hits]').should('have.value', payload.body.minHits);
         	cy.get('[data-cy=recent-suggestions-size]').should('have.value', payload.body.size);
+            cy.get('[data-cy=recent-suggestions-minChars]').should('have.value', payload.body.minChars);
+
+            cy.get('[data-cy=recent-suggestions-indices] > div > ul > li').each(($el, index) => {
+                if (index < payload.body.indices.length - 1) {
+                    expect($el).to.have.text(payload.body.indices[index]);
+                }
+            });
         })
     });
 });

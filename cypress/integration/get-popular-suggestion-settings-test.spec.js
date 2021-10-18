@@ -36,8 +36,13 @@ describe('Popular Suggestion Settings add test flow', () => {
             }
         })
         .then((payload) => {
-            console.log(payload,"jnkijnkio");
             cy.wait(2000);
+
+            cy.get('[data-cy=popular-suggestions-indices] > div > ul > li').each(($el, index) => {
+                if (index < payload.body.indices.length - 1) {
+                    expect($el).to.have.text(payload.body.indices[index]);
+                }
+            });
 
             cy.get('[data-cy=number-of-days]').should('have.value', payload.body.numberOfDays);
             cy.get('[data-cy=min-count]').should('have.value', payload.body.minCount);
