@@ -49,7 +49,7 @@ const renderFilters = (fields) => {
 							dataField={field}
 							title="Vote Average"
 							filterLabel="Vote Average"
-							showHistogram
+							showHistogram={true}
 							rangeLabels={(min, max) => ({
 								start: min,
 								end: max,
@@ -63,9 +63,9 @@ const renderFilters = (fields) => {
 							componentId={field}
 							dataField={field}
 							key={field}
-							showHistogram
 							title="Release Year"
 							filterLabel="Release Year"
+							showHistogram={true}
 							range={{
 								start: 1950,
 								end: 2021,
