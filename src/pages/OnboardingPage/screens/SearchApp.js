@@ -8,8 +8,9 @@ import {
 	ReactiveList,
 	ResultList,
 	SelectedFilters,
+	RangeInput
 } from '@appbaseio/reactivesearch';
-
+import { Tag, Icon } from 'antd';
 import appbaseHelpers from '../utils/appbaseHelpers';
 import { getURL } from '../../../constants/config';
 
@@ -26,46 +27,48 @@ const renderFilters = (fields) => {
 							componentId={field}
 							dataField="genres.keyword"
 							title="Genres"
-							size={15}
-							sortBy="count"
-							react={{
-								and: ['search', 'original_language', 'release_year'],
-							}}
-							showSearch={false}
 							filterLabel="Genres"
-						/>
-					);
-				}
-				case 'original_language': {
-					return (
-						<MultiList
-							key={field}
-							componentId={field}
-							dataField="original_language.keyword"
-							title="Language"
 							size={15}
 							sortBy="count"
 							react={{
-								and: ['search', 'genres', 'release_year'],
+								and: [
+									'search',
+									'vote_average',
+									'release_year'
+								],
 							}}
 							showSearch={false}
-							filterLabel="Language"
 						/>
 					);
 				}
-				case 'release_year': {
+				case 'vote_average': {
 					return (
 						<DynamicRangeSlider
 							key={field}
 							componentId={field}
 							dataField={field}
-							title="Release Year"
+							title="Vote Average"
+							filterLabel="Vote Average"
+							showHistogram={true}
 							rangeLabels={(min, max) => ({
 								start: min,
 								end: max,
 							})}
-							react={{
-								and: ['search', 'genres', 'original_language'],
+						/>
+					);
+				}
+				case 'release_year': {
+					return (
+						<RangeInput
+							componentId={field}
+							dataField={field}
+							key={field}
+							title="Release Year"
+							filterLabel="Release Year"
+							showHistogram={true}
+							range={{
+								start: 1950,
+								end: 2021,
 							}}
 						/>
 					);
@@ -93,6 +96,9 @@ const getWeights = (fields) => {
 		original_title: 10,
 		'original_title.raw': 10,
 		'original_title.search': 2,
+		title: 10,
+		'title.raw': 10,
+		'title.search': 2,
 		tagline: 5,
 		'tagline.raw': 5,
 		'tagline.search': 1,
@@ -109,7 +115,7 @@ const renderResultList = () => (
 		componentId="results"
 		dataField="name"
 		react={{
-			and: ['search', 'genres', 'original_language', 'release_year'],
+			and: ['search', 'genres', 'vote_average', 'release_year'],
 		}}
 		size={4}
 		className="right-col"
@@ -123,38 +129,53 @@ const renderResultList = () => (
 		{({ data }) => (
 			<ResultListWrapper>
 				{data.map((item) => (
-					<ResultList key={item._id} id={item._id}>
-						<ResultList.Image src={item.poster_path} />
-						<ResultList.Content>
-							<ResultList.Title
-								dangerouslySetInnerHTML={{
-									__html: item.original_title,
-								}}
-							/>
-							<ResultList.Description>
-								<div>
-									<p
-										style={{ fontSize: '16px', lineHeight: '24px' }}
-										dangerouslySetInnerHTML={{ __html: item.tagline }}
-									/>
-									<p
-										style={{
-											color: '#888',
-											margin: '8px 0',
-											fontSize: '13px',
-											lineHeight: '18px',
-										}}
-										dangerouslySetInnerHTML={{ __html: item.overview }}
-									/>
+					<div style={{display: 'flex', padding: 10, borderBottom: '1px solid rgb(239, 239, 239)'}}>
+						<img
+							style={{
+								height: 160,
+								width: 160,
+								objectFit: 'contain',
+							}}
+							src={item.poster_path}
+							alt={item.poster_path}
+							onError={(event) => {
+								event.target.src = 'https://www.houseoftara.com/shop/wp-content/uploads/2019/05/placeholder.jpg'; // eslint-disable-line no-param-reassign
+							}}
+						/>
+						<ResultList key={item._id} id={item._id}>
+							<ResultList.Content>
+								<ResultList.Title
+									dangerouslySetInnerHTML={{
+										__html: item.original_title,
+									}}
+								/>
+								<ResultList.Description>
 									<div>
-										{item.genres ? (
-											<span className="tag">{item.genres}</span>
-										) : null}
+										<div style={{display: 'flex', color: '#424242'}}>
+											<p style={{fontWeight: '600', marginRight: 5}}>Release Year </p>
+											<p> {item.release_year}</p>
+											<p><Icon type="star" style={{ marginLeft: 40, marginRight: 3 }} theme="twoTone" /> {item.vote_average}/10</p>
+										</div>
+										<p
+											style={{
+												color: '#888',
+												margin: '8px 0',
+												fontSize: '13px',
+												lineHeight: '18px',
+											}}
+											dangerouslySetInnerHTML={{ __html: item.overview }}
+										/>
+										<div>
+											{item.genres.map((genre) => (
+												<Tag>{genre}</Tag>
+											))}
+										</div>
 									</div>
-								</div>
-							</ResultList.Description>
-						</ResultList.Content>
-					</ResultList>
+								</ResultList.Description>
+							</ResultList.Content>
+						</ResultList>
+
+					</div>
 				))}
 			</ResultListWrapper>
 		)}
@@ -218,6 +239,7 @@ export default class SearchApp extends Component {
 			<ReactiveBase
 				{...this.appConfig}
 				url={SCALR_API}
+				enableAppbase
 				className="search-app"
 				theme={{
 					colors: {
