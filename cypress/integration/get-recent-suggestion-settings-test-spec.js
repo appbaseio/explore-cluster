@@ -27,11 +27,10 @@ describe('Recent Suggestion Settings add test flow', () => {
     });
 
     it('Should Get Recent Suggestions Settings Form Data', () => {
-		const url = "http://localhost:8000"
         let credentials = btoa(`${username}:${password}`);
         cy.request({
             method: 'GET',
-            url: `${url}/_recent_suggestions/preferences`,
+            url: `${app_url}/_recent_suggestions/preferences`,
             headers: {
                 Authorization: `Basic ${credentials}`
             }
