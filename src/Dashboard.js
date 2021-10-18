@@ -14,10 +14,6 @@ import Loader from './components/Loader';
 import Logo from './components/Logo';
 import { APP_ROUTES, CLUSTER_ROUTES } from './constants/routes';
 
-Sentry.init({
-	dsn: 'https://8e07fb23ba8f46d8a730e65496bb7f00@sentry.io/58038',
-});
-
 // routes
 const LoginPage = Loadable({
 	loader: () => import(/* webpackChunkName: "LoginPage" */ './pages/LoginPage'),
@@ -56,9 +52,16 @@ class Dashboard extends Component {
 		redirectLocation: null,
 	};
 
+	eventId = null;
+
 	componentDidMount() {
 		const { loadArcUser } = this.props;
 		const { pathname, search } = window.location;
+
+		window.addEventListener('error', event => {
+            const errorId = Sentry.lastEventId();
+            this.eventId = errorId;
+        });
 
 		if (pathname !== '/login' && pathname !== '/' && search) {
 			this.setState({
@@ -209,14 +212,17 @@ class Dashboard extends Component {
 							Back to Dashboard
 						</Button>
 						<Button
-							href="mailto:info@appbase.io"
-							target="_blank"
 							size="large"
 							type="danger"
 							css={{ marginLeft: '8' }}
+							onClick={() => {
+								Sentry.showReportDialog({
+									eventId: this.eventId,
+								});
+							}}
 						>
 							<Icon type="info-circle" />
-							Report Bug
+							Report this problem
 						</Button>
 					</section>
 				</section>
