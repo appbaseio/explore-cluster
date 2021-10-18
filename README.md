@@ -1,6 +1,6 @@
 ## appbase.io dashboard
 
-sugar, spice and everything nice.
+sugar, spice and everything nice
 
 ### Setup
 
