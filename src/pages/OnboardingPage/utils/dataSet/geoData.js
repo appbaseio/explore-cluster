@@ -1,4 +1,4 @@
-export const GEO_DATA = [
+module.exports = [
 	{
 		location: {
 			lat: '-53.496',

@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Select from 'react-select';
-
+import EcommSearchApp from './searchApp/ecommData';
+import GeoSearchApp from './searchApp/geoData';
+import MoviesSearchApp from './searchApp/moviesData';
 import SearchApp from './SearchApp';
 import Footer from '../components/Footer';
 
@@ -41,14 +43,76 @@ export default class Search extends Component {
 	};
 
 	renderSearchApp = () => {
-		const { searchFields } = this.props;
-		return (
-			<div>
-				{this.renderSearchInput(true)}
-				<SearchApp fields={searchFields} />
-			</div>
-		);
+		const { searchFields, selectedDataset } = this.props;
+		if(selectedDataset === 'movies') {
+			return (
+				<div>
+					{this.renderSearchInput(true)}
+					<MoviesSearchApp fields={searchFields} />
+				</div>
+			)
+		} else if(selectedDataset === 'products') {
+			return (
+				<div>
+					{this.renderSearchInput(true)}
+					<EcommSearchApp fields={searchFields} />
+				</div>
+			)
+		} else if(selectedDataset === 'geo') {
+			return (
+				<div>
+					{this.renderSearchInput(true)}
+					<GeoSearchApp fields={searchFields} />
+				</div>
+			)
+		} else {
+			return (
+				<div>
+					{this.renderSearchInput(true)}
+					<SearchApp fields={searchFields} />
+				</div>
+			);
+		}
+
 	};
+
+	handleOptions = () => {
+		const {selectedDataset} = this.props;
+		if(selectedDataset === 'movies') {
+			return [
+				{
+					value: 'original_title',
+					label: 'original_title',
+				},
+				{
+					value: 'overview',
+					label: 'overview',
+				},
+			]
+		} else if(selectedDataset === 'products') {
+			return [
+				{
+					value: 'product_name',
+					label: 'product_name',
+				},
+				{
+					value: 'description',
+					label: 'description',
+				},
+				{
+					value: 'categories',
+					label: 'categories',
+				}
+			]
+		} else {
+			return [
+				{
+					value: 'place',
+					label: 'place',
+				}
+			]
+		}
+	}
 
 	renderSearchInput = (horizontal) => {
 		const { error, selectedOption } = this.state;
@@ -74,16 +138,7 @@ export default class Search extends Component {
 						isClearable={false}
 						inputId="searchable-fields"
 						data-cy="search-field"
-						options={[
-							{
-								value: 'original_title',
-								label: 'original_title',
-							},
-							{
-								value: 'overview',
-								label: 'overview',
-							},
-						]}
+						// options={() => handleOptions}
 					/>
 				</div>
 				{error && (
@@ -144,10 +199,12 @@ Search.propTypes = {
 	searchFields: PropTypes.array,
 	previousScreen: PropTypes.func,
 	setSearchFields: PropTypes.func.isRequired,
+	selectedDataset: PropTypes.string,
 };
 
 Search.defaultProps = {
 	nextScreen: null,
 	searchFields: [],
 	previousScreen: null,
+	selectedDataset: 'movies'
 };

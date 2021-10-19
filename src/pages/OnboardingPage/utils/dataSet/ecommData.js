@@ -1,4 +1,4 @@
-export const ECOMM_DATA = [
+module.exports = [
 	{
 		brand: 'couponsmall',
 		categories: [

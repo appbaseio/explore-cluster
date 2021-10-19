@@ -1,4 +1,4 @@
-export const MOVIES_DATA = [
+module.exports = [
 	{
 		adult: false,
 		backdrop_path: 'https://www.themoviedb.org/t/p/w1280/8Y43POKjjKDGI9MH89NW0NAzzp8.jpg',

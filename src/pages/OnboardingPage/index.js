@@ -30,6 +30,7 @@ export default class Onboarding extends Component {
 		searchFields: [],
 		facetFields: [],
 		url: '',
+		selectedDataset: 'movies',
 	};
 
 	nextScreen = () => {
@@ -83,6 +84,12 @@ export default class Onboarding extends Component {
 		});
 	};
 
+	handleDataset = (selectedDataset) => {
+		this.setState({
+			selectedDataset,
+		})
+	}
+
 	setSearchFields = (searchFields) => {
 		this.setState({
 			searchFields,
@@ -108,7 +115,7 @@ export default class Onboarding extends Component {
 	};
 
 	renderCurrentScreen = () => {
-		const { currentScreen, hasJSON, url, searchFields, facetFields, newApp } = this.state;
+		const { currentScreen, hasJSON, url, searchFields, facetFields, newApp, selectedDataset } = this.state;
 		const RenderScreen = screens[currentScreen];
 		let props = {};
 
@@ -126,11 +133,13 @@ export default class Onboarding extends Component {
 			props = {
 				url,
 				setURL: this.setURL,
+				handleDataset: this.handleDataset,
 			};
 		} else if (currentScreen === 3) {
 			props = {
 				setSearchFields: this.setSearchFields,
 				searchFields,
+				selectedDataset,
 			};
 		} else if (currentScreen === 4) {
 			props = {
@@ -138,6 +147,7 @@ export default class Onboarding extends Component {
 				facetFields,
 				searchFields,
 				app: newApp,
+				selectedDataset,
 			};
 		} else {
 			props = {

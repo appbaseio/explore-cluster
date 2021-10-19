@@ -44,18 +44,19 @@ const datsetMappings = [
 ];
 
 
-function selectDataset({ nextScreen, setURL, url: newUrl }) {
+function selectDataset({ nextScreen, setURL, url: newUrl, handleDataset }) {
 	const [dataset, setDataSet] = useState({ name: 'Movies Dataset', count: '10,000' });
     const [layout, setLayout] = useState(0);
     const [url,saveUrl] = useState(newUrl);
     const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState('Applying relevant settings...');
 
-    function handleSelect(name, count) {
+    function handleSelect(name, count, id) {
 		setDataSet({
 			name,
 			count
 		});
+		handleDataset(id);
 	}
 
 	function setMapping() {
@@ -65,11 +66,11 @@ function selectDataset({ nextScreen, setURL, url: newUrl }) {
 			.then(() => {
                 setStatus('Preparing the database configuration...')
 			})
-			.then(appbaseHelpers.updateMapping)
+			.then(appbaseHelpers.updateMapping(dataset))
 			.then(() => {
-                setStatus('Indexing === data of === records... Almost done!')
+                setStatus(`Indexing ${dataset.name} of ${dataset.count} records... Almost done!`)
 			})
-			.then(appbaseHelpers.indexData)
+			.then(appbaseHelpers.indexData(dataset))
 			.then(() => {
                 setStatus('Loading data browser... Hang tight!')
 			})
@@ -214,7 +215,7 @@ function selectDataset({ nextScreen, setURL, url: newUrl }) {
 											border: data.name === dataset.name ? '1px solid #1890ff' : 'none',
 											// background: '#e4f0fb
 										}}
-										onClick={() => handleSelect(data.name, data.count)}
+										onClick={() => handleSelect(data.name, data.count, data.id)}
 									>
 										<img
 											src={data.url}
