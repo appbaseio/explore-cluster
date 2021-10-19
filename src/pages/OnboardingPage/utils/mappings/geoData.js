@@ -27,15 +27,6 @@ export default {
 	time: {
 		type: 'date',
 	},
-	_id: {
-		type: 'text',
-		fields: {
-			keyword: {
-				type: 'keyword',
-			},
-		},
-		analyzer: 'standard',
-	},
 	year: {
 		type: 'integer',
 	},

@@ -59,35 +59,60 @@ function selectDataset({ nextScreen, setURL, url: newUrl, handleDataset }) {
 		handleDataset(id);
 	}
 
-	function setMapping() {
-        setLoading(true);
-        appbaseHelpers
-			.applyAnalyzers()
-			.then(() => {
-                setStatus('Preparing the database configuration...')
-			})
-			.then(appbaseHelpers.updateMapping(dataset))
-			.then(() => {
-                setStatus(`Indexing ${dataset.name} of ${dataset.count} records... Almost done!`)
-			})
-			.then(appbaseHelpers.indexData(dataset))
-			.then(() => {
-                setStatus('Loading data browser... Hang tight!')
-			})
-			.then(() => {
+	async function setMapping() {
+		try {
+			setLoading(true);
+			await appbaseHelpers.applyAnalyzers();
+			setStatus('Preparing the database configuration...');
+
+			await appbaseHelpers.updateMapping(dataset);
+			setStatus(`Indexing ${dataset.name} of ${dataset.count} records... Almost done!`);
+
+			await appbaseHelpers.indexData(dataset);
+			setStatus('Loading data browser... Hang tight!');
+
+			await appbaseHelpers.createURL(handleUrl);
+		} catch(err) {
+			if (
+				e._bodyInit ===
+				'{"error":{"root_cause":[{"type":"parse_exception","reason":"request body is required"}],"type":"parse_exception","reason":"request body is required"},"status":400}'
+			) {
 				appbaseHelpers.createURL(handleUrl);
-			})
-			.catch((e) => {
-				if (
-					e._bodyInit ===
-					'{"error":{"root_cause":[{"type":"parse_exception","reason":"request body is required"}],"type":"parse_exception","reason":"request body is required"},"status":400}'
-				) {
-					appbaseHelpers.createURL(handleUrl);
-				}
-				console.log('@error-at-importing-data', e);
-				console.log('@error-at-importing-data-response-type', typeof e);
-				console.log('error', e);
-			});
+			}
+			console.log('@error-at-importing-data', e);
+			console.log('@error-at-importing-data-response-type', typeof e);
+			console.log('error', e);
+		}
+
+
+
+		// appbaseHelpers
+		// 	.applyAnalyzers()
+		// 	.then(() => {
+        //         setStatus('Preparing the database configuration...')
+		// 	})
+		// 	.then(appbaseHelpers.updateMapping(dataset))
+		// 	.then(() => {
+        //         setStatus(`Indexing ${dataset.name} of ${dataset.count} records... Almost done!`)
+		// 	})
+		// 	.then(appbaseHelpers.indexData(dataset))
+		// 	.then(() => {
+        //         setStatus('Loading data browser... Hang tight!')
+		// 	})
+		// 	.then(() => {
+		// 		appbaseHelpers.createURL(handleUrl);
+		// 	})
+		// 	.catch((e) => {
+		// 		if (
+		// 			e._bodyInit ===
+		// 			'{"error":{"root_cause":[{"type":"parse_exception","reason":"request body is required"}],"type":"parse_exception","reason":"request body is required"},"status":400}'
+		// 		) {
+		// 			appbaseHelpers.createURL(handleUrl);
+		// 		}
+		// 		console.log('@error-at-importing-data', e);
+		// 		console.log('@error-at-importing-data-response-type', typeof e);
+		// 		console.log('error', e);
+		// 	});
     }
 
 	function hideLoader() {
