@@ -6,6 +6,9 @@ import PropTypes from 'prop-types';
 import Loader from '../components/Loader';
 import parser from 'url-parser-lite';
 import appbaseHelpers from '../utils/appbaseHelpers';
+import { moviesJson } from '../utils/sampleData/moviesData';
+import { geoJson } from '../utils/sampleData/geoData';
+import { ecommJson } from '../utils/sampleData/ecommData';
 
 const datsetMappings = [
 	{
@@ -16,6 +19,7 @@ const datsetMappings = [
 		url:
 			'http://img5a.flixcart.com/image/keyboard/tablet-keyboard/r/z/y/couponsmall-key-343-original-imaefv2emhpp3tku.jpeg',
 		alt: 'movies-image',
+		count: '10,000'
 	},
 	{
 		id: 'products',
@@ -25,6 +29,7 @@ const datsetMappings = [
 		url:
 			'http://img5a.flixcart.com/image/keyboard/tablet-keyboard/r/z/y/couponsmall-key-343-original-imaefv2emhpp3tku.jpeg',
 		alt: 'products-image',
+		count: '1,500',
 	},
 	{
 		id: 'geo',
@@ -34,48 +39,26 @@ const datsetMappings = [
 		url:
 			'http://img5a.flixcart.com/image/keyboard/tablet-keyboard/r/z/y/couponsmall-key-343-original-imaefv2emhpp3tku.jpeg',
 		alt: 'geo-image',
+		count: '3,500'
 	},
 ];
 
-function selectDataset({ nextScreen }) {
-	const [dataset, setDataSet] = useState('movies');
+
+function selectDataset({ nextScreen, setURL, url: newUrl }) {
+	const [dataset, setDataSet] = useState({ name: 'Movies Dataset', count: '10,000' });
     const [layout, setLayout] = useState(0);
-    const [url,saveUrl] = useState('');
-    const [loading, setLoading] = useState('');
+    const [url,saveUrl] = useState(newUrl);
+    const [loading, setLoading] = useState(false);
     const [status, setStatus] = useState('Applying relevant settings...');
 
-    function handleSelect(id) {
-		setDataSet(id);
+    function handleSelect(name, count) {
+		setDataSet({
+			name,
+			count
+		});
 	}
 
-    function handleLayout() {
-        setLayout(1);
-    }
-
-    function setURL(url) {
-        saveUrl(url);
-        setURL(url);
-    }
-
-    function hideLoader() {
-        setStatus('');
-        setLoading(false);
-    }
-
-    function renderJSONBlock() {
-        return (
-            <div>
-			<p>Showing a sample JSON to be imported:</p>
-			<div
-				style={{ width: '650px' }}
-				className="code-block"
-				// dangerouslySetInnerHTML={{ __html: =====sample Data==== }}
-			/>
-		</div>
-        )
-    }
-
-    function setMapping() {
+	function setMapping() {
         setLoading(true);
         appbaseHelpers
 			.applyAnalyzers()
@@ -91,20 +74,58 @@ function selectDataset({ nextScreen }) {
                 setStatus('Loading data browser... Hang tight!')
 			})
 			.then(() => {
-				appbaseHelpers.createURL(setURL);
+				appbaseHelpers.createURL(handleUrl);
 			})
 			.catch((e) => {
 				if (
 					e._bodyInit ===
 					'{"error":{"root_cause":[{"type":"parse_exception","reason":"request body is required"}],"type":"parse_exception","reason":"request body is required"},"status":400}'
 				) {
-					appbaseHelpers.createURL(setURL);
+					appbaseHelpers.createURL(handleUrl);
 				}
 				console.log('@error-at-importing-data', e);
 				console.log('@error-at-importing-data-response-type', typeof e);
 				console.log('error', e);
 			});
     }
+
+	function hideLoader() {
+        setStatus('');
+        setLoading(false);
+    }
+
+	function jsonBlock() {
+		if(dataset.name === 'Movies Dataset') {
+			return moviesJson;
+		} else if(dataset.name === 'Products Dataset') {
+			return ecommJson;
+		} else {
+			return geoJson;
+		}
+	}
+
+    function renderJSONBlock() {
+        return (
+            <div>
+			<p>Showing a sample JSON to be imported:</p>
+			<div
+				style={{ width: '650px' }}
+				className="code-block"
+				dangerouslySetInnerHTML={{ __html: jsonBlock() }}
+			/>
+		</div>
+        )
+    }
+
+	function handleUrl(url) {
+        saveUrl(url);
+        setURL(url);
+    }
+
+    function handleLayout() {
+        setLayout(1);
+    }
+
 
     function sampleLayout() {
         let iframeURL = null;
@@ -125,9 +146,9 @@ function selectDataset({ nextScreen }) {
 						<header className="vcenter">
 							<h2>Import data into your app</h2>
 							{url ? (
-								<p>Explore your imported dataset for the ==== store.</p>
+								<p>{`Explore your imported ${dataset.name}.`}</p>
 							) : (
-								<p>We will import a dataset of === movies obtained from TMDB.</p>
+								<p>{`We will import a dataset of ${dataset.count} items obtained from TMDB.`}</p>
 							)}
 						</header>
 
@@ -143,7 +164,7 @@ function selectDataset({ nextScreen }) {
 							src={iframeURL}
 							frameBorder="0"
 							style={{ marginTop: '-10px' }}
-							onLoad={this.hideLoader}
+							onLoad={() => hideLoader()}
 						/>
 					</div>
 				) : null}
@@ -154,11 +175,11 @@ function selectDataset({ nextScreen }) {
 					<footer>
 						<div className="left-column">
 							<a
-								onClick={this.setMapping}
+								onClick={() => setMapping()}
 								data-cy="submit-data"
 								className="primary button big"
 							>
-								Import ==== Dataset
+								{`Import ${dataset.name}`}
 							</a>
 						</div>
 					</footer>
@@ -190,10 +211,10 @@ function selectDataset({ nextScreen }) {
 											marginBottom: '15px',
 											display: 'flex',
 											background: 'white',
-											border: data.id === dataset ? '1px solid #1890ff' : 'none',
+											border: data.name === dataset.name ? '1px solid #1890ff' : 'none',
 											// background: '#e4f0fb
 										}}
-										onClick={() => handleSelect(data.id)}
+										onClick={() => handleSelect(data.name, data.count)}
 									>
 										<img
 											src={data.url}

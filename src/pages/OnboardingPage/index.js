@@ -122,12 +122,17 @@ export default class Onboarding extends Component {
 				url,
 				setURL: this.setURL,
 			};
-		} else if (currentScreen === 2) {
+		}else if (currentScreen === 2) {
+			props = {
+				url,
+				setURL: this.setURL,
+			};
+		} else if (currentScreen === 3) {
 			props = {
 				setSearchFields: this.setSearchFields,
 				searchFields,
 			};
-		} else if (currentScreen === 3) {
+		} else if (currentScreen === 4) {
 			props = {
 				setFacetFields: this.setFacetFields,
 				facetFields,
@@ -208,6 +213,14 @@ export default class Onboarding extends Component {
 								onClick={() => this.setScreen(3)}
 							>
 								Set aggregation fields
+							</a>
+						</li>
+						<li>
+							<a
+								className={currentScreen === 5 ? 'active' : null}
+								onClick={() => this.setScreen(4)}
+							>
+								Demo and next steps
 							</a>
 						</li>
 						{/* <li>
