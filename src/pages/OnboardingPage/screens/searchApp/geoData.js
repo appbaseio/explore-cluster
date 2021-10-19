@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
 	DataSearch,
-	DynamicRangeSlider,
+	RangeSlider,
 	MultiList,
 	ReactiveBase,
 	ReactiveList,
@@ -29,9 +29,9 @@ const renderFilters = (fields) => {
                             title="Magnitude"
                             filterLabel="Magnitude"
                             showHistogram={true}
-                            range={{
-                                start: 0,
-                                end: 10,
+                            rangeLabels={{
+                                start: '0',
+                                end: '10',
                             }}
                         />
                     );

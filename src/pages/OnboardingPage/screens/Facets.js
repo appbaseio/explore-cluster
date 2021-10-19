@@ -1,16 +1,36 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Select from 'react-select';
-
+import EcommSearchApp from './searchApp/ecommData';
+import GeoSearchApp from './searchApp/geoData';
+import MoviesSearchApp from './searchApp/moviesData';
 import SearchApp from './SearchApp';
 import Footer from '../components/Footer';
 
 export default class Search extends Component {
 	state = {
 		error: '',
+		options: [
+			{
+				value: 'release_year',
+				label: 'release_year',
+			},
+			{
+				value: 'genres',
+				label: 'genres',
+			},
+			{
+				value: 'vote_average',
+				label: 'vote_average',
+			},
+		],
 		// eslint-disable-next-line react/destructuring-assignment
 		selectedOption: this.props.facetFields.map((item) => ({ label: item, value: item })) || [],
 	};
+
+	componentDidMount() {
+		this.handleOptions();
+	}
 
 	handleChange = (selectedOption) => {
 		this.setState({ selectedOption });
@@ -45,17 +65,97 @@ export default class Search extends Component {
 	};
 
 	renderSearchApp = () => {
-		const { searchFields, facetFields } = this.props;
-		return (
-			<div>
-				{this.renderFacetInput(true)}
-				<SearchApp fields={searchFields} facets={facetFields} />
-			</div>
-		);
+		const { searchFields, facetFields, selectedDataset } = this.props;
+
+		if(selectedDataset === 'movies') {
+			return (
+				<div>
+					{this.renderFacetInput(true)}
+					<MoviesSearchApp fields={searchFields} facets={facetFields}/>
+				</div>
+			)
+		} else if(selectedDataset === 'products') {
+			return (
+				<div>
+					{this.renderFacetInput(true)}
+					<EcommSearchApp fields={searchFields} facets={facetFields}/>
+				</div>
+			)
+		} else if(selectedDataset === 'geo') {
+			return (
+				<div>
+					{this.renderFacetInput(true)}
+					<GeoSearchApp fields={searchFields} facets={facetFields}/>
+				</div>
+			)
+		} else {
+			return (
+				<div>
+					{this.renderFacetInput(true)}
+					<SearchApp fields={searchFields} facets={facetFields}/>
+				</div>
+			);
+		}
+
 	};
 
+	handleOptions = () => {
+		const {selectedDataset} = this.props;
+		if(selectedDataset === 'movies') {
+			this.setState({
+				options: [
+					{
+						value: 'release_year',
+						label: 'release_year',
+					},
+					{
+						value: 'genres',
+						label: 'genres',
+					},
+					{
+						value: 'vote_average',
+						label: 'vote_average',
+					},
+				]
+			})
+		} else if(selectedDataset === 'products') {
+			this.setState({
+				options: [
+					{
+						value: 'categories',
+						label: 'categories',
+					},
+					{
+						value: 'brand',
+						label: 'brand',
+					},
+					{
+						value: 'retail_price',
+						label: 'retail_price',
+					},
+				]
+			})
+		} else {
+			this.setState({
+				options: [
+					{
+						value: 'magnitude',
+						label: 'magnitude',
+					},
+					{
+						value: 'year',
+						label: 'year',
+					},
+					{
+						value: 'place',
+						label: 'place',
+					},
+				]
+			})
+		}
+	}
 	renderFacetInput = (horizontal) => {
-		const { error, selectedOption } = this.state;
+		const { error, selectedOption, options } = this.state;
 		return (
 			<div className={`search-field-container ${horizontal ? 'full-row' : ''}`}>
 				<div>
@@ -74,20 +174,7 @@ export default class Search extends Component {
 						isMulti
 						inputId="searchable-aggergation-field"
 						isClearable={false}
-						options={[
-							{
-								value: 'release_year',
-								label: 'release_year',
-							},
-							{
-								value: 'genres',
-								label: 'genres',
-							},
-							{
-								value: 'vote_average',
-								label: 'vote_average',
-							},
-						]}
+						options={options}
 					/>
 				</div>
 				{error && (

@@ -10,9 +10,23 @@ import Footer from '../components/Footer';
 export default class Search extends Component {
 	state = {
 		error: '',
+		options: [
+			{
+				value: 'original_title',
+				label: 'original_title',
+			},
+			{
+				value: 'overview',
+				label: 'overview',
+			},
+		],
 		// eslint-disable-next-line react/destructuring-assignment
 		selectedOption: this.props.searchFields.map((item) => ({ label: item, value: item })) || [],
 	};
+
+	componentDidMount() {
+		this.handleOptions();
+	}
 
 	setError = (e) => {
 		if (this.interval) clearInterval(this.interval);
@@ -44,6 +58,7 @@ export default class Search extends Component {
 
 	renderSearchApp = () => {
 		const { searchFields, selectedDataset } = this.props;
+		console.log(selectedDataset, searchFields, "======");
 		if(selectedDataset === 'movies') {
 			return (
 				<div>
@@ -79,43 +94,79 @@ export default class Search extends Component {
 	handleOptions = () => {
 		const {selectedDataset} = this.props;
 		if(selectedDataset === 'movies') {
-			return [
-				{
-					value: 'original_title',
-					label: 'original_title',
-				},
-				{
-					value: 'overview',
-					label: 'overview',
-				},
-			]
+			this.setState({
+				options: [
+					{
+						value: 'original_title',
+						label: 'original_title',
+					},
+					{
+						value: 'overview',
+						label: 'overview',
+					},
+				]
+			})
+			// return [
+			// 	{
+			// 		value: 'original_title',
+			// 		label: 'original_title',
+			// 	},
+			// 	{
+			// 		value: 'overview',
+			// 		label: 'overview',
+			// 	},
+			// ]
 		} else if(selectedDataset === 'products') {
-			return [
-				{
-					value: 'product_name',
-					label: 'product_name',
-				},
-				{
-					value: 'description',
-					label: 'description',
-				},
-				{
-					value: 'categories',
-					label: 'categories',
-				}
-			]
+			this.setState({
+				options: [
+					{
+						value: 'product_name',
+						label: 'product_name',
+					},
+					{
+						value: 'description',
+						label: 'description',
+					},
+					{
+						value: 'categories',
+						label: 'categories',
+					}
+				]
+			})
+			// return [
+			// 	{
+			// 		value: 'product_name',
+			// 		label: 'product_name',
+			// 	},
+			// 	{
+			// 		value: 'description',
+			// 		label: 'description',
+			// 	},
+			// 	{
+			// 		value: 'categories',
+			// 		label: 'categories',
+			// 	}
+			// ]
 		} else {
-			return [
-				{
-					value: 'place',
-					label: 'place',
-				}
-			]
+			this.setState({
+				options: [
+					{
+						value: 'place',
+						label: 'place',
+					}
+				]
+			})
+			// return [
+			// 	{
+			// 		value: 'place',
+			// 		label: 'place',
+			// 	}
+			// ]
 		}
 	}
 
 	renderSearchInput = (horizontal) => {
-		const { error, selectedOption } = this.state;
+		const { error, selectedOption, options } = this.state;
 		return (
 			<div
 				style={{ marginTop: 0 }}
@@ -138,7 +189,7 @@ export default class Search extends Component {
 						isClearable={false}
 						inputId="searchable-fields"
 						data-cy="search-field"
-						// options={() => handleOptions}
+						options={options}
 					/>
 				</div>
 				{error && (
