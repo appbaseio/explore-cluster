@@ -274,7 +274,7 @@ const settingsMap = {
 		title: 'Min Hits',
 		description: 'Define the minimum number of results that must present for a suggestion.',
 	},
-	minCharacters: {
+	minChars: {
 		title: 'Min Characters',
 		description: 'Define the minimum number of characters that must be present for a suggestion.',
 	},
