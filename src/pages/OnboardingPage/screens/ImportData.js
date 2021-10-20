@@ -9,27 +9,46 @@ import Loader from '../components/Loader';
 import appbaseHelpers from '../utils/appbaseHelpers';
 
 const jsonBlock = `
-<div style="background: #DCF8FF; overflow:auto;width:auto;padding:1rem;"><pre style="margin: 0; line-height: 180%; border: 0; background: transparent; border-radius: 0;">[
-	{
-		<span style="font-weight: bold; color: #4070a0">&quot;genres&quot;</span><span style="color: #666666">:</span> <span style="color: #4070a0">&quot;Comedy&quot;</span>,
-		<span style="font-weight: bold; color: #4070a0">&quot;original_language&quot;</span><span style="color: #666666">:</span> <span style="color: #4070a0">&quot;English&quot;</span>,
-		<span style="font-weight: bold; color: #4070a0">&quot;original_title&quot;</span><span style="color: #666666">:</span> <span style="color: #4070a0">&quot;Minions&quot;</span>,
-		<span style="font-weight: bold; color: #4070a0">&quot;overview&quot;</span><span style="color: #666666">:</span> <span style="color: #4070a0">&quot;Minions Stuart, Kevin and Bob are recruited by Scarlet Overkill, a super-villain who, alongside her inventor husband Herb, hatches a plot to take over the world.&quot;</span>,
-		<span style="font-weight: bold; color: #4070a0">&quot;poster_path&quot;</span><span style="color: #666666">:</span> <span style="color: #4070a0">&quot;https://image.tmdb.org/t/p/w185/q0R4crx2SehcEEQEkYObktdeFy.jpg&quot;</span>,
-		<span style="font-weight: bold; color: #4070a0">&quot;release_year&quot;</span><span style="color: #666666">:</span> <span style="color: #40a070">2015</span>,
-		<span style="font-weight: bold; color: #4070a0">&quot;tagline&quot;</span><span style="color: #666666">:</span> <span style="color: #4070a0">&quot;Before Gru, they had a history of bad bosses&quot;</span>
-	},
-	{
-		<span style="font-weight: bold; color: #4070a0">&quot;genres&quot;</span><span style="color: #666666">:</span> <span style="color: #4070a0">&quot;Action&quot;</span>,
-		<span style="font-weight: bold; color: #4070a0">&quot;original_language&quot;</span><span style="color: #666666">:</span> <span style="color: #4070a0">&quot;English&quot;</span>,
-		<span style="font-weight: bold; color: #4070a0">&quot;original_title&quot;</span><span style="color: #666666">:</span> <span style="color: #4070a0">&quot;Wonder Woman&quot;</span>,
-		<span style="font-weight: bold; color: #4070a0">&quot;overview&quot;</span><span style="color: #666666">:</span> <span style="color: #4070a0">&quot;An Amazon princess comes to the world of Man to become the greatest of the female superheroes.&quot;</span>,
-		<span style="font-weight: bold; color: #4070a0">&quot;poster_path&quot;</span><span style="color: #666666">:</span> <span style="color: #4070a0">&quot;https://image.tmdb.org/t/p/w185/imekS7f1OuHyUP2LAiTEM0zBzUz.jpg&quot;</span>,
-		<span style="font-weight: bold; color: #4070a0">&quot;release_year&quot;</span><span style="color: #666666">:</span> <span style="color: #40a070">2017</span>,
-		<span style="font-weight: bold; color: #4070a0">&quot;tagline&quot;</span><span style="color: #666666">:</span> <span style="color: #4070a0">&quot;Power. Grace. Wisdom. Wonder.&quot;</span>
-	},
-	...
+<div style="background: #DCF8FF; overflow:auto;width:auto;padding:1rem;">
+<pre style="margin: 0; line-height: 180%; border: 0; background: transparent; border-radius: 0;">
+ <code>
+ [
+    {
+        "adult": false,
+        "backdrop_path": "https://www.themoviedb.org/t/p/w1280/inJjDhCjfhh3RtrJWBmmDqeuSYC.jpg",
+        "genres": [ "Action", "Adventure", "Fantasy" ],
+        "id": 399566,
+        "original_language": "en",
+        "original_title": "Godzilla vs. Kong",
+        "overview": "In a time when monsters walk the Earth, humanity’s fight for its future sets Godzilla and Kong on a collision course that will see the two most powerful forces of nature on the planet collide in a spectacular battle for the ages.",
+        "popularity": 456.906,
+        "poster_path": "https://www.themoviedb.org/t/p/w1280/pgqgaUx1cJb5oZQQ5v0tNARCeBp.jpg",
+        "release_date": "2021-03-24",
+        "title": "Godzilla vs. Kong",
+        "video": false,
+        "vote_average": 7.9,
+        "vote_count": 7001,
+        "release_year": 2021,
+    },
+    {
+        "adult": false,
+        "backdrop_path": "https://www.themoviedb.org/t/p/w1280/dssCw0mUmD4EriUmkwB3PnsGu4q.jpg",
+        "genre_ids": [ "Animation", "Action", "Fantasy" ],
+        "id": 841755,
+        "original_language": "en",
+        "original_title": "Mortal Kombat Legends: Battle of the Realms",
+        "overview": "The Earthrealm heroes must journey to the Outworld and fight for the survival of their homeland, invaded by the forces of evil warlord Shao Kahn, in the tournament to end all tournaments: the final Mortal Kombat.",
+        "popularity": 395.824,
+        "poster_path": "https://www.themoviedb.org/t/p/w1280/ablrE8IbWcIrAxMmm4gnPn75AMS.jpg",
+        "release_date": "2021-08-30",
+        "title": "Mortal Kombat Legends: Battle of the Realms",
+        "video": false,
+        "vote_average": 8,
+        "vote_count": 138,
+        "release_year": 2021,
+    }
 ]
+ </code>
 </pre></div>
 `;
 
@@ -60,7 +79,7 @@ export default class Introduction extends Component {
 			.then(appbaseHelpers.updateMapping)
 			.then(() => {
 				this.setState({
-					status: 'Indexing movies data of 500 records... Almost done!',
+					status: 'Indexing movies data of 10,000 records... Almost done!',
 				});
 			})
 			.then(appbaseHelpers.indexData)
@@ -229,7 +248,7 @@ export default class Introduction extends Component {
 							{url ? (
 								<p>Explore your imported dataset for the movies store.</p>
 							) : (
-								<p>We will import a dataset of 500 movies obtained from TMDB.</p>
+								<p>We will import a dataset of 10,000 movies obtained from TMDB.</p>
 							)}
 						</header>
 
