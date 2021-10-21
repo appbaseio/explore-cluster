@@ -11,7 +11,7 @@ import Container from '../../../components/Container';
 import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
 import {
 	getRecentSuggestionsPreferences,
-	saveRecentSuggestionsPreferences
+	saveRecentSuggestionsPreferences,
 } from '../../../batteries/modules/actions';
 import PreferenceForm from './PreferenceForm';
 import { isValidPlan } from '../../../batteries/utils';
@@ -21,7 +21,7 @@ import Flex from '../../../batteries/components/shared/Flex';
 import ErrorToaster from '../../../batteries/components/shared/ErrorToaster';
 import { event, timingEvent } from '../../../utils/gtag';
 import moment from '../../../utils/moment';
-import { PreferenceFormContext  } from '../IndexSuggestions';
+import { PreferenceFormContext } from '../IndexSuggestions';
 
 const main = css`
 	.actionBtn {
@@ -67,7 +67,6 @@ class QuerySuggestions extends React.Component {
 			minChars: [0, [Validators.required, Validators.min(0), Validators.max(10)]],
 			indices: [['*']],
 		});
-
 	}
 
 	componentDidMount() {
@@ -79,7 +78,7 @@ class QuerySuggestions extends React.Component {
 			value: null,
 		});
 
-		const {tier, featureSuggestions} = this.props;
+		const { tier, featureSuggestions } = this.props;
 
 		if (isValidPlan(tier, featureSuggestions)) {
 			this.fetchPreferences();
@@ -128,43 +127,43 @@ class QuerySuggestions extends React.Component {
 	}
 
 	fetchPreferences = () => {
-		const {getPreferences} = this.props;
+		const { getPreferences } = this.props;
 		getPreferences().then((action) => {
 			// prefilling
 			const payload = get(action, 'payload');
 			if (payload) {
 				this.form.patchValue({
 					minHits: parseInt(payload.minHits, 10) || 0,
-					size: parseInt(payload.size, 10) || 0,
+					size: parseInt(payload.size, 10) || 1,
 					minChars: parseInt(payload.minChars, 10) || 0,
 					indices: payload.indices || ['*'],
 				});
 				this.setState({
 					initialData: {
 						minHits: parseInt(payload.minHits, 10) || 0,
-						size: parseInt(payload.size, 10) || 0,
+						size: parseInt(payload.size, 10) || 1,
 						minChars: parseInt(payload.minChars, 10) || 0,
 						indices: payload.indices || ['*'],
-					}
-				})
+					},
+				});
 			} else {
 				this.setState({
 					initialData: {
 						minHits: 0,
-						size: 0,
+						size: 1,
 						minChars: 0,
 						indices: ['*'],
-					}
-				})
+					},
+				});
 			}
 		});
-	}
+	};
 
 	handleSaveTemplate = (obj = '') => {
 		try {
 			const { savePreferences } = this.props;
 			let payload;
-			if(obj) {
+			if (obj) {
 				payload = {};
 			} else {
 				payload = {
@@ -200,7 +199,7 @@ class QuerySuggestions extends React.Component {
 			<React.Fragment>
 				<PreferenceFormContext.Provider
 					value={{
-						value: "recent",
+						value: 'recent',
 						saveTemplate: this.handleSaveTemplate,
 					}}
 				>
@@ -235,15 +234,13 @@ class QuerySuggestions extends React.Component {
 							</>
 						)}
 						<ErrorToaster>
-							{
-								Object.keys(initialData).length > 0 && (
-									<PreferenceForm
-										indices={indices}
-										control={this.form}
-										initialData={initialData}
-									/>
-								)
-							}
+							{Object.keys(initialData).length > 0 && (
+								<PreferenceForm
+									indices={indices}
+									control={this.form}
+									initialData={initialData}
+								/>
+							)}
 						</ErrorToaster>
 					</Container>
 				</PreferenceFormContext.Provider>
