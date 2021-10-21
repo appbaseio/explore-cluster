@@ -262,7 +262,7 @@ const settingsMap = {
 		title: 'Category Field',
 		description: 'When specified, suggestions will show category specific suggestions based on the most frequent values based on this field.',
 	},
-	url: {
+	urlField: {
 		title: 'URL',
 		description: 'When specified, suggestions will redirect to the URL value based on this field.',
 	},
