@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Input, Select, Button, Affix, Switch, Popover, Icon } from 'antd';
+import { Input, Select, Switch, Popover, Icon } from 'antd';
 import { css } from 'react-emotion';
 import PropTypes from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
@@ -35,7 +35,7 @@ const modal = css`
 	max-width: 800px;
 	margin: 20px auto;
 	background-color: #fff;
-	padding: 50px 70px;
+
 	width: 100%;
 	.error {
 		color: tomato;
@@ -254,7 +254,6 @@ class PreferenceForm extends React.Component {
 											checked={value}
 											{...handler()}
 											onChange={val => {
-												console.log(val, "distinct-toggle");
 												this.handleChange('showDistinctSuggestions', val, 'indexSuggestions')
 												handler().onChange(val);
 											}}
@@ -727,22 +726,22 @@ class PreferenceForm extends React.Component {
 								);
 							}}
 						/>
-						<Affix offsetBottom={0}>
+						{/* <Affix offsetBottom={0}>
 							<div
 								style={{
 									display: 'flex',
 									justifyContent: 'space-between',
-									padding: 20,
+									// padding: 20,
 									background: 'white',
 								}}
 							>
-								{/* <SearchPreviewSwitcher
+								<SearchPreviewSwitcher
 									filteredApps={filteredApps}
 									onSelect={this.onAppSelect}
 									onCancel={this.toggleVisibility}
 									visible={visible}
 									app={app}
-								/> */}
+								/>
 								<Button
 									data-cy="index-suggestions-save"
 									onClick={handleSaveTemplate}
@@ -760,7 +759,20 @@ class PreferenceForm extends React.Component {
 									changedData={indexSuggestions}
 								/>
 							</div>
-						</Affix>
+						</Affix> */}
+						{/* <SearchPreviewSwitcher
+							filteredApps={filteredApps}
+							onSelect={this.onAppSelect}
+							onCancel={this.toggleVisibility}
+							visible={visible}
+							app={app}
+						/> */}
+						<Footer
+							handleSaveTemplate={handleSaveTemplate}
+							originalData={initialData}
+							tab='index-suggestions'
+							changedData={indexSuggestions}
+						/>
 					</div>
 				)}
 			/>
