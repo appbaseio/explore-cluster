@@ -100,8 +100,14 @@ const Footer = ({
                         app={app}
                     />
                 </div>
-                <div>
-                    <Button size="large" onClick={() => saveTemplate({})}>Reset To Default Settings</Button>
+                <div style={{display: 'flex'}}>
+                    <Button
+                        style={{marginRight: 5}}
+                        size="large"
+                        onClick={() => saveTemplate({})}
+                    >
+                        Reset To Default Settings
+                    </Button>
                     <ReviewAndSave oldData={oldObj} newData={newObj} />
                 </div>
             </div>
