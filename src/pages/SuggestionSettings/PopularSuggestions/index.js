@@ -20,7 +20,7 @@ import Flex from '../../../batteries/components/shared/Flex';
 import ErrorToaster from '../../../batteries/components/shared/ErrorToaster';
 import { event, timingEvent } from '../../../utils/gtag';
 import moment from '../../../utils/moment';
-export const PreferenceFormContext = React.createContext();
+export const PopularPreferenceFormContext = React.createContext();
 
 const main = css`
 	.actionBtn {
@@ -214,15 +214,14 @@ class QuerySuggestions extends React.Component {
 	render() {
 		const { isLoading, preferences } = this.props;
 		const { indices, total, initialData } = this.state;
-
 		if (isLoading && !preferences) {
 			return <Loader />;
 		}
 		return (
 			<React.Fragment>
-				<PreferenceFormContext.Provider
+				<PopularPreferenceFormContext.Provider
 					value={{
-						value: "demo",
+						value: "popular",
 						saveTemplate: this.handleSaveTemplate,
 					}}
 				>
@@ -262,13 +261,14 @@ class QuerySuggestions extends React.Component {
 										indices={indices}
 										control={this.form}
 										initialData={initialData}
+										// handleSaveTemplate={handleSaveTemplate}
 									/>
 								)
 							}
 
 						</ErrorToaster>
 					</Container>
-				</PreferenceFormContext.Provider>
+				</PopularPreferenceFormContext.Provider>
 			</React.Fragment>
 		);
 	}

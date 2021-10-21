@@ -231,7 +231,7 @@ class QuerySuggestions extends React.Component {
 			<React.Fragment>
 				<PreferenceFormContext.Provider
 					value={{
-						value: "demo",
+						value: "index",
 						saveTemplate: this.handleSaveTemplate,
 					}}
 				>

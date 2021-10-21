@@ -45,66 +45,6 @@ const content = (message) => {
 	return <div>{message}</div>;
 };
 
-const InputElement = ({ name, label, toolTipMessage, inputProps, placeholder }) => (
-	<FieldControl
-		name={name}
-		render={({ handler, invalid, touched, hasError, getError }) => (
-			<Grid
-				label={
-					<p css={styles.labelContainer}>
-						{label}
-						<Popover content={content(toolTipMessage)} css={styles.iconContainer}>
-							<Icon type="info-circle" />
-						</Popover>
-					</p>
-				}
-				component={
-					<div style={{ width: '100%' }}>
-						<div>
-							<Input
-								className={touched && invalid ? 'input-error' : null}
-								placeholder={placeholder}
-								type="number"
-								{...handler()}
-								{...inputProps}
-							/>
-						</div>
-
-						{touched && invalid && (
-							<div className="error">
-								{(hasError('required') &&
-									`Please enter ${label.toLowerCase()} value.`) ||
-									(hasError('min') &&
-										`Minimum allowed value for ${label.toLowerCase()} is ${
-											getError('min').min
-										}.`) ||
-									(hasError('max') &&
-										`Maximum allowed value for ${label.toLowerCase()} is ${
-											getError('max').max
-										}.`)}
-							</div>
-						)}
-					</div>
-				}
-			/>
-		)}
-	/>
-);
-
-InputElement.propTypes = {
-	name: PropTypes.string.isRequired,
-	label: PropTypes.string.isRequired,
-	toolTipMessage: PropTypes.any,
-	inputProps: PropTypes.object,
-	placeholder: PropTypes.string,
-};
-
-InputElement.defaultProps = {
-	toolTipMessage: undefined,
-	inputProps: {},
-	placeholder: undefined,
-};
-
 class PreferenceForm extends React.Component {
 	constructor(props) {
 		super(props);

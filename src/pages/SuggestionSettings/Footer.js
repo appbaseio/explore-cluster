@@ -7,6 +7,8 @@ import keys from 'lodash/keys';
 import { connect } from 'react-redux';
 import SearchPreviewSwitcher from '../../components/SearchPreviewSwitcher';
 import { PreferenceFormContext } from './IndexSuggestions';
+import { PopularPreferenceFormContext } from './PopularSuggestions';
+import { RecentPreferenceFormContext } from './RecentSuggestions';
 
 const Footer = ({
     originalData,
@@ -73,8 +75,9 @@ const Footer = ({
         setVisible(!visible);
 	};
 
-    const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.') && !appName.startsWith('metricbeat'))
-    const { saveTemplate } = useContext(PreferenceFormContext);
+    const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.') && !appName.startsWith('metricbeat'));
+    console.log("=====", useContext(PopularPreferenceFormContext));
+    // const { saveTemplate } = useContext(PreferenceFormContext);
     return (
         <div
             style={{

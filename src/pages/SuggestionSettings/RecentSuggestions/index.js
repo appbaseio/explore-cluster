@@ -21,7 +21,7 @@ import Flex from '../../../batteries/components/shared/Flex';
 import ErrorToaster from '../../../batteries/components/shared/ErrorToaster';
 import { event, timingEvent } from '../../../utils/gtag';
 import moment from '../../../utils/moment';
-export const PreferenceFormContext = React.createContext();
+export const RecentPreferenceFormContext = React.createContext();
 
 const main = css`
 	.actionBtn {
@@ -193,9 +193,9 @@ class QuerySuggestions extends React.Component {
 		}
 		return (
 			<React.Fragment>
-				<PreferenceFormContext.Provider
+				<RecentPreferenceFormContext.Provider
 					value={{
-						value: "demo",
+						value: "recent",
 						saveTemplate: this.handleSaveTemplate,
 					}}
 				>
@@ -241,7 +241,7 @@ class QuerySuggestions extends React.Component {
 							}
 						</ErrorToaster>
 					</Container>
-				</PreferenceFormContext.Provider>
+				</RecentPreferenceFormContext.Provider>
 			</React.Fragment>
 		);
 	}
