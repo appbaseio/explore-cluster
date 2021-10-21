@@ -19,7 +19,7 @@ import Footer from '../Footer';
 
 const gridRatio = 0.40;
 const calculateValue = (value) => {
-	const index = value.indexOf('*');
+	const index = value?.indexOf('*');
 	if (index > -1) {
 		if (index === 0 && value.length !== 1) {
 			value.splice(index, 1);
@@ -49,6 +49,7 @@ const content = (message) => {
 };
 
 const getDisabled = (value) => {
+	console.log(value);
 	if (Array.isArray(value)) return value[0] === '*';
 	return false;
 };
@@ -58,7 +59,7 @@ class PreferenceForm extends React.Component {
 		super(props);
 		this.state = {
 			visible: false,
-			selectedIndices: props.initialData.indices || [],
+			selectedIndices: JSON.stringify(props.initialData.indices) == JSON.stringify(['*']) ? props.indices : props.initialData.indices || [],
 			aggregationFields: [],
 			indexSuggestions: props.initialData,
 			isFetchingMappings: props.isFetchingMappings,
@@ -161,8 +162,6 @@ class PreferenceForm extends React.Component {
 		} = this.state;
 		let mappingsFromIndices = [];
 
-
-		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
 		selectedIndices?.map(index => {
 			if(mappings[index]) {
 				mappings[index].forEach((mapping) => {
@@ -488,7 +487,7 @@ class PreferenceForm extends React.Component {
 											notFoundContent={null}
 											style={{ width: '100%' }}
 											tokenSeparators={[',']}
-											disabled={getDisabled(excludeFields)}
+											// disabled={getDisabled(excludeFields)}
 											data-cy="include-fields"
 											showSearch
 											onChange={(value) => {
@@ -600,6 +599,7 @@ class PreferenceForm extends React.Component {
 									component={
 										<Select
 											{...handler()}
+											allowClear
 											placeholder="Add category fields from schema"
 											loading={isFetchingMappings}
 											style={{ width: '100%' }}
@@ -649,6 +649,7 @@ class PreferenceForm extends React.Component {
 									component={
 										<Select
 											{...handler()}
+											allowClear
 											placeholder="Add URL field from schema"
 											loading={isFetchingMappings}
 											style={{ width: '100%' }}

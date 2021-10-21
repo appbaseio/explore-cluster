@@ -241,7 +241,6 @@ ReviewAndSave.propTypes = {
 
 const mapStateToProps = (state) => {
     const isLoading= get(state, '$savePopularSuggestionsPreferences.isFetching', false);
-    console.log(isLoading);
     return {
         isLoading,
     }

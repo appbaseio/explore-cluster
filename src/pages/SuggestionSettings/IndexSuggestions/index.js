@@ -154,7 +154,7 @@ class QuerySuggestions extends React.Component {
 					showDistinctSuggestions: payload.showDistinctSuggestions || false,
 					enablePredictiveSuggestions: payload.enablePredictiveSuggestions || false,
 					enableSynonyms: payload.enableSynonyms || false,
-					size: parseInt(payload.size, 10) || 0,
+					size: parseInt(payload.size, 10) || 1,
 					indices: payload.indices || ['*'],
 				});
 				this.setState({
@@ -171,7 +171,7 @@ class QuerySuggestions extends React.Component {
 						enablePredictiveSuggestions:
 							payload.enablePredictiveSuggestions || false,
 						enableSynonyms: payload.enableSynonyms || false,
-						size: parseInt(payload.size, 10) || 0,
+						size: parseInt(payload.size, 10) || 1,
 						indices: payload.indices || ['*'],
 					},
 				});
@@ -189,7 +189,7 @@ class QuerySuggestions extends React.Component {
 						showDistinctSuggestions: false,
 						enablePredictiveSuggestions: false,
 						enableSynonyms: false,
-						size: 0,
+						size: 1,
 						indices: ['*'],
 					},
 				});

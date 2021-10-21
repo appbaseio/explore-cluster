@@ -57,7 +57,7 @@ class QuerySuggestions extends React.Component {
 			externalSuggestions: null,
 			minCount: [0, [Validators.required, Validators.min(0), Validators.max(1000)]],
 			minHits: [0, [Validators.required, Validators.min(0)]],
-			numberOfDays: [1, [Validators.required, Validators.min(1), Validators.max(365)]],
+			numberOfDays: [30, [Validators.required, Validators.min(1), Validators.max(365)]],
 			minChars: [0, [Validators.required, Validators.min(0)]],
 			size: [0, [Validators.required, Validators.min(0), Validators.max(10)]],
 			transformDiacritics: false,
@@ -141,7 +141,7 @@ class QuerySuggestions extends React.Component {
 					externalSuggestions: payload.externalSuggestions || [],
 					minCount: parseInt(payload.minCount, 10) || 0,
 					minHits: parseInt(payload.minHits, 10) || 0,
-					numberOfDays: payload.numberOfDays || 1,
+					numberOfDays: payload.numberOfDays || 30,
 					minChars: parseInt(payload.minChars, 10) || 0,
 					size: parseInt(payload.size, 10) || 0,
 					indices: payload.indices || ['*'],
@@ -154,7 +154,7 @@ class QuerySuggestions extends React.Component {
 						externalSuggestions: payload.externalSuggestions || [],
 						minCount: parseInt(payload.minCount, 10) || 0,
 						minHits: parseInt(payload.minHits, 10) || 0,
-						numberOfDays: payload.numberOfDays || 1,
+						numberOfDays: payload.numberOfDays || 30,
 						minChars: parseInt(payload.minChars, 10) || 0,
 						size: parseInt(payload.size, 10) || 0,
 						indices: payload.indices || ['*'],
@@ -168,7 +168,7 @@ class QuerySuggestions extends React.Component {
 						externalSuggestions: [],
 						minCount: 0,
 						minHits: 0,
-						numberOfDays: 1,
+						numberOfDays: 30,
 						minChars: 0,
 						size: 0,
 						indices: ['*'],
@@ -185,7 +185,7 @@ class QuerySuggestions extends React.Component {
 			let payload;
 			if(obj) {
 				payload = {
-					numberOfDays: 1,
+					numberOfDays: 30,
 				};
 			} else {
 				payload = {
