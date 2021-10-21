@@ -21,6 +21,9 @@ import Flex from '../../../batteries/components/shared/Flex';
 import ErrorToaster from '../../../batteries/components/shared/ErrorToaster';
 import { event, timingEvent } from '../../../utils/gtag';
 import moment from '../../../utils/moment';
+// import PreferenceFormContext from '../context';
+export const PreferenceFormContext = React.createContext({});
+
 
 const main = css`
 	.actionBtn {
@@ -116,8 +119,8 @@ class QuerySuggestions extends React.Component {
 							customQuery: payload.customQuery,
 							includeFields: payload.includeFields || ['*'],
 							excludeFields: payload.excludeFields || [],
-							categoryField: payload.categoryField || [],
-							urlField: payload.urlField || [],
+							categoryField: payload.categoryField || '',
+							urlField: payload.urlField || '',
 							showDistinctSuggestions: payload.showDistinctSuggestions || false,
 							enablePredictiveSuggestions:
 								payload.enablePredictiveSuggestions || false,
@@ -135,8 +138,8 @@ class QuerySuggestions extends React.Component {
 							customQuery: '',
 							includeFields: ['*'],
 							excludeFields: [],
-							categoryField: [],
-							urlField: [],
+							categoryField: '',
+							urlField: '',
 							showDistinctSuggestions: false,
 							enablePredictiveSuggestions: false,
 							enableSynonyms: false,
@@ -224,47 +227,52 @@ class QuerySuggestions extends React.Component {
 		}
 		return (
 			<React.Fragment>
-				<Container css={main}>
-					{total !== undefined && get(preferences, 'index') && !hide && (
-						<>
-							<Banner {...bannerDetails} />
-							<Card className={cardStyle}>
-								<Flex
-									justifyContent="space-between"
-									style={{ alignItems: 'center' }}
-								>
-									<Flex>
-										<Alert
-											message={`Last synced ${total} index suggestions at ${moment(
-												preferences.last_synced_time * 1000,
-											).format('MMM DD, YYYY hh:mm A')}.`}
-											type="info"
-											showIcon
-										/>
+				<PreferenceFormContext.Provider
+					value="demo"
+				>
+
+					<Container css={main}>
+						{total !== undefined && get(preferences, 'index') && !hide && (
+							<>
+								<Banner {...bannerDetails} />
+								<Card className={cardStyle}>
+									<Flex
+										justifyContent="space-between"
+										style={{ alignItems: 'center' }}
+									>
+										<Flex>
+											<Alert
+												message={`Last synced ${total} index suggestions at ${moment(
+													preferences.last_synced_time * 1000,
+												).format('MMM DD, YYYY hh:mm A')}.`}
+												type="info"
+												showIcon
+											/>
+										</Flex>
+										<Flex>
+											<Button
+												type="primary"
+												href={`/app/${preferences.index}/browse`}
+											>
+												Browse Data
+											</Button>
+										</Flex>
 									</Flex>
-									<Flex>
-										<Button
-											type="primary"
-											href={`/app/${preferences.index}/browse`}
-										>
-											Browse Data
-										</Button>
-									</Flex>
-								</Flex>
-							</Card>
-						</>
-					)}
-					<ErrorToaster>
-						{Object.keys(initialData).length > 0 && (
-							<PreferenceForm
-								indices={indices}
-								handleSaveTemplate={this.handleSaveTemplate}
-								control={this.form}
-								initialData={initialData}
-							/>
+								</Card>
+							</>
 						)}
-					</ErrorToaster>
-				</Container>
+						<ErrorToaster>
+							{Object.keys(initialData).length > 0 && (
+								<PreferenceForm
+										indices={indices}
+										control={this.form}
+										initialData={initialData}
+									/>
+
+							)}
+						</ErrorToaster>
+					</Container>
+				</PreferenceFormContext.Provider>
 			</React.Fragment>
 		);
 	}

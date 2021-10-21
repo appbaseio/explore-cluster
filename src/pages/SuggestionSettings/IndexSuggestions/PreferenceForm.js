@@ -151,6 +151,7 @@ class PreferenceForm extends React.Component {
 			mappings,
 			appStoredQueries,
 		} = this.props;
+
 		const {
 			visible,
 			app,
@@ -700,6 +701,7 @@ class PreferenceForm extends React.Component {
 											<Select
 												data-cy="custom-query"
 												placeholder="Select Custom Query"
+												allowClear
 												style={{ width: '100%' }}
 												{...handler()}
 												defaultValue={value}
@@ -713,8 +715,8 @@ class PreferenceForm extends React.Component {
 												{(appStoredQueries || []).map((v) => {
 													return (
 														<Select.Option key={v.id} label={v.id} value={v.id} data-cy={v.id}>
-															<div>{v.id}</div>
-															<div>{v.description}</div>
+															<div style={{fontWeight: 'bold'}}>{v.id}</div>
+															<div style={{fontSize: 12}}>{v.description}</div>
 														</Select.Option>
 													);
 												})}
@@ -752,6 +754,7 @@ class PreferenceForm extends React.Component {
 									Save
 								</Button>
 								<Footer
+									handleSaveTemplate={handleSaveTemplate}
 									originalData={initialData}
 									tab='index-suggestions'
 									changedData={indexSuggestions}
