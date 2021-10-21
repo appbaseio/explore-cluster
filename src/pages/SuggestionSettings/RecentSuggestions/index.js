@@ -21,7 +21,7 @@ import Flex from '../../../batteries/components/shared/Flex';
 import ErrorToaster from '../../../batteries/components/shared/ErrorToaster';
 import { event, timingEvent } from '../../../utils/gtag';
 import moment from '../../../utils/moment';
-export const RecentPreferenceFormContext = React.createContext();
+import { PreferenceFormContext  } from '../IndexSuggestions';
 
 const main = css`
 	.actionBtn {
@@ -79,38 +79,10 @@ class QuerySuggestions extends React.Component {
 			value: null,
 		});
 
-		const {tier, featureSuggestions, getPreferences} = this.props;
+		const {tier, featureSuggestions} = this.props;
 
 		if (isValidPlan(tier, featureSuggestions)) {
-			getPreferences().then((action) => {
-				// prefilling
-				const payload = get(action, 'payload');
-				if (payload) {
-					this.form.patchValue({
-						minHits: parseInt(payload.minHits, 10) || 0,
-						size: parseInt(payload.size, 10) || 0,
-						minChars: parseInt(payload.minChars, 10) || 0,
-						indices: payload.indices || ['*'],
-					});
-					this.setState({
-						initialData: {
-							minHits: parseInt(payload.minHits, 10) || 0,
-							size: parseInt(payload.size, 10) || 0,
-							minChars: parseInt(payload.minChars, 10) || 0,
-							indices: payload.indices || ['*'],
-						}
-					})
-				} else {
-					this.setState({
-						initialData: {
-							minHits: 0,
-							size: 0,
-							minChars: 0,
-							indices: ['*'],
-						}
-					})
-				}
-			});
+			this.fetchPreferences();
 			fetch(`${getURL()}/.suggestions/_search`, {
 				method: 'POST',
 				headers: {
@@ -155,9 +127,42 @@ class QuerySuggestions extends React.Component {
 		});
 	}
 
+	fetchPreferences = () => {
+		const {getPreferences} = this.props;
+		getPreferences().then((action) => {
+			// prefilling
+			const payload = get(action, 'payload');
+			if (payload) {
+				this.form.patchValue({
+					minHits: parseInt(payload.minHits, 10) || 0,
+					size: parseInt(payload.size, 10) || 0,
+					minChars: parseInt(payload.minChars, 10) || 0,
+					indices: payload.indices || ['*'],
+				});
+				this.setState({
+					initialData: {
+						minHits: parseInt(payload.minHits, 10) || 0,
+						size: parseInt(payload.size, 10) || 0,
+						minChars: parseInt(payload.minChars, 10) || 0,
+						indices: payload.indices || ['*'],
+					}
+				})
+			} else {
+				this.setState({
+					initialData: {
+						minHits: 0,
+						size: 0,
+						minChars: 0,
+						indices: ['*'],
+					}
+				})
+			}
+		});
+	}
+
 	handleSaveTemplate = (obj = '') => {
 		try {
-			const { savePreferences, getPreferences } = this.props;
+			const { savePreferences } = this.props;
 			let payload;
 			if(obj) {
 				payload = {};
@@ -174,7 +179,7 @@ class QuerySuggestions extends React.Component {
 					notification.success({
 						message: 'Recent Suggestions preferences saved successfully.',
 					});
-					getPreferences();
+					this.fetchPreferences();
 				}
 			});
 		} catch (e) {
@@ -193,7 +198,7 @@ class QuerySuggestions extends React.Component {
 		}
 		return (
 			<React.Fragment>
-				<RecentPreferenceFormContext.Provider
+				<PreferenceFormContext.Provider
 					value={{
 						value: "recent",
 						saveTemplate: this.handleSaveTemplate,
@@ -241,7 +246,7 @@ class QuerySuggestions extends React.Component {
 							}
 						</ErrorToaster>
 					</Container>
-				</RecentPreferenceFormContext.Provider>
+				</PreferenceFormContext.Provider>
 			</React.Fragment>
 		);
 	}

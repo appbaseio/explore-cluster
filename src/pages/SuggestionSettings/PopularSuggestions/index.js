@@ -20,7 +20,7 @@ import Flex from '../../../batteries/components/shared/Flex';
 import ErrorToaster from '../../../batteries/components/shared/ErrorToaster';
 import { event, timingEvent } from '../../../utils/gtag';
 import moment from '../../../utils/moment';
-export const PopularPreferenceFormContext = React.createContext();
+import { PreferenceFormContext  } from '../IndexSuggestions';
 
 const main = css`
 	.actionBtn {
@@ -74,54 +74,10 @@ class QuerySuggestions extends React.Component {
 			value: null,
 		});
 
-		const {tier, featureSuggestions, getPreferences} = this.props;
+		const {tier, featureSuggestions} = this.props;
 
 		if (isValidPlan(tier, featureSuggestions)) {
-			getPreferences().then((action) => {
-				// prefilling
-				const payload = get(action, 'payload');
-				if (payload) {
-					this.form.patchValue({
-						blacklist: payload.blacklist || [],
-						externalSuggestions: payload.externalSuggestions || [],
-						minCount: parseInt(payload.minCount, 10) || 0,
-						minHits: parseInt(payload.minHits, 10) || 0,
-						numberOfDays: payload.numberOfDays || 1,
-						minChars: parseInt(payload.minChars, 10) || 0,
-						size: parseInt(payload.size, 10) || 0,
-						indices: payload.indices || ['*'],
-						transformDiacritics: payload.transformDiacritics,
-					});
-
-					this.setState({
-						initialData: {
-							blacklist: payload.blacklist || [],
-							externalSuggestions: payload.externalSuggestions || [],
-							minCount: parseInt(payload.minCount, 10) || 0,
-							minHits: parseInt(payload.minHits, 10) || 0,
-							numberOfDays: payload.numberOfDays || 1,
-							minChars: parseInt(payload.minChars, 10) || 0,
-							size: parseInt(payload.size, 10) || 0,
-							indices: payload.indices || ['*'],
-							transformDiacritics: payload.transformDiacritics,
-						}
-					});
-				} else {
-					this.setState({
-						initialData: {
-							blacklist: [],
-							externalSuggestions: [],
-							minCount: 0,
-							minHits: 0,
-							numberOfDays: 1,
-							minChars: 0,
-							size: 0,
-							indices: ['*'],
-							transformDiacritics: false,
-						}
-					});
-				}
-			});
+			this.fetchPreferences();
 			fetch(`${getURL()}/.suggestions/_search`, {
 				method: 'POST',
 				headers: {
@@ -174,12 +130,63 @@ class QuerySuggestions extends React.Component {
 		});
 	}
 
+	fetchPreferences = () => {
+		const { getPreferences } = this.props;
+		getPreferences().then((action) => {
+			// prefilling
+			const payload = get(action, 'payload');
+			if (payload) {
+				this.form.patchValue({
+					blacklist: payload.blacklist || [],
+					externalSuggestions: payload.externalSuggestions || [],
+					minCount: parseInt(payload.minCount, 10) || 0,
+					minHits: parseInt(payload.minHits, 10) || 0,
+					numberOfDays: payload.numberOfDays || 1,
+					minChars: parseInt(payload.minChars, 10) || 0,
+					size: parseInt(payload.size, 10) || 0,
+					indices: payload.indices || ['*'],
+					transformDiacritics: payload.transformDiacritics,
+				});
+
+				this.setState({
+					initialData: {
+						blacklist: payload.blacklist || [],
+						externalSuggestions: payload.externalSuggestions || [],
+						minCount: parseInt(payload.minCount, 10) || 0,
+						minHits: parseInt(payload.minHits, 10) || 0,
+						numberOfDays: payload.numberOfDays || 1,
+						minChars: parseInt(payload.minChars, 10) || 0,
+						size: parseInt(payload.size, 10) || 0,
+						indices: payload.indices || ['*'],
+						transformDiacritics: payload.transformDiacritics,
+					}
+				});
+			} else {
+				this.setState({
+					initialData: {
+						blacklist: [],
+						externalSuggestions: [],
+						minCount: 0,
+						minHits: 0,
+						numberOfDays: 1,
+						minChars: 0,
+						size: 0,
+						indices: ['*'],
+						transformDiacritics: false,
+					}
+				});
+			}
+		});
+	}
+
 	handleSaveTemplate = (obj = '') => {
 		try {
-			const { savePreferences, getPreferences } = this.props;
+			const { savePreferences } = this.props;
 			let payload;
 			if(obj) {
-				payload = {};
+				payload = {
+					numberOfDays: 1,
+				};
 			} else {
 				payload = {
 					...this.form.value,
@@ -200,7 +207,7 @@ class QuerySuggestions extends React.Component {
 					notification.success({
 						message: 'Popular Suggestions preferences saved successfully.',
 					});
-					getPreferences();
+					this.fetchPreferences();
 				}
 			});
 		} catch (e) {
@@ -219,7 +226,7 @@ class QuerySuggestions extends React.Component {
 		}
 		return (
 			<React.Fragment>
-				<PopularPreferenceFormContext.Provider
+				<PreferenceFormContext.Provider
 					value={{
 						value: "popular",
 						saveTemplate: this.handleSaveTemplate,
@@ -268,7 +275,7 @@ class QuerySuggestions extends React.Component {
 
 						</ErrorToaster>
 					</Container>
-				</PopularPreferenceFormContext.Provider>
+				</PreferenceFormContext.Provider>
 			</React.Fragment>
 		);
 	}

@@ -88,66 +88,10 @@ class QuerySuggestions extends React.Component {
 			value: null,
 		});
 
-		const { tier, featureSuggestions, getPreferences } = this.props;
+		const { tier, featureSuggestions } = this.props;
 
 		if (isValidPlan(tier, featureSuggestions)) {
-			getPreferences().then((action) => {
-				// prefilling
-				const payload = get(action, 'payload');
-				if (payload) {
-					this.form.patchValue({
-						applyStopwords: payload.applyStopwords || false,
-						customStopwords: payload.customStopwords || [],
-						maxPredictedWords: parseInt(payload.maxPredictedWords, 10) || 1,
-						customQuery: payload.customQuery,
-						includeFields: payload.includeFields || ['*'],
-						excludeFields: payload.excludeFields || [],
-						categoryField: payload.categoryField || '',
-						urlField: payload.urlField || '',
-						showDistinctSuggestions: payload.showDistinctSuggestions || false,
-						enablePredictiveSuggestions: payload.enablePredictiveSuggestions || false,
-						enableSynonyms: payload.enableSynonyms || false,
-						size: parseInt(payload.size, 10) || 0,
-						indices: payload.indices || ['*'],
-					});
-					this.setState({
-						initialData: {
-							applyStopwords: payload.applyStopwords || false,
-							customStopwords: payload.customStopwords || [],
-							maxPredictedWords: parseInt(payload.maxPredictedWords, 10) || 1,
-							customQuery: payload.customQuery,
-							includeFields: payload.includeFields || ['*'],
-							excludeFields: payload.excludeFields || [],
-							categoryField: payload.categoryField || '',
-							urlField: payload.urlField || '',
-							showDistinctSuggestions: payload.showDistinctSuggestions || false,
-							enablePredictiveSuggestions:
-								payload.enablePredictiveSuggestions || false,
-							enableSynonyms: payload.enableSynonyms || false,
-							size: parseInt(payload.size, 10) || 0,
-							indices: payload.indices || ['*'],
-						},
-					});
-				} else {
-					this.setState({
-						initialData: {
-							applyStopwords: false,
-							customStopwords: [],
-							maxPredictedWords: 1,
-							customQuery: '',
-							includeFields: ['*'],
-							excludeFields: [],
-							categoryField: '',
-							urlField: '',
-							showDistinctSuggestions: false,
-							enablePredictiveSuggestions: false,
-							enableSynonyms: false,
-							size: 0,
-							indices: ['*'],
-						},
-					});
-				}
-			});
+			this.fetchPreferences();
 			fetch(`${getURL()}/.suggestions/_search`, {
 				method: 'POST',
 				headers: {
@@ -192,9 +136,70 @@ class QuerySuggestions extends React.Component {
 		});
 	}
 
+	fetchPreferences = () => {
+		const { getPreferences } = this.props;
+		getPreferences().then((action) => {
+			// prefilling
+			const payload = get(action, 'payload');
+			if (payload) {
+				this.form.patchValue({
+					applyStopwords: payload.applyStopwords || false,
+					customStopwords: payload.customStopwords || [],
+					maxPredictedWords: parseInt(payload.maxPredictedWords, 10) || 1,
+					customQuery: payload.customQuery,
+					includeFields: payload.includeFields || ['*'],
+					excludeFields: payload.excludeFields || [],
+					categoryField: payload.categoryField || '',
+					urlField: payload.urlField || '',
+					showDistinctSuggestions: payload.showDistinctSuggestions || false,
+					enablePredictiveSuggestions: payload.enablePredictiveSuggestions || false,
+					enableSynonyms: payload.enableSynonyms || false,
+					size: parseInt(payload.size, 10) || 0,
+					indices: payload.indices || ['*'],
+				});
+				this.setState({
+					initialData: {
+						applyStopwords: payload.applyStopwords || false,
+						customStopwords: payload.customStopwords || [],
+						maxPredictedWords: parseInt(payload.maxPredictedWords, 10) || 1,
+						customQuery: payload.customQuery,
+						includeFields: payload.includeFields || ['*'],
+						excludeFields: payload.excludeFields || [],
+						categoryField: payload.categoryField || '',
+						urlField: payload.urlField || '',
+						showDistinctSuggestions: payload.showDistinctSuggestions || false,
+						enablePredictiveSuggestions:
+							payload.enablePredictiveSuggestions || false,
+						enableSynonyms: payload.enableSynonyms || false,
+						size: parseInt(payload.size, 10) || 0,
+						indices: payload.indices || ['*'],
+					},
+				});
+			} else {
+				this.setState({
+					initialData: {
+						applyStopwords: false,
+						customStopwords: [],
+						maxPredictedWords: 1,
+						customQuery: '',
+						includeFields: ['*'],
+						excludeFields: [],
+						categoryField: '',
+						urlField: '',
+						showDistinctSuggestions: false,
+						enablePredictiveSuggestions: false,
+						enableSynonyms: false,
+						size: 0,
+						indices: ['*'],
+					},
+				});
+			}
+		});
+	}
+
 	handleSaveTemplate = (obj = '') => {
 		try {
-			const { savePreferences, getPreferences } = this.props;
+			const { savePreferences } = this.props;
 			let payload;
 			if(obj) {
 				payload = {};
@@ -210,7 +215,7 @@ class QuerySuggestions extends React.Component {
 					notification.success({
 						message: 'Index Suggestions preferences saved successfully.',
 					});
-					getPreferences();
+					this.fetchPreferences();
 				}
 			});
 		} catch (e) {

@@ -7,8 +7,6 @@ import keys from 'lodash/keys';
 import { connect } from 'react-redux';
 import SearchPreviewSwitcher from '../../components/SearchPreviewSwitcher';
 import { PreferenceFormContext } from './IndexSuggestions';
-import { PopularPreferenceFormContext } from './PopularSuggestions';
-import { RecentPreferenceFormContext } from './RecentSuggestions';
 
 const Footer = ({
     originalData,
@@ -34,7 +32,7 @@ const Footer = ({
         const oldData = changeOriginalData();
         setOldObj({...oldData});
         setNewObj({...oldObj});
-    },[])
+    },[originalData])
 
     useEffect(() => {
         const data = changeNewData();
@@ -76,8 +74,7 @@ const Footer = ({
 	};
 
     const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.') && !appName.startsWith('metricbeat'));
-    console.log("=====", useContext(PopularPreferenceFormContext));
-    // const { saveTemplate } = useContext(PreferenceFormContext);
+    const { saveTemplate } = useContext(PreferenceFormContext);
     return (
         <div
             style={{

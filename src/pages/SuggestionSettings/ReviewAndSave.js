@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import styled from 'react-emotion';
-// import PreferenceFormContext from './context';
 import { PreferenceFormContext } from './IndexSuggestions';
 import { Button, Modal } from 'antd';
 import get from 'lodash/get';
@@ -23,16 +23,20 @@ const Badge = styled.span`
      z-index: 100;
  `;
 
-const ReviewAndSave = ({oldData, newData }) => {
+const ReviewAndSave = ({oldData, newData, isLoading }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isResetting, setIsResetting] = useState(false);
-    const [isSaving, setIsSaving] = useState(false);
-
     const { saveTemplate } = useContext(PreferenceFormContext);
 
     useEffect(() => {
         setIsOpen(isResetting);
     }, [isResetting]);
+
+    useEffect(() => {
+        if(!isLoading) {
+            setIsOpen(false)
+        }
+    },[isLoading])
 
     const showModal = () => {
         setIsOpen(true);
@@ -42,12 +46,6 @@ const ReviewAndSave = ({oldData, newData }) => {
         setIsOpen(false);
         setIsResetting(false);
     };
-
-    const handleSave = () => {
-        // setIsSaving(true)
-        saveTemplate();
-
-    }
 
     const getDiffData = (oldObj, newObj) => {
         let diffData = diff({ ...oldObj }, { ...newObj });
@@ -213,7 +211,6 @@ const ReviewAndSave = ({oldData, newData }) => {
                     'Review Settings Before Deploying'
                 }
                 onOk={() => {
-                    // console.log("=====");
                     saveTemplate();
                 }}
                 width={1000}
@@ -222,7 +219,6 @@ const ReviewAndSave = ({oldData, newData }) => {
                 }}
                 destroyOnClose
                 okText="Review and Save"
-                // confirmLoading={isSaving}
                 onCancel={handleCancel}
                 cancelButtonProps={{ 'data-cy': 'cancel-modal-button' }}
                 okButtonProps={{
@@ -234,14 +230,21 @@ const ReviewAndSave = ({oldData, newData }) => {
                 </>
             </Modal>
         </div>
-
-
     )
 }
 
 ReviewAndSave.propTypes = {
     oldData: PropTypes.object.isRequired,
-    newData: PropTypes.object.isRequired
+    newData: PropTypes.object.isRequired,
+    isLoading: PropTypes.bool.isRequired,
 };
 
-export default ReviewAndSave;
+const mapStateToProps = (state) => {
+    const isLoading= get(state, '$savePopularSuggestionsPreferences.isFetching', false);
+    console.log(isLoading);
+    return {
+        isLoading,
+    }
+};
+
+export default connect(mapStateToProps)(ReviewAndSave);
