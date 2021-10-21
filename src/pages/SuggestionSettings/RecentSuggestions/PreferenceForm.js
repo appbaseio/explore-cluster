@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Input, Select, Button, Affix, Icon, Popover } from 'antd';
+import { Input, Select, Icon, Popover } from 'antd';
 import { css } from 'react-emotion';
 import PropTypes from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
@@ -11,7 +11,6 @@ import {
 	setLocalRelevancyState,
 } from '../../../batteries/modules/actions';
 import { suggestionsMessages as Messages } from '../../../utils/messages';
-import SearchPreviewSwitcher from '../../../components/SearchPreviewSwitcher';
 import styles from '../styles';
 import Footer from '../Footer';
 
@@ -146,7 +145,7 @@ class PreferenceForm extends React.Component {
 	};
 
 	render() {
-		const { control, handleSaveTemplate, isLoading, apps,indices , initialData } = this.props;
+		const { control, isLoading, apps,indices , initialData } = this.props;
 		const { visible, app, recentSuggestions } = this.state;
 		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
 
@@ -303,7 +302,7 @@ class PreferenceForm extends React.Component {
 								);
 							}}
 						/>
-						<Affix offsetBottom={0}>
+						{/* <Affix offsetBottom={0}>
 							<div
 								style={{
 									display: 'flex',
@@ -312,13 +311,13 @@ class PreferenceForm extends React.Component {
 									background: 'white',
 								}}
 							>
-								{/* <SearchPreviewSwitcher
+								<SearchPreviewSwitcher
 									filteredApps={filteredApps}
 									onSelect={this.onAppSelect}
 									onCancel={this.toggleVisibility}
 									visible={visible}
 									app={app}
-								/> */}
+								/>
 								<Button
 									data-cy="recent-suggestions-save"
 									onClick={handleSaveTemplate}
@@ -335,7 +334,12 @@ class PreferenceForm extends React.Component {
 									changedData={recentSuggestions}
 								/>
 							</div>
-						</Affix>
+						</Affix> */}
+						<Footer
+							originalData={initialData}
+							tab='recent-suggestions'
+							changedData={recentSuggestions}
+						/>
 					</div>
 				)}
 			/>
@@ -344,7 +348,6 @@ class PreferenceForm extends React.Component {
 }
 
 PreferenceForm.propTypes = {
-	handleSaveTemplate: PropTypes.func.isRequired,
 	control: PropTypes.object.isRequired,
 	isLoading: PropTypes.bool.isRequired,
 	indices: PropTypes.array.isRequired,

@@ -20,6 +20,7 @@ import Flex from '../../../batteries/components/shared/Flex';
 import ErrorToaster from '../../../batteries/components/shared/ErrorToaster';
 import { event, timingEvent } from '../../../utils/gtag';
 import moment from '../../../utils/moment';
+export const PreferenceFormContext = React.createContext();
 
 const main = css`
 	.actionBtn {
@@ -173,24 +174,27 @@ class QuerySuggestions extends React.Component {
 		});
 	}
 
-	handleSaveTemplate = () => {
+	handleSaveTemplate = (obj = '') => {
 		try {
 			const { savePreferences, getPreferences } = this.props;
-
-			const payload = {
-				...this.form.value,
-				minCount: Number(this.form.value.minCount),
-				minHits: Number(this.form.value.minHits),
-				numberOfDays: Number(this.form.value.numberOfDays),
-				minChars: Number(this.form.value.minChars),
-				size: Number(this.form.value.size),
-				externalSuggestions:
-					this.form.value.externalSuggestions &&
-					typeof this.form.value.externalSuggestions === 'string'
-						? JSON.parse(this.form.value.externalSuggestions)
-						: [],
-			};
-
+			let payload;
+			if(obj) {
+				payload = {};
+			} else {
+				payload = {
+					...this.form.value,
+					minCount: Number(this.form.value.minCount),
+					minHits: Number(this.form.value.minHits),
+					numberOfDays: Number(this.form.value.numberOfDays),
+					minChars: Number(this.form.value.minChars),
+					size: Number(this.form.value.size),
+					externalSuggestions:
+						this.form.value.externalSuggestions &&
+						typeof this.form.value.externalSuggestions === 'string'
+							? JSON.parse(this.form.value.externalSuggestions)
+							: [],
+				};
+			}
 			savePreferences(payload).then((action) => {
 				if (get(action, 'payload')) {
 					notification.success({
@@ -216,49 +220,55 @@ class QuerySuggestions extends React.Component {
 		}
 		return (
 			<React.Fragment>
-				<Container css={main}>
-					{total !== undefined && (
-						<>
-							<Card className={cardStyle}>
-								<Flex
-									justifyContent="space-between"
-									style={{ alignItems: 'center' }}
-								>
-									<Flex>
-										<Alert
-											message={`Last synced ${total} popular suggestions at ${moment(
-												preferences?.lastSyncedTime * 1000,
-											).format('MMM DD, YYYY hh:mm A')}.`}
-											type="info"
-											showIcon
-										/>
+				<PreferenceFormContext.Provider
+					value={{
+						value: "demo",
+						saveTemplate: this.handleSaveTemplate,
+					}}
+				>
+					<Container css={main}>
+						{total !== undefined && (
+							<>
+								<Card className={cardStyle}>
+									<Flex
+										justifyContent="space-between"
+										style={{ alignItems: 'center' }}
+									>
+										<Flex>
+											<Alert
+												message={`Last synced ${total} popular suggestions at ${moment(
+													preferences?.lastSyncedTime * 1000,
+												).format('MMM DD, YYYY hh:mm A')}.`}
+												type="info"
+												showIcon
+											/>
+										</Flex>
+										<Flex>
+											<Button
+												type="primary"
+												href={`/app/${preferences.index}/browse`}
+											>
+												Browse Data
+											</Button>
+										</Flex>
 									</Flex>
-									<Flex>
-										<Button
-											type="primary"
-											href={`/app/${preferences.index}/browse`}
-										>
-											Browse Data
-										</Button>
-									</Flex>
-								</Flex>
-							</Card>
-						</>
-					)}
-					<ErrorToaster>
-						{
-							Object.keys(initialData).length > 0 && (
-								<PreferenceForm
-									indices={indices}
-									handleSaveTemplate={this.handleSaveTemplate}
-									control={this.form}
-									initialData={initialData}
-								/>
-							)
-						}
+								</Card>
+							</>
+						)}
+						<ErrorToaster>
+							{
+								Object.keys(initialData).length > 0 && (
+									<PreferenceForm
+										indices={indices}
+										control={this.form}
+										initialData={initialData}
+									/>
+								)
+							}
 
-					</ErrorToaster>
-				</Container>
+						</ErrorToaster>
+					</Container>
+				</PreferenceFormContext.Provider>
 			</React.Fragment>
 		);
 	}

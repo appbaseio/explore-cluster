@@ -21,8 +21,7 @@ import Flex from '../../../batteries/components/shared/Flex';
 import ErrorToaster from '../../../batteries/components/shared/ErrorToaster';
 import { event, timingEvent } from '../../../utils/gtag';
 import moment from '../../../utils/moment';
-// import PreferenceFormContext from '../context';
-export const PreferenceFormContext = React.createContext({});
+export const PreferenceFormContext = React.createContext();
 
 
 const main = css`
@@ -66,7 +65,7 @@ class QuerySuggestions extends React.Component {
 		this.form = FormBuilder.group({
 			applyStopwords: false,
 			customStopwords: [],
-			maxPredictedWords: [0, [Validators.required, Validators.min(0)]],
+			maxPredictedWords: [1, [Validators.required, Validators.min(1)]],
 			customQuery: '',
 			includeFields: [['*']],
 			excludeFields: [[]],
@@ -99,7 +98,7 @@ class QuerySuggestions extends React.Component {
 					this.form.patchValue({
 						applyStopwords: payload.applyStopwords || false,
 						customStopwords: payload.customStopwords || [],
-						maxPredictedWords: parseInt(payload.maxPredictedWords, 10) || 0,
+						maxPredictedWords: parseInt(payload.maxPredictedWords, 10) || 1,
 						customQuery: payload.customQuery,
 						includeFields: payload.includeFields || ['*'],
 						excludeFields: payload.excludeFields || [],
@@ -115,7 +114,7 @@ class QuerySuggestions extends React.Component {
 						initialData: {
 							applyStopwords: payload.applyStopwords || false,
 							customStopwords: payload.customStopwords || [],
-							maxPredictedWords: parseInt(payload.maxPredictedWords, 10) || 0,
+							maxPredictedWords: parseInt(payload.maxPredictedWords, 10) || 1,
 							customQuery: payload.customQuery,
 							includeFields: payload.includeFields || ['*'],
 							excludeFields: payload.excludeFields || [],
@@ -134,7 +133,7 @@ class QuerySuggestions extends React.Component {
 						initialData: {
 							applyStopwords: false,
 							customStopwords: [],
-							maxPredictedWords: 0,
+							maxPredictedWords: 1,
 							customQuery: '',
 							includeFields: ['*'],
 							excludeFields: [],
@@ -193,16 +192,19 @@ class QuerySuggestions extends React.Component {
 		});
 	}
 
-	handleSaveTemplate = () => {
+	handleSaveTemplate = (obj = '') => {
 		try {
 			const { savePreferences, getPreferences } = this.props;
-
-			const payload = {
-				...this.form.value,
-				maxPredictedWords: Number(this.form.value.maxPredictedWords),
-				size: Number(this.form.value.size),
-			};
-			console.log('formValue:', this.form.value);
+			let payload;
+			if(obj) {
+				payload = {};
+			} else {
+				payload = {
+					...this.form.value,
+					maxPredictedWords: Number(this.form.value.maxPredictedWords),
+					size: Number(this.form.value.size),
+				};
+			}
 			savePreferences(payload).then((action) => {
 				if (get(action, 'payload')) {
 					notification.success({
@@ -228,9 +230,11 @@ class QuerySuggestions extends React.Component {
 		return (
 			<React.Fragment>
 				<PreferenceFormContext.Provider
-					value="demo"
+					value={{
+						value: "demo",
+						saveTemplate: this.handleSaveTemplate,
+					}}
 				>
-
 					<Container css={main}>
 						{total !== undefined && get(preferences, 'index') && !hide && (
 							<>
@@ -264,11 +268,11 @@ class QuerySuggestions extends React.Component {
 						<ErrorToaster>
 							{Object.keys(initialData).length > 0 && (
 								<PreferenceForm
-										indices={indices}
-										control={this.form}
-										initialData={initialData}
-									/>
-
+									indices={indices}
+									control={this.form}
+									initialData={initialData}
+									// handleSaveTemplate={handleSaveTemplate}
+								/>
 							)}
 						</ErrorToaster>
 					</Container>
@@ -314,5 +318,3 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(QuerySuggestions);
-
-// testing

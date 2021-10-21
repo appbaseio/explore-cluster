@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import ReviewAndSave from './ReviewAndSave';
 import { Button } from 'antd';
@@ -6,6 +6,7 @@ import get from 'lodash/get';
 import keys from 'lodash/keys';
 import { connect } from 'react-redux';
 import SearchPreviewSwitcher from '../../components/SearchPreviewSwitcher';
+import { PreferenceFormContext } from './IndexSuggestions';
 
 const Footer = ({
     originalData,
@@ -73,6 +74,7 @@ const Footer = ({
 	};
 
     const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.') && !appName.startsWith('metricbeat'))
+    const { saveTemplate } = useContext(PreferenceFormContext);
     return (
         <div
             style={{
@@ -99,7 +101,7 @@ const Footer = ({
                     />
                 </div>
                 <div>
-                    <Button>Reset To Default Settings</Button>
+                    <Button size="large" onClick={() => saveTemplate({})}>Reset To Default Settings</Button>
                     <ReviewAndSave oldData={oldObj} newData={newObj} />
                 </div>
             </div>

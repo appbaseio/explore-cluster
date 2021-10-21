@@ -21,6 +21,7 @@ import Flex from '../../../batteries/components/shared/Flex';
 import ErrorToaster from '../../../batteries/components/shared/ErrorToaster';
 import { event, timingEvent } from '../../../utils/gtag';
 import moment from '../../../utils/moment';
+export const PreferenceFormContext = React.createContext();
 
 const main = css`
 	.actionBtn {
@@ -154,16 +155,20 @@ class QuerySuggestions extends React.Component {
 		});
 	}
 
-	handleSaveTemplate = () => {
+	handleSaveTemplate = (obj = '') => {
 		try {
 			const { savePreferences, getPreferences } = this.props;
-
-			const payload = {
-				...this.form.value,
-				minHits: Number(this.form.value.minHits),
-				size: Number(this.form.value.size),
-				minChars: Number(this.form.value.minChars),
-			};
+			let payload;
+			if(obj) {
+				payload = {};
+			} else {
+				payload = {
+					...this.form.value,
+					minHits: Number(this.form.value.minHits),
+					size: Number(this.form.value.size),
+					minChars: Number(this.form.value.minChars),
+				};
+			}
 			savePreferences(payload).then((action) => {
 				if (get(action, 'payload')) {
 					notification.success({
@@ -188,49 +193,55 @@ class QuerySuggestions extends React.Component {
 		}
 		return (
 			<React.Fragment>
-				<Container css={main}>
-					{total !== undefined && get(preferences, 'index') && !hide && (
-						<>
-							<Banner {...bannerDetails} />
-							<Card className={cardStyle}>
-								<Flex
-									justifyContent="space-between"
-									style={{ alignItems: 'center' }}
-								>
-									<Flex>
-										<Alert
-											message={`Last synced ${total} recent suggestions at ${moment(
-												preferences.last_synced_time * 1000,
-											).format('MMM DD, YYYY hh:mm A')}.`}
-											type="info"
-											showIcon
-										/>
+				<PreferenceFormContext.Provider
+					value={{
+						value: "demo",
+						saveTemplate: this.handleSaveTemplate,
+					}}
+				>
+					<Container css={main}>
+						{total !== undefined && get(preferences, 'index') && !hide && (
+							<>
+								<Banner {...bannerDetails} />
+								<Card className={cardStyle}>
+									<Flex
+										justifyContent="space-between"
+										style={{ alignItems: 'center' }}
+									>
+										<Flex>
+											<Alert
+												message={`Last synced ${total} recent suggestions at ${moment(
+													preferences.last_synced_time * 1000,
+												).format('MMM DD, YYYY hh:mm A')}.`}
+												type="info"
+												showIcon
+											/>
+										</Flex>
+										<Flex>
+											<Button
+												type="primary"
+												href={`/app/${preferences.index}/browse`}
+											>
+												Browse Data
+											</Button>
+										</Flex>
 									</Flex>
-									<Flex>
-										<Button
-											type="primary"
-											href={`/app/${preferences.index}/browse`}
-										>
-											Browse Data
-										</Button>
-									</Flex>
-								</Flex>
-							</Card>
-						</>
-					)}
-					<ErrorToaster>
-						{
-							Object.keys(initialData).length > 0 && (
-								<PreferenceForm
-									indices={indices}
-									handleSaveTemplate={this.handleSaveTemplate}
-									control={this.form}
-									initialData={initialData}
-								/>
-							)
-						}
-					</ErrorToaster>
-				</Container>
+								</Card>
+							</>
+						)}
+						<ErrorToaster>
+							{
+								Object.keys(initialData).length > 0 && (
+									<PreferenceForm
+										indices={indices}
+										control={this.form}
+										initialData={initialData}
+									/>
+								)
+							}
+						</ErrorToaster>
+					</Container>
+				</PreferenceFormContext.Provider>
 			</React.Fragment>
 		);
 	}

@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'react-emotion';
+// import PreferenceFormContext from './context';
+import { PreferenceFormContext } from './IndexSuggestions';
 import { Button, Modal } from 'antd';
 import get from 'lodash/get';
 import { diff } from 'jsondiffpatch';
@@ -21,10 +23,12 @@ const Badge = styled.span`
      z-index: 100;
  `;
 
-const ReviewAndSave = ({oldData, newData}) => {
+const ReviewAndSave = ({oldData, newData }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isResetting, setIsResetting] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+
+    const { saveTemplate } = useContext(PreferenceFormContext);
 
     useEffect(() => {
         setIsOpen(isResetting);
@@ -40,7 +44,8 @@ const ReviewAndSave = ({oldData, newData}) => {
     };
 
     const handleSave = () => {
-        setIsSaving(true);
+        // setIsSaving(true)
+        saveTemplate();
 
     }
 
@@ -185,7 +190,6 @@ const ReviewAndSave = ({oldData, newData}) => {
     }
 
     const [diffCount, diffData] = getDiffData(oldData, newData);
-    console.log("diffData:", diffData);
     return (
         <div>
             <div style={{ position: 'relative' }}>
@@ -208,14 +212,17 @@ const ReviewAndSave = ({oldData, newData}) => {
                 title={
                     'Review Settings Before Deploying'
                 }
-                onOk={handleSave}
+                onOk={() => {
+                    // console.log("=====");
+                    saveTemplate();
+                }}
                 width={1000}
                 style={{
                     top: 20,
                 }}
                 destroyOnClose
                 okText="Review and Save"
-                confirmLoading={isSaving}
+                // confirmLoading={isSaving}
                 onCancel={handleCancel}
                 cancelButtonProps={{ 'data-cy': 'cancel-modal-button' }}
                 okButtonProps={{
@@ -234,7 +241,7 @@ const ReviewAndSave = ({oldData, newData}) => {
 
 ReviewAndSave.propTypes = {
     oldData: PropTypes.object.isRequired,
-    newData: PropTypes.object.isRequired,
+    newData: PropTypes.object.isRequired
 };
 
 export default ReviewAndSave;

@@ -14,7 +14,6 @@ import { getRawMappingsByAppName, getTraversedMappingsByAppName } from '../../..
 import Grid from '../../../components/CreateCredentials/Grid';
 import { removeWhiteSpaces, getDatafields } from '../../../utils';
 import { suggestionsMessages as Messages } from '../../../utils/messages';
-import SearchPreviewSwitcher from '../../../components/SearchPreviewSwitcher';
 import styles from '../styles';
 import Footer from '../Footer';
 
@@ -752,23 +751,9 @@ class PreferenceForm extends React.Component {
 								>
 									Save
 								</Button>
-								<Footer
-									handleSaveTemplate={handleSaveTemplate}
-									originalData={initialData}
-									tab='index-suggestions'
-									changedData={indexSuggestions}
-								/>
 							</div>
 						</Affix> */}
-						{/* <SearchPreviewSwitcher
-							filteredApps={filteredApps}
-							onSelect={this.onAppSelect}
-							onCancel={this.toggleVisibility}
-							visible={visible}
-							app={app}
-						/> */}
 						<Footer
-							handleSaveTemplate={handleSaveTemplate}
 							originalData={initialData}
 							tab='index-suggestions'
 							changedData={indexSuggestions}

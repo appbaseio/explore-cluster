@@ -43,7 +43,7 @@ const SuggestionSettings = ({ tier, featureSuggestions }) => {
 			<Banner {...bannerDetails} />
 			<div
 				className={container}
-				style={{ backgroundColor: '#fff', padding: '10px 20px', marginBottom: 0 }}
+				style={{ backgroundColor: '#fff', padding: '10px 20px', marginBottom: 100 }}
 			>
 				<Tabs defaultActiveKey="1" style={{ minHeight: 500 }}>
 					<TabPane tab="Popular Suggestions" key="1" data-cy="popular-suggestions-tab">

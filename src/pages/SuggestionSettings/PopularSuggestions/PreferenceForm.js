@@ -14,7 +14,6 @@ import {
 	getSettings,
 	getDefaultSettings,
 } from '../../../batteries/modules/actions';
-import SearchPreviewSwitcher from '../../../components/SearchPreviewSwitcher';
 import styles from '../styles';
 import Footer from '../Footer';
 
@@ -100,7 +99,7 @@ class PreferenceForm extends React.Component {
 	};
 
 	render() {
-		const { control, handleSaveTemplate, isLoading, indices, apps, initialData } = this.props;
+		const { control, isLoading, indices, apps, initialData } = this.props;
 		const { visible, app, popularSuggestions } = this.state;
 		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.') && appName.startsWith('metricbeat'));
 
@@ -516,7 +515,6 @@ class PreferenceForm extends React.Component {
 }
 
 PreferenceForm.propTypes = {
-	handleSaveTemplate: PropTypes.func.isRequired,
 	control: PropTypes.object.isRequired,
 	isLoading: PropTypes.bool.isRequired,
 	indices: PropTypes.array.isRequired,
