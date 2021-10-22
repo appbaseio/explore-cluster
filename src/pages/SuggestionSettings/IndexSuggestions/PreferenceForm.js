@@ -5,7 +5,6 @@ import { Input, Select, Switch, Popover, Icon } from 'antd';
 import { css } from 'react-emotion';
 import PropTypes from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
-import keys from 'lodash/keys';
 import {
 	getAppMappings,
 	getAppStoredQueries,
@@ -48,17 +47,10 @@ const content = (message) => {
 	return <div>{message}</div>;
 };
 
-const getDisabled = (value) => {
-	console.log(value);
-	if (Array.isArray(value)) return value[0] === '*';
-	return false;
-};
-
 class PreferenceForm extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			visible: false,
 			selectedIndices: JSON.stringify(props.initialData.indices) == JSON.stringify(['*']) ? props.indices : props.initialData.indices || [],
 			aggregationFields: [],
 			indexSuggestions: props.initialData,
@@ -93,8 +85,10 @@ class PreferenceForm extends React.Component {
 		}
 	}
 
-	onAppSelect = (app) => {
-		this.setState({ app, visible: true });
+	getDisabled = (value) => {
+		console.log(value);
+		if (Array.isArray(value)) return value[0] === '*';
+		return false;
 	};
 
 	getMappings() {
@@ -120,12 +114,6 @@ class PreferenceForm extends React.Component {
 		})
 	};
 
-	toggleVisibility = () => {
-		this.setState((prevState) => ({
-			visible: !prevState.visible,
-		}));
-	};
-
 	getAggregationFields = () => {
 		const { rawMappings } =  this.props
 		const { selectedIndices } = this.state;
@@ -144,17 +132,13 @@ class PreferenceForm extends React.Component {
 		const {
 			control,
 			handleSaveTemplate,
-			isLoading,
 			indices,
-			apps,
 			initialData,
 			mappings,
 			appStoredQueries,
 		} = this.props;
 
 		const {
-			visible,
-			app,
 			aggregationFields,
 			indexSuggestions,
 			selectedIndices,
@@ -481,13 +465,13 @@ class PreferenceForm extends React.Component {
 									component={
 										<Select
 											{...handler()}
-											loading={false}
+											loading={isFetchingMappings}
 											placeholder="Select one ore more fields"
 											mode="tags"
 											notFoundContent={null}
 											style={{ width: '100%' }}
 											tokenSeparators={[',']}
-											// disabled={getDisabled(excludeFields)}
+											disabled={this.getDisabled(excludeFields)}
 											data-cy="include-fields"
 											showSearch
 											onChange={(value) => {
@@ -543,13 +527,13 @@ class PreferenceForm extends React.Component {
 									component={
 										<Select
 											{...handler()}
-											loading={false}
+											loading={isFetchingMappings}
 											placeholder="Select one ore more fields"
 											mode="tags"
 											notFoundContent={null}
 											style={{ width: '100%' }}
 											tokenSeparators={[',']}
-											disabled={getDisabled(includeFields)}
+											disabled={this.getDisabled(includeFields)}
 											data-cy="exclude-fields"
 											showSearch
 											onChange={(value) => {
@@ -769,11 +753,9 @@ class PreferenceForm extends React.Component {
 PreferenceForm.propTypes = {
 	handleSaveTemplate: PropTypes.func.isRequired,
 	control: PropTypes.object.isRequired,
-	isLoading: PropTypes.bool.isRequired,
 	indices: PropTypes.array.isRequired,
 	appStoredQueries: PropTypes.array.isRequired,
 	fetchMappings: PropTypes.func.isRequired,
-	apps: PropTypes.object,
 	initialData: PropTypes.object.isRequired,
 	appName: PropTypes.string,
 	mappings: PropTypes.oneOfType([
@@ -790,7 +772,6 @@ PreferenceForm.propTypes = {
 };
 
 PreferenceForm.defaultProps = {
-	apps: {},
 	mappings: [],
 	rawMappings: [],
 	appName: undefined,
@@ -805,10 +786,8 @@ const mapStateToProps = (state) => {
 	return {
 		mappings,
 		rawMappings,
-		isLoading: get(state, '$saveSuggestionsPreferences.isFetching', false),
 		isFetchingMappings: get(state, '$getAppMappings.isFetching', false),
 		appName,
-		apps: get(state, 'apps.data'),
 		credentials: `${username}:${password}`,
 		appStoredQueries: get(state, ['$getAppStoredQueries', 'results'], []),
 	};
