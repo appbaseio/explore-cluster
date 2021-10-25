@@ -40,6 +40,7 @@ export default {
 		},
 		crawl_timestamp: {
 			type: 'date',
+			format: 'strict_date_optional_time',
 		},
 		description: {
 			type: 'text',
