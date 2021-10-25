@@ -72,7 +72,7 @@ function selectDataset({ nextScreen, setURL, url: newUrl, handleDataset }) {
 			setStatus('Loading data browser... Hang tight!');
 
 			await appbaseHelpers.createURL(handleUrl);
-		} catch(err) {
+		} catch(e) {
 			if (
 				e._bodyInit ===
 				'{"error":{"root_cause":[{"type":"parse_exception","reason":"request body is required"}],"type":"parse_exception","reason":"request body is required"},"status":400}'
@@ -240,6 +240,7 @@ function selectDataset({ nextScreen, setURL, url: newUrl, handleDataset }) {
 											border: data.name === dataset.name ? '1px solid #1890ff' : 'none',
 											// background: '#e4f0fb
 										}}
+										key={data.id}
 										onClick={() => handleSelect(data.name, data.count, data.id)}
 									>
 										<img
