@@ -1,19 +1,16 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
-	DataSearch,
 	RangeSlider,
 	MultiList,
 	ReactiveBase,
 	ReactiveList,
-	ResultList,
 	SelectedFilters,
 	RangeInput
 } from '@appbaseio/reactivesearch';
 import {
 	ReactiveGoogleMap,
   } from "@appbaseio/reactivemaps";
-import { Tag, Icon } from 'antd';
 import appbaseHelpers from '../../utils/appbaseHelpers';
 import { getURL } from '../../../../constants/config';
 
