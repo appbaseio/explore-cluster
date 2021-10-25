@@ -10,6 +10,9 @@ import {
 	SelectedFilters,
 	RangeInput
 } from '@appbaseio/reactivesearch';
+import {
+	ReactiveGoogleMap,
+  } from "@appbaseio/reactivemaps";
 import { Tag, Icon } from 'antd';
 import appbaseHelpers from '../../utils/appbaseHelpers';
 import { getURL } from '../../../../constants/config';
@@ -97,78 +100,30 @@ const getWeights = (fields) => {
 	return fields.map((item) => weights[item]);
 };
 
-const renderResultList = () => (
-	<div>maps render here===</div>
-	// <ReactiveList
-	// 	componentId="results"
-	// 	dataField="name"
-	// 	react={{
-	// 		and: ['search', 'magnitude', 'year', 'place'],
-	// 	}}
-	// 	size={4}
-	// 	className="right-col"
-	// 	innerClass={{
-	// 		listItem: 'list-item',
-	// 		resultStats: 'result-stats',
-	// 	}}
-	// 	pagination
-	// 	stream
-	// >
-	// 	{({ data }) => (
-	// 		<ResultListWrapper>
-	// 			{data.map((item) => (
-	// 				<div style={{display: 'flex', padding: 10, borderBottom: '1px solid rgb(239, 239, 239)'}}>
-	// 					<img
-	// 						style={{
-	// 							height: 160,
-	// 							width: 160,
-	// 							objectFit: 'contain',
-	// 						}}
-	// 						src={item.image[0]}
-	// 						alt={item.image[0]}
-	// 						onError={(event) => {
-	// 							event.target.src = 'https://www.houseoftara.com/shop/wp-content/uploads/2019/05/placeholder.jpg'; // eslint-disable-line no-param-reassign
-	// 						}}
-	// 					/>
-	// 					<ResultList key={item._id} id={item._id}>
-	// 						<ResultList.Content>
-	// 							<ResultList.Title
-	// 								dangerouslySetInnerHTML={{
-	// 									__html: item.product_name,
-	// 								}}
-	// 							/>
-	// 							<ResultList.Description>
-	// 								<div>
-	// 									<div style={{display: 'flex', color: '#424242'}}>
-	// 										<p style={{fontWeight: '600', marginRight: 5}}>Retail Price </p>
-	// 										<p> {item.retail_price}</p>
-	// 										<p><Icon type="star" style={{ marginLeft: 40, marginRight: 3 }} theme="twoTone" /> {item.product_rating}/5</p>
-	// 									</div>
-	// 									<p
-	// 										style={{
-	// 											color: '#888',
-	// 											margin: '8px 0',
-	// 											fontSize: '13px',
-	// 											lineHeight: '18px',
-	// 										}}
-	// 										dangerouslySetInnerHTML={{ __html: item.description }}
-	// 									/>
-	// 									<div>
-	// 										{item.categories.map((category) => (
-	// 											<Tag>{category}</Tag>
-	// 										))}
-	// 									</div>
-	// 								</div>
-	// 							</ResultList.Description>
-	// 						</ResultList.Content>
-	// 					</ResultList>
-
-	// 				</div>
-	// 			))}
-	// 		</ResultListWrapper>
-	// 	)}
-	// </ReactiveList>
-);
+const renderResultList = () => {
+	const mapProps = {
+		dataField: "location",
+		defaultMapStyle: "Light Monochrome",
+		title: "Reactive Maps",
+		defaultZoom: 13,
+		react: {
+		  and: "places"
+		},
+		onPopoverClick: item => <div>{item.place}</div>,
+		showMapStyles: true,
+		renderData: result => {
+		  console.log(result);
+		  return {
+			label: <div>{result.magnitude}</div>
+		  };
+		}
+	};
+	return (
+	<div style={{margin: 10}}>
+		<ReactiveGoogleMap componentId="googleMap" {...mapProps} />
+	</div>
+	);
+};
 
 const renderJSONList = () => (
 	<ReactiveList
@@ -229,6 +184,7 @@ export default class GeoSearchApp extends Component {
 				url={SCALR_API}
 				enableAppbase
 				className="search-app"
+				mapKey="AIzaSyCqWUHFYNXCMlt13StFZzim5y06Yr99vRY"
 				theme={{
 					colors: {
 						primaryColor: '#FF307A',
@@ -248,24 +204,9 @@ export default class GeoSearchApp extends Component {
 							🌎
 						</span>
 					</h2>
-
-					<DataSearch
-						componentId="search"
-						dataField={fields}
-						showIcon={false}
-						placeholder="Search geo data..."
-						autosuggest={false}
-						filterLabel="Search"
-						fieldWeights={getWeights(fields)}
-						highlight
-						style={{
-							maxWidth: '400px',
-							margin: '0 auto',
-						}}
-					/>
 				</header>
 
-				<SelectedFilters style={{ marginTop: 20 }} />
+				{/* <SelectedFilters style={{ marginTop: 20 }} /> */}
 
 				<div className={facets && facets.length ? 'multi-col' : ''}>
 					<div className="left-col">{renderFilters(facets)}</div>

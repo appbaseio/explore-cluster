@@ -11,7 +11,6 @@ export const geoJson = `
         "magnitude": "6.8",
         "place": "Bouvet Island region",
         "year": "1970",
-        "_id": "zzcfc3EBdEU4aeo6D_kv"
     },
     {
         "location": {
@@ -21,7 +20,6 @@ export const geoJson = `
         "magnitude": "6.8",
         "place": "Izu Islands_Japan region",
         "year": "2012",
-        "_id": "zzcfc3EBdEU4aeo6D_gv"
     }
 	...
 ]

@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
 	DataSearch,
-	DynamicRangeSlider,
 	MultiList,
 	ReactiveBase,
 	ReactiveList,
@@ -25,15 +24,15 @@ const renderFilters = (fields) => {
                         <MultiList
                             key={field}
                             componentId={field}
-                            dataField={field}
+                            dataField="categories.keyword"
                             title="Categories"
+							filterLabel="Categories"
                             size={15}
                             sortBy="count"
                             react={{
                                 and: ['search', 'brand', 'retail_price'],
                             }}
                             showSearch={false}
-                            filterLabel="Categories"
                         />
                     );
                 }
@@ -42,15 +41,15 @@ const renderFilters = (fields) => {
                         <MultiList
                             key={field}
                             componentId={field}
-                            dataField={field}
+                            dataField="brand.keyword"
                             title="Brand"
+							filterLabel="Brand"
                             size={15}
                             sortBy="count"
                             react={{
                                 and: ['search', 'categories', 'retail_price'],
                             }}
                             showSearch={false}
-                            filterLabel="Brand"
                         />
                     );
                 }
@@ -64,8 +63,8 @@ const renderFilters = (fields) => {
                             filterLabel="Retail Price"
                             showHistogram={true}
                             range={{
-                                start: 1950,
-                                end: 2021,
+                                start: 100,
+                                end: 10000,
                             }}
                         />
                     );
