@@ -7,9 +7,9 @@ export const relevancyTitles = {
 	aggregations: 'Aggregation Settings',
 	results: 'Result Settings',
 	synonyms: 'Synonyms Settings',
-	popularSuggestions: 'Suggestions Settings/ Popular Suggestions',
-	recentSuggestions: 'Suggestions Settings/ Recent Suggestions',
-	indexSuggestions: 'Suggestions Settings/ Index Suggestions',
+	popularSuggestions: 'Suggestions Settings / Popular Suggestions',
+	recentSuggestions: 'Suggestions Settings / Recent Suggestions',
+	indexSuggestions: 'Suggestions Settings / Index Suggestions',
 };
 
 const settingsMap = {
