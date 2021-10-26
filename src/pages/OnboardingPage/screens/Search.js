@@ -83,10 +83,6 @@ export default class Search extends Component {
 								value: 'overview',
 								label: 'overview',
 							},
-							{
-								value: 'tagline',
-								label: 'tagline',
-							},
 						]}
 					/>
 				</div>
