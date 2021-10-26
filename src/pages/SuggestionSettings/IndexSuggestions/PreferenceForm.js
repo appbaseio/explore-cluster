@@ -86,7 +86,6 @@ class PreferenceForm extends React.Component {
 	}
 
 	getDisabled = (value) => {
-		console.log(value);
 		if (Array.isArray(value)) return value[0] === '*';
 		return false;
 	};

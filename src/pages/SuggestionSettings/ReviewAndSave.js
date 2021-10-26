@@ -202,13 +202,13 @@ const ReviewAndSave = ({oldData, newData, isLoading }) => {
                     onClick={showModal}
                     data-cy="review-deploy-suggestion-settings"
                 >
-                    Review and Deploy
+                    Save Preferences
                 </Button>
             </div>
             <Modal
                 visible={isOpen}
                 title={
-                    'Review Settings Before Deploying'
+                    'Review Settings Before Saving'
                 }
                 onOk={() => {
                     saveTemplate();
@@ -218,7 +218,7 @@ const ReviewAndSave = ({oldData, newData, isLoading }) => {
                     top: 20,
                 }}
                 destroyOnClose
-                okText="Review and Save"
+                okText="Save Preferences"
                 onCancel={handleCancel}
                 cancelButtonProps={{ 'data-cy': 'cancel-modal-button' }}
                 okButtonProps={{
