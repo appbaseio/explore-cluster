@@ -145,7 +145,7 @@ class QuerySuggestions extends React.Component {
 				this.form.patchValue({
 					applyStopwords: payload.applyStopwords || false,
 					customStopwords: payload.customStopwords || [],
-					maxPredictedWords: parseInt(payload.maxPredictedWords, 10) || 1,
+					maxPredictedWords: parseInt(payload.maxPredictedWords, 10),
 					customQuery: payload.customQuery || '',
 					includeFields: payload.includeFields || ['*'],
 					excludeFields: payload.excludeFields || [],
@@ -154,14 +154,14 @@ class QuerySuggestions extends React.Component {
 					showDistinctSuggestions: payload.showDistinctSuggestions || false,
 					enablePredictiveSuggestions: payload.enablePredictiveSuggestions || false,
 					enableSynonyms: payload.enableSynonyms || false,
-					size: parseInt(payload.size, 10) || 1,
+					size: parseInt(payload.size, 10) || 0,
 					indices: payload.indices || ['*'],
 				});
 				this.setState({
 					initialData: {
 						applyStopwords: payload.applyStopwords || false,
 						customStopwords: payload.customStopwords || [],
-						maxPredictedWords: parseInt(payload.maxPredictedWords, 10) || 1,
+						maxPredictedWords: parseInt(payload.maxPredictedWords, 10) || 0,
 						customQuery: payload.customQuery || '',
 						includeFields: payload.includeFields || ['*'],
 						excludeFields: payload.excludeFields || [],
@@ -171,7 +171,7 @@ class QuerySuggestions extends React.Component {
 						enablePredictiveSuggestions:
 							payload.enablePredictiveSuggestions || false,
 						enableSynonyms: payload.enableSynonyms || false,
-						size: parseInt(payload.size, 10) || 1,
+						size: parseInt(payload.size, 10) || 0,
 						indices: payload.indices || ['*'],
 					},
 				});
@@ -180,7 +180,7 @@ class QuerySuggestions extends React.Component {
 					initialData: {
 						applyStopwords: false,
 						customStopwords: [],
-						maxPredictedWords: 1,
+						maxPredictedWords: 0,
 						customQuery: '',
 						includeFields: ['*'],
 						excludeFields: [],
@@ -189,7 +189,7 @@ class QuerySuggestions extends React.Component {
 						showDistinctSuggestions: false,
 						enablePredictiveSuggestions: false,
 						enableSynonyms: false,
-						size: 1,
+						size: 0,
 						indices: ['*'],
 					},
 				});

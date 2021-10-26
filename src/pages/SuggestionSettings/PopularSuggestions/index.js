@@ -137,26 +137,26 @@ class QuerySuggestions extends React.Component {
 			const payload = get(action, 'payload');
 			if (payload) {
 				this.form.patchValue({
-					blacklist: payload.blacklist || [],
+					blacklist: payload.blacklist,
 					externalSuggestions: payload.externalSuggestions || [],
-					minCount: parseInt(payload.minCount, 10) || 0,
-					minHits: parseInt(payload.minHits, 10) || 0,
+					minCount: parseInt(payload.minCount, 10),
+					minHits: parseInt(payload.minHits, 10),
 					numberOfDays: payload.numberOfDays || 30,
-					minChars: parseInt(payload.minChars, 10) || 0,
-					size: parseInt(payload.size, 10) || 0,
+					minChars: parseInt(payload.minChars, 10),
+					size: parseInt(payload.size, 10),
 					indices: payload.indices || ['*'],
 					transformDiacritics: payload.transformDiacritics,
 				});
 
 				this.setState({
 					initialData: {
-						blacklist: payload.blacklist || [],
+						blacklist: payload.blacklist,
 						externalSuggestions: payload.externalSuggestions || [],
-						minCount: parseInt(payload.minCount, 10) || 0,
-						minHits: parseInt(payload.minHits, 10) || 0,
+						minCount: parseInt(payload.minCount, 10),
+						minHits: parseInt(payload.minHits, 10),
 						numberOfDays: payload.numberOfDays || 30,
-						minChars: parseInt(payload.minChars, 10) || 0,
-						size: parseInt(payload.size, 10) || 0,
+						minChars: parseInt(payload.minChars, 10),
+						size: parseInt(payload.size, 10),
 						indices: payload.indices || ['*'],
 						transformDiacritics: payload.transformDiacritics,
 					}
