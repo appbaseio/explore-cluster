@@ -17,7 +17,7 @@ const datsetMappings = [
 		description:
 			'A dataset of 10,000 movies obtained from TMDB. This is ideal to experiment with SaaS and E-Commerce use-cases.',
 		url:
-			'http://img5a.flixcart.com/image/keyboard/tablet-keyboard/r/z/y/couponsmall-key-343-original-imaefv2emhpp3tku.jpeg',
+			'https://www.themoviedb.org/t/p/w1280/xmbU4JTUm8rsdtn7Y3Fcm30GpeT.jpg',
 		alt: 'movies-image',
 		count: '10,000'
 	},
@@ -37,7 +37,7 @@ const datsetMappings = [
 		description:
 			'A dataset of 3,500 eathquake samples. This is ideal to experiment with E-Commerce use-cases and aggregator use-cases.',
 		url:
-			'http://img5a.flixcart.com/image/keyboard/tablet-keyboard/r/z/y/couponsmall-key-343-original-imaefv2emhpp3tku.jpeg',
+			'https://imgur.com/q9neV4t.png',
 		alt: 'geo-image',
 		count: '3,500'
 	},
@@ -246,7 +246,7 @@ function selectDataset({ nextScreen, setURL, url: newUrl, handleDataset }) {
 										<img
 											src={data.url}
 											alt={data.alt}
-											style={{ height: '150px', width: '150px' }}
+											style={{ height: '150px', width: '150px', margin: 20 }}
 										/>
 										<div>
 											<h3>{data.name}</h3>

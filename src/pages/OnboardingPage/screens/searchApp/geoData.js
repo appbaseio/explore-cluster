@@ -181,7 +181,7 @@ export default class GeoSearchApp extends Component {
 				url={SCALR_API}
 				enableAppbase
 				className="search-app"
-				mapKey="AIzaSyCqWUHFYNXCMlt13StFZzim5y06Yr99vRY"
+				mapKey="REDACTED_GOOGLE_API_KEY"
 				theme={{
 					colors: {
 						primaryColor: '#FF307A',
