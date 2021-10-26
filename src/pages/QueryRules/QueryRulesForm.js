@@ -335,20 +335,22 @@ class QueryRulesForm extends React.Component {
 			indexes: selectedIndexes,
 			isAggs: true,
 		});
-		this.setState({
-			mappings,
-			dataFields,
-			searchFields,
-			aggsFields,
-			fieldMap,
-			subFieldsMap,
-			loading: false,
-		}, () => {
-			if(aggsFields?.length) {
-				console.log("aggsFields:", aggsFields);
-				this.fetchPreviewCount();
-			}
-		});
+		this.setState(
+			{
+				mappings,
+				dataFields,
+				searchFields,
+				aggsFields,
+				fieldMap,
+				subFieldsMap,
+				loading: false,
+			},
+			() => {
+				if (aggsFields?.length) {
+					this.fetchPreviewCount();
+				}
+			},
+		);
 	};
 
 	getAlertMessage = (hasChanged, isCreating, isUpdating, count) => {
@@ -395,7 +397,7 @@ class QueryRulesForm extends React.Component {
 			{
 				[name]: value,
 			},
-			() => this.fetchPreviewCount,
+			() => this.fetchPreviewCount(),
 		);
 	};
 
