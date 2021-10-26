@@ -40,7 +40,7 @@ function EndScreen({ settings, credentials, url, fetchSearchSettings }) {
 			<div className={endScreenStyles}>
 				<div className="container">
 					<div className="header-card">
-						<h3>Share what you've built:</h3>
+						<h3 style={{fontWeight: 'bold'}}>Share what you've built:</h3>
 						<div style={{display: 'flex', alignItems: 'center', gap: 10}}>
 							<div className="overflow-text">{generateCodeSandbox()}</div>
 							<CopyToClipboard text={generateCodeSandbox()}>
@@ -183,6 +183,7 @@ EndScreen.propTypes = {
 	fetchSearchSettings: PropTypes.func.isRequired,
 	credentials: PropTypes.string.isRequired,
 	url: PropTypes.string.isRequired,
+	settings: PropTypes.object,
 }
 
 EndScreen.defaultProps = {

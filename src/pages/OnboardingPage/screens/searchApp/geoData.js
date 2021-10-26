@@ -14,8 +14,6 @@ import {
 import appbaseHelpers from '../../utils/appbaseHelpers';
 import { getURL } from '../../../../constants/config';
 
-const { ResultListWrapper } = ReactiveList;
-
 const renderFilters = (fields) => {
 	if (fields && fields.length) {
 		return fields.map((field) => {
@@ -57,15 +55,15 @@ const renderFilters = (fields) => {
                         <MultiList
                             key={field}
                             componentId={field}
-                            dataField={field}
-                            title="Place"
+                            dataField="place.keyword"
+                            title="Places"
+							filterLabel="Places"
                             size={15}
                             sortBy="count"
                             react={{
                                 and: ['search', 'year', 'magnitude'],
                             }}
                             showSearch={false}
-                            filterLabel="Place"
                         />
                     );
                 }
@@ -102,18 +100,30 @@ const renderResultList = () => {
 		dataField: "location",
 		defaultMapStyle: "Light Monochrome",
 		title: "Reactive Maps",
-		defaultZoom: 13,
+		defaultZoom: 6,
+		size: 10,
 		react: {
-		  and: "places"
+		  and: "place"
 		},
 		onPopoverClick: item => <div>{item.place}</div>,
 		showMapStyles: true,
-		renderData: result => {
-		  console.log(result);
-		  return {
-			label: <div>{result.magnitude}</div>
-		  };
-		}
+		renderData: (result) => ({
+			custom: (
+			  <div
+				style={{
+				  background: "dodgerblue",
+				  color: "#fff",
+				  paddingLeft: 5,
+				  paddingRight: 5,
+				  borderRadius: 3,
+				  padding: 10
+				}}
+			  >
+				<i className="fas fa-globe-europe" />
+				&nbsp;{result.magnitude}
+			  </div>
+			)
+		})
 	};
 	return (
 	<div style={{margin: 10}}>
@@ -203,11 +213,11 @@ export default class GeoSearchApp extends Component {
 					</h2>
 				</header>
 
-				{/* <SelectedFilters style={{ marginTop: 20 }} /> */}
+				<SelectedFilters style={{ marginTop: 20 }} />
 
 				<div className={facets && facets.length ? 'multi-col' : ''}>
 					<div className="left-col">{renderFilters(facets)}</div>
-					{renderCode(ui)}
+					<div style={{width: facets && facets.length ? '70%' : '100%'}}>{renderCode(ui)}</div>
 				</div>
 			</ReactiveBase>
 		);
