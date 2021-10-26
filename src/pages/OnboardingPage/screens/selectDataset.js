@@ -232,13 +232,11 @@ function selectDataset({ nextScreen, setURL, url: newUrl, handleDataset }) {
 							<div>
 								{datsetMappings.map((data) => (
 									<div
+										className="dataset-container"
 										style={{
-											width: '100%',
-											marginBottom: '15px',
-											display: 'flex',
-											background: 'white',
+
 											border: data.name === dataset.name ? '1px solid #1890ff' : 'none',
-											// background: '#e4f0fb
+											background: data.name === dataset.name ? 'rgb(234, 245, 255)' : 'white',
 										}}
 										key={data.id}
 										onClick={() => handleSelect(data.name, data.count, data.id)}

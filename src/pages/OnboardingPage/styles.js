@@ -132,6 +132,14 @@ const onboardingStyles = css`
 		.content {
 			flex-grow: 1;
 			margin: 0 0 0 30px;
+			.dataset-container {
+				width: 100%;
+				margin-bottom: 15px;
+				display: flex;
+				&:hover {
+					cursor: pointer;
+				}
+			}
 		}
 	}
 	header {
