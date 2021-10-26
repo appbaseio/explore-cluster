@@ -69,7 +69,6 @@ class Result extends React.Component {
 		if (id) {
 			ruleData = rules.find((rule) => rule.id === id) || {};
 		}
-		console.log(page, withRule, id,  "===============");
 		return (
 			<Card>
 				<StateProvider
@@ -77,87 +76,81 @@ class Result extends React.Component {
 					componentIds={['result']}
 					render={({ searchState }) => {
 						const rulesApplied = get(searchState, 'result.settings.queryRules', []);
-						console.log(rulesApplied);
-						if (rulesApplied.length) {
+						if(page === 'rules' && id && withRule) {
 							return (
-								<>
-									{ page == 'rules' && id ? (
-										withRule && (
-											<Alert
-												type="info"
-												icon="info"
-												style={{ margin: '0px 0 16px' }}
-												message={
-													<React.Fragment>
-														<div className={ruleStyle}>
-															<div>
-																<p className="name">{ruleData.name}</p>
-																<p className="expression">
-																	{ruleData.trigger &&
-																		ruleData.trigger.expression}
-																</p>
-															</div>
-															<div>
-																{get(ruleData, 'actions', []).map((action) => (
-																	<div key={action.type} className={section}>
-																		<ActionView action={action} ruleId={ruleData.id} />
-																	</div>
-																))}
-															</div>
+								<Alert
+									type="info"
+									icon="info"
+									style={{ margin: '0px 0 16px' }}
+									message={
+										<React.Fragment>
+											<div className={ruleStyle}>
+												<div>
+													<p className="name">{ruleData.name}</p>
+													<p className="expression">
+														{ruleData.trigger &&
+															ruleData.trigger.expression}
+													</p>
+												</div>
+												<div>
+													{get(ruleData, 'actions', []).map((action) => (
+														<div key={action.type} className={section}>
+															<ActionView action={action} ruleId={ruleData.id} />
 														</div>
-													</React.Fragment>
-												}
-											/>
-										)
-									) : (
-										// <div>he</div>
-										<Alert
-											type="info"
-											icon="info"
-											style={{ margin: '0px 0 16px' }}
-											message={
-												<React.Fragment>
-													<Typography.Text>
-														Query{' '}
-														{rulesApplied.length > 1 ? 'rules' : 'rule'}{' '}
-														applied
-													</Typography.Text>
-													{rulesApplied.map((rule) => {
-														const ruleInfo = (rules || []).find(
-															(r) => r.id === rule,
-														);
+													))}
+												</div>
+											</div>
+										</React.Fragment>
+									}
+								/>
+							)
+						} else if(rulesApplied.length) {
+							return (
+								<Alert
+									type="info"
+									icon="info"
+									style={{ margin: '0px 0 16px' }}
+									message={
+										<React.Fragment>
+											<Typography.Text>
+												Query{' '}
+												{rulesApplied.length > 1 ? 'rules' : 'rule'}{' '}
+												applied
+											</Typography.Text>
+											{rulesApplied.map((rule) => {
+												const ruleInfo = (rules || []).find(
+													(r) => r.id === rule,
+												);
 
-														return (
-															<div className={ruleStyle}>
-																<div>
-																	<p className="name">
-																		{ruleInfo.name}
-																	</p>
-																	<p className="expression">
-																		{ruleInfo &&
-																			ruleInfo.trigger &&
-																			ruleInfo.trigger
-																				.expression}
-																	</p>
-																</div>
-																<div>
-																	<Link
-																		to={`/cluster/rules/${rule}`}
-																	>
-																		<Button size="small">
-																			Edit Rule
-																		</Button>
-																	</Link>
-																</div>
-															</div>
-														);
-													})}
-												</React.Fragment>
-											}
-										/>
-									)}
-								</>
-							);
+												return (
+													<div className={ruleStyle}>
+														<div>
+															<p className="name">
+																{ruleInfo.name}
+															</p>
+															<p className="expression">
+																{ruleInfo &&
+																	ruleInfo.trigger &&
+																	ruleInfo.trigger
+																		.expression}
+															</p>
+														</div>
+														<div>
+															<Link
+																to={`/cluster/rules/${rule}`}
+															>
+																<Button size="small">
+																	Edit Rule
+																</Button>
+															</Link>
+														</div>
+													</div>
+												);
+											})}
+										</React.Fragment>
+									}
+								/>
+							)
 						}
 						return null;
 					}}
