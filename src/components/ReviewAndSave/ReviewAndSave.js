@@ -520,8 +520,9 @@ class ReviewAndSave extends React.Component {
 			// if ngram is enabled .search field should be added before saving as it requires re-indexing of data
 			if (get(newSettings, 'indexSettings.enableNgram')) {
 				const currentDataFields = get(newSettings, 'search.dataField');
-				const [ngramDataFields, ngramFieldWeights] =
-					applyNgramDataFields(currentDataFields);
+				const [ngramDataFields, ngramFieldWeights] = applyNgramDataFields(
+					currentDataFields,
+				);
 				newSettings = {
 					...newSettings,
 					search: {
