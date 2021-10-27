@@ -137,7 +137,7 @@ class QuerySuggestions extends React.Component {
 			const payload = get(action, 'payload');
 			if (payload) {
 				this.form.patchValue({
-					blacklist: payload.blacklist,
+					blacklist: payload.blacklist || [],
 					externalSuggestions: payload.externalSuggestions || [],
 					minCount: parseInt(payload.minCount, 10),
 					minHits: parseInt(payload.minHits, 10),
@@ -150,7 +150,7 @@ class QuerySuggestions extends React.Component {
 
 				this.setState({
 					initialData: {
-						blacklist: payload.blacklist,
+						blacklist: payload.blacklist || [],
 						externalSuggestions: payload.externalSuggestions || [],
 						minCount: parseInt(payload.minCount, 10),
 						minHits: parseInt(payload.minHits, 10),
