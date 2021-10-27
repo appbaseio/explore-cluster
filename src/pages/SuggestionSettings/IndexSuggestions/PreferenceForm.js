@@ -130,7 +130,6 @@ class PreferenceForm extends React.Component {
 	render() {
 		const {
 			control,
-			handleSaveTemplate,
 			indices,
 			initialData,
 			mappings,
@@ -722,7 +721,6 @@ class PreferenceForm extends React.Component {
 }
 
 PreferenceForm.propTypes = {
-	handleSaveTemplate: PropTypes.func.isRequired,
 	control: PropTypes.object.isRequired,
 	indices: PropTypes.array.isRequired,
 	appStoredQueries: PropTypes.array.isRequired,
