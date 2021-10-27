@@ -1,6 +1,8 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Tabs } from 'antd';
 import { connect } from 'react-redux';
+import get from 'lodash/get';
 import { container } from '../ResultsPage/styles';
 import PopularSuggestions from './PopularSuggestions/index';
 import RecentSuggestions from './RecentSuggestions';
@@ -8,7 +10,6 @@ import IndexSuggestions from './IndexSuggestions';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Overlay from '../../components/Overlay';
 import { isValidPlan } from '../../batteries/utils';
-import get from 'lodash/get';
 
 const { TabPane } = Tabs;
 
@@ -22,8 +23,7 @@ const bannerDetails = {
 };
 
 const SuggestionSettings = ({ tier, featureSuggestions }) => {
-
-	if (!isValidPlan(tier, featureSuggestions )) {
+	if (!isValidPlan(tier, featureSuggestions)) {
 		return (
 			<React.Fragment>
 				<Banner {...bannerDetails} />
@@ -53,12 +53,17 @@ const SuggestionSettings = ({ tier, featureSuggestions }) => {
 						<RecentSuggestions hide />
 					</TabPane>
 					<TabPane tab="Index Suggestions" key="3" data-cy="index-suggestions-tab">
-						<IndexSuggestions hide/>
+						<IndexSuggestions hide />
 					</TabPane>
 				</Tabs>
 			</div>
 		</>
 	);
+};
+
+SuggestionSettings.propTypes = {
+	tier: PropTypes.string,
+	featureSuggestions: PropTypes.bool,
 };
 
 SuggestionSettings.defaultProps = {
@@ -70,6 +75,5 @@ const mapStateToProps = (state) => ({
 	tier: get(state, '$getAppPlan.results.tier'),
 	featureSuggestions: get(state, '$getAppPlan.results.feature_suggestions', false),
 });
-
 
 export default connect(mapStateToProps, null)(SuggestionSettings);
