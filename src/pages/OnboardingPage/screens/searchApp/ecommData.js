@@ -95,7 +95,7 @@ const getWeights = (fields) => {
 		categories: 3,
 		'categories.raw': 3,
 		'categories.search': 1,
-		overview: 1,
+		description: 1,
 		'description.raw': 1,
 		'description.search': 1,
 	};
