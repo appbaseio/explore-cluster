@@ -77,6 +77,7 @@ class PreferenceForm extends React.Component {
 			this.setState({ isFetchingMappings });
 		}
 
+		console.log(prevProps.initialData, initialData);
 		if (prevProps.initialData !== initialData) {
 			this.setState({
 				indexSuggestions: initialData,

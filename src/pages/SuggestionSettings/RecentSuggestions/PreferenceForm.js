@@ -242,39 +242,6 @@ class PreferenceForm extends React.Component {
 								);
 							}}
 						/>
-						{/* <Affix offsetBottom={0}>
-							<div
-								style={{
-									display: 'flex',
-									justifyContent: 'space-between',
-									padding: 20,
-									background: 'white',
-								}}
-							>
-								<SearchPreviewSwitcher
-									filteredApps={filteredApps}
-									onSelect={this.onAppSelect}
-									onCancel={this.toggleVisibility}
-									visible={visible}
-									app={app}
-								/>
-								<Button
-									data-cy="recent-suggestions-save"
-									onClick={handleSaveTemplate}
-									size="large"
-									type="primary"
-									loading={isLoading}
-									disabled={isLoading || invalidForm || pristine}
-								>
-									Save
-								</Button>
-								<Footer
-									originalData={initialData}
-									tab='recent-suggestions'
-									changedData={recentSuggestions}
-								/>
-							</div>
-						</Affix> */}
 						<Footer
 							originalData={initialData}
 							tab='recent-suggestions'

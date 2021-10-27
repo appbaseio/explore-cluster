@@ -38,7 +38,7 @@ const cardStyle = css`
 	}
 `;
 
-class QuerySuggestions extends React.Component {
+class PopularSuggestions extends React.Component {
 	constructor(props) {
 		super(props);
 		this.startTime = moment();
@@ -281,12 +281,12 @@ class QuerySuggestions extends React.Component {
 	}
 }
 
-QuerySuggestions.defaultProps = {
+PopularSuggestions.defaultProps = {
 	preferences: {},
 	apps: {},
 };
 
-QuerySuggestions.propTypes = {
+PopularSuggestions.propTypes = {
 	isLoading: PropTypes.bool.isRequired,
 	preferences: PropTypes.object,
 	errors: PropTypes.array.isRequired,
@@ -316,4 +316,4 @@ const mapDispatchToProps = (dispatch) => {
 	};
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(QuerySuggestions);
+export default connect(mapStateToProps, mapDispatchToProps)(PopularSuggestions);

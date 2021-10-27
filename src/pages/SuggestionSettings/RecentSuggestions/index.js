@@ -48,7 +48,7 @@ const cardStyle = css`
 	}
 `;
 
-class QuerySuggestions extends React.Component {
+class RecentSuggestions extends React.Component {
 	constructor(props) {
 		super(props);
 		this.startTime = moment();
@@ -249,13 +249,13 @@ class QuerySuggestions extends React.Component {
 	}
 }
 
-QuerySuggestions.defaultProps = {
+RecentSuggestions.defaultProps = {
 	preferences: {},
 	apps: {},
 	hide: false,
 };
 
-QuerySuggestions.propTypes = {
+RecentSuggestions.propTypes = {
 	isLoading: PropTypes.bool.isRequired,
 	preferences: PropTypes.object,
 	errors: PropTypes.array.isRequired,
@@ -284,4 +284,4 @@ const mapDispatchToProps = (dispatch) => ({
 	savePreferences: (payload) => dispatch(saveRecentSuggestionsPreferences(payload)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(QuerySuggestions);
+export default connect(mapStateToProps, mapDispatchToProps)(RecentSuggestions);
