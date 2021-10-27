@@ -462,8 +462,8 @@ class SearchPreview extends React.Component {
 					url={url}
 					appbaseConfig={{
 						recordAnalytics: showFeaturedProducts ? false : isAnalyticsEnabled,
+						enableQueryRules: page !== 'rules',
 					}}
-					// initialQueriesSyncTime={100}
 				>
 					<Col md={6}>
 						<ErrorToaster>
