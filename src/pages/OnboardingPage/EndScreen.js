@@ -34,22 +34,26 @@ function EndScreen({ settings, credentials, url, fetchSearchSettings }) {
 		return '';
 	}
 
+	const csbURL = generateCodeSandbox();
 	return (
 		<Layout>
 			<FullHeader />
 			<div className={endScreenStyles}>
 				<div className="container">
-					<div className="header-card">
-						<h3 style={{fontWeight: 'bold'}}>Share what you've built:</h3>
-						<div style={{display: 'flex', alignItems: 'center', gap: 10}}>
-							<div className="overflow-text">{generateCodeSandbox()}</div>
-							<CopyToClipboard text={generateCodeSandbox()}>
-								<Icon type="copy" theme="outlined" className="icon-active"/>
-							</CopyToClipboard>
+					{
+						csbURL && (
+							<div className="header-card">
+								<h3 style={{fontWeight: 'bold'}}>Share what you've built:</h3>
+								<div style={{display: 'flex', alignItems: 'center', gap: 10}}>
+									<div className="overflow-text">{csbURL}</div>
+									<CopyToClipboard text={csbURL}>
+										<Icon type="copy" theme="outlined" className="icon-active"/>
+									</CopyToClipboard>
 
-						</div>
-
-					</div>
+								</div>
+							</div>
+						)
+					}
 					<div className="banner-row">
 						<div className="big-card">
 							<h2>WEB APP</h2>

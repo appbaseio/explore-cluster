@@ -237,7 +237,7 @@ export default class Search extends Component {
 
 				<Footer
 					nextScreen={nextScreen}
-					previousScreen={previousScreen}
+					// previousScreen={previousScreen}
 					disabled={!searchFields.length}
 				/>
 			</div>
