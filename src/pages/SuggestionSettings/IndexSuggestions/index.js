@@ -145,8 +145,8 @@ class QuerySuggestions extends React.Component {
 				this.form.patchValue({
 					applyStopwords: payload.applyStopwords || false,
 					customStopwords: payload.customStopwords || [],
-					maxPredictedWords: parseInt(payload.maxPredictedWords, 10),
-					customQuery: payload.customQuery || '',
+					maxPredictedWords: parseInt(payload.maxPredictedWords, 10) || 0,
+					customQuery: payload.customQuery,
 					includeFields: payload.includeFields || ['*'],
 					excludeFields: payload.excludeFields || [],
 					categoryField: payload.categoryField ,
@@ -154,7 +154,7 @@ class QuerySuggestions extends React.Component {
 					showDistinctSuggestions: payload.showDistinctSuggestions || false,
 					enablePredictiveSuggestions: payload.enablePredictiveSuggestions || false,
 					enableSynonyms: payload.enableSynonyms || false,
-					size: parseInt(payload.size, 10) || 0,
+					size: parseInt(payload.size, 10) || 1,
 					indices: payload.indices || ['*'],
 				});
 				this.setState({
@@ -162,7 +162,7 @@ class QuerySuggestions extends React.Component {
 						applyStopwords: payload.applyStopwords || false,
 						customStopwords: payload.customStopwords || [],
 						maxPredictedWords: parseInt(payload.maxPredictedWords, 10) || 0,
-						customQuery: payload.customQuery || '',
+						customQuery: payload.customQuery ,
 						includeFields: payload.includeFields || ['*'],
 						excludeFields: payload.excludeFields || [],
 						categoryField: payload.categoryField ,
@@ -171,7 +171,7 @@ class QuerySuggestions extends React.Component {
 						enablePredictiveSuggestions:
 							payload.enablePredictiveSuggestions || false,
 						enableSynonyms: payload.enableSynonyms || false,
-						size: parseInt(payload.size, 10) || 0,
+						size: parseInt(payload.size, 10) || 1,
 						indices: payload.indices || ['*'],
 					},
 				});
@@ -189,7 +189,7 @@ class QuerySuggestions extends React.Component {
 						showDistinctSuggestions: false,
 						enablePredictiveSuggestions: false,
 						enableSynonyms: false,
-						size: 0,
+						size: 1,
 						indices: ['*'],
 					},
 				});
