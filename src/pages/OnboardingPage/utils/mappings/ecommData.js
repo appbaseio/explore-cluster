@@ -122,7 +122,16 @@ export default {
 		retail_price: {
 			type: 'integer',
 		},
-		specifications: {
+		'specifications.key': {
+			type: 'text',
+			fields: {
+				keyword: {
+					type: 'keyword',
+				},
+			},
+			analyzer: 'standard',
+		},
+		'specifications.value': {
 			type: 'text',
 			fields: {
 				keyword: {
