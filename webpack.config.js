@@ -86,9 +86,7 @@ module.exports = {
 		},
 		minimizer: [
 			new TerserJSPlugin({
-				terserOptions: {
-					sourceMap: true,
-				},
+				parallel: true,
 			}),
 			new OptimizeCSSAssetsPlugin({}),
 		],
