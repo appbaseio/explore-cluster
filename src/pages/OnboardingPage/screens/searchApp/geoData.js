@@ -104,7 +104,7 @@ const renderResultList = () => {
 		defaultZoom: 6,
 		size: 10,
 		react: {
-		  and: "place"
+		  and: ['place', 'search']
 		},
 		onPopoverClick: item => <div>{item.place}</div>,
 		showMapStyles: true,

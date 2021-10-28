@@ -12,6 +12,7 @@ import {
 import { Tag } from 'antd';
 import appbaseHelpers from '../../utils/appbaseHelpers';
 import { getURL } from '../../../../constants/config';
+import { seachAppStyles } from "./styles";
 
 const { ResultListWrapper } = ReactiveList;
 
@@ -122,19 +123,17 @@ const renderResultList = () => (
 		{({ data }) => (
 			<ResultListWrapper>
 				{data.map((item) => (
-					<div style={{display: 'flex', padding: 10, borderBottom: '1px solid rgb(239, 239, 239)'}}>
-						<img
-							style={{
-								height: 160,
-								width: 160,
-								objectFit: 'contain',
-							}}
-							src={item.image[0]}
-							alt={item.image[0]}
-							onError={(event) => {
-								event.target.src = 'https://www.houseoftara.com/shop/wp-content/uploads/2019/05/placeholder.jpg'; // eslint-disable-line no-param-reassign
-							}}
-						/>
+					<div className={seachAppStyles}>
+						<div>
+							<img
+								className="img-container"
+								src={item.image[0]}
+								alt={item.image[0]}
+								onError={(event) => {
+									event.target.src = 'https://www.houseoftara.com/shop/wp-content/uploads/2019/05/placeholder.jpg'; // eslint-disable-line no-param-reassign
+								}}
+							/>
+						</div>
 						<ResultList key={item._id} id={item._id}>
 							<ResultList.Content>
 								<ResultList.Title
@@ -147,16 +146,15 @@ const renderResultList = () => (
 										<div style={{display: 'flex', color: '#424242'}}>
 											<p style={{fontWeight: '600', marginRight: 5}}>Retail Price </p>
 											<p>{item.retail_price}</p>
-											<p style={{ marginLeft: 40, fontWeight: '600', marginRight: 5 }}>Brand{" "}</p>
-											<p>{item.brand}</p>
+											{ item.brand && (
+												<>
+													<p style={{ marginLeft: 40, fontWeight: '600', marginRight: 5 }}>Brand{" "}</p>
+													<p>{item.brand}</p>
+												</>
+											)}
 										</div>
 										<p
-											style={{
-												color: '#888',
-												margin: '8px 0',
-												fontSize: '13px',
-												lineHeight: '18px',
-											}}
+											className="description-container"
 											dangerouslySetInnerHTML={{ __html: item.description }}
 										/>
 										<div>
