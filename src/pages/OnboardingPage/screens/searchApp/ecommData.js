@@ -9,7 +9,7 @@ import {
 	SelectedFilters,
 	RangeInput
 } from '@appbaseio/reactivesearch';
-import { Tag, Icon } from 'antd';
+import { Tag } from 'antd';
 import appbaseHelpers from '../../utils/appbaseHelpers';
 import { getURL } from '../../../../constants/config';
 
@@ -64,7 +64,7 @@ const renderFilters = (fields) => {
                             showHistogram={true}
                             range={{
                                 start: 100,
-                                end: 10000,
+                                end: 110000,
                             }}
                         />
                     );
@@ -138,16 +138,17 @@ const renderResultList = () => (
 						<ResultList key={item._id} id={item._id}>
 							<ResultList.Content>
 								<ResultList.Title
-									dangerouslySetInnerHTML={{
-										__html: item.product_name,
+									dangerouslySetInnerHTML = {{
+										__html: item.product_name, //eslint-disable-line
 									}}
 								/>
 								<ResultList.Description>
 									<div>
 										<div style={{display: 'flex', color: '#424242'}}>
 											<p style={{fontWeight: '600', marginRight: 5}}>Retail Price </p>
-											<p> {item.retail_price}</p>
-											<p><Icon type="star" style={{ marginLeft: 40, marginRight: 3 }} theme="twoTone" /> {item.product_rating}/5</p>
+											<p>{item.retail_price}</p>
+											<p style={{ marginLeft: 40, fontWeight: '600', marginRight: 5 }}>Brand{" "}</p>
+											<p>{item.brand}</p>
 										</div>
 										<p
 											style={{
@@ -159,9 +160,20 @@ const renderResultList = () => (
 											dangerouslySetInnerHTML={{ __html: item.description }}
 										/>
 										<div>
-											{item.categories.map((category) => (
-												<Tag>{category}</Tag>
-											))}
+											{Array.isArray(item?.categories) ? (
+												item.categories.map((category) => (
+													<Tag>{category}</Tag>
+												))
+											) : (
+												<Tag>
+													<p
+														dangerouslySetInnerHTML={{
+															__html: item.categories
+														}}
+													/>
+												</Tag>
+											)
+											}
 										</div>
 									</div>
 								</ResultList.Description>

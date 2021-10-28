@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {
 	RangeSlider,
 	MultiList,
+	DataSearch,
 	ReactiveBase,
 	ReactiveList,
 	SelectedFilters,
@@ -28,8 +29,8 @@ const renderFilters = (fields) => {
                             filterLabel="Magnitude"
                             showHistogram={true}
                             rangeLabels={{
-                                start: '0',
-                                end: '10',
+                                start: '0.0 Richter',
+                                end: '10.0 Richter',
                             }}
                         />
                     );
@@ -211,6 +212,20 @@ export default class GeoSearchApp extends Component {
 							🌎
 						</span>
 					</h2>
+					<DataSearch
+						componentId="search"
+						dataField={fields}
+						showIcon={false}
+						placeholder="Search for places..."
+						autosuggest={false}
+						filterLabel="Search"
+						fieldWeights={getWeights(fields)}
+						highlight
+						style={{
+							maxWidth: "400px",
+							margin: "0 auto"
+						}}
+					/>
 				</header>
 
 				<SelectedFilters style={{ marginTop: 20 }} />
