@@ -84,7 +84,14 @@ module.exports = {
 		runtimeChunk: {
 			name: 'manifest',
 		},
-		minimizer: [new TerserJSPlugin({}), new OptimizeCSSAssetsPlugin({})],
+		minimizer: [
+			new TerserJSPlugin({
+				terserOptions: {
+					sourceMap: true,
+				},
+			}),
+			new OptimizeCSSAssetsPlugin({}),
+		],
 		splitChunks: {
 			cacheGroups: {
 				vendor: {

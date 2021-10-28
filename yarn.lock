@@ -51,10 +51,10 @@
     url-search-params "^1.1.0"
     uuid "^3.3.2"
 
-"@appbaseio-confidential/reactivesearch-playground@^1.0.13-beta":
-  version "1.0.13-beta"
-  resolved "https://npm.pkg.github.com/download/@appbaseio-confidential/reactivesearch-playground/1.0.13-beta/121ffbe9c01a842c84a9a6d064cbc6b47442e6cf8e07729d9a339f84914d7a0d#73ca3ab220cfd1d23f9b0a31439461694dcc620c"
-  integrity sha512-FavGwxIedps4dQe3cfF9pFSye0cNuQbhaD4Hf8VMAqYnLI93XSpHSHVX0s1ppshJCp7nJpEHEdAoKKEzFFZjyw==
+"@appbaseio-confidential/reactivesearch-playground@^1.0.14-beta":
+  version "1.0.14-beta"
+  resolved "https://npm.pkg.github.com/download/@appbaseio-confidential/reactivesearch-playground/1.0.14-beta/aacac31a505f8ed9301c5bb3b3e3b170c0777b7c6a13564133dabdccbcb37576#23c44d593bd0c313ffb7ee4725fb5cdf152c043d"
+  integrity sha512-EdGVi339cs/o/P1JQmo+SUQv0Fz/mpityJhdrpyaSMttsxOZ6lk7ZFIzSqBT9prHQcBQ4veldRwXxoyNd6gMlQ==
   dependencies:
     "@monaco-editor/react" "^4.2.1"
     "@reduxjs/toolkit" "^1.6.0"
@@ -13976,7 +13976,7 @@ standalone-react-addons-pure-render-mixin@^0.1.1:
   resolved "https://registry.yarnpkg.com/standalone-react-addons-pure-render-mixin/-/standalone-react-addons-pure-render-mixin-0.1.1.tgz#3c7409f4c79c40de9ac72c616cf679a994f37551"
   integrity sha1-PHQJ9MecQN6axyxhbPZ5qZTzdVE=
 
-state-local@^1.0.6, state-local@^1.0.7:
+state-local@^1.0.6:
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/state-local/-/state-local-1.0.7.tgz#da50211d07f05748d53009bee46307a37db386d5"
   integrity sha512-HTEHMNieakEnoe33shBYcZ7NX83ACUjCu8c40iOGEZsngj9zRnkqS9j1pqQPXwobB0ZcVTk27REb7COQ0UR59w==
