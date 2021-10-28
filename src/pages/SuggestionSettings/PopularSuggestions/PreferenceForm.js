@@ -5,7 +5,6 @@ import { Input, Select, Checkbox, Icon, Popover } from 'antd';
 import { css } from 'react-emotion';
 import PropTypes from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
-import keys from 'lodash/keys';
 import Grid from '../../../components/CreateCredentials/Grid';
 import Ace from '../../../batteries/components/SearchSandbox/containers/AceEditor';
 import { suggestionsMessages as Messages } from '../../../utils/messages';
@@ -50,7 +49,6 @@ class PreferenceForm extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			visible: false,
 			popularSuggestions: props.initialData,
 		};
 	}
@@ -58,19 +56,6 @@ class PreferenceForm extends React.Component {
 	componentDidMount() {
 		this.getMappings();
 	}
-
-	componentDidUpdate(prevProps) {
-		const { initialData } = this.props;
-		if (prevProps.initialData !== initialData) {
-			this.setState({
-				popularSuggestions: initialData
-			})
-		}
-	}
-
-	onAppSelect = (app) => {
-		this.setState({ app, visible: true });
-	};
 
 	getMappings() {
 		const { appName, fetchMappings, credentials, mappings } = this.props;
@@ -80,7 +65,7 @@ class PreferenceForm extends React.Component {
 		}
 	}
 
-	handleChange = (key, value, dataKey) => {
+	handleChange = (key, value, dataKey) => { // eslint-disable-line
 		const { popularSuggestions } = this.state;
 		const newPopularSuggestions = {
 			...popularSuggestions,
@@ -92,22 +77,15 @@ class PreferenceForm extends React.Component {
 
 	};
 
-	toggleVisibility = () => {
-		this.setState((prevState) => ({
-			visible: !prevState.visible,
-		}));
-	};
-
 	render() {
-		const { control, isLoading, indices, apps, initialData } = this.props;
-		const { visible, app, popularSuggestions } = this.state;
-		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.') && appName.startsWith('metricbeat'));
+		const { control, indices, initialData } = this.props;
+		const { popularSuggestions } = this.state;
 
 		return (
 			<FieldGroup
 				control={control}
 				strict={false}
-				render={({ pristine, invalid: invalidForm }) => {
+				render={({ invalid: invalidForm }) => { // eslint-disable-line
 					return (
 					<div css={modal}>
 						<FieldControl
@@ -468,39 +446,6 @@ class PreferenceForm extends React.Component {
 								);
 							}}
 						/>
-						{/* <Affix offsetBottom={0}>
-							<div
-								style={{
-									display: 'flex',
-									justifyContent: 'space-between',
-									padding: 20,
-									background: 'white',
-								}}
-							>
-								<SearchPreviewSwitcher
-									filteredApps={filteredApps}
-									onSelect={this.onAppSelect}
-									onCancel={this.toggleVisibility}
-									visible={visible}
-									app={app}
-								/>
-								<Button
-									data-cy="popular-suggestions-save"
-									onClick={handleSaveTemplate}
-									size="large"
-									type="primary"
-									loading={isLoading}
-									disabled={isLoading || invalidForm || pristine}
-								>
-									Save
-								</Button>
-								<Footer
-									originalData={initialData}
-									tab='popular-suggestions'
-									changedData={popularSuggestions}
-								/>
-							</div>
-						</Affix> */}
 						<Footer
 							originalData={initialData}
 							tab='popular-suggestions'

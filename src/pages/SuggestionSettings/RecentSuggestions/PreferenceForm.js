@@ -5,7 +5,6 @@ import { Input, Select, Icon, Popover } from 'antd';
 import { css } from 'react-emotion';
 import PropTypes from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
-import keys from 'lodash/keys';
 import Grid from '../../../components/CreateCredentials/Grid';
 import {
 	setLocalRelevancyState,
@@ -49,25 +48,11 @@ class PreferenceForm extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			visible: false ,
 			recentSuggestions: props.initialData,
 		};
 	}
 
-	componentDidUpdate(prevProps) {
-		const { initialData } = this.props;
-		if (prevProps.initialData !== initialData) {
-			this.setState({
-				recentSuggestions: initialData
-			})
-		}
-	}
-
-	onAppSelect = (app) => {
-		this.setState({ app, visible: true });
-	};
-
-	handleChange = (key, value, dataKey) => {
+	handleChange = (key, value, dataKey) => { // eslint-disable-line
 		const { recentSuggestions } = this.state;
 		const newRecentSuggestions = {
 			...recentSuggestions,
@@ -78,22 +63,15 @@ class PreferenceForm extends React.Component {
 		})
 	};
 
-	toggleVisibility = () => {
-		this.setState((prevState) => ({
-			visible: !prevState.visible,
-		}));
-	};
-
 	render() {
-		const { control, isLoading, apps,indices , initialData } = this.props;
-		const { visible, app, recentSuggestions } = this.state;
-		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
+		const { control, indices , initialData } = this.props;
+		const { recentSuggestions } = this.state;
 
 		return (
 			<FieldGroup
 				control={control}
 				strict={false}
-				render={({ pristine, invalid: invalidForm }) => (
+				render={({ invalid: invalidForm }) => (
 					<div css={modal}>
 						<FieldControl
 							name="minHits"

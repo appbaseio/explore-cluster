@@ -14,7 +14,7 @@ import Grid from '../../../components/CreateCredentials/Grid';
 import { removeWhiteSpaces, getDatafields } from '../../../utils';
 import { suggestionsMessages as Messages } from '../../../utils/messages';
 import styles from '../styles';
-import Footer from '../Footer';
+import Footer from '../Footer'; // eslint-disable-line
 
 const gridRatio = 0.40;
 const calculateValue = (value) => {
@@ -51,7 +51,7 @@ class PreferenceForm extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			selectedIndices: JSON.stringify(props.initialData.indices) == JSON.stringify(['*']) ? props.indices : props.initialData.indices || [],
+			selectedIndices: JSON.stringify(props.initialData.indices) === JSON.stringify(['*']) ? props.indices : props.initialData.indices || [],
 			aggregationFields: [],
 			indexSuggestions: props.initialData,
 			isFetchingMappings: props.isFetchingMappings,
@@ -68,13 +68,13 @@ class PreferenceForm extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { rawMappings, initialData, isFetchingMappings } = this.props;
+		const { rawMappings, isFetchingMappings } = this.props;
 		if (rawMappings && prevProps.rawMappings !== rawMappings) {
 			this.getAggregationFields();
 		}
 
 		if (isFetchingMappings !== prevProps.isFetchingMappings) {
-			this.setState({ isFetchingMappings });
+			this.setState({ isFetchingMappings }); // eslint-disable-line
 		}
 	}
 
@@ -91,7 +91,7 @@ class PreferenceForm extends React.Component {
 		}
 	}
 
-	handleChange = (key, val, dataKey) => {
+	handleChange = (key, val, dataKey) => { // eslint-disable-line
 		let value = val;
 		if (key === 'customStopwords') {
 			value = val.split(',').map((i) => removeWhiteSpaces(i));
@@ -128,7 +128,7 @@ class PreferenceForm extends React.Component {
 			mappings,
 			appStoredQueries,
 		} = this.props;
-
+		// eslint-disable-line
 		const {
 			aggregationFields,
 			indexSuggestions,
@@ -154,7 +154,7 @@ class PreferenceForm extends React.Component {
 			<FieldGroup
 				control={control}
 				strict={false}
-				render={({ pristine, invalid: invalidForm }) => (
+				render={({ invalid: invalidForm }) => ( // eslint-disable-line
 					<div css={modal}>
 						<FieldControl
 							name="indices"
