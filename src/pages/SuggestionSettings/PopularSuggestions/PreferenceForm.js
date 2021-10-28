@@ -79,6 +79,7 @@ class PreferenceForm extends React.Component {
 
 	render() {
 		const { control, indices, initialData } = this.props;
+		console.log(control, initialData);
 		const { popularSuggestions } = this.state;
 
 		return (

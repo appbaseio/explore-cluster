@@ -111,7 +111,7 @@ class PopularSuggestions extends React.Component {
 		const { errors, apps } = this.props;
 		displayErrors(errors, prevProps.errors, true);
 		if(prevProps.apps !== apps) {
-			this.setState({
+			this.setState({ //eslint-disable-line
 				indices: Object.keys(apps)
 						.sort()
 						.filter((i) => !i.startsWith('.') && !i.startsWith('metricbeat'))
@@ -268,7 +268,6 @@ class PopularSuggestions extends React.Component {
 										indices={indices}
 										control={this.form}
 										initialData={initialData}
-										// handleSaveTemplate={handleSaveTemplate}
 									/>
 								)
 							}
