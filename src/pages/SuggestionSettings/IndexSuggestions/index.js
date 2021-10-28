@@ -276,7 +276,6 @@ class IndexSuggestions extends React.Component {
 									indices={indices}
 									control={this.form}
 									initialData={initialData}
-									// handleSaveTemplate={handleSaveTemplate}
 								/>
 							)}
 						</ErrorToaster>
