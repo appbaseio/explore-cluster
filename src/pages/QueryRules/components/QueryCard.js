@@ -1,10 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Card, Col, Icon, message, Row, Switch, Tooltip, Typography } from 'antd';
+import { Alert, Button, Card, Col, Icon, message, Row, Switch, Tooltip, Typography } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-
 import get from 'lodash/get';
 import ActionView from './ActionView';
 import MobileMenu from './MobileMenu';
@@ -93,6 +92,7 @@ class QueryCard extends React.Component {
 			'dragProvided',
 			'dragSnapshot',
 			'index',
+			'usageStatsCount',
 		]);
 	}
 
@@ -118,7 +118,15 @@ class QueryCard extends React.Component {
 	};
 
 	render() {
-		const { rule, dragProvided, dragSnapshot, removeRule, toggleRule, index } = this.props;
+		const {
+			rule,
+			dragProvided,
+			dragSnapshot,
+			removeRule,
+			toggleRule,
+			index,
+			usageStatsCount,
+		} = this.props;
 		const actionButtonSize = window.innerWidth < 1090 ? 'small' : 'default';
 		return (
 			<Card
@@ -209,10 +217,25 @@ class QueryCard extends React.Component {
 						</div>
 					</Col>
 				</Row>
+				<Alert
+					type="info"
+					showIcon
+					message={
+						usageStatsCount > 0
+							? `Used ${usageStatsCount} times in last 30 days`
+							: 'Not used in the last 30 days'
+					}
+				/>
 			</Card>
 		);
 	}
 }
+
+QueryCard.defaultProps = {
+	rule: {},
+	dragProvided: {},
+	dragSnapshot: {},
+};
 
 QueryCard.propTypes = {
 	rule: PropTypes.object,
@@ -221,12 +244,7 @@ QueryCard.propTypes = {
 	removeRule: PropTypes.func.isRequired,
 	toggleRule: PropTypes.func.isRequired,
 	index: PropTypes.number.isRequired,
-};
-
-QueryCard.defaultProps = {
-	rule: {},
-	dragProvided: {},
-	dragSnapshot: {},
+	usageStatsCount: PropTypes.number.isRequired,
 };
 
 const mapDispatchToProps = (dispatch) => ({

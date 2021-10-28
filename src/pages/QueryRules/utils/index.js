@@ -66,7 +66,7 @@ const getValueFromExpression = (expression = '') => {
 	}
 
 	if (filterQuery) {
-		const isDoubleQuotePresent = searchQuery.includes(`"`);
+		const isDoubleQuotePresent = searchQuery?.includes(`"`);
 		let dataFieldValue;
 		if (
 			isDoubleQuotePresent &&
@@ -96,6 +96,7 @@ const getExpressionFromValue = ({
 	queryValue,
 	selectedIndexes,
 	condition,
+	type,
 }) => {
 	let expression = `'${selectedIndexes.join(',')}' in $index`;
 
@@ -107,8 +108,11 @@ const getExpressionFromValue = ({
 		if (dataField && dataFieldValue) {
 			expression = `${expression} and $filter.${dataField} matches '${dataFieldValue}'`;
 		}
-	}
 
+		if (type?.length) {
+			expression = `${expression} and $type in ${JSON.stringify(type)}`;
+		}
+	}
 	return expression;
 };
 
@@ -176,18 +180,6 @@ const toolTips = {
 				target="_blank"
 				rel="noopener noreferrer"
 				href="https://docs.appbase.io/docs/search/Rules/#custom-data"
-			>
-				Learn more
-			</a>
-		</>
-	),
-	function: (
-		<>
-			Add a user-defined function to pre or post-process when trigger conditions are met.{' '}
-			<a
-				target="_blank"
-				rel="noopener noreferrer"
-				href="https://docs.appbase.io/docs/search/functions"
 			>
 				Learn more
 			</a>

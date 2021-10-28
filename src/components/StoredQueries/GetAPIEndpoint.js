@@ -6,12 +6,12 @@ import { css } from 'emotion';
 import { Card, Modal, Button, notification } from 'antd';
 import { FieldControl, FormBuilder, Validators, FieldGroup } from 'react-reactive-form';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { getAppTemplate, getPermission } from '../../batteries/modules/actions';
+import { getAppStoredQuery, getPermission } from '../../batteries/modules/actions';
 import Loader from '../../batteries/components/shared/Loader/Spinner';
-import Ace from '../../batteries/components/SearchSandbox/containers/AceEditor';
-import { jsonValidator, getString, extractParams } from './utils';
-import Grid from '../../components/CreateCredentials/Grid';
+import { jsonValidator, getString } from './utils';
+import Grid from '../CreateCredentials/Grid';
 import { getURL } from '../../constants/config';
+import Monaco from '../../batteries/components/SearchSandbox/containers/MonacoEditor';
 
 const main = css`
 	margin-bottom: 15px;
@@ -24,9 +24,9 @@ class GetAPIEndpoint extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			sourceStr: '',
+			queryStr: '',
 		};
-		this.url = `${getURL()}/_search/template`;
+		this.url = `${getURL()}/_storedquery/${props.storedQueryId}/execute`;
 		this.form = FormBuilder.group({
 			query: [null, [Validators.required, jsonValidator]],
 		});
@@ -34,25 +34,19 @@ class GetAPIEndpoint extends React.Component {
 			const { fetchPermissions } = props;
 			fetchPermissions();
 		}
-		props.fetchTemplate(props.templateId).then((action) => {
+		props.fetchStoredQuery(props.storedQueryId).then((action) => {
 			if (get(action, 'payload')) {
 				const value = get(action, 'payload');
-				const source = get(value, 'script.source');
-				const sourceStr = getString(source);
+				const source = get(value, 'query');
+				const params = get(value, 'params');
+				const queryStr = getString(source);
 				this.form.patchValue({
 					query: getString({
-						id: props.templateId,
-						params: extractParams(sourceStr).reduce(
-							(params = {}, i) => ({
-								[i]: '',
-								...params,
-							}),
-							{},
-						),
+						params,
 					}),
 				});
 				this.setState({
-					sourceStr,
+					queryStr,
 				});
 			}
 		});
@@ -68,7 +62,7 @@ class GetAPIEndpoint extends React.Component {
 		} = this.form;
 		const { credentials } = this.props;
 		const { username, password } = credentials || {};
-		return `curl -X GET ${
+		return `curl -X POST ${
 			this.url
 		} -H 'Content-Type: application/json' -H 'Authorization: ${`Basic ${btoa(
 			`${username}:${password}`,
@@ -84,7 +78,7 @@ ${getString(query)}
 	};
 
 	render() {
-		const { sourceStr } = this.state;
+		const { queryStr } = this.state;
 		const { visible, handleCancel } = this.props;
 		const { isLoading } = this.props;
 		return (
@@ -124,7 +118,7 @@ ${getString(query)}
 						) : (
 							<React.Fragment>
 								<Card css={main} title="Source Query">
-									<pre>{sourceStr}</pre>
+									<pre>{queryStr}</pre>
 								</Card>
 								<Grid
 									gridRatio={0.1}
@@ -137,30 +131,35 @@ ${getString(query)}
 									component={
 										<FieldControl
 											name="query"
-											render={({ handler }) => (
-												<Ace
-													mode="json"
-													{...handler()}
-													theme="monokai"
-													name="editor-JSON"
-													fontSize={16}
-													showPrintMargin
-													style={{
-														width: '100%',
-														maxWidth: 800,
-														maxHeight: 250,
-													}}
-													showGutter
-													highlightActiveLine
-													setOptions={{
-														showLineNumbers: true,
-														tabSize: 2,
-													}}
-													editorProps={{
-														$blockScrolling: true,
-													}}
-												/>
-											)}
+											render={() => {
+												const editorValue = this.form.get('query').value;
+												return (
+													<Monaco
+														defaultValue="{}"
+														language="json"
+														value={editorValue}
+														onChange={(value) => {
+															this.form.get('query').setValue(value);
+														}}
+														theme="vs-dark"
+														options={{
+															cursorStyle: 'line',
+															lineNumbersMinChars: 2,
+															fontFamily: 'Monaco, monospace',
+															fontSize: 14,
+															padding: {
+																top: 10,
+																bottom: 10,
+															},
+															minimap: {
+																enabled: false,
+															},
+														}}
+														height="300px"
+														width="100%"
+													/>
+												);
+											}}
 										/>
 									}
 								/>
@@ -180,11 +179,10 @@ GetAPIEndpoint.defaultProps = {
 GetAPIEndpoint.propTypes = {
 	visible: PropTypes.bool.isRequired,
 	handleCancel: PropTypes.func.isRequired,
-	templateId: PropTypes.string.isRequired,
+	storedQueryId: PropTypes.string.isRequired,
 	credentials: PropTypes.object,
-	appName: PropTypes.string.isRequired,
 	isLoading: PropTypes.bool.isRequired,
-	fetchTemplate: PropTypes.func.isRequired,
+	fetchStoredQuery: PropTypes.func.isRequired,
 	fetchPermissions: PropTypes.func.isRequired,
 };
 
@@ -193,11 +191,10 @@ const mapStateToProps = (state) => ({
 		get(state, '$getAppTemplate.isFetching', false) ||
 		get(state, '$getAppPermissions.isFetching', false),
 	credentials: get(state, 'user.data', {}),
-	appName: get(state, '$getCurrentApp.name'),
 });
 
 const mapDispatchToProps = (dispatch) => ({
-	fetchTemplate: (id) => dispatch(getAppTemplate(id)),
+	fetchStoredQuery: (id) => dispatch(getAppStoredQuery(id)),
 	fetchPermissions: (appName) => dispatch(getPermission(appName)),
 });
 

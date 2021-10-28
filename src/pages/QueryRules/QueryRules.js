@@ -6,9 +6,8 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import keys from 'lodash/keys';
-
 import QueryCard from './components/QueryCard';
-import { getRules, reorderRules } from '../../batteries/modules/actions';
+import { getRules, reorderRules, getUsageStats } from '../../batteries/modules/actions';
 import Loader from '../../components/Loader';
 import DNDWrapper from '../../components/DNDWrapper';
 import { isValidPlan } from '../../batteries/utils';
@@ -26,6 +25,7 @@ const { Header } = Layout;
 
 const container = css`
 	padding: 50px;
+	margin-bottom: 70px;
 `;
 
 class QueryRules extends Component {
@@ -44,7 +44,8 @@ class QueryRules extends Component {
 			value: null,
 		});
 
-		const { fetchRules, rules, tier, featureRules } = this.props;
+		const { fetchRules, rules, tier, featureRules, fetchUsageStats } = this.props;
+		fetchUsageStats();
 		if (isValidPlan(tier, featureRules)) {
 			if (!rules) {
 				fetchRules();
@@ -108,7 +109,7 @@ class QueryRules extends Component {
 	};
 
 	render() {
-		const { collapsed, rules, isLoading, tier, featureRules, apps } = this.props;
+		const { collapsed, rules, isLoading, tier, featureRules, apps, usageStats } = this.props;
 		const { visible, app } = this.state;
 
 		if (!isValidPlan(tier, featureRules)) {
@@ -203,6 +204,7 @@ class QueryRules extends Component {
 										dragSnapshot={dragSnapshot}
 										rule={item}
 										index={index}
+										usageStatsCount={usageStats[item.id]?.count || 0} // res.key === item.id
 									/>
 								)}
 							</DNDWrapper>
@@ -269,6 +271,8 @@ QueryRules.propTypes = {
 	deleted: PropTypes.bool,
 	isLoading: PropTypes.bool,
 	collapsed: PropTypes.bool.isRequired,
+	fetchUsageStats: PropTypes.func.isRequired,
+	usageStats: PropTypes.object.isRequired,
 };
 
 QueryRules.defaultProps = {
@@ -293,12 +297,14 @@ const mapStateToProps = (state) => ({
 	featureRules: get(state, '$getAppPlan.results.feature_rules', false),
 	apps: get(state, 'apps.data'),
 	collapsed: get(state, 'sideBarCollapsed'),
+	usageStats: get(state, '$getUsageStats.results', {}),
 });
 
 const mapDispatchToProps = (dispatch) => ({
 	fetchRules: () => dispatch(getRules()),
 	updateOrder: ({ toBePromoted, toBeDemoted }) =>
 		dispatch(reorderRules({ toBePromoted, toBeDemoted })),
+	fetchUsageStats: () => dispatch(getUsageStats()),
 });
 
 export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(QueryRules));

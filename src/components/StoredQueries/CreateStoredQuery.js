@@ -1,12 +1,12 @@
 import React from 'react';
 import get from 'lodash/get';
 import { css } from 'emotion';
-import { Card, Input, Button, Tooltip } from 'antd';
+import { Card, Input, Button, Tooltip, Tag } from 'antd';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import Loader from '../../batteries/components/shared/Loader/Spinner';
-import Grid from '../../components/CreateCredentials/Grid';
+import Grid from '../CreateCredentials/Grid';
 import StoredQueryResponse from './StoredQueryResponse';
 import { clearAppStoredQueries, getAppStoredQuery } from '../../batteries/modules/actions';
 import Flex from '../../batteries/components/shared/Flex';
@@ -16,7 +16,58 @@ import ReviewChanges from './ReviewChanges';
 const main = css`
 	.error {
 		color: tomato;
-		margin-left: 15px;
+		margin-top: 8px;
+	}
+	.actionBtn {
+		position: absolute;
+		right: 50px;
+	}
+
+	.actionBtn button {
+		margin: 2px 10px;
+	}
+	span {
+		white-space: nowrap;
+	}
+
+	.top-row {
+		margin-bottom: 30px;
+		@media only screen and (max-width: 1200px) {
+			margin-top: 50px;
+		}
+
+		@media only screen and (max-width: 850px) {
+			margin-top: 80px;
+		}
+
+		@media only screen and (max-width: 600px) {
+			margin-top: 110px;
+		}
+	}
+
+	.top-row input {
+		width: 100%;
+		max-width: 200px;
+		@media only screen and (max-width: 500px) {
+		}
+	}
+
+	.query-validation-tag.ant-tag {
+		position: absolute;
+		right: 48px;
+		margin: 0;
+		transform: translateY(-28px);
+	}
+	.actionBtn {
+		position: absolute;
+		right: 50px;
+	}
+
+	.actionBtn button {
+		margin: 2px 10px;
+	}
+	span {
+		white-space: nowrap;
 	}
 `;
 
@@ -94,6 +145,7 @@ class CreateStoredQuery extends React.Component {
 					  ),
 			},
 			updatedData: null,
+			isQueryExecuted: undefined,
 		};
 		const editMode = !!props.storedQuery.id;
 		const idControl = props.control.get('id');
@@ -137,27 +189,62 @@ class CreateStoredQuery extends React.Component {
 		this.setState({ openReviewSave: false });
 	};
 
-	handleValidateAndRender = () => {
+	handleValidateAndRender = async () => {
 		const { clearStoredQueries, handleValidateStoredQuery } = this.props;
 		clearStoredQueries();
-		handleValidateStoredQuery();
-		this.setState({
-			queryResponseTitle: 'Rendered Query',
-		});
+		if (await handleValidateStoredQuery()) {
+			this.setState({
+				queryResponseTitle: 'Rendered Query',
+			});
+		}
 	};
 
-	handleExecute = () => {
+	handleExecute = async () => {
 		const { clearStoredQueries, handleExecuteStoredQuery } = this.props;
 		clearStoredQueries();
-		handleExecuteStoredQuery();
-		this.setState({
-			queryResponseTitle: 'Executed Query',
-		});
+		if (await handleExecuteStoredQuery()) {
+			this.setState({
+				queryResponseTitle: 'Executed Query',
+				isQueryExecuted: true,
+			});
+		} else {
+			this.setState({ isQueryExecuted: false });
+		}
+	};
+
+	handleEditorValueChange = (value, queryControl) => {
+		const { isQueryExecuted } = this.state;
+		if (isQueryExecuted) {
+			this.setState({
+				...(isQueryExecuted && { isQueryExecuted: undefined }),
+			});
+		}
+		queryControl.setValue(value);
+	};
+
+	renderQueryValidityTag = (tagValidator) => {
+		if (typeof tagValidator !== 'boolean') {
+			return null;
+		}
+		const tagText = tagValidator ? 'Valid Query' : 'Inavlid Query';
+		const tagColor = tagValidator ? 'green' : 'red';
+
+		return (
+			<Tag className="query-validation-tag" color={tagColor}>
+				{tagText}
+			</Tag>
+		);
 	};
 
 	render() {
 		const { isExecuting, isValidating, control, handleSaveStoredQuery, isLoading } = this.props;
-		const { openReviewSave, defaultData, updatedData, queryResponseTitle } = this.state;
+		const {
+			openReviewSave,
+			defaultData,
+			updatedData,
+			queryResponseTitle,
+			isQueryExecuted,
+		} = this.state;
 		if (isLoading) {
 			return <Loader />;
 		}
@@ -179,15 +266,12 @@ class CreateStoredQuery extends React.Component {
 									title="Verify the validity of the query and render the query based on the parameter values."
 								>
 									<Button
-										style={{
-											margin: '0 10px',
-										}}
 										disabled={getControl('query').invalid}
 										onClick={this.handleValidateAndRender}
 										loading={isValidating}
 										data-cy="sq-validate"
 									>
-										Validate and Render
+										Render Query
 									</Button>
 								</Tooltip>
 								<Tooltip
@@ -195,9 +279,6 @@ class CreateStoredQuery extends React.Component {
 									title="Execute the query, this will return the results back."
 								>
 									<Button
-										style={{
-											margin: '0 10px',
-										}}
 										disabled={getControl('query').invalid}
 										onClick={this.handleExecute}
 										loading={isExecuting}
@@ -208,10 +289,7 @@ class CreateStoredQuery extends React.Component {
 								</Tooltip>
 
 								<Button
-									style={{
-										margin: '0 10px',
-									}}
-									disabled={getControl('query').invalid}
+									disabled={getControl('query').invalid || !isQueryExecuted}
 									onClick={this.handleReviewSave}
 									data-cy="sq-review-and-save"
 								>
@@ -228,6 +306,7 @@ class CreateStoredQuery extends React.Component {
 										}
 									`,
 								}}
+								className="top-row"
 								gridRatio={0.15}
 								label="Stored Query Id"
 								component={
@@ -241,23 +320,26 @@ class CreateStoredQuery extends React.Component {
 										}) => {
 											const isError = touched && invalidName;
 											return (
-												<Flex alignItems="center">
+												<Flex
+													flexDirection="column"
+													alignItems="flex-start"
+												>
 													<Input
 														style={{
-															width: 200,
 															...(isError && {
 																borderColor: 'tomato',
 															}),
 														}}
 														{...handler()}
 														data-cy="stored-query-id"
+														placeholder="your_unique_id"
 													/>
 													{isError && (
 														<span className="error">
 															{(hasError('required') &&
-																'Please enter Stored Query Id.') ||
+																'Enter an id for your stored query') ||
 																(hasError('pattern') &&
-																	'Stored Query Id can not have spaces or special characters.')}
+																	`Stored query id cannot use spaces and special characters.`)}
 														</span>
 													)}
 												</Flex>
@@ -287,16 +369,17 @@ class CreateStoredQuery extends React.Component {
 										}) => {
 											const isError = touched && invalidDescription;
 											return (
-												<Flex alignItems="center">
+												<Flex alignItems="center" css="flex: 1">
 													<Input
 														style={{
-															width: 400,
+															maxWidth: 400,
 															...(isError && {
 																borderColor: 'tomato',
 															}),
 														}}
 														{...handler()}
 														data-cy="stored-query-description"
+														placeholder="A human friendly 👦 👧 description for this stored query"
 													/>
 												</Flex>
 											);
@@ -304,6 +387,7 @@ class CreateStoredQuery extends React.Component {
 									/>
 								}
 							/>
+							{this.renderQueryValidityTag(isQueryExecuted)}
 							<Grid
 								toolTipMessage={queryMessage}
 								toolTipProps={{
@@ -323,18 +407,14 @@ class CreateStoredQuery extends React.Component {
 										render={() => {
 											return (
 												<Monaco
-													defaultValue={JSON.stringify(
-														{
-															query: {},
-															params: {},
-														},
-														0,
-														4,
-													)}
+													defaultValue={defaultData.query}
 													language="json"
 													value={control.controls.query.value}
 													onChange={(value) =>
-														control.controls.query.setValue(value)
+														this.handleEditorValueChange(
+															value,
+															control.controls.query,
+														)
 													}
 													theme="vs-dark"
 													options={{

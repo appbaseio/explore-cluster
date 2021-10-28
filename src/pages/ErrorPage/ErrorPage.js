@@ -5,14 +5,19 @@ import get from 'lodash/get';
 import { connect } from 'react-redux';
 import * as Sentry from '@sentry/browser';
 
-Sentry.init({
-	dsn: 'https://8e07fb23ba8f46d8a730e65496bb7f00@sentry.io/58038',
-});
-
 class ErrorPage extends React.Component {
 	state = {
 		error: false,
 	};
+
+	eventId = null;
+
+	componentDidMount() {
+		window.addEventListener('error', event => {
+            const errorId = Sentry.lastEventId();
+            this.eventId = errorId;
+        });
+	}
 
 	componentDidUpdate(prevProps) {
 		const {
@@ -62,14 +67,15 @@ class ErrorPage extends React.Component {
 						Back to {user ? 'Home' : 'Login'}
 					</Button>
 					<Button
-						href="mailto:info@appbase.io"
-						target="_blank"
 						size="large"
 						type="danger"
 						css={{ marginLeft: '8' }}
+						onClick={() => {
+							Sentry.showReportDialog();
+						}}
 					>
 						<Icon type="info-circle" />
-						Report Bug
+						Report this problem
 					</Button>
 				</section>
 			</section>

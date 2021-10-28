@@ -12,9 +12,9 @@ import moment from '../../utils/moment';
 
 const bannerMessagesAnalytics = {
 	free: {
-		title: 'Unlock the ROI impact of your search',
+		title: 'Requests Per Minute',
 		description:
-			'Get a paid plan to see actionable analytics on search volume, popular searches, no results, track clicks and conversions.',
+			'Understand the status of your requests, Learn how to make the most of request distribution insights.',
 		buttonText: 'Upgrade Now',
 		href: 'billing',
 	},

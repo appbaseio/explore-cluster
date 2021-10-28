@@ -88,4 +88,28 @@ const getQueryGrades = ({ query }) => {
 	return doGet(`${ACC_API}/_grade/${finalQuery}`);
 };
 
-export { isValidJSON, generateQuery, flatObject, recordGrade, getQueryGrades };
+const transformQuery = (query) => {
+
+	const queryArr = [...query];
+	// eslint-disable-next-line
+	const resultantMap = queryArr.forEach((query, index) => {
+
+		if (query.dataField?.length && query.fieldWeights?.length) {
+
+			const { dataField, fieldWeights } = query;
+			const result = [];
+
+			dataField?.map((field, index) => {
+				result.push({
+					field,
+					weight: fieldWeights[index],
+				});
+			});
+			queryArr[index].dataField = [...result];
+			delete queryArr[index].fieldWeights;
+		}
+	});
+
+	return [...queryArr];
+};
+export { isValidJSON, generateQuery, flatObject, recordGrade, getQueryGrades, transformQuery };

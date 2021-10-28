@@ -972,28 +972,6 @@ class PricingTable extends Component {
 								</span>{' '}
 							</td>
 						</tr>
-						<tr>
-							<td>
-								<span data-tip="Create secure template based REST endpoints via dashboard to prevent DSL injections.">
-									Search Templates
-								</span>
-							</td>
-							<td>
-								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
-									✅{' '}
-								</span>{' '}
-							</td>
-							<td>
-								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
-									✅{' '}
-								</span>{' '}
-							</td>
-							<td>
-								<span role="img" aria-label="check" style={{ marginRight: '3px' }}>
-									✅{' '}
-								</span>{' '}
-							</td>
-						</tr>
 
 						<tr className={HeadingTr}>
 							<td>
@@ -1182,7 +1160,6 @@ class PricingTable extends Component {
 								'User Management',
 								'API Credentials',
 								'Role Based Access Control',
-								'Search Templates',
 							]}
 						/>
 						<ListCaption style={{ color: theme.colors.footer }}>
@@ -1231,7 +1208,6 @@ class PricingTable extends Component {
 								'User Management',
 								'API Credentials',
 								'Role Based Access Control',
-								'Search Templates',
 							]}
 						/>
 						<ListCaption style={{ color: theme.colors.footer }}>
@@ -1302,7 +1278,6 @@ class PricingTable extends Component {
 								'User Management',
 								'API Credentials',
 								'Role Based Access Control',
-								'Search Templates',
 							]}
 						/>
 						<ListCaption style={{ color: theme.colors.footer }}>
