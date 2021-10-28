@@ -76,14 +76,6 @@ class PreferenceForm extends React.Component {
 		if (isFetchingMappings !== prevProps.isFetchingMappings) {
 			this.setState({ isFetchingMappings });
 		}
-
-		console.log(prevProps.initialData, initialData);
-		if (prevProps.initialData !== initialData) {
-			this.setState({
-				indexSuggestions: initialData,
-				selectedIndices: initialData.indices,
-			})
-		}
 	}
 
 	getDisabled = (value) => {
@@ -418,7 +410,7 @@ class PreferenceForm extends React.Component {
 											Size
 											<Popover
 												content={content(
-													Messages.index_size,
+													Messages.indexSize,
 												)}
 												css={styles.iconContainer}
 											>
