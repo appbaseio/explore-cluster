@@ -10,10 +10,9 @@ import { endScreenStyles } from './styles';
 import { getSettings } from '../../batteries/modules/actions';
 import { getURL } from '../../constants/config';
 import { generateQuery } from '../SandboxPage/utils';
-import {CopyToClipboard} from 'react-copy-to-clipboard';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 // TODO: Add navbar
 function EndScreen({ settings, credentials, url, fetchSearchSettings }) {
-
 	function getQuery() {
 		const query = new URLSearchParams(window.location.search);
 		return query?.get('app');
@@ -25,10 +24,14 @@ function EndScreen({ settings, credentials, url, fetchSearchSettings }) {
 		}
 	}, []);
 
-
 	function generateCodeSandbox() {
 		if (settings) {
-			const codesandboxURL = generateSandboxURL({ settings: generateQuery(settings) , app: getQuery(), credentials, url });
+			const codesandboxURL = generateSandboxURL({
+				settings: generateQuery(settings),
+				app: getQuery(),
+				credentials,
+				url,
+			});
 			return codesandboxURL;
 		}
 		return '';
@@ -40,20 +43,17 @@ function EndScreen({ settings, credentials, url, fetchSearchSettings }) {
 			<FullHeader />
 			<div className={endScreenStyles}>
 				<div className="container">
-					{
-						csbURL && (
-							<div className="header-card">
-								<h3 style={{fontWeight: 'bold'}}>Share what you've built:</h3>
-								<div style={{display: 'flex', alignItems: 'center', gap: 10}}>
-									<div className="overflow-text">{csbURL}</div>
-									<CopyToClipboard text={csbURL}>
-										<Icon type="copy" theme="outlined" className="icon-active"/>
-									</CopyToClipboard>
-
-								</div>
+					{csbURL && (
+						<div className="header-card">
+							<h3 style={{ fontWeight: 'bold' }}>Share what you've built:</h3>
+							<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+								<div className="overflow-text">{csbURL}</div>
+								<CopyToClipboard text={csbURL}>
+									<Icon type="copy" theme="outlined" className="icon-active" />
+								</CopyToClipboard>
 							</div>
-						)
-					}
+						</div>
+					)}
 					<div className="banner-row">
 						<div className="big-card">
 							<h2>WEB APP</h2>
@@ -82,7 +82,9 @@ function EndScreen({ settings, credentials, url, fetchSearchSettings }) {
 										alt="Webapp"
 									/>
 									<h3>Learn how to build a web app</h3>
-									<p>appbase.io UI components for building data-driven web apps.</p>
+									<p>
+										appbase.io UI components for building data-driven web apps.
+									</p>
 									<a
 										target="_blank"
 										rel="noreferrer"
@@ -116,7 +118,10 @@ function EndScreen({ settings, credentials, url, fetchSearchSettings }) {
 							>
 								Create an app or browse your current apps via the dashboard.
 							</p>
-							<a className="button" href={`/app/${window.location.search.split('=')[1]}`}>
+							<a
+								className="button"
+								href={`/app/${window.location.search.split('=')[1]}`}
+							>
 								Go to Dashboard
 							</a>
 						</div>
@@ -164,8 +169,8 @@ function EndScreen({ settings, credentials, url, fetchSearchSettings }) {
 								alt="API"
 							/>
 							<p>
-								Get started with the APIs for indexing, querying and searching data with
-								appbase.
+								Get started with the APIs for indexing, querying and searching data
+								with appbase.
 							</p>
 							<a
 								className="button"
@@ -180,34 +185,38 @@ function EndScreen({ settings, credentials, url, fetchSearchSettings }) {
 				</div>
 			</div>
 		</Layout>
-	)
-};
+	);
+}
 
 EndScreen.propTypes = {
 	fetchSearchSettings: PropTypes.func.isRequired,
 	credentials: PropTypes.string.isRequired,
 	url: PropTypes.string.isRequired,
 	settings: PropTypes.object,
-}
+};
 
 EndScreen.defaultProps = {
 	settings: null,
-}
+};
 
 const mapStateToProps = (state, props) => {
+	const appName = get(state, '$getCurrentApp.name');
 	const { username, password } = get(state, 'user.data', {});
 	const defaultSettings = get(state.$getAppSettings, `defaultSettings`);
 	return {
-		settings: get(state.$getAppSettings, `settings.${props.app}`, defaultSettings),
+		settings: get(
+			state,
+			['$getAppSettings', 'settings', props?.location?.search?.split('=')[1] || appName],
+			defaultSettings,
+		),
 		fetchingDefaultSettings: get(state.$getAppSettings, `default.loading`),
 		credentials: username ? `${username}:${password}` : null,
 		url: getURL(),
-	}
-}
+	};
+};
 
 const mapDispatchToProps = (dispatch) => ({
 	fetchSearchSettings: (appName) => dispatch(getSettings(appName)),
 });
-
 
 export default connect(mapStateToProps, mapDispatchToProps)(EndScreen);

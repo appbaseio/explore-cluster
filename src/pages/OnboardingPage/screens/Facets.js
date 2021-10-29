@@ -65,27 +65,27 @@ export default class Search extends Component {
 	};
 
 	renderSearchApp = () => {
-		const { searchFields, facetFields, selectedDataset } = this.props;
+		const { searchFields, facetFields, selectedDataset, app } = this.props;
 
 		if(selectedDataset === 'movies') {
 			return (
 				<div>
 					{this.renderFacetInput(true)}
-					<MoviesSearchApp fields={searchFields} facets={facetFields}/>
+					<MoviesSearchApp fields={searchFields} facets={facetFields} app={app}/>
 				</div>
 			)
 		} else if(selectedDataset === 'products') {
 			return (
 				<div>
 					{this.renderFacetInput(true)}
-					<EcommSearchApp fields={searchFields} facets={facetFields}/>
+					<EcommSearchApp fields={searchFields} facets={facetFields} app={app}/>
 				</div>
 			)
 		} else if(selectedDataset === 'geo') {
 			return (
 				<div>
 					{this.renderFacetInput(true)}
-					<GeoSearchApp fields={searchFields} facets={facetFields}/>
+					<GeoSearchApp fields={searchFields} facets={facetFields} app={app}/>
 				</div>
 			)
 		} else {
@@ -218,12 +218,6 @@ export default class Search extends Component {
 				</div>
 
 				{facetFields.length ? this.renderSearchApp() : null}
-
-				{/* <Footer
-					nextScreen={this.props.nextScreen}
-					previousScreen={this.props.previousScreen}
-					disabled={!this.props.facetFields.length}
-				/> */}
 				<Footer
 					nextScreen={nextScreen}
 					previousScreen={previousScreen}
@@ -238,11 +232,12 @@ export default class Search extends Component {
 
 Search.propTypes = {
 	nextScreen: PropTypes.func,
-	app: PropTypes.string.isRequired,
 	previousScreen: PropTypes.func,
 	facetFields: PropTypes.array,
 	searchFields: PropTypes.array,
 	setFacetFields: PropTypes.func.isRequired,
+	selectedDataset: PropTypes.string,
+	app: PropTypes.string.isRequired,
 };
 
 Search.defaultProps = {
@@ -250,4 +245,5 @@ Search.defaultProps = {
 	previousScreen: null,
 	facetFields: [],
 	searchFields: [],
+	selectedDataset: 'movies'
 };

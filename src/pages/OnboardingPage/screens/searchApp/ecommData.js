@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import get from 'lodash/get';
 import {
 	DataSearch,
 	MultiList,
@@ -9,8 +11,9 @@ import {
 	SelectedFilters,
 	RangeInput
 } from '@appbaseio/reactivesearch';
-import { Tag } from 'antd';
+import { Tag, notification } from 'antd';
 import appbaseHelpers from '../../utils/appbaseHelpers';
+import { putSettings, getSettings } from '../../../../batteries/modules/actions';
 import { getURL } from '../../../../constants/config';
 import { seachAppStyles } from "./styles";
 
@@ -64,9 +67,13 @@ const renderFilters = (fields) => {
                             filterLabel="Retail Price"
                             showHistogram={true}
                             range={{
-                                start: 100,
-                                end: 110000,
+                                start: 45,
+                                end: 50000,
                             }}
+							rangeLabels={{
+								start: 'Rs.45',
+								end: 'Rs.50K'
+							}}
                         />
                     );
                 }
@@ -227,17 +234,65 @@ const renderCode = (lib) => {
 	}
 };
 
-export default class EcommSearchApp extends Component {
+class EcommSearchApp extends Component {
 	constructor(props) {
 		super(props);
-
 		this.appConfig = appbaseHelpers.appConfig();
+	}
+
+	componentDidMount() {
+		const {settings, fetchSearchSettings, app, fields: fieldsProp} = this.props;
+		if (!settings) {
+			fetchSearchSettings(app);
+		} else {
+			const fields = getFields(fieldsProp, ['', '.search']);
+			this.updateAppSettings(fields);
+		}
+	}
+
+	updateAppSettings = async(fields) => {
+		const { settings, app, updateSettingsAction } = this.props;
+		const dataField = [...fields];
+		const fieldWeights = getWeights(fields);
+		const newSettings = { ...settings };
+
+		const settingsData = {
+			...newSettings,
+			search: {
+				...newSettings?.search,
+				fieldWeights,
+				dataField,
+			},
+			aggregations: {
+				...newSettings?.aggregations,
+				dataField: {
+					"brand.keyword":"term",
+					"categories.keyword":"term",
+					"retail_price":"range"
+				}
+			}
+		}
+		try {
+			const savedSettings = await updateSettingsAction(app, settingsData);
+			if (savedSettings && savedSettings.error) {
+				notification.error({
+					message: 'Failed to save Search Settings',
+					description: get(savedSettings, 'error.message'),
+				});
+			}
+		} catch (err) {
+			notification.error({
+				message: 'Failed to save Search Settings',
+				description: err.message,
+			});
+		}
 	}
 
 	render() {
 		const { facets, fields: fieldsProp, ui } = this.props;
 		const fields = getFields(fieldsProp, ['', '.search']);
 		const SCALR_API = getURL();
+
 		return (
 			<ReactiveBase
 				{...this.appConfig}
@@ -295,10 +350,36 @@ EcommSearchApp.propTypes = {
 	facets: PropTypes.array,
 	fields: PropTypes.array,
 	ui: PropTypes.string,
+	fetchSearchSettings: PropTypes.func.isRequired,
+	settings: PropTypes.object,
+	credentials: PropTypes.string.isRequired,
+	updateSettingsAction: PropTypes.func.isRequired,
+	app: PropTypes.string.isRequired,
 };
 
 EcommSearchApp.defaultProps = {
 	facets: [],
 	fields: [],
 	ui: undefined,
+	settings: null,
 };
+
+const mapStateToProps = (state, props) => {
+
+	const { username, password } = get(state, 'user.data', {});
+	const defaultSettings = get(state.$getAppSettings, `defaultSettings`);
+	const settings = get(state, ['$getAppSettings', 'settings', props.app], defaultSettings);
+	return {
+		settings,
+		fetchingDefaultSettings: get(state.$getAppSettings, `default.loading`),
+		credentials: username ? `${username}:${password}` : null,
+	};
+};
+
+const mapDispatchToProps = (dispatch) => ({
+	fetchSearchSettings: (appName) => dispatch(getSettings(appName)),
+	updateSettingsAction: (appName, payload) => dispatch(putSettings(appName, payload)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(EcommSearchApp);
+// export default EcommSearchApp;

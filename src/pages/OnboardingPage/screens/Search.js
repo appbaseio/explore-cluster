@@ -57,27 +57,26 @@ export default class Search extends Component {
 	};
 
 	renderSearchApp = () => {
-		const { searchFields, selectedDataset } = this.props;
-		console.log(selectedDataset, searchFields, "======");
+		const { searchFields, selectedDataset, app } = this.props;
 		if(selectedDataset === 'movies') {
 			return (
 				<div>
 					{this.renderSearchInput(true)}
-					<MoviesSearchApp fields={searchFields} />
+					<MoviesSearchApp fields={searchFields} app={app}/>
 				</div>
 			)
 		} else if(selectedDataset === 'products') {
 			return (
 				<div>
 					{this.renderSearchInput(true)}
-					<EcommSearchApp fields={searchFields} />
+					<EcommSearchApp fields={searchFields} app={app}/>
 				</div>
 			)
 		} else if(selectedDataset === 'geo') {
 			return (
 				<div>
 					{this.renderSearchInput(true)}
-					<GeoSearchApp fields={searchFields} />
+					<GeoSearchApp fields={searchFields} app={app}/>
 				</div>
 			)
 		} else {
@@ -106,16 +105,6 @@ export default class Search extends Component {
 					},
 				]
 			})
-			// return [
-			// 	{
-			// 		value: 'original_title',
-			// 		label: 'original_title',
-			// 	},
-			// 	{
-			// 		value: 'overview',
-			// 		label: 'overview',
-			// 	},
-			// ]
 		} else if(selectedDataset === 'products') {
 			this.setState({
 				options: [
@@ -133,20 +122,6 @@ export default class Search extends Component {
 					}
 				]
 			})
-			// return [
-			// 	{
-			// 		value: 'product_name',
-			// 		label: 'product_name',
-			// 	},
-			// 	{
-			// 		value: 'description',
-			// 		label: 'description',
-			// 	},
-			// 	{
-			// 		value: 'categories',
-			// 		label: 'categories',
-			// 	}
-			// ]
 		} else {
 			this.setState({
 				options: [
@@ -156,12 +131,6 @@ export default class Search extends Component {
 					}
 				]
 			})
-			// return [
-			// 	{
-			// 		value: 'place',
-			// 		label: 'place',
-			// 	}
-			// ]
 		}
 	}
 
@@ -207,7 +176,7 @@ export default class Search extends Component {
 	};
 
 	render() {
-		const { nextScreen, searchFields, previousScreen } = this.props;
+		const { nextScreen, searchFields } = this.props;
 		return (
 			<div>
 				<div className="wrapper">
@@ -237,7 +206,6 @@ export default class Search extends Component {
 
 				<Footer
 					nextScreen={nextScreen}
-					// previousScreen={previousScreen}
 					disabled={!searchFields.length}
 				/>
 			</div>
@@ -248,14 +216,13 @@ export default class Search extends Component {
 Search.propTypes = {
 	nextScreen: PropTypes.func,
 	searchFields: PropTypes.array,
-	previousScreen: PropTypes.func,
 	setSearchFields: PropTypes.func.isRequired,
 	selectedDataset: PropTypes.string,
+	app: PropTypes.string.isRequired,
 };
 
 Search.defaultProps = {
 	nextScreen: null,
 	searchFields: [],
-	previousScreen: null,
 	selectedDataset: 'movies'
 };

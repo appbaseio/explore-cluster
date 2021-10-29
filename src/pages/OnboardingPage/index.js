@@ -31,6 +31,7 @@ export default class Onboarding extends Component {
 		facetFields: [],
 		url: '',
 		selectedDataset: 'movies',
+		newApp: '',
 	};
 
 	nextScreen = () => {
@@ -139,6 +140,7 @@ export default class Onboarding extends Component {
 			props = {
 				setSearchFields: this.setSearchFields,
 				searchFields,
+				app: newApp,
 				selectedDataset,
 			};
 		} else if (currentScreen === 4) {
