@@ -9,12 +9,10 @@ import {
 	ReactiveBase,
 	ReactiveList,
 	SelectedFilters,
-	RangeInput
+	RangeInput,
 } from '@appbaseio/reactivesearch';
-import {
-	ReactiveGoogleMap,
-  } from "@appbaseio/reactivemaps";
-  import { notification } from 'antd';
+import { ReactiveGoogleMap } from '@appbaseio/reactivemaps';
+import { notification } from 'antd';
 import appbaseHelpers from '../../utils/appbaseHelpers';
 import { putSettings, getSettings } from '../../../../batteries/modules/actions';
 import { getURL } from '../../../../constants/config';
@@ -23,55 +21,55 @@ const renderFilters = (fields) => {
 	if (fields && fields.length) {
 		return fields.map((field) => {
 			switch (field) {
-                case 'magnitude': {
-                    return (
-                        <RangeSlider
-                            componentId={field}
-                            dataField={field}
-                            key={field}
-                            title="Magnitude (Richter)"
-                            filterLabel="Magnitude"
-                            showHistogram={true}
-                            rangeLabels={{
-                                start: '0.0',
-                                end: '10.0',
-                            }}
-                        />
-                    );
-                }
-                case 'year': {
-                    return (
-                        <RangeInput
-                            componentId={field}
-                            dataField={field}
-                            key={field}
-                            title="Year"
-                            filterLabel="Year"
-                            showHistogram={true}
-                            range={{
-                                start: 1950,
-                                end: 2021,
-                            }}
-                        />
-                    );
-                }
-                case 'place': {
-                    return (
-                        <MultiList
-                            key={field}
-                            componentId={field}
-                            dataField="place.keyword"
-                            title="Places"
+				case 'magnitude': {
+					return (
+						<RangeSlider
+							componentId={field}
+							dataField={field}
+							key={field}
+							title="Magnitude (Richter)"
+							filterLabel="Magnitude"
+							showHistogram
+							rangeLabels={{
+								start: '0.0',
+								end: '10.0',
+							}}
+						/>
+					);
+				}
+				case 'year': {
+					return (
+						<RangeInput
+							componentId={field}
+							dataField={field}
+							key={field}
+							title="Year"
+							filterLabel="Year"
+							showHistogram
+							range={{
+								start: 1970,
+								end: 2017,
+							}}
+						/>
+					);
+				}
+				case 'place': {
+					return (
+						<MultiList
+							key={field}
+							componentId={field}
+							dataField="place.keyword"
+							title="Places"
 							filterLabel="Places"
-                            size={15}
-                            sortBy="count"
-                            react={{
-                                and: ['search', 'year', 'magnitude'],
-                            }}
-                            showSearch={false}
-                        />
-                    );
-                }
+							size={15}
+							sortBy="count"
+							react={{
+								and: ['search', 'year', 'magnitude'],
+							}}
+							showSearch={false}
+						/>
+					);
+				}
 				default:
 					return null;
 			}
@@ -102,38 +100,38 @@ const getWeights = (fields) => {
 
 const renderResultList = () => {
 	const mapProps = {
-		dataField: "location",
-		defaultMapStyle: "Light Monochrome",
-		title: "Reactive Maps",
+		dataField: 'location',
+		defaultMapStyle: 'Light Monochrome',
+		title: 'Reactive Maps',
 		defaultZoom: 6,
 		size: 10,
 		react: {
-		  and: ['place', 'search']
+			and: ['place', 'search'],
 		},
-		onPopoverClick: item => <div>{item.place}</div>,
+		onPopoverClick: (item) => <div>{item.place}</div>,
 		showMapStyles: true,
 		renderData: (result) => ({
 			custom: (
-			  <div
-				style={{
-				  background: "dodgerblue",
-				  color: "#fff",
-				  paddingLeft: 5,
-				  paddingRight: 5,
-				  borderRadius: 3,
-				  padding: 10
-				}}
-			  >
-				<i className="fas fa-globe-europe" />
-				&nbsp;{result.magnitude}
-			  </div>
-			)
-		})
+				<div
+					style={{
+						background: 'dodgerblue',
+						color: '#fff',
+						paddingLeft: 5,
+						paddingRight: 5,
+						borderRadius: 3,
+						padding: 10,
+					}}
+				>
+					<i className="fas fa-globe-europe" />
+					&nbsp;{result.magnitude}
+				</div>
+			),
+		}),
 	};
 	return (
-	<div style={{margin: 10}}>
-		<ReactiveGoogleMap componentId="googleMap" {...mapProps} />
-	</div>
+		<div style={{ margin: 10 }}>
+			<ReactiveGoogleMap componentId="googleMap" {...mapProps} />
+		</div>
 	);
 };
 
@@ -186,7 +184,7 @@ class GeoSearchApp extends Component {
 	}
 
 	componentDidMount() {
-		const {settings, fetchSearchSettings, app, fields: fieldsProp} = this.props;
+		const { settings, fetchSearchSettings, app, fields: fieldsProp } = this.props;
 		if (!settings) {
 			fetchSearchSettings(app);
 		} else {
@@ -195,7 +193,7 @@ class GeoSearchApp extends Component {
 		}
 	}
 
-	updateAppSettings = async(fields) => {
+	updateAppSettings = async (fields) => {
 		const { settings, app, updateSettingsAction } = this.props;
 		const dataField = [...fields];
 		const fieldWeights = getWeights(fields);
@@ -211,12 +209,12 @@ class GeoSearchApp extends Component {
 			aggregations: {
 				...newSettings?.aggregations,
 				dataField: {
-					"place.keyword":"term",
-					"magnitude":"range",
-					"year":"range"
-				}
-			}
-		}
+					'place.keyword': 'term',
+					magnitude: 'range',
+					year: 'range',
+				},
+			},
+		};
 		try {
 			const savedSettings = await updateSettingsAction(app, settingsData);
 			if (savedSettings && savedSettings.error) {
@@ -231,7 +229,8 @@ class GeoSearchApp extends Component {
 				description: err.message,
 			});
 		}
-	}
+	};
+
 	render() {
 		const { facets, fields: fieldsProp, ui } = this.props;
 		const fields = getFields(fieldsProp, ['', '.search']);
@@ -273,17 +272,19 @@ class GeoSearchApp extends Component {
 						fieldWeights={getWeights(fields)}
 						highlight
 						style={{
-							maxWidth: "400px",
-							margin: "0 auto"
+							maxWidth: '400px',
+							margin: '0 auto',
 						}}
 					/>
 				</header>
 
-				<SelectedFilters style={{ marginTop: 20 }} showClearAll={false}/>
+				<SelectedFilters style={{ marginTop: 20 }} showClearAll={false} />
 
 				<div className={facets && facets.length ? 'multi-col' : ''}>
 					<div className="left-col">{renderFilters(facets)}</div>
-					<div style={{width: facets && facets.length ? '70%' : '100%'}}>{renderCode(ui)}</div>
+					<div style={{ width: facets && facets.length ? '70%' : '100%' }}>
+						{renderCode(ui)}
+					</div>
 				</div>
 			</ReactiveBase>
 		);
@@ -309,7 +310,6 @@ GeoSearchApp.defaultProps = {
 };
 
 const mapStateToProps = (state, props) => {
-
 	const { username, password } = get(state, 'user.data', {});
 	const defaultSettings = get(state.$getAppSettings, `defaultSettings`);
 	const settings = get(state, ['$getAppSettings', 'settings', props.app], defaultSettings);
