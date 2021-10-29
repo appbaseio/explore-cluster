@@ -70,10 +70,6 @@ const renderFilters = (fields) => {
                                 start: 45,
                                 end: 50000,
                             }}
-							rangeLabels={{
-								start: '45',
-								end: '50K'
-							}}
                         />
                     );
                 }
@@ -151,11 +147,11 @@ const renderResultList = () => (
 								<ResultList.Description>
 									<div>
 										<div style={{display: 'flex', color: '#424242'}}>
-											<p style={{fontWeight: '600', marginRight: 5}}>Retail Price </p>
-											<p>{item.retail_price}</p>
+											<p style={{fontWeight: '600', marginRight: 5}}>Retail Price: </p>
+											<p>Rs.{item.retail_price}</p>
 											{ item.brand && (
 												<>
-													<p style={{ marginLeft: 40, fontWeight: '600', marginRight: 5 }}>Brand{" "}</p>
+													<p style={{ marginLeft: 40, fontWeight: '600', marginRight: 5 }}>Brand:{" "}</p>
 													<p>{item.brand}</p>
 												</>
 											)}
