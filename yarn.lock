@@ -51,12 +51,12 @@
     url-search-params "^1.1.0"
     uuid "^3.3.2"
 
-"@appbaseio-confidential/reactivesearch-playground@^1.0.14-beta":
-  version "1.0.14-beta"
-  resolved "https://npm.pkg.github.com/download/@appbaseio-confidential/reactivesearch-playground/1.0.14-beta/aacac31a505f8ed9301c5bb3b3e3b170c0777b7c6a13564133dabdccbcb37576#23c44d593bd0c313ffb7ee4725fb5cdf152c043d"
-  integrity sha512-EdGVi339cs/o/P1JQmo+SUQv0Fz/mpityJhdrpyaSMttsxOZ6lk7ZFIzSqBT9prHQcBQ4veldRwXxoyNd6gMlQ==
+"@appbaseio-confidential/reactivesearch-playground@^1.2.1-beta":
+  version "1.2.1-beta"
+  resolved "https://npm.pkg.github.com/download/@appbaseio-confidential/reactivesearch-playground/1.2.1-beta/991bc27f35be18ac579ccd01ce57c5c5e29de4b22c07cbe7d3aa871ea134e9aa#1977ae993c347d7a9a0b15cced69b12bd4f007d1"
+  integrity sha512-FyIm9BXh0UBuDnSLXnyQV9eBguxrPUWW4Yi6neuxc8rEIYBuH7A8RWvOHlkXDN5KHybrZMqpeVeI0gBX6tSIVQ==
   dependencies:
-    "@monaco-editor/react" "^4.2.1"
+    "@monaco-editor/react" "^4.3.1"
     "@reduxjs/toolkit" "^1.6.0"
     "@types/styled-components" "^5.1.11"
     firebase "^8.8.0"
@@ -1926,7 +1926,7 @@
   dependencies:
     state-local "^1.0.6"
 
-"@monaco-editor/react@^4.2.1", "@monaco-editor/react@^4.2.2":
+"@monaco-editor/react@^4.2.2", "@monaco-editor/react@^4.3.1":
   version "4.3.1"
   resolved "https://registry.yarnpkg.com/@monaco-editor/react/-/react-4.3.1.tgz#d65bcbf174c39b6d4e7fec43d0cddda82b70a12a"
   integrity sha512-f+0BK1PP/W5I50hHHmwf11+Ea92E5H1VZXs+wvKplWUWOfyMa1VVwqkJrXjRvbcqHL+XdIGYWhWNdi4McEvnZg==
