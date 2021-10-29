@@ -279,7 +279,7 @@ class GeoSearchApp extends Component {
 					/>
 				</header>
 
-				<SelectedFilters style={{ marginTop: 20 }} />
+				<SelectedFilters style={{ marginTop: 20 }} showClearAll={false}/>
 
 				<div className={facets && facets.length ? 'multi-col' : ''}>
 					<div className="left-col">{renderFilters(facets)}</div>
