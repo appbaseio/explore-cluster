@@ -14,6 +14,7 @@ import {
 import {
 	ReactiveGoogleMap,
   } from "@appbaseio/reactivemaps";
+  import { notification } from 'antd';
 import appbaseHelpers from '../../utils/appbaseHelpers';
 import { putSettings, getSettings } from '../../../../batteries/modules/actions';
 import { getURL } from '../../../../constants/config';
