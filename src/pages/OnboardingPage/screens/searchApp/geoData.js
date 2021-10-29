@@ -29,12 +29,12 @@ const renderFilters = (fields) => {
                             componentId={field}
                             dataField={field}
                             key={field}
-                            title="Magnitude"
+                            title="Magnitude (Richter)"
                             filterLabel="Magnitude"
                             showHistogram={true}
                             rangeLabels={{
-                                start: '0.0 Richter',
-                                end: '10.0 Richter',
+                                start: '0.0',
+                                end: '10.0',
                             }}
                         />
                     );

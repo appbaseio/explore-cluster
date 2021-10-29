@@ -63,7 +63,7 @@ const renderFilters = (fields) => {
                             componentId={field}
                             dataField={field}
                             key={field}
-                            title="Retail Price"
+                            title="Retail Price (Rupees)"
                             filterLabel="Retail Price"
                             showHistogram={true}
                             range={{
@@ -71,8 +71,8 @@ const renderFilters = (fields) => {
                                 end: 50000,
                             }}
 							rangeLabels={{
-								start: 'Rs.45',
-								end: 'Rs.50K'
+								start: '45',
+								end: '50K'
 							}}
                         />
                     );
