@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import get from 'lodash/get';
 import {
 	DataSearch,
 	DynamicRangeSlider,
@@ -10,8 +12,9 @@ import {
 	SelectedFilters,
 	RangeInput
 } from '@appbaseio/reactivesearch';
-import { Tag, Icon } from 'antd';
+import { Tag, Icon, notification } from 'antd';
 import appbaseHelpers from '../../utils/appbaseHelpers';
+import { putSettings, getSettings } from '../../../../batteries/modules/actions';
 import { getURL } from '../../../../constants/config';
 
 const { ResultListWrapper } = ReactiveList;
@@ -224,11 +227,59 @@ const renderCode = (lib) => {
 	}
 };
 
-export default class MoviesSearchApp extends Component {
+class MoviesSearchApp extends Component {
 	constructor(props) {
 		super(props);
 
 		this.appConfig = appbaseHelpers.appConfig();
+	}
+
+	componentDidMount() {
+		const {settings, fetchSearchSettings, app, fields: fieldsProp} = this.props;
+		if (!settings) {
+			fetchSearchSettings(app);
+		} else {
+			const fields = getFields(fieldsProp, ['', '.search']);
+			this.updateAppSettings(fields);
+		}
+	}
+
+	updateAppSettings = async(fields) => {
+		const { settings, app, updateSettingsAction } = this.props;
+		const dataField = [...fields];
+		const fieldWeights = getWeights(fields);
+		const newSettings = { ...settings };
+
+		const settingsData = {
+			...newSettings,
+			search: {
+				...newSettings?.search,
+				fieldWeights,
+				dataField,
+			},
+			aggregations: {
+				...newSettings?.aggregations,
+				dataField: {
+					"genres.keyword":"term",
+					"vote_average":"range",
+					"release_year":"range"
+				}
+			}
+		}
+		try {
+			const savedSettings = await updateSettingsAction(app, settingsData);
+			if (savedSettings && savedSettings.error) {
+				notification.error({
+					message: 'Failed to save Search Settings',
+					description: get(savedSettings, 'error.message'),
+				});
+			}
+		} catch (err) {
+			notification.error({
+				message: 'Failed to save Search Settings',
+				description: err.message,
+			});
+		}
 	}
 
 	render() {
@@ -292,10 +343,35 @@ MoviesSearchApp.propTypes = {
 	facets: PropTypes.array,
 	fields: PropTypes.array,
 	ui: PropTypes.string,
+	fetchSearchSettings: PropTypes.func.isRequired,
+	settings: PropTypes.object,
+	credentials: PropTypes.string.isRequired,
+	updateSettingsAction: PropTypes.func.isRequired,
+	app: PropTypes.string.isRequired,
 };
 
 MoviesSearchApp.defaultProps = {
 	facets: [],
 	fields: [],
 	ui: undefined,
+	settings: null,
 };
+
+const mapStateToProps = (state, props) => {
+
+	const { username, password } = get(state, 'user.data', {});
+	const defaultSettings = get(state.$getAppSettings, `defaultSettings`);
+	const settings = get(state, ['$getAppSettings', 'settings', props.app], defaultSettings);
+	return {
+		settings,
+		fetchingDefaultSettings: get(state.$getAppSettings, `default.loading`),
+		credentials: username ? `${username}:${password}` : null,
+	};
+};
+
+const mapDispatchToProps = (dispatch) => ({
+	fetchSearchSettings: (appName) => dispatch(getSettings(appName)),
+	updateSettingsAction: (appName, payload) => dispatch(putSettings(appName, payload)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(MoviesSearchApp);
