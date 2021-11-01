@@ -27,13 +27,25 @@ const getErrorMessages = (state) => {
 		show_advance_editor,
 		expressionError,
 		error: currentErrorState,
+		type,
+		queryValue,
+		dataFieldValue,
 	} = state;
 	const error = {};
+
+	console.log(queryValue);
 
 	if (!name) {
 		error.name = {
 			hasError: true,
 			description: 'Name cannot be empty',
+		};
+	}
+
+	if (type.length === 0) {
+		error.type = {
+			hasError: true,
+			description: 'At least one search type should be selected.',
 		};
 	}
 
@@ -128,6 +140,22 @@ const getErrorMessages = (state) => {
 				};
 			}
 		}
+	}
+
+	if (queryValue && !type.includes('suggestion') && !type.includes('search')) {
+		error.queryValue = {
+			hasError: true,
+			description:
+				'Search type should be at least Search or Suggestion for a trigger condition based on a query clause',
+		};
+	}
+
+	if (dataFieldValue && !type.includes('term')) {
+		error.dataFieldValue = {
+			hasError: true,
+			description:
+				'Search type should be at least Term for a trigger condition based on a filter clause.',
+		};
 	}
 
 	return error;

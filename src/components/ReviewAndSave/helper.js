@@ -7,9 +7,20 @@ export const relevancyTitles = {
 	aggregations: 'Aggregation Settings',
 	results: 'Result Settings',
 	synonyms: 'Synonyms Settings',
+	popularSuggestions: 'Suggestions Settings / Popular Suggestions',
+	recentSuggestions: 'Suggestions Settings / Recent Suggestions',
+	indexSuggestions: 'Suggestions Settings / Index Suggestions',
 };
 
 const settingsMap = {
+	categoryFields: {
+		title: 'Category Fields',
+		description: 'When specified, suggestions will show category specific suggestions based on the most frequent values based on this field.',
+	},
+	indices: {
+		title: 'Indices',
+		description: 'Only selected indices will be considered to calculate the suggestions.',
+	},
 	size: {
 		title: 'Page Size',
 		description: 'Number of results to show in a page',
@@ -18,6 +29,7 @@ const settingsMap = {
 		title: 'Include Fields',
 		description: 'Fields to include in the search results',
 	},
+
 	rankFeature: {
 		title: 'Boost search relevancy',
 		description: 'Using the rank feature you can boost the search relevancy',
@@ -230,6 +242,63 @@ const settingsMap = {
 			</>
 		),
 	},
+	showDistinctSuggestions: {
+		title: 'Show Distinct Suggestions',
+		description: 'Show only up to 1 suggestion per document (i.e. record). If set to false, multiple suggestions can be shown when relevant (based on different matching fields) from the same document.',
+	},
+	enablePredictiveSuggestions: {
+		title: 'Enable Predictive Suggestions',
+		description: 'Defaults to false. When set to true, it predicts the next relevant words from a fields value based on the search query typed by the user. When set to false (default), the entire fields value would be displayed.',
+	},
+	maxPredictedWords: {
+		title: 'Max Predicted Words',
+		description: 'Maximum number of predicted words.',
+	},
+	size: {
+		title: 'Size',
+		description: 'Maximum number of popular suggestions to be displayed.',
+	},
+	categoryField: {
+		title: 'Category Field',
+		description: 'When specified, suggestions will show category specific suggestions based on the most frequent values based on this field.',
+	},
+	urlField: {
+		title: 'URL',
+		description: 'When specified, suggestions will redirect to the URL value based on this field.',
+	},
+	customQuery: {
+		title: 'Custom Query',
+		description: 'Specify a custom stored query to execute instead of the default suggestions query. This is an advanced setting.',
+	},
+	minHits: {
+		title: 'Min Hits',
+		description: 'Define the minimum number of results that must present for a suggestion.',
+	},
+	minChars: {
+		title: 'Min Characters',
+		description: 'Define the minimum number of characters that must be present for a suggestion.',
+	},
+	numberOfDays: {
+		title: 'Number of days',
+		description: 'Define the number of days after which you want to re-calculate the suggestions.',
+	},
+	minCount: {
+		title: 'Min Count',
+		description: 'Min value of count for the suggestions.',
+	},
+	transformDiacritics: {
+		title: 'Transform Diacritics',
+		description: 'If enabled then Appbase will transform(strip) the diacritics before populating the suggestions. For an example, "Crème Brulée" becomes "Creme Brulee".',
+	},
+	blacklist: {
+		title: 'Blacklist',
+		description: 'A list of queries which can be marked as blacklist.',
+	},
+	externalSuggestions: {
+		title: 'External Suggestions',
+		description: 'Define your custom suggestions.',
+	},
+
 };
 
 export default settingsMap;

@@ -12,6 +12,7 @@ import {
 	Button,
 	Card,
 	Col,
+	Checkbox,
 	DatePicker,
 	Divider,
 	Icon,
@@ -140,6 +141,29 @@ DocsLink.propTypes = {
 	url: PropTypes.string.isRequired,
 };
 
+const searchTypeArr = [
+	{
+		label: 'Search',
+		value: 'search',
+	},
+	{
+		label: 'Suggestion',
+		value: 'suggestion',
+	},
+	{
+		label: 'Term',
+		value: 'term',
+	},
+	{
+		label: 'Range',
+		value: 'range',
+	},
+	{
+		label: 'Geo',
+		value: 'geo',
+	},
+];
+
 class QueryRulesForm extends React.Component {
 	constructor(props) {
 		super(props);
@@ -176,6 +200,7 @@ class QueryRulesForm extends React.Component {
 
 			subFieldsMap: {},
 
+			type: ['search', 'suggestion', 'geo', 'term', 'range'],
 			error: {},
 			loading: false,
 			editorKey: Date.now(),
@@ -324,6 +349,7 @@ class QueryRulesForm extends React.Component {
 
 	handleInput = (e) => {
 		const { name, value } = e.target;
+
 		this.setState((prevState) => ({
 			[name]: value,
 			actions:
@@ -429,6 +455,7 @@ class QueryRulesForm extends React.Component {
 			show_advance_editor,
 			advancedExpression,
 			fieldMap,
+			type,
 		} = this.state;
 
 		let { actions } = this.state;
@@ -443,7 +470,7 @@ class QueryRulesForm extends React.Component {
 			return show_advance_editor
 				? `'${(selectedIndexes || []).join(',')}' in $index ${
 						advancedExpression ? suffixExpression : ''
-				  }`
+				  } and $type in ${JSON.stringify(type)}`
 				: getExpressionFromValue({
 						selectedIndexes,
 						dataFieldValue,
@@ -451,6 +478,7 @@ class QueryRulesForm extends React.Component {
 						query,
 						queryValue,
 						condition,
+						type,
 				  });
 		}
 
@@ -543,6 +571,7 @@ class QueryRulesForm extends React.Component {
 			'selectedIndexes',
 			'enabled',
 			'timeframe',
+			'type',
 		];
 
 		const { props, state } = this;
@@ -611,6 +640,19 @@ class QueryRulesForm extends React.Component {
 		}
 	};
 
+	handleTypeChange = (data) => {
+		const { error } = this.state;
+
+		this.setState({
+			error: {
+				...error,
+				type: {
+					hasError: !data.length,
+				},
+			},
+		});
+	};
+
 	render() {
 		const {
 			condition,
@@ -636,6 +678,7 @@ class QueryRulesForm extends React.Component {
 			editorKey,
 			subFieldsMap,
 		} = this.state;
+
 		const {
 			isCreating,
 			rulesLoading,
@@ -711,6 +754,7 @@ class QueryRulesForm extends React.Component {
 		if (isEditPage) {
 			hasChanged = this.getChangeStatus();
 		}
+
 		return (
 			<div className={container}>
 				<Link to="/cluster/rules">
@@ -819,6 +863,43 @@ class QueryRulesForm extends React.Component {
 												onChange={this.handleIndex}
 											/>
 										</div>
+										<div
+											className={formStyle}
+											style={{
+												border: error?.type?.hasError
+													? '1px solid red'
+													: 'none',
+												padding: '10px',
+											}}
+										>
+											<div>
+												<label>
+													Search Type{' '}
+													<Info content="Select the type of search query to trigger this rule on." />
+												</label>
+												{error?.type?.hasError && (
+													<div style={{ color: 'red', fontSize: 13 }}>
+														{error?.type?.description}
+													</div>
+												)}
+											</div>
+
+											<Checkbox.Group
+												name="type"
+												options={searchTypeArr}
+												defaultValue={[
+													'search',
+													'suggestion',
+													'term',
+													'range',
+													'geo',
+												]}
+												style={{ display: 'flex', flexWrap: 'wrap' }}
+												onChange={(data) => {
+													this.setState({ type: data });
+												}}
+											/>
+										</div>
 										<label
 											style={{
 												marginBottom: 15,
@@ -831,11 +912,12 @@ class QueryRulesForm extends React.Component {
 										</label>
 									</>
 								)}
+
 								{!show_advance_editor && (
 									<ErrorToaster inline>
 										<Conditions
 											onChange={this.handleInput}
-											error={error.condition}
+											error={error}
 											condition={condition}
 											dataFields={dataFields}
 											dataField={dataField}
@@ -846,6 +928,7 @@ class QueryRulesForm extends React.Component {
 										/>
 									</ErrorToaster>
 								)}
+
 								{show_advance_editor && condition === 'filter' && (
 									<div className={customReactFilter}>
 										<label>
