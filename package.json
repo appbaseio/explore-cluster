@@ -8,7 +8,7 @@
 	"license": "MIT",
 	"private": false,
 	"scripts": {
-		"start": "NODE_ENV=development webpack-dev-server --mode development --content-base . --history-api-fallback  --hot --inline --progress --colors --port 3333",
+		"start": "NODE_ENV=development webpack-dev-server --mode development . --history-api-fallback  --hot --progress --port 3333",
 		"lint": "eslint --cache .",
 		"build": "NODE_ENV=production node ./scripts/create-env.js && node --max_old_space_size=8192 ./node_modules/webpack/bin/webpack.js --mode production --progress",
 		"glow": "glow --watch",
