@@ -130,7 +130,30 @@ const renderResultList = () => {
 	};
 	return (
 		<div style={{ margin: 10 }}>
-			<ReactiveGoogleMap componentId="googleMap" {...mapProps} />
+			<ReactiveGoogleMap
+				componentId="googleMap"
+				{...mapProps}
+				renderAllData={(
+					hits,
+					loadMore,
+					renderMap,
+					renderPagination,
+					triggerClickAnalytics,
+					meta,
+				) => {
+					console.log(meta);
+					return (
+						<>
+							{/* {hits.map(hit => <pre onClick={() => triggerClickAnalytics(hit._click_id)}>{JSON.stringify(hit)}</pre>)} */}
+							<div style={{ fontSize: '0.82rem', marginBottom: '10px' }}>
+								{meta?.resultStats?.numberOfResults} results found in{' '}
+								{meta?.resultStats?.time}ms
+							</div>
+							{renderMap()}
+						</>
+					);
+				}}
+			/>
 		</div>
 	);
 };
