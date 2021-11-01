@@ -113,11 +113,8 @@ class PreferencesFormWrapper extends React.Component {
 
 	componentDidMount() {
 		// Fetch preferences and update redux store
-		const {
-			isRecommendation,
-			fetchSearchPreferences,
-			fetchRecommendationsPreferences,
-		} = this.props;
+		const { isRecommendation, fetchSearchPreferences, fetchRecommendationsPreferences } =
+			this.props;
 		if (isRecommendation) {
 			fetchRecommendationsPreferences();
 		} else {
@@ -266,7 +263,6 @@ class PreferencesFormWrapper extends React.Component {
 						fetchingFilterOptions,
 					};
 				};
-				console.log('reach', this.form);
 				// Patch form value
 
 				try {
@@ -437,13 +433,10 @@ class PreferencesFormWrapper extends React.Component {
 								  }),
 						}),
 					);
-					console.log('parsed patch', patchVar);
 					this.form.patchValue(patchVar);
 				} catch (e) {
 					console.error(e);
 				}
-
-				console.log('voice pref', this.form.get('showVoiceSearch').value);
 			} catch (e) {
 				console.warn('Error while syncing the preferences', e);
 			}
@@ -463,14 +456,12 @@ class PreferencesFormWrapper extends React.Component {
 		const preferencesPayload = this.getPreferencesPayload();
 		if (!isRecommendation) {
 			if (get(preferencesPayload, 'facetSettings.staticFacets')) {
-				preferencesPayload.facetSettings.staticFacets = preferencesPayload.facetSettings.staticFacets.filter(
-					(o) => o.enabled,
-				);
+				preferencesPayload.facetSettings.staticFacets =
+					preferencesPayload.facetSettings.staticFacets.filter((o) => o.enabled);
 			}
 			if (get(preferencesPayload, 'facetSettings.dynamicFacets')) {
-				preferencesPayload.facetSettings.dynamicFacets = preferencesPayload.facetSettings.dynamicFacets.filter(
-					(o) => o.enabled,
-				);
+				preferencesPayload.facetSettings.dynamicFacets =
+					preferencesPayload.facetSettings.dynamicFacets.filter((o) => o.enabled);
 			}
 		}
 		preferencesPayload.appbaseSettings = {
