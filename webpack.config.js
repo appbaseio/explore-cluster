@@ -5,11 +5,11 @@ const SentryPlugin = require('@sentry/webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 // const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 const TerserJSPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
 
 require('dotenv').config();
@@ -22,8 +22,12 @@ const plugins = [
 		template: path.join(__dirname, 'index.html'),
 		filename: 'index.html',
 	}),
-	new CopyWebpackPlugin([{ from: 'static', to: 'static' }, '_redirects']),
-	new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+	new CopyWebpackPlugin({
+		patterns: [{ from: 'static', to: 'static' }, '_redirects'],
+	}),
+	new webpack.IgnorePlugin({
+		resourceRegExp: (/^\.\/locale$/, /moment$/),
+	}),
 	new MiniCssExtractPlugin({
 		filename: isProduction ? '[name].[contenthash:8].css' : '[name].css',
 		chunkFilename: isProduction ? '[name].[contenthash:8].css' : '[name].bundle.css',
@@ -80,7 +84,6 @@ module.exports = {
 	plugins,
 	devtool: 'source-map',
 	optimization: {
-		moduleIds: 'hashed',
 		runtimeChunk: {
 			name: 'manifest',
 		},
@@ -88,13 +91,13 @@ module.exports = {
 			new TerserJSPlugin({
 				parallel: true,
 			}),
-			new OptimizeCSSAssetsPlugin({}),
+			new CssMinimizerPlugin(),
 		],
 		splitChunks: {
 			cacheGroups: {
 				vendor: {
+					idHint: 'vendor',
 					test: /[\\/]node_modules[\\/](react|react-dom|antd)[\\/]/,
-					name: 'vendor',
 					chunks: 'all',
 					reuseExistingChunk: true,
 				},
