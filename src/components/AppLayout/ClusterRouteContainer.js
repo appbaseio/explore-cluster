@@ -16,11 +16,6 @@ const ProfilePage = Loadable({
 	loader: () => import(/* webpackChunkName: "ProfilePage" */ '../../pages/ProfilePage'),
 	loading: Loader,
 });
-const QuerySuggestionsPage = Loadable({
-	loader: () =>
-		import(/* webpackChunkName: "QuerySuggestionsPage" */ '../../pages/QuerySuggestionsPage'),
-	loading: Loader,
-});
 const CachePreferences = Loadable({
 	loader: () => import(/* webpackChunkName: "CachePreferences" */ '../../pages/CachePreferences'),
 	loading: Loader,
@@ -120,6 +115,12 @@ const GradeEvaluation = Loadable({
 	loading: Loader,
 });
 
+const SuggestionsPage = Loadable({
+	loader: () =>
+		import(/* webpackChunkName: "LanguageSettings" */ '../../pages/SuggestionSettings'),
+	loading: Loader,
+});
+
 class ClusterRouteContainer extends React.Component {
 	shouldComponentUpdate(nextProps) {
 		const { location, allowedRoutes } = this.props;
@@ -145,19 +146,6 @@ class ClusterRouteContainer extends React.Component {
 									<AppPageContainer {...props} component={OverviewPage} />
 								) : (
 									<Redirect to={Object.keys(allowedRoutes)[0]} />
-								)}
-							</>
-						)}
-					/>
-					<Route
-						exact
-						path="/cluster/popular-suggestions"
-						component={(props) => (
-							<>
-								{get(allowedRoutes, '/cluster/popular-suggestions') ? (
-									<AppPageContainer {...props} component={QuerySuggestionsPage} />
-								) : (
-									<UnauthorizedPage />
 								)}
 							</>
 						)}
@@ -215,7 +203,19 @@ class ClusterRouteContainer extends React.Component {
 							</>
 						)}
 					/>
-
+					<Route
+						exact
+						path="/cluster/suggestions"
+						render={(props) => (
+							<>
+								{get(allowedRoutes, '/cluster/suggestions') ? (
+									<AppPageContainer {...props} component={SuggestionsPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
+						)}
+					/>
 					<Route
 						exact
 						path="/cluster/rules"
