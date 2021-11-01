@@ -26,7 +26,8 @@ const plugins = [
 		patterns: [{ from: 'static', to: 'static' }, '_redirects'],
 	}),
 	new webpack.IgnorePlugin({
-		resourceRegExp: (/^\.\/locale$/, /moment$/),
+		resourceRegExp: /^\.\/locale$/,
+		contextRegExp: /moment$/,
 	}),
 	new MiniCssExtractPlugin({
 		filename: isProduction ? '[name].[contenthash:8].css' : '[name].css',
