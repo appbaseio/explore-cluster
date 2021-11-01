@@ -10,7 +10,7 @@ import {
 	ReactiveList,
 	ResultList,
 	SelectedFilters,
-	RangeInput
+	RangeInput,
 } from '@appbaseio/reactivesearch';
 import { Tag, Icon, notification } from 'antd';
 import appbaseHelpers from '../../utils/appbaseHelpers';
@@ -34,11 +34,7 @@ const renderFilters = (fields) => {
 							size={15}
 							sortBy="count"
 							react={{
-								and: [
-									'search',
-									'vote_average',
-									'release_year'
-								],
+								and: ['search', 'vote_average', 'release_year'],
 							}}
 							showSearch={false}
 						/>
@@ -52,7 +48,7 @@ const renderFilters = (fields) => {
 							dataField={field}
 							title="Vote Average"
 							filterLabel="Vote Average"
-							showHistogram={true}
+							showHistogram
 							rangeLabels={(min, max) => ({
 								start: min,
 								end: max,
@@ -68,7 +64,7 @@ const renderFilters = (fields) => {
 							key={field}
 							title="Release Year"
 							filterLabel="Release Year"
-							showHistogram={true}
+							showHistogram
 							range={{
 								start: 1950,
 								end: 2021,
@@ -99,12 +95,6 @@ const getWeights = (fields) => {
 		original_title: 10,
 		'original_title.raw': 10,
 		'original_title.search': 2,
-		title: 10,
-		'title.raw': 10,
-		'title.search': 2,
-		tagline: 5,
-		'tagline.raw': 5,
-		'tagline.search': 1,
 		overview: 1,
 		'overview.raw': 1,
 		'overview.search': 1,
@@ -132,7 +122,13 @@ const renderResultList = () => (
 		{({ data }) => (
 			<ResultListWrapper>
 				{data.map((item) => (
-					<div style={{display: 'flex', padding: 10, borderBottom: '1px solid rgb(239, 239, 239)'}}>
+					<div
+						style={{
+							display: 'flex',
+							padding: 10,
+							borderBottom: '1px solid rgb(239, 239, 239)',
+						}}
+					>
 						<img
 							style={{
 								height: 160,
@@ -142,7 +138,8 @@ const renderResultList = () => (
 							src={item.poster_path}
 							alt={item.poster_path}
 							onError={(event) => {
-								event.target.src = 'https://www.houseoftara.com/shop/wp-content/uploads/2019/05/placeholder.jpg'; // eslint-disable-line no-param-reassign
+								event.target.src =
+									'https://www.houseoftara.com/shop/wp-content/uploads/2019/05/placeholder.jpg'; // eslint-disable-line no-param-reassign
 							}}
 						/>
 						<ResultList key={item._id} id={item._id}>
@@ -154,10 +151,19 @@ const renderResultList = () => (
 								/>
 								<ResultList.Description>
 									<div>
-										<div style={{display: 'flex', color: '#424242'}}>
-											<p style={{fontWeight: '600', marginRight: 5}}>Release Year </p>
+										<div style={{ display: 'flex', color: '#424242' }}>
+											<p style={{ fontWeight: '600', marginRight: 5 }}>
+												Release Year{' '}
+											</p>
 											<p> {item.release_year}</p>
-											<p><Icon type="star" style={{ marginLeft: 40, marginRight: 3 }} theme="twoTone" /> {item.vote_average}/10</p>
+											<p>
+												<Icon
+													type="star"
+													style={{ marginLeft: 40, marginRight: 3 }}
+													theme="twoTone"
+												/>{' '}
+												{item.vote_average}/10
+											</p>
 										</div>
 										<p
 											style={{
@@ -177,7 +183,6 @@ const renderResultList = () => (
 								</ResultList.Description>
 							</ResultList.Content>
 						</ResultList>
-
 					</div>
 				))}
 			</ResultListWrapper>
@@ -235,7 +240,7 @@ class MoviesSearchApp extends Component {
 	}
 
 	componentDidMount() {
-		const {settings, fetchSearchSettings, app, fields: fieldsProp} = this.props;
+		const { settings, fetchSearchSettings, app, fields: fieldsProp } = this.props;
 		if (!settings) {
 			fetchSearchSettings(app);
 		} else {
@@ -244,7 +249,7 @@ class MoviesSearchApp extends Component {
 		}
 	}
 
-	updateAppSettings = async(fields) => {
+	updateAppSettings = async (fields) => {
 		const { settings, app, updateSettingsAction } = this.props;
 		const dataField = [...fields];
 		const fieldWeights = getWeights(fields);
@@ -260,12 +265,12 @@ class MoviesSearchApp extends Component {
 			aggregations: {
 				...newSettings?.aggregations,
 				dataField: {
-					"genres.keyword":"term",
-					"vote_average":"range",
-					"release_year":"range"
-				}
-			}
-		}
+					'genres.keyword': 'term',
+					vote_average: 'range',
+					release_year: 'range',
+				},
+			},
+		};
 		try {
 			const savedSettings = await updateSettingsAction(app, settingsData);
 			if (savedSettings && savedSettings.error) {
@@ -280,7 +285,7 @@ class MoviesSearchApp extends Component {
 				description: err.message,
 			});
 		}
-	}
+	};
 
 	render() {
 		const { facets, fields: fieldsProp, ui } = this.props;
@@ -328,7 +333,7 @@ class MoviesSearchApp extends Component {
 					/>
 				</header>
 
-				<SelectedFilters style={{ marginTop: 20 }} showClearAll={false}/>
+				<SelectedFilters style={{ marginTop: 20 }} showClearAll={false} />
 
 				<div className={facets && facets.length ? 'multi-col' : ''}>
 					<div className="left-col">{renderFilters(facets)}</div>
@@ -358,7 +363,6 @@ MoviesSearchApp.defaultProps = {
 };
 
 const mapStateToProps = (state, props) => {
-
 	const { username, password } = get(state, 'user.data', {});
 	const defaultSettings = get(state.$getAppSettings, `defaultSettings`);
 	const settings = get(state, ['$getAppSettings', 'settings', props.app], defaultSettings);

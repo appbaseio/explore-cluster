@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { css } from 'emotion';
 import get from 'lodash/get';
 import {
 	RangeSlider,
@@ -16,6 +17,15 @@ import { notification } from 'antd';
 import appbaseHelpers from '../../utils/appbaseHelpers';
 import { putSettings, getSettings } from '../../../../batteries/modules/actions';
 import { getURL } from '../../../../constants/config';
+
+const statStyles = css`
+	max-width: none;
+	margin: 30px 0 0;
+	font-size: 16px;
+	margin-bottom: 10px;
+	line-height: 16px;
+	text-align: right;
+`;
 
 const renderFilters = (fields) => {
 	if (fields && fields.length) {
@@ -144,8 +154,7 @@ const renderResultList = () => {
 					console.log(meta);
 					return (
 						<>
-							{/* {hits.map(hit => <pre onClick={() => triggerClickAnalytics(hit._click_id)}>{JSON.stringify(hit)}</pre>)} */}
-							<div style={{ fontSize: '0.82rem', marginBottom: '10px' }}>
+							<div css={statStyles}>
 								{meta?.resultStats?.numberOfResults} results found in{' '}
 								{meta?.resultStats?.time}ms
 							</div>

@@ -9,13 +9,13 @@ import {
 	ReactiveList,
 	ResultList,
 	SelectedFilters,
-	RangeInput
+	RangeInput,
 } from '@appbaseio/reactivesearch';
 import { Tag, notification } from 'antd';
 import appbaseHelpers from '../../utils/appbaseHelpers';
 import { putSettings, getSettings } from '../../../../batteries/modules/actions';
 import { getURL } from '../../../../constants/config';
-import { seachAppStyles } from "./styles";
+import { seachAppStyles } from './styles';
 
 const { ResultListWrapper } = ReactiveList;
 
@@ -24,55 +24,55 @@ const renderFilters = (fields) => {
 		return fields.map((field) => {
 			switch (field) {
 				case 'categories': {
-                    return (
-                        <MultiList
-                            key={field}
-                            componentId={field}
-                            dataField="categories.keyword"
-                            title="Categories"
+					return (
+						<MultiList
+							key={field}
+							componentId={field}
+							dataField="categories.keyword"
+							title="Categories"
 							filterLabel="Categories"
-                            size={15}
-                            sortBy="count"
-                            react={{
-                                and: ['search', 'brand', 'retail_price'],
-                            }}
-                            showSearch={false}
-                        />
-                    );
-                }
-                case 'brand': {
-                    return (
-                        <MultiList
-                            key={field}
-                            componentId={field}
-                            dataField="brand.keyword"
-                            title="Brand"
+							size={15}
+							sortBy="count"
+							react={{
+								and: ['search', 'brand', 'retail_price'],
+							}}
+							showSearch={false}
+						/>
+					);
+				}
+				case 'brand': {
+					return (
+						<MultiList
+							key={field}
+							componentId={field}
+							dataField="brand.keyword"
+							title="Brand"
 							filterLabel="Brand"
-                            size={15}
-                            sortBy="count"
-                            react={{
-                                and: ['search', 'categories', 'retail_price'],
-                            }}
-                            showSearch={false}
-                        />
-                    );
-                }
-                case 'retail_price': {
-                    return (
-                        <RangeInput
-                            componentId={field}
-                            dataField={field}
-                            key={field}
-                            title="Retail Price (Rupees)"
-                            filterLabel="Retail Price"
-                            showHistogram={true}
-                            range={{
-                                start: 45,
-                                end: 50000,
-                            }}
-                        />
-                    );
-                }
+							size={15}
+							sortBy="count"
+							react={{
+								and: ['search', 'categories', 'retail_price'],
+							}}
+							showSearch={false}
+						/>
+					);
+				}
+				case 'retail_price': {
+					return (
+						<RangeInput
+							componentId={field}
+							dataField={field}
+							key={field}
+							title="Retail Price (Rupees)"
+							filterLabel="Retail Price"
+							showHistogram
+							range={{
+								start: 45,
+								end: 20000,
+							}}
+						/>
+					);
+				}
 				default:
 					return null;
 			}
@@ -133,25 +133,36 @@ const renderResultList = () => (
 								src={item.image[0]}
 								alt={item.image[0]}
 								onError={(event) => {
-									event.target.src = 'https://www.houseoftara.com/shop/wp-content/uploads/2019/05/placeholder.jpg'; // eslint-disable-line no-param-reassign
+									event.target.src =
+										'https://www.houseoftara.com/shop/wp-content/uploads/2019/05/placeholder.jpg'; // eslint-disable-line no-param-reassign
 								}}
 							/>
 						</div>
 						<ResultList key={item._id} id={item._id}>
 							<ResultList.Content>
 								<ResultList.Title
-									dangerouslySetInnerHTML = {{
+									dangerouslySetInnerHTML={{
 										__html: item.product_name, //eslint-disable-line
 									}}
 								/>
 								<ResultList.Description>
 									<div>
-										<div style={{display: 'flex', color: '#424242'}}>
-											<p style={{fontWeight: '600', marginRight: 5}}>Retail Price: </p>
+										<div style={{ display: 'flex', color: '#424242' }}>
+											<p style={{ fontWeight: '600', marginRight: 5 }}>
+												Retail Price:{' '}
+											</p>
 											<p>Rs.{item.retail_price}</p>
-											{ item.brand && (
+											{item.brand && (
 												<>
-													<p style={{ marginLeft: 40, fontWeight: '600', marginRight: 5 }}>Brand:{" "}</p>
+													<p
+														style={{
+															marginLeft: 40,
+															fontWeight: '600',
+															marginRight: 5,
+														}}
+													>
+														Brand:{' '}
+													</p>
 													<p>{item.brand}</p>
 												</>
 											)}
@@ -169,18 +180,16 @@ const renderResultList = () => (
 												<Tag>
 													<p
 														dangerouslySetInnerHTML={{
-															__html: item.categories
+															__html: item.categories,
 														}}
 													/>
 												</Tag>
-											)
-											}
+											)}
 										</div>
 									</div>
 								</ResultList.Description>
 							</ResultList.Content>
 						</ResultList>
-
 					</div>
 				))}
 			</ResultListWrapper>
@@ -237,7 +246,7 @@ class EcommSearchApp extends Component {
 	}
 
 	componentDidMount() {
-		const {settings, fetchSearchSettings, app, fields: fieldsProp} = this.props;
+		const { settings, fetchSearchSettings, app, fields: fieldsProp } = this.props;
 		if (!settings) {
 			fetchSearchSettings(app);
 		} else {
@@ -246,7 +255,7 @@ class EcommSearchApp extends Component {
 		}
 	}
 
-	updateAppSettings = async(fields) => {
+	updateAppSettings = async (fields) => {
 		const { settings, app, updateSettingsAction } = this.props;
 		const dataField = [...fields];
 		const fieldWeights = getWeights(fields);
@@ -262,12 +271,12 @@ class EcommSearchApp extends Component {
 			aggregations: {
 				...newSettings?.aggregations,
 				dataField: {
-					"brand.keyword":"term",
-					"categories.keyword":"term",
-					"retail_price":"range"
-				}
-			}
-		}
+					'brand.keyword': 'term',
+					'categories.keyword': 'term',
+					retail_price: 'range',
+				},
+			},
+		};
 		try {
 			const savedSettings = await updateSettingsAction(app, settingsData);
 			if (savedSettings && savedSettings.error) {
@@ -282,7 +291,7 @@ class EcommSearchApp extends Component {
 				description: err.message,
 			});
 		}
-	}
+	};
 
 	render() {
 		const { facets, fields: fieldsProp, ui } = this.props;
@@ -331,7 +340,7 @@ class EcommSearchApp extends Component {
 					/>
 				</header>
 
-				<SelectedFilters style={{ marginTop: 20 }} showClearAll={false}/>
+				<SelectedFilters style={{ marginTop: 20 }} showClearAll={false} />
 
 				<div className={facets && facets.length ? 'multi-col' : ''}>
 					<div className="left-col">{renderFilters(facets)}</div>
@@ -361,7 +370,6 @@ EcommSearchApp.defaultProps = {
 };
 
 const mapStateToProps = (state, props) => {
-
 	const { username, password } = get(state, 'user.data', {});
 	const defaultSettings = get(state.$getAppSettings, `defaultSettings`);
 	const settings = get(state, ['$getAppSettings', 'settings', props.app], defaultSettings);
