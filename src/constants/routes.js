@@ -21,13 +21,18 @@ export const APP_ROUTES = {
 		action: ALLOWED_ACTIONS.SEARCH_RELEVANCY,
 		menu: [
 			{ label: 'Language Settings', link: 'languages', tag: 'Beta' },
+			{
+				label: 'Suggestion Settings',
+				link: '/cluster/suggestions',
+				tag: 'Beta',
+				hasExactPath: true,
+			},
 			{ label: 'Search Settings', link: 'search', tag: 'Beta' },
 			{ label: 'Aggregation Settings', link: 'aggs', tag: 'Beta' },
 			{ label: 'Result Settings', link: 'results', tag: 'Beta' },
 			{ label: 'Index Settings', link: 'index-settings', tag: 'Beta' },
 			{ label: 'Schema', link: 'schema', tag: 'Beta' },
 			{ label: 'Synonyms', link: 'synonyms', tag: 'Beta' },
-			{ label: 'Popular Suggestions', link: 'popular-suggestions', tag: 'Beta' },
 			{
 				label: 'Query Rules',
 				link: '/cluster/rules',
@@ -136,6 +141,11 @@ export const CLUSTER_ROUTES = {
 				tag: 'Beta',
 				openIndexMenu: true,
 			},
+			{
+				label: 'Suggestion Settings',
+				link: '/cluster/suggestions',
+				tag: 'Beta',
+			},
 			{ label: 'Search Settings', link: 'search', tag: 'Beta', openIndexMenu: true },
 			{
 				label: 'Aggregation Settings',
@@ -152,11 +162,6 @@ export const CLUSTER_ROUTES = {
 			},
 			{ label: 'Schema', link: 'schema', tag: 'Beta', openIndexMenu: true },
 			{ label: 'Synonyms', link: 'synonyms', tag: 'Beta', openIndexMenu: true },
-			{
-				label: 'Popular Suggestions',
-				link: '/cluster/popular-suggestions',
-				tag: 'Beta',
-			},
 			{ label: 'Query Rules', link: '/cluster/rules', tag: 'Beta' },
 			{ label: 'Grade Evaluation', link: '/cluster/grade-evaluation', tag: 'Beta' },
 		],
