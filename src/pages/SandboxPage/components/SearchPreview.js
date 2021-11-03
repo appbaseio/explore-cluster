@@ -95,7 +95,6 @@ class SearchPreview extends React.Component {
 				fetchRules();
 			}
 		}
-
 		/*
 			Update Grading to be false if not a valid plan.
 		*/

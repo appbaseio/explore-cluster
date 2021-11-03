@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Card, Icon, Button, Tooltip } from 'antd';
 import { Link } from 'react-router-dom';
 import get from 'lodash/get';
-import { MultiList } from '@appbaseio/reactivesearch';
+import { MultiList, DynamicRangeSlider } from '@appbaseio/reactivesearch';
 import settingsMap from '../../../components/ReviewAndSave/helper';
 
 const Filter = (props) => {
@@ -15,20 +15,36 @@ const Filter = (props) => {
 					key={agg.dataField}
 					data-cy={`aggs-values-${get(agg, 'dataField[0]', '').replace('.keyword', '')}`}
 				>
-					<MultiList
-						{...agg}
-						title={get(agg, 'dataField[0]', '').replace('.keyword', '')}
-						renderNoResults={() =>
-							`No Data Found for ${get(agg, 'dataField[0]', '').replace(
-								'.keyword',
-								'',
-							)}`
-						}
-						dataField={get(agg, 'dataField[0]')}
-						onChange={(value) => handleValueChange(agg.id, value)}
-						componentId={agg.id}
-						loader="Loading Items"
-					/>
+					{agg.type === 'term' ? (
+						<MultiList
+							{...agg}
+							title={get(agg, 'dataField[0]', '').replace('.keyword', '')}
+							renderNoResults={() =>
+								`No Data Found for ${get(agg, 'dataField[0]', '').replace(
+									'.keyword',
+									'',
+								)}`
+							}
+							dataField={get(agg, 'dataField[0]')}
+							onChange={(value) => handleValueChange(agg.id, value)}
+							componentId={agg.id}
+							loader="Loading Items"
+						/>
+					) : (
+						<DynamicRangeSlider
+							title={get(agg, 'dataField[0]', '').replace('.keyword', '')}
+							renderNoResults={() =>
+								`No Data Found for ${get(agg, 'dataField[0]', '').replace(
+									'.keyword',
+									'',
+								)}`
+							}
+							onChange={(value) => handleValueChange(agg.id, value)}
+							loader="Loading Items"
+							componentId={agg.id}
+							dataField={get(agg, 'dataField[0]')}
+						/>
+					)}
 				</Card>
 			))}
 
