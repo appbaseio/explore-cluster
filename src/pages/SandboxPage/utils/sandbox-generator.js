@@ -47,6 +47,7 @@ import {
 	ReactiveBase,
 	ReactiveList,
 	MultiList,
+	DynamicRangeSlider,
 	DataSearch,
 	SelectedFilters,
 } from '@appbaseio/reactivesearch';
@@ -307,19 +308,34 @@ const generateFiltersCode = (filtersWithProps) => {
 	}
 
 	return filtersWithProps.reduce((agg, { id, value, type, dataField, ...filter }) => {
-		const listCode = reactElementToJSXString(
-			<div
-				{...filter}
-				defaultValue={value || []}
-				dataField={get(dataField, '[0]', '')}
-				className="filter"
-				title={get(dataField, '[0]', '').replace('.keyword', '')}
-				componentId={id}
-			/>,
-			{
-				showFunctions: false,
-			},
-		).replace('div', 'MultiList');
+		let listCode = '';
+		if (type === 'term') {
+			listCode = reactElementToJSXString(
+				<div
+					{...filter}
+					defaultValue={value || []}
+					dataField={get(dataField, '[0]', '')}
+					className="filter"
+					title={get(dataField, '[0]', '').replace('.keyword', '')}
+					componentId={id}
+				/>,
+				{
+					showFunctions: false,
+				},
+			).replace('div', 'MultiList');
+		} else {
+			listCode = reactElementToJSXString(
+				<div
+					dataField={get(dataField, '[0]', '')}
+					className="filter"
+					title={get(dataField, '[0]', '').replace('.keyword', '')}
+					componentId={id}
+				/>,
+				{
+					showFunctions: false,
+				},
+			).replace('div', 'DynamicRangeSlider');
+		}
 
 		if (agg) {
 			return `${agg}\n${listCode}`;
