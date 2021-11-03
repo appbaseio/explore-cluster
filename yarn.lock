@@ -51,10 +51,10 @@
     url-search-params "^1.1.0"
     uuid "^3.3.2"
 
-"@appbaseio-confidential/reactivesearch-playground@^1.2.1-beta":
-  version "1.2.1-beta"
-  resolved "https://npm.pkg.github.com/download/@appbaseio-confidential/reactivesearch-playground/1.2.1-beta/991bc27f35be18ac579ccd01ce57c5c5e29de4b22c07cbe7d3aa871ea134e9aa#1977ae993c347d7a9a0b15cced69b12bd4f007d1"
-  integrity sha512-FyIm9BXh0UBuDnSLXnyQV9eBguxrPUWW4Yi6neuxc8rEIYBuH7A8RWvOHlkXDN5KHybrZMqpeVeI0gBX6tSIVQ==
+"@appbaseio-confidential/reactivesearch-playground@^1.2.3-beta":
+  version "1.2.3-beta"
+  resolved "https://npm.pkg.github.com/download/@appbaseio-confidential/reactivesearch-playground/1.2.3-beta/11955ae8bd7c18380992c81b74eda70e0ab4235ebaa3dfec707e9b382eca4685#30f90501eacb1927f2688d85d1c5bfc97ff6c926"
+  integrity sha512-VHUISVdM6MleuOYZ+LG/eDJZOTbztL8V34FT63sqcZgJbP7kOBBuADU3YDfekjm3ZZqRXByc1D3vSFWvE1vnRg==
   dependencies:
     "@monaco-editor/react" "^4.3.1"
     "@reduxjs/toolkit" "^1.6.0"
