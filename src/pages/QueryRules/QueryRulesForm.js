@@ -59,6 +59,8 @@ import { getRawQuery, parseExpression } from '../../components/AdvancedEditor/he
 
 import { allowedTiers } from '../../utils/prop-types';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { doPost } from '../../batteries/utils/requestService';
+import { getAuthHeaders } from '../../batteries/utils/mappings';
 
 const customReactFilter = css`
 	.react-filter-box {
@@ -788,15 +790,12 @@ class QueryRulesForm extends React.Component {
 		if (mode === 'save') {
 			saveState(payload);
 		}
-		fetch(`${ACC_API}/${index}/_reactivesearch`, {
-			method: 'POST',
-			headers: {
-				Authorization: `Basic ${btoa(`${username}:${password}`)}`,
-				'Content-Type': 'application/x-ndjson',
-			},
-			body: JSON.stringify(payload),
-		})
-			.then((res) => res.json())
+
+		return doPost(
+			`${ACC_API}/${index}/_reactivesearch`,
+			payload,
+			getAuthHeaders(btoa(`${username}:${password}`)),
+		)
 			.then((json) => {
 				this.setState({ previewCount: json?.search?.hits.total.value });
 			})
