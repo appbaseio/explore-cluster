@@ -151,7 +151,6 @@ const renderResultList = () => {
 					triggerClickAnalytics,
 					meta,
 				) => {
-					console.log(meta);
 					return (
 						<>
 							<div css={statStyles}>
