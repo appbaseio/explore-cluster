@@ -67,7 +67,7 @@ const renderFilters = (fields) => {
 							filterLabel="Retail Price"
 							showHistogram
 							range={{
-								start: 45,
+								start: 10,
 								end: 10000,
 							}}
 						/>
