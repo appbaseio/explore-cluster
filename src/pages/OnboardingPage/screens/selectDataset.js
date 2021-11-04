@@ -1,10 +1,10 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useState } from 'react';
-import Footer from '../components/Footer';
 import { Icon } from 'antd';
 import PropTypes from 'prop-types';
-import Loader from '../components/Loader';
 import parser from 'url-parser-lite';
+import Loader from '../components/Loader';
+import Footer from '../components/Footer';
 import appbaseHelpers from '../utils/appbaseHelpers';
 import { moviesJson } from '../utils/sampleData/moviesData';
 import { geoJson } from '../utils/sampleData/geoData';
@@ -15,46 +15,42 @@ const datsetMappings = [
 		id: 'movies',
 		name: 'Movies Dataset',
 		description:
-			'A dataset of 10,000 movies obtained from TMDB. This is ideal to experiment with SaaS and E-Commerce use-cases.',
-		url:
-			'https://www.themoviedb.org/t/p/w1280/xmbU4JTUm8rsdtn7Y3Fcm30GpeT.jpg',
+			'A dataset of 10,000 movies obtained from TMDB. This is ideal to experiment with SaaS use-cases.',
+		url: 'https://www.themoviedb.org/t/p/w1280/xmbU4JTUm8rsdtn7Y3Fcm30GpeT.jpg',
 		alt: 'movies-image',
-		count: '10,000'
+		count: '10,000',
 	},
 	{
 		id: 'products',
 		name: 'Products Dataset',
 		description:
-			'A dataset of 1,500 e-commerce products. This is ideal to experiment with E-Commerce use-cases and aggregator use-cases.',
-		url:
-			'http://img5a.flixcart.com/image/keyboard/tablet-keyboard/r/z/y/couponsmall-key-343-original-imaefv2emhpp3tku.jpeg',
+			'A dataset of 3,000 e-commerce products. This is ideal to experiment with E-commerce use-cases.',
+		url: 'https://imgur.com/eZ4wZMq.png',
 		alt: 'products-image',
-		count: '1,500',
+		count: '3,000',
 	},
 	{
 		id: 'geo',
 		name: 'Geo Dataset',
 		description:
-			'A dataset of 3,500 eathquake samples. This is ideal to experiment with E-Commerce use-cases and aggregator use-cases.',
-		url:
-			'https://imgur.com/q9neV4t.png',
+			'A dataset of 3,500 earthquake samples from the last 100 years. This is ideal to experiment with the Geo use-cases.',
+		url: 'https://imgur.com/q9neV4t.png',
 		alt: 'geo-image',
-		count: '3,500'
+		count: '3,500',
 	},
 ];
 
-
 function selectDataset({ nextScreen, setURL, url: newUrl, handleDataset }) {
 	const [dataset, setDataSet] = useState({ name: 'Movies Dataset', count: '10,000' });
-    const [layout, setLayout] = useState(0);
-    const [url,saveUrl] = useState(newUrl);
-    const [loading, setLoading] = useState(false);
-    const [status, setStatus] = useState('Applying relevant settings...');
+	const [layout, setLayout] = useState(0);
+	const [url, saveUrl] = useState(newUrl);
+	const [loading, setLoading] = useState(false);
+	const [status, setStatus] = useState('Applying relevant settings...');
 
-    function handleSelect(name, count, id) {
+	function handleSelect(name, count, id) {
 		setDataSet({
 			name,
-			count
+			count,
 		});
 		handleDataset(id);
 	}
@@ -72,7 +68,7 @@ function selectDataset({ nextScreen, setURL, url: newUrl, handleDataset }) {
 			setStatus('Loading data browser... Hang tight!');
 
 			await appbaseHelpers.createURL(handleUrl);
-		} catch(e) {
+		} catch (e) {
 			if (
 				e._bodyInit ===
 				'{"error":{"root_cause":[{"type":"parse_exception","reason":"request body is required"}],"type":"parse_exception","reason":"request body is required"},"status":400}'
@@ -83,48 +79,47 @@ function selectDataset({ nextScreen, setURL, url: newUrl, handleDataset }) {
 			console.log('@error-at-importing-data-response-type', typeof e);
 			console.log('error', e);
 		}
-    }
-
-	function hideLoader() {
-        setStatus('');
-        setLoading(false);
-    }
-
-	function jsonBlock() {
-		if(dataset.name === 'Movies Dataset') {
-			return moviesJson;
-		} else if(dataset.name === 'Products Dataset') {
-			return ecommJson;
-		} else {
-			return geoJson;
-		}
 	}
 
-    function renderJSONBlock() {
-        return (
-            <div>
-			<p>Showing a sample JSON to be imported:</p>
-			<div
-				style={{ width: '650px' }}
-				className="code-block"
-				dangerouslySetInnerHTML={{ __html: jsonBlock() }}
-			/>
-		</div>
-        )
-    }
+	function hideLoader() {
+		setStatus('');
+		setLoading(false);
+	}
 
-	function handleUrl(url) {
-        saveUrl(url);
-        setURL(url);
-    }
+	function jsonBlock() {
+		if (dataset.name === 'Movies Dataset') {
+			return moviesJson;
+		}
+		if (dataset.name === 'Products Dataset') {
+			return ecommJson;
+		}
+		return geoJson;
+	}
 
-    function handleLayout() {
-        setLayout(1);
-    }
+	function renderJSONBlock() {
+		return (
+			<div>
+				<p>Showing a sample JSON to be imported:</p>
+				<div
+					style={{ width: '650px' }}
+					className="code-block"
+					dangerouslySetInnerHTML={{ __html: jsonBlock() }}
+				/>
+			</div>
+		);
+	}
 
+	function handleUrl(data) {
+		saveUrl(data);
+		setURL(data);
+	}
 
-    function sampleLayout() {
-        let iframeURL = null;
+	function handleLayout() {
+		setLayout(1);
+	}
+
+	function sampleLayout() {
+		let iframeURL = null;
 		if (url) {
 			const config = JSON.parse(url);
 			const { protocol, host, auth } = parser(config.url);
@@ -132,7 +127,7 @@ function selectDataset({ nextScreen, setURL, url: newUrl, handleDataset }) {
 			iframeURL = `https://dejavu.appbase.io/?appname=${config.appname}&url=${dejavuAddress}&footer=false&sidebar=false&appswitcher=false&mode=edit&cloneApp=false&oldBanner=false`;
 		}
 
-        return (
+		return (
 			<div>
 				<div className="wrapper">
 					<div>
@@ -182,68 +177,74 @@ function selectDataset({ nextScreen, setURL, url: newUrl, handleDataset }) {
 				)}
 			</div>
 		);
-    }
+	}
 
 	return (
 		<div>
-			{
-				layout === 0 ? (
-					<div className="wrapper">
-						<div>
-							<img src="/static/images/onboarding/Create.svg" alt="create app" />
-						</div>
-						<div className="content">
-							<header>
-								<h2>Choose a sample dataset to import from</h2>
-								<p>
-									We will be using the appbase.io dashboard to import this dataset from.
-								</p>
-							</header>
-							<div>
-								{datsetMappings.map((data) => (
-									<div
-										className="dataset-container"
-										style={{
-
-											border: data.name === dataset.name ? '1px solid #1890ff' : 'none',
-											background: data.name === dataset.name ? 'rgb(234, 245, 255)' : 'white',
-										}}
-										key={data.id}
-										onClick={() => handleSelect(data.name, data.count, data.id)}
-									>
-										<img
-											src={data.url}
-											alt={data.alt}
-											style={{ height: '150px', width: '150px', margin: 20 }}
-										/>
-										<div>
-											<h3>{data.name}</h3>
-											<p>{data.description}</p>
-										</div>
-									</div>
-								))}
-							</div>
-						</div>
-						<footer>
-							<div className="left-column">
-								<a
-									className="button has-icon"
-									data-cy="submit-data-import"
-									onClick={handleLayout}
-								>
-									Next &nbsp; <Icon type="right" theme="outlined" />
-								</a>
-							</div>
-						</footer>
+			{layout === 0 ? (
+				<div className="wrapper">
+					<div>
+						<img src="/static/images/onboarding/Create.svg" alt="create app" />
 					</div>
-				) : sampleLayout()
-			}
+					<div className="content">
+						<header>
+							<h2>Choose a sample dataset to import from</h2>
+							<p>
+								We will be using the appbase.io dashboard to import this dataset
+								from.
+							</p>
+						</header>
+						<div>
+							{datsetMappings.map((data) => (
+								<div
+									className="dataset-container"
+									style={{
+										border:
+											data.name === dataset.name
+												? '1px solid #1890ff'
+												: 'none',
+										background:
+											data.name === dataset.name
+												? 'rgb(234, 245, 255)'
+												: 'white',
+									}}
+									key={data.id}
+									onClick={() => handleSelect(data.name, data.count, data.id)}
+								>
+									<img
+										src={data.url}
+										alt={data.alt}
+										style={{ height: '150px', width: '150px', margin: 20 }}
+									/>
+									<div>
+										<h3>{data.name}</h3>
+										<p>{data.description}</p>
+									</div>
+								</div>
+							))}
+						</div>
+					</div>
+					<footer>
+						<div className="left-column">
+							<a
+								className="button has-icon"
+								data-cy="submit-data-import"
+								onClick={handleLayout}
+							>
+								Next &nbsp; <Icon type="right" theme="outlined" />
+							</a>
+						</div>
+					</footer>
+				</div>
+			) : (
+				sampleLayout()
+			)}
 		</div>
 	);
 }
 
 selectDataset.propTypes = {
-    setURL: PropTypes.func.isRequired,
+	setURL: PropTypes.func.isRequired,
 	nextScreen: PropTypes.func,
 	url: PropTypes.string,
 };

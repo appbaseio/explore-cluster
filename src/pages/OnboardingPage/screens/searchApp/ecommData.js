@@ -68,7 +68,7 @@ const renderFilters = (fields) => {
 							showHistogram
 							range={{
 								start: 45,
-								end: 20000,
+								end: 10000,
 							}}
 						/>
 					);
@@ -133,6 +133,7 @@ const renderResultList = () => (
 								src={item.image[0]}
 								alt={item.image[0]}
 								onError={(event) => {
+									// eslint-disable-next-line no-param-reassign
 									event.target.src =
 										'https://www.houseoftara.com/shop/wp-content/uploads/2019/05/placeholder.jpg'; // eslint-disable-line no-param-reassign
 								}}

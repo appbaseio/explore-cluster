@@ -138,6 +138,7 @@ const renderResultList = () => (
 							src={item.poster_path}
 							alt={item.poster_path}
 							onError={(event) => {
+								// eslint-disable-next-line no-param-reassign
 								event.target.src =
 									'https://www.houseoftara.com/shop/wp-content/uploads/2019/05/placeholder.jpg'; // eslint-disable-line no-param-reassign
 							}}
