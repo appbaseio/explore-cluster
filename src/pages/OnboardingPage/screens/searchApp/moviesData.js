@@ -196,7 +196,7 @@ const renderJSONList = () => (
 		componentId="results"
 		dataField="name"
 		react={{
-			and: ['search', 'genres', 'original_language', 'release_year'],
+			and: ['search', 'genres', 'vote_average', 'release_year'],
 		}}
 		size={4}
 		renderItem={(res) => (
