@@ -4,7 +4,7 @@ import { getVersion, getURL } from '../constants/config';
 import mappingUsecase from '../batteries/utils/mappingUsecase';
 import { getAuthHeaders } from '../batteries/utils/mappings';
 import { getPossibleSubFields, unflattenObject } from '.';
-import { SUB_FIELDS } from '../constants';
+import { SUB_FIELDS, RANGE_FIELDS } from '../constants';
 
 export const getMappingsInfo = ({
 	mappings: originalMappings,
@@ -471,6 +471,14 @@ export const flatObject = (originalObject, path = '') => {
 
 export const hasKeyword = (fieldMappings) => {
 	if (get(fieldMappings, 'fields.keyword.type', '') === 'keyword') {
+		return true;
+	}
+
+	return false;
+};
+
+export const isRangeType = (type) => {
+	if (RANGE_FIELDS.includes(type)) {
 		return true;
 	}
 
