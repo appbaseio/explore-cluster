@@ -1,9 +1,11 @@
 import React from 'react';
-import { Button, Modal, Switch, Form, Select } from 'antd';
+import { Button, Modal, Switch, Form, Select, List, Radio } from 'antd';
 import { string, object, func, bool } from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import DataFieldSelector from '../../../../components/Form/DataFieldSelector';
 import TextInput from '../../../../components/Form/Input';
+
+const { Item } = List;
 
 class CustomizeFilter extends React.Component {
 	state = {
@@ -82,6 +84,26 @@ class CustomizeFilter extends React.Component {
 											</Form.Item>
 										)
 									}
+								</FieldControl>
+								<FieldControl name="filterType">
+									{(formControl) => (
+										<Item
+											actions={[
+												<Radio.Group
+													{...formControl.handler()}
+													onChange={(value) => {
+														formControl.markAsTouched();
+														formControl.handler().onChange(value);
+													}}
+												>
+													<Radio value="list">MultiList</Radio>
+													<Radio value="range">RangeSlider</Radio>
+												</Radio.Group>,
+											]}
+										>
+											<Item.Meta title="Choose Type" />
+										</Item>
+									)}
 								</FieldControl>
 								<TextInput
 									name="title"
