@@ -12,7 +12,7 @@ import {
 	SelectedFilters,
 	RangeInput,
 } from '@appbaseio/reactivesearch';
-import { ReactiveGoogleMap } from '@appbaseio/reactivemaps';
+import { ReactiveOpenStreetMap } from '@appbaseio/reactivemaps';
 import { notification } from 'antd';
 import appbaseHelpers from '../../utils/appbaseHelpers';
 import { putSettings, getSettings } from '../../../../batteries/modules/actions';
@@ -140,7 +140,7 @@ const renderResultList = () => {
 	};
 	return (
 		<div style={{ margin: 10 }}>
-			<ReactiveGoogleMap
+			<ReactiveOpenStreetMap
 				componentId="googleMap"
 				{...mapProps}
 				renderAllData={(
