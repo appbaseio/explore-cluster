@@ -115,6 +115,7 @@ const renderResultList = () => {
 		title: 'Reactive Maps',
 		defaultZoom: 6,
 		size: 10,
+		style: { zIndex: 0 },
 		react: {
 			and: ['place', 'search', 'year', 'magnitude'],
 		},
