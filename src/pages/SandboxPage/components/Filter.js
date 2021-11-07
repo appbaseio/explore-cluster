@@ -8,6 +8,15 @@ import settingsMap from '../../../components/ReviewAndSave/helper';
 
 const Filter = (props) => {
 	const { app, aggs, handleValueChange, handleModal } = props;
+
+	const sentenceCase = (text) => {
+		if (text) {
+			const result = text.replace(/([A-Z])/g, ' $1');
+			return result.charAt(0).toUpperCase() + result.slice(1);
+		}
+		return text;
+	};
+
 	return (
 		<React.Fragment>
 			{aggs.map((agg) => (
@@ -18,7 +27,9 @@ const Filter = (props) => {
 					{agg.type === 'term' ? (
 						<MultiList
 							{...agg}
-							title={get(agg, 'dataField[0]', '').replace('.keyword', '')}
+							title={sentenceCase(
+								get(agg, 'dataField[0]', '').replace('.keyword', ''),
+							)}
 							renderNoResults={() =>
 								`No Data Found for ${get(agg, 'dataField[0]', '').replace(
 									'.keyword',
@@ -29,10 +40,15 @@ const Filter = (props) => {
 							onChange={(value) => handleValueChange(agg.id, value)}
 							componentId={agg.id}
 							loader="Loading Items"
+							filterLabel={sentenceCase(
+								get(agg, 'dataField[0]', '').replace('.keyword', ''),
+							)}
 						/>
 					) : (
 						<DynamicRangeSlider
-							title={get(agg, 'dataField[0]', '').replace('.keyword', '')}
+							title={sentenceCase(
+								get(agg, 'dataField[0]', '').replace('.keyword', ''),
+							)}
 							renderNoResults={() =>
 								`No Data Found for ${get(agg, 'dataField[0]', '').replace(
 									'.keyword',
@@ -43,6 +59,9 @@ const Filter = (props) => {
 							loader="Loading Items"
 							componentId={agg.id}
 							dataField={get(agg, 'dataField[0]')}
+							filterLabel={sentenceCase(
+								get(agg, 'dataField[0]', '').replace('.keyword', ''),
+							)}
 						/>
 					)}
 				</Card>

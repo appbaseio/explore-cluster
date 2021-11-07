@@ -302,6 +302,14 @@ const generateSearchCode = ({ id: searchId, value, ...searchProps }) => {
 	).replace('div', 'DataSearch');
 };
 
+const sentenceCase = (text) => {
+	if (text) {
+		const result = text.replace(/([A-Z])/g, ' $1');
+		return result.charAt(0).toUpperCase() + result.slice(1);
+	}
+	return text;
+};
+
 const generateFiltersCode = (filtersWithProps) => {
 	if (filtersWithProps.length === 0) {
 		return '';
@@ -316,7 +324,8 @@ const generateFiltersCode = (filtersWithProps) => {
 					defaultValue={value || []}
 					dataField={get(dataField, '[0]', '')}
 					className="filter"
-					title={get(dataField, '[0]', '').replace('.keyword', '')}
+					title={sentenceCase(get(dataField, '[0]', '').replace('.keyword', ''))}
+					filterLabel={sentenceCase(get(dataField, '[0]', '').replace('.keyword', ''))}
 					componentId={id}
 				/>,
 				{
@@ -328,8 +337,9 @@ const generateFiltersCode = (filtersWithProps) => {
 				<div
 					dataField={get(dataField, '[0]', '')}
 					className="filter"
-					title={get(dataField, '[0]', '').replace('.keyword', '')}
+					title={sentenceCase(get(dataField, '[0]', '').replace('.keyword', ''))}
 					componentId={id}
+					filterLabel={sentenceCase(get(dataField, '[0]', '').replace('.keyword', ''))}
 				/>,
 				{
 					showFunctions: false,
