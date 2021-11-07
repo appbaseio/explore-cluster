@@ -42,6 +42,7 @@ class CustomizeFilter extends React.Component {
 	render() {
 		const { visible, filterType } = this.state;
 		const { buttonLabel, control, buttonProps, disableListOptions } = this.props;
+		console.log(control);
 		return (
 			<React.Fragment>
 				<Button {...buttonProps} onClick={this.showModal}>
@@ -86,7 +87,7 @@ class CustomizeFilter extends React.Component {
 										)
 									}
 								</FieldControl>
-								<FieldControl name="filterType">
+								<FieldControl name="filterType" label="Choose Type">
 									{(formControl) => (
 										<Item
 											actions={[
@@ -101,7 +102,6 @@ class CustomizeFilter extends React.Component {
 															.handler()
 															.onChange(e.target.value);
 													}}
-													value={filterType}
 												>
 													<Radio value="list">MultiList</Radio>
 													<Radio value="range">RangeSlider</Radio>
