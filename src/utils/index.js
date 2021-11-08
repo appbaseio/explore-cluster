@@ -136,6 +136,9 @@ export async function getCreateApp(options, authToken) {
 			settings: {
 				...options.settings,
 			},
+			mappings: {
+				...options.mappings,
+			},
 		}),
 		headers: {
 			'Content-Type': 'application/json',
