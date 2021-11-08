@@ -132,6 +132,14 @@ const onboardingStyles = css`
 		.content {
 			flex-grow: 1;
 			margin: 0 0 0 30px;
+			.dataset-container {
+				width: 100%;
+				margin-bottom: 15px;
+				display: flex;
+				&:hover {
+					cursor: pointer;
+				}
+			}
 		}
 	}
 	header {
@@ -467,6 +475,25 @@ const endScreenStyles = css`
 			justify-content: center;
 			h2 {
 				margin-top: 0px;
+			}
+		}
+	}
+	.header-card {
+		background-color: #c7f4ff;
+		color: #232e44;
+		width: 100%;
+		padding: 1%;
+		margin: 10px 0px;
+		.overflow-text {
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			background: white;
+			padding: 3px;
+		}
+		.icon-active {
+			&:hover {
+				color: blue;
 			}
 		}
 	}

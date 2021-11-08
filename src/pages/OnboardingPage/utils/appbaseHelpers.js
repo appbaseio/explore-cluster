@@ -2,8 +2,13 @@ import Appbase from 'appbase-js';
 import parser from 'url-parser-lite';
 
 import settings from './settings';
-import mappingObj from './moviesMapping';
-import moviesData from './data';
+import moviesMapping from './mappings/moviesData';
+import ecommMapping from './mappings/ecommData';
+import geoMapping from './mappings/geoData';
+import mData from './data';
+import moviesData from './dataSet/moviesData';
+import geoData from './dataSet/geoData';
+import ecommData from './dataSet/ecommData';
 import { getURL } from '../../../constants/config';
 
 const streamingData = {
@@ -155,7 +160,17 @@ class AppbaseUtils {
 		this.app = app;
 	};
 
-	updateMapping = () => {
+	handleMapping = (dataset) => {
+		if(dataset.name === 'Movies Dataset') {
+			return moviesMapping;
+		} else if(dataset.name === 'Products Dataset') {
+			return ecommMapping;
+		} else {
+			return geoMapping;
+		}
+	}
+
+	updateMapping = (dataset) => {
 		const type = '_doc';
 		this.app.type = type;
 
@@ -165,16 +180,27 @@ class AppbaseUtils {
 				Authorization: `Basic ${this.authToken}`,
 				'content-type': 'application/json',
 			},
-			body: JSON.stringify(mappingObj),
-		});
+			body: JSON.stringify(this.handleMapping(dataset)),
+		})
 	};
 
-	indexData = () => {
+	handleDataBase = (dataset) => {
+		if(dataset.name === 'Movies Dataset') {
+			return moviesData;
+		} else if(dataset.name === 'Products Dataset') {
+			return ecommData;
+		} else {
+			return geoData;
+		}
+	}
+
+	indexData = (dataset) => {
 		const finalData = [];
 		const indexObj = {
 			index: {},
 		};
-		moviesData.forEach((record) => {
+
+		this.handleDataBase(dataset).forEach((record) => {
 			finalData.push(indexObj);
 			finalData.push(record);
 		});

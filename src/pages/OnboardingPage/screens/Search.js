@@ -1,16 +1,32 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Select from 'react-select';
-
+import EcommSearchApp from './searchApp/ecommData';
+import GeoSearchApp from './searchApp/geoData';
+import MoviesSearchApp from './searchApp/moviesData';
 import SearchApp from './SearchApp';
 import Footer from '../components/Footer';
 
 export default class Search extends Component {
 	state = {
 		error: '',
+		options: [
+			{
+				value: 'original_title',
+				label: 'original_title',
+			},
+			{
+				value: 'overview',
+				label: 'overview',
+			},
+		],
 		// eslint-disable-next-line react/destructuring-assignment
 		selectedOption: this.props.searchFields.map((item) => ({ label: item, value: item })) || [],
 	};
+
+	componentDidMount() {
+		this.handleOptions();
+	}
 
 	setError = (e) => {
 		if (this.interval) clearInterval(this.interval);
@@ -41,17 +57,85 @@ export default class Search extends Component {
 	};
 
 	renderSearchApp = () => {
-		const { searchFields } = this.props;
-		return (
-			<div>
-				{this.renderSearchInput(true)}
-				<SearchApp fields={searchFields} />
-			</div>
-		);
+		const { searchFields, selectedDataset, app } = this.props;
+		if(selectedDataset === 'movies') {
+			return (
+				<div>
+					{this.renderSearchInput(true)}
+					<MoviesSearchApp fields={searchFields} app={app}/>
+				</div>
+			)
+		} else if(selectedDataset === 'products') {
+			return (
+				<div>
+					{this.renderSearchInput(true)}
+					<EcommSearchApp fields={searchFields} app={app}/>
+				</div>
+			)
+		} else if(selectedDataset === 'geo') {
+			return (
+				<div>
+					{this.renderSearchInput(true)}
+					<GeoSearchApp fields={searchFields} app={app}/>
+				</div>
+			)
+		} else {
+			return (
+				<div>
+					{this.renderSearchInput(true)}
+					<SearchApp fields={searchFields} />
+				</div>
+			);
+		}
+
 	};
 
+	handleOptions = () => {
+		const {selectedDataset} = this.props;
+		if(selectedDataset === 'movies') {
+			this.setState({
+				options: [
+					{
+						value: 'original_title',
+						label: 'original_title',
+					},
+					{
+						value: 'overview',
+						label: 'overview',
+					},
+				]
+			})
+		} else if(selectedDataset === 'products') {
+			this.setState({
+				options: [
+					{
+						value: 'product_name',
+						label: 'product_name',
+					},
+					{
+						value: 'description',
+						label: 'description',
+					},
+					{
+						value: 'categories',
+						label: 'categories',
+					}
+				]
+			})
+		} else {
+			this.setState({
+				options: [
+					{
+						value: 'place',
+						label: 'place',
+					}
+				]
+			})
+		}
+	}
+
 	renderSearchInput = (horizontal) => {
-		const { error, selectedOption } = this.state;
+		const { error, selectedOption, options } = this.state;
 		return (
 			<div
 				style={{ marginTop: 0 }}
@@ -74,16 +158,7 @@ export default class Search extends Component {
 						isClearable={false}
 						inputId="searchable-fields"
 						data-cy="search-field"
-						options={[
-							{
-								value: 'original_title',
-								label: 'original_title',
-							},
-							{
-								value: 'overview',
-								label: 'overview',
-							},
-						]}
+						options={options}
 					/>
 				</div>
 				{error && (
@@ -101,7 +176,7 @@ export default class Search extends Component {
 	};
 
 	render() {
-		const { nextScreen, searchFields, previousScreen } = this.props;
+		const { nextScreen, searchFields } = this.props;
 		return (
 			<div>
 				<div className="wrapper">
@@ -131,7 +206,6 @@ export default class Search extends Component {
 
 				<Footer
 					nextScreen={nextScreen}
-					previousScreen={previousScreen}
 					disabled={!searchFields.length}
 				/>
 			</div>
@@ -142,12 +216,13 @@ export default class Search extends Component {
 Search.propTypes = {
 	nextScreen: PropTypes.func,
 	searchFields: PropTypes.array,
-	previousScreen: PropTypes.func,
 	setSearchFields: PropTypes.func.isRequired,
+	selectedDataset: PropTypes.string,
+	app: PropTypes.string.isRequired,
 };
 
 Search.defaultProps = {
 	nextScreen: null,
 	searchFields: [],
-	previousScreen: null,
+	selectedDataset: 'movies'
 };

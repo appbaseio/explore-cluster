@@ -1,9 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Icon } from 'antd';
 import parser from 'url-parser-lite';
-
 import Footer from '../components/Footer';
 import Loader from '../components/Loader';
 import appbaseHelpers from '../utils/appbaseHelpers';
@@ -136,91 +134,85 @@ export default class Introduction extends Component {
 		});
 	};
 
-	renderImportContent = () => (
-		<div>
-			<div className="wrapper">
-				<div>
-					<img src="/static/images/onboarding/Import.svg" alt="importing data" />
-				</div>
-				<div className="content">
-					<header className="vcenter">
-						<h2>Import data into your app</h2>
-					</header>
+	renderImportContent = () => {
+		const { nextScreen } = this.props;
+		return (
+			<div>
+				<div className="wrapper">
 					<div>
-						<h3>There are three ways to bring your data into appbase.io:</h3>
+						<img src="/static/images/onboarding/Import.svg" alt="importing data" />
+					</div>
+					<div className="content">
+						<header className="vcenter">
+							<h2>Import data into your app</h2>
+						</header>
+						<div>
+							<h3>There are three ways to bring your data into appbase.io:</h3>
 
-						<div className="feature-list">
-							<div>
-								<div style={{ display: 'block' }}>
-									<img
-										src="/static/images/onboarding/Dashboard.png"
-										srcSet="/static/images/onboarding/Dashboard.png 110w, /static/images/onboarding/Dashboard@2x.png 220w"
-										alt="Dashboard"
-									/>
+							<div className="feature-list">
+								<div>
+									<div style={{ display: 'block' }}>
+										<img
+											src="/static/images/onboarding/Dashboard.png"
+											srcSet="/static/images/onboarding/Dashboard.png 110w, /static/images/onboarding/Dashboard@2x.png 220w"
+											alt="Dashboard"
+										/>
+									</div>
+									<p>
+										Dashboard offers a GUI for importing JSON/CSV files when
+										creating a new app.
+									</p>
 								</div>
-								<p>
-									Dashboard offers a GUI for importing JSON/CSV files when
-									creating a new app.
-								</p>
-							</div>
-							<div>
-								<div style={{ display: 'block' }}>
-									<img
-										src="/static/images/onboarding/CLI.png"
-										srcSet="/static/images/onboarding/CLI.png 110w, /static/images/onboarding/CLI@2x.png 220w"
-										alt="CLI"
-									/>
+								<div>
+									<div style={{ display: 'block' }}>
+										<img
+											src="/static/images/onboarding/CLI.png"
+											srcSet="/static/images/onboarding/CLI.png 110w, /static/images/onboarding/CLI@2x.png 220w"
+											alt="CLI"
+										/>
+									</div>
+									<p>
+										<a
+											className="dashed"
+											href="https://github.com/appbaseio/abc"
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											CLI
+										</a>{' '}
+										syncs data from popular database and file formats like
+										MongoDB, MySQL, PostgreSQL, SQLServer, Kafka, JSON and CSV.
+									</p>
 								</div>
-								<p>
-									<a
-										className="dashed"
-										href="https://github.com/appbaseio/abc"
-										target="_blank"
-										rel="noopener noreferrer"
-									>
-										CLI
-									</a>{' '}
-									syncs data from popular database and file formats like MongoDB,
-									MySQL, PostgreSQL, SQLServer, Kafka, JSON and CSV.
-								</p>
-							</div>
-							<div>
-								<div style={{ display: 'block' }}>
-									<img
-										src="/static/images/onboarding/REST.png"
-										srcSet="/static/images/onboarding/REST.png 110w, /static/images/onboarding/REST@2x.png 220w"
-										alt="REST API"
-									/>
+								<div>
+									<div style={{ display: 'block' }}>
+										<img
+											src="/static/images/onboarding/REST.png"
+											srcSet="/static/images/onboarding/REST.png 110w, /static/images/onboarding/REST@2x.png 220w"
+											alt="REST API"
+										/>
+									</div>
+									<p>
+										<a
+											className="dashed"
+											href="https://rest.appbase.io"
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											REST based APIs
+										</a>{' '}
+										enable indexing data in a programming language of your
+										choice.
+									</p>
 								</div>
-								<p>
-									<a
-										className="dashed"
-										href="https://rest.appbase.io"
-										target="_blank"
-										rel="noopener noreferrer"
-									>
-										REST based APIs
-									</a>{' '}
-									enable indexing data in a programming language of your choice.
-								</p>
 							</div>
 						</div>
 					</div>
 				</div>
+				<Footer nextScreen={nextScreen} />
 			</div>
-			<footer>
-				<div className="left-column">
-					<a
-						className="button has-icon"
-						data-cy="submit-data-import"
-						onClick={this.nextLayout}
-					>
-						Next &nbsp; <Icon type="right" theme="outlined" />
-					</a>
-				</div>
-			</footer>
-		</div>
-	);
+		);
+	};
 
 	render() {
 		const { url, loading, layout, status } = this.state;
