@@ -6,9 +6,7 @@ import { css } from 'react-emotion';
 import PropTypes from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import Grid from '../../../components/CreateCredentials/Grid';
-import {
-	setLocalRelevancyState,
-} from '../../../batteries/modules/actions';
+import { setLocalRelevancyState } from '../../../batteries/modules/actions';
 import { suggestionsMessages as Messages } from '../../../utils/messages';
 import styles from '../styles';
 import Footer from '../Footer';
@@ -52,26 +50,29 @@ class PreferenceForm extends React.Component {
 		};
 	}
 
-	handleChange = (key, value, dataKey) => { // eslint-disable-line
+	handleChange = (key, value) => {
+		// eslint-disable-line
 		const { recentSuggestions } = this.state;
 		const newRecentSuggestions = {
 			...recentSuggestions,
 			[key]: value,
-		}
+		};
 		this.setState({
-			recentSuggestions: newRecentSuggestions
-		})
+			recentSuggestions: newRecentSuggestions,
+		});
 	};
 
 	render() {
-		const { control, indices , initialData } = this.props;
+		const { control, indices, initialData } = this.props;
 		const { recentSuggestions } = this.state;
 
 		return (
 			<FieldGroup
 				control={control}
 				strict={false}
-				render={({ invalid: invalidForm }) => (
+				render={(
+					{ invalid: invalidForm }, // eslint-disable-line
+				) => (
 					<div css={modal}>
 						<FieldControl
 							name="minHits"
@@ -81,9 +82,7 @@ class PreferenceForm extends React.Component {
 										<p css={styles.labelContainer}>
 											Min Hits
 											<Popover
-												content={content(
-													Messages.minHits,
-												)}
+												content={content(Messages.minHits)}
 												css={styles.iconContainer}
 											>
 												<Icon type="info-circle" />
@@ -99,7 +98,7 @@ class PreferenceForm extends React.Component {
 											value={value}
 											placeholder="Enter min Hits"
 											onChange={(e) => {
-												this.handleChange('minHits', e.target.value, 'recentSuggestions')
+												this.handleChange('minHits', e.target.value);
 												handler().onChange(e.target.value);
 											}}
 										/>
@@ -115,9 +114,7 @@ class PreferenceForm extends React.Component {
 										<p css={styles.labelContainer}>
 											Size
 											<Popover
-												content={content(
-													Messages.recentSize,
-												)}
+												content={content(Messages.recentSize)}
 												css={styles.iconContainer}
 											>
 												<Icon type="info-circle" />
@@ -133,7 +130,7 @@ class PreferenceForm extends React.Component {
 											type="number"
 											placeholder="Enter min count"
 											onChange={(e) => {
-												this.handleChange('size', e.target.value, 'recentSuggestions')
+												this.handleChange('size', e.target.value);
 												handler().onChange(e.target.value);
 											}}
 										/>
@@ -149,9 +146,7 @@ class PreferenceForm extends React.Component {
 										<p css={styles.labelContainer}>
 											Min Characters
 											<Popover
-												content={content(
-													Messages.minChars,
-												)}
+												content={content(Messages.minChars)}
 												css={styles.iconContainer}
 											>
 												<Icon type="info-circle" />
@@ -167,7 +162,7 @@ class PreferenceForm extends React.Component {
 											type="number"
 											placeholder="Enter min chars"
 											onChange={(e) => {
-												this.handleChange('minChars', e.target.value, 'recentSuggestions')
+												this.handleChange('minChars', e.target.value);
 												handler().onChange(e.target.value);
 											}}
 										/>
@@ -203,7 +198,7 @@ class PreferenceForm extends React.Component {
 												{...inputHandler}
 												onChange={(val) => {
 													inputHandler.onChange(calculateValue(val));
-													this.handleChange('indices', val, 'recentSuggestions')
+													this.handleChange('indices', val);
 												}}
 											>
 												<Select.Option value="*">All (*)</Select.Option>
@@ -222,7 +217,7 @@ class PreferenceForm extends React.Component {
 						/>
 						<Footer
 							originalData={initialData}
-							tab='recent-suggestions'
+							tab="recent-suggestions"
 							changedData={recentSuggestions}
 						/>
 					</div>
@@ -251,7 +246,7 @@ const mapStateToProps = (state) => {
 		appName,
 		apps: get(state, 'apps.data'),
 		localRelevancy: get(state, ['$getLocalRelevancy', appName], null),
-	}
+	};
 };
 
 const mapDispatchToProps = (dispatch) => ({

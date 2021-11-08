@@ -20,7 +20,7 @@ import Flex from '../../../batteries/components/shared/Flex';
 import ErrorToaster from '../../../batteries/components/shared/ErrorToaster';
 import { event, timingEvent } from '../../../utils/gtag';
 import moment from '../../../utils/moment';
-import { PreferenceFormContext  } from '../IndexSuggestions';
+import { PreferenceFormContext } from '../IndexSuggestions';
 
 const main = css`
 	.actionBtn {
@@ -46,8 +46,7 @@ class PopularSuggestions extends React.Component {
 			indices: props.apps
 				? Object.keys(props.apps)
 						.sort()
-						.filter((i) => !i.startsWith('.') && !i.startsWith('metricbeat')
-						)
+						.filter((i) => !i.startsWith('.') && !i.startsWith('metricbeat'))
 				: [],
 			total: undefined,
 			initialData: {},
@@ -74,7 +73,7 @@ class PopularSuggestions extends React.Component {
 			value: null,
 		});
 
-		const {tier, featureSuggestions} = this.props;
+		const { tier, featureSuggestions } = this.props;
 
 		if (isValidPlan(tier, featureSuggestions)) {
 			this.fetchPreferences();
@@ -104,18 +103,18 @@ class PopularSuggestions extends React.Component {
 				})
 				.catch((err) => console.error(err));
 		}
-
 	}
 
 	componentDidUpdate(prevProps) {
 		const { errors, apps } = this.props;
 		displayErrors(errors, prevProps.errors, true);
-		if(prevProps.apps !== apps) {
-			this.setState({ //eslint-disable-line
+		if (prevProps.apps !== apps) {
+			// eslint-disable-next-line react/no-did-update-set-state
+			this.setState({
 				indices: Object.keys(apps)
-						.sort()
-						.filter((i) => !i.startsWith('.') && !i.startsWith('metricbeat'))
-			})
+					.sort()
+					.filter((i) => !i.startsWith('.') && !i.startsWith('metricbeat')),
+			});
 		}
 	}
 
@@ -159,7 +158,7 @@ class PopularSuggestions extends React.Component {
 						size: parseInt(payload.size, 10),
 						indices: payload.indices || ['*'],
 						transformDiacritics: payload.transformDiacritics,
-					}
+					},
 				});
 			} else {
 				this.setState({
@@ -173,17 +172,17 @@ class PopularSuggestions extends React.Component {
 						size: 0,
 						indices: ['*'],
 						transformDiacritics: false,
-					}
+					},
 				});
 			}
 		});
-	}
+	};
 
 	handleSaveTemplate = (obj = '') => {
 		try {
 			const { savePreferences } = this.props;
 			let payload;
-			if(obj) {
+			if (obj) {
 				payload = {
 					numberOfDays: 30,
 				};
@@ -228,7 +227,7 @@ class PopularSuggestions extends React.Component {
 			<React.Fragment>
 				<PreferenceFormContext.Provider
 					value={{
-						value: "popular",
+						value: 'popular',
 						saveTemplate: this.handleSaveTemplate,
 					}}
 				>
@@ -262,16 +261,13 @@ class PopularSuggestions extends React.Component {
 							</>
 						)}
 						<ErrorToaster>
-							{
-								Object.keys(initialData).length > 0 && (
-									<PreferenceForm
-										indices={indices}
-										control={this.form}
-										initialData={initialData}
-									/>
-								)
-							}
-
+							{Object.keys(initialData).length > 0 && (
+								<PreferenceForm
+									indices={indices}
+									control={this.form}
+									initialData={initialData}
+								/>
+							)}
 						</ErrorToaster>
 					</Container>
 				</PreferenceFormContext.Provider>
