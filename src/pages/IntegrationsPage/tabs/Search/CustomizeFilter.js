@@ -42,7 +42,6 @@ class CustomizeFilter extends React.Component {
 	render() {
 		const { visible, filterType } = this.state;
 		const { buttonLabel, control, buttonProps, disableListOptions } = this.props;
-		console.log(control);
 		return (
 			<React.Fragment>
 				<Button {...buttonProps} onClick={this.showModal}>
@@ -88,29 +87,35 @@ class CustomizeFilter extends React.Component {
 									}
 								</FieldControl>
 								<FieldControl name="filterType">
-									{(formControl) => (
-										<Item
-											actions={[
-												<Radio.Group
-													{...formControl.handler()}
-													onChange={(e) => {
-														this.setState({
-															filterType: e.target.value,
-														});
-														formControl.markAsTouched();
-														formControl
-															.handler()
-															.onChange(e.target.value);
-													}}
-												>
-													<Radio value="list">List</Radio>
-													<Radio value="range">Range</Radio>
-												</Radio.Group>,
-											]}
-										>
-											<Item.Meta title="Display Filter As" />
-										</Item>
-									)}
+									{(formControl) => {
+										this.setState({
+											filterType: formControl.handler().value,
+										});
+										// console.log(formControl.handler());
+										return (
+											<Item
+												actions={[
+													<Radio.Group
+														{...formControl.handler()}
+														onChange={(e) => {
+															this.setState({
+																filterType: e.target.value,
+															});
+															formControl.markAsTouched();
+															formControl
+																.handler()
+																.onChange(e.target.value);
+														}}
+													>
+														<Radio value="list">List</Radio>
+														<Radio value="range">Range</Radio>
+													</Radio.Group>,
+												]}
+											>
+												<Item.Meta title="Display Filter As" />
+											</Item>
+										);
+									}}
 								</FieldControl>
 								<TextInput
 									name="title"
