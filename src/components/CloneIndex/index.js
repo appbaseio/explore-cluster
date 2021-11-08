@@ -132,7 +132,7 @@ const CloneIndex = (props) => {
 			okText="Clone"
 			confirmLoading={loading}
 			okButtonProps={{
-				disabled: !destIndex || exists || isEmpty(action),
+				disabled: !destIndex || isEmpty(action),
 				'data-cy': 'clone-button',
 			}}
 		>
@@ -145,12 +145,12 @@ const CloneIndex = (props) => {
 				</Col>
 				<Col span={16}>
 					<Form.Item
-						validateStatus={exists ? 'error' : null}
 						help={exists ? 'An index with that name already exists' : ''}
 						style={{ marginBottom: 0 }}
 					>
 						<Input
 							value={destIndex}
+							// eslint-disable-next-line react/jsx-no-bind
 							onChange={handleInputChange}
 							placeholder="Destination Index"
 							data-cy="destination-index-name"
