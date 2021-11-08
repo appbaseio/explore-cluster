@@ -44,12 +44,13 @@ class Result extends React.Component {
 	};
 
 	titleCase = (str) => {
-		let sentence = str. toLowerCase(). split("_");
-		for (let i = 0; i < sentence. length; i++) {
-		sentence[i] = sentence[i][0]. toUpperCase() + sentence[i]. slice(1);
+		const sentence = str.toLowerCase().split('_');
+		// eslint-disable-next-line
+		for (let i = 0; i < sentence.length; i++) {
+			sentence[i] = sentence[i][0].toUpperCase() + sentence[i].slice(1);
 		}
-		return sentence. join(" ");
-	}
+		return sentence.join(' ');
+	};
 
 	render() {
 		const {
@@ -67,7 +68,7 @@ class Result extends React.Component {
 		let ruleData;
 		const id = window?.window.location.pathname.split('/')[3];
 		if (id) {
-			ruleData = rules.find((rule) => rule.id === id) || {};
+			ruleData = rules?.find((rule) => rule.id === id) || {};
 		}
 		return (
 			<Card>
@@ -76,7 +77,7 @@ class Result extends React.Component {
 					componentIds={['result']}
 					render={({ searchState }) => {
 						const rulesApplied = get(searchState, 'result.settings.queryRules', []);
-						if(page === 'rules' && id && withRule) {
+						if (page === 'rules' && id && withRule) {
 							return (
 								<Alert
 									type="info"
@@ -95,7 +96,10 @@ class Result extends React.Component {
 												<div>
 													{get(ruleData, 'actions', []).map((action) => (
 														<div key={action.type} className={section}>
-															<ActionView action={action} ruleId={ruleData.id} />
+															<ActionView
+																action={action}
+																ruleId={ruleData.id}
+															/>
 														</div>
 													))}
 												</div>
@@ -103,8 +107,9 @@ class Result extends React.Component {
 										</React.Fragment>
 									}
 								/>
-							)
-						} else if(rulesApplied.length) {
+							);
+						}
+						if (rulesApplied.length) {
 							return (
 								<Alert
 									type="info"
@@ -113,8 +118,7 @@ class Result extends React.Component {
 									message={
 										<React.Fragment>
 											<Typography.Text>
-												Query{' '}
-												{rulesApplied.length > 1 ? 'rules' : 'rule'}{' '}
+												Query {rulesApplied.length > 1 ? 'rules' : 'rule'}{' '}
 												applied
 											</Typography.Text>
 											{rulesApplied.map((rule) => {
@@ -125,20 +129,15 @@ class Result extends React.Component {
 												return (
 													<div className={ruleStyle}>
 														<div>
-															<p className="name">
-																{ruleInfo.name}
-															</p>
+															<p className="name">{ruleInfo.name}</p>
 															<p className="expression">
 																{ruleInfo &&
 																	ruleInfo.trigger &&
-																	ruleInfo.trigger
-																		.expression}
+																	ruleInfo.trigger.expression}
 															</p>
 														</div>
 														<div>
-															<Link
-																to={`/cluster/rules/${rule}`}
-															>
+															<Link to={`/cluster/rules/${rule}`}>
 																<Button size="small">
 																	Edit Rule
 																</Button>
@@ -150,7 +149,7 @@ class Result extends React.Component {
 										</React.Fragment>
 									}
 								/>
-							)
+							);
 						}
 						return null;
 					}}
