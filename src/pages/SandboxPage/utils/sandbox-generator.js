@@ -314,6 +314,13 @@ const generateFiltersCode = (filtersWithProps) => {
 	if (filtersWithProps.length === 0) {
 		return '';
 	}
+	const listArr = ['search'];
+	filtersWithProps.forEach((filter) => {
+		if (filter.type === 'term') {
+			listArr.push(filter.id);
+		}
+	});
+	console.log(listArr);
 
 	return filtersWithProps.reduce((agg, { id, value, type, dataField, ...filter }) => {
 		let listCode = '';
@@ -327,6 +334,7 @@ const generateFiltersCode = (filtersWithProps) => {
 					title={sentenceCase(get(dataField, '[0]', '').replace('.keyword', ''))}
 					filterLabel={sentenceCase(get(dataField, '[0]', '').replace('.keyword', ''))}
 					componentId={id}
+					react={{ and: listArr.filter((i) => i !== id) }}
 				/>,
 				{
 					showFunctions: false,
