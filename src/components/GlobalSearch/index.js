@@ -21,25 +21,25 @@ class GlobalSearch extends PureComponent {
 		searchValue: '',
 	};
 
-	handleSearchValueChange = (searchValue) => {
-		this.setState({
-			searchValue,
-		});
-	};
-
 	componentDidMount() {
-		const { app, getSettingsAction } = this.props;
-		if (app) {
+		const { app, getSettingsAction, avoidApi } = this.props;
+		if (app && !avoidApi) {
 			getSettingsAction(app);
 		}
 	}
 
 	componentDidUpdate(prevProps) {
-		if (this.props.app != prevProps.app) {
-			const { app, getSettingsAction } = this.props;
+		const { app, getSettingsAction } = this.props;
+		if (app !== prevProps.app) {
 			getSettingsAction(app);
 		}
 	}
+
+	handleSearchValueChange = (searchValue) => {
+		this.setState({
+			searchValue,
+		});
+	};
 
 	render() {
 		const {
@@ -64,7 +64,7 @@ class GlobalSearch extends PureComponent {
 							height: 34px !important;
 						`} ${className}`,
 						list: css`
-							top: 34px !important;
+							top: 42px !important;
 							font-size: 0.8rem !important;
 							border-radius: 5px !important;
 							max-height: 420px !important;
@@ -105,8 +105,9 @@ GlobalSearch.propTypes = {
 	onValueSelected: PropTypes.func,
 	getSettingsAction: PropTypes.func.isRequired,
 	app: PropTypes.string,
-	dataFieldSettings: PropTypes.array,
+	dataFieldSettings: PropTypes.array.isRequired,
 	subprops: PropTypes.object,
+	avoidApi: PropTypes.bool,
 };
 
 const noop = () => {};
@@ -115,6 +116,8 @@ GlobalSearch.defaultProps = {
 	onKeyDown: noop,
 	onValueSelected: noop,
 	subprops: {},
+	avoidApi: false,
+	app: '',
 };
 
 const mapStateToProps = (state, props) => ({
@@ -131,4 +134,6 @@ const mapDispatchToProps = (dispatch) => ({
 	getSettingsAction: (name) => dispatch(getSearchSettings(name)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(GlobalSearch);
+const GlobalSearchWrapper = connect(mapStateToProps, mapDispatchToProps)(GlobalSearch);
+
+export default React.forwardRef((props, ref) => <GlobalSearchWrapper innerRef={ref} {...props} />);

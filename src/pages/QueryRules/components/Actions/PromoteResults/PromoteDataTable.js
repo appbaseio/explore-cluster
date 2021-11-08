@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { css } from 'emotion';
-import { Icon, Popover, List, Row, Col, Tooltip } from 'antd';
+import { Icon, Popover, List, Row, Col, Tooltip, Input } from 'antd';
 import { Draggable } from 'react-beautiful-dnd';
 import get from 'lodash/get';
 import JsonView from '../../../../../components/JsonView';
@@ -32,7 +32,7 @@ function getItemStyle(isDragging, draggableStyle) {
 
 const overflow = { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
 
-export default function PromoteDataTable({ dataSource, handleDelete }) {
+export default function PromoteDataTable({ dataSource, handleDelete, onChange }) {
 	return (
 		<List
 			size="small"
@@ -43,7 +43,12 @@ export default function PromoteDataTable({ dataSource, handleDelete }) {
 				item1.position > item2.position ? 1 : -1,
 			)}
 			renderItem={(item, index) => (
-				<RowData item={item} index={index} handleDelete={handleDelete} />
+				<RowData
+					item={item}
+					index={index}
+					handleDelete={handleDelete}
+					onChange={onChange}
+				/>
 			)}
 		/>
 	);
@@ -52,12 +57,15 @@ export default function PromoteDataTable({ dataSource, handleDelete }) {
 PromoteDataTable.propTypes = {
 	dataSource: PropTypes.array,
 	handleDelete: PropTypes.func.isRequired,
+	onChange: PropTypes.func.isRequired,
 };
 
 PromoteDataTable.defaultProps = {
 	dataSource: [],
 };
-function PromoteJSONView({ record }) {
+function PromoteJSONView({ record, isEdit, onChange }) {
+	const displayData = get(record, 'doc._suggestion_display_value') || get(record, 'doc._id');
+
 	return (
 		<>
 			<Popover
@@ -68,17 +76,32 @@ function PromoteJSONView({ record }) {
 				}
 				trigger="click"
 			>
-				<div
-					css={{
-						cursor: 'pointer',
-						margin: '0 7px',
-						maxWidth: '95%',
-						...overflow,
-					}}
-				>
-					{` {...} `}
-					{get(record, 'doc._suggestion_display_value') || get(record, 'doc._id')}
-				</div>
+				{isEdit ? (
+					<div style={{ display: 'flex', alignItems: 'center' }}>
+						<Input
+							style={{ width: '100%', marginBottom: 0 }}
+							value={displayData}
+							onChange={(e) => {
+								onChange(
+									{ _suggestion_display_value: e.target.value },
+									record.position,
+								);
+							}}
+						/>
+					</div>
+				) : (
+					<div
+						css={{
+							cursor: 'pointer',
+							margin: '0 7px',
+							maxWidth: '95%',
+							...overflow,
+						}}
+					>
+						{` {...} `}
+						{displayData}
+					</div>
+				)}
 			</Popover>
 		</>
 	);
@@ -86,35 +109,58 @@ function PromoteJSONView({ record }) {
 
 PromoteJSONView.propTypes = {
 	record: PropTypes.object,
+	isEdit: PropTypes.bool,
+	onChange: PropTypes.func.isRequired,
 };
 
 PromoteJSONView.defaultProps = {
 	record: {},
+	isEdit: false,
 };
 
-function PromoteActions({ onClick }) {
+function PromoteActions({ onDelete, onEdit }) {
+	const [isEdit, setIsEdit] = useState(false);
+
+	function handleEditChange() {
+		onEdit(!isEdit);
+		setIsEdit(!isEdit);
+	}
+
 	return (
-		<Icon
+		<div
 			style={{
-				color: '#ff4d4f',
 				cursor: 'pointer',
-				marginLeft: '40%',
+				display: 'flex',
+				justifyContent: 'center',
+				gap: '10%',
 			}}
-			type="delete"
-			onClick={onClick}
-		/>
+		>
+			{isEdit ? (
+				<Icon type="check-circle" theme="twoTone" onClick={handleEditChange} />
+			) : (
+				<Icon type="edit" theme="twoTone" onClick={handleEditChange} />
+			)}
+			<Icon
+				style={{
+					color: '#ff4d4f',
+				}}
+				type="delete"
+				onClick={onDelete}
+			/>
+		</div>
 	);
 }
 
 PromoteActions.propTypes = {
-	onClick: PropTypes.func.isRequired,
+	onDelete: PropTypes.func.isRequired,
+	onEdit: PropTypes.func.isRequired,
 };
 
 function HeaderData() {
 	return (
 		<Row gutter={[16, 2]}>
 			<Col span={4}>Position</Col>
-			<Col span={16}>
+			<Col span={10}>
 				<Popover
 					content={
 						<div css={popoverContent}>
@@ -133,13 +179,18 @@ function HeaderData() {
 					</span>
 				</Popover>
 			</Col>
+			<Col span={6}>URL</Col>
 			<Col span={4}>Action</Col>
 		</Row>
 	);
 }
 
-function RowData({ item, index, handleDelete }) {
+function RowData({ item, index, handleDelete, onChange }) {
+	const [isEdit, setIsEdit] = useState(false);
 	const { position, doc } = item;
+
+	const url = get(item, 'doc._suggestion_url') || '';
+
 	return (
 		<Draggable key={doc._id} draggableId={doc._id} index={index}>
 			{(provided, snapshot) => (
@@ -160,11 +211,40 @@ function RowData({ item, index, handleDelete }) {
 										</Tooltip>
 									</Col>
 									<Col xs={3}>{position}</Col>
-									<Col xs={16}>
-										<PromoteJSONView record={item} />
+									<Col xs={10}>
+										<PromoteJSONView
+											record={item}
+											isEdit={isEdit}
+											onChange={onChange}
+										/>
+									</Col>
+									<Col xs={6}>
+										{isEdit ? (
+											<div style={{ display: 'flex', alignItems: 'center' }}>
+												<Input
+													style={{ width: '100%', marginBottom: 0 }}
+													value={url}
+													onChange={(e) => {
+														// handleUrlChange(e.target.value);
+														onChange(
+															{ _suggestion_url: e.target.value },
+															position,
+														);
+													}}
+												/>
+											</div>
+										) : (
+											<div css={{ maxWidth: '95%', ...overflow }}>{url}</div>
+										)}
 									</Col>
 									<Col xs={4}>
-										<PromoteActions onClick={() => handleDelete(position)} />
+										<PromoteActions
+											position={position}
+											onDelete={() => handleDelete(position)}
+											onEdit={(status) => {
+												setIsEdit(status);
+											}}
+										/>
 									</Col>
 								</List.Item>
 							</div>
@@ -180,6 +260,7 @@ RowData.propTypes = {
 	item: PropTypes.object,
 	index: PropTypes.number.isRequired,
 	handleDelete: PropTypes.func.isRequired,
+	onChange: PropTypes.func.isRequired,
 };
 
 RowData.defaultProps = {

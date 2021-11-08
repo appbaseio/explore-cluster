@@ -43,7 +43,7 @@ class PromoteResults extends Component {
 			...dataSource,
 			{
 				position: dataSource.length + 1,
-				doc: { ...suggestionSource, _suggestion_display_value: selectedSuggestion },
+				doc: { ...suggestionSource, _suggestion_display_value: selectedSuggestion, _suggestion_url: '' },
 			},
 		];
 		this.setState({ dataSource: newData }, this.updateResults);
@@ -85,7 +85,7 @@ class PromoteResults extends Component {
 
 	clearSearch() {
 		if (this.globalSearchRef) {
-			this.globalSearchRef.current.handleSearchValueChange('');
+			this.globalSearchRef.current?.handleSearchValueChange('');
 		}
 	}
 
@@ -108,6 +108,7 @@ class PromoteResults extends Component {
 						dataFields={(dataFields || []).map((field) =>
 							field.replace(/.keyword/g, ''),
 						)}
+						// avoidApi
 						subprops={{ enablePredictiveSuggestions: true }}
 						app={app}
 						ref={this.globalSearchRef}
@@ -128,6 +129,21 @@ class PromoteResults extends Component {
 								<PromoteDataTable
 									handleDelete={this.handleDelete}
 									dataSource={dataSource}
+									onChange={(data, position) => {
+
+										const newDataSource = [...dataSource];
+
+										const doc = {
+											...newDataSource[position - 1].doc,
+											...data,
+										};
+										newDataSource[position-1] = {
+											...newDataSource[position-1],
+											doc: { ...doc}
+										};
+
+										this.setState({ dataSource: newDataSource }, this.updateResults);
+									}}
 								/>
 								{provided.placeholder}
 							</div>

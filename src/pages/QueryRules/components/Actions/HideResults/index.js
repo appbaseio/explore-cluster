@@ -51,7 +51,7 @@ class HideResults extends Component {
 
 	clearSearch() {
 		if (this.globalSearchRef) {
-			this.globalSearchRef.current.handleSearchValueChange('');
+			this.globalSearchRef.current?.handleSearchValueChange('');
 		}
 	}
 
@@ -66,6 +66,7 @@ class HideResults extends Component {
 					url={getURL()}
 					credentials={atob(sessionStorage.getItem('authToken'))}
 					style={{ marginBottom: 12 }}
+					enableAppbase
 				>
 					<GlobalSearch
 						indexes={indexes}
@@ -73,6 +74,7 @@ class HideResults extends Component {
 						dataFields={(dataFields || []).map((field) =>
 							field.replace(/.keyword/g, ''),
 						)}
+						avoidApi
 						app={app}
 						ref={this.globalSearchRef}
 						// onKeyDown={this.handleAdd}
