@@ -559,7 +559,7 @@ export const applyLanguageMapping = (mappings, language) => {
 		analyzer: 'synonyms',
 		type: 'text',
 	};
-	const updatedMappings = Object.keys(mappings).reduce((agg, field) => {
+	const updatedMappings = Object.keys(mappings || {}).reduce((agg, field) => {
 		const fieldVal = { ...get(mappings, field) };
 		let updatedData = { ...agg };
 		const type = get(fieldVal, 'type', ``);
