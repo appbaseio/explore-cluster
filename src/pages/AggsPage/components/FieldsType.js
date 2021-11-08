@@ -142,7 +142,7 @@ const FieldType = ({ handleFieldType, handleDelete, fieldTypes, updateToAggsFiel
 								})
 							}
 						>
-							<Option value="term">Term</Option>
+							{!isRangeType(typeVal) ? <Option value="term">Term</Option> : null}
 							{isRangeType(typeVal) ? <Option value="range">Range</Option> : null}
 						</Select>
 					)}
