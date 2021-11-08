@@ -87,7 +87,7 @@ class CustomizeFilter extends React.Component {
 										)
 									}
 								</FieldControl>
-								<FieldControl name="filterType" label="Choose Type">
+								<FieldControl name="filterType">
 									{(formControl) => (
 										<Item
 											actions={[
@@ -103,12 +103,12 @@ class CustomizeFilter extends React.Component {
 															.onChange(e.target.value);
 													}}
 												>
-													<Radio value="list">MultiList</Radio>
-													<Radio value="range">RangeSlider</Radio>
+													<Radio value="list">List</Radio>
+													<Radio value="range">Range</Radio>
 												</Radio.Group>,
 											]}
 										>
-											<Item.Meta title="Choose Type" />
+											<Item.Meta title="Display Filter As" />
 										</Item>
 									)}
 								</FieldControl>
@@ -246,14 +246,6 @@ class CustomizeFilter extends React.Component {
 												</Form.Item>
 											)}
 										</FieldControl>
-										<TextInput
-											name="interval"
-											label="Interval"
-											inputProps={{
-												placeholder: 'Enter interval',
-												type: 'number',
-											}}
-										/>
 										<TextInput
 											name="filterLabel"
 											label="Filter Label"
