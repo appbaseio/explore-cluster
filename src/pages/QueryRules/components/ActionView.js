@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { css } from 'emotion';
 import { Tag, Typography, Popover } from 'antd';
 import { hasValuesChanged } from '../utils';
+import JsonView from '../../../components/JsonView';
 
 const subTitle = css`
 	font-size: 14px;
@@ -10,6 +11,16 @@ const subTitle = css`
 	color: rgba(0, 0, 0, 0.75);
 	font-weight: bold;
 `;
+
+const popoverContent = css`
+	overflow-y: auto;
+	overflow-x: auto;
+	word-wrap: break-word;
+	max-width: 300px;
+	max-height: 300px;
+`;
+
+const overflow = { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
 
 const { Text } = Typography;
 
@@ -47,7 +58,27 @@ class ActionView extends React.Component {
 						<h4 className={subTitle}>Promote Result</h4>
 						{action.data.map((item) => (
 							<Tag color="blue" key={`${ruleId}-${item.doc._id}`}>
-								{item.doc._suggestion_display_value || item.doc._id}
+								{/* promotedData */}
+								<Popover
+									content={
+										<div css={popoverContent}>
+											<JsonView json={item.doc} />
+										</div>
+									}
+									trigger="click"
+								>
+									<div
+										css={{
+											cursor: 'pointer',
+											margin: '0 7px',
+											maxWidth: '95%',
+											...overflow,
+										}}
+									>
+										{` {...} `}
+										{item.doc._suggestion_display_value || item.doc._id}
+									</div>
+								</Popover>
 							</Tag>
 						))}
 					</React.Fragment>
