@@ -304,8 +304,11 @@ const generateSearchCode = ({ id: searchId, value, ...searchProps }) => {
 
 const sentenceCase = (text) => {
 	if (text) {
-		const result = text.replace(/([A-Z])/g, ' $1');
-		return result.charAt(0).toUpperCase() + result.slice(1);
+		return text.replace(/(?:_| |\b)(\w)/g, function ($1) {
+			return $1.toUpperCase().replace('_', ' ');
+		});
+		// const result = text.replace(/([A-Z])/g, ' $1');
+		// return result.charAt(0).toUpperCase() + result.slice(1);
 	}
 	return text;
 };
