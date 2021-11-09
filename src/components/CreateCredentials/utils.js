@@ -1,6 +1,7 @@
 import isEqual from 'lodash/isEqual';
 import sortBy from 'lodash/sortBy';
 import get from 'lodash/get';
+import isCidr from 'is-cidr';
 import filter from 'lodash/filter';
 import find from 'lodash/find';
 import { getDefaultAllowedActions } from '../../utils/allowedActions';
@@ -45,20 +46,7 @@ export const getSuggestionCode = (str) => {
 	return Suggestions[1].description;
 };
 export const ipValidator = (value) => {
-	const splitIp = value && value.split('/');
-	if (
-		splitIp &&
-		/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(
-			splitIp[0],
-		)
-	) {
-		const parsedNumber = parseInt(splitIp[1], 10);
-		if (parsedNumber > -1 && parsedNumber < 33) {
-			return true;
-		}
-		return false;
-	}
-	return false;
+	return !!isCidr(value);
 };
 export const isNegative = (control) => {
 	if (control.value && parseInt(control.value, 10) < 0) {
@@ -212,8 +200,7 @@ export const aclOptionsMessage = {
 	storedquery:
 		'Allow white-listed queries, think parameterized Elasticsearch DSL to be used directly or in conjunction with ReactiveSearch API',
 	// Elasticsearch endpoints related categories:
-	search:
-		'Allow searching via the Elasticsearch Query DSL using _search, _msearch and similar actions',
+	search: 'Allow searching via the Elasticsearch Query DSL using _search, _msearch and similar actions',
 	docs: 'Allow CRUD operations on documents such as create, index, update, get, and delete',
 	indices: 'Allow index specific actions such as settings, mappings, open, close',
 	clusters: 'All cluster specific actions such as cluster nodes, tasks, remote, cat',
