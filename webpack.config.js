@@ -1,3 +1,5 @@
+import dotenv from 'dotenv';
+
 const path = require('path');
 const webpack = require('webpack');
 
@@ -12,14 +14,12 @@ const TerserJSPlugin = require('terser-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
 
-require('dotenv').config();
-
 const isProduction = process.env.NODE_ENV === 'production';
 
 const plugins = [
 	new CleanWebpackPlugin(),
 	new webpack.DefinePlugin({
-		'process.env.NODE_ENV': process.env.NODE_ENV,
+		'process.env': JSON.stringify(dotenv.config().parsed), // it will automatically pick up key values from .env file
 	}),
 	new HtmlWebpackPlugin({
 		template: path.join(__dirname, 'index.html'),
