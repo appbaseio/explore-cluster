@@ -136,13 +136,8 @@ class CreateCredentials extends React.Component {
 	}
 
 	componentDidMount() {
-		const {
-			disabled,
-			initialValues,
-			isUserManagement,
-			appbaseCredentials,
-			appbaseVersion,
-		} = this.props;
+		const { disabled, initialValues, isUserManagement, appbaseCredentials, appbaseVersion } =
+			this.props;
 		if (appbaseCredentials) {
 			this.getMappings();
 		}
@@ -695,9 +690,8 @@ class CreateCredentials extends React.Component {
 												name="include_fields"
 												render={({ handler }) => {
 													const inputHandler = handler();
-													const excludedFields = this.form.get(
-														'exclude_fields',
-													).value;
+													const excludedFields =
+														this.form.get('exclude_fields').value;
 													const uniqueMappings = {};
 													return (
 														<Grid
@@ -812,9 +806,8 @@ class CreateCredentials extends React.Component {
 												name="exclude_fields"
 												render={({ handler }) => {
 													const inputHandler = handler();
-													const includedFields = this.form.get(
-														'include_fields',
-													).value;
+													const includedFields =
+														this.form.get('include_fields').value;
 													const uniqueMappings = {};
 													return (
 														<Grid
