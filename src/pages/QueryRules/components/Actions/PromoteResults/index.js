@@ -43,7 +43,11 @@ class PromoteResults extends Component {
 			...dataSource,
 			{
 				position: dataSource.length + 1,
-				doc: { ...suggestionSource, _suggestion_display_value: selectedSuggestion, _suggestion_url: '' },
+				doc: {
+					...suggestionSource,
+					_suggestion_display_value: selectedSuggestion,
+					_suggestion_url: '',
+				},
 			},
 		];
 		this.setState({ dataSource: newData }, this.updateResults);
@@ -85,10 +89,10 @@ class PromoteResults extends Component {
 
 	clearSearch() {
 		if (this.globalSearchRef) {
-			this.globalSearchRef.current?.handleSearchValueChange('');
+			this.globalSearchRef.current?.handleSearchValueChange(''); // eslint-disable-line
 		}
 	}
-
+	// eslint-disable-next-line
 	render() {
 		const { indexes, dataFields } = this.props;
 		const { dataSource } = this.state;
@@ -130,19 +134,21 @@ class PromoteResults extends Component {
 									handleDelete={this.handleDelete}
 									dataSource={dataSource}
 									onChange={(data, position) => {
-
 										const newDataSource = [...dataSource];
 
 										const doc = {
 											...newDataSource[position - 1].doc,
 											...data,
 										};
-										newDataSource[position-1] = {
-											...newDataSource[position-1],
-											doc: { ...doc}
+										newDataSource[position - 1] = {
+											...newDataSource[position - 1],
+											doc: { ...doc },
 										};
 
-										this.setState({ dataSource: newDataSource }, this.updateResults);
+										this.setState(
+											{ dataSource: newDataSource },
+											this.updateResults,
+										);
 									}}
 								/>
 								{provided.placeholder}
