@@ -18,6 +18,9 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 const plugins = [
 	new CleanWebpackPlugin(),
+	new webpack.DefinePlugin({
+		'process.env.NODE_ENV': process.env.NODE_ENV,
+	}),
 	new HtmlWebpackPlugin({
 		template: path.join(__dirname, 'index.html'),
 		filename: 'index.html',
