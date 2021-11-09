@@ -91,7 +91,6 @@ class CustomizeFilter extends React.Component {
 										this.setState({
 											filterType: formControl.handler().value,
 										});
-										// console.log(formControl.handler());
 										return (
 											<Item
 												actions={[
