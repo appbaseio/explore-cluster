@@ -92,7 +92,7 @@ class PromoteResults extends Component {
 			this.globalSearchRef.current?.handleSearchValueChange(''); // eslint-disable-line
 		}
 	}
-	// eslint-disable-next-line
+
 	render() {
 		const { indexes, dataFields } = this.props;
 		const { dataSource } = this.state;
