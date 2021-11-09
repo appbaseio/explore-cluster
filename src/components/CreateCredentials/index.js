@@ -590,7 +590,7 @@ class CreateCredentials extends React.Component {
 														label="HTTP Referers"
 														defaultValue="*"
 														handleWarningMessage={(defaultValue) =>
-															`Warning! You don't have the default value (${defaultValue}) as selected which means that only the selected referers will be considered as valid.`
+															`Warning! You don't have the Allow All Referers (${defaultValue}) set.`
 														}
 														inputProps={{
 															placeholder: 'Add a HTTP Referer',
@@ -606,7 +606,7 @@ class CreateCredentials extends React.Component {
 														toolTipMessage={Messages.sources}
 														label="IP Sources"
 														handleWarningMessage={(defaultValue) =>
-															`Warning! You don't have the default value (${defaultValue}) as selected which means that only the selected sources will be considered as valid.`
+															`Warning! You don't have the Allow All IP sources (${defaultValue}) set.`
 														}
 														defaultValue="0.0.0.0/0"
 														inputProps={{
@@ -981,7 +981,7 @@ class CreateCredentials extends React.Component {
 													toolTipMessage={Messages.sources}
 													label="IP Sources"
 													handleWarningMessage={(defaultValue) =>
-														`Warning! You don't have the default value (${defaultValue}) as selected which means that only the selected sources will be considered as valid.`
+														`Warning! You don't have the Allow All IP sources (${defaultValue}) set.`
 													}
 													defaultValue="0.0.0.0/0"
 													inputProps={{
