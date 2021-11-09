@@ -307,8 +307,6 @@ const sentenceCase = (text) => {
 		return text.replace(/(?:_| |\b)(\w)/g, function ($1) {
 			return $1.toUpperCase().replace('_', ' ');
 		});
-		// const result = text.replace(/([A-Z])/g, ' $1');
-		// return result.charAt(0).toUpperCase() + result.slice(1);
 	}
 	return text;
 };
@@ -323,7 +321,6 @@ const generateFiltersCode = (filtersWithProps) => {
 			listArr.push(filter.id);
 		}
 	});
-	console.log(listArr);
 
 	return filtersWithProps.reduce((agg, { id, value, type, dataField, ...filter }) => {
 		let listCode = '';

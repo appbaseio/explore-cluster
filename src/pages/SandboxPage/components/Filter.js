@@ -14,61 +14,53 @@ const Filter = (props) => {
 			return text.replace(/(?:_| |\b)(\w)/g, function ($1) {
 				return $1.toUpperCase().replace('_', ' ');
 			});
-			// const result = text.replace(/([A-Z])/g, ' $1');
-			// return result.charAt(0).toUpperCase() + result.slice(1);
 		}
 		return text;
 	};
 
 	return (
 		<React.Fragment>
-			{aggs.map((agg) => (
-				<Card
-					key={agg.dataField}
-					data-cy={`aggs-values-${get(agg, 'dataField[0]', '').replace('.keyword', '')}`}
-				>
-					{agg.type === 'term' ? (
-						<MultiList
-							{...agg}
-							title={sentenceCase(
-								get(agg, 'dataField[0]', '').replace('.keyword', ''),
-							)}
-							renderNoResults={() =>
-								`No Data Found for ${get(agg, 'dataField[0]', '').replace(
-									'.keyword',
-									'',
-								)}`
-							}
-							dataField={get(agg, 'dataField[0]')}
-							onChange={(value) => handleValueChange(agg.id, value)}
-							componentId={agg.id}
-							loader="Loading Items"
-							filterLabel={sentenceCase(
-								get(agg, 'dataField[0]', '').replace('.keyword', ''),
-							)}
-						/>
-					) : (
-						<DynamicRangeSlider
-							title={sentenceCase(
-								get(agg, 'dataField[0]', '').replace('.keyword', ''),
-							)}
-							renderNoResults={() =>
-								`No Data Found for ${get(agg, 'dataField[0]', '').replace(
-									'.keyword',
-									'',
-								)}`
-							}
-							onChange={(value) => handleValueChange(agg.id, value)}
-							loader="Loading Items"
-							componentId={agg.id}
-							dataField={get(agg, 'dataField[0]')}
-							filterLabel={sentenceCase(
-								get(agg, 'dataField[0]', '').replace('.keyword', ''),
-							)}
-						/>
-					)}
-				</Card>
-			))}
+			{aggs?.map((agg) => {
+				let dataField = '';
+				if (Array.isArray(agg.dataField)) {
+					dataField = get(agg, 'dataField[0]', '');
+				} else {
+					dataField = get(agg, 'dataField', '');
+				}
+				return (
+					<Card
+						key={agg.dataField}
+						data-cy={`aggs-values-${dataField.replace('.keyword', '')}`}
+					>
+						{agg.type === 'term' ? (
+							<MultiList
+								{...agg}
+								title={sentenceCase(dataField.replace('.keyword', ''))}
+								renderNoResults={() =>
+									`No Data Found for ${dataField.replace('.keyword', '')}`
+								}
+								dataField={dataField}
+								onChange={(value) => handleValueChange(agg.id, value)}
+								componentId={agg.id}
+								loader="Loading Items"
+								filterLabel={sentenceCase(dataField.replace('.keyword', ''))}
+							/>
+						) : (
+							<DynamicRangeSlider
+								title={sentenceCase(dataField.replace('.keyword', ''))}
+								renderNoResults={() =>
+									`No Data Found for ${dataField.replace('.keyword', '')}`
+								}
+								onChange={(value) => handleValueChange(agg.id, value)}
+								loader="Loading Items"
+								componentId={agg.id}
+								dataField={dataField}
+								filterLabel={sentenceCase(dataField.replace('.keyword', ''))}
+							/>
+						)}
+					</Card>
+				);
+			})}
 
 			<Link
 				onClick={window.location.pathname === `/app/${app}/aggs` ? handleModal : null}
