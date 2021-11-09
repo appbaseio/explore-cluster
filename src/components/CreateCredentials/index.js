@@ -80,6 +80,7 @@ class CreateCredentials extends React.Component {
 			filteredMappings: {},
 		};
 
+		this.allowStoredQuery = versionCompare(props.appbaseVersion, '7.52.0') !== -1;
 		this.form = props.isUserManagement
 			? FormBuilder.group({
 					username: ['', Validators.required],
@@ -90,6 +91,9 @@ class CreateCredentials extends React.Component {
 						? [{ value: [props.appName], disabled: false }]
 						: [{ value: ['*'], disabled: false }],
 					allowedActions: [[], Validators.required],
+					...(this.allowStoredQuery
+						? { sources: [{ value: ['0.0.0.0/0'], disabled: false }] }
+						: null),
 			  })
 			: FormBuilder.group({
 					description: '',
@@ -967,6 +971,26 @@ class CreateCredentials extends React.Component {
 												)}
 											/>
 										</React.Fragment>
+									)}
+									{isUserManagement && this.allowStoredQuery && (
+										<FieldControl
+											name="sources"
+											render={(control) => (
+												<WhiteList
+													control={control}
+													toolTipMessage={Messages.sources}
+													label="IP Sources"
+													handleWarningMessage={(defaultValue) =>
+														`Warning! You don't have the default value (${defaultValue}) as selected which means that only the selected sources will be considered as valid.`
+													}
+													defaultValue="0.0.0.0/0"
+													inputProps={{
+														placeholder:
+															'Add an IP Source in CIDR format',
+													}}
+												/>
+											)}
+										/>
 									)}
 								</div>
 							</React.Fragment>
