@@ -89,6 +89,18 @@ const SUB_FIELDS = {
 	DELIMITER: 'delimiter',
 };
 
+const RANGE_FIELDS = [
+	'long',
+	'integer',
+	'double',
+	'short',
+	'byte',
+	'float',
+	'half_float',
+	'scaled_float',
+	'unsigned_long',
+];
+
 export {
 	USER,
 	APPS,
@@ -102,4 +114,5 @@ export {
 	SIDE_BAR,
 	SUB_FIELDS,
 	ALLOWED_ACTIONS_LABELS,
+	RANGE_FIELDS,
 };

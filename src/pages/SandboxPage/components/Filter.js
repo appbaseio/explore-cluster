@@ -3,34 +3,64 @@ import PropTypes from 'prop-types';
 import { Card, Icon, Button, Tooltip } from 'antd';
 import { Link } from 'react-router-dom';
 import get from 'lodash/get';
-import { MultiList } from '@appbaseio/reactivesearch';
+import { MultiList, DynamicRangeSlider } from '@appbaseio/reactivesearch';
 import settingsMap from '../../../components/ReviewAndSave/helper';
 
 const Filter = (props) => {
 	const { app, aggs, handleValueChange, handleModal } = props;
+
+	const sentenceCase = (text) => {
+		if (text) {
+			return text.replace(/(?:_| |\b)(\w)/g, function ($1) {
+				return $1.toUpperCase().replace('_', ' ');
+			});
+		}
+		return text;
+	};
+
 	return (
 		<React.Fragment>
-			{aggs.map((agg) => (
-				<Card
-					key={agg.dataField}
-					data-cy={`aggs-values-${get(agg, 'dataField[0]', '').replace('.keyword', '')}`}
-				>
-					<MultiList
-						{...agg}
-						title={get(agg, 'dataField[0]', '').replace('.keyword', '')}
-						renderNoResults={() =>
-							`No Data Found for ${get(agg, 'dataField[0]', '').replace(
-								'.keyword',
-								'',
-							)}`
-						}
-						dataField={get(agg, 'dataField[0]')}
-						onChange={(value) => handleValueChange(agg.id, value)}
-						componentId={agg.id}
-						loader="Loading Items"
-					/>
-				</Card>
-			))}
+			{aggs?.map((agg) => {
+				let dataField = '';
+				if (Array.isArray(agg.dataField)) {
+					dataField = get(agg, 'dataField[0]', '');
+				} else {
+					dataField = get(agg, 'dataField', '');
+				}
+				return (
+					<Card
+						key={agg.dataField}
+						data-cy={`aggs-values-${dataField.replace('.keyword', '')}`}
+					>
+						{agg.type === 'term' ? (
+							<MultiList
+								{...agg}
+								title={sentenceCase(dataField.replace('.keyword', ''))}
+								renderNoResults={() =>
+									`No Data Found for ${dataField.replace('.keyword', '')}`
+								}
+								dataField={dataField}
+								onChange={(value) => handleValueChange(agg.id, value)}
+								componentId={agg.id}
+								loader="Loading Items"
+								filterLabel={sentenceCase(dataField.replace('.keyword', ''))}
+							/>
+						) : (
+							<DynamicRangeSlider
+								title={sentenceCase(dataField.replace('.keyword', ''))}
+								renderNoResults={() =>
+									`No Data Found for ${dataField.replace('.keyword', '')}`
+								}
+								onChange={(value) => handleValueChange(agg.id, value)}
+								loader="Loading Items"
+								componentId={agg.id}
+								dataField={dataField}
+								filterLabel={sentenceCase(dataField.replace('.keyword', ''))}
+							/>
+						)}
+					</Card>
+				);
+			})}
 
 			<Link
 				onClick={window.location.pathname === `/app/${app}/aggs` ? handleModal : null}
