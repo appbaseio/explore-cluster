@@ -96,10 +96,10 @@
     react-codemirror2 "^5.1.0"
     react-dom "^16.6.3"
 
-"@appbaseio/reactivecore@9.12.4":
-  version "9.12.4"
-  resolved "https://registry.yarnpkg.com/@appbaseio/reactivecore/-/reactivecore-9.12.4.tgz#814036b2a5122375bdb1edfa986626e5070d14ea"
-  integrity sha512-2/SMIPAunBDYyU2z1JFz5Z24U8lxidJdlj38gTobqQhF/fUiTUqW1/B2swFC/+7i8EjArrXt6aut6kYfG1kc8A==
+"@appbaseio/reactivecore@9.12.6":
+  version "9.12.6"
+  resolved "https://registry.yarnpkg.com/@appbaseio/reactivecore/-/reactivecore-9.12.6.tgz#74980d7bab39c25a4e8e99e54a0e306ee7dd9335"
+  integrity sha512-zqPt793G4gRKoQ20q/3uqTTcsHOR5XBQJxUBkuL5opB2t/335xSAX/K2C6O7IIVGYY/yNhntvILn28qyjVaqXA==
   dependencies:
     cross-fetch "^3.0.4"
     prop-types "^15.6.0"
@@ -123,15 +123,15 @@
     react-leaflet "^2.1.3"
     rheostat "^2.1.1"
 
-"@appbaseio/reactivesearch@3.24.2":
-  version "3.24.2"
-  resolved "https://registry.yarnpkg.com/@appbaseio/reactivesearch/-/reactivesearch-3.24.2.tgz#8df29e6016369d3813053d5405a4a6ab063d34ed"
-  integrity sha512-nQ5a6VaLS0OKWoR8zLUGSH3RIbs1gW7DqCUUT2Ys8CLTKTFei8rSUtgamqU010scjWNUzsf7MXEKSwUItuv1Xw==
+"@appbaseio/reactivesearch@3.25.0":
+  version "3.25.0"
+  resolved "https://registry.yarnpkg.com/@appbaseio/reactivesearch/-/reactivesearch-3.25.0.tgz#1d2c81563ace6e9da8a9fe80de530562a40e2a39"
+  integrity sha512-yNrI1P+x6JO/bwW4OtAWw/eewkFB6cBS5nUcRFKLgo3jcWAMYkfIXLMu1kfcF5/AbpH/xLCaaOjAgUDupV26tg==
   dependencies:
-    "@appbaseio/reactivecore" "9.12.4"
+    "@appbaseio/reactivecore" "9.12.6"
     "@emotion/core" "^10.0.28"
     "@emotion/styled" "^10.0.27"
-    appbase-js "^4.1.5"
+    appbase-js "^4.4.1"
     cross-env "^5.2.0"
     downshift "^1.31.2"
     emotion-theming "^10.0.27"
@@ -2902,10 +2902,19 @@ anymatch@^3.0.3, anymatch@~3.1.2:
     normalize-path "^3.0.0"
     picomatch "^2.0.4"
 
-appbase-js@^4.0.2-beta.11, appbase-js@^4.1.2, appbase-js@^4.1.5:
+appbase-js@^4.0.2-beta.11, appbase-js@^4.1.2:
   version "4.3.1"
   resolved "https://registry.yarnpkg.com/appbase-js/-/appbase-js-4.3.1.tgz#af2ed40e51d7826b8bf6ada80cc4e45e1bc95411"
   integrity sha512-+7+99AKHAvObgxCdhzIhdqPM+Bv2SVyRp2UmRcpUZ+Dz3FyMykPsLvoZNIhKO+NHS1z/8vR4Ue0zt1sIzrFMOQ==
+  dependencies:
+    cross-fetch "^2.2.2"
+    querystring "^0.2.0"
+    url-parser-lite "^0.1.0"
+
+appbase-js@^4.4.1:
+  version "4.4.1"
+  resolved "https://registry.yarnpkg.com/appbase-js/-/appbase-js-4.4.1.tgz#fd25bce54049229384b45686a74509ea87283c90"
+  integrity sha512-NisyYnH83+4EYaP0uGENebGAKTLUp1G7wucQs+2ojOJdb5ElnTU7/DV+Ts7oyVRjat259CuJz0xsuT1tZ5pk1g==
   dependencies:
     cross-fetch "^2.2.2"
     querystring "^0.2.0"
