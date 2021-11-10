@@ -302,6 +302,7 @@ export const getFilterConfigurationForm = (customFields = {}, isDynamicFilter = 
 		customize: FormBuilder.group({
 			title: isDynamicFilter ? [undefined, Validators.required] : undefined,
 			dataField: isDynamicFilter ? [undefined, Validators.required] : undefined,
+			filterType: 'list',
 			size: undefined,
 			queryFormat: 'or',
 			sortBy: 'count',

@@ -18,6 +18,9 @@ const isProduction = process.env.NODE_ENV === 'production';
 
 const plugins = [
 	new CleanWebpackPlugin(),
+	new webpack.DefinePlugin({
+		'process.env': JSON.stringify(process.env), // it will automatically pick up key values from .env file
+	}),
 	new HtmlWebpackPlugin({
 		template: path.join(__dirname, 'index.html'),
 		filename: 'index.html',

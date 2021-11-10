@@ -1,13 +1,16 @@
 import React from 'react';
-import { Button, Modal, Switch, Form, Select } from 'antd';
+import { Button, Modal, Switch, Form, Select, List, Radio } from 'antd';
 import { string, object, func, bool } from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import DataFieldSelector from '../../../../components/Form/DataFieldSelector';
 import TextInput from '../../../../components/Form/Input';
 
+const { Item } = List;
+
 class CustomizeFilter extends React.Component {
 	state = {
 		visible: false,
+		filterType: 'list',
 	};
 
 	showModal = () => {
@@ -37,7 +40,7 @@ class CustomizeFilter extends React.Component {
 	};
 
 	render() {
-		const { visible } = this.state;
+		const { visible, filterType } = this.state;
 		const { buttonLabel, control, buttonProps, disableListOptions } = this.props;
 		return (
 			<React.Fragment>
@@ -83,6 +86,36 @@ class CustomizeFilter extends React.Component {
 										)
 									}
 								</FieldControl>
+								<FieldControl name="filterType">
+									{(formControl) => {
+										this.setState({
+											filterType: formControl.handler().value,
+										});
+										return (
+											<Item
+												actions={[
+													<Radio.Group
+														{...formControl.handler()}
+														onChange={(e) => {
+															this.setState({
+																filterType: e.target.value,
+															});
+															formControl.markAsTouched();
+															formControl
+																.handler()
+																.onChange(e.target.value);
+														}}
+													>
+														<Radio value="list">List</Radio>
+														<Radio value="range">Range</Radio>
+													</Radio.Group>,
+												]}
+											>
+												<Item.Meta title="Display Filter As" />
+											</Item>
+										);
+									}}
+								</FieldControl>
 								<TextInput
 									name="title"
 									label="Title"
@@ -91,7 +124,7 @@ class CustomizeFilter extends React.Component {
 									}}
 								/>
 
-								{!disableListOptions ? (
+								{!disableListOptions && filterType === 'list' && (
 									<>
 										<TextInput
 											name="size"
@@ -176,7 +209,56 @@ class CustomizeFilter extends React.Component {
 											}}
 										/>
 									</>
-								) : null}
+								)}
+
+								{!disableListOptions && filterType === 'range' && (
+									<>
+										<TextInput
+											name="startValue"
+											label="Start Value"
+											inputProps={{
+												placeholder: 'Enter start value',
+												type: 'number',
+											}}
+										/>
+										<TextInput
+											name="endValue"
+											label="End Value"
+											inputProps={{
+												placeholder: 'Enter end value',
+												type: 'number',
+											}}
+										/>
+										<TextInput
+											name="startLabel"
+											label="Start Label"
+											inputProps={{
+												placeholder: 'Enter start label',
+											}}
+										/>
+										<TextInput
+											name="endLabel"
+											label="End Label"
+											inputProps={{
+												placeholder: 'Enter end label',
+											}}
+										/>
+										<FieldControl name="showHistogram">
+											{({ handler }) => (
+												<Form.Item label="Show Histogram">
+													<Switch {...handler('checkbox')} />
+												</Form.Item>
+											)}
+										</FieldControl>
+										<TextInput
+											name="filterLabel"
+											label="Filter Label"
+											inputProps={{
+												placeholder: 'Enter filter label',
+											}}
+										/>
+									</>
+								)}
 							</Form>
 						</Modal>
 					)}

@@ -4,7 +4,7 @@ import { getVersion, getURL } from '../constants/config';
 import mappingUsecase from '../batteries/utils/mappingUsecase';
 import { getAuthHeaders } from '../batteries/utils/mappings';
 import { getPossibleSubFields, unflattenObject } from '.';
-import { SUB_FIELDS } from '../constants';
+import { SUB_FIELDS, RANGE_FIELDS } from '../constants';
 
 export const getMappingsInfo = ({
 	mappings: originalMappings,
@@ -477,6 +477,14 @@ export const hasKeyword = (fieldMappings) => {
 	return false;
 };
 
+export const isRangeType = (type) => {
+	if (RANGE_FIELDS.includes(type)) {
+		return true;
+	}
+
+	return false;
+};
+
 export const applyNgramMapping = (mappings, isNgramEnabled) => {
 	const updatedMappings = Object.keys(mappings).reduce((agg, field) => {
 		const fieldVal = { ...get(mappings, field) };
@@ -559,7 +567,7 @@ export const applyLanguageMapping = (mappings, language) => {
 		analyzer: 'synonyms',
 		type: 'text',
 	};
-	const updatedMappings = Object.keys(mappings).reduce((agg, field) => {
+	const updatedMappings = Object.keys(mappings || {}).reduce((agg, field) => {
 		const fieldVal = { ...get(mappings, field) };
 		let updatedData = { ...agg };
 		const type = get(fieldVal, 'type', ``);

@@ -520,9 +520,8 @@ class ReviewAndSave extends React.Component {
 			// if ngram is enabled .search field should be added before saving as it requires re-indexing of data
 			if (get(newSettings, 'indexSettings.enableNgram')) {
 				const currentDataFields = get(newSettings, 'search.dataField');
-				const [ngramDataFields, ngramFieldWeights] = applyNgramDataFields(
-					currentDataFields,
-				);
+				const [ngramDataFields, ngramFieldWeights] =
+					applyNgramDataFields(currentDataFields);
 				newSettings = {
 					...newSettings,
 					search: {
@@ -562,9 +561,11 @@ class ReviewAndSave extends React.Component {
 					const { filter: analyzerFilter } = updatedAnalyzer[a];
 					// asciifolding should appear before [x]_stop word filter
 					// inorder to do that find that index and splice before it
-					let stopIndex = analyzerFilter.findIndex((f) => f.includes('_stop'));
-					if (stopIndex === -1) stopIndex = 0;
-					analyzerFilter.splice(stopIndex, 0, 'asciifolding');
+					if (analyzerFilter) {
+						let stopIndex = analyzerFilter.findIndex((f) => f.includes('_stop'));
+						if (stopIndex === -1) stopIndex = 0;
+						analyzerFilter.splice(stopIndex, 0, 'asciifolding');
+					}
 					return {
 						...obj,
 						[a]: {

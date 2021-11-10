@@ -12,7 +12,7 @@ const generateQuery = ({ aggregations: filters, search, results, synonyms }) => 
 						dataField: typeof filterField === 'string' ? [filterField] : filterField,
 						sortBy: get(filters, 'sortBy', 'asc'),
 						size: get(filters, 'size', 10),
-						type: 'term',
+						type: filters.dataField[filterField],
 						value: [],
 						queryFormat: get(filters, 'queryFormat', 'or'),
 					};
@@ -89,16 +89,13 @@ const getQueryGrades = ({ query }) => {
 };
 
 const transformQuery = (query) => {
-
 	const queryArr = [...query];
 	// eslint-disable-next-line
 	const resultantMap = queryArr.forEach((query, index) => {
-
 		if (query.dataField?.length && query.fieldWeights?.length) {
-
 			const { dataField, fieldWeights } = query;
 			const result = [];
-
+			// eslint-disable-next-line
 			dataField?.map((field, index) => {
 				result.push({
 					field,

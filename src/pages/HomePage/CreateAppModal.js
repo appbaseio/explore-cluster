@@ -40,6 +40,7 @@ class CreateAppModal extends Component {
 			shards: 1,
 			replicas: 0,
 			indexSettings: '',
+			indexMappings: '',
 			language: 'universal',
 		};
 	}
@@ -101,7 +102,7 @@ class CreateAppModal extends Component {
 	};
 
 	handleOk = async () => {
-		const { appName, shards, replicas, indexSettings } = this.state;
+		const { appName, shards, replicas, indexSettings, indexMappings } = this.state;
 		const { handleCreateApp } = this.props;
 		let { language } = this.state;
 		language = getLanguageFallback(language);
@@ -116,13 +117,27 @@ class CreateAppModal extends Component {
 				return;
 			}
 		}
+		// validate index mappings
+		if (indexMappings) {
+			const isValidSettings = validateJSON(indexMappings);
+			if (!isValidSettings) {
+				notification.error({
+					message: 'Invalid Index mappings',
+					description: 'Please use valid JSON value for index mappings.',
+				});
+				return;
+			}
+		}
 		const options = {
 			appName,
 			settings: {
 				...(indexSettings ? JSON.parse(indexSettings) : null),
-				number_of_shards: shards,
-				number_of_replicas: replicas,
+				'index.number_of_shards': shards,
+				'index.number_of_replicas': replicas,
 				analysis: get(languages, [language, 'analysis']),
+			},
+			mappings: {
+				...(indexMappings ? JSON.parse(indexMappings) : null),
 			},
 		};
 
@@ -182,6 +197,7 @@ class CreateAppModal extends Component {
 			replicas,
 			language,
 			indexSettings,
+			indexMappings,
 		} = this.state;
 		const { createdApp, showModal } = this.props;
 
@@ -281,22 +297,25 @@ class CreateAppModal extends Component {
 					/>
 					<Row type="flex" justify="space-between" align="middle">
 						<h3 style={{ marginTop: 20 }} className={modalHeading}>
-							Index Settings
+							Additional Index Settings
 						</h3>
 						<Popover
 							placement="right"
 							content={
 								<span>
-									It allows to define additional index settings in JSON format.{' '}
-									<br />
-									You can check the available options at{' '}
-									<a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#index-modules-settings">
+									Define additional index settings in JSON format. <br />
+									You can check the available options over{' '}
+									<a
+										target="_blank"
+										href="https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules.html#index-modules-settings"
+										rel="noreferrer"
+									>
 										here
 									</a>
 									.
 								</span>
 							}
-							title="Index name validations"
+							title="Index settings"
 						>
 							<Icon type="info-circle" />
 						</Popover>
@@ -309,6 +328,9 @@ class CreateAppModal extends Component {
 								? indexSettings
 								: JSON.stringify(indexSettings, 0, 2)
 						}
+						placeholder={`{
+    "index.codec": "best_compression"
+}`}
 						onChange={(value) => this.handleInputNumber('indexSettings', value)}
 						theme="monokai"
 						name="editor-JSON"
@@ -318,6 +340,68 @@ class CreateAppModal extends Component {
 							width: '100%',
 							maxWidth: 800,
 							maxHeight: 250,
+							whiteSpace: 'pre',
+						}}
+						showGutter
+						highlightActiveLine
+						setOptions={{
+							showLineNumbers: true,
+							tabSize: 2,
+						}}
+						editorProps={{
+							$blockScrolling: true,
+						}}
+					/>
+					<Row type="flex" justify="space-between" align="middle">
+						<h3 style={{ marginTop: 20 }} className={modalHeading}>
+							Explicit Mappings
+						</h3>
+						<Popover
+							placement="right"
+							content={
+								<span>
+									Define explicit index mappings in JSON format. <br />
+									You can check the available options over{' '}
+									<a
+										target="_blank"
+										href="https://www.elastic.co/guide/en/elasticsearch/reference/current/explicit-mapping.html"
+										rel="noreferrer"
+									>
+										here
+									</a>
+									.
+								</span>
+							}
+							title="Index mappings"
+						>
+							<Icon type="info-circle" />
+						</Popover>
+					</Row>
+					<Ace
+						defaultValue=""
+						mode="json"
+						value={
+							typeof indexMappings === 'string'
+								? indexMappings
+								: JSON.stringify(indexMappings, 0, 2)
+						}
+						placeholder={`{
+    "properties": {
+        "age":    { "type": "integer" },
+        "email":  { "type": "keyword"  },
+        "name":   { "type": "text"  }
+    }
+}`}
+						onChange={(value) => this.handleInputNumber('indexMappings', value)}
+						theme="monokai"
+						name="editor-JSON"
+						fontSize={16}
+						showPrintMargin
+						style={{
+							width: '100%',
+							maxWidth: 800,
+							maxHeight: 250,
+							whiteSpace: 'pre',
 						}}
 						showGutter
 						highlightActiveLine

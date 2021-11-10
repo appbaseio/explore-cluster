@@ -51,6 +51,8 @@ class WhiteList extends React.Component {
 		if (index > -1) {
 			value.splice(index, 1);
 			control.onChange(value);
+			control.markAsTouched();
+			control.markAsDirty();
 		}
 	};
 
@@ -216,7 +218,11 @@ class WhiteList extends React.Component {
 									}}
 								/>
 							)}
-							{hasError('invalidIP') && <div css={styles.error}>Not a valid IP</div>}
+							{hasError('invalidIP') && (
+								<div css={styles.error}>
+									An IP source should be a valid IPv4 or IPv6 CIDR address
+								</div>
+							)}
 						</div>
 					</Flex>
 				}

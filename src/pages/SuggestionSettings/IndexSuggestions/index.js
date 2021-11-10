@@ -13,6 +13,7 @@ import {
 	getIndexSuggestionsPreferences,
 	saveIndexSuggestionsPreferences,
 } from '../../../batteries/modules/actions';
+// eslint-disable-next-line import/no-cycle
 import PreferenceForm from './PreferenceForm';
 import { isValidPlan } from '../../../batteries/utils';
 import { getURL } from '../../../constants/config';
@@ -21,8 +22,8 @@ import Flex from '../../../batteries/components/shared/Flex';
 import ErrorToaster from '../../../batteries/components/shared/ErrorToaster';
 import { event, timingEvent } from '../../../utils/gtag';
 import moment from '../../../utils/moment';
-export const PreferenceFormContext = React.createContext();
 
+export const PreferenceFormContext = React.createContext();
 
 const main = css`
 	.actionBtn {
@@ -149,8 +150,8 @@ class IndexSuggestions extends React.Component {
 					customQuery: payload.customQuery,
 					includeFields: payload.includeFields || ['*'],
 					excludeFields: payload.excludeFields || [],
-					categoryField: payload.categoryField ,
-					urlField: payload.urlField ,
+					categoryField: payload.categoryField,
+					urlField: payload.urlField,
 					showDistinctSuggestions: payload.showDistinctSuggestions || false,
 					enablePredictiveSuggestions: payload.enablePredictiveSuggestions || false,
 					enableSynonyms: payload.enableSynonyms || false,
@@ -162,14 +163,13 @@ class IndexSuggestions extends React.Component {
 						applyStopwords: payload.applyStopwords || false,
 						customStopwords: payload.customStopwords || [],
 						maxPredictedWords: parseInt(payload.maxPredictedWords, 10) || 0,
-						customQuery: payload.customQuery ,
+						customQuery: payload.customQuery,
 						includeFields: payload.includeFields || ['*'],
 						excludeFields: payload.excludeFields || [],
-						categoryField: payload.categoryField ,
-						urlField: payload.urlField ,
+						categoryField: payload.categoryField,
+						urlField: payload.urlField,
 						showDistinctSuggestions: payload.showDistinctSuggestions || false,
-						enablePredictiveSuggestions:
-							payload.enablePredictiveSuggestions || false,
+						enablePredictiveSuggestions: payload.enablePredictiveSuggestions || false,
 						enableSynonyms: payload.enableSynonyms || false,
 						size: parseInt(payload.size, 10) || 1,
 						indices: payload.indices || ['*'],
@@ -195,13 +195,13 @@ class IndexSuggestions extends React.Component {
 				});
 			}
 		});
-	}
+	};
 
 	handleSaveTemplate = (obj = '') => {
 		try {
 			const { savePreferences } = this.props;
 			let payload;
-			if(obj) {
+			if (obj) {
 				payload = {};
 			} else {
 				payload = {
@@ -236,7 +236,7 @@ class IndexSuggestions extends React.Component {
 			<React.Fragment>
 				<PreferenceFormContext.Provider
 					value={{
-						value: "index",
+						value: 'index',
 						saveTemplate: this.handleSaveTemplate,
 					}}
 				>
