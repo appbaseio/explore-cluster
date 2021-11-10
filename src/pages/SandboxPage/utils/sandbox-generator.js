@@ -47,6 +47,7 @@ import {
 	ReactiveBase,
 	ReactiveList,
 	MultiList,
+	DynamicRangeSlider,
 	DataSearch,
 	SelectedFilters,
 } from '@appbaseio/reactivesearch';
@@ -301,25 +302,58 @@ const generateSearchCode = ({ id: searchId, value, ...searchProps }) => {
 	).replace('div', 'DataSearch');
 };
 
+const sentenceCase = (text) => {
+	if (text) {
+		return text.replace(/(?:_| |\b)(\w)/g, function ($1) {
+			return $1.toUpperCase().replace('_', ' ');
+		});
+	}
+	return text;
+};
+
 const generateFiltersCode = (filtersWithProps) => {
 	if (filtersWithProps.length === 0) {
 		return '';
 	}
+	const listArr = ['search'];
+	filtersWithProps.forEach((filter) => {
+		if (filter.type === 'term') {
+			listArr.push(filter.id);
+		}
+	});
 
 	return filtersWithProps.reduce((agg, { id, value, type, dataField, ...filter }) => {
-		const listCode = reactElementToJSXString(
-			<div
-				{...filter}
-				defaultValue={value || []}
-				dataField={get(dataField, '[0]', '')}
-				className="filter"
-				title={get(dataField, '[0]', '').replace('.keyword', '')}
-				componentId={id}
-			/>,
-			{
-				showFunctions: false,
-			},
-		).replace('div', 'MultiList');
+		let listCode = '';
+		if (type === 'term') {
+			listCode = reactElementToJSXString(
+				<div
+					{...filter}
+					defaultValue={value || []}
+					dataField={get(dataField, '[0]', '')}
+					className="filter"
+					title={sentenceCase(get(dataField, '[0]', '').replace('.keyword', ''))}
+					filterLabel={sentenceCase(get(dataField, '[0]', '').replace('.keyword', ''))}
+					componentId={id}
+					react={{ and: listArr.filter((i) => i !== id) }}
+				/>,
+				{
+					showFunctions: false,
+				},
+			).replace('div', 'MultiList');
+		} else {
+			listCode = reactElementToJSXString(
+				<div
+					dataField={get(dataField, '[0]', '')}
+					className="filter"
+					title={sentenceCase(get(dataField, '[0]', '').replace('.keyword', ''))}
+					componentId={id}
+					filterLabel={sentenceCase(get(dataField, '[0]', '').replace('.keyword', ''))}
+				/>,
+				{
+					showFunctions: false,
+				},
+			).replace('div', 'DynamicRangeSlider');
+		}
 
 		if (agg) {
 			return `${agg}\n${listCode}`;

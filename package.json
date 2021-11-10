@@ -102,6 +102,7 @@
 		"emotion": "^9.2.6",
 		"hex-rgb": "^3.0.0",
 		"husky": "^4.2.5",
+		"is-cidr": "^4.0.2",
 		"jsondiffpatch": "^0.4.1",
 		"lint-staged": "^10.1.7",
 		"lodash": "^4.17.10",

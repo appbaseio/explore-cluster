@@ -202,10 +202,10 @@ class UserManagementPage extends React.Component {
 					}
 				>
 					<Paragraph strong>Login URL for this cluster:</Paragraph>
-					{compareVersion(version, '7.33.0') === -1 && (
+					{compareVersion(version, '7.52.0') === -1 && (
 						<Alert
 							type="warning"
-							message="Upgrade appbase.io to v7.33.0 or above for using the new user management features"
+							message="Upgrade appbase.io to v7.52.0 or above for using the new user management features"
 							showIcon
 							style={{ marginBottom: 10 }}
 						/>

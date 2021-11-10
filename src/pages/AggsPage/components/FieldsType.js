@@ -7,7 +7,7 @@ import MappingWrapper from '../../../components/MappingsWrapper';
 import FieldRow from '../../MappingsPage/components/FieldRow';
 import ObjectField from '../../MappingsPage/components/ObjectField';
 import { VIEWS } from '../../../constants/props';
-import { getMappingsByPath, hasKeyword } from '../../../utils/mappings';
+import { getMappingsByPath, hasKeyword, isRangeType } from '../../../utils/mappings';
 import conversionMap from '../../../utils/conversionMap';
 
 const headerRow = css`
@@ -32,8 +32,7 @@ const mappingHeaderLeft = [
 const mappingHeaderRight = [
 	{
 		title: 'Aggregation Type',
-		info:
-			'Set the aggregation type for the fields. Only fields with their type set appear in the "Test Search Relevancy" UI view.',
+		info: 'Set the aggregation type for the fields. Only fields with their type set appear in the "Test Search Relevancy" UI view.',
 	},
 ];
 
@@ -144,7 +143,7 @@ const FieldType = ({ handleFieldType, handleDelete, fieldTypes, updateToAggsFiel
 							}
 						>
 							<Option value="term">Term</Option>
-							{hasKeyword(mapping) ? null : <Option value="range">Range</Option>}
+							{isRangeType(typeVal) ? <Option value="range">Range</Option> : null}
 						</Select>
 					)}
 					onDelete={(deletePath) =>
