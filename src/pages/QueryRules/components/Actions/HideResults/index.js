@@ -51,6 +51,7 @@ class HideResults extends Component {
 
 	clearSearch() {
 		if (this.globalSearchRef) {
+			// eslint-disable-next-line
 			this.globalSearchRef.current?.handleSearchValueChange('');
 		}
 	}

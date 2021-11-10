@@ -136,8 +136,10 @@ function PromoteActions({ onDelete, onEdit }) {
 			}}
 		>
 			{isEdit ? (
+				// eslint-disable-next-line
 				<Icon type="check-circle" theme="twoTone" onClick={handleEditChange} />
 			) : (
+				// eslint-disable-next-line
 				<Icon type="edit" theme="twoTone" onClick={handleEditChange} />
 			)}
 			<Icon
