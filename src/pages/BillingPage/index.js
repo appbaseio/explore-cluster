@@ -118,7 +118,7 @@ class Billing extends Component {
 			return (
 				<BillingFrame
 					id="softr-0bda9055-b056-42d5-8fe3-040a77024336-pricing-dashboard-bye"
-					url="https://www.appbase.io/embed/pages/0bda9055-b056-42d5-8fe3-040a77024336/blocks/pricing-dashboard-bye"
+					url="https://www.appbase.io/embed/pages/2eb4244d-cdd5-4031-8e65-2a8fc0b50bb9/blocks/pricing2"
 				/>
 			);
 		}
@@ -126,7 +126,7 @@ class Billing extends Component {
 		return (
 			<BillingFrame
 				id="softr-bf3757e1-4c3b-4d90-97e6-ee9e66034603-pricing-dashboard-self-host"
-				url="https://www.appbase.io/embed/pages/bf3757e1-4c3b-4d90-97e6-ee9e66034603/blocks/pricing-dashboard-self-host"
+				url="https://www.appbase.io/embed/pages/fc720c4a-816f-4916-beee-4c6f93ecaf53/blocks/pricing2"
 			/>
 		);
 	}
@@ -186,6 +186,7 @@ class Billing extends Component {
 
 		const isSelfHostedArc = !isHostedArc && !isClusterBilling;
 		const isOSS = plan === 'Free';
+
 		return (
 			<React.Fragment>
 				<BannerHeader
@@ -274,6 +275,12 @@ class Billing extends Component {
 									consider upgrading to paid version to access all the features.
 								</p>
 							)}
+							{isOnTrial && (
+								<p>
+									Your plan will change to <b>Basic</b> at the end of the trial
+									duration.
+								</p>
+							)}
 						</Row>
 					}
 				/>
@@ -317,7 +324,7 @@ class Billing extends Component {
 				{!subscriptionID && !isPaid && !isOnTrial && (
 					<Card bodyStyle={{ padding: '20px 50px' }}>
 						<p style={{ marginBottom: '0' }}>
-							Need a trial extended?{' '}
+							Need a trial extension?{' '}
 							<StyledLink onClick={this.openChatWindow}>Chat with us</StyledLink>
 						</p>
 					</Card>
