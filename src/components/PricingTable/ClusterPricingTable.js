@@ -41,22 +41,10 @@ const data = [
 				</StyledLink>
 			</RowContent>
 		),
-		desc: 'Starter tier and above.',
+		desc: 'Starter tier and above',
 	},
 	{
 		key: '1',
-		name: (
-			<RowContent>
-				<div>Analytics with custom Events and API access</div>
-				<StyledLink href="https://docs.appbase.io/docs/analytics/Overview/" target="_blank">
-					Read more
-				</StyledLink>
-			</RowContent>
-		),
-		desc: 'Production-I tier and above.',
-	},
-	{
-		key: '2',
 		name: (
 			<RowContent>
 				<div>Search Relevancy</div>
@@ -65,13 +53,25 @@ const data = [
 				</StyledLink>
 			</RowContent>
 		),
-		desc: 'Production-I tier and above.',
+		desc: 'Starter tier and above',
+	},
+	{
+		key: '2',
+		name: (
+			<RowContent>
+				<div>Analytics with custom Events and API access</div>
+				<StyledLink href="https://docs.appbase.io/docs/analytics/Overview/" target="_blank">
+					Read more
+				</StyledLink>
+			</RowContent>
+		),
+		desc: 'Production-I tier and above',
 	},
 	{
 		key: '3',
 		name: (
 			<RowContent>
-				<div>Popular Suggestions</div>
+				<div>Popular and Recent Suggestions</div>
 				<StyledLink
 					href="https://docs.appbase.io/docs/analytics/popular-suggestions/"
 					target="_blank"
@@ -80,27 +80,22 @@ const data = [
 				</StyledLink>
 			</RowContent>
 		),
-		desc: 'Production-I tier and above.',
+		desc: 'Production-I tier and above',
 	},
 	{
 		key: '4',
 		name: (
 			<RowContent>
-				<div>
-					<span role="img" aria-label="fast">
-						⚡️
-					</span>
-					Fast search with appbase.io cache
-				</div>
+				<div>UI Builder</div>
 				<StyledLink
-					href="https://docs.appbase.io/docs/speed/cache-management/"
+					href="https://docs.appbase.io/docs/reactivesearch/ui-builder/search"
 					target="_blank"
 				>
 					Read more
 				</StyledLink>
 			</RowContent>
 		),
-		desc: 'Production-I tier and above.',
+		desc: 'Production-I tier and above',
 	},
 	{
 		key: '5',
@@ -112,7 +107,27 @@ const data = [
 				</StyledLink>
 			</RowContent>
 		),
-		desc: 'Production-I tier and above.',
+		desc: 'Production-I tier and above',
+	},
+	{
+		key: '6',
+		name: (
+			<RowContent>
+				<div>
+					<span role="img" aria-label="fast">
+						⚡️
+					</span>
+					&nbsp;Fast search with appbase.io cache
+				</div>
+				<StyledLink
+					href="https://docs.appbase.io/docs/speed/cache-management/"
+					target="_blank"
+				>
+					Read more
+				</StyledLink>
+			</RowContent>
+		),
+		desc: 'Production-I tier and above',
 	},
 ];
 
