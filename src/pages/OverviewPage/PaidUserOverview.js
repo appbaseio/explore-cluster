@@ -1,8 +1,10 @@
 import React from 'react';
+import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import { css } from 'react-emotion';
 import PropTypes from 'prop-types';
+import { Button } from 'antd';
 import { mediaKey } from '../../utils/media';
 import SearchVolumeChart from '../../batteries/components/shared/Chart/SearchVolume';
 import Flex from '../../batteries/components/shared/Flex';
@@ -51,6 +53,13 @@ const noResultsCls = css`
 		margin-top: 20px;
 	}
 `;
+
+const routesMapper = {
+	'/cluster/rules': 'Query Rules',
+	'/cluter/suggestions': 'Suggestion Settings',
+	'/cluster/stores-queries': 'Stored Queries',
+	'/': 'Cluster',
+};
 class PaidUserOverview extends React.Component {
 	componentDidMount() {
 		const { fetchAppAnalytics, stats, fetchApps } = this.props;
@@ -63,6 +72,18 @@ class PaidUserOverview extends React.Component {
 		window.location = url;
 	};
 
+	routeMapper = (route) => {
+		console.log(route, routesMapper[route], routesMapper.route);
+		const routeArr = route.split('/');
+		if (routesMapper[route]) {
+			return routesMapper[route];
+		}
+		if (routeArr[routeArr?.length - 1]) {
+			return routeArr[routeArr?.length - 1];
+		}
+		return 'Cluster';
+	};
+
 	render() {
 		const {
 			// prettier-ignore
@@ -73,11 +94,23 @@ class PaidUserOverview extends React.Component {
 			searchVolume,
 			allowedActions,
 			appsData,
+			history,
+			recentRoute,
 		} = this.props;
 		const hasAnalytics = allowedActions.includes(ALLOWED_ACTIONS.ANALYTICS);
 
 		return (
 			<Container>
+				<Button
+					size="small"
+					style={{ margin: 10 }}
+					onClick={() => {
+						history.push('/');
+						history.push(recentRoute);
+					}}
+				>
+					{`Go Back to ${this.routeMapper(recentRoute) || 'Cluster'} View`}
+				</Button>
 				<Flex css={main} justifyContent="space-between">
 					<div css={usage}>
 						<StatsBox
@@ -150,6 +183,8 @@ PaidUserOverview.propTypes = {
 	stats: PropTypes.object.isRequired,
 	fetchApps: PropTypes.func.isRequired,
 	allowedActions: PropTypes.array.isRequired,
+	history: PropTypes.object.isRequired,
+	recentRoute: PropTypes.string.isRequired,
 };
 const mapStateToProps = (state) => {
 	const analyticsArr = getAppAnalyticsByName(state) || [];
@@ -171,10 +206,12 @@ const mapStateToProps = (state) => {
 		noResults: get(analytics, 'no_results_searches'),
 		searchVolume: get(analytics, 'search_histogram'),
 		allowedActions: get(state, 'user.data.allowedActions'),
+		recentRoute: get(state, 'recentRoutes.recentRoute', '/'),
 	};
 };
 const mapDispatchToProps = (dispatch) => ({
 	fetchAppAnalytics: (appName, plan) => dispatch(getAppAnalytics(appName, plan)),
 	fetchApps: () => dispatch(loadApps()),
 });
-export default connect(mapStateToProps, mapDispatchToProps)(PaidUserOverview);
+
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(PaidUserOverview));

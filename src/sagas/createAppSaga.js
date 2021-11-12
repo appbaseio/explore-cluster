@@ -13,7 +13,7 @@ function* createAppWorker(options) {
 		const response = yield call(getCreateApp, options, user.authToken);
 		yield put(appendApp({ [options.appName]: String(response.id) }));
 		yield put(getUserPermissions());
-		yield put(setCreateApp(response));
+		yield put(setCreateApp({ ...response, ...options }));
 	} catch (e) {
 		yield put(createAppFail(e));
 	}

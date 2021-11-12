@@ -102,7 +102,7 @@ class CreateAppModal extends Component {
 	};
 
 	handleOk = async () => {
-		const { appName, shards, replicas, indexSettings, indexMappings } = this.state;
+		const { appName, shards, replicas, indexSettings, indexMappings, hasJSON } = this.state;
 		const { handleCreateApp } = this.props;
 		let { language } = this.state;
 		language = getLanguageFallback(language);
@@ -130,6 +130,7 @@ class CreateAppModal extends Component {
 		}
 		const options = {
 			appName,
+			hasJSON,
 			settings: {
 				...(indexSettings ? JSON.parse(indexSettings) : null),
 				'index.number_of_shards': shards,
@@ -143,7 +144,7 @@ class CreateAppModal extends Component {
 
 		const isValid = validateAppName(appName);
 		if (isValid) {
-			handleCreateApp(options);
+			await handleCreateApp(options);
 		} else {
 			notification.error({
 				message: 'Invalid App name',

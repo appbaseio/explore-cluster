@@ -6,6 +6,7 @@ import {
 	APP_SCREEN_PREFERENCES,
 	SIDE_BAR,
 	ROUTES_ACTION,
+	SAVE_HISTORY,
 } from '../constants';
 import { createAction } from '../batteries/modules/actions/utils';
 
@@ -95,4 +96,8 @@ export function setAppRoutes(payload: Object): Object {
 
 export function setClusterRoutes(payload: Object): Object {
 	return { type: ROUTES_ACTION.SET_CLUSTER_ROUTES, payload };
+}
+
+export function saveRecentRoute(payload: string): Object {
+	return { type: SAVE_HISTORY, payload };
 }

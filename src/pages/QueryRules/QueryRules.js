@@ -20,6 +20,8 @@ import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 import { event, timingEvent } from '../../utils/gtag';
 import moment from '../../utils/moment';
+import NoIndex from '../NoIndexPage/NoIndex';
+import { saveRecentRoute } from '../../actions';
 
 const { Header } = Layout;
 
@@ -54,7 +56,16 @@ class QueryRules extends Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { reordering, hasError, deleted } = this.props;
+		const {
+			reordering,
+			hasError,
+			deleted,
+			isAppCreating,
+			createdAppName: appName,
+			updateRecentRoute,
+			history,
+			hasJSON,
+		} = this.props;
 		if (!reordering && prevProps.reordering !== reordering) {
 			if (hasError) {
 				message.error('Error while sorting items');
@@ -65,6 +76,19 @@ class QueryRules extends Component {
 
 		if (prevProps.deleted !== deleted) {
 			message.success('Deleted item successfully');
+		}
+
+		if (!isAppCreating && prevProps.isAppCreating) {
+			updateRecentRoute(window.location.pathname);
+			history.push('/');
+
+			if (hasJSON === 'sample') {
+				history.push(`app/${appName}/import?load-data=true`);
+			} else if (hasJSON) {
+				history.push(`app/${appName}/import`);
+			} else {
+				history.push(`app/${appName}`);
+			}
 		}
 	}
 
@@ -109,7 +133,8 @@ class QueryRules extends Component {
 	};
 
 	render() {
-		const { collapsed, rules, isLoading, tier, featureRules, apps, usageStats } = this.props;
+		const { collapsed, rules, isLoading, tier, featureRules, apps, usageStats, isFetching } =
+			this.props;
 		const { visible, app } = this.state;
 
 		if (!isValidPlan(tier, featureRules)) {
@@ -132,6 +157,16 @@ class QueryRules extends Component {
 		}
 
 		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
+		// console.log(apps);
+		if (
+			!isLoading &&
+			!isFetching &&
+			apps &&
+			!Object.keys(apps)?.filter((i) => !i.startsWith('.') && !i.startsWith('metricbeat'))
+				?.length
+		) {
+			return <NoIndex view="Query Rules" />;
+		}
 
 		return (
 			<Fragment>
@@ -273,6 +308,12 @@ QueryRules.propTypes = {
 	collapsed: PropTypes.bool.isRequired,
 	fetchUsageStats: PropTypes.func.isRequired,
 	usageStats: PropTypes.object.isRequired,
+	isFetching: PropTypes.bool,
+	isAppCreating: PropTypes.bool.isRequired,
+	updateRecentRoute: PropTypes.func.isRequired,
+	history: PropTypes.object.isRequired,
+	createdAppName: PropTypes.string,
+	hasJSON: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]).isRequired,
 };
 
 QueryRules.defaultProps = {
@@ -283,7 +324,9 @@ QueryRules.defaultProps = {
 	hasError: false,
 	deleted: false,
 	isLoading: false,
+	isFetching: false,
 	apps: {},
+	createdAppName: '',
 };
 
 const mapStateToProps = (state) => ({
@@ -295,9 +338,13 @@ const mapStateToProps = (state) => ({
 	tier: get(state, '$getAppPlan.results.tier'),
 	appName: get(state, '$getCurrentApp.name'),
 	featureRules: get(state, '$getAppPlan.results.feature_rules', false),
-	apps: get(state, 'apps.data'),
+	apps: get(state, 'apps.data', {}),
+	isFetching: get(state, 'apps.isFetching', false),
 	collapsed: get(state, 'sideBarCollapsed'),
 	usageStats: get(state, '$getUsageStats.results', {}),
+	isAppCreating: get(state, 'createdApp.isLoading', false),
+	createdAppName: get(state, 'createdApp.data.appName'),
+	hasJSON: get(state, 'createdApp.data.hasJSON'),
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -305,6 +352,7 @@ const mapDispatchToProps = (dispatch) => ({
 	updateOrder: ({ toBePromoted, toBeDemoted }) =>
 		dispatch(reorderRules({ toBePromoted, toBeDemoted })),
 	fetchUsageStats: () => dispatch(getUsageStats()),
+	updateRecentRoute: (routeName) => dispatch(saveRecentRoute(routeName)),
 });
 
 export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(QueryRules));
