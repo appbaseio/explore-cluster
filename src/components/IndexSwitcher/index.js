@@ -24,14 +24,15 @@ function IndexSwitcher({
 	renderItem,
 	isAppsLoading,
 }) {
-	if (filteredApps.length === 1 && item.link)
+	const userApps = filteredApps.filter((index) => index && !index.includes('metricbeat-'));
+
+	if (userApps.length === 1 && item.link)
 		return (
-			<Link to={`/app/${filteredApps[0]}/${item.link}`}>
+			<Link to={`/app/${userApps[0]}/${item.link}`}>
 				{renderItem ? renderItem() : <LabelTag item={item} />}
 			</Link>
 		);
 
-	const userApps = filteredApps.filter((index) => index && !index.includes('metricbeat-'));
 	const sortedApps = userApps.sort((a, b) => {
 		if (a < b) {
 			return -1;

@@ -102,7 +102,7 @@ const AppHeader = ({
 		{isUsingTrial && showProfile() && (
 			<div style={{ marginRight: 20 }}>
 				<Tooltip title="You are currently on a trial which unlocks all the appbase.io enterprise plan features. You can upgrade to a paid plan anytime till the trial expires. Once your trial expires, you won't be able to access appbase.io.">
-					<Button css={trialBtn} type="danger" href="billing">
+					<Button css={trialBtn} type="danger" href="/cluster/billing">
 						<span css={trialText}>
 							{daysLeft > 0
 								? `Trial expires in ${daysLeft} ${

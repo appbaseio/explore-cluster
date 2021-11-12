@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { Table, Card, notification, Alert } from 'antd';
 import get from 'lodash/get';
@@ -25,6 +26,8 @@ import { errorMessageTemplate, jsonValidator } from './utils';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { event, timingEvent } from '../../utils/gtag';
 import moment from '../../utils/moment';
+import NoIndex from '../../pages/NoIndexPage/NoIndex';
+import { saveRecentRoute } from '../../actions';
 
 const columns = [
 	{
@@ -141,8 +144,28 @@ class StoredQueries extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { errors } = this.props;
+		const {
+			errors,
+			isAppCreating,
+			updateRecentRoute,
+			history,
+			createdAppName: appName,
+			hasJSON,
+		} = this.props;
 		displayErrors(errors, prevProps.errors, true);
+
+		if (!isAppCreating && prevProps.isAppCreating) {
+			updateRecentRoute(window.location.pathname);
+			history.push('/');
+
+			if (hasJSON === 'sample') {
+				history.push(`app/${appName}/import?load-data=true`);
+			} else if (hasJSON) {
+				history.push(`app/${appName}/import`);
+			} else {
+				history.push(`app/${appName}`);
+			}
+		}
 	}
 
 	componentWillUnmount() {
@@ -363,12 +386,21 @@ class StoredQueries extends React.Component {
 
 	render() {
 		const { createMode, editMode, currentStoredQuery, copyEndpoint } = this.state;
-		const { isLoading, storedQueries, isDeleting, storedQueriesUsage } = this.props;
+		const { isLoading, storedQueries, isDeleting, storedQueriesUsage, apps, isFetching } =
+			this.props;
 		const isDefault = !(createMode || editMode);
-		if (isLoading && !(Array.isArray(storedQueries) && storedQueries.length)) {
+		if (isLoading && !(Array.isArray(storedQueries) && storedQueries.length) && isFetching) {
 			return <Loader />;
 		}
 
+		if (
+			apps &&
+			!Object.keys(apps)?.filter((i) => !i.startsWith('.') && !i.startsWith('metricbeat'))
+				?.length &&
+			!isFetching
+		) {
+			return <NoIndex view="Stored Queries" />;
+		}
 		return (
 			<React.Fragment>
 				<Banner {...this.bannerDetails} />
@@ -415,7 +447,7 @@ class StoredQueries extends React.Component {
 											message={
 												record.usageCount > 0
 													? `Used ${record.usageCount}
-															 times in last 30 days`
+																 times in last 30 days`
 													: 'Not used in the last 30 days'
 											}
 										/>
@@ -453,6 +485,9 @@ class StoredQueries extends React.Component {
 StoredQueries.defaultProps = {
 	storedQueries: [],
 	appName: '',
+	apps: {},
+	isFetching: false,
+	createdAppName: '',
 };
 
 StoredQueries.propTypes = {
@@ -469,6 +504,13 @@ StoredQueries.propTypes = {
 	appName: PropTypes.string,
 	plan: PropTypes.string.isRequired,
 	storedQueriesUsage: PropTypes.object.isRequired,
+	apps: PropTypes.object,
+	isFetching: PropTypes.bool,
+	isAppCreating: PropTypes.bool.isRequired,
+	updateRecentRoute: PropTypes.func.isRequired,
+	history: PropTypes.object.isRequired,
+	createdAppName: PropTypes.string,
+	hasJSON: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]).isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -476,6 +518,8 @@ const mapStateToProps = (state) => ({
 	storedQueries: get(state, '$getAppStoredQueries.results', []),
 	isLoading: get(state, '$getAppStoredQueries.isFetching', false),
 	isDeleting: get(state, '$deleteAppStoredQuery.isFetching', false),
+	apps: get(state, 'apps.data', {}),
+	isFetching: get(state, 'apps.isFetching', false),
 	errors: [
 		get(state, '$getAppStoredQueries.error'),
 		get(state, '$saveAppStoredQuery.error'),
@@ -485,6 +529,9 @@ const mapStateToProps = (state) => ({
 	],
 	appName: get(state, '$getCurrentApp.name'),
 	storedQueriesUsage: get(state, '$getAppStoredQueriesUsage.results', {}),
+	isAppCreating: get(state, 'createdApp.isLoading', false),
+	createdAppName: get(state, 'createdApp.data.appName'),
+	hasJSON: get(state, 'createdApp.data.hasJSON'),
 });
 
 const mapDispatchToProps = (dispatch) => ({
@@ -494,6 +541,7 @@ const mapDispatchToProps = (dispatch) => ({
 	validateStoredQuery: (id, payload) => dispatch(validateAppStoredQuery(id, payload)),
 	executeStoredQuery: (id, payload) => dispatch(executeAppStoredQuery(id, payload)),
 	fetchStoredQueriesUsage: () => dispatch(getStoredQueriesUsage()),
+	updateRecentRoute: (routeName) => dispatch(saveRecentRoute(routeName)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(StoredQueries);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(StoredQueries));

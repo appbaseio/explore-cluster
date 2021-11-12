@@ -740,7 +740,7 @@ class QueryRulesForm extends React.Component {
 			viewType,
 			aggsFields,
 		} = this.state;
-		const { username, password, saveState } = this.props;
+		const { username, password, saveState, searchState } = this.props;
 
 		const index = selectedIndexes?.join(',');
 		const ACC_API = getURL();
@@ -788,7 +788,11 @@ class QueryRulesForm extends React.Component {
 		}
 
 		if (mode === 'save') {
-			saveState(payload);
+			if (searchState.promotedData) {
+				saveState({ promotedData: searchState.promotedData, payload });
+			} else {
+				saveState(payload);
+			}
 		}
 
 		return doPost(
@@ -1316,6 +1320,7 @@ QueryRulesForm.propTypes = {
 	appName: PropTypes.string,
 	fetchUsageStats: PropTypes.func.isRequired,
 	usageStats: PropTypes.object.isRequired,
+	searchState: PropTypes.object,
 };
 
 QueryRulesForm.defaultProps = {
@@ -1334,6 +1339,7 @@ QueryRulesForm.defaultProps = {
 	handleReplayClick: undefined,
 	mappings: {},
 	appName: '',
+	searchState: null,
 };
 
 const mapStateToProps = (state, props) => {
@@ -1368,6 +1374,7 @@ const mapStateToProps = (state, props) => {
 			username,
 			password,
 			appName: get(state, '$getCurrentApp.name'),
+			searchState: get(state, '$getSearchState.searchState', null),
 		};
 	}
 
