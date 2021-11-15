@@ -64,13 +64,16 @@ class Result extends React.Component {
 			selectButtonLabel,
 			page,
 			withRule,
-			// searchState = ruleState
+			searchState: rulesState,
 		} = this.props;
 		const { view } = this.state;
-		let ruleData;
+		let ruleData = {};
 		const id = window?.window.location.pathname.split('/')[3];
 		if (id) {
 			ruleData = rules?.find((rule) => rule.id === id) || {};
+		}
+		if (withRule) {
+			ruleData = rulesState?.localData || {};
 		}
 
 		return (
@@ -80,7 +83,7 @@ class Result extends React.Component {
 					componentIds={['result']}
 					render={({ searchState }) => {
 						const rulesApplied = get(searchState, 'result.settings.queryRules', []);
-						if (page === 'rules' && id && withRule) {
+						if (page === 'rules' && withRule) {
 							return (
 								<Alert
 									type="info"
@@ -101,7 +104,9 @@ class Result extends React.Component {
 														<div key={action.type} className={section}>
 															<ActionView
 																action={action}
-																ruleId={ruleData.id}
+																ruleId={
+																	ruleData.id || ruleData.name
+																}
 															/>
 														</div>
 													))}
@@ -223,7 +228,7 @@ Result.defaultProps = {
 const mapStateToProps = (state) => {
 	return {
 		searchState: get(state, '$getSearchState.searchState', null),
-	}
+	};
 };
 
 export default connect(mapStateToProps, null)(Result);

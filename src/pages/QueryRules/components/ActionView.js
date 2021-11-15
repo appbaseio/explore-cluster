@@ -87,7 +87,8 @@ class ActionView extends React.Component {
 											}}
 										>
 											{` {...} `}
-											{item.doc._suggestion_display_value || item.doc._id}
+											{item.doc._suggestion_display_value?.slice(0, 3) ||
+												item.doc._id?.slice(0, 3)}
 										</div>
 									</Popover>
 								</Tag>

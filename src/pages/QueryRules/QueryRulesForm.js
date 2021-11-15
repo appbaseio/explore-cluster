@@ -729,6 +729,7 @@ class QueryRulesForm extends React.Component {
 	fetchPreviewCount = (mode = 'none') => {
 		const {
 			selectedIndexes,
+			query,
 			queryValue,
 			dataField,
 			dataFieldValue,
@@ -739,8 +740,29 @@ class QueryRulesForm extends React.Component {
 			condition,
 			viewType,
 			aggsFields,
+			type,
+			advancedExpression,
+			fieldMap,
 		} = this.state;
-		const { username, password, saveState, searchState } = this.props;
+		const { username, password, saveState } = this.props;
+
+		const suffixExpression = `and ${parseExpression(advancedExpression, fieldMap)}`;
+
+		function getExpression() {
+			return show_advance_editor
+				? `'${(selectedIndexes || []).join(',')}' in $index ${
+						advancedExpression ? suffixExpression : ''
+				  } and $type in ${JSON.stringify(type)}`
+				: getExpressionFromValue({
+						selectedIndexes,
+						dataFieldValue,
+						dataField,
+						query,
+						queryValue,
+						condition,
+						type,
+				  });
+		}
 
 		const index = selectedIndexes?.join(',');
 		const ACC_API = getURL();
@@ -788,8 +810,15 @@ class QueryRulesForm extends React.Component {
 		}
 
 		if (mode === 'save') {
-			if (searchState && searchState.promotedData) {
-				saveState({ promotedData: searchState.promotedData, payload });
+			if (viewType === 'withRule') {
+				const newPayload = { ...payload };
+				newPayload.localData = {
+					name,
+					description,
+					actions,
+					trigger: { expression: condition === 'always' ? '' : getExpression() },
+				};
+				saveState(newPayload);
 			} else {
 				saveState(payload);
 			}
