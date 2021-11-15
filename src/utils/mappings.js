@@ -364,16 +364,20 @@ export const updateSubFields = ({
 				fields: get(mappings, `properties.${field}.fields`, {}),
 			}),
 		};
+		const fieldData = {
+			...get(mappings, `properties.${field}`, {}),
+			...(Object.keys(fields).length ? { fields } : {}),
+		};
+
+		if (type.trim()) {
+			fieldData.type = type;
+		}
 
 		return {
 			...agg,
 			properties: {
 				...agg.properties,
-				[field]: {
-					type,
-					...get(mappings, `properties.${field}`, {}),
-					...(Object.keys(fields).length ? { fields } : {}),
-				},
+				[field]: fieldData,
 			},
 		};
 	}, {});
@@ -492,13 +496,16 @@ export const applyNgramMapping = (mappings, isNgramEnabled) => {
 		const type = get(fieldVal, 'type', ``);
 		if (get(fieldVal, 'properties', null)) {
 			// recursive call the function
+			const fieldData = {
+				properties: applyNgramMapping(get(fieldVal, 'properties'), isNgramEnabled),
+			};
 
+			if (type.trim()) {
+				fieldData.type = type;
+			}
 			updatedData = {
 				...updatedData,
-				[field]: {
-					type,
-					properties: applyNgramMapping(get(fieldVal, 'properties'), isNgramEnabled),
-				},
+				[field]: fieldData,
 			};
 		} else if (type === 'text') {
 			if (!isNgramEnabled && get(fieldVal, 'fields.search', null)) {
@@ -510,9 +517,7 @@ export const applyNgramMapping = (mappings, isNgramEnabled) => {
 						...fieldVal,
 					},
 				};
-			}
-
-			if (isNgramEnabled && !get(fieldVal, 'fields.search', null)) {
+			} else if (isNgramEnabled && !get(fieldVal, 'fields.search', null)) {
 				// add the .search field
 				updatedData = {
 					...updatedData,
@@ -526,6 +531,13 @@ export const applyNgramMapping = (mappings, isNgramEnabled) => {
 								type: 'text',
 							},
 						},
+					},
+				};
+			} else {
+				updatedData = {
+					...updatedData,
+					[field]: {
+						...fieldVal,
 					},
 				};
 			}
@@ -573,12 +585,17 @@ export const applyLanguageMapping = (mappings, language) => {
 		const type = get(fieldVal, 'type', ``);
 		if (get(fieldVal, 'properties', null)) {
 			// recursive call the function
+			const fieldData = {
+				properties: applyNgramMapping(get(fieldVal, 'properties'), language),
+			};
+
+			if (type.trim()) {
+				fieldData.type = type;
+			}
+
 			updatedData = {
 				...updatedData,
-				[field]: {
-					type,
-					properties: applyNgramMapping(get(fieldVal, 'properties'), language),
-				},
+				[field]: fieldData,
 			};
 		} else if (type === 'text') {
 			updatedData = {
