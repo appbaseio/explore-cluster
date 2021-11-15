@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { Card, Radio, Icon, Row, Button, Alert, Tooltip, Typography } from 'antd';
 import { StateProvider } from '@appbaseio/reactivesearch';
 import { Link } from 'react-router-dom';
@@ -63,6 +64,7 @@ class Result extends React.Component {
 			selectButtonLabel,
 			page,
 			withRule,
+			// searchState = ruleState
 		} = this.props;
 		const { view } = this.state;
 		let ruleData;
@@ -70,6 +72,7 @@ class Result extends React.Component {
 		if (id) {
 			ruleData = rules?.find((rule) => rule.id === id) || {};
 		}
+
 		return (
 			<Card>
 				<StateProvider
@@ -202,6 +205,7 @@ Result.propTypes = {
 	value: PropTypes.array,
 	page: PropTypes.string,
 	withRule: PropTypes.bool,
+	searchState: PropTypes.object,
 };
 
 Result.defaultProps = {
@@ -213,14 +217,15 @@ Result.defaultProps = {
 	value: [],
 	page: '',
 	withRule: false,
+	searchState: null,
 };
 
-// const mapStateToProps = (state, props) => {
-// 	return {
-// 		AppRules:  get(state, '$getSearchState.searchState.settings'),
-// 	}
-// };
+const mapStateToProps = (state) => {
+	return {
+		searchState: get(state, '$getSearchState.searchState', null),
+	}
+};
 
-// export default connect(mapStateToProps, null)(Result);
+export default connect(mapStateToProps, null)(Result);
 
-export default Result;
+// export default Result;
