@@ -788,7 +788,7 @@ class QueryRulesForm extends React.Component {
 		}
 
 		if (mode === 'save') {
-			if (searchState.promotedData) {
+			if (searchState && searchState.promotedData) {
 				saveState({ promotedData: searchState.promotedData, payload });
 			} else {
 				saveState(payload);
