@@ -396,14 +396,13 @@ const generateSandboxURL = ({ settings, app, credentials, url }) => {
 		'src/styles.css': { content: styles(filtersWithProps.length) },
 		'package.json': {
 			content: {
-				name: 'ReactiveSearch Starter',
+				name: 'ReactiveSearch Starter App',
 				description:
-					'Reactivesearch Starter generated from Search Preview feature of Appbase.io',
+					'Reactivesearch starter app generated from Search preview in appbase.io dashboard',
 				version: '0.0.1',
 				keywords: ['react', 'reactivesearch'],
 				main: 'src/index.js',
 				browserslist: ['>0.2%', 'not dead', 'not ie <= 11', 'not op_mini all'],
-				author: 'jyash97@gmail.com',
 				dependencies,
 			},
 		},
