@@ -1,18 +1,28 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { Card, Radio, Icon, Row, Button, Alert, Tooltip, Typography } from 'antd';
 import { StateProvider } from '@appbaseio/reactivesearch';
 import { Link } from 'react-router-dom';
+import { css } from 'emotion';
 import get from 'lodash/get';
 import QueryView from './QueryView';
 import ListView from './ListView';
 import settingsMap from '../../../../components/ReviewAndSave/helper';
 import { ruleStyle } from './styles';
+import ActionView from '../../../QueryRules/components/ActionView';
+
+const section = css`
+	margin-bottom: 10px;
+`;
 
 class Result extends React.Component {
-	state = {
-		view: 'list',
-	};
+	constructor(props) {
+		super(props);
+		this.state = {
+			view: 'list',
+		};
+	}
 
 	shouldComponentUpdate(nextProps, nextState) {
 		const { result, app, rules } = this.props;
@@ -34,6 +44,15 @@ class Result extends React.Component {
 		});
 	};
 
+	titleCase = (str) => {
+		const sentence = str.toLowerCase().split('_');
+		// eslint-disable-next-line
+		for (let i = 0; i < sentence.length; i++) {
+			sentence[i] = sentence[i][0].toUpperCase() + sentence[i].slice(1);
+		}
+		return sentence.join(' ');
+	};
+
 	render() {
 		const {
 			result,
@@ -43,8 +62,20 @@ class Result extends React.Component {
 			onChange,
 			value,
 			selectButtonLabel,
+			page,
+			withRule,
+			searchState: rulesState,
 		} = this.props;
 		const { view } = this.state;
+		let ruleData = {};
+		const id = window?.window.location.pathname.split('/')[3];
+		if (id) {
+			ruleData = rules?.find((rule) => rule.id === id) || {};
+		}
+		if (withRule) {
+			ruleData = rulesState?.localData || {};
+		}
+
 		return (
 			<Card>
 				<StateProvider
@@ -52,6 +83,40 @@ class Result extends React.Component {
 					componentIds={['result']}
 					render={({ searchState }) => {
 						const rulesApplied = get(searchState, 'result.settings.queryRules', []);
+						if (page === 'rules' && withRule) {
+							return (
+								<Alert
+									type="info"
+									icon="info"
+									style={{ margin: '0px 0 16px' }}
+									message={
+										<React.Fragment>
+											<div className={ruleStyle}>
+												<div>
+													<p className="name">{ruleData.name}</p>
+													<p className="expression">
+														{ruleData.trigger &&
+															ruleData.trigger.expression}
+													</p>
+												</div>
+												<div>
+													{get(ruleData, 'actions', []).map((action) => (
+														<div key={action.type} className={section}>
+															<ActionView
+																action={action}
+																ruleId={
+																	ruleData.id || ruleData.name
+																}
+															/>
+														</div>
+													))}
+												</div>
+											</div>
+										</React.Fragment>
+									}
+								/>
+							);
+						}
 						if (rulesApplied.length) {
 							return (
 								<Alert
@@ -98,14 +163,16 @@ class Result extends React.Component {
 					}}
 				/>
 				<Row type="flex" justify="space-between" align="middle">
-					<Link to={`/app/${app}/results/`}>
-						<Tooltip title={settingsMap.set_result.description}>
-							<Button ghost type="primary">
-								<Icon type="edit" />
-								{settingsMap.set_result.title}
-							</Button>
-						</Tooltip>
-					</Link>
+					{page !== 'rules' && (
+						<Link to={`/app/${app}/results/`}>
+							<Tooltip title={settingsMap.set_result.description}>
+								<Button ghost type="primary">
+									<Icon type="edit" />
+									{settingsMap.set_result.title}
+								</Button>
+							</Tooltip>
+						</Link>
+					)}
 					<Radio.Group value={view} onChange={this.handleViewChange}>
 						<Radio.Button value="list">
 							<Icon style={{ marginRight: 5 }} type="unordered-list" />
@@ -141,6 +208,9 @@ Result.propTypes = {
 	selectButtonLabel: PropTypes.string,
 	onChange: PropTypes.func,
 	value: PropTypes.array,
+	page: PropTypes.string,
+	withRule: PropTypes.bool,
+	searchState: PropTypes.object,
 };
 
 Result.defaultProps = {
@@ -150,6 +220,17 @@ Result.defaultProps = {
 	selectButtonLabel: undefined,
 	onChange: () => {},
 	value: [],
+	page: '',
+	withRule: false,
+	searchState: null,
 };
 
-export default Result;
+const mapStateToProps = (state) => {
+	return {
+		searchState: get(state, '$getSearchState.searchState', null),
+	};
+};
+
+export default connect(mapStateToProps, null)(Result);
+
+// export default Result;

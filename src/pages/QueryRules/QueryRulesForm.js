@@ -33,9 +33,11 @@ import Conditions from './components/Conditions';
 import ActionSelector from './components/ActionSelector';
 import Actions from './components/Actions';
 import { getErrorClass, getErrorCount, getErrorMessage, getErrorMessages } from './utils/error';
-import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
+import { getURL } from '../../constants/config';
 import { addQueryRule, deleteRule, getRules, putRule } from '../../batteries/modules/actions/rules';
-import { getAppMappings, getUsageStats } from '../../batteries/modules/actions';
+import PreviewPage from './PreviewPage';
+import { getAppMappings, getUsageStats, setSearchState } from '../../batteries/modules/actions';
+import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import CloneRule from './components/CloneRule';
 import Info from '../../components/Info';
 import {
@@ -54,8 +56,11 @@ import { getSingleFunction } from '../../batteries/utils/app';
 import { isValidPlan } from '../../batteries/utils';
 import { AdvancedEditor, CustomAutoComplete } from '../../components/AdvancedEditor';
 import { getRawQuery, parseExpression } from '../../components/AdvancedEditor/helper';
+
 import { allowedTiers } from '../../utils/prop-types';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { doPost } from '../../batteries/utils/requestService';
+import { getAuthHeaders } from '../../batteries/utils/mappings';
 
 const customReactFilter = css`
 	.react-filter-box {
@@ -169,6 +174,7 @@ class QueryRulesForm extends React.Component {
 		super(props);
 		const hasId = get(props.match, 'params.id');
 		this.state = {
+			viewType: 'withoutRule',
 			// Rule Info
 			name: '',
 			description: '',
@@ -204,6 +210,7 @@ class QueryRulesForm extends React.Component {
 			error: {},
 			loading: false,
 			editorKey: Date.now(),
+			previewCount: 0,
 		};
 	}
 
@@ -221,6 +228,7 @@ class QueryRulesForm extends React.Component {
 			appName,
 		} = this.props;
 		const { isEditPage } = this.state;
+
 		if (!(rules && rules.length)) {
 			fetchRules();
 		}
@@ -259,22 +267,28 @@ class QueryRulesForm extends React.Component {
 			unparsedRule,
 			mappings,
 		} = this.props;
+
 		const { isEditPage } = this.state;
 
 		if (!Object.keys(prevProps.mappings).length && Object.keys(mappings).length) {
 			this.updateAppMappings();
 		}
 
-		if (isEditPage && prevProps.rule !== rule && !isUpdating) {
+		if (isEditPage && JSON.stringify(prevProps.rule) !== JSON.stringify(rule) && !isUpdating) {
 			const { show_advance_editor } = rule;
 			const { rawQuery, indexes } = getRawQuery(show_advance_editor, unparsedRule);
 			// eslint-disable-next-line react/no-did-update-set-state
-			this.setState({
-				...rule,
-				rawQuery,
-				advancedExpression: rawQuery,
-				selectedIndexes: show_advance_editor ? indexes : rule.selectedIndexes,
-			});
+			this.setState(
+				{
+					...rule,
+					rawQuery,
+					advancedExpression: rawQuery,
+					selectedIndexes: show_advance_editor ? indexes : rule.selectedIndexes,
+				},
+				() => {
+					this.fetchPreviewCount();
+				},
+			);
 		}
 
 		if (!isEditPage && !isCreating && prevProps.isCreating !== isCreating) {
@@ -323,15 +337,22 @@ class QueryRulesForm extends React.Component {
 			indexes: selectedIndexes,
 			isAggs: true,
 		});
-		this.setState({
-			mappings,
-			dataFields,
-			searchFields,
-			aggsFields,
-			fieldMap,
-			subFieldsMap,
-			loading: false,
-		});
+		this.setState(
+			{
+				mappings,
+				dataFields,
+				searchFields,
+				aggsFields,
+				fieldMap,
+				subFieldsMap,
+				loading: false,
+			},
+			() => {
+				if (aggsFields?.length) {
+					this.fetchPreviewCount();
+				}
+			},
+		);
 	};
 
 	getAlertMessage = (hasChanged, isCreating, isUpdating, count) => {
@@ -349,26 +370,37 @@ class QueryRulesForm extends React.Component {
 
 	handleInput = (e) => {
 		const { name, value } = e.target;
-
-		this.setState((prevState) => ({
-			[name]: value,
-			actions:
-				name === 'condition'
-					? prevState.actions.filter((action) => action.type !== 'replace_search_term')
-					: prevState.actions,
-			error: {
-				...prevState.error,
-				[name === 'dataFieldValue' || name === 'queryValue' ? 'condition' : name]: {
-					hasError: false,
+		this.setState(
+			(prevState) => ({
+				[name]: value,
+				actions:
+					name === 'condition'
+						? prevState.actions.filter(
+								(action) => action.type !== 'replace_search_term',
+						  )
+						: prevState.actions,
+				error: {
+					...prevState.error,
+					[name === 'dataFieldValue' || name === 'queryValue' ? 'condition' : name]: {
+						hasError: false,
+					},
 				},
+			}),
+			() => {
+				if (name === 'condition') {
+					this.fetchPreviewCount();
+				}
 			},
-		}));
+		);
 	};
 
 	handleDropdown = (name, value) => {
-		this.setState({
-			[name]: value,
-		});
+		this.setState(
+			{
+				[name]: value,
+			},
+			() => this.fetchPreviewCount(),
+		);
 	};
 
 	handleStatus = (value) => {
@@ -391,20 +423,23 @@ class QueryRulesForm extends React.Component {
 			isAggs: true,
 		});
 
-		this.setState((prevState) => ({
-			editorKey: Date.now(),
-			selectedIndexes,
-			dataFields,
-			searchFields,
-			aggsFields,
-			dataField: dataFields.includes(prevState.dataField) ? prevState.dataField : '',
-			error: {
-				...prevState.error,
-				selectedIndexes: {
-					hasError: false,
+		this.setState(
+			(prevState) => ({
+				editorKey: Date.now(),
+				selectedIndexes,
+				dataFields,
+				searchFields,
+				aggsFields,
+				dataField: dataFields.includes(prevState.dataField) ? prevState.dataField : '',
+				error: {
+					...prevState.error,
+					selectedIndexes: {
+						hasError: false,
+					},
 				},
-			},
-		}));
+			}),
+			this.fetchPreviewCount,
+		);
 	};
 
 	setActions = (action) => {
@@ -653,6 +688,155 @@ class QueryRulesForm extends React.Component {
 		});
 	};
 
+	handleTabChange = (key) => {
+		// eslint-disable-next-line
+		if (key == 1) {
+			this.setState({ viewType: 'withoutRule' }, () => this.fetchPreviewCount('save'));
+		} else {
+			this.setState({ viewType: 'withRule' }, () => this.fetchPreviewCount('save'));
+		}
+	};
+
+	handleReplaySearch = (type) => {
+		const { handleReplayClick } = this.props;
+		const { selectedIndexes } = this.state;
+
+		this.fetchPreviewCount('save');
+
+		if (handleReplayClick) {
+			handleReplayClick(selectedIndexes.join(','));
+		} else {
+			this.setState({
+				visible: true,
+				previewType: type,
+			});
+		}
+	};
+
+	numberWithCommas = (x) => {
+		return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+	};
+
+	handleCancel = () => {
+		const { saveState } = this.props;
+		this.setState({
+			visible: false,
+			viewType: 'withoutRule',
+		});
+		saveState({});
+	};
+
+	fetchPreviewCount = (mode = 'none') => {
+		const {
+			selectedIndexes,
+			query,
+			queryValue,
+			dataField,
+			dataFieldValue,
+			name,
+			description,
+			show_advance_editor,
+			actions,
+			condition,
+			viewType,
+			aggsFields,
+			type,
+			advancedExpression,
+			fieldMap,
+		} = this.state;
+		const { username, password, saveState } = this.props;
+
+		const suffixExpression = `and ${parseExpression(advancedExpression, fieldMap)}`;
+
+		function getExpression() {
+			return show_advance_editor
+				? `'${(selectedIndexes || []).join(',')}' in $index ${
+						advancedExpression ? suffixExpression : ''
+				  } and $type in ${JSON.stringify(type)}`
+				: getExpressionFromValue({
+						selectedIndexes,
+						dataFieldValue,
+						dataField,
+						query,
+						queryValue,
+						condition,
+						type,
+				  });
+		}
+
+		const index = selectedIndexes?.join(',');
+		const ACC_API = getURL();
+		const payload = {
+			query: [],
+			settings: {
+				enableQueryRules: false,
+			},
+		};
+
+		if (condition === 'always') {
+			payload.query.push({
+				id: 'search',
+			});
+		} else {
+			payload.query.push({
+				id: 'search',
+				type: 'search',
+				value: queryValue || '',
+				size: 10,
+				react: {},
+			});
+
+			if (dataField || dataFieldValue) {
+				payload.query.push({
+					id: 'list-1',
+					type: 'term',
+					dataField: aggsFields.includes(`${dataField}.keyword`)
+						? `${dataField}.keyword`
+						: dataField,
+					value: [dataFieldValue],
+					execute: true,
+				});
+				payload.query[0].react = { and: ['list-1'] };
+			}
+		}
+
+		if (viewType === 'withRule') {
+			payload.settings.queryRule = {
+				name,
+				description,
+				show_advance_editor,
+				actions,
+			};
+		}
+
+		if (mode === 'save') {
+			if (viewType === 'withRule') {
+				const newPayload = { ...payload };
+				newPayload.localData = {
+					name,
+					description,
+					actions,
+					trigger: { expression: condition === 'always' ? '' : getExpression() },
+				};
+				saveState(newPayload);
+			} else {
+				saveState(payload);
+			}
+		}
+
+		return doPost(
+			`${ACC_API}/${index}/_reactivesearch`,
+			payload,
+			getAuthHeaders(btoa(`${username}:${password}`)),
+		)
+			.then((json) => {
+				this.setState({ previewCount: json?.search?.hits.total.value });
+			})
+			.catch((err) => {
+				console.error(err);
+			});
+	};
+
 	render() {
 		const {
 			condition,
@@ -692,6 +876,8 @@ class QueryRulesForm extends React.Component {
 			featureRules,
 			usageStats,
 		} = this.props;
+
+		const { visible, previewCount, previewType } = this.state;
 		this.customAutoComplete = new CustomAutoComplete(null, [
 			{ columnField: '$query', type: 'selection' },
 			...dataFields.map((field) => ({
@@ -818,6 +1004,36 @@ class QueryRulesForm extends React.Component {
 									<div style={{ marginTop: 10 }}>
 										<DocsLink url="https://docs.appbase.io/docs/search/Rules/#configure-if-condition" />
 									</div>
+									{/* Preview */}
+									<div
+										style={{
+											border: '1px solid #e8e8e8',
+											borderStyle: 'dashed',
+											padding: 10,
+											margin: 10,
+											display: 'flex',
+											alignItems: 'center',
+											justifyContent: 'space-between',
+										}}
+									>
+										<div>
+											{this.numberWithCommas(previewCount || 0)} documents
+											match
+										</div>
+										<PreviewPage
+											previewType={previewType}
+											showModal={visible}
+											selectedIndexes={selectedIndexes}
+											handleCancel={this.handleCancel}
+											onChange={this.handleTabChange}
+										/>
+										<Button
+											onClick={() => this.handleReplaySearch('preview')}
+											type="primary"
+										>
+											Preview
+										</Button>
+									</div>
 								</Typography.Text>
 							</Col>
 
@@ -896,7 +1112,10 @@ class QueryRulesForm extends React.Component {
 												]}
 												style={{ display: 'flex', flexWrap: 'wrap' }}
 												onChange={(data) => {
-													this.setState({ type: data });
+													this.setState(
+														{ type: data },
+														this.fetchPreviewCount,
+													);
 												}}
 											/>
 										</div>
@@ -925,6 +1144,7 @@ class QueryRulesForm extends React.Component {
 											query={query}
 											onDropdownChange={this.handleDropdown}
 											queryValue={queryValue}
+											onBlur={this.fetchPreviewCount}
 										/>
 									</ErrorToaster>
 								)}
@@ -1071,6 +1291,15 @@ class QueryRulesForm extends React.Component {
 								/>
 							)}
 							<Button
+								onClick={() => this.handleReplaySearch('ruleEffectPreview')}
+								type="primary"
+								ghost
+								size="large"
+								style={{ marginRight: 10 }}
+							>
+								Preview Rule Effect
+							</Button>
+							<Button
 								disabled={isEditPage && !hasChanged}
 								size="large"
 								onClick={this.getErrorStatus}
@@ -1106,6 +1335,11 @@ QueryRulesForm.propTypes = {
 	updateRule: PropTypes.func.isRequired,
 	match: PropTypes.object.isRequired,
 	fetchRules: PropTypes.func.isRequired,
+
+	username: PropTypes.string.isRequired,
+	password: PropTypes.string.isRequired,
+	handleReplayClick: PropTypes.func,
+	saveState: PropTypes.func.isRequired,
 	fetchMappings: PropTypes.func.isRequired,
 	mappings: PropTypes.oneOfType([
 		PropTypes.array,
@@ -1115,6 +1349,7 @@ QueryRulesForm.propTypes = {
 	appName: PropTypes.string,
 	fetchUsageStats: PropTypes.func.isRequired,
 	usageStats: PropTypes.object.isRequired,
+	searchState: PropTypes.object,
 };
 
 QueryRulesForm.defaultProps = {
@@ -1130,8 +1365,10 @@ QueryRulesForm.defaultProps = {
 	rules: null,
 	tier: undefined,
 	featureRules: false,
+	handleReplayClick: undefined,
 	mappings: {},
 	appName: '',
+	searchState: null,
 };
 
 const mapStateToProps = (state, props) => {
@@ -1163,7 +1400,10 @@ const mapStateToProps = (state, props) => {
 			updateError: get(ruleData, 'update.error'),
 			isDeleting: get(ruleData, 'isDeleting'),
 			deleteError: get(ruleData, 'deleteError'),
+			username,
+			password,
 			appName: get(state, '$getCurrentApp.name'),
+			searchState: get(state, '$getSearchState.searchState', null),
 		};
 	}
 
@@ -1175,6 +1415,7 @@ const mapDispatchToProps = (dispatch) => ({
 	createRule: (rule) => dispatch(addQueryRule(rule)),
 	updateRule: (rule) => dispatch(putRule(rule)),
 	removeRule: (id) => dispatch(deleteRule(id)),
+	saveState: (state) => dispatch(setSearchState(state)),
 	fetchMappings: (appName, credentials) => dispatch(getAppMappings(appName, credentials)),
 	fetchUsageStats: () => dispatch(getUsageStats()),
 });

@@ -356,6 +356,8 @@ class SearchPreview extends React.Component {
 			onChange,
 			value,
 			selectButtonLabel,
+			page,
+			withRule,
 		} = this.props;
 
 		const {
@@ -460,6 +462,7 @@ class SearchPreview extends React.Component {
 					url={url}
 					appbaseConfig={{
 						recordAnalytics: showFeaturedProducts ? false : isAnalyticsEnabled,
+						enableQueryRules: page !== 'rules',
 					}}
 				>
 					<Col md={6}>
@@ -469,6 +472,7 @@ class SearchPreview extends React.Component {
 								app={app}
 								aggs={aggregations}
 								handleModal={handleModal}
+								page={page}
 							/>
 						</ErrorToaster>
 					</Col>
@@ -483,6 +487,7 @@ class SearchPreview extends React.Component {
 								onValueChange={this.setQueryGrades}
 								search={search}
 								handleModal={handleModal}
+								page={page}
 							/>
 						</ErrorToaster>
 
@@ -509,6 +514,8 @@ class SearchPreview extends React.Component {
 									selectButtonLabel={selectButtonLabel}
 									onChange={onChange}
 									value={value}
+									page={page}
+									withRule={withRule}
 								/>
 							</SandboxContext.Provider>
 						</ErrorToaster>
@@ -564,7 +571,7 @@ SearchPreview.propTypes = {
 	fetchingDefaultSettings: PropTypes.bool,
 	isFetchingMappings: PropTypes.bool,
 	mappings: PropTypes.object,
-	searchState: PropTypes.object,
+	searchState: PropTypes.array,
 	clearState: PropTypes.func,
 	handleModal: PropTypes.func,
 	showFeaturedProducts: PropTypes.bool,
@@ -572,6 +579,8 @@ SearchPreview.propTypes = {
 	value: PropTypes.array,
 	selectButtonLabel: PropTypes.string,
 	appbaseVersion: PropTypes.string.isRequired, // eslint-disable-line
+	page: PropTypes.string,
+	withRule: PropTypes.bool,
 };
 
 SearchPreview.defaultProps = {
@@ -592,6 +601,8 @@ SearchPreview.defaultProps = {
 	onChange: () => {},
 	value: [],
 	selectButtonLabel: undefined,
+	page: '',
+	withRule: false,
 };
 
 export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(SearchPreview));

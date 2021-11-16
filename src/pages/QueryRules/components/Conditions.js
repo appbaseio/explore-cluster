@@ -32,6 +32,7 @@ class Conditions extends React.Component {
 			onDropdownChange,
 			error,
 			condition,
+			onBlur,
 		} = this.props;
 
 		return (
@@ -91,6 +92,7 @@ class Conditions extends React.Component {
 										name="queryValue"
 										value={queryValue}
 										onChange={onChange}
+										onBlur={onBlur}
 									/>
 								</Col>
 							</div>
@@ -157,6 +159,7 @@ class Conditions extends React.Component {
 										name="dataFieldValue"
 										value={dataFieldValue}
 										onChange={onChange}
+										onBlur={onBlur}
 									/>
 								</Col>
 							</div>
@@ -178,6 +181,7 @@ Conditions.propTypes = {
 	onDropdownChange: PropTypes.func.isRequired,
 	error: PropTypes.object,
 	condition: PropTypes.string,
+	onBlur: PropTypes.func,
 };
 
 Conditions.defaultProps = {
@@ -188,6 +192,7 @@ Conditions.defaultProps = {
 	queryValue: undefined,
 	error: {},
 	condition: undefined,
+	onBlur: () => null,
 };
 
 export default Conditions;

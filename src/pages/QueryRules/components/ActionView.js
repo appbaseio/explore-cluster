@@ -1,8 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { css } from 'emotion';
+import get from 'lodash/get';
+import { connect } from 'react-redux';
 import { Tag, Typography, Popover } from 'antd';
 import { hasValuesChanged } from '../utils';
+import JsonView from '../../../components/JsonView';
 
 const subTitle = css`
 	font-size: 14px;
@@ -11,16 +14,34 @@ const subTitle = css`
 	font-weight: bold;
 `;
 
+const popoverContent = css`
+	overflow-y: auto;
+	overflow-x: auto;
+	word-wrap: break-word;
+	max-width: 300px;
+	max-height: 300px;
+`;
+
+const overflow = { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
+
 const { Text } = Typography;
 
+let promotedData = [];
 class ActionView extends React.Component {
 	shouldComponentUpdate(nextProps) {
 		return hasValuesChanged(nextProps, this.props, 'action');
 	}
 
 	render() {
-		const { action, ruleId } = this.props;
+		const { action, ruleId, searchState } = this.props;
 		const actionType = action.type;
+
+		if (searchState && searchState.promotedData) {
+			promotedData = [...searchState.promotedData];
+		} else {
+			promotedData = action?.data || [];
+		}
+
 		switch (actionType) {
 			case 'replace_search_term':
 				return action.data ? (
@@ -45,11 +66,33 @@ class ActionView extends React.Component {
 				return action.data ? (
 					<React.Fragment key={ruleId}>
 						<h4 className={subTitle}>Promote Result</h4>
-						{action.data.map((item) => (
-							<Tag color="blue" key={`${ruleId}-${item.doc._id}`}>
-								{item.doc._suggestion_display_value || item.doc._id}
-							</Tag>
-						))}
+						{promotedData?.length &&
+							promotedData.map((item) => (
+								<Tag color="blue" key={`${ruleId}-${item.doc._id}`}>
+									{/* promotedData */}
+									<Popover
+										content={
+											<div css={popoverContent}>
+												<JsonView json={item.doc} />
+											</div>
+										}
+										trigger="click"
+									>
+										<div
+											css={{
+												cursor: 'pointer',
+												margin: '0 7px',
+												maxWidth: '95%',
+												...overflow,
+											}}
+										>
+											{` {...} `}
+											{item.doc._suggestion_display_value?.slice(0, 3) ||
+												item.doc._id?.slice(0, 3)}
+										</div>
+									</Popover>
+								</Tag>
+							))}
 					</React.Fragment>
 				) : null;
 			case 'add_filter':
@@ -145,11 +188,19 @@ class ActionView extends React.Component {
 ActionView.propTypes = {
 	action: PropTypes.object,
 	ruleId: PropTypes.string,
+	searchState: PropTypes.object,
 };
 
 ActionView.defaultProps = {
 	action: {},
 	ruleId: undefined,
+	searchState: null,
 };
 
-export default ActionView;
+const mapStateToProps = (state) => {
+	return {
+		searchState: get(state, '$getSearchState.searchState', null),
+	};
+};
+
+export default connect(mapStateToProps, null)(ActionView);

@@ -86,12 +86,12 @@ class Search extends React.Component {
 	};
 
 	render() {
-		const { app, search, handleModal, onValueChange } = this.props;
+		const { app, search, handleModal, onValueChange, page } = this.props;
 		const { value } = this.state;
 		return (
 			<Card>
 				<Row type="flex" gutter={8} align="middle" justify="space-between">
-					<Col xs={20}>
+					<Col xs={page === 'rules' ? 24 : 20}>
 						{search.dataField && search.dataField.length ? (
 							<DataSearch
 								{...search}
@@ -127,26 +127,28 @@ class Search extends React.Component {
 							</div>
 						)}
 					</Col>
-					<Col xs={4}>
-						<Link
-							onClick={
-								window.location.pathname === `/app/${app}/search`
-									? handleModal
-									: null
-							}
-							to={`/app/${app}/search`}
-						>
-							<Tooltip title={settingsMap.set_search.description}>
-								<Button size="large" ghost type="primary">
-									<Icon type="edit" />
-									{settingsMap.set_search.title}
-								</Button>
-							</Tooltip>
-							{search.dataField && search.dataField.length ? null : (
-								<span className={highlighter} />
-							)}
-						</Link>
-					</Col>
+					{page !== 'rules' && (
+						<Col xs={4}>
+							<Link
+								onClick={
+									window.location.pathname === `/app/${app}/search`
+										? handleModal
+										: null
+								}
+								to={`/app/${app}/search`}
+							>
+								<Tooltip title={settingsMap.set_search.description}>
+									<Button size="large" ghost type="primary">
+										<Icon type="edit" />
+										{settingsMap.set_search.title}
+									</Button>
+								</Tooltip>
+								{search.dataField && search.dataField.length ? null : (
+									<span className={highlighter} />
+								)}
+							</Link>
+						</Col>
+					)}
 					<Col xs={24}>
 						<SelectedFilters />
 					</Col>
@@ -162,12 +164,14 @@ Search.propTypes = {
 	handleValueChange: PropTypes.func,
 	handleModal: PropTypes.func,
 	onValueChange: PropTypes.func.isRequired,
+	page: PropTypes.string,
 };
 
 Search.defaultProps = {
 	search: {},
 	handleValueChange: () => {},
 	handleModal: () => {},
+	page: '',
 };
 
 export default Search;

@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { css } from 'emotion';
 import { Icon, Popover, List, Row, Col, Tooltip, Input } from 'antd';
 import { Draggable } from 'react-beautiful-dnd';
 import get from 'lodash/get';
 import JsonView from '../../../../../components/JsonView';
+import { setSearchState } from '../../../../../batteries/modules/actions';
 
 const popoverContent = css`
 	overflow-y: auto;
@@ -32,7 +34,11 @@ function getItemStyle(isDragging, draggableStyle) {
 
 const overflow = { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
 
-export default function PromoteDataTable({ dataSource, handleDelete, onChange }) {
+function PromoteDataTable({ dataSource, handleDelete, onChange, saveState }) {
+	useEffect(() => {
+		saveState({ promotedData: dataSource });
+	}, [dataSource]);
+
 	return (
 		<List
 			size="small"
@@ -58,6 +64,7 @@ PromoteDataTable.propTypes = {
 	dataSource: PropTypes.array,
 	handleDelete: PropTypes.func.isRequired,
 	onChange: PropTypes.func.isRequired,
+	saveState: PropTypes.func.isRequired,
 };
 
 PromoteDataTable.defaultProps = {
@@ -268,3 +275,9 @@ RowData.propTypes = {
 RowData.defaultProps = {
 	item: {},
 };
+
+const mapDispatchToProps = (dispatch) => ({
+	saveState: (state) => dispatch(setSearchState(state)),
+});
+
+export default connect(null, mapDispatchToProps)(PromoteDataTable);
