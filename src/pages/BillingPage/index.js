@@ -15,8 +15,8 @@ import Loader from '../../batteries/components/shared/Loader';
 import { displayErrors } from '../../utils/helper';
 import ClusterPricingTable from '../../components/PricingTable/ClusterPricingTable';
 import { PRICE_BY_PLANS, EFFECTIVE_PRICE_BY_PLANS } from '../../batteries/utils';
-import { getESVersion, getAuthHeaders } from '../../batteries/utils/mappings';
-import { getVersion, getURL } from '../../constants/config';
+import { getAuthHeaders } from '../../batteries/utils/mappings';
+import { getURL } from '../../constants/config';
 import { event, timingEvent } from '../../utils/gtag';
 import moment from '../../utils/moment';
 import BillingFrame from '../../components/PricingTable/BillingFrame';
@@ -61,11 +61,11 @@ class Billing extends Component {
 			label: 'visit',
 			value: null,
 		});
-		const { isAppPlanFetched, fetchAppPlan, credentials, errors } = this.props;
-		const esVersion = getVersion() || (await getESVersion(null, credentials));
+		const { isAppPlanFetched, fetchAppPlan, errors } = this.props;
 		// if there are already errors with plan api, don't try to fetch it again
 		// otherwise there is sideEffect with redux being updated and infinite call being made
-		if (!isAppPlanFetched && esVersion.split('.')[0] > 5 && !errors.length) {
+		// errors[0] is undefined.
+		if (!isAppPlanFetched && !errors[0]) {
 			fetchAppPlan();
 		}
 	}
