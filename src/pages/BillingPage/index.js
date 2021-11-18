@@ -2,7 +2,16 @@ import React, { Component } from 'react';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import styled, { css } from 'react-emotion';
-import { Card, Row, Collapse, message } from 'antd';
+import {
+	Card,
+	Row,
+	Collapse,
+	message as antMessage,
+	Button,
+	Input,
+	Modal,
+	notification,
+} from 'antd';
 import { connect } from 'react-redux';
 import StripeForm from '../../components/StripeForms/StripeForm';
 import BannerHeader from '../../components/Banner/Header';
@@ -10,16 +19,17 @@ import Grid from '../../components/CreateCredentials/Grid';
 import GlobalLoader from '../../batteries/components/shared/Loader/Spinner';
 import Flex from '../../batteries/components/shared/Flex';
 import { getAppPlanByName } from '../../batteries/modules/selectors';
-import { getAppPlan } from '../../batteries/modules/actions';
+import { getAppPlan, deleteAppSubscription } from '../../batteries/modules/actions';
 import Loader from '../../batteries/components/shared/Loader';
 import { displayErrors } from '../../utils/helper';
 import ClusterPricingTable from '../../components/PricingTable/ClusterPricingTable';
 import { PRICE_BY_PLANS, EFFECTIVE_PRICE_BY_PLANS } from '../../batteries/utils';
-import { getESVersion, getAuthHeaders } from '../../batteries/utils/mappings';
-import { getVersion, getURL } from '../../constants/config';
+import { getAuthHeaders } from '../../batteries/utils/mappings';
+import { getURL } from '../../constants/config';
 import { event, timingEvent } from '../../utils/gtag';
 import moment from '../../utils/moment';
 import BillingFrame from '../../components/PricingTable/BillingFrame';
+import Unsubscribe from '../../components/PricingTable/Unsubscribe';
 
 function numberWithCommas(x) {
 	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -50,6 +60,10 @@ class Billing extends Component {
 		this.startTime = moment();
 		this.state = {
 			isShowingUnsubscribeArcModal: false,
+			otp: '',
+			showOtpModal: false,
+			message: '',
+			resending: false,
 		};
 	}
 
@@ -61,11 +75,11 @@ class Billing extends Component {
 			label: 'visit',
 			value: null,
 		});
-		const { isAppPlanFetched, fetchAppPlan, credentials, errors } = this.props;
-		const esVersion = getVersion() || (await getESVersion(null, credentials));
+		const { isAppPlanFetched, fetchAppPlan, errors } = this.props;
 		// if there are already errors with plan api, don't try to fetch it again
 		// otherwise there is sideEffect with redux being updated and infinite call being made
-		if (!isAppPlanFetched && esVersion.split('.')[0] > 5 && !errors.length) {
+		// errors[0] is undefined.
+		if (!isAppPlanFetched && !errors[0]) {
 			fetchAppPlan();
 		}
 	}
@@ -131,6 +145,17 @@ class Billing extends Component {
 		);
 	}
 
+	get isOtpValid() {
+		const { otp } = this.state;
+		return otp && otp.length === 6;
+	}
+
+	cancelConfirmBox = () => {
+		this.setState({
+			isShowingUnsubscribeArcModal: false,
+		});
+	};
+
 	onShowUnsubscribeArcModal = () => {
 		this.setState((currentState) => ({
 			isShowingUnsubscribeArcModal: !currentState.isShowingUnsubscribeArcModal,
@@ -139,6 +164,70 @@ class Billing extends Component {
 
 	openChatWindow = () => {
 		window.Intercom('show');
+	};
+
+	closeOtpModal = () => {
+		this.setState({
+			showOtpModal: false,
+			otp: '',
+		});
+	};
+
+	deleteSubscription = () => {
+		const { deleteSubscription } = this.props;
+		deleteSubscription().then((action) => {
+			const message = get(action, 'payload.message');
+			if (message) {
+				this.cancelConfirmBox();
+				this.setState({
+					showOtpModal: true,
+					message,
+				});
+			}
+		});
+	};
+
+	deleteFinalSubscription = () => {
+		const { otp } = this.state;
+		const { deleteSubscription, fetchAppPlan } = this.props;
+		deleteSubscription({
+			otp: String(otp),
+		}).then((action) => {
+			const payload = get(action, 'payload');
+			if (payload) {
+				this.closeOtpModal();
+				const message = get(action, 'payload.message');
+				if (message) {
+					notification.success({
+						title: 'Unsubscribed successfully.',
+						message,
+					});
+				}
+				fetchAppPlan();
+			}
+		});
+	};
+
+	resendCode = () => {
+		const { deleteSubscription } = this.props;
+		this.setState({
+			resending: true,
+		});
+		deleteSubscription().then((action) => {
+			this.setState({
+				resending: false,
+			});
+			const message = get(action, 'payload.message');
+			if (message) {
+				this.setState({
+					otp: '',
+				});
+				notification.success({
+					title: 'Activation code sent successfully',
+					message,
+				});
+			}
+		});
 	};
 
 	updatePaymentDetails = async (token) => {
@@ -156,9 +245,9 @@ class Billing extends Component {
 			});
 			response = await response.text();
 			response = JSON.parse(response);
-			message.success(response.message);
+			antMessage.success(response.message);
 		} catch (err) {
-			message.error(err.message);
+			antMessage.error(err.message);
 		}
 	};
 
@@ -175,7 +264,10 @@ class Billing extends Component {
 			isHostedArc,
 			isClusterBilling,
 			isFetchingPlan,
+			isSubmitting
 		} = this.props;
+
+		const { showOtpModal, otp, message, resending, isShowingUnsubscribeArcModal } = this.state;
 
 		if (isFetchingPlan) {
 			return <GlobalLoader />;
@@ -189,6 +281,60 @@ class Billing extends Component {
 
 		return (
 			<React.Fragment>
+				<Modal
+					title="Cancel Subscription"
+					visible={showOtpModal}
+					onCancel={this.closeOtpModal}
+					footer={[
+						<Button key="back1" onClick={this.closeOtpModal}>
+							Cancel
+						</Button>,
+						<Button
+							loading={resending}
+							key="resend"
+							type="primary"
+							onClick={this.resendCode}
+						>
+							Resend Code
+						</Button>,
+						<Button
+							loading={!resending && isSubmitting}
+							key="submit1"
+							type="danger"
+							onClick={this.deleteFinalSubscription}
+							disabled={!this.isOtpValid}
+						>
+							Unsubscribe
+						</Button>,
+					]}
+				>
+					{message && <p>{message}</p>}
+					<div style={{ margin: '20px 0px' }}>
+						<Flex>
+							<Input
+								addonBefore="Enter Activation code"
+								name="otp"
+								value={otp}
+								autoFocus
+								onChange={(e) => {
+									this.setState({
+										otp: e.target.value,
+									});
+								}}
+								style={{
+									width: '300px',
+								}}
+							/>
+						</Flex>
+					</div>
+				</Modal>
+				{isShowingUnsubscribeArcModal && (
+					<Unsubscribe
+						deleteSubscription={this.deleteSubscription}
+						loading={isSubmitting}
+						onCancel={this.cancelConfirmBox}
+					/>
+				)}
 				<BannerHeader
 					title={plan !== 'Basic' ? 'Upgrade Your Plan Now' : 'Your Current Plan Info'}
 					description=""
@@ -285,7 +431,7 @@ class Billing extends Component {
 					}
 				/>
 				{this.billingView}
-				{subscriptionID && isPaid && (isHostedArc || isClusterBilling) && (
+				{subscriptionID && isPaid && !isOSS && (isHostedArc || isClusterBilling) && (
 					<Card
 						style={{
 							borderBottom: 0,
@@ -329,7 +475,7 @@ class Billing extends Component {
 						</p>
 					</Card>
 				)}
-				{isPaid && isSelfHostedArc && (
+				{isPaid && isSelfHostedArc && !isOnTrial && (
 					<Card
 						style={{
 							borderBottom: 0,
@@ -379,6 +525,7 @@ Billing.defaultProps = {
 };
 
 Billing.propTypes = {
+	isSubmitting: PropTypes.bool.isRequired,
 	plan: PropTypes.string.isRequired,
 	planValidity: PropTypes.number,
 	fetchAppPlan: PropTypes.func.isRequired,
@@ -393,12 +540,14 @@ Billing.propTypes = {
 	isLoading: PropTypes.bool.isRequired,
 	errors: PropTypes.array.isRequired,
 	credentials: PropTypes.string.isRequired,
+	deleteSubscription: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => {
 	const appPlan = getAppPlanByName(state);
 	const { username, password } = get(state, 'user.data') || {};
 	return {
+		isSubmitting: get(state, '$deleteAppSubscription.isFetching'),
 		isFetchingPlan: get(state, '$getAppPlan.isFetching'),
 		isAppPlanFetched: !!getAppPlanByName(state),
 		plan: get(appPlan, 'tier') || 'Free',
@@ -410,12 +559,16 @@ const mapStateToProps = (state) => {
 		isClusterBilling: get(appPlan, 'isClusterBilling', false),
 		subscriptionID: get(appPlan, 'subscription_id'),
 		isLoading: get(state, '$updateAppPaymentMethod.isFetching'),
-		errors: [get(state, '$updateAppPaymentMethod.error')],
+		errors: [
+			get(state, '$updateAppPaymentMethod.error'),
+			get(state, '$deleteAppSubscription.error'),
+		],
 		credentials: username && password ? `${username}:${password}` : null,
 	};
 };
 
 const mapDispatchToProps = (dispatch) => ({
+	deleteSubscription: (payload) => dispatch(deleteAppSubscription(payload)),
 	fetchAppPlan: () => dispatch(getAppPlan()),
 });
 
