@@ -163,6 +163,13 @@ export const cacheMessages = {
 	),
 	indices: Message('Only selected indices will be considered to be cached.'),
 };
+
+export const accessControlMessages = {
+	syncInterval: Message(
+		'Manage sync frequency of plugin preferences on each appbase.io node from the upstream Elasticsearch cluster.',
+	),
+};
+
 // eslint-disable-next-line
 export const getMessages = (isUserManagement) =>
 	isUserManagement ? userManagementMessages : credentialsMessages;

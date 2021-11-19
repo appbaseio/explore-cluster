@@ -105,6 +105,11 @@ const RoleBaseAccess = Loadable({
 	loading: Loader,
 });
 
+const SyncPreferences = Loadable({
+	loader: () => import(/* webpackChunkName: "SyncPreferences" */ '../../pages/SyncPreferences'),
+	loading: Loader,
+});
+
 const ClusterInsights = Loadable({
 	loader: () => import(/* webpackChunkName: "ClusterInsights" */ '../../pages/ClusterInsights'),
 	loading: Loader,
@@ -117,7 +122,7 @@ const GradeEvaluation = Loadable({
 
 const SuggestionsPage = Loadable({
 	loader: () =>
-		import(/* webpackChunkName: "LanguageSettings" */ '../../pages/SuggestionSettings'),
+		import(/* webpackChunkName: "SuggestionsSettings" */ '../../pages/SuggestionSettings'),
 	loading: Loader,
 });
 
@@ -377,7 +382,19 @@ class ClusterRouteContainer extends React.Component {
 							</>
 						)}
 					/>
-
+					<Route
+						exact
+						path="/cluster/sync-preferences"
+						component={(props) => (
+							<>
+								{get(allowedRoutes, '/cluster/sync-preferences') ? (
+									<AppPageContainer {...props} component={SyncPreferences} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
+						)}
+					/>
 					<Route
 						exact
 						path="/cluster/curated-insights"

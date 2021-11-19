@@ -13,7 +13,7 @@ const InputElement = ({ name, label, toolTipMessage, inputProps, placeholder, gr
 				toolTipMessage={toolTipMessage}
 				gridRatio={gridRatio}
 				component={
-					<div style={{ width: '100%' }}>
+					<div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
 						<div>
 							<Input
 								className={touched && invalid ? 'input-error' : null}

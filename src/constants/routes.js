@@ -95,6 +95,12 @@ export const APP_ROUTES = {
 				tag: 'Beta',
 				hasExactPath: true,
 			},
+			{
+				label: 'Node Sync Preferences',
+				link: '/cluster/sync-preferences',
+				tag: 'Beta',
+				hasExactPath: true,
+			},
 		],
 	},
 	'User Management': {
@@ -213,6 +219,11 @@ export const CLUSTER_ROUTES = {
 		menu: [
 			{ label: 'API Credentials', link: '/cluster/credentials' },
 			{ label: 'Role Based Access', link: '/cluster/role-based-access', tag: 'Beta' },
+			{
+				label: 'Node Sync Preferences',
+				link: '/cluster/sync-preferences',
+				tag: 'Beta',
+			},
 		],
 	},
 	'User Management': {
