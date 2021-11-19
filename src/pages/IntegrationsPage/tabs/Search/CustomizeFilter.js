@@ -4,14 +4,17 @@ import { string, object, func, bool } from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import DataFieldSelector from '../../../../components/Form/DataFieldSelector';
 import TextInput from '../../../../components/Form/Input';
+import { RANGE_FIELDS } from '../../../../constants';
 
 const { Item } = List;
 
 class CustomizeFilter extends React.Component {
 	state = {
 		visible: false,
-		filterType: 'list',
+		isRange: false,
 	};
+
+	message = '';
 
 	showModal = () => {
 		this.setState({
@@ -39,9 +42,35 @@ class CustomizeFilter extends React.Component {
 		});
 	};
 
+	setFieldType = (val, formControl) => {
+		const { type } = this.props;
+
+		if (type !== 'price') {
+			if (RANGE_FIELDS.includes(val)) {
+				// eslint-disable-next-line
+				formControl.parent?.get('filterType')?.setValue('range');
+				this.setState({
+					isRange: true,
+				});
+			} else {
+				// eslint-disable-next-line
+				formControl.parent?.get('filterType')?.setValue('list');
+				this.setState({
+					isRange: false,
+				});
+			}
+		} else if (!RANGE_FIELDS.includes(val)) {
+			this.message =
+				'Field is expected to be of Numeric type. Facet may not render correctly otherwise.';
+		} else {
+			this.message = '';
+		}
+	};
+
 	render() {
-		const { visible, filterType } = this.state;
-		const { buttonLabel, control, buttonProps, disableListOptions } = this.props;
+		const { visible, isRange } = this.state;
+		const { buttonLabel, control, buttonProps, disableListOptions, disableFilterType, type } =
+			this.props;
 		return (
 			<React.Fragment>
 				<Button {...buttonProps} onClick={this.showModal}>
@@ -52,7 +81,7 @@ class CustomizeFilter extends React.Component {
 					name={control ? undefined : 'customize'}
 					control={control}
 				>
-					{({ pristine, invalid }) => (
+					{({ pristine, invalid, value }) => (
 						<Modal
 							title="Set A Custom Filter"
 							visible={visible}
@@ -81,41 +110,64 @@ class CustomizeFilter extends React.Component {
 												<DataFieldSelector
 													isAggFields
 													control={formControl}
+													setFieldType={(val) =>
+														this.setFieldType(val, formControl)
+													}
 												/>
+												{type === 'price' && this.message && (
+													<div
+														style={{
+															lineHeight: 'normal',
+															color: 'tomato',
+														}}
+													>
+														{this.message}
+													</div>
+												)}
+												{type === 'color' && value.dataField && (
+													<div
+														style={{
+															lineHeight: 'normal',
+															color: 'tomato',
+														}}
+													>
+														Field is expected to be of Color / List
+														type. Facet may not render correctly
+														otherwise.
+													</div>
+												)}
 											</Form.Item>
 										)
 									}
 								</FieldControl>
-								<FieldControl name="filterType">
-									{(formControl) => {
-										this.setState({
-											filterType: formControl.handler().value,
-										});
-										return (
-											<Item
-												actions={[
-													<Radio.Group
-														{...formControl.handler()}
-														onChange={(e) => {
-															this.setState({
-																filterType: e.target.value,
-															});
-															formControl.markAsTouched();
-															formControl
-																.handler()
-																.onChange(e.target.value);
-														}}
-													>
-														<Radio value="list">List</Radio>
-														<Radio value="range">Range</Radio>
-													</Radio.Group>,
-												]}
-											>
-												<Item.Meta title="Display Filter As" />
-											</Item>
-										);
-									}}
-								</FieldControl>
+								{!disableFilterType && (
+									<FieldControl name="filterType" strict={false}>
+										{(formControl) => {
+											return (
+												<Item
+													actions={[
+														<Radio.Group
+															{...formControl.handler()}
+															onChange={(e) => {
+																formControl.markAsTouched();
+																formControl
+																	.handler()
+																	.onChange(e.target.value);
+															}}
+														>
+															<Radio value="list">List</Radio>
+															{(isRange || !value?.dataField) && (
+																<Radio value="range">Range</Radio>
+															)}
+														</Radio.Group>,
+													]}
+												>
+													<Item.Meta title="Display Filter As" />
+												</Item>
+											);
+										}}
+									</FieldControl>
+								)}
 								<TextInput
 									name="title"
 									label="Title"
@@ -124,7 +176,7 @@ class CustomizeFilter extends React.Component {
 									}}
 								/>
 
-								{!disableListOptions && filterType === 'list' && (
+								{!disableListOptions && value?.filterType === 'list' && (
 									<>
 										<TextInput
 											name="size"
@@ -194,13 +246,13 @@ class CustomizeFilter extends React.Component {
 												placeholder: 'Enter missing label',
 											}}
 										/>
-										<TextInput
+										{/* <TextInput
 											name="filterLabel"
 											label="Filter Label"
 											inputProps={{
 												placeholder: 'Enter filter label',
 											}}
-										/>
+										/> */}
 										<TextInput
 											name="selectAllLabel"
 											label="Select All Label"
@@ -211,7 +263,8 @@ class CustomizeFilter extends React.Component {
 									</>
 								)}
 
-								{!disableListOptions && filterType === 'range' && (
+								{((!disableListOptions && value?.filterType === 'range') ||
+									disableListOptions) && (
 									<>
 										<TextInput
 											name="startValue"
@@ -250,13 +303,6 @@ class CustomizeFilter extends React.Component {
 												</Form.Item>
 											)}
 										</FieldControl>
-										<TextInput
-											name="filterLabel"
-											label="Filter Label"
-											inputProps={{
-												placeholder: 'Enter filter label',
-											}}
-										/>
 									</>
 								)}
 							</Form>
@@ -275,6 +321,8 @@ CustomizeFilter.defaultProps = {
 	onSave: null,
 	onCancel: null,
 	buttonProps: null,
+	disableFilterType: false,
+	type: '',
 };
 CustomizeFilter.propTypes = {
 	buttonLabel: string,
@@ -283,6 +331,8 @@ CustomizeFilter.propTypes = {
 	control: object,
 	onSave: func,
 	onCancel: func,
+	disableFilterType: bool,
+	type: string,
 };
 
 export default CustomizeFilter;

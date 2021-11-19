@@ -70,6 +70,8 @@ class DataFieldSelector extends React.Component {
 			formItemProps,
 			addOptions,
 			selectProps,
+			mappings,
+			setFieldType,
 		} = this.props;
 		const selectPropsCalculated = {
 			placeholder: 'Select data field',
@@ -95,6 +97,7 @@ class DataFieldSelector extends React.Component {
 							<Select
 								className={touched && invalid ? selectCls : undefined}
 								placeholder="Select field"
+								allowClear
 								{...selectPropsCalculated}
 								{...inputHandler}
 								value={
@@ -108,6 +111,9 @@ class DataFieldSelector extends React.Component {
 										inputHandler.onChange(undefined);
 									} else {
 										inputHandler.onChange(val);
+										setFieldType(
+											mappings?.properties[val.split('.keyword')[0]].type,
+										);
 									}
 								}}
 								onFocus={this.getMappings}
@@ -129,6 +135,7 @@ class DataFieldSelector extends React.Component {
 				placeholder="Select field"
 				{...selectPropsCalculated}
 				onFocus={this.getMappings}
+				allowClear
 			>
 				{this.renderOptions()}
 			</Select>
@@ -149,6 +156,7 @@ DataFieldSelector.defaultProps = {
 	selectProps: null,
 	includeMappings: undefined,
 	includeTypes: undefined,
+	setFieldType: null,
 };
 
 DataFieldSelector.propTypes = {
@@ -168,6 +176,7 @@ DataFieldSelector.propTypes = {
 	addOptions: element,
 	includeMappings: array,
 	includeTypes: array,
+	setFieldType: func,
 };
 
 const mapStateToProps = (state) => {

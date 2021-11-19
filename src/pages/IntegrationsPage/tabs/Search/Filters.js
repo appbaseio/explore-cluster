@@ -10,27 +10,32 @@ export const defaultSettings = [
 		id: 'productType',
 		label: 'Show product type filter (only works with Shopify apps)',
 		value: false,
+		disableFilterType: true,
 	},
 	{
 		id: 'collections',
 		label: 'Show collections filter (only works with Shopify apps)',
 		value: false,
+		disableFilterType: true,
 	},
 	{
 		id: 'size',
 		label: 'Show size filter',
 		value: false,
+		disableFilterType: false,
 	},
 	{
 		id: 'color',
 		label: 'Show color filter',
 		value: false,
+		disableFilterType: true,
 	},
 	{
 		id: 'price',
 		label: 'Show price range filter',
 		disableListOptions: true,
 		value: false,
+		disableFilterType: true,
 	},
 ];
 
@@ -56,6 +61,8 @@ const Filters = () => (
 											</FieldControl>,
 											<CustomizeFilter
 												disableListOptions={item.disableListOptions}
+												type={item.id}
+												disableFilterType={item.disableFilterType}
 											/>,
 										]}
 									>

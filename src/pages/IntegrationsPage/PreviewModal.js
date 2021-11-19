@@ -149,7 +149,7 @@ PreviewModal.defaultProps = {
 	similarToField: undefined,
 	displayProductPicker: false,
 	isRecommendation: false,
-	label: 'StoreFront Preview',
+	label: 'Preview',
 	buttonProps: null,
 };
 
