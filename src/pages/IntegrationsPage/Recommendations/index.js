@@ -13,7 +13,7 @@ const bannerDetails = {
 	title: 'Recommendations UI Builder',
 	description:
 		'Build a WYSIWYG recommendations UI that can be installed to any E-Commerce platform or to your own site.',
-	icon: 'pencil',
+	icon: 'info-circle',
 };
 
 const bannerDetailsPaid = {

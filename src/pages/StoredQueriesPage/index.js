@@ -12,8 +12,8 @@ const bannerMessagesStoredQueries = {
 		title: 'Stored Queries',
 		description:
 			'GUI to manage your stored queries. Use them as direct REST APIs or with ReactiveSearch API.',
-		buttonText: 'Read More',
-		icon: 'pencil',
+		buttonText: 'Read Docs',
+		icon: 'info-circle',
 		href: 'https://docs.appbase.io/docs/data/stored-queries/',
 	},
 };

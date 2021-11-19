@@ -13,7 +13,7 @@ const bannerDetails = {
 	title: 'Search UI Builder',
 	description:
 		'Build a WYSIWYG storefront search preview that can be installed to your favorite E-Commerce platform.',
-	icon: 'pencil',
+	icon: 'info-circle',
 };
 
 const bannerDetailsPaid = {

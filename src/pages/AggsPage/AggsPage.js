@@ -27,9 +27,9 @@ const bannerDetails = {
 	title: 'Aggregation Settings',
 	description:
 		'Aggregation Settings allows you to set the fields that should be used for aggregations (aka search facets).',
-	buttonText: 'Read More',
+	buttonText: 'Read Docs',
 	videoLink: 'https://youtu.be/bNhju-9mDR0',
-	icon: 'pencil',
+	icon: 'info-circle',
 	href: 'https://docs.appbase.io/docs/search/relevancy/#aggregation-settings',
 };
 

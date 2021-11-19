@@ -217,7 +217,7 @@ class QueryRules extends Component {
 									rel="noopener noreferrer"
 									onClick={() => window.open(bannerDetails.href)}
 								>
-									Read More
+									Read Docs
 								</Button>
 							</Col>
 						</Row>

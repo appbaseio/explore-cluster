@@ -22,8 +22,8 @@ const bannerDetails = {
 	title: 'Suggestions',
 	description:
 		'GUI to manage preferences for Suggestion Settings. Configure the defaults for your autosuggestions (popular, recent, and index based).',
-	buttonText: 'Read more',
-	icon: 'pencil',
+	buttonText: 'Read Docs',
+	icon: 'info-circle',
 	href: 'https://docs.appbase.io/docs/search/relevancy/#suggestions',
 };
 

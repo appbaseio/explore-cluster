@@ -32,9 +32,9 @@ const { confirm } = Modal;
 
 const bannerDetails = {
 	title: 'Search Settings',
-	buttonText: 'Read More',
+	buttonText: 'Read Docs',
 	description: `Search Settings enables you to control search query and relevance settings.`,
-	icon: 'pencil',
+	icon: 'info-circle',
 	videoLink: 'https://youtu.be/moxJ2ZB4owI',
 	href: 'https://docs.appbase.io/docs/search/relevancy/#search-settings',
 };
@@ -471,14 +471,8 @@ class SearchSettingsPage extends React.Component {
 			);
 		}
 
-		const {
-			fuzziness,
-			queryFormat,
-			queryString,
-			searchOperators,
-			dataField,
-			distinctField,
-		} = get(localRelevancy, `search`);
+		const { fuzziness, queryFormat, queryString, searchOperators, dataField, distinctField } =
+			get(localRelevancy, `search`);
 
 		const { enableNgram } = get(localRelevancy, `indexSettings`);
 		const { enabled: enableSynonyms } = get(localRelevancy, `synonyms`);

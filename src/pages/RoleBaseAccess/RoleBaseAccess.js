@@ -273,7 +273,7 @@ class RoleBaseAccess extends React.Component {
 															target="_blank"
 															rel="noopener noreferrer"
 														>
-															Read More
+															Read Docs
 														</a>
 														<br />
 														<img

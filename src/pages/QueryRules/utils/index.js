@@ -131,8 +131,8 @@ const bannerDetails = {
 	title: 'Query Rules',
 	description: 'Create "If this, then that" style query rules',
 	videoLink: 'https://youtu.be/2g9sZgLPNxk',
-	buttonText: 'Read More',
-	icon: 'pencil',
+	buttonText: 'Read Docs',
+	icon: 'info-circle',
 	href: 'https://docs.appbase.io/docs/search/rules/',
 };
 

@@ -42,9 +42,9 @@ const fallback = {
 const bannerDetails = {
 	title: 'Language Settings',
 	description: 'Configure language settings to understand search intent.',
-	buttonText: 'Read More',
+	buttonText: 'Read Docs',
 	videoLink: 'https://youtu.be/wx8ac4IkTas',
-	icon: 'pencil',
+	icon: 'info-circle',
 	href: 'https://docs.appbase.io/docs/search/relevancy/#language-settings',
 };
 

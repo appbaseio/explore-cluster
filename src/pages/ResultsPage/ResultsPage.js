@@ -28,20 +28,20 @@ import { event, timingEvent } from '../../utils/gtag';
 import moment from '../../utils/moment';
 
 const bannerDetails = {
-	title: 'Result Settings',
-	buttonText: 'Read More',
+	title: 'Results Settings',
+	buttonText: 'Read Docs',
 	description:
-		'Result settings allow you to control the page size, fields returned, and highlighting settings.',
+		'Results settings allow you to control the page size, fields returned, and highlighting settings.',
 	videoLink: 'https://youtu.be/EtqBS6egIfU',
-	icon: 'pencil',
+	icon: 'info-circle',
 	href: 'https://docs.appbase.io/docs/search/relevancy/#result-settings',
 };
 
 const bannerMessage = {
-	title: 'Result Settings',
+	title: 'Results Settings',
 	videoLink: 'https://youtu.be/EtqBS6egIfU',
 	description:
-		'Result settings allow you to control the page size, fields returned, and highlighting settings.',
+		'Results settings allow you to control the page size, fields returned, and highlighting settings.',
 	buttonText: 'Read Docs',
 	href: 'https://docs.appbase.io/docs/search/relevancy/#result-settings',
 };
@@ -199,14 +199,8 @@ class ResultsPage extends React.Component {
 			);
 		}
 
-		const {
-			excludeFields,
-			highlightFields,
-			highlight,
-			highlightOptions,
-			includeFields,
-			size,
-		} = get(localRelevancy, `results`);
+		const { excludeFields, highlightFields, highlight, highlightOptions, includeFields, size } =
+			get(localRelevancy, `results`);
 
 		return (
 			<>

@@ -17,8 +17,8 @@ import {
 const bannerDetails = {
 	title: 'Node Sync Preferences',
 	description: 'Manage node sync preferences for appbase.io when using it in a multi-node setup',
-	buttonText: 'Read more',
-	icon: 'pencil',
+	buttonText: 'Read Docs',
+	icon: 'info-circle',
 	href: 'https://docs.appbase.io/docs/security/node-sync-preferences/',
 };
 

@@ -33,8 +33,8 @@ const bannerDetails = {
 	title: 'Recent Suggestions',
 	description:
 		'GUI to manage preferences for recent suggestions. Recent suggestions are stored in the .suggestions index by appbase.io based on the analytics data of what end users are searching for.',
-	buttonText: 'Read more',
-	icon: 'pencil',
+	buttonText: 'Read Docs',
+	icon: 'info-circle',
 	href: 'https://docs.appbase.io/docs/analytics/recent-suggestions/',
 };
 
