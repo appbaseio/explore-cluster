@@ -5,7 +5,7 @@ import IndexSwitcher from '../IndexSwitcher';
 import { modalStyles } from '../SearchPreviewModal/SearchPreviewModal';
 import SearchPreview from '../../pages/SandboxPage/components/SearchPreview';
 
-const SearchPreviewSwitcher = ({ app, filteredApps, onCancel, onSelect, visible }) => (
+const SearchPreviewSwitcher = ({ app, filteredApps, onCancel, onSelect, visible, page }) => (
 	<>
 		<IndexSwitcher
 			filteredApps={filteredApps}
@@ -27,7 +27,7 @@ const SearchPreviewSwitcher = ({ app, filteredApps, onCancel, onSelect, visible 
 				destroyOnClose
 				visible={visible}
 			>
-				<SearchPreview app={app} />
+				<SearchPreview app={app} page={page} />
 			</Modal>
 		)}
 	</>
@@ -39,12 +39,14 @@ SearchPreviewSwitcher.propTypes = {
 	onCancel: PropTypes.func.isRequired,
 	onSelect: PropTypes.func.isRequired,
 	visible: PropTypes.bool,
+	page: PropTypes.string,
 };
 
 SearchPreviewSwitcher.defaultProps = {
 	filteredApps: [],
 	visible: false,
 	app: undefined,
+	page: '',
 };
 
 export default SearchPreviewSwitcher;

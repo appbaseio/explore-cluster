@@ -56,7 +56,7 @@ const noResultsCls = css`
 
 const routesMapper = {
 	'/cluster/rules': 'Query Rules',
-	'/cluter/suggestions': 'Suggestion Settings',
+	'/cluter/suggestions': 'Suggestions Settings',
 	'/cluster/stores-queries': 'Stored Queries',
 	'/': 'Cluster',
 };

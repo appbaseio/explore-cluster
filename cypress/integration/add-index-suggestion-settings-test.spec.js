@@ -27,10 +27,13 @@ describe('Index Suggestion Settings add test flow', () => {
 
     it('Should Add Index Suggestions Settings Form Data', () => {
 
+        cy.get('[data-cy=index-suggestions-fields-container] > [data-cy=suggestions-footer] > [data-cy=buttons-container] > [style="display: flex;"] > [data-cy=reset-suggestions]').click();
+        cy.wait(2000);
+
         cy.get('[data-cy=index-suggestions-indices]').invoke('val', '');
         cy.get('[data-cy=index-suggestions-indices]').click();
-        cy.get('[data-cy=airbeds-test-app]').click();
-        cy.get('[data-cy=indices-label]').click();
+        cy.get('[data-cy=airbeds-test-app]').click({ force: true, multiple: true });
+        cy.get('[data-cy=index-suggestions-fields-container]').click({ force: true, multiple: true });
         cy.wait(3000);
 
         cy.get('[data-cy=show-distinct-suggestions]').click();
@@ -45,9 +48,9 @@ describe('Index Suggestion Settings add test flow', () => {
         cy.get('[data-cy=bed_type]').click();
         cy.get('[data-cy=include-fields-label]').click();
 
-        cy.get('[data-cy=exclude-fields]').click();
-        cy.get('[data-cy=bathrooms]').click({ force: true, multiple: true });
-        cy.get('[data-cy=exclude-fields-label]').click();
+        // cy.get('[data-cy=exclude-fields]').click();
+        // cy.get('[data-cy=bathrooms]').click({ force: true, multiple: true });
+        // cy.get('[data-cy=exclude-fields-label]').click();
 
         cy.get('[data-cy=category-field]').click();
         cy.get('[data-cy=bathrooms]').click({ force: true, multiple: true });
@@ -59,7 +62,8 @@ describe('Index Suggestion Settings add test flow', () => {
 
         cy.wait(1000);
         // save button
-        cy.get('[data-cy=index-suggestions-save]').click();
+        cy.get('[data-cy=index-suggestions-fields-container] > [data-cy=suggestions-footer] > [data-cy=buttons-container] > [style="display: flex;"] > :nth-child(2) > div > [data-cy=review-deploy-suggestion-settings]').click();
+        cy.get('[data-cy=review-save-button]').click();
         let credentials = btoa(`${username}:${password}`);
 
         cy.request({

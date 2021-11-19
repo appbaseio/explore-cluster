@@ -21,13 +21,13 @@ export const APP_ROUTES = {
 		action: ALLOWED_ACTIONS.SEARCH_RELEVANCY,
 		menu: [
 			{ label: 'Language Settings', link: 'languages', tag: 'Beta' },
+			{ label: 'Search Settings', link: 'search', tag: 'Beta' },
 			{
-				label: 'Suggestion Settings',
+				label: 'Suggestions Settings',
 				link: '/cluster/suggestions',
 				tag: 'Beta',
 				hasExactPath: true,
 			},
-			{ label: 'Search Settings', link: 'search', tag: 'Beta' },
 			{ label: 'Aggregation Settings', link: 'aggs', tag: 'Beta' },
 			{ label: 'Result Settings', link: 'results', tag: 'Beta' },
 			{ label: 'Index Settings', link: 'index-settings', tag: 'Beta' },
@@ -141,12 +141,12 @@ export const CLUSTER_ROUTES = {
 				tag: 'Beta',
 				openIndexMenu: true,
 			},
+			{ label: 'Search Settings', link: 'search', tag: 'Beta', openIndexMenu: true },
 			{
-				label: 'Suggestion Settings',
+				label: 'Suggestions Settings',
 				link: '/cluster/suggestions',
 				tag: 'Beta',
 			},
-			{ label: 'Search Settings', link: 'search', tag: 'Beta', openIndexMenu: true },
 			{
 				label: 'Aggregation Settings',
 				link: 'aggs',

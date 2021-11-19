@@ -1,12 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Input, Select, Icon, Popover } from 'antd';
+import { Select, Icon, Popover, InputNumber } from 'antd';
 import { css } from 'react-emotion';
 import PropTypes from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import Grid from '../../../components/CreateCredentials/Grid';
-import { setLocalRelevancyState } from '../../../batteries/modules/actions';
+import { setLocalRelevancyState, setSearchState } from '../../../batteries/modules/actions';
 import { suggestionsMessages as Messages } from '../../../utils/messages';
 import styles from '../styles';
 import Footer from '../Footer';
@@ -50,15 +50,43 @@ class PreferenceForm extends React.Component {
 		};
 	}
 
+	componentDidMount() {
+		const { saveState, searchState, initialData } = this.props;
+		saveState({
+			suggestions: {
+				...searchState?.suggestions,
+				recentSuggestions: initialData,
+			},
+		});
+	}
+
+	componentDidUpdate(prevProps) {
+		const { initialData } = this.props;
+		if (JSON.stringify(prevProps.initialData) !== JSON.stringify(initialData)) {
+			// eslint-disable-next-line
+			this.setState({
+				recentSuggestions: initialData,
+			});
+		}
+	}
+
 	handleChange = (key, value) => {
 		// eslint-disable-line
 		const { recentSuggestions } = this.state;
+		const { saveState, searchState } = this.props;
+
 		const newRecentSuggestions = {
 			...recentSuggestions,
 			[key]: value,
 		};
 		this.setState({
 			recentSuggestions: newRecentSuggestions,
+		});
+		saveState({
+			suggestions: {
+				...searchState?.suggestions,
+				recentSuggestions: newRecentSuggestions,
+			},
 		});
 	};
 
@@ -73,7 +101,7 @@ class PreferenceForm extends React.Component {
 				render={(
 					{ invalid: invalidForm }, // eslint-disable-line
 				) => (
-					<div css={modal}>
+					<div css={modal} data-cy="recent-suggestions-fields-container">
 						<FieldControl
 							name="minHits"
 							render={({ handler, value }) => (
@@ -90,16 +118,17 @@ class PreferenceForm extends React.Component {
 										</p>
 									}
 									component={
-										<Input
+										<InputNumber
 											data-cy="recent-suggestions-min-hits"
 											{...handler()}
-											type="number"
+											style={{ width: '100%' }}
+											min={0}
+											max={1000}
 											defaultValue={value}
 											value={value}
-											placeholder="Enter min Hits"
 											onChange={(e) => {
-												this.handleChange('minHits', e.target.value);
-												handler().onChange(e.target.value);
+												this.handleChange('minHits', e);
+												handler().onChange(e);
 											}}
 										/>
 									}
@@ -122,16 +151,16 @@ class PreferenceForm extends React.Component {
 										</p>
 									}
 									component={
-										<Input
+										<InputNumber
 											data-cy="recent-suggestions-size"
 											{...handler()}
+											style={{ width: '100%' }}
 											defaultValue={value}
 											value={value}
-											type="number"
-											placeholder="Enter min count"
+											min={0}
 											onChange={(e) => {
-												this.handleChange('size', e.target.value);
-												handler().onChange(e.target.value);
+												this.handleChange('size', e);
+												handler().onChange(e);
 											}}
 										/>
 									}
@@ -154,16 +183,17 @@ class PreferenceForm extends React.Component {
 										</p>
 									}
 									component={
-										<Input
+										<InputNumber
 											data-cy="recent-suggestions-minChars"
 											{...handler()}
+											style={{ width: '100%' }}
 											defaultValue={value}
 											value={value}
-											type="number"
-											placeholder="Enter min chars"
+											min={0}
+											max={32}
 											onChange={(e) => {
-												this.handleChange('minChars', e.target.value);
-												handler().onChange(e.target.value);
+												this.handleChange('minChars', e);
+												handler().onChange(e);
 											}}
 										/>
 									}
@@ -177,7 +207,10 @@ class PreferenceForm extends React.Component {
 								return (
 									<Grid
 										label={
-											<p css={styles.labelContainer} data-cy="indices-label">
+											<p
+												css={styles.labelContainer}
+												data-cy="recent-suggestions-indices-label"
+											>
 												Indices
 												<Popover
 													content={content(Messages.indices)}
@@ -233,10 +266,13 @@ PreferenceForm.propTypes = {
 	indices: PropTypes.array.isRequired,
 	apps: PropTypes.object,
 	initialData: PropTypes.object.isRequired,
+	saveState: PropTypes.func.isRequired,
+	searchState: PropTypes.object,
 };
 
 PreferenceForm.defaultProps = {
 	apps: {},
+	searchState: null,
 };
 
 const mapStateToProps = (state) => {
@@ -246,11 +282,13 @@ const mapStateToProps = (state) => {
 		appName,
 		apps: get(state, 'apps.data'),
 		localRelevancy: get(state, ['$getLocalRelevancy', appName], null),
+		searchState: get(state, '$getSearchState.searchState', null),
 	};
 };
 
 const mapDispatchToProps = (dispatch) => ({
 	updateLocalRelevancy: (name, data) => dispatch(setLocalRelevancyState(name, data)),
+	saveState: (state) => dispatch(setSearchState(state)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(PreferenceForm);

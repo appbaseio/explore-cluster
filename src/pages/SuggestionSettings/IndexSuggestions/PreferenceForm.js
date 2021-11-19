@@ -1,17 +1,21 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Input, Select, Switch, Popover, Icon } from 'antd';
+import { Select, Switch, Popover, Icon, InputNumber } from 'antd';
 import { css } from 'react-emotion';
 import PropTypes from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
-import { getAppMappings, getAppStoredQueries } from '../../../batteries/modules/actions';
+import {
+	getAppMappings,
+	getAppStoredQueries,
+	setSearchState,
+} from '../../../batteries/modules/actions';
 import {
 	getRawMappingsByAppName,
 	getTraversedMappingsByAppName,
 } from '../../../batteries/modules/selectors';
 import Grid from '../../../components/CreateCredentials/Grid';
-import { removeWhiteSpaces, getDatafields } from '../../../utils';
+import { getDatafields } from '../../../utils';
 import { suggestionsMessages as Messages } from '../../../utils/messages';
 import styles from '../styles';
 import Footer from '../Footer'; // eslint-disable-line
@@ -55,27 +59,37 @@ class PreferenceForm extends React.Component {
 				JSON.stringify(props.initialData.indices) === JSON.stringify(['*'])
 					? props.indices
 					: props.initialData.indices || [],
-			aggregationFields: [],
 			indexSuggestions: props.initialData,
 			isFetchingMappings: props.isFetchingMappings,
 		};
 	}
 
 	componentDidMount() {
-		const { fetchStoredQueries } = this.props;
+		const { fetchStoredQueries, saveState, searchState, initialData } = this.props;
 
 		fetchStoredQueries();
 		this.getMappings();
+
+		saveState({
+			suggestions: {
+				...searchState?.suggestions,
+				indexSuggestions: initialData,
+			},
+		});
 	}
 
 	componentDidUpdate(prevProps) {
-		const { rawMappings, isFetchingMappings } = this.props;
-		if (rawMappings && prevProps.rawMappings !== rawMappings) {
-			this.getAggregationFields();
-		}
+		const { isFetchingMappings, initialData } = this.props;
 
 		if (isFetchingMappings !== prevProps.isFetchingMappings) {
 			this.setState({ isFetchingMappings }); // eslint-disable-line
+		}
+
+		if (JSON.stringify(prevProps.initialData) !== JSON.stringify(initialData)) {
+			// eslint-disable-next-line
+			this.setState({
+				indexSuggestions: initialData,
+			});
 		}
 	}
 
@@ -92,19 +106,24 @@ class PreferenceForm extends React.Component {
 		}
 	}
 
-	handleChange = (key, val) => {
+	handleChange = (key, value) => {
 		// eslint-disable-line
-		let value = val;
-		if (key === 'customStopwords') {
-			value = val.split(',').map((i) => removeWhiteSpaces(i));
-		}
+		const { saveState, searchState } = this.props;
 		const { indexSuggestions } = this.state;
+
 		const newIndexSuggestions = {
 			...indexSuggestions,
 			[key]: value,
 		};
 		this.setState({
 			indexSuggestions: newIndexSuggestions,
+		});
+
+		saveState({
+			suggestions: {
+				...searchState?.suggestions,
+				indexSuggestions: newIndexSuggestions,
+			},
 		});
 	};
 
@@ -117,15 +136,14 @@ class PreferenceForm extends React.Component {
 			indexes: selectedIndices,
 			isAggs: true,
 		});
-		const newAggregationFields = aggsFields.filter((i) => i.includes('.keyword'));
-		this.setState({ aggregationFields: newAggregationFields });
+
+		return aggsFields.filter((i) => i.includes('.keyword'));
 	};
 
 	render() {
 		const { control, indices, initialData, mappings, appStoredQueries } = this.props;
 		// eslint-disable-line
-		const { aggregationFields, indexSuggestions, selectedIndices, isFetchingMappings } =
-			this.state;
+		const { indexSuggestions, selectedIndices, isFetchingMappings } = this.state;
 		const mappingsFromIndices = [];
 
 		// eslint-disable-next-line no-unused-expressions
@@ -139,7 +157,6 @@ class PreferenceForm extends React.Component {
 			}
 		});
 
-		const categoryFields = aggregationFields;
 		const { excludeFields, includeFields } = indexSuggestions;
 
 		return (
@@ -147,12 +164,12 @@ class PreferenceForm extends React.Component {
 				control={control}
 				strict={false}
 				render={(
-					{ invalid: invalidForm }, // eslint-disable-line
+					{ invalid: invalidForm, value }, // eslint-disable-line
 				) => (
-					<div css={modal}>
+					<div css={modal} data-cy="index-suggestions-fields-container">
 						<FieldControl
 							name="indices"
-							render={({ handler, value }) => {
+							render={({ handler, value: app }) => {
 								const inputHandler = handler();
 								return (
 									<Grid
@@ -174,7 +191,7 @@ class PreferenceForm extends React.Component {
 												mode="tags"
 												style={{ width: '100%' }}
 												tokenSeparators={[',']}
-												value={value}
+												value={app}
 												{...inputHandler}
 												onChange={(val) => {
 													this.handleChange('indices', val);
@@ -182,7 +199,6 @@ class PreferenceForm extends React.Component {
 													this.setState({
 														selectedIndices: val,
 													});
-													this.getAggregationFields();
 												}}
 											>
 												<Select.Option value="*">All (*)</Select.Option>
@@ -206,7 +222,7 @@ class PreferenceForm extends React.Component {
 						/>
 						<FieldControl
 							name="showDistinctSuggestions"
-							render={({ handler, value }) => (
+							render={({ handler, value: checked }) => (
 								<Grid
 									label={
 										<p css={styles.labelContainer}>
@@ -222,7 +238,7 @@ class PreferenceForm extends React.Component {
 									component={
 										<Switch
 											data-cy="show-distinct-suggestions"
-											checked={value}
+											checked={checked}
 											{...handler()}
 											onChange={(val) => {
 												this.handleChange('showDistinctSuggestions', val);
@@ -236,7 +252,7 @@ class PreferenceForm extends React.Component {
 						/>
 						<FieldControl
 							name="enablePredictiveSuggestions"
-							render={({ handler, value }) => (
+							render={({ handler, value: checked }) => (
 								<Grid
 									label={
 										<p css={styles.labelContainer}>
@@ -254,7 +270,7 @@ class PreferenceForm extends React.Component {
 									component={
 										<Switch
 											data-cy="enable-predictive-suggestions"
-											checked={value}
+											checked={checked}
 											{...handler()}
 											onChange={(val) => {
 												this.handleChange(
@@ -272,7 +288,7 @@ class PreferenceForm extends React.Component {
 
 						<FieldControl
 							name="maxPredictedWords"
-							render={({ handler, value }) => {
+							render={({ handler, value: count }) => {
 								const inputHandler = { ...handler() };
 
 								return (
@@ -289,19 +305,17 @@ class PreferenceForm extends React.Component {
 											</p>
 										}
 										component={
-											<Input
+											<InputNumber
 												data-cy="max-predicted-words"
 												{...inputHandler}
-												defaultValue={value}
-												type="number"
-												placeholder="Enter max predicted words"
-												value={value}
+												style={{ width: '100%' }}
+												defaultValue={count}
+												min={1}
+												max={5}
+												value={count}
 												onChange={(e) => {
-													this.handleChange(
-														'maxPredictedWords',
-														e.target.value,
-													);
-													inputHandler.onChange(e.target.value);
+													this.handleChange('maxPredictedWords', e);
+													inputHandler.onChange(e);
 												}}
 											/>
 										}
@@ -313,7 +327,7 @@ class PreferenceForm extends React.Component {
 
 						<FieldControl
 							name="applyStopwords"
-							render={({ handler, value }) => (
+							render={({ handler, value: checked }) => (
 								<Grid
 									label={
 										<p css={styles.labelContainer}>
@@ -329,7 +343,7 @@ class PreferenceForm extends React.Component {
 									component={
 										<Switch
 											data-cy="apply-stopwords"
-											checked={value}
+											checked={checked}
 											{...handler()}
 											onChange={(val) => {
 												this.handleChange('applyStopwords', val);
@@ -343,7 +357,7 @@ class PreferenceForm extends React.Component {
 						/>
 						<FieldControl
 							name="customStopwords"
-							render={({ handler, value }) => (
+							render={({ handler, value: stopWords }) => (
 								<Grid
 									label={
 										<p css={styles.labelContainer}>
@@ -357,18 +371,22 @@ class PreferenceForm extends React.Component {
 										</p>
 									}
 									component={
-										<Input
+										<Select
 											data-cy="custom-stopwords"
 											{...handler()}
-											defaultValue={value?.join(',') || ''}
-											value={value?.join(',') || ''}
+											defaultValue={stopWords}
+											value={stopWords}
 											placeholder="Enter custom stopwords"
-											onChange={(e) => {
+											mode="tags"
+											notFoundContent={null}
+											style={{ width: '100%' }}
+											tokenSeparators={[',']}
+											onChange={(val) => {
 												this.handleChange(
 													'customStopwords',
-													e.target.value,
+													calculateValue(val),
 												);
-												handler().onChange(e.target.value.split(','));
+												handler().onChange(val);
 											}}
 										/>
 									}
@@ -378,7 +396,7 @@ class PreferenceForm extends React.Component {
 						/>
 						<FieldControl
 							name="enableSynonyms"
-							render={({ handler, value }) => (
+							render={({ handler, value: checked }) => (
 								<Grid
 									label={
 										<p css={styles.labelContainer}>
@@ -394,7 +412,7 @@ class PreferenceForm extends React.Component {
 									component={
 										<Switch
 											data-cy="enable-synonyms"
-											checked={value}
+											checked={checked}
 											{...handler()}
 											onChange={(val) => {
 												this.handleChange('enableSynonyms', val);
@@ -408,7 +426,7 @@ class PreferenceForm extends React.Component {
 						/>
 						<FieldControl
 							name="size"
-							render={({ handler, value }) => (
+							render={({ handler, value: count }) => (
 								<Grid
 									label={
 										<p css={styles.labelContainer}>
@@ -422,16 +440,17 @@ class PreferenceForm extends React.Component {
 										</p>
 									}
 									component={
-										<Input
+										<InputNumber
 											data-cy="index-suggestions-size"
 											{...handler()}
-											defaultValue={value}
-											value={value}
-											type="number"
-											placeholder="Enter size"
+											style={{ width: '100%' }}
+											defaultValue={count}
+											value={count}
+											min={0}
+											max={20}
 											onChange={(e) => {
-												this.handleChange('size', e.target.value);
-												handler().onChange(e.target.value);
+												this.handleChange('size', e);
+												handler().onChange(e);
 											}}
 										/>
 									}
@@ -441,6 +460,7 @@ class PreferenceForm extends React.Component {
 						/>
 						<FieldControl
 							name="includeFields"
+							strict={false}
 							render={({ handler }) => (
 								<Grid
 									label={
@@ -466,15 +486,15 @@ class PreferenceForm extends React.Component {
 											notFoundContent={null}
 											style={{ width: '100%' }}
 											tokenSeparators={[',']}
-											disabled={this.getDisabled(excludeFields)}
+											disabled={this.getDisabled(value?.excludeFields)}
 											data-cy="include-fields"
 											showSearch
-											onChange={(value) => {
+											onChange={(val) => {
 												this.handleChange(
 													'includeFields',
-													calculateValue(value),
+													calculateValue(val),
 												);
-												handler().onChange(calculateValue(value));
+												handler().onChange(calculateValue(val));
 											}}
 										>
 											<Select.Option key="*">
@@ -502,6 +522,7 @@ class PreferenceForm extends React.Component {
 						/>
 						<FieldControl
 							name="excludeFields"
+							strict={false}
 							render={({ handler }) => (
 								<Grid
 									label={
@@ -527,7 +548,7 @@ class PreferenceForm extends React.Component {
 											notFoundContent={null}
 											style={{ width: '100%' }}
 											tokenSeparators={[',']}
-											disabled={this.getDisabled(includeFields)}
+											disabled={this.getDisabled(value?.includeFields)}
 											data-cy="exclude-fields"
 											showSearch
 											onChange={(val) => {
@@ -565,6 +586,7 @@ class PreferenceForm extends React.Component {
 						/>
 						<FieldControl
 							name="categoryField"
+							strict={false}
 							render={({ handler }) => (
 								<Grid
 									label={
@@ -598,7 +620,7 @@ class PreferenceForm extends React.Component {
 												handler().onChange(calculateValue(val));
 											}}
 										>
-											{(categoryFields || []).map((v) => {
+											{(this.getAggregationFields() || []).map((v) => {
 												const val = v.split('.keyword')[0];
 												return (
 													<Select.Option
@@ -618,6 +640,7 @@ class PreferenceForm extends React.Component {
 						/>
 						<FieldControl
 							name="urlField"
+							strict={false}
 							render={({ handler }) => (
 								<Grid
 									label={
@@ -640,15 +663,12 @@ class PreferenceForm extends React.Component {
 											style={{ width: '100%' }}
 											data-cy="url-index-setting"
 											showSearch
-											onChange={(value) => {
-												this.handleChange(
-													'urlField',
-													calculateValue(value),
-												);
-												handler().onChange(calculateValue(value));
+											onChange={(val) => {
+												this.handleChange('urlField', calculateValue(val));
+												handler().onChange(calculateValue(val));
 											}}
 										>
-											{(categoryFields || []).map((v) => {
+											{(this.getAggregationFields() || []).map((v) => {
 												const val = v.split('.keyword')[0];
 												return (
 													<Select.Option
@@ -668,7 +688,7 @@ class PreferenceForm extends React.Component {
 						/>
 						<FieldControl
 							name="customQuery"
-							render={({ handler, value }) => {
+							render={({ handler, value: query }) => {
 								return (
 									<Grid
 										label={
@@ -689,8 +709,8 @@ class PreferenceForm extends React.Component {
 												allowClear
 												style={{ width: '100%' }}
 												{...handler()}
-												defaultValue={value}
-												value={value}
+												defaultValue={query}
+												value={query}
 												optionLabelProp="label"
 												onChange={(val) => {
 													this.handleChange('customQuery', val);
@@ -748,12 +768,15 @@ PreferenceForm.propTypes = {
 	fetchStoredQueries: PropTypes.func.isRequired,
 	credentials: PropTypes.string.isRequired,
 	isFetchingMappings: PropTypes.bool.isRequired,
+	saveState: PropTypes.func.isRequired,
+	searchState: PropTypes.object,
 };
 
 PreferenceForm.defaultProps = {
 	mappings: [],
 	rawMappings: [],
 	appName: undefined,
+	searchState: null,
 };
 
 const mapStateToProps = (state) => {
@@ -769,12 +792,14 @@ const mapStateToProps = (state) => {
 		appName,
 		credentials: `${username}:${password}`,
 		appStoredQueries: get(state, ['$getAppStoredQueries', 'results'], []),
+		searchState: get(state, '$getSearchState.searchState', null),
 	};
 };
 
 const mapDispatchToProps = (dispatch) => ({
 	fetchMappings: (appName, credentials) => dispatch(getAppMappings(appName, credentials)),
 	fetchStoredQueries: () => dispatch(getAppStoredQueries()),
+	saveState: (state) => dispatch(setSearchState(state)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(PreferenceForm);

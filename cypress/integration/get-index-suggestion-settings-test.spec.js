@@ -36,34 +36,47 @@ describe('Index Suggestion Settings add test flow', () => {
         })
         .then((payload) => {
             cy.wait(3000);
+            const indexSuggestions = {
+                showDistinctSuggestions: payload.body.showDistinctSuggestions || false,
+                enablePredictiveSuggestions: payload.body.enablePredictiveSuggestions || false,
+                maxPredictedWords: parseInt(payload.body.maxPredictedWords, 10) || 1,
+                applyStopwords: payload.body.applyStopwords || false,
+                customStopwords: payload.body.customStopwords || [],
+                enableSynonyms: payload.body.enableSynonyms || false,
+                size: parseInt(payload.body.size, 10) || 1,
+                indices: payload.body.indices || ['*'],
+                categoryField: payload.body.categoryField || '',
+                urlField: payload.body.urlField || '',
+            }
+
             cy.get('[data-cy=index-suggestions-indices] > div > ul > li').each(($el, index) => {
-                if (index < payload.body.indices.length - 1) {
+                if (index < payload.body.indices?.length - 1) {
                     expect($el).to.have.text(payload.body.indices[index]);
                 }
             });
 
-            cy.get('[data-cy=show-distinct-suggestions]').should('have.value', JSON.stringify(payload.body.showDistinctSuggestions));
-			cy.get('[data-cy=enable-predictive-suggestions]').should('have.value', JSON.stringify(payload.body.enablePredictiveSuggestions));
-			cy.get('[data-cy=max-predicted-words]').should('have.value', payload.body.maxPredictedWords);
-			cy.get('[data-cy=apply-stopwords]').should('have.value', JSON.stringify(payload.body.applyStopwords));
-			cy.get('[data-cy=custom-stopwords]').should('have.value', payload.body.customStopwords.join(','));
-			cy.get('[data-cy=enable-synonyms]').should('have.value', JSON.stringify(payload.body.enableSynonyms));
-			cy.get('[data-cy=index-suggestions-size]').should('have.value', payload.body.size);
+            cy.get('[data-cy=show-distinct-suggestions]').should('have.value', JSON.stringify(indexSuggestions.showDistinctSuggestions));
+			cy.get('[data-cy=enable-predictive-suggestions]').should('have.value', JSON.stringify(indexSuggestions.enablePredictiveSuggestions));
+			cy.get('[data-cy=max-predicted-words]').should('have.value', indexSuggestions.maxPredictedWords);
+			cy.get('[data-cy=apply-stopwords]').should('have.value', JSON.stringify(indexSuggestions.applyStopwords));
+			cy.get('[data-cy=custom-stopwords]').should('have.value', indexSuggestions.customStopwords?.join(','));
+			cy.get('[data-cy=enable-synonyms]').should('have.value', JSON.stringify(indexSuggestions.enableSynonyms));
+			cy.get('[data-cy=index-suggestions-size]').should('have.value', indexSuggestions.size);
 
             cy.get('[data-cy=include-fields] > div > ul > li').each(($el, index) => {
-                if (index < payload.body.indices.length - 1) {
+                if (index < payload.body.indices?.length - 1) {
                     expect($el).to.have.text(payload.body.includeFields[index]);
                 }
             });
 
             cy.get('[data-cy=exclude-fields] > div > ul > li').each(($el, index) => {
-                if (index < payload.body.indices.length - 1) {
+                if (index < payload.body.indices?.length - 1) {
                     expect($el).to.have.text(payload.body.excludeFields[index]);
                 }
             });
 
-            cy.get('[data-cy=category-field] > div > div.ant-select-selection-selected-value').should('have.text', payload.body.categoryField);
-            cy.get('[data-cy=url-index-setting] > div > div.ant-select-selection-selected-value').should('have.text', payload.body.urlField);
+            cy.get('[data-cy=category-field] > div > div.ant-select-selection-selected-value').should('have.text', indexSuggestions.categoryField);
+            cy.get('[data-cy=url-index-setting] > div > div.ant-select-selection-selected-value').should('have.text', indexSuggestions.urlField);
 
         })
 

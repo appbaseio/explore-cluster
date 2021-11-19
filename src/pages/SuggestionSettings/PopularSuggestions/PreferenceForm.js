@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Input, Select, Checkbox, Icon, Popover } from 'antd';
+import { Select, Checkbox, Icon, Popover, InputNumber } from 'antd';
 import { css } from 'react-emotion';
 import PropTypes from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
@@ -12,6 +12,7 @@ import {
 	getAppMappings,
 	getSettings,
 	getDefaultSettings,
+	setSearchState,
 } from '../../../batteries/modules/actions';
 import styles from '../styles';
 import Footer from '../Footer';
@@ -40,7 +41,13 @@ const modal = css`
 	.input-error {
 		border-color: tomato;
 	}
+	.heading {
+		font-weight: bold;
+		margin-bottom: 30px;
+		margin-top: 40px;
+	}
 `;
+
 const content = (message) => {
 	return <div>{message}</div>;
 };
@@ -54,7 +61,25 @@ class PreferenceForm extends React.Component {
 	}
 
 	componentDidMount() {
+		const { saveState, searchState, initialData } = this.props;
+
 		this.getMappings();
+		saveState({
+			suggestions: {
+				...searchState?.suggestions,
+				popularSuggestions: initialData,
+			},
+		});
+	}
+
+	componentDidUpdate(prevProps) {
+		const { initialData } = this.props;
+		if (JSON.stringify(prevProps.initialData) !== JSON.stringify(initialData)) {
+			// eslint-disable-next-line
+			this.setState({
+				popularSuggestions: initialData,
+			});
+		}
 	}
 
 	getMappings() {
@@ -68,12 +93,19 @@ class PreferenceForm extends React.Component {
 	handleChange = (key, value) => {
 		// eslint-disable-line
 		const { popularSuggestions } = this.state;
+		const { saveState, searchState } = this.props;
 		const newPopularSuggestions = {
 			...popularSuggestions,
 			[key]: value,
 		};
 		this.setState({
 			popularSuggestions: newPopularSuggestions,
+		});
+		saveState({
+			suggestions: {
+				...searchState?.suggestions,
+				popularSuggestions: newPopularSuggestions,
+			},
 		});
 	};
 
@@ -89,50 +121,11 @@ class PreferenceForm extends React.Component {
 					{ invalid: invalidForm }, // eslint-disable-line
 				) => {
 					return (
-						<div css={modal}>
-							<FieldControl
-								name="indices"
-								render={({ handler, value }) => {
-									const inputHandler = handler();
-									return (
-										<Grid
-											label={
-												<p css={styles.labelContainer}>
-													Indices
-													<Popover
-														content={content(Messages.indices)}
-														css={styles.iconContainer}
-													>
-														<Icon type="info-circle" />
-													</Popover>
-												</p>
-											}
-											component={
-												<Select
-													data-cy="popular-suggestions-indices"
-													placeholder="Enter indices"
-													mode="tags"
-													style={{ width: '100%' }}
-													tokenSeparators={[',']}
-													value={value}
-													{...inputHandler}
-													onChange={(val) => {
-														this.handleChange('indices', val);
-														inputHandler.onChange(calculateValue(val));
-													}}
-												>
-													<Select.Option value="*">All (*)</Select.Option>
-													{indices.map((index) => (
-														<Select.Option key={index}>
-															{index}
-														</Select.Option>
-													))}
-												</Select>
-											}
-										/>
-									);
-								}}
-							/>
+						<div css={modal} data-cy="popular-suggestions-fields-container">
+							<h3 className="heading">
+								Following settings are applicable only at index time to populate the
+								popular suggestions index
+							</h3>
 							<FieldControl
 								name="numberOfDays"
 								render={({ handler, value }) => (
@@ -149,51 +142,17 @@ class PreferenceForm extends React.Component {
 											</p>
 										}
 										component={
-											<Input
+											<InputNumber
 												data-cy="number-of-days"
 												{...handler()}
+												style={{ width: '100%' }}
 												defaultValue={value}
 												value={value}
-												type="number"
-												placeholder="Enter number of days"
+												min={1}
+												max={90}
 												onChange={(e) => {
-													this.handleChange(
-														'numberOfDays',
-														e.target.value,
-													);
-													handler().onChange(e.target.value);
-												}}
-											/>
-										}
-									/>
-								)}
-							/>
-							<FieldControl
-								name="minCount"
-								render={({ handler, value }) => (
-									<Grid
-										label={
-											<p css={styles.labelContainer}>
-												Min Count
-												<Popover
-													content={content(Messages.minCount)}
-													css={styles.iconContainer}
-												>
-													<Icon type="info-circle" />
-												</Popover>
-											</p>
-										}
-										component={
-											<Input
-												data-cy="min-count"
-												// {...handler()}
-												defaultValue={value}
-												value={value}
-												type="number"
-												placeholder="Enter min count"
-												onChange={(e) => {
-													this.handleChange('minCount', e.target.value);
-													handler().onChange(e.target.value);
+													this.handleChange('numberOfDays', e);
+													handler().onChange(e);
 												}}
 											/>
 										}
@@ -216,48 +175,17 @@ class PreferenceForm extends React.Component {
 											</p>
 										}
 										component={
-											<Input
+											<InputNumber
 												data-cy="popular-suggestions-min-hits"
 												{...handler()}
+												style={{ width: '100%' }}
 												defaultValue={value}
 												value={value}
-												type="number"
-												placeholder="Enter min Hits"
+												min={0}
+												max={1000}
 												onChange={(e) => {
-													this.handleChange('minHits', e.target.value);
-													handler().onChange(e.target.value);
-												}}
-											/>
-										}
-									/>
-								)}
-							/>
-							<FieldControl
-								name="minChars"
-								render={({ handler, value }) => (
-									<Grid
-										label={
-											<p css={styles.labelContainer}>
-												Min Characters
-												<Popover
-													content={content(Messages.minChars)}
-													css={styles.iconContainer}
-												>
-													<Icon type="info-circle" />
-												</Popover>
-											</p>
-										}
-										component={
-											<Input
-												data-cy="min-characters"
-												{...handler()}
-												defaultValue={value}
-												value={value}
-												type="number"
-												placeholder="Enter min chars"
-												onChange={(e) => {
-													this.handleChange('minChars', e.target.value);
-													handler().onChange(e.target.value);
+													this.handleChange('minHits', e);
+													handler().onChange(e);
 												}}
 											/>
 										}
@@ -308,38 +236,6 @@ class PreferenceForm extends React.Component {
 								}}
 							/>
 							<FieldControl
-								name="size"
-								render={({ handler, value }) => (
-									<Grid
-										label={
-											<p css={styles.labelContainer}>
-												Size
-												<Popover
-													content={content(Messages.popularSize)}
-													css={styles.iconContainer}
-												>
-													<Icon type="info-circle" />
-												</Popover>
-											</p>
-										}
-										component={
-											<Input
-												data-cy="popular-suggestions-size"
-												{...handler()}
-												defaultValue={value}
-												value={value}
-												type="number"
-												placeholder="Enter size"
-												onChange={(e) => {
-													this.handleChange('size', e.target.value);
-													handler().onChange(e.target.value);
-												}}
-											/>
-										}
-									/>
-								)}
-							/>
-							<FieldControl
 								name="blacklist"
 								render={({ handler, value }) => (
 									<Grid
@@ -377,7 +273,6 @@ class PreferenceForm extends React.Component {
 									/>
 								)}
 							/>
-
 							<FieldControl
 								name="externalSuggestions"
 								render={({ handler }) => {
@@ -409,16 +304,8 @@ class PreferenceForm extends React.Component {
 											component={
 												<Ace
 													data-cy="external-suggestions"
-													{...handler()}
-													defaultValue={
-														typeof inputHandler.value === 'string'
-															? inputHandler.value
-															: JSON.stringify(
-																	inputHandler.value,
-																	0,
-																	2,
-															  )
-													}
+													// {...handler()}
+													defaultValue=""
 													mode="json"
 													value={
 														typeof inputHandler.value === 'string'
@@ -429,7 +316,25 @@ class PreferenceForm extends React.Component {
 																	2,
 															  )
 													}
-													onChange={inputHandler.onChange}
+													placeholder={`[
+	{
+		"count": 6,
+		"indices": [ "abc", "def" ],
+		"key": "hello"
+	},
+	{
+		"count": 3,
+		"indices": [ "abc" ],
+		"key": "world"
+	}
+]`}
+													onChange={(val) => {
+														this.handleChange(
+															'externalSuggestions',
+															val,
+														);
+														inputHandler.onChange(val);
+													}}
 													theme="monokai"
 													name="editor-JSON"
 													fontSize={16}
@@ -438,8 +343,9 @@ class PreferenceForm extends React.Component {
 														width: '100%',
 														maxWidth: 800,
 														maxHeight: 250,
+														whiteSpace: 'pre',
 													}}
-													readOnly={inputHandler.disabled}
+													// readOnly={inputHandler.disabled}
 													showGutter
 													highlightActiveLine
 													setOptions={{
@@ -454,6 +360,157 @@ class PreferenceForm extends React.Component {
 										/>
 									);
 								}}
+							/>
+							<h3 className="heading">
+								Following settings are applicable at index time as well as used as
+								query time defaults
+							</h3>
+							<FieldControl
+								name="indices"
+								render={({ handler, value }) => {
+									const inputHandler = handler();
+									return (
+										<Grid
+											label={
+												<p
+													css={styles.labelContainer}
+													data-cy="indices-label"
+												>
+													Indices
+													<Popover
+														content={content(Messages.indices)}
+														css={styles.iconContainer}
+													>
+														<Icon type="info-circle" />
+													</Popover>
+												</p>
+											}
+											component={
+												<Select
+													data-cy="popular-suggestions-indices"
+													placeholder="Enter indices"
+													mode="tags"
+													style={{ width: '100%' }}
+													tokenSeparators={[',']}
+													value={value}
+													{...inputHandler}
+													onChange={(val) => {
+														this.handleChange('indices', val);
+														inputHandler.onChange(calculateValue(val));
+													}}
+												>
+													<Select.Option value="*">All (*)</Select.Option>
+													{indices.map((index) => (
+														<Select.Option key={index}>
+															{index}
+														</Select.Option>
+													))}
+												</Select>
+											}
+										/>
+									);
+								}}
+							/>
+							<FieldControl
+								name="minCount"
+								render={({ handler, value }) => (
+									<Grid
+										label={
+											<p css={styles.labelContainer}>
+												Min Count
+												<Popover
+													content={content(Messages.minCount)}
+													css={styles.iconContainer}
+												>
+													<Icon type="info-circle" />
+												</Popover>
+											</p>
+										}
+										component={
+											<InputNumber
+												data-cy="min-count"
+												style={{ width: '100%' }}
+												min={0}
+												defaultValue={value}
+												value={value}
+												// placeholder="Enter min count"
+												onChange={(e) => {
+													this.handleChange('minCount', e);
+													handler().onChange(e);
+												}}
+											/>
+										}
+									/>
+								)}
+							/>
+							<FieldControl
+								name="minChars"
+								render={({ handler, value }) => (
+									<Grid
+										label={
+											<p css={styles.labelContainer}>
+												Min Characters
+												<Popover
+													content={content(Messages.minChars)}
+													css={styles.iconContainer}
+												>
+													<Icon type="info-circle" />
+												</Popover>
+											</p>
+										}
+										component={
+											<InputNumber
+												data-cy="min-characters"
+												{...handler()}
+												style={{ width: '100%' }}
+												defaultValue={value}
+												value={value}
+												min={0}
+												max={32}
+												onChange={(e) => {
+													this.handleChange('minChars', e);
+													handler().onChange(e);
+												}}
+											/>
+										}
+									/>
+								)}
+							/>
+							<h3 className="heading">
+								Following settings are applicable at query time only
+							</h3>
+							<FieldControl
+								name="size"
+								render={({ handler, value }) => (
+									<Grid
+										label={
+											<p css={styles.labelContainer}>
+												Size
+												<Popover
+													content={content(Messages.popularSize)}
+													css={styles.iconContainer}
+												>
+													<Icon type="info-circle" />
+												</Popover>
+											</p>
+										}
+										component={
+											<InputNumber
+												data-cy="popular-suggestions-size"
+												{...handler()}
+												style={{ width: '100%' }}
+												defaultValue={value}
+												value={value}
+												min={0}
+												max={20}
+												onChange={(e) => {
+													this.handleChange('size', e);
+													handler().onChange(e);
+												}}
+											/>
+										}
+									/>
+								)}
 							/>
 							<Footer
 								originalData={initialData}
@@ -481,12 +538,15 @@ PreferenceForm.propTypes = {
 		PropTypes.object, // at cluster level
 	]),
 	credentials: PropTypes.string.isRequired,
+	saveState: PropTypes.func.isRequired,
+	searchState: PropTypes.object,
 };
 
 PreferenceForm.defaultProps = {
 	apps: {},
 	appName: undefined,
 	mappings: [],
+	searchState: null,
 };
 
 const mapStateToProps = (state) => {
@@ -498,6 +558,7 @@ const mapStateToProps = (state) => {
 		apps: get(state, 'apps.data'),
 		credentials: `${username}:${password}`,
 		settings: get(state, ['$getAppSettings', 'settings', appName]),
+		searchState: get(state, '$getSearchState.searchState', null),
 	};
 };
 
@@ -505,6 +566,7 @@ const mapDispatchToProps = (dispatch) => ({
 	fetchMappings: (appName, credentials) => dispatch(getAppMappings(appName, credentials)),
 	getSettingsAction: (name) => dispatch(getSettings(name)),
 	getDefaultSettingsAction: () => dispatch(getDefaultSettings()),
+	saveState: (state) => dispatch(setSearchState(state)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(PreferenceForm);

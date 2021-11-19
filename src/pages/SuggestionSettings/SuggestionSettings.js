@@ -14,6 +14,7 @@ import Loader from '../../components/Loader';
 import { isValidPlan } from '../../batteries/utils';
 import { saveRecentRoute } from '../../actions';
 import NoIndex from '../NoIndexPage/NoIndex';
+import { clearSearchState } from '../../batteries/modules/actions';
 
 const { TabPane } = Tabs;
 
@@ -36,8 +37,15 @@ const SuggestionSettings = ({
 	apps,
 	appName,
 	hasJSON,
+	clearState,
 }) => {
 	const [creating, setCreating] = useState(isCreating);
+
+	useEffect(() => {
+		return () => {
+			clearState();
+		};
+	}, []);
 
 	useEffect(() => {
 		if (!isCreating && creating) {
@@ -118,6 +126,7 @@ SuggestionSettings.propTypes = {
 	history: PropTypes.object.isRequired,
 	appName: PropTypes.string,
 	hasJSON: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]).isRequired,
+	clearState: PropTypes.func,
 };
 
 SuggestionSettings.defaultProps = {
@@ -126,6 +135,7 @@ SuggestionSettings.defaultProps = {
 	apps: {},
 	isFetching: false,
 	appName: '',
+	clearState: () => {},
 };
 
 const mapStateToProps = (state) => ({
@@ -140,6 +150,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
 	updateRecentRoute: (routeName) => dispatch(saveRecentRoute(routeName)),
+	clearState: () => dispatch(clearSearchState()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(SuggestionSettings));

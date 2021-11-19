@@ -38,12 +38,19 @@ describe('Recent Suggestion Settings add test flow', () => {
         .then((payload) => {
             cy.wait(2000);
 
-            cy.get('[data-cy=recent-suggestions-min-hits]').should('have.value', payload.body.minHits);
-        	cy.get('[data-cy=recent-suggestions-size]').should('have.value', payload.body.size);
-            cy.get('[data-cy=recent-suggestions-minChars]').should('have.value', payload.body.minChars);
+            const recentSuggestions = {
+                minHits: parseInt(payload.body.minHits, 10) || 0,
+                size: parseInt(payload.body.size, 10) || 1,
+                minChars: parseInt(payload.body.minChars, 10) || 0,
+                indices: payload.indices || ['*'],
+            };
+
+            cy.get('[data-cy=recent-suggestions-min-hits]').should('have.value', recentSuggestions.minHits);
+        	cy.get('[data-cy=recent-suggestions-size]').should('have.value', recentSuggestions.size);
+            cy.get('[data-cy=recent-suggestions-minChars]').should('have.value', recentSuggestions.minChars);
 
             cy.get('[data-cy=recent-suggestions-indices] > div > ul > li').each(($el, index) => {
-                if (index < payload.body.indices.length - 1) {
+                if (index < payload.body.indices?.length - 1) {
                     expect($el).to.have.text(payload.body.indices[index]);
                 }
             });

@@ -1,6 +1,13 @@
 import React from 'react';
 
-const Message = (message) => <div style={{ maxWidth: 220 }}>{message}</div>;
+const Message = (message, json = '') => {
+	return (
+		<>
+			<div style={{ maxWidth: 220 }}>{message}</div>
+			{json && <div style={{ whiteSpace: 'pre' }}>{json}</div>}
+		</>
+	);
+};
 
 export const hoverMessage = Message(
 	`All appbase.io paid plans offer setting ACLs, rate limits per IP and advanced security
@@ -75,47 +82,75 @@ export const credentialsMessages = {
 
 // Messages for popular suggestions
 export const suggestionsMessages = {
-	blacklist: Message('A list of queries which can be marked as blacklist.'),
-	externalSuggestions: Message('Define your custom suggestions.'),
-	minCount: Message('Min value of count for the suggestions.'),
-	minHits: Message('Define the minimum number of results that must present for a suggestion.'),
+	blacklist: Message(
+		'A list of suggestion terms to be ignored when populating the popular suggestions index.',
+	),
+	externalSuggestions: Message(
+		`Define your custom suggestions in the following format:`,
+		`[
+	{
+		"count": 6,
+		"indices": [
+		"abc",
+		"def"
+		],
+		"key": "hello"
+	}
+]`,
+	),
+	minCount: Message(
+		'Set the minimum number of times a term must be searched by users before it is considered. Value should be ≥ 0.',
+	),
+	minHits: Message(
+		'Set the minimum number of hits that must be returned for a suggestion term to be considered. Value should be between [0, 1000].',
+	),
 	minChars: Message(
-		'Define the minimum number of characters that must be present for a suggestion.',
+		'Set the minimum number of characters that must be present for a suggestion term to be considered. Value should be between [0, 32].',
 	),
 	transformDiacritics: Message(
-		'If enabled then Appbase will transform(strip) the diacritics before populating the suggestions. For an example, "Crème Brulée" becomes "Creme Brulee".',
+		'When enabled, suggestion terms will be transformed to remove the diacritics from them. For an example, "Crème Brulée" becomes "Creme Brulee".',
 	),
 	numberOfDays: Message(
-		'Define the number of days after which you want to re-calculate the suggestions.',
+		'Set the duration of days for which to populate the popular suggestions index. Value should be between [1, 90].',
 	),
-	popularSize: Message('Maximum number of popular suggestions to be displayed.'),
-	recentSize: Message('Maximum number of recent suggestions to be displayed.'),
-	indexSize: Message('Maximum number of index suggestions to be displayed.'),
+	popularSize: Message(
+		'Set the maximum number of popular suggestions to be displayed. Value should be between [0, 20].',
+	),
+	recentSize: Message(
+		'Set the maximum number of recent suggestions to be displayed. Value should be between [0, 20].',
+	),
+	indexSize: Message(
+		'Set the maximum number of index suggestions to be displayed. Value should be between [0, 20].',
+	),
 	indices: Message('Only selected indices will be considered to calculate the suggestions.'),
 	showDistinctSuggestions: Message(
-		'Show only up to 1 suggestion per document (i.e. record). If set to false, multiple suggestions can be shown when relevant (based on different matching fields) from the same document.',
+		'When set to true, returns only up to 1 suggestion per document. When set to false, multiple suggestions can be shown when relevant from the same document.',
 	),
 	enablePredictiveSuggestions: Message(
-		'Defaults to false. When set to true, it predicts the next relevant words from a fields value based on the search query typed by the user. When set to false (default), the entire fields value would be displayed.',
+		"When set to true, it predicts the next relevant words from a fields value based on the search query typed by the user. When set to false (default), the entire field's value would be displayed.",
 	),
-	maxPredictedWords: Message('Maximum number of predicted words.'),
+	maxPredictedWords: Message(
+		'Maximum number of predicted words. Value should be between [1, 5].',
+	),
 	applyStopwords: Message(
 		'Enable or disable application of default stopwords. Enabled by default.',
 	),
 	customStopwords: Message(
-		'Set comma separated stopwords to be ignored during the language specifc analysis process.',
+		'Set custom stopwords (comma separated) to be used during the suggestions query.',
 	),
-	enableSynonyms: Message('Allow synonyms.'),
+	enableSynonyms: Message(
+		'When set to true, search for suggestions based on the synonyms values.',
+	),
 	categoryField: Message(
 		'When specified, suggestions will show category specific suggestions based on the most frequent values based on this field.',
 	),
 	urlField: Message(
 		'When specified, suggestions will redirect to the URL value based on this field.',
 	),
-	includeFields: Message('Fields to include in the search results.'),
-	excludeFields: Message('Fields to exclude from the search results'),
+	includeFields: Message('Fields to include in the suggestion result.'),
+	excludeFields: Message('Fields to exclude from the suggestion result'),
 	customQuery: Message(
-		'Specify a custom stored query to execute instead of the default suggestions query. This is an advanced setting.',
+		'Specify a custom stored query to execute instead of the pre-tuned suggestions query. Note: this is an advanced setting.',
 	),
 };
 

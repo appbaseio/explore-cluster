@@ -31,10 +31,14 @@ const main = css`
 
 const cardStyle = css`
 	max-width: 800px;
-	margin: auto;
+	margin: auto !important;
 	padding: 0 15px;
+	.ant-card {
+		padding: 0px 15px;
+		margin: auto !important;
+	}
 	.ant-card-body {
-		padding: 24px 0;
+		padding: 24px;
 	}
 `;
 
@@ -50,6 +54,7 @@ class PopularSuggestions extends React.Component {
 				: [],
 			total: undefined,
 			initialData: {},
+			lastSyncedTime: 0,
 		};
 		this.form = FormBuilder.group({
 			blacklist: [[]],
@@ -137,7 +142,7 @@ class PopularSuggestions extends React.Component {
 			if (payload) {
 				this.form.patchValue({
 					blacklist: payload.blacklist || [],
-					externalSuggestions: payload.externalSuggestions || [],
+					externalSuggestions: payload.externalSuggestions || '',
 					minCount: parseInt(payload.minCount, 10),
 					minHits: parseInt(payload.minHits, 10),
 					numberOfDays: payload.numberOfDays || 30,
@@ -146,11 +151,13 @@ class PopularSuggestions extends React.Component {
 					indices: payload.indices || ['*'],
 					transformDiacritics: payload.transformDiacritics,
 				});
-
+				this.setState({
+					lastSyncedTime: payload?.lastSyncedTime,
+				});
 				this.setState({
 					initialData: {
 						blacklist: payload.blacklist || [],
-						externalSuggestions: payload.externalSuggestions || [],
+						externalSuggestions: payload.externalSuggestions || '',
 						minCount: parseInt(payload.minCount, 10),
 						minHits: parseInt(payload.minHits, 10),
 						numberOfDays: payload.numberOfDays || 30,
@@ -219,7 +226,7 @@ class PopularSuggestions extends React.Component {
 
 	render() {
 		const { isLoading, preferences } = this.props;
-		const { indices, total, initialData } = this.state;
+		const { indices, total, initialData, lastSyncedTime } = this.state;
 		if (isLoading && !preferences) {
 			return <Loader />;
 		}
@@ -232,8 +239,10 @@ class PopularSuggestions extends React.Component {
 					}}
 				>
 					<Container css={main}>
-						{total !== undefined && (
-							<>
+						{total !== undefined &&
+							total !== 0 &&
+							lastSyncedTime &&
+							lastSyncedTime !== 0 && (
 								<Card className={cardStyle}>
 									<Flex
 										justifyContent="space-between"
@@ -242,7 +251,7 @@ class PopularSuggestions extends React.Component {
 										<Flex>
 											<Alert
 												message={`Last synced ${total} popular suggestions at ${moment(
-													preferences?.lastSyncedTime * 1000,
+													lastSyncedTime * 1000,
 												).format('MMM DD, YYYY hh:mm A')}.`}
 												type="info"
 												showIcon
@@ -258,8 +267,7 @@ class PopularSuggestions extends React.Component {
 										</Flex>
 									</Flex>
 								</Card>
-							</>
-						)}
+							)}
 						<ErrorToaster>
 							{Object.keys(initialData).length > 0 && (
 								<PreferenceForm

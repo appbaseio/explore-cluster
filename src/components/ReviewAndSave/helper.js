@@ -15,15 +15,12 @@ export const relevancyTitles = {
 const settingsMap = {
 	categoryFields: {
 		title: 'Category Fields',
-		description: 'When specified, suggestions will show category specific suggestions based on the most frequent values based on this field.',
+		description:
+			'When specified, suggestions will show category specific suggestions based on the most frequent values based on this field.',
 	},
 	indices: {
 		title: 'Indices',
 		description: 'Only selected indices will be considered to calculate the suggestions.',
-	},
-	size: {
-		title: 'Page Size',
-		description: 'Number of results to show in a page',
 	},
 	includeFields: {
 		title: 'Include Fields',
@@ -244,61 +241,71 @@ const settingsMap = {
 	},
 	showDistinctSuggestions: {
 		title: 'Show Distinct Suggestions',
-		description: 'Show only up to 1 suggestion per document (i.e. record). If set to false, multiple suggestions can be shown when relevant (based on different matching fields) from the same document.',
+		description:
+			'When set to true, returns only up to 1 suggestion per document. When set to false, multiple suggestions can be shown when relevant from the same document.',
 	},
 	enablePredictiveSuggestions: {
 		title: 'Enable Predictive Suggestions',
-		description: 'Defaults to false. When set to true, it predicts the next relevant words from a fields value based on the search query typed by the user. When set to false (default), the entire fields value would be displayed.',
+		description:
+			"When set to true, it predicts the next relevant words from a fields value based on the search query typed by the user. If set to false (default), the entire field's value would be displayed.",
 	},
 	maxPredictedWords: {
 		title: 'Max Predicted Words',
-		description: 'Maximum number of predicted words.',
+		description: 'Set the maximum number of predicted words.',
 	},
 	size: {
 		title: 'Size',
-		description: 'Maximum number of popular suggestions to be displayed.',
+		description: 'Set the maximum number of results to be returned.',
 	},
 	categoryField: {
 		title: 'Category Field',
-		description: 'When specified, suggestions will show category specific suggestions based on the most frequent values based on this field.',
+		description:
+			'When specified, suggestions will show category specific suggestions based on the most frequent values based on this field.',
 	},
 	urlField: {
 		title: 'URL',
-		description: 'When specified, suggestions will redirect to the URL value based on this field.',
+		description:
+			'When specified, suggestions will redirect to the URL value based on this field.',
 	},
 	customQuery: {
 		title: 'Custom Query',
-		description: 'Specify a custom stored query to execute instead of the default suggestions query. This is an advanced setting.',
+		description:
+			'Specify a custom stored query to execute instead of the pre-tuned suggestions query.',
 	},
 	minHits: {
 		title: 'Min Hits',
-		description: 'Define the minimum number of results that must present for a suggestion.',
+		description:
+			'Set the minimum number of hits that must be returned for a suggestion term to be considered.',
 	},
 	minChars: {
 		title: 'Min Characters',
-		description: 'Define the minimum number of characters that must be present for a suggestion.',
+		description:
+			'Set the minimum number of characters that must be present for a suggestion term to be considered.',
 	},
 	numberOfDays: {
 		title: 'Number of days',
-		description: 'Define the number of days after which you want to re-calculate the suggestions.',
+		description:
+			'Set the duration of days for which to populate the popular suggestions index.',
 	},
 	minCount: {
 		title: 'Min Count',
-		description: 'Min value of count for the suggestions.',
+		description:
+			'Set the minimum number of times a term must be searched by users before it is considered.',
 	},
 	transformDiacritics: {
 		title: 'Transform Diacritics',
-		description: 'If enabled then Appbase will transform(strip) the diacritics before populating the suggestions. For an example, "Crème Brulée" becomes "Creme Brulee".',
+		description:
+			'When enabled, suggestion terms will be transformed to remove the diacritics from them.',
 	},
 	blacklist: {
 		title: 'Blacklist',
-		description: 'A list of queries which can be marked as blacklist.',
+		description:
+			'A list of suggestion terms to be ignored when populating the popular suggestions index.',
 	},
 	externalSuggestions: {
 		title: 'External Suggestions',
 		description: 'Define your custom suggestions.',
 	},
-
 };
 
 export default settingsMap;

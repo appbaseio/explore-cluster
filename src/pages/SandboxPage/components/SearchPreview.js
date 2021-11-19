@@ -6,10 +6,11 @@ import { css } from 'emotion';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import { ReactiveBase } from '@appbaseio/reactivesearch';
-
 import Filter from './Filter';
-
 import {
+	getPopularSuggestionsPreferences,
+	getIndexSuggestionsPreferences,
+	getRecentSuggestionsPreferences,
 	getSettings,
 	getAppMappings,
 	getRules,
@@ -37,6 +38,8 @@ const container = css`
 	}
 `;
 
+let config = {};
+let initial = true;
 const getDataFieldsWithWeights = (searchableMappings = {}, appbaseVersion) => {
 	// apply dataField new format for appbase version >= 7.47.0
 	const versionComparison = versionCompare(appbaseVersion, '7.47.0');
@@ -65,10 +68,14 @@ class SearchPreview extends React.Component {
 		isGradingEnabled: localStorage.getItem('enableGrading')
 			? localStorage.getItem('enableGrading') === 'true'
 			: false,
+		isTypeahead: localStorage.getItem('enableTypeahead')
+			? localStorage.getItem('enableTypeahead') === 'true'
+			: false,
 		queryGrades: {},
+		searchApi: false,
 	};
 
-	componentDidMount() {
+	componentDidMount = async () => {
 		const {
 			app,
 			fetchSearchSettings,
@@ -132,7 +139,20 @@ class SearchPreview extends React.Component {
 		} else {
 			fetchMappings(app, credentials, url);
 		}
-	}
+
+		const popularSuggestionsConfig = await this.fetchPopularPreferences();
+		const recentSuggestionsConfig = await this.fetchRecentPreferences();
+		const indexSuggestionsConfig = await this.fetchIndexPreferences();
+		config = {
+			enablePopularSuggestions: true,
+			popularSuggestionsConfig,
+			enableRecentSuggestions: true,
+			recentSuggestionsConfig,
+			...Object.fromEntries(
+				Object.entries(indexSuggestionsConfig).filter(([_, v]) => v != null), // eslint-disable-line
+			),
+		};
+	};
 
 	componentDidUpdate(prevProps) {
 		const { mappings, isFetchingMappings, hasTestSettings, settings, searchState } = this.props;
@@ -169,10 +189,10 @@ class SearchPreview extends React.Component {
 	}
 
 	componentWillUnmount() {
-		const { clearState } = this.props;
+		const { clearState, page } = this.props;
 		const { settings } = this.state;
 
-		if (settings) {
+		if (settings && page !== 'suggestions') {
 			clearState();
 		}
 	}
@@ -290,6 +310,139 @@ class SearchPreview extends React.Component {
 		return state;
 	}
 
+	// eslint-disable-next-line consistent-return
+	fetchIndexPreferences = async () => {
+		const { getIndexPreferences, app, searchStateSuggestions } = this.props;
+		if (searchStateSuggestions && searchStateSuggestions.indexSuggestions) {
+			return {
+				applyStopwords: searchStateSuggestions.indexSuggestions.applyStopwords || false,
+				customStopwords: searchStateSuggestions.indexSuggestions.customStopwords || [],
+				maxPredictedWords: parseInt(searchStateSuggestions.indexSuggestions, 10) || 0,
+				includeFields: searchStateSuggestions.indexSuggestions.includeFields || ['*'],
+				excludeFields: searchStateSuggestions.indexSuggestions.excludeFields || [],
+				categoryField: searchStateSuggestions.indexSuggestions.categoryField,
+				urlField: searchStateSuggestions.indexSuggestions.urlField,
+				showDistinctSuggestions:
+					searchStateSuggestions.indexSuggestions.showDistinctSuggestions || false,
+				enablePredictiveSuggestions:
+					searchStateSuggestions.indexSuggestions.enablePredictiveSuggestions || false,
+				enableSynonyms: searchStateSuggestions.indexSuggestions.enableSynonyms || false,
+				size: parseInt(searchStateSuggestions.indexSuggestions.size, 10) || 3,
+				index: this.validateIndex(searchStateSuggestions.indexSuggestions.indices),
+			};
+		}
+		try {
+			const data = await getIndexPreferences();
+			if (data.payload) {
+				return {
+					applyStopwords: data.payload.applyStopwords || false,
+					customStopwords: data.payload.customStopwords || [],
+					maxPredictedWords: parseInt(data.payload.maxPredictedWords, 10) || 0,
+					includeFields: data.payload.includeFields || ['*'],
+					excludeFields: data.payload.excludeFields || [],
+					categoryField: data.payload.categoryField,
+					urlField: data.payload.urlField,
+					showDistinctSuggestions: data.payload.showDistinctSuggestions || false,
+					enablePredictiveSuggestions: data.payload.enablePredictiveSuggestions || false,
+					enableSynonyms: data.payload.enableSynonyms || false,
+					size: parseInt(data.payload.size, 10) || 3,
+					index: this.validateIndex(data.payload.indices),
+				};
+			}
+			return {
+				applyStopwords: false,
+				customStopwords: [],
+				maxPredictedWords: 0,
+				includeFields: ['*'],
+				excludeFields: [],
+				categoryField: '',
+				urlField: '',
+				showDistinctSuggestions: false,
+				enablePredictiveSuggestions: false,
+				enableSynonyms: false,
+				size: 3,
+				index: app,
+			};
+		} catch (err) {
+			// eslint-disable-next-line no-console
+			console.error(err);
+		}
+	};
+
+	// eslint-disable-next-line consistent-return
+	fetchRecentPreferences = async () => {
+		const { getRecentPreferences, app, searchStateSuggestions } = this.props;
+		if (searchStateSuggestions && searchStateSuggestions.recentSuggestions) {
+			return {
+				minHits: parseInt(searchStateSuggestions.recentSuggestions.minHits, 10) || 1,
+				size: parseInt(searchStateSuggestions.recentSuggestions.size, 10) || 3,
+				minChars: parseInt(searchStateSuggestions.recentSuggestions.minChars, 10) || 3,
+				index: this.validateIndex(searchStateSuggestions.recentSuggestions.indices),
+			};
+		}
+		try {
+			const data = await getRecentPreferences();
+			if (data.payload) {
+				return {
+					minHits: parseInt(data.payload.minHits, 10) || 1,
+					size: parseInt(data.payload.size, 10) || 3,
+					minChars: parseInt(data.payload.minChars, 10) || 3,
+					index: this.validateIndex(data.payload.indices),
+				};
+			}
+			return {
+				minHits: 1,
+				size: 3,
+				minChars: 3,
+				index: app,
+			};
+		} catch (err) {
+			// eslint-disable-next-line no-console
+			console.error(err);
+		}
+	};
+
+	// eslint-disable-next-line consistent-return
+	fetchPopularPreferences = async () => {
+		const { getPopularPreferences, app, searchStateSuggestions } = this.props;
+		if (searchStateSuggestions && searchStateSuggestions.popularSuggestions) {
+			return {
+				index: this.validateIndex(searchStateSuggestions.popularSuggestions.indices),
+				minCount: parseInt(searchStateSuggestions.popularSuggestions.minCount, 10) || 5,
+				minChars: parseInt(searchStateSuggestions.popularSuggestions.minChars, 10) || 3,
+				size: parseInt(searchStateSuggestions.popularSuggestions.size, 10) || 3,
+			};
+		}
+		try {
+			const data = await getPopularPreferences();
+			if (data.payload) {
+				return {
+					index: this.validateIndex(data.payload.indices),
+					minCount: parseInt(data.payload.minCount, 10) || 5,
+					minChars: parseInt(data.payload.minChars, 10) || 3,
+					size: parseInt(data.payload.size, 10) || 3,
+				};
+			}
+			return {
+				index: app,
+				minCount: 5,
+				minChars: 3,
+				size: 3,
+			};
+		} catch (err) {
+			// eslint-disable-next-line no-console
+			console.error(err);
+		}
+	};
+
+	validateIndex = (indices) => {
+		const { app } = this.props;
+		if (indices?.length && indices[0] !== '*') {
+			return indices.join(',');
+		}
+		return app;
+	};
+
 	handleSettingsChange = (settings) => {
 		this.setState({
 			settings,
@@ -300,6 +453,13 @@ class SearchPreview extends React.Component {
 		localStorage.setItem('enableAnalytics', JSON.stringify(value));
 		this.setState({
 			isAnalyticsEnabled: value,
+		});
+	};
+
+	toggleTypeahead = (value) => {
+		localStorage.setItem('enableTypeahead', JSON.stringify(value));
+		this.setState({
+			isTypeahead: value,
 		});
 	};
 
@@ -331,12 +491,56 @@ class SearchPreview extends React.Component {
 		window.open(codesandboxURL, '_blank');
 	};
 
+	onSelected = (query) => {
+		this.setState({
+			searchApi: true,
+		});
+		this.setQueryGrades(query);
+	};
+
 	setQueryGrades = (query) => {
 		getQueryGrades({ query }).then((res) => {
 			this.setState({
 				queryGrades: res,
 			});
 		});
+	};
+
+	fetchResults = (type) => {
+		this.setState({
+			searchApi: type,
+		});
+	};
+
+	transformRequest = (props) => {
+		const { isTypeahead, searchApi } = this.state;
+
+		if (isTypeahead && !initial && !searchApi) {
+			const parsedBody = JSON.parse(props.body);
+			// eslint-disable-next-line consistent-return
+			parsedBody.query.forEach((item) => {
+				if (item.id === 'result') {
+					return props;
+				}
+				if (item.id === 'search__internal' || item.id === 'search') {
+					parsedBody.query = [
+						{
+							type: 'suggestion',
+							id: 'search',
+							value: item.value || '',
+							...config,
+						},
+					];
+					// eslint-disable-next-line no-param-reassign
+					props.body = JSON.stringify(parsedBody);
+					return props;
+				}
+			});
+		}
+		if (initial) {
+			initial = false;
+		}
+		return props;
 	};
 
 	render() {
@@ -350,8 +554,6 @@ class SearchPreview extends React.Component {
 			isFetchingMappings,
 			mappings,
 			handleModal,
-			tier,
-			featureGrade,
 			showFeaturedProducts,
 			onChange,
 			value,
@@ -364,10 +566,9 @@ class SearchPreview extends React.Component {
 			settings: stateSettings,
 			isAnalyticsEnabled,
 			isGradingEnabled,
+			isTypeahead,
 			queryGrades,
 		} = this.state;
-
-		const isGradingAllowed = isValidPlan(tier, featureGrade);
 
 		if (fetchingDefaultSettings) {
 			return (
@@ -429,21 +630,14 @@ class SearchPreview extends React.Component {
 										/>
 									</label>
 								</Tooltip>
-								<Tooltip
-									title={
-										isGradingAllowed
-											? 'Toggle to enable (or disable) grading of search results.'
-											: 'This feature is not available for the current plan, please upgrade to a higher plan.'
-									}
-								>
-									<label htmlFor="grading">
-										Grade Search
+								<Tooltip title="Toggle to enable autosuggestions">
+									<label htmlFor="suggestions">
+										Enable Autosuggestion
 										<Switch
-											checked={isGradingEnabled}
-											disabled={!isGradingAllowed}
+											checked={isTypeahead}
 											style={{ marginLeft: 5 }}
-											onChange={this.toggleGrading}
-											id="grading"
+											onChange={this.toggleTypeahead}
+											id="suggestions"
 										/>
 									</label>
 								</Tooltip>
@@ -463,6 +657,10 @@ class SearchPreview extends React.Component {
 					appbaseConfig={{
 						recordAnalytics: showFeaturedProducts ? false : isAnalyticsEnabled,
 						enableQueryRules: page !== 'rules',
+					}}
+					transformRequest={(props) => {
+						const newProps = this.transformRequest(props);
+						return newProps;
 					}}
 				>
 					<Col md={6}>
@@ -484,9 +682,11 @@ class SearchPreview extends React.Component {
 							<Search
 								handleValueChange={this.handleValueChange}
 								app={app}
-								onValueChange={this.setQueryGrades}
+								onValueChange={this.onSelected}
 								search={search}
+								isTypeahead={isTypeahead}
 								handleModal={handleModal}
+								fetchResults={(type, val) => this.fetchResults(type, val)}
 								page={page}
 							/>
 						</ErrorToaster>
@@ -543,6 +743,7 @@ const mapStateToProps = (state, props) => {
 		searchState: get(state, '$getSearchState.parsedSearchState', null),
 		featureRules: get(state, '$getAppPlan.results.feature_rules', false),
 		appbaseVersion: get(state, '$getAppPlan.results.version'),
+		searchStateSuggestions: get(state, '$getSearchState.searchState.suggestions', null),
 	};
 };
 
@@ -552,6 +753,9 @@ const mapDispatchToProps = (dispatch) => ({
 	fetchMappings: (appName, credentials, url) =>
 		dispatch(getAppMappings(appName, credentials, url)),
 	clearState: () => dispatch(clearSearchState()),
+	getPopularPreferences: () => dispatch(getPopularSuggestionsPreferences()),
+	getRecentPreferences: () => dispatch(getRecentSuggestionsPreferences()),
+	getIndexPreferences: () => dispatch(getIndexSuggestionsPreferences()),
 });
 
 SearchPreview.propTypes = {
@@ -579,6 +783,10 @@ SearchPreview.propTypes = {
 	value: PropTypes.array,
 	selectButtonLabel: PropTypes.string,
 	appbaseVersion: PropTypes.string.isRequired, // eslint-disable-line
+	getPopularPreferences: PropTypes.func.isRequired,
+	getRecentPreferences: PropTypes.func.isRequired,
+	getIndexPreferences: PropTypes.func.isRequired,
+	searchStateSuggestions: PropTypes.object,
 	page: PropTypes.string,
 	withRule: PropTypes.bool,
 };
@@ -601,6 +809,7 @@ SearchPreview.defaultProps = {
 	onChange: () => {},
 	value: [],
 	selectButtonLabel: undefined,
+	searchStateSuggestions: null,
 	page: '',
 	withRule: false,
 };

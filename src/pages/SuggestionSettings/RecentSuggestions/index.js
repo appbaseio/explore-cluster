@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { notification, Alert, Card, Button } from 'antd';
+import { notification } from 'antd';
 import get from 'lodash/get';
 import { FormBuilder, Validators } from 'react-reactive-form';
 import { css } from 'emotion';
@@ -17,7 +17,6 @@ import PreferenceForm from './PreferenceForm';
 import { isValidPlan } from '../../../batteries/utils';
 import { getURL } from '../../../constants/config';
 import { getAuthToken } from '../../../batteries/components/analytics/utils';
-import Flex from '../../../batteries/components/shared/Flex';
 import ErrorToaster from '../../../batteries/components/shared/ErrorToaster';
 import { event, timingEvent } from '../../../utils/gtag';
 import moment from '../../../utils/moment';
@@ -38,15 +37,6 @@ const bannerDetails = {
 	icon: 'pencil',
 	href: 'https://docs.appbase.io/docs/analytics/recent-suggestions/',
 };
-
-const cardStyle = css`
-	max-width: 800px;
-	margin: auto;
-	padding: 0 15px;
-	.ant-card-body {
-		padding: 24px 0;
-	}
-`;
 
 class RecentSuggestions extends React.Component {
 	constructor(props) {
@@ -207,30 +197,6 @@ class RecentSuggestions extends React.Component {
 						{total !== undefined && get(preferences, 'index') && !hide && (
 							<>
 								<Banner {...bannerDetails} />
-								<Card className={cardStyle}>
-									<Flex
-										justifyContent="space-between"
-										style={{ alignItems: 'center' }}
-									>
-										<Flex>
-											<Alert
-												message={`Last synced ${total} recent suggestions at ${moment(
-													preferences.last_synced_time * 1000,
-												).format('MMM DD, YYYY hh:mm A')}.`}
-												type="info"
-												showIcon
-											/>
-										</Flex>
-										<Flex>
-											<Button
-												type="primary"
-												href={`/app/${preferences.index}/browse`}
-											>
-												Browse Data
-											</Button>
-										</Flex>
-									</Flex>
-								</Card>
 							</>
 						)}
 						<ErrorToaster>

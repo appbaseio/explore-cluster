@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { notification, Alert, Card, Button } from 'antd';
+import { notification } from 'antd';
 import get from 'lodash/get';
 import { FormBuilder, Validators } from 'react-reactive-form';
 import { css } from 'emotion';
@@ -18,7 +18,6 @@ import PreferenceForm from './PreferenceForm';
 import { isValidPlan } from '../../../batteries/utils';
 import { getURL } from '../../../constants/config';
 import { getAuthToken } from '../../../batteries/components/analytics/utils';
-import Flex from '../../../batteries/components/shared/Flex';
 import ErrorToaster from '../../../batteries/components/shared/ErrorToaster';
 import { event, timingEvent } from '../../../utils/gtag';
 import moment from '../../../utils/moment';
@@ -40,15 +39,6 @@ const bannerDetails = {
 	icon: 'pencil',
 	href: 'https://docs.appbase.io/docs/analytics/index-suggestions/',
 };
-
-const cardStyle = css`
-	max-width: 800px;
-	margin: auto;
-	padding: 0 15px;
-	.ant-card-body {
-		padding: 24px 0;
-	}
-`;
 
 class IndexSuggestions extends React.Component {
 	constructor(props) {
@@ -75,7 +65,7 @@ class IndexSuggestions extends React.Component {
 			showDistinctSuggestions: false,
 			enablePredictiveSuggestions: false,
 			enableSynonyms: false,
-			size: [0, [Validators.required, Validators.min(0), Validators.max(10)]],
+			size: [3, [Validators.required, Validators.min(0), Validators.max(10)]],
 			indices: [['*']],
 		});
 	}
@@ -146,7 +136,7 @@ class IndexSuggestions extends React.Component {
 				this.form.patchValue({
 					applyStopwords: payload.applyStopwords || false,
 					customStopwords: payload.customStopwords || [],
-					maxPredictedWords: parseInt(payload.maxPredictedWords, 10) || 0,
+					maxPredictedWords: parseInt(payload.maxPredictedWords, 10) || 1,
 					customQuery: payload.customQuery,
 					includeFields: payload.includeFields || ['*'],
 					excludeFields: payload.excludeFields || [],
@@ -155,14 +145,14 @@ class IndexSuggestions extends React.Component {
 					showDistinctSuggestions: payload.showDistinctSuggestions || false,
 					enablePredictiveSuggestions: payload.enablePredictiveSuggestions || false,
 					enableSynonyms: payload.enableSynonyms || false,
-					size: parseInt(payload.size, 10) || 1,
+					size: parseInt(payload.size, 10) || 3,
 					indices: payload.indices || ['*'],
 				});
 				this.setState({
 					initialData: {
 						applyStopwords: payload.applyStopwords || false,
 						customStopwords: payload.customStopwords || [],
-						maxPredictedWords: parseInt(payload.maxPredictedWords, 10) || 0,
+						maxPredictedWords: parseInt(payload.maxPredictedWords, 10) || 1,
 						customQuery: payload.customQuery,
 						includeFields: payload.includeFields || ['*'],
 						excludeFields: payload.excludeFields || [],
@@ -171,7 +161,7 @@ class IndexSuggestions extends React.Component {
 						showDistinctSuggestions: payload.showDistinctSuggestions || false,
 						enablePredictiveSuggestions: payload.enablePredictiveSuggestions || false,
 						enableSynonyms: payload.enableSynonyms || false,
-						size: parseInt(payload.size, 10) || 1,
+						size: parseInt(payload.size, 10) || 3,
 						indices: payload.indices || ['*'],
 					},
 				});
@@ -180,7 +170,7 @@ class IndexSuggestions extends React.Component {
 					initialData: {
 						applyStopwords: false,
 						customStopwords: [],
-						maxPredictedWords: 0,
+						maxPredictedWords: 1,
 						customQuery: '',
 						includeFields: ['*'],
 						excludeFields: [],
@@ -189,7 +179,7 @@ class IndexSuggestions extends React.Component {
 						showDistinctSuggestions: false,
 						enablePredictiveSuggestions: false,
 						enableSynonyms: false,
-						size: 1,
+						size: 3,
 						indices: ['*'],
 					},
 				});
@@ -210,7 +200,10 @@ class IndexSuggestions extends React.Component {
 					size: Number(this.form.value.size),
 				};
 			}
-			savePreferences(payload).then((action) => {
+
+			savePreferences(
+				Object.fromEntries(Object.entries(payload).filter(([_, v]) => v != null)), // eslint-disable-line
+			).then((action) => {
 				if (get(action, 'payload')) {
 					notification.success({
 						message: 'Index Suggestions preferences saved successfully.',
@@ -244,30 +237,6 @@ class IndexSuggestions extends React.Component {
 						{total !== undefined && get(preferences, 'index') && !hide && (
 							<>
 								<Banner {...bannerDetails} />
-								<Card className={cardStyle}>
-									<Flex
-										justifyContent="space-between"
-										style={{ alignItems: 'center' }}
-									>
-										<Flex>
-											<Alert
-												message={`Last synced ${total} index suggestions at ${moment(
-													preferences.last_synced_time * 1000,
-												).format('MMM DD, YYYY hh:mm A')}.`}
-												type="info"
-												showIcon
-											/>
-										</Flex>
-										<Flex>
-											<Button
-												type="primary"
-												href={`/app/${preferences.index}/browse`}
-											>
-												Browse Data
-											</Button>
-										</Flex>
-									</Flex>
-								</Card>
 							</>
 						)}
 						<ErrorToaster>
