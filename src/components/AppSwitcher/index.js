@@ -14,7 +14,8 @@ const selectStyle = css`
 		border: none;
 	}
 	.ant-select-selection-selected-value {
-		max-width: 92%;
+		max-width: 100%;
+		padding: 0 20px 0 0;
 	}
 `;
 
@@ -50,7 +51,7 @@ class AppSwitcher extends React.Component {
 				<Select
 					className={selectStyle}
 					value={currentApp}
-					style={{ minWidth: 180 }}
+					style={{ minWidth: 180, maxWidth: 420 }}
 					onSelect={(appName) => {
 						updateCurrentApp(appName);
 						history.push(`/app/${appName}/${route || ''}`);

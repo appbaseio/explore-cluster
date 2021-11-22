@@ -49,7 +49,7 @@ function IndexSwitcher({
 		return (
 			<Select
 				placeholder="Search for an index."
-				style={{ minWidth: 180 }}
+				style={{ minWidth: 180, maxWidth: 420 }}
 				onSelect={(value) => {
 					// do not use updateCurrentApp here, since onSelect prop is used for `Test Search Relevancy` button
 					if (onSelect) onSelect(value);
