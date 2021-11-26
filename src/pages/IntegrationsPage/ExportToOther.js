@@ -17,8 +17,12 @@ const copyToClipboard = () => {
 const ExportToOther = ({ control, preferences, isRecommendation, widgetId }) => {
 	// Override user credentials to API credentials selected by user
 	const credentials = control.get('credentials') ? control.get('credentials').value : undefined;
+
+	const newPreferences = { ...preferences() };
+	newPreferences.appbaseSettings.userId = 'appbase.io dashboard';
+
 	const installationHeadScript = getInstallationHeadScript(
-		preferences(),
+		newPreferences,
 		credentials,
 		isRecommendation,
 	);

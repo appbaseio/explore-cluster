@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { ReactiveBase } from '@appbaseio/reactivesearch';
 import { notification } from 'antd';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { getURL } from '../../../../../constants/config';
 import GlobalSearch from '../../../../../components/GlobalSearch';
 import PromoteDataTable from './PromoteDataTable';
+import { getIndexSuggestionsPreferences } from '../../../../../batteries/modules/actions';
 
+let config = {};
 class PromoteResults extends Component {
 	constructor(props) {
 		super(props);
@@ -15,6 +18,21 @@ class PromoteResults extends Component {
 		};
 		this.globalSearchRef = React.createRef();
 	}
+
+	componentDidMount = async () => {
+		const indexSuggestionsConfig = await this.fetchIndexPreferences();
+
+		config = {
+			enablePopularSuggestions: false,
+			enableRecentSuggestions: false,
+			enablePredictiveSuggestions: true,
+			maxPredictedWords: 3,
+			showDistinctSuggestions: true,
+			...Object.fromEntries(
+				Object.entries(indexSuggestionsConfig).filter(([_, v]) => v != null), // eslint-disable-line
+			),
+		};
+	};
 
 	updateResults = () => {
 		const { onChange } = this.props;
@@ -87,6 +105,68 @@ class PromoteResults extends Component {
 		this.setState({ dataSource: updatedData }, this.updateResults);
 	};
 
+	// eslint-disable-next-line consistent-return
+	fetchIndexPreferences = async () => {
+		const { getIndexPreferences } = this.props;
+		try {
+			const data = await getIndexPreferences();
+			if (data.payload) {
+				return {
+					applyStopwords: data.payload.applyStopwords || true,
+					customStopwords: data.payload.customStopwords || [],
+					includeFields: data.payload.includeFields || ['*'],
+					excludeFields: data.payload.excludeFields || [],
+					categoryField: data.payload.categoryField,
+					urlField: data.payload.urlField,
+					enableSynonyms: data.payload.enableSynonyms || true,
+					size: parseInt(data.payload.size, 10) || 3,
+				};
+			}
+			return {
+				applyStopwords: true,
+				customStopwords: [],
+				includeFields: ['*'],
+				excludeFields: [],
+				categoryField: '',
+				urlField: '',
+				enableSynonyms: true,
+				size: 3,
+			};
+		} catch (err) {
+			// eslint-disable-next-line no-console
+			console.error(err);
+		}
+	};
+
+	transformRequest = (props) => {
+		const { indexes } = this.props;
+		const parsedBody = JSON.parse(props.body);
+
+		// eslint-disable-next-line consistent-return
+		parsedBody.query.forEach((item) => {
+			if (item.id === 'GlobalSearch') {
+				parsedBody.settings = {
+					...parsedBody.settings,
+					useCache: false,
+				};
+				parsedBody.query = [
+					{
+						type: 'suggestion',
+						id: 'GlobalSearch',
+						value: item.value || '',
+						...config,
+						index: indexes.join(',') || '*', // rule particular index
+					},
+				];
+				// eslint-disable-next-line no-param-reassign
+				props.body = JSON.stringify(parsedBody);
+				return props;
+			}
+		});
+
+		return props;
+	};
+
 	clearSearch() {
 		if (this.globalSearchRef) {
 			this.globalSearchRef.current?.handleSearchValueChange(''); // eslint-disable-line
@@ -105,6 +185,15 @@ class PromoteResults extends Component {
 					credentials={atob(sessionStorage.getItem('authToken'))}
 					style={{ marginBottom: 12 }}
 					enableAppbase
+					appbaseConfig={{
+						recordAnalytics: false,
+						enableQueryRules: false,
+						useCache: false,
+					}}
+					transformRequest={(props) => {
+						const newProps = this.transformRequest(props);
+						return newProps;
+					}}
 				>
 					<GlobalSearch
 						indexes={indexes}
@@ -166,6 +255,7 @@ PromoteResults.propTypes = {
 	dataFields: PropTypes.array,
 	value: PropTypes.array,
 	onChange: PropTypes.func.isRequired,
+	getIndexPreferences: PropTypes.func.isRequired,
 };
 
 PromoteResults.defaultProps = {
@@ -174,4 +264,8 @@ PromoteResults.defaultProps = {
 	value: [],
 };
 
-export default PromoteResults;
+const mapDispatchToProps = (dispatch) => ({
+	getIndexPreferences: () => dispatch(getIndexSuggestionsPreferences()),
+});
+
+export default connect(null, mapDispatchToProps)(PromoteResults);

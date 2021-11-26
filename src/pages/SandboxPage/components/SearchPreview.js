@@ -657,6 +657,7 @@ class SearchPreview extends React.Component {
 					appbaseConfig={{
 						recordAnalytics: showFeaturedProducts ? false : isAnalyticsEnabled,
 						enableQueryRules: page !== 'rules',
+						userId: 'appbase.io dashboard',
 					}}
 					transformRequest={(props) => {
 						const newProps = this.transformRequest(props);

@@ -47,14 +47,17 @@ class StoreFrontPreview extends React.Component {
 		}
 		div.setAttribute('isPreview', true);
 		// Set preferences
+
+		// Add userId
+		const newPreferences = { ...preferences() };
+		newPreferences.appbaseSettings.userId = 'appbase.io dashboard';
+
 		if (isRecommendation) {
-			this.iframeRef.current.contentWindow.APPBASE_RECOMMENDATIONS_PREFERENCES = JSON.stringify(
-				preferences(),
-			);
+			this.iframeRef.current.contentWindow.APPBASE_RECOMMENDATIONS_PREFERENCES =
+				JSON.stringify(preferences());
 		} else {
-			this.iframeRef.current.contentWindow.APPBASE_SEARCH_PREFERENCES = JSON.stringify(
-				preferences(),
-			);
+			this.iframeRef.current.contentWindow.APPBASE_SEARCH_PREFERENCES =
+				JSON.stringify(newPreferences);
 		}
 
 		this.iframeRef.current.contentDocument.body.appendChild(div);

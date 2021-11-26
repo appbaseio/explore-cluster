@@ -6,6 +6,7 @@ import { css } from 'react-emotion';
 import { Icon } from 'antd';
 import get from 'lodash/get';
 import { getSettings as getSearchSettings } from '../../batteries/modules/actions';
+import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
 const inputBox = css`
 	&:hover,
@@ -42,14 +43,8 @@ class GlobalSearch extends PureComponent {
 	};
 
 	render() {
-		const {
-			className,
-			dataFields,
-			onKeyDown,
-			onValueSelected,
-			subprops,
-			dataFieldSettings,
-		} = this.props;
+		const { className, dataFields, onKeyDown, onValueSelected, subprops, dataFieldSettings } =
+			this.props;
 		const { searchValue } = this.state;
 		const isFieldDefined = Array.isArray(dataFieldSettings) && dataFieldSettings.length;
 		return (
@@ -76,11 +71,75 @@ class GlobalSearch extends PureComponent {
 					onChange={this.handleSearchValueChange}
 					value={searchValue}
 					onKeyDown={onKeyDown}
-					onValueSelected={onValueSelected}
+					onValueSelected={(value, cause, source) => {
+						if (source) {
+							onValueSelected(value, cause, source);
+						}
+						this.handleSearchValueChange('');
+					}}
 					{...subprops}
 					// Prioritize the data fields from search settings
 					dataField={isFieldDefined ? undefined : dataFields}
 					fieldWeights={isFieldDefined ? undefined : subprops.fieldWeights}
+					render={({ rawData, downshiftProps }) => {
+						const suggestionsArr = rawData?.hits?.hits;
+						if (suggestionsArr && suggestionsArr?.length && downshiftProps.isOpen) {
+							return (
+								<div
+									style={{
+										position: 'absolute',
+										color: '#424242',
+										fontSize: '0.9rem',
+										border: '1px solid #ddd',
+										background: 'white',
+										borderRadius: 2,
+										marginTop: 0,
+										width: '100%',
+										overflowY: 'scroll',
+										zIndex: 10,
+										maxHeight: '100vh',
+										boxShadow: '0 2px 4px #d9d9d9',
+									}}
+								>
+									{suggestionsArr.map(
+										(suggestion, index) =>
+											suggestion.label && (
+												<div
+													style={{
+														padding: 10,
+														fontSize: '0.8rem',
+														background:
+															index ===
+															downshiftProps.highlightedIndex
+																? '#eee'
+																: 'transparent',
+													}}
+													key={`${suggestion._id}-${index}`} // eslint-disable-line react/no-array-index-key
+													onClick={() => {
+														onValueSelected(
+															suggestion.value,
+															'SUGGESTION_SELECT',
+															suggestion,
+														);
+														this.handleSearchValueChange('');
+													}}
+												>
+													<div
+														{...downshiftProps.getItemProps({
+															item: suggestion,
+														})}
+														dangerouslySetInnerHTML={{
+															__html: suggestion.label,
+														}}
+													/>
+												</div>
+											),
+									)}
+								</div>
+							);
+						}
+						return null;
+					}}
 				/>
 				<Icon
 					className="search-icon"
@@ -134,6 +193,8 @@ const mapDispatchToProps = (dispatch) => ({
 	getSettingsAction: (name) => dispatch(getSearchSettings(name)),
 });
 
-const GlobalSearchWrapper = connect(mapStateToProps, mapDispatchToProps)(GlobalSearch);
+const GlobalSearchWrapper = withErrorToaster(
+	connect(mapStateToProps, mapDispatchToProps)(GlobalSearch),
+);
 
 export default React.forwardRef((props, ref) => <GlobalSearchWrapper innerRef={ref} {...props} />);
