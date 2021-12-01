@@ -748,7 +748,7 @@ class ReviewAndSave extends React.Component {
 						top: 20,
 					}}
 					destroyOnClose
-					okText="Review and Save"
+					okText="Review and Deploy"
 					confirmLoading={isSaving}
 					onCancel={this.handleCancel}
 					cancelButtonProps={{ 'data-cy': 'cancel-modal-button' }}

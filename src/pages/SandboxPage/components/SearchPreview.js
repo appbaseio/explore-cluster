@@ -317,7 +317,8 @@ class SearchPreview extends React.Component {
 			return {
 				applyStopwords: searchStateSuggestions.indexSuggestions.applyStopwords || false,
 				customStopwords: searchStateSuggestions.indexSuggestions.customStopwords || [],
-				maxPredictedWords: parseInt(searchStateSuggestions.indexSuggestions, 10) || 0,
+				maxPredictedWords:
+					parseInt(searchStateSuggestions.indexSuggestions.maxPredictedWords, 10) || 0,
 				includeFields: searchStateSuggestions.indexSuggestions.includeFields || ['*'],
 				excludeFields: searchStateSuggestions.indexSuggestions.excludeFields || [],
 				categoryField: searchStateSuggestions.indexSuggestions.categoryField,
