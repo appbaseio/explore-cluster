@@ -23,7 +23,6 @@ class HideResults extends Component {
 		config = {
 			enablePopularSuggestions: false,
 			enableRecentSuggestions: false,
-			enablePredictiveSuggestions: true,
 			maxPredictedWords: 3,
 			showDistinctSuggestions: true,
 			...Object.fromEntries(
