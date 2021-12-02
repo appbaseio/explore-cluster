@@ -67,41 +67,41 @@ export default class Search extends Component {
 	renderSearchApp = () => {
 		const { searchFields, facetFields, selectedDataset, app } = this.props;
 
-		if(selectedDataset === 'movies') {
+		if (selectedDataset === 'movies') {
 			return (
 				<div>
 					{this.renderFacetInput(true)}
-					<MoviesSearchApp fields={searchFields} facets={facetFields} app={app}/>
-				</div>
-			)
-		} else if(selectedDataset === 'products') {
-			return (
-				<div>
-					{this.renderFacetInput(true)}
-					<EcommSearchApp fields={searchFields} facets={facetFields} app={app}/>
-				</div>
-			)
-		} else if(selectedDataset === 'geo') {
-			return (
-				<div>
-					{this.renderFacetInput(true)}
-					<GeoSearchApp fields={searchFields} facets={facetFields} app={app}/>
-				</div>
-			)
-		} else {
-			return (
-				<div>
-					{this.renderFacetInput(true)}
-					<SearchApp fields={searchFields} facets={facetFields}/>
+					<MoviesSearchApp fields={searchFields} facets={facetFields} app={app} />
 				</div>
 			);
 		}
-
+		if (selectedDataset === 'products') {
+			return (
+				<div>
+					{this.renderFacetInput(true)}
+					<EcommSearchApp fields={searchFields} facets={facetFields} app={app} />
+				</div>
+			);
+		}
+		if (selectedDataset === 'geo') {
+			return (
+				<div>
+					{this.renderFacetInput(true)}
+					<GeoSearchApp fields={searchFields} facets={facetFields} app={app} />
+				</div>
+			);
+		}
+		return (
+			<div>
+				{this.renderFacetInput(true)}
+				<SearchApp fields={searchFields} facets={facetFields} />
+			</div>
+		);
 	};
 
 	handleOptions = () => {
-		const {selectedDataset} = this.props;
-		if(selectedDataset === 'movies') {
+		const { selectedDataset } = this.props;
+		if (selectedDataset === 'movies') {
 			this.setState({
 				options: [
 					{
@@ -116,9 +116,9 @@ export default class Search extends Component {
 						value: 'vote_average',
 						label: 'vote_average',
 					},
-				]
-			})
-		} else if(selectedDataset === 'products') {
+				],
+			});
+		} else if (selectedDataset === 'products') {
 			this.setState({
 				options: [
 					{
@@ -133,8 +133,8 @@ export default class Search extends Component {
 						value: 'retail_price',
 						label: 'retail_price',
 					},
-				]
-			})
+				],
+			});
 		} else {
 			this.setState({
 				options: [
@@ -150,10 +150,11 @@ export default class Search extends Component {
 						value: 'place',
 						label: 'place',
 					},
-				]
-			})
+				],
+			});
 		}
-	}
+	};
+
 	renderFacetInput = (horizontal) => {
 		const { error, selectedOption, options } = this.state;
 		return (
@@ -192,7 +193,8 @@ export default class Search extends Component {
 	};
 
 	render() {
-		const { nextScreen, app, previousScreen, facetFields } = this.props;
+		const { nextScreen, app, previousScreen, facetFields, searchFields, selectedDataset } =
+			this.props;
 		return (
 			<div>
 				<div className="wrapper">
@@ -224,6 +226,9 @@ export default class Search extends Component {
 					disabled={!facetFields.length}
 					label="Finish"
 					app={app}
+					facetFields={facetFields}
+					searchFields={searchFields}
+					selectedDataset={selectedDataset}
 				/>
 			</div>
 		);
@@ -245,5 +250,5 @@ Search.defaultProps = {
 	previousScreen: null,
 	facetFields: [],
 	searchFields: [],
-	selectedDataset: 'movies'
+	selectedDataset: 'movies',
 };

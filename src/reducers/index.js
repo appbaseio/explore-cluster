@@ -8,6 +8,7 @@ import sideBarCollapsedReducer from './sideBarCollapsedReducer';
 import appRoutesReducer from './appRoutesReducer';
 import clusterRoutesReducer from './clusterRoutesReducer';
 import recentRoutesReducer from './recentRoutesReducer';
+import csbUrlReducer from './csbUrlReducer';
 
 export default {
 	user: userReducer,
@@ -20,4 +21,5 @@ export default {
 	appsScreenPreferences,
 	sideBarCollapsed: sideBarCollapsedReducer,
 	recentRoutes: recentRoutesReducer,
+	csbURL: csbUrlReducer,
 };

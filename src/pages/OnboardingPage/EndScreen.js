@@ -1,43 +1,23 @@
 /* eslint-disable react/jsx-curly-brace-presence */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Layout, Icon } from 'antd';
 import get from 'lodash/get';
-import FullHeader from '../../components/FullHeader';
-import generateSandboxURL from '../SandboxPage/utils/sandbox-generator';
-import { endScreenStyles } from './styles';
-import { getSettings } from '../../batteries/modules/actions';
-import { getURL } from '../../constants/config';
-import { generateQuery } from '../SandboxPage/utils';
+import { Layout, Icon } from 'antd';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import FullHeader from '../../components/FullHeader';
+import { endScreenStyles } from './styles';
 // TODO: Add navbar
-function EndScreen({ settings, credentials, url, fetchSearchSettings }) {
-	function getQuery() {
-		const query = new URLSearchParams(window.location.search);
-		return query?.get('app');
-	}
+
+function EndScreen({ sandboxURL }) {
+	const [csbURL, setCsbURL] = useState('');
 
 	useEffect(() => {
-		if (!settings) {
-			fetchSearchSettings(getQuery());
+		if (sandboxURL !== '/') {
+			setCsbURL(sandboxURL);
 		}
-	}, []);
+	}, [sandboxURL]);
 
-	function generateCodeSandbox() {
-		if (settings) {
-			const codesandboxURL = generateSandboxURL({
-				settings: generateQuery(settings),
-				app: getQuery(),
-				credentials,
-				url,
-			});
-			return codesandboxURL;
-		}
-		return '';
-	}
-
-	const csbURL = generateCodeSandbox();
 	return (
 		<Layout>
 			<FullHeader />
@@ -45,12 +25,21 @@ function EndScreen({ settings, credentials, url, fetchSearchSettings }) {
 				<div className="container">
 					{csbURL && (
 						<div className="header-card">
+							{/* eslint-disable-next-line */}
 							<h3 style={{ fontWeight: 'bold' }}>Share what you've built:</h3>
 							<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
 								<div className="overflow-text">{csbURL}</div>
 								<CopyToClipboard text={csbURL}>
 									<Icon type="copy" theme="outlined" className="icon-active" />
 								</CopyToClipboard>
+								<a
+									target="_blank"
+									rel="noreferrer"
+									href={csbURL}
+									style={{ height: 20, color: 'black' }}
+								>
+									<Icon type="link" theme="outlined" className="icon-active" />
+								</a>
 							</div>
 						</div>
 					)}
@@ -189,34 +178,14 @@ function EndScreen({ settings, credentials, url, fetchSearchSettings }) {
 }
 
 EndScreen.propTypes = {
-	fetchSearchSettings: PropTypes.func.isRequired,
-	credentials: PropTypes.string.isRequired,
-	url: PropTypes.string.isRequired,
-	settings: PropTypes.object,
+	sandboxURL: PropTypes.string.isRequired,
 };
 
-EndScreen.defaultProps = {
-	settings: null,
-};
-
-const mapStateToProps = (state, props) => {
-	const appName = get(state, '$getCurrentApp.name');
-	const { username, password } = get(state, 'user.data', {});
-	const defaultSettings = get(state.$getAppSettings, `defaultSettings`);
+const mapStateToProps = (state) => {
+	const sandboxURL = get(state, 'csbURL.csbURL', '');
 	return {
-		settings: get(
-			state,
-			['$getAppSettings', 'settings', props?.location?.search?.split('=')[1] || appName],
-			defaultSettings,
-		),
-		fetchingDefaultSettings: get(state.$getAppSettings, `default.loading`),
-		credentials: username ? `${username}:${password}` : null,
-		url: getURL(),
+		sandboxURL,
 	};
 };
 
-const mapDispatchToProps = (dispatch) => ({
-	fetchSearchSettings: (appName) => dispatch(getSettings(appName)),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(EndScreen);
+export default connect(mapStateToProps, null)(EndScreen);

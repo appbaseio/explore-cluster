@@ -73,7 +73,6 @@ class PaidUserOverview extends React.Component {
 	};
 
 	routeMapper = (route) => {
-		console.log(route, routesMapper[route], routesMapper.route);
 		const routeArr = route.split('/');
 		if (routesMapper[route]) {
 			return routesMapper[route];

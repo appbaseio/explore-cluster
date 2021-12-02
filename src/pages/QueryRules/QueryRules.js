@@ -157,7 +157,6 @@ class QueryRules extends Component {
 		}
 
 		const filteredApps = keys(apps).filter((appName) => !appName.startsWith('.'));
-		// console.log(apps);
 		if (
 			!isLoading &&
 			!isFetching &&

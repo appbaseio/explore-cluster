@@ -7,6 +7,7 @@ import {
 	SIDE_BAR,
 	ROUTES_ACTION,
 	SAVE_HISTORY,
+	SAVE_CSB_URL,
 } from '../constants';
 import { createAction } from '../batteries/modules/actions/utils';
 
@@ -100,4 +101,8 @@ export function setClusterRoutes(payload: Object): Object {
 
 export function saveRecentRoute(payload: string): Object {
 	return { type: SAVE_HISTORY, payload };
+}
+
+export function saveCsbUrl(payload: string): Object {
+	return { type: SAVE_CSB_URL, payload };
 }
