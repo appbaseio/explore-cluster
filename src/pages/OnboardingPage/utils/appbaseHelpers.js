@@ -5,7 +5,6 @@ import settings from './settings';
 import moviesMapping from './mappings/moviesData';
 import ecommMapping from './mappings/ecommData';
 import geoMapping from './mappings/geoData';
-import mData from './data';
 import moviesData from './dataSet/moviesData';
 import geoData from './dataSet/geoData';
 import ecommData from './dataSet/ecommData';
@@ -161,14 +160,14 @@ class AppbaseUtils {
 	};
 
 	handleMapping = (dataset) => {
-		if(dataset.name === 'Movies Dataset') {
+		if (dataset.name === 'Movies Dataset') {
 			return moviesMapping;
-		} else if(dataset.name === 'Products Dataset') {
-			return ecommMapping;
-		} else {
-			return geoMapping;
 		}
-	}
+		if (dataset.name === 'Products Dataset') {
+			return ecommMapping;
+		}
+		return geoMapping;
+	};
 
 	updateMapping = (dataset) => {
 		const type = '_doc';
@@ -181,18 +180,18 @@ class AppbaseUtils {
 				'content-type': 'application/json',
 			},
 			body: JSON.stringify(this.handleMapping(dataset)),
-		})
+		});
 	};
 
 	handleDataBase = (dataset) => {
-		if(dataset.name === 'Movies Dataset') {
+		if (dataset.name === 'Movies Dataset') {
 			return moviesData;
-		} else if(dataset.name === 'Products Dataset') {
-			return ecommData;
-		} else {
-			return geoData;
 		}
-	}
+		if (dataset.name === 'Products Dataset') {
+			return ecommData;
+		}
+		return geoData;
+	};
 
 	indexData = (dataset) => {
 		const finalData = [];
@@ -214,7 +213,6 @@ class AppbaseUtils {
 		return new Promise((resolve, reject) => {
 			this.appbaseRef
 				.bulk({
-					type: this.app.type,
 					body: finalData,
 				})
 				.then(() => {
