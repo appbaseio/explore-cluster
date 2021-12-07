@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Card, Radio, Icon, Row, Button, Alert, Tooltip, Typography } from 'antd';
+import { Card, Radio, Icon, Row, Button, Alert, Tooltip } from 'antd';
 import { StateProvider } from '@appbaseio/reactivesearch';
 import { Link } from 'react-router-dom';
 import { css } from 'emotion';
@@ -125,10 +125,6 @@ class Result extends React.Component {
 									style={{ margin: '0px 0 16px' }}
 									message={
 										<React.Fragment>
-											<Typography.Text>
-												Query {rulesApplied.length > 1 ? 'rules' : 'rule'}{' '}
-												applied
-											</Typography.Text>
 											{rulesApplied.map((rule) => {
 												const ruleInfo = (rules || []).find(
 													(r) => r.id === rule,
@@ -137,7 +133,24 @@ class Result extends React.Component {
 												return (
 													<div className={ruleStyle}>
 														<div>
-															<p className="name">{ruleInfo.name}</p>
+															<div style={{ display: 'flex' }}>
+																<p className="name">
+																	{ruleInfo.name}
+																</p>
+																<div style={{ marginLeft: 5 }}>
+																	<Link
+																		to={`/cluster/rules/${ruleInfo.id}`}
+																	>
+																		<Button
+																			type="primary"
+																			size="small"
+																			ghost
+																		>
+																			Edit Rule ↗
+																		</Button>
+																	</Link>
+																</div>
+															</div>
 															<p className="expression">
 																{ruleInfo &&
 																	ruleInfo.trigger &&
@@ -145,11 +158,22 @@ class Result extends React.Component {
 															</p>
 														</div>
 														<div>
-															<Link to={`/cluster/rules/${rule}`}>
-																<Button size="small">
-																	Edit Rule
-																</Button>
-															</Link>
+															{get(ruleInfo, 'actions', []).map(
+																(action) => (
+																	<div
+																		key={action.type}
+																		className={section}
+																	>
+																		<ActionView
+																			action={action}
+																			ruleId={
+																				ruleInfo.id ||
+																				ruleInfo.name
+																			}
+																		/>
+																	</div>
+																),
+															)}
 														</div>
 													</div>
 												);
