@@ -5,6 +5,7 @@ import { Tabs } from 'antd';
 import { FormContext, verticalTab } from '../../utils';
 import SearchLayout from './SearchLayout';
 import StylePresets from './StylePresets';
+import Branding from './Branding';
 import CustomCss from './CustomCss';
 import CustomCssRecommendations from './CustomCssRecommendation';
 
@@ -20,6 +21,9 @@ const Layout = ({ defaultActiveKey, appendTabs, isRecommendation }) => {
 					<FieldGroup control={form} render={() => <SearchLayout />} />
 				</TabPane>
 			)}
+			<TabPane tab="Branding" key="branding">
+				<FieldGroup control={form} render={() => <Branding control={form} />} />
+			</TabPane>
 			<TabPane tab="Style Presets" key="style-presets">
 				<FieldGroup control={form} render={() => <StylePresets />} />
 			</TabPane>

@@ -457,6 +457,9 @@ export const defaultSettings = [
 ];
 
 export const defaultRecommendationsPreferences = {
+	logoUrl: '',
+	logoWidth: 20,
+	logoAlignment: 'left',
 	themeType: 'classic',
 	primaryColor: '#0B6AFF',
 	primaryTextColor: '#fff',
@@ -477,6 +480,9 @@ export const defaultRecommendationsPreferences = {
 };
 
 export const defaultSearchPreferences = {
+	logoUrl: '',
+	logoWidth: 20,
+	logoAlignment: 'left',
 	themeType: 'classic',
 	primaryColor: '#0B6AFF',
 	primaryTextColor: '#fff',
@@ -579,6 +585,13 @@ export const getRecommendationPreferencesPayload = (formValue) => {
 			globalSettings: {
 				currency: get(formValue, 'storeInfo.currency'),
 				showSelectedFilters: !!get(formValue, 'showSelectedFilters'),
+				meta: {
+					branding: {
+						logoUrl: get(formValue, 'logoUrl'),
+						logoWidth: get(formValue, 'logoWidth'),
+						logoAlignment: get(formValue, 'logoAlignment'),
+					},
+				},
 			},
 			exportSettings: get(formValue, 'exportSettings'),
 			resultSettings: {
@@ -649,6 +662,13 @@ export const getSearchPreferencesPayload = (formValue) => {
 			globalSettings: {
 				currency: get(formValue, 'storeInfo.currency'),
 				showSelectedFilters: !!get(formValue, 'showSelectedFilters'),
+				meta: {
+					branding: {
+						logoUrl: get(formValue, 'logoUrl'),
+						logoWidth: get(formValue, 'logoWidth'),
+						logoAlignment: get(formValue, 'logoAlignment'),
+					},
+				},
 			},
 			exportSettings: get(formValue, 'exportSettings'),
 			resultSettings: {

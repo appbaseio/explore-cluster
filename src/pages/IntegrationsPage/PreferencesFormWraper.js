@@ -32,6 +32,10 @@ class PreferencesFormWrapper extends React.Component {
 	constructor(props) {
 		super(props);
 		this.form = FormBuilder.group({
+			// Custom Logo Settings
+			logoUrl: '',
+			logoWidth: 20,
+			logoAlignment: 'left',
 			// Common controls =>>>>> Starts
 			themeType: 'classic',
 			primaryColor: '#0B6AFF',
@@ -268,6 +272,17 @@ class PreferencesFormWrapper extends React.Component {
 				try {
 					const patchVar = JSON.parse(
 						JSON.stringify({
+							logoUrl: get(preferences, 'globalSettings.meta.branding.logoUrl', ''),
+							logoWidth: get(
+								preferences,
+								'globalSettings.meta.branding.logoWidth',
+								20,
+							),
+							logoAlignment: get(
+								preferences,
+								'globalSettings.meta.branding.logoAlignment',
+								'left',
+							),
 							themeType: get(preferences, 'themeSettings.type'),
 							primaryColor: get(
 								preferences,
