@@ -14,7 +14,7 @@
 		"glow": "glow --watch",
 		"format": "prettier --write --use-tabs 'src/!(batteries*)**/**/*.js'",
 		"analyze": "source-map-explorer 'dist/*.js'",
-		"test": "jest --config ./jest.config.json",
+		"test": "jest --env node --config ./jest.config.json",
 		"cypress:run": "cypress run --record --key 8e90df64-6ae0-484d-b8ef-3b7c5a521382 open",
 		"cypress:open": " cypress open",
 		"cypress:chrome": "cypress run --headless chrome"
