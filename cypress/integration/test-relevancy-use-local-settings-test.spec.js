@@ -92,8 +92,7 @@ describe('Test relevancy use local settings test flow', () => {
 
 		cy.window()
 			.then((win) => {
-				const editor = win.ace.edit('query-editor');
-				const value = JSON.parse(editor.getValue());
+				const value = JSON.parse(win.monaco.editor.getModels()[0].getValue());
 				cy.log(JSON.stringify(value));
 				const resultSettings = value.query[0];
 				const searchQuery = value.query[1];

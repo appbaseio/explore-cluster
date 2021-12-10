@@ -114,8 +114,28 @@ describe('Disable ngram remove search fields and reindex data test flow', () => 
 			.wait(1000);
 	});
 
+	it('Should detect reinderxing and assign indexname prior deletion', () => {
+		let credentials = btoa(`${username}:${password}`);
+
+		fetch(`${app_url}_alias/${indexName}`, {
+			headers: {
+				Authorization: `Basic ${credentials}`,
+			},
+		})
+			.then((response) => {
+				return response.json();
+			})
+			.then((data) => {
+				indexName = Object.keys(data)[0];
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	});
+
 	it('Should delete index', () => {
 		let credentials = btoa(`${username}:${password}`);
+
 		cy.request({
 			method: 'DELETE',
 			url: `${app_url}${indexName}`,

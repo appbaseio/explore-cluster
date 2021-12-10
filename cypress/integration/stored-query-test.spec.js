@@ -40,9 +40,13 @@ describe('Stored query create test flow', () => {
 
 	it('Should fill stored-query query ', () => {
 		cy.typeInMonacoEditorSQ(queryValue);
+		cy.scrollTo('top');
 	});
 
 	it('Should review the stored-query entered values', () => {
+		cy.get(`[data-cy=sq-execute]`).click({ force: true });
+		cy.wait(2000);
+		cy.scrollTo('top');
 		cy.get('[data-cy=sq-review-and-save]').click();
 		cy.get(`[data-cy=new-value-StoredQueryId-status]`).should('contain', storedQueryId);
 		cy.get(`[data-cy=new-value-QueryDescription-status]`).should('contain', 'test description');
@@ -77,6 +81,9 @@ describe('Stored query create test flow', () => {
 			'{selectall}{backspace}test description edited',
 		);
 		cy.typeInMonacoEditorSQ(editQueryValue);
+		cy.get(`[data-cy=sq-execute]`).click({ force: true });
+		cy.wait(2000);
+		cy.scrollTo('top');
 		cy.get('[data-cy=sq-review-and-save]').click();
 		cy.saveSQ(storedQueryId);
 		cy.wait(2000);

@@ -48,7 +48,7 @@ Cypress.Commands.add('openPageSQ', (url) => {
 
 Cypress.Commands.add('typeInMonacoEditorSQ', (value) => {
 	cy.get('.view-lines.monaco-mouse-cursor-text').click().type(value);
-	cy.contains('Beautify').click();
+	cy.contains('Beautify').click({ force: true });
 	cy.wait(2000);
 });
 

@@ -86,8 +86,7 @@ describe('Configure result settings without reindexing test flow', () => {
 		cy.get('[data-cy=raw-request-button]').click({ force: true }).wait(2000);
 		cy.window()
 			.then((win) => {
-				const editor = win.ace.edit('query-editor');
-				const value = JSON.parse(editor.getValue());
+				const value = JSON.parse(win.monaco.editor.getModels()[0].getValue());
 				const resultSettings = value.query[0];
 				cy.expect(resultSettings.size).to.eql(11);
 				cy.expect(resultSettings.highlightFields).to.includes.members(['email', 'name']);

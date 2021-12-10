@@ -3,9 +3,8 @@ import { base_url, username, password, app_url, cluster } from '../utils/index';
 
 let indexName = 'airbeds-test-app';
 
-
 describe('Recent Suggestion Settings add test flow', () => {
-    before(() => {
+	before(() => {
 		cy.window().then((win) => {
 			win.sessionStorage.clear();
 		});
@@ -18,42 +17,50 @@ describe('Recent Suggestion Settings add test flow', () => {
 
 	it('Should login from cluster URL', () => {
 		cy.loginUser(username, password, cluster);
-        cy.wait(3000);
+		cy.wait(3000);
 	});
 
-    it('Should Recent suggestion settings page URL', () => {
-        cy.visit(`${base_url}/cluster/suggestions`).wait(2000);
-        cy.get('.ant-tabs-nav > :nth-child(1) > :nth-child(2)').click();
-    });
+	it('Should Recent suggestion settings page URL', () => {
+		cy.visit(`${base_url}/cluster/suggestions`).wait(2000);
+		cy.get('.ant-tabs-nav > :nth-child(1) > :nth-child(2)').click();
+	});
 
-    it('Should Get Recent Suggestions Settings Form Data', () => {
-        let credentials = btoa(`${username}:${password}`);
-        cy.request({
-            method: 'GET',
-            url: `${app_url}/_recent_suggestions/preferences`,
-            headers: {
-                Authorization: `Basic ${credentials}`
-            }
-        })
-        .then((payload) => {
-            cy.wait(2000);
+	it('Should Get Recent Suggestions Settings Form Data', () => {
+		let credentials = btoa(`${username}:${password}`);
+		cy.request({
+			method: 'GET',
+			url: `${app_url}_recent_suggestions/preferences`,
+			headers: {
+				Authorization: `Basic ${credentials}`,
+			},
+		}).then((payload) => {
+			cy.wait(2000);
 
-            const recentSuggestions = {
-                minHits: parseInt(payload.body.minHits, 10) || 0,
-                size: parseInt(payload.body.size, 10) || 1,
-                minChars: parseInt(payload.body.minChars, 10) || 0,
-                indices: payload.indices || ['*'],
-            };
+			const recentSuggestions = {
+				minHits: parseInt(payload.body.minHits, 10) || 0,
+				size: parseInt(payload.body.size, 10) || 1,
+				minChars: parseInt(payload.body.minChars, 10) || 0,
+				indices: payload.indices || ['*'],
+			};
 
-            cy.get('[data-cy=recent-suggestions-min-hits]').should('have.value', recentSuggestions.minHits);
-        	cy.get('[data-cy=recent-suggestions-size]').should('have.value', recentSuggestions.size);
-            cy.get('[data-cy=recent-suggestions-minChars]').should('have.value', recentSuggestions.minChars);
+			cy.get('[data-cy=recent-suggestions-min-hits]').should(
+				'have.value',
+				recentSuggestions.minHits,
+			);
+			cy.get('[data-cy=recent-suggestions-size]').should(
+				'have.value',
+				recentSuggestions.size,
+			);
+			cy.get('[data-cy=recent-suggestions-minChars]').should(
+				'have.value',
+				recentSuggestions.minChars,
+			);
 
-            cy.get('[data-cy=recent-suggestions-indices] > div > ul > li').each(($el, index) => {
-                if (index < payload.body.indices?.length - 1) {
-                    expect($el).to.have.text(payload.body.indices[index]);
-                }
-            });
-        })
-    });
+			cy.get('[data-cy=recent-suggestions-indices] > div > ul > li').each(($el, index) => {
+				if (index < payload.body.indices?.length - 1) {
+					expect($el).to.have.text(payload.body.indices[index]);
+				}
+			});
+		});
+	});
 });

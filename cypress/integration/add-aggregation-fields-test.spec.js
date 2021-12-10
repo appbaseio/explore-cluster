@@ -79,11 +79,11 @@ describe('Aggregation fields add test flow', () => {
 	});
 
 	it('Should test search relevancy & results', () => {
-		cy.root().contains('Test Search Relevancy').click().wait(5000);
+		cy.get('[data-cy=test-search-relevancy-button]').click().wait(5000);
 		cy.get('[data-cy=aggs-values-email]')
-			.should('contain', 'email')
+			.should('contain', 'Email')
 			.get('[data-cy=aggs-values-name]')
-			.should('contain', 'name');
+			.should('contain', 'Name');
 		cy.get('.ant-modal-close-icon').click().wait(2000);
 	});
 
