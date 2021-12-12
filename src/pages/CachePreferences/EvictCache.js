@@ -17,7 +17,11 @@ const EvictCache = ({ isLoading, errors, handleEvictCache }) => {
 			handleEvictCache().then((action) => {
 				if (get(action, 'payload')) {
 					notification.success({
-						message: 'Deleted cached requests successfully.',
+						message: get(
+							action,
+							'payload.message',
+							'Deleted cached requests successfully.',
+						),
 					});
 				}
 			});
