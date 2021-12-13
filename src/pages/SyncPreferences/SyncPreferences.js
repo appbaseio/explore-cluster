@@ -58,7 +58,11 @@ class SyncPreferences extends React.Component {
 			savePreferences(payload).then((action) => {
 				if (get(action, 'payload')) {
 					notification.success({
-						message: 'Node sync preferences saved successfully.',
+						message: get(
+							action,
+							'payload.message',
+							'Node sync preferences saved successfully.',
+						),
 					});
 					getPreferences();
 				}

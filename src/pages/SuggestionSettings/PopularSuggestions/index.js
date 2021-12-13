@@ -211,7 +211,11 @@ class PopularSuggestions extends React.Component {
 			savePreferences(payload).then((action) => {
 				if (get(action, 'payload')) {
 					notification.success({
-						message: 'Popular Suggestions preferences saved successfully.',
+						message: get(
+							action,
+							'payload.message',
+							'Popular Suggestions preferences saved successfully.',
+						),
 					});
 					this.fetchPreferences();
 				}

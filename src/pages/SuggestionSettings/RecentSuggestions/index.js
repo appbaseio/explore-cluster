@@ -166,7 +166,11 @@ class RecentSuggestions extends React.Component {
 			savePreferences(payload).then((action) => {
 				if (get(action, 'payload')) {
 					notification.success({
-						message: 'Recent Suggestions preferences saved successfully.',
+						message: get(
+							action,
+							'payload.message',
+							'Recent Suggestions preferences saved successfully.',
+						),
 					});
 					this.fetchPreferences();
 				}

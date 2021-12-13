@@ -206,7 +206,11 @@ class IndexSuggestions extends React.Component {
 			).then((action) => {
 				if (get(action, 'payload')) {
 					notification.success({
-						message: 'Index Suggestions preferences saved successfully.',
+						message: get(
+							action,
+							'payload.message',
+							'Index Suggestions preferences saved successfully.',
+						),
 					});
 					this.fetchPreferences();
 				}

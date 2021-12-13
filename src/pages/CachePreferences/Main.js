@@ -62,7 +62,11 @@ class Main extends React.Component {
 			savePreferences(payload).then((action) => {
 				if (get(action, 'payload')) {
 					notification.success({
-						message: 'Caching preferences saved successfully.',
+						message: get(
+							action,
+							'payload.message',
+							'Caching preferences saved successfully.',
+						),
 					});
 					getPreferences();
 				}
