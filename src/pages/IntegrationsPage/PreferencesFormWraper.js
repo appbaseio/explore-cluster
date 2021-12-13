@@ -82,6 +82,8 @@ class PreferencesFormWrapper extends React.Component {
 						showPagination: false,
 						layout: 'grid',
 						viewSwitcher: true,
+						sortOptionSelector: [],
+						resultHighlights: 'false',
 						customMessages: FormBuilder.group({
 							resultStats: '[count] products found in [time] ms',
 							noFilterItem: 'No items Found',
@@ -386,6 +388,15 @@ class PreferencesFormWrapper extends React.Component {
 										showPagination: !!get(
 											preferences,
 											'resultSettings.rsConfig.pagination',
+										),
+										sortOptionSelector: get(
+											preferences,
+											'resultSettings.sortOptionSelector',
+										),
+										resultHighlights: get(
+											preferences,
+											'resultSettings.resultHighlights',
+											false,
 										),
 										layout: get(preferences, 'resultSettings.layout') || 'grid',
 										viewSwitcher: get(

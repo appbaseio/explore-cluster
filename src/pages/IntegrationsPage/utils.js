@@ -687,6 +687,8 @@ export const getSearchPreferencesPayload = (formValue) => {
 					pagination: !!get(formValue, 'showPagination'),
 					infiniteScroll: !get(formValue, 'showPagination'),
 				},
+				sortOptionSelector: get(formValue, 'sortOptionSelector'),
+				resultHighlights: get(formValue, 'resultHighlights'),
 				layout: get(formValue, 'layout'),
 				viewSwitcher: get(formValue, 'viewSwitcher'),
 			},
