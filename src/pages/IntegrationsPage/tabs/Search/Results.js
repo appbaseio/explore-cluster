@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { FieldControl } from 'react-reactive-form';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { FieldControl } from 'react-reactive-form';
 import { Switch, Form, List, Radio, Button, Icon } from 'antd';
-import { bool, array, string, object, func } from 'prop-types';
+import { bool, array, object, string, func } from 'prop-types';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import DataFieldSelector from '../../../../components/Form/DataFieldSelector';
 import SortOptionSelector from './SortOptionSelector';
-import { getAppMappings } from '../../../../batteries/modules/actions';
+import { traverseMapping } from '../../../../batteries/utils/mappings';
 import { getRawMappingsByAppName } from '../../../../batteries/modules/selectors';
+import { getAppMappings } from '../../../../batteries/modules/actions';
 
 export const defaultSettings = [
 	{
@@ -102,34 +103,23 @@ const fieldSelectorIds = [
 
 const { Item } = List;
 
-const Results = ({ withoutForm, dataSource, appName, mappings, credentials, fetchMappings }) => {
-	const [dataFields, setDataFields] = useState([]);
+const Results = ({ withoutForm, dataSource, mappings, fetchMappings, credentials, appName }) => {
 	const [error, setError] = useState(false);
 
 	useEffect(() => {
-		if (credentials && !Object.keys(mappings).length) {
+		if (credentials && get(mappings, 'length') === 0) {
 			// Fetch Mappings if permissions are present
 			fetchMappings(appName, credentials);
 		}
 	}, []);
 
-	useEffect(() => {
-		if (mappings && Object.keys(mappings).length) {
-			setDataFields(getDatafields());
-		}
-	}, [mappings]);
-
 	const getDatafields = () => {
-		if (mappings.properties) {
-			const newDataFields = Object.keys(mappings.properties).map((field) => {
-				if (mappings.properties[field].type === 'text') {
-					return `${field}.keyword`;
-				}
-				return field;
-			});
-			return ['_score', ...newDataFields];
-		}
-		return [];
+		const traversedMappings = traverseMapping(mappings || {}, undefined, {
+			isAggFields: true,
+			includeMappings: undefined,
+			includeTypes: undefined,
+		});
+		return ['_score', ...traversedMappings];
 	};
 
 	const move = (from, to, arr) => {
@@ -218,7 +208,7 @@ const Results = ({ withoutForm, dataSource, appName, mappings, credentials, fetc
 																		<SortOptionSelector
 																			item={ele}
 																			index={index}
-																			fieldPicker={dataFields}
+																			fieldPicker={getDatafields()}
 																			onChange={onChange}
 																			value={value}
 																			onError={onError}
@@ -283,6 +273,7 @@ const Results = ({ withoutForm, dataSource, appName, mappings, credentials, fetc
 			}}
 		/>
 	);
+
 	if (withoutForm) {
 		return component();
 	}
@@ -293,25 +284,24 @@ Results.defaultProps = {
 	withoutForm: false,
 	dataSource: defaultSettings,
 	mappings: {},
-	appName: undefined,
 };
 
 Results.propTypes = {
 	withoutForm: bool,
 	dataSource: array,
 	mappings: object,
-	appName: string,
-	fetchMappings: func.isRequired,
+	appName: string.isRequired,
 	credentials: string.isRequired,
+	fetchMappings: func.isRequired,
 };
 
 const mapStateToProps = (state) => {
-	const mappings = getRawMappingsByAppName(state);
 	const appName = get(state, '$getCurrentApp.name');
+	const mappings = getRawMappingsByAppName(state);
 	const { username, password } = get(state, 'user.data', {});
 	return {
-		mappings,
 		appName,
+		mappings,
 		credentials: `${username}:${password}`,
 	};
 };

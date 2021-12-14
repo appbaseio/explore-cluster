@@ -22,6 +22,13 @@ const generateQuery = ({ aggregations: filters, search, results, synonyms }) => 
 	const filtersId = filtersData.map((filter) => filter.id);
 	const resultDataField = get(results, 'dataField', '_score');
 	const searchDataField = get(search, 'dataField', []);
+
+	let newProps = {};
+	if (get(results, 'sortOptions', []).length) {
+		newProps = {
+			sortOptions: get(results, 'sortOptions'),
+		};
+	}
 	const query = [
 		{
 			...results,
@@ -31,6 +38,7 @@ const generateQuery = ({ aggregations: filters, search, results, synonyms }) => 
 			},
 			size: get(results, 'size', 10),
 			dataField: Array.isArray(resultDataField) ? resultDataField : [resultDataField],
+			...newProps,
 		},
 		{
 			...search,

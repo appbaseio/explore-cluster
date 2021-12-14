@@ -317,6 +317,19 @@ const getDiffData = (oldObj, newObj) => {
 		delete diffData.results.highlightOptions;
 	}
 
+	if (get(diffData, 'results.sortOptions', null)) {
+		const newVal = get(newObj, 'results.sortOptions', []);
+		const oldVal = get(oldObj, 'results.sortOptions', []);
+
+		diffData = {
+			...diffData,
+			results: {
+				...diffData.results,
+				sortOptions: [JSON.stringify(oldVal), JSON.stringify(newVal)],
+			},
+		};
+	}
+
 	if (get(diffData, 'results.pre_tags', null) && get(diffData, 'results.post_tags', null)) {
 		const newHighlightTags = [
 			get(diffData, 'results.pre_tags._0[0]'),

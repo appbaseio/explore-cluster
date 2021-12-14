@@ -48,7 +48,6 @@ const Branding = ({ control }) => {
 			<h2>Branding</h2>
 			<FieldControl name="logoUrl" strict={false}>
 				{({ value }) => {
-					console.log(value);
 					return (
 						<Grid
 							label="Set Logo"

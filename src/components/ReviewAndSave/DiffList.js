@@ -117,7 +117,9 @@ const DiffList = ({ diff }) => {
 																		}}
 																		data-cy={`old-value-${item.title}-status`}
 																	>
-																		{typeof ov === 'boolean' ? ov.toString() : ov}
+																		{typeof ov === 'boolean'
+																			? ov.toString()
+																			: ov}
 																	</Tag>
 																),
 															},
@@ -130,7 +132,9 @@ const DiffList = ({ diff }) => {
 																		color="green"
 																		data-cy={`new-value-${item.title}-status`}
 																	>
-																		{typeof nv === 'boolean' ? nv.toString() : nv}
+																		{typeof nv === 'boolean'
+																			? nv.toString()
+																			: nv}
 																	</Tag>
 																),
 															},

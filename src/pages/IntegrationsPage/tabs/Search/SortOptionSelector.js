@@ -109,11 +109,11 @@ function SortOptionSelector({ index, item, fieldPicker, value, onChange, onError
 									))}
 								</Select>
 							</Col>
-							<Col xs={6}>
+							<Col xs={8}>
 								{/* Input */}
 								<Input
 									value={item.label}
-									style={{ marginLeft: 10, width: 130 }}
+									style={{ marginLeft: 10 }}
 									onChange={(e) => {
 										const newArr = value;
 										newArr[index].label = e.target.value;
@@ -126,7 +126,7 @@ function SortOptionSelector({ index, item, fieldPicker, value, onChange, onError
 									}}
 								/>
 							</Col>
-							<Col xs={6} style={{ marginLeft: 10 }}>
+							<Col xs={5} style={{ marginLeft: 30 }}>
 								<Radio.Group
 									value={item.sortBy}
 									onChange={(e) => {

@@ -2,8 +2,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Card, Form, Input, InputNumber, Select, Switch, Skeleton } from 'antd';
-
+import { Card, Form, Input, InputNumber, Select, Switch, Skeleton, Button, Icon } from 'antd';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import {
@@ -17,7 +17,10 @@ import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { container, label } from './styles';
 import SettingTooltip from '../../components/SettingTooltip';
 import settingsMap from '../../components/ReviewAndSave/helper';
-import { getTraversedMappingsByAppName } from '../../batteries/modules/selectors';
+import {
+	getRawMappingsByAppName,
+	getTraversedMappingsByAppName,
+} from '../../batteries/modules/selectors';
 import { features, isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import { allowedTiers } from '../../utils/prop-types';
@@ -26,6 +29,8 @@ import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster
 import SettingsFooter from '../../components/SettingsFooter';
 import { event, timingEvent } from '../../utils/gtag';
 import moment from '../../utils/moment';
+import SortOptionSelector from '../IntegrationsPage/tabs/Search/SortOptionSelector';
+import { traverseMapping } from '../../batteries/utils/mappings';
 
 const bannerDetails = {
 	title: 'Results Settings',
@@ -67,6 +72,9 @@ class ResultsPage extends React.Component {
 	constructor(props) {
 		super(props);
 		this.startTime = moment();
+		this.state = {
+			error: false,
+		};
 	}
 
 	componentDidMount() {
@@ -131,6 +139,16 @@ class ResultsPage extends React.Component {
 		}
 	}
 
+	getDatafields = () => {
+		const { rawMappings } = this.props;
+		const traversedMappings = traverseMapping(rawMappings || {}, undefined, {
+			isAggFields: true,
+			includeMappings: undefined,
+			includeTypes: undefined,
+		});
+		return ['_score', ...traversedMappings];
+	};
+
 	init = (settings) => {
 		const { appName, updateLocalRelevancy, localRelevancy } = this.props;
 		if (!localRelevancy) {
@@ -147,6 +165,29 @@ class ResultsPage extends React.Component {
 				[key]: val,
 			},
 		});
+	};
+
+	onError = (state) => {
+		this.setState({
+			error: state,
+		});
+	};
+
+	move = (from, to, arr) => {
+		const newArr = [...arr];
+
+		const item = newArr.splice(from, 1)[0];
+		newArr.splice(to, 0, item);
+
+		return newArr;
+	};
+
+	handleItemReOrder = (result, value) => {
+		const newArr = [...value];
+		const sourcePosition = result.source.index;
+		const destinationPosition = result.destination.index;
+		const newDataSource = this.move(sourcePosition, destinationPosition, newArr);
+		this.handleChange('sortOptions', newDataSource);
 	};
 
 	handleHighlightOptionChange = (key, val) => {
@@ -172,6 +213,7 @@ class ResultsPage extends React.Component {
 
 	render() {
 		const { tier, featureSearchRelevancy, localRelevancy, isLoading, mappings } = this.props;
+		const { error } = this.state;
 
 		if (!isValidPlan(tier, featureSearchRelevancy, features.SEARCH_RELEVANCY)) {
 			return (
@@ -201,6 +243,7 @@ class ResultsPage extends React.Component {
 
 		const { excludeFields, highlightFields, highlight, highlightOptions, includeFields, size } =
 			get(localRelevancy, `results`);
+		const sortOptions = get(localRelevancy, `results.sortOptions`, []);
 
 		return (
 			<>
@@ -441,6 +484,76 @@ class ResultsPage extends React.Component {
 									</>
 								)}
 							</Card>
+							<Card style={{ marginTop: 20 }} title="Sort Result Options">
+								<div>
+									<Form.Item>
+										<div>
+											<DragDropContext
+												onDragEnd={(res) =>
+													this.handleItemReOrder(res, sortOptions)
+												}
+											>
+												<Droppable droppableId="droppable">
+													{(provided, snapshot) => (
+														<div
+															ref={provided.innerRef}
+															style={{
+																margin: 10,
+																backgroundColor:
+																	snapshot.isDraggingOver
+																		? 'transparent'
+																		: 'transparent',
+															}}
+															{...provided.droppableProps}
+														>
+															{sortOptions && sortOptions.length
+																? sortOptions.map((ele, index) => (
+																		<SortOptionSelector
+																			item={ele}
+																			index={index}
+																			fieldPicker={this.getDatafields()}
+																			onChange={(val) => {
+																				this.handleChange(
+																					'sortOptions',
+																					val,
+																				);
+																			}}
+																			value={sortOptions}
+																			onError={this.onError}
+																		/>
+																  ))
+																: null}
+															{provided.placeholder}
+														</div>
+													)}
+												</Droppable>
+											</DragDropContext>
+
+											<Button
+												style={{ marginLeft: 10 }}
+												type="primary"
+												size="small"
+												ghost
+												onClick={() => {
+													const newValue = [
+														...sortOptions,
+														{
+															label: 'Relevance',
+															dataField: '_score',
+															sortBy: 'desc',
+														},
+													];
+													this.handleChange('sortOptions', newValue);
+												}}
+												disabled={error}
+											>
+												<Icon type="plus" />
+												Add Sort Option
+											</Button>
+										</div>
+									</Form.Item>
+								</div>
+							</Card>
 						</ErrorToaster>
 						<SettingsFooter />
 					</Form>
@@ -465,6 +578,7 @@ ResultsPage.propTypes = {
 	fetchMappings: PropTypes.func.isRequired,
 	credentials: PropTypes.string.isRequired,
 	mappings: PropTypes.array,
+	rawMappings: PropTypes.object,
 	localRelevancy: PropTypes.object,
 	updateLocalRelevancy: PropTypes.func.isRequired,
 	isLoading: PropTypes.bool.isRequired,
@@ -478,12 +592,14 @@ ResultsPage.defaultProps = {
 	tier: undefined,
 	featureSearchRelevancy: false,
 	mappings: [],
+	rawMappings: {},
 	localRelevancy: null,
 };
 
 const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');
 	const mappings = getTraversedMappingsByAppName(state);
+	const rawMappings = getRawMappingsByAppName(state);
 	// when elasticsearch v6, mappings is an object with values corresponding to _doc key
 	const parsedMappings = Array.isArray(mappings) ? mappings : get(mappings, '_doc', []);
 	const { username, password } = get(state, 'user.data', {});
@@ -491,6 +607,7 @@ const mapStateToProps = (state) => {
 	return {
 		appName,
 		mappings: isEmpty(parsedMappings) ? [] : parsedMappings,
+		rawMappings,
 		credentials: `${username}:${password}`,
 		isLoading: get(state, '$getAppSettings.isFetching'),
 		settings: get(state, ['$getAppSettings', 'settings', appName]),

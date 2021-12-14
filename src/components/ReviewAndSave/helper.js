@@ -61,6 +61,10 @@ const settingsMap = {
 		description:
 			'Set custom options for your highlight results such as number_of_fragments, fragment_size, pre_tags and post_tags.',
 	},
+	sortOptions: {
+		title: 'Sort Results By',
+		description: `It creates a sorting view in the results list component's UI`,
+	},
 	language: {
 		title: 'Language',
 		description: 'Set the search engine language for this index. Defaults to Universal.',

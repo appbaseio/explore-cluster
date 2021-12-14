@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { ReactiveList } from '@appbaseio/reactivesearch';
 import get from 'lodash/get';
-
+import { css } from 'react-emotion';
 import { children as childrenProp } from '../../../../utils/prop-types';
 import ResultList from './ResultList';
 
@@ -42,6 +42,11 @@ class ListView extends React.Component {
 				<Container hasPagination={result.pagination}>
 					<ReactiveList
 						{...result}
+						innerClass={{
+							resultStats: css`
+								margin: 0;
+							`,
+						}}
 						dataField={get(result, 'dataField[0]', '_score')}
 						scrollTarget="result-container"
 						style={
