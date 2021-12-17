@@ -36,15 +36,17 @@ const Footer = ({
 	}, [app]);
 
 	const handleClick = async () => {
-		codesandboxURL = await generateTutorialSandboxURL({
-			settings: generateQuery(settings),
-			app,
-			credentials,
-			url,
-			facetFields,
-			selectedDataset,
-		});
-		updateCsbUrl(codesandboxURL);
+		if (settings) {
+			codesandboxURL = await generateTutorialSandboxURL({
+				settings: generateQuery(settings),
+				app,
+				credentials,
+				url,
+				facetFields,
+				selectedDataset,
+			});
+			updateCsbUrl(codesandboxURL);
+		}
 
 		history.push({
 			pathname: '/tutorial/finish',

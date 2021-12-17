@@ -75,11 +75,11 @@ class Billing extends Component {
 			label: 'visit',
 			value: null,
 		});
-		const { isAppPlanFetched, fetchAppPlan, errors } = this.props;
+		const { isAppPlanFetched, fetchAppPlan, errors, isError } = this.props;
 		// if there are already errors with plan api, don't try to fetch it again
 		// otherwise there is sideEffect with redux being updated and infinite call being made
 		// errors[0] is undefined.
-		if (!isAppPlanFetched && !errors[0]) {
+		if (!isAppPlanFetched && !errors[0] && !Object.keys(isError)) {
 			fetchAppPlan();
 		}
 	}
@@ -522,6 +522,7 @@ Billing.defaultProps = {
 	isAppPlanFetched: false,
 	isPaid: false,
 	isFetchingPlan: false,
+	isError: {},
 };
 
 Billing.propTypes = {
@@ -541,6 +542,7 @@ Billing.propTypes = {
 	errors: PropTypes.array.isRequired,
 	credentials: PropTypes.string.isRequired,
 	deleteSubscription: PropTypes.func.isRequired,
+	isError: PropTypes.object,
 };
 
 const mapStateToProps = (state) => {
@@ -558,6 +560,7 @@ const mapStateToProps = (state) => {
 		isHostedArc: get(appPlan, 'isHostedArc', false),
 		isClusterBilling: get(appPlan, 'isClusterBilling', false),
 		subscriptionID: get(appPlan, 'subscription_id'),
+		isError: get(state, '$getAppPlan.error', {}),
 		isLoading: get(state, '$updateAppPaymentMethod.isFetching'),
 		errors: [
 			get(state, '$updateAppPaymentMethod.error'),
