@@ -17,7 +17,7 @@ export const defaultSettings = [
 	},
 ];
 
-export const suggestionSettings = [
+export const autosuggestionSettings = [
 	{
 		id: 'enablePopularSuggestions',
 		label: 'Show popular suggestions (based on analytics data)',
@@ -59,7 +59,7 @@ const Search = () => (
 
 									return (
 										<List
-											dataSource={suggestionSettings}
+											dataSource={autosuggestionSettings}
 											renderItem={(data) => (
 												<FieldControl name={data.id}>
 													{({ value, onChange }) => (

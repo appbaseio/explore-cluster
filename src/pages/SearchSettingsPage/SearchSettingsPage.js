@@ -16,7 +16,7 @@ import { allowedTiers } from '../../utils/prop-types';
 import { getMappingsByPath, getMappingsInfo, getTopLevelFields } from '../../utils/mappings';
 import { features, isValidPlan } from '../../batteries/utils';
 import { container } from '../ResultsPage/styles';
-
+import { getSettings as getAppSettings } from '../../batteries/utils/mappings';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Overlay from '../../components/Overlay';
 import SettingsOptions from './components/SettingsOptions';
@@ -51,13 +51,14 @@ const getqueryFormat = ({ queryString, searchOperators }) => {
 	return 'default';
 };
 
+let updatedSettings = {};
 class SearchSettingsPage extends React.Component {
 	constructor(props) {
 		super(props);
 		this.startTime = moment();
 	}
 
-	componentDidMount() {
+	componentDidMount = async () => {
 		// triggering custom event for google analytics
 		event({
 			action: 'Search Settings',
@@ -73,6 +74,7 @@ class SearchSettingsPage extends React.Component {
 			getDefaultSettingsAction,
 			defaultSettings,
 			localRelevancy,
+			credentials,
 		} = this.props;
 
 		if (settings && !localRelevancy) {
@@ -84,7 +86,11 @@ class SearchSettingsPage extends React.Component {
 		if (!defaultSettings) {
 			getDefaultSettingsAction();
 		}
-	}
+
+		updatedSettings = await getAppSettings(appName, credentials).then(
+			(data) => data[appName].settings,
+		);
+	};
 
 	componentDidUpdate(prevProps) {
 		const { settings, mappings, localRelevancy, isLoading, defaultSettings } = this.props;
@@ -117,7 +123,7 @@ class SearchSettingsPage extends React.Component {
 		});
 	}
 
-	handleChange = (name, value) => {
+	handleChange = (name, value, settings) => {
 		const { localRelevancy, updateLocalRelevancy, appName } = this.props;
 		const searchSettings = get(localRelevancy, `search`);
 		const updatedDataField = [...get(searchSettings, 'dataField')];
@@ -191,7 +197,6 @@ class SearchSettingsPage extends React.Component {
 
 				newFieldWeights = newFieldWeights.filter((_, i) => !indices.includes(i));
 			}
-
 			updateLocalRelevancy(appName, {
 				...localRelevancy,
 				search: {
@@ -204,6 +209,68 @@ class SearchSettingsPage extends React.Component {
 					enableNgram: value,
 				},
 			});
+		} else if (name === 'enableAutoSuggestion') {
+			let newDataFields = [...updatedDataField];
+			let newFieldWeights = [...updatedFieldWeights];
+
+			if (value) {
+				const topLevelFields = getTopLevelFields({ dataField: newDataFields });
+				Object.keys(topLevelFields).forEach((f) => {
+					const newField = `${f}.autosuggest`;
+
+					if (!newDataFields.includes(newField)) {
+						newDataFields.push(newField);
+						newFieldWeights.push(
+							getFieldWeight('autosuggest', updatedFieldWeights[topLevelFields[f]]),
+						);
+					}
+				});
+			} else {
+				const indices = [];
+				newDataFields = newDataFields.filter((f, i) => {
+					if (f.indexOf('.autosuggest') > -1) {
+						indices.push(i);
+						return false;
+					}
+
+					return true;
+				});
+
+				newFieldWeights = newFieldWeights.filter((_, i) => !indices.includes(i));
+			}
+
+			updateLocalRelevancy(appName, {
+				...localRelevancy,
+				search: {
+					...searchSettings,
+					dataField: newDataFields,
+					fieldWeights: newFieldWeights,
+				},
+				indexSettings: {
+					...get(localRelevancy, `indexSettings`, {}),
+					enableAutoSuggestion: value,
+				},
+			});
+		} else if (name === 'autosuggestionSettings') {
+			if (value) {
+				updateLocalRelevancy(appName, {
+					...localRelevancy,
+					indexSettings: {
+						...get(localRelevancy, `indexSettings`, {}),
+						...settings,
+					},
+				});
+			}
+		} else if (name === 'ngramSettings') {
+			if (value) {
+				updateLocalRelevancy(appName, {
+					...localRelevancy,
+					indexSettings: {
+						...get(localRelevancy, `indexSettings`, {}),
+						...settings,
+					},
+				});
+			}
 		} else if (name === 'queryType') {
 			updateLocalRelevancy(appName, {
 				...localRelevancy,
@@ -254,6 +321,7 @@ class SearchSettingsPage extends React.Component {
 		const { flattenUsecase } = getMappingsInfo({
 			mappings,
 			enableNgram: indexSettings.enableNgram,
+			enableAutoSuggestion: indexSettings.enableAutoSuggestion,
 			enableSynonyms: synonymsSettings.enabled,
 			language: languageSettings.language,
 		});
@@ -270,6 +338,11 @@ class SearchSettingsPage extends React.Component {
 			hasSearchFields
 		) {
 			const { enableNgram } = get(localRelevancy || settings, `indexSettings`);
+			const enableAutoSuggestion = get(
+				localRelevancy || settings,
+				`indexSettings.enableAutoSuggestion`,
+				false,
+			);
 			const { language } = get(localRelevancy || settings, `language`);
 			const { enabled: enableSynonyms } = get(localRelevancy || settings, `synonyms`);
 
@@ -290,6 +363,7 @@ class SearchSettingsPage extends React.Component {
 							weight: 1,
 							address: item,
 							skipSearch: enableNgram === false,
+							skipAutosuggest: enableAutoSuggestion === false,
 							skipLang: !language,
 							skipSynonyms: enableSynonyms === false,
 						});
@@ -321,12 +395,14 @@ class SearchSettingsPage extends React.Component {
 		const dataField = [...get(localRelevancy, `search.dataField`)];
 		const fieldWeights = [...get(localRelevancy, `search.fieldWeights`)];
 		const { enableNgram } = get(localRelevancy, `indexSettings`);
+		const { enableAutoSuggestion } = get(localRelevancy, `indexSettings`);
 		const { enabled: enableSynonyms } = get(localRelevancy, `synonyms`);
 		const { language } = get(localRelevancy, `language`);
 		const updatedFields = getSubFields({
 			fields: get(mapping, 'fields'),
 			weight: Number(weight).toFixed(1),
 			address: field,
+			skipAutosuggest: enableAutoSuggestion === false,
 			skipSearch: enableNgram === false,
 			skipLang: !language,
 			skipSynonyms: enableSynonyms === false,
@@ -411,6 +487,7 @@ class SearchSettingsPage extends React.Component {
 		const { localRelevancy, appName, updateLocalRelevancy } = this.props;
 		const { fieldWeights, dataField } = get(localRelevancy, `search`);
 		const { enableNgram } = get(localRelevancy, `indexSettings`);
+		const { enableAutoSuggestion } = get(localRelevancy, `indexSettings`);
 		const { enabled: enableSynonyms } = get(localRelevancy, `synonyms`);
 		const { language } = get(localRelevancy, `language`);
 
@@ -428,6 +505,7 @@ class SearchSettingsPage extends React.Component {
 			weight: 1,
 			address: field,
 			skipSearch: enableNgram === false,
+			skipAutosuggest: enableAutoSuggestion === false,
 			skipLang: !language,
 			skipSynonyms: enableSynonyms === false,
 		});
@@ -475,6 +553,7 @@ class SearchSettingsPage extends React.Component {
 			get(localRelevancy, `search`);
 
 		const { enableNgram } = get(localRelevancy, `indexSettings`);
+		const { enableAutoSuggestion } = get(localRelevancy, `indexSettings`);
 		const { enabled: enableSynonyms } = get(localRelevancy, `synonyms`);
 
 		return (
@@ -540,13 +619,16 @@ class SearchSettingsPage extends React.Component {
 
 									<Divider />
 									<SettingsOptions
-										handleChange={(name, value) =>
-											this.handleChange(name, value)
+										handleChange={(name, value, settings = {}) =>
+											this.handleChange(name, value, settings)
 										}
 										queryFormat={queryFormat}
 										fuzziness={fuzziness}
 										enableSynonyms={enableSynonyms}
 										enableNgram={enableNgram}
+										enableAutoSuggestion={enableAutoSuggestion}
+										updatedSettings={updatedSettings}
+										indexSettings={get(localRelevancy, 'indexSettings')}
 										distinctField={distinctField}
 										queryType={getqueryFormat({ queryString, searchOperators })}
 									/>
@@ -569,7 +651,7 @@ SearchSettingsPage.propTypes = {
 	resetState: PropTypes.object,
 	settings: PropTypes.object,
 	tier: allowedTiers,
-
+	credentials: PropTypes.string.isRequired,
 	featureSearchRelevancy: PropTypes.bool,
 	getDefaultSettingsAction: PropTypes.func.isRequired,
 	getSettingsAction: PropTypes.func.isRequired,
@@ -598,6 +680,7 @@ const mapStateToProps = (state) => {
 	const defaultSearchSettings = errorCode === 404 ? defaultSettings : null;
 	const appName = get(state, '$getCurrentApp.name');
 	const localRelevancy = get(state, ['$getLocalRelevancy', appName], null);
+	const { username, password } = get(state, 'user.data', {});
 	return {
 		isLoading: get(state, '$getAppSettings.isFetching'),
 		settings: get(state, ['$getAppSettings', 'settings', appName], defaultSearchSettings),
@@ -610,6 +693,7 @@ const mapStateToProps = (state) => {
 		isFetchingMapping: get(state, '$getAppMappings.isFetching', false),
 		localRelevancy,
 		mappings: getRawMappingsByAppName(state) || null,
+		credentials: username ? `${username}:${password}` : null,
 	};
 };
 

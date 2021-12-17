@@ -47,7 +47,7 @@ class MappingsWrapper extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { mappings, enableSynonyms, enableNgram, language, isFetchingMapping } = this.props;
+		const { mappings, enableSynonyms, enableNgram, enableAutoSuggestion, language, isFetchingMapping } = this.props;
 		if (JSON.stringify(mappings) !== JSON.stringify(prevProps.mappings)) {
 			this.init(mappings);
 		}
@@ -58,6 +58,7 @@ class MappingsWrapper extends React.Component {
 
 		if (
 			enableNgram !== prevProps.enableNgram ||
+			enableAutoSuggestion !== prevProps.enableAutoSuggestion ||
 			enableSynonyms !== prevProps.enableSynonyms ||
 			language !== prevProps.language
 		) {
@@ -66,12 +67,13 @@ class MappingsWrapper extends React.Component {
 	}
 
 	updateFields = () => {
-		const { mappings, enableSynonyms, enableNgram, language } = this.props;
+		const { mappings, enableSynonyms, enableNgram, enableAutoSuggestion, language } = this.props;
 
 		const updatedMappings = updateSubFields({
 			mappings,
 			enableSynonyms,
 			enableNgram,
+			enableAutoSuggestion,
 			language,
 		});
 
@@ -81,10 +83,11 @@ class MappingsWrapper extends React.Component {
 	};
 
 	init = (mappings) => {
-		const { enableNgram, enableSynonyms, language } = this.props;
+		const { enableNgram, enableAutoSuggestion, enableSynonyms, language } = this.props;
 		const { usecase, flattenType, flattenUsecase, type } = getMappingsInfo({
 			mappings,
 			enableNgram,
+			enableAutoSuggestion,
 			enableSynonyms,
 			language,
 		});
@@ -191,7 +194,7 @@ class MappingsWrapper extends React.Component {
 	setMapping = (data) => {
 		const { usecase, type, mappings, flattenUsecase, flattenType } = this.state;
 
-		const { enableNgram, language, appName, updateLocalMappingState } = this.props;
+		const { enableNgram, enableAutoSuggestion, language, appName, updateLocalMappingState } = this.props;
 		let updatedMappings = null;
 		let updatedUsecase = null;
 		let updatedType = null;
@@ -207,6 +210,7 @@ class MappingsWrapper extends React.Component {
 				type: fieldType,
 				settings: {
 					enableNgram,
+					enableAutoSuggestion,
 					enableSynonyms: true,
 					language,
 				},
@@ -305,6 +309,7 @@ MappingsWrapper.propTypes = {
 	credentials: PropTypes.string.isRequired,
 	mappings: PropTypes.object,
 	enableNgram: PropTypes.bool,
+	enableAutoSuggestion: PropTypes.bool,
 	enableSynonyms: PropTypes.bool,
 	language: PropTypes.string,
 	searchRelevancy: PropTypes.object,
@@ -324,6 +329,7 @@ MappingsWrapper.defaultProps = {
 	mappings: null,
 	searchRelevancy: null,
 	enableNgram: true,
+	enableAutoSuggestion: true,
 	enableSynonyms: true,
 	language: 'universal',
 	error: null,
@@ -359,6 +365,12 @@ const mapStateToProps = (state, props) => {
 						'indexSettings.enableNgram',
 						true,
 				  ),
+		enableAutoSuggestion :
+			get(
+				get(state, ['$getAppSettings', 'settings', appName], defaultSettings),
+				'indexSettings.enableAutoSuggestion',
+				true,
+			),
 		enableSynonyms:
 			props.forceSynonyms !== undefined
 				? props.forceSynonyms

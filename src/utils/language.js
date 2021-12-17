@@ -5,7 +5,6 @@ import languages from '../constants/language';
 
 export function buildLanguageAnalysis(language, languagePayload) {
 	const analysis = cloneDeep(get(languages, [language, 'analysis']));
-
 	const getStopwords = () => {
 		const defaultStopWords = get(analysis, `filter.${language}_stop.stopwords`);
 		const { customStopwords, applyStopwords } = languagePayload;

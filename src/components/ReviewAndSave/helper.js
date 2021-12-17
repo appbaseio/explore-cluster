@@ -219,9 +219,24 @@ const settingsMap = {
 			'Query type determines the query DSL to be used. It defaults to ReactiveSearch.',
 	},
 	enableNgram: {
-		title: 'Enable N gram',
+		title: 'Enable N-gram (infix) search',
 		description:
-			'appbase.io adds an n-grams tokenizer to enable partial infix matching of search terms, but this comes with a substantial storage increase. By disabling n-grams, you can make significant storage savings.',
+			'appbase.io adds an n-gram tokenizer to enable partial infix matching of search terms, but this comes with a substantial storage increase. By disabling n-gram search, you can save significant storage space.',
+	},
+	enableAutoSuggestion: {
+		title: 'Enable Autosuggestion (prefix) search',
+		description:
+			'appbase.io adds an edge n-grams tokenizer to enable prefix matching of search terms, but this comes with a substantial storage increase. By disabling autosuggestions search, you can save significant storage space.',
+	},
+	ngramSettings: {
+		title: 'N-gram settings',
+		description:
+			'Configure min-gram (minimum characters to index infixes for) and max-gram (maximum characters to index infixes for) values to fine tune how infix search should work.',
+	},
+	autosuggestionSettings: {
+		title: 'Autosuggestion settings',
+		description:
+			'Configure min-gram (minimum characters to index prefixes for) and max-gram (maximum characters to index prefixes for) values to fine tune how autosuggestion search should work.',
 	},
 	distinctField: {
 		title: 'Distinct Field',

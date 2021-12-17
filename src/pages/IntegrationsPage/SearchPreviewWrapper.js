@@ -104,6 +104,7 @@ class SearchPreviewWrapper extends React.Component {
 		const { flattenUsecase } = getMappingsInfo({
 			mappings,
 			enableNgram: indexSettings.enableNgram,
+			enableAutoSuggestion: indexSettings.enableAutoSuggestion,
 			enableSynonyms: synonymsSettings.enabled,
 			language: languageSettings.language,
 		});
@@ -120,6 +121,7 @@ class SearchPreviewWrapper extends React.Component {
 			hasSearchFields
 		) {
 			const { enableNgram } = get(localRelevancy || settings, `indexSettings`);
+			const { enableAutoSuggestion } = get(localRelevancy || settings, `indexSettings`);
 			const { language } = get(localRelevancy || settings, `language`);
 			const { enabled: enableSynonyms } = get(localRelevancy || settings, `synonyms`);
 
@@ -140,6 +142,7 @@ class SearchPreviewWrapper extends React.Component {
 							weight: 1,
 							address: item,
 							skipSearch: enableNgram === false,
+							skipAutosuggest: enableAutoSuggestion === false,
 							skipLang: !language,
 							skipSynonyms: enableSynonyms === false,
 						});

@@ -9,12 +9,14 @@ import { SUB_FIELDS, RANGE_FIELDS } from '../constants';
 export const getMappingsInfo = ({
 	mappings: originalMappings,
 	enableNgram,
+	enableAutoSuggestion,
 	enableSynonyms,
 	language,
 }) => {
 	const mappings = updateSubFields({
 		mappings: originalMappings,
 		enableNgram,
+		enableAutoSuggestion,
 		enableSynonyms,
 		language,
 	});
@@ -111,8 +113,9 @@ const _getUsecase = (fields, type) => {
 };
 
 const _getFieldsByRelevancy = ({
-	enableNgram,
 	enableSynonyms,
+	enableNgram,
+	enableAutoSuggestion,
 	language,
 	fields: originalFields,
 	type,
@@ -166,16 +169,36 @@ const _getFieldsByRelevancy = ({
 		}
 	}
 
+	if (!enableAutoSuggestion) {
+		delete updatedFields.autosuggest;
+	} else if (type === 'text' && enableAutoSuggestion) {
+		if (
+			_getUsecase(updatedFields, type).includes('autosuggest') &&
+			!updatedFields.autosuggest
+		) {
+			updatedFields = {
+				...updatedFields,
+				search: {
+					type: 'text',
+					index: 'true',
+					analyzer: 'autosuggest_analyzer',
+					search_analyzer: 'standard',
+				},
+			};
+		}
+	}
+
 	return updatedFields;
 };
 
 const _updateNestedMapping = ({ mapping, type, usecase, fields, currentIndex, settings }) => {
 	if (fields.length === currentIndex + 1) {
-		const { enableNgram, enableSynonyms, language } = settings;
+		const { enableNgram, enableAutoSuggestion, enableSynonyms, language } = settings;
 
 		const updatedFields = _getFieldsByRelevancy({
 			enableSynonyms,
 			enableNgram,
+			enableAutoSuggestion,
 			language,
 			fields: get(mappingUsecase, `${usecase}.fields`),
 			type,
@@ -317,6 +340,7 @@ export const updateSubFields = ({
 	mappings: originalMappings,
 	enableSynonyms,
 	enableNgram,
+	enableAutoSuggestion,
 	language,
 }) => {
 	const mappings = JSON.parse(JSON.stringify(originalMappings));
@@ -349,6 +373,7 @@ export const updateSubFields = ({
 						mappings: get(mappings, `properties.${field}`, {}),
 						enableSynonyms,
 						enableNgram,
+						enableAutoSuggestion,
 						language,
 					}),
 				},
@@ -359,6 +384,7 @@ export const updateSubFields = ({
 			..._getFieldsByRelevancy({
 				enableSynonyms,
 				enableNgram,
+				enableAutoSuggestion,
 				language,
 				type,
 				fields: get(mappings, `properties.${field}.fields`, {}),
@@ -549,6 +575,69 @@ export const applyNgramMapping = (mappings, isNgramEnabled) => {
 	return updatedMappings;
 };
 
+export const applyAutosuggestionMapping = (mappings, isAutosuggestionEnabled) => {
+	const updatedMappings = Object.keys(mappings).reduce((agg, field) => {
+		const fieldVal = { ...get(mappings, field) };
+		let updatedData = { ...agg };
+		const type = get(fieldVal, 'type', ``);
+		if (get(fieldVal, 'properties', null)) {
+			// recursive call the function
+			const fieldData = {
+				properties: applyAutosuggestionMapping(
+					get(fieldVal, 'properties'),
+					isAutosuggestionEnabled,
+				),
+			};
+
+			if (type.trim()) {
+				fieldData.type = type;
+			}
+			updatedData = {
+				...updatedData,
+				[field]: fieldData,
+			};
+		} else if (type === 'text') {
+			if (!applyAutosuggestionMapping && get(fieldVal, 'fields.autosuggest', null)) {
+				// remove the .search field
+				delete fieldVal.fields.autosuggest;
+				updatedData = {
+					...updatedData,
+					[field]: {
+						...fieldVal,
+					},
+				};
+			} else if (isAutosuggestionEnabled && !get(fieldVal, 'fields.autosuggest', null)) {
+				// add the .search field
+				updatedData = {
+					...updatedData,
+					[field]: {
+						...fieldVal,
+						fields: {
+							...get(fieldVal, 'fields'),
+							search: {
+								analyzer: 'autosuggest_analyzer',
+								search_analyzer: 'standard',
+								type: 'text',
+							},
+						},
+					},
+				};
+			} else {
+				updatedData = {
+					...updatedData,
+					[field]: {
+						...fieldVal,
+					},
+				};
+			}
+		}
+
+		return updatedData;
+	}, {});
+
+	return updatedMappings;
+};
+
 export const applyNgramDataFields = (dataFields) => {
 	const subFields = getPossibleSubFields();
 	const dataFieldsWithoutSubFields = dataFields.filter(
@@ -561,6 +650,27 @@ export const applyNgramDataFields = (dataFields) => {
 			if (!dataFields.includes(`${item}.search`)) {
 				return [
 					[...agg[0], `${item}.search`],
+					[...agg[1], 0.1],
+				];
+			}
+			return agg;
+		},
+		[[], []],
+	);
+};
+
+export const applyAutosuggestionDataFields = (dataFields) => {
+	const subFields = getPossibleSubFields();
+	const dataFieldsWithoutSubFields = dataFields.filter(
+		(i) => !subFields.some((s) => i.includes(s)),
+	);
+
+	// returns a tuple [autosuggestSearchFields, autosuggestSearchFieldsWeights]
+	return dataFieldsWithoutSubFields.reduce(
+		(agg, item) => {
+			if (!dataFields.includes(`${item}.autosuggest`)) {
+				return [
+					[...agg[0], `${item}.autosuggest`],
 					[...agg[1], 0.1],
 				];
 			}
@@ -617,12 +727,19 @@ export const applyLanguageMapping = (mappings, language) => {
 	return updatedMappings;
 };
 
-export const getValidSubFields = ({ fieldMapping, enableNgram, enableSynonyms }) => {
+export const getValidSubFields = ({
+	fieldMapping,
+	enableNgram,
+	enableAutoSuggestion,
+	enableSynonyms,
+}) => {
 	const possibleSubFields = Object.values(SUB_FIELDS).filter((field) => {
 		if (field === SUB_FIELDS.SEARCH && !enableNgram) {
 			return false;
 		}
-
+		if (field === SUB_FIELDS.AUTOSUGGEST && !enableAutoSuggestion) {
+			return false;
+		}
 		if (field === SUB_FIELDS.SYNONYMS && !enableSynonyms) {
 			return false;
 		}

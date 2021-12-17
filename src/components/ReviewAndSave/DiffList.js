@@ -89,6 +89,8 @@ const DiffList = ({ diff }) => {
 												get(item, 'data.length', 0) === 2 &&
 												item.title !== 'dataField' &&
 												item.title !== 'fieldWeights' &&
+												item.title !== 'ngramSettings' &&
+												item.title !== 'autosuggestionSettings' &&
 												item.title !== 'rankFeature' && (
 													<Table
 														bordered
@@ -204,6 +206,76 @@ const DiffList = ({ diff }) => {
 													]}
 												/>
 											)}
+											{(item.title === 'ngramSettings' ||
+												item.title === 'autosuggestionSettings') &&
+												setting === 'search' && (
+													<Table
+														bordered
+														key={item.title}
+														pagination={false}
+														size="small"
+														rowKey="field"
+														dataSource={item.data}
+														style={{
+															height: 300,
+															overflow: 'auto',
+														}}
+														columns={[
+															{
+																title: 'Field',
+																key: 'field',
+																dataIndex: 'field',
+																render: (field, fieldData) => {
+																	return (
+																		<>
+																			{get(
+																				fieldData,
+																				'isDeleted',
+																			) ? (
+																				<span>
+																					{field}&nbsp;
+																					<Tag color="red">
+																						removed
+																					</Tag>
+																				</span>
+																			) : (
+																				<span>
+																					{field}&nbsp;
+																					{fieldData.oldValue ===
+																						'N/A' && (
+																						<Tag color="green">
+																							new
+																						</Tag>
+																					)}
+																				</span>
+																			)}
+																		</>
+																	);
+																},
+															},
+															{
+																title: 'Old Value',
+																key: 'oldValue',
+																dataIndex: 'oldValue',
+																render: (ov) => (
+																	<Tag color="volcano">
+																		{ov.toString()}
+																	</Tag>
+																),
+															},
+															{
+																title: 'New Value',
+																key: 'newValue',
+																dataIndex: 'newValue',
+																render: (nv) => (
+																	<Tag color="green">
+																		{nv.toString()}
+																	</Tag>
+																),
+															},
+														]}
+													/>
+												)}
 											{item.title === 'dataField' && setting === 'search' && (
 												<Table
 													bordered

@@ -538,6 +538,7 @@ export const getFieldWeight = (field, weightData) => {
 	const weight = Number(weightData);
 	switch (field) {
 		case SUB_FIELDS.AUTOSUGGEST:
+			return (weight ? weight * 0.1 : 0).toFixed(1);
 		case SUB_FIELDS.LANGUAGE:
 			return (weight ? weight * 0.9 : 0).toFixed(1);
 		case SUB_FIELDS.SYNONYMS:
@@ -562,6 +563,7 @@ export function getSubFields({
 	weight,
 	address,
 	skipSearch = false,
+	skipAutosuggest = false,
 	skipSynonyms = false,
 	skipLang = false,
 }) {
@@ -570,6 +572,7 @@ export function getSubFields({
 		const subFields = fieldsToMap
 			.filter((field) => {
 				if (skipSearch && field === 'search') return false;
+				if (skipAutosuggest && field === 'autosuggest') return false;
 				if (skipSynonyms && field === 'synonyms') return false;
 				if (skipLang && field === 'lang') return false;
 				return true;

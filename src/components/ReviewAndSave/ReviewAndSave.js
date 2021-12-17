@@ -27,6 +27,8 @@ import {
 	applyNgramMapping,
 	applyLanguageMapping,
 	applyNgramDataFields,
+	applyAutosuggestionMapping,
+	applyAutosuggestionDataFields,
 } from '../../utils/mappings';
 import {
 	putSettings,
@@ -59,7 +61,7 @@ const Badge = styled.span`
 	z-index: 100;
 `;
 
-const getDiffData = (oldObj, newObj) => {
+const getDiffData = (oldObj, newObj, analyzerSettings) => {
 	let diffData = diff({ ...oldObj }, { ...newObj });
 	if (!diffData) {
 		return [0, {}];
@@ -232,13 +234,130 @@ const getDiffData = (oldObj, newObj) => {
 	}
 
 	if ('enableNgram' in get(diffData, 'indexSettings', {})) {
-		diffData = {
-			...diffData,
-			search: {
-				...get(diffData, 'search'),
-				enableNgram: get(diffData, 'indexSettings.enableNgram'),
-			},
-		};
+		const newEnableNgram = get(newObj, 'indexSettings.enableNgram', false);
+		const oldEnableNgram = get(oldObj, 'indexSettings.enableNgram', false);
+
+		if (newEnableNgram !== oldEnableNgram) {
+			diffData = {
+				...diffData,
+				search: {
+					...get(diffData, 'search'),
+					enableNgram: [oldEnableNgram, newEnableNgram],
+				},
+			};
+		}
+	}
+
+	if ('enableAutoSuggestion' in get(diffData, 'indexSettings', {})) {
+		const newEnableAutoSuggestion = get(newObj, 'indexSettings.enableAutoSuggestion', false);
+		const oldEnableAutoSuggestion = get(oldObj, 'indexSettings.enableAutoSuggestion', false);
+
+		if (newEnableAutoSuggestion !== oldEnableAutoSuggestion) {
+			diffData = {
+				...diffData,
+				search: {
+					...get(diffData, 'search'),
+					enableAutoSuggestion: [oldEnableAutoSuggestion, newEnableAutoSuggestion],
+				},
+			};
+		}
+	}
+
+	if (get(diffData, 'indexSettings.ngramSettings', {})) {
+		const defaultSettings = get(analyzerSettings, 'index.analysis.filter.ngram_filter', {
+			min_gram: 3,
+			max_gram: 7,
+		});
+		const newNgramSettings = get(newObj, 'indexSettings.ngramSettings', {});
+		let oldNgramSettings = {};
+		if (
+			get(oldObj, 'indexSettings.ngramSettings.min_gram') &&
+			get(oldObj, 'indexSettings.ngramSettings.max_gram')
+		) {
+			oldNgramSettings = get(oldObj, 'indexSettings.ngramSettings', defaultSettings);
+		} else {
+			oldNgramSettings = defaultSettings;
+		}
+
+		if (
+			newNgramSettings &&
+			Object.keys(newNgramSettings).length &&
+			JSON.stringify(oldNgramSettings) !== JSON.stringify(newNgramSettings) &&
+			get(newObj, 'indexSettings.enableNgram', false) &&
+			(parseInt(newNgramSettings.min_gram, 10) !== parseInt(oldNgramSettings.min_gram, 10) ||
+				parseInt(newNgramSettings.max_gram, 10) !== parseInt(oldNgramSettings.max_gram, 10))
+		) {
+			diffData = {
+				...diffData,
+				search: {
+					...get(diffData, 'search'),
+					ngramSettings: [
+						{
+							field: 'min_chars',
+							newValue: newNgramSettings.min_gram,
+							oldValue: oldNgramSettings.min_gram,
+						},
+						{
+							field: 'max_chars',
+							newValue: newNgramSettings.max_gram,
+							oldValue: oldNgramSettings.max_gram,
+						},
+					],
+				},
+			};
+		}
+	}
+
+	if (get(diffData, 'indexSettings.autosuggestionSettings', {})) {
+		const defaultSettings = get(
+			analyzerSettings,
+			'index.analysis.tokenizer.autosuggest_tokenizer',
+			{ min_gram: 3, max_gram: 7 },
+		);
+		const newSuggestionSettings = get(newObj, 'indexSettings.autosuggestionSettings', {});
+		let oldSuggestionSettings = {};
+		if (
+			get(oldObj, 'indexSettings.autosuggestionSettings.min_gram') &&
+			get(oldObj, 'indexSettings.autosuggestionSettings.max_gram')
+		) {
+			oldSuggestionSettings = get(
+				oldObj,
+				'indexSettings.autosuggestionSettings',
+				defaultSettings,
+			);
+		} else {
+			oldSuggestionSettings = defaultSettings;
+		}
+
+		if (
+			newSuggestionSettings &&
+			Object.keys(newSuggestionSettings).length &&
+			JSON.stringify(oldSuggestionSettings) !== JSON.stringify(newSuggestionSettings) &&
+			get(newObj, 'indexSettings.enableAutoSuggestion', false) &&
+			(parseInt(newSuggestionSettings.min_gram, 10) !==
+				parseInt(oldSuggestionSettings.min_gram, 10) ||
+				parseInt(newSuggestionSettings.max_gram, 10) !==
+					parseInt(oldSuggestionSettings.max_gram, 10))
+		) {
+			diffData = {
+				...diffData,
+				search: {
+					...get(diffData, 'search'),
+					autosuggestionSettings: [
+						{
+							field: 'min_chars',
+							newValue: newSuggestionSettings.min_gram,
+							oldValue: oldSuggestionSettings.min_gram,
+						},
+						{
+							field: 'max_chars',
+							newValue: newSuggestionSettings.max_gram,
+							oldValue: oldSuggestionSettings.max_gram,
+						},
+					],
+				},
+			};
+		}
 	}
 
 	if (get(diffData, 'aggregations.dataField', null)) {
@@ -434,6 +553,27 @@ const shouldReIndex = (localMapping, oldSettings, newSettings) => {
 	}
 
 	if (
+		get(newSettings, 'indexSettings.enableAutoSuggestion') !==
+		get(oldSettings, 'indexSettings.enableAutoSuggestion')
+	) {
+		return true;
+	}
+
+	if (
+		get(newSettings, 'indexSettings.ngramSettings') !==
+		get(oldSettings, 'indexSettings.ngramSettings')
+	) {
+		return true;
+	}
+
+	if (
+		get(newSettings, 'indexSettings.autosuggestionSettings') !==
+		get(oldSettings, 'indexSettings.autosuggestionSettings')
+	) {
+		return true;
+	}
+
+	if (
 		JSON.stringify(get(newSettings, 'language')) !==
 		JSON.stringify(get(oldSettings, 'language'))
 	) {
@@ -447,6 +587,15 @@ class ReviewAndSave extends React.Component {
 		isOpen: false,
 		isResetting: false,
 		isSaving: false,
+	};
+
+	analyzerSettings = {};
+
+	componentDidMount = async () => {
+		const { appName, credentials } = this.props;
+		this.analyzerSettings = await getAppSettings(appName, credentials).then(
+			(data) => data[appName].settings,
+		);
 	};
 
 	showModal = () => {
@@ -524,7 +673,13 @@ class ReviewAndSave extends React.Component {
 			get(newSettings, 'indexSettings.enableNgram') !==
 			get(oldSettings, 'indexSettings.enableNgram')
 		) {
+			const newNgramSettings = get(newSettings, 'indexSettings.ngramSettings', {});
+			shouldUpdateSettings = true;
 			const isNgramEnabled = get(newSettings, 'indexSettings.enableNgram');
+
+			updatedSettings = await getAppSettings(appName, credentials).then(
+				(data) => data[appName].settings,
+			);
 
 			updatedMappings = {
 				properties: applyNgramMapping(get(updatedMappings, 'properties'), isNgramEnabled),
@@ -533,20 +688,111 @@ class ReviewAndSave extends React.Component {
 			// if ngram is enabled .search field should be added before saving as it requires re-indexing of data
 			if (get(newSettings, 'indexSettings.enableNgram')) {
 				const currentDataFields = get(newSettings, 'search.dataField');
+				// eslint-disable-next-line
 				const [ngramDataFields, ngramFieldWeights] =
 					applyNgramDataFields(currentDataFields);
 				newSettings = {
 					...newSettings,
 					search: {
 						...get(newSettings, 'search'),
-						dataField: [...currentDataFields, ...ngramDataFields],
+						dataField: [
+							...currentDataFields,
+							// ...ngramDataFields
+						],
 						fieldWeights: [
 							...get(newSettings, 'search.fieldWeights'),
-							...ngramFieldWeights,
+							// ...ngramFieldWeights,
 						],
 					},
 				};
 			}
+			updatedSettings = {
+				index: {
+					...get(updatedSettings, 'index', {}),
+					analysis: {
+						...get(updatedSettings, 'index.analysis', {}),
+						filter: {
+							...get(updatedSettings, 'index.analysis.filter', {}),
+							ngram_filter: {
+								...get(updatedSettings, 'index.analysis.filter.ngram_filter', {}),
+								...newNgramSettings,
+							},
+						},
+					},
+				},
+			};
+			delete updatedSettings.index.creation_date;
+		}
+
+		if (
+			get(newSettings, 'indexSettings.enableAutoSuggestion', false) !==
+			get(oldSettings, 'indexSettings.enableAutoSuggestion', false)
+		) {
+			const newSuggestionSettings = get(
+				newSettings,
+				'indexSettings.autosuggestionSettings',
+				{},
+			);
+			const isAutosuggestionEnabled = get(
+				newSettings,
+				'indexSettings.enableAutoSuggestion',
+				false,
+			);
+			shouldUpdateSettings = true;
+			updatedSettings = await getAppSettings(appName, credentials).then(
+				(data) => data[appName].settings,
+			);
+
+			updatedMappings = {
+				properties: applyAutosuggestionMapping(
+					get(updatedMappings, 'properties'),
+					isAutosuggestionEnabled,
+				),
+			};
+
+			// if autosuggestion is enabled .autosuggest field should be added before saving as it requires re-indexing of data
+			if (get(newSettings, 'indexSettings.enableAutoSuggestion')) {
+				const currentDataFields = get(newSettings, 'search.dataField');
+				// eslint-disable-next-line
+				const [autosuggestDataFields, autosuggestFieldsWeights] =
+					applyAutosuggestionDataFields(currentDataFields);
+
+				newSettings = {
+					...newSettings,
+					search: {
+						...get(newSettings, 'search'),
+						dataField: [
+							...currentDataFields,
+							// ...autosuggestDataFields
+						],
+						fieldWeights: [
+							...get(newSettings, 'search.fieldWeights'),
+							// ...autosuggestFieldsWeights,
+						],
+					},
+				};
+			}
+			updatedSettings = {
+				index: {
+					...get(updatedSettings, 'index', {}),
+					analysis: {
+						...get(updatedSettings, 'index.analysis', {}),
+						tokenizer: {
+							...get(updatedSettings, 'index.analysis.tokenizer', {}),
+							autosuggest_tokenizer: {
+								...get(
+									updatedSettings,
+									'index.analysis.tokenizer.autosuggest_tokenizer',
+									{},
+								),
+								...newSuggestionSettings,
+							},
+						},
+					},
+				},
+			};
+
+			delete updatedSettings.index.creation_date;
 		}
 
 		if (
@@ -630,6 +876,7 @@ class ReviewAndSave extends React.Component {
 				},
 			};
 
+			// console.log(settingsData);
 			const savedSettings = await updateSettingsAction(appName, settingsData);
 			if (isResetting) {
 				updateLocalRelevancyState(appName, defaultSettings);
@@ -715,8 +962,8 @@ class ReviewAndSave extends React.Component {
 		const { isOpen, isResetting, isSaving } = this.state;
 		const { defaultSettings, settings, localRelevancy, localMapping } = this.props;
 		const [diffCount, diffData] = isResetting
-			? getDiffData(settings, defaultSettings)
-			: getDiffData(settings, localRelevancy);
+			? getDiffData(settings, defaultSettings, this.analyzerSettings)
+			: getDiffData(settings, localRelevancy, this.analyzerSettings);
 		const renderShouldReIndex =
 			isOpen &&
 			shouldReIndex(localMapping, settings, isResetting ? defaultSettings : localRelevancy);

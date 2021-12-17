@@ -81,6 +81,7 @@ class FieldWeights extends React.Component {
 			const { flattenType, flattenUsecase } = getMappingsInfo({
 				mappings: localMapping,
 				enableNgram: indexSettings.enableNgram,
+				enableAutoSuggestion: indexSettings.enableAutoSuggestion,
 				enableSynonyms: synonymsSettings.enabled,
 				language: languageSettings.language,
 			});
@@ -215,6 +216,7 @@ class FieldWeights extends React.Component {
 			const validSubFields = getValidSubFields({
 				fieldMapping,
 				enableNgram: indexSettings.enableNgram,
+				enableAutoSuggestion: indexSettings.enableAutoSuggestion,
 				enableSynonyms: synonymsSettings.enabled,
 			});
 
