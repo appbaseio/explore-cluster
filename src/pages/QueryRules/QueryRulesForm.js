@@ -1224,6 +1224,7 @@ class QueryRulesForm extends React.Component {
 										onChange={this.updateActions}
 										error={error}
 										subFieldsMap={subFieldsMap}
+										rule={rule}
 									/>
 								</ErrorToaster>
 								<ErrorToaster inline>

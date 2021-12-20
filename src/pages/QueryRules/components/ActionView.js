@@ -36,7 +36,7 @@ class ActionView extends React.Component {
 		const { action, ruleId, searchState } = this.props;
 		const actionType = action.type;
 
-		if (searchState && searchState.promotedData) {
+		if (searchState && searchState.promotedData && ruleId === searchState.rule?.id) {
 			promotedData = [...searchState.promotedData];
 		} else {
 			promotedData = action?.data || [];

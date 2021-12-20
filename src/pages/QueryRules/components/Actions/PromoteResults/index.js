@@ -173,7 +173,7 @@ class PromoteResults extends Component {
 	}
 
 	render() {
-		const { indexes, dataFields } = this.props;
+		const { indexes, dataFields, rule } = this.props;
 		const { dataSource } = this.state;
 		const app = indexes.join(',') || '*';
 		return (
@@ -238,6 +238,7 @@ class PromoteResults extends Component {
 											this.updateResults,
 										);
 									}}
+									rule={rule}
 								/>
 								{provided.placeholder}
 							</div>
@@ -255,6 +256,7 @@ PromoteResults.propTypes = {
 	value: PropTypes.array,
 	onChange: PropTypes.func.isRequired,
 	getIndexPreferences: PropTypes.func.isRequired,
+	rule: PropTypes.object.isRequired,
 };
 
 PromoteResults.defaultProps = {

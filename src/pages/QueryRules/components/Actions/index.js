@@ -126,9 +126,10 @@ class Actions extends React.Component {
 	};
 
 	renderComponent = (item) => {
+		const { rule } = this.props;
 		const Component = componentMappings[item.type];
 		const getProps = () => {
-			const defaultProps = { value: item.data };
+			const defaultProps = { value: item.data, rule };
 			const { indexes, searchFields, aggsFields, subFieldsMap } = this.props;
 			if (item.type === 'promote_result' || item.type === 'hide_result') {
 				return {
@@ -265,6 +266,7 @@ Actions.propTypes = {
 	searchFields: PropTypes.array,
 	subFieldsMap: PropTypes.object,
 	aggsFields: PropTypes.array,
+	rule: PropTypes.object.isRequired,
 };
 
 Actions.defaultProps = {

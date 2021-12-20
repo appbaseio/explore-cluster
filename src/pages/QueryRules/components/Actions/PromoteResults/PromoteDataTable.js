@@ -34,9 +34,9 @@ function getItemStyle(isDragging, draggableStyle) {
 
 const overflow = { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
 
-function PromoteDataTable({ dataSource, handleDelete, onChange, saveState }) {
+function PromoteDataTable({ dataSource, handleDelete, onChange, saveState, rule }) {
 	useEffect(() => {
-		saveState({ promotedData: dataSource });
+		saveState({ promotedData: dataSource, rule });
 	}, [dataSource]);
 
 	return (
@@ -65,6 +65,7 @@ PromoteDataTable.propTypes = {
 	handleDelete: PropTypes.func.isRequired,
 	onChange: PropTypes.func.isRequired,
 	saveState: PropTypes.func.isRequired,
+	rule: PropTypes.object.isRequired,
 };
 
 PromoteDataTable.defaultProps = {
