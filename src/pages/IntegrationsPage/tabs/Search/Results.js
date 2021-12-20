@@ -107,7 +107,7 @@ const Results = ({ withoutForm, dataSource, mappings, fetchMappings, credentials
 	const [error, setError] = useState(false);
 
 	useEffect(() => {
-		if (credentials && get(mappings, 'length') === 0) {
+		if (credentials && !Object.keys(mappings).length) {
 			// Fetch Mappings if permissions are present
 			fetchMappings(appName, credentials);
 		}
