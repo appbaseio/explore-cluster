@@ -92,6 +92,78 @@ const getDiffData = (oldObj, newObj, analyzerSettings) => {
 		};
 	}
 
+	if (!get(diffData, 'search.fieldWeights', null) && get(diffData, 'search.dataField', null)) {
+		// handle adding | removing of new field
+
+		// get the fields to be removed
+		// key with _[indexNumber] means removed field
+		// key with [indexNumber] means added field
+		const { dataField, fieldWeights } = get(newObj, 'search');
+		const { dataField: olderDataFields, fieldWeights: olderWeights } = get(oldObj, 'search');
+
+		const newDataFields = Object.keys(diffData.search.dataField).reduce((agg, i) => {
+			const fieldName = get(diffData, `search.dataField`)[i][0];
+			const olderDataFieldIndex = olderDataFields.findIndex((f) => f === fieldName);
+			const newDataFieldIndex = dataField.findIndex((f) => f === fieldName);
+
+			// const hasSubfield = subFields.some((s) => !fieldName || fieldName.includes(s));
+			let newData = [...agg];
+
+			if (fieldName && i !== '_t') {
+				// removed field
+				const isDeleted = i[0] === '_';
+
+				newData = [
+					...newData,
+					{
+						field: fieldName,
+						index: isDeleted ? olderDataFieldIndex : newDataFieldIndex,
+						isDeleted,
+						oldWeight: isDeleted ? olderWeights[olderDataFieldIndex] || 'N/A' : 'N/A',
+						newWeight: isDeleted ? 'N/A' : fieldWeights[newDataFieldIndex] || 'N/A', // always first index holds the value
+					},
+				];
+			}
+			return newData;
+		}, []);
+
+		// handle only field weight change along with dataField add/remove
+		const newFieldWeights = dataField.reduce((agg, item, index) => {
+			// const hasSubfield = subFields.some((s) => item.includes(s));
+			const isPartOfDataField = newDataFields.some((i) => i.field === item);
+			const oldWeight = olderWeights[olderDataFields.findIndex((x) => x === item)];
+			const newWeight = fieldWeights[index];
+			let dataToReturn = [...agg];
+			if (oldWeight !== newWeight && !isPartOfDataField) {
+				dataToReturn = [
+					...dataToReturn,
+					{
+						field: item,
+						oldWeight,
+						newWeight,
+					},
+				];
+			}
+
+			return dataToReturn;
+		}, []);
+		diffData = {
+			...diffData,
+			search: {
+				...diffData.search,
+				fieldWeights: newFieldWeights,
+				dataField: newDataFields,
+			},
+		};
+
+		if (!newDataFields.length) {
+			delete diffData.search.dataField;
+		}
+		if (!newFieldWeights.length) {
+			delete diffData.search.fieldWeights;
+		}
+	}
+
 	if (get(diffData, 'search.dataField', null) && get(diffData, 'search.fieldWeights', null)) {
 		// handle adding | removing of new field
 
