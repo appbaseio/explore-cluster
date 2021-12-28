@@ -122,6 +122,7 @@ class StoreFrontPreview extends React.Component {
 
 	render() {
 		const { isMobile, loading, currentProduct } = this.state;
+		const { pipeline } = this.props;
 		const { displayProductPicker } = this.props;
 		let showLayoutSwitcher = true;
 		if (displayProductPicker && !currentProduct) {
@@ -156,6 +157,7 @@ class StoreFrontPreview extends React.Component {
 				{displayProductPicker && !currentProduct && (
 					<SearchPreviewWrapper
 						openWithModal={false}
+						pipeline={pipeline}
 						selectButtonLabel="Select Product"
 						value={currentProduct ? [currentProduct] : []}
 						onChange={this.handleProductSelection}
@@ -182,6 +184,7 @@ StoreFrontPreview.defaultProps = {
 	widgetId: undefined,
 	similarToField: undefined,
 	onSelectProduct: null,
+	pipeline: undefined,
 	displayProductPicker: false,
 };
 
@@ -189,6 +192,7 @@ StoreFrontPreview.propTypes = {
 	preferences: func.isRequired,
 	onSelectProduct: func,
 	similarToField: string,
+	pipeline: string,
 	displayProductPicker: bool,
 	isRecommendation: bool,
 	widgetId: oneOfType([number, string]),

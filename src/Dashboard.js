@@ -58,10 +58,10 @@ class Dashboard extends Component {
 		const { loadArcUser } = this.props;
 		const { pathname, search } = window.location;
 
-		window.addEventListener('error', event => {
-            const errorId = Sentry.lastEventId();
-            this.eventId = errorId;
-        });
+		window.addEventListener('error', () => {
+			const errorId = Sentry.lastEventId();
+			this.eventId = errorId;
+		});
 
 		if (pathname !== '/login' && pathname !== '/' && search) {
 			this.setState({

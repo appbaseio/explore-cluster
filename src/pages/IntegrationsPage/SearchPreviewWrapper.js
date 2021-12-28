@@ -202,11 +202,9 @@ class SearchPreviewWrapper extends React.Component {
 							...localRelevancy,
 							search: {
 								...localRelevancy.search,
-								fieldWeights: get(
-									localRelevancy,
-									'search.fieldWeights',
-									[],
-								).map((i) => Number(i)),
+								fieldWeights: get(localRelevancy, 'search.fieldWeights', []).map(
+									(i) => Number(i),
+								),
 							},
 						}}
 						toggleVisibility={this.toggleVisibility}
@@ -308,11 +306,11 @@ SearchPreviewWrapper.defaultProps = {
 	showFeaturedProducts: false,
 };
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, props) => {
 	const defaultSettings = get(state.$getAppSettings, `defaultSettings`);
 	const errorCode = get(state, '$getAppSettings.error.actual.code');
 	const defaultSearchSettings = errorCode === 404 ? defaultSettings : null;
-	const appName = get(state, '$getCurrentApp.name');
+	const appName = props.pipeline || get(state, '$getCurrentApp.name');
 	const localRelevancy = get(state, ['$getLocalRelevancy', appName], null);
 	const { username, password } = get(state, 'user.data') || {};
 

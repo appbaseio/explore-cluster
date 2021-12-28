@@ -567,6 +567,9 @@ export const defaultSearchPreferences = {
 export const getRecommendationPreferencesPayload = (formValue) => {
 	return JSON.parse(
 		JSON.stringify({
+			name: get(formValue, 'name'),
+			description: get(formValue, 'description'),
+			pipeline: get(formValue, 'pipeline'),
 			themeSettings: {
 				type: get(formValue, 'themeType'),
 				customCss: get(formValue, 'customCss'),
@@ -644,6 +647,9 @@ export const getRecommendationPreferencesPayload = (formValue) => {
 export const getSearchPreferencesPayload = (formValue) => {
 	return JSON.parse(
 		JSON.stringify({
+			name: get(formValue, 'name'),
+			description: get(formValue, 'description'),
+			pipeline: get(formValue, 'pipeline'),
 			themeSettings: {
 				type: get(formValue, 'themeType'),
 				customCss: get(formValue, 'customCss'),

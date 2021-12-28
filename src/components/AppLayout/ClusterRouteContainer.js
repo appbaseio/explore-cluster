@@ -81,7 +81,7 @@ const StoredQueriesPage = Loadable({
 const SearchIntegrationsPage = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "SearchIntegrationsPage" */ '../../pages/IntegrationsPage/Search'
+			/* webpackChunkName: "SearchIntegrationsPage" */ '../../pages/IntegrationsPage/SearchN'
 		),
 	loading: Loader,
 });
@@ -89,7 +89,7 @@ const SearchIntegrationsPage = Loadable({
 const RecommendationsIntegrationsPage = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "RecommendationsIntegrationsPage" */ '../../pages/IntegrationsPage/Recommendations'
+			/* webpackChunkName: "RecommendationsIntegrationsPage" */ '../../pages/IntegrationsPage/RecommendationsN'
 		),
 	loading: Loader,
 });

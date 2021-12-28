@@ -145,6 +145,7 @@
 		"url-parser-lite": "^0.1.0",
 		"url-search-params": "^1.1.0",
 		"urlsafe-base64": "https://github.com/farhan687/urlsafe-base64.git",
-		"util": "^0.12.4"
+		"util": "^0.12.4",
+		"uuid": "^8.3.2"
 	}
 }

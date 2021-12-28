@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { Icon, Input, Layout, Menu, Tag } from 'antd';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
+
 import AppLayout from '../../components/AppLayout';
 import {
 	getDefaultSettings,
@@ -12,7 +13,8 @@ import {
 	setCurrentApp,
 } from '../../batteries/modules/actions';
 import Logo from '../../components/Logo';
-
+import { ALLOWED_ACTIONS } from '../../constants';
+import { versionCompare } from '../../batteries/utils/helpers';
 import { getParam, getParsedRoutes } from '../../utils';
 import { setIsSidebarCollapsed } from '../../actions';
 import { breakpoints } from '../../utils/media';
@@ -82,8 +84,32 @@ class AppWrapper extends Component {
 		// const collapsed = window.innerWidth <= breakpoints.medium;
 		const getActiveMenuData = getActiveMenu(props, undefined, props.routes);
 
+		const { routes, arcVersion } = props;
+
+		let routesToSet = routes;
+		if (versionCompare(arcVersion, '7.54.0') !== -1) {
+			// UPDATE UIBuilder route
+			routesToSet = {
+				...routes,
+				'UI Builder': {
+					icon: 'control',
+					action: ALLOWED_ACTIONS.UI_BUILDER,
+					menu: [
+						{ label: 'Search', link: '/cluster/search-builder', hasExactPath: true },
+						{
+							label: 'Recommendations',
+							link: '/cluster/recommendations-builder',
+							hasExactPath: true,
+						},
+					],
+					tag: 'Beta',
+				},
+			};
+		}
+
 		this.state = {
 			showHeader,
+			routes: routesToSet,
 			appName: props.match.params.appName, // eslint-disable-line
 			value: '',
 			...getActiveMenuData,
@@ -94,7 +120,7 @@ class AppWrapper extends Component {
 		const { appName } = props.match.params;
 		const { currentApp } = props;
 		let setActiveMenu = null;
-		const { routes } = props;
+		const { routes } = state;
 		if (props.match.url !== url) {
 			setActiveMenu = {
 				...getActiveMenu(props, state.activeSubMenu, routes),
@@ -134,10 +160,37 @@ class AppWrapper extends Component {
 		setIsCollapsed(collapsed);
 	}
 
-	componentDidUpdate() {
-		const { history, currentApp, match } = this.props;
+	componentDidUpdate(prevProps) {
+		const { history, currentApp, match, arcVersion, routes } = this.props;
 		const { appName } = this.state;
-
+		if (arcVersion && arcVersion !== prevProps.arcVersion) {
+			if (versionCompare(arcVersion, '7.54.0') !== -1) {
+				// UPDATE UIBuilder route
+				// eslint-disable-next-line
+				this.setState({
+					routes: {
+						...routes,
+						'UI Builder': {
+							icon: 'control',
+							action: ALLOWED_ACTIONS.UI_BUILDER,
+							menu: [
+								{
+									label: 'Search',
+									link: '/cluster/search-builder',
+									hasExactPath: true,
+								},
+								{
+									label: 'Recommendations',
+									link: '/cluster/recommendations-builder',
+									hasExactPath: true,
+								},
+							],
+							tag: 'Beta',
+						},
+					},
+				});
+			}
+		}
 		const route = match.params.route || '';
 
 		if (currentApp && appName !== currentApp) {
@@ -192,8 +245,9 @@ class AppWrapper extends Component {
 	};
 
 	render() {
-		const { showHeader, appName, activeSubMenu, activeMenuItem, loading, value } = this.state;
-		const { history, collapsed, routes, currentApp } = this.props;
+		const { showHeader, appName, activeSubMenu, activeMenuItem, routes, loading, value } =
+			this.state;
+		const { history, collapsed, currentApp } = this.props;
 		if (!currentApp) return null;
 		return (
 			<Layout>
@@ -363,6 +417,7 @@ AppWrapper.propTypes = {
 	setIsCollapsed: PropTypes.func.isRequired,
 	collapsed: PropTypes.bool.isRequired,
 	routes: PropTypes.object.isRequired,
+	arcVersion: PropTypes.string,
 	updateCurrentApp: PropTypes.func.isRequired,
 };
 
@@ -370,6 +425,7 @@ AppWrapper.defaultProps = {
 	settings: null,
 	tier: undefined,
 	featureSearchRelevancy: false,
+	arcVersion: null,
 	defaultSettings: null,
 	currentApp: null,
 };
@@ -384,6 +440,7 @@ const mapStateToProps = (state) => {
 		featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
 		collapsed: get(state, 'sideBarCollapsed'),
 		routes: get(state, 'appRoutes'),
+		arcVersion: get(state, '$getAppPlan.results.version'),
 	};
 };
 

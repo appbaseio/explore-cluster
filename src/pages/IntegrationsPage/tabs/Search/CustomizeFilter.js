@@ -71,6 +71,7 @@ class CustomizeFilter extends React.Component {
 		const { visible, isRange } = this.state;
 		const { buttonLabel, control, buttonProps, disableListOptions, disableFilterType, type } =
 			this.props;
+		const { pipeline } = this.props;
 		return (
 			<React.Fragment>
 				<Button {...buttonProps} onClick={this.showModal}>
@@ -109,6 +110,7 @@ class CustomizeFilter extends React.Component {
 											<Form.Item label="DataField">
 												<DataFieldSelector
 													isAggFields
+													pipeline={pipeline}
 													control={formControl}
 													setFieldType={(val) =>
 														this.setFieldType(val, formControl)
@@ -323,9 +325,11 @@ CustomizeFilter.defaultProps = {
 	buttonProps: null,
 	disableFilterType: false,
 	type: '',
+	pipeline: undefined,
 };
 CustomizeFilter.propTypes = {
 	buttonLabel: string,
+	pipeline: string,
 	disableListOptions: bool,
 	buttonProps: object,
 	control: object,

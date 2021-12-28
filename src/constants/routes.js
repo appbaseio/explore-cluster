@@ -202,7 +202,6 @@ export const CLUSTER_ROUTES = {
 	'UI Builder': {
 		icon: 'control',
 		action: ALLOWED_ACTIONS.UI_BUILDER,
-		link: '/cluster/billing',
 		menu: [
 			{ label: 'Search', link: 'search-builder', openIndexMenu: true },
 			{

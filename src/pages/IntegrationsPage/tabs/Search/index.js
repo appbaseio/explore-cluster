@@ -31,7 +31,14 @@ const SearchSettings = () => {
 				<FieldGroup control={form} render={() => <Filters />} />
 			</TabPane>
 			<TabPane tab="Results" key="3">
-				<FieldGroup control={form} render={() => <Results />} />
+				<FieldGroup
+					control={form}
+					render={() => (
+						<Results
+							pipeline={form.get('pipeline') ? form.get('pipeline').value : undefined}
+						/>
+					)}
+				/>
 			</TabPane>
 			<TabPane tab="Custom Messages" key="4">
 				<FieldGroup control={form} render={() => <CustomMessages />} />

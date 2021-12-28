@@ -58,6 +58,7 @@ class PreviewModal extends React.Component {
 	render() {
 		const { visible, currentProduct } = this.state;
 		const {
+			pipeline,
 			preferences,
 			label,
 			isRecommendation,
@@ -117,6 +118,7 @@ class PreviewModal extends React.Component {
 					className={modalStyles}
 				>
 					<StoreFrontPreview
+						pipeline={pipeline}
 						preferences={preferences}
 						isRecommendation={isRecommendation}
 						widgetId={widgetId}
@@ -138,6 +140,7 @@ PreviewModal.propTypes = {
 	preferences: func.isRequired,
 	isRecommendation: bool,
 	displayProductPicker: bool,
+	pipeline: string,
 	similarToField: string,
 	label: string,
 	widgetId: oneOfType([number, string]),
@@ -146,6 +149,7 @@ PreviewModal.propTypes = {
 
 PreviewModal.defaultProps = {
 	widgetId: undefined,
+	pipeline: undefined,
 	similarToField: undefined,
 	displayProductPicker: false,
 	isRecommendation: false,

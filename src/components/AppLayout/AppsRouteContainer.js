@@ -9,6 +9,7 @@ import Loader from '../Loader';
 import AppPageContainer from '../AppPageContainer';
 import ErrorPage from '../../pages/ErrorPage';
 import AppsAnalyticsRoutes from './AppsAnalyticsRoutes';
+import { versionCompare } from '../../batteries/utils/helpers';
 import UnauthorizedPage from '../../pages/UnauthorizedPage';
 import { getAuthorizedRoutes } from '../../utils';
 import { ALLOWED_ACTIONS } from '../../constants';
@@ -56,7 +57,7 @@ const SandboxPage = Loadable({
 const SearchIntegrationsPage = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "SearchIntegrationsPage" */ '../../pages/IntegrationsPage/Search'
+			/* webpackChunkName: "SearchIntegrationsPage" */ '../../pages/IntegrationsPage/SearchN'
 		),
 	loading: Loader,
 });
@@ -70,7 +71,7 @@ const StoredQueriesPage = Loadable({
 const RecommendationsIntegrationsPage = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "RecommendationsIntegrationsPage" */ '../../pages/IntegrationsPage/Recommendations'
+			/* webpackChunkName: "RecommendationsIntegrationsPage" */ '../../pages/IntegrationsPage/RecommendationsN'
 		),
 	loading: Loader,
 });
@@ -123,7 +124,7 @@ class RouteContainer extends React.Component {
 	}
 
 	render() {
-		const { allowedRoutes, allowedActions } = this.props;
+		const { allowedRoutes, allowedActions, arcVersion } = this.props;
 		const hasSearchRelevancy = allowedActions.includes(ALLOWED_ACTIONS.SEARCH_RELEVANCY);
 		const hasUIBuilder = allowedActions.includes(ALLOWED_ACTIONS.UI_BUILDER);
 
@@ -303,24 +304,27 @@ class RouteContainer extends React.Component {
 							</>
 						)}
 					/>
-					<Route
-						exact
-						path="/app/:appName/search-builder"
-						render={(props) => (
-							<AppPageContainer {...props} component={SearchIntegrationsPage} />
-						)}
-					/>
-					<Route
-						exact
-						path="/app/:appName/recommendations-builder"
-						render={(props) => (
-							<AppPageContainer
-								{...props}
-								component={RecommendationsIntegrationsPage}
-							/>
-						)}
-					/>
-
+					{versionCompare(arcVersion, '7.54.0') === -1 ? (
+						<Route
+							exact
+							path="/app/:appName/search-builder"
+							render={(props) => (
+								<AppPageContainer {...props} component={SearchIntegrationsPage} />
+							)}
+						/>
+					) : null}
+					{versionCompare(arcVersion, '7.54.0') === -1 ? (
+						<Route
+							exact
+							path="/app/:appName/recommendations-builder"
+							render={(props) => (
+								<AppPageContainer
+									{...props}
+									component={RecommendationsIntegrationsPage}
+								/>
+							)}
+						/>
+					) : null}
 					<Route
 						exact
 						path="/app/:appName/aggs"
@@ -442,6 +446,7 @@ class RouteContainer extends React.Component {
 RouteContainer.propTypes = {
 	location: PropTypes.object.isRequired,
 	allowedRoutes: PropTypes.object.isRequired,
+	arcVersion: PropTypes.string.isRequired,
 	allowedActions: PropTypes.array.isRequired,
 };
 
@@ -449,6 +454,7 @@ const mapStateToProps = (state) => {
 	return {
 		allowedRoutes: getAuthorizedRoutes(get(state, 'appRoutes')),
 		allowedActions: get(state, 'user.data.allowedActions'),
+		arcVersion: get(state, '$getAppPlan.results.version'),
 	};
 };
 

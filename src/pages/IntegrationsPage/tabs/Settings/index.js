@@ -71,6 +71,11 @@ const Settings = () => {
 									</span>
 								</div>
 								<ResultSettings
+									pipeline={
+										form.get('pipeline')
+											? form.get('pipeline').value
+											: undefined
+									}
 									dataSource={[
 										{
 											id: 'resultTitle',

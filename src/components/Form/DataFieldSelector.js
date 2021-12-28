@@ -111,9 +111,12 @@ class DataFieldSelector extends React.Component {
 										inputHandler.onChange(undefined);
 									} else {
 										inputHandler.onChange(val);
-										setFieldType(
-											mappings?.properties[val.split('.keyword')[0]].type,
-										);
+										if (setFieldType) {
+											setFieldType(
+												mappings?.properties[val.split('.keyword')[0]]
+													?.type,
+											);
+										}
 									}
 								}}
 								onFocus={this.getMappings}
@@ -179,10 +182,10 @@ DataFieldSelector.propTypes = {
 	setFieldType: func,
 };
 
-const mapStateToProps = (state) => {
-	const mappings = getRawMappingsByAppName(state);
+const mapStateToProps = (state, props) => {
+	const mappings = getRawMappingsByAppName(state, props.pipeline);
 	const { username, password } = get(state, 'user.data', {});
-	const index = get(state, '$getCurrentApp.name');
+	const index = props.pipeline || get(state, '$getCurrentApp.name');
 	return {
 		appbaseCredentials: username ? `${username}:${password}` : null,
 		index,

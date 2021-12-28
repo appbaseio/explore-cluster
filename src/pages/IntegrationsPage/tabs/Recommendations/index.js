@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { func, bool } from 'prop-types';
+import { func, bool, string } from 'prop-types';
 import { FieldGroup, FieldArray, FieldControl, Validators } from 'react-reactive-form';
 import { Table, Button, Form, Select, Tooltip, Icon } from 'antd';
 import { css } from 'emotion';
@@ -51,7 +51,7 @@ class Recommendations extends React.Component {
 		{
 			title: 'Actions',
 			render: (item) => {
-				const { getPreferences } = this.props;
+				const { getPreferences, pipeline } = this.props;
 				const btnStyle = {
 					marginLeft: 10,
 				};
@@ -70,6 +70,7 @@ class Recommendations extends React.Component {
 								type: 'default',
 								style: btnStyle,
 							}}
+							pipeline={pipeline}
 							isRecommendation
 							preferences={getPreferences}
 							{...previewProps}
@@ -257,7 +258,7 @@ class Recommendations extends React.Component {
 
 	render() {
 		const { showForm } = this.state;
-
+		const { pipeline } = this.props;
 		return (
 			<div>
 				{showForm ? (
@@ -338,6 +339,7 @@ class Recommendations extends React.Component {
 										name="dataFieldSimilarTo"
 										isAggFields
 										hideOnDisabled
+										pipeline={pipeline}
 										wrapInsideForm
 										formItemProps={{
 											label: (
@@ -356,6 +358,7 @@ class Recommendations extends React.Component {
 										name="dataFieldMostRecent"
 										hideOnDisabled
 										wrapInsideForm
+										pipeline={pipeline}
 										formItemProps={{
 											label: (
 												<span>
@@ -399,6 +402,7 @@ class Recommendations extends React.Component {
 																onChange([...value]);
 															}
 														}}
+														pipeline={pipeline}
 														showFeaturedProducts
 													/>
 												</Form.Item>
@@ -453,6 +457,7 @@ class Recommendations extends React.Component {
 																<DataFieldSelector
 																	name="productsPageUrlField"
 																	isAggFields
+																	pipeline={pipeline}
 																	addOptions={
 																		<Select.Option
 																			key="_id"
@@ -540,12 +545,14 @@ class Recommendations extends React.Component {
 Recommendations.defaultProps = {
 	isSuccess: false,
 	onChangeEdit: undefined,
+	pipeline: undefined,
 };
 
 Recommendations.propTypes = {
 	getPreferences: func.isRequired,
 	isSuccess: bool,
 	onChangeEdit: func,
+	pipeline: string,
 };
 
 const mapStateToProps = (state) => ({

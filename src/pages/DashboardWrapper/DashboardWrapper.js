@@ -5,11 +5,13 @@ import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import keys from 'lodash/keys';
-import { bool, func, object } from 'prop-types';
+import { bool, func, object, string } from 'prop-types';
+import { ALLOWED_ACTIONS } from '../../constants';
 import Loader from '../../components/Loader';
 import AppHeader from '../../components/AppHeader';
 import Logo from '../../components/Logo';
 import { breakpoints } from '../../utils/media';
+import { versionCompare } from '../../batteries/utils/helpers';
 import { getAppPlan } from '../../batteries/modules/actions';
 import { getParam, getAuthorizedRoutes, getParsedRoutes } from '../../utils';
 import LabelTag from '../../components/LabelTag';
@@ -99,12 +101,29 @@ class DashboardWrapper extends Component {
 			console.log(e);
 		}
 		const getActiveMenuData = getActiveMenu(props, undefined, props.routes);
-		const { routes } = props;
+		const { routes, arcVersion } = props;
+		let routesToSet = routes;
+		if (arcVersion && versionCompare(arcVersion, '7.54.0') !== -1) {
+			routesToSet = {
+				...routes,
+				'UI Builder': {
+					icon: 'control',
+					action: ALLOWED_ACTIONS.UI_BUILDER,
+					menu: [
+						{ label: 'Search', link: '/cluster/search-builder' },
+						{
+							label: 'Recommendations',
+							link: '/cluster/recommendations-builder',
+						},
+					],
+					tag: 'Beta',
+				},
+			};
+		}
 		this.state = {
 			appName: props.match.params.appName, // eslint-disable-line
-
 			showHeader,
-			routes,
+			routes: routesToSet,
 			value: '',
 			...getActiveMenuData,
 		};
@@ -158,7 +177,30 @@ class DashboardWrapper extends Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { isBillingEnabled, routes } = this.props;
+		const { arcVersion, isBillingEnabled, routes } = this.props;
+		if (arcVersion && arcVersion !== prevProps.arcVersion) {
+			if (versionCompare(arcVersion, '7.54.0') !== -1) {
+				// UPDATE UIBuilder route
+				// eslint-disable-next-line
+				this.setState({
+					routes: {
+						...routes,
+						'UI Builder': {
+							icon: 'control',
+							action: ALLOWED_ACTIONS.UI_BUILDER,
+							menu: [
+								{ label: 'Search', link: '/cluster/search-builder' },
+								{
+									label: 'Recommendations',
+									link: '/cluster/recommendations-builder',
+								},
+							],
+							tag: 'Beta',
+						},
+					},
+				});
+			}
+		}
 		if (isBillingEnabled && isBillingEnabled !== prevProps.isBillingEnabled) {
 			// eslint-disable-next-line
 			this.setState({
@@ -190,7 +232,6 @@ class DashboardWrapper extends Component {
 	render() {
 		const { showHeader, routes, activeSubMenu, activeMenuItem, value } = this.state;
 		const { apps, history, match, collapsed } = this.props;
-
 		const filteredApps = keys(apps).filter((app) => !app.startsWith('.'));
 		const allowedRoutes = getAuthorizedRoutes(routes);
 		return (
@@ -377,6 +418,7 @@ class DashboardWrapper extends Component {
 
 DashboardWrapper.defaultProps = {
 	isBillingEnabled: false,
+	arcVersion: null,
 	isClusterPlanFetching: false,
 	apps: {},
 };
@@ -389,6 +431,7 @@ DashboardWrapper.propTypes = {
 	apps: object,
 	fetchApps: func.isRequired,
 	history: object.isRequired,
+	arcVersion: string,
 	match: object.isRequired,
 	location: object.isRequired,
 	collapsed: bool.isRequired,
@@ -400,6 +443,7 @@ const mapStateToProps = (state) => ({
 	isBillingEnabled: !(get(state, '$getAppPlan.results.billing') === false),
 	isClusterPlanFetched: get(state, '$getAppPlan.success'),
 	isClusterPlanFetching: get(state, '$getAppPlan.isFetching', false),
+	arcVersion: get(state, '$getAppPlan.results.version'),
 	apps: get(state, 'apps.data'),
 	collapsed: get(state, 'sideBarCollapsed'),
 	routes: get(state, 'clusterRoutes'),

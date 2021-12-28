@@ -103,7 +103,15 @@ const fieldSelectorIds = [
 
 const { Item } = List;
 
-const Results = ({ withoutForm, dataSource, mappings, fetchMappings, credentials, appName }) => {
+const Results = ({
+	pipeline,
+	withoutForm,
+	dataSource,
+	mappings,
+	fetchMappings,
+	credentials,
+	appName,
+}) => {
 	const [error, setError] = useState(false);
 
 	useEffect(() => {
@@ -255,7 +263,7 @@ const Results = ({ withoutForm, dataSource, mappings, fetchMappings, credentials
 							<Item
 								actions={
 									fieldSelectorIds.includes(item.id)
-										? [<DataFieldSelector name={item.id} />]
+										? [<DataFieldSelector pipeline={pipeline} name={item.id} />]
 										: [<Switch checked={value} onChange={onChange} />]
 								}
 							>
@@ -282,6 +290,8 @@ const Results = ({ withoutForm, dataSource, mappings, fetchMappings, credentials
 
 Results.defaultProps = {
 	withoutForm: false,
+	pipeline: undefined,
+	appName: undefined,
 	dataSource: defaultSettings,
 	mappings: {},
 };
@@ -290,13 +300,14 @@ Results.propTypes = {
 	withoutForm: bool,
 	dataSource: array,
 	mappings: object,
-	appName: string.isRequired,
+	pipeline: string,
+	appName: string,
 	credentials: string.isRequired,
 	fetchMappings: func.isRequired,
 };
 
-const mapStateToProps = (state) => {
-	const appName = get(state, '$getCurrentApp.name');
+const mapStateToProps = (state, props) => {
+	const appName = props.pipeline || get(state, '$getCurrentApp.name');
 	const mappings = getRawMappingsByAppName(state);
 	const { username, password } = get(state, 'user.data', {});
 	return {

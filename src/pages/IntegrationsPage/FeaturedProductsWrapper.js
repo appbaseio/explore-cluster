@@ -125,8 +125,8 @@ const FeaturedProductsWrapper = (props) => {
 													color: '#999999',
 												}}
 											>
-												No products are featured. Go to <strong>Browse Products</strong> to
-												feature some.
+												No products are featured. Go to{' '}
+												<strong>Browse Products</strong> to feature some.
 											</div>
 										);
 									},

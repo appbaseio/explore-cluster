@@ -67,9 +67,10 @@ const Platform = ({ isRecommendation, index }) => (
 									marginTop: 20,
 									marginBottom: 50,
 								}}
+								disabled={!!index}
 								target="blank"
 								icon="reload"
-								href={getResyncURL(index, syncPreferences)}
+								href={index ? getResyncURL(index, syncPreferences) : null}
 							>
 								Resync
 							</Button>
@@ -83,14 +84,15 @@ const Platform = ({ isRecommendation, index }) => (
 
 Platform.defaultProps = {
 	isRecommendation: false,
+	index: null,
 };
 
 Platform.propTypes = {
 	isRecommendation: bool,
-	index: string.isRequired,
+	index: string,
 };
 
-const mapStateToProps = (state) => ({
-	index: get(state, '$getCurrentApp.name'),
+const mapStateToProps = (state, props) => ({
+	index: props.pipeline || get(state, '$getCurrentApp.name'),
 });
 export default connect(mapStateToProps)(Platform);

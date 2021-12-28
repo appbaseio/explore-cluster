@@ -145,7 +145,7 @@ SyncStatus.propTypes = {
 	form: object.isRequired,
 };
 
-const mapStateToProps = (state) => ({
-	index: get(state, '$getCurrentApp.name'),
+const mapStateToProps = (state, props) => ({
+	index: props.pipeline || get(state, '$getCurrentApp.name'),
 });
 export default connect(mapStateToProps)(SyncStatus);

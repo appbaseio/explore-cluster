@@ -31,6 +31,7 @@ const DynamicFilters = () => {
 			buttonProps={{
 				type: 'primary',
 			}}
+			pipeline={form.get('pipeline') ? form.get('pipeline').value : undefined}
 			onSave={addControl}
 			onCancel={handleCancel}
 		/>
