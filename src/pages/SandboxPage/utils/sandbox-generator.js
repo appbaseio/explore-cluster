@@ -1,4 +1,7 @@
+import React from 'react';
+import reactElementToJSXString from 'react-element-to-jsx-string';
 import { getParameters } from 'codesandbox/lib/api/define';
+import get from 'lodash/get';
 import { transformQuery } from './index';
 import { facetMappings } from './constants';
 
@@ -100,13 +103,16 @@ const renderHeading = (app) => {
         </h2>
     `;
 	}
-	return `<h2 className="header-heading">
+	if (app === 'geo') {
+		return `<h2 className="header-heading">
             The Geo Data{' '}
             <span role="img" aria-label="books">
                 🌎
             </span>
         </h2>
         `;
+	}
+	return '';
 };
 
 const generateAppCode = ({
@@ -116,7 +122,7 @@ const generateAppCode = ({
 	app,
 	credentials,
 	url,
-	selectedDataset,
+	selectedDataset = '',
 }) => `
 import React from 'react';
 import {
@@ -135,6 +141,8 @@ import './styles.css';
 import { Tag } from 'antd';
 import { StarTwoTone } from "@ant-design/icons";
 import "antd/dist/antd.css";
+import Expand from './Expand';
+import Tooltip from './Tooltip';
 
 const App = () => {
 	return (
@@ -431,15 +439,63 @@ export default Expand;
 
 `;
 
-const generateResultCode = (facetFields, app) => {
-	const reactArr = JSON.stringify(['search', ...facetFields]);
-	if (app === 'movies') {
-		return moviesLayout(reactArr);
+const generateResultCode = (facetFields, app = '') => {
+	if (app) {
+		const reactArr = JSON.stringify(['search', ...facetFields]);
+		if (app === 'movies') {
+			return moviesLayout(reactArr);
+		}
+		if (app === 'products') {
+			return ecommLayout(reactArr);
+		}
+		if (app === 'geo') {
+			return geoLayout(reactArr);
+		}
 	}
-	if (app === 'products') {
-		return ecommLayout(reactArr);
-	}
-	return geoLayout(reactArr);
+	return appLayout(facetFields);
+};
+
+const appLayout = ({ id: resultId, dataField, ...resultProps }) => {
+	return reactElementToJSXString(
+		<div
+			{...resultProps}
+			componentId={resultId}
+			dataField={(dataField && dataField[0]) || '_score'}
+			renderItem
+		/>,
+	)
+		.replace('div', 'ReactiveList')
+		.replace(
+			'renderItem',
+			`
+			renderItem={item => {
+				const { _promoted, _click_id, _index, highlight, _type, index, ...rest } = item;
+				// Change to update the UI
+				return (
+					<Expand className="item" key={rest._id}>
+						{Object.keys(rest).map(key => (
+						<div className="item-key">
+							<span>{key}</span>
+							<Tooltip
+							code={typeof rest[key] === "object"}
+							title={JSON.stringify(rest[key], null, 2) || "N/A"}
+							>
+							<div
+								className="value"
+								dangerouslySetInnerHTML={{
+								__html:
+									typeof rest[key] === "object"
+									? "{...}"
+									: JSON.stringify(rest[key]) || "N/A"
+								}}
+							/>
+							</Tooltip>
+						</div>
+						))}
+					</Expand>
+				);
+			}}`,
+		);
 };
 
 const moviesLayout = (reactArr) => `
@@ -456,66 +512,66 @@ const moviesLayout = (reactArr) => `
 							<ReactiveList.ResultListWrapper>
 							{data.map((item) => (
 								<div
-								style={{
-									display: "flex",
-									padding: 10,
-									borderBottom: "1px solid rgb(239, 239, 239)"
-								}}
-								>
-								<img
 									style={{
-									height: 160,
-									width: 160,
-									objectFit: "contain"
+										display: "flex",
+										padding: 10,
+										borderBottom: "1px solid rgb(239, 239, 239)"
 									}}
-									src={item.poster_path}
-									alt={item.poster_path}
-									onError={(event) => {
-									event.target.src =
-										"https://www.houseoftara.com/shop/wp-content/uploads/2019/05/placeholder.jpg"; // eslint-disable-line no-param-reassign
-									}}
-								/>
-								<ResultList key={item._id} id={item._id}>
-									<ResultList.Content>
-									<ResultList.Title
-										dangerouslySetInnerHTML={{
-										__html: item.original_title
+								>
+									<img
+										style={{
+										height: 160,
+										width: 160,
+										objectFit: "contain"
+										}}
+										src={item.poster_path}
+										alt={item.poster_path}
+										onError={(event) => {
+										event.target.src =
+											"https://www.houseoftara.com/shop/wp-content/uploads/2019/05/placeholder.jpg"; // eslint-disable-line no-param-reassign
 										}}
 									/>
-									<ResultList.Description>
-										<div>
-										<div style={{ display: "flex", color: "#424242" }}>
-											<p style={{ fontWeight: "600", marginRight: 5 }}>
-											Release Year{" "}
-											</p>
-											<p> {item.release_year}</p>
-											<p>
-											<StarTwoTone
-												style={{ marginLeft: 40, marginRight: 3 }}
-											/>{" "}
-											{item.vote_average}/10
-											</p>
-										</div>
-										<p
-											style={{
-											color: "#888",
-											margin: "8px 0",
-											fontSize: "13px",
-											lineHeight: "18px"
-											}}
-											dangerouslySetInnerHTML={{
-											__html: item.overview
-											}}
-										/>
-										<div>
-										{item.genres.map((genre, index) => (
-											<Tag>{genre}</Tag>
-										))}
-										</div>
-										</div>
-									</ResultList.Description>
-									</ResultList.Content>
-								</ResultList>
+									<ResultList key={item._id} id={item._id}>
+										<ResultList.Content>
+											<ResultList.Title
+												dangerouslySetInnerHTML={{
+												__html: item.original_title
+												}}
+											/>
+											<ResultList.Description>
+												<div>
+												<div style={{ display: "flex", color: "#424242" }}>
+													<p style={{ fontWeight: "600", marginRight: 5 }}>
+													Release Year{" "}
+													</p>
+													<p> {item.release_year}</p>
+													<p>
+													<StarTwoTone
+														style={{ marginLeft: 40, marginRight: 3 }}
+													/>{" "}
+													{item.vote_average}/10
+													</p>
+												</div>
+												<p
+													style={{
+													color: "#888",
+													margin: "8px 0",
+													fontSize: "13px",
+													lineHeight: "18px"
+													}}
+													dangerouslySetInnerHTML={{
+													__html: item.overview
+													}}
+												/>
+												<div>
+												{item.genres.map((genre, index) => (
+													<Tag>{genre}</Tag>
+												))}
+												</div>
+												</div>
+											</ResultList.Description>
+										</ResultList.Content>
+									</ResultList>
 								</div>
 							))}
 							</ReactiveList.ResultListWrapper>
@@ -703,101 +759,141 @@ const sentenceCase = (text) => {
 	return text;
 };
 
-const generateFiltersCode = (filtersWithProps, facetFields) => {
-	if (facetFields.length === 0) {
-		return '';
-	}
+const generateFiltersCode = (filtersWithProps, facetFields = []) => {
 	const listArr = ['search'];
-	facetFields.forEach((filter) => {
-		if (facetMappings[filter] === 'term') {
-			listArr.push(filter);
-		}
-	});
+	if (facetFields.length === 0 && filtersWithProps.length) {
+		// render Search Preview filters based on type
+		filtersWithProps.forEach((filter) => {
+			if (filter.type === 'term') {
+				listArr.push(filter.id);
+			}
+		});
 
-	return facetFields.reduce((agg, field) => {
-		let listCode = '';
-		if (facetMappings[field] === 'term') {
-			listCode = `
-          <MultiList
-            componentId="${field}"
-            dataField="${field}.keyword"
-            className="filter"
-            title="${sentenceCase(field)}"
-            filterLabel="${sentenceCase(field)}"
-            size={10}
-            sortBy="count"
-            react={{ and: ${JSON.stringify(listArr.filter((i) => i !== field))}}}
-          />`;
-		} else if (field === 'retail_price') {
-			listCode = `
-          <RangeInput
-            componentId="${field}"
-            dataField="${field}"
-            key="${field}"
-            title="Retail Price (Rupees)"
-            filterLabel="Retail Price"
-            showHistogram
-            range={{
-              start: 10,
-              end: 10000,
-            }}
-          />`;
-		} else if (field === 'magnitude') {
-			listCode = `
-          <RangeSlider
-            componentId="${field}"
-            dataField="${field}"
-            key="${field}"
-            title="Magnitude (Richter)"
-            filterLabel="Magnitude"
-            showHistogram
-            rangeLabels={{
-              start: '0.0',
-              end: '10.0',
-            }}
-          />`;
-		} else if (field === 'year') {
-			listCode = `
-          <RangeInput
-            componentId="${field}"
-            dataField="${field}"
-            key="${field}"
-            filterLabel="Year"
-            showHistogram
-            range={{
-              start: 1970,
-              end: 2017,
-            }}
-          />`;
-		} else if (field === 'release_year') {
-			listCode = `
-          <RangeInput
-            componentId="${field}"
-            dataField="${field}"
-            key="${field}"
-            title="Release Year"
-            filterLabel="Release Year"
-            showHistogram
-            range={{
-              start: 1950,
-              end: 2021,
-            }}
-          />`;
-		} else {
-			listCode = `
-          <DynamicRangeSlider
-            componentId="${field}"
-            dataField="${field}"
-            title="${sentenceCase(field)}"
-            filterLabel="${sentenceCase(field)}"
-          />`;
-		}
+		// eslint-disable-next-line
+		return filtersWithProps.reduce((agg, { id, value, type, dataField, ...filter }) => {
+			let listCode = '';
+			if (type === 'term') {
+				listCode = `
+					<MultiList
+						componentId="${id}"
+						dataField="${get(dataField, '[0]', '')}"
+						className="filter"
+						title="${sentenceCase(get(dataField, '[0]', '').replace('.keyword', ''))}"
+						filterLabel="${sentenceCase(get(dataField, '[0]', '').replace('.keyword', ''))}"
+						size={10}
+						sortBy="count"
+						react={{ and: ${JSON.stringify(listArr.filter((i) => i !== id))}}}
+					/>`;
+			} else {
+				listCode = `
+					<DynamicRangeSlider
+						componentId="${id}"
+						dataField="${get(dataField, '[0]', '')}"
+						title="${sentenceCase(get(dataField, '[0]', ''))}"
+						filterLabel="${sentenceCase(get(dataField, '[0]', ''))}"
+					/>`;
+			}
 
-		if (agg) {
-			return `${agg}\n${listCode}`;
-		}
-		return listCode;
-	}, '');
+			if (agg) {
+				return `${agg}\n${listCode}`;
+			}
+			return `${listCode}`;
+		}, '');
+	}
+	if (facetFields.length) {
+		// render tutorial filters
+		facetFields.forEach((filter) => {
+			if (facetMappings[filter] === 'term') {
+				listArr.push(filter);
+			}
+		});
+
+		return facetFields.reduce((agg, field) => {
+			let listCode = '';
+			if (facetMappings[field] === 'term') {
+				listCode = `
+					<MultiList
+						componentId="${field}"
+						dataField="${field}.keyword"
+						className="filter"
+						title="${sentenceCase(field)}"
+						filterLabel="${sentenceCase(field)}"
+						size={10}
+						sortBy="count"
+						react={{ and: ${JSON.stringify(listArr.filter((i) => i !== field))}}}
+					/>`;
+			} else if (field === 'retail_price') {
+				listCode = `
+					<RangeInput
+						componentId="${field}"
+						dataField="${field}"
+						key="${field}"
+						title="Retail Price (Rupees)"
+						filterLabel="Retail Price"
+						showHistogram
+						range={{
+						start: 10,
+						end: 10000,
+						}}
+					/>`;
+			} else if (field === 'magnitude') {
+				listCode = `
+					<RangeSlider
+						componentId="${field}"
+						dataField="${field}"
+						key="${field}"
+						title="Magnitude (Richter)"
+						filterLabel="Magnitude"
+						showHistogram
+						rangeLabels={{
+						start: '0.0',
+						end: '10.0',
+						}}
+					/>`;
+			} else if (field === 'year') {
+				listCode = `
+					<RangeInput
+						componentId="${field}"
+						dataField="${field}"
+						key="${field}"
+						filterLabel="Year"
+						showHistogram
+						range={{
+						start: 1970,
+						end: 2017,
+						}}
+					/>`;
+			} else if (field === 'release_year') {
+				listCode = `
+					<RangeInput
+						componentId="${field}"
+						dataField="${field}"
+						key="${field}"
+						title="Release Year"
+						filterLabel="Release Year"
+						showHistogram
+						range={{
+						start: 1950,
+						end: 2021,
+						}}
+					/>`;
+			} else {
+				listCode = `
+					<DynamicRangeSlider
+						componentId="${field}"
+						dataField="${field}"
+						title="${sentenceCase(field)}"
+						filterLabel="${sentenceCase(field)}"
+					/>`;
+			}
+
+			if (agg) {
+				return `${agg}\n${listCode}`;
+			}
+			return listCode;
+		}, '');
+	}
+	return '';
 };
 
 const generateSandboxURL = ({ settings, app, credentials, url }) => {
@@ -824,8 +920,8 @@ const generateSandboxURL = ({ settings, app, credentials, url }) => {
 		'src/App.js': {
 			content: generateAppCode({
 				searchCode,
-				resultCode,
 				filtersCode,
+				resultCode,
 				app,
 				credentials,
 				url,
@@ -894,8 +990,8 @@ export const generateTutorialSandboxURL = ({
 		'src/App.js': {
 			content: generateAppCode({
 				searchCode,
-				resultCode,
 				filtersCode,
+				resultCode,
 				app,
 				credentials,
 				url,
