@@ -488,7 +488,6 @@ const ScriptConsole = ({
 									placement="bottom"
 									title={getTooltipTitle['execution-context']}
 									autoAdjustOverflow={false}
-									visible
 								>
 									<span style={{ marginLeft: 5 }}>
 										<Icon type="info-circle" />
