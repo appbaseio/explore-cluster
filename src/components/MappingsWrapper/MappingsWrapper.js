@@ -47,7 +47,14 @@ class MappingsWrapper extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { mappings, enableSynonyms, enableNgram, enableAutoSuggestion, language, isFetchingMapping } = this.props;
+		const {
+			mappings,
+			enableSynonyms,
+			enableNgram,
+			enableAutoSuggestion,
+			language,
+			isFetchingMapping,
+		} = this.props;
 		if (JSON.stringify(mappings) !== JSON.stringify(prevProps.mappings)) {
 			this.init(mappings);
 		}
@@ -67,7 +74,8 @@ class MappingsWrapper extends React.Component {
 	}
 
 	updateFields = () => {
-		const { mappings, enableSynonyms, enableNgram, enableAutoSuggestion, language } = this.props;
+		const { mappings, enableSynonyms, enableNgram, enableAutoSuggestion, language } =
+			this.props;
 
 		const updatedMappings = updateSubFields({
 			mappings,
@@ -194,7 +202,8 @@ class MappingsWrapper extends React.Component {
 	setMapping = (data) => {
 		const { usecase, type, mappings, flattenUsecase, flattenType } = this.state;
 
-		const { enableNgram, enableAutoSuggestion, language, appName, updateLocalMappingState } = this.props;
+		const { enableNgram, enableAutoSuggestion, language, appName, updateLocalMappingState } =
+			this.props;
 		let updatedMappings = null;
 		let updatedUsecase = null;
 		let updatedType = null;
@@ -251,14 +260,8 @@ class MappingsWrapper extends React.Component {
 	};
 
 	render() {
-		const {
-			children,
-			error,
-			isFetchingMapping,
-			isFetchingSetting,
-			appName,
-			localMapping,
-		} = this.props;
+		const { children, error, isFetchingMapping, isFetchingSetting, appName, localMapping } =
+			this.props;
 		const {
 			usecase,
 			mappings,
@@ -365,12 +368,11 @@ const mapStateToProps = (state, props) => {
 						'indexSettings.enableNgram',
 						true,
 				  ),
-		enableAutoSuggestion :
-			get(
-				get(state, ['$getAppSettings', 'settings', appName], defaultSettings),
-				'indexSettings.enableAutoSuggestion',
-				true,
-			),
+		enableAutoSuggestion: get(
+			get(state, ['$getAppSettings', 'settings', appName], defaultSettings),
+			'indexSettings.enableAutoSuggestion',
+			true,
+		),
 		enableSynonyms:
 			props.forceSynonyms !== undefined
 				? props.forceSynonyms

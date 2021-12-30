@@ -41,8 +41,7 @@ const mappingHeaderLeft = [
 const mappingHeaderRight = [
 	{
 		title: 'Field Weight',
-		info:
-			'Set the search weight to boost query matches against this field. Higher weight fields imply a higher boost.',
+		info: 'Set the search weight to boost query matches against this field. Higher weight fields imply a higher boost.',
 	},
 ];
 
@@ -166,13 +165,8 @@ class FieldWeights extends React.Component {
 	};
 
 	renderFields = ({ path = '', mappings, fieldWeightMap = {}, dataField = [] }) => {
-		const {
-			handleDelete,
-			localRelevancy,
-			handleFieldWeights,
-			advanceSearchState,
-			appName,
-		} = this.props;
+		const { handleDelete, localRelevancy, handleFieldWeights, advanceSearchState, appName } =
+			this.props;
 
 		const synonymsSettings = get(localRelevancy, 'synonyms');
 		const indexSettings = get(localRelevancy, 'indexSettings');

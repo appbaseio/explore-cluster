@@ -62,6 +62,13 @@ const getErrorMessages = (state) => {
 	}
 
 	function hasError(item) {
+		if (item.type === 'script') {
+			if (!item.script) {
+				return true;
+			}
+			return false;
+		}
+
 		if (!item.data) return true;
 		if (Array.isArray(item.data)) return !item.data.length;
 		return Object.keys(item.data).length === 0;

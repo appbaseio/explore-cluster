@@ -17,6 +17,7 @@ import SearchSettings from './SearchSettings';
 import { removeSubFields } from '../../../../utils';
 import AddFilter from './AddFilter';
 import ReplaceSearchQuery from './ReplaceSearchQuery';
+import ScriptRule from './ScriptRule';
 
 const componentMappings = {
 	replace_search_term: ReplaceSearch,
@@ -28,6 +29,7 @@ const componentMappings = {
 	search_settings: SearchSettings,
 	add_filter: AddFilter,
 	replace_search_query: ReplaceSearchQuery,
+	script: ScriptRule,
 };
 
 const actionMapping = {
@@ -40,6 +42,7 @@ const actionMapping = {
 	search_settings: 'Set Search Settings',
 	add_filter: 'Add Filter',
 	replace_search_query: 'Replace Search Query',
+	script: 'Script Rule',
 };
 
 const errorKeys = Object.keys(actionMapping).map((item) => `error.${item}`);
@@ -111,7 +114,7 @@ class Actions extends React.Component {
 			if (action.type === type) {
 				return {
 					...action,
-					data: value,
+					[type === 'script' ? 'script' : 'data']: value,
 				};
 			}
 			return action;
@@ -131,6 +134,15 @@ class Actions extends React.Component {
 		const getProps = () => {
 			const defaultProps = { value: item.data, rule };
 			const { indexes, searchFields, aggsFields, subFieldsMap } = this.props;
+			if (item.type === 'script') {
+				return {
+					scriptId: item.script // we are just checking if the script is present as one of the actions of rule
+						? // scriptId is same as rule id so we are fetching it from the URL,
+						  // this is safe since script key holds the whole script value after the save action
+						  window.location.pathname.split('/').splice(-1)[0]
+						: null,
+				};
+			}
 			if (item.type === 'promote_result' || item.type === 'hide_result') {
 				return {
 					...defaultProps,

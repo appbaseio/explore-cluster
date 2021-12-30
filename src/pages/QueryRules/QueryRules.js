@@ -312,7 +312,7 @@ QueryRules.propTypes = {
 	updateRecentRoute: PropTypes.func.isRequired,
 	history: PropTypes.object.isRequired,
 	createdAppName: PropTypes.string,
-	hasJSON: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]).isRequired,
+	hasJSON: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
 };
 
 QueryRules.defaultProps = {
@@ -326,6 +326,7 @@ QueryRules.defaultProps = {
 	isFetching: false,
 	apps: {},
 	createdAppName: '',
+	hasJSON: '',
 };
 
 const mapStateToProps = (state) => ({

@@ -179,6 +179,29 @@ class ActionView extends React.Component {
 						</Tag>
 					</React.Fragment>
 				) : null;
+			case 'script':
+				return action.script ? (
+					<React.Fragment key={ruleId}>
+						<h4 className={subTitle}>
+							Script Action
+							<span
+								css={css`
+									background: #e9c100;
+									color: black;
+									padding: 2px 2px 1px 8px;
+									font-weight: bold;
+									display: inline-block;
+									position: relative;
+									bottom: 4px;
+									left: 1px;
+									font-size: 10px;
+								`}
+							>
+								JS
+							</span>
+						</h4>{' '}
+					</React.Fragment>
+				) : null;
 			default:
 				return null;
 		}

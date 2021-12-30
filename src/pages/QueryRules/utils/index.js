@@ -98,7 +98,9 @@ const getExpressionFromValue = ({
 	condition,
 	type,
 }) => {
-	let expression = `'${selectedIndexes.join(',')}' in $index`;
+	let expression = Array.isArray(selectedIndexes)
+		? `'${selectedIndexes.join(',')}' in $index`
+		: '';
 
 	if (condition === 'filter') {
 		if (query && queryValue) {
@@ -248,6 +250,18 @@ const toolTips = {
 				target="_blank"
 				rel="noopener noreferrer"
 				href="https://docs.appbase.io/docs/search/rules/#search-settings"
+			>
+				Learn more
+			</a>
+		</>
+	),
+	script: (
+		<>
+			Add a script rule to be applied.
+			<a
+				target="_blank"
+				rel="noopener noreferrer"
+				href="https://docs.appbase.io/docs/search/rules/#script-rule"
 			>
 				Learn more
 			</a>

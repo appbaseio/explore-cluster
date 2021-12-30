@@ -4,7 +4,6 @@ import { css } from 'emotion';
 import { Card, Icon, Select } from 'antd';
 import { getErrorClass, getErrorMessage } from '../utils/error';
 import { hasValuesChanged } from '../utils';
-import { getFunctionHealthCheck } from '../../../utils';
 
 const { Option } = Select;
 
@@ -53,18 +52,14 @@ const actions = {
 		name: 'Replace Search Query',
 		data: '',
 	},
+	script: {
+		name: 'Script Rule',
+		script: '',
+	},
 };
 
 class ActionSelector extends React.Component {
 	state = { healthy: true };
-
-	async componentDidMount() {
-		try {
-			await getFunctionHealthCheck();
-		} catch (e) {
-			this.setState({ healthy: false });
-		}
-	}
 
 	shouldComponentUpdate(nextProps, nextState) {
 		const { healthy } = this.state;
@@ -76,7 +71,6 @@ class ActionSelector extends React.Component {
 
 	handleDropdown = (value) => {
 		const { onChange } = this.props;
-
 		onChange({
 			type: value,
 			data: actions[value].data,
@@ -106,6 +100,7 @@ class ActionSelector extends React.Component {
 						placeholder="Select Appropriate Action"
 						style={{ width: '100%' }}
 						value={undefined}
+						showSearch
 					>
 						{optionsToShow.map((action) => (
 							<Option disabled={this.getDisabled(condition, action)} key={action}>

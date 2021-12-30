@@ -316,28 +316,6 @@ export async function fetchMappings(name = '*') {
 	return data;
 }
 
-// checks open-faas health
-export async function getFunctionHealthCheck() {
-	const ACC_API = getURL();
-	const authToken = sessionStorage.getItem('authToken');
-	const response = await fetch(`${ACC_API}/_functions/health`, {
-		headers: {
-			'Content-Type': 'application/json',
-			Authorization: `Basic ${authToken}`,
-		},
-		method: 'GET',
-	});
-	const data = await response.json();
-	if (response.status >= 400) {
-		throw {
-			status: response.status,
-			message: data.error.message,
-		};
-	}
-
-	return data;
-}
-
 // checks whether it is a valid URL
 export const isAbsoluteURL = (str) => /^[a-z][a-z0-9+.-]*:/.test(str);
 
@@ -384,7 +362,7 @@ export async function getClusterMappings() {
 }
 
 export function getDatafields({ mappings, indexes, isSearch = false, isAggs = false }) {
-	const hasAllIndex = indexes.includes('*');
+	const hasAllIndex = Array.isArray(indexes) && indexes.includes('*');
 	let fieldMap = {};
 	let subFieldsMap = {};
 
@@ -403,7 +381,7 @@ export function getDatafields({ mappings, indexes, isSearch = false, isAggs = fa
 
 	const dataFields = Object.keys(mappings)
 		.filter((index) => !index.startsWith('.'))
-		.filter((index) => hasAllIndex || indexes.includes(index))
+		.filter((index) => hasAllIndex || indexes?.includes(index))
 		.reduce((acc, key) => {
 			const { properties } =
 				get(mappings[key], 'mappings._doc') || mappings[key]?.mappings || mappings[key];

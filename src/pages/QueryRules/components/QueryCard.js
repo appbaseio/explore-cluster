@@ -118,15 +118,8 @@ class QueryCard extends React.Component {
 	};
 
 	render() {
-		const {
-			rule,
-			dragProvided,
-			dragSnapshot,
-			removeRule,
-			toggleRule,
-			index,
-			usageStatsCount,
-		} = this.props;
+		const { rule, dragProvided, dragSnapshot, removeRule, toggleRule, index, usageStatsCount } =
+			this.props;
 		const actionButtonSize = window.innerWidth < 1090 ? 'small' : 'default';
 		return (
 			<Card

@@ -833,6 +833,7 @@ class QueryRulesForm extends React.Component {
 				this.setState({ previewCount: json?.search?.hits.total.value });
 			})
 			.catch((err) => {
+				// eslint-disable-next-line
 				console.error(err);
 			});
 	};
@@ -862,7 +863,6 @@ class QueryRulesForm extends React.Component {
 			editorKey,
 			subFieldsMap,
 		} = this.state;
-
 		const {
 			isCreating,
 			rulesLoading,
