@@ -10,5 +10,5 @@ export default {
 	'Modify Request with Compromise':
 		"function handleRequest(){ const body = JSON.parse(context.request.body); return { ...context.request, body: JSON.stringify({...body, query: [...body.query, { id: 'brandFilter', execute: false, 'type': 'term', dataField: 'brand.keyword', value: nlp('the purple dinosaur').nouns().toPlural().text() }] })} }",
 	'Modify Response with Lodash':
-		"function handleResponse() { const body = _.omit(JSON.parse(context.response.body), `search._shards`); return { ...context.response, body: JSON.stringify({ ...body }) }}",
+		'function handleResponse() { const body = _.omit(JSON.parse(context.response.body), `search._shards`); return { ...context.response, body: JSON.stringify({ ...body }) }}',
 };
