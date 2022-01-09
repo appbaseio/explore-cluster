@@ -169,6 +169,25 @@ const searchTypeArr = [
 	},
 ];
 
+const indexTypeArr = [
+	{
+		label: 'Index',
+		value: 'index',
+	},
+	{
+		label: 'Update',
+		value: 'update',
+	},
+	{
+		label: 'Create',
+		value: 'create',
+	},
+	{
+		label: 'Bulk',
+		value: 'bulk',
+	},
+];
+
 class QueryRulesForm extends React.Component {
 	constructor(props) {
 		super(props);
@@ -207,6 +226,7 @@ class QueryRulesForm extends React.Component {
 			subFieldsMap: {},
 
 			type: ['search', 'suggestion', 'geo', 'term', 'range'],
+			indexType: ['index', 'update', 'bulk', 'create'],
 			error: {},
 			loading: false,
 			editorKey: Date.now(),
@@ -268,7 +288,7 @@ class QueryRulesForm extends React.Component {
 			mappings,
 		} = this.props;
 
-		const { isEditPage } = this.state;
+		const { isEditPage, condition } = this.state;
 
 		if (!Object.keys(prevProps.mappings).length && Object.keys(mappings).length) {
 			this.updateAppMappings();
@@ -286,7 +306,9 @@ class QueryRulesForm extends React.Component {
 					selectedIndexes: show_advance_editor ? indexes : rule.selectedIndexes,
 				},
 				() => {
-					this.fetchPreviewCount();
+					if (condition !== 'index') {
+						this.fetchPreviewCount();
+					}
 				},
 			);
 		}
@@ -320,7 +342,7 @@ class QueryRulesForm extends React.Component {
 	}
 
 	updateAppMappings = () => {
-		const { selectedIndexes } = this.state;
+		const { selectedIndexes, condition } = this.state;
 		const { mappings } = this.props;
 		this.setState({ loading: true });
 		const [dataFields, fieldMap, subFieldsMap] = getDatafields({
@@ -348,7 +370,7 @@ class QueryRulesForm extends React.Component {
 				loading: false,
 			},
 			() => {
-				if (aggsFields?.length) {
+				if (aggsFields?.length && condition !== 'index') {
 					this.fetchPreviewCount();
 				}
 			},
@@ -370,6 +392,8 @@ class QueryRulesForm extends React.Component {
 
 	handleInput = (e) => {
 		const { name, value } = e.target;
+		const { condition } = this.state;
+
 		this.setState(
 			(prevState) => ({
 				[name]: value,
@@ -387,7 +411,7 @@ class QueryRulesForm extends React.Component {
 				},
 			}),
 			() => {
-				if (name === 'condition') {
+				if (name === 'condition' && condition !== 'index') {
 					this.fetchPreviewCount();
 				}
 			},
@@ -491,6 +515,7 @@ class QueryRulesForm extends React.Component {
 			advancedExpression,
 			fieldMap,
 			type,
+			indexType,
 		} = this.state;
 
 		let { actions } = this.state;
@@ -502,19 +527,24 @@ class QueryRulesForm extends React.Component {
 		const suffixExpression = `and ${parseExpression(advancedExpression, fieldMap)}`;
 
 		function getExpression() {
-			return show_advance_editor
-				? `'${(selectedIndexes || []).join(',')}' in $index ${
-						advancedExpression ? suffixExpression : ''
-				  } and $type in ${JSON.stringify(type)}`
-				: getExpressionFromValue({
-						selectedIndexes,
-						dataFieldValue,
-						dataField,
-						query,
-						queryValue,
-						condition,
-						type,
-				  });
+			if (condition !== 'index') {
+				return show_advance_editor
+					? `'${(selectedIndexes || []).join(',')}' in $index ${
+							advancedExpression ? suffixExpression : ''
+					  } and $type in ${JSON.stringify(type)}`
+					: getExpressionFromValue({
+							selectedIndexes,
+							dataFieldValue,
+							dataField,
+							query,
+							queryValue,
+							condition,
+							type,
+					  });
+			}
+			return `'${(selectedIndexes || []).join(',')}' in $index and $acl in ${JSON.stringify(
+				indexType,
+			)}`;
 		}
 
 		const params = {
@@ -838,6 +868,15 @@ class QueryRulesForm extends React.Component {
 			});
 	};
 
+	validIndexAction = () => {
+		const { actions } = this.state;
+		// eslint-disable-next-line no-plusplus
+		for (let i = 0; i < actions.length; i++) {
+			if (actions[i].type !== 'script') return false;
+		}
+		return true;
+	};
+
 	render() {
 		const {
 			condition,
@@ -1004,47 +1043,49 @@ class QueryRulesForm extends React.Component {
 									<div style={{ marginTop: 10 }}>
 										<DocsLink url="https://docs.appbase.io/docs/search/Rules/#configure-if-condition" />
 									</div>
-									{/* Preview */}
-									<div
-										style={{
-											border: '1px solid #e8e8e8',
-											borderStyle: 'dashed',
-											padding: 10,
-											margin: 10,
-											display: 'flex',
-											alignItems: 'center',
-											justifyContent: 'space-between',
-										}}
-									>
-										<div>
-											{this.numberWithCommas(previewCount || 0)} documents
-											match
-										</div>
-										<PreviewPage
-											previewType={previewType}
-											showModal={visible}
-											selectedIndexes={selectedIndexes}
-											handleCancel={this.handleCancel}
-											onChange={this.handleTabChange}
-										/>
-										<Button
-											onClick={() => this.handleReplaySearch('preview')}
-											type="primary"
+									{condition !== 'index' ? (
+										<div
+											style={{
+												border: '1px solid #e8e8e8',
+												borderStyle: 'dashed',
+												padding: 10,
+												margin: 10,
+												display: 'flex',
+												alignItems: 'center',
+												justifyContent: 'space-between',
+											}}
 										>
-											Preview
-										</Button>
-									</div>
+											<div>
+												{this.numberWithCommas(previewCount || 0)} documents
+												match
+											</div>
+											<PreviewPage
+												previewType={previewType}
+												showModal={visible}
+												selectedIndexes={selectedIndexes}
+												handleCancel={this.handleCancel}
+												onChange={this.handleTabChange}
+											/>
+											<Button
+												onClick={() => this.handleReplaySearch('preview')}
+												type="primary"
+											>
+												Preview
+											</Button>
+										</div>
+									) : null}
 								</Typography.Text>
 							</Col>
 
 							<Col md={12} sm={24}>
 								<label style={{ marginTop: 15 }}>
-									Trigger
+									Trigger Type
 									<Info
 										content={
 											<>
-												When to trigger the rule. Choose one of the two
-												options, a condition or an always on trigger.{' '}
+												When to trigger the rule. Choose one of the three
+												options, an indexing based trigger, a querying based
+												trigger or an always on trigger.{' '}
 												<a
 													href="https://docs.appbase.io/docs/search/Rules/#configure-if-condition"
 													target="_blank"
@@ -1058,12 +1099,24 @@ class QueryRulesForm extends React.Component {
 								</label>
 								<Radio.Group
 									name="condition"
-									onChange={this.handleInput}
+									onChange={(e) => {
+										if (
+											e.target.value === 'index' &&
+											!this.validIndexAction()
+										) {
+											message.error(
+												`Can't change trigger type to Index as it only supports Script action`,
+											);
+										} else {
+											this.handleInput(e);
+										}
+									}}
 									value={condition}
 									style={{ display: 'flex', marginBottom: '15px' }}
 								>
-									<Radio value="filter">Set Condition</Radio>
-									<Radio value="always">Always Trigger</Radio>
+									<Radio value="filter">Query</Radio>
+									<Radio value="index">Index</Radio>
+									<Radio value="always">Always</Radio>
 								</Radio.Group>
 								{condition === 'filter' && (
 									<>
@@ -1131,7 +1184,50 @@ class QueryRulesForm extends React.Component {
 										</label>
 									</>
 								)}
+								{condition === 'index' && (
+									<>
+										<div style={{ marginBottom: 15 }}>
+											<label>
+												Index to apply rule to
+												<Info content="Select the index or indices to apply the rule to." />
+											</label>
+											{getErrorMessage(error.selectedIndexes)}
+											<IndexDropdown
+												selectedIndexes={selectedIndexes}
+												error={error && error.selectedIndexes}
+												onChange={this.handleIndex}
+											/>
+										</div>
+										<div
+											className={formStyle}
+											style={{
+												border: error?.type?.hasError
+													? '1px solid red'
+													: 'none',
+												padding: '10px',
+											}}
+										>
+											<div>
+												<label>
+													Index Type{' '}
+													<Info content="Select the type of index request to trigger this rule on." />
+												</label>
+											</div>
 
+											<Checkbox.Group
+												name="indexType"
+												options={indexTypeArr}
+												defaultValue={['index', 'update', 'create', 'bulk']}
+												style={{ display: 'flex', flexWrap: 'wrap' }}
+												onChange={(data) => {
+													this.setState({
+														indexTypeArr: data,
+													});
+												}}
+											/>
+										</div>
+									</>
+								)}
 								{!show_advance_editor && (
 									<ErrorToaster inline>
 										<Conditions
@@ -1170,32 +1266,35 @@ class QueryRulesForm extends React.Component {
 										</ErrorToaster>
 									</div>
 								)}
-
-								<label>
-									Timeframe (optional)
-									<Info
-										content="Set a timeframe during which this rule should be triggered.
-									You can also set either of the start time or end time (without setting the other)."
-									/>
-								</label>
-								<RangePicker
-									value={
-										timeframe
-											? [
-													moment(timeframe.start_time * 1000),
-													moment(timeframe.end_time * 1000),
-											  ]
-											: null
-									}
-									onChange={this.handleTime}
-									style={{ width: '100%' }}
-									disabledDate={(current) => {
-										// Can not select days before today
-										const now = new Date();
-										now.setHours(0, 0, 0, 0);
-										return current && current.valueOf() < now.valueOf();
-									}}
-								/>
+								{condition !== 'index' && (
+									<>
+										<label>
+											Timeframe (optional)
+											<Info
+												content="Set a timeframe during which this rule should be triggered.
+												You can also set either of the start time or end time (without setting the other)."
+											/>
+										</label>
+										<RangePicker
+											value={
+												timeframe
+													? [
+															moment(timeframe.start_time * 1000),
+															moment(timeframe.end_time * 1000),
+													  ]
+													: null
+											}
+											onChange={this.handleTime}
+											style={{ width: '100%' }}
+											disabledDate={(current) => {
+												// Can not select days before today
+												const now = new Date();
+												now.setHours(0, 0, 0, 0);
+												return current && current.valueOf() < now.valueOf();
+											}}
+										/>
+									</>
+								)}
 							</Col>
 						</Row>
 						<Divider />
@@ -1292,6 +1391,7 @@ class QueryRulesForm extends React.Component {
 								/>
 							)}
 							<Button
+								disabled={condition === 'index'}
 								onClick={() => this.handleReplaySearch('ruleEffectPreview')}
 								type="primary"
 								ghost

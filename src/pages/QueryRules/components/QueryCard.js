@@ -1,13 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Alert, Button, Card, Col, Icon, message, Row, Switch, Tooltip, Typography } from 'antd';
+import {
+	Alert,
+	Button,
+	Card,
+	Col,
+	Icon,
+	InputNumber,
+	message,
+	Row,
+	Switch,
+	Tooltip,
+	Typography,
+} from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import get from 'lodash/get';
 import ActionView from './ActionView';
 import MobileMenu from './MobileMenu';
-import { deleteRule, toggleRuleStatus } from '../../../batteries/modules/actions';
+import { deleteRule, toggleRuleStatus, reorderRules } from '../../../batteries/modules/actions';
 import CloneRule from './CloneRule';
 import { hasValuesChanged } from '../utils';
 import DeleteModal from '../../../components/DeleteModal';
@@ -83,17 +95,33 @@ const card = css`
 			opacity: 1;
 		}
 	}
+	.ant-input-number-handler-wrap {
+		display: none;
+	}
 `;
 
 class QueryCard extends React.Component {
-	shouldComponentUpdate(nextProps) {
-		return hasValuesChanged(this.props, nextProps, [
-			'rule',
-			'dragProvided',
-			'dragSnapshot',
-			'index',
-			'usageStatsCount',
-		]);
+	constructor(props) {
+		super(props);
+		this.state = {
+			isEdit: false,
+			value: props.rule.order,
+		};
+	}
+
+	shouldComponentUpdate(nextProps, nextState) {
+		const { isEdit, value } = this.state;
+		return (
+			hasValuesChanged(this.props, nextProps, [
+				'rule',
+				'dragProvided',
+				'dragSnapshot',
+				'index',
+				'usageStatsCount',
+			]) ||
+			isEdit !== nextState.isEdit ||
+			value !== nextState.value
+		);
 	}
 
 	componentDidUpdate(prevProps) {
@@ -118,9 +146,20 @@ class QueryCard extends React.Component {
 	};
 
 	render() {
-		const { rule, dragProvided, dragSnapshot, removeRule, toggleRule, index, usageStatsCount } =
-			this.props;
+		const {
+			rule,
+			dragProvided,
+			dragSnapshot,
+			removeRule,
+			toggleRule,
+			index, // eslint-disable-line
+			usageStatsCount,
+			updateOrder,
+			hasError,
+		} = this.props;
+		const { isEdit, value } = this.state;
 		const actionButtonSize = window.innerWidth < 1090 ? 'small' : 'default';
+
 		return (
 			<Card
 				hoverable
@@ -133,13 +172,102 @@ class QueryCard extends React.Component {
 					<div className={mobileMenu}>
 						<MobileMenu rule={rule} removeRule={removeRule} toggleRule={toggleRule} />
 					</div>
-					<Col xs={1}>
-						<Tooltip title="Drag to update the ordering of rules">
-							<div {...dragProvided.dragHandleProps} className={dragIcon}>
-								<Icon type="drag" />
-								<Typography.Text strong>{index + 1}</Typography.Text>
+					<Col xs={3}>
+						<div style={{ display: 'flex' }}>
+							<Tooltip title="Drag to update the ordering of rules.">
+								<div {...dragProvided.dragHandleProps} className={dragIcon}>
+									<Icon type="drag" />
+								</div>
+							</Tooltip>
+
+							<div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+								{isEdit ? (
+									<InputNumber
+										style={{
+											width: 50,
+										}}
+										min={1}
+										value={rule.order}
+										onChange={(val) => {
+											this.setState({ value: val });
+										}}
+										onPressEnter={(e) => {
+											if (parseInt(e.target.value, 10) !== rule.order) {
+												updateOrder({
+													toBePromoted: {
+														id: rule.id,
+														order: parseInt(e.target.value, 10),
+													},
+													toBeDemoted: {
+														id: rule.id,
+														order: rule.order,
+													},
+												});
+												if (hasError) {
+													message.error('Error while re-ordering items');
+												} else {
+													message.success(
+														`Rule re-ordered successfully from ${
+															rule.order
+														} to ${parseInt(e.target.value, 10)}`,
+													);
+												}
+												this.setState({ isEdit: false });
+											}
+										}}
+										// onBlur={(e) => {
+										// 	this.setState({isEdit: false})
+										// }}
+									/>
+								) : (
+									<div>{rule.order}</div>
+								)}
+								<Tooltip title="Click to edit the order.">
+									{isEdit ? (
+										// eslint-disable-next-line
+										<Icon
+											type="check-circle"
+											theme="twoTone"
+											onClick={() => {
+												if (parseInt(value, 10) !== rule.order) {
+													updateOrder({
+														toBePromoted: {
+															id: rule.id,
+															order: parseInt(value, 10),
+														},
+														toBeDemoted: {
+															id: rule.id,
+															order: rule.order,
+														},
+													});
+													if (hasError) {
+														message.error(
+															'Error while re-ordering items',
+														);
+													} else {
+														message.success(
+															`Rule re-ordered successfully from ${
+																rule.order
+															} to ${parseInt(value, 10)}`,
+														);
+													}
+												}
+												this.setState({ isEdit: false });
+											}}
+										/>
+									) : (
+										// eslint-disable-next-line
+										<Icon
+											type="edit"
+											theme="twoTone"
+											onClick={() => {
+												this.setState({ isEdit: true });
+											}}
+										/>
+									)}
+								</Tooltip>
 							</div>
-						</Tooltip>
+						</div>
 					</Col>
 					<Col xl={7} lg={7} md={11} sm={24}>
 						<h4 className={title}>{rule.name}</h4>
@@ -157,7 +285,7 @@ class QueryCard extends React.Component {
 							</div>
 						))}
 					</Col>
-					<Col xl={9} lg={9} xs={0}>
+					<Col xl={7} lg={9} xs={0}>
 						<div className={actions}>
 							<DeleteModal
 								name="rule"
@@ -228,6 +356,7 @@ QueryCard.defaultProps = {
 	rule: {},
 	dragProvided: {},
 	dragSnapshot: {},
+	hasError: false,
 };
 
 QueryCard.propTypes = {
@@ -238,11 +367,19 @@ QueryCard.propTypes = {
 	toggleRule: PropTypes.func.isRequired,
 	index: PropTypes.number.isRequired,
 	usageStatsCount: PropTypes.number.isRequired,
+	updateOrder: PropTypes.func.isRequired,
+	hasError: PropTypes.bool,
 };
 
+const mapStateToProps = (state) => ({
+	hasError: get(state, '$getAppRules.error'),
+});
+
 const mapDispatchToProps = (dispatch) => ({
+	updateOrder: ({ toBePromoted, toBeDemoted }) =>
+		dispatch(reorderRules({ toBePromoted, toBeDemoted })),
 	removeRule: (id) => dispatch(deleteRule(id)),
 	toggleRule: (rule) => dispatch(toggleRuleStatus(rule)),
 });
 
-export default connect(null, mapDispatchToProps)(QueryCard);
+export default connect(mapStateToProps, mapDispatchToProps)(QueryCard);

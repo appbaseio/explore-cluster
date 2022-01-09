@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Col, Icon, Layout, message, Result, Row } from 'antd';
+import { Button, Col, Icon, Layout, message, Result, Row, Tabs } from 'antd';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -57,8 +57,6 @@ class QueryRules extends Component {
 
 	componentDidUpdate(prevProps) {
 		const {
-			reordering,
-			hasError,
 			deleted,
 			isAppCreating,
 			createdAppName: appName,
@@ -66,13 +64,6 @@ class QueryRules extends Component {
 			history,
 			hasJSON,
 		} = this.props;
-		if (!reordering && prevProps.reordering !== reordering) {
-			if (hasError) {
-				message.error('Error while sorting items');
-			} else {
-				message.success('Sorted items successfully');
-			}
-		}
 
 		if (prevProps.deleted !== deleted) {
 			message.success('Deleted item successfully');
@@ -104,11 +95,34 @@ class QueryRules extends Component {
 	}
 
 	onDragEnd = (result) => {
-		const { rules, updateOrder } = this.props;
-		if (get(result, 'source.index') !== get(result, 'destination.index')) {
-			const ruleToPromote = rules.find((rule) => rule.order === result.source.index);
-			const ruleToDemote = rules.find((rule) => rule.order === result.destination.index);
+		const { rules, updateOrder, hasError } = this.props;
+		const ruleToPromote = rules.find((rule) => rule.order === result.source.index);
+		const ruleToDemote = rules.find((rule) => rule.order === result.destination.index);
 
+		if (result.source.index < result.destination.index) {
+			// dropping at nextELem + 1
+			updateOrder({
+				toBeDemoted: {
+					id: ruleToDemote.id,
+					order: result.source.index,
+				},
+				toBePromoted: {
+					id: ruleToPromote.id,
+					order: result.destination.index + 1,
+				},
+			});
+
+			if (hasError) {
+				message.error('Error while sorting items');
+			} else {
+				message.success(
+					`Rule re-ordered successfully from ${result.source.index} to ${
+						result.destination.index + 1
+					}`,
+				);
+			}
+		} else if (result.destination.index === 1) {
+			// dropping at position 1
 			updateOrder({
 				toBeDemoted: {
 					id: ruleToDemote.id,
@@ -119,6 +133,36 @@ class QueryRules extends Component {
 					order: result.destination.index,
 				},
 			});
+
+			if (hasError) {
+				message.error('Error while sorting items');
+			} else {
+				message.success(
+					`Rule re-ordered successfully from ${result.source.index} to ${result.destination.index}`,
+				);
+			}
+		} else {
+			// dropping at bottomElem - 1
+			updateOrder({
+				toBeDemoted: {
+					id: ruleToDemote.id,
+					order: result.source.index,
+				},
+				toBePromoted: {
+					id: ruleToPromote.id,
+					order: result.destination.index - 1,
+				},
+			});
+
+			if (hasError) {
+				message.error('Error while re-ordering items');
+			} else {
+				message.success(
+					`Rule re-ordered successfully from ${result.source.index} to ${
+						result.destination.index - 1
+					}`,
+				);
+			}
 		}
 	};
 
@@ -225,23 +269,104 @@ class QueryRules extends Component {
 				<div className={container}>
 					{rules && rules.length ? (
 						<ErrorToaster>
-							<DNDWrapper
-								onDragEnd={this.onDragEnd}
-								items={rules.sort((a, b) => a.order - b.order)}
-								dropId="RULES"
-								indexKey="order"
-								idKey="id"
-							>
-								{({ item, dragProvided, dragSnapshot, index }) => (
-									<QueryCard
-										dragProvided={dragProvided}
-										dragSnapshot={dragSnapshot}
-										rule={item}
-										index={index}
-										usageStatsCount={usageStats[item.id]?.count || 0} // res.key === item.id
-									/>
-								)}
-							</DNDWrapper>
+							<div>
+								<Tabs defaultActiveKey="1">
+									<Tabs.TabPane tab="All Query Rules" key="1">
+										<DNDWrapper
+											onDragEnd={this.onDragEnd}
+											items={rules.sort((a, b) => a.order - b.order)}
+											dropId="RULES"
+											indexKey="order"
+											idKey="id"
+										>
+											{/* eslint-disable-next-line */}
+											{({ item, dragProvided, dragSnapshot, index }) => (
+												<QueryCard
+													dragProvided={dragProvided}
+													dragSnapshot={dragSnapshot}
+													rule={item}
+													index={item.order}
+													usageStatsCount={
+														usageStats[item.id]?.count || 0
+													} // res.key === item.id
+												/>
+											)}
+										</DNDWrapper>
+									</Tabs.TabPane>
+									<Tabs.TabPane tab="Index Rules" key="2">
+										<DNDWrapper
+											onDragEnd={this.onDragEnd}
+											items={rules
+												.filter((rule) => rule.trigger.type === 'index')
+												.sort((a, b) => a.order - b.order)}
+											dropId="RULES"
+											indexKey="order"
+											idKey="id"
+										>
+											{/* eslint-disable-next-line */}
+											{({ item, dragProvided, dragSnapshot, index }) => (
+												<QueryCard
+													dragProvided={dragProvided}
+													dragSnapshot={dragSnapshot}
+													rule={item}
+													index={item.order}
+													usageStatsCount={
+														usageStats[item.id]?.count || 0
+													} // res.key === item.id
+												/>
+											)}
+										</DNDWrapper>
+									</Tabs.TabPane>
+									<Tabs.TabPane tab="Query Rules" key="3">
+										<DNDWrapper
+											onDragEnd={this.onDragEnd}
+											items={rules
+												.filter((rule) => rule.trigger.type === 'filter')
+												.sort((a, b) => a.order - b.order)}
+											dropId="RULES"
+											indexKey="order"
+											idKey="id"
+										>
+											{/* eslint-disable-next-line */}
+											{({ item, dragProvided, dragSnapshot, index }) => (
+												<QueryCard
+													dragProvided={dragProvided}
+													dragSnapshot={dragSnapshot}
+													rule={item}
+													index={item.order}
+													usageStatsCount={
+														usageStats[item.id]?.count || 0
+													} // res.key === item.id
+												/>
+											)}
+										</DNDWrapper>
+									</Tabs.TabPane>
+									<Tabs.TabPane tab="Always Rules" key="4">
+										<DNDWrapper
+											onDragEnd={this.onDragEnd}
+											items={rules
+												.filter((rule) => rule.trigger.type === 'always')
+												.sort((a, b) => a.order - b.order)}
+											dropId="RULES"
+											indexKey="order"
+											idKey="id"
+										>
+											{/* eslint-disable-next-line */}
+											{({ item, dragProvided, dragSnapshot, index }) => (
+												<QueryCard
+													dragProvided={dragProvided}
+													dragSnapshot={dragSnapshot}
+													rule={item}
+													index={item.order}
+													usageStatsCount={
+														usageStats[item.id]?.count || 0
+													} // res.key === item.id
+												/>
+											)}
+										</DNDWrapper>
+									</Tabs.TabPane>
+								</Tabs>
+							</div>
 						</ErrorToaster>
 					) : (
 						<Result
