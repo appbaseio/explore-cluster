@@ -271,7 +271,7 @@ class QueryRules extends Component {
 						<ErrorToaster>
 							<div>
 								<Tabs defaultActiveKey="1">
-									<Tabs.TabPane tab="All Query Rules" key="1">
+									<Tabs.TabPane tab="All Rules" key="1">
 										<DNDWrapper
 											onDragEnd={this.onDragEnd}
 											items={rules.sort((a, b) => a.order - b.order)}
@@ -293,31 +293,7 @@ class QueryRules extends Component {
 											)}
 										</DNDWrapper>
 									</Tabs.TabPane>
-									<Tabs.TabPane tab="Index Rules" key="2">
-										<DNDWrapper
-											onDragEnd={this.onDragEnd}
-											items={rules
-												.filter((rule) => rule.trigger.type === 'index')
-												.sort((a, b) => a.order - b.order)}
-											dropId="RULES"
-											indexKey="order"
-											idKey="id"
-										>
-											{/* eslint-disable-next-line */}
-											{({ item, dragProvided, dragSnapshot, index }) => (
-												<QueryCard
-													dragProvided={dragProvided}
-													dragSnapshot={dragSnapshot}
-													rule={item}
-													index={item.order}
-													usageStatsCount={
-														usageStats[item.id]?.count || 0
-													} // res.key === item.id
-												/>
-											)}
-										</DNDWrapper>
-									</Tabs.TabPane>
-									<Tabs.TabPane tab="Query Rules" key="3">
+									<Tabs.TabPane tab="Query Rules" key="2">
 										<DNDWrapper
 											onDragEnd={this.onDragEnd}
 											items={rules
@@ -341,7 +317,55 @@ class QueryRules extends Component {
 											)}
 										</DNDWrapper>
 									</Tabs.TabPane>
-									<Tabs.TabPane tab="Always Rules" key="4">
+									<Tabs.TabPane tab="Index Rules" key="3">
+										<DNDWrapper
+											onDragEnd={this.onDragEnd}
+											items={rules
+												.filter((rule) => rule.trigger.type === 'index')
+												.sort((a, b) => a.order - b.order)}
+											dropId="RULES"
+											indexKey="order"
+											idKey="id"
+										>
+											{/* eslint-disable-next-line */}
+											{({ item, dragProvided, dragSnapshot, index }) => (
+												<QueryCard
+													dragProvided={dragProvided}
+													dragSnapshot={dragSnapshot}
+													rule={item}
+													index={item.order}
+													usageStatsCount={
+														usageStats[item.id]?.count || 0
+													} // res.key === item.id
+												/>
+											)}
+										</DNDWrapper>
+									</Tabs.TabPane>
+									<Tabs.TabPane tab="Cron Rules" key="4">
+										<DNDWrapper
+											onDragEnd={this.onDragEnd}
+											items={rules
+												.filter((rule) => rule.trigger.type === 'cron')
+												.sort((a, b) => a.order - b.order)}
+											dropId="RULES"
+											indexKey="order"
+											idKey="id"
+										>
+											{/* eslint-disable-next-line */}
+											{({ item, dragProvided, dragSnapshot, index }) => (
+												<QueryCard
+													dragProvided={dragProvided}
+													dragSnapshot={dragSnapshot}
+													rule={item}
+													index={item.order}
+													usageStatsCount={
+														usageStats[item.id]?.count || 0
+													} // res.key === item.id
+												/>
+											)}
+										</DNDWrapper>
+									</Tabs.TabPane>
+									<Tabs.TabPane tab="Always Rules" key="5">
 										<DNDWrapper
 											onDragEnd={this.onDragEnd}
 											items={rules

@@ -231,6 +231,10 @@ class QueryRulesForm extends React.Component {
 			loading: false,
 			editorKey: Date.now(),
 			previewCount: 0,
+			cronExpression: '',
+			envs: {},
+			environmentValue: '',
+			environmentKey: '',
 		};
 	}
 
@@ -255,6 +259,7 @@ class QueryRulesForm extends React.Component {
 		if (!usageStats) {
 			fetchUsageStats();
 		}
+
 		if (isEditPage && rule) {
 			const { show_advance_editor } = rule;
 			const { rawQuery, indexes } = getRawQuery(show_advance_editor, unparsedRule);
@@ -306,7 +311,7 @@ class QueryRulesForm extends React.Component {
 					selectedIndexes: show_advance_editor ? indexes : rule.selectedIndexes,
 				},
 				() => {
-					if (condition !== 'index') {
+					if (condition !== 'index' && condition !== 'cron') {
 						this.fetchPreviewCount();
 					}
 				},
@@ -370,7 +375,7 @@ class QueryRulesForm extends React.Component {
 				loading: false,
 			},
 			() => {
-				if (aggsFields?.length && condition !== 'index') {
+				if (aggsFields?.length && condition !== 'index' && condition !== 'cron') {
 					this.fetchPreviewCount();
 				}
 			},
@@ -416,6 +421,17 @@ class QueryRulesForm extends React.Component {
 				}
 			},
 		);
+	};
+
+	handleEnvsChange = () => {
+		const { envs, environmentValue, environmentKey } = this.state;
+		const newEnvs = { ...envs };
+		newEnvs[environmentKey] = environmentValue;
+		this.setState({
+			envs: newEnvs,
+			environmentValue: '',
+			environmentKey: '',
+		});
 	};
 
 	handleDropdown = (name, value) => {
@@ -516,6 +532,10 @@ class QueryRulesForm extends React.Component {
 			fieldMap,
 			type,
 			indexType,
+			envs,
+			cronExpression,
+			environmentKey,
+			environmentValue,
 		} = this.state;
 
 		let { actions } = this.state;
@@ -526,8 +546,21 @@ class QueryRulesForm extends React.Component {
 
 		const suffixExpression = `and ${parseExpression(advancedExpression, fieldMap)}`;
 
+		const newEnvs = { ...envs };
+		if (environmentKey && environmentValue) {
+			newEnvs[environmentKey] = environmentValue;
+			this.setState({
+				envs: newEnvs,
+				environmentValue: '',
+				environmentKey: '',
+			});
+		}
+
 		function getExpression() {
-			if (condition !== 'index') {
+			if (condition === 'always') {
+				return '';
+			}
+			if (condition === 'query') {
 				return show_advance_editor
 					? `'${(selectedIndexes || []).join(',')}' in $index ${
 							advancedExpression ? suffixExpression : ''
@@ -542,9 +575,12 @@ class QueryRulesForm extends React.Component {
 							type,
 					  });
 			}
-			return `'${(selectedIndexes || []).join(',')}' in $index and $acl in ${JSON.stringify(
-				indexType,
-			)}`;
+			if (condition === 'index') {
+				return `'${(selectedIndexes || []).join(
+					',',
+				)}' in $index and $acl in ${JSON.stringify(indexType)}`;
+			}
+			return cronExpression;
 		}
 
 		const params = {
@@ -553,7 +589,7 @@ class QueryRulesForm extends React.Component {
 			show_advance_editor,
 			trigger: {
 				type: condition,
-				expression: condition === 'always' ? '' : getExpression(),
+				expression: getExpression(condition),
 				timeframe,
 			},
 		};
@@ -574,6 +610,11 @@ class QueryRulesForm extends React.Component {
 						...action,
 						data: get(action, 'data.function.service') || action.data,
 					};
+				}
+				if (condition === 'cron' && action.type === 'script') {
+					const newAction = { ...action };
+					newAction.envs = envs;
+					return newAction;
 				}
 				return action;
 			});
@@ -637,6 +678,8 @@ class QueryRulesForm extends React.Component {
 			'enabled',
 			'timeframe',
 			'type',
+			// 'envs',
+			// 'cronExpression'
 		];
 
 		const { props, state } = this;
@@ -901,7 +944,15 @@ class QueryRulesForm extends React.Component {
 			rawQuery,
 			editorKey,
 			subFieldsMap,
+			cronExpression,
+			envs,
+			environmentKey,
+			environmentValue,
+			visible,
+			previewCount,
+			previewType,
 		} = this.state;
+
 		const {
 			isCreating,
 			rulesLoading,
@@ -916,7 +967,6 @@ class QueryRulesForm extends React.Component {
 			usageStats,
 		} = this.props;
 
-		const { visible, previewCount, previewType } = this.state;
 		this.customAutoComplete = new CustomAutoComplete(null, [
 			{ columnField: '$query', type: 'selection' },
 			...dataFields.map((field) => ({
@@ -1043,7 +1093,7 @@ class QueryRulesForm extends React.Component {
 									<div style={{ marginTop: 10 }}>
 										<DocsLink url="https://docs.appbase.io/docs/search/Rules/#configure-if-condition" />
 									</div>
-									{condition !== 'index' ? (
+									{condition !== 'index' && condition !== 'cron' ? (
 										<div
 											style={{
 												border: '1px solid #e8e8e8',
@@ -1101,11 +1151,12 @@ class QueryRulesForm extends React.Component {
 									name="condition"
 									onChange={(e) => {
 										if (
-											e.target.value === 'index' &&
+											(e.target.value === 'index' ||
+												e.target.value === 'cron') &&
 											!this.validIndexAction()
 										) {
 											message.error(
-												`Can't change trigger type to Index as it only supports Script action`,
+												`Can't change the trigger type as it only supports Script action`,
 											);
 										} else {
 											this.handleInput(e);
@@ -1116,6 +1167,7 @@ class QueryRulesForm extends React.Component {
 								>
 									<Radio value="filter">Query</Radio>
 									<Radio value="index">Index</Radio>
+									<Radio value="cron">Cron</Radio>
 									<Radio value="always">Always</Radio>
 								</Radio.Group>
 								{condition === 'filter' && (
@@ -1228,6 +1280,87 @@ class QueryRulesForm extends React.Component {
 										</div>
 									</>
 								)}
+								{condition === 'cron' && (
+									<>
+										<div>
+											Cron Expression
+											<Input
+												name="cronExpression"
+												value={cronExpression}
+												placeholder="Enter Cron Expression"
+												onChange={this.handleInput}
+											/>
+										</div>
+										<div>
+											Set Environment
+											{envs && Object.keys(envs).length
+												? Object.keys(envs).map((field) => (
+														<div
+															style={{
+																display: 'flex',
+																alignItems: 'center',
+																gap: '10px',
+															}}
+														>
+															<Input
+																name="environmentKey"
+																value={field}
+																placeholder="Key"
+																onChange={this.handleInput}
+															/>
+															<Input
+																name="environmentValue"
+																value={envs[field]}
+																placeholder="Value"
+																onChange={this.handleInput}
+															/>
+															<Icon
+																type="delete"
+																style={{
+																	marginBottom: 15,
+																	color: 'red',
+																}}
+																onClick={() => {
+																	const newEnvs = { ...envs };
+																	delete newEnvs[field];
+																	this.setState({
+																		envs: newEnvs,
+																	});
+																}}
+															/>
+														</div>
+												  ))
+												: null}
+											<div
+												style={{
+													display: 'flex',
+													alignItems: 'center',
+													gap: '10px',
+												}}
+											>
+												<Input
+													name="environmentKey"
+													value={environmentKey}
+													placeholder="Key"
+													onChange={this.handleInput}
+													style={{ margin: 0 }}
+												/>
+												<Input
+													name="environmentValue"
+													value={environmentValue}
+													placeholder="Value"
+													onChange={this.handleInput}
+													style={{ margin: 0 }}
+												/>
+												<Icon
+													type="plus"
+													style={{ color: '#1990ff' }}
+													onClick={this.handleEnvsChange}
+												/>
+											</div>
+										</div>
+									</>
+								)}
 								{!show_advance_editor && (
 									<ErrorToaster inline>
 										<Conditions
@@ -1266,7 +1399,7 @@ class QueryRulesForm extends React.Component {
 										</ErrorToaster>
 									</div>
 								)}
-								{condition !== 'index' && (
+								{condition !== 'index' && condition !== 'cron' && (
 									<>
 										<label>
 											Timeframe (optional)
@@ -1391,7 +1524,7 @@ class QueryRulesForm extends React.Component {
 								/>
 							)}
 							<Button
-								disabled={condition === 'index'}
+								disabled={condition === 'index' || condition === 'cron'}
 								onClick={() => this.handleReplaySearch('ruleEffectPreview')}
 								type="primary"
 								ghost

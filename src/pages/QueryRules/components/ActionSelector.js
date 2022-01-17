@@ -89,7 +89,7 @@ class ActionSelector extends React.Component {
 	render() {
 		const { actions: selectedActions, error, condition } = this.props;
 		let specificActions;
-		if (condition === 'index') {
+		if (condition === 'index' || condition === 'cron') {
 			specificActions = {
 				script: {
 					name: 'Script Rule',
