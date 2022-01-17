@@ -1,6 +1,6 @@
 import React from 'react';
-import { FieldControl } from 'react-reactive-form';
 import { Card, Tag } from 'antd';
+import { FieldControl } from 'react-reactive-form';
 
 const { Meta } = Card;
 
@@ -18,6 +18,12 @@ const themeTypes = [
 		description: 'Theme appropriate for Fashion store.',
 		image: '/static/images/ecomm/minimal.png',
 	},
+	{
+		type: 'geo',
+		name: 'Geo',
+		description: 'Theme appropriate for geo / map search UI.',
+		image: '/static/images/ecomm/geo.png',
+	},
 ];
 
 const SearchLayout = () => (
@@ -31,7 +37,9 @@ const SearchLayout = () => (
 						<Card
 							hoverable={themeObject.type !== value}
 							key={themeObject.type}
-							onClick={() => onChange(themeObject.type)}
+							onClick={() => {
+								onChange(themeObject.type);
+							}}
 							style={{
 								width: 240,
 								border: 0,

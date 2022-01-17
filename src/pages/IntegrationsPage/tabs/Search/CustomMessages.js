@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Alert } from 'antd';
+import { Input, Alert, Card, Button, Icon } from 'antd';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import { css } from 'emotion';
 import AceEditor from '../../../../batteries/components/SearchSandbox/containers/AceEditor';
@@ -13,6 +13,26 @@ const container = css`
 	}
 	.error {
 		color: red;
+	}
+
+	.ant-card {
+		background-color: #e8f0ff;
+		width: 200px;
+		height: 174px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin: 15px;
+	}
+
+	.ant-card-body {
+		width: 200px;
+		display: flex;
+		justify-content: center;
+	}
+
+	.ant-btn {
+		overflow: hidden;
 	}
 `;
 
@@ -62,7 +82,35 @@ const CustomMessages = () => (
 							</div>
 						)}
 					/>
-
+					<FieldControl
+						name="redirectUrlText"
+						render={({ handler }) => {
+							return (
+								<div>
+									<strong>Redirect URL Text</strong>
+									<Input
+										name="redirectUrlText"
+										placeholder="Enter Redirect URL Text"
+										css={{ marginTop: 5 }}
+										{...handler()}
+									/>
+									<div
+										style={{
+											display: 'flex',
+											justifyContent: 'center',
+										}}
+									>
+										<Card hoverable={false} bordered={false}>
+											<Button type="primary" size="large">
+												<Icon type="eye" />
+												{handler().value}
+											</Button>
+										</Card>
+									</div>
+								</div>
+							);
+						}}
+					/>
 					<FieldControl
 						name="noSuggestion"
 						render={({ handler }) => (

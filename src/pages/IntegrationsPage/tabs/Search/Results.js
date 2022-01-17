@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FieldControl } from 'react-reactive-form';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Switch, Form, List, Radio, Button, Icon } from 'antd';
+import { Switch, Form, List, Radio, Button, Icon, InputNumber, Input } from 'antd';
 import { bool, array, object, string, func } from 'prop-types';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import DataFieldSelector from '../../../../components/Form/DataFieldSelector';
@@ -11,7 +11,7 @@ import { traverseMapping } from '../../../../batteries/utils/mappings';
 import { getRawMappingsByAppName } from '../../../../batteries/modules/selectors';
 import { getAppMappings } from '../../../../batteries/modules/actions';
 
-export const defaultSettings = [
+const defaultSettings = [
 	{
 		id: 'showSelectedFilters',
 		label: 'Show active filter tags',
@@ -93,7 +93,113 @@ export const defaultSettings = [
 	},
 ];
 
+const geoDefaultSettings = [
+	{
+		id: 'mapLayout',
+		label: 'Show results as:',
+		value: true,
+	},
+	{
+		id: 'viewSwitcher',
+		label: 'Show results view switcher',
+		value: true,
+	},
+	{
+		id: 'mapComponent',
+		label: 'Pick your map component',
+		value: true,
+	},
+	{
+		id: 'defaultZoom',
+		label: 'Set default Zoom Level',
+		value: true,
+	},
+	{
+		id: 'showSearchAsMove',
+		label: 'Show Search As Move',
+		value: true,
+	},
+	{
+		id: 'mapsAPIkey',
+		label: 'Maps API Key',
+		value: false,
+	},
+	{
+		id: 'showMarkerClusters',
+		label: 'Enable Clustering',
+		value: false,
+	},
+	{
+		id: 'locationDatafield',
+		label: 'Select the data field to display the location of the item',
+		value: false,
+	},
+	{
+		id: 'resultTitle',
+		label: (
+			<span>
+				Select the data field to display the <strong>title</strong> of the result item
+			</span>
+		),
+		value: true,
+	},
+	{
+		id: 'resultDescription',
+		label: (
+			<span>
+				Select the data field to display the <strong>description</strong> of the result item
+			</span>
+		),
+		value: true,
+	},
+	{
+		id: 'resultPrice',
+		label: (
+			<span>
+				Select the data field to display the <strong>price</strong> of the result item
+			</span>
+		),
+		value: true,
+	},
+	{
+		id: 'resultImage',
+		label: (
+			<span>
+				Select the data field to display the <strong>image</strong> of the result item
+			</span>
+		),
+		value: true,
+	},
+	{
+		id: 'resultHandle',
+		label: (
+			<span>
+				Select the data field to define the <strong>redirect url</strong> for the result
+				item
+			</span>
+		),
+		value: true,
+	},
+];
+
 const fieldSelectorIds = [
+	'resultTitle',
+	'resultDescription',
+	'resultPrice',
+	'resultImage',
+	'resultHandle',
+	'locationDatafield',
+];
+
+const geoOptions = [
+	'mapLayout',
+	'mapComponent',
+	'viewSwitcher',
+	'defaultZoom',
+	'showSearchAsMove',
+	'mapsAPIkey',
+	'showMarkerClusters',
+	'locationDatafield',
 	'resultTitle',
 	'resultDescription',
 	'resultPrice',
@@ -111,6 +217,7 @@ const Results = ({
 	fetchMappings,
 	credentials,
 	appName,
+	themeType,
 }) => {
 	const [error, setError] = useState(false);
 
@@ -120,6 +227,14 @@ const Results = ({
 			fetchMappings(appName, credentials);
 		}
 	}, []);
+
+	const getDataSource = () => {
+		if (!dataSource.length) {
+			if (themeType === 'geo') return geoDefaultSettings;
+			return defaultSettings;
+		}
+		return dataSource;
+	};
 
 	const getDatafields = () => {
 		const traversedMappings = traverseMapping(mappings || {}, undefined, {
@@ -151,136 +266,275 @@ const Results = ({
 		setError(state);
 	};
 
-	const component = () => (
-		<List
-			dataSource={dataSource}
-			bordered
-			renderItem={(item) => {
-				if (item.id === 'layout') {
-					return (
-						<FieldControl name={item.id}>
-							{(control) => (
-								<Item
-									actions={[
-										<Radio.Group
-											{...control.handler()}
-											onChange={(value) => {
-												control.markAsTouched();
-												control.handler().onChange(value);
+	const component = () => {
+		return (
+			<List
+				dataSource={getDataSource()}
+				bordered
+				renderItem={(item) => {
+					if (themeType === 'geo') {
+						if (item.id === 'mapLayout') {
+							return (
+								<FieldControl name={item.id}>
+									{(control) => (
+										<Item
+											actions={[
+												<Radio.Group
+													{...control.handler()}
+													onChange={(value) => {
+														control.markAsTouched();
+														control.handler().onChange(value);
+													}}
+												>
+													<Radio value="map">Map</Radio>
+													<Radio value="list">List</Radio>
+												</Radio.Group>,
+											]}
+										>
+											<Item.Meta title={item.label} />
+										</Item>
+									)}
+								</FieldControl>
+							);
+						}
+						if (item.id === 'mapComponent') {
+							return (
+								<FieldControl name={item.id}>
+									{(control) => (
+										<Item
+											actions={[
+												<Radio.Group
+													{...control.handler()}
+													onChange={(value) => {
+														control.markAsTouched();
+														control.handler().onChange(value);
+													}}
+												>
+													<Radio value="openStreetMap">
+														OpenStreetMap
+													</Radio>
+													<Radio value="googleMap">Google Map</Radio>
+												</Radio.Group>,
+											]}
+										>
+											<Item.Meta title={item.label} />
+										</Item>
+									)}
+								</FieldControl>
+							);
+						}
+						if (item.id === 'defaultZoom') {
+							return (
+								<FieldControl name={item.id}>
+									{({ value, onChange }) => (
+										<Item
+											actions={[
+												<InputNumber
+													value={value}
+													onChange={onChange}
+													min={0}
+													max={20}
+												/>,
+											]}
+										>
+											<Item.Meta
+												title={
+													typeof item.label === 'function'
+														? item.label(value)
+														: item.label
+												}
+											/>
+										</Item>
+									)}
+								</FieldControl>
+							);
+						}
+						if (item.id === 'mapsAPIkey') {
+							return (
+								<FieldControl name={item.id}>
+									{({ value, onChange }) => (
+										<Item
+											actions={[<Input value={value} onChange={onChange} />]}
+										>
+											<Item.Meta
+												title={
+													typeof item.label === 'function'
+														? item.label(value)
+														: item.label
+												}
+											/>
+										</Item>
+									)}
+								</FieldControl>
+							);
+						}
+						if (geoOptions.includes(item.id)) {
+							return (
+								<FieldControl name={item.id}>
+									{({ value, onChange }) => (
+										<Item
+											actions={
+												fieldSelectorIds.includes(item.id)
+													? [
+															<DataFieldSelector
+																pipeline={pipeline}
+																name={item.id}
+															/>,
+													  ]
+													: [
+															<Switch
+																checked={value}
+																onChange={onChange}
+															/>,
+													  ]
+											}
+										>
+											<Item.Meta
+												title={
+													typeof item.label === 'function'
+														? item.label(value)
+														: item.label
+												}
+											/>
+										</Item>
+									)}
+								</FieldControl>
+							);
+						}
+						return null;
+					}
+					if (item.id === 'layout') {
+						return (
+							<FieldControl name={item.id}>
+								{(control) => (
+									<Item
+										actions={[
+											<Radio.Group
+												{...control.handler()}
+												onChange={(value) => {
+													control.markAsTouched();
+													control.handler().onChange(value);
+												}}
+											>
+												<Radio value="grid">Grid</Radio>
+												<Radio value="list">List</Radio>
+											</Radio.Group>,
+										]}
+									>
+										<Item.Meta title={item.label} />
+									</Item>
+								)}
+							</FieldControl>
+						);
+					}
+					if (item.id === 'sortOptionSelector') {
+						return (
+							<FieldControl name={item.id} strict={false}>
+								{({ value = [], onChange }) => {
+									return (
+										<div
+											style={{
+												padding: '12px 24px',
+												borderBottom: '1px solid #e8e8e8',
 											}}
 										>
-											<Radio value="grid">Grid</Radio>
-											<Radio value="list">List</Radio>
-										</Radio.Group>,
-									]}
+											{item.label}
+											<div>
+												<DragDropContext
+													onDragEnd={(res) =>
+														handleItemReOrder(res, value, onChange)
+													}
+												>
+													<Droppable droppableId="droppable">
+														{(provided, snapshot) => (
+															<div
+																ref={provided.innerRef}
+																style={{
+																	margin: 10,
+																	backgroundColor:
+																		snapshot.isDraggingOver
+																			? 'transparent'
+																			: 'transparent',
+																}}
+																{...provided.droppableProps}
+															>
+																{value && value.length
+																	? value.map((ele, index) => (
+																			<SortOptionSelector
+																				item={ele}
+																				index={index}
+																				fieldPicker={getDatafields()}
+																				onChange={onChange}
+																				value={value}
+																				onError={onError}
+																			/>
+																	  ))
+																	: null}
+																{provided.placeholder}
+															</div>
+														)}
+													</Droppable>
+												</DragDropContext>
+
+												<Button
+													style={{ marginLeft: 10 }}
+													type="primary"
+													size="small"
+													ghost
+													onClick={() => {
+														const newValue = [
+															...value,
+															{
+																label: 'Relevance',
+																dataField: '_score',
+																sortBy: 'desc',
+															},
+														];
+														onChange(newValue);
+													}}
+													disabled={error}
+												>
+													<Icon type="plus" />
+													Add Sort Option
+												</Button>
+											</div>
+										</div>
+									);
+								}}
+							</FieldControl>
+						);
+					}
+
+					return (
+						<FieldControl name={item.id}>
+							{({ value, onChange }) => (
+								<Item
+									actions={
+										fieldSelectorIds.includes(item.id)
+											? [
+													<DataFieldSelector
+														pipeline={pipeline}
+														name={item.id}
+													/>,
+											  ]
+											: [<Switch checked={value} onChange={onChange} />]
+									}
 								>
-									<Item.Meta title={item.label} />
+									<Item.Meta
+										title={
+											typeof item.label === 'function'
+												? item.label(value)
+												: item.label
+										}
+									/>
 								</Item>
 							)}
 						</FieldControl>
 					);
-				}
-				if (item.id === 'sortOptionSelector') {
-					return (
-						<FieldControl name={item.id} strict={false}>
-							{({ value = [], onChange }) => {
-								return (
-									<div
-										style={{
-											padding: '12px 24px',
-											borderBottom: '1px solid #e8e8e8',
-										}}
-									>
-										{item.label}
-										<div>
-											<DragDropContext
-												onDragEnd={(res) =>
-													handleItemReOrder(res, value, onChange)
-												}
-											>
-												<Droppable droppableId="droppable">
-													{(provided, snapshot) => (
-														<div
-															ref={provided.innerRef}
-															style={{
-																margin: 10,
-																backgroundColor:
-																	snapshot.isDraggingOver
-																		? 'transparent'
-																		: 'transparent',
-															}}
-															{...provided.droppableProps}
-														>
-															{value && value.length
-																? value.map((ele, index) => (
-																		<SortOptionSelector
-																			item={ele}
-																			index={index}
-																			fieldPicker={getDatafields()}
-																			onChange={onChange}
-																			value={value}
-																			onError={onError}
-																		/>
-																  ))
-																: null}
-															{provided.placeholder}
-														</div>
-													)}
-												</Droppable>
-											</DragDropContext>
-
-											<Button
-												style={{ marginLeft: 10 }}
-												type="primary"
-												size="small"
-												ghost
-												onClick={() => {
-													const newValue = [
-														...value,
-														{
-															label: 'Relevance',
-															dataField: '_score',
-															sortBy: 'desc',
-														},
-													];
-													onChange(newValue);
-												}}
-												disabled={error}
-											>
-												<Icon type="plus" />
-												Add Sort Option
-											</Button>
-										</div>
-									</div>
-								);
-							}}
-						</FieldControl>
-					);
-				}
-				return (
-					<FieldControl name={item.id}>
-						{({ value, onChange }) => (
-							<Item
-								actions={
-									fieldSelectorIds.includes(item.id)
-										? [<DataFieldSelector pipeline={pipeline} name={item.id} />]
-										: [<Switch checked={value} onChange={onChange} />]
-								}
-							>
-								<Item.Meta
-									title={
-										typeof item.label === 'function'
-											? item.label(value)
-											: item.label
-									}
-								/>
-							</Item>
-						)}
-					</FieldControl>
-				);
-			}}
-		/>
-	);
+				}}
+			/>
+		);
+	};
 
 	if (withoutForm) {
 		return component();
@@ -290,9 +544,10 @@ const Results = ({
 
 Results.defaultProps = {
 	withoutForm: false,
+	themeType: 'classic',
 	pipeline: undefined,
 	appName: undefined,
-	dataSource: defaultSettings,
+	dataSource: [],
 	mappings: {},
 };
 
@@ -304,12 +559,14 @@ Results.propTypes = {
 	appName: string,
 	credentials: string.isRequired,
 	fetchMappings: func.isRequired,
+	themeType: string,
 };
 
 const mapStateToProps = (state, props) => {
 	const appName = props.pipeline || get(state, '$getCurrentApp.name');
 	const mappings = getRawMappingsByAppName(state);
 	const { username, password } = get(state, 'user.data', {});
+
 	return {
 		appName,
 		mappings,

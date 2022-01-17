@@ -66,6 +66,35 @@ class StoreFrontPreview extends React.Component {
 		link.type = 'text/css';
 		link.href = BaseCSSURL;
 		this.iframeRef.current.contentDocument.body.appendChild(link);
+
+		const link1 = this.iframeRef.current.contentDocument.createElement('link');
+		link1.rel = 'stylesheet';
+		link1.href = 'https://use.fontawesome.com/releases/v5.8.1/css/all.css';
+		link1.integrity = 'sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf';
+		link1.crossorigin = 'anonymous';
+		this.iframeRef.current.contentDocument.body.appendChild(link1);
+
+		const link2 = this.iframeRef.current.contentDocument.createElement('link');
+		link2.rel = 'stylesheet';
+		link2.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.4/leaflet.css';
+		this.iframeRef.current.contentDocument.body.appendChild(link2);
+
+		const link3 = this.iframeRef.current.contentDocument.createElement('link');
+		link3.rel = 'shortcut icon';
+		link3.href = '/static/images/favicon.ico';
+		this.iframeRef.current.contentDocument.body.appendChild(link3);
+
+		const link4 = this.iframeRef.current.contentDocument.createElement('link');
+		link4.rel = 'preload';
+		link4.as = 'style';
+		link4.href = 'https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700';
+		this.iframeRef.current.contentDocument.body.appendChild(link4);
+
+		const link5 = this.iframeRef.current.contentDocument.createElement('link');
+		link5.rel = 'stylesheet';
+		link5.href = 'https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700s';
+		this.iframeRef.current.contentDocument.body.appendChild(link5);
+
 		const script = this.iframeRef.current.contentDocument.createElement('script');
 		script.type = 'text/javascript';
 		script.src = BaseURL;
@@ -80,6 +109,22 @@ class StoreFrontPreview extends React.Component {
 			});
 		};
 		this.iframeRef.current.contentDocument.body.appendChild(script);
+
+		const script1 = this.iframeRef.current.contentDocument.createElement('script');
+		script1.type = 'text/javascript';
+		script1.src =
+			'https://maps.google.com/maps/api/js?libraries=places&key=REDACTED_GOOGLE_API_KEY';
+		script1.onload = () => {
+			this.setState({
+				loading: false,
+			});
+		};
+		script1.onerror = () => {
+			this.setState({
+				loading: false,
+			});
+		};
+		this.iframeRef.current.contentDocument.body.appendChild(script1);
 	};
 
 	handleViewChange = () => {

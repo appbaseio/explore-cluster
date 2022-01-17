@@ -495,6 +495,13 @@ export const defaultSearchPreferences = {
 	resultPrice: '',
 	resultImage: '',
 	resultHandle: '',
+	mapLayout: 'map',
+	locationDatafield: '',
+	mapComponent: 'googleMap',
+	defaultZoom: 13,
+	showSearchAsMove: true,
+	showMarkerClusters: true,
+	mapsAPIkey: '',
 	storeInfo: { currency: 'USD' },
 	exportSettings: { exportAs: 'embed', credentials: '', openAsPage: false, type: 'other' },
 	showPagination: false,
@@ -507,6 +514,7 @@ export const defaultSearchPreferences = {
 		fetchingFilterOptions: 'Fetching Options',
 		searchText: 'Click here to search',
 		searchIcon: '',
+		redirectUrlText: 'View Product',
 	},
 	autoSuggestionSettings: {
 		enablePopularSuggestions: false,
@@ -697,6 +705,13 @@ export const getSearchPreferencesPayload = (formValue) => {
 				resultHighlights: get(formValue, 'resultHighlights'),
 				layout: get(formValue, 'layout'),
 				viewSwitcher: get(formValue, 'viewSwitcher'),
+				mapLayout: get(formValue, 'mapLayout'),
+				locationDatafield: get(formValue, 'locationDatafield'),
+				mapComponent: get(formValue, 'mapComponent'),
+				defaultZoom: get(formValue, 'defaultZoom'),
+				showSearchAsMove: get(formValue, 'showSearchAsMove'),
+				showMarkerClusters: get(formValue, 'showMarkerClusters'),
+				mapsAPIkey: get(formValue, 'mapsAPIkey'),
 			},
 			searchSettings: {
 				customMessages: {
@@ -705,6 +720,9 @@ export const getSearchPreferencesPayload = (formValue) => {
 				searchButton: {
 					icon: get(formValue, 'customMessages.searchIcon'),
 					text: get(formValue, 'customMessages.searchText'),
+				},
+				redirectUrlText: {
+					text: get(formValue, 'customMessages.redirectUrlText'),
 				},
 				fields: {
 					title: get(formValue, 'resultTitle'),

@@ -25,7 +25,11 @@ const Main = ({ closeForm, preferenceId }) => (
 						style={{ backgroundColor: '#fff', padding: '10px 20px' }}
 						className={container}
 					>
-						<Tabs defaultActiveKey="1" style={{ minHeight: 500 }}>
+						<Tabs
+							defaultActiveKey="1"
+							style={{ minHeight: 500 }}
+							destroyInactiveTabPane
+						>
 							<TabPane tab="General" key="1">
 								<General />
 							</TabPane>

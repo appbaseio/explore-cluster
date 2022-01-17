@@ -36,6 +36,9 @@ const SearchSettings = () => {
 					render={() => (
 						<Results
 							pipeline={form.get('pipeline') ? form.get('pipeline').value : undefined}
+							themeType={
+								form.get('themeType') ? form.get('themeType').value : 'classic'
+							}
 						/>
 					)}
 				/>

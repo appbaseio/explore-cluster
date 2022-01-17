@@ -83,6 +83,13 @@ class PreferencesFormWrapperN extends React.Component {
 						viewSwitcher: true,
 						sortOptionSelector: [],
 						resultHighlights: 'false',
+						mapLayout: 'map',
+						mapComponent: 'googleMap',
+						locationDatafield: '',
+						defaultZoom: 13,
+						showSearchAsMove: true,
+						showMarkerClusters: true,
+						mapsAPIkey: '',
 						customMessages: FormBuilder.group({
 							resultStats: '[count] products found in [time] ms',
 							noFilterItem: 'No items Found',
@@ -91,6 +98,7 @@ class PreferencesFormWrapperN extends React.Component {
 							fetchingFilterOptions: 'Fetching Options',
 							searchText: 'Click here to search',
 							searchIcon: ['', validateURL],
+							redirectUrlText: 'View Product',
 						}),
 						staticFilters: FormBuilder.group({
 							productType: getFilterConfigurationForm({
@@ -322,6 +330,35 @@ class PreferencesFormWrapperN extends React.Component {
 											preferences,
 											'resultSettings.viewSwitcher',
 										),
+										mapLayout: get(
+											preferences,
+											'resultSettings.mapLayout',
+											'map',
+										),
+										mapComponent: get(
+											preferences,
+											'resultSettings.mapComponent',
+											'googleMap',
+										),
+										locationDatafield: get(
+											preferences,
+											'resultSettings.locationDatafield',
+											'',
+										),
+										defaultZoom: get(
+											preferences,
+											'resultSettings.defaultZoom',
+											13,
+										),
+										showSearchAsMove: get(
+											preferences,
+											'resultSettings.showSearchAsMove',
+										),
+										showMarkerClusters: get(
+											preferences,
+											'resultSettings.showMarkerClusters',
+										),
+										mapsAPIkey: get(preferences, 'resultSettings.mapsAPIkey'),
 										syncSettings: get(preferences, 'syncSettings') || {},
 										customMessages: {
 											resultStats: get(
@@ -343,6 +380,10 @@ class PreferencesFormWrapperN extends React.Component {
 											searchIcon: get(
 												preferences,
 												'searchSettings.searchButton.icon',
+											),
+											redirectUrlText: get(
+												preferences,
+												'searchSettings.redirectUrlText.text',
 											),
 											...getFilterMessages(),
 										},
