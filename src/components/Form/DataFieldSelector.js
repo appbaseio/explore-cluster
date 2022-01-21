@@ -28,9 +28,24 @@ class DataFieldSelector extends React.Component {
 		};
 	}
 
+	componentDidMount() {
+		const { appbaseCredentials } = this.props;
+		if (appbaseCredentials) {
+			this.getMappings();
+		}
+	}
+
 	componentDidUpdate(prevProps) {
-		const { mappings, isAggFields, includeMappings, includeTypes } = this.props;
+		const { mappings, isAggFields, includeMappings, includeTypes, setFieldType, control } =
+			this.props;
 		if (prevProps.mappings !== mappings) {
+			if (control && control.value && mappings?.properties) {
+				setFieldType(
+					mappings?.properties[control.value.split('.keyword')[0]]?.type,
+					control,
+				);
+			}
+
 			const traversedMappings = traverseMapping(mappings || {}, undefined, {
 				isAggFields,
 				includeMappings,

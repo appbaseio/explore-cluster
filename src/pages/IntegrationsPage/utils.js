@@ -313,6 +313,12 @@ export const getFilterConfigurationForm = (customFields = {}, isDynamicFilter = 
 			showMissing: false,
 			missingLabel: undefined,
 			selectAllLabel: undefined,
+			startValue: undefined,
+			endValue: undefined,
+			startLabel: undefined,
+			endLabel: undefined,
+			showHistogram: false,
+			calendarInterval: undefined,
 			...customFields,
 		}),
 	});
@@ -324,6 +330,11 @@ export const getPriceFilterConfigurationForm = () => {
 		customize: FormBuilder.group({
 			title: undefined,
 			dataField: undefined,
+			startValue: undefined,
+			endValue: undefined,
+			startLabel: undefined,
+			endLabel: undefined,
+			showHistogram: false,
 		}),
 	});
 };
@@ -564,9 +575,24 @@ export const defaultSearchPreferences = {
 				showCheckbox: true,
 				showSearch: true,
 				showMissing: false,
+				startValue: '',
+				endValue: '',
+				startLabel: '',
+				endLabel: '',
+				showHistogram: false,
+				calendarInterval: '',
 			},
 		},
-		price: { enabled: false, customize: {} },
+		price: {
+			enabled: false,
+			customize: {
+				startValue: '',
+				endValue: '',
+				startLabel: '',
+				endLabel: '',
+				showHistogram: false,
+			},
+		},
 	},
 	dynamicFilters: [],
 	syncSettings: defaultSettings.reduce((acc, item) => ({ ...acc, [item.id]: item.value }), {}),
@@ -721,9 +747,7 @@ export const getSearchPreferencesPayload = (formValue) => {
 					icon: get(formValue, 'customMessages.searchIcon'),
 					text: get(formValue, 'customMessages.searchText'),
 				},
-				redirectUrlText: {
-					text: get(formValue, 'customMessages.redirectUrlText'),
-				},
+				redirectUrlText: get(formValue, 'customMessages.redirectUrlText'),
 				fields: {
 					title: get(formValue, 'resultTitle'),
 					description: get(formValue, 'resultDescription'),

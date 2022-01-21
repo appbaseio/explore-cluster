@@ -131,7 +131,13 @@ const Filters = () => {
 																/>
 															)}
 														</FieldControl>,
-														<CustomizeFilter />,
+														<CustomizeFilter
+															pipeline={
+																form.get('pipeline')
+																	? form.get('pipeline').value
+																	: undefined
+															}
+														/>,
 														<Button
 															onClick={() => {
 																control.parent.removeAt(index);

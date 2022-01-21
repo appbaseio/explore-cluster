@@ -105,6 +105,37 @@ const RANGE_FIELDS = [
 	'unsigned_long',
 ];
 
+const CALENDAR_INTERVAL_FIELDS = [
+	{
+		label: 'Minute',
+		value: 'minute',
+	},
+	{
+		label: 'Hour',
+		value: 'hour',
+	},
+	{
+		label: 'Day',
+		value: 'day',
+	},
+	{
+		label: 'Week',
+		value: 'week',
+	},
+	{
+		label: 'Month',
+		value: 'month',
+	},
+	{
+		label: 'Quarter',
+		value: 'quarter',
+	},
+	{
+		label: 'Year',
+		value: 'year',
+	},
+];
+
 export {
 	USER,
 	APPS,
@@ -121,4 +152,5 @@ export {
 	SAVE_HISTORY,
 	SAVE_CSB_URL,
 	RANGE_FIELDS,
+	CALENDAR_INTERVAL_FIELDS,
 };
