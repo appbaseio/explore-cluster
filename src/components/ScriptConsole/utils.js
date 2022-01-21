@@ -1,6 +1,6 @@
 export const VALID_EXECUTION_CONTEXT_KEYS = ['request', 'response', 'envs'];
 
-export const DEFAULT_EXECUTION_CONTEXT_VALUE = JSON.stringify({
+export const DEFAULT_EXECUTION_CONTEXT_VALUE = {
 	request: {
 		body: {
 			query: [
@@ -126,7 +126,25 @@ export const DEFAULT_EXECUTION_CONTEXT_VALUE = JSON.stringify({
 			platform: 'mac',
 		},
 	},
-});
+};
+
+export const getDefaultExecutionContextValue = (overrideObject = {}) => {
+	const finalObjectValue = { ...DEFAULT_EXECUTION_CONTEXT_VALUE };
+	Object.keys(overrideObject).forEach((key) => {
+		if (Object.keys(DEFAULT_EXECUTION_CONTEXT_VALUE).includes(key)) {
+			if (typeof DEFAULT_EXECUTION_CONTEXT_VALUE[key] === 'object') {
+				finalObjectValue[key] = {
+					...DEFAULT_EXECUTION_CONTEXT_VALUE[key],
+					...overrideObject[key],
+				};
+			} else {
+				finalObjectValue[key] = overrideObject[key];
+			}
+		}
+	});
+
+	return JSON.stringify(finalObjectValue);
+};
 
 export const sanitizeScriptString = (scriptString = '') =>
 	scriptString?.replace(/ {4}/g, '').replace(/(\r\n|\n|\r)/gm, '');

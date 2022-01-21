@@ -109,12 +109,13 @@ class Actions extends React.Component {
 	handleChange = (type, value, errorObj = {}) => {
 		const { actions: originalActions, onChange } = this.props;
 		let actions = JSON.parse(JSON.stringify(originalActions));
-
 		actions = actions.map((action) => {
 			if (action.type === type) {
 				return {
 					...action,
-					[type === 'script' ? 'script' : 'data']: value,
+					...(type === 'script'
+						? { script: value.scriptValue, envs: value.envs }
+						: { data: value }),
 				};
 			}
 			return action;
@@ -141,6 +142,7 @@ class Actions extends React.Component {
 						  // this is safe since script key holds the whole script value after the save action
 						  window.location.pathname.split('/').splice(-1)[0]
 						: null,
+					envs: item.envs || {},
 				};
 			}
 			if (item.type === 'promote_result' || item.type === 'hide_result') {

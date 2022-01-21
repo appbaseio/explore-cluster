@@ -17,13 +17,7 @@ const getParsedRule = (rule = {}) => {
 		values.timeframe = timeframe || null;
 		values.condition = type;
 		values.show_advance_editor = rule.show_advance_editor;
-		values.envs =
-			rule.trigger &&
-			rule.trigger.type === 'cron' &&
-			rule?.actions[0] &&
-			rule?.actions[0]?.envs
-				? rule?.actions[0]?.envs
-				: {};
+		values.envs = rule?.actions?.[0] && rule?.actions[0]?.envs ? rule?.actions[0]?.envs : {};
 		values.cronExpression =
 			rule.trigger && rule.trigger.expression ? rule.trigger.expression : '';
 

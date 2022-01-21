@@ -1,4 +1,4 @@
-import { Button, Col, Icon, Row, Select, Tag, Tooltip } from 'antd';
+import { Button, Col, Icon, Row, Select, Tag, Tooltip, Modal } from 'antd';
 import { css } from 'emotion';
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
@@ -9,18 +9,18 @@ import Flex from '../../batteries/components/shared/Flex';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 import { clearValidatedScriptRule, validateScript } from '../../batteries/modules/actions';
 import {
-	DEFAULT_EXECUTION_CONTEXT_VALUE,
 	generateScriptValidationRequestBody,
+	getDefaultExecutionContextValue,
 	sanitizeScriptString,
 } from './utils';
 import scriptTemplates from './scriptTemplates';
 
 const { Option } = Select;
+const { confirm } = Modal;
 
 const monacoOptions = {
 	cursorStyle: 'line',
-	lineNumbersMinChars: 2,
-	fontFamily: 'Monaco, monospace !important',
+	fontFamily: 'Monaco, monospace',
 	fontSize: 14,
 	autoIndent: true,
 	padding: {
@@ -152,106 +152,119 @@ const getTooltipTitle = {
 			</p>
 			<p>Following global packages are available and can be used directly:</p>
 			<table css={queryAreaTooltipTable}>
-				<tr>
-					<th>Package name</th>
-					<th>Use Global as</th>
-					<th>Typical use-case</th>
-					<th />
-				</tr>
-				<tr>
-					<td>fetch</td>
-					<td>
-						<code>fetch</code>
-					</td>
-					<td>
-						Perform additional HTTP requests, supported in both sync and async modes.
-					</td>
-					<td>
-						<a
-							href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch"
-							target="_blank"
-							rel="noreferrer"
-						>
-							Docs Reference
-						</a>
-					</td>
-				</tr>
-				<tr>
-					<td>crypto-js@4.1.1</td>
-					<td>
-						<code>CryptoJS</code>
-					</td>
-					<td>
-						Cryptographic utilities, useful for implementing request authorization using
-						any cryptographic scheme.
-					</td>
-					<td>
-						<a
-							href="https://cryptojs.gitbook.io/docs/"
-							target="_blank"
-							rel="noreferrer"
-						>
-							Docs Reference
-						</a>
-						<br />
-						<a
-							href="https://www.npmjs.com/package/crypto-js"
-							target="_blank"
-							rel="noreferrer"
-						>
-							npm module link
-						</a>
-					</td>
-				</tr>
-				<tr>
-					<td>compromise@13.11.4</td>
-					<td>
-						<code>nlp</code>
-					</td>
-					<td>
-						Blazing fast{' '}
-						<span role="img" aria-label="lightning-emoji">
-							⚡️
-						</span>{' '}
-						NLP utilities for parts of speech tagging, parsing natural language, dates,
-						numbers, and doing basic named entity recognition.
-					</td>
-					<td>
-						<a href="http://compromise.cool/" target="_blank" rel="noreferrer">
-							Docs Reference
-						</a>
-						<br />
-						<a
-							href="https://www.npmjs.com/package/compromise"
-							target="_blank"
-							rel="noreferrer"
-						>
-							npm module link
-						</a>
-					</td>
-				</tr>
-				<tr>
-					<td>lodash@4.17.21</td>
-					<td>
-						<code>_</code>
-					</td>
-					<td>Utility library delivering modularity, performance, and extras.</td>
-					<td>
-						<a href="https://lodash.com/docs/4.17.15" target="_blank" rel="noreferrer">
-							Docs Reference
-						</a>
-						<br />
-						<a
-							href="https://www.npmjs.com/package/lodash"
-							target="_blank"
-							rel="noreferrer"
-						>
-							npm module link
-						</a>
-					</td>
-				</tr>
+				<thead>
+					<tr>
+						<th>Package name</th>
+						<th>Use Global as</th>
+						<th>Typical use-case</th>
+						<th />
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>fetch</td>
+						<td>
+							<code>fetch</code>
+						</td>
+						<td>
+							Perform additional HTTP requests, supported in both sync and async
+							modes.
+						</td>
+						<td>
+							<a
+								href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch"
+								target="_blank"
+								rel="noreferrer"
+							>
+								Docs Reference
+							</a>
+						</td>
+					</tr>
+					<tr>
+						<td>crypto-js@4.1.1</td>
+						<td>
+							<code>CryptoJS</code>
+						</td>
+						<td>
+							Cryptographic utilities, useful for implementing request authorization
+							using any cryptographic scheme.
+						</td>
+						<td>
+							<a
+								href="https://cryptojs.gitbook.io/docs/"
+								target="_blank"
+								rel="noreferrer"
+							>
+								Docs Reference
+							</a>
+							<br />
+							<a
+								href="https://www.npmjs.com/package/crypto-js"
+								target="_blank"
+								rel="noreferrer"
+							>
+								npm module link
+							</a>
+						</td>
+					</tr>
+					<tr>
+						<td>compromise@13.11.4</td>
+						<td>
+							<code>nlp</code>
+						</td>
+						<td>
+							Blazing fast{' '}
+							<span role="img" aria-label="lightning-emoji">
+								⚡️
+							</span>{' '}
+							NLP utilities for parts of speech tagging, parsing natural language,
+							dates, numbers, and doing basic named entity recognition.
+						</td>
+						<td>
+							<a href="http://compromise.cool/" target="_blank" rel="noreferrer">
+								Docs Reference
+							</a>
+							<br />
+							<a
+								href="https://www.npmjs.com/package/compromise"
+								target="_blank"
+								rel="noreferrer"
+							>
+								npm module link
+							</a>
+						</td>
+					</tr>
+					<tr>
+						<td>lodash@4.17.21</td>
+						<td>
+							<code>_</code>
+						</td>
+						<td>Utility library delivering modularity, performance, and extras.</td>
+						<td>
+							<a
+								href="https://lodash.com/docs/4.17.15"
+								target="_blank"
+								rel="noreferrer"
+							>
+								Docs Reference
+							</a>
+							<br />
+							<a
+								href="https://www.npmjs.com/package/lodash"
+								target="_blank"
+								rel="noreferrer"
+							>
+								npm module link
+							</a>
+						</td>
+					</tr>
+				</tbody>
 			</table>
-			<a href="https://docs.appbase.io/" target="_blank" rel="noreferrer">
+			<a
+				href="https://docs.appbase.io/docs/search/script/gettingstarted"
+				target="_blank"
+				rel="noreferrer"
+			>
 				Read the docs for script over here
 			</a>
 		</div>
@@ -261,6 +274,8 @@ const getTooltipTitle = {
 			<p>
 				A script typically executes in a request / response cycle. You can simulate this
 				context by defining your own request and response bodies as well as environments.
+				The execution context is only meant to validate the script and isn’t available at
+				the runtime.
 			</p>
 			<p>Your handler function has access to the execution context via the context global.</p>
 			<p>Access Examples:</p>
@@ -287,27 +302,35 @@ const getTooltipTitle = {
 	'execute-button': <div>Execute the script request</div>,
 };
 
+const DEFAULT_QUERY_EDITOR_VALUE = '// query here';
+
 const ScriptConsole = ({
 	validatedscriptRule,
 	validateScriptRule,
 	clearValidatedScriptRule: clearValidationValueFromStore,
 	scriptRule,
 	onScriptSave,
+	envs,
 }) => {
 	const scriptEditorRef = useRef(null);
-	const [scriptRuleValue, setScriptRuleValue] = useState(
-		scriptTemplates[Object.keys(scriptTemplates)[0]],
-	);
+	const isNewScriptRule = useRef(!scriptRule);
+	const [scriptRuleValue, setScriptRuleValue] = useState('');
+
 	const [executionContext, setExecutionContext] = useState('');
 	const [scriptRuleValidationResponse, setScriptRuleValidationResponse] = useState('');
 
-	const [selectedTemplateKey, setSelectedTemplateKey] = useState(Object.keys(scriptTemplates)[0]);
+	const [selectedTemplateKey, setSelectedTemplateKey] = useState('');
 
 	useEffect(() => {
+		if (!scriptRule) {
+			isNewScriptRule.current = true;
+		}
+
 		return () => {
 			clearValidationValueFromStore();
 		};
 	}, []);
+
 	useEffect(() => {
 		if (scriptEditorRef && scriptEditorRef.current) {
 			scriptEditorRef.current.trigger('', 'editor.action.formatDocument');
@@ -342,6 +365,16 @@ const ScriptConsole = ({
 		}
 	}, [validatedscriptRule]);
 
+	useEffect(() => {
+		if (
+			isNewScriptRule.current &&
+			!!scriptRuleValue &&
+			scriptRuleValue.trim() !== DEFAULT_QUERY_EDITOR_VALUE.trim()
+		) {
+			isNewScriptRule.current = false;
+		}
+	}, [scriptRuleValue]);
+
 	const triggerScriptRuleValidation = () => {
 		try {
 			validateScriptRule(
@@ -362,8 +395,27 @@ const ScriptConsole = ({
 	};
 
 	const onTemplateSelect = (value) => {
-		setScriptRuleValue(scriptTemplates[value]);
-		setSelectedTemplateKey(value);
+		const actionCallback = () => {
+			setScriptRuleValue(scriptTemplates[value]);
+			setSelectedTemplateKey(value);
+			if (isNewScriptRule.current) {
+				isNewScriptRule.current = false;
+			}
+		};
+
+		if (!isNewScriptRule.current && !selectedTemplateKey) {
+			confirm({
+				title: 'Do you want to proceed?',
+				content:
+					'By choosing this script template, your existing script will get overridden.',
+				onOk() {
+					actionCallback();
+				},
+				onCancel() {},
+			});
+		} else {
+			actionCallback();
+		}
 	};
 
 	const renderResponseCodeTime = () => {
@@ -415,6 +467,7 @@ const ScriptConsole = ({
 			</Flex>
 		);
 	};
+
 	return (
 		<Row justify="space-between" css={scriptConsoleCss}>
 			<Col span={12} className="script-console__col query-area">
@@ -446,24 +499,31 @@ const ScriptConsole = ({
 							</span>
 						</Tooltip>
 					</h3>
-
-					<Select
-						showSearch
-						size="small"
-						style={{ width: '300px' }}
-						placeholder="Select a Script Template"
-						defaultValue={Object.keys(scriptTemplates)[0]}
-						onChange={onTemplateSelect}
-						value={selectedTemplateKey}
+					<Tooltip
+						visible={isNewScriptRule.current}
+						placement="top"
+						title="Choose a template to start with!"
 					>
-						{getTemplateDropdownOptions()}
-					</Select>
+						<Select
+							defaultOpen={isNewScriptRule.current}
+							showSearch
+							size="small"
+							style={{ width: '300px' }}
+							placeholder="Select a Script Template"
+							onChange={onTemplateSelect}
+							value={selectedTemplateKey}
+						>
+							{getTemplateDropdownOptions()}
+						</Select>
+					</Tooltip>
 				</Flex>
 				<Monaco
-					defaultValue="// query here"
+					defaultValue={DEFAULT_QUERY_EDITOR_VALUE}
 					language="javascript"
 					value={scriptRuleValue}
-					onChange={(value) => setScriptRuleValue(value)}
+					onChange={(value) => {
+						setScriptRuleValue(value);
+					}}
 					theme="vs-dark"
 					options={monacoOptions}
 					readOnly={false}
@@ -504,7 +564,7 @@ const ScriptConsole = ({
 						</Flex>
 
 						<Monaco
-							defaultValue={DEFAULT_EXECUTION_CONTEXT_VALUE}
+							defaultValue={getDefaultExecutionContextValue({ envs })}
 							language="json"
 							value={executionContext}
 							onChange={(value) => setExecutionContext(value)}
@@ -549,6 +609,7 @@ ScriptConsole.defaultProps = {
 	scriptRule: '',
 	validatedscriptRule: {},
 	onScriptSave: () => {},
+	envs: {},
 };
 
 ScriptConsole.propTypes = {
@@ -557,6 +618,7 @@ ScriptConsole.propTypes = {
 	clearValidatedScriptRule: PropTypes.func.isRequired,
 	scriptRule: PropTypes.string,
 	onScriptSave: PropTypes.func,
+	envs: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({

@@ -15,14 +15,12 @@ import { mediaKey } from './utils/media';
 // eslint-disable-next-line
 injectGlobal`
 * {
+
+	&:not(.monaco-editor), &:not(.view-line*span) {
+  		font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Noto Sans', 'Ubuntu', 'Droid Sans', 'Helvetica Neue', sans-serif;
+	}
 	box-sizing: border-box;
-	font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Noto Sans', 'Ubuntu', 'Droid Sans', 'Helvetica Neue', sans-serif;
-}
-// monaco-editor is applied this property globally due to conflicting styles
-// forcing the font locally in a file led to text selection issue
-// wherein the text flickered as the user selected it
-.monaco-editor{
-	font-family: Monaco, monospace !important;
+
 }
 body {
 	background-color: #fafafa !important;

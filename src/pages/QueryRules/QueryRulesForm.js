@@ -232,9 +232,6 @@ class QueryRulesForm extends React.Component {
 			editorKey: Date.now(),
 			previewCount: 0,
 			cronExpression: '',
-			envs: {},
-			environmentValue: '',
-			environmentKey: '',
 		};
 	}
 
@@ -423,17 +420,6 @@ class QueryRulesForm extends React.Component {
 		);
 	};
 
-	handleEnvsChange = () => {
-		const { envs, environmentValue, environmentKey } = this.state;
-		const newEnvs = { ...envs };
-		newEnvs[environmentKey] = environmentValue;
-		this.setState({
-			envs: newEnvs,
-			environmentValue: '',
-			environmentKey: '',
-		});
-	};
-
 	handleDropdown = (name, value) => {
 		this.setState(
 			{
@@ -532,10 +518,7 @@ class QueryRulesForm extends React.Component {
 			fieldMap,
 			type,
 			indexType,
-			envs,
 			cronExpression,
-			environmentKey,
-			environmentValue,
 		} = this.state;
 
 		let { actions } = this.state;
@@ -545,16 +528,6 @@ class QueryRulesForm extends React.Component {
 		const hasError = !!Object.keys(error).length;
 
 		const suffixExpression = `and ${parseExpression(advancedExpression, fieldMap)}`;
-
-		const newEnvs = { ...envs };
-		if (environmentKey && environmentValue) {
-			newEnvs[environmentKey] = environmentValue;
-			this.setState({
-				envs: newEnvs,
-				environmentValue: '',
-				environmentKey: '',
-			});
-		}
 
 		function getExpression() {
 			if (condition === 'always') {
@@ -610,11 +583,6 @@ class QueryRulesForm extends React.Component {
 						...action,
 						data: get(action, 'data.function.service') || action.data,
 					};
-				}
-				if (condition === 'cron' && action.type === 'script') {
-					const newAction = { ...action };
-					newAction.envs = envs;
-					return newAction;
 				}
 				return action;
 			});
@@ -945,9 +913,6 @@ class QueryRulesForm extends React.Component {
 			editorKey,
 			subFieldsMap,
 			cronExpression,
-			envs,
-			environmentKey,
-			environmentValue,
 			visible,
 			previewCount,
 			previewType,
@@ -1290,74 +1255,6 @@ class QueryRulesForm extends React.Component {
 												placeholder="Enter Cron Expression"
 												onChange={this.handleInput}
 											/>
-										</div>
-										<div>
-											Set Environment
-											{envs && Object.keys(envs).length
-												? Object.keys(envs).map((field) => (
-														<div
-															style={{
-																display: 'flex',
-																alignItems: 'center',
-																gap: '10px',
-															}}
-														>
-															<Input
-																name="environmentKey"
-																value={field}
-																placeholder="Key"
-																onChange={this.handleInput}
-															/>
-															<Input
-																name="environmentValue"
-																value={envs[field]}
-																placeholder="Value"
-																onChange={this.handleInput}
-															/>
-															<Icon
-																type="delete"
-																style={{
-																	marginBottom: 15,
-																	color: 'red',
-																}}
-																onClick={() => {
-																	const newEnvs = { ...envs };
-																	delete newEnvs[field];
-																	this.setState({
-																		envs: newEnvs,
-																	});
-																}}
-															/>
-														</div>
-												  ))
-												: null}
-											<div
-												style={{
-													display: 'flex',
-													alignItems: 'center',
-													gap: '10px',
-												}}
-											>
-												<Input
-													name="environmentKey"
-													value={environmentKey}
-													placeholder="Key"
-													onChange={this.handleInput}
-													style={{ margin: 0 }}
-												/>
-												<Input
-													name="environmentValue"
-													value={environmentValue}
-													placeholder="Value"
-													onChange={this.handleInput}
-													style={{ margin: 0 }}
-												/>
-												<Icon
-													type="plus"
-													style={{ color: '#1990ff' }}
-													onClick={this.handleEnvsChange}
-												/>
-											</div>
 										</div>
 									</>
 								)}
