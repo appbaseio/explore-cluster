@@ -5,6 +5,7 @@ import { Button } from 'antd';
 import get from 'lodash/get';
 import isEqual from 'lodash/isEqual';
 import { connect } from 'react-redux';
+import { diff } from 'jsondiffpatch';
 import {
 	saveSearchPreferenceN,
 	saveRecommendationPreferenceN,
@@ -16,7 +17,6 @@ import {
 	getRecommendationPreferenceById,
 } from '../../batteries/modules/selectors';
 import { displayErrors } from '../../batteries/utils/helpers';
-
 import {
 	FormContext,
 	getRecommendationPreferencesPayload,
@@ -58,19 +58,17 @@ class SavePreferencesN extends React.Component {
 	}
 
 	handleChange = () => {
-		const { compareChange } = this;
-		const { hasChanged } = this.state;
-		if (compareChange !== hasChanged) {
-			this.setState({
-				hasChanged: this.compareChange,
-			});
-			if (compareChange) {
-				window.onbeforeunload = () => {
-					return 'You have unsaved changes, are you sure you want to leave?';
-				};
-			} else {
-				window.onbeforeunload = () => {};
-			}
+		const isChanged = this.compareChange;
+
+		this.setState({
+			hasChanged: isChanged,
+		});
+		if (isChanged) {
+			window.onbeforeunload = () => {
+				return 'You have unsaved changes, are you sure you want to leave?';
+			};
+		} else {
+			window.onbeforeunload = () => {};
 		}
 	};
 
@@ -80,11 +78,43 @@ class SavePreferencesN extends React.Component {
 			recommendationsPreferences,
 			searchPreferences,
 			getPreferencesPayload,
+			form,
 		} = this.props;
-		return !isEqual(
-			isRecommendation ? recommendationsPreferences : searchPreferences,
-			getPreferencesPayload(),
-		);
+
+		let newPreferences = {};
+		if (isRecommendation) {
+			newPreferences = recommendationsPreferences;
+			delete newPreferences.resultSettings.layout;
+			delete newPreferences.resultSettings.viewSwitcher;
+		} else {
+			newPreferences = searchPreferences;
+			if (newPreferences.resultSettings && !newPreferences.resultSettings.resultHighlight) {
+				newPreferences.resultSettings.resultHighlight = false;
+			}
+
+			const diffData = diff(newPreferences, getPreferencesPayload());
+			if (
+				form.get('csbID').value &&
+				(diffData?.facetSettings ||
+					diffData?.globalSettings ||
+					diffData?.themeSettings ||
+					diffData?.resultSettings ||
+					diffData?.searchSettings ||
+					diffData?.pipeline)
+			) {
+				form.get('csbID').setValue('');
+				form.get('hasEdited').setValue(false);
+			}
+			if (get(diffData, 'searchSettings.redirectUrlText', '')) {
+				newPreferences.searchSettings.redirectUrlText = 'View Product';
+			}
+		}
+		delete newPreferences.type;
+		delete newPreferences.deploySettings;
+		delete newPreferences.created_at;
+		delete newPreferences.updated_at;
+
+		return !isEqual(newPreferences, getPreferencesPayload());
 	}
 
 	handleSave = () => {
@@ -93,32 +123,36 @@ class SavePreferencesN extends React.Component {
 			updateSearchPreferences,
 			updateRecommendationsPreferences,
 			getPreferencesPayload,
-			getSearchPreferences,
-			getRecommendationsPreferences,
 			closeForm,
 		} = this.props;
+
 		if (isRecommendation) {
 			updateRecommendationsPreferences(getPreferencesPayload()).then((action) => {
 				if (!(action && action.error)) {
+					this.setState({
+						hasChanged: false,
+					});
 					closeForm();
-					// fetch preferences
-					getRecommendationsPreferences();
 				}
 			});
 		} else {
-			updateSearchPreferences(getPreferencesPayload()).then((action) => {
-				if (!(action && action.error)) {
-					closeForm();
-					// fetch preferences
-					getSearchPreferences();
-				}
-			});
+			updateSearchPreferences(getPreferencesPayload(getPreferencesPayload())).then(
+				(action) => {
+					if (!(action && action.error)) {
+						this.setState({
+							hasChanged: false,
+						});
+						closeForm();
+					}
+				},
+			);
 		}
 	};
 
 	render() {
 		const { label, buttonProps, isLoading } = this.props;
 		const { hasChanged } = this.state;
+
 		return (
 			<>
 				<Prompt

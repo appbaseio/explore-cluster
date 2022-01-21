@@ -91,8 +91,11 @@ class SyncStatus extends React.Component {
 
 	render() {
 		const { documents, products, collections } = this.state;
+		const { form } = this.props;
+		const title = form.get('name') ? form.get('name').value : '';
 		return (
 			<Card>
+				<h2>{title}</h2>
 				<Flex justifyContent="space-between" alignItems="center">
 					{this.isShopify ? (
 						<div>

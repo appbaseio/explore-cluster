@@ -468,9 +468,15 @@ export const defaultSettings = [
 ];
 
 export const defaultRecommendationsPreferences = {
+	name: '',
+	description: '',
+	pipeline: '',
+	id: '',
 	logoUrl: '',
 	logoWidth: 20,
 	logoAlignment: 'left',
+	csbID: '',
+	hasEdited: false,
 	themeType: 'classic',
 	primaryColor: '#0B6AFF',
 	primaryTextColor: '#fff',
@@ -491,9 +497,15 @@ export const defaultRecommendationsPreferences = {
 };
 
 export const defaultSearchPreferences = {
+	name: '',
+	description: '',
+	pipeline: '',
+	id: '',
 	logoUrl: '',
 	logoWidth: 20,
 	logoAlignment: 'left',
+	csbID: '',
+	hasEdited: false,
 	themeType: 'classic',
 	primaryColor: '#0B6AFF',
 	primaryTextColor: '#fff',
@@ -506,13 +518,9 @@ export const defaultSearchPreferences = {
 	resultPrice: '',
 	resultImage: '',
 	resultHandle: '',
-	mapLayout: 'map',
-	locationDatafield: '',
-	mapComponent: 'googleMap',
-	defaultZoom: 13,
-	showSearchAsMove: true,
-	showMarkerClusters: true,
-	mapsAPIkey: '',
+	layout: 'grid',
+	resultHighlight: false,
+	viewSwitcher: true,
 	storeInfo: { currency: 'USD' },
 	exportSettings: { exportAs: 'embed', credentials: '', openAsPage: false, type: 'other' },
 	showPagination: false,
@@ -527,6 +535,8 @@ export const defaultSearchPreferences = {
 		searchIcon: '',
 		redirectUrlText: 'View Product',
 	},
+	autosuggest: true,
+	showVoiceSearch: true,
 	autoSuggestionSettings: {
 		enablePopularSuggestions: false,
 		enableRecentSearches: false,
@@ -536,6 +546,7 @@ export const defaultSearchPreferences = {
 		productType: {
 			enabled: false,
 			customize: {
+				filterType: 'list',
 				queryFormat: 'or',
 				sortBy: 'count',
 				showCount: true,
@@ -547,6 +558,7 @@ export const defaultSearchPreferences = {
 		collections: {
 			enabled: false,
 			customize: {
+				filterType: 'list',
 				queryFormat: 'or',
 				sortBy: 'count',
 				showCount: true,
@@ -558,6 +570,7 @@ export const defaultSearchPreferences = {
 		color: {
 			enabled: false,
 			customize: {
+				filterType: 'list',
 				queryFormat: 'or',
 				sortBy: 'count',
 				showCount: true,
@@ -569,6 +582,7 @@ export const defaultSearchPreferences = {
 		size: {
 			enabled: false,
 			customize: {
+				filterType: 'list',
 				queryFormat: 'or',
 				sortBy: 'count',
 				showCount: true,
@@ -604,6 +618,7 @@ export const getRecommendationPreferencesPayload = (formValue) => {
 			name: get(formValue, 'name'),
 			description: get(formValue, 'description'),
 			pipeline: get(formValue, 'pipeline'),
+			id: get(formValue, 'id'),
 			themeSettings: {
 				type: get(formValue, 'themeType'),
 				customCss: get(formValue, 'customCss'),
@@ -684,6 +699,7 @@ export const getSearchPreferencesPayload = (formValue) => {
 			name: get(formValue, 'name'),
 			description: get(formValue, 'description'),
 			pipeline: get(formValue, 'pipeline'),
+			id: get(formValue, 'id'),
 			themeSettings: {
 				type: get(formValue, 'themeType'),
 				customCss: get(formValue, 'customCss'),
@@ -708,6 +724,10 @@ export const getSearchPreferencesPayload = (formValue) => {
 						logoWidth: get(formValue, 'logoWidth'),
 						logoAlignment: get(formValue, 'logoAlignment'),
 					},
+					deploySettings: {
+						csbID: get(formValue, 'csbID'),
+						hasEdited: get(formValue, 'hasEdited'),
+					},
 				},
 			},
 			exportSettings: get(formValue, 'exportSettings'),
@@ -728,16 +748,18 @@ export const getSearchPreferencesPayload = (formValue) => {
 					infiniteScroll: !get(formValue, 'showPagination'),
 				},
 				sortOptionSelector: get(formValue, 'sortOptionSelector'),
-				resultHighlights: get(formValue, 'resultHighlights'),
+				resultHighlight: get(formValue, 'resultHighlight'),
 				layout: get(formValue, 'layout'),
 				viewSwitcher: get(formValue, 'viewSwitcher'),
-				mapLayout: get(formValue, 'mapLayout'),
-				locationDatafield: get(formValue, 'locationDatafield'),
-				mapComponent: get(formValue, 'mapComponent'),
-				defaultZoom: get(formValue, 'defaultZoom'),
-				showSearchAsMove: get(formValue, 'showSearchAsMove'),
-				showMarkerClusters: get(formValue, 'showMarkerClusters'),
-				mapsAPIkey: get(formValue, 'mapsAPIkey'),
+				...(get(formValue, 'themeType') === 'geo' && {
+					mapLayout: get(formValue, 'mapLayout'),
+					locationDataField: get(formValue, 'locationDataField'),
+					mapComponent: get(formValue, 'mapComponent'),
+					defaultZoom: get(formValue, 'defaultZoom'),
+					showSearchAsMove: get(formValue, 'showSearchAsMove'),
+					showMarkerClusters: get(formValue, 'showMarkerClusters'),
+					mapsAPIkey: get(formValue, 'mapsAPIkey'),
+				}),
 			},
 			searchSettings: {
 				customMessages: {

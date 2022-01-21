@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { withRouter } from 'react-router-dom';
 import get from 'lodash/get';
-import { func, array, bool } from 'prop-types';
+import { func, array, bool, object } from 'prop-types';
 import { css } from 'react-emotion';
 import { Table, Card, Button } from 'antd';
 import { connect } from 'react-redux';
@@ -11,7 +12,6 @@ import Container from '../../../components/Container';
 import { displayErrors } from '../../../batteries/utils/helpers';
 import usePrevious from '../../../batteries/hooks/usePrevious';
 import { getSearchPreferencesN, deleteSearchPreferenceN } from '../../../batteries/modules/actions';
-import Main from './Main';
 
 const columns = [
 	{
@@ -59,20 +59,13 @@ const List = ({
 	isFetchingPreferences,
 	isDeletingPreference,
 	deleteSearchPreference,
+	history,
 }) => {
-	const [showForm, setShowForm] = useState(false);
-	const [preferenceId, setPreferenceId] = useState(undefined);
 	const handleCreate = () => {
-		setPreferenceId(null);
-		setShowForm(true);
-	};
-	const closeForm = () => {
-		setPreferenceId(null);
-		setShowForm(false);
+		history.push('/cluster/search-builder/new');
 	};
 	const handleEdit = (id) => {
-		setPreferenceId(id);
-		setShowForm(true);
+		history.push(`/cluster/search-builder/${id}`);
 	};
 	const handleDelete = (id) => {
 		deleteSearchPreference(id).then((action) => {
@@ -82,6 +75,7 @@ const List = ({
 			}
 		});
 	};
+
 	useEffect(() => {
 		// fetch preferences
 		getPreferences();
@@ -91,16 +85,14 @@ const List = ({
 	useEffect(() => {
 		displayErrors(errors, prevErrors);
 	}, [errors]);
-	if (showForm) {
-		return <Main closeForm={closeForm} preferenceId={preferenceId} />;
-	}
+
 	return (
 		<Container>
 			<Card
-				title="Manage Search Preferences"
+				title="Manage Search UIs"
 				extra={
 					<Button onClick={handleCreate} type="primary" icon="plus">
-						Create Preference{' '}
+						Create Search UI{' '}
 					</Button>
 				}
 			>
@@ -144,6 +136,7 @@ List.propTypes = {
 	isDeletingPreference: bool,
 	errors: array,
 	preferences: array,
+	history: object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -158,4 +151,4 @@ const mapDispatchToProps = (dispatch) => ({
 	deleteSearchPreference: (id) => dispatch(deleteSearchPreferenceN(id)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(List);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(List));

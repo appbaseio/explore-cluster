@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
+import { withRouter } from 'react-router-dom';
 import get from 'lodash/get';
-import { func, array, bool } from 'prop-types';
+import { func, array, bool, object } from 'prop-types';
 import { css } from 'react-emotion';
 import { Table, Card, Button } from 'antd';
 import { connect } from 'react-redux';
@@ -14,7 +15,6 @@ import {
 	getRecommendationsPreferencesN,
 	deleteRecommendationPreferenceN,
 } from '../../../batteries/modules/actions';
-import Main from './Main';
 
 const columns = [
 	{
@@ -62,20 +62,13 @@ const List = ({
 	isFetchingPreferences,
 	isDeletingPreference,
 	deletePreference,
+	history,
 }) => {
-	const [showForm, setShowForm] = useState(false);
-	const [preferenceId, setPreferenceId] = useState(undefined);
 	const handleCreate = () => {
-		setPreferenceId(null);
-		setShowForm(true);
-	};
-	const closeForm = () => {
-		setPreferenceId(null);
-		setShowForm(false);
+		history.push('/cluster/recommendations-builder/new');
 	};
 	const handleEdit = (id) => {
-		setPreferenceId(id);
-		setShowForm(true);
+		history.push(`/cluster/recommendations-builder/${id}`);
 	};
 	const handleDelete = (id) => {
 		deletePreference(id).then((action) => {
@@ -85,6 +78,7 @@ const List = ({
 			}
 		});
 	};
+
 	useEffect(() => {
 		// fetch preferences
 		getPreferences();
@@ -94,16 +88,14 @@ const List = ({
 	useEffect(() => {
 		displayErrors(errors, prevErrors);
 	}, [errors]);
-	if (showForm) {
-		return <Main closeForm={closeForm} preferenceId={preferenceId} />;
-	}
+
 	return (
 		<Container>
 			<Card
-				title="Manage Recommendations Preferences"
+				title="Manage Recommendation UIs"
 				extra={
 					<Button onClick={handleCreate} type="primary" icon="plus">
-						Create Preference{' '}
+						Create Recommendation UI{' '}
 					</Button>
 				}
 			>
@@ -147,6 +139,7 @@ List.propTypes = {
 	isDeletingPreference: bool,
 	errors: array,
 	preferences: array,
+	history: object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -161,4 +154,4 @@ const mapDispatchToProps = (dispatch) => ({
 	deletePreference: (id) => dispatch(deleteRecommendationPreferenceN(id)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(List);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(List));

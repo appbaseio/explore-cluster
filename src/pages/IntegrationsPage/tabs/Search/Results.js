@@ -41,7 +41,7 @@ const defaultSettings = [
 		value: false,
 	},
 	{
-		id: 'resultHighlights',
+		id: 'resultHighlight',
 		label: 'Enable results highlights',
 		value: false,
 	},
@@ -130,7 +130,7 @@ const geoDefaultSettings = [
 		value: false,
 	},
 	{
-		id: 'locationDatafield',
+		id: 'locationDataField',
 		label: 'Select the data field to display the location of the item',
 		value: false,
 	},
@@ -188,7 +188,7 @@ const fieldSelectorIds = [
 	'resultPrice',
 	'resultImage',
 	'resultHandle',
-	'locationDatafield',
+	'locationDataField',
 ];
 
 const geoOptions = [
@@ -199,7 +199,7 @@ const geoOptions = [
 	'showSearchAsMove',
 	'mapsAPIkey',
 	'showMarkerClusters',
-	'locationDatafield',
+	'locationDataField',
 	'resultTitle',
 	'resultDescription',
 	'resultPrice',
@@ -305,6 +305,7 @@ const Results = ({
 											actions={[
 												<Radio.Group
 													{...control.handler()}
+													value={control.handler().value || 'googleMap'}
 													onChange={(value) => {
 														control.markAsTouched();
 														control.handler().onChange(value);
@@ -330,7 +331,7 @@ const Results = ({
 										<Item
 											actions={[
 												<InputNumber
-													value={value}
+													value={value || 13}
 													onChange={onChange}
 													min={0}
 													max={20}

@@ -94,6 +94,30 @@ const RecommendationsIntegrationsPage = Loadable({
 	loading: Loader,
 });
 
+const inlineCodesandboxPage = Loadable({
+	loader: () =>
+		import(
+			/* webpackChunkName: "inlineCodesandboxPage" */ '../../pages/IntegrationsPage/CodeSandboxModal'
+		),
+	loading: Loader,
+});
+
+const SearchPreferencePage = Loadable({
+	loader: () =>
+		import(
+			/* webpackChunkName: "SearchPreferencePage" */ '../../pages/IntegrationsPage/SearchN/Main'
+		),
+	loading: Loader,
+});
+
+const RecommendationsPreferencePage = Loadable({
+	loader: () =>
+		import(
+			/* webpackChunkName: "RecommendationsPreferencePage" */ '../../pages/IntegrationsPage/RecommendationsN/Main'
+		),
+	loading: Loader,
+});
+
 const ShareSettings = Loadable({
 	loader: () =>
 		import(/* webpackChunkName: "ShareSettingsPage" */ '../../pages/ShareSettingsPage'),
@@ -361,11 +385,52 @@ class ClusterRouteContainer extends React.Component {
 					/>
 					<Route
 						exact
+						path="/cluster/search-builder/:id"
+						render={(props) => (
+							<AppPageContainer {...props} component={SearchPreferencePage} />
+						)}
+					/>
+					<Route
+						exact
+						path="/cluster/search-builder/new"
+						render={(props) => (
+							<AppPageContainer {...props} component={SearchPreferencePage} />
+						)}
+					/>
+					<Route
+						exact
+						path="/cluster/search-builder/:id/code"
+						render={(props) => (
+							<AppPageContainer {...props} component={inlineCodesandboxPage} />
+						)}
+					/>
+					<Route
+						exact
 						path="/cluster/recommendations-builder"
 						render={(props) => (
 							<AppPageContainer
 								{...props}
 								component={RecommendationsIntegrationsPage}
+							/>
+						)}
+					/>
+					<Route
+						exact
+						path="/cluster/recommendations-builder/:id"
+						render={(props) => (
+							<AppPageContainer
+								{...props}
+								component={RecommendationsPreferencePage}
+							/>
+						)}
+					/>
+					<Route
+						exact
+						path="/cluster/recommendations-builder/new"
+						render={(props) => (
+							<AppPageContainer
+								{...props}
+								component={RecommendationsPreferencePage}
 							/>
 						)}
 					/>

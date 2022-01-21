@@ -1,8 +1,10 @@
 import React from 'react';
 import get from 'lodash/get';
-import { string, func, bool, object } from 'prop-types';
+import { string, func, bool, object, array } from 'prop-types';
 import { connect } from 'react-redux';
-import { Button } from 'antd';
+import { withRouter } from 'react-router-dom';
+import { css } from 'react-emotion';
+import { Button, Icon, Popconfirm, Tooltip } from 'antd';
 import { FormBuilder, Validators } from 'react-reactive-form';
 import {
 	FormContext,
@@ -23,7 +25,31 @@ import {
 	getSearchPreferenceById,
 	getRecommendationPreferenceById,
 } from '../../batteries/modules/selectors';
+import {
+	getSearchPreferencesN,
+	getRecommendationsPreferencesN,
+} from '../../batteries/modules/actions';
 
+const modalStyles = css`
+	.header-container {
+		padding: 16px 24px;
+		color: rgba(0, 0, 0, 0.65);
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		font-size: 20px;
+		position: absolute;
+		top: 0;
+		right: 0;
+		left: 0;
+		z-index: 999;
+		background: white;
+		height: 60px;
+	}
+	.close-icon {
+		cursor: pointer;
+	}
+`;
 class PreferencesFormWrapperN extends React.Component {
 	constructor(props) {
 		super(props);
@@ -31,6 +57,7 @@ class PreferencesFormWrapperN extends React.Component {
 			name: '',
 			description: '',
 			pipeline: [undefined, Validators.required],
+			id: '',
 			// Custom Logo Settings
 			logoUrl: '',
 			logoWidth: 20,
@@ -68,6 +95,8 @@ class PreferencesFormWrapperN extends React.Component {
 				  }
 				: {
 						// Search specific controls
+						csbID: '',
+						hasEdited: false,
 						autoSuggestionSettings: FormBuilder.group({
 							enablePopularSuggestions: false,
 							enableRecentSearches: false,
@@ -82,14 +111,14 @@ class PreferencesFormWrapperN extends React.Component {
 						layout: 'grid',
 						viewSwitcher: true,
 						sortOptionSelector: [],
-						resultHighlights: 'false',
+						resultHighlight: false,
 						mapLayout: 'map',
 						mapComponent: 'googleMap',
-						locationDatafield: '',
+						locationDataField: 'location',
 						defaultZoom: 13,
 						showSearchAsMove: true,
 						showMarkerClusters: true,
-						mapsAPIkey: '',
+						mapsAPIkey: 'REDACTED_GOOGLE_API_KEY',
 						customMessages: FormBuilder.group({
 							resultStats: '[count] products found in [time] ms',
 							noFilterItem: 'No items Found',
@@ -125,6 +154,35 @@ class PreferencesFormWrapperN extends React.Component {
 	}
 
 	componentDidMount() {
+		const {
+			isRecommendation,
+			allSearchPreferences,
+			getSearchPreferences,
+			getRecommendationsPreferences,
+			allRecommendationsPreferences,
+		} = this.props;
+
+		if (!isRecommendation && !allSearchPreferences.length) {
+			getSearchPreferences();
+		}
+		if (isRecommendation && !allRecommendationsPreferences.length) {
+			getRecommendationsPreferences();
+		}
+
+		this.getFormPreferences();
+	}
+
+	componentDidUpdate(prevProps) {
+		const { searchPreferences, recommendationsPreferences } = this.props;
+		if (
+			prevProps.searchPreferences !== searchPreferences ||
+			prevProps.recommendationsPreferences !== recommendationsPreferences
+		) {
+			this.getFormPreferences();
+		}
+	}
+
+	getFormPreferences = () => {
 		const { isRecommendation, searchPreferences, recommendationsPreferences } = this.props;
 
 		let preferences;
@@ -201,6 +259,7 @@ class PreferencesFormWrapperN extends React.Component {
 							name: get(preferences, 'name', ''),
 							description: get(preferences, 'description', ''),
 							pipeline: get(preferences, 'pipeline', ''),
+							id: get(preferences, 'id', ''),
 							logoUrl: get(preferences, 'globalSettings.meta.branding.logoUrl', ''),
 							logoWidth: get(
 								preferences,
@@ -290,6 +349,16 @@ class PreferencesFormWrapperN extends React.Component {
 										}),
 								  }
 								: {
+										csbID: get(
+											preferences,
+											'globalSettings.meta.deploySettings.csbID',
+											'',
+										),
+										hasEdited: get(
+											preferences,
+											'globalSettings.meta.deploySettings.hasEdited',
+											'',
+										),
 										autosuggest: get(
 											preferences,
 											'searchSettings.rsConfig.autosuggest',
@@ -307,7 +376,6 @@ class PreferencesFormWrapperN extends React.Component {
 											preferences,
 											'searchSettings.rsConfig.enablePredictiveSuggestions',
 										),
-
 										showSelectedFilters: get(
 											preferences,
 											'globalSettings.showSelectedFilters',
@@ -320,9 +388,9 @@ class PreferencesFormWrapperN extends React.Component {
 											preferences,
 											'resultSettings.sortOptionSelector',
 										),
-										resultHighlights: get(
+										resultHighlight: get(
 											preferences,
-											'resultSettings.resultHighlights',
+											'resultSettings.resultHighlight',
 											false,
 										),
 										layout: get(preferences, 'resultSettings.layout') || 'grid',
@@ -330,35 +398,40 @@ class PreferencesFormWrapperN extends React.Component {
 											preferences,
 											'resultSettings.viewSwitcher',
 										),
-										mapLayout: get(
-											preferences,
-											'resultSettings.mapLayout',
-											'map',
-										),
-										mapComponent: get(
-											preferences,
-											'resultSettings.mapComponent',
-											'googleMap',
-										),
-										locationDatafield: get(
-											preferences,
-											'resultSettings.locationDatafield',
-											'',
-										),
-										defaultZoom: get(
-											preferences,
-											'resultSettings.defaultZoom',
-											13,
-										),
-										showSearchAsMove: get(
-											preferences,
-											'resultSettings.showSearchAsMove',
-										),
-										showMarkerClusters: get(
-											preferences,
-											'resultSettings.showMarkerClusters',
-										),
-										mapsAPIkey: get(preferences, 'resultSettings.mapsAPIkey'),
+										...(get(preferences, 'themeSettings.type') === 'geo' && {
+											mapLayout: get(
+												preferences,
+												'resultSettings.mapLayout',
+												'map',
+											),
+											mapComponent: get(
+												preferences,
+												'resultSettings.mapComponent',
+												'googleMap',
+											),
+											locationDataField: get(
+												preferences,
+												'resultSettings.locationDataField',
+												'',
+											),
+											defaultZoom: get(
+												preferences,
+												'resultSettings.defaultZoom',
+												13,
+											),
+											showSearchAsMove: get(
+												preferences,
+												'resultSettings.showSearchAsMove',
+											),
+											showMarkerClusters: get(
+												preferences,
+												'resultSettings.showMarkerClusters',
+											),
+											mapsAPIkey: get(
+												preferences,
+												'resultSettings.mapsAPIkey',
+											),
+										}),
 										syncSettings: get(preferences, 'syncSettings') || {},
 										customMessages: {
 											resultStats: get(
@@ -496,7 +569,7 @@ class PreferencesFormWrapperN extends React.Component {
 			});
 			this.form.get('autoSuggestionSettings').valueChanges.subscribe(() => {});
 		}
-	}
+	};
 
 	getPreferencesPayload = () => {
 		const { isRecommendation } = this.props;
@@ -530,19 +603,54 @@ class PreferencesFormWrapperN extends React.Component {
 	};
 
 	render() {
-		const { children, closeForm } = this.props;
+		const { children, closeForm, history, location, match, isRecommendation } = this.props;
+		const preferenceId = match.params.id;
+		const isInlinePage = location.pathname.split('/').slice(-1)[0] === 'code';
+
 		return (
-			<div>
-				<Button
-					style={{
-						margin: '5px 0px',
-					}}
-					type="link"
-					icon="arrow-left"
-					onClick={closeForm}
-				>
-					Go Back to Preferences
-				</Button>
+			<div className={modalStyles}>
+				{/* eslint-disable-next-line */}
+				{isInlinePage ? (
+					<div className="header-container">
+						<div>Edit Code Inline</div>
+						<Popconfirm
+							title="Are you sure you want to exit without saving? Any changes you’ve made via code editor will be lost."
+							onConfirm={() => {
+								history.push(`/cluster/search-builder/${preferenceId}`);
+							}}
+							okText="Yes"
+							cancelText="No"
+						>
+							<Tooltip title="Exit without saving">
+								<Icon type="close" />
+							</Tooltip>
+						</Popconfirm>
+					</div>
+				) : isRecommendation ? (
+					<Button
+						style={{
+							margin: '5px 0px',
+						}}
+						type="link"
+						icon="arrow-left"
+						onClick={() => {
+							history.push(`/cluster/recommendations-builder`);
+						}}
+					>
+						Go back to Recommendation UIs
+					</Button>
+				) : (
+					<Button
+						style={{
+							margin: '5px 0px',
+						}}
+						type="link"
+						icon="arrow-left"
+						onClick={closeForm}
+					>
+						Go back to Search UIs
+					</Button>
+				)}
 				<FormContext.Provider value={this.form}>
 					{children({
 						form: this.form,
@@ -571,11 +679,25 @@ PreferencesFormWrapperN.propTypes = {
 	searchPreferences: object,
 	closeForm: func.isRequired,
 	recommendationsPreferences: object,
+	history: object.isRequired,
+	match: object.isRequired,
+	location: object.isRequired,
+	allSearchPreferences: array.isRequired,
+	getSearchPreferences: func.isRequired,
+	getRecommendationsPreferences: func.isRequired,
+	allRecommendationsPreferences: array.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({
 	searchPreferences: getSearchPreferenceById(state, props.preferenceId),
 	recommendationsPreferences: getRecommendationPreferenceById(state, props.preferenceId),
+	allSearchPreferences: get(state, '$getSearchPreferencesN.results', []),
+	allRecommendationsPreferences: get(state, '$getRecommendationsPreferencesN.results', []),
 });
 
-export default connect(mapStateToProps, null)(PreferencesFormWrapperN);
+const mapDispatchToProps = (dispatch) => ({
+	getSearchPreferences: () => dispatch(getSearchPreferencesN()),
+	getRecommendationsPreferences: () => dispatch(getRecommendationsPreferencesN()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(PreferencesFormWrapperN));
