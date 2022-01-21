@@ -1,11 +1,25 @@
 import React from 'react';
-import { Button, Popconfirm, Tooltip } from 'antd';
+import { Button, Popconfirm, Tooltip, Icon } from 'antd';
 import { css } from 'react-emotion';
-import { string, func } from 'prop-types';
+import { string, func, bool } from 'prop-types';
 import Flex from '../../batteries/components/shared/Flex';
 
 const container = css`
-	padding-right: 10px;
+	.left-container {
+		padding-right: 20px;
+	}
+	.show-on-hover {
+		transform: rotateX(90deg);
+		opacity: 0;
+		transition: all ease 0.3s;
+		font-size: 16px;
+	}
+	&:hover {
+		.show-on-hover {
+			transform: rotateX(0deg);
+			opacity: 1;
+		}
+	}
 `;
 class Actions extends React.Component {
 	handleEdit = () => {
@@ -19,25 +33,32 @@ class Actions extends React.Component {
 	};
 
 	render() {
+		const { isRecommendation } = this.props;
 		return (
-			<Flex alignItems="center">
-				<Flex justifyContent="space-between" alignItems="center" css={container}>
+			<Flex alignItems="center" css={container}>
+				<Flex justifyContent="space-between" alignItems="center" className="left-container">
 					<Flex>
-						<Tooltip placement="topLeft" title="Edit Preference">
+						<Tooltip
+							placement="topLeft"
+							title={isRecommendation ? `Edit Recommendation UI` : `Edit Seach UI`}
+						>
 							<Button onClick={this.handleEdit} type="normal">
 								View
 							</Button>
 						</Tooltip>
 					</Flex>
 				</Flex>
-				<Tooltip placement="topLeft" title="Delete Preference">
+				<Tooltip
+					placement="topLeft"
+					title={isRecommendation ? `Delete Recommendation UI` : `Delete Search UI`}
+				>
 					<Popconfirm
-						title="Are you sure to delete preference?"
+						title={isRecommendation ? `Delete Recommendation UI` : `Delete Search UI`}
 						onConfirm={this.handleDelete}
-						okText="Yes"
-						cancelText="No"
+						okText="Confirm"
+						cancelText="Cancel"
 					>
-						<Button type="danger">Delete</Button>
+						<Icon type="delete" className="show-on-hover" />
 					</Popconfirm>
 				</Tooltip>
 			</Flex>
@@ -45,10 +66,15 @@ class Actions extends React.Component {
 	}
 }
 
+Actions.defaultProps = {
+	isRecommendation: false,
+};
+
 Actions.propTypes = {
 	id: string.isRequired,
 	handleEdit: func.isRequired,
 	handleDelete: func.isRequired,
+	isRecommendation: bool,
 };
 
 export default Actions;

@@ -4,6 +4,7 @@ import { func, array, bool } from 'prop-types';
 import { css } from 'react-emotion';
 import { Table, Card, Button } from 'antd';
 import { connect } from 'react-redux';
+import moment from 'moment';
 import Actions from '../Actions';
 import Loader from '../../../batteries/components/shared/Loader/Spinner';
 import Container from '../../../components/Container';
@@ -33,8 +34,17 @@ const columns = [
 		key: 'pipeline',
 	},
 	{
+		title: 'Last Updated',
+		dataIndex: 'updatedAt',
+		render: (key) => {
+			return {
+				children: <p style={{ fontSize: '14px', width: 'max-content' }}>{key}</p>,
+			};
+		},
+	},
+	{
 		title: 'Actions',
-		render: (preference) => <Actions {...preference} />,
+		render: (preference) => <Actions {...preference} isRecommendation />,
 		key: 'id',
 	},
 ];
@@ -103,6 +113,12 @@ const List = ({
 						name: preference.name,
 						description: preference.description,
 						pipeline: preference.pipeline,
+						updatedAt:
+							preference.updated_at || preference.created_at
+								? moment
+										.unix(preference.updated_at || preference.created_at)
+										.format('ddd D MMM, hh:mm A')
+								: 'NA',
 						handleEdit,
 						handleDelete,
 					}))}
