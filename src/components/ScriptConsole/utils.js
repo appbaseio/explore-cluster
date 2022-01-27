@@ -1,5 +1,3 @@
-export const VALID_EXECUTION_CONTEXT_KEYS = ['request', 'response', 'envs'];
-
 export const DEFAULT_EXECUTION_CONTEXT_VALUE = {
 	request: {
 		body: {
@@ -157,9 +155,7 @@ export const generateScriptValidationRequestBody = (scriptValue, executionContex
 		const executionContextValueObj = JSON.parse(executionContextValue);
 		if (Object.keys(executionContextValueObj))
 			Object.keys(executionContextValueObj).forEach((key) => {
-				if (VALID_EXECUTION_CONTEXT_KEYS.includes(key)) {
-					Object.assign(requestBody, { [key]: executionContextValueObj[key] });
-				}
+				Object.assign(requestBody, { [key]: executionContextValueObj[key] });
 			});
 	}
 

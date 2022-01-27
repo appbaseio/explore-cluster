@@ -13,8 +13,18 @@ import {
 	getDefaultExecutionContextValue,
 	sanitizeScriptString,
 } from './utils';
-import scriptTemplates from './scriptTemplates';
 
+import scriptTemplates, { TEMPLATE_KEYS } from './scriptTemplates';
+
+const {
+	MODIFY_INDEXING_REQUEST,
+	MODIFY_BULK_REQUEST,
+	CRON_SCRIPT,
+	MODIFY_REQUEST_COMPROMISE,
+	ASYNC_FETCH,
+	SYNC_FETCH,
+	MODIFY_REQUEST_CRYPTOJS,
+} = TEMPLATE_KEYS;
 const { Option } = Select;
 const { confirm } = Modal;
 
@@ -313,6 +323,8 @@ const ScriptConsole = ({
 	envs,
 }) => {
 	const scriptEditorRef = useRef(null);
+	const executionContextEditorRef = useRef(null);
+	const triggerExecutionContextFormatter = useRef(false);
 	const isNewScriptRule = useRef(!scriptRule);
 	const [scriptRuleValue, setScriptRuleValue] = useState('');
 
@@ -334,6 +346,44 @@ const ScriptConsole = ({
 	useEffect(() => {
 		if (scriptEditorRef && scriptEditorRef.current) {
 			scriptEditorRef.current.trigger('', 'editor.action.formatDocument');
+		}
+		if (selectedTemplateKey) {
+			let parsedExecutionContextValue = JSON.parse(executionContext);
+
+			const { executionContextOverride } = scriptTemplates[selectedTemplateKey];
+			if (executionContextOverride) {
+				parsedExecutionContextValue = { ...executionContextOverride };
+				// setting env values from external ui ---> "Set Environments"
+				parsedExecutionContextValue.envs = { ...parsedExecutionContextValue.envs, ...envs };
+			} else {
+				parsedExecutionContextValue = JSON.parse(getDefaultExecutionContextValue({ envs }));
+				switch (selectedTemplateKey) {
+					case CRON_SCRIPT:
+						break;
+					case MODIFY_BULK_REQUEST:
+						break;
+					case MODIFY_INDEXING_REQUEST:
+						break;
+					case MODIFY_REQUEST_COMPROMISE:
+						delete parsedExecutionContextValue.response;
+						break;
+					case ASYNC_FETCH:
+						delete parsedExecutionContextValue.response;
+						break;
+					case SYNC_FETCH:
+						delete parsedExecutionContextValue.response;
+						break;
+					case MODIFY_REQUEST_CRYPTOJS:
+						delete parsedExecutionContextValue.response;
+						break;
+					default:
+						break;
+				}
+			}
+
+			// set overridden execution context value
+			setExecutionContext(JSON.stringify(parsedExecutionContextValue));
+			triggerExecutionContextFormatter.current = true;
 		}
 	}, [selectedTemplateKey]);
 
@@ -375,6 +425,14 @@ const ScriptConsole = ({
 		}
 	}, [scriptRuleValue]);
 
+	useEffect(() => {
+		if (triggerExecutionContextFormatter.current === true && executionContext) {
+			if (executionContextEditorRef && executionContextEditorRef.current) {
+				executionContextEditorRef.current.trigger('', 'editor.action.formatDocument');
+				triggerExecutionContextFormatter.current = false;
+			}
+		}
+	}, [triggerExecutionContextFormatter.current]);
 	const triggerScriptRuleValidation = () => {
 		try {
 			validateScriptRule(
@@ -396,7 +454,7 @@ const ScriptConsole = ({
 
 	const onTemplateSelect = (value) => {
 		const actionCallback = () => {
-			setScriptRuleValue(scriptTemplates[value]);
+			setScriptRuleValue(scriptTemplates[value].script);
 			setSelectedTemplateKey(value);
 			if (isNewScriptRule.current) {
 				isNewScriptRule.current = false;
@@ -568,6 +626,9 @@ const ScriptConsole = ({
 							language="json"
 							value={executionContext}
 							onChange={(value) => setExecutionContext(value)}
+							customizeMonacoInstance={(monaco, editorRef) => {
+								executionContextEditorRef.current = editorRef;
+							}}
 							theme="vs-dark"
 							options={monacoOptions}
 							readOnly={false}
