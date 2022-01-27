@@ -69,12 +69,6 @@ export const APP_ROUTES = {
 		action: ALLOWED_ACTIONS.SPEED,
 		menu: [{ label: 'Cache', link: '/cluster/cache', tag: 'Beta', hasExactPath: true }],
 	},
-	'Curated Insights': {
-		icon: 'rise',
-		link: '/cluster/curated-insights',
-		hasExactPath: true,
-		action: ALLOWED_ACTIONS.CURATED_INSIGHTS,
-	},
 	'UI Builder': {
 		icon: 'control',
 		action: ALLOWED_ACTIONS.UI_BUILDER,
@@ -193,11 +187,6 @@ export const CLUSTER_ROUTES = {
 		icon: 'thunderbolt',
 		action: ALLOWED_ACTIONS.SPEED,
 		menu: [{ label: 'Cache', link: '/cluster/cache', tag: 'Beta' }],
-	},
-	'Curated Insights': {
-		icon: 'rise',
-		action: ALLOWED_ACTIONS.CURATED_INSIGHTS,
-		link: '/cluster/curated-insights',
 	},
 	'UI Builder': {
 		icon: 'control',
