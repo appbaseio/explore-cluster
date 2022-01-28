@@ -19,6 +19,7 @@ import {
 	Input,
 	message,
 	notification,
+	Popover,
 	Radio,
 	Result,
 	Row,
@@ -1248,7 +1249,43 @@ class QueryRulesForm extends React.Component {
 								{condition === 'cron' && (
 									<>
 										<div>
-											Cron Expression
+											Cron Expression / Pre-defined Schedule{' '}
+											<Popover
+												trigger="hover"
+												content={
+													<React.Fragment>
+														<div>
+															Enter a cron expression with 6
+															spaced-separated fields (seconds minutes
+															hours day_of_month month day_of_week).
+															Read more over{' '}
+															<a
+																href="https://pkg.go.dev/github.com/robfig/cron#hdr-CRON_Expression_Format"
+																target="_blank"
+																rel="noreferrer"
+															>
+																here
+															</a>
+															.
+														</div>
+														<br />
+														<div>
+															Alternatively, add a pre-defined
+															schedule in the format: @every{' '}
+															<a
+																href="https://pkg.go.dev/time#ParseDuration"
+																target="_blank"
+																rel="noreferrer"
+															>
+																&lt;duration&gt;
+															</a>
+															, e.g. @every 1h30m
+														</div>
+													</React.Fragment>
+												}
+											>
+												<Icon type="info-circle" />
+											</Popover>
 											<Input
 												name="cronExpression"
 												value={cronExpression}
