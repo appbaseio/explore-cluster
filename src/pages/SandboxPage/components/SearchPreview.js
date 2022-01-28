@@ -39,7 +39,6 @@ const container = css`
 `;
 
 let config = {};
-let initial = true;
 const getDataFieldsWithWeights = (searchableMappings = {}, appbaseVersion) => {
 	// apply dataField new format for appbase version >= 7.47.0
 	const versionComparison = versionCompare(appbaseVersion, '7.47.0');
@@ -72,7 +71,6 @@ class SearchPreview extends React.Component {
 			? localStorage.getItem('enableTypeahead') === 'true'
 			: false,
 		queryGrades: {},
-		searchApi: false,
 	};
 
 	componentDidMount = async () => {
@@ -493,9 +491,6 @@ class SearchPreview extends React.Component {
 	};
 
 	onSelected = (query) => {
-		this.setState({
-			searchApi: true,
-		});
 		this.setQueryGrades(query);
 	};
 
@@ -505,43 +500,6 @@ class SearchPreview extends React.Component {
 				queryGrades: res,
 			});
 		});
-	};
-
-	fetchResults = (type) => {
-		this.setState({
-			searchApi: type,
-		});
-	};
-
-	transformRequest = (props) => {
-		const { isTypeahead, searchApi } = this.state;
-
-		if (isTypeahead && !initial && !searchApi) {
-			const parsedBody = JSON.parse(props.body);
-			// eslint-disable-next-line consistent-return
-			parsedBody.query.forEach((item) => {
-				if (item.id === 'result') {
-					return props;
-				}
-				if (item.id === 'search__internal' || item.id === 'search') {
-					parsedBody.query = [
-						{
-							type: 'suggestion',
-							id: 'search',
-							value: item.value || '',
-							...config,
-						},
-					];
-					// eslint-disable-next-line no-param-reassign
-					props.body = JSON.stringify(parsedBody);
-					return props;
-				}
-			});
-		}
-		if (initial) {
-			initial = false;
-		}
-		return props;
 	};
 
 	render() {
@@ -660,10 +618,6 @@ class SearchPreview extends React.Component {
 						enableQueryRules: page !== 'rules',
 						userId: 'appbase.io dashboard',
 					}}
-					transformRequest={(props) => {
-						const newProps = this.transformRequest(props);
-						return newProps;
-					}}
 				>
 					<Col md={6}>
 						<ErrorToaster>
@@ -685,10 +639,12 @@ class SearchPreview extends React.Component {
 								handleValueChange={this.handleValueChange}
 								app={app}
 								onValueChange={this.onSelected}
-								search={search}
+								search={{
+									...search,
+									...config,
+								}}
 								isTypeahead={isTypeahead}
 								handleModal={handleModal}
-								fetchResults={(type, val) => this.fetchResults(type, val)}
 								page={page}
 							/>
 						</ErrorToaster>
