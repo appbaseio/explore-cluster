@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { DataSearch } from '@appbaseio/reactivesearch';
+import { SearchBox } from '@appbaseio/reactivesearch';
 import { css } from 'react-emotion';
 import { Icon } from 'antd';
 import get from 'lodash/get';
@@ -49,7 +49,7 @@ class GlobalSearch extends PureComponent {
 		const isFieldDefined = Array.isArray(dataFieldSettings) && dataFieldSettings.length;
 		return (
 			<div className={inputBox} css={{ position: 'relative' }}>
-				<DataSearch
+				<SearchBox
 					componentId="GlobalSearch"
 					innerClass={{
 						input: `ant-input ${css`
@@ -70,7 +70,7 @@ class GlobalSearch extends PureComponent {
 					showDistinctSuggestions
 					onChange={this.handleSearchValueChange}
 					value={searchValue}
-					onKeyDown={onKeyDown}
+					// onKeyDown={onKeyDown}
 					onValueSelected={(value, cause, source) => {
 						if (source) {
 							onValueSelected(value, cause, source);

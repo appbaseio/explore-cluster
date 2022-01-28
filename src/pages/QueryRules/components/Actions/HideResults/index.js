@@ -99,35 +99,6 @@ class HideResults extends Component {
 		}
 	};
 
-	transformRequest = (props) => {
-		const { indexes } = this.props;
-		const parsedBody = JSON.parse(props.body);
-
-		// eslint-disable-next-line consistent-return
-		parsedBody.query.forEach((item) => {
-			if (item.id === 'GlobalSearch') {
-				parsedBody.settings = {
-					...parsedBody.settings,
-					useCache: false,
-				};
-				parsedBody.query = [
-					{
-						type: 'suggestion',
-						id: 'GlobalSearch',
-						value: item.value || '',
-						...config,
-						index: indexes.join(',') || '*', // rule particular index
-					},
-				];
-				// eslint-disable-next-line no-param-reassign
-				props.body = JSON.stringify(parsedBody);
-				return props;
-			}
-		});
-
-		return props;
-	};
-
 	clearSearch() {
 		if (this.globalSearchRef) {
 			// eslint-disable-next-line
@@ -152,10 +123,6 @@ class HideResults extends Component {
 						enableQueryRules: false,
 						useCache: false,
 					}}
-					transformRequest={(props) => {
-						const newProps = this.transformRequest(props);
-						return newProps;
-					}}
 				>
 					<GlobalSearch
 						indexes={indexes}
@@ -167,6 +134,10 @@ class HideResults extends Component {
 						app={app}
 						ref={this.globalSearchRef}
 						// onKeyDown={this.handleAdd}
+						subprops={{
+							enablePredictiveSuggestions: true,
+							...config,
+						}}
 					/>
 				</ReactiveBase>
 				<div>
