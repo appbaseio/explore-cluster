@@ -6,6 +6,7 @@ import get from 'lodash/get';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
 import LabelTag from '../LabelTag';
+import { setSessionData } from '../../actions';
 
 const popOverClass = css`
 	.ant-popover-buttons {
@@ -23,6 +24,7 @@ function IndexSwitcher({
 	onSelect,
 	renderItem,
 	isAppsLoading,
+	updateSessionData,
 }) {
 	const userApps = filteredApps.filter((index) => index && !index.includes('metricbeat-'));
 
@@ -50,12 +52,15 @@ function IndexSwitcher({
 			<Select
 				placeholder="Search for an index."
 				style={{ minWidth: 180, maxWidth: 420 }}
+				value={sessionStorage.getItem('appName') || undefined}
 				onSelect={(value) => {
 					// do not use updateCurrentApp here, since onSelect prop is used for `Test Search Relevancy` button
 					if (onSelect) onSelect(value);
 					else {
 						history.push(`/app/${value}/${item.link}`);
 					}
+					sessionStorage.setItem('appName', value);
+					updateSessionData(value);
 				}}
 				showSearch
 			>
@@ -98,6 +103,7 @@ IndexSwitcher.propTypes = {
 	onSelect: PropTypes.func,
 	renderItem: PropTypes.func,
 	isAppsLoading: PropTypes.bool,
+	updateSessionData: PropTypes.func.isRequired,
 };
 
 IndexSwitcher.defaultProps = {
@@ -113,4 +119,8 @@ const mapStateToProps = (state) => ({
 	isAppsLoading: get(state, 'apps.isFetching'),
 });
 
-export default connect(mapStateToProps)(IndexSwitcher);
+const mapDispatchToProps = (dispatch) => ({
+	updateSessionData: (data) => dispatch(setSessionData(data)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(IndexSwitcher);

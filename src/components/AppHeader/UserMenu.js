@@ -22,6 +22,7 @@ const handleLogout = () => {
 	sessionStorage.removeItem('password');
 	sessionStorage.removeItem('isAdmin');
 	sessionStorage.removeItem('allowedActions');
+	sessionStorage.removeItem('appName');
 	window.location.href = '/';
 };
 

@@ -231,9 +231,11 @@ class DashboardWrapper extends Component {
 
 	render() {
 		const { showHeader, routes, activeSubMenu, activeMenuItem, value } = this.state;
-		const { apps, history, match, collapsed } = this.props;
+		const { apps, history, match, collapsed, sessionData } = this.props;
 		const filteredApps = keys(apps).filter((app) => !app.startsWith('.'));
 		const allowedRoutes = getAuthorizedRoutes(routes);
+		const indexName = sessionStorage.getItem('appName') || sessionData || '';
+
 		return (
 			<Layout>
 				<Sider
@@ -309,12 +311,24 @@ class DashboardWrapper extends Component {
 										<SubMenu key={route} title={Title}>
 											{routes[route].menu.map((item) => (
 												<Menu.Item key={item.label}>
+													{/* eslint-disable-next-line */}
 													{item.openIndexMenu ? (
-														<IndexSwitcher
-															item={item}
-															filteredApps={filteredApps}
-															history={history}
-														/>
+														indexName ? (
+															<LabelTag
+																item={item}
+																onClick={() =>
+																	history.push(
+																		`/app/${indexName}/${item.link}`,
+																	)
+																}
+															/>
+														) : (
+															<IndexSwitcher
+																item={item}
+																filteredApps={filteredApps}
+																history={history}
+															/>
+														)
 													) : (
 														<Link replace to={item.link}>
 															<LabelTag item={item} />
@@ -421,6 +435,7 @@ DashboardWrapper.defaultProps = {
 	arcVersion: null,
 	isClusterPlanFetching: false,
 	apps: {},
+	sessionData: '',
 };
 
 DashboardWrapper.propTypes = {
@@ -437,6 +452,7 @@ DashboardWrapper.propTypes = {
 	collapsed: bool.isRequired,
 	setIsCollapsed: func.isRequired,
 	routes: object.isRequired,
+	sessionData: string,
 };
 
 const mapStateToProps = (state) => ({
@@ -447,6 +463,7 @@ const mapStateToProps = (state) => ({
 	apps: get(state, 'apps.data'),
 	collapsed: get(state, 'sideBarCollapsed'),
 	routes: get(state, 'clusterRoutes'),
+	sessionData: get(state, 'sessionData.sessionData', ''),
 });
 
 const mapDispatchToProps = (dispatch) => ({

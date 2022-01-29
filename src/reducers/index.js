@@ -9,6 +9,7 @@ import appRoutesReducer from './appRoutesReducer';
 import clusterRoutesReducer from './clusterRoutesReducer';
 import recentRoutesReducer from './recentRoutesReducer';
 import csbUrlReducer from './csbUrlReducer';
+import setSessionDataReducer from './setSessionDataReducer';
 
 export default {
 	user: userReducer,
@@ -22,4 +23,5 @@ export default {
 	sideBarCollapsed: sideBarCollapsedReducer,
 	recentRoutes: recentRoutesReducer,
 	csbURL: csbUrlReducer,
+	sessionData: setSessionDataReducer,
 };

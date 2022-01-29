@@ -55,6 +55,7 @@ class AppSwitcher extends React.Component {
 					onSelect={(appName) => {
 						updateCurrentApp(appName);
 						history.push(`/app/${appName}/${route || ''}`);
+						sessionStorage.setItem('appName', appName);
 					}}
 					showSearch
 					autoFocus

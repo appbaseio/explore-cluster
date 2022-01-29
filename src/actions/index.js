@@ -8,7 +8,9 @@ import {
 	ROUTES_ACTION,
 	SAVE_HISTORY,
 	SAVE_CSB_URL,
+	SET_SESSION_DATA,
 } from '../constants';
+
 import { createAction } from '../batteries/modules/actions/utils';
 
 export function loadUser(username: string, password: string, url?: string): Object {
@@ -105,4 +107,8 @@ export function saveRecentRoute(payload: string): Object {
 
 export function saveCsbUrl(payload: string): Object {
 	return { type: SAVE_CSB_URL, payload };
+}
+
+export function setSessionData(payload: string): Object {
+	return { type: SET_SESSION_DATA, payload };
 }

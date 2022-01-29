@@ -34,7 +34,10 @@ class QueryRules extends Component {
 	constructor(props) {
 		super(props);
 		this.startTime = moment();
-		this.state = { visible: false };
+		this.state = {
+			visible: false,
+			activeTab: localStorage.getItem('activeTab') || '1',
+		};
 	}
 
 	componentDidMount() {
@@ -176,10 +179,17 @@ class QueryRules extends Component {
 		this.setState({ app, visible: true });
 	};
 
+	handleTabChange = (tab) => {
+		this.setState({
+			activeTab: tab,
+		});
+		localStorage.setItem('activeTab', tab);
+	};
+
 	render() {
 		const { collapsed, rules, isLoading, tier, featureRules, apps, usageStats, isFetching } =
 			this.props;
-		const { visible, app } = this.state;
+		const { visible, app, activeTab } = this.state;
 
 		if (!isValidPlan(tier, featureRules)) {
 			return (
@@ -270,7 +280,7 @@ class QueryRules extends Component {
 					{rules && rules.length ? (
 						<ErrorToaster>
 							<div>
-								<Tabs defaultActiveKey="1">
+								<Tabs activeKey={activeTab} onChange={this.handleTabChange}>
 									<Tabs.TabPane tab="All Rules" key="1">
 										<DNDWrapper
 											onDragEnd={this.onDragEnd}
