@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FieldControl } from 'react-reactive-form';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Switch, Form, List, Radio, Button, Icon, InputNumber, Input } from 'antd';
+import { Switch, Form, List, Radio, Button, Icon, InputNumber, Input, Popover } from 'antd';
 import { bool, array, object, string, func } from 'prop-types';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import DataFieldSelector from '../../../../components/Form/DataFieldSelector';
@@ -14,35 +14,73 @@ import { getAppMappings } from '../../../../batteries/modules/actions';
 const defaultSettings = [
 	{
 		id: 'showSelectedFilters',
-		label: 'Show active filter tags',
+		label: (
+			<span>
+				Show applied filters
+				<Popover content="Show applied user filters at the top of results">
+					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+				</Popover>
+			</span>
+		),
 		value: true,
 	},
 	{
 		id: 'layout',
-		label: 'Show results as:',
+		label: (
+			<span>
+				Show results as
+				<Popover content="Pick the primary layout for showing search results">
+					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+				</Popover>
+			</span>
+		),
 		value: true,
 	},
 	{
 		id: 'viewSwitcher',
-		label: 'Show results view switcher',
+		label: (
+			<span>
+				Show results view switcher
+				<Popover content="Show a search results layout switcher to your end-users">
+					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+				</Popover>
+			</span>
+		),
 		value: true,
 	},
 	{
 		id: 'showPagination',
-		label: (value) =>
-			value
-				? 'Pagination is enabled. Toggle to use an infinite scroll'
-				: 'Infinite scroll is enabled. Toggle to use pagination',
+		label: (value) => (
+			<span>
+				{value
+					? 'Pagination is enabled. Toggle to use an infinite scroll'
+					: 'Infinite scroll is enabled. Toggle to use pagination'}
+			</span>
+		),
 		value: false,
 	},
 	{
 		id: 'sortOptionSelector',
-		label: 'Set sort option selector for results',
+		label: (
+			<span>
+				Set sort option selector for results
+				<Popover content="Set sort options picker to allow your end-users to sort search results by">
+					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+				</Popover>
+			</span>
+		),
 		value: false,
 	},
 	{
 		id: 'resultHighlight',
-		label: 'Enable results highlights',
+		label: (
+			<span>
+				Enable results highlighting
+				<Popover content="Show highlighting of matching content in the search results">
+					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+				</Popover>
+			</span>
+		),
 		value: false,
 	},
 	{
@@ -68,6 +106,9 @@ const defaultSettings = [
 		label: (
 			<span>
 				Select the data field to display the <strong>price</strong> of the result item
+				<Popover content="You can substitute price for any other similarly significant field">
+					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+				</Popover>
 			</span>
 		),
 		value: true,
@@ -77,6 +118,9 @@ const defaultSettings = [
 		label: (
 			<span>
 				Select the data field to display the <strong>image</strong> of the result item
+				<Popover content="The value should be of a URL type for the image content to be displayed correctly">
+					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+				</Popover>
 			</span>
 		),
 		value: true,
@@ -96,42 +140,96 @@ const defaultSettings = [
 const geoDefaultSettings = [
 	{
 		id: 'mapLayout',
-		label: 'Show results as:',
+		label: (
+			<span>
+				Show results as
+				<Popover content="Pick the primary layout for showing search results">
+					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+				</Popover>
+			</span>
+		),
 		value: true,
 	},
 	{
 		id: 'viewSwitcher',
-		label: 'Show results view switcher',
+		label: (
+			<span>
+				Show results view switcher
+				<Popover content="Show a search results layout switcher to your end-users">
+					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+				</Popover>
+			</span>
+		),
 		value: true,
 	},
 	{
 		id: 'mapComponent',
-		label: 'Pick your map component',
-		value: true,
-	},
-	{
-		id: 'defaultZoom',
-		label: 'Set default Zoom Level',
-		value: true,
-	},
-	{
-		id: 'showSearchAsMove',
-		label: 'Show Search As Move',
+		label: (
+			<span>
+				Pick your map component
+				<Popover content="Choose a map component: OpenStreetMap is free (no API key needed) whereas GoogleMap offers more features (clustering, places search)">
+					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+				</Popover>
+			</span>
+		),
 		value: true,
 	},
 	{
 		id: 'mapsAPIkey',
-		label: 'Maps API Key',
+		label: (
+			<span>
+				Maps API Key
+				<Popover content="Enter your Google Maps API key over here (leave blank for OpenStreetMap)">
+					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+				</Popover>
+			</span>
+		),
 		value: false,
 	},
 	{
+		id: 'defaultZoom',
+		label: (
+			<span>
+				Set default zoom level
+				<Popover content="Preset map's zoom level, accepts integer values between [0, 20]. 0 is the minimum zoom level, where you can see the entire globe. 20 is the maximum zoom level">
+					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+				</Popover>
+			</span>
+		),
+		value: true,
+	},
+	{
+		id: 'showSearchAsMove',
+		label: (
+			<span>
+				Show Search As Move
+				<Popover content="Show a search as move checkbox on the map for end-users to decide when to update the search">
+					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+				</Popover>
+			</span>
+		),
+		value: true,
+	},
+	{
 		id: 'showMarkerClusters',
-		label: 'Enable Clustering',
+		label: (
+			<span>
+				Enable Clustering
+				<Popover content="Cluster nearby map markers together (only works with Google Maps)">
+					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+				</Popover>
+			</span>
+		),
 		value: false,
 	},
 	{
 		id: 'locationDataField',
-		label: 'Select the data field to display the location of the item',
+		label: (
+			<span>
+				Select the data field to display the <strong>location</strong> marker of the result
+				item
+			</span>
+		),
 		value: false,
 	},
 	{
@@ -157,6 +255,9 @@ const geoDefaultSettings = [
 		label: (
 			<span>
 				Select the data field to display the <strong>price</strong> of the result item
+				<Popover content="You can substitute price for any other similarly significant field">
+					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+				</Popover>
 			</span>
 		),
 		value: true,
@@ -166,6 +267,9 @@ const geoDefaultSettings = [
 		label: (
 			<span>
 				Select the data field to display the <strong>image</strong> of the result item
+				<Popover content="The value should be of a URL type for the image content to be displayed correctly">
+					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+				</Popover>
 			</span>
 		),
 		value: true,
@@ -194,10 +298,10 @@ const fieldSelectorIds = [
 const geoOptions = [
 	'mapLayout',
 	'mapComponent',
+	'mapsAPIkey',
 	'viewSwitcher',
 	'defaultZoom',
 	'showSearchAsMove',
-	'mapsAPIkey',
 	'showMarkerClusters',
 	'locationDataField',
 	'resultTitle',
@@ -355,7 +459,13 @@ const Results = ({
 								<FieldControl name={item.id}>
 									{({ value, onChange }) => (
 										<Item
-											actions={[<Input value={value} onChange={onChange} />]}
+											actions={[
+												<Input
+													style={{ width: 300 }}
+													value={value}
+													onChange={onChange}
+												/>,
+											]}
 										>
 											<Item.Meta
 												title={

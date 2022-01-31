@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { func, bool, string } from 'prop-types';
 import { FieldGroup, FieldArray, FieldControl, Validators } from 'react-reactive-form';
-import { Table, Button, Form, Select, Tooltip, Icon } from 'antd';
+import { Table, Button, Form, Select, Tooltip, Icon, Popconfirm } from 'antd';
 import { css } from 'emotion';
 import get from 'lodash/get';
 import TextInput from '../../../../components/Form/Input';
@@ -62,7 +62,7 @@ class Recommendations extends React.Component {
 					similarToField: get(item, 'productsPageHandle.productsPageUrlField'),
 				};
 				return (
-					<Flex>
+					<Flex style={{ alignItems: 'center', gap: 10 }}>
 						<Button onClick={() => this.handleEdit(item.id, previewProps)}>Edit</Button>
 						<PreviewModal
 							buttonProps={{
@@ -84,13 +84,14 @@ class Recommendations extends React.Component {
 							preferences={getPreferences}
 							isRecommendation
 						/>
-						<Button
-							style={btnStyle}
-							className="delete-icon"
-							onClick={() => this.handleDelete(item.id)}
+						<Popconfirm
+							title="Delete Recommendation UI"
+							onConfirm={() => this.handleDelete(item.id)}
+							okText="Yes"
+							cancelText="No"
 						>
-							Delete
-						</Button>
+							<Icon type="delete" className="delete-icon" />
+						</Popconfirm>
 					</Flex>
 				);
 			},

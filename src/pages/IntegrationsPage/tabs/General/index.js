@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Select, Form, Icon } from 'antd';
+import { Select, Form, Icon, Input, Popover } from 'antd';
 import { bool, object } from 'prop-types';
 import get from 'lodash/get';
 import keys from 'lodash/keys';
@@ -79,6 +79,45 @@ const General = ({ apps, isRecommendation }) => {
 									},
 								}}
 							/>
+							<div>
+								<div style={{ margin: '10px 0px', color: 'rgba(0, 0, 0, 0.85)' }}>
+									<span>
+										API Credentials
+										<Popover
+											content={
+												<div>
+													API credentials allow secure UI access to the
+													appbase.io cluster. Check docs at{' '}
+													<a
+														target="blank"
+														href="https://docs.appbase.io/docs/security/credentials/"
+													>
+														here
+													</a>
+													. <br />
+													You can get the API credentials from{' '}
+													<a href="credentials">API Credentials</a> page
+													under <strong>Access Control</strong>.
+												</div>
+											}
+										>
+											<Icon
+												type="info-circle"
+												style={{ marginLeft: '5px' }}
+											/>
+										</Popover>
+									</span>
+								</div>
+								<Input
+									placeholder="Enter API credentials"
+									value={form.get('exportSettings').get('credentials').value}
+									onChange={(e) => {
+										form.get('exportSettings')
+											.get('credentials')
+											.setValue(e.target.value);
+									}}
+								/>
+							</div>
 						</div>
 					</div>
 					<FieldControl strict={false} name="hasEdited">
@@ -102,9 +141,9 @@ const General = ({ apps, isRecommendation }) => {
 									<p style={{ margin: 0 }}>
 										{' '}
 										{/* eslint-disable-next-line */}
-										You've persisted code changes via Code Editor. Making
-										further changes through the no-code onfiguirator will
-										overwrite your code changes.
+										You've persisted code changes via code editor. Making
+										further changes through the no-code configurator will these
+										code changes.
 									</p>
 								</div>
 							)

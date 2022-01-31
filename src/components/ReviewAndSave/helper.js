@@ -10,6 +10,13 @@ export const relevancyTitles = {
 	popularSuggestions: 'Suggestions Settings / Popular Suggestions',
 	recentSuggestions: 'Suggestions Settings / Recent Suggestions',
 	indexSuggestions: 'Suggestions Settings / Index Suggestions',
+	ecommercePlatform: 'E-Commerce Platform',
+	layoutAndDesign: 'Layout and Design',
+	searchSettings: 'Search Settings',
+	codeSettings: 'Code Settings',
+	exportSettings: 'Export Settings',
+	generalSettings: 'General Settings',
+	resultSettings: 'Result Settings',
 };
 
 const settingsMap = {
@@ -324,6 +331,206 @@ const settingsMap = {
 	externalSuggestions: {
 		title: 'External Suggestions',
 		description: 'Define your custom suggestions.',
+	},
+	exportType: {
+		title: 'Choose e-commerce platform',
+		description: '',
+	},
+	syncSettings: {
+		title: 'Sync Settings',
+		description: '',
+	},
+	storeInfo: {
+		title: 'Store Info',
+		description: 'Set currency',
+	},
+	searchLayout: {
+		title: 'Search Layout',
+		description: '',
+	},
+	branding: {
+		title: 'Branding',
+		description: 'Logo and placement',
+	},
+	stylePresets: {
+		title: 'Style Presets',
+		description: '',
+	},
+	customCSS: {
+		title: 'Custom CSS',
+		description: 'Apply custom CSS classes',
+	},
+	autosuggest: {
+		title: 'Search / Show Autosuggestions',
+		description: '',
+	},
+	enablePopularSuggestions: {
+		title: 'Search / Show Popular suggestions (based on analytics data)',
+		description: '',
+	},
+	enableRecentSearches: {
+		title: 'Search / Show recent suggestions (based on analytics data)',
+		description: '',
+	},
+	showVoiceSearch: {
+		title: 'Search / Enable Voice Search',
+		description: '',
+	},
+	staticFilters: {
+		title: 'Filters / Static Filters',
+		description: 'Static Filters',
+	},
+	dynamicFacets: {
+		title: 'Filters / Custom Filters',
+		description: 'Custom filter(s) set based on the schema',
+	},
+	csbID: {
+		title: 'Codesandbox ID',
+		description: 'Persisted codesandbox.io editor Id',
+	},
+	exportAs: {
+		title: 'Export Mode',
+		description: 'Your code export mode',
+	},
+	openAsPage: {
+		title: 'Open As Page',
+		description: 'Open search as a page',
+	},
+	name: {
+		title: 'Name',
+		description: '',
+	},
+	pipeline: {
+		title: 'Pipeline',
+		description: '',
+	},
+	description: {
+		title: 'Description',
+		description: '',
+	},
+	credentials: {
+		title: 'Credentials',
+		description: '',
+	},
+	showSelectedFilters: {
+		title: 'Show Selected Filters',
+		description: '',
+	},
+	pagination: {
+		title: 'Pagination',
+		description: '',
+	},
+	infiniteScroll: {
+		title: 'Infinite Scroll',
+		description: '',
+	},
+	sortOptionSelector: {
+		title: 'Sort Options Selector',
+		description: '',
+	},
+	resultHighlight: {
+		title: 'Result Highlight',
+		description: '',
+	},
+	layout: {
+		title: 'Layout',
+		description: '',
+	},
+	viewSwitcher: {
+		title: 'View Switcher',
+		description: '',
+	},
+	title: {
+		title: 'Title',
+		description: '',
+	},
+	price: {
+		title: 'Price',
+		description: '',
+	},
+	image: {
+		title: 'Image',
+		description: '',
+	},
+	handle: {
+		title: 'Handle',
+		description: '',
+	},
+	noSuggestion: {
+		title: 'No Suggestions',
+		description: '',
+	},
+	noResults: {
+		title: 'Search Button Text',
+		description: '',
+	},
+	searchButton: {
+		title: 'Search Button Text',
+		description: '',
+	},
+	searchIcon: {
+		title: 'Search Icon',
+		description: '',
+	},
+	redirectUrlText: {
+		title: 'Redirect Url Text',
+		description: '',
+	},
+	redirectUrlIcon: {
+		title: 'Redirect Url Icon',
+		description: '',
+	},
+	resultStats: {
+		title: 'Result Stats',
+		description: '',
+	},
+	mapLayout: {
+		title: 'Map Layout',
+		description: '',
+	},
+	mapComponent: {
+		title: 'Map Component',
+		description: '',
+	},
+	defaultZoom: {
+		title: 'Default Zoom',
+		description: '',
+	},
+	showSearchAsMove: {
+		title: 'Show search as move',
+		description: '',
+	},
+	mapsAPIkey: {
+		title: 'Maps API key',
+		description: '',
+	},
+	showMarkerClusters: {
+		title: 'Show marker clusters',
+		description: '',
+	},
+	locationDataField: {
+		title: 'Location',
+		description: '',
+	},
+	productTypeFilter: {
+		title: 'Filters / Show product type filter',
+		description: 'Applicable for Shopify storefront search',
+	},
+	collectionsFilter: {
+		title: 'Filters / Show collections filter',
+		description: '',
+	},
+	sizeFilter: {
+		title: 'Filters / Show size filter',
+		description: '',
+	},
+	colorFilter: {
+		title: 'Filters / Show color filter',
+		description: '',
+	},
+	priceFilter: {
+		title: 'Filters / Show price filter',
+		description: '',
 	},
 };
 

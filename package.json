@@ -123,6 +123,7 @@
 		"react-color": "^2.18.1",
 		"react-copy-to-clipboard": "^5.0.4",
 		"react-day-picker": "^7.4.10",
+		"react-diff-viewer": "^3.1.1",
 		"react-dom": "^16.4.2",
 		"react-element-to-jsx-string": "^14.0.1",
 		"react-emotion": "^9.2.6",

@@ -40,7 +40,7 @@ class Actions extends React.Component {
 					<Flex>
 						<Tooltip
 							placement="topLeft"
-							title={isRecommendation ? `Edit Recommendation UI` : `Edit Seach UI`}
+							title={isRecommendation ? `Edit Recommendation UI` : `Edit Search UI`}
 						>
 							<Button onClick={this.handleEdit} type="normal">
 								View

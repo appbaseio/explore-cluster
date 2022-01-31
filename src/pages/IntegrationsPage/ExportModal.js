@@ -6,7 +6,6 @@ import get from 'lodash/get';
 import ExportToShopify from './ExportToShopify';
 import ExportToOther from './ExportToOther';
 import ExportToHackable from './ExportToHackable';
-import TextInput from '../../components/Form/Input';
 import { FormContext } from './utils';
 
 class ExportModal extends React.Component {
@@ -113,28 +112,6 @@ class ExportModal extends React.Component {
 											</Form.Item>
 										)}
 									</FieldControl>
-									<TextInput
-										name="credentials"
-										label="API Credentials"
-										inputProps={{
-											placeholder: 'Enter API credentials',
-										}}
-									/>
-									<div style={{ marginBottom: 24 }}>
-										API credentials allow secure access to the appbase.io
-										clusters. Check docs at{' '}
-										<a
-											target="blank"
-											href="https://docs.appbase.io/docs/security/credentials/"
-										>
-											here
-										</a>
-										. <br />
-										You can get the API credentials from{' '}
-										<a href="credentials">API Credentials</a> page under{' '}
-										<strong>Access Control</strong>.
-									</div>
-
 									{!isRecommendation && (
 										<FieldControl name="openAsPage">
 											{({ handler }) => (

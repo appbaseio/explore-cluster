@@ -24,12 +24,15 @@ import {
 	defaultSearchPreferences,
 	defaultRecommendationsPreferences,
 } from './utils';
+import ReviewAndSave from './ReviewAndSave';
 
 class SavePreferencesN extends React.Component {
 	constructor(props) {
 		super(props);
+		this.hasEdited = false;
 		this.state = {
 			hasChanged: this.compareChange,
+			preferences: props.searchPreferences,
 		};
 	}
 
@@ -59,9 +62,11 @@ class SavePreferencesN extends React.Component {
 
 	handleChange = () => {
 		const isChanged = this.compareChange;
+		const { searchPreferences, recommendationsPreferences, isRecommendation } = this.props;
 
 		this.setState({
 			hasChanged: isChanged,
+			preferences: isRecommendation ? recommendationsPreferences : searchPreferences,
 		});
 		if (isChanged) {
 			window.onbeforeunload = () => {
@@ -78,7 +83,6 @@ class SavePreferencesN extends React.Component {
 			recommendationsPreferences,
 			searchPreferences,
 			getPreferencesPayload,
-			form,
 		} = this.props;
 
 		let newPreferences = {};
@@ -93,20 +97,18 @@ class SavePreferencesN extends React.Component {
 			}
 
 			const diffData = diff(newPreferences, getPreferencesPayload());
-			if (
-				form.get('csbID').value &&
-				(diffData?.facetSettings ||
-					diffData?.globalSettings ||
-					diffData?.themeSettings ||
-					diffData?.resultSettings ||
-					diffData?.searchSettings ||
-					diffData?.pipeline)
-			) {
-				form.get('csbID').setValue('');
-				form.get('hasEdited').setValue(false);
-			}
+
 			if (get(diffData, 'searchSettings.redirectUrlText', '')) {
 				newPreferences.searchSettings.redirectUrlText = 'View Product';
+			}
+			if (get(diffData, 'searchSettings.redirectUrlIcon', '')) {
+				newPreferences.searchSettings.redirectUrlIcon = '';
+			}
+			if (get(diffData, 'resultSettings.mapsAPIkey', '')) {
+				newPreferences.resultSettings.mapsAPIkey = '';
+			}
+			if (get(diffData, 'resultSettings.locationDataField', '')) {
+				newPreferences.resultSettings.locationDataField = '';
 			}
 		}
 		delete newPreferences.type;
@@ -122,6 +124,7 @@ class SavePreferencesN extends React.Component {
 			isRecommendation,
 			updateSearchPreferences,
 			updateRecommendationsPreferences,
+			getRecommendationsPreferences,
 			getPreferencesPayload,
 			closeForm,
 		} = this.props;
@@ -132,46 +135,75 @@ class SavePreferencesN extends React.Component {
 					this.setState({
 						hasChanged: false,
 					});
-					closeForm();
+					getRecommendationsPreferences();
+					// closeForm();
 				}
 			});
 		} else {
-			updateSearchPreferences(getPreferencesPayload(getPreferencesPayload())).then(
-				(action) => {
-					if (!(action && action.error)) {
-						this.setState({
-							hasChanged: false,
-						});
-						closeForm();
-					}
-				},
-			);
+			updateSearchPreferences(getPreferencesPayload()).then((action) => {
+				if (!(action && action.error)) {
+					this.setState({
+						hasChanged: false,
+					});
+					closeForm();
+				}
+			});
 		}
 	};
 
 	render() {
-		const { label, buttonProps, isLoading } = this.props;
-		const { hasChanged } = this.state;
-
+		const {
+			label,
+			form,
+			buttonProps,
+			isLoading,
+			preferenceId,
+			isRecommendation,
+			getSearchPreferences,
+			getPreferencesPayload,
+			closeForm,
+		} = this.props;
+		const { hasChanged, preferences } = this.state;
 		return (
 			<>
 				<Prompt
 					when={hasChanged}
 					message="You have unsaved changes, are you sure you want to leave?"
 				/>
-				<Button
-					onClick={this.handleSave}
-					loading={isLoading}
-					type="primary"
-					size="large"
-					style={{
-						marginLeft: 10,
-					}}
-					disabled={!hasChanged}
-					{...buttonProps}
-				>
-					{label}
-				</Button>
+				{isRecommendation ? (
+					<Button
+						onClick={this.handleSave}
+						loading={isLoading}
+						type="primary"
+						size="large"
+						style={{
+							marginLeft: 10,
+						}}
+						disabled={!hasChanged}
+						{...buttonProps}
+					>
+						{label}
+					</Button>
+				) : (
+					<ReviewAndSave
+						preferenceId={preferenceId}
+						closeForm={closeForm}
+						buttonProps={buttonProps}
+						oldData={preferences}
+						newData={getPreferencesPayload()}
+						setHasChanged={() => {
+							this.setState(
+								{
+									hasChanged: false,
+								},
+								() => getSearchPreferences(),
+							);
+						}}
+						getPreferencesPayload={getPreferencesPayload}
+						hasEdited={this.hasEdited}
+						form={form}
+					/>
+				)}
 			</>
 		);
 	}

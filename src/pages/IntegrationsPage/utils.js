@@ -298,7 +298,7 @@ export const validateURL = (control) => {
 
 export const getFilterConfigurationForm = (customFields = {}, isDynamicFilter = false) => {
 	return FormBuilder.group({
-		enabled: true,
+		enabled: false,
 		customize: FormBuilder.group({
 			title: isDynamicFilter ? [undefined, Validators.required] : undefined,
 			dataField: isDynamicFilter ? [undefined, Validators.required] : undefined,
@@ -313,12 +313,6 @@ export const getFilterConfigurationForm = (customFields = {}, isDynamicFilter = 
 			showMissing: false,
 			missingLabel: undefined,
 			selectAllLabel: undefined,
-			startValue: undefined,
-			endValue: undefined,
-			startLabel: undefined,
-			endLabel: undefined,
-			showHistogram: false,
-			calendarInterval: undefined,
 			...customFields,
 		}),
 	});
@@ -534,6 +528,7 @@ export const defaultSearchPreferences = {
 		searchText: 'Click here to search',
 		searchIcon: '',
 		redirectUrlText: 'View Product',
+		redirectUrlIcon: '',
 	},
 	autosuggest: true,
 	showVoiceSearch: true,
@@ -589,21 +584,21 @@ export const defaultSearchPreferences = {
 				showCheckbox: true,
 				showSearch: true,
 				showMissing: false,
-				startValue: '',
-				endValue: '',
-				startLabel: '',
-				endLabel: '',
 				showHistogram: false,
-				calendarInterval: '',
+				startValue: undefined,
+				endValue: undefined,
+				startLabel: undefined,
+				endLabel: undefined,
+				calendarInterval: undefined,
 			},
 		},
 		price: {
 			enabled: false,
 			customize: {
-				startValue: '',
-				endValue: '',
-				startLabel: '',
-				endLabel: '',
+				startValue: undefined,
+				endValue: undefined,
+				startLabel: undefined,
+				endLabel: undefined,
 				showHistogram: false,
 			},
 		},
@@ -770,6 +765,7 @@ export const getSearchPreferencesPayload = (formValue) => {
 					text: get(formValue, 'customMessages.searchText'),
 				},
 				redirectUrlText: get(formValue, 'customMessages.redirectUrlText'),
+				redirectUrlIcon: get(formValue, 'customMessages.redirectUrlIcon'),
 				fields: {
 					title: get(formValue, 'resultTitle'),
 					description: get(formValue, 'resultDescription'),

@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { Tabs, Affix } from 'antd';
-import { func, string, object, bool } from 'prop-types';
+import { string, object, bool } from 'prop-types';
 import { v4 as uuidv4 } from 'uuid';
 import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
 import SettingsTab from '../tabs/Settings';
@@ -135,7 +135,6 @@ Main.defaultProps = {
 };
 
 Main.propTypes = {
-	closeForm: func.isRequired,
 	preferenceId: string,
 	history: object.isRequired,
 	match: object.isRequired,

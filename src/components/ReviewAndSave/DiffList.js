@@ -110,6 +110,7 @@ const DiffList = ({ diff }) => {
 																title: 'Old Value',
 																key: 'oldVal',
 																dataIndex: 'oldVal',
+																width: '50%',
 																render: (ov) => (
 																	<Tag
 																		color="volcano"
@@ -128,6 +129,7 @@ const DiffList = ({ diff }) => {
 															{
 																title: 'New Value',
 																key: 'newVal',
+																width: '50%',
 																dataIndex: 'newVal',
 																render: (nv) => (
 																	<Tag

@@ -81,7 +81,7 @@ class PreferencesFormWrapperN extends React.Component {
 			}),
 			exportSettings: FormBuilder.group({
 				exportAs: 'embed',
-				credentials: ['', Validators.required],
+				credentials: '',
 				openAsPage: false,
 				type: 'other',
 			}),
@@ -118,7 +118,7 @@ class PreferencesFormWrapperN extends React.Component {
 						defaultZoom: 13,
 						showSearchAsMove: true,
 						showMarkerClusters: true,
-						mapsAPIkey: 'REDACTED_GOOGLE_API_KEY',
+						mapsAPIkey: '',
 						customMessages: FormBuilder.group({
 							resultStats: '[count] products found in [time] ms',
 							noFilterItem: 'No items Found',
@@ -128,6 +128,7 @@ class PreferencesFormWrapperN extends React.Component {
 							searchText: 'Click here to search',
 							searchIcon: ['', validateURL],
 							redirectUrlText: 'View Product',
+							redirectUrlIcon: ['', validateURL],
 						}),
 						staticFilters: FormBuilder.group({
 							productType: getFilterConfigurationForm({
@@ -137,7 +138,14 @@ class PreferencesFormWrapperN extends React.Component {
 								dataField: { value: '', disabled: true },
 							}),
 							color: getFilterConfigurationForm(),
-							size: getFilterConfigurationForm(),
+							size: getFilterConfigurationForm({
+								showHistogram: false,
+								startValue: undefined,
+								endValue: undefined,
+								startLabel: undefined,
+								endLabel: undefined,
+								calendarInterval: undefined,
+							}),
 							price: getPriceFilterConfigurationForm(),
 						}),
 						dynamicFilters: FormBuilder.array([]),
@@ -456,7 +464,11 @@ class PreferencesFormWrapperN extends React.Component {
 											),
 											redirectUrlText: get(
 												preferences,
-												'searchSettings.redirectUrlText.text',
+												'searchSettings.redirectUrlText',
+											),
+											redirectUrlIcon: get(
+												preferences,
+												'searchSettings.redirectUrlIcon',
 											),
 											...getFilterMessages(),
 										},
@@ -594,9 +606,7 @@ class PreferencesFormWrapperN extends React.Component {
 		}
 		preferencesPayload.appbaseSettings = {
 			index: preferencesPayload.pipeline,
-			credentials: `${sessionStorage.getItem('username')}:${sessionStorage.getItem(
-				'password',
-			)}`,
+			credentials: get(preferencesPayload, 'exportSettings.credentials', ''),
 			url: sessionStorage.getItem('url'),
 		};
 		return preferencesPayload;
