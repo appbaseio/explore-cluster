@@ -111,12 +111,23 @@ class Actions extends React.Component {
 		let actions = JSON.parse(JSON.stringify(originalActions));
 		actions = actions.map((action) => {
 			if (action.type === type) {
-				return {
-					...action,
-					...(type === 'script'
-						? { script: value.scriptValue, envs: value.envs }
-						: { data: value }),
-				};
+				const actionObject = {};
+
+				if (type === 'script') {
+					Object.assign(actionObject, {
+						...(value.payloadExecutionContextObj || action),
+						type,
+						script: value.scriptValue,
+						envs: value.envs,
+					});
+				} else {
+					Object.assign(actionObject, {
+						...action,
+						data: value,
+					});
+				}
+
+				return actionObject;
 			}
 			return action;
 		});
@@ -136,6 +147,13 @@ class Actions extends React.Component {
 			const defaultProps = { value: item.data, rule };
 			const { indexes, searchFields, aggsFields, subFieldsMap } = this.props;
 			if (item.type === 'script') {
+				const savedExecutionContext = {};
+				if (item.request instanceof Object) {
+					Object.assign(savedExecutionContext, { request: item.request });
+				}
+				if (item.response instanceof Object) {
+					Object.assign(savedExecutionContext, { response: item.response });
+				}
 				return {
 					scriptId: item.script // we are just checking if the script is present as one of the actions of rule
 						? // scriptId is same as rule id so we are fetching it from the URL,
@@ -143,6 +161,7 @@ class Actions extends React.Component {
 						  window.location.pathname.split('/').splice(-1)[0]
 						: null,
 					envs: item.envs || {},
+					savedExecutionContext,
 				};
 			}
 			if (item.type === 'promote_result' || item.type === 'hide_result') {

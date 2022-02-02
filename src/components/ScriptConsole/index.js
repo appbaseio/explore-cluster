@@ -321,6 +321,7 @@ const ScriptConsole = ({
 	scriptRule,
 	onScriptSave,
 	envs,
+	savedExecutionContext,
 }) => {
 	const scriptEditorRef = useRef(null);
 	const executionContextEditorRef = useRef(null);
@@ -336,6 +337,44 @@ const ScriptConsole = ({
 	useEffect(() => {
 		if (!scriptRule) {
 			isNewScriptRule.current = true;
+		}
+
+		if (savedExecutionContext instanceof Object && Object.keys(savedExecutionContext).length) {
+			try {
+				const { request, response } = savedExecutionContext || {};
+				const processedExecutionObject = {};
+				if (request instanceof Object && Object.keys(request).length) {
+					Object.assign(processedExecutionObject, {
+						request: {
+							...request,
+							...(typeof request.body === 'string' && {
+								body: JSON.parse(request.body),
+							}),
+						},
+					});
+				}
+				if (response instanceof Object && Object.keys(response).length) {
+					Object.assign(processedExecutionObject, {
+						response: {
+							...response,
+							...(typeof response.body === 'string' && {
+								body: JSON.parse(response.body),
+							}),
+						},
+					});
+				}
+
+				if (envs instanceof Object && Object.keys(envs).length) {
+					Object.assign(processedExecutionObject, {
+						envs,
+					});
+				}
+
+				setExecutionContext(JSON.stringify(processedExecutionObject));
+			} catch (error) {
+				// eslint-disable-next-line no-console
+				console.error(error);
+			}
 		}
 
 		return () => {
@@ -411,7 +450,7 @@ const ScriptConsole = ({
 			}
 		} catch (error) {
 			// eslint-disable-next-line
-			console.log(error);
+			console.error(error);
 		}
 	}, [validatedscriptRule]);
 
@@ -440,7 +479,7 @@ const ScriptConsole = ({
 			);
 		} catch (error) {
 			// eslint-disable-next-line
-			console.log(error);
+			console.error(error);
 		}
 	};
 
@@ -524,6 +563,45 @@ const ScriptConsole = ({
 				) : null}
 			</Flex>
 		);
+	};
+
+	const saveScriptHandler = () => {
+		try {
+			const savePayload = { script: sanitizeScriptString(scriptRuleValue) };
+
+			const parsedExecutionContext = JSON.parse(executionContext || {});
+			const { request, response } = parsedExecutionContext || {};
+
+			const payloadExecutionContextObj = {};
+			if (request instanceof Object && Object.keys(request).length) {
+				Object.assign(payloadExecutionContextObj, {
+					request: {
+						...request,
+						...(typeof request.body === 'object' && {
+							body: JSON.stringify(request.body),
+						}),
+					},
+				});
+			}
+
+			if (response instanceof Object && Object.keys(response).length) {
+				Object.assign(payloadExecutionContextObj, {
+					response: {
+						...response,
+						...(typeof response.body === 'object' && {
+							body: JSON.stringify(response.body),
+						}),
+					},
+				});
+			}
+			onScriptSave({
+				...savePayload,
+				payloadExecutionContextObj,
+			});
+		} catch (error) {
+			// eslint-disable-next-line no-console
+			console.error(error);
+		}
 	};
 
 	return (
@@ -615,14 +693,16 @@ const ScriptConsole = ({
 							<Button
 								className="save-script-btn"
 								type="primary"
-								onClick={() => onScriptSave(sanitizeScriptString(scriptRuleValue))}
+								onClick={saveScriptHandler}
 							>
 								Save Script
 							</Button>
 						</Flex>
 
 						<Monaco
-							defaultValue={getDefaultExecutionContextValue({ envs })}
+							defaultValue={getDefaultExecutionContextValue({
+								envs,
+							})}
 							language="json"
 							value={executionContext}
 							onChange={(value) => setExecutionContext(value)}
@@ -671,6 +751,7 @@ ScriptConsole.defaultProps = {
 	validatedscriptRule: {},
 	onScriptSave: () => {},
 	envs: {},
+	savedExecutionContext: {},
 };
 
 ScriptConsole.propTypes = {
@@ -680,6 +761,7 @@ ScriptConsole.propTypes = {
 	scriptRule: PropTypes.string,
 	onScriptSave: PropTypes.func,
 	envs: PropTypes.object,
+	savedExecutionContext: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({

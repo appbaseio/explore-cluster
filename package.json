@@ -70,7 +70,6 @@
 		"less-loader": "^4.1.0",
 		"linkinator": "^2.0.6",
 		"mini-css-extract-plugin": "^0.9.0",
-		"prettier": "^2.0.4",
 		"source-map-explorer": "^2.4.1",
 		"style-loader": "^0.22.1",
 		"terser-webpack-plugin": "^5.2.4",
@@ -148,6 +147,7 @@
 		"url-search-params": "^1.1.0",
 		"urlsafe-base64": "https://github.com/farhan687/urlsafe-base64.git",
 		"util": "^0.12.4",
-		"uuid": "^8.3.2"
+		"uuid": "^8.3.2",
+		"prettier": "^2.0.4"
 	}
 }

@@ -1,3 +1,8 @@
+/* eslint-disable import/no-extraneous-dependencies */
+
+const prettier = require('prettier');
+const babylon = require('prettier/parser-babel');
+
 export const DEFAULT_EXECUTION_CONTEXT_VALUE = {
 	request: {
 		body: {
@@ -144,9 +149,14 @@ export const getDefaultExecutionContextValue = (overrideObject = {}) => {
 	return JSON.stringify(finalObjectValue);
 };
 
-export const sanitizeScriptString = (scriptString = '') =>
-	scriptString?.replace(/ {4}/g, '').replace(/(\r\n|\n|\r)/gm, '');
-
+export const sanitizeScriptString = (scriptString = '') => {
+	const scriptStringFormatted = prettier.format(scriptString, {
+		parser: 'babel',
+		plugins: [babylon],
+	});
+	/* eslint-enable import/no-extraneous-dependencies */
+	return scriptStringFormatted?.replace(/ {4}/g, '').replace(/(\r\n|\n|\r)/gm, ''); // removing long spaces of 4 space-chars
+};
 export const generateScriptValidationRequestBody = (scriptValue, executionContextValue) => {
 	// we process spaces and newline chars before appending to requestbody
 	// we remove combination of 4 spaces at a time since we use 4 tab spaces in monaco to format string

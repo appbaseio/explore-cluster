@@ -20,7 +20,14 @@ const scriptRuleModal = css`
 	}
 `;
 
-const ScriptRule = ({ scriptId, envs: envsProp, fetchRule, onChange, scriptRule }) => {
+const ScriptRule = ({
+	scriptId,
+	envs: envsProp,
+	savedExecutionContext,
+	fetchRule,
+	onChange,
+	scriptRule,
+}) => {
 	const [isScriptConsoleOpen, setIsScriptConsoleOpen] = useState(false);
 	const [scriptRuleLocalValue, setScriptRuleLocalValue] = useState('');
 
@@ -220,13 +227,14 @@ const ScriptRule = ({ scriptId, envs: envsProp, fetchRule, onChange, scriptRule 
 					}}
 				>
 					<ScriptConsole
-						onScriptSave={(value) => {
-							setScriptRuleLocalValue(value);
-							onChange({ scriptValue: value, envs });
+						onScriptSave={({ script, payloadExecutionContextObj }) => {
+							setScriptRuleLocalValue(script);
+							onChange({ scriptValue: script, envs, payloadExecutionContextObj });
 							setIsScriptConsoleOpen(false);
 						}}
 						scriptRule={scriptRuleLocalValue}
 						envs={envs}
+						savedExecutionContext={savedExecutionContext}
 					/>
 				</Modal>
 			)}
@@ -245,6 +253,7 @@ ScriptRule.propTypes = {
 	fetchRule: PropTypes.func.isRequired,
 	onChange: PropTypes.func.isRequired,
 	envs: PropTypes.object.isRequired,
+	savedExecutionContext: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
