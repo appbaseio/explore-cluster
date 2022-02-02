@@ -74,7 +74,12 @@ class LoginPage extends Component {
 
 	render() {
 		const { user } = this.props;
+		const redirectUrl = sessionStorage.getItem('redirectUrl');
+
 		if (user.data) {
+			if (redirectUrl) {
+				return <Redirect to={`${redirectUrl}`} />;
+			}
 			return <Redirect to="/" />;
 		}
 		return (
