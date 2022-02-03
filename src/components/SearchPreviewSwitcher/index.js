@@ -27,6 +27,7 @@ const SearchPreviewSwitcher = ({ app, filteredApps, onCancel, onSelect, visible,
 					),
 				}}
 				onSelect={onSelect}
+				disablePopover
 			/>
 			{visible && (
 				<Modal
@@ -37,7 +38,13 @@ const SearchPreviewSwitcher = ({ app, filteredApps, onCancel, onSelect, visible,
 					destroyOnClose
 					visible={visible}
 				>
-					<SearchPreview app={app} page={page} />
+					<SearchPreview
+						app={app}
+						page={page}
+						filteredApps={filteredApps}
+						onSelect={onSelect}
+						showIndexSwitcher
+					/>
 				</Modal>
 			)}
 		</>

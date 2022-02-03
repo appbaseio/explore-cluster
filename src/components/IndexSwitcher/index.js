@@ -25,9 +25,12 @@ function IndexSwitcher({
 	renderItem,
 	isAppsLoading,
 	updateSessionData,
+	indexChooser,
+	disablePopover,
+	sessionData,
 }) {
 	const userApps = filteredApps.filter((index) => index && !index.includes('metricbeat-'));
-
+	console.log(sessionData, disablePopover);
 	if (userApps.length === 1 && item.link)
 		return (
 			<Link to={`/app/${userApps[0]}/${item.link}`}>
@@ -73,7 +76,17 @@ function IndexSwitcher({
 		);
 	}
 
-	return (
+	// eslint-disable-next-line
+	return indexChooser ? (
+		getTitle()
+	) : // eslint-disable-next-line
+	sessionData && disablePopover ? (
+		renderItem ? (
+			renderItem()
+		) : (
+			<LabelTag item={item} />
+		)
+	) : (
 		<Popconfirm
 			overlayClassName={popOverClass}
 			placement="right"
@@ -90,6 +103,7 @@ function IndexSwitcher({
 				</Tooltip>
 			}
 			title={getTitle()}
+			disabled={sessionData && disablePopover}
 		>
 			{renderItem ? renderItem() : <LabelTag item={item} />}
 		</Popconfirm>
@@ -104,6 +118,9 @@ IndexSwitcher.propTypes = {
 	renderItem: PropTypes.func,
 	isAppsLoading: PropTypes.bool,
 	updateSessionData: PropTypes.func.isRequired,
+	indexChooser: PropTypes.bool,
+	sessionData: PropTypes.string,
+	disablePopover: PropTypes.bool,
 };
 
 IndexSwitcher.defaultProps = {
@@ -113,10 +130,14 @@ IndexSwitcher.defaultProps = {
 	renderItem: null,
 	history: null,
 	isAppsLoading: false,
+	indexChooser: false,
+	sessionData: '',
+	disablePopover: false,
 };
 
 const mapStateToProps = (state) => ({
 	isAppsLoading: get(state, 'apps.isFetching'),
+	sessionData: get(state, 'sessionData.sessionData', ''),
 });
 
 const mapDispatchToProps = (dispatch) => ({

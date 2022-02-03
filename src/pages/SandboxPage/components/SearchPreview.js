@@ -29,6 +29,7 @@ import ErrorToaster from '../../../batteries/components/shared/ErrorToaster';
 import { withErrorToaster } from '../../../batteries/components/shared/ErrorToaster/ErrorToaster';
 import SandboxContext from './SandboxContext';
 import { versionCompare } from '../../../batteries/utils/helpers';
+import IndexSwitcher from '../../../components/IndexSwitcher';
 
 const container = css`
 	padding: 16px;
@@ -519,6 +520,9 @@ class SearchPreview extends React.Component {
 			selectButtonLabel,
 			page,
 			withRule,
+			showIndexSwitcher,
+			filteredApps,
+			onSelect,
 		} = this.props;
 
 		const {
@@ -594,12 +598,19 @@ class SearchPreview extends React.Component {
 										Enable Autosuggestion
 										<Switch
 											checked={isTypeahead}
-											style={{ marginLeft: 5 }}
+											style={{ marginLeft: 5, marginRight: 10 }}
 											onChange={this.toggleTypeahead}
 											id="suggestions"
 										/>
 									</label>
 								</Tooltip>
+								{showIndexSwitcher && (
+									<IndexSwitcher
+										filteredApps={filteredApps}
+										onSelect={onSelect}
+										indexChooser
+									/>
+								)}
 							</div>
 							<Button onClick={this.generateCodeSandbox} size="large" type="primary">
 								<Icon type="code-sandbox" />
@@ -747,6 +758,9 @@ SearchPreview.propTypes = {
 	searchStateSuggestions: PropTypes.object,
 	page: PropTypes.string,
 	withRule: PropTypes.bool,
+	showIndexSwitcher: PropTypes.bool,
+	onSelect: PropTypes.func,
+	filteredApps: PropTypes.array,
 };
 
 SearchPreview.defaultProps = {
@@ -770,6 +784,9 @@ SearchPreview.defaultProps = {
 	searchStateSuggestions: null,
 	page: '',
 	withRule: false,
+	showIndexSwitcher: false,
+	onSelect: () => {},
+	filteredApps: [],
 };
 
 export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(SearchPreview));
