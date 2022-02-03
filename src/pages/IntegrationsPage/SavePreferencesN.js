@@ -1,7 +1,6 @@
 import React from 'react';
 import { Prompt } from 'react-router-dom';
 import { arrayOf, bool, func, object, string } from 'prop-types';
-import { Button } from 'antd';
 import get from 'lodash/get';
 import isEqual from 'lodash/isEqual';
 import { connect } from 'react-redux';
@@ -153,13 +152,13 @@ class SavePreferencesN extends React.Component {
 
 	render() {
 		const {
-			label,
 			form,
+			label,
 			buttonProps,
-			isLoading,
 			preferenceId,
 			isRecommendation,
 			getSearchPreferences,
+			getRecommendationsPreferences,
 			getPreferencesPayload,
 			closeForm,
 		} = this.props;
@@ -170,40 +169,31 @@ class SavePreferencesN extends React.Component {
 					when={hasChanged}
 					message="You have unsaved changes, are you sure you want to leave?"
 				/>
-				{isRecommendation ? (
-					<Button
-						onClick={this.handleSave}
-						loading={isLoading}
-						type="primary"
-						size="large"
-						style={{
-							marginLeft: 10,
-						}}
-						disabled={!hasChanged}
-						{...buttonProps}
-					>
-						{label}
-					</Button>
-				) : (
-					<ReviewAndSave
-						preferenceId={preferenceId}
-						closeForm={closeForm}
-						buttonProps={buttonProps}
-						oldData={preferences}
-						newData={getPreferencesPayload()}
-						setHasChanged={() => {
-							this.setState(
-								{
-									hasChanged: false,
-								},
-								() => getSearchPreferences(),
-							);
-						}}
-						getPreferencesPayload={getPreferencesPayload}
-						hasEdited={this.hasEdited}
-						form={form}
-					/>
-				)}
+				<ReviewAndSave
+					label={label}
+					isRecommendation={isRecommendation}
+					preferenceId={preferenceId}
+					closeForm={closeForm}
+					buttonProps={buttonProps}
+					oldData={preferences}
+					newData={getPreferencesPayload()}
+					setHasChanged={() => {
+						this.setState(
+							{
+								hasChanged: false,
+							},
+							() => {
+								// eslint-disable-next-line
+								isRecommendation
+									? getRecommendationsPreferences()
+									: getSearchPreferences();
+							},
+						);
+					}}
+					getPreferencesPayload={getPreferencesPayload}
+					hasEdited={this.hasEdited}
+					form={form}
+				/>
 			</>
 		);
 	}
@@ -214,7 +204,6 @@ SavePreferencesN.defaultProps = {
 	preferenceId: null,
 	buttonProps: null,
 	isRecommendation: false,
-	isLoading: false,
 	searchPreferences: getSearchPreferencesPayload(defaultSearchPreferences),
 	recommendationsPreferences: getRecommendationPreferencesPayload(
 		defaultRecommendationsPreferences,
@@ -225,7 +214,6 @@ SavePreferencesN.defaultProps = {
 SavePreferencesN.propTypes = {
 	label: string,
 	preferenceId: string,
-	isLoading: bool,
 	buttonProps: object,
 	isRecommendation: bool,
 	updateSearchPreferences: func.isRequired,
@@ -243,9 +231,6 @@ SavePreferencesN.propTypes = {
 const mapStateToProps = (state, props) => ({
 	searchPreferences: getSearchPreferenceById(state, props.preferenceId),
 	recommendationsPreferences: getRecommendationPreferenceById(state, props.preferenceId),
-	isLoading: props.isRecommendation
-		? get(state, '$saveRecommendationPreferenceN.isFetching')
-		: get(state, '$saveSearchPreferenceN.isFetching'),
 	errors: props.isRecommendation
 		? [get(state, '$saveRecommendationPreferenceN.error')]
 		: [get(state, '$saveSearchPreferenceN.error')],

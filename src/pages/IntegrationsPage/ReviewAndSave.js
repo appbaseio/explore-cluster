@@ -6,7 +6,10 @@ import { connect } from 'react-redux';
 import { func, object, bool, string } from 'prop-types';
 import { diff } from 'jsondiffpatch';
 import DiffList from './DiffList';
-import { saveSearchPreferenceN } from '../../batteries/modules/actions';
+import {
+	saveSearchPreferenceN,
+	saveRecommendationPreferenceN,
+} from '../../batteries/modules/actions';
 
 const Badge = styled.span`
 	background: #f5222d;
@@ -34,13 +37,17 @@ const staticFacetsFields = [
 const ReviewAndSave = ({
 	oldData,
 	newData,
-	isLoading,
+	isRecommLoading,
+	isSearchLoading,
+	label,
 	buttonProps,
 	updateSearchPreferences,
+	updateRecommendationsPreferences,
 	getPreferencesPayload,
 	setHasChanged,
 	hasEdited,
 	form,
+	isRecommendation,
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isResetting, setIsResetting] = useState(false);
@@ -57,10 +64,10 @@ const ReviewAndSave = ({
 	}, [isResetting]);
 
 	useEffect(() => {
-		if (!isLoading) {
+		if (!isRecommLoading || isSearchLoading) {
 			setIsOpen(false);
 		}
-	}, [isLoading]);
+	}, [isRecommLoading, isSearchLoading]);
 
 	const showModal = () => {
 		setIsOpen(true);
@@ -72,27 +79,35 @@ const ReviewAndSave = ({
 	};
 
 	const handleSave = () => {
-		if (
-			form.get('csbID').value &&
-			(diffData?.facetSettings ||
-				diffData?.themeSettings ||
-				diffData?.resultSettings ||
-				diffData?.searchSettings ||
-				diffData?.pipeline)
-		) {
-			form.get('csbID').setValue('');
-			form.get('hasEdited').setValue(false);
-		}
-		updateSearchPreferences(getPreferencesPayload()).then((action) => {
-			if (!(action && action.error)) {
-				setHasChanged();
+		if (isRecommendation) {
+			updateRecommendationsPreferences(getPreferencesPayload()).then((action) => {
+				if (!(action && action.error)) {
+					setHasChanged();
+				}
+			});
+		} else {
+			if (
+				form.get('csbID') &&
+				form.get('csbID').value &&
+				(diffData?.facetSettings ||
+					diffData?.themeSettings ||
+					diffData?.resultSettings ||
+					diffData?.searchSettings ||
+					diffData?.pipeline)
+			) {
+				form.get('csbID').setValue('');
+				form.get('hasEdited').setValue(false);
 			}
-		});
+			updateSearchPreferences(getPreferencesPayload()).then((action) => {
+				if (!(action && action.error)) {
+					setHasChanged();
+				}
+			});
+		}
 	};
 
 	const getDiffData = (oldObj, newObj) => {
 		let diffData = diff({ ...oldObj }, { ...newObj });
-
 		if (!diffData) {
 			return [0, {}];
 		}
@@ -133,6 +148,7 @@ const ReviewAndSave = ({
 		}
 
 		if (
+			form.get('csbID') &&
 			form.get('csbID').value &&
 			(diffData?.facetSettings ||
 				diffData?.themeSettings ||
@@ -349,6 +365,19 @@ const ReviewAndSave = ({
 
 		if (get(diffData, 'resultSettings.fields', null)) {
 			const resultSettings = get(diffData, 'resultSettings.fields', {});
+			Object.keys(resultSettings).forEach((i) => {
+				let field = resultSettings[i];
+				if (field[0] && !field[1]) {
+					field = [field[0], ''];
+				} else if (!field[0] && field[1]) {
+					field = ['', field[1]];
+				} else if (!field[0] && !field[1] && field.length === 3 && field[2]) {
+					field = ['', field[2]];
+				} else {
+					field = [field[0], field[1]];
+				}
+				resultSettings[i] = field;
+			});
 			diffData = {
 				...diffData,
 				resultSettings: {
@@ -357,7 +386,7 @@ const ReviewAndSave = ({
 				},
 			};
 			delete diffData.resultSettings.fields;
-			delete diffData.searchSettings.fields;
+			delete diffData?.searchSettings?.fields;
 		}
 
 		if (get(diffData, 'resultSettings', null)) {
@@ -407,6 +436,29 @@ const ReviewAndSave = ({
 			delete diffData.resultSettings.customMessages;
 		}
 
+		if (get(diffData, 'recommendationSettings', null)) {
+			const recommendationSettings = get(diffData, 'recommendationSettings', null);
+			diffData = {
+				...diffData,
+				recommendationSettings: {
+					...diffData.recommendationSettings,
+					...recommendationSettings,
+				},
+			};
+		}
+
+		if (get(diffData, 'recommendationSettings.recommendations', null)) {
+			const newVal = get(newObj, 'recommendationSettings.recommendations', {});
+			const oldVal = get(oldObj, 'recommendationSettings.recommendations', {});
+			diffData = {
+				...diffData,
+				recommendationSettings: {
+					...diffData.recommendationSettings,
+					recommendations: [oldVal, newVal],
+				},
+			};
+		}
+
 		diffData = {
 			ecommercePlatform: get(diffData, 'ecommercePlatform', {}),
 			layoutAndDesign: get(diffData, 'layoutAndDesign', {}),
@@ -415,6 +467,7 @@ const ReviewAndSave = ({
 			generalSettings: get(diffData, 'generalSettings', {}),
 			resultSettings: get(diffData, 'resultSettings', {}),
 			exportSettings: get(diffData, 'exportSettings', {}),
+			recommendationSettings: get(diffData, 'recommendationSettings', {}),
 		};
 
 		// filter empty fields
@@ -457,7 +510,7 @@ const ReviewAndSave = ({
 					type="primary"
 					disabled={!diffCount}
 					onClick={showModal}
-					loading={isLoading}
+					loading={isSearchLoading || isRecommLoading}
 					data-cy="review-deploy-ui-builder"
 					{...buttonProps}
 				>
@@ -473,7 +526,7 @@ const ReviewAndSave = ({
 					top: 20,
 				}}
 				destroyOnClose
-				okText="Save"
+				okText={label}
 				onCancel={handleCancel}
 				cancelButtonProps={{ 'data-cy': 'cancel-modal-button' }}
 				okButtonProps={{
@@ -500,13 +553,18 @@ const ReviewAndSave = ({
 
 ReviewAndSave.defaultProps = {
 	buttonProps: null,
-	isLoading: false,
 	preferenceId: null,
 	hasEdited: false,
+	isRecommLoading: false,
+	isSearchLoading: false,
+	isRecommendation: false,
+	label: 'Save',
 };
 
 ReviewAndSave.propTypes = {
-	isLoading: bool,
+	isSearchLoading: bool,
+	isRecommLoading: bool,
+	label: string,
 	hasEdited: bool,
 	buttonProps: object,
 	preferenceId: string,
@@ -515,16 +573,21 @@ ReviewAndSave.propTypes = {
 	setHasChanged: func.isRequired,
 	getPreferencesPayload: func.isRequired,
 	updateSearchPreferences: func.isRequired,
+	updateRecommendationsPreferences: func.isRequired,
 	form: object.isRequired,
+	isRecommendation: bool,
 };
 
 const mapStateToProps = (state) => ({
-	isLoading: get(state, '$saveSearchPreferenceN.isFetching'),
+	isSearchLoading: get(state, '$saveSearchPreferenceN.isFetching'),
+	isRecommLoading: get(state, '$saveRecommendationPreferenceN.isFetching'),
 });
 
 const mapDispatchToProps = (dispatch, props) => ({
 	updateSearchPreferences: (payload) =>
 		dispatch(saveSearchPreferenceN(props.preferenceId, payload)),
+	updateRecommendationsPreferences: (payload) =>
+		dispatch(saveRecommendationPreferenceN(props.preferenceId, payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(ReviewAndSave);

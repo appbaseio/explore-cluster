@@ -532,6 +532,18 @@ const settingsMap = {
 		title: 'Filters / Show price filter',
 		description: '',
 	},
+	ctaAction: {
+		title: 'CTA Action',
+		description: '',
+	},
+	ctaTitle: {
+		title: 'Title',
+		description: '',
+	},
+	recommendations: {
+		title: 'Recommendations UI',
+		description: '',
+	},
 };
 
 export default settingsMap;
