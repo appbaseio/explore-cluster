@@ -1,20 +1,23 @@
-import { Button, Col, Icon, Row, Select, Tag, Tooltip, Modal } from 'antd';
-import { css } from 'emotion';
+import { Button, Col, Icon, Row, Select, Tag, Tooltip, Modal, Tabs } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
+import { css } from 'emotion';
 import Monaco from '../../batteries/components/SearchSandbox/containers/MonacoEditor';
 import Flex from '../../batteries/components/shared/Flex';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 import { clearValidatedScriptRule, validateScript } from '../../batteries/modules/actions';
 import {
+	DEFAULT_QUERY_EDITOR_VALUE,
 	generateScriptValidationRequestBody,
 	getDefaultExecutionContextValue,
+	monacoOptions,
 	sanitizeScriptString,
 } from './utils';
 
 import scriptTemplates, { TEMPLATE_KEYS } from './scriptTemplates';
+import ConsoleLogger from './ConsoleLogger';
 
 const {
 	MODIFY_INDEXING_REQUEST,
@@ -27,21 +30,30 @@ const {
 } = TEMPLATE_KEYS;
 const { Option } = Select;
 const { confirm } = Modal;
+const { TabPane } = Tabs;
+const queryAreaTooltipTableCss = css`
+	td,
+	th {
+		border: 1px solid #fff;
+		text-align: left;
+		vertical-align: middle;
+		padding: 3px;
+	}
 
-const monacoOptions = {
-	cursorStyle: 'line',
-	fontFamily: 'Monaco, monospace',
-	fontSize: 14,
-	autoIndent: true,
-	padding: {
-		top: 10,
-		bottom: 10,
-	},
-	minimap: {
-		enabled: false,
-	},
-	comments: 'insertSpace',
-};
+	th {
+		white-space: no-wrap;
+	}
+
+	td {
+		max-width: 400px;
+	}
+
+	table {
+		a:firstchild {
+			margin-bottom: 1px;
+		}
+	}
+`;
 const scriptConsoleCss = css`
 	display: flex !important;
 	align-items: stretch;
@@ -49,13 +61,45 @@ const scriptConsoleCss = css`
 	min-height: 500px;
 	position: relative !important;
 
+	.ant-select-sm.ant-select {
+		width: 300px;
+	}
+	.tabs-container {
+		height: calc(100% + 4px);
+
+		.ant-tabs-extra-content {
+			line-height: 35px;
+			margin-right: 1px;
+			margin-left: 2px;
+		}
+		.ant-tabs-bar {
+			margin: 6px 0 9px 5px;
+		}
+		.ant-tabs-content {
+			height: 100%;
+		}
+		.ant-tabs-tab {
+			margin: 0;
+			padding: 5px 16px;
+
+			h3 {
+				margin-bottom: 0;
+			}
+		}
+	}
+
 	.monaco-wrapper {
 		width: 100% !important;
 		height: calc(100% - 42px) !important;
 	}
 
-	.save-script-btn {
-		font-size: 14px;
+	.save-script-btn-wrapper {
+		padding: 0 5px 5px;
+		background: white;
+
+		button {
+			font-size: 14px;
+		}
 	}
 	.script-console {
 		&__col {
@@ -111,41 +155,57 @@ const scriptConsoleCss = css`
 			&.response-area {
 				min-height: 250px;
 				height: 100%;
+
+				#response-area-placeholder {
+					position: absolute;
+					width: 100%;
+					height: 100%;
+					background: #151515;
+					h2 {
+						color: white;
+						position: absolute;
+						top: 50%;
+						left: 50%;
+						transform: translate(-50%, -50%);
+						width: 80%;
+						text-align: center;
+						font-weight: 400 !important;
+					}
+				}
 			}
 
 			&.template-area {
 			}
 
 			&.response-area {
+				position: relative;
+				.response-stats-wrapper {
+					width: max-content;
+					position: absolute;
+					z-index: 1;
+					right: 10px;
+					top: 6px;
+				}
 			}
 
 			&-wrapper {
-				height: 50%;
+				height: 100%;
 			}
 		}
 	}
-`;
 
-const queryAreaTooltipTable = css`
-	td,
-	th {
-		border: 1px solid #fff;
-		text-align: left;
-		vertical-align: middle;
-		padding: 3px;
-	}
+	@media only screen and (max-width: 1024px) {
+		h3 {
+			font-size: 12px;
+		}
 
-	th {
-		white-space: no-wrap;
-	}
+		.ant-select-sm.ant-select {
+			width: 200px;
+			font-size: 12px;
+		}
 
-	td {
-		max-width: 400px;
-	}
-
-	table {
-		a:firstchild {
-			margin-bottom: 1px;
+		.ant-tabs-tab {
+			padding: 5px 4px;
 		}
 	}
 `;
@@ -161,7 +221,7 @@ const getTooltipTitle = {
 				For modifying the response, define the <code>handleResponse</code> function.
 			</p>
 			<p>Following global packages are available and can be used directly:</p>
-			<table css={queryAreaTooltipTable}>
+			<table css={queryAreaTooltipTableCss}>
 				<thead>
 					<tr>
 						<th>Package name</th>
@@ -309,10 +369,25 @@ const getTooltipTitle = {
 		</div>
 	),
 	'response-area': <div>Script response can be seen here once you play the request.</div>,
-	'execute-button': <div>Execute the script request</div>,
+	'execute-button': <div>Execute the script request.</div>,
+	'console-logs': <div>View console logs.</div>,
 };
 
-const DEFAULT_QUERY_EDITOR_VALUE = '// query here';
+const TABS_KEYS = {
+	EXECUTION_CONTEXT: 'Execution Context',
+	RESPONSE_OUTPUT_SHORT: 'Response',
+	RESPONSE_OUTPUT: 'Response Output',
+	CONSOLE_LOGS: 'Console Logs',
+	CONSOLE_LOGS_SHORT: 'Console',
+};
+
+const {
+	EXECUTION_CONTEXT,
+	RESPONSE_OUTPUT,
+	RESPONSE_OUTPUT_SHORT,
+	CONSOLE_LOGS,
+	CONSOLE_LOGS_SHORT,
+} = TABS_KEYS;
 
 const ScriptConsole = ({
 	validatedscriptRule,
@@ -334,6 +409,9 @@ const ScriptConsole = ({
 
 	const [selectedTemplateKey, setSelectedTemplateKey] = useState('');
 
+	const [activeTabKey, setActiveTabKey] = useState(EXECUTION_CONTEXT);
+
+	const [isSmallScreen, setIsSmallScreen] = useState(false);
 	useEffect(() => {
 		if (!scriptRule) {
 			isNewScriptRule.current = true;
@@ -377,7 +455,12 @@ const ScriptConsole = ({
 			}
 		}
 
+		const updateSmallScreenVariable = () => {
+			setIsSmallScreen(window.innerWidth <= 1320);
+		};
+		window.addEventListener('resize', updateSmallScreenVariable);
 		return () => {
+			window.removeEventListener('resize', updateSmallScreenVariable);
 			clearValidationValueFromStore();
 		};
 	}, []);
@@ -423,6 +506,11 @@ const ScriptConsole = ({
 			// set overridden execution context value
 			setExecutionContext(JSON.stringify(parsedExecutionContextValue));
 			triggerExecutionContextFormatter.current = true;
+
+			// reset tab values after template is changed
+			setActiveTabKey(EXECUTION_CONTEXT);
+			clearValidationValueFromStore();
+			setScriptRuleValidationResponse('');
 		}
 	}, [selectedTemplateKey]);
 
@@ -435,6 +523,7 @@ const ScriptConsole = ({
 
 	useEffect(() => {
 		try {
+			let shouldSwitchToResponseTab = false;
 			if (
 				typeof validatedscriptRule.results === 'object' &&
 				Object.keys(validatedscriptRule.results).length
@@ -442,11 +531,17 @@ const ScriptConsole = ({
 				setScriptRuleValidationResponse(
 					JSON.stringify(validatedscriptRule.results, null, '\t'),
 				);
+				shouldSwitchToResponseTab = true;
 			}
 			if (validatedscriptRule.error) {
 				setScriptRuleValidationResponse(
 					JSON.stringify(validatedscriptRule.error.message, null, '\t'),
 				);
+				shouldSwitchToResponseTab = true;
+			}
+
+			if (shouldSwitchToResponseTab) {
+				setActiveTabKey(RESPONSE_OUTPUT);
 			}
 		} catch (error) {
 			// eslint-disable-next-line
@@ -603,7 +698,6 @@ const ScriptConsole = ({
 			console.error(error);
 		}
 	};
-
 	return (
 		<Row justify="space-between" css={scriptConsoleCss}>
 			<Col span={12} className="script-console__col query-area">
@@ -644,7 +738,6 @@ const ScriptConsole = ({
 							defaultOpen={isNewScriptRule.current}
 							showSearch
 							size="small"
-							style={{ width: '300px' }}
 							placeholder="Select a Script Template"
 							onChange={onTemplateSelect}
 							value={selectedTemplateKey}
@@ -670,11 +763,30 @@ const ScriptConsole = ({
 				/>
 			</Col>
 			<Col span={12}>
-				<Row className="script-console__col-wrapper">
-					<Col span={24} className="script-console__col template-area">
-						<Flex justifyContent="space-between" alignItems="center">
+				<Tabs
+					tabBarExtraContent={
+						<div className="save-script-btn-wrapper">
+							<Button type="primary" onClick={saveScriptHandler}>
+								{isSmallScreen ? (
+									<Tooltip title="Save Script" trigger="hover">
+										<Icon type="save" title="" />{' '}
+									</Tooltip>
+								) : (
+									'Save Script'
+								)}
+							</Button>
+						</div>
+					}
+					className="tabs-container"
+					defaultActiveKey={EXECUTION_CONTEXT}
+					onChange={(key) => setActiveTabKey(key)}
+					activeKey={activeTabKey}
+				>
+					<TabPane
+						className="script-console__col-wrapper"
+						tab={
 							<h3>
-								Execution Context
+								{EXECUTION_CONTEXT}
 								<Tooltip
 									overlayStyle={{
 										width: '450px',
@@ -690,57 +802,78 @@ const ScriptConsole = ({
 									</span>
 								</Tooltip>
 							</h3>
-							<Button
-								className="save-script-btn"
-								type="primary"
-								onClick={saveScriptHandler}
-							>
-								Save Script
-							</Button>
-						</Flex>
-
-						<Monaco
-							defaultValue={getDefaultExecutionContextValue({
-								envs,
-							})}
-							language="json"
-							value={executionContext}
-							onChange={(value) => setExecutionContext(value)}
-							customizeMonacoInstance={(monaco, editorRef) => {
-								executionContextEditorRef.current = editorRef;
-							}}
-							theme="vs-dark"
-							options={monacoOptions}
-							readOnly={false}
-							wrapperClass="monaco-wrapper"
-						/>
-					</Col>
-				</Row>
-				<Row className="script-console__col-wrapper">
-					<Col span={24} className="script-console__col response-area">
-						<Flex justifyContent="space-between">
+						}
+						key={EXECUTION_CONTEXT}
+					>
+						<Col span={24} className="script-console__col template-area">
+							<Monaco
+								defaultValue={getDefaultExecutionContextValue({
+									envs,
+								})}
+								language="json"
+								value={executionContext}
+								onChange={(value) => setExecutionContext(value)}
+								customizeMonacoInstance={(monaco, editorRef) => {
+									executionContextEditorRef.current = editorRef;
+								}}
+								theme="vs-dark"
+								options={monacoOptions}
+								readOnly={false}
+								wrapperClass="monaco-wrapper"
+							/>
+						</Col>
+					</TabPane>
+					<TabPane
+						className="script-console__col-wrapper"
+						tab={
 							<h3>
-								Response{' '}
+								{isSmallScreen ? RESPONSE_OUTPUT_SHORT : RESPONSE_OUTPUT}{' '}
 								<Tooltip placement="right" title={getTooltipTitle['response-area']}>
 									<span style={{ marginLeft: 5 }}>
 										<Icon type="info-circle" />
 									</span>
 								</Tooltip>
 							</h3>
-
-							{renderResponseCodeTime()}
-						</Flex>
-						<Monaco
-							defaultValue="// Validation Response "
-							language="json"
-							value={scriptRuleValidationResponse}
-							theme="vs-dark"
-							options={monacoOptions}
-							readOnly
-							wrapperClass="monaco-wrapper"
+						}
+						key={RESPONSE_OUTPUT}
+					>
+						<Col span={24} className="script-console__col response-area">
+							<div className="response-stats-wrapper">{renderResponseCodeTime()}</div>
+							{scriptRuleValidationResponse ? (
+								<Monaco
+									defaultValue="// Run the request to see the response output"
+									language="json"
+									value={scriptRuleValidationResponse}
+									theme="vs-dark"
+									options={monacoOptions}
+									readOnly
+									wrapperClass="monaco-wrapper"
+								/>
+							) : (
+								<div id="response-area-placeholder">
+									<h2>Run the request to see the response output</h2>
+								</div>
+							)}
+						</Col>
+					</TabPane>
+					<TabPane
+						tab={
+							<h3>
+								{isSmallScreen ? CONSOLE_LOGS_SHORT : CONSOLE_LOGS}
+								<Tooltip placement="right" title={getTooltipTitle['console-logs']}>
+									<span style={{ marginLeft: 5 }}>
+										<Icon type="info-circle" />
+									</span>
+								</Tooltip>
+							</h3>
+						}
+						key={CONSOLE_LOGS}
+					>
+						<ConsoleLogger
+							consoleArray={validatedscriptRule?.results?.response?.console}
 						/>
-					</Col>
-				</Row>
+					</TabPane>
+				</Tabs>
 			</Col>
 		</Row>
 	);

@@ -1,5 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
-
 const prettier = require('prettier');
 const babylon = require('prettier/parser-babel');
 
@@ -170,4 +168,37 @@ export const generateScriptValidationRequestBody = (scriptValue, executionContex
 	}
 
 	return requestBody;
+};
+
+export const monacoOptions = {
+	cursorStyle: 'line',
+	fontFamily: 'Monaco, monospace',
+	fontSize: 14,
+	autoIndent: true,
+	padding: {
+		top: 10,
+		bottom: 10,
+	},
+	minimap: {
+		enabled: false,
+	},
+	comments: 'insertSpace',
+};
+
+export const DEFAULT_QUERY_EDITOR_VALUE = '// query here';
+
+export const isJson = (itemProp) => {
+	let item = typeof itemProp !== 'string' ? JSON.stringify(itemProp) : itemProp;
+
+	try {
+		item = JSON.parse(item);
+	} catch (e) {
+		return false;
+	}
+
+	if (typeof item === 'object' && item !== null) {
+		return true;
+	}
+
+	return false;
 };
