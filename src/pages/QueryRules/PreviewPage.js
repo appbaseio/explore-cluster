@@ -56,7 +56,7 @@ function PreviewPage({ showModal, handleCancel, selectedIndexes, previewType, on
 							<SearchPreview app={selectedIndexes.join(',')} page="rules" />
 						</TabPane>
 						<TabPane tab="With rule applied" key="2">
-							<SearchPreview app={selectedIndexes.join(',')} page="rules" withRule={true}/>
+							<SearchPreview app={selectedIndexes.join(',')} page="rules" withRule />
 						</TabPane>
 					</Tabs>
 				)}

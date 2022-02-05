@@ -534,7 +534,7 @@ class QueryRulesForm extends React.Component {
 			if (condition === 'always') {
 				return '';
 			}
-			if (condition === 'query') {
+			if (condition === 'filter') {
 				return show_advance_editor
 					? `'${(selectedIndexes || []).join(',')}' in $index ${
 							advancedExpression ? suffixExpression : ''

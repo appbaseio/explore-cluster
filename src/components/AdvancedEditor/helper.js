@@ -263,8 +263,8 @@ export const unParseExpression = (query = '') => {
 // unparses expression and returns index and expression from the two combined
 export const getRawQuery = (showAdvancedEditor, unparsedRule) => {
 	let rawQuery = '';
-	let indexes = '*';
-	if (showAdvancedEditor && get(unparsedRule, 'trigger.type') === 'filter') {
+	let indexes = ['*'];
+	if (showAdvancedEditor && ['filter', 'index'].includes(get(unparsedRule, 'trigger.type'))) {
 		rawQuery = get(unparsedRule, 'trigger.expression', '');
 		rawQuery = rawQuery.split('in $index and ');
 		const pattern = /'(.*?)'/;
