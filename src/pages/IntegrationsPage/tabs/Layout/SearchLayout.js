@@ -9,19 +9,19 @@ const themeTypes = [
 		type: 'classic',
 		name: 'Classic',
 		description:
-			'Theme appropriate for store having multiple categories like electronics, clothing, etc.',
+			'Theme appropriate for an e-commerce or site search UI having many facet filters',
 		image: '/static/images/ecomm/classic.png',
 	},
 	{
 		type: 'minimal',
 		name: 'Minimal',
-		description: 'Theme appropriate for Fashion store.',
+		description: 'Theme appropriate for a search site with a basic facet navigation',
 		image: '/static/images/ecomm/minimal.png',
 	},
 	{
 		type: 'geo',
 		name: 'Geo',
-		description: 'Theme appropriate for geo / map search UI.',
+		description: 'Theme appropriate for a geo / map search UI',
 		image: '/static/images/ecomm/geo.png',
 	},
 ];
@@ -29,7 +29,7 @@ const themeTypes = [
 const SearchLayout = () => (
 	<div>
 		<h2>Search Layout</h2>
-		<p>Search Layout lets you choose a layout preset for the search view.</p>
+		<p>Search Layout lets you choose a layout preset for the search view</p>
 		<FieldControl name="themeType">
 			{({ value, onChange }) => (
 				<div style={{ display: 'flex', alignItems: 'baseline' }}>
