@@ -675,7 +675,7 @@ Results.propTypes = {
 
 const mapStateToProps = (state, props) => {
 	const appName = props.pipeline || get(state, '$getCurrentApp.name');
-	const mappings = getRawMappingsByAppName(state);
+	const mappings = getRawMappingsByAppName(state, appName);
 	const { username, password } = get(state, 'user.data', {});
 
 	return {
