@@ -870,7 +870,11 @@ const ScriptConsole = ({
 						key={CONSOLE_LOGS}
 					>
 						<ConsoleLogger
-							consoleArray={validatedscriptRule?.results?.response?.console}
+							consoleArray={
+								validatedscriptRule?.results?.['console_logs'] ||
+								validatedscriptRule?.results?.response?.['console_logs'] ||
+								validatedscriptRule?.results?.response?.['logs']
+							}
 						/>
 					</TabPane>
 				</Tabs>

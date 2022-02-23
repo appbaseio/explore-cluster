@@ -232,7 +232,7 @@ export const ResultsLayout = () => {
             defaultPreferences.resultSettings.viewSwitcher,
         );
 
-        const redirectUrlText = get(preferences, 'searchSettings.redirectUrlText.text', 'View Product');
+        const redirectUrlText = get(preferences, 'searchSettings.redirectUrlText', 'View Product');
 
         const resultSettings = get(preferences, 'resultSettings');
 

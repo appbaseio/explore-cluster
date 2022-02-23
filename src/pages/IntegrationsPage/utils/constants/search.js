@@ -1179,17 +1179,18 @@ export const Search = () => {
                     filterLabel="Search"
                     className="search"
                     debounce={100}
-                    placeholder="Search for products..."
+                    placeholder={get(this.searchSettings, 'searchButton.text') || "Search for products..."}
                     iconPosition="right"
-                    icon={get(this.searchSettings, 'searchButton.icon')}
+                    icon={<img height="20px" src={get(this.searchSettings, 'searchButton.icon')} alt="search icon"/>}
                     ref={searchRef}
                     URLParams
                     style={{
                         marginBottom: 20,
                         position: 'sticky',
                         top: '10px',
-                        zIndex: 4,
+                        zIndex: 10000,
                         display: toggleFilters ? 'none' : 'block',
+                        background: 'white'
                     }}
                     // onKeyDown={(e) => {
                     //     if(e.keyCode === 27) {

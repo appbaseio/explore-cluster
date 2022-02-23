@@ -55,11 +55,11 @@ RSPlayground.defaultProps = {
 	},
 };
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, props) => {
 	return {
 		username: get(state, 'user.data.username'),
 		password: get(state, 'user.data.password'),
-		currentIndexName: get(state, '$getCurrentApp.name'),
+		currentIndexName: get(state, '$getCurrentApp.name') || props.app,
 	};
 };
 

@@ -188,12 +188,19 @@ class StoreFrontPreview extends React.Component {
 							left: '50%',
 							right: '50%',
 							zIndex: 5,
+							padding: 0,
+							width: 'max-content',
+							display: 'flex',
+							placeItems: 'center',
 						}}
 						onClick={this.handleViewChange}
 					>
 						<Icon
 							style={{
 								fontSize: 20,
+								position: 'relative',
+								top: '1px',
+								margin: '0 7px',
 							}}
 							type={isMobile ? 'desktop' : 'mobile'}
 						/>

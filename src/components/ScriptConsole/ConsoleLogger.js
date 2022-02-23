@@ -12,6 +12,8 @@ const consoleLoggerCss = css`
 	height: 100%;
 	overflow-y: scroll;
 	width: 101%;
+	padding-bottom: 3rem;
+
 	.log-item {
 		width: 100%;
 		padding: 6px 1.5rem 10px 10px;

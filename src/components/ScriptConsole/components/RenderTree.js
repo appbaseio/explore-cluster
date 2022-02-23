@@ -21,28 +21,29 @@ const renderJsonItemCss = css`
 function RenderRowLi({ keyProp: key, value }) {
 	const [expandGroup, setExpandGroup] = useState(false);
 
-	const renderLabel = (keyParam, valueParam) => {
+	const renderLabel = (keyParam, valueParam = 'null') => {
 		const label = () => {
-			if (typeof valueParam === 'object') {
+			if (valueParam !== null && typeof valueParam === 'object') {
 				if (Array.isArray(valueParam)) {
 					return valueParam.length ? `Array(${valueParam.length})` : '[]';
 				}
 
 				return Object.keys(valueParam).length ? 'Object' : '{}';
 			}
-			return valueParam;
+
+			return String(valueParam);
 		};
 
 		return (
 			<span>
 				<span>{keyParam} : </span>
-				<span style={{ textTransform: 'capitalize' }}>{label()}</span>
+				<span>{label()}</span>
 			</span>
 		);
 	};
 
 	let showExpansionSymbol = false;
-	if (typeof value === 'object' && Object.keys(value).length) {
+	if (value !== null && typeof value === 'object' && Object.keys(value).length) {
 		showExpansionSymbol = true;
 	}
 	return (
@@ -72,7 +73,7 @@ RenderRowLi.propTypes = {
 
 export default function RenderTree({ item }) {
 	let createTree = false;
-	if (typeof item === 'object' && Object.keys(item).length) {
+	if (item !== null && typeof item === 'object' && Object.keys(item).length) {
 		createTree = true;
 	}
 

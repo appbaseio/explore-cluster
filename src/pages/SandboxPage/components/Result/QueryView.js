@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Typography } from 'antd';
 import Appbase from 'appbase-js';
 import { css } from 'emotion';
-import { transformQuery } from '../../utils'
+import { transformQuery } from '../../utils';
 import SandboxContext from '../SandboxContext';
 import RSPlayground from '../../../../components/RSPlayground';
 
@@ -78,6 +78,7 @@ class QueryView extends React.Component {
 
 	render() {
 		const { query } = this.state;
+		const { app } = this.props;
 		return (
 			<React.Fragment>
 				<Typography.Text className={headingStyle} strong>
@@ -85,6 +86,7 @@ class QueryView extends React.Component {
 				</Typography.Text>
 				<div className={playgroundContainerStyle}>
 					<RSPlayground
+						app={app}
 						presets={{
 							editorPresets: {
 								queryEditorValue: query,
@@ -120,7 +122,6 @@ QueryView.defaultProps = {
 };
 
 const QueryViewWrapper = () => {
-
 	return (
 		<SandboxContext.Consumer>
 			{({ query, recordAnalytics, url, app, credentials }) => (
