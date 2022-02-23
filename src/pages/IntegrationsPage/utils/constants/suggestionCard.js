@@ -42,7 +42,8 @@ export const SuggestionCard = () => {
 
         const shouldShowCtaAction = ctaAction !== CtaActions.NO_BUTTON;
         const preferences = getSearchPreferences();
-        const redirectUrlText = get(preferences, 'searchSettings.redirectUrlText.text', 'View Product');
+        const redirectUrlText = get(preferences, 'searchSettings.redirectUrlText', 'View Product');
+        const redirectUrlIcon = get(preferences, 'searchSettings.redirectUrlIcon', '');
 
         return (
             <div {...props}>
@@ -165,7 +166,19 @@ export const SuggestionCard = () => {
                                 size="large"
                                 className="product-button"
                             >
-                                <Icon type="eye" />
+                                {redirectUrlIcon ?
+                                    <img
+                                        src={redirectUrlIcon}
+                                        alt='redirect-url-icon'
+                                        height="15px"
+                                        width="15px"
+                                        style={{
+                                            marginRight: 5
+                                        }}
+                                    />
+                                    :
+                                    <Icon type="eye" />
+                                }
                                 {redirectUrlText || ctaTitle}
                             </Button>
                         ) : null}

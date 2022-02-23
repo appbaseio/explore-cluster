@@ -203,6 +203,7 @@ export const ProductSuggestions = () => {
             this.credentials = get(preferences, 'appbaseSettings.credentials');
             this.url = get(preferences, 'appbaseSettings.url');
             this.userId = get(this.preferences, 'appbaseSettings.userId', '');
+            this.logoSettings = get(preferences, 'globalSettings.meta.branding', {});
         }
 
     componentDidMount() {
@@ -649,103 +650,119 @@ export const ProductSuggestions = () => {
                 return null;
             }
             return (
-                <div style={{ margin: '25px auto', position: 'relative' }}>
-                    <div css={titleCls}>{this.recommendation.title}</div>
-                    <div css={main}>
-                        <Button
-                            disabled={currentPage === 1}
-                            css={buttonLeft}
-                            onClick={this.prevPage}
-                        >
-                            <Icon css={icon} type="left" />
-                        </Button>
-                        <div
-                            css={css({
-                                margin: '10px 50px',
-                                [mediaMax.small]: {
-                                    margin: '10px 25px',
-                                },
-                            })}
-                        >
-                            <Slider
-                                ref={(c) => {
-                                    this.slick = c;
+                <div>
+                    {Object.keys(this.logoSettings).length && this.logoSettings.logoUrl ? (
+                        <div style={{ height: 50 }}>
+                            <img
+                                src={\`\${this.logoSettings.logoUrl}/tr:w-\${this.logoSettings.logoWidth*2}\`}
+                                alt="logo-url"
+                                style={{
+                                    width: \`\${this.logoSettings.logoWidth}px\`,
+                                    height: \`50px\`,
+                                    float: \`\${this.logoSettings.logoAlignment}\`,
+                                    margin: '10px 0px',
                                 }}
-                                {...settings}
-                                css={resultListCls}
-                            >
-                                {data.map(
-                                    (
-                                        { _id, variants, _click_id, ...rest },
-                                        index,
-                                    ) => (
-                                        <SuggestionCard
-                                            key={_id}
-                                            id={_id}
-                                            theme={this.theme}
-                                            themeType={this.themeType}
-                                            className="product-card"
-                                            ctaAction={this.ctaAction}
-                                            ctaTitle={this.ctaTitle}
-                                            isPreview={isPreview}
-                                            cardStyle={{
-                                                ...this.getFontFamily(),
-                                            }}
-                                            {...{
-                                                handle: get(
-                                                    rest,
-                                                    get(
-                                                        this.resultSettings,
-                                                        'fields.handle',
-                                                    ),
-                                                ),
-                                                image: get(
-                                                    rest,
-                                                    get(
-                                                        this.resultSettings,
-                                                        'fields.image',
-                                                    ),
-                                                ),
-                                                title: get(
-                                                    rest,
-                                                    get(
-                                                        this.resultSettings,
-                                                        'fields.title',
-                                                    ),
-                                                ),
-                                                body_html: get(
-                                                    rest,
-                                                    get(
-                                                        this.resultSettings,
-                                                        'fields.description',
-                                                    ),
-                                                ),
-                                                price: get(
-                                                    rest,
-                                                    get(
-                                                        this.resultSettings,
-                                                        'fields.price',
-                                                    ),
-                                                ),
-                                                variants,
-                                                currency: this.currency,
-                                                index,
-                                                clickId: _click_id,
-                                                triggerAnalytics: triggerClickAnalytics,
-                                            }}
-                                            index={_id}
-                                        />
-                                    ),
-                                )}
-                            </Slider>
+                            />
                         </div>
-                        <Button
-                            disabled={currentPage * maxSize >= data.length}
-                            css={buttonRight}
-                            onClick={this.nextPage}
-                        >
-                            <Icon css={icon} type="right" />
-                        </Button>
+                    ): null}
+                    <div style={{ margin: '25px auto', position: 'relative' }}>
+                        <div css={titleCls}>{this.recommendation.title}</div>
+                        <div css={main}>
+                            <Button
+                                disabled={currentPage === 1}
+                                css={buttonLeft}
+                                onClick={this.prevPage}
+                            >
+                                <Icon css={icon} type="left" />
+                            </Button>
+                            <div
+                                css={css({
+                                    margin: '10px 50px',
+                                    [mediaMax.small]: {
+                                        margin: '10px 25px',
+                                    },
+                                })}
+                            >
+                                <Slider
+                                    ref={(c) => {
+                                        this.slick = c;
+                                    }}
+                                    {...settings}
+                                    css={resultListCls}
+                                >
+                                    {data.map(
+                                        (
+                                            { _id, variants, _click_id, ...rest },
+                                            index,
+                                        ) => (
+                                            <SuggestionCard
+                                                key={_id}
+                                                id={_id}
+                                                theme={this.theme}
+                                                themeType={this.themeType}
+                                                className="product-card"
+                                                ctaAction={this.ctaAction}
+                                                ctaTitle={this.ctaTitle}
+                                                isPreview={isPreview}
+                                                cardStyle={{
+                                                    ...this.getFontFamily(),
+                                                }}
+                                                {...{
+                                                    handle: get(
+                                                        rest,
+                                                        get(
+                                                            this.resultSettings,
+                                                            'fields.handle',
+                                                        ),
+                                                    ),
+                                                    image: get(
+                                                        rest,
+                                                        get(
+                                                            this.resultSettings,
+                                                            'fields.image',
+                                                        ),
+                                                    ),
+                                                    title: get(
+                                                        rest,
+                                                        get(
+                                                            this.resultSettings,
+                                                            'fields.title',
+                                                        ),
+                                                    ),
+                                                    body_html: get(
+                                                        rest,
+                                                        get(
+                                                            this.resultSettings,
+                                                            'fields.description',
+                                                        ),
+                                                    ),
+                                                    price: get(
+                                                        rest,
+                                                        get(
+                                                            this.resultSettings,
+                                                            'fields.price',
+                                                        ),
+                                                    ),
+                                                    variants,
+                                                    currency: this.currency,
+                                                    index,
+                                                    clickId: _click_id,
+                                                    triggerAnalytics: triggerClickAnalytics,
+                                                }}
+                                                index={_id}
+                                            />
+                                        ),
+                                    )}
+                                </Slider>
+                            </div>
+                            <Button
+                                disabled={currentPage * maxSize >= data.length}
+                                css={buttonRight}
+                                onClick={this.nextPage}
+                            >
+                                <Icon css={icon} type="right" />
+                            </Button>
+                        </div>
                     </div>
                 </div>
             );

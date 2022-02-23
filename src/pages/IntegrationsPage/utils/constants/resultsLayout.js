@@ -233,7 +233,7 @@ export const ResultsLayout = () => {
         );
 
         const redirectUrlText = get(preferences, 'searchSettings.redirectUrlText', 'View Product');
-
+        const redirectUrlIcon = get(preferences, 'searchSettings.redirectUrlIcon', '');
         const resultSettings = get(preferences, 'resultSettings');
 
         function getFontFamily() {
@@ -405,7 +405,19 @@ export const ResultsLayout = () => {
                                                 size="large"
                                                 className="product-button"
                                             >
-                                                <Icon type="eye" />
+                                                {redirectUrlIcon ?
+                                                    <img
+                                                        src={redirectUrlIcon}
+                                                        alt='redirect-url-icon'
+                                                        height="15px"
+                                                        width="15px"
+                                                        style={{
+                                                            marginRight: 5
+                                                        }}
+                                                    />
+                                                    :
+                                                    <Icon type="eye" />
+                                                }
                                                 {redirectUrlText}
                                             </Button>
                                     ) : null}
@@ -552,7 +564,19 @@ export const ResultsLayout = () => {
                                                 size="large"
                                                 className="product-button"
                                             >
-                                                <Icon type="eye" />
+                                                {redirectUrlIcon ?
+                                                    <img
+                                                        src={redirectUrlIcon}
+                                                        alt='redirect-url-icon'
+                                                        height="15px"
+                                                        width="15px"
+                                                        style={{
+                                                            marginRight: 5
+                                                        }}
+                                                    />
+                                                    :
+                                                    <Icon type="eye" />
+                                                }
                                                 {redirectUrlText}
                                             </Button>
                                         ) : null}

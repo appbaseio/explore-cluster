@@ -1172,6 +1172,8 @@ export const Search = () => {
         renderCategorySearch = (categorySearchProps) => {
             const { toggleFilters, blur } = this.state;
             const { isPreview } = this.props;
+            const searchIcon = get(this.searchSettings, 'searchButton.icon', '');
+
             return (
                 <SearchBox
                     // Don't change the component id it is tied to shopify
@@ -1181,7 +1183,7 @@ export const Search = () => {
                     debounce={100}
                     placeholder={get(this.searchSettings, 'searchButton.text') || "Search for products..."}
                     iconPosition="right"
-                    icon={<img height="20px" src={get(this.searchSettings, 'searchButton.icon')} alt="search icon"/>}
+                    icon={searchIcon ? <img src={searchIcon} alt="Search Icon" width="20px" height="20px"/> : searchIcon}
                     ref={searchRef}
                     URLParams
                     style={{
@@ -1274,6 +1276,8 @@ export const Search = () => {
             }
 
             const logoSettings = get(this.globalSettings, 'meta.branding', {});
+            const mapsAPIkey = get(this.resultSettings, 'mapsAPIkey', '');
+
             return (
                 <ReactiveBase
                     app={this.index}
@@ -1285,6 +1289,7 @@ export const Search = () => {
                         recordAnalytics: true,
                         ...userIdObj
                     }}
+                    mapKey={mapsAPIkey}
                     setSearchParams={
                         isPreview
                             ? () => {}

@@ -41,7 +41,7 @@ const modalStyles = (csbUrl) => css`
 		width: 170px;
 	}
 	.ant-input {
-		border: 1px solid ${csbUrl.length !== 5 ? 'red' : '#d9d9d9'};
+		border: 1px solid ${csbUrl.length !== 5 && csbUrl.length !== 6 ? 'red' : '#d9d9d9'};
 	}
 `;
 
@@ -117,7 +117,7 @@ const ExportInline = ({
 							<p style={{ fontWeight: 'bold', margin: 0 }}>
 								Enter your updated CodeSandbox ID as shown in the browser to persist
 								the changes
-								<Popover content="A CSB ID should be of length 5. Make sure you’ve entered a correct ID.">
+								<Popover content="A CSB ID should be of length 5 or 6. Make sure you’ve entered a correct ID.">
 									<Icon type="info-circle" style={{ marginLeft: 5 }} />
 								</Popover>
 							</p>
@@ -146,7 +146,7 @@ const ExportInline = ({
 									style={{ marginRight: 10 }}
 									disabled={
 										control?.get('csbID').value === csbUrl ||
-										csbUrl.length !== 5
+										(csbUrl.length !== 5 && csbUrl.length !== 6)
 									}
 									onClick={handleSave}
 								>
@@ -159,7 +159,7 @@ const ExportInline = ({
 									}}
 									disabled={
 										control?.get('csbID').value === csbUrl ||
-										csbUrl.length !== 5
+										(csbUrl.length !== 5 && csbUrl.length !== 6)
 									}
 									size="large"
 									style={{ marginRight: 10 }}
@@ -169,9 +169,9 @@ const ExportInline = ({
 							</div>
 						</div>
 						<div style={{ height: 10 }}>
-							{csbUrl.length !== 5 && (
+							{csbUrl.length !== 5 && csbUrl.length !== 6 && (
 								<div style={{ color: 'red', display: 'flex', marginLeft: '61%' }}>
-									CSB ID should be of length 5.
+									CSB ID should be of length 5 or 6.
 								</div>
 							)}
 						</div>
