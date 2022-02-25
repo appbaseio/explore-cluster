@@ -114,7 +114,7 @@ describe('New field from schema should allow it to add to agg settings test flow
 		cy.get('[data-cy=cancel-modal-button]').click();
 	});
 
-	it('Should detect reinderxing and assign indexname prior deletion', () => {
+	it('Should detect re-indexing and assign index name prior to deletion', () => {
 		let credentials = btoa(`${username}:${password}`);
 
 		fetch(`${app_url}_alias/${indexName}`, {

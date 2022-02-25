@@ -129,7 +129,7 @@ describe('Diff change table test flow', () => {
 			.get('[data-cy=search-field-name]')
 			.should('contain', 'name')
 			.get('[data-cy=new-weight]')
-			.eq(7)
+			.eq(8)
 			.should('contain', '1.0')
 			.get('[data-cy=search-field-rating]')
 			.should('contain', 'rating')

@@ -102,7 +102,7 @@ describe('Clone settings test flow', () => {
 			.get('[data-cy=search-field-name]')
 			.should('contain', 'name')
 			.get('[data-cy=new-weight]')
-			.eq(7)
+			.eq(8)
 			.should('contain', '1.0')
 			.get('[data-cy=search-field-rating]')
 			.should('contain', 'rating')
@@ -144,18 +144,31 @@ describe('Clone settings test flow', () => {
 			.should('have.value', '4.0');
 	});
 
-	it('Should delete indices', () => {
+	it('Should detect re-indexing and assign index name prior to deletion', () => {
 		let credentials = btoa(`${username}:${password}`);
-		cy.request({
-			method: 'DELETE',
-			url: `${app_url}${indexName}`,
+
+		fetch(`${app_url}_alias/${indexName}`, {
 			headers: {
 				Authorization: `Basic ${credentials}`,
 			},
-		});
+		})
+			.then((response) => {
+				return response.json();
+			})
+			.then((data) => {
+				indexName = Object.keys(data)[0];
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	});
+
+	it('Should delete index', () => {
+		let credentials = btoa(`${username}:${password}`);
+
 		cy.request({
 			method: 'DELETE',
-			url: `${app_url}${indexName2}`,
+			url: `${app_url}${indexName}`,
 			headers: {
 				Authorization: `Basic ${credentials}`,
 			},

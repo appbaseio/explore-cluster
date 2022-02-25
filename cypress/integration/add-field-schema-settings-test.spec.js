@@ -89,7 +89,7 @@ describe('Add field schema settings test flow', () => {
 			});
 	});
 
-	it('Should detect reinderxing and assign indexname prior deletion', () => {
+	it('Should detect re-indexing and assign index name prior to deletion', () => {
 		let credentials = btoa(`${username}:${password}`);
 
 		fetch(`${app_url}_alias/${indexName}`, {
