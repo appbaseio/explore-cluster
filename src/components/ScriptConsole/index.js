@@ -578,9 +578,17 @@ const ScriptConsole = ({
 		}
 	};
 
+	const camelize = (str) => {
+		return str
+			.replace(/(?:^\w|[A-Z]|\b\w)/g, function (word, index) {
+				return index === 0 ? word.toLowerCase() : word.toUpperCase();
+			})
+			.replace(/\s+/g, '');
+	};
+
 	const getTemplateDropdownOptions = () => {
 		return Object.keys(scriptTemplates).map((key) => (
-			<Option key={key} value={key}>
+			<Option key={key} value={key} data-cy={camelize(key)}>
 				<Tooltip title={key}>{key}</Tooltip>
 			</Option>
 		));
@@ -741,6 +749,7 @@ const ScriptConsole = ({
 							placeholder="Select a Script Template"
 							onChange={onTemplateSelect}
 							value={selectedTemplateKey}
+							data-cy="script-template"
 						>
 							{getTemplateDropdownOptions()}
 						</Select>
@@ -766,7 +775,11 @@ const ScriptConsole = ({
 				<Tabs
 					tabBarExtraContent={
 						<div className="save-script-btn-wrapper">
-							<Button type="primary" onClick={saveScriptHandler}>
+							<Button
+								type="primary"
+								onClick={saveScriptHandler}
+								data-cy="query-rule-save-script"
+							>
 								{isSmallScreen ? (
 									<Tooltip title="Save Script" trigger="hover">
 										<Icon type="save" title="" />{' '}

@@ -257,6 +257,7 @@ class QueryRules extends Component {
 										type="primary"
 										size="large"
 										rel="noopener noreferrer"
+										data-cy="create-query-rule"
 									>
 										<Icon type="plus" />
 										Create Rule
@@ -408,7 +409,7 @@ class QueryRules extends Component {
 							subTitle="Create a new Rule to get started."
 							extra={
 								<Link to="/cluster/rules/new">
-									<Button type="primary">
+									<Button type="primary" data-cy="create-query-rule">
 										<Icon type="plus" />
 										Create Rule
 									</Button>

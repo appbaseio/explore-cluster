@@ -75,21 +75,26 @@ const AddFilter = (props) => {
 						value={currentSelectedField}
 						style={{ width: '100%' }}
 						showSearch
+						data-cy="filter-key"
 					>
 						<Option key={item}>{currentSelectedField}</Option>
 						{aggsFields.map((field) => (
-							<Option key={field}>{field.replace(/.keyword/g, '')}</Option>
+							<Option key={field} data-cy={field.replace(/.keyword/g, '')}>
+								{field.replace(/.keyword/g, '')}
+							</Option>
 						))}
 					</Select>
 				</Col>
 				<Col md={11}>
 					<Select
 						mode="tags"
+						tokenSeparators={[',']}
 						style={{ width: '100%' }}
 						value={value[item] || []}
 						dropdownClassName={hideDropdown}
 						placeholder="Press enter to add more values"
 						onChange={(dropdownValue) => handleDropdown(item, dropdownValue)}
+						data-cy="filter-values"
 					/>
 				</Col>
 				<Col style={{ display: 'flex', justifyContent: 'flex-end' }} md={2}>
@@ -113,7 +118,11 @@ const AddFilter = (props) => {
 				<React.Fragment key={item}>{renderRow(item, index)}</React.Fragment>
 			))}
 
-			<Button disabled={aggsFields.length === 0} onClick={addNewFilter}>
+			<Button
+				disabled={aggsFields.length === 0}
+				onClick={addNewFilter}
+				data-cy="add-filter-action"
+			>
 				Add Filter
 			</Button>
 		</React.Fragment>

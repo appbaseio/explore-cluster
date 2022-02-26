@@ -55,10 +55,13 @@ class IndexDropdown extends React.Component {
 				className={getErrorClass(error)}
 				value={selectedIndexes}
 				onChange={this.handleChange}
+				data-cy="index-dropdown"
 			>
 				<Option key="*">* (Include all index)</Option>
 				{filteredApps.map((app) => (
-					<Option key={app}>{app}</Option>
+					<Option key={app} data-cy={app}>
+						{app}
+					</Option>
 				))}
 			</Select>
 		);

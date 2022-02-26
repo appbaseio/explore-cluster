@@ -18,6 +18,8 @@ const RemoveWord = ({ value = [], onChange }) => {
 			placeholder="Press enter to add multiple words"
 			dropdownClassName={hideDropdown}
 			onChange={onChange}
+			tokenSeparators={[',']}
+			data-cy="remove-words"
 		/>
 	);
 };

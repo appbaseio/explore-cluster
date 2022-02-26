@@ -948,7 +948,6 @@ class ReviewAndSave extends React.Component {
 				},
 			};
 
-			// console.log(settingsData);
 			const savedSettings = await updateSettingsAction(appName, settingsData);
 			if (isResetting) {
 				updateLocalRelevancyState(appName, defaultSettings);

@@ -113,9 +113,14 @@ class ActionSelector extends React.Component {
 						style={{ width: '100%' }}
 						value={undefined}
 						showSearch
+						data-cy="query-rule-action"
 					>
 						{optionsToShow.map((action) => (
-							<Option disabled={this.getDisabled(condition, action)} key={action}>
+							<Option
+								disabled={this.getDisabled(condition, action)}
+								key={action}
+								data-cy={action}
+							>
 								{actions[action].name}
 							</Option>
 						))}

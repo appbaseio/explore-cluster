@@ -976,7 +976,7 @@ class QueryRulesForm extends React.Component {
 							subTitle="The rule you are looking for does not exist. Try creating a new rule."
 							extra={
 								<Link to="/cluster/rules/new">
-									<Button type="primary">
+									<Button type="primary" data-cy="create-qyery-rule">
 										<Icon type="plus" />
 										Create Rule
 									</Button>
@@ -1131,10 +1131,18 @@ class QueryRulesForm extends React.Component {
 									value={condition}
 									style={{ display: 'flex', marginBottom: '15px' }}
 								>
-									<Radio value="filter">Query</Radio>
-									<Radio value="index">Index</Radio>
-									<Radio value="cron">Cron</Radio>
-									<Radio value="always">Always</Radio>
+									<Radio value="filter" data-cy="trigger-type-query">
+										Query
+									</Radio>
+									<Radio value="index" data-cy="trigger-type-index">
+										Index
+									</Radio>
+									<Radio value="cron" data-cy="trigger-type-cron">
+										Cron
+									</Radio>
+									<Radio value="always" data-cy="trigger-type-always">
+										Always
+									</Radio>
 								</Radio.Group>
 								{condition === 'filter' && (
 									<>
@@ -1291,6 +1299,7 @@ class QueryRulesForm extends React.Component {
 												value={cronExpression}
 												placeholder="Enter Cron Expression"
 												onChange={this.handleInput}
+												data-cy="cron-expression"
 											/>
 										</div>
 									</>
@@ -1472,6 +1481,7 @@ class QueryRulesForm extends React.Component {
 								size="large"
 								onClick={this.getErrorStatus}
 								type="primary"
+								data-cy="save-query-rule"
 							>
 								<Icon type={isCreating || isUpdating ? 'loading' : 'save'} />
 								Save

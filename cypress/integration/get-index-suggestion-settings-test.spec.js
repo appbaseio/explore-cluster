@@ -41,7 +41,7 @@ describe('Index Suggestion Settings add test flow', () => {
 				applyStopwords: payload.body.applyStopwords || false,
 				customStopwords: payload.body.customStopwords || [],
 				enableSynonyms: payload.body.enableSynonyms || false,
-				size: parseInt(payload.body.size, 10) || 1,
+				size: parseInt(payload.body.size, 10) || 3,
 				indices: payload.body.indices || ['*'],
 				categoryField: payload.body.categoryField || '',
 				urlField: payload.body.urlField || '',

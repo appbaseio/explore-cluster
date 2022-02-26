@@ -8,6 +8,7 @@ const ReplaceSearch = ({ value, onChange }) => {
 			placeholder="Enter the new search term"
 			value={value}
 			onChange={(e) => onChange(e.target.value)}
+			data-cy="replace_search_term-input"
 		/>
 	);
 };

@@ -56,6 +56,7 @@ const ReplaceWord = ({ value = {}, onChange }) => {
 							defaultValue={word}
 							onBlur={(e) => handleWord(e.target.value, index)}
 							placeholder="Enter word"
+							data-cy="original-term"
 						/>
 					</Col>
 					<Col span={10}>
@@ -63,6 +64,7 @@ const ReplaceWord = ({ value = {}, onChange }) => {
 							value={value[word]}
 							placeholder="Enter replace term"
 							onChange={(e) => handleWordReplacer(e.target.value, word)}
+							data-cy="replace-term"
 						/>
 					</Col>
 					<Col
@@ -85,7 +87,9 @@ const ReplaceWord = ({ value = {}, onChange }) => {
 					</Col>
 				</Row>
 			))}
-			<Button onClick={addWord}>Add Word</Button>
+			<Button onClick={addWord} data-cy="replace-words-action-add-word">
+				Add Word
+			</Button>
 		</React.Fragment>
 	);
 };

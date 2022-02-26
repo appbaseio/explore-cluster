@@ -93,5 +93,7 @@ describe('Index Suggestion Settings add test flow', () => {
 				exludeFields: [''],
 			},
 		});
+
+		cy.get('[data-cy=index-suggestions-fields-container] > [data-cy=suggestions-footer] > [data-cy=buttons-container] > [style="display: flex;"] > [data-cy=reset-suggestions]').click();
 	});
 });

@@ -127,10 +127,13 @@ class SearchSettings extends React.Component {
 						value={currentSelectedField}
 						style={{ width: '100%' }}
 						showSearch
+						data-cy="set-search-settings-key"
 					>
 						<Option key={item}>{currentSelectedField}</Option>
 						{searchFields.map((field) => (
-							<Option key={field}>{field.replace(/.keyword/g, '')}</Option>
+							<Option key={field} data-cy={field.replace(/.keyword/g, '')}>
+								{field.replace(/.keyword/g, '')}
+							</Option>
 						))}
 					</Select>
 				</Col>
@@ -140,6 +143,7 @@ class SearchSettings extends React.Component {
 						style={{ width: '100%' }}
 						min={1}
 						onChange={(weight) => this.handleFieldWeight(item, weight)}
+						data-cy="set-search-settings-value"
 					/>
 				</Col>
 				<Col
@@ -170,7 +174,11 @@ class SearchSettings extends React.Component {
 					<React.Fragment key={item}>{this.renderRow(item, index)}</React.Fragment>
 				))}
 
-				<Button disabled={searchFields.length === 0} onClick={this.addNewFilter}>
+				<Button
+					disabled={searchFields.length === 0}
+					onClick={this.addNewFilter}
+					data-cy="set-search-settings-action-add-field"
+				>
 					Add Field
 				</Button>
 			</React.Fragment>

@@ -121,7 +121,6 @@ const SettingsOptions = ({
 		return false;
 	}
 
-	console.log();
 	return (
 		<div className={optionContainer}>
 			<h6>

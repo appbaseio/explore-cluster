@@ -19,8 +19,9 @@
 		}
 	},
 	"retries": {
-    "runMode": 3,
-    "openMode": 2
-  },
-  "chromeWebSecurity": false
+		"runMode": 3,
+		"openMode": 2
+	},
+	"chromeWebSecurity": false,
+	"experimentalFetchPolyfill": true
 }

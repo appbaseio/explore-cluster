@@ -30,7 +30,6 @@ function IndexSwitcher({
 	sessionData,
 }) {
 	const userApps = filteredApps.filter((index) => index && !index.includes('metricbeat-'));
-	console.log(sessionData, disablePopover);
 	if (userApps.length === 1 && item.link)
 		return (
 			<Link to={`/app/${userApps[0]}/${item.link}`}>
