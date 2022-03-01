@@ -3,8 +3,8 @@ import { getURL } from '../constants/config';
 
 const checkReIndexing = async (indexName) => {
 	const url = getURL();
-	const username = sessionStorage.getItem('username');
-	const password = sessionStorage.getItem('password');
+	const username = localStorage.getItem('username') || sessionStorage.getItem('username');
+	const password = localStorage.getItem('password') || sessionStorage.getItem('password');
 	const authHeader = `Basic ${btoa(`${username}:${password}`)}`;
 
 	try {
