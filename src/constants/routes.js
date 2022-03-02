@@ -47,6 +47,13 @@ export const APP_ROUTES = {
 			},
 		],
 	},
+	Pipelines: {
+		icon: 'deployment-unit',
+		action: ALLOWED_ACTIONS.PIPELINES,
+		link: '/cluster/pipelines',
+		hasExactPath: true,
+		tag: 'Beta',
+	},
 	Analytics: {
 		icon: 'line-chart',
 		action: ALLOWED_ACTIONS.ANALYTICS,
@@ -165,6 +172,13 @@ export const CLUSTER_ROUTES = {
 			{ label: 'Query Rules', link: '/cluster/rules', tag: 'Beta' },
 			{ label: 'Grade Evaluation', link: '/cluster/grade-evaluation', tag: 'Beta' },
 		],
+	},
+	Pipelines: {
+		icon: 'deployment-unit',
+		action: ALLOWED_ACTIONS.PIPELINES,
+		link: '/cluster/pipelines',
+		hasExactPath: true,
+		tag: 'Beta',
 	},
 	Analytics: {
 		icon: 'line-chart',

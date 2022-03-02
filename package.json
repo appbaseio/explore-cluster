@@ -101,18 +101,22 @@
 		"d3-scale": "^2.1.2",
 		"dotenv": "^8.0.0",
 		"emotion": "^9.2.6",
+		"file-saver": "^2.0.5",
 		"hex-rgb": "^3.0.0",
 		"husky": "^4.2.5",
 		"imagekit": "^3.2.3",
 		"imagekit-uppy-plugin": "^1.0.2",
 		"imagekitio-react": "^1.0.11",
 		"is-cidr": "^4.0.2",
+		"js-yaml": "^4.1.0",
 		"jsondiffpatch": "^0.4.1",
+		"jszip": "^3.7.1",
 		"lint-staged": "^10.1.7",
 		"lodash": "^4.17.10",
 		"lzma": "^2.3.2",
 		"moment": "^2.22.2",
 		"partial-json-parser": "^1.1.1",
+		"prettier": "^2.0.4",
 		"prop-types": "^15.6.2",
 		"rc-progress": "^2.2.5",
 		"react": "^16.4.2",
@@ -147,7 +151,6 @@
 		"url-search-params": "^1.1.0",
 		"urlsafe-base64": "https://github.com/farhan687/urlsafe-base64.git",
 		"util": "^0.12.4",
-		"uuid": "^8.3.2",
-		"prettier": "^2.0.4"
+		"uuid": "^8.3.2"
 	}
 }

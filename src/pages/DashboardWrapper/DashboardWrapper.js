@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Icon, Input, Layout, Menu } from 'antd';
+import { Icon, Input, Layout, Menu, Tag } from 'antd';
 import { Link, Route, Switch, Redirect } from 'react-router-dom';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
@@ -344,7 +344,25 @@ class DashboardWrapper extends Component {
 										<Menu.Item key={route}>
 											<Link replace to={routes[route].link}>
 												<Icon type={routes[route].icon} />
-												<span>{route}</span>
+												<span>
+													{route}
+													{routes[route].tag ? (
+														<Tag
+															style={{
+																fontSize: 10,
+																marginLeft: 8,
+																...(Array.isArray(activeMenuItem) &&
+																activeMenuItem.includes(route) ===
+																	false
+																	? { border: '1px solid white' }
+																	: {}),
+															}}
+															color="#001529"
+														>
+															{routes[route].tag}
+														</Tag>
+													) : null}
+												</span>
 											</Link>
 										</Menu.Item>
 									);

@@ -195,9 +195,8 @@ export const isJson = (itemProp) => {
 	} catch (e) {
 		return false;
 	}
-
 	if (typeof item === 'object' && item !== null) {
-		return true;
+		return item;
 	}
 
 	return false;

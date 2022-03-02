@@ -59,7 +59,9 @@ export async function getUser(username, password, url) {
 			sessionStorage.setItem('version', version);
 		})
 		.catch((e) => {
+			// eslint-disable-next-line no-console
 			console.error('Error while fetching the Elasticsearch details');
+			// eslint-disable-next-line no-console
 			console.error(e);
 		});
 
@@ -727,7 +729,6 @@ export const compareVersion = (versionA = '0.0.0', versionB = '0.0.0') => {
 	if (versionA === versionB) {
 		return 0;
 	}
-
 	const versionASplit = versionA.split('.');
 	const versionBSplit = versionB.split('.');
 
@@ -735,7 +736,7 @@ export const compareVersion = (versionA = '0.0.0', versionB = '0.0.0') => {
 	const majorMinorB = Number(`${versionBSplit[0]}.${versionBSplit[1]}`);
 	const patchA = Number(versionASplit[2]);
 	const patchB = Number(versionBSplit[2]);
-	if (majorMinorA > majorMinorB || (majorMinorA === majorMinorB && patchA > patchB)) {
+	if (majorMinorA > majorMinorB || (majorMinorA === majorMinorB && patchA >= patchB)) {
 		return 1;
 	}
 

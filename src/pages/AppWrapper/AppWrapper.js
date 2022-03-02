@@ -369,7 +369,25 @@ class AppWrapper extends Component {
 										<Menu.Item key={route}>
 											<Link replace to={routes[route].link}>
 												<Icon type={routes[route].icon} />
-												<span>{route}</span>
+												<span>
+													{route}
+													{routes[route].tag ? (
+														<Tag
+															style={{
+																fontSize: 10,
+																marginLeft: 8,
+																...(Array.isArray(activeMenuItem) &&
+																activeMenuItem.includes(route) ===
+																	false
+																	? { border: '1px solid white' }
+																	: {}),
+															}}
+															color="#001529"
+														>
+															{routes[route].tag}
+														</Tag>
+													) : null}
+												</span>
 											</Link>
 										</Menu.Item>
 									);

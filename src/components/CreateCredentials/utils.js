@@ -154,6 +154,7 @@ export const getAllowedActionsByVersion = (appbaseVersion) => {
 	// New scope to version map
 	const newScopes = {
 		SPEED: '7.42.0',
+		PIPELINES: '7.58.0',
 	};
 	Object.keys(newScopes).forEach((action) => {
 		if (versionCompare(appbaseVersion, newScopes[action]) === -1) {
