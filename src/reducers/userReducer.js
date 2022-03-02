@@ -2,9 +2,9 @@
 import { USER } from '../constants';
 import { getDefaultAllowedActions } from '../utils/allowedActions';
 
-const defaultUsername = localStorage.getItem('username') || sessionStorage.getItem('username');
-const defaultPassword = localStorage.getItem('password') || sessionStorage.getItem('password');
-const defaultToken = localStorage.getItem('authToken');
+const defaultUsername = sessionStorage.getItem('username');
+const defaultPassword = sessionStorage.getItem('password');
+const defaultToken = sessionStorage.getItem('authToken');
 const defaultAllowedActions = sessionStorage.getItem('allowedActions');
 
 let defaultIsAdmin = false;

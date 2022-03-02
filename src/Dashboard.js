@@ -84,7 +84,7 @@ class Dashboard extends Component {
 		}
 		if (params.has('url')) {
 			const url = params.get('url');
-			localStorage.setItem('url', url);
+			sessionStorage.setItem('url', url);
 		}
 		if (params.has('header')) {
 			const header = params.get('header');
@@ -106,8 +106,8 @@ class Dashboard extends Component {
 			const username = params.get('username');
 			const password = params.get('password');
 
-			localStorage.setItem('username', username);
-			localStorage.setItem('password', password);
+			sessionStorage.setItem('username', username);
+			sessionStorage.setItem('password', password);
 
 			loadArcUser(username, password);
 		} else {

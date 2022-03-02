@@ -115,7 +115,7 @@ class HideResults extends Component {
 				<ReactiveBase
 					app={app}
 					url={getURL()}
-					credentials={atob(localStorage.getItem('authToken'))}
+					credentials={atob(sessionStorage.getItem('authToken'))}
 					style={{ marginBottom: 12 }}
 					enableAppbase
 					appbaseConfig={{

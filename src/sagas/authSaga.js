@@ -6,12 +6,12 @@ import { setUser, loadApps, setUserError } from '../actions';
 
 function* authWorker(username, password, url) {
 	try {
-		localStorage.setItem('url', url);
-		localStorage.setItem('username', username);
-		localStorage.setItem('password', password);
+		sessionStorage.setItem('url', url);
+		sessionStorage.setItem('username', username);
+		sessionStorage.setItem('password', password);
 		const user = yield call(getUser, username, password, url);
 
-		localStorage.setItem('authToken', user.authToken);
+		sessionStorage.setItem('authToken', user.authToken);
 		sessionStorage.setItem('isAdmin', user.isAdmin);
 
 		sessionStorage.setItem('allowedActions', user.allowedActions);

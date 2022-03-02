@@ -1,16 +1,16 @@
 export const getURL = () => {
-	let url = localStorage.getItem('url') || sessionStorage.getItem('url');
+	let url = sessionStorage.getItem('url');
 	const params = new URLSearchParams(window.location.search);
 	if (!url || url === 'undefined') {
 		url = params.has('url') ? params.get('url') : 'null';
 
-		if (url) localStorage.setItem('url', url.replace(/\/+$/, ''));
+		if (url) sessionStorage.setItem('url', url.replace(/\/+$/, ''));
 	}
 	return url === 'null' ? 'http://localhost:8000' : url;
 };
 
 export const getVersion = () => {
-	const version = localStorage.getItem('version');
+	const version = sessionStorage.getItem('version');
 	return version;
 };
 

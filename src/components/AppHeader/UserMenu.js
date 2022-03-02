@@ -20,9 +20,6 @@ const handleLogout = () => {
 	sessionStorage.removeItem('url');
 	sessionStorage.removeItem('username');
 	sessionStorage.removeItem('password');
-	localStorage.removeItem('url');
-	localStorage.removeItem('username');
-	localStorage.removeItem('password');
 	sessionStorage.removeItem('isAdmin');
 	sessionStorage.removeItem('allowedActions');
 	sessionStorage.removeItem('appName');

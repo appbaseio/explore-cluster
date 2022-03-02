@@ -36,17 +36,9 @@ class LoginPage extends Component {
 
 	setCredentials(credObj) {
 		if (get(this, 'username.current.input'))
-			this.username.current.input.value =
-				credObj.username ||
-				localStorage.getItem('username') ||
-				sessionStorage.getItem('username') ||
-				'';
+			this.username.current.input.value = credObj.username || '';
 		if (this.password && this.password.current)
-			this.password.current.input.value =
-				credObj.password ||
-				localStorage.getItem('password') ||
-				sessionStorage.getItem('password') ||
-				'';
+			this.password.current.input.value = credObj.password || '';
 	}
 
 	login = () => {

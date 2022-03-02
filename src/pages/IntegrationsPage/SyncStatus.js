@@ -7,8 +7,8 @@ import Flex from '../../batteries/components/shared/Flex';
 
 const getURL = () => {
 	const { host, protocol } = new URL(sessionStorage.getItem('url'));
-	const username = localStorage.getItem('username') || sessionStorage.getItem('username');
-	const password = localStorage.getItem('password') || sessionStorage.getItem('password');
+	const username = sessionStorage.getItem('username');
+	const password = sessionStorage.getItem('password');
 	const uri = `${protocol}//${username}:${password}@${host}`;
 	return uri;
 };
@@ -61,7 +61,7 @@ class SyncStatus extends React.Component {
 		fetch(`${sessionStorage.getItem('url')}/${index}/_msearch`, {
 			method: 'POST',
 			headers: {
-				Authorization: `Basic ${localStorage.getItem('authToken')}`,
+				Authorization: `Basic ${sessionStorage.getItem('authToken')}`,
 				Accept: 'application/json',
 				'Content-Type': 'application/x-ndjson',
 			},

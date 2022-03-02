@@ -24,7 +24,7 @@ const streamingData = {
 const getAuthToken = () => {
 	let token = null;
 	try {
-		token = localStorage.getItem('authToken');
+		token = sessionStorage.getItem('authToken');
 	} catch (e) {
 		console.error(e);
 	}
@@ -35,8 +35,8 @@ const getCredentials = () => {
 	let username = null;
 	let password = null;
 	try {
-		username = localStorage.getItem('username') || sessionStorage.getItem('username');
-		password = localStorage.getItem('password') || sessionStorage.getItem('password');
+		username = sessionStorage.getItem('username');
+		password = sessionStorage.getItem('password');
 	} catch (e) {
 		console.error(e);
 	}
