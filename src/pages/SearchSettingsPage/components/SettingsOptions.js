@@ -188,7 +188,7 @@ const SettingsOptions = ({
 					]}
 					selectProps={{
 						value: distinctField ? distinctField.split('.keyword')[0] : undefined,
-						onSelect: (val) => {
+						onChange: (val) => {
 							if (distinctField === val) {
 								// To unselect
 								handleChange('distinctField', undefined);

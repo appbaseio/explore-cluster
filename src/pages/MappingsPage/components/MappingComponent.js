@@ -13,6 +13,7 @@ import { footerStyles, headerRow } from './styles';
 
 import { getMappingsByPath, deleteMappingField } from '../../../utils/mappings';
 import { VIEWS } from '../../../constants/props';
+import CopyField from './CopyField';
 
 const mappingHeaderLeft = [
 	{
@@ -24,8 +25,7 @@ const mappingHeaderLeft = [
 const mappingHeaderRight = [
 	{
 		title: 'Use case',
-		info:
-			'We detect the appropriate analyzers and mappings here representing the usecase - search or aggregations.',
+		info: 'We detect the appropriate analyzers and mappings here representing the usecase - search or aggregations.',
 	},
 	{
 		title: 'Data Type',
@@ -34,6 +34,11 @@ const mappingHeaderRight = [
 ];
 
 class MappingComponent extends React.Component {
+	state = {
+		showCopyModal: false,
+		copiedFieldItem: null,
+	};
+
 	handleDelete = ({
 		path,
 		usecase,
@@ -88,7 +93,6 @@ class MappingComponent extends React.Component {
 			const usecaseVal = get(usecase, field);
 			const typeVal = get(type, field);
 			const isObj = typeof usecaseVal === 'object';
-
 			if (isObj) {
 				return (
 					<ObjectField
@@ -147,6 +151,16 @@ class MappingComponent extends React.Component {
 							...rest,
 						})
 					}
+					triggerCopyField={() => {
+						this.setState({
+							showCopyModal: true,
+							copiedFieldItem: {
+								fieldName: field,
+								fieldUsecase: usecaseVal,
+								fieldType: typeVal,
+							},
+						});
+					}}
 				/>
 			);
 		});
@@ -154,6 +168,7 @@ class MappingComponent extends React.Component {
 
 	render() {
 		const { collapsed, appName } = this.props;
+		const { showCopyModal, copiedFieldItem } = this.state;
 		return (
 			<>
 				<>
@@ -341,6 +356,30 @@ class MappingComponent extends React.Component {
 										</div>
 									</div>
 								</div>
+								<CopyField
+									useAsModal
+									visible={showCopyModal}
+									copiedFieldItem={copiedFieldItem}
+									fields={Object.keys(usecase || {})}
+									onCopyField={({
+										type: fieldType,
+										path,
+										usecase: fieldUseCase,
+										script,
+									}) =>
+										setMapping([
+											{
+												type: fieldType,
+												usecase: fieldUseCase,
+												path,
+												script,
+											},
+										])
+									}
+									onCloseModal={() => {
+										this.setState({ showCopyModal: false });
+									}}
+								/>
 							</div>
 						)}
 					</MappingsWrapper>

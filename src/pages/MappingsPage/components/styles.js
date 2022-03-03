@@ -36,7 +36,8 @@ export const deleteRow = css`
 		box-shadow: none;
 		margin-right: 8px;
 	}
-	.delete-btn {
+	.delete-btn,
+	.copy-field-trigger-btn {
 		margin-left: 8px;
 		transform: scale(0);
 		transition: all ease 0.2s;
@@ -50,8 +51,15 @@ export const deleteRow = css`
 		color: #f5222d;
 	}
 
+	.copy-field-trigger-btn {
+		color: #40a9ff;
+	}
+	.copy-field-trigger-btn:hover {
+		color: rgb(24, 144, 255);
+	}
 	&:hover {
-		.delete-btn {
+		.delete-btn,
+		.copy-field-trigger-btn {
 			transform: scale(1);
 		}
 		.advance-btn {

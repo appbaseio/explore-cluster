@@ -23,6 +23,7 @@ const FieldRow = ({
 	showAdvanceOption,
 	isAdvanceOption,
 	onAdvanceStateChange,
+	triggerCopyField,
 }) => {
 	const [fieldName, setFieldName] = React.useState(path);
 	return (
@@ -65,6 +66,17 @@ const FieldRow = ({
 						>
 							{isAdvanceOption ? <Icon type="minus" /> : <Icon type="plus" />}
 							Advanced settings
+						</Button>
+					)}
+					{view === VIEWS.SCHEMA && (
+						<Button
+							className="copy-field-trigger-btn"
+							type="primary"
+							size="small"
+							onClick={triggerCopyField}
+						>
+							<Icon type="copy" data-cy={`copy-field-${field}`} />
+							Copy Field
 						</Button>
 					)}
 					<Button
@@ -124,6 +136,7 @@ FieldRow.defaultProps = {
 	showAdvanceOption: false,
 	isAdvanceOption: false,
 	onAdvanceStateChange: () => {},
+	triggerCopyField: () => {},
 };
 
 FieldRow.propTypes = {
@@ -143,6 +156,7 @@ FieldRow.propTypes = {
 	showAdvanceOption: PropTypes.bool,
 	isAdvanceOption: PropTypes.bool,
 	onAdvanceStateChange: PropTypes.func,
+	triggerCopyField: PropTypes.func,
 };
 
 export default FieldRow;

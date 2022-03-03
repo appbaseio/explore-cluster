@@ -419,11 +419,20 @@ export const updateSubFields = ({
 	return { ...updatedMappings };
 };
 
-export function reIndex({ mappings, appName, version, credentials, settings, excludeFields }) {
+export function reIndex({
+	mappings,
+	appName,
+	version,
+	credentials,
+	settings,
+	excludeFields,
+	script,
+}) {
 	const body = {
 		mappings,
 		settings,
 		es_version: version,
+		script,
 	};
 
 	if (excludeFields && excludeFields.length) {

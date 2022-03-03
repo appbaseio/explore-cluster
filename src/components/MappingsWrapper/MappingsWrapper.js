@@ -31,6 +31,7 @@ class MappingsWrapper extends React.Component {
 		deletedPaths: [],
 		originalType: null,
 		originalUseCas: null,
+		script: undefined,
 	};
 
 	componentDidMount() {
@@ -148,8 +149,7 @@ class MappingsWrapper extends React.Component {
 
 	handleReindex = async () => {
 		const { appName, credentials, updateReIndexingTasks } = this.props;
-		const { mappings, deletedPaths } = this.state;
-
+		const { mappings, deletedPaths, script } = this.state;
 		this.setState({
 			isReindexing: true,
 		});
@@ -169,6 +169,7 @@ class MappingsWrapper extends React.Component {
 					...get(appSettings, 'index.analysis'),
 				},
 			},
+			script,
 		});
 
 		reIndexPromise
@@ -210,8 +211,16 @@ class MappingsWrapper extends React.Component {
 		let updatedFlattenUsecase = null;
 		let updatedFlattenType = null;
 
+		// this key was added to support passing a script to copy
+		// field values when leveraging copy field funcitonality
+		// assumption is that only one script value can be there at a time
+		// coz only when field is copied
+		let scriptValue;
 		data.forEach((item) => {
-			const { path, type: fieldType, usecase: fieldUseCase } = item;
+			const { path, type: fieldType, usecase: fieldUseCase, script } = item;
+			if (script) {
+				scriptValue = script;
+			}
 			updatedMappings = updateMapping({
 				originalMapping: mappings,
 				usecase: fieldUseCase,
@@ -255,6 +264,7 @@ class MappingsWrapper extends React.Component {
 			type: updatedType,
 			flattenType: updatedFlattenType,
 			flattenUsecase: updatedFlattenUsecase,
+			script: scriptValue,
 		});
 		return updatedMappings;
 	};
