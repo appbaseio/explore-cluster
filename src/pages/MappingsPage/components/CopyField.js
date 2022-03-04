@@ -75,9 +75,7 @@ class CopyField extends React.Component {
 			path: fieldName,
 			type: fieldType,
 			usecase: fieldUsecase,
-			script: {
-				source: `ctx._source.${copiedFieldItem.fieldName} = ctx._source.${fieldName}`,
-			},
+			script: `ctx._source.${fieldName} = ctx._source.${copiedFieldItem.fieldName}`,
 		});
 	};
 
