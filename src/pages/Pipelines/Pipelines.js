@@ -72,7 +72,7 @@ const Pipelines = (props) => {
 		});
 	};
 
-	if (compareVersion(appVersion, '7.57.0') === -1)
+	if (compareVersion(appVersion, '7.58.0') === -1)
 		return (
 			<React.Fragment>
 				<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
