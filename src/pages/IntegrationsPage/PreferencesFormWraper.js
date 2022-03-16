@@ -495,7 +495,7 @@ class PreferencesFormWrapper extends React.Component {
 			credentials: `${
 				localStorage.getItem('username') || sessionStorage.getItem('username')
 			}:${sessionStorage.getItem('password')}`,
-			url: sessionStorage.getItem('url'),
+			url: localStorage.getItem('url') || sessionStorage.getItem('url'),
 		};
 		return preferencesPayload;
 	};

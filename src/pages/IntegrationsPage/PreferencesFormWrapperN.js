@@ -607,7 +607,7 @@ class PreferencesFormWrapperN extends React.Component {
 		preferencesPayload.appbaseSettings = {
 			index: preferencesPayload.pipeline,
 			credentials: get(preferencesPayload, 'exportSettings.credentials', ''),
-			url: sessionStorage.getItem('url'),
+			url: localStorage.getItem('url') || sessionStorage.getItem('url'),
 		};
 		return preferencesPayload;
 	};

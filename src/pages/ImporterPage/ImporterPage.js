@@ -53,7 +53,9 @@ class ImporterPage extends React.Component {
 		});
 		const { type, appName: index } = this.props;
 		const cluster = sessionStorage.getItem('cluster') || '';
-		const { host, protocol } = new URL(sessionStorage.getItem('url'));
+		const { host, protocol } = new URL(
+			localStorage.getItem('url') || sessionStorage.getItem('url'),
+		);
 		const username = localStorage.getItem('username') || sessionStorage.getItem('username');
 		const password = localStorage.getItem('password') || sessionStorage.getItem('password');
 		const uri = `${protocol}//${username}:${password}@${host}`;
