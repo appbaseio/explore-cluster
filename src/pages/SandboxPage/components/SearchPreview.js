@@ -503,6 +503,29 @@ class SearchPreview extends React.Component {
 		});
 	};
 
+	transformRequest = (props) => {
+		const { tier, featureSuggestions } = this.props;
+		const { isTypeahead } = this.state;
+
+		if (isTypeahead && !isValidPlan(tier, featureSuggestions)) {
+			const parsedBody = JSON.parse(props.body);
+			parsedBody.query.forEach((item, index) => {
+				if (item.id === 'search' && item.type === 'suggestion') {
+					parsedBody.query[index] = {
+						...item,
+						enablePopularSuggestions: false,
+						enableRecentSuggestions: false,
+					};
+					// eslint-disable-next-line no-param-reassign
+					props.body = JSON.stringify(parsedBody);
+					return props;
+				}
+				return props;
+			});
+		}
+		return props;
+	};
+
 	render() {
 		const {
 			settings,
@@ -624,6 +647,10 @@ class SearchPreview extends React.Component {
 					enableAppbase
 					credentials={credentials}
 					url={url}
+					transformRequest={(props) => {
+						const newProps = this.transformRequest(props);
+						return newProps;
+					}}
 					appbaseConfig={{
 						recordAnalytics: showFeaturedProducts ? false : isAnalyticsEnabled,
 						enableQueryRules: page !== 'rules',
@@ -711,6 +738,7 @@ const mapStateToProps = (state, props) => {
 		featureGrade: get(state, '$getAppPlan.results.feature_search_grader'),
 		searchState: get(state, '$getSearchState.parsedSearchState', null),
 		featureRules: get(state, '$getAppPlan.results.feature_rules', false),
+		featureSuggestions: get(state, '$getAppPlan.results.feature_suggestions', false),
 		appbaseVersion: get(state, '$getAppPlan.results.version'),
 		searchStateSuggestions: get(state, '$getSearchState.searchState.suggestions', null),
 	};
@@ -761,6 +789,7 @@ SearchPreview.propTypes = {
 	showIndexSwitcher: PropTypes.bool,
 	onSelect: PropTypes.func,
 	filteredApps: PropTypes.array,
+	featureSuggestions: PropTypes.bool,
 };
 
 SearchPreview.defaultProps = {
@@ -787,6 +816,7 @@ SearchPreview.defaultProps = {
 	showIndexSwitcher: false,
 	onSelect: () => {},
 	filteredApps: [],
+	featureSuggestions: false,
 };
 
 export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(SearchPreview));
