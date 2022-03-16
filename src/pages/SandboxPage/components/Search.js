@@ -88,9 +88,10 @@ class Search extends React.Component {
 								enableRecentSuggestions={isTypeahead}
 								enablePredictiveSuggestions={isTypeahead}
 								value={value}
-								onChange={(valueParam) => {
+								onChange={(valueParam, triggerQuery) => {
 									this.handleChange(valueParam);
 									handleValueChange(search.id, valueParam);
+									if (!isTypeahead) triggerQuery();
 								}}
 								componentId={search.id}
 								innerClass={{

@@ -492,10 +492,10 @@ class PreferencesFormWrapper extends React.Component {
 		}
 		preferencesPayload.appbaseSettings = {
 			index,
-			credentials: `${sessionStorage.getItem('username')}:${sessionStorage.getItem(
-				'password',
-			)}`,
-			url: sessionStorage.getItem('url'),
+			credentials: `${
+				localStorage.getItem('username') || sessionStorage.getItem('username')
+			}:${sessionStorage.getItem('password')}`,
+			url: localStorage.getItem('url') || sessionStorage.getItem('url'),
 		};
 		return preferencesPayload;
 	};

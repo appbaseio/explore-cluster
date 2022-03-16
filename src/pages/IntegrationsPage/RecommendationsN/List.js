@@ -38,7 +38,9 @@ const columns = [
 		dataIndex: 'updatedAt',
 		render: (key) => {
 			return {
-				children: <p style={{ fontSize: '14px', width: 'max-content' }}>{key}</p>,
+				children: (
+					<p style={{ fontSize: '14px', width: 'max-content', margin: 0 }}>{key}</p>
+				),
 			};
 		},
 	},

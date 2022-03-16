@@ -152,7 +152,7 @@ class PromoteResults extends Component {
 				<ReactiveBase
 					app={app}
 					url={getURL()}
-					credentials={atob(sessionStorage.getItem('authToken'))}
+					credentials={atob(localStorage.getItem('authToken'))}
 					style={{ marginBottom: 12 }}
 					enableAppbase
 					appbaseConfig={{

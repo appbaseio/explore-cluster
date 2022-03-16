@@ -879,9 +879,11 @@ export const getSearchPreferencesPayload = (formValue) => {
 };
 
 const getURL = () => {
-	const { host, protocol } = new URL(sessionStorage.getItem('url'));
-	const username = sessionStorage.getItem('username');
-	const password = sessionStorage.getItem('password');
+	const { host, protocol } = new URL(
+		localStorage.getItem('url') || sessionStorage.getItem('url'),
+	);
+	const username = localStorage.getItem('username') || sessionStorage.getItem('username');
+	const password = localStorage.getItem('password') || sessionStorage.getItem('password');
 	const uri = `${protocol}//${username}:${password}@${host}`;
 	return uri;
 };

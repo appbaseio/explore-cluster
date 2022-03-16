@@ -6,9 +6,11 @@ import { connect } from 'react-redux';
 import Flex from '../../batteries/components/shared/Flex';
 
 const getURL = () => {
-	const { host, protocol } = new URL(sessionStorage.getItem('url'));
-	const username = sessionStorage.getItem('username');
-	const password = sessionStorage.getItem('password');
+	const { host, protocol } = new URL(
+		localStorage.getItem('url') || sessionStorage.getItem('url'),
+	);
+	const username = localStorage.getItem('username') || sessionStorage.getItem('username');
+	const password = localStorage.getItem('password') || sessionStorage.getItem('password');
 	const uri = `${protocol}//${username}:${password}@${host}`;
 	return uri;
 };
@@ -58,10 +60,10 @@ class SyncStatus extends React.Component {
 
 	fetchData = () => {
 		const { index } = this.props;
-		fetch(`${sessionStorage.getItem('url')}/${index}/_msearch`, {
+		fetch(`${localStorage.getItem('url') || sessionStorage.getItem('url')}/${index}/_msearch`, {
 			method: 'POST',
 			headers: {
-				Authorization: `Basic ${sessionStorage.getItem('authToken')}`,
+				Authorization: `Basic ${localStorage.getItem('authToken')}`,
 				Accept: 'application/json',
 				'Content-Type': 'application/x-ndjson',
 			},

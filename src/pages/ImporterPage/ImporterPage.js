@@ -53,9 +53,11 @@ class ImporterPage extends React.Component {
 		});
 		const { type, appName: index } = this.props;
 		const cluster = sessionStorage.getItem('cluster') || '';
-		const { host, protocol } = new URL(sessionStorage.getItem('url'));
-		const username = sessionStorage.getItem('username');
-		const password = sessionStorage.getItem('password');
+		const { host, protocol } = new URL(
+			localStorage.getItem('url') || sessionStorage.getItem('url'),
+		);
+		const username = localStorage.getItem('username') || sessionStorage.getItem('username');
+		const password = localStorage.getItem('password') || sessionStorage.getItem('password');
 		const uri = `${protocol}//${username}:${password}@${host}`;
 
 		if (type === 'cluster') {
@@ -116,8 +118,7 @@ class ImporterPage extends React.Component {
 		const sourceParams = loadSample
 			? {
 					subType: 'url',
-					uri:
-						'https://raw.githubusercontent.com/appbaseio/cdn/dev/appbase/ecommerce_data.json',
+					uri: 'https://raw.githubusercontent.com/appbaseio/cdn/dev/appbase/ecommerce_data.json',
 					extraType: 'SourceFile',
 					type: 'json',
 					useBulk: true,

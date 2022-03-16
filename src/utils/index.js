@@ -56,7 +56,7 @@ export async function getUser(username, password, url) {
 		.then((es) => es.json())
 		.then((esResponse) => {
 			const version = get(esResponse, 'version.number');
-			sessionStorage.setItem('version', version);
+			localStorage.setItem('version', version);
 		})
 		.catch((e) => {
 			// eslint-disable-next-line no-console
@@ -77,7 +77,7 @@ export async function getUser(username, password, url) {
 export const getAuthToken = () => {
 	let token = null;
 	try {
-		token = sessionStorage.getItem('authToken');
+		token = localStorage.getItem('authToken');
 	} catch (e) {
 		console.error(e);
 	}
@@ -173,7 +173,7 @@ export function getParam(name, url) {
 
 export async function deleteApp(appName) {
 	const ACC_API = getURL();
-	const authToken = sessionStorage.getItem('authToken');
+	const authToken = localStorage.getItem('authToken');
 	try {
 		const response = await fetch(`${ACC_API}/${appName}`, {
 			headers: {
@@ -214,7 +214,7 @@ export const setRole = (username, role) =>
 export async function cloneApp(source, destination, payload = {}) {
 	if (!source || !destination) return;
 	const ACC_API = getURL();
-	const authToken = sessionStorage.getItem('authToken');
+	const authToken = localStorage.getItem('authToken');
 	const response = await fetch(`${ACC_API}/_reindex/${source}/${destination}`, {
 		headers: {
 			Authorization: `Basic ${authToken}`,
@@ -253,7 +253,7 @@ export const deleteRole = (appId, username) =>
 // set private registry
 export async function setPrivateRegistry(payload = {}) {
 	const ACC_API = getURL();
-	const authToken = sessionStorage.getItem('authToken');
+	const authToken = localStorage.getItem('authToken');
 
 	const response = await fetch(`${ACC_API}/_functions/registry_config`, {
 		headers: {
@@ -283,7 +283,7 @@ function extractLogs(data) {
 // fetch logs
 export async function fetchLogs(name = 'default') {
 	const ACC_API = getURL();
-	const authToken = sessionStorage.getItem('authToken');
+	const authToken = localStorage.getItem('authToken');
 	const response = await fetch(`${ACC_API}/_function/${name}/logs?tail=100`, {
 		headers: {
 			'Content-Type': 'application/json',
@@ -303,7 +303,7 @@ export async function fetchLogs(name = 'default') {
 
 export async function fetchMappings(name = '*') {
 	const ACC_API = getURL();
-	const authToken = sessionStorage.getItem('authToken');
+	const authToken = localStorage.getItem('authToken');
 	const response = await fetch(`${ACC_API}/${name}/_mapping`, {
 		headers: {
 			'Content-Type': 'application/json',
@@ -348,7 +348,7 @@ export const isEmpty = (val) => val == null || !(Object.keys(val) || val).length
 
 export async function getClusterMappings() {
 	const ACC_API = getURL();
-	const authToken = sessionStorage.getItem('authToken');
+	const authToken = localStorage.getItem('authToken');
 	const response = await fetch(`${ACC_API}/*/_mapping`, {
 		headers: {
 			'Content-Type': 'application/json',

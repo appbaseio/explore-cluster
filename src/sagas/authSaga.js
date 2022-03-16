@@ -6,15 +6,17 @@ import { setUser, loadApps, setUserError } from '../actions';
 
 function* authWorker(username, password, url) {
 	try {
-		sessionStorage.setItem('url', url);
-		sessionStorage.setItem('username', username);
-		sessionStorage.setItem('password', password);
+		localStorage.setItem('url', url);
+		localStorage.setItem('username', username);
+		localStorage.setItem('password', password);
 		const user = yield call(getUser, username, password, url);
 
-		sessionStorage.setItem('authToken', user.authToken);
-		sessionStorage.setItem('isAdmin', user.isAdmin);
+		localStorage.setItem('authToken', user.authToken);
+		localStorage.setItem('isAdmin', user.isAdmin);
+		localStorage.setItem('allowedActions', user.allowedActions);
 
-		sessionStorage.setItem('allowedActions', user.allowedActions);
+		// sessionStorage.setItem('isAdmin', user.isAdmin);
+		// sessionStorage.setItem('allowedActions', user.allowedActions);
 		yield put(setUser(user));
 		yield put(loadApps());
 	} catch (e) {

@@ -3,12 +3,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Tooltip, Row, Col, Divider, Popover, Tag, Icon, Button } from 'antd';
-
+import createDOMPurify from 'dompurify';
 import { listItem } from './styles';
 import Grading from './Grading';
 import Expand from './Expand';
 
 const MAX_RENDERED_KEYS = 10;
+const DOMPurify = createDOMPurify(window);
 
 const getObjKeys = ({ hasOverflow, collapsed, data }) => {
 	const keys = Object.keys(data);
@@ -19,14 +20,8 @@ const getObjKeys = ({ hasOverflow, collapsed, data }) => {
 // eslint-disable-next-line react/prefer-stateless-function
 class ListItem extends React.Component {
 	render() {
-		const {
-			item,
-			showFeaturedProducts,
-			onChange,
-			value,
-			selectButtonLabel,
-			showFeaturedList,
-		} = this.props;
+		const { item, showFeaturedProducts, onChange, value, selectButtonLabel, showFeaturedList } =
+			this.props;
 		const { _promoted, _click_id, _index, highlight, _type, index, ...rest } = item;
 
 		return (
@@ -59,20 +54,24 @@ class ListItem extends React.Component {
 														content={
 															typeof rest[key] === 'object' ? (
 																<pre
+																	// eslint-disable-next-line
 																	dangerouslySetInnerHTML={{
-																		__html:
+																		__html: DOMPurify.sanitize(
 																			JSON.stringify(
 																				rest[key],
 																			) || 'N/A',
+																		),
 																	}}
 																/>
 															) : (
 																<span
+																	// eslint-disable-next-line
 																	dangerouslySetInnerHTML={{
-																		__html:
+																		__html: DOMPurify.sanitize(
 																			JSON.stringify(
 																				rest[key],
 																			) || 'N/A',
+																		),
 																	}}
 																/>
 															)
@@ -82,10 +81,12 @@ class ListItem extends React.Component {
 															JSON.stringify(rest[key])
 														) : (
 															<span
+																// eslint-disable-next-line
 																dangerouslySetInnerHTML={{
-																	__html:
+																	__html: DOMPurify.sanitize(
 																		JSON.stringify(rest[key]) ||
-																		'N/A',
+																			'N/A',
+																	),
 																}}
 															/>
 														)}
