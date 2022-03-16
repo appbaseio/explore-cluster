@@ -3,12 +3,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Tooltip, Row, Col, Divider, Popover, Tag, Icon, Button } from 'antd';
-
+import createDOMPurify from 'dompurify';
 import { listItem } from './styles';
 import Grading from './Grading';
 import Expand from './Expand';
 
 const MAX_RENDERED_KEYS = 10;
+const DOMPurify = createDOMPurify(window);
 
 const getObjKeys = ({ hasOverflow, collapsed, data }) => {
 	const keys = Object.keys(data);
@@ -59,20 +60,22 @@ class ListItem extends React.Component {
 														content={
 															typeof rest[key] === 'object' ? (
 																<pre
+																	// eslint-disable-next-line
 																	dangerouslySetInnerHTML={{
 																		__html:
-																			JSON.stringify(
+																			DOMPurify.sanitize(JSON.stringify(
 																				rest[key],
-																			) || 'N/A',
+																			) || 'N/A'),
 																	}}
 																/>
 															) : (
 																<span
+																	// eslint-disable-next-line
 																	dangerouslySetInnerHTML={{
 																		__html:
-																			JSON.stringify(
+																			DOMPurify.sanitize(JSON.stringify(
 																				rest[key],
-																			) || 'N/A',
+																			) || 'N/A'),
 																	}}
 																/>
 															)
@@ -82,10 +85,11 @@ class ListItem extends React.Component {
 															JSON.stringify(rest[key])
 														) : (
 															<span
+																// eslint-disable-next-line
 																dangerouslySetInnerHTML={{
 																	__html:
-																		JSON.stringify(rest[key]) ||
-																		'N/A',
+																		DOMPurify.sanitize(JSON.stringify(rest[key]) ||
+																		'N/A'),
 																}}
 															/>
 														)}

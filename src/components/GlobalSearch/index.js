@@ -5,9 +5,11 @@ import { SearchBox } from '@appbaseio/reactivesearch';
 import { css } from 'react-emotion';
 import { Icon } from 'antd';
 import get from 'lodash/get';
+import createDOMPurify from 'dompurify';
 import { getSettings as getSearchSettings } from '../../batteries/modules/actions';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 
+const DOMPurify = createDOMPurify(window);
 const inputBox = css`
 	&:hover,
 	&:focus {
@@ -128,8 +130,9 @@ class GlobalSearch extends PureComponent {
 														{...downshiftProps.getItemProps({
 															item: suggestion,
 														})}
+														// eslint-disable-next-line
 														dangerouslySetInnerHTML={{
-															__html: suggestion.label,
+															__html: DOMPurify.sanitize(suggestion.label),
 														}}
 													/>
 												</div>
