@@ -2,15 +2,18 @@
 import { USER } from '../constants';
 import { getDefaultAllowedActions } from '../utils/allowedActions';
 
-const defaultUsername = sessionStorage.getItem('username');
-const defaultPassword = sessionStorage.getItem('password');
-const defaultToken = sessionStorage.getItem('authToken');
-const defaultAllowedActions = sessionStorage.getItem('allowedActions');
+const defaultUsername = localStorage.getItem('username') || sessionStorage.getItem('username');
+const defaultPassword = localStorage.getItem('password') || sessionStorage.getItem('password');
+const defaultToken = localStorage.getItem('authToken');
+const defaultAllowedActions =
+	localStorage.getItem('allowedActions') || sessionStorage.getItem('allowedActions');
 
 let defaultIsAdmin = false;
 
 try {
-	defaultIsAdmin = Boolean(JSON.parse(sessionStorage.getItem('isAdmin')));
+	defaultIsAdmin = Boolean(
+		JSON.parse(localStorage.getItem('isAdmin') || sessionStorage.getItem('isAdmin')),
+	);
 } catch (err) {
 	console.error(err);
 }
