@@ -11,7 +11,7 @@ export const bannerDetails = {
 export const monacoOptions = {
 	cursorStyle: 'line',
 	fontFamily: 'Monaco, monospace',
-	fontSize: 14,
+	fontSize: 12,
 	autoIndent: true,
 	scrollBeyondLastLine: false,
 	padding: {
@@ -22,6 +22,7 @@ export const monacoOptions = {
 		enabled: false,
 	},
 	comments: 'insertSpace',
+	automaticLayout: true,
 };
 
 export const TAB_ACTIONS = {
@@ -59,4 +60,28 @@ export const getConsoleLogsArray = (refObj) => {
 	}
 
 	return [];
+};
+
+// deletes the keys recursively
+// and returns back the post-deletion object along with the object
+// containing the deleted keys and their values
+export const deleteRecursive = (inputProp, keysToDelete) => {
+	if (!(inputProp instanceof Object)) {
+		return null;
+	}
+	const input = inputProp;
+	// eslint-disable-next-line consistent-return
+	Object.keys(input).forEach((key) => {
+		if (keysToDelete.includes(key)) {
+			delete input[key];
+		}
+		if (typeof input[key] === 'object') {
+			input[key] = deleteRecursive(input[key], keysToDelete);
+		}
+	});
+	return input;
+};
+
+export const trimExtension = (string, extension = '.js') => {
+	return string?.replace(new RegExp(`${extension}+$`), '') ?? '';
 };

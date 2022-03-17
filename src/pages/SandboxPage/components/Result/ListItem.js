@@ -20,14 +20,8 @@ const getObjKeys = ({ hasOverflow, collapsed, data }) => {
 // eslint-disable-next-line react/prefer-stateless-function
 class ListItem extends React.Component {
 	render() {
-		const {
-			item,
-			showFeaturedProducts,
-			onChange,
-			value,
-			selectButtonLabel,
-			showFeaturedList,
-		} = this.props;
+		const { item, showFeaturedProducts, onChange, value, selectButtonLabel, showFeaturedList } =
+			this.props;
 		const { _promoted, _click_id, _index, highlight, _type, index, ...rest } = item;
 
 		return (
@@ -62,20 +56,22 @@ class ListItem extends React.Component {
 																<pre
 																	// eslint-disable-next-line
 																	dangerouslySetInnerHTML={{
-																		__html:
-																			DOMPurify.sanitize(JSON.stringify(
+																		__html: DOMPurify.sanitize(
+																			JSON.stringify(
 																				rest[key],
-																			) || 'N/A'),
+																			) || 'N/A',
+																		),
 																	}}
 																/>
 															) : (
 																<span
 																	// eslint-disable-next-line
 																	dangerouslySetInnerHTML={{
-																		__html:
-																			DOMPurify.sanitize(JSON.stringify(
+																		__html: DOMPurify.sanitize(
+																			JSON.stringify(
 																				rest[key],
-																			) || 'N/A'),
+																			) || 'N/A',
+																		),
 																	}}
 																/>
 															)
@@ -87,9 +83,10 @@ class ListItem extends React.Component {
 															<span
 																// eslint-disable-next-line
 																dangerouslySetInnerHTML={{
-																	__html:
-																		DOMPurify.sanitize(JSON.stringify(rest[key]) ||
-																		'N/A'),
+																	__html: DOMPurify.sanitize(
+																		JSON.stringify(rest[key]) ||
+																			'N/A',
+																	),
 																}}
 															/>
 														)}

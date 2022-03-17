@@ -45,8 +45,7 @@ class GlobalSearch extends PureComponent {
 	};
 
 	render() {
-		const { className, dataFields, onKeyDown, onValueSelected, subprops, dataFieldSettings } =
-			this.props;
+		const { className, dataFields, onValueSelected, subprops, dataFieldSettings } = this.props;
 		const { searchValue } = this.state;
 		const isFieldDefined = Array.isArray(dataFieldSettings) && dataFieldSettings.length;
 		return (
@@ -132,7 +131,9 @@ class GlobalSearch extends PureComponent {
 														})}
 														// eslint-disable-next-line
 														dangerouslySetInnerHTML={{
-															__html: DOMPurify.sanitize(suggestion.label),
+															__html: DOMPurify.sanitize(
+																suggestion.label,
+															),
 														}}
 													/>
 												</div>

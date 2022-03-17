@@ -102,6 +102,7 @@ const TabContent = (props) => {
 		} catch (error) {
 			// eslint-disable-next-line
 			console.error(error);
+			setValidatedScriptRule(error);
 		}
 	};
 

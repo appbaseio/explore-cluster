@@ -10,7 +10,11 @@ import Loader from '../../components/Loader';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import DNDWrapper from '../../components/DNDWrapper';
 import { bannerDetails } from './utils';
-import { getPipelines, reorderPipelines } from '../../batteries/modules/actions';
+import {
+	getPipelines,
+	getPipelinesUsageStats,
+	reorderPipelines,
+} from '../../batteries/modules/actions';
 import PipelineCard from './components/PipelineCard';
 import { isValidPlan } from '../../batteries/utils';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
@@ -32,11 +36,14 @@ const Pipelines = (props) => {
 		tier,
 		appVersion,
 		featurePipelines,
+		fetchUsageStats,
+		history,
 	} = props;
 
 	useLayoutEffect(() => {
 		if (isValidPlan(tier, featurePipelines)) {
 			fetchPipelines();
+			fetchUsageStats();
 		}
 	}, []);
 
@@ -180,6 +187,7 @@ const Pipelines = (props) => {
 										dragSnapshot={dragSnapshot}
 										pipeline={item}
 										index={item.priority}
+										history={history}
 									/>
 								)}
 							</DNDWrapper>
@@ -212,6 +220,8 @@ Pipelines.propTypes = {
 	reorderPipeline: PropTypes.func.isRequired,
 	tier: allowedTiers,
 	appVersion: PropTypes.string,
+	fetchUsageStats: PropTypes.func.isRequired,
+	history: {},
 };
 
 Pipelines.defaultProps = {
@@ -220,6 +230,7 @@ Pipelines.defaultProps = {
 	tier: undefined,
 	featurePipelines: false,
 	appVersion: undefined,
+	history: PropTypes.object,
 };
 
 const mapStateToProps = (state) => ({
@@ -233,6 +244,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
 	fetchPipelines: () => dispatch(getPipelines()),
 	reorderPipeline: (payload) => dispatch(reorderPipelines(payload)),
+	fetchUsageStats: () => dispatch(getPipelinesUsageStats()),
 });
 
 export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(Pipelines));

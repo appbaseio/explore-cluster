@@ -160,10 +160,10 @@ class ClusterAnalyticsRoutes extends React.Component {
 							)}
 						</>
 					)}
-				/>
+				/>{' '}
 				<Route
 					exact
-					path="/cluster/request-logs/:tab?"
+					path="/cluster/request-logs"
 					component={(props) => (
 						<>
 							{get(allowedRoutes, '/cluster/request-logs') ? (

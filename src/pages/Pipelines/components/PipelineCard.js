@@ -178,8 +178,8 @@ const PipelineCard = (props) => {
 		showDrag,
 		showExport,
 		history,
+		usageStats,
 	} = props;
-
 	const [isEditPriority, setIsEditPriority] = useState(false);
 
 	const [priorityValue, setpriorityValue] = useState(false);
@@ -187,7 +187,7 @@ const PipelineCard = (props) => {
 	const actionButtonSize = window.innerWidth < 1090 ? 'small' : 'default';
 
 	const handlePipelineStatus = (value) => {
-		const modifiedPipelineValue = yamlToJson.dump({
+		const modifiedPipelineValue = JSON.stringify({
 			...yamlToJson.load(pipeline.content),
 			enabled: value,
 		});
@@ -216,7 +216,7 @@ const PipelineCard = (props) => {
 	const handleZipExport = () => {
 		const zip = new JSZip();
 		const folder = zip.folder(`${pipeline.id}`);
-		folder.file('pipeline.yaml', pipeline.content);
+		folder.file('pipeline.json', pipeline.content);
 		if (Object.keys(pipelineScripts).length) {
 			Object.keys(pipelineScripts).forEach((fileName) => {
 				const { content, extension } = pipelineScripts[fileName];
@@ -267,7 +267,6 @@ const PipelineCard = (props) => {
 		}
 		return null;
 	};
-
 	return (
 		<Card
 			hoverable
@@ -287,7 +286,7 @@ const PipelineCard = (props) => {
 				<Col xs={2}>
 					<div style={{ display: 'flex' }}>
 						{showDrag && (
-							<Tooltip title="Drag to update the ordering of rules.">
+							<Tooltip title="Drag to update the priority of pipelines. The pipelines are sorted and executed based on priority, with lowest values having the highest priority.">
 								<div {...dragProvided.dragHandleProps} className={dragIcon}>
 									<Icon type="drag" />
 								</div>
@@ -317,7 +316,7 @@ const PipelineCard = (props) => {
 								) : (
 									<div>{pipeline.priority}</div>
 								)}
-								<div title="Click to edit the order.">
+								<Tooltip title="Click to edit the priority. The pipelines are sorted and executed based on priority, with lowest values having the highest priority.">
 									{isEditPriority ? (
 										// eslint-disable-next-line
 										<Icon
@@ -343,15 +342,15 @@ const PipelineCard = (props) => {
 											}}
 										/>
 									)}
-								</div>
+								</Tooltip>
 							</div>
 						</div>
 					</div>
 				</Col>
 				<Col xl={8} lg={8} md={12} sm={24}>
 					<h4 className={title}>
-						<span>{pipelinesRoutePaths?.[0] ?? ''}</span>
-						{pipelinesRoutePaths?.length > 1 && (
+						<Tooltip title={pipeline.id}>{pipeline.id}</Tooltip>
+						{pipelinesRoutePaths?.length > 0 && (
 							<Tag className="routes-popover-tag" color="blue">
 								<Popover
 									content={
@@ -427,11 +426,7 @@ const PipelineCard = (props) => {
 								</div>
 							)}
 						</DeleteModal>
-						<ClonePipeline
-							pipeline={pipeline}
-							pipelineScripts={pipelineScripts}
-							buttonSize={actionButtonSize}
-						/>
+						<ClonePipeline pipeline={pipeline} buttonSize={actionButtonSize} />
 						{showEdit && (
 							<Link to={`/cluster/pipelines/${pipeline.id}`}>
 								<Button size={actionButtonSize} type="primary">
@@ -461,15 +456,15 @@ const PipelineCard = (props) => {
 					type="info"
 					showIcon
 					message={
-						23 < 0
-							? `Used ${0} times in last ${30} days`
+						usageStats?.count > 0
+							? `Used ${usageStats?.count} times in last ${30} days`
 							: 'Not used in the last 30 days'
 					}
 				/>
 				<Button
 					type="link"
 					onClick={() => {
-						// todo
+						message.info('Pipeline logs coming soon! :)');
 					}}
 					className="view-logs-btn"
 				>
@@ -523,10 +518,16 @@ PipelineCard.propTypes = {
 	showDrag: PropTypes.bool,
 	history: PropTypes.object,
 	pipelineScripts: PropTypes.object,
+	usageStats: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state, props) => {
+	const usageStats =
+		get(state, '$getPipelinesUsageStats.results')?.pipelines?.find(
+			(item) => item.key === props.pipeline.id,
+		) ?? null;
 	return {
+		usageStats,
 		pipelineScripts: get(state, '$getAppPipelines.scriptResults')?.[props.pipeline.id],
 	};
 };

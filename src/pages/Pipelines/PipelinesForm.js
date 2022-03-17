@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign,camelcase,jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for,jsx-a11y/no-noninteractive-element-interactions */
-import React, { Fragment, useEffect, useState } from 'react';
+import React, { Fragment, useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
@@ -19,6 +19,7 @@ import {
 	message,
 	Switch,
 	Tooltip,
+	Collapse,
 } from 'antd';
 import yamlToJson from 'js-yaml';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
@@ -30,26 +31,32 @@ import { allowedTiers } from '../../utils/prop-types';
 import {
 	addPipeline,
 	deletePipeline,
-	getAppMappings,
 	getPipelines,
+	getPipelinesUsageStats,
 	putPipeline,
 } from '../../batteries/modules/actions';
 import {
 	bannerDetails,
 	DEFAULT_EXECUTION_CONTEXT_VALUE,
+	deleteRecursive,
 	getConsoleLogsArray,
-	monacoOptions,
 	TAB_ACTIONS,
+	trimExtension,
 } from './utils';
 import PipelineCard from './components/PipelineCard';
-import Monaco from '../../batteries/components/SearchSandbox/containers/MonacoEditor';
 import TabContent from './components/TabContent';
 import Flex from '../../batteries/components/shared/Flex';
 import { isEmpty } from '../../utils';
 import { generatePipelinePayload } from '../../batteries/utils/helpers';
 import PipelineValidation from './components/PipelineValidation';
 import { validatePipeline } from '../../batteries/utils/app';
+import PipelineTemplateChooser from './components/PipelineTemplateChooser';
 
+import PIPELINE_TEMPLATES from './utils/pipeline-templates';
+import PipelineEditorComponent from './components/PipelineEditorComponent';
+import { isJson } from '../../components/ScriptConsole/utils';
+
+const { Panel } = Collapse;
 const { TabPane } = Tabs;
 const link = css`
 	font-size: 14px;
@@ -65,7 +72,7 @@ const link = css`
 `;
 
 const container = css`
-	padding: 50px;
+	padding: 10px 50px;
 	position: relative;
 	.space-between {
 		display: flex;
@@ -161,7 +168,6 @@ const editorAreaContainer = css`
 
 	.tab-content {
 		min-height: 450px;
-		max-height: 700px;
 		height: 60vh;
 	}
 `;
@@ -199,13 +205,19 @@ const PipelinesForm = (props) => {
 		isValidating,
 		isUpdating,
 		history,
+		fetchUsageStats,
 	} = props;
 	const isEditPage = get(match, 'params.id');
+	const [showTemplateChoser, setShowTemplateChoser] = useState(!isEditPage);
+	const [selectedTemplate, setSelectedTemplate] = useState('');
+
 	const [isValidateMode, setIsValidateMode] = useState(false);
 	const [pipelineValidationRes, setPipelineValidationRes] = useState(null);
 	const [executionContext, setExecutionContext] = useState(DEFAULT_EXECUTION_CONTEXT_VALUE);
 
 	const [editorPipelineValue, setEditorPipelineValue] = useState('');
+	// eslint-disable-next-line no-unused-vars
+	const [hasError, setHasError] = useState(false); // currently accounts for pipeline editor only
 	const [tabPanes, setTabPanes] = useState([]);
 	const [activeTabKey, setactiveTabKey] = useState(DEFAULT_TAB_KEY);
 	const [tabEditMode, setTabEditMode] = useState(''); // key of tab title being edited
@@ -224,23 +236,31 @@ const PipelinesForm = (props) => {
 	const validateMissingScriptFiles = () => {
 		try {
 			if (editorPipelineValue) {
-				// validating the yaml with script files open
+				// validating the json with script files open
 				const missingScripts = [];
-				const pipelinesStages = yamlToJson.load(editorPipelineValue)?.stages;
-
+				const pipelinesStages = JSON.parse(editorPipelineValue)?.stages;
 				if (Array.isArray(pipelinesStages) && pipelinesStages.length) {
 					pipelinesStages.forEach((stageItem) => {
 						if (
 							stageItem?.scriptRef &&
-							!Object.keys(scriptFilesMap).includes(
-								stageItem?.scriptRef?.replace('.js', ''),
+							!(
+								Object.keys(scriptFilesMap).includes(stageItem?.scriptRef) ||
+								Object.keys(scriptFilesMap).includes(
+									trimExtension(stageItem?.scriptRef),
+								)
 							)
 						) {
-							missingScripts.push(stageItem.scriptRef.replace('.js', ''));
+							if (
+								!(
+									missingScripts.includes(stageItem?.scriptRef) ||
+									missingScripts.includes(trimExtension(stageItem?.scriptRef))
+								) // avoid duplicates // test and test.js is same
+							) {
+								missingScripts.push(stageItem.scriptRef);
+							}
 						}
 					});
 				}
-
 				setMissingScriptFiles(missingScripts);
 			}
 		} catch (error) {
@@ -281,6 +301,42 @@ const PipelinesForm = (props) => {
 		setScriptFilesMap(newFilesMap);
 	};
 
+	useLayoutEffect(() => {
+		fetchUsageStats();
+	}, []);
+
+	useEffect(() => {
+		if (!isEditPage && selectedTemplate) {
+			const templateJson = PIPELINE_TEMPLATES[selectedTemplate];
+			const newScriptFilesMap = {};
+			const newTabPanes = [];
+			// eslint-disable-next-line no-unused-expressions
+			templateJson.stages?.forEach((stageItem) => {
+				if (stageItem.scriptRef && stageItem.content) {
+					newScriptFilesMap[stageItem.scriptRef] = {
+						scriptValue: stageItem.content,
+						validatedScripRule: '',
+					};
+
+					// update new TabPanes
+
+					newTabPanes.push({
+						title: stageItem.scriptRef,
+						key: stageItem.scriptRef,
+					});
+				}
+			});
+			setTabPanes(newTabPanes);
+			setScriptFilesMap(newScriptFilesMap);
+
+			// saving pipeline editor value
+
+			setEditorPipelineValue(
+				JSON.stringify(deleteRecursive(templateJson, ['content']), null, 4),
+			);
+		}
+	}, [selectedTemplate]);
+
 	useEffect(() => {
 		if (isEmpty(pipeline)) {
 			fetchPipelines();
@@ -291,9 +347,9 @@ const PipelinesForm = (props) => {
 		if (pipeline?.content) {
 			let pipelineValue;
 			if (pipeline.extension === 'yaml') {
-				pipelineValue = pipeline.content;
+				pipelineValue = JSON.stringify(yamlToJson.load(pipeline.content));
 			} else if (pipeline.extension === 'json') {
-				pipelineValue = JSON.stringify(pipeline.content);
+				pipelineValue = pipeline.content;
 			}
 			if (!pipeline?.update?.error && !pipeline?.update?.isLoading) {
 				setEditorPipelineValue(pipelineValue);
@@ -307,19 +363,21 @@ const PipelinesForm = (props) => {
 			const newTabPanes = [...tabPanes];
 			const newScriptFilesMap = {};
 			scriptFileNames.forEach((fileKey) => {
-				Object.assign(newScriptFilesMap, {
-					[fileKey]: {
-						scriptValue: pipelineScripts[fileKey].content,
-						validatedScripRule: '',
-					},
-				});
+				if (!(newScriptFilesMap[fileKey] || newScriptFilesMap[trimExtension(fileKey)])) {
+					Object.assign(newScriptFilesMap, {
+						[fileKey]: {
+							scriptValue: pipelineScripts[fileKey].content,
+							validatedScripRule: '',
+						},
+					});
 
-				// update new TabPanes
+					// update new TabPanes
 
-				newTabPanes.push({
-					title: fileKey,
-					key: fileKey,
-				});
+					newTabPanes.push({
+						title: fileKey,
+						key: fileKey,
+					});
+				}
 			});
 			setScriptFilesMap(newScriptFilesMap);
 			setTabPanes(newTabPanes);
@@ -331,77 +389,83 @@ const PipelinesForm = (props) => {
 		validateMissingScriptFiles();
 	}, [editorPipelineValue, scriptFilesMap]);
 
-	const getTabTitle = (title, key) => {
-		let currentTabValue = title;
-		const handleTabNameChange = (e) => {
-			currentTabValue = e.target.value;
-		};
-		const handleDoubleClick = (e) => {
-			switch (e.detail) {
-				case 2:
-					setTabEditMode(key);
-					break;
+	const getTabTitle = useCallback(
+		(title, key) => {
+			let currentTabValue = title;
+			const handleTabNameChange = (e) => {
+				currentTabValue = e.target.value;
+			};
+			const handleDoubleClick = (e) => {
+				switch (e.detail) {
+					case 2:
+						setTabEditMode(key);
+						break;
 
-				default:
-			}
-		};
-
-		const handleSaveEditedText = () => {
-			if (!currentTabValue) return;
-			const newTabPanes = [...tabPanes];
-			const newFilesMap = { ...scriptFilesMap };
-			newTabPanes.forEach((tabItem) => {
-				if (tabItem.key === key) {
-					// remove .js at the end
-					if (currentTabValue.length >= 3) {
-						if (currentTabValue.slice(-3) === '.js') {
-							currentTabValue = currentTabValue.slice(0, currentTabValue.length - 3);
-						}
-					}
-
-					// avoid any action incase tab isn't renamed
-					if (currentTabValue.replace(/[/\\?.%*:|"<>]/g, '-') === tabItem.title) {
-						return;
-					}
-					tabItem.title = currentTabValue.replace(/[/\\?.%*:|"<>]/g, '-');
-					tabItem.key = tabItem.title;
-
-					// set active tab
-					setactiveTabKey(tabItem.key);
-					// update newFilesMap
-					newFilesMap[tabItem.key] = newFilesMap[key];
-					delete newFilesMap[key];
+					default:
 				}
-			});
+			};
 
-			setTabPanes(newTabPanes);
-			setTabEditMode(null);
+			const handleSaveEditedText = () => {
+				if (!currentTabValue) return;
+				const newTabPanes = [...tabPanes];
+				const newFilesMap = { ...scriptFilesMap };
 
-			// update filesmap
-			setScriptFilesMap(newFilesMap);
-		};
-
-		if (tabEditMode === key) {
-			return (
-				<input
-					className="edit-tab-input"
-					onBlur={handleSaveEditedText}
-					onKeyPress={(event) => {
-						if (event.key === 'Enter') {
-							handleSaveEditedText();
+				const currentTabKeys = tabPanes.map((tab) => tab.key);
+				if (
+					currentTabKeys.includes(currentTabValue) ||
+					currentTabKeys.includes(trimExtension(currentTabValue))
+				) {
+					message.error('File already present!');
+					return;
+				}
+				newTabPanes.forEach((tabItem) => {
+					if (tabItem.key === key) {
+						// avoid any action incase tab isn't renamed
+						if (currentTabValue === tabItem.title) {
+							return;
 						}
-					}}
-					defaultValue={title?.trim() ?? ''}
-					onChange={handleTabNameChange}
-				/>
+						// remove .js at the end
+						tabItem.title = trimExtension(currentTabValue);
+						tabItem.key = tabItem.title;
+
+						// set active tab
+						setactiveTabKey(tabItem.key);
+						// update newFilesMap
+						newFilesMap[tabItem.key] = newFilesMap[key];
+						delete newFilesMap[key];
+					}
+				});
+
+				setTabPanes(newTabPanes);
+				setTabEditMode(null);
+
+				// update filesmap
+				setScriptFilesMap(newFilesMap);
+			};
+
+			if (tabEditMode === key) {
+				return (
+					<input
+						className="edit-tab-input"
+						onBlur={handleSaveEditedText}
+						onKeyPress={(event) => {
+							if (event.key === 'Enter') {
+								handleSaveEditedText();
+							}
+						}}
+						defaultValue={trimExtension(title)?.trim() ?? ''}
+						onChange={handleTabNameChange}
+					/>
+				);
+			}
+			return (
+				<span className="tab-title" onClick={handleDoubleClick}>
+					{trimExtension(title)}.js
+				</span>
 			);
-		}
-		return (
-			<span className="tab-title" onClick={handleDoubleClick}>
-				{title}.js
-			</span>
-		);
-	};
+		},
+		[tabPanes, scriptFilesMap, tabEditMode],
+	);
 	const handleTabChange = (tabKey) => {
 		setactiveTabKey(tabKey);
 	};
@@ -443,20 +507,24 @@ const PipelinesForm = (props) => {
 	};
 
 	// this is used to get rid of script files which aren't part of pipeline yaml
-	const filterScriptFilesMap = (pipelineYamlString, scriptFilesMapParam) => {
+	const filterScriptFilesMap = (pipelineJSONString, scriptFilesMapParam) => {
 		const newScriptFilesMap = {};
-		const pipelinesStages = yamlToJson.load(pipelineYamlString)?.stages;
+		const pipelinesStages = JSON.parse(pipelineJSONString)?.stages;
 		if (Array.isArray(pipelinesStages) && pipelinesStages.length) {
 			pipelinesStages.forEach((stageItem) => {
 				if (stageItem?.scriptRef) {
 					if (Object.keys(scriptFilesMap).includes(stageItem?.scriptRef)) {
 						newScriptFilesMap[stageItem?.scriptRef] =
 							scriptFilesMapParam[stageItem?.scriptRef];
+					} else if (
+						Object.keys(scriptFilesMap).includes(trimExtension(stageItem?.scriptRef))
+					) {
+						newScriptFilesMap[stageItem?.scriptRef] =
+							scriptFilesMapParam[trimExtension(stageItem?.scriptRef)];
 					}
 				}
 			});
 		}
-
 		return newScriptFilesMap;
 	};
 
@@ -479,7 +547,7 @@ const PipelinesForm = (props) => {
 				},
 			});
 
-			pipelinePayload.append('request', JSON.stringify(payloadRequestObject));
+			pipelinePayload.append('request', JSON.stringify(payloadRequestObject.request));
 		}
 		if (response instanceof Object && !isEmpty(response)) {
 			const payloadResponseObject = {};
@@ -499,13 +567,24 @@ const PipelinesForm = (props) => {
 
 		validatePipeline(pipelinePayload)
 			.then((res) => {
-				setPipelineValidationRes(res);
+				const parsedResponse = { ...res };
+				if (parsedResponse.request) {
+					if (isJson(parsedResponse.request.body)) {
+						parsedResponse.request.body = isJson(parsedResponse.request.body);
+					}
+				}
+				if (parsedResponse.response) {
+					if (isJson(parsedResponse.response.body)) {
+						parsedResponse.response.body = isJson(parsedResponse.response.body);
+					}
+				}
+				setPipelineValidationRes(parsedResponse);
 			})
 			.catch((e) => {
 				notification.error({
-					message: `Failed to validate pipeline${e}`,
+					message: `Failed to validate pipeline  ${`${e.code}   ${e.message}`}`,
 				});
-				setPipelineValidationRes(null);
+				setPipelineValidationRes(e);
 			});
 	};
 
@@ -613,8 +692,8 @@ const PipelinesForm = (props) => {
 						className="alert-box"
 						message={
 							<Fragment>
-								<b>{`${fileName}.js`}</b> is present as a script ref but it’s script
-								is missing.
+								<b>{`${trimExtension(fileName)}.js`}</b> is present as a script ref
+								but it’s script is missing.
 								<Button
 									type="link"
 									danger
@@ -652,159 +731,195 @@ const PipelinesForm = (props) => {
 
 	return (
 		<div className={container}>
-			<Link to="/cluster/pipelines">
-				<Button>
-					<Icon type="arrow-left" />
-					Back to Pipelines
-				</Button>
-			</Link>
-			<Card style={{ marginTop: 15 }} hoverable>
-				<div>
-					<Typography.Title level={3}>
-						{isEditPage ? 'Update' : 'Create'} Pipeline
-					</Typography.Title>
-					{isEditPage ? (
-						<PipelineCard
-							pipeline={pipeline}
-							showDrag={false}
-							showEdit={false}
-							showExport
-							history={history}
-						/>
-					) : null}
-				</div>
-				<section className={editorAreaContainer}>
-					<Tabs
-						defaultActiveKey="pipeline_tab"
-						onChange={handleTabChange}
-						onEdit={handleAddOrRemoveTab}
-						tabBarExtraContent={<div style={{ width: '100px' }} />}
-						tabBarGutter={2}
-						type="editable-card"
-						hideAdd
-						activeKey={activeTabKey}
-					>
-						<TabPane tab="Pipeline" key="pipeline_tab" closable={false}>
-							<div className="tab-content">
-								<Flex
-									alignItems="center"
-									style={{
-										padding: '5px',
-										width: 'max-content',
-										position: 'absolute',
-										right: 0,
-										top: 0,
-									}}
-								>
-									<span>Edit</span>
-									<Switch
-										checked={isValidateMode}
-										onChange={() => setIsValidateMode(!isValidateMode)}
-										style={{ margin: '0 5px' }}
-									/>{' '}
-									<span>Validate</span>
-								</Flex>
-								<Flex>
-									<div
-										className="tab-content"
-										style={{
-											width: isValidateMode ? '50%' : '100%',
-											transition: 'all .3s ease-in',
-										}}
+			{showTemplateChoser ? (
+				<PipelineTemplateChooser
+					isVisible={showTemplateChoser}
+					closeTemplateChoser={() => setShowTemplateChoser(false)}
+					onTemplateClick={(templateKey) => {
+						setSelectedTemplate(templateKey);
+						setShowTemplateChoser(false);
+					}}
+				/>
+			) : (
+				<Fragment>
+					<Link to="/cluster/pipelines">
+						<Button>
+							<Icon type="arrow-left" />
+							Back to Pipelines
+						</Button>
+					</Link>
+					<Card style={{ marginTop: 15 }} bodyStyle={{ paddingBottom: 0 }} hoverable>
+						<div>
+							<Typography.Title level={3}>
+								{isEditPage ? 'Update' : 'Create'} Pipeline
+							</Typography.Title>
+							{isEditPage ? (
+								<Collapse>
+									<Panel
+										header={
+											<h3 style={{ marginBottom: '0' }}>Pipeline Details</h3>
+										}
+										key="1"
 									>
-										<Monaco
-											defaultValue="# pipeline config"
-											language="yaml"
-											value={editorPipelineValue}
-											onChange={(value) => {
-												setEditorPipelineValue(value);
+										<PipelineCard
+											pipeline={pipeline}
+											showDrag={false}
+											showEdit={false}
+											showExport
+											history={history}
+										/>
+									</Panel>
+								</Collapse>
+							) : null}
+						</div>
+						<section className={editorAreaContainer}>
+							<Tabs
+								defaultActiveKey="pipeline_tab"
+								onChange={handleTabChange}
+								onEdit={handleAddOrRemoveTab}
+								tabBarExtraContent={<div style={{ width: '150px' }}>&nbsp;</div>}
+								tabBarGutter={2}
+								type="editable-card"
+								hideAdd
+								activeKey={activeTabKey}
+							>
+								<TabPane tab="Pipeline" key="pipeline_tab" closable={false}>
+									<div className="tab-content">
+										<Flex
+											alignItems="center"
+											style={{
+												padding: '5px',
+												width: 'max-content',
+												position: 'absolute',
+												right: 0,
+												top: 0,
 											}}
-											theme="vs-dark"
-											options={monacoOptions}
-											readOnly={false}
-											wrapperClass="monaco-wrapper"
-										/>
-									</div>
+										>
+											<span>Edit</span>
+											<Switch
+												checked={isValidateMode}
+												onChange={() => setIsValidateMode(!isValidateMode)}
+												style={{ margin: '0 5px' }}
+											/>{' '}
+											<span>Validate</span>
+										</Flex>
+										<Flex>
+											<div
+												className="tab-content"
+												style={{
+													width: isValidateMode ? '50%' : '100%',
+													transition: 'all .3s ease-in',
+												}}
+											>
+												<PipelineEditorComponent
+													valueProp={editorPipelineValue}
+													onChange={(value) => {
+														setEditorPipelineValue(value);
+													}}
+													setErrorFlag={setHasError}
+												/>
+											</div>
 
-									<div
-										className="tab-content"
-										style={{
-											width: isValidateMode ? '50%' : '0%',
-											transition: 'all .3s ease-in',
-										}}
-									>
-										<PipelineValidation
-											executionContext={executionContext}
-											setExecutionContext={setExecutionContext}
-											isVisible={isValidateMode}
-											onPlayButtonClick={handlePipelineValidation}
-											responseTabValue={
-												pipelineValidationRes
-													? JSON.stringify(pipelineValidationRes, null, 4)
-													: ''
-											}
-											consoleLogsArray={getConsoleLogsArray(
-												pipelineValidationRes,
-											)}
-										/>
+											<div
+												className="tab-content"
+												style={{
+													width: isValidateMode ? '50%' : '0%',
+													transition: 'all .3s ease-in',
+												}}
+											>
+												<PipelineValidation
+													executionContext={executionContext}
+													setExecutionContext={setExecutionContext}
+													isVisible={isValidateMode}
+													onPlayButtonClick={handlePipelineValidation}
+													responseTabValue={
+														pipelineValidationRes
+															? JSON.stringify(
+																	pipelineValidationRes,
+																	null,
+																	4,
+															  )
+															: ''
+													}
+													consoleLogsArray={getConsoleLogsArray(
+														pipelineValidationRes,
+													)}
+												/>
+											</div>
+										</Flex>
 									</div>
-								</Flex>
-							</div>
-						</TabPane>
-						{tabPanes.map((tab) => (
-							<TabPane tab={getTabTitle(tab.title, tab.key)} key={tab.key} closable>
-								<TabContent
-									onScriptFileChange={(value) => {
-										updateScriptFileMap(tab.key, SCRIPT_FILES_MAP_ACTIONS.ADD, {
-											scriptValue: value,
-										});
-									}}
-									scriptValueProp={scriptFilesMap?.[tab.key]?.scriptValue ?? ''}
-									onValidatedScriptRuleChange={(validatedScriptValue) => {
-										updateScriptFileMap(tab.key, SCRIPT_FILES_MAP_ACTIONS.ADD, {
-											validatedScripRule: validatedScriptValue,
-										});
-									}}
-								/>
-							</TabPane>
-						))}
-						<TabPane
-							tab={
-								<Tooltip title="Add script file">
-									<Button
-										className="add-script-btn"
-										onClick={(e) => {
-											e.stopPropagation();
-											handleAddOrRemoveTab(null, TAB_ACTIONS.ADD);
-										}}
+								</TabPane>
+								{tabPanes.map((tab) => (
+									<TabPane
+										tab={getTabTitle(tab.title, tab.key)}
+										key={tab.key}
+										closable
 									>
-										<Icon type="plus" />
-									</Button>
-								</Tooltip>
-							}
-							key="add_script"
-							closable={false}
-						/>
-					</Tabs>
-				</section>
-			</Card>
-			<Affix offsetBottom={0}>
-				<Flex className="card-footer">
-					<div>{renderErrorMessges()}</div>{' '}
-					<Button
-						block
-						type="primary"
-						size="large"
-						rel="noopener noreferrer"
-						className="create-save-btn"
-						onClick={handleSave}
-						loading={isCreating || isUpdating || isValidating}
-					>
-						<Icon type={renderButtonIcon()} />
-						{renderButtonLabel()}
-					</Button>
-				</Flex>
-			</Affix>
+										<TabContent
+											onScriptFileChange={(value) => {
+												updateScriptFileMap(
+													tab.key,
+													SCRIPT_FILES_MAP_ACTIONS.ADD,
+													{
+														scriptValue: value,
+													},
+												);
+											}}
+											scriptValueProp={
+												scriptFilesMap?.[tab.key]?.scriptValue ?? ''
+											}
+											onValidatedScriptRuleChange={(validatedScriptValue) => {
+												updateScriptFileMap(
+													tab.key,
+													SCRIPT_FILES_MAP_ACTIONS.ADD,
+													{
+														validatedScripRule: validatedScriptValue,
+													},
+												);
+											}}
+										/>
+									</TabPane>
+								))}
+								<TabPane
+									tab={
+										<Tooltip title="Add script file">
+											<Button
+												className="add-script-btn"
+												onClick={(e) => {
+													e.stopPropagation();
+													handleAddOrRemoveTab(null, TAB_ACTIONS.ADD);
+												}}
+											>
+												<Icon type="plus" />
+											</Button>
+										</Tooltip>
+									}
+									key="add_script"
+									closable={false}
+								/>
+							</Tabs>
+						</section>
+					</Card>
+					<Affix offsetBottom={0}>
+						<Flex className="card-footer">
+							<div>{renderErrorMessges()}</div>{' '}
+							<Button
+								block
+								type="primary"
+								size="large"
+								rel="noopener noreferrer"
+								className="create-save-btn"
+								onClick={handleSave}
+								loading={isCreating || isUpdating || isValidating}
+								// disabled={hasError}
+							>
+								<Icon type={renderButtonIcon()} />
+								{renderButtonLabel()}
+							</Button>
+						</Flex>
+					</Affix>
+				</Fragment>
+			)}
 		</div>
 	);
 };
@@ -829,12 +944,10 @@ PipelinesForm.propTypes = {
 	password: PropTypes.string.isRequired,
 	appbaseCredentials: PropTypes.string.isRequired,
 	appName: PropTypes.string,
-	// fetchUsageStats: PropTypes.func.isRequired,
-	// usageStats: PropTypes.object.isRequired,
 	featurePipelines: PropTypes.bool,
 	pipelineScripts: PropTypes.object,
-	validatePipelineAction: PropTypes.func.isRequired,
 	isValidating: PropTypes.bool,
+	fetchUsageStats: PropTypes.func.isRequired,
 };
 
 PipelinesForm.defaultProps = {
@@ -895,7 +1008,7 @@ const mapDispatchToProps = (dispatch) => ({
 	createPipeline: (payload) => dispatch(addPipeline(payload)),
 	updatePipeline: (payload) => dispatch(putPipeline(payload)),
 	removePipeline: (id) => dispatch(deletePipeline(id)),
-	fetchMappings: (appName, credentials) => dispatch(getAppMappings(appName, credentials)),
+	fetchUsageStats: () => dispatch(getPipelinesUsageStats()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(PipelinesForm);

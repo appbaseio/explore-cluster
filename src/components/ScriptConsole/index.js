@@ -66,7 +66,7 @@ const scriptConsoleCss = css`
 	}
 	.tabs-container {
 		height: calc(100% + 4px);
-
+		width: 100%;
 		.ant-tabs-extra-content {
 			line-height: 35px;
 			margin-right: 1px;
