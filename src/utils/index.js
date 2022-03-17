@@ -56,6 +56,10 @@ export async function getUser(username, password, url) {
 		.then((es) => es.json())
 		.then((esResponse) => {
 			const version = get(esResponse, 'version.number');
+			localStorage.setItem(
+				'isUsingOpenSearch',
+				esResponse?.version?.distribution === 'opensearch',
+			);
 			localStorage.setItem('version', version);
 		})
 		.catch((e) => {
@@ -380,7 +384,6 @@ export function getDatafields({ mappings, indexes, isSearch = false, isAggs = fa
 			propertyType === 'float'
 		);
 	}
-
 	const dataFields = Object.keys(mappings)
 		.filter((index) => !index.startsWith('.'))
 		.filter((index) => hasAllIndex || indexes?.includes(index))
@@ -402,7 +405,6 @@ export function getDatafields({ mappings, indexes, isSearch = false, isAggs = fa
 					}
 					subFieldsMap[field] = fields;
 				};
-
 				if (isSearch) {
 					setKeyWordField(type, fields);
 				} else {
@@ -417,7 +419,6 @@ export function getDatafields({ mappings, indexes, isSearch = false, isAggs = fa
 			fieldMap = { ...fieldMap, ...nestedDataFields };
 			return [...acc, ...values(nestedDataFields)];
 		}, []);
-
 	return [[...new Set(dataFields)], fieldMap, subFieldsMap];
 }
 
@@ -589,24 +590,28 @@ export function removeWhiteSpaces(str) {
 const getFieldsTree = (mappings = {}, prefix = null) => {
 	let tree = {};
 	Object.keys(mappings).forEach((key) => {
-		if (mappings[key].properties) {
-			tree = {
-				...tree,
-				...getFieldsTree(mappings[key].properties, `${prefix ? `${prefix}.` : ''}${key}`),
-			};
-		} else {
-			const originalFields = mappings[key].fields;
-			tree = {
-				...tree,
-				[`${prefix ? `${prefix}.` : ''}${key}`]: {
-					type: mappings[key].type,
-					fields: mappings[key].fields ? Object.keys(mappings[key].fields) : [],
-					originalFields: originalFields || {},
-				},
-			};
+		if (mappings[key].type !== 'nested') {
+			if (mappings[key].properties) {
+				tree = {
+					...tree,
+					...getFieldsTree(
+						mappings[key].properties,
+						`${prefix ? `${prefix}.` : ''}${key}`,
+					),
+				};
+			} else {
+				const originalFields = mappings[key].fields;
+				tree = {
+					...tree,
+					[`${prefix ? `${prefix}.` : ''}${key}`]: {
+						type: mappings[key].type,
+						fields: mappings[key].fields ? Object.keys(mappings[key].fields) : [],
+						originalFields: originalFields || {},
+					},
+				};
+			}
 		}
 	});
-
 	return tree;
 };
 

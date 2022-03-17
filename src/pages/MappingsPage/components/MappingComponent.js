@@ -70,8 +70,8 @@ class MappingComponent extends React.Component {
 
 	renderMapping = ({
 		// initialUseCase & initialType are passed to handle the delete field, otherwise usecase/type value can change with recursive iteration
-		usecase,
-		type,
+		usecase, // field usecase map
+		type, // field type map
 		initialUseCase,
 		initialType,
 		mappings,
@@ -109,6 +109,23 @@ class MappingComponent extends React.Component {
 							})
 						}
 						view={VIEWS.SCHEMA}
+						type={type?.[field]?.isNestedField ? 'nested' : 'object'}
+						usecase=""
+						setMapping={({
+							type: fieldType,
+							path: fieldPath,
+							usecase: fieldUseCase,
+						}) => {
+							setMapping([
+								{
+									type: fieldType,
+									usecase: fieldUseCase,
+									path: fieldPath,
+									properties: mappings.properties?.[field]?.properties,
+									shouldEnableConfirmMappingsCTA: true,
+								},
+							]);
+						}}
 					>
 						{this.renderMapping({
 							usecase: usecaseVal,
@@ -123,7 +140,6 @@ class MappingComponent extends React.Component {
 					</ObjectField>
 				);
 			}
-
 			return (
 				<FieldRow
 					view={VIEWS.SCHEMA}
@@ -155,7 +171,7 @@ class MappingComponent extends React.Component {
 						this.setState({
 							showCopyModal: true,
 							copiedFieldItem: {
-								fieldName: field,
+								fieldName: `${path}${field}`,
 								fieldUsecase: usecaseVal,
 								fieldType: typeVal,
 							},

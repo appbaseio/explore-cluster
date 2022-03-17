@@ -70,7 +70,6 @@ class FieldWeights extends React.Component {
 		const { flattenUsecase: usecases, flattenType: types } = mappingWrapperProps;
 		let typeData = types;
 		let useCaseData = usecases;
-
 		const dataField = get(localRelevancy, 'search.dataField', []);
 
 		if (localMapping) {
@@ -181,11 +180,12 @@ class FieldWeights extends React.Component {
 				/>
 			);
 		}
-
 		return Object.keys(fieldWeightMap).map((field) => {
 			const fieldPath = `${path}${field}`;
+			if (mappings?.properties?.[field]?.type === 'nested') {
+				return null;
+			}
 			const isObj = !get(fieldWeightMap, `${field}.__fields__`, null);
-
 			if (isObj) {
 				return (
 					<ObjectField

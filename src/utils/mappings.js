@@ -22,12 +22,11 @@ export const getMappingsInfo = ({
 	});
 
 	const ES_VERSION = getVersion();
-
 	if (!ES_VERSION) {
 		return {};
 	}
 
-	let TOP_FIELD = '';
+	let TOP_FIELD = 'properties';
 
 	if (+ES_VERSION[0] >= 6) {
 		TOP_FIELD = '_doc.properties';
@@ -56,10 +55,6 @@ export const getMappingsInfo = ({
 
 const _getMappingsUsecase = (mappings) => {
 	return Object.keys(mappings).reduce((agg, item) => {
-		const type = get(mappings, `${item}.type`, ``);
-		if (type === 'nested') {
-			return agg;
-		}
 		return {
 			...agg,
 			[item]: get(mappings, `${item}.properties`)
@@ -72,13 +67,14 @@ const _getMappingsUsecase = (mappings) => {
 const _getMappingsType = (mappings) => {
 	return Object.keys(mappings).reduce((agg, item) => {
 		const type = get(mappings, `${item}.type`, ``);
-		if (type === 'nested') {
-			return agg;
-		}
+
 		return {
 			...agg,
 			[item]: get(mappings, `${item}.properties`)
-				? { ..._getMappingsType(get(mappings, `${item}.properties`)) }
+				? {
+						..._getMappingsType(get(mappings, `${item}.properties`)),
+						...(type === 'nested' ? { isNestedField: true } : {}),
+				  }
 				: get(mappings, `${item}.type`),
 		};
 	}, {});
@@ -191,7 +187,15 @@ const _getFieldsByRelevancy = ({
 	return updatedFields;
 };
 
-const _updateNestedMapping = ({ mapping, type, usecase, fields, currentIndex, settings }) => {
+const _updateNestedMapping = ({
+	mapping,
+	type,
+	usecase,
+	fields,
+	currentIndex,
+	settings,
+	properties,
+}) => {
 	if (fields.length === currentIndex + 1) {
 		const { enableNgram, enableAutoSuggestion, enableSynonyms, language } = settings;
 
@@ -214,6 +218,7 @@ const _updateNestedMapping = ({ mapping, type, usecase, fields, currentIndex, se
 			data = {
 				...mappingUsecase[usecase],
 				type,
+				properties, // useful when switching between nested and object
 			};
 		}
 
@@ -241,7 +246,7 @@ const _updateNestedMapping = ({ mapping, type, usecase, fields, currentIndex, se
 	};
 };
 
-export const updateMapping = ({ originalMapping, type, usecase, path, settings }) => {
+export const updateMapping = ({ originalMapping, type, usecase, path, settings, properties }) => {
 	const mapping = JSON.parse(JSON.stringify(originalMapping));
 
 	const ES_VERSION = getVersion();
@@ -262,6 +267,7 @@ export const updateMapping = ({ originalMapping, type, usecase, path, settings }
 		fields: path.split('.'),
 		currentIndex: 0,
 		settings,
+		properties,
 	});
 	if (+ES_VERSION[0] >= 6 && +ES_VERSION[0] < 7) {
 		return {
@@ -478,7 +484,6 @@ export const updateObjectNestedProperty = ({ obj, value, fields, currentIndex = 
 			[fields[currentIndex]]: value,
 		};
 	}
-
 	return {
 		...obj,
 		[fields[currentIndex]]: {
@@ -497,6 +502,12 @@ export const flatObject = (originalObject, path = '') => {
 	const clonedObject = JSON.parse(JSON.stringify(originalObject));
 
 	return Object.keys(clonedObject).reduce((agg, key) => {
+		if (clonedObject[key].isNestedField) {
+			// avoid nested type in dropdowns
+			return {
+				...agg,
+			};
+		}
 		const parsedKey =
 			typeof clonedObject[key] === 'object'
 				? flatObject(clonedObject[key], `${path}${key}.`)
