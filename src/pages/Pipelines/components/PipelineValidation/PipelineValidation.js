@@ -20,7 +20,7 @@ const container = css`
 	}
 	.tabs-container {
 		height: calc(100% + 4px);
-
+		width: 100%;
 		.ant-tabs-extra-content {
 			line-height: 35px;
 			margin-right: 1px;
@@ -59,7 +59,7 @@ const container = css`
 		&.template-area,
 		&.response-area {
 			min-height: 250px;
-			height: 100%;
+			height: calc(100% - 50px);
 		}
 
 		&.response-area {
@@ -351,7 +351,7 @@ const PipelineValidation = ({
 };
 
 PipelineValidation.propTypes = {
-	executionContext: PropTypes.string.isRequired,
+	executionContext: PropTypes.object.isRequired,
 	setExecutionContext: PropTypes.func.isRequired,
 	isVisible: PropTypes.bool,
 	onPlayButtonClick: PropTypes.func,

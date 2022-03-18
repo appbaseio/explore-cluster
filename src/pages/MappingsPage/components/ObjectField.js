@@ -3,6 +3,7 @@ import { Row, Button, Col, Icon } from 'antd';
 import PropTypes from 'prop-types';
 import { row, deleteRow } from './styles';
 import { VIEWS } from '../../../constants/props';
+import TypeDropdown from './TypeDropdown';
 
 class ObjectField extends React.Component {
 	state = {
@@ -16,7 +17,7 @@ class ObjectField extends React.Component {
 	};
 
 	render() {
-		const { children, field, path, onDelete, view } = this.props;
+		const { children, field, path, onDelete, view, type, setMapping, usecase } = this.props;
 		const { isCollapsed } = this.state;
 
 		// when all the children are null don't render object header
@@ -26,7 +27,14 @@ class ObjectField extends React.Component {
 		return (
 			<Row className={row}>
 				<Col xs={24}>
-					<Row className={deleteRow} type="flex" justify="space-between">
+					<Row className={deleteRow} type="flex" justify="start">
+						<Col>
+							<Icon
+								style={{ marginRight: 15, marginTop: 8 }}
+								type={isCollapsed ? 'up' : 'down'}
+								onClick={this.toggleCollapse}
+							/>
+						</Col>
 						<Col>
 							<p>
 								{field}
@@ -40,14 +48,24 @@ class ObjectField extends React.Component {
 									{view === VIEWS.SCHEMA ? 'Remove field' : `Remove from ${view}`}
 								</Button>
 							</p>
-						</Col>
-						<Col>
-							<Icon
-								style={{ marginRight: 15 }}
-								type={isCollapsed ? 'up' : 'down'}
-								onClick={this.toggleCollapse}
-							/>
-						</Col>
+						</Col>{' '}
+						{view === VIEWS.SCHEMA && (
+							<Col
+								style={{
+									marginLeft: 'auto',
+									width: 'max-content',
+									marginRight: '12px',
+								}}
+								data-cy={`data-type-${field}`}
+							>
+								<TypeDropdown
+									value={type}
+									usecase={usecase}
+									onTypeChange={setMapping}
+									path={path}
+								/>
+							</Col>
+						)}
 					</Row>
 				</Col>
 
@@ -79,4 +97,7 @@ ObjectField.propTypes = {
 	path: PropTypes.string.isRequired,
 	onDelete: PropTypes.func.isRequired,
 	view: PropTypes.string,
+	setMapping: PropTypes.func.isRequired,
+	type: PropTypes.string.isRequired,
+	usecase: PropTypes.string.isRequired,
 };

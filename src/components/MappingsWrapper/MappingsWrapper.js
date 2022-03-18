@@ -32,6 +32,7 @@ class MappingsWrapper extends React.Component {
 		originalType: null,
 		originalUseCas: null,
 		script: undefined,
+		forceHasMappingsChanged: false, // to force enable the Confirm Mappings Button when switching between nested---object
 	};
 
 	componentDidMount() {
@@ -100,7 +101,6 @@ class MappingsWrapper extends React.Component {
 			enableSynonyms,
 			language,
 		});
-
 		// eslint-disable-next-line
 		this.setState(
 			{
@@ -177,6 +177,7 @@ class MappingsWrapper extends React.Component {
 				this.setState({
 					isReindexing: false,
 					deletedPaths: [],
+					forceHasMappingsChanged: false,
 				});
 				if (get(res, 'failures', []).length) {
 					get(res, 'failures', []).forEach((fail) => {
@@ -206,18 +207,25 @@ class MappingsWrapper extends React.Component {
 		const { enableNgram, enableAutoSuggestion, language, appName, updateLocalMappingState } =
 			this.props;
 		let updatedMappings = null;
-		let updatedUsecase = null;
-		let updatedType = null;
+		let updatedUsecase = usecase;
+		let updatedType = type;
 		let updatedFlattenUsecase = null;
 		let updatedFlattenType = null;
-
 		// this key was added to support passing a script to copy
 		// field values when leveraging copy field funcitonality
 		// assumption is that only one script value can be there at a time
 		// coz only when field is copied
 		let scriptValue;
+		let forceHasMappingsChanged = false;
 		data.forEach((item) => {
-			const { path, type: fieldType, usecase: fieldUseCase, script } = item;
+			const {
+				path,
+				type: fieldType,
+				usecase: fieldUseCase,
+				script,
+				properties,
+				shouldEnableConfirmMappingsCTA,
+			} = item;
 			if (script) {
 				scriptValue = script;
 			}
@@ -226,24 +234,31 @@ class MappingsWrapper extends React.Component {
 				usecase: fieldUseCase,
 				path,
 				type: fieldType,
+				properties,
 				settings: {
 					enableNgram,
 					enableAutoSuggestion,
-					enableSynonyms: true,
-					language,
+					// enable synonyms and language fields only for usecases including search
+					enableSynonyms: fieldUseCase.includes('search'),
+					language: fieldUseCase.includes('search') ? language : null,
 				},
 			});
 
-			updatedUsecase = updateObjectNestedProperty({
-				obj: usecase,
-				fields: path.split('.'),
-				value: fieldUseCase,
-			});
-			updatedType = updateObjectNestedProperty({
-				obj: type,
-				fields: path.split('.'),
-				value: fieldType,
-			});
+			if (fieldType === 'nested' || fieldType === 'object') {
+				updatedType[path].isNestedField = fieldType === 'nested';
+				forceHasMappingsChanged = shouldEnableConfirmMappingsCTA;
+			} else {
+				updatedUsecase = updateObjectNestedProperty({
+					obj: usecase,
+					fields: path.split('.'),
+					value: fieldUseCase,
+				});
+				updatedType = updateObjectNestedProperty({
+					obj: type,
+					fields: path.split('.'),
+					value: fieldType,
+				});
+			}
 
 			updatedFlattenUsecase = {
 				...flattenUsecase,
@@ -265,6 +280,7 @@ class MappingsWrapper extends React.Component {
 			flattenType: updatedFlattenType,
 			flattenUsecase: updatedFlattenUsecase,
 			script: scriptValue,
+			forceHasMappingsChanged,
 		});
 		return updatedMappings;
 	};
@@ -282,11 +298,12 @@ class MappingsWrapper extends React.Component {
 			originalType,
 			originalUseCase,
 			isReindexing,
+			forceHasMappingsChanged,
 		} = this.state;
 		const hasMappingsChanged =
 			JSON.stringify(type) !== JSON.stringify(originalType) ||
-			JSON.stringify(usecase) !== JSON.stringify(originalUseCase);
-
+			JSON.stringify(usecase) !== JSON.stringify(originalUseCase) ||
+			forceHasMappingsChanged;
 		return (
 			<div key={Date.now()}>
 				{children({

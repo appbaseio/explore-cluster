@@ -175,7 +175,7 @@ class AppsAnalyticsRoutes extends React.Component {
 				/>
 				<Route
 					exact
-					path="/app/:appName/request-logs/:tab?"
+					path="/app/:appName/request-logs"
 					component={(props) => (
 						<>
 							{get(allowedRoutes, 'request-logs') ? (
@@ -185,7 +185,7 @@ class AppsAnalyticsRoutes extends React.Component {
 							)}
 						</>
 					)}
-				/>
+				/>{' '}
 				<Route
 					exact
 					path="/app/:appName/no-results-searches"

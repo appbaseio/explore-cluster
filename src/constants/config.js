@@ -13,7 +13,9 @@ export const getVersion = () => {
 	const version = localStorage.getItem('version');
 	return version;
 };
-
+export const isUsingOpenSearch = () => {
+	return localStorage.getItem('isUsingOpenSearch') === 'true';
+};
 export const SCALR_URL = 'scalr.api.appbase.io';
 export const ACC_API = 'https://accapi.appbase.io';
 export const SCALR_API = 'https://scalr.api.appbase.io';

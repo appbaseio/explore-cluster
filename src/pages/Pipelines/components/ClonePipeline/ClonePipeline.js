@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { Button, Icon, message, notification, Typography } from 'antd';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { clonePipeline } from '../../../../batteries/modules/actions';
+import yamlToJson from 'js-yaml';
+import { clonePipeline, getPipelines } from '../../../../batteries/modules/actions';
 
 const ClonePipeline = (props) => {
 	const {
@@ -15,14 +16,23 @@ const ClonePipeline = (props) => {
 		buttonSize,
 		clonePipelineAction,
 		history,
+		fetchPipelines,
 	} = props;
-
 	const handleClone = () => {
 		const formData = new FormData();
+		const pipelineContent =
+			pipeline.extension === 'json'
+				? JSON.parse(pipeline.content)
+				: yamlToJson.load(pipeline.content);
+		if (pipelineContent.id) {
+			delete pipelineContent.id;
+		}
+		pipelineContent.description = `Clone of ${pipeline.id} - ${pipeline.description ?? ''}`;
+
 		formData.append(
 			'pipeline',
 			JSON.stringify({
-				content: pipeline.content || '',
+				content: JSON.stringify(pipelineContent),
 				extension: pipeline.extension,
 			}),
 		);
@@ -31,7 +41,7 @@ const ClonePipeline = (props) => {
 
 		if (scriptRefs.length) {
 			scriptRefs.forEach((ref) => {
-				formData.append(ref, JSON.stringify(pipelineScripts[scriptRefs]));
+				formData.append(ref, JSON.stringify(pipelineScripts[ref]));
 			});
 		}
 
@@ -43,7 +53,10 @@ const ClonePipeline = (props) => {
 				});
 			} else {
 				message.success(`Pipeline cloned successfully`);
-				history.push('/cluster/pipelines');
+				fetchPipelines();
+				if (history) {
+					history.push('/cluster/pipelines');
+				}
 			}
 		});
 	};
@@ -78,7 +91,8 @@ ClonePipeline.propTypes = {
 	buttonSize: PropTypes.string,
 	clonePipelineAction: PropTypes.func.isRequired,
 	pipelineScripts: PropTypes.object,
-	history: PropTypes.object.isRequired,
+	history: PropTypes.object,
+	fetchPipelines: PropTypes.func.isRequired,
 };
 
 ClonePipeline.defaultProps = {
@@ -88,10 +102,17 @@ ClonePipeline.defaultProps = {
 	ghost: false,
 	buttonStyle: {},
 	buttonSize: 'default',
+	history: undefined,
 };
 
+const mapStateToProps = (state, props) => {
+	return {
+		pipelineScripts: get(state, '$getAppPipelines.scriptResults')?.[props.pipeline.id],
+	};
+};
 const mapDispatchToProps = (dispatch) => ({
+	fetchPipelines: () => dispatch(getPipelines()),
 	clonePipelineAction: (pipeline, newPipeline) => dispatch(clonePipeline(pipeline, newPipeline)),
 });
 
-export default connect(null, mapDispatchToProps)(ClonePipeline);
+export default connect(mapStateToProps, mapDispatchToProps)(ClonePipeline);

@@ -2,16 +2,20 @@ import React from 'react';
 import { Button, Modal, Row, Col, Input, Select } from 'antd';
 import PropTypes from 'prop-types';
 
-import conversionMap from '../../../utils/conversionMap';
+import conversionMap, { DenseVector } from '../../../utils/conversionMap';
 import usecases from '../../../utils/usecases';
-import { getVersion } from '../../../constants/config';
+import { getVersion, isUsingOpenSearch } from '../../../constants/config';
 import { capitalizeFirstLetter } from '../../../utils/helper';
 
 const { Option } = Select;
 const version = parseInt(getVersion()[0], 10);
 const types = Object.keys(conversionMap).filter(
 	(key) =>
-		key !== 'object' || (version < 7 && (key !== 'rank_features' || key !== 'rank_feature')),
+		key !== 'object' &&
+		(isUsingOpenSearch() ||
+			(version < 7 &&
+				(key !== 'rank_features' || key !== 'rank_feature') &&
+				key !== DenseVector)),
 );
 
 class NewField extends React.Component {

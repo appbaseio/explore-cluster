@@ -1,6 +1,7 @@
 import React from 'react';
 import { Icon } from 'antd';
 import PropTypes from 'prop-types';
+import { DenseVector } from '../../../utils/conversionMap';
 
 const iconStyle = { margin: 0, fontSize: 13 };
 
@@ -30,6 +31,8 @@ const MappingsTypeIcon = ({ type }) => {
 
 		case 'rank_feature':
 		case 'rank_features':
+			return <Icon style={iconStyle} type="rise" theme="outlined" />;
+		case DenseVector:
 			return <Icon style={iconStyle} type="rise" theme="outlined" />;
 
 		default:

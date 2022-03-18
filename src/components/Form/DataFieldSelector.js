@@ -18,11 +18,16 @@ class DataFieldSelector extends React.Component {
 	constructor(props) {
 		super(props);
 		const { mappings, isAggFields, includeMappings, includeTypes } = props;
-		const traversedMappings = traverseMapping(mappings || {}, undefined, {
-			isAggFields,
-			includeMappings,
-			includeTypes,
-		});
+		const traversedMappings = traverseMapping(
+			this.filterOutNestedTypes(mappings) || {},
+			undefined,
+			{
+				isAggFields,
+				includeMappings,
+				includeTypes,
+			},
+		);
+		this.filterOutNestedTypes(mappings);
 		this.state = {
 			traversedMappings: Array.isArray(traversedMappings) ? traversedMappings : [],
 		};
@@ -46,11 +51,15 @@ class DataFieldSelector extends React.Component {
 				);
 			}
 
-			const traversedMappings = traverseMapping(mappings || {}, undefined, {
-				isAggFields,
-				includeMappings,
-				includeTypes,
-			});
+			const traversedMappings = traverseMapping(
+				this.filterOutNestedTypes(mappings) || {},
+				undefined,
+				{
+					isAggFields,
+					includeMappings,
+					includeTypes,
+				},
+			);
 			// eslint-disable-next-line
 			this.setState({
 				traversedMappings: Array.isArray(traversedMappings) ? traversedMappings : [],
@@ -63,6 +72,18 @@ class DataFieldSelector extends React.Component {
 		if (!loading && !mappings && appbaseCredentials) {
 			fetchMappings(index, appbaseCredentials);
 		}
+	};
+
+	filterOutNestedTypes = (mappings = { properties: {} }) => {
+		const filteredMappings = { ...mappings };
+		// eslint-disable-next-line no-unused-expressions
+		Object.keys(filteredMappings.properties ?? {})?.forEach((key) => {
+			if (filteredMappings.properties[key].type === 'nested') {
+				delete filteredMappings.properties[key];
+			}
+		});
+
+		return filteredMappings;
 	};
 
 	renderOptions() {

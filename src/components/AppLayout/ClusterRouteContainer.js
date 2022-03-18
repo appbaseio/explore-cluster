@@ -28,6 +28,7 @@ const PipelinesPage = Loadable({
 	loader: () => import(/* webpackChunkName: "Pipelines" */ '../../pages/Pipelines'),
 	loading: Loader,
 });
+
 const QueryRulesForm = Loadable({
 	loader: () =>
 		import(/* webpackChunkName: "QueryRulesForm" */ '../../pages/QueryRules/QueryRulesForm'),

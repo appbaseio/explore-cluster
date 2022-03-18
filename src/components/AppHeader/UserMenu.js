@@ -27,6 +27,7 @@ const handleLogout = () => {
 	sessionStorage.removeItem('allowedActions');
 	sessionStorage.removeItem('appName');
 	sessionStorage.removeItem('redirectUrl');
+	localStorage.removeItem('isUsingOpenSearch');
 	window.location.href = '/';
 };
 
