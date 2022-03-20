@@ -306,15 +306,15 @@ const PipelinesForm = (props) => {
 	}, []);
 
 	useEffect(() => {
-		if (!isEditPage && selectedTemplate) {
-			const templateJson = PIPELINE_TEMPLATES[selectedTemplate];
+		if (!isEditPage && !!selectedTemplate) {
+			const templateJson = { ...PIPELINE_TEMPLATES[selectedTemplate] };
 			const newScriptFilesMap = {};
 			const newTabPanes = [];
 			// eslint-disable-next-line no-unused-expressions
 			templateJson.stages?.forEach((stageItem) => {
-				if (stageItem.scriptRef && stageItem.content) {
+				if (stageItem.scriptRef && stageItem.scriptContent) {
 					newScriptFilesMap[stageItem.scriptRef] = {
-						scriptValue: stageItem.content,
+						scriptValue: stageItem.scriptContent,
 						validatedScripRule: '',
 					};
 
@@ -330,9 +330,8 @@ const PipelinesForm = (props) => {
 			setScriptFilesMap(newScriptFilesMap);
 
 			// saving pipeline editor value
-
 			setEditorPipelineValue(
-				JSON.stringify(deleteRecursive(templateJson, ['content']), null, 4),
+				JSON.stringify(deleteRecursive(templateJson, ['scriptContent']), null, 4),
 			);
 		}
 	}, [selectedTemplate]);

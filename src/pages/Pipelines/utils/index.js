@@ -69,16 +69,27 @@ export const deleteRecursive = (inputProp, keysToDelete) => {
 	if (!(inputProp instanceof Object)) {
 		return null;
 	}
-	const input = inputProp;
-	// eslint-disable-next-line consistent-return
-	Object.keys(input).forEach((key) => {
-		if (keysToDelete.includes(key)) {
-			delete input[key];
-		}
-		if (typeof input[key] === 'object') {
-			input[key] = deleteRecursive(input[key], keysToDelete);
-		}
-	});
+	let input;
+
+	if (Array.isArray(inputProp)) {
+		input = [...inputProp];
+		input.forEach((arrElement, index) => {
+			if (typeof arrElement === 'object') {
+				input[index] = deleteRecursive(arrElement, keysToDelete);
+			}
+		});
+	} else {
+		input = { ...inputProp };
+		// eslint-disable-next-line consistent-return
+		Object.keys(input).forEach((key) => {
+			if (keysToDelete.includes(key)) {
+				delete input[key];
+			}
+			if (typeof input[key] === 'object') {
+				input[key] = deleteRecursive(input[key], keysToDelete);
+			}
+		});
+	}
 	return input;
 };
 
