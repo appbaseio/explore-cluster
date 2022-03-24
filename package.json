@@ -79,7 +79,7 @@
 		"webpack-dev-server": "^4.4.0"
 	},
 	"dependencies": {
-		"@appbaseio-confidential/importer": "git+https://1dc0d0fc07f05943afdde9bdb85b7aa438a0ce3b:x-oauth-basic@github.com/appbaseio-confidential/importer#cf9221c52b0bb53c5b60de78508a79d8545f2c95",
+		"@appbaseio-confidential/importer": "git+https://1dc0d0fc07f05943afdde9bdb85b7aa438a0ce3b:x-oauth-basic@github.com/appbaseio-confidential/importer#22773f7d51169674105fb9976ef5b038fbdd8ae0",
 		"@appbaseio-confidential/reactivesearch-playground": "^1.2.7-beta",
 		"@appbaseio/dejavu-browser": "^3.6.0",
 		"@appbaseio/react-filter-box": "^3.4.1",
