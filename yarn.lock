@@ -104,10 +104,10 @@
     react-codemirror2 "^5.1.0"
     react-dom "^16.6.3"
 
-"@appbaseio/reactivecore@9.14.0":
-  version "9.14.0"
-  resolved "https://registry.yarnpkg.com/@appbaseio/reactivecore/-/reactivecore-9.14.0.tgz#8369ab003456ba6180adb8dc0486d9b6c176ed36"
-  integrity sha512-bCHa+UHBskKM2iIrXc7iqpT64P/b8jm4gg1je5TuW9padxxFVoXP6V91Lfj9OYd1ih6++7xttoXBIso8x4+0vw==
+"@appbaseio/reactivecore@9.14.3":
+  version "9.14.3"
+  resolved "https://registry.yarnpkg.com/@appbaseio/reactivecore/-/reactivecore-9.14.3.tgz#59e8f89601d4a6aab65aacf9dd09a75cfc83f778"
+  integrity sha512-nj2wTjG6JUsjXQ2Qfqs0vftivpzhJASui/9kONHI8RSrWtO9o/Vo2Cc9D/NtEKYn3JaQxn0Qg+POoc5rVlzbig==
   dependencies:
     cross-fetch "^3.0.4"
     prop-types "^15.6.0"
@@ -131,12 +131,12 @@
     react-leaflet "^2.1.3"
     rheostat "^2.1.1"
 
-"@appbaseio/reactivesearch@3.29.0":
-  version "3.29.0"
-  resolved "https://registry.yarnpkg.com/@appbaseio/reactivesearch/-/reactivesearch-3.29.0.tgz#07158920e305a81a8a47217694a8febc53910d6b"
-  integrity sha512-2BDAk7LYkPrv0uu8wZ0h3XO7M7yWe4mW/ohG3PQVDdAXujKNZWlvFl9n++7kIDzhJqNOCHzCP7kJnAlfj7lQPQ==
+"@appbaseio/reactivesearch@3.29.1":
+  version "3.29.1"
+  resolved "https://registry.yarnpkg.com/@appbaseio/reactivesearch/-/reactivesearch-3.29.1.tgz#962edf01ea052c6637753956eb730985c692877c"
+  integrity sha512-CKqM8LWatz6DdUCtCAkpoXv+AXPWjsB1HDE0N8/6O3/4Km0yWERCJSSsrXWgm3wUuwbyF8Pu11XqXe/+y0NvPg==
   dependencies:
-    "@appbaseio/reactivecore" "9.14.0"
+    "@appbaseio/reactivecore" "9.14.3"
     "@emotion/core" "^10.0.28"
     "@emotion/styled" "^10.0.27"
     appbase-js "5.0.0"
