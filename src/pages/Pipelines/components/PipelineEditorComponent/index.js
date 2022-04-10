@@ -5,393 +5,10 @@ import yamlToJson from 'js-yaml';
 import { Button, Dropdown, Icon, Menu } from 'antd';
 import Container from '../../../../components/Container';
 import Monaco from '../../../../batteries/components/SearchSandbox/containers/MonacoEditor';
-import { monacoOptions } from '../../utils';
+import { modifySchema, monacoOptions } from '../../utils';
 import { getPipelineSchema } from '../../../../batteries/utils/app';
 import { isJson } from '../../../../components/ScriptConsole/utils';
-// REMOVE IT LATER ON
-const fakeSchema = {
-	$schema: 'http://json-schema.org/draft-04/schema#',
-	properties: {
-		id: {
-			type: 'string',
-		},
-		enabled: {
-			type: 'boolean',
-		},
-		description: {
-			type: 'string',
-		},
-		priority: {
-			type: 'integer',
-		},
-		routes: {
-			items: {
-				properties: {
-					path: {
-						type: 'string',
-					},
-					method: {
-						type: 'string',
-					},
-					recordLogs: {
-						type: 'boolean',
-					},
-					classify: {
-						properties: {
-							category: {
-								type: 'integer',
-							},
-							acl: {
-								type: 'integer',
-							},
-						},
-						additionalProperties: false,
-						type: 'object',
-					},
-				},
-				additionalProperties: false,
-				type: 'object',
-			},
-			type: 'array',
-		},
-		envs: {
-			patternProperties: {
-				'.*': {
-					additionalProperties: true,
-				},
-			},
-			type: 'object',
-		},
-		trigger: {
-			properties: {
-				type: {
-					type: 'integer',
-				},
-				expression: {
-					type: 'string',
-				},
-				timeframe: {
-					properties: {
-						start_time: {
-							type: 'integer',
-						},
-						end_time: {
-							type: 'integer',
-						},
-					},
-					additionalProperties: false,
-					type: 'object',
-				},
-			},
-			additionalProperties: false,
-			type: 'object',
-		},
-		stages: {
-			items: {
-				oneOf: [
-					{
-						required: ['id'],
-					},
-					{
-						required: ['use'],
-					},
-				],
-				properties: {
-					use: {
-						type: 'string',
-						enum: [
-							'classifyCategory',
-							'classifyACL',
-							'logsRecorder',
-							'authorization',
-							'validateRatelimits',
-							'validateSources',
-							'validateReferers',
-							'validateIndices',
-							'validateCategory',
-							'validateOperation',
-							'validatePermissionExpiryvalidatePermissionExpiry',
-							'elasticsearchQuery',
-							'reactivesearchQuery',
-						],
-						additionalProperties: {
-							stages: {
-								elasticsearchQuery: {
-									description: 'Stage to query elasticsearch BE',
-									inputs: {
-										properties: {
-											method: {
-												type: 'string',
-											},
-										},
-									},
-								},
-								authorization: {
-									description: 'To authorize user',
-									inputs: {
-										properties: {
-											type: {
-												type: 'string',
-												enum: ['basic', 'bearer'],
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-					id: {
-						type: 'string',
-					},
-					enabled: {
-						type: 'boolean',
-					},
-					async: {
-						type: 'boolean',
-					},
-					script: {
-						type: 'string',
-					},
-					scriptRef: {
-						type: 'string',
-					},
-					continueOnError: {
-						type: 'boolean',
-					},
-					envs: {
-						patternProperties: {
-							'.*': {
-								additionalProperties: true,
-							},
-						},
-						type: 'object',
-					},
-					needs: {
-						items: {
-							type: 'string',
-						},
-						type: 'array',
-					},
-					description: {
-						type: 'string',
-					},
-				},
-				additionalProperties: false,
-				type: 'object',
-			},
-			type: 'array',
-		},
-	},
-	required: ['routes'],
-	additionalProperties: false,
-	type: 'object',
-	definitions: {
-		ClassifyRoute: {
-			properties: {
-				category: {
-					type: 'integer',
-				},
-				acl: {
-					type: 'integer',
-				},
-			},
-			additionalProperties: false,
-			type: 'object',
-		},
-		ESPipelineRoutes: {
-			properties: {
-				path: {
-					type: 'string',
-				},
-				method: {
-					type: 'string',
-				},
-				recordLogs: {
-					type: 'boolean',
-				},
-				classify: {
-					properties: {
-						category: {
-							type: 'integer',
-						},
-						acl: {
-							type: 'integer',
-						},
-					},
-					additionalProperties: false,
-					type: 'object',
-				},
-			},
-			additionalProperties: false,
-			type: 'object',
-		},
-		ESPipelineStage: {
-			properties: {
-				use: {
-					enum: [
-						'classifyCategory',
-						'classifyACL',
-						'logsRecorder',
-						'authorization',
-						'validateRatelimits',
-						'validateSources',
-						'validateReferers',
-						'validateIndices',
-						'validateCategory',
-						'validateOperation',
-						'validatePermissionExpiry',
-						'elasticsearchQuery',
-						'reactivesearchQuery',
-					],
-					additionalProperties: {
-						stages: {
-							elasticsearchQuery: {
-								description: 'Stage to query elasticsearch BE',
-								inputs: {
-									properties: {
-										method: {
-											type: 'string',
-										},
-									},
-								},
-							},
-							authorization: {
-								description: 'To authorize user',
-								inputs: {
-									properties: {
-										type: {
-											type: 'string',
-											enum: ['basic', 'bearer'],
-										},
-									},
-								},
-							},
-						},
-					},
-					type: 'string',
-				},
-				id: {
-					type: 'string',
-				},
-				enabled: {
-					type: 'boolean',
-				},
-				async: {
-					type: 'boolean',
-				},
-				script: {
-					type: 'string',
-				},
-				scriptRef: {
-					type: 'string',
-				},
-				continueOnError: {
-					type: 'boolean',
-				},
-				envs: {
-					patternProperties: {
-						'.*': {
-							additionalProperties: true,
-						},
-					},
-					type: 'object',
-				},
-				needs: {
-					items: {
-						type: 'string',
-					},
-					type: 'array',
-				},
-				description: {
-					type: 'string',
-				},
-			},
-			additionalProperties: false,
-			type: 'object',
-		},
-		PreBuiltStage: {
-			enum: [
-				'elasticsearchQueryelasticsearchQueryelasticsearchQuery',
-				'classifyCategory',
-				'classifyACL',
-				'logsRecorder',
-				'authorization',
-				'validateRatelimits',
-				'validateSources',
-				'validateReferers',
-				'validateIndices',
-				'validateCategory',
-				'validateOperation',
-				'validatePermissionExpiryvalidatePermissionExpiry',
 
-				'reactivesearchQuery',
-			],
-			type: 'string',
-			additionalProperties: {
-				stages: {
-					elasticsearchQueryelasticsearchQueryelasticsearchQuery: {
-						description:
-							'Stage to query elasticsearch BEStage to query elasticsearch BEStage to query elasticsearch BEStage to query elasticsearch BEStage to query elasticsearch BE',
-						inputs: {
-							properties: {
-								method: {
-									type: 'string',
-								},
-							},
-						},
-					},
-					authorization: {
-						description: 'To authorize user',
-						inputs: {
-							properties: {
-								type: {
-									type: 'string',
-									enum: ['basic', 'bearer'],
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-		TimeFrame: {
-			properties: {
-				start_time: {
-					type: 'integer',
-				},
-				end_time: {
-					type: 'integer',
-				},
-			},
-			additionalProperties: false,
-			type: 'object',
-		},
-		Trigger: {
-			properties: {
-				type: {
-					type: 'integer',
-				},
-				expression: {
-					type: 'string',
-				},
-				timeframe: {
-					properties: {
-						start_time: {
-							type: 'integer',
-						},
-						end_time: {
-							type: 'integer',
-						},
-					},
-					additionalProperties: false,
-					type: 'object',
-				},
-			},
-			additionalProperties: false,
-			type: 'object',
-		},
-	},
-};
 const CSS = css`
 	height: 100%;
 	width: 100%;
@@ -580,8 +197,10 @@ const PipelineEditorComponent = (props) => {
 		if (!pipelineSchema) {
 			getPipelineSchema()
 				.then((res) => {
-					const { $schema, definitions, ...rest } = res;
-					setPipelineSchema(fakeSchema); // CHANGE IT AFTERWARDS
+					const processedSchema = modifySchema(res);
+					const { $schema, definitions, ...rest } = processedSchema;
+
+					setPipelineSchema(processedSchema); // CHANGE IT AFTERWARDS
 					monacoInstance.current.languages.json.jsonDefaults.setDiagnosticsOptions({
 						validate: true,
 						schemaValidation: 'error',
@@ -611,11 +230,13 @@ const PipelineEditorComponent = (props) => {
 
 	const handleMenuClick = (e) => {
 		try {
+			const perbuiltStages = pipelineSchema?.definitions?.PreBuiltStage || {};
 			const editorValue = { ...getEditorValue() };
 			if (editorValue?.stages) {
 				editorValue.stages.push({
 					id: e.key,
-					description: 'dummy',
+					description:
+						perbuiltStages?.additionalProperties?.stages?.[e.key]?.description ?? '',
 				});
 			}
 
@@ -632,6 +253,17 @@ const PipelineEditorComponent = (props) => {
 		return (
 			<Menu css={dropdownMenuCss} onClick={handleMenuClick}>
 				{(perbuiltStages.enum ?? [''])
+					.sort((a, b) => {
+						const textA = a.toUpperCase();
+						const textB = b.toUpperCase();
+						if (textA < textB) {
+							return -1;
+						}
+						if (textA > textB) {
+							return 1;
+						}
+						return 0;
+					})
 					.filter((stageKey) => prebuiltStagesInEditor.includes(stageKey) === false)
 					.map((stageKey) => {
 						return (
