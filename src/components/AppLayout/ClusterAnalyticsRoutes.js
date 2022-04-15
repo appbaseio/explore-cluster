@@ -38,6 +38,14 @@ const RequestLogs = Loadable({
 	loading: Loader,
 });
 
+const RequestLogDetails = Loadable({
+	loader: () =>
+		import(
+			/* webpackChunkName: "RequestLogDetails" */ '../../pages/RequestLogs/RequestLogDetails'
+		),
+	loading: Loader,
+});
+
 const RequestDistributionPage = Loadable({
 	loader: () =>
 		import(/* webpackChunkName: "RequestDistribution" */ '../../pages/RequestDistributionPage'),
@@ -168,6 +176,19 @@ class ClusterAnalyticsRoutes extends React.Component {
 						<>
 							{get(allowedRoutes, '/cluster/request-logs') ? (
 								<AppPageContainer {...props} component={RequestLogs} />
+							) : (
+								<UnauthorizedPage />
+							)}
+						</>
+					)}
+				/>
+				<Route
+					exact
+					path="/cluster/request-logs/:logId"
+					component={(props) => (
+						<>
+							{get(allowedRoutes, '/cluster/request-logs') ? (
+								<AppPageContainer {...props} component={RequestLogDetails} />
 							) : (
 								<UnauthorizedPage />
 							)}

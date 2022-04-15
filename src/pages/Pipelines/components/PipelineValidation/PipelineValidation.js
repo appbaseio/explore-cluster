@@ -2,6 +2,7 @@ import { Col, Icon, Tabs, Tag, Tooltip } from 'antd';
 import { css } from 'emotion';
 import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from 'react';
+import RequestDiff from '../../../../batteries/components/analytics/components/RequestLogs/RequestDiff';
 import Monaco from '../../../../batteries/components/SearchSandbox/containers/MonacoEditor';
 import Flex from '../../../../batteries/components/shared/Flex';
 import ConsoleLogger from '../../../../components/ScriptConsole/ConsoleLogger';
@@ -147,6 +148,8 @@ const TABS_KEYS = {
 	RESPONSE_OUTPUT: 'Response Output',
 	CONSOLE_LOGS: 'Console Logs',
 	CONSOLE_LOGS_SHORT: 'Console',
+	STAGE_CHANGES: 'Stage Changes',
+	STAGE_CHANGES_SHORT: 'Stages',
 };
 
 const {
@@ -155,6 +158,8 @@ const {
 	RESPONSE_OUTPUT_SHORT,
 	CONSOLE_LOGS,
 	CONSOLE_LOGS_SHORT,
+	STAGE_CHANGES,
+	STAGE_CHANGES_SHORT,
 } = TABS_KEYS;
 
 const PipelineValidation = ({
@@ -165,9 +170,11 @@ const PipelineValidation = ({
 	onPlayButtonClick,
 	consoleLogsArray,
 	isScriptValidation,
+	showStageChanges,
 }) => {
 	const [activeTabKey, setActiveTabKey] = useState(EXECUTION_CONTEXT);
 	const [validationResponse, setValidationResponse] = useState('');
+	const [stageChanges, setStateChanges] = useState([]);
 	const executionContextEditorRef = useRef(null);
 	const [isSmallScreen, setIsSmallScreen] = useState(false);
 	useEffect(() => {
@@ -183,8 +190,67 @@ const PipelineValidation = ({
 
 	useEffect(() => {
 		if (validationResponse !== responseTabValue) {
-			setValidationResponse(responseTabValue);
+			const { request, response } = JSON.parse(responseTabValue);
+			const filteredResponseTabValue = JSON.stringify(
+				{
+					request,
+					response,
+				},
+				null,
+				4,
+			);
+			setValidationResponse(filteredResponseTabValue);
 			setActiveTabKey(RESPONSE_OUTPUT);
+			if (showStageChanges) {
+				// compute stage changes' tab value
+				const getDataForStageChangesTab = (json) => {
+					const finalStageChangesData = {};
+
+					const requestVal = json.request ?? {};
+					if (requestVal.body) {
+						if (typeof requestVal.body === 'string' && isJson(requestVal.body)) {
+							requestVal.body = JSON.parse(requestVal.body);
+						}
+					}
+
+					const stageChangesValue = [];
+
+					json.stageChanges.forEach((stageItem) => {
+						if (stageItem) {
+							const stage = { ...stageItem };
+							if (stage?.context?.request?.body) {
+								if (
+									typeof stage.context.request.body === 'string' &&
+									isJson(stage.context.request.body)
+								) {
+									stage.context.request.body = JSON.parse(
+										stage.context.request.body,
+									);
+								}
+							}
+							if (stage?.context?.response?.body) {
+								if (
+									typeof stage.context.response.body === 'string' &&
+									isJson(stage.context.response.body)
+								) {
+									stage.context.response.body = JSON.parse(
+										stage.context.response.body,
+									);
+								}
+							}
+							stageChangesValue.push(stage);
+						}
+					});
+
+					finalStageChangesData.request = requestVal;
+					finalStageChangesData.headers = json.request.headers;
+					finalStageChangesData.url = json.envs.path;
+					finalStageChangesData.stageChanges = stageChangesValue;
+					return { ...finalStageChangesData };
+				};
+				const processStageChanges = getDataForStageChangesTab(JSON.parse(responseTabValue));
+				setStateChanges(processStageChanges);
+			}
 		}
 	}, [responseTabValue]);
 	const renderResponseCodeTime = () => {
@@ -345,6 +411,32 @@ const PipelineValidation = ({
 				>
 					<ConsoleLogger consoleArray={consoleLogsArray} />
 				</TabPane>
+				{showStageChanges && (
+					<TabPane
+						tab={
+							<h3>
+								{isSmallScreen ? STAGE_CHANGES_SHORT : STAGE_CHANGES}
+								<Tooltip placement="right" title="Stage changes">
+									<span style={{ marginLeft: 5 }}>
+										<Icon type="info-circle" />
+									</span>
+								</Tooltip>
+							</h3>
+						}
+						key={STAGE_CHANGES}
+					>
+						<div style={{ overflow: 'auto', maxHeight: '80%', paddingLeft: '1rem' }}>
+							<RequestDiff
+								requestBody={stageChanges?.request?.body}
+								url={stageChanges.rul}
+								headers={stageChanges.headers}
+								method="POST"
+								requestChanges={stageChanges.stageChanges ?? []}
+								shouldDecode={false}
+							/>
+						</div>
+					</TabPane>
+				)}
 			</Tabs>
 		</div>
 	);
@@ -358,6 +450,7 @@ PipelineValidation.propTypes = {
 	responseTabValue: PropTypes.string,
 	consoleLogsArray: PropTypes.array,
 	isScriptValidation: PropTypes.bool,
+	showStageChanges: PropTypes.bool,
 };
 
 PipelineValidation.defaultProps = {
@@ -366,6 +459,7 @@ PipelineValidation.defaultProps = {
 	responseTabValue: '',
 	consoleLogsArray: null,
 	isScriptValidation: false,
+	showStageChanges: false,
 };
 
 export default PipelineValidation;

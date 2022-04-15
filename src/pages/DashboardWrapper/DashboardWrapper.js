@@ -70,6 +70,13 @@ const getActiveMenu = (props, prevActiveSubMenu = [], routes = {}) => {
 			activeSubMenu = route;
 			activeMenuItem = route;
 			return true;
+		} else if (route === 'Pipelines') {
+			// a patchy condition to make menu item without submenu active if related routes are navigated
+			if (pathname.includes('pipelines')) {
+				activeSubMenu = route;
+				activeMenuItem = route;
+				return true;
+			}
 		}
 		return false;
 	});

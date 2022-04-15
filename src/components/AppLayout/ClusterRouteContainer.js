@@ -29,6 +29,19 @@ const PipelinesPage = Loadable({
 	loading: Loader,
 });
 
+const PipelineLogsPage = Loadable({
+	loader: () => import(/* webpackChunkName: "PipelineLogsPage" */ '../../pages/PipelineLogs'),
+	loading: Loader,
+});
+
+const PipelineLogDetailsPage = Loadable({
+	loader: () =>
+		import(
+			/* webpackChunkName: "PipelineLogDetailsPage" */ '../../pages/PipelineLogs/PipelineLogDetails'
+		),
+	loading: Loader,
+});
+
 const QueryRulesForm = Loadable({
 	loader: () =>
 		import(/* webpackChunkName: "QueryRulesForm" */ '../../pages/QueryRules/QueryRulesForm'),
@@ -302,6 +315,35 @@ class ClusterRouteContainer extends React.Component {
 							<>
 								{get(allowedRoutes, '/cluster/pipelines') ? (
 									<AppPageContainer {...props} component={PipelinesPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
+						)}
+					/>
+					<Route
+						exact
+						path="/cluster/pipelines/:id/logs"
+						render={(props) => (
+							<>
+								{get(allowedRoutes, '/cluster/pipelines') ? (
+									<AppPageContainer {...props} component={PipelineLogsPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
+						)}
+					/>
+					<Route
+						exact
+						path="/cluster/pipelines/:id/logs/:logId"
+						render={(props) => (
+							<>
+								{get(allowedRoutes, '/cluster/pipelines') ? (
+									<AppPageContainer
+										{...props}
+										component={PipelineLogDetailsPage}
+									/>
 								) : (
 									<UnauthorizedPage />
 								)}

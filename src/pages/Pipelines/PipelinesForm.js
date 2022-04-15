@@ -827,6 +827,9 @@ const PipelinesForm = (props) => {
 												}}
 											>
 												<PipelineValidation
+													showStageChanges={
+														activeTabKey === 'pipeline_tab'
+													}
 													executionContext={executionContext}
 													setExecutionContext={setExecutionContext}
 													isVisible={isValidateMode}

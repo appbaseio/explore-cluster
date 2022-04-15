@@ -464,7 +464,7 @@ const PipelineCard = (props) => {
 				<Button
 					type="link"
 					onClick={() => {
-						message.info('Pipeline logs coming soon! :)');
+						history.push(`/cluster/pipelines/${pipeline.id}/logs`);
 					}}
 					className="view-logs-btn"
 				>

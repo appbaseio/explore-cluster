@@ -221,7 +221,7 @@ Pipelines.propTypes = {
 	tier: allowedTiers,
 	appVersion: PropTypes.string,
 	fetchUsageStats: PropTypes.func.isRequired,
-	history: {},
+	history: PropTypes.object,
 };
 
 Pipelines.defaultProps = {
