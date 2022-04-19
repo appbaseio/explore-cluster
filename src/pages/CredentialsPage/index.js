@@ -3,6 +3,7 @@ import get from 'lodash/get';
 import { Card, Table, Tooltip, Button, Alert, Typography, Icon, Result } from 'antd';
 import { connect } from 'react-redux';
 import { string, func, bool, array, object } from 'prop-types';
+import Text from 'antd/lib/typography/Text';
 import CreateCredentials from '../../components/CreateCredentials';
 import Container from '../../components/Container';
 import { getAppPermissionsByName } from '../../batteries/modules/selectors';
@@ -45,6 +46,25 @@ const columns = [
 		),
 		width: '50%',
 		disabled: true,
+	},
+	{
+		title: 'Last Updated',
+		key: 'last-updated',
+		width: '17%',
+		render: (item) => {
+			/* eslint-disable camelcase */
+			const {
+				permissionInfo: { created_at, updated_at },
+			} = { ...item };
+			const timestamp = updated_at || created_at;
+			return (
+				<Text disabled={!timestamp}>
+					{timestamp
+						? moment.unix(new Date(timestamp).valueOf()).format('ddd D MMM, hh:mm A')
+						: 'NA'}{' '}
+				</Text>
+			);
+		},
 	},
 	{
 		title: 'Credentials',
