@@ -209,6 +209,29 @@ class Credentials extends Component {
 	render() {
 		const { showCredForm, currentPermissionInfo, deleteModal } = this.state;
 		const { isLoading, permissions, isOwner, location, appName, appId, isAdmin } = this.props;
+		const shouldDisplayUpdatedAt = permissions.some(
+			(permission) => permission.updated_at || permission.created_at,
+		);
+		const columnsToDisplay = shouldDisplayUpdatedAt
+			? columns
+			: columns.filter((col) => col.key === 'last-updated');
+		const sortedByUpdatedAt = orderBy(
+			permissions,
+			(a) => {
+				const timestamp = a.updated_at || a.created_at;
+				const timeInMilliSecondsSinceEpoch = new Date(timestamp).valueOf();
+				return timeInMilliSecondsSinceEpoch || 0;
+			},
+			['desc'],
+		);
+		const dataSource =
+			Array.isArray(permissions) &&
+			sortedByUpdatedAt.map((permission) => ({
+				permissionInfo: permission,
+				deletePermission: this.deletePermission,
+				showForm: this.showForm,
+			}));
+
 		if (isLoading) {
 			return <Loader />;
 		}
@@ -263,31 +286,14 @@ class Credentials extends Component {
 					<ErrorToaster inline>
 						<Table
 							scroll={{ x: 700 }}
-							dataSource={
-								Array.isArray(permissions) &&
-								orderBy(
-									permissions,
-									(a) => {
-										const timestamp = a.updated_at || a.created_at;
-										const timeInMilliSecondsSinceEpoch = new Date(
-											timestamp,
-										).valueOf();
-										return timeInMilliSecondsSinceEpoch || 0;
-									},
-									['desc'],
-								).map((permission) => ({
-									permissionInfo: permission,
-									deletePermission: this.deletePermission,
-									showForm: this.showForm,
-								}))
-							}
+							dataSource={dataSource}
 							rowKey={(row) =>
 								`${get(row, 'permissionInfo.username')}${get(
 									row,
 									'permissionInfo.password',
 								)}`
 							}
-							columns={columns}
+							columns={columnsToDisplay}
 							css="tr:hover td {
 								background: transparent;
 							}"
