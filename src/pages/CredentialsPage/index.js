@@ -4,6 +4,7 @@ import { Card, Table, Tooltip, Button, Alert, Typography, Icon, Result } from 'a
 import { connect } from 'react-redux';
 import { string, func, bool, array, object } from 'prop-types';
 import Text from 'antd/lib/typography/Text';
+import orderBy from 'lodash/orderBy';
 import CreateCredentials from '../../components/CreateCredentials';
 import Container from '../../components/Container';
 import { getAppPermissionsByName } from '../../batteries/modules/selectors';
@@ -57,10 +58,11 @@ const columns = [
 				permissionInfo: { created_at, updated_at },
 			} = { ...item };
 			const timestamp = updated_at || created_at;
+			const timeInSecondsSinceEpoch = new Date(timestamp).valueOf() / 1000;
 			return (
 				<Text disabled={!timestamp}>
 					{timestamp
-						? moment.unix(new Date(timestamp).valueOf()).format('ddd D MMM, hh:mm A')
+						? moment.unix(timeInSecondsSinceEpoch).format('ddd DD MMM YYYY, hh:mm A')
 						: 'NA'}{' '}
 				</Text>
 			);
@@ -261,11 +263,24 @@ class Credentials extends Component {
 					<ErrorToaster inline>
 						<Table
 							scroll={{ x: 700 }}
-							dataSource={permissions.map((permission) => ({
-								permissionInfo: permission,
-								deletePermission: this.deletePermission,
-								showForm: this.showForm,
-							}))}
+							dataSource={
+								Array.isArray(permissions) &&
+								orderBy(
+									permissions,
+									(a) => {
+										const timestamp = a.updated_at || a.created_at;
+										const timeInMilliSecondsSinceEpoch = new Date(
+											timestamp,
+										).valueOf();
+										return timeInMilliSecondsSinceEpoch || 0;
+									},
+									['desc'],
+								).map((permission) => ({
+									permissionInfo: permission,
+									deletePermission: this.deletePermission,
+									showForm: this.showForm,
+								}))
+							}
 							rowKey={(row) =>
 								`${get(row, 'permissionInfo.username')}${get(
 									row,
