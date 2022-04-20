@@ -5,6 +5,8 @@ import { Card, Button, Table, Alert, Typography } from 'antd';
 import PropTypes from 'prop-types';
 import { css } from 'react-emotion';
 import get from 'lodash/get';
+import Text from 'antd/lib/typography/Text';
+import orderBy from 'lodash/orderBy';
 import CredentialsForm from '../../components/CreateCredentials';
 import Permission from './Permission';
 import Password from './Password';
@@ -57,6 +59,26 @@ const columns = [
 		render: ({ permissionInfo }) => permissionInfo.email || 'No email',
 	},
 	{
+		title: 'Last Updated',
+		key: 'last-updated',
+		width: '10%',
+		render: (item) => {
+			/* eslint-disable camelcase */
+			const {
+				permissionInfo: { created_at, updated_at },
+			} = { ...item };
+			const timestamp = updated_at || created_at;
+			const timeInSecondsSinceEpoch = new Date(timestamp).valueOf() / 1000;
+			return (
+				<Text disabled={!timestamp}>
+					{timestamp
+						? moment.unix(timeInSecondsSinceEpoch).format('ddd DD MMM YYYY, hh:mm A')
+						: 'NA'}{' '}
+				</Text>
+			);
+		},
+	},
+	{
 		title: 'Actions',
 		key: 'credentials',
 		width: '10%',
@@ -82,7 +104,7 @@ class UserManagementPage extends React.Component {
 			label: 'visit',
 			value: null,
 		});
-		this.refetchPermissions();
+		this.refetchusers();
 	}
 
 	componentWillUnmount() {
@@ -110,7 +132,7 @@ class UserManagementPage extends React.Component {
 		}
 	};
 
-	refetchPermissions = () => {
+	refetchusers = () => {
 		const { fetchUsers, credentials } = this.props;
 		fetchUsers(credentials);
 	};
@@ -142,7 +164,7 @@ class UserManagementPage extends React.Component {
 								showForm: false,
 							},
 							() => {
-								this.refetchPermissions();
+								this.refetchusers();
 							},
 						);
 					}
@@ -156,7 +178,7 @@ class UserManagementPage extends React.Component {
 							showForm: false,
 						},
 						() => {
-							this.refetchPermissions();
+							this.refetchusers();
 						},
 					);
 				}
@@ -168,7 +190,7 @@ class UserManagementPage extends React.Component {
 		const { credentials, deleteUser } = this.props;
 		deleteUser(credentials, username).then(({ payload }) => {
 			if (payload) {
-				this.refetchPermissions();
+				this.refetchusers();
 			}
 		});
 	};
@@ -177,6 +199,28 @@ class UserManagementPage extends React.Component {
 		const { users, isFetching, allowedActions, version } = this.props;
 		const { showForm, currentPermissionInfo } = this.state;
 		const hasEditAccess = allowedActions.includes(ALLOWED_ACTIONS.USER_MANAGEMENT);
+		const shouldDisplayUpdatedAt = users.some(
+			(permission) => permission.updated_at || permission.created_at,
+		);
+		const columnsToDisplay = shouldDisplayUpdatedAt
+			? columns
+			: columns.filter((col) => col.key === 'last-updated');
+		const sortedByUpdatedAt = orderBy(
+			users,
+			(a) => {
+				const timestamp = a.updated_at || a.created_at;
+				const timeInMilliSecondsSinceEpoch = new Date(timestamp).valueOf();
+				return timeInMilliSecondsSinceEpoch || 0;
+			},
+			['desc'],
+		);
+		const dataSource =
+			Array.isArray(users) &&
+			sortedByUpdatedAt.map((permission) => ({
+				permissionInfo: permission,
+				deletePermission: this.deletePermission,
+				showForm: this.showForm,
+			}));
 
 		if (isFetching) {
 			return <Loader />;
@@ -239,18 +283,14 @@ class UserManagementPage extends React.Component {
 					<ErrorToaster inline>
 						<Table
 							scroll={{ x: 900 }}
-							dataSource={users.map((user) => ({
-								permissionInfo: user,
-								deletePermission: this.deletePermission,
-								showForm: this.showForm,
-							}))}
+							dataSource={dataSource}
 							rowKey={(row) =>
 								`${get(row, 'permissionInfo.username')}:${get(
 									row,
 									'permissionInfo.password',
 								)}`
 							}
-							columns={columns}
+							columns={columnsToDisplay}
 							css={tableCls}
 						/>
 					</ErrorToaster>
