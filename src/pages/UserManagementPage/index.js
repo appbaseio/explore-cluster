@@ -40,23 +40,27 @@ const columns = [
 	{
 		title: 'Username',
 		key: `username${updateIndex()}`,
+		width: '10%',
 		render: ({ permissionInfo }) => permissionInfo.username,
 	},
 	{
 		title: 'Password (We encrypt all passwords)',
 		key: `password${updateIndex()}`,
+		width: '10%',
 		// eslint-disable-next-line
 		render: ({ permissionInfo }) => <Password password={permissionInfo.password} />,
 	},
 	{
 		title: 'Email',
 		key: `email${updateIndex()}`,
+		width: '10%',
 		render: ({ permissionInfo }) => permissionInfo.email || 'No email',
 	},
 	{
 		title: 'Actions',
-		render: (permission) => <Permission {...permission} />,
 		key: 'credentials',
+		width: '10%',
+		render: (permission) => <Permission {...permission} />,
 	},
 ];
 
