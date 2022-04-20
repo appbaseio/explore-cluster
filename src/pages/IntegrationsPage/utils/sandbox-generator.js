@@ -34,7 +34,7 @@ const html = (prefs) => {
         <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
 
         <script type="text/javascript"
-            src="https://maps.google.com/maps/api/js?libraries=places&key=REDACTED_GOOGLE_API_KEY">
+            src="https://maps.googleapis.com/maps/api/js?libraries=places&key=REDACTED_GOOGLE_API_KEY">
         </script>
 
         <title>ReactiveSearch Shopify</title>

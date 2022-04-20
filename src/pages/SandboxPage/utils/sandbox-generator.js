@@ -61,7 +61,7 @@ const geoHtml = `
     />
     <script
       type="text/javascript"
-      src="https://maps.google.com/maps/api/js?libraries=places&key=REDACTED_GOOGLE_API_KEY"
+      src="https://maps.googleapis.com/maps/api/js?libraries=places&key=REDACTED_GOOGLE_API_KEY"
     ></script>
     <title>React App</title>
   </head>

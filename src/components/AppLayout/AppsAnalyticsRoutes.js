@@ -53,7 +53,13 @@ const RequestLogs = Loadable({
 	loader: () => import(/* webpackChunkName: "RequestLogs" */ '../../pages/RequestLogs'),
 	loading: Loader,
 });
-
+const RequestLogDetails = Loadable({
+	loader: () =>
+		import(
+			/* webpackChunkName: "RequestLogDetails" */ '../../pages/RequestLogs/RequestLogDetails'
+		),
+	loading: Loader,
+});
 const MonitoringPage = Loadable({
 	loader: () => import(/* webpackChunkName: "SearchLatency" */ '../../pages/MonitoringPage'),
 	loading: Loader,
@@ -186,6 +192,19 @@ class AppsAnalyticsRoutes extends React.Component {
 						</>
 					)}
 				/>{' '}
+				<Route
+					exact
+					path="/app/:appName/request-logs/:logId"
+					component={(props) => (
+						<>
+							{get(allowedRoutes, 'request-logs') ? (
+								<AppPageContainer {...props} component={RequestLogDetails} />
+							) : (
+								<UnauthorizedPage />
+							)}
+						</>
+					)}
+				/>
 				<Route
 					exact
 					path="/app/:appName/no-results-searches"

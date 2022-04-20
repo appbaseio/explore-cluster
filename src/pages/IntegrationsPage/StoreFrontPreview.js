@@ -113,7 +113,7 @@ class StoreFrontPreview extends React.Component {
 		const script1 = this.iframeRef.current.contentDocument.createElement('script');
 		script1.type = 'text/javascript';
 		script1.src =
-			'https://maps.google.com/maps/api/js?libraries=places&key=REDACTED_GOOGLE_API_KEY';
+			'https://maps.googleapis.com/maps/api/js?libraries=places&key=REDACTED_GOOGLE_API_KEY';
 		script1.onload = () => {
 			this.setState({
 				loading: false,

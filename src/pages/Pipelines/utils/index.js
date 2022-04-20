@@ -96,3 +96,51 @@ export const deleteRecursive = (inputProp, keysToDelete) => {
 export const trimExtension = (string, extension = '.js') => {
 	return string?.replace(new RegExp(`${extension}+$`), '') ?? '';
 };
+
+// currently this util  method supports injection of conditional schema
+// fot 'inputs' property based on selected stage (under schema.definitions.PreBuiltStage.additionalProperties.stages)
+export const modifySchema = (schema) => {
+	const processedSchema = { ...schema };
+	const prebuiltStages =
+		processedSchema?.definitions?.PreBuiltStage?.additionalProperties?.stages;
+
+	const schemaObject = {
+		allOf: [],
+	};
+	Object.keys(prebuiltStages).forEach((stage) => {
+		if (prebuiltStages[stage].inputs) {
+			const { $schema, ...rest } = prebuiltStages[stage].inputs;
+			// refer to: https://json-schema.org/understanding-json-schema/reference/conditionals.html#if-then-else
+			schemaObject.allOf.push(
+				...[
+					{
+						if: {
+							properties: { id: { const: stage } },
+							required: ['id'],
+						},
+						then: {
+							properties: { inputs: rest },
+						},
+					},
+					{
+						if: {
+							properties: { use: { const: stage } },
+							required: ['use'],
+						},
+						then: {
+							properties: { inputs: rest },
+						},
+					},
+				],
+			);
+		}
+	});
+
+	if (processedSchema?.properties?.stages?.items?.properties) {
+		processedSchema.properties.stages.items = {
+			...processedSchema.properties.stages.items,
+			...schemaObject,
+		};
+	}
+	return processedSchema;
+};
