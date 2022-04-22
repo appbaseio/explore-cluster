@@ -53,10 +53,11 @@ const columns = [
 		key: 'last-updated',
 		width: '17%',
 		render: (item) => {
-			/* eslint-disable camelcase */
 			const {
+				/* eslint-disable-next-line camelcase */
 				permissionInfo: { created_at, updated_at },
 			} = item;
+			/* eslint-disable-next-line camelcase */
 			const timestamp = updated_at || created_at;
 			const timeInSecondsSinceEpoch = new Date(timestamp).valueOf() / 1000;
 			return (
