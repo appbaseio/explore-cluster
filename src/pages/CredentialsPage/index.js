@@ -56,7 +56,7 @@ const columns = [
 			/* eslint-disable camelcase */
 			const {
 				permissionInfo: { created_at, updated_at },
-			} = { ...item };
+			} = item;
 			const timestamp = updated_at || created_at;
 			const timeInSecondsSinceEpoch = new Date(timestamp).valueOf() / 1000;
 			return (
@@ -209,28 +209,26 @@ class Credentials extends Component {
 	render() {
 		const { showCredForm, currentPermissionInfo, deleteModal } = this.state;
 		const { isLoading, permissions, isOwner, location, appName, appId, isAdmin } = this.props;
-		const shouldDisplayUpdatedAt = permissions.some(
+		const everyPermissionHasUpdatedAtData = permissions.every(
 			(permission) => permission.updated_at || permission.created_at,
 		);
-		const columnsToDisplay = shouldDisplayUpdatedAt
+		const columnsToDisplay = everyPermissionHasUpdatedAtData
 			? columns
-			: columns.filter((col) => col.key === 'last-updated');
+			: columns.filter((col) => col.key !== 'last-updated');
 		const sortedByUpdatedAt = orderBy(
 			permissions,
 			(a) => {
 				const timestamp = a.updated_at || a.created_at;
 				const timeInMilliSecondsSinceEpoch = new Date(timestamp).valueOf();
-				return timeInMilliSecondsSinceEpoch || 0;
+				return timeInMilliSecondsSinceEpoch;
 			},
 			['desc'],
 		);
-		const dataSource =
-			Array.isArray(permissions) &&
-			sortedByUpdatedAt.map((permission) => ({
-				permissionInfo: permission,
-				deletePermission: this.deletePermission,
-				showForm: this.showForm,
-			}));
+		const dataSource = sortedByUpdatedAt.map((permission) => ({
+			permissionInfo: permission,
+			deletePermission: this.deletePermission,
+			showForm: this.showForm,
+		}));
 
 		if (isLoading) {
 			return <Loader />;

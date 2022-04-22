@@ -49,7 +49,6 @@ const columns = [
 		title: 'Password (We encrypt all passwords)',
 		key: `password${updateIndex()}`,
 		width: '10%',
-		// eslint-disable-next-line
 		render: ({ permissionInfo }) => <Password password={permissionInfo.password} />,
 	},
 	{
@@ -104,7 +103,7 @@ class UserManagementPage extends React.Component {
 			label: 'visit',
 			value: null,
 		});
-		this.refetchusers();
+		this.refetchPermissions();
 	}
 
 	componentWillUnmount() {
@@ -132,7 +131,7 @@ class UserManagementPage extends React.Component {
 		}
 	};
 
-	refetchusers = () => {
+	refetchPermissions = () => {
 		const { fetchUsers, credentials } = this.props;
 		fetchUsers(credentials);
 	};
@@ -164,7 +163,7 @@ class UserManagementPage extends React.Component {
 								showForm: false,
 							},
 							() => {
-								this.refetchusers();
+								this.refetchPermissions();
 							},
 						);
 					}
@@ -178,7 +177,7 @@ class UserManagementPage extends React.Component {
 							showForm: false,
 						},
 						() => {
-							this.refetchusers();
+							this.refetchPermissions();
 						},
 					);
 				}
@@ -190,7 +189,7 @@ class UserManagementPage extends React.Component {
 		const { credentials, deleteUser } = this.props;
 		deleteUser(credentials, username).then(({ payload }) => {
 			if (payload) {
-				this.refetchusers();
+				this.refetchPermissions();
 			}
 		});
 	};
@@ -199,28 +198,24 @@ class UserManagementPage extends React.Component {
 		const { users, isFetching, allowedActions, version } = this.props;
 		const { showForm, currentPermissionInfo } = this.state;
 		const hasEditAccess = allowedActions.includes(ALLOWED_ACTIONS.USER_MANAGEMENT);
-		const shouldDisplayUpdatedAt = users.some(
-			(permission) => permission.updated_at || permission.created_at,
-		);
-		const columnsToDisplay = shouldDisplayUpdatedAt
+		const everyUserHasUpdatedAtData = users.some((user) => user.updated_at || user.created_at);
+		const columnsToDisplay = everyUserHasUpdatedAtData
 			? columns
-			: columns.filter((col) => col.key === 'last-updated');
+			: columns.filter((col) => col.key !== 'last-updated');
 		const sortedByUpdatedAt = orderBy(
 			users,
 			(a) => {
 				const timestamp = a.updated_at || a.created_at;
 				const timeInMilliSecondsSinceEpoch = new Date(timestamp).valueOf();
-				return timeInMilliSecondsSinceEpoch || 0;
+				return timeInMilliSecondsSinceEpoch;
 			},
 			['desc'],
 		);
-		const dataSource =
-			Array.isArray(users) &&
-			sortedByUpdatedAt.map((permission) => ({
-				permissionInfo: permission,
-				deletePermission: this.deletePermission,
-				showForm: this.showForm,
-			}));
+		const dataSource = sortedByUpdatedAt.map((permission) => ({
+			permissionInfo: permission,
+			deletePermission: this.deletePermission,
+			showForm: this.showForm,
+		}));
 
 		if (isFetching) {
 			return <Loader />;
