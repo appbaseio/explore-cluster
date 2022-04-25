@@ -65,7 +65,7 @@ const columns = [
 			const {
 				// eslint-disable-next-line camelcase
 				permissionInfo: { created_at, updated_at },
-			} = { ...item };
+			} = item;
 			// eslint-disable-next-line camelcase
 			const timestamp = updated_at || created_at;
 			const timeInSecondsSinceEpoch = new Date(timestamp).valueOf() / 1000;
