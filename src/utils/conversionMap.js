@@ -11,6 +11,7 @@ export default {
 		'date',
 		'boolean',
 		'rank_feature',
+		'geo_point',
 		DenseVector,
 	],
 	keyword: [
@@ -24,7 +25,7 @@ export default {
 		'rank_feature',
 		DenseVector,
 	],
-	object: ['nested'],
+	object: ['nested', 'geo_point'],
 	nested: ['object'],
 
 	integer: ['text', 'keyword', 'float', 'long', 'rank_feature', DenseVector],
