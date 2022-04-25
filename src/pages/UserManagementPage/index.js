@@ -72,7 +72,7 @@ const columns = [
 			return (
 				<Text disabled={!timestamp}>
 					{timestamp
-						? moment.unix(timeInSecondsSinceEpoch).format('ddd DD MMM YYYY, hh:mm A')
+						? moment.unix(timeInSecondsSinceEpoch).format('ddd DD MMM, hh:mm A')
 						: 'NA'}{' '}
 				</Text>
 			);
