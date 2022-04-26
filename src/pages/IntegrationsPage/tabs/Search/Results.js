@@ -220,7 +220,7 @@ const geoDefaultSettings = [
 				</Popover>
 			</span>
 		),
-		value: false,
+		value: true,
 	},
 	{
 		id: 'locationDataField',
