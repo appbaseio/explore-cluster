@@ -1,12 +1,13 @@
 import { isEmpty } from '../../../utils';
 
 export const bannerDetails = {
-	title: 'Pipelines',
-	description:
-		'Pipelines let you create pre and post-processing stages for searching and indexing data.',
+	title: 'ReactiveSearch Pipelines',
+	description: `Pipelines are a set of declarative stages that allow
+        creating pre-processing or post-processing flows for
+        searching or indexing data.`,
 	buttonText: 'Read Docs',
 	icon: 'info-circle',
-	href: 'https://docs.appbase.io/docs/search/pipelines/',
+	href: 'https://docs.appbase.io/docs/search/pipelines/concepts/',
 };
 export const monacoOptions = {
 	cursorStyle: 'line',

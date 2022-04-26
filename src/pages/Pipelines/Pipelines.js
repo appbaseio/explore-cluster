@@ -112,7 +112,7 @@ const Pipelines = (props) => {
 						maxWidth: '70%',
 					}}
 					src="https://i.imgur.com/J4Hjdsl.png"
-					alt="Pipelines"
+					alt="ReactiveSearch Pipelines"
 				/>
 			</React.Fragment>
 		);
@@ -132,12 +132,13 @@ const Pipelines = (props) => {
 				>
 					<Row type="flex" justify="space-between" align="middle" gutter={16}>
 						<Col lg={18}>
-							<h2>Pipelines</h2>
+							<h2>ReactiveSearch Pipelines</h2>
 							<Row>
 								<Col lg={18}>
 									<p>
-										Pipelines let you create pre and post-processing stages for
-										searching and indexing data.
+										Pipelines are a set of declarative stages that allow
+										creating pre-processing or post-processing flows for
+										searching or indexing data.
 									</p>
 								</Col>
 							</Row>
