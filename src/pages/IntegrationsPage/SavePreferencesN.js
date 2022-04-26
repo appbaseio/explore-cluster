@@ -103,13 +103,24 @@ class SavePreferencesN extends React.Component {
 			if (get(diffData, 'searchSettings.redirectUrlIcon', '')) {
 				newPreferences.searchSettings.redirectUrlIcon = '';
 			}
-			if (get(diffData, 'resultSettings.mapsAPIkey', '')) {
-				newPreferences.resultSettings.mapsAPIkey = '';
+			if (
+				get(diffData, 'resultSettings.showSearchAsMove', false) &&
+				get(newPreferences, 'resultSettings.showSearchAsMove', '') === false &&
+				get(getPreferencesPayload(), 'resultSettings.showSearchAsMove', undefined) ===
+					undefined
+			) {
+				delete newPreferences.resultSettings.showSearchAsMove;
 			}
-			if (get(diffData, 'resultSettings.locationDataField', '')) {
-				newPreferences.resultSettings.locationDataField = '';
+			if (
+				get(diffData, 'resultSettings.showMarkerClusters', false) &&
+				get(newPreferences, 'resultSettings.showMarkerClusters', '') === false &&
+				get(getPreferencesPayload(), 'resultSettings.showMarkerClusters', undefined) ===
+					undefined
+			) {
+				delete newPreferences.resultSettings.showMarkerClusters;
 			}
 		}
+
 		delete newPreferences.type;
 		delete newPreferences.deploySettings;
 		delete newPreferences.created_at;

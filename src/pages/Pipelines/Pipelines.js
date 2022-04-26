@@ -9,7 +9,7 @@ import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster
 import Loader from '../../components/Loader';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import DNDWrapper from '../../components/DNDWrapper';
-import { bannerDetails } from './utils';
+import { pipelinesBannerDetails } from './utils';
 import {
 	getPipelines,
 	getPipelinesUsageStats,
@@ -39,6 +39,7 @@ const Pipelines = (props) => {
 		fetchUsageStats,
 		history,
 	} = props;
+	const bannerDetails = pipelinesBannerDetails.allPipelines;
 
 	useLayoutEffect(() => {
 		if (isValidPlan(tier, featurePipelines)) {

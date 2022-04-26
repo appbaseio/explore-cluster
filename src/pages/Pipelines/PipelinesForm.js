@@ -36,7 +36,7 @@ import {
 	putPipeline,
 } from '../../batteries/modules/actions';
 import {
-	bannerDetails,
+	pipelinesBannerDetails,
 	DEFAULT_EXECUTION_CONTEXT_VALUE,
 	deleteRecursive,
 	getConsoleLogsArray,
@@ -232,6 +232,8 @@ const PipelinesForm = (props) => {
 
 	// track of script file-names to be added
 	const [missingScriptFiles, setMissingScriptFiles] = useState([]);
+
+	const bannerDetails = pipelinesBannerDetails.allPipelines;
 
 	const validateMissingScriptFiles = () => {
 		try {
