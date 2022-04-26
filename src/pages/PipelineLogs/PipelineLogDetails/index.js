@@ -19,7 +19,7 @@ const bannerDetails = {
 	description: 'Log details',
 	buttonText: 'Read Docs',
 	icon: 'info-circle',
-	href: 'https://docs.appbase.io/docs/search/pipelines/',
+	href: 'https://docs.appbase.io/docs/pipelines/concepts/',
 };
 
 const PipelineLogDetailsWrapper = ({

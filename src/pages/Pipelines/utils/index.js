@@ -1,31 +1,22 @@
 import { isEmpty } from '../../../utils';
 
-export const bannerDetails = {
-	title: 'ReactiveSearch Pipelines',
-	description: `Pipelines are a set of declarative stages that allow
-        creating pre-processing or post-processing flows for
-        searching or indexing data.`,
-	buttonText: 'Read Docs',
-	icon: 'info-circle',
-	href: 'https://docs.appbase.io/docs/search/pipelines/concepts/',
-};
-
 export const pipelinesBannerDetails = {
 	allPipelines: {
-		title: 'Pipelines',
-		description:
-			'Pipelines let you create pre and post-processing stages for searching and indexing data.',
+		title: 'ReactiveSearch Pipelines',
+		description: `Pipelines are a set of declarative stages that allow
+        creating pre-processing or post-processing flows for
+        searching or indexing data.`,
 		buttonText: 'Read Docs',
 		icon: 'info-circle',
-		href: 'https://docs.appbase.io/docs/search/pipelines/',
+		href: 'https://docs.appbase.io/docs/pipelines/concepts/',
 	},
 	globalVars: {
 		title: 'Global Variables for Pipelines',
 		description:
-			'Global variables are KEY/VALUE pairs that can be re-used across multiple pipelines. They can represent backend connection configurations.',
+			'Global variables are key/value pairs that can be re-used across multiple pipelines. They can be API keys, database connection configurations, or anything else that makes sense to define once.',
 		buttonText: 'Read More',
 		icon: 'info-circle',
-		href: 'https://docs.appbase.io/docs/pipelines/#global-vars',
+		href: 'https://docs.appbase.io/docs/pipelines/concepts/global-variables',
 	},
 };
 
