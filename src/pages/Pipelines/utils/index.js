@@ -8,6 +8,26 @@ export const bannerDetails = {
 	icon: 'info-circle',
 	href: 'https://docs.appbase.io/docs/search/pipelines/',
 };
+
+export const pipelinesBannerDetails = {
+	allPipelines: {
+		title: 'Pipelines',
+		description:
+			'Pipelines let you create pre and post-processing stages for searching and indexing data.',
+		buttonText: 'Read Docs',
+		icon: 'info-circle',
+		href: 'https://docs.appbase.io/docs/search/pipelines/',
+	},
+	globalVars: {
+		title: 'Global Variables for Pipelines',
+		description:
+			'Global variables are KEY/VALUE pairs that can be re-used across multiple pipelines. They can represent backend connection configurations.',
+		buttonText: 'Read More',
+		icon: 'info-circle',
+		href: 'https://docs.appbase.io/docs/pipelines/#global-vars',
+	},
+};
+
 export const monacoOptions = {
 	cursorStyle: 'line',
 	fontFamily: 'Monaco, monospace',

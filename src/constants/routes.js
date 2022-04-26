@@ -50,9 +50,20 @@ export const APP_ROUTES = {
 	Pipelines: {
 		icon: 'deployment-unit',
 		action: ALLOWED_ACTIONS.PIPELINES,
-		link: '/cluster/pipelines',
-		hasExactPath: true,
-		tag: 'Beta',
+		menu: [
+			{
+				label: 'View All Pipelines',
+				link: '/cluster/pipelines',
+				hasExactPath: true,
+				tag: 'Beta',
+			},
+			{
+				label: 'Global Variables',
+				link: '/cluster/global-vars',
+				hasExactPath: true,
+				tag: 'Beta',
+			}
+		]
 	},
 	Analytics: {
 		icon: 'line-chart',
@@ -176,9 +187,18 @@ export const CLUSTER_ROUTES = {
 	Pipelines: {
 		icon: 'deployment-unit',
 		action: ALLOWED_ACTIONS.PIPELINES,
-		link: '/cluster/pipelines',
-		hasExactPath: true,
-		tag: 'Beta',
+		menu: [
+			{
+				label: 'View All Pipelines',
+				link: '/cluster/pipelines',
+				tag: 'Beta',
+			},
+			{
+				label: 'Global Variables',
+				link: '/cluster/global-vars',
+				tag: 'Beta',
+			}
+		]
 	},
 	Analytics: {
 		icon: 'line-chart',
