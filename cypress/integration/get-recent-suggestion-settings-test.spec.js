@@ -6,11 +6,17 @@ let indexName = 'airbeds-test-app';
 describe('Recent Suggestion Settings add test flow', () => {
 	before(() => {
 		cy.window().then((win) => {
+			win.localStorage.clear();
 			win.sessionStorage.clear();
 		});
 		// indexName = generateName();
 	});
-
+	beforeEach(() => {
+		cy.restoreLocalStorage();
+	});
+	afterEach(() => {
+		cy.saveLocalStorage();
+	});
 	it('Should open arc dashboard locally', () => {
 		cy.visit(`${base_url}`).wait(2000);
 	});
@@ -62,5 +68,9 @@ describe('Recent Suggestion Settings add test flow', () => {
 				}
 			});
 		});
+	});
+	it('Should logout user', () => {
+		cy.clearLocalStorage();
+		cy.logoutUser();
 	});
 });
