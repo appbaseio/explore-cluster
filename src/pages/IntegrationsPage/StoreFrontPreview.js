@@ -109,22 +109,6 @@ class StoreFrontPreview extends React.Component {
 			});
 		};
 		this.iframeRef.current.contentDocument.body.appendChild(script);
-
-		const script1 = this.iframeRef.current.contentDocument.createElement('script');
-		script1.type = 'text/javascript';
-		script1.src =
-			'https://maps.googleapis.com/maps/api/js?libraries=places&key=REDACTED_GOOGLE_API_KEY';
-		script1.onload = () => {
-			this.setState({
-				loading: false,
-			});
-		};
-		script1.onerror = () => {
-			this.setState({
-				loading: false,
-			});
-		};
-		this.iframeRef.current.contentDocument.body.appendChild(script1);
 	};
 
 	handleViewChange = () => {
