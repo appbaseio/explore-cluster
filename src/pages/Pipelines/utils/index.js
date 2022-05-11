@@ -11,12 +11,12 @@ export const pipelinesBannerDetails = {
 		href: 'https://docs.appbase.io/docs/pipelines/concepts/',
 	},
 	globalVars: {
-		title: 'Global Variables for Pipelines',
+		title: 'Global Envs for Pipelines',
 		description:
-			'Global variables are key/value pairs that can be re-used across multiple pipelines. They can be API keys, database connection configurations, or anything else that makes sense to define once.',
+			'Global environments are key/value pairs that can be re-used across multiple pipelines. They can be API keys, database connection configurations, or anything else that makes sense to define once.',
 		buttonText: 'Read More',
 		icon: 'info-circle',
-		href: 'https://docs.appbase.io/docs/pipelines/concepts/global-variables',
+		href: 'https://docs.appbase.io/docs/pipelines/concepts/global-envs',
 	},
 };
 

@@ -80,7 +80,7 @@ const Pipelines = (props) => {
 		});
 	};
 
-	if (compareVersion(appVersion, '7.58.0') === -1)
+	if (compareVersion(appVersion, '8.0.0') === -1)
 		return (
 			<React.Fragment>
 				<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
@@ -96,7 +96,7 @@ const Pipelines = (props) => {
 				>
 					<Alert
 						type="warning"
-						message="Upgrade appbase.io to v7.58.0 or above for using the pipeline features"
+						message="Upgrade appbase.io to v8.0.0 or above for using the ReactiveSearch pipelines feature"
 						showIcon
 						style={{ marginBottom: 10, height: 'max-content' }}
 					/>

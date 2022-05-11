@@ -18,7 +18,7 @@ const GlobalVarList = ({ formData, handleClose, credentials, globalVars }) => {
 
 	const hanldeDelete = () => {
 		const ACC_API = getURL();
-		fetch(`${ACC_API}/_pipelines/var/${formData.key}`, {
+		fetch(`${ACC_API}/_pipelines/env/${formData.key}`, {
 			method: 'DELETE',
 			headers: {
 				'Content-Type': 'application/json',
@@ -81,7 +81,7 @@ const GlobalVarList = ({ formData, handleClose, credentials, globalVars }) => {
 				</div>
 			</div>
 			<Modal
-				title={`Delete global variable ${formData.key}`}
+				title={`Delete global env ${formData.key}`}
 				visible={deleteModal}
 				onOk={() => hanldeDelete()}
 				onCancel={() => setDeleteModal(false)}
@@ -94,7 +94,7 @@ const GlobalVarList = ({ formData, handleClose, credentials, globalVars }) => {
 				<Alert
 					type="warning"
 					showIcon
-					message="Deleting a global variable may break existing pipelines from resolving."
+					message="Deleting a global env can prevent existing pipelines from resolving if the env is being used."
 				/>
 			</Modal>
 			<CreateModal

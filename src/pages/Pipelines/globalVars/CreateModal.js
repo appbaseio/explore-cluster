@@ -43,7 +43,7 @@ const CreateModal = ({
 
 	const getGlobalVar = () => {
 		const ACC_API = getURL();
-		fetch(`${ACC_API}/_pipelines/var/${pipelineKey}`, {
+		fetch(`${ACC_API}/_pipelines/env/${pipelineKey}`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
@@ -133,7 +133,7 @@ const CreateModal = ({
 			}
 
 			if (pipelineKey && mode === 'Update') {
-				fetch(`${ACC_API}/_pipeline/var/${pipelineKey}`, {
+				fetch(`${ACC_API}/_pipelines/env/${pipelineKey}`, {
 					method: 'PUT',
 					headers: {
 						'Content-Type': 'application/json',
@@ -154,7 +154,7 @@ const CreateModal = ({
 						console.error('Failed to update', error);
 					});
 			} else {
-				fetch(`${ACC_API}/_pipeline/var`, {
+				fetch(`${ACC_API}/_pipelines/env`, {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
@@ -344,7 +344,7 @@ const CreateModal = ({
 	return (
 		<div>
 			<Modal
-				title={`${mode} global variable`}
+				title={`${mode} global env`}
 				visible={open}
 				destroyOnClose
 				onOk={() => handleSave()}
@@ -352,7 +352,7 @@ const CreateModal = ({
 					handleModalClose();
 					setOpen(false);
 				}}
-				okText={`${mode} Global Var`}
+				okText={`${mode} Global Env`}
 				okButtonProps={{
 					disabled: !modalFormData.key || !modalFormData.label || !modalFormData.value,
 				}}

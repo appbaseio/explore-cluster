@@ -58,12 +58,12 @@ export const APP_ROUTES = {
 				tag: 'Beta',
 			},
 			{
-				label: 'Global Variables',
-				link: '/cluster/global-vars',
+				label: 'Global Envs',
+				link: '/cluster/global-envs',
 				hasExactPath: true,
 				tag: 'Beta',
-			}
-		]
+			},
+		],
 	},
 	Analytics: {
 		icon: 'line-chart',
@@ -194,11 +194,11 @@ export const CLUSTER_ROUTES = {
 				tag: 'Beta',
 			},
 			{
-				label: 'Global Variables',
-				link: '/cluster/global-vars',
+				label: 'Global Envs',
+				link: '/cluster/global-envs',
 				tag: 'Beta',
-			}
-		]
+			},
+		],
 	},
 	Analytics: {
 		icon: 'line-chart',

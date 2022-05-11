@@ -329,10 +329,10 @@ class ClusterRouteContainer extends React.Component {
 					/>
 					<Route
 						exact
-						path="/cluster/global-vars"
+						path="/cluster/global-envs"
 						render={(props) => (
 							<>
-								{get(allowedRoutes, '/cluster/global-vars') ? (
+								{get(allowedRoutes, '/cluster/global-envs') ? (
 									<AppPageContainer {...props} component={GlobalVarsPage} />
 								) : (
 									<UnauthorizedPage />

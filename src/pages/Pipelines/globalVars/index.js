@@ -30,7 +30,7 @@ const GlobalVarsPage = ({ tier, featurePipelines, credentials, appVersion }) => 
 
 	const getGlobalVars = () => {
 		const ACC_API = getURL();
-		fetch(`${ACC_API}/_pipelines/vars`, {
+		fetch(`${ACC_API}/_pipelines/envs`, {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ const GlobalVarsPage = ({ tier, featurePipelines, credentials, appVersion }) => 
 			});
 	};
 
-	if (compareVersion(appVersion, '7.58.0') === -1)
+	if (compareVersion(appVersion, '8.1.0') === -1)
 		return (
 			<React.Fragment>
 				<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
@@ -62,7 +62,7 @@ const GlobalVarsPage = ({ tier, featurePipelines, credentials, appVersion }) => 
 				>
 					<Alert
 						type="warning"
-						message="Upgrade appbase.io to v7.58.0 or above for using the pipeline features"
+						message="Upgrade appbase.io to v8.1.0 or above for using the ReactiveSearch pipelines env feature"
 						showIcon
 						style={{ marginBottom: 10, height: 'max-content' }}
 					/>
@@ -79,7 +79,7 @@ const GlobalVarsPage = ({ tier, featurePipelines, credentials, appVersion }) => 
 						maxWidth: '70%',
 					}}
 					src="https://imgur.com/EirsyK3.png"
-					alt="global_vars"
+					alt="global_envs"
 				/>
 			</React.Fragment>
 		);
@@ -100,7 +100,7 @@ const GlobalVarsPage = ({ tier, featurePipelines, credentials, appVersion }) => 
 					style={{ position: 'absolute', right: 10, top: 10 }}
 					onClick={() => setOpen(true)}
 				>
-					<Icon type="plus" /> Create New Var
+					<Icon type="plus" /> Create New Env
 				</Button>
 				{globalVars.map((data) => (
 					<GlobalVarList
