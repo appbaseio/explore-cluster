@@ -174,7 +174,11 @@ const PipelineEditorComponent = (props) => {
 					const clipboardData = event.clipboardData || window.clipboardData;
 					const pastedData = clipboardData.getData('Text');
 					try {
-						if (yamlToJson.load(pastedData) && !isJson(pastedData)) {
+						if (
+							yamlToJson.load(pastedData) &&
+							isJson(yamlToJson.load(pastedData)) &&
+							!isJson(pastedData)
+						) {
 							onChange(JSON.stringify(yamlToJson.load(pastedData), null, 4));
 							event.preventDefault();
 							event.stopPropagation();
@@ -212,6 +216,8 @@ const PipelineEditorComponent = (props) => {
 							},
 						],
 					});
+					// scroll to bottom of the page on mount to let user see full editor window
+					window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
 				})
 				.catch((err) => {
 					// eslint-disable-next-line no-console
