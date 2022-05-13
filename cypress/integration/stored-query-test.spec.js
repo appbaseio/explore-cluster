@@ -12,11 +12,17 @@ let editQueryValue =
 describe('Stored query create test flow', () => {
 	before(() => {
 		cy.window().then((win) => {
+			win.localStorage.clear();
 			win.sessionStorage.clear();
 		});
 		storedQueryId = generateName();
 	});
-
+	beforeEach(() => {
+		cy.restoreLocalStorage();
+	});
+	afterEach(() => {
+		cy.saveLocalStorage();
+	});
 	it('Should open arc dashboard locally', () => {
 		cy.visit(`${base_url}`).wait(2000);
 	});
@@ -95,10 +101,12 @@ describe('Stored query create test flow', () => {
 		cy.wait(2000);
 	});
 	it('Should logout user', () => {
+		cy.clearLocalStorage();
 		cy.logoutUser();
 	});
 
 	after(() => {
+		localStorage.clear();
 		storedQueryId = '';
 	});
 });

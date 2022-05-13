@@ -6,9 +6,16 @@ let indexName = '';
 describe('Copy field schema settings test flow', () => {
 	before(() => {
 		cy.window().then((win) => {
+			win.localStorage.clear();
 			win.sessionStorage.clear();
 		});
 		indexName = generateName();
+	});
+	beforeEach(() => {
+		cy.restoreLocalStorage();
+	});
+	afterEach(() => {
+		cy.saveLocalStorage();
 	});
 
 	it('Should open arc dashboard locally', () => {
@@ -115,10 +122,12 @@ describe('Copy field schema settings test flow', () => {
 	});
 
 	it('Should logout user', () => {
+		cy.clearLocalStorage();
 		cy.logoutUser();
 	});
 
 	after(() => {
+		localStorage.clear();
 		indexName = undefined;
 	});
 });

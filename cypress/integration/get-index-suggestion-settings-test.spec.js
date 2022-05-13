@@ -6,8 +6,15 @@ let indexName = 'airbeds-test-app';
 describe('Index Suggestion Settings add test flow', () => {
 	before(() => {
 		cy.window().then((win) => {
+			win.localStorage.clear();
 			win.sessionStorage.clear();
 		});
+	});
+	beforeEach(() => {
+		cy.restoreLocalStorage();
+	});
+	afterEach(() => {
+		cy.saveLocalStorage();
 	});
 
 	it('Should open arc dashboard locally', () => {
@@ -99,5 +106,9 @@ describe('Index Suggestion Settings add test flow', () => {
 				'[data-cy=url-index-setting] > div > div.ant-select-selection-selected-value',
 			).should('have.text', indexSuggestions.urlField);
 		});
+	});
+	it('Should logout user', () => {
+		cy.clearLocalStorage();
+		cy.logoutUser();
 	});
 });

@@ -6,9 +6,16 @@ let indexName = '';
 describe('Test relevancy use local settings test flow', () => {
 	before(() => {
 		cy.window().then((win) => {
+			win.localStorage.clear();
 			win.sessionStorage.clear();
 		});
 		indexName = generateName();
+	});
+	beforeEach(() => {
+		cy.restoreLocalStorage();
+	});
+	afterEach(() => {
+		cy.saveLocalStorage();
 	});
 
 	it('Should open arc dashboard locally', () => {
@@ -119,10 +126,12 @@ describe('Test relevancy use local settings test flow', () => {
 	});
 
 	it('Should logout user', () => {
+		cy.clearLocalStorage();
 		cy.logoutUser();
 	});
 
 	after(() => {
+		localStorage.clear();
 		indexName = undefined;
 	});
 });

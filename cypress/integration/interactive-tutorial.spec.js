@@ -6,9 +6,16 @@ let appName = '';
 describe('Interactive Tutorial', () => {
 	before(() => {
 		cy.window().then((win) => {
+			win.localStorage.clear();
 			win.sessionStorage.clear();
 		});
 		appName = generateName();
+	});
+	beforeEach(() => {
+		cy.restoreLocalStorage();
+	});
+	afterEach(() => {
+		cy.saveLocalStorage();
 	});
 	it('Should skip tutorial section and route to dashboard', () => {
 		cy.visit(TEST_URL, { timeout: 100000 })
@@ -84,10 +91,12 @@ describe('Interactive Tutorial', () => {
 	});
 
 	it('Should logout user', () => {
+		cy.clearLocalStorage();
 		cy.logoutUser();
 	});
 
 	after(() => {
+		localStorage.clear();
 		TEST_URL = undefined;
 		appName = undefined;
 	});

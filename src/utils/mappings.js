@@ -221,7 +221,9 @@ const _updateNestedMapping = ({
 				properties, // useful when switching between nested and object
 			};
 		}
-
+		if (type === 'geo_point') {
+			delete data.properties;
+		}
 		return {
 			...mapping,
 			[`${fields[currentIndex]}`]: data,

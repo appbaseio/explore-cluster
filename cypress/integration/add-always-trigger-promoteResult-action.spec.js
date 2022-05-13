@@ -2,13 +2,20 @@ import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
 
 describe('Query Rule creation with trigger index and script action', () => {
-    before(() => {
+	before(() => {
 		cy.window().then((win) => {
+			win.localStorage.clear();
 			win.sessionStorage.clear();
 		});
 	});
+	beforeEach(() => {
+		cy.restoreLocalStorage();
+	});
+	afterEach(() => {
+		cy.saveLocalStorage();
+	});
 
-    it('Should open arc dashboard locally', () => {
+	it('Should open arc dashboard locally', () => {
 		cy.visit(`${base_url}`).wait(2000);
 	});
 
@@ -17,7 +24,7 @@ describe('Query Rule creation with trigger index and script action', () => {
 		cy.wait(3000);
 	});
 
-    it('Should open query rules page', () => {
+	it('Should open query rules page', () => {
 		cy.visit(`${base_url}/cluster/rules`).wait(2000);
 	});
 
@@ -28,11 +35,11 @@ describe('Query Rule creation with trigger index and script action', () => {
 		cy.get('[name="name"]').type('cypress-testing-rule-name');
 		cy.get('[name="description"]').type('cypress-testing-rule-description');
 
-        // Select index
-        cy.get('[data-cy=index-dropdown]').click();
-        cy.get('[data-cy=best-buy-dataset]').click({ force: true, multiple: true });
+		// Select index
+		cy.get('[data-cy=index-dropdown]').click();
+		cy.get('[data-cy=best-buy-dataset]').click({ force: true, multiple: true });
 
-        // Select always trigger type
+		// Select always trigger type
 		cy.get('[data-cy=trigger-type-always]').click();
 
 		// Select Add filter action
@@ -42,18 +49,18 @@ describe('Query Rule creation with trigger index and script action', () => {
 		cy.get('.input-group > div > .ant-input').type('sa');
 		cy.get('#GlobalSearch-downshift-item-0').click();
 
-        // Save query rule
+		// Save query rule
 		const credentials = btoa(`${username}:${password}`);
 		cy.server();
 		cy.route({
-			method: "POST",
+			method: 'POST',
 			url: `${app_url}_rule`,
-		}).as("save");
+		}).as('save');
 
 		cy.get('[data-cy=save-query-rule]').click();
-		cy.wait("@save", {timeout: 15000});
+		cy.wait('@save', { timeout: 15000 });
 
-		cy.get("@save").then(xhr => {
+		cy.get('@save').then((xhr) => {
 			const ruleId = xhr?.response?.body?.id || null;
 			cy.request({
 				method: 'DELETE',
@@ -64,5 +71,9 @@ describe('Query Rule creation with trigger index and script action', () => {
 			}).wait(2000);
 			cy.visit(`${base_url}/cluster/rules`);
 		});
+	});
+	it('Should logout user', () => {
+		cy.clearLocalStorage();
+		cy.logoutUser();
 	});
 });

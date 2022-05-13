@@ -9,7 +9,7 @@ import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster
 import Loader from '../../components/Loader';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import DNDWrapper from '../../components/DNDWrapper';
-import { bannerDetails } from './utils';
+import { pipelinesBannerDetails } from './utils';
 import {
 	getPipelines,
 	getPipelinesUsageStats,
@@ -39,6 +39,7 @@ const Pipelines = (props) => {
 		fetchUsageStats,
 		history,
 	} = props;
+	const bannerDetails = pipelinesBannerDetails.allPipelines;
 
 	useLayoutEffect(() => {
 		if (isValidPlan(tier, featurePipelines)) {
@@ -79,7 +80,7 @@ const Pipelines = (props) => {
 		});
 	};
 
-	if (compareVersion(appVersion, '7.58.0') === -1)
+	if (compareVersion(appVersion, '8.0.0') === -1)
 		return (
 			<React.Fragment>
 				<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
@@ -95,7 +96,7 @@ const Pipelines = (props) => {
 				>
 					<Alert
 						type="warning"
-						message="Upgrade appbase.io to v7.58.0 or above for using the pipeline features"
+						message="Upgrade appbase.io to v8.0.0 or above for using the ReactiveSearch pipelines feature"
 						showIcon
 						style={{ marginBottom: 10, height: 'max-content' }}
 					/>
@@ -112,7 +113,7 @@ const Pipelines = (props) => {
 						maxWidth: '70%',
 					}}
 					src="https://i.imgur.com/J4Hjdsl.png"
-					alt="Pipelines"
+					alt="ReactiveSearch Pipelines"
 				/>
 			</React.Fragment>
 		);
@@ -132,12 +133,13 @@ const Pipelines = (props) => {
 				>
 					<Row type="flex" justify="space-between" align="middle" gutter={16}>
 						<Col lg={18}>
-							<h2>Pipelines</h2>
+							<h2>ReactiveSearch Pipelines</h2>
 							<Row>
 								<Col lg={18}>
 									<p>
-										Pipelines let you create pre and post-processing stages for
-										searching and indexing data.
+										Pipelines are a set of declarative stages that allow
+										creating pre-processing or post-processing flows for
+										searching or indexing data.
 									</p>
 								</Col>
 							</Row>

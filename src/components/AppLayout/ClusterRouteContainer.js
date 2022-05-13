@@ -54,6 +54,12 @@ const PipelinesForm = Loadable({
 	loading: Loader,
 });
 
+const GlobalVarsPage = Loadable({
+	loader: () =>
+		import(/* webpackChunkName: "GlobalVarsPage" */ '../../pages/Pipelines/globalVars/index'),
+	loading: Loader,
+});
+
 const BillingPage = Loadable({
 	loader: () => import(/* webpackChunkName: "BillingPage" */ '../../pages/BillingPage'),
 	loading: Loader,
@@ -315,6 +321,19 @@ class ClusterRouteContainer extends React.Component {
 							<>
 								{get(allowedRoutes, '/cluster/pipelines') ? (
 									<AppPageContainer {...props} component={PipelinesPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
+						)}
+					/>
+					<Route
+						exact
+						path="/cluster/global-envs"
+						render={(props) => (
+							<>
+								{get(allowedRoutes, '/cluster/global-envs') ? (
+									<AppPageContainer {...props} component={GlobalVarsPage} />
 								) : (
 									<UnauthorizedPage />
 								)}
