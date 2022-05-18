@@ -370,15 +370,16 @@ export const updateSubFields = ({
 	const mappingFields = Object.keys(get(mappings, TOP_FIELD, {}));
 
 	const updatedMappings = mappingFields.reduce((agg, field) => {
-		const type = get(mappings, `properties.${field}.type`);
-		if (get(mappings, `properties.${field}.properties`, null) && type !== 'nested') {
+		const { type } = mappings.properties[field];
+
+		if ((mappings.properties[field].properties || null) && type !== 'nested') {
 			return {
 				...agg,
 
 				properties: {
 					...agg.properties,
 					[field]: updateSubFields({
-						mappings: get(mappings, `properties.${field}`, {}),
+						mappings: mappings.properties[field] || {},
 						enableSynonyms,
 						enableNgram,
 						enableAutoSuggestion,
@@ -402,7 +403,6 @@ export const updateSubFields = ({
 			...get(mappings, `properties.${field}`, {}),
 			...(Object.keys(fields).length ? { fields } : {}),
 		};
-
 		if (type.trim()) {
 			fieldData.type = type;
 		}
