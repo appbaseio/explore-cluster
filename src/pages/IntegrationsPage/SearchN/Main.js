@@ -14,7 +14,6 @@ import ChoosePlatformTab from '../tabs/ChoosePlatform';
 import { container } from '../../ResultsPage/styles';
 import Loader from '../../../components/Loader';
 import PreviewModal from '../PreviewModal';
-import ExportModal from '../ExportModal';
 import SyncStatus from '../SyncStatus';
 import PreferencesFormWrapper from '../PreferencesFormWrapperN';
 import SavePreferences from '../SavePreferencesN';
@@ -118,17 +117,9 @@ const Main = ({ tier, featureEcommerce, ...props }) => {
 														}}
 														size="large"
 													>
-														Edit Code Inline
+														Edit Code
 													</Button>
 												)}
-											/>
-											<ExportModal
-												preferences={getPreferences}
-												buttonProps={{
-													style: {
-														marginLeft: 10,
-													},
-												}}
 											/>
 										</div>
 										<div>
