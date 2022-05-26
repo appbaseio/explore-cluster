@@ -61,10 +61,10 @@ const CustomMessages = () => {
 								name="searchText"
 								render={({ handler }) => (
 									<div>
-										<strong>Search Text</strong>
+										<strong>Search Placeholder</strong>
 										<Input
 											name="searchText"
-											placeholder="Enter Search Text Button"
+											placeholder="Enter Search Placeholder"
 											css={{ marginTop: 5 }}
 											{...handler()}
 										/>
@@ -156,7 +156,7 @@ const CustomMessages = () => {
 									) : (
 										<Icon type="eye" />
 									)}
-									View Product
+									{form.get('customMessages').value.redirectUrlText}
 								</Button>
 							</Card>
 						</div>

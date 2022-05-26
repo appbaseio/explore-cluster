@@ -25,7 +25,14 @@ const SearchSettings = () => {
 	return (
 		<Tabs defaultActiveKey="1" tabPosition="left" className={verticalTab}>
 			<TabPane tab="Search" key="1">
-				<FieldGroup control={form} render={() => <Search />} />
+				<FieldGroup
+					control={form}
+					render={() => (
+						<Search
+							pipeline={form.get('pipeline') ? form.get('pipeline').value : undefined}
+						/>
+					)}
+				/>
 			</TabPane>
 			<TabPane tab="Filters" key="2">
 				<FieldGroup control={form} render={() => <Filters />} />

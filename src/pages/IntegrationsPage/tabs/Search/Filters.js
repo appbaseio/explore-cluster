@@ -124,10 +124,11 @@ const Filters = () => {
 												<Item
 													actions={[
 														<FieldControl strict={false} name="enabled">
-															{({ value, onChange }) => (
+															{(
+																control, //eslint-disable-line
+															) => (
 																<Switch
-																	checked={value}
-																	onChange={onChange}
+																	{...control.handler('checkbox')}
 																/>
 															)}
 														</FieldControl>,
@@ -137,6 +138,7 @@ const Filters = () => {
 																	? form.get('pipeline').value
 																	: undefined
 															}
+															control={control.get('customize')}
 														/>,
 														<Button
 															onClick={() => {

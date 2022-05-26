@@ -44,7 +44,9 @@ class CustomizeFilter extends React.Component {
 	};
 
 	handleOk = () => {
-		const { onSave, control } = this.props;
+		const { onSave, control, tempControl } = this.props;
+		if (tempControl && tempControl.get('enabled')) tempControl.get('enabled').setValue(true);
+
 		if (onSave) {
 			onSave(control);
 		}
@@ -465,6 +467,7 @@ CustomizeFilter.defaultProps = {
 	buttonLabel: 'Customize',
 	disableListOptions: false,
 	control: null,
+	tempControl: null,
 	onSave: null,
 	onCancel: null,
 	buttonProps: null,
@@ -478,6 +481,7 @@ CustomizeFilter.propTypes = {
 	disableListOptions: bool,
 	buttonProps: object,
 	control: object,
+	tempControl: object,
 	onSave: func,
 	onCancel: func,
 	disableFilterType: bool,

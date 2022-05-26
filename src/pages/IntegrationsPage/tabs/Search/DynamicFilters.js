@@ -34,6 +34,7 @@ const DynamicFilters = () => {
 			pipeline={form.get('pipeline') ? form.get('pipeline').value : undefined}
 			onSave={addControl}
 			onCancel={handleCancel}
+			tempControl={tempControl}
 		/>
 	);
 };
