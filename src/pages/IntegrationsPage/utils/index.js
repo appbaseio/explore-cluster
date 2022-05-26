@@ -63,3 +63,11 @@ export const getAuthToken = () => {
 	}
 	return token;
 };
+
+export const updateConstantsWithPreferences = (preferences) => {
+	return `
+const appbasePrefs = ${JSON.stringify(JSON.stringify(preferences))};
+
+export default appbasePrefs;
+	`;
+};

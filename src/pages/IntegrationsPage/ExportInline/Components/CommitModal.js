@@ -4,7 +4,15 @@ import { Alert, Icon, Input, Modal } from 'antd';
 import { commitModalStyles } from './styles';
 import '../styles.css';
 
-const CommitModal = ({ open, handleOk, handleCancel, errMsg, setErrMsg, isLoading }) => {
+const CommitModal = ({
+	open,
+	handleOk,
+	handleCancel,
+	errMsg,
+	setErrMsg,
+	isLoading,
+	uiBuilderName,
+}) => {
 	const [value, setValue] = useState('');
 
 	useEffect(() => {
@@ -18,7 +26,7 @@ const CommitModal = ({ open, handleOk, handleCancel, errMsg, setErrMsg, isLoadin
 
 	return (
 		<Modal
-			title={<div style={{ fontWeight: 'bold' }}>Commit code for ui_builder</div>}
+			title={<div style={{ fontWeight: 'bold' }}>Commit code for {uiBuilderName}</div>}
 			visible={open}
 			onOk={() => {
 				handleOk(value);
@@ -61,6 +69,7 @@ CommitModal.propTypes = {
 	handleOk: PropTypes.func.isRequired,
 	handleCancel: PropTypes.func.isRequired,
 	isLoading: PropTypes.bool,
+	uiBuilderName: PropTypes.string,
 };
 
 CommitModal.defaultProps = {
@@ -68,6 +77,7 @@ CommitModal.defaultProps = {
 	errMsg: '',
 	setErrMsg: () => {},
 	isLoading: false,
+	uiBuilderName: '',
 };
 
 export default CommitModal;

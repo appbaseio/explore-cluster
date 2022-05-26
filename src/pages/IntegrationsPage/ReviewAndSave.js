@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, Alert } from 'antd';
+import { Button, Modal } from 'antd';
 import styled from 'react-emotion';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
@@ -10,6 +10,8 @@ import {
 	saveSearchPreferenceN,
 	saveRecommendationPreferenceN,
 } from '../../batteries/modules/actions';
+import { getByVersionId, commitCode } from './utils/sandpack-generator';
+import { updateConstantsWithPreferences } from './utils/index';
 
 const Badge = styled.span`
 	background: #f5222d;
@@ -35,6 +37,7 @@ const staticFacetsFields = [
 ];
 
 const ReviewAndSave = ({
+	form,
 	oldData,
 	newData,
 	isRecommLoading,
@@ -44,10 +47,10 @@ const ReviewAndSave = ({
 	updateSearchPreferences,
 	updateRecommendationsPreferences,
 	getPreferencesPayload,
+	getPreferences,
 	setHasChanged,
-	hasEdited,
-	form,
 	isRecommendation,
+	preferenceId,
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isResetting, setIsResetting] = useState(false);
@@ -86,18 +89,48 @@ const ReviewAndSave = ({
 				}
 			});
 		} else {
-			if (
-				form.get('csbID') &&
-				form.get('csbID').value &&
-				(diffData?.facetSettings ||
-					diffData?.themeSettings ||
-					diffData?.resultSettings ||
-					diffData?.searchSettings ||
-					diffData?.pipeline)
-			) {
-				form.get('csbID').setValue('');
-				form.get('hasEdited').setValue(false);
-			}
+			// Update preferences in sandpack
+			handleCommitCode('system commit: auto save UI builder panel preferences');
+		}
+	};
+
+	const replaceWithPreferences = (code) => {
+		const newCode = { ...code };
+		newCode['/src/utils/constants.js'] = updateConstantsWithPreferences(getPreferences());
+		return newCode;
+	};
+
+	const handleCommitCode = (commitMessage) => {
+		if (form.get('versionId').value) {
+			// fetch by versionID and update constants file with new preferences
+			getByVersionId(preferenceId, form.get('versionId').value)
+				.then((resp) => {
+					const body = {
+						metadata: {
+							commit: commitMessage,
+						},
+						content: replaceWithPreferences(resp.content),
+					};
+					commitCode(preferenceId, body)
+						.then((res) => {
+							// update versionId in preferences with res.version_id
+							form.get('versionId').setValue(res.version_id);
+							// Save the new preferences
+							updateSearchPreferences(getPreferencesPayload()).then((action) => {
+								if (!(action && action.error)) {
+									setHasChanged();
+								}
+							});
+						})
+						.catch((err) => {
+							console.error(err);
+						});
+				})
+				.catch((err) => {
+					console.error(err);
+					return {};
+				});
+		} else {
 			updateSearchPreferences(getPreferencesPayload()).then((action) => {
 				if (!(action && action.error)) {
 					setHasChanged();
@@ -143,24 +176,6 @@ const ReviewAndSave = ({
 				generalSettings: {
 					...diffData.generalSettings,
 					description: [oldVal, newVal],
-				},
-			};
-		}
-
-		if (
-			form.get('csbID') &&
-			form.get('csbID').value &&
-			(diffData?.facetSettings ||
-				diffData?.themeSettings ||
-				diffData?.resultSettings ||
-				diffData?.searchSettings ||
-				diffData?.pipeline)
-		) {
-			diffData = {
-				...diffData,
-				codeSettings: {
-					...diffData.codeSettings,
-					csbID: [form.get('csbID').value, ''],
 				},
 			};
 		}
@@ -533,19 +548,7 @@ const ReviewAndSave = ({
 					'data-cy': 'review-save-button',
 				}}
 			>
-				<>
-					{hasEdited && (
-						<Alert
-							type="warning"
-							showIcon
-							message="Your previously saved codesandbox changes will be overwritten once you save new changes for this search UI"
-							style={{
-								marginBottom: 10,
-							}}
-						/>
-					)}
-					{isOpen && <DiffList diff={diffData} />}
-				</>
+				{isOpen && <DiffList diff={diffData} />}
 			</Modal>
 		</div>
 	);
@@ -554,7 +557,6 @@ const ReviewAndSave = ({
 ReviewAndSave.defaultProps = {
 	buttonProps: null,
 	preferenceId: null,
-	hasEdited: false,
 	isRecommLoading: false,
 	isSearchLoading: false,
 	isRecommendation: false,
@@ -565,17 +567,17 @@ ReviewAndSave.propTypes = {
 	isSearchLoading: bool,
 	isRecommLoading: bool,
 	label: string,
-	hasEdited: bool,
 	buttonProps: object,
 	preferenceId: string,
 	oldData: object.isRequired,
 	newData: object.isRequired,
 	setHasChanged: func.isRequired,
 	getPreferencesPayload: func.isRequired,
+	getPreferences: func.isRequired,
 	updateSearchPreferences: func.isRequired,
 	updateRecommendationsPreferences: func.isRequired,
-	form: object.isRequired,
 	isRecommendation: bool,
+	form: object.isRequired,
 };
 
 const mapStateToProps = (state) => ({

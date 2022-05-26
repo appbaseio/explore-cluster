@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { withRouter } from 'react-router-dom';
-import { object } from 'prop-types';
+import { connect } from 'react-redux';
+import { object, func } from 'prop-types';
 import { get } from 'lodash';
 import { css } from 'react-emotion';
 import { SandpackProvider } from '@codesandbox/sandpack-react';
@@ -12,8 +13,10 @@ import {
 	generateInlineSandboxURL,
 	tabSettings,
 	getLatestVersion,
+	getByVersionId,
 	replaceWithPreferences,
 } from '../utils/sandpack-generator';
+import { saveSearchPreferenceN, getSearchPreferencesN } from '../../../batteries/modules/actions';
 
 const modalStyles = css`
 	padding-bottom: 0 !important;
@@ -42,7 +45,15 @@ const modalStyles = css`
 
 export const SandpackCodeContext = React.createContext();
 
-const ExportInline = ({ preferences, history, match }) => {
+const ExportInline = ({
+	preferences,
+	history,
+	match,
+	control,
+	updateSearchPreferences,
+	getPreferencesPayload,
+	getSearchPreferences,
+}) => {
 	const preferenceId = match.params.id;
 	const [sandpackCode, setSandpackCode] = useState({});
 	const [searchIndex, setSearchIndex] = useState({});
@@ -52,7 +63,8 @@ const ExportInline = ({ preferences, history, match }) => {
 	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
-		fetchLatestVersion();
+		if (control?.get('versionId')?.value) fetchByVersionId(control.get('versionId').value);
+		else fetchLatestVersion();
 	}, [preferences]);
 
 	const getSandPackCode = async () => {
@@ -123,6 +135,25 @@ const ExportInline = ({ preferences, history, match }) => {
 			.catch((err) => {
 				console.error('Error to fetch latest version', err);
 				getSandPackCode();
+			});
+	};
+
+	const fetchByVersionId = (versionId) => {
+		getByVersionId(preferenceId, versionId)
+			.then((res) => {
+				setCurrentVersion({
+					version_id: res.version_id,
+					updated_at: res.updated_at || res.created_at,
+					commit: res?.metadata?.commit || '',
+				});
+				updateSandpackCode(res.content);
+				setUpdatedCode(res.content);
+				setInitialCode(res.content);
+				setIsLoading(false);
+			})
+			.catch((err) => {
+				console.error(err);
+				// setErrMsg(err);
 			});
 	};
 
@@ -226,6 +257,19 @@ const ExportInline = ({ preferences, history, match }) => {
 		updateSearchIndex(newSearchIndex);
 	};
 
+	const handleSave = () => {
+		if (control.get('versionId').value !== currentVersion.version_id) {
+			control.get('versionId').setValue(currentVersion.version_id);
+			updateSearchPreferences(getPreferencesPayload()).then((action) => {
+				if (!(action && action.error)) {
+					// fetch preferences
+					getSearchPreferences();
+					console.log('Stored version id');
+				}
+			});
+		}
+	};
+
 	const theme = get(preferences, 'themeSettings.type', 'classic');
 	const uiBuilderName = get(preferences, 'name', '');
 
@@ -237,10 +281,13 @@ const ExportInline = ({ preferences, history, match }) => {
 				updateSandpackCode={updateSandpackCode}
 				uiBuilderName={uiBuilderName}
 				updatedCode={updatedCode}
+				setUpdatedCode={setUpdatedCode}
 				currentVersion={currentVersion}
 				setCurrentVersion={setCurrentVersion}
 				setInitialCode={setInitialCode}
 				initialCode={initialCode}
+				handleSave={handleSave}
+				fetchByVersionId={fetchByVersionId}
 			/>
 			<div className={modalStyles}>
 				<SandpackProvider
@@ -284,6 +331,16 @@ ExportInline.propTypes = {
 	history: object.isRequired,
 	match: object.isRequired,
 	preferences: object.isRequired,
+	control: object.isRequired,
+	getPreferencesPayload: func.isRequired,
+	updateSearchPreferences: func.isRequired,
+	getSearchPreferences: func.isRequired,
 };
 
-export default withRouter(ExportInline);
+const mapDispatchToProps = (dispatch, props) => ({
+	getSearchPreferences: () => dispatch(getSearchPreferencesN()),
+	updateSearchPreferences: (payload) =>
+		dispatch(saveSearchPreferenceN(props.preferenceId, payload)),
+});
+
+export default connect(null, mapDispatchToProps)(withRouter(ExportInline));

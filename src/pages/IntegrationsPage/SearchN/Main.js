@@ -127,6 +127,7 @@ const Main = ({ tier, featureEcommerce, ...props }) => {
 												form={form}
 												closeForm={closeForm}
 												preferenceId={preferenceId}
+												getPreferences={getPreferences}
 												getPreferencesPayload={getPreferencesPayload}
 											/>
 										</div>

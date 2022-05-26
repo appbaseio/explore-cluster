@@ -28,10 +28,13 @@ const ModalHeader = ({
 	match,
 	updateSandpackCode,
 	updatedCode,
+	setUpdatedCode,
 	currentVersion,
 	setCurrentVersion,
 	setInitialCode,
 	initialCode,
+	uiBuilderName,
+	handleSave,
 }) => {
 	const [modalType, setModalType] = useState('');
 	const [visible, setVisible] = useState(false);
@@ -65,6 +68,7 @@ const ModalHeader = ({
 					commit: res?.metadata?.commit || '',
 				});
 				updateSandpackCode(res.content);
+				setUpdatedCode(res.content);
 				setInitialCode(res.content);
 			})
 			.catch((err) => {
@@ -108,6 +112,34 @@ const ModalHeader = ({
 			<div className="header-container">
 				<div className="header-title-container">
 					<div className="header-font">Code Editor</div>
+					{currentVersion.version_id && currentVersion.commit ? (
+						<div className="header-title-container">
+							<Tooltip title={currentVersion.commit}>
+								<p
+									style={{ maxWidth: 200 }}
+									className="overflow-container commit-font"
+								>
+									{currentVersion.commit}
+								</p>
+							</Tooltip>
+
+							<img
+								src="/static/images/commit.png"
+								alt="commit-icon"
+								width={20}
+								style={{ margin: '0px 5px 0px 5px' }}
+							/>
+							<Tooltip title={currentVersion.version_id}>
+								<p
+									style={{ maxWidth: 150 }}
+									className="overflow-container  versionid-font"
+								>
+									{currentVersion.version_id}
+								</p>
+							</Tooltip>
+						</div>
+					) : null}
+
 					<div className="right-partition">
 						<Button
 							disabled={JSON.stringify(initialCode) === JSON.stringify(updatedCode)}
@@ -135,6 +167,7 @@ const ModalHeader = ({
 							type="close"
 							onClick={() => {
 								history.push(`/cluster/search-builder/${preferenceId}`);
+								handleSave();
 							}}
 						/>
 					</div>
@@ -153,6 +186,7 @@ const ModalHeader = ({
 					handleCommitCode(commitMessage);
 				}}
 				handleCancel={handleCancel}
+				uiBuilderName={uiBuilderName}
 			/>
 			<PastVersionsDrawer
 				visible={visible}
@@ -170,10 +204,13 @@ ModalHeader.propTypes = {
 	match: PropTypes.object.isRequired,
 	updateSandpackCode: PropTypes.func,
 	updatedCode: PropTypes.object,
+	setUpdatedCode: PropTypes.func,
 	initialCode: PropTypes.object,
 	currentVersion: PropTypes.object,
 	setCurrentVersion: PropTypes.func,
 	setInitialCode: PropTypes.func,
+	uiBuilderName: PropTypes.string,
+	handleSave: PropTypes.func,
 };
 
 ModalHeader.defaultProps = {
@@ -183,6 +220,9 @@ ModalHeader.defaultProps = {
 	currentVersion: {},
 	setCurrentVersion: () => {},
 	setInitialCode: () => {},
+	setUpdatedCode: () => {},
+	handleSave: () => {},
+	uiBuilderName: '',
 };
 
 export default withRouter(ModalHeader);

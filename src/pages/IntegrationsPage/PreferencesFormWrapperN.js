@@ -63,6 +63,19 @@ const modalStyles = css`
 		margin: 5px 50px 0px 0px;
 		cursor: pointer;
 	}
+	.commit-font {
+		font-size: 14px;
+	}
+	.versionid-font {
+		font-size: 12px;
+	}
+	.overflow-container {
+		max-width: 150px;
+		margin: 0;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
+	}
 `;
 class PreferencesFormWrapperN extends React.Component {
 	constructor(props) {
@@ -109,8 +122,7 @@ class PreferencesFormWrapperN extends React.Component {
 				  }
 				: {
 						// Search specific controls
-						csbID: '',
-						hasEdited: false,
+						versionId: '',
 						autoSuggestionSettings: FormBuilder.group({
 							enablePopularSuggestions: false,
 							enableRecentSearches: false,
@@ -371,14 +383,9 @@ class PreferencesFormWrapperN extends React.Component {
 										}),
 								  }
 								: {
-										csbID: get(
+										versionId: get(
 											preferences,
-											'globalSettings.meta.deploySettings.csbID',
-											'',
-										),
-										hasEdited: get(
-											preferences,
-											'globalSettings.meta.deploySettings.hasEdited',
+											'globalSettings.meta.deploySettings.versionId',
 											'',
 										),
 										autosuggest: get(
