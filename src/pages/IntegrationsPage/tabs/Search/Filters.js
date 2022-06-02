@@ -54,7 +54,7 @@ const Filters = () => {
 							bordered
 							renderItem={(item) => (
 								<FieldGroup name={item.id}>
-									{() => (
+									{(control) => (
 										<Item
 											actions={[
 												<FieldControl name="enabled">
@@ -74,6 +74,7 @@ const Filters = () => {
 															: undefined
 													}
 													disableFilterType={item.disableFilterType}
+													control={control.get('customize')}
 												/>,
 											]}
 										>
@@ -124,11 +125,16 @@ const Filters = () => {
 												<Item
 													actions={[
 														<FieldControl strict={false} name="enabled">
-															{(
-																control, //eslint-disable-line
-															) => (
+															{() => (
 																<Switch
-																	{...control.handler('checkbox')}
+																	checked={
+																		control.get('enabled').value
+																	}
+																	onChange={(val) => {
+																		control
+																			.get('enabled')
+																			.setValue(val);
+																	}}
 																/>
 															)}
 														</FieldControl>,

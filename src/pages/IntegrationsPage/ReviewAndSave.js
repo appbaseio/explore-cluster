@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal } from 'antd';
+import { Button, Icon, Modal } from 'antd';
 import styled from 'react-emotion';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
@@ -54,6 +54,7 @@ const ReviewAndSave = ({
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isResetting, setIsResetting] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 
 	useEffect(() => {
 		if (oldData && oldData.resultSettings && !oldData.resultSettings.resultHighlight) {
@@ -82,10 +83,12 @@ const ReviewAndSave = ({
 	};
 
 	const handleSave = () => {
+		setIsLoading(true);
 		if (isRecommendation) {
 			updateRecommendationsPreferences(getPreferencesPayload()).then((action) => {
 				if (!(action && action.error)) {
 					setHasChanged();
+					setIsLoading(false);
 				}
 			});
 		} else {
@@ -119,6 +122,7 @@ const ReviewAndSave = ({
 							updateSearchPreferences(getPreferencesPayload()).then((action) => {
 								if (!(action && action.error)) {
 									setHasChanged();
+									setIsLoading(false);
 								}
 							});
 						})
@@ -382,8 +386,10 @@ const ReviewAndSave = ({
 			const resultSettings = get(diffData, 'resultSettings.fields', {});
 			Object.keys(resultSettings).forEach((i) => {
 				let field = resultSettings[i];
-				if (field[0] && !field[1]) {
-					field = [field[0], ''];
+				if (field.length === 1 && field[0]) {
+					field = ['', field[0]];
+				} else if (field[0] && !field[1]) {
+					field = [field[1], ''];
 				} else if (!field[0] && field[1]) {
 					field = ['', field[1]];
 				} else if (!field[0] && !field[1] && field.length === 3 && field[2]) {
@@ -541,7 +547,12 @@ const ReviewAndSave = ({
 					top: 20,
 				}}
 				destroyOnClose
-				okText={label}
+				okText={
+					<>
+						<Icon type={isLoading ? 'loading' : ''} />
+						{label}
+					</>
+				}
 				onCancel={handleCancel}
 				cancelButtonProps={{ 'data-cy': 'cancel-modal-button' }}
 				okButtonProps={{

@@ -44,15 +44,16 @@ class CustomizeFilter extends React.Component {
 	};
 
 	handleOk = () => {
+		this.setState({
+			visible: false,
+		});
+
 		const { onSave, control, tempControl } = this.props;
 		if (tempControl && tempControl.get('enabled')) tempControl.get('enabled').setValue(true);
 
 		if (onSave) {
 			onSave(control);
 		}
-		this.setState({
-			visible: false,
-		});
 	};
 
 	handleCancel = () => {
@@ -123,23 +124,17 @@ class CustomizeFilter extends React.Component {
 								visible={visible}
 								onOk={this.handleOk}
 								onCancel={this.handleCancel}
+								okButtonProps={{
+									disabled: invalid || pristine,
+								}}
 								destroyOnClose
-								footer={[
-									<Button key="back" onClick={this.handleCancel}>
-										Cancel
-									</Button>,
-									<Button
-										disabled={invalid || pristine}
-										key="submit"
-										type="primary"
-										onClick={this.handleOk}
-									>
-										Save
-									</Button>,
-								]}
+								okText="Save"
 							>
 								<Form colon={false}>
-									<FieldControl name="dataField">
+									<FieldControl
+										name="dataField"
+										control={control.get('dataField')}
+									>
 										{(formControl) =>
 											formControl.disabled ? null : (
 												<Form.Item label="DataField">
@@ -169,7 +164,11 @@ class CustomizeFilter extends React.Component {
 									</FieldControl>
 									{!disableFilterType && (
 										<div>
-											<FieldControl name="filterType" strict={false}>
+											<FieldControl
+												name="filterType"
+												strict={false}
+												control={control.get('filterType')}
+											>
 												{(formControl) => {
 													return (
 														<Item
@@ -246,6 +245,7 @@ class CustomizeFilter extends React.Component {
 										inputProps={{
 											placeholder: 'Enter title',
 										}}
+										control={control.get('title')}
 									/>
 
 									{!disableListOptions && value?.filterType === 'list' && (
@@ -257,8 +257,13 @@ class CustomizeFilter extends React.Component {
 													placeholder: 'Enter size',
 													type: 'number',
 												}}
+												control={control.get('size')}
 											/>
-											<FieldControl strict={false} name="queryFormat">
+											<FieldControl
+												strict={false}
+												name="queryFormat"
+												control={control.get('queryFormat')}
+											>
 												{({ handler }) => (
 													<Form.Item label="Query Format">
 														<Select {...handler()}>
@@ -272,7 +277,10 @@ class CustomizeFilter extends React.Component {
 													</Form.Item>
 												)}
 											</FieldControl>
-											<FieldControl name="sortBy">
+											<FieldControl
+												name="sortBy"
+												control={control.get('sortBy')}
+											>
 												{({ handler }) => (
 													<Form.Item label="Sort By">
 														<Select {...handler()}>
@@ -289,28 +297,40 @@ class CustomizeFilter extends React.Component {
 													</Form.Item>
 												)}
 											</FieldControl>
-											<FieldControl name="showCount">
+											<FieldControl
+												name="showCount"
+												control={control.get('showCount')}
+											>
 												{({ handler }) => (
 													<Form.Item label="Show Count">
 														<Switch {...handler('checkbox')} />
 													</Form.Item>
 												)}
 											</FieldControl>
-											<FieldControl name="showCheckbox">
+											<FieldControl
+												name="showCheckbox"
+												control={control.get('showCheckbox')}
+											>
 												{({ handler }) => (
 													<Form.Item label="Show Checkbox">
 														<Switch {...handler('checkbox')} />
 													</Form.Item>
 												)}
 											</FieldControl>
-											<FieldControl name="showSearch">
+											<FieldControl
+												name="showSearch"
+												control={control.get('showSearch')}
+											>
 												{({ handler }) => (
 													<Form.Item label="Show Search">
 														<Switch {...handler('checkbox')} />
 													</Form.Item>
 												)}
 											</FieldControl>
-											<FieldControl name="showMissing">
+											<FieldControl
+												name="showMissing"
+												control={control.get('showMissing')}
+											>
 												{({ handler }) => (
 													<Form.Item label="Show Missing">
 														<Switch {...handler('checkbox')} />
@@ -323,6 +343,7 @@ class CustomizeFilter extends React.Component {
 												inputProps={{
 													placeholder: 'Enter missing label',
 												}}
+												control={control.get('missingLabel')}
 											/>
 											<TextInput
 												name="selectAllLabel"
@@ -331,6 +352,7 @@ class CustomizeFilter extends React.Component {
 													placeholder:
 														'Enter label for select all option',
 												}}
+												control={control.get('selectAllLabel')}
 											/>
 										</>
 									)}
@@ -345,6 +367,7 @@ class CustomizeFilter extends React.Component {
 													placeholder: 'Enter start value',
 													type: 'number',
 												}}
+												control={control.get('startValue')}
 											/>
 											<TextInput
 												name="endValue"
@@ -353,6 +376,7 @@ class CustomizeFilter extends React.Component {
 													placeholder: 'Enter end value',
 													type: 'number',
 												}}
+												control={control.get('endValue')}
 											/>
 											<TextInput
 												name="startLabel"
@@ -360,6 +384,7 @@ class CustomizeFilter extends React.Component {
 												inputProps={{
 													placeholder: 'Enter start label',
 												}}
+												control={control.get('startLabel')}
 											/>
 											<TextInput
 												name="endLabel"
@@ -367,8 +392,12 @@ class CustomizeFilter extends React.Component {
 												inputProps={{
 													placeholder: 'Enter end label',
 												}}
+												control={control.get('endLabel')}
 											/>
-											<FieldControl name="showHistogram">
+											<FieldControl
+												name="showHistogram"
+												control={control.get('showHistogram')}
+											>
 												{({ handler }) => (
 													<Form.Item label="Show Histogram">
 														<Switch {...handler('checkbox')} />
@@ -380,7 +409,10 @@ class CustomizeFilter extends React.Component {
 
 									{!disableListOptions && value?.filterType === 'date' && (
 										<>
-											<FieldControl name="startValue">
+											<FieldControl
+												name="startValue"
+												control={control.get('startValue')}
+											>
 												{({ handler }) => (
 													<div css={DatePickerStyles}>
 														<Form.Item label="Start Value">
@@ -395,7 +427,10 @@ class CustomizeFilter extends React.Component {
 													</div>
 												)}
 											</FieldControl>
-											<FieldControl name="endValue">
+											<FieldControl
+												name="endValue"
+												control={control.get('endValue')}
+											>
 												{({ handler }) => (
 													<div css={DatePickerStyles}>
 														<Form.Item label="End Value">
@@ -416,6 +451,7 @@ class CustomizeFilter extends React.Component {
 												inputProps={{
 													placeholder: 'Enter start label',
 												}}
+												control={control.get('startLabel')}
 											/>
 											<TextInput
 												name="endLabel"
@@ -423,8 +459,13 @@ class CustomizeFilter extends React.Component {
 												inputProps={{
 													placeholder: 'Enter end label',
 												}}
+												control={control.get('endLabel')}
 											/>
-											<FieldControl name="calendarInterval" strict={false}>
+											<FieldControl
+												name="calendarInterval"
+												strict={false}
+												control={control.get('calendarInterval')}
+											>
 												{({ handler }) => (
 													<Form.Item label="Calendar Interval">
 														<Select
@@ -444,7 +485,10 @@ class CustomizeFilter extends React.Component {
 													</Form.Item>
 												)}
 											</FieldControl>
-											<FieldControl name="showHistogram">
+											<FieldControl
+												name="showHistogram"
+												control={control.get('showHistogram')}
+											>
 												{({ handler }) => (
 													<Form.Item label="Show Histogram">
 														<Switch {...handler('checkbox')} />
@@ -466,7 +510,7 @@ class CustomizeFilter extends React.Component {
 CustomizeFilter.defaultProps = {
 	buttonLabel: 'Customize',
 	disableListOptions: false,
-	control: null,
+	control: {},
 	tempControl: null,
 	onSave: null,
 	onCancel: null,

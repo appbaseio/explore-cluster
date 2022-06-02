@@ -101,6 +101,7 @@ class PreferencesFormWrapperN extends React.Component {
 			resultTitle: '',
 			resultDescription: '',
 			resultPrice: '',
+			priceUnit: undefined,
 			resultImage: '',
 			resultHandle: '',
 			storeInfo: FormBuilder.group({
@@ -331,6 +332,7 @@ class PreferencesFormWrapperN extends React.Component {
 								'resultSettings.fields.description',
 							),
 							resultPrice: get(preferences, 'resultSettings.fields.price'),
+							priceUnit: get(preferences, 'resultSettings.fields.priceUnit'),
 							resultImage: get(preferences, 'resultSettings.fields.image'),
 							resultHandle: get(preferences, 'resultSettings.fields.handle'),
 							exportSettings: get(preferences, 'exportSettings'),
@@ -572,6 +574,7 @@ class PreferencesFormWrapperN extends React.Component {
 						resultTitle: '',
 						resultDescription: '',
 						resultPrice: '',
+						priceUnit: undefined,
 						resultImage: '',
 						resultHandle: '',
 					});
