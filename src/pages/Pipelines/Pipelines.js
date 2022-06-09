@@ -204,7 +204,6 @@ const Pipelines = (props) => {
 										dragProvided={dragProvided}
 										dragSnapshot={dragSnapshot}
 										pipeline={item}
-										index={item.position}
 										history={history}
 									/>
 								)}
