@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Button, Col, Icon, Row, Layout, Result, Alert, message, notification } from 'antd';
 import { css } from 'emotion';
 import get from 'lodash/get';
+import orderBy from 'lodash/orderBy';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
@@ -178,9 +179,24 @@ const Pipelines = (props) => {
 						<div>
 							<DNDWrapper
 								onDragEnd={onDragEnd}
-								items={(pipelines || []).sort((a, b) => a.priority - b.priority)}
+								items={orderBy(
+									pipelines,
+									[
+										(a) => {
+											const priority = Number.isNaN(a.priority)
+												? Number.MAX_SAFE_INTEGER
+												: a.priority;
+											return priority;
+										},
+										(a) => {
+											const timestamp = a.updated_at || a.created_at;
+											return timestamp;
+										},
+									],
+									['asc', 'desc'],
+								).map((doc, idx) => ({ ...doc, position: idx }))}
 								dropId="PIPELINES"
-								indexKey="priority"
+								indexKey="position"
 								idKey="id"
 							>
 								{({ item, dragProvided, dragSnapshot }) => (
@@ -188,7 +204,7 @@ const Pipelines = (props) => {
 										dragProvided={dragProvided}
 										dragSnapshot={dragSnapshot}
 										pipeline={item}
-										index={item.priority}
+										index={item.position}
 										history={history}
 									/>
 								)}
