@@ -9,7 +9,6 @@ describe('Interactive Tutorial', () => {
 			win.localStorage.clear();
 			win.sessionStorage.clear();
 		});
-		appName = generateName();
 	});
 	beforeEach(() => {
 		cy.restoreLocalStorage();
@@ -18,6 +17,7 @@ describe('Interactive Tutorial', () => {
 		cy.saveLocalStorage();
 	});
 	it('Should skip tutorial section and route to dashboard', () => {
+		appName = generateName();
 		cy.visit(TEST_URL, { timeout: 100000 })
 			.wait(5000)
 			.contains('Interactive Tutorial')
