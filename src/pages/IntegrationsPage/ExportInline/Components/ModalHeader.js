@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
-import { Button, Tooltip, Icon } from 'antd';
+
+import { Button, Tooltip, Icon, Modal, message } from 'antd';
 import CommitModal from './CommitModal';
 import PastVersionsDrawer from './PastVersionsDrawer';
-// import { deployStatusMapper } from '../../utils/index';
-import { commitCode, getAllVersions, getByVersionId } from '../../utils/sandpack-generator';
+import DeployLogsModal from './DeployLogsModal';
+import DeployModal from './DeployModal';
+import { deployStatusMapper } from '../../utils/index';
+import {
+	commitCode,
+	getAllVersions,
+	getByVersionId,
+	getDeploymentStatus,
+	deployUiBuilder,
+} from '../../utils/sandpack-generator';
 
 export async function asyncCallWithTimeout(asyncPromise, timeLimit) {
 	let timeoutHandle;
@@ -23,6 +32,19 @@ export async function asyncCallWithTimeout(asyncPromise, timeLimit) {
 	});
 }
 
+export function transformContent(content) {
+	const newContent = {};
+	Object.keys(content).forEach((path) => {
+		if (path[0] !== '/') {
+			const newPath = `/${path}`;
+			newContent[newPath] = content[path];
+		} else {
+			newContent[path] = content[path];
+		}
+	});
+	return newContent;
+}
+
 const ModalHeader = ({
 	history,
 	match,
@@ -35,18 +57,38 @@ const ModalHeader = ({
 	initialCode,
 	uiBuilderName,
 	handleSave,
+	collapsed,
+	setIsCollapsed,
+	modalType,
+	setModalType,
+	setOpenCommitModal,
 }) => {
-	const [modalType, setModalType] = useState('');
 	const [visible, setVisible] = useState(false);
 	const [allVersions, setAllVersions] = useState([]);
 	const [errMsg, setErrMsg] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
-
+	const [deploymentStatus, setDeploymentStatus] = useState({});
 	const preferenceId = match.params.id;
+	let myInterval = null;
 
 	useEffect(() => {
 		fetchAllVersions();
+		fetchDeploymentStatus();
 	}, []);
+
+	useEffect(() => {
+		if (modalType === 'error') {
+			Modal.warning({
+				title: (
+					<div>
+						Commit code for <b>{uiBuilderName}</b>
+					</div>
+				),
+				content: 'You need to make some changes before you can commit',
+				onOk: () => handleCancel(),
+			});
+		}
+	}, [modalType]);
 
 	const fetchAllVersions = () => {
 		getAllVersions(preferenceId)
@@ -67,9 +109,10 @@ const ModalHeader = ({
 					updated_at: res.updated_at || res.created_at,
 					commit: res?.metadata?.commit || '',
 				});
-				updateSandpackCode(res.content);
-				setUpdatedCode(res.content);
-				setInitialCode(res.content);
+				const newContent = transformContent(res.content);
+				updateSandpackCode(newContent);
+				setUpdatedCode(newContent);
+				setInitialCode(newContent);
 			})
 			.catch((err) => {
 				console.error(err);
@@ -78,12 +121,23 @@ const ModalHeader = ({
 	};
 
 	const handleCommitCode = (commitMessage) => {
+		const newObj = {};
+		Object.keys(updatedCode).forEach((path) => {
+			if (path[0] === '/') {
+				const newPath = path.slice(1);
+				newObj[newPath] = updatedCode[path];
+			} else {
+				newObj[path] = updatedCode[path];
+			}
+		});
+
 		const body = {
 			metadata: {
 				commit: commitMessage,
 			},
-			content: updatedCode,
+			content: newObj,
 		};
+
 		commitCode(preferenceId, body)
 			.then((res) => {
 				setCurrentVersion({
@@ -92,19 +146,60 @@ const ModalHeader = ({
 					commit: commitMessage,
 				});
 				fetchAllVersions();
-				setModalType('');
+				handleCancel();
 				setIsLoading(false);
 				setInitialCode(updatedCode);
+
+				message.info('Code is committed successfully');
 			})
 			.catch((err) => {
-				console.error(err);
+				console.error('Error to commit code', err);
 				setErrMsg('Error to commit code');
 				setIsLoading(false);
 			});
 	};
 
+	const handleDeploy = (body) => {
+		if (body.version_id === '') {
+			// eslint-disable-next-line
+			delete body.version_id;
+		}
+		deployUiBuilder(preferenceId, body)
+			.then(() => {
+				message.info('Deployed successfully');
+				fetchDeploymentStatus('deployed');
+				myInterval = setInterval(() => fetchDeploymentStatus(), 7000);
+			})
+			.catch((err) => {
+				console.error(err);
+				setIsLoading(false);
+				if (err.message) setErrMsg(err.message);
+				else setErrMsg('Error in deployment');
+			});
+	};
+
+	const fetchDeploymentStatus = (status = 'notDeployed') => {
+		getDeploymentStatus(preferenceId)
+			.then((res) => {
+				const state = deploymentStatus.status || deploymentStatus.state;
+				setDeploymentStatus(res);
+				if (status === 'deployed') {
+					setIsLoading(false);
+					setModalType('');
+				}
+				if (state === 'ERROR' || state === 'READY' || state === 'CANCELED')
+					clearInterval(myInterval);
+			})
+			.catch((err) => {
+				console.error(err);
+				// setErrMsg(err);
+			});
+	};
+
 	const handleCancel = () => {
 		setModalType('');
+		setOpenCommitModal(false);
+		setErrMsg('');
 	};
 
 	return (
@@ -147,6 +242,13 @@ const ModalHeader = ({
 						>
 							Commit
 						</Button>
+						<Button
+							type="primary"
+							onClick={() => setModalType('deploy-modal')}
+							disabled={!currentVersion.version_id}
+						>
+							Deploy
+						</Button>
 
 						<Tooltip title="Past Versions" style={{ fontSize: 14 }}>
 							{/* Past Versions */}
@@ -172,15 +274,28 @@ const ModalHeader = ({
 						/>
 					</div>
 				</div>
+				{deploymentStatus.status || deploymentStatus.state ? (
+					<div className="status-container" onClick={() => setModalType('deploy-logs')}>
+						<Button type="link" style={{ padding: 0 }}>
+							Deploy Status
+						</Button>
+						{deployStatusMapper[deploymentStatus.status || deploymentStatus.state]}
+					</div>
+				) : null}
+				<div>
+					<Icon
+						styles={{ cursor: 'pointer' }}
+						type={collapsed ? 'menu-unfold' : 'menu-fold'}
+						onClick={() => setIsCollapsed(!collapsed)}
+					/>
+				</div>
 			</div>
 
 			<CommitModal
 				errMsg={errMsg}
 				setErrMsg={setErrMsg}
 				open={modalType === 'commit'}
-				setOpen={setModalType}
 				isLoading={isLoading}
-				preferenceId={preferenceId}
 				handleOk={(commitMessage) => {
 					setIsLoading(true);
 					handleCommitCode(commitMessage);
@@ -195,6 +310,26 @@ const ModalHeader = ({
 				allVersions={allVersions}
 				fetchByVersionId={fetchByVersionId}
 			/>
+			<DeployLogsModal
+				open={modalType === 'deploy-logs'}
+				handleCancel={handleCancel}
+				deploymentStatus={deploymentStatus}
+				uiBuilderName={uiBuilderName}
+				preferenceId={preferenceId}
+			/>
+			<DeployModal
+				errMsg={errMsg}
+				setErrMsg={setErrMsg}
+				open={modalType === 'deploy-modal'}
+				uiBuilderName={uiBuilderName}
+				handleOk={(deployObj) => {
+					setIsLoading(true);
+					handleDeploy(deployObj);
+				}}
+				isLoading={isLoading}
+				handleCancel={handleCancel}
+				allVersions={allVersions}
+			/>
 		</>
 	);
 };
@@ -203,14 +338,19 @@ ModalHeader.propTypes = {
 	history: PropTypes.object.isRequired,
 	match: PropTypes.object.isRequired,
 	updateSandpackCode: PropTypes.func,
+	uiBuilderName: PropTypes.string,
 	updatedCode: PropTypes.object,
 	setUpdatedCode: PropTypes.func,
 	initialCode: PropTypes.object,
 	currentVersion: PropTypes.object,
 	setCurrentVersion: PropTypes.func,
 	setInitialCode: PropTypes.func,
-	uiBuilderName: PropTypes.string,
 	handleSave: PropTypes.func,
+	setIsCollapsed: PropTypes.func,
+	collapsed: PropTypes.bool,
+	modalType: PropTypes.string,
+	setModalType: PropTypes.func,
+	setOpenCommitModal: PropTypes.func,
 };
 
 ModalHeader.defaultProps = {
@@ -222,7 +362,12 @@ ModalHeader.defaultProps = {
 	setInitialCode: () => {},
 	setUpdatedCode: () => {},
 	handleSave: () => {},
+	setIsCollapsed: () => {},
 	uiBuilderName: '',
+	collapsed: false,
+	modalType: '',
+	setModalType: () => {},
+	setOpenCommitModal: () => {},
 };
 
 export default withRouter(ModalHeader);

@@ -4,15 +4,23 @@ import { get } from 'lodash';
 import { SandpackCodeContext } from '../..'; //eslint-disable-line
 import Directory from './Directory'; //eslint-disable-line
 import File from './File'; //eslint-disable-line
-import { templateConfigMap } from '../../../utils/sandpack-generator';
+import { excludedArr, templateConfigMap } from '../../../utils/sandpack-generator';
 
 const ModuleList = ({ depth, activePath, selectFile, prefixedPath }) => {
 	const { sandpackCode: files, preferences } = useContext(SandpackCodeContext);
 	const theme = get(preferences, 'themeSettings.type', 'classic');
-
-	const fileListWithTemplate = Object.keys(files || {}).filter(
-		(file) => !templateConfigMap[theme].includes(file),
-	);
+	// eslint-disable-next-line
+	const fileListWithTemplate = Object.keys(files || {}).filter((file) => {
+		if (
+			!(
+				excludedArr.indexOf(file) !== -1 ||
+				file.includes('build') ||
+				file.includes('.vscode') ||
+				templateConfigMap[theme].includes(file)
+			)
+		)
+			return file;
+	});
 
 	const fileListWithoutPrefix = fileListWithTemplate
 		.filter((file) => file.startsWith(prefixedPath))

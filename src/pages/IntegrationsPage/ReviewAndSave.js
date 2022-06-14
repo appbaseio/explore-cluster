@@ -6,11 +6,11 @@ import { connect } from 'react-redux';
 import { func, object, bool, string } from 'prop-types';
 import { diff } from 'jsondiffpatch';
 import DiffList from './DiffList';
+import { generateInlineSandboxURL, getByVersionId, commitCode } from './utils/sandpack-generator';
 import {
 	saveSearchPreferenceN,
 	saveRecommendationPreferenceN,
 } from '../../batteries/modules/actions';
-import { getByVersionId, commitCode } from './utils/sandpack-generator';
 import { updateConstantsWithPreferences } from './utils/index';
 
 const Badge = styled.span`
@@ -99,11 +99,11 @@ const ReviewAndSave = ({
 
 	const replaceWithPreferences = (code) => {
 		const newCode = { ...code };
-		newCode['/src/utils/constants.js'] = updateConstantsWithPreferences(getPreferences());
+		newCode['src/utils/constants.js'] = updateConstantsWithPreferences(getPreferences());
 		return newCode;
 	};
 
-	const handleCommitCode = (commitMessage) => {
+	const handleCommitCode = async (commitMessage) => {
 		if (form.get('versionId').value) {
 			// fetch by versionID and update constants file with new preferences
 			getByVersionId(preferenceId, form.get('versionId').value)
@@ -131,15 +131,41 @@ const ReviewAndSave = ({
 						});
 				})
 				.catch((err) => {
-					console.error(err);
+					console.error('Error to get latest version', err);
 					return {};
 				});
 		} else {
-			updateSearchPreferences(getPreferencesPayload()).then((action) => {
-				if (!(action && action.error)) {
-					setHasChanged();
+			const response = await generateInlineSandboxURL(getPreferencesPayload());
+			const newObj = {};
+			Object.keys(response).forEach((path) => {
+				if (path[0] === '/') {
+					const newPath = path.slice(1);
+					newObj[newPath] = response[path];
+				} else {
+					newObj[path] = response[path];
 				}
 			});
+			const body = {
+				metadata: {
+					commit: commitMessage,
+				},
+				content: newObj,
+			};
+			commitCode(preferenceId, body)
+				.then((res) => {
+					// update versionId in preferences with res.version_id
+					form.get('versionId').setValue(res.version_id);
+					// Save the new preferences
+					updateSearchPreferences(getPreferencesPayload()).then((action) => {
+						if (!(action && action.error)) {
+							setHasChanged();
+							setIsLoading(false);
+						}
+					});
+				})
+				.catch((err) => {
+					console.error(err);
+				});
 		}
 	};
 

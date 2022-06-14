@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [[ -d ./constants ]]
+then
+    rm -rf constants
+fi
+
 releaseId='67366237'
 
 URL="https://api.github.com/repos/appbaseio/reactivesearch-shopify-plugin/releases/$releaseId"

@@ -11,7 +11,7 @@ import { searchFilesContainer } from './styles';
 
 const { Panel } = Collapse;
 
-const FileExplorer = ({ setHighlightLine, iframeHeight }) => {
+const FileExplorer = ({ setHighlightLine, iframeHeight, collapsed }) => {
 	const [searchAllContent, setSearchAllContent] = useState([]);
 	const [value, setValue] = useState('');
 
@@ -24,7 +24,14 @@ const FileExplorer = ({ setHighlightLine, iframeHeight }) => {
 	});
 
 	return (
-		<div css={searchFilesContainer} style={{ height: iframeHeight, overflow: 'scroll' }}>
+		<div
+			css={searchFilesContainer}
+			style={{
+				height: iframeHeight,
+				overflow: 'scroll',
+				display: collapsed ? 'none' : 'block',
+			}}
+		>
 			<SandpackSearch
 				setSearchAllContent={setSearchAllContent}
 				value={value}
@@ -84,7 +91,9 @@ const FileExplorer = ({ setHighlightLine, iframeHeight }) => {
 				<ModuleList
 					activePath={sandpack.activePath}
 					prefixedPath="/"
-					selectFile={sandpack.openFile}
+					selectFile={(key) => {
+						sandpack.openFile(key);
+					}}
 				/>
 			)}
 		</div>
@@ -94,10 +103,12 @@ const FileExplorer = ({ setHighlightLine, iframeHeight }) => {
 FileExplorer.propTypes = {
 	setHighlightLine: PropTypes.func,
 	iframeHeight: PropTypes.number.isRequired,
+	collapsed: PropTypes.bool,
 };
 
 FileExplorer.defaultProps = {
 	setHighlightLine: () => {},
+	collapsed: false,
 };
 
 export default FileExplorer;

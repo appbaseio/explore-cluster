@@ -10,29 +10,36 @@ const Editor = ({ logs, errMsg }) => {
 					let bgClass = '';
 					if (log.level === 'WARNING') {
 						bgClass = 'bg-warning';
-					} else if (log.level === 'ERROR') {
+					} else if (
+						log.type === 'stderr' ||
+						(log.type === 'deployment-state' &&
+							log?.payload?.info?.readyState === 'ERROR')
+					) {
 						bgClass = 'bg-error';
 					} else {
 						bgClass = '';
 					}
-					if (!log.timestamp && !log.level && log.detail && logs.length === 1) {
+					if (!log.created && !log.type && !log.payload === 1) {
 						return (
 							<div className={`log-line ${bgClass}`}>
 								<div className="log-component">No logs found...!!!</div>
 							</div>
 						);
-					} else {
+					}
+					if (Object.keys(log).length)
 						return (
 							<div className={`log-line ${bgClass}`}>
-								<div className="log-component width">{log.level}&nbsp;</div>
+								<div className="log-component width">{log.type}&nbsp;</div>
 								<div className="log-component width">
-									{new Date(log.timestamp).toLocaleTimeString()}
+									{new Date(log.created).toLocaleTimeString()}
 									&nbsp;
 								</div>
-								<div className="log-component">{log.text}</div>
+								<div className="log-component">
+									{log?.payload?.text || log?.payload?.info?.readyState || ''}
+								</div>
 							</div>
 						);
-					}
+					return null;
 				})
 			) : (
 				<div className="log-line bg-error" style={{ paddingLeft: 15 }}>

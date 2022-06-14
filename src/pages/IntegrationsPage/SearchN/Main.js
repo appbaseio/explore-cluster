@@ -11,6 +11,7 @@ import LayoutTab from '../tabs/Layout';
 import SearchTab from '../tabs/Search';
 import General from '../tabs/General';
 import ChoosePlatformTab from '../tabs/ChoosePlatform';
+import DomainSettingsTab from '../tabs/DomainSettings';
 import { container } from '../../ResultsPage/styles';
 import Loader from '../../../components/Loader';
 import PreviewModal from '../PreviewModal';
@@ -86,6 +87,9 @@ const Main = ({ tier, featureEcommerce, ...props }) => {
 									</TabPane>
 									<TabPane tab="Search Settings" key="4">
 										<SearchTab />
+									</TabPane>
+									<TabPane tab="Domain Settings" key="5">
+										<DomainSettingsTab preferenceId={preferenceId} />
 									</TabPane>
 								</Tabs>
 

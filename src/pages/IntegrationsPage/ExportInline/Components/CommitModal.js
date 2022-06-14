@@ -18,6 +18,7 @@ const CommitModal = ({
 	useEffect(() => {
 		if (!open) setValue('');
 	}, [open]);
+
 	const handleInputChange = (val) => {
 		setValue(val);
 		if (val.length > 256) setErrMsg('Commit message can be up to 256 chars');
@@ -26,7 +27,11 @@ const CommitModal = ({
 
 	return (
 		<Modal
-			title={<div style={{ fontWeight: 'bold' }}>Commit code for {uiBuilderName}</div>}
+			title={
+				<div>
+					Commit code for <b>{uiBuilderName}</b>
+				</div>
+			}
 			visible={open}
 			onOk={() => {
 				handleOk(value);
@@ -36,7 +41,7 @@ const CommitModal = ({
 			}}
 			okText={<>Commit {isLoading ? <Icon type="loading" /> : null}</>}
 			okButtonProps={{
-				disabled: errMsg,
+				disabled: errMsg || !value,
 			}}
 		>
 			<div css={commitModalStyles}>

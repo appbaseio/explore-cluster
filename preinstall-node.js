@@ -2,23 +2,6 @@ const https = require('https');
 const fs = require('fs');
 // const excludedArr = require('./utils/constants');
 
-const excludedArr = [
-	'/.eslintignore',
-	'/.eslintrc.js',
-	'/.gitignore',
-	'/.nvmrc',
-	'/.prettierrc.js',
-	'/.vscode',
-	'/README.md',
-	'/build',
-	'/config-overrides.js',
-	'/public/favicon.ico',
-	'/public/images',
-	'/public/manifest.json',
-	'/yarn.lock',
-	'/public/images/loader.svg',
-];
-
 var options = {
 	host: 'api.github.com',
 	path: '/repos/appbaseio/reactivesearch-shopify-plugin/git/trees/master',
@@ -53,8 +36,6 @@ function getData(path) {
 		request.end();
 	});
 }
-
-function blacklistFiles(files) {}
 
 var path = require('path');
 var walk = function (dir, done) {
@@ -93,20 +74,25 @@ fs.readdirSync(testFolder).forEach((file) => {
 
 			results.forEach((path) => {
 				const fileName = path.split(`${file}`)[1];
-				if (
-					!(
-						excludedArr.indexOf(fileName) !== -1 ||
-						fileName.includes('build') ||
-						fileName.includes('.vscode')
-					)
-				) {
+
+				if (fileName.includes('.ico') || fileName.includes('.png')) {
 					const data = fs.readFileSync(
 						`./${path.split('arc-dashboard/')[1] || path.split('repo/')[1]}`,
 						{
-							encoding: 'utf8',
+							encoding: 'base64',
 						},
 					);
 					filesObj[fileName] = data; //content for files.js
+				} else {
+					if (!fileName.includes('build')) {
+						const data = fs.readFileSync(
+							`./${path.split('arc-dashboard/')[1] || path.split('repo/')[1]}`,
+							{
+								encoding: 'utf8',
+							},
+						);
+						filesObj[fileName] = data; //content for files.js
+					}
 				}
 			});
 

@@ -604,6 +604,7 @@ export const defaultSearchPreferences = {
 	},
 	dynamicFilters: [],
 	syncSettings: defaultSettings.reduce((acc, item) => ({ ...acc, [item.id]: item.value }), {}),
+	domain: '',
 };
 
 export const getRecommendationPreferencesPayload = (formValue) => {
@@ -875,6 +876,9 @@ export const getSearchPreferencesPayload = (formValue) => {
 				get(formValue, 'exportSettings.type') === 'shopify'
 					? get(formValue, 'syncSettings')
 					: null,
+			domainSettings: {
+				domain: get(formValue, 'domain'),
+			},
 		}),
 	);
 };

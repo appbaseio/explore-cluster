@@ -3,7 +3,7 @@ import { css } from 'react-emotion';
 const commitModalStyles = css`
 	.label-container {
 		font-size: 16px;
-		margin-bottom: 5px;
+		margin: 10px 0px 5px 0px;
 	}
 `;
 
@@ -52,6 +52,26 @@ const pastVersionsStyles = css`
 	.label {
 		font-weight: 550;
 	}
+
+	.max-width {
+		max-width: 450px;
+	}
+	.overflow {
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+	}
+	.icon-active {
+		&:hover {
+			color: #40a9ff;
+		}
+	}
+	.clickable-url {
+		cursor: pointer;
+		&:hover {
+			color: #40a9ff;
+		}
+	}
 `;
 
 const deployModalStyles = css`
@@ -72,12 +92,12 @@ const editorContainer = css`
 	}
 
 	.log-component {
-		margin-left: 15px;
+		margin-left: 5px;
 	}
 
 	.width {
-		width: 70px;
-		min-width: 70px;
+		width: 120px;
+		min-width: 120px;
 	}
 
 	.bg-warning {

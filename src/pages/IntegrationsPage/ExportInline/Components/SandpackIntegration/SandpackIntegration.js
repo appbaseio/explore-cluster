@@ -7,7 +7,13 @@ import MonacoEditor from './MonacoEditor';
 import '@codesandbox/sandpack-react/dist/index.css';
 import '../../styles.css';
 
-const SandPackIntegration = ({ updatedCode, setUpdatedCode, trasformSearchIndex }) => {
+const SandPackIntegration = ({
+	updatedCode,
+	setUpdatedCode,
+	trasformSearchIndex,
+	collapsed,
+	setOpenCommitModal,
+}) => {
 	const [highlightLine, setHighlightLine] = useState({
 		line: 0,
 		lines: [],
@@ -99,11 +105,16 @@ const SandPackIntegration = ({ updatedCode, setUpdatedCode, trasformSearchIndex 
 	return (
 		<div>
 			<SandpackLayout>
-				<FileExplorer setHighlightLine={setHighlightLine} iframeHeight={iframeHeight} />
+				<FileExplorer
+					setHighlightLine={setHighlightLine}
+					iframeHeight={iframeHeight}
+					collapsed={collapsed}
+				/>
 				<MonacoEditor
 					iframeHeight={iframeHeight}
 					highlightLine={highlightLine}
 					path={activePath}
+					setOpenCommitModal={setOpenCommitModal}
 				/>
 				<div className="resizer" id="dragMe" />
 				<SandpackPreview viewportSize={{ height: `${iframeHeight}px` }} />
@@ -115,12 +126,15 @@ const SandPackIntegration = ({ updatedCode, setUpdatedCode, trasformSearchIndex 
 SandPackIntegration.propTypes = {
 	updatedCode: PropTypes.object,
 	setUpdatedCode: PropTypes.func,
+	collapsed: PropTypes.bool,
 	trasformSearchIndex: PropTypes.func.isRequired,
+	setOpenCommitModal: PropTypes.func.isRequired,
 };
 
 SandPackIntegration.defaultProps = {
 	setUpdatedCode: () => {},
 	updatedCode: {},
+	collapsed: false,
 };
 
 export default SandPackIntegration;

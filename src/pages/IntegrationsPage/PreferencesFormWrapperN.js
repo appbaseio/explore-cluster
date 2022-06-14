@@ -184,6 +184,7 @@ class PreferencesFormWrapperN extends React.Component {
 							metafield_sync: [{ value: false, disabled: false }],
 							namedtags_sync: [{ value: false, disabled: false }],
 						}),
+						domain: '',
 				  }),
 		});
 	}
@@ -524,6 +525,7 @@ class PreferencesFormWrapperN extends React.Component {
 											enabled: facet.enabled,
 											customize: get(facet, 'rsConfig'),
 										})),
+										domain: get(preferences, 'domainSettings.domain'),
 								  }),
 						}),
 					);

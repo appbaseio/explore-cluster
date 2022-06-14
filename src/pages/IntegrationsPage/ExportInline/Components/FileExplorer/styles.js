@@ -23,7 +23,7 @@ const hoverStyles = css`
 		width: auto;
 	}
 	.filename-container {
-		max-width: 140px;
+		max-width: 120px;
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}

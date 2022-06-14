@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { Icon, Input, Menu, Dropdown } from 'antd';
 import PropTypes from 'prop-types';
+import { useSandpack } from '@codesandbox/sandpack-react';
 import { DirectoryIcon, FileIcon } from './icons';
 // eslint-disable-next-line
 import { SandpackCodeContext } from '../..';
@@ -11,6 +12,7 @@ const File = ({ path, selectFile, active, onClick, depth, isDirOpen, createNew, 
 	const [mode, setMode] = useState('file-add');
 	const [value, setvalue] = useState('');
 
+	const { sandpack } = useSandpack();
 	const { handleRenameFile, handleRenameFolder, handleDelete, handleCreateFile } =
 		useContext(SandpackCodeContext);
 
@@ -21,7 +23,7 @@ const File = ({ path, selectFile, active, onClick, depth, isDirOpen, createNew, 
 	};
 
 	const handleFileCreation = (val) => {
-		handleCreateFile(val, path);
+		handleCreateFile(val, path, sandpack);
 		closeInput();
 	};
 

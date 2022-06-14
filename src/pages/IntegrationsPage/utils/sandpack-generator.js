@@ -1,3 +1,4 @@
+import { get } from 'lodash';
 import { getURL } from '../../../constants/config';
 import files from '../../../../constants/files';
 import { doGet, doPut } from '../../../batteries/utils/requestService';
@@ -18,6 +19,19 @@ export const templateConfigMap = {
 	],
 	geo: ['/src/components/LayoutSwitch.js', '/src/components/ResultsLayout.js'],
 };
+
+export const excludedArr = [
+	'/.eslintignore',
+	'/.eslintrc.js',
+	'/.gitignore',
+	'/.nvmrc',
+	'/.prettierrc.js',
+	'/.vscode',
+	'/README.md',
+	'/build',
+	'/config-overrides.js',
+	'/yarn.lock',
+];
 
 export const tabSettings = {
 	classic: {
@@ -48,11 +62,19 @@ export const tabSettings = {
 
 export const generateInlineSandboxURL = async (preferences) => {
 	const newFiles = { ...files };
+	const newPrefs = {
+		...preferences,
+		appbaseSettings: {
+			index: preferences.pipeline,
+			credentials: get(preferences, 'exportSettings.credentials', ''),
+			url: localStorage.getItem('url') || sessionStorage.getItem('url'),
+		},
+	};
 	const str = newFiles['/src/utils/constants.js'];
 	if (str) {
 		const newStr = str.replace(
 			`'{{APPBASE_PREFERENCES}}'`,
-			JSON.stringify(JSON.stringify(preferences)),
+			JSON.stringify(JSON.stringify(newPrefs)),
 		);
 
 		newFiles['/src/utils/constants.js'] = newStr;
@@ -62,11 +84,19 @@ export const generateInlineSandboxURL = async (preferences) => {
 
 export const replaceWithPreferences = async (code, preferences) => {
 	const newFiles = { ...code };
+	const newPrefs = {
+		...preferences,
+		appbaseSettings: {
+			index: preferences.pipeline,
+			credentials: get(preferences, 'exportSettings.credentials', ''),
+			url: localStorage.getItem('url') || sessionStorage.getItem('url'),
+		},
+	};
 	const str = newFiles['/src/utils/constants.js'];
 	if (str) {
 		const newStr = str.replace(
 			`'{{APPBASE_PREFERENCES}}'`,
-			JSON.stringify(JSON.stringify(preferences)),
+			JSON.stringify(JSON.stringify(newPrefs)),
 		);
 
 		newFiles['/src/utils/constants.js'] = newStr;
@@ -104,7 +134,7 @@ export function getLatestVersion(id) {
 	});
 }
 
-export async function getByVersionId(id, versionId) {
+export function getByVersionId(id, versionId) {
 	const authToken = getAuthToken();
 	const ACC_API = getURL();
 
@@ -114,12 +144,45 @@ export async function getByVersionId(id, versionId) {
 	});
 }
 
-export function getDeploymentStatus(id, versionId) {
+export function getDeploymentStatus(id) {
 	const ACC_API = getURL();
 	const authToken = getAuthToken();
 
-	return doGet(`${ACC_API}/_uibuilder/${id}/deploy_status?version=${versionId}`, {
+	return doGet(`${ACC_API}/_uibuilder/${id}/deploy`, {
 		'Content-Type': 'application/json',
 		Authorization: `Basic ${authToken}`,
 	});
+}
+
+export function getDeploymentStatusByDeploymentId(id, deploymentId) {
+	const ACC_API = getURL();
+	const authToken = getAuthToken();
+
+	return doGet(`${ACC_API}/_uibuilder/${id}/deploy/${deploymentId}`, {
+		'Content-Type': 'application/json',
+		Authorization: `Basic ${authToken}`,
+	});
+}
+
+export function deployUiBuilder(id, body = {}) {
+	const authToken = getAuthToken();
+	const ACC_API = getURL();
+
+	return doPut(`${ACC_API}/_uibuilder/${id}/deploy`, body, {
+		'Content-Type': 'application/json',
+		Authorization: `Basic ${authToken}`,
+	});
+}
+
+export function getDeploymentLogs(id, clusterId = '', deploymentId = '') {
+	const authToken = getAuthToken();
+	// const ACC_API = getURL();
+
+	return doGet(
+		`https://accapi.appbase.io/uibuilder/deploy/${clusterId}/${id}/${deploymentId}/events?follow=1`,
+		{
+			'Content-Type': 'application/json',
+			Authorization: `Basic ${authToken}`,
+		},
+	);
 }

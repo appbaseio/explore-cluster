@@ -7,7 +7,7 @@ import { css } from 'react-emotion';
 import { SandpackProvider } from '@codesandbox/sandpack-react';
 // eslint-disable-next-line
 import SandPackIntegration from './Components/SandpackIntegration/SandpackIntegration';
-import ModalHeader from './Components/ModalHeader';
+import ModalHeader, { transformContent } from './Components/ModalHeader';
 import Loader from '../../../components/Loader';
 import {
 	generateInlineSandboxURL,
@@ -61,11 +61,26 @@ const ExportInline = ({
 	const [updatedCode, setUpdatedCode] = useState({});
 	const [currentVersion, setCurrentVersion] = useState({});
 	const [isLoading, setIsLoading] = useState(true);
+	const [collapsed, setIsCollapsed] = useState(false);
+	const [modalType, setModalType] = useState('');
+	const [openCommitModal, setOpenCommitModal] = useState(false);
 
 	useEffect(() => {
 		if (control?.get('versionId')?.value) fetchByVersionId(control.get('versionId').value);
 		else fetchLatestVersion();
 	}, [preferences]);
+
+	useEffect(() => {
+		if (openCommitModal) {
+			if (JSON.stringify(initialCode) === JSON.stringify(updatedCode)) {
+				// Open error modal on cntr+s or cmd+s
+				setModalType('error');
+			} else {
+				// Open commit modal on cntr+s or cmd+s
+				setModalType('commit');
+			}
+		}
+	}, [openCommitModal]);
 
 	const getSandPackCode = async () => {
 		const searchIndexObj = {};
@@ -120,8 +135,9 @@ const ExportInline = ({
 		getLatestVersion(preferenceId)
 			.then(async (res) => {
 				if (res.content) {
-					setInitialCode(res.content);
-					const response = await replaceWithPreferences(res.content, preferences);
+					const newContent = transformContent(res.content);
+					setInitialCode(newContent);
+					const response = await replaceWithPreferences(newContent, preferences);
 					updateSandpackCode(response);
 					setUpdatedCode(response);
 					setIsLoading(false);
@@ -146,9 +162,10 @@ const ExportInline = ({
 					updated_at: res.updated_at || res.created_at,
 					commit: res?.metadata?.commit || '',
 				});
-				updateSandpackCode(res.content);
-				setUpdatedCode(res.content);
-				setInitialCode(res.content);
+				const newContent = transformContent(res.content);
+				updateSandpackCode(newContent);
+				setUpdatedCode(newContent);
+				setInitialCode(newContent);
 				setIsLoading(false);
 			})
 			.catch((err) => {
@@ -157,7 +174,7 @@ const ExportInline = ({
 			});
 	};
 
-	const handleCreateFile = (val, path) => {
+	const handleCreateFile = (val, path, sandpack) => {
 		const regex = /\/\//gm;
 		const newPath = path.replace(regex, `/${val}`);
 		const newSandpackCode = {
@@ -175,6 +192,9 @@ const ExportInline = ({
 			},
 		];
 		updateSearchIndex(newSearchIndex);
+		setTimeout(() => {
+			sandpack.openFile(newPath);
+		}, 0);
 	};
 
 	const handleRenameFile = (data, path) => {
@@ -264,7 +284,6 @@ const ExportInline = ({
 				if (!(action && action.error)) {
 					// fetch preferences
 					getSearchPreferences();
-					console.log('Stored version id');
 				}
 			});
 		}
@@ -288,6 +307,11 @@ const ExportInline = ({
 				initialCode={initialCode}
 				handleSave={handleSave}
 				fetchByVersionId={fetchByVersionId}
+				setIsCollapsed={setIsCollapsed}
+				collapsed={collapsed}
+				modalType={modalType}
+				setModalType={setModalType}
+				setOpenCommitModal={setOpenCommitModal}
 			/>
 			<div className={modalStyles}>
 				<SandpackProvider
@@ -309,6 +333,7 @@ const ExportInline = ({
 							handleRenameFile,
 							handleRenameFolder,
 							handleDelete,
+							setModalType,
 						}}
 						openPaths={tabSettings[theme].openPaths}
 						activePath={tabSettings[theme].activePath}
@@ -318,7 +343,9 @@ const ExportInline = ({
 							closeModal={closeModal}
 							trasformSearchIndex={trasformSearchIndex}
 							updatedCode={updatedCode}
+							setOpenCommitModal={setOpenCommitModal}
 							setUpdatedCode={setUpdatedCode}
+							collapsed={collapsed}
 						/>
 					</SandpackCodeContext.Provider>
 				</SandpackProvider>

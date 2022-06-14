@@ -1,4 +1,5 @@
 import React from 'react';
+import { Prompt } from 'react-router-dom';
 import { FieldGroup } from 'react-reactive-form';
 import { bool, object } from 'prop-types';
 import { connect } from 'react-redux';
@@ -29,44 +30,49 @@ const CodeSandboxModal = ({ ...props }) => {
 
 	return (
 		<React.Fragment>
-			{props.isPaidUser ? (
-				<VersionController version="8.1.0">
-					<PreferencesFormWrapper closeForm={closeForm} preferenceId={preferenceId}>
-						{({ getPreferences, getPreferencesPayload, form }) => {
-							return (
-								<FieldGroup
-									control={form}
-									render={() => (
-										<ExportInline
-											preferences={getPreferences()}
-											buttonProps={{
-												style: {
-													marginLeft: 10,
-												},
-											}}
-											control={form}
-											closeForm={closeForm}
-											preferenceId={preferenceId}
-											getPreferencesPayload={getPreferencesPayload}
-										/>
-									)}
-								/>
-							);
-						}}
-					</PreferencesFormWrapper>
-				</VersionController>
-			) : (
-				<React.Fragment>
-					<Banner {...bannerMessages.free} />
-					<Overlay
-						style={{
-							maxWidth: '70%',
-						}}
-						src="https://i.imgur.com/igSOMzm.png"
-						alt="Code Editor"
-					/>
-				</React.Fragment>
-			)}
+			<Prompt message="Are you sure you want to leave?" />
+
+			<div>
+				{props.isPaidUser ? (
+					<VersionController version="8.1.0">
+						<PreferencesFormWrapper closeForm={closeForm} preferenceId={preferenceId}>
+							{/* eslint-disable-next-line */}
+							{({ getPreferences, getPreferencesPayload, form }) => {
+								return (
+									<FieldGroup
+										control={form}
+										render={() => (
+											<ExportInline
+												preferences={getPreferencesPayload()}
+												buttonProps={{
+													style: {
+														marginLeft: 10,
+													},
+												}}
+												control={form}
+												closeForm={closeForm}
+												preferenceId={preferenceId}
+												getPreferencesPayload={getPreferencesPayload}
+											/>
+										)}
+									/>
+								);
+							}}
+						</PreferencesFormWrapper>
+					</VersionController>
+				) : (
+					<React.Fragment>
+						<Banner {...bannerMessages.free} />
+						<Overlay
+							style={{
+								maxWidth: '70%',
+							}}
+							src="https://i.imgur.com/igSOMzm.png"
+							alt="Code Editor"
+						/>
+					</React.Fragment>
+				)}
+			</div>
 		</React.Fragment>
 	);
 };
