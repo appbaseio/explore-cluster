@@ -1,9 +1,10 @@
 export default {
 	'Basic Template': {
 		enabled: true,
+		description: 'Template to create a pipeline',
 		routes: [
 			{
-				path: '/{index}/_reactivesearch',
+				path: '/basic/_reactivesearch',
 				method: 'POST',
 				classify: {
 					category: 'reactivesearch',
@@ -38,7 +39,7 @@ export default {
 			'Pipeline to retrieve and merge Google knowledge graph response to ES response',
 		routes: [
 			{
-				path: '/{index}/_reactivesearch',
+				path: '/knowledge_graph/_reactivesearch',
 				method: 'POST',
 				classify: {
 					category: 'reactivesearch',
@@ -89,7 +90,7 @@ export default {
 		description: 'Pipeline to save search to an Elasticsearch index',
 		routes: [
 			{
-				path: '/{index}/_reactivesearch',
+				path: '/saved_search/_reactivesearch',
 				method: 'POST',
 				classify: {
 					category: 'reactivesearch',
