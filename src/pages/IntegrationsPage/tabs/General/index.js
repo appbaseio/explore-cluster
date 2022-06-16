@@ -120,35 +120,6 @@ const General = ({ apps, isRecommendation }) => {
 							</div>
 						</div>
 					</div>
-					<FieldControl strict={false} name="hasEdited">
-						{({ handler }) =>
-							handler().value && (
-								<div
-									style={{
-										border: '1px solid rgb(219 210 210 / 65%)',
-										margin: 10,
-										padding: 20,
-										display: 'flex',
-										alignItems: 'center',
-										gap: 20,
-									}}
-								>
-									<Icon
-										type="warning"
-										theme="filled"
-										style={{ color: '#f7c325', fontSize: 40 }}
-									/>
-									<p style={{ margin: 0 }}>
-										{' '}
-										{/* eslint-disable-next-line */}
-										You've persisted code changes via code editor. Making
-										further changes through the no-code configurator will these
-										code changes.
-									</p>
-								</div>
-							)
-						}
-					</FieldControl>
 				</div>
 			)}
 		</FieldGroup>

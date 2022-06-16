@@ -17,7 +17,8 @@
 		"test": "jest --env node --config ./jest.config.json",
 		"cypress:run": "cypress run --record --key 8e90df64-6ae0-484d-b8ef-3b7c5a521382 open",
 		"cypress:open": " cypress open",
-		"cypress:chrome": "cypress run --headless chrome"
+		"cypress:chrome": "cypress run --headless chrome",
+		"preinstall": "./extract-shopify.sh && node preinstall-node.js"
 	},
 	"husky": {
 		"hooks": {
@@ -86,6 +87,7 @@
 		"@appbaseio/reactivemaps": "^3.0.0-beta.14",
 		"@appbaseio/reactivesearch": "3.29.1",
 		"@babel/plugin-proposal-class-properties": "^7.0.0-rc.1",
+		"@codesandbox/sandpack-react": "^0.19.0",
 		"@monaco-editor/react": "^4.2.2",
 		"@sentry/browser": "^6.13.2",
 		"@stripe/react-stripe-js": "^1.1.2",
@@ -97,18 +99,22 @@
 		"antd": "^3.18.2",
 		"appbase-js": "^4.1.2",
 		"brace": "^0.11.1",
+		"can-ndjson-stream": "^1.0.2",
 		"codesandbox": "1.2.16",
 		"d3-scale": "^2.1.2",
+		"diff-match-patch": "1.0.5",
 		"dompurify": "^2.3.6",
 		"dotenv": "^8.0.0",
 		"emotion": "^9.2.6",
 		"file-saver": "^2.0.5",
+		"fuse.js": "^6.6.1",
 		"hex-rgb": "^3.0.0",
 		"husky": "^4.2.5",
 		"imagekit": "^3.2.3",
 		"imagekit-uppy-plugin": "^1.0.2",
 		"imagekitio-react": "^1.0.11",
 		"is-cidr": "^4.0.2",
+		"is-valid-domain": "^0.1.6",
 		"js-yaml": "^4.1.0",
 		"jsondiffpatch": "^0.4.1",
 		"jszip": "^3.7.1",
@@ -152,7 +158,6 @@
 		"url-search-params": "^1.1.0",
 		"urlsafe-base64": "https://github.com/farhan687/urlsafe-base64.git",
 		"util": "^0.12.4",
-		"uuid": "^8.3.2",
-		"diff-match-patch": "1.0.5"
+		"uuid": "^8.3.2"
 	}
 }

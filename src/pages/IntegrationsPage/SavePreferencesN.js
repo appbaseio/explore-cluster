@@ -119,6 +119,22 @@ class SavePreferencesN extends React.Component {
 			) {
 				delete newPreferences.resultSettings.showMarkerClusters;
 			}
+
+			if (get(diffData, 'globalSettings.meta.deploySettings', false)) {
+				delete newPreferences?.globalSettings?.meta?.deploySettings?.csbID;
+				delete newPreferences?.globalSettings?.meta.deploySettings?.hasEdited;
+
+				if (
+					get(diffData, 'globalSettings.meta.deploySettings.versionId', '') &&
+					get(
+						newPreferences,
+						'globalSettings.meta.deploySettings.versionId',
+						undefined,
+					) === undefined
+				) {
+					newPreferences.globalSettings.meta.deploySettings.versionId = '';
+				}
+			}
 		}
 
 		delete newPreferences.type;
@@ -171,6 +187,7 @@ class SavePreferencesN extends React.Component {
 			getSearchPreferences,
 			getRecommendationsPreferences,
 			getPreferencesPayload,
+			getPreferences,
 			closeForm,
 		} = this.props;
 		const { hasChanged, preferences } = this.state;
@@ -202,7 +219,7 @@ class SavePreferencesN extends React.Component {
 						);
 					}}
 					getPreferencesPayload={getPreferencesPayload}
-					hasEdited={this.hasEdited}
+					getPreferences={getPreferences}
 					form={form}
 				/>
 			</>
@@ -230,6 +247,7 @@ SavePreferencesN.propTypes = {
 	updateSearchPreferences: func.isRequired,
 	updateRecommendationsPreferences: func.isRequired,
 	getPreferencesPayload: func.isRequired,
+	getPreferences: func.isRequired,
 	getSearchPreferences: func.isRequired,
 	getRecommendationsPreferences: func.isRequired,
 	searchPreferences: object,

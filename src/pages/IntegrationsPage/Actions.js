@@ -2,7 +2,10 @@ import React from 'react';
 import { Button, Popconfirm, Tooltip, Icon } from 'antd';
 import { css } from 'react-emotion';
 import { string, func, bool } from 'prop-types';
+import DeployLogsModal from './ExportInline/Components/DeployLogsModal';
 import Flex from '../../batteries/components/shared/Flex';
+import { getDeploymentStatus } from './utils/sandpack-generator';
+// import asyncCallWithTimeout from './ExportInline/Components/ModalHeader';
 
 const container = css`
 	.left-container {
@@ -22,6 +25,15 @@ const container = css`
 	}
 `;
 class Actions extends React.Component {
+	state = {
+		modalType: '',
+		deploymentStatus: {},
+	};
+
+	componentDidMount() {
+		this.fetchDeploymentStatus();
+	}
+
 	handleEdit = () => {
 		const { id, handleEdit } = this.props;
 		handleEdit(id);
@@ -32,8 +44,30 @@ class Actions extends React.Component {
 		handleDelete(id);
 	};
 
+	handleCancel = () => {
+		this.setState({
+			modalType: '',
+		});
+	};
+
+	fetchDeploymentStatus = () => {
+		const { id } = this.props;
+		getDeploymentStatus(id)
+			.then((res) => {
+				this.setState({
+					deploymentStatus: res,
+				});
+			})
+			.catch((err) => {
+				console.error(err);
+				// setErrMsg(err);
+			});
+	};
+
 	render() {
-		const { isRecommendation } = this.props;
+		const { modalType, deploymentStatus } = this.state;
+		const { isRecommendation, name } = this.props;
+
 		return (
 			<Flex alignItems="center" css={container}>
 				<Flex justifyContent="space-between" alignItems="center" className="left-container">
@@ -46,6 +80,20 @@ class Actions extends React.Component {
 								View
 							</Button>
 						</Tooltip>
+						<div style={{ width: 120 }}>
+							{!isRecommendation && Object.keys(deploymentStatus).length ? (
+								<Button
+									onClick={() => {
+										this.setState({ modalType: 'deploy-logs' });
+									}}
+									type="normal"
+									className="show-on-hover"
+									style={{ marginLeft: 5 }}
+								>
+									Deploy Status
+								</Button>
+							) : null}
+						</div>
 					</Flex>
 				</Flex>
 				<Tooltip
@@ -61,6 +109,12 @@ class Actions extends React.Component {
 						<Icon type="delete" className="show-on-hover" />
 					</Popconfirm>
 				</Tooltip>
+				<DeployLogsModal
+					open={modalType === 'deploy-logs'}
+					handleCancel={this.handleCancel}
+					deploymentStatus={deploymentStatus}
+					uiBuilderName={name}
+				/>
 			</Flex>
 		);
 	}
@@ -70,11 +124,16 @@ Actions.defaultProps = {
 	isRecommendation: false,
 };
 
+Actions.defaultProps = {
+	name: '',
+};
+
 Actions.propTypes = {
 	id: string.isRequired,
 	handleEdit: func.isRequired,
 	handleDelete: func.isRequired,
 	isRecommendation: bool,
+	name: string,
 };
 
 export default Actions;

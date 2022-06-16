@@ -469,8 +469,6 @@ export const defaultRecommendationsPreferences = {
 	logoUrl: '',
 	logoWidth: 20,
 	logoAlignment: 'left',
-	csbID: '',
-	hasEdited: false,
 	themeType: 'classic',
 	primaryColor: '#0B6AFF',
 	primaryTextColor: '#fff',
@@ -481,6 +479,7 @@ export const defaultRecommendationsPreferences = {
 	resultTitle: '',
 	resultDescription: '',
 	resultPrice: '',
+	priceUnit: undefined,
 	resultImage: '',
 	resultHandle: '',
 	storeInfo: { currency: 'USD' },
@@ -498,8 +497,7 @@ export const defaultSearchPreferences = {
 	logoUrl: '',
 	logoWidth: 20,
 	logoAlignment: 'left',
-	csbID: '',
-	hasEdited: false,
+	versionId: '',
 	themeType: 'classic',
 	primaryColor: '#0B6AFF',
 	primaryTextColor: '#fff',
@@ -510,6 +508,7 @@ export const defaultSearchPreferences = {
 	resultTitle: '',
 	resultDescription: '',
 	resultPrice: '',
+	priceUnit: undefined,
 	resultImage: '',
 	resultHandle: '',
 	layout: 'grid',
@@ -605,6 +604,7 @@ export const defaultSearchPreferences = {
 	},
 	dynamicFilters: [],
 	syncSettings: defaultSettings.reduce((acc, item) => ({ ...acc, [item.id]: item.value }), {}),
+	domain: '',
 };
 
 export const getRecommendationPreferencesPayload = (formValue) => {
@@ -646,6 +646,7 @@ export const getRecommendationPreferencesPayload = (formValue) => {
 					title: get(formValue, 'resultTitle'),
 					description: get(formValue, 'resultDescription'),
 					price: get(formValue, 'resultPrice'),
+					priceUnit: get(formValue, 'priceUnit'),
 					image: get(formValue, 'resultImage'),
 					handle: get(formValue, 'resultHandle'),
 				},
@@ -720,8 +721,7 @@ export const getSearchPreferencesPayload = (formValue) => {
 						logoAlignment: get(formValue, 'logoAlignment'),
 					},
 					deploySettings: {
-						csbID: get(formValue, 'csbID'),
-						hasEdited: get(formValue, 'hasEdited'),
+						versionId: get(formValue, 'versionId'),
 					},
 				},
 			},
@@ -731,6 +731,7 @@ export const getSearchPreferencesPayload = (formValue) => {
 					title: get(formValue, 'resultTitle'),
 					description: get(formValue, 'resultDescription'),
 					price: get(formValue, 'resultPrice'),
+					priceUnit: get(formValue, 'priceUnit'),
 					image: get(formValue, 'resultImage'),
 					handle: get(formValue, 'resultHandle'),
 				},
@@ -770,6 +771,7 @@ export const getSearchPreferencesPayload = (formValue) => {
 					title: get(formValue, 'resultTitle'),
 					description: get(formValue, 'resultDescription'),
 					price: get(formValue, 'resultPrice'),
+					priceUnit: get(formValue, 'priceUnit'),
 					image: get(formValue, 'resultImage'),
 					handle: get(formValue, 'resultHandle'),
 				},
@@ -874,6 +876,9 @@ export const getSearchPreferencesPayload = (formValue) => {
 				get(formValue, 'exportSettings.type') === 'shopify'
 					? get(formValue, 'syncSettings')
 					: null,
+			domainSettings: {
+				domain: get(formValue, 'domain'),
+			},
 		}),
 	);
 };

@@ -44,7 +44,8 @@ describe('Query Rule creation with trigger index and script action', () => {
 		cy.get('.ace_content')
 			.type('{selectall}{backspace}')
 			.type('{ "data": "val" }', { parseSpecialCharSequences: false });
-
+		// add addiotional wait time to pass
+		cy.wait(2000);
 		// Save query rule
 		const credentials = btoa(`${username}:${password}`);
 		cy.server();

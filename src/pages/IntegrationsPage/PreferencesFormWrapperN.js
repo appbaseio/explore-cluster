@@ -4,7 +4,7 @@ import { string, func, bool, object, array } from 'prop-types';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { css } from 'react-emotion';
-import { Button, Icon, Popconfirm, Tooltip } from 'antd';
+import { Button } from 'antd';
 import { FormBuilder, Validators } from 'react-reactive-form';
 import {
 	FormContext,
@@ -34,20 +34,47 @@ const modalStyles = css`
 	.header-container {
 		padding: 16px 24px;
 		color: rgba(0, 0, 0, 0.65);
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		font-size: 20px;
 		position: absolute;
 		top: 0;
 		right: 0;
 		left: 0;
 		z-index: 999;
 		background: white;
-		height: 60px;
+		height: 85px;
+	}
+	.header-title-container {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
 	}
 	.close-icon {
 		cursor: pointer;
+	}
+	.header-font {
+		font-size: 20px;
+	}
+	.right-partition {
+		display: flex;
+		align-items: center;
+		gap: 20px;
+	}
+	.status-container {
+		float: right;
+		margin: 5px 50px 0px 0px;
+		cursor: pointer;
+	}
+	.commit-font {
+		font-size: 14px;
+	}
+	.versionid-font {
+		font-size: 12px;
+	}
+	.overflow-container {
+		max-width: 150px;
+		margin: 0;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
 	}
 `;
 class PreferencesFormWrapperN extends React.Component {
@@ -74,6 +101,7 @@ class PreferencesFormWrapperN extends React.Component {
 			resultTitle: '',
 			resultDescription: '',
 			resultPrice: '',
+			priceUnit: undefined,
 			resultImage: '',
 			resultHandle: '',
 			storeInfo: FormBuilder.group({
@@ -95,8 +123,7 @@ class PreferencesFormWrapperN extends React.Component {
 				  }
 				: {
 						// Search specific controls
-						csbID: '',
-						hasEdited: false,
+						versionId: '',
 						autoSuggestionSettings: FormBuilder.group({
 							enablePopularSuggestions: false,
 							enableRecentSearches: false,
@@ -157,6 +184,7 @@ class PreferencesFormWrapperN extends React.Component {
 							metafield_sync: [{ value: false, disabled: false }],
 							namedtags_sync: [{ value: false, disabled: false }],
 						}),
+						domain: '',
 				  }),
 		});
 	}
@@ -305,6 +333,7 @@ class PreferencesFormWrapperN extends React.Component {
 								'resultSettings.fields.description',
 							),
 							resultPrice: get(preferences, 'resultSettings.fields.price'),
+							priceUnit: get(preferences, 'resultSettings.fields.priceUnit'),
 							resultImage: get(preferences, 'resultSettings.fields.image'),
 							resultHandle: get(preferences, 'resultSettings.fields.handle'),
 							exportSettings: get(preferences, 'exportSettings'),
@@ -357,14 +386,9 @@ class PreferencesFormWrapperN extends React.Component {
 										}),
 								  }
 								: {
-										csbID: get(
+										versionId: get(
 											preferences,
-											'globalSettings.meta.deploySettings.csbID',
-											'',
-										),
-										hasEdited: get(
-											preferences,
-											'globalSettings.meta.deploySettings.hasEdited',
+											'globalSettings.meta.deploySettings.versionId',
 											'',
 										),
 										autosuggest: get(
@@ -501,6 +525,7 @@ class PreferencesFormWrapperN extends React.Component {
 											enabled: facet.enabled,
 											customize: get(facet, 'rsConfig'),
 										})),
+										domain: get(preferences, 'domainSettings.domain'),
 								  }),
 						}),
 					);
@@ -551,6 +576,7 @@ class PreferencesFormWrapperN extends React.Component {
 						resultTitle: '',
 						resultDescription: '',
 						resultPrice: '',
+						priceUnit: undefined,
 						resultImage: '',
 						resultHandle: '',
 					});
@@ -613,30 +639,11 @@ class PreferencesFormWrapperN extends React.Component {
 	};
 
 	render() {
-		const { children, closeForm, history, location, match, isRecommendation } = this.props;
-		const preferenceId = match.params.id;
-		const isInlinePage = location.pathname.split('/').slice(-1)[0] === 'code';
+		const { children, closeForm, history, isRecommendation } = this.props;
 
 		return (
 			<div className={modalStyles}>
-				{/* eslint-disable-next-line */}
-				{isInlinePage ? (
-					<div className="header-container">
-						<div>Edit Code Inline</div>
-						<Popconfirm
-							title="Are you sure you want to exit without saving? Any changes you’ve made via code editor will be lost."
-							onConfirm={() => {
-								history.push(`/cluster/search-builder/${preferenceId}`);
-							}}
-							okText="Yes"
-							cancelText="No"
-						>
-							<Tooltip title="Exit without saving">
-								<Icon type="close" />
-							</Tooltip>
-						</Popconfirm>
-					</div>
-				) : isRecommendation ? (
+				{isRecommendation ? (
 					<Button
 						style={{
 							margin: '5px 0px',
@@ -690,8 +697,6 @@ PreferencesFormWrapperN.propTypes = {
 	closeForm: func.isRequired,
 	recommendationsPreferences: object,
 	history: object.isRequired,
-	match: object.isRequired,
-	location: object.isRequired,
 	allSearchPreferences: array.isRequired,
 	getSearchPreferences: func.isRequired,
 	getRecommendationsPreferences: func.isRequired,

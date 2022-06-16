@@ -448,6 +448,10 @@ const settingsMap = {
 		title: 'Price',
 		description: '',
 	},
+	priceUnit: {
+		title: 'Price Unit',
+		description: '',
+	},
 	image: {
 		title: 'Image',
 		description: '',

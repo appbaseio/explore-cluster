@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal, Alert } from 'antd';
+import { Button, Icon, Modal } from 'antd';
 import styled from 'react-emotion';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { func, object, bool, string } from 'prop-types';
 import { diff } from 'jsondiffpatch';
 import DiffList from './DiffList';
+import { generateInlineSandboxURL, getByVersionId, commitCode } from './utils/sandpack-generator';
 import {
 	saveSearchPreferenceN,
 	saveRecommendationPreferenceN,
 } from '../../batteries/modules/actions';
+import { updateConstantsWithPreferences } from './utils/index';
 
 const Badge = styled.span`
 	background: #f5222d;
@@ -35,6 +37,7 @@ const staticFacetsFields = [
 ];
 
 const ReviewAndSave = ({
+	form,
 	oldData,
 	newData,
 	isRecommLoading,
@@ -44,13 +47,14 @@ const ReviewAndSave = ({
 	updateSearchPreferences,
 	updateRecommendationsPreferences,
 	getPreferencesPayload,
+	getPreferences,
 	setHasChanged,
-	hasEdited,
-	form,
 	isRecommendation,
+	preferenceId,
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isResetting, setIsResetting] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
 
 	useEffect(() => {
 		if (oldData && oldData.resultSettings && !oldData.resultSettings.resultHighlight) {
@@ -79,30 +83,89 @@ const ReviewAndSave = ({
 	};
 
 	const handleSave = () => {
+		setIsLoading(true);
 		if (isRecommendation) {
 			updateRecommendationsPreferences(getPreferencesPayload()).then((action) => {
 				if (!(action && action.error)) {
 					setHasChanged();
+					setIsLoading(false);
 				}
 			});
 		} else {
-			if (
-				form.get('csbID') &&
-				form.get('csbID').value &&
-				(diffData?.facetSettings ||
-					diffData?.themeSettings ||
-					diffData?.resultSettings ||
-					diffData?.searchSettings ||
-					diffData?.pipeline)
-			) {
-				form.get('csbID').setValue('');
-				form.get('hasEdited').setValue(false);
-			}
-			updateSearchPreferences(getPreferencesPayload()).then((action) => {
-				if (!(action && action.error)) {
-					setHasChanged();
+			// Update preferences in sandpack
+			handleCommitCode('system commit: auto save UI builder panel preferences');
+		}
+	};
+
+	const replaceWithPreferences = (code) => {
+		const newCode = { ...code };
+		newCode['src/utils/constants.js'] = updateConstantsWithPreferences(getPreferences());
+		return newCode;
+	};
+
+	const handleCommitCode = async (commitMessage) => {
+		if (form.get('versionId').value) {
+			// fetch by versionID and update constants file with new preferences
+			getByVersionId(preferenceId, form.get('versionId').value)
+				.then((resp) => {
+					const body = {
+						metadata: {
+							commit: commitMessage,
+						},
+						content: replaceWithPreferences(resp.content),
+					};
+					commitCode(preferenceId, body)
+						.then((res) => {
+							// update versionId in preferences with res.version_id
+							form.get('versionId').setValue(res.version_id);
+							// Save the new preferences
+							updateSearchPreferences(getPreferencesPayload()).then((action) => {
+								if (!(action && action.error)) {
+									setHasChanged();
+									setIsLoading(false);
+								}
+							});
+						})
+						.catch((err) => {
+							console.error(err);
+						});
+				})
+				.catch((err) => {
+					console.error('Error to get latest version', err);
+					return {};
+				});
+		} else {
+			const response = await generateInlineSandboxURL(getPreferencesPayload());
+			const newObj = {};
+			Object.keys(response).forEach((path) => {
+				if (path[0] === '/') {
+					const newPath = path.slice(1);
+					newObj[newPath] = response[path];
+				} else {
+					newObj[path] = response[path];
 				}
 			});
+			const body = {
+				metadata: {
+					commit: commitMessage,
+				},
+				content: newObj,
+			};
+			commitCode(preferenceId, body)
+				.then((res) => {
+					// update versionId in preferences with res.version_id
+					form.get('versionId').setValue(res.version_id);
+					// Save the new preferences
+					updateSearchPreferences(getPreferencesPayload()).then((action) => {
+						if (!(action && action.error)) {
+							setHasChanged();
+							setIsLoading(false);
+						}
+					});
+				})
+				.catch((err) => {
+					console.error(err);
+				});
 		}
 	};
 
@@ -143,24 +206,6 @@ const ReviewAndSave = ({
 				generalSettings: {
 					...diffData.generalSettings,
 					description: [oldVal, newVal],
-				},
-			};
-		}
-
-		if (
-			form.get('csbID') &&
-			form.get('csbID').value &&
-			(diffData?.facetSettings ||
-				diffData?.themeSettings ||
-				diffData?.resultSettings ||
-				diffData?.searchSettings ||
-				diffData?.pipeline)
-		) {
-			diffData = {
-				...diffData,
-				codeSettings: {
-					...diffData.codeSettings,
-					csbID: [form.get('csbID').value, ''],
 				},
 			};
 		}
@@ -367,8 +412,10 @@ const ReviewAndSave = ({
 			const resultSettings = get(diffData, 'resultSettings.fields', {});
 			Object.keys(resultSettings).forEach((i) => {
 				let field = resultSettings[i];
-				if (field[0] && !field[1]) {
-					field = [field[0], ''];
+				if (field.length === 1 && field[0]) {
+					field = ['', field[0]];
+				} else if (field[0] && !field[1]) {
+					field = [field[1], ''];
 				} else if (!field[0] && field[1]) {
 					field = ['', field[1]];
 				} else if (!field[0] && !field[1] && field.length === 3 && field[2]) {
@@ -526,26 +573,19 @@ const ReviewAndSave = ({
 					top: 20,
 				}}
 				destroyOnClose
-				okText={label}
+				okText={
+					<>
+						<Icon type={isLoading ? 'loading' : ''} />
+						{label}
+					</>
+				}
 				onCancel={handleCancel}
 				cancelButtonProps={{ 'data-cy': 'cancel-modal-button' }}
 				okButtonProps={{
 					'data-cy': 'review-save-button',
 				}}
 			>
-				<>
-					{hasEdited && (
-						<Alert
-							type="warning"
-							showIcon
-							message="Your previously saved codesandbox changes will be overwritten once you save new changes for this search UI"
-							style={{
-								marginBottom: 10,
-							}}
-						/>
-					)}
-					{isOpen && <DiffList diff={diffData} />}
-				</>
+				{isOpen && <DiffList diff={diffData} />}
 			</Modal>
 		</div>
 	);
@@ -554,7 +594,6 @@ const ReviewAndSave = ({
 ReviewAndSave.defaultProps = {
 	buttonProps: null,
 	preferenceId: null,
-	hasEdited: false,
 	isRecommLoading: false,
 	isSearchLoading: false,
 	isRecommendation: false,
@@ -565,17 +604,17 @@ ReviewAndSave.propTypes = {
 	isSearchLoading: bool,
 	isRecommLoading: bool,
 	label: string,
-	hasEdited: bool,
 	buttonProps: object,
 	preferenceId: string,
 	oldData: object.isRequired,
 	newData: object.isRequired,
 	setHasChanged: func.isRequired,
 	getPreferencesPayload: func.isRequired,
+	getPreferences: func.isRequired,
 	updateSearchPreferences: func.isRequired,
 	updateRecommendationsPreferences: func.isRequired,
-	form: object.isRequired,
 	isRecommendation: bool,
+	form: object.isRequired,
 };
 
 const mapStateToProps = (state) => ({

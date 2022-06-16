@@ -11,10 +11,10 @@ import LayoutTab from '../tabs/Layout';
 import SearchTab from '../tabs/Search';
 import General from '../tabs/General';
 import ChoosePlatformTab from '../tabs/ChoosePlatform';
+import DomainSettingsTab from '../tabs/DomainSettings';
 import { container } from '../../ResultsPage/styles';
 import Loader from '../../../components/Loader';
 import PreviewModal from '../PreviewModal';
-import ExportModal from '../ExportModal';
 import SyncStatus from '../SyncStatus';
 import PreferencesFormWrapper from '../PreferencesFormWrapperN';
 import SavePreferences from '../SavePreferencesN';
@@ -88,6 +88,9 @@ const Main = ({ tier, featureEcommerce, ...props }) => {
 									<TabPane tab="Search Settings" key="4">
 										<SearchTab />
 									</TabPane>
+									<TabPane tab="Domain Settings" key="5">
+										<DomainSettingsTab preferenceId={preferenceId} />
+									</TabPane>
 								</Tabs>
 
 								<Affix
@@ -118,17 +121,9 @@ const Main = ({ tier, featureEcommerce, ...props }) => {
 														}}
 														size="large"
 													>
-														Edit Code Inline
+														Edit Code
 													</Button>
 												)}
-											/>
-											<ExportModal
-												preferences={getPreferences}
-												buttonProps={{
-													style: {
-														marginLeft: 10,
-													},
-												}}
 											/>
 										</div>
 										<div>
@@ -136,6 +131,7 @@ const Main = ({ tier, featureEcommerce, ...props }) => {
 												form={form}
 												closeForm={closeForm}
 												preferenceId={preferenceId}
+												getPreferences={getPreferences}
 												getPreferencesPayload={getPreferencesPayload}
 											/>
 										</div>

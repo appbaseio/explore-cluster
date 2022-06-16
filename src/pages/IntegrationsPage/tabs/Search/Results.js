@@ -6,6 +6,7 @@ import { Switch, Form, List, Radio, Button, Icon, InputNumber, Input, Popover } 
 import { bool, array, object, string, func } from 'prop-types';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import DataFieldSelector from '../../../../components/Form/DataFieldSelector';
+import PriceUnit from './PriceUnit';
 import SortOptionSelector from './SortOptionSelector';
 import { traverseMapping } from '../../../../batteries/utils/mappings';
 import { getRawMappingsByAppName } from '../../../../batteries/modules/selectors';
@@ -112,6 +113,7 @@ const defaultSettings = [
 			</span>
 		),
 		value: true,
+		showPriceUnitInput: true,
 	},
 	{
 		id: 'resultImage',
@@ -261,6 +263,7 @@ const geoDefaultSettings = [
 			</span>
 		),
 		value: true,
+		showPriceUnitInput: true,
 	},
 	{
 		id: 'resultImage',
@@ -487,10 +490,15 @@ const Results = ({
 											actions={
 												fieldSelectorIds.includes(item.id)
 													? [
-															<DataFieldSelector
-																pipeline={pipeline}
-																name={item.id}
-															/>,
+															<div>
+																{item?.showPriceUnitInput ? (
+																	<PriceUnit name="priceUnit" />
+																) : null}
+																<DataFieldSelector
+																	pipeline={pipeline}
+																	name={item.id}
+																/>
+															</div>,
 													  ]
 													: [
 															<Switch
@@ -623,10 +631,15 @@ const Results = ({
 									actions={
 										fieldSelectorIds.includes(item.id)
 											? [
-													<DataFieldSelector
-														pipeline={pipeline}
-														name={item.id}
-													/>,
+													<div>
+														{item?.showPriceUnitInput ? (
+															<PriceUnit name="priceUnit" />
+														) : null}
+														<DataFieldSelector
+															pipeline={pipeline}
+															name={item.id}
+														/>
+													</div>,
 											  ]
 											: [<Switch checked={value} onChange={onChange} />]
 									}
