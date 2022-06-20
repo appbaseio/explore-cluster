@@ -42,9 +42,10 @@ const dropdownMenuCss = css`
 	max-width: min(95vw, 600px);
 
 	.stage-menu-item {
+		padding: 10px;
 		padding-right: 25px;
 		position: relative;
-		overflow: hidden;
+		height: 100px;
 		.add-icon {
 			position: absolute;
 			top: 50%;
@@ -73,6 +74,7 @@ const dropdownMenuCss = css`
 		}
 
 		&:hover {
+			background: #e6f7ff;
 			.add-icon {
 				font-size: 23px;
 				transition: all 0.1s;
@@ -119,20 +121,18 @@ const DropdownMenu = ({ pipelineSchema, getEditorValue, handleMenuClick }) => {
 			<Menu css={dropdownMenuCss} onClick={handleMenuClick}>
 				{titleAndDescriptionResults.map((stageKey) => {
 					return (
-						<Menu.Item key={stageKey}>
-							<div className="stage-menu-item">
-								<h4 title={stageKey}>{stageKey}</h4>
-								<p
-									title={
-										prebuiltStages?.additionalProperties?.stages?.[stageKey]
-											?.description ?? ''
-									}
-								>
-									{prebuiltStages?.additionalProperties?.stages?.[stageKey]
-										?.description ?? ''}
-								</p>
-								<Icon type="plus-square" theme="filled" className="add-icon" />
-							</div>
+						<Menu.Item className="stage-menu-item" key={stageKey}>
+							<h4 title={stageKey}>{stageKey}</h4>
+							<p
+								title={
+									prebuiltStages?.additionalProperties?.stages?.[stageKey]
+										?.description ?? ''
+								}
+							>
+								{prebuiltStages?.additionalProperties?.stages?.[stageKey]
+									?.description ?? ''}
+							</p>
+							<Icon type="plus-square" theme="filled" className="add-icon" />
 						</Menu.Item>
 					);
 				})}
