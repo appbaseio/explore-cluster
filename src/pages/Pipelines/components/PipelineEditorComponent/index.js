@@ -2,7 +2,7 @@ import { css } from 'emotion';
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import yamlToJson from 'js-yaml';
-import { Button, Dropdown, Icon, Menu } from 'antd';
+import { Button, Dropdown, Icon, Input, Menu } from 'antd';
 import Container from '../../../../components/Container';
 import Monaco from '../../../../batteries/components/SearchSandbox/containers/MonacoEditor';
 import { modifySchema, monacoOptions } from '../../utils';
@@ -81,6 +81,53 @@ const dropdownMenuCss = css`
 `;
 
 const QUERY_EDITOR_MODEL_PATH = 'a://b/foo.json';
+
+// eslint-disable-next-line react/prop-types
+const DropdownMenu = ({ pipelineSchema, getEditorValue, handleMenuClick }) => {
+	// eslint-disable-next-line react/prop-types
+	const prebuiltStages = pipelineSchema?.definitions?.PreBuiltStage || {};
+	const prebuiltStagesInEditor = (getEditorValue()?.stages ?? []).map((item) => item.id) ?? [];
+	const [query, setQuery] = useState('');
+	return (
+		<>
+			<Input value={query} onChange={(e) => setQuery(e.target.value)} />
+			<Menu css={dropdownMenuCss} onClick={handleMenuClick}>
+				{(prebuiltStages.enum ?? [''])
+					.sort((a, b) => {
+						const textA = a.toUpperCase();
+						const textB = b.toUpperCase();
+						if (textA < textB) {
+							return -1;
+						}
+						if (textA > textB) {
+							return 1;
+						}
+						return 0;
+					})
+					.filter((stageKey) => prebuiltStagesInEditor.includes(stageKey) === false)
+					.map((stageKey) => {
+						return (
+							<Menu.Item key={stageKey}>
+								<div className="stage-menu-item">
+									<h4 title={stageKey}>{stageKey}</h4>
+									<p
+										title={
+											prebuiltStages?.additionalProperties?.stages?.[stageKey]
+												?.description ?? ''
+										}
+									>
+										{prebuiltStages?.additionalProperties?.stages?.[stageKey]
+											?.description ?? ''}
+									</p>
+									<Icon type="plus-square" theme="filled" className="add-icon" />
+								</div>
+							</Menu.Item>
+						);
+					})}
+			</Menu>
+		</>
+	);
+};
 
 // Editor view when we want to create or edit a pipeline
 const PipelineEditorComponent = (props) => {
@@ -254,50 +301,19 @@ const PipelineEditorComponent = (props) => {
 			console.log(error);
 		}
 	};
-	const getStagesMenu = () => {
-		const prebuiltStages = pipelineSchema?.definitions?.PreBuiltStage || {};
-		const prebuiltStagesInEditor =
-			(getEditorValue()?.stages ?? []).map((item) => item.id) ?? [];
-		return (
-			<Menu css={dropdownMenuCss} onClick={handleMenuClick}>
-				{(prebuiltStages.enum ?? [''])
-					.sort((a, b) => {
-						const textA = a.toUpperCase();
-						const textB = b.toUpperCase();
-						if (textA < textB) {
-							return -1;
-						}
-						if (textA > textB) {
-							return 1;
-						}
-						return 0;
-					})
-					.filter((stageKey) => prebuiltStagesInEditor.includes(stageKey) === false)
-					.map((stageKey) => {
-						return (
-							<Menu.Item key={stageKey}>
-								<div className="stage-menu-item">
-									<h4 title={stageKey}>{stageKey}</h4>
-									<p
-										title={
-											prebuiltStages?.additionalProperties?.stages?.[stageKey]
-												?.description ?? ''
-										}
-									>
-										{prebuiltStages?.additionalProperties?.stages?.[stageKey]
-											?.description ?? ''}
-									</p>
-									<Icon type="plus-square" theme="filled" className="add-icon" />
-								</div>
-							</Menu.Item>
-						);
-					})}
-			</Menu>
-		);
-	};
+
 	return (
 		<Container css={CSS}>
-			<Dropdown className="stages-dropdown" overlay={getStagesMenu()}>
+			<Dropdown
+				className="stages-dropdown"
+				overlay={
+					<DropdownMenu
+						pipelineSchema={pipelineSchema}
+						getEditorValue={getEditorValue}
+						handleMenuClick={handleMenuClick}
+					/>
+				}
+			>
 				<Button className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
 					Add Stages <Icon type="down" />
 				</Button>
