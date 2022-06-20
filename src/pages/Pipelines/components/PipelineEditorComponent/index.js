@@ -81,6 +81,8 @@ const dropdownMenuCss = css`
 `;
 
 const QUERY_EDITOR_MODEL_PATH = 'a://b/foo.json';
+
+// Editor view when we want to create or edit a pipeline
 const PipelineEditorComponent = (props) => {
 	const { valueProp, onChange, setErrorFlag } = props;
 	const [pipelineSchema, setPipelineSchema] = useState(null);
@@ -236,13 +238,13 @@ const PipelineEditorComponent = (props) => {
 
 	const handleMenuClick = (e) => {
 		try {
-			const perbuiltStages = pipelineSchema?.definitions?.PreBuiltStage || {};
+			const prebuiltStages = pipelineSchema?.definitions?.PreBuiltStage || {};
 			const editorValue = { ...getEditorValue() };
 			if (editorValue?.stages) {
 				editorValue.stages.push({
 					id: e.key,
 					description:
-						perbuiltStages?.additionalProperties?.stages?.[e.key]?.description ?? '',
+						prebuiltStages?.additionalProperties?.stages?.[e.key]?.description ?? '',
 				});
 			}
 
@@ -253,12 +255,12 @@ const PipelineEditorComponent = (props) => {
 		}
 	};
 	const getStagesMenu = () => {
-		const perbuiltStages = pipelineSchema?.definitions?.PreBuiltStage || {};
+		const prebuiltStages = pipelineSchema?.definitions?.PreBuiltStage || {};
 		const prebuiltStagesInEditor =
 			(getEditorValue()?.stages ?? []).map((item) => item.id) ?? [];
 		return (
 			<Menu css={dropdownMenuCss} onClick={handleMenuClick}>
-				{(perbuiltStages.enum ?? [''])
+				{(prebuiltStages.enum ?? [''])
 					.sort((a, b) => {
 						const textA = a.toUpperCase();
 						const textB = b.toUpperCase();
@@ -278,11 +280,11 @@ const PipelineEditorComponent = (props) => {
 									<h4 title={stageKey}>{stageKey}</h4>
 									<p
 										title={
-											perbuiltStages?.additionalProperties?.stages?.[stageKey]
+											prebuiltStages?.additionalProperties?.stages?.[stageKey]
 												?.description ?? ''
 										}
 									>
-										{perbuiltStages?.additionalProperties?.stages?.[stageKey]
+										{prebuiltStages?.additionalProperties?.stages?.[stageKey]
 											?.description ?? ''}
 									</p>
 									<Icon type="plus-square" theme="filled" className="add-icon" />
