@@ -39,7 +39,7 @@ const CSS = css`
 const dropdownMenuCss = css`
 	max-height: 300px;
 	overflow: auto;
-	max-width: min(95vw, 600px);
+	width: min(95vw, 600px);
 
 	.stage-menu-item {
 		padding: 10px;
@@ -117,7 +117,13 @@ const DropdownMenu = ({ pipelineSchema, getEditorValue, handleMenuClick }) => {
 	);
 	return (
 		<>
-			<Input value={query} onChange={(e) => setQuery(e.target.value)} />
+			<Input
+				value={query}
+				onChange={(e) => setQuery(e.target.value)}
+				allowClear
+				placeholder="Search for stages"
+				prefix={<Icon type="search" style={{ color: '#1990ff' }} />}
+			/>
 			<Menu css={dropdownMenuCss} onClick={handleMenuClick}>
 				{titleAndDescriptionResults.map((stageKey) => {
 					return (
