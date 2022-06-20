@@ -138,6 +138,7 @@ const PipelineEditorComponent = (props) => {
 	const editorRef = useRef(null);
 	const currentModelMarkers = useRef('');
 	const oldEditorDecorations = useRef([]);
+	const [showStagesMenu, setShowStagesMenu] = useState(false);
 
 	const handleValueChange = (val) => {
 		if (valueProp !== val) {
@@ -315,6 +316,7 @@ const PipelineEditorComponent = (props) => {
 		<Container css={CSS}>
 			<Dropdown
 				className="stages-dropdown"
+				visible={showStagesMenu}
 				overlay={
 					<DropdownMenu
 						pipelineSchema={pipelineSchema}
@@ -323,7 +325,10 @@ const PipelineEditorComponent = (props) => {
 					/>
 				}
 			>
-				<Button className="ant-dropdown-link" onClick={(e) => e.preventDefault()}>
+				<Button
+					className="ant-dropdown-link"
+					onClick={() => setShowStagesMenu(!showStagesMenu)}
+				>
 					Add Stages <Icon type="down" />
 				</Button>
 			</Dropdown>
