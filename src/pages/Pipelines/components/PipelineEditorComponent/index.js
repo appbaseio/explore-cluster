@@ -38,7 +38,7 @@ const CSS = css`
 const dropdownMenuCss = css`
 	max-height: 300px;
 	overflow: auto;
-	max-width: 350px;
+	max-width: min(95vw, 600px);
 
 	.stage-menu-item {
 		padding-right: 25px;
