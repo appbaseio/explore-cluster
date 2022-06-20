@@ -293,6 +293,15 @@ const PipelineEditorComponent = (props) => {
 					description:
 						prebuiltStages?.additionalProperties?.stages?.[e.key]?.description ?? '',
 				});
+			} else {
+				editorValue.stages = [
+					{
+						id: e.key,
+						description:
+							prebuiltStages?.additionalProperties?.stages?.[e.key]?.description ??
+							'',
+					},
+				];
 			}
 
 			onChange(JSON.stringify(editorValue, null, 4));
