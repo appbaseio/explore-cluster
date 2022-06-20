@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import yamlToJson from 'js-yaml';
 import { Button, Dropdown, Icon, Input, Menu } from 'antd';
+import { unionWith } from 'lodash';
 import Container from '../../../../components/Container';
 import Monaco from '../../../../batteries/components/SearchSandbox/containers/MonacoEditor';
 import { modifySchema, monacoOptions } from '../../utils';
@@ -88,42 +89,53 @@ const DropdownMenu = ({ pipelineSchema, getEditorValue, handleMenuClick }) => {
 	const prebuiltStages = pipelineSchema?.definitions?.PreBuiltStage || {};
 	const prebuiltStagesInEditor = (getEditorValue()?.stages ?? []).map((item) => item.id) ?? [];
 	const [query, setQuery] = useState('');
+	const results = (prebuiltStages.enum ?? [''])
+		.sort((a, b) => {
+			const textA = a.toUpperCase();
+			const textB = b.toUpperCase();
+			if (textA < textB) {
+				return -1;
+			}
+			if (textA > textB) {
+				return 1;
+			}
+			return 0;
+		})
+		.filter((stageKey) => prebuiltStagesInEditor.includes(stageKey) === false);
+
+	const titleResults = results.filter((stageKey) => stageKey.includes(query));
+	const descriptionResults = results.filter((stageKey) => {
+		const description = prebuiltStages?.additionalProperties?.stages?.[stageKey]?.description;
+		return description.includes(query);
+	});
+	const titleAndDescriptionResults = unionWith(
+		titleResults,
+		descriptionResults,
+		(a, b) => a === b,
+	);
 	return (
 		<>
 			<Input value={query} onChange={(e) => setQuery(e.target.value)} />
 			<Menu css={dropdownMenuCss} onClick={handleMenuClick}>
-				{(prebuiltStages.enum ?? [''])
-					.sort((a, b) => {
-						const textA = a.toUpperCase();
-						const textB = b.toUpperCase();
-						if (textA < textB) {
-							return -1;
-						}
-						if (textA > textB) {
-							return 1;
-						}
-						return 0;
-					})
-					.filter((stageKey) => prebuiltStagesInEditor.includes(stageKey) === false)
-					.map((stageKey) => {
-						return (
-							<Menu.Item key={stageKey}>
-								<div className="stage-menu-item">
-									<h4 title={stageKey}>{stageKey}</h4>
-									<p
-										title={
-											prebuiltStages?.additionalProperties?.stages?.[stageKey]
-												?.description ?? ''
-										}
-									>
-										{prebuiltStages?.additionalProperties?.stages?.[stageKey]
-											?.description ?? ''}
-									</p>
-									<Icon type="plus-square" theme="filled" className="add-icon" />
-								</div>
-							</Menu.Item>
-						);
-					})}
+				{titleAndDescriptionResults.map((stageKey) => {
+					return (
+						<Menu.Item key={stageKey}>
+							<div className="stage-menu-item">
+								<h4 title={stageKey}>{stageKey}</h4>
+								<p
+									title={
+										prebuiltStages?.additionalProperties?.stages?.[stageKey]
+											?.description ?? ''
+									}
+								>
+									{prebuiltStages?.additionalProperties?.stages?.[stageKey]
+										?.description ?? ''}
+								</p>
+								<Icon type="plus-square" theme="filled" className="add-icon" />
+							</div>
+						</Menu.Item>
+					);
+				})}
 			</Menu>
 		</>
 	);
