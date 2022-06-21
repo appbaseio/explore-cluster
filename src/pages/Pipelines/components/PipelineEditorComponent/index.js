@@ -1,6 +1,6 @@
 import { css } from 'emotion';
 import React, { useEffect, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
+import PropTypes, { func, object } from 'prop-types';
 import yamlToJson from 'js-yaml';
 import { Button, Dropdown, Icon, Input, Menu } from 'antd';
 import { unionWith } from 'lodash';
@@ -85,9 +85,7 @@ const dropdownMenuCss = css`
 
 const QUERY_EDITOR_MODEL_PATH = 'a://b/foo.json';
 
-// eslint-disable-next-line react/prop-types
-const DropdownMenu = ({ pipelineSchema, getEditorValue, handleMenuClick }) => {
-	// eslint-disable-next-line react/prop-types
+const StagesMenu = ({ pipelineSchema, getEditorValue, handleMenuClick }) => {
 	const prebuiltStages = pipelineSchema?.definitions?.PreBuiltStage || {};
 	const prebuiltStagesInEditor = (getEditorValue()?.stages ?? []).map((item) => item.id) ?? [];
 	const [query, setQuery] = useState('');
@@ -145,6 +143,12 @@ const DropdownMenu = ({ pipelineSchema, getEditorValue, handleMenuClick }) => {
 			</Menu>
 		</>
 	);
+};
+
+StagesMenu.propTypes = {
+	pipelineSchema: object.isRequired,
+	getEditorValue: func.isRequired,
+	handleMenuClick: func.isRequired,
 };
 
 // Editor view when we want to create or edit a pipeline
@@ -336,7 +340,7 @@ const PipelineEditorComponent = (props) => {
 				className="stages-dropdown"
 				visible={showStagesMenu}
 				overlay={
-					<DropdownMenu
+					<StagesMenu
 						pipelineSchema={pipelineSchema}
 						getEditorValue={getEditorValue}
 						handleMenuClick={handleMenuClick}
