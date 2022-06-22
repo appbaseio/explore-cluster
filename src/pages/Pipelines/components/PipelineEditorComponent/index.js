@@ -40,12 +40,16 @@ const dropdownMenuCss = css`
 	max-height: 300px;
 	overflow: auto;
 	width: min(95vw, 600px);
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
 
 	.stage-menu-item {
-		padding: 10px;
+		padding: 0 14px;
 		padding-right: 25px;
 		position: relative;
-		height: 100px;
+		height: 70px;
+		margin-bottom: 0 !important;
+
 		.add-icon {
 			position: absolute;
 			top: 50%;
@@ -58,17 +62,17 @@ const dropdownMenuCss = css`
 		h4 {
 			font-weight: 600;
 			font-size: 16px;
-			margin-bottom: 7px;
+			margin-bottom: 0;
 			overflow: hidden;
+			height: 36px;
 			text-overflow: ellipsis;
-			margin-top: 4px;
 		}
 
 		p {
 			margin-bottom: 0;
 			overflow: hidden;
 			text-overflow: ellipsis;
-			max-width: 92%;
+			max-width: 96%;
 			display: inline-block;
 			font-size: 14px;
 		}
@@ -80,6 +84,12 @@ const dropdownMenuCss = css`
 				transition: all 0.1s;
 			}
 		}
+	}
+`;
+const inputStyle = css`
+	input {
+		border-bottom-left-radius: 0;
+		border-bottom-right-radius: 0;
 	}
 `;
 
@@ -105,7 +115,8 @@ const StagesMenu = ({ pipelineSchema, getEditorValue, handleMenuClick }) => {
 
 	const titleResults = results.filter((stageKey) => stageKey.includes(query));
 	const descriptionResults = results.filter((stageKey) => {
-		const description = prebuiltStages?.additionalProperties?.stages?.[stageKey]?.description;
+		const description =
+			prebuiltStages?.additionalProperties?.stages?.[stageKey]?.description ?? '';
 		return description.includes(query);
 	});
 	const titleAndDescriptionResults = unionWith(
@@ -121,6 +132,7 @@ const StagesMenu = ({ pipelineSchema, getEditorValue, handleMenuClick }) => {
 				allowClear
 				placeholder="Search for stages"
 				prefix={<Icon type="search" style={{ color: '#1990ff' }} />}
+				css={inputStyle}
 			/>
 			<Menu css={dropdownMenuCss} onClick={handleMenuClick}>
 				{titleAndDescriptionResults.map((stageKey) => {
