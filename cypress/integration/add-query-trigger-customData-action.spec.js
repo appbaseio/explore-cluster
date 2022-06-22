@@ -41,9 +41,9 @@ describe('Query Rule creation with trigger index and script action', () => {
 		cy.get('[data-cy=query-rule-action]').click();
 		cy.get('[data-cy=custom_data]').click({ force: true, multiple: true });
 		cy.wait(2000);
-		cy.get('.ace_content')
-			.type('{selectall}{backspace}')
-			.type('{ "data": "val" }', { parseSpecialCharSequences: false });
+		cy.get('.ace_content').type('{selectall}{backspace}');
+		cy.wait(1000);
+		cy.get('.ace_content').type('{ "data": "val" }', { parseSpecialCharSequences: false });
 		// add addiotional wait time to pass
 		cy.wait(2000);
 		// Save query rule
