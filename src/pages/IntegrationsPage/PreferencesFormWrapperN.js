@@ -76,6 +76,11 @@ const modalStyles = css`
 		overflow: hidden;
 		white-space: nowrap;
 	}
+	.overflow {
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+	}
 `;
 class PreferencesFormWrapperN extends React.Component {
 	constructor(props) {
@@ -184,7 +189,6 @@ class PreferencesFormWrapperN extends React.Component {
 							metafield_sync: [{ value: false, disabled: false }],
 							namedtags_sync: [{ value: false, disabled: false }],
 						}),
-						domain: '',
 				  }),
 		});
 	}
@@ -525,7 +529,6 @@ class PreferencesFormWrapperN extends React.Component {
 											enabled: facet.enabled,
 											customize: get(facet, 'rsConfig'),
 										})),
-										domain: get(preferences, 'domainSettings.domain'),
 								  }),
 						}),
 					);

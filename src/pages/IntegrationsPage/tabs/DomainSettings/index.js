@@ -76,7 +76,7 @@ const DomainSettingsTab = ({ preferenceId }) => {
 				console.error('Error to fetch all domains', err);
 			});
 	};
-	console.log(domainsData);
+
 	return (
 		<div css={domainSettingsTabStyles}>
 			<div className="input-container">

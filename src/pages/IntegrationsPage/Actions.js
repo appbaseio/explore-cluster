@@ -8,6 +8,10 @@ import { getDeploymentStatus } from './utils/sandpack-generator';
 // import asyncCallWithTimeout from './ExportInline/Components/ModalHeader';
 
 const container = css`
+	gap: 10px;
+	.ant-btn {
+		padding: 0px 10px;
+	}
 	.left-container {
 		padding-right: 20px;
 	}
@@ -69,53 +73,55 @@ class Actions extends React.Component {
 		const { isRecommendation, name } = this.props;
 
 		return (
-			<Flex alignItems="center" css={container}>
-				<Flex justifyContent="space-between" alignItems="center" className="left-container">
-					<Flex>
-						<Tooltip
-							placement="topLeft"
-							title={isRecommendation ? `Edit Recommendation UI` : `Edit Search UI`}
-						>
-							<Button onClick={this.handleEdit} type="normal">
-								View
-							</Button>
-						</Tooltip>
-						<div style={{ width: 120 }}>
-							{!isRecommendation && Object.keys(deploymentStatus).length ? (
-								<Button
-									onClick={() => {
-										this.setState({ modalType: 'deploy-logs' });
-									}}
-									type="normal"
-									className="show-on-hover"
-									style={{ marginLeft: 5 }}
-								>
-									Deploy Status
-								</Button>
-							) : null}
-						</div>
-					</Flex>
-				</Flex>
-				<Tooltip
-					placement="topLeft"
-					title={isRecommendation ? `Delete Recommendation UI` : `Delete Search UI`}
-				>
-					<Popconfirm
-						title={isRecommendation ? `Delete Recommendation UI` : `Delete Search UI`}
-						onConfirm={this.handleDelete}
-						okText="Confirm"
-						cancelText="Cancel"
+			<div>
+				<Flex alignItems="center" css={container} justifyContent="space-between">
+					{/* <Flex justifyContent="space-between" alignItems="center" className="left-container"> */}
+
+					<Tooltip
+						placement="topLeft"
+						title={isRecommendation ? `Edit Recommendation UI` : `Edit Search UI`}
 					>
-						<Icon type="delete" className="show-on-hover" />
-					</Popconfirm>
-				</Tooltip>
+						<Button onClick={this.handleEdit} type="normal">
+							View
+						</Button>
+					</Tooltip>
+
+					{!isRecommendation && Object.keys(deploymentStatus).length ? (
+						<Button
+							onClick={() => {
+								this.setState({ modalType: 'deploy-logs' });
+							}}
+							type="normal"
+						>
+							Deploy Status
+						</Button>
+					) : null}
+
+					<Tooltip
+						placement="topLeft"
+						title={isRecommendation ? `Delete Recommendation UI` : `Delete Search UI`}
+					>
+						<Popconfirm
+							title={
+								isRecommendation ? `Delete Recommendation UI` : `Delete Search UI`
+							}
+							onConfirm={this.handleDelete}
+							okText="Confirm"
+							cancelText="Cancel"
+						>
+							<Icon type="delete" className="show-on-hover" />
+						</Popconfirm>
+					</Tooltip>
+				</Flex>
+
 				<DeployLogsModal
 					open={modalType === 'deploy-logs'}
 					handleCancel={this.handleCancel}
 					deploymentStatus={deploymentStatus}
 					uiBuilderName={name}
 				/>
-			</Flex>
+				{/* </Flex> */}
+			</div>
 		);
 	}
 }

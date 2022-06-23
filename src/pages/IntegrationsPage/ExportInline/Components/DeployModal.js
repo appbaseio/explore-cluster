@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Alert, Icon, Modal, Select } from 'antd';
+import { Alert, Icon, Modal, Select, Tooltip } from 'antd';
 import { timeDifference, unsafeChars } from '../../utils/index';
 import { commitModalStyles } from './styles';
 import '../styles.css';
@@ -15,6 +15,7 @@ const DeployModal = ({
 	setErrMsg,
 	uiBuilderName,
 	allVersions,
+	currentVersion,
 }) => {
 	const defaultObj = {
 		projectSettings: {
@@ -25,12 +26,18 @@ const DeployModal = ({
 			framework: null,
 			// build_dir: 'build',
 		},
-		target: '',
+		target: 'staging',
 		version_id: '',
 	};
 
 	const [deployObj, setDeployObj] = useState(defaultObj);
-	const [updatedAt, setUpdatedAt] = useState(0);
+
+	useEffect(() => {
+		setDeployObj({
+			...defaultObj,
+			version_id: currentVersion.version_id,
+		});
+	}, [currentVersion]);
 
 	const handleInputChange = (key, val) => {
 		setErrMsg('');
@@ -60,19 +67,6 @@ const DeployModal = ({
 		}
 	};
 
-	const getStatus = (val) => {
-		const versionConfig = allVersions.filter((i) => i.version_id === val);
-		if (versionConfig.length) {
-			const time = timeDifference(
-				new Date(),
-				new Date(versionConfig[0].updated_at || versionConfig[0].created_at * 1000),
-			);
-			setUpdatedAt(time);
-		} else {
-			setUpdatedAt(0);
-		}
-	};
-
 	function validDomain(str) {
 		const pattern = new RegExp(
 			'^(https?:\\/\\/)?' + // protocol
@@ -98,20 +92,26 @@ const DeployModal = ({
 			title={<div style={{ fontWeight: 'bold' }}>Deploy {uiBuilderName}</div>}
 			visible={open}
 			afterClose={() => {
-				setDeployObj(defaultObj);
+				setDeployObj({
+					...defaultObj,
+					version_id: currentVersion.version_id ? currentVersion.version_id : '',
+				});
 				setErrMsg('');
-				setUpdatedAt(0);
 			}}
 			onOk={() => handleOk(deployObj)}
 			onCancel={() => {
 				handleCancel();
-				setDeployObj(defaultObj);
+				setDeployObj({
+					...defaultObj,
+					version_id: currentVersion.version_id ? currentVersion.version_id : '',
+				});
 				setErrMsg('');
 			}}
 			okText={<>Deploy {isLoading ? <Icon type="loading" /> : null}</>}
 			okButtonProps={{
 				disabled: errMsg || !deployObj.target,
 			}}
+			width={600}
 		>
 			<div css={commitModalStyles}>
 				{/* <div className="label-container">Site Name</div> */}
@@ -140,19 +140,41 @@ const DeployModal = ({
 					optionLabelProp="value"
 					onSelect={(val) => {
 						handleInputChange('version_id', val);
-						getStatus(val);
 					}}
 				>
-					{(allVersions || []).map((data) => (
-						<Select.Option value={data.version_id} key={data.version_id}>
-							<b>{data.metadata.commit}</b>
-							<div>{data.version_id}</div>
-						</Select.Option>
-					))}
+					{(allVersions || []).map((data) => {
+						const time = timeDifference(
+							new Date(),
+							new Date(data.updated_at || data.created_at * 1000),
+						);
+						return (
+							<Select.Option
+								value={data.version_id}
+								key={data.version_id}
+								css={commitModalStyles}
+							>
+								<span className="suggestion">
+									<Tooltip title={data.metadata.commit}>
+										<div className="commit-message overflow">
+											{data.metadata.commit}
+										</div>
+									</Tooltip>
+
+									<img
+										src="/static/images/commit.png"
+										alt="commit-icon"
+										width={20}
+										style={{ margin: '0px 5px 0px 5px' }}
+									/>
+									<div className="version-id overflow">{data.version_id}</div>
+								</span>
+								{/* eslint-disable-next-line */}
+								{time && isNaN(time) ? <div>saved {time}</div> : null}
+							</Select.Option>
+						);
+					})}
 				</Select>
 
-				{/* eslint-disable-next-line */}
-				{updatedAt && isNaN(updatedAt) ? <>&nbsp; saved {updatedAt}</> : null}
 				<div style={{ height: 'auto', marginTop: 10 }}>
 					{errMsg ? (
 						<Alert
@@ -177,6 +199,7 @@ DeployModal.propTypes = {
 	uiBuilderName: PropTypes.string,
 	allVersions: PropTypes.array,
 	isLoading: PropTypes.bool,
+	currentVersion: PropTypes.object,
 };
 
 DeployModal.defaultProps = {
@@ -186,6 +209,7 @@ DeployModal.defaultProps = {
 	uiBuilderName: '',
 	allVersions: [],
 	isLoading: false,
+	currentVersion: {},
 };
 
 export default withRouter(DeployModal);

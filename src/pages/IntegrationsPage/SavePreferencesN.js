@@ -135,6 +135,13 @@ class SavePreferencesN extends React.Component {
 					newPreferences.globalSettings.meta.deploySettings.versionId = '';
 				}
 			}
+
+			if (
+				get(diffData, 'fusionSettings', {}) &&
+				get(newPreferences, 'fusionSettings') === null
+			) {
+				delete newPreferences.fusionSettings;
+			}
 		}
 
 		delete newPreferences.type;

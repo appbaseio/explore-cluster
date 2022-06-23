@@ -166,7 +166,6 @@ const ModalHeader = ({
 		}
 		deployUiBuilder(preferenceId, body)
 			.then(() => {
-				message.info('Deployed successfully');
 				fetchDeploymentStatus('deployed');
 				myInterval = setInterval(() => fetchDeploymentStatus(), 7000);
 			})
@@ -181,11 +180,11 @@ const ModalHeader = ({
 	const fetchDeploymentStatus = (status = 'notDeployed') => {
 		getDeploymentStatus(preferenceId)
 			.then((res) => {
-				const state = deploymentStatus.status || deploymentStatus.state;
+				const state = res.status || res.state;
 				setDeploymentStatus(res);
 				if (status === 'deployed') {
 					setIsLoading(false);
-					setModalType('');
+					setModalType('deploy-logs');
 				}
 				if (state === 'ERROR' || state === 'READY' || state === 'CANCELED')
 					clearInterval(myInterval);
@@ -205,14 +204,17 @@ const ModalHeader = ({
 	return (
 		<>
 			<div className="header-container">
-				<div className="header-title-container">
+				<div className="header-title-container" style={{ width: '100%' }}>
 					<div className="header-font">Code Editor</div>
 					{currentVersion.version_id && currentVersion.commit ? (
-						<div className="header-title-container">
+						<div
+							className="header-title-container"
+							style={{ justifyContent: 'center', maxWidth: '70%' }}
+						>
 							<Tooltip title={currentVersion.commit}>
 								<p
-									style={{ maxWidth: 200 }}
-									className="overflow-container commit-font"
+									style={{ maxWidth: '65%', margin: 0 }}
+									className="overflow commit-font"
 								>
 									{currentVersion.commit}
 								</p>
@@ -225,10 +227,7 @@ const ModalHeader = ({
 								style={{ margin: '0px 5px 0px 5px' }}
 							/>
 							<Tooltip title={currentVersion.version_id}>
-								<p
-									style={{ maxWidth: 150 }}
-									className="overflow-container  versionid-font"
-								>
+								<p style={{ margin: 0 }} className="overflow  versionid-font">
 									{currentVersion.version_id}
 								</p>
 							</Tooltip>
@@ -274,7 +273,9 @@ const ModalHeader = ({
 						/>
 					</div>
 				</div>
-				{deploymentStatus.status || deploymentStatus.state ? (
+				{/* eslint-disable-next-line */}
+				{currentVersion.version_id === deploymentStatus?.meta?.version_id &&
+				(deploymentStatus.status || deploymentStatus.state) ? (
 					<div className="status-container" onClick={() => setModalType('deploy-logs')}>
 						<Button type="link" style={{ padding: 0 }}>
 							Deploy Status
@@ -329,6 +330,7 @@ const ModalHeader = ({
 				isLoading={isLoading}
 				handleCancel={handleCancel}
 				allVersions={allVersions}
+				currentVersion={currentVersion}
 			/>
 		</>
 	);
