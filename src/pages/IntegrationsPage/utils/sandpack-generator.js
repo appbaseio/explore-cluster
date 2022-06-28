@@ -1,8 +1,9 @@
 import { get } from 'lodash';
 import { getURL } from '../../../constants/config';
-import files from '../../../../constants/files';
+import files from '../../../../templates/files';
 import { doGet, doPut } from '../../../batteries/utils/requestService';
 import { getAuthToken } from './index';
+import templates from '../../../../template-sources-output.json';
 
 export const templateConfigMap = {
 	classic: [
@@ -60,26 +61,45 @@ export const tabSettings = {
 	},
 };
 
-export const generateInlineSandboxURL = async (preferences) => {
-	const newFiles = { ...files };
-	const newPrefs = {
-		...preferences,
-		appbaseSettings: {
-			index: preferences.pipeline,
-			credentials: get(preferences, 'exportSettings.credentials', ''),
-			url: localStorage.getItem('url') || sessionStorage.getItem('url'),
-		},
-	};
-	const str = newFiles['/src/utils/constants.js'];
-	if (str) {
-		const newStr = str.replace(
-			`'{{APPBASE_PREFERENCES}}'`,
-			JSON.stringify(JSON.stringify(newPrefs)),
-		);
+const getTemplate = (template) => {
+	return templates.filter((i) => i.name === template)[0];
+};
 
-		newFiles['/src/utils/constants.js'] = newStr;
+export const generateInlineSandboxURL = async (preferences) => {
+	let fileName = '';
+	const themeType = get(preferences, 'themeSettings.type', '');
+	const template = getTemplate(themeType);
+	if (Object.keys(template).length) {
+		if (template.version) {
+			fileName = `reactivesearch-shopify-plugin@${template.version}`;
+		} else if (template.commit) {
+			fileName = `reactivesearch-shopify-plugin@${template.commit}`;
+		} else if (template.branch) {
+			fileName = `reactivesearch-shopify-plugin@${template.branch}`;
+		} else {
+			fileName = `reactivesearch-shopify-plugin@master`;
+		}
+		const newFiles = { ...files[fileName] };
+		const newPrefs = {
+			...preferences,
+			appbaseSettings: {
+				index: preferences.pipeline,
+				credentials: get(preferences, 'exportSettings.credentials', ''),
+				url: localStorage.getItem('url') || sessionStorage.getItem('url'),
+			},
+		};
+		const str = newFiles['/src/utils/constants.js'];
+		if (str) {
+			const newStr = str.replace(
+				`'{{APPBASE_PREFERENCES}}'`,
+				JSON.stringify(JSON.stringify(newPrefs)),
+			);
+
+			newFiles['/src/utils/constants.js'] = newStr;
+		}
+		return newFiles;
 	}
-	return newFiles;
+	return {};
 };
 
 export const replaceWithPreferences = async (code, preferences) => {

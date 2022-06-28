@@ -8,7 +8,7 @@ import {
 	ReactiveList,
 	ResultList,
 	SelectedFilters,
-	RangeInput
+	RangeInput,
 } from '@appbaseio/reactivesearch';
 import { Tag, Icon } from 'antd';
 import appbaseHelpers from '../utils/appbaseHelpers';
@@ -31,11 +31,7 @@ const renderFilters = (fields) => {
 							size={15}
 							sortBy="count"
 							react={{
-								and: [
-									'search',
-									'vote_average',
-									'release_year'
-								],
+								and: ['search', 'vote_average', 'release_year'],
 							}}
 							showSearch={false}
 						/>
@@ -49,7 +45,7 @@ const renderFilters = (fields) => {
 							dataField={field}
 							title="Vote Average"
 							filterLabel="Vote Average"
-							showHistogram={true}
+							showHistogram
 							rangeLabels={(min, max) => ({
 								start: min,
 								end: max,
@@ -65,7 +61,7 @@ const renderFilters = (fields) => {
 							key={field}
 							title="Release Year"
 							filterLabel="Release Year"
-							showHistogram={true}
+							showHistogram
 							range={{
 								start: 1950,
 								end: 2021,
@@ -129,7 +125,13 @@ const renderResultList = () => (
 		{({ data }) => (
 			<ResultListWrapper>
 				{data.map((item) => (
-					<div style={{display: 'flex', padding: 10, borderBottom: '1px solid rgb(239, 239, 239)'}}>
+					<div
+						style={{
+							display: 'flex',
+							padding: 10,
+							borderBottom: '1px solid rgb(239, 239, 239)',
+						}}
+					>
 						<img
 							style={{
 								height: 160,
@@ -139,7 +141,9 @@ const renderResultList = () => (
 							src={item.poster_path}
 							alt={item.poster_path}
 							onError={(event) => {
-								event.target.src = 'https://www.houseoftara.com/shop/wp-content/uploads/2019/05/placeholder.jpg'; // eslint-disable-line no-param-reassign
+								// eslint-disable-next-line
+								event.target.src =
+									'https://banksiafdn.com/wp-content/uploads/2019/10/placeholde-image.jpg'; // eslint-disable-line no-param-reassign
 							}}
 						/>
 						<ResultList key={item._id} id={item._id}>
@@ -151,10 +155,19 @@ const renderResultList = () => (
 								/>
 								<ResultList.Description>
 									<div>
-										<div style={{display: 'flex', color: '#424242'}}>
-											<p style={{fontWeight: '600', marginRight: 5}}>Release Year </p>
+										<div style={{ display: 'flex', color: '#424242' }}>
+											<p style={{ fontWeight: '600', marginRight: 5 }}>
+												Release Year{' '}
+											</p>
 											<p> {item.release_year}</p>
-											<p><Icon type="star" style={{ marginLeft: 40, marginRight: 3 }} theme="twoTone" /> {item.vote_average}/10</p>
+											<p>
+												<Icon
+													type="star"
+													style={{ marginLeft: 40, marginRight: 3 }}
+													theme="twoTone"
+												/>{' '}
+												{item.vote_average}/10
+											</p>
 										</div>
 										<p
 											style={{
@@ -174,7 +187,6 @@ const renderResultList = () => (
 								</ResultList.Description>
 							</ResultList.Content>
 						</ResultList>
-
 					</div>
 				))}
 			</ResultListWrapper>

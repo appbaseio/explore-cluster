@@ -18,7 +18,7 @@
 		"cypress:run": "cypress run --record --key 8e90df64-6ae0-484d-b8ef-3b7c5a521382 open",
 		"cypress:open": " cypress open",
 		"cypress:chrome": "cypress run --headless chrome",
-		"preinstall": "./extract-shopify.sh && node preinstall-node.js"
+		"preinstall": "./extract-shopify.sh && node preinstall-server.js"
 	},
 	"husky": {
 		"hooks": {

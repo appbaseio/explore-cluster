@@ -139,6 +139,14 @@ const SearchPreferencePage = Loadable({
 	loading: Loader,
 });
 
+const SearchTemplatePage = Loadable({
+	loader: () =>
+		import(
+			/* webpackChunkName: "SearchPreferencePage" */ '../../pages/IntegrationsPage/SearchN/Wizard/index'
+		),
+	loading: Loader,
+});
+
 const RecommendationsPreferencePage = Loadable({
 	loader: () =>
 		import(
@@ -495,18 +503,25 @@ class ClusterRouteContainer extends React.Component {
 					/>
 					<Route
 						exact
+						path="/cluster/search-builder/new"
+						render={(props) => (
+							<AppPageContainer {...props} component={SearchTemplatePage} />
+						)}
+					/>
+					<Route
+						exact
 						path="/cluster/search-builder/:id"
 						render={(props) => (
 							<AppPageContainer {...props} component={SearchPreferencePage} />
 						)}
 					/>
-					<Route
+					{/* <Route
 						exact
 						path="/cluster/search-builder/new"
 						render={(props) => (
 							<AppPageContainer {...props} component={SearchPreferencePage} />
 						)}
-					/>
+					/> */}
 					<Route
 						exact
 						path="/cluster/search-builder/:id/code"

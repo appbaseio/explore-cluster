@@ -3,7 +3,6 @@ import { string, element, bool } from 'prop-types';
 import { FieldGroup } from 'react-reactive-form';
 import { Tabs } from 'antd';
 import { FormContext, verticalTab } from '../../utils';
-import SearchLayout from './SearchLayout';
 import StylePresets from './StylePresets';
 import Branding from './Branding';
 import CustomCss from './CustomCss';
@@ -16,11 +15,7 @@ const Layout = ({ defaultActiveKey, appendTabs, isRecommendation }) => {
 	return (
 		<Tabs defaultActiveKey={defaultActiveKey} tabPosition="left" className={verticalTab}>
 			{appendTabs}
-			{!isRecommendation && (
-				<TabPane tab="Search Layout" key="search-layout">
-					<FieldGroup control={form} render={() => <SearchLayout />} />
-				</TabPane>
-			)}
+
 			<TabPane tab="Branding" key="branding">
 				<FieldGroup control={form} render={() => <Branding control={form} />} />
 			</TabPane>
