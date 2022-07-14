@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { withRouter } from 'react-router-dom';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
-import { Tabs, Affix, Button } from 'antd';
+import { Tabs, Affix, Button, Icon } from 'antd';
 import { FieldGroup } from 'react-reactive-form';
 import { object, array, func, string, bool } from 'prop-types';
 import { v4 as uuidv4 } from 'uuid';
@@ -10,7 +10,6 @@ import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
 import LayoutTab from '../tabs/Layout';
 import SearchTab from '../tabs/Search';
 import General from '../tabs/General';
-import ChoosePlatformTab from '../tabs/ChoosePlatform';
 import DomainSettingsTab from '../tabs/DomainSettings';
 import { container } from '../../ResultsPage/styles';
 import Loader from '../../../components/Loader';
@@ -18,6 +17,7 @@ import PreviewModal from '../PreviewModal';
 import SyncStatus from '../SyncStatus';
 import PreferencesFormWrapper from '../PreferencesFormWrapperN';
 import SavePreferences from '../SavePreferencesN';
+import PageRoutes from '../PageRoutes';
 import { getSearchPreferencesN } from '../../../batteries/modules/actions';
 import { isValidPlan, features } from '../../../batteries/utils';
 
@@ -38,9 +38,14 @@ const bannerDetailsPaid = {
 	href: 'http://docs.appbase.io/docs/reactivesearch/ui-builder/search/',
 };
 
-const Main = ({ tier, featureEcommerce, ...props }) => {
+const Main = ({ tier, featureEcommerce, getPreferencesN, ...props }) => {
+	useEffect(() => {
+		getPreferencesN();
+	}, []);
+
 	const preferenceId = props.match.params.id === 'new' ? uuidv4() : props.match.params.id;
 	const [isLoading, setIsLoading] = useState(true);
+	const [isEditorLoading, setIsEditorLoading] = useState(false);
 
 	const closeForm = () => {
 		props.history.push('/cluster/search-builder');
@@ -63,7 +68,11 @@ const Main = ({ tier, featureEcommerce, ...props }) => {
 					}
 					return (
 						<>
-							{pipeline ? <SyncStatus form={form} pipeline={pipeline} /> : null}
+							<SyncStatus
+								form={form}
+								pipeline={pipeline}
+								preferenceId={preferenceId}
+							/>
 							<div
 								style={{
 									backgroundColor: '#fff',
@@ -76,19 +85,54 @@ const Main = ({ tier, featureEcommerce, ...props }) => {
 									style={{ minHeight: 500 }}
 									destroyInactiveTabPane
 								>
-									<TabPane tab="General" key="1">
+									<TabPane
+										tab={
+											<span>
+												<Icon type="setting" />
+												General
+											</span>
+										}
+										key="1"
+									>
 										<General />
 									</TabPane>
-									<TabPane tab="E-Commerce Platform" key="2">
-										<ChoosePlatformTab pipeline={pipeline} />
-									</TabPane>
-									<TabPane tab="Layout and Design" key="3">
+									<TabPane
+										tab={
+											<span>
+												<img
+													alt="theme-icon"
+													width={15}
+													src="/static/images/theme-icon.svg"
+													style={{ marginRight: 8 }}
+												/>
+												Theme
+											</span>
+										}
+										key="2"
+									>
 										<LayoutTab />
 									</TabPane>
-									<TabPane tab="Search Settings" key="4">
+									<TabPane
+										tab={
+											<span>
+												<Icon type="appstore" />
+												UI Components
+											</span>
+										}
+										key="3"
+									>
 										<SearchTab />
 									</TabPane>
-									<TabPane tab="Domain Settings" key="5">
+									<TabPane
+										tab={
+											<span>
+												{/* <Icon type="database" style={{ margin: 0 }} /> */}
+												<Icon type="database" />
+												Domain
+											</span>
+										}
+										key="4"
+									>
 										<DomainSettingsTab preferenceId={preferenceId} />
 									</TabPane>
 								</Tabs>
@@ -102,26 +146,59 @@ const Main = ({ tier, featureEcommerce, ...props }) => {
 									}}
 								>
 									<div className="flex space-between card-footer">
-										<div className="flex">
+										<div className="flex" style={{ gap: 10 }}>
+											<FieldGroup
+												control={form}
+												strict={false}
+												render={() => (
+													<PageRoutes
+														getPreferencesPayload={
+															getPreferencesPayload
+														}
+														preferences={getPreferences()}
+														form={form}
+														setIsEditorLoading={setIsEditorLoading}
+													/>
+												)}
+											/>
+
 											<PreviewModal
 												pipeline={pipeline}
 												preferences={getPreferences}
+												preferenceId={preferenceId}
+												form={form}
+												getPreferencesPayload={getPreferencesPayload}
+												isEditorLoading={isEditorLoading}
+												setIsEditorLoading={setIsEditorLoading}
 											/>
 											<FieldGroup
 												control={form}
+												strict={false}
 												render={() => (
 													<Button
-														style={{
-															marginLeft: 10,
-														}}
 														onClick={() => {
 															props.history.push(
 																`/cluster/search-builder/${preferenceId}/code`,
 															);
 														}}
+														disabled={isEditorLoading}
 														size="large"
 													>
-														Edit Code
+														<div className="button-label">
+															{isEditorLoading ? (
+																<Icon
+																	type="loading"
+																	style={{ marginRight: 5 }}
+																/>
+															) : (
+																<img
+																	alt="code-icon"
+																	width={15}
+																	src="/static/images/code-icon.svg"
+																/>
+															)}
+															Code Editor
+														</div>
 													</Button>
 												)}
 											/>
@@ -153,6 +230,7 @@ Main.propTypes = {
 	getPreferencesN: func.isRequired,
 	tier: string.isRequired,
 	featureEcommerce: bool,
+	searchPreferences: array.isRequired,
 };
 
 Main.defaultProps = {
@@ -162,6 +240,7 @@ Main.defaultProps = {
 
 const mapStateToProps = (state) => ({
 	tier: get(state, '$getAppPlan.results.tier'),
+	searchPreferences: get(state, '$getSearchPreferencesN.results', []),
 	featureEcommerce: get(state, '$getAppPlan.results.feature_ecommerce', false),
 });
 

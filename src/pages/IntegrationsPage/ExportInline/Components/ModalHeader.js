@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
-
+import get from 'lodash/get';
 import { Button, Tooltip, Icon, Modal, message } from 'antd';
 import CommitModal from './CommitModal';
 import PastVersionsDrawer from './PastVersionsDrawer';
 import DeployLogsModal from './DeployLogsModal';
 import DeployModal from './DeployModal';
-import { deployStatusMapper } from '../../utils/index';
+import { deployStatusMapper, getTemplate } from '../../utils/index';
 import {
 	commitCode,
 	getAllVersions,
@@ -62,6 +62,7 @@ const ModalHeader = ({
 	modalType,
 	setModalType,
 	setOpenCommitModal,
+	preferences,
 }) => {
 	const [visible, setVisible] = useState(false);
 	const [allVersions, setAllVersions] = useState([]);
@@ -89,6 +90,16 @@ const ModalHeader = ({
 			});
 		}
 	}, [modalType]);
+
+	useEffect(() => {
+		const themeType = get(preferences, 'themeSettings.type', '');
+		const templateObj = getTemplate(themeType);
+		if (templateObj.manifest_path && !updatedCode[`/${templateObj.manifest_path}`]) {
+			setErrMsg('Manifest is missing');
+		} else {
+			setErrMsg('');
+		}
+	}, [updatedCode]);
 
 	const fetchAllVersions = () => {
 		getAllVersions(preferenceId)
@@ -198,7 +209,7 @@ const ModalHeader = ({
 	const handleCancel = () => {
 		setModalType('');
 		setOpenCommitModal(false);
-		setErrMsg('');
+		if (errMsg !== 'Manifest is missing') setErrMsg('');
 	};
 
 	return (
@@ -353,6 +364,7 @@ ModalHeader.propTypes = {
 	modalType: PropTypes.string,
 	setModalType: PropTypes.func,
 	setOpenCommitModal: PropTypes.func,
+	preferences: PropTypes.object,
 };
 
 ModalHeader.defaultProps = {
@@ -370,6 +382,7 @@ ModalHeader.defaultProps = {
 	modalType: '',
 	setModalType: () => {},
 	setOpenCommitModal: () => {},
+	preferences: {},
 };
 
 export default withRouter(ModalHeader);

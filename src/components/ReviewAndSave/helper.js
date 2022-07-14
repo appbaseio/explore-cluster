@@ -420,6 +420,10 @@ const settingsMap = {
 		title: 'Pagination',
 		description: '',
 	},
+	componentType: {
+		title: 'Component Type',
+		description: '',
+	},
 	infiniteScroll: {
 		title: 'Infinite Scroll',
 		description: '',

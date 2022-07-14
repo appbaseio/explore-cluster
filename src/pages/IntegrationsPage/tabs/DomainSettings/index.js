@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Alert, Form, Icon, Input } from 'antd';
 import { string } from 'prop-types';
-import { addDomain, getDomainStatus, getAllDomains } from '../../utils/index';
+import { addDomain, getDomainStatus, getAllDomains } from '../../utils/domain-apis';
 import { domainSettingsTabStyles } from './styles';
 import DomainList from './DomainList';
 
@@ -76,7 +76,6 @@ const DomainSettingsTab = ({ preferenceId }) => {
 				console.error('Error to fetch all domains', err);
 			});
 	};
-
 	return (
 		<div css={domainSettingsTabStyles}>
 			<div className="input-container">

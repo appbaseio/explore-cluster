@@ -6,12 +6,18 @@ import { connect } from 'react-redux';
 import { func, object, bool, string } from 'prop-types';
 import { diff } from 'jsondiffpatch';
 import DiffList from './DiffList';
-import { generateInlineSandboxURL, getByVersionId, commitCode } from './utils/sandpack-generator';
+import {
+	generateInlineSandboxURL,
+	getByVersionId,
+	commitCode,
+	preferencesInConstants,
+} from './utils/sandpack-generator';
 import {
 	saveSearchPreferenceN,
 	saveRecommendationPreferenceN,
 } from '../../batteries/modules/actions';
-import { updateConstantsWithPreferences } from './utils/index';
+import { transformPreferences } from './utils/index';
+import { transformContent } from './ExportInline/Components/ModalHeader';
 
 const Badge = styled.span`
 	background: #f5222d;
@@ -47,7 +53,6 @@ const ReviewAndSave = ({
 	updateSearchPreferences,
 	updateRecommendationsPreferences,
 	getPreferencesPayload,
-	getPreferences,
 	setHasChanged,
 	isRecommendation,
 	preferenceId,
@@ -97,29 +102,26 @@ const ReviewAndSave = ({
 		}
 	};
 
-	const replaceWithPreferences = (code) => {
-		const newCode = { ...code };
-		newCode['src/utils/constants.js'] = updateConstantsWithPreferences(getPreferences());
-		return newCode;
-	};
-
 	const handleCommitCode = async (commitMessage) => {
+		const newPreferences = transformPreferences(getPreferencesPayload());
 		if (form.get('versionId').value) {
 			// fetch by versionID and update constants file with new preferences
 			getByVersionId(preferenceId, form.get('versionId').value)
 				.then((resp) => {
+					const content = transformContent(resp.content);
+					const newContent = preferencesInConstants(content, newPreferences);
 					const body = {
 						metadata: {
-							commit: commitMessage,
+							commit: 'system commit: auto save page changes',
 						},
-						content: replaceWithPreferences(resp.content),
+						content: newContent,
 					};
 					commitCode(preferenceId, body)
 						.then((res) => {
 							// update versionId in preferences with res.version_id
 							form.get('versionId').setValue(res.version_id);
 							// Save the new preferences
-							updateSearchPreferences(getPreferencesPayload()).then((action) => {
+							updateSearchPreferences(newPreferences).then((action) => {
 								if (!(action && action.error)) {
 									setHasChanged();
 									setIsLoading(false);
@@ -156,7 +158,7 @@ const ReviewAndSave = ({
 					// update versionId in preferences with res.version_id
 					form.get('versionId').setValue(res.version_id);
 					// Save the new preferences
-					updateSearchPreferences(getPreferencesPayload()).then((action) => {
+					updateSearchPreferences(newPreferences).then((action) => {
 						if (!(action && action.error)) {
 							setHasChanged();
 							setIsLoading(false);
@@ -312,11 +314,9 @@ const ReviewAndSave = ({
 			const searchSettings = get(diffData, 'searchSettings.rsConfig', {});
 			Object.keys(searchSettings).forEach((field) => {
 				if (searchSettings[field].length !== 2) {
-					if (searchSettings[field][0] && !searchSettings[field][1]) {
-						searchSettings[field] = [searchSettings[field][0], false];
-					} else {
-						delete searchSettings[field];
-					}
+					const newVal = get(newObj, `searchSettings.rsConfig.${field}`, '');
+					const oldVal = get(oldObj, `searchSettings.rsConfig.${field}`, '');
+					searchSettings[field] = [oldVal, newVal];
 				}
 			});
 			diffData = {
@@ -398,6 +398,18 @@ const ReviewAndSave = ({
 
 		if (get(diffData, 'resultSettings.rsConfig', null)) {
 			const resultSettings = get(diffData, 'resultSettings.rsConfig', {});
+			if (resultSettings.componentType) {
+				const newVal = get(newObj, 'resultSettings.componentType', '');
+				const oldVal = get(oldObj, 'resultSettings.componentType', '');
+
+				diffData = {
+					...diffData,
+					resultSettings: {
+						componentType: [oldVal, newVal],
+					},
+				};
+			}
+
 			diffData = {
 				...diffData,
 				resultSettings: {

@@ -29,6 +29,7 @@ import {
 	getSearchPreferencesN,
 	getRecommendationsPreferencesN,
 } from '../../batteries/modules/actions';
+import { reOrderPreferences } from './utils/index';
 
 const modalStyles = css`
 	.header-container {
@@ -90,6 +91,7 @@ class PreferencesFormWrapperN extends React.Component {
 			description: '',
 			pipeline: [undefined, Validators.required],
 			id: '',
+			currentPage: '',
 			// Custom Logo Settings
 			logoUrl: '',
 			logoWidth: 20,
@@ -189,8 +191,15 @@ class PreferencesFormWrapperN extends React.Component {
 							metafield_sync: [{ value: false, disabled: false }],
 							namedtags_sync: [{ value: false, disabled: false }],
 						}),
+						pageSettings: {
+							pages: {},
+							fields: {},
+						},
 				  }),
 		});
+		this.state = {
+			currentPage: '',
+		};
 	}
 
 	componentDidMount() {
@@ -213,23 +222,188 @@ class PreferencesFormWrapperN extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
+		const { currentPage } = this.state;
 		const { searchPreferences, recommendationsPreferences } = this.props;
 		if (
 			prevProps.searchPreferences !== searchPreferences ||
 			prevProps.recommendationsPreferences !== recommendationsPreferences
 		) {
 			this.getFormPreferences();
+			const newPage = get(searchPreferences, 'pageSettings.currentPage', '');
+			if (currentPage !== newPage) {
+				// eslint-disable-next-line
+				this.setState({
+					currentPage: newPage,
+				});
+			}
 		}
 	}
 
+	transformSearchPreferences = (preferences) => {
+		const getStaticFilterFormValue = (filterName) => {
+			const preference = get(preferences, 'facetSettings.staticFacets', []).find(
+				(o) => o.name === filterName,
+			);
+			if (preference) {
+				return {
+					enabled: preference.enabled,
+					customize: get(preference, 'rsConfig'),
+				};
+			}
+			return undefined;
+		};
+		const resetFormArrayControls = () => {
+			const dynamicFilterControl = this.form.get('dynamicFilters');
+			if (dynamicFilterControl) {
+				dynamicFilterControl.controls = [];
+			}
+			const recommendationsControl = this.form.get('recommendations');
+			if (recommendationsControl) {
+				recommendationsControl.controls = [];
+			}
+		};
+		const getFilterMessages = () => {
+			let noFilterItem;
+			let fetchingFilterOptions;
+			get(preferences, 'facetSettings.staticFacets', []).forEach((i) => {
+				noFilterItem = get(i, 'customMessages.noResults');
+				fetchingFilterOptions = get(i, 'customMessages.loading');
+			});
+			get(preferences, 'facetSettings.dynamicFacets', []).forEach((i) => {
+				noFilterItem = get(i, 'customMessages.noResults');
+				fetchingFilterOptions = get(i, 'customMessages.loading');
+			});
+			return {
+				noFilterItem,
+				fetchingFilterOptions,
+			};
+		};
+		resetFormArrayControls();
+		// Add controls for dynamic filters
+		const dynamicFilterControl = this.form.get('dynamicFilters');
+		get(preferences, 'facetSettings.dynamicFacets', []).forEach((data, index) => {
+			const control = getFilterConfigurationForm(data.rsConfig, true);
+			control.meta = {
+				key: getDynamicFilterKey(index),
+			};
+			dynamicFilterControl.push(control);
+		});
+		try {
+			const patchVar = JSON.parse(
+				JSON.stringify({
+					name: get(preferences, 'name', ''),
+					description: get(preferences, 'description', ''),
+					pipeline: get(preferences, 'pipeline', ''),
+					id: get(preferences, 'id', ''),
+					currentPage: get(preferences, 'pageSettings.currentPage', ''),
+					logoUrl: get(preferences, 'globalSettings.meta.branding.logoUrl', ''),
+					logoWidth: get(preferences, 'globalSettings.meta.branding.logoWidth', 20),
+					logoAlignment: get(
+						preferences,
+						'globalSettings.meta.branding.logoAlignment',
+						'left',
+					),
+					themeType: get(preferences, 'themeSettings.type'),
+					primaryColor: get(preferences, 'themeSettings.rsConfig.colors.primaryColor'),
+					primaryTextColor: get(
+						preferences,
+						'themeSettings.rsConfig.colors.primaryTextColor',
+					),
+					textColor: get(preferences, 'themeSettings.rsConfig.colors.textColor'),
+					titleColor: get(preferences, 'themeSettings.rsConfig.colors.titleColor'),
+					fontFamily: get(preferences, 'themeSettings.rsConfig.typography.fontFamily'),
+					customCss: get(preferences, 'themeSettings.customCss'),
+					// result fields
+					resultTitle: get(preferences, 'resultSettings.fields.title'),
+					resultDescription: get(preferences, 'resultSettings.fields.description'),
+					resultPrice: get(preferences, 'resultSettings.fields.price'),
+					priceUnit: get(preferences, 'resultSettings.fields.priceUnit'),
+					resultImage: get(preferences, 'resultSettings.fields.image'),
+					resultHandle: get(preferences, 'resultSettings.fields.handle'),
+					exportSettings: get(preferences, 'exportSettings'),
+					storeInfo: {
+						currency: get(preferences, 'globalSettings.currency'),
+					},
+					versionId: get(preferences, 'globalSettings.meta.deploySettings.versionId', ''),
+					autosuggest: get(preferences, 'searchSettings.rsConfig.autosuggest'),
+
+					showVoiceSearch: get(preferences, 'searchSettings.rsConfig.showVoiceSearch'),
+					enablePopularSuggestions: get(
+						preferences,
+						'searchSettings.rsConfig.enablePopularSuggestions',
+					),
+					enablePredictiveSuggestions: get(
+						preferences,
+						'searchSettings.rsConfig.enablePredictiveSuggestions',
+					),
+					showSelectedFilters: get(preferences, 'globalSettings.showSelectedFilters'),
+					showPagination: !!get(preferences, 'resultSettings.rsConfig.pagination'),
+					sortOptionSelector: get(preferences, 'resultSettings.sortOptionSelector'),
+					resultHighlight: get(preferences, 'resultSettings.resultHighlight', false),
+					layout: get(preferences, 'resultSettings.layout') || 'grid',
+					viewSwitcher: get(preferences, 'resultSettings.viewSwitcher'),
+					...(get(preferences, 'themeSettings.type') === 'geo' && {
+						mapLayout: get(preferences, 'resultSettings.mapLayout', 'map'),
+						mapComponent: get(preferences, 'resultSettings.mapComponent', 'googleMap'),
+						locationDataField: get(preferences, 'resultSettings.locationDataField', ''),
+						defaultZoom: get(preferences, 'resultSettings.defaultZoom', 13),
+						showSearchAsMove: get(preferences, 'resultSettings.showSearchAsMove'),
+						showMarkerClusters: get(preferences, 'resultSettings.showMarkerClusters'),
+						mapsAPIkey: get(preferences, 'resultSettings.mapsAPIkey'),
+					}),
+					syncSettings: get(preferences, 'syncSettings') || {},
+					customMessages: {
+						resultStats: get(preferences, 'resultSettings.customMessages.resultStats'),
+						noResultItem: get(preferences, 'resultSettings.customMessages.noResults'),
+						noSuggestion: get(preferences, 'searchSettings.customMessages.noResults'),
+						searchText: get(preferences, 'searchSettings.searchButton.text'),
+						searchIcon: get(preferences, 'searchSettings.searchButton.icon'),
+						redirectUrlText: get(preferences, 'searchSettings.redirectUrlText'),
+						redirectUrlIcon: get(preferences, 'searchSettings.redirectUrlIcon'),
+						...getFilterMessages(),
+					},
+					autoSuggestionSettings: {
+						enablePopularSuggestions: get(
+							preferences,
+							'searchSettings.rsConfig.enablePopularSuggestions',
+						),
+						enableRecentSearches: get(
+							preferences,
+							'searchSettings.rsConfig.enableRecentSearches',
+						),
+						highlight: get(preferences, 'searchSettings.rsConfig.highlight'),
+					},
+					staticFilters: {
+						productType: getStaticFilterFormValue('productType'),
+						collections: getStaticFilterFormValue('collection'),
+						color: getStaticFilterFormValue('color'),
+						size: getStaticFilterFormValue('size'),
+						price: getStaticFilterFormValue('price'),
+					},
+					dynamicFilters: get(preferences, 'facetSettings.dynamicFacets', []).map(
+						(facet) => ({
+							enabled: facet.enabled,
+							customize: get(facet, 'rsConfig'),
+						}),
+					),
+					pageSettings: get(preferences, 'pageSettings', {}),
+				}),
+			);
+			this.form.patchValue(patchVar);
+		} catch (e) {
+			console.error(e);
+		}
+	};
+
 	getFormPreferences = () => {
 		const { isRecommendation, searchPreferences, recommendationsPreferences } = this.props;
+		const newSearchPreferences = reOrderPreferences(searchPreferences);
 
 		let preferences;
 		if (isRecommendation) {
 			preferences = recommendationsPreferences;
 		} else {
-			preferences = searchPreferences;
+			preferences = newSearchPreferences;
 		}
 		const resetFormArrayControls = () => {
 			const dynamicFilterControl = this.form.get('dynamicFilters');
@@ -300,6 +474,7 @@ class PreferencesFormWrapperN extends React.Component {
 							description: get(preferences, 'description', ''),
 							pipeline: get(preferences, 'pipeline', ''),
 							id: get(preferences, 'id', ''),
+							currentPage: get(preferences, 'pageSettings.currentPage', ''),
 							logoUrl: get(preferences, 'globalSettings.meta.branding.logoUrl', ''),
 							logoWidth: get(
 								preferences,
@@ -529,10 +704,12 @@ class PreferencesFormWrapperN extends React.Component {
 											enabled: facet.enabled,
 											customize: get(facet, 'rsConfig'),
 										})),
+										pageSettings: get(preferences, 'pageSettings', {}),
 								  }),
 						}),
 					);
-					this.form.patchValue(patchVar);
+					// this.form.patchValue(patchVar);
+					this.form.reset(patchVar);
 				} catch (e) {
 					console.error(e);
 				}
@@ -610,6 +787,24 @@ class PreferencesFormWrapperN extends React.Component {
 			});
 			this.form.get('autoSuggestionSettings').valueChanges.subscribe(() => {});
 		}
+
+		this.form.get('currentPage').valueChanges.subscribe(async (value) => {
+			if (value) {
+				const { currentPage } = this.state;
+				if (value !== currentPage) {
+					this.setState(
+						{
+							currentPage: value,
+						},
+						() =>
+							this.transformSearchPreferences(
+								reOrderPreferences(searchPreferences, value),
+							),
+					);
+				}
+				//
+			}
+		});
 	};
 
 	getPreferencesPayload = () => {

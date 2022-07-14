@@ -8,6 +8,7 @@ import {
 	saveSearchPreferenceN,
 } from '../../../../../batteries/modules/actions';
 import { commitCode, generateInlineSandboxURL } from '../../../utils/sandpack-generator';
+import { transformPreferences } from '../../../utils/index';
 import { footerStyles } from '../styles';
 
 const Footer = ({
@@ -25,8 +26,9 @@ const Footer = ({
 	const handleSave = async () => {
 		setIsLoading(true);
 		const preferences = { ...getPreferencesPayload() };
+		const newPreferences = transformPreferences(getPreferencesPayload());
 		preferences.facetSettings.staticFacets = [];
-		const response = await generateInlineSandboxURL(preferences);
+		const response = await generateInlineSandboxURL(newPreferences);
 		const newObj = {};
 		Object.keys(response).forEach((path) => {
 			if (path[0] === '/') {
@@ -42,10 +44,11 @@ const Footer = ({
 			},
 			content: newObj,
 		};
+
 		commitCode(preferenceId, body)
 			.then(() => {
 				// form.get('versionId').setValue(res.version_id);
-				updateSearchPreferences(getPreferencesPayload()).then((action) => {
+				updateSearchPreferences(newPreferences).then((action) => {
 					if (!(action && action.error)) {
 						getSearchPreferences();
 						setIsLoading(false);

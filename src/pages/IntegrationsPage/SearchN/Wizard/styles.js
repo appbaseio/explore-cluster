@@ -62,7 +62,7 @@ export const suggestionStyles = css`
 
 export const SearchUIStyles = css`
 	.description-container {
-		margin-top: 20px;
+		margin: 20px 0px 20px 0px;
 		font-size: 18px;
 	}
 `;
@@ -79,4 +79,3 @@ export const footerStyles = css`
 		justify-content: space-between;
 	}
 `;
-// 	justify-content: space-between;

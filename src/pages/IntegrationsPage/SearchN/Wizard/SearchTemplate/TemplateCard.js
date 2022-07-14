@@ -16,6 +16,7 @@ const TemplateCard = ({ template, selectedTemplate, setSelectedTemplate }) => {
 			className={selectedTemplate === template.name ? 'card-border' : ''}
 			cover={
 				<img
+					style={{ width: 238, height: 280 }}
 					alt={template.name}
 					src={
 						template.image ||

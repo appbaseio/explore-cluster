@@ -40,7 +40,7 @@ const DeployModal = ({
 	}, [currentVersion]);
 
 	const handleInputChange = (key, val) => {
-		setErrMsg('');
+		if (errMsg && errMsg !== 'Manifest is missing') setErrMsg('');
 		const newDeployObj = { ...deployObj };
 		if (key === 'target' || key === 'version_id') {
 			setDeployObj({
@@ -96,7 +96,7 @@ const DeployModal = ({
 					...defaultObj,
 					version_id: currentVersion.version_id ? currentVersion.version_id : '',
 				});
-				setErrMsg('');
+				if (errMsg && errMsg !== 'Manifest is missing') setErrMsg('');
 			}}
 			onOk={() => handleOk(deployObj)}
 			onCancel={() => {
@@ -105,7 +105,7 @@ const DeployModal = ({
 					...defaultObj,
 					version_id: currentVersion.version_id ? currentVersion.version_id : '',
 				});
-				setErrMsg('');
+				if (errMsg && errMsg !== 'Manifest is missing') setErrMsg('');
 			}}
 			okText={<>Deploy {isLoading ? <Icon type="loading" /> : null}</>}
 			okButtonProps={{

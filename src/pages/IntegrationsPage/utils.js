@@ -2,6 +2,7 @@ import React from 'react';
 import get from 'lodash/get';
 import { FormBuilder, Validators } from 'react-reactive-form';
 import { css } from 'emotion';
+import { componentTypes } from '@appbaseio/reactivesearch';
 
 // eslint-disable-next-line
 export const FormContext = React.createContext(null);
@@ -312,7 +313,9 @@ export const getFilterConfigurationForm = (customFields = {}, isDynamicFilter = 
 			showSearch: true,
 			showMissing: false,
 			missingLabel: undefined,
+			multiSelect: false,
 			selectAllLabel: undefined,
+			componentType: componentTypes.multiList,
 			...customFields,
 		}),
 	});
@@ -329,6 +332,7 @@ export const getPriceFilterConfigurationForm = () => {
 			startLabel: undefined,
 			endLabel: undefined,
 			showHistogram: false,
+			componentType: componentTypes.dynamicRangeSlider,
 		}),
 	});
 };
@@ -382,10 +386,25 @@ export const shopifyDefaultFields = {
 	handle: 'handle',
 };
 
-export const getMultiListProps = (values) => ({
-	...values,
-	size: Number.isNaN(parseInt(values.size, 10)) ? undefined : parseInt(values.size, 10),
-});
+export const getMultiListProps = (values) => {
+	let obj = {};
+	if (values.filterType === 'range') {
+		if (values.startValue && values.endValue) {
+			obj = {
+				componentType: componentTypes.rangeInput,
+			};
+		} else {
+			obj = {
+				componentType: componentTypes.dynamicRangeSlider,
+			};
+		}
+	}
+	return {
+		...values,
+		...obj,
+		size: Number.isNaN(parseInt(values.size, 10)) ? undefined : parseInt(values.size, 10),
+	};
+};
 
 export const RecommendationTypes = {
 	MOST_POPULAR_PRODUCTS: 'most_popular',
@@ -494,6 +513,7 @@ export const defaultSearchPreferences = {
 	description: '',
 	pipeline: '',
 	id: '',
+	currentPage: '',
 	logoUrl: '',
 	logoWidth: 20,
 	logoAlignment: 'left',
@@ -508,7 +528,8 @@ export const defaultSearchPreferences = {
 	resultTitle: '',
 	resultDescription: '',
 	resultPrice: '',
-	priceUnit: undefined,
+	priceUnit: null,
+	sortOptionSelector: [],
 	resultImage: '',
 	resultHandle: '',
 	layout: 'grid',
@@ -540,18 +561,26 @@ export const defaultSearchPreferences = {
 		productType: {
 			enabled: false,
 			customize: {
+				title: null,
 				filterType: 'list',
+				filterLabel: null,
 				queryFormat: 'or',
 				sortBy: 'count',
 				showCount: true,
 				showCheckbox: true,
 				showSearch: true,
 				showMissing: false,
+				missingLabel: null,
+				selectAllLabel: null,
+				componentType: componentTypes.multiList,
+				multiSelect: false,
 			},
 		},
 		collections: {
 			enabled: false,
 			customize: {
+				title: null,
+				filterLabel: null,
 				filterType: 'list',
 				queryFormat: 'or',
 				sortBy: 'count',
@@ -559,11 +588,18 @@ export const defaultSearchPreferences = {
 				showCheckbox: true,
 				showSearch: true,
 				showMissing: false,
+				componentType: componentTypes.multiList,
+				multiSelect: false,
+				missingLabel: null,
+				selectAllLabel: null,
 			},
 		},
 		color: {
 			enabled: false,
 			customize: {
+				title: null,
+				dataField: null,
+				filterLabel: null,
 				filterType: 'list',
 				queryFormat: 'or',
 				sortBy: 'count',
@@ -571,11 +607,18 @@ export const defaultSearchPreferences = {
 				showCheckbox: true,
 				showSearch: true,
 				showMissing: false,
+				componentType: componentTypes.multiList,
+				multiSelect: false,
+				missingLabel: null,
+				selectAllLabel: null,
 			},
 		},
 		size: {
 			enabled: false,
 			customize: {
+				title: null,
+				dataField: null,
+				filterLabel: null,
 				filterType: 'list',
 				queryFormat: 'or',
 				sortBy: 'count',
@@ -584,21 +627,28 @@ export const defaultSearchPreferences = {
 				showSearch: true,
 				showMissing: false,
 				showHistogram: false,
-				startValue: undefined,
-				endValue: undefined,
-				startLabel: undefined,
-				endLabel: undefined,
-				calendarInterval: undefined,
+				startValue: null,
+				endValue: null,
+				startLabel: null,
+				endLabel: null,
+				calendarInterval: null,
+				componentType: componentTypes.multiList,
+				multiSelect: false,
+				missingLabel: null,
+				selectAllLabel: null,
 			},
 		},
 		price: {
 			enabled: false,
 			customize: {
-				startValue: undefined,
-				endValue: undefined,
-				startLabel: undefined,
-				endLabel: undefined,
+				title: null,
+				dataField: null,
+				startValue: null,
+				endValue: null,
+				startLabel: null,
+				endLabel: null,
 				showHistogram: false,
+				componentType: componentTypes.dynamicRangeSlider,
 			},
 		},
 	},
@@ -695,6 +745,11 @@ export const getSearchPreferencesPayload = (formValue) => {
 			description: get(formValue, 'description'),
 			pipeline: get(formValue, 'pipeline'),
 			id: get(formValue, 'id'),
+			pageSettings: {
+				currentPage: get(formValue, 'currentPage'),
+				pages: get(formValue, 'pageSettings.pages'),
+				fields: get(formValue, 'pageSettings.fields'),
+			},
 			themeSettings: {
 				type: get(formValue, 'themeType'),
 				customCss: get(formValue, 'customCss'),
@@ -741,6 +796,10 @@ export const getSearchPreferencesPayload = (formValue) => {
 				rsConfig: {
 					pagination: !!get(formValue, 'showPagination'),
 					infiniteScroll: !get(formValue, 'showPagination'),
+					componentType:
+						get(formValue, 'themeType') === 'geo'
+							? componentTypes.reactiveMap
+							: componentTypes.reactiveList,
 				},
 				sortOptionSelector: get(formValue, 'sortOptionSelector'),
 				resultHighlight: get(formValue, 'resultHighlight'),
@@ -786,6 +845,7 @@ export const getSearchPreferencesPayload = (formValue) => {
 					),
 					highlight: get(formValue, 'autoSuggestionSettings.highlight'),
 					showVoiceSearch: get(formValue, 'showVoiceSearch'),
+					componentType: componentTypes.searchBox,
 				},
 			},
 			facetSettings: {

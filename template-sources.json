@@ -3,14 +3,14 @@
         "url": "https://github.com/appbaseio/reactivesearch-shopify-plugin",
         "version": "",
         "commit": "",
-        "branch": "manifest-templates",
+        "branch": "v2",
         "manifest_path": "reactivesearch-manifest-ecomm-template.json"
     },
     {
         "url": "https://github.com/appbaseio/reactivesearch-shopify-plugin",
         "version": "",
         "commit": "",
-        "branch": "manifest-templates",
+        "branch": "v2",
         "manifest_path": "reactivesearch-manifest-geo-template.json"
     },
     {

@@ -91,6 +91,7 @@ const Wizard = ({ history, match }) => {
 									</TabPane>
 								</Tabs>
 								<Footer
+									form={form}
 									activeKey={activeKey}
 									tabsValidated={tabsValidated}
 									setActiveKey={setActiveKey}

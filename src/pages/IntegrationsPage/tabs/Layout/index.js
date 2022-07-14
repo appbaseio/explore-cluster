@@ -15,7 +15,6 @@ const Layout = ({ defaultActiveKey, appendTabs, isRecommendation }) => {
 	return (
 		<Tabs defaultActiveKey={defaultActiveKey} tabPosition="left" className={verticalTab}>
 			{appendTabs}
-
 			<TabPane tab="Branding" key="branding">
 				<FieldGroup control={form} render={() => <Branding control={form} />} />
 			</TabPane>

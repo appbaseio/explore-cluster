@@ -22,7 +22,7 @@ const CommitModal = ({
 	const handleInputChange = (val) => {
 		setValue(val);
 		if (val.length > 256) setErrMsg('Commit message can be up to 256 chars');
-		else if (errMsg) setErrMsg('');
+		else if (errMsg && errMsg !== 'Manifest is missing') setErrMsg('');
 	};
 
 	return (

@@ -80,11 +80,7 @@ async function generateTemplatesOutput() {
 								);
 								filesObj[fileName] = data; //content for files.js
 							} else {
-								let excludeManifest = templatesConstants.filter((i) =>
-									fileName.includes(i.manifest_path),
-								);
-
-								if (!fileName.includes('build') && !excludeManifest.length) {
+								if (!fileName.includes('build')) {
 									const data = fs.readFileSync(
 										`./${
 											path.split('arc-dashboard/')[1] ||

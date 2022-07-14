@@ -5,6 +5,8 @@ import { css } from 'emotion';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import 'react-day-picker/lib/style.css';
+import { componentTypes } from '@appbaseio/reactivesearch';
+
 import DataFieldSelector from '../../../../components/Form/DataFieldSelector';
 import TextInput from '../../../../components/Form/Input';
 import { RANGE_FIELDS, CALENDAR_INTERVAL_FIELDS } from '../../../../constants';
@@ -34,6 +36,11 @@ class CustomizeFilter extends React.Component {
 	};
 
 	message = '';
+
+	componentWillUnmount() {
+		// eslint-disable-next-line
+		this.props.control?.get('filterType')?.valueChanges.unsubscribe();
+	}
 
 	showModal = () => {
 		this.setState({
@@ -239,6 +246,37 @@ class CustomizeFilter extends React.Component {
 											)}
 										</div>
 									)}
+
+									{!disableListOptions && value?.filterType === 'list' ? (
+										<FieldControl
+											name="componentType"
+											strict={false}
+											control={control.get('componentType')}
+										>
+											{({ handler }) => (
+												<Form.Item label="Pick List type">
+													<Select {...handler()}>
+														<Select.Option
+															key={componentTypes.multiList}
+														>
+															MultiList
+														</Select.Option>
+														<Select.Option
+															key={componentTypes.singleList}
+														>
+															SingleList
+														</Select.Option>
+														<Select.Option
+															key={componentTypes.tagCloud}
+														>
+															TagCloud
+														</Select.Option>
+													</Select>
+												</Form.Item>
+											)}
+										</FieldControl>
+									) : null}
+
 									<TextInput
 										name="title"
 										label="Title"
@@ -259,6 +297,7 @@ class CustomizeFilter extends React.Component {
 												}}
 												control={control.get('size')}
 											/>
+
 											<FieldControl
 												strict={false}
 												name="queryFormat"
@@ -307,26 +346,30 @@ class CustomizeFilter extends React.Component {
 													</Form.Item>
 												)}
 											</FieldControl>
-											<FieldControl
-												name="showCheckbox"
-												control={control.get('showCheckbox')}
-											>
-												{({ handler }) => (
-													<Form.Item label="Show Checkbox">
-														<Switch {...handler('checkbox')} />
-													</Form.Item>
-												)}
-											</FieldControl>
-											<FieldControl
-												name="showSearch"
-												control={control.get('showSearch')}
-											>
-												{({ handler }) => (
-													<Form.Item label="Show Search">
-														<Switch {...handler('checkbox')} />
-													</Form.Item>
-												)}
-											</FieldControl>
+											{value.componentType !== componentTypes.tagCloud ? (
+												<FieldControl
+													name="showCheckbox"
+													control={control.get('showCheckbox')}
+												>
+													{({ handler }) => (
+														<Form.Item label="Show Checkbox">
+															<Switch {...handler('checkbox')} />
+														</Form.Item>
+													)}
+												</FieldControl>
+											) : null}
+											{value.componentType !== componentTypes.tagCloud ? (
+												<FieldControl
+													name="showSearch"
+													control={control.get('showSearch')}
+												>
+													{({ handler }) => (
+														<Form.Item label="Show Search">
+															<Switch {...handler('checkbox')} />
+														</Form.Item>
+													)}
+												</FieldControl>
+											) : null}
 											<FieldControl
 												name="showMissing"
 												control={control.get('showMissing')}
@@ -337,6 +380,19 @@ class CustomizeFilter extends React.Component {
 													</Form.Item>
 												)}
 											</FieldControl>
+
+											{value.componentType === componentTypes.tagCloud ? (
+												<FieldControl
+													name="multiSelect"
+													control={control.get('multiSelect')}
+												>
+													{({ handler }) => (
+														<Form.Item label="Multi Select">
+															<Switch {...handler('checkbox')} />
+														</Form.Item>
+													)}
+												</FieldControl>
+											) : null}
 											<TextInput
 												name="missingLabel"
 												label="Missing Label"
@@ -345,15 +401,17 @@ class CustomizeFilter extends React.Component {
 												}}
 												control={control.get('missingLabel')}
 											/>
-											<TextInput
-												name="selectAllLabel"
-												label="Select All Label"
-												inputProps={{
-													placeholder:
-														'Enter label for select all option',
-												}}
-												control={control.get('selectAllLabel')}
-											/>
+											{value.componentType !== componentTypes.tagCloud ? (
+												<TextInput
+													name="selectAllLabel"
+													label="Select All Label"
+													inputProps={{
+														placeholder:
+															'Enter label for select all option',
+													}}
+													control={control.get('selectAllLabel')}
+												/>
+											) : null}
 										</>
 									)}
 

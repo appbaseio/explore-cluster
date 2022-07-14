@@ -1,9 +1,8 @@
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { getURL } from '../../../constants/config';
 import files from '../../../../templates/files';
 import { doGet, doPut } from '../../../batteries/utils/requestService';
-import { getAuthToken } from './index';
-import templates from '../../../../template-sources-output.json';
+import { getAuthToken, getTemplate } from './index';
 
 export const templateConfigMap = {
 	classic: [
@@ -61,8 +60,21 @@ export const tabSettings = {
 	},
 };
 
-const getTemplate = (template) => {
-	return templates.filter((i) => i.name === template)[0];
+export const preferencesInConstants = (code, prefs) => {
+	const newPrefs = {
+		...prefs,
+		appbaseSettings: {
+			index: prefs.pipeline,
+			credentials: get(prefs, 'exportSettings.credentials', ''),
+			url: localStorage.getItem('url') || sessionStorage.getItem('url'),
+		},
+	};
+	const newFiles = { ...code };
+	newFiles['/src/utils/constants.js'] = `
+const appbasePrefs = ${JSON.stringify(newPrefs, null, 2)};
+export default JSON.stringify(appbasePrefs);
+`;
+	return newFiles;
 };
 
 export const generateInlineSandboxURL = async (preferences) => {
@@ -92,7 +104,7 @@ export const generateInlineSandboxURL = async (preferences) => {
 		if (str) {
 			const newStr = str.replace(
 				`'{{APPBASE_PREFERENCES}}'`,
-				JSON.stringify(JSON.stringify(newPrefs)),
+				JSON.stringify(newPrefs, null, 2),
 			);
 
 			newFiles['/src/utils/constants.js'] = newStr;
@@ -114,10 +126,7 @@ export const replaceWithPreferences = async (code, preferences) => {
 	};
 	const str = newFiles['/src/utils/constants.js'];
 	if (str) {
-		const newStr = str.replace(
-			`'{{APPBASE_PREFERENCES}}'`,
-			JSON.stringify(JSON.stringify(newPrefs)),
-		);
+		const newStr = str.replace(`'{{APPBASE_PREFERENCES}}'`, JSON.stringify(newPrefs, null, 2));
 
 		newFiles['/src/utils/constants.js'] = newStr;
 	}
