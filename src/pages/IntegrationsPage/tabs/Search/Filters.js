@@ -2,8 +2,8 @@ import React, { useContext } from 'react';
 import { FieldControl, FieldGroup, FieldArray } from 'react-reactive-form';
 import { Switch, Form, List, Button } from 'antd';
 import get from 'lodash/get';
-import CustomizeFilter from './CustomizeFilter';
-import DynamicFilters from './DynamicFilters';
+import CustomizeFilter from './Filters/CustomizeFilter';
+import DynamicFilters from './Filters/DynamicFilters';
 import { FormContext } from '../../utils';
 
 export const defaultSettings = [
@@ -42,7 +42,7 @@ export const defaultSettings = [
 
 const { Item } = List;
 
-const Filters = () => {
+const Filters = ({ getPreferencesPayload }) => {
 	const form = useContext(FormContext);
 	return (
 		<>
@@ -75,6 +75,8 @@ const Filters = () => {
 													}
 													disableFilterType={item.disableFilterType}
 													control={control.get('customize')}
+													form={form}
+													getPreferencesPayload={getPreferencesPayload}
 												/>,
 											]}
 										>
@@ -99,7 +101,10 @@ const Filters = () => {
 									justifyContent: 'flex-end',
 								}}
 							>
-								<DynamicFilters />
+								<DynamicFilters
+									form={form}
+									getPreferencesPayload={getPreferencesPayload}
+								/>
 							</div>
 						);
 					}
@@ -113,7 +118,10 @@ const Filters = () => {
 								}}
 							>
 								<h3>Custom Filters</h3>
-								<DynamicFilters />
+								<DynamicFilters
+									form={form}
+									getPreferencesPayload={getPreferencesPayload}
+								/>
 							</div>
 							<List
 								dataSource={controls}
@@ -145,6 +153,10 @@ const Filters = () => {
 																	: undefined
 															}
 															control={control.get('customize')}
+															form={form}
+															getPreferencesPayload={
+																getPreferencesPayload
+															}
 														/>,
 														<Button
 															onClick={() => {

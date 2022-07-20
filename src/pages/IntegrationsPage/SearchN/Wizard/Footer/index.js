@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import get from 'lodash/get';
 import { withRouter } from 'react-router-dom';
 import { Affix, Button, Icon } from 'antd';
 import { connect } from 'react-redux';
@@ -26,8 +27,28 @@ const Footer = ({
 	const handleSave = async () => {
 		setIsLoading(true);
 		const preferences = { ...getPreferencesPayload() };
-		const newPreferences = transformPreferences(getPreferencesPayload());
-		preferences.facetSettings.staticFacets = [];
+		let obj = {};
+		if (get(preferences, 'themeSettings.type', 'classic') === 'geo') {
+			obj = {
+				...obj,
+				mapLayout: 'map',
+				mapComponent: 'googleMap',
+				locationDataField: '',
+				defaultZoom: 5,
+				showSearchAsMove: true,
+				showMarkerClusters: true,
+				mapsAPIkey: '',
+			};
+		}
+		const newPreferences = transformPreferences({
+			...preferences,
+			resultSettings: {
+				...preferences.resultSettings,
+				...obj,
+			},
+		});
+		newPreferences.facetSettings.staticFacets = [];
+
 		const response = await generateInlineSandboxURL(newPreferences);
 		const newObj = {};
 		Object.keys(response).forEach((path) => {

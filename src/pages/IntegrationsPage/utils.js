@@ -535,6 +535,13 @@ export const defaultSearchPreferences = {
 	layout: 'grid',
 	resultHighlight: false,
 	viewSwitcher: true,
+	mapLayout: 'map',
+	mapComponent: 'googleMap',
+	locationDataField: 'location',
+	defaultZoom: 13,
+	showSearchAsMove: true,
+	showMarkerClusters: true,
+	mapsAPIkey: '',
 	storeInfo: { currency: 'USD' },
 	exportSettings: { exportAs: 'embed', credentials: '', openAsPage: false, type: 'other' },
 	showPagination: false,
@@ -957,4 +964,125 @@ export const getResyncURL = (index, params = {}) => {
 		url.set(i, params[i]);
 	});
 	return `https://shopify-sync.appbase.io?${url.toString()}`;
+};
+
+export const rsConfigMapper = {
+	MULTILIST: [
+		'dataField',
+		'title',
+		'componentId',
+		'componentType',
+		'missingLabel',
+		'queryFormat',
+		'selectAllLabel',
+		'showCheckbox',
+		'showCount',
+		'showMissing',
+		'showSearch',
+		'sortBy',
+		'aggregationSize',
+		'size',
+	],
+	SINGLELIST: [
+		'dataField',
+		'title',
+		'componentId',
+		'componentType',
+		'missingLabel',
+		'selectAllLabel',
+		'showCount',
+		'showMissing',
+		'showSearch',
+		'sortBy',
+		'aggregationSize',
+		'size',
+	],
+	RANGEINPUT: [
+		'dataField',
+		'title',
+		'componentId',
+		'componentType',
+		'queryFormat',
+		'range',
+		'rangeLabels',
+		'showHistogram',
+	],
+	DYNAMICRANGESLIDER: [
+		'dataField',
+		'title',
+		'componentId',
+		'componentType',
+		'queryFormat',
+		'showHistogram',
+	],
+	TAGCLOUD: [
+		'dataField',
+		'title',
+		'componentId',
+		'componentType',
+		'queryFormat',
+		'showCount',
+		'multiSelect',
+		'aggregationSize',
+		'size',
+	],
+};
+
+const transformRSConfig = (config) => {
+	const newRsConfig = {};
+	const rsConfig = { ...config };
+	if (config.filterType === 'range' || config.filterType === 'date') {
+		if (config.startValue && config.endValue)
+			rsConfig.componentType = componentTypes.rangeInput;
+		else rsConfig.componentType = componentTypes.dynamicRangeSlider;
+
+		if (rsConfig.filterType === 'date') rsConfig.queryFormat = 'date';
+		else delete rsConfig.queryFormat;
+	} else if (rsConfig.size) {
+		rsConfig.aggregationSize = parseInt(rsConfig.size, 10);
+		rsConfig.size = parseInt(rsConfig.size, 10);
+	}
+
+	// eslint-disable-next-line
+	Object.entries(rsConfig).map(([key, value]) => {
+		if (
+			// rsConfigMapper[rsConfig.componentType] is an Array from mapper.
+			rsConfigMapper[rsConfig.componentType] &&
+			rsConfigMapper[rsConfig.componentType].length &&
+			rsConfigMapper[rsConfig.componentType].includes(key)
+		) {
+			if (key === 'showHistogram' && value === undefined) newRsConfig[key] = false;
+			else newRsConfig[key] = value;
+		}
+	});
+	if (
+		(rsConfig.filterType === 'range' || rsConfig.filterType === 'date') &&
+		rsConfig.componentType === 'RANGEINPUT'
+	) {
+		newRsConfig.range = {
+			start:
+				rsConfig.filterType === 'date'
+					? new Date(get(rsConfig, 'startValue', ''))
+					: parseInt(get(rsConfig, 'startValue', ''), 10),
+			end:
+				rsConfig.filterType === 'date'
+					? new Date(get(rsConfig, 'endValue', ''))
+					: parseInt(get(rsConfig, 'endValue', ''), 10),
+		};
+		newRsConfig.rangeLabels = {
+			start: get(rsConfig, 'startLabel', ''),
+			end: get(rsConfig, 'endLabel', ''),
+		};
+	}
+
+	return newRsConfig;
+};
+
+// 'filterType',
+export const transformFacets = (facetPrefs) => {
+	if (facetPrefs.rsConfig) {
+		const { rsConfig } = facetPrefs;
+		return transformRSConfig(rsConfig);
+	}
+	return transformRSConfig(facetPrefs);
 };

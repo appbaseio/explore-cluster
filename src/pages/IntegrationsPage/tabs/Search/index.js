@@ -9,7 +9,7 @@ import CustomMessages from './CustomMessages';
 
 const { TabPane } = Tabs;
 
-const SearchSettings = () => {
+const SearchSettings = ({ getPreferencesPayload }) => {
 	const form = useContext(FormContext);
 
 	useEffect(() => {
@@ -35,7 +35,10 @@ const SearchSettings = () => {
 				/>
 			</TabPane>
 			<TabPane tab="Filters" key="2">
-				<FieldGroup control={form} render={() => <Filters />} />
+				<FieldGroup
+					control={form}
+					render={() => <Filters getPreferencesPayload={getPreferencesPayload} />}
+				/>
 			</TabPane>
 			<TabPane tab="Results" key="3">
 				<FieldGroup

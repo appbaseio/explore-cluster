@@ -121,7 +121,7 @@ const Main = ({ tier, featureEcommerce, getPreferencesN, ...props }) => {
 										}
 										key="3"
 									>
-										<SearchTab />
+										<SearchTab getPreferencesPayload={getPreferencesPayload}  />
 									</TabPane>
 									<TabPane
 										tab={

@@ -1,8 +1,8 @@
 import React, { useContext, useState } from 'react';
 import CustomizeFilter from './CustomizeFilter';
-import { getFilterConfigurationForm, FormContext, getDynamicFilterKey } from '../../utils';
+import { getFilterConfigurationForm, FormContext, getDynamicFilterKey } from '../../../utils';
 
-const DynamicFilters = () => {
+const DynamicFilters = ({ getPreferencesPayload }) => {
 	const form = useContext(FormContext);
 	const [tempControl, resetTempControl] = useState(getFilterConfigurationForm(null, true));
 	const [key, setKey] = useState('dynamic-filter-form');
@@ -35,6 +35,8 @@ const DynamicFilters = () => {
 			onSave={addControl}
 			onCancel={handleCancel}
 			tempControl={tempControl}
+			form={form}
+			getPreferencesPayload={getPreferencesPayload}
 		/>
 	);
 };
