@@ -1,11 +1,13 @@
 import React, { useContext, useEffect } from 'react';
 import { FieldGroup } from 'react-reactive-form';
 import { Tabs } from 'antd';
+import { func } from 'prop-types';
 import { FormContext, verticalTab } from '../../utils';
 import Search from './Search';
 import Results from './Results';
 import Filters from './Filters';
 import CustomMessages from './CustomMessages';
+import Charts from './Charts';
 
 const { TabPane } = Tabs;
 
@@ -40,7 +42,13 @@ const SearchSettings = ({ getPreferencesPayload }) => {
 					render={() => <Filters getPreferencesPayload={getPreferencesPayload} />}
 				/>
 			</TabPane>
-			<TabPane tab="Results" key="3">
+			<TabPane tab="Charts" key="3">
+				<FieldGroup
+					control={form}
+					render={() => <Charts getPreferencesPayload={getPreferencesPayload} />}
+				/>
+			</TabPane>
+			<TabPane tab="Results" key="4">
 				<FieldGroup
 					control={form}
 					render={() => (
@@ -53,11 +61,15 @@ const SearchSettings = ({ getPreferencesPayload }) => {
 					)}
 				/>
 			</TabPane>
-			<TabPane tab="Custom Messages" key="4">
+			<TabPane tab="Custom Messages" key="5">
 				<FieldGroup control={form} render={() => <CustomMessages />} />
 			</TabPane>
 		</Tabs>
 	);
+};
+
+SearchSettings.propTypes = {
+	getPreferencesPayload: func.isRequired,
 };
 
 export default SearchSettings;

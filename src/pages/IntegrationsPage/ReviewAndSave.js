@@ -383,6 +383,17 @@ const ReviewAndSave = ({
 				},
 			};
 		}
+		if (get(diffData, 'chartSettings.charts', null)) {
+			const newVal = get(newObj, 'chartSettings.charts', []);
+			const oldVal = get(oldObj, 'chartSettings.charts', []);
+			diffData = {
+				...diffData,
+				chartSettings: {
+					...diffData.chartSettings,
+					chartSettings: [oldVal, newVal],
+				},
+			};
+		}
 
 		if (get(diffData, 'globalSettings.showSelectedFilters', null)) {
 			const newVal = get(newObj, 'globalSettings.showSelectedFilters', '');
@@ -527,6 +538,7 @@ const ReviewAndSave = ({
 			resultSettings: get(diffData, 'resultSettings', {}),
 			exportSettings: get(diffData, 'exportSettings', {}),
 			recommendationSettings: get(diffData, 'recommendationSettings', {}),
+			chartSettings: get(diffData, 'chartSettings', {}),
 		};
 
 		// filter empty fields
@@ -558,7 +570,6 @@ const ReviewAndSave = ({
 	};
 
 	const [diffCount, diffData] = getDiffData(oldData, newData);
-
 	return (
 		<div>
 			<div style={{ position: 'relative' }}>
@@ -587,8 +598,8 @@ const ReviewAndSave = ({
 				destroyOnClose
 				okText={
 					<>
-						<Icon type={isLoading ? 'loading' : ''} />
-						{label}
+						<span>{isLoading ? <Icon type="loading" /> : null}</span>
+						<span>{label}</span>
 					</>
 				}
 				onCancel={handleCancel}

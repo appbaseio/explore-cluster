@@ -89,7 +89,7 @@ export const getTemplate = (template) => {
 export const transformPreferences = (preferences) => {
 	// const pageRoutes = templateObj.pages;
 	const newPreferences = { ...preferences };
-	const { facetSettings } = preferences;
+	const { facetSettings, chartSettings } = preferences;
 
 	let componentSettings = {
 		search: {
@@ -173,6 +173,21 @@ export const transformPreferences = (preferences) => {
 				...newObj,
 			};
 		}
+	}
+	if (chartSettings) {
+		let newCompononentSettings = {};
+		if (chartSettings.charts.length) {
+			chartSettings.charts.forEach((chart) => {
+				newCompononentSettings = {
+					...newCompononentSettings,
+					[chart.rsConfig.componentId]: chart,
+				};
+			});
+		}
+		componentSettings = {
+			...componentSettings,
+			...newCompononentSettings,
+		};
 	}
 
 	if (newPreferences.pageSettings && newPreferences.pageSettings.currentPage) {
@@ -286,6 +301,7 @@ export const reOrderPreferences = (prefs, page = '') => {
 			staticFacets: [],
 			dynamicFacets: [],
 		};
+		const chartSettings = { charts: [] };
 		if (newPreferences.pageSettings && Object.keys(newPreferences.pageSettings).length) {
 			const { currentPage } = newPreferences.pageSettings;
 			if (page || currentPage) {
@@ -346,13 +362,16 @@ export const reOrderPreferences = (prefs, page = '') => {
 				} else {
 					facetSettings.dynamicFacets.push(newFacetObj);
 				}
+				// If component is a chart
+			} else if (facet.rsConfig.componentType === componentTypes.reactiveChart) {
+				chartSettings.charts.push(facet);
 			}
 		});
 
 		newPreferences.facetSettings = facetSettings;
+		newPreferences.chartSettings = chartSettings;
 
 		delete newPreferences?.componentSettings;
-
 		return newPreferences;
 	}
 	return prefs;

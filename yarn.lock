@@ -133,7 +133,7 @@
     react-leaflet "^2.1.3"
     rheostat "^2.1.1"
 
-"@appbaseio/reactivesearch@3.34.3":
+"@appbaseio/reactivesearch@^3.34.3":
   version "3.34.3"
   resolved "https://registry.yarnpkg.com/@appbaseio/reactivesearch/-/reactivesearch-3.34.3.tgz#232cc878dbba99dc58a400179666c53bc4dbc660"
   integrity sha512-uWydMxsftMnpeUu7xS3X8PNIv5AW939uZfmZynXBwcSIdPNZwpIgYhRfU0PKkJICxLLCr0nZFLbcFu+iS+tqVg==

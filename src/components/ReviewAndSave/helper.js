@@ -17,6 +17,7 @@ export const relevancyTitles = {
 	exportSettings: 'Export Settings',
 	generalSettings: 'General Settings',
 	resultSettings: 'Result Settings',
+	chartSettings: 'Chart Settings',
 };
 
 const settingsMap = {
@@ -550,6 +551,10 @@ const settingsMap = {
 	},
 	recommendations: {
 		title: 'Recommendations UI',
+		description: '',
+	},
+	charts: {
+		title: 'Charts',
 		description: '',
 	},
 };

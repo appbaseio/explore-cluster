@@ -20,6 +20,8 @@ import {
 	getSearchPreferencesPayload,
 	getRecommendationPreferencesPayload,
 	RecommendationTypes,
+	getChartConfigurationForm,
+	getChartKey,
 } from './utils';
 import {
 	getSearchPreferenceById,
@@ -183,6 +185,7 @@ class PreferencesFormWrapperN extends React.Component {
 							price: getPriceFilterConfigurationForm(),
 						}),
 						dynamicFilters: FormBuilder.array([]),
+						charts: FormBuilder.array([]),
 						syncSettings: FormBuilder.group({
 							product_sync: [{ value: true, disabled: true }],
 							smartcollection_sync: [{ value: true, disabled: true }],
@@ -257,6 +260,10 @@ class PreferencesFormWrapperN extends React.Component {
 			if (dynamicFilterControl) {
 				dynamicFilterControl.controls = [];
 			}
+			const chartsControl = this.form.get('charts');
+			if (chartsControl) {
+				chartsControl.controls = [];
+			}
 			const recommendationsControl = this.form.get('recommendations');
 			if (recommendationsControl) {
 				recommendationsControl.controls = [];
@@ -287,6 +294,14 @@ class PreferencesFormWrapperN extends React.Component {
 				key: getDynamicFilterKey(index),
 			};
 			dynamicFilterControl.push(control);
+		});
+		const chartsControl = this.form.get('charts');
+		get(preferences, 'chartSettings.charts', []).forEach((chart, index) => {
+			const control = getChartConfigurationForm(chart.rsConfig);
+			control.meta = {
+				key: getChartKey(index),
+			};
+			chartsControl.push(control);
 		});
 		try {
 			const patchVar = JSON.parse(
@@ -386,6 +401,10 @@ class PreferencesFormWrapperN extends React.Component {
 							customize: get(facet, 'rsConfig'),
 						}),
 					),
+					charts: get(preferences, 'chartSettings.charts', []).map((chart) => ({
+						enabled: chart.enabled,
+						customize: get(chart, 'rsConfig'),
+					})),
 					pageSettings: get(preferences, 'pageSettings', {}),
 				}),
 			);
@@ -410,6 +429,10 @@ class PreferencesFormWrapperN extends React.Component {
 			if (dynamicFilterControl) {
 				dynamicFilterControl.controls = [];
 			}
+			const chartsControl = this.form.get('charts');
+			if (chartsControl) {
+				chartsControl.controls = [];
+			}
 			const recommendationsControl = this.form.get('recommendations');
 			if (recommendationsControl) {
 				recommendationsControl.controls = [];
@@ -428,6 +451,14 @@ class PreferencesFormWrapperN extends React.Component {
 						key: getDynamicFilterKey(index),
 					};
 					dynamicFilterControl.push(control);
+				});
+				const chartsControl = this.form.get('charts');
+				get(preferences, 'chartSettings.charts', []).forEach((chart, index) => {
+					const control = getChartConfigurationForm(chart.rsConfig);
+					control.meta = {
+						key: getDynamicFilterKey(index),
+					};
+					chartsControl.push(control);
 				});
 				// Add controls for recommendations
 				const recommendationsControl = this.form.get('recommendations');
@@ -704,6 +735,12 @@ class PreferencesFormWrapperN extends React.Component {
 											enabled: facet.enabled,
 											customize: get(facet, 'rsConfig'),
 										})),
+										charts: get(preferences, 'chartSettings.charts', []).map(
+											(chart) => ({
+												enabled: chart.enabled,
+												customize: get(chart, 'rsConfig'),
+											}),
+										),
 										pageSettings: get(preferences, 'pageSettings', {}),
 								  }),
 						}),
@@ -826,6 +863,10 @@ class PreferencesFormWrapperN extends React.Component {
 			if (get(preferencesPayload, 'facetSettings.dynamicFacets')) {
 				preferencesPayload.facetSettings.dynamicFacets =
 					preferencesPayload.facetSettings.dynamicFacets.filter((o) => o.enabled);
+			}
+			if (get(preferencesPayload, 'chartSettings.charts')) {
+				preferencesPayload.chartSettings.charts =
+					preferencesPayload.chartSettings.charts.filter((o) => o.enabled);
 			}
 		}
 		preferencesPayload.appbaseSettings = {

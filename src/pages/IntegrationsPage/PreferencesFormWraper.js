@@ -17,6 +17,8 @@ import {
 	getSearchPreferencesPayload,
 	getRecommendationPreferencesPayload,
 	RecommendationTypes,
+	getChartConfigurationForm,
+	getChartKey,
 } from './utils';
 import {
 	getSearchPreferences,
@@ -105,6 +107,7 @@ class PreferencesFormWrapper extends React.Component {
 							price: getPriceFilterConfigurationForm(),
 						}),
 						dynamicFilters: FormBuilder.array([]),
+						charts: FormBuilder.array([]),
 						syncSettings: FormBuilder.group({
 							product_sync: [{ value: true, disabled: true }],
 							smartcollection_sync: [{ value: true, disabled: true }],
@@ -214,6 +217,10 @@ class PreferencesFormWrapper extends React.Component {
 			if (dynamicFilterControl) {
 				dynamicFilterControl.controls = [];
 			}
+			const chartsControl = this.form.get('charts');
+			if (chartsControl) {
+				chartsControl.controls = [];
+			}
 			const recommendationsControl = this.form.get('recommendations');
 			if (recommendationsControl) {
 				recommendationsControl.controls = [];
@@ -232,6 +239,15 @@ class PreferencesFormWrapper extends React.Component {
 						key: getDynamicFilterKey(index),
 					};
 					dynamicFilterControl.push(control);
+				});
+				const chartsControl = this.form.get('charts');
+
+				get(preferences, 'chartSettings.charts', []).forEach((data, index) => {
+					const control = getChartConfigurationForm(data.rsConfig);
+					control.meta = {
+						key: getChartKey(index),
+					};
+					chartsControl.push(control);
 				});
 				// Add controls for recommendations
 				const recommendationsControl = this.form.get('recommendations');
@@ -456,6 +472,13 @@ class PreferencesFormWrapper extends React.Component {
 											enabled: facet.enabled,
 											customize: get(facet, 'rsConfig'),
 										})),
+										charts: get(preferences, 'chartSettings.charts', []).map(
+											(chart) => ({
+												enabled: chart.enabled,
+												componentType: chart.componentType,
+												customize: get(chart, 'rsConfig'),
+											}),
+										),
 								  }),
 						}),
 					);

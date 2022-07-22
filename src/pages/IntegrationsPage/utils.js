@@ -296,6 +296,30 @@ export const validateURL = (control) => {
 	}
 	return null;
 };
+export const getChartConfigurationForm = (customFields) => {
+	return FormBuilder.group({
+		enabled: false,
+		customize: FormBuilder.group({
+			title: [undefined, Validators.required],
+			dataField: [undefined, Validators.required],
+			size: null,
+			queryFormat: null,
+			chartType: null,
+			sortBy: null,
+			useAsFilter: false,
+			labelFormatter: null,
+			defaultQuery: '',
+			setOption: '',
+			type: 'term',
+			xAxisName: null,
+			yAxisName: null,
+			xAxisField: null,
+			yAxisField: null,
+			componentType: componentTypes.reactiveChart,
+			...customFields,
+		}),
+	});
+};
 
 export const getFilterConfigurationForm = (customFields = {}, isDynamicFilter = false) => {
 	return FormBuilder.group({
@@ -374,6 +398,10 @@ export const getRecommendationForm = (recommendationType, exportType) => {
 
 export const getDynamicFilterKey = (index) => {
 	return `dynamic-filter-control_${index}_${new Date().getTime()}`;
+};
+
+export const getChartKey = (index) => {
+	return `chart-form_${index}_${new Date().getTime()}`;
 };
 
 export const shopifyDefaultFields = {
@@ -938,6 +966,17 @@ export const getSearchPreferencesPayload = (formValue) => {
 					},
 				})),
 			},
+			chartSettings: {
+				charts: get(formValue, 'charts', []).map((chart, idx) => ({
+					enabled: chart.enabled,
+					componentType: componentTypes.reactiveChart,
+					rsConfig: {
+						componentId: `${get(chart, 'customize.title')?.replace(' ', '_')}_${idx}`,
+						componentType: componentTypes.reactiveChart,
+						...chart.customize,
+					},
+				})),
+			},
 			syncSettings:
 				get(formValue, 'exportSettings.type') === 'shopify'
 					? get(formValue, 'syncSettings')
@@ -1085,4 +1124,16 @@ export const transformFacets = (facetPrefs) => {
 		return transformRSConfig(rsConfig);
 	}
 	return transformRSConfig(facetPrefs);
+};
+
+export const transformCharts = (chartPrefs) => {
+	const componentProps = { ...chartPrefs };
+	// Temporarily disable setting defaultQuery and setOption until we add support
+	delete componentProps.defaultQuery;
+	delete componentProps.setOption;
+	Object.keys(componentProps).forEach((key) => {
+		if (!componentProps[key]) delete componentProps[key];
+	});
+	delete componentProps.type;
+	return componentProps;
 };

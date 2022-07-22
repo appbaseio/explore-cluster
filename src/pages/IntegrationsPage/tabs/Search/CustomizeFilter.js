@@ -144,7 +144,7 @@ class CustomizeFilter extends React.Component {
 									>
 										{(formControl) =>
 											formControl.disabled ? null : (
-												<Form.Item label="DataField">
+												<Form.Item label="Data Field">
 													<DataFieldSelector
 														isAggFields
 														pipeline={pipeline}

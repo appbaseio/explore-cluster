@@ -88,11 +88,15 @@ class DataFieldSelector extends React.Component {
 
 	renderOptions() {
 		const { traversedMappings } = this.state;
-		return traversedMappings.map((v) => (
-			<Select.Option key={v} title={v}>
-				{v.split('.keyword')[0]}
-			</Select.Option>
-		));
+		const { withoutSuffix } = this.props;
+		return traversedMappings.map((v) => {
+			const value = v.split('.keyword')[0];
+			return (
+				<Select.Option key={withoutSuffix ? value : v} title={v}>
+					{value}
+				</Select.Option>
+			);
+		});
 	}
 
 	render() {
@@ -196,6 +200,7 @@ DataFieldSelector.defaultProps = {
 	includeMappings: undefined,
 	includeTypes: undefined,
 	setFieldType: null,
+	withoutSuffix: false,
 };
 
 DataFieldSelector.propTypes = {
@@ -216,6 +221,7 @@ DataFieldSelector.propTypes = {
 	includeMappings: array,
 	includeTypes: array,
 	setFieldType: func,
+	withoutSuffix: bool,
 };
 
 const mapStateToProps = (state, props) => {
