@@ -778,22 +778,12 @@ const PipelinesForm = (props) => {
 								defaultActiveKey="pipeline_tab"
 								onChange={handleTabChange}
 								onEdit={handleAddOrRemoveTab}
-								tabBarExtraContent={<div style={{ width: '150px' }}>&nbsp;</div>}
-								tabBarGutter={2}
-								type="editable-card"
-								hideAdd
-								activeKey={activeTabKey}
-							>
-								<TabPane tab="Pipeline" key="pipeline_tab" closable={false}>
-									<div className="tab-content">
+								tabBarExtraContent={
+									<div style={{ width: '150px' }}>
 										<Flex
 											alignItems="center"
 											style={{
-												padding: '5px',
 												width: 'max-content',
-												position: 'absolute',
-												right: 0,
-												top: 0,
 											}}
 										>
 											<span>Edit</span>
@@ -804,6 +794,15 @@ const PipelinesForm = (props) => {
 											/>{' '}
 											<span>Validate</span>
 										</Flex>
+									</div>
+								}
+								tabBarGutter={2}
+								type="editable-card"
+								hideAdd
+								activeKey={activeTabKey}
+							>
+								<TabPane tab="Pipeline" key="pipeline_tab" closable={false}>
+									<div className="tab-content">
 										<Flex>
 											<div
 												className="tab-content"
@@ -829,9 +828,7 @@ const PipelinesForm = (props) => {
 												}}
 											>
 												<PipelineValidation
-													showStageChanges={
-														activeTabKey === 'pipeline_tab'
-													}
+													showStageChanges
 													executionContext={executionContext}
 													setExecutionContext={setExecutionContext}
 													isVisible={isValidateMode}
@@ -881,6 +878,19 @@ const PipelinesForm = (props) => {
 													},
 												);
 											}}
+											validationComponentProps={{
+												showStageChanges: true,
+												executionContext,
+												setExecutionContext,
+												isVisible: isValidateMode,
+												onPlayButtonClick: handlePipelineValidation,
+												responseTabValue: pipelineValidationRes
+													? JSON.stringify(pipelineValidationRes, null, 4)
+													: '',
+												consoleLogsArray:
+													getConsoleLogsArray(pipelineValidationRes),
+											}}
+											isValidateMode={isValidateMode}
 										/>
 									</TabPane>
 								))}

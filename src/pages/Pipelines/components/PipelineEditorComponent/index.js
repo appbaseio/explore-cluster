@@ -44,10 +44,10 @@ const dropdownMenuCss = css`
 	border-bottom-right-radius: 4px;
 
 	.stage-menu-item {
-		padding: 0 14px;
-		padding-right: 25px;
-		position: relative;
-		height: 70px;
+		padding: 0 14px !important;
+		padding-right: 25px !important;
+		position: relative !important;
+		height: 60px !important;
 		margin-bottom: 0 !important;
 
 		.add-icon {
@@ -60,8 +60,8 @@ const dropdownMenuCss = css`
 		}
 
 		h4 {
-			font-weight: 600;
-			font-size: 16px;
+			font-weight: 500;
+			font-size: 14px;
 			margin-bottom: 0;
 			overflow: hidden;
 			height: 36px;
@@ -74,7 +74,7 @@ const dropdownMenuCss = css`
 			text-overflow: ellipsis;
 			max-width: 96%;
 			display: inline-block;
-			font-size: 14px;
+			font-size: 12px;
 		}
 
 		&:hover {
@@ -124,6 +124,7 @@ const StagesMenu = ({ pipelineSchema, getEditorValue, handleMenuClick }) => {
 		descriptionResults,
 		(a, b) => a === b,
 	);
+	console.log('prebuiltStages', prebuiltStages);
 	return (
 		<>
 			<Input
@@ -136,6 +137,7 @@ const StagesMenu = ({ pipelineSchema, getEditorValue, handleMenuClick }) => {
 			/>
 			<Menu css={dropdownMenuCss} onClick={handleMenuClick}>
 				{titleAndDescriptionResults.map((stageKey) => {
+					console.log(stageKey);
 					return (
 						<Menu.Item className="stage-menu-item" key={stageKey}>
 							<h4 title={stageKey}>{stageKey}</h4>

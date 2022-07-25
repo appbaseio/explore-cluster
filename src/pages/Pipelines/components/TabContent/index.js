@@ -1,16 +1,10 @@
-import { Switch } from 'antd';
 import PropTypes from 'prop-types';
 import { css } from 'emotion';
 import React, { useEffect, useState, useRef } from 'react';
 import Monaco from '../../../../batteries/components/SearchSandbox/containers/MonacoEditor';
 import Flex from '../../../../batteries/components/shared/Flex';
-import { validateScriptRule } from '../../../../batteries/utils/app';
-import { DEFAULT_EXECUTION_CONTEXT_VALUE, getConsoleLogsArray, monacoOptions } from '../../utils';
+import { monacoOptions } from '../../utils';
 import PipelineValidation from '../PipelineValidation';
-import {
-	generateScriptValidationRequestBody,
-	isJson,
-} from '../../../../components/ScriptConsole/utils';
 
 const container = css`
 	.validate-script-btn {
@@ -54,21 +48,14 @@ const container = css`
 		min-height: 450px;
 		max-height: 700px;
 		height: 60vh;
-		&:first-child {
-			border-right: 2px solid blue;
-			background: red;
-		}
 	}
 `;
 
 // component to render each script tab content
 const TabContent = (props) => {
-	const { scriptValueProp, onValidatedScriptRuleChange, onScriptFileChange } = props;
+	const { scriptValueProp, onScriptFileChange, validationComponentProps, isValidateMode } = props;
 	const scriptEditorRef = useRef(null);
 	const [scriptValue, setScriptValue] = useState(scriptValueProp);
-	const [validatedScriptRule, setValidatedScriptRule] = useState('');
-	const [isValidateMode, setIsValidateMode] = useState(false);
-	const [executionContext, setExecutionContext] = useState(DEFAULT_EXECUTION_CONTEXT_VALUE);
 
 	useEffect(() => {
 		if (scriptValueProp) {
@@ -79,53 +66,13 @@ const TabContent = (props) => {
 	}, []);
 
 	useEffect(() => {
-		onValidatedScriptRuleChange(validatedScriptRule ?? '');
-	}, [validatedScriptRule]);
-	useEffect(() => {
 		if (scriptValueProp !== scriptValue) {
 			onScriptFileChange(scriptValue);
 		}
 	}, [scriptValue]);
 
-	const handleScriptValidation = async () => {
-		try {
-			setValidatedScriptRule(
-				await validateScriptRule(
-					generateScriptValidationRequestBody(
-						scriptValue,
-						isJson(executionContext)
-							? JSON.stringify({ isCron: true, executionContext })
-							: '{}',
-					),
-				),
-			);
-		} catch (error) {
-			// eslint-disable-next-line
-			console.error(error);
-			setValidatedScriptRule(error);
-		}
-	};
-
 	return (
 		<Flex style={{ width: '100%' }} alignItems="center" className={container}>
-			<Flex
-				alignItems="center"
-				style={{
-					padding: '5px',
-					width: 'max-content',
-					position: 'absolute',
-					right: 0,
-					top: 0,
-				}}
-			>
-				<span>Edit</span>
-				<Switch
-					checked={isValidateMode}
-					onChange={() => setIsValidateMode(!isValidateMode)}
-					style={{ margin: '0 5px' }}
-				/>{' '}
-				<span>Validate</span>
-			</Flex>
 			<div
 				className="editor-content-wrapper "
 				style={{
@@ -155,19 +102,7 @@ const TabContent = (props) => {
 					transition: 'all .3s ease-in',
 				}}
 			>
-				<PipelineValidation
-					executionContext={executionContext}
-					setExecutionContext={setExecutionContext}
-					isVisible={isValidateMode}
-					onPlayButtonClick={handleScriptValidation}
-					responseTabValue={
-						isJson(validatedScriptRule)
-							? JSON.stringify(validatedScriptRule, null, 4)
-							: ''
-					}
-					consoleLogsArray={getConsoleLogsArray(validatedScriptRule)}
-					isScriptValidation
-				/>
+				<PipelineValidation {...validationComponentProps} isScriptValidation={false} />
 			</div>
 		</Flex>
 	);
@@ -177,6 +112,8 @@ TabContent.propTypes = {
 	scriptValueProp: PropTypes.string,
 	onValidatedScriptRuleChange: PropTypes.func.isRequired,
 	onScriptFileChange: PropTypes.func.isRequired,
+	validationComponentProps: PropTypes.object.isRequired,
+	isValidateMode: PropTypes.bool.isRequired,
 };
 
 TabContent.defaultProps = {
