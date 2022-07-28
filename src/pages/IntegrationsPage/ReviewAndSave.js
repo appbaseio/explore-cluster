@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Icon, Modal } from 'antd';
+import { Button, Modal } from 'antd';
 import styled from 'react-emotion';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
@@ -596,16 +596,12 @@ const ReviewAndSave = ({
 					top: 20,
 				}}
 				destroyOnClose
-				okText={
-					<>
-						<span>{isLoading ? <Icon type="loading" /> : null}</span>
-						<span>{label}</span>
-					</>
-				}
+				okText={label}
 				onCancel={handleCancel}
 				cancelButtonProps={{ 'data-cy': 'cancel-modal-button' }}
 				okButtonProps={{
 					'data-cy': 'review-save-button',
+					loading: isLoading,
 				}}
 			>
 				{isOpen && <DiffList diff={diffData} />}

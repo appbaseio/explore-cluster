@@ -13,7 +13,7 @@ import {
 	getLatestVersion,
 	preferencesInConstants,
 } from './utils/sandpack-generator';
-import { getTemplate } from './utils/index';
+import { getTemplate, transformPreferences } from './utils/index';
 
 const SandpackModal = ({ preferences, preferenceId }) => {
 	const [sandpackCode, setSandpackCode] = useState({});
@@ -29,7 +29,8 @@ const SandpackModal = ({ preferences, preferenceId }) => {
 			.then(async (res) => {
 				if (res.content) {
 					const content = transformContent(res.content);
-					const newContent = preferencesInConstants(content, preferences);
+					const newPreferences = { ...transformPreferences(preferences) };
+					const newContent = preferencesInConstants(content, newPreferences);
 					setSandpackCode(newContent);
 					setIsLoading(false);
 				}
@@ -50,7 +51,7 @@ const SandpackModal = ({ preferences, preferenceId }) => {
 	const themeType = get(preferences, 'themeSettings.type', '');
 	const templateObj = getTemplate(themeType);
 	const { currentPage } = pageSettings;
-	const route = templateObj.pages[currentPage];
+	const route = templateObj.pages ? templateObj.pages[currentPage] || '/' : '/';
 
 	return isLoading ? (
 		<Loader />

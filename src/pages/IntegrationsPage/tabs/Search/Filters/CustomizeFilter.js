@@ -130,7 +130,7 @@ class CustomizeFilter extends React.Component {
 					{({ pristine, invalid, value }) => {
 						return (
 							<Modal
-								title="Set A Custom Filter"
+								title="Set A Custom Facet"
 								visible={visible}
 								onOk={this.handleOk}
 								onCancel={this.handleCancel}

@@ -82,7 +82,7 @@ export default JSON.stringify(appbasePrefs);
 };
 
 export const getTemplate = (template) => {
-	return templates.filter((i) => i.name === template)[0];
+	return templates.filter((i) => i.name === template)[0] || {};
 };
 
 // Generate the pageSettings from resultSettings, searchSettings, facetSettings during save to B.E

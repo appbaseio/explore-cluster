@@ -99,7 +99,7 @@ const PageRoutes = ({
 			});
 	};
 
-	if (!templateObj.pages || !Object.keys(templateObj.pages).length) {
+	if (!templateObj || !templateObj.pages || !Object.keys(templateObj.pages).length) {
 		return null;
 	}
 

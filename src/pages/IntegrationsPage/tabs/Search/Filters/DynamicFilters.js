@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+import { func } from 'prop-types';
 import CustomizeFilter from './CustomizeFilter';
 import { getFilterConfigurationForm, FormContext, getDynamicFilterKey } from '../../../utils';
 
@@ -27,7 +28,7 @@ const DynamicFilters = ({ getPreferencesPayload }) => {
 			// Use key to unmount the stale form
 			key={key}
 			control={tempControl.get('customize')}
-			buttonLabel="Add Filter"
+			buttonLabel="Add Facet"
 			buttonProps={{
 				type: 'primary',
 			}}
@@ -39,6 +40,10 @@ const DynamicFilters = ({ getPreferencesPayload }) => {
 			getPreferencesPayload={getPreferencesPayload}
 		/>
 	);
+};
+
+DynamicFilters.propTypes = {
+	getPreferencesPayload: func.isRequired,
 };
 
 export default DynamicFilters;

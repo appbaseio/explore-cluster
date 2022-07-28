@@ -257,25 +257,9 @@ class PreferencesFormWrapper extends React.Component {
 						recommendationsControl.push(control);
 					},
 				);
-				const getStaticFilterFormValue = (filterName) => {
-					const preference = get(preferences, 'facetSettings.staticFacets', []).find(
-						(o) => o.name === filterName,
-					);
-					if (preference) {
-						return {
-							enabled: preference.enabled,
-							customize: get(preference, 'rsConfig'),
-						};
-					}
-					return undefined;
-				};
 				const getFilterMessages = () => {
 					let noFilterItem;
 					let fetchingFilterOptions;
-					get(preferences, 'facetSettings.staticFacets', []).forEach((i) => {
-						noFilterItem = get(i, 'customMessages.noResults');
-						fetchingFilterOptions = get(i, 'customMessages.loading');
-					});
 					get(preferences, 'facetSettings.dynamicFacets', []).forEach((i) => {
 						noFilterItem = get(i, 'customMessages.noResults');
 						fetchingFilterOptions = get(i, 'customMessages.loading');
@@ -457,13 +441,6 @@ class PreferencesFormWrapper extends React.Component {
 												'searchSettings.rsConfig.highlight',
 											),
 										},
-										staticFilters: {
-											productType: getStaticFilterFormValue('productType'),
-											collections: getStaticFilterFormValue('collection'),
-											color: getStaticFilterFormValue('color'),
-											size: getStaticFilterFormValue('size'),
-											price: getStaticFilterFormValue('price'),
-										},
 										dynamicFilters: get(
 											preferences,
 											'facetSettings.dynamicFacets',
@@ -504,10 +481,6 @@ class PreferencesFormWrapper extends React.Component {
 		const { isRecommendation, index } = this.props;
 		const preferencesPayload = this.getPreferencesPayload();
 		if (!isRecommendation) {
-			if (get(preferencesPayload, 'facetSettings.staticFacets')) {
-				preferencesPayload.facetSettings.staticFacets =
-					preferencesPayload.facetSettings.staticFacets.filter((o) => o.enabled);
-			}
 			if (get(preferencesPayload, 'facetSettings.dynamicFacets')) {
 				preferencesPayload.facetSettings.dynamicFacets =
 					preferencesPayload.facetSettings.dynamicFacets.filter((o) => o.enabled);

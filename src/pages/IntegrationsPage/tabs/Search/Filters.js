@@ -1,7 +1,8 @@
 import React, { useContext } from 'react';
 import { FieldControl, FieldGroup, FieldArray } from 'react-reactive-form';
-import { Switch, Form, List, Button } from 'antd';
+import { Switch, List, Button } from 'antd';
 import get from 'lodash/get';
+import { func } from 'prop-types';
 import CustomizeFilter from './Filters/CustomizeFilter';
 import DynamicFilters from './Filters/DynamicFilters';
 import { FormContext } from '../../utils';
@@ -46,50 +47,6 @@ const Filters = ({ getPreferencesPayload }) => {
 	const form = useContext(FormContext);
 	return (
 		<>
-			<FieldGroup strict={false} name="staticFilters">
-				{() => (
-					<Form layout="inline">
-						<List
-							dataSource={defaultSettings}
-							bordered
-							renderItem={(item) => (
-								<FieldGroup name={item.id}>
-									{(control) => (
-										<Item
-											actions={[
-												<FieldControl name="enabled">
-													{({ value, onChange }) => (
-														<Switch
-															checked={value}
-															onChange={onChange}
-														/>
-													)}
-												</FieldControl>,
-												<CustomizeFilter
-													disableListOptions={item.disableListOptions}
-													type={item.id}
-													pipeline={
-														form.get('pipeline')
-															? form.get('pipeline').value
-															: undefined
-													}
-													disableFilterType={item.disableFilterType}
-													control={control.get('customize')}
-													form={form}
-													getPreferencesPayload={getPreferencesPayload}
-												/>,
-											]}
-										>
-											<Item.Meta title={item.label} />
-										</Item>
-									)}
-								</FieldGroup>
-							)}
-						/>
-					</Form>
-				)}
-			</FieldGroup>
-
 			<FieldArray name="dynamicFilters">
 				{({ controls }) => {
 					if (!controls.length) {
@@ -98,9 +55,10 @@ const Filters = ({ getPreferencesPayload }) => {
 								style={{
 									padding: '10px 0',
 									display: 'flex',
-									justifyContent: 'flex-end',
+									justifyContent: 'space-between',
 								}}
 							>
+								<h3>Facets</h3>
 								<DynamicFilters
 									form={form}
 									getPreferencesPayload={getPreferencesPayload}
@@ -185,6 +143,10 @@ const Filters = ({ getPreferencesPayload }) => {
 			</FieldArray>
 		</>
 	);
+};
+
+Filters.propTypes = {
+	getPreferencesPayload: func.isRequired,
 };
 
 export default Filters;

@@ -299,7 +299,7 @@ const ExportInline = ({
 	const pageSettings = get(preferences, 'pageSettings', {});
 	const templateObj = getTemplate(theme);
 	const { currentPage } = pageSettings;
-	const route = templateObj.pages[currentPage];
+	const route = templateObj.pages ? templateObj.pages[currentPage] || '/' : '/';
 
 	if (isLoading) return <Loader />;
 
@@ -328,8 +328,8 @@ const ExportInline = ({
 					customSetup={{
 						files: { ...sandpackCode },
 					}}
-					openPaths={tabSettings[theme].openPaths}
-					activePath={tabSettings[theme].activePath}
+					openPaths={tabSettings[theme]?.openPaths}
+					activePath={tabSettings[theme]?.activePath}
 					template="react"
 					startRoute={route}
 				>
@@ -346,8 +346,8 @@ const ExportInline = ({
 							handleDelete,
 							setModalType,
 						}}
-						openPaths={tabSettings[theme].openPaths}
-						activePath={tabSettings[theme].activePath}
+						openPaths={tabSettings[theme]?.openPaths}
+						activePath={tabSettings[theme]?.activePath}
 						template="react"
 					>
 						<SandPackIntegration

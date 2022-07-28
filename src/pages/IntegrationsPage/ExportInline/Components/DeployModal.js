@@ -107,9 +107,10 @@ const DeployModal = ({
 				});
 				if (errMsg && errMsg !== 'Manifest is missing') setErrMsg('');
 			}}
-			okText={<>Deploy {isLoading ? <Icon type="loading" /> : null}</>}
+			okText="Deploy"
 			okButtonProps={{
 				disabled: errMsg || !deployObj.target,
+				loading: isLoading,
 			}}
 			width={600}
 		>

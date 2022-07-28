@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import get from 'lodash/get';
 import { withRouter } from 'react-router-dom';
-import { Affix, Button, Icon } from 'antd';
+import { Affix, Button } from 'antd';
 import { connect } from 'react-redux';
 import { func, object, string } from 'prop-types';
 import {
@@ -47,7 +47,6 @@ const Footer = ({
 				...obj,
 			},
 		});
-		newPreferences.facetSettings.staticFacets = [];
 
 		const response = await generateInlineSandboxURL(newPreferences);
 		const newObj = {};
@@ -97,8 +96,13 @@ const Footer = ({
 						) : null}
 					</div>
 					{activeKey === '3' ? (
-						<Button type="primary" disabled={!tabsValidated.tab3} onClick={handleSave}>
-							<Icon type={isLoading ? 'loading' : ''} /> Finish ▶
+						<Button
+							type="primary"
+							disabled={!tabsValidated.tab3}
+							onClick={handleSave}
+							loading={isLoading}
+						>
+							Finish ▶
 						</Button>
 					) : (
 						<Button

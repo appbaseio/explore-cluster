@@ -16,7 +16,7 @@ const ModuleList = ({ depth, activePath, selectFile, prefixedPath }) => {
 				excludedArr.indexOf(file) !== -1 ||
 				file.includes('build') ||
 				file.includes('.vscode') ||
-				templateConfigMap[theme].includes(file)
+				templateConfigMap[theme]?.includes(file)
 			)
 		)
 			return file;

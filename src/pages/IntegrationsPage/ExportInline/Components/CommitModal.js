@@ -39,9 +39,10 @@ const CommitModal = ({
 			onCancel={() => {
 				handleCancel();
 			}}
-			okText={<>Commit {isLoading ? <Icon type="loading" /> : null}</>}
+			okText="Commit"
 			okButtonProps={{
 				disabled: errMsg || !value,
+				loading: isLoading,
 			}}
 		>
 			<div css={commitModalStyles}>

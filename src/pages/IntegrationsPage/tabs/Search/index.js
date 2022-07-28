@@ -36,7 +36,7 @@ const SearchSettings = ({ getPreferencesPayload }) => {
 					)}
 				/>
 			</TabPane>
-			<TabPane tab="Filters" key="2">
+			<TabPane tab="Facets" key="2">
 				<FieldGroup
 					control={form}
 					render={() => <Filters getPreferencesPayload={getPreferencesPayload} />}
