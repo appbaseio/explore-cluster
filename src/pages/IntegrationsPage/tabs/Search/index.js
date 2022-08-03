@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from 'react';
 import { FieldGroup } from 'react-reactive-form';
-import { Tabs } from 'antd';
 import { func } from 'prop-types';
+import { Tabs } from 'antd';
 import { FormContext, verticalTab } from '../../utils';
 import Search from './Search';
 import Results from './Results';
@@ -66,6 +66,9 @@ const SearchSettings = ({ getPreferencesPayload }) => {
 			</TabPane>
 		</Tabs>
 	);
+};
+SearchSettings.propTypes = {
+	getPreferencesPayload: func.isRequired,
 };
 
 SearchSettings.propTypes = {

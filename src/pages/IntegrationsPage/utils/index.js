@@ -298,7 +298,6 @@ export const reOrderPreferences = (prefs, page = '') => {
 	if (prefs && prefs.name && (prefs.pageSettings || prefs.componentSettings)) {
 		newPreferences = { ...prefs };
 		const facetSettings = {
-			staticFacets: [],
 			dynamicFacets: [],
 		};
 		const chartSettings = { charts: [] };
@@ -347,19 +346,7 @@ export const reOrderPreferences = (prefs, page = '') => {
 				delete newFacetObj.facetType;
 				delete newFacetObj.componentType;
 
-				if (facet.facetType === 'static') {
-					if (facet.name === 'productType') {
-						facetSettings.staticFacets[0] = newFacetObj;
-					} else if (facet.name === 'collection') {
-						facetSettings.staticFacets[1] = newFacetObj;
-					} else if (facet.name === 'color') {
-						facetSettings.staticFacets[2] = newFacetObj;
-					} else if (facet.name === 'size') {
-						facetSettings.staticFacets[3] = newFacetObj;
-					} else if (facet.name === 'price') {
-						facetSettings.staticFacets[4] = newFacetObj;
-					} else facetSettings.staticFacets.push(newFacetObj);
-				} else {
+				if (facet.facetType !== 'static') {
 					facetSettings.dynamicFacets.push(newFacetObj);
 				}
 				// If component is a chart

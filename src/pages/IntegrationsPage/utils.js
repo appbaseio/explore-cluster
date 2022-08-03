@@ -296,6 +296,16 @@ export const validateURL = (control) => {
 	}
 	return null;
 };
+// Add all the fields which have default values
+export const chartConfigurationFormDefaultFields = {
+	customize: {
+		useAsFilter: false,
+		defaultQuery: '',
+		setOption: '',
+		type: 'term',
+		componentType: componentTypes.reactiveChart,
+	},
+};
 export const getChartConfigurationForm = (customFields) => {
 	return FormBuilder.group({
 		enabled: false,
@@ -306,40 +316,41 @@ export const getChartConfigurationForm = (customFields) => {
 			queryFormat: null,
 			chartType: null,
 			sortBy: null,
-			useAsFilter: false,
 			labelFormatter: null,
-			defaultQuery: '',
-			setOption: '',
-			type: 'term',
 			xAxisName: null,
 			yAxisName: null,
 			xAxisField: null,
 			yAxisField: null,
-			componentType: componentTypes.reactiveChart,
+			...chartConfigurationFormDefaultFields.customize,
 			...customFields,
 		}),
 	});
 };
-
+// Add all the fields which have default values
+export const filterConfigurationFormDefaultFields = {
+	customize: {
+		filterType: 'list',
+		queryFormat: 'or',
+		sortBy: 'count',
+		componentType: componentTypes.multiList,
+		showCount: true,
+		showCheckbox: true,
+		showSearch: true,
+		showMissing: false,
+		multiSelect: false,
+	},
+};
 export const getFilterConfigurationForm = (customFields = {}, isDynamicFilter = false) => {
 	return FormBuilder.group({
-		enabled: false,
+		enabled: true,
 		customize: FormBuilder.group({
 			title: isDynamicFilter ? [undefined, Validators.required] : undefined,
 			dataField: isDynamicFilter ? [undefined, Validators.required] : undefined,
-			filterType: 'list',
 			size: undefined,
-			queryFormat: 'or',
-			sortBy: 'count',
 			filterLabel: undefined,
-			showCount: true,
-			showCheckbox: true,
-			showSearch: true,
-			showMissing: false,
 			missingLabel: undefined,
-			multiSelect: false,
 			selectAllLabel: undefined,
-			componentType: componentTypes.multiList,
+			...filterConfigurationFormDefaultFields.customize,
 			...customFields,
 		}),
 	});
@@ -689,6 +700,18 @@ export const defaultSearchPreferences = {
 	},
 	dynamicFilters: [],
 	syncSettings: defaultSettings.reduce((acc, item) => ({ ...acc, [item.id]: item.value }), {}),
+	authenticationSettings: {
+		clientId: 'mZLIFUlQedQJlZO21LiUauZwSMhiteGd',
+		enableAuth0: true,
+		enableProfilePage: true,
+		profileSettingsForm: {
+			viewData: true,
+			editData: true,
+			closeAccount: true,
+			editThemeSettings: true,
+			editSearchPreferences: true,
+		},
+	},
 };
 
 export const getRecommendationPreferencesPayload = (formValue) => {
@@ -915,6 +938,10 @@ export const getSearchPreferencesPayload = (formValue) => {
 				get(formValue, 'exportSettings.type') === 'shopify'
 					? get(formValue, 'syncSettings')
 					: null,
+			authenticationSettings: {
+				...get(formValue, 'authenticationSettings'),
+				clientId: 'mZLIFUlQedQJlZO21LiUauZwSMhiteGd',
+			},
 		}),
 	);
 };
@@ -999,6 +1026,25 @@ export const rsConfigMapper = {
 		'aggregationSize',
 		'size',
 	],
+	REACTIVE_CHART: [
+		'dataField',
+		'title',
+		'componentId',
+		'componentType',
+		'chartType',
+		'useAsFilter',
+		'labelFormatter',
+		'defaultQuery',
+		'setOption',
+		'xAxisField',
+		'yAxisField',
+		'xAxisName',
+		'yAxisName',
+		'range',
+		'sortBy',
+		'queryFormat',
+		'type',
+	],
 };
 
 const transformRSConfig = (config) => {
@@ -1028,9 +1074,12 @@ const transformRSConfig = (config) => {
 			else newRsConfig[key] = value;
 		}
 	});
+
 	if (
-		(rsConfig.filterType === 'range' || rsConfig.filterType === 'date') &&
-		rsConfig.componentType === 'RANGEINPUT'
+		(rsConfig.componentType === 'RANGEINPUT' ||
+			(rsConfig.componentType === 'REACTIVE_CHART' && rsConfig.type === 'range')) &&
+		rsConfig.startValue &&
+		rsConfig.endValue
 	) {
 		newRsConfig.range = {
 			start:
@@ -1042,12 +1091,17 @@ const transformRSConfig = (config) => {
 					? new Date(get(rsConfig, 'endValue', ''))
 					: parseInt(get(rsConfig, 'endValue', ''), 10),
 		};
-		newRsConfig.rangeLabels = {
-			start: get(rsConfig, 'startLabel', ''),
-			end: get(rsConfig, 'endLabel', ''),
-		};
+		if (
+			(rsConfig.filterType === 'range' || rsConfig.filterType === 'date') &&
+			rsConfig.startLabel &&
+			rsConfig.endLabel
+		) {
+			newRsConfig.rangeLabels = {
+				start: get(rsConfig, 'startLabel', ''),
+				end: get(rsConfig, 'endLabel', ''),
+			};
+		}
 	}
-
 	return newRsConfig;
 };
 
@@ -1062,12 +1116,8 @@ export const transformFacets = (facetPrefs) => {
 
 export const transformCharts = (chartPrefs) => {
 	const componentProps = { ...chartPrefs };
-	// Temporarily disable setting defaultQuery and setOption until we add support
-	delete componentProps.defaultQuery;
-	delete componentProps.setOption;
 	Object.keys(componentProps).forEach((key) => {
 		if (!componentProps[key]) delete componentProps[key];
 	});
-	delete componentProps.type;
-	return componentProps;
+	return transformRSConfig(componentProps);
 };

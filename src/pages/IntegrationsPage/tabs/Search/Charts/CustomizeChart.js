@@ -183,7 +183,7 @@ class CustomizeChart extends React.Component {
 					{({ pristine, invalid, value }) => {
 						return (
 							<Modal
-								title="Set A Custom Filter"
+								title="Set Chart"
 								visible={visible}
 								onOk={this.handleOk}
 								onCancel={this.handleCancel}
@@ -208,29 +208,32 @@ class CustomizeChart extends React.Component {
 													setFieldType={this.handleDataFieldChange}
 												/>
 											</Form.Item>
-											{supportsRangeQuery ? (
-												<Form.Item label="Type of Query">
-													<FieldControl
-														name="type"
-														control={control.get('type')}
-													>
-														{({ handler }) => (
-															<Select {...handler()}>
-																<Select.Option
-																	value={queryTypes.term}
-																>
-																	Term
-																</Select.Option>
+											<Form.Item label="Type of Query">
+												<FieldControl
+													name="type"
+													control={control.get('type')}
+												>
+													{({ handler }) => (
+														<Select {...handler()}>
+															<Select.Option value={queryTypes.term}>
+																Term
+															</Select.Option>
+															{supportsRangeQuery ? (
 																<Select.Option
 																	value={queryTypes.range}
 																>
 																	Range
 																</Select.Option>
-															</Select>
-														)}
-													</FieldControl>
-												</Form.Item>
-											) : null}
+															) : null}
+															<Select.Option
+																value={queryTypes.search}
+															>
+																Search
+															</Select.Option>
+														</Select>
+													)}
+												</FieldControl>
+											</Form.Item>
 											<Form.Item label="Type of Chart">
 												<FieldControl
 													name="chartType"
@@ -286,7 +289,7 @@ class CustomizeChart extends React.Component {
 													)}
 												</FieldControl>
 											</Form.Item>
-											{value.chartType === chartTypes.range.scatter.id ? (
+											{value.chartType === chartTypes.search.scatter.id ? (
 												<>
 													<Form.Item label="X-Axis Field">
 														<FieldControl
@@ -376,8 +379,8 @@ class CustomizeChart extends React.Component {
 												<>
 													<Form.Item label="Start value">
 														<FieldControl
-															name="startVal"
-															control={control?.get('startVal')}
+															name="startValue"
+															control={control?.get('startValue')}
 														>
 															{({ handler }) => (
 																<Input type="text" {...handler()} />
@@ -386,8 +389,8 @@ class CustomizeChart extends React.Component {
 													</Form.Item>
 													<Form.Item label="End value">
 														<FieldControl
-															name="endVal"
-															control={control?.get('endVal')}
+															name="endValue"
+															control={control?.get('endValue')}
 														>
 															{({ handler }) => (
 																<Input type="text" {...handler()} />
@@ -494,7 +497,10 @@ class CustomizeChart extends React.Component {
 											>
 												{(setOptionControl) => (
 													<CodeEditorModal
-														defaultValue={this.getSetOptionPrefill()}
+														defaultValue={
+															setOptionControl.value ||
+															this.getSetOptionPrefill()
+														}
 														visible={showSetOptionEditor}
 														language="javascript"
 														onCancel={() =>

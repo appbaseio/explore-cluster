@@ -47,7 +47,6 @@ const Footer = ({
 				...obj,
 			},
 		});
-
 		const response = await generateInlineSandboxURL(newPreferences);
 		const newObj = {};
 		Object.keys(response).forEach((path) => {
@@ -67,7 +66,6 @@ const Footer = ({
 
 		commitCode(preferenceId, body)
 			.then(() => {
-				// form.get('versionId').setValue(res.version_id);
 				updateSearchPreferences(newPreferences).then((action) => {
 					if (!(action && action.error)) {
 						getSearchPreferences();
@@ -77,6 +75,7 @@ const Footer = ({
 				});
 			})
 			.catch((err) => {
+				// eslint-disable-next-line no-console
 				console.error('Error to save preferences', err);
 			});
 	};

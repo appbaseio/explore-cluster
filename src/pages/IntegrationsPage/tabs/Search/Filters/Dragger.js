@@ -16,7 +16,7 @@ const Dragger = () => {
 
 		// Handle the mousedown event
 		// that's triggered when user drags the resizer
-		const mouseDownHandler = function (e) {
+		const mouseDownHandler = (e) => {
 			// Get the current mouse position
 			x = e.clientX;
 			y = e.clientY;
@@ -27,7 +27,7 @@ const Dragger = () => {
 			document.addEventListener('mouseup', mouseUpHandler);
 		};
 
-		const mouseMoveHandler = function (e) {
+		const mouseMoveHandler = (e) => {
 			// How far the mouse has been moved
 			const dx = e.clientX - x;
 			const dy = e.clientY - y; // eslint-disable-line
@@ -47,7 +47,7 @@ const Dragger = () => {
 			rightSide.style.pointerEvents = 'none';
 		};
 
-		const mouseUpHandler = function () {
+		const mouseUpHandler = () => {
 			resizer.style.removeProperty('cursor');
 			document.body.style.removeProperty('cursor');
 
@@ -66,7 +66,7 @@ const Dragger = () => {
 		resizer.addEventListener('mousedown', mouseDownHandler);
 	}, []);
 
-	return <div class="resizer" id="dragMe"></div>;
+	return <div className="resizer" id="dragMe" />;
 };
 
 export default Dragger;

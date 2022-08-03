@@ -47,13 +47,13 @@ async function generateTemplatesOutput() {
 		let fileName = '';
 
 		if (data.version) {
-			fileName = `reactivesearch-shopify-plugin@${data.version}`;
+			fileName = `${data.repository}@${data.version}`;
 		} else if (data.commit) {
-			fileName = `reactivesearch-shopify-plugin@${data.commit}`;
+			fileName = `${data.repository}@${data.commit}`;
 		} else if (data.branch) {
-			fileName = `reactivesearch-shopify-plugin@${data.branch}`;
+			fileName = `${data.repository}@${data.branch}`;
 		} else {
-			fileName = `reactivesearch-shopify-plugin@master`;
+			fileName = `${data.repository}@master`;
 		}
 
 		promises.push(

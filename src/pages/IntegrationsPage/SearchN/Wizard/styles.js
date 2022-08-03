@@ -16,12 +16,18 @@ export const SearchTemplateStyles = css`
 	}
 
 	.card-border {
-		border: 1px solid #1890ff;
+		border: 1px solid #1890ff !important;
 	}
 
 	.heading > h3 {
 		font-weight: 700;
 		font-size: 16px;
+	}
+
+	.meta-title {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
 	}
 `;
 

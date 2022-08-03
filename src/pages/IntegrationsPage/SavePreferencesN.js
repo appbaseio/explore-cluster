@@ -147,6 +147,23 @@ class SavePreferencesN extends React.Component {
 			) {
 				delete newPreferences.fusionSettings;
 			}
+
+			if (
+				get(diffData, 'authenticationSettings', null) &&
+				get(newPreferences, 'authenticationSettings', null) === null
+			) {
+				newPreferences.authenticationSettings = {
+					enableAuth0: true,
+					enableProfilePage: true,
+					profileSettingsForm: {
+						viewData: true,
+						editData: true,
+						closeAccount: true,
+						editThemeSettings: true,
+						editSearchPreferences: true,
+					},
+				};
+			}
 		}
 
 		delete newPreferences.type;

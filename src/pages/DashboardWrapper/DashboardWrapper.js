@@ -122,6 +122,10 @@ class DashboardWrapper extends Component {
 							label: 'Recommendations',
 							link: '/cluster/recommendations-builder',
 						},
+						{
+							label: 'Auth settings',
+							link: '/cluster/auth-settings',
+						},
 					],
 					tag: 'Beta',
 				},
@@ -200,6 +204,10 @@ class DashboardWrapper extends Component {
 								{
 									label: 'Recommendations',
 									link: '/cluster/recommendations-builder',
+								},
+								{
+									label: 'Auth settings',
+									link: '/cluster/auth-settings',
 								},
 							],
 							tag: 'Beta',

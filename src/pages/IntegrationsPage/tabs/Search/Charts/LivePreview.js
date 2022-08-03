@@ -12,7 +12,9 @@ const LivePreview = ({ form, control, customizeControlObj, setCustomizeControlOb
 		if (
 			newControl.dataField !== customizeControlObj.dataField ||
 			newControl.sortBy !== customizeControlObj.sortBy ||
-			newControl.size !== customizeControlObj.size
+			newControl.size !== customizeControlObj.size ||
+			newControl.defaultQuery !== customizeControlObj.defaultQuery ||
+			newControl.setOption !== customizeControlObj.setOption
 		) {
 			handleReload(700);
 		}
@@ -32,7 +34,7 @@ const LivePreview = ({ form, control, customizeControlObj, setCustomizeControlOb
 		}, time);
 	};
 	const shouldDisplayPreview = (obj) => {
-		if (obj.chartType === chartTypes.range.scatter.id) {
+		if (obj.chartType === chartTypes.search.scatter.id) {
 			return (
 				customizeControlObj.dataField &&
 				customizeControlObj.xAxisField &&

@@ -1,7 +1,12 @@
 import React, { useContext, useState } from 'react';
 import { func } from 'prop-types';
 import CustomizeFilter from './CustomizeFilter';
-import { getFilterConfigurationForm, FormContext, getDynamicFilterKey } from '../../../utils';
+import {
+	getFilterConfigurationForm,
+	filterConfigurationFormDefaultFields,
+	FormContext,
+	getDynamicFilterKey,
+} from '../../../utils';
 
 const DynamicFilters = ({ getPreferencesPayload }) => {
 	const form = useContext(FormContext);
@@ -17,11 +22,19 @@ const DynamicFilters = ({ getPreferencesPayload }) => {
 		// Set key
 		setKey(`dynamic-filter-form-${new Date().getTime()}`);
 		// Reset temporary control
+		// Creates a new temporary control
 		resetTempControl(getFilterConfigurationForm(null, true));
+	};
+	const resetTempControlValues = (defaultValues) => {
+		// Resets the current temp control
+		tempControl.reset(defaultValues);
+		tempControl.markAsUntouched();
+		tempControl.markAsPristine();
+		tempControl.markAsUnsubmitted();
 	};
 	const handleCancel = () => {
 		// Reset temporary control
-		resetTempControl(getFilterConfigurationForm(null, true));
+		resetTempControlValues(filterConfigurationFormDefaultFields);
 	};
 	return (
 		<CustomizeFilter
@@ -40,6 +53,9 @@ const DynamicFilters = ({ getPreferencesPayload }) => {
 			getPreferencesPayload={getPreferencesPayload}
 		/>
 	);
+};
+DynamicFilters.propTypes = {
+	getPreferencesPayload: func.isRequired,
 };
 
 DynamicFilters.propTypes = {

@@ -109,13 +109,16 @@ const ReviewAndSave = ({
 			getByVersionId(preferenceId, form.get('versionId').value)
 				.then((resp) => {
 					const content = transformContent(resp.content);
-					const newContent = preferencesInConstants(content, newPreferences);
+					const newPrefsWithAuth = { ...JSON.parse(JSON.stringify(newPreferences)) };
+
+					const newContent = preferencesInConstants(content, newPrefsWithAuth);
 					const body = {
 						metadata: {
 							commit: 'system commit: auto save page changes',
 						},
 						content: newContent,
 					};
+
 					commitCode(preferenceId, body)
 						.then((res) => {
 							// update versionId in preferences with res.version_id
@@ -137,7 +140,9 @@ const ReviewAndSave = ({
 					return {};
 				});
 		} else {
-			const response = await generateInlineSandboxURL(getPreferencesPayload());
+			const newPrefsWithAuth = { ...JSON.parse(JSON.stringify(newPreferences)) };
+
+			const response = await generateInlineSandboxURL(newPrefsWithAuth);
 			const newObj = {};
 			Object.keys(response).forEach((path) => {
 				if (path[0] === '/') {
@@ -169,6 +174,22 @@ const ReviewAndSave = ({
 					console.error(err);
 				});
 		}
+	};
+
+	const flattenObject = (obj) => {
+		const flattened = {};
+
+		Object.keys(obj).forEach((key) => {
+			const value = obj[key];
+
+			if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+				Object.assign(flattened, flattenObject(value));
+			} else {
+				flattened[key] = value;
+			}
+		});
+
+		return flattened;
 	};
 
 	const getDiffData = (oldObj, newObj) => {
@@ -529,6 +550,31 @@ const ReviewAndSave = ({
 			};
 		}
 
+		if (get(diffData, 'authenticationSettings', null)) {
+			let newDiffData = {};
+			const oldVal = get(oldObj, 'authenticationSettings', {});
+			const newVal = get(newObj, 'authenticationSettings', {});
+			const oldValObj = flattenObject(oldVal);
+			const newValObj = flattenObject(newVal);
+			const traversalObj = { ...newValObj, ...oldValObj };
+
+			Object.keys(traversalObj).forEach((data) => {
+				const arr0 = oldValObj[data] || false;
+				const arr1 = newValObj[data] || false;
+				if (arr0 !== arr1 && data !== 'clientId')
+					newDiffData = {
+						...newDiffData,
+						[data]: [arr0, arr1],
+					};
+			});
+			diffData = {
+				...diffData,
+				authenticationSettings: {
+					...newDiffData,
+				},
+			};
+		}
+
 		diffData = {
 			ecommercePlatform: get(diffData, 'ecommercePlatform', {}),
 			layoutAndDesign: get(diffData, 'layoutAndDesign', {}),
@@ -537,6 +583,7 @@ const ReviewAndSave = ({
 			generalSettings: get(diffData, 'generalSettings', {}),
 			resultSettings: get(diffData, 'resultSettings', {}),
 			exportSettings: get(diffData, 'exportSettings', {}),
+			authenticationSettings: get(diffData, 'authenticationSettings', {}),
 			recommendationSettings: get(diffData, 'recommendationSettings', {}),
 			chartSettings: get(diffData, 'chartSettings', {}),
 		};

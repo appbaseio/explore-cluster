@@ -187,6 +187,11 @@ const SuggestionsPage = Loadable({
 	loading: Loader,
 });
 
+const SearchAuth0SettingsPage = Loadable({
+	loader: () =>
+		import(/* webpackChunkName: "SearchAuth0SettingsPage" */ '../../pages/SearchAuth0Settings'),
+	loading: Loader,
+});
 class ClusterRouteContainer extends React.Component {
 	shouldComponentUpdate(nextProps) {
 		const { location, allowedRoutes } = this.props;
@@ -499,6 +504,13 @@ class ClusterRouteContainer extends React.Component {
 						path="/cluster/search-builder"
 						render={(props) => (
 							<AppPageContainer {...props} component={SearchIntegrationsPage} />
+						)}
+					/>
+					<Route
+						exact
+						path="/cluster/auth-settings"
+						render={(props) => (
+							<AppPageContainer {...props} component={SearchAuth0SettingsPage} />
 						)}
 					/>
 					<Route

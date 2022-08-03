@@ -50,8 +50,12 @@ export default Filter = () => {
 	};
 
 	const removeEmpty = (obj) => {
-		// eslint-disable-next-line
-		return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v != null));
+		return Object.fromEntries(
+			Object.entries(obj)
+				// eslint-disable-next-line
+				.filter(([_, v]) => v != null)
+				.map(([k, v]) => [k, v === Object(v) ? removeEmpty(v) : v]),
+		);
 	};
 
 	const propsBasedOnComponent = () => {
@@ -64,7 +68,7 @@ export default Filter = () => {
 			// eslint-disable-next-line
 			if (typeof value === 'boolean' || (typeof value === 'number' && isFinite(value)))
 				str += `{${value}}\n`;
-			else if (typeof value === 'object') str += `${JSON.stringify(value)}\n`;
+			else if (typeof value === 'object') str += `{${JSON.stringify(value)}}\n`;
 			else str += `"${value}"\n`;
 		});
 		return str;

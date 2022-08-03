@@ -61,16 +61,8 @@ class UploadSynonymsModal extends React.Component {
 	};
 
 	render() {
-		const {
-			onRemove,
-			beforeUpload,
-			appName,
-			fileList,
-			file,
-			onOk,
-			onCancel,
-			confirmLoading,
-		} = this.props;
+		const { onRemove, beforeUpload, appName, fileList, file, onOk, onCancel, confirmLoading } =
+			this.props;
 		const { tabKey } = this.state;
 		return (
 			<Modal

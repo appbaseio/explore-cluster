@@ -1,40 +1,68 @@
-import React, { useEffect } from 'react';
-import { Card } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Card, Icon, Modal } from 'antd';
 import { func, object, string } from 'prop-types';
+import Preview from './Preview';
+import { modalStyles } from '../../../PreviewModal';
 
 const { Meta } = Card;
 
 const TemplateCard = ({ template, selectedTemplate, setSelectedTemplate }) => {
+	const [visible, setVisible] = useState(false);
+
 	useEffect(() => {
 		if (selectedTemplate === template.name) setSelectedTemplate(template.name);
 	}, []);
 
+	const handleCancel = () => {
+		setVisible(false);
+	};
+
 	return (
-		<Card
-			hoverable
-			style={{ width: 240 }}
-			className={selectedTemplate === template.name ? 'card-border' : ''}
-			cover={
-				<img
-					style={{ width: 238, height: 280 }}
-					alt={template.name}
-					src={
-						template.image ||
-						'https://banksiafdn.com/wp-content/uploads/2019/10/placeholde-image.jpg'
+		<div>
+			<Card
+				hoverable
+				style={{ width: 240 }}
+				className={selectedTemplate === template.name ? 'card-border' : ''}
+				cover={
+					<img
+						style={{ width: 238, height: 280 }}
+						alt={template.name}
+						src={
+							template.image ||
+							'https://banksiafdn.com/wp-content/uploads/2019/10/placeholde-image.jpg'
+						}
+						onError={(event) => {
+							// eslint-disable-next-line
+							event.target.src =
+								'https://banksiafdn.com/wp-content/uploads/2019/10/placeholde-image.jpg'; // eslint-disable-line
+						}}
+					/>
+				}
+				onClick={() => {
+					setSelectedTemplate(template.name);
+				}}
+			>
+				<Meta
+					title={
+						<div className="meta-title">
+							<>{template.label}</>{' '}
+							<Icon type="eye" theme="twoTone" onClick={() => setVisible(true)} />
+						</div>
 					}
-					onError={(event) => {
-						// eslint-disable-next-line
-						event.target.src =
-							'https://banksiafdn.com/wp-content/uploads/2019/10/placeholde-image.jpg'; // eslint-disable-line
-					}}
+					description={<div dangerouslySetInnerHTML={{ __html: template.description }} />}
 				/>
-			}
-			onClick={() => {
-				setSelectedTemplate(template.name);
-			}}
-		>
-			<Meta title={template.name} description={template.description} />
-		</Card>
+			</Card>
+			<Modal
+				title="Preview"
+				visible={visible}
+				className={modalStyles}
+				onCancel={handleCancel}
+				footer={null}
+				width="100%"
+			>
+				<Preview theme={selectedTemplate} />
+			</Modal>
+		</div>
 	);
 };
 

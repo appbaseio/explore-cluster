@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { object, string } from 'prop-types';
 import get from 'lodash/get';
-import {
-	SandpackProvider,
-	SandpackPreview,
-	SandpackThemeProvider,
-} from '@codesandbox/sandpack-react';
+import { SandpackProvider } from '@codesandbox/sandpack-react';
 import { transformContent } from './ExportInline/Components/ModalHeader';
-import Loader from '../../components/Loader';
+import SandpackPreviewContainer from './SandpackPreviewContainer';
+import ReactivesearchLoader from '../../components/ReactivesearchLoader/ReactivesearchLoader';
 import {
 	generateInlineSandboxURL,
 	getLatestVersion,
@@ -18,7 +15,6 @@ import { getTemplate, transformPreferences } from './utils/index';
 const SandpackModal = ({ preferences, preferenceId }) => {
 	const [sandpackCode, setSandpackCode] = useState({});
 	const [isLoading, setIsLoading] = useState(true);
-	const iframeHeight = window.innerHeight - 60;
 
 	useEffect(() => {
 		fetchLatestVersion();
@@ -54,20 +50,14 @@ const SandpackModal = ({ preferences, preferenceId }) => {
 	const route = templateObj.pages ? templateObj.pages[currentPage] || '/' : '/';
 
 	return isLoading ? (
-		<Loader />
+		<ReactivesearchLoader />
 	) : (
 		<SandpackProvider
 			template="react"
 			customSetup={{ files: { ...sandpackCode } }}
 			startRoute={route}
 		>
-			<SandpackThemeProvider>
-				<SandpackPreview
-					viewportSize={{ height: `${iframeHeight}px` }}
-					showRefreshButton
-					showOpenInCodeSandbox
-				/>
-			</SandpackThemeProvider>
+			<SandpackPreviewContainer />
 		</SandpackProvider>
 	);
 };

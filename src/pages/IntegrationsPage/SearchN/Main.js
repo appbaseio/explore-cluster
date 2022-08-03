@@ -20,6 +20,7 @@ import SavePreferences from '../SavePreferencesN';
 import PageRoutes from '../PageRoutes';
 import { getSearchPreferencesN } from '../../../batteries/modules/actions';
 import { isValidPlan, features } from '../../../batteries/utils';
+import EndUserAuthentication from '../tabs/EndUserAuthentication';
 
 const { TabPane } = Tabs;
 
@@ -121,17 +122,27 @@ const Main = ({ tier, featureEcommerce, getPreferencesN, ...props }) => {
 										}
 										key="3"
 									>
-										<SearchTab getPreferencesPayload={getPreferencesPayload}  />
+										<SearchTab getPreferencesPayload={getPreferencesPayload} />
 									</TabPane>
 									<TabPane
 										tab={
 											<span>
-												{/* <Icon type="database" style={{ margin: 0 }} /> */}
+												<Icon type="unlock" />
+												End-user Authentication
+											</span>
+										}
+										key="4"
+									>
+										<EndUserAuthentication />
+									</TabPane>
+									<TabPane
+										tab={
+											<span>
 												<Icon type="database" />
 												Domain
 											</span>
 										}
-										key="4"
+										key="5"
 									>
 										<DomainSettingsTab preferenceId={preferenceId} />
 									</TabPane>

@@ -17,6 +17,7 @@ export const relevancyTitles = {
 	exportSettings: 'Export Settings',
 	generalSettings: 'General Settings',
 	resultSettings: 'Result Settings',
+	authenticationSettings: 'End-user Authentication',
 	chartSettings: 'Chart Settings',
 };
 
@@ -552,6 +553,36 @@ const settingsMap = {
 	recommendations: {
 		title: 'Recommendations UI',
 		description: '',
+	},
+
+	enableAuth0: {
+		title: 'Enable authentication',
+		description: 'Enable end-user authentication for this search UI',
+	},
+	enableProfilePage: {
+		title: 'Show profile page',
+		description:
+			'Show profile page at (`/profile`) route where end users can view and edit their preferences',
+	},
+	viewData: {
+		title: 'View data',
+		description: 'User can view their data',
+	},
+	editData: {
+		title: 'Edit data',
+		description: 'User can edit their data',
+	},
+	closeAccount: {
+		title: 'Close account',
+		description: 'User can close their account (GDPR compliance)',
+	},
+	editThemeSettings: {
+		title: 'Edit theme settings',
+		description: 'Allow user to set theme settings',
+	},
+	editSearchPreferences: {
+		title: 'Edit search preferences',
+		description: 'Allow users to specify search preferences',
 	},
 	charts: {
 		title: 'Charts',

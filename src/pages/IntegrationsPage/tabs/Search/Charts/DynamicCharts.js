@@ -1,9 +1,14 @@
 import React, { useContext, useState } from 'react';
 import { func } from 'prop-types';
 import CustomizeChart from './CustomizeChart';
-import { FormContext, getChartConfigurationForm, getChartKey } from '../../../utils';
+import {
+	FormContext,
+	getChartConfigurationForm,
+	chartConfigurationFormDefaultFields,
+	getChartKey,
+} from '../../../utils';
 
-// DynamicFilters
+// DynamicCharts
 const DynamicCharts = ({ getPreferencesPayload }) => {
 	const form = useContext(FormContext);
 	const [tempControl, resetTempControl] = useState(getChartConfigurationForm(null));
@@ -17,12 +22,19 @@ const DynamicCharts = ({ getPreferencesPayload }) => {
 		chartsControl.push(tempControl);
 		// Set key
 		setKey(`chart-form-${new Date().getTime()}`);
-		// Reset temporary control
-		resetTempControl(getChartConfigurationForm(null));
+		// Creates a new temporary control
+		resetTempControl(getChartConfigurationForm(null, true));
+	};
+	const resetTempControlValues = (defaultValues) => {
+		// Resets the current temp control
+		tempControl.reset(defaultValues);
+		tempControl.markAsUntouched();
+		tempControl.markAsPristine();
+		tempControl.markAsUnsubmitted();
 	};
 	const handleCancel = () => {
 		// Reset temporary control
-		resetTempControl(getChartConfigurationForm(null));
+		resetTempControlValues(chartConfigurationFormDefaultFields);
 	};
 	return (
 		<CustomizeChart

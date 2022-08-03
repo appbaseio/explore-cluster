@@ -9,7 +9,7 @@ import SandpackModal from './SandpackModal';
 import PageRoutes from './PageRoutes';
 import Loader from '../../components/Loader';
 
-const modalStyles = css`
+export const modalStyles = css`
 	top: 0 !important;
 	height: 100vh;
 	padding-bottom: 0 !important;

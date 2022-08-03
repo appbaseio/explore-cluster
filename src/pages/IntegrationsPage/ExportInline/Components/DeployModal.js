@@ -27,6 +27,11 @@ const DeployModal = ({
 			// build_dir: 'build',
 		},
 		target: 'staging',
+		env: {
+			REACT_APP_AUTH0_APPLICATION_CLIENT_ID:
+				process.env.REACT_APP_AUTH0_APPLICATION_CLIENT_ID,
+			REACT_APP_AUTH0_APPLICATION_DOMAIN: process.env.REACT_APP_AUTH0_APPLICATION_DOMAIN,
+		},
 		version_id: '',
 	};
 

@@ -94,7 +94,8 @@ const ModalHeader = ({
 	useEffect(() => {
 		const themeType = get(preferences, 'themeSettings.type', '');
 		const templateObj = getTemplate(themeType);
-		if (templateObj.manifest_path && !updatedCode[`/${templateObj.manifest_path}`]) {
+		// eslint-disable-next-line
+		if (templateObj?.manifest_path && !updatedCode[`/${templateObj.manifest_path}`]) {
 			setErrMsg('Manifest is missing');
 		} else {
 			setErrMsg('');

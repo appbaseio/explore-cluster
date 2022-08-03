@@ -5,6 +5,18 @@ import { doGet, doPut } from '../../../batteries/utils/requestService';
 import { getAuthToken, getTemplate } from './index';
 
 export const templateConfigMap = {
+	reactivechart: [
+		'/src/components/GeoLayout/GeoResultsLayout.js',
+		'/src/components/GeoLayout/LayoutSwitch.js',
+		'/src/components/GeoLayout/ListLayout.js',
+		'/src/components/GeoLayout/ResultsLayout.js',
+	],
+	'auth0-classic': [
+		'/src/components/GeoLayout/GeoResultsLayout.js',
+		'/src/components/GeoLayout/LayoutSwitch.js',
+		'/src/components/GeoLayout/ListLayout.js',
+		'/src/components/GeoLayout/ResultsLayout.js',
+	],
 	classic: [
 		'/src/components/GeoLayout/GeoResultsLayout.js',
 		'/src/components/GeoLayout/LayoutSwitch.js',
@@ -34,6 +46,18 @@ export const excludedArr = [
 ];
 
 export const tabSettings = {
+	reactivechart: {
+		openPaths: ['/public/index.html', '/src/components/AllFilters.js'],
+		activePath: '/public/index.html',
+	},
+	'auth0-classic': {
+		openPaths: [
+			'/public/index.html',
+			'/src/components/ResultsLayout.js',
+			'/src/components/Search.js',
+		],
+		activePath: '/public/index.html',
+	},
 	classic: {
 		openPaths: [
 			'/public/index.html',
@@ -61,6 +85,8 @@ export const tabSettings = {
 };
 
 export const preferencesInConstants = (code, prefs) => {
+	const themeType = get(prefs, 'themeSettings.type', '');
+	const template = getTemplate(themeType);
 	const newPrefs = {
 		...prefs,
 		appbaseSettings: {
@@ -70,7 +96,13 @@ export const preferencesInConstants = (code, prefs) => {
 		},
 	};
 	const newFiles = { ...code };
-	newFiles['/src/utils/constants.js'] = `
+	newFiles[
+		`/${
+			template && template.preferences_path
+				? template.preferences_path
+				: 'src/utils/constants.js'
+		}`
+	] = `
 const appbasePrefs = ${JSON.stringify(newPrefs, null, 2)};
 export default JSON.stringify(appbasePrefs);
 `;
@@ -83,13 +115,13 @@ export const generateInlineSandboxURL = async (preferences) => {
 	const template = getTemplate(themeType);
 	if (Object.keys(template).length) {
 		if (template.version) {
-			fileName = `reactivesearch-shopify-plugin@${template.version}`;
+			fileName = `${template.repository}@${template.version}`;
 		} else if (template.commit) {
-			fileName = `reactivesearch-shopify-plugin@${template.commit}`;
+			fileName = `${template.repository}@${template.commit}`;
 		} else if (template.branch) {
-			fileName = `reactivesearch-shopify-plugin@${template.branch}`;
+			fileName = `${template.repository}@${template.branch}`;
 		} else {
-			fileName = `reactivesearch-shopify-plugin@master`;
+			fileName = `${template.repository}@master`;
 		}
 		const newFiles = { ...files[fileName] };
 		const newPrefs = {
@@ -100,14 +132,27 @@ export const generateInlineSandboxURL = async (preferences) => {
 				url: localStorage.getItem('url') || sessionStorage.getItem('url'),
 			},
 		};
-		const str = newFiles['/src/utils/constants.js'];
+		const str =
+			newFiles[
+				`/${
+					template && template.preferences_path
+						? template.preferences_path
+						: 'src/utils/constants.js'
+				}`
+			];
 		if (str) {
 			const newStr = str.replace(
 				`'{{APPBASE_PREFERENCES}}'`,
 				JSON.stringify(newPrefs, null, 2),
 			);
 
-			newFiles['/src/utils/constants.js'] = newStr;
+			newFiles[
+				`/${
+					template && template.preferences_path
+						? template.preferences_path
+						: 'src/utils/constants.js'
+				}`
+			] = newStr;
 		}
 		return newFiles;
 	}
@@ -115,6 +160,8 @@ export const generateInlineSandboxURL = async (preferences) => {
 };
 
 export const replaceWithPreferences = async (code, preferences) => {
+	const themeType = get(preferences, 'themeSettings.type', '');
+	const template = getTemplate(themeType);
 	const newFiles = { ...code };
 	const newPrefs = {
 		...preferences,
@@ -124,11 +171,24 @@ export const replaceWithPreferences = async (code, preferences) => {
 			url: localStorage.getItem('url') || sessionStorage.getItem('url'),
 		},
 	};
-	const str = newFiles['/src/utils/constants.js'];
+	const str =
+		newFiles[
+			`/${
+				template && template.preferences_path
+					? template.preferences_path
+					: 'src/utils/constants.js'
+			}`
+		];
 	if (str) {
 		const newStr = str.replace(`'{{APPBASE_PREFERENCES}}'`, JSON.stringify(newPrefs, null, 2));
 
-		newFiles['/src/utils/constants.js'] = newStr;
+		newFiles[
+			`/${
+				template && template.preferences_path
+					? template.preferences_path
+					: 'src/utils/constants.js'
+			}`
+		] = newStr;
 	}
 	return newFiles;
 };

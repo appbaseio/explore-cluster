@@ -73,6 +73,7 @@ const PageRoutes = ({
 				componentSettings: defaultPageSettings(newPrefs.pageSettings.fields),
 			};
 		}
+
 		getLatestVersion(preferences.id)
 			.then((resp) => {
 				const content = transformContent(resp.content);

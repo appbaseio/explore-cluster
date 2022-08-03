@@ -122,6 +122,17 @@ class PreferencesFormWrapperN extends React.Component {
 				openAsPage: false,
 				type: 'other',
 			}),
+			authenticationSettings: FormBuilder.group({
+				enableAuth0: true,
+				enableProfilePage: true,
+				profileSettingsForm: FormBuilder.group({
+					viewData: true,
+					editData: true,
+					closeAccount: true,
+					editThemeSettings: true,
+					editSearchPreferences: true,
+				}),
+			}),
 			// Common controls =>>>>> Ends
 			...(props.isRecommendation
 				? {
@@ -511,6 +522,11 @@ class PreferencesFormWrapperN extends React.Component {
 							storeInfo: {
 								currency: get(preferences, 'globalSettings.currency'),
 							},
+							authenticationSettings: get(preferences, 'authenticationSettings'),
+							profileSettingsForm: get(
+								preferences,
+								'authenticationSettings.profileSettingsForm',
+							),
 							...(isRecommendation
 								? {
 										ctaTitle: get(

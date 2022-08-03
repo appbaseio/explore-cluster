@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Modal, Switch, Form, Select, List, Radio } from 'antd';
+import { Button, Modal, Switch, Form, Select, List, Radio, Icon } from 'antd';
 import { string, object, func, bool } from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
@@ -23,11 +23,6 @@ class CustomizeFilter extends React.Component {
 
 	message = '';
 
-	componentWillUnmount() {
-		// eslint-disable-next-line
-		this.props.control?.get('filterType')?.valueChanges.unsubscribe();
-	}
-
 	showModal = () => {
 		this.setState({
 			visible: true,
@@ -41,8 +36,7 @@ class CustomizeFilter extends React.Component {
 			visible: false,
 		});
 
-		const { onSave, control, tempControl } = this.props;
-		if (tempControl && tempControl.get('enabled')) tempControl.get('enabled').setValue(true);
+		const { onSave, control } = this.props;
 
 		if (onSave) {
 			onSave(control);
@@ -159,12 +153,17 @@ class CustomizeFilter extends React.Component {
 																isAggFields
 																pipeline={pipeline}
 																control={formControl}
-																setFieldType={(val) =>
+																setFieldType={(val) => {
+																	if (message) {
+																		this.setState({
+																			message: '',
+																		});
+																	}
 																	this.setFieldType(
 																		val,
 																		formControl,
-																	)
-																}
+																	);
+																}}
 															/>
 															{type === 'color' && value.dataField && (
 																<div
@@ -260,16 +259,22 @@ class CustomizeFilter extends React.Component {
 														<div
 															style={{
 																lineHeight: 'normal',
-																color: 'tomato',
+																color: 'orange',
 															}}
 														>
+															<Icon
+																type="exclamation-circle"
+																style={{ marginRight: 5 }}
+															/>
 															{message}
 														</div>
 													)}
 												</div>
 											)}
 
-											{!disableListOptions && value?.filterType === 'list' ? (
+											{!disableListOptions &&
+											control.get('filterType') &&
+											control.get('filterType').value === 'list' ? (
 												<FieldControl
 													name="componentType"
 													strict={false}
@@ -308,147 +313,158 @@ class CustomizeFilter extends React.Component {
 												control={control.get('title')}
 											/>
 
-											{!disableListOptions && value?.filterType === 'list' && (
-												<>
-													<TextInput
-														name="size"
-														label="Size"
-														inputProps={{
-															placeholder: 'Enter size',
-															type: 'number',
-														}}
-														control={control.get('size')}
-													/>
-
-													<FieldControl
-														strict={false}
-														name="queryFormat"
-														control={control.get('queryFormat')}
-													>
-														{({ handler }) => (
-															<Form.Item label="Query Format">
-																<Select {...handler()}>
-																	<Select.Option key="or">
-																		Or
-																	</Select.Option>
-																	<Select.Option key="and">
-																		And
-																	</Select.Option>
-																</Select>
-															</Form.Item>
-														)}
-													</FieldControl>
-													<FieldControl
-														name="sortBy"
-														control={control.get('sortBy')}
-													>
-														{({ handler }) => (
-															<Form.Item label="Sort By">
-																<Select {...handler()}>
-																	<Select.Option key="count">
-																		Count
-																	</Select.Option>
-																	<Select.Option key="asc">
-																		Asc
-																	</Select.Option>
-																	<Select.Option key="desc">
-																		Desc
-																	</Select.Option>
-																</Select>
-															</Form.Item>
-														)}
-													</FieldControl>
-													<FieldControl
-														name="showCount"
-														control={control.get('showCount')}
-													>
-														{({ handler }) => (
-															<Form.Item label="Show Count">
-																<Switch {...handler('checkbox')} />
-															</Form.Item>
-														)}
-													</FieldControl>
-													{value.componentType !==
-													componentTypes.tagCloud ? (
-														<FieldControl
-															name="showCheckbox"
-															control={control.get('showCheckbox')}
-														>
-															{({ handler }) => (
-																<Form.Item label="Show Checkbox">
-																	<Switch
-																		{...handler('checkbox')}
-																	/>
-																</Form.Item>
-															)}
-														</FieldControl>
-													) : null}
-													{value.componentType !==
-													componentTypes.tagCloud ? (
-														<FieldControl
-															name="showSearch"
-															control={control.get('showSearch')}
-														>
-															{({ handler }) => (
-																<Form.Item label="Show Search">
-																	<Switch
-																		{...handler('checkbox')}
-																	/>
-																</Form.Item>
-															)}
-														</FieldControl>
-													) : null}
-													<FieldControl
-														name="showMissing"
-														control={control.get('showMissing')}
-													>
-														{({ handler }) => (
-															<Form.Item label="Show Missing">
-																<Switch {...handler('checkbox')} />
-															</Form.Item>
-														)}
-													</FieldControl>
-
-													{value.componentType ===
-													componentTypes.tagCloud ? (
-														<FieldControl
-															name="multiSelect"
-															control={control.get('multiSelect')}
-														>
-															{({ handler }) => (
-																<Form.Item label="Multi Select">
-																	<Switch
-																		{...handler('checkbox')}
-																	/>
-																</Form.Item>
-															)}
-														</FieldControl>
-													) : null}
-													<TextInput
-														name="missingLabel"
-														label="Missing Label"
-														inputProps={{
-															placeholder: 'Enter missing label',
-														}}
-														control={control.get('missingLabel')}
-													/>
-													{value.componentType !==
-													componentTypes.tagCloud ? (
+											{!disableListOptions &&
+												control.get('filterType') &&
+												control.get('filterType').value === 'list' && (
+													<>
 														<TextInput
-															name="selectAllLabel"
-															label="Select All Label"
+															name="size"
+															label="Size"
 															inputProps={{
-																placeholder:
-																	'Enter label for select all option',
+																placeholder: 'Enter size',
+																type: 'number',
 															}}
-															control={control.get('selectAllLabel')}
+															control={control.get('size')}
 														/>
-													) : null}
-												</>
-											)}
+
+														<FieldControl
+															strict={false}
+															name="queryFormat"
+															control={control.get('queryFormat')}
+														>
+															{({ handler }) => (
+																<Form.Item label="Query Format">
+																	<Select {...handler()}>
+																		<Select.Option key="or">
+																			Or
+																		</Select.Option>
+																		<Select.Option key="and">
+																			And
+																		</Select.Option>
+																	</Select>
+																</Form.Item>
+															)}
+														</FieldControl>
+														<FieldControl
+															name="sortBy"
+															control={control.get('sortBy')}
+														>
+															{({ handler }) => (
+																<Form.Item label="Sort By">
+																	<Select {...handler()}>
+																		<Select.Option key="count">
+																			Count
+																		</Select.Option>
+																		<Select.Option key="asc">
+																			Asc
+																		</Select.Option>
+																		<Select.Option key="desc">
+																			Desc
+																		</Select.Option>
+																	</Select>
+																</Form.Item>
+															)}
+														</FieldControl>
+														<FieldControl
+															name="showCount"
+															control={control.get('showCount')}
+														>
+															{({ handler }) => (
+																<Form.Item label="Show Count">
+																	<Switch
+																		{...handler('checkbox')}
+																	/>
+																</Form.Item>
+															)}
+														</FieldControl>
+														{value.componentType !==
+														componentTypes.tagCloud ? (
+															<FieldControl
+																name="showCheckbox"
+																control={control.get(
+																	'showCheckbox',
+																)}
+															>
+																{({ handler }) => (
+																	<Form.Item label="Show Checkbox">
+																		<Switch
+																			{...handler('checkbox')}
+																		/>
+																	</Form.Item>
+																)}
+															</FieldControl>
+														) : null}
+														{value.componentType !==
+														componentTypes.tagCloud ? (
+															<FieldControl
+																name="showSearch"
+																control={control.get('showSearch')}
+															>
+																{({ handler }) => (
+																	<Form.Item label="Show Search">
+																		<Switch
+																			{...handler('checkbox')}
+																		/>
+																	</Form.Item>
+																)}
+															</FieldControl>
+														) : null}
+														<FieldControl
+															name="showMissing"
+															control={control.get('showMissing')}
+														>
+															{({ handler }) => (
+																<Form.Item label="Show Missing">
+																	<Switch
+																		{...handler('checkbox')}
+																	/>
+																</Form.Item>
+															)}
+														</FieldControl>
+
+														{value.componentType ===
+														componentTypes.tagCloud ? (
+															<FieldControl
+																name="multiSelect"
+																control={control.get('multiSelect')}
+															>
+																{({ handler }) => (
+																	<Form.Item label="Multi Select">
+																		<Switch
+																			{...handler('checkbox')}
+																		/>
+																	</Form.Item>
+																)}
+															</FieldControl>
+														) : null}
+														<TextInput
+															name="missingLabel"
+															label="Missing Label"
+															inputProps={{
+																placeholder: 'Enter missing label',
+															}}
+															control={control.get('missingLabel')}
+														/>
+														{value.componentType !==
+														componentTypes.tagCloud ? (
+															<TextInput
+																name="selectAllLabel"
+																label="Select All Label"
+																inputProps={{
+																	placeholder:
+																		'Enter label for select all option',
+																}}
+																control={control.get(
+																	'selectAllLabel',
+																)}
+															/>
+														) : null}
+													</>
+												)}
 
 											{((!disableListOptions &&
-												value?.filterType === 'range') ||
+												control.get('filterType') &&
+												control.get('filterType').value === 'range') ||
 												disableListOptions) && (
 												<>
 													<TextInput

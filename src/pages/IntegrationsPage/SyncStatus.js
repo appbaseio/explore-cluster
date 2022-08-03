@@ -8,7 +8,7 @@ import Flex from '../../batteries/components/shared/Flex';
 import DeployModal from './ExportInline/Components/DeployModal';
 import DeployLogsModal from './ExportInline/Components/DeployLogsModal';
 import { getDeploymentStatus, getAllVersions, deployUiBuilder } from './utils/sandpack-generator';
-import { deployStatusMapper } from './utils/index';
+import { deployStatusMapper, getTemplate } from './utils/index';
 
 const headerStyles = css`
 	b {
@@ -50,7 +50,9 @@ class SyncStatus extends React.Component {
 		this.state = {
 			exportType: form.get('exportSettings.type').value,
 			documents: 0,
+			// eslint-disable-next-line
 			products: 0,
+			// eslint-disable-next-line
 			collections: 0,
 			deploymentStatus: {},
 			modalType: '',
@@ -116,7 +118,9 @@ class SyncStatus extends React.Component {
 			.then((res) => res.json())
 			.then((res) => {
 				this.setState({
+					// eslint-disable-next-line
 					products: get(res, 'responses[0].hits.total.value'),
+					// eslint-disable-next-line
 					collections: get(res, 'responses[1].hits.total.value'),
 					documents: get(res, 'responses[2].hits.total.value'),
 				});
@@ -134,6 +138,7 @@ class SyncStatus extends React.Component {
 		}
 		deployUiBuilder(preferenceId, body)
 			.then(() => {
+				this.fetchDeploymentStatus('deployed');
 				this.myInterval = setInterval(() => this.fetchDeploymentStatus(), 7000);
 			})
 			.catch((err) => {
@@ -166,18 +171,19 @@ class SyncStatus extends React.Component {
 			});
 	};
 
-	fetchDeploymentStatus = () => {
+	fetchDeploymentStatus = (status = 'notDeployed') => {
 		const { preferenceId } = this.props;
 		getDeploymentStatus(preferenceId)
 			.then((res) => {
 				const state = res.status || res.state;
-				this.setState(
-					{
-						deploymentStatus: res,
-					},
-					() => this.handleCancel(),
-				);
-
+				this.setState({
+					deploymentStatus: res,
+				});
+				if (status === 'deployed') {
+					this.setState({
+						modalType: 'deploy-logs',
+					});
+				}
 				if (state === 'ERROR' || state === 'READY' || state === 'CANCELED')
 					clearInterval(this.myInterval);
 			})
@@ -198,9 +204,10 @@ class SyncStatus extends React.Component {
 			this.state;
 		const { form } = this.props;
 		const title = form.get('name') ? form.get('name').value : '';
-		const template = form.get('themeType') ? form.get('themeType').value : '';
+		const themeType = form.get('themeType') ? form.get('themeType').value : '';
 		const pipeline = form.get('pipeline') ? form.get('pipeline').value : '';
 		const status = deploymentStatus.status || deploymentStatus.state;
+		const templateObj = getTemplate(themeType);
 
 		return (
 			<Card>
@@ -220,10 +227,10 @@ class SyncStatus extends React.Component {
 							</Flex>
 
 							<Flex className="sub-part">
-								{template ? (
+								{themeType ? (
 									<>
 										<b>Search Template</b>
-										<>{template}</>
+										<>{templateObj.label || themeType}</>
 									</>
 								) : null}
 							</Flex>
@@ -235,11 +242,13 @@ class SyncStatus extends React.Component {
 											<b>Deploy Status:</b> {status}{' '}
 											{deployStatusMapper[status]}
 										</div>
-										<Tooltip title={deploymentStatus.url}>
-											<div className="deploy-url overflow">
-												<b>Preview URL:</b> {deploymentStatus.url}
-											</div>
-										</Tooltip>
+										{status === 'READY' ? (
+											<Tooltip title={deploymentStatus.url}>
+												<div className="deploy-url overflow">
+													<b>Preview URL:</b> {deploymentStatus.url}
+												</div>
+											</Tooltip>
+										) : null}
 
 										<Button
 											type="link"
