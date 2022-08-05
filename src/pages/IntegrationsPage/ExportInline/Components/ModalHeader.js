@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router-dom';
-
+import get from 'lodash/get';
 import { Button, Tooltip, Icon, Modal, message } from 'antd';
 import CommitModal from './CommitModal';
 import PastVersionsDrawer from './PastVersionsDrawer';
 import DeployLogsModal from './DeployLogsModal';
 import DeployModal from './DeployModal';
-import { deployStatusMapper } from '../../utils/index';
+import { deployStatusMapper, getTemplate } from '../../utils/index';
 import {
 	commitCode,
 	getAllVersions,
@@ -62,6 +62,7 @@ const ModalHeader = ({
 	modalType,
 	setModalType,
 	setOpenCommitModal,
+	preferences,
 }) => {
 	const [visible, setVisible] = useState(false);
 	const [allVersions, setAllVersions] = useState([]);
@@ -89,6 +90,17 @@ const ModalHeader = ({
 			});
 		}
 	}, [modalType]);
+
+	useEffect(() => {
+		const themeType = get(preferences, 'themeSettings.type', '');
+		const templateObj = getTemplate(themeType);
+		// eslint-disable-next-line
+		if (templateObj?.manifest_path && !updatedCode[`/${templateObj.manifest_path}`]) {
+			setErrMsg('Manifest is missing');
+		} else {
+			setErrMsg('');
+		}
+	}, [updatedCode]);
 
 	const fetchAllVersions = () => {
 		getAllVersions(preferenceId)
@@ -166,7 +178,6 @@ const ModalHeader = ({
 		}
 		deployUiBuilder(preferenceId, body)
 			.then(() => {
-				message.info('Deployed successfully');
 				fetchDeploymentStatus('deployed');
 				myInterval = setInterval(() => fetchDeploymentStatus(), 7000);
 			})
@@ -181,11 +192,11 @@ const ModalHeader = ({
 	const fetchDeploymentStatus = (status = 'notDeployed') => {
 		getDeploymentStatus(preferenceId)
 			.then((res) => {
-				const state = deploymentStatus.status || deploymentStatus.state;
+				const state = res.status || res.state;
 				setDeploymentStatus(res);
 				if (status === 'deployed') {
 					setIsLoading(false);
-					setModalType('');
+					setModalType('deploy-logs');
 				}
 				if (state === 'ERROR' || state === 'READY' || state === 'CANCELED')
 					clearInterval(myInterval);
@@ -199,20 +210,23 @@ const ModalHeader = ({
 	const handleCancel = () => {
 		setModalType('');
 		setOpenCommitModal(false);
-		setErrMsg('');
+		if (errMsg !== 'Manifest is missing') setErrMsg('');
 	};
 
 	return (
 		<>
 			<div className="header-container">
-				<div className="header-title-container">
+				<div className="header-title-container" style={{ width: '100%' }}>
 					<div className="header-font">Code Editor</div>
 					{currentVersion.version_id && currentVersion.commit ? (
-						<div className="header-title-container">
+						<div
+							className="header-title-container"
+							style={{ justifyContent: 'center', maxWidth: '70%' }}
+						>
 							<Tooltip title={currentVersion.commit}>
 								<p
-									style={{ maxWidth: 200 }}
-									className="overflow-container commit-font"
+									style={{ maxWidth: '65%', margin: 0 }}
+									className="overflow commit-font"
 								>
 									{currentVersion.commit}
 								</p>
@@ -225,10 +239,7 @@ const ModalHeader = ({
 								style={{ margin: '0px 5px 0px 5px' }}
 							/>
 							<Tooltip title={currentVersion.version_id}>
-								<p
-									style={{ maxWidth: 150 }}
-									className="overflow-container  versionid-font"
-								>
+								<p style={{ margin: 0 }} className="overflow  versionid-font">
 									{currentVersion.version_id}
 								</p>
 							</Tooltip>
@@ -274,7 +285,9 @@ const ModalHeader = ({
 						/>
 					</div>
 				</div>
-				{deploymentStatus.status || deploymentStatus.state ? (
+				{/* eslint-disable-next-line */}
+				{currentVersion.version_id === deploymentStatus?.meta?.version_id &&
+				(deploymentStatus.status || deploymentStatus.state) ? (
 					<div className="status-container" onClick={() => setModalType('deploy-logs')}>
 						<Button type="link" style={{ padding: 0 }}>
 							Deploy Status
@@ -329,6 +342,7 @@ const ModalHeader = ({
 				isLoading={isLoading}
 				handleCancel={handleCancel}
 				allVersions={allVersions}
+				currentVersion={currentVersion}
 			/>
 		</>
 	);
@@ -351,6 +365,7 @@ ModalHeader.propTypes = {
 	modalType: PropTypes.string,
 	setModalType: PropTypes.func,
 	setOpenCommitModal: PropTypes.func,
+	preferences: PropTypes.object,
 };
 
 ModalHeader.defaultProps = {
@@ -368,6 +383,7 @@ ModalHeader.defaultProps = {
 	modalType: '',
 	setModalType: () => {},
 	setOpenCommitModal: () => {},
+	preferences: {},
 };
 
 export default withRouter(ModalHeader);

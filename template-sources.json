@@ -1,0 +1,38 @@
+[
+    {
+        "organization": "appbaseio-confidential",
+        "repository": "enterprise-search-ui-template",
+        "version": "",
+        "commit": "",
+        "branch": "autho-template",
+        "manifest_path": "reactivesearch-manifest.json",
+        "repositoryType": "private"
+    },
+    {
+        "organization": "appbaseio-confidential",
+        "repository": "marketplace-apps",
+        "version": "",
+        "commit": "",
+        "branch": "reactivechart-dashboard-app",
+        "manifest_path": "reactivesearch-manifest.json",
+        "repositoryType": "private"
+    },
+    {
+        "organization": "appbaseio",
+        "repository": "reactivesearch-shopify-plugin",
+        "version": "",
+        "commit": "",
+        "branch": "v2-ecomm-template",
+        "manifest_path": "reactivesearch-manifest.json",
+        "repositoryType": "public"
+    },
+    {
+        "organization": "appbaseio",
+        "repository": "reactivesearch-shopify-plugin",
+        "version": "",
+        "commit": "",
+        "branch": "v2-geo-template",
+        "manifest_path": "reactivesearch-manifest.json",
+        "repositoryType": "public"
+    }
+]

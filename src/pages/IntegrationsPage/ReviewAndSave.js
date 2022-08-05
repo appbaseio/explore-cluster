@@ -1,17 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Icon, Modal } from 'antd';
+import { Button, Modal } from 'antd';
 import styled from 'react-emotion';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { func, object, bool, string } from 'prop-types';
 import { diff } from 'jsondiffpatch';
 import DiffList from './DiffList';
-import { generateInlineSandboxURL, getByVersionId, commitCode } from './utils/sandpack-generator';
+import {
+	generateInlineSandboxURL,
+	getByVersionId,
+	commitCode,
+	preferencesInConstants,
+} from './utils/sandpack-generator';
 import {
 	saveSearchPreferenceN,
 	saveRecommendationPreferenceN,
 } from '../../batteries/modules/actions';
-import { updateConstantsWithPreferences } from './utils/index';
+import { transformPreferences } from './utils/index';
+import { transformContent } from './ExportInline/Components/ModalHeader';
 
 const Badge = styled.span`
 	background: #f5222d;
@@ -47,7 +53,6 @@ const ReviewAndSave = ({
 	updateSearchPreferences,
 	updateRecommendationsPreferences,
 	getPreferencesPayload,
-	getPreferences,
 	setHasChanged,
 	isRecommendation,
 	preferenceId,
@@ -97,29 +102,29 @@ const ReviewAndSave = ({
 		}
 	};
 
-	const replaceWithPreferences = (code) => {
-		const newCode = { ...code };
-		newCode['src/utils/constants.js'] = updateConstantsWithPreferences(getPreferences());
-		return newCode;
-	};
-
 	const handleCommitCode = async (commitMessage) => {
+		const newPreferences = transformPreferences(getPreferencesPayload());
 		if (form.get('versionId').value) {
 			// fetch by versionID and update constants file with new preferences
 			getByVersionId(preferenceId, form.get('versionId').value)
 				.then((resp) => {
+					const content = transformContent(resp.content);
+					const newPrefsWithAuth = { ...JSON.parse(JSON.stringify(newPreferences)) };
+
+					const newContent = preferencesInConstants(content, newPrefsWithAuth);
 					const body = {
 						metadata: {
-							commit: commitMessage,
+							commit: 'system commit: auto save page changes',
 						},
-						content: replaceWithPreferences(resp.content),
+						content: newContent,
 					};
+
 					commitCode(preferenceId, body)
 						.then((res) => {
 							// update versionId in preferences with res.version_id
 							form.get('versionId').setValue(res.version_id);
 							// Save the new preferences
-							updateSearchPreferences(getPreferencesPayload()).then((action) => {
+							updateSearchPreferences(newPreferences).then((action) => {
 								if (!(action && action.error)) {
 									setHasChanged();
 									setIsLoading(false);
@@ -135,7 +140,9 @@ const ReviewAndSave = ({
 					return {};
 				});
 		} else {
-			const response = await generateInlineSandboxURL(getPreferencesPayload());
+			const newPrefsWithAuth = { ...JSON.parse(JSON.stringify(newPreferences)) };
+
+			const response = await generateInlineSandboxURL(newPrefsWithAuth);
 			const newObj = {};
 			Object.keys(response).forEach((path) => {
 				if (path[0] === '/') {
@@ -156,7 +163,7 @@ const ReviewAndSave = ({
 					// update versionId in preferences with res.version_id
 					form.get('versionId').setValue(res.version_id);
 					// Save the new preferences
-					updateSearchPreferences(getPreferencesPayload()).then((action) => {
+					updateSearchPreferences(newPreferences).then((action) => {
 						if (!(action && action.error)) {
 							setHasChanged();
 							setIsLoading(false);
@@ -167,6 +174,22 @@ const ReviewAndSave = ({
 					console.error(err);
 				});
 		}
+	};
+
+	const flattenObject = (obj) => {
+		const flattened = {};
+
+		Object.keys(obj).forEach((key) => {
+			const value = obj[key];
+
+			if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+				Object.assign(flattened, flattenObject(value));
+			} else {
+				flattened[key] = value;
+			}
+		});
+
+		return flattened;
 	};
 
 	const getDiffData = (oldObj, newObj) => {
@@ -312,11 +335,9 @@ const ReviewAndSave = ({
 			const searchSettings = get(diffData, 'searchSettings.rsConfig', {});
 			Object.keys(searchSettings).forEach((field) => {
 				if (searchSettings[field].length !== 2) {
-					if (searchSettings[field][0] && !searchSettings[field][1]) {
-						searchSettings[field] = [searchSettings[field][0], false];
-					} else {
-						delete searchSettings[field];
-					}
+					const newVal = get(newObj, `searchSettings.rsConfig.${field}`, '');
+					const oldVal = get(oldObj, `searchSettings.rsConfig.${field}`, '');
+					searchSettings[field] = [oldVal, newVal];
 				}
 			});
 			diffData = {
@@ -383,6 +404,17 @@ const ReviewAndSave = ({
 				},
 			};
 		}
+		if (get(diffData, 'chartSettings.charts', null)) {
+			const newVal = get(newObj, 'chartSettings.charts', []);
+			const oldVal = get(oldObj, 'chartSettings.charts', []);
+			diffData = {
+				...diffData,
+				chartSettings: {
+					...diffData.chartSettings,
+					chartSettings: [oldVal, newVal],
+				},
+			};
+		}
 
 		if (get(diffData, 'globalSettings.showSelectedFilters', null)) {
 			const newVal = get(newObj, 'globalSettings.showSelectedFilters', '');
@@ -398,6 +430,18 @@ const ReviewAndSave = ({
 
 		if (get(diffData, 'resultSettings.rsConfig', null)) {
 			const resultSettings = get(diffData, 'resultSettings.rsConfig', {});
+			if (resultSettings.componentType) {
+				const newVal = get(newObj, 'resultSettings.componentType', '');
+				const oldVal = get(oldObj, 'resultSettings.componentType', '');
+
+				diffData = {
+					...diffData,
+					resultSettings: {
+						componentType: [oldVal, newVal],
+					},
+				};
+			}
+
 			diffData = {
 				...diffData,
 				resultSettings: {
@@ -506,6 +550,31 @@ const ReviewAndSave = ({
 			};
 		}
 
+		if (get(diffData, 'authenticationSettings', null)) {
+			let newDiffData = {};
+			const oldVal = get(oldObj, 'authenticationSettings', {});
+			const newVal = get(newObj, 'authenticationSettings', {});
+			const oldValObj = flattenObject(oldVal);
+			const newValObj = flattenObject(newVal);
+			const traversalObj = { ...newValObj, ...oldValObj };
+
+			Object.keys(traversalObj).forEach((data) => {
+				const arr0 = oldValObj[data] || false;
+				const arr1 = newValObj[data] || false;
+				if (arr0 !== arr1 && data !== 'clientId')
+					newDiffData = {
+						...newDiffData,
+						[data]: [arr0, arr1],
+					};
+			});
+			diffData = {
+				...diffData,
+				authenticationSettings: {
+					...newDiffData,
+				},
+			};
+		}
+
 		diffData = {
 			ecommercePlatform: get(diffData, 'ecommercePlatform', {}),
 			layoutAndDesign: get(diffData, 'layoutAndDesign', {}),
@@ -514,7 +583,9 @@ const ReviewAndSave = ({
 			generalSettings: get(diffData, 'generalSettings', {}),
 			resultSettings: get(diffData, 'resultSettings', {}),
 			exportSettings: get(diffData, 'exportSettings', {}),
+			authenticationSettings: get(diffData, 'authenticationSettings', {}),
 			recommendationSettings: get(diffData, 'recommendationSettings', {}),
+			chartSettings: get(diffData, 'chartSettings', {}),
 		};
 
 		// filter empty fields
@@ -546,7 +617,6 @@ const ReviewAndSave = ({
 	};
 
 	const [diffCount, diffData] = getDiffData(oldData, newData);
-
 	return (
 		<div>
 			<div style={{ position: 'relative' }}>
@@ -573,16 +643,12 @@ const ReviewAndSave = ({
 					top: 20,
 				}}
 				destroyOnClose
-				okText={
-					<>
-						<Icon type={isLoading ? 'loading' : ''} />
-						{label}
-					</>
-				}
+				okText={label}
 				onCancel={handleCancel}
 				cancelButtonProps={{ 'data-cy': 'cancel-modal-button' }}
 				okButtonProps={{
 					'data-cy': 'review-save-button',
+					loading: isLoading,
 				}}
 			>
 				{isOpen && <DiffList diff={diffData} />}

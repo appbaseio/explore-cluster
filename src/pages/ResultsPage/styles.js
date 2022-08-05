@@ -33,6 +33,11 @@ export const container = css`
 			padding-bottom: 0;
 		}
 	}
+	.button-label {
+		display: flex;
+		align-items: center;
+		gap: 5px;
+	}
 `;
 
 export const label = css`

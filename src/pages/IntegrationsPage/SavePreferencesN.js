@@ -23,6 +23,7 @@ import {
 	defaultSearchPreferences,
 	defaultRecommendationsPreferences,
 } from './utils';
+import { reOrderPreferences } from './utils/index';
 import ReviewAndSave from './ReviewAndSave';
 
 class SavePreferencesN extends React.Component {
@@ -90,7 +91,12 @@ class SavePreferencesN extends React.Component {
 			delete newPreferences.resultSettings.layout;
 			delete newPreferences.resultSettings.viewSwitcher;
 		} else {
-			newPreferences = searchPreferences;
+			if (searchPreferences.componentSettings || searchPreferences.pageSettings) {
+				newPreferences = { ...reOrderPreferences(searchPreferences) };
+			} else {
+				newPreferences = { ...searchPreferences };
+			}
+
 			if (newPreferences.resultSettings && !newPreferences.resultSettings.resultHighlight) {
 				newPreferences.resultSettings.resultHighlight = false;
 			}
@@ -134,6 +140,29 @@ class SavePreferencesN extends React.Component {
 				) {
 					newPreferences.globalSettings.meta.deploySettings.versionId = '';
 				}
+			}
+			if (
+				get(diffData, 'fusionSettings', {}) &&
+				get(newPreferences, 'fusionSettings') === null
+			) {
+				delete newPreferences.fusionSettings;
+			}
+
+			if (
+				get(diffData, 'authenticationSettings', null) &&
+				get(newPreferences, 'authenticationSettings', null) === null
+			) {
+				newPreferences.authenticationSettings = {
+					enableAuth0: true,
+					enableProfilePage: true,
+					profileSettingsForm: {
+						viewData: true,
+						editData: true,
+						closeAccount: true,
+						editThemeSettings: true,
+						editSearchPreferences: true,
+					},
+				};
 			}
 		}
 
@@ -203,7 +232,7 @@ class SavePreferencesN extends React.Component {
 					preferenceId={preferenceId}
 					closeForm={closeForm}
 					buttonProps={buttonProps}
-					oldData={preferences}
+					oldData={reOrderPreferences(preferences)}
 					newData={getPreferencesPayload()}
 					setHasChanged={() => {
 						this.setState(

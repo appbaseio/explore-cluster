@@ -1,4 +1,7 @@
-import { getURL } from '../../../constants/config';
+import get from 'lodash/get';
+import { componentTypes } from '@appbaseio/reactivesearch';
+import templates from '../../../../template-sources-output.json';
+import { getSearchPreferencesPayload, defaultSearchPreferences } from '../utils';
 
 export const deployStatusMapper = {
 	QUEUED: '🕓',
@@ -72,74 +75,291 @@ export const getAuthToken = () => {
 
 export const updateConstantsWithPreferences = (preferences) => {
 	return `
-const appbasePrefs = ${JSON.stringify(JSON.stringify(preferences))};
+const appbasePrefs = ${JSON.stringify(preferences, null)};
 
-export default appbasePrefs;
+export default JSON.stringify(appbasePrefs);
 	`;
 };
 
-export function addDomain(id, body) {
-	const ACC_API = getURL();
-	const token = getAuthToken();
-	const url = `${ACC_API}/_uibuilder/${id}/domain`;
+export const getTemplate = (template) => {
+	return templates.filter((i) => i.name === template)[0] || {};
+};
 
-	const options = {
-		method: 'POST',
-		headers: {
-			authorization: `Basic ${token}`,
-			'Content-Type': 'application/json',
+// Generate the pageSettings from resultSettings, searchSettings, facetSettings during save to B.E
+export const transformPreferences = (preferences) => {
+	// const pageRoutes = templateObj.pages;
+	const newPreferences = { ...preferences };
+	const { facetSettings, chartSettings } = preferences;
+
+	let componentSettings = {
+		search: {
+			componentType: componentTypes.searchBox,
+			...newPreferences.searchSettings,
 		},
-		body: JSON.stringify(body),
-	};
-
-	return fetch(url, options);
-}
-
-export function getDomainStatus(id, domainName) {
-	const ACC_API = getURL();
-	const token = getAuthToken();
-
-	const url = `${ACC_API}/_uibuilder/${id}/domain/${domainName}`;
-
-	const options = {
-		method: 'POST',
-		headers: {
-			authorization: `Basic ${token}`,
-			'Content-Type': 'application/json',
+		result: {
+			componentType: componentTypes.reactiveList,
+			...newPreferences.resultSettings,
 		},
 	};
 
-	return fetch(url, options);
-}
+	if (facetSettings.dynamicFacets) {
+		let newObj = {};
+		let filterType = '';
+		if (facetSettings.dynamicFacets.length) {
+			facetSettings.dynamicFacets.forEach((data) => {
+				if (data?.rsConfig?.filterType === 'list') {
+					filterType = 'multiList';
+				} else if (
+					data?.rsConfig?.filterType === 'date' ||
+					data?.rsConfig?.filterType === 'range'
+				) {
+					if (data?.rsConfig?.startValue && data?.rsConfig?.endValue) {
+						filterType = 'rangeInput';
+					} else {
+						filterType = 'dynamicRangeSlider';
+					}
+				} else {
+					filterType = 'dynamicRangeSlider';
+				}
 
-export function getAllDomains(id) {
-	const ACC_API = getURL();
-	const token = getAuthToken();
-	const url = `${ACC_API}/_uibuilder/${id}/domain`;
-	const options = {
-		method: 'GET',
-		headers: {
-			authorization: `Basic ${token}`,
-			'Content-Type': 'application/json',
+				newObj = {
+					...newObj,
+					[data.rsConfig.componentId]: {
+						...data,
+						componentType: data?.rsConfig?.componentType || componentTypes[filterType],
+						facetType: 'dynamic',
+					},
+				};
+			});
+			componentSettings = {
+				...componentSettings,
+				...newObj,
+			};
+		}
+	}
+
+	if (facetSettings.staticFacets) {
+		// collection, productType, color, size, price
+		let newObj = {};
+		let filterType = '';
+		if (facetSettings.staticFacets.length) {
+			facetSettings.staticFacets.forEach((data) => {
+				if (data?.rsConfig?.filterType === 'list') {
+					filterType = 'multiList';
+				} else if (
+					data?.rsConfig?.filterType === 'date' ||
+					data?.rsConfig?.filterType === 'range'
+				) {
+					if (data?.rsConfig?.startValue && data?.rsConfig?.endValue) {
+						filterType = 'rangeInput';
+					} else {
+						filterType = 'dynamicRangeSlider';
+					}
+				} else {
+					filterType = 'dynamicRangeSlider';
+				}
+
+				newObj = {
+					...newObj,
+					[data.name]: {
+						...data,
+						componentType: data?.rsConfig?.componentType || componentTypes[filterType],
+						facetType: 'static',
+					},
+				};
+			});
+			componentSettings = {
+				...componentSettings,
+				...newObj,
+			};
+		}
+	}
+	if (chartSettings) {
+		let newCompononentSettings = {};
+		if (chartSettings.charts.length) {
+			chartSettings.charts.forEach((chart) => {
+				newCompononentSettings = {
+					...newCompononentSettings,
+					[chart.rsConfig.componentId]: chart,
+				};
+			});
+		}
+		componentSettings = {
+			...componentSettings,
+			...newCompononentSettings,
+		};
+	}
+
+	if (newPreferences.pageSettings && newPreferences.pageSettings.currentPage) {
+		newPreferences.pageSettings = {
+			...newPreferences.pageSettings,
+			pages: {
+				...newPreferences.pageSettings.pages,
+				[newPreferences.pageSettings.currentPage]: {
+					componentSettings,
+				},
+			},
+			currentPage: newPreferences.pageSettings.currentPage,
+		};
+	} else {
+		// Ui builder creation: Wizard flow
+		const themeType = get(preferences, 'themeSettings.type', '');
+		const template = getTemplate(themeType);
+		if (Object.keys(template?.pages || []).length) {
+			// Generate pageSettings and fields for defaultPageSettings
+			let pageSettings = {
+				fields: get(
+					componentSettings,
+					'result.fields',
+					get(newPreferences, 'resultSettings.fields', {}),
+				),
+			};
+			Object.keys(template.pages || []).forEach((page, idx) => {
+				pageSettings = {
+					...pageSettings,
+					pages: {
+						...(pageSettings.pages || {}),
+						[page]: {
+							componentSettings,
+						},
+					},
+				};
+				if (idx === 0) pageSettings.currentPage = page;
+			});
+			newPreferences.pageSettings = pageSettings;
+		} else {
+			newPreferences.componentSettings = componentSettings;
+		}
+	}
+	return newPreferences;
+};
+
+export const defaultPageSettings = (fields = {}) => {
+	const fieldsObj = Object.keys(fields).length ? { fields } : {};
+	const defaultSettings = getSearchPreferencesPayload(defaultSearchPreferences);
+	const { facetSettings } = defaultSettings;
+	// get componentSettings from defaultSettings and replace fields in resultSettings with fields from pageSettings.
+	let componentSettings = {
+		search: {
+			componentType: componentTypes.searchBox,
+			...defaultSettings.searchSettings,
+			...fieldsObj,
+		},
+		result: {
+			componentType: componentTypes.reactiveList,
+			...defaultSettings.resultSettings,
+			...fieldsObj,
 		},
 	};
 
-	return fetch(url, options);
-}
+	if (facetSettings.staticFacets) {
+		// collection, productType, color, size, price
+		let newObj = {};
+		let filterType = '';
+		if (facetSettings.staticFacets.length) {
+			facetSettings.staticFacets.forEach((data) => {
+				if (data?.rsConfig?.filterType === 'list') {
+					filterType = 'multiList';
+				} else if (
+					data?.rsConfig?.filterType === 'date' ||
+					data?.rsConfig?.filterType === 'range'
+				) {
+					if (data?.rsConfig?.startValue && data?.rsConfig?.endValue) {
+						filterType = 'rangeInput';
+					} else {
+						filterType = 'dynamicRangeSlider';
+					}
+				} else {
+					filterType = 'dynamicRangeSlider';
+				}
 
-export function deleteDomain(id, domainName) {
-	const ACC_API = getURL();
-	const token = getAuthToken();
+				newObj = {
+					...newObj,
+					[data.name]: {
+						...data,
+						componentType: data?.rsConfig?.componentType || componentTypes[filterType],
+						facetType: 'static',
+					},
+				};
+			});
+			componentSettings = {
+				...componentSettings,
+				...newObj,
+			};
+		}
+	}
+	return componentSettings;
+};
 
-	const url = `${ACC_API}/_uibuilder/${id}/domain/${domainName}`;
+// Trasform the preferences from B.E to get resultSettings, searchSettings, facetSettings from pageSettings of currentPage selected.
+export const reOrderPreferences = (prefs, page = '') => {
+	let newPreferences = {};
+	let compSettings = {};
+	if (prefs && prefs.name && (prefs.pageSettings || prefs.componentSettings)) {
+		newPreferences = { ...prefs };
+		const facetSettings = {
+			dynamicFacets: [],
+		};
+		const chartSettings = { charts: [] };
+		if (newPreferences.pageSettings && Object.keys(newPreferences.pageSettings).length) {
+			const { currentPage } = newPreferences.pageSettings;
+			if (page || currentPage) {
+				if (newPreferences.pageSettings.pages[page || currentPage]) {
+					const { componentSettings } =
+						newPreferences.pageSettings.pages[page || currentPage];
+					compSettings = componentSettings;
+				} else if (newPreferences.pageSettings.fields) {
+					const componentSettings = defaultPageSettings(
+						newPreferences.pageSettings.fields,
+					);
+					compSettings = componentSettings;
+					newPreferences.pageSettings.pages[page] = {
+						componentSettings,
+					};
+				} else {
+					const componentSettings = defaultPageSettings();
+					compSettings = componentSettings;
+					newPreferences.pageSettings.pages[page] = {
+						componentSettings,
+					};
+				}
+				newPreferences.pageSettings.currentPage = page || currentPage;
+			}
+		} else {
+			const { componentSettings } = newPreferences;
+			compSettings = componentSettings;
+		}
 
-	const options = {
-		method: 'DELETE',
-		headers: {
-			authorization: `Basic ${token}`,
-			'Content-Type': 'application/json',
-		},
-	};
+		delete compSettings?.result?.componentType;
+		delete compSettings?.search?.componentType;
 
-	return fetch(url, options);
-}
+		newPreferences.resultSettings = {
+			...compSettings.result,
+		};
+		newPreferences.searchSettings = {
+			...compSettings.search,
+		};
+		Object.values(compSettings).forEach((facet) => {
+			if (facet.facetType) {
+				const newFacetObj = { ...facet };
+
+				delete newFacetObj.facetType;
+				delete newFacetObj.componentType;
+
+				if (facet.facetType !== 'static') {
+					facetSettings.dynamicFacets.push(newFacetObj);
+				}
+				// If component is a chart
+			} else if (facet.rsConfig.componentType === componentTypes.reactiveChart) {
+				chartSettings.charts.push(facet);
+			}
+		});
+
+		newPreferences.facetSettings = facetSettings;
+		newPreferences.chartSettings = chartSettings;
+
+		delete newPreferences?.componentSettings;
+		return newPreferences;
+	}
+	return prefs;
+};

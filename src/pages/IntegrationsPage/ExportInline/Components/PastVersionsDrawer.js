@@ -87,7 +87,7 @@ const PastVersionsDrawer = ({
 	return (
 		<div>
 			<Drawer
-				width={600}
+				width={700}
 				placement="right"
 				closable={false}
 				onClose={() => setVisible(false)}

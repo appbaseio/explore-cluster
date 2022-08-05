@@ -18,7 +18,7 @@
 		"cypress:run": "cypress run --record --key 8e90df64-6ae0-484d-b8ef-3b7c5a521382 open",
 		"cypress:open": " cypress open",
 		"cypress:chrome": "cypress run --headless chrome",
-		"preinstall": "./extract-shopify.sh && node preinstall-node.js"
+		"preinstall": "./extract-shopify.sh && node preinstall-server.js"
 	},
 	"husky": {
 		"hooks": {
@@ -81,11 +81,11 @@
 	},
 	"dependencies": {
 		"@appbaseio-confidential/importer": "git+https://1dc0d0fc07f05943afdde9bdb85b7aa438a0ce3b:x-oauth-basic@github.com/appbaseio-confidential/importer#22773f7d51169674105fb9976ef5b038fbdd8ae0",
-		"@appbaseio-confidential/reactivesearch-playground": "^1.2.9-beta",
+		"@appbaseio-confidential/reactivesearch-playground": "^1.2.14-beta",
 		"@appbaseio/dejavu-browser": "^3.6.0",
 		"@appbaseio/react-filter-box": "^3.4.1",
 		"@appbaseio/reactivemaps": "^3.0.0-beta.14",
-		"@appbaseio/reactivesearch": "3.29.1",
+		"@appbaseio/reactivesearch": "^3.36.0",
 		"@babel/plugin-proposal-class-properties": "^7.0.0-rc.1",
 		"@codesandbox/sandpack-react": "^0.19.0",
 		"@monaco-editor/react": "^4.2.2",
@@ -121,7 +121,7 @@
 		"lint-staged": "^10.1.7",
 		"lodash": "^4.17.10",
 		"lzma": "^2.3.2",
-		"moment": "^2.29.2",
+		"moment": "^2.29.4",
 		"partial-json-parser": "^1.1.1",
 		"prettier": "^2.0.4",
 		"prop-types": "^15.6.2",

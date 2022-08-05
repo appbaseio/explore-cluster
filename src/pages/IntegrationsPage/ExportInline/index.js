@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { object, func } from 'prop-types';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { css } from 'react-emotion';
 import { SandpackProvider } from '@codesandbox/sandpack-react';
 // eslint-disable-next-line
@@ -17,6 +17,7 @@ import {
 	replaceWithPreferences,
 } from '../utils/sandpack-generator';
 import { saveSearchPreferenceN, getSearchPreferencesN } from '../../../batteries/modules/actions';
+import { getTemplate } from '../utils/index';
 
 const modalStyles = css`
 	padding-bottom: 0 !important;
@@ -66,8 +67,7 @@ const ExportInline = ({
 	const [openCommitModal, setOpenCommitModal] = useState(false);
 
 	useEffect(() => {
-		if (control?.get('versionId')?.value) fetchByVersionId(control.get('versionId').value);
-		else fetchLatestVersion();
+		fetchLatestVersion();
 	}, [preferences]);
 
 	useEffect(() => {
@@ -182,6 +182,7 @@ const ExportInline = ({
 			[newPath]: '',
 		};
 		updateSandpackCode(newSandpackCode);
+		setUpdatedCode(newSandpackCode);
 
 		const newSearchIndex = { ...searchIndex };
 		newSearchIndex[newPath] = [
@@ -210,6 +211,7 @@ const ExportInline = ({
 			delete newSandpackCode[path];
 		}
 		updateSandpackCode(newSandpackCode);
+		setUpdatedCode(newSandpackCode);
 
 		const newSearchIndex = { ...searchIndex };
 		if (newSearchIndex[path]) {
@@ -243,6 +245,8 @@ const ExportInline = ({
 			}
 		}
 		updateSandpackCode(newSandpackCode);
+		setUpdatedCode(newSandpackCode);
+
 		// eslint-disable-next-line
 		for (const [key, val] of Object.entries(newSearchIndex)) {
 			if (key.indexOf(newPath) !== -1) {
@@ -266,6 +270,7 @@ const ExportInline = ({
 			}
 		}
 		updateSandpackCode(newSandpackCode);
+		setUpdatedCode(newSandpackCode);
 
 		const newSearchIndex = { ...searchIndex };
 		// eslint-disable-next-line
@@ -291,6 +296,10 @@ const ExportInline = ({
 
 	const theme = get(preferences, 'themeSettings.type', 'classic');
 	const uiBuilderName = get(preferences, 'name', '');
+	const pageSettings = get(preferences, 'pageSettings', {});
+	const templateObj = getTemplate(theme);
+	const { currentPage } = pageSettings;
+	const route = templateObj.pages ? templateObj.pages[currentPage] || '/' : '/';
 
 	if (isLoading) return <Loader />;
 
@@ -312,15 +321,17 @@ const ExportInline = ({
 				modalType={modalType}
 				setModalType={setModalType}
 				setOpenCommitModal={setOpenCommitModal}
+				preferences={preferences}
 			/>
 			<div className={modalStyles}>
 				<SandpackProvider
 					customSetup={{
 						files: { ...sandpackCode },
 					}}
-					openPaths={tabSettings[theme].openPaths}
-					activePath={tabSettings[theme].activePath}
+					openPaths={tabSettings[theme]?.openPaths}
+					activePath={tabSettings[theme]?.activePath}
 					template="react"
+					startRoute={route}
 				>
 					<SandpackCodeContext.Provider
 						value={{
@@ -335,8 +346,8 @@ const ExportInline = ({
 							handleDelete,
 							setModalType,
 						}}
-						openPaths={tabSettings[theme].openPaths}
-						activePath={tabSettings[theme].activePath}
+						openPaths={tabSettings[theme]?.openPaths}
+						activePath={tabSettings[theme]?.activePath}
 						template="react"
 					>
 						<SandPackIntegration

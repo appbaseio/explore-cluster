@@ -12,7 +12,9 @@ const List = ({ data, setIsLoading, fetchByVersionId }) => {
 			<div className="row-data">
 				<div className="sub-title-container">
 					<Tooltip title={data.metadata.commit}>
-						<p className="overflow-container commit-font">{data.metadata.commit}</p>
+						<p className="overflow commit-font" style={{ margin: 0, maxWidth: '60%' }}>
+							{data.metadata.commit}
+						</p>
 					</Tooltip>
 					<img
 						src="/static/images/commit.png"
@@ -21,7 +23,9 @@ const List = ({ data, setIsLoading, fetchByVersionId }) => {
 						style={{ margin: '0px 5px 0px 5px' }}
 					/>
 					<Tooltip title={data.version_id}>
-						<p className="overflow-container versionid-font">{data.version_id}</p>
+						<p className="overflow versionid-font" style={{ margin: 0 }}>
+							{data.version_id}
+						</p>
 					</Tooltip>
 				</div>
 				{/* {deploymentStatus && deploymentStatus.status ? (

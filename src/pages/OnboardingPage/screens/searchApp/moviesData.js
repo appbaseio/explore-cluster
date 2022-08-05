@@ -140,7 +140,7 @@ const renderResultList = () => (
 							onError={(event) => {
 								// eslint-disable-next-line no-param-reassign
 								event.target.src =
-									'https://www.houseoftara.com/shop/wp-content/uploads/2019/05/placeholder.jpg'; // eslint-disable-line no-param-reassign
+									'https://banksiafdn.com/wp-content/uploads/2019/10/placeholde-image.jpg'; // eslint-disable-line no-param-reassign
 							}}
 						/>
 						<ResultList key={item._id} id={item._id}>

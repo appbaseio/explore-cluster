@@ -2,6 +2,7 @@ import React from 'react';
 import get from 'lodash/get';
 import { FormBuilder, Validators } from 'react-reactive-form';
 import { css } from 'emotion';
+import { componentTypes } from '@appbaseio/reactivesearch';
 
 // eslint-disable-next-line
 export const FormContext = React.createContext(null);
@@ -295,24 +296,61 @@ export const validateURL = (control) => {
 	}
 	return null;
 };
-
-export const getFilterConfigurationForm = (customFields = {}, isDynamicFilter = false) => {
+// Add all the fields which have default values
+export const chartConfigurationFormDefaultFields = {
+	customize: {
+		useAsFilter: false,
+		defaultQuery: '',
+		setOption: '',
+		type: 'term',
+		componentType: componentTypes.reactiveChart,
+	},
+};
+export const getChartConfigurationForm = (customFields) => {
 	return FormBuilder.group({
 		enabled: false,
 		customize: FormBuilder.group({
+			title: [undefined, Validators.required],
+			dataField: [undefined, Validators.required],
+			size: null,
+			queryFormat: null,
+			chartType: null,
+			sortBy: null,
+			labelFormatter: null,
+			xAxisName: null,
+			yAxisName: null,
+			xAxisField: null,
+			yAxisField: null,
+			...chartConfigurationFormDefaultFields.customize,
+			...customFields,
+		}),
+	});
+};
+// Add all the fields which have default values
+export const filterConfigurationFormDefaultFields = {
+	customize: {
+		filterType: 'list',
+		queryFormat: 'or',
+		sortBy: 'count',
+		componentType: componentTypes.multiList,
+		showCount: true,
+		showCheckbox: true,
+		showSearch: true,
+		showMissing: false,
+		multiSelect: false,
+	},
+};
+export const getFilterConfigurationForm = (customFields = {}, isDynamicFilter = false) => {
+	return FormBuilder.group({
+		enabled: true,
+		customize: FormBuilder.group({
 			title: isDynamicFilter ? [undefined, Validators.required] : undefined,
 			dataField: isDynamicFilter ? [undefined, Validators.required] : undefined,
-			filterType: 'list',
 			size: undefined,
-			queryFormat: 'or',
-			sortBy: 'count',
 			filterLabel: undefined,
-			showCount: true,
-			showCheckbox: true,
-			showSearch: true,
-			showMissing: false,
 			missingLabel: undefined,
 			selectAllLabel: undefined,
+			...filterConfigurationFormDefaultFields.customize,
 			...customFields,
 		}),
 	});
@@ -329,6 +367,7 @@ export const getPriceFilterConfigurationForm = () => {
 			startLabel: undefined,
 			endLabel: undefined,
 			showHistogram: false,
+			componentType: componentTypes.dynamicRangeSlider,
 		}),
 	});
 };
@@ -372,6 +411,10 @@ export const getDynamicFilterKey = (index) => {
 	return `dynamic-filter-control_${index}_${new Date().getTime()}`;
 };
 
+export const getChartKey = (index) => {
+	return `chart-form_${index}_${new Date().getTime()}`;
+};
+
 export const shopifyDefaultFields = {
 	size: 'variants.option1.keyword',
 	color: 'variants.option2.keyword',
@@ -382,10 +425,25 @@ export const shopifyDefaultFields = {
 	handle: 'handle',
 };
 
-export const getMultiListProps = (values) => ({
-	...values,
-	size: Number.isNaN(parseInt(values.size, 10)) ? undefined : parseInt(values.size, 10),
-});
+export const getMultiListProps = (values) => {
+	let obj = {};
+	if (values.filterType === 'range') {
+		if (values.startValue && values.endValue) {
+			obj = {
+				componentType: componentTypes.rangeInput,
+			};
+		} else {
+			obj = {
+				componentType: componentTypes.dynamicRangeSlider,
+			};
+		}
+	}
+	return {
+		...values,
+		...obj,
+		size: Number.isNaN(parseInt(values.size, 10)) ? undefined : parseInt(values.size, 10),
+	};
+};
 
 export const RecommendationTypes = {
 	MOST_POPULAR_PRODUCTS: 'most_popular',
@@ -494,6 +552,7 @@ export const defaultSearchPreferences = {
 	description: '',
 	pipeline: '',
 	id: '',
+	currentPage: '',
 	logoUrl: '',
 	logoWidth: 20,
 	logoAlignment: 'left',
@@ -508,12 +567,20 @@ export const defaultSearchPreferences = {
 	resultTitle: '',
 	resultDescription: '',
 	resultPrice: '',
-	priceUnit: undefined,
+	priceUnit: null,
+	sortOptionSelector: [],
 	resultImage: '',
 	resultHandle: '',
 	layout: 'grid',
 	resultHighlight: false,
 	viewSwitcher: true,
+	mapLayout: 'map',
+	mapComponent: 'googleMap',
+	locationDataField: 'location',
+	defaultZoom: 13,
+	showSearchAsMove: true,
+	showMarkerClusters: true,
+	mapsAPIkey: '',
 	storeInfo: { currency: 'USD' },
 	exportSettings: { exportAs: 'embed', credentials: '', openAsPage: false, type: 'other' },
 	showPagination: false,
@@ -540,18 +607,26 @@ export const defaultSearchPreferences = {
 		productType: {
 			enabled: false,
 			customize: {
+				title: null,
 				filterType: 'list',
+				filterLabel: null,
 				queryFormat: 'or',
 				sortBy: 'count',
 				showCount: true,
 				showCheckbox: true,
 				showSearch: true,
 				showMissing: false,
+				missingLabel: null,
+				selectAllLabel: null,
+				componentType: componentTypes.multiList,
+				multiSelect: false,
 			},
 		},
 		collections: {
 			enabled: false,
 			customize: {
+				title: null,
+				filterLabel: null,
 				filterType: 'list',
 				queryFormat: 'or',
 				sortBy: 'count',
@@ -559,11 +634,18 @@ export const defaultSearchPreferences = {
 				showCheckbox: true,
 				showSearch: true,
 				showMissing: false,
+				componentType: componentTypes.multiList,
+				multiSelect: false,
+				missingLabel: null,
+				selectAllLabel: null,
 			},
 		},
 		color: {
 			enabled: false,
 			customize: {
+				title: null,
+				dataField: null,
+				filterLabel: null,
 				filterType: 'list',
 				queryFormat: 'or',
 				sortBy: 'count',
@@ -571,11 +653,18 @@ export const defaultSearchPreferences = {
 				showCheckbox: true,
 				showSearch: true,
 				showMissing: false,
+				componentType: componentTypes.multiList,
+				multiSelect: false,
+				missingLabel: null,
+				selectAllLabel: null,
 			},
 		},
 		size: {
 			enabled: false,
 			customize: {
+				title: null,
+				dataField: null,
+				filterLabel: null,
 				filterType: 'list',
 				queryFormat: 'or',
 				sortBy: 'count',
@@ -584,27 +673,45 @@ export const defaultSearchPreferences = {
 				showSearch: true,
 				showMissing: false,
 				showHistogram: false,
-				startValue: undefined,
-				endValue: undefined,
-				startLabel: undefined,
-				endLabel: undefined,
-				calendarInterval: undefined,
+				startValue: null,
+				endValue: null,
+				startLabel: null,
+				endLabel: null,
+				calendarInterval: null,
+				componentType: componentTypes.multiList,
+				multiSelect: false,
+				missingLabel: null,
+				selectAllLabel: null,
 			},
 		},
 		price: {
 			enabled: false,
 			customize: {
-				startValue: undefined,
-				endValue: undefined,
-				startLabel: undefined,
-				endLabel: undefined,
+				title: null,
+				dataField: null,
+				startValue: null,
+				endValue: null,
+				startLabel: null,
+				endLabel: null,
 				showHistogram: false,
+				componentType: componentTypes.dynamicRangeSlider,
 			},
 		},
 	},
 	dynamicFilters: [],
 	syncSettings: defaultSettings.reduce((acc, item) => ({ ...acc, [item.id]: item.value }), {}),
-	domain: '',
+	authenticationSettings: {
+		clientId: 'mZLIFUlQedQJlZO21LiUauZwSMhiteGd',
+		enableAuth0: true,
+		enableProfilePage: true,
+		profileSettingsForm: {
+			viewData: true,
+			editData: true,
+			closeAccount: true,
+			editThemeSettings: true,
+			editSearchPreferences: true,
+		},
+	},
 };
 
 export const getRecommendationPreferencesPayload = (formValue) => {
@@ -696,6 +803,11 @@ export const getSearchPreferencesPayload = (formValue) => {
 			description: get(formValue, 'description'),
 			pipeline: get(formValue, 'pipeline'),
 			id: get(formValue, 'id'),
+			pageSettings: {
+				currentPage: get(formValue, 'currentPage'),
+				pages: get(formValue, 'pageSettings.pages'),
+				fields: get(formValue, 'pageSettings.fields'),
+			},
 			themeSettings: {
 				type: get(formValue, 'themeType'),
 				customCss: get(formValue, 'customCss'),
@@ -742,6 +854,10 @@ export const getSearchPreferencesPayload = (formValue) => {
 				rsConfig: {
 					pagination: !!get(formValue, 'showPagination'),
 					infiniteScroll: !get(formValue, 'showPagination'),
+					componentType:
+						get(formValue, 'themeType') === 'geo'
+							? componentTypes.reactiveMap
+							: componentTypes.reactiveList,
 				},
 				sortOptionSelector: get(formValue, 'sortOptionSelector'),
 				resultHighlight: get(formValue, 'resultHighlight'),
@@ -787,75 +903,10 @@ export const getSearchPreferencesPayload = (formValue) => {
 					),
 					highlight: get(formValue, 'autoSuggestionSettings.highlight'),
 					showVoiceSearch: get(formValue, 'showVoiceSearch'),
+					componentType: componentTypes.searchBox,
 				},
 			},
 			facetSettings: {
-				staticFacets: [
-					{
-						name: 'productType',
-						enabled: get(formValue, 'staticFilters.productType.enabled'),
-						isCollapsible: true,
-						customMessages: {
-							loading: get(formValue, 'customMessages.fetchingFilterOptions'),
-							noResults: get(formValue, 'customMessages.noFilterItem'),
-						},
-						rsConfig: {
-							...getMultiListProps(
-								get(formValue, 'staticFilters.productType.customize'),
-							),
-						},
-					},
-					{
-						name: 'collection',
-						enabled: get(formValue, 'staticFilters.collections.enabled'),
-						isCollapsible: true,
-						customMessages: {
-							loading: get(formValue, 'customMessages.fetchingFilterOptions'),
-							noResults: get(formValue, 'customMessages.noFilterItem'),
-						},
-						rsConfig: {
-							...getMultiListProps(
-								get(formValue, 'staticFilters.collections.customize'),
-							),
-						},
-					},
-					{
-						name: 'color',
-						enabled: get(formValue, 'staticFilters.color.enabled'),
-						isCollapsible: true,
-						customMessages: {
-							loading: get(formValue, 'customMessages.fetchingFilterOptions'),
-							noResults: get(formValue, 'customMessages.noFilterItem'),
-						},
-						rsConfig: {
-							...getMultiListProps(get(formValue, 'staticFilters.color.customize')),
-						},
-					},
-					{
-						name: 'size',
-						enabled: get(formValue, 'staticFilters.size.enabled'),
-						isCollapsible: true,
-						customMessages: {
-							loading: get(formValue, 'customMessages.fetchingFilterOptions'),
-							noResults: get(formValue, 'customMessages.noFilterItem'),
-						},
-						rsConfig: {
-							...getMultiListProps(get(formValue, 'staticFilters.size.customize')),
-						},
-					},
-					{
-						name: 'price',
-						enabled: get(formValue, 'staticFilters.price.enabled'),
-						isCollapsible: true,
-						customMessages: {
-							loading: get(formValue, 'customMessages.fetchingFilterOptions'),
-							noResults: get(formValue, 'customMessages.noFilterItem'),
-						},
-						rsConfig: {
-							...getMultiListProps(get(formValue, 'staticFilters.price.customize')),
-						},
-					},
-				],
 				dynamicFacets: get(formValue, 'dynamicFilters', []).map((filter, filterIndex) => ({
 					enabled: filter.enabled,
 					customMessages: {
@@ -872,12 +923,24 @@ export const getSearchPreferencesPayload = (formValue) => {
 					},
 				})),
 			},
+			chartSettings: {
+				charts: get(formValue, 'charts', []).map((chart, idx) => ({
+					enabled: chart.enabled,
+					componentType: componentTypes.reactiveChart,
+					rsConfig: {
+						componentId: `${get(chart, 'customize.title')?.replace(' ', '_')}_${idx}`,
+						componentType: componentTypes.reactiveChart,
+						...chart.customize,
+					},
+				})),
+			},
 			syncSettings:
 				get(formValue, 'exportSettings.type') === 'shopify'
 					? get(formValue, 'syncSettings')
 					: null,
-			domainSettings: {
-				domain: get(formValue, 'domain'),
+			authenticationSettings: {
+				...get(formValue, 'authenticationSettings'),
+				clientId: 'mZLIFUlQedQJlZO21LiUauZwSMhiteGd',
 			},
 		}),
 	);
@@ -901,4 +964,160 @@ export const getResyncURL = (index, params = {}) => {
 		url.set(i, params[i]);
 	});
 	return `https://shopify-sync.appbase.io?${url.toString()}`;
+};
+
+export const rsConfigMapper = {
+	MULTILIST: [
+		'dataField',
+		'title',
+		'componentId',
+		'componentType',
+		'missingLabel',
+		'queryFormat',
+		'selectAllLabel',
+		'showCheckbox',
+		'showCount',
+		'showMissing',
+		'showSearch',
+		'sortBy',
+		'aggregationSize',
+		'size',
+	],
+	SINGLELIST: [
+		'dataField',
+		'title',
+		'componentId',
+		'componentType',
+		'missingLabel',
+		'selectAllLabel',
+		'showCount',
+		'showMissing',
+		'showSearch',
+		'sortBy',
+		'aggregationSize',
+		'size',
+	],
+	RANGEINPUT: [
+		'dataField',
+		'title',
+		'componentId',
+		'componentType',
+		'queryFormat',
+		'range',
+		'rangeLabels',
+		'showHistogram',
+	],
+	DYNAMICRANGESLIDER: [
+		'dataField',
+		'title',
+		'componentId',
+		'componentType',
+		'queryFormat',
+		'showHistogram',
+	],
+	TAGCLOUD: [
+		'dataField',
+		'title',
+		'componentId',
+		'componentType',
+		'queryFormat',
+		'showCount',
+		'multiSelect',
+		'aggregationSize',
+		'size',
+	],
+	REACTIVE_CHART: [
+		'dataField',
+		'title',
+		'componentId',
+		'componentType',
+		'chartType',
+		'useAsFilter',
+		'labelFormatter',
+		'defaultQuery',
+		'setOption',
+		'xAxisField',
+		'yAxisField',
+		'xAxisName',
+		'yAxisName',
+		'range',
+		'sortBy',
+		'queryFormat',
+		'type',
+	],
+};
+
+const transformRSConfig = (config) => {
+	const newRsConfig = {};
+	const rsConfig = { ...config };
+	if (config.filterType === 'range' || config.filterType === 'date') {
+		if (config.startValue && config.endValue)
+			rsConfig.componentType = componentTypes.rangeInput;
+		else rsConfig.componentType = componentTypes.dynamicRangeSlider;
+
+		if (rsConfig.filterType === 'date') rsConfig.queryFormat = 'date';
+		else delete rsConfig.queryFormat;
+	} else if (rsConfig.size) {
+		rsConfig.aggregationSize = parseInt(rsConfig.size, 10);
+		rsConfig.size = parseInt(rsConfig.size, 10);
+	}
+
+	// eslint-disable-next-line
+	Object.entries(rsConfig).map(([key, value]) => {
+		if (
+			// rsConfigMapper[rsConfig.componentType] is an Array from mapper.
+			rsConfigMapper[rsConfig.componentType] &&
+			rsConfigMapper[rsConfig.componentType].length &&
+			rsConfigMapper[rsConfig.componentType].includes(key)
+		) {
+			if (key === 'showHistogram' && value === undefined) newRsConfig[key] = false;
+			else newRsConfig[key] = value;
+		}
+	});
+
+	if (
+		(rsConfig.componentType === 'RANGEINPUT' ||
+			(rsConfig.componentType === 'REACTIVE_CHART' && rsConfig.type === 'range')) &&
+		rsConfig.startValue &&
+		rsConfig.endValue
+	) {
+		newRsConfig.range = {
+			start:
+				rsConfig.filterType === 'date'
+					? new Date(get(rsConfig, 'startValue', ''))
+					: parseInt(get(rsConfig, 'startValue', ''), 10),
+			end:
+				rsConfig.filterType === 'date'
+					? new Date(get(rsConfig, 'endValue', ''))
+					: parseInt(get(rsConfig, 'endValue', ''), 10),
+		};
+		if (
+			(rsConfig.filterType === 'range' || rsConfig.filterType === 'date') &&
+			rsConfig.startLabel &&
+			rsConfig.endLabel
+		) {
+			newRsConfig.rangeLabels = {
+				start: get(rsConfig, 'startLabel', ''),
+				end: get(rsConfig, 'endLabel', ''),
+			};
+		}
+	}
+	return newRsConfig;
+};
+
+// 'filterType',
+export const transformFacets = (facetPrefs) => {
+	if (facetPrefs.rsConfig) {
+		const { rsConfig } = facetPrefs;
+		return transformRSConfig(rsConfig);
+	}
+	return transformRSConfig(facetPrefs);
+};
+
+export const transformCharts = (chartPrefs) => {
+	const componentProps = { ...chartPrefs };
+	Object.keys(componentProps).forEach((key) => {
+		if (!componentProps[key]) delete componentProps[key];
+	});
+	return transformRSConfig(componentProps);
 };

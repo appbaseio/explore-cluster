@@ -7,12 +7,24 @@ import { css } from 'emotion';
 import { Button } from 'antd';
 
 const MonacoEditor = ({ iframeHeight, highlightLine, path, setOpenCommitModal }) => {
-	const [isImage, setIsImage] = useState(false);
-
 	const { code, updateCode } = useActiveCode();
+	const [isImage, setIsImage] = useState(false);
+	const [updatedCode, setUpdatedCode] = useState(code);
 
 	const editorRef = useRef(null);
 	const { sandpack } = useSandpack();
+
+	useEffect(() => {
+		setUpdatedCode(code);
+	}, [code]);
+
+	useEffect(() => {
+		const delayDebounceFn = setTimeout(() => {
+			updateCode(updatedCode);
+		}, 1500);
+
+		return () => clearTimeout(delayDebounceFn);
+	}, [updatedCode]);
 
 	useEffect(() => {
 		renderImage();
@@ -165,9 +177,9 @@ const MonacoEditor = ({ iframeHeight, highlightLine, path, setOpenCommitModal })
 						theme="light"
 						key={sandpack.activePath}
 						defaultValue={code}
-						value={code}
+						value={updatedCode}
 						onChange={(value) => {
-							updateCode(value || '');
+							setUpdatedCode(value);
 						}}
 						line={highlightLine.line}
 						onMount={handleEditorDidMount}

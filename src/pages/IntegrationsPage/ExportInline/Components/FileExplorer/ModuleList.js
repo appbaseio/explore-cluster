@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { SandpackCodeContext } from '../..'; //eslint-disable-line
 import Directory from './Directory'; //eslint-disable-line
 import File from './File'; //eslint-disable-line
@@ -16,7 +16,7 @@ const ModuleList = ({ depth, activePath, selectFile, prefixedPath }) => {
 				excludedArr.indexOf(file) !== -1 ||
 				file.includes('build') ||
 				file.includes('.vscode') ||
-				templateConfigMap[theme].includes(file)
+				templateConfigMap[theme]?.includes(file)
 			)
 		)
 			return file;

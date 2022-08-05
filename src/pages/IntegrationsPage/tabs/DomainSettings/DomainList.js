@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Icon, Tag, Button, Tooltip, Modal, Input, message, Table } from 'antd';
 import { func, object, string } from 'prop-types';
 import { hoverStyles } from './styles';
-import { deleteDomain } from '../../utils/index';
+import { deleteDomain } from '../../utils/domain-apis';
 
 const DomainList = ({
 	domain: response,
@@ -58,7 +58,7 @@ const DomainList = ({
 									</Tag>
 								) : (
 									<>
-										<Tag className="tag-container">Verification Error...</Tag>
+										<Tag className="tag-container">Verification Pending...</Tag>
 										<Tooltip title="Refresh verification status">
 											<Button
 												type="primary"

@@ -1,8 +1,7 @@
 import React from 'react';
 import { Button, Modal, Row, Col, Input, Select, Divider, Alert } from 'antd';
 import PropTypes from 'prop-types';
-
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { connect } from 'react-redux';
 import conversionMap, { DenseVector } from '../../../utils/conversionMap';
 import usecases from '../../../utils/usecases';

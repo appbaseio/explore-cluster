@@ -101,6 +101,11 @@ class AppWrapper extends Component {
 							link: '/cluster/recommendations-builder',
 							hasExactPath: true,
 						},
+						{
+							label: 'Auth Settings',
+							link: '/cluster/auth-settings',
+							hasExactPath: true,
+						},
 					],
 					tag: 'Beta',
 				},
@@ -182,6 +187,11 @@ class AppWrapper extends Component {
 								{
 									label: 'Recommendations',
 									link: '/cluster/recommendations-builder',
+									hasExactPath: true,
+								},
+								{
+									label: 'Auth Settings',
+									link: '/cluster/auth-settings',
 									hasExactPath: true,
 								},
 							],

@@ -1,10 +1,22 @@
-import { get } from 'lodash';
+import get from 'lodash/get';
 import { getURL } from '../../../constants/config';
-import files from '../../../../constants/files';
+import files from '../../../../templates/files';
 import { doGet, doPut } from '../../../batteries/utils/requestService';
-import { getAuthToken } from './index';
+import { getAuthToken, getTemplate } from './index';
 
 export const templateConfigMap = {
+	reactivechart: [
+		'/src/components/GeoLayout/GeoResultsLayout.js',
+		'/src/components/GeoLayout/LayoutSwitch.js',
+		'/src/components/GeoLayout/ListLayout.js',
+		'/src/components/GeoLayout/ResultsLayout.js',
+	],
+	'auth0-classic': [
+		'/src/components/GeoLayout/GeoResultsLayout.js',
+		'/src/components/GeoLayout/LayoutSwitch.js',
+		'/src/components/GeoLayout/ListLayout.js',
+		'/src/components/GeoLayout/ResultsLayout.js',
+	],
 	classic: [
 		'/src/components/GeoLayout/GeoResultsLayout.js',
 		'/src/components/GeoLayout/LayoutSwitch.js',
@@ -34,6 +46,18 @@ export const excludedArr = [
 ];
 
 export const tabSettings = {
+	reactivechart: {
+		openPaths: ['/public/index.html', '/src/components/AllFilters.js'],
+		activePath: '/public/index.html',
+	},
+	'auth0-classic': {
+		openPaths: [
+			'/public/index.html',
+			'/src/components/ResultsLayout.js',
+			'/src/components/Search.js',
+		],
+		activePath: '/public/index.html',
+	},
 	classic: {
 		openPaths: [
 			'/public/index.html',
@@ -60,29 +84,84 @@ export const tabSettings = {
 	},
 };
 
-export const generateInlineSandboxURL = async (preferences) => {
-	const newFiles = { ...files };
+export const preferencesInConstants = (code, prefs) => {
+	const themeType = get(prefs, 'themeSettings.type', '');
+	const template = getTemplate(themeType);
 	const newPrefs = {
-		...preferences,
+		...prefs,
 		appbaseSettings: {
-			index: preferences.pipeline,
-			credentials: get(preferences, 'exportSettings.credentials', ''),
+			index: prefs.pipeline,
+			credentials: get(prefs, 'exportSettings.credentials', ''),
 			url: localStorage.getItem('url') || sessionStorage.getItem('url'),
 		},
 	};
-	const str = newFiles['/src/utils/constants.js'];
-	if (str) {
-		const newStr = str.replace(
-			`'{{APPBASE_PREFERENCES}}'`,
-			JSON.stringify(JSON.stringify(newPrefs)),
-		);
-
-		newFiles['/src/utils/constants.js'] = newStr;
-	}
+	const newFiles = { ...code };
+	newFiles[
+		`/${
+			template && template.preferences_path
+				? template.preferences_path
+				: 'src/utils/constants.js'
+		}`
+	] = `
+const appbasePrefs = ${JSON.stringify(newPrefs, null, 2)};
+export default JSON.stringify(appbasePrefs);
+`;
 	return newFiles;
 };
 
+export const generateInlineSandboxURL = async (preferences) => {
+	let fileName = '';
+	const themeType = get(preferences, 'themeSettings.type', '');
+	const template = getTemplate(themeType);
+	if (Object.keys(template).length) {
+		if (template.version) {
+			fileName = `${template.repository}@${template.version}`;
+		} else if (template.commit) {
+			fileName = `${template.repository}@${template.commit}`;
+		} else if (template.branch) {
+			fileName = `${template.repository}@${template.branch}`;
+		} else {
+			fileName = `${template.repository}@master`;
+		}
+		const newFiles = { ...files[fileName] };
+		const newPrefs = {
+			...preferences,
+			appbaseSettings: {
+				index: preferences.pipeline,
+				credentials: get(preferences, 'exportSettings.credentials', ''),
+				url: localStorage.getItem('url') || sessionStorage.getItem('url'),
+			},
+		};
+		const str =
+			newFiles[
+				`/${
+					template && template.preferences_path
+						? template.preferences_path
+						: 'src/utils/constants.js'
+				}`
+			];
+		if (str) {
+			const newStr = str.replace(
+				`'{{APPBASE_PREFERENCES}}'`,
+				JSON.stringify(newPrefs, null, 2),
+			);
+
+			newFiles[
+				`/${
+					template && template.preferences_path
+						? template.preferences_path
+						: 'src/utils/constants.js'
+				}`
+			] = newStr;
+		}
+		return newFiles;
+	}
+	return {};
+};
+
 export const replaceWithPreferences = async (code, preferences) => {
+	const themeType = get(preferences, 'themeSettings.type', '');
+	const template = getTemplate(themeType);
 	const newFiles = { ...code };
 	const newPrefs = {
 		...preferences,
@@ -92,14 +171,24 @@ export const replaceWithPreferences = async (code, preferences) => {
 			url: localStorage.getItem('url') || sessionStorage.getItem('url'),
 		},
 	};
-	const str = newFiles['/src/utils/constants.js'];
+	const str =
+		newFiles[
+			`/${
+				template && template.preferences_path
+					? template.preferences_path
+					: 'src/utils/constants.js'
+			}`
+		];
 	if (str) {
-		const newStr = str.replace(
-			`'{{APPBASE_PREFERENCES}}'`,
-			JSON.stringify(JSON.stringify(newPrefs)),
-		);
+		const newStr = str.replace(`'{{APPBASE_PREFERENCES}}'`, JSON.stringify(newPrefs, null, 2));
 
-		newFiles['/src/utils/constants.js'] = newStr;
+		newFiles[
+			`/${
+				template && template.preferences_path
+					? template.preferences_path
+					: 'src/utils/constants.js'
+			}`
+		] = newStr;
 	}
 	return newFiles;
 };

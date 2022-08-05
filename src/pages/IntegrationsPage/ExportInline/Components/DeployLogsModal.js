@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Modal, Card, Skeleton, Tooltip, Icon } from 'antd';
+import { Modal, Card, Skeleton, Tooltip, Icon, Button } from 'antd';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import ndjsonStream from 'can-ndjson-stream';
 import Editor from './Editor';
@@ -11,9 +11,27 @@ import '../styles.css';
 const DeployLogsModal = ({ open, handleCancel, deploymentStatus, uiBuilderName, preferenceId }) => {
 	const [deployLogs, setDeployLogs] = useState([]);
 	const [errMsg, setErrMsg] = useState('');
+	const [tmpReader, setReader] = useState(null);
+	const [scrollType, setScrollType] = useState('');
+	const logsStartRef = useRef(null);
 
 	useEffect(() => {
-		if (deploymentStatus.uid || deploymentStatus.id) getLogs();
+		return () => {
+			if (tmpReader) {
+				tmpReader.cancel();
+				setReader(null);
+			}
+		};
+	}, []);
+
+	useEffect(() => {
+		if (deploymentStatus.uid || deploymentStatus.id) {
+			if (tmpReader) {
+				tmpReader.cancel();
+				setReader(null);
+			}
+			getLogs();
+		}
 	}, [deploymentStatus.uid, deploymentStatus.id]);
 
 	const getLogs = () => {
@@ -35,6 +53,7 @@ const DeployLogsModal = ({ open, handleCancel, deploymentStatus, uiBuilderName, 
 			})
 			.then((stream) => {
 				const reader = stream.getReader();
+				setReader(reader);
 				let read;
 				reader.read().then(
 					(read = (result) => {
@@ -70,6 +89,10 @@ const DeployLogsModal = ({ open, handleCancel, deploymentStatus, uiBuilderName, 
 		return url;
 	};
 
+	const scrollToTop = () => {
+		if (logsStartRef.current) logsStartRef.current.scrollIntoView({ behavior: 'smooth' });
+	};
+
 	const status = deploymentStatus.status || deploymentStatus.state;
 
 	return (
@@ -82,6 +105,7 @@ const DeployLogsModal = ({ open, handleCancel, deploymentStatus, uiBuilderName, 
 				footer={null}
 				width={1000}
 			>
+				<div ref={logsStartRef} />
 				<Card
 					title={
 						<div style={{ maxHeight: 200 }} css={pastVersionsStyles}>
@@ -152,13 +176,35 @@ const DeployLogsModal = ({ open, handleCancel, deploymentStatus, uiBuilderName, 
 									) : null}
 								</div>
 							</div>
+							<div className="navigation-buttons-container">
+								<Tooltip title="Go to top">
+									<Button icon="arrow-up" onClick={() => scrollToTop()} />
+								</Tooltip>
+								<Tooltip title="Go to bottom">
+									<Button
+										icon="arrow-down"
+										onClick={() => setScrollType('down')}
+									/>
+								</Tooltip>
+							</div>
 						</div>
 					}
+					headStyle={{
+						position: 'sticky',
+						top: 0,
+						background: '#fff',
+					}}
 				>
 					{!deployLogs.length ? (
 						<Skeleton active />
 					) : (
-						<Editor logs={deployLogs} errMsg={errMsg} />
+						<Editor
+							logs={deployLogs}
+							errMsg={errMsg}
+							scrollType={scrollType}
+							setScrollType={setScrollType}
+							deploymentStatus={deploymentStatus}
+						/>
 					)}
 				</Card>
 			</Modal>

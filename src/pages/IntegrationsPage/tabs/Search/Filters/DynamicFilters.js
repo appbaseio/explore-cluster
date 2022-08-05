@@ -1,8 +1,14 @@
 import React, { useContext, useState } from 'react';
+import { func } from 'prop-types';
 import CustomizeFilter from './CustomizeFilter';
-import { getFilterConfigurationForm, FormContext, getDynamicFilterKey } from '../../utils';
+import {
+	getFilterConfigurationForm,
+	filterConfigurationFormDefaultFields,
+	FormContext,
+	getDynamicFilterKey,
+} from '../../../utils';
 
-const DynamicFilters = () => {
+const DynamicFilters = ({ getPreferencesPayload }) => {
 	const form = useContext(FormContext);
 	const [tempControl, resetTempControl] = useState(getFilterConfigurationForm(null, true));
 	const [key, setKey] = useState('dynamic-filter-form');
@@ -16,18 +22,26 @@ const DynamicFilters = () => {
 		// Set key
 		setKey(`dynamic-filter-form-${new Date().getTime()}`);
 		// Reset temporary control
+		// Creates a new temporary control
 		resetTempControl(getFilterConfigurationForm(null, true));
+	};
+	const resetTempControlValues = (defaultValues) => {
+		// Resets the current temp control
+		tempControl.reset(defaultValues);
+		tempControl.markAsUntouched();
+		tempControl.markAsPristine();
+		tempControl.markAsUnsubmitted();
 	};
 	const handleCancel = () => {
 		// Reset temporary control
-		resetTempControl(getFilterConfigurationForm(null, true));
+		resetTempControlValues(filterConfigurationFormDefaultFields);
 	};
 	return (
 		<CustomizeFilter
 			// Use key to unmount the stale form
 			key={key}
 			control={tempControl.get('customize')}
-			buttonLabel="Add Filter"
+			buttonLabel="Add Facet"
 			buttonProps={{
 				type: 'primary',
 			}}
@@ -35,8 +49,17 @@ const DynamicFilters = () => {
 			onSave={addControl}
 			onCancel={handleCancel}
 			tempControl={tempControl}
+			form={form}
+			getPreferencesPayload={getPreferencesPayload}
 		/>
 	);
+};
+DynamicFilters.propTypes = {
+	getPreferencesPayload: func.isRequired,
+};
+
+DynamicFilters.propTypes = {
+	getPreferencesPayload: func.isRequired,
 };
 
 export default DynamicFilters;

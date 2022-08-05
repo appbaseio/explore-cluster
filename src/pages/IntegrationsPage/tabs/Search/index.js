@@ -1,15 +1,17 @@
 import React, { useContext, useEffect } from 'react';
 import { FieldGroup } from 'react-reactive-form';
+import { func } from 'prop-types';
 import { Tabs } from 'antd';
 import { FormContext, verticalTab } from '../../utils';
 import Search from './Search';
 import Results from './Results';
 import Filters from './Filters';
 import CustomMessages from './CustomMessages';
+import Charts from './Charts';
 
 const { TabPane } = Tabs;
 
-const SearchSettings = () => {
+const SearchSettings = ({ getPreferencesPayload }) => {
 	const form = useContext(FormContext);
 
 	useEffect(() => {
@@ -34,10 +36,19 @@ const SearchSettings = () => {
 					)}
 				/>
 			</TabPane>
-			<TabPane tab="Filters" key="2">
-				<FieldGroup control={form} render={() => <Filters />} />
+			<TabPane tab="Facets" key="2">
+				<FieldGroup
+					control={form}
+					render={() => <Filters getPreferencesPayload={getPreferencesPayload} />}
+				/>
 			</TabPane>
-			<TabPane tab="Results" key="3">
+			<TabPane tab="Charts" key="3">
+				<FieldGroup
+					control={form}
+					render={() => <Charts getPreferencesPayload={getPreferencesPayload} />}
+				/>
+			</TabPane>
+			<TabPane tab="Results" key="4">
 				<FieldGroup
 					control={form}
 					render={() => (
@@ -50,11 +61,18 @@ const SearchSettings = () => {
 					)}
 				/>
 			</TabPane>
-			<TabPane tab="Custom Messages" key="4">
+			<TabPane tab="Custom Messages" key="5">
 				<FieldGroup control={form} render={() => <CustomMessages />} />
 			</TabPane>
 		</Tabs>
 	);
+};
+SearchSettings.propTypes = {
+	getPreferencesPayload: func.isRequired,
+};
+
+SearchSettings.propTypes = {
+	getPreferencesPayload: func.isRequired,
 };
 
 export default SearchSettings;

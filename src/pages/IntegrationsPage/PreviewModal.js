@@ -1,11 +1,15 @@
 import React from 'react';
-import { Button, Modal, Popover } from 'antd';
+import { Button, Icon, Modal, Popover } from 'antd';
 import { css } from 'react-emotion';
 import get from 'lodash/get';
 import { func, string, bool, object, number, oneOfType } from 'prop-types';
+import { FieldGroup } from 'react-reactive-form';
 import StoreFrontPreview from './StoreFrontPreview';
+import SandpackModal from './SandpackModal';
+import PageRoutes from './PageRoutes';
+import Loader from '../../components/Loader';
 
-const modalStyles = css`
+export const modalStyles = css`
 	top: 0 !important;
 	height: 100vh;
 	padding-bottom: 0 !important;
@@ -22,12 +26,23 @@ const modalStyles = css`
 	@media (max-width: 767px) {
 		margin: 0 !important;
 	}
+	.sp-preview-iframe {
+		height: 100%;
+		width: 100%;
+	}
+	.sp-preview-container {
+		height: 100%;
+	}
+	.sp-preview-iframe {
+		border-width: 0px;
+	}
 `;
 
 class PreviewModal extends React.Component {
 	state = {
 		visible: false,
 		currentProduct: undefined,
+		isMobile: false,
 	};
 
 	showModal = () => {
@@ -55,8 +70,14 @@ class PreviewModal extends React.Component {
 		});
 	};
 
+	handleViewChange = () => {
+		this.setState((prevState) => ({
+			isMobile: !prevState.isMobile,
+		}));
+	};
+
 	render() {
-		const { visible, currentProduct } = this.state;
+		const { visible, currentProduct, isMobile } = this.state;
 		const {
 			pipeline,
 			preferences,
@@ -66,6 +87,11 @@ class PreviewModal extends React.Component {
 			widgetId,
 			displayProductPicker,
 			similarToField,
+			preferenceId,
+			getPreferencesPayload,
+			form,
+			isEditorLoading,
+			setIsEditorLoading,
 		} = this.props;
 		let title = label;
 		if (displayProductPicker) {
@@ -104,10 +130,52 @@ class PreviewModal extends React.Component {
 				}
 			}
 		}
+
 		return (
 			<React.Fragment>
 				<Modal
-					title={title}
+					title={
+						<div
+							style={{
+								display: 'flex',
+								alignItems: 'center',
+								width: '50%',
+								justifyContent: 'space-between',
+							}}
+						>
+							{title}
+							<span style={{ marginLeft: '13%' }}>
+								<FieldGroup
+									control={form}
+									strict={false}
+									render={() => (
+										<PageRoutes
+											getPreferencesPayload={getPreferencesPayload}
+											preferences={preferences()}
+											form={form}
+											setIsEditorLoading={setIsEditorLoading}
+										/>
+									)}
+								/>
+							</span>
+
+							<span>
+								{!displayProductPicker ? (
+									<Button onClick={this.handleViewChange}>
+										<Icon
+											style={{
+												fontSize: 20,
+												position: 'relative',
+												top: '1px',
+												margin: '0 7px',
+											}}
+											type={isMobile ? 'desktop' : 'mobile'}
+										/>
+									</Button>
+								) : null}
+							</span>
+						</div>
+					}
 					visible={visible}
 					okText="Save"
 					onOk={this.handleOk}
@@ -117,19 +185,44 @@ class PreviewModal extends React.Component {
 					width="100%"
 					className={modalStyles}
 				>
-					<StoreFrontPreview
-						pipeline={pipeline}
-						preferences={preferences}
-						isRecommendation={isRecommendation}
-						widgetId={widgetId}
-						displayProductPicker={displayProductPicker}
-						buttonProps={buttonProps}
-						similarToField={similarToField}
-						onSelectProduct={this.handleProductSelection}
-					/>
+					<div
+						style={{
+							display: 'flex',
+							justifyContent: 'center',
+						}}
+					>
+						{isRecommendation ? (
+							<StoreFrontPreview
+								pipeline={pipeline}
+								preferences={preferences}
+								isRecommendation={isRecommendation}
+								widgetId={widgetId}
+								displayProductPicker={displayProductPicker}
+								buttonProps={buttonProps}
+								similarToField={similarToField}
+								onSelectProduct={this.handleProductSelection}
+							/>
+						) : (
+							<div
+								style={{
+									border: isMobile ? '1px solid rgb(204, 204, 204)' : undefined,
+									width: isMobile ? 400 : '100%',
+								}}
+							>
+								{isEditorLoading ? (
+									<Loader />
+								) : (
+									<SandpackModal
+										preferenceId={preferenceId}
+										preferences={preferences()}
+									/>
+								)}
+							</div>
+						)}
+					</div>
 				</Modal>
 				<Button onClick={this.showModal} type="primary" size="large" {...buttonProps}>
-					{label}
+					<Icon type="eye" /> {label}
 				</Button>
 			</React.Fragment>
 		);
@@ -145,6 +238,11 @@ PreviewModal.propTypes = {
 	label: string,
 	widgetId: oneOfType([number, string]),
 	buttonProps: object,
+	preferenceId: string,
+	getPreferencesPayload: func.isRequired,
+	form: object,
+	isEditorLoading: bool,
+	setIsEditorLoading: func,
 };
 
 PreviewModal.defaultProps = {
@@ -153,8 +251,12 @@ PreviewModal.defaultProps = {
 	similarToField: undefined,
 	displayProductPicker: false,
 	isRecommendation: false,
-	label: 'Preview',
+	label: 'UI Preview',
 	buttonProps: null,
+	preferenceId: '',
+	form: {},
+	isEditorLoading: false,
+	setIsEditorLoading: () => {},
 };
 
 export default PreviewModal;

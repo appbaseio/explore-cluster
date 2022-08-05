@@ -5,6 +5,22 @@ const commitModalStyles = css`
 		font-size: 16px;
 		margin: 10px 0px 5px 0px;
 	}
+	.suggestion {
+		width: 100%;
+		display: flex;
+		align-items: center;
+	}
+	.commit-message {
+		width: 65%;
+	}
+	.overflow {
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+	}
+	.version-id {
+		width: 30%;
+	}
 `;
 
 const pastVersionsStyles = css`
@@ -29,6 +45,7 @@ const pastVersionsStyles = css`
 		color: rgb(51 50 50 / 65%);
 		display: flex;
 		align-items: center;
+		width: 100%;
 	}
 	.commit-font {
 		font-size: 14px;
@@ -71,6 +88,12 @@ const pastVersionsStyles = css`
 		&:hover {
 			color: #40a9ff;
 		}
+	}
+	.navigation-buttons-container {
+		float: right;
+		display: flex;
+		gap: 10px;
+		margin-top: 15px;
 	}
 `;
 

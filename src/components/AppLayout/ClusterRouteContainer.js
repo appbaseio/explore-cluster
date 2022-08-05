@@ -139,6 +139,14 @@ const SearchPreferencePage = Loadable({
 	loading: Loader,
 });
 
+const SearchTemplatePage = Loadable({
+	loader: () =>
+		import(
+			/* webpackChunkName: "SearchPreferencePage" */ '../../pages/IntegrationsPage/SearchN/Wizard/index'
+		),
+	loading: Loader,
+});
+
 const RecommendationsPreferencePage = Loadable({
 	loader: () =>
 		import(
@@ -179,6 +187,11 @@ const SuggestionsPage = Loadable({
 	loading: Loader,
 });
 
+const SearchAuth0SettingsPage = Loadable({
+	loader: () =>
+		import(/* webpackChunkName: "SearchAuth0SettingsPage" */ '../../pages/SearchAuth0Settings'),
+	loading: Loader,
+});
 class ClusterRouteContainer extends React.Component {
 	shouldComponentUpdate(nextProps) {
 		const { location, allowedRoutes } = this.props;
@@ -495,18 +508,32 @@ class ClusterRouteContainer extends React.Component {
 					/>
 					<Route
 						exact
-						path="/cluster/search-builder/:id"
+						path="/cluster/auth-settings"
 						render={(props) => (
-							<AppPageContainer {...props} component={SearchPreferencePage} />
+							<AppPageContainer {...props} component={SearchAuth0SettingsPage} />
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/search-builder/new"
 						render={(props) => (
+							<AppPageContainer {...props} component={SearchTemplatePage} />
+						)}
+					/>
+					<Route
+						exact
+						path="/cluster/search-builder/:id"
+						render={(props) => (
 							<AppPageContainer {...props} component={SearchPreferencePage} />
 						)}
 					/>
+					{/* <Route
+						exact
+						path="/cluster/search-builder/new"
+						render={(props) => (
+							<AppPageContainer {...props} component={SearchPreferencePage} />
+						)}
+					/> */}
 					<Route
 						exact
 						path="/cluster/search-builder/:id/code"
