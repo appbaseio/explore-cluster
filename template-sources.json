@@ -27,6 +27,15 @@
         "repositoryType": "public"
     },
     {
+        "organization": "appbaseio-confidential",
+        "repository": "multi-page-search",
+        "version": "",
+        "commit": "",
+        "branch": "main",
+        "manifest_path": "reactivesearch-manifest.json",
+        "repositoryType": "private"
+    },
+    {
         "organization": "appbaseio",
         "repository": "reactivesearch-shopify-plugin",
         "version": "",
