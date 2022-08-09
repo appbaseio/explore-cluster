@@ -339,25 +339,25 @@ export const reOrderPreferences = (prefs, page = '') => {
 		newPreferences.searchSettings = {
 			...compSettings.search,
 		};
-		Object.values(compSettings).forEach((facet) => {
-			if (facet.facetType) {
-				const newFacetObj = { ...facet };
-
-				delete newFacetObj.facetType;
-				delete newFacetObj.componentType;
-
-				if (facet.facetType !== 'static') {
-					facetSettings.dynamicFacets.push(newFacetObj);
-				}
+		Object.keys(compSettings).forEach((facet) => {
+			if (facet !== 'search' && facet !== 'result') {
 				// If component is a chart
-			} else if (facet.rsConfig.componentType === componentTypes.reactiveChart) {
-				chartSettings.charts.push(facet);
+				if (compSettings[facet].rsConfig.componentType === componentTypes.reactiveChart) {
+					chartSettings.charts.push(compSettings[facet]);
+				} else if (compSettings[facet].rsConfig.title) {
+					const newFacetObj = { ...compSettings[facet] };
+					if (newFacetObj.facetType) delete newFacetObj.facetType;
+					delete newFacetObj.componentType;
+
+					if (compSettings[facet].facetType !== 'static') {
+						facetSettings.dynamicFacets.push(newFacetObj);
+					}
+				}
 			}
 		});
 
 		newPreferences.facetSettings = facetSettings;
 		newPreferences.chartSettings = chartSettings;
-
 		delete newPreferences?.componentSettings;
 		return newPreferences;
 	}

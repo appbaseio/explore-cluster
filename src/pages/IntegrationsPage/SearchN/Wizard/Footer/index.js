@@ -9,7 +9,8 @@ import {
 	saveSearchPreferenceN,
 } from '../../../../../batteries/modules/actions';
 import { commitCode, generateInlineSandboxURL } from '../../../utils/sandpack-generator';
-import { transformPreferences } from '../../../utils/index';
+import { transformPreferences, getTemplate } from '../../../utils/index';
+import files from '../../../../../../templates/files';
 import { footerStyles } from '../styles';
 
 const Footer = ({
@@ -23,6 +24,54 @@ const Footer = ({
 	preferenceId,
 }) => {
 	const [isLoading, setIsLoading] = useState(false);
+
+	const getDefaultPreferences = (preferences) => {
+		let fileName = '';
+		const newPrefs = { ...JSON.parse(JSON.stringify(preferences)) };
+		const themeType = get(preferences, 'themeSettings.type', '');
+		const template = getTemplate(themeType);
+		if (Object.keys(template).length) {
+			if (template.version) {
+				fileName = `${template.repository}@${template.version}`;
+			} else if (template.commit) {
+				fileName = `${template.repository}@${template.commit}`;
+			} else if (template.branch) {
+				fileName = `${template.repository}@${template.branch}`;
+			} else {
+				fileName = `${template.repository}@master`;
+			}
+		}
+		const templateFiles = { ...files[fileName] };
+		const defaultPrefs = JSON.parse(
+			templateFiles['/src/utils/reactivesearchPreferences.json'] || '{}',
+		);
+		if (defaultPrefs && defaultPrefs.pageSettings && defaultPrefs.pageSettings.pages) {
+			Object.keys(defaultPrefs.pageSettings.pages).forEach((page) => {
+				if (newPrefs.pageSettings.pages[page]) {
+					const { componentSettings } = defaultPrefs.pageSettings.pages[page];
+					const newComponentSettings = {
+						...JSON.parse(JSON.stringify(componentSettings)),
+					};
+					const newObj = {};
+					Object.keys(newComponentSettings).forEach((component) => {
+						if (component !== 'result' && component !== 'search') {
+							newObj[component] = newComponentSettings[component];
+							newObj[component].enabled = false;
+						}
+					});
+					newPrefs.pageSettings.pages[page] = {
+						...newPrefs.pageSettings.pages[page],
+						componentSettings: {
+							...newPrefs.pageSettings.pages[page].componentSettings,
+							...newObj,
+						},
+					};
+				}
+			});
+		}
+
+		return newPrefs;
+	};
 
 	const handleSave = async () => {
 		setIsLoading(true);
@@ -63,10 +112,10 @@ const Footer = ({
 			},
 			content: newObj,
 		};
-
+		const prefenecesWithDefaultFacets = getDefaultPreferences(newPreferences);
 		commitCode(preferenceId, body)
 			.then(() => {
-				updateSearchPreferences(newPreferences).then((action) => {
+				updateSearchPreferences(prefenecesWithDefaultFacets).then((action) => {
 					if (!(action && action.error)) {
 						getSearchPreferences();
 						setIsLoading(false);

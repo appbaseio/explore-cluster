@@ -5,6 +5,7 @@ import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { func, object, bool, string } from 'prop-types';
 import { diff } from 'jsondiffpatch';
+import isEqual from 'lodash/isEqual';
 import DiffList from './DiffList';
 import {
 	generateInlineSandboxURL,
@@ -174,6 +175,15 @@ const ReviewAndSave = ({
 					console.error(err);
 				});
 		}
+	};
+
+	const removeEmpty = (obj) => {
+		return Object.fromEntries(
+			Object.entries(obj)
+				// eslint-disable-next-line
+				.filter(([_, v]) => v != null)
+				.map(([k, v]) => [k, v === Object(v) ? removeEmpty(v) : v]),
+		);
 	};
 
 	const flattenObject = (obj) => {
@@ -405,15 +415,21 @@ const ReviewAndSave = ({
 			};
 		}
 		if (get(diffData, 'chartSettings.charts', null)) {
-			const newVal = get(newObj, 'chartSettings.charts', []);
-			const oldVal = get(oldObj, 'chartSettings.charts', []);
-			diffData = {
-				...diffData,
-				chartSettings: {
-					...diffData.chartSettings,
-					chartSettings: [oldVal, newVal],
-				},
-			};
+			const newVal = get(newObj, 'chartSettings.charts', []).map((filter) =>
+				removeEmpty(filter),
+			);
+			const oldVal = get(oldObj, 'chartSettings.charts', []).map((filter) =>
+				removeEmpty(filter),
+			);
+			if (!isEqual(oldVal, newVal)) {
+				diffData = {
+					...diffData,
+					chartSettings: {
+						...diffData.chartSettings,
+						charts: [oldVal, newVal],
+					},
+				};
+			} else delete diffData.chartSettings.charts;
 		}
 
 		if (get(diffData, 'globalSettings.showSelectedFilters', null)) {

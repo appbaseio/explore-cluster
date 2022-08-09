@@ -39,13 +39,17 @@ const SearchSettings = ({ getPreferencesPayload }) => {
 			<TabPane tab="Facets" key="2">
 				<FieldGroup
 					control={form}
-					render={() => <Filters getPreferencesPayload={getPreferencesPayload} />}
+					render={() => (
+						<Filters getPreferencesPayload={getPreferencesPayload} form={form} />
+					)}
 				/>
 			</TabPane>
 			<TabPane tab="Charts" key="3">
 				<FieldGroup
 					control={form}
-					render={() => <Charts getPreferencesPayload={getPreferencesPayload} />}
+					render={() => (
+						<Charts getPreferencesPayload={getPreferencesPayload} form={form} />
+					)}
 				/>
 			</TabPane>
 			<TabPane tab="Results" key="4">

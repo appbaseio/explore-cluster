@@ -926,7 +926,7 @@ export const getSearchPreferencesPayload = (formValue) => {
 			chartSettings: {
 				charts: get(formValue, 'charts', []).map((chart, idx) => ({
 					enabled: chart.enabled,
-					componentType: componentTypes.reactiveChart,
+					// componentType: componentTypes.reactiveChart,
 					rsConfig: {
 						componentId: `${get(chart, 'customize.title')?.replace(' ', '_')}_${idx}`,
 						componentType: componentTypes.reactiveChart,
