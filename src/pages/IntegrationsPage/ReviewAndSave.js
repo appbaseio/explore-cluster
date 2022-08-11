@@ -17,7 +17,7 @@ import {
 	saveSearchPreferenceN,
 	saveRecommendationPreferenceN,
 } from '../../batteries/modules/actions';
-import { transformPreferences } from './utils/index';
+import { removeEmpty, transformPreferences } from './utils/index';
 import { transformContent } from './ExportInline/Components/ModalHeader';
 
 const Badge = styled.span`
@@ -177,15 +177,6 @@ const ReviewAndSave = ({
 		}
 	};
 
-	const removeEmpty = (obj) => {
-		return Object.fromEntries(
-			Object.entries(obj)
-				// eslint-disable-next-line
-				.filter(([_, v]) => v != null)
-				.map(([k, v]) => [k, v === Object(v) ? removeEmpty(v) : v]),
-		);
-	};
-
 	const flattenObject = (obj) => {
 		const flattened = {};
 
@@ -203,7 +194,7 @@ const ReviewAndSave = ({
 	};
 
 	const getDiffData = (oldObj, newObj) => {
-		let diffData = diff({ ...oldObj }, { ...newObj });
+		let diffData = diff(removeEmpty({ ...oldObj }), removeEmpty({ ...newObj }));
 		if (!diffData) {
 			return [0, {}];
 		}

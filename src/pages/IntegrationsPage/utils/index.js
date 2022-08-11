@@ -81,6 +81,27 @@ export default JSON.stringify(appbasePrefs);
 	`;
 };
 
+export const removeEmpty = (obj) => {
+	const isArray = Array.isArray(obj);
+	Object.keys(obj).forEach((k) => {
+		if (obj[k] === null) {
+			if (isArray) {
+				obj.splice(k, 1);
+			} else {
+				// eslint-disable-next-line
+				delete obj[k];
+			}
+		} else if (typeof obj[k] === 'object') {
+			removeEmpty(obj[k]);
+		}
+		if (isArray && obj.length === k) {
+			removeEmpty(obj);
+		}
+	});
+
+	return obj;
+};
+
 export const getTemplate = (template) => {
 	return templates.filter((i) => i.name === template)[0] || {};
 };
@@ -106,7 +127,8 @@ export const transformPreferences = (preferences) => {
 		let newObj = {};
 		let filterType = '';
 		if (facetSettings.dynamicFacets.length) {
-			facetSettings.dynamicFacets.forEach((data) => {
+			facetSettings.dynamicFacets.forEach((facet, idx) => {
+				const data = { ...facet };
 				if (data?.rsConfig?.filterType === 'list') {
 					filterType = 'multiList';
 				} else if (
@@ -121,11 +143,21 @@ export const transformPreferences = (preferences) => {
 				} else {
 					filterType = 'dynamicRangeSlider';
 				}
-
+				if (
+					data?.rsConfig &&
+					data?.rsConfig?.queryFormat &&
+					data?.rsConfig?.filterType === 'range'
+				)
+					delete data?.rsConfig?.queryFormat;
+				const newComponentId = `${data.rsConfig.title.split(' ').join('_')}_${idx}`;
 				newObj = {
 					...newObj,
-					[data.rsConfig.componentId]: {
+					[newComponentId]: {
 						...data,
+						rsConfig: {
+							...data.rsConfig,
+							componentId: newComponentId,
+						},
 						componentType: data?.rsConfig?.componentType || componentTypes[filterType],
 						facetType: 'dynamic',
 					},
@@ -177,10 +209,17 @@ export const transformPreferences = (preferences) => {
 	if (chartSettings) {
 		let newCompononentSettings = {};
 		if (chartSettings.charts.length) {
-			chartSettings.charts.forEach((chart) => {
+			chartSettings.charts.forEach((chart, idx) => {
+				const newComponentId = `${chart.rsConfig.title.split(' ').join('_')}_${idx}`;
 				newCompononentSettings = {
 					...newCompononentSettings,
-					[chart.rsConfig.componentId]: chart,
+					[newComponentId]: {
+						...chart,
+						rsConfig: {
+							...chart.rsConfig,
+							componentId: newComponentId,
+						},
+					},
 				};
 			});
 		}
@@ -343,22 +382,30 @@ export const reOrderPreferences = (prefs, page = '') => {
 			if (facet !== 'search' && facet !== 'result') {
 				// If component is a chart
 				if (compSettings[facet].rsConfig.componentType === componentTypes.reactiveChart) {
-					chartSettings.charts.push(compSettings[facet]);
+					const arr = compSettings[facet].rsConfig.componentId.split('_');
+					const idx = arr.at(-1) || 0;
+
+					chartSettings.charts[idx] = compSettings[facet];
 				} else if (compSettings[facet].rsConfig.title) {
 					const newFacetObj = { ...compSettings[facet] };
 					if (newFacetObj.facetType) delete newFacetObj.facetType;
 					delete newFacetObj.componentType;
 
 					if (compSettings[facet].facetType !== 'static') {
-						facetSettings.dynamicFacets.push(newFacetObj);
+						const arr = compSettings[facet].rsConfig.componentId.split('_');
+						const idx = arr.at(-1) || 0;
+						facetSettings.dynamicFacets[idx] = newFacetObj;
 					}
 				}
 			}
 		});
 
+		facetSettings.dynamicFacets = facetSettings.dynamicFacets.filter((n) => n);
+		chartSettings.charts = chartSettings.charts.filter((n) => n);
 		newPreferences.facetSettings = facetSettings;
 		newPreferences.chartSettings = chartSettings;
 		delete newPreferences?.componentSettings;
+
 		return newPreferences;
 	}
 	return prefs;

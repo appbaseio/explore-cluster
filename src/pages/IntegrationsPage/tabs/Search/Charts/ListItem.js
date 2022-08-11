@@ -1,20 +1,21 @@
 import React from 'react';
 import get from 'lodash/get';
-import { List, Button, Switch } from 'antd';
+import { List, Button, Switch, Icon } from 'antd';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
-import { array, bool, func, number, object, string } from 'prop-types';
+import { array, bool, func, number, object } from 'prop-types';
 import CustomizeChart from './CustomizeChart';
 import CustomizeFilter from '../Filters/CustomizeFilter';
 
 const ListItem = ({
 	control,
-	pipeline,
 	getPreferencesPayload,
 	form,
 	traversedMappings,
 	index,
 	isFilter,
+	provided,
 }) => {
+	const pipeline = form.get('pipeline') ? form.get('pipeline')?.value : '';
 	return (
 		<FieldGroup strict={false} control={control}>
 			{() => (
@@ -61,11 +62,24 @@ const ListItem = ({
 					<List.Item.Meta
 						title={
 							<>
-								{!traversedMappings.includes(
+								<span {...provided.dragHandleProps}>
+									<Icon
+										type="drag"
+										style={{
+											marginRight: 10,
+										}}
+									/>
+								</span>
+								{traversedMappings.length &&
+								!traversedMappings.includes(
 									get(control, 'value.customize.dataField'),
 								) ? (
 									// eslint-disable-next-line
-									<span style={{ color: 'orange', marginRight: 5 }} role="img">
+									<span
+										style={{ color: 'orange', marginRight: 10 }}
+										role="img"
+										aria-label="warning"
+									>
 										⚠️
 									</span>
 								) : (
@@ -83,7 +97,6 @@ const ListItem = ({
 };
 
 ListItem.defaultProps = {
-	pipeline: '',
 	traversedMappings: [],
 	index: 0,
 	isFilter: false,
@@ -91,12 +104,12 @@ ListItem.defaultProps = {
 
 ListItem.propTypes = {
 	control: object.isRequired,
-	pipeline: string,
 	getPreferencesPayload: func.isRequired,
 	form: object.isRequired,
 	traversedMappings: array,
 	index: number,
 	isFilter: bool,
+	provided: object.isRequired,
 };
 
 export default ListItem;

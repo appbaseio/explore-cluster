@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Modal, Switch, Form, Select, List, Radio, Icon } from 'antd';
+import { Button, Modal, Switch, Form, Select, List, Radio } from 'antd';
 import { string, object, func, bool } from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
@@ -262,10 +262,16 @@ class CustomizeFilter extends React.Component {
 																color: 'orange',
 															}}
 														>
-															<Icon
-																type="exclamation-circle"
-																style={{ marginRight: 5 }}
-															/>
+															<span
+																style={{
+																	marginRight: 5,
+																}}
+																role="img"
+																aria-label="warning"
+															>
+																⚠️
+															</span>
+
 															{message}
 														</div>
 													)}
