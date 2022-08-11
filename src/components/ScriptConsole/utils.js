@@ -183,6 +183,9 @@ export const monacoOptions = {
 		enabled: false,
 	},
 	comments: 'insertSpace',
+	scrollbar: {
+		alwaysConsumeMouseWheel: false,
+	},
 };
 
 export const DEFAULT_QUERY_EDITOR_VALUE = '// query here';

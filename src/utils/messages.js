@@ -85,6 +85,7 @@ export const suggestionsMessages = {
 	blacklist: Message(
 		'A list of suggestion terms to be ignored when populating the popular suggestions index.',
 	),
+	body: Message('Payload to send in the HTTP request'),
 	externalSuggestions: Message(
 		`Define your custom suggestions in the following format:`,
 		`[
@@ -98,6 +99,7 @@ export const suggestionsMessages = {
 	}
 ]`,
 	),
+	headers: Message('Headers to send in the HTTP request'),
 	minCount: Message(
 		'Set the minimum number of times a term must be searched by users before it is considered. Value should be ≥ 0.',
 	),
@@ -107,6 +109,7 @@ export const suggestionsMessages = {
 	minChars: Message(
 		'Set the minimum number of characters that must be present for a suggestion term to be considered. Value should be between [0, 32].',
 	),
+	method: Message('When specified, suggestions will use the method to perform network requests'),
 	transformDiacritics: Message(
 		'When enabled, suggestion terms will be transformed to remove the diacritics from them. For an example, "Crème Brulée" becomes "Creme Brulee".',
 	),

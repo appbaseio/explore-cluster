@@ -93,6 +93,10 @@ export const APP_ROUTES = {
 		menu: [
 			{ label: 'Search', link: 'search-builder' },
 			{ label: 'Recommendations', link: 'recommendations-builder' },
+			{
+				label: 'Searchbox',
+				link: 'searchboxes',
+			},
 			{ label: 'Auth Settings', link: 'search-auth-settings' },
 		],
 		tag: 'Beta',
@@ -232,6 +236,10 @@ export const CLUSTER_ROUTES = {
 				label: 'Recommendations',
 				link: 'recommendations-builder',
 				openIndexMenu: true,
+			},
+			{
+				label: 'Searchbox',
+				link: 'searchboxes',
 			},
 			{ label: 'Auth Settings', link: 'search-auth-settings' },
 		],
