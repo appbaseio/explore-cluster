@@ -133,3 +133,14 @@ export function resetConsoleOverride() {
 	console.log = console.stdlog.bind(console);
 }
 /* eslint-enable */
+
+export const DEFAULT_DESIGN_COLORS = {
+	light: {
+		primaryColor: '#4A90E2',
+		textColor: '#333',
+	},
+	dark: {
+		primaryColor: '#4A90E2',
+		textColor: '#ABABAB',
+	},
+};

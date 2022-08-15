@@ -24,6 +24,7 @@ import EndpointSuggestions from './components/EndpointSuggestions';
 import { urlValidator } from '../SearchAuth0Settings/utils';
 import { isEmpty } from '../../utils';
 import CredentialsSelector from './components/CredentialsSelector';
+import { DEFAULT_DESIGN_COLORS } from './utils';
 
 const { TabPane } = Tabs;
 
@@ -184,8 +185,8 @@ const SearchBoxForm = (props) => {
 				enableVoiceSearch: false,
 				highlight: false,
 				theme: 'light',
-				primaryColor: '#ffffff',
-				textColor: 'black',
+				primaryColor: DEFAULT_DESIGN_COLORS.light.primaryColor,
+				textColor: DEFAULT_DESIGN_COLORS.light.textColor,
 				searchbox: {},
 			}),
 		}),
@@ -267,35 +268,42 @@ const SearchBoxForm = (props) => {
 			const { controls } = form.current;
 			if (controls.designAndLayout.status === 'INVALID') {
 				setActiveTab('1');
-			} else if (controls.popular.status === 'INVALID') {
-				setActiveTab('2');
-			} else if (controls.recent.status === 'INVALID') {
-				setActiveTab('3');
-			} else if (controls.endpoint.status === 'INVALID') {
-				setActiveTab('4');
+				return;
 			}
-		} else {
-			saveSearchBox(id, payload)
-				.then((res) => {
-					if (res.payload) {
-						notification.success({
-							message: `Searchbox ${isEditPage ? 'edited' : 'created'} successfully!`,
-						});
-						if (!isEditPage) {
-							history.push(`/cluster/searchboxes`);
-						}
-					} else if (res.error) {
-						notification.error({
-							message: <p>Something went wrong while creating the searchbox!</p>,
-						});
-					}
-				})
-				.catch((createError) => {
-					notification.error({
-						message: createError,
-					});
-				});
+			if (controls.popular.status === 'INVALID') {
+				setActiveTab('2');
+				return;
+			}
+			if (controls.recent.status === 'INVALID') {
+				setActiveTab('3');
+				return;
+			}
+			// if (controls.endpoint.status === 'INVALID') {
+			// 	setActiveTab('4');
+			// 	return;
+			// }
 		}
+
+		saveSearchBox(id, payload)
+			.then((res) => {
+				if (res.payload) {
+					notification.success({
+						message: `Searchbox ${isEditPage ? 'edited' : 'created'} successfully!`,
+					});
+					if (!isEditPage) {
+						history.push(`/cluster/searchboxes`);
+					}
+				} else if (res.error) {
+					notification.error({
+						message: <p>Something went wrong while creating the searchbox!</p>,
+					});
+				}
+			})
+			.catch((createError) => {
+				notification.error({
+					message: createError,
+				});
+			});
 	};
 
 	useEffect(() => {

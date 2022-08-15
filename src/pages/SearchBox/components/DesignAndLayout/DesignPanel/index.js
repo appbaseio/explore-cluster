@@ -7,6 +7,7 @@ import Grid from '../../../../../components/CreateCredentials/Grid';
 import ColorPicker from './ColorPicker';
 import { Heading, Section } from './styles';
 import { FormContext } from '../../../../IntegrationsPage/utils';
+import { DEFAULT_DESIGN_COLORS } from '../../../utils';
 
 const DesignGrid = styled(Grid)`
 	margin: 20px 0px;
@@ -43,7 +44,18 @@ export default function DesignPanel() {
 								<DesignGrid
 									label="Theme"
 									component={
-										<Select {...handler()}>
+										<Select
+											{...handler()}
+											onChange={(value) => {
+												form.patchValue({
+													theme: value,
+													primaryColor:
+														DEFAULT_DESIGN_COLORS[value].primaryColor,
+													textColor:
+														DEFAULT_DESIGN_COLORS[value].textColor,
+												});
+											}}
+										>
 											<Select.Option value="dark">Dark</Select.Option>
 											<Select.Option value="light">Light</Select.Option>
 										</Select>

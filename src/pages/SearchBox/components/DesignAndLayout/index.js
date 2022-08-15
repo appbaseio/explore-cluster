@@ -1,5 +1,5 @@
 import { ReactiveBase, SearchBox } from '@appbaseio/reactivesearch';
-import { Alert, Modal, notification } from 'antd';
+import { Alert, Modal, notification, Spin } from 'antd';
 import { css } from 'emotion';
 import { uniqueId } from 'lodash';
 import { any, bool, func, object, oneOfType, string } from 'prop-types';
@@ -48,6 +48,7 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 	const mainForm = useContext(FormContext);
 	const form = mainForm.get('designAndLayout');
 	const [showLivePreview, setShowLivePreview] = useState(false);
+	const [previewLoading, setPreviewLoading] = useState(false);
 	const featuredSuggestionsPayload = useRef({});
 	const featuredSuggestionsId = useRef('');
 
@@ -66,6 +67,8 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 	const handleLivePreview = useCallback(async () => {
 		try {
 			if (featuredSuggestionsPayload.current) {
+				setPreviewLoading(true);
+				setShowLivePreview(true);
 				const payload = {
 					hidden: true,
 					searchbox: {
@@ -83,8 +86,12 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 
 				featuredSuggestionsId.current = response.payload.id;
 			}
-			setShowLivePreview(true);
+			setTimeout(() => {
+				setPreviewLoading(false);
+			}, 500);
 		} catch (e) {
+			setShowLivePreview(false);
+			setPreviewLoading(false);
 			notification.error({
 				description: e,
 				message: 'Error processing live preview.',
@@ -93,7 +100,7 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 	}, [setShowLivePreview]);
 
 	useEffect(() => {
-		if (triggerLivePreview) {
+		if (triggerLivePreview && !previewLoading) {
 			handleLivePreview();
 		}
 	}, [triggerLivePreview]);
@@ -127,8 +134,7 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 			<Modal
 				title={
 					<div>
-						<h3>Live Preview</h3>{' '}
-						<span>(Can take a min for unsaved suggestions to be indexed)</span>
+						<h3>Live Preview</h3>
 					</div>
 				}
 				visible={showLivePreview}
@@ -140,39 +146,46 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 				}}
 				style={{
 					top: '4rem',
+					maxWidth: 'min(652px, 95vw)',
 				}}
+				width="max(652px, 75vw) !important"
 				footer={null}
 			>
-				<ReactiveBase
-					app="featured_suggestions"
-					credentials={mainForm.value.credentials}
-					url={getURL()}
-					enableAppbase
-					themePreset={form.value.theme}
-					theme={{
-						colors: {
-							primaryColor: form.value.primaryColor,
-							textColor: form.value.textColor,
-						},
-					}}
-				>
-					<SearchBox
-						enableRecentSuggestions={form.value.enableRecentSuggestions}
-						enablePopularSuggestions={form.value.enablePopularSuggestions}
-						enableFeaturedSuggestions={form.value.enableFeaturedSuggestions}
-						enableIndexSuggestions={false}
-						showVoiceSearch={form.value.enableVoiceSearch}
-						highlight={form.value.highlight}
-						componentId="search_box"
-						size={10}
-						{...(featuredSuggestionsId.current && {
-							searchboxId: featuredSuggestionsId.current,
-							featuredSuggestionsConfig: {
-								sectionsOrder: featuredSuggestionsPayload.current.sectionsOrder,
-							},
-						})}
-					/>
-				</ReactiveBase>
+				<Spin style={{ margin: 'auto', width: '100%' }} spinning={previewLoading}>
+					{previewLoading ? null : (
+						<ReactiveBase
+							app="featured_suggestions"
+							credentials={mainForm.value.credentials}
+							url={getURL()}
+							enableAppbase
+							themePreset={form.value.theme}
+							theme={{
+								colors: {
+									primaryColor: form.value.primaryColor,
+									textColor: form.value.textColor,
+								},
+							}}
+						>
+							<SearchBox
+								enableRecentSuggestions={form.value.enableRecentSuggestions}
+								enablePopularSuggestions={form.value.enablePopularSuggestions}
+								enableFeaturedSuggestions={form.value.enableFeaturedSuggestions}
+								enableIndexSuggestions={false}
+								showVoiceSearch={form.value.enableVoiceSearch}
+								highlight={form.value.highlight}
+								componentId="search_box"
+								size={10}
+								{...(featuredSuggestionsId.current && {
+									searchboxId: featuredSuggestionsId.current,
+									featuredSuggestionsConfig: {
+										sectionsOrder:
+											featuredSuggestionsPayload.current.sectionsOrder,
+									},
+								})}
+							/>
+						</ReactiveBase>
+					)}
+				</Spin>
 			</Modal>
 		</>
 	);
