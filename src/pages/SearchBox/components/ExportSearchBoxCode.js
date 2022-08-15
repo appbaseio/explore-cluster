@@ -86,7 +86,7 @@ const mapStateToProps = (state, props) => {
 		(item) => item.id === props.searchBoxId,
 	);
 	return {
-		initialCredentials: searchBoxData.searchbox.featured.design.credentials ?? '',
+		initialCredentials: searchBoxData?.searchbox?.featured?.design?.credentials ?? '',
 	};
 };
 

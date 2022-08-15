@@ -192,8 +192,15 @@ const SearchBoxForm = (props) => {
 	);
 	const handleSaveSearchBox = () => {
 		const { value: formValue } = form.current;
-		const { id, description, popular, recent, designAndLayout, endpoint, credentials } =
-			formValue;
+		const {
+			id,
+			description,
+			popular = {},
+			recent = {},
+			designAndLayout = {},
+			endpoint = {},
+			credentials,
+		} = formValue;
 
 		const payload = {
 			enabled: true,
@@ -237,10 +244,10 @@ const SearchBoxForm = (props) => {
 				},
 				endpoint: {
 					endpoint: {
-						url: endpoint.endpoint.url,
-						headers: parseJSON(endpoint.endpoint.headers),
-						body: parseJSON(endpoint.endpoint.body),
-						method: endpoint.endpoint.method,
+						url: endpoint?.endpoint?.url,
+						headers: parseJSON(endpoint?.endpoint?.headers),
+						body: parseJSON(endpoint?.endpoint?.body),
+						method: endpoint?.endpoint?.method,
 					},
 					applyStopwords: endpoint.applyStopwords,
 					customStopwords: endpoint.customStopwords || [],
@@ -296,55 +303,57 @@ const SearchBoxForm = (props) => {
 			form.current.patchValue({
 				id: searchBoxData.id,
 				description: searchBoxData.description ?? '',
-				credentials: searchBoxData.searchbox.featured.design.credentials ?? '',
+				credentials: searchBoxData.searchbox?.featured?.design?.credentials ?? '',
 				popular: {
-					minCount: searchBoxData.searchbox.popular.minCount,
-					minChars: searchBoxData.searchbox.popular.minChars,
-					indices: searchBoxData.searchbox.popular.index.trim().split(','),
-					size: searchBoxData.searchbox.popular.size,
+					minCount: searchBoxData.searchbox?.popular?.minCount,
+					minChars: searchBoxData.searchbox?.popular?.minChars,
+					indices: searchBoxData.searchbox?.popular?.index.trim().split(','),
+					size: searchBoxData.searchbox?.popular?.size,
 				},
 				recent: {
-					minHits: searchBoxData.searchbox.recent.minHits,
-					minChars: searchBoxData.searchbox.recent.minChars,
-					indices: searchBoxData.searchbox.recent.index.trim().split(','),
-					size: searchBoxData.searchbox.recent.size,
+					minHits: searchBoxData.searchbox?.recent?.minHits,
+					minChars: searchBoxData.searchbox?.recent?.minChars,
+					indices: searchBoxData.searchbox?.recent?.index.trim().split(','),
+					size: searchBoxData.searchbox?.recent?.size,
 				},
 				designAndLayout: {
-					textColor: searchBoxData.searchbox.featured.design.textColor,
-					theme: searchBoxData.searchbox.featured?.design?.theme,
-					primaryColor: searchBoxData.searchbox.featured?.design?.primaryColor,
+					textColor: searchBoxData.searchbox?.featured.design.textColor,
+					theme: searchBoxData.searchbox?.featured?.design?.theme,
+					primaryColor: searchBoxData.searchbox?.featured?.design?.primaryColor,
 					enableFeaturedSuggestions:
-						searchBoxData.searchbox.featured?.design?.enableFeaturedSuggestions,
+						searchBoxData.searchbox?.featured?.design?.enableFeaturedSuggestions,
 					enablePopularSuggestions:
-						searchBoxData.searchbox.featured?.design?.enablePopularSuggestions,
+						searchBoxData.searchbox?.featured?.design?.enablePopularSuggestions,
 					enableIndexSuggestions:
-						searchBoxData.searchbox.featured?.design?.enableIndexSuggestions,
+						searchBoxData.searchbox?.featured?.design?.enableIndexSuggestions,
 					enableRecentSuggestions:
-						searchBoxData.searchbox.featured?.design?.enableRecentSuggestions,
-					enableVoiceSearch: searchBoxData.searchbox.featured?.design?.enableVoiceSearch,
-					highlight: searchBoxData.searchbox.featured?.design?.highlight,
+						searchBoxData.searchbox?.featured?.design?.enableRecentSuggestions,
+					enableVoiceSearch: searchBoxData.searchbox?.featured?.design?.enableVoiceSearch,
+					highlight: searchBoxData.searchbox?.featured?.design?.highlight,
 					searchbox: {
-						sections: searchBoxData.searchbox.featured?.layout?.sections,
-						sectionsOrder: searchBoxData.searchbox.featured?.layout?.sectionsOrder,
+						sections: searchBoxData.searchbox?.featured?.layout?.sections,
+						sectionsOrder: searchBoxData.searchbox?.featured?.layout?.sectionsOrder,
 					},
 				},
 				endpoint: {
 					endpoint: {
-						url: searchBoxData.searchbox.endpoint?.endpoint.url,
-						headers: stringifyJSON(searchBoxData.searchbox.endpoint?.endpoint.headers),
-						body: stringifyJSON(searchBoxData.searchbox.endpoint?.endpoint.body),
-						method: searchBoxData.searchbox.endpoint?.endpoint.method,
+						url: searchBoxData.searchbox?.endpoint?.endpoint.url,
+						headers: stringifyJSON(
+							searchBoxData.searchbox?.endpoint?.endpoint?.headers,
+						),
+						body: stringifyJSON(searchBoxData.searchbox?.endpoint?.endpoint?.body),
+						method: searchBoxData.searchbox?.endpoint?.endpoint?.method,
 					},
-					applyStopwords: searchBoxData.searchbox.endpoint.applyStopwords,
-					customStopwords: searchBoxData.searchbox.endpoint.customStopwords,
-					enableSynonyms: searchBoxData.searchbox.endpoint.enableSynonyms,
-					excludeFields: searchBoxData.searchbox.endpoint.excludeFields,
-					includeFields: searchBoxData.searchbox.endpoint.includeFields,
-					maxPredictedWords: searchBoxData.searchbox.endpoint.maxPredictedWords,
+					applyStopwords: searchBoxData.searchbox?.endpoint?.applyStopwords,
+					customStopwords: searchBoxData.searchbox?.endpoint?.customStopwords,
+					enableSynonyms: searchBoxData.searchbox?.endpoint?.enableSynonyms,
+					excludeFields: searchBoxData.searchbox?.endpoint?.excludeFields,
+					includeFields: searchBoxData.searchbox?.endpoint?.includeFields,
+					maxPredictedWords: searchBoxData.searchbox?.endpoint?.maxPredictedWords,
 					showDistinctSuggestions:
-						searchBoxData.searchbox.endpoint.showDistinctSuggestions,
-					transformResponse: searchBoxData.searchbox.endpoint.transformResponse,
-					urlField: searchBoxData.searchbox.endpoint.urlField,
+						searchBoxData.searchbox?.endpoint?.showDistinctSuggestions,
+					transformResponse: searchBoxData.searchbox?.endpoint?.transformResponse,
+					urlField: searchBoxData.searchbox?.endpoint?.urlField,
 				},
 			});
 		}
