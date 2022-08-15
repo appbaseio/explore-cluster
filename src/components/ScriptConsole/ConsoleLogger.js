@@ -115,7 +115,7 @@ const ConsoleLogger = ({ consoleArray }) => {
 
 	const renderConsoleItems = () => {
 		return consoleArray
-			.filter((consoleItem) => consoleItem.toLowerCase().includes(filterValue.toLowerCase()))
+			.filter((consoleItem) => consoleItem?.toLowerCase().includes(filterValue.toLowerCase()))
 			.map((consoleItem) => (
 				<div key={(Math.random() + 1).toString(36).substring(7)} className="log-item">
 					<span id="log-line-indicator">
@@ -136,6 +136,7 @@ const ConsoleLogger = ({ consoleArray }) => {
 			flexDirection="column"
 			alignItems="flex-start"
 			justifyContent="flex-start"
+			className="console-logger-container"
 		>
 			{consoleArray.length === 0 ? (
 				<h2 id="console-placeholder">

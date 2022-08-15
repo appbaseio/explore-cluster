@@ -23,7 +23,7 @@ import {
 	defaultSearchPreferences,
 	defaultRecommendationsPreferences,
 } from './utils';
-import { reOrderPreferences } from './utils/index';
+import { removeEmpty, reOrderPreferences } from './utils/index';
 import ReviewAndSave from './ReviewAndSave';
 
 class SavePreferencesN extends React.Component {
@@ -171,7 +171,7 @@ class SavePreferencesN extends React.Component {
 		delete newPreferences.created_at;
 		delete newPreferences.updated_at;
 
-		return !isEqual(newPreferences, getPreferencesPayload());
+		return !isEqual(removeEmpty(newPreferences), removeEmpty(getPreferencesPayload()));
 	}
 
 	handleSave = () => {

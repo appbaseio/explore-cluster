@@ -1,0 +1,200 @@
+import { ReactiveBase, SearchBox } from '@appbaseio/reactivesearch';
+import { Alert, Modal, notification } from 'antd';
+import { css } from 'emotion';
+import { uniqueId } from 'lodash';
+import { any, bool, func, object, oneOfType, string } from 'prop-types';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { connect } from 'react-redux';
+import Flex from '../../../../batteries/components/shared/Flex';
+import {
+	removeSearchBox as removeSearchBoxAction,
+	saveSearchBox as saveSearchBoxAction,
+} from '../../../../batteries/modules/actions/searchboxes';
+import { getURL } from '../../../../constants/config';
+import { FormContext } from '../../../IntegrationsPage/utils';
+import DesignPanel from './DesignPanel';
+
+import SearchBoxPreview from './SearchBoxPreview';
+
+const container = css`
+	flex-wrap: wrap;
+	gap: 1.5rem;
+	height: 100%;
+	padding-top: 3.5rem;
+	overflow: auto;
+
+	& > div {
+		height: 100%;
+		&:first-of-type {
+			min-width: max(35%, 300px);
+			border-right: 1px solid white;
+			height: max-content;
+			margin-bottom: 40px;
+			flex-grow: 1;
+			@media only screen and (max-width: 980px) {
+				border-bottom: 1px solid #bfbfbf;
+			}
+		}
+		&:nth-of-type(2) {
+			flex-grow: 1;
+			padding: 0 1rem 1rem 0;
+			margin-left: 1rem;
+			width: 48%;
+		}
+	}
+`;
+
+const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, searchBoxData }) => {
+	const mainForm = useContext(FormContext);
+	const form = mainForm.get('designAndLayout');
+	const [showLivePreview, setShowLivePreview] = useState(false);
+	const featuredSuggestionsPayload = useRef({});
+	const featuredSuggestionsId = useRef('');
+
+	const collectSearchBoxPreviewState = useCallback(
+		(stateObject) => {
+			featuredSuggestionsPayload.current = stateObject;
+			form.patchValue({
+				searchbox: {
+					...featuredSuggestionsPayload.current,
+				},
+			});
+		},
+		[featuredSuggestionsPayload],
+	);
+
+	const handleLivePreview = useCallback(async () => {
+		try {
+			if (featuredSuggestionsPayload.current) {
+				const payload = {
+					hidden: true,
+					searchbox: {
+						featured: {
+							layout: {
+								...featuredSuggestionsPayload.current,
+							},
+						},
+					},
+				};
+				const tempSearchBoxId = uniqueId(
+					`temp_featured_suggestions${new Date().getTime()}`,
+				);
+				const response = await saveSearchBox(tempSearchBoxId, payload, false);
+
+				featuredSuggestionsId.current = response.payload.id;
+			}
+			setShowLivePreview(true);
+		} catch (e) {
+			notification.error({
+				description: e,
+				message: 'Error processing live preview.',
+			});
+		}
+	}, [setShowLivePreview]);
+
+	useEffect(() => {
+		if (triggerLivePreview) {
+			handleLivePreview();
+		}
+	}, [triggerLivePreview]);
+
+	return (
+		<>
+			<Flex className={container}>
+				<div style={{ position: 'relative', paddingBottom: '60px' }}>
+					<DesignPanel />
+					<Alert
+						type="info"
+						icon="info"
+						style={{
+							minHeight: '38px',
+							maxHeight: '60px',
+							width: 'fit-content',
+							position: 'absolute',
+							bottom: '11px',
+						}}
+						message="Design elements are only testable with live preview"
+					/>
+				</div>
+				<div>
+					<SearchBoxPreview
+						stateCollector={collectSearchBoxPreviewState}
+						searchBoxData={searchBoxData}
+					/>
+				</div>
+			</Flex>
+
+			<Modal
+				title={
+					<div>
+						<h3>Live Preview</h3>{' '}
+						<span>(Can take a min for unsaved suggestions to be indexed)</span>
+					</div>
+				}
+				visible={showLivePreview}
+				onCancel={() => {
+					setShowLivePreview(false);
+
+					deleteSearchBox(featuredSuggestionsId.current, false);
+					featuredSuggestionsId.current = '';
+				}}
+				style={{
+					top: '4rem',
+				}}
+				footer={null}
+			>
+				<ReactiveBase
+					app="featured_suggestions"
+					credentials={mainForm.value.credentials}
+					url={getURL()}
+					enableAppbase
+					themePreset={form.value.theme}
+					theme={{
+						colors: {
+							primaryColor: form.value.primaryColor,
+							textColor: form.value.textColor,
+						},
+					}}
+				>
+					<SearchBox
+						enableRecentSuggestions={form.value.enableRecentSuggestions}
+						enablePopularSuggestions={form.value.enablePopularSuggestions}
+						enableFeaturedSuggestions={form.value.enableFeaturedSuggestions}
+						enableIndexSuggestions={false}
+						showVoiceSearch={form.value.enableVoiceSearch}
+						highlight={form.value.highlight}
+						componentId="search_box"
+						size={10}
+						{...(featuredSuggestionsId.current && {
+							searchboxId: featuredSuggestionsId.current,
+							featuredSuggestionsConfig: {
+								sectionsOrder: featuredSuggestionsPayload.current.sectionsOrder,
+							},
+						})}
+					/>
+				</ReactiveBase>
+			</Modal>
+		</>
+	);
+};
+
+DesignAndLayout.propTypes = {
+	saveSearchBox: func.isRequired,
+	deleteSearchBox: func.isRequired,
+	editPageId: oneOfType([string, any]).isRequired,
+	triggerLivePreview: bool.isRequired,
+	form: object.isRequired,
+	searchBoxData: object,
+};
+DesignAndLayout.defaultProps = {
+	searchBoxData: null,
+};
+
+const mapDispatchToProps = (dispatch) => ({
+	saveSearchBox: (id, payload, shouldFetchSearchboxes) =>
+		dispatch(saveSearchBoxAction(id, payload, shouldFetchSearchboxes)),
+	deleteSearchBox: (id, shouldRefetchSearchboxes) =>
+		dispatch(removeSearchBoxAction(id, shouldRefetchSearchboxes)),
+});
+
+export default connect(null, mapDispatchToProps)(DesignAndLayout);

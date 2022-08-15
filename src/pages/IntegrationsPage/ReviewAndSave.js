@@ -5,6 +5,7 @@ import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { func, object, bool, string } from 'prop-types';
 import { diff } from 'jsondiffpatch';
+import isEqual from 'lodash/isEqual';
 import DiffList from './DiffList';
 import {
 	generateInlineSandboxURL,
@@ -16,7 +17,7 @@ import {
 	saveSearchPreferenceN,
 	saveRecommendationPreferenceN,
 } from '../../batteries/modules/actions';
-import { transformPreferences } from './utils/index';
+import { removeEmpty, transformPreferences } from './utils/index';
 import { transformContent } from './ExportInline/Components/ModalHeader';
 
 const Badge = styled.span`
@@ -193,7 +194,7 @@ const ReviewAndSave = ({
 	};
 
 	const getDiffData = (oldObj, newObj) => {
-		let diffData = diff({ ...oldObj }, { ...newObj });
+		let diffData = diff(removeEmpty({ ...oldObj }), removeEmpty({ ...newObj }));
 		if (!diffData) {
 			return [0, {}];
 		}
@@ -405,15 +406,21 @@ const ReviewAndSave = ({
 			};
 		}
 		if (get(diffData, 'chartSettings.charts', null)) {
-			const newVal = get(newObj, 'chartSettings.charts', []);
-			const oldVal = get(oldObj, 'chartSettings.charts', []);
-			diffData = {
-				...diffData,
-				chartSettings: {
-					...diffData.chartSettings,
-					chartSettings: [oldVal, newVal],
-				},
-			};
+			const newVal = get(newObj, 'chartSettings.charts', []).map((filter) =>
+				removeEmpty(filter),
+			);
+			const oldVal = get(oldObj, 'chartSettings.charts', []).map((filter) =>
+				removeEmpty(filter),
+			);
+			if (!isEqual(oldVal, newVal)) {
+				diffData = {
+					...diffData,
+					chartSettings: {
+						...diffData.chartSettings,
+						charts: [oldVal, newVal],
+					},
+				};
+			} else delete diffData.chartSettings.charts;
 		}
 
 		if (get(diffData, 'globalSettings.showSelectedFilters', null)) {

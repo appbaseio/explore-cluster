@@ -11,6 +11,7 @@ const renderJsonItemCss = css`
 		transition: all 0.2s ease-in;
 		display: inline-block;
 		margin-right: 5px !important;
+		cursor: pointer;
 
 		&.expanded {
 			transform: rotate(90deg);

@@ -242,7 +242,7 @@ class CustomizeChart extends React.Component {
 													{({ handler }) => (
 														<Select {...handler()}>
 															{Object.keys(
-																chartTypes[value.type],
+																chartTypes[value.type] || {},
 															).map((key) => {
 																const chart =
 																	chartTypes[value.type]?.[key];

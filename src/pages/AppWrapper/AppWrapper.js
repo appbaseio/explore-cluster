@@ -102,6 +102,10 @@ class AppWrapper extends Component {
 							hasExactPath: true,
 						},
 						{
+							label: 'Searchbox',
+							link: '/cluster/searchboxes',
+						},
+						{
 							label: 'Auth Settings',
 							link: '/cluster/auth-settings',
 							hasExactPath: true,
@@ -188,6 +192,10 @@ class AppWrapper extends Component {
 									label: 'Recommendations',
 									link: '/cluster/recommendations-builder',
 									hasExactPath: true,
+								},
+								{
+									label: 'Searchbox',
+									link: '/cluster/searchboxes',
 								},
 								{
 									label: 'Auth Settings',

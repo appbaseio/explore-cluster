@@ -238,13 +238,8 @@ class CreateStoredQuery extends React.Component {
 
 	render() {
 		const { isExecuting, isValidating, control, handleSaveStoredQuery, isLoading } = this.props;
-		const {
-			openReviewSave,
-			defaultData,
-			updatedData,
-			queryResponseTitle,
-			isQueryExecuted,
-		} = this.state;
+		const { openReviewSave, defaultData, updatedData, queryResponseTitle, isQueryExecuted } =
+			this.state;
 		if (isLoading) {
 			return <Loader />;
 		}

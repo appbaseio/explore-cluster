@@ -123,6 +123,17 @@ const RecommendationsIntegrationsPage = Loadable({
 	loading: Loader,
 });
 
+const SearchBoxPage = Loadable({
+	loader: () => import(/* webpackChunkName: "SearchBoxPage" */ '../../pages/SearchBox'),
+	loading: Loader,
+});
+
+const SearchBoxForm = Loadable({
+	loader: () =>
+		import(/* webpackChunkName: "SearchBoxForm" */ '../../pages/SearchBox/SearchBoxForm'),
+	loading: Loader,
+});
+
 const inlineCodesandboxPage = Loadable({
 	loader: () =>
 		import(
@@ -260,7 +271,6 @@ class ClusterRouteContainer extends React.Component {
 							</>
 						)}
 					/>
-
 					<Route
 						exact
 						path="/cluster/import"
@@ -313,7 +323,6 @@ class ClusterRouteContainer extends React.Component {
 							</>
 						)}
 					/>
-
 					<Route
 						exact
 						path="/cluster/rules/:id"
@@ -573,6 +582,27 @@ class ClusterRouteContainer extends React.Component {
 					/>
 					<Route
 						exact
+						path="/cluster/searchboxes"
+						render={(props) => (
+							<AppPageContainer {...props} component={SearchBoxPage} />
+						)}
+					/>{' '}
+					<Route
+						exact
+						path="/cluster/searchboxes/new"
+						render={(props) => (
+							<AppPageContainer {...props} component={SearchBoxForm} />
+						)}
+					/>
+					<Route
+						exact
+						path="/cluster/searchboxes/:id"
+						render={(props) => (
+							<AppPageContainer {...props} component={SearchBoxForm} />
+						)}
+					/>
+					<Route
+						exact
 						path="/cluster/role-based-access"
 						component={(props) => (
 							<>
@@ -610,7 +640,6 @@ class ClusterRouteContainer extends React.Component {
 							</>
 						)}
 					/>
-
 					<Route
 						exact
 						path="/cluster/grade-evaluation"
@@ -624,7 +653,6 @@ class ClusterRouteContainer extends React.Component {
 							</>
 						)}
 					/>
-
 					<ClusterAnalyticsRoutes />
 				</Switch>
 			</ErrorPage>

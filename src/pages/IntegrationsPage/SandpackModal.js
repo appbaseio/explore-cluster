@@ -10,7 +10,7 @@ import {
 	getLatestVersion,
 	preferencesInConstants,
 } from './utils/sandpack-generator';
-import { getTemplate, transformPreferences } from './utils/index';
+import { getTemplate, removeEmpty, transformPreferences } from './utils/index';
 
 const SandpackModal = ({ preferences, preferenceId }) => {
 	const [sandpackCode, setSandpackCode] = useState({});
@@ -25,7 +25,7 @@ const SandpackModal = ({ preferences, preferenceId }) => {
 			.then(async (res) => {
 				if (res.content) {
 					const content = transformContent(res.content);
-					const newPreferences = { ...transformPreferences(preferences) };
+					const newPreferences = removeEmpty({ ...transformPreferences(preferences) });
 					const newContent = preferencesInConstants(content, newPreferences);
 					setSandpackCode(newContent);
 					setIsLoading(false);

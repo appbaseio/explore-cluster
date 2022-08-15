@@ -2,6 +2,7 @@ import React, { useContext, useEffect } from 'react';
 import { FieldGroup } from 'react-reactive-form';
 import { func } from 'prop-types';
 import { Tabs } from 'antd';
+import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { FormContext, verticalTab } from '../../utils';
 import Search from './Search';
 import Results from './Results';
@@ -24,6 +25,17 @@ const SearchSettings = ({ getPreferencesPayload }) => {
 		}
 	}, []);
 
+	const handleItemReOrder = (index, field) => {
+		const sourcePosition = index.source.index;
+		const destinationPosition = index.destination.index;
+		if (form.get(field)) {
+			const filtersControl = form.get(field);
+			const control = filtersControl.at(sourcePosition);
+			filtersControl.removeAt(sourcePosition);
+			filtersControl.insert(destinationPosition, control);
+		}
+	};
+
 	return (
 		<Tabs defaultActiveKey="1" tabPosition="left" className={verticalTab}>
 			<TabPane tab="Search" key="1">
@@ -39,13 +51,59 @@ const SearchSettings = ({ getPreferencesPayload }) => {
 			<TabPane tab="Facets" key="2">
 				<FieldGroup
 					control={form}
-					render={() => <Filters getPreferencesPayload={getPreferencesPayload} />}
+					render={() => (
+						<DragDropContext
+							onDragEnd={(idx) => handleItemReOrder(idx, 'dynamicFilters')}
+						>
+							<Droppable droppableId="droppable">
+								{(provided, snapshot) => (
+									<div
+										ref={provided.innerRef}
+										style={{
+											backgroundColor: snapshot.isDraggingOver
+												? 'transparent'
+												: 'transparent',
+										}}
+										{...provided.droppableProps}
+									>
+										<Filters
+											getPreferencesPayload={getPreferencesPayload}
+											form={form}
+										/>
+										{provided.placeholder}
+									</div>
+								)}
+							</Droppable>
+						</DragDropContext>
+					)}
 				/>
 			</TabPane>
 			<TabPane tab="Charts" key="3">
 				<FieldGroup
 					control={form}
-					render={() => <Charts getPreferencesPayload={getPreferencesPayload} />}
+					render={() => (
+						<DragDropContext onDragEnd={(idx) => handleItemReOrder(idx, 'charts')}>
+							<Droppable droppableId="droppable">
+								{(provided, snapshot) => (
+									<div
+										ref={provided.innerRef}
+										style={{
+											backgroundColor: snapshot.isDraggingOver
+												? 'transparent'
+												: 'transparent',
+										}}
+										{...provided.droppableProps}
+									>
+										<Charts
+											getPreferencesPayload={getPreferencesPayload}
+											form={form}
+										/>
+										{provided.placeholder}
+									</div>
+								)}
+							</Droppable>
+						</DragDropContext>
+					)}
 				/>
 			</TabPane>
 			<TabPane tab="Results" key="4">
