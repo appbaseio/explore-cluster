@@ -126,7 +126,7 @@
 		"prettier": "^2.0.4",
 		"prop-types": "^15.6.2",
 		"rc-progress": "^2.2.5",
-		"react": "^18.2.0",
+		"react": "^16.4.2",
 		"react-ace": "^6.1.4",
 		"react-animated-number": "^0.4.4",
 		"react-beautiful-dnd": "^12.2.0",
