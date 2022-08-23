@@ -24,23 +24,9 @@ import EndpointSuggestions from './components/EndpointSuggestions';
 import { urlValidator } from '../SearchAuth0Settings/utils';
 import { isEmpty } from '../../utils';
 import CredentialsSelector from './components/CredentialsSelector';
-import { DEFAULT_DESIGN_COLORS } from './utils';
+import { DEFAULT_DESIGN_COLORS, parseJSON } from './utils';
 
 const { TabPane } = Tabs;
-
-function parseJSON(input) {
-	if (typeof input === 'string') {
-		try {
-			return JSON.parse(input);
-		} catch (error) {
-			return {};
-		}
-	}
-	if (typeof input === 'object') {
-		return input;
-	}
-	return {};
-}
 
 function stringifyJSON(input) {
 	if (typeof input === 'object') {

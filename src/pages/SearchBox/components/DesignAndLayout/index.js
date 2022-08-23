@@ -12,6 +12,7 @@ import {
 } from '../../../../batteries/modules/actions/searchboxes';
 import { getURL } from '../../../../constants/config';
 import { FormContext } from '../../../IntegrationsPage/utils';
+import { parseJSON } from '../../utils';
 import DesignPanel from './DesignPanel';
 
 import SearchBoxPreview from './SearchBoxPreview';
@@ -69,6 +70,7 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 			if (featuredSuggestionsPayload.current) {
 				setPreviewLoading(true);
 				setShowLivePreview(true);
+				const { endpoint = {}, popular = {}, recent = {} } = mainForm.value;
 				const payload = {
 					hidden: true,
 					searchbox: {
@@ -76,6 +78,35 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 							layout: {
 								...featuredSuggestionsPayload.current,
 							},
+						},
+						endpoint: {
+							endpoint: {
+								url: endpoint?.endpoint?.url,
+								headers: parseJSON(endpoint?.endpoint?.headers),
+								body: parseJSON(endpoint?.endpoint?.body),
+								method: endpoint?.endpoint?.method,
+							},
+							applyStopwords: endpoint.applyStopwords,
+							customStopwords: endpoint.customStopwords || [],
+							enableSynonyms: endpoint.enableSynonyms,
+							excludeFields: endpoint.excludeFields,
+							includeFields: endpoint.includeFields,
+							maxPredictedWords: endpoint.maxPredictedWords,
+							showDistinctSuggestions: endpoint.showDistinctSuggestions,
+							transformResponse: endpoint.transformResponse,
+							urlField: endpoint.urlField,
+						},
+						popular: {
+							size: popular.size,
+							index: popular.indices?.join(','),
+							minCount: popular.minCount,
+							minChars: popular.minChars,
+						},
+						recent: {
+							size: recent.size,
+							index: recent.indices?.join(','),
+							minHits: recent.minHits,
+							minChars: recent.minChars,
 						},
 					},
 				};

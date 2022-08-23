@@ -144,3 +144,17 @@ export const DEFAULT_DESIGN_COLORS = {
 		textColor: '#ABABAB',
 	},
 };
+
+export function parseJSON(input) {
+	if (typeof input === 'string') {
+		try {
+			return JSON.parse(input);
+		} catch (error) {
+			return {};
+		}
+	}
+	if (typeof input === 'object') {
+		return input;
+	}
+	return {};
+}

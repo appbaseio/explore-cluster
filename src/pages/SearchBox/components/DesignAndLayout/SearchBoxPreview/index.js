@@ -1,6 +1,6 @@
 import { Input, Icon, Empty } from 'antd';
 import { css } from 'emotion';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import PropTypes from 'prop-types';
 import { uniqueId } from 'lodash';
@@ -8,7 +8,6 @@ import AddSectionModal from './AddSectionModal';
 import AddSuggestion from './AddSuggestionModal';
 import RenderSections from './RenderSections';
 import { generateFeaturedSuggestionPayload } from '../../../utils';
-import { FormContext } from '../../../../IntegrationsPage/utils';
 
 const container = css`
 	position: relative;
@@ -67,8 +66,6 @@ const DEFAULT_ADD_EDIT_SUGGESTION_STATE = {
 };
 
 const SearchBoxPreview = ({ stateCollector, searchBoxData }) => {
-	const mainForm = useContext(FormContext);
-	const form = mainForm.get('designAndLayout');
 	const [inputValue, setInputValue] = useState('');
 	const [addEditSuggestionState, setAddEditSuggestionState] = useState(
 		DEFAULT_ADD_EDIT_SUGGESTION_STATE,
@@ -343,12 +340,14 @@ const SearchBoxPreview = ({ stateCollector, searchBoxData }) => {
 					newSectionsState[section.id] = {
 						id: section.id,
 						title: section.label,
-						suggestionsIds: section.suggestions.map((suggItem) => suggItem.id),
+						suggestionsIds: section?.suggestions?.map((suggItem) => suggItem.id) ?? [],
 					};
 
-					section.suggestions.forEach((suggItem) => {
-						newSuggestionsState[suggItem.id] = { ...suggItem };
-					});
+					if (Array.isArray(section.suggestions)) {
+						section.suggestions.forEach((suggItem) => {
+							newSuggestionsState[suggItem.id] = { ...suggItem };
+						});
+					}
 				});
 
 				setSections(newSectionsState);
@@ -356,10 +355,6 @@ const SearchBoxPreview = ({ stateCollector, searchBoxData }) => {
 				setSectionsOrder(initialData.sectionsOrder);
 			}
 		}
-
-		form.get('searchbox').valueChanges.subscribe((value) => {
-			console.log('value', value);
-		});
 	}, []);
 
 	return (
