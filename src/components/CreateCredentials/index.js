@@ -92,7 +92,10 @@ class CreateCredentials extends React.Component {
 						: [{ value: ['*'], disabled: false }],
 					allowedActions: [[], Validators.required],
 					...(this.allowStoredQuery
-						? { sources: [{ value: ['0.0.0.0/0'], disabled: false }] }
+						? {
+								sources: [{ value: ['0.0.0.0/0'], disabled: false }],
+								sources_xff_value: [{ value: 0, disabled: false }, [isNegative]],
+						  }
 						: null),
 			  })
 			: FormBuilder.group({
@@ -112,6 +115,7 @@ class CreateCredentials extends React.Component {
 					),
 					referers: [{ value: ['*'], disabled: false }],
 					sources: [{ value: ['0.0.0.0/0'], disabled: false }],
+					sources_xff_value: [{ value: 0, disabled: false }, [isNegative]],
 					rsApiRestrictions: new FormGroup({
 						maxQuerySize: new FormControl(undefined, [
 							Validators.min(0),
@@ -613,31 +617,43 @@ class CreateCredentials extends React.Component {
 												)}
 											/>
 										)}
-										{!isUserManagement && (
-											<React.Fragment>
-												<Grid
-													label="Security"
-													toolTipMessage={Messages.security}
-												/>
-												<FieldControl
-													name="referers"
-													render={(control) => (
-														<WhiteList
-															toolTipMessage={Messages.referers}
-															control={control}
-															type="dropdown"
-															defaultSuggestionValue="https://example.com/"
-															label="HTTP Referers"
-															defaultValue="*"
-															handleWarningMessage={(defaultValue) =>
-																`Warning! You don't have the Allow All Referers (${defaultValue}) set.`
-															}
-															inputProps={{
-																placeholder: 'Add a HTTP Referer',
-															}}
-														/>
-													)}
-												/>
+										{(!isUserManagement || this.allowStoredQuery) && (
+											<>
+												{!isUserManagement && (
+													<Grid
+														label="Security"
+														toolTipMessage={Messages.security}
+													/>
+												)}
+												{!isUserManagement && (
+													<FieldControl
+														name="referers"
+														render={(control) => (
+															<WhiteList
+																toolTipMessage={Messages.referers}
+																control={control}
+																type="dropdown"
+																defaultSuggestionValue="https://example.com/"
+																label="HTTP Referers"
+																defaultValue="*"
+																handleWarningMessage={(
+																	defaultValue,
+																) =>
+																	`Warning! You don't have the Allow All Referers (${defaultValue}) set.`
+																}
+																inputProps={{
+																	placeholder:
+																		'Add a HTTP Referer',
+																}}
+																labelClassName={
+																	isUserManagement
+																		? ''
+																		: styles.subHeader
+																}
+															/>
+														)}
+													/>
+												)}
 												<FieldControl
 													name="sources"
 													render={(control) => (
@@ -653,9 +669,54 @@ class CreateCredentials extends React.Component {
 																placeholder:
 																	'Add an IP Source in CIDR format',
 															}}
+															labelClassName={
+																isUserManagement
+																	? ''
+																	: styles.subHeader
+															}
 														/>
 													)}
 												/>
+												<FieldControl
+													name="sources_xff_value"
+													render={({ handler, hasError }) => (
+														<Grid
+															label={
+																<span
+																	className={
+																		isUserManagement
+																			? ''
+																			: styles.subHeader
+																	}
+																>
+																	IP Source Depth
+																</span>
+															}
+															toolTipMessage={
+																Messages.sourcesXFFValue
+															}
+															component={
+																<div>
+																	<Input
+																		type="number"
+																		placeholder="Enter a positive depth value"
+																		{...handler()}
+																	/>
+																	{hasError('isNegative') && (
+																		<div css={styles.error}>
+																			IP Source Depth value
+																			can&apos;t be negative.
+																		</div>
+																	)}
+																</div>
+															}
+														/>
+													)}
+												/>
+											</>
+										)}
+										{!isUserManagement && (
+											<React.Fragment>
 												{this.isApp ? null : (
 													<FieldControl
 														strict={false}
@@ -1045,26 +1106,6 @@ class CreateCredentials extends React.Component {
 													)}
 												/>
 											</React.Fragment>
-										)}
-										{isUserManagement && this.allowStoredQuery && (
-											<FieldControl
-												name="sources"
-												render={(control) => (
-													<WhiteList
-														control={control}
-														toolTipMessage={Messages.sources}
-														label="IP Sources"
-														handleWarningMessage={(defaultValue) =>
-															`Warning! You don't have the Allow All IP sources (${defaultValue}) set.`
-														}
-														defaultValue="0.0.0.0/0"
-														inputProps={{
-															placeholder:
-																'Add an IP Source in CIDR format',
-														}}
-													/>
-												)}
-											/>
 										)}
 									</div>
 								</fieldset>

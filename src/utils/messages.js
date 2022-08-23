@@ -28,6 +28,14 @@ export const userManagementMessages = {
 	),
 	allowedActions: Message('Set the scope of actions that a user can perform'),
 	categories: Message('Authorize API access to only selected operations.'),
+	security: Message('Authorize API access based on selected HTTP Referers and IP Source values.'),
+	sources: Message(
+		`Only selected IP ranges (in CIDR format) are authorized to call the API with this
+			credential.`,
+	),
+	sourcesXFFValue:
+		Message(`To define the depth of the IP address to read from x-forwarded-header when multiple IP addresses are present.
+For example, if x-forwarded-header value is client, proxy1, proxy2, proxy3 and you want to specify proxy2 as the IP to be used for IP sources validation then you must set sources_xff_value as 3.`),
 };
 // Messages for api credentials form
 export const credentialsMessages = {
@@ -78,6 +86,9 @@ export const credentialsMessages = {
 	),
 	ttl: Message("Expiry time for this credential (in seconds). -1 means that it doesn't expire."),
 	ipLimit: Message('Set a per hour ratelimit on API calls per IP address.'),
+	sourcesXFFValue:
+		Message(`To define the depth of the IP address to read from x-forwarded-header when multiple IP addresses are present.
+For example, if x-forwarded-header value is client, proxy1, proxy2, proxy3 and you want to specify proxy2 as the IP to be used for IP sources validation then you must set sources_xff_value as 3.`),
 };
 
 // Messages for popular suggestions

@@ -280,6 +280,7 @@ export const mapFormToValues = (value, hasLimits, appbaseVersion) => {
 		ops: value.operationType && value.operationType.ops,
 		referers: value.referers,
 		sources: value.sources,
+		sources_xff_value: parseInt(value.sources_xff_value, 10) || undefined,
 		limits: filteredCategories.limits,
 		ttl: parseInt(value.ttl, 10) || undefined,
 		username: value.username,
