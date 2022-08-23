@@ -179,8 +179,8 @@ const AddSuggestion = (props) => {
 			label: ['', Validators.required],
 			value: ['', Validators.required],
 			description: '',
-			action: ['', Validators.required],
-			navigationType: ['', Validators.required],
+			action: [ALLOWED_ACTIONS.NAVIGATE.value, Validators.required],
+			navigationType: [NAVIGATION_TYPES['New Tab'], Validators.required],
 			link: ['', Validators.required, linkValidator],
 			iconURL: ['', null, linkValidator],
 		};
@@ -247,7 +247,6 @@ const AddSuggestion = (props) => {
 		return suggestionObject;
 	};
 	const handleSave = () => {
-		console.log('form.invalid', form.current);
 		if (form.current.invalid) {
 			return;
 		}
