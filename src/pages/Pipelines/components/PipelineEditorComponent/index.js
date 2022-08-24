@@ -2,7 +2,7 @@ import { css } from 'emotion';
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes, { func, object } from 'prop-types';
 import yamlToJson from 'js-yaml';
-import { Button, Dropdown, Icon, Input, Menu } from 'antd';
+import { Button, Dropdown, Icon, Input, Menu, message } from 'antd';
 import { unionWith } from 'lodash';
 import Container from '../../../../components/Container';
 import Monaco from '../../../../batteries/components/SearchSandbox/containers/MonacoEditor';
@@ -97,7 +97,7 @@ const QUERY_EDITOR_MODEL_PATH = 'a://b/foo.json';
 
 const StagesMenu = ({ pipelineSchema, getEditorValue, handleMenuClick }) => {
 	const prebuiltStages = pipelineSchema?.definitions?.PreBuiltStage || {};
-	const prebuiltStagesInEditor = (getEditorValue()?.stages ?? []).map((item) => item.id) ?? [];
+	const prebuiltStagesInEditor = (getEditorValue()?.stages ?? []).map((item) => item.use) ?? [];
 	const [query, setQuery] = useState('');
 	const results = (prebuiltStages.enum ?? [''])
 		.sort((a, b) => {
@@ -124,7 +124,6 @@ const StagesMenu = ({ pipelineSchema, getEditorValue, handleMenuClick }) => {
 		descriptionResults,
 		(a, b) => a === b,
 	);
-	console.log('prebuiltStages', prebuiltStages);
 	return (
 		<>
 			<Input
@@ -137,7 +136,6 @@ const StagesMenu = ({ pipelineSchema, getEditorValue, handleMenuClick }) => {
 			/>
 			<Menu css={dropdownMenuCss} onClick={handleMenuClick}>
 				{titleAndDescriptionResults.map((stageKey) => {
-					console.log(stageKey);
 					return (
 						<Menu.Item className="stage-menu-item" key={stageKey}>
 							<h4 title={stageKey}>{stageKey}</h4>
@@ -197,33 +195,41 @@ const PipelineEditorComponent = (props) => {
 			const decorations = [];
 			modelMarkers
 				.filter((item) => item.owner === 'json')
-				.forEach(({ startLineNumber, startColumn, endLineNumber, endColumn, message }) => {
-					decorations.push({
-						range: new monacoInstance.current.Range(
-							startLineNumber,
-							startColumn,
-							endLineNumber,
-							endColumn,
-						),
-						options: {
-							isWholeLine: true,
-							className: 'myContentClass',
-							glyphMarginClassName: 'myGlyphMarginClass',
-							glyphMarginHoverMessage: [
-								{
-									value: message,
-									isTrusted: true,
-								},
-							],
-							hoverMessage: [
-								{
-									value: message,
-									isTrusted: true,
-								},
-							],
-						},
-					});
-				});
+				.forEach(
+					({
+						startLineNumber,
+						startColumn,
+						endLineNumber,
+						endColumn,
+						message: markerMessage,
+					}) => {
+						decorations.push({
+							range: new monacoInstance.current.Range(
+								startLineNumber,
+								startColumn,
+								endLineNumber,
+								endColumn,
+							),
+							options: {
+								isWholeLine: true,
+								className: 'myContentClass',
+								glyphMarginClassName: 'myGlyphMarginClass',
+								glyphMarginHoverMessage: [
+									{
+										value: markerMessage,
+										isTrusted: true,
+									},
+								],
+								hoverMessage: [
+									{
+										value: markerMessage,
+										isTrusted: true,
+									},
+								],
+							},
+						});
+					},
+				);
 			oldEditorDecorations.current = editorRef.current.deltaDecorations(
 				oldEditorDecorations.current,
 				[...decorations],
@@ -289,8 +295,7 @@ const PipelineEditorComponent = (props) => {
 				.then((res) => {
 					const processedSchema = modifySchema(res);
 					const { $schema, definitions, ...rest } = processedSchema;
-
-					setPipelineSchema(processedSchema); // CHANGE IT AFTERWARDS
+					setPipelineSchema(processedSchema);
 					monacoInstance.current.languages.json.jsonDefaults.setDiagnosticsOptions({
 						validate: true,
 						schemaValidation: 'error',
@@ -322,18 +327,29 @@ const PipelineEditorComponent = (props) => {
 
 	const handleMenuClick = (e) => {
 		try {
+			if (getEditorValue() == null) {
+				message.error(
+					'Pipeline editor value is not a valid JSON. Stages can only be added to valid JSON.',
+				);
+				setTimeout(() => {
+					setShowStagesMenu(false);
+				}, 200);
+				return;
+			}
+
 			const prebuiltStages = pipelineSchema?.definitions?.PreBuiltStage || {};
 			const editorValue = { ...getEditorValue() };
+
 			if (editorValue?.stages) {
 				editorValue.stages.push({
-					id: e.key,
+					use: e.key,
 					description:
 						prebuiltStages?.additionalProperties?.stages?.[e.key]?.description ?? '',
 				});
 			} else {
 				editorValue.stages = [
 					{
-						id: e.key,
+						use: e.key,
 						description:
 							prebuiltStages?.additionalProperties?.stages?.[e.key]?.description ??
 							'',

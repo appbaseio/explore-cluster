@@ -1,6 +1,6 @@
 import React, { Fragment, useLayoutEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Col, Icon, Row, Layout, Result, Alert, message, notification } from 'antd';
+import { Button, Col, Icon, Row, Layout, Result, Alert } from 'antd';
 import { css } from 'emotion';
 import get from 'lodash/get';
 import orderBy from 'lodash/orderBy';
@@ -9,7 +9,6 @@ import { Link } from 'react-router-dom';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 import Loader from '../../components/Loader';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
-import DNDWrapper from '../../components/DNDWrapper';
 import { pipelinesBannerDetails } from './utils';
 import {
 	getPipelines,
@@ -33,7 +32,6 @@ const Pipelines = (props) => {
 		isLoading,
 		pipelines,
 		fetchPipelines,
-		reorderPipeline,
 		tier,
 		appVersion,
 		featurePipelines,
@@ -48,38 +46,6 @@ const Pipelines = (props) => {
 			fetchUsageStats();
 		}
 	}, []);
-
-	const onDragEnd = (result) => {
-		const pipelineToReorder = pipelines.find(
-			(pipeline) => pipeline.priority === result.source.index,
-		);
-
-		let priority;
-
-		if (result.source.index < result.destination.index) {
-			// dropping at nextELem + 1
-			priority = result.destination.index + 1;
-		} else if (result.destination.index === 1) {
-			priority = result.destination.index;
-		} else {
-			priority = result.destination.index - 1;
-		}
-		reorderPipeline({
-			id: pipelineToReorder.id,
-			priority,
-		}).then((res) => {
-			if (res && res.error) {
-				notification.error({
-					message: 'Error',
-					description: get(res.error, 'message'),
-				});
-			} else {
-				message.success(
-					`Pipeline re-ordered successfully from ${pipelineToReorder.priority} to ${priority}`,
-				);
-			}
-		});
-	};
 
 	if (compareVersion(appVersion, '8.0.0') === -1)
 		return (
@@ -177,37 +143,15 @@ const Pipelines = (props) => {
 				{pipelines && pipelines.length ? (
 					<ErrorToaster>
 						<div>
-							<DNDWrapper
-								onDragEnd={onDragEnd}
-								items={orderBy(
-									pipelines,
-									[
-										(a) => {
-											const priority = Number.isNaN(a.priority)
-												? Number.MAX_SAFE_INTEGER
-												: a.priority;
-											return priority;
-										},
-										(a) => {
-											const timestamp = a.updated_at || a.created_at;
-											return timestamp;
-										},
-									],
-									['asc', 'desc'],
-								).map((doc, idx) => ({ ...doc, position: idx }))}
-								dropId="PIPELINES"
-								indexKey="position"
-								idKey="id"
-							>
-								{({ item, dragProvided, dragSnapshot }) => (
-									<PipelineCard
-										dragProvided={dragProvided}
-										dragSnapshot={dragSnapshot}
-										pipeline={item}
-										history={history}
-									/>
-								)}
-							</DNDWrapper>
+							{orderBy(
+								pipelines,
+								(a) => {
+									return a.updated_at || a.created_at || 0;
+								},
+								['desc'],
+							).map((item) => (
+								<PipelineCard key={item.id} pipeline={item} history={history} />
+							))}
 						</div>
 					</ErrorToaster>
 				) : (

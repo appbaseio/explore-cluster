@@ -35,6 +35,9 @@ export const monacoOptions = {
 	},
 	comments: 'insertSpace',
 	automaticLayout: true,
+	scrollbar: {
+		alwaysConsumeMouseWheel: false,
+	},
 };
 
 export const TAB_ACTIONS = {
