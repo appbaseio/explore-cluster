@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import {
 	Alert,
@@ -8,13 +8,10 @@ import {
 	Icon,
 	message,
 	notification,
-	Popover,
 	Row,
 	Switch,
-	Tag,
 	Tooltip,
 	Typography,
-	InputNumber,
 } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
@@ -80,18 +77,6 @@ const actions = css`
 	}
 `;
 
-const dragIcon = css`
-	display: flex;
-	align-items: center;
-	justify-content: space-evenly;
-	padding: 2px;
-	border-radius: 2px;
-	transition: all ease 0.2s;
-	&:hover {
-		background: #f5f5f5;
-	}
-`;
-
 const mobileMenu = css`
 	display: none;
 	@media (max-width: 992px) {
@@ -151,38 +136,32 @@ const popoverContent = css`
 	overflow-x: auto;
 	word-wrap: break-word;
 	max-width: 500px;
-	max-height: 300px;
+	max-height: 110px;
 
 	span {
-		margin: 12px auto;
-		overflow: auto;
-		max-width: 100%;
+		margin: 12px 0;
 		display: block;
+		white-space: nowrap;
+		padding: 0 10px 0 0;
+		width: max-content;
+
 		code {
 			white-space: nowrap;
 		}
 	}
 `;
-const overflow = { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' };
 
 const PipelineCard = (props) => {
 	const {
 		pipeline,
 		pipelineScripts,
-		dragSnapshot,
-		dragProvided,
 		togglePipeline,
 		removePipeline,
-		reorderPipeline,
 		showEdit,
-		showDrag,
 		showExport,
 		history,
 		usageStats,
 	} = props;
-	const [isEditPriority, setIsEditPriority] = useState(false);
-
-	const [priorityValue, setpriorityValue] = useState(false);
 
 	const actionButtonSize = window.innerWidth < 1090 ? 'small' : 'default';
 
@@ -229,50 +208,37 @@ const PipelineCard = (props) => {
 		});
 	};
 
-	const handleReordering = (val) => {
-		reorderPipeline({
-			id: pipeline.id,
-			priority: val,
-		}).then((res) => {
-			if (res && res.error) {
-				notification.error({
-					message: 'Error',
-					description: get(res.error, 'message'),
-				});
-			} else {
-				message.success(
-					`Pipeline re-ordered successfully from ${pipeline.priority} to ${val}`,
-				);
-			}
-
-			setIsEditPriority(false);
-		});
-	};
-	const pipelinesRoutePaths = pipeline.routes?.map((route) => route.path) || null;
+	const pipelinesRoutePaths =
+		pipeline.routes?.map((route) => ({ path: route.path, method: route.method })) || null;
 
 	const getCreatedUpdatedStats = () => {
+		const stats = {};
 		if (pipeline.updated_at) {
-			return (
+			stats.title = (
 				<div>
-					<p>Updated: {moment.unix(pipeline.updated_at).format('ddd D MMM, hh:mm A')}</p>
+					<p>{moment.unix(pipeline.updated_at).format('ddd D MMM, hh:mm A')}</p>
 				</div>
 			);
+			stats.difftime = `Updated ${moment.unix(pipeline.updated_at).stdFromNow()}`;
+			return stats;
 		}
 		if (pipeline.created_at) {
-			return (
+			stats.title = (
 				<div>
-					<p>Created: {moment.unix(pipeline.created_at).format('ddd D MMM, hh:mm A')}</p>
+					<p>{moment.unix(pipeline.created_at).format('ddd D MMM, hh:mm A')}</p>
 				</div>
 			);
+			stats.difftime = `Created ${moment.unix(pipeline.created_at).stdFromNow()}`;
+			return stats;
 		}
-		return null;
+		return stats;
 	};
 	return (
 		<Card
 			hoverable
 			className={card}
 			style={{
-				background: dragSnapshot.isDragging ? '#e6f7ff' : 'white',
+				background: 'white',
 			}}
 		>
 			<Row style={{ position: 'relative' }} gutter={8}>
@@ -283,108 +249,24 @@ const PipelineCard = (props) => {
 						togglePipeline={togglePipeline}
 					/>
 				</div>
-				<Col xs={2}>
-					<div style={{ display: 'flex' }}>
-						{showDrag && (
-							<Tooltip title="Drag to update the priority of pipelines. The pipelines are sorted and executed based on priority, with lowest values having the highest priority.">
-								<div {...dragProvided.dragHandleProps} className={dragIcon}>
-									<Icon type="drag" />
-								</div>
-							</Tooltip>
-						)}
 
-						<div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-							<div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-								{isEditPriority ? (
-									<InputNumber
-										style={{
-											width: 50,
-										}}
-										min={1}
-										value={pipeline.order}
-										onChange={(val) => {
-											setpriorityValue(val);
-										}}
-										onPressEnter={(e) => {
-											if (
-												parseInt(e.target.value, 10) !== pipeline.priority
-											) {
-												handleReordering(parseInt(e.target.value, 10));
-											}
-										}}
-									/>
-								) : (
-									<div>{pipeline.priority}</div>
-								)}
-								<Tooltip title="Click to edit the priority. The pipelines are sorted and executed based on priority, with lowest values having the highest priority.">
-									{isEditPriority ? (
-										// eslint-disable-next-line
-										<Icon
-											type="check-circle"
-											theme="twoTone"
-											onClick={() => {
-												if (
-													parseInt(priorityValue, 10) !==
-													pipeline.priority
-												) {
-													handleReordering(priorityValue);
-												}
-												setIsEditPriority(false);
-											}}
-										/>
-									) : (
-										// eslint-disable-next-line
-										<Icon
-											type="edit"
-											theme="twoTone"
-											onClick={() => {
-												setIsEditPriority(true);
-											}}
-										/>
-									)}
-								</Tooltip>
-							</div>
-						</div>
-					</div>
-				</Col>
 				<Col xl={8} lg={8} md={12} sm={24}>
 					<h4 className={title}>
 						<Tooltip title={pipeline.id}>{pipeline.id}</Tooltip>
-						{pipelinesRoutePaths?.length > 0 && (
-							<Tag className="routes-popover-tag" color="blue">
-								<Popover
-									content={
-										<div css={popoverContent}>
-											<h3>All Routes</h3>
-											{pipelinesRoutePaths.map((route) => (
-												<span>
-													<code key={route}>{route}</code>
-													<br />
-												</span>
-											))}
-										</div>
-									}
-									trigger="click"
-								>
-									<div
-										css={{
-											cursor: 'pointer',
-											margin: '0 7px',
-											maxWidth: '95%',
-											...overflow,
-										}}
-									>
-										{` {...} `}
-									</div>
-								</Popover>
-							</Tag>
-						)}
 					</h4>
 
 					<p className={description}>{pipeline.description}</p>
 				</Col>
-				<Col lg={7} md={12} sm={24} className="date-column">
-					{getCreatedUpdatedStats()}
+				<Col lg={9} md={14} sm={24} className="date-column">
+					<div css={popoverContent}>
+						{pipelinesRoutePaths.map(({ path, method }) => (
+							<span>
+								<b>{method} &nbsp;</b>
+								<code key={path}>{path}</code>
+								<br />
+							</span>
+						))}
+					</div>
 				</Col>
 				<Col xl={7} lg={7} xs={0}>
 					<div className={actions}>
@@ -451,6 +333,9 @@ const PipelineCard = (props) => {
 				alignItems="center"
 				style={{ width: '100%', marginTop: '24px' }}
 			>
+				<Tooltip title={getCreatedUpdatedStats().title}>
+					{getCreatedUpdatedStats().difftime}
+				</Tooltip>
 				<Alert
 					className="usage-alert"
 					type="info"
@@ -498,24 +383,17 @@ const PipelineCard = (props) => {
 PipelineCard.defaultProps = {
 	pipeline: {},
 	pipelineScripts: {},
-	dragProvided: {},
-	dragSnapshot: {},
 	showEdit: true,
 	showExport: false,
-	showDrag: true,
 	history: {},
 };
 
 PipelineCard.propTypes = {
 	pipeline: PropTypes.object,
-	dragProvided: PropTypes.object,
-	dragSnapshot: PropTypes.object,
 	removePipeline: PropTypes.func.isRequired,
 	togglePipeline: PropTypes.func.isRequired,
-	reorderPipeline: PropTypes.func.isRequired,
 	showEdit: PropTypes.bool,
 	showExport: PropTypes.bool,
-	showDrag: PropTypes.bool,
 	history: PropTypes.object,
 	pipelineScripts: PropTypes.object,
 	usageStats: PropTypes.object.isRequired,

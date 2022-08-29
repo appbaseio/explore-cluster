@@ -82,6 +82,7 @@ class WhiteList extends React.Component {
 		const {
 			label,
 			inputProps,
+			labelClassName,
 			defaultSuggestionValue,
 			defaultValue,
 			handleWarningMessage,
@@ -93,7 +94,7 @@ class WhiteList extends React.Component {
 		const { onChange } = handler();
 		return (
 			<Grid
-				label={<span css={styles.subHeader}>{label}</span>}
+				label={<span css={labelClassName}>{label}</span>}
 				toolTipMessage={toolTipMessage}
 				component={
 					<Flex css="width: 100%;position: relative" flexDirection="column">
@@ -239,6 +240,7 @@ WhiteList.propTypes = {
 	defaultSuggestionValue: PropTypes.string,
 	control: PropTypes.object.isRequired,
 	type: PropTypes.oneOf(['dropdown']),
+	labelClassName: PropTypes.string,
 };
 
 WhiteList.defaultProps = {
@@ -247,6 +249,7 @@ WhiteList.defaultProps = {
 	inputProps: {},
 	type: undefined,
 	defaultSuggestionValue: undefined,
+	labelClassName: '',
 };
 
 export default WhiteList;

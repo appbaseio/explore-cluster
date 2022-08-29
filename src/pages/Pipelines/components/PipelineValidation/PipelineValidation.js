@@ -190,11 +190,12 @@ const PipelineValidation = ({
 
 	useEffect(() => {
 		if (validationResponse !== responseTabValue) {
-			const { request, response } = JSON.parse(responseTabValue);
+			const { request, response, error } = JSON.parse(responseTabValue);
 			const filteredResponseTabValue = JSON.stringify(
 				{
 					request,
 					response,
+					error,
 				},
 				null,
 				4,
@@ -215,36 +216,38 @@ const PipelineValidation = ({
 
 					const stageChangesValue = [];
 
-					json.stageChanges.forEach((stageItem) => {
-						if (stageItem) {
-							const stage = { ...stageItem };
-							if (stage?.context?.request?.body) {
-								if (
-									typeof stage.context.request.body === 'string' &&
-									isJson(stage.context.request.body)
-								) {
-									stage.context.request.body = JSON.parse(
-										stage.context.request.body,
-									);
+					if (Array.isArray(json.stageChanges)) {
+						json.stageChanges.forEach((stageItem) => {
+							if (stageItem) {
+								const stage = { ...stageItem };
+								if (stage?.context?.request?.body) {
+									if (
+										typeof stage.context.request.body === 'string' &&
+										isJson(stage.context.request.body)
+									) {
+										stage.context.request.body = JSON.parse(
+											stage.context.request.body,
+										);
+									}
 								}
-							}
-							if (stage?.context?.response?.body) {
-								if (
-									typeof stage.context.response.body === 'string' &&
-									isJson(stage.context.response.body)
-								) {
-									stage.context.response.body = JSON.parse(
-										stage.context.response.body,
-									);
+								if (stage?.context?.response?.body) {
+									if (
+										typeof stage.context.response.body === 'string' &&
+										isJson(stage.context.response.body)
+									) {
+										stage.context.response.body = JSON.parse(
+											stage.context.response.body,
+										);
+									}
 								}
+								stageChangesValue.push(stage);
 							}
-							stageChangesValue.push(stage);
-						}
-					});
+						});
+					}
 
 					finalStageChangesData.request = requestVal;
-					finalStageChangesData.headers = json.request.headers;
-					finalStageChangesData.url = json.envs.path;
+					finalStageChangesData.headers = json?.request?.headers;
+					finalStageChangesData.url = json?.envs?.path;
 					finalStageChangesData.stageChanges = stageChangesValue;
 					return { ...finalStageChangesData };
 				};

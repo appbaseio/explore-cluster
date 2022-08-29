@@ -585,7 +585,7 @@ const PipelinesForm = (props) => {
 				notification.error({
 					message: `Failed to validate pipeline  ${`${e.code}   ${e.message}`}`,
 				});
-				setPipelineValidationRes(e);
+				setPipelineValidationRes({ error: e });
 			});
 	};
 
