@@ -16,7 +16,8 @@ import {
 
 const bannerDetails = {
 	title: 'Node Sync Preferences',
-	description: 'Manage node sync preferences for appbase.io when using it in a multi-node setup',
+	description:
+		'Manage node sync preferences for reactivesearch.io when using it in a multi-node setup',
 	buttonText: 'Read Docs',
 	icon: 'info-circle',
 	href: 'https://docs.appbase.io/docs/security/node-sync-preferences/',
@@ -108,8 +109,8 @@ class SyncPreferences extends React.Component {
 							<div>
 								{' '}
 								{/* eslint-disable-next-line */}
-								You're running appbase.io in a single-node setup. Sync Preferences
-								are only applicable when running in a multi-node setup.
+								You're running reactivesearch.io in a single-node setup. Sync
+								Preferences are only applicable when running in a multi-node setup.
 							</div>
 						)}
 					</Card>

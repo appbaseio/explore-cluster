@@ -8,6 +8,7 @@ import keys from 'lodash/keys';
 import { bool, func, object, string } from 'prop-types';
 import { ALLOWED_ACTIONS } from '../../constants';
 import Loader from '../../components/Loader';
+// eslint-disable-next-line
 import AppHeader from '../../components/AppHeader';
 import Logo from '../../components/Logo';
 import { breakpoints } from '../../utils/media';
@@ -33,6 +34,7 @@ const HomePage = Loadable({
 
 const ClusterLayout = Loadable({
 	loader: () =>
+		// eslint-disable-next-line
 		import(/* webpackChunkName: "ClusterLayout" */ '../../components/AppLayout/ClusterLayout'),
 	loading: Loader,
 });

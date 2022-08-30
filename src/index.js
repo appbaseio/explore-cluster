@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { injectGlobal } from 'emotion';
 import { Layout } from 'antd';
 import { PersistGate } from 'redux-persist/integration/react';
-
+import AnnouncementBanner from './AnnouncementBanner';
 import * as Sentry from '@sentry/browser';
 import configureStore from './store';
 import Dashboard from './Dashboard';
@@ -17,17 +17,19 @@ injectGlobal`
 * {
 
 	&:not(.monaco-editor), &:not(.view-line*span) {
-  		font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Noto Sans', 'Ubuntu', 'Droid Sans', 'Helvetica Neue', sans-serif;
+		font-family: 'Inter', sans-serif;
 	}
 	box-sizing: border-box;
 
 }
 body {
 	background-color: #fafafa !important;
+	font-family: 'Inter', sans-serif;
+	height: 100%;
 }
 h1, h2 {
 	margin: 0 0 8px;
-	font-weight: 700 !important;
+	font-weight: 500 !important;
 	line-height: 2.5rem;
 
 	${mediaKey.medium} {
@@ -47,18 +49,37 @@ p {
 }
 `;
 
-const { Content } = Layout;
+const { Header, Content } = Layout;
 const { store, persistor } = configureStore();
+export const bannerContext = React.createContext('');
 
-const App = () => (
-	<Content>
-		<PersistGate loading={null} persistor={persistor}>
-			<Provider store={store}>
-				<Dashboard />
-			</Provider>
-		</PersistGate>
-	</Content>
-);
+const App = () => {
+	const [showBanner, setShowBanner] = useState(localStorage.getItem('announcementBanner') === 'true');
+	if(localStorage.getItem('announcementBanner') === null) {
+        localStorage.setItem('announcementBanner', 'true');
+        setShowBanner(true);
+    }
+
+	return (
+		<div>
+			<Header style={{ height: 35, display: showBanner ? 'block' : 'none' }}>
+				<AnnouncementBanner showBanner={showBanner}  setShowBanner={setShowBanner}/>
+			</Header>
+			<Content>
+			<PersistGate loading={null} persistor={persistor} >
+				<Provider store={store}>
+					<>
+
+						<bannerContext.Provider value={showBanner}>
+							<Dashboard />
+						</bannerContext.Provider>
+					</>
+				</Provider>
+			</PersistGate>
+		</Content>
+		</div>
+	);
+}
 
 // expose store when run in Cypress
 if (window.Cypress) {

@@ -134,7 +134,7 @@ class ImporterPage extends React.Component {
 								<Col lg={18}>
 									<p>
 										Bring data from JSON/CSV/Elasticsearch/SQL sources into
-										appbase.io via GUI.
+										reactivesearch.io via GUI.
 										<br />
 										<br />
 										Want to use other sources like MongoDB or 3rd party APIs?

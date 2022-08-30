@@ -167,9 +167,9 @@ const ExportToShopify = ({ control, preferences, isRecommendation, widgetId }) =
 	return (
 		<React.Fragment>
 			<h2>Installation</h2>
-			In order to add the appbase.io e-commerce plugin to your shopify store you can embed the
-			following code in your required template file. This file can be different depending on
-			your current theme. For example, it could be{' '}
+			In order to add the reactivesearch.io e-commerce plugin to your shopify store you can
+			embed the following code in your required template file. This file can be different
+			depending on your current theme. For example, it could be{' '}
 			<b>
 				<code>{isRecommendation ? 'product.liquid' : 'header.liquid'}</code>
 			</b>{' '}

@@ -58,41 +58,41 @@ export default class Search extends Component {
 
 	renderSearchApp = () => {
 		const { searchFields, selectedDataset, app } = this.props;
-		if(selectedDataset === 'movies') {
+		if (selectedDataset === 'movies') {
 			return (
 				<div>
 					{this.renderSearchInput(true)}
-					<MoviesSearchApp fields={searchFields} app={app}/>
-				</div>
-			)
-		} else if(selectedDataset === 'products') {
-			return (
-				<div>
-					{this.renderSearchInput(true)}
-					<EcommSearchApp fields={searchFields} app={app}/>
-				</div>
-			)
-		} else if(selectedDataset === 'geo') {
-			return (
-				<div>
-					{this.renderSearchInput(true)}
-					<GeoSearchApp fields={searchFields} app={app}/>
-				</div>
-			)
-		} else {
-			return (
-				<div>
-					{this.renderSearchInput(true)}
-					<SearchApp fields={searchFields} />
+					<MoviesSearchApp fields={searchFields} app={app} />
 				</div>
 			);
 		}
-
+		if (selectedDataset === 'products') {
+			return (
+				<div>
+					{this.renderSearchInput(true)}
+					<EcommSearchApp fields={searchFields} app={app} />
+				</div>
+			);
+		}
+		if (selectedDataset === 'geo') {
+			return (
+				<div>
+					{this.renderSearchInput(true)}
+					<GeoSearchApp fields={searchFields} app={app} />
+				</div>
+			);
+		}
+		return (
+			<div>
+				{this.renderSearchInput(true)}
+				<SearchApp fields={searchFields} />
+			</div>
+		);
 	};
 
 	handleOptions = () => {
-		const {selectedDataset} = this.props;
-		if(selectedDataset === 'movies') {
+		const { selectedDataset } = this.props;
+		if (selectedDataset === 'movies') {
 			this.setState({
 				options: [
 					{
@@ -103,9 +103,9 @@ export default class Search extends Component {
 						value: 'overview',
 						label: 'overview',
 					},
-				]
-			})
-		} else if(selectedDataset === 'products') {
+				],
+			});
+		} else if (selectedDataset === 'products') {
 			this.setState({
 				options: [
 					{
@@ -119,20 +119,20 @@ export default class Search extends Component {
 					{
 						value: 'categories',
 						label: 'categories',
-					}
-				]
-			})
+					},
+				],
+			});
 		} else {
 			this.setState({
 				options: [
 					{
 						value: 'place',
 						label: 'place',
-					}
-				]
-			})
+					},
+				],
+			});
 		}
-	}
+	};
 
 	renderSearchInput = (horizontal) => {
 		const { error, selectedOption, options } = this.state;
@@ -187,8 +187,8 @@ export default class Search extends Component {
 						<header>
 							<h2>Set searchable fields</h2>
 							<p>
-								All fields in appbase.io are indexed to allow for a blazing fast
-								querying performance.
+								All fields in reactivesearch.io are indexed to allow for a blazing
+								fast querying performance.
 							</p>
 							<p>
 								However, all fields aren ’t created equal. When you set a field as{' '}
@@ -204,10 +204,7 @@ export default class Search extends Component {
 
 				{searchFields.length ? this.renderSearchApp() : null}
 
-				<Footer
-					nextScreen={nextScreen}
-					disabled={!searchFields.length}
-				/>
+				<Footer nextScreen={nextScreen} disabled={!searchFields.length} />
 			</div>
 		);
 	}
@@ -224,5 +221,5 @@ Search.propTypes = {
 Search.defaultProps = {
 	nextScreen: null,
 	searchFields: [],
-	selectedDataset: 'movies'
+	selectedDataset: 'movies',
 };

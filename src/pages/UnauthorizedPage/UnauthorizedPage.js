@@ -12,7 +12,7 @@ const UnauthorizedPage = ({ view }) => {
 				<div style={{ display: 'flex', justifyContent: 'center' }}>
 					<div style={{ width: '60%' }}>
 						You don&apos;t have access to the {view} view. You can contact the
-						appbase.io admin to grant you access to view this. Read the{' '}
+						reactivesearch.io admin to grant you access to view this. Read the{' '}
 						<a
 							href="https://docs.appbase.io/docs/security/user-management/"
 							target="_blank"

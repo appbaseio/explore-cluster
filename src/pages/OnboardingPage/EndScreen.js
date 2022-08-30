@@ -72,7 +72,8 @@ function EndScreen({ sandboxURL }) {
 									/>
 									<h3>Learn how to build a web app</h3>
 									<p>
-										appbase.io UI components for building data-driven web apps.
+										reactivesearch.io UI components for building data-driven web
+										apps.
 									</p>
 									<a
 										target="_blank"
@@ -123,7 +124,7 @@ function EndScreen({ sandboxURL }) {
 								src="/static/images/onboarding/finish-screen/ReactiveNative.svg"
 								alt="Reactive search"
 							/>
-							<p>appbase.io UI components for building mobile apps.</p>
+							<p>reactivesearch.io UI components for building mobile apps.</p>
 							<a
 								className="button"
 								target="_blank"
@@ -139,7 +140,10 @@ function EndScreen({ sandboxURL }) {
 								src="/static/images/onboarding/finish-screen/ReactiveMaps.svg"
 								alt="Reactive maps"
 							/>
-							<p>appbase.io UI components for building realtime geolocation apps.</p>
+							<p>
+								reactivesearch.io UI components for building realtime geolocation
+								apps.
+							</p>
 							<a
 								className="button"
 								target="_blank"

@@ -77,7 +77,7 @@ class Unsubscribe extends Component {
 						<p>
 							We{"'"}re sorry to see you go. Are you sure you want to unsubscribe from
 							the current plan? Canceling the subscription would make the dashboard
-							GUI and appbase.io endpoints inaccessible within 24 hours.
+							GUI and reactivesearch.io endpoints inaccessible within 24 hours.
 							<br />
 							<br />
 							<p>You{"'"}ll be asked for a one question feedback survey.</p>
@@ -85,8 +85,8 @@ class Unsubscribe extends Component {
 					)}
 					{typeFormStep === TYPE_FORM.SUBMITTED && (
 						<p>
-							Thanks for giving us feedback. We{"'"}ll keep in mind to make appbase.io
-							better.
+							Thanks for giving us feedback. We{"'"}ll keep in mind to make
+							reactivesearch.io better.
 						</p>
 					)}
 				</>

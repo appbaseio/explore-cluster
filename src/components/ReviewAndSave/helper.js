@@ -230,12 +230,12 @@ const settingsMap = {
 	enableNgram: {
 		title: 'Enable N-gram (infix) search',
 		description:
-			'appbase.io adds an n-gram tokenizer to enable partial infix matching of search terms, but this comes with a substantial storage increase. By disabling n-gram search, you can save significant storage space.',
+			'reactivesearch.io adds an n-gram tokenizer to enable partial infix matching of search terms, but this comes with a substantial storage increase. By disabling n-gram search, you can save significant storage space.',
 	},
 	enableAutoSuggestion: {
 		title: 'Enable Autosuggestion (prefix) search',
 		description:
-			'appbase.io adds an edge n-grams tokenizer to enable prefix matching of search terms, but this comes with a substantial storage increase. By disabling autosuggestions search, you can save significant storage space.',
+			'reactivesearch.io adds an edge n-grams tokenizer to enable prefix matching of search terms, but this comes with a substantial storage increase. By disabling autosuggestions search, you can save significant storage space.',
 	},
 	ngramSettings: {
 		title: 'N-gram settings',

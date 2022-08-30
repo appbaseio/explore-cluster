@@ -4,13 +4,37 @@ import { number, string } from 'prop-types';
 const Logo = ({ type, width }) => {
 	switch (type) {
 		case 'white':
-			return <img src="/static/images/appbase_white.svg" width={width} alt="appbase.io" />;
+			return (
+				<img
+					src="/static/images/reactivesearch_white.svg"
+					width={width}
+					alt="reactivesearch.io"
+				/>
+			);
 		case 'small':
-			return <img src="/static/images/appbase_small.svg" width={width} alt="appbase.io" />;
+			return (
+				<img
+					src="/static/images/reactivesearch_small.png"
+					width={width}
+					alt="reactivesearch.io"
+				/>
+			);
 		case 'black':
-			return <img src="/static/images/appbase_black.svg" width={width} alt="appbase.io" />;
+			return (
+				<img
+					src="/static/images/reactivesearch_black.svg"
+					width={width}
+					alt="reactivesearch.io"
+				/>
+			);
 		default:
-			return <img src="/static/images/appbase.svg" width={width} alt="appbase.io" />;
+			return (
+				<img
+					src="/static/images/reactivesearch_grey.svg"
+					width={width}
+					alt="reactivesearch.io"
+				/>
+			);
 	}
 };
 

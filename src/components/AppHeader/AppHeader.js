@@ -10,6 +10,8 @@ import UserMenu from './UserMenu';
 import { media } from '../../utils/media';
 import headerStyles from './styles';
 import AppSwitcher from '../AppSwitcher';
+// eslint-disable-next-line
+import { bannerContext } from '../..';
 
 const { Header } = Layout;
 const noBorder = css`
@@ -56,72 +58,80 @@ const AppHeader = ({
 	collapsed,
 	onToggle,
 }) => (
-	<Header
-		className={headerStyles}
-		css={{
-			width: big ? 'calc(100% - 80px)' : 'calc(100% - 260px)',
-			justifyContent: minimal ? 'flex-end !important' : 'space-between',
-			left: big ? '80px' : '260px',
-		}}
-	>
-		{minimal ? (
-			<Icon
-				style={{ position: 'absolute', left: 20 }}
-				className="trigger"
-				type={collapsed ? 'menu-unfold' : 'menu-fold'}
-				onClick={onToggle}
-			/>
-		) : (
-			<Menu mode="horizontal">
-				<Menu.Item key="back" className={noBorder} style={{ padding: 0 }}>
+	<bannerContext.Consumer>
+		{(val) => (
+			<Header
+				className={headerStyles(val)}
+				css={{
+					width: big ? 'calc(100% - 80px)' : 'calc(100% - 260px)',
+					justifyContent: minimal ? 'flex-end !important' : 'space-between',
+					left: big ? '80px' : '260px',
+				}}
+			>
+				{minimal ? (
 					<Icon
+						style={{ position: 'absolute', left: 20 }}
 						className="trigger"
 						type={collapsed ? 'menu-unfold' : 'menu-fold'}
 						onClick={onToggle}
 					/>
-				</Menu.Item>
-				<Menu.Item className={noBorder} style={{ marginBottom: 12 }} key="breadcrumb">
-					<Breadcrumb>
-						<Breadcrumb.Item>
-							<Link to="/">Cluster Overview</Link>
-						</Breadcrumb.Item>
-						{showApp && (
-							<Breadcrumb.Item>
-								<AppSwitcher
-									currentApp={currentApp || 'Loading...'}
-									history={history}
-									match={match}
-								/>
-							</Breadcrumb.Item>
-						)}
-					</Breadcrumb>
-				</Menu.Item>
-			</Menu>
-		)}
+				) : (
+					<Menu mode="horizontal">
+						<Menu.Item key="back" className={noBorder} style={{ padding: 0 }}>
+							<Icon
+								className="trigger"
+								type={collapsed ? 'menu-unfold' : 'menu-fold'}
+								onClick={onToggle}
+							/>
+						</Menu.Item>
+						<Menu.Item
+							className={noBorder}
+							style={{ marginBottom: 12 }}
+							key="breadcrumb"
+						>
+							<Breadcrumb>
+								<Breadcrumb.Item>
+									<Link to="/">Cluster Overview</Link>
+								</Breadcrumb.Item>
+								{showApp && (
+									<Breadcrumb.Item>
+										<AppSwitcher
+											currentApp={currentApp || 'Loading...'}
+											history={history}
+											match={match}
+										/>
+									</Breadcrumb.Item>
+								)}
+							</Breadcrumb>
+						</Menu.Item>
+					</Menu>
+				)}
 
-		{isUsingTrial && showProfile() && (
-			<div style={{ marginRight: 20 }}>
-				<Tooltip title="You are currently on a trial which unlocks all the appbase.io enterprise plan features. You can upgrade to a paid plan anytime till the trial expires. Once your trial expires, you won't be able to access appbase.io.">
-					<Button css={trialBtn} type="danger" href="/cluster/billing">
-						<span css={trialText}>
-							{daysLeft > 0
-								? `Trial expires in ${daysLeft} ${
-										daysLeft > 1 ? 'days' : 'day'
-								  }. Upgrade now`
-								: 'Trial has expired. Upgrade Now'}
-						</span>
-					</Button>
-				</Tooltip>
-			</div>
-		)}
+				{isUsingTrial && showProfile() && (
+					<div style={{ marginRight: 20 }}>
+						<Tooltip title="You are currently on a trial which unlocks all the reactivesearch.io enterprise plan features. You can upgrade to a paid plan anytime till the trial expires. Once your trial expires, you won't be able to access reactivesearch.io.">
+							<Button css={trialBtn} type="danger" href="/cluster/billing">
+								<span css={trialText}>
+									{daysLeft > 0
+										? `Trial expires in ${daysLeft} ${
+												daysLeft > 1 ? 'days' : 'day'
+										  }. Upgrade now`
+										: 'Trial has expired. Upgrade Now'}
+								</span>
+							</Button>
+						</Tooltip>
+					</div>
+				)}
 
-		{showProfile() && (
-			<Row justify="space-between" align="middle">
-				<UserMenu user={user} />
-			</Row>
+				{showProfile() && (
+					<Row justify="space-between" align="middle">
+						<UserMenu user={user} />
+					</Row>
+				)}
+				<MenuSlider />
+			</Header>
 		)}
-		<MenuSlider />
-	</Header>
+	</bannerContext.Consumer>
 );
 
 AppHeader.propTypes = {

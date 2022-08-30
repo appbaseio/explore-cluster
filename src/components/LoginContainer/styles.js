@@ -6,31 +6,38 @@ const main = css`
 	text-rendering: optimizeLegibility;
 	-moz-osx-font-smoothing: grayscale;
 	-moz-font-feature-settings: 'liga' on;
-	margin: 0 auto;
-	max-width: 992px;
+
 	> div {
 		width: 100%;
-		padding: 40px 0px 15px;
+	}
+	.left-container {
+		background: linear-gradient(207.14deg, #20182d -19.78%, #502c7d 84.11%);
+		padding: 80px;
+		color: #fff;
+		height: 100vh;
 	}
 	.content {
-		margin-right: 100px;
 		mark {
 			background-color: dodgerblue;
 			color: #fff;
 		}
 		.highlight {
-			color: yellow;
+			color: #ff2a6f;
 		}
 		.title {
-			line-height: 1.9em;
+			color: #fff;
+			line-height: 1.5em;
 			font-weight: 600;
-			font-size: 28px;
+			font-size: 40px;
 			margin-top: 28px;
-			margin-bottom: 14px;
-			max-width: 380px;
+			margin-bottom: 20px;
 			word-spacing: 0.03rem;
+			${mediaKey.xlarge} {
+				line-height: 1.2em;
+			}
 		}
 		.signup_description {
+			margin-top: 40px;
 			h4 {
 				margin-top: 14px;
 				margin-bottom: 14px;
@@ -47,8 +54,8 @@ const main = css`
 				display: flex;
 				flex-direction: column;
 				.icon {
-					background-color: lightblue;
-					color: dodgerblue;
+					background-color: #ff2a6f;
+					color: #fff;
 					display: flex;
 					justify-content: center;
 					align-items: center;
@@ -74,7 +81,7 @@ const main = css`
 	}
 	${mediaKey.large} {
 		padding: 0;
-
+		height: 100%;
 		.content {
 			display: none;
 		}
@@ -98,7 +105,6 @@ const main = css`
 const footer = css`
 	width: 100%;
 	max-width: 700px;
-	margin: 0px auto 30px;
 	text-align: center;
 
 	h2 {
@@ -110,7 +116,7 @@ const footer = css`
 	}
 
 	img {
-		max-width: 110px;
+		max-width: 70px;
 	}
 
 	${mediaKey.large} {

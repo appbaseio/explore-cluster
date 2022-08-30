@@ -8,12 +8,12 @@ const styles = css`
 	flex-wrap: wrap;
 	justify-content: center;
 	align-items: center;
-	margin-top: 20px;
+
 	img {
-		max-width: 30%;
-		margin: 10px;
+		max-width: 20%;
+		margin: 20px;
 		${media.medium(css`
-			max-width: 30%;
+			max-width: 20%;
 			margin: 30px 5px;
 		`)};
 	}
@@ -35,21 +35,20 @@ const AppbaseUsers = ({ className, style, title, imageStyle }) => (
 	<React.Fragment>
 		{title && <h2 css={headingCls}>{title}</h2>}
 		<div className={cx(styles, className)} style={style}>
-			<img src="/static/images/testimonials/aerial.png" style={imageStyle} alt="Aerial" />
-			<img src="/static/images/testimonials/kwiat.png" style={imageStyle} alt="Kwiat" />
-			<img src="/static/images/testimonials/inquisit.png" style={imageStyle} alt="Inquisit" />
-			<img src="/static/images/testimonials/lyearn.png" style={imageStyle} alt="Lyearn" />
 			<img
-				src="/static/images/testimonials/shopelect.png"
-				style={imageStyle}
-				alt="Shopelect"
+				src="/static/images/testimonials/accenture.png"
+				alt="Accenture"
 			/>
-			<img src="/static/images/testimonials/rumbleon.png" style={imageStyle} alt="Rumbleon" />
 			<img
-				src="/static/images/testimonials/munivisor.png"
-				style={imageStyle}
-				alt="Munivisor"
+				src="/static/images/testimonials/changeup.png"
+				alt="Changeup"
 			/>
+			<img src="/static/images/testimonials/decibio.png" alt="Decibio" />
+			<img
+				src="/static/images/testimonials/hirecloud.png"
+				alt="HireCloud"
+			/>
+			<img src="/static/images/testimonials/rivalry.png" alt="Rivalry" />
 		</div>
 	</React.Fragment>
 );

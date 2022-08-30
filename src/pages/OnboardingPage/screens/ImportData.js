@@ -147,7 +147,7 @@ export default class Introduction extends Component {
 							<h2>Import data into your app</h2>
 						</header>
 						<div>
-							<h3>There are three ways to bring your data into appbase.io:</h3>
+							<h3>There are three ways to bring your data into reactivesearch.io:</h3>
 
 							<div className="feature-list">
 								<div>

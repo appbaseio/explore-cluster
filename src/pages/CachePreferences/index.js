@@ -20,8 +20,8 @@ const main = css`
 `;
 
 const bannerDetails = {
-	title: 'Build ⚡️ fast search for your end users with appbase.io cache',
-	description: "Tailor appbase.io's caching preferences based on your search use-case",
+	title: 'Build ⚡️ fast search for your end users with reactivesearch.io cache',
+	description: "Tailor reactivesearch.io's caching preferences based on your search use-case",
 	buttonText: 'Read Docs',
 	icon: 'info-circle',
 	href: 'https://docs.appbase.io/docs/speed/cache-management/',
