@@ -20,7 +20,7 @@ const noData = css`
 
 function AppDataWrapper({ apps, onCreateModalChange, isFetching }) {
 	const renderData = (data, showListView) => {
-		if (isFetching) return <Loader style={{ marginTop: 40 }} />;
+		if (isFetching) return <Loader />;
 		if (showListView) return <AppTable onCreateModalChange={onCreateModalChange} apps={data} />;
 		if (data.length === 0) {
 			return (

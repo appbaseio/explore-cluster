@@ -416,7 +416,7 @@ class Billing extends Component {
 										target="_blank"
 										rel="noopener noreferrer"
 									>
-										Appbase.io{' '}
+										Reactivesearch.io{' '}
 									</a>
 									consider upgrading to paid version to access all the features.
 								</p>

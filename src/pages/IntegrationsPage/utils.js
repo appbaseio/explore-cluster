@@ -481,7 +481,7 @@ export const messages = {
 		</span>
 	),
 	dataFieldSimilarProduct:
-		'Select a field to display the similar products. For example, if you select `brand` and user is viewing the `Adidas Black Shoe` product that has `brand` value as `adidas` then appbase.io will show the products having `adidas` brand as recommendations.',
+		'Select a field to display the similar products. For example, if you select `brand` and user is viewing the `Adidas Black Shoe` product that has `brand` value as `adidas` then reactivesearch.io will show the products having `adidas` brand as recommendations.',
 	dataFieldMostRecent: 'Select the timestamp field to sort the products.',
 	featuredProducts: 'Select the products to be featured.',
 };

@@ -249,7 +249,7 @@ class UserManagementPage extends React.Component {
 					{compareVersion(version, '7.52.0') === -1 && (
 						<Alert
 							type="warning"
-							message="Upgrade appbase.io to v7.52.0 or above for using the new user management features"
+							message="Upgrade reactivesearch.io to v7.52.0 or above for using the new user management features"
 							showIcon
 							style={{ marginBottom: 10 }}
 						/>

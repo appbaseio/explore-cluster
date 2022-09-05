@@ -115,7 +115,7 @@ class ClusterInsights extends React.Component {
 			<React.Fragment>
 				<Banner
 					title="Curated Insights"
-					description="Curated Insights are weekly search insights delievered by the appbase.io team."
+					description="Curated Insights are weekly search insights delievered by the reactivesearch.io team."
 					href="https://docs.appbase.io/docs/analytics/curated-insights/"
 					showButton={false}
 					renderButtons={() => (

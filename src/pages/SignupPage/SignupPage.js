@@ -3,12 +3,12 @@ import { connect } from 'react-redux';
 import { Card, Button, Icon, Checkbox } from 'antd';
 import { Redirect, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-
 import Logo from '../../components/Logo';
 import { getURL } from '../../constants/config';
-
 import { container, card, githubBtn, googleBtn, gitlabBtn } from '../LoginPage/styles';
 import { checkbox } from './styles';
+
+const backgroundUrlImage = require('../../../static/images/Herobg.png');
 
 const getSignupURL = (provider) => {
 	const ACC_API = getURL();
@@ -41,8 +41,16 @@ class SignupPage extends React.Component {
 			return <Redirect to="/" />;
 		}
 		return (
-			<section className={container}>
-				<Logo width={200} />
+			<section
+				className={container}
+				style={{
+					backgroundImage: `url(${backgroundUrlImage})`,
+					height: '100vh',
+					justifyContent: 'center',
+					alignItems: 'center',
+				}}
+			>
+				<Logo width={250} />
 
 				<Card className={card} bordered={false}>
 					<h2>Sign up to get started</h2>

@@ -5,6 +5,7 @@ import { Redirect, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import get from 'lodash/get';
 import { loadUser } from '../../actions';
+import Logo from '../../components/Logo';
 import LoginContainer from '../../components/LoginContainer';
 import { container, card, gitlabBtn } from './styles';
 import {
@@ -92,8 +93,9 @@ class LoginPage extends Component {
 		}
 		return (
 			<LoginContainer>
-				<section className={container}>
-					<Card style={{ marginTop: 70 }} className={card} bordered={false}>
+				<section className={container} style={{ alignItems: 'center' }}>
+					<Logo width={250} />
+					<Card className={card} bordered={false}>
 						<h2>Sign in to get started</h2>
 						<Input
 							ref={this.url}
@@ -129,6 +131,7 @@ class LoginPage extends Component {
 							size="small"
 							block
 							data-cy="signin-button"
+							style={{ height: 40 }}
 						>
 							Signin
 							<Icon type="arrow-right" />
@@ -138,16 +141,10 @@ class LoginPage extends Component {
 						<Button
 							size="large"
 							ghost
-							style={{
-								border: 0,
-								boxShadow: 'none',
-								color: '#424242',
-								margin: '20px 0',
-								fontSize: 18,
-								letterSpacing: '0.02rem',
-							}}
+							className="link-container"
+							style={{ whiteSpace: 'inherit' }}
 						>
-							Install a new appbase.io instance
+							Install a new reactivesearch.io instance
 							<Icon type="arrow-right" />
 						</Button>
 					</Link>

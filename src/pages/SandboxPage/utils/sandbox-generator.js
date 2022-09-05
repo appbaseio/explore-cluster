@@ -932,7 +932,7 @@ const generateSandboxURL = ({ settings, app, credentials, url }) => {
 			content: {
 				name: 'ReactiveSearch Starter App',
 				description:
-					'Reactivesearch starter app generated from Search preview in appbase.io dashboard',
+					'Reactivesearch starter app generated from Search preview in reactivesearch.io dashboard',
 				version: '0.0.1',
 				keywords: ['react', 'reactivesearch'],
 				main: 'src/index.js',
@@ -1003,7 +1003,7 @@ export const generateTutorialSandboxURL = ({
 			content: {
 				name: 'ReactiveSearch Starter App',
 				description:
-					'Reactivesearch starter app generated from Search preview in appbase.io dashboard',
+					'Reactivesearch starter app generated from Search preview in reactivesearch.io dashboard',
 				version: '0.0.1',
 				keywords: ['react', 'reactivesearch'],
 				main: 'src/index.js',

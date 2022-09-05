@@ -190,8 +190,8 @@ function selectDataset({ nextScreen, setURL, url: newUrl, handleDataset }) {
 						<header>
 							<h2>Choose a sample dataset to import from</h2>
 							<p>
-								We will be using the appbase.io dashboard to import this dataset
-								from.
+								We will be using the reactivesearch.io dashboard to import this
+								dataset from.
 							</p>
 						</header>
 						<div>

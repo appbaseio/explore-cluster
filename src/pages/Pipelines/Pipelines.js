@@ -63,7 +63,7 @@ const Pipelines = (props) => {
 				>
 					<Alert
 						type="warning"
-						message="Upgrade appbase.io to v8.0.0 or above for using the ReactiveSearch pipelines feature"
+						message="Upgrade reactivesearch.io to v8.0.0 or above for using the ReactiveSearch pipelines feature"
 						showIcon
 						style={{ marginBottom: 10, height: 'max-content' }}
 					/>

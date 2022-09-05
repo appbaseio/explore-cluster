@@ -1,6 +1,6 @@
 import { css } from 'react-emotion';
 
-const header = css`
+const header = (val) => css`
 	display: flex;
 	flex-direction: row;
 	align-items: center;
@@ -12,7 +12,7 @@ const header = css`
 	box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.15);
 	z-index: 999;
 	position: fixed;
-	top: 0px;
+	top: ${val ? '40px' : '0px'};
 	transition: width 0.3s ease;
 
 	ul {

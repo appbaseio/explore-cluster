@@ -131,7 +131,7 @@ module.exports = {
 							javascriptEnabled: true,
 							modifyVars: {
 								'@font-family':
-									"'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Noto Sans', 'Ubuntu', 'Droid Sans', 'Helvetica Neue', sans-serif",
+									"'Inter', sans-serif",
 							},
 						},
 					},

@@ -87,7 +87,7 @@ const General = ({ apps, isRecommendation }) => {
 											content={
 												<div>
 													API credentials allow secure UI access to the
-													appbase.io cluster. Check docs at{' '}
+													reactivesearch.io cluster. Check docs at{' '}
 													<a
 														target="blank"
 														href="https://docs.appbase.io/docs/security/credentials/"

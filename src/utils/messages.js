@@ -10,7 +10,7 @@ const Message = (message, json = '') => {
 };
 
 export const hoverMessage = Message(
-	`All appbase.io paid plans offer setting ACLs, rate limits per IP and advanced security
+	`All reactivesearch.io paid plans offer setting ACLs, rate limits per IP and advanced security
 		permissions based on IP sources, HTTP Referers and restricting what fields are accessible.`,
 );
 // Messages for user management form
