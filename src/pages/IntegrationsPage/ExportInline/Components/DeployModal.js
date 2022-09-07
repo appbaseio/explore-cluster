@@ -120,14 +120,6 @@ const DeployModal = ({
 			width={600}
 		>
 			<div css={commitModalStyles}>
-				{/* <div className="label-container">Site Name</div> */}
-				{/* <Input
-					value={deployObj.projectSettings.alias}
-					allowClear
-					onChange={(e) => handleInputChange('alias', e.target.value)}
-					onBlur={(e) => validateURL(e.target.value)}
-				/> */}
-
 				<div className="label-container">Environment *</div>
 				<Select
 					style={{ width: '100%' }}
@@ -142,7 +134,12 @@ const DeployModal = ({
 				<div className="label-container">Version to deploy</div>
 				<Select
 					style={{ width: '100%' }}
-					value={deployObj.version_id}
+					value={
+						deployObj.version_id || allVersions.length
+							? // eslint-disable-next-line
+							  allVersions[0]?.version_id || undefined
+							: undefined
+					}
 					optionLabelProp="value"
 					onSelect={(val) => {
 						handleInputChange('version_id', val);

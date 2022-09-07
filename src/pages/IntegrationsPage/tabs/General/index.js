@@ -11,6 +11,7 @@ import TextInput from '../../../../components/Form/Input';
 const General = ({ apps, isRecommendation }) => {
 	const form = useContext(FormContext);
 	const filteredApps = keys(apps).filter((app) => !app.startsWith('.'));
+
 	return (
 		<FieldGroup control={form}>
 			{() => (
@@ -42,7 +43,7 @@ const General = ({ apps, isRecommendation }) => {
 											padding: 0,
 										}}
 										required
-										label="Pipeline"
+										label="Main Pipeline"
 									>
 										<Select
 											{...handler()}
@@ -62,6 +63,7 @@ const General = ({ apps, isRecommendation }) => {
 									</Form.Item>
 								)}
 							</FieldControl>
+
 							<TextInput
 								name="description"
 								label="Description"
@@ -129,11 +131,13 @@ const General = ({ apps, isRecommendation }) => {
 General.defaultProps = {
 	apps: {},
 	isRecommendation: false,
+	preferences: {},
 };
 
 General.propTypes = {
 	apps: object,
 	isRecommendation: bool,
+	preferences: object,
 };
 
 const mapStateToProps = (state) => ({

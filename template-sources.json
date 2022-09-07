@@ -22,7 +22,7 @@
         "repository": "reactivesearch-shopify-plugin",
         "version": "",
         "commit": "",
-        "branch": "v2-ecomm-template",
+        "branch": "ecomm-result-category-type",
         "manifest_path": "reactivesearch-manifest.json",
         "repositoryType": "public"
     },
@@ -43,5 +43,14 @@
         "branch": "v2-geo-template",
         "manifest_path": "reactivesearch-manifest.json",
         "repositoryType": "public"
+    },
+    {
+        "organization": "appbaseio-confidential",
+        "repository": "enterprise-demo-search-ui-template",
+        "version": "",
+        "commit": "",
+        "branch": "master",
+        "manifest_path": "reactivesearch-manifest.json",
+        "repositoryType": "private"
     }
 ]

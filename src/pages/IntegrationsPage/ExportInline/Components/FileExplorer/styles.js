@@ -53,6 +53,12 @@ const searchFilesContainer = css`
 	.ant-collapse-header {
 		padding: 5px 16px 0px 40px !important;
 	}
+	.padding {
+		padding: 10px;
+	}
+	.cursor {
+		cursor: pointer;
+	}
 `;
 
 export { hoverStyles, searchFilesContainer };

@@ -327,31 +327,141 @@ export const getChartConfigurationForm = (customFields) => {
 	});
 };
 // Add all the fields which have default values
-export const filterConfigurationFormDefaultFields = {
-	customize: {
-		filterType: 'list',
-		queryFormat: 'or',
-		sortBy: 'count',
-		componentType: componentTypes.multiList,
-		showCount: true,
-		showCheckbox: true,
-		showSearch: true,
-		showMissing: false,
-		multiSelect: false,
-	},
+export const filterConfigurationFormDefaultFields = (fields = {}, returnType = 'object') => {
+	const customFields = { ...fields };
+	const defaultFields = {
+		MULTILIST: {
+			title: undefined,
+			dataField: undefined,
+			filterLabel: undefined,
+			filterType: 'list',
+			size: undefined,
+			queryFormat: 'or',
+			sortBy: 'count',
+			componentType: componentTypes.multiList,
+			showCount: true,
+			showCheckbox: true,
+			showSearch: true,
+			showMissing: false,
+			missingLabel: undefined,
+			selectAllLabel: undefined,
+		},
+		SINGLELIST: {
+			title: undefined,
+			dataField: undefined,
+			filterLabel: undefined,
+			filterType: 'list',
+			size: undefined,
+			sortBy: 'count',
+			componentType: componentTypes.singleList,
+			showCount: true,
+			showSearch: true,
+			showMissing: false,
+			missingLabel: undefined,
+			selectAllLabel: undefined,
+		},
+		RANGEINPUT: {
+			title: undefined,
+			dataField: undefined,
+			filterLabel: undefined,
+			filterType: 'range',
+			startValue: undefined,
+			endValue: undefined,
+			startLabel: undefined,
+			endLabel: undefined,
+			showHistogram: false,
+			componentType: componentTypes.rangeInput,
+		},
+		DYNAMICRANGESLIDER: {
+			title: undefined,
+			dataField: undefined,
+			filterLabel: undefined,
+			filterType: 'range',
+			showHistogram: false,
+			componentType: componentTypes.dynamicRangeSlider,
+		},
+		TAGCLOUD: {
+			title: undefined,
+			dataField: undefined,
+			filterLabel: undefined,
+			filterType: 'list',
+			size: undefined,
+			queryFormat: 'or',
+			componentType: componentTypes.tagCloud,
+			showCount: true,
+			multiSelect: false,
+		},
+		TABDATALIST: {
+			title: undefined,
+			dataField: undefined,
+			filterLabel: undefined,
+			filterType: 'list',
+			componentType: componentTypes.tabDataList,
+			data: [],
+			showCount: true,
+			displayAsVertical: false,
+			showRadio: false,
+			showSearch: true,
+		},
+		customize: {
+			title: undefined,
+			dataField: undefined,
+			filterType: 'list',
+			// queryFormat: 'or',
+			// sortBy: 'count',
+			// componentType: componentTypes.multiList,
+			// showCount: true,
+			// showCheckbox: true,
+			// showRadio: false,
+			// displayAsVertical: false,
+			// showSearch: true,
+			// showMissing: false,
+			// multiSelect: false,
+			// data: FormBuilder.array(dataPropFromArray(customFields?.data)),
+		},
+	};
+
+	const defaultObj = defaultFields[customFields.componentType || componentTypes.multiList];
+	const validProps = Object.keys(defaultObj);
+	const newObj = { ...defaultObj };
+	Object.keys(customFields).forEach((key) => {
+		if (validProps.includes(key)) {
+			if (
+				customFields.componentType === 'TABDATALIST' &&
+				key === 'data' &&
+				returnType === 'controlObj'
+			) {
+				newObj[key] = FormBuilder.array(dataPropFromArray(customFields?.data));
+			}
+			newObj[key] = customFields[key];
+		}
+	});
+
+	return newObj;
 };
+
+export function dataPropFromArray(arr) {
+	if (Array.isArray(arr)) {
+		return arr.map((obj) => FormBuilder.group(obj));
+	}
+	return [];
+}
+
 export const getFilterConfigurationForm = (customFields = {}, isDynamicFilter = false) => {
+	const filtersConfig = filterConfigurationFormDefaultFields(customFields || {}, 'controlObj');
+	// ...customFields,
 	return FormBuilder.group({
 		enabled: true,
 		customize: FormBuilder.group({
+			...filtersConfig,
 			title: isDynamicFilter ? [undefined, Validators.required] : undefined,
 			dataField: isDynamicFilter ? [undefined, Validators.required] : undefined,
-			size: undefined,
-			filterLabel: undefined,
-			missingLabel: undefined,
-			selectAllLabel: undefined,
-			...filterConfigurationFormDefaultFields.customize,
-			...customFields,
+			componentType: componentTypes.multiList,
+			...(customFields && customFields.componentType === 'TABDATALIST'
+				? {
+						data: FormBuilder.array(dataPropFromArray(customFields?.data)),
+				  }
+				: {}),
 		}),
 	});
 };
@@ -568,6 +678,7 @@ export const defaultSearchPreferences = {
 	resultDescription: '',
 	resultPrice: '',
 	priceUnit: null,
+	cssSelector: '',
 	sortOptionSelector: [],
 	resultImage: '',
 	resultHandle: '',
@@ -585,6 +696,7 @@ export const defaultSearchPreferences = {
 	exportSettings: { exportAs: 'embed', credentials: '', openAsPage: false, type: 'other' },
 	showPagination: false,
 	showSelectedFilters: true,
+	displayFields: {},
 	customMessages: {
 		resultStats: '[count] products found in [time] ms',
 		noFilterItem: 'No items Found',
@@ -796,7 +908,36 @@ export const getRecommendationPreferencesPayload = (formValue) => {
 	);
 };
 
+const getPagesConfig = (formValue) => {
+	const pages = get(formValue, 'pageSettings.pages', {});
+	const currentPage = get(formValue, 'pageSettings.currentPage', {});
+	const newPages = {};
+	Object.keys(pages).forEach((page) => {
+		newPages[page] = {
+			...pages[page],
+		};
+		if (page === currentPage) {
+			newPages[page].indexSettings = get(formValue, 'indexSettings');
+		}
+	});
+
+	return newPages;
+};
+
 export const getSearchPreferencesPayload = (formValue) => {
+	const displayFieldsObj = {};
+	const displayFields = get(formValue, 'displayFields', {});
+	Object.keys(displayFields).forEach((key) => {
+		displayFieldsObj[key] = {
+			title: get(displayFields[key], 'resultTitle'),
+			description: get(displayFields[key], 'resultDescription'),
+			price: get(displayFields[key], 'resultPrice'),
+			priceUnit: get(displayFields[key], 'priceUnit'),
+			image: get(displayFields[key], 'resultImage'),
+			handle: get(displayFields[key], 'resultHandle'),
+			cssSelector: get(displayFields[key], 'cssSelector'),
+		};
+	});
 	return JSON.parse(
 		JSON.stringify({
 			name: get(formValue, 'name'),
@@ -805,7 +946,7 @@ export const getSearchPreferencesPayload = (formValue) => {
 			id: get(formValue, 'id'),
 			pageSettings: {
 				currentPage: get(formValue, 'currentPage'),
-				pages: get(formValue, 'pageSettings.pages'),
+				pages: getPagesConfig(formValue),
 				fields: get(formValue, 'pageSettings.fields'),
 			},
 			themeSettings: {
@@ -846,6 +987,7 @@ export const getSearchPreferencesPayload = (formValue) => {
 					priceUnit: get(formValue, 'priceUnit'),
 					image: get(formValue, 'resultImage'),
 					handle: get(formValue, 'resultHandle'),
+					cssSelector: get(formValue, 'cssSelector'),
 				},
 				customMessages: {
 					resultStats: get(formValue, 'customMessages.resultStats'),
@@ -872,6 +1014,11 @@ export const getSearchPreferencesPayload = (formValue) => {
 					showMarkerClusters: get(formValue, 'showMarkerClusters'),
 					mapsAPIkey: get(formValue, 'mapsAPIkey'),
 				}),
+				...(Object.keys(get(formValue, 'displayFields', {}) || {}).length && {
+					displayFields: displayFieldsObj,
+					categoryField: get(formValue, 'categoryField'),
+					categoryFieldValue: get(formValue, 'categoryFieldValue'),
+				}),
 			},
 			searchSettings: {
 				customMessages: {
@@ -890,6 +1037,7 @@ export const getSearchPreferencesPayload = (formValue) => {
 					priceUnit: get(formValue, 'priceUnit'),
 					image: get(formValue, 'resultImage'),
 					handle: get(formValue, 'resultHandle'),
+					cssSelector: get(formValue, 'cssSelector'),
 				},
 				rsConfig: {
 					autosuggest: get(formValue, 'autosuggest'),
@@ -940,7 +1088,9 @@ export const getSearchPreferencesPayload = (formValue) => {
 					: null,
 			authenticationSettings: {
 				...get(formValue, 'authenticationSettings'),
-				clientId: 'mZLIFUlQedQJlZO21LiUauZwSMhiteGd',
+			},
+			indexSettings: {
+				index: get(formValue, 'indexSettings.index'),
 			},
 		}),
 	);
@@ -1045,6 +1195,18 @@ export const rsConfigMapper = {
 		'queryFormat',
 		'type',
 	],
+	TABDATALIST: [
+		'dataField',
+		'title',
+		'componentId',
+		'componentType',
+		'queryFormat',
+		'showCount',
+		'showRadio',
+		'showSearch',
+		'displayAsVertical',
+		'data',
+	],
 };
 
 const transformRSConfig = (config) => {
@@ -1121,3 +1283,36 @@ export const transformCharts = (chartPrefs) => {
 	});
 	return transformRSConfig(componentProps);
 };
+
+export const perPageDependentKeys = [
+	'charts',
+	'dynamicFilters',
+	'resultTitle',
+	'resultDescription',
+	'resultPrice',
+	'priceUnit',
+	'resultImage',
+	'resultHandle',
+	'cssSelector',
+	'customMessages',
+	'showPagination',
+	'themeType',
+	'sortOptionSelector',
+	'resultHighlight',
+	'layout',
+	'viewSwitcher',
+	'mapLayout',
+	'locationDataField',
+	'mapComponent',
+	'defaultZoom',
+	'showSearchAsMove',
+	'showMarkerClusters',
+	'mapsAPIkey',
+	'displayFields',
+	'categoryField',
+	'categoryFieldValue',
+	'autosuggest',
+	'autoSuggestionSettings',
+	'showVoiceSearch',
+	'indexSettings',
+];

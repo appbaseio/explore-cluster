@@ -16,12 +16,11 @@ const PageRoutes = ({
 	// updateSearchPreferences,
 	setIsEditorLoading,
 }) => {
-	const [manifestObj, setManifestObj] = useState({});
-	const [isLoading, setIsLoading] = useState(true);
-
 	const preferences = getPreferencesPayload();
 	const themeType = get(preferences, 'themeSettings.type', '');
 	const templateObj = getTemplate(themeType);
+	const [manifestObj, setManifestObj] = useState(templateObj);
+	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
 		fetchLatestVersion();
@@ -100,6 +99,17 @@ const PageRoutes = ({
 			});
 	};
 
+	const getValue = (value) => {
+		const pages = Object.keys(manifestObj?.pages || {});
+		if (manifestObj.pages && pages.length) {
+			if (value && manifestObj.pages[value]) {
+				return `${value} (${manifestObj.pages[value]})`;
+			}
+			return `${pages[0]} (${manifestObj.pages[pages[0]]})`;
+		}
+		return undefined;
+	};
+
 	if (!templateObj || !templateObj.pages || !Object.keys(templateObj.pages).length) {
 		return null;
 	}
@@ -111,11 +121,7 @@ const PageRoutes = ({
 					<Select
 						placeholder="Select page"
 						style={{ width: 220 }}
-						value={
-							value && manifestObj.pages && manifestObj.pages[value]
-								? `${value} (${manifestObj.pages[value]})`
-								: undefined
-						}
+						value={getValue(value)}
 						loading={isLoading}
 						size="large"
 						optionLabelProp="value"

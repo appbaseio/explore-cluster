@@ -17,7 +17,6 @@ import PreviewModal from '../PreviewModal';
 import SyncStatus from '../SyncStatus';
 import PreferencesFormWrapper from '../PreferencesFormWrapperN';
 import SavePreferences from '../SavePreferencesN';
-import PageRoutes from '../PageRoutes';
 import { getSearchPreferencesN } from '../../../batteries/modules/actions';
 import { isValidPlan, features } from '../../../batteries/utils';
 import EndUserAuthentication from '../tabs/EndUserAuthentication';
@@ -95,7 +94,7 @@ const Main = ({ tier, featureEcommerce, getPreferencesN, ...props }) => {
 										}
 										key="1"
 									>
-										<General />
+										<General preferences={getPreferencesPayload()} />
 									</TabPane>
 									<TabPane
 										tab={
@@ -122,7 +121,11 @@ const Main = ({ tier, featureEcommerce, getPreferencesN, ...props }) => {
 										}
 										key="3"
 									>
-										<SearchTab getPreferencesPayload={getPreferencesPayload} />
+										<SearchTab
+											getPreferences={getPreferences}
+											getPreferencesPayload={getPreferencesPayload}
+											setIsEditorLoading={setIsEditorLoading}
+										/>
 									</TabPane>
 									<TabPane
 										tab={
@@ -158,21 +161,6 @@ const Main = ({ tier, featureEcommerce, getPreferencesN, ...props }) => {
 								>
 									<div className="flex space-between card-footer">
 										<div className="flex" style={{ gap: 10 }}>
-											<FieldGroup
-												control={form}
-												strict={false}
-												render={() => (
-													<PageRoutes
-														getPreferencesPayload={
-															getPreferencesPayload
-														}
-														preferences={getPreferences()}
-														form={form}
-														setIsEditorLoading={setIsEditorLoading}
-													/>
-												)}
-											/>
-
 											<PreviewModal
 												pipeline={pipeline}
 												preferences={getPreferences}

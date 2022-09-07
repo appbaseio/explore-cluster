@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Modal } from 'antd';
+import { Button, message, Modal } from 'antd';
 import styled from 'react-emotion';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { func, object, bool, string } from 'prop-types';
 import { diff } from 'jsondiffpatch';
 import isEqual from 'lodash/isEqual';
+import { isEqualWith } from 'lodash';
 import DiffList from './DiffList';
 import {
 	generateInlineSandboxURL,
@@ -17,7 +18,7 @@ import {
 	saveSearchPreferenceN,
 	saveRecommendationPreferenceN,
 } from '../../batteries/modules/actions';
-import { removeEmpty, transformPreferences } from './utils/index';
+import { transformPreferences, transformResultsDefaultFields, removeEmpty } from './utils/index';
 import { transformContent } from './ExportInline/Components/ModalHeader';
 
 const Badge = styled.span`
@@ -57,6 +58,7 @@ const ReviewAndSave = ({
 	setHasChanged,
 	isRecommendation,
 	preferenceId,
+	clientId,
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isResetting, setIsResetting] = useState(false);
@@ -104,7 +106,8 @@ const ReviewAndSave = ({
 	};
 
 	const handleCommitCode = async (commitMessage) => {
-		const newPreferences = transformPreferences(getPreferencesPayload());
+		const preferences = transformPreferences(getPreferencesPayload());
+		const newPreferences = transformResultsDefaultFields(preferences);
 		if (form.get('versionId').value) {
 			// fetch by versionID and update constants file with new preferences
 			getByVersionId(preferenceId, form.get('versionId').value)
@@ -124,19 +127,27 @@ const ReviewAndSave = ({
 						.then((res) => {
 							// update versionId in preferences with res.version_id
 							form.get('versionId').setValue(res.version_id);
+							// inject auth0 clientId in authentication settings
+							if (newPreferences.authenticationSettings && clientId) {
+								newPreferences.authenticationSettings.clientId = clientId;
+							}
 							// Save the new preferences
+
 							updateSearchPreferences(newPreferences).then((action) => {
 								if (!(action && action.error)) {
 									setHasChanged();
-									setIsLoading(false);
 								}
+								setIsLoading(false);
 							});
 						})
 						.catch((err) => {
+							setIsLoading(false);
 							console.error(err);
+							message.error('Failed to commit code.');
 						});
 				})
 				.catch((err) => {
+					setIsLoading(false);
 					console.error('Error to get latest version', err);
 					return {};
 				});
@@ -164,15 +175,21 @@ const ReviewAndSave = ({
 					// update versionId in preferences with res.version_id
 					form.get('versionId').setValue(res.version_id);
 					// Save the new preferences
+					// inject auth0 clientId in authentication settings
+					if (newPreferences.authenticationSettings && clientId) {
+						newPreferences.authenticationSettings.clientId = clientId;
+					}
 					updateSearchPreferences(newPreferences).then((action) => {
 						if (!(action && action.error)) {
 							setHasChanged();
-							setIsLoading(false);
 						}
+						setIsLoading(false);
 					});
 				})
 				.catch((err) => {
+					setIsLoading(false);
 					console.error(err);
+					message.error('Failed to commit code.');
 				});
 		}
 	};
@@ -193,408 +210,532 @@ const ReviewAndSave = ({
 		return flattened;
 	};
 
-	const getDiffData = (oldObj, newObj) => {
+	const getDiffData = (oldObj, newObj, isPageLevelDiff = false) => {
 		let diffData = diff(removeEmpty({ ...oldObj }), removeEmpty({ ...newObj }));
 		if (!diffData) {
 			return [0, {}];
 		}
-		if (get(diffData, 'name', null)) {
-			const newVal = get(newObj, 'name', '');
-			const oldVal = get(oldObj, 'name', '');
-			diffData = {
-				...diffData,
-				generalSettings: {
-					...diffData.generalSettings,
-					name: [oldVal, newVal],
-				},
-			};
-		}
-
-		if (get(diffData, 'pipeline', null)) {
-			const newVal = get(newObj, 'pipeline', '');
-			const oldVal = get(oldObj, 'pipeline', '');
-			diffData = {
-				...diffData,
-				generalSettings: {
-					...diffData.generalSettings,
-					pipeline: [oldVal, newVal],
-				},
-			};
-		}
-
-		if (get(diffData, 'description', null)) {
-			const newVal = get(newObj, 'description', '');
-			const oldVal = get(oldObj, 'description', '');
-			diffData = {
-				...diffData,
-				generalSettings: {
-					...diffData.generalSettings,
-					description: [oldVal, newVal],
-				},
-			};
-		}
-
-		if (get(diffData, 'exportSettings.type', null)) {
-			const newVal = get(newObj, 'exportSettings.type', '');
-			const oldVal = get(oldObj, 'exportSettings.type', '');
-			diffData = {
-				...diffData,
-				ecommercePlatform: {
-					...diffData.ecommercePlatform,
-					exportType: [oldVal, newVal],
-				},
-			};
-			delete diffData.exportSettings.type;
-		}
-
-		if (get(diffData, 'exportSettings.credentials', null)) {
-			const newVal = get(newObj, 'exportSettings.credentials', '');
-			const oldVal = get(oldObj, 'exportSettings.credentials', '');
-			diffData = {
-				...diffData,
-				generalSettings: {
-					...diffData.generalSettings,
-					credentials: [oldVal, newVal],
-				},
-			};
-			delete diffData.exportSettings.credentials;
-		}
-
-		if (get(diffData, 'syncSettings', null)) {
-			const newVal = get(newObj, 'syncSettings', '');
-			const oldVal = get(oldObj, 'syncSettings', '');
-			diffData = {
-				...diffData,
-				ecommercePlatform: {
-					...diffData.ecommercePlatform,
-					syncSettings: [oldVal, newVal],
-				},
-			};
-		}
-
-		if (get(diffData, 'globalSettings.currency', null)) {
-			const newVal = get(newObj, 'globalSettings.currency', '');
-			const oldVal = get(oldObj, 'globalSettings.currency', '');
-			diffData = {
-				...diffData,
-				ecommercePlatform: {
-					...diffData.ecommercePlatform,
-					storeInfo: [oldVal, newVal],
-				},
-			};
-		}
-
-		if (get(diffData, 'themeSettings.type', null)) {
-			const newVal = get(newObj, 'themeSettings.type', '');
-			const oldVal = get(oldObj, 'themeSettings.type', '');
-			diffData = {
-				...diffData,
-				layoutAndDesign: {
-					...diffData.layoutAndDesign,
-					searchLayout: [oldVal, newVal],
-				},
-			};
-		}
-
-		if (get(diffData, 'globalSettings.meta.branding', null)) {
-			const newVal = get(newObj, 'globalSettings.meta.branding', '');
-			const oldVal = get(oldObj, 'globalSettings.meta.branding', '');
-			diffData = {
-				...diffData,
-				layoutAndDesign: {
-					...diffData.layoutAndDesign,
-					branding: [oldVal, newVal],
-				},
-			};
-		}
-
-		if (get(diffData, 'themeSettings.rsConfig', null)) {
-			const newVal = get(newObj, 'themeSettings.rsConfig', '');
-			const oldVal = get(oldObj, 'themeSettings.rsConfig', '');
-			diffData = {
-				...diffData,
-				layoutAndDesign: {
-					...diffData.layoutAndDesign,
-					stylePresets: [oldVal, newVal],
-				},
-			};
-		}
-
-		if (get(diffData, 'themeSettings.customCss', null)) {
-			const newVal = get(newObj, 'themeSettings.customCss', '');
-			const oldVal = get(oldObj, 'themeSettings.customCss', '');
-			diffData = {
-				...diffData,
-				layoutAndDesign: {
-					...diffData.layoutAndDesign,
-					customCSS: [oldVal, newVal],
-				},
-			};
-		}
-
-		if (get(diffData, 'searchSettings.rsConfig', null)) {
-			const searchSettings = get(diffData, 'searchSettings.rsConfig', {});
-			Object.keys(searchSettings).forEach((field) => {
-				if (searchSettings[field].length !== 2) {
-					const newVal = get(newObj, `searchSettings.rsConfig.${field}`, '');
-					const oldVal = get(oldObj, `searchSettings.rsConfig.${field}`, '');
-					searchSettings[field] = [oldVal, newVal];
-				}
-			});
-			diffData = {
-				...diffData,
-				searchSettings: {
-					...diffData.searchSettings,
-					...searchSettings,
-				},
-			};
-			delete diffData.searchSettings.rsConfig;
-		}
-
-		if (get(diffData, 'searchSettings.searchButton', null)) {
-			const customMessagesObj = {};
-			if (get(diffData, 'searchSettings.searchButton.text', null)) {
-				const newVal = get(newObj, 'searchSettings.searchButton.text', '');
-				const oldVal = get(oldObj, 'searchSettings.searchButton.text', '');
-				customMessagesObj.searchButton = [oldVal, newVal];
+		if (!isPageLevelDiff) {
+			if (get(diffData, 'name', null)) {
+				const newVal = get(newObj, 'name', '');
+				const oldVal = get(oldObj, 'name', '');
+				diffData = {
+					...diffData,
+					generalSettings: {
+						...diffData.generalSettings,
+						name: [oldVal, newVal],
+					},
+				};
 			}
-			if (get(diffData, 'searchSettings.searchButton.icon', null)) {
-				const newVal = get(newObj, 'searchSettings.searchButton.icon', '');
-				const oldVal = get(oldObj, 'searchSettings.searchButton.icon', '');
-				customMessagesObj.searchIcon = [oldVal, newVal];
-			}
-			diffData = {
-				...diffData,
-				searchSettings: {
-					...diffData.searchSettings,
-					...customMessagesObj,
-				},
-			};
-		}
 
-		if (get(diffData, 'facetSettings.staticFacets', null)) {
-			const newVal = get(newObj, 'facetSettings.staticFacets', []);
-			const oldVal = get(oldObj, 'facetSettings.staticFacets', []);
-			let facetSettings = {};
-			// eslint-disable-next-line
-			for (let i = 0; i < 5; i++) {
-				if (diff(oldVal[i], newVal[i])) {
-					facetSettings = {
-						...facetSettings,
-						[staticFacetsFields[i]]: [oldVal[i], newVal[i]],
+			if (get(diffData, 'pipeline', null)) {
+				const newVal = get(newObj, 'pipeline', '');
+				const oldVal = get(oldObj, 'pipeline', '');
+				diffData = {
+					...diffData,
+					generalSettings: {
+						...diffData.generalSettings,
+						pipeline: [oldVal, newVal],
+					},
+				};
+			}
+
+			if (get(diffData, 'description', null)) {
+				const newVal = get(newObj, 'description', '');
+				const oldVal = get(oldObj, 'description', '');
+				diffData = {
+					...diffData,
+					generalSettings: {
+						...diffData.generalSettings,
+						description: [oldVal, newVal],
+					},
+				};
+			}
+
+			if (get(diffData, 'exportSettings.type', null)) {
+				const newVal = get(newObj, 'exportSettings.type', '');
+				const oldVal = get(oldObj, 'exportSettings.type', '');
+				diffData = {
+					...diffData,
+					ecommercePlatform: {
+						...diffData.ecommercePlatform,
+						exportType: [oldVal, newVal],
+					},
+				};
+				delete diffData.exportSettings.type;
+			}
+
+			if (get(diffData, 'exportSettings.credentials', null)) {
+				const newVal = get(newObj, 'exportSettings.credentials', '');
+				const oldVal = get(oldObj, 'exportSettings.credentials', '');
+				diffData = {
+					...diffData,
+					generalSettings: {
+						...diffData.generalSettings,
+						credentials: [oldVal, newVal],
+					},
+				};
+				delete diffData.exportSettings.credentials;
+			}
+
+			if (get(diffData, 'syncSettings', null)) {
+				const newVal = get(newObj, 'syncSettings', '');
+				const oldVal = get(oldObj, 'syncSettings', '');
+				diffData = {
+					...diffData,
+					ecommercePlatform: {
+						...diffData.ecommercePlatform,
+						syncSettings: [oldVal, newVal],
+					},
+				};
+			}
+
+			if (get(diffData, 'globalSettings.currency', null)) {
+				const newVal = get(newObj, 'globalSettings.currency', '');
+				const oldVal = get(oldObj, 'globalSettings.currency', '');
+				diffData = {
+					...diffData,
+					ecommercePlatform: {
+						...diffData.ecommercePlatform,
+						storeInfo: [oldVal, newVal],
+					},
+				};
+			}
+
+			if (get(diffData, 'themeSettings.type', null)) {
+				const newVal = get(newObj, 'themeSettings.type', '');
+				const oldVal = get(oldObj, 'themeSettings.type', '');
+				diffData = {
+					...diffData,
+					layoutAndDesign: {
+						...diffData.layoutAndDesign,
+						searchLayout: [oldVal, newVal],
+					},
+				};
+			}
+
+			if (get(diffData, 'globalSettings.meta.branding', null)) {
+				const newVal = get(newObj, 'globalSettings.meta.branding', '');
+				const oldVal = get(oldObj, 'globalSettings.meta.branding', '');
+				diffData = {
+					...diffData,
+					layoutAndDesign: {
+						...diffData.layoutAndDesign,
+						branding: [oldVal, newVal],
+					},
+				};
+			}
+
+			if (get(diffData, 'themeSettings.rsConfig', null)) {
+				const newVal = get(newObj, 'themeSettings.rsConfig', '');
+				const oldVal = get(oldObj, 'themeSettings.rsConfig', '');
+				diffData = {
+					...diffData,
+					layoutAndDesign: {
+						...diffData.layoutAndDesign,
+						stylePresets: [oldVal, newVal],
+					},
+				};
+			}
+
+			if (get(diffData, 'themeSettings.customCss', null)) {
+				const newVal = get(newObj, 'themeSettings.customCss', '');
+				const oldVal = get(oldObj, 'themeSettings.customCss', '');
+				diffData = {
+					...diffData,
+					layoutAndDesign: {
+						...diffData.layoutAndDesign,
+						customCSS: [oldVal, newVal],
+					},
+				};
+			}
+
+			if (get(diffData, 'globalSettings.showSelectedFilters', null)) {
+				const newVal = get(newObj, 'globalSettings.showSelectedFilters', '');
+				const oldVal = get(oldObj, 'globalSettings.showSelectedFilters', '');
+				diffData = {
+					...diffData,
+					resultSettings: {
+						...diffData.resultSettings,
+						showSelectedFilters: [oldVal, newVal],
+					},
+				};
+			}
+
+			if (get(diffData, 'recommendationSettings', null)) {
+				const recommendationSettings = get(diffData, 'recommendationSettings', null);
+				diffData = {
+					...diffData,
+					recommendationSettings: {
+						...diffData.recommendationSettings,
+						...recommendationSettings,
+					},
+				};
+			}
+
+			if (get(diffData, 'recommendationSettings.recommendations', null)) {
+				const newVal = get(newObj, 'recommendationSettings.recommendations', {});
+				const oldVal = get(oldObj, 'recommendationSettings.recommendations', {});
+				diffData = {
+					...diffData,
+					recommendationSettings: {
+						...diffData.recommendationSettings,
+						recommendations: [oldVal, newVal],
+					},
+				};
+			}
+
+			if (get(diffData, 'authenticationSettings', null)) {
+				let newDiffData = {};
+				const oldVal = get(oldObj, 'authenticationSettings', {});
+				const newVal = get(newObj, 'authenticationSettings', {});
+				const oldValObj = flattenObject(oldVal);
+				const newValObj = flattenObject(newVal);
+				const traversalObj = { ...newValObj, ...oldValObj };
+
+				Object.keys(traversalObj).forEach((data) => {
+					const arr0 = oldValObj[data] || false;
+					const arr1 = newValObj[data] || false;
+					if (arr0 !== arr1 && data !== 'clientId')
+						newDiffData = {
+							...newDiffData,
+							[data]: [arr0, arr1],
+						};
+				});
+				diffData = {
+					...diffData,
+					authenticationSettings: {
+						...newDiffData,
+					},
+				};
+			}
+		} else {
+			// TODO: page level settings
+
+			if (get(diffData, 'pageSettings.pages', null)) {
+				const currentPage = get(newObj, 'pageSettings.currentPage', '');
+				const oldVal = get(
+					oldObj,
+					`pageSettings.pages.${currentPage}.indexSettings.index`,
+					'',
+				);
+				const newVal = get(
+					newObj,
+					`pageSettings.pages.${currentPage}.indexSettings.index`,
+					'',
+				);
+
+				if (!isEqualWith(oldVal, newVal)) {
+					diffData = {
+						...diffData,
+						searchSettings: {
+							...diffData.searchSettings,
+							pagePipeline: [oldVal, newVal],
+						},
 					};
 				}
 			}
-			diffData = {
-				...diffData,
-				searchSettings: {
-					...diffData.searchSettings,
-					...facetSettings,
-				},
-			};
-		}
-
-		if (get(diffData, 'facetSettings.dynamicFacets', null)) {
-			const newVal = get(newObj, 'facetSettings.dynamicFacets', '');
-			const oldVal = get(oldObj, 'facetSettings.dynamicFacets', '');
-			diffData = {
-				...diffData,
-				searchSettings: {
-					...diffData.searchSettings,
-					dynamicFacets: [oldVal, newVal],
-				},
-			};
-		}
-		if (get(diffData, 'chartSettings.charts', null)) {
-			const newVal = get(newObj, 'chartSettings.charts', []).map((filter) =>
-				removeEmpty(filter),
-			);
-			const oldVal = get(oldObj, 'chartSettings.charts', []).map((filter) =>
-				removeEmpty(filter),
-			);
-			if (!isEqual(oldVal, newVal)) {
+			if (get(diffData, 'searchSettings.rsConfig', null)) {
+				const searchSettings = get(diffData, 'searchSettings.rsConfig', {});
+				Object.keys(searchSettings).forEach((field) => {
+					if (searchSettings[field].length !== 2) {
+						const newVal = get(newObj, `searchSettings.rsConfig.${field}`, '');
+						const oldVal = get(oldObj, `searchSettings.rsConfig.${field}`, '');
+						searchSettings[field] = [oldVal, newVal];
+					}
+				});
 				diffData = {
 					...diffData,
-					chartSettings: {
-						...diffData.chartSettings,
-						charts: [oldVal, newVal],
+					searchSettings: {
+						...diffData.searchSettings,
+						...searchSettings,
 					},
 				};
-			} else delete diffData.chartSettings.charts;
-		}
+				delete diffData.searchSettings.rsConfig;
+			}
 
-		if (get(diffData, 'globalSettings.showSelectedFilters', null)) {
-			const newVal = get(newObj, 'globalSettings.showSelectedFilters', '');
-			const oldVal = get(oldObj, 'globalSettings.showSelectedFilters', '');
-			diffData = {
-				...diffData,
-				resultSettings: {
-					...diffData.resultSettings,
-					showSelectedFilters: [oldVal, newVal],
-				},
-			};
-		}
+			if (get(diffData, 'searchSettings.searchButton', null)) {
+				const customMessagesObj = {};
+				if (get(diffData, 'searchSettings.searchButton.text', null)) {
+					const newVal = get(newObj, 'searchSettings.searchButton.text', '');
+					const oldVal = get(oldObj, 'searchSettings.searchButton.text', '');
+					customMessagesObj.searchButton = [oldVal, newVal];
+				}
+				if (get(diffData, 'searchSettings.searchButton.icon', null)) {
+					const newVal = get(newObj, 'searchSettings.searchButton.icon', '');
+					const oldVal = get(oldObj, 'searchSettings.searchButton.icon', '');
+					customMessagesObj.searchIcon = [oldVal, newVal];
+				}
+				diffData = {
+					...diffData,
+					searchSettings: {
+						...diffData.searchSettings,
+						...customMessagesObj,
+					},
+				};
+			}
 
-		if (get(diffData, 'resultSettings.rsConfig', null)) {
-			const resultSettings = get(diffData, 'resultSettings.rsConfig', {});
-			if (resultSettings.componentType) {
-				const newVal = get(newObj, 'resultSettings.componentType', '');
-				const oldVal = get(oldObj, 'resultSettings.componentType', '');
+			if (get(diffData, 'facetSettings.staticFacets', null)) {
+				const newVal = get(newObj, 'facetSettings.staticFacets', []);
+				const oldVal = get(oldObj, 'facetSettings.staticFacets', []);
+				let facetSettings = {};
+				// eslint-disable-next-line
+				for (let i = 0; i < 5; i++) {
+					if (diff(oldVal[i], newVal[i])) {
+						facetSettings = {
+							...facetSettings,
+							[staticFacetsFields[i]]: [oldVal[i], newVal[i]],
+						};
+					}
+				}
+				diffData = {
+					...diffData,
+					searchSettings: {
+						...diffData.searchSettings,
+						...facetSettings,
+					},
+				};
+			}
+
+			if (get(diffData, 'facetSettings.dynamicFacets', null)) {
+				const newVal = get(newObj, 'facetSettings.dynamicFacets', '').map((filter) => {
+					const finalObj = {
+						enabled: filter.enabled,
+						...filter.rsConfig,
+						...filter.customMessages,
+					};
+
+					return finalObj;
+				});
+				const oldVal = get(oldObj, 'facetSettings.dynamicFacets', '').map((filter) => {
+					const finalObj = {
+						enabled: filter.enabled,
+						...filter.rsConfig,
+						...filter.customMessages,
+					};
+
+					return finalObj;
+				});
+
+				const finalObjArray = [];
+				Array.from(new Set([...Object.keys(oldVal), ...Object.keys(newVal)])).forEach(
+					(key) => {
+						if (!isEqual(oldVal[key], newVal[key])) {
+							finalObjArray.push({
+								title: newVal?.[key]?.title || oldVal?.[key]?.title,
+								oldVal: oldVal[key],
+								newVal: newVal[key],
+							});
+						}
+					},
+				);
+
+				diffData = {
+					...diffData,
+					searchSettings: {
+						...diffData.searchSettings,
+						dynamicFacets: finalObjArray,
+					},
+				};
+			}
+			if (get(diffData, 'chartSettings.charts', null)) {
+				const newVal = get(newObj, 'chartSettings.charts', []).map((filter) => {
+					const finalObj = { enabled: filter.enabled, ...filter.rsConfig };
+
+					return removeEmpty(finalObj);
+				});
+				const oldVal = get(oldObj, 'chartSettings.charts', []).map((filter) => {
+					const finalObj = { enabled: filter.enabled, ...filter.rsConfig };
+
+					return removeEmpty(finalObj);
+				});
+				const finalObjArray = [];
+				Array.from(new Set([...Object.keys(oldVal), ...Object.keys(newVal)])).forEach(
+					(key) => {
+						if (!isEqual(oldVal[key], newVal[key])) {
+							finalObjArray.push({
+								title: newVal?.[key]?.title || oldVal?.[key]?.title,
+								oldVal: oldVal[key],
+								newVal: newVal[key],
+							});
+						}
+					},
+				);
+				if (!isEqual(oldVal, newVal)) {
+					diffData = {
+						...diffData,
+						chartSettings: {
+							...diffData.chartSettings,
+							charts: finalObjArray,
+						},
+					};
+				} else delete diffData.chartSettings.charts;
+			}
+			if (get(diffData, 'resultSettings.rsConfig', null)) {
+				const resultSettings = get(diffData, 'resultSettings.rsConfig', {});
+				if (resultSettings.componentType) {
+					const newVal = get(newObj, 'resultSettings.componentType', '');
+					const oldVal = get(oldObj, 'resultSettings.componentType', '');
+
+					diffData = {
+						...diffData,
+						resultSettings: {
+							componentType: [oldVal, newVal],
+						},
+					};
+				}
 
 				diffData = {
 					...diffData,
 					resultSettings: {
-						componentType: [oldVal, newVal],
+						...diffData.resultSettings,
+						...resultSettings,
+					},
+				};
+				delete diffData.resultSettings.rsConfig;
+			}
+
+			if (get(diffData, 'resultSettings.fields', null)) {
+				const newVal = get(removeEmpty(newObj), 'resultSettings.fields', '');
+				const oldVal = get(removeEmpty(oldObj), 'resultSettings.fields', '');
+				const resultSettings = get(diffData, 'resultSettings.fields', {});
+
+				Object.keys(resultSettings).forEach((i) => {
+					resultSettings[i] = [oldVal[i] || '', newVal[i] || ''];
+				});
+				diffData = {
+					...diffData,
+					resultSettings: {
+						...diffData.resultSettings,
+						...resultSettings,
+					},
+				};
+
+				diffData = {
+					...diffData,
+					resultSettings: {
+						...diffData.resultSettings,
+						...resultSettings,
+					},
+				};
+				delete diffData.resultSettings.fields;
+				delete diffData?.searchSettings?.fields;
+			}
+
+			if (get(diffData, 'resultSettings.displayFields', null)) {
+				const newVal = get(removeEmpty(newObj), 'resultSettings.displayFields', {});
+				const oldVal = get(removeEmpty(oldObj), 'resultSettings.displayFields', {});
+				const resultSettings = get(diffData, 'resultSettings.fields', {});
+
+				diffData = {
+					...diffData,
+					resultSettings: {
+						...diffData.resultSettings,
+						displayFields: [oldVal, newVal],
+					},
+				};
+
+				diffData = {
+					...diffData,
+					resultSettings: {
+						...diffData.resultSettings,
+						...resultSettings,
+					},
+				};
+				delete diffData.resultSettings.fields;
+				delete diffData?.searchSettings?.fields;
+			}
+
+			if (get(diffData, 'resultSettings.categoryFieldValue', null)) {
+				const newVal = get(newObj, 'resultSettings.categoryFieldValue', []);
+				const oldVal = get(oldObj, 'resultSettings.categoryFieldValue', []);
+
+				diffData = {
+					...diffData,
+					resultSettings: {
+						...diffData.resultSettings,
+						categoryFieldValue: [JSON.stringify(oldVal), JSON.stringify(newVal)],
 					},
 				};
 			}
+			if (get(diffData, 'resultSettings.sortOptionSelector', null)) {
+				const newVal = get(newObj, `resultSettings.sortOptionSelector`, []);
+				const oldVal = get(oldObj, `resultSettings.sortOptionSelector`, []);
 
-			diffData = {
-				...diffData,
-				resultSettings: {
-					...diffData.resultSettings,
-					...resultSettings,
-				},
-			};
-			delete diffData.resultSettings.rsConfig;
-		}
-
-		if (get(diffData, 'resultSettings.fields', null)) {
-			const resultSettings = get(diffData, 'resultSettings.fields', {});
-			Object.keys(resultSettings).forEach((i) => {
-				let field = resultSettings[i];
-				if (field.length === 1 && field[0]) {
-					field = ['', field[0]];
-				} else if (field[0] && !field[1]) {
-					field = [field[1], ''];
-				} else if (!field[0] && field[1]) {
-					field = ['', field[1]];
-				} else if (!field[0] && !field[1] && field.length === 3 && field[2]) {
-					field = ['', field[2]];
-				} else {
-					field = [field[0], field[1]];
+				if (JSON.stringify(newVal) !== JSON.stringify(oldVal)) {
+					diffData = {
+						...diffData,
+						resultSettings: {
+							...diffData.resultSettings,
+							sortOptionSelector: [oldVal, newVal],
+						},
+					};
 				}
-				resultSettings[i] = field;
-			});
-			diffData = {
-				...diffData,
-				resultSettings: {
-					...diffData.resultSettings,
-					...resultSettings,
-				},
-			};
-			delete diffData.resultSettings.fields;
-			delete diffData?.searchSettings?.fields;
-		}
-
-		if (get(diffData, 'resultSettings', null)) {
-			const resultSettings = get(diffData, 'resultSettings', null);
-			// eslint-disable-next-line
-			for (const key in resultSettings) {
-				if (Array.isArray(resultSettings[key]) && resultSettings[key].length !== 2) {
-					const newVal = get(newObj, `resultSettings.${key}`, '');
-					const oldVal = get(oldObj, `resultSettings.${key}`, '');
-					if (newVal !== oldVal) {
-						diffData = {
-							...diffData,
-							resultSettings: {
-								...diffData.resultSettings,
-								[key]: [oldVal, newVal],
-							},
-						};
-					} else {
-						delete diffData.resultSettings[key];
+			}
+			if (get(diffData, 'resultSettings', null)) {
+				const resultSettings = get(diffData, 'resultSettings', null);
+				// eslint-disable-next-line
+				for (const key in resultSettings) {
+					if (Array.isArray(resultSettings[key]) && resultSettings[key].length !== 2) {
+						const newVal = get(newObj, `resultSettings.${key}`, '');
+						const oldVal = get(oldObj, `resultSettings.${key}`, '');
+						if (newVal !== oldVal) {
+							diffData = {
+								...diffData,
+								resultSettings: {
+									...diffData.resultSettings,
+									[key]: [oldVal, newVal],
+								},
+							};
+						} else {
+							delete diffData.resultSettings[key];
+						}
 					}
 				}
 			}
-		}
 
-		if (get(diffData, 'searchSettings.customMessages.noResults', null)) {
-			const newVal = get(newObj, 'searchSettings.customMessages.noResults', '');
-			const oldVal = get(oldObj, 'searchSettings.customMessages.noResults', '');
-			diffData = {
-				...diffData,
-				searchSettings: {
-					...diffData.searchSettings,
-					noSuggestion: [oldVal, newVal],
-				},
-			};
-			delete diffData.searchSettings.customMessages;
-		}
+			if (get(diffData, 'searchSettings.customMessages.noResults', null)) {
+				const newVal = get(newObj, 'searchSettings.customMessages.noResults', '');
+				const oldVal = get(oldObj, 'searchSettings.customMessages.noResults', '');
+				diffData = {
+					...diffData,
+					searchSettings: {
+						...diffData.searchSettings,
+						noSuggestion: [oldVal, newVal],
+					},
+				};
+				delete diffData.searchSettings.customMessages;
+			}
 
-		if (get(diffData, 'resultSettings.customMessages', null)) {
-			const customMessages = get(diffData, 'resultSettings.customMessages', null);
-			diffData = {
-				...diffData,
-				resultSettings: {
-					...diffData.resultSettings,
-					...customMessages,
-				},
-			};
-			delete diffData.resultSettings.customMessages;
-		}
-
-		if (get(diffData, 'recommendationSettings', null)) {
-			const recommendationSettings = get(diffData, 'recommendationSettings', null);
-			diffData = {
-				...diffData,
-				recommendationSettings: {
-					...diffData.recommendationSettings,
-					...recommendationSettings,
-				},
-			};
-		}
-
-		if (get(diffData, 'recommendationSettings.recommendations', null)) {
-			const newVal = get(newObj, 'recommendationSettings.recommendations', {});
-			const oldVal = get(oldObj, 'recommendationSettings.recommendations', {});
-			diffData = {
-				...diffData,
-				recommendationSettings: {
-					...diffData.recommendationSettings,
-					recommendations: [oldVal, newVal],
-				},
-			};
-		}
-
-		if (get(diffData, 'authenticationSettings', null)) {
-			let newDiffData = {};
-			const oldVal = get(oldObj, 'authenticationSettings', {});
-			const newVal = get(newObj, 'authenticationSettings', {});
-			const oldValObj = flattenObject(oldVal);
-			const newValObj = flattenObject(newVal);
-			const traversalObj = { ...newValObj, ...oldValObj };
-
-			Object.keys(traversalObj).forEach((data) => {
-				const arr0 = oldValObj[data] || false;
-				const arr1 = newValObj[data] || false;
-				if (arr0 !== arr1 && data !== 'clientId')
-					newDiffData = {
-						...newDiffData,
-						[data]: [arr0, arr1],
-					};
-			});
-			diffData = {
-				...diffData,
-				authenticationSettings: {
-					...newDiffData,
-				},
-			};
+			if (get(diffData, 'resultSettings.customMessages', null)) {
+				const customMessages = get(diffData, 'resultSettings.customMessages', null);
+				diffData = {
+					...diffData,
+					resultSettings: {
+						...diffData.resultSettings,
+						...customMessages,
+					},
+				};
+				delete diffData.resultSettings.customMessages;
+			}
 		}
 
 		diffData = {
-			ecommercePlatform: get(diffData, 'ecommercePlatform', {}),
-			layoutAndDesign: get(diffData, 'layoutAndDesign', {}),
-			searchSettings: get(diffData, 'searchSettings', {}),
-			codeSettings: get(diffData, 'codeSettings', {}),
-			generalSettings: get(diffData, 'generalSettings', {}),
-			resultSettings: get(diffData, 'resultSettings', {}),
-			exportSettings: get(diffData, 'exportSettings', {}),
-			authenticationSettings: get(diffData, 'authenticationSettings', {}),
-			recommendationSettings: get(diffData, 'recommendationSettings', {}),
-			chartSettings: get(diffData, 'chartSettings', {}),
+			...(!isPageLevelDiff && {
+				ecommercePlatform: get(diffData, 'ecommercePlatform', {}),
+				layoutAndDesign: get(diffData, 'layoutAndDesign', {}),
+				codeSettings: get(diffData, 'codeSettings', {}),
+				generalSettings: get(diffData, 'generalSettings', {}),
+				exportSettings: get(diffData, 'exportSettings', {}),
+				authenticationSettings: get(diffData, 'authenticationSettings', {}),
+				recommendationSettings: get(diffData, 'recommendationSettings', {}),
+			}),
+			...(isPageLevelDiff && {
+				resultSettings: get(diffData, 'resultSettings', {}),
+				searchSettings: get(diffData, 'searchSettings', {}),
+				chartSettings: get(diffData, 'chartSettings', {}),
+			}),
 		};
-
 		// filter empty fields
 		diffData = Object.keys(diffData).reduce((agg, item) => {
 			if (Object.keys(diffData[item]).length) {
@@ -623,7 +764,25 @@ const ReviewAndSave = ({
 		return [diffCount, diffData];
 	};
 
-	const [diffCount, diffData] = getDiffData(oldData, newData);
+	// eslint-disable-next-line prefer-const
+	let [diffCount, diffData] = getDiffData(oldData.general, newData.general, false);
+
+	const pagesKeys = Array.from(
+		new Set([...(Object.keys(oldData) ?? {}), ...(Object.keys(newData) ?? {})]),
+	);
+	delete pagesKeys.general;
+	const pagesDiffdata = [];
+	pagesKeys.forEach((pageKey) => {
+		if (pageKey === 'general') {
+			return;
+		}
+		const pageDiffData = getDiffData(oldData[pageKey], newData[pageKey], true);
+		diffCount += pageDiffData[0];
+		pagesDiffdata.push({
+			sectionTitle: pageKey,
+			diffData: pageDiffData[1],
+		});
+	});
 	return (
 		<div>
 			<div style={{ position: 'relative' }}>
@@ -657,8 +816,9 @@ const ReviewAndSave = ({
 					'data-cy': 'review-save-button',
 					loading: isLoading,
 				}}
+				afterClose={() => setIsLoading(false)}
 			>
-				{isOpen && <DiffList diff={diffData} />}
+				{isOpen && <DiffList diff={[diffData, ...pagesDiffdata]} />}
 			</Modal>
 		</div>
 	);
@@ -671,6 +831,7 @@ ReviewAndSave.defaultProps = {
 	isSearchLoading: false,
 	isRecommendation: false,
 	label: 'Save',
+	clientId: '',
 };
 
 ReviewAndSave.propTypes = {
@@ -688,11 +849,13 @@ ReviewAndSave.propTypes = {
 	updateRecommendationsPreferences: func.isRequired,
 	isRecommendation: bool,
 	form: object.isRequired,
+	clientId: string,
 };
 
 const mapStateToProps = (state) => ({
 	isSearchLoading: get(state, '$saveSearchPreferenceN.isFetching'),
 	isRecommLoading: get(state, '$saveRecommendationPreferenceN.isFetching'),
+	clientId: get(state, '$getAuth0Preferences.results')?.['_client_id'],
 });
 
 const mapDispatchToProps = (dispatch, props) => ({

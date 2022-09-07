@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { func, object } from 'prop-types';
+import get from 'lodash/get';
 import { ReactiveBase, ReactiveComponent } from '@appbaseio/reactivesearch';
 import { getURL } from '../../../../../constants/config';
 import { transformFacets } from '../../../utils';
@@ -12,7 +13,9 @@ const LivePreview = ({ form, control, customizeConrolObj, setCustomizeConrolObj 
 		if (
 			newControl.dataField !== customizeConrolObj.dataField ||
 			newControl.sortBy !== customizeConrolObj.sortBy ||
-			newControl.size !== customizeConrolObj.size
+			newControl.size !== customizeConrolObj.size ||
+			newControl.data !== customizeConrolObj.data ||
+			newControl.showCount !== customizeConrolObj.showCount
 		) {
 			handleReload(700);
 		}
@@ -32,6 +35,9 @@ const LivePreview = ({ form, control, customizeConrolObj, setCustomizeConrolObj 
 		}, time);
 	};
 
+	const pipeline = form.get('pipeline') ? form.get('pipeline').value : '';
+	const indexSettings = form.get('indexSettings') ? form.get('indexSettings').value : {};
+	const secondaryPipeline = get(indexSettings, 'index', '');
 	return (
 		<div>
 			{customizeConrolObj.dataField ? (
@@ -42,7 +48,7 @@ const LivePreview = ({ form, control, customizeConrolObj, setCustomizeConrolObj 
 							<img src="/static/images/loader.svg" alt="loading" />
 						) : (
 							<ReactiveBase
-								app={form.get('pipeline') ? form.get('pipeline').value : ''}
+								app={secondaryPipeline || pipeline}
 								url={getURL()}
 								credentials={atob(localStorage.getItem('authToken'))}
 								enableAppbase

@@ -182,6 +182,7 @@ class SavePreferencesN extends React.Component {
 			getRecommendationsPreferences,
 			getPreferencesPayload,
 			closeForm,
+			clientId,
 		} = this.props;
 
 		if (isRecommendation) {
@@ -195,7 +196,14 @@ class SavePreferencesN extends React.Component {
 				}
 			});
 		} else {
-			updateSearchPreferences(getPreferencesPayload()).then((action) => {
+			const preferencesPayload = getPreferencesPayload();
+
+			// inject auth0 clientId in authentication settings
+			if (preferencesPayload.authenticationSettings && clientId) {
+				preferencesPayload.authenticationSettings.clientId = clientId;
+			}
+
+			updateSearchPreferences(preferencesPayload).then((action) => {
 				if (!(action && action.error)) {
 					this.setState({
 						hasChanged: false,
@@ -220,6 +228,19 @@ class SavePreferencesN extends React.Component {
 			closeForm,
 		} = this.props;
 		const { hasChanged, preferences } = this.state;
+		const oldData = {
+			general: reOrderPreferences(
+				preferences,
+				get(form.value, 'pageSettings.currentPage', ''),
+			),
+		};
+		const newData = {
+			general: getPreferencesPayload(),
+		};
+		Object.keys(get(form.value, 'pageSettings.pages', '')).forEach((pageKey) => {
+			oldData[pageKey] = reOrderPreferences(preferences, pageKey);
+			newData[pageKey] = reOrderPreferences(getPreferencesPayload(), pageKey);
+		});
 		return (
 			<>
 				<Prompt
@@ -232,8 +253,8 @@ class SavePreferencesN extends React.Component {
 					preferenceId={preferenceId}
 					closeForm={closeForm}
 					buttonProps={buttonProps}
-					oldData={reOrderPreferences(preferences)}
-					newData={getPreferencesPayload()}
+					oldData={oldData}
+					newData={newData}
 					setHasChanged={() => {
 						this.setState(
 							{
@@ -266,6 +287,7 @@ SavePreferencesN.defaultProps = {
 		defaultRecommendationsPreferences,
 	),
 	errors: null,
+	clientId: '',
 };
 
 SavePreferencesN.propTypes = {
@@ -284,6 +306,7 @@ SavePreferencesN.propTypes = {
 	form: object.isRequired,
 	errors: arrayOf(object),
 	closeForm: func.isRequired,
+	clientId: string,
 };
 
 const mapStateToProps = (state, props) => ({
@@ -292,6 +315,7 @@ const mapStateToProps = (state, props) => ({
 	errors: props.isRecommendation
 		? [get(state, '$saveRecommendationPreferenceN.error')]
 		: [get(state, '$saveSearchPreferenceN.error')],
+	clientId: get(state, '$getAuth0Preferences.results')?.['_client_id'],
 });
 
 const mapDispatchToProps = (dispatch, props) => ({

@@ -287,8 +287,8 @@ const settingsMap = {
 	},
 	categoryField: {
 		title: 'Category Field',
-		description:
-			'When specified, suggestions will show category specific suggestions based on the most frequent values based on this field.',
+		description: '',
+		// 'When specified, suggestions will show category specific suggestions based on the most frequent values based on this field.',
 	},
 	urlField: {
 		title: 'URL',
@@ -587,6 +587,18 @@ const settingsMap = {
 	charts: {
 		title: 'Charts',
 		description: '',
+	},
+	displayFields: {
+		title: 'Display Fields',
+		description: '',
+	},
+	categoryFieldValue: {
+		title: 'Document Type Value',
+		description: '',
+	},
+	pagePipeline: {
+		title: 'Page Pipeline',
+		description: 'Pipeline for page route',
 	},
 };
 

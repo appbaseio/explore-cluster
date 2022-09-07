@@ -210,6 +210,7 @@ const ModalHeader = ({
 	const handleCancel = () => {
 		setModalType('');
 		setOpenCommitModal(false);
+		setIsLoading(false);
 		if (errMsg !== 'Manifest is missing') setErrMsg('');
 	};
 

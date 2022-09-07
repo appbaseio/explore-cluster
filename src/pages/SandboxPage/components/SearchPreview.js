@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Row, Col, Switch, Tooltip, Spin, Button, Icon, Empty } from 'antd';
+import { Row, Col, Switch, Tooltip, Spin, Button, Empty } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
@@ -487,8 +487,7 @@ class SearchPreview extends React.Component {
 		const { settings } = this.state;
 		const { app, credentials, url } = this.props;
 		const codesandboxURL = generateSandboxURL({ settings, app, credentials, url });
-
-		window.open(codesandboxURL, '_blank');
+		return codesandboxURL;
 	};
 
 	onSelected = (query) => {
@@ -598,6 +597,7 @@ class SearchPreview extends React.Component {
 		const aggregations = stateSettings.filter((item) => item.id.startsWith('list'));
 		const search = stateSettings.find((item) => item.id === 'search');
 		const result = stateSettings.find((item) => item.id === 'result');
+		const parameters = this.generateCodeSandbox();
 
 		return (
 			<Row className={container} gutter={16}>
@@ -635,10 +635,21 @@ class SearchPreview extends React.Component {
 									/>
 								)}
 							</div>
-							<Button onClick={this.generateCodeSandbox} size="large" type="primary">
-								<Icon type="code-sandbox" />
-								Open in Codesandbox
-							</Button>
+							<form
+								action="https://codesandbox.io/api/v1/sandboxes/define"
+								method="POST"
+								target="_blank"
+							>
+								<input type="hidden" name="parameters" value={parameters} />
+								<Button
+									size="large"
+									type="primary"
+									htmlType="submit"
+									icon="code-sandbox"
+								>
+									Open in Codesandbox
+								</Button>
+							</form>
 						</Row>
 					)}
 				</Col>

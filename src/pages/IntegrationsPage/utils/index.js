@@ -1,7 +1,11 @@
 import get from 'lodash/get';
 import { componentTypes } from '@appbaseio/reactivesearch';
 import templates from '../../../../template-sources-output.json';
-import { getSearchPreferencesPayload, defaultSearchPreferences } from '../utils';
+import {
+	getSearchPreferencesPayload,
+	defaultSearchPreferences,
+	filterConfigurationFormDefaultFields,
+} from '../utils';
 
 export const deployStatusMapper = {
 	QUEUED: '🕓',
@@ -106,6 +110,29 @@ export const getTemplate = (template) => {
 	return templates.filter((i) => i.name === template)[0] || {};
 };
 
+export const transformResultsDefaultFields = (prefs) => {
+	const preferences = { ...JSON.parse(JSON.stringify(prefs)) };
+	const { pageSettings } = preferences;
+	const componentSettings = get(
+		pageSettings,
+		`pages.${pageSettings.currentPage}.componentSettings`,
+		{},
+	);
+	const defaultFields = removeEmpty(get(componentSettings, 'result.displayFields._default', {}));
+	const fields = get(componentSettings, 'result.fields', {});
+	if (
+		JSON.stringify(defaultFields) !== JSON.stringify(fields) &&
+		Object.keys(defaultFields).length
+	) {
+		componentSettings.search.fields = defaultFields;
+		componentSettings.result.fields = defaultFields;
+		preferences.pageSettings.pages[pageSettings.currentPage].componentSettings =
+			componentSettings;
+		return preferences;
+	}
+	return preferences;
+};
+
 // Generate the pageSettings from resultSettings, searchSettings, facetSettings during save to B.E
 export const transformPreferences = (preferences) => {
 	// const pageRoutes = templateObj.pages;
@@ -129,6 +156,8 @@ export const transformPreferences = (preferences) => {
 		if (facetSettings.dynamicFacets.length) {
 			facetSettings.dynamicFacets.forEach((facet, idx) => {
 				const data = { ...facet };
+				data.rsConfig = filterConfigurationFormDefaultFields({ ...(data?.rsConfig || {}) });
+
 				if (data?.rsConfig?.filterType === 'list') {
 					filterType = 'multiList';
 				} else if (
@@ -143,12 +172,7 @@ export const transformPreferences = (preferences) => {
 				} else {
 					filterType = 'dynamicRangeSlider';
 				}
-				if (
-					data?.rsConfig &&
-					data?.rsConfig?.queryFormat &&
-					data?.rsConfig?.filterType === 'range'
-				)
-					delete data?.rsConfig?.queryFormat;
+
 				const newComponentId = `${data.rsConfig.title.split(' ').join('_')}_${idx}`;
 				newObj = {
 					...newObj,
@@ -170,42 +194,6 @@ export const transformPreferences = (preferences) => {
 		}
 	}
 
-	if (facetSettings.staticFacets) {
-		// collection, productType, color, size, price
-		let newObj = {};
-		let filterType = '';
-		if (facetSettings.staticFacets.length) {
-			facetSettings.staticFacets.forEach((data) => {
-				if (data?.rsConfig?.filterType === 'list') {
-					filterType = 'multiList';
-				} else if (
-					data?.rsConfig?.filterType === 'date' ||
-					data?.rsConfig?.filterType === 'range'
-				) {
-					if (data?.rsConfig?.startValue && data?.rsConfig?.endValue) {
-						filterType = 'rangeInput';
-					} else {
-						filterType = 'dynamicRangeSlider';
-					}
-				} else {
-					filterType = 'dynamicRangeSlider';
-				}
-
-				newObj = {
-					...newObj,
-					[data.name]: {
-						...data,
-						componentType: data?.rsConfig?.componentType || componentTypes[filterType],
-						facetType: 'static',
-					},
-				};
-			});
-			componentSettings = {
-				...componentSettings,
-				...newObj,
-			};
-		}
-	}
 	if (chartSettings) {
 		let newCompononentSettings = {};
 		if (chartSettings.charts.length) {
@@ -230,12 +218,20 @@ export const transformPreferences = (preferences) => {
 	}
 
 	if (newPreferences.pageSettings && newPreferences.pageSettings.currentPage) {
+		const { currentPage } = newPreferences.pageSettings;
 		newPreferences.pageSettings = {
 			...newPreferences.pageSettings,
 			pages: {
 				...newPreferences.pageSettings.pages,
 				[newPreferences.pageSettings.currentPage]: {
 					componentSettings,
+					indexSettings: {
+						...get(
+							newPreferences,
+							`pageSettings.pages.${currentPage}.indexSettings`,
+							{},
+						),
+					},
 				},
 			},
 			currentPage: newPreferences.pageSettings.currentPage,
@@ -260,6 +256,9 @@ export const transformPreferences = (preferences) => {
 						...(pageSettings.pages || {}),
 						[page]: {
 							componentSettings,
+							indexSettings: {
+								index: '',
+							},
 						},
 					},
 				};
@@ -270,6 +269,10 @@ export const transformPreferences = (preferences) => {
 			newPreferences.componentSettings = componentSettings;
 		}
 	}
+
+	delete newPreferences.resultSettings;
+	delete newPreferences.searchSettings;
+	delete newPreferences.facetSettings;
 	return newPreferences;
 };
 
@@ -363,10 +366,18 @@ export const reOrderPreferences = (prefs, page = '') => {
 					};
 				}
 				newPreferences.pageSettings.currentPage = page || currentPage;
+
+				const pageConfig = newPreferences.pageSettings.pages[page || currentPage];
+				newPreferences.indexSettings = {
+					...(pageConfig.indexSettings || {}),
+				};
 			}
 		} else {
 			const { componentSettings } = newPreferences;
 			compSettings = componentSettings;
+			newPreferences.indexSettings = {
+				index: '',
+			};
 		}
 
 		delete compSettings?.result?.componentType;
@@ -378,6 +389,7 @@ export const reOrderPreferences = (prefs, page = '') => {
 		newPreferences.searchSettings = {
 			...compSettings.search,
 		};
+
 		Object.keys(compSettings).forEach((facet) => {
 			if (facet !== 'search' && facet !== 'result') {
 				// If component is a chart
@@ -409,4 +421,37 @@ export const reOrderPreferences = (prefs, page = '') => {
 		return newPreferences;
 	}
 	return prefs;
+};
+
+export const facetKeyLabel = {
+	chartType: 'Chart Type',
+	enabled: 'Enabled',
+	componentId: 'Component Id',
+	componentType: 'Component Type',
+	title: 'Title',
+	dataField: 'DataField',
+	useAsFilter: 'Use As Filter',
+	defaultQuery: 'Default Query',
+	setOption: 'Set Option',
+	type: 'Type',
+	filterType: 'Filter Type',
+	queryFormat: 'Query Format',
+	showCheckbox: 'Show Checkbox',
+	showCount: 'Show Count',
+	showMissing: 'Show Missing',
+	showSearch: 'Show Search',
+	sortBy: 'Sort By',
+	startValue: 'Start Value',
+	endValue: 'End Value',
+	startLabel: 'Start Label',
+	endLabel: 'End Label',
+	showHistogram: 'Show Histogram',
+	missingLabel: 'Missing Label',
+	selectAllLabel: 'SelectAll Label',
+	xAxisField: 'X-Axis Field',
+	yAxisField: 'Y-Axis Field',
+	xAxisName: 'X-Axis Name',
+	yAxisName: 'Y-Axis Name',
+	size: 'Size',
+	multiSelect: 'Multi Select',
 };

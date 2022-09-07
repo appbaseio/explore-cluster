@@ -1,6 +1,6 @@
 import React from 'react';
 import { css } from 'emotion';
-import { Card, Button, Tooltip } from 'antd';
+import { Card, Button } from 'antd';
 import get from 'lodash/get';
 import { string, object } from 'prop-types';
 import { connect } from 'react-redux';
@@ -29,6 +29,13 @@ const headerStyles = css`
 	.sub-part {
 		max-width: 33%;
 		flex-direction: column;
+	}
+	.overflow-ellipsis {
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 `;
 
@@ -197,6 +204,10 @@ class SyncStatus extends React.Component {
 		this.setState({
 			modalType: '',
 		});
+
+		this.setState({
+			isLoading: false,
+		});
 	};
 
 	render() {
@@ -219,11 +230,21 @@ class SyncStatus extends React.Component {
 						>
 							<Flex className="sub-part">
 								<b>{title}</b>
-								<Flex>Number of Documents: {documents}</Flex>
+								{documents ? (
+									<>
+										<Flex>Number of Documents: {documents}</Flex>
 
-								<Button type="link" href="browse" className="link-button">
-									Browse Data
-								</Button>
+										<Button type="link" href="browse" className="link-button">
+											Browse Data
+										</Button>
+									</>
+								) : (
+									<Flex className="overflow-ellipsis">
+										{form.get('description')
+											? form.get('description').value
+											: ''}
+									</Flex>
+								)}
 							</Flex>
 
 							<Flex className="sub-part">
@@ -236,38 +257,30 @@ class SyncStatus extends React.Component {
 							</Flex>
 
 							<Flex className="sub-part">
+								<Button
+									type="primary"
+									onClick={() => {
+										this.setState({ modalType: 'deploy-modal' });
+										this.fetchAllVersions();
+									}}
+								>
+									Deploy
+								</Button>
 								{status ? (
-									<>
-										<div>
-											<b>Deploy Status:</b> {status}{' '}
-											{deployStatusMapper[status]}
-										</div>
-										{status === 'READY' ? (
-											<Tooltip title={deploymentStatus.url}>
-												<div className="deploy-url overflow">
-													<b>Preview URL:</b> {deploymentStatus.url}
-												</div>
-											</Tooltip>
-										) : null}
-
+									<span>
 										<Button
 											type="link"
 											className="link-button"
+											style={{ marginRight: 5 }}
 											onClick={() =>
 												this.setState({ modalType: 'deploy-logs' })
 											}
 										>
-											View Details
+											Deploy Status
 										</Button>
-									</>
-								) : (
-									<Button
-										type="primary"
-										onClick={() => this.setState({ modalType: 'deploy-modal' })}
-									>
-										Deploy
-									</Button>
-								)}
+										{deployStatusMapper[status]}
+									</span>
+								) : null}
 							</Flex>
 						</Flex>
 					</div>

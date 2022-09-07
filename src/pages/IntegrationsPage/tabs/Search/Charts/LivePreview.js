@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { func, object } from 'prop-types';
+import get from 'lodash/get';
 import { ReactiveBase, ReactiveComponent } from '@appbaseio/reactivesearch';
 import { getURL } from '../../../../../constants/config';
 import { transformCharts } from '../../../utils';
@@ -43,6 +44,10 @@ const LivePreview = ({ form, control, customizeControlObj, setCustomizeControlOb
 		}
 		return customizeControlObj.dataField && customizeControlObj.chartType;
 	};
+
+	const pipeline = form.get('pipeline') ? form.get('pipeline').value : '';
+	const indexSettings = form.get('indexSettings') ? form.get('indexSettings').value : {};
+	const secondaryPipeline = get(indexSettings, 'index', '');
 	return (
 		<div>
 			{shouldDisplayPreview(customizeControlObj) ? (
@@ -53,7 +58,7 @@ const LivePreview = ({ form, control, customizeControlObj, setCustomizeControlOb
 							<img src="/static/images/loader.svg" alt="loading" />
 						) : (
 							<ReactiveBase
-								app={form.get('pipeline') ? form.get('pipeline').value : ''}
+								app={secondaryPipeline || pipeline}
 								url={getURL()}
 								credentials={atob(localStorage.getItem('authToken'))}
 								enableAppbase

@@ -85,6 +85,8 @@ const Wizard = ({ history, match }) => {
 													pipeline={pipeline}
 													tabsValidated={tabsValidated}
 													setTabsValidated={setTabsValidated}
+													preferences={getPreferencesPayload()}
+													form={form}
 												/>
 											)}
 										/>
@@ -92,10 +94,12 @@ const Wizard = ({ history, match }) => {
 								</Tabs>
 								<Footer
 									form={form}
+									pipeline={pipeline}
 									activeKey={activeKey}
 									tabsValidated={tabsValidated}
 									setActiveKey={setActiveKey}
 									preferenceId={preferenceId}
+									getPreferences={getPreferences}
 									getPreferencesPayload={getPreferencesPayload}
 								/>
 							</>

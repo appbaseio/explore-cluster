@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import get from 'lodash/get';
 import { withRouter } from 'react-router-dom';
-import { Affix, Button } from 'antd';
+import { Affix, Button, message } from 'antd';
 import { connect } from 'react-redux';
 import { func, object, string } from 'prop-types';
 import {
@@ -9,11 +9,17 @@ import {
 	saveSearchPreferenceN,
 } from '../../../../../batteries/modules/actions';
 import { commitCode, generateInlineSandboxURL } from '../../../utils/sandpack-generator';
-import { transformPreferences, getTemplate } from '../../../utils/index';
+import {
+	transformPreferences,
+	getTemplate,
+	transformResultsDefaultFields,
+} from '../../../utils/index';
 import files from '../../../../../../templates/files';
 import { footerStyles } from '../styles';
+import PreviewModal from '../../../PreviewModal';
 
 const Footer = ({
+	form,
 	history,
 	activeKey,
 	tabsValidated,
@@ -22,6 +28,9 @@ const Footer = ({
 	updateSearchPreferences,
 	getPreferencesPayload,
 	preferenceId,
+	pipeline,
+	getPreferences,
+	clientId,
 }) => {
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -69,8 +78,22 @@ const Footer = ({
 				}
 			});
 		}
+		if (defaultPrefs.authenticationSettings) {
+			newPrefs.authenticationSettings = defaultPrefs.authenticationSettings;
+		}
 
 		return newPrefs;
+	};
+
+	const setSecondaryPipeline = (prefs) => {
+		const preferences = { ...prefs };
+		const { pipeline: mainPipeline, pageSettings } = preferences;
+		if (pageSettings && pageSettings.pages) {
+			Object.keys(pageSettings.pages).forEach((page) => {
+				pageSettings.pages[page].indexSettings.index = mainPipeline;
+			});
+		}
+		return preferences;
 	};
 
 	const handleSave = async () => {
@@ -82,21 +105,23 @@ const Footer = ({
 				...obj,
 				mapLayout: 'map',
 				mapComponent: 'googleMap',
-				locationDataField: '',
 				defaultZoom: 5,
 				showSearchAsMove: true,
 				showMarkerClusters: true,
 				mapsAPIkey: '',
 			};
 		}
-		const newPreferences = transformPreferences({
+		const newPrefs = transformPreferences({
 			...preferences,
 			resultSettings: {
 				...preferences.resultSettings,
 				...obj,
 			},
 		});
-		const response = await generateInlineSandboxURL(newPreferences);
+		const newPreferences = transformResultsDefaultFields(newPrefs);
+		const prefenecesWithDefaultFacets = getDefaultPreferences(newPreferences);
+		const prefenecesWithSecondaryPipeline = setSecondaryPipeline(prefenecesWithDefaultFacets);
+		const response = await generateInlineSandboxURL(prefenecesWithSecondaryPipeline);
 		const newObj = {};
 		Object.keys(response).forEach((path) => {
 			if (path[0] === '/') {
@@ -112,18 +137,22 @@ const Footer = ({
 			},
 			content: newObj,
 		};
-		const prefenecesWithDefaultFacets = getDefaultPreferences(newPreferences);
+		// inject auth0 clientId in authentication settings
+		if (prefenecesWithSecondaryPipeline.authenticationSettings && clientId) {
+			prefenecesWithSecondaryPipeline.authenticationSettings.clientId = clientId;
+		}
 		commitCode(preferenceId, body)
 			.then(() => {
-				updateSearchPreferences(prefenecesWithDefaultFacets).then((action) => {
+				updateSearchPreferences(prefenecesWithSecondaryPipeline).then((action) => {
 					if (!(action && action.error)) {
 						getSearchPreferences();
-						setIsLoading(false);
 						history.push(`/cluster/search-builder/${preferenceId}`);
-					}
+					} else if (action.error.message) message.error(action.error.message);
+					setIsLoading(false);
 				});
 			})
 			.catch((err) => {
+				setIsLoading(false);
 				// eslint-disable-next-line no-console
 				console.error('Error to save preferences', err);
 			});
@@ -144,14 +173,27 @@ const Footer = ({
 						) : null}
 					</div>
 					{activeKey === '3' ? (
-						<Button
-							type="primary"
-							disabled={!tabsValidated.tab3}
-							onClick={handleSave}
-							loading={isLoading}
-						>
-							Finish ▶
-						</Button>
+						<div>
+							<PreviewModal
+								pipeline={pipeline}
+								preferences={getPreferences}
+								preferenceId={preferenceId}
+								form={form}
+								getPreferencesPayload={getPreferencesPayload}
+								buttonProps={{
+									size: 'default',
+									style: { marginRight: 10 },
+								}}
+							/>
+							<Button
+								type="primary"
+								disabled={!tabsValidated.tab3}
+								onClick={handleSave}
+								loading={isLoading}
+							>
+								Finish ▶
+							</Button>
+						</div>
 					) : (
 						<Button
 							type="primary"
@@ -172,6 +214,8 @@ Footer.defaultProps = {
 	tabsValidated: {},
 	setActiveKey: () => {},
 	preferenceId: '',
+	pipeline: '',
+	clientId: '',
 };
 
 Footer.propTypes = {
@@ -183,12 +227,18 @@ Footer.propTypes = {
 	updateSearchPreferences: func.isRequired,
 	getSearchPreferences: func.isRequired,
 	getPreferencesPayload: func.isRequired,
+	form: object.isRequired,
+	pipeline: string,
+	getPreferences: func.isRequired,
+	clientId: string,
 };
-
+const mapStateToProps = (state) => ({
+	clientId: get(state, '$getAuth0Preferences.results')?.['_client_id'],
+});
 const mapDispatchToProps = (dispatch, props) => ({
 	getSearchPreferences: () => dispatch(getSearchPreferencesN()),
 	updateSearchPreferences: (payload) =>
 		dispatch(saveSearchPreferenceN(props.preferenceId, payload)),
 });
 
-export default connect(null, mapDispatchToProps)(withRouter(Footer));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Footer));
