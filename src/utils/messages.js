@@ -34,8 +34,8 @@ export const userManagementMessages = {
 			credential.`,
 	),
 	sourcesXFFValue:
-		Message(`To define the depth of the IP address to read from x-forwarded-header when multiple IP addresses are present.
-For example, if x-forwarded-header value is client, proxy1, proxy2, proxy3 and you want to specify proxy2 as the IP to be used for IP sources validation then you must set sources_xff_value as 3.`),
+		Message(`Depth of the IP address to read from the x-forwarded-header for IP sources validation (last IP is read first) when multiple IP addresses are present.
+For example, if x-forwarded-header value is client, proxy1, proxy2, proxy3 and you want to specify proxy3 as the IP to be used for IP sources validation then you must set sources_xff_value as 1.`),
 };
 // Messages for api credentials form
 export const credentialsMessages = {
@@ -88,7 +88,7 @@ export const credentialsMessages = {
 	ipLimit: Message('Set a per hour ratelimit on API calls per IP address.'),
 	sourcesXFFValue:
 		Message(`To define the depth of the IP address to read from x-forwarded-header when multiple IP addresses are present.
-For example, if x-forwarded-header value is client, proxy1, proxy2, proxy3 and you want to specify proxy2 as the IP to be used for IP sources validation then you must set sources_xff_value as 3.`),
+For example, if x-forwarded-header value is client, proxy1, proxy2, proxy3 and you want to specify proxy2 as the IP to be used for IP sources validation then you must set sources_xff_value as 2.`),
 };
 
 // Messages for popular suggestions

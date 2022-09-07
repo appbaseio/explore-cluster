@@ -34,6 +34,7 @@ import {
 	getDefaultAclOptionsByVersion,
 	isNegative,
 	isNegativeTTL,
+	isZero,
 	mapFormToValues,
 	mapValuesToForm,
 	getAllowedActionsByVersion,
@@ -94,7 +95,10 @@ class CreateCredentials extends React.Component {
 					...(this.allowStoredQuery
 						? {
 								sources: [{ value: ['0.0.0.0/0'], disabled: false }],
-								sources_xff_value: [{ value: 0, disabled: false }, [isNegative]],
+								sources_xff_value: [
+									{ value: undefined, disabled: false },
+									[isNegative, isZero],
+								],
 						  }
 						: null),
 			  })
@@ -115,7 +119,10 @@ class CreateCredentials extends React.Component {
 					),
 					referers: [{ value: ['*'], disabled: false }],
 					sources: [{ value: ['0.0.0.0/0'], disabled: false }],
-					sources_xff_value: [{ value: 0, disabled: false }, [isNegative]],
+					sources_xff_value: [
+						{ value: undefined, disabled: false },
+						[isNegative, isZero],
+					],
 					rsApiRestrictions: new FormGroup({
 						maxQuerySize: new FormControl(undefined, [
 							Validators.min(0),
@@ -679,39 +686,56 @@ class CreateCredentials extends React.Component {
 												/>
 												<FieldControl
 													name="sources_xff_value"
-													render={({ handler, hasError }) => (
-														<Grid
-															label={
-																<span
-																	className={
-																		isUserManagement
-																			? ''
-																			: styles.subHeader
-																	}
-																>
-																	IP Source Depth
-																</span>
-															}
-															toolTipMessage={
-																Messages.sourcesXFFValue
-															}
-															component={
-																<div>
-																	<Input
-																		type="number"
-																		placeholder="Enter a positive depth value"
-																		{...handler()}
-																	/>
-																	{hasError('isNegative') && (
-																		<div css={styles.error}>
-																			IP Source Depth value
-																			can&apos;t be negative.
-																		</div>
-																	)}
-																</div>
-															}
-														/>
-													)}
+													render={({ handler, hasError }) => {
+														const inputHandler = handler();
+														return (
+															<Grid
+																label={
+																	<span
+																		className={
+																			isUserManagement
+																				? ''
+																				: styles.subHeader
+																		}
+																	>
+																		IP Source Depth
+																	</span>
+																}
+																toolTipMessage={
+																	Messages.sourcesXFFValue
+																}
+																component={
+																	<div>
+																		<Input
+																			type="number"
+																			placeholder="Enter a positive depth value"
+																			{...inputHandler}
+																			value={
+																				inputHandler.value
+																					? inputHandler.value
+																					: ''
+																			}
+																			min={1}
+																		/>
+																		{hasError('isNegative') && (
+																			<div css={styles.error}>
+																				IP Source Depth
+																				value can&apos;t be
+																				negative.
+																			</div>
+																		)}
+																		{hasError('isZero') && (
+																			<div css={styles.error}>
+																				IP Source Depth
+																				value should be
+																				greater than zero.
+																			</div>
+																		)}
+																	</div>
+																}
+															/>
+														);
+													}}
 												/>
 											</>
 										)}
