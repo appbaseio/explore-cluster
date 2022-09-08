@@ -119,16 +119,18 @@ class DashboardWrapper extends Component {
 					icon: 'control',
 					action: ALLOWED_ACTIONS.UI_BUILDER,
 					menu: [
-						{ label: 'Search', link: '/cluster/search-builder' },
+						{ label: 'Search', link: '/cluster/search-builder', tag: 'Beta' },
 						{
 							label: 'Recommendations',
 							link: '/cluster/recommendations-builder',
+							tag: 'Beta',
 						},
 						{
 							label: 'Searchbox',
 							link: '/cluster/searchboxes',
+							tag: 'Beta',
 						},
-						{ label: 'Auth settings', link: '/cluster/auth-settings' },
+						{ label: 'Auth settings', link: '/cluster/auth-settings', tag: 'Beta' },
 					],
 					tag: 'Beta',
 				},
@@ -203,16 +205,22 @@ class DashboardWrapper extends Component {
 							icon: 'control',
 							action: ALLOWED_ACTIONS.UI_BUILDER,
 							menu: [
-								{ label: 'Search', link: '/cluster/search-builder' },
+								{ label: 'Search', link: '/cluster/search-builder', tag: 'Beta' },
 								{
 									label: 'Recommendations',
 									link: '/cluster/recommendations-builder',
+									tag: 'Beta',
 								},
 								{
 									label: 'Searchbox',
 									link: '/cluster/searchboxes',
+									tag: 'Beta',
 								},
-								{ label: 'Auth settings', link: '/cluster/auth-settings' },
+								{
+									label: 'Auth settings',
+									link: '/cluster/auth-settings',
+									tag: 'Beta',
+								},
 							],
 							tag: 'Beta',
 						},
