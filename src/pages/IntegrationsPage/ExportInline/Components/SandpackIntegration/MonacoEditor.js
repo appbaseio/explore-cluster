@@ -6,7 +6,7 @@ import { func, number, object, string } from 'prop-types';
 import { css } from 'emotion';
 import { Button } from 'antd';
 
-const MonacoEditor = ({ iframeHeight, highlightLine, path, setOpenCommitModal }) => {
+const MonacoEditor = ({ iframeHeight, highlightLine, path, setOpenCommitModal, setSearchType }) => {
 	const { code, updateCode } = useActiveCode();
 	const [isImage, setIsImage] = useState(false);
 	const [updatedCode, setUpdatedCode] = useState(code);
@@ -69,6 +69,12 @@ const MonacoEditor = ({ iframeHeight, highlightLine, path, setOpenCommitModal })
 			if ((e.ctrlKey || e.metaKey) && e.code === 'KeyS') {
 				e.preventDefault();
 				setOpenCommitModal(true);
+			}
+			if ((e.ctrlKey || e.metaKey) && e.code === 'KeyP') {
+				e.preventDefault();
+				// Enable File Search
+				setSearchType('fileSearch');
+				document.getElementById('file-explorer-search').focus();
 			}
 		});
 
@@ -209,6 +215,7 @@ MonacoEditor.propTypes = {
 	highlightLine: object,
 	path: string.isRequired,
 	setOpenCommitModal: func.isRequired,
+	setSearchType: func,
 };
 
 MonacoEditor.defaultProps = {
@@ -216,6 +223,7 @@ MonacoEditor.defaultProps = {
 		line: 0,
 		lines: [],
 	},
+	setSearchType: () => {},
 };
 
 export default MonacoEditor;

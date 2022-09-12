@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Modal, Switch, Form, Select, List, Radio } from 'antd';
 import { string, object, func, bool } from 'prop-types';
-import { FieldGroup, FieldControl } from 'react-reactive-form';
+import { FieldGroup, FieldControl, FormBuilder } from 'react-reactive-form';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import { componentTypes } from '@appbaseio/reactivesearch';
 import Dragger from './Dragger';
@@ -12,6 +12,8 @@ import TextInput from '../../../../../components/Form/Input';
 import { RANGE_FIELDS, CALENDAR_INTERVAL_FIELDS } from '../../../../../constants';
 import { DatePickerStyles, filterModalStyles } from './styles';
 import 'react-day-picker/lib/style.css';
+import Data from './Data';
+import { dataPropFromArray } from '../../../utils';
 
 const { Item } = List;
 
@@ -22,6 +24,14 @@ class CustomizeFilter extends React.Component {
 	};
 
 	message = '';
+
+	componentDidMount() {
+		const { control } = this.props;
+		control.get('componentType').valueChanges.subscribe((value) => {
+			if (!control.get('data') && value === componentTypes.tabDataList)
+				control.addControl('data', FormBuilder.array(dataPropFromArray([])));
+		});
+	}
 
 	showModal = () => {
 		this.setState({
@@ -304,6 +314,11 @@ class CustomizeFilter extends React.Component {
 																>
 																	TagCloud
 																</Select.Option>
+																<Select.Option
+																	key={componentTypes.tabDataList}
+																>
+																	TabDataList
+																</Select.Option>
 															</Select>
 														</Form.Item>
 													)}
@@ -323,54 +338,65 @@ class CustomizeFilter extends React.Component {
 												control.get('filterType') &&
 												control.get('filterType').value === 'list' && (
 													<>
-														<TextInput
-															name="size"
-															label="Size"
-															inputProps={{
-																placeholder: 'Enter size',
-																type: 'number',
-															}}
-															control={control.get('size')}
-														/>
-
-														<FieldControl
-															strict={false}
-															name="queryFormat"
-															control={control.get('queryFormat')}
-														>
-															{({ handler }) => (
-																<Form.Item label="Query Format">
-																	<Select {...handler()}>
-																		<Select.Option key="or">
-																			Or
-																		</Select.Option>
-																		<Select.Option key="and">
-																			And
-																		</Select.Option>
-																	</Select>
-																</Form.Item>
-															)}
-														</FieldControl>
-														<FieldControl
-															name="sortBy"
-															control={control.get('sortBy')}
-														>
-															{({ handler }) => (
-																<Form.Item label="Sort By">
-																	<Select {...handler()}>
-																		<Select.Option key="count">
-																			Count
-																		</Select.Option>
-																		<Select.Option key="asc">
-																			Asc
-																		</Select.Option>
-																		<Select.Option key="desc">
-																			Desc
-																		</Select.Option>
-																	</Select>
-																</Form.Item>
-															)}
-														</FieldControl>
+														{![componentTypes.tabDataList].includes(
+															value.componentType,
+														) ? (
+															<TextInput
+																name="size"
+																label="Size"
+																inputProps={{
+																	placeholder: 'Enter size',
+																	type: 'number',
+																}}
+																control={control.get('size')}
+															/>
+														) : null}
+														{![componentTypes.tabDataList].includes(
+															value.componentType,
+														) ? (
+															<FieldControl
+																strict={false}
+																name="queryFormat"
+																control={control.get('queryFormat')}
+															>
+																{({ handler }) => (
+																	<Form.Item label="Query Format">
+																		<Select {...handler()}>
+																			<Select.Option key="or">
+																				Or
+																			</Select.Option>
+																			<Select.Option key="and">
+																				And
+																			</Select.Option>
+																		</Select>
+																	</Form.Item>
+																)}
+															</FieldControl>
+														) : null}
+														{![componentTypes.tabDataList].includes(
+															value.componentType,
+														) ? (
+															<FieldControl
+																name="sortBy"
+																control={control.get('sortBy')}
+															>
+																{({ handler }) => (
+																	<Form.Item label="Sort By">
+																		<Select {...handler()}>
+																			<Select.Option key="count">
+																				Count
+																			</Select.Option>
+																			<Select.Option key="asc">
+																				Asc
+																			</Select.Option>
+																			<Select.Option key="desc">
+																				Desc
+																			</Select.Option>
+																		</Select>
+																	</Form.Item>
+																)}
+															</FieldControl>
+														) : null}
 														<FieldControl
 															name="showCount"
 															control={control.get('showCount')}
@@ -383,8 +409,10 @@ class CustomizeFilter extends React.Component {
 																</Form.Item>
 															)}
 														</FieldControl>
-														{value.componentType !==
-														componentTypes.tagCloud ? (
+														{![
+															componentTypes.tagCloud,
+															componentTypes.tabDataList,
+														].includes(value.componentType) ? (
 															<FieldControl
 																name="showCheckbox"
 																control={control.get(
@@ -400,8 +428,9 @@ class CustomizeFilter extends React.Component {
 																)}
 															</FieldControl>
 														) : null}
-														{value.componentType !==
-														componentTypes.tagCloud ? (
+														{![componentTypes.tagCloud].includes(
+															value.componentType,
+														) ? (
 															<FieldControl
 																name="showSearch"
 																control={control.get('showSearch')}
@@ -415,18 +444,22 @@ class CustomizeFilter extends React.Component {
 																)}
 															</FieldControl>
 														) : null}
-														<FieldControl
-															name="showMissing"
-															control={control.get('showMissing')}
-														>
-															{({ handler }) => (
-																<Form.Item label="Show Missing">
-																	<Switch
-																		{...handler('checkbox')}
-																	/>
-																</Form.Item>
-															)}
-														</FieldControl>
+														{![componentTypes.tabDataList].includes(
+															value.componentType,
+														) ? (
+															<FieldControl
+																name="showMissing"
+																control={control.get('showMissing')}
+															>
+																{({ handler }) => (
+																	<Form.Item label="Show Missing">
+																		<Switch
+																			{...handler('checkbox')}
+																		/>
+																	</Form.Item>
+																)}
+															</FieldControl>
+														) : null}
 
 														{value.componentType ===
 														componentTypes.tagCloud ? (
@@ -443,16 +476,25 @@ class CustomizeFilter extends React.Component {
 																)}
 															</FieldControl>
 														) : null}
-														<TextInput
-															name="missingLabel"
-															label="Missing Label"
-															inputProps={{
-																placeholder: 'Enter missing label',
-															}}
-															control={control.get('missingLabel')}
-														/>
-														{value.componentType !==
-														componentTypes.tagCloud ? (
+														{![componentTypes.tabDataList].includes(
+															value.componentType,
+														) ? (
+															<TextInput
+																name="missingLabel"
+																label="Missing Label"
+																inputProps={{
+																	placeholder:
+																		'Enter missing label',
+																}}
+																control={control.get(
+																	'missingLabel',
+																)}
+															/>
+														) : null}
+														{![
+															componentTypes.tagCloud,
+															componentTypes.tabDataList,
+														].includes(value.componentType) ? (
 															<TextInput
 																name="selectAllLabel"
 																label="Select All Label"
@@ -464,6 +506,45 @@ class CustomizeFilter extends React.Component {
 																	'selectAllLabel',
 																)}
 															/>
+														) : null}
+														{[componentTypes.tabDataList].includes(
+															value.componentType,
+														) ? (
+															<FieldControl
+																name="displayAsVertical"
+																control={control.get(
+																	'displayAsVertical',
+																)}
+															>
+																{({ handler }) => (
+																	<Form.Item label="Layout Vertical">
+																		<Switch
+																			{...handler('checkbox')}
+																		/>
+																	</Form.Item>
+																)}
+															</FieldControl>
+														) : null}
+														{[componentTypes.tabDataList].includes(
+															value.componentType,
+														) ? (
+															<FieldControl
+																name="showRadio"
+																control={control.get('showRadio')}
+															>
+																{({ handler }) => (
+																	<Form.Item label="Show Radio">
+																		<Switch
+																			{...handler('checkbox')}
+																		/>
+																	</Form.Item>
+																)}
+															</FieldControl>
+														) : null}
+														{[componentTypes.tabDataList].includes(
+															value.componentType,
+														) ? (
+															<Data form={control.get('data')} />
 														) : null}
 													</>
 												)}

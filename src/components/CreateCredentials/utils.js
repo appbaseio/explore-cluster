@@ -54,6 +54,12 @@ export const isNegative = (control) => {
 	}
 	return undefined;
 };
+export const isZero = (control) => {
+	if (control && parseInt(control.value, 10) === 0) {
+		return { isZero: true };
+	}
+	return undefined;
+};
 
 export const isNegativeTTL = (control) => {
 	if (control.value !== -1 && control.value && parseInt(control.value, 10) < 0) {

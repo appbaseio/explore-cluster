@@ -13,6 +13,7 @@ import { getAuthorizedViews } from './utils';
 import Loader from './components/Loader';
 import Logo from './components/Logo';
 import { APP_ROUTES, CLUSTER_ROUTES } from './constants/routes';
+import { fetchAuth0Preferences } from './batteries/modules/actions';
 
 // routes
 const LoginPage = Loadable({
@@ -55,7 +56,7 @@ class Dashboard extends Component {
 	eventId = null;
 
 	componentDidMount() {
-		const { loadArcUser } = this.props;
+		const { loadArcUser, getAuth0Preferences } = this.props;
 		const { pathname, search } = window.location;
 
 		window.addEventListener('error', () => {
@@ -115,6 +116,7 @@ class Dashboard extends Component {
 				isLoading: false,
 			});
 		}
+		getAuth0Preferences();
 	}
 
 	static getDerivedStateFromProps(props, state) {
@@ -147,9 +149,9 @@ class Dashboard extends Component {
 						title: error.message,
 						content: (
 							<p>
-								Are you using a valid reactivesearch.io ID? Subscribe to a plan to continue
-								accessing reactivesearch.io. It can take up to 1 hour for a payment made to
-								get reflected. Reach out to us at{' '}
+								Are you using a valid reactivesearch.io ID? Subscribe to a plan to
+								continue accessing reactivesearch.io. It can take up to 1 hour for a
+								payment made to get reflected. Reach out to us at{' '}
 								<a href="mailto:support@appbase.io">support@appbase.io</a> for any
 								questions.
 							</p>
@@ -264,6 +266,7 @@ Dashboard.propTypes = {
 	error: PropTypes.any,
 	updateAppRoutes: PropTypes.func.isRequired,
 	updateClusterRoutes: PropTypes.func.isRequired,
+	getAuth0Preferences: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = ({ user }) => ({
@@ -273,6 +276,7 @@ const mapStateToProps = ({ user }) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
+	getAuth0Preferences: () => dispatch(fetchAuth0Preferences()),
 	loadArcUser: (u, p) => dispatch(loadUser(u, p)),
 	updateAppRoutes: (routes) => dispatch(setAppRoutes(routes)),
 	updateClusterRoutes: (routes) => dispatch(setClusterRoutes(routes)),

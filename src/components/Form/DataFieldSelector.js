@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Select, Form } from 'antd';
+import { Select, Form, Tooltip } from 'antd';
 import { css } from 'emotion';
 import { string, func, bool, object, element, array } from 'prop-types';
 import get from 'lodash/get';
@@ -41,8 +41,18 @@ class DataFieldSelector extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { mappings, isAggFields, includeMappings, includeTypes, setFieldType, control } =
-			this.props;
+		const {
+			mappings,
+			isAggFields,
+			includeMappings,
+			includeTypes,
+			setFieldType,
+			control,
+			pipeline,
+		} = this.props;
+		if (prevProps.pipeline !== pipeline) {
+			this.getMappings();
+		}
 		if (prevProps.mappings !== mappings) {
 			if (control && control.value && mappings?.properties) {
 				setFieldType(
@@ -112,7 +122,9 @@ class DataFieldSelector extends React.Component {
 			selectProps,
 			mappings,
 			setFieldType,
+			handleReload,
 		} = this.props;
+		const { traversedMappings } = this.state;
 		const selectPropsCalculated = {
 			placeholder: 'Select data field',
 			loading,
@@ -134,36 +146,52 @@ class DataFieldSelector extends React.Component {
 							return null;
 						}
 						const child = (
-							<Select
-								className={touched && invalid ? selectCls : undefined}
-								placeholder="Select field"
-								allowClear
-								{...selectPropsCalculated}
-								{...inputHandler}
-								value={
-									inputHandler.value
-										? inputHandler.value.split('.keyword')[0]
-										: undefined
-								}
-								onSelect={(val) => {
-									if (value === val) {
-										// To unselect
-										inputHandler.onChange(undefined);
-									} else {
-										inputHandler.onChange(val);
-										if (setFieldType) {
-											setFieldType(
-												mappings?.properties[val.split('.keyword')[0]]
-													?.type,
-											);
-										}
+							<>
+								{inputHandler.value &&
+								traversedMappings.length &&
+								!traversedMappings.includes(inputHandler.value) ? (
+									<Tooltip title="The provided field has no corresponding mappings with the pipeline">
+										<span
+											style={{ color: 'orange', marginRight: 10 }}
+											role="img"
+											aria-label="warning"
+										>
+											⚠️
+										</span>
+									</Tooltip>
+								) : null}
+								<Select
+									className={touched && invalid ? selectCls : undefined}
+									placeholder="Select field"
+									allowClear
+									{...selectPropsCalculated}
+									{...inputHandler}
+									value={
+										inputHandler.value
+											? inputHandler.value.split('.keyword')[0]
+											: undefined
 									}
-								}}
-								onFocus={this.getMappings}
-							>
-								{addOptions}
-								{this.renderOptions()}
-							</Select>
+									onSelect={(val) => {
+										if (value === val) {
+											// To unselect
+											inputHandler.onChange(undefined);
+										} else {
+											inputHandler.onChange(val);
+											if (setFieldType) {
+												setFieldType(
+													mappings?.properties[val.split('.keyword')[0]]
+														?.type,
+												);
+											}
+										}
+										handleReload();
+									}}
+									onFocus={this.getMappings}
+								>
+									{addOptions}
+									{this.renderOptions()}
+								</Select>
+							</>
 						);
 						if (wrapInsideForm) {
 							return withFormItem(child);
@@ -201,6 +229,8 @@ DataFieldSelector.defaultProps = {
 	includeTypes: undefined,
 	setFieldType: null,
 	withoutSuffix: false,
+	pipeline: '',
+	handleReload: () => {},
 };
 
 DataFieldSelector.propTypes = {
@@ -222,6 +252,8 @@ DataFieldSelector.propTypes = {
 	includeTypes: array,
 	setFieldType: func,
 	withoutSuffix: bool,
+	pipeline: string,
+	handleReload: func,
 };
 
 const mapStateToProps = (state, props) => {

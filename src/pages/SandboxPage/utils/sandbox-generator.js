@@ -956,7 +956,7 @@ const generateSandboxURL = ({ settings, app, credentials, url }) => {
 		files,
 	});
 
-	return `https://codesandbox.io/api/v1/sandboxes/define?parameters=${parameters}`;
+	return parameters;
 };
 
 export const generateTutorialSandboxURL = ({

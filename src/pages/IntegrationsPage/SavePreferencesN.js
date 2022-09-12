@@ -2,9 +2,7 @@ import React from 'react';
 import { Prompt } from 'react-router-dom';
 import { arrayOf, bool, func, object, string } from 'prop-types';
 import get from 'lodash/get';
-import isEqual from 'lodash/isEqual';
 import { connect } from 'react-redux';
-import { diff } from 'jsondiffpatch';
 import {
 	saveSearchPreferenceN,
 	saveRecommendationPreferenceN,
@@ -22,6 +20,7 @@ import {
 	getSearchPreferencesPayload,
 	defaultSearchPreferences,
 	defaultRecommendationsPreferences,
+	getDiffDataAndCount,
 } from './utils';
 import { removeEmpty, reOrderPreferences } from './utils/index';
 import ReviewAndSave from './ReviewAndSave';
@@ -32,6 +31,7 @@ class SavePreferencesN extends React.Component {
 		this.hasEdited = false;
 		this.state = {
 			hasChanged: this.compareChange,
+			// eslint-disable-next-line react/no-unused-state
 			preferences: props.searchPreferences,
 		};
 	}
@@ -66,6 +66,7 @@ class SavePreferencesN extends React.Component {
 
 		this.setState({
 			hasChanged: isChanged,
+			// eslint-disable-next-line react/no-unused-state
 			preferences: isRecommendation ? recommendationsPreferences : searchPreferences,
 		});
 		if (isChanged) {
@@ -78,100 +79,9 @@ class SavePreferencesN extends React.Component {
 	};
 
 	get compareChange() {
-		const {
-			isRecommendation,
-			recommendationsPreferences,
-			searchPreferences,
-			getPreferencesPayload,
-		} = this.props;
+		const { oldData, newData } = this.getOldDataNewData();
 
-		let newPreferences = {};
-		if (isRecommendation) {
-			newPreferences = recommendationsPreferences;
-			delete newPreferences.resultSettings.layout;
-			delete newPreferences.resultSettings.viewSwitcher;
-		} else {
-			if (searchPreferences.componentSettings || searchPreferences.pageSettings) {
-				newPreferences = { ...reOrderPreferences(searchPreferences) };
-			} else {
-				newPreferences = { ...searchPreferences };
-			}
-
-			if (newPreferences.resultSettings && !newPreferences.resultSettings.resultHighlight) {
-				newPreferences.resultSettings.resultHighlight = false;
-			}
-
-			const diffData = diff(newPreferences, getPreferencesPayload());
-
-			if (get(diffData, 'searchSettings.redirectUrlText', '')) {
-				newPreferences.searchSettings.redirectUrlText = 'View Product';
-			}
-			if (get(diffData, 'searchSettings.redirectUrlIcon', '')) {
-				newPreferences.searchSettings.redirectUrlIcon = '';
-			}
-			if (
-				get(diffData, 'resultSettings.showSearchAsMove', false) &&
-				get(newPreferences, 'resultSettings.showSearchAsMove', '') === false &&
-				get(getPreferencesPayload(), 'resultSettings.showSearchAsMove', undefined) ===
-					undefined
-			) {
-				delete newPreferences.resultSettings.showSearchAsMove;
-			}
-			if (
-				get(diffData, 'resultSettings.showMarkerClusters', false) &&
-				get(newPreferences, 'resultSettings.showMarkerClusters', '') === false &&
-				get(getPreferencesPayload(), 'resultSettings.showMarkerClusters', undefined) ===
-					undefined
-			) {
-				delete newPreferences.resultSettings.showMarkerClusters;
-			}
-
-			if (get(diffData, 'globalSettings.meta.deploySettings', false)) {
-				delete newPreferences?.globalSettings?.meta?.deploySettings?.csbID;
-				delete newPreferences?.globalSettings?.meta.deploySettings?.hasEdited;
-
-				if (
-					get(diffData, 'globalSettings.meta.deploySettings.versionId', '') &&
-					get(
-						newPreferences,
-						'globalSettings.meta.deploySettings.versionId',
-						undefined,
-					) === undefined
-				) {
-					newPreferences.globalSettings.meta.deploySettings.versionId = '';
-				}
-			}
-			if (
-				get(diffData, 'fusionSettings', {}) &&
-				get(newPreferences, 'fusionSettings') === null
-			) {
-				delete newPreferences.fusionSettings;
-			}
-
-			if (
-				get(diffData, 'authenticationSettings', null) &&
-				get(newPreferences, 'authenticationSettings', null) === null
-			) {
-				newPreferences.authenticationSettings = {
-					enableAuth0: true,
-					enableProfilePage: true,
-					profileSettingsForm: {
-						viewData: true,
-						editData: true,
-						closeAccount: true,
-						editThemeSettings: true,
-						editSearchPreferences: true,
-					},
-				};
-			}
-		}
-
-		delete newPreferences.type;
-		delete newPreferences.deploySettings;
-		delete newPreferences.created_at;
-		delete newPreferences.updated_at;
-
-		return !isEqual(removeEmpty(newPreferences), removeEmpty(getPreferencesPayload()));
+		return !!getDiffDataAndCount(removeEmpty(oldData), removeEmpty(newData)).diffCount;
 	}
 
 	handleSave = () => {
@@ -182,6 +92,7 @@ class SavePreferencesN extends React.Component {
 			getRecommendationsPreferences,
 			getPreferencesPayload,
 			closeForm,
+			clientId,
 		} = this.props;
 
 		if (isRecommendation) {
@@ -195,7 +106,14 @@ class SavePreferencesN extends React.Component {
 				}
 			});
 		} else {
-			updateSearchPreferences(getPreferencesPayload()).then((action) => {
+			const preferencesPayload = getPreferencesPayload();
+
+			// inject auth0 clientId in authentication settings
+			if (preferencesPayload.authenticationSettings && clientId) {
+				preferencesPayload.authenticationSettings.clientId = clientId;
+			}
+
+			updateSearchPreferences(preferencesPayload).then((action) => {
 				if (!(action && action.error)) {
 					this.setState({
 						hasChanged: false,
@@ -204,6 +122,26 @@ class SavePreferencesN extends React.Component {
 				}
 			});
 		}
+	};
+
+	getOldDataNewData = () => {
+		const { form, getPreferencesPayload } = this.props;
+		const { preferences } = this.state || {};
+		const oldData = {
+			general: reOrderPreferences(
+				preferences,
+				get(form.value, 'pageSettings.currentPage', ''),
+			),
+		};
+		const newData = {
+			general: getPreferencesPayload(),
+		};
+		Object.keys(get(form.value, 'pageSettings.pages', '')).forEach((pageKey) => {
+			oldData[pageKey] = reOrderPreferences(preferences, pageKey);
+			newData[pageKey] = reOrderPreferences(getPreferencesPayload(), pageKey);
+		});
+
+		return { oldData, newData };
 	};
 
 	render() {
@@ -219,7 +157,9 @@ class SavePreferencesN extends React.Component {
 			getPreferences,
 			closeForm,
 		} = this.props;
-		const { hasChanged, preferences } = this.state;
+		const { hasChanged } = this.state;
+		const { oldData, newData } = this.getOldDataNewData();
+
 		return (
 			<>
 				<Prompt
@@ -232,8 +172,8 @@ class SavePreferencesN extends React.Component {
 					preferenceId={preferenceId}
 					closeForm={closeForm}
 					buttonProps={buttonProps}
-					oldData={reOrderPreferences(preferences)}
-					newData={getPreferencesPayload()}
+					oldData={oldData}
+					newData={newData}
 					setHasChanged={() => {
 						this.setState(
 							{
@@ -266,6 +206,7 @@ SavePreferencesN.defaultProps = {
 		defaultRecommendationsPreferences,
 	),
 	errors: null,
+	clientId: '',
 };
 
 SavePreferencesN.propTypes = {
@@ -284,6 +225,7 @@ SavePreferencesN.propTypes = {
 	form: object.isRequired,
 	errors: arrayOf(object),
 	closeForm: func.isRequired,
+	clientId: string,
 };
 
 const mapStateToProps = (state, props) => ({
@@ -292,6 +234,7 @@ const mapStateToProps = (state, props) => ({
 	errors: props.isRecommendation
 		? [get(state, '$saveRecommendationPreferenceN.error')]
 		: [get(state, '$saveSearchPreferenceN.error')],
+	clientId: get(state, '$getAuth0Preferences.results')?.['_client_id'],
 });
 
 const mapDispatchToProps = (dispatch, props) => ({

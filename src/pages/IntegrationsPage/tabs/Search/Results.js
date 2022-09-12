@@ -5,12 +5,19 @@ import get from 'lodash/get';
 import { Switch, Form, List, Radio, Button, Icon, InputNumber, Input, Popover } from 'antd';
 import { bool, array, object, string, func } from 'prop-types';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import { ReactiveBase } from '@appbaseio/reactivesearch';
 import DataFieldSelector from '../../../../components/Form/DataFieldSelector';
 import PriceUnit from './PriceUnit';
 import SortOptionSelector from './SortOptionSelector';
+import DefaultResults from './Results/DefaultResults';
 import { traverseMapping } from '../../../../batteries/utils/mappings';
 import { getRawMappingsByAppName } from '../../../../batteries/modules/selectors';
 import { getAppMappings } from '../../../../batteries/modules/actions';
+import DocType from './Results/DocType';
+import TabLayout from './Results/TabLayout';
+import { getURL } from '../../../../constants/config';
+import { getTemplate } from '../../utils/index';
+import { geoDefaultFields } from './Results/constants';
 
 const defaultSettings = [
 	{
@@ -85,57 +92,22 @@ const defaultSettings = [
 		value: false,
 	},
 	{
-		id: 'resultTitle',
+		id: 'categoryField',
 		label: (
 			<span>
-				Select the data field to display the <strong>title</strong> of the result item
+				Customize result display by <strong>document type</strong>
 			</span>
 		),
-		value: true,
+		value: false,
 	},
 	{
-		id: 'resultDescription',
+		id: 'categoryFieldValue',
 		label: (
 			<span>
-				Select the data field to display the <strong>description</strong> of the result item
+				Select <strong>document type value</strong>
 			</span>
 		),
-		value: true,
-	},
-	{
-		id: 'resultPrice',
-		label: (
-			<span>
-				Select the data field to display the <strong>price</strong> of the result item
-				<Popover content="You can substitute price for any other similarly significant field">
-					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
-				</Popover>
-			</span>
-		),
-		value: true,
-		showPriceUnitInput: true,
-	},
-	{
-		id: 'resultImage',
-		label: (
-			<span>
-				Select the data field to display the <strong>image</strong> of the result item
-				<Popover content="The value should be of a URL type for the image content to be displayed correctly">
-					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
-				</Popover>
-			</span>
-		),
-		value: true,
-	},
-	{
-		id: 'resultHandle',
-		label: (
-			<span>
-				Select the data field to define the <strong>redirect url</strong> for the result
-				item
-			</span>
-		),
-		value: true,
+		value: false,
 	},
 ];
 
@@ -224,69 +196,7 @@ const geoDefaultSettings = [
 		),
 		value: true,
 	},
-	{
-		id: 'locationDataField',
-		label: (
-			<span>
-				Select the data field to display the <strong>location</strong> marker of the result
-				item
-			</span>
-		),
-		value: false,
-	},
-	{
-		id: 'resultTitle',
-		label: (
-			<span>
-				Select the data field to display the <strong>title</strong> of the result item
-			</span>
-		),
-		value: true,
-	},
-	{
-		id: 'resultDescription',
-		label: (
-			<span>
-				Select the data field to display the <strong>description</strong> of the result item
-			</span>
-		),
-		value: true,
-	},
-	{
-		id: 'resultPrice',
-		label: (
-			<span>
-				Select the data field to display the <strong>price</strong> of the result item
-				<Popover content="You can substitute price for any other similarly significant field">
-					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
-				</Popover>
-			</span>
-		),
-		value: true,
-		showPriceUnitInput: true,
-	},
-	{
-		id: 'resultImage',
-		label: (
-			<span>
-				Select the data field to display the <strong>image</strong> of the result item
-				<Popover content="The value should be of a URL type for the image content to be displayed correctly">
-					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
-				</Popover>
-			</span>
-		),
-		value: true,
-	},
-	{
-		id: 'resultHandle',
-		label: (
-			<span>
-				Select the data field to define the <strong>redirect url</strong> for the result
-				item
-			</span>
-		),
-		value: true,
-	},
+	...geoDefaultFields,
 ];
 
 const fieldSelectorIds = [
@@ -317,23 +227,50 @@ const geoOptions = [
 const { Item } = List;
 
 const Results = ({
-	pipeline,
+	form,
 	withoutForm,
 	dataSource,
 	mappings,
 	fetchMappings,
 	credentials,
 	appName,
-	themeType,
+	getPreferencesPayload,
 }) => {
 	const [error, setError] = useState(false);
+	const [categoryField, setCategoryField] = useState(
+		form && form.get('categoryField') ? form.get('categoryField').value : '',
+	);
+	const [isLoading, setIsLoading] = useState(false);
+	const pipeline = form && form.get('pipeline') ? form.get('pipeline').value : undefined;
+	const indexSettings = form && form.get('indexSettings') ? form.get('indexSettings').value : {};
+	const secondaryPipeline = get(indexSettings, 'index', '');
+	const themeType = form && form.get('themeType') ? form.get('themeType').value : 'classic';
+	const preferences = getPreferencesPayload?.();
 
 	useEffect(() => {
 		if (credentials && !Object.keys(mappings).length) {
 			// Fetch Mappings if permissions are present
 			fetchMappings(appName, credentials);
 		}
+
+		if (form && form.get('categoryField')) {
+			form.get('categoryField').valueChanges.subscribe((value) => {
+				if (categoryField !== value) {
+					const categoryFieldValueControl = form.get('categoryFieldValue');
+					categoryFieldValueControl.reset([]);
+					setCategoryField(value);
+				}
+			});
+		}
 	}, []);
+
+	const handleReload = () => {
+		setIsLoading(true);
+
+		setTimeout(() => {
+			setIsLoading(false);
+		}, 1);
+	};
 
 	const getDataSource = () => {
 		if (!dataSource.length) {
@@ -349,7 +286,13 @@ const Results = ({
 			includeMappings: undefined,
 			includeTypes: undefined,
 		});
-		return ['_score', ...traversedMappings];
+		if (Array.isArray(traversedMappings)) {
+			return ['_score', ...traversedMappings];
+		}
+		const newTraversedMappings = traversedMappings[secondaryPipeline || pipeline];
+		if (Array.isArray(newTraversedMappings)) return ['_score', ...newTraversedMappings];
+
+		return ['_score'];
 	};
 
 	const move = (from, to, arr) => {
@@ -374,13 +317,162 @@ const Results = ({
 	};
 
 	const component = () => {
+		const templateObj = getTemplate(themeType);
 		return (
-			<List
-				dataSource={getDataSource()}
-				bordered
-				renderItem={(item) => {
-					if (themeType === 'geo') {
-						if (item.id === 'mapLayout') {
+			<>
+				<List
+					dataSource={getDataSource()}
+					bordered
+					renderItem={(item) => {
+						if (themeType === 'geo') {
+							if (item.id === 'mapLayout') {
+								return (
+									<FieldControl name={item.id}>
+										{(control) => (
+											<Item
+												actions={[
+													<Radio.Group
+														{...control.handler()}
+														onChange={(value) => {
+															control.markAsTouched();
+															control.handler().onChange(value);
+														}}
+													>
+														<Radio value="map">Map</Radio>
+														<Radio value="list">List</Radio>
+													</Radio.Group>,
+												]}
+											>
+												<Item.Meta title={item.label} />
+											</Item>
+										)}
+									</FieldControl>
+								);
+							}
+							if (item.id === 'mapComponent') {
+								return (
+									<FieldControl name={item.id}>
+										{(control) => (
+											<Item
+												actions={[
+													<Radio.Group
+														{...control.handler()}
+														value={
+															control.handler().value || 'googleMap'
+														}
+														onChange={(value) => {
+															control.markAsTouched();
+															control.handler().onChange(value);
+														}}
+													>
+														<Radio value="openStreetMap">
+															OpenStreetMap
+														</Radio>
+														<Radio value="googleMap">Google Map</Radio>
+													</Radio.Group>,
+												]}
+											>
+												<Item.Meta title={item.label} />
+											</Item>
+										)}
+									</FieldControl>
+								);
+							}
+							if (item.id === 'defaultZoom') {
+								return (
+									<FieldControl name={item.id}>
+										{({ value, onChange }) => (
+											<Item
+												actions={[
+													<InputNumber
+														value={value || 13}
+														onChange={onChange}
+														min={0}
+														max={20}
+													/>,
+												]}
+											>
+												<Item.Meta
+													title={
+														typeof item.label === 'function'
+															? item.label(value)
+															: item.label
+													}
+												/>
+											</Item>
+										)}
+									</FieldControl>
+								);
+							}
+							if (item.id === 'mapsAPIkey') {
+								return (
+									<FieldControl name={item.id}>
+										{({ value, onChange }) => (
+											<Item
+												actions={[
+													<Input
+														style={{ width: 300 }}
+														value={value}
+														onChange={onChange}
+													/>,
+												]}
+											>
+												<Item.Meta
+													title={
+														typeof item.label === 'function'
+															? item.label(value)
+															: item.label
+													}
+												/>
+											</Item>
+										)}
+									</FieldControl>
+								);
+							}
+							if (geoOptions.includes(item.id)) {
+								return (
+									<FieldControl name={item.id}>
+										{({ value, onChange }) => (
+											<Item
+												actions={
+													fieldSelectorIds.includes(item.id)
+														? [
+																<div>
+																	{item?.showPriceUnitInput ? (
+																		<PriceUnit name="priceUnit" />
+																	) : null}
+																	<DataFieldSelector
+																		pipeline={
+																			secondaryPipeline ||
+																			pipeline
+																		}
+																		name={item.id}
+																	/>
+																</div>,
+														  ]
+														: [
+																<Switch
+																	checked={value}
+																	onChange={onChange}
+																/>,
+														  ]
+												}
+											>
+												<Item.Meta
+													title={
+														typeof item.label === 'function'
+															? item.label(value)
+															: item.label
+													}
+												/>
+											</Item>
+										)}
+									</FieldControl>
+								);
+							}
+							return null;
+						}
+						if (item.id === 'layout') {
 							return (
 								<FieldControl name={item.id}>
 									{(control) => (
@@ -393,7 +485,7 @@ const Results = ({
 														control.handler().onChange(value);
 													}}
 												>
-													<Radio value="map">Map</Radio>
+													<Radio value="grid">Grid</Radio>
 													<Radio value="list">List</Radio>
 												</Radio.Group>,
 											]}
@@ -404,259 +496,221 @@ const Results = ({
 								</FieldControl>
 							);
 						}
-						if (item.id === 'mapComponent') {
+						if (item.id === 'sortOptionSelector') {
 							return (
-								<FieldControl name={item.id}>
-									{(control) => (
-										<Item
-											actions={[
-												<Radio.Group
-													{...control.handler()}
-													value={control.handler().value || 'googleMap'}
-													onChange={(value) => {
-														control.markAsTouched();
-														control.handler().onChange(value);
-													}}
-												>
-													<Radio value="openStreetMap">
-														OpenStreetMap
-													</Radio>
-													<Radio value="googleMap">Google Map</Radio>
-												</Radio.Group>,
-											]}
-										>
-											<Item.Meta title={item.label} />
-										</Item>
-									)}
-								</FieldControl>
-							);
-						}
-						if (item.id === 'defaultZoom') {
-							return (
-								<FieldControl name={item.id}>
-									{({ value, onChange }) => (
-										<Item
-											actions={[
-												<InputNumber
-													value={value || 13}
-													onChange={onChange}
-													min={0}
-													max={20}
-												/>,
-											]}
-										>
-											<Item.Meta
-												title={
-													typeof item.label === 'function'
-														? item.label(value)
-														: item.label
-												}
-											/>
-										</Item>
-									)}
-								</FieldControl>
-							);
-						}
-						if (item.id === 'mapsAPIkey') {
-							return (
-								<FieldControl name={item.id}>
-									{({ value, onChange }) => (
-										<Item
-											actions={[
-												<Input
-													style={{ width: 300 }}
-													value={value}
-													onChange={onChange}
-												/>,
-											]}
-										>
-											<Item.Meta
-												title={
-													typeof item.label === 'function'
-														? item.label(value)
-														: item.label
-												}
-											/>
-										</Item>
-									)}
-								</FieldControl>
-							);
-						}
-						if (geoOptions.includes(item.id)) {
-							return (
-								<FieldControl name={item.id}>
-									{({ value, onChange }) => (
-										<Item
-											actions={
-												fieldSelectorIds.includes(item.id)
-													? [
-															<div>
-																{item?.showPriceUnitInput ? (
-																	<PriceUnit name="priceUnit" />
-																) : null}
-																<DataFieldSelector
-																	pipeline={pipeline}
-																	name={item.id}
-																/>
-															</div>,
-													  ]
-													: [
-															<Switch
-																checked={value}
-																onChange={onChange}
-															/>,
-													  ]
-											}
-										>
-											<Item.Meta
-												title={
-													typeof item.label === 'function'
-														? item.label(value)
-														: item.label
-												}
-											/>
-										</Item>
-									)}
-								</FieldControl>
-							);
-						}
-						return null;
-					}
-					if (item.id === 'layout') {
-						return (
-							<FieldControl name={item.id}>
-								{(control) => (
-									<Item
-										actions={[
-											<Radio.Group
-												{...control.handler()}
-												onChange={(value) => {
-													control.markAsTouched();
-													control.handler().onChange(value);
+								<FieldControl name={item.id} strict={false}>
+									{({ value = [], onChange }) => {
+										return (
+											<div
+												style={{
+													padding: '12px 24px',
+													borderBottom: '1px solid #e8e8e8',
 												}}
 											>
-												<Radio value="grid">Grid</Radio>
-												<Radio value="list">List</Radio>
-											</Radio.Group>,
-										]}
+												{item.label}
+												<div>
+													<DragDropContext
+														onDragEnd={(res) =>
+															handleItemReOrder(res, value, onChange)
+														}
+													>
+														<Droppable droppableId="droppable">
+															{(provided, snapshot) => (
+																<div
+																	ref={provided.innerRef}
+																	style={{
+																		margin: 10,
+																		backgroundColor:
+																			snapshot.isDraggingOver
+																				? 'transparent'
+																				: 'transparent',
+																	}}
+																	{...provided.droppableProps}
+																>
+																	{value && value.length
+																		? value.map(
+																				(ele, index) => (
+																					<SortOptionSelector
+																						item={ele}
+																						index={
+																							index
+																						}
+																						fieldPicker={getDatafields()}
+																						onChange={
+																							onChange
+																						}
+																						value={
+																							value
+																						}
+																						onError={
+																							onError
+																						}
+																					/>
+																				),
+																		  )
+																		: null}
+																	{provided.placeholder}
+																</div>
+															)}
+														</Droppable>
+													</DragDropContext>
+
+													<Button
+														style={{ marginLeft: 10 }}
+														type="primary"
+														size="small"
+														ghost
+														onClick={() => {
+															const newValue = [
+																...value,
+																{
+																	label: 'Relevance',
+																	dataField: '_score',
+																	sortBy: 'desc',
+																},
+															];
+															onChange(newValue);
+														}}
+														disabled={error}
+													>
+														<Icon type="plus" />
+														Add Sort Option
+													</Button>
+												</div>
+											</div>
+										);
+									}}
+								</FieldControl>
+							);
+						}
+
+						if (item.id === 'categoryField') {
+							return templateObj?.name !== 'geo' ? (
+								<FieldControl name={item.id}>
+									{/* eslint-disable-next-line */}
+									{({ value, onChange }) => {
+										return (
+											<Item
+												actions={[
+													<DataFieldSelector
+														pipeline={secondaryPipeline || pipeline}
+														name={item.id}
+														isAggFields
+														handleReload={handleReload}
+													/>,
+												]}
+											>
+												<Item.Meta
+													title={
+														typeof item.label === 'function'
+															? item.label(value)
+															: item.label
+													}
+												/>
+											</Item>
+										);
+									}}
+								</FieldControl>
+							) : (
+								<></>
+							);
+						}
+						if (item.id === 'categoryFieldValue') {
+							return form &&
+								form.get('categoryField') &&
+								form.get('categoryField').value &&
+								(secondaryPipeline || preferences?.pipeline) ? (
+								<FieldControl name={item.id} strict={false}>
+									{({ value, onChange }) => {
+										return (
+											<>
+												<Item
+													actions={[
+														!isLoading ? (
+															<ReactiveBase
+																app={
+																	secondaryPipeline ||
+																	preferences?.pipeline ||
+																	''
+																}
+																url={getURL()}
+																credentials={
+																	preferences?.exportSettings
+																		?.credentials || ''
+																}
+																enableAppbase
+															>
+																<DocType
+																	value={value}
+																	onChange={onChange}
+																	form={form}
+																/>
+															</ReactiveBase>
+														) : (
+															<></>
+														),
+													]}
+												>
+													<Item.Meta
+														title={
+															typeof item.label === 'function'
+																? item.label(value)
+																: item.label
+														}
+													/>
+												</Item>
+												{form.get('categoryField').value ? (
+													<TabLayout
+														values={value}
+														form={form}
+														pipeline={secondaryPipeline || pipeline}
+													/>
+												) : null}
+											</>
+										);
+									}}
+								</FieldControl>
+							) : (
+								<DefaultResults pipeline={secondaryPipeline || pipeline} />
+							);
+						}
+
+						return (
+							<FieldControl name={item.id}>
+								{({ value, onChange }) => (
+									<Item
+										actions={
+											fieldSelectorIds.includes(item.id)
+												? [
+														<div>
+															{item?.showPriceUnitInput ? (
+																<PriceUnit name="priceUnit" />
+															) : null}
+															<DataFieldSelector
+																pipeline={
+																	secondaryPipeline || pipeline
+																}
+																name={item.id}
+															/>
+														</div>,
+												  ]
+												: [<Switch checked={value} onChange={onChange} />]
+										}
 									>
-										<Item.Meta title={item.label} />
+										<Item.Meta
+											title={
+												typeof item.label === 'function'
+													? item.label(value)
+													: item.label
+											}
+										/>
 									</Item>
 								)}
 							</FieldControl>
 						);
-					}
-					if (item.id === 'sortOptionSelector') {
-						return (
-							<FieldControl name={item.id} strict={false}>
-								{({ value = [], onChange }) => {
-									return (
-										<div
-											style={{
-												padding: '12px 24px',
-												borderBottom: '1px solid #e8e8e8',
-											}}
-										>
-											{item.label}
-											<div>
-												<DragDropContext
-													onDragEnd={(res) =>
-														handleItemReOrder(res, value, onChange)
-													}
-												>
-													<Droppable droppableId="droppable">
-														{(provided, snapshot) => (
-															<div
-																ref={provided.innerRef}
-																style={{
-																	margin: 10,
-																	backgroundColor:
-																		snapshot.isDraggingOver
-																			? 'transparent'
-																			: 'transparent',
-																}}
-																{...provided.droppableProps}
-															>
-																{value && value.length
-																	? value.map((ele, index) => (
-																			<SortOptionSelector
-																				item={ele}
-																				index={index}
-																				fieldPicker={getDatafields()}
-																				onChange={onChange}
-																				value={value}
-																				onError={onError}
-																			/>
-																	  ))
-																	: null}
-																{provided.placeholder}
-															</div>
-														)}
-													</Droppable>
-												</DragDropContext>
-
-												<Button
-													style={{ marginLeft: 10 }}
-													type="primary"
-													size="small"
-													ghost
-													onClick={() => {
-														const newValue = [
-															...value,
-															{
-																label: 'Relevance',
-																dataField: '_score',
-																sortBy: 'desc',
-															},
-														];
-														onChange(newValue);
-													}}
-													disabled={error}
-												>
-													<Icon type="plus" />
-													Add Sort Option
-												</Button>
-											</div>
-										</div>
-									);
-								}}
-							</FieldControl>
-						);
-					}
-
-					return (
-						<FieldControl name={item.id}>
-							{({ value, onChange }) => (
-								<Item
-									actions={
-										fieldSelectorIds.includes(item.id)
-											? [
-													<div>
-														{item?.showPriceUnitInput ? (
-															<PriceUnit name="priceUnit" />
-														) : null}
-														<DataFieldSelector
-															pipeline={pipeline}
-															name={item.id}
-														/>
-													</div>,
-											  ]
-											: [<Switch checked={value} onChange={onChange} />]
-									}
-								>
-									<Item.Meta
-										title={
-											typeof item.label === 'function'
-												? item.label(value)
-												: item.label
-										}
-									/>
-								</Item>
-							)}
-						</FieldControl>
-					);
-				}}
-			/>
+					}}
+				/>
+			</>
 		);
 	};
 
@@ -668,8 +722,7 @@ const Results = ({
 
 Results.defaultProps = {
 	withoutForm: false,
-	themeType: 'classic',
-	pipeline: undefined,
+
 	appName: undefined,
 	dataSource: [],
 	mappings: {},
@@ -679,11 +732,13 @@ Results.propTypes = {
 	withoutForm: bool,
 	dataSource: array,
 	mappings: object,
-	pipeline: string,
+
 	appName: string,
 	credentials: string.isRequired,
 	fetchMappings: func.isRequired,
-	themeType: string,
+
+	getPreferencesPayload: func.isRequired,
+	form: object.isRequired,
 };
 
 const mapStateToProps = (state, props) => {

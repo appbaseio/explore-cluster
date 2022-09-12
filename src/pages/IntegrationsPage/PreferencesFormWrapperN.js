@@ -6,6 +6,7 @@ import { withRouter } from 'react-router-dom';
 import { css } from 'react-emotion';
 import { Button } from 'antd';
 import { FormBuilder, Validators } from 'react-reactive-form';
+import { componentTypes } from '@appbaseio/reactivesearch';
 import {
 	FormContext,
 	validateURL,
@@ -22,6 +23,8 @@ import {
 	RecommendationTypes,
 	getChartConfigurationForm,
 	getChartKey,
+	filterConfigurationFormDefaultFields,
+	perPageDependentKeys,
 } from './utils';
 import {
 	getSearchPreferenceById,
@@ -113,6 +116,7 @@ class PreferencesFormWrapperN extends React.Component {
 			priceUnit: undefined,
 			resultImage: '',
 			resultHandle: '',
+			cssSelector: '',
 			storeInfo: FormBuilder.group({
 				currency: 'USD',
 			}),
@@ -132,6 +136,7 @@ class PreferencesFormWrapperN extends React.Component {
 					editThemeSettings: true,
 					editSearchPreferences: true,
 				}),
+				clientId: '',
 			}),
 			// Common controls =>>>>> Ends
 			...(props.isRecommendation
@@ -209,6 +214,12 @@ class PreferencesFormWrapperN extends React.Component {
 							pages: {},
 							fields: {},
 						},
+						displayFields: FormBuilder.group({}),
+						categoryField: '',
+						categoryFieldValue: [],
+						indexSettings: FormBuilder.group({
+							index: '',
+						}),
 				  }),
 		});
 		this.state = {
@@ -233,6 +244,129 @@ class PreferencesFormWrapperN extends React.Component {
 		}
 
 		this.getFormPreferences();
+
+		if (this.form.get('categoryFieldValue')) {
+			this.form.get('categoryFieldValue').valueChanges.subscribe((values) => {
+				const displayFieldsControl = this.form.get('displayFields');
+				const removedFields = Object.keys(displayFieldsControl.value).filter(
+					(field) => !values.includes(field) && field !== '_default',
+				);
+
+				removedFields.forEach((field) => {
+					displayFieldsControl.removeControl(field);
+				});
+			});
+		}
+		const getNewPageSettings = (formValue) => {
+			const pages = get(formValue, 'pageSettings.pages', {});
+			const currentPage = get(formValue, 'currentPage', {});
+			const newPages = {};
+			const payload = getSearchPreferencesPayload(formValue);
+			Object.keys(pages).forEach((page) => {
+				newPages[page] = {
+					...pages[page],
+				};
+				if (page === currentPage) {
+					newPages[page].indexSettings = get(formValue, 'indexSettings');
+					const compSettings = { ...newPages[page].componentSettings };
+
+					// always extract out facets from the form state
+					// as facets could be removed or added, relying on the pageSettings object in the form
+					// can leave out newly added/ removed facets
+					const facetKeys = [
+						{ facetId: 'result', facetType: 'result' },
+						{ facetId: 'search', facetType: 'search' },
+					];
+					payload.chartSettings.charts.forEach((chartItem, index) => {
+						if (chartItem.rsConfig && chartItem.rsConfig.componentId) {
+							facetKeys.push({
+								facetId: chartItem.rsConfig.componentId,
+								facetType: chartItem.rsConfig.componentType,
+								index,
+							});
+						}
+					});
+					payload.facetSettings.dynamicFacets.forEach((item, index) => {
+						if (item.rsConfig && item.rsConfig.componentId) {
+							facetKeys.push({
+								facetId: item.rsConfig.componentId,
+								facetType: item.rsConfig.componentType,
+								index,
+							});
+						}
+					});
+
+					// remove deleted facets from pageSettings
+					Object.keys(compSettings).forEach((componentFacetKey) => {
+						if (!facetKeys.includes(componentFacetKey)) {
+							delete compSettings[componentFacetKey];
+						}
+					});
+
+					// further page's component settings
+					facetKeys.forEach(({ facetId, facetType, index }) => {
+						let facetSettingsObject = compSettings[facetId];
+						if (!facetSettingsObject) {
+							if (facetType !== 'search' && facetType !== 'result') {
+								if (facetType === componentTypes.reactiveChart) {
+									facetSettingsObject = payload.chartSettings.charts[index];
+								} else {
+									facetSettingsObject =
+										payload.facetSettings.dynamicFacets[index];
+								}
+							}
+						}
+						if (facetId !== 'search' && facetId !== 'result') {
+							// If component is a chart
+							if (
+								facetSettingsObject.rsConfig.componentType ===
+								componentTypes.reactiveChart
+							) {
+								const arr = facetSettingsObject.rsConfig.componentId.split('_');
+								const idx = arr.at(-1) || 0;
+
+								compSettings[facetId] = payload.chartSettings.charts[idx];
+							} else if (facetSettingsObject.rsConfig.title) {
+								if (facetSettingsObject.facetType !== 'static') {
+									const arr = facetSettingsObject.rsConfig.componentId.split('_');
+									const idx = arr.at(-1) || 0;
+									compSettings[facetId] =
+										payload.facetSettings.dynamicFacets[idx];
+								}
+							}
+						} else if (facetId === 'result') {
+							compSettings[facetId] = payload.resultSettings;
+						} else if (facetId === 'search') {
+							compSettings[facetId] = payload.searchSettings;
+						}
+					});
+					newPages[page].componentSettings = compSettings;
+				}
+			});
+
+			const newPageSettings = {
+				pages: newPages,
+				currentPage: get(formValue, 'currentPage'),
+				fields: get(formValue, 'pageSettings.fields'),
+			};
+
+			return newPageSettings;
+		};
+
+		if (!isRecommendation) {
+			// we update the pageSettings on every update of a property which is per page level
+			perPageDependentKeys.forEach((key) => {
+				if (this.form.get(key)) {
+					this.form.get(key).valueChanges.subscribe(() => {
+						if (this.form.get('pageSettings')) {
+							this.form.get('pageSettings').setValue({
+								...getNewPageSettings(this.form.getRawValue()),
+							});
+						}
+					});
+				}
+			});
+		}
 	}
 
 	componentDidUpdate(prevProps) {
@@ -268,6 +402,10 @@ class PreferencesFormWrapperN extends React.Component {
 				recommendationsControl.controls = [];
 			}
 		};
+		const resetFormGroupControls = () => {
+			const displayFieldsControl = this.form.get('displayFields');
+			if (displayFieldsControl) displayFieldsControl.reset({});
+		};
 		const getFilterMessages = () => {
 			let noFilterItem;
 			let fetchingFilterOptions;
@@ -281,6 +419,7 @@ class PreferencesFormWrapperN extends React.Component {
 			};
 		};
 		resetFormArrayControls();
+		resetFormGroupControls();
 		// Add controls for dynamic filters
 		const dynamicFilterControl = this.form.get('dynamicFilters');
 		get(preferences, 'facetSettings.dynamicFacets', []).forEach((data, index) => {
@@ -298,6 +437,25 @@ class PreferencesFormWrapperN extends React.Component {
 			};
 			chartsControl.push(control);
 		});
+
+		const displayFieldsObj = {};
+		const displayFieldsControl = this.form.get('displayFields');
+		const displayFieldsPrefs = get(preferences, 'resultSettings.displayFields', {});
+		Object.keys(displayFieldsPrefs).forEach((field) => {
+			const newControlObj = {
+				resultTitle: get(displayFieldsPrefs[field], 'title'),
+				resultDescription: get(displayFieldsPrefs[field], 'description'),
+				resultPrice: get(displayFieldsPrefs[field], 'price'),
+				priceUnit: get(displayFieldsPrefs[field], 'priceUnit'),
+				resultImage: get(displayFieldsPrefs[field], 'image'),
+				resultHandle: get(displayFieldsPrefs[field], 'handle'),
+				cssSelector: get(displayFieldsPrefs[field], 'cssSelector'),
+			};
+			displayFieldsControl.addControl(field, FormBuilder.group(newControlObj));
+
+			displayFieldsObj[field] = newControlObj;
+		});
+
 		try {
 			const patchVar = JSON.parse(
 				JSON.stringify({
@@ -330,6 +488,7 @@ class PreferencesFormWrapperN extends React.Component {
 					priceUnit: get(preferences, 'resultSettings.fields.priceUnit'),
 					resultImage: get(preferences, 'resultSettings.fields.image'),
 					resultHandle: get(preferences, 'resultSettings.fields.handle'),
+					cssSelector: get(preferences, 'resultSettings.fields.cssSelector'),
 					exportSettings: get(preferences, 'exportSettings'),
 					storeInfo: {
 						currency: get(preferences, 'globalSettings.currency'),
@@ -386,7 +545,7 @@ class PreferencesFormWrapperN extends React.Component {
 					dynamicFilters: get(preferences, 'facetSettings.dynamicFacets', []).map(
 						(facet) => ({
 							enabled: facet.enabled,
-							customize: get(facet, 'rsConfig'),
+							customize: filterConfigurationFormDefaultFields(get(facet, 'rsConfig')),
 						}),
 					),
 					charts: get(preferences, 'chartSettings.charts', []).map((chart) => ({
@@ -394,6 +553,10 @@ class PreferencesFormWrapperN extends React.Component {
 						customize: get(chart, 'rsConfig'),
 					})),
 					pageSettings: get(preferences, 'pageSettings', {}),
+					displayFields: displayFieldsObj,
+					categoryField: get(preferences, 'resultSettings.categoryField', ''),
+					categoryFieldValue: get(preferences, 'resultSettings.categoryFieldValue', []),
+					indexSettings: get(preferences, 'indexSettings', {}),
 				}),
 			);
 			this.form.patchValue(patchVar);
@@ -426,11 +589,16 @@ class PreferencesFormWrapperN extends React.Component {
 				recommendationsControl.controls = [];
 			}
 		};
+		const resetFormGroupControls = () => {
+			const displayFieldsControl = this.form.get('displayFields');
+			if (displayFieldsControl) displayFieldsControl.reset({});
+		};
 		// Sync form values
 		if (preferences) {
 			try {
 				// Reset dynamic controls
 				resetFormArrayControls();
+				resetFormGroupControls();
 				// Add controls for dynamic filters
 				const dynamicFilterControl = this.form.get('dynamicFilters');
 				get(preferences, 'facetSettings.dynamicFacets', []).forEach((data, index) => {
@@ -456,6 +624,25 @@ class PreferencesFormWrapperN extends React.Component {
 						recommendationsControl.push(control);
 					},
 				);
+
+				const displayFieldsObj = {};
+				const displayFieldsControl = this.form.get('displayFields');
+				const displayFieldsPrefs = get(preferences, 'resultSettings.displayFields', {});
+				Object.keys(displayFieldsPrefs).forEach((field) => {
+					const newControlObj = {
+						resultTitle: get(displayFieldsPrefs[field], 'title'),
+						resultDescription: get(displayFieldsPrefs[field], 'description'),
+						resultPrice: get(displayFieldsPrefs[field], 'price'),
+						priceUnit: get(displayFieldsPrefs[field], 'priceUnit'),
+						resultImage: get(displayFieldsPrefs[field], 'image'),
+						resultHandle: get(displayFieldsPrefs[field], 'handle'),
+						cssSelector: get(displayFieldsPrefs[field], 'cssSelector'),
+					};
+					displayFieldsControl.addControl(field, FormBuilder.group(newControlObj));
+
+					displayFieldsObj[field] = newControlObj;
+				});
+
 				const getFilterMessages = () => {
 					let noFilterItem;
 					let fetchingFilterOptions;
@@ -469,7 +656,6 @@ class PreferencesFormWrapperN extends React.Component {
 					};
 				};
 				// Patch form value
-
 				try {
 					const patchVar = JSON.parse(
 						JSON.stringify({
@@ -518,6 +704,7 @@ class PreferencesFormWrapperN extends React.Component {
 							priceUnit: get(preferences, 'resultSettings.fields.priceUnit'),
 							resultImage: get(preferences, 'resultSettings.fields.image'),
 							resultHandle: get(preferences, 'resultSettings.fields.handle'),
+							cssSelector: get(preferences, 'resultSettings.fields.cssSelector'),
 							exportSettings: get(preferences, 'exportSettings'),
 							storeInfo: {
 								currency: get(preferences, 'globalSettings.currency'),
@@ -703,7 +890,9 @@ class PreferencesFormWrapperN extends React.Component {
 											[],
 										).map((facet) => ({
 											enabled: facet.enabled,
-											customize: get(facet, 'rsConfig'),
+											customize: filterConfigurationFormDefaultFields(
+												get(facet, 'rsConfig'),
+											),
 										})),
 										charts: get(preferences, 'chartSettings.charts', []).map(
 											(chart) => ({
@@ -712,6 +901,18 @@ class PreferencesFormWrapperN extends React.Component {
 											}),
 										),
 										pageSettings: get(preferences, 'pageSettings', {}),
+										displayFields: displayFieldsObj,
+										categoryField: get(
+											preferences,
+											'resultSettings.categoryField',
+											'',
+										),
+										categoryFieldValue: get(
+											preferences,
+											'resultSettings.categoryFieldValue',
+											[],
+										),
+										indexSettings: get(preferences, 'indexSettings', {}),
 								  }),
 						}),
 					);
@@ -766,6 +967,7 @@ class PreferencesFormWrapperN extends React.Component {
 						priceUnit: undefined,
 						resultImage: '',
 						resultHandle: '',
+						cssSelector: '',
 					});
 
 					if (colorFilter) {
@@ -795,23 +997,24 @@ class PreferencesFormWrapperN extends React.Component {
 			this.form.get('autoSuggestionSettings').valueChanges.subscribe(() => {});
 		}
 
-		this.form.get('currentPage').valueChanges.subscribe(async (value) => {
-			if (value) {
-				const { currentPage } = this.state;
-				if (value !== currentPage) {
-					this.setState(
-						{
-							currentPage: value,
-						},
-						() =>
-							this.transformSearchPreferences(
-								reOrderPreferences(searchPreferences, value),
-							),
-					);
+		if (!this.form.get('currentPage').valueChanges.observers.length) {
+			this.form.get('currentPage').valueChanges.subscribe(async (value) => {
+				if (value) {
+					const { currentPage } = this.state;
+					if (value !== currentPage) {
+						this.setState(
+							{
+								currentPage: value,
+							},
+							() =>
+								this.transformSearchPreferences(
+									reOrderPreferences(this.getPreferencesPayload(), value),
+								),
+						);
+					}
 				}
-				//
-			}
-		});
+			});
+		}
 	};
 
 	getPreferencesPayload = () => {
@@ -908,12 +1111,14 @@ PreferencesFormWrapperN.propTypes = {
 	allRecommendationsPreferences: array.isRequired,
 };
 
-const mapStateToProps = (state, props) => ({
-	searchPreferences: getSearchPreferenceById(state, props.preferenceId),
-	recommendationsPreferences: getRecommendationPreferenceById(state, props.preferenceId),
-	allSearchPreferences: get(state, '$getSearchPreferencesN.results', []),
-	allRecommendationsPreferences: get(state, '$getRecommendationsPreferencesN.results', []),
-});
+const mapStateToProps = (state, props) => {
+	return {
+		searchPreferences: getSearchPreferenceById(state, props.preferenceId),
+		recommendationsPreferences: getRecommendationPreferenceById(state, props.preferenceId),
+		allSearchPreferences: get(state, '$getSearchPreferencesN.results', []),
+		allRecommendationsPreferences: get(state, '$getRecommendationsPreferencesN.results', []),
+	};
+};
 
 const mapDispatchToProps = (dispatch) => ({
 	getSearchPreferences: () => dispatch(getSearchPreferencesN()),

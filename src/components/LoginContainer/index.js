@@ -13,48 +13,39 @@ const LoginContainer = ({ children }) => {
 			<Flex css={main}>
 				<Flex className="content left-container" flexDirection="column">
 					<h2 className="title">
-						Give <span className="highlight">superpowers</span> to your Elasticsearch
-						cluster!
+						<span className="highlight">Supercharge</span> your search
 					</h2>
 					<p style={{ fontSize: 20, textAlign: 'left' }}>
-						<a href="https://www.reactivesearch.io/">reactivesearch.io</a> enables you
-						to build the best relevant search experiences for web and mobile. You can
-						deploy it on cloud or host it yourself.
+						Build, collaborate and ship search UIs with{' '}
+						<a href="https://www.reactivesearch.io/">ReactiveSearch</a> 10x faster
 					</p>
 					<div className="signup_description">
 						<ul className="signup_benefits">
 							<li>
 								<Icon type="check" className="icon" />
-								<span>
-									Deployment Flexibility: Our cloud, your cloud, local environment
-									- works everywhere
+								<span>Author search UIs with point and click</span>
+							</li>
+							<li>
+								<Icon type="check" className="icon" />
+								<span>Extend search UIs with cloud IDE</span>
+							</li>
+							<li>
+								<Icon type="check" className="icon" />
+								<span role="img" aria-label="emoji">
+									Configure 🔐 access controls and 👨🏼 end-user authentication
+								</span>
+							</li>
+							<li>
+								<Icon type="check" className="icon" />
+								<span role="img" aria-label="emoji">
+									Deploy on the 🌐 global edge with your domain in one click
 								</span>
 							</li>
 							<li>
 								<Icon type="check" className="icon" />
 								<span>
-									Import JSON / CSV data or use our CLI for importing from your
-									favorite data source
-								</span>
-							</li>
-							<li>
-								<Icon type="check" className="icon" />
-								<span>
-									Browse data, edit schema, build relevant search visually, and
-									apply query rules to extend the search engine.
-								</span>
-							</li>
-							<li>
-								<Icon type="check" className="icon" />
-								<span>
-									Get actionable analytics to understand and improve the search
-									ROI impact on your business
-								</span>
-							</li>
-							<li>
-								<Icon type="check" className="icon" />
-								<span>
-									Setup access control for search that works out of the box
+									Out of the box analytics and insights for your deployed search
+									UI
 								</span>
 							</li>
 						</ul>

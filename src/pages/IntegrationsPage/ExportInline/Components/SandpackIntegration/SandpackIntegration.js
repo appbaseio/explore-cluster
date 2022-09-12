@@ -18,7 +18,7 @@ const SandPackIntegration = ({
 		line: 0,
 		lines: [],
 	});
-
+	const [searchType, setSearchType] = useState('');
 	const { sandpack } = useSandpack();
 	const { files, activePath } = sandpack;
 	const { code } = files[activePath];
@@ -109,12 +109,15 @@ const SandPackIntegration = ({
 					setHighlightLine={setHighlightLine}
 					iframeHeight={iframeHeight}
 					collapsed={collapsed}
+					searchType={searchType}
+					setSearchType={setSearchType}
 				/>
 				<MonacoEditor
 					iframeHeight={iframeHeight}
 					highlightLine={highlightLine}
 					path={activePath}
 					setOpenCommitModal={setOpenCommitModal}
+					setSearchType={setSearchType}
 				/>
 				<div className="resizer" id="dragMe" />
 				<SandpackPreview viewportSize={{ height: `${iframeHeight}px` }} />

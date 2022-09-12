@@ -5,6 +5,7 @@ import { Icon, Input, Layout, Menu, Tag } from 'antd';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 
+// eslint-disable-next-line import/no-cycle
 import AppLayout from '../../components/AppLayout';
 import {
 	getDefaultSettings,
@@ -95,20 +96,28 @@ class AppWrapper extends Component {
 					icon: 'control',
 					action: ALLOWED_ACTIONS.UI_BUILDER,
 					menu: [
-						{ label: 'Search', link: '/cluster/search-builder', hasExactPath: true },
+						{
+							label: 'Search',
+							link: '/cluster/search-builder',
+							hasExactPath: true,
+							tag: 'Beta',
+						},
 						{
 							label: 'Recommendations',
 							link: '/cluster/recommendations-builder',
+							tag: 'Beta',
 							hasExactPath: true,
 						},
 						{
 							label: 'Searchbox',
 							link: '/cluster/searchboxes',
+							tag: 'Beta',
 						},
 						{
 							label: 'Auth Settings',
 							link: '/cluster/auth-settings',
 							hasExactPath: true,
+							tag: 'Beta',
 						},
 					],
 					tag: 'Beta',
@@ -187,19 +196,23 @@ class AppWrapper extends Component {
 									label: 'Search',
 									link: '/cluster/search-builder',
 									hasExactPath: true,
+									tag: 'Beta',
 								},
 								{
 									label: 'Recommendations',
 									link: '/cluster/recommendations-builder',
 									hasExactPath: true,
+									tag: 'Beta',
 								},
 								{
 									label: 'Searchbox',
 									link: '/cluster/searchboxes',
+									tag: 'Beta',
 								},
 								{
 									label: 'Auth Settings',
 									link: '/cluster/auth-settings',
+									tag: 'Beta',
 									hasExactPath: true,
 								},
 							],

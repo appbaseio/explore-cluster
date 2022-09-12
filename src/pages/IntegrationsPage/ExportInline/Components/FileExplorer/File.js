@@ -2,16 +2,16 @@ import React, { useState, useContext } from 'react';
 import { Icon, Input, Menu, Dropdown } from 'antd';
 import PropTypes from 'prop-types';
 import { useSandpack } from '@codesandbox/sandpack-react';
-import { DirectoryIcon, FileIcon } from './icons';
+import { FileIcon } from './icons';
 // eslint-disable-next-line
 import { SandpackCodeContext } from '../..';
 import { hoverStyles } from './styles';
 
-const File = ({ path, selectFile, active, onClick, depth, isDirOpen, createNew, setNewFolder }) => {
+const File = ({ path, selectFile, active, onClick, depth, createNew, setNewFolder }) => {
 	const [showInput, setShowInput] = useState(false);
 	const [mode, setMode] = useState('file-add');
 	const [value, setvalue] = useState('');
-
+	const [isCollapsed, setIsCollapsed] = useState(false);
 	const { sandpack } = useSandpack();
 	const { handleRenameFile, handleRenameFolder, handleDelete, handleCreateFile } =
 		useContext(SandpackCodeContext);
@@ -20,6 +20,10 @@ const File = ({ path, selectFile, active, onClick, depth, isDirOpen, createNew, 
 		if (selectFile) {
 			selectFile(path);
 		}
+	};
+
+	const handleCollapse = () => {
+		setIsCollapsed(!isCollapsed);
 	};
 
 	const handleFileCreation = (val) => {
@@ -127,7 +131,17 @@ const File = ({ path, selectFile, active, onClick, depth, isDirOpen, createNew, 
 				style={{ paddingLeft: `${8 * depth}px` }}
 				type="button"
 			>
-				{!createNew ? <FileIcon /> : <DirectoryIcon isOpen={isDirOpen} />}
+				{!createNew ? (
+					<FileIcon />
+				) : (
+					<div onClick={handleCollapse} style={{ display: 'flex' }}>
+						{isCollapsed ? (
+							<Icon type="caret-right" onClick={onClick} />
+						) : (
+							<Icon type="caret-down" onClick={onClick} />
+						)}
+					</div>
+				)}
 				<span className="directory-container">
 					{mode === 'folder-edit' || mode === 'file-edit' ? (
 						<Input
@@ -170,7 +184,6 @@ File.propTypes = {
 	active: PropTypes.bool,
 	onClick: PropTypes.func,
 	depth: PropTypes.number.isRequired,
-	isDirOpen: PropTypes.bool,
 	createNew: PropTypes.bool,
 	setNewFolder: PropTypes.func,
 };
@@ -178,7 +191,6 @@ File.propTypes = {
 File.defaultProps = {
 	selectFile: () => {},
 	onClick: () => {},
-	isDirOpen: false,
 	active: false,
 	createNew: false,
 	setNewFolder: () => {},

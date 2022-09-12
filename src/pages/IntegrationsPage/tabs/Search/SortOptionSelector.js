@@ -66,12 +66,25 @@ function SortOptionSelector({ index, item, fieldPicker, value, onChange, onError
 						className={card}
 					>
 						<Row gutter={8}>
-							<Col xs={1}>
+							<Col xs={1} style={{ display: 'flex' }}>
 								<Tooltip title="Drag to update the ordering">
-									<div {...provided.dragHandleProps}>
+									<span {...provided.dragHandleProps}>
 										<Icon type="drag" className={dragIcon} />
-									</div>
+									</span>
 								</Tooltip>
+								{item?.dataField &&
+								fieldPicker.length &&
+								!fieldPicker.includes(item?.dataField) ? (
+									<Tooltip title="The provided field has no corresponding mappings with the pipeline">
+										<span
+											style={{ color: 'orange', marginLeft: 5 }}
+											role="img"
+											aria-label="warning"
+										>
+											⚠️
+										</span>
+									</Tooltip>
+								) : null}
 							</Col>
 							<Col xs={8}>
 								<Select
@@ -104,7 +117,7 @@ function SortOptionSelector({ index, item, fieldPicker, value, onChange, onError
 								>
 									{fieldPicker.map((field) => (
 										<Select.Option value={field} key={field}>
-											{field}
+											<Tooltip title={field}>{field}</Tooltip>
 										</Select.Option>
 									))}
 								</Select>

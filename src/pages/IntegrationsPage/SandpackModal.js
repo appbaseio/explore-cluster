@@ -10,7 +10,12 @@ import {
 	getLatestVersion,
 	preferencesInConstants,
 } from './utils/sandpack-generator';
-import { getTemplate, removeEmpty, transformPreferences } from './utils/index';
+import {
+	getTemplate,
+	removeEmpty,
+	transformPreferences,
+	transformResultsDefaultFields,
+} from './utils/index';
 
 const SandpackModal = ({ preferences, preferenceId }) => {
 	const [sandpackCode, setSandpackCode] = useState({});
@@ -25,7 +30,9 @@ const SandpackModal = ({ preferences, preferenceId }) => {
 			.then(async (res) => {
 				if (res.content) {
 					const content = transformContent(res.content);
-					const newPreferences = removeEmpty({ ...transformPreferences(preferences) });
+					const newPreferences = removeEmpty({
+						...transformResultsDefaultFields(transformPreferences(preferences)),
+					});
 					const newContent = preferencesInConstants(content, newPreferences);
 					setSandpackCode(newContent);
 					setIsLoading(false);
@@ -38,7 +45,10 @@ const SandpackModal = ({ preferences, preferenceId }) => {
 	};
 
 	const getSandPackCode = async () => {
-		const response = await generateInlineSandboxURL(preferences);
+		const newPreferences = {
+			...transformResultsDefaultFields(transformPreferences(preferences)),
+		};
+		const response = await generateInlineSandboxURL(newPreferences);
 		setSandpackCode(response);
 		setIsLoading(false);
 	};
@@ -56,6 +66,7 @@ const SandpackModal = ({ preferences, preferenceId }) => {
 			template="react"
 			customSetup={{ files: { ...sandpackCode } }}
 			startRoute={route}
+			options={{ bundlerURL: 'https://sandpack-bundler.pages.dev' }}
 		>
 			<SandpackPreviewContainer />
 		</SandpackProvider>

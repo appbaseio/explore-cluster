@@ -27,10 +27,10 @@ const FiltersWrapper = ({
 
 	const getMappings = () => {
 		if (!loading && !mappings && appbaseCredentials) {
-			fetchMappings(
-				form.get('pipeline') ? form.get('pipeline')?.value : '',
-				appbaseCredentials,
-			);
+			const pipeline = form.get('pipeline') ? form.get('pipeline')?.value : '';
+			const indexSettings = form.get('indexSettings') ? form.get('indexSettings').value : {};
+			const secondaryPipeline = get(indexSettings, 'index', '');
+			fetchMappings(secondaryPipeline || pipeline, appbaseCredentials);
 		}
 	};
 
@@ -78,7 +78,12 @@ FiltersWrapper.propTypes = {
 };
 
 const mapStateToProps = (state, props) => {
-	const mappings = getRawMappingsByAppName(state, props.form?.get('pipeline')?.value || '');
+	const pipeline = props.form?.get('pipeline') ? props.form?.get('pipeline')?.value : '';
+	const indexSettings = props.form?.get('indexSettings')
+		? props.form?.get('indexSettings')?.value
+		: {};
+	const secondaryPipeline = get(indexSettings, 'index', '');
+	const mappings = getRawMappingsByAppName(state, secondaryPipeline || pipeline);
 	const { username, password } = get(state, 'user.data', {});
 	return {
 		mappings,

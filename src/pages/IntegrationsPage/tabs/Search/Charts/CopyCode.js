@@ -2,13 +2,17 @@ import React from 'react';
 import { Icon, Tabs, Tooltip, message } from 'antd';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { func, object } from 'prop-types';
+import get from 'lodash/get';
 import { transformCharts } from '../../../utils';
 import { getURL } from '../../../../../constants/config';
+import { removeEmpty } from '../../../utils/index';
 
 const CopyCode = ({ control, getPreferencesPayload }) => {
 	const preferences = getPreferencesPayload();
 
 	const contentWithPreferences = (prefs = '') => {
+		const pipeline = get(prefs, 'pipeline', '');
+		const secondaryPipeline = get(prefs, 'indexSettings.index', '');
 		return `
 import { ReactiveBase, ReactiveComponent } from "@appbaseio/reactivesearch";
 
@@ -19,7 +23,7 @@ export default Chart = () => {
 	<ReactiveBase
 	  enableAppbase
 	  preferences={preferences}
-	  app="${preferences.pipeline ? preferences.pipeline : ''}"
+	  app="${secondaryPipeline || pipeline}"
 	  url="${getURL()}"
 	  credentials="${preferences?.exportSettings?.credentials || ''}"
 	>
@@ -32,15 +36,6 @@ export default Chart = () => {
 	</ReactiveBase>
   )
 }`;
-	};
-
-	const removeEmpty = (obj) => {
-		return Object.fromEntries(
-			Object.entries(obj)
-				// eslint-disable-next-line
-				.filter(([_, v]) => v != null)
-				.map(([k, v]) => [k, v === Object(v) ? removeEmpty(v) : v]),
-		);
 	};
 
 	const propsBasedOnComponent = () => {

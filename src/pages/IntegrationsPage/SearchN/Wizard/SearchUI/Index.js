@@ -1,70 +1,60 @@
-import React from 'react';
-import { List, Popover, Icon } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { List } from 'antd';
 import { FieldControl } from 'react-reactive-form';
 import { string, object, func } from 'prop-types';
-import PriceUnit from '../../../tabs/Search/PriceUnit';
+import { ReactiveBase } from '@appbaseio/reactivesearch';
 import DataFieldSelector from '../../../../../components/Form/DataFieldSelector';
 import { SearchUIStyles } from '../styles';
+import { getURL } from '../../../../../constants/config';
+import DocType from '../../../tabs/Search/Results/DocType';
+import TabLayout from '../../../tabs/Search/Results/TabLayout';
+import DefaultResults from '../../../tabs/Search/Results/DefaultResults';
+import { getTemplate } from '../../../utils/index';
 
 const defaultSettings = [
+	// {
+	// 	id: 'categoryField',
+	// 	label: (
+	// 		<span>
+	// 			Customize result display by <strong>document type</strong>
+	// 		</span>
+	// 	),
+	// 	value: false,
+	// },
 	{
-		id: 'resultTitle',
+		id: 'categoryFieldValue',
 		label: (
 			<span>
-				Select the data field to display the <strong>title</strong> of the result item
+				Select <strong>document type value</strong>
 			</span>
 		),
-		value: true,
-	},
-	{
-		id: 'resultDescription',
-		label: (
-			<span>
-				Select the data field to display the <strong>description</strong> of the result item
-			</span>
-		),
-		value: true,
-	},
-	{
-		id: 'resultPrice',
-		label: (
-			<span>
-				Select the data field to display the <strong>price</strong> of the result item
-				<Popover content="You can substitute price for any other similarly significant field">
-					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
-				</Popover>
-			</span>
-		),
-		value: true,
-		showPriceUnitInput: true,
-	},
-	{
-		id: 'resultImage',
-		label: (
-			<span>
-				Select the data field to display the <strong>image</strong> of the result item
-				<Popover content="The value should be of a URL type for the image content to be displayed correctly">
-					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
-				</Popover>
-			</span>
-		),
-		value: true,
-	},
-	{
-		id: 'resultHandle',
-		label: (
-			<span>
-				Select the data field to define the <strong>redirect url</strong> for the result
-				item
-			</span>
-		),
-		value: true,
+		value: false,
 	},
 ];
 
 const { Item } = List;
 
-const SearchUI = ({ pipeline, tabsValidated, setTabsValidated }) => {
+const SearchUI = ({ pipeline, tabsValidated, setTabsValidated, preferences, form }) => {
+	const [isLoading, setIsLoading] = useState(false);
+	const [categoryFieldValue, setDocumentTypeValue] = useState('');
+
+	useEffect(() => {
+		form.get('categoryField').valueChanges.subscribe(() => {
+			const categoryFieldValueControl = form.get('categoryFieldValue');
+			categoryFieldValueControl.reset([]);
+		});
+	}, []);
+
+	const handleReload = () => {
+		setIsLoading(true);
+
+		setTimeout(() => {
+			setIsLoading(false);
+		}, 1);
+	};
+
+	const themeType = form.get('themeType') ? form.get('themeType').value : 'classic';
+	const templateObj = getTemplate(themeType);
 	return (
 		<div css={SearchUIStyles}>
 			<div className="description-container">
@@ -76,42 +66,109 @@ const SearchUI = ({ pipeline, tabsValidated, setTabsValidated }) => {
 				dataSource={defaultSettings}
 				bordered
 				renderItem={(item) => {
-					return (
-						<FieldControl name={item.id}>
-							{/* eslint-disable-next-line */}
-							{({ value, onChange }) => {
-								if (!tabsValidated.tab3 && value) {
-									setTabsValidated({
-										...tabsValidated,
-										tab3: true,
-									});
-								}
-								return (
-									<Item
-										actions={[
-											<div>
-												{item?.showPriceUnitInput ? (
-													<PriceUnit name="priceUnit" />
-												) : null}
+					if (item.id === 'categoryFieldValue') {
+						return categoryFieldValue ? (
+							<FieldControl name={item.id} strict={false}>
+								{({ value, onChange }) => {
+									return (
+										<>
+											<Item
+												actions={[
+													!isLoading ? (
+														<ReactiveBase
+															app={preferences?.pipeline || ''}
+															url={getURL()}
+															credentials={
+																preferences?.exportSettings
+																	?.credentials || ''
+															}
+															enableAppbase
+														>
+															<DocType
+																value={value}
+																onChange={onChange}
+																form={form}
+															/>
+														</ReactiveBase>
+													) : (
+														<></>
+													),
+												]}
+											>
+												<Item.Meta
+													title={
+														typeof item.label === 'function'
+															? item.label(value)
+															: item.label
+													}
+												/>
+											</Item>
+											{form.get('categoryField').value ? (
+												<TabLayout
+													values={value}
+													form={form}
+													pipeline={pipeline}
+												/>
+											) : null}
+										</>
+									);
+								}}
+							</FieldControl>
+						) : (
+							<DefaultResults
+								pipeline={pipeline}
+								setValidation={(val) => {
+									if (!tabsValidated.tab3 && val) {
+										setTabsValidated({
+											...tabsValidated,
+											tab3: true,
+										});
+									}
+								}}
+								themeType={themeType}
+							/>
+						);
+					}
+					if (item.id === 'categoryField') {
+						return templateObj?.name !== 'geo' ? (
+							<FieldControl name={item.id}>
+								{/* eslint-disable-next-line */}
+								{({ value, onChange }) => {
+									if (!tabsValidated.tab3 && value) {
+										setTabsValidated({
+											...tabsValidated,
+											tab3: true,
+										});
+									}
+									setDocumentTypeValue(value);
+									return (
+										<Item
+											actions={[
 												<DataFieldSelector
 													pipeline={pipeline}
 													name={item.id}
-												/>
-											</div>,
-										]}
-									>
-										<Item.Meta
-											title={
-												typeof item.label === 'function'
-													? item.label(value)
-													: item.label
-											}
-										/>
-									</Item>
-								);
-							}}
-						</FieldControl>
-					);
+													isAggFields
+													handleReload={handleReload}
+												/>,
+											]}
+										>
+											<Item.Meta
+												title={
+													typeof item.label === 'function'
+														? item.label(value)
+														: item.label
+												}
+											/>
+										</Item>
+									);
+								}}
+							</FieldControl>
+						) : (
+							<></>
+						);
+					}
+
+					return <></>;
 				}}
 			/>
 		</div>
@@ -122,12 +179,16 @@ SearchUI.defaultProps = {
 	pipeline: '',
 	tabsValidated: {},
 	setTabsValidated: () => {},
+	preferences: {},
+	form: {},
 };
 
 SearchUI.propTypes = {
 	tabsValidated: object,
 	pipeline: string,
 	setTabsValidated: func,
+	preferences: object,
+	form: object,
 };
 
 export default SearchUI;

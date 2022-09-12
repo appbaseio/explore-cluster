@@ -16,6 +16,8 @@ const ListItem = ({
 	provided,
 }) => {
 	const pipeline = form.get('pipeline') ? form.get('pipeline')?.value : '';
+	const indexSettings = form.get('indexSettings') ? form.get('indexSettings').value : {};
+	const secondaryPipeline = get(indexSettings, 'index', '');
 	return (
 		<FieldGroup strict={false} control={control}>
 			{() => (
@@ -35,7 +37,7 @@ const ListItem = ({
 							{isFilter ? (
 								<CustomizeFilter
 									control={control.get('customize')}
-									pipeline={pipeline}
+									pipeline={secondaryPipeline || pipeline}
 									buttonLabel="Customize"
 									getPreferencesPayload={getPreferencesPayload}
 									form={form}
@@ -43,7 +45,7 @@ const ListItem = ({
 							) : (
 								<CustomizeChart
 									control={control.get('customize')}
-									pipeline={pipeline}
+									pipeline={secondaryPipeline || pipeline}
 									buttonLabel="Customize"
 									getPreferencesPayload={getPreferencesPayload}
 									form={form}

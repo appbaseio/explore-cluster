@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Icon, Tabs, Tooltip, message } from 'antd';
+import get from 'lodash/get';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { componentTypes } from '@appbaseio/reactivesearch';
 import { func, object } from 'prop-types';
 import { transformFacets } from '../../../utils';
 import { getURL } from '../../../../../constants/config';
+import { removeEmpty } from '../../../utils/index';
 
 const CopyCode = ({ control, getPreferencesPayload }) => {
 	const [component, setComponent] = useState('MultiList');
@@ -24,6 +26,8 @@ const CopyCode = ({ control, getPreferencesPayload }) => {
 	}, [control]);
 
 	const contentWithPreferences = (prefs = '') => {
+		const pipeline = get(prefs, 'pipeline', '');
+		const secondaryPipeline = get(prefs, 'indexSettings.index', '');
 		return `
 import { ReactiveBase, ReactiveComponent } from "@appbaseio/reactivesearch";
 
@@ -34,7 +38,7 @@ export default Filter = () => {
 	<ReactiveBase
 	  enableAppbase
 	  preferences={preferences}
-	  app="${preferences.pipeline ? preferences.pipeline : ''}"
+	  app="${secondaryPipeline || pipeline || ''}"
 	  url="${getURL()}"
 	  credentials="${preferences?.exportSettings?.credentials || ''}"
 	>
@@ -47,15 +51,6 @@ export default Filter = () => {
 	</ReactiveBase>
   )
 }`;
-	};
-
-	const removeEmpty = (obj) => {
-		return Object.fromEntries(
-			Object.entries(obj)
-				// eslint-disable-next-line
-				.filter(([_, v]) => v != null)
-				.map(([k, v]) => [k, v === Object(v) ? removeEmpty(v) : v]),
-		);
 	};
 
 	const propsBasedOnComponent = () => {
