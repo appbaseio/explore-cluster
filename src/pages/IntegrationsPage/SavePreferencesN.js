@@ -2,6 +2,7 @@ import React from 'react';
 import { Prompt } from 'react-router-dom';
 import { arrayOf, bool, func, object, string } from 'prop-types';
 import get from 'lodash/get';
+import isEqual from 'lodash/isEqual';
 import { connect } from 'react-redux';
 import {
 	saveSearchPreferenceN,
@@ -30,7 +31,6 @@ class SavePreferencesN extends React.Component {
 		super(props);
 		this.hasEdited = false;
 		this.state = {
-			hasChanged: this.compareChange,
 			// eslint-disable-next-line react/no-unused-state
 			preferences: props.searchPreferences,
 		};
@@ -47,8 +47,9 @@ class SavePreferencesN extends React.Component {
 	componentDidUpdate(prevProps) {
 		const { searchPreferences, recommendationsPreferences, errors } = this.props;
 		displayErrors(errors, prevProps.errors);
+
 		if (
-			searchPreferences !== prevProps.searchPreferences ||
+			!isEqual(searchPreferences, prevProps.searchPreferences) ||
 			recommendationsPreferences !== prevProps.recommendationsPreferences
 		) {
 			this.handleChange();
@@ -65,7 +66,6 @@ class SavePreferencesN extends React.Component {
 		const { searchPreferences, recommendationsPreferences, isRecommendation } = this.props;
 
 		this.setState({
-			hasChanged: isChanged,
 			// eslint-disable-next-line react/no-unused-state
 			preferences: isRecommendation ? recommendationsPreferences : searchPreferences,
 		});
@@ -80,7 +80,6 @@ class SavePreferencesN extends React.Component {
 
 	get compareChange() {
 		const { oldData, newData } = this.getOldDataNewData();
-
 		return !!getDiffDataAndCount(removeEmpty(oldData), removeEmpty(newData)).diffCount;
 	}
 
@@ -98,9 +97,6 @@ class SavePreferencesN extends React.Component {
 		if (isRecommendation) {
 			updateRecommendationsPreferences(getPreferencesPayload()).then((action) => {
 				if (!(action && action.error)) {
-					this.setState({
-						hasChanged: false,
-					});
 					getRecommendationsPreferences();
 					// closeForm();
 				}
@@ -115,9 +111,6 @@ class SavePreferencesN extends React.Component {
 
 			updateSearchPreferences(preferencesPayload).then((action) => {
 				if (!(action && action.error)) {
-					this.setState({
-						hasChanged: false,
-					});
 					closeForm();
 				}
 			});
@@ -157,13 +150,11 @@ class SavePreferencesN extends React.Component {
 			getPreferences,
 			closeForm,
 		} = this.props;
-		const { hasChanged } = this.state;
 		const { oldData, newData } = this.getOldDataNewData();
-
 		return (
 			<>
 				<Prompt
-					when={hasChanged}
+					when={this.compareChange}
 					message="You have unsaved changes, are you sure you want to leave?"
 				/>
 				<ReviewAndSave
@@ -175,17 +166,8 @@ class SavePreferencesN extends React.Component {
 					oldData={oldData}
 					newData={newData}
 					setHasChanged={() => {
-						this.setState(
-							{
-								hasChanged: false,
-							},
-							() => {
-								// eslint-disable-next-line
-								isRecommendation
-									? getRecommendationsPreferences()
-									: getSearchPreferences();
-							},
-						);
+						// eslint-disable-next-line
+						isRecommendation ? getRecommendationsPreferences() : getSearchPreferences();
 					}}
 					getPreferencesPayload={getPreferencesPayload}
 					getPreferences={getPreferences}
