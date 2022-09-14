@@ -127,7 +127,7 @@ class PreferencesFormWrapperN extends React.Component {
 				type: 'other',
 			}),
 			authenticationSettings: FormBuilder.group({
-				enableAuth0: true,
+				enableAuth0: false,
 				enableProfilePage: true,
 				profileSettingsForm: FormBuilder.group({
 					viewData: true,

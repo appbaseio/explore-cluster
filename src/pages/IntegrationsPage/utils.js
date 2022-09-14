@@ -818,8 +818,8 @@ export const defaultSearchPreferences = {
 	dynamicFilters: [],
 	syncSettings: defaultSettings.reduce((acc, item) => ({ ...acc, [item.id]: item.value }), {}),
 	authenticationSettings: {
-		clientId: 'mZLIFUlQedQJlZO21LiUauZwSMhiteGd',
-		enableAuth0: true,
+		clientId: '',
+		enableAuth0: false,
 		enableProfilePage: true,
 		profileSettingsForm: {
 			viewData: true,
