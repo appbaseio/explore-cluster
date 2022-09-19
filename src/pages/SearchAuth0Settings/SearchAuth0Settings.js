@@ -6,7 +6,7 @@ import { css } from 'emotion';
 import { Affix, Button, notification, Tabs } from 'antd';
 import { get, isEmpty } from 'lodash';
 import { connect } from 'react-redux';
-import { FormBuilder, Validators } from 'react-reactive-form';
+import { FormBuilder, FormControl, Validators } from 'react-reactive-form';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import ApplicationSettings from './components/ApplicationSettings';
 import Providers from './components/Providers/index';
@@ -134,8 +134,8 @@ const SearchAuth0Settings = (props) => {
 							],
 						],
 						display_button: true,
-						display_button_name: ['', [Validators.required]],
-						button_logo_url: ['', [urlValidator]],
+						// display_button_name: ['', [Validators.required]],
+						// button_logo_url: ['', [urlValidator]],
 						// protocol_binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
 					}),
 				},
@@ -147,6 +147,31 @@ const SearchAuth0Settings = (props) => {
 	);
 	useEffect(() => {
 		getAuth0Preferences();
+
+		const {
+			controls: { providersForm },
+		} = auth0Form.current;
+		const samlpConfigForm = providersForm.get('samlpConfigForm');
+		const displayButtonValueListener = (value) => {
+			if (value) {
+				samlpConfigForm.addControl(
+					'display_button_name',
+					new FormControl('', [Validators.required, Validators.minLength(3)]),
+				);
+				samlpConfigForm.addControl('button_logo_url', new FormControl('', [urlValidator]));
+			} else {
+				samlpConfigForm.removeControl('display_button_name');
+				samlpConfigForm.removeControl('button_logo_url');
+			}
+		};
+
+		samlpConfigForm.get('display_button').valueChanges.subscribe(displayButtonValueListener);
+
+		return () => {
+			samlpConfigForm
+				.get('display_button')
+				.valueChanges.unsubscribe(displayButtonValueListener);
+		};
 	}, []);
 
 	useEffect(() => {
@@ -158,6 +183,7 @@ const SearchAuth0Settings = (props) => {
 	useEffect(() => {
 		if (samlConnectionId) {
 			fetchAuth0Connection(samlConnectionId).then((res) => {
+				const { display_name, show_as_button } = res.payload;
 				const {
 					cert,
 					signInEndpoint,
@@ -166,9 +192,7 @@ const SearchAuth0Settings = (props) => {
 					user_id_attribute = '',
 					disableSignout = true,
 					domain_aliases,
-					show_as_button,
 					icon_url,
-					display_name,
 				} = res.payload.options;
 				auth0Form.current.controls.providersForm.patchValue({
 					samlpConfigForm: {
@@ -181,7 +205,7 @@ const SearchAuth0Settings = (props) => {
 						debug_mode: debug,
 						idp_domains: domain_aliases ? domain_aliases.join(',') : '',
 						// protocol_binding: protocolBinding,
-						display_button: show_as_button,
+						display_button: show_as_button ?? false,
 						button_logo_url: icon_url,
 						display_button_name: display_name,
 					},
@@ -316,22 +340,21 @@ const SearchAuth0Settings = (props) => {
 			},
 		} = samlpConfigForm;
 		const samlConnectionPayload = {
+			show_as_button: display_button,
+			display_name: display_button_name,
 			options: {
 				cert: signing_cert,
 				signingCert: btoa(signing_cert),
-				...(display_button
-					? {
-							show_as_button: display_button,
-							icon_url: button_logo_url,
-							display_name: display_button_name,
-					  }
-					: { domain_aliases: idp_domains ? idp_domains.trim().split(',') : undefined }),
-
 				signInEndpoint: signin_url,
 				signOutEndpoint: signout_url,
 				disableSignout: !enable_sign_out,
 				user_id_attribute: user_id_attr ?? '',
 				debug: debug_mode,
+				...(display_button
+					? {
+							icon_url: button_logo_url,
+					  }
+					: { domain_aliases: idp_domains ? idp_domains.trim().split(',') : undefined }),
 				// signatureAlgorithm: '',
 				// digestAlgorithm: '',
 				// protocolBinding: protocol_binding,
@@ -434,6 +457,7 @@ const SearchAuth0Settings = (props) => {
 							notification.success({
 								message: 'Auth connections updated!',
 							});
+							fetchAuth0ClientConnections(clientId);
 						} else if (res.error) {
 							notification.error({
 								message: (
@@ -537,7 +561,7 @@ const SearchAuth0Settings = (props) => {
 	return (
 		<>
 			<Banner {...bannerDetails} />
-			<div css={container}>
+			<div className={container}>
 				{!clientId && showOverlay ? (
 					<div>
 						<p>
@@ -631,7 +655,8 @@ const mapStateToProps = (state) => {
 		isClientSaving:
 			get(state, '$saveAuth0Client.isFetching') ||
 			get(state, '$createAuth0Client.isFetching') ||
-			get(state, '$saveAuth0ClientConnections.isFetching'),
+			get(state, '$saveAuth0ClientConnections.isFetching') ||
+			get(state, '$updateAuth0ClientConnection.isFetching'),
 		clientConnections: get(state, '$getAuth0ClientConnections.results'),
 	};
 };

@@ -82,7 +82,7 @@ const SamlConfigForm = () => {
 	};
 	return (
 		<>
-			<div css={container}>
+			<div className={container}>
 				<FieldGroup
 					parent={providersForm}
 					name="samlpConfigForm"
@@ -361,66 +361,79 @@ const SamlConfigForm = () => {
 												className="field-wrapper"
 												component={
 													<>
-														<Switch {...handler('checkbox')} />
+														<Switch
+															{...handler('checkbox')}
+															disabled={handler('checkbox').checked}
+														/>
 													</>
 												}
 											/>
 										);
 									}}
 								/>
-								{value.display_button && (
-									<>
-										<FieldControl
-											name="display_button_name"
-											render={({ handler, errors }) => {
-												const showError = touched && errors?.required;
-												return (
-													<Grid
-														label="Button display name"
-														toolTipMessage={
-															Messages.display_button_name
-														}
-														className={`field-wrapper ${
-															showError ? 'error' : ''
-														}`}
-														component={
-															<>
-																<Input
-																	placeholder="test"
-																	{...handler()}
-																/>
-																{showError &&
-																	renderErrorSpan(
-																		'Button display name is required',
-																	)}
-															</>
-														}
-													/>
-												);
-											}}
-										/>
-										<FieldControl
-											name="button_logo_url"
-											render={({ handler }) => {
-												return (
-													<Grid
-														label="Button logo URL"
-														toolTipMessage={Messages.button_logo_url}
-														className={`field-wrapper `}
-														component={
-															<>
-																<Input
-																	placeholder="https://cdn.example.com/logo.svg"
-																	{...handler()}
-																/>
-															</>
-														}
-													/>
-												);
-											}}
-										/>
-									</>
-								)}
+								<>
+									<FieldControl
+										name="display_button_name"
+										render={({ handler, errors }) => {
+											const showError = touched
+												? errors?.required || errors?.minLength
+												: false;
+
+											let errorMessage = errors?.required
+												? 'Button display name is required'
+												: '';
+											if (!errorMessage && errors?.minLength) {
+												errorMessage = `Button display name should be atleast ${errors?.minLength.requiredLength} chars.`;
+											}
+											return (
+												<Grid
+													label="Button display name"
+													toolTipMessage={Messages.display_button_name}
+													className={`field-wrapper ${
+														showError ? 'error' : ''
+													}`}
+													component={
+														<>
+															<Input
+																placeholder="Enter Button label"
+																{...handler()}
+															/>
+															{showError &&
+																renderErrorSpan(errorMessage)}
+														</>
+													}
+												/>
+											);
+										}}
+									/>
+									<FieldControl
+										name="button_logo_url"
+										render={({ handler, errors }) => {
+											const showError = touched ? errors?.invalidLink : false;
+
+											const errorMessage = 'Enter a valid URL.';
+											return (
+												<Grid
+													label="Button logo URL"
+													toolTipMessage={Messages.button_logo_url}
+													className={`field-wrapper ${
+														showError ? 'error' : ''
+													}`}
+													component={
+														<>
+															<Input
+																placeholder="https://cdn.example.com/logo.svg"
+																{...handler()}
+															/>
+															{showError &&
+																renderErrorSpan(errorMessage)}
+														</>
+													}
+												/>
+											);
+										}}
+									/>
+								</>
 							</div>
 						);
 					}}
