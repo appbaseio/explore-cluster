@@ -212,6 +212,7 @@ const PipelinesForm = (props) => {
 	const [selectedTemplate, setSelectedTemplate] = useState('');
 
 	const [isValidateMode, setIsValidateMode] = useState(false);
+	const [isValidatingPipeline, setIsValidatingPipeline] = useState(false);
 	const [pipelineValidationRes, setPipelineValidationRes] = useState(null);
 	const [executionContext, setExecutionContext] = useState(DEFAULT_EXECUTION_CONTEXT_VALUE);
 
@@ -530,63 +531,71 @@ const PipelinesForm = (props) => {
 	};
 
 	const handlePipelineValidation = () => {
-		const pipelinePayload = generatePipelinePayload(
-			editorPipelineValue,
-			filterScriptFilesMap(editorPipelineValue, scriptFilesMap),
-		);
-		pipelinePayload.append('pipeline_id', pipeline.id);
+		try {
+			setIsValidatingPipeline(true);
+			setPipelineValidationRes({});
+			const pipelinePayload = generatePipelinePayload(
+				editorPipelineValue,
+				filterScriptFilesMap(editorPipelineValue, scriptFilesMap),
+			);
+			pipelinePayload.append('pipeline_id', pipeline.id);
 
-		const { request = {}, response = {}, envs = {} } = executionContext;
-		if (request instanceof Object && !isEmpty(request)) {
-			const payloadRequestObject = {};
-			Object.assign(payloadRequestObject, {
-				request: {
-					...request,
-					...(typeof request.body === 'object' && {
-						body: JSON.stringify(request.body),
-					}),
-				},
-			});
-
-			pipelinePayload.append('request', JSON.stringify(payloadRequestObject.request));
-		}
-		if (response instanceof Object && !isEmpty(response)) {
-			const payloadResponseObject = {};
-			Object.assign(payloadResponseObject, {
-				response: {
-					...response,
-					...(typeof response.body === 'object' && {
-						body: JSON.stringify(response.body),
-					}),
-				},
-			});
-			pipelinePayload.append('response', JSON.stringify(payloadResponseObject));
-		}
-		if (!isEmpty(envs)) {
-			pipelinePayload.append('envs', JSON.stringify(envs));
-		}
-
-		validatePipeline(pipelinePayload)
-			.then((res) => {
-				const parsedResponse = { ...res };
-				if (parsedResponse.request) {
-					if (isJson(parsedResponse.request.body)) {
-						parsedResponse.request.body = isJson(parsedResponse.request.body);
-					}
-				}
-				if (parsedResponse.response) {
-					if (isJson(parsedResponse.response.body)) {
-						parsedResponse.response.body = isJson(parsedResponse.response.body);
-					}
-				}
-				setPipelineValidationRes(parsedResponse);
-			})
-			.catch((e) => {
-				notification.error({
-					message: `Failed to validate pipeline  ${`${e.code}   ${e.message}`}`,
+			const { request = {}, response = {}, envs = {} } = executionContext;
+			if (request instanceof Object && !isEmpty(request)) {
+				const payloadRequestObject = {};
+				Object.assign(payloadRequestObject, {
+					request: {
+						...request,
+						...(typeof request.body === 'object' && {
+							body: JSON.stringify(request.body),
+						}),
+					},
 				});
-				setPipelineValidationRes({ error: e });
-			});
+
+				pipelinePayload.append('request', JSON.stringify(payloadRequestObject.request));
+			}
+			if (response instanceof Object && !isEmpty(response)) {
+				const payloadResponseObject = {};
+				Object.assign(payloadResponseObject, {
+					response: {
+						...response,
+						...(typeof response.body === 'object' && {
+							body: JSON.stringify(response.body),
+						}),
+					},
+				});
+				pipelinePayload.append('response', JSON.stringify(payloadResponseObject));
+			}
+			if (!isEmpty(envs)) {
+				pipelinePayload.append('envs', JSON.stringify(envs));
+			}
+
+			validatePipeline(pipelinePayload)
+				.then((res) => {
+					const parsedResponse = { ...res };
+					if (parsedResponse.request) {
+						if (isJson(parsedResponse.request.body)) {
+							parsedResponse.request.body = isJson(parsedResponse.request.body);
+						}
+					}
+					if (parsedResponse.response) {
+						if (isJson(parsedResponse.response.body)) {
+							parsedResponse.response.body = isJson(parsedResponse.response.body);
+						}
+					}
+					setPipelineValidationRes(parsedResponse);
+					setIsValidatingPipeline(false);
+				})
+				.catch((e) => {
+					notification.error({
+						message: `Failed to validate pipeline  ${`${e.code}   ${e.message}`}`,
+					});
+					setPipelineValidationRes({ error: e });
+					setIsValidatingPipeline(false);
+				});
+		} catch (error) {
+			console.log('error', error, error.stack);
+		}
 	};
 
 	// handles -  save/ create
@@ -845,6 +854,7 @@ const PipelinesForm = (props) => {
 													consoleLogsArray={getConsoleLogsArray(
 														pipelineValidationRes,
 													)}
+													isValidating={isValidatingPipeline}
 												/>
 											</div>
 										</Flex>
@@ -889,6 +899,7 @@ const PipelinesForm = (props) => {
 													: '',
 												consoleLogsArray:
 													getConsoleLogsArray(pipelineValidationRes),
+												isValidating: isValidatingPipeline,
 											}}
 											isValidateMode={isValidateMode}
 										/>

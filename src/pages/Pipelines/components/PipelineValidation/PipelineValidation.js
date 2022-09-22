@@ -8,6 +8,7 @@ import Flex from '../../../../batteries/components/shared/Flex';
 import ConsoleLogger from '../../../../components/ScriptConsole/ConsoleLogger';
 import { isJson } from '../../../../components/ScriptConsole/utils';
 import { monacoOptions } from '../../utils';
+import ButtonLoadingSvg from './ButtonLoadingSvg';
 
 const container = css`
 	display: flex !important;
@@ -46,7 +47,6 @@ const container = css`
 
 	.monaco-wrapper {
 		width: 100% !important;
-		height: calc(100% - 42px) !important;
 	}
 
 	h3 {
@@ -171,6 +171,7 @@ const PipelineValidation = ({
 	consoleLogsArray,
 	isScriptValidation,
 	showStageChanges,
+	isValidating,
 }) => {
 	const [activeTabKey, setActiveTabKey] = useState(EXECUTION_CONTEXT);
 	const [validationResponse, setValidationResponse] = useState('');
@@ -316,11 +317,15 @@ const PipelineValidation = ({
 	if (!isVisible) {
 		return null;
 	}
+
 	return (
-		<div css={container}>
-			<Tooltip placement="bottom" title="Click to validate">
+		<div className={container}>
+			<Tooltip
+				placement="bottom"
+				title={isValidating ? 'Validating...' : 'Click to validate'}
+			>
 				<button className="validate-script-btn" type="button" onClick={onPlayButtonClick}>
-					<div className="play-triangle" />
+					{isValidating ? <ButtonLoadingSvg /> : <div className="play-triangle" />}
 				</button>
 			</Tooltip>
 			<Tabs
@@ -454,6 +459,7 @@ PipelineValidation.propTypes = {
 	consoleLogsArray: PropTypes.array,
 	isScriptValidation: PropTypes.bool,
 	showStageChanges: PropTypes.bool,
+	isValidating: PropTypes.bool,
 };
 
 PipelineValidation.defaultProps = {
@@ -463,6 +469,7 @@ PipelineValidation.defaultProps = {
 	consoleLogsArray: null,
 	isScriptValidation: false,
 	showStageChanges: false,
+	isValidating: false,
 };
 
 export default PipelineValidation;

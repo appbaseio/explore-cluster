@@ -16,7 +16,7 @@ const CSS = css`
 	position: relative;
 	.stages-dropdown {
 		position: absolute;
-		z-index: 100;
+		z-index: 40;
 		top: 4px;
 		right: 17px;
 	}
@@ -264,12 +264,18 @@ const PipelineEditorComponent = (props) => {
 				'paste',
 				(event) => {
 					const clipboardData = event.clipboardData || window.clipboardData;
-					const pastedData = clipboardData.getData('Text');
+					// get pasted data post removal of trailing commas
+					const pastedData = clipboardData.getData('Text').replace(/(^,)|(,$)/g, '');
 					try {
 						if (
 							yamlToJson.load(pastedData) &&
 							isJson(yamlToJson.load(pastedData)) &&
-							!isJson(pastedData)
+							!isJson(pastedData) &&
+							// the last condition handles a case
+							// where text - '"method": "POST"' isn't a valid JSON but a valid YAML
+							// so we put it in between braces and check if it's valid JSON, if it is
+							// we don't want to replace the whole content
+							!isJson(`{${pastedData}}`)
 						) {
 							onChange(JSON.stringify(yamlToJson.load(pastedData), null, 4));
 							event.preventDefault();
