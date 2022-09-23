@@ -24,11 +24,7 @@ import { Link } from 'react-router-dom';
 import ClonePipeline from './ClonePipeline';
 import DeleteModal from '../../../components/DeleteModal';
 import MobileMenu from './MobileMenu';
-import {
-	deletePipeline,
-	togglePipelineStatus,
-	reorderPipelines,
-} from '../../../batteries/modules/actions';
+import { deletePipeline, togglePipelineStatus } from '../../../batteries/modules/actions';
 import Flex from '../../../batteries/components/shared/Flex';
 import { generatePipelinePayload } from '../../../batteries/utils/helpers';
 
@@ -175,8 +171,8 @@ const PipelineCard = (props) => {
 			pipelineScripts,
 			'content',
 		);
-
-		togglePipeline({
+		pipelinePayload.append('enabled', value);
+		togglePipeline(pipeline.id, pipeline._version, {
 			id: pipeline.id,
 			enabled: value,
 			pipelinePayload,
@@ -243,11 +239,7 @@ const PipelineCard = (props) => {
 		>
 			<Row style={{ position: 'relative' }} gutter={8}>
 				<div className={mobileMenu}>
-					<MobileMenu
-						pipeline={pipeline}
-						removePipeline={removePipeline}
-						togglePipeline={togglePipeline}
-					/>
+					<MobileMenu pipeline={pipeline} removePipeline={removePipeline} />
 				</div>
 
 				<Col xl={8} lg={8} md={12} sm={24}>
@@ -412,8 +404,8 @@ const mapStateToProps = (state, props) => {
 
 const mapDispatchToProps = (dispatch) => ({
 	removePipeline: (id) => dispatch(deletePipeline(id)),
-	togglePipeline: (payload) => dispatch(togglePipelineStatus(payload)),
-	reorderPipeline: (payload) => dispatch(reorderPipelines(payload)),
+	togglePipeline: (pipelineId, versionId, payload) =>
+		dispatch(togglePipelineStatus(pipelineId, versionId, payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(PipelineCard);

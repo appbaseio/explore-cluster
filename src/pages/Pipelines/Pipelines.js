@@ -10,11 +10,7 @@ import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster
 import Loader from '../../components/Loader';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { pipelinesBannerDetails } from './utils';
-import {
-	getPipelines,
-	getPipelinesUsageStats,
-	reorderPipelines,
-} from '../../batteries/modules/actions';
+import { getPipelines, getPipelinesUsageStats } from '../../batteries/modules/actions';
 import PipelineCard from './components/PipelineCard';
 import { isValidPlan } from '../../batteries/utils';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
@@ -79,7 +75,7 @@ const Pipelines = (props) => {
 					style={{
 						maxWidth: '70%',
 					}}
-					src="https://i.imgur.com/J4Hjdsl.png"
+					src="https://i.imgur.com/SUd3WeP.png"
 					alt="ReactiveSearch Pipelines"
 				/>
 			</React.Fragment>
@@ -93,7 +89,7 @@ const Pipelines = (props) => {
 		<Fragment>
 			<Header style={{ background: 'white', height: 'auto' }}>
 				<div
-					css={{
+					style={{
 						padding: '25px 0px',
 						margin: '0 auto',
 					}}
@@ -138,7 +134,7 @@ const Pipelines = (props) => {
 					</Row>
 				</div>
 			</Header>
-			<div css={pipelinesContainer}>
+			<div className={pipelinesContainer}>
 				{' '}
 				{pipelines && pipelines.length ? (
 					<ErrorToaster>
@@ -178,7 +174,6 @@ Pipelines.propTypes = {
 	featurePipelines: PropTypes.bool,
 	pipelines: PropTypes.array,
 	fetchPipelines: PropTypes.func.isRequired,
-	reorderPipeline: PropTypes.func.isRequired,
 	tier: allowedTiers,
 	appVersion: PropTypes.string,
 	fetchUsageStats: PropTypes.func.isRequired,
@@ -204,7 +199,6 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
 	fetchPipelines: () => dispatch(getPipelines()),
-	reorderPipeline: (payload) => dispatch(reorderPipelines(payload)),
 	fetchUsageStats: () => dispatch(getPipelinesUsageStats()),
 });
 
