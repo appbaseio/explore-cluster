@@ -80,12 +80,16 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 							},
 						},
 						endpoint: {
-							endpoint: {
-								url: endpoint?.endpoint?.url,
-								headers: parseJSON(endpoint?.endpoint?.headers),
-								body: parseJSON(endpoint?.endpoint?.body),
-								method: endpoint?.endpoint?.method,
-							},
+							...(endpoint?.endpoint?.url && endpoint?.endpoint?.method
+								? {
+										endpoint: {
+											url: endpoint?.endpoint?.url,
+											headers: parseJSON(endpoint?.endpoint?.headers),
+											body: parseJSON(endpoint?.endpoint?.body),
+											method: endpoint?.endpoint?.method,
+										},
+								  }
+								: {}),
 							applyStopwords: endpoint.applyStopwords,
 							customStopwords: endpoint.customStopwords || [],
 							enableSynonyms: endpoint.enableSynonyms,
@@ -93,8 +97,10 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 							includeFields: endpoint.includeFields,
 							maxPredictedWords: endpoint.maxPredictedWords,
 							showDistinctSuggestions: endpoint.showDistinctSuggestions,
-							transformResponse: endpoint.transformResponse,
-							urlField: endpoint.urlField,
+							...(endpoint.transformResponse
+								? { transformResponse: endpoint.transformResponse }
+								: {}),
+							...(endpoint.urlField ? { urlField: endpoint.urlField } : {}),
 						},
 						popular: {
 							size: popular.size,
@@ -202,6 +208,7 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 								enablePopularSuggestions={form.value.enablePopularSuggestions}
 								enableFeaturedSuggestions={form.value.enableFeaturedSuggestions}
 								enableIndexSuggestions={false}
+								enableEndpointSuggestions={form.value.enableIndexSuggestions} // index-suggestions is mapped to endpoint-suggestion --- assume it a typo
 								showVoiceSearch={form.value.enableVoiceSearch}
 								highlight={form.value.highlight}
 								componentId="search_box"

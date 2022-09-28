@@ -1,4 +1,4 @@
-export const urlValidator = (control) => {
+export const urlValidator = (control, allowUrlsWithForwardSlahes) => {
 	try {
 		if (!control.value) {
 			return null;
@@ -6,8 +6,13 @@ export const urlValidator = (control) => {
 		let invalidLink = null;
 		// eslint-disable-next-line no-useless-escape
 		const matcher = /^(?:\w+:)?\/\/([^\s\.]+\.\S{2}|localhost[\:?\d]*)\S*$/;
-		invalidLink = !matcher.test(control.value);
 
+		invalidLink = !matcher.test(control.value);
+		if (invalidLink) {
+			if (allowUrlsWithForwardSlahes) {
+				invalidLink = !control.value.startsWith('/');
+			}
+		}
 		return invalidLink ? { invalidLink } : null;
 	} catch (e) {
 		return {

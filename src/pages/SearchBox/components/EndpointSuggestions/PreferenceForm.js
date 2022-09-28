@@ -18,6 +18,9 @@ import CodeEditor from './CodeEditor';
 import TextInput from '../../../../components/Form/Input';
 import CodeEditorModal from './CodeEditorModal';
 import { FormContext } from '../../../IntegrationsPage/utils';
+import { FUNCTION_EDITOR_TABS_KEYS } from '../DesignAndLayout/SearchBoxPreview/AddSuggestionModal/FunctionEditor';
+import { getURL } from '../../../../constants/config';
+import { isJson } from '../../../../components/ScriptConsole/utils';
 
 const gridRatio = 0.4;
 
@@ -54,6 +57,21 @@ class PreferenceForm extends React.Component {
 		};
 	}
 
+	componentDidMount() {
+		const mainForm = this.context;
+		const control = mainForm.get('endpoint');
+		this.state.executionContext = {
+			endpointResponse: [{ label: '', value: '' }],
+			endpointPreferences: {
+				...control.value.endpoint,
+			},
+		};
+
+		const endpointControl = control.get('endpoint');
+
+		this.fetchExecutionContextResponse(endpointControl.value);
+	}
+
 	getDisabled = (value) => {
 		if (Array.isArray(value)) return value[0] === '*';
 		return false;
@@ -66,6 +84,60 @@ class PreferenceForm extends React.Component {
 			fetchMappings(appName, credentials);
 		}
 	}
+
+	fetchExecutionContextResponse = (value) => {
+		const mainForm = this.context;
+		const endpointValue = { url: value.url, method: value.method };
+		const control = mainForm.get('endpoint');
+		if (isJson(value.headers) && value.headers !== '{}') {
+			endpointValue.headers = JSON.parse(value.headers);
+		}
+		if (isJson(value.body) && value.body !== '{}') {
+			endpointValue.body = JSON.parse(value.body);
+		}
+
+		fetch(`${getURL()}/non-existent-app/_reactivesearch.v3`, {
+			method: 'POST',
+			body: JSON.stringify({
+				settings: {
+					recordAnalytics: false,
+					enableQueryRules: false,
+				},
+				query: [
+					{
+						id: 'search_box',
+						type: 'search',
+						endpoint: {
+							...endpointValue,
+							body: endpointValue.body || null,
+						},
+					},
+				],
+			}),
+			headers: {
+				Authorization: `Basic ${btoa(mainForm.value.credentials)}`,
+				'content-type': 'application/json',
+			},
+		})
+			.then((res) => {
+				return res.json();
+			})
+			.then((parsedRes) => {
+				if (parsedRes.search_box) {
+					this.setState({
+						executionContext: {
+							endpointResponse: parsedRes.search_box,
+							endpointPreferences: {
+								...control.value.endpoint,
+							},
+						},
+					});
+				}
+			})
+			.catch((e) => {
+				console.log(e);
+			});
+	};
 
 	getAggregationFields = () => {
 		const { rawMappings } = this.props;
@@ -83,7 +155,6 @@ class PreferenceForm extends React.Component {
 	render() {
 		const mainForm = this.context;
 		const control = mainForm.get('endpoint');
-
 		const { mappings } = this.props;
 		// eslint-disable-line
 		const { modalVisible } = this.state;
@@ -100,6 +171,7 @@ class PreferenceForm extends React.Component {
 				});
 			}
 		});
+
 		return (
 			<FieldGroup
 				control={control}
@@ -107,7 +179,7 @@ class PreferenceForm extends React.Component {
 				render={(
 					{ invalid: invalidForm, value: formValue, submitted }, // eslint-disable-line
 				) => (
-					<div css={modal} data-cy="index-suggestions-fields-container">
+					<div className={modal} data-cy="index-suggestions-fields-container">
 						<Grid
 							label={
 								<div>
@@ -170,9 +242,15 @@ class PreferenceForm extends React.Component {
 							{(endpointControl) => (
 								<Modal
 									visible={modalVisible.endpoint}
-									onOk={() =>
-										this.setState({ modalVisible: { endpoint: false } })
-									}
+									onOk={() => {
+										if (endpointControl.valid) {
+											this.fetchExecutionContextResponse(
+												endpointControl.value,
+											);
+										}
+
+										this.setState({ modalVisible: { endpoint: false } });
+									}}
 									onCancel={() =>
 										this.setState({ modalVisible: { endpoint: false } })
 									}
@@ -180,7 +258,7 @@ class PreferenceForm extends React.Component {
 										disabled:
 											endpointControl.invalid || endpointControl.pristine,
 									}}
-									css={modal}
+									className={modal}
 								>
 									<FieldControl
 										strict={false}
@@ -194,7 +272,7 @@ class PreferenceForm extends React.Component {
 													<TextInput
 														name="url"
 														label={
-															<span css={styles.labelContainer}>
+															<span className={styles.labelContainer}>
 																<span className="required-marker">
 																	*
 																</span>
@@ -203,7 +281,7 @@ class PreferenceForm extends React.Component {
 																	content={content(
 																		Messages.urlField,
 																	)}
-																	css={styles.iconContainer}
+																	className={styles.iconContainer}
 																>
 																	<Icon type="info-circle" />
 																</Popover>
@@ -247,14 +325,14 @@ class PreferenceForm extends React.Component {
 											return (
 												<Form.Item
 													label={
-														<span css={styles.labelContainer}>
+														<span className={styles.labelContainer}>
 															<span className="required-marker">
 																*
 															</span>
 															Method
 															<Popover
 																content={content(Messages.method)}
-																css={styles.iconContainer}
+																className={styles.iconContainer}
 															>
 																<Icon type="info-circle" />
 															</Popover>
@@ -290,11 +368,11 @@ class PreferenceForm extends React.Component {
 									</FieldControl>
 									<Form.Item
 										label={
-											<span css={styles.labelContainer}>
+											<span className={styles.labelContainer}>
 												Headers
 												<Popover
 													content={content(Messages.headers)}
-													css={styles.iconContainer}
+													className={styles.iconContainer}
 												>
 													<Icon type="info-circle" />
 												</Popover>
@@ -311,11 +389,11 @@ class PreferenceForm extends React.Component {
 									</Form.Item>
 									<Form.Item
 										label={
-											<span css={styles.labelContainer}>
+											<span className={styles.labelContainer}>
 												Body
 												<Popover
 													content={content(Messages.body)}
-													css={styles.iconContainer}
+													className={styles.iconContainer}
 												>
 													<Icon type="info-circle" />
 												</Popover>
@@ -350,10 +428,13 @@ class PreferenceForm extends React.Component {
   }))
 }`
 									}
-									defaultExecutionContext={{
-										endpointResponse: [{ label: '', value: '' }],
-										endpointPreferences: {},
-									}}
+									// eslint-disable-next-line react/destructuring-assignment
+									defaultExecutionContext={this.state.executionContext}
+									allowedTabs={[
+										FUNCTION_EDITOR_TABS_KEYS.CONSOLE_LOGS,
+										FUNCTION_EDITOR_TABS_KEYS.EXECUTION_CONTEXT,
+										FUNCTION_EDITOR_TABS_KEYS.RESPONSE_OUTPUT,
+									]}
 									language="javascript"
 									visible={modalVisible.transformResponse}
 									onCancel={() =>
@@ -364,7 +445,7 @@ class PreferenceForm extends React.Component {
 										})
 									}
 									customFunctionExecutor={(paramFunc, executionContext) => {
-										paramFunc(
+										return paramFunc(
 											executionContext.endpointResponse,
 											executionContext.endpointPreferences,
 										);
@@ -385,11 +466,11 @@ class PreferenceForm extends React.Component {
 							render={({ handler, value: checked }) => (
 								<Grid
 									label={
-										<p css={styles.labelContainer}>
+										<p className={styles.labelContainer}>
 											Show Distinct Suggestions
 											<Popover
 												content={content(Messages.showDistinctSuggestions)}
-												css={styles.iconContainer}
+												className={styles.iconContainer}
 											>
 												<Icon type="info-circle" />
 											</Popover>
@@ -414,13 +495,13 @@ class PreferenceForm extends React.Component {
 							render={({ handler, value: checked }) => (
 								<Grid
 									label={
-										<p css={styles.labelContainer}>
+										<p className={styles.labelContainer}>
 											Enable Predictive Suggestions
 											<Popover
 												content={content(
 													Messages.enablePredictiveSuggestions,
 												)}
-												css={styles.iconContainer}
+												className={styles.iconContainer}
 											>
 												<Icon type="info-circle" />
 											</Popover>
@@ -450,12 +531,12 @@ class PreferenceForm extends React.Component {
 								return (
 									<Grid
 										label={
-											<p css={styles.labelContainer}>
+											<p className={styles.labelContainer}>
 												<span className="required-marker">*</span>
 												<span>Max predicted words</span>
 												<Popover
 													content={content(Messages.maxPredictedWords)}
-													css={styles.iconContainer}
+													className={styles.iconContainer}
 												>
 													<Icon type="info-circle" />
 												</Popover>
@@ -489,11 +570,11 @@ class PreferenceForm extends React.Component {
 							render={({ handler, value: checked }) => (
 								<Grid
 									label={
-										<p css={styles.labelContainer}>
+										<p className={styles.labelContainer}>
 											Apply Default Stopwords
 											<Popover
 												content={content(Messages.applyStopwords)}
-												css={styles.iconContainer}
+												className={styles.iconContainer}
 											>
 												<Icon type="info-circle" />
 											</Popover>
@@ -518,11 +599,11 @@ class PreferenceForm extends React.Component {
 							render={({ handler, value: stopWords }) => (
 								<Grid
 									label={
-										<p css={styles.labelContainer}>
+										<p className={styles.labelContainer}>
 											Set Custom Stopwords
 											<Popover
 												content={content(Messages.customStopwords)}
-												css={styles.iconContainer}
+												className={styles.iconContainer}
 											>
 												<Icon type="info-circle" />
 											</Popover>
@@ -553,11 +634,11 @@ class PreferenceForm extends React.Component {
 							render={({ handler, value: checked }) => (
 								<Grid
 									label={
-										<p css={styles.labelContainer}>
+										<p className={styles.labelContainer}>
 											Enable Synonyms
 											<Popover
 												content={content(Messages.enableSynonyms)}
-												css={styles.iconContainer}
+												className={styles.iconContainer}
 											>
 												<Icon type="info-circle" />
 											</Popover>
@@ -584,13 +665,13 @@ class PreferenceForm extends React.Component {
 								<Grid
 									label={
 										<p
-											css={styles.labelContainer}
+											className={styles.labelContainer}
 											data-cy="include-fields-label"
 										>
 											Include Fields
 											<Popover
 												content={content(Messages.includeFields)}
-												css={styles.iconContainer}
+												className={styles.iconContainer}
 											>
 												<Icon type="info-circle" />
 											</Popover>
@@ -626,13 +707,13 @@ class PreferenceForm extends React.Component {
 								<Grid
 									label={
 										<p
-											css={styles.labelContainer}
+											className={styles.labelContainer}
 											data-cy="exclude-fields-label"
 										>
 											Exclude Fields
 											<Popover
 												content={content(Messages.excludeFields)}
-												css={styles.iconContainer}
+												className={styles.iconContainer}
 											>
 												<Icon type="info-circle" />
 											</Popover>
@@ -674,12 +755,12 @@ class PreferenceForm extends React.Component {
 								return (
 									<Grid
 										label={
-											<span css={styles.labelContainer}>
+											<span className={styles.labelContainer}>
 												<span className="required-marker">*</span>
 												URL
 												<Popover
 													content={content(Messages.urlField)}
-													css={styles.iconContainer}
+													className={styles.iconContainer}
 												>
 													<Icon type="info-circle" />
 												</Popover>
