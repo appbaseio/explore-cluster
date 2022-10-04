@@ -160,11 +160,14 @@ const SearchBoxForm = (props) => {
 					headers: '',
 					body: '',
 					method: ['', [requiredValidator]],
-					url: ['', [requiredValidator, urlValidator]],
+					url: [
+						'',
+						[requiredValidator, (control) => urlValidator(control, true)], //  to allow forward slash values eg: /fusion/abc.v3
+					],
 				}),
 			}),
 			designAndLayout: FormBuilder.group({
-				enableFeaturedSuggestions: false,
+				enableFeaturedSuggestions: true,
 				enablePopularSuggestions: false,
 				enableIndexSuggestions: false,
 				enableRecentSuggestions: false,

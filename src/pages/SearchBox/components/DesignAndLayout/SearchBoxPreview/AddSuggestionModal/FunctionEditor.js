@@ -131,12 +131,13 @@ const container = css`
 		&.template-area,
 		&.response-area {
 			min-height: 250px;
-			height: calc(100% - 50px);
+			height: calc(100% - 46px);
 		}
 
 		&.response-area {
 			position: relative;
-    background: rgb(21,21,21);
+   			background: rgb(21,21,21);    top: 2px;
+
 			#response-area-placeholder h2{
 				position: absolute;
 				top: 50%;
@@ -172,7 +173,8 @@ export const FUNCTION_EDITOR_TABS_KEYS = {
 	RESPONSE_OUTPUT: 'Response Output',
 };
 
-const { EXECUTION_CONTEXT, CONSOLE_LOGS, CONSOLE_LOGS_SHORT } = FUNCTION_EDITOR_TABS_KEYS;
+const { EXECUTION_CONTEXT, CONSOLE_LOGS, CONSOLE_LOGS_SHORT, RESPONSE_OUTPUT } =
+	FUNCTION_EDITOR_TABS_KEYS;
 
 const DEFAULT_EXECUTION_CONTEXT_VALUE = {
 	currentSuggestion: {},
@@ -213,6 +215,11 @@ const FunctionEditor = ({
 	const [disableSaveButton, setDisableSaveButton] = useState(!saveButtonEnabledInitially);
 
 	const [modalVisible, setModalVisible] = useState(true);
+	const [responseOutput, setResponseOutput] = useState(functionResponse ?? '');
+
+	useEffect(() => {
+		setExecutionContext(JSON.stringify(defaultExecutionContext, null, 4));
+	}, [defaultExecutionContext]);
 
 	useEffect(() => {
 		const updateSmallScreenVariable = () => {
@@ -236,7 +243,13 @@ const FunctionEditor = ({
 				`${shouldAppendReturnToFunctionConstructor ? 'return' : ''} ${functionValue}`,
 			)();
 			if (typeof customFunctionExecutor === 'function') {
-				customFunctionExecutor(func, JSON.parse(executionContext));
+				let returnedValue = customFunctionExecutor(func, JSON.parse(executionContext));
+				if (returnedValue) {
+					if (isJson(returnedValue)) {
+						returnedValue = JSON.stringify(returnedValue, 0, 4);
+					}
+					setResponseOutput(returnedValue);
+				}
 			} else {
 				func(
 					...(isJson(executionContext)
@@ -261,7 +274,7 @@ const FunctionEditor = ({
 			}
 
 			resetConsoleOverride();
-			setActiveTabKey(CONSOLE_LOGS);
+			setActiveTabKey(allowedTabs.includes(RESPONSE_OUTPUT) ? RESPONSE_OUTPUT : CONSOLE_LOGS);
 		} catch (error) {
 			// eslint-disable-next-line no-console
 			console.error(error);
@@ -277,7 +290,7 @@ const FunctionEditor = ({
 	};
 	const getContent = () => {
 		return (
-			<div css={container}>
+			<div className={container}>
 				{showSaveFunctionButton && (
 					<Button
 						className="save-btn"
@@ -397,11 +410,11 @@ const FunctionEditor = ({
 								key={FUNCTION_EDITOR_TABS_KEYS.RESPONSE_OUTPUT}
 							>
 								<Col span={24} className="response-area-wrapper response-area">
-									{functionResponse ? (
+									{responseOutput ? (
 										<Monaco
 											defaultValue="// Run the request to see the response output"
 											language="json"
-											value={functionResponse}
+											value={responseOutput}
 											theme="vs-dark"
 											options={monacoOptions}
 											readOnly

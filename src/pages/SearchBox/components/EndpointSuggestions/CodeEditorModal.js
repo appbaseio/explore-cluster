@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Modal } from 'antd';
-import { bool, func, object, string } from 'prop-types';
+import { array, bool, func, object, string } from 'prop-types';
 import FunctionEditor, {
 	FUNCTION_EDITOR_TABS_KEYS,
 } from '../DesignAndLayout/SearchBoxPreview/AddSuggestionModal/FunctionEditor';
@@ -13,6 +13,7 @@ function CodeEditorModal({
 	defaultExecutionContext,
 	defaultCode,
 	customFunctionExecutor,
+	allowedTabs,
 }) {
 	const [code, setCode] = useState('');
 	return (
@@ -30,10 +31,7 @@ function CodeEditorModal({
 				defaultCode={defaultCode}
 				customFunctionExecutor={customFunctionExecutor}
 				onChange={(funcString) => setCode(funcString)}
-				allowedTabs={[
-					FUNCTION_EDITOR_TABS_KEYS.CONSOLE_LOGS,
-					FUNCTION_EDITOR_TABS_KEYS.EXECUTION_CONTEXT,
-				]}
+				allowedTabs={allowedTabs}
 			/>
 		</Modal>
 	);
@@ -46,6 +44,10 @@ CodeEditorModal.defaultProps = {
 	defaultCode: '',
 	defaultExecutionContext: {},
 	width: '90%',
+	allowedTabs: [
+		FUNCTION_EDITOR_TABS_KEYS.CONSOLE_LOGS,
+		FUNCTION_EDITOR_TABS_KEYS.EXECUTION_CONTEXT,
+	],
 };
 
 CodeEditorModal.propTypes = {
@@ -56,6 +58,7 @@ CodeEditorModal.propTypes = {
 	width: string,
 	defaultExecutionContext: object,
 	customFunctionExecutor: func,
+	allowedTabs: array,
 };
 
 export default CodeEditorModal;

@@ -1,11 +1,11 @@
-import Dashboard from '@uppy/dashboard';
+// import Dashboard from '@uppy/dashboard';
 import { Input } from 'antd';
 import { css } from 'emotion';
-import ImageKitUppyPlugin from 'imagekit-uppy-plugin';
-import { IKContext, IKImage } from 'imagekitio-react';
+// import ImageKitUppyPlugin from 'imagekit-uppy-plugin';
+// import { IKContext, IKImage } from 'imagekitio-react';
 import React, { useContext, useEffect } from 'react';
 import { FieldControl, FieldGroup } from 'react-reactive-form';
-import Uppy from '@uppy/core';
+// import Uppy from '@uppy/core';
 import Grid from '../../../components/CreateCredentials/Grid';
 import '@uppy/core/dist/style.css';
 import '@uppy/dashboard/dist/style.css';
@@ -65,36 +65,36 @@ const container = css`
 
 const ApplicationSettings = () => {
 	const parentForm = useContext(FormContext);
-	const {
-		controls: { applicationForm },
-	} = parentForm;
+	// const {
+	// 	controls: { applicationForm },
+	// } = parentForm;
 	useEffect(() => {
 		// eslint-disable-next-line
-		const uppy = new Uppy({ debug: true, autoProceed: false })
-			.use(Dashboard, {
-				inline: true,
-				target: '#uppyDashboard', // your element
-			})
-			.use(ImageKitUppyPlugin, {
-				id: 'appbaseio',
-				publicKey: 'REDACTED_IMAGEKIT_PUBLIC_KEY=',
-				authenticationEndpoint: '/.netlify/functions/imagekit-upload/',
-			})
-			.on('upload-success', onUploadSuccess());
+		// const uppy = new Uppy({ debug: true, autoProceed: false })
+		// 	.use(Dashboard, {
+		// 		inline: true,
+		// 		target: '#uppyDashboard', // your element
+		// 	})
+		// 	.use(ImageKitUppyPlugin, {
+		// 		id: 'appbaseio',
+		// 		publicKey: 'REDACTED_IMAGEKIT_PUBLIC_KEY=',
+		// 		authenticationEndpoint: '/.netlify/functions/imagekit-upload/',
+		// 	})
+		// 	.on('upload-success', onUploadSuccess());
 	}, []);
 
-	const onUploadSuccess = () => (file, response) => {
-		const imgUrl = response.uploadURL;
-		applicationForm.get('logo_uri').setValue(imgUrl);
-		applicationForm.pristine = false;
-	};
+	// const onUploadSuccess = () => (file, response) => {
+	// 	const imgUrl = response.uploadURL;
+	// 	applicationForm.get('logo_uri').setValue(imgUrl);
+	// 	applicationForm.pristine = false;
+	// };
 	const renderErrorSpan = (message) => {
 		return <span className="error-span">{message}</span>;
 	};
 
 	return (
 		<>
-			<div css={container}>
+			<div className={container}>
 				<FieldGroup
 					parent={parentForm}
 					name="applicationForm"
@@ -128,7 +128,7 @@ const ApplicationSettings = () => {
 										);
 									}}
 								/>
-								<FieldControl name="logo_uri" strict={false}>
+								{/* <FieldControl name="logo_uri" strict={false}>
 									{({ value }) => {
 										return (
 											<Grid
@@ -174,7 +174,7 @@ const ApplicationSettings = () => {
 											/>
 										);
 									}}
-								</FieldControl>
+								</FieldControl> */}
 								<FieldControl
 									name="callbacks"
 									strict={false}

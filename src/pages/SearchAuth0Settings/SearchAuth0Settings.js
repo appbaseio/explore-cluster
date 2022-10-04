@@ -31,6 +31,7 @@ import {
 } from './utils';
 import Loader from '../../batteries/components/shared/Loader/Spinner';
 import VersionController from '../../batteries/components/shared/VersionController';
+import UserManagement from './components/UserManagement';
 
 const { TabPane } = Tabs;
 
@@ -68,6 +69,11 @@ const CONNECTIONS_CONSTANTS = {
 	GOOGLE_AUTH: 'google-oauth2',
 	SAML: 'samlp',
 };
+const TABS_KEYS = {
+	APPLICATION: 'application-settings',
+	PROVIDERS: 'providers',
+	USER_MANAGEMENT: 'user-management',
+};
 
 const SearchAuth0Settings = (props) => {
 	const {
@@ -88,6 +94,7 @@ const SearchAuth0Settings = (props) => {
 		updateAuth0ClientConnection,
 	} = props;
 	const [showOverlay, setShowOverlay] = useState(true);
+	const [activeTab, setActiveTab] = useState(TABS_KEYS.APPLICATION);
 	const samlConfigInitialValue = useRef('');
 	const applicationFormInitialData = useRef('');
 	const providersFormInitialData = useRef('');
@@ -117,6 +124,7 @@ const SearchAuth0Settings = (props) => {
 			providersForm: FormBuilder.group(
 				{
 					[CONNECTIONS_CONSTANTS.AUTH0]: false,
+					auth0_enable_signup: undefined,
 					[CONNECTIONS_CONSTANTS.GOOGLE_AUTH]: false,
 					[CONNECTIONS_CONSTANTS.SAML]: false,
 					samlpConfigForm: FormBuilder.group({
@@ -174,9 +182,58 @@ const SearchAuth0Settings = (props) => {
 		};
 	}, []);
 
+	const updateConnectionSettings = (
+		connectionId,
+		connectionPayload,
+		messages = {
+			success: 'Connection Settings updated successfully!',
+			error: "Oops! Connection settings couldn't be updated!",
+		},
+		showMessages = true,
+	) => {
+		updateAuth0ClientConnection(connectionId, connectionPayload, clientId)
+			.then((res) => {
+				if (showMessages) {
+					if (res.payload) {
+						notification.success({
+							message: messages.success,
+						});
+					} else if (res.error) {
+						notification.error({
+							message: <p>{messages.error}</p>,
+						});
+					}
+				}
+			})
+			.catch((updateError) => {
+				if (showMessages) {
+					notification.error({
+						message: updateError,
+					});
+				}
+			});
+	};
+
 	useEffect(() => {
 		if (clientId) {
-			fetchAuth0ClientConnections(clientId);
+			fetchAuth0ClientConnections(clientId).then((res) => {
+				if (res?.payload?.[CONNECTIONS_CONSTANTS.AUTH0]) {
+					fetchAuth0Connection(res?.payload?.[CONNECTIONS_CONSTANTS.AUTH0].id).then(
+						(connec_res) => {
+							if (
+								connec_res?.payload?.options &&
+								auth0Form.current.controls.providersForm.value
+									.auth0_enable_signup === undefined
+							) {
+								auth0Form.current.controls.providersForm.patchValue({
+									auth0_enable_signup:
+										!connec_res?.payload?.options?.disable_signup,
+								});
+							}
+						},
+					);
+				}
+			});
 		}
 	}, [clientId]);
 
@@ -551,12 +608,37 @@ const SearchAuth0Settings = (props) => {
 							message: updateError,
 						});
 					});
+			} // update disable signup option for auth0 connection
+			if (auth0Form.current.controls.providersForm.get([CONNECTIONS_CONSTANTS.AUTH0]).value) {
+				const disableSignup =
+					!auth0Form.current.controls.providersForm.get('auth0_enable_signup').value;
+				const auth0ConnectionUpdatePayload = {
+					options: {
+						disable_signup: disableSignup,
+					},
+				};
+
+				updateConnectionSettings(
+					clientConnections?.[CONNECTIONS_CONSTANTS.AUTH0].id,
+					auth0ConnectionUpdatePayload,
+					{
+						success: `Sign up ${disableSignup ? 'disabled' : 'enabled'} successfully!`,
+						error: `Something went wrong while ${
+							disableSignup ? 'dis' : 'en'
+						}abling sign up!`,
+					},
+					true,
+				);
 			}
 		}
 	};
 	if (isLoading) {
 		return <Loader />;
 	}
+
+	const handleTabsChange = (key) => {
+		setActiveTab(key);
+	};
 
 	return (
 		<>
@@ -583,34 +665,39 @@ const SearchAuth0Settings = (props) => {
 				) : (
 					<VersionController version="8.4.0">
 						<FormContext.Provider value={auth0Form.current}>
-							<Tabs defaultActiveKey="application-settings">
-								<TabPane tab="Application Settings" key="application-settings">
+							<Tabs activeKey={activeTab} onChange={handleTabsChange}>
+								<TabPane tab="Application Settings" key={TABS_KEYS.APPLICATION}>
 									<ApplicationSettings />
 								</TabPane>
-								<TabPane tab="Providers" key="providers">
+								<TabPane tab="Providers" key={TABS_KEYS.PROVIDERS}>
 									<Providers />
+								</TabPane>
+								<TabPane tab="User Management" key={TABS_KEYS.USER_MANAGEMENT}>
+									<UserManagement />
 								</TabPane>
 							</Tabs>
 						</FormContext.Provider>
-						<Affix
-							offsetBottom={0}
-							style={{
-								padding: '15px 10px',
-								width: '100%',
-							}}
-						>
-							<div className={footer}>
-								<Button
-									type="primary"
-									size="default"
-									className="save-btn"
-									onClick={handleSave}
-									loading={isClientSaving}
-								>
-									Save
-								</Button>
-							</div>
-						</Affix>
+						{activeTab !== TABS_KEYS.USER_MANAGEMENT && (
+							<Affix
+								offsetBottom={0}
+								style={{
+									padding: '15px 10px',
+									width: '100%',
+								}}
+							>
+								<div className={footer}>
+									<Button
+										type="primary"
+										size="default"
+										className="save-btn"
+										onClick={handleSave}
+										loading={isClientSaving}
+									>
+										Save
+									</Button>
+								</div>
+							</Affix>
+						)}
 					</VersionController>
 				)}
 			</div>

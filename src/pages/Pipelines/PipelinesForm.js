@@ -20,8 +20,10 @@ import {
 	Switch,
 	Tooltip,
 	Collapse,
+	Tag,
 } from 'antd';
 import yamlToJson from 'js-yaml';
+import { isEqual } from 'lodash';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Overlay from '../../components/Overlay';
 import { mediaKey } from '../../utils/media';
@@ -33,7 +35,10 @@ import {
 	deletePipeline,
 	getPipelines,
 	getPipelinesUsageStats,
-	putPipeline,
+	getPipelineVersions,
+	makePipelineVersionLive as makePipelineVersionLiveAction,
+	createPipelineVersion as createPipelineVersionAction,
+	updatePipelineVersion as updatePipelineVersionAction,
 } from '../../batteries/modules/actions';
 import {
 	pipelinesBannerDetails,
@@ -55,6 +60,8 @@ import PipelineTemplateChooser from './components/PipelineTemplateChooser';
 import PIPELINE_TEMPLATES from './utils/pipeline-templates';
 import PipelineEditorComponent from './components/PipelineEditorComponent';
 import { isJson } from '../../components/ScriptConsole/utils';
+import PipelineVersionsDrawer from './components/PipelineVersionsDrawer';
+import VersionDescriptionModal from './components/VersionDescriptionModal';
 
 const { Panel } = Collapse;
 const { TabPane } = Tabs;
@@ -74,6 +81,23 @@ const link = css`
 const container = css`
 	padding: 10px 50px;
 	position: relative;
+
+	.card-header-wrapper {
+		position: relative;
+		.version-drawer-triggerer {
+			position: absolute;
+			right: 2px;
+			top: 8px;
+			font-size: 20px;
+		}
+	}
+	.live-tag {
+		display: inline-flex;
+		align-items: center;
+		gap: 3px;
+		font-weight: 500;
+		font-size: 16px;
+	}
 	.space-between {
 		display: flex;
 		justify-content: space-between;
@@ -206,12 +230,17 @@ const PipelinesForm = (props) => {
 		isUpdating,
 		history,
 		fetchUsageStats,
+		fetchPipelineVersions,
+		makePipelineVersionLive,
+		createPipelineVersion,
+		updatePipelineVersion,
 	} = props;
 	const isEditPage = get(match, 'params.id');
 	const [showTemplateChoser, setShowTemplateChoser] = useState(!isEditPage);
 	const [selectedTemplate, setSelectedTemplate] = useState('');
 
 	const [isValidateMode, setIsValidateMode] = useState(false);
+	const [isValidatingPipeline, setIsValidatingPipeline] = useState(false);
 	const [pipelineValidationRes, setPipelineValidationRes] = useState(null);
 	const [executionContext, setExecutionContext] = useState(DEFAULT_EXECUTION_CONTEXT_VALUE);
 
@@ -232,6 +261,10 @@ const PipelinesForm = (props) => {
 
 	// track of script file-names to be added
 	const [missingScriptFiles, setMissingScriptFiles] = useState([]);
+
+	// version drawer control
+	const [showVersionDrawer, setShowVersionDrawer] = useState(false);
+	const [showVDescModal, setShowVDescModal] = useState(false);
 
 	const bannerDetails = pipelinesBannerDetails.allPipelines;
 
@@ -352,8 +385,18 @@ const PipelinesForm = (props) => {
 			} else if (pipeline.extension === 'json') {
 				pipelineValue = pipeline.content;
 			}
-			if (!pipeline?.update?.error && !pipeline?.update?.isLoading) {
+			if (
+				!pipeline?.update?.error &&
+				!pipeline?.update?.isLoading &&
+				!isEqual(pipelineValue, editorPipelineValue)
+			) {
 				setEditorPipelineValue(pipelineValue);
+			}
+		}
+
+		if (pipeline?.id) {
+			if (!pipeline.versions && !pipeline.isFetchingVersions) {
+				fetchPipelineVersions(pipeline?.id);
 			}
 		}
 	}, [pipeline]);
@@ -389,6 +432,11 @@ const PipelinesForm = (props) => {
 		// validate when either pipeline or script tab is removed
 		validateMissingScriptFiles();
 	}, [editorPipelineValue, scriptFilesMap]);
+
+	const getCurrentVersion = useCallback(() => {
+		if (!pipeline.id) return false;
+		return (pipeline?.versions ?? []).find((item) => item._version === pipeline._version);
+	}, [pipeline]);
 
 	const getTabTitle = useCallback(
 		(title, key) => {
@@ -530,92 +578,125 @@ const PipelinesForm = (props) => {
 	};
 
 	const handlePipelineValidation = () => {
-		const pipelinePayload = generatePipelinePayload(
-			editorPipelineValue,
-			filterScriptFilesMap(editorPipelineValue, scriptFilesMap),
-		);
-		pipelinePayload.append('pipeline_id', pipeline.id);
-
-		const { request = {}, response = {}, envs = {} } = executionContext;
-		if (request instanceof Object && !isEmpty(request)) {
-			const payloadRequestObject = {};
-			Object.assign(payloadRequestObject, {
-				request: {
-					...request,
-					...(typeof request.body === 'object' && {
-						body: JSON.stringify(request.body),
-					}),
-				},
-			});
-
-			pipelinePayload.append('request', JSON.stringify(payloadRequestObject.request));
-		}
-		if (response instanceof Object && !isEmpty(response)) {
-			const payloadResponseObject = {};
-			Object.assign(payloadResponseObject, {
-				response: {
-					...response,
-					...(typeof response.body === 'object' && {
-						body: JSON.stringify(response.body),
-					}),
-				},
-			});
-			pipelinePayload.append('response', JSON.stringify(payloadResponseObject));
-		}
-		if (!isEmpty(envs)) {
-			pipelinePayload.append('envs', JSON.stringify(envs));
-		}
-
-		validatePipeline(pipelinePayload)
-			.then((res) => {
-				const parsedResponse = { ...res };
-				if (parsedResponse.request) {
-					if (isJson(parsedResponse.request.body)) {
-						parsedResponse.request.body = isJson(parsedResponse.request.body);
-					}
-				}
-				if (parsedResponse.response) {
-					if (isJson(parsedResponse.response.body)) {
-						parsedResponse.response.body = isJson(parsedResponse.response.body);
-					}
-				}
-				setPipelineValidationRes(parsedResponse);
-			})
-			.catch((e) => {
-				notification.error({
-					message: `Failed to validate pipeline  ${`${e.code}   ${e.message}`}`,
-				});
-				setPipelineValidationRes({ error: e });
-			});
-	};
-
-	// handles -  save/ create
-	const handleSave = () => {
 		try {
-			const { createPipeline, updatePipeline } = props;
+			setIsValidatingPipeline(true);
+			setPipelineValidationRes({});
 			const pipelinePayload = generatePipelinePayload(
 				editorPipelineValue,
 				filterScriptFilesMap(editorPipelineValue, scriptFilesMap),
 			);
-			if (isEditPage) {
-				updatePipeline({
-					pipelinePayload,
-					id: pipeline.id,
-					// enable need to control fron form
-				}) /* eslint-disable react/prop-types */
-					.then((res) => {
-						if (res?.error) {
-							notification.error({
-								message: 'Error',
-								description: res.error?.actual
-									? res.error?.actual?.message
-									: res.error?.message,
-							});
-						} else if (res.payload) {
-							message.success('successfully updated pipeline');
-							history.push('/cluster/pipelines');
+			pipelinePayload.append('pipeline_id', pipeline.id);
+
+			const { request = {}, response = {}, envs = {} } = executionContext;
+			if (request instanceof Object && !isEmpty(request)) {
+				const payloadRequestObject = {};
+				Object.assign(payloadRequestObject, {
+					request: {
+						...request,
+						...(typeof request.body === 'object' && {
+							body: JSON.stringify(request.body),
+						}),
+					},
+				});
+
+				pipelinePayload.append('request', JSON.stringify(payloadRequestObject.request));
+			}
+			if (response instanceof Object && !isEmpty(response)) {
+				const payloadResponseObject = {};
+				Object.assign(payloadResponseObject, {
+					response: {
+						...response,
+						...(typeof response.body === 'object' && {
+							body: JSON.stringify(response.body),
+						}),
+					},
+				});
+				pipelinePayload.append('response', JSON.stringify(payloadResponseObject));
+			}
+			if (!isEmpty(envs)) {
+				pipelinePayload.append('envs', JSON.stringify(envs));
+			}
+
+			validatePipeline(pipelinePayload)
+				.then((res) => {
+					const parsedResponse = { ...res };
+					if (parsedResponse.request) {
+						if (isJson(parsedResponse.request.body)) {
+							parsedResponse.request.body = isJson(parsedResponse.request.body);
 						}
+					}
+					if (parsedResponse.response) {
+						if (isJson(parsedResponse.response.body)) {
+							parsedResponse.response.body = isJson(parsedResponse.response.body);
+						}
+					}
+					setPipelineValidationRes(parsedResponse);
+					setIsValidatingPipeline(false);
+				})
+				.catch((e) => {
+					notification.error({
+						message: `Failed to validate pipeline  ${`${e.code}   ${e.message}`}`,
 					});
+					setPipelineValidationRes({ error: e });
+					setIsValidatingPipeline(false);
+				});
+		} catch (error) {
+			console.log('error', error, error.stack);
+		}
+	};
+
+	// handles -  save/ create
+	const handleSave = (versionSave = false, versionDescription) => {
+		try {
+			const { createPipeline } = props;
+			const pipelinePayload = generatePipelinePayload(
+				editorPipelineValue,
+				filterScriptFilesMap(editorPipelineValue, scriptFilesMap),
+			);
+			if (versionDescription) {
+				pipelinePayload.append('versionDescription', versionDescription);
+			}
+			if (isEditPage) {
+				if (versionSave) {
+					createPipelineVersion(
+						pipeline.id,
+						pipelinePayload,
+					) /* eslint-disable react/prop-types */
+						.then((res) => {
+							if (res?.error) {
+								notification.error({
+									message: 'Error',
+									description: res.error?.actual
+										? res.error?.actual?.message
+										: res.error?.message,
+								});
+							} else if (res.payload) {
+								message.success(res.payload.message);
+								history.push(`/cluster/pipelines/${pipeline.id}`);
+							}
+						});
+				} else {
+					updatePipelineVersion(
+						pipeline.id,
+						pipeline.activeVersion,
+						pipelinePayload,
+					) /* eslint-disable react/prop-types */
+						.then((res) => {
+							if (res?.error) {
+								notification.error({
+									message: 'Error',
+									description: res.error?.actual
+										? res.error?.actual?.message
+										: res.error?.message,
+								});
+							} else if (res.payload) {
+								message.success(
+									`successfully updated pipeline version: ${pipeline.activeVersion}`,
+								);
+								history.push('/cluster/pipelines');
+							}
+						});
+				}
 			} else {
 				createPipeline(pipelinePayload).then((res) => {
 					if (res?.error) {
@@ -717,7 +798,7 @@ const PipelinesForm = (props) => {
 	};
 
 	const renderButtonLabel = () => {
-		const labelPrefix = !isEditPage ? 'Create' : 'Save';
+		const labelPrefix = !isEditPage ? 'Create' : 'Update';
 
 		return `${labelPrefix} Pipeline`;
 	};
@@ -728,6 +809,26 @@ const PipelinesForm = (props) => {
 		const icon = !isEditPage ? 'plus' : 'edit';
 
 		return icon;
+	};
+
+	const renderLiveVersionTag = () => {
+		if (isEditPage && pipeline.versions) {
+			const { is_live, _version, _version_description } = getCurrentVersion() ?? {};
+			if (_version) {
+				return (
+					<Tooltip title={_version_description}>
+						<sup className="live-tag">
+							<span>v{_version} </span>
+							<Tag color={is_live ? 'green' : 'grey'}>
+								{is_live ? 'Live' : 'Draft'}
+							</Tag>
+						</sup>
+					</Tooltip>
+				);
+			}
+		}
+
+		return null;
 	};
 
 	return (
@@ -750,9 +851,30 @@ const PipelinesForm = (props) => {
 						</Button>
 					</Link>
 					<Card style={{ marginTop: 15 }} bodyStyle={{ paddingBottom: 0 }} hoverable>
-						<div>
+						<div className="card-header-wrapper">
+							{isEditPage && pipeline?.versions && (
+								<Tooltip title="Versions" style={{ fontSize: 14 }}>
+									{/* Pipeline Versions Versions */}
+									<Icon
+										style={{
+											cursor: getCurrentVersion()?._version
+												? 'pointer'
+												: 'not-allowed',
+											color: getCurrentVersion()?._version
+												? 'rgba(0,0,0,0.65)'
+												: '#bbb7b7',
+										}}
+										className="version-drawer-triggerer"
+										type="clock-circle"
+										onClick={() => {
+											if (getCurrentVersion()?._version)
+												setShowVersionDrawer(true);
+										}}
+									/>
+								</Tooltip>
+							)}
 							<Typography.Title level={3}>
-								{isEditPage ? 'Update' : 'Create'} Pipeline
+								{isEditPage ? 'Update' : 'Create'} Pipeline {renderLiveVersionTag()}
 							</Typography.Title>
 							{isEditPage ? (
 								<Collapse>
@@ -845,6 +967,7 @@ const PipelinesForm = (props) => {
 													consoleLogsArray={getConsoleLogsArray(
 														pipelineValidationRes,
 													)}
+													isValidating={isValidatingPipeline}
 												/>
 											</div>
 										</Flex>
@@ -889,6 +1012,7 @@ const PipelinesForm = (props) => {
 													: '',
 												consoleLogsArray:
 													getConsoleLogsArray(pipelineValidationRes),
+												isValidating: isValidatingPipeline,
 											}}
 											isValidateMode={isValidateMode}
 										/>
@@ -923,15 +1047,58 @@ const PipelinesForm = (props) => {
 								size="large"
 								rel="noopener noreferrer"
 								className="create-save-btn"
-								onClick={handleSave}
+								onClick={() => handleSave()}
 								loading={isCreating || isUpdating || isValidating}
 								// disabled={hasError}
+								icon={renderButtonIcon()}
 							>
-								<Icon type={renderButtonIcon()} />
 								{renderButtonLabel()}
 							</Button>
+							{isEditPage && (
+								<Tooltip title="Save pipeline as a new version">
+									<Button
+										block
+										type="default"
+										size="large"
+										rel="noopener noreferrer"
+										className="create-save-btn"
+										onClick={() => setShowVDescModal(true)}
+									>
+										<Icon type={renderButtonIcon()} />
+										Save Pipeline (as new version)
+									</Button>
+								</Tooltip>
+							)}
 						</Flex>
 					</Affix>
+					<PipelineVersionsDrawer
+						visible={showVersionDrawer}
+						setVisible={setShowVersionDrawer}
+						allVersions={pipeline.versions}
+						makePipelineVersionLive={(versionId) => {
+							makePipelineVersionLive(pipeline.id, versionId).then((res) => {
+								if (res?.error) {
+									notification.error({
+										message: 'Error',
+										description: res.error?.actual
+											? res.error?.actual?.message
+											: res.error?.message,
+									});
+								} else if (res.payload) {
+									message.success(res.payload.res.message);
+									history.push(`/cluster/pipelines/${pipeline.id}`);
+								}
+							});
+						}}
+					/>
+					<VersionDescriptionModal
+						visible={showVDescModal}
+						onSave={(value) => {
+							handleSave(true, value);
+							setShowVDescModal(false);
+						}}
+						onCancel={() => setShowVDescModal(false)}
+					/>
 				</Fragment>
 			)}
 		</div>
@@ -952,7 +1119,6 @@ PipelinesForm.propTypes = {
 	tier: allowedTiers,
 	fetchPipelines: PropTypes.func.isRequired,
 	createPipeline: PropTypes.func.isRequired,
-	updatePipeline: PropTypes.func.isRequired,
 	match: PropTypes.object.isRequired,
 	username: PropTypes.string.isRequired,
 	password: PropTypes.string.isRequired,
@@ -962,6 +1128,10 @@ PipelinesForm.propTypes = {
 	pipelineScripts: PropTypes.object,
 	isValidating: PropTypes.bool,
 	fetchUsageStats: PropTypes.func.isRequired,
+	fetchPipelineVersions: PropTypes.func.isRequired,
+	makePipelineVersionLive: PropTypes.func.isRequired,
+	createPipelineVersion: PropTypes.func.isRequired,
+	updatePipelineVersion: PropTypes.func.isRequired,
 };
 
 PipelinesForm.defaultProps = {
@@ -998,8 +1168,19 @@ const mapStateToProps = (state, props) => {
 	};
 
 	if (id) {
-		const pipelineData = defaultState.pipelines.find((pipeline) => pipeline.id === id) || {};
-
+		let pipelineData = defaultState.pipelines.find((pipeline) => pipeline.id === id) || {};
+		// incase editing a non-live(draft) version for a pipeline
+		if (
+			pipelineData.activeVersion !== pipelineData._version &&
+			Array.isArray(pipelineData.versions)
+		) {
+			const versionData = pipelineData.versions.find(
+				(version) => version._version === pipelineData.activeVersion,
+			);
+			if (versionData) {
+				pipelineData = { ...pipelineData, ...versionData };
+			}
+		}
 		return {
 			...defaultState,
 			pipeline: pipelineData,
@@ -1020,9 +1201,15 @@ const mapStateToProps = (state, props) => {
 const mapDispatchToProps = (dispatch) => ({
 	fetchPipelines: () => dispatch(getPipelines()),
 	createPipeline: (payload) => dispatch(addPipeline(payload)),
-	updatePipeline: (payload) => dispatch(putPipeline(payload)),
 	removePipeline: (id) => dispatch(deletePipeline(id)),
 	fetchUsageStats: () => dispatch(getPipelinesUsageStats()),
+	fetchPipelineVersions: (id) => dispatch(getPipelineVersions(id)),
+	makePipelineVersionLive: (pipelineId, versionId) =>
+		dispatch(makePipelineVersionLiveAction(pipelineId, versionId)),
+	createPipelineVersion: (pipelineId, payload) =>
+		dispatch(createPipelineVersionAction(pipelineId, payload)),
+	updatePipelineVersion: (pipelineId, versionId, payload) =>
+		dispatch(updatePipelineVersionAction(pipelineId, versionId, payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(PipelinesForm);

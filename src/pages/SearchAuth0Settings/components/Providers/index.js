@@ -61,7 +61,7 @@ const Providers = () => {
 
 	return (
 		<>
-			<div css={container}>
+			<div className={container}>
 				<FieldGroup
 					parent={parentForm}
 					name="providersForm"
@@ -69,7 +69,6 @@ const Providers = () => {
 					render={() => {
 						return (
 							<>
-								{' '}
 								<form
 									className={`${
 										providersForm.submitted && providersForm.errors?.noneChecked
@@ -89,6 +88,21 @@ const Providers = () => {
 												);
 											}}
 										/>
+										{providersForm.value.auth0 && (
+											<FieldControl
+												name="auth0_enable_signup"
+												render={({ handler }) => {
+													return (
+														<Checkbox
+															style={{ marginLeft: '26px' }}
+															{...handler('checkbox')}
+														>
+															Sign up enabled
+														</Checkbox>
+													);
+												}}
+											/>
+										)}
 										<FieldControl
 											name="google-oauth2"
 											render={({ handler }) => {
