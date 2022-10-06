@@ -620,6 +620,7 @@ const PipelinesForm = (props) => {
 			validatePipeline(pipelinePayload)
 				.then((res) => {
 					const parsedResponse = { ...res };
+
 					if (parsedResponse.request) {
 						if (isJson(parsedResponse.request.body)) {
 							parsedResponse.request.body = isJson(parsedResponse.request.body);
@@ -634,10 +635,21 @@ const PipelinesForm = (props) => {
 					setIsValidatingPipeline(false);
 				})
 				.catch((e) => {
+					const parsedResponse = { ...e };
 					notification.error({
-						message: `Failed to validate pipeline  ${`${e.code}   ${e.message}`}`,
+						message: `Failed to validate pipeline  ${`${e.response?.code}   ${e.message}`}`,
 					});
-					setPipelineValidationRes({ error: e });
+					if (parsedResponse.request) {
+						if (isJson(parsedResponse.request.body)) {
+							parsedResponse.request.body = isJson(parsedResponse.request.body);
+						}
+					}
+					if (parsedResponse.response) {
+						if (isJson(parsedResponse.response.body)) {
+							parsedResponse.response.body = isJson(parsedResponse.response.body);
+						}
+					}
+					setPipelineValidationRes(parsedResponse);
 					setIsValidatingPipeline(false);
 				});
 		} catch (error) {
