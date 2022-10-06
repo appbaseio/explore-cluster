@@ -459,9 +459,11 @@ const appLayout = ({ id: resultId, dataField, ...resultProps }) => {
 	return reactElementToJSXString(
 		<div
 			{...resultProps}
+			/* eslint-disable react/no-unknown-property */
 			componentId={resultId}
 			dataField={(dataField && dataField[0]) || '_score'}
 			renderItem
+			/* eslint-enable react/no-unknown-property */
 		/>,
 	)
 		.replace('div', 'ReactiveList')
@@ -739,7 +741,7 @@ const ecommLayout = (reactArr) => `
 	`;
 
 const generateSearchCode = ({ id: searchId, value, ...searchProps }) => {
-	return `<DataSearch
+	return `<SearchBox
           autosuggest={false}
           componentId="search"
           dataField={${JSON.stringify(searchProps.dataField)}}
@@ -747,12 +749,13 @@ const generateSearchCode = ({ id: searchId, value, ...searchProps }) => {
           highlight={true}
           placeholder="Search ..."
           showIcon={false}
+		  debounce={500}
         />`;
 };
 
 const sentenceCase = (text) => {
 	if (text) {
-		return text.replace(/(?:_| |\b)(\w)/g, function ($1) {
+		return text.replace(/(?:_| |\b)(\w)/g, ($1) => {
 			return $1.toUpperCase().replace('_', ' ');
 		});
 	}

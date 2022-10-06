@@ -80,12 +80,12 @@
 		"webpack-dev-server": "^4.4.0"
 	},
 	"dependencies": {
-		"@appbaseio-confidential/importer": "git+https://1dc0d0fc07f05943afdde9bdb85b7aa438a0ce3b:x-oauth-basic@github.com/appbaseio-confidential/importer#22773f7d51169674105fb9976ef5b038fbdd8ae0",
+		"@appbaseio-confidential/importer": "git+https://1dc0d0fc07f05943afdde9bdb85b7aa438a0ce3b:x-oauth-basic@github.com/appbaseio-confidential/importer#d3fb2e825118e100de17e97aeadc354907a49639",
 		"@appbaseio-confidential/reactivesearch-playground": "^1.2.16-beta",
 		"@appbaseio/dejavu-browser": "^3.6.0",
 		"@appbaseio/react-filter-box": "^3.4.1",
 		"@appbaseio/reactivemaps": "^3.0.0-beta.14",
-		"@appbaseio/reactivesearch": "^3.38.3",
+		"@appbaseio/reactivesearch": "^3.41.0",
 		"@babel/plugin-proposal-class-properties": "^7.0.0-rc.1",
 		"@codesandbox/sandpack-react": "^0.19.0",
 		"@monaco-editor/react": "^4.2.2",

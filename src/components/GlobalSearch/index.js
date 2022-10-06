@@ -49,7 +49,7 @@ class GlobalSearch extends PureComponent {
 		const { searchValue } = this.state;
 		const isFieldDefined = Array.isArray(dataFieldSettings) && dataFieldSettings.length;
 		return (
-			<div className={inputBox} css={{ position: 'relative' }}>
+			<div className={inputBox} style={{ position: 'relative' }}>
 				<SearchBox
 					componentId="GlobalSearch"
 					innerClass={{
@@ -66,7 +66,7 @@ class GlobalSearch extends PureComponent {
 							max-height: 420px !important;
 						`,
 					}}
-					debounce={5}
+					debounce={50}
 					showIcon={false}
 					showDistinctSuggestions
 					onChange={this.handleSearchValueChange}

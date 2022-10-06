@@ -273,6 +273,7 @@ class AppWrapper extends Component {
 	onCollapse = () => {
 		const { setIsCollapsed, collapsed } = this.props;
 		setIsCollapsed(!collapsed);
+		this.setState({ activeSubMenu: [] });
 	};
 
 	render() {
