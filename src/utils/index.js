@@ -6,6 +6,7 @@ import values from 'lodash/values';
 import { notification } from 'antd';
 import { getURL } from '../constants/config';
 import { getSingleFunction, updateFunctions } from '../batteries/utils/app';
+// eslint-disable-next-line import/no-cycle
 import { getESVersion } from '../batteries/utils/mappings';
 import { doGet } from '../batteries/utils/requestService';
 import { getDefaultAllowedActions } from './allowedActions';
