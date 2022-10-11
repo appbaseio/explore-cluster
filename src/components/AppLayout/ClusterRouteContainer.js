@@ -28,7 +28,10 @@ const PipelinesPage = Loadable({
 	loader: () => import(/* webpackChunkName: "Pipelines" */ '../../pages/Pipelines'),
 	loading: Loader,
 });
-
+const PipelinesInsightsPage = Loadable({
+	loader: () => import(/* webpackChunkName: "Pipelines" */ '../../pages/PipelinesInsights'),
+	loading: Loader,
+});
 const PipelineLogsPage = Loadable({
 	loader: () => import(/* webpackChunkName: "PipelineLogsPage" */ '../../pages/PipelineLogs'),
 	loading: Loader,
@@ -411,6 +414,22 @@ class ClusterRouteContainer extends React.Component {
 							<>
 								{get(allowedRoutes, '/cluster/pipelines') ? (
 									<AppPageContainer {...props} component={PipelinesForm} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
+						)}
+					/>
+					<Route
+						exact
+						path="/cluster/pipeline-insights"
+						render={(props) => (
+							<>
+								{get(allowedRoutes, '/cluster/pipeline-insights') ? (
+									<AppPageContainer
+										{...props}
+										component={PipelinesInsightsPage}
+									/>
 								) : (
 									<UnauthorizedPage />
 								)}

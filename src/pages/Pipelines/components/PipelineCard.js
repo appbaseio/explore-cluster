@@ -250,7 +250,7 @@ const PipelineCard = (props) => {
 					<p className={description}>{pipeline.description}</p>
 				</Col>
 				<Col lg={9} md={14} sm={24} className="date-column">
-					<div css={popoverContent}>
+					<div className={popoverContent}>
 						{pipelinesRoutePaths.map(({ path, method }) => (
 							<span>
 								<b>{method} &nbsp;</b>

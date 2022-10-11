@@ -130,8 +130,7 @@ module.exports = {
 						options: {
 							javascriptEnabled: true,
 							modifyVars: {
-								'@font-family':
-									"'Inter', sans-serif",
+								'@font-family': "'Inter', sans-serif",
 							},
 						},
 					},
@@ -148,5 +147,13 @@ module.exports = {
 				},
 			},
 		],
+	},
+	devServer: {
+		client: {
+			overlay: {
+				warnings: false,
+				errors: true,
+			},
+		},
 	},
 };

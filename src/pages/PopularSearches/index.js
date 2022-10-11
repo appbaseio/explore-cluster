@@ -90,9 +90,8 @@ const PopularSearchesWrapper = ({ appName, plan, isPaidUser }) => {
 							<Filter filterId={filterId} />
 							<Route
 								component={({ match }) => {
-									const splitedURL = window.location.href.split(
-										'query-overview/',
-									);
+									const splitedURL =
+										window.location.href.split('query-overview/');
 									return (
 										<React.Fragment>
 											{window.location.href.includes('query-overview') ? (
