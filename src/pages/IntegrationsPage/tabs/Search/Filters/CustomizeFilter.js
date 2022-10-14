@@ -1,11 +1,11 @@
 import React from 'react';
-import { Button, Modal, Switch, Form, Select, List, Radio } from 'antd';
+import { Button, Modal, Switch, Form, Select, List, Radio, Typography } from 'antd';
 import { string, object, func, bool } from 'prop-types';
 import { FieldGroup, FieldControl, FormBuilder } from 'react-reactive-form';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import { componentTypes } from '@appbaseio/reactivesearch';
 import Dragger from './Dragger';
-import LivePreview from './LivePreview';
+import LivePreview from '../LivePreview';
 import CopyCode from './CopyCode';
 import DataFieldSelector from '../../../../../components/Form/DataFieldSelector';
 import TextInput from '../../../../../components/Form/Input';
@@ -14,13 +14,16 @@ import { DatePickerStyles, filterModalStyles } from './styles';
 import 'react-day-picker/lib/style.css';
 import Data from './Data';
 import { dataPropFromArray } from '../../../utils';
+import { CardButton, CodeEditorCard } from '../styles';
+import CodeEditorModal from '../CodeEditorModal';
 
 const { Item } = List;
 
 class CustomizeFilter extends React.Component {
 	state = {
 		visible: false,
-		customizeConrolObj: {},
+		showDefaultQueryEditor: false,
+		showCustomQueryEditor: false,
 	};
 
 	message = '';
@@ -61,15 +64,6 @@ class CustomizeFilter extends React.Component {
 		this.setState({
 			visible: false,
 		});
-		this.setCustomizeConrolObj({});
-	};
-
-	setCustomizeConrolObj = (obj) => {
-		if (Object.keys(obj).length) {
-			this.setState({
-				customizeConrolObj: obj,
-			});
-		}
 	};
 
 	setFieldType = (val, formControl) => {
@@ -108,7 +102,8 @@ class CustomizeFilter extends React.Component {
 	};
 
 	render() {
-		const { visible, dataFieldType, message, customizeConrolObj } = this.state;
+		const { visible, dataFieldType, message, showCustomQueryEditor, showDefaultQueryEditor } =
+			this.state;
 		const {
 			buttonLabel,
 			control,
@@ -116,7 +111,6 @@ class CustomizeFilter extends React.Component {
 			disableListOptions,
 			disableFilterType,
 			type,
-			form,
 			getPreferencesPayload,
 		} = this.props;
 		const { pipeline } = this.props;
@@ -146,7 +140,6 @@ class CustomizeFilter extends React.Component {
 								destroyOnClose
 								okText="Save"
 								width="90%"
-								afterClose={() => this.setCustomizeConrolObj({})}
 							>
 								<div css={filterModalStyles}>
 									<div className="left-container">
@@ -695,15 +688,125 @@ class CustomizeFilter extends React.Component {
 													</FieldControl>
 												</>
 											)}
+											{value.dataField ? (
+												<>
+													<CodeEditorCard>
+														<CardButton
+															icon="edit"
+															onClick={() =>
+																this.setState({
+																	showDefaultQueryEditor: true,
+																})
+															}
+														>
+															Edit
+														</CardButton>
+														<Typography.Paragraph>
+															Default Query:
+														</Typography.Paragraph>
+														<Typography.Paragraph>
+															Edit defaultQuery code exported as
+															function
+														</Typography.Paragraph>
+													</CodeEditorCard>
+													<CodeEditorCard>
+														<CardButton
+															icon="edit"
+															onClick={() =>
+																this.setState({
+																	showCustomQueryEditor: true,
+																})
+															}
+														>
+															Edit
+														</CardButton>
+														<Typography.Paragraph>
+															Set Custom Query:
+														</Typography.Paragraph>
+														<Typography.Paragraph>
+															Edit Custom Query code exported as
+															function
+														</Typography.Paragraph>
+													</CodeEditorCard>
+												</>
+											) : null}
+
+											<FieldControl
+												name="defaultQuery"
+												strict={false}
+												control={control?.get('defaultQuery')}
+											>
+												{(defaultQueryControl) => (
+													<CodeEditorModal
+														visible={showDefaultQueryEditor}
+														onCancel={() =>
+															this.setState({
+																showDefaultQueryEditor: false,
+															})
+														}
+														onSave={(code) => {
+															this.setState({
+																showDefaultQueryEditor: false,
+															});
+															defaultQueryControl
+																.handler()
+																.onChange(code);
+														}}
+														componentConfig={{
+															...control.value,
+															defaultQuery:
+																defaultQueryControl.value ||
+																`(value, props)=>({})`,
+														}}
+														functionProperty="defaultQuery"
+														pipeline={pipeline}
+														showLivePreview={false}
+													/>
+												)}
+											</FieldControl>
+											<FieldControl
+												name="customQuery"
+												strict={false}
+												control={control?.get('customQuery')}
+											>
+												{(customQueryControl) => (
+													<CodeEditorModal
+														visible={showCustomQueryEditor}
+														onCancel={() =>
+															this.setState({
+																showCustomQueryEditor: false,
+															})
+														}
+														onSave={(code) => {
+															this.setState({
+																showCustomQueryEditor: false,
+															});
+															customQueryControl
+																.handler()
+																.onChange(code);
+														}}
+														componentConfig={{
+															...control.value,
+															customQuery:
+																customQueryControl.value ||
+																`(value, props)=>(${JSON.stringify(
+																	{ aggs: {} },
+																	null,
+																	2,
+																)})`,
+														}}
+														functionProperty="customQuery"
+														pipeline={pipeline}
+													/>
+												)}
+											</FieldControl>
 										</Form>
 									</div>
 									<Dragger />
 									<div className="right-container">
 										<LivePreview
-											form={form}
-											control={control.value}
-											setCustomizeConrolObj={this.setCustomizeConrolObj}
-											customizeConrolObj={customizeConrolObj}
+											pipeline={pipeline}
+											componentConfig={control.value}
 										/>
 										<CopyCode
 											control={value}

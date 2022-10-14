@@ -305,8 +305,6 @@ export const validateURL = (control) => {
 export const chartConfigurationFormDefaultFields = {
 	customize: {
 		useAsFilter: false,
-		defaultQuery: '',
-		setOption: '',
 		type: 'term',
 		componentType: componentTypes.reactiveChart,
 	},
@@ -1137,6 +1135,8 @@ export const rsConfigMapper = {
 		'sortBy',
 		'aggregationSize',
 		'size',
+		'defaultQuery',
+		'customQuery',
 	],
 	SINGLELIST: [
 		'dataField',
@@ -1151,6 +1151,9 @@ export const rsConfigMapper = {
 		'sortBy',
 		'aggregationSize',
 		'size',
+
+		'defaultQuery',
+		'customQuery',
 	],
 	RANGEINPUT: [
 		'dataField',
@@ -1161,6 +1164,9 @@ export const rsConfigMapper = {
 		'range',
 		'rangeLabels',
 		'showHistogram',
+
+		'defaultQuery',
+		'customQuery',
 	],
 	DYNAMICRANGESLIDER: [
 		'dataField',
@@ -1169,6 +1175,9 @@ export const rsConfigMapper = {
 		'componentType',
 		'queryFormat',
 		'showHistogram',
+
+		'defaultQuery',
+		'customQuery',
 	],
 	TAGCLOUD: [
 		'dataField',
@@ -1180,6 +1189,9 @@ export const rsConfigMapper = {
 		'multiSelect',
 		'aggregationSize',
 		'size',
+
+		'defaultQuery',
+		'customQuery',
 	],
 	REACTIVE_CHART: [
 		'dataField',
@@ -1189,8 +1201,6 @@ export const rsConfigMapper = {
 		'chartType',
 		'useAsFilter',
 		'labelFormatter',
-		'defaultQuery',
-		'setOption',
 		'xAxisField',
 		'yAxisField',
 		'xAxisName',
@@ -1199,6 +1209,9 @@ export const rsConfigMapper = {
 		'sortBy',
 		'queryFormat',
 		'type',
+		'setOption',
+		'defaultQuery',
+		'customQuery',
 	],
 	TABDATALIST: [
 		'dataField',

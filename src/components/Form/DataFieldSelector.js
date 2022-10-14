@@ -8,6 +8,7 @@ import { FieldControl } from 'react-reactive-form';
 import { getAppMappings } from '../../batteries/modules/actions';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import { traverseMapping } from '../../batteries/utils/mappings';
+import { RANGE_FIELDS } from '../../constants';
 
 const selectCls = css`
 	.ant-select-selection {
@@ -98,9 +99,20 @@ class DataFieldSelector extends React.Component {
 
 	renderOptions() {
 		const { traversedMappings } = this.state;
-		const { withoutSuffix } = this.props;
+		const { withoutSuffix, mappings, showRangeFieldsOnly } = this.props;
+
 		return traversedMappings.map((v) => {
 			const value = v.split('.keyword')[0];
+			const fieldType = mappings?.properties[value]?.type;
+			if (showRangeFieldsOnly) {
+				return (
+					RANGE_FIELDS.includes(fieldType) && (
+						<Select.Option key={withoutSuffix ? value : v} title={v}>
+							{value}
+						</Select.Option>
+					)
+				);
+			}
 			return (
 				<Select.Option key={withoutSuffix ? value : v} title={v}>
 					{value}
@@ -231,6 +243,7 @@ DataFieldSelector.defaultProps = {
 	withoutSuffix: false,
 	pipeline: '',
 	handleReload: () => {},
+	showRangeFieldsOnly: false,
 };
 
 DataFieldSelector.propTypes = {
@@ -254,6 +267,7 @@ DataFieldSelector.propTypes = {
 	withoutSuffix: bool,
 	pipeline: string,
 	handleReload: func,
+	showRangeFieldsOnly: bool,
 };
 
 const mapStateToProps = (state, props) => {
