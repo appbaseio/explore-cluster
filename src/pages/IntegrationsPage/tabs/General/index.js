@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Select, Form, Icon, Input, Popover } from 'antd';
+import { Select, Form, Icon, Popover } from 'antd';
 import { bool, object } from 'prop-types';
 import get from 'lodash/get';
 import keys from 'lodash/keys';
@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import { FormContext } from '../../utils';
 import TextInput from '../../../../components/Form/Input';
+import CredentialsModal from '../../Credentials/CredentialsModal';
 
 const General = ({ apps, isRecommendation }) => {
 	const form = useContext(FormContext);
@@ -81,45 +82,51 @@ const General = ({ apps, isRecommendation }) => {
 									},
 								}}
 							/>
-							<div>
-								<div style={{ margin: '10px 0px', color: 'rgba(0, 0, 0, 0.85)' }}>
-									<span>
-										API Credentials
-										<Popover
-											content={
-												<div>
-													API credentials allow secure UI access to the
-													reactivesearch.io cluster. Check docs at{' '}
-													<a
-														target="blank"
-														href="https://docs.appbase.io/docs/security/credentials/"
-													>
-														here
-													</a>
-													. <br />
-													You can get the API credentials from{' '}
-													<a href="credentials">API Credentials</a> page
-													under <strong>Access Control</strong>.
-												</div>
-											}
+							<FieldGroup control={form.get('exportSettings')}>
+								{() => (
+									<div>
+										<div
+											style={{
+												margin: '10px 0px',
+												color: 'rgba(0, 0, 0, 0.85)',
+											}}
 										>
-											<Icon
-												type="info-circle"
-												style={{ marginLeft: '5px' }}
-											/>
-										</Popover>
-									</span>
-								</div>
-								<Input
-									placeholder="Enter API credentials"
-									value={form.get('exportSettings').get('credentials').value}
-									onChange={(e) => {
-										form.get('exportSettings')
-											.get('credentials')
-											.setValue(e.target.value);
-									}}
-								/>
-							</div>
+											<span>
+												API Credentials
+												<Popover
+													content={
+														<div>
+															API credentials allow secure UI access
+															to the reactivesearch.io cluster. Check
+															docs at{' '}
+															<a
+																target="blank"
+																href="https://docs.appbase.io/docs/security/credentials/"
+															>
+																here
+															</a>
+															.
+														</div>
+													}
+												>
+													<Icon
+														type="info-circle"
+														style={{ marginLeft: '5px' }}
+													/>
+												</Popover>
+											</span>
+										</div>
+										<FieldControl name="credentials" strict={false}>
+											{({ value, onChange }) => (
+												<CredentialsModal
+													value={value}
+													onChange={onChange}
+												/>
+											)}
+										</FieldControl>
+									</div>
+								)}
+							</FieldGroup>
 						</div>
 					</div>
 				</div>

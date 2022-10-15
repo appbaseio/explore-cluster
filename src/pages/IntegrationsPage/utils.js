@@ -1359,7 +1359,7 @@ const flattenObject = (obj) => {
 	return flattened;
 };
 
-export const getDiffData = (oldObj, newObj, isPageLevelDiff = false) => {
+export const getDiffData = (oldObj, newObj, isPageLevelDiff = false, isRecommendation) => {
 	let diffData = diff(removeEmpty({ ...oldObj }), removeEmpty({ ...newObj }));
 	if (!diffData) {
 		return [0, {}];
@@ -1557,6 +1557,25 @@ export const getDiffData = (oldObj, newObj, isPageLevelDiff = false) => {
 					...newDiffData,
 				},
 			};
+		}
+
+		if (isRecommendation) {
+			if (get(diffData, 'resultSettings', null)) {
+				const newVal = get(removeEmpty(newObj), 'resultSettings.fields', '');
+				const oldVal = get(removeEmpty(oldObj), 'resultSettings.fields', '');
+				const resultSettings = get(diffData, 'resultSettings.fields', {});
+
+				Object.keys(resultSettings).forEach((i) => {
+					resultSettings[i] = [oldVal[i] || '', newVal[i] || ''];
+				});
+
+				diffData = {
+					...diffData,
+					resultSettings,
+				};
+
+				delete diffData.resultSettings.fields;
+			}
 		}
 	} else {
 		// TODO: page level settings
@@ -1866,6 +1885,9 @@ export const getDiffData = (oldObj, newObj, isPageLevelDiff = false) => {
 			exportSettings: get(diffData, 'exportSettings', {}),
 			authenticationSettings: get(diffData, 'authenticationSettings', {}),
 			recommendationSettings: get(diffData, 'recommendationSettings', {}),
+			...(isRecommendation && {
+				resultSettings: get(diffData, 'resultSettings', {}),
+			}),
 		}),
 		...(isPageLevelDiff && {
 			resultSettings: get(diffData, 'resultSettings', {}),
@@ -1901,9 +1923,14 @@ export const getDiffData = (oldObj, newObj, isPageLevelDiff = false) => {
 	return [diffCount, diffData];
 };
 
-export const getDiffDataAndCount = (oldData, newData) => {
+export const getDiffDataAndCount = (oldData, newData, isRecommendation = false) => {
 	// eslint-disable-next-line prefer-const
-	let [diffCount, diffData] = getDiffData(oldData.general, newData.general, false);
+	let [diffCount, diffData] = getDiffData(
+		oldData.general,
+		newData.general,
+		false,
+		isRecommendation,
+	);
 
 	const pagesKeys = Array.from(
 		new Set([...(Object.keys(oldData) ?? {}), ...(Object.keys(newData) ?? {})]),
@@ -1914,7 +1941,12 @@ export const getDiffDataAndCount = (oldData, newData) => {
 		if (pageKey === 'general') {
 			return;
 		}
-		const pageDiffData = getDiffData(oldData[pageKey], newData[pageKey], true);
+		const pageDiffData = getDiffData(
+			oldData[pageKey],
+			newData[pageKey],
+			true,
+			isRecommendation,
+		);
 		diffCount += pageDiffData[0];
 		pagesDiffdata.push({
 			sectionTitle: pageKey,

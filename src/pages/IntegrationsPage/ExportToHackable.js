@@ -29,11 +29,7 @@ const ExportToHackable = ({ control, preferences, isRecommendation, widgetId }) 
 				Open the CodeSandbox{' '}
 				<a
 					target="blank"
-					href={
-						isRecommendation
-							? 'https://codesandbox.io/s/github/appbaseio/reactivesearch-shopify-plugin/tree/export-to-csb-recommendation?file=/public/index.html'
-							: 'https://codesandbox.io/s/github/appbaseio/reactivesearch-shopify-plugin/tree/export-to-csb?file=/public/index.html'
-					}
+					href="https://codesandbox.io/s/github/appbaseio/recommendations-template/tree/main?file=/public/index.html"
 				>
 					link here
 				</a>

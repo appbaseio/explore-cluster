@@ -1154,12 +1154,13 @@ CreateCredentials.defaultProps = {
 	mappings: [],
 	indices: [],
 	readOnly: false,
+	onSubmit: () => {},
 };
 CreateCredentials.propTypes = {
 	isPaidUser: PropTypes.bool,
 	isSubmitting: PropTypes.bool,
 	show: PropTypes.bool,
-	onSubmit: PropTypes.func.isRequired,
+	onSubmit: PropTypes.func,
 	fetchPermissions: PropTypes.func.isRequired,
 	initialValues: PropTypes.shape({
 		description: PropTypes.string,

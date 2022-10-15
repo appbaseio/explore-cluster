@@ -79,8 +79,10 @@ class SavePreferencesN extends React.Component {
 	};
 
 	get compareChange() {
+		const { isRecommendation } = this.props;
 		const { oldData, newData } = this.getOldDataNewData();
-		return !!getDiffDataAndCount(removeEmpty(oldData), removeEmpty(newData)).diffCount;
+		return !!getDiffDataAndCount(removeEmpty(oldData), removeEmpty(newData), isRecommendation)
+			.diffCount;
 	}
 
 	handleSave = () => {

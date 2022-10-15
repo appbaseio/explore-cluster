@@ -237,6 +237,12 @@ class Recommendations extends React.Component {
 		);
 	};
 
+	addControl = () => {
+		this.setState({
+			showForm: false,
+		});
+	};
+
 	handleEdit = (id, previewProps) => {
 		this.showForm(id, previewProps);
 	};
@@ -413,10 +419,8 @@ class Recommendations extends React.Component {
 
 									<FieldGroup name="productsPageHandle">
 										{({ disabled, value: formValue }) => {
-											const urlField = get(
-												formValue,
-												'productsPageUrlField',
-												'',
+											const urlField = (
+												get(formValue, 'productsPageUrlField', '') || ''
 											).split('.keyword')[0];
 											return disabled ? null : (
 												<>
@@ -499,6 +503,12 @@ class Recommendations extends React.Component {
 											},
 										}}
 									/>
+
+									<Flex justifyContent="center">
+										<Button onClick={this.addControl} type="primary">
+											Save
+										</Button>
+									</Flex>
 								</Form>
 							)}
 						</FieldGroup>

@@ -160,7 +160,7 @@ class PreviewModal extends React.Component {
 							</span>
 
 							<span>
-								{!displayProductPicker ? (
+								{!displayProductPicker && !isRecommendation ? (
 									<Button onClick={this.handleViewChange}>
 										<Icon
 											style={{
@@ -187,7 +187,7 @@ class PreviewModal extends React.Component {
 				>
 					<div
 						style={{
-							display: 'flex',
+							display: isRecommendation ? 'block' : 'flex',
 							justifyContent: 'center',
 						}}
 					>
