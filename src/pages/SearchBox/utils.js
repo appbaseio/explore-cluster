@@ -150,11 +150,11 @@ export function parseJSON(input) {
 		try {
 			return JSON.parse(input);
 		} catch (error) {
-			return {};
+			return null;
 		}
 	}
 	if (typeof input === 'object') {
 		return input;
 	}
-	return {};
+	return null
 }
