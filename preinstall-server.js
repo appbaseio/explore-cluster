@@ -1,15 +1,15 @@
 const https = require('https');
 const fs = require('fs');
-var path = require('path');
+const path = require('path');
 const templatesConstants = require('./template-sources.json');
 
 var walk = function (dir, done) {
-	var results = [];
+	let results = [];
 	fs.readdir(dir, function (err, list) {
 		if (err) return done(err);
-		var i = 0;
+		let i = 0;
 		(function next() {
-			var file = list[i++];
+			let file = list[i++];
 			if (!file) return done(null, results);
 			file = path.resolve(dir, file);
 			fs.stat(file, function (err, stat) {
@@ -61,7 +61,7 @@ async function generateTemplatesOutput() {
 				const testFolder = `./templates/${fileName}/`;
 				fs.readdirSync(testFolder).forEach((file) => {
 					walk(`${testFolder}${file}`, function (err, results) {
-						let filesObj = {};
+						const filesObj = {};
 						let templateOutputObj = {};
 
 						if (err) throw err;
@@ -72,7 +72,9 @@ async function generateTemplatesOutput() {
 							if (fileName.includes('.ico') || fileName.includes('.png')) {
 								const data = fs.readFileSync(
 									`./${
-										path.split('arc-dashboard/')[1] || path.split('repo/')[1]
+										path.split('arc-dashboard/')[1] ||
+										path.split('repo/')[1] ||
+										path.split('vercel/path0/')[1]
 									}`,
 									{
 										encoding: 'base64',
@@ -84,7 +86,8 @@ async function generateTemplatesOutput() {
 									const data = fs.readFileSync(
 										`./${
 											path.split('arc-dashboard/')[1] ||
-											path.split('repo/')[1]
+											path.split('repo/')[1] ||
+											path.split('vercel/path0/')[1]
 										}`,
 										{
 											encoding: 'utf8',
@@ -98,7 +101,9 @@ async function generateTemplatesOutput() {
 							if (data.manifest_path === path.split(`${file}/`)[1]) {
 								const templateData = fs.readFileSync(
 									`./${
-										path.split('arc-dashboard/')[1] || path.split('repo/')[1]
+										path.split('arc-dashboard/')[1] ||
+										path.split('repo/')[1] ||
+										path.split('vercel/path0/')[1]
 									}`,
 									{
 										encoding: 'utf8',
@@ -109,10 +114,9 @@ async function generateTemplatesOutput() {
 									...data,
 									...JSON.parse(templateData),
 								};
-								// return;
 							}
 						});
-						// console.log(templateOutputObj.name);
+
 						filesTemplatesObj = {
 							...filesTemplatesObj,
 							[fileName]: { ...filesObj },
@@ -136,7 +140,6 @@ async function generateTemplatesOutput() {
 		(err) => {
 			if (err) {
 				console.error(err);
-				return;
 			}
 		},
 	);
@@ -147,7 +150,6 @@ async function generateTemplatesOutput() {
 		(err) => {
 			if (err) {
 				console.error(err);
-				return;
 			}
 		},
 	);

@@ -1,4 +1,6 @@
 #!/bin/bash
+yum install jq -y
+
 if [[ -d ./templates ]]
 then
     rm -rf templates
