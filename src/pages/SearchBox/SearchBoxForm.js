@@ -134,15 +134,15 @@ const SearchBoxForm = (props) => {
 			description: '',
 			credentials: ['', [Validators.required]],
 			popular: FormBuilder.group({
-				minCount: [0, [requiredValidator, Validators.min(0), Validators.max(1000)]],
-				minChars: [0, [requiredValidator, Validators.min(0)]],
-				size: [0, [requiredValidator, Validators.min(0), Validators.max(10)]],
+				minCount: [0, [Validators.min(0), Validators.max(1000)]],
+				minChars: [0, [Validators.min(0)]],
+				size: [5, [Validators.min(0), Validators.max(10)]],
 				indices: [['*'], [arrayValidator]],
 			}),
 			recent: FormBuilder.group({
-				minHits: [0, [requiredValidator, Validators.min(0)]],
-				size: [0, [requiredValidator, Validators.min(0), Validators.max(10)]],
-				minChars: [0, [requiredValidator, Validators.min(0), Validators.max(10)]],
+				minHits: [0, [Validators.min(0)]],
+				size: [5, [Validators.min(0), Validators.max(10)]],
+				minChars: [0, [Validators.min(0), Validators.max(10)]],
 				indices: [['*'], [arrayValidator]],
 			}),
 			endpoint: FormBuilder.group({
@@ -151,11 +151,11 @@ const SearchBoxForm = (props) => {
 				maxPredictedWords: [1, [requiredValidator, Validators.min(1)]],
 				includeFields: [['*']],
 				excludeFields: [[]],
-				urlField: ['', [requiredValidator]],
+				urlField: [''],
 				showDistinctSuggestions: false,
 				enablePredictiveSuggestions: false,
 				enableSynonyms: false,
-				transformResponse: '',
+				transformResponse: ['', [Validators.required]],
 				endpoint: FormBuilder.group({
 					headers: '',
 					body: '',
@@ -169,7 +169,7 @@ const SearchBoxForm = (props) => {
 			designAndLayout: FormBuilder.group({
 				enableFeaturedSuggestions: true,
 				enablePopularSuggestions: false,
-				enableIndexSuggestions: false,
+				enableEndpointSuggestions: false,
 				enableRecentSuggestions: false,
 				enableVoiceSearch: false,
 				highlight: false,
@@ -216,7 +216,7 @@ const SearchBoxForm = (props) => {
 						theme: designAndLayout.theme,
 						enableFeaturedSuggestions: designAndLayout.enableFeaturedSuggestions,
 						enablePopularSuggestions: designAndLayout.enablePopularSuggestions,
-						enableIndexSuggestions: designAndLayout.enableIndexSuggestions,
+						enableEndpointSuggestions: designAndLayout.enableEndpointSuggestions,
 						enableRecentSuggestions: designAndLayout.enableRecentSuggestions,
 						enableVoiceSearch: designAndLayout.enableVoiceSearch,
 						highlight: designAndLayout.highlight,
@@ -255,22 +255,28 @@ const SearchBoxForm = (props) => {
 		if (form.current.invalid) {
 			form.current.handleSubmit();
 			const { controls } = form.current;
+			if (!id || !credentials) {
+				return;
+			}
 			if (controls.designAndLayout.status === 'INVALID') {
 				setActiveTab('1');
 				return;
 			}
-			if (controls.popular.status === 'INVALID') {
+			if (controls.popular.status === 'INVALID' && designAndLayout.enablePopularSuggestions) {
 				setActiveTab('2');
 				return;
 			}
-			if (controls.recent.status === 'INVALID') {
+			if (controls.recent.status === 'INVALID' && designAndLayout.enableRecentSuggestions) {
 				setActiveTab('3');
 				return;
 			}
-			// if (controls.endpoint.status === 'INVALID') {
-			// 	setActiveTab('4');
-			// 	return;
-			// }
+			if (
+				controls.endpoint.status === 'INVALID' &&
+				designAndLayout.enableEndpointSuggestions
+			) {
+				setActiveTab('4');
+				return;
+			}
 		}
 
 		saveSearchBox(id, payload)
@@ -321,8 +327,8 @@ const SearchBoxForm = (props) => {
 						searchBoxData.searchbox?.featured?.design?.enableFeaturedSuggestions,
 					enablePopularSuggestions:
 						searchBoxData.searchbox?.featured?.design?.enablePopularSuggestions,
-					enableIndexSuggestions:
-						searchBoxData.searchbox?.featured?.design?.enableIndexSuggestions,
+					enableEndpointSuggestions:
+						searchBoxData.searchbox?.featured?.design?.enableEndpointSuggestions,
 					enableRecentSuggestions:
 						searchBoxData.searchbox?.featured?.design?.enableRecentSuggestions,
 					enableVoiceSearch: searchBoxData.searchbox?.featured?.design?.enableVoiceSearch,
@@ -354,7 +360,7 @@ const SearchBoxForm = (props) => {
 				},
 			});
 		}
-	}, [searchBoxData]);
+	}, [String(searchBoxData)]);
 
 	if (isEditPage && (!searchBoxes.length || searchBoxesLoading)) {
 		return (
@@ -387,6 +393,7 @@ const SearchBoxForm = (props) => {
 			</div>
 		);
 	}
+
 	return (
 		<>
 			<div

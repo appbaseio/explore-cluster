@@ -24,6 +24,7 @@ function CodeEditorModal({
 			okText="Save"
 			width={width}
 			bodyStyle={{ paddingTop: '41px' }}
+			style={{ top: '2.5rem' }}
 		>
 			<FunctionEditor
 				openAsModal={false}

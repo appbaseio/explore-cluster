@@ -137,7 +137,7 @@ export default function DesignPanel() {
 							)}
 						/>
 						<FieldControl
-							name="enableIndexSuggestions"
+							name="enableEndpointSuggestions"
 							render={({ handler }) => (
 								<DesignGrid
 									label="Endpoint"

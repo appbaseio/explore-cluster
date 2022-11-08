@@ -60,7 +60,6 @@ function PreferenceForm() {
 								<Grid
 									label={
 										<p css={styles.labelContainer}>
-											<span className="required-marker">*</span>
 											<span>Min hits</span>
 											<Popover
 												content={content(Messages.minHits)}
@@ -101,7 +100,6 @@ function PreferenceForm() {
 								<Grid
 									label={
 										<p css={styles.labelContainer}>
-											<span className="required-marker">*</span>
 											<span>Size</span>
 										</p>
 									}
@@ -136,7 +134,6 @@ function PreferenceForm() {
 								<Grid
 									label={
 										<p css={styles.labelContainer}>
-											<span className="required-marker">*</span>
 											<span>Min chars</span>
 											<Popover
 												content={content(Messages.minChars)}
