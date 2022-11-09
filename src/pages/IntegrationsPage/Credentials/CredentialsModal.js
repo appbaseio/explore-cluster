@@ -62,7 +62,7 @@ const CredentialsModal = ({ value, onChange, permissions, fetchPermissions }) =>
 							value={`${permission.username}:${permission.password}`}
 							title={permission.description}
 						>
-							<div css={suggestionStyles}>
+							<div className={suggestionStyles}>
 								<div className="row-data">
 									<div
 										className="overflow"
@@ -77,7 +77,10 @@ const CredentialsModal = ({ value, onChange, permissions, fetchPermissions }) =>
 											{permission.description}
 										</Tooltip>
 									</div>
-									<Tag>{permission.ops[0]}</Tag>
+									<Tag>
+										{permission.ops[0]}{' '}
+										{permission.ops[1] ? `& ${permission.ops[1]}` : ''}
+									</Tag>
 								</div>
 								<div className="row-data">
 									<Button

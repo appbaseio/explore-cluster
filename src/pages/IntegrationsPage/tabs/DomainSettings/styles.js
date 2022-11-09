@@ -14,6 +14,20 @@ export const domainSettingsTabStyles = css`
 		width: 85%;
 	}
 
+	.deployment-status-container {
+		padding: 20px;
+		margin: 20px 0px;
+		border: 1px solid #ebedf0;
+		width: 70vw;
+		font-size: 20px;
+	}
+
+	.warning-icon {
+		color: orange;
+		margin: 0px 5px;
+		font-size: 30px;
+	}
+
 	.domain-row {
 		display: flex;
 		align-items: center;

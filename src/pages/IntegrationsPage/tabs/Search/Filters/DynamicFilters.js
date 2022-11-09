@@ -63,8 +63,4 @@ DynamicFilters.propTypes = {
 	getPreferencesPayload: func.isRequired,
 };
 
-DynamicFilters.propTypes = {
-	getPreferencesPayload: func.isRequired,
-};
-
 export default DynamicFilters;

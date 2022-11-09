@@ -1,20 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import PropTypes, { object } from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import get from 'lodash/get';
 import { Button, Tooltip, Icon, Modal, message } from 'antd';
+import { connect } from 'react-redux';
 import CommitModal from './CommitModal';
+// eslint-disable-next-line import/no-cycle
 import PastVersionsDrawer from './PastVersionsDrawer';
 import DeployLogsModal from './DeployLogsModal';
 import DeployModal from './DeployModal';
 import { deployStatusMapper, getTemplate } from '../../utils/index';
 import {
 	commitCode,
-	getAllVersions,
-	getByVersionId,
 	getDeploymentStatus,
 	deployUiBuilder,
+	transformPreferences,
 } from '../../utils/sandpack-generator';
+import UploadModal from './ProjectUpload/UploadModal';
+import ThemeSwitch from '../../../../components/ThemeSwitcher';
+import {
+	getSearchPreferencesN,
+	getSearchPreferenceVersionsN,
+	saveSearchPreferenceN,
+} from '../../../../batteries/modules/actions';
+import AppConstants from '../../../../batteries/modules/constants';
 
 export async function asyncCallWithTimeout(asyncPromise, timeLimit) {
 	let timeoutHandle;
@@ -48,13 +57,7 @@ export function transformContent(content) {
 const ModalHeader = ({
 	history,
 	match,
-	updateSandpackCode,
 	updatedCode,
-	setUpdatedCode,
-	currentVersion,
-	setCurrentVersion,
-	setInitialCode,
-	initialCode,
 	uiBuilderName,
 	handleSave,
 	collapsed,
@@ -63,17 +66,30 @@ const ModalHeader = ({
 	setModalType,
 	setOpenCommitModal,
 	preferences,
+	themeType,
+	setThemeType,
+	getSearchPreferenceVersions,
+	versionState,
+	updateVersionStateForPreference,
+	getSearchPreferences,
+	updateSearchPreferences,
 }) => {
 	const [visible, setVisible] = useState(false);
-	const [allVersions, setAllVersions] = useState([]);
 	const [errMsg, setErrMsg] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
 	const [deploymentStatus, setDeploymentStatus] = useState({});
+
 	const preferenceId = match.params.id;
+	const {
+		allVersions = [],
+		currentVersion = {},
+		initialCode = {},
+	} = versionState[preferenceId] ?? {};
 	let myInterval = null;
 
 	useEffect(() => {
-		fetchAllVersions();
+		getSearchPreferenceVersions(preferenceId);
+
 		fetchDeploymentStatus();
 	}, []);
 
@@ -92,8 +108,8 @@ const ModalHeader = ({
 	}, [modalType]);
 
 	useEffect(() => {
-		const themeType = get(preferences, 'themeSettings.type', '');
-		const templateObj = getTemplate(themeType);
+		const theme = get(preferences, 'themeSettings.type', '');
+		const templateObj = getTemplate(theme);
 		// eslint-disable-next-line
 		if (templateObj?.manifest_path && !updatedCode[`/${templateObj.manifest_path}`]) {
 			setErrMsg('Manifest is missing');
@@ -102,66 +118,82 @@ const ModalHeader = ({
 		}
 	}, [updatedCode]);
 
-	const fetchAllVersions = () => {
-		getAllVersions(preferenceId)
-			.then((res) => {
-				setAllVersions(res.versions);
-			})
-			.catch((err) => {
-				console.error(err);
-				// setErrMsg(err);
+	const handleCommitCode = (commitMessage, fileContent = {}) => {
+		let newObj = {};
+		const isUploadCommit = fileContent && Object.keys(fileContent).length;
+		if (isUploadCommit) {
+			newObj = { ...fileContent };
+		} else
+			Object.keys(updatedCode).forEach((path) => {
+				if (path[0] === '/') {
+					const newPath = path.slice(1);
+					newObj[newPath] = updatedCode[path];
+				} else {
+					newObj[path] = updatedCode[path];
+				}
 			});
-	};
-
-	const fetchByVersionId = (versionId) => {
-		getByVersionId(preferenceId, versionId)
-			.then((res) => {
-				setCurrentVersion({
-					version_id: res.version_id,
-					updated_at: res.updated_at || res.created_at,
-					commit: res?.metadata?.commit || '',
-				});
-				const newContent = transformContent(res.content);
-				updateSandpackCode(newContent);
-				setUpdatedCode(newContent);
-				setInitialCode(newContent);
-			})
-			.catch((err) => {
-				console.error(err);
-				// setErrMsg(err);
-			});
-	};
-
-	const handleCommitCode = (commitMessage) => {
-		const newObj = {};
-		Object.keys(updatedCode).forEach((path) => {
-			if (path[0] === '/') {
-				const newPath = path.slice(1);
-				newObj[newPath] = updatedCode[path];
-			} else {
-				newObj[path] = updatedCode[path];
-			}
-		});
 
 		const body = {
 			metadata: {
 				commit: commitMessage,
+				user: localStorage.getItem('username'),
 			},
 			content: newObj,
 		};
 
 		commitCode(preferenceId, body)
 			.then((res) => {
-				setCurrentVersion({
-					version_id: res.version_id,
-					updated_at: res.updated_at || res.created_at,
-					commit: commitMessage,
-				});
-				fetchAllVersions();
+				// fetch all the versions again
+				getSearchPreferenceVersions(preferenceId);
 				handleCancel();
 				setIsLoading(false);
-				setInitialCode(updatedCode);
+				let initialCodeNew;
+				let updatedCodeNew;
+				let sandpackCode;
+				if (isUploadCommit) {
+					const newContent = transformContent(newObj);
+					updatedCodeNew = newContent;
+					sandpackCode = newContent;
+					initialCodeNew = newContent;
+				} else initialCodeNew = updatedCode;
 
+				// update current Version in  redux store
+				updateVersionStateForPreference({
+					preferenceId,
+					patchPayload: JSON.parse(
+						JSON.stringify({
+							currentVersion: {
+								version_id: res.version_id,
+								updated_at: res.updated_at || res.created_at,
+								commit: commitMessage,
+							},
+							initialCode: initialCodeNew,
+							sandpackCode,
+							updatedCode: updatedCodeNew,
+						}),
+					),
+				});
+
+				// below code is responsible for syhncing the committed code with what appears in the main settings page
+				const newContent = transformContent(body.content);
+				const theme = get(preferences, 'themeSettings.type', '');
+				const templateObj = getTemplate(theme);
+
+				const newPreferences = JSON.parse(
+					newContent[`/${templateObj.preferences_path}`]
+						.replace('const appbasePrefs = ', '')
+						.replace('export default JSON.stringify(appbasePrefs);', '')
+						.replace(';', '')
+						.trim(),
+				);
+
+				updateSearchPreferences(
+					preferenceId,
+					transformPreferences(newPreferences, true),
+				).then(() => {
+					getSearchPreferenceVersions(preferenceId);
+					getSearchPreferences();
+				});
 				message.info('Code is committed successfully');
 			})
 			.catch((err) => {
@@ -214,6 +246,14 @@ const ModalHeader = ({
 		if (errMsg !== 'Manifest is missing') setErrMsg('');
 	};
 
+	const iconColor = () => {
+		if (localStorage.getItem('theme') === 'dark') {
+			return 'brightness(0) invert(1)';
+		}
+
+		return 'brightness(0%)';
+	};
+
 	return (
 		<>
 			<div className="header-container">
@@ -237,7 +277,7 @@ const ModalHeader = ({
 								src="/static/images/commit.png"
 								alt="commit-icon"
 								width={20}
-								style={{ margin: '0px 5px 0px 5px' }}
+								style={{ margin: '0px 5px 0px 5px', filter: iconColor() }}
 							/>
 							<Tooltip title={currentVersion.version_id}>
 								<p style={{ margin: 0 }} className="overflow  versionid-font">
@@ -267,9 +307,6 @@ const ModalHeader = ({
 							<Icon
 								style={{
 									cursor: currentVersion.version_id ? 'pointer' : 'not-allowed',
-									color: currentVersion.version_id
-										? 'rgba(0,0,0,0.65)'
-										: '#bbb7b7',
 								}}
 								type="clock-circle"
 								onClick={() => {
@@ -296,12 +333,23 @@ const ModalHeader = ({
 						{deployStatusMapper[deploymentStatus.status || deploymentStatus.state]}
 					</div>
 				) : null}
-				<div>
+				<div className="header-icons">
 					<Icon
-						styles={{ cursor: 'pointer' }}
+						style={{ cursor: 'pointer' }}
 						type={collapsed ? 'menu-unfold' : 'menu-fold'}
 						onClick={() => setIsCollapsed(!collapsed)}
 					/>
+					<UploadModal
+						errMsg={errMsg}
+						setErrMsg={setErrMsg}
+						setIsLoading={setIsLoading}
+						isLoading={isLoading}
+						open={modalType === 'upload'}
+						setModalType={setModalType}
+						handleCancel={handleCancel}
+						handleCommitCode={handleCommitCode}
+					/>
+					<ThemeSwitch themeType={themeType} setThemeType={setThemeType} />
 				</div>
 			</div>
 
@@ -316,13 +364,18 @@ const ModalHeader = ({
 				}}
 				handleCancel={handleCancel}
 				uiBuilderName={uiBuilderName}
+				updatedCode={updatedCode}
+				initialCode={initialCode}
 			/>
 			<PastVersionsDrawer
 				visible={visible}
 				setVisible={setVisible}
 				currentVersion={currentVersion}
 				allVersions={allVersions}
-				fetchByVersionId={fetchByVersionId}
+				preferenceId={preferenceId}
+				updatedCode={updatedCode}
+				initialCode={initialCode}
+				updateVersionStateForPreference={updateVersionStateForPreference}
 			/>
 			<DeployLogsModal
 				open={modalType === 'deploy-logs'}
@@ -344,6 +397,7 @@ const ModalHeader = ({
 				handleCancel={handleCancel}
 				allVersions={allVersions}
 				currentVersion={currentVersion}
+				deploymentStatus={deploymentStatus}
 			/>
 		</>
 	);
@@ -352,14 +406,8 @@ const ModalHeader = ({
 ModalHeader.propTypes = {
 	history: PropTypes.object.isRequired,
 	match: PropTypes.object.isRequired,
-	updateSandpackCode: PropTypes.func,
 	uiBuilderName: PropTypes.string,
 	updatedCode: PropTypes.object,
-	setUpdatedCode: PropTypes.func,
-	initialCode: PropTypes.object,
-	currentVersion: PropTypes.object,
-	setCurrentVersion: PropTypes.func,
-	setInitialCode: PropTypes.func,
 	handleSave: PropTypes.func,
 	setIsCollapsed: PropTypes.func,
 	collapsed: PropTypes.bool,
@@ -367,16 +415,17 @@ ModalHeader.propTypes = {
 	setModalType: PropTypes.func,
 	setOpenCommitModal: PropTypes.func,
 	preferences: PropTypes.object,
+	themeType: PropTypes.string,
+	setThemeType: PropTypes.func,
+	getSearchPreferenceVersions: PropTypes.func.isRequired,
+	versionState: object,
+	updateVersionStateForPreference: PropTypes.func.isRequired,
+	updateSearchPreferences: PropTypes.func.isRequired,
+	getSearchPreferences: PropTypes.func.isRequired,
 };
 
 ModalHeader.defaultProps = {
-	updateSandpackCode: () => {},
 	updatedCode: {},
-	initialCode: {},
-	currentVersion: {},
-	setCurrentVersion: () => {},
-	setInitialCode: () => {},
-	setUpdatedCode: () => {},
 	handleSave: () => {},
 	setIsCollapsed: () => {},
 	uiBuilderName: '',
@@ -385,6 +434,28 @@ ModalHeader.defaultProps = {
 	setModalType: () => {},
 	setOpenCommitModal: () => {},
 	preferences: {},
+	themeType: localStorage.getItem('theme') || 'light',
+	setThemeType: () => {},
+	versionState: {},
+};
+const mapStateToProps = (state) => {
+	return {
+		versionState: get(state, '$getSearchPreferencesVersionsN.results', {}),
+	};
 };
 
-export default withRouter(ModalHeader);
+const mapDispatchToProps = (dispatch) => ({
+	getSearchPreferences: () => dispatch(getSearchPreferencesN()),
+	getSearchPreferenceVersions: (preferenceId) =>
+		dispatch(getSearchPreferenceVersionsN(preferenceId)),
+	updateVersionStateForPreference: (payload) =>
+		dispatch({
+			type: AppConstants.APP.UI_BUILDERN.SEARCH_PREFERENCE_VERSIONS
+				.UPDATE_PREFERENCE_STATE_SUCCESS,
+			payload,
+		}),
+	updateSearchPreferences: (preferenceId, payload) =>
+		dispatch(saveSearchPreferenceN(preferenceId, payload)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(ModalHeader));

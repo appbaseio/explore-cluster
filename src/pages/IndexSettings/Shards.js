@@ -41,7 +41,7 @@ const Shards = ({
 				<a
 					target="_blank"
 					rel="noopener noreferrer"
-					href="https://docs.appbase.io/docs/search/relevancy/#index-settings"
+					href="https://docs.reactivesearch.io/docs/search/relevancy/#index-settings"
 				>
 					here
 				</a>

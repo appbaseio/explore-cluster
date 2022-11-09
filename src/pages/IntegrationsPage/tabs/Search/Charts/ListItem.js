@@ -1,23 +1,67 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import get from 'lodash/get';
+import { connect } from 'react-redux';
 import { List, Button, Switch, Icon } from 'antd';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
-import { array, bool, func, number, object } from 'prop-types';
+import { array, bool, func, number, object, string } from 'prop-types';
 import CustomizeChart from './CustomizeChart';
 import CustomizeFilter from '../Filters/CustomizeFilter';
+import { getApiGeneralization } from '../../../utils/be-apis';
+import apisMapper from '../../../utils/apisMapper';
+import { BACKENDS } from '../../../../../batteries/utils';
+import { transformGeneralMappingsToFusionArrayFormat } from '../../../utils/fusion-apis';
 
 const ListItem = ({
 	control,
 	getPreferencesPayload,
 	form,
-	traversedMappings,
 	index,
 	isFilter,
 	provided,
+	backend,
+	traversedMappings: mappings,
+	endpoints,
 }) => {
+	const [traversedMappings, setTraversedMappings] = useState([]);
+	const [isLoading, setIsLoading] = useState(true);
+
+	useEffect(() => {
+		fetchFields(get(control, 'value.customize.dataField'));
+	}, [get(control, 'value.customize.dataField'), mappings]);
+
+	const fetchFields = (query) => {
+		setIsLoading(true);
+		if (backend === BACKENDS.FUSION.name) {
+			const profile = form.get('profile') ? form.get('profile').value : 'appbase';
+			const indexSettings = form.get('indexSettings') ? form.get('indexSettings').value : {};
+			const secondaryProfile = get(indexSettings, 'fusionSettings.profile', '');
+			const schemaConfig = endpoints?.schema || apisMapper[backend].schema || {};
+			getApiGeneralization(schemaConfig, { index: secondaryProfile || profile, q: query })
+				.then((res) => res.json())
+				.then((res) => {
+					if (Array.isArray(res)) setTraversedMappings(res.map((i) => i.name) || []);
+					else {
+						const transformedResponse = transformGeneralMappingsToFusionArrayFormat(
+							res[secondaryProfile || profile],
+						);
+						setTraversedMappings(transformedResponse.map((i) => i.name) || []);
+					}
+					setIsLoading(false);
+				})
+				.catch((err) => {
+					console.error('Error to fetch search query profiles', err);
+					setIsLoading(false);
+				});
+		} else {
+			setTraversedMappings(mappings);
+			setIsLoading(false);
+		}
+	};
+
 	const pipeline = form.get('pipeline') ? form.get('pipeline')?.value : '';
 	const indexSettings = form.get('indexSettings') ? form.get('indexSettings').value : {};
 	const secondaryPipeline = get(indexSettings, 'index', '');
+
 	return (
 		<FieldGroup strict={false} control={control}>
 			{() => (
@@ -41,6 +85,9 @@ const ListItem = ({
 									buttonLabel="Customize"
 									getPreferencesPayload={getPreferencesPayload}
 									form={form}
+									onModalClose={() => {
+										fetchFields(get(control, 'value.customize.dataField'));
+									}}
 								/>
 							) : (
 								<CustomizeChart
@@ -49,6 +96,9 @@ const ListItem = ({
 									buttonLabel="Customize"
 									getPreferencesPayload={getPreferencesPayload}
 									form={form}
+									onModalClose={() => {
+										fetchFields(get(control, 'value.customize.dataField'));
+									}}
 								/>
 							)}
 						</>,
@@ -72,21 +122,22 @@ const ListItem = ({
 										}}
 									/>
 								</span>
-								{traversedMappings.length &&
-								!traversedMappings.includes(
-									get(control, 'value.customize.dataField'),
-								) ? (
-									// eslint-disable-next-line
-									<span
-										style={{ color: 'orange', marginRight: 10 }}
-										role="img"
-										aria-label="warning"
-									>
-										⚠️
-									</span>
-								) : (
-									''
-								)}
+								{isLoading ||
+									(traversedMappings &&
+									traversedMappings.length &&
+									traversedMappings.includes(
+										get(control, 'value.customize.dataField'),
+									) ? (
+										''
+									) : (
+										<span
+											style={{ color: 'orange', marginRight: 10 }}
+											role="img"
+											aria-label="warning"
+										>
+											⚠️
+										</span>
+									))}
 
 								{get(control, 'value.customize.title')}
 							</>
@@ -99,19 +150,28 @@ const ListItem = ({
 };
 
 ListItem.defaultProps = {
-	traversedMappings: [],
 	index: 0,
 	isFilter: false,
+	traversedMappings: [],
+	backend: BACKENDS.ELASTICSEARCH.name,
+	endpoints: {},
 };
 
 ListItem.propTypes = {
 	control: object.isRequired,
 	getPreferencesPayload: func.isRequired,
 	form: object.isRequired,
-	traversedMappings: array,
 	index: number,
 	isFilter: bool,
 	provided: object.isRequired,
+	backend: string,
+	traversedMappings: array,
+	endpoints: object,
 };
 
-export default ListItem;
+const mapStateToProps = (state) => ({
+	backend: get(state, '$getAppPlan.results.backend'),
+	endpoints: get(state, 'endpoints.data'),
+});
+
+export default connect(mapStateToProps, null)(ListItem);

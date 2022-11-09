@@ -115,7 +115,7 @@ const PipelineTemplateChooser = (props) => {
 		return null;
 	}
 	return (
-		<div css={pipelineTemplateCss}>
+		<div className={pipelineTemplateCss}>
 			<div className="title-wrapper">
 				<h2>
 					Pipeline Templates{' '}

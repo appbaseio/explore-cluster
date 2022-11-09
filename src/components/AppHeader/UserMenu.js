@@ -27,6 +27,9 @@ const handleLogout = () => {
 	sessionStorage.removeItem('allowedActions');
 	sessionStorage.removeItem('appName');
 	sessionStorage.removeItem('redirectUrl');
+	localStorage.removeItem('isAdmin');
+	localStorage.removeItem('allowedActions');
+	localStorage.removeItem('authToken');
 	localStorage.removeItem('isUsingOpenSearch');
 	window.location.href = '/';
 };

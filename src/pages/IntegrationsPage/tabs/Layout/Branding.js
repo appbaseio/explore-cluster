@@ -33,9 +33,11 @@ const Branding = ({ control }) => {
 			.use(ImageKitUppyPlugin, {
 				id: 'appbaseio',
 				publicKey: 'REDACTED_IMAGEKIT_PUBLIC_KEY=',
-				authenticationEndpoint: '/.netlify/functions/imagekit-upload/',
+				authenticationEndpoint: '/api/upload/',
 			})
-			.on('upload-success', onUploadSuccess());
+			.on('upload-success', onUploadSuccess())
+			.on('error', (e) => console.error('Imagekit Error', e))
+			.on('upload-error', (e) => console.error('Imagekit Upload Error', e));
 	}, []);
 
 	const onUploadSuccess = () => (file, response) => {
@@ -56,7 +58,7 @@ const Branding = ({ control }) => {
 									<IKContext
 										urlEndpoint="https://ik.imagekit.io/appbaseio/"
 										publicKey="REDACTED_IMAGEKIT_PUBLIC_KEY="
-										authenticationEndpoint="/.netlify/functions/imagekit-upload/"
+										authenticationEndpoint="/api/upload/"
 									>
 										<div
 											style={{

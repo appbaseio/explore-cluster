@@ -20,13 +20,9 @@ const Logo = ({ type, width }) => {
 				/>
 			);
 		case 'black':
-			return (
-				<img
-					src="/static/images/reactivesearch_black.svg"
-					width={width}
-					alt="reactivesearch.io"
-				/>
-			);
+			return <img src="/static/images/appbase_black.svg" width={width} alt="appbase.io" />;
+		case 'lucid_works':
+			return <img src="/static/images/lucid_works.png" width={width} alt="lucidworks logo" />;
 		default:
 			return (
 				<img

@@ -138,7 +138,7 @@ const bannerDetails = {
 	videoLink: 'https://youtu.be/2g9sZgLPNxk',
 	buttonText: 'Read Docs',
 	icon: 'info-circle',
-	href: 'https://docs.appbase.io/docs/search/rules/',
+	href: 'https://docs.reactivesearch.io/docs/search/rules/',
 };
 
 const toolTips = {
@@ -148,7 +148,7 @@ const toolTips = {
 			<a
 				target="_blank"
 				rel="noopener noreferrer"
-				href="https://docs.appbase.io/docs/search/rules/#promote-results"
+				href="https://docs.reactivesearch.io/docs/search/rules/#promote-results"
 			>
 				Learn more
 			</a>
@@ -160,7 +160,7 @@ const toolTips = {
 			<a
 				target="_blank"
 				rel="noopener noreferrer"
-				href="https://docs.appbase.io/docs/search/rules/#hide-results"
+				href="https://docs.reactivesearch.io/docs/search/rules/#hide-results"
 			>
 				Learn more
 			</a>
@@ -172,7 +172,7 @@ const toolTips = {
 			<a
 				target="_blank"
 				rel="noopener noreferrer"
-				href="https://docs.appbase.io/docs/search/rules/#replace-search-term"
+				href="https://docs.reactivesearch.io/docs/search/rules/#replace-search-term"
 			>
 				Learn more
 			</a>
@@ -184,7 +184,7 @@ const toolTips = {
 			<a
 				target="_blank"
 				rel="noopener noreferrer"
-				href="https://docs.appbase.io/docs/search/Rules/#custom-data"
+				href="https://docs.reactivesearch.io/docs/search/Rules/#custom-data"
 			>
 				Learn more
 			</a>
@@ -196,7 +196,7 @@ const toolTips = {
 			<a
 				target="_blank"
 				rel="noopener noreferrer"
-				href="https://docs.appbase.io/docs/search/rules/#remove-words"
+				href="https://docs.reactivesearch.io/docs/search/rules/#remove-words"
 			>
 				Learn more
 			</a>
@@ -208,7 +208,7 @@ const toolTips = {
 			<a
 				target="_blank"
 				rel="noopener noreferrer"
-				href="https://docs.appbase.io/docs/search/rules/#replace-words"
+				href="https://docs.reactivesearch.io/docs/search/rules/#replace-words"
 			>
 				Learn more
 			</a>
@@ -220,7 +220,7 @@ const toolTips = {
 			<a
 				target="_blank"
 				rel="noopener noreferrer"
-				href="https://docs.appbase.io/docs/search/rules/#add_filter"
+				href="https://docs.reactivesearch.io/docs/search/rules/#add_filter"
 			>
 				Learn more
 			</a>
@@ -240,7 +240,7 @@ const toolTips = {
 			<a
 				target="_blank"
 				rel="noopener noreferrer"
-				href="https://docs.appbase.io/docs/search/rules/#replace-search-query"
+				href="https://docs.reactivesearch.io/docs/search/rules/#replace-search-query"
 			>
 				Learn more
 			</a>
@@ -252,7 +252,7 @@ const toolTips = {
 			<a
 				target="_blank"
 				rel="noopener noreferrer"
-				href="https://docs.appbase.io/docs/search/rules/#search-settings"
+				href="https://docs.reactivesearch.io/docs/search/rules/#search-settings"
 			>
 				Learn more
 			</a>
@@ -264,7 +264,7 @@ const toolTips = {
 			<a
 				target="_blank"
 				rel="noopener noreferrer"
-				href="https://docs.appbase.io/docs/search/rules/#script-rule"
+				href="https://docs.reactivesearch.io/docs/search/rules/#script-rule"
 			>
 				Learn more
 			</a>

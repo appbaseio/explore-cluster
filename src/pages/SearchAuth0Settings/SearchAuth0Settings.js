@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import PropTypes from 'prop-types';
 import { css } from 'emotion';
-import { Affix, Button, notification, Tabs } from 'antd';
+import { Affix, Button, Icon, notification, Tabs } from 'antd';
 import { get, isEmpty } from 'lodash';
 import { connect } from 'react-redux';
 import { FormBuilder, FormControl, Validators } from 'react-reactive-form';
@@ -32,14 +32,16 @@ import {
 import Loader from '../../batteries/components/shared/Loader/Spinner';
 import VersionController from '../../batteries/components/shared/VersionController';
 import UserManagement from './components/UserManagement';
+import { getURL } from '../../constants/config';
 
 const { TabPane } = Tabs;
 
 const bannerDetails = {
-	title: 'UI Builder: Auth Settings',
-	description: 'Configure authentication settings and login providers for UI Builder',
+	title: 'UI Builder: End-user Authentication',
+	description:
+		'Configure end-user authentication and login flow for UI Builder deployed search UIs',
 	buttonText: 'Read Docs',
-	href: 'http://docs.appbase.io/docs/reactivesearch/ui-builder/search/',
+	href: 'http://docs.reactivesearch.io/docs/reactivesearch/ui-builder/search/',
 };
 
 const container = css`
@@ -70,9 +72,13 @@ const CONNECTIONS_CONSTANTS = {
 	SAML: 'samlp',
 };
 const TABS_KEYS = {
-	APPLICATION: 'application-settings',
+	APPLICATION: 'login-flow-settings',
 	PROVIDERS: 'providers',
 	USER_MANAGEMENT: 'user-management',
+};
+
+const getClusterId = (url = '') => {
+	return url.match(/(?<=https:\/\/)(.*)(?=-arc)/s)?.[0];
 };
 
 const SearchAuth0Settings = (props) => {
@@ -98,15 +104,18 @@ const SearchAuth0Settings = (props) => {
 	const samlConfigInitialValue = useRef('');
 	const applicationFormInitialData = useRef('');
 	const providersFormInitialData = useRef('');
-
 	const auth0Form = useRef(
 		FormBuilder.group({
 			applicationForm: FormBuilder.group({
-				name: ['', Validators.required],
+				name: [`application_name_${getURL()}`, Validators.required],
 				logo_uri: '',
 				callbacks: [
-					'',
-					[(control) => commaSeparatedStringsValidator(control, validUrlPattern)],
+					// eslint-disable-next-line no-template-curly-in-string
+					`https://${getClusterId(getURL()) ?? '*'}-*.vercel.app`,
+					[
+						Validators.required,
+						(control) => commaSeparatedStringsValidator(control, validUrlPattern),
+					],
 				],
 				allowed_origins: [
 					'',
@@ -539,8 +548,10 @@ const SearchAuth0Settings = (props) => {
 		const {
 			controls: { applicationForm, providersForm },
 		} = auth0Form.current;
-
-		if (applicationForm.invalid || providersForm.invalid) {
+		if (
+			applicationForm.invalid ||
+			(providersForm.invalid && !providersForm.controls.samlpConfigForm.invalid)
+		) {
 			return;
 		}
 
@@ -550,23 +561,31 @@ const SearchAuth0Settings = (props) => {
 
 		const { value: applicationFormValue } = applicationForm;
 		const payload = {
-			name: applicationFormValue.name,
+			name: `application_name_${getURL()}`,
+			// applicationFormValue.name,
 			logo_uri: applicationFormValue.logo_uri,
 			callbacks: applicationFormValue.callbacks
 				? applicationFormValue.callbacks.split(',')
 				: [],
-			allowed_origins: applicationFormValue.allowed_origins
-				? applicationFormValue.allowed_origins.split(',')
+			allowed_origins: applicationFormValue.callbacks
+				? applicationFormValue.callbacks.split(',')
 				: [],
-			web_origins: applicationFormValue.web_origins
-				? applicationFormValue.web_origins.split(',')
+			web_origins: applicationFormValue.callbacks
+				? applicationFormValue.callbacks.split(',')
 				: [],
-			allowed_logout_urls: applicationFormValue.allowed_logout_urls
-				? applicationFormValue.allowed_logout_urls.split(',')
+			allowed_logout_urls: applicationFormValue.callbacks
+				? applicationFormValue.callbacks.split(',')
 				: [],
 		};
 		if (!clientId) {
-			createAuth0Client(payload)
+			createAuth0Client({
+				...payload,
+				token_endpoint_auth_method: 'none',
+				jwt_configuration: {
+					alg: 'RS256',
+					lifetime_in_seconds: 36000,
+				},
+			})
 				.then((res) => {
 					if (res.payload) {
 						notification.success({
@@ -587,6 +606,7 @@ const SearchAuth0Settings = (props) => {
 				});
 		} else {
 			handleClientConnectionsUpdate(clientId);
+
 			if (
 				!applicationForm.pristine &&
 				applicationFormInitialData.current !== JSON.stringify(applicationFormValue)
@@ -597,6 +617,7 @@ const SearchAuth0Settings = (props) => {
 							notification.success({
 								message: 'Auth settings updated!',
 							});
+							applicationForm.markAsPristine();
 						} else if (res.error) {
 							notification.error({
 								message: <p>Something went wrong!</p>,
@@ -617,7 +638,8 @@ const SearchAuth0Settings = (props) => {
 						disable_signup: disableSignup,
 					},
 				};
-
+				if (auth0Form.current.controls.providersForm.get('auth0_enable_signup').pristine)
+					return;
 				updateConnectionSettings(
 					clientConnections?.[CONNECTIONS_CONSTANTS.AUTH0].id,
 					auth0ConnectionUpdatePayload,
@@ -666,13 +688,38 @@ const SearchAuth0Settings = (props) => {
 					<VersionController version="8.4.0">
 						<FormContext.Provider value={auth0Form.current}>
 							<Tabs activeKey={activeTab} onChange={handleTabsChange}>
-								<TabPane tab="Application Settings" key={TABS_KEYS.APPLICATION}>
+								<TabPane
+									tab={
+										<>
+											<Icon type="setting" />
+											Login Flow Settings
+										</>
+									}
+									key={TABS_KEYS.APPLICATION}
+								>
 									<ApplicationSettings />
 								</TabPane>
-								<TabPane tab="Providers" key={TABS_KEYS.PROVIDERS}>
+								<TabPane
+									tab={
+										<>
+											<Icon type="unlock" />
+											Providers
+										</>
+									}
+									key={TABS_KEYS.PROVIDERS}
+								>
 									<Providers />
 								</TabPane>
-								<TabPane tab="User Management" key={TABS_KEYS.USER_MANAGEMENT}>
+								<TabPane
+									disabled={!clientId}
+									tab={
+										<>
+											<Icon type="usergroup-delete" />
+											User Management
+										</>
+									}
+									key={TABS_KEYS.USER_MANAGEMENT}
+								>
 									<UserManagement />
 								</TabPane>
 							</Tabs>
@@ -736,7 +783,9 @@ const mapStateToProps = (state) => {
 		isLoading:
 			get(state, '$getAuth0Preferences.isFetching') ||
 			get(state, '$getAuth0Client.isFetching'),
-		clientId: get(state, '$getAuth0Preferences.results')?.['_client_id'],
+		clientId:
+			get(state, '$getAuth0Preferences.results')?.['_client_id'] ??
+			get(state, '$getAuth0Preferences.results')?.['client_id'],
 		samlConnectionId: get(state, '$getAuth0Preferences.results')?.['_saml_conn_id'],
 		clientData: get(state, '$getAuth0Client.results'),
 		isClientSaving:

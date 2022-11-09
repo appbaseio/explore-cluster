@@ -17,6 +17,7 @@ export const relevancyTitles = {
 	exportSettings: 'Export Settings',
 	generalSettings: 'General Settings',
 	resultSettings: 'Result Settings',
+	fusionSettings: 'Fusion Settings',
 	authenticationSettings: 'End-user Authentication',
 	chartSettings: 'Chart Settings',
 };
@@ -256,7 +257,7 @@ const settingsMap = {
 					It is equivalent to the DISTINCT clause in SQL. It internally uses the collapse
 					feature of Elasticsearch. You can read more about it over{' '}
 					<a
-						href="https://docs.appbase.io/docs/search/reactivesearch-api/reference/#distinctfield"
+						href="https://docs.reactivesearch.io/docs/search/reactivesearch-api/reference/#distinctfield"
 						target="_blank"
 						rel="noopener noreferrer"
 					>
@@ -362,6 +363,10 @@ const settingsMap = {
 		title: 'Custom CSS',
 		description: 'Apply custom CSS classes',
 	},
+	showSearchAs: {
+		title: 'CSS position of search bar: Sticky or Relative',
+		description: '',
+	},
 	autosuggest: {
 		title: 'Search / Show Autosuggestions',
 		description: '',
@@ -404,6 +409,22 @@ const settingsMap = {
 	},
 	pipeline: {
 		title: 'Pipeline',
+		description: '',
+	},
+	app: {
+		title: 'Fusion App',
+		description: '',
+	},
+	profile: {
+		title: 'Main Query Profile',
+		description: '',
+	},
+	searchProfile: {
+		title: 'Search Query Profile',
+		description: '',
+	},
+	sponsoredProfile: {
+		title: 'Sponsored Query Profile',
 		description: '',
 	},
 	description: {
@@ -458,8 +479,16 @@ const settingsMap = {
 		title: 'Price Unit',
 		description: '',
 	},
+	handleViewer: {
+		title: 'Redirect URL Viewer',
+		description: 'Show Redirection URL as: Link or Button',
+	},
 	image: {
 		title: 'Image',
+		description: '',
+	},
+	userDefinedFields: {
+		title: 'Meta Data',
 		description: '',
 	},
 	handle: {
@@ -599,6 +628,18 @@ const settingsMap = {
 	pagePipeline: {
 		title: 'Page Pipeline',
 		description: 'Pipeline for page route',
+	},
+	url: {
+		title: 'URL',
+		description: 'URL where the data cluster is hosted',
+	},
+	method: {
+		title: 'Method',
+		description: 'set method of the API request',
+	},
+	headers: {
+		title: 'Headers',
+		description: 'set custom headers to be sent with each server request as key/value pairs',
 	},
 };
 

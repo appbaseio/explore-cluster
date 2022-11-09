@@ -17,6 +17,7 @@ import {
 import files from '../../../../../../templates/files';
 import { footerStyles } from '../styles';
 import PreviewModal from '../../../PreviewModal';
+import { BACKENDS } from '../../../../../batteries/utils';
 
 const Footer = ({
 	form,
@@ -31,12 +32,14 @@ const Footer = ({
 	pipeline,
 	getPreferences,
 	clientId,
+	backend,
 }) => {
 	const [isLoading, setIsLoading] = useState(false);
+	const isFusion = backend === BACKENDS.FUSION.name;
 
 	const getDefaultPreferences = (preferences) => {
 		let fileName = '';
-		const newPrefs = { ...JSON.parse(JSON.stringify(preferences)) };
+		const newPrefs = JSON.parse(JSON.stringify({ ...preferences }));
 		const themeType = get(preferences, 'themeSettings.type', '');
 		const template = getTemplate(themeType);
 		if (Object.keys(template).length) {
@@ -66,6 +69,15 @@ const Footer = ({
 						if (component !== 'result' && component !== 'search') {
 							newObj[component] = newComponentSettings[component];
 							newObj[component].enabled = false;
+						} else if (component === 'result') {
+							newObj[component] = {
+								...newPrefs.pageSettings.pages[page].componentSettings.result,
+								...newComponentSettings[component],
+								fields: {
+									...newPrefs.pageSettings.pages[page].componentSettings.result
+										.fields,
+								},
+							};
 						}
 					});
 					newPrefs.pageSettings.pages[page] = {
@@ -81,18 +93,77 @@ const Footer = ({
 		if (defaultPrefs.authenticationSettings) {
 			newPrefs.authenticationSettings = defaultPrefs.authenticationSettings;
 		}
+		newPrefs.name = `Search ${newPrefs.pipeline || ''} + ${template.label || ''}`;
 
 		return newPrefs;
 	};
 
-	const setSecondaryPipeline = (prefs) => {
+	const setInitialHighlightConfig = (componentSettings) => {
+		const newComponentSettings = { ...componentSettings };
+		const resultFields = get(componentSettings, 'result.fields', {});
+		const { title, description } = resultFields;
+		newComponentSettings.result.fields = {
+			...newComponentSettings.result.fields,
+			title: `${title.split('~')[0]}~true`,
+			description: `${description.split('~')[0]}~true`,
+		};
+		newComponentSettings.result.resultHighlight = true;
+		newComponentSettings.search.fields = {
+			...newComponentSettings.search.fields,
+			title: `${title.split('~')[0]}~true`,
+			description: `${description.split('~')[0]}~true`,
+		};
+
+		return newComponentSettings;
+	};
+
+	const setSecondaryData = (prefs) => {
 		const preferences = { ...prefs };
-		const { pipeline: mainPipeline, pageSettings } = preferences;
+		const { pipeline: mainPipeline, fusionSettings, pageSettings } = preferences;
+		let endpointObj = {};
+		const exportSettings = get(preferences, 'exportSettings', {});
+
+		if (isFusion) {
+			endpointObj = {
+				url: `/_fusion/_reactivesearch`,
+				method: 'POST',
+				headers: `{"Authorization":"Basic ${btoa(exportSettings.credentials || '')}"}`,
+			};
+			preferences.fusionSettings.searchProfile = get(fusionSettings, 'profile', '');
+		} else {
+			endpointObj = {
+				url: `/${mainPipeline}/_reactivesearch`,
+				method: 'POST',
+				headers: `{"Authorization":"Basic ${btoa(exportSettings.credentials || '')}"}`,
+			};
+		}
+		preferences.globalSettings.endpoint = endpointObj;
+
 		if (pageSettings && pageSettings.pages) {
 			Object.keys(pageSettings.pages).forEach((page) => {
-				pageSettings.pages[page].indexSettings.index = mainPipeline;
+				if (isFusion) {
+					pageSettings.pages[page].indexSettings = {
+						fusionSettings: {
+							app: get(fusionSettings, 'app', ''),
+							profile: get(fusionSettings, 'profile', ''),
+							searchProfile: get(fusionSettings, 'profile', ''),
+							meta: { sponsoredProfile: '' },
+						},
+						index: '_fusion',
+						endpoint: endpointObj,
+					};
+				} else {
+					pageSettings.pages[page].indexSettings = {
+						index: mainPipeline,
+						endpoint: endpointObj,
+					};
+				}
+				pageSettings.pages[page].componentSettings = {
+					...setInitialHighlightConfig(pageSettings.pages[page].componentSettings),
+				};
 			});
 		}
+
 		return preferences;
 	};
 
@@ -119,8 +190,10 @@ const Footer = ({
 			},
 		});
 		const newPreferences = transformResultsDefaultFields(newPrefs);
-		const prefenecesWithDefaultFacets = getDefaultPreferences(newPreferences);
-		const prefenecesWithSecondaryPipeline = setSecondaryPipeline(prefenecesWithDefaultFacets);
+		const prefenecesWithDefaultFacets = getDefaultPreferences(
+			JSON.parse(JSON.stringify({ ...newPreferences })),
+		);
+		const prefenecesWithSecondaryPipeline = setSecondaryData(prefenecesWithDefaultFacets);
 		const response = await generateInlineSandboxURL(prefenecesWithSecondaryPipeline);
 		const newObj = {};
 		Object.keys(response).forEach((path) => {
@@ -141,6 +214,7 @@ const Footer = ({
 		if (prefenecesWithSecondaryPipeline.authenticationSettings && clientId) {
 			prefenecesWithSecondaryPipeline.authenticationSettings.clientId = clientId;
 		}
+
 		commitCode(preferenceId, body)
 			.then(() => {
 				updateSearchPreferences(prefenecesWithSecondaryPipeline).then((action) => {
@@ -160,7 +234,7 @@ const Footer = ({
 
 	return (
 		<Affix offsetBottom={0}>
-			<div css={footerStyles}>
+			<div className={footerStyles}>
 				<div className="footer-container">
 					<div>
 						{activeKey !== '1' ? (
@@ -216,6 +290,7 @@ Footer.defaultProps = {
 	preferenceId: '',
 	pipeline: '',
 	clientId: '',
+	backend: BACKENDS.ELASTICSEARCH.name,
 };
 
 Footer.propTypes = {
@@ -231,10 +306,14 @@ Footer.propTypes = {
 	pipeline: string,
 	getPreferences: func.isRequired,
 	clientId: string,
+	backend: string,
 };
+
 const mapStateToProps = (state) => ({
 	clientId: get(state, '$getAuth0Preferences.results')?.['_client_id'],
+	backend: get(state, '$getAppPlan.results.backend'),
 });
+
 const mapDispatchToProps = (dispatch, props) => ({
 	getSearchPreferences: () => dispatch(getSearchPreferencesN()),
 	updateSearchPreferences: (payload) =>

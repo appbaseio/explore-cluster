@@ -4,6 +4,7 @@ export const APP_ROUTES = {
 	'App Overview': {
 		icon: 'home',
 		link: '',
+		action: ALLOWED_ACTIONS.OVERVIEW,
 	},
 	Develop: {
 		icon: 'dashboard',
@@ -103,7 +104,7 @@ export const APP_ROUTES = {
 				label: 'Searchbox',
 				link: '/cluster/searchboxes',
 			},
-			{ label: 'Auth Settings', link: '/cluster/search-auth-settings' },
+			{ label: 'End-user Authentication', link: '/cluster/search-auth-settings' },
 		],
 		tag: 'Beta',
 	},
@@ -143,6 +144,7 @@ export const CLUSTER_ROUTES = {
 	'Cluster Overview': {
 		icon: 'cluster',
 		link: '/',
+		action: ALLOWED_ACTIONS.OVERVIEW,
 	},
 	Develop: {
 		icon: 'dashboard',
@@ -252,7 +254,7 @@ export const CLUSTER_ROUTES = {
 				label: 'Searchbox',
 				link: '/cluster/searchboxes',
 			},
-			{ label: 'Auth Settings', link: '/cluster/search-auth-settings' },
+			{ label: 'End-user Authentication', link: '/cluster/search-auth-settings' },
 		],
 		tag: 'Beta',
 	},

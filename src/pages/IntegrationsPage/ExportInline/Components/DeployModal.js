@@ -16,7 +16,9 @@ const DeployModal = ({
 	uiBuilderName,
 	allVersions,
 	currentVersion,
+	deploymentStatus,
 }) => {
+	const [initialDeploy, setIsInitialDeploy] = useState(false);
 	const defaultObj = {
 		projectSettings: {
 			buildCommand: 'yarn build',
@@ -26,7 +28,7 @@ const DeployModal = ({
 			framework: null,
 			// build_dir: 'build',
 		},
-		target: 'staging',
+		target: initialDeploy ? 'production' : 'staging',
 		env: {
 			REACT_APP_AUTH0_APPLICATION_CLIENT_ID:
 				process.env.REACT_APP_AUTH0_APPLICATION_CLIENT_ID,
@@ -43,6 +45,10 @@ const DeployModal = ({
 			version_id: currentVersion.version_id,
 		});
 	}, [currentVersion]);
+
+	useEffect(() => {
+		setIsInitialDeploy(isInitialDeploy());
+	}, [deploymentStatus]);
 
 	const handleInputChange = (key, val) => {
 		if (errMsg && errMsg !== 'Manifest is missing') setErrMsg('');
@@ -92,6 +98,18 @@ const DeployModal = ({
 		} else setErrMsg('Site Name / domain is invalid');
 	};
 
+	const isInitialDeploy = () => {
+		if (
+			!deploymentStatus ||
+			(!deploymentStatus.state && !deploymentStatus.status) ||
+			(deploymentStatus.status && deploymentStatus.status === 'Not deployed') ||
+			(deploymentStatus.state && deploymentStatus.state === 'Not deployed')
+		)
+			return true;
+
+		return false;
+	};
+
 	return (
 		<Modal
 			title={<div style={{ fontWeight: 'bold' }}>Deploy {uiBuilderName}</div>}
@@ -120,16 +138,22 @@ const DeployModal = ({
 			width={600}
 		>
 			<div css={commitModalStyles}>
-				<div className="label-container">Environment *</div>
-				<Select
-					style={{ width: '100%' }}
-					defaultValue="staging"
-					value={deployObj.target}
-					onSelect={(val) => handleInputChange('target', val)}
-				>
-					<Select.Option value="staging">staging</Select.Option>
-					<Select.Option value="production">production</Select.Option>
-				</Select>
+				{initialDeploy ? (
+					<></>
+				) : (
+					<>
+						<div className="label-container">Environment *</div>
+						<Select
+							style={{ width: '100%' }}
+							defaultValue="staging"
+							value={deployObj.target}
+							onSelect={(val) => handleInputChange('target', val)}
+						>
+							<Select.Option value="staging">staging</Select.Option>
+							<Select.Option value="production">production</Select.Option>
+						</Select>
+					</>
+				)}
 
 				<div className="label-container">Version to deploy</div>
 				<Select
@@ -203,6 +227,7 @@ DeployModal.propTypes = {
 	allVersions: PropTypes.array,
 	isLoading: PropTypes.bool,
 	currentVersion: PropTypes.object,
+	deploymentStatus: PropTypes.object,
 };
 
 DeployModal.defaultProps = {
@@ -213,6 +238,7 @@ DeployModal.defaultProps = {
 	allVersions: [],
 	isLoading: false,
 	currentVersion: {},
+	deploymentStatus: {},
 };
 
 export default withRouter(DeployModal);

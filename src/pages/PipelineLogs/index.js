@@ -41,7 +41,7 @@ const bannerDetails = {
 	description: 'Pipeline logs to glean insights.',
 	buttonText: 'Read Docs',
 	icon: 'info-circle',
-	href: 'https://docs.appbase.io/docs/search/pipelines/',
+	href: 'https://docs.reactivesearch.io/docs/search/pipelines/',
 };
 
 const PipelineLogsWrapper = ({ appVersion, tier, featurePipelines, pipelineId, history }) => {

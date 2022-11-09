@@ -11,7 +11,7 @@ const bannerMessage = {
 	buttonText: 'Read Docs',
 	videoLink: 'https://youtu.be/ejk2wybEwoc',
 	description: 'View mappings, edit use-case and data types, add or delete fields',
-	href: 'https://docs.appbase.io/docs/search/relevancy/#schema',
+	href: 'https://docs.reactivesearch.io/docs/search/relevancy/#schema',
 };
 
 const MappingsPage = () => {

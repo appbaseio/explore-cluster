@@ -9,6 +9,7 @@ import Logo from '../../components/Logo';
 import Flex from '../../batteries/components/shared/Flex';
 import { card } from '../LoginPage/styles';
 import { checkbox } from './styles';
+import { isFusion } from '../../batteries/utils';
 
 class InstallPage extends React.Component {
 	state = {
@@ -45,7 +46,11 @@ class InstallPage extends React.Component {
 			<LoginContainer>
 				<React.Fragment>
 					<Flex flexDirection="column" alignItems="center" justifyContent="center">
-						<Logo width={250} />
+						{isFusion() ? (
+							<Logo type="lucid_works" width={250} />
+						) : (
+							<Logo width={250} />
+						)}
 						<Card className={card} bordered={false}>
 							<h2>Install a new reactivesearch.io instance</h2>
 

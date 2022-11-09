@@ -3,5 +3,5 @@ export const pipelinesInsightsBannerDetails = {
 	description: `Track insights for ReactiveSearch pipelines.`,
 	buttonText: 'Read Docs',
 	icon: 'info-circle',
-	href: 'https://docs.appbase.io/docs/pipelines/concepts/',
+	href: 'https://docs.reactivesearch.io/docs/pipelines/concepts/',
 };

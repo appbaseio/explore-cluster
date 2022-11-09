@@ -11,6 +11,7 @@ import ErrorPage from '../../pages/ErrorPage';
 import ClusterAnalyticsRoutes from './ClusterAnalyticsRoutes';
 import UnauthorizedPage from '../../pages/UnauthorizedPage';
 import { getAuthorizedRoutes } from '../../utils';
+import { BACKENDS } from '../../batteries/utils';
 
 const ProfilePage = Loadable({
 	loader: () => import(/* webpackChunkName: "ProfilePage" */ '../../pages/ProfilePage'),
@@ -217,7 +218,7 @@ class ClusterRouteContainer extends React.Component {
 	}
 
 	render() {
-		const { allowedRoutes } = this.props;
+		const { allowedRoutes, backend } = this.props;
 
 		return (
 			<ErrorPage {...this.props}>
@@ -625,7 +626,9 @@ class ClusterRouteContainer extends React.Component {
 						path="/cluster/role-based-access"
 						component={(props) => (
 							<>
-								{get(allowedRoutes, '/cluster/role-based-access') ? (
+								{get(allowedRoutes, '/cluster/role-based-access') &&
+								(backend === BACKENDS.ELASTICSEARCH.name ||
+									backend === BACKENDS.OPENSEARCH.name) ? (
 									<AppPageContainer {...props} component={RoleBaseAccess} />
 								) : (
 									<UnauthorizedPage />
@@ -638,7 +641,9 @@ class ClusterRouteContainer extends React.Component {
 						path="/cluster/sync-preferences"
 						component={(props) => (
 							<>
-								{get(allowedRoutes, '/cluster/sync-preferences') ? (
+								{get(allowedRoutes, '/cluster/sync-preferences') &&
+								(backend === BACKENDS.ELASTICSEARCH.name ||
+									backend === BACKENDS.OPENSEARCH.name) ? (
 									<AppPageContainer {...props} component={SyncPreferences} />
 								) : (
 									<UnauthorizedPage />
@@ -679,16 +684,22 @@ class ClusterRouteContainer extends React.Component {
 	}
 }
 
+ClusterRouteContainer.defaultProps = {
+	backend: BACKENDS.ELASTICSEARCH.name,
+};
+
 ClusterRouteContainer.propTypes = {
 	history: PropTypes.object.isRequired,
 	match: PropTypes.object.isRequired,
 	location: PropTypes.object.isRequired,
 	allowedRoutes: PropTypes.object.isRequired,
+	backend: PropTypes.string,
 };
 
 const mapStateToProps = (state) => {
 	return {
 		allowedRoutes: getAuthorizedRoutes(get(state, 'clusterRoutes')),
+		backend: get(state, '$getAppPlan.results.backend'),
 	};
 };
 

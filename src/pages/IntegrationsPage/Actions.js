@@ -64,7 +64,6 @@ class Actions extends React.Component {
 			})
 			.catch((err) => {
 				console.error(err);
-				// setErrMsg(err);
 			});
 	};
 
@@ -109,7 +108,7 @@ class Actions extends React.Component {
 							okText="Confirm"
 							cancelText="Cancel"
 						>
-							<Icon type="delete" className="show-on-hover" />
+							<Icon type="delete" className="" />
 						</Popconfirm>
 					</Tooltip>
 				</Flex>

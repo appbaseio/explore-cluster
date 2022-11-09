@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { css } from 'emotion';
-import { Icon, Modal, Input, Radio, Tooltip, Button, Select, Switch } from 'antd';
+import { Icon, Modal, Input, Radio, Tooltip, Button, Select, Switch, Collapse } from 'antd';
 import {
 	FieldArray,
 	FormBuilder,
@@ -28,7 +28,7 @@ import {
 	getTraversedMappingsByAppName,
 	getAppPermissionsByName,
 } from '../../batteries/modules/selectors';
-import { CLUSTER_PLANS } from '../../batteries/utils';
+import { BACKENDS, CLUSTER_PLANS } from '../../batteries/utils';
 import {
 	Types,
 	getDefaultAclOptionsByVersion,
@@ -151,8 +151,14 @@ class CreateCredentials extends React.Component {
 	}
 
 	componentDidMount() {
-		const { disabled, initialValues, isUserManagement, appbaseCredentials, appbaseVersion } =
-			this.props;
+		const {
+			disabled,
+			initialValues,
+			isUserManagement,
+			appbaseCredentials,
+			appbaseVersion,
+			backend,
+		} = this.props;
 		if (appbaseCredentials) {
 			this.getMappings();
 		}
@@ -175,7 +181,7 @@ class CreateCredentials extends React.Component {
 					if (value) {
 						if (allowedActionsHandler) {
 							allowedActionsHandler.setValue(
-								Object.values(getAllowedActionsByVersion(appbaseVersion)),
+								Object.values(getAllowedActionsByVersion(appbaseVersion, backend)),
 							);
 							allowedActionsHandler.disable();
 						}
@@ -330,8 +336,8 @@ class CreateCredentials extends React.Component {
 	};
 
 	getMappings() {
-		const { appName, fetchMappings, appbaseCredentials } = this.props;
-		if (appbaseCredentials) {
+		const { appName, fetchMappings, appbaseCredentials, backend } = this.props;
+		if (appbaseCredentials && backend !== BACKENDS.FUSION.name) {
 			// Fetch Mappings if permissions are present
 			fetchMappings(appName, appbaseCredentials);
 		}
@@ -383,12 +389,14 @@ class CreateCredentials extends React.Component {
 			mappings: rawMappings,
 			appbaseVersion,
 			readOnly,
+			backend,
 		} = this.props;
 		const mappings = Array.isArray(rawMappings) ? rawMappings : [];
 		const { filteredMappings } = this.state;
 		const Messages = getMessages(isUserManagement);
 		const isClusterPlan = Object.values(CLUSTER_PLANS).includes(arcPlan);
-		const allowedActions = getAllowedActionsByVersion(appbaseVersion);
+		const allowedActions = getAllowedActionsByVersion(appbaseVersion, backend);
+
 		// don't show downtime alerts in case of hosted / self hosted arc
 		const actionOptions = isClusterPlan
 			? Object.values(allowedActions).map((i) => ({
@@ -408,7 +416,7 @@ class CreateCredentials extends React.Component {
 							width: '600px',
 						}}
 						title={this.getText}
-						css={modal}
+						className={modal}
 						footer={
 							!disabled
 								? [
@@ -441,7 +449,7 @@ class CreateCredentials extends React.Component {
 						) : (
 							<React.Fragment>
 								<fieldset disabled={readOnly}>
-									<div css="position: relative">
+									<div style={{ position: 'relative' }}>
 										{isUserManagement && (
 											<React.Fragment>
 												<FieldControl
@@ -561,7 +569,7 @@ class CreateCredentials extends React.Component {
 														component={
 															<Radio.Group
 																{...handler()}
-																css="label { font-weight: 100 }"
+																className="label { font-weight: 100 }"
 															>
 																{Object.keys(Types).map((type) => (
 																	<Radio
@@ -578,10 +586,13 @@ class CreateCredentials extends React.Component {
 											/>
 										)}
 										{!isPaidUser && (
-											<div css={styles.overlay}>
-												<div css={styles.upgradePlan}>
+											<div className={styles.overlay}>
+												<div className={styles.upgradePlan}>
 													<div style={{ marginBottom: 20 }}>
-														<Icon type="lock" css="font-size: 40px" />
+														<Icon
+															type="lock"
+															style={{ fontSize: 40 }}
+														/>
 													</div>
 													Upgrade to a paid plan to add advanced security
 													permissions.
@@ -593,7 +604,6 @@ class CreateCredentials extends React.Component {
 													</Tooltip>
 													<Button
 														type="primary"
-														css="margin-top: 10px"
 														href="billing"
 														target="_blank"
 														style={{
@@ -624,513 +634,701 @@ class CreateCredentials extends React.Component {
 												)}
 											/>
 										)}
-										{(!isUserManagement || this.allowStoredQuery) && (
-											<>
-												{!isUserManagement && (
-													<Grid
-														label="Security"
-														toolTipMessage={Messages.security}
-													/>
-												)}
-												{!isUserManagement && (
-													<FieldControl
-														name="referers"
-														render={(control) => (
-															<WhiteList
-																toolTipMessage={Messages.referers}
-																control={control}
-																type="dropdown"
-																defaultSuggestionValue="https://example.com/"
-																label="HTTP Referers"
-																defaultValue="*"
-																handleWarningMessage={(
-																	defaultValue,
-																) =>
-																	`Warning! You don't have the Allow All Referers (${defaultValue}) set.`
-																}
-																inputProps={{
-																	placeholder:
-																		'Add a HTTP Referer',
-																}}
-																labelClassName={
-																	isUserManagement
-																		? ''
-																		: styles.subHeader
-																}
-															/>
-														)}
-													/>
-												)}
-												<FieldControl
-													name="sources"
-													render={(control) => (
-														<WhiteList
-															control={control}
-															toolTipMessage={Messages.sources}
-															label="IP Sources"
-															handleWarningMessage={(defaultValue) =>
-																`Warning! You don't have the Allow All IP sources (${defaultValue}) set.`
-															}
-															defaultValue="0.0.0.0/0"
-															inputProps={{
-																placeholder:
-																	'Add an IP Source in CIDR format',
-															}}
-															labelClassName={
-																isUserManagement
-																	? ''
-																	: styles.subHeader
-															}
-														/>
-													)}
+										<Collapse
+											bordered={false}
+											expandIcon={({ isActive }) => (
+												<Icon
+													type="caret-right"
+													rotate={isActive ? 90 : 0}
 												/>
-												<FieldControl
-													name="sources_xff_value"
-													render={({ handler, hasError }) => {
-														const inputHandler = handler();
-														return (
-															<Grid
-																label={
-																	<span
-																		className={
+											)}
+										>
+											<Collapse.Panel
+												header={
+													<Button type="link" icon="settings">
+														Advanced Settings
+													</Button>
+												}
+												style={{ border: 0 }}
+												key="1"
+											>
+												<>
+													{(!isUserManagement ||
+														this.allowStoredQuery) && (
+														<>
+															{!isUserManagement && (
+																<Grid
+																	label="Security"
+																	toolTipMessage={
+																		Messages.security
+																	}
+																/>
+															)}
+															{!isUserManagement && (
+																<FieldControl
+																	name="referers"
+																	render={(control) => (
+																		<WhiteList
+																			toolTipMessage={
+																				Messages.referers
+																			}
+																			control={control}
+																			type="dropdown"
+																			defaultSuggestionValue="https://example.com/"
+																			label="HTTP Referers"
+																			defaultValue="*"
+																			handleWarningMessage={(
+																				defaultValue,
+																			) =>
+																				`Warning! You don't have the Allow All Referers (${defaultValue}) set.`
+																			}
+																			inputProps={{
+																				placeholder:
+																					'Add a HTTP Referer',
+																			}}
+																			labelClassName={
+																				isUserManagement
+																					? ''
+																					: styles.subHeader
+																			}
+																		/>
+																	)}
+																/>
+															)}
+															<FieldControl
+																name="sources"
+																render={(control) => (
+																	<WhiteList
+																		control={control}
+																		toolTipMessage={
+																			Messages.sources
+																		}
+																		label="IP Sources"
+																		handleWarningMessage={(
+																			defaultValue,
+																		) =>
+																			`Warning! You don't have the Allow All IP sources (${defaultValue}) set.`
+																		}
+																		defaultValue="0.0.0.0/0"
+																		inputProps={{
+																			placeholder:
+																				'Add an IP Source in CIDR format',
+																		}}
+																		labelClassName={
 																			isUserManagement
 																				? ''
 																				: styles.subHeader
 																		}
-																	>
-																		IP Source Depth
-																	</span>
-																}
-																toolTipMessage={
-																	Messages.sourcesXFFValue
-																}
-																component={
-																	<div>
-																		<Input
-																			type="number"
-																			placeholder="Enter a positive depth value"
-																			{...inputHandler}
-																			value={
-																				inputHandler.value
-																					? inputHandler.value
-																					: ''
-																			}
-																			min={1}
-																		/>
-																		{hasError('isNegative') && (
-																			<div css={styles.error}>
-																				IP Source Depth
-																				value can&apos;t be
-																				negative.
-																			</div>
-																		)}
-																		{hasError('isZero') && (
-																			<div css={styles.error}>
-																				IP Source Depth
-																				value should be
-																				greater than zero.
-																			</div>
-																		)}
-																	</div>
-																}
+																	/>
+																)}
 															/>
-														);
-													}}
-												/>
-											</>
-										)}
-										{!isUserManagement && (
-											<React.Fragment>
-												{this.isApp ? null : (
-													<FieldControl
-														strict={false}
-														name="indices"
-														render={({ handler }) => {
-															const inputHandler = handler();
-															const { value } =
-																this.form.get('indices');
-															return (
-																<Grid
-																	label="Indices"
-																	toolTipMessage={
-																		Messages.indices
-																	}
-																	component={
-																		<Select
-																			placeholder="Select indices"
-																			mode="tags"
-																			style={{
-																				width: '100%',
-																			}}
-																			tokenSeparators={[',']}
-																			value={value}
-																			{...inputHandler}
-																			onChange={(val) => {
-																				inputHandler.onChange(
-																					calculateValue(
-																						val,
-																					),
+															<FieldControl
+																name="sources_xff_value"
+																render={({ handler, hasError }) => {
+																	const inputHandler = handler();
+																	return (
+																		<Grid
+																			label={
+																				<span
+																					className={
+																						isUserManagement
+																							? ''
+																							: styles.subHeader
+																					}
+																				>
+																					IP Source Depth
+																				</span>
+																			}
+																			toolTipMessage={
+																				Messages.sourcesXFFValue
+																			}
+																			component={
+																				<div>
+																					<Input
+																						type="number"
+																						placeholder="Enter a positive depth value"
+																						{...inputHandler}
+																						value={
+																							inputHandler.value
+																								? inputHandler.value
+																								: ''
+																						}
+																						min={1}
+																					/>
+																					{hasError(
+																						'isNegative',
+																					) && (
+																						<div
+																							className={
+																								styles.error
+																							}
+																						>
+																							IP
+																							Source
+																							Depth
+																							value
+																							can&apos;t
+																							be
+																							negative.
+																						</div>
+																					)}
+																					{hasError(
+																						'isZero',
+																					) && (
+																						<div
+																							className={
+																								styles.error
+																							}
+																						>
+																							IP
+																							Source
+																							Depth
+																							value
+																							should
+																							be
+																							greater
+																							than
+																							zero.
+																						</div>
+																					)}
+																				</div>
+																			}
+																		/>
+																	);
+																}}
+															/>
+
+															{!isUserManagement && (
+																<React.Fragment>
+																	{this.isApp ? null : (
+																		<FieldControl
+																			strict={false}
+																			name="indices"
+																			render={({
+																				handler,
+																			}) => {
+																				const inputHandler =
+																					handler();
+																				const { value } =
+																					this.form.get(
+																						'indices',
+																					);
+																				return (
+																					<Grid
+																						label="Indices"
+																						toolTipMessage={
+																							Messages.indices
+																						}
+																						component={
+																							<Select
+																								placeholder="Select indices"
+																								mode="tags"
+																								style={{
+																									width: '100%',
+																								}}
+																								tokenSeparators={[
+																									',',
+																								]}
+																								value={
+																									value
+																								}
+																								{...inputHandler}
+																								onChange={(
+																									val,
+																								) => {
+																									inputHandler.onChange(
+																										calculateValue(
+																											val,
+																										),
+																									);
+																								}}
+																							>
+																								<Option key="*">
+																									*
+																									(Include
+																									all
+																									indices)
+																								</Option>
+																								{(
+																									indices ||
+																									[]
+																								)
+																									.filter(
+																										(
+																											i,
+																										) =>
+																											!i.startsWith(
+																												'.',
+																											) &&
+																											!i.startsWith(
+																												'metricbeat',
+																											),
+																									)
+																									.map(
+																										(
+																											index,
+																										) => (
+																											<Select.Option
+																												key={
+																													index
+																												}
+																											>
+																												{
+																													index
+																												}
+																											</Select.Option>
+																										),
+																									)}
+																							</Select>
+																						}
+																					/>
 																				);
 																			}}
-																		>
-																			<Option key="*">
-																				* (Include all
-																				indices)
-																			</Option>
-																			{(indices || [])
-																				.filter(
-																					(i) =>
-																						!i.startsWith(
-																							'.',
-																						) &&
-																						!i.startsWith(
-																							'metricbeat',
-																						),
-																				)
-																				.map((index) => (
-																					<Select.Option
-																						key={index}
+																		/>
+																	)}
+
+																	{this.shouldRenderRsApiRestrictions() && (
+																		<>
+																			<Grid
+																				label={
+																					<b>
+																						ReactiveSearch
+																						API
+																						Restrictions
+																					</b>
+																				}
+																				gridRatio={1}
+																				toolTipMessage={
+																					Messages.rsApiRestrictions
+																				}
+																			/>
+																			<RsApiRestrictions
+																				control={this.form.get(
+																					'rsApiRestrictions',
+																				)}
+																				Messages={Messages}
+																			/>
+																		</>
+																	)}
+
+																	<Grid
+																		label="Fields Filtering"
+																		toolTipMessage={
+																			Messages.fieldFiltering
+																		}
+																	/>
+																	<FieldControl
+																		strict={false}
+																		name="include_fields"
+																		render={({ handler }) => {
+																			const inputHandler =
+																				handler();
+																			const excludedFields =
+																				this.form.get(
+																					'exclude_fields',
+																				).value;
+																			const uniqueMappings =
+																				{};
+																			return (
+																				<Grid
+																					label={
+																						<span
+																							className={
+																								styles.subHeader
+																							}
+																						>
+																							Include
+																						</span>
+																					}
+																					toolTipMessage={
+																						Messages.include
+																					}
+																					component={
+																						<Select
+																							placeholder="Select field value"
+																							mode="multiple"
+																							notFoundContent={
+																								null
+																							}
+																							style={{
+																								width: '100%',
+																							}}
+																							tokenSeparators={[
+																								',',
+																							]}
+																							{...inputHandler}
+																							value={
+																								inputHandler.value ||
+																								[]
+																							}
+																							onChange={(
+																								value,
+																							) => {
+																								inputHandler.onChange(
+																									calculateValue(
+																										value,
+																									),
+																								);
+																							}}
+																						>
+																							<Option key="*">
+																								*
+																								(Include
+																								all
+																								fields)
+																							</Option>
+																							{this
+																								.isApp
+																								? mappings.map(
+																										(
+																											v,
+																										) => {
+																											if (
+																												!(
+																													excludedFields ||
+																													[]
+																												).includes(
+																													v,
+																												)
+																											) {
+																												return (
+																													<Option
+																														key={
+																															v
+																														}
+																														title={
+																															v
+																														}
+																													>
+																														{
+																															v
+																														}
+																													</Option>
+																												);
+																											}
+																											return null;
+																										},
+																								  )
+																								: Object.keys(
+																										filteredMappings,
+																								  ).map(
+																										(
+																											i,
+																										) =>
+																											filteredMappings[
+																												i
+																											].map(
+																												(
+																													v,
+																												) => {
+																													// duplicate keys cause re-rendering issues
+																													if (
+																														uniqueMappings[
+																															v
+																														]
+																													) {
+																														return null;
+																													}
+																													uniqueMappings[
+																														v
+																													] = true;
+																													if (
+																														!(
+																															excludedFields ||
+																															[]
+																														).includes(
+																															v,
+																														)
+																													) {
+																														return (
+																															<Option
+																																key={
+																																	v
+																																}
+																																value={
+																																	v
+																																}
+																																title={
+																																	v
+																																}
+																															>
+																																{
+																																	v
+																																}
+																																<span
+																																	className={
+																																		styles.fieldBadge
+																																	}
+																																>
+																																	{
+																																		i
+																																	}
+																																</span>
+																															</Option>
+																														);
+																													}
+																													return null;
+																												},
+																											),
+																								  )}
+																						</Select>
+																					}
+																				/>
+																			);
+																		}}
+																	/>
+																	<FieldControl
+																		strict={false}
+																		name="exclude_fields"
+																		render={({ handler }) => {
+																			const inputHandler =
+																				handler();
+																			const includedFields =
+																				this.form.get(
+																					'include_fields',
+																				).value;
+																			const uniqueMappings =
+																				{};
+																			return (
+																				<Grid
+																					label={
+																						<span
+																							className={
+																								styles.subHeader
+																							}
+																						>
+																							Exclude
+																						</span>
+																					}
+																					toolTipMessage={
+																						Messages.exclude
+																					}
+																					component={
+																						<Select
+																							placeholder="Select field value"
+																							mode="multiple"
+																							notFoundContent={
+																								null
+																							}
+																							style={{
+																								width: '100%',
+																							}}
+																							{...inputHandler}
+																							value={
+																								inputHandler.value ||
+																								[]
+																							}
+																							onChange={(
+																								value,
+																							) => {
+																								inputHandler.onChange(
+																									calculateValue(
+																										value,
+																									),
+																								);
+																							}}
+																						>
+																							<Option key="*">
+																								*
+																								(Exclude
+																								all
+																								fields)
+																							</Option>
+																							{this
+																								.isApp
+																								? mappings.map(
+																										(
+																											v,
+																										) => {
+																											if (
+																												!(
+																													includedFields ||
+																													[]
+																												).includes(
+																													v,
+																												)
+																											) {
+																												return (
+																													<Option
+																														key={
+																															v
+																														}
+																														title={
+																															v
+																														}
+																													>
+																														{
+																															v
+																														}
+																													</Option>
+																												);
+																											}
+																											return null;
+																										},
+																								  )
+																								: Object.keys(
+																										filteredMappings,
+																								  ).map(
+																										(
+																											i,
+																										) =>
+																											filteredMappings[
+																												i
+																											].map(
+																												(
+																													v,
+																												) => {
+																													// duplicate keys cause re-rendering issues
+																													if (
+																														uniqueMappings[
+																															v
+																														]
+																													) {
+																														return null;
+																													}
+																													uniqueMappings[
+																														v
+																													] = true;
+																													if (
+																														!(
+																															includedFields ||
+																															[]
+																														).includes(
+																															v,
+																														)
+																													) {
+																														return (
+																															<Option
+																																key={
+																																	v
+																																}
+																																title={
+																																	v
+																																}
+																															>
+																																{
+																																	v
+																																}
+																																<span
+																																	className={
+																																		styles.fieldBadge
+																																	}
+																																>
+																																	{
+																																		i
+																																	}
+																																</span>
+																															</Option>
+																														);
+																													}
+																													return null;
+																												},
+																											),
+																								  )}
+																						</Select>
+																					}
+																				/>
+																			);
+																		}}
+																	/>
+																	<FieldControl
+																		name="ip_limit"
+																		render={({
+																			handler,
+																			hasError,
+																		}) => (
+																			<Grid
+																				label="Max API calls/IP/hour"
+																				toolTipMessage={
+																					Messages.ipLimit
+																				}
+																				component={
+																					<Flex
+																						justifyContent="center"
+																						alignItems="center"
 																					>
-																						{index}
-																					</Select.Option>
-																				))}
-																		</Select>
-																	}
-																/>
-															);
-														}}
-													/>
-												)}
-
-												{this.shouldRenderRsApiRestrictions() && (
-													<>
-														<Grid
-															label={
-																<b>
-																	ReactiveSearch API Restrictions
-																</b>
-															}
-															gridRatio={1}
-															toolTipMessage={
-																Messages.rsApiRestrictions
-															}
-														/>
-														<RsApiRestrictions
-															control={this.form.get(
-																'rsApiRestrictions',
+																						<Input
+																							type="number"
+																							style={{
+																								border: '1px solid  #9195A2 !important',
+																								width: 120,
+																							}}
+																							{...handler()}
+																						/>
+																						{hasError(
+																							'isNegative',
+																						) && (
+																							<span
+																								style={{
+																									color: 'red',
+																									marginLeft: 10,
+																								}}
+																							>
+																								Field
+																								value
+																								can&apos;t
+																								be
+																								negative.
+																							</span>
+																						)}
+																					</Flex>
+																				}
+																			/>
+																		)}
+																	/>
+																	<FieldControl
+																		name="ttl"
+																		render={({
+																			handler,
+																			hasError,
+																		}) => (
+																			<Grid
+																				label="TTL"
+																				toolTipMessage={
+																					Messages.ttl
+																				}
+																				component={
+																					<Flex
+																						justifyContent="center"
+																						alignItems="center"
+																					>
+																						<Input
+																							type="number"
+																							min="0"
+																							style={{
+																								border: '1px solid  #9195A2 !important',
+																								width: 120,
+																							}}
+																							{...handler()}
+																						/>
+																						{hasError(
+																							'isNegative',
+																						) && (
+																							<span
+																								style={{
+																									color: 'red',
+																									marginLeft: 10,
+																								}}
+																							>
+																								Field
+																								value
+																								can&apos;t
+																								be
+																								negative.
+																							</span>
+																						)}
+																					</Flex>
+																				}
+																			/>
+																		)}
+																	/>
+																</React.Fragment>
 															)}
-															Messages={Messages}
-														/>
-													</>
-												)}
-
-												<Grid
-													label="Fields Filtering"
-													toolTipMessage={Messages.fieldFiltering}
-												/>
-												<FieldControl
-													strict={false}
-													name="include_fields"
-													render={({ handler }) => {
-														const inputHandler = handler();
-														const excludedFields =
-															this.form.get('exclude_fields').value;
-														const uniqueMappings = {};
-														return (
-															<Grid
-																label={
-																	<span css={styles.subHeader}>
-																		Include
-																	</span>
-																}
-																toolTipMessage={Messages.include}
-																component={
-																	<Select
-																		placeholder="Select field value"
-																		mode="multiple"
-																		notFoundContent={null}
-																		style={{
-																			width: '100%',
-																		}}
-																		tokenSeparators={[',']}
-																		{...inputHandler}
-																		value={
-																			inputHandler.value || []
-																		}
-																		onChange={(value) => {
-																			inputHandler.onChange(
-																				calculateValue(
-																					value,
-																				),
-																			);
-																		}}
-																	>
-																		<Option key="*">
-																			* (Include all fields)
-																		</Option>
-																		{this.isApp
-																			? mappings.map((v) => {
-																					if (
-																						!(
-																							excludedFields ||
-																							[]
-																						).includes(
-																							v,
-																						)
-																					) {
-																						return (
-																							<Option
-																								key={
-																									v
-																								}
-																								title={
-																									v
-																								}
-																							>
-																								{v}
-																							</Option>
-																						);
-																					}
-																					return null;
-																			  })
-																			: Object.keys(
-																					filteredMappings,
-																			  ).map((i) =>
-																					filteredMappings[
-																						i
-																					].map((v) => {
-																						// duplicate keys cause re-rendering issues
-																						if (
-																							uniqueMappings[
-																								v
-																							]
-																						) {
-																							return null;
-																						}
-																						uniqueMappings[
-																							v
-																						] = true;
-																						if (
-																							!(
-																								excludedFields ||
-																								[]
-																							).includes(
-																								v,
-																							)
-																						) {
-																							return (
-																								<Option
-																									key={
-																										v
-																									}
-																									value={
-																										v
-																									}
-																									title={
-																										v
-																									}
-																								>
-																									{
-																										v
-																									}
-																									<span
-																										css={
-																											styles.fieldBadge
-																										}
-																									>
-																										{
-																											i
-																										}
-																									</span>
-																								</Option>
-																							);
-																						}
-																						return null;
-																					}),
-																			  )}
-																	</Select>
-																}
-															/>
-														);
-													}}
-												/>
-												<FieldControl
-													strict={false}
-													name="exclude_fields"
-													render={({ handler }) => {
-														const inputHandler = handler();
-														const includedFields =
-															this.form.get('include_fields').value;
-														const uniqueMappings = {};
-														return (
-															<Grid
-																label={
-																	<span css={styles.subHeader}>
-																		Exclude
-																	</span>
-																}
-																toolTipMessage={Messages.exclude}
-																component={
-																	<Select
-																		placeholder="Select field value"
-																		mode="multiple"
-																		notFoundContent={null}
-																		style={{ width: '100%' }}
-																		{...inputHandler}
-																		value={
-																			inputHandler.value || []
-																		}
-																		onChange={(value) => {
-																			inputHandler.onChange(
-																				calculateValue(
-																					value,
-																				),
-																			);
-																		}}
-																	>
-																		<Option key="*">
-																			* (Exclude all fields)
-																		</Option>
-																		{this.isApp
-																			? mappings.map((v) => {
-																					if (
-																						!(
-																							includedFields ||
-																							[]
-																						).includes(
-																							v,
-																						)
-																					) {
-																						return (
-																							<Option
-																								key={
-																									v
-																								}
-																								title={
-																									v
-																								}
-																							>
-																								{v}
-																							</Option>
-																						);
-																					}
-																					return null;
-																			  })
-																			: Object.keys(
-																					filteredMappings,
-																			  ).map((i) =>
-																					filteredMappings[
-																						i
-																					].map((v) => {
-																						// duplicate keys cause re-rendering issues
-																						if (
-																							uniqueMappings[
-																								v
-																							]
-																						) {
-																							return null;
-																						}
-																						uniqueMappings[
-																							v
-																						] = true;
-																						if (
-																							!(
-																								includedFields ||
-																								[]
-																							).includes(
-																								v,
-																							)
-																						) {
-																							return (
-																								<Option
-																									key={
-																										v
-																									}
-																									title={
-																										v
-																									}
-																								>
-																									{
-																										v
-																									}
-																									<span
-																										css={
-																											styles.fieldBadge
-																										}
-																									>
-																										{
-																											i
-																										}
-																									</span>
-																								</Option>
-																							);
-																						}
-																						return null;
-																					}),
-																			  )}
-																	</Select>
-																}
-															/>
-														);
-													}}
-												/>
-												<FieldControl
-													name="ip_limit"
-													render={({ handler, hasError }) => (
-														<Grid
-															label="Max API calls/IP/hour"
-															toolTipMessage={Messages.ipLimit}
-															component={
-																<Flex
-																	justifyContent="center"
-																	alignItems="center"
-																>
-																	<Input
-																		type="number"
-																		css="border: solid 1px #9195A2!important;width: 120px"
-																		{...handler()}
-																	/>
-																	{hasError('isNegative') && (
-																		<span css="color: red;margin-left: 10px">
-																			Field value can&apos;t
-																			be negative.
-																		</span>
-																	)}
-																</Flex>
-															}
-														/>
+														</>
 													)}
-												/>
-												<FieldControl
-													name="ttl"
-													render={({ handler, hasError }) => (
-														<Grid
-															label="TTL"
-															toolTipMessage={Messages.ttl}
-															component={
-																<Flex
-																	justifyContent="center"
-																	alignItems="center"
-																>
-																	<Input
-																		type="number"
-																		min="0"
-																		css="border: solid 1px #9195A2!important;width: 120px"
-																		{...handler()}
-																	/>
-																	{hasError('isNegative') && (
-																		<span css="color: red;margin-left: 10px">
-																			Field value can&apos;t
-																			be negative.
-																		</span>
-																	)}
-																</Flex>
-															}
-														/>
-													)}
-												/>
-											</React.Fragment>
-										)}
+												</>
+											</Collapse.Panel>
+										</Collapse>
 									</div>
 								</fieldset>
 							</React.Fragment>
@@ -1154,6 +1352,7 @@ CreateCredentials.defaultProps = {
 	mappings: [],
 	indices: [],
 	readOnly: false,
+	backend: BACKENDS.ELASTICSEARCH.name,
 	onSubmit: () => {},
 };
 CreateCredentials.propTypes = {
@@ -1195,6 +1394,7 @@ CreateCredentials.propTypes = {
 	arcPlan: PropTypes.string.isRequired,
 	appbaseVersion: PropTypes.string.isRequired,
 	readOnly: PropTypes.bool,
+	backend: PropTypes.string,
 };
 
 const mapStateToProps = (state) => {
@@ -1226,6 +1426,7 @@ const mapStateToProps = (state) => {
 			get(state, '$createClusterUser.error'),
 			get(state, '$updateClusterUser.error'),
 		],
+		backend: get(state, '$getAppPlan.results.backend'),
 	};
 };
 

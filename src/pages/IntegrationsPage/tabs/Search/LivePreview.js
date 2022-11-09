@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { func, object, string } from 'prop-types';
 import {
 	componentTypes,
@@ -6,8 +6,11 @@ import {
 	ReactiveChart,
 	ReactiveComponent,
 } from '@appbaseio/reactivesearch';
+import { connect } from 'react-redux';
+import { get } from 'lodash';
 import { getURL } from '../../../../constants/config';
-import { transformFacets } from '../../utils';
+import { FormContext, transformFacets } from '../../utils';
+import { BACKENDS } from '../../../../batteries/utils';
 
 const DEBOUNCE_TIME = 1000;
 
@@ -28,15 +31,19 @@ function parseStringifiedFunction(funcString) {
 
 const LivePreview = React.memo(
 	({
-		pipeline,
 		componentConfig,
 		prefix,
 		hookOwnRender,
 		hookResultRender,
 		hookDefaultQuery,
 		hookCustomQuery,
+		backend,
 	}) => {
 		const [componentRsConfig, setComponentRsConfig] = useState({});
+		const form = useContext(FormContext);
+		const indexSettings = form.get('indexSettings') ? form.get('indexSettings').value : {};
+		const pipeline = form.get('pipeline') ? form.get('pipeline').value : '';
+		const secondaryPipeline = get(indexSettings, 'index', '');
 		const [isLoading, setIsLoading] = useState(true);
 		const [functions, setFunctions] = useState({
 			// hook used by filter
@@ -54,15 +61,45 @@ const LivePreview = React.memo(
 				render: undefined,
 			},
 		});
+		const transformRequest =
+			backend === BACKENDS.FUSION.name
+				? (props) => {
+						const mainFusionSettings = form.get('fusionSettings')?.value;
+						const pageFusionSettings = get(
+							indexSettings,
+							'fusionSettings',
+							form.get('fusionSettings')?.value,
+						);
+						const fusionSettings = Object.assign(
+							{},
+							mainFusionSettings,
+							pageFusionSettings,
+						);
+						if (Object.keys(fusionSettings).length) {
+							// eslint-disable-next-line
+							const newBody = JSON.parse(props.body);
+							newBody.metadata = {
+								app: fusionSettings.app,
+								profile: fusionSettings.profile,
+								suggestion_profile: fusionSettings.searchProfile,
+							};
+							// eslint-disable-next-line
+							props.body = JSON.stringify(newBody);
+						}
+						return props;
+				  }
+				: undefined;
 
 		useEffect(() => {
 			setIsLoading(true);
 			const timeoutId = setTimeout(() => {
 				const newRsConfig = transformFacets(componentConfig);
+				// To run hooks after the current rendering task.
+				const promiseQueue = Promise.resolve();
 				// We expect that componentConfig.defaultQuery, customQuery, setOption would be stringified functions
 				const defaultQueryWithHook = (...args) => {
 					if (typeof hookDefaultQuery === 'function') {
-						hookDefaultQuery(...args);
+						promiseQueue.then(() => hookDefaultQuery(...args));
 					}
 					const parsedFunc = parseStringifiedFunction(componentConfig.defaultQuery);
 					return parsedFunc && parsedFunc(...args);
@@ -73,14 +110,14 @@ const LivePreview = React.memo(
 				};
 				const customQueryWithHook = (...args) => {
 					if (typeof hookCustomQuery === 'function') {
-						hookCustomQuery(...args);
+						promiseQueue.then(() => hookCustomQuery(...args));
 					}
 					const parsedFunc = parseStringifiedFunction(componentConfig.customQuery);
 					return parsedFunc && parsedFunc(...args);
 				};
 				const setOptionWithHook = (...args) => {
 					if (typeof hookOwnRender === 'function') {
-						hookOwnRender(...args);
+						promiseQueue.then(() => hookOwnRender(...args));
 					}
 					const parsedFunc = parseStringifiedFunction(componentConfig.setOption);
 					const data = args[0];
@@ -105,7 +142,7 @@ const LivePreview = React.memo(
 					hiddenComponent: {
 						render: (...args) => {
 							if (typeof hookOwnRender === 'function') {
-								hookOwnRender(...args);
+								promiseQueue.then(() => hookOwnRender(...args));
 							}
 							return 'OUTPUT to silence react errors';
 						},
@@ -114,7 +151,7 @@ const LivePreview = React.memo(
 					result: {
 						render: (...args) => {
 							if (typeof hookResultRender === 'function') {
-								hookResultRender(...args);
+								promiseQueue.then(() => hookResultRender(...args));
 							}
 							return 'Results found!';
 						},
@@ -172,10 +209,11 @@ const LivePreview = React.memo(
 						<h3 className="section-header">Live Preview</h3>
 						<div className="preview-container">
 							<ReactiveBase
-								app={pipeline}
+								app={secondaryPipeline || pipeline}
 								url={getURL()}
 								credentials={atob(localStorage.getItem('authToken'))}
 								enableAppbase
+								transformRequest={transformRequest}
 								preferences={preferences}
 							>
 								{isLoading ? (
@@ -225,6 +263,9 @@ const LivePreview = React.memo(
 				propsAreEqual = false;
 			}
 		});
+		if (nextProps.backend !== prevProps.backend) {
+			propsAreEqual = false;
+		}
 		return propsAreEqual;
 	},
 );
@@ -238,8 +279,8 @@ LivePreview.defaultProps = {
 };
 
 LivePreview.propTypes = {
+	backend: string.isRequired,
 	componentConfig: object.isRequired,
-	pipeline: string.isRequired,
 	prefix: string,
 	hookResultRender: func,
 	hookOwnRender: func,
@@ -247,4 +288,8 @@ LivePreview.propTypes = {
 	hookDefaultQuery: func,
 };
 
-export default LivePreview;
+const mapStateToProps = (state) => ({
+	backend: get(state, '$getAppPlan.results.backend'),
+});
+
+export default connect(mapStateToProps, null)(LivePreview);

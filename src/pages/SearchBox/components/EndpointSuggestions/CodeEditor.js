@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { number, object, oneOf, string } from 'prop-types';
 import { FieldControl } from 'react-reactive-form';
@@ -22,51 +22,65 @@ const monacoOptions = {
 };
 
 const CodeEditor = ({ defaultValue, language, height, control, name, ...controlProps }) => {
+	const [isBlur, setBlur] = useState(false);
+
 	return (
 		<FieldControl name={name} control={control} {...controlProps}>
-			{({ handler }) => (
-				<Monaco
-					defaultValue={defaultValue}
-					language={language}
-					theme="vs-dark"
-					height={height}
-					options={{
-						...monacoOptions,
-						suggest: {
-							showEnums: true,
-							showEnumMembers: true,
-							showConstants: true,
-							showStructs: true,
-							showFields: true,
-							showProperties: true,
-							snippetsPreventQuickSuggestions: false,
-							insertMode: 'insert',
-							shareSuggestSelections: false,
-							showFunctions: true,
-							showSnippets: true,
-							showValues: true,
-						},
-						autoClosingBrackets: true,
-						codeLens: false,
-						contextmenu: true,
-						cursorBlinking: 'blink',
-						cursorStyle: 'line',
-						disableLayerHinting: false,
-						disableMonospaceOptimizations: false,
-						fixedOverflowWidgets: false,
-						formatOnType: true,
-						quickSuggestions: true,
-						suggestOnTriggerCharacters: true,
-						wordBasedSuggestions: false,
-						snippetSuggestions: 'top',
-						inlineSuggest: { enabled: true },
-						glyphMargin: true,
-					}}
-					readOnly={false}
-					wrapperClass="monaco-wrapper"
-					{...handler()}
-				/>
-			)}
+			{({ handler, errors }) => {
+				return (
+					<>
+						<Monaco
+							defaultValue={defaultValue}
+							language={language}
+							theme="vs-dark"
+							height={height}
+							options={{
+								...monacoOptions,
+								suggest: {
+									showEnums: true,
+									showEnumMembers: true,
+									showConstants: true,
+									showStructs: true,
+									showFields: true,
+									showProperties: true,
+									snippetsPreventQuickSuggestions: false,
+									insertMode: 'insert',
+									shareSuggestSelections: false,
+									showFunctions: true,
+									showSnippets: true,
+									showValues: true,
+								},
+								autoClosingBrackets: true,
+								codeLens: false,
+								contextmenu: true,
+								cursorBlinking: 'blink',
+								cursorStyle: 'line',
+								disableLayerHinting: false,
+								disableMonospaceOptimizations: false,
+								fixedOverflowWidgets: false,
+								formatOnType: true,
+								quickSuggestions: true,
+								suggestOnTriggerCharacters: true,
+								wordBasedSuggestions: false,
+								snippetSuggestions: 'top',
+								inlineSuggest: { enabled: true },
+								glyphMargin: true,
+							}}
+							readOnly={false}
+							wrapperClass="monaco-wrapper"
+							{...handler()}
+							onBlur={() => {
+								setBlur(true);
+							}}
+						/>
+						{isBlur && errors.invalidHeaders ? (
+							<div className="error">{errors.message}</div>
+						) : (
+							<></>
+						)}
+					</>
+				);
+			}}
 		</FieldControl>
 	);
 };

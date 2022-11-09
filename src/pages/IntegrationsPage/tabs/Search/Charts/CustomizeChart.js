@@ -2,8 +2,11 @@ import React from 'react';
 import { Button, Modal, Switch, Form, Select, Input, Typography } from 'antd';
 import { string, object, func, bool } from 'prop-types';
 import styled from 'react-emotion';
+import get from 'lodash/get';
 import { FieldGroup, FieldControl, Validators } from 'react-reactive-form';
 import { ReactiveChart } from '@appbaseio/reactivesearch';
+import { connect } from 'react-redux';
+import { BACKENDS } from '../../../../../batteries/utils';
 import LivePreview from '../LivePreview';
 import CopyCode from './CopyCode';
 import DataFieldSelector from '../../../../../components/Form/DataFieldSelector';
@@ -106,11 +109,15 @@ class CustomizeChart extends React.Component {
 			visible: false,
 		});
 
-		const { onSave, control, tempControl } = this.props;
+		const { onSave, control, tempControl, onModalClose } = this.props;
 		if (tempControl && tempControl.get('enabled')) tempControl.get('enabled').setValue(true);
 
 		if (onSave) {
 			onSave(control);
+		}
+
+		if (onModalClose) {
+			onModalClose();
 		}
 	};
 
@@ -125,14 +132,25 @@ class CustomizeChart extends React.Component {
 	};
 
 	handleDataFieldChange = (value) => {
-		const supports = RANGE_FIELDS.includes(value) || value === 'date';
-		this.setState({ supportsRangeQuery: supports });
+		const supports = RANGE_FIELDS.includes(value);
+		// Temporarily enable range for all fields
+		this.setState({ supportsRangeQuery: true });
+		// const supports = RANGE_FIELDS.includes(value) || value === 'date';
+		// this.setState({ supportsRangeQuery: supports });
 		return supports;
 	};
 
 	render() {
 		const { visible, currentEditorModal, supportsRangeQuery } = this.state;
-		const { buttonLabel, control, buttonProps, getPreferencesPayload, pipeline } = this.props;
+		const {
+			buttonLabel,
+			control,
+			buttonProps,
+			getPreferencesPayload,
+			pipeline,
+			form,
+			backend,
+		} = this.props;
 		return (
 			<React.Fragment>
 				<Button {...buttonProps} onClick={this.showModal}>
@@ -169,6 +187,7 @@ class CustomizeChart extends React.Component {
 													pipeline={pipeline}
 													control={control?.get('dataField')}
 													setFieldType={this.handleDataFieldChange}
+													form={form}
 												/>
 											</Form.Item>
 											{value.chartType === chartTypes.range.scatter.id ? (
@@ -328,7 +347,6 @@ class CustomizeChart extends React.Component {
 													)}
 												</FieldControl>
 											</Form.Item>
-
 											{value.type === queryTypes.term ? (
 												<>
 													<FieldControl
@@ -577,6 +595,33 @@ class CustomizeChart extends React.Component {
 														showLivePreview={false}
 														functionProperty="setOption"
 														pipeline={pipeline}
+														header={
+															<div>
+																<p>
+																	<b>Customize Chart Display:</b>
+																</p>
+																<p>
+																	<span>
+																		Charts are built with Apache
+																		Echarts library.
+																	</span>
+																	&nbsp;
+																	<a
+																		target="_blank"
+																		href="https://echarts.apache.org/examples/en/index.html"
+																		rel="noreferrer"
+																	>
+																		See their examples
+																	</a>
+																	&nbsp;
+																	<span>
+																		for options structure, they
+																		can also be pasted in the
+																		function body
+																	</span>
+																</p>
+															</div>
+														}
 													/>
 												)}
 											</FieldControl>
@@ -628,6 +673,7 @@ class CustomizeChart extends React.Component {
 										<CopyCode
 											control={value}
 											getPreferencesPayload={getPreferencesPayload}
+											backend={backend}
 										/>
 									</div>
 								</ModalContainer>
@@ -653,6 +699,8 @@ CustomizeChart.defaultProps = {
 	pipeline: undefined,
 	form: {},
 	getPreferencesPayload: () => {},
+	onModalClose: () => {},
+	backend: BACKENDS.ELASTICSEARCH.name,
 };
 CustomizeChart.propTypes = {
 	buttonLabel: string,
@@ -667,6 +715,12 @@ CustomizeChart.propTypes = {
 	type: string,
 	form: object,
 	getPreferencesPayload: func,
+	onModalClose: func,
+	backend: string,
 };
 
-export default CustomizeChart;
+const mapStateToProps = (state) => ({
+	backend: get(state, '$getAppPlan.results.backend'),
+});
+
+export default connect(mapStateToProps, null)(CustomizeChart);

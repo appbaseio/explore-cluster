@@ -66,8 +66,8 @@ class Permission extends React.Component {
 		const { permissionInfo } = this.props;
 		const isExpired = permissionInfo.expired;
 		return (
-			<Flex css={main} alignItems="center">
-				<Flex justifyContent="space-between" alignItems="center" css={container}>
+			<Flex className={main} alignItems="center">
+				<Flex justifyContent="space-between" alignItems="center" className={container}>
 					<span>{viewKey ? this.key : '########################################'}</span>
 					<Flex>
 						<Tooltip

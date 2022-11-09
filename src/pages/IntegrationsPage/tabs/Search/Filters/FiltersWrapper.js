@@ -5,6 +5,7 @@ import { bool, func, object, string } from 'prop-types';
 import { traverseMapping } from '../../../../../batteries/utils/mappings';
 import { getAppMappings } from '../../../../../batteries/modules/actions';
 import { getRawMappingsByAppName } from '../../../../../batteries/modules/selectors';
+import { BACKENDS } from '../../../../../batteries/utils';
 
 const FiltersWrapper = ({
 	children,
@@ -13,6 +14,7 @@ const FiltersWrapper = ({
 	fetchMappings,
 	appbaseCredentials,
 	mappings,
+	backend,
 }) => {
 	const [traversedMappings, setTraversedMappings] = useState([]);
 	useEffect(() => {
@@ -30,7 +32,8 @@ const FiltersWrapper = ({
 			const pipeline = form.get('pipeline') ? form.get('pipeline')?.value : '';
 			const indexSettings = form.get('indexSettings') ? form.get('indexSettings').value : {};
 			const secondaryPipeline = get(indexSettings, 'index', '');
-			fetchMappings(secondaryPipeline || pipeline, appbaseCredentials);
+
+			fetchMappings(secondaryPipeline || pipeline, appbaseCredentials, backend);
 		}
 	};
 
@@ -67,6 +70,7 @@ const FiltersWrapper = ({
 FiltersWrapper.defaultProps = {
 	loading: false,
 	mappings: null,
+	backend: BACKENDS.ELASTICSEARCH.name,
 };
 
 FiltersWrapper.propTypes = {
@@ -75,6 +79,7 @@ FiltersWrapper.propTypes = {
 	appbaseCredentials: string.isRequired,
 	fetchMappings: func.isRequired,
 	form: object.isRequired,
+	backend: string,
 };
 
 const mapStateToProps = (state, props) => {
@@ -89,11 +94,13 @@ const mapStateToProps = (state, props) => {
 		mappings,
 		loading: get(state, '$getAppMappings.isFetching'),
 		appbaseCredentials: username ? `${username}:${password}` : null,
+		backend: get(state, '$getAppPlan.results.backend'),
 	};
 };
 
 const mapDispatchToProps = (dispatch) => ({
-	fetchMappings: (appName, credentials) => dispatch(getAppMappings(appName, credentials)),
+	fetchMappings: (appName, credentials, backend) =>
+		dispatch(getAppMappings(appName, credentials, undefined, backend)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(FiltersWrapper);

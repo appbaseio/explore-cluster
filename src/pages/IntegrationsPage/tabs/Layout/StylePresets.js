@@ -1,28 +1,40 @@
 import React, { Component } from 'react';
 // import { object, func } from 'prop-types';
 import { Select, Row, Col } from 'antd';
-import { css } from 'react-emotion';
+import styled from 'react-emotion';
 import { FieldControl } from 'react-reactive-form';
 // import Helmet from 'react-helmet';
 // import { ReactiveBase, CategorySearch } from '@appbaseio/reactivesearch';
 // import get from 'lodash/get';
 import ColorPicker from '../../ColorPicker';
+import { fontWeights } from '../../utils';
+import ThemePreview from './ThemePreview';
 // import SuggestionsRenderer from './SuggestionRenderer';
 
 const { Option } = Select;
 
 // const inputRef = React.createRef(null);
-
-const labelStyles = css`
+const InputContainer = styled.div`
+	display: grid;
+	grid-gap: 10px;
+`;
+const Label = styled.div`
 	margin-right: 50px;
 	font-weight: 500;
 `;
 
-const main = css`
+const MainInput = styled.div`
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 	max-width: 350px;
+`;
+const FontFamilySelect = styled(Select)`
+	min-width: 200px;
+	width: 50%;
+`;
+const Section = styled(Col)`
+	padding-top: 10px;
 `;
 
 class StylePresets extends Component {
@@ -35,7 +47,7 @@ class StylePresets extends Component {
 			this.getFontFamily();
 		} catch (error) {
 			// eslint-disable-next-line
-            console.error(error);
+			console.error(error);
 		}
 	}
 
@@ -80,7 +92,6 @@ class StylePresets extends Component {
 
 	render() {
 		const { fontFamilies } = this.state;
-
 		// if (preferences._theme) {
 		// 	// this is necessary since often batteries mess up with my code and resets preferences
 		// 	primaryColor = preferences._theme.colors.primaryColor || primaryColor;
@@ -109,13 +120,47 @@ class StylePresets extends Component {
 		// };
 		return (
 			<Row>
-				<h2>Style Presets</h2>
-				<Col md={12} sm={24}>
-					<div css={{ display: 'grid', gridGap: 10 }}>
+				<Section lg={12} md={24}>
+					<h2>Style Presets</h2>
+					<InputContainer>
+						<FieldControl name="bodyBackgroundColor">
+							{(control) => {
+								// This line assumes this.form in PreferenceFormWrapperN is always filled with some defaultValue
+								if (!control.value) {
+									control.setValue(control.formState || '#000000');
+								}
+								return (
+									<ColorPicker
+										label="Body Background Color"
+										value={control.value}
+										onChange={(value) => {
+											control.onChange(value && value.hex);
+										}}
+									/>
+								);
+							}}
+						</FieldControl>
+						<FieldControl name="navbarBackgroundColor">
+							{(control) => {
+								// This line assumes this.form in PreferenceFormWrapperN is always filled with some defaultValue
+								if (!control.value) {
+									control.setValue(control.formState || '#000000');
+								}
+								return (
+									<ColorPicker
+										label="Navbar Background Color"
+										value={control.value}
+										onChange={(value) => {
+											control.onChange(value && value.hex);
+										}}
+									/>
+								);
+							}}
+						</FieldControl>
 						<FieldControl name="primaryColor">
 							{({ value, onChange }) => (
 								<ColorPicker
-									label="Primary Color"
+									label="Accent Color"
 									value={value}
 									onChange={({ hex }) => {
 										onChange(hex);
@@ -123,17 +168,6 @@ class StylePresets extends Component {
 								/>
 							)}
 						</FieldControl>
-
-						<FieldControl name="textColor">
-							{({ value, onChange }) => (
-								<ColorPicker
-									label="Text Color"
-									value={value}
-									onChange={({ hex }) => onChange(hex)}
-								/>
-							)}
-						</FieldControl>
-
 						<FieldControl name="titleColor">
 							{({ value, onChange }) => (
 								<ColorPicker
@@ -143,14 +177,38 @@ class StylePresets extends Component {
 								/>
 							)}
 						</FieldControl>
-
+						<FieldControl name="textColor">
+							{({ value, onChange }) => (
+								<ColorPicker
+									label="Text Color"
+									value={value}
+									onChange={({ hex }) => onChange(hex)}
+								/>
+							)}
+						</FieldControl>
+						<FieldControl name="linkColor">
+							{(control) => {
+								// This line assumes this.form in PreferenceFormWrapperN is always filled with some defaultValue
+								if (!control.value) {
+									control.setValue(control.formState || '#000000');
+								}
+								return (
+									<ColorPicker
+										label="Link Color"
+										value={control.value}
+										onChange={(value) => {
+											control.onChange(value && value.hex);
+										}}
+									/>
+								);
+							}}
+						</FieldControl>
 						<FieldControl strict={false} name="fontFamily">
 							{({ value, onChange }) =>
 								fontFamilies.length > 0 ? (
-									<div css={main}>
-										<div className={labelStyles}>Font Family</div>
-										<Select
-											css="width : 50%"
+									<MainInput>
+										<Label>Font Family</Label>
+										<FontFamilySelect
 											showSearch
 											value={value}
 											placeholder="Select Font family"
@@ -163,20 +221,61 @@ class StylePresets extends Component {
 											}
 										>
 											<Option key="default" value="default">
-												Chinese Quote
+												Open Sans
 											</Option>
 											{fontFamilies.map(({ family }) => (
 												<Option key={family} value={family}>
 													{family}
 												</Option>
 											))}
-										</Select>
-									</div>
+										</FontFamilySelect>
+									</MainInput>
 								) : null
 							}
 						</FieldControl>
-					</div>
-				</Col>
+						<FieldControl strict={false} name="fontWeight">
+							{(control) => {
+								if (!control.value) {
+									control.setValue(control.formState || '100');
+								}
+								return (
+									<MainInput>
+										<Label>Font Weight</Label>
+										<Select
+											css="width : 50%"
+											showSearch
+											value={control.value}
+											placeholder="Select Font Weight"
+											onChange={control.onChange}
+										>
+											{fontWeights.map((weight) => {
+												let fontWeight = 'lighter';
+												if (weight.value > 200) {
+													fontWeight = 'regular';
+												}
+												if (weight.value > 600) {
+													fontWeight = 'bold';
+												}
+												return (
+													<Option
+														style={{ fontWeight }}
+														key={weight.value}
+														value={weight.value}
+													>
+														{weight.label}
+													</Option>
+												);
+											})}
+										</Select>
+									</MainInput>
+								);
+							}}
+						</FieldControl>
+					</InputContainer>
+				</Section>
+				<Section lg={12} md={24}>
+					<ThemePreview />
+				</Section>
 				{/* <Col md={12} sm={24}>
 					{fontFamilyLink ? <Helmet>{fontFamilyLink}</Helmet> : null}
 					<ReactiveBase app={app} credentials={credentials} theme={themeConfig}>

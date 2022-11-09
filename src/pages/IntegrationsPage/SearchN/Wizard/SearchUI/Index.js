@@ -3,7 +3,7 @@ import { List } from 'antd';
 import { FieldControl } from 'react-reactive-form';
 import { string, object, func } from 'prop-types';
 import { ReactiveBase } from '@appbaseio/reactivesearch';
-import DataFieldSelector from '../../../../../components/Form/DataFieldSelector';
+import FusionDatafieldSelector from '../FusionDatafieldSelector';
 import { SearchUIStyles } from '../styles';
 import { getURL } from '../../../../../constants/config';
 import DocType from '../../../tabs/Search/Results/DocType';
@@ -56,9 +56,9 @@ const SearchUI = ({ pipeline, tabsValidated, setTabsValidated, preferences, form
 	const themeType = form.get('themeType') ? form.get('themeType').value : 'classic';
 	const templateObj = getTemplate(themeType);
 	return (
-		<div css={SearchUIStyles}>
+		<div className={SearchUIStyles}>
 			<div className="description-container">
-				Configure UI fields to display search results. This is required to disaplay the
+				Configure UI fields to display search results. This is required to display the
 				initial Search UI preview. You can always change this later.
 			</div>
 
@@ -83,6 +83,32 @@ const SearchUI = ({ pipeline, tabsValidated, setTabsValidated, preferences, form
 																	?.credentials || ''
 															}
 															enableAppbase
+															transformRequest={(props) => {
+																const newBody = JSON.parse(
+																	// eslint-disable-next-line
+																	props.body,
+																);
+																newBody.metadata = {
+																	app: form.get('app')
+																		? form.get('app').value
+																		: '',
+																	profile: form.get('profile')
+																		? form.get('profile').value
+																		: '',
+																	suggestion_profile: form.get(
+																		'searchProfile',
+																	)
+																		? form.get('searchProfile')
+																				.value
+																		: '',
+																};
+
+																// eslint-disable-next-line
+																props.body =
+																	JSON.stringify(newBody);
+
+																return props;
+															}}
 														>
 															<DocType
 																value={value}
@@ -126,6 +152,8 @@ const SearchUI = ({ pipeline, tabsValidated, setTabsValidated, preferences, form
 									}
 								}}
 								themeType={themeType}
+								form={form}
+								isWizard
 							/>
 						);
 					}
@@ -144,10 +172,10 @@ const SearchUI = ({ pipeline, tabsValidated, setTabsValidated, preferences, form
 									return (
 										<Item
 											actions={[
-												<DataFieldSelector
-													pipeline={pipeline}
-													name={item.id}
-													isAggFields
+												<FusionDatafieldSelector
+													value={value}
+													onChange={onChange}
+													form={form}
 													handleReload={handleReload}
 												/>,
 											]}
@@ -176,19 +204,19 @@ const SearchUI = ({ pipeline, tabsValidated, setTabsValidated, preferences, form
 };
 
 SearchUI.defaultProps = {
-	pipeline: '',
 	tabsValidated: {},
 	setTabsValidated: () => {},
 	preferences: {},
 	form: {},
+	pipeline: '',
 };
 
 SearchUI.propTypes = {
 	tabsValidated: object,
-	pipeline: string,
 	setTabsValidated: func,
 	preferences: object,
 	form: object,
+	pipeline: string,
 };
 
 export default SearchUI;

@@ -13,7 +13,7 @@ const CreateNew = ({ path, selectFile, active, onClick, depth, setNewFolder, new
 	const [value, setvalue] = useState('');
 
 	const { sandpack } = useSandpack();
-	const { sandpackCode, updateSandpackCode } = useContext(SandpackCodeContext);
+	const { sandpackCode, updateSandpackCode, themeType } = useContext(SandpackCodeContext);
 
 	const clickFile = () => {
 		if (selectFile) {
@@ -112,7 +112,7 @@ const CreateNew = ({ path, selectFile, active, onClick, depth, setNewFolder, new
 	);
 
 	return (
-		<div css={hoverStyles}>
+		<div className={hoverStyles(themeType)}>
 			<div
 				className="sp-button sp-explorer"
 				data-active={active}

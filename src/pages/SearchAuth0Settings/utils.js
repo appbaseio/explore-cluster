@@ -63,3 +63,28 @@ export const atleastOneCheckBoxValidator = (form) => {
 		  }
 		: null;
 };
+
+export const headersValidator = (control) => {
+	let headersObj = { invalidHeaders: false };
+	try {
+		if (!control.value) {
+			return null;
+		}
+		const validObj = JSON.parse(control.value);
+		// eslint-disable-next-line consistent-return
+		Object.keys(validObj).forEach((key) => {
+			if (typeof validObj[key] !== 'string')
+				headersObj = {
+					invalidHeaders: true,
+					message: 'Headers must have a valid key/value as strings',
+				};
+		});
+		return headersObj;
+	} catch (e) {
+		headersObj = {
+			invalidHeaders: true,
+			message: 'Headers must be a valid JSON object',
+		};
+		return headersObj;
+	}
+};

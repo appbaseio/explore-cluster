@@ -23,6 +23,12 @@ const APPS = {
 	DELETE_APP: 'DELETE_APP',
 };
 
+const ENDPOINTS = {
+	LOAD: 'ENDPOINTS_LOAD',
+	LOAD_SUCCESS: 'ENDPOINTS_LOAD_SUCCESS',
+	LOAD_FAIL: 'ENDPOINTS_LOAD_FAIL',
+};
+
 const CREATE_APP = {
 	LOAD: 'CREATING_APP',
 	LOAD_SUCCESS: 'CREATE_APP_SUCCESS',
@@ -56,6 +62,7 @@ const SIDE_BAR = {
 };
 
 const ALLOWED_ACTIONS = {
+	OVERVIEW: 'overview',
 	DEVELOP: 'develop',
 	ANALYTICS: 'analytics',
 	CURATED_INSIGHTS: 'curated-insights',
@@ -70,6 +77,7 @@ const ALLOWED_ACTIONS = {
 };
 
 const ALLOWED_ACTIONS_LABELS = {
+	[ALLOWED_ACTIONS.OVERVIEW]: 'Overview',
 	[ALLOWED_ACTIONS.DEVELOP]: 'Develop',
 	[ALLOWED_ACTIONS.ANALYTICS]: 'Analytics',
 	[ALLOWED_ACTIONS.CURATED_INSIGHTS]: 'Curated Insights',
@@ -107,6 +115,10 @@ const RANGE_FIELDS = [
 	'half_float',
 	'scaled_float',
 	'unsigned_long',
+	'pint',
+	'plong',
+	'pfloat',
+	'pdouble',
 ];
 
 const CALENDAR_INTERVAL_FIELDS = [
@@ -143,6 +155,7 @@ const CALENDAR_INTERVAL_FIELDS = [
 export {
 	USER,
 	APPS,
+	ENDPOINTS,
 	CREATE_APP,
 	STRIPE_KEY,
 	TYPE_FORM,

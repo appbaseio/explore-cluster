@@ -35,20 +35,26 @@ const data = [
 		key: '0',
 		name: (
 			<RowContent>
-				<div>Retain Analytics for greater than 30 days </div>
-				<StyledLink href="https://docs.appbase.io/docs/analytics/Overview/" target="_blank">
+				<div>Build Search UIs</div>
+				<StyledLink
+					href="https://docs.reactivesearch.io/docs/reactivesearch/ui-builder/search"
+					target="_blank"
+				>
 					Read more
 				</StyledLink>
 			</RowContent>
 		),
-		desc: 'Starter tier and above',
+		desc: 'Sandbox tier and above',
 	},
 	{
 		key: '1',
 		name: (
 			<RowContent>
-				<div>Search Relevancy</div>
-				<StyledLink href="https://docs.appbase.io/docs/search/relevancy/" target="_blank">
+				<div>Retain Analytics for greater than 30 days </div>
+				<StyledLink
+					href="https://docs.reactivesearch.io/docs/analytics/Overview/"
+					target="_blank"
+				>
 					Read more
 				</StyledLink>
 			</RowContent>
@@ -59,21 +65,24 @@ const data = [
 		key: '2',
 		name: (
 			<RowContent>
-				<div>Analytics with custom Events and API access</div>
-				<StyledLink href="https://docs.appbase.io/docs/analytics/Overview/" target="_blank">
+				<div>Search Relevancy</div>
+				<StyledLink
+					href="https://docs.reactivesearch.io/docs/search/relevancy/"
+					target="_blank"
+				>
 					Read more
 				</StyledLink>
 			</RowContent>
 		),
-		desc: 'Production-I tier and above',
+		desc: 'Starter tier and above',
 	},
 	{
 		key: '3',
 		name: (
 			<RowContent>
-				<div>Popular and Recent Suggestions</div>
+				<div>Analytics with custom Events and API access</div>
 				<StyledLink
-					href="https://docs.appbase.io/docs/analytics/popular-suggestions/"
+					href="https://docs.reactivesearch.io/docs/analytics/Overview/"
 					target="_blank"
 				>
 					Read more
@@ -86,9 +95,9 @@ const data = [
 		key: '4',
 		name: (
 			<RowContent>
-				<div>UI Builder</div>
+				<div>Popular and Recent Suggestions</div>
 				<StyledLink
-					href="https://docs.appbase.io/docs/reactivesearch/ui-builder/search"
+					href="https://docs.reactivesearch.io/docs/analytics/popular-suggestions/"
 					target="_blank"
 				>
 					Read more
@@ -101,8 +110,11 @@ const data = [
 		key: '5',
 		name: (
 			<RowContent>
-				<div>Query Rules</div>
-				<StyledLink href="https://docs.appbase.io/docs/search/Rules/" target="_blank">
+				<div>Search Pipelines</div>
+				<StyledLink
+					href="https://docs.reactivesearch.io/docs/pipelines/concepts/"
+					target="_blank"
+				>
 					Read more
 				</StyledLink>
 			</RowContent>
@@ -113,14 +125,29 @@ const data = [
 		key: '6',
 		name: (
 			<RowContent>
+				<div>Query Rules</div>
+				<StyledLink
+					href="https://docs.reactivesearch.io/docs/search/rules/"
+					target="_blank"
+				>
+					Read more
+				</StyledLink>
+			</RowContent>
+		),
+		desc: 'Production-I tier and above',
+	},
+	{
+		key: '7',
+		name: (
+			<RowContent>
 				<div>
 					<span role="img" aria-label="fast">
 						⚡️
 					</span>
-					&nbsp;Fast search with appbase.io cache
+					&nbsp;Fast search with ReactiveSearch cache
 				</div>
 				<StyledLink
-					href="https://docs.appbase.io/docs/speed/cache-management/"
+					href="https://docs.reactivesearch.io/docs/speed/cache-management/"
 					target="_blank"
 				>
 					Read more

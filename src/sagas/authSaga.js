@@ -1,23 +1,27 @@
 import { take, call, put } from 'redux-saga/effects';
 
 import { USER } from '../constants';
-import { getUser } from '../utils';
-import { setUser, loadApps, setUserError } from '../actions';
+import { setUser, loadApps, setUserError, loadEndpointsSuccess } from '../actions';
+import { getOriginURL, getUser, getEndpoints } from '../utils';
+import { getAppPlan } from '../batteries/utils/app';
 
 function* authWorker(username, password, url) {
 	try {
 		const user = yield call(getUser, username, password, url);
-		localStorage.setItem('url', url);
+		localStorage.setItem('url', getOriginURL(url));
 		localStorage.setItem('username', username);
 		localStorage.setItem('password', password);
 
 		localStorage.setItem('authToken', user.authToken);
 		localStorage.setItem('isAdmin', user.isAdmin);
 		localStorage.setItem('allowedActions', user.allowedActions);
-
+		const endpoints = yield call(getEndpoints);
+		yield put(loadEndpointsSuccess(endpoints));
 		// sessionStorage.setItem('isAdmin', user.isAdmin);
 		// sessionStorage.setItem('allowedActions', user.allowedActions);
 		yield put(setUser(user));
+		const appPlan = yield call(getAppPlan);
+		if (appPlan.image_type === 'sls') window.location.pathname = '/cluster/search-builder';
 		yield put(loadApps());
 	} catch (e) {
 		yield put(setUserError(e));

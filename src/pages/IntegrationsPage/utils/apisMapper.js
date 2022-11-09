@@ -92,6 +92,20 @@ const apisMapper = {
 			method: 'GET',
 		},
 	},
+	zinc: {
+		index: {
+			url: '/_indices',
+			method: 'GET',
+		},
+		schema: {
+			url: '/${index}/_schema',
+			method: 'GET',
+		},
+		search: {
+			url: '/_zinc/${index}/_reactivesearch',
+			method: 'POST',
+		},
+	},
 };
 
 export default apisMapper;

@@ -24,7 +24,7 @@ const bannerMessagesAnalytics = {
 		title: 'Recent Results',
 		description: 'Understand how to make the most of the recent results analytics.',
 		buttonText: 'Read Docs',
-		href: 'https://docs.appbase.io/docs/analytics/overview/#recent-results',
+		href: 'https://docs.reactivesearch.io/docs/analytics/overview/#recent-results',
 	},
 };
 

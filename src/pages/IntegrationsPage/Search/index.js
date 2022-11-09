@@ -21,7 +21,7 @@ const bannerDetailsPaid = {
 	description:
 		'Build a WYSIWYG storefront search preview that can be installed to your favorite E-Commerce platform.',
 	buttonText: 'Read Docs',
-	href: 'http://docs.appbase.io/docs/reactivesearch/ui-builder/search/',
+	href: 'http://docs.reactivesearch.io/docs/reactivesearch/ui-builder/search/',
 };
 
 const SearchIntegrationsPage = ({ tier, featureEcommerce }) => {

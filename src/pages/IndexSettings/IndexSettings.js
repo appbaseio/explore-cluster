@@ -32,7 +32,7 @@ import moment from '../../utils/moment';
 const bannerMessage = {
 	title: 'Index Settings',
 	buttonText: 'Read Docs',
-	href: 'https://docs.appbase.io/docs/search/relevancy/#index-settings',
+	href: 'https://docs.reactivesearch.io/docs/search/relevancy/#index-settings',
 	videoLink: 'https://youtu.be/oRIsIHkTN9Y',
 };
 

@@ -1,42 +1,57 @@
-import React, { useEffect, useState } from 'react';
-import { object, string } from 'prop-types';
+import React, { useEffect } from 'react';
+import { bool, func, object, string } from 'prop-types';
 import get from 'lodash/get';
 import { SandpackProvider } from '@codesandbox/sandpack-react';
+import { atomDark } from '@codesandbox/sandpack-themes';
+import { connect } from 'react-redux';
 import { transformContent } from './ExportInline/Components/ModalHeader';
 import SandpackPreviewContainer from './SandpackPreviewContainer';
 import ReactivesearchLoader from '../../components/ReactivesearchLoader/ReactivesearchLoader';
-import {
-	generateInlineSandboxURL,
-	getLatestVersion,
-	preferencesInConstants,
-} from './utils/sandpack-generator';
+import { generateInlineSandboxURL, preferencesInConstants } from './utils/sandpack-generator';
 import {
 	getTemplate,
 	removeEmpty,
 	transformPreferences,
 	transformResultsDefaultFields,
 } from './utils/index';
+import { getSearchPreferenceLatestVersionN } from '../../batteries/modules/actions';
+import AppConstants from '../../batteries/modules/constants';
 
-const SandpackModal = ({ preferences, preferenceId }) => {
-	const [sandpackCode, setSandpackCode] = useState({});
-	const [isLoading, setIsLoading] = useState(true);
-
+const SandpackModal = ({
+	preferences,
+	preferenceId,
+	getLatestVersionCode,
+	updateVersionStateForPreference,
+	versionState,
+	isLoading,
+}) => {
+	const { sandpackCode } = versionState[preferenceId] ?? {};
 	useEffect(() => {
-		fetchLatestVersion();
-	}, [preferences]);
+		if (!isLoading) fetchLatestVersion();
+	}, []);
 
 	const fetchLatestVersion = () => {
-		getLatestVersion(preferenceId)
-			.then(async (res) => {
-				if (res.content) {
-					const content = transformContent(res.content);
-					const newPreferences = removeEmpty({
-						...transformResultsDefaultFields(transformPreferences(preferences)),
-					});
-					const newContent = preferencesInConstants(content, newPreferences);
-					setSandpackCode(newContent);
-					setIsLoading(false);
+		getLatestVersionCode(preferenceId)
+			.then(async (response) => {
+				if (response.payload) {
+					const { res } = response.payload;
+					if (res.content) {
+						const content = transformContent(res.content);
+						const newPreferences = removeEmpty({
+							...transformResultsDefaultFields(transformPreferences(preferences)),
+						});
+						const newContent = preferencesInConstants(content, newPreferences);
+
+						updateVersionStateForPreference({
+							preferenceId,
+							patchPayload: {
+								sandpackCode: newContent,
+							},
+						});
+					}
+					if (res.error) getSandPackCode();
 				}
+				if (response.error) getSandPackCode();
 			})
 			.catch((err) => {
 				console.error('Error to fetch latest version', err);
@@ -49,8 +64,12 @@ const SandpackModal = ({ preferences, preferenceId }) => {
 			...transformResultsDefaultFields(transformPreferences(preferences)),
 		};
 		const response = await generateInlineSandboxURL(newPreferences);
-		setSandpackCode(response);
-		setIsLoading(false);
+		updateVersionStateForPreference({
+			preferenceId,
+			patchPayload: {
+				sandpackCode: response,
+			},
+		});
 	};
 
 	const pageSettings = get(preferences, 'pageSettings', {});
@@ -59,14 +78,19 @@ const SandpackModal = ({ preferences, preferenceId }) => {
 	const { currentPage } = pageSettings;
 	const route = templateObj.pages ? templateObj.pages[currentPage] || '/' : '/';
 
-	return isLoading ? (
+	return isLoading || !sandpackCode ? (
 		<ReactivesearchLoader />
 	) : (
 		<SandpackProvider
-			template="react"
-			customSetup={{ files: { ...sandpackCode } }}
+			files={{ ...sandpackCode }}
+			customSetup={{
+				entry: 'src/index.js',
+			}}
 			startRoute={route}
-			options={{ bundlerURL: 'https://sandpack-bundler.pages.dev' }}
+			options={{
+				startRoute: route,
+			}}
+			theme={atomDark}
 		>
 			<SandpackPreviewContainer />
 		</SandpackProvider>
@@ -76,10 +100,31 @@ const SandpackModal = ({ preferences, preferenceId }) => {
 SandpackModal.propTypes = {
 	preferences: object.isRequired,
 	preferenceId: string,
+	updateVersionStateForPreference: func.isRequired,
+	getLatestVersionCode: func.isRequired,
+	versionState: object.isRequired,
+	isLoading: bool.isRequired,
 };
 
 SandpackModal.defaultProps = {
 	preferenceId: '',
 };
 
-export default SandpackModal;
+const mapStateToProps = (state) => {
+	return {
+		versionState: get(state, '$getSearchPreferencesVersionsN.results', {}),
+		isLoading: get(state, '$getSearchPreferencesVersionsN.isLoading', false),
+	};
+};
+const mapDispatchToProps = (dispatch) => ({
+	getLatestVersionCode: (preferenceId) =>
+		dispatch(getSearchPreferenceLatestVersionN(preferenceId)),
+	updateVersionStateForPreference: (payload) =>
+		dispatch({
+			type: AppConstants.APP.UI_BUILDERN.SEARCH_PREFERENCE_VERSIONS
+				.UPDATE_PREFERENCE_STATE_SUCCESS,
+			payload,
+		}),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(SandpackModal);

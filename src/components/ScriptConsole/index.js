@@ -331,7 +331,7 @@ const getTooltipTitle = {
 				</tbody>
 			</table>
 			<a
-				href="https://docs.appbase.io/docs/search/scripts/gettingstarted"
+				href="https://docs.reactivesearch.io/docs/search/scripts/gettingstarted"
 				target="_blank"
 				rel="noreferrer"
 			>

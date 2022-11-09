@@ -71,7 +71,6 @@ class GlobalSearch extends PureComponent {
 					showDistinctSuggestions
 					onChange={this.handleSearchValueChange}
 					value={searchValue}
-					// onKeyDown={onKeyDown}
 					onValueSelected={(value, cause, source) => {
 						if (source) {
 							onValueSelected(value, cause, source);

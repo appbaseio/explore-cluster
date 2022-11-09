@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Select, Form, Tag, Tooltip } from 'antd';
-import { array, func, object } from 'prop-types';
+import { Button, Select, Tag, Tooltip } from 'antd';
+import { array, func, object, string } from 'prop-types';
 import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
@@ -9,16 +9,19 @@ import { FieldGroup, FieldControl } from 'react-reactive-form';
 import { createPermission, getPermission } from '../../../../../batteries/modules/actions';
 import ErrorToaster from '../../../../../batteries/components/shared/ErrorToaster';
 import CreateCredentials from '../../../../../components/CreateCredentials';
-
 import { configureConnectionStyles, suggestionStyles } from '../styles';
+import EndpointDropdown from '../../../Endpoint/EndpointDropdown';
+import { BACKENDS } from '../../../../../batteries/utils';
 
 const ConfigureConnection = ({
 	tabsValidated,
 	setTabsValidated,
-	apps,
 	permissions,
 	handleCreatePermission,
 	fetchPermissions,
+	control,
+	backend,
+	formValue,
 }) => {
 	const [showForm, setShowForm] = useState(false);
 	const [currentPermissionInfo, setCurrentPermissionInfo] = useState(undefined);
@@ -27,6 +30,34 @@ const ConfigureConnection = ({
 	useEffect(() => {
 		fetchPermissions();
 	}, []);
+
+	useEffect(() => {
+		if (
+			!tabsValidated.tab2 &&
+			formValue.app &&
+			backend === BACKENDS.FUSION.name &&
+			formValue.exportSettings.credentials
+		) {
+			setTabsValidated({
+				...tabsValidated,
+				tab2: true,
+			});
+		}
+	}, [formValue?.app, formValue.exportSettings]);
+
+	useEffect(() => {
+		if (
+			!tabsValidated.tab2 &&
+			formValue.pipeline &&
+			backend !== BACKENDS.FUSION.name &&
+			formValue.exportSettings.credentials
+		) {
+			setTabsValidated({
+				...tabsValidated,
+				tab2: true,
+			});
+		}
+	}, [formValue?.pipeline, formValue.exportSettings]);
 
 	// eslint-disable-next-line
 	const handleSubmit = (form, username) => {
@@ -47,7 +78,6 @@ const ConfigureConnection = ({
 		setMode('create');
 	};
 
-	const filteredApps = Object.keys(apps).filter((app) => !app.startsWith('.'));
 	const sortedByUpdatedAt = orderBy(
 		permissions,
 		(a) => {
@@ -59,7 +89,7 @@ const ConfigureConnection = ({
 	);
 
 	return (
-		<div css={configureConnectionStyles}>
+		<div className={configureConnectionStyles}>
 			<div className="description-container">
 				Configure the data source and default security for your search app.
 			</div>
@@ -69,44 +99,15 @@ const ConfigureConnection = ({
 					A search engine backend is configured using a pipeline. You can choose an
 					existing pipeline, you can also change or configure this later.
 				</div>
-				<FieldControl name="pipeline">
-					{({ value, onChange }) => (
-						<Form.Item
-							style={{
-								margin: 0,
-								padding: 0,
-							}}
-							required
-						>
-							<Select
-								value={value || undefined}
-								showSearch
-								placeholder="Choose your pipeline"
-								style={{
-									minWidth: 300,
-								}}
-								onSelect={(val) => {
-									onChange(val);
-									setTabsValidated({
-										...tabsValidated,
-										tab2: true,
-									});
-								}}
-							>
-								{(filteredApps || [])
-									.filter((k) => !k.includes('metricbeat'))
-									.map((k) => (
-										<Select.Option key={k}>{k}</Select.Option>
-									))}
-							</Select>
-						</Form.Item>
-					)}
-				</FieldControl>
+				<EndpointDropdown form={control} formValue={formValue} isWizard />
 			</div>
 			<div className="field-container">
-				<div className="heading">Default Security</div>
+				<div className="heading">
+					<span className="required-color">*</span> Default Security
+				</div>
 				<div className="field-description">
-					Configure the default security that your app will use.
+					Configure the default security that Search UI will use for connecting to the
+					ReactiveSearch API server.
 				</div>
 
 				<FieldGroup name="exportSettings" strict={false}>
@@ -136,6 +137,13 @@ const ConfigureConnection = ({
 											optionLabelProp="value"
 											onSelect={(val) => {
 												onChange(val);
+												control
+													.get('headers')
+													.setValue(
+														`{"Authorization":"Basic ${btoa(
+															val || '',
+														)}"}`,
+													);
 											}}
 											optionFilterProp="children"
 											filterOption={(input, option) =>
@@ -156,7 +164,7 @@ const ConfigureConnection = ({
 														value={`${permission.username}:${permission.password}`}
 														title={permission.description}
 													>
-														<div css={suggestionStyles}>
+														<div className={suggestionStyles}>
 															<div className="row-data">
 																<div
 																	className="overflow"
@@ -175,7 +183,12 @@ const ConfigureConnection = ({
 																		{permission.description}
 																	</Tooltip>
 																</div>
-																<Tag>{permission.ops[0]}</Tag>
+																<Tag>
+																	{permission.ops[0]}{' '}
+																	{permission.ops[1]
+																		? `& ${permission.ops[1]}`
+																		: ''}
+																</Tag>
 															</div>
 															<div className="row-data">
 																<Button
@@ -222,34 +235,37 @@ const ConfigureConnection = ({
 					handleCancel={() => handleCancel()}
 					initialValues={currentPermissionInfo}
 					readOnly={mode !== 'create'}
+					backend={backend}
 				/>
 			</ErrorToaster>
 		</div>
-		// 	)}
-		// </FieldGroup>
 	);
 };
 
 ConfigureConnection.defaultProps = {
-	apps: {},
 	tabsValidated: {},
 	setTabsValidated: () => {},
+	backend: BACKENDS.ELASTICSEARCH.name,
+	formValue: {},
 };
 
 ConfigureConnection.propTypes = {
-	apps: object,
 	tabsValidated: object,
 	permissions: array.isRequired,
 	handleCreatePermission: func.isRequired,
 	fetchPermissions: func.isRequired,
 	setTabsValidated: func,
+	control: object.isRequired,
+	backend: string,
+	formValue: object,
 };
 
 const mapStateToProps = (state) => {
 	const appPermissions = get(state, '$getAppPermissions.results.default');
+	const backend = get(state, '$getAppPlan.results.backend');
 	return {
-		apps: get(state, 'apps.data'),
 		permissions: get(appPermissions, 'results', []),
+		backend,
 	};
 };
 

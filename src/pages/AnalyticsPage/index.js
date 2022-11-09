@@ -33,7 +33,7 @@ const bannerMessagesAnalytics = {
 			'See our docs on how to track search, filters, click events, conversions and add your own custom events.',
 		buttonText: 'Read Docs',
 		videoLink: 'https://youtu.be/cjGSWj9LehM',
-		href: 'https://docs.appbase.io/docs/analytics/Overview/#getting-insights-from-analytics',
+		href: 'https://docs.reactivesearch.io/docs/analytics/Overview/#getting-insights-from-analytics',
 	},
 };
 

@@ -3,7 +3,7 @@ import { Modal } from 'antd';
 import { any, arrayOf, bool, func, object, shape, string } from 'prop-types';
 import FunctionEditor, { FUNCTION_EDITOR_TABS_KEYS } from './FunctionEditor';
 
-function CodeEditorModal({ visible, onSave, onCancel, width, slot, ...props }) {
+function CodeEditorModal({ visible, onSave, onCancel, width, slot, header, ...props }) {
 	const [code, setCode] = useState('');
 	return (
 		<Modal
@@ -13,6 +13,7 @@ function CodeEditorModal({ visible, onSave, onCancel, width, slot, ...props }) {
 			okText="Save"
 			width={width}
 			bodyStyle={{ paddingTop: 50 }}
+			title={header}
 		>
 			<FunctionEditor
 				openAsModal={false}
@@ -37,6 +38,7 @@ CodeEditorModal.defaultProps = {
 	width: '90%',
 	slot: null,
 	additionalControlledTabs: [],
+	header: null,
 };
 
 CodeEditorModal.propTypes = {
@@ -49,6 +51,7 @@ CodeEditorModal.propTypes = {
 	customFunctionExecutor: func,
 	slot: any,
 	additionalControlledTabs: arrayOf(shape({ label: string, value: string, onChange: func })),
+	header: any,
 };
 
 export default CodeEditorModal;

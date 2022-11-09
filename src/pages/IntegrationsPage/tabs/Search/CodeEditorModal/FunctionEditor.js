@@ -324,7 +324,7 @@ const FunctionEditor = ({
 	const selectedValue = parsedExecutionContext && parsedExecutionContext[0];
 
 	return (
-		<div css={container}>
+		<div className={container}>
 			{showSaveFunctionButton && (
 				<Button
 					className="save-btn"
@@ -579,7 +579,6 @@ const FunctionEditor = ({
 					)}
 				</Tabs>
 			</Flex>
-
 			<div ref={saveButtonRef} />
 		</div>
 	);

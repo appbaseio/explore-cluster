@@ -140,7 +140,7 @@ class ImporterPage extends React.Component {
 										Want to use other sources like MongoDB or 3rd party APIs?
 										Read the{' '}
 										<a
-											href="https://docs.appbase.io/docs/data/Import/"
+											href="https://docs.reactivesearch.io/docs/data/Import/"
 											target="_blank"
 											rel="noopener noreferrer"
 										>

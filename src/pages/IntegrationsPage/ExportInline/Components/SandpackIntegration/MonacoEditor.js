@@ -1,16 +1,18 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import Editor from '@monaco-editor/react';
 import { useActiveCode, SandpackStack, FileTabs, useSandpack } from '@codesandbox/sandpack-react';
-import '@codesandbox/sandpack-react/dist/index.css';
 import { func, number, object, string } from 'prop-types';
 import { css } from 'emotion';
 import { Button } from 'antd';
+// eslint-disable-next-line
+import { SandpackCodeContext } from '../..';
+import '../sandpack-css.css';
 
 const MonacoEditor = ({ iframeHeight, highlightLine, path, setOpenCommitModal, setSearchType }) => {
 	const { code, updateCode } = useActiveCode();
 	const [isImage, setIsImage] = useState(false);
 	const [updatedCode, setUpdatedCode] = useState(code);
-
+	const { themeType } = useContext(SandpackCodeContext);
 	const editorRef = useRef(null);
 	const { sandpack } = useSandpack();
 
@@ -123,10 +125,11 @@ const MonacoEditor = ({ iframeHeight, highlightLine, path, setOpenCommitModal, s
 
 	const renderImage = (value = '') => {
 		if (
-			path.includes('.ico') ||
-			path.includes('.png') ||
-			path.includes('.jpg') ||
-			path.includes('.jpeg')
+			path &&
+			(path.includes('.ico') ||
+				path.includes('.png') ||
+				path.includes('.jpg') ||
+				path.includes('.jpeg'))
 		) {
 			if (value || code) {
 				const image = new Image();
@@ -146,7 +149,14 @@ const MonacoEditor = ({ iframeHeight, highlightLine, path, setOpenCommitModal, s
 	};
 
 	return (
-		<SandpackStack customStyle={{ height: `${iframeHeight}px`, margin: 0, minWidth: 150 }}>
+		<SandpackStack
+			style={{
+				height: `${iframeHeight}px`,
+				margin: 0,
+				minWidth: 150,
+				border: 'rgb(52, 52, 52)',
+			}}
+		>
 			<FileTabs showTabs showLineNumbers showInlineErrors wrapContent={false} closableTabs />
 			<div style={{ flex: 1 }}>
 				{isImage ? (
@@ -180,7 +190,7 @@ const MonacoEditor = ({ iframeHeight, highlightLine, path, setOpenCommitModal, s
 						width="100%"
 						height="100%"
 						language="javascript"
-						theme="light"
+						theme={themeType === 'dark' ? 'vs-dark' : 'light'}
 						key={sandpack.activePath}
 						defaultValue={code}
 						value={updatedCode}

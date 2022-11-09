@@ -13,10 +13,10 @@ class ErrorPage extends React.Component {
 	eventId = null;
 
 	componentDidMount() {
-		window.addEventListener('error', event => {
-            const errorId = Sentry.lastEventId();
-            this.eventId = errorId;
-        });
+		window.addEventListener('error', () => {
+			const errorId = Sentry.lastEventId();
+			this.eventId = errorId;
+		});
 	}
 
 	componentDidUpdate(prevProps) {
@@ -46,7 +46,7 @@ class ErrorPage extends React.Component {
 		const { children, user } = this.props; // eslint-disable-line
 		return error ? (
 			<section
-				css={{
+				style={{
 					justifyContent: 'center',
 					alignItems: 'center',
 					display: 'flex',
@@ -58,7 +58,7 @@ class ErrorPage extends React.Component {
 				<h2>Something went wrong!</h2>
 				<p>Our team has been notified about this.</p>
 				<section
-					css={{
+					style={{
 						display: 'flex',
 					}}
 				>
@@ -69,7 +69,7 @@ class ErrorPage extends React.Component {
 					<Button
 						size="large"
 						type="danger"
-						css={{ marginLeft: '8' }}
+						style={{ marginLeft: '8' }}
 						onClick={() => {
 							Sentry.showReportDialog();
 						}}

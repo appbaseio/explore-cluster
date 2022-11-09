@@ -23,7 +23,7 @@ import {
 	defaultRecommendationsPreferences,
 	getDiffDataAndCount,
 } from './utils';
-import { removeEmpty, reOrderPreferences } from './utils/index';
+import { removeEmpty, reOrderPreferences, transformPreferences } from './utils/index';
 import ReviewAndSave from './ReviewAndSave';
 
 class SavePreferencesN extends React.Component {
@@ -100,7 +100,6 @@ class SavePreferencesN extends React.Component {
 			updateRecommendationsPreferences(getPreferencesPayload()).then((action) => {
 				if (!(action && action.error)) {
 					getRecommendationsPreferences();
-					// closeForm();
 				}
 			});
 		} else {
@@ -122,6 +121,7 @@ class SavePreferencesN extends React.Component {
 	getOldDataNewData = () => {
 		const { form, getPreferencesPayload } = this.props;
 		const { preferences } = this.state || {};
+		const formStatePrefs = { ...getPreferencesPayload() };
 		const oldData = {
 			general: reOrderPreferences(
 				preferences,
@@ -129,13 +129,12 @@ class SavePreferencesN extends React.Component {
 			),
 		};
 		const newData = {
-			general: getPreferencesPayload(),
+			general: formStatePrefs,
 		};
 		Object.keys(get(form.value, 'pageSettings.pages', '')).forEach((pageKey) => {
 			oldData[pageKey] = reOrderPreferences(preferences, pageKey);
-			newData[pageKey] = reOrderPreferences(getPreferencesPayload(), pageKey);
+			newData[pageKey] = reOrderPreferences(transformPreferences(formStatePrefs), pageKey);
 		});
-
 		return { oldData, newData };
 	};
 
@@ -151,8 +150,10 @@ class SavePreferencesN extends React.Component {
 			getPreferencesPayload,
 			getPreferences,
 			closeForm,
+			remountComponent,
 		} = this.props;
 		const { oldData, newData } = this.getOldDataNewData();
+
 		return (
 			<>
 				<Prompt
@@ -174,6 +175,7 @@ class SavePreferencesN extends React.Component {
 					getPreferencesPayload={getPreferencesPayload}
 					getPreferences={getPreferences}
 					form={form}
+					remountComponent={remountComponent}
 				/>
 			</>
 		);
@@ -210,6 +212,7 @@ SavePreferencesN.propTypes = {
 	errors: arrayOf(object),
 	closeForm: func.isRequired,
 	clientId: string,
+	remountComponent: func.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({

@@ -118,7 +118,7 @@ class StoredQueries extends React.Component {
 				showGoBack: true,
 				goBackText: 'Go back to Stored Queries',
 				onClickGoBack: () => this.toggleCreateMode(),
-				href: 'https://docs.appbase.io/docs/data/stored-queries/',
+				href: 'https://docs.reactivesearch.io/docs/data/stored-queries/',
 			},
 			edit: {
 				title: 'Edit Stored Query',
@@ -126,7 +126,7 @@ class StoredQueries extends React.Component {
 				showGoBack: true,
 				goBackText: 'Go back to Stored Queries',
 				onClickGoBack: () => this.toggleEditMode(),
-				href: 'https://docs.appbase.io/docs/data/stored-queries/',
+				href: 'https://docs.reactivesearch.io/docs/data/stored-queries/',
 			},
 		};
 	}

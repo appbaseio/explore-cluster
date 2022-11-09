@@ -8,6 +8,7 @@ import isEqual from 'lodash/isEqual';
 import { isEqualWith } from 'lodash';
 // eslint-disable-next-line import/no-cycle
 import { removeEmpty } from './utils/index';
+import { BACKENDS } from '../../batteries/utils';
 
 // eslint-disable-next-line
 export const FormContext = React.createContext(null);
@@ -29,6 +30,17 @@ export const verticalTab = css`
 		padding-right: 0 !important;
 	}
 `;
+
+export const fontWeights = [
+	{ label: '100 - Thin', value: 100 },
+	{ label: '200 - Extra Light', value: 200 },
+	{ label: '300 - Light', value: 300 },
+	{ label: '400 - Normal', value: 400 },
+	{ label: '500 - Medium', value: 500 },
+	{ label: '600 - Semi Bold', value: 600 },
+	{ label: '700 - Bold', value: 700 },
+	{ label: '800 - Extra Bold', value: 800 },
+];
 
 export const currencies = [
 	{ cc: 'AED', symbol: '\u062f.\u0625;', name: 'UAE dirham' },
@@ -197,8 +209,10 @@ export const currencies = [
 	{ cc: 'ZWR', symbol: 'Z$', name: 'Zimbabwean dollar' },
 ];
 
-export const BaseURL = 'https://appbase-ecomm.netlify.app/static/js/main.js';
-export const BaseCSSURL = 'https://appbase-ecomm.netlify.app/static/css/main.css';
+export const BaseURL =
+	'https://62a8120ef6db26000970a18e--appbase-ecomm.netlify.app/static/js/main.js';
+export const BaseCSSURL =
+	'https://62a8120ef6db26000970a18e--appbase-ecomm.netlify.app/static/css/main.css';
 
 export const getInstallationScript = (preferences = {}, credentials) => `
 <script>var APPBASE_SEARCH_PREFERENCES=${JSON.stringify(
@@ -373,6 +387,7 @@ export const filterConfigurationFormDefaultFields = (fields = {}, returnType = '
 			startLabel: undefined,
 			endLabel: undefined,
 			showHistogram: false,
+			calendarInterval: undefined,
 			componentType: componentTypes.rangeInput,
 		},
 		DYNAMICRANGESLIDER: {
@@ -381,6 +396,7 @@ export const filterConfigurationFormDefaultFields = (fields = {}, returnType = '
 			filterLabel: undefined,
 			filterType: 'range',
 			showHistogram: false,
+			calendarInterval: undefined,
 			componentType: componentTypes.dynamicRangeSlider,
 		},
 		TAGCLOUD: {
@@ -393,6 +409,7 @@ export const filterConfigurationFormDefaultFields = (fields = {}, returnType = '
 			componentType: componentTypes.tagCloud,
 			showCount: true,
 			multiSelect: false,
+			sortBy: 'count',
 		},
 		TABDATALIST: {
 			title: undefined,
@@ -405,6 +422,7 @@ export const filterConfigurationFormDefaultFields = (fields = {}, returnType = '
 			displayAsVertical: false,
 			showRadio: false,
 			showSearch: true,
+			selectAllLabel: undefined,
 		},
 		customize: {
 			title: undefined,
@@ -540,7 +558,7 @@ export const shopifyDefaultFields = {
 
 export const getMultiListProps = (values) => {
 	let obj = {};
-	if (values.filterType === 'range') {
+	if (values.filterType === 'range' || values.filterType === 'date') {
 		if (values.startValue && values.endValue) {
 			obj = {
 				componentType: componentTypes.rangeInput,
@@ -638,7 +656,7 @@ export const defaultRecommendationsPreferences = {
 	pipeline: '',
 	id: '',
 	logoUrl: '',
-	logoWidth: 20,
+	logoWidth: 200,
 	logoAlignment: 'left',
 	themeType: 'classic',
 	primaryColor: '#0B6AFF',
@@ -653,6 +671,7 @@ export const defaultRecommendationsPreferences = {
 	priceUnit: undefined,
 	resultImage: '',
 	resultHandle: '',
+	resultHandleViewer: 'link',
 	storeInfo: { currency: 'USD' },
 	exportSettings: { exportAs: 'embed', credentials: '', openAsPage: false, type: 'other' },
 	ctaTitle: 'View Product',
@@ -664,10 +683,18 @@ export const defaultSearchPreferences = {
 	name: '',
 	description: '',
 	pipeline: '',
+	app: '',
+	profile: '',
+	searchProfile: '',
+	sponsoredProfile: '',
+	url: '',
+	method: 'POST',
+	headers: '',
+	backend: BACKENDS.ELASTICSEARCH.name,
 	id: '',
 	currentPage: '',
 	logoUrl: '',
-	logoWidth: 20,
+	logoWidth: 200,
 	logoAlignment: 'left',
 	versionId: '',
 	themeType: 'classic',
@@ -676,15 +703,21 @@ export const defaultSearchPreferences = {
 	textColor: '#424242',
 	titleColor: '#424242',
 	fontFamily: 'default',
+	fontWeight: 400,
+	bodyBackgroundColor: '#fff',
+	navbarBackgroundColor: '#001628',
+	linkColor: '#3eb0ef',
 	customCss: '',
 	resultTitle: '',
 	resultDescription: '',
 	resultPrice: '',
 	priceUnit: null,
+	metaDataFields: [],
 	cssSelector: '',
 	sortOptionSelector: [],
 	resultImage: '',
 	resultHandle: '',
+	resultHandleViewer: 'link',
 	layout: 'grid',
 	resultHighlight: false,
 	viewSwitcher: true,
@@ -708,10 +741,11 @@ export const defaultSearchPreferences = {
 		fetchingFilterOptions: 'Fetching Options',
 		searchText: 'Click here to search',
 		searchIcon: '',
-		redirectUrlText: 'View Product',
+		redirectUrlText: 'Open URL',
 		redirectUrlIcon: '',
 	},
 	autosuggest: true,
+	showSearchAs: 'sticky',
 	showVoiceSearch: true,
 	autoSuggestionSettings: {
 		enablePopularSuggestions: false,
@@ -829,6 +863,27 @@ export const defaultSearchPreferences = {
 	},
 };
 
+function getMetaDataFields(meta) {
+	const newMeta = {};
+	if (Array.isArray(meta || [])) {
+		(meta || []).forEach((obj) => {
+			newMeta[obj.label] = {
+				dataField: obj.dataField,
+				highlight: obj.highlight,
+			};
+		});
+	} else if (meta && typeof meta === 'object' && meta.label) {
+		newMeta[meta.label] = {
+			dataField: meta.dataField,
+			highlight: meta.highlight,
+		};
+	} else if (meta && typeof meta === 'string') {
+		return getMetaDataFields(JSON.parse(meta));
+	}
+
+	return newMeta;
+}
+
 export const getRecommendationPreferencesPayload = (formValue) => {
 	return JSON.parse(
 		JSON.stringify({
@@ -871,6 +926,7 @@ export const getRecommendationPreferencesPayload = (formValue) => {
 					priceUnit: get(formValue, 'priceUnit'),
 					image: get(formValue, 'resultImage'),
 					handle: get(formValue, 'resultHandle'),
+					handleViewer: get(formValue, 'resultHandleViewer'),
 				},
 				customMessages: {
 					resultStats: '',
@@ -938,14 +994,21 @@ export const getSearchPreferencesPayload = (formValue) => {
 			priceUnit: get(displayFields[key], 'priceUnit'),
 			image: get(displayFields[key], 'resultImage'),
 			handle: get(displayFields[key], 'resultHandle'),
+			handleViewer: get(displayFields[key], 'resultHandleViewer'),
+			userDefinedFields: getMetaDataFields(get(displayFields[key], 'metaDataFields')),
 			cssSelector: get(displayFields[key], 'cssSelector'),
 		};
 	});
+
 	return JSON.parse(
 		JSON.stringify({
 			name: get(formValue, 'name'),
 			description: get(formValue, 'description'),
 			pipeline: get(formValue, 'pipeline'),
+			...(get(formValue, 'backend') === BACKENDS.FUSION.name && {
+				pipeline: '_fusion',
+			}),
+			backend: get(formValue, 'backend'),
 			id: get(formValue, 'id'),
 			pageSettings: {
 				currentPage: get(formValue, 'currentPage'),
@@ -966,6 +1029,12 @@ export const getSearchPreferencesPayload = (formValue) => {
 						fontFamily: get(formValue, 'fontFamily'),
 					},
 				},
+				meta: {
+					bodyBackgroundColor: get(formValue, 'bodyBackgroundColor'),
+					navbarBackgroundColor: get(formValue, 'navbarBackgroundColor'),
+					linkColor: get(formValue, 'linkColor'),
+					fontWeight: get(formValue, 'fontWeight'),
+				},
 			},
 			globalSettings: {
 				currency: get(formValue, 'storeInfo.currency'),
@@ -980,6 +1049,11 @@ export const getSearchPreferencesPayload = (formValue) => {
 						versionId: get(formValue, 'versionId'),
 					},
 				},
+				endpoint: {
+					url: get(formValue, 'url'),
+					method: get(formValue, 'method'),
+					headers: get(formValue, 'headers'),
+				},
 			},
 			exportSettings: get(formValue, 'exportSettings'),
 			resultSettings: {
@@ -990,6 +1064,8 @@ export const getSearchPreferencesPayload = (formValue) => {
 					priceUnit: get(formValue, 'priceUnit'),
 					image: get(formValue, 'resultImage'),
 					handle: get(formValue, 'resultHandle'),
+					handleViewer: get(formValue, 'resultHandleViewer'),
+					userDefinedFields: getMetaDataFields(get(formValue, 'metaDataFields')),
 					cssSelector: get(formValue, 'cssSelector'),
 				},
 				customMessages: {
@@ -1033,6 +1109,7 @@ export const getSearchPreferencesPayload = (formValue) => {
 				},
 				redirectUrlText: get(formValue, 'customMessages.redirectUrlText'),
 				redirectUrlIcon: get(formValue, 'customMessages.redirectUrlIcon'),
+				showSearchAs: get(formValue, 'showSearchAs'),
 				fields: {
 					title: get(formValue, 'resultTitle'),
 					description: get(formValue, 'resultDescription'),
@@ -1040,6 +1117,8 @@ export const getSearchPreferencesPayload = (formValue) => {
 					priceUnit: get(formValue, 'priceUnit'),
 					image: get(formValue, 'resultImage'),
 					handle: get(formValue, 'resultHandle'),
+					handleViewer: get(formValue, 'resultHandleViewer'),
+					userDefinedFields: getMetaDataFields(get(formValue, 'metaDataFields')),
 					cssSelector: get(formValue, 'cssSelector'),
 				},
 				rsConfig: {
@@ -1077,7 +1156,6 @@ export const getSearchPreferencesPayload = (formValue) => {
 			chartSettings: {
 				charts: get(formValue, 'charts', []).map((chart, idx) => ({
 					enabled: chart.enabled,
-					// componentType: componentTypes.reactiveChart,
 					rsConfig: {
 						componentId: `${get(chart, 'customize.title')?.replace(' ', '_')}_${idx}`,
 						componentType: componentTypes.reactiveChart,
@@ -1089,11 +1167,20 @@ export const getSearchPreferencesPayload = (formValue) => {
 				get(formValue, 'exportSettings.type') === 'shopify'
 					? get(formValue, 'syncSettings')
 					: null,
+			...(get(formValue, 'backend') === BACKENDS.FUSION.name && {
+				fusionSettings: {
+					app: get(formValue, 'app'),
+					profile: get(formValue, 'profile'),
+					searchProfile: get(formValue, 'searchProfile'),
+				},
+			}),
 			authenticationSettings: {
 				...get(formValue, 'authenticationSettings'),
 			},
 			indexSettings: {
 				index: get(formValue, 'indexSettings.index'),
+				fusionSettings: get(formValue, 'indexSettings.fusionSettings'),
+				endpoint: get(formValue, 'indexSettings.endpoint'),
 			},
 		}),
 	);
@@ -1189,7 +1276,7 @@ export const rsConfigMapper = {
 		'multiSelect',
 		'aggregationSize',
 		'size',
-
+		'sortBy',
 		'defaultQuery',
 		'customQuery',
 	],
@@ -1224,6 +1311,7 @@ export const rsConfigMapper = {
 		'showSearch',
 		'displayAsVertical',
 		'data',
+		'selectAllLabel',
 	],
 };
 
@@ -1282,10 +1370,13 @@ const transformRSConfig = (config) => {
 			};
 		}
 	}
+	if (rsConfig.componentType === componentTypes.tabDataList) {
+		newRsConfig.data = rsConfig.data.filter((o) => o.label);
+	}
+
 	return newRsConfig;
 };
 
-// 'filterType',
 export const transformFacets = (facetPrefs) => {
 	if (facetPrefs.rsConfig) {
 		const { rsConfig } = facetPrefs;
@@ -1311,6 +1402,8 @@ export const perPageDependentKeys = [
 	'priceUnit',
 	'resultImage',
 	'resultHandle',
+	'resultHandleViewer',
+	'metaDataFields',
 	'cssSelector',
 	'customMessages',
 	'showPagination',
@@ -1334,6 +1427,25 @@ export const perPageDependentKeys = [
 	'showVoiceSearch',
 	'indexSettings',
 ];
+
+const getDiffFieldsFromObject = (diffData, field, oldObj, newObj) => {
+	const oldKeys = Object.keys(get(oldObj, field, {}) || {});
+	const newKeys = Object.keys(get(newObj, field, {}) || {});
+
+	let newDiffData = {};
+	[...oldKeys, ...newKeys].forEach((key) => {
+		const newVal = get(newObj, `${field}.${key}`, '');
+		const oldVal = get(oldObj, `${field}.${key}`, '');
+
+		if ((oldVal || newVal) && !isEqual(oldVal, newVal))
+			newDiffData = {
+				...newDiffData,
+				[key]: [oldVal, newVal],
+			};
+	});
+
+	return newDiffData;
+};
 
 // For review and save diff data
 export const staticFacetsFields = [
@@ -1361,6 +1473,7 @@ const flattenObject = (obj) => {
 
 export const getDiffData = (oldObj, newObj, isPageLevelDiff = false, isRecommendation) => {
 	let diffData = diff(removeEmpty({ ...oldObj }), removeEmpty({ ...newObj }));
+
 	if (!diffData) {
 		return [0, {}];
 	}
@@ -1451,6 +1564,26 @@ export const getDiffData = (oldObj, newObj, isPageLevelDiff = false, isRecommend
 			};
 		}
 
+		if (get(diffData, 'globalSettings.endpoint', null)) {
+			const newVal = get(newObj, 'globalSettings.endpoint', '');
+			const oldVal = get(oldObj, 'globalSettings.endpoint', '');
+
+			if (!isEqualWith(oldVal, newVal)) {
+				diffData = {
+					...diffData,
+					generalSettings: {
+						...diffData.generalSettings,
+						...getDiffFieldsFromObject(
+							get(diffData, `globalSettings.endpoint `, {}),
+							`globalSettings.endpoint`,
+							oldObj,
+							newObj,
+						),
+					},
+				};
+			}
+		}
+
 		if (get(diffData, 'themeSettings.type', null)) {
 			const newVal = get(newObj, 'themeSettings.type', '');
 			const oldVal = get(oldObj, 'themeSettings.type', '');
@@ -1475,16 +1608,28 @@ export const getDiffData = (oldObj, newObj, isPageLevelDiff = false, isRecommend
 			};
 		}
 
-		if (get(diffData, 'themeSettings.rsConfig', null)) {
-			const newVal = get(newObj, 'themeSettings.rsConfig', '');
-			const oldVal = get(oldObj, 'themeSettings.rsConfig', '');
-			diffData = {
-				...diffData,
-				layoutAndDesign: {
-					...diffData.layoutAndDesign,
-					stylePresets: [oldVal, newVal],
-				},
-			};
+		if (get(diffData, 'themeSettings', null)) {
+			const newRsConfig = get(newObj, 'themeSettings.rsConfig', {});
+			const oldRsConfig = get(oldObj, 'themeSettings.rsConfig', {});
+			const newMeta = get(newObj, 'themeSettings.meta', {});
+			const oldMeta = get(oldObj, 'themeSettings.meta', {});
+			const newVal = { rsConfig: newRsConfig, meta: newMeta };
+			const oldVal = { rsConfig: oldRsConfig, meta: oldMeta };
+			try {
+				// For below to work objects must contain only properties and no methods.
+				const isObjectSame = JSON.stringify(newVal) === JSON.stringify(oldVal);
+				if (!isObjectSame) {
+					diffData = {
+						...diffData,
+						layoutAndDesign: {
+							...diffData.layoutAndDesign,
+							stylePresets: [oldVal, newVal],
+						},
+					};
+				}
+			} catch (e) {
+				// Silence error
+			}
 		}
 
 		if (get(diffData, 'themeSettings.customCss', null)) {
@@ -1559,6 +1704,20 @@ export const getDiffData = (oldObj, newObj, isPageLevelDiff = false, isRecommend
 			};
 		}
 
+		if (get(diffData, 'fusionSettings', null)) {
+			diffData = {
+				...diffData,
+				fusionSettings: {
+					...getDiffFieldsFromObject(
+						get(diffData, 'fusionSettings', {}),
+						'fusionSettings',
+						oldObj,
+						newObj,
+					),
+				},
+			};
+		}
+
 		if (isRecommendation) {
 			if (get(diffData, 'resultSettings', null)) {
 				const newVal = get(removeEmpty(newObj), 'resultSettings.fields', '');
@@ -1591,6 +1750,66 @@ export const getDiffData = (oldObj, newObj, isPageLevelDiff = false, isRecommend
 					searchSettings: {
 						...diffData.searchSettings,
 						pagePipeline: [oldVal, newVal],
+					},
+				};
+			}
+
+			const oldFusionSettingsVal = get(
+				oldObj,
+				`pageSettings.pages.${currentPage}.indexSettings.fusionSettings`,
+				'',
+			);
+			const newFusionSettingsVal = get(
+				newObj,
+				`pageSettings.pages.${currentPage}.indexSettings.fusionSettings`,
+				'',
+			);
+
+			if (!isEqualWith(oldFusionSettingsVal, newFusionSettingsVal)) {
+				diffData = {
+					...diffData,
+					searchSettings: {
+						...diffData.searchSettings,
+						...getDiffFieldsFromObject(
+							get(
+								diffData,
+								`pageSettings.pages.${currentPage}.indexSettings.fusionSettings `,
+								{},
+							),
+							`pageSettings.pages.${currentPage}.indexSettings.fusionSettings`,
+							oldObj,
+							newObj,
+						),
+					},
+				};
+			}
+
+			const oldEndpointVal = get(
+				oldObj,
+				`pageSettings.pages.${currentPage}.indexSettings.endpoint`,
+				'',
+			);
+			const newEndpointVal = get(
+				newObj,
+				`pageSettings.pages.${currentPage}.indexSettings.endpoint`,
+				'',
+			);
+
+			if (!isEqualWith(oldEndpointVal, newEndpointVal)) {
+				diffData = {
+					...diffData,
+					searchSettings: {
+						...diffData.searchSettings,
+						...getDiffFieldsFromObject(
+							get(
+								diffData,
+								`pageSettings.pages.${currentPage}.indexSettings.endpoint `,
+								{},
+							),
+							`pageSettings.pages.${currentPage}.indexSettings.endpoint`,
+							oldObj,
+							newObj,
+						),
 					},
 				};
 			}
@@ -1633,6 +1852,22 @@ export const getDiffData = (oldObj, newObj, isPageLevelDiff = false, isRecommend
 					...customMessagesObj,
 				},
 			};
+		}
+
+		if (get(diffData, 'searchSettings.showSearchAs', null)) {
+			const newVal = get(newObj, 'searchSettings.showSearchAs', 'sticky');
+			const oldVal = get(oldObj, 'searchSettings.showSearchAs', 'sticky');
+			if (oldVal === newVal) {
+				delete diffData.searchSettings.showSearchAs;
+			} else {
+				diffData = {
+					...diffData,
+					searchSettings: {
+						...diffData.searchSettings,
+						showSearchAs: [oldVal, newVal],
+					},
+				};
+			}
 		}
 
 		if (get(diffData, 'facetSettings.staticFacets', null)) {
@@ -1757,7 +1992,15 @@ export const getDiffData = (oldObj, newObj, isPageLevelDiff = false, isRecommend
 			const resultSettings = get(diffData, 'resultSettings.fields', {});
 
 			Object.keys(resultSettings).forEach((i) => {
-				resultSettings[i] = [oldVal[i] || '', newVal[i] || ''];
+				if (i === 'handleViewer') {
+					const oldData = oldVal[i] || 'link';
+					const newData = newVal[i] || 'link';
+					if (oldData !== newData) resultSettings[i] = [oldData, newData];
+				} else {
+					const oldData = oldVal[i] || '';
+					const newData = newVal[i] || '';
+					if (oldData !== newData) resultSettings[i] = [oldData, newData];
+				}
 			});
 			diffData = {
 				...diffData,
@@ -1782,14 +2025,15 @@ export const getDiffData = (oldObj, newObj, isPageLevelDiff = false, isRecommend
 			const newVal = get(removeEmpty(newObj), 'resultSettings.displayFields', {});
 			const oldVal = get(removeEmpty(oldObj), 'resultSettings.displayFields', {});
 			const resultSettings = get(diffData, 'resultSettings.fields', {});
-
-			diffData = {
-				...diffData,
-				resultSettings: {
-					...diffData.resultSettings,
-					displayFields: [oldVal, newVal],
-				},
-			};
+			diffData = JSON.parse(
+				JSON.stringify({
+					...diffData,
+					resultSettings: {
+						...diffData.resultSettings,
+						displayFields: !isEqual(oldVal, newVal) ? [oldVal, newVal] : undefined,
+					},
+				}),
+			);
 
 			diffData = {
 				...diffData,
@@ -1801,7 +2045,6 @@ export const getDiffData = (oldObj, newObj, isPageLevelDiff = false, isRecommend
 			delete diffData.resultSettings.fields;
 			delete diffData?.searchSettings?.fields;
 		}
-
 		if (get(diffData, 'resultSettings.categoryFieldValue', null)) {
 			const newVal = get(newObj, 'resultSettings.categoryFieldValue', []);
 			const oldVal = get(oldObj, 'resultSettings.categoryFieldValue', []);
@@ -1885,6 +2128,7 @@ export const getDiffData = (oldObj, newObj, isPageLevelDiff = false, isRecommend
 			exportSettings: get(diffData, 'exportSettings', {}),
 			authenticationSettings: get(diffData, 'authenticationSettings', {}),
 			recommendationSettings: get(diffData, 'recommendationSettings', {}),
+			fusionSettings: get(diffData, 'fusionSettings', {}),
 			...(isRecommendation && {
 				resultSettings: get(diffData, 'resultSettings', {}),
 			}),

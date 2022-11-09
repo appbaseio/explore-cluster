@@ -9,6 +9,7 @@ import {
 	SAVE_HISTORY,
 	SAVE_CSB_URL,
 	SET_SESSION_DATA,
+	ENDPOINTS,
 } from '../constants';
 
 import { createAction } from '../batteries/modules/actions/utils';
@@ -47,6 +48,18 @@ export function setAppsMetrics(metrics: Object): Object {
 
 export function setAppsMetricsError(error: Object): Object {
 	return createAction(APPS.LOAD_METRICS_FAIL, null, error, null);
+}
+
+export function loadEndpoints(): Object {
+	return createAction(ENDPOINTS.LOAD, null, null, null);
+}
+
+export function loadEndpointsSuccess(endpoints: Object): Object {
+	return createAction(ENDPOINTS.LOAD_SUCCESS, endpoints, null, null);
+}
+
+export function loadEndpointsError(error: Object): Object {
+	return createAction(ENDPOINTS.LOAD_FAIL, null, error, null);
 }
 
 export function getAppsOwners(): Object {

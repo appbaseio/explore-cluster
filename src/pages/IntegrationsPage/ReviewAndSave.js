@@ -109,6 +109,7 @@ const ReviewAndSave = ({
 					const body = {
 						metadata: {
 							commit: 'system commit: auto save page changes',
+							user: localStorage.getItem('username'),
 						},
 						content: newContent,
 					};

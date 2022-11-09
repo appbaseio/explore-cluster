@@ -228,7 +228,7 @@ class UserManagementPage extends React.Component {
 					extra={
 						<div style={{ textAlign: 'center' }}>
 							<a
-								href="https://docs.appbase.io/docs/security/user-management/"
+								href="https://docs.reactivesearch.io/docs/security/user-management/"
 								rel="noopener noreferrer"
 								target="_blank"
 							>
@@ -266,10 +266,10 @@ class UserManagementPage extends React.Component {
 								<Paragraph
 									strong
 									copyable={{
-										text: `https://dash.appbase.io?url=${getURL()}`,
+										text: `https://dash.reactivesearch.io?url=${getURL()}`,
 									}}
 								>
-									{`https://dash.appbase.io?url=${getURL()}`}
+									{`https://dash.reactivesearch.io?url=${getURL()}`}
 								</Paragraph>
 							</React.Fragment>
 						}

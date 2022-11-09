@@ -67,11 +67,12 @@ const Wizard = ({ history, match }) => {
 										<FieldGroup
 											control={form}
 											strict={false}
-											render={() => (
+											render={({ value }) => (
 												<ConfigureConnection
 													tabsValidated={tabsValidated}
 													setTabsValidated={setTabsValidated}
 													control={form}
+													formValue={value}
 												/>
 											)}
 										/>

@@ -39,7 +39,7 @@ const bannerDetails = {
 		'Results settings allow you to control the page size, fields returned, and highlighting settings.',
 	videoLink: 'https://youtu.be/EtqBS6egIfU',
 	icon: 'info-circle',
-	href: 'https://docs.appbase.io/docs/search/relevancy/#result-settings',
+	href: 'https://docs.reactivesearch.io/docs/search/relevancy/#result-settings',
 };
 
 const bannerMessage = {
@@ -48,7 +48,7 @@ const bannerMessage = {
 	description:
 		'Results settings allow you to control the page size, fields returned, and highlighting settings.',
 	buttonText: 'Read Docs',
-	href: 'https://docs.appbase.io/docs/search/relevancy/#result-settings',
+	href: 'https://docs.reactivesearch.io/docs/search/relevancy/#result-settings',
 };
 
 const getDisabled = (value) => {

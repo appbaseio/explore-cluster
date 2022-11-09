@@ -109,7 +109,7 @@ class Billing extends Component {
 					<p style={{ paddingTop: '20px' }}>
 						Read more about the pricing plans over{' '}
 						<a
-							href="https://appbase.io/pricing/"
+							href="https://reactivesearch.io/pricing/"
 							target="_blank"
 							rel="noopener noreferrer"
 							style={{
@@ -131,16 +131,16 @@ class Billing extends Component {
 		if (isHostedArc) {
 			return (
 				<BillingFrame
-					id="softr-0bda9055-b056-42d5-8fe3-040a77024336-pricing-dashboard-bye"
-					url="https://www.appbase.io/embed/pages/2eb4244d-cdd5-4031-8e65-2a8fc0b50bb9/blocks/pricing2"
+					id="softr-525dc68b-6f97-436e-ba83-11c9ad9ca059-pricing2"
+					url="https://www.reactivesearch.io/embed/pages/525dc68b-6f97-436e-ba83-11c9ad9ca059/blocks/pricing2"
 				/>
 			);
 		}
 		// Self hosted Arc
 		return (
 			<BillingFrame
-				id="softr-bf3757e1-4c3b-4d90-97e6-ee9e66034603-pricing-dashboard-self-host"
-				url="https://www.appbase.io/embed/pages/fc720c4a-816f-4916-beee-4c6f93ecaf53/blocks/pricing2"
+				id="softr-bddcd2a5-c2a3-427e-b637-bafe6a71e328-pricing2"
+				url="https://www.reactivesearch.io/embed/pages/bddcd2a5-c2a3-427e-b637-bafe6a71e328/blocks/pricing2"
 			/>
 		);
 	}
@@ -347,7 +347,7 @@ class Billing extends Component {
 										margin: '0px',
 									}}
 									gridRatio={0.4}
-									label={<h3 css={heading}>Plan</h3>}
+									label={<h3 className={heading}>Plan</h3>}
 									component={isOnTrial ? `${plan} (Trial Mode)` : plan}
 								/>
 							</Flex>
@@ -361,7 +361,7 @@ class Billing extends Component {
 											marginTop: '-35px',
 										}}
 										gridRatio={0.4}
-										label={<h3 css={heading}>Valid Up To</h3>}
+										label={<h3 className={heading}>Valid Up To</h3>}
 										component={new Date(planValidity * 1000).toDateString()}
 									/>
 								</Flex>
@@ -375,7 +375,9 @@ class Billing extends Component {
 											marginTop: '-35px',
 										}}
 										gridRatio={0.4}
-										label={<h3 css={heading}>Total Elasticsearch Nodes</h3>}
+										label={
+											<h3 className={heading}>Total Elasticsearch Nodes</h3>
+										}
 										component={nodeCount}
 									/>
 								</Flex>
@@ -389,7 +391,7 @@ class Billing extends Component {
 											marginTop: '-35px',
 										}}
 										gridRatio={0.4}
-										label={<h3 css={heading}>Effective Monthly Price</h3>}
+										label={<h3 className={heading}>Effective Monthly Price</h3>}
 										component={
 											isClusterBilling
 												? `$${numberWithCommas(

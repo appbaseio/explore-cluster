@@ -5,7 +5,7 @@ import { Input } from 'antd';
 import { FieldControl } from 'react-reactive-form';
 
 const inputStyles = css`
-	width: 150px !important;
+	width: 135px !important;
 	margin-right: 10px !important;
 `;
 

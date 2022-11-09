@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Alert, Icon, Input, Modal } from 'antd';
 import { commitModalStyles } from './styles';
 import '../styles.css';
+import CodeDiff from './CodeDiff/CodeDiff';
 
 const CommitModal = ({
 	open,
@@ -12,6 +13,8 @@ const CommitModal = ({
 	setErrMsg,
 	isLoading,
 	uiBuilderName,
+	updatedCode,
+	initialCode,
 }) => {
 	const [value, setValue] = useState('');
 
@@ -44,8 +47,9 @@ const CommitModal = ({
 				disabled: errMsg || !value,
 				loading: isLoading,
 			}}
+			width="80%"
 		>
-			<div css={commitModalStyles}>
+			<div className={commitModalStyles}>
 				<div className="label-container">Commit Message</div>
 				<Input
 					placeholder="Enter commit message"
@@ -63,6 +67,9 @@ const CommitModal = ({
 						/>
 					) : null}
 				</div>
+				<div style={{ marginTop: 10 }}>
+					<CodeDiff newCode={updatedCode} oldCode={initialCode} />
+				</div>
 			</div>
 		</Modal>
 	);
@@ -76,6 +83,8 @@ CommitModal.propTypes = {
 	handleCancel: PropTypes.func.isRequired,
 	isLoading: PropTypes.bool,
 	uiBuilderName: PropTypes.string,
+	initialCode: PropTypes.object,
+	updatedCode: PropTypes.object,
 };
 
 CommitModal.defaultProps = {
@@ -84,6 +93,8 @@ CommitModal.defaultProps = {
 	setErrMsg: () => {},
 	isLoading: false,
 	uiBuilderName: '',
+	initialCode: {},
+	updatedCode: {},
 };
 
 export default CommitModal;

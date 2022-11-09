@@ -5,7 +5,7 @@ export const SearchBoxBannerDetails = {
 	description: `GUI to create and manage searchbox UI preferences. Configure design, and suggestions layout: supports featured, popular, recent and endpoint type of suggestions.`,
 	buttonText: 'Read Docs',
 	icon: 'info-circle',
-	href: 'https://docs.appbase.io/docs/reactivesearch/v3/search/searchbox/',
+	href: 'https://docs.reactivesearch.io/docs/reactivesearch/v3/search/searchbox/',
 };
 
 // function to validate for a valid HTML string
@@ -156,5 +156,5 @@ export function parseJSON(input) {
 	if (typeof input === 'object') {
 		return input;
 	}
-	return null
+	return null;
 }

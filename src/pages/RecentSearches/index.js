@@ -24,7 +24,7 @@ const bannerMessagesAnalytics = {
 		title: 'Recent Searches',
 		description: 'Understand the recent search patterns of users.',
 		buttonText: 'Read Docs',
-		href: 'https://docs.appbase.io/docs/analytics/overview/#recent-searches',
+		href: 'https://docs.reactivesearch.io/docs/analytics/overview/#recent-searches',
 	},
 };
 

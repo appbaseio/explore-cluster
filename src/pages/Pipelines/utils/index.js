@@ -8,7 +8,7 @@ export const pipelinesBannerDetails = {
         searching or indexing data.`,
 		buttonText: 'Read Docs',
 		icon: 'info-circle',
-		href: 'https://docs.appbase.io/docs/pipelines/concepts/',
+		href: 'https://docs.reactivesearch.io/docs/pipelines/concepts/',
 	},
 	globalVars: {
 		title: 'Global Envs for Pipelines',
@@ -16,7 +16,7 @@ export const pipelinesBannerDetails = {
 			'Global environments are key/value pairs that can be re-used across multiple pipelines. They can be API keys, database connection configurations, or anything else that makes sense to define once.',
 		buttonText: 'Read More',
 		icon: 'info-circle',
-		href: 'https://docs.appbase.io/docs/pipelines/concepts/global-envs',
+		href: 'https://docs.reactivesearch.io/docs/pipelines/concepts/global-envs',
 	},
 };
 
