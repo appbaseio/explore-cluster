@@ -156,9 +156,9 @@ const StagesMenu = ({ pipelineSchema, getEditorValue, handleMenuClick }) => {
 		</>
 	);
 };
-
+StagesMenu.defaultProps = { pipelineSchema: null };
 StagesMenu.propTypes = {
-	pipelineSchema: object.isRequired,
+	pipelineSchema: object,
 	getEditorValue: func.isRequired,
 	handleMenuClick: func.isRequired,
 };

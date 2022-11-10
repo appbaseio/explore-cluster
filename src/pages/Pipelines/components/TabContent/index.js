@@ -71,6 +71,12 @@ const TabContent = (props) => {
 		}
 	}, [scriptValue]);
 
+	useEffect(() => {
+		if (scriptValueProp !== scriptValue) {
+			setScriptValue(scriptValueProp);
+		}
+	}, [scriptValueProp]);
+
 	return (
 		<Flex style={{ width: '100%' }} alignItems="center" className={container}>
 			<div

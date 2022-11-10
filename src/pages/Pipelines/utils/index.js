@@ -117,7 +117,7 @@ export const trimExtension = (string, extension = '.js') => {
 export const modifySchema = (schema) => {
 	const processedSchema = { ...schema };
 	const prebuiltStages =
-		processedSchema?.definitions?.PreBuiltStage?.additionalProperties?.stages;
+		processedSchema?.definitions?.PreBuiltStage?.additionalProperties?.stages ?? {};
 
 	const schemaObject = {
 		allOf: [],

@@ -145,9 +145,9 @@ const container = css`
 				}
 			}
 		}
-		button.create-save-btn {
-			width: 35%;
-			max-width: 200px;
+		.create-save-btn {
+			width: max-content;
+			max-width: max-content;
 			min-width: 150px;
 			margin-left: 1rem;
 		}
@@ -234,6 +234,7 @@ const PipelinesForm = (props) => {
 		makePipelineVersionLive,
 		createPipelineVersion,
 		updatePipelineVersion,
+		isVersionCreating,
 	} = props;
 	const isEditPage = get(match, 'params.id');
 	const [showTemplateChoser, setShowTemplateChoser] = useState(!isEditPage);
@@ -404,10 +405,16 @@ const PipelinesForm = (props) => {
 	useEffect(() => {
 		const scriptFileNames = Object.keys(pipelineScripts) ?? [];
 		if (scriptFileNames.length) {
-			const newTabPanes = [...tabPanes];
+			const newTabPanes = [];
 			const newScriptFilesMap = {};
 			scriptFileNames.forEach((fileKey) => {
-				if (!(newScriptFilesMap[fileKey] || newScriptFilesMap[trimExtension(fileKey)])) {
+				if (
+					!(newScriptFilesMap[fileKey] || newScriptFilesMap[trimExtension(fileKey)]) ||
+					!isEqual(
+						pipelineScripts[fileKey]?.content,
+						newScriptFilesMap[fileKey]?.scriptValue,
+					)
+				) {
 					Object.assign(newScriptFilesMap, {
 						[fileKey]: {
 							scriptValue: pipelineScripts[fileKey].content,
@@ -416,15 +423,18 @@ const PipelinesForm = (props) => {
 					});
 
 					// update new TabPanes
-
-					newTabPanes.push({
-						title: fileKey,
-						key: fileKey,
-					});
+					if (!newTabPanes.find((item) => item.key === fileKey))
+						newTabPanes.push({
+							title: fileKey,
+							key: fileKey,
+						});
 				}
 			});
 			setScriptFilesMap(newScriptFilesMap);
-			setTabPanes(newTabPanes);
+			setTabPanes(newTabPanes.filter((file) => scriptFileNames.indexOf(file.key) !== -1));
+		} else {
+			setScriptFilesMap({});
+			setTabPanes([]);
 		}
 	}, [pipelineScripts]);
 
@@ -685,6 +695,7 @@ const PipelinesForm = (props) => {
 							} else if (res.payload) {
 								message.success(res.payload.message);
 								history.push(`/cluster/pipelines/${pipeline.id}`);
+								fetchPipelines();
 							}
 						});
 				} else {
@@ -1061,7 +1072,7 @@ const PipelinesForm = (props) => {
 								className="create-save-btn"
 								onClick={() => handleSave()}
 								loading={isCreating || isUpdating || isValidating}
-								// disabled={hasError}
+								disabled={!!missingScriptFiles?.length || isVersionCreating}
 								icon={renderButtonIcon()}
 							>
 								{renderButtonLabel()}
@@ -1075,8 +1086,15 @@ const PipelinesForm = (props) => {
 										rel="noopener noreferrer"
 										className="create-save-btn"
 										onClick={() => setShowVDescModal(true)}
+										loading={isVersionCreating}
+										icon={renderButtonIcon()}
+										disabled={
+											!!missingScriptFiles?.length ||
+											isCreating ||
+											isUpdating ||
+											isValidating
+										}
 									>
-										<Icon type={renderButtonIcon()} />
 										Save Pipeline (as new version)
 									</Button>
 								</Tooltip>
@@ -1144,6 +1162,7 @@ PipelinesForm.propTypes = {
 	makePipelineVersionLive: PropTypes.func.isRequired,
 	createPipelineVersion: PropTypes.func.isRequired,
 	updatePipelineVersion: PropTypes.func.isRequired,
+	isVersionCreating: PropTypes.bool,
 };
 
 PipelinesForm.defaultProps = {
@@ -1160,6 +1179,7 @@ PipelinesForm.defaultProps = {
 	pipelines: null,
 	tier: undefined,
 	featurePipelines: false,
+	isVersionCreating: false,
 	appName: '',
 };
 
@@ -1168,6 +1188,7 @@ const mapStateToProps = (state, props) => {
 	const { username, password } = get(state, 'user.data', {});
 	const defaultState = {
 		isCreating: get(state, '$getAppPipelines.create.isLoading'),
+		isVersionCreating: get(state, '$getAppPipelines.createVersion.isLoading'),
 		createError: get(state, '$getAppPipelines.create.error.actual'),
 		isValidating: get(state, '$getAppPipelines.validating'),
 		pipelines: get(state, '$getAppPipelines.results', []),

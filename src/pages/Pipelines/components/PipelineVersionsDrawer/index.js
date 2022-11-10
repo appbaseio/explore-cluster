@@ -79,10 +79,11 @@ const PipelineVersionsDrawer = ({
 
 						return (
 							<VersionCard
+								key={_version}
 								usage={formattedUsage}
 								version={_version}
 								versionDescription={_version_description}
-								createdAt={updated_at || created_at}
+								createdAt={String(updated_at || created_at)}
 								isLive={is_live}
 								onClickMakeLive={() => {
 									makePipelineVersionLive(_version);
