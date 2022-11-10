@@ -2,21 +2,12 @@ import React, { useEffect } from 'react';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { bool, string } from 'prop-types';
-import { features, isValidPlan } from '../../../batteries/utils';
-import Overlay from '../../../components/Overlay';
 import List from './List';
 import { versionCompare } from '../../../batteries/utils/helpers';
 import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
 import Main from '../Recommendations/Main';
 import { event, timingEvent } from '../../../utils/gtag';
 import moment from '../../../utils/moment';
-
-const bannerDetails = {
-	title: 'Recommendations UI Builder',
-	description:
-		'Build a WYSIWYG recommendations UI that can be installed to any E-Commerce platform or to your own site.',
-	icon: 'info-circle',
-};
 
 const bannerDetailsPaid = {
 	title: 'Recommendations UI Builder',
@@ -26,7 +17,7 @@ const bannerDetailsPaid = {
 	href: 'http://docs.reactivesearch.io/docs/reactivesearch/ui-builder/recommendations/',
 };
 
-const RecommendationsIntegrationsPage = ({ arcVersion, tier, featureEcommerce }) => {
+const RecommendationsIntegrationsPage = ({ arcVersion }) => {
 	useEffect(() => {
 		const startTime = moment();
 		// triggering custom event for google analytics
@@ -49,23 +40,6 @@ const RecommendationsIntegrationsPage = ({ arcVersion, tier, featureEcommerce })
 		};
 	}, []);
 
-	if (!isValidPlan(tier, featureEcommerce, features.UI_BUILDER)) {
-		return (
-			<React.Fragment>
-				<Banner {...bannerDetails} />
-				<Overlay
-					style={{
-						maxWidth: '80%',
-					}}
-					lockSectionStyle={{
-						marginTop: '20%',
-					}}
-					src="https://i.imgur.com/EUDyu6a.png"
-					alt="integrations"
-				/>
-			</React.Fragment>
-		);
-	}
 	return (
 		<>
 			<Banner {...bannerDetailsPaid} />

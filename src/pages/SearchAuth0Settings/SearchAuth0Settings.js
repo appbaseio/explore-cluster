@@ -9,7 +9,9 @@ import { connect } from 'react-redux';
 import { FormBuilder, FormControl, Validators } from 'react-reactive-form';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import ApplicationSettings from './components/ApplicationSettings';
+import Overlay from '../../components/Overlay';
 import Providers from './components/Providers/index';
+import { features, isValidPlan } from '../../batteries/utils';
 import {
 	fetchAuth0Preferences,
 	getAuth0ClientConnections,
@@ -98,6 +100,8 @@ const SearchAuth0Settings = (props) => {
 		samlConnectionId,
 		fetchAuth0Connection,
 		updateAuth0ClientConnection,
+		tier,
+		featureUIBuilderPremium,
 	} = props;
 	const [showOverlay, setShowOverlay] = useState(true);
 	const [activeTab, setActiveTab] = useState(TABS_KEYS.APPLICATION);
@@ -657,6 +661,20 @@ const SearchAuth0Settings = (props) => {
 	if (isLoading) {
 		return <Loader />;
 	}
+	if (!isValidPlan(tier, featureUIBuilderPremium, features.UI_BUILDER_PREMIUM)) {
+		return (
+			<React.Fragment>
+				<Banner {...bannerDetails} />
+				<Overlay
+					style={{
+						maxWidth: '70%',
+					}}
+					src="https://i.imgur.com/W2I8vCa.png"
+					alt="integrations"
+				/>
+			</React.Fragment>
+		);
+	}
 
 	const handleTabsChange = (key) => {
 		setActiveTab(key);
@@ -758,6 +776,7 @@ SearchAuth0Settings.defaultProps = {
 	clientData: {},
 	isClientSaving: false,
 	clientConnections: {},
+	featureUIBuilderPremium: false,
 };
 
 SearchAuth0Settings.propTypes = {
@@ -776,6 +795,8 @@ SearchAuth0Settings.propTypes = {
 	updateAuth0ClientConnection: PropTypes.func.isRequired,
 	clientConnections: PropTypes.object,
 	samlConnectionId: PropTypes.string,
+	tier: PropTypes.string.isRequired,
+	featureUIBuilderPremium: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => {
@@ -783,6 +804,7 @@ const mapStateToProps = (state) => {
 		isLoading:
 			get(state, '$getAuth0Preferences.isFetching') ||
 			get(state, '$getAuth0Client.isFetching'),
+		errors: [get(state, '$getAuth0Preferences.error')],
 		clientId:
 			get(state, '$getAuth0Preferences.results')?.['_client_id'] ??
 			get(state, '$getAuth0Preferences.results')?.['client_id'],
@@ -794,6 +816,8 @@ const mapStateToProps = (state) => {
 			get(state, '$saveAuth0ClientConnections.isFetching') ||
 			get(state, '$updateAuth0ClientConnection.isFetching'),
 		clientConnections: get(state, '$getAuth0ClientConnections.results'),
+		tier: get(state, '$getAppPlan.results.tier'),
+		featureUIBuilderPremium: get(state, '$getAppPlan.results.feature_uibuilder_premium', false),
 	};
 };
 

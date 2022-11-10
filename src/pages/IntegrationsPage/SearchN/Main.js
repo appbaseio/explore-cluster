@@ -18,17 +18,9 @@ import SyncStatus from '../SyncStatus';
 import PreferencesFormWrapper from '../PreferencesFormWrapperN';
 import SavePreferences from '../SavePreferencesN';
 import { getSearchPreferencesN } from '../../../batteries/modules/actions';
-import { isValidPlan, features } from '../../../batteries/utils';
 import EndUserAuthentication from '../tabs/EndUserAuthentication';
 
 const { TabPane } = Tabs;
-
-const bannerDetails = {
-	title: 'Search UI Builder',
-	description:
-		'Build a WYSIWYG storefront search preview that can be installed to your favorite E-Commerce platform.',
-	icon: 'info-circle',
-};
 
 const bannerDetailsPaid = {
 	title: 'Search UI Builder',
@@ -54,11 +46,7 @@ const Main = ({ tier, featureEcommerce, getPreferencesN, ...props }) => {
 
 	return (
 		<div>
-			{!isValidPlan(tier, featureEcommerce, features.UI_BUILDER) ? (
-				<Banner {...bannerDetails} />
-			) : (
-				<Banner {...bannerDetailsPaid} />
-			)}
+			<Banner {...bannerDetailsPaid} />
 			<PreferencesFormWrapper
 				key={componentKey}
 				closeForm={closeForm}

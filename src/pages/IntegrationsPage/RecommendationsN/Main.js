@@ -14,16 +14,8 @@ import PreviewModal from '../PreviewModal';
 import SyncStatus from '../SyncStatus';
 import PreferencesFormWrapper from '../PreferencesFormWrapperN';
 import SavePreferences from '../SavePreferencesN';
-import { isValidPlan, features } from '../../../batteries/utils';
 
 const { TabPane } = Tabs;
-
-const bannerDetails = {
-	title: 'Recommendations UI Builder',
-	description:
-		'Build a WYSIWYG recommendations UI that can be installed to any E-Commerce platform or to your own site.',
-	icon: 'info-circle',
-};
 
 const bannerDetailsPaid = {
 	title: 'Recommendations UI Builder',
@@ -46,11 +38,7 @@ const Main = ({ tier, featureEcommerce, ...props }) => {
 
 	return (
 		<div>
-			{!isValidPlan(tier, featureEcommerce, features.UI_BUILDER) ? (
-				<Banner {...bannerDetails} />
-			) : (
-				<Banner {...bannerDetailsPaid} />
-			)}
+			<Banner {...bannerDetailsPaid} />
 			<PreferencesFormWrapper
 				closeForm={closeForm}
 				preferenceId={preferenceId}

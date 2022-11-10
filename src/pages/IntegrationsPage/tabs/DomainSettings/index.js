@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { string, bool } from 'prop-types';
+import get from 'lodash/get';
+import { connect } from 'react-redux';
 import { Alert, Button, Form, Icon, Input, Spin } from 'antd';
-import { string } from 'prop-types';
+import Overlay from '../../../../components/Overlay';
+import { features, isValidPlan } from '../../../../batteries/utils';
 import { addDomain, getDomainStatus, getAllDomains } from '../../utils/domain-apis';
 import { domainSettingsTabStyles } from './styles';
 import DomainList from './DomainList';
@@ -13,7 +17,7 @@ import DeployModal from '../../ExportInline/Components/DeployModal';
 
 const isValidDomain = require('is-valid-domain');
 
-const DomainSettingsTab = ({ preferenceId }) => {
+const DomainSettingsTab = ({ preferenceId, tier, featureUIBuilderPremium }) => {
 	const [errorMsg, setErrorMsg] = useState('');
 	const [domainsData, setDomainsData] = useState([]);
 	const [domainStatus, setDomainStatus] = useState({ name: '', status: '' });
@@ -89,6 +93,25 @@ const DomainSettingsTab = ({ preferenceId }) => {
 				console.error('Error to fetch all domains', err);
 			});
 	};
+	if (!isValidPlan(tier, featureUIBuilderPremium, features.UI_BUILDER_PREMIUM)) {
+		return (
+			<React.Fragment>
+				<Overlay
+					style={{
+						maxWidth: '70%',
+					}}
+					lockSectionStyle={{
+						marginTop: '10%',
+					}}
+					src="https://i.imgur.com/86swNZ3.png"
+					alt="integrations"
+					btnProps={{
+						href: '/cluster/billing',
+					}}
+				/>
+			</React.Fragment>
+		);
+	}
 
 	const fetchDeploymentStatus = () => {
 		getDeploymentStatus(preferenceId)
@@ -238,10 +261,20 @@ const DomainSettingsTab = ({ preferenceId }) => {
 
 DomainSettingsTab.defaultProps = {
 	preferenceId: '',
+	featureUIBuilderPremium: false,
 };
 
 DomainSettingsTab.propTypes = {
 	preferenceId: string,
+	tier: string.isRequired,
+	featureUIBuilderPremium: bool,
 };
 
-export default DomainSettingsTab;
+const mapStateToProps = (state) => {
+	return {
+		tier: get(state, '$getAppPlan.results.tier'),
+		featureUIBuilderPremium: get(state, '$getAppPlan.results.feature_uibuilder_premium', false),
+	};
+};
+
+export default connect(mapStateToProps, null)(DomainSettingsTab);
