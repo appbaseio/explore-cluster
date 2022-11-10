@@ -44,7 +44,7 @@ class PreferencesFormWrapper extends React.Component {
 			primaryTextColor: '#fff',
 			textColor: '#424242',
 			titleColor: '#424242',
-			fontFamily: 'default',
+			fontFamily: 'Open Sans',
 			customCss: '',
 			// result fields
 			resultTitle: '',

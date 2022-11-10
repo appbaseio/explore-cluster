@@ -131,7 +131,7 @@ class PreferencesFormWrapperN extends React.Component {
 			primaryTextColor: '#fff',
 			textColor: '#424242',
 			titleColor: '#424242',
-			fontFamily: 'default',
+			fontFamily: 'Open Sans',
 			fontWeight: 400,
 			bodyBackgroundColor: '#fff',
 			navbarBackgroundColor: '#001628',

@@ -220,9 +220,6 @@ class StylePresets extends Component {
 													.indexOf(input.toLowerCase()) >= 0
 											}
 										>
-											<Option key="default" value="default">
-												Open Sans
-											</Option>
 											{fontFamilies.map(({ family }) => (
 												<Option key={family} value={family}>
 													{family}
