@@ -143,11 +143,29 @@ function SortOptionSelector({
 							</Col>
 							<Col xs={8}>
 								<AutoComplete
-									filterOption={(inputValue, option) =>
-										option.props.children
-											.toUpperCase()
-											.indexOf(inputValue.toUpperCase()) !== -1
-									}
+									filterOption={(inputValue, option) => {
+										if (
+											option.props.children &&
+											typeof option.props.children === 'object'
+										) {
+											const newOption = { ...option.props.children };
+											const newInputVal =
+												typeof inputValue === 'object' &&
+												inputValue.props.children
+													? inputValue.props.children
+													: inputValue;
+											return (
+												newOption.props.children
+													.toUpperCase()
+													.indexOf(newInputVal.toUpperCase()) !== -1
+											);
+										}
+										return (
+											option.props.children
+												.toUpperCase()
+												.indexOf(inputValue.toUpperCase()) !== -1
+										);
+									}}
 									showSearch
 									placeholder="Select field"
 									value={item?.dataField}
@@ -185,6 +203,7 @@ function SortOptionSelector({
 										}
 										getDatafields(val, 'fetching');
 									}}
+									optionLabelProp="text"
 								>
 									{/* eslint-disable-next-line */}
 									{isFusion ? (
@@ -199,7 +218,7 @@ function SortOptionSelector({
 										) : (
 											fieldPicker.map((field) => (
 												<AutoComplete.Option
-													value={field.name}
+													text={field.name}
 													key={field.name}
 												>
 													{field.name}
@@ -208,7 +227,7 @@ function SortOptionSelector({
 										)
 									) : (
 										fieldPicker.map((field) => (
-											<AutoComplete.Option value={field} key={field}>
+											<AutoComplete.Option text={field} key={field}>
 												<Tooltip title={field}>{field}</Tooltip>
 											</AutoComplete.Option>
 										))

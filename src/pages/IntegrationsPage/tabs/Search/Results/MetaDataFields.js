@@ -151,11 +151,29 @@ function MetaDataFields({
 							</Col>
 							<Col xs={8}>
 								<AutoComplete
-									filterOption={(inputValue, option) =>
-										option.props.children
-											.toUpperCase()
-											.indexOf(inputValue.toUpperCase()) !== -1
-									}
+									filterOption={(inputValue, option) => {
+										if (
+											option.props.children &&
+											typeof option.props.children === 'object'
+										) {
+											const newOption = { ...option.props.children };
+											const newInputVal =
+												typeof inputValue === 'object' &&
+												inputValue.props.children
+													? inputValue.props.children
+													: inputValue;
+											return (
+												newOption.props.children
+													.toUpperCase()
+													.indexOf(newInputVal.toUpperCase()) !== -1
+											);
+										}
+										return (
+											option.props.children
+												.toUpperCase()
+												.indexOf(inputValue.toUpperCase()) !== -1
+										);
+									}}
 									showSearch
 									placeholder="Select data field"
 									value={item?.dataField}
@@ -192,6 +210,7 @@ function MetaDataFields({
 										}
 										getDatafields(val, 'fetching');
 									}}
+									optionLabelProp="text"
 								>
 									{/* eslint-disable-next-line */}
 									{isFusion ? (
@@ -206,7 +225,7 @@ function MetaDataFields({
 										) : (
 											fieldPicker.map((field) => (
 												<AutoComplete.Option
-													value={field.name}
+													text={field.name}
 													key={field.name}
 												>
 													{field.name}
@@ -215,7 +234,7 @@ function MetaDataFields({
 										)
 									) : (
 										fieldPicker.map((field) => (
-											<AutoComplete.Option value={field} key={field}>
+											<AutoComplete.Option text={field} key={field}>
 												<Tooltip title={field}>{field}</Tooltip>
 											</AutoComplete.Option>
 										))
