@@ -96,7 +96,7 @@ const inputStyle = css`
 const QUERY_EDITOR_MODEL_PATH = 'a://b/foo.json';
 
 const StagesMenu = ({ pipelineSchema, getEditorValue, handleMenuClick }) => {
-	const prebuiltStages = pipelineSchema?.definitions?.PreBuiltStage || {};
+	const prebuiltStages = pipelineSchema?.properties?.stages?.items?.properties?.use ?? {};
 	const prebuiltStagesInEditor = (getEditorValue()?.stages ?? []).map((item) => item.use) ?? [];
 	const [query, setQuery] = useState('');
 	const results = (prebuiltStages.enum ?? [''])
@@ -113,11 +113,10 @@ const StagesMenu = ({ pipelineSchema, getEditorValue, handleMenuClick }) => {
 		})
 		.filter((stageKey) => prebuiltStagesInEditor.includes(stageKey) === false);
 
-	const titleResults = results.filter((stageKey) => stageKey.includes(query));
+	const titleResults = results.filter((stageKey) => (query ? stageKey.includes(query) : true));
 	const descriptionResults = results.filter((stageKey) => {
-		const description =
-			prebuiltStages?.additionalProperties?.stages?.[stageKey]?.description ?? '';
-		return description.includes(query);
+		const description = prebuiltStages?.stages?.[stageKey]?.description ?? '';
+		return query ? description.includes(query) : true;
 	});
 	const titleAndDescriptionResults = unionWith(
 		titleResults,
@@ -139,14 +138,8 @@ const StagesMenu = ({ pipelineSchema, getEditorValue, handleMenuClick }) => {
 					return (
 						<Menu.Item className="stage-menu-item" key={stageKey}>
 							<h4 title={stageKey}>{stageKey}</h4>
-							<p
-								title={
-									prebuiltStages?.additionalProperties?.stages?.[stageKey]
-										?.description ?? ''
-								}
-							>
-								{prebuiltStages?.additionalProperties?.stages?.[stageKey]
-									?.description ?? ''}
+							<p title={prebuiltStages?.stages?.[stageKey]?.description ?? ''}>
+								{prebuiltStages?.stages?.[stageKey]?.description ?? ''}
 							</p>
 							<Icon type="plus-square" theme="filled" className="add-icon" />
 						</Menu.Item>
@@ -343,14 +336,14 @@ const PipelineEditorComponent = (props) => {
 				return;
 			}
 
-			const prebuiltStages = pipelineSchema?.definitions?.PreBuiltStage || {};
+			const prebuiltStages =
+				pipelineSchema?.properties?.stages?.items?.properties?.use?.stages ?? {};
 			const editorValue = { ...getEditorValue() };
 
 			if (editorValue?.stages) {
 				editorValue.stages.push({
 					use: e.key,
-					description:
-						prebuiltStages?.additionalProperties?.stages?.[e.key]?.description ?? '',
+					description: prebuiltStages?.[e.key]?.description ?? '',
 				});
 			} else {
 				editorValue.stages = [
