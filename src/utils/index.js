@@ -58,11 +58,13 @@ export async function getUser(username, password, url) {
 		.then((es) => es.json())
 		.then((esResponse) => {
 			const version = get(esResponse, 'version.number');
+			const clusterId = get(esResponse, 'cluster_name');
 			localStorage.setItem(
 				'isUsingOpenSearch',
 				esResponse?.version?.distribution === 'opensearch',
 			);
 			localStorage.setItem('version', version);
+			localStorage.setItem('clusterId', clusterId);
 		})
 		.catch((e) => {
 			// eslint-disable-next-line no-console

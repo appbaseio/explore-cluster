@@ -21,6 +21,7 @@ import 'antd/es/modal/style/css';
 import 'antd/es/card/style/css';
 
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
+import { getURL, getVersion } from '../../constants/config';
 
 // eslint-disable-next-line no-unused-expressions
 injectGlobal`
@@ -105,7 +106,7 @@ class ImporterPage extends React.Component {
 	};
 
 	render() {
-		const { user } = this.props;
+		const { user, apps } = this.props;
 
 		const { destinationParams, preparingApp } = this.state;
 		const isLocalES = destinationParams
@@ -201,14 +202,38 @@ class ImporterPage extends React.Component {
 						) : (
 							<Importer
 								initSource={sourceParams}
-								initUser={
-									user && user.data && user.data.email
-										? user
-										: { data: { email: 'user@arc.appbase.io' } }
-								}
 								arc
 								embed
 								initDestination={destinationParams}
+								initUser={{
+									apps: { ...apps },
+									'deployment-timeframe': 'This is a hobby project',
+									email:
+										user && user.data ? user.data.email : 'user@arc.appbase.io',
+									name: localStorage.getItem('username'),
+									picture:
+										'https://lh3.googleusercontent.com/a/ALm5wu1DDcWwt2VDhwJdTsPgNPGx6IHjeKMfMX6R7MPa=s96-c',
+									reactive_apps: {},
+									usecase: 'A web app',
+									verified_email: true,
+								}}
+								initClusters={[
+									{
+										es_version: getVersion(),
+										name: localStorage.getItem('clusterId'),
+										id: localStorage.getItem('clusterId'),
+									},
+								]}
+								clusterInfo={{
+									url: getURL(),
+									username:
+										localStorage.getItem('username') ||
+										sessionStorage.getItem('username'),
+									password:
+										localStorage.getItem('password') ||
+										sessionStorage.getItem('password'),
+									es_version: getVersion(),
+								}}
 							/>
 						)}
 					</section>
@@ -222,11 +247,13 @@ ImporterPage.propTypes = {
 	appName: string.isRequired,
 	user: object,
 	type: string,
+	apps: object,
 };
 
 ImporterPage.defaultProps = {
 	user: {},
 	type: '',
+	apps: {},
 };
 
 const mapStateToProps = (state) => {
@@ -235,6 +262,7 @@ const mapStateToProps = (state) => {
 		credentials: username ? `${username}:${password}` : '',
 		type: get(state, '$getAppPlan.results.billing_type'),
 		user: get(state, 'user', { data: { email: 'user@arc.appbase.io' } }),
+		apps: get(state, 'apps.data', {}),
 	};
 };
 
