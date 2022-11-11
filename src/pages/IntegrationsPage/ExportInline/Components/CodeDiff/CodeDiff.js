@@ -37,6 +37,7 @@ const CodeDiff = ({ oldCode, newCode, currentVersion: versionStatus, versionStat
 		let removes = 0;
 		Object.keys(diffData || {}).forEach((path) => {
 			const changedDetails = getChangedDetails(
+				// eslint-disable-next-line no-undef
 				Diff.diffLines(oldCode[path] || '', newCode[path] || ''),
 			);
 			adds += changedDetails.added;
@@ -58,7 +59,6 @@ const CodeDiff = ({ oldCode, newCode, currentVersion: versionStatus, versionStat
 	const preferenceId = match.params.id;
 	const { currentVersion = {} } = versionState[preferenceId] ?? {};
 	const diffDataLength = diffDataKeys.length;
-	console.log({ currentVersion, versionStatus });
 	if (diffDataLength)
 		return (
 			<div>
@@ -109,6 +109,7 @@ const CodeDiff = ({ oldCode, newCode, currentVersion: versionStatus, versionStat
 				<Collapse defaultActiveKey={diffDataLength < 5 ? diffDataKeys : []}>
 					{(Object.keys(diffData || {}) || []).map((path) => {
 						const changedDetails = getChangedDetails(
+							// eslint-disable-next-line no-undef
 							Diff.diffLines(oldCode[path] || '', newCode[path] || ''),
 						);
 

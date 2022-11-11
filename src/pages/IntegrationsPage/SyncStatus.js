@@ -425,6 +425,17 @@ class SyncStatus extends React.Component {
 					allVersions={allVersions}
 					fetchByVersionId={this.fetchByVersionId}
 				/>
+				<PastVersionsDrawer
+					visible={showPastVersionsDrawer}
+					setVisible={() =>
+						this.setState({
+							showPastVersionsDrawer: !showPastVersionsDrawer,
+						})
+					}
+					currentVersion={currentVersion}
+					allVersions={allVersions}
+					fetchByVersionId={this.fetchByVersionId}
+				/>
 			</Card>
 		);
 	}

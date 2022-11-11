@@ -57,13 +57,14 @@ const UploadFiles = ({ setErrMsg, setIsFilesFetching, setFileContent, setIsLoadi
 		setErrMsg('');
 		setIsFilesFetching(true);
 		const files = await fromEvent(event);
-		let fileContent = {};
-		for (var i = 0; i < files.length; i += 1) {
+		const fileContent = {};
+		for (let i = 0; i < files.length; i += 1) {
 			const file = files[i];
 			if (file.path && !excludeFile(file.path)) {
-				let arr = file.path.split('/');
+				const arr = file.path.split('/');
 				arr.shift();
 				const filePath = arr.join('/');
+				// eslint-disable-next-line no-await-in-loop
 				fileContent[filePath] = await file.text();
 			}
 		}
@@ -78,10 +79,11 @@ const UploadFiles = ({ setErrMsg, setIsFilesFetching, setFileContent, setIsLoadi
 				code editor
 			</p>
 			<label
+				// eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
 				role="button"
-				tabindex={0}
+				tabIndex={0}
 				className="custom-file-upload"
-				for="file-upload"
+				htmlFor="file-upload"
 				onClick={() => {
 					setErrMsg('');
 					setIsFilesFetching(true);

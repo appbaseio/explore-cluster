@@ -138,8 +138,10 @@ class Dashboard extends Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { error, status, user, updateAppRoutes, updateClusterRoutes, backend } = this.props;
+		const { error, status, user, updateAppRoutes, updateClusterRoutes, backend, backendImage } =
+			this.props;
 
+		const { redirectLocation } = this.state;
 		const allowedActions = get(user, 'data.allowedActions', []).filter((action) =>
 			ALLOWED_ACTIONS_BY_BACKEND[backend].includes(action),
 		);
@@ -172,6 +174,10 @@ class Dashboard extends Component {
 						},
 					}),
 			);
+		}
+
+		if (backendImage === 'sls' && !backend && redirectLocation !== '/login') {
+			window.location.href = '/cluster/configure-search-engine-backend';
 		}
 	}
 
@@ -267,6 +273,7 @@ class Dashboard extends Component {
 
 Dashboard.defaultProps = {
 	error: undefined,
+	backendImage: '',
 	status: undefined,
 	backend: BACKENDS.ELASTICSEARCH.name,
 };
@@ -279,6 +286,7 @@ Dashboard.propTypes = {
 	updateAppRoutes: PropTypes.func.isRequired,
 	updateClusterRoutes: PropTypes.func.isRequired,
 	getAuth0Preferences: PropTypes.func.isRequired,
+	backendImage: PropTypes.string,
 	backend: PropTypes.string,
 };
 
@@ -286,6 +294,7 @@ const mapStateToProps = ({ user, $getAppPlan }) => ({
 	user,
 	error: get(user, 'error'),
 	status: get(user, 'error.actual.status'),
+	backendImage: get($getAppPlan, 'results.image_type'),
 	backend: get($getAppPlan, 'results.backend'),
 });
 

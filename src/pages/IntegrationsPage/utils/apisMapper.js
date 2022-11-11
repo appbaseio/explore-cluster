@@ -109,6 +109,3 @@ const apisMapper = {
 };
 
 export default apisMapper;
-// search: reactivebase
-// schema:
-// index:

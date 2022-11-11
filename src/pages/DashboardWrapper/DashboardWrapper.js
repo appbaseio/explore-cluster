@@ -336,7 +336,7 @@ class DashboardWrapper extends Component {
 
 	render() {
 		const { showHeader, routes, activeSubMenu, activeMenuItem, value } = this.state;
-		const { apps, history, match, collapsed, sessionData, backend } = this.props;
+		const { apps, history, match, collapsed, sessionData, backendImage, backend } = this.props;
 		const filteredApps = keys(apps).filter((app) => !app.startsWith('.'));
 		const routesFiltered = {};
 
@@ -429,33 +429,43 @@ class DashboardWrapper extends Component {
 									);
 									return (
 										<SubMenu key={route} title={Title}>
-											{routes[route].menu.map((item) => (
-												<Menu.Item key={item.label}>
-													{/* eslint-disable-next-line */}
-													{item.openIndexMenu ? (
-														indexName ? (
-															<LabelTag
-																item={item}
-																onClick={() =>
-																	history.push(
-																		`/app/${indexName}/${item.link}`,
-																	)
-																}
-															/>
+											{routes[route].menu.map((item) => {
+												if (
+													item.link.includes(
+														'configure-search-engine-backend',
+													) &&
+													backendImage !== 'sls'
+												) {
+													return null;
+												}
+												return (
+													<Menu.Item key={item.label}>
+														{/* eslint-disable-next-line */}
+														{item.openIndexMenu ? (
+															indexName ? (
+																<LabelTag
+																	item={item}
+																	onClick={() =>
+																		history.push(
+																			`/app/${indexName}/${item.link}`,
+																		)
+																	}
+																/>
+															) : (
+																<IndexSwitcher
+																	item={item}
+																	filteredApps={filteredApps}
+																	history={history}
+																/>
+															)
 														) : (
-															<IndexSwitcher
-																item={item}
-																filteredApps={filteredApps}
-																history={history}
-															/>
-														)
-													) : (
-														<Link replace to={item.link}>
-															<LabelTag item={item} />
-														</Link>
-													)}
-												</Menu.Item>
-											))}
+															<Link replace to={item.link}>
+																<LabelTag item={item} />
+															</Link>
+														)}
+													</Menu.Item>
+												);
+											})}
 										</SubMenu>
 									);
 								}
@@ -574,6 +584,7 @@ DashboardWrapper.defaultProps = {
 	isClusterPlanFetching: false,
 	apps: {},
 	sessionData: '',
+	backendImage: '',
 	backend: BACKENDS.ELASTICSEARCH.name,
 };
 
@@ -592,6 +603,7 @@ DashboardWrapper.propTypes = {
 	setIsCollapsed: func.isRequired,
 	routes: object.isRequired,
 	sessionData: string,
+	backendImage: string,
 	backend: string,
 };
 
@@ -604,6 +616,7 @@ const mapStateToProps = (state) => ({
 	collapsed: get(state, 'sideBarCollapsed'),
 	routes: get(state, 'clusterRoutes'),
 	sessionData: get(state, 'sessionData.sessionData', ''),
+	backendImage: get(state, '$getAppPlan.results.image_type'),
 	backend: get(state, '$getAppPlan.results.backend'),
 });
 

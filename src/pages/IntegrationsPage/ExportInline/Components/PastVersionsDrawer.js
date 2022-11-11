@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Drawer, Divider, Icon, Row, Tooltip } from 'antd';
+// eslint-disable-next-line import/no-cycle
 import List from './List';
 import { pastVersionsStyles } from './styles';
 import { timeDifference } from '../../utils/index';

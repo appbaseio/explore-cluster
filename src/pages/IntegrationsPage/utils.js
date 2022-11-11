@@ -1708,6 +1708,7 @@ export const getDiffData = (oldObj, newObj, isPageLevelDiff = false, isRecommend
 			diffData = {
 				...diffData,
 				fusionSettings: {
+					...diffData.fusionSettings,
 					...getDiffFieldsFromObject(
 						get(diffData, 'fusionSettings', {}),
 						'fusionSettings',

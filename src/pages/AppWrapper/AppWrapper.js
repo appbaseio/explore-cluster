@@ -351,7 +351,7 @@ class AppWrapper extends Component {
 	render() {
 		const { showHeader, appName, activeSubMenu, activeMenuItem, routes, loading, value } =
 			this.state;
-		const { history, collapsed, currentApp, backend } = this.props;
+		const { history, collapsed, currentApp, backendImage, backend } = this.props;
 		if (!currentApp) return null;
 
 		const routesFiltered = {};
@@ -440,40 +440,50 @@ class AppWrapper extends Component {
 									);
 									return (
 										<SubMenu key={route} title={Title}>
-											{routes[route].menu.map((item) => (
-												<Menu.Item
-													key={item.label}
-													data-cy={`path-sub-${item.label
-														.split(' ')
-														.join('')}`}
-												>
-													<WithRedirectTooltip
-														showTooltip={item.hasExactPath}
+											{routes[route].menu.map((item) => {
+												if (
+													item.link.includes(
+														'configure-search-engine-backend',
+													) &&
+													backendImage !== 'sls'
+												) {
+													return null;
+												}
+												return (
+													<Menu.Item
+														key={item.label}
+														data-cy={`path-sub-${item.label
+															.split(' ')
+															.join('')}`}
 													>
-														<Link
-															replace
-															to={
-																item.hasExactPath
-																	? item.link
-																	: `/app/${appName}/${item.link}`
-															}
+														<WithRedirectTooltip
+															showTooltip={item.hasExactPath}
 														>
-															{item.label}
-															{item.tag ? (
-																<Tag
-																	style={{
-																		fontSize: 10,
-																		marginLeft: 8,
-																	}}
-																	color="#001529"
-																>
-																	{item.tag}
-																</Tag>
-															) : null}
-														</Link>
-													</WithRedirectTooltip>
-												</Menu.Item>
-											))}
+															<Link
+																replace
+																to={
+																	item.hasExactPath
+																		? item.link
+																		: `/app/${appName}/${item.link}`
+																}
+															>
+																{item.label}
+																{item.tag ? (
+																	<Tag
+																		style={{
+																			fontSize: 10,
+																			marginLeft: 8,
+																		}}
+																		color="#001529"
+																	>
+																		{item.tag}
+																	</Tag>
+																) : null}
+															</Link>
+														</WithRedirectTooltip>
+													</Menu.Item>
+												);
+											})}
 										</SubMenu>
 									);
 								}
@@ -550,6 +560,7 @@ AppWrapper.propTypes = {
 	routes: PropTypes.object.isRequired,
 	arcVersion: PropTypes.string,
 	updateCurrentApp: PropTypes.func.isRequired,
+	backendImage: PropTypes.string,
 	backend: PropTypes.string,
 };
 
@@ -560,6 +571,7 @@ AppWrapper.defaultProps = {
 	arcVersion: null,
 	defaultSettings: null,
 	currentApp: null,
+	backendImage: '',
 	backend: BACKENDS.ELASTICSEARCH.name,
 };
 
@@ -574,6 +586,7 @@ const mapStateToProps = (state) => {
 		collapsed: get(state, 'sideBarCollapsed'),
 		routes: get(state, 'appRoutes'),
 		arcVersion: get(state, '$getAppPlan.results.version'),
+		backendImage: get(state, '$getAppPlan.results.image_type'),
 		backend: get(state, '$getAppPlan.results.backend'),
 	};
 };

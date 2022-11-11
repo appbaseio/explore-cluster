@@ -64,6 +64,12 @@ export const APP_ROUTES = {
 				hasExactPath: true,
 				tag: 'Beta',
 			},
+			{
+				label: 'Search Engine Backend',
+				link: '/cluster/configure-search-engine-backend',
+				hasExactPath: true,
+				tag: 'Beta',
+			},
 		],
 	},
 	Analytics: {
@@ -209,6 +215,11 @@ export const CLUSTER_ROUTES = {
 			{
 				label: 'Global Envs',
 				link: '/cluster/global-envs',
+				tag: 'Beta',
+			},
+			{
+				label: 'Search Engine Backend',
+				link: '/cluster/configure-search-engine-backend',
 				tag: 'Beta',
 			},
 		],

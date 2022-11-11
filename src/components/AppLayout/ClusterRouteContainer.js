@@ -46,6 +46,10 @@ const PipelineLogDetailsPage = Loadable({
 	loading: Loader,
 });
 
+const ConfigureSearchBackend = Loadable({
+	loader: () => import(/* webpackChunkName: "Pipelines" */ '../../pages/ConfigureBackendPage'),
+	loading: Loader,
+});
 const QueryRulesForm = Loadable({
 	loader: () =>
 		import(/* webpackChunkName: "QueryRulesForm" */ '../../pages/QueryRules/QueryRulesForm'),
@@ -343,15 +347,17 @@ class ClusterRouteContainer extends React.Component {
 					<Route
 						exact
 						path="/cluster/pipelines"
-						render={(props) => (
-							<>
-								{get(allowedRoutes, '/cluster/pipelines') ? (
-									<AppPageContainer {...props} component={PipelinesPage} />
-								) : (
-									<UnauthorizedPage />
-								)}
-							</>
-						)}
+						render={(props) => {
+							return (
+								<>
+									{get(allowedRoutes, '/cluster/pipelines') ? (
+										<AppPageContainer {...props} component={PipelinesPage} />
+									) : (
+										<UnauthorizedPage />
+									)}
+								</>
+							);
+						}}
 					/>
 					<Route
 						exact
@@ -360,6 +366,22 @@ class ClusterRouteContainer extends React.Component {
 							<>
 								{get(allowedRoutes, '/cluster/global-envs') ? (
 									<AppPageContainer {...props} component={GlobalVarsPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
+						)}
+					/>
+					<Route
+						exact
+						path="/cluster/configure-search-engine-backend"
+						render={(props) => (
+							<>
+								{get(allowedRoutes, '/cluster/pipelines') ? (
+									<AppPageContainer
+										{...props}
+										component={ConfigureSearchBackend}
+									/>
 								) : (
 									<UnauthorizedPage />
 								)}

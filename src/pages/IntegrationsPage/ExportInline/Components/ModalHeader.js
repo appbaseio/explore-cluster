@@ -434,9 +434,9 @@ ModalHeader.defaultProps = {
 	setModalType: () => {},
 	setOpenCommitModal: () => {},
 	preferences: {},
+	versionState: {},
 	themeType: localStorage.getItem('theme') || 'light',
 	setThemeType: () => {},
-	versionState: {},
 };
 const mapStateToProps = (state) => {
 	return {
