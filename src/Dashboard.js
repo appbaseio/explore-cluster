@@ -13,8 +13,8 @@ import { getAuthorizedViews, getOriginURL } from './utils';
 import Loader from './components/Loader';
 import Logo from './components/Logo';
 import { APP_ROUTES, CLUSTER_ROUTES } from './constants/routes';
-import { fetchAuth0Preferences } from './batteries/modules/actions';
 import { ALLOWED_ACTIONS_BY_BACKEND, BACKENDS } from './batteries/utils';
+import { fetchAuth0Preferences } from './batteries/modules/actions';
 
 // routes
 const LoginPage = Loadable({
@@ -78,6 +78,7 @@ class Dashboard extends Component {
 		}
 
 		const params = new URLSearchParams(search);
+		const url = params.get('url');
 		if (params.has('showProfile')) {
 			const showProfile = params.get('showProfile');
 			sessionStorage.setItem('showProfile', showProfile);
@@ -91,7 +92,6 @@ class Dashboard extends Component {
 			sessionStorage.setItem('showHelpChat', true);
 		}
 		if (params.has('url')) {
-			const url = params.get('url');
 			localStorage.setItem('url', getOriginURL(url));
 		}
 		if (params.has('header')) {
@@ -113,16 +113,17 @@ class Dashboard extends Component {
 		if (params.has('username') && params.has('password')) {
 			const username = params.get('username');
 			const password = params.get('password');
-
+			const authToken = btoa(`${username}:${password}`);
 			localStorage.setItem('username', username);
 			localStorage.setItem('password', password);
-
-			loadArcUser(username, password);
+			localStorage.setItem('authToken', authToken);
+			loadArcUser(username, password, url);
 		} else {
 			this.setState({
 				isLoading: false,
 			});
 		}
+
 		getAuth0Preferences();
 	}
 
@@ -285,9 +286,9 @@ Dashboard.propTypes = {
 	error: PropTypes.any,
 	updateAppRoutes: PropTypes.func.isRequired,
 	updateClusterRoutes: PropTypes.func.isRequired,
-	getAuth0Preferences: PropTypes.func.isRequired,
 	backendImage: PropTypes.string,
 	backend: PropTypes.string,
+	getAuth0Preferences: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = ({ user, $getAppPlan }) => ({
@@ -300,7 +301,7 @@ const mapStateToProps = ({ user, $getAppPlan }) => ({
 
 const mapDispatchToProps = (dispatch) => ({
 	getAuth0Preferences: () => dispatch(fetchAuth0Preferences()),
-	loadArcUser: (u, p) => dispatch(loadUser(u, p)),
+	loadArcUser: (u, p, url) => dispatch(loadUser(u, p, url)),
 	updateAppRoutes: (routes) => dispatch(setAppRoutes(routes)),
 	updateClusterRoutes: (routes) => dispatch(setClusterRoutes(routes)),
 });
