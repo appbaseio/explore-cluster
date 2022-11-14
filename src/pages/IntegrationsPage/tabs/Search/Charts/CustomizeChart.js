@@ -1,5 +1,7 @@
 import React from 'react';
-import { Button, Modal, Switch, Form, Select, Input, Typography } from 'antd';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Button, Modal, Switch, Select, Input, Typography } from 'antd';
 import { string, object, func, bool } from 'prop-types';
 import styled from 'react-emotion';
 import get from 'lodash/get';

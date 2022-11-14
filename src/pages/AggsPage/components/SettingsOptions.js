@@ -1,5 +1,6 @@
 import React from 'react';
-import { Switch, Tooltip, Icon, Radio, Select, InputNumber } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { Switch, Tooltip, Radio, Select, InputNumber } from 'antd';
 import { css } from 'emotion';
 import PropTypes from 'prop-types';
 import settingsMap from '../../../components/ReviewAndSave/helper';
@@ -29,7 +30,7 @@ const SettingsOptions = ({ handleChange, sortBy, size, includeNullValues, queryF
 		<h6>
 			Query Format
 			<Tooltip title={settingsMap.queryFormat.description}>
-				<Icon style={{ marginLeft: 5 }} type="info-circle" />
+				<InfoCircleOutlined style={{ marginLeft: 5 }} />
 			</Tooltip>
 		</h6>
 		<Radio.Group
@@ -47,7 +48,7 @@ const SettingsOptions = ({ handleChange, sortBy, size, includeNullValues, queryF
 		<h6>
 			Default Size For Aggregations{' '}
 			<Tooltip title={settingsMap.agg_size.description}>
-				<Icon type="info-circle" />
+				<InfoCircleOutlined />
 			</Tooltip>
 		</h6>
 		<InputNumber
@@ -60,7 +61,7 @@ const SettingsOptions = ({ handleChange, sortBy, size, includeNullValues, queryF
 		<h6>
 			Default Sort{' '}
 			<Tooltip title={settingsMap.sortBy.description}>
-				<Icon type="info-circle" />
+				<InfoCircleOutlined />
 			</Tooltip>
 		</h6>
 		<Select
@@ -82,7 +83,7 @@ const SettingsOptions = ({ handleChange, sortBy, size, includeNullValues, queryF
 		<h6>
 			Include Null Values{' '}
 			<Tooltip title={settingsMap.includeNullValues.description}>
-				<Icon type="info-circle" />
+				<InfoCircleOutlined />
 			</Tooltip>
 		</h6>
 		<Switch

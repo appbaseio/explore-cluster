@@ -1,5 +1,6 @@
 import React from 'react';
 import { func, object, bool, number, oneOfType, string } from 'prop-types';
+import { CopyOutlined } from '@ant-design/icons';
 import { Button, message } from 'antd';
 import { FieldControl, FieldGroup } from 'react-reactive-form';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -47,7 +48,7 @@ const ExportToHackable = ({ control, preferences, isRecommendation, widgetId }) 
 			>
 				<CopyToClipboard text={installationHeadScript} onCopy={copyToClipboard}>
 					<Button
-						icon="copy"
+						icon={<CopyOutlined />}
 						shape="circle"
 						css={{
 							position: 'absolute',
@@ -79,7 +80,7 @@ const ExportToHackable = ({ control, preferences, isRecommendation, widgetId }) 
 					>
 						<CopyToClipboard text={recommendationScript} onCopy={copyToClipboard}>
 							<Button
-								icon="copy"
+								icon={<CopyOutlined />}
 								shape="circle"
 								css={{
 									position: 'absolute',
@@ -126,7 +127,7 @@ const ExportToHackable = ({ control, preferences, isRecommendation, widgetId }) 
 												onCopy={copyToClipboard}
 											>
 												<Button
-													icon="copy"
+													icon={<CopyOutlined />}
 													shape="circle"
 													style={{
 														position: 'absolute',
@@ -180,7 +181,7 @@ const ExportToHackable = ({ control, preferences, isRecommendation, widgetId }) 
 												onCopy={copyToClipboard}
 											>
 												<Button
-													icon="copy"
+													icon={<CopyOutlined />}
 													shape="circle"
 													style={{
 														position: 'absolute',

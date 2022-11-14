@@ -1,6 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Col, Icon, Layout, message, Result, Row, Tabs } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { Button, Col, Layout, message, Result, Row, Tabs } from 'antd';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
@@ -259,7 +260,7 @@ class QueryRules extends Component {
 										rel="noopener noreferrer"
 										data-cy="create-query-rule"
 									>
-										<Icon type="plus" />
+										<PlusOutlined />
 										Create Rule
 									</Button>
 								</Link>
@@ -410,7 +411,7 @@ class QueryRules extends Component {
 							extra={
 								<Link to="/cluster/rules/new">
 									<Button type="primary" data-cy="create-query-rule">
-										<Icon type="plus" />
+										<PlusOutlined />
 										Create Rule
 									</Button>
 								</Link>

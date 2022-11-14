@@ -3,7 +3,8 @@ import { connect } from 'react-redux';
 import Loadable from 'react-loadable';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Button, Icon, Modal } from 'antd';
+import { HomeOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { Button, Modal } from 'antd';
 import get from 'lodash/get';
 import URLSearchParams from '@ungap/url-search-params';
 import * as Sentry from '@sentry/browser';
@@ -207,7 +208,7 @@ class Dashboard extends Component {
 
 		if (error) {
 			return (
-				<section
+                <section
 					style={{
 						justifyContent: 'center',
 						alignItems: 'center',
@@ -226,7 +227,7 @@ class Dashboard extends Component {
 						}}
 					>
 						<Button href="/" size="large" type="primary">
-							<Icon type="home" />
+							<HomeOutlined />
 							Back to Dashboard
 						</Button>
 						<Button
@@ -239,12 +240,12 @@ class Dashboard extends Component {
 								});
 							}}
 						>
-							<Icon type="info-circle" />
+							<InfoCircleOutlined />
 							Report this problem
 						</Button>
 					</section>
 				</section>
-			);
+            );
 		}
 
 		return (

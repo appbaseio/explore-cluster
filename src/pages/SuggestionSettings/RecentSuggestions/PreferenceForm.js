@@ -1,7 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Select, Icon, Popover, InputNumber } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { Select, Popover, InputNumber } from 'antd';
 import { css } from 'react-emotion';
 import PropTypes from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
@@ -113,7 +114,7 @@ class PreferenceForm extends React.Component {
 												content={content(Messages.minHits)}
 												css={styles.iconContainer}
 											>
-												<Icon type="info-circle" />
+												<InfoCircleOutlined />
 											</Popover>
 										</p>
 									}
@@ -146,7 +147,7 @@ class PreferenceForm extends React.Component {
 												content={content(Messages.recentSize)}
 												css={styles.iconContainer}
 											>
-												<Icon type="info-circle" />
+												<InfoCircleOutlined />
 											</Popover>
 										</p>
 									}
@@ -178,7 +179,7 @@ class PreferenceForm extends React.Component {
 												content={content(Messages.minChars)}
 												css={styles.iconContainer}
 											>
-												<Icon type="info-circle" />
+												<InfoCircleOutlined />
 											</Popover>
 										</p>
 									}
@@ -216,7 +217,7 @@ class PreferenceForm extends React.Component {
 													content={content(Messages.indices)}
 													css={styles.iconContainer}
 												>
-													<Icon type="info-circle" />
+													<InfoCircleOutlined />
 												</Popover>
 											</p>
 										}

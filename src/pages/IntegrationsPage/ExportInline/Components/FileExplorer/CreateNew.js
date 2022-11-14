@@ -1,5 +1,14 @@
 import React, { useState, useContext } from 'react';
-import { Icon, Input, Menu, Dropdown } from 'antd';
+
+import {
+	DeleteOutlined,
+	EditOutlined,
+	FileAddOutlined,
+	FolderAddOutlined,
+	MoreOutlined,
+} from '@ant-design/icons';
+
+import { Input, Menu, Dropdown } from 'antd';
 import PropTypes from 'prop-types';
 import { useSandpack } from '@codesandbox/sandpack-react';
 import { DirectoryIcon } from './icons';
@@ -79,7 +88,7 @@ const CreateNew = ({ path, selectFile, active, onClick, depth, setNewFolder, new
 					setMode('file-add');
 				}}
 			>
-				<Icon type="file-add" />
+				<FileAddOutlined />
 				New File
 			</Menu.Item>
 			<Menu.Item
@@ -88,7 +97,7 @@ const CreateNew = ({ path, selectFile, active, onClick, depth, setNewFolder, new
 					setMode('folder-add');
 				}}
 			>
-				<Icon type="folder-add" />
+				<FolderAddOutlined />
 				New Folder
 			</Menu.Item>
 			<Menu.Item
@@ -96,7 +105,7 @@ const CreateNew = ({ path, selectFile, active, onClick, depth, setNewFolder, new
 					setMode('folder-edit');
 				}}
 			>
-				<Icon type="edit" theme="outlined" />
+				<EditOutlined />
 				Rename
 			</Menu.Item>
 			<Menu.Item
@@ -105,7 +114,7 @@ const CreateNew = ({ path, selectFile, active, onClick, depth, setNewFolder, new
 					handleDelete();
 				}}
 			>
-				<Icon type="delete" theme="outlined" />
+				<DeleteOutlined />
 				Delete
 			</Menu.Item>
 		</Menu>
@@ -141,7 +150,7 @@ const CreateNew = ({ path, selectFile, active, onClick, depth, setNewFolder, new
 						onClick={(e) => e.preventDefault()}
 					>
 						<div style={{ cursor: 'pointer' }}>
-							<Icon type="more" className="show-on-hover" />
+							<MoreOutlined className="show-on-hover" />
 						</div>
 					</Dropdown>
 				</span>

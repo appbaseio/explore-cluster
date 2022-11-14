@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Dropdown, Icon, Menu, message, notification, Typography } from 'antd';
+import { DeleteOutlined, DownloadOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons';
+import { Button, Dropdown, Menu, message, notification, Typography } from 'antd';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
 import CloneSearchBox from './CloneSearchBox';
@@ -22,13 +23,13 @@ const MobileMenu = (props) => {
 				<Menu className={menuStyle}>
 					<Menu.Item key="1">
 						<span onClick={onExportCode}>
-							<Icon type="download" /> <Typography.Text>Export Code</Typography.Text>
+							<DownloadOutlined /> <Typography.Text>Export Code</Typography.Text>
 						</span>
 					</Menu.Item>
 					{showEdit && (
 						<Menu.Item key="0">
 							<Link to={`/cluster/searchboxes/${searchBoxItem.id}`}>
-								<Icon type="edit" /> <Typography.Text>Edit</Typography.Text>
+								<EditOutlined /> <Typography.Text>Edit</Typography.Text>
 							</Link>
 						</Menu.Item>
 					)}
@@ -57,14 +58,14 @@ const MobileMenu = (props) => {
 						}}
 						key="3"
 					>
-						<Icon style={{ color: '#f5222d' }} type="delete" />{' '}
+						<DeleteOutlined style={{ color: '#f5222d' }} />{' '}
 						<Typography.Text style={{ color: '#f5222d' }}>Delete</Typography.Text>
 					</Menu.Item>
 				</Menu>
 			}
 			trigger={['click']}
 		>
-			<Button shape="circle" icon="more" />
+			<Button shape="circle" icon={<MoreOutlined />} />
 		</Dropdown>
 	);
 };

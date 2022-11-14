@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
 import PropTypes from 'prop-types';
+import { CodeSandboxOutlined } from '@ant-design/icons';
 import { Row, Col, Switch, Tooltip, Spin, Button, Empty } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
@@ -645,7 +646,7 @@ class SearchPreview extends React.Component {
 									size="large"
 									type="primary"
 									htmlType="submit"
-									icon="code-sandbox"
+									icon={<CodeSandboxOutlined />}
 								>
 									Open in Codesandbox
 								</Button>

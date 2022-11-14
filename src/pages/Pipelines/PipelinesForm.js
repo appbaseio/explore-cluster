@@ -6,10 +6,16 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import {
+	ArrowLeftOutlined,
+	ClockCircleOutlined,
+	LinkOutlined,
+	PlusOutlined,
+} from '@ant-design/icons';
+import { Icon as LegacyIcon } from '@ant-design/compatible';
+import {
 	Affix,
 	Button,
 	Card,
-	Icon,
 	Result,
 	Skeleton,
 	Typography,
@@ -199,7 +205,7 @@ const editorAreaContainer = css`
 function DocsLink({ url }) {
 	return (
 		<a href={url} className={link} target="_blank" rel="noopener noreferrer">
-			Learn more <Icon type="link" />
+			Learn more <LinkOutlined />
 		</a>
 	);
 }
@@ -777,7 +783,7 @@ const PipelinesForm = (props) => {
 						extra={
 							<Link to="/cluster/pipelines/new">
 								<Button type="primary">
-									<Icon type="plus" />
+									<PlusOutlined />
 									Create Pipeline
 								</Button>
 							</Link>
@@ -807,7 +813,7 @@ const PipelinesForm = (props) => {
 									}
 									className="create-script-file-link-btn"
 								>
-									<Icon type="plus" />
+									<PlusOutlined />
 									Add script file
 								</Button>
 							</Fragment>
@@ -869,7 +875,7 @@ const PipelinesForm = (props) => {
 				<Fragment>
 					<Link to="/cluster/pipelines">
 						<Button>
-							<Icon type="arrow-left" />
+							<ArrowLeftOutlined />
 							Back to Pipelines
 						</Button>
 					</Link>
@@ -878,7 +884,7 @@ const PipelinesForm = (props) => {
 							{isEditPage && pipeline?.versions && (
 								<Tooltip title="Versions" style={{ fontSize: 14 }}>
 									{/* Pipeline Versions Versions */}
-									<Icon
+									<ClockCircleOutlined
 										style={{
 											cursor: getCurrentVersion()?._version
 												? 'pointer'
@@ -888,7 +894,6 @@ const PipelinesForm = (props) => {
 												: '#bbb7b7',
 										}}
 										className="version-drawer-triggerer"
-										type="clock-circle"
 										onClick={() => {
 											if (getCurrentVersion()?._version)
 												setShowVersionDrawer(true);
@@ -1051,7 +1056,7 @@ const PipelinesForm = (props) => {
 													handleAddOrRemoveTab(null, TAB_ACTIONS.ADD);
 												}}
 											>
-												<Icon type="plus" />
+												<PlusOutlined />
 											</Button>
 										</Tooltip>
 									}
@@ -1073,7 +1078,7 @@ const PipelinesForm = (props) => {
 								onClick={() => handleSave()}
 								loading={isCreating || isUpdating || isValidating}
 								disabled={!!missingScriptFiles?.length || isVersionCreating}
-								icon={renderButtonIcon()}
+								icon={<LegacyIcon type={renderButtonIcon()} />}
 							>
 								{renderButtonLabel()}
 							</Button>
@@ -1087,7 +1092,7 @@ const PipelinesForm = (props) => {
 										className="create-save-btn"
 										onClick={() => setShowVDescModal(true)}
 										loading={isVersionCreating}
-										icon={renderButtonIcon()}
+										icon={<LegacyIcon type={renderButtonIcon()} />}
 										disabled={
 											!!missingScriptFiles?.length ||
 											isCreating ||

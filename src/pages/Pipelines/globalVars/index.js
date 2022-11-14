@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Button, Icon, Alert } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { Button, Alert } from 'antd';
 import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
 import Overlay from '../../../components/Overlay';
 import GlobalVarList from './GlobalVarList';
@@ -100,7 +101,7 @@ const GlobalVarsPage = ({ tier, featurePipelines, credentials, appVersion }) => 
 					style={{ position: 'absolute', right: 10, top: 10 }}
 					onClick={() => setOpen(true)}
 				>
-					<Icon type="plus" /> Create New Env
+					<PlusOutlined /> Create New Env
 				</Button>
 				{globalVars.map((data) => (
 					<GlobalVarList

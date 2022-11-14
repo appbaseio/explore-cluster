@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { CopyOutlined } from '@ant-design/icons';
 import { Button, message, Modal } from 'antd';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { css } from 'emotion';
@@ -50,7 +51,7 @@ const ExportSearchBoxCode = ({ visible, onCancel, searchBoxId, initialCredential
 			>
 				<CopyToClipboard text={getExportCode()} onCopy={copyToClipboard}>
 					<Button
-						icon="copy"
+						icon={<CopyOutlined />}
 						shape="circle"
 						css={{
 							position: 'absolute',

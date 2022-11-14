@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Form, Icon, Select, Tag, Tooltip } from 'antd';
+import { InfoCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Button, Select, Tag, Tooltip } from 'antd';
 import { array, bool, func, object, string } from 'prop-types';
 import { connect } from 'react-redux';
 import moment from 'moment';
@@ -95,7 +98,7 @@ const EndpointDropdown = ({
 				<>Configure Data Endpoint</>
 
 				<Tooltip title="Data Endpoint is where you specify how the search UI fetches data.">
-					<Icon type="info-circle" style={{ marginLeft: 5 }} />
+					<InfoCircleOutlined style={{ marginLeft: 5 }} />
 				</Tooltip>
 			</span>
 			<Form className="row-data">
@@ -167,7 +170,7 @@ const EndpointDropdown = ({
 								value={`${method} ${url}`}
 								notFoundContent={
 									<Button onClick={() => setShowForm(true)}>
-										<Icon type="plus" /> Enter your own endpoint
+										<PlusOutlined /> Enter your own endpoint
 									</Button>
 								}
 							>
@@ -294,7 +297,7 @@ const EndpointDropdown = ({
 									</Select.Option>
 								))}
 								<Select.Option key="custom" onClick={() => setShowForm(true)}>
-									<Icon type="plus" /> Enter your own endpoint
+									<PlusOutlined /> Enter your own endpoint
 								</Select.Option>
 							</Select>
 						</Form.Item>

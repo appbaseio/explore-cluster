@@ -1,5 +1,6 @@
 import React from 'react';
-import { Card, Tooltip, Button, Icon, Skeleton, Row, Alert, Empty, Col } from 'antd';
+import { InfoCircleOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Card, Tooltip, Button, Skeleton, Row, Alert, Empty, Col } from 'antd';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
@@ -239,7 +240,7 @@ class MappingComponent extends React.Component {
 														}}
 														onClick={reloadMappings}
 													>
-														<Icon type="reload" />
+														<ReloadOutlined />
 														Reload Mappings
 													</Button>
 												</Tooltip>
@@ -278,7 +279,7 @@ class MappingComponent extends React.Component {
 																<p key={item.title}>
 																	{item.title}
 																	<Tooltip title={item.info}>
-																		<Icon type="info-circle" />
+																		<InfoCircleOutlined />
 																	</Tooltip>
 																</p>
 															))}
@@ -296,7 +297,7 @@ class MappingComponent extends React.Component {
 																			<Tooltip
 																				title={item.info}
 																			>
-																				<Icon type="info-circle" />
+																				<InfoCircleOutlined />
 																			</Tooltip>
 																		</p>
 																	</Col>

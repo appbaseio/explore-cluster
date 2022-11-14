@@ -2,7 +2,15 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { func, bool, string } from 'prop-types';
 import { FieldGroup, FieldArray, FieldControl, Validators } from 'react-reactive-form';
-import { Table, Button, Form, Select, Tooltip, Icon, Popconfirm } from 'antd';
+import {
+	ArrowLeftOutlined,
+	DeleteOutlined,
+	PlusOutlined,
+	QuestionCircleOutlined,
+} from '@ant-design/icons';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Table, Button, Select, Tooltip, Popconfirm } from 'antd';
 import { css } from 'emotion';
 import get from 'lodash/get';
 import TextInput from '../../../../components/Form/Input';
@@ -90,7 +98,7 @@ class Recommendations extends React.Component {
 							okText="Yes"
 							cancelText="No"
 						>
-							<Icon type="delete" className="delete-icon" />
+							<DeleteOutlined className="delete-icon" />
 						</Popconfirm>
 					</Flex>
 				);
@@ -290,7 +298,7 @@ class Recommendations extends React.Component {
 								}}
 								onClick={this.closeForm}
 								type="link"
-								icon="arrow-left"
+								icon={<ArrowLeftOutlined />}
 							>
 								Go back
 							</Button>
@@ -355,7 +363,7 @@ class Recommendations extends React.Component {
 													<Tooltip
 														title={messages.dataFieldSimilarProduct}
 													>
-														<Icon type="question-circle-o" />
+														<QuestionCircleOutlined />
 													</Tooltip>
 												</span>
 											),
@@ -371,7 +379,7 @@ class Recommendations extends React.Component {
 												<span>
 													DataField&nbsp;
 													<Tooltip title={messages.dataFieldMostRecent}>
-														<Icon type="question-circle-o" />
+														<QuestionCircleOutlined />
 													</Tooltip>
 												</span>
 											),
@@ -393,7 +401,7 @@ class Recommendations extends React.Component {
 															<Tooltip
 																title={messages.featuredProducts}
 															>
-																<Icon type="question-circle-o" />
+																<QuestionCircleOutlined />
 															</Tooltip>
 														</span>
 													}
@@ -432,7 +440,7 @@ class Recommendations extends React.Component {
 																<Tooltip
 																	title={messages.productsPageURL}
 																>
-																	<Icon type="question-circle-o" />
+																	<QuestionCircleOutlined />
 																</Tooltip>
 															</span>
 														}
@@ -527,7 +535,7 @@ class Recommendations extends React.Component {
 									marginBottom: 10,
 								}}
 								type="primary"
-								icon="plus"
+								icon={<PlusOutlined />}
 								onClick={() => this.showForm()}
 							>
 								Add

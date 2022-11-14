@@ -1,5 +1,8 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
+import { LoadingOutlined } from '@ant-design/icons';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
 import {
 	Col,
 	Row,
@@ -8,12 +11,10 @@ import {
 	Card,
 	Typography,
 	Radio,
-	Form,
 	Input,
 	Button,
 	notification,
 	Spin,
-	Icon,
 } from 'antd';
 import { css } from 'emotion';
 import get from 'lodash/get';
@@ -289,7 +290,7 @@ const ConfigureBackend = (props) => {
 	return (
 		<Spin
 			spinning={isLoading}
-			indicator={<Icon type="loading" style={{ fontSize: 72 }} spin />}
+			indicator={<LoadingOutlined style={{ fontSize: 72 }} spin />}
 			tip={
 				<div>
 					<h4>

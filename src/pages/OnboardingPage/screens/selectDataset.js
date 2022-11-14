@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useState } from 'react';
-import { Icon } from 'antd';
+import { RightOutlined } from '@ant-design/icons';
 import PropTypes from 'prop-types';
 import parser from 'url-parser-lite';
 import Loader from '../components/Loader';
@@ -231,7 +231,7 @@ function selectDataset({ nextScreen, setURL, url: newUrl, handleDataset }) {
 								data-cy="submit-data-import"
 								onClick={handleLayout}
 							>
-								Next &nbsp; <Icon type="right" theme="outlined" />
+								Next &nbsp; <RightOutlined />
 							</a>
 						</div>
 					</footer>

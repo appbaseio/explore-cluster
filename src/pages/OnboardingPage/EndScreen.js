@@ -3,7 +3,8 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Layout, Icon } from 'antd';
+import { CopyOutlined, LinkOutlined } from '@ant-design/icons';
+import { Layout } from 'antd';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import FullHeader from '../../components/FullHeader';
 import { endScreenStyles } from './styles';
@@ -30,7 +31,7 @@ function EndScreen({ sandboxURL }) {
 							<div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
 								<div className="overflow-text">{csbURL}</div>
 								<CopyToClipboard text={csbURL}>
-									<Icon type="copy" theme="outlined" className="icon-active" />
+									<CopyOutlined className="icon-active" />
 								</CopyToClipboard>
 								<a
 									target="_blank"
@@ -38,7 +39,7 @@ function EndScreen({ sandboxURL }) {
 									href={csbURL}
 									style={{ height: 20, color: 'black' }}
 								>
-									<Icon type="link" theme="outlined" className="icon-active" />
+									<LinkOutlined className="icon-active" />
 								</a>
 							</div>
 						</div>

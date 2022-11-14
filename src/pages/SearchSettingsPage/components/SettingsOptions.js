@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Switch, Tooltip, Icon, Radio, Select, InputNumber, notification } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { Switch, Tooltip, Radio, Select, InputNumber, notification } from 'antd';
 import { css } from 'emotion';
 import PropTypes from 'prop-types';
 import settingsMap from '../../../components/ReviewAndSave/helper';
@@ -126,7 +127,7 @@ const SettingsOptions = ({
 			<h6>
 				Query Type
 				<Tooltip title={settingsMap.queryType.description}>
-					<Icon style={{ marginLeft: 5 }} type="info-circle" />
+					<InfoCircleOutlined style={{ marginLeft: 5 }} />
 				</Tooltip>
 			</h6>
 			<Radio.Group
@@ -138,20 +139,20 @@ const SettingsOptions = ({
 				<Radio value="queryString">
 					{settingsMap.queryString.title}
 					<Tooltip title={settingsMap.queryString.description}>
-						<Icon type="info-circle" />
+						<InfoCircleOutlined />
 					</Tooltip>
 				</Radio>
 				<Radio value="searchOperators" data-cy="search-operators-radio-button">
 					{settingsMap.searchOperators.title}
 					<Tooltip title={settingsMap.searchOperators.description}>
-						<Icon type="info-circle" />
+						<InfoCircleOutlined />
 					</Tooltip>
 				</Radio>
 			</Radio.Group>
 			<h6>
 				Query Format
 				<Tooltip title={settingsMap.queryFormat.description}>
-					<Icon style={{ marginLeft: 5 }} type="info-circle" />
+					<InfoCircleOutlined style={{ marginLeft: 5 }} />
 				</Tooltip>
 			</h6>
 			<Radio.Group
@@ -167,7 +168,7 @@ const SettingsOptions = ({
 			<h6>
 				{settingsMap.distinctField.title}
 				<Tooltip title={settingsMap.distinctField.description}>
-					<Icon style={{ marginLeft: 5 }} type="info-circle" />
+					<InfoCircleOutlined style={{ marginLeft: 5 }} />
 				</Tooltip>
 			</h6>
 			<VersionController version="7.42.0">
@@ -203,7 +204,7 @@ const SettingsOptions = ({
 			<h6>
 				{settingsMap.enableTypoTolerance.title}
 				<Tooltip title={settingsMap.enableTypoTolerance.description}>
-					<Icon style={{ marginLeft: 5 }} type="info-circle" />
+					<InfoCircleOutlined style={{ marginLeft: 5 }} />
 				</Tooltip>
 			</h6>
 			<Switch
@@ -223,7 +224,7 @@ const SettingsOptions = ({
 					<h6>
 						{settingsMap.typoToleranceValue.title}
 						<Tooltip title={settingsMap.typoToleranceValue.description}>
-							<Icon style={{ marginLeft: 5 }} type="info-circle" />
+							<InfoCircleOutlined style={{ marginLeft: 5 }} />
 						</Tooltip>
 					</h6>
 					<Select
@@ -246,7 +247,7 @@ const SettingsOptions = ({
 			<h6>
 				Enable Synonyms
 				<Tooltip title={settingsMap.synonyms.description}>
-					<Icon style={{ marginLeft: 5 }} type="info-circle" />
+					<InfoCircleOutlined style={{ marginLeft: 5 }} />
 				</Tooltip>
 			</h6>
 			<Switch
@@ -258,7 +259,7 @@ const SettingsOptions = ({
 			<h6>
 				{settingsMap.enableNgram.title}
 				<Tooltip title={settingsMap.enableNgram.description}>
-					<Icon style={{ marginLeft: 5 }} type="info-circle" />
+					<InfoCircleOutlined style={{ marginLeft: 5 }} />
 				</Tooltip>
 			</h6>
 			<Switch
@@ -272,7 +273,7 @@ const SettingsOptions = ({
 						<h6>
 							N-gram Settings
 							<Tooltip title={settingsMap.enableNgram.description}>
-								<Icon style={{ marginLeft: 5 }} type="info-circle" />
+								<InfoCircleOutlined style={{ marginLeft: 5 }} />
 							</Tooltip>
 						</h6>
 						<div style={{ display: 'flex' }}>
@@ -346,7 +347,7 @@ const SettingsOptions = ({
 			<h6>
 				{settingsMap.enableAutoSuggestion.title}
 				<Tooltip title={settingsMap.enableAutoSuggestion.description}>
-					<Icon style={{ marginLeft: 5 }} type="info-circle" />
+					<InfoCircleOutlined style={{ marginLeft: 5 }} />
 				</Tooltip>
 			</h6>
 			<Switch
@@ -360,7 +361,7 @@ const SettingsOptions = ({
 						<h6>
 							Autosuggestion Settings
 							<Tooltip title={settingsMap.enableAutoSuggestion.description}>
-								<Icon style={{ marginLeft: 5 }} type="info-circle" />
+								<InfoCircleOutlined style={{ marginLeft: 5 }} />
 							</Tooltip>
 						</h6>
 						<div style={{ display: 'flex' }}>

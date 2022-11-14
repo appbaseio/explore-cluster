@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Icon, Input, Tooltip } from 'antd';
+import { FileSearchOutlined, SearchOutlined } from '@ant-design/icons';
+import { Input, Tooltip } from 'antd';
 import Fuse from 'fuse.js';
 import { css } from 'react-emotion';
 import { func, string } from 'prop-types';
@@ -121,7 +122,7 @@ const SandpackSearch = ({
 		<div className={searchContainerStyles}>
 			<Input
 				id="file-explorer-search"
-				prefix={<Icon type="search" />}
+				prefix={<SearchOutlined />}
 				suffix={
 					<>
 						{searchType !== 'fileSearch' ? (
@@ -144,8 +145,7 @@ const SandpackSearch = ({
 						) : null}
 
 						<Tooltip title="File Search">
-							<Icon
-								type="file-search"
+							<FileSearchOutlined
 								style={{
 									filter: iconColor('fileSearch'),
 								}}

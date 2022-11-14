@@ -1,5 +1,7 @@
 import React from 'react';
-import { Button, Modal, Form, Switch, Radio } from 'antd';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Button, Modal, Switch, Radio } from 'antd';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import { func, object, number, bool, oneOfType, string } from 'prop-types';
 import get from 'lodash/get';

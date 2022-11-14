@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { Button, Col, Icon, Tabs, Tooltip } from 'antd';
+import { CloseOutlined, InfoCircleOutlined } from '@ant-design/icons';
+
+import { Button, Col, Tabs, Tooltip } from 'antd';
 import { css } from 'emotion';
 import PropTypes from 'prop-types';
 import styled from 'react-emotion';
@@ -50,7 +52,7 @@ const IconContainer = styled.div`
 	display: flex;
 	justify-content: flex-end;
 `;
-const CloseIcon = styled(Icon)`
+const CloseIcon = styled(CloseOutlined)`
 	font-size: 1rem;
 	padding: 10px;
 	cursor: pointer;
@@ -348,7 +350,7 @@ const FunctionEditor = ({
 						overlay="Function Body"
 						placement="rightTop"
 					>
-						<Icon type="info-circle" theme="outlined" />
+						<InfoCircleOutlined />
 					</Tooltip>
 				}
 			</h3>
@@ -401,7 +403,7 @@ const FunctionEditor = ({
 										autoAdjustOverflow={false}
 									>
 										<span style={{ marginLeft: 5 }}>
-											<Icon type="info-circle" />
+											<InfoCircleOutlined />
 										</span>
 									</Tooltip>
 								</h3>
@@ -444,7 +446,6 @@ const FunctionEditor = ({
 											>
 												<IconContainer>
 													<CloseIcon
-														type="close"
 														onClick={() =>
 															setShowLivePreviewModal(false)
 														}
@@ -534,7 +535,7 @@ const FunctionEditor = ({
 									{isSmallScreen ? CONSOLE_LOGS_SHORT : CONSOLE_LOGS}
 									<Tooltip placement="right" title="Console Logs">
 										<span style={{ marginLeft: 5 }}>
-											<Icon type="info-circle" />
+											<InfoCircleOutlined />
 										</span>
 									</Tooltip>
 								</h3>
@@ -551,7 +552,7 @@ const FunctionEditor = ({
 									{isSmallScreen ? 'Response' : 'Response Output'}{' '}
 									<Tooltip placement="right" title="Validated Response">
 										<span style={{ marginLeft: 5 }}>
-											<Icon type="info-circle" />
+											<InfoCircleOutlined />
 										</span>
 									</Tooltip>
 								</h3>

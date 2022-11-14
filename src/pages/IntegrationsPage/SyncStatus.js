@@ -1,6 +1,7 @@
 import React from 'react';
 import { css } from 'emotion';
-import { Card, Button, Icon, Tooltip } from 'antd';
+import { ClockCircleOutlined } from '@ant-design/icons';
+import { Card, Button, Tooltip } from 'antd';
 import get from 'lodash/get';
 import { string, object, func } from 'prop-types';
 import { connect } from 'react-redux';
@@ -340,7 +341,7 @@ class SyncStatus extends React.Component {
 								<Flex style={{ gap: '10px' }} alignItems="center">
 									<Tooltip title="Past Versions" style={{ fontSize: 14 }}>
 										{/* Past Versions */}
-										<Icon
+										<ClockCircleOutlined
 											style={{
 												cursor: currentVersion.version_id
 													? 'pointer'
@@ -349,7 +350,6 @@ class SyncStatus extends React.Component {
 													? 'rgba(0,0,0,0.65)'
 													: '#bbb7b7',
 											}}
-											type="clock-circle"
 											onClick={() => {
 												if (currentVersion.version_id)
 													this.setState({

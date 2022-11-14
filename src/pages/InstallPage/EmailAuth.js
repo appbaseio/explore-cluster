@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { CheckCircleOutlined } from '@ant-design/icons';
+import { Icon as LegacyIcon } from '@ant-design/compatible';
 import { Button, Input, message } from 'antd';
 import { Validators } from 'react-reactive-form';
 import { emailBtn, inputStyles, smallBtn } from './styles';
@@ -148,7 +150,7 @@ class EmailAuth extends React.Component {
 
 						<Button
 							onClick={this.verifyOtp}
-							icon="check-circle"
+							icon={<CheckCircleOutlined />}
 							size="small"
 							loading={isVerifying}
 							className={emailBtn}
@@ -159,7 +161,7 @@ class EmailAuth extends React.Component {
 						<Flex flexDirection="column" alignItems="flex-end">
 							<Button
 								onClick={isEmailAuth ? this.handleEmailSubmission : toggleEmailAuth}
-								icon={isEmailAuth ? '' : 'mail'}
+								icon={<LegacyIcon type={isEmailAuth ? '' : 'mail'} />}
 								size="small"
 								disabled={disabled}
 								className={smallBtn}
@@ -180,7 +182,7 @@ class EmailAuth extends React.Component {
 				) : (
 					<Button
 						onClick={isEmailAuth ? this.handleEmailSubmission : toggleEmailAuth}
-						icon={isEmailAuth ? '' : 'mail'}
+						icon={<LegacyIcon type={isEmailAuth ? '' : 'mail'} />}
 						size="large"
 						disabled={disabled}
 						loading={isLoading}

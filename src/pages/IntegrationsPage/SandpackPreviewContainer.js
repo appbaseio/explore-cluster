@@ -5,6 +5,7 @@ import {
 	useLoadingOverlayState,
 	SandpackConsole,
 } from '@codesandbox/sandpack-react';
+import { CodeOutlined } from '@ant-design/icons';
 import { Button, Tooltip } from 'antd';
 import ReactivesearchLoader from '../../components/ReactivesearchLoader/ReactivesearchLoader';
 
@@ -50,7 +51,7 @@ const SandpackPreviewContainer = () => {
 						<Tooltip title="View Console">
 							<Button
 								shape="circle"
-								icon="code"
+								icon={<CodeOutlined />}
 								size="small"
 								className="sp-button sp-icon-standalone"
 								style={{ marginBottom: 5 }}

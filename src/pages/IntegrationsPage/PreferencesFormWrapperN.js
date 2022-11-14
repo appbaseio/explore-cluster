@@ -4,6 +4,7 @@ import { string, func, bool, object, array } from 'prop-types';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { css } from 'react-emotion';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import { FormBuilder, Validators } from 'react-reactive-form';
 import { componentTypes } from '@appbaseio/reactivesearch';
@@ -1241,7 +1242,7 @@ class PreferencesFormWrapperN extends React.Component {
 							margin: '5px 0px',
 						}}
 						type="link"
-						icon="arrow-left"
+						icon={<ArrowLeftOutlined />}
 						onClick={() => {
 							history.push(`/cluster/recommendations-builder`);
 						}}
@@ -1254,7 +1255,7 @@ class PreferencesFormWrapperN extends React.Component {
 							margin: '5px 0px',
 						}}
 						type="link"
-						icon="arrow-left"
+						icon={<ArrowLeftOutlined />}
 						onClick={closeForm}
 					>
 						Go back to Search UIs

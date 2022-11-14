@@ -1,4 +1,5 @@
-import { Button, Col, Icon, Row, Select, Tag, Tooltip, Modal, Tabs } from 'antd';
+import { InfoCircleOutlined, SaveOutlined } from '@ant-design/icons';
+import { Button, Col, Row, Select, Tag, Tooltip, Modal, Tabs } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -733,7 +734,7 @@ const ScriptConsole = ({
 							title={getTooltipTitle['query-area']}
 						>
 							<span style={{ marginLeft: 5 }}>
-								<Icon type="info-circle" />
+								<InfoCircleOutlined />
 							</span>
 						</Tooltip>
 					</h3>
@@ -782,7 +783,7 @@ const ScriptConsole = ({
 							>
 								{isSmallScreen ? (
 									<Tooltip title="Save Script" trigger="hover">
-										<Icon type="save" title="" />{' '}
+										<SaveOutlined title="" />{' '}
 									</Tooltip>
 								) : (
 									'Save Script'
@@ -811,7 +812,7 @@ const ScriptConsole = ({
 									autoAdjustOverflow={false}
 								>
 									<span style={{ marginLeft: 5 }}>
-										<Icon type="info-circle" />
+										<InfoCircleOutlined />
 									</span>
 								</Tooltip>
 							</h3>
@@ -843,7 +844,7 @@ const ScriptConsole = ({
 								{isSmallScreen ? RESPONSE_OUTPUT_SHORT : RESPONSE_OUTPUT}{' '}
 								<Tooltip placement="right" title={getTooltipTitle['response-area']}>
 									<span style={{ marginLeft: 5 }}>
-										<Icon type="info-circle" />
+										<InfoCircleOutlined />
 									</span>
 								</Tooltip>
 							</h3>
@@ -875,7 +876,7 @@ const ScriptConsole = ({
 								{isSmallScreen ? CONSOLE_LOGS_SHORT : CONSOLE_LOGS}
 								<Tooltip placement="right" title={getTooltipTitle['console-logs']}>
 									<span style={{ marginLeft: 5 }}>
-										<Icon type="info-circle" />
+										<InfoCircleOutlined />
 									</span>
 								</Tooltip>
 							</h3>

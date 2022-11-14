@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { Button, Col, Icon, Modal, Tabs, Tooltip } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+
+import { Button, Col, Modal, Tabs, Tooltip } from 'antd';
 import { css } from 'emotion';
 import PropTypes from 'prop-types';
 import Monaco from '../../../../../../batteries/components/SearchSandbox/containers/MonacoEditor';
@@ -318,7 +320,7 @@ const FunctionEditor = ({
 							overlay="Function Body"
 							placement="rightTop"
 						>
-							<Icon type="info-circle" theme="outlined" />
+							<InfoCircleOutlined />
 						</Tooltip>
 					}
 				</h3>
@@ -371,7 +373,7 @@ const FunctionEditor = ({
 											autoAdjustOverflow={false}
 										>
 											<span style={{ marginLeft: 5 }}>
-												<Icon type="info-circle" />
+												<InfoCircleOutlined />
 											</span>
 										</Tooltip>
 									</h3>
@@ -402,7 +404,7 @@ const FunctionEditor = ({
 										{isSmallScreen ? 'Response' : 'Response Output'}{' '}
 										<Tooltip placement="right" title="Validated Response">
 											<span style={{ marginLeft: 5 }}>
-												<Icon type="info-circle" />
+												<InfoCircleOutlined />
 											</span>
 										</Tooltip>
 									</h3>
@@ -435,7 +437,7 @@ const FunctionEditor = ({
 										{isSmallScreen ? CONSOLE_LOGS_SHORT : CONSOLE_LOGS}
 										<Tooltip placement="right" title="Console Logs">
 											<span style={{ marginLeft: 5 }}>
-												<Icon type="info-circle" />
+												<InfoCircleOutlined />
 											</span>
 										</Tooltip>
 									</h3>

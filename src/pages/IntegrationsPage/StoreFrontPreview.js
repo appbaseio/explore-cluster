@@ -1,6 +1,7 @@
 import React from 'react';
 import { func, bool, number, oneOfType, string } from 'prop-types';
-import { Button, Icon, notification } from 'antd';
+import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { Button, notification } from 'antd';
 import get from 'lodash/get';
 import Loader from '../../components/Loader';
 import SearchPreviewWrapper from './SearchPreviewWrapper';
@@ -179,7 +180,7 @@ class StoreFrontPreview extends React.Component {
 						}}
 						onClick={this.handleViewChange}
 					>
-						<Icon
+						<LegacyIcon
 							style={{
 								fontSize: 20,
 								position: 'relative',

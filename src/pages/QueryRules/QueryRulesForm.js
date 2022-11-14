@@ -7,6 +7,13 @@ import { connect } from 'react-redux';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import {
+	ArrowLeftOutlined,
+	InfoCircleOutlined,
+	LinkOutlined,
+	PlusOutlined,
+} from '@ant-design/icons';
+import { Icon as LegacyIcon } from '@ant-design/compatible';
+import {
 	Affix,
 	Alert,
 	Button,
@@ -15,7 +22,6 @@ import {
 	Checkbox,
 	DatePicker,
 	Divider,
-	Icon,
 	Input,
 	message,
 	notification,
@@ -138,7 +144,7 @@ const formStyle = css`
 function DocsLink({ url }) {
 	return (
 		<a href={url} className={link} target="_blank" rel="noopener noreferrer">
-			Learn more <Icon type="link" />
+			Learn more <LinkOutlined />
 		</a>
 	);
 }
@@ -977,7 +983,7 @@ class QueryRulesForm extends React.Component {
 							extra={
 								<Link to="/cluster/rules/new">
 									<Button type="primary" data-cy="create-qyery-rule">
-										<Icon type="plus" />
+										<PlusOutlined />
 										Create Rule
 									</Button>
 								</Link>
@@ -1000,7 +1006,7 @@ class QueryRulesForm extends React.Component {
 			<div className={container}>
 				<Link to="/cluster/rules">
 					<Button>
-						<Icon type="arrow-left" />
+						<ArrowLeftOutlined />
 						Back to Rules
 					</Button>
 				</Link>
@@ -1292,7 +1298,7 @@ class QueryRulesForm extends React.Component {
 													</React.Fragment>
 												}
 											>
-												<Icon type="info-circle" />
+												<InfoCircleOutlined />
 											</Popover>
 											<Input
 												name="cronExpression"
@@ -1438,7 +1444,8 @@ class QueryRulesForm extends React.Component {
 											ghost
 											type="danger"
 										>
-											<Icon type={isDeleting ? 'loading' : 'delete'} /> Delete
+											<LegacyIcon type={isDeleting ? 'loading' : 'delete'} />{' '}
+											Delete
 										</Button>
 									)}
 								</DeleteModal>
@@ -1483,7 +1490,7 @@ class QueryRulesForm extends React.Component {
 								type="primary"
 								data-cy="save-query-rule"
 							>
-								<Icon type={isCreating || isUpdating ? 'loading' : 'save'} />
+								<LegacyIcon type={isCreating || isUpdating ? 'loading' : 'save'} />
 								Save
 							</Button>
 						</div>

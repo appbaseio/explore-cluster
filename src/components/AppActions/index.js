@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Col, Icon, Row } from 'antd';
+import { CopyOutlined, DeleteOutlined, ThunderboltOutlined } from '@ant-design/icons';
+import { Col, Row } from 'antd';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { actionIcon, cloneButton, columnSeparator, deleteButton } from '../AppCard/styles';
@@ -45,7 +46,7 @@ class AppActions extends Component {
 						css={{ color: '#1890ff' }}
 						onClick={onExploreClick}
 					>
-						<Icon className={actionIcon} type="thunderbolt" />
+						<ThunderboltOutlined className={actionIcon} />
 						Explore
 					</Col>
 					{canEdit && (
@@ -57,7 +58,7 @@ class AppActions extends Component {
 								this.handleCloneModal();
 							}}
 						>
-							<Icon className={actionIcon} type="copy" />
+							<CopyOutlined className={actionIcon} />
 							Clone Index
 						</Col>
 					)}
@@ -71,7 +72,7 @@ class AppActions extends Component {
 							}}
 							data-cy={`delete-app-${get(data, 'alias') || get(data, 'index')}`}
 						>
-							<Icon className={actionIcon} type="delete" />
+							<DeleteOutlined className={actionIcon} />
 							Delete Index
 						</Col>
 					)}

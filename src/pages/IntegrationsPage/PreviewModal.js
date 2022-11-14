@@ -1,5 +1,7 @@
 import React from 'react';
-import { Button, Icon, Modal, Popover } from 'antd';
+import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { EyeOutlined } from '@ant-design/icons';
+import { Button, Modal, Popover } from 'antd';
 import { css } from 'react-emotion';
 import get from 'lodash/get';
 import { func, string, bool, object, number, oneOfType } from 'prop-types';
@@ -162,7 +164,7 @@ class PreviewModal extends React.Component {
 							<span>
 								{!displayProductPicker && !isRecommendation ? (
 									<Button onClick={this.handleViewChange}>
-										<Icon
+										<LegacyIcon
 											style={{
 												fontSize: 20,
 												position: 'relative',
@@ -222,7 +224,7 @@ class PreviewModal extends React.Component {
 					</div>
 				</Modal>
 				<Button onClick={this.showModal} type="primary" size="large" {...buttonProps}>
-					<Icon type="eye" /> {label}
+					<EyeOutlined /> {label}
 				</Button>
 			</React.Fragment>
 		);

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { SearchBox } from '@appbaseio/reactivesearch';
 import { css } from 'react-emotion';
-import { Icon } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
 import get from 'lodash/get';
 import createDOMPurify from 'dompurify';
 import { getSettings as getSearchSettings } from '../../batteries/modules/actions';
@@ -144,9 +144,8 @@ class GlobalSearch extends PureComponent {
 						return null;
 					}}
 				/>
-				<Icon
+				<SearchOutlined
 					className="search-icon"
-					type="search"
 					css={{
 						position: 'absolute',
 						top: '50%',

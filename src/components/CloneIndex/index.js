@@ -1,17 +1,8 @@
 import React, { useState } from 'react';
-import {
-	Checkbox,
-	Col,
-	Form,
-	Icon,
-	Input,
-	message,
-	Modal,
-	notification,
-	Row,
-	Tooltip,
-	List,
-} from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Checkbox, Col, Input, message, Modal, notification, Row, Tooltip, List } from 'antd';
 import { css } from 'emotion';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -140,7 +131,7 @@ const CloneIndex = (props) => {
 				<Col style={{ marginBottom: exists ? '20px' : '1px' }} span={8}>
 					Destination Index{' '}
 					<Tooltip title="Destination Index should be a new index name that doesn't already exist in the cluster.">
-						<Icon style={{ cursor: 'pointer' }} type="info-circle" />
+						<InfoCircleOutlined style={{ cursor: 'pointer' }} />
 					</Tooltip>
 				</Col>
 				<Col span={16}>

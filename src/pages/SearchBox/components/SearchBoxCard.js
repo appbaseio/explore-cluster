@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Card, Col, Icon, message, notification, Row, Tooltip } from 'antd';
+import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { DownloadOutlined, EditOutlined } from '@ant-design/icons';
+import { Button, Card, Col, message, notification, Row, Tooltip } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
 import moment from 'moment';
@@ -221,7 +223,7 @@ const SearchBoxCard = (props) => {
 										}}
 										onClick={handleModal}
 									>
-										<Icon
+										<LegacyIcon
 											type={searchBoxItem.isDeleting ? 'loading' : 'delete'}
 										/>{' '}
 										Delete
@@ -232,7 +234,7 @@ const SearchBoxCard = (props) => {
 								<Link to={`/cluster/searchboxes/${searchBoxItem.id}`}>
 									<Tooltip title="Edit Searchbox">
 										<Button size={actionButtonSize} type="primary">
-											<Icon type="edit" /> Edit{' '}
+											<EditOutlined /> Edit{' '}
 										</Button>
 									</Tooltip>
 								</Link>
@@ -245,7 +247,7 @@ const SearchBoxCard = (props) => {
 										size={actionButtonSize}
 										type="primary"
 									>
-										<Icon type="download" />
+										<DownloadOutlined />
 									</Button>
 								</Tooltip>
 							)}

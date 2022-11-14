@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Icon } from 'antd';
+import { BookOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
 import { Link } from 'react-router-dom';
 import { container } from './styles';
 import CreateAppModal from '../HomePage/CreateAppModal';
@@ -24,11 +25,11 @@ function NoIndex({ view }) {
 					onClick={() => handleChange()}
 					data-cy="initialize-new-index-creation"
 				>
-					<Icon type="plus" /> Create a new index
+					<PlusOutlined /> Create a new index
 				</Button>
 				<Button size="large">
 					<Link to="/tutorial">
-						Interactive Tutorial <Icon type="book" />
+						Interactive Tutorial <BookOutlined />
 					</Link>
 				</Button>
 			</div>

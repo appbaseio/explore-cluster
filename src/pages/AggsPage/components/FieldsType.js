@@ -2,7 +2,8 @@ import React from 'react';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import { css } from 'react-emotion';
-import { Skeleton, Icon, Tooltip, Empty, Row, Col, Select } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { Skeleton, Tooltip, Empty, Row, Col, Select } from 'antd';
 import MappingWrapper from '../../../components/MappingsWrapper';
 import FieldRow from '../../MappingsPage/components/FieldRow';
 import ObjectField from '../../MappingsPage/components/ObjectField';
@@ -214,7 +215,7 @@ const FieldType = ({ handleFieldType, handleDelete, fieldTypes, updateToAggsFiel
 												<p key={item.title}>
 													{item.title}
 													<Tooltip title={item.info}>
-														<Icon type="info-circle" />
+														<InfoCircleOutlined />
 													</Tooltip>
 												</p>
 											))}
@@ -226,7 +227,7 @@ const FieldType = ({ handleFieldType, handleDelete, fieldTypes, updateToAggsFiel
 														<p style={{ width: 155 }}>
 															{item.title}
 															<Tooltip title={item.info}>
-																<Icon type="info-circle" />
+																<InfoCircleOutlined />
 															</Tooltip>
 														</p>
 													</Col>

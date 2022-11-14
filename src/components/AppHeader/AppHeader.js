@@ -1,5 +1,6 @@
 import React from 'react';
-import { Layout, Menu, Icon, Tooltip, Button, Row, Breadcrumb } from 'antd';
+import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { Layout, Menu, Tooltip, Button, Row, Breadcrumb } from 'antd';
 import { Link } from 'react-router-dom';
 import { string, object, bool, number, func } from 'prop-types';
 import { css } from 'react-emotion';
@@ -69,7 +70,7 @@ const AppHeader = ({
 				}}
 			>
 				{minimal ? (
-					<Icon
+					<LegacyIcon
 						style={{ position: 'absolute', left: 20 }}
 						className="trigger"
 						type={collapsed ? 'menu-unfold' : 'menu-fold'}
@@ -78,7 +79,7 @@ const AppHeader = ({
 				) : (
 					<Menu mode="horizontal">
 						<Menu.Item key="back" className={noBorder} style={{ padding: 0 }}>
-							<Icon
+							<LegacyIcon
 								className="trigger"
 								type={collapsed ? 'menu-unfold' : 'menu-fold'}
 								onClick={onToggle}

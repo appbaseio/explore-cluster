@@ -1,4 +1,5 @@
-import { Input, Icon, Empty } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
+import { Input, Empty } from 'antd';
 import { css } from 'emotion';
 import React, { useEffect, useState } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
@@ -369,7 +370,7 @@ const SearchBoxPreview = ({ stateCollector, searchBoxData }) => {
 						value={inputValue}
 						onChange={inputChangeHandler}
 						placeholder="Search across suggestions..."
-						prefix={<Icon style={{ transform: 'scale(1.25)' }} type="search" />}
+						prefix={<SearchOutlined style={{ transform: 'scale(1.25)' }} />}
 					/>
 				</div>
 				<DragDropContext className="suggestions-wrapper" onDragEnd={onDragEnd}>

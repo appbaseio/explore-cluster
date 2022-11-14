@@ -2,7 +2,8 @@ import { css } from 'emotion';
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes, { func, object } from 'prop-types';
 import yamlToJson from 'js-yaml';
-import { Button, Dropdown, Icon, Input, Menu, message } from 'antd';
+import { DownOutlined, PlusSquareFilled, SearchOutlined } from '@ant-design/icons';
+import { Button, Dropdown, Input, Menu, message } from 'antd';
 import { unionWith } from 'lodash';
 import Container from '../../../../components/Container';
 import Monaco from '../../../../batteries/components/SearchSandbox/containers/MonacoEditor';
@@ -130,7 +131,7 @@ const StagesMenu = ({ pipelineSchema, getEditorValue, handleMenuClick }) => {
 				onChange={(e) => setQuery(e.target.value)}
 				allowClear
 				placeholder="Search for stages"
-				prefix={<Icon type="search" style={{ color: '#1990ff' }} />}
+				prefix={<SearchOutlined style={{ color: '#1990ff' }} />}
 				css={inputStyle}
 			/>
 			<Menu css={dropdownMenuCss} onClick={handleMenuClick}>
@@ -141,7 +142,7 @@ const StagesMenu = ({ pipelineSchema, getEditorValue, handleMenuClick }) => {
 							<p title={prebuiltStages?.stages?.[stageKey]?.description ?? ''}>
 								{prebuiltStages?.stages?.[stageKey]?.description ?? ''}
 							</p>
-							<Icon type="plus-square" theme="filled" className="add-icon" />
+							<PlusSquareFilled className="add-icon" />
 						</Menu.Item>
 					);
 				})}
@@ -380,7 +381,7 @@ const PipelineEditorComponent = (props) => {
 					className="ant-dropdown-link"
 					onClick={() => setShowStagesMenu(!showStagesMenu)}
 				>
-					Add Stages <Icon type="down" />
+					Add Stages <DownOutlined />
 				</Button>
 			</Dropdown>
 			<Monaco

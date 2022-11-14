@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import PropTypes, { object } from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import get from 'lodash/get';
-import { Button, Tooltip, Icon, Modal, message } from 'antd';
+import { ClockCircleOutlined, CloseOutlined } from '@ant-design/icons';
+import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { Button, Tooltip, Modal, message } from 'antd';
 import { connect } from 'react-redux';
 import CommitModal from './CommitModal';
 // eslint-disable-next-line import/no-cycle
@@ -304,18 +306,16 @@ const ModalHeader = ({
 
 						<Tooltip title="Past Versions" style={{ fontSize: 14 }}>
 							{/* Past Versions */}
-							<Icon
+							<ClockCircleOutlined
 								style={{
 									cursor: currentVersion.version_id ? 'pointer' : 'not-allowed',
 								}}
-								type="clock-circle"
 								onClick={() => {
 									if (currentVersion.version_id) setVisible(true);
 								}}
 							/>
 						</Tooltip>
-						<Icon
-							type="close"
+						<CloseOutlined
 							onClick={() => {
 								history.push(`/cluster/search-builder/${preferenceId}`);
 								handleSave();
@@ -334,7 +334,7 @@ const ModalHeader = ({
 					</div>
 				) : null}
 				<div className="header-icons">
-					<Icon
+					<LegacyIcon
 						style={{ cursor: 'pointer' }}
 						type={collapsed ? 'menu-unfold' : 'menu-fold'}
 						onClick={() => setIsCollapsed(!collapsed)}

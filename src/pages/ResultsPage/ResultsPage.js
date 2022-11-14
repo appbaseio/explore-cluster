@@ -2,7 +2,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Card, Form, Input, InputNumber, Select, Switch, Skeleton, Button, Icon } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Card, Input, InputNumber, Select, Switch, Skeleton, Button } from 'antd';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
@@ -547,7 +550,7 @@ class ResultsPage extends React.Component {
 												}}
 												disabled={error}
 											>
-												<Icon type="plus" />
+												<PlusOutlined />
 												Add Sort Option
 											</Button>
 										</div>

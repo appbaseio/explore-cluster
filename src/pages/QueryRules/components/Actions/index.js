@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { DeleteOutlined } from '@ant-design/icons';
 import { Button, Card, Icon, Tooltip, Typography } from 'antd';
 import { css } from 'emotion';
 import get from 'lodash/get';
@@ -272,7 +273,7 @@ class Actions extends React.Component {
 											onClick={() => this.deleteAction(item.type)}
 											className="delete-icon"
 											shape="circle"
-											icon="delete"
+											icon={<DeleteOutlined />}
 										/>
 									</div>
 								</div>

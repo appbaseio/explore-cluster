@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Card, Button, Icon, Input } from 'antd';
+import { ArrowRightOutlined, ClusterOutlined, LockOutlined, UserOutlined } from '@ant-design/icons';
+import { Card, Button, Input } from 'antd';
 import { Redirect, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import get from 'lodash/get';
@@ -101,7 +102,7 @@ class LoginPage extends Component {
 						<Input
 							ref={this.url}
 							size="large"
-							prefix={<Icon type="cluster" style={{ color: 'rgba(0,0,0,.25)' }} />}
+							prefix={<ClusterOutlined style={{ color: 'rgba(0,0,0,.25)' }} />}
 							placeholder="Cluster URL"
 							onBlur={this.onClusterURLBlur}
 							onPressEnter={this.onClusterURLBlur}
@@ -113,7 +114,7 @@ class LoginPage extends Component {
 							}}
 							ref={this.username}
 							size="large"
-							prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
+							prefix={<UserOutlined style={{ color: 'rgba(0,0,0,.25)' }} />}
 							placeholder="Username"
 						/>
 						<Input
@@ -122,7 +123,7 @@ class LoginPage extends Component {
 							}}
 							ref={this.password}
 							size="large"
-							prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />}
+							prefix={<LockOutlined style={{ color: 'rgba(0,0,0,.25)' }} />}
 							type="password"
 							placeholder="Password"
 						/>
@@ -135,7 +136,7 @@ class LoginPage extends Component {
 							style={{ height: 40 }}
 						>
 							Signin
-							<Icon type="arrow-right" />
+							<ArrowRightOutlined />
 						</Button>
 					</Card>
 					<Link to="/install">
@@ -146,7 +147,7 @@ class LoginPage extends Component {
 							style={{ whiteSpace: 'inherit' }}
 						>
 							Install a new reactivesearch.io instance
-							<Icon type="arrow-right" />
+							<ArrowRightOutlined />
 						</Button>
 					</Link>
 				</section>

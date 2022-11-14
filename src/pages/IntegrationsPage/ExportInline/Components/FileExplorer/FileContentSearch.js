@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Collapse, Tooltip, Tag, Icon } from 'antd';
+import { CaretRightOutlined } from '@ant-design/icons';
+import { Collapse, Tooltip, Tag } from 'antd';
 import { groupBy } from 'lodash';
 
 const FileContentSearch = ({ searchAllContent, selectFile, setHighlightLine }) => {
@@ -13,7 +14,7 @@ const FileContentSearch = ({ searchAllContent, selectFile, setHighlightLine }) =
 	return searchAllContent.length ? (
 		<Collapse
 			bordered={false}
-			expandIcon={({ isActive }) => <Icon type="caret-right" rotate={isActive ? 90 : 0} />}
+			expandIcon={({ isActive }) => <CaretRightOutlined rotate={isActive ? 90 : 0} />}
 			defaultActiveKey={Object.keys(groupedFiles)}
 		>
 			<div className="result-stats">

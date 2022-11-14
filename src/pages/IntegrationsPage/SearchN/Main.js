@@ -2,7 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { withRouter } from 'react-router-dom';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
-import { Tabs, Affix, Button, Icon } from 'antd';
+
+import {
+	AppstoreOutlined,
+	DatabaseOutlined,
+	LoadingOutlined,
+	SettingOutlined,
+	UnlockOutlined,
+} from '@ant-design/icons';
+
+import { Tabs, Affix, Button } from 'antd';
 import { FieldGroup } from 'react-reactive-form';
 import { object, array, func, string, bool } from 'prop-types';
 import { v4 as uuidv4 } from 'uuid';
@@ -81,7 +90,7 @@ const Main = ({ tier, featureEcommerce, getPreferencesN, ...props }) => {
 									<TabPane
 										tab={
 											<span>
-												<Icon type="setting" />
+												<SettingOutlined />
 												General
 											</span>
 										}
@@ -108,7 +117,7 @@ const Main = ({ tier, featureEcommerce, getPreferencesN, ...props }) => {
 									<TabPane
 										tab={
 											<span>
-												<Icon type="appstore" />
+												<AppstoreOutlined />
 												UI Components
 											</span>
 										}
@@ -123,7 +132,7 @@ const Main = ({ tier, featureEcommerce, getPreferencesN, ...props }) => {
 									<TabPane
 										tab={
 											<span>
-												<Icon type="unlock" />
+												<UnlockOutlined />
 												End-user Authentication
 											</span>
 										}
@@ -134,7 +143,7 @@ const Main = ({ tier, featureEcommerce, getPreferencesN, ...props }) => {
 									<TabPane
 										tab={
 											<span>
-												<Icon type="database" />
+												<DatabaseOutlined />
 												Domain
 											</span>
 										}
@@ -178,8 +187,7 @@ const Main = ({ tier, featureEcommerce, getPreferencesN, ...props }) => {
 													>
 														<div className="button-label">
 															{isEditorLoading ? (
-																<Icon
-																	type="loading"
+																<LoadingOutlined
 																	style={{ marginRight: 5 }}
 																/>
 															) : (

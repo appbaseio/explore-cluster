@@ -1,5 +1,16 @@
 import React, { useState, useContext } from 'react';
-import { Icon, Input, Menu, Dropdown } from 'antd';
+
+import {
+	CaretDownOutlined,
+	CaretRightOutlined,
+	DeleteOutlined,
+	EditOutlined,
+	FileAddOutlined,
+	FolderAddOutlined,
+	MoreOutlined,
+} from '@ant-design/icons';
+
+import { Input, Menu, Dropdown } from 'antd';
 import PropTypes from 'prop-types';
 import { useSandpack } from '@codesandbox/sandpack-react';
 import { FileIcon } from './icons';
@@ -68,7 +79,7 @@ const File = ({ path, selectFile, active, onClick, depth, createNew, setNewFolde
 					setMode('file-add');
 				}}
 			>
-				<Icon type="file-add" />
+				<FileAddOutlined />
 				New File
 			</Menu.Item>
 			<Menu.Item
@@ -77,7 +88,7 @@ const File = ({ path, selectFile, active, onClick, depth, createNew, setNewFolde
 					setMode('folder-add');
 				}}
 			>
-				<Icon type="folder-add" />
+				<FolderAddOutlined />
 				New Folder
 			</Menu.Item>
 			<Menu.Item
@@ -85,7 +96,7 @@ const File = ({ path, selectFile, active, onClick, depth, createNew, setNewFolde
 					setMode('folder-edit');
 				}}
 			>
-				<Icon type="edit" theme="outlined" />
+				<EditOutlined />
 				Rename
 			</Menu.Item>
 			<Menu.Item
@@ -94,7 +105,7 @@ const File = ({ path, selectFile, active, onClick, depth, createNew, setNewFolde
 					handleDelete(path);
 				}}
 			>
-				<Icon type="delete" theme="outlined" />
+				<DeleteOutlined />
 				Delete
 			</Menu.Item>
 		</Menu>
@@ -105,7 +116,7 @@ const File = ({ path, selectFile, active, onClick, depth, createNew, setNewFolde
 					setMode('file-edit');
 				}}
 			>
-				<Icon type="edit" theme="outlined" />
+				<EditOutlined />
 				Rename
 			</Menu.Item>
 			<Menu.Item
@@ -114,7 +125,7 @@ const File = ({ path, selectFile, active, onClick, depth, createNew, setNewFolde
 					handleDelete(path);
 				}}
 			>
-				<Icon type="delete" theme="outlined" />
+				<DeleteOutlined />
 				Delete
 			</Menu.Item>
 		</Menu>
@@ -136,9 +147,9 @@ const File = ({ path, selectFile, active, onClick, depth, createNew, setNewFolde
 				) : (
 					<div onClick={handleCollapse} style={{ display: 'flex' }}>
 						{isCollapsed ? (
-							<Icon type="caret-right" onClick={onClick} />
+							<CaretRightOutlined onClick={onClick} />
 						) : (
-							<Icon type="caret-down" onClick={onClick} />
+							<CaretDownOutlined onClick={onClick} />
 						)}
 					</div>
 				)}
@@ -160,7 +171,7 @@ const File = ({ path, selectFile, active, onClick, depth, createNew, setNewFolde
 						onClick={(e) => e.preventDefault()}
 					>
 						<div style={{ cursor: 'pointer' }}>
-							<Icon type="more" className="show-on-hover" />
+							<MoreOutlined className="show-on-hover" />
 						</div>
 					</Dropdown>
 				</span>

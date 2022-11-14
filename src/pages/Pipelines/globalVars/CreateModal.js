@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Modal, Input, InputNumber, Select, Alert, Button, Icon, Tooltip } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { Modal, Input, InputNumber, Select, Alert, Button, Tooltip } from 'antd';
 import Ace from '../../../batteries/components/SearchSandbox/containers/AceEditor';
 import { getURL } from '../../../constants/config';
 import { globalVarsMessages } from '../utils/messages';
@@ -362,7 +364,7 @@ const CreateModal = ({
 						<div>
 							Key{' '}
 							<Tooltip title={globalVarsMessages.key}>
-								<Icon type="info-circle" />
+								<InfoCircleOutlined />
 							</Tooltip>
 						</div>
 						<Input
@@ -378,7 +380,7 @@ const CreateModal = ({
 							<div>
 								Label{' '}
 								<Tooltip title={globalVarsMessages.label}>
-									<Icon type="info-circle" />
+									<InfoCircleOutlined />
 								</Tooltip>
 							</div>
 							<Input
@@ -392,7 +394,7 @@ const CreateModal = ({
 							<div>
 								Description{' '}
 								<Tooltip title={globalVarsMessages.description}>
-									<Icon type="info-circle" />
+									<InfoCircleOutlined />
 								</Tooltip>
 							</div>
 							<Input
@@ -407,7 +409,7 @@ const CreateModal = ({
 						<div>
 							Value{' '}
 							<Tooltip title={globalVarsMessages.value}>
-								<Icon type="info-circle" />
+								<InfoCircleOutlined />
 							</Tooltip>
 						</div>
 						<Input
@@ -427,7 +429,7 @@ const CreateModal = ({
 								<div>
 									Expected Status{' '}
 									<Tooltip title={globalVarsMessages.expected_status}>
-										<Icon type="info-circle" />
+										<InfoCircleOutlined />
 									</Tooltip>
 								</div>
 								<InputNumber
@@ -448,7 +450,7 @@ const CreateModal = ({
 								<div>
 									URL{' '}
 									<Tooltip title={globalVarsMessages.url}>
-										<Icon type="info-circle" />
+										<InfoCircleOutlined />
 									</Tooltip>
 								</div>
 								<Input
@@ -469,7 +471,7 @@ const CreateModal = ({
 								<div>
 									Method{' '}
 									<Tooltip title={globalVarsMessages.method}>
-										<Icon type="info-circle" />
+										<InfoCircleOutlined />
 									</Tooltip>
 								</div>
 								<Select
@@ -493,7 +495,7 @@ const CreateModal = ({
 								<div>
 									Headers{' '}
 									<Tooltip title={globalVarsMessages.headers}>
-										<Icon type="info-circle" />
+										<InfoCircleOutlined />
 									</Tooltip>
 								</div>
 								<Ace
@@ -523,7 +525,7 @@ const CreateModal = ({
 								<div>
 									Body{' '}
 									<Tooltip title={globalVarsMessages.body}>
-										<Icon type="info-circle" />
+										<InfoCircleOutlined />
 									</Tooltip>
 								</div>
 								<Ace
@@ -557,7 +559,7 @@ const CreateModal = ({
 								type="primary"
 								onClick={() => validateForm()}
 							>
-								Validate {iconType ? <Icon type={iconType} /> : null}
+								Validate {iconType ? <LegacyIcon type={iconType} /> : null}
 							</Button>
 						</div>
 					</div>

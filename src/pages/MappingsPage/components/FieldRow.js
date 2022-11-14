@@ -1,6 +1,7 @@
 import React from 'react';
 import get from 'lodash/get';
-import { Button, Row, Col, Icon, Popover, Input } from 'antd';
+import { CopyOutlined, DeleteOutlined, MinusOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Row, Col, Popover, Input } from 'antd';
 import PropTypes from 'prop-types';
 import UsecaseDropdown from './UsecaseDropdown';
 import TypeDropdown from './TypeDropdown';
@@ -64,7 +65,7 @@ const FieldRow = ({
 							size="small"
 							onClick={() => onAdvanceStateChange(path, !isAdvanceOption)}
 						>
-							{isAdvanceOption ? <Icon type="minus" /> : <Icon type="plus" />}
+							{isAdvanceOption ? <MinusOutlined /> : <PlusOutlined />}
 							Advanced settings
 						</Button>
 					)}
@@ -75,7 +76,7 @@ const FieldRow = ({
 							size="small"
 							onClick={triggerCopyField}
 						>
-							<Icon type="copy" data-cy={`copy-field-${field}`} />
+							<CopyOutlined data-cy={`copy-field-${field}`} />
 							Copy Field
 						</Button>
 					)}
@@ -85,7 +86,7 @@ const FieldRow = ({
 						size="small"
 						onClick={() => onDelete(path)}
 					>
-						<Icon type="delete" data-cy={`remove-field-${field}`} />{' '}
+						<DeleteOutlined data-cy={`remove-field-${field}`} />{' '}
 						{view === VIEWS.SCHEMA ? 'Remove field' : `Remove from ${view}`}
 					</Button>
 				</div>

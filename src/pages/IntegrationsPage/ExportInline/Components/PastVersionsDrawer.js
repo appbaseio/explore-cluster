@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Drawer, Divider, Icon, Row, Tooltip } from 'antd';
+import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { CalendarTwoTone } from '@ant-design/icons';
+import { Drawer, Divider, Row, Tooltip } from 'antd';
 // eslint-disable-next-line import/no-cycle
 import List from './List';
 import { pastVersionsStyles } from './styles';
@@ -31,7 +33,7 @@ const PastVersionsDrawer = ({
 
 		return (
 			<div className={pastVersionsStyles}>
-				<Icon
+				<LegacyIcon
 					type={isLoading ? 'loading' : 'clock-circle'}
 					className="active-version-icon"
 				/>
@@ -65,11 +67,7 @@ const PastVersionsDrawer = ({
 						<Tooltip
 							title={
 								<>
-									<Icon
-										type="calendar"
-										theme="twoTone"
-										style={{ marginRight: 5 }}
-									/>
+									<CalendarTwoTone style={{ marginRight: 5 }} />
 									<span style={{ fontSize: 12 }}>
 										{new Date(
 											currentVersion.updated_at * 1000,

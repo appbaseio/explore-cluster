@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import get from 'lodash/get';
 
 import { connect } from 'react-redux';
-import { Card, Divider, Skeleton, Button, Tooltip, Icon, Modal } from 'antd';
+import { DeleteOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Card, Divider, Skeleton, Button, Tooltip, Modal } from 'antd';
 import {
 	getDefaultSettings,
 	putSettings,
@@ -570,7 +571,7 @@ class SearchSettingsPage extends React.Component {
 											onClick={mappingWrapperProps.reloadMappings}
 											data-cy="reload-mappings-button"
 										>
-											<Icon type="reload" />
+											<ReloadOutlined />
 											Reload Mappings
 										</Button>
 									</Tooltip>
@@ -589,7 +590,7 @@ class SearchSettingsPage extends React.Component {
 												}
 												disabled={this.disableRemoveAllButton()}
 											>
-												<Icon type="delete" />
+												<DeleteOutlined />
 												Remove All Fields
 											</Button>
 										</Tooltip>

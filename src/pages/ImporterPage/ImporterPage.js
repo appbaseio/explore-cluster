@@ -1,5 +1,6 @@
 import React, { Fragment } from 'react';
-import { Row, Col, Button, Icon, Skeleton, Alert } from 'antd';
+import { FormOutlined } from '@ant-design/icons';
+import { Row, Col, Button, Skeleton, Alert } from 'antd';
 import { injectGlobal } from 'emotion';
 import { connect } from 'react-redux';
 import { string, object } from 'prop-types';
@@ -174,7 +175,7 @@ class ImporterPage extends React.Component {
 								target="_blank"
 								rel="noopener noreferrer"
 							>
-								<Icon type="form" />
+								<FormOutlined />
 								Contact Us
 							</Button>
 							<p

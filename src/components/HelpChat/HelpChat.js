@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { QuestionOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Menu } from 'antd';
 import { css } from 'emotion';
 
@@ -77,7 +78,7 @@ class HelpButton extends React.Component {
 						type="primary"
 						size="large"
 						shape="circle"
-						icon="question"
+						icon={<QuestionOutlined />}
 					/>
 				</Dropdown>
 			</React.Fragment>

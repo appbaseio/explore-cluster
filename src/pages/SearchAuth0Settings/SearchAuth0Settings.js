@@ -3,7 +3,8 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import PropTypes from 'prop-types';
 import { css } from 'emotion';
-import { Affix, Button, Icon, notification, Tabs } from 'antd';
+import { SettingOutlined, UnlockOutlined, UsergroupDeleteOutlined } from '@ant-design/icons';
+import { Affix, Button, notification, Tabs } from 'antd';
 import { get, isEmpty } from 'lodash';
 import { connect } from 'react-redux';
 import { FormBuilder, FormControl, Validators } from 'react-reactive-form';
@@ -709,7 +710,7 @@ const SearchAuth0Settings = (props) => {
 								<TabPane
 									tab={
 										<>
-											<Icon type="setting" />
+											<SettingOutlined />
 											Login Flow Settings
 										</>
 									}
@@ -720,7 +721,7 @@ const SearchAuth0Settings = (props) => {
 								<TabPane
 									tab={
 										<>
-											<Icon type="unlock" />
+											<UnlockOutlined />
 											Providers
 										</>
 									}
@@ -732,7 +733,7 @@ const SearchAuth0Settings = (props) => {
 									disabled={!clientId}
 									tab={
 										<>
-											<Icon type="usergroup-delete" />
+											<UsergroupDeleteOutlined />
 											User Management
 										</>
 									}

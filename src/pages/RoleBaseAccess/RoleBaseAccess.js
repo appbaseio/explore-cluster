@@ -2,7 +2,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import get from 'lodash/get';
-import { Button, Card, Form, Icon, Input, notification, Popover, Skeleton, Table } from 'antd';
+import { QuestionCircleOutlined } from '@ant-design/icons';
+import { Form, Icon as LegacyIcon } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Button, Card, Input, notification, Popover, Skeleton, Table } from 'antd';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
@@ -286,7 +289,7 @@ class RoleBaseAccess extends React.Component {
 													</>
 												}
 											>
-												Role Claim <Icon type="question-circle" />
+												Role Claim <QuestionCircleOutlined />
 											</Popover>
 										}
 										style={labelMargin}
@@ -307,7 +310,7 @@ class RoleBaseAccess extends React.Component {
 											type="primary"
 											onClick={this.handleSave}
 										>
-											<Icon type={updatingKeys ? 'loading' : 'save'} />
+											<LegacyIcon type={updatingKeys ? 'loading' : 'save'} />
 											Save
 										</Button>
 									</Form.Item>
@@ -353,7 +356,7 @@ class RoleBaseAccess extends React.Component {
 													type="normal"
 													onClick={() => this.showKey(value.username)}
 												>
-													<Icon
+													<LegacyIcon
 														type={
 															visibleKey[`${value.username}`]
 																? 'eye-invisible'
@@ -392,7 +395,7 @@ class RoleBaseAccess extends React.Component {
 													onClick={() => saveRoleFunc(value)}
 													type="primary"
 												>
-													<Icon
+													<LegacyIcon
 														type={
 															loadingKey && loadingKey[value.username]
 																? 'loading'

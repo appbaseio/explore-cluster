@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Modal, Card, Skeleton, Tooltip, Icon, Button } from 'antd';
+import { ArrowDownOutlined, ArrowUpOutlined, CopyOutlined } from '@ant-design/icons';
+import { Modal, Card, Skeleton, Tooltip, Button } from 'antd';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import ndjsonStream from 'can-ndjson-stream';
 import Editor from './Editor';
@@ -166,11 +167,7 @@ const DeployLogsModal = ({ open, handleCancel, deploymentStatus, uiBuilderName, 
 												</a>
 											</Tooltip>
 											<CopyToClipboard text={deploymentStatus.url}>
-												<Icon
-													type="copy"
-													theme="outlined"
-													className="icon-active"
-												/>
+												<CopyOutlined className="icon-active" />
 											</CopyToClipboard>
 										</div>
 									) : null}
@@ -178,11 +175,14 @@ const DeployLogsModal = ({ open, handleCancel, deploymentStatus, uiBuilderName, 
 							</div>
 							<div className="navigation-buttons-container">
 								<Tooltip title="Go to top">
-									<Button icon="arrow-up" onClick={() => scrollToTop()} />
+									<Button
+										icon={<ArrowUpOutlined />}
+										onClick={() => scrollToTop()}
+									/>
 								</Tooltip>
 								<Tooltip title="Go to bottom">
 									<Button
-										icon="arrow-down"
+										icon={<ArrowDownOutlined />}
 										onClick={() => setScrollType('down')}
 									/>
 								</Tooltip>

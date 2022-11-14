@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { fromEvent } from 'file-selector';
 import PropTypes from 'prop-types';
-import { Icon } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 import { uploadStyles } from './styles';
 import { excludedArr } from '../../../utils/sandpack-generator';
 
@@ -91,7 +91,7 @@ const UploadFiles = ({ setErrMsg, setIsFilesFetching, setFileContent, setIsLoadi
 				}}
 			>
 				<input ref={inputRef} type="file" webkitdirectory="true" id="file-upload" />
-				<Icon type="upload" /> Browse Files
+				<UploadOutlined /> Browse Files
 			</label>
 		</div>
 	);

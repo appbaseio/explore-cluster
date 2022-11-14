@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Card, Button, Icon, Checkbox } from 'antd';
+import { ArrowRightOutlined } from '@ant-design/icons';
+import { Card, Button, Checkbox } from 'antd';
 import { Redirect, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import EmailAuth from './EmailAuth';
@@ -112,7 +113,7 @@ class InstallPage extends React.Component {
 								}}
 							>
 								Already installed reactivesearch.io? &nbsp; Sign in here
-								<Icon type="arrow-right" />
+								<ArrowRightOutlined />
 							</Button>
 						</Link>
 					</Flex>

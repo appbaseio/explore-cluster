@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Icon } from 'antd';
+import { FrownOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { Button } from 'antd';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import * as Sentry from '@sentry/browser';
@@ -54,7 +56,7 @@ class ErrorPage extends React.Component {
 					height: '80vh',
 				}}
 			>
-				<Icon type="frown" theme="outlined" style={{ fontSize: 55, marginBottom: 10 }} />
+				<FrownOutlined style={{ fontSize: 55, marginBottom: 10 }} />
 				<h2>Something went wrong!</h2>
 				<p>Our team has been notified about this.</p>
 				<section
@@ -63,7 +65,7 @@ class ErrorPage extends React.Component {
 					}}
 				>
 					<Button href={user ? '/' : '/login'} size="large" type="primary">
-						<Icon type={user ? 'home' : 'left'} />
+						<LegacyIcon type={user ? 'home' : 'left'} />
 						Back to {user ? 'Home' : 'Login'}
 					</Button>
 					<Button
@@ -74,7 +76,7 @@ class ErrorPage extends React.Component {
 							Sentry.showReportDialog();
 						}}
 					>
-						<Icon type="info-circle" />
+						<InfoCircleOutlined />
 						Report this problem
 					</Button>
 				</section>

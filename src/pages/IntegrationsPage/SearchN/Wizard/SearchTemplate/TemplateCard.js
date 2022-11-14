@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Icon, Modal } from 'antd';
+import { EyeTwoTone } from '@ant-design/icons';
+import { Card, Modal } from 'antd';
 import { func, object, string } from 'prop-types';
 import Preview from './Preview';
 import { modalStyles } from '../../../PreviewModal';
@@ -45,8 +46,7 @@ const TemplateCard = ({ template, selectedTemplate, setSelectedTemplate }) => {
 				<Meta
 					title={
 						<div className="meta-title">
-							<>{template.label}</>{' '}
-							<Icon type="eye" theme="twoTone" onClick={() => setVisible(true)} />
+							<>{template.label}</> <EyeTwoTone onClick={() => setVisible(true)} />
 						</div>
 					}
 					description={<div dangerouslySetInnerHTML={{ __html: template.description }} />}

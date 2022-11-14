@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import { Icon, Input, Layout, Menu, Tag } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
+import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { Input, Layout, Menu, Tag } from 'antd';
 import { Link, Route, Switch, Redirect } from 'react-router-dom';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
@@ -403,7 +405,7 @@ class DashboardWrapper extends Component {
 									value={value}
 									onChange={this.handleSearchTerm}
 									placeholder="Search for a menu item"
-									suffix={<Icon type="search" />}
+									suffix={<SearchOutlined />}
 								/>
 							</div>
 						)}
@@ -423,7 +425,7 @@ class DashboardWrapper extends Component {
 								if (routes[route].menu) {
 									const Title = (
 										<span>
-											<Icon type={routes[route].icon} />
+											<LegacyIcon type={routes[route].icon} />
 											<span>{route}</span>
 										</span>
 									);
@@ -473,7 +475,7 @@ class DashboardWrapper extends Component {
 									return (
 										<Menu.Item key={route}>
 											<Link replace to={routes[route].link}>
-												<Icon type={routes[route].icon} />
+												<LegacyIcon type={routes[route].icon} />
 												<span>
 													{route}
 													{routes[route].tag ? (
@@ -507,14 +509,14 @@ class DashboardWrapper extends Component {
 												history={history}
 												renderItem={() => (
 													<div>
-														<Icon type={routes[route].icon} />
+														<LegacyIcon type={routes[route].icon} />
 														<span>{route}</span>
 													</div>
 												)}
 											/>
 										) : (
 											<Link replace to={routes[route].link}>
-												<Icon type={routes[route].icon} />
+												<LegacyIcon type={routes[route].icon} />
 												<span>{route}</span>
 											</Link>
 										)}

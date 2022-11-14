@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { PlusOutlined } from '@ant-design/icons';
 import { Button, Select, Tag, Tooltip } from 'antd';
 import { array, func, object, string } from 'prop-types';
 import orderBy from 'lodash/orderBy';
@@ -117,7 +118,7 @@ const ConfigureConnection = ({
 								{({ value, onChange }) => (
 									<>
 										<Button
-											icon="plus"
+											icon={<PlusOutlined />}
 											type="primary"
 											onClick={() => {
 												setMode('create');

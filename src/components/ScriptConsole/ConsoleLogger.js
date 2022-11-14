@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { css } from 'emotion';
-import { Icon } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
 import { isJson } from './utils';
 import Flex from '../../batteries/components/shared/Flex';
 import RenderTree from './components/RenderTree';
@@ -151,7 +151,7 @@ const ConsoleLogger = ({ consoleArray }) => {
 							onChange={handleFilterValueChange}
 							placeholder="Search for logs..."
 						/>
-						<Icon type="search" style={{ color: 'white' }} />
+						<SearchOutlined style={{ color: 'white' }} />
 					</div>
 					{renderConsoleItems()}
 				</>

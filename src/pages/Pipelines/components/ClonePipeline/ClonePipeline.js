@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Icon, message, notification, Typography } from 'antd';
+import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { Button, message, notification, Typography } from 'antd';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import yamlToJson from 'js-yaml';
@@ -64,7 +65,7 @@ const ClonePipeline = (props) => {
 		return (
 			// eslint-disable-next-line
 			<div onClick={handleClone}>
-				<Icon type={pipeline.isCloning ? 'loading' : 'copy'} />{' '}
+				<LegacyIcon type={pipeline.isCloning ? 'loading' : 'copy'} />{' '}
 				<Typography.Text>Clone</Typography.Text>
 			</div>
 		);
@@ -78,7 +79,7 @@ const ClonePipeline = (props) => {
 			size={buttonSize}
 			disabled={pipeline.isCloning}
 		>
-			<Icon type={pipeline.isCloning ? 'loading' : 'copy'} /> Clone
+			<LegacyIcon type={pipeline.isCloning ? 'loading' : 'copy'} /> Clone
 		</Button>
 	);
 };

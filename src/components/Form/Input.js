@@ -1,7 +1,9 @@
 import React from 'react';
 import { string, object, any } from 'prop-types';
 import { FieldControl } from 'react-reactive-form';
-import { Input, Form } from 'antd';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Input } from 'antd';
 
 const TextInput = ({ name, control, label, inputProps, formItemProps, controlProps }) => (
 	<FieldControl name={name} control={control} {...controlProps}>

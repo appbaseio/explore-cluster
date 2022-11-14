@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
 import PropTypes from 'prop-types';
+import { CloseOutlined } from '@ant-design/icons';
 import { Col, Input, Row, Button } from 'antd';
 
 const ReplaceWord = ({ value = {}, onChange }) => {
@@ -80,7 +81,7 @@ const ReplaceWord = ({ value = {}, onChange }) => {
 							ghost
 							size="small"
 							type="danger"
-							icon="close"
+							icon={<CloseOutlined />}
 							style={{ marginTop: 3 }}
 							onClick={() => deleteWord(word)}
 						/>

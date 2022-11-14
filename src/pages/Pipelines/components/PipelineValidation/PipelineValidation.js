@@ -1,4 +1,5 @@
-import { Col, Icon, Tabs, Tag, Tooltip } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { Col, Tabs, Tag, Tooltip } from 'antd';
 import { css } from 'emotion';
 import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from 'react';
@@ -349,7 +350,7 @@ const PipelineValidation = ({
 								autoAdjustOverflow={false}
 							>
 								<span style={{ marginLeft: 5 }}>
-									<Icon type="info-circle" />
+									<InfoCircleOutlined />
 								</span>
 							</Tooltip>
 						</h3>
@@ -378,7 +379,7 @@ const PipelineValidation = ({
 							{isSmallScreen ? RESPONSE_OUTPUT_SHORT : RESPONSE_OUTPUT}{' '}
 							<Tooltip placement="right" title="Validated Response">
 								<span style={{ marginLeft: 5 }}>
-									<Icon type="info-circle" />
+									<InfoCircleOutlined />
 								</span>
 							</Tooltip>
 						</h3>
@@ -410,7 +411,7 @@ const PipelineValidation = ({
 							{isSmallScreen ? CONSOLE_LOGS_SHORT : CONSOLE_LOGS}
 							<Tooltip placement="right" title="Console Logs">
 								<span style={{ marginLeft: 5 }}>
-									<Icon type="info-circle" />
+									<InfoCircleOutlined />
 								</span>
 							</Tooltip>
 						</h3>
@@ -426,7 +427,7 @@ const PipelineValidation = ({
 								{isSmallScreen ? STAGE_CHANGES_SHORT : STAGE_CHANGES}
 								<Tooltip placement="right" title="Stage changes">
 									<span style={{ marginLeft: 5 }}>
-										<Icon type="info-circle" />
+										<InfoCircleOutlined />
 									</span>
 								</Tooltip>
 							</h3>

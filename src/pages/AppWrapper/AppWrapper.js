@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { Icon, Input, Layout, Menu, Tag } from 'antd';
+import { ClusterOutlined, SearchOutlined } from '@ant-design/icons';
+import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { Input, Layout, Menu, Tag } from 'antd';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 
@@ -402,7 +404,7 @@ class AppWrapper extends Component {
 									)
 								) : (
 									<React.Fragment>
-										<Icon type="cluster" />
+										<ClusterOutlined />
 										Cluster Overview
 									</React.Fragment>
 								)}
@@ -415,7 +417,7 @@ class AppWrapper extends Component {
 									value={value}
 									onChange={this.handleSearchTerm}
 									placeholder="Search for a menu item"
-									suffix={<Icon type="search" />}
+									suffix={<SearchOutlined />}
 								/>
 							</div>
 						)}
@@ -434,7 +436,7 @@ class AppWrapper extends Component {
 								if (routes[route].menu) {
 									const Title = (
 										<span>
-											<Icon type={routes[route].icon} />
+											<LegacyIcon type={routes[route].icon} />
 											<span>{route}</span>
 										</span>
 									);
@@ -491,7 +493,7 @@ class AppWrapper extends Component {
 									return (
 										<Menu.Item key={route}>
 											<Link replace to={routes[route].link}>
-												<Icon type={routes[route].icon} />
+												<LegacyIcon type={routes[route].icon} />
 												<span>
 													{route}
 													{routes[route].tag ? (
@@ -518,7 +520,7 @@ class AppWrapper extends Component {
 								return (
 									<Menu.Item key={route}>
 										<Link replace to={`/app/${appName}/${routes[route].link}`}>
-											<Icon type={routes[route].icon} />
+											<LegacyIcon type={routes[route].icon} />
 											<span>{route}</span>
 										</Link>
 									</Menu.Item>

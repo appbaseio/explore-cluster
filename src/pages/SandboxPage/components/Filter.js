@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Card, Icon, Button, Tooltip } from 'antd';
+import { EditOutlined } from '@ant-design/icons';
+import { Card, Button, Tooltip } from 'antd';
 import { Link } from 'react-router-dom';
 import get from 'lodash/get';
 import { MultiList, DynamicRangeSlider } from '@appbaseio/reactivesearch';
@@ -61,21 +62,19 @@ const Filter = (props) => {
 					</Card>
 				);
 			})}
-			{
-				page !== 'rules' && (
-					<Link
-						onClick={window.location.pathname === `/app/${app}/aggs` ? handleModal : null}
-						to={`/app/${app}/aggs`}
-					>
-						<Tooltip title={settingsMap.set_aggs.description}>
-							<Button style={{ marginTop: 8 }} block type="primary">
-								<Icon type="edit" />
-								{settingsMap.set_aggs.title}
-							</Button>
-						</Tooltip>
-					</Link>
-				)
-			}
+			{page !== 'rules' && (
+				<Link
+					onClick={window.location.pathname === `/app/${app}/aggs` ? handleModal : null}
+					to={`/app/${app}/aggs`}
+				>
+					<Tooltip title={settingsMap.set_aggs.description}>
+						<Button style={{ marginTop: 8 }} block type="primary">
+							<EditOutlined />
+							{settingsMap.set_aggs.title}
+						</Button>
+					</Tooltip>
+				</Link>
+			)}
 		</React.Fragment>
 	);
 };

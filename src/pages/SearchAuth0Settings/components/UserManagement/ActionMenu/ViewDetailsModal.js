@@ -1,5 +1,7 @@
 /* eslint-disable camelcase */
-import { Alert, Button, Card, Icon, Modal, Tooltip } from 'antd';
+import { Icon as LegacyIcon } from '@ant-design/compatible';
+
+import { Alert, Button, Card, Modal, Tooltip } from 'antd';
 import React from 'react';
 import { bool, func, object } from 'prop-types';
 import moment from 'moment';
@@ -113,7 +115,7 @@ const ViewDetailsModal = ({
 								<Tooltip
 									title={email_verified ? 'Verified' : 'Verification pending'}
 								>
-									<Icon
+									<LegacyIcon
 										type={email_verified ? 'check-circle' : 'clock-circle'}
 										style={{
 											color: email_verified ? 'green' : 'red',

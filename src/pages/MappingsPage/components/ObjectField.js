@@ -1,5 +1,7 @@
 import React from 'react';
-import { Row, Button, Col, Icon } from 'antd';
+import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { DeleteOutlined } from '@ant-design/icons';
+import { Row, Button, Col } from 'antd';
 import PropTypes from 'prop-types';
 import { row, deleteRow } from './styles';
 import { VIEWS } from '../../../constants/props';
@@ -29,7 +31,7 @@ class ObjectField extends React.Component {
 				<Col xs={24}>
 					<Row className={deleteRow} type="flex" justify="start">
 						<Col>
-							<Icon
+							<LegacyIcon
 								style={{ marginRight: 15, marginTop: 8 }}
 								type={isCollapsed ? 'up' : 'down'}
 								onClick={this.toggleCollapse}
@@ -44,7 +46,7 @@ class ObjectField extends React.Component {
 									size="small"
 									onClick={() => onDelete(path)}
 								>
-									<Icon type="delete" />{' '}
+									<DeleteOutlined />{' '}
 									{view === VIEWS.SCHEMA ? 'Remove field' : `Remove from ${view}`}
 								</Button>
 							</p>

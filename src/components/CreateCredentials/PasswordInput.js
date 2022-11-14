@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { css } from 'react-emotion';
-import { Input, Icon } from 'antd';
+import { EditOutlined, EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
+import { Input } from 'antd';
 
 const iconBtn = css`
 	cursor: pointer;
@@ -20,8 +21,7 @@ class PasswordInput extends React.Component {
 		const { visible } = this.state;
 		if (pristine && isEditing) {
 			return (
-				<Icon
-					type="edit"
+				<EditOutlined
 					className={iconBtn}
 					onClick={() => {
 						// Enable the input
@@ -36,9 +36,9 @@ class PasswordInput extends React.Component {
 			);
 		}
 		if (visible) {
-			return <Icon type="eye" className={iconBtn} onClick={this.handleClick} />;
+			return <EyeOutlined className={iconBtn} onClick={this.handleClick} />;
 		}
-		return <Icon type="eye-invisible" className={iconBtn} onClick={this.handleClick} />;
+		return <EyeInvisibleOutlined className={iconBtn} onClick={this.handleClick} />;
 	}
 
 	handleClick = () => {

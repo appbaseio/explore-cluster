@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import { Icon } from 'antd';
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import get from 'lodash/get';
 import { getURL } from '../../../constants/config';
 import { getSettings } from '../../../batteries/modules/actions';
@@ -64,7 +64,7 @@ const Footer = ({
 						onClick={previousScreen}
 						data-cy="goto-previous-step"
 					>
-						<Icon type="left" theme="outlined" /> &nbsp; Previous
+						<LeftOutlined /> &nbsp; Previous
 					</a>
 				) : null}
 				{label === 'Finish' ? (
@@ -73,7 +73,7 @@ const Footer = ({
 						onClick={() => handleClick()}
 						data-cy="finish-tutorial"
 					>
-						Finish &nbsp; <Icon type="right" theme="outlined" />
+						Finish &nbsp; <RightOutlined />
 					</a>
 				) : (
 					<a
@@ -83,7 +83,7 @@ const Footer = ({
 						}}
 						data-cy="goto-next-step"
 					>
-						{label || 'Next'} &nbsp; <Icon type="right" theme="outlined" />
+						{label || 'Next'} &nbsp; <RightOutlined />
 					</a>
 				)}
 			</div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Icon, message, notification, Typography } from 'antd';
+import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { Button, message, notification, Typography } from 'antd';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import {
@@ -46,7 +47,7 @@ const CloneSearchBoxComponent = (props) => {
 		return (
 			// eslint-disable-next-line
 			<div onClick={handleClone}>
-				<Icon type={searchBox.isCloning ? 'loading' : 'copy'} />{' '}
+				<LegacyIcon type={searchBox.isCloning ? 'loading' : 'copy'} />{' '}
 				<Typography.Text>Clone</Typography.Text>
 			</div>
 		);
@@ -60,7 +61,7 @@ const CloneSearchBoxComponent = (props) => {
 			size={buttonSize}
 			disabled={searchBox.isCloning}
 		>
-			<Icon type={searchBox.isCloning ? 'loading' : 'copy'} />
+			<LegacyIcon type={searchBox.isCloning ? 'loading' : 'copy'} />
 		</Button>
 	);
 };

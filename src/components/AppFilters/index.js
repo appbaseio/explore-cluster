@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Checkbox, Icon, Input, Radio, Row, Tooltip } from 'antd';
+import { AppstoreOutlined, RedoOutlined, UnorderedListOutlined } from '@ant-design/icons';
+import { Button, Checkbox, Input, Radio, Row, Tooltip } from 'antd';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { css } from 'emotion';
@@ -63,7 +64,7 @@ function AppFilters({ apps, children, preferences, updatePreferences, fetchApps 
 
 	return (
 		<>
-			<div gutter={22} className={commonFlex} style={{ padding: '10px' }}>
+			<div className={commonFlex} style={{ padding: '10px' }}>
 				<div className={searchClass}>
 					<Input
 						placeholder="Filter by index name"
@@ -80,7 +81,11 @@ function AppFilters({ apps, children, preferences, updatePreferences, fetchApps 
 				</div>
 				<div>
 					<Tooltip title="Reload Indices">
-						<Button style={{ marginRight: 10 }} icon="redo" onClick={fetchApps} />
+						<Button
+							style={{ marginRight: 10 }}
+							icon={<RedoOutlined />}
+							onClick={fetchApps}
+						/>
 					</Tooltip>
 					<Radio.Group
 						defaultValue={preferences.showListView ? 'list' : 'card'}
@@ -89,12 +94,12 @@ function AppFilters({ apps, children, preferences, updatePreferences, fetchApps 
 					>
 						<Tooltip title="Show as grid view" placement="topRight">
 							<Radio.Button value="card">
-								<Icon type="appstore" />
+								<AppstoreOutlined />
 							</Radio.Button>
 						</Tooltip>
 						<Tooltip title="Show as list view">
 							<Radio.Button value="list">
-								<Icon type="unordered-list" />
+								<UnorderedListOutlined />
 							</Radio.Button>
 						</Tooltip>
 					</Radio.Group>

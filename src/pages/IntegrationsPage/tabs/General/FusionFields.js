@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Select } from 'antd';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Select } from 'antd';
 import { array, object, string } from 'prop-types';
 import get from 'lodash/get';
 import { connect } from 'react-redux';

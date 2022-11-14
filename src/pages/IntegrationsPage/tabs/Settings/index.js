@@ -1,6 +1,8 @@
 import React, { useContext } from 'react';
 import { FieldControl, FieldGroup } from 'react-reactive-form';
-import { Form, Tabs, Select } from 'antd';
+import { Form } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css';
+import { Tabs, Select } from 'antd';
 import { css } from 'emotion';
 import ResultSettings from '../Search/Results';
 import TextInput from '../../../../components/Form/Input';

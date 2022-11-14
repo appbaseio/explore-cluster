@@ -1,5 +1,6 @@
 import React from 'react';
-import { Popover, Icon } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { Popover } from 'antd';
 
 export const defaultDataFields = [
 	{
@@ -31,7 +32,7 @@ export const defaultDataFields = [
 				<span>
 					Set a <strong>numeric value</strong> for the result item
 					<Popover content="This can be price, dates, or any other significant value">
-						<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+						<InfoCircleOutlined style={{ marginLeft: '5px' }} />
 					</Popover>
 				</span>
 			);
@@ -46,7 +47,7 @@ export const defaultDataFields = [
 				<span>
 					Set an <strong>image</strong> for the result item
 					<Popover content="The value should be of a URL type for the image content to be displayed correctly">
-						<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+						<InfoCircleOutlined style={{ marginLeft: '5px' }} />
 					</Popover>
 				</span>
 			);
@@ -71,7 +72,7 @@ export const defaultDataFields = [
 				<span>
 					Show Redirection URL as
 					<Popover content="When choosing a link, full redirection URL will be displayed. When choosing a CTA button, you can customize the CTA text in the Custom Messages Section.">
-						<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+						<InfoCircleOutlined style={{ marginLeft: '5px' }} />
 					</Popover>
 				</span>
 			);
@@ -98,7 +99,7 @@ export const defaultDataFields = [
 							</>
 						}
 					>
-						<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+						<InfoCircleOutlined style={{ marginLeft: '5px' }} />
 					</Popover>
 				</span>
 			);
@@ -117,7 +118,7 @@ export const geoDefaultFields = [
 					<Popover
 						content={<>The schema for this field should be geo point or similar</>}
 					>
-						<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+						<InfoCircleOutlined style={{ marginLeft: '5px' }} />
 					</Popover>
 				</span>
 			);
@@ -153,7 +154,7 @@ export const geoDefaultFields = [
 				<span>
 					Set a <strong>numeric value</strong> for the result item
 					<Popover content="This can be price, dates, or any other significant value">
-						<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+						<InfoCircleOutlined style={{ marginLeft: '5px' }} />
 					</Popover>
 				</span>
 			);
@@ -168,7 +169,7 @@ export const geoDefaultFields = [
 				<span>
 					Set an <strong>image</strong> for the result item
 					<Popover content="The value should be of a URL type for the image content to be displayed correctly">
-						<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+						<InfoCircleOutlined style={{ marginLeft: '5px' }} />
 					</Popover>
 				</span>
 			);
@@ -193,7 +194,7 @@ export const geoDefaultFields = [
 				<span>
 					Show Redirection URL as
 					<Popover content="When choosing a link, full redirection URL will be displayed. When choosing a CTA button, you can customize the CTA text in the Custom Messages Section.">
-						<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+						<InfoCircleOutlined style={{ marginLeft: '5px' }} />
 					</Popover>
 				</span>
 			);
@@ -215,7 +216,7 @@ export const geoDefaultFields = [
 							</>
 						}
 					>
-						<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+						<InfoCircleOutlined style={{ marginLeft: '5px' }} />
 					</Popover>
 				</span>
 			);
