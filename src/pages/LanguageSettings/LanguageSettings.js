@@ -2,9 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Form } from '@ant-design/compatible';
-import '@ant-design/compatible/assets/index.css';
-import { Card, Input, Select, Switch, Skeleton } from 'antd';
+import { Card, Input, Select, Switch, Skeleton, Form } from 'antd';
 
 import get from 'lodash/get';
 import {

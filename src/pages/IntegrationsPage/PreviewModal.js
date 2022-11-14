@@ -1,6 +1,5 @@
 import React from 'react';
-import { Icon as LegacyIcon } from '@ant-design/compatible';
-import { EyeOutlined } from '@ant-design/icons';
+import { EyeOutlined, DesktopOutlined, MobileOutlined } from '@ant-design/icons';
 import { Button, Modal, Popover } from 'antd';
 import { css } from 'react-emotion';
 import get from 'lodash/get';
@@ -164,15 +163,7 @@ class PreviewModal extends React.Component {
 							<span>
 								{!displayProductPicker && !isRecommendation ? (
 									<Button onClick={this.handleViewChange}>
-										<LegacyIcon
-											style={{
-												fontSize: 20,
-												position: 'relative',
-												top: '1px',
-												margin: '0 7px',
-											}}
-											type={isMobile ? 'desktop' : 'mobile'}
-										/>
+										{isMobile ? <MobileOutlined /> : <DesktopOutlined />}
 									</Button>
 								) : null}
 							</span>

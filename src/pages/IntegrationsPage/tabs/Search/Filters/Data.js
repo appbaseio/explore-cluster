@@ -1,7 +1,5 @@
 import { MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons';
-import { Form } from '@ant-design/compatible';
-import '@ant-design/compatible/assets/index.css';
-import { AutoComplete, Tooltip } from 'antd';
+import { AutoComplete, Tooltip, Form } from 'antd';
 import { array, object } from 'prop-types';
 import React, { Component } from 'react';
 import styled from 'react-emotion';

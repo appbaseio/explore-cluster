@@ -1,6 +1,6 @@
 import React from 'react';
-import { Icon as LegacyIcon } from '@ant-design/compatible';
 import { Layout, Menu, Tooltip, Button, Row, Breadcrumb } from 'antd';
+import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { string, object, bool, number, func } from 'prop-types';
 import { css } from 'react-emotion';
@@ -46,6 +46,14 @@ function showProfile() {
 	return true;
 }
 
+const MenuIcon = ({ collapsed, ...rest }) => {
+	return collapsed ? <MenuUnfoldOutlined {...rest} /> : <MenuFoldOutlined {...rest} />;
+};
+
+MenuIcon.propTypes = {
+	collapsed: bool.isRequired,
+};
+
 const AppHeader = ({
 	currentApp,
 	user,
@@ -70,20 +78,16 @@ const AppHeader = ({
 				}}
 			>
 				{minimal ? (
-					<LegacyIcon
+					<MenuIcon
 						style={{ position: 'absolute', left: 20 }}
+						collapsed={collapsed}
 						className="trigger"
-						type={collapsed ? 'menu-unfold' : 'menu-fold'}
 						onClick={onToggle}
 					/>
 				) : (
 					<Menu mode="horizontal">
 						<Menu.Item key="back" className={noBorder} style={{ padding: 0 }}>
-							<LegacyIcon
-								className="trigger"
-								type={collapsed ? 'menu-unfold' : 'menu-fold'}
-								onClick={onToggle}
-							/>
+							<MenuIcon className="trigger" onClick={onToggle} />
 						</Menu.Item>
 						<Menu.Item
 							className={noBorder}

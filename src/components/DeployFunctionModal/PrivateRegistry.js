@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Form } from '@ant-design/compatible';
-import '@ant-design/compatible/assets/index.css';
-import { Button, Collapse, Input, notification, Row, message } from 'antd';
+import { Button, Collapse, Input, notification, Row, message, Form } from 'antd';
 import { Validators } from 'react-reactive-form';
 import get from 'lodash/get';
 import { connect } from 'react-redux';

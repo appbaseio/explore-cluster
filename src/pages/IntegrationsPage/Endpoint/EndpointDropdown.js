@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { InfoCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import { Form } from '@ant-design/compatible';
-import '@ant-design/compatible/assets/index.css';
-import { Button, Select, Tag, Tooltip } from 'antd';
+import { Button, Select, Tag, Tooltip, Form } from 'antd';
 import { array, bool, func, object, string } from 'prop-types';
 import { connect } from 'react-redux';
 import moment from 'moment';
