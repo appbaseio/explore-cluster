@@ -5,6 +5,7 @@ import { Icon, Input, Layout, Menu, Tag } from 'antd';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 
+import { isEqual } from 'lodash';
 // eslint-disable-next-line import/no-cycle
 import AppLayout from '../../components/AppLayout';
 import {
@@ -20,7 +21,7 @@ import { getParam, getParsedRoutes } from '../../utils';
 import { setIsSidebarCollapsed } from '../../actions';
 import { breakpoints } from '../../utils/media';
 import Loader from '../../components/Loader';
-import { features, isValidPlan } from '../../batteries/utils';
+import { features, isValidPlan, ALLOWED_ACTIONS_BY_BACKEND, BACKENDS } from '../../batteries/utils';
 import SidebarAutocomplete from '../../components/SidebarAutocomplete';
 import { allowedTiers } from '../../utils/prop-types';
 import searchInputStyle from '../DashboardWrapper/styles';
@@ -85,11 +86,11 @@ class AppWrapper extends Component {
 		// const collapsed = window.innerWidth <= breakpoints.medium;
 		const getActiveMenuData = getActiveMenu(props, undefined, props.routes);
 
-		const { routes, arcVersion } = props;
+		const { routes, arcVersion, backend } = props;
 
 		let routesToSet = routes;
 		if (versionCompare(arcVersion, '7.54.0') !== -1) {
-			// UPDATE UIBuilder route
+			// UPDATE UI Builder route
 			routesToSet = {
 				...routes,
 				'UI Builder': {
@@ -102,19 +103,24 @@ class AppWrapper extends Component {
 							hasExactPath: true,
 							tag: 'Beta',
 						},
+						...(backend === BACKENDS.ELASTICSEARCH.name ||
+						backend === BACKENDS.OPENSEARCH.name
+							? [
+									{
+										label: 'Recommendations',
+										link: '/cluster/recommendations-builder',
+										tag: 'Beta',
+										hasExactPath: true,
+									},
+									{
+										label: 'Searchbox',
+										link: '/cluster/searchboxes',
+										tag: 'Beta',
+									},
+							  ]
+							: []),
 						{
-							label: 'Recommendations',
-							link: '/cluster/recommendations-builder',
-							tag: 'Beta',
-							hasExactPath: true,
-						},
-						{
-							label: 'Searchbox',
-							link: '/cluster/searchboxes',
-							tag: 'Beta',
-						},
-						{
-							label: 'Auth Settings',
+							label: 'End-user Authentication',
 							link: '/cluster/auth-settings',
 							hasExactPath: true,
 							tag: 'Beta',
@@ -122,6 +128,35 @@ class AppWrapper extends Component {
 					],
 					tag: 'Beta',
 				},
+				...(routes['Access Control']
+					? {
+							'Access Control': {
+								icon: 'key',
+								action: 'access-control',
+								menu: [
+									{
+										label: 'API Credentials',
+										link: '/cluster/credentials',
+									},
+									...(backend === BACKENDS.ELASTICSEARCH.name ||
+									backend === BACKENDS.OPENSEARCH.name
+										? [
+												{
+													label: 'Role Based Access',
+													link: '/cluster/role-based-access',
+													tag: 'Beta',
+												},
+												{
+													label: 'Node Sync Preferences',
+													link: '/cluster/sync-preferences',
+													tag: 'Beta',
+												},
+										  ]
+										: []),
+								],
+							},
+					  }
+					: {}),
 			};
 		}
 
@@ -179,9 +214,12 @@ class AppWrapper extends Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { history, currentApp, match, arcVersion, routes } = this.props;
+		const { history, currentApp, match, arcVersion, routes, backend } = this.props;
 		const { appName } = this.state;
-		if (arcVersion && arcVersion !== prevProps.arcVersion) {
+		if (
+			!isEqual(routes, prevProps.routes) ||
+			(arcVersion && arcVersion !== prevProps.arcVersion)
+		) {
 			if (versionCompare(arcVersion, '7.54.0') !== -1) {
 				// UPDATE UIBuilder route
 				// eslint-disable-next-line
@@ -198,19 +236,24 @@ class AppWrapper extends Component {
 									hasExactPath: true,
 									tag: 'Beta',
 								},
+								...(backend === BACKENDS.ELASTICSEARCH.name ||
+								backend === BACKENDS.OPENSEARCH.name
+									? [
+											({
+												label: 'Recommendations',
+												link: '/cluster/recommendations-builder',
+												hasExactPath: true,
+												tag: 'Beta',
+											},
+											{
+												label: 'Searchbox',
+												link: '/cluster/searchboxes',
+												tag: 'Beta',
+											}),
+									  ]
+									: []),
 								{
-									label: 'Recommendations',
-									link: '/cluster/recommendations-builder',
-									hasExactPath: true,
-									tag: 'Beta',
-								},
-								{
-									label: 'Searchbox',
-									link: '/cluster/searchboxes',
-									tag: 'Beta',
-								},
-								{
-									label: 'Auth Settings',
+									label: 'End-user Authentication',
 									link: '/cluster/auth-settings',
 									tag: 'Beta',
 									hasExactPath: true,
@@ -218,6 +261,35 @@ class AppWrapper extends Component {
 							],
 							tag: 'Beta',
 						},
+						...(routes['Access Control']
+							? {
+									'Access Control': {
+										icon: 'key',
+										action: 'access-control',
+										menu: [
+											{
+												label: 'API Credentials',
+												link: '/cluster/credentials',
+											},
+											...(backend === BACKENDS.ELASTICSEARCH.name ||
+											backend === BACKENDS.OPENSEARCH.name
+												? [
+														{
+															label: 'Role Based Access',
+															link: '/cluster/role-based-access',
+															tag: 'Beta',
+														},
+														{
+															label: 'Node Sync Preferences',
+															link: '/cluster/sync-preferences',
+															tag: 'Beta',
+														},
+												  ]
+												: []),
+										],
+									},
+							  }
+							: {}),
 					},
 				});
 			}
@@ -273,13 +345,23 @@ class AppWrapper extends Component {
 	onCollapse = () => {
 		const { setIsCollapsed, collapsed } = this.props;
 		setIsCollapsed(!collapsed);
+		this.setState({ activeSubMenu: [] });
 	};
 
 	render() {
 		const { showHeader, appName, activeSubMenu, activeMenuItem, routes, loading, value } =
 			this.state;
-		const { history, collapsed, currentApp } = this.props;
+		const { history, collapsed, currentApp, backendImage, backend } = this.props;
 		if (!currentApp) return null;
+
+		const routesFiltered = {};
+
+		Object.keys(routes).forEach((key) => {
+			if (ALLOWED_ACTIONS_BY_BACKEND[backend].includes(routes[key].action)) {
+				routesFiltered[key] = routes[key];
+			}
+		});
+
 		return (
 			<Layout>
 				<Sider
@@ -348,7 +430,7 @@ class AppWrapper extends Component {
 						)}
 
 						{!value &&
-							Object.keys(routes).map((route) => {
+							Object.keys(routesFiltered).map((route) => {
 								if (routes[route].menu) {
 									const Title = (
 										<span>
@@ -358,40 +440,50 @@ class AppWrapper extends Component {
 									);
 									return (
 										<SubMenu key={route} title={Title}>
-											{routes[route].menu.map((item) => (
-												<Menu.Item
-													key={item.label}
-													data-cy={`path-sub-${item.label
-														.split(' ')
-														.join('')}`}
-												>
-													<WithRedirectTooltip
-														showTooltip={item.hasExactPath}
+											{routes[route].menu.map((item) => {
+												if (
+													item.link.includes(
+														'configure-search-engine-backend',
+													) &&
+													backendImage !== 'sls'
+												) {
+													return null;
+												}
+												return (
+													<Menu.Item
+														key={item.label}
+														data-cy={`path-sub-${item.label
+															.split(' ')
+															.join('')}`}
 													>
-														<Link
-															replace
-															to={
-																item.hasExactPath
-																	? item.link
-																	: `/app/${appName}/${item.link}`
-															}
+														<WithRedirectTooltip
+															showTooltip={item.hasExactPath}
 														>
-															{item.label}
-															{item.tag ? (
-																<Tag
-																	style={{
-																		fontSize: 10,
-																		marginLeft: 8,
-																	}}
-																	color="#001529"
-																>
-																	{item.tag}
-																</Tag>
-															) : null}
-														</Link>
-													</WithRedirectTooltip>
-												</Menu.Item>
-											))}
+															<Link
+																replace
+																to={
+																	item.hasExactPath
+																		? item.link
+																		: `/app/${appName}/${item.link}`
+																}
+															>
+																{item.label}
+																{item.tag ? (
+																	<Tag
+																		style={{
+																			fontSize: 10,
+																			marginLeft: 8,
+																		}}
+																		color="#001529"
+																	>
+																		{item.tag}
+																	</Tag>
+																) : null}
+															</Link>
+														</WithRedirectTooltip>
+													</Menu.Item>
+												);
+											})}
 										</SubMenu>
 									);
 								}
@@ -468,6 +560,8 @@ AppWrapper.propTypes = {
 	routes: PropTypes.object.isRequired,
 	arcVersion: PropTypes.string,
 	updateCurrentApp: PropTypes.func.isRequired,
+	backendImage: PropTypes.string,
+	backend: PropTypes.string,
 };
 
 AppWrapper.defaultProps = {
@@ -477,6 +571,8 @@ AppWrapper.defaultProps = {
 	arcVersion: null,
 	defaultSettings: null,
 	currentApp: null,
+	backendImage: '',
+	backend: BACKENDS.ELASTICSEARCH.name,
 };
 
 const mapStateToProps = (state) => {
@@ -490,6 +586,8 @@ const mapStateToProps = (state) => {
 		collapsed: get(state, 'sideBarCollapsed'),
 		routes: get(state, 'appRoutes'),
 		arcVersion: get(state, '$getAppPlan.results.version'),
+		backendImage: get(state, '$getAppPlan.results.image_type'),
+		backend: get(state, '$getAppPlan.results.backend'),
 	};
 };
 

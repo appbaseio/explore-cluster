@@ -49,7 +49,7 @@ const PreferenceForm = ({ control, handleSaveTemplate, isLoading, apps }) => {
 			control={control}
 			strict={false}
 			render={({ pristine, invalid: invalidForm }) => (
-				<div css={modal}>
+				<div className={modal}>
 					<FieldControl
 						name="enable_cache"
 						render={({ handler }) => (

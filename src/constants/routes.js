@@ -4,6 +4,7 @@ export const APP_ROUTES = {
 	'App Overview': {
 		icon: 'home',
 		link: '',
+		action: ALLOWED_ACTIONS.OVERVIEW,
 	},
 	Develop: {
 		icon: 'dashboard',
@@ -63,6 +64,12 @@ export const APP_ROUTES = {
 				hasExactPath: true,
 				tag: 'Beta',
 			},
+			{
+				label: 'Search Engine Backend',
+				link: '/cluster/configure-search-engine-backend',
+				hasExactPath: true,
+				tag: 'Beta',
+			},
 		],
 	},
 	Analytics: {
@@ -79,6 +86,12 @@ export const APP_ROUTES = {
 			{ label: 'Geo Distribution', link: 'geo-distribution' },
 			{ label: 'Requests Per Minute', link: 'requests-per-minute' },
 			{ label: 'Search Latency', link: 'search-latency' },
+			{
+				label: 'Pipelines Insights',
+				link: '/cluster/pipeline-insights',
+				hasExactPath: true,
+				tag: 'Beta',
+			},
 			{ label: 'Cluster Monitoring', link: '/cluster/monitoring', hasExactPath: true },
 		],
 	},
@@ -97,7 +110,7 @@ export const APP_ROUTES = {
 				label: 'Searchbox',
 				link: '/cluster/searchboxes',
 			},
-			{ label: 'Auth Settings', link: '/cluster/search-auth-settings' },
+			{ label: 'End-user Authentication', link: '/cluster/search-auth-settings' },
 		],
 		tag: 'Beta',
 	},
@@ -137,6 +150,7 @@ export const CLUSTER_ROUTES = {
 	'Cluster Overview': {
 		icon: 'cluster',
 		link: '/',
+		action: ALLOWED_ACTIONS.OVERVIEW,
 	},
 	Develop: {
 		icon: 'dashboard',
@@ -203,6 +217,11 @@ export const CLUSTER_ROUTES = {
 				link: '/cluster/global-envs',
 				tag: 'Beta',
 			},
+			{
+				label: 'Search Engine Backend',
+				link: '/cluster/configure-search-engine-backend',
+				tag: 'Beta',
+			},
 		],
 	},
 	Analytics: {
@@ -219,6 +238,11 @@ export const CLUSTER_ROUTES = {
 			{ label: 'Geo Distribution', link: '/cluster/geo-distribution' },
 			{ label: 'Requests Per Minute', link: '/cluster/requests-per-minute' },
 			{ label: 'Search Latency', link: '/cluster/search-latency' },
+			{
+				label: 'Pipelines Insights',
+				link: '/cluster/pipeline-insights',
+				tag: 'Beta',
+			},
 			{ label: 'Cluster Monitoring', link: '/cluster/monitoring' },
 		],
 	},
@@ -241,7 +265,7 @@ export const CLUSTER_ROUTES = {
 				label: 'Searchbox',
 				link: '/cluster/searchboxes',
 			},
-			{ label: 'Auth Settings', link: '/cluster/search-auth-settings' },
+			{ label: 'End-user Authentication', link: '/cluster/search-auth-settings' },
 		],
 		tag: 'Beta',
 	},

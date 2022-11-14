@@ -99,6 +99,7 @@ class Search extends React.Component {
 								}}
 								className={searchStyle}
 								onValueSelected={onValueChange}
+								debounce={50}
 							/>
 						) : (
 							<div

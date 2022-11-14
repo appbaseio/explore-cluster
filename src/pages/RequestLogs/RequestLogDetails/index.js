@@ -24,13 +24,13 @@ const bannerMessagesAnalytics = {
 		title: 'Log Details',
 		description: '',
 		buttonText: 'Read More',
-		href: 'https://docs.appbase.io',
+		href: 'https://docs.reactivesearch.io',
 	},
 	growth: {
 		title: 'Log Details',
 		description: '',
 		buttonText: 'Read More',
-		href: 'https://docs.appbase.io',
+		href: 'https://docs.reactivesearch.io',
 	},
 };
 

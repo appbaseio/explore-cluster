@@ -43,6 +43,10 @@ export const configureConnectionStyles = css`
 	.field-container {
 		margin-top: 50px;
 	}
+	.required-color {
+		color: red;
+		font-size: 14px;
+	}
 	.field-description {
 		margin-top: 20px;
 	}

@@ -7,7 +7,7 @@ import ListItem from '../Charts/ListItem';
 import DynamicFilters from './DynamicFilters';
 import DynamicCharts from '../Charts/DynamicCharts';
 
-const FiltersControl = ({ controls, traversedMappings, form, getPreferencesPayload, isFilter }) => {
+const FiltersControl = ({ controls, form, getPreferencesPayload, isFilter, traversedMappings }) => {
 	function getItemStyle(isDragging, draggableStyle) {
 		return {
 			border: isDragging ? '1px solid #d2d2d2' : null,

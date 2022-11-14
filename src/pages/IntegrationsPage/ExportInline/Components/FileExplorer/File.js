@@ -13,7 +13,7 @@ const File = ({ path, selectFile, active, onClick, depth, createNew, setNewFolde
 	const [value, setvalue] = useState('');
 	const [isCollapsed, setIsCollapsed] = useState(false);
 	const { sandpack } = useSandpack();
-	const { handleRenameFile, handleRenameFolder, handleDelete, handleCreateFile } =
+	const { handleRenameFile, handleRenameFolder, handleDelete, handleCreateFile, themeType } =
 		useContext(SandpackCodeContext);
 
 	const clickFile = () => {
@@ -123,7 +123,7 @@ const File = ({ path, selectFile, active, onClick, depth, createNew, setNewFolde
 	const fileName = path.split('/').filter(Boolean).pop();
 
 	return (
-		<div css={hoverStyles}>
+		<div className={hoverStyles(themeType)}>
 			<div
 				className="sp-button sp-explorer"
 				data-active={active}

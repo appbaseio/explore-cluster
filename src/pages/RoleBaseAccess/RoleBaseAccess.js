@@ -238,7 +238,7 @@ class RoleBaseAccess extends React.Component {
 				<Banner
 					{...bannerMessage}
 					onClick={() =>
-						window.open('https://docs.appbase.io/docs/security/Role/', '_blank')
+						window.open('https://docs.reactivesearch.io/docs/security/Role/', '_blank')
 					}
 				/>
 				<Container>
@@ -269,7 +269,7 @@ class RoleBaseAccess extends React.Component {
 														Key in JWT Object that helps
 														<br /> in asserting the role information.{' '}
 														<a
-															href="https://docs.appbase.io/docs/security/Role/"
+															href="https://docs.reactivesearch.io/docs/security/Role/"
 															target="_blank"
 															rel="noopener noreferrer"
 														>

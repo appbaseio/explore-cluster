@@ -64,7 +64,7 @@ class Conditions extends React.Component {
 													Select a query condition based on which you want
 													to invoke a rule.
 													<a
-														href="https://docs.appbase.io/docs/search/Rules/#configure-if-condition"
+														href="https://docs.reactivesearch.io/docs/search/Rules/#configure-if-condition"
 														target="_blank"
 														rel="noopener noreferrer"
 													>

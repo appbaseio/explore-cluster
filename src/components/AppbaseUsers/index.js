@@ -31,23 +31,14 @@ const headingCls = css({
 	},
 });
 
-const AppbaseUsers = ({ className, style, title, imageStyle }) => (
+const AppbaseUsers = ({ className, style, title }) => (
 	<React.Fragment>
 		{title && <h2 css={headingCls}>{title}</h2>}
 		<div className={cx(styles, className)} style={style}>
-			<img
-				src="/static/images/testimonials/accenture.png"
-				alt="Accenture"
-			/>
-			<img
-				src="/static/images/testimonials/changeup.png"
-				alt="Changeup"
-			/>
+			<img src="/static/images/testimonials/accenture.png" alt="Accenture" />
+			<img src="/static/images/testimonials/changeup.png" alt="Changeup" />
 			<img src="/static/images/testimonials/decibio.png" alt="Decibio" />
-			<img
-				src="/static/images/testimonials/hirecloud.png"
-				alt="HireCloud"
-			/>
+			<img src="/static/images/testimonials/hirecloud.png" alt="HireCloud" />
 			<img src="/static/images/testimonials/rivalry.png" alt="Rivalry" />
 		</div>
 	</React.Fragment>
@@ -57,13 +48,11 @@ AppbaseUsers.propTypes = {
 	className: string,
 	style: object,
 	title: string.isRequired,
-	imageStyle: object,
 };
 
 AppbaseUsers.defaultProps = {
 	className: '',
 	style: {},
-	imageStyle: {},
 };
 
 export default AppbaseUsers;

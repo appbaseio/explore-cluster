@@ -36,7 +36,7 @@ const bannerDetails = {
 	description: `Search Settings enables you to control search query and relevance settings.`,
 	icon: 'info-circle',
 	videoLink: 'https://youtu.be/moxJ2ZB4owI',
-	href: 'https://docs.appbase.io/docs/search/relevancy/#search-settings',
+	href: 'https://docs.reactivesearch.io/docs/search/relevancy/#search-settings',
 };
 
 const getqueryFormat = ({ queryString, searchOperators }) => {

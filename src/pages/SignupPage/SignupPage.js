@@ -7,8 +7,7 @@ import Logo from '../../components/Logo';
 import { getURL } from '../../constants/config';
 import { container, card, githubBtn, googleBtn, gitlabBtn } from '../LoginPage/styles';
 import { checkbox } from './styles';
-
-const backgroundUrlImage = require('../../../static/images/Herobg.png');
+import { isFusion } from '../../batteries/utils';
 
 const getSignupURL = (provider) => {
 	const ACC_API = getURL();
@@ -41,17 +40,8 @@ class SignupPage extends React.Component {
 			return <Redirect to="/" />;
 		}
 		return (
-			<section
-				className={container}
-				style={{
-					backgroundImage: `url(${backgroundUrlImage})`,
-					height: '100vh',
-					justifyContent: 'center',
-					alignItems: 'center',
-				}}
-			>
-				<Logo width={250} />
-
+			<section className={container}>
+				<Logo width={250} type={isFusion() ? 'lucid_works' : ''} />
 				<Card className={card} bordered={false}>
 					<h2>Sign up to get started</h2>
 

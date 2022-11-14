@@ -41,8 +41,23 @@ export const excludedArr = [
 	'/.vscode',
 	'/README.md',
 	'/build',
+	'/node_modules',
 	'/config-overrides.js',
 	'/yarn.lock',
+	'.eslintignore',
+	'.eslintrc.js',
+	'.gitignore',
+	'.nvmrc',
+	'.prettierrc.js',
+	'.vscode',
+	'README.md',
+	'build',
+	'node_modules',
+	'config-overrides.js',
+	'yarn.lock',
+	'.editorconfig',
+	'.git',
+	'LICENSE.md',
 ];
 
 export const tabSettings = {
@@ -84,11 +99,82 @@ export const tabSettings = {
 	},
 };
 
+const getObjectStructure = (value) => {
+	const [dataField = '', highlight = false] =
+		typeof value === 'string' ? value.split('~') : ['', false];
+	return { dataField, highlight: highlight === 'true' };
+};
+
+export const getObjectStructureReverse = (obj) => {
+	if (obj instanceof Object && Object.keys(obj).length) {
+		return `${obj.dataField}~${obj.highlight}`;
+	}
+
+	return obj;
+};
+
+const transformResultSettingsWithHighlight = (
+	resultSettings,
+	maintainStringFormatForFields = false,
+) => {
+	const newObj = {};
+	Object.keys(resultSettings || {}).forEach((field) => {
+		if (field === 'userDefinedFields') {
+			newObj[field] = resultSettings[field];
+		} else if (field !== 'priceUnit' && field !== 'cssSelector' && field !== 'handleViewer') {
+			newObj[field] = maintainStringFormatForFields
+				? getObjectStructureReverse(resultSettings[field])
+				: getObjectStructure(resultSettings[field]);
+		} else {
+			newObj[field] = resultSettings[field];
+		}
+	});
+
+	return newObj;
+};
+
+export const transformPreferences = (preferences, maintainStringFormatForFields = false) => {
+	const newPreferences = JSON.parse(JSON.stringify({ ...preferences }));
+	const { pageSettings } = newPreferences;
+	const pages = get(newPreferences, 'pageSettings.pages', {});
+	const pageSettingsFields = transformResultSettingsWithHighlight(
+		pageSettings.fields,
+		maintainStringFormatForFields,
+	);
+	newPreferences.pageSettings.fields = pageSettingsFields;
+	const newPageSettings = {};
+	Object.keys(pages).forEach((page) => {
+		newPageSettings[page] = { ...pages[page] };
+		const { componentSettings } = pages[page];
+		const resultSettings = componentSettings.result;
+		const { displayFields = {}, fields = {} } = resultSettings;
+		const newResultSettings = { ...resultSettings };
+		newResultSettings.fields = transformResultSettingsWithHighlight(
+			fields,
+			maintainStringFormatForFields,
+		);
+
+		const newDisplayFields = {};
+		Object.keys(displayFields).forEach((field) => {
+			newDisplayFields[field] = transformResultSettingsWithHighlight(
+				displayFields[field],
+				maintainStringFormatForFields,
+			);
+		});
+		newResultSettings.displayFields = newDisplayFields;
+
+		newPageSettings[page].componentSettings.result = newResultSettings;
+		newPageSettings[page].componentSettings.search.fields = newResultSettings.fields;
+	});
+	newPreferences.pageSettings.pages = newPageSettings;
+	return newPreferences;
+};
+
 export const preferencesInConstants = (code, prefs) => {
 	const themeType = get(prefs, 'themeSettings.type', '');
 	const template = getTemplate(themeType);
 	const newPrefs = {
-		...prefs,
+		...transformPreferences(prefs),
 		appbaseSettings: {
 			index: prefs.pipeline,
 			credentials: get(prefs, 'exportSettings.credentials', ''),
@@ -125,7 +211,7 @@ export const generateInlineSandboxURL = async (preferences) => {
 		}
 		const newFiles = { ...files[fileName] };
 		const newPrefs = {
-			...preferences,
+			...transformPreferences(preferences),
 			appbaseSettings: {
 				index: preferences.pipeline,
 				credentials: get(preferences, 'exportSettings.credentials', ''),
@@ -164,7 +250,7 @@ export const replaceWithPreferences = async (code, preferences) => {
 	const template = getTemplate(themeType);
 	const newFiles = { ...code };
 	const newPrefs = {
-		...preferences,
+		...transformPreferences(preferences),
 		appbaseSettings: {
 			index: preferences.pipeline,
 			credentials: get(preferences, 'exportSettings.credentials', ''),
@@ -275,3 +361,14 @@ export function getDeploymentLogs(id, clusterId = '', deploymentId = '') {
 		},
 	);
 }
+
+export const getChangedDetails = (arr = []) => {
+	let added = 0;
+	let removed = 0;
+	(arr || []).forEach((element) => {
+		if (element.added && element.value !== '\n') added += 1;
+
+		if (element.removed && element.value !== '\n') removed += 1;
+	});
+	return { added, removed };
+};

@@ -24,7 +24,7 @@ const bannerDetails = {
 	description: "Tailor reactivesearch.io's caching preferences based on your search use-case",
 	buttonText: 'Read Docs',
 	icon: 'info-circle',
-	href: 'https://docs.appbase.io/docs/speed/cache-management/',
+	href: 'https://docs.reactivesearch.io/docs/speed/cache-management/',
 };
 
 class CachePreferences extends React.Component {
@@ -76,7 +76,7 @@ class CachePreferences extends React.Component {
 		return (
 			<React.Fragment>
 				<Banner {...bannerDetails} />
-				<Container css={main}>
+				<Container className={main}>
 					<VersionController version="7.42.0">
 						<Main />
 					</VersionController>

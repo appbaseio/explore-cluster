@@ -71,51 +71,57 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 				setPreviewLoading(true);
 				setShowLivePreview(true);
 				const { endpoint = {}, popular = {}, recent = {} } = mainForm.value;
-				const payload = {
-					hidden: true,
-					searchbox: {
-						featured: {
-							layout: {
-								...featuredSuggestionsPayload.current,
+				const payload = JSON.parse(
+					JSON.stringify({
+						hidden: true,
+						searchbox: {
+							featured: {
+								layout: {
+									...featuredSuggestionsPayload.current,
+								},
+							},
+							endpoint: {
+								...(endpoint?.endpoint?.url && endpoint?.endpoint?.method
+									? {
+											endpoint: {
+												url: endpoint?.endpoint?.url,
+												headers:
+													parseJSON(endpoint?.endpoint?.headers) ||
+													undefined,
+												body:
+													parseJSON(endpoint?.endpoint?.body) ||
+													undefined,
+												method: endpoint?.endpoint?.method,
+											},
+									  }
+									: {}),
+								applyStopwords: endpoint.applyStopwords,
+								customStopwords: endpoint.customStopwords || [],
+								enableSynonyms: endpoint.enableSynonyms,
+								excludeFields: endpoint.excludeFields,
+								includeFields: endpoint.includeFields,
+								maxPredictedWords: endpoint.maxPredictedWords,
+								showDistinctSuggestions: endpoint.showDistinctSuggestions,
+								...(endpoint.transformResponse
+									? { transformResponse: endpoint.transformResponse }
+									: {}),
+								...(endpoint.urlField ? { urlField: endpoint.urlField } : {}),
+							},
+							popular: {
+								size: popular.size,
+								index: popular.indices?.join(','),
+								minCount: popular.minCount,
+								minChars: popular.minChars,
+							},
+							recent: {
+								size: recent.size,
+								index: recent.indices?.join(','),
+								minHits: recent.minHits,
+								minChars: recent.minChars,
 							},
 						},
-						endpoint: {
-							...(endpoint?.endpoint?.url && endpoint?.endpoint?.method
-								? {
-										endpoint: {
-											url: endpoint?.endpoint?.url,
-											headers: parseJSON(endpoint?.endpoint?.headers),
-											body: parseJSON(endpoint?.endpoint?.body),
-											method: endpoint?.endpoint?.method,
-										},
-								  }
-								: {}),
-							applyStopwords: endpoint.applyStopwords,
-							customStopwords: endpoint.customStopwords || [],
-							enableSynonyms: endpoint.enableSynonyms,
-							excludeFields: endpoint.excludeFields,
-							includeFields: endpoint.includeFields,
-							maxPredictedWords: endpoint.maxPredictedWords,
-							showDistinctSuggestions: endpoint.showDistinctSuggestions,
-							...(endpoint.transformResponse
-								? { transformResponse: endpoint.transformResponse }
-								: {}),
-							...(endpoint.urlField ? { urlField: endpoint.urlField } : {}),
-						},
-						popular: {
-							size: popular.size,
-							index: popular.indices?.join(','),
-							minCount: popular.minCount,
-							minChars: popular.minChars,
-						},
-						recent: {
-							size: recent.size,
-							index: recent.indices?.join(','),
-							minHits: recent.minHits,
-							minChars: recent.minChars,
-						},
-					},
-				};
+					}),
+				);
 				const tempSearchBoxId = uniqueId(
 					`temp_featured_suggestions${new Date().getTime()}`,
 				);
@@ -208,7 +214,7 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 								enablePopularSuggestions={form.value.enablePopularSuggestions}
 								enableFeaturedSuggestions={form.value.enableFeaturedSuggestions}
 								enableIndexSuggestions={false}
-								enableEndpointSuggestions={form.value.enableIndexSuggestions} // index-suggestions is mapped to endpoint-suggestion --- assume it a typo
+								enableEndpointSuggestions={form.value.enableEndpointSuggestions}
 								showVoiceSearch={form.value.enableVoiceSearch}
 								highlight={form.value.highlight}
 								componentId="search_box"

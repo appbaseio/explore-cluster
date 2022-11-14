@@ -1,8 +1,14 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { Select, Row, Col, Tooltip, Icon, Input, Radio } from 'antd';
+import React, { useEffect, useState } from 'react';
+import PropTypes, { object, string } from 'prop-types';
+import get from 'lodash/get';
+import { connect } from 'react-redux';
+import { AutoComplete, Row, Col, Tooltip, Icon, Input, Radio } from 'antd';
 import { css } from 'emotion';
 import { Draggable } from 'react-beautiful-dnd';
+import apisMapper from '../../utils/apisMapper';
+import { getApiGeneralization } from '../../utils/be-apis';
+import { BACKENDS } from '../../../../batteries/utils';
+import { transformGeneralMappingsToFusionArrayFormat } from '../../utils/fusion-apis';
 
 const dragIcon = css`
 	transition: all ease 0.2s;
@@ -39,7 +45,25 @@ function getItemStyle(isDragging, draggableStyle) {
 	};
 }
 
-function SortOptionSelector({ index, item, fieldPicker, value, onChange, onError }) {
+function SortOptionSelector({
+	index,
+	item,
+	value,
+	onChange,
+	onError,
+	form,
+	fieldPicker: dataFields,
+	backend,
+	endpoints,
+}) {
+	const [fieldPicker, setFieldPicker] = useState([{ name: '_score' }]);
+	const [isInitial, setIsInitial] = useState(true);
+	const isFusion = backend === BACKENDS.FUSION.name;
+
+	useEffect(() => {
+		getDatafields(item?.dataField);
+	}, [dataFields]);
+
 	function onDelete() {
 		const newArr = [...value];
 		newArr.splice(index, 1);
@@ -54,6 +78,35 @@ function SortOptionSelector({ index, item, fieldPicker, value, onChange, onError
 		}
 		return text;
 	}
+
+	const getDatafields = (query, state = 'initial') => {
+		const profile = form.get('profile') ? form.get('profile').value : 'appbase';
+		const indexSettings = form.get('indexSettings') ? form.get('indexSettings').value : {};
+		const secondaryProfile = get(indexSettings, 'fusionSettings.profile', '');
+		if (isFusion) {
+			const schemaConfig = endpoints.schema || apisMapper[backend].schema || {};
+			getApiGeneralization(schemaConfig, { index: secondaryProfile || profile, q: query })
+				.then((res) => res.json())
+				.then((res) => {
+					if (Array.isArray(res)) setFieldPicker([{ name: '_score' }, ...res]);
+					else {
+						const transformedResponse = transformGeneralMappingsToFusionArrayFormat(
+							res[secondaryProfile || profile],
+						);
+						setFieldPicker([{ name: '_score' }, ...transformedResponse]);
+					}
+				})
+				.catch((err) => {
+					console.error('Error to fetch search query profiles', err);
+				});
+		} else {
+			setFieldPicker(dataFields);
+		}
+
+		if (state !== 'initial') setIsInitial(false);
+	};
+
+	const fieldsArr = fieldPicker.map((i) => i.name || i);
 
 	return (
 		<Draggable key={index} draggableId={`${index}`} index={index}>
@@ -73,8 +126,10 @@ function SortOptionSelector({ index, item, fieldPicker, value, onChange, onError
 									</span>
 								</Tooltip>
 								{item?.dataField &&
-								fieldPicker.length &&
-								!fieldPicker.includes(item?.dataField) ? (
+								isInitial &&
+								(!fieldPicker.length ||
+									(fieldPicker.length &&
+										!fieldsArr.includes(item?.dataField))) ? (
 									<Tooltip title="The provided field has no corresponding mappings with the pipeline">
 										<span
 											style={{ color: 'orange', marginLeft: 5 }}
@@ -87,7 +142,30 @@ function SortOptionSelector({ index, item, fieldPicker, value, onChange, onError
 								) : null}
 							</Col>
 							<Col xs={8}>
-								<Select
+								<AutoComplete
+									filterOption={(inputValue, option) => {
+										if (
+											option.props.children &&
+											typeof option.props.children === 'object'
+										) {
+											const newOption = { ...option.props.children };
+											const newInputVal =
+												typeof inputValue === 'object' &&
+												inputValue.props.children
+													? inputValue.props.children
+													: inputValue;
+											return (
+												newOption.props.children
+													.toUpperCase()
+													.indexOf(newInputVal.toUpperCase()) !== -1
+											);
+										}
+										return (
+											option.props.children
+												.toUpperCase()
+												.indexOf(inputValue.toUpperCase()) !== -1
+										);
+									}}
 									showSearch
 									placeholder="Select field"
 									value={item?.dataField}
@@ -114,16 +192,49 @@ function SortOptionSelector({ index, item, fieldPicker, value, onChange, onError
 											onError(false);
 										}
 									}}
+									onSearch={(val) => {
+										const newArr = value;
+										newArr[index].dataField = val;
+										onChange(newArr);
+										if (!val) {
+											onError(true);
+										} else {
+											onError(false);
+										}
+										getDatafields(val, 'fetching');
+									}}
+									optionLabelProp="text"
 								>
-									{fieldPicker.map((field) => (
-										<Select.Option value={field} key={field}>
-											<Tooltip title={field}>{field}</Tooltip>
-										</Select.Option>
-									))}
-								</Select>
+									{/* eslint-disable-next-line */}
+									{isFusion ? (
+										item?.dataField === '_score' ? (
+											<AutoComplete.Option
+												key="empty-query"
+												value="empty-query"
+												disabled
+											>
+												Enter a character to see field suggestions
+											</AutoComplete.Option>
+										) : (
+											fieldPicker.map((field) => (
+												<AutoComplete.Option
+													text={field.name}
+													key={field.name}
+												>
+													{field.name}
+												</AutoComplete.Option>
+											))
+										)
+									) : (
+										fieldPicker.map((field) => (
+											<AutoComplete.Option text={field} key={field}>
+												<Tooltip title={field}>{field}</Tooltip>
+											</AutoComplete.Option>
+										))
+									)}
+								</AutoComplete>
 							</Col>
 							<Col xs={8}>
-								{/* Input */}
 								<Input
 									value={item.label}
 									style={{ marginLeft: 10 }}
@@ -177,14 +288,25 @@ SortOptionSelector.propTypes = {
 	item: PropTypes.object.isRequired,
 	index: PropTypes.number.isRequired,
 	fieldPicker: PropTypes.array,
+	form: PropTypes.object,
 	value: PropTypes.array,
 	onChange: PropTypes.func.isRequired,
 	onError: PropTypes.func.isRequired,
+	backend: string,
+	endpoints: object,
 };
 
 SortOptionSelector.defaultProps = {
-	fieldPicker: [],
+	form: {},
 	value: [],
+	fieldPicker: [],
+	backend: BACKENDS.ELASTICSEARCH.name,
+	endpoints: {},
 };
 
-export default SortOptionSelector;
+const mapStateToProps = (state) => ({
+	backend: get(state, '$getAppPlan.results.backend'),
+	endpoints: get(state, 'endpoints.data'),
+});
+
+export default connect(mapStateToProps, null)(SortOptionSelector);

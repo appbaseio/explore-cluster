@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { withRouter } from 'react-router-dom';
 import { Button, message, Modal } from 'antd';
 import styled from 'react-emotion';
 import get from 'lodash/get';
@@ -49,10 +50,12 @@ const ReviewAndSave = ({
 	isRecommendation,
 	preferenceId,
 	clientId,
+	history,
+	match,
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
-	const [isResetting, setIsResetting] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
+	const [isError, setIsError] = useState(false);
 
 	useEffect(() => {
 		if (oldData && oldData.resultSettings && !oldData.resultSettings.resultHighlight) {
@@ -60,10 +63,6 @@ const ReviewAndSave = ({
 			oldData.resultSettings.resultHighlight = false;
 		}
 	}, []);
-
-	useEffect(() => {
-		setIsOpen(isResetting);
-	}, [isResetting]);
 
 	useEffect(() => {
 		if (!isRecommLoading || isSearchLoading) {
@@ -77,17 +76,18 @@ const ReviewAndSave = ({
 
 	const handleCancel = () => {
 		setIsOpen(false);
-		setIsResetting(false);
 	};
 
 	const handleSave = () => {
 		setIsLoading(true);
 		if (isRecommendation) {
 			updateRecommendationsPreferences(getPreferencesPayload()).then((action) => {
+				setIsLoading(false);
 				if (!(action && action.error)) {
 					setHasChanged();
-					setIsLoading(false);
+					setIsError(false);
 				}
+				if (action.error) setIsError(true);
 			});
 		} else {
 			// Update preferences in sandpack
@@ -109,6 +109,7 @@ const ReviewAndSave = ({
 					const body = {
 						metadata: {
 							commit: 'system commit: auto save page changes',
+							user: localStorage.getItem('username'),
 						},
 						content: newContent,
 					};
@@ -184,7 +185,7 @@ const ReviewAndSave = ({
 		}
 	};
 
-	const { diffCount, diffDataArray } = getDiffDataAndCount(oldData, newData);
+	const { diffCount, diffDataArray } = getDiffDataAndCount(oldData, newData, isRecommendation);
 	return (
 		<div>
 			<div style={{ position: 'relative' }}>
@@ -218,7 +219,13 @@ const ReviewAndSave = ({
 					'data-cy': 'review-save-button',
 					loading: isLoading,
 				}}
-				afterClose={() => setIsLoading(false)}
+				afterClose={() => {
+					setIsLoading(false);
+					if (match.params.id === 'new' && isRecommendation && !isError)
+						setTimeout(() => {
+							history.push(`/cluster/recommendations-builder/${preferenceId}`);
+						}, 1000);
+				}}
 			>
 				{isOpen && <DiffList diff={diffDataArray} />}
 			</Modal>
@@ -252,6 +259,8 @@ ReviewAndSave.propTypes = {
 	isRecommendation: bool,
 	form: object.isRequired,
 	clientId: string,
+	history: object.isRequired,
+	match: object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
@@ -267,4 +276,4 @@ const mapDispatchToProps = (dispatch, props) => ({
 		dispatch(saveRecommendationPreferenceN(props.preferenceId, payload)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(ReviewAndSave);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(ReviewAndSave));

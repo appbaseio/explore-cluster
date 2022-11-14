@@ -65,6 +65,25 @@ export const defaultDataFields = [
 		value: true,
 	},
 	{
+		id: 'resultHandleViewer',
+		label: () => {
+			return (
+				<span>
+					Show Redirection URL as
+					<Popover content="When choosing a link, full redirection URL will be displayed. When choosing a CTA button, you can customize the CTA text in the Custom Messages Section.">
+						<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+					</Popover>
+				</span>
+			);
+		},
+		value: true,
+	},
+	{
+		id: 'metaDataFields',
+		label: <span>Add additional metadata to the result</span>,
+		value: false,
+	},
+	{
 		id: 'cssSelector',
 		label: () => {
 			return (
@@ -168,6 +187,20 @@ export const geoDefaultFields = [
 		value: true,
 	},
 	{
+		id: 'resultHandleViewer',
+		label: () => {
+			return (
+				<span>
+					Show Redirection URL as
+					<Popover content="When choosing a link, full redirection URL will be displayed. When choosing a CTA button, you can customize the CTA text in the Custom Messages Section.">
+						<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+					</Popover>
+				</span>
+			);
+		},
+		value: true,
+	},
+	{
 		id: 'cssSelector',
 		label: () => {
 			return (
@@ -197,5 +230,6 @@ export const fieldSelectorIds = [
 	'resultPrice',
 	'resultImage',
 	'resultHandle',
+	'resultHandleViewer',
 	'locationDataField',
 ];

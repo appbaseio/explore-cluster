@@ -30,7 +30,7 @@ const bannerDetails = {
 	buttonText: 'Read Docs',
 	videoLink: 'https://youtu.be/bNhju-9mDR0',
 	icon: 'info-circle',
-	href: 'https://docs.appbase.io/docs/search/relevancy/#aggregation-settings',
+	href: 'https://docs.reactivesearch.io/docs/search/relevancy/#aggregation-settings',
 };
 
 class AggsPage extends React.Component {

@@ -155,6 +155,7 @@ class PreferenceForm extends React.Component {
 	render() {
 		const mainForm = this.context;
 		const control = mainForm.get('endpoint');
+		const { designAndLayout = {} } = mainForm.value;
 		const { mappings } = this.props;
 		// eslint-disable-line
 		const { modalVisible } = this.state;
@@ -195,6 +196,7 @@ class PreferenceForm extends React.Component {
 								>
 									{(endpointControl) => {
 										const showError =
+											designAndLayout.enableEndpointSuggestions &&
 											(submitted || endpointControl.touched) &&
 											endpointControl.status === 'INVALID';
 										return (
@@ -211,7 +213,11 @@ class PreferenceForm extends React.Component {
 													Specify Endpoint
 												</Button>
 												{showError ? (
-													<div className="error">Field is invalid</div>
+													<div className="error">
+														{endpointControl.touched
+															? 'Field is invalid'
+															: 'Field is required'}
+													</div>
 												) : null}
 											</div>
 										);
@@ -221,16 +227,49 @@ class PreferenceForm extends React.Component {
 							gridRatio={gridRatio}
 						/>
 						<Grid
-							label="Transform Response"
+							label={
+								<div>
+									<span className="required-marker">*</span>
+									Transform Response
+								</div>
+							}
 							component={
-								<Button
-									onClick={() =>
-										this.setState({ modalVisible: { transformResponse: true } })
-									}
-									icon="edit"
+								<FieldControl
+									name="transformResponse"
+									control={control.get('transformResponse')}
+									strict={false}
 								>
-									Define Function
-								</Button>
+									{(transformResponseControl) => {
+										const showError =
+											designAndLayout.enableEndpointSuggestions &&
+											(submitted || transformResponseControl.touched) &&
+											transformResponseControl.status === 'INVALID';
+										return (
+											<div>
+												<Button
+													onClick={() =>
+														this.setState({
+															modalVisible: {
+																transformResponse: true,
+															},
+														})
+													}
+													className={showError ? 'input-error' : ''}
+													icon="edit"
+												>
+													Define Function
+												</Button>
+												{showError ? (
+													<div className="error">
+														{transformResponseControl.touched
+															? 'Field is invalid'
+															: 'Field is required'}
+													</div>
+												) : null}
+											</div>
+										);
+									}}
+								</FieldControl>
 							}
 							gridRatio={gridRatio}
 						/>
@@ -273,6 +312,7 @@ class PreferenceForm extends React.Component {
 														name="url"
 														label={
 															<span className={styles.labelContainer}>
+																{' '}
 																<span className="required-marker">
 																	*
 																</span>
@@ -289,8 +329,8 @@ class PreferenceForm extends React.Component {
 														}
 														formItemProps={{ colon: false }}
 														control={endpointURLControl}
-													/>
-													{(submitted || touched) && errors?.required ? (
+													/>{' '}
+													{touched && errors?.required ? (
 														<div
 															style={{ marginTop: -30 }}
 															className="error"
@@ -298,9 +338,7 @@ class PreferenceForm extends React.Component {
 															URL field is required
 														</div>
 													) : null}
-													{(submitted || touched) &&
-													!errors?.required &&
-													errors?.invalidLink ? (
+													{touched && errors?.invalidLink ? (
 														<div
 															className="error"
 															style={{ marginTop: -30 }}
@@ -319,9 +357,7 @@ class PreferenceForm extends React.Component {
 										control={endpointControl.get('method')}
 									>
 										{({ handler, errors, touched }) => {
-											const showError =
-												(submitted || touched) &&
-												(errors?.required || errors?.invalidLink);
+											const showError = touched && errors?.required;
 											return (
 												<Form.Item
 													label={
@@ -550,7 +586,7 @@ class PreferenceForm extends React.Component {
 													style={{ width: '100%' }}
 													defaultValue={value}
 													value={value}
-													min={0}
+													min={1}
 													max={1000}
 												/>
 												{showError && (
@@ -749,14 +785,11 @@ class PreferenceForm extends React.Component {
 							control={control.get('urlField')}
 							render={(endpointURLControl) => {
 								const { errors, touched, handler } = endpointURLControl;
-								const showError =
-									(submitted || touched) &&
-									(errors?.required || errors?.invalidLink);
+								const showError = (submitted || touched) && errors?.invalidLink;
 								return (
 									<Grid
 										label={
 											<span className={styles.labelContainer}>
-												<span className="required-marker">*</span>
 												URL
 												<Popover
 													content={content(Messages.urlField)}
@@ -772,11 +805,6 @@ class PreferenceForm extends React.Component {
 													{...handler()}
 													className={showError ? 'input-error' : ''}
 												/>
-												{showError ? (
-													<div className="error">
-														URL field is required
-													</div>
-												) : null}
 											</div>
 										}
 										gridRatio={gridRatio}

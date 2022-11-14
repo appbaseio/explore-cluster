@@ -13,8 +13,8 @@ const PageRoutes = ({
 	getPreferencesPayload,
 	preferences: prefs,
 	form,
-	// updateSearchPreferences,
 	setIsEditorLoading,
+	// updateSearchPreferences, // commented for a reason
 }) => {
 	const preferences = getPreferencesPayload();
 	const themeType = get(preferences, 'themeSettings.type', '');
@@ -81,6 +81,7 @@ const PageRoutes = ({
 				const body = {
 					metadata: {
 						commit: 'system commit: auto save page changes',
+						user: localStorage.getItem('username'),
 					},
 					content: newContent,
 				};
@@ -123,7 +124,6 @@ const PageRoutes = ({
 						style={{ width: 220 }}
 						value={getValue(value)}
 						loading={isLoading}
-						size="large"
 						optionLabelProp="value"
 						onSelect={(val) => {
 							setIsEditorLoading(true);

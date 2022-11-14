@@ -1,14 +1,29 @@
 import React from 'react';
 import { css } from 'emotion';
-import { Card, Button } from 'antd';
+import { Card, Button, Icon, Tooltip } from 'antd';
 import get from 'lodash/get';
-import { string, object } from 'prop-types';
+import { string, object, func } from 'prop-types';
 import { connect } from 'react-redux';
 import Flex from '../../batteries/components/shared/Flex';
 import DeployModal from './ExportInline/Components/DeployModal';
 import DeployLogsModal from './ExportInline/Components/DeployLogsModal';
-import { getDeploymentStatus, getAllVersions, deployUiBuilder } from './utils/sandpack-generator';
+import {
+	getDeploymentStatus,
+	getAllVersions,
+	deployUiBuilder,
+	transformPreferences,
+} from './utils/sandpack-generator';
 import { deployStatusMapper, getTemplate } from './utils/index';
+import PastVersionsDrawer from './ExportInline/Components/PastVersionsDrawer';
+import {
+	getSearchPreferencesN,
+	getSearchPreferenceVersionCodeByVersionN,
+	getSearchPreferenceVersionsN,
+	saveSearchPreferenceN,
+} from '../../batteries/modules/actions';
+
+import AppConstants from '../../batteries/modules/constants';
+import { transformContent } from './ExportInline/Components/ModalHeader';
 
 const headerStyles = css`
 	b {
@@ -52,7 +67,7 @@ const getURL = () => {
 class SyncStatus extends React.Component {
 	constructor(props) {
 		super(props);
-		const { form } = props;
+		const { form, getSearchPreferences } = props;
 		this.myInterval = null;
 		this.state = {
 			exportType: form.get('exportSettings.type').value,
@@ -66,14 +81,19 @@ class SyncStatus extends React.Component {
 			errMsg: '',
 			isLoading: false,
 			allVersions: [],
+			themeType: '',
+			showPastVersionsDrawer: false,
 		};
 		this.fetchData();
+		getSearchPreferences();
 	}
 
 	componentDidMount() {
 		const { form } = this.props;
 		const exportTypeHandler = form.get('exportSettings.type');
 		exportTypeHandler.valueChanges.subscribe(this.handleTypeChange);
+		const themeType = form.get('themeType');
+		themeType.valueChanges.subscribe(this.handleThemeTypeChange);
 		this.fetchAllVersions();
 		this.fetchDeploymentStatus();
 	}
@@ -93,6 +113,14 @@ class SyncStatus extends React.Component {
 		const { exportType } = this.state;
 		return exportType === 'shopify';
 	}
+
+	handleThemeTypeChange = (value) => {
+		const { themeType } = this.state;
+		if (themeType !== value)
+			this.setState({
+				themeType: value,
+			});
+	};
 
 	handleTypeChange = (value) => {
 		const { exportType } = this.state;
@@ -210,20 +238,73 @@ class SyncStatus extends React.Component {
 		});
 	};
 
+	fetchByVersionId = (versionId) => {
+		const { themeType } = this.state;
+		const {
+			getCodeByVersionId,
+			preferenceId,
+			updateVersionStateForPreference,
+			updateSearchPreferences,
+			getSearchPreferenceVersions,
+			getSearchPreferences,
+		} = this.props;
+		getCodeByVersionId(preferenceId, versionId)
+			.then((response) => {
+				const { res } = response.payload;
+
+				const newContent = transformContent(res.content);
+				const templateObj = getTemplate(themeType);
+				const newPreferences = JSON.parse(
+					newContent[`/${templateObj.preferences_path}`]
+						.replace('const appbasePrefs = ', '')
+						.replace('export default JSON.stringify(appbasePrefs);', '')
+						.replace(';', '')
+						.trim(),
+				);
+				updateVersionStateForPreference({
+					preferenceId,
+					patchPayload: {
+						updatedCode: newContent,
+						sandpackCode: newContent,
+						initialCode: newContent,
+					},
+				});
+				updateSearchPreferences(
+					preferenceId,
+					transformPreferences(newPreferences, true),
+				).then(() => {
+					getSearchPreferenceVersions(preferenceId);
+					getSearchPreferences();
+				});
+			})
+			.catch((err) => {
+				console.error(err);
+				// setErrMsg(err);
+			});
+	};
+
 	render() {
-		const { documents, deploymentStatus, modalType, errMsg, isLoading, allVersions } =
-			this.state;
-		const { form } = this.props;
+		const {
+			documents,
+			deploymentStatus,
+			modalType,
+			errMsg,
+			isLoading,
+			allVersions,
+			themeType,
+			showPastVersionsDrawer,
+		} = this.state;
+		const { form, versionState, preferenceId } = this.props;
 		const title = form.get('name') ? form.get('name').value : '';
-		const themeType = form.get('themeType') ? form.get('themeType').value : '';
 		const pipeline = form.get('pipeline') ? form.get('pipeline').value : '';
 		const status = deploymentStatus.status || deploymentStatus.state;
 		const templateObj = getTemplate(themeType);
+		const { currentVersion = {} } = versionState[preferenceId] ?? {};
 
 		return (
 			<Card>
 				{pipeline ? (
-					<div css={headerStyles}>
+					<div className={headerStyles}>
 						<Flex
 							justifyContent="space-between"
 							// alignItems="center"
@@ -255,17 +336,39 @@ class SyncStatus extends React.Component {
 									</>
 								) : null}
 							</Flex>
-
 							<Flex className="sub-part">
-								<Button
-									type="primary"
-									onClick={() => {
-										this.setState({ modalType: 'deploy-modal' });
-										this.fetchAllVersions();
-									}}
-								>
-									Deploy
-								</Button>
+								<Flex style={{ gap: '10px' }} alignItems="center">
+									<Tooltip title="Past Versions" style={{ fontSize: 14 }}>
+										{/* Past Versions */}
+										<Icon
+											style={{
+												cursor: currentVersion.version_id
+													? 'pointer'
+													: 'not-allowed',
+												color: currentVersion.version_id
+													? 'rgba(0,0,0,0.65)'
+													: '#bbb7b7',
+											}}
+											type="clock-circle"
+											onClick={() => {
+												if (currentVersion.version_id)
+													this.setState({
+														showPastVersionsDrawer: true,
+													});
+											}}
+										/>
+									</Tooltip>
+
+									<Button
+										type="primary"
+										onClick={() => {
+											this.setState({ modalType: 'deploy-modal' });
+											this.fetchAllVersions();
+										}}
+									>
+										Deploy
+									</Button>
+								</Flex>
 								{status ? (
 									<span>
 										<Button
@@ -309,6 +412,29 @@ class SyncStatus extends React.Component {
 					isLoading={isLoading}
 					handleCancel={this.handleCancel}
 					allVersions={allVersions}
+					deploymentStatus={deploymentStatus}
+				/>
+				<PastVersionsDrawer
+					visible={showPastVersionsDrawer}
+					setVisible={() =>
+						this.setState({
+							showPastVersionsDrawer: !showPastVersionsDrawer,
+						})
+					}
+					currentVersion={currentVersion}
+					allVersions={allVersions}
+					fetchByVersionId={this.fetchByVersionId}
+				/>
+				<PastVersionsDrawer
+					visible={showPastVersionsDrawer}
+					setVisible={() =>
+						this.setState({
+							showPastVersionsDrawer: !showPastVersionsDrawer,
+						})
+					}
+					currentVersion={currentVersion}
+					allVersions={allVersions}
+					fetchByVersionId={this.fetchByVersionId}
 				/>
 			</Card>
 		);
@@ -317,16 +443,38 @@ class SyncStatus extends React.Component {
 
 SyncStatus.defaultProps = {
 	preferenceId: '',
+	versionState: {},
 };
 
 SyncStatus.propTypes = {
 	index: string.isRequired,
 	form: object.isRequired,
 	preferenceId: string,
+	versionState: object,
+	getSearchPreferences: func.isRequired,
+	getCodeByVersionId: func.isRequired,
+	updateVersionStateForPreference: func.isRequired,
+	updateSearchPreferences: func.isRequired,
+	getSearchPreferenceVersions: func.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({
 	index: props.pipeline || get(state, '$getCurrentApp.name'),
+	versionState: get(state, '$getSearchPreferencesVersionsN.results', {}),
 });
-
-export default connect(mapStateToProps)(SyncStatus);
+const mapDispatchToProps = (dispatch) => ({
+	getSearchPreferences: () => dispatch(getSearchPreferencesN()),
+	updateSearchPreferences: (preferenceId, payload) =>
+		dispatch(saveSearchPreferenceN(preferenceId, payload)),
+	updateVersionStateForPreference: (payload) =>
+		dispatch({
+			type: AppConstants.APP.UI_BUILDERN.SEARCH_PREFERENCE_VERSIONS
+				.UPDATE_PREFERENCE_STATE_SUCCESS,
+			payload,
+		}),
+	getSearchPreferenceVersions: (preferenceId) =>
+		dispatch(getSearchPreferenceVersionsN(preferenceId)),
+	getCodeByVersionId: (preferenceId, versionId) =>
+		dispatch(getSearchPreferenceVersionCodeByVersionN(preferenceId, versionId)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(SyncStatus);

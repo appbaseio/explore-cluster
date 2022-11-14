@@ -10,10 +10,12 @@ import clusterRoutesReducer from './clusterRoutesReducer';
 import recentRoutesReducer from './recentRoutesReducer';
 import csbUrlReducer from './csbUrlReducer';
 import setSessionDataReducer from './setSessionDataReducer';
+import endpointsReducer from './endpointsReducer';
 
 export default {
 	user: userReducer,
 	apps: appsReducer,
+	endpoints: endpointsReducer,
 	appRoutes: appRoutesReducer,
 	clusterRoutes: clusterRoutesReducer,
 	appsMetrics: appsMetricsReducer,

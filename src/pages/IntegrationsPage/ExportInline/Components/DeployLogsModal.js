@@ -69,7 +69,7 @@ const DeployLogsModal = ({ open, handleCancel, deploymentStatus, uiBuilderName, 
 				);
 			})
 			.catch((err) => {
-				console.log('Error to fetch logs', err);
+				console.log('Error to fetch logs ', err);
 				setErrMsg('Error to fetch logs');
 			});
 	};
@@ -118,7 +118,7 @@ const DeployLogsModal = ({ open, handleCancel, deploymentStatus, uiBuilderName, 
 							</div>
 							<div className="row-data">
 								<div className="max-width overflow">
-									<span className="label">Deployed: </span>
+									<span className="label">Deployment started: </span>
 									{timeDifference(
 										new Date(),
 										new Date(

@@ -37,7 +37,7 @@ const bannerDetails = {
 		'GUI to manage preferences for index suggestions. Index suggestions are stored in the .suggestions index by reactivesearch.io based on the analytics data of what end users are searching for.',
 	buttonText: 'Read Docs',
 	icon: 'info-circle',
-	href: 'https://docs.appbase.io/docs/analytics/index-suggestions/',
+	href: 'https://docs.reactivesearch.io/docs/analytics/index-suggestions/',
 };
 
 class IndexSuggestions extends React.Component {

@@ -1,26 +1,24 @@
 import React from 'react';
-import { Button, Modal, Switch, Form, Select, Input, Typography, Card } from 'antd';
+import { Button, Modal, Switch, Form, Select, Input, Typography } from 'antd';
 import { string, object, func, bool } from 'prop-types';
 import styled from 'react-emotion';
+import get from 'lodash/get';
 import { FieldGroup, FieldControl, Validators } from 'react-reactive-form';
 import { ReactiveChart } from '@appbaseio/reactivesearch';
-import LivePreview from './LivePreview';
+import { connect } from 'react-redux';
+import { BACKENDS } from '../../../../../batteries/utils';
+import LivePreview from '../LivePreview';
 import CopyCode from './CopyCode';
 import DataFieldSelector from '../../../../../components/Form/DataFieldSelector';
 import { RANGE_FIELDS } from '../../../../../constants';
-import CodeEditorModal from './CodeEditorModal';
-import { chartTypes, queryTypes } from './constants';
+import CodeEditorModal from '../CodeEditorModal';
+import { chartTypes, customChartType, queryTypes } from './constants';
+import { CardButton, CodeEditorCard } from '../styles';
 
-const CodeEditorCard = styled(Card)`
-	position: relative;
-`;
-
-const CardButton = styled(Button)`
-	position: absolute;
-	box-sizing: border-box;
-	top: 10px;
-	right: 10px;
-`;
+function setValidator(control, validators) {
+	control.setValidators(validators);
+	control.setValue(control.value || undefined);
+}
 
 const ModalContainer = styled('div')`
 	display: flex;
@@ -66,10 +64,8 @@ const ModalContainer = styled('div')`
 class CustomizeChart extends React.Component {
 	state = {
 		visible: false,
-		showDefaultQueryEditor: false,
 		supportsRangeQuery: false,
-		showSetOptionEditor: false,
-		customizeControlObj: {},
+		currentEditorModal: '',
 	};
 
 	message = '';
@@ -88,24 +84,10 @@ class CustomizeChart extends React.Component {
 	getSetOptionPrefill = () => {
 		const { control } = this.props;
 		const chartType = control.get('chartType').value;
-		const title = control.get('title').value;
-		const xAxisName = control.get('xAxisName').value;
-		const yAxisName = control.get('xAxisName').value;
 
-		const options = ReactiveChart.getOption({
-			chartType: chartType || chartTypes.term.bar.id,
-			xAxisName,
-			yAxisName,
-			title,
-			aggregationData: [],
-			data: [],
-		});
-		const prefillTemplate = `({
-				data,
-				aggregationData,
-				rawData,
-				value
-			})=>(\n${JSON.stringify(options, null, 2)}\n)`;
+		const prefillTemplate = ReactiveChart.getOptionAsString(
+			chartType || chartTypes.term.bar.id,
+		);
 
 		return prefillTemplate;
 	};
@@ -127,11 +109,15 @@ class CustomizeChart extends React.Component {
 			visible: false,
 		});
 
-		const { onSave, control, tempControl } = this.props;
+		const { onSave, control, tempControl, onModalClose } = this.props;
 		if (tempControl && tempControl.get('enabled')) tempControl.get('enabled').setValue(true);
 
 		if (onSave) {
 			onSave(control);
+		}
+
+		if (onModalClose) {
+			onModalClose();
 		}
 	};
 
@@ -143,33 +129,28 @@ class CustomizeChart extends React.Component {
 		this.setState({
 			visible: false,
 		});
-		this.setCustomizeControlObj({});
 	};
 
 	handleDataFieldChange = (value) => {
 		const supports = RANGE_FIELDS.includes(value);
-		this.setState({ supportsRangeQuery: supports });
+		// Temporarily enable range for all fields
+		this.setState({ supportsRangeQuery: true });
+		// const supports = RANGE_FIELDS.includes(value) || value === 'date';
+		// this.setState({ supportsRangeQuery: supports });
 		return supports;
 	};
 
-	setCustomizeControlObj = (obj) => {
-		if (Object.keys(obj).length) {
-			this.setState({
-				customizeControlObj: obj,
-			});
-		}
-	};
-
 	render() {
+		const { visible, currentEditorModal, supportsRangeQuery } = this.state;
 		const {
-			visible,
-			customizeControlObj,
-			showDefaultQueryEditor,
-			showSetOptionEditor,
-			supportsRangeQuery,
-		} = this.state;
-		const { buttonLabel, control, buttonProps, form, getPreferencesPayload, pipeline } =
-			this.props;
+			buttonLabel,
+			control,
+			buttonProps,
+			getPreferencesPayload,
+			pipeline,
+			form,
+			backend,
+		} = this.props;
 		return (
 			<React.Fragment>
 				<Button {...buttonProps} onClick={this.showModal}>
@@ -181,6 +162,7 @@ class CustomizeChart extends React.Component {
 					control={control}
 				>
 					{({ pristine, invalid, value }) => {
+						const showFunctionEditors = value.dataField && value.chartType;
 						return (
 							<Modal
 								title="Set Chart"
@@ -195,7 +177,6 @@ class CustomizeChart extends React.Component {
 								destroyOnClose
 								okText="Save"
 								width="90%"
-								afterClose={() => this.setCustomizeControlObj({})}
 							>
 								<ModalContainer>
 									<div className="left-container">
@@ -206,8 +187,55 @@ class CustomizeChart extends React.Component {
 													pipeline={pipeline}
 													control={control?.get('dataField')}
 													setFieldType={this.handleDataFieldChange}
+													form={form}
 												/>
 											</Form.Item>
+											{value.chartType === chartTypes.range.scatter.id ? (
+												<>
+													<Form.Item label="X-Axis Field">
+														<FieldControl
+															name="xAxisField"
+															options={{
+																validators: Validators.required,
+															}}
+														>
+															{(fieldControl) => (
+																<DataFieldSelector
+																	isAggFields
+																	pipeline={pipeline}
+																	control={fieldControl}
+																	setFieldType={() => {
+																		return null;
+																	}}
+																	showRangeFieldsOnly
+																	withoutSuffix
+																/>
+															)}
+														</FieldControl>
+													</Form.Item>
+													<Form.Item label="Y-Axis Field">
+														<FieldControl
+															name="yAxisField"
+															options={{
+																validators: Validators.required,
+															}}
+														>
+															{(fieldControl) => (
+																<DataFieldSelector
+																	isAggFields
+																	pipeline={pipeline}
+																	control={fieldControl}
+																	setFieldType={() => {
+																		return null;
+																	}}
+																	showRangeFieldsOnly
+																	withoutSuffix
+																/>
+															)}
+														</FieldControl>
+													</Form.Item>
+												</>
+											) : null}
 											<Form.Item label="Type of Query">
 												<FieldControl
 													name="type"
@@ -225,11 +253,6 @@ class CustomizeChart extends React.Component {
 																	Range
 																</Select.Option>
 															) : null}
-															<Select.Option
-																value={queryTypes.search}
-															>
-																Search
-															</Select.Option>
 														</Select>
 													)}
 												</FieldControl>
@@ -240,7 +263,36 @@ class CustomizeChart extends React.Component {
 													control={control.get('chartType')}
 												>
 													{({ handler }) => (
-														<Select {...handler()}>
+														<Select
+															{...handler()}
+															onChange={(val) => {
+																const defaultQueryControl =
+																	control.get('defaultQuery');
+																const setQueryControl =
+																	control.get('setOption');
+
+																if (val === customChartType) {
+																	setValidator(
+																		defaultQueryControl,
+																		Validators.required,
+																	);
+																	setValidator(
+																		setQueryControl,
+																		Validators.required,
+																	);
+																} else {
+																	setValidator(
+																		defaultQueryControl,
+																		null,
+																	);
+																	setValidator(
+																		setQueryControl,
+																		null,
+																	);
+																}
+																handler().onChange(val);
+															}}
+														>
 															{Object.keys(
 																chartTypes[value.type] || {},
 															).map((key) => {
@@ -255,6 +307,12 @@ class CustomizeChart extends React.Component {
 																	</Select.Option>
 																);
 															})}
+															<Select.Option
+																key={customChartType}
+																value={customChartType}
+															>
+																Custom Chart
+															</Select.Option>
 														</Select>
 													)}
 												</FieldControl>
@@ -289,50 +347,6 @@ class CustomizeChart extends React.Component {
 													)}
 												</FieldControl>
 											</Form.Item>
-											{value.chartType === chartTypes.search.scatter.id ? (
-												<>
-													<Form.Item label="X-Axis Field">
-														<FieldControl
-															name="xAxisField"
-															options={{
-																validators: Validators.required,
-															}}
-														>
-															{(fieldControl) => (
-																<DataFieldSelector
-																	isAggFields
-																	pipeline={pipeline}
-																	control={fieldControl}
-																	setFieldType={() => {
-																		return null;
-																	}}
-																	withoutSuffix
-																/>
-															)}
-														</FieldControl>
-													</Form.Item>
-													<Form.Item label="Y-Axis Field">
-														<FieldControl
-															name="yAxisField"
-															options={{
-																validators: Validators.required,
-															}}
-														>
-															{(fieldControl) => (
-																<DataFieldSelector
-																	isAggFields
-																	pipeline={pipeline}
-																	control={fieldControl}
-																	setFieldType={() => {
-																		return null;
-																	}}
-																	withoutSuffix
-																/>
-															)}
-														</FieldControl>
-													</Form.Item>
-												</>
-											) : null}
 											{value.type === queryTypes.term ? (
 												<>
 													<FieldControl
@@ -413,50 +427,108 @@ class CustomizeChart extends React.Component {
 													</Form.Item>
 												</>
 											) : null}
-											<Form.Item label="Use as Filter for search UI">
-												<FieldControl
-													name="useAsFilter"
-													control={control?.get('useAsFilter')}
-												>
-													{({ handler }) => (
-														<Switch {...handler('checkbox')} />
-													)}
-												</FieldControl>
-											</Form.Item>
-											<CodeEditorCard>
-												<CardButton
-													icon="edit"
-													onClick={() =>
-														this.setState({
-															showDefaultQueryEditor: true,
-														})
-													}
-												>
-													Edit
-												</CardButton>
-												<Typography.Paragraph>
-													Default Query:
-												</Typography.Paragraph>
-												<Typography.Paragraph>
-													Edit defaultQuery code exported as function
-												</Typography.Paragraph>
-											</CodeEditorCard>
-											<CodeEditorCard>
-												<CardButton
-													icon="edit"
-													onClick={() =>
-														this.setState({ showSetOptionEditor: true })
-													}
-												>
-													Edit
-												</CardButton>
-												<Typography.Paragraph>
-													Set Option:
-												</Typography.Paragraph>
-												<Typography.Paragraph>
-													Edit Set Option code exported as function
-												</Typography.Paragraph>
-											</CodeEditorCard>
+											{value.chartType ===
+											chartTypes.range.scatter.id ? null : (
+												<Form.Item label="Use as Filter for search UI">
+													<FieldControl
+														name="useAsFilter"
+														control={control?.get('useAsFilter')}
+													>
+														{({ handler }) => (
+															<Switch
+																{...handler('checkbox')}
+																onChange={(val) => {
+																	const customQueryControl =
+																		control.get('customQuery');
+																	if (
+																		val &&
+																		control.value.chartType ===
+																			customChartType
+																	) {
+																		setValidator(
+																			customQueryControl,
+																			Validators.required,
+																		);
+																	} else {
+																		setValidator(
+																			customQueryControl,
+																			null,
+																		);
+																	}
+																	handler('checkbox').onChange(
+																		val,
+																	);
+																}}
+															/>
+														)}
+													</FieldControl>
+												</Form.Item>
+											)}
+											{showFunctionEditors ? (
+												<>
+													<CodeEditorCard>
+														<CardButton
+															icon="edit"
+															onClick={() =>
+																this.setState({
+																	currentEditorModal:
+																		'defaultQuery',
+																})
+															}
+														>
+															Edit
+														</CardButton>
+														<Typography.Paragraph>
+															Default Query:
+														</Typography.Paragraph>
+														<Typography.Paragraph>
+															Edit defaultQuery code exported as
+															function
+														</Typography.Paragraph>
+													</CodeEditorCard>
+													<CodeEditorCard>
+														<CardButton
+															icon="edit"
+															onClick={() =>
+																this.setState({
+																	currentEditorModal: 'setOption',
+																})
+															}
+														>
+															Edit
+														</CardButton>
+														<Typography.Paragraph>
+															Set Option:
+														</Typography.Paragraph>
+														<Typography.Paragraph>
+															Edit Set Option code exported as
+															function
+														</Typography.Paragraph>
+													</CodeEditorCard>
+													{control.value.useAsFilter ? (
+														<CodeEditorCard>
+															<CardButton
+																icon="edit"
+																onClick={() =>
+																	this.setState({
+																		currentEditorModal:
+																			'customQuery',
+																	})
+																}
+															>
+																Edit
+															</CardButton>
+															<Typography.Paragraph>
+																Custom Query:
+															</Typography.Paragraph>
+															<Typography.Paragraph>
+																Edit Custom Query code exported as
+																function
+															</Typography.Paragraph>
+														</CodeEditorCard>
+													) : null}
+												</>
+											) : null}
 											<FieldControl
 												name="defaultQuery"
 												strict={false}
@@ -464,29 +536,31 @@ class CustomizeChart extends React.Component {
 											>
 												{(defaultQueryControl) => (
 													<CodeEditorModal
-														defaultValue={
-															defaultQueryControl.value ||
-															`(value, props)=>(${JSON.stringify(
-																{ aggs: {} },
-																null,
-																2,
-															)})`
+														visible={
+															currentEditorModal === 'defaultQuery'
 														}
-														language="javascript"
-														visible={showDefaultQueryEditor}
 														onCancel={() =>
 															this.setState({
-																showDefaultQueryEditor: false,
+																currentEditorModal: '',
 															})
 														}
 														onSave={(code) => {
 															this.setState({
-																showDefaultQueryEditor: false,
+																currentEditorModal: '',
 															});
 															defaultQueryControl
 																.handler()
 																.onChange(code);
 														}}
+														componentConfig={{
+															...control.value,
+															defaultQuery:
+																defaultQueryControl.value ||
+																`(value, props)=>({})`,
+														}}
+														functionProperty="defaultQuery"
+														showLivePreview={false}
+														pipeline={pipeline}
 													/>
 												)}
 											</FieldControl>
@@ -497,25 +571,95 @@ class CustomizeChart extends React.Component {
 											>
 												{(setOptionControl) => (
 													<CodeEditorModal
-														defaultValue={
-															setOptionControl.value ||
-															this.getSetOptionPrefill()
-														}
-														visible={showSetOptionEditor}
-														language="javascript"
+														visible={currentEditorModal === 'setOption'}
 														onCancel={() =>
 															this.setState({
-																showSetOptionEditor: false,
+																currentEditorModal: '',
 															})
 														}
 														onSave={(code) => {
 															this.setState({
-																showSetOptionEditor: false,
+																currentEditorModal: '',
 															});
 															setOptionControl
 																.handler()
 																.onChange(code);
 														}}
+														componentConfig={{
+															...control.value,
+															setOption:
+																setOptionControl.value ||
+																this.getSetOptionPrefill(),
+														}}
+														showResponseOutput={false}
+														showLivePreview={false}
+														functionProperty="setOption"
+														pipeline={pipeline}
+														header={
+															<div>
+																<p>
+																	<b>Customize Chart Display:</b>
+																</p>
+																<p>
+																	<span>
+																		Charts are built with Apache
+																		Echarts library.
+																	</span>
+																	&nbsp;
+																	<a
+																		target="_blank"
+																		href="https://echarts.apache.org/examples/en/index.html"
+																		rel="noreferrer"
+																	>
+																		See their examples
+																	</a>
+																	&nbsp;
+																	<span>
+																		for options structure, they
+																		can also be pasted in the
+																		function body
+																	</span>
+																</p>
+															</div>
+														}
+													/>
+												)}
+											</FieldControl>
+											<FieldControl
+												name="customQuery"
+												strict={false}
+												control={control?.get('customQuery')}
+											>
+												{(customQueryControl) => (
+													<CodeEditorModal
+														visible={
+															currentEditorModal === 'customQuery'
+														}
+														onCancel={() =>
+															this.setState({
+																currentEditorModal: '',
+															})
+														}
+														onSave={(code) => {
+															this.setState({
+																currentEditorModal: '',
+															});
+															customQueryControl
+																.handler()
+																.onChange(code);
+														}}
+														componentConfig={{
+															...control.value,
+															customQuery:
+																customQueryControl.value ||
+																`(value, props)=>(${JSON.stringify(
+																	{ aggs: {} },
+																	null,
+																	2,
+																)})`,
+														}}
+														functionProperty="customQuery"
+														pipeline={pipeline}
 													/>
 												)}
 											</FieldControl>
@@ -523,14 +667,13 @@ class CustomizeChart extends React.Component {
 									</div>
 									<div className="right-container">
 										<LivePreview
-											form={form}
-											control={control.value}
-											setCustomizeControlObj={this.setCustomizeControlObj}
-											customizeControlObj={customizeControlObj}
+											pipeline={pipeline}
+											componentConfig={control.value}
 										/>
 										<CopyCode
 											control={value}
 											getPreferencesPayload={getPreferencesPayload}
+											backend={backend}
 										/>
 									</div>
 								</ModalContainer>
@@ -556,6 +699,8 @@ CustomizeChart.defaultProps = {
 	pipeline: undefined,
 	form: {},
 	getPreferencesPayload: () => {},
+	onModalClose: () => {},
+	backend: BACKENDS.ELASTICSEARCH.name,
 };
 CustomizeChart.propTypes = {
 	buttonLabel: string,
@@ -570,6 +715,12 @@ CustomizeChart.propTypes = {
 	type: string,
 	form: object,
 	getPreferencesPayload: func,
+	onModalClose: func,
+	backend: string,
 };
 
-export default CustomizeChart;
+const mapStateToProps = (state) => ({
+	backend: get(state, '$getAppPlan.results.backend'),
+});
+
+export default connect(mapStateToProps, null)(CustomizeChart);

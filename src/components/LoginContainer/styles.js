@@ -37,7 +37,6 @@ const main = css`
 			}
 		}
 		.signup_description {
-			margin-top: 40px;
 			h4 {
 				margin-top: 14px;
 				margin-bottom: 14px;

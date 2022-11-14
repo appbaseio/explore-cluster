@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Drawer, Divider, Icon, Row, Tooltip } from 'antd';
+// eslint-disable-next-line import/no-cycle
 import List from './List';
 import { pastVersionsStyles } from './styles';
 import { timeDifference } from '../../utils/index';
@@ -10,7 +11,9 @@ const PastVersionsDrawer = ({
 	setVisible,
 	currentVersion,
 	allVersions,
-	fetchByVersionId,
+	preferenceId,
+	updatedCode,
+	updateVersionStateForPreference,
 }) => {
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -27,7 +30,7 @@ const PastVersionsDrawer = ({
 		}
 
 		return (
-			<div css={pastVersionsStyles}>
+			<div className={pastVersionsStyles}>
 				<Icon
 					type={isLoading ? 'loading' : 'clock-circle'}
 					className="active-version-icon"
@@ -103,7 +106,9 @@ const PastVersionsDrawer = ({
 							<List
 								data={data}
 								setIsLoading={setIsLoading}
-								fetchByVersionId={fetchByVersionId}
+								preferenceId={preferenceId}
+								updatedCode={updatedCode}
+								updateVersionStateForPreference={updateVersionStateForPreference}
 							/>
 						);
 					})}
@@ -117,7 +122,9 @@ PastVersionsDrawer.propTypes = {
 	setVisible: PropTypes.func,
 	currentVersion: PropTypes.object,
 	allVersions: PropTypes.array,
-	fetchByVersionId: PropTypes.func.isRequired,
+	preferenceId: PropTypes.string,
+	updatedCode: PropTypes.object,
+	updateVersionStateForPreference: PropTypes.func.isRequired,
 };
 
 PastVersionsDrawer.defaultProps = {
@@ -125,6 +132,8 @@ PastVersionsDrawer.defaultProps = {
 	currentVersion: {},
 	allVersions: [],
 	setVisible: () => {},
+	preferenceId: '',
+	updatedCode: {},
 };
 
 export default PastVersionsDrawer;

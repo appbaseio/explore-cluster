@@ -50,7 +50,7 @@ const bannerMessagesAnalytics = {
 		description:
 			'See our docs on how to track search, filters, click events, conversions and add your own custom events.',
 		buttonText: 'Read Docs',
-		href: 'https://docs.appbase.io/docs/analytics/overview/#popular-searches',
+		href: 'https://docs.reactivesearch.io/docs/analytics/overview/#popular-searches',
 	},
 };
 
@@ -90,9 +90,8 @@ const PopularSearchesWrapper = ({ appName, plan, isPaidUser }) => {
 							<Filter filterId={filterId} />
 							<Route
 								component={({ match }) => {
-									const splitedURL = window.location.href.split(
-										'query-overview/',
-									);
+									const splitedURL =
+										window.location.href.split('query-overview/');
 									return (
 										<React.Fragment>
 											{window.location.href.includes('query-overview') ? (

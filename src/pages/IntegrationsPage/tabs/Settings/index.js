@@ -76,6 +76,7 @@ const Settings = () => {
 											? form.get('pipeline').value
 											: undefined
 									}
+									form={form}
 									dataSource={[
 										{
 											id: 'resultTitle',

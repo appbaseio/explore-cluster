@@ -14,7 +14,7 @@ const bannerMessagesStoredQueries = {
 			'GUI to manage your stored queries. Use them as direct REST APIs or with ReactiveSearch API.',
 		buttonText: 'Read Docs',
 		icon: 'info-circle',
-		href: 'https://docs.appbase.io/docs/data/stored-queries/',
+		href: 'https://docs.reactivesearch.io/docs/data/stored-queries/',
 	},
 };
 const StoredQueriesView = ({ isPaidUser }) => {

@@ -28,7 +28,7 @@ const bannerMessagesAnalytics = {
 		title: 'Popular Results',
 		description: 'Understand how to make the most of the popular results analytics.',
 		buttonText: 'Read Docs',
-		href: 'https://docs.appbase.io/docs/analytics/overview/#popular-results',
+		href: 'https://docs.reactivesearch.io/docs/analytics/overview/#popular-results',
 	},
 };
 

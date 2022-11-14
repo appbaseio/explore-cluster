@@ -21,7 +21,7 @@ const ExportToHackable = ({ control, preferences, isRecommendation, widgetId }) 
 		<React.Fragment>
 			<h2>Export to CodeSandbox</h2>
 			<div
-				css={{
+				style={{
 					position: 'relative',
 					marginBottom: 25,
 				}}
@@ -29,11 +29,7 @@ const ExportToHackable = ({ control, preferences, isRecommendation, widgetId }) 
 				Open the CodeSandbox{' '}
 				<a
 					target="blank"
-					href={
-						isRecommendation
-							? 'https://codesandbox.io/s/github/appbaseio/reactivesearch-shopify-plugin/tree/export-to-csb-recommendation?file=/public/index.html'
-							: 'https://codesandbox.io/s/github/appbaseio/reactivesearch-shopify-plugin/tree/export-to-csb?file=/public/index.html'
-					}
+					href="https://codesandbox.io/s/github/appbaseio/recommendations-template/tree/main?file=/public/index.html"
 				>
 					link here
 				</a>
@@ -44,7 +40,7 @@ const ExportToHackable = ({ control, preferences, isRecommendation, widgetId }) 
 				<strong>index.html</strong> file to apply the preferences.
 			</div>
 			<div
-				css={{
+				style={{
 					position: 'relative',
 					marginBottom: 25,
 				}}
@@ -62,7 +58,7 @@ const ExportToHackable = ({ control, preferences, isRecommendation, widgetId }) 
 				</CopyToClipboard>
 
 				<pre
-					css={{
+					style={{
 						background: '#eee',
 						padding: '0 20px',
 						margin: '20px 0',
@@ -76,7 +72,7 @@ const ExportToHackable = ({ control, preferences, isRecommendation, widgetId }) 
 					Add the following snippet into <strong>body</strong> tag of{' '}
 					<strong>index.html</strong> file.
 					<div
-						css={{
+						style={{
 							position: 'relative',
 							marginBottom: 25,
 						}}
@@ -94,7 +90,7 @@ const ExportToHackable = ({ control, preferences, isRecommendation, widgetId }) 
 						</CopyToClipboard>
 						<div>
 							<pre
-								css={{
+								style={{
 									background: '#eee',
 									padding: '20px 20px',
 									margin: '20px 0',
@@ -120,7 +116,7 @@ const ExportToHackable = ({ control, preferences, isRecommendation, widgetId }) 
 										</div>
 
 										<div
-											css={{
+											style={{
 												position: 'relative',
 												marginBottom: 25,
 											}}
@@ -132,7 +128,7 @@ const ExportToHackable = ({ control, preferences, isRecommendation, widgetId }) 
 												<Button
 													icon="copy"
 													shape="circle"
-													css={{
+													style={{
 														position: 'absolute',
 														right: 10,
 														top: 10,
@@ -141,7 +137,7 @@ const ExportToHackable = ({ control, preferences, isRecommendation, widgetId }) 
 											</CopyToClipboard>
 											<div>
 												<pre
-													css={{
+													style={{
 														background: '#eee',
 														padding: '20px 20px',
 														margin: '20px 0',
@@ -159,7 +155,7 @@ const ExportToHackable = ({ control, preferences, isRecommendation, widgetId }) 
 										</div>
 										<div>
 											<pre
-												css={{
+												style={{
 													background: '#eee',
 													padding: '20px 20px',
 													margin: '20px 0',
@@ -174,7 +170,7 @@ const ExportToHackable = ({ control, preferences, isRecommendation, widgetId }) 
 										Add the following snippet into <strong>body</strong> tag of{' '}
 										<strong>index.html</strong> file.
 										<div
-											css={{
+											style={{
 												position: 'relative',
 												marginBottom: 25,
 											}}
@@ -186,7 +182,7 @@ const ExportToHackable = ({ control, preferences, isRecommendation, widgetId }) 
 												<Button
 													icon="copy"
 													shape="circle"
-													css={{
+													style={{
 														position: 'absolute',
 														right: 10,
 														top: 10,
@@ -195,7 +191,7 @@ const ExportToHackable = ({ control, preferences, isRecommendation, widgetId }) 
 											</CopyToClipboard>
 											<div>
 												<pre
-													css={{
+													style={{
 														background: '#eee',
 														padding: '20px 20px',
 														margin: '20px 0',

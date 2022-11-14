@@ -9,29 +9,20 @@ import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
 import SettingsTab from '../tabs/Settings';
 import General from '../tabs/General';
 import RecommendationsTab from '../tabs/Recommendations';
-import ChoosePlatformTab from '../tabs/ChoosePlatform';
 import { container } from '../../ResultsPage/styles';
 import PreviewModal from '../PreviewModal';
 import SyncStatus from '../SyncStatus';
 import PreferencesFormWrapper from '../PreferencesFormWrapperN';
 import SavePreferences from '../SavePreferencesN';
-import { isValidPlan, features } from '../../../batteries/utils';
 
 const { TabPane } = Tabs;
-
-const bannerDetails = {
-	title: 'Recommendations UI Builder',
-	description:
-		'Build a WYSIWYG recommendations UI that can be installed to any E-Commerce platform or to your own site.',
-	icon: 'info-circle',
-};
 
 const bannerDetailsPaid = {
 	title: 'Recommendations UI Builder',
 	description:
 		'Build a WYSIWYG recommendations UI that can be installed to any E-Commerce platform or to your own site.',
 	buttonText: 'Read Docs',
-	href: 'http://docs.appbase.io/docs/reactivesearch/ui-builder/recommendations/',
+	href: 'http://docs.reactivesearch.io/docs/reactivesearch/ui-builder/recommendations/',
 };
 
 const Main = ({ tier, featureEcommerce, ...props }) => {
@@ -47,11 +38,7 @@ const Main = ({ tier, featureEcommerce, ...props }) => {
 
 	return (
 		<div>
-			{!isValidPlan(tier, featureEcommerce, features.UI_BUILDER) ? (
-				<Banner {...bannerDetails} />
-			) : (
-				<Banner {...bannerDetailsPaid} />
-			)}
+			<Banner {...bannerDetailsPaid} />
 			<PreferencesFormWrapper
 				closeForm={closeForm}
 				preferenceId={preferenceId}
@@ -70,21 +57,20 @@ const Main = ({ tier, featureEcommerce, ...props }) => {
 									onChange={handleTabChange}
 									defaultActiveKey="1"
 									style={{ minHeight: 500 }}
+									destroyInactiveTabPane
 								>
 									<TabPane tab="General" key="1">
 										<General isRecommendation />
 									</TabPane>
-									<TabPane tab="E-Commerce Platform" key="2">
-										<ChoosePlatformTab pipeline={pipeline} />
-									</TabPane>
-									<TabPane tab="Recommendations UI" key="3">
+
+									<TabPane tab="Recommendations UI" key="2">
 										<RecommendationsTab
 											pipeline={pipeline}
 											onChangeEdit={handleWidgetInfo}
 											getPreferences={getPreferences}
 										/>
 									</TabPane>
-									<TabPane tab="Settings" key="4">
+									<TabPane tab="Settings" key="3">
 										<SettingsTab />
 									</TabPane>
 								</Tabs>

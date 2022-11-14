@@ -79,7 +79,7 @@ function EndScreen({ sandboxURL }) {
 										target="_blank"
 										rel="noreferrer"
 										className="button"
-										href="https://docs.appbase.io/docs/reactivesearch/v3/overview/quickstart/"
+										href="https://docs.reactivesearch.io/docs/reactivesearch/v3/overview/quickstart/"
 									>
 										Get Started
 									</a>
@@ -129,7 +129,7 @@ function EndScreen({ sandboxURL }) {
 								className="button"
 								target="_blank"
 								rel="noreferrer"
-								href="https://docs.appbase.io/docs/reactivesearch/react-native-searchbox/quickstart/"
+								href="https://docs.reactivesearch.io/docs/reactivesearch/react-native-searchbox/quickstart/"
 							>
 								Learn More
 							</a>
@@ -148,7 +148,7 @@ function EndScreen({ sandboxURL }) {
 								className="button"
 								target="_blank"
 								rel="noreferrer"
-								href="https://docs.appbase.io/docs/reactivesearch/v3/overview/reactivemaps/"
+								href="https://docs.reactivesearch.io/docs/reactivesearch/v3/overview/reactivemaps/"
 							>
 								Learn More
 							</a>
@@ -169,7 +169,7 @@ function EndScreen({ sandboxURL }) {
 								className="button"
 								target="_blank"
 								rel="noreferrer"
-								href="https://docs.appbase.io/api/examples/rest/"
+								href="https://docs.reactivesearch.io/api/examples/rest/"
 							>
 								Learn More
 							</a>

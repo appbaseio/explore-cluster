@@ -10,7 +10,7 @@ import { excludedArr, templateConfigMap } from '../../../utils/sandpack-generato
 const searchContainerStyles = css`
 	.case-sensitive {
 		width: 15px;
-		background: #e6f6ff;
+
 		border-radius: 3px;
 		cursor: pointer;
 	}
@@ -104,8 +104,21 @@ const SandpackSearch = ({
 		setValue(val);
 	};
 
+	const iconColor = (val) => {
+		if (localStorage.getItem('theme') === 'dark') {
+			if (searchType && val && searchType === val) {
+				return 'invert(42%) sepia(93%) saturate(1352%) hue-rotate(87deg) brightness(119%) contrast(119%)';
+			}
+			return 'brightness(0) invert(1)';
+		}
+		if (searchType && val && searchType === val) {
+			return 'invert(42%) sepia(33%) saturate(1352%) hue-rotate(900deg) brightness(119%) contrast(119%)';
+		}
+		return 'brightness(0%)';
+	};
+
 	return (
-		<div css={searchContainerStyles}>
+		<div className={searchContainerStyles}>
 			<Input
 				id="file-explorer-search"
 				prefix={<Icon type="search" />}
@@ -117,10 +130,7 @@ const SandpackSearch = ({
 								<img
 									src="/static/images/case-sensitive.svg"
 									style={{
-										background:
-											searchType === 'caseSensitive'
-												? 'rgb(205 231 246)'
-												: 'none',
+										filter: iconColor('caseSensitive'),
 										marginRight: 3,
 									}}
 									alt="case-sensitive-icon"
@@ -137,8 +147,7 @@ const SandpackSearch = ({
 							<Icon
 								type="file-search"
 								style={{
-									background:
-										searchType === 'fileSearch' ? 'rgb(205 231 246)' : 'none',
+									filter: iconColor('fileSearch'),
 								}}
 								onClick={() => {
 									if (searchType === 'fileSearch') setSearchType('');

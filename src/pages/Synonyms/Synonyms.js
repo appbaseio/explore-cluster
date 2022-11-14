@@ -375,7 +375,7 @@ class Synonyms extends React.Component {
 			title: 'Manage Synonyms',
 			buttonText: 'Read Docs',
 			videoLink: 'https://youtu.be/FA6knNSaChA',
-			href: 'https://docs.appbase.io/docs/search/relevancy/#synonyms',
+			href: 'https://docs.reactivesearch.io/docs/search/relevancy/#synonyms',
 		};
 
 		return (

@@ -1,4 +1,15 @@
 .resizer {
-	width: 10px;
+	width: 5px;
 	cursor: ew-resize;
+}
+
+.arrow-up {
+	padding: 9px !important;
+	border-radius: 50%;
+	height: 29px !important;
+	width: 29px !important;
+	position: absolute;
+    right: 53px;
+    bottom: 6px;
+	border: 0;
 }

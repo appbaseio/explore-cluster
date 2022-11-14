@@ -252,7 +252,7 @@ class Credentials extends Component {
 					extra={
 						<div style={{ textAlign: 'center' }}>
 							<a
-								href="https://docs.appbase.io/docs/security/Credentials/"
+								href="https://docs.reactivesearch.io/docs/security/Credentials/"
 								rel="noopener noreferrer"
 								target="_blank"
 							>
@@ -280,7 +280,7 @@ class Credentials extends Component {
 							</Typography.Paragraph>
 						}
 						type="info"
-						css={{ marginBottom: 20 }}
+						style={{ marginBottom: 20 }}
 					/>
 					<ErrorToaster inline>
 						<Table

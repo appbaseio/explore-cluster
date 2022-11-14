@@ -1,56 +1,56 @@
 [
-    {
-        "organization": "appbaseio-confidential",
-        "repository": "enterprise-search-ui-template",
-        "version": "",
-        "commit": "",
-        "branch": "autho-template",
-        "manifest_path": "reactivesearch-manifest.json",
-        "repositoryType": "private"
-    },
-    {
-        "organization": "appbaseio-confidential",
-        "repository": "marketplace-apps",
-        "version": "",
-        "commit": "",
-        "branch": "reactivechart-dashboard-app",
-        "manifest_path": "reactivesearch-manifest.json",
-        "repositoryType": "private"
-    },
-    {
-        "organization": "appbaseio",
-        "repository": "reactivesearch-shopify-plugin",
-        "version": "",
-        "commit": "",
-        "branch": "ecomm-result-category-type",
-        "manifest_path": "reactivesearch-manifest.json",
-        "repositoryType": "public"
-    },
-    {
-        "organization": "appbaseio-confidential",
-        "repository": "multi-page-search",
-        "version": "",
-        "commit": "",
-        "branch": "main",
-        "manifest_path": "reactivesearch-manifest.json",
-        "repositoryType": "private"
-    },
-    {
-        "organization": "appbaseio",
-        "repository": "reactivesearch-shopify-plugin",
-        "version": "",
-        "commit": "",
-        "branch": "v2-geo-template",
-        "manifest_path": "reactivesearch-manifest.json",
-        "repositoryType": "public"
-    },
-    {
-        "organization": "appbaseio-confidential",
-        "repository": "enterprise-demo-search-ui-template",
-        "version": "",
-        "commit": "",
-        "branch": "master",
-        "manifest_path": "reactivesearch-manifest.json",
-        "repositoryType": "private"
-    }
+	{
+		"organization": "appbaseio-confidential",
+		"repository": "enterprise-search-ui-template",
+		"version": "",
+		"commit": "",
+		"branch": "main",
+		"manifest_path": "reactivesearch-manifest.json",
+		"repositoryType": "private"
+	},
+	{
+		"organization": "appbaseio-confidential",
+		"repository": "charts-dashboard-template",
+		"version": "",
+		"commit": "",
+		"branch": "main",
+		"manifest_path": "reactivesearch-manifest.json",
+		"repositoryType": "private"
+	},
+	{
+		"organization": "appbaseio",
+		"repository": "faceted-search-template",
+		"version": "",
+		"commit": "",
+		"branch": "main",
+		"manifest_path": "reactivesearch-manifest.json",
+		"repositoryType": "public"
+	},
+	{
+		"organization": "appbaseio",
+		"repository": "geo-search-template",
+		"version": "",
+		"commit": "",
+		"branch": "main",
+		"manifest_path": "reactivesearch-manifest.json",
+		"repositoryType": "public"
+	},
+	{
+		"organization": "appbaseio-confidential",
+		"repository": "multi-page-search",
+		"version": "",
+		"commit": "",
+		"branch": "main",
+		"manifest_path": "reactivesearch-manifest.json",
+		"repositoryType": "private"
+	},
+	{
+		"organization": "appbaseio-confidential",
+		"repository": "enterprise-demo-search-ui-template",
+		"version": "",
+		"commit": "",
+		"branch": "main",
+		"manifest_path": "reactivesearch-manifest.json",
+		"repositoryType": "private"
+	}
 ]

@@ -24,7 +24,7 @@ const main = css`
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	max-width: 210px;
+	max-width: 300px;
 `;
 
 const Color = styled('div')(({ color }) => ({
@@ -35,7 +35,7 @@ const Color = styled('div')(({ color }) => ({
 }));
 
 const ColorPicker = ({ label, value, onChange }) => (
-	<div css={main}>
+	<div className={main}>
 		{label && <div className={labelStyles}>{label}</div>}
 		<Popover
 			overlayStyle={{ width: 300 }}

@@ -1,5 +1,5 @@
 // import Dashboard from '@uppy/dashboard';
-import { Input } from 'antd';
+import { Input, Typography } from 'antd';
 import { css } from 'emotion';
 // import ImageKitUppyPlugin from 'imagekit-uppy-plugin';
 // import { IKContext, IKImage } from 'imagekitio-react';
@@ -15,6 +15,8 @@ const { TextArea } = Input;
 
 const Messages = {
 	name: 'Name of the Auth application',
+	white_list_url:
+		'By default, authentication will work on the deployed Search UI domains for your cluster. You can add custom domains you intend to use for authentication here. This is required to configure post login callback URL, set CORS, and web origins.',
 	uri_logo:
 		'The URL of the logo to display for the application, if none is set the default badge for this type of application will be shown. Recommended size is 150x150 pixels.',
 	callbacks:
@@ -55,7 +57,7 @@ const container = css`
 		.error-span {
 			position: absolute;
 			color: red;
-			bottom: -22px;
+			bottom: 5px;
 			left: 2px;
 			display: block;
 			width: max-content;
@@ -101,7 +103,7 @@ const ApplicationSettings = () => {
 					render={({ touched }) => {
 						return (
 							<div id="application-settings-form">
-								<FieldControl
+								{/* <FieldControl
 									name="name"
 									render={({ handler, errors }) => {
 										const showError = touched && errors?.required;
@@ -127,7 +129,7 @@ const ApplicationSettings = () => {
 											/>
 										);
 									}}
-								/>
+								/> */}
 								{/* <FieldControl name="logo_uri" strict={false}>
 									{({ value }) => {
 										return (
@@ -176,36 +178,50 @@ const ApplicationSettings = () => {
 									}}
 								</FieldControl> */}
 								<FieldControl
-									name="callbacks"
+									name="callbacks" // use callbacks as a uniersal field for other hidden Auth0 relevant settings
 									strict={false}
 									render={({ handler, errors }) => {
-										const showError = touched && errors?.invalidTextAreaInput;
+										const showError =
+											touched &&
+											(errors?.required || errors?.invalidTextAreaInput);
 
 										return (
 											<Grid
-												label="Allowed Callback URLs"
-												toolTipMessage={Messages.callbacks}
+												label="Whitelist URLs for Authentication Use"
+												toolTipMessage={Messages.white_list_url}
 												className={`field-wrapper ${
 													showError ? 'error' : ''
 												}`}
 												component={
-													<>
-														<TextArea
-															rows={4}
-															placeholder="Enter comma-separated URLs"
-															{...handler()}
-														/>
-														{showError &&
-															renderErrorSpan(
-																'Enter comma-separated valid URLs',
-															)}
-													</>
+													<div>
+														<div style={{ position: 'relative' }}>
+															{' '}
+															<TextArea
+																rows={4}
+																placeholder="Enter comma-separated URLs"
+																{...handler()}
+																style={{
+																	width: '100%',
+																	marginBottom: '2rem',
+																}}
+															/>
+															{showError &&
+																renderErrorSpan(
+																	errors?.required
+																		? 'This is a required field'
+																		: 'Enter comma-separated valid URLs',
+																)}
+														</div>
+														<Typography.Paragraph>
+															{Messages.white_list_url}
+														</Typography.Paragraph>
+													</div>
 												}
 											/>
 										);
 									}}
 								/>
-								<FieldControl
+								{/* <FieldControl
 									name="allowed_origins"
 									strict={false}
 									render={({ handler, errors }) => {
@@ -294,7 +310,7 @@ const ApplicationSettings = () => {
 											/>
 										);
 									}}
-								/>
+								/> */}
 							</div>
 						);
 					}}

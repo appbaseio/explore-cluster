@@ -33,19 +33,23 @@ import {
 import {
 	getSearchPreferencesN,
 	getRecommendationsPreferencesN,
+	getSearchPreferenceLatestVersionN,
+	getSearchPreferenceVersionsN,
 } from '../../batteries/modules/actions';
-import { reOrderPreferences } from './utils/index';
+import AppConstants from '../../batteries/modules/constants';
+import { transformContent } from './ExportInline/Components/ModalHeader';
+import { removeEmpty, reOrderPreferences } from './utils/index';
+import { BACKENDS } from '../../batteries/utils';
+import { replaceWithPreferences } from './utils/sandpack-generator';
 
 const modalStyles = css`
 	.header-container {
 		padding: 16px 24px;
-		color: rgba(0, 0, 0, 0.65);
 		position: absolute;
 		top: 0;
 		right: 0;
 		left: 0;
 		z-index: 999;
-		background: white;
 		height: 85px;
 	}
 	.header-title-container {
@@ -87,19 +91,39 @@ const modalStyles = css`
 		white-space: nowrap;
 		overflow: hidden;
 	}
+	.header-icons {
+		display: flex;
+		gap: 20px;
+		font-size: 18px;
+		align-items: center;
+
+	.ant-switch-inner {
+		display: flex;
+	}
 `;
 class PreferencesFormWrapperN extends React.Component {
 	constructor(props) {
 		super(props);
+		this.isFusion = props.backend === BACKENDS.FUSION.name;
 		this.form = FormBuilder.group({
 			name: '',
 			description: '',
 			pipeline: [undefined, Validators.required],
+			url: ['/_fusion/_reactivesearch', Validators.required],
+			method: 'POST',
+			headers: '',
+			backend: props.backend || BACKENDS.ELASTICSEARCH.name,
+			...(this.isFusion && {
+				pipeline: '_fusion',
+				app: '',
+				profile: '',
+				searchProfile: '',
+			}),
 			id: '',
 			currentPage: '',
 			// Custom Logo Settings
 			logoUrl: '',
-			logoWidth: 20,
+			logoWidth: 200,
 			logoAlignment: 'left',
 			// Common controls =>>>>> Starts
 			themeType: 'classic',
@@ -107,7 +131,11 @@ class PreferencesFormWrapperN extends React.Component {
 			primaryTextColor: '#fff',
 			textColor: '#424242',
 			titleColor: '#424242',
-			fontFamily: 'default',
+			fontFamily: 'Open Sans',
+			fontWeight: 400,
+			bodyBackgroundColor: '#fff',
+			navbarBackgroundColor: '#001628',
+			linkColor: '#3eb0ef',
 			customCss: '',
 			// result fields
 			resultTitle: '',
@@ -116,6 +144,8 @@ class PreferencesFormWrapperN extends React.Component {
 			priceUnit: undefined,
 			resultImage: '',
 			resultHandle: '',
+			resultHandleViewer: 'link',
+			metaDataFields: [],
 			cssSelector: '',
 			storeInfo: FormBuilder.group({
 				currency: 'USD',
@@ -154,6 +184,7 @@ class PreferencesFormWrapperN extends React.Component {
 							enableRecentSearches: false,
 							highlight: false,
 						}),
+						showSearchAs: 'sticky',
 						autosuggest: true,
 						showVoiceSearch: true,
 						enablePredictiveSuggestions: false,
@@ -179,7 +210,7 @@ class PreferencesFormWrapperN extends React.Component {
 							fetchingFilterOptions: 'Fetching Options',
 							searchText: 'Click here to search',
 							searchIcon: ['', validateURL],
-							redirectUrlText: 'View Product',
+							redirectUrlText: 'Open URL',
 							redirectUrlIcon: ['', validateURL],
 						}),
 						staticFilters: FormBuilder.group({
@@ -219,12 +250,56 @@ class PreferencesFormWrapperN extends React.Component {
 						categoryFieldValue: [],
 						indexSettings: FormBuilder.group({
 							index: '',
+							fusionSettings: FormBuilder.group({
+								app: '',
+								profile: '',
+								searchProfile: '',
+								meta: { sponsoredProfile: '' },
+							}),
+							endpoint: FormBuilder.group({
+								url: '',
+								method: '',
+								headers: '',
+							}),
 						}),
 				  }),
 		});
 		this.state = {
 			currentPage: '',
 		};
+		const {
+			getSearchPreferenceVersions,
+			preferenceId,
+			getLatestVersionCode,
+			searchPreferences,
+			updateVersionStateForPreference,
+		} = this.props;
+
+		getSearchPreferenceVersions(preferenceId);
+		getLatestVersionCode(preferenceId)
+			.then(async (response) => {
+				if (response.payload) {
+					const { res } = response.payload;
+					if (res.content) {
+						const newContent = transformContent(res.content);
+						const updatedCodeResponse = await replaceWithPreferences(
+							newContent,
+							searchPreferences,
+						);
+						updateVersionStateForPreference({
+							preferenceId,
+							patchPayload: {
+								updatedCode: updatedCodeResponse,
+								sandpackCode: updatedCodeResponse,
+								initialCode: newContent,
+							},
+						});
+					}
+				}
+			})
+			.catch((err) => {
+				console.error('Error to fetch latest version', err);
+			});
 	}
 
 	componentDidMount() {
@@ -245,6 +320,35 @@ class PreferencesFormWrapperN extends React.Component {
 
 		this.getFormPreferences();
 
+		if (this.form.get('categoryField')) {
+			this.form.get('categoryField').valueChanges.subscribe((value) => {
+				const displayFieldsControl = this.form.get('displayFields');
+				if (value)
+					displayFieldsControl.addControl(
+						'_default',
+						FormBuilder.group(
+							removeEmpty({
+								resultTitle: this.form.get('resultTitle').value,
+								resultDescription: this.form.get('resultDescription').value,
+								resultPrice: this.form.get('resultPrice').value,
+								priceUnit: this.form.get('priceUnit').value,
+								resultImage: this.form.get('resultImage').value,
+								resultHandle: this.form.get('resultHandle').value,
+								resultHandleViewer: this.form.get('resultHandleViewer').value,
+								metaDataFields: JSON.stringify(
+									this.form.get('metaDataFields').value,
+								),
+								cssSelector: this.form.get('cssSelector').value,
+							}),
+						),
+					);
+				else {
+					Object.keys(displayFieldsControl.value).forEach((field) =>
+						displayFieldsControl.removeControl(field),
+					);
+				}
+			});
+		}
 		if (this.form.get('categoryFieldValue')) {
 			this.form.get('categoryFieldValue').valueChanges.subscribe((values) => {
 				const displayFieldsControl = this.form.get('displayFields');
@@ -387,7 +491,20 @@ class PreferencesFormWrapperN extends React.Component {
 		}
 	}
 
+	getMetaDataFields = (meta) => {
+		const newMeta = Object.keys(meta || {}).map((key) => {
+			return {
+				label: key,
+				dataField: meta[key].dataField || '',
+				highlight: meta[key].highlight || false,
+			};
+		});
+
+		return newMeta;
+	};
+
 	transformSearchPreferences = (preferences) => {
+		const { backend } = this.props;
 		const resetFormArrayControls = () => {
 			const dynamicFilterControl = this.form.get('dynamicFilters');
 			if (dynamicFilterControl) {
@@ -449,6 +566,10 @@ class PreferencesFormWrapperN extends React.Component {
 				priceUnit: get(displayFieldsPrefs[field], 'priceUnit'),
 				resultImage: get(displayFieldsPrefs[field], 'image'),
 				resultHandle: get(displayFieldsPrefs[field], 'handle'),
+				resultHandleViewer: get(displayFieldsPrefs[field], 'handleViewer'),
+				metaDataFields: JSON.stringify(
+					this.getMetaDataFields(get(displayFieldsPrefs[field], 'userDefinedFields')),
+				),
 				cssSelector: get(displayFieldsPrefs[field], 'cssSelector'),
 			};
 			displayFieldsControl.addControl(field, FormBuilder.group(newControlObj));
@@ -462,10 +583,20 @@ class PreferencesFormWrapperN extends React.Component {
 					name: get(preferences, 'name', ''),
 					description: get(preferences, 'description', ''),
 					pipeline: get(preferences, 'pipeline', ''),
+					url: get(preferences, 'globalSettings.endpoint.url', ''),
+					method: get(preferences, 'globalSettings.endpoint.method', ''),
+					headers: get(preferences, 'globalSettings.endpoint.headers', ''),
+					backend: backend || BACKENDS.ELASTICSEARCH.name,
+					...(this.isFusion && {
+						pipeline: '_fusion',
+						app: get(preferences, 'fusionSettings.app', ''),
+						profile: get(preferences, 'fusionSettings.profile', ''),
+						searchProfile: get(preferences, 'fusionSettings.searchProfile', ''),
+					}),
 					id: get(preferences, 'id', ''),
 					currentPage: get(preferences, 'pageSettings.currentPage', ''),
 					logoUrl: get(preferences, 'globalSettings.meta.branding.logoUrl', ''),
-					logoWidth: get(preferences, 'globalSettings.meta.branding.logoWidth', 20),
+					logoWidth: get(preferences, 'globalSettings.meta.branding.logoWidth', 200),
 					logoAlignment: get(
 						preferences,
 						'globalSettings.meta.branding.logoAlignment',
@@ -480,6 +611,13 @@ class PreferencesFormWrapperN extends React.Component {
 					textColor: get(preferences, 'themeSettings.rsConfig.colors.textColor'),
 					titleColor: get(preferences, 'themeSettings.rsConfig.colors.titleColor'),
 					fontFamily: get(preferences, 'themeSettings.rsConfig.typography.fontFamily'),
+					bodyBackgroundColor: get(preferences, 'themeSettings.meta.bodyBackgroundColor'),
+					navbarBackgroundColor: get(
+						preferences,
+						'themeSettings.meta.navbarBackgroundColor',
+					),
+					linkColor: get(preferences, 'themeSettings.meta.linkColor'),
+					fontWeight: get(preferences, 'themeSettings.meta.fontWeight'),
 					customCss: get(preferences, 'themeSettings.customCss'),
 					// result fields
 					resultTitle: get(preferences, 'resultSettings.fields.title'),
@@ -488,6 +626,10 @@ class PreferencesFormWrapperN extends React.Component {
 					priceUnit: get(preferences, 'resultSettings.fields.priceUnit'),
 					resultImage: get(preferences, 'resultSettings.fields.image'),
 					resultHandle: get(preferences, 'resultSettings.fields.handle'),
+
+					metaDataFields: this.getMetaDataFields(
+						get(preferences, 'resultSettings.fields.userDefinedFields'),
+					),
 					cssSelector: get(preferences, 'resultSettings.fields.cssSelector'),
 					exportSettings: get(preferences, 'exportSettings'),
 					storeInfo: {
@@ -495,7 +637,7 @@ class PreferencesFormWrapperN extends React.Component {
 					},
 					versionId: get(preferences, 'globalSettings.meta.deploySettings.versionId', ''),
 					autosuggest: get(preferences, 'searchSettings.rsConfig.autosuggest'),
-
+					showSearchAs: get(preferences, 'searchSettings.showSearchAs', 'sticky'),
 					showVoiceSearch: get(preferences, 'searchSettings.rsConfig.showVoiceSearch'),
 					enablePopularSuggestions: get(
 						preferences,
@@ -566,7 +708,8 @@ class PreferencesFormWrapperN extends React.Component {
 	};
 
 	getFormPreferences = () => {
-		const { isRecommendation, searchPreferences, recommendationsPreferences } = this.props;
+		const { isRecommendation, searchPreferences, recommendationsPreferences, backend } =
+			this.props;
 		const newSearchPreferences = reOrderPreferences(searchPreferences);
 
 		let preferences;
@@ -636,10 +779,15 @@ class PreferencesFormWrapperN extends React.Component {
 						priceUnit: get(displayFieldsPrefs[field], 'priceUnit'),
 						resultImage: get(displayFieldsPrefs[field], 'image'),
 						resultHandle: get(displayFieldsPrefs[field], 'handle'),
+						resultHandleViewer: get(displayFieldsPrefs[field], 'handleViewer'),
+						metaDataFields: JSON.stringify(
+							this.getMetaDataFields(
+								get(displayFieldsPrefs[field], 'userDefinedFields'),
+							),
+						),
 						cssSelector: get(displayFieldsPrefs[field], 'cssSelector'),
 					};
 					displayFieldsControl.addControl(field, FormBuilder.group(newControlObj));
-
 					displayFieldsObj[field] = newControlObj;
 				});
 
@@ -662,13 +810,23 @@ class PreferencesFormWrapperN extends React.Component {
 							name: get(preferences, 'name', ''),
 							description: get(preferences, 'description', ''),
 							pipeline: get(preferences, 'pipeline', ''),
+							url: get(preferences, 'globalSettings.endpoint.url', ''),
+							method: get(preferences, 'globalSettings.endpoint.method', ''),
+							headers: get(preferences, 'globalSettings.endpoint.headers', ''),
+							backend: backend || BACKENDS.ELASTICSEARCH.name,
+							...(this.isFusion && {
+								pipeline: '_fusion',
+								app: get(preferences, 'fusionSettings.app', ''),
+								profile: get(preferences, 'fusionSettings.profile', ''),
+								searchProfile: get(preferences, 'fusionSettings.searchProfile', ''),
+							}),
 							id: get(preferences, 'id', ''),
 							currentPage: get(preferences, 'pageSettings.currentPage', ''),
 							logoUrl: get(preferences, 'globalSettings.meta.branding.logoUrl', ''),
 							logoWidth: get(
 								preferences,
 								'globalSettings.meta.branding.logoWidth',
-								20,
+								200,
 							),
 							logoAlignment: get(
 								preferences,
@@ -693,6 +851,16 @@ class PreferencesFormWrapperN extends React.Component {
 								preferences,
 								'themeSettings.rsConfig.typography.fontFamily',
 							),
+							bodyBackgroundColor: get(
+								preferences,
+								'themeSettings.meta.bodyBackgroundColor',
+							),
+							navbarBackgroundColor: get(
+								preferences,
+								'themeSettings.meta.navbarBackgroundColor',
+							),
+							linkColor: get(preferences, 'themeSettings.meta.linkColor'),
+							fontWeight: get(preferences, 'themeSettings.meta.fontWeight'),
 							customCss: get(preferences, 'themeSettings.customCss'),
 							// result fields
 							resultTitle: get(preferences, 'resultSettings.fields.title'),
@@ -704,6 +872,14 @@ class PreferencesFormWrapperN extends React.Component {
 							priceUnit: get(preferences, 'resultSettings.fields.priceUnit'),
 							resultImage: get(preferences, 'resultSettings.fields.image'),
 							resultHandle: get(preferences, 'resultSettings.fields.handle'),
+							resultHandleViewer: get(
+								preferences,
+								'resultSettings.fields.handleViewer',
+								'link',
+							),
+							metaDataFields: this.getMetaDataFields(
+								get(preferences, 'resultSettings.fields.userDefinedFields'),
+							),
 							cssSelector: get(preferences, 'resultSettings.fields.cssSelector'),
 							exportSettings: get(preferences, 'exportSettings'),
 							storeInfo: {
@@ -769,7 +945,11 @@ class PreferencesFormWrapperN extends React.Component {
 											preferences,
 											'searchSettings.rsConfig.autosuggest',
 										),
-
+										showSearchAs: get(
+											preferences,
+											'searchSettings.showSearchAs',
+											'sticky',
+										),
 										showVoiceSearch: get(
 											preferences,
 											'searchSettings.rsConfig.showVoiceSearch',
@@ -916,7 +1096,6 @@ class PreferencesFormWrapperN extends React.Component {
 								  }),
 						}),
 					);
-					// this.form.patchValue(patchVar);
 					this.form.reset(patchVar);
 				} catch (e) {
 					console.error(e);
@@ -1042,6 +1221,11 @@ class PreferencesFormWrapperN extends React.Component {
 			index: preferencesPayload.pipeline,
 			credentials: get(preferencesPayload, 'exportSettings.credentials', ''),
 			url: localStorage.getItem('url') || sessionStorage.getItem('url'),
+			endpoint: {
+				url: preferencesPayload.url,
+				method: preferencesPayload.method,
+				headers: preferencesPayload.headers,
+			},
 		};
 		return preferencesPayload;
 	};
@@ -1087,6 +1271,7 @@ class PreferencesFormWrapperN extends React.Component {
 		);
 	}
 }
+
 PreferencesFormWrapperN.defaultProps = {
 	isRecommendation: false,
 	preferenceId: null,
@@ -1094,6 +1279,7 @@ PreferencesFormWrapperN.defaultProps = {
 	recommendationsPreferences: getRecommendationPreferencesPayload(
 		defaultRecommendationsPreferences,
 	),
+	backend: BACKENDS.ELASTICSEARCH.name,
 };
 
 PreferencesFormWrapperN.propTypes = {
@@ -1109,6 +1295,10 @@ PreferencesFormWrapperN.propTypes = {
 	getSearchPreferences: func.isRequired,
 	getRecommendationsPreferences: func.isRequired,
 	allRecommendationsPreferences: array.isRequired,
+	backend: string,
+	getSearchPreferenceVersions: func.isRequired,
+	getLatestVersionCode: func.isRequired,
+	updateVersionStateForPreference: func.isRequired,
 };
 
 const mapStateToProps = (state, props) => {
@@ -1117,12 +1307,23 @@ const mapStateToProps = (state, props) => {
 		recommendationsPreferences: getRecommendationPreferenceById(state, props.preferenceId),
 		allSearchPreferences: get(state, '$getSearchPreferencesN.results', []),
 		allRecommendationsPreferences: get(state, '$getRecommendationsPreferencesN.results', []),
+		backend: get(state, '$getAppPlan.results.backend'),
 	};
 };
 
 const mapDispatchToProps = (dispatch) => ({
 	getSearchPreferences: () => dispatch(getSearchPreferencesN()),
+	getLatestVersionCode: (preferenceId) =>
+		dispatch(getSearchPreferenceLatestVersionN(preferenceId)),
+	getSearchPreferenceVersions: (preferenceId) =>
+		dispatch(getSearchPreferenceVersionsN(preferenceId)),
 	getRecommendationsPreferences: () => dispatch(getRecommendationsPreferencesN()),
+	updateVersionStateForPreference: (payload) =>
+		dispatch({
+			type: AppConstants.APP.UI_BUILDERN.SEARCH_PREFERENCE_VERSIONS
+				.UPDATE_PREFERENCE_STATE_SUCCESS,
+			payload,
+		}),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(PreferencesFormWrapperN));

@@ -11,6 +11,7 @@ import ErrorPage from '../../pages/ErrorPage';
 import ClusterAnalyticsRoutes from './ClusterAnalyticsRoutes';
 import UnauthorizedPage from '../../pages/UnauthorizedPage';
 import { getAuthorizedRoutes } from '../../utils';
+import { BACKENDS } from '../../batteries/utils';
 
 const ProfilePage = Loadable({
 	loader: () => import(/* webpackChunkName: "ProfilePage" */ '../../pages/ProfilePage'),
@@ -28,7 +29,10 @@ const PipelinesPage = Loadable({
 	loader: () => import(/* webpackChunkName: "Pipelines" */ '../../pages/Pipelines'),
 	loading: Loader,
 });
-
+const PipelinesInsightsPage = Loadable({
+	loader: () => import(/* webpackChunkName: "Pipelines" */ '../../pages/PipelinesInsights'),
+	loading: Loader,
+});
 const PipelineLogsPage = Loadable({
 	loader: () => import(/* webpackChunkName: "PipelineLogsPage" */ '../../pages/PipelineLogs'),
 	loading: Loader,
@@ -42,6 +46,10 @@ const PipelineLogDetailsPage = Loadable({
 	loading: Loader,
 });
 
+const ConfigureSearchBackend = Loadable({
+	loader: () => import(/* webpackChunkName: "Pipelines" */ '../../pages/ConfigureBackendPage'),
+	loading: Loader,
+});
 const QueryRulesForm = Loadable({
 	loader: () =>
 		import(/* webpackChunkName: "QueryRulesForm" */ '../../pages/QueryRules/QueryRulesForm'),
@@ -214,7 +222,7 @@ class ClusterRouteContainer extends React.Component {
 	}
 
 	render() {
-		const { allowedRoutes } = this.props;
+		const { allowedRoutes, backend } = this.props;
 
 		return (
 			<ErrorPage {...this.props}>
@@ -339,15 +347,17 @@ class ClusterRouteContainer extends React.Component {
 					<Route
 						exact
 						path="/cluster/pipelines"
-						render={(props) => (
-							<>
-								{get(allowedRoutes, '/cluster/pipelines') ? (
-									<AppPageContainer {...props} component={PipelinesPage} />
-								) : (
-									<UnauthorizedPage />
-								)}
-							</>
-						)}
+						render={(props) => {
+							return (
+								<>
+									{get(allowedRoutes, '/cluster/pipelines') ? (
+										<AppPageContainer {...props} component={PipelinesPage} />
+									) : (
+										<UnauthorizedPage />
+									)}
+								</>
+							);
+						}}
 					/>
 					<Route
 						exact
@@ -356,6 +366,22 @@ class ClusterRouteContainer extends React.Component {
 							<>
 								{get(allowedRoutes, '/cluster/global-envs') ? (
 									<AppPageContainer {...props} component={GlobalVarsPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
+						)}
+					/>
+					<Route
+						exact
+						path="/cluster/configure-search-engine-backend"
+						render={(props) => (
+							<>
+								{get(allowedRoutes, '/cluster/pipelines') ? (
+									<AppPageContainer
+										{...props}
+										component={ConfigureSearchBackend}
+									/>
 								) : (
 									<UnauthorizedPage />
 								)}
@@ -411,6 +437,22 @@ class ClusterRouteContainer extends React.Component {
 							<>
 								{get(allowedRoutes, '/cluster/pipelines') ? (
 									<AppPageContainer {...props} component={PipelinesForm} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
+						)}
+					/>
+					<Route
+						exact
+						path="/cluster/pipeline-insights"
+						render={(props) => (
+							<>
+								{get(allowedRoutes, '/cluster/pipeline-insights') ? (
+									<AppPageContainer
+										{...props}
+										component={PipelinesInsightsPage}
+									/>
 								) : (
 									<UnauthorizedPage />
 								)}
@@ -606,7 +648,9 @@ class ClusterRouteContainer extends React.Component {
 						path="/cluster/role-based-access"
 						component={(props) => (
 							<>
-								{get(allowedRoutes, '/cluster/role-based-access') ? (
+								{get(allowedRoutes, '/cluster/role-based-access') &&
+								(backend === BACKENDS.ELASTICSEARCH.name ||
+									backend === BACKENDS.OPENSEARCH.name) ? (
 									<AppPageContainer {...props} component={RoleBaseAccess} />
 								) : (
 									<UnauthorizedPage />
@@ -619,7 +663,9 @@ class ClusterRouteContainer extends React.Component {
 						path="/cluster/sync-preferences"
 						component={(props) => (
 							<>
-								{get(allowedRoutes, '/cluster/sync-preferences') ? (
+								{get(allowedRoutes, '/cluster/sync-preferences') &&
+								(backend === BACKENDS.ELASTICSEARCH.name ||
+									backend === BACKENDS.OPENSEARCH.name) ? (
 									<AppPageContainer {...props} component={SyncPreferences} />
 								) : (
 									<UnauthorizedPage />
@@ -660,16 +706,22 @@ class ClusterRouteContainer extends React.Component {
 	}
 }
 
+ClusterRouteContainer.defaultProps = {
+	backend: BACKENDS.ELASTICSEARCH.name,
+};
+
 ClusterRouteContainer.propTypes = {
 	history: PropTypes.object.isRequired,
 	match: PropTypes.object.isRequired,
 	location: PropTypes.object.isRequired,
 	allowedRoutes: PropTypes.object.isRequired,
+	backend: PropTypes.string,
 };
 
 const mapStateToProps = (state) => {
 	return {
 		allowedRoutes: getAuthorizedRoutes(get(state, 'clusterRoutes')),
+		backend: get(state, '$getAppPlan.results.backend'),
 	};
 };
 

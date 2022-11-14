@@ -1,6 +1,7 @@
 import get from 'lodash/get';
 import { componentTypes } from '@appbaseio/reactivesearch';
 import templates from '../../../../template-sources-output.json';
+// eslint-disable-next-line
 import {
 	getSearchPreferencesPayload,
 	defaultSearchPreferences,
@@ -130,6 +131,12 @@ export const transformResultsDefaultFields = (prefs) => {
 			componentSettings;
 		return preferences;
 	}
+	if (
+		preferences.globalSettings &&
+		preferences.globalSettings.endpoint &&
+		!preferences.globalSettings.endpoint.url
+	)
+		preferences.globalSettings.endpoint.url = '/_fusion/_reactivesearch';
 	return preferences;
 };
 
@@ -173,7 +180,9 @@ export const transformPreferences = (preferences) => {
 					filterType = 'dynamicRangeSlider';
 				}
 
-				const newComponentId = `${data.rsConfig.title.split(' ').join('_')}_${idx}`;
+				const newComponentId = `${
+					data.rsConfig.title ? data.rsConfig.title.split(' ').join('_') : ''
+				}_${idx}`;
 				newObj = {
 					...newObj,
 					[newComponentId]: {
@@ -273,15 +282,15 @@ export const transformPreferences = (preferences) => {
 	delete newPreferences.resultSettings;
 	delete newPreferences.searchSettings;
 	delete newPreferences.facetSettings;
+	delete newPreferences.indexSettings;
 	return newPreferences;
 };
 
 export const defaultPageSettings = (fields = {}) => {
 	const fieldsObj = Object.keys(fields).length ? { fields } : {};
 	const defaultSettings = getSearchPreferencesPayload(defaultSearchPreferences);
-	const { facetSettings } = defaultSettings;
 	// get componentSettings from defaultSettings and replace fields in resultSettings with fields from pageSettings.
-	let componentSettings = {
+	const componentSettings = {
 		search: {
 			componentType: componentTypes.searchBox,
 			...defaultSettings.searchSettings,
@@ -294,42 +303,6 @@ export const defaultPageSettings = (fields = {}) => {
 		},
 	};
 
-	if (facetSettings.staticFacets) {
-		// collection, productType, color, size, price
-		let newObj = {};
-		let filterType = '';
-		if (facetSettings.staticFacets.length) {
-			facetSettings.staticFacets.forEach((data) => {
-				if (data?.rsConfig?.filterType === 'list') {
-					filterType = 'multiList';
-				} else if (
-					data?.rsConfig?.filterType === 'date' ||
-					data?.rsConfig?.filterType === 'range'
-				) {
-					if (data?.rsConfig?.startValue && data?.rsConfig?.endValue) {
-						filterType = 'rangeInput';
-					} else {
-						filterType = 'dynamicRangeSlider';
-					}
-				} else {
-					filterType = 'dynamicRangeSlider';
-				}
-
-				newObj = {
-					...newObj,
-					[data.name]: {
-						...data,
-						componentType: data?.rsConfig?.componentType || componentTypes[filterType],
-						facetType: 'static',
-					},
-				};
-			});
-			componentSettings = {
-				...componentSettings,
-				...newObj,
-			};
-		}
-	}
 	return componentSettings;
 };
 
@@ -454,4 +427,9 @@ export const facetKeyLabel = {
 	yAxisName: 'Y-Axis Name',
 	size: 'Size',
 	multiSelect: 'Multi Select',
+	filterLabel: 'Filter Label',
+	data: 'Data',
+	calendarInterval: 'Calendar Interval',
+	loading: 'Loading Message',
+	noResults: 'No Results Message',
 };

@@ -95,6 +95,17 @@ const pastVersionsStyles = css`
 		gap: 10px;
 		margin-top: 15px;
 	}
+	.show-on-hover {
+		transform: rotateX(90deg);
+		opacity: 0;
+		transition: all ease 0.3s;
+	}
+	&:hover {
+		.show-on-hover {
+			transform: rotateX(0deg);
+			opacity: 1;
+		}
+	}
 `;
 
 const deployModalStyles = css`

@@ -237,7 +237,7 @@ class CreateAppModal extends Component {
 							<Icon type="info-circle" onClick={this.handleValidationPopOver} />
 						</Popover>
 					</Row>
-					<p css={{ fontSize: 14, margin: '-4px 0 8px 0', lineHeight: '20px' }}>
+					<p style={{ fontSize: 14, margin: '-4px 0 8px 0', lineHeight: '20px' }}>
 						Index names are unique across the cluster and should use lowercase
 						alphabets. Click
 						<span style={{ color: '#1890ff' }} onClick={this.handleValidationPopOver}>
@@ -415,7 +415,7 @@ class CreateAppModal extends Component {
 						}}
 					/>
 					{createdApp && createdApp.error ? (
-						<div css={{ color: 'tomato', marginTop: 8 }}>
+						<div style={{ color: 'tomato', marginTop: 8 }}>
 							{get(createdApp, 'error.actual.message')}
 						</div>
 					) : null}

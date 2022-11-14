@@ -4,12 +4,14 @@ import includes from 'lodash/includes';
 import keys from 'lodash/keys';
 import values from 'lodash/values';
 import { notification } from 'antd';
-import { getURL } from '../constants/config';
+import { BACKENDS } from '../batteries/utils';
 import { getSingleFunction, updateFunctions } from '../batteries/utils/app';
+// eslint-disable-next-line import/no-cycle
 import { getESVersion } from '../batteries/utils/mappings';
 import { doGet } from '../batteries/utils/requestService';
 import { getDefaultAllowedActions } from './allowedActions';
 import { ALLOWED_ACTIONS, SUB_FIELDS } from '../constants';
+import { getURL } from '../constants/config';
 
 export async function getUser(username, password, url) {
 	const ACC_API = getURL();
@@ -56,11 +58,13 @@ export async function getUser(username, password, url) {
 		.then((es) => es.json())
 		.then((esResponse) => {
 			const version = get(esResponse, 'version.number');
+			const clusterId = get(esResponse, 'cluster_name');
 			localStorage.setItem(
 				'isUsingOpenSearch',
 				esResponse?.version?.distribution === 'opensearch',
 			);
 			localStorage.setItem('version', version);
+			localStorage.setItem('clusterId', clusterId);
 		})
 		.catch((e) => {
 			// eslint-disable-next-line no-console
@@ -88,11 +92,55 @@ export const getAuthToken = () => {
 	return token;
 };
 
-export async function getESIndices(authToken) {
+const transformRegexString = (regex, varRegex, str, attrs = { app: 'appbase' }) => {
+	let newStr = str;
+	// newStr.match(regex) -> returns array of ${variable} available in the string
+	newStr.match(regex).forEach((tempVar) => {
+		// Extract variable from ${variable}
+		const keyVariable = varRegex.exec(tempVar)[1];
+		const reqStr = attrs[keyVariable];
+		if (reqStr) {
+			const newRegex = `\${${keyVariable}}`;
+			// Replace the ${varibale} with the value
+			newStr = newStr.replace(newRegex, reqStr);
+		}
+	});
+
+	return newStr;
+};
+
+export const getValidURL = (config = {}, attrs = {}) => {
+	const regex = /\${[a-zA-Z0-9_]*}/gm;
+	const varRegex = /(?<=\${)(.*?)(?=\})/;
+	const { url, qs = [] } = config;
+	let newStr = url;
+
+	// Traverse the queryStrings and append them to url.
+	qs.forEach((attr, idx) => {
+		if (idx === 0) newStr += `?${attr.key}=${attrs[attr.key]}`;
+		else newStr += `&${attr.key}=${attrs[attr.key]}`;
+	});
+
+	// check if newStr has any template string of format ${variable}
+	if (newStr.match(regex)) newStr = transformRegexString(regex, varRegex, newStr, attrs);
+
+	return newStr;
+};
+
+export async function getESIndices(authToken, backend, endpointConfig = {}) {
 	const ACC_API = getURL();
-	const esVersion = await getESVersion(null, atob(authToken));
-	let url = `${ACC_API}/_aliasedindices`;
-	if (esVersion && esVersion < 6) url = `${ACC_API}/_cat/indices?format=json`;
+	// let url = `${ACC_API}/_aliasedindices`;
+	let url = '';
+	if (backend === BACKENDS.FUSION.name) {
+		url = `${ACC_API}/${getValidURL(endpointConfig.app)}`;
+	} else {
+		url = `${ACC_API}/${getValidURL(endpointConfig.index)}`;
+		if (backend === BACKENDS.ELASTICSEARCH.name) {
+			const esVersion = await getESVersion(null, atob(authToken));
+			if (esVersion && esVersion < 6) url = `${ACC_API}/_cat/indices?format=json`;
+		}
+	}
+
 	const response = await fetch(url, {
 		method: 'GET',
 		headers: {
@@ -106,7 +154,7 @@ export async function getESIndices(authToken) {
 
 	const indices = {};
 	data.forEach((item) => {
-		indices[item.alias || item.index] = item;
+		indices[item.alias || item.index || item.name] = item;
 	});
 
 	return indices;
@@ -349,6 +397,19 @@ export const getURLParameters = (url) =>
 	);
 
 export const isEmpty = (val) => val == null || !(Object.keys(val) || val).length;
+
+export const getOriginURL = (value) => {
+	const credObj = getURLCredentials(value) || {};
+	const { url } = getURLParameters(value);
+	const originURL = value.split('@')[1];
+	if (url) return removeTrailingSlashes(url);
+	if (!isEmpty(credObj)) {
+		localStorage.setItem('username', credObj.username);
+		localStorage.setItem('password', credObj.password);
+		return `${getProtocol(value)}//${removeTrailingSlashes(originURL || '')}`;
+	}
+	return removeTrailingSlashes(value);
+};
 
 export async function getClusterMappings() {
 	const ACC_API = getURL();
@@ -687,22 +748,32 @@ export const validateQueryString = (queryString) => {
 	return doGet(`${ACC_API}/_validate/query?q=${queryString}`);
 };
 
-export const getAuthorizedViews = (routes = {}, allowedActions = []) => {
-	// over page is showed only if user has develop, analytics or search relevancy access
-	const hasOverviewPageAccess = allowedActions.some(
-		(i) =>
-			i === ALLOWED_ACTIONS.DEVELOP ||
-			i === ALLOWED_ACTIONS.ANALYTICS ||
-			i === ALLOWED_ACTIONS.SEARCH_RELEVANCY,
-	);
-	return Object.keys(routes)
+export const getAuthorizedViews = (routes = {}, allowedActions = [], backend) => {
+	// overview page is showed only if user has develop, analytics or search relevancy access
+	const hasOverviewPageAccess =
+		(backend === BACKENDS.ELASTICSEARCH.name ||
+			backend === BACKENDS.OPENSEARCH.name ||
+			backend === BACKENDS.ZINC.name) &&
+		allowedActions.some(
+			(i) =>
+				i === ALLOWED_ACTIONS.DEVELOP ||
+				i === ALLOWED_ACTIONS.ANALYTICS ||
+				i === ALLOWED_ACTIONS.SEARCH_RELEVANCY,
+		);
+
+	const authorizedViews = Object.keys(routes)
 		.filter((r) => {
 			const routeAction = get(routes, `${r}.action`);
-			return (
-				(hasOverviewPageAccess && !routeAction) ||
-				allowedActions.includes(routeAction) ||
-				!routeAction
-			);
+
+			if (routeAction) {
+				if (routeAction === ALLOWED_ACTIONS.OVERVIEW) {
+					return hasOverviewPageAccess;
+				} else {
+					return allowedActions.includes(routeAction);
+				}
+			} else {
+				return true;
+			}
 		})
 		.reduce((res, key) => {
 			return {
@@ -710,6 +781,8 @@ export const getAuthorizedViews = (routes = {}, allowedActions = []) => {
 				[key]: { ...routes[key] },
 			};
 		}, {});
+
+	return authorizedViews;
 };
 
 // this function takes in parsedRoutes which are already parsed through getAuthorizedViews
@@ -763,3 +836,25 @@ export const renameObjectKey = (oldObj, oldName, newName) => {
 
 	return newObj;
 };
+
+export async function getEndpoints() {
+	try {
+		const authToken = localStorage.getItem('authToken');
+		const ACC_API = getURL();
+		let url = `${ACC_API}/reactivesearch/endpoints`;
+
+		const response = await fetch(url, {
+			method: 'GET',
+			headers: {
+				Authorization: `Basic ${authToken}`,
+			},
+		});
+		const data = await response.json();
+		if (response.status >= 400) {
+			throw new Error(data);
+		}
+		return data;
+	} catch (error) {
+		console.log('Error loading endpoints', error);
+	}
+}

@@ -7,10 +7,10 @@ import { bool, array, object, string, func } from 'prop-types';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { ReactiveBase } from '@appbaseio/reactivesearch';
 import DataFieldSelector from '../../../../components/Form/DataFieldSelector';
+import FusionDatafieldSelector from '../../SearchN/Wizard/FusionDatafieldSelector';
 import PriceUnit from './PriceUnit';
 import SortOptionSelector from './SortOptionSelector';
 import DefaultResults from './Results/DefaultResults';
-import { traverseMapping } from '../../../../batteries/utils/mappings';
 import { getRawMappingsByAppName } from '../../../../batteries/modules/selectors';
 import { getAppMappings } from '../../../../batteries/modules/actions';
 import DocType from './Results/DocType';
@@ -18,6 +18,8 @@ import TabLayout from './Results/TabLayout';
 import { getURL } from '../../../../constants/config';
 import { getTemplate } from '../../utils/index';
 import { geoDefaultFields } from './Results/constants';
+import { traverseMapping } from '../../../../batteries/utils/mappings';
+import { BACKENDS } from '../../../../batteries/utils';
 
 const defaultSettings = [
 	{
@@ -205,6 +207,7 @@ const fieldSelectorIds = [
 	'resultPrice',
 	'resultImage',
 	'resultHandle',
+	'resultHandleViewer',
 	'locationDataField',
 ];
 
@@ -222,6 +225,7 @@ const geoOptions = [
 	'resultPrice',
 	'resultImage',
 	'resultHandle',
+	'resultHandleViewer',
 ];
 
 const { Item } = List;
@@ -235,34 +239,46 @@ const Results = ({
 	credentials,
 	appName,
 	getPreferencesPayload,
+	backend,
+	secondaryPipeline,
 }) => {
 	const [error, setError] = useState(false);
+	// eslint-disable-next-line
 	const [categoryField, setCategoryField] = useState(
 		form && form.get('categoryField') ? form.get('categoryField').value : '',
 	);
 	const [isLoading, setIsLoading] = useState(false);
 	const pipeline = form && form.get('pipeline') ? form.get('pipeline').value : undefined;
-	const indexSettings = form && form.get('indexSettings') ? form.get('indexSettings').value : {};
-	const secondaryPipeline = get(indexSettings, 'index', '');
 	const themeType = form && form.get('themeType') ? form.get('themeType').value : 'classic';
 	const preferences = getPreferencesPayload?.();
+	const isFusion = backend === BACKENDS.FUSION.name;
 
 	useEffect(() => {
-		if (credentials && !Object.keys(mappings).length) {
+		if (credentials && !Object.keys(mappings).length && !isFusion) {
 			// Fetch Mappings if permissions are present
-			fetchMappings(appName, credentials);
+			fetchMappings(appName, credentials, backend);
 		}
 
 		if (form && form.get('categoryField')) {
 			form.get('categoryField').valueChanges.subscribe((value) => {
-				if (categoryField !== value) {
-					const categoryFieldValueControl = form.get('categoryFieldValue');
-					categoryFieldValueControl.reset([]);
-					setCategoryField(value);
-				}
+				setCategoryField((prevValue) => {
+					if (prevValue !== value) {
+						const categoryFieldValueControl = form.get('categoryFieldValue');
+						categoryFieldValueControl.reset([]);
+						return value;
+					}
+					return prevValue;
+				});
 			});
 		}
 	}, []);
+
+	useEffect(() => {
+		if (credentials && !isFusion) {
+			// Fetch Mappings if permissions are present
+			fetchMappings(secondaryPipeline, credentials, backend);
+		}
+	}, [secondaryPipeline]);
 
 	const handleReload = () => {
 		setIsLoading(true);
@@ -429,6 +445,35 @@ const Results = ({
 									</FieldControl>
 								);
 							}
+							if (item.id === 'cssSelector') {
+								return (
+									<FieldControl name={item.id} strict={false}>
+										{/* eslint-disable-next-line */}
+										{({ value, onChange }) => {
+											return (
+												<Item
+													actions={[
+														<Input
+															value={value}
+															onChange={onChange}
+															style={{ width: 200 }}
+															placeholder="Eg: my-class-name"
+														/>,
+													]}
+												>
+													<Item.Meta
+														title={
+															typeof item.label === 'function'
+																? item.label(value)
+																: item.label
+														}
+													/>
+												</Item>
+											);
+										}}
+									</FieldControl>
+								);
+							}
 							if (geoOptions.includes(item.id)) {
 								return (
 									<FieldControl name={item.id}>
@@ -441,13 +486,21 @@ const Results = ({
 																	{item?.showPriceUnitInput ? (
 																		<PriceUnit name="priceUnit" />
 																	) : null}
-																	<DataFieldSelector
-																		pipeline={
-																			secondaryPipeline ||
-																			pipeline
-																		}
-																		name={item.id}
-																	/>
+																	{isFusion ? (
+																		<FusionDatafieldSelector
+																			form={form}
+																			value={value}
+																			onChange={onChange}
+																		/>
+																	) : (
+																		<DataFieldSelector
+																			pipeline={
+																				secondaryPipeline ||
+																				pipeline
+																			}
+																			name={item.id}
+																		/>
+																	)}
 																</div>,
 														  ]
 														: [
@@ -535,7 +588,6 @@ const Results = ({
 																						index={
 																							index
 																						}
-																						fieldPicker={getDatafields()}
 																						onChange={
 																							onChange
 																						}
@@ -545,6 +597,8 @@ const Results = ({
 																						onError={
 																							onError
 																						}
+																						form={form}
+																						fieldPicker={getDatafields()}
 																					/>
 																				),
 																		  )
@@ -586,18 +640,27 @@ const Results = ({
 
 						if (item.id === 'categoryField') {
 							return templateObj?.name !== 'geo' ? (
-								<FieldControl name={item.id}>
+								<FieldControl name={item.id} strict={false}>
 									{/* eslint-disable-next-line */}
 									{({ value, onChange }) => {
 										return (
 											<Item
 												actions={[
-													<DataFieldSelector
-														pipeline={secondaryPipeline || pipeline}
-														name={item.id}
-														isAggFields
-														handleReload={handleReload}
-													/>,
+													isFusion ? (
+														<FusionDatafieldSelector
+															form={form}
+															value={value}
+															onChange={onChange}
+															handleReload={handleReload}
+														/>
+													) : (
+														<DataFieldSelector
+															pipeline={secondaryPipeline || pipeline}
+															name={item.id}
+															isAggFields
+															handleReload={handleReload}
+														/>
+													),
 												]}
 											>
 												<Item.Meta
@@ -619,7 +682,7 @@ const Results = ({
 							return form &&
 								form.get('categoryField') &&
 								form.get('categoryField').value &&
-								(secondaryPipeline || preferences?.pipeline) ? (
+								preferences?.pipeline ? (
 								<FieldControl name={item.id} strict={false}>
 									{({ value, onChange }) => {
 										return (
@@ -628,17 +691,42 @@ const Results = ({
 													actions={[
 														!isLoading ? (
 															<ReactiveBase
-																app={
-																	secondaryPipeline ||
-																	preferences?.pipeline ||
-																	''
-																}
+																app={preferences?.pipeline || ''}
 																url={getURL()}
 																credentials={
 																	preferences?.exportSettings
 																		?.credentials || ''
 																}
 																enableAppbase
+																transformRequest={(props) => {
+																	const newBody = JSON.parse(
+																		// eslint-disable-next-line
+																		props.body,
+																	);
+																	newBody.metadata = {
+																		app: form.get('app')
+																			? form.get('app').value
+																			: '',
+																		profile: form.get('profile')
+																			? form.get('profile')
+																					.value
+																			: '',
+																		suggestion_profile:
+																			form.get(
+																				'searchProfile',
+																			)
+																				? form.get(
+																						'searchProfile',
+																				  ).value
+																				: '',
+																	};
+
+																	// eslint-disable-next-line
+																	props.body =
+																		JSON.stringify(newBody);
+
+																	return props;
+																}}
 															>
 																<DocType
 																	value={value}
@@ -671,7 +759,11 @@ const Results = ({
 									}}
 								</FieldControl>
 							) : (
-								<DefaultResults pipeline={secondaryPipeline || pipeline} />
+								<DefaultResults
+									pipeline={secondaryPipeline || pipeline}
+									form={form}
+									fieldPicker={getDatafields()}
+								/>
 							);
 						}
 
@@ -686,12 +778,21 @@ const Results = ({
 															{item?.showPriceUnitInput ? (
 																<PriceUnit name="priceUnit" />
 															) : null}
-															<DataFieldSelector
-																pipeline={
-																	secondaryPipeline || pipeline
-																}
-																name={item.id}
-															/>
+															{isFusion ? (
+																<FusionDatafieldSelector
+																	form={form}
+																	value={value}
+																	onChange={onChange}
+																/>
+															) : (
+																<DataFieldSelector
+																	pipeline={
+																		secondaryPipeline ||
+																		pipeline
+																	}
+																	name={item.id}
+																/>
+															)}
 														</div>,
 												  ]
 												: [<Switch checked={value} onChange={onChange} />]
@@ -722,39 +823,43 @@ const Results = ({
 
 Results.defaultProps = {
 	withoutForm: false,
-
 	appName: undefined,
 	dataSource: [],
 	mappings: {},
+	form: null,
+	secondaryPipeline: '',
+	backend: BACKENDS.ELASTICSEARCH.name,
 };
 
 Results.propTypes = {
 	withoutForm: bool,
 	dataSource: array,
 	mappings: object,
-
 	appName: string,
 	credentials: string.isRequired,
 	fetchMappings: func.isRequired,
-
 	getPreferencesPayload: func.isRequired,
-	form: object.isRequired,
+	form: object,
+	backend: string,
+	secondaryPipeline: string,
 };
 
 const mapStateToProps = (state, props) => {
-	const appName = props.pipeline || get(state, '$getCurrentApp.name');
+	const appName = props.secondaryPipeline || get(state, '$getCurrentApp.name');
 	const mappings = getRawMappingsByAppName(state, appName);
 	const { username, password } = get(state, 'user.data', {});
-
+	const backend = get(state, '$getAppPlan.results.backend');
 	return {
 		appName,
 		mappings,
 		credentials: `${username}:${password}`,
+		backend,
 	};
 };
 
 const mapDispatchToProps = (dispatch) => ({
-	fetchMappings: (appName, credentials) => dispatch(getAppMappings(appName, credentials)),
+	fetchMappings: (appName, credentials, backend) =>
+		dispatch(getAppMappings(appName, credentials, undefined, backend)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Results);

@@ -63,6 +63,7 @@ export default function Footer({ collapsed, onLivePreview, isEditPage, onSave, i
 						type="primary"
 						onClick={onSave}
 						loading={isSaving}
+						disabled={isSaving}
 					>
 						Save
 					</Button>

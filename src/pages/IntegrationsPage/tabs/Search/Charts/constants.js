@@ -1,3 +1,7 @@
+/**
+ * Changes here might need change in CustomizeChart.js
+ */
+
 export const chartTypes = {
 	term: {
 		bar: { id: 'bar', label: 'Bar Chart' },
@@ -8,14 +12,12 @@ export const chartTypes = {
 		bar: { id: 'bar', label: 'Bar Chart' },
 		line: { id: 'line', label: 'Line Graph' },
 		histogram: { id: 'histogram', label: 'Histogram' },
-	},
-	search: {
 		scatter: { id: 'scatter', label: 'Scatter Plot' },
 	},
 };
+export const customChartType = 'custom';
 
 export const queryTypes = {
 	range: 'range',
 	term: 'term',
-	search: 'search',
 };

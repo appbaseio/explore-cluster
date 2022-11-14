@@ -1057,7 +1057,7 @@ class QueryRulesForm extends React.Component {
 										Condition based on which this query rule will be executed.
 									</div>
 									<div style={{ marginTop: 10 }}>
-										<DocsLink url="https://docs.appbase.io/docs/search/Rules/#configure-if-condition" />
+										<DocsLink url="https://docs.reactivesearch.io/docs/search/Rules/#configure-if-condition" />
 									</div>
 									{condition !== 'index' && condition !== 'cron' ? (
 										<div
@@ -1103,7 +1103,7 @@ class QueryRulesForm extends React.Component {
 												options, an indexing based trigger, a querying based
 												trigger or an always on trigger.{' '}
 												<a
-													href="https://docs.appbase.io/docs/search/Rules/#configure-if-condition"
+													href="https://docs.reactivesearch.io/docs/search/Rules/#configure-if-condition"
 													target="_blank"
 													rel="noopener noreferrer"
 												>
@@ -1383,7 +1383,7 @@ class QueryRulesForm extends React.Component {
 										satisfied
 									</div>
 									<div style={{ marginTop: 10 }}>
-										<DocsLink url="https://docs.appbase.io/docs/search/Rules/#configure-then-actions" />
+										<DocsLink url="https://docs.reactivesearch.io/docs/search/Rules/#configure-then-actions" />
 									</div>
 								</Typography.Text>
 							</Col>

@@ -31,14 +31,31 @@ const LoginContainer = ({ children }) => {
 							</li>
 							<li>
 								<Icon type="check" className="icon" />
-								<span role="img" aria-label="emoji">
-									Configure 🔐 access controls and 👨🏼 end-user authentication
+								<span>
+									Configure{' '}
+									<span
+										role="img"
+										style={{ display: 'inline' }}
+										aria-label="lock"
+									>
+										🔐
+									</span>{' '}
+									access controls and 👨🏼 end-user authentication{' '}
 								</span>
 							</li>
 							<li>
 								<Icon type="check" className="icon" />
-								<span role="img" aria-label="emoji">
-									Deploy on the 🌐 global edge with your domain in one click
+								<span>
+									{' '}
+									Deploy on the{' '}
+									<span
+										role="img"
+										style={{ display: 'inline' }}
+										aria-label="globally"
+									>
+										🌐
+									</span>{' '}
+									global edge with your domain in one click
 								</span>
 							</li>
 							<li>

@@ -1,18 +1,28 @@
 import React from 'react';
 import { Icon, Tabs, Tooltip, message } from 'antd';
 import CopyToClipboard from 'react-copy-to-clipboard';
-import { func, object } from 'prop-types';
+import { func, object, string } from 'prop-types';
 import get from 'lodash/get';
 import { transformCharts } from '../../../utils';
 import { getURL } from '../../../../../constants/config';
 import { removeEmpty } from '../../../utils/index';
+import { BACKENDS } from '../../../../../batteries/utils';
 
-const CopyCode = ({ control, getPreferencesPayload }) => {
+const CopyCode = ({ control, getPreferencesPayload, backend }) => {
 	const preferences = getPreferencesPayload();
 
 	const contentWithPreferences = (prefs = '') => {
-		const pipeline = get(prefs, 'pipeline', '');
-		const secondaryPipeline = get(prefs, 'indexSettings.index', '');
+		const pipeline = get(preferences, 'pipeline', '');
+		const secondaryPipeline = get(preferences, 'indexSettings.index', '');
+		const mainFusionSettings = get(preferences, 'fusionSettings', {});
+		const pageSettings = get(preferences, 'pageSettings', {});
+		const pageFusionSettings = get(
+			pageSettings,
+			`pages.${pageSettings.currentPage}.indexSettings.fusionSettings`,
+			mainFusionSettings,
+		);
+		const fusionSettings = Object.assign({}, mainFusionSettings, pageFusionSettings);
+
 		return `
 import { ReactiveBase, ReactiveComponent } from "@appbaseio/reactivesearch";
 
@@ -26,6 +36,22 @@ export default Chart = () => {
 	  app="${secondaryPipeline || pipeline}"
 	  url="${getURL()}"
 	  credentials="${preferences?.exportSettings?.credentials || ''}"
+	  ${
+			backend === BACKENDS.FUSION.name
+				? `transformRequest={(props) => {
+		const newBody = JSON.parse(props.body);
+		newBody.metadata = {
+			app: "${fusionSettings.app || ''}",
+			profile: "${fusionSettings.profile || ''}",
+			suggestion_profile: "${fusionSettings.searchProfile || ''}",
+			sponsored_profile: "${fusionSettings.sponsoredProfile || ''}",
+		};
+		props.body = JSON.stringify(newBody);
+
+		return props;
+	}}`
+				: ''
+		}
 	>
 	  <ReactiveComponent
 		componentId="${control.componentId ? control.componentId : 'chartComponent'}"
@@ -149,11 +175,13 @@ ${propsBasedOnComponent()}/>
 
 CopyCode.defaultProps = {
 	control: {},
+	backend: BACKENDS.ELASTICSEARCH.name,
 };
 
 CopyCode.propTypes = {
 	control: object,
 	getPreferencesPayload: func.isRequired,
+	backend: string,
 };
 
 export default CopyCode;

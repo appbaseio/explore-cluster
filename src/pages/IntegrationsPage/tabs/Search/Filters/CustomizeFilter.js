@@ -1,11 +1,13 @@
 import React from 'react';
-import { Button, Modal, Switch, Form, Select, List, Radio } from 'antd';
+import { Button, Modal, Switch, Form, Select, List, Radio, Typography } from 'antd';
 import { string, object, func, bool } from 'prop-types';
+import get from 'lodash/get';
 import { FieldGroup, FieldControl, FormBuilder } from 'react-reactive-form';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import { componentTypes } from '@appbaseio/reactivesearch';
+import { connect } from 'react-redux';
 import Dragger from './Dragger';
-import LivePreview from './LivePreview';
+import LivePreview from '../LivePreview';
 import CopyCode from './CopyCode';
 import DataFieldSelector from '../../../../../components/Form/DataFieldSelector';
 import TextInput from '../../../../../components/Form/Input';
@@ -14,13 +16,21 @@ import { DatePickerStyles, filterModalStyles } from './styles';
 import 'react-day-picker/lib/style.css';
 import Data from './Data';
 import { dataPropFromArray } from '../../../utils';
+import { BACKENDS } from '../../../../../batteries/utils';
+import { CardButton, CodeEditorCard } from '../styles';
+import CodeEditorModal from '../CodeEditorModal';
 
 const { Item } = List;
 
 class CustomizeFilter extends React.Component {
 	state = {
 		visible: false,
-		customizeConrolObj: {},
+		showDefaultQueryEditor: false,
+		showCustomQueryEditor: false,
+		aggregationsWithCount: {
+			isLoading: false,
+			data: [],
+		},
 	};
 
 	message = '';
@@ -28,8 +38,13 @@ class CustomizeFilter extends React.Component {
 	componentDidMount() {
 		const { control } = this.props;
 		control.get('componentType').valueChanges.subscribe((value) => {
-			if (!control.get('data') && value === componentTypes.tabDataList)
-				control.addControl('data', FormBuilder.array(dataPropFromArray([])));
+			if (value === componentTypes.tabDataList) {
+				if (control.get('data')) {
+					control.setControl('data', FormBuilder.array(dataPropFromArray([])));
+				} else {
+					control.addControl('data', FormBuilder.array(dataPropFromArray([])));
+				}
+			}
 		});
 	}
 
@@ -46,10 +61,13 @@ class CustomizeFilter extends React.Component {
 			visible: false,
 		});
 
-		const { onSave, control } = this.props;
+		const { onSave, control, onModalClose } = this.props;
 
 		if (onSave) {
 			onSave(control);
+		}
+		if (onModalClose) {
+			onModalClose();
 		}
 	};
 
@@ -61,19 +79,13 @@ class CustomizeFilter extends React.Component {
 		this.setState({
 			visible: false,
 		});
-		this.setCustomizeConrolObj({});
-	};
-
-	setCustomizeConrolObj = (obj) => {
-		if (Object.keys(obj).length) {
-			this.setState({
-				customizeConrolObj: obj,
-			});
-		}
 	};
 
 	setFieldType = (val, formControl) => {
-		const { type } = this.props;
+		const { type, control } = this.props;
+		if (control && control.value.componentType === componentTypes.tabDataList) {
+			this.setState({ aggregationsWithCount: { isLoading: true, data: [] } });
+		}
 
 		if (type !== 'price') {
 			if (RANGE_FIELDS.includes(val)) {
@@ -108,7 +120,14 @@ class CustomizeFilter extends React.Component {
 	};
 
 	render() {
-		const { visible, dataFieldType, message, customizeConrolObj } = this.state;
+		const {
+			visible,
+			dataFieldType,
+			message,
+			showCustomQueryEditor,
+			showDefaultQueryEditor,
+			aggregationsWithCount,
+		} = this.state;
 		const {
 			buttonLabel,
 			control,
@@ -116,10 +135,20 @@ class CustomizeFilter extends React.Component {
 			disableListOptions,
 			disableFilterType,
 			type,
-			form,
 			getPreferencesPayload,
+			backend,
+			form,
 		} = this.props;
 		const { pipeline } = this.props;
+		const handleComponentTypeChange = (componentType) => {
+			const showSearchControl = control.get('showSearch');
+
+			if (componentType === componentTypes.tabDataList) {
+				showSearchControl.setValue(false);
+			} else {
+				showSearchControl.setValue(true);
+			}
+		};
 
 		return (
 			<React.Fragment>
@@ -146,9 +175,8 @@ class CustomizeFilter extends React.Component {
 								destroyOnClose
 								okText="Save"
 								width="90%"
-								afterClose={() => this.setCustomizeConrolObj({})}
 							>
-								<div css={filterModalStyles}>
+								<div className={filterModalStyles}>
 									<div className="left-container">
 										<h3 className="section-header">Configure Component</h3>
 										<Form colon={false}>
@@ -174,6 +202,7 @@ class CustomizeFilter extends React.Component {
 																		formControl,
 																	);
 																}}
+																form={form}
 															/>
 															{type === 'color' && value.dataField && (
 																<div
@@ -298,7 +327,13 @@ class CustomizeFilter extends React.Component {
 												>
 													{({ handler }) => (
 														<Form.Item label="Pick List type">
-															<Select {...handler()}>
+															<Select
+																{...handler()}
+																onChange={(val) => {
+																	handleComponentTypeChange(val);
+																	handler().onChange(val);
+																}}
+															>
 																<Select.Option
 																	key={componentTypes.multiList}
 																>
@@ -491,10 +526,9 @@ class CustomizeFilter extends React.Component {
 																)}
 															/>
 														) : null}
-														{![
-															componentTypes.tagCloud,
-															componentTypes.tabDataList,
-														].includes(value.componentType) ? (
+														{![componentTypes.tagCloud].includes(
+															value.componentType,
+														) ? (
 															<TextInput
 																name="selectAllLabel"
 																label="Select All Label"
@@ -544,7 +578,32 @@ class CustomizeFilter extends React.Component {
 														{[componentTypes.tabDataList].includes(
 															value.componentType,
 														) ? (
-															<Data form={control.get('data')} />
+															<div style={{ position: 'relative' }}>
+																{aggregationsWithCount.isLoading ? (
+																	<img
+																		style={{
+																			position: 'absolute',
+																			display: 'block',
+																			width: '100%',
+																			height: '100%',
+																			backgroundColor:
+																				'whitesmoke',
+																			zIndex: '2',
+																		}}
+																		src="/static/images/loader.svg"
+																		alt="loading"
+																	/>
+																) : null}
+																<Data
+																	form={control.get('data')}
+																	options={aggregationsWithCount.data.map(
+																		({ key }) => ({
+																			value: key,
+																			text: key,
+																		}),
+																	)}
+																/>
+															</div>
 														) : null}
 													</>
 												)}
@@ -608,7 +667,7 @@ class CustomizeFilter extends React.Component {
 														control={control.get('startValue')}
 													>
 														{({ handler }) => (
-															<div css={DatePickerStyles}>
+															<div className={DatePickerStyles}>
 																<Form.Item label="Start Value">
 																	<DayPickerInput
 																		placeholder="Enter start value (YYYY-MM-DD)"
@@ -626,7 +685,7 @@ class CustomizeFilter extends React.Component {
 														control={control.get('endValue')}
 													>
 														{({ handler }) => (
-															<div css={DatePickerStyles}>
+															<div className={DatePickerStyles}>
 																<Form.Item label="End Value">
 																	<DayPickerInput
 																		placeholder="Enter end value (YYYY-MM-DD)"
@@ -695,19 +754,152 @@ class CustomizeFilter extends React.Component {
 													</FieldControl>
 												</>
 											)}
+											{value.dataField ? (
+												<>
+													<CodeEditorCard>
+														<CardButton
+															icon="edit"
+															onClick={() =>
+																this.setState({
+																	showDefaultQueryEditor: true,
+																})
+															}
+														>
+															Edit
+														</CardButton>
+														<Typography.Paragraph>
+															Default Query:
+														</Typography.Paragraph>
+														<Typography.Paragraph>
+															Edit defaultQuery code exported as
+															function
+														</Typography.Paragraph>
+													</CodeEditorCard>
+													<CodeEditorCard>
+														<CardButton
+															icon="edit"
+															onClick={() =>
+																this.setState({
+																	showCustomQueryEditor: true,
+																})
+															}
+														>
+															Edit
+														</CardButton>
+														<Typography.Paragraph>
+															Set Custom Query:
+														</Typography.Paragraph>
+														<Typography.Paragraph>
+															Edit Custom Query code exported as
+															function
+														</Typography.Paragraph>
+													</CodeEditorCard>
+												</>
+											) : null}
+
+											<FieldControl
+												name="defaultQuery"
+												strict={false}
+												control={control?.get('defaultQuery')}
+											>
+												{(defaultQueryControl) => (
+													<CodeEditorModal
+														visible={showDefaultQueryEditor}
+														onCancel={() =>
+															this.setState({
+																showDefaultQueryEditor: false,
+															})
+														}
+														onSave={(code) => {
+															this.setState({
+																showDefaultQueryEditor: false,
+															});
+															defaultQueryControl
+																.handler()
+																.onChange(code);
+														}}
+														componentConfig={{
+															...control.value,
+															defaultQuery:
+																defaultQueryControl.value ||
+																`(value, props)=>({})`,
+														}}
+														functionProperty="defaultQuery"
+														pipeline={pipeline}
+														showLivePreview={false}
+													/>
+												)}
+											</FieldControl>
+											<FieldControl
+												name="customQuery"
+												strict={false}
+												control={control?.get('customQuery')}
+											>
+												{(customQueryControl) => (
+													<CodeEditorModal
+														visible={showCustomQueryEditor}
+														onCancel={() =>
+															this.setState({
+																showCustomQueryEditor: false,
+															})
+														}
+														onSave={(code) => {
+															this.setState({
+																showCustomQueryEditor: false,
+															});
+															customQueryControl
+																.handler()
+																.onChange(code);
+														}}
+														componentConfig={{
+															...control.value,
+															customQuery:
+																customQueryControl.value ||
+																`(value, props)=>(${JSON.stringify(
+																	{ aggs: {} },
+																	null,
+																	2,
+																)})`,
+														}}
+														functionProperty="customQuery"
+														pipeline={pipeline}
+													/>
+												)}
+											</FieldControl>
 										</Form>
 									</div>
 									<Dragger />
 									<div className="right-container">
 										<LivePreview
-											form={form}
-											control={control.value}
-											setCustomizeConrolObj={this.setCustomizeConrolObj}
-											customizeConrolObj={customizeConrolObj}
+											pipeline={pipeline}
+											componentConfig={control.value}
+											hookOwnRender={({ rawData }) => {
+												if (
+													value.componentType ===
+														componentTypes.tabDataList &&
+													rawData
+												) {
+													const aggDataField = Object.keys(
+														rawData.aggregations,
+													)[0];
+													const formDataField = value.dataField;
+													const data =
+														rawData.aggregations[aggDataField].buckets;
+													this.setState({
+														aggregationsWithCount: {
+															// Show loading until formDataField and query Data Field become equal
+															isLoading:
+																aggDataField !== formDataField,
+															data,
+														},
+													});
+												}
+											}}
 										/>
 										<CopyCode
 											control={value}
 											getPreferencesPayload={getPreferencesPayload}
+											backend={backend}
 										/>
 									</div>
 								</div>
@@ -733,6 +925,8 @@ CustomizeFilter.defaultProps = {
 	pipeline: undefined,
 	form: {},
 	getPreferencesPayload: () => {},
+	onModalClose: () => {},
+	backend: BACKENDS.ELASTICSEARCH.name,
 };
 CustomizeFilter.propTypes = {
 	buttonLabel: string,
@@ -747,6 +941,12 @@ CustomizeFilter.propTypes = {
 	type: string,
 	form: object,
 	getPreferencesPayload: func,
+	onModalClose: func,
+	backend: string,
 };
 
-export default CustomizeFilter;
+const mapStateToProps = (state) => ({
+	backend: get(state, '$getAppPlan.results.backend'),
+});
+
+export default connect(mapStateToProps, null)(CustomizeFilter);

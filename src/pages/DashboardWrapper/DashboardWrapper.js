@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import get from 'lodash/get';
 import keys from 'lodash/keys';
 import { bool, func, object, string } from 'prop-types';
+import { isEqual } from 'lodash';
 import { ALLOWED_ACTIONS } from '../../constants';
 import Loader from '../../components/Loader';
 // eslint-disable-next-line
@@ -21,6 +22,7 @@ import { loadApps, setIsSidebarCollapsed } from '../../actions';
 import SidebarAutocomplete from '../../components/SidebarAutocomplete';
 import searchInputStyle from './styles';
 import UnauthorizedPage from '../UnauthorizedPage';
+import { ALLOWED_ACTIONS_BY_BACKEND, BACKENDS } from '../../batteries/utils';
 
 const NoMatch = Loadable({
 	loader: () => import(/* webpackChunkName: "NoMatchPage" */ '../../NoMatch'),
@@ -110,7 +112,7 @@ class DashboardWrapper extends Component {
 			console.log(e);
 		}
 		const getActiveMenuData = getActiveMenu(props, undefined, props.routes);
-		const { routes, arcVersion } = props;
+		const { routes, arcVersion, backend } = props;
 		let routesToSet = routes;
 		if (arcVersion && versionCompare(arcVersion, '7.54.0') !== -1) {
 			routesToSet = {
@@ -120,20 +122,58 @@ class DashboardWrapper extends Component {
 					action: ALLOWED_ACTIONS.UI_BUILDER,
 					menu: [
 						{ label: 'Search', link: '/cluster/search-builder', tag: 'Beta' },
+						...(backend === BACKENDS.ELASTICSEARCH.name ||
+						backend === BACKENDS.OPENSEARCH.name
+							? [
+									({
+										label: 'Recommendations',
+										link: '/cluster/recommendations-builder',
+										tag: 'Beta',
+									},
+									{
+										label: 'Searchbox',
+										link: '/cluster/searchboxes',
+										tag: 'Beta',
+									}),
+							  ]
+							: []),
 						{
-							label: 'Recommendations',
-							link: '/cluster/recommendations-builder',
+							label: 'End-user Authentication',
+							link: '/cluster/auth-settings',
 							tag: 'Beta',
 						},
-						{
-							label: 'Searchbox',
-							link: '/cluster/searchboxes',
-							tag: 'Beta',
-						},
-						{ label: 'Auth settings', link: '/cluster/auth-settings', tag: 'Beta' },
 					],
 					tag: 'Beta',
 				},
+				...(routes['Access Control']
+					? {
+							'Access Control': {
+								icon: 'key',
+								action: 'access-control',
+								menu: [
+									{
+										label: 'API Credentials',
+										link: '/cluster/credentials',
+									},
+									...(backend === BACKENDS.ELASTICSEARCH.name ||
+									backend === BACKENDS.OPENSEARCH.name
+										? [
+												{
+													label: 'Role Based Access',
+													link: '/cluster/role-based-access',
+													tag: 'Beta',
+												},
+												{
+													label: 'Node Sync Preferences',
+													link: '/cluster/sync-preferences',
+													tag: 'Beta',
+												},
+										  ]
+										: []),
+								],
+							},
+					  }
+					: {}),
 			};
 		}
 		this.state = {
@@ -193,8 +233,11 @@ class DashboardWrapper extends Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { arcVersion, isBillingEnabled, routes } = this.props;
-		if (arcVersion && arcVersion !== prevProps.arcVersion) {
+		const { arcVersion, isBillingEnabled, routes, backend } = this.props;
+		if (
+			!isEqual(routes, prevProps.routes) ||
+			(arcVersion && arcVersion !== prevProps.arcVersion)
+		) {
 			if (versionCompare(arcVersion, '7.54.0') !== -1) {
 				// UPDATE UIBuilder route
 				// eslint-disable-next-line
@@ -206,24 +249,58 @@ class DashboardWrapper extends Component {
 							action: ALLOWED_ACTIONS.UI_BUILDER,
 							menu: [
 								{ label: 'Search', link: '/cluster/search-builder', tag: 'Beta' },
+								...(backend === BACKENDS.ELASTICSEARCH.name ||
+								backend === BACKENDS.OPENSEARCH.name
+									? [
+											{
+												label: 'Recommendations',
+												link: '/cluster/recommendations-builder',
+												tag: 'Beta',
+											},
+											{
+												label: 'Searchbox',
+												link: '/cluster/searchboxes',
+												tag: 'Beta',
+											},
+									  ]
+									: []),
 								{
-									label: 'Recommendations',
-									link: '/cluster/recommendations-builder',
-									tag: 'Beta',
-								},
-								{
-									label: 'Searchbox',
-									link: '/cluster/searchboxes',
-									tag: 'Beta',
-								},
-								{
-									label: 'Auth settings',
+									label: 'End-user Authentication',
 									link: '/cluster/auth-settings',
 									tag: 'Beta',
 								},
 							],
 							tag: 'Beta',
 						},
+						...(routes['Access Control']
+							? {
+									'Access Control': {
+										icon: 'key',
+										action: 'access-control',
+										menu: [
+											{
+												label: 'API Credentials',
+												link: '/cluster/credentials',
+											},
+											...(backend === BACKENDS.ELASTICSEARCH.name ||
+											backend === BACKENDS.OPENSEARCH.name
+												? [
+														{
+															label: 'Role Based Access',
+															link: '/cluster/role-based-access',
+															tag: 'Beta',
+														},
+														{
+															label: 'Node Sync Preferences',
+															link: '/cluster/sync-preferences',
+															tag: 'Beta',
+														},
+												  ]
+												: []),
+										],
+									},
+							  }
+							: {}),
 					},
 				});
 			}
@@ -254,13 +331,22 @@ class DashboardWrapper extends Component {
 	onCollapse = () => {
 		const { setIsCollapsed, collapsed } = this.props;
 		setIsCollapsed(!collapsed);
+		this.setState({ activeSubMenu: [] });
 	};
 
 	render() {
 		const { showHeader, routes, activeSubMenu, activeMenuItem, value } = this.state;
-		const { apps, history, match, collapsed, sessionData } = this.props;
+		const { apps, history, match, collapsed, sessionData, backendImage, backend } = this.props;
 		const filteredApps = keys(apps).filter((app) => !app.startsWith('.'));
-		const allowedRoutes = getAuthorizedRoutes(routes);
+		const routesFiltered = {};
+
+		Object.keys(routes).forEach((key) => {
+			if (ALLOWED_ACTIONS_BY_BACKEND[backend].includes(routes[key].action)) {
+				routesFiltered[key] = routes[key];
+			}
+		});
+		const allowedRoutes = getAuthorizedRoutes(routesFiltered);
+
 		const indexName = sessionStorage.getItem('appName') || sessionData || '';
 
 		return (
@@ -299,7 +385,14 @@ class DashboardWrapper extends Component {
 									{collapsed ? (
 										<Logo type="small" width={20} />
 									) : (
-										<Logo type="white" width={160} />
+										<Logo
+											type={
+												backend === BACKENDS.FUSION.name
+													? 'lucid_works'
+													: 'white'
+											}
+											width={160}
+										/>
 									)}
 								</Link>
 							</Menu.Item>
@@ -326,7 +419,7 @@ class DashboardWrapper extends Component {
 						)}
 
 						{!value &&
-							Object.keys(routes).map((route) => {
+							Object.keys(routesFiltered).map((route) => {
 								if (routes[route].menu) {
 									const Title = (
 										<span>
@@ -336,33 +429,43 @@ class DashboardWrapper extends Component {
 									);
 									return (
 										<SubMenu key={route} title={Title}>
-											{routes[route].menu.map((item) => (
-												<Menu.Item key={item.label}>
-													{/* eslint-disable-next-line */}
-													{item.openIndexMenu ? (
-														indexName ? (
-															<LabelTag
-																item={item}
-																onClick={() =>
-																	history.push(
-																		`/app/${indexName}/${item.link}`,
-																	)
-																}
-															/>
+											{routes[route].menu.map((item) => {
+												if (
+													item.link.includes(
+														'configure-search-engine-backend',
+													) &&
+													backendImage !== 'sls'
+												) {
+													return null;
+												}
+												return (
+													<Menu.Item key={item.label}>
+														{/* eslint-disable-next-line */}
+														{item.openIndexMenu ? (
+															indexName ? (
+																<LabelTag
+																	item={item}
+																	onClick={() =>
+																		history.push(
+																			`/app/${indexName}/${item.link}`,
+																		)
+																	}
+																/>
+															) : (
+																<IndexSwitcher
+																	item={item}
+																	filteredApps={filteredApps}
+																	history={history}
+																/>
+															)
 														) : (
-															<IndexSwitcher
-																item={item}
-																filteredApps={filteredApps}
-																history={history}
-															/>
-														)
-													) : (
-														<Link replace to={item.link}>
-															<LabelTag item={item} />
-														</Link>
-													)}
-												</Menu.Item>
-											))}
+															<Link replace to={item.link}>
+																<LabelTag item={item} />
+															</Link>
+														)}
+													</Menu.Item>
+												);
+											})}
 										</SubMenu>
 									);
 								}
@@ -481,6 +584,8 @@ DashboardWrapper.defaultProps = {
 	isClusterPlanFetching: false,
 	apps: {},
 	sessionData: '',
+	backendImage: '',
+	backend: BACKENDS.ELASTICSEARCH.name,
 };
 
 DashboardWrapper.propTypes = {
@@ -498,6 +603,8 @@ DashboardWrapper.propTypes = {
 	setIsCollapsed: func.isRequired,
 	routes: object.isRequired,
 	sessionData: string,
+	backendImage: string,
+	backend: string,
 };
 
 const mapStateToProps = (state) => ({
@@ -509,6 +616,8 @@ const mapStateToProps = (state) => ({
 	collapsed: get(state, 'sideBarCollapsed'),
 	routes: get(state, 'clusterRoutes'),
 	sessionData: get(state, 'sessionData.sessionData', ''),
+	backendImage: get(state, '$getAppPlan.results.image_type'),
+	backend: get(state, '$getAppPlan.results.backend'),
 });
 
 const mapDispatchToProps = (dispatch) => ({

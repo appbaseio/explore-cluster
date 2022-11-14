@@ -1,8 +1,8 @@
-import { Icon } from 'antd';
-import { object } from 'prop-types';
+import { AutoComplete, Form, Icon, Tooltip } from 'antd';
+import { array, object } from 'prop-types';
 import React, { Component } from 'react';
 import styled from 'react-emotion';
-import { FieldArray, FieldGroup, FormBuilder } from 'react-reactive-form';
+import { FieldArray, FieldControl, FieldGroup, FormBuilder } from 'react-reactive-form';
 import TextInput from '../../../../../components/Form/Input';
 
 const Container = styled.div`
@@ -23,6 +23,14 @@ const IconButton = styled.button`
 	transition: color 500ms ease;
 	cursor: pointer;
 	font-size: 1rem;
+	&:disabled:hover {
+		color: lightgray;
+		cursor: not-allowed;
+	}
+	&:disabled {
+		color: lightgray;
+		cursor: not-allowed;
+	}
 `;
 
 const RemoveButton = styled(IconButton)`
@@ -30,12 +38,35 @@ const RemoveButton = styled(IconButton)`
 		color: crimson;
 	}
 `;
-
 const AddButton = styled(IconButton)`
 	&:hover {
-		color: blue;
+		color: green;
 	}
 `;
+
+const Dropdown = ({ options, control }) => {
+	return (
+		<FieldControl name="value" control={control} strict={false}>
+			{({ handler }) => {
+				return (
+					<Form.Item label="Value">
+						<AutoComplete
+							dataSource={options.filter((option) => option.value)}
+							filterOption={(query, option) => option.key.includes(query)}
+							{...handler()}
+						/>
+					</Form.Item>
+				);
+			}}
+		</FieldControl>
+	);
+};
+
+Dropdown.propTypes = {
+	options: array.isRequired,
+	control: object.isRequired,
+};
+
 class Data extends Component {
 	state = {
 		keyCount: 1,
@@ -81,15 +112,35 @@ class Data extends Component {
 	}
 
 	render() {
-		const { form } = this.props;
+		const { form, options } = this.props;
 		return (
 			<FieldArray control={form} strict={false}>
 				{({ controls }) => (
 					<>
-						<div>Data</div>
+						<div>
+							<div>Data</div>
+							<Tooltip title="Add label-value fields at the end">
+								<AddButton
+									onClick={() => {
+										this.addItem();
+									}}
+									style={{ marginLeft: 'auto' }}
+									disabled={
+										controls &&
+										controls.filter((c) => !c.value.label).length > 0
+									}
+								>
+									<Icon type="plus-square" />
+								</AddButton>
+							</Tooltip>
+						</div>
 						{controls.map((control, idx) => (
-							// eslint-disable-next-line react/no-array-index-key
-							<FieldGroup control={control} key={`${control.meta.key}-${idx}`}>
+							<FieldGroup
+								// eslint-disable-next-line react/no-array-index-key
+								key={`${control.meta.key}-${idx}`}
+								control={control}
+								strict={false}
+							>
 								{() => (
 									<Container>
 										<MarginHorizontal>
@@ -103,34 +154,24 @@ class Data extends Component {
 											/>
 										</MarginHorizontal>
 										<MarginHorizontal>
-											<TextInput
-												name="value"
-												label="Value"
-												inputProps={{
-													placeholder: 'Enter value for data',
-												}}
+											<Dropdown
+												options={options}
 												control={control.get('value')}
 											/>
 										</MarginHorizontal>
-										{idx !== 0 ? (
-											<RemoveButton
-												type="button"
-												onClick={() => {
-													this.removeItem(idx);
-												}}
-											>
-												<Icon type="minus-square" />
-											</RemoveButton>
-										) : (
-											<AddButton
-												type="button"
-												onClick={() => {
-													this.addItem();
-												}}
-											>
-												<Icon type="plus-square" />
-											</AddButton>
-										)}
+										<MarginHorizontal>
+											<Form.Item label=" ">
+												<RemoveButton
+													type="button"
+													onClick={() => {
+														this.removeItem(idx);
+													}}
+													disabled={controls.length === 1 && idx === 0}
+												>
+													<Icon type="minus-square" />
+												</RemoveButton>
+											</Form.Item>
+										</MarginHorizontal>
 									</Container>
 								)}
 							</FieldGroup>
@@ -145,6 +186,7 @@ Data.defaultProps = {
 	form: {},
 };
 Data.propTypes = {
+	options: array.isRequired,
 	form: object,
 };
 

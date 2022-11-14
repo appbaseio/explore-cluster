@@ -24,7 +24,7 @@ const bannerDetails = {
 		'GUI to manage preferences for Suggestion Settings. Configure the defaults for your autosuggestions (popular, recent, and index based).',
 	buttonText: 'Read Docs',
 	icon: 'info-circle',
-	href: 'https://docs.appbase.io/docs/search/relevancy/#suggestions',
+	href: 'https://docs.reactivesearch.io/docs/search/relevancy/#suggestions',
 };
 
 const SuggestionSettings = ({

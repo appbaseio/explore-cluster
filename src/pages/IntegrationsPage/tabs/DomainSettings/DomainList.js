@@ -58,7 +58,7 @@ const DomainList = ({
 									</Tag>
 								) : (
 									<>
-										<Tag className="tag-container">Verification Pending...</Tag>
+										<Tag className="tag-container">Verification Pending</Tag>
 										<Tooltip title="Refresh verification status">
 											<Button
 												type="primary"

@@ -7,6 +7,7 @@ import find from 'lodash/find';
 import { getDefaultAllowedActions } from '../../utils/allowedActions';
 import { versionCompare } from '../../batteries/utils/helpers';
 import { ALLOWED_ACTIONS } from '../../constants';
+import { ALLOWED_ACTIONS_BY_BACKEND, BACKENDS } from '../../batteries/utils';
 
 export const Suggestions = {
 	1: {
@@ -155,8 +156,11 @@ export const getDefaultAclOptionsByVersion = (appbaseVersion) => {
 	return categories;
 };
 
-export const getAllowedActionsByVersion = (appbaseVersion) => {
-	const actions = { ...ALLOWED_ACTIONS };
+export const getAllowedActionsByVersion = (
+	appbaseVersion,
+	backend = BACKENDS.ELASTICSEARCH.name,
+) => {
+	const actions = { ...(backend ? ALLOWED_ACTIONS_BY_BACKEND[backend] : ALLOWED_ACTIONS) };
 	// New scope to version map
 	const newScopes = {
 		SPEED: '7.42.0',

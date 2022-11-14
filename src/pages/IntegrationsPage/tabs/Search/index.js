@@ -1,23 +1,26 @@
 import React, { useContext, useEffect } from 'react';
-import { FieldControl, FieldGroup } from 'react-reactive-form';
-import { func, object } from 'prop-types';
-import { Form, Select, Tabs } from 'antd';
+import { FieldGroup } from 'react-reactive-form';
+import { func, string } from 'prop-types';
+import { Tabs } from 'antd';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
-import { get, keys } from 'lodash';
+import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { FormContext, verticalTab } from '../../utils';
 import Search from './Search';
 import Results from './Results';
 import Filters from './Filters';
 import CustomMessages from './CustomMessages';
+import FusionSearch from './FusionSearch';
 import Charts from './Charts';
 import PageRoutes from '../../PageRoutes';
-import Flex from '../../../../batteries/components/shared/Flex';
+import EndpointDropdown from '../../Endpoint/EndpointDropdown';
+import { BACKENDS } from '../../../../batteries/utils';
 
 const { TabPane } = Tabs;
 
-const SearchSettings = ({ getPreferencesPayload, getPreferences, setIsEditorLoading, apps }) => {
+const SearchSettings = ({ getPreferencesPayload, getPreferences, setIsEditorLoading, backend }) => {
 	const form = useContext(FormContext);
+	const isFusion = backend === BACKENDS.FUSION.name;
 
 	useEffect(() => {
 		const autoSuggestionSettingsControl = form.get('autoSuggestionSettings');
@@ -39,93 +42,70 @@ const SearchSettings = ({ getPreferencesPayload, getPreferences, setIsEditorLoad
 			filtersControl.insert(destinationPosition, control);
 		}
 	};
-	const filteredApps = keys(apps).filter((app) => !app.startsWith('.'));
 
 	return (
 		<div>
-			<Flex
-				alignItems="center"
-				justifyContent="flex-start"
-				style={{ marginBottom: '1.5rem', gap: '3rem', flexWrap: 'wrap' }}
-			>
-				<FieldGroup
-					control={form}
-					strict={false}
-					render={() => (
-						<div>
-							<h2
-								style={{
-									fontSize: '14px',
-									fontWeight: 500,
-									marginBottom: 0,
-									lineHeight: '39.9999px',
-								}}
-							>
-								Current Page Route
-							</h2>
-							<PageRoutes
-								getPreferencesPayload={getPreferencesPayload}
-								preferences={getPreferences()}
-								form={form}
-								setIsEditorLoading={setIsEditorLoading}
-							/>
-						</div>
-					)}
-				/>{' '}
-				<FieldGroup parent={form} name="indexSettings">
-					{() => (
-						<FieldControl strict={false} name="index">
-							{({ handler }) => (
-								<Form.Item
-									style={{
-										margin: 0,
-										padding: 0,
-									}}
-									required
-									label={
-										<>
-											Pipeline for{' '}
-											<span style={{ color: '#7c7b7b' }}>
-												{get(form.value, 'pageSettings.currentPage', '') ||
-													''}
-											</span>{' '}
-											page route
-										</>
-									}
-								>
-									<Select
-										{...handler()}
-										value={handler().value || undefined}
-										showSearch
-										placeholder="Select an Index"
-										style={{
-											minWidth: 300,
-										}}
-										size="large"
-									>
-										{(filteredApps || [])
-											.filter((k) => !k.includes('metricbeat'))
-											.map((k) => (
-												<Select.Option key={k}>{k}</Select.Option>
-											))}
-									</Select>
-								</Form.Item>
-							)}
-						</FieldControl>
-					)}
-				</FieldGroup>
-			</Flex>
+			<FieldGroup
+				control={form}
+				strict={false}
+				render={() => (
+					<div>
+						<h2
+							style={{
+								fontSize: '14px',
+								fontWeight: 500,
+								marginBottom: 0,
+								lineHeight: '39.9999px',
+							}}
+						>
+							Current Page Route
+						</h2>
+						<PageRoutes
+							getPreferencesPayload={getPreferencesPayload}
+							preferences={getPreferences()}
+							form={form}
+							setIsEditorLoading={setIsEditorLoading}
+						/>
+					</div>
+				)}
+			/>{' '}
+			<FieldGroup parent={form} name="indexSettings" strict={false}>
+				{(formControl) => {
+					const endpointControl = formControl.get('endpoint');
+
+					return (
+						<EndpointDropdown
+							formValue={endpointControl.value}
+							form={form}
+							endpointControl={endpointControl}
+							isPageLevel
+						/>
+					);
+				}}
+			</FieldGroup>
 			<Tabs defaultActiveKey="1" tabPosition="left" className={verticalTab}>
 				<TabPane tab="Search" key="1">
 					<FieldGroup
 						control={form}
-						render={() => (
-							<Search
-								pipeline={
-									form.get('pipeline') ? form.get('pipeline').value : undefined
-								}
-							/>
-						)}
+						render={() =>
+							isFusion ? (
+								<FusionSearch
+									form={form}
+									getPreferencesPayload={getPreferencesPayload}
+								/>
+							) : (
+								<Search
+									pipeline={
+										form.get('pipeline')
+											? form.get('pipeline').value
+											: undefined
+									}
+									form={form}
+									backend={backend}
+									getPreferencesPayload={getPreferencesPayload}
+								/>
+							)
+						}
 					/>
 				</TabPane>
 				<TabPane tab="Facets" key="2">
@@ -149,6 +129,7 @@ const SearchSettings = ({ getPreferencesPayload, getPreferences, setIsEditorLoad
 											<Filters
 												getPreferencesPayload={getPreferencesPayload}
 												form={form}
+												backend={backend}
 											/>
 											{provided.placeholder}
 										</div>
@@ -177,6 +158,7 @@ const SearchSettings = ({ getPreferencesPayload, getPreferences, setIsEditorLoad
 											<Charts
 												getPreferencesPayload={getPreferencesPayload}
 												form={form}
+												backend={backend}
 											/>
 											{provided.placeholder}
 										</div>
@@ -189,9 +171,17 @@ const SearchSettings = ({ getPreferencesPayload, getPreferences, setIsEditorLoad
 				<TabPane tab="Results" key="4">
 					<FieldGroup
 						control={form}
-						render={() => (
-							<Results form={form} getPreferencesPayload={getPreferencesPayload} />
-						)}
+						strict={false}
+						render={({ value }) => {
+							const secondaryPipeline = get(value, 'indexSettings.index', '');
+							return (
+								<Results
+									form={form}
+									getPreferencesPayload={getPreferencesPayload}
+									secondaryPipeline={secondaryPipeline}
+								/>
+							);
+						}}
 					/>
 				</TabPane>
 				<TabPane tab="Custom Messages" key="5">
@@ -201,15 +191,20 @@ const SearchSettings = ({ getPreferencesPayload, getPreferences, setIsEditorLoad
 		</div>
 	);
 };
+
+SearchSettings.defaultProps = {
+	backend: BACKENDS.ELASTICSEARCH.name,
+};
+
 SearchSettings.propTypes = {
 	getPreferencesPayload: func.isRequired,
 	getPreferences: func.isRequired,
 	setIsEditorLoading: func.isRequired,
-	apps: object.isRequired,
+	backend: string,
 };
 
 const mapStateToProps = (state) => ({
-	apps: get(state, 'apps.data'),
+	backend: get(state, '$getAppPlan.results.backend'),
 });
 
 export default connect(mapStateToProps, null)(SearchSettings);

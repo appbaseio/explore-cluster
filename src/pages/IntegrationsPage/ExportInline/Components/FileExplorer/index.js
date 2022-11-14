@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useSandpack } from '@codesandbox/sandpack-react';
 import SandpackSearch from '../Search'; // eslint-disable-line
@@ -7,16 +7,18 @@ import ModuleList from './ModuleList'; // eslint-disable-line
 import { FileIcon } from './icons';
 import { searchFilesContainer } from './styles';
 import SearchList from './SearchList';
+// eslint-disable-next-line
+import { SandpackCodeContext } from '../..';
 
 const FileExplorer = ({ setHighlightLine, iframeHeight, collapsed, searchType, setSearchType }) => {
 	const [searchAllContent, setSearchAllContent] = useState([]);
 	const [value, setValue] = useState('');
-
+	const { themeType } = useContext(SandpackCodeContext);
 	const { sandpack } = useSandpack();
 
 	return (
 		<div
-			css={searchFilesContainer}
+			className={searchFilesContainer(themeType)}
 			style={{
 				height: iframeHeight,
 				overflow: 'scroll',

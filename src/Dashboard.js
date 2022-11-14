@@ -9,11 +9,12 @@ import URLSearchParams from '@ungap/url-search-params';
 import * as Sentry from '@sentry/browser';
 
 import { loadUser, setAppRoutes, setClusterRoutes } from './actions';
-import { getAuthorizedViews } from './utils';
+import { getAuthorizedViews, getOriginURL } from './utils';
 import Loader from './components/Loader';
 import Logo from './components/Logo';
 import { APP_ROUTES, CLUSTER_ROUTES } from './constants/routes';
 import { fetchAuth0Preferences } from './batteries/modules/actions';
+import { ALLOWED_ACTIONS_BY_BACKEND, BACKENDS } from './batteries/utils';
 
 // routes
 const LoginPage = Loadable({
@@ -37,12 +38,18 @@ const InstallPage = Loadable({
 });
 
 const Wrapper = Loadable({
+	// eslint-disable-next-line import/no-cycle
 	loader: () => import(/* webpackChunkName: "WrapperComponent" */ './pages/Wrapper'),
 	loading: Loader,
 });
 
 const PrivateRoute = Loadable({
 	loader: () => import(/* webpackChunkName: "PrivateRoute" */ './pages/LoginPage/PrivateRoute'),
+	loading: Loader,
+});
+
+const LogoutRoute = Loadable({
+	loader: () => import(/* webpackChunkName: "PrivateRoute" */ './pages/LogoutPage'),
 	loading: Loader,
 });
 
@@ -85,7 +92,7 @@ class Dashboard extends Component {
 		}
 		if (params.has('url')) {
 			const url = params.get('url');
-			localStorage.setItem('url', url);
+			localStorage.setItem('url', getOriginURL(url));
 		}
 		if (params.has('header')) {
 			const header = params.get('header');
@@ -131,12 +138,17 @@ class Dashboard extends Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { error, status, user, updateAppRoutes, updateClusterRoutes } = this.props;
-		const allowedActions = get(user, 'data.allowedActions', []);
-		const isAdmin = get(user, 'data.isAdmin', false);
-		if (!isAdmin && allowedActions.length) {
-			updateAppRoutes(getAuthorizedViews(APP_ROUTES, allowedActions));
-			updateClusterRoutes(getAuthorizedViews(CLUSTER_ROUTES, allowedActions));
+		const { error, status, user, updateAppRoutes, updateClusterRoutes, backend, backendImage } =
+			this.props;
+
+		const { redirectLocation } = this.state;
+		const allowedActions = get(user, 'data.allowedActions', []).filter((action) =>
+			ALLOWED_ACTIONS_BY_BACKEND[backend].includes(action),
+		);
+
+		if (allowedActions.length) {
+			updateAppRoutes(getAuthorizedViews(APP_ROUTES, allowedActions, backend));
+			updateClusterRoutes(getAuthorizedViews(CLUSTER_ROUTES, allowedActions, backend));
 		}
 		if (status === 402 && error && error !== prevProps.error) {
 			// eslint-disable-next-line
@@ -162,6 +174,10 @@ class Dashboard extends Component {
 						},
 					}),
 			);
+		}
+
+		if (backendImage === 'sls' && !backend && redirectLocation !== '/login') {
+			window.location.href = '/cluster/configure-search-engine-backend';
 		}
 	}
 
@@ -192,7 +208,7 @@ class Dashboard extends Component {
 		if (error) {
 			return (
 				<section
-					css={{
+					style={{
 						justifyContent: 'center',
 						alignItems: 'center',
 						display: 'flex',
@@ -205,7 +221,7 @@ class Dashboard extends Component {
 					<h2 style={{ marginTop: 20 }}>Something went wrong!</h2>
 					<p>Our team has been notified about this.</p>
 					<section
-						css={{
+						style={{
 							display: 'flex',
 						}}
 					>
@@ -238,6 +254,7 @@ class Dashboard extends Component {
 					<Route exact path="/install" component={InstallPage} />
 					<Route exact path="/login" component={LoginPage} />
 					<Route exact path="/signup" component={SignupPage} />
+					<Route exact path="/logout" component={LogoutRoute} />
 					<PrivateRoute
 						user={user}
 						component={(props) => (
@@ -256,7 +273,9 @@ class Dashboard extends Component {
 
 Dashboard.defaultProps = {
 	error: undefined,
+	backendImage: '',
 	status: undefined,
+	backend: BACKENDS.ELASTICSEARCH.name,
 };
 
 Dashboard.propTypes = {
@@ -267,12 +286,16 @@ Dashboard.propTypes = {
 	updateAppRoutes: PropTypes.func.isRequired,
 	updateClusterRoutes: PropTypes.func.isRequired,
 	getAuth0Preferences: PropTypes.func.isRequired,
+	backendImage: PropTypes.string,
+	backend: PropTypes.string,
 };
 
-const mapStateToProps = ({ user }) => ({
+const mapStateToProps = ({ user, $getAppPlan }) => ({
 	user,
 	error: get(user, 'error'),
 	status: get(user, 'error.actual.status'),
+	backendImage: get($getAppPlan, 'results.image_type'),
+	backend: get($getAppPlan, 'results.backend'),
 });
 
 const mapDispatchToProps = (dispatch) => ({

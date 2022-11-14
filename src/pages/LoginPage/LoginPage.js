@@ -16,6 +16,7 @@ import {
 	removeTrailingSlashes,
 } from '../../utils';
 import { getURL } from '../../constants/config';
+import { isFusion } from '../../batteries/utils';
 
 class LoginPage extends Component {
 	constructor(props) {
@@ -94,7 +95,7 @@ class LoginPage extends Component {
 		return (
 			<LoginContainer>
 				<section className={container} style={{ alignItems: 'center' }}>
-					<Logo width={250} />
+					{isFusion() ? <Logo type="lucid_works" width={250} /> : <Logo width={250} />}
 					<Card className={card} bordered={false}>
 						<h2>Sign in to get started</h2>
 						<Input
