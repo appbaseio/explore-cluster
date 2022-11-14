@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { DeleteOutlined } from '@ant-design/icons';
-import { Button, Card, Icon, Tooltip, Typography } from 'antd';
+import { DeleteOutlined, DragOutlined } from '@ant-design/icons';
+import { Button, Card, Tooltip, Typography } from 'antd';
 import { css } from 'emotion';
 import get from 'lodash/get';
 import DNDWrapper from '../../../../components/DNDWrapper';
@@ -244,9 +244,8 @@ class Actions extends React.Component {
 								<div className="action-head">
 									<div>
 										<Tooltip title="Drag to reorder action">
-											<Icon
+											<DragOutlined
 												{...dragProvided.dragHandleProps}
-												type="drag"
 												className="drag-icon"
 											/>
 										</Tooltip>
