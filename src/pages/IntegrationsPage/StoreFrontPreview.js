@@ -1,6 +1,6 @@
 import React from 'react';
 import { func, bool, number, oneOfType, string } from 'prop-types';
-import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { MobileOutlined, DesktopOutlined } from '@ant-design/icons';
 import { Button, notification } from 'antd';
 import get from 'lodash/get';
 import Loader from '../../components/Loader';
@@ -180,15 +180,25 @@ class StoreFrontPreview extends React.Component {
 						}}
 						onClick={this.handleViewChange}
 					>
-						<LegacyIcon
-							style={{
-								fontSize: 20,
-								position: 'relative',
-								top: '1px',
-								margin: '0 7px',
-							}}
-							type={isMobile ? 'desktop' : 'mobile'}
-						/>
+						{isMobile ? (
+							<DesktopOutlined
+								style={{
+									fontSize: 20,
+									position: 'relative',
+									top: '1px',
+									margin: '0 7px',
+								}}
+							/>
+						) : (
+							<MobileOutlined
+								style={{
+									fontSize: 20,
+									position: 'relative',
+									top: '1px',
+									margin: '0 7px',
+								}}
+							/>
+						)}
 					</Button>
 				)}
 				{displayProductPicker && !currentProduct && (
