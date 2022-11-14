@@ -319,7 +319,6 @@ const mapStateToProps = (state) => {
 LanguageSettings.propTypes = {
 	appName: PropTypes.string.isRequired,
 	getSettingsAction: PropTypes.func.isRequired,
-	form: PropTypes.object.isRequired,
 	credentials: PropTypes.string.isRequired,
 	getDefaultSettingsAction: PropTypes.func.isRequired,
 	settings: PropTypes.object,
@@ -358,6 +357,4 @@ const mapDispatchToProps = (dispatch) => ({
 	updateLocalRelevancy: (name, data) => dispatch(setLocalRelevancyState(name, data)),
 });
 
-const LanguageForm = Form.create({ name: 'language' })(LanguageSettings);
-
-export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(LanguageForm));
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(LanguageSettings));

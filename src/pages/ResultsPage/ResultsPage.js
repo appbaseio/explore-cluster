@@ -567,7 +567,6 @@ class ResultsPage extends React.Component {
 }
 
 ResultsPage.propTypes = {
-	form: PropTypes.object.isRequired,
 	isUpdating: PropTypes.bool,
 	resetState: PropTypes.object,
 	settings: PropTypes.object,
@@ -631,6 +630,4 @@ const mapDispatchToProps = (dispatch) => ({
 	updateLocalRelevancy: (name, data) => dispatch(setLocalRelevancyState(name, data)),
 });
 
-const ResultsForm = Form.create({ name: 'results' })(ResultsPage);
-
-export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(ResultsForm));
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(ResultsPage));
