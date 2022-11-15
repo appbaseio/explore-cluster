@@ -208,8 +208,7 @@ class ImporterPage extends React.Component {
 								initUser={{
 									apps: { ...apps },
 									'deployment-timeframe': 'This is a hobby project',
-									email:
-										user && user.data ? user.data.email : 'user@arc.appbase.io',
+									email: user?.data?.email ?? 'info@appbase.io',
 									name: localStorage.getItem('username'),
 									picture:
 										'https://lh3.googleusercontent.com/a/ALm5wu1DDcWwt2VDhwJdTsPgNPGx6IHjeKMfMX6R7MPa=s96-c',
