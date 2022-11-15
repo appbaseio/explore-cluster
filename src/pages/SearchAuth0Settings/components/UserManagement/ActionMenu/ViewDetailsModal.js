@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
-import { Icon as LegacyIcon } from '@ant-design/compatible';
-
 import { Alert, Button, Card, Modal, Tooltip } from 'antd';
+import { CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import React from 'react';
 import { bool, func, object } from 'prop-types';
 import moment from 'moment';
@@ -115,12 +114,11 @@ const ViewDetailsModal = ({
 								<Tooltip
 									title={email_verified ? 'Verified' : 'Verification pending'}
 								>
-									<LegacyIcon
-										type={email_verified ? 'check-circle' : 'clock-circle'}
-										style={{
-											color: email_verified ? 'green' : 'red',
-										}}
-									/>
+									{email_verified ? (
+										<CheckCircleOutlined style={{ color: 'green' }} />
+									) : (
+										<ClockCircleOutlined style={{ color: 'red' }} />
+									)}
 								</Tooltip>{' '}
 							</span>
 						}

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Icon as LegacyIcon } from '@ant-design/compatible';
-import { DownloadOutlined, EditOutlined } from '@ant-design/icons';
+import { DownloadOutlined, EditOutlined, DeleteOutlined, LoadingOutlined } from '@ant-design/icons';
 import { Button, Card, Col, message, notification, Row, Tooltip } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
@@ -223,9 +222,11 @@ const SearchBoxCard = (props) => {
 										}}
 										onClick={handleModal}
 									>
-										<LegacyIcon
-											type={searchBoxItem.isDeleting ? 'loading' : 'delete'}
-										/>{' '}
+										{searchBoxItem.isDeleting ? (
+											<LoadingOutlined />
+										) : (
+											<DeleteOutlined />
+										)}{' '}
 										Delete
 									</div>
 								)}

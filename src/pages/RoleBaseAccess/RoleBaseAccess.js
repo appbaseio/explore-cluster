@@ -3,8 +3,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import get from 'lodash/get';
 import { QuestionCircleOutlined } from '@ant-design/icons';
-import { Form, Icon as LegacyIcon } from '@ant-design/compatible';
-import '@ant-design/compatible/assets/index.css';
 import { Button, Card, Input, notification, Popover, Skeleton, Table } from 'antd';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';

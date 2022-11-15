@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Icon as LegacyIcon } from '@ant-design/compatible';
-import { DownloadOutlined, EditOutlined } from '@ant-design/icons';
+import { DownloadOutlined, EditOutlined, LoadingOutlined, DeleteOutlined } from '@ant-design/icons';
 import {
 	Alert,
 	Button,
@@ -296,7 +295,7 @@ const PipelineCard = (props) => {
 									}}
 									onClick={handleModal}
 								>
-									<LegacyIcon type={pipeline.isDeleting ? 'loading' : 'delete'} />{' '}
+									{pipeline.isDeleting ? <LoadingOutlined /> : <DeleteOutlined />}{' '}
 									Delete
 								</div>
 							)}
