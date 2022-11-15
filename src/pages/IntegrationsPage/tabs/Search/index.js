@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from 'react';
 import { FieldGroup } from 'react-reactive-form';
 import { func, string } from 'prop-types';
-import { Tabs } from 'antd';
+import { Form, Tabs } from 'antd';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
@@ -45,44 +45,46 @@ const SearchSettings = ({ getPreferencesPayload, getPreferences, setIsEditorLoad
 
 	return (
 		<div>
-			<FieldGroup
-				control={form}
-				strict={false}
-				render={() => (
-					<div>
-						<h2
-							style={{
-								fontSize: '14px',
-								fontWeight: 500,
-								marginBottom: 0,
-								lineHeight: '39.9999px',
-							}}
-						>
-							Current Page Route
-						</h2>
-						<PageRoutes
-							getPreferencesPayload={getPreferencesPayload}
-							preferences={getPreferences()}
-							form={form}
-							setIsEditorLoading={setIsEditorLoading}
-						/>
-					</div>
-				)}
-			/>{' '}
-			<FieldGroup parent={form} name="indexSettings" strict={false}>
-				{(formControl) => {
-					const endpointControl = formControl.get('endpoint');
+			<Form>
+				<FieldGroup
+					control={form}
+					strict={false}
+					render={() => (
+						<div>
+							<h2
+								style={{
+									fontSize: '14px',
+									fontWeight: 500,
+									marginBottom: 0,
+									lineHeight: '39.9999px',
+								}}
+							>
+								Current Page Route
+							</h2>
+							<PageRoutes
+								getPreferencesPayload={getPreferencesPayload}
+								preferences={getPreferences()}
+								form={form}
+								setIsEditorLoading={setIsEditorLoading}
+							/>
+						</div>
+					)}
+				/>{' '}
+				<FieldGroup parent={form} name="indexSettings" strict={false}>
+					{(formControl) => {
+						const endpointControl = formControl.get('endpoint');
 
-					return (
-						<EndpointDropdown
-							formValue={endpointControl.value}
-							form={form}
-							endpointControl={endpointControl}
-							isPageLevel
-						/>
-					);
-				}}
-			</FieldGroup>
+						return (
+							<EndpointDropdown
+								formValue={endpointControl.value}
+								form={form}
+								endpointControl={endpointControl}
+								isPageLevel
+							/>
+						);
+					}}
+				</FieldGroup>
+			</Form>
 			<Tabs defaultActiveKey="1" tabPosition="left" className={verticalTab}>
 				<TabPane tab="Search" key="1">
 					<FieldGroup
