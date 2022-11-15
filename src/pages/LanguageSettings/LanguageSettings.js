@@ -44,7 +44,6 @@ const bannerDetails = {
 	description: 'Configure language settings to understand search intent.',
 	buttonText: 'Read Docs',
 	videoLink: 'https://youtu.be/wx8ac4IkTas',
-	icon: 'info-circle',
 	href: 'https://docs.reactivesearch.io/docs/search/relevancy/#language-settings',
 };
 

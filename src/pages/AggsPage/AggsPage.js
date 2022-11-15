@@ -29,7 +29,6 @@ const bannerDetails = {
 		'Aggregation Settings allows you to set the fields that should be used for aggregations (aka search facets).',
 	buttonText: 'Read Docs',
 	videoLink: 'https://youtu.be/bNhju-9mDR0',
-	icon: 'info-circle',
 	href: 'https://docs.reactivesearch.io/docs/search/relevancy/#aggregation-settings',
 };
 

@@ -39,7 +39,6 @@ const bannerDetails = {
 	description:
 		'Results settings allow you to control the page size, fields returned, and highlighting settings.',
 	videoLink: 'https://youtu.be/EtqBS6egIfU',
-	icon: 'info-circle',
 	href: 'https://docs.reactivesearch.io/docs/search/relevancy/#result-settings',
 };
 

@@ -170,7 +170,6 @@ const ConfigureBackend = (props) => {
 		title: 'Search Backend Configuration',
 		description: `This will setup a connector pipeline so you can make search API requests and build search UIs with the configured search engine.`,
 		buttonText: 'Read Docs',
-		icon: 'info-circle',
 		href: 'https://docs.appbase.io/docs/pipelines/concepts/',
 	};
 	const [disabledSave, setDisabledSave] = useState(true);

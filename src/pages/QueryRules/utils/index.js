@@ -137,7 +137,6 @@ const bannerDetails = {
 	description: 'Create "If this, then that" style query rules',
 	videoLink: 'https://youtu.be/2g9sZgLPNxk',
 	buttonText: 'Read Docs',
-	icon: 'info-circle',
 	href: 'https://docs.reactivesearch.io/docs/search/rules/',
 };
 

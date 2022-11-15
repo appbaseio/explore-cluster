@@ -7,6 +7,7 @@ import get from 'lodash/get';
 import orderBy from 'lodash/orderBy';
 import { FormBuilder, Validators } from 'react-reactive-form';
 import Text from 'antd/lib/typography/Text';
+import { PlusOutlined } from '@ant-design/icons';
 import { displayErrors } from '../../utils/helper';
 import Loader from '../../batteries/components/shared/Loader/Spinner';
 import Container from '../Container';
@@ -109,7 +110,7 @@ class StoredQueries extends React.Component {
 				description:
 					'GUI to manage your stored queries. Use them as direct REST APIs or with ReactiveSearch API.',
 				buttonText: 'Create Stored Query',
-				icon: 'plus',
+				icon: <PlusOutlined />,
 				onClick: () => this.toggleCreateMode(),
 			},
 			create: {
