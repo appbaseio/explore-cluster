@@ -2,13 +2,17 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { InfoCircleOutlined } from '@ant-design/icons';
-import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { CheckCircleOutlined, CloseCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { Modal, Input, InputNumber, Select, Alert, Button, Tooltip } from 'antd';
 import Ace from '../../../batteries/components/SearchSandbox/containers/AceEditor';
 import { getURL } from '../../../constants/config';
 import { globalVarsMessages } from '../utils/messages';
 import { modalContainer } from './styles';
+
+const iconMap = {
+	'close-circle': <CloseCircleOutlined />,
+	'check-circle': <CheckCircleOutlined />,
+};
 
 const CreateModal = ({
 	mode,
@@ -559,7 +563,7 @@ const CreateModal = ({
 								type="primary"
 								onClick={() => validateForm()}
 							>
-								Validate {iconType ? <LegacyIcon type={iconType} /> : null}
+								Validate {iconType ? iconMap[iconType] : null}
 							</Button>
 						</div>
 					</div>
