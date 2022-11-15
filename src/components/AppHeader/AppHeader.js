@@ -1,9 +1,9 @@
 import React from 'react';
-import { Icon as LegacyIcon } from '@ant-design/compatible';
 import { Layout, Menu, Tooltip, Button, Row, Breadcrumb } from 'antd';
+import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 import { string, object, bool, number, func } from 'prop-types';
-import { css } from 'react-emotion';
+import styled, { css } from 'react-emotion';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import MenuSlider from '../FullHeader/MenuSlider';
@@ -36,6 +36,17 @@ const trialBtn = css`
 		display: none;
 	`)};
 `;
+const StyledMenu = styled(Menu)`
+	min-width: 400px;
+`;
+const StyledMenuItem = styled(Menu.Item)`
+	display: flex;
+	align-items: center;
+	& .ant-breadcrumb ol {
+		display: flex;
+		align-items: center;
+	}
+`;
 
 function showProfile() {
 	const storedValue = sessionStorage.getItem('showProfile');
@@ -45,6 +56,14 @@ function showProfile() {
 	}
 	return true;
 }
+
+const MenuIcon = ({ collapsed, ...rest }) => {
+	return collapsed ? <MenuUnfoldOutlined {...rest} /> : <MenuFoldOutlined {...rest} />;
+};
+
+MenuIcon.propTypes = {
+	collapsed: bool.isRequired,
+};
 
 const AppHeader = ({
 	currentApp,
@@ -70,24 +89,20 @@ const AppHeader = ({
 				}}
 			>
 				{minimal ? (
-					<LegacyIcon
+					<MenuIcon
 						style={{ position: 'absolute', left: 20 }}
+						collapsed={collapsed}
 						className="trigger"
-						type={collapsed ? 'menu-unfold' : 'menu-fold'}
 						onClick={onToggle}
 					/>
 				) : (
-					<Menu mode="horizontal">
+					<StyledMenu mode="horizontal">
 						<Menu.Item key="back" className={noBorder} style={{ padding: 0 }}>
-							<LegacyIcon
-								className="trigger"
-								type={collapsed ? 'menu-unfold' : 'menu-fold'}
-								onClick={onToggle}
-							/>
+							<MenuIcon className="trigger" onClick={onToggle} />
 						</Menu.Item>
-						<Menu.Item
+						<StyledMenuItem
 							className={noBorder}
-							style={{ marginBottom: 12 }}
+							style={{ display: 'flex', alignItems: 'center' }}
 							key="breadcrumb"
 						>
 							<Breadcrumb>
@@ -104,8 +119,8 @@ const AppHeader = ({
 									</Breadcrumb.Item>
 								)}
 							</Breadcrumb>
-						</Menu.Item>
-					</Menu>
+						</StyledMenuItem>
+					</StyledMenu>
 				)}
 
 				{isUsingTrial && showProfile() && (

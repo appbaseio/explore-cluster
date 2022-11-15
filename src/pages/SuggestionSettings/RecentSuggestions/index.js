@@ -34,7 +34,6 @@ const bannerDetails = {
 	description:
 		'GUI to manage preferences for recent suggestions. Recent suggestions are stored in the .suggestions index by reactivesearch.io based on the analytics data of what end users are searching for.',
 	buttonText: 'Read Docs',
-	icon: 'info-circle',
 	href: 'https://docs.reactivesearch.io/docs/analytics/recent-suggestions/',
 };
 

@@ -16,6 +16,7 @@ const popOverClass = css`
 	.ant-popover-inner-content {
 		padding: 12px;
 	}
+	z-index: 1040;
 `;
 
 function IndexSwitcher({

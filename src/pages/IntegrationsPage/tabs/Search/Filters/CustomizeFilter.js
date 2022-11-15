@@ -1,7 +1,6 @@
 import React from 'react';
-import { Form } from '@ant-design/compatible';
-import '@ant-design/compatible/assets/index.css';
-import { Button, Modal, Switch, Select, List, Radio, Typography } from 'antd';
+import { Button, Modal, Switch, Select, List, Radio, Typography, Form } from 'antd';
+import { EditOutlined } from '@ant-design/icons';
 import { string, object, func, bool } from 'prop-types';
 import get from 'lodash/get';
 import { FieldGroup, FieldControl, FormBuilder } from 'react-reactive-form';
@@ -760,7 +759,7 @@ class CustomizeFilter extends React.Component {
 												<>
 													<CodeEditorCard>
 														<CardButton
-															icon="edit"
+															icon={<EditOutlined />}
 															onClick={() =>
 																this.setState({
 																	showDefaultQueryEditor: true,
@@ -779,7 +778,7 @@ class CustomizeFilter extends React.Component {
 													</CodeEditorCard>
 													<CodeEditorCard>
 														<CardButton
-															icon="edit"
+															icon={<EditOutlined />}
 															onClick={() =>
 																this.setState({
 																	showCustomQueryEditor: true,

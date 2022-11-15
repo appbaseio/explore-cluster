@@ -41,7 +41,6 @@ const bannerDetails = {
 	title: 'Pipeline Logs',
 	description: 'Pipeline logs to glean insights.',
 	buttonText: 'Read Docs',
-	icon: 'info-circle',
 	href: 'https://docs.reactivesearch.io/docs/search/pipelines/',
 };
 

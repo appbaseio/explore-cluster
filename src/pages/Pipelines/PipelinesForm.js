@@ -10,8 +10,8 @@ import {
 	ClockCircleOutlined,
 	LinkOutlined,
 	PlusOutlined,
+	EditOutlined,
 } from '@ant-design/icons';
-import { Icon as LegacyIcon } from '@ant-design/compatible';
 import {
 	Affix,
 	Button,
@@ -832,10 +832,14 @@ const PipelinesForm = (props) => {
 		return `${labelPrefix} Pipeline`;
 	};
 
-	const renderButtonIcon = () => {
+	const ButtonIcon = (buttonIconProps) => {
 		if (isCreating || isUpdating || isValidating) return null;
 
-		const icon = !isEditPage ? 'plus' : 'edit';
+		const icon = !isEditPage ? (
+			<PlusOutlined {...buttonIconProps} />
+		) : (
+			<EditOutlined {...buttonIconProps} />
+		);
 
 		return icon;
 	};
@@ -1078,7 +1082,7 @@ const PipelinesForm = (props) => {
 								onClick={() => handleSave()}
 								loading={isCreating || isUpdating || isValidating}
 								disabled={!!missingScriptFiles?.length || isVersionCreating}
-								icon={<LegacyIcon type={renderButtonIcon()} />}
+								icon={<ButtonIcon />}
 							>
 								{renderButtonLabel()}
 							</Button>
@@ -1092,7 +1096,7 @@ const PipelinesForm = (props) => {
 										className="create-save-btn"
 										onClick={() => setShowVDescModal(true)}
 										loading={isVersionCreating}
-										icon={<LegacyIcon type={renderButtonIcon()} />}
+										icon={<ButtonIcon />}
 										disabled={
 											!!missingScriptFiles?.length ||
 											isCreating ||

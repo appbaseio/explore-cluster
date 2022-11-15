@@ -23,7 +23,6 @@ const bannerDetails = {
 	title: 'Build ⚡️ fast search for your end users with reactivesearch.io cache',
 	description: "Tailor reactivesearch.io's caching preferences based on your search use-case",
 	buttonText: 'Read Docs',
-	icon: 'info-circle',
 	href: 'https://docs.reactivesearch.io/docs/speed/cache-management/',
 };
 

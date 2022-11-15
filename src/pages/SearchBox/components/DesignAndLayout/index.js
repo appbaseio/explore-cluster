@@ -155,7 +155,7 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 					<DesignPanel />
 					<Alert
 						type="info"
-						icon="info"
+						showIcon
 						style={{
 							minHeight: '38px',
 							maxHeight: '60px',

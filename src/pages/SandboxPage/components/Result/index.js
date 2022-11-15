@@ -88,7 +88,7 @@ class Result extends React.Component {
 							return (
 								<Alert
 									type="info"
-									icon="info"
+									showIcon
 									style={{ margin: '0px 0 16px' }}
 									message={
 										<React.Fragment>
@@ -122,7 +122,7 @@ class Result extends React.Component {
 							return (
 								<Alert
 									type="info"
-									icon="info"
+									showIcon
 									style={{ margin: '0px 0 16px' }}
 									message={
 										<React.Fragment>

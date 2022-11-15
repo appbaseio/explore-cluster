@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { InfoCircleOutlined } from '@ant-design/icons';
-import { Form } from '@ant-design/compatible';
-import '@ant-design/compatible/assets/index.css';
-import { Checkbox, Col, Input, message, Modal, notification, Row, Tooltip, List } from 'antd';
+import { Checkbox, Col, Input, message, Modal, notification, Row, Tooltip, List, Form } from 'antd';
 import { css } from 'emotion';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';

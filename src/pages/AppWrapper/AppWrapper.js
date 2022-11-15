@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { ClusterOutlined, SearchOutlined } from '@ant-design/icons';
-import { Icon as LegacyIcon } from '@ant-design/compatible';
 import { Input, Layout, Menu, Tag } from 'antd';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
@@ -29,6 +28,7 @@ import { allowedTiers } from '../../utils/prop-types';
 import searchInputStyle from '../DashboardWrapper/styles';
 import WithRedirectTooltip from '../../components/WithRedirectTooltip';
 import ReIndexTracker from '../../components/ReIndexTracker';
+import { iconMap } from '../../components/iconMap';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
@@ -436,7 +436,7 @@ class AppWrapper extends Component {
 								if (routes[route].menu) {
 									const Title = (
 										<span>
-											<LegacyIcon type={routes[route].icon} />
+											{iconMap[routes[route].icon]}
 											<span>{route}</span>
 										</span>
 									);
@@ -493,7 +493,7 @@ class AppWrapper extends Component {
 									return (
 										<Menu.Item key={route}>
 											<Link replace to={routes[route].link}>
-												<LegacyIcon type={routes[route].icon} />
+												{iconMap[routes[route].icon]}
 												<span>
 													{route}
 													{routes[route].tag ? (
@@ -520,7 +520,7 @@ class AppWrapper extends Component {
 								return (
 									<Menu.Item key={route}>
 										<Link replace to={`/app/${appName}/${routes[route].link}`}>
-											<LegacyIcon type={routes[route].icon} />
+											{iconMap[routes[route].icon]}
 											<span>{route}</span>
 										</Link>
 									</Menu.Item>

@@ -1,8 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { LoadingOutlined } from '@ant-design/icons';
-import { Form } from '@ant-design/compatible';
-import '@ant-design/compatible/assets/index.css';
 import {
 	Col,
 	Row,
@@ -15,6 +13,7 @@ import {
 	Button,
 	notification,
 	Spin,
+	Form,
 } from 'antd';
 import { css } from 'emotion';
 import get from 'lodash/get';
@@ -171,7 +170,6 @@ const ConfigureBackend = (props) => {
 		title: 'Search Backend Configuration',
 		description: `This will setup a connector pipeline so you can make search API requests and build search UIs with the configured search engine.`,
 		buttonText: 'Read Docs',
-		icon: 'info-circle',
 		href: 'https://docs.appbase.io/docs/pipelines/concepts/',
 	};
 	const [disabledSave, setDisabledSave] = useState(true);

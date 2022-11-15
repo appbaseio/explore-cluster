@@ -11,8 +11,10 @@ import {
 	InfoCircleOutlined,
 	LinkOutlined,
 	PlusOutlined,
+	LoadingOutlined,
+	DeleteOutlined,
+	SaveOutlined,
 } from '@ant-design/icons';
-import { Icon as LegacyIcon } from '@ant-design/compatible';
 import {
 	Affix,
 	Alert,
@@ -1444,7 +1446,7 @@ class QueryRulesForm extends React.Component {
 											ghost
 											type="danger"
 										>
-											<LegacyIcon type={isDeleting ? 'loading' : 'delete'} />{' '}
+											{isDeleting ? <LoadingOutlined /> : <DeleteOutlined />}{' '}
 											Delete
 										</Button>
 									)}
@@ -1490,7 +1492,7 @@ class QueryRulesForm extends React.Component {
 								type="primary"
 								data-cy="save-query-rule"
 							>
-								<LegacyIcon type={isCreating || isUpdating ? 'loading' : 'save'} />
+								{isCreating || isUpdating ? <LoadingOutlined /> : <SaveOutlined />}
 								Save
 							</Button>
 						</div>

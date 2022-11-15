@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Icon as LegacyIcon } from '@ant-design/compatible';
-import { CalendarTwoTone } from '@ant-design/icons';
+import { CalendarTwoTone, LoadingOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { Drawer, Divider, Row, Tooltip } from 'antd';
 // eslint-disable-next-line import/no-cycle
 import List from './List';
@@ -33,10 +32,7 @@ const PastVersionsDrawer = ({
 
 		return (
 			<div className={pastVersionsStyles}>
-				<LegacyIcon
-					type={isLoading ? 'loading' : 'clock-circle'}
-					className="active-version-icon"
-				/>
+				{isLoading ? <LoadingOutlined /> : <ClockCircleOutlined />}
 				<div className="title-container">
 					<Tooltip title={currentVersion.commit}>
 						<p

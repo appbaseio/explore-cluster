@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Icon as LegacyIcon } from '@ant-design/compatible';
 import { Button, message, notification, Typography } from 'antd';
+import { LoadingOutlined, CopyOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import yamlToJson from 'js-yaml';
@@ -63,9 +63,8 @@ const ClonePipeline = (props) => {
 	};
 	if (isMobile) {
 		return (
-			// eslint-disable-next-line
 			<div onClick={handleClone}>
-				<LegacyIcon type={pipeline.isCloning ? 'loading' : 'copy'} />{' '}
+				{pipeline.isCloning ? <LoadingOutlined /> : <CopyOutlined />}
 				<Typography.Text>Clone</Typography.Text>
 			</div>
 		);
@@ -79,7 +78,7 @@ const ClonePipeline = (props) => {
 			size={buttonSize}
 			disabled={pipeline.isCloning}
 		>
-			<LegacyIcon type={pipeline.isCloning ? 'loading' : 'copy'} /> Clone
+			{pipeline.isCloning ? <LoadingOutlined /> : <CopyOutlined />} Clone
 		</Button>
 	);
 };

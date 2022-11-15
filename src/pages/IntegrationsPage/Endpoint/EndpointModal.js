@@ -1,7 +1,5 @@
 import React, { useRef } from 'react';
-import { Form } from '@ant-design/compatible';
-import '@ant-design/compatible/assets/index.css';
-import { Modal, Select } from 'antd';
+import { Modal, Select, Form } from 'antd';
 import { css } from 'react-emotion';
 import { array, bool, func, object } from 'prop-types';
 import { FieldControl, FieldGroup, FormBuilder, Validators } from 'react-reactive-form';

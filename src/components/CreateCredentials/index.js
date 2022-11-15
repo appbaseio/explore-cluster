@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { css } from 'emotion';
-import { CaretRightOutlined, LockOutlined } from '@ant-design/icons';
-import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { CaretRightOutlined, LockOutlined, SettingOutlined } from '@ant-design/icons';
 import { Modal, Input, Radio, Tooltip, Button, Select, Switch, Collapse } from 'antd';
 import {
 	FieldArray,
@@ -641,10 +640,7 @@ class CreateCredentials extends React.Component {
 										>
 											<Collapse.Panel
 												header={
-													<Button
-														type="link"
-														icon={<LegacyIcon type="settings" />}
-													>
+													<Button type="link" icon={<SettingOutlined />}>
 														Advanced Settings
 													</Button>
 												}

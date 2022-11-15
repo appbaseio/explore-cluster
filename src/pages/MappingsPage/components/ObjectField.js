@@ -1,6 +1,5 @@
 import React from 'react';
-import { Icon as LegacyIcon } from '@ant-design/compatible';
-import { DeleteOutlined } from '@ant-design/icons';
+import { DeleteOutlined, UpOutlined, DownOutlined } from '@ant-design/icons';
 import { Row, Button, Col } from 'antd';
 import PropTypes from 'prop-types';
 import { row, deleteRow } from './styles';
@@ -31,11 +30,17 @@ class ObjectField extends React.Component {
 				<Col xs={24}>
 					<Row className={deleteRow} type="flex" justify="start">
 						<Col>
-							<LegacyIcon
-								style={{ marginRight: 15, marginTop: 8 }}
-								type={isCollapsed ? 'up' : 'down'}
-								onClick={this.toggleCollapse}
-							/>
+							{isCollapsed ? (
+								<UpOutlined
+									style={{ marginRight: 15, marginTop: 8 }}
+									onClick={this.toggleCollapse}
+								/>
+							) : (
+								<DownOutlined
+									style={{ marginRight: 15, marginTop: 8 }}
+									onClick={this.toggleCollapse}
+								/>
+							)}
 						</Col>
 						<Col>
 							<p>

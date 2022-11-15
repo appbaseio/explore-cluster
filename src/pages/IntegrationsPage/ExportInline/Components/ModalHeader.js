@@ -2,8 +2,12 @@ import React, { useState, useEffect } from 'react';
 import PropTypes, { object } from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import get from 'lodash/get';
-import { ClockCircleOutlined, CloseOutlined } from '@ant-design/icons';
-import { Icon as LegacyIcon } from '@ant-design/compatible';
+import {
+	ClockCircleOutlined,
+	CloseOutlined,
+	MenuUnfoldOutlined,
+	MenuFoldOutlined,
+} from '@ant-design/icons';
 import { Button, Tooltip, Modal, message } from 'antd';
 import { connect } from 'react-redux';
 import CommitModal from './CommitModal';
@@ -334,11 +338,17 @@ const ModalHeader = ({
 					</div>
 				) : null}
 				<div className="header-icons">
-					<LegacyIcon
-						style={{ cursor: 'pointer' }}
-						type={collapsed ? 'menu-unfold' : 'menu-fold'}
-						onClick={() => setIsCollapsed(!collapsed)}
-					/>
+					{collapsed ? (
+						<MenuUnfoldOutlined
+							style={{ cursor: 'pointer' }}
+							onClick={() => setIsCollapsed(!collapsed)}
+						/>
+					) : (
+						<MenuFoldOutlined
+							style={{ cursor: 'pointer' }}
+							onClick={() => setIsCollapsed(!collapsed)}
+						/>
+					)}
 					<UploadModal
 						errMsg={errMsg}
 						setErrMsg={setErrMsg}

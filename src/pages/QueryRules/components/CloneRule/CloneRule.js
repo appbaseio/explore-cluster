@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Icon as LegacyIcon } from '@ant-design/compatible';
 import { Button, message, notification, Typography } from 'antd';
+import { LoadingOutlined, CopyOutlined } from '@ant-design/icons';
 import { connect } from 'react-redux';
 import omit from 'lodash/omit';
 import get from 'lodash/get';
@@ -60,7 +60,7 @@ class CloneRule extends React.Component {
 			return (
 				// eslint-disable-next-line
 				<div onClick={this.handleClone}>
-					<LegacyIcon type={rule.isCloning ? 'loading' : 'copy'} />{' '}
+					{rule.isCloning ? <LoadingOutlined /> : <CopyOutlined />}{' '}
 					<Typography.Text>Clone</Typography.Text>
 				</div>
 			);
@@ -74,7 +74,8 @@ class CloneRule extends React.Component {
 				size={buttonSize}
 				disabled={rule.isCloning}
 			>
-				<LegacyIcon type={rule.isCloning ? 'loading' : 'copy'} /> Clone
+				{rule.isCloning ? <LoadingOutlined /> : <CopyOutlined />}
+				Clone
 			</Button>
 		);
 	}

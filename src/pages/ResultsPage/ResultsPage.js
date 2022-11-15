@@ -3,9 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { PlusOutlined } from '@ant-design/icons';
-import { Form } from '@ant-design/compatible';
-import '@ant-design/compatible/assets/index.css';
-import { Card, Input, InputNumber, Select, Switch, Skeleton, Button } from 'antd';
+import { Card, Input, InputNumber, Select, Switch, Skeleton, Button, Form } from 'antd';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
@@ -41,7 +39,6 @@ const bannerDetails = {
 	description:
 		'Results settings allow you to control the page size, fields returned, and highlighting settings.',
 	videoLink: 'https://youtu.be/EtqBS6egIfU',
-	icon: 'info-circle',
 	href: 'https://docs.reactivesearch.io/docs/search/relevancy/#result-settings',
 };
 
@@ -567,7 +564,6 @@ class ResultsPage extends React.Component {
 }
 
 ResultsPage.propTypes = {
-	form: PropTypes.object.isRequired,
 	isUpdating: PropTypes.bool,
 	resetState: PropTypes.object,
 	settings: PropTypes.object,
@@ -631,6 +627,4 @@ const mapDispatchToProps = (dispatch) => ({
 	updateLocalRelevancy: (name, data) => dispatch(setLocalRelevancyState(name, data)),
 });
 
-const ResultsForm = Form.create({ name: 'results' })(ResultsPage);
-
-export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(ResultsForm));
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(ResultsPage));

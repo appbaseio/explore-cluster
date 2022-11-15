@@ -1,8 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Form } from '@ant-design/compatible';
-import '@ant-design/compatible/assets/index.css';
-import { Select, Tooltip, AutoComplete } from 'antd';
+import { Select, Tooltip, AutoComplete, Form } from 'antd';
 import { css } from 'emotion';
 import { string, func, bool, object, element, array } from 'prop-types';
 import get from 'lodash/get';

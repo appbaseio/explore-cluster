@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FrownOutlined, InfoCircleOutlined } from '@ant-design/icons';
-import { Icon as LegacyIcon } from '@ant-design/compatible';
+import { FrownOutlined, InfoCircleOutlined, HomeOutlined, LeftOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
@@ -65,7 +64,7 @@ class ErrorPage extends React.Component {
 					}}
 				>
 					<Button href={user ? '/' : '/login'} size="large" type="primary">
-						<LegacyIcon type={user ? 'home' : 'left'} />
+						{user ? <HomeOutlined /> : <LeftOutlined />}
 						Back to {user ? 'Home' : 'Login'}
 					</Button>
 					<Button

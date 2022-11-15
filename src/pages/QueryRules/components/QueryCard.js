@@ -1,7 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { CheckCircleTwoTone, DragOutlined, EditOutlined, EditTwoTone } from '@ant-design/icons';
-import { Icon as LegacyIcon } from '@ant-design/compatible';
+import {
+	CheckCircleTwoTone,
+	DragOutlined,
+	EditOutlined,
+	EditTwoTone,
+	LoadingOutlined,
+	DeleteOutlined,
+} from '@ant-design/icons';
 import {
 	Alert,
 	Button,
@@ -300,7 +306,7 @@ class QueryCard extends React.Component {
 										}}
 										onClick={handleModal}
 									>
-										<LegacyIcon type={rule.isDeleting ? 'loading' : 'delete'} />{' '}
+										{rule.isDeleting ? <LoadingOutlined /> : <DeleteOutlined />}{' '}
 										Delete
 									</div>
 								)}

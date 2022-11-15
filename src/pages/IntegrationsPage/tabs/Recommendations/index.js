@@ -8,9 +8,7 @@ import {
 	PlusOutlined,
 	QuestionCircleOutlined,
 } from '@ant-design/icons';
-import { Form } from '@ant-design/compatible';
-import '@ant-design/compatible/assets/index.css';
-import { Table, Button, Select, Tooltip, Popconfirm } from 'antd';
+import { Table, Button, Select, Tooltip, Popconfirm, Form } from 'antd';
 import { css } from 'emotion';
 import get from 'lodash/get';
 import TextInput from '../../../../components/Form/Input';
