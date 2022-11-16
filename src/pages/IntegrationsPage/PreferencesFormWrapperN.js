@@ -254,7 +254,7 @@ class PreferencesFormWrapperN extends React.Component {
 								app: '',
 								profile: '',
 								searchProfile: '',
-								meta: { sponsoredProfile: '' },
+								meta: FormBuilder.group({ sponsoredProfile: '' }),
 							}),
 							endpoint: FormBuilder.group({
 								url: '',
@@ -492,6 +492,7 @@ class PreferencesFormWrapperN extends React.Component {
 	}
 
 	getMetaDataFields = (meta) => {
+		if (meta && Array.isArray(meta)) return meta;
 		const newMeta = Object.keys(meta || {}).map((key) => {
 			return {
 				label: key,
@@ -568,7 +569,9 @@ class PreferencesFormWrapperN extends React.Component {
 				resultHandle: get(displayFieldsPrefs[field], 'handle'),
 				resultHandleViewer: get(displayFieldsPrefs[field], 'handleViewer'),
 				metaDataFields: JSON.stringify(
-					this.getMetaDataFields(get(displayFieldsPrefs[field], 'userDefinedFields')),
+					// this.getMetaDataFields(
+					get(displayFieldsPrefs[field], 'userDefinedFields'),
+					// ),
 				),
 				cssSelector: get(displayFieldsPrefs[field], 'cssSelector'),
 			};
@@ -781,9 +784,9 @@ class PreferencesFormWrapperN extends React.Component {
 						resultHandle: get(displayFieldsPrefs[field], 'handle'),
 						resultHandleViewer: get(displayFieldsPrefs[field], 'handleViewer'),
 						metaDataFields: JSON.stringify(
-							this.getMetaDataFields(
-								get(displayFieldsPrefs[field], 'userDefinedFields'),
-							),
+							// this.getMetaDataFields(
+							get(displayFieldsPrefs[field], 'userDefinedFields'),
+							// ),
 						),
 						cssSelector: get(displayFieldsPrefs[field], 'cssSelector'),
 					};
