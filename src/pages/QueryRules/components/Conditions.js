@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Select, Input, Row, Col, Button } from 'antd';
+import { Select, Input, Col, Button, Form } from 'antd';
 import { getErrorClass, getErrorMessage } from '../utils/error';
 import { hasValuesChanged } from '../utils';
 import Info from '../../../components/Info';
@@ -38,25 +38,12 @@ class Conditions extends React.Component {
 		return (
 			<React.Fragment>
 				{condition === 'filter' ? (
-					<>
-						<Row>
-							<Col xs={24}>{getErrorMessage(error.condition)}</Col>
-							<div
-								style={{
-									border: error?.queryValue?.hasError ? '1px solid red' : 'none',
-									height: error?.queryValue?.hasError ? 150 : 0,
-									marginBottom: '15px',
-									padding: 10,
-								}}
-							>
-								{error?.queryValue?.hasError && (
-									<div style={{ color: 'red', fontSize: 13 }}>
-										{error?.queryValue.description}
-									</div>
-								)}
-
-								<Col md={12} sm={24}>
-									<label>
+					<Form layout="vertical">
+						<Col xs={24}>{getErrorMessage(error.condition)}</Col>
+						<Form.Item>
+							<Form.Item
+								label={
+									<div>
 										Query{' '}
 										<Info
 											content={
@@ -73,7 +60,24 @@ class Conditions extends React.Component {
 												</>
 											}
 										/>
-									</label>
+									</div>
+								}
+							>
+								<div
+									style={{
+										border: error?.queryValue?.hasError
+											? '1px solid red'
+											: 'none',
+										height: error?.queryValue?.hasError ? 150 : 0,
+										marginBottom: '15px',
+										padding: 10,
+									}}
+								>
+									{error?.queryValue?.hasError && (
+										<div style={{ color: 'red', fontSize: 13 }}>
+											{error?.queryValue.description}
+										</div>
+									)}
 									<Select
 										onChange={(value) => onDropdownChange('query', value)}
 										value={query}
@@ -84,74 +88,75 @@ class Conditions extends React.Component {
 										<Option value="startsWith">Query starts with</Option>
 										<Option value="endsWith">Query ends with </Option>
 									</Select>
-								</Col>
-								<Col md={12} sm={24}>
-									<label>Value</label>
-									<Input
-										className={queryValue ? '' : getErrorClass(error.condition)}
-										name="queryValue"
-										value={queryValue}
-										onChange={onChange}
-										onBlur={onBlur}
-									/>
-								</Col>
-							</div>
-						</Row>
-						<Row>
-							<div
-								style={{
-									border: error?.dataFieldValue?.hasError
-										? '1px solid red'
-										: 'none',
-									height: error?.dataFieldValue?.hasError ? 150 : 0,
-									marginBottom: '15px',
-									padding: 10,
-								}}
-							>
-								{error?.dataFieldValue?.hasError && (
-									<div style={{ color: 'red', fontSize: 13 }}>
-										{error?.dataFieldValue?.description}
-									</div>
-								)}
-								<Col md={12} sm={24}>
-									<label>
+								</div>
+							</Form.Item>
+							<Form.Item label="Value">
+								<Input
+									className={queryValue ? '' : getErrorClass(error.condition)}
+									name="queryValue"
+									value={queryValue}
+									onChange={onChange}
+									onBlur={onBlur}
+								/>
+							</Form.Item>
+						</Form.Item>
+						<Form.Item>
+							<Form.Item
+								label={
+									<div>
 										Filter
 										<Info content="Select a filter field and value which needs to be set before triggering this rule." />
-									</label>
-									<Select
-										onChange={(value) => onDropdownChange('dataField', value)}
-										value={dataField}
-										className={dataField ? '' : getErrorClass(error.condition)}
-										style={{ width: '100%' }}
-										showSearch
-									>
-										{dataFields.map((field) => (
-											<Option key={field}>
-												{field.replace(/.keyword/g, '')}
-											</Option>
-										))}
-									</Select>
-									{dataField || dataFieldValue ? (
-										<Button
-											style={{
-												margin: '4px 0',
-												padding: 0,
-												border: 0,
-												color: '#1890ff',
-											}}
-											ghost
-											size="small"
-											onClick={() => {
-												onDropdownChange('dataField', '');
-												onDropdownChange('dataFieldValue', '');
-											}}
-										>
-											Clear Filter
-										</Button>
-									) : null}
-								</Col>
-								<Col md={12} sm={24}>
-									<label>Value</label>
+									</div>
+								}
+							>
+								<Select
+									onChange={(value) => onDropdownChange('dataField', value)}
+									value={dataField}
+									className={dataField ? '' : getErrorClass(error.condition)}
+									style={{ width: '100%' }}
+									showSearch
+								>
+									{dataFields.map((field) => (
+										<Option key={field}>
+											{field.replace(/.keyword/g, '')}
+										</Option>
+									))}
+								</Select>
+							</Form.Item>
+							{dataField || dataFieldValue ? (
+								<Button
+									style={{
+										margin: '4px 0',
+										padding: 0,
+										border: 0,
+										color: '#1890ff',
+									}}
+									ghost
+									size="small"
+									onClick={() => {
+										onDropdownChange('dataField', '');
+										onDropdownChange('dataFieldValue', '');
+									}}
+								>
+									Clear Filter
+								</Button>
+							) : null}
+							<Form.Item label="Value">
+								<div
+									style={{
+										border: error?.dataFieldValue?.hasError
+											? '1px solid red'
+											: 'none',
+										height: error?.dataFieldValue?.hasError ? 150 : 0,
+										marginBottom: '15px',
+										padding: 10,
+									}}
+								>
+									{error?.dataFieldValue?.hasError && (
+										<div style={{ color: 'red', fontSize: 13 }}>
+											{error?.dataFieldValue?.description}
+										</div>
+									)}
 									<Input
 										className={
 											dataFieldValue ? '' : getErrorClass(error.condition)
@@ -161,10 +166,10 @@ class Conditions extends React.Component {
 										onChange={onChange}
 										onBlur={onBlur}
 									/>
-								</Col>
-							</div>
-						</Row>
-					</>
+								</div>
+							</Form.Item>
+						</Form.Item>
+					</Form>
 				) : null}
 			</React.Fragment>
 		);
