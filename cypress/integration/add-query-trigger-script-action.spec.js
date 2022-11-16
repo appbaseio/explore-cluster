@@ -41,8 +41,16 @@ describe('Query Rule creation with trigger index and script action', () => {
 		cy.get('[data-cy=query-rule-action]').click();
 		cy.get('[data-cy=script]').click({ force: true, multiple: true });
 		cy.wait(2000);
-		// cy.get('[data-cy=script-template]').click({ force: true}).type('{enter}');
+		// Remove tooltip blocking the select box
+		cy.get('.ant-tooltip').then((tooltipEl) => {
+			console.log({ tooltipEl });
+			tooltipEl.remove();
+		});
+		cy.wait(2000);
+		cy.get('[data-cy=script-template]').click().type('a');
+		cy.wait(2000);
 		cy.get('[data-cy=asyncFetch]').wait(1000).click();
+		cy.wait(2000);
 		cy.get('[data-cy=query-rule-save-script]').click();
 		cy.wait(2000);
 
