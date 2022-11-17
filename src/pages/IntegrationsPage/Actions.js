@@ -80,7 +80,9 @@ class Actions extends React.Component {
 						</Button>
 					</Tooltip>
 
-					{!isRecommendation && Object.keys(deploymentStatus).length ? (
+					{!isRecommendation &&
+					Object.keys(deploymentStatus).length &&
+					!deploymentStatus.error ? (
 						<Button
 							onClick={() => {
 								this.setState({ modalType: 'deploy-logs' });

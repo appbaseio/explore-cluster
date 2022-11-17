@@ -366,7 +366,7 @@ class SyncStatus extends React.Component {
 										Deploy
 									</Button>
 								</Flex>
-								{status ? (
+								{status && status !== 'Not deployed' ? (
 									<span>
 										<Button
 											type="link"
