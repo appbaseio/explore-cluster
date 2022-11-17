@@ -7,15 +7,11 @@ import { connect } from 'react-redux';
 import Flex from '../../batteries/components/shared/Flex';
 import DeployModal from './ExportInline/Components/DeployModal';
 import DeployLogsModal from './ExportInline/Components/DeployLogsModal';
-import {
-	getDeploymentStatus,
-	getAllVersions,
-	deployUiBuilder,
-	transformPreferences,
-} from './utils/sandpack-generator';
+import { getAllVersions, deployUiBuilder, transformPreferences } from './utils/sandpack-generator';
 import { deployStatusMapper, getTemplate } from './utils/index';
 import PastVersionsDrawer from './ExportInline/Components/PastVersionsDrawer';
 import {
+	getSearchPreferenceDeploymentStatus,
 	getSearchPreferencesN,
 	getSearchPreferenceVersionCodeByVersionN,
 	getSearchPreferenceVersionsN,
@@ -76,7 +72,6 @@ class SyncStatus extends React.Component {
 			products: 0,
 			// eslint-disable-next-line
 			collections: 0,
-			deploymentStatus: {},
 			modalType: '',
 			errMsg: '',
 			isLoading: false,
@@ -89,13 +84,14 @@ class SyncStatus extends React.Component {
 	}
 
 	componentDidMount() {
-		const { form } = this.props;
+		const { form, versionState, preferenceId } = this.props;
+		const { deploymentStatus = {} } = versionState[preferenceId] ?? {};
 		const exportTypeHandler = form.get('exportSettings.type');
 		exportTypeHandler.valueChanges.subscribe(this.handleTypeChange);
 		const themeType = form.get('themeType');
 		themeType.valueChanges.subscribe(this.handleThemeTypeChange);
 		this.fetchAllVersions();
-		this.fetchDeploymentStatus();
+		if (!Object.keys(deploymentStatus).length) this.fetchDeploymentStatus();
 	}
 
 	componentWillUnmount() {
@@ -207,13 +203,10 @@ class SyncStatus extends React.Component {
 	};
 
 	fetchDeploymentStatus = (status = 'notDeployed') => {
-		const { preferenceId } = this.props;
+		const { preferenceId, getDeploymentStatus } = this.props;
 		getDeploymentStatus(preferenceId)
 			.then((res) => {
 				const state = res.status || res.state;
-				this.setState({
-					deploymentStatus: res,
-				});
 				if (status === 'deployed') {
 					this.setState({
 						modalType: 'deploy-logs',
@@ -286,7 +279,7 @@ class SyncStatus extends React.Component {
 	render() {
 		const {
 			documents,
-			deploymentStatus,
+
 			modalType,
 			errMsg,
 			isLoading,
@@ -297,9 +290,13 @@ class SyncStatus extends React.Component {
 		const { form, versionState, preferenceId, updateVersionStateForPreference } = this.props;
 		const title = form.get('name') ? form.get('name').value : '';
 		const pipeline = form.get('pipeline') ? form.get('pipeline').value : '';
-		const status = deploymentStatus.status || deploymentStatus.state;
 		const templateObj = getTemplate(themeType);
-		const { currentVersion = {}, updatedCode = {} } = versionState[preferenceId] ?? {};
+		const {
+			currentVersion = {},
+			updatedCode = {},
+			deploymentStatus = {},
+		} = versionState[preferenceId] ?? {};
+		const status = deploymentStatus.status || deploymentStatus.state || '';
 
 		return (
 			<Card>
@@ -448,6 +445,7 @@ SyncStatus.propTypes = {
 	updateVersionStateForPreference: func.isRequired,
 	updateSearchPreferences: func.isRequired,
 	getSearchPreferenceVersions: func.isRequired,
+	getDeploymentStatus: func.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({
@@ -468,5 +466,7 @@ const mapDispatchToProps = (dispatch) => ({
 		dispatch(getSearchPreferenceVersionsN(preferenceId)),
 	getCodeByVersionId: (preferenceId, versionId) =>
 		dispatch(getSearchPreferenceVersionCodeByVersionN(preferenceId, versionId)),
+	getDeploymentStatus: (preferenceId) =>
+		dispatch(getSearchPreferenceDeploymentStatus(preferenceId)),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(SyncStatus);
