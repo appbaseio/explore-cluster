@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { string, bool } from 'prop-types';
+import { string, bool, object, func } from 'prop-types';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { Alert, Button, Form, Icon, Input, Spin } from 'antd';
@@ -8,16 +8,19 @@ import { features, isValidPlan } from '../../../../batteries/utils';
 import { addDomain, getDomainStatus, getAllDomains } from '../../utils/domain-apis';
 import { domainSettingsTabStyles } from './styles';
 import DomainList from './DomainList';
-import {
-	getDeploymentStatus,
-	deployUiBuilder,
-	getAllVersions,
-} from '../../utils/sandpack-generator';
+import { deployUiBuilder, getAllVersions } from '../../utils/sandpack-generator';
 import DeployModal from '../../ExportInline/Components/DeployModal';
+import { getSearchPreferenceDeploymentStatus } from '../../../../batteries/modules/actions';
 
 const isValidDomain = require('is-valid-domain');
 
-const DomainSettingsTab = ({ preferenceId, tier, featureUIBuilderPremium }) => {
+const DomainSettingsTab = ({
+	preferenceId,
+	tier,
+	featureUIBuilderPremium,
+	versionState,
+	getDeploymentStatus,
+}) => {
 	const [errorMsg, setErrorMsg] = useState('');
 	const [domainsData, setDomainsData] = useState([]);
 	const [domainStatus, setDomainStatus] = useState({ name: '', status: '' });
@@ -30,7 +33,8 @@ const DomainSettingsTab = ({ preferenceId, tier, featureUIBuilderPremium }) => {
 
 	useEffect(() => {
 		fetchAllDomains();
-		fetchDeploymentStatus();
+		const { deploymentStatus: deployStatus = {} } = versionState[preferenceId] ?? {};
+		if (!Object.keys(deployStatus).length) fetchDeploymentStatus();
 		fetchAllVersions();
 	}, []);
 
@@ -268,13 +272,21 @@ DomainSettingsTab.propTypes = {
 	preferenceId: string,
 	tier: string.isRequired,
 	featureUIBuilderPremium: bool,
+	versionState: object.isRequired,
+	getDeploymentStatus: func.isRequired,
 };
 
 const mapStateToProps = (state) => {
 	return {
 		tier: get(state, '$getAppPlan.results.tier'),
 		featureUIBuilderPremium: get(state, '$getAppPlan.results.feature_uibuilder_premium', false),
+		versionState: get(state, '$getSearchPreferencesVersionsN.results', {}),
 	};
 };
 
-export default connect(mapStateToProps, null)(DomainSettingsTab);
+const mapDispatchToProps = (dispatch) => ({
+	getDeploymentStatus: (preferenceId) =>
+		dispatch(getSearchPreferenceDeploymentStatus(preferenceId)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(DomainSettingsTab);
