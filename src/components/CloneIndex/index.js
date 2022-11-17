@@ -23,7 +23,6 @@ const centerAligned = css`
 `;
 
 const radioStyle = css`
-	display: block;
 	height: 30px;
 	line-height: 30px;
 `;
