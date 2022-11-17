@@ -84,7 +84,8 @@ class SyncStatus extends React.Component {
 	}
 
 	componentDidMount() {
-		const { form, versionState, preferenceId } = this.props;
+		const { form, versionState, preferenceId, getSearchPreferenceVersions } = this.props;
+		if (!versionState) getSearchPreferenceVersions(preferenceId);
 		const { deploymentStatus = {} } = versionState[preferenceId] ?? {};
 		const exportTypeHandler = form.get('exportSettings.type');
 		exportTypeHandler.valueChanges.subscribe(this.handleTypeChange);
