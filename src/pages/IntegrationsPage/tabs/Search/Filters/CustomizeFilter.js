@@ -180,7 +180,7 @@ class CustomizeFilter extends React.Component {
 								<div className={filterModalStyles}>
 									<div className="left-container">
 										<h3 className="section-header">Configure Component</h3>
-										<Form colon={false}>
+										<Form colon={false} layout="vertical">
 											<FieldControl
 												name="dataField"
 												control={control.get('dataField')}

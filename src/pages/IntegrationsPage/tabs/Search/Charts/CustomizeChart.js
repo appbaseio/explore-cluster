@@ -181,7 +181,7 @@ class CustomizeChart extends React.Component {
 							>
 								<ModalContainer>
 									<div className="left-container">
-										<Form>
+										<Form layout="vertical">
 											<Form.Item label="Data Field">
 												<DataFieldSelector
 													isAggFields
