@@ -15,14 +15,12 @@ const container = css`
 	display: flex !important;
 	align-items: stretch;
 	height: 100% !important;
-	min-height: 500px;
 	position: relative !important;
 
 	.ant-select-sm.ant-select {
 		width: 300px;
 	}
 	.tabs-container {
-		height: calc(100% + 4px);
 		width: 100%;
 		.ant-tabs-extra-content {
 			line-height: 35px;
@@ -46,8 +44,12 @@ const container = css`
 		}
 	}
 
+	.ant-tabs-tabpane {
+		height: 100%;
+	}
 	.monaco-wrapper {
 		width: 100% !important;
+		height: 100%;
 	}
 
 	h3 {
@@ -61,7 +63,6 @@ const container = css`
 		&.template-area,
 		&.response-area {
 			min-height: 250px;
-			height: calc(100% - 50px);
 		}
 
 		&.response-area {
