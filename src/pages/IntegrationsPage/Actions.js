@@ -1,11 +1,12 @@
 import React from 'react';
 import { Button, Popconfirm, Tooltip, Icon } from 'antd';
 import { css } from 'react-emotion';
-import { string, func, bool } from 'prop-types';
+import get from 'lodash/get';
+import { string, func, bool, object } from 'prop-types';
+import { connect } from 'react-redux';
 import DeployLogsModal from './ExportInline/Components/DeployLogsModal';
 import Flex from '../../batteries/components/shared/Flex';
-import { getDeploymentStatus } from './utils/sandpack-generator';
-// import asyncCallWithTimeout from './ExportInline/Components/ModalHeader';
+import { getSearchPreferenceDeploymentStatus } from '../../batteries/modules/actions';
 
 const container = css`
 	gap: 10px;
@@ -31,11 +32,12 @@ const container = css`
 class Actions extends React.Component {
 	state = {
 		modalType: '',
-		deploymentStatus: {},
 	};
 
 	componentDidMount() {
-		this.fetchDeploymentStatus();
+		const { versionState, id } = this.props;
+		const { deploymentStatus = {} } = versionState[id] ?? {};
+		if (!Object.keys(deploymentStatus).length) this.fetchDeploymentStatus();
 	}
 
 	handleEdit = () => {
@@ -55,21 +57,14 @@ class Actions extends React.Component {
 	};
 
 	fetchDeploymentStatus = () => {
-		const { id } = this.props;
-		getDeploymentStatus(id)
-			.then((res) => {
-				this.setState({
-					deploymentStatus: res,
-				});
-			})
-			.catch((err) => {
-				console.error(err);
-			});
+		const { id, getDeploymentStatus } = this.props;
+		getDeploymentStatus(id);
 	};
 
 	render() {
-		const { modalType, deploymentStatus } = this.state;
-		const { isRecommendation, name } = this.props;
+		const { modalType } = this.state;
+		const { isRecommendation, name, versionState, id } = this.props;
+		const { deploymentStatus = {} } = versionState[id] ?? {};
 
 		return (
 			<div>
@@ -126,11 +121,8 @@ class Actions extends React.Component {
 }
 
 Actions.defaultProps = {
-	isRecommendation: false,
-};
-
-Actions.defaultProps = {
 	name: '',
+	isRecommendation: false,
 };
 
 Actions.propTypes = {
@@ -139,6 +131,17 @@ Actions.propTypes = {
 	handleDelete: func.isRequired,
 	isRecommendation: bool,
 	name: string,
+	versionState: object.isRequired,
+	getDeploymentStatus: func.isRequired,
 };
 
-export default Actions;
+const mapStateToProps = (state) => ({
+	versionState: get(state, '$getSearchPreferencesVersionsN.results', {}),
+});
+
+const mapDispatchToProps = (dispatch) => ({
+	getDeploymentStatus: (preferenceId) =>
+		dispatch(getSearchPreferenceDeploymentStatus(preferenceId)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Actions);
