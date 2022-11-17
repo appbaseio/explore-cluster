@@ -294,12 +294,12 @@ class SyncStatus extends React.Component {
 			themeType,
 			showPastVersionsDrawer,
 		} = this.state;
-		const { form, versionState, preferenceId } = this.props;
+		const { form, versionState, preferenceId, updateVersionStateForPreference } = this.props;
 		const title = form.get('name') ? form.get('name').value : '';
 		const pipeline = form.get('pipeline') ? form.get('pipeline').value : '';
 		const status = deploymentStatus.status || deploymentStatus.state;
 		const templateObj = getTemplate(themeType);
-		const { currentVersion = {} } = versionState[preferenceId] ?? {};
+		const { currentVersion = {}, updatedCode = {} } = versionState[preferenceId] ?? {};
 
 		return (
 			<Card>
@@ -424,17 +424,9 @@ class SyncStatus extends React.Component {
 					currentVersion={currentVersion}
 					allVersions={allVersions}
 					fetchByVersionId={this.fetchByVersionId}
-				/>
-				<PastVersionsDrawer
-					visible={showPastVersionsDrawer}
-					setVisible={() =>
-						this.setState({
-							showPastVersionsDrawer: !showPastVersionsDrawer,
-						})
-					}
-					currentVersion={currentVersion}
-					allVersions={allVersions}
-					fetchByVersionId={this.fetchByVersionId}
+					preferenceId={preferenceId}
+					updatedCode={updatedCode}
+					updateVersionStateForPreference={updateVersionStateForPreference}
 				/>
 			</Card>
 		);

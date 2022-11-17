@@ -23,7 +23,7 @@ const Preview = ({ theme }) => {
 				frameBorder="0"
 				width="100%"
 				height={window.innerHeight}
-				src={templateObj.netlifyURL}
+				src={templateObj.previewURL || templateObj.netlifyURL}
 			/>
 		</div>
 	);
