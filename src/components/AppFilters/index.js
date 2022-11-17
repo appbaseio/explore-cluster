@@ -11,6 +11,8 @@ const commonFlex = css`
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	width: 100%;
+	padding: 10px;
 `;
 
 const searchClass = css`
@@ -28,6 +30,9 @@ const sysIndicesCheckbox = css`
 	@media (max-width: 600px) {
 		margin-left: 0;
 	}
+`;
+const fullWidth = css`
+	width: 100%;
 `;
 
 function AppFilters({ apps, children, preferences, updatePreferences, fetchApps }) {
@@ -64,7 +69,7 @@ function AppFilters({ apps, children, preferences, updatePreferences, fetchApps 
 
 	return (
 		<>
-			<div className={commonFlex} style={{ padding: '10px' }}>
+			<div className={commonFlex}>
 				<div className={searchClass}>
 					<Input
 						placeholder="Filter by index name"
@@ -105,7 +110,7 @@ function AppFilters({ apps, children, preferences, updatePreferences, fetchApps 
 					</Radio.Group>
 				</div>
 			</div>
-			<Row>{children(data, listView)}</Row>
+			<Row className={fullWidth}>{children(data, listView)}</Row>
 		</>
 	);
 }

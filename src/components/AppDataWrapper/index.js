@@ -16,6 +16,7 @@ const noData = css`
 	text-align: center;
 	margin: 0 10px;
 	padding: 16px;
+	flex: 1;
 `;
 
 function AppDataWrapper({ apps, onCreateModalChange, isFetching }) {
