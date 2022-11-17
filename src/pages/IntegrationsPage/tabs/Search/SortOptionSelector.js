@@ -35,6 +35,9 @@ const card = css`
 		align-items: center;
 	}
 `;
+const autocomplete = css`
+	width: 100%;
+`;
 
 function getItemStyle(isDragging, draggableStyle) {
 	return {
@@ -144,6 +147,7 @@ function SortOptionSelector({
 							</Col>
 							<Col xs={8}>
 								<AutoComplete
+									className={autocomplete}
 									filterOption={(inputValue, option) => {
 										if (
 											option.props.children &&
