@@ -4,7 +4,6 @@ import { ArrowRightOutlined, ClusterOutlined, LockOutlined, UserOutlined } from 
 import { Card, Button, Input } from 'antd';
 import { Redirect, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import get from 'lodash/get';
 import { loadUser } from '../../actions';
 import Logo from '../../components/Logo';
 import LoginContainer from '../../components/LoginContainer';
@@ -20,44 +19,36 @@ import { getURL } from '../../constants/config';
 import { isFusion } from '../../batteries/utils';
 
 class LoginPage extends Component {
-	constructor(props) {
-		super(props);
-		this.username = React.createRef();
-		this.password = React.createRef();
-		this.url = React.createRef();
-	}
+	state = {
+		url: '',
+		password: '',
+		username: '',
+	};
 
 	componentDidMount() {
-		if (get(this, 'url.current.input')) {
-			const urlValue = getURL() || '';
-			this.url.current.input.value = urlValue;
-			const credObj = getURLCredentials(urlValue) || {};
-			this.url.current.input.value = this.getURL(urlValue);
-			this.setCredentials(credObj);
-		}
+		const urlValue = getURL() || '';
+		const credObj = getURLCredentials(urlValue) || {};
+		this.setCredentials(credObj);
+		this.setState({ url: this.getURLWithoutCredentials(urlValue) });
 	}
 
 	setCredentials(credObj) {
-		if (get(this, 'username.current.input'))
-			this.username.current.input.value =
-				credObj.username ||
-				localStorage.getItem('username') ||
-				sessionStorage.getItem('username') ||
-				'';
-		if (this.password && this.password.current)
-			this.password.current.input.value =
-				credObj.password ||
-				localStorage.getItem('password') ||
-				sessionStorage.getItem('password') ||
-				'';
+		const username =
+			credObj.username ||
+			localStorage.getItem('username') ||
+			sessionStorage.getItem('username') ||
+			'';
+		const password =
+			credObj.password ||
+			localStorage.getItem('password') ||
+			sessionStorage.getItem('password') ||
+			'';
+		this.setState({ username: username.trim(), password: password.trim() });
 	}
 
 	login = () => {
 		const { loadArcUser } = this.props;
-		const username = get(this, 'username.current.input.value', '').trim();
-		const password = get(this, 'password.current.input.value');
-		const url = get(this, 'url.current.input.value');
-
+		const { username, password, url } = this.state;
 		if (username && password && url) {
 			loadArcUser(username, password, url);
 		}
@@ -67,13 +58,14 @@ class LoginPage extends Component {
 		const { value } = event.target;
 		if (!value) return;
 		const credObj = getURLCredentials(value) || {};
-		if (get(this, 'url.current')) this.url.current.input.value = this.getURL(value);
+		const url = this.getURLWithoutCredentials(value);
 		if (!isEmpty(credObj)) {
 			this.setCredentials(credObj);
 		}
+		this.setState({ url });
 	};
 
-	getURL = (value) => {
+	getURLWithoutCredentials = (value) => {
 		const credObj = getURLCredentials(value) || {};
 		const { url } = getURLParameters(value);
 		const originURL = value.split('@')[1];
@@ -85,6 +77,7 @@ class LoginPage extends Component {
 
 	render() {
 		const { user } = this.props;
+		const { url, username, password } = this.state;
 		const redirectUrl = sessionStorage.getItem('redirectUrl');
 
 		if (user.data) {
@@ -100,10 +93,11 @@ class LoginPage extends Component {
 					<Card className={card} bordered={false}>
 						<h2>Sign in to get started</h2>
 						<Input
-							ref={this.url}
 							size="large"
+							value={url}
 							prefix={<ClusterOutlined style={{ color: 'rgba(0,0,0,.25)' }} />}
 							placeholder="Cluster URL"
+							onChange={(e) => this.setState({ url: e.target.value })}
 							onBlur={this.onClusterURLBlur}
 							onPressEnter={this.onClusterURLBlur}
 							data-cy="cluster-url"
@@ -112,7 +106,8 @@ class LoginPage extends Component {
 							style={{
 								margin: '6px 0',
 							}}
-							ref={this.username}
+							value={username}
+							onChange={(e) => this.setState({ username: e.target.value })}
 							size="large"
 							prefix={<UserOutlined style={{ color: 'rgba(0,0,0,.25)' }} />}
 							placeholder="Username"
@@ -121,7 +116,8 @@ class LoginPage extends Component {
 							style={{
 								margin: '0 0 6px 0',
 							}}
-							ref={this.password}
+							value={password}
+							onChange={(e) => this.setState({ password: e.target.value })}
 							size="large"
 							prefix={<LockOutlined style={{ color: 'rgba(0,0,0,.25)' }} />}
 							type="password"
