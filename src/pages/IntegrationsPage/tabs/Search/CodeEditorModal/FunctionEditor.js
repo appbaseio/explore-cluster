@@ -66,17 +66,15 @@ const Footer = styled.div`
 const container = css`
 	display: flex !important;
 	align-items: stretch;
-	height: 100% !important;
-	min-height: 500px;
 	position: relative !important;
 	max-width: 100%;
 	margin-top: 2.5rem;
+	min-height: 500px;
 	.save-btn {
 		position: absolute;
-    left: 0;
-    z-index: 4;
-    bottom: 0;
-}
+		left: 0;
+		z-index: 4;
+		bottom: 0;
 	}
 	h3.container-heading {
 		position: absolute;
@@ -92,10 +90,8 @@ const container = css`
 		width: 50%;
 	}
 	.tabs-container {
-		height: calc(100% + 4px);
 		width: 50%;
 		position: relative;
-    	top: -35px;
 		.ant-tabs-extra-content {
 			line-height: 35px;
 			margin-right: 1px;
@@ -116,18 +112,14 @@ const container = css`
 				padding: 0;
 			}
 		}
-
-		.console-logger-container {
-			height: calc(91% - 1px);
-    		position: relative;
-    		top: 2px;
-			max-height: 80vh;
-		}
 	}
 
+	.ant-tabs-tabpane {
+		height: 100%;
+	}
 	.monaco-wrapper {
 		width: 100% !important;
-		height: calc(100% - 42px) !important;
+		height: 100%;
 	}
 
 	h3 {
@@ -141,7 +133,6 @@ const container = css`
 		height: 100%;
 		position: relative;
 	}
-
 
 	.validate-script-btn {
 		box-sizing: border-box;
@@ -183,20 +174,14 @@ const container = css`
 		height: 100%;
 		padding: 0.1rem 0.3rem;
 
-		&.template-area,
-		&.response-area {
-			min-height: 250px;
-			height: calc(100% - 50px);
-		}
-
 		&.response-area {
 			position: relative;
-    background: rgb(21,21,21);
-			#response-area-placeholder h2{
+			background: rgb(21, 21, 21);
+			#response-area-placeholder h2 {
 				position: absolute;
 				top: 50%;
 				left: 50%;
-				transform: translate(-50%,-50%);
+				transform: translate(-50%, -50%);
 				width: 80%;
 				text-align: center;
 				font-weight: 400 !important;
@@ -216,11 +201,11 @@ const container = css`
 
 		&.live-preview-area {
 			position: relative;
-			#response-area-placeholder h2{
+			#response-area-placeholder h2 {
 				position: absolute;
 				top: 50%;
 				left: 50%;
-				transform: translate(-50%,-50%);
+				transform: translate(-50%, -50%);
 				width: 80%;
 				text-align: center;
 				font-weight: 400 !important;
@@ -455,6 +440,7 @@ const FunctionEditor = ({
 													pipeline={pipeline}
 													prefix={functionProperty}
 													hookOwnRender={(data) => {
+														console.log({ data });
 														if (functionProperty === 'defaultQuery') {
 															setState((s) => ({
 																...s,
