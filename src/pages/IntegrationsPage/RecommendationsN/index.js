@@ -5,7 +5,7 @@ import { bool, string } from 'prop-types';
 import List from './List';
 import { versionCompare } from '../../../batteries/utils/helpers';
 import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
-import Main from '../Recommendations/Main';
+import Main from './Main';
 import { event, timingEvent } from '../../../utils/gtag';
 import moment from '../../../utils/moment';
 
