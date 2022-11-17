@@ -130,13 +130,9 @@ const container = css`
 const formStyle = css`
 	margin: 15px 0;
 	label {
-		display: block;
 		font-weight: 500;
 		margin-bottom: 5px;
 		color: rgba(0, 0, 0, 0.85);
-	}
-	input {
-		margin-bottom: 15px;
 	}
 	.ant-divider-horizontal {
 		margin: 35px 0;
