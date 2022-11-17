@@ -300,27 +300,83 @@ class PreferenceForm extends React.Component {
 									}}
 									className={modal}
 								>
-									<FieldControl
-										strict={false}
-										name="url"
-										control={endpointControl.get('url')}
-									>
-										{(endpointURLControl) => {
-											const { errors, touched } = endpointURLControl;
-											return (
-												<div>
-													<TextInput
-														name="url"
+									<Form layout="vertical">
+										<FieldControl
+											strict={false}
+											name="url"
+											control={endpointControl.get('url')}
+										>
+											{(endpointURLControl) => {
+												const { errors, touched } = endpointURLControl;
+												return (
+													<div>
+														<TextInput
+															name="url"
+															label={
+																<span
+																	className={
+																		styles.labelContainer
+																	}
+																>
+																	{' '}
+																	<span className="required-marker">
+																		*
+																	</span>
+																	<span>URL</span>
+																	<Popover
+																		content={content(
+																			Messages.urlField,
+																		)}
+																		className={
+																			styles.iconContainer
+																		}
+																	>
+																		<InfoCircleOutlined />
+																	</Popover>
+																</span>
+															}
+															formItemProps={{ colon: false }}
+															control={endpointURLControl}
+														/>{' '}
+														{touched && errors?.required ? (
+															<div
+																style={{ marginTop: -30 }}
+																className="error"
+															>
+																URL field is required
+															</div>
+														) : null}
+														{touched && errors?.invalidLink ? (
+															<div
+																className="error"
+																style={{ marginTop: -30 }}
+															>
+																URL field is invalid
+															</div>
+														) : null}
+													</div>
+												);
+											}}
+										</FieldControl>
+										<FieldControl
+											strict={false}
+											name="method"
+											style={{ marginBottom: 0 }}
+											control={endpointControl.get('method')}
+										>
+											{({ handler, errors, touched }) => {
+												const showError = touched && errors?.required;
+												return (
+													<Form.Item
 														label={
 															<span className={styles.labelContainer}>
-																{' '}
 																<span className="required-marker">
 																	*
 																</span>
-																<span>URL</span>
+																Method
 																<Popover
 																	content={content(
-																		Messages.urlField,
+																		Messages.method,
 																	)}
 																	className={styles.iconContainer}
 																>
@@ -328,123 +384,83 @@ class PreferenceForm extends React.Component {
 																</Popover>
 															</span>
 														}
-														formItemProps={{ colon: false }}
-														control={endpointURLControl}
-													/>{' '}
-													{touched && errors?.required ? (
-														<div
-															style={{ marginTop: -30 }}
-															className="error"
-														>
-															URL field is required
-														</div>
-													) : null}
-													{touched && errors?.invalidLink ? (
-														<div
-															className="error"
-															style={{ marginTop: -30 }}
-														>
-															URL field is invalid
-														</div>
-													) : null}
-												</div>
-											);
-										}}
-									</FieldControl>
-									<FieldControl
-										strict={false}
-										name="method"
-										style={{ marginBottom: 0 }}
-										control={endpointControl.get('method')}
-									>
-										{({ handler, errors, touched }) => {
-											const showError = touched && errors?.required;
-											return (
-												<Form.Item
-													label={
-														<span className={styles.labelContainer}>
-															<span className="required-marker">
-																*
-															</span>
-															Method
-															<Popover
-																content={content(Messages.method)}
-																className={styles.iconContainer}
-															>
-																<InfoCircleOutlined />
-															</Popover>
-														</span>
-													}
-													colon={false}
-												>
-													<Select
-														{...handler()}
-														className={showError ? 'input-error' : ''}
-														style={{ width: '100%' }}
+														colon={false}
 													>
-														<Select.Option key="GET">GET</Select.Option>
-														<Select.Option key="POST">
-															POST
-														</Select.Option>
-														<Select.Option key="DELETE">
-															DELETE
-														</Select.Option>
-														<Select.Option key="PUT">PUT</Select.Option>
-													</Select>
-													{showError ? (
-														<div
-															className="error"
-															style={{ padding: 5 }}
+														<Select
+															{...handler()}
+															className={
+																showError ? 'input-error' : ''
+															}
+															style={{ width: '100%' }}
 														>
-															This field is required
-														</div>
-													) : null}
-												</Form.Item>
-											);
-										}}
-									</FieldControl>
-									<Form.Item
-										label={
-											<span className={styles.labelContainer}>
-												Headers
-												<Popover
-													content={content(Messages.headers)}
-													className={styles.iconContainer}
-												>
-													<InfoCircleOutlined />
-												</Popover>
-											</span>
-										}
-										colon={false}
-									>
-										<CodeEditor
-											name="headers"
-											strict={false}
-											control={endpointControl.get('headers')}
-											height={100}
-										/>
-									</Form.Item>
-									<Form.Item
-										label={
-											<span className={styles.labelContainer}>
-												Body
-												<Popover
-													content={content(Messages.body)}
-													className={styles.iconContainer}
-												>
-													<InfoCircleOutlined />
-												</Popover>
-											</span>
-										}
-										colon={false}
-									>
-										<CodeEditor
-											name="body"
-											strict={false}
-											control={endpointControl.get('body')}
-											height={100}
-										/>
-									</Form.Item>
+															<Select.Option key="GET">
+																GET
+															</Select.Option>
+															<Select.Option key="POST">
+																POST
+															</Select.Option>
+															<Select.Option key="DELETE">
+																DELETE
+															</Select.Option>
+															<Select.Option key="PUT">
+																PUT
+															</Select.Option>
+														</Select>
+														{showError ? (
+															<div
+																className="error"
+																style={{ padding: 5 }}
+															>
+																This field is required
+															</div>
+														) : null}
+													</Form.Item>
+												);
+											}}
+										</FieldControl>
+										<Form.Item
+											label={
+												<span className={styles.labelContainer}>
+													Headers
+													<Popover
+														content={content(Messages.headers)}
+														className={styles.iconContainer}
+													>
+														<InfoCircleOutlined />
+													</Popover>
+												</span>
+											}
+											colon={false}
+										>
+											<CodeEditor
+												name="headers"
+												strict={false}
+												control={endpointControl.get('headers')}
+												height={100}
+											/>
+										</Form.Item>
+										<Form.Item
+											label={
+												<span className={styles.labelContainer}>
+													Body
+													<Popover
+														content={content(Messages.body)}
+														className={styles.iconContainer}
+													>
+														<InfoCircleOutlined />
+													</Popover>
+												</span>
+											}
+											colon={false}
+										>
+											<CodeEditor
+												name="body"
+												strict={false}
+												control={endpointControl.get('body')}
+												height={100}
+											/>
+										</Form.Item>
+									</Form>
 								</Modal>
 							)}
 						</FieldGroup>
