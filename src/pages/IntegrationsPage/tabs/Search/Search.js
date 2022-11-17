@@ -61,7 +61,7 @@ const Search = ({ history, pipeline, apps, form, backend, getPreferencesPayload 
 				/>
 			</h2>
 
-			<Form layout="inline">
+			<Form layout="vertical">
 				<List
 					dataSource={defaultSettings}
 					renderItem={(item) => {

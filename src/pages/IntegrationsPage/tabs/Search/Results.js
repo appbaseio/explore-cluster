@@ -819,7 +819,7 @@ const Results = ({
 	if (withoutForm) {
 		return component();
 	}
-	return <Form layout="inline">{component()}</Form>;
+	return <Form layout="vertical">{component()}</Form>;
 };
 
 Results.defaultProps = {
