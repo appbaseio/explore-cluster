@@ -10,15 +10,11 @@ import PastVersionsDrawer from './PastVersionsDrawer';
 import DeployLogsModal from './DeployLogsModal';
 import DeployModal from './DeployModal';
 import { deployStatusMapper, getTemplate } from '../../utils/index';
-import {
-	commitCode,
-	getDeploymentStatus,
-	deployUiBuilder,
-	transformPreferences,
-} from '../../utils/sandpack-generator';
+import { commitCode, deployUiBuilder, transformPreferences } from '../../utils/sandpack-generator';
 import UploadModal from './ProjectUpload/UploadModal';
 import ThemeSwitch from '../../../../components/ThemeSwitcher';
 import {
+	getSearchPreferenceDeploymentStatus,
 	getSearchPreferencesN,
 	getSearchPreferenceVersionsN,
 	saveSearchPreferenceN,
@@ -73,11 +69,11 @@ const ModalHeader = ({
 	updateVersionStateForPreference,
 	getSearchPreferences,
 	updateSearchPreferences,
+	getDeploymentStatus,
 }) => {
 	const [visible, setVisible] = useState(false);
 	const [errMsg, setErrMsg] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
-	const [deploymentStatus, setDeploymentStatus] = useState({});
 
 	const preferenceId = match.params.id;
 	const {
@@ -89,8 +85,8 @@ const ModalHeader = ({
 
 	useEffect(() => {
 		getSearchPreferenceVersions(preferenceId);
-
-		fetchDeploymentStatus();
+		const { deploymentStatus = {} } = versionState[preferenceId] ?? {};
+		if (!Object.keys(deploymentStatus).length) fetchDeploymentStatus();
 	}, []);
 
 	useEffect(() => {
@@ -225,7 +221,6 @@ const ModalHeader = ({
 		getDeploymentStatus(preferenceId)
 			.then((res) => {
 				const state = res.status || res.state;
-				setDeploymentStatus(res);
 				if (status === 'deployed') {
 					setIsLoading(false);
 					setModalType('deploy-logs');
@@ -254,6 +249,7 @@ const ModalHeader = ({
 		return 'brightness(0%)';
 	};
 
+	const { deploymentStatus = {} } = versionState[preferenceId] ?? {};
 	return (
 		<>
 			<div className="header-container">
@@ -422,6 +418,7 @@ ModalHeader.propTypes = {
 	updateVersionStateForPreference: PropTypes.func.isRequired,
 	updateSearchPreferences: PropTypes.func.isRequired,
 	getSearchPreferences: PropTypes.func.isRequired,
+	getDeploymentStatus: PropTypes.func.isRequired,
 };
 
 ModalHeader.defaultProps = {
@@ -456,6 +453,8 @@ const mapDispatchToProps = (dispatch) => ({
 		}),
 	updateSearchPreferences: (preferenceId, payload) =>
 		dispatch(saveSearchPreferenceN(preferenceId, payload)),
+	getDeploymentStatus: (preferenceId) =>
+		dispatch(getSearchPreferenceDeploymentStatus(preferenceId)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(ModalHeader));
