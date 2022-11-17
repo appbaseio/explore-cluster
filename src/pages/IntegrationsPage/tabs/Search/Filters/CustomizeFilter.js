@@ -142,11 +142,12 @@ class CustomizeFilter extends React.Component {
 		const { pipeline } = this.props;
 		const handleComponentTypeChange = (componentType) => {
 			const showSearchControl = control.get('showSearch');
-
-			if (componentType === componentTypes.tabDataList) {
-				showSearchControl.setValue(false);
-			} else {
-				showSearchControl.setValue(true);
+			if (showSearchControl) {
+				if (componentType === componentTypes.tabDataList) {
+					showSearchControl.setValue(false);
+				} else {
+					showSearchControl.setValue(true);
+				}
 			}
 		};
 
