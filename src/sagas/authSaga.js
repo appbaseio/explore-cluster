@@ -16,7 +16,7 @@ function* authWorker(username, password, url) {
 		localStorage.setItem('allowedActions', user.allowedActions);
 		if (
 			!window.location.search.includes('redirectTo') &&
-			!window.location.search.includes('/cluster/search-builder')
+			!window.location.pathname.includes('/cluster/search-builder')
 		) {
 			window.location.pathname = '/cluster/search-builder';
 		}
