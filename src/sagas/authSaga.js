@@ -14,8 +14,12 @@ function* authWorker(username, password, url) {
 		localStorage.setItem('authToken', user.authToken);
 		localStorage.setItem('isAdmin', user.isAdmin);
 		localStorage.setItem('allowedActions', user.allowedActions);
-		if (!window.location.search.includes('redirectTo'))
+		if (
+			!window.location.search.includes('redirectTo') &&
+			!window.location.search.includes('/cluster/search-builder')
+		) {
 			window.location.pathname = '/cluster/search-builder';
+		}
 		const endpoints = yield call(getEndpoints);
 		yield put(loadEndpointsSuccess(endpoints));
 		// sessionStorage.setItem('isAdmin', user.isAdmin);
