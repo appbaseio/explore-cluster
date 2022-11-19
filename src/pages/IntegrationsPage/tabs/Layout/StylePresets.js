@@ -7,7 +7,7 @@ import { FieldControl } from 'react-reactive-form';
 // import { ReactiveBase, CategorySearch } from '@appbaseio/reactivesearch';
 // import get from 'lodash/get';
 import ColorPicker from '../../ColorPicker';
-import { fontWeights } from '../../utils';
+import { fontWeights, webSafeFonts } from '../../utils';
 import ThemePreview from './ThemePreview';
 // import SuggestionsRenderer from './SuggestionRenderer';
 
@@ -63,7 +63,7 @@ class StylePresets extends Component {
 						family: item.family,
 					}));
 					this.setState({
-						fontFamilies,
+						fontFamilies: [...webSafeFonts, ...fontFamilies],
 					});
 				});
 		} catch (error) {
@@ -92,6 +92,7 @@ class StylePresets extends Component {
 
 	render() {
 		const { fontFamilies } = this.state;
+		console.log({ fontFamilies });
 		// if (preferences._theme) {
 		// 	// this is necessary since often batteries mess up with my code and resets preferences
 		// 	primaryColor = preferences._theme.colors.primaryColor || primaryColor;

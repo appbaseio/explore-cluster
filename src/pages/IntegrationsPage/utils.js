@@ -42,6 +42,36 @@ export const fontWeights = [
 	{ label: '800 - Extra Bold', value: 800 },
 ];
 
+export const webSafeFonts = [
+	{
+		family: 'Arial',
+	},
+	{
+		family: 'Verdana',
+	},
+	{
+		family: 'Tahoma',
+	},
+	{
+		family: 'Trebuchet',
+	},
+	{
+		family: 'Times New Roman',
+	},
+	{
+		family: 'Georgia',
+	},
+	{
+		family: 'Garamond',
+	},
+	{
+		family: 'Courier New',
+	},
+	{
+		family: 'Brush Script MT',
+	},
+];
+
 export const currencies = [
 	{ cc: 'AED', symbol: '\u062f.\u0625;', name: 'UAE dirham' },
 	{ cc: 'AFN', symbol: 'Afs', name: 'Afghan afghani' },
@@ -1436,8 +1466,7 @@ const getDiffFieldsFromObject = (diffData, field, oldObj, newObj) => {
 	[...oldKeys, ...newKeys].forEach((key) => {
 		const newVal = get(newObj, `${field}.${key}`, '');
 		const oldVal = get(oldObj, `${field}.${key}`, '');
-
-		if ((oldVal || newVal) && !isEqual(oldVal, newVal))
+		if ((oldVal || newVal) && !isEqual(returnEmpty(oldVal), returnEmpty(newVal)))
 			newDiffData = {
 				...newDiffData,
 				[key]: [oldVal, newVal],
