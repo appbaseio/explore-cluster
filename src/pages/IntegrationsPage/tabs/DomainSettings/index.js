@@ -34,7 +34,12 @@ const DomainSettingsTab = ({
 	useEffect(() => {
 		fetchAllDomains();
 		const { deploymentStatus: deployStatus = {} } = versionState[preferenceId] ?? {};
-		if (!Object.keys(deployStatus).length) fetchDeploymentStatus();
+		if (!deployStatus.error) {
+			if (!Object.keys(deployStatus).length) fetchDeploymentStatus();
+			else setDeploymentStatus(deployStatus);
+		} else
+			setDeploymentStatus({ ...deployStatus, status: 'Not deployed', state: 'Not deployed' });
+
 		fetchAllVersions();
 	}, []);
 
@@ -169,6 +174,7 @@ const DomainSettingsTab = ({
 		setIsLoading(false);
 	};
 
+	console.log({ deploymentStatus });
 	const DeployComponent = () => {
 		if (deploymentStatus.status === 'Not deployed')
 			return (
