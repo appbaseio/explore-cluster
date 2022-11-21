@@ -92,7 +92,6 @@ class StylePresets extends Component {
 
 	render() {
 		const { fontFamilies } = this.state;
-		console.log({ fontFamilies });
 		// if (preferences._theme) {
 		// 	// this is necessary since often batteries mess up with my code and resets preferences
 		// 	primaryColor = preferences._theme.colors.primaryColor || primaryColor;
