@@ -410,6 +410,7 @@ class SyncStatus extends React.Component {
 					isLoading={isLoading}
 					handleCancel={this.handleCancel}
 					allVersions={allVersions}
+					templateObj={templateObj}
 					deploymentStatus={deploymentStatus}
 				/>
 				<PastVersionsDrawer

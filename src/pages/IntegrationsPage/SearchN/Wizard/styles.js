@@ -2,6 +2,10 @@ import { css } from 'emotion';
 
 export const SearchTemplateStyles = css`
 	.theme-container {
+		margin-bottom: 40px;
+	}
+
+	.tab-container {
 		margin-top: 40px;
 	}
 
