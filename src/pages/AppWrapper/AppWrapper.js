@@ -5,6 +5,7 @@ import { ClusterOutlined, SearchOutlined } from '@ant-design/icons';
 import { Input, Layout, Menu, Tag } from 'antd';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
+import { css } from 'emotion';
 
 import { isEqual } from 'lodash';
 // eslint-disable-next-line import/no-cycle
@@ -32,6 +33,15 @@ import { iconMap } from '../../components/iconMap';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
+
+const sidebarStyles = css`
+	height: 100vh;
+	position: fixed !important;
+	left: 0;
+	& .ant-layout-sider-children .ant-menu.ant-menu-inline-collapsed {
+		width: 100%;
+	}
+`;
 
 const getActiveMenu = (props, prevActiveSubMenu = [], routes = {}) => {
 	let activeSubMenu = 'App Overview';
@@ -368,11 +378,7 @@ class AppWrapper extends Component {
 			<Layout>
 				<Sider
 					width={260}
-					css={{
-						height: '100vh',
-						position: 'fixed !important',
-						left: 0,
-					}}
+					className={sidebarStyles}
 					collapsible
 					collapsed={collapsed}
 					onCollapse={this.onCollapse}

@@ -8,6 +8,7 @@ import get from 'lodash/get';
 import keys from 'lodash/keys';
 import { bool, func, object, string } from 'prop-types';
 import { isEqual } from 'lodash';
+import { css } from 'emotion';
 import { ALLOWED_ACTIONS } from '../../constants';
 import Loader from '../../components/Loader';
 // eslint-disable-next-line
@@ -55,6 +56,15 @@ const accountRoute = {
 		],
 	},
 };
+
+const sidebarStyles = css`
+	height: 100vh;
+	position: fixed !important;
+	left: 0;
+	& .ant-layout-sider-children .ant-menu.ant-menu-inline-collapsed {
+		width: 100%;
+	}
+`;
 
 const getActiveMenu = (props, prevActiveSubMenu = [], routes = {}) => {
 	let activeSubMenu = 'App Overview';
@@ -355,26 +365,17 @@ class DashboardWrapper extends Component {
 			<Layout>
 				<Sider
 					width={260}
-					css={{
-						height: '100vh',
-						position: 'fixed !important',
-						left: 0,
-					}}
+					collapsedWidth={80}
 					collapsible
 					collapsed={collapsed}
 					onCollapse={this.onCollapse}
+					className={sidebarStyles}
 				>
 					<Menu
 						theme="dark"
 						openKeys={activeSubMenu}
 						selectedKeys={activeMenuItem}
 						mode="inline"
-						css={{
-							overflow: 'auto',
-							position: 'absolute',
-							width: '100%',
-							height: 'calc(100% - 102px)',
-						}}
 						onOpenChange={(param) => {
 							this.setState({
 								activeSubMenu: param,
