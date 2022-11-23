@@ -42,8 +42,8 @@ describe('Query Rule creation with trigger index and script action', () => {
 		cy.get('[data-cy=search_settings]').click({ force: true, multiple: true });
 		cy.wait(1000);
 		cy.get('[data-cy=set-search-settings-action-add-field]').click();
-		cy.get('[data-cy=set-search-settings-key]').click({ force: true, multiple: true });
-		cy.get('[data-cy=originalTitle]').click();
+		cy.get('[data-cy=set-search-settings-key]').click().type('orig');
+		cy.get('[data-cy=original_title]').click();
 		cy.get('[data-cy=set-search-settings-value]')
 			.focus()
 			.type('{selectall}{backspace}')
