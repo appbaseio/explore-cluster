@@ -557,7 +557,7 @@ const PipelinesForm = (props) => {
 			setTabPanes(newTabPanes);
 
 			// reset active tab
-			const activeTab = newTabPanes.length ? newTabPanes.at(-1).key : DEFAULT_TAB_KEY;
+			const activeTab = newTabPanes.length ? newTabPanes.pop().key : DEFAULT_TAB_KEY;
 			setactiveTabKey(activeTab);
 
 			// update ScriptFileMap

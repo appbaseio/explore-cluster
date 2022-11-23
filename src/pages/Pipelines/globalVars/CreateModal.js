@@ -220,7 +220,7 @@ const CreateModal = ({
 
 	const validateForm = () => {
 		const regex = /\${[a-zA-Z0-9_]*}/gm;
-		const varRegex = /(?<=\${)(.*?)(?=\})/;
+		const varRegex = /(?:\${)(.*?)(?=\})/;
 		const pipelineVariables = globalVars.map((data) => {
 			if (data.key === modalFormData.key) {
 				return modalFormData;
@@ -258,7 +258,7 @@ const CreateModal = ({
 				obj.headers.Authorization.includes('Basic') &&
 				obj.headers.Authorization.includes('btoa')
 			) {
-				const varRegexBtoa = /(?<=\${btoa\()(.*?)(?=\)})/;
+				const varRegexBtoa = /(?:\${btoa\()(.*?)(?=\)})/;
 				if (varRegexBtoa.exec(obj.headers.Authorization)) {
 					const keyVariable = varRegexBtoa.exec(obj.headers.Authorization)[1];
 					const creds = btoa(keyVariable);

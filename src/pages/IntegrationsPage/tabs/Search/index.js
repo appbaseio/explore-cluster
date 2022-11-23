@@ -38,7 +38,7 @@ const SearchSettings = ({ getPreferencesPayload, getPreferences, setIsEditorLoad
 		const destinationPosition = index.destination.index;
 		if (form.get(field)) {
 			const filtersControl = form.get(field);
-			const control = filtersControl.at(sourcePosition);
+			const control = filtersControl[sourcePosition];
 			filtersControl.removeAt(sourcePosition);
 			filtersControl.insert(destinationPosition, control);
 		}

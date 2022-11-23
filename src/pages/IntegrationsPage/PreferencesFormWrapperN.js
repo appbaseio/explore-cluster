@@ -427,13 +427,13 @@ class PreferencesFormWrapperN extends React.Component {
 								componentTypes.reactiveChart
 							) {
 								const arr = facetSettingsObject.rsConfig.componentId.split('_');
-								const idx = arr.at(-1) || 0;
+								const idx = arr.pop() || 0;
 
 								compSettings[facetId] = payload.chartSettings.charts[idx];
 							} else if (facetSettingsObject.rsConfig.title) {
 								if (facetSettingsObject.facetType !== 'static') {
 									const arr = facetSettingsObject.rsConfig.componentId.split('_');
-									const idx = arr.at(-1) || 0;
+									const idx = arr.pop() || 0;
 									compSettings[facetId] =
 										payload.facetSettings.dynamicFacets[idx];
 								}
