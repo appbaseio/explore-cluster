@@ -1,7 +1,7 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
 
-let indexName = 'airbeds-test-app';
+const indexName = 'clone-airbeds';
 
 describe('Popular Suggestion Settings add test flow', () => {
 	before(() => {
@@ -27,7 +27,7 @@ describe('Popular Suggestion Settings add test flow', () => {
 
 	it('Should Popular suggestion settings page URL', () => {
 		cy.visit(`${base_url}/cluster/suggestions`).wait(2000);
-		cy.get('.ant-tabs-nav > :nth-child(1) > :nth-child(1)').click();
+		cy.get('.ant-tabs-nav .ant-tabs-tab:nth-child(1)').click();
 	});
 
 	it('Should Add Popular Suggestions Settings Form Data', () => {
@@ -63,7 +63,7 @@ describe('Popular Suggestion Settings add test flow', () => {
 				minCharacters: 2,
 				size: 2,
 				transformDiacritics: true,
-				indices: ['airbeds-test-app'],
+				indices: [indexName],
 			},
 		});
 	});
