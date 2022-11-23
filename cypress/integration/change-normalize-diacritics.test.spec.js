@@ -26,8 +26,13 @@ describe('Change normalize diacritics test flow', () => {
 		cy.loginUser(username, password, cluster);
 	});
 
+	it('Should navigate to cluster overview', () => {
+		cy.wait(5000);
+		cy.visit(`${base_url}`);
+	});
+
 	it('Should create new index', () => {
-		cy.wait(5000).get('[data-cy=initialize-new-index-creation]').click().wait(2000);
+		cy.wait(1000).get('[data-cy=initialize-new-index-creation]').click().wait(2000);
 		generateName();
 		cy.get('[data-cy=new-index-name]')
 			.type(`${indexName}`)
