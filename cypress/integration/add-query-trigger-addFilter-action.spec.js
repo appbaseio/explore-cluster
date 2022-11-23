@@ -45,7 +45,7 @@ describe('Query Rule creation with trigger index and filter action', () => {
 		cy.get('[data-cy=add_filter]').click({ force: true, multiple: true });
 		cy.wait(1000);
 		cy.get('[data-cy=add-filter-action]').click();
-		cy.get('[data-cy=filter-key]').click({ force: true, multiple: true });
+		cy.get('[data-cy=filter-key]').click().type('br');
 		cy.get('[data-cy=brand]').click();
 		cy.get('[data-cy=filter-values]').type('apple,samsung,');
 
