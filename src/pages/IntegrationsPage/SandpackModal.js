@@ -82,6 +82,7 @@ const SandpackModal = ({
 		<ReactivesearchLoader />
 	) : (
 		<SandpackProvider
+			template={templateObj.template || 'react'}
 			files={{ ...sandpackCode }}
 			customSetup={{
 				entry: 'src/index.js',

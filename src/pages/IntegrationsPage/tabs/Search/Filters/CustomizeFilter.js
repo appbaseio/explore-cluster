@@ -20,6 +20,7 @@ import { dataPropFromArray } from '../../../utils';
 import { BACKENDS } from '../../../../../batteries/utils';
 import { CardButton, CodeEditorCard } from '../styles';
 import CodeEditorModal from '../CodeEditorModal';
+import { getTemplate } from '../../../utils/index';
 
 const { Item } = List;
 
@@ -141,13 +142,17 @@ class CustomizeFilter extends React.Component {
 			form,
 		} = this.props;
 		const { pipeline } = this.props;
+		const themeType = form && form.get('themeType') ? form.get('themeType').value : 'classic';
+		const templateObj = getTemplate(themeType || 'classic');
+
 		const handleComponentTypeChange = (componentType) => {
 			const showSearchControl = control.get('showSearch');
-
-			if (componentType === componentTypes.tabDataList) {
-				showSearchControl.setValue(false);
-			} else {
-				showSearchControl.setValue(true);
+			if (showSearchControl) {
+				if (componentType === componentTypes.tabDataList) {
+					showSearchControl.setValue(false);
+				} else {
+					showSearchControl.setValue(true);
+				}
 			}
 		};
 
@@ -345,16 +350,24 @@ class CustomizeFilter extends React.Component {
 																>
 																	SingleList
 																</Select.Option>
-																<Select.Option
-																	key={componentTypes.tagCloud}
-																>
-																	TagCloud
-																</Select.Option>
-																<Select.Option
-																	key={componentTypes.tabDataList}
-																>
-																	TabDataList
-																</Select.Option>
+																{templateObj.template !== 'vue' && (
+																	<Select.Option
+																		key={
+																			componentTypes.tagCloud
+																		}
+																	>
+																		TagCloud
+																	</Select.Option>
+																)}
+																{templateObj.template !== 'vue' && (
+																	<Select.Option
+																		key={
+																			componentTypes.tabDataList
+																		}
+																	>
+																		TabDataList
+																	</Select.Option>
+																)}
 															</Select>
 														</Form.Item>
 													)}

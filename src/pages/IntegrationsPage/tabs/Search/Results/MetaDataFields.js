@@ -60,7 +60,18 @@ function MetaDataFields({
 	const [fieldPicker, setFieldPicker] = useState([]);
 	const [isInitial, setIsInitial] = useState(true);
 	const [metaDataItem, setMetaDataItem] = useState(item);
+	const [resultHighlight, setResultHighlight] = useState(form.get('resultHighlight').value);
 	const isFusion = backend === BACKENDS.FUSION.name;
+
+	useEffect(() => {
+		form.get('resultHighlight').valueChanges.subscribe((val) => {
+			setResultHighlight(val);
+		});
+	}, []);
+
+	useEffect(() => {
+		setMetaDataItem(item);
+	}, [item]);
 
 	useEffect(() => {
 		getDatafields(item?.dataField);
@@ -261,17 +272,19 @@ function MetaDataFields({
 								/>
 							</Col>
 							<Col xs={5} style={{ marginLeft: 30 }}>
-								<Tooltip title="Toggle to enable or disable field level highlight">
-									<Switch
-										checked={metaDataItem.highlight}
-										onChange={(val) => {
-											handleChange('highlight', val);
-											const newArr = value;
-											newArr[index].highlight = val;
-											onChange(newArr);
-										}}
-									/>
-								</Tooltip>
+								{resultHighlight && (
+									<Tooltip title="Toggle to enable or disable field level highlight">
+										<Switch
+											checked={metaDataItem.highlight}
+											onChange={(val) => {
+												handleChange('highlight', val);
+												const newArr = value;
+												newArr[index].highlight = val;
+												onChange(newArr);
+											}}
+										/>
+									</Tooltip>
+								)}
 							</Col>
 							<Col xs={1}>
 								<div className="show-on-hover">

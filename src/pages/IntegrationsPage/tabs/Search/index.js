@@ -15,6 +15,7 @@ import Charts from './Charts';
 import PageRoutes from '../../PageRoutes';
 import EndpointDropdown from '../../Endpoint/EndpointDropdown';
 import { BACKENDS } from '../../../../batteries/utils';
+import { getTemplate } from '../../utils/index';
 
 const { TabPane } = Tabs;
 
@@ -43,6 +44,8 @@ const SearchSettings = ({ getPreferencesPayload, getPreferences, setIsEditorLoad
 		}
 	};
 
+	const themeType = form && form.get('themeType') ? form.get('themeType').value : 'classic';
+	const templateObj = getTemplate(themeType);
 	return (
 		<div>
 			<Form>
@@ -141,35 +144,39 @@ const SearchSettings = ({ getPreferencesPayload, getPreferences, setIsEditorLoad
 						)}
 					/>
 				</TabPane>
-				<TabPane tab="Charts" key="3">
-					<FieldGroup
-						control={form}
-						render={() => (
-							<DragDropContext onDragEnd={(idx) => handleItemReOrder(idx, 'charts')}>
-								<Droppable droppableId="droppable">
-									{(provided, snapshot) => (
-										<div
-											ref={provided.innerRef}
-											style={{
-												backgroundColor: snapshot.isDraggingOver
-													? 'transparent'
-													: 'transparent',
-											}}
-											{...provided.droppableProps}
-										>
-											<Charts
-												getPreferencesPayload={getPreferencesPayload}
-												form={form}
-												backend={backend}
-											/>
-											{provided.placeholder}
-										</div>
-									)}
-								</Droppable>
-							</DragDropContext>
-						)}
-					/>
-				</TabPane>
+				{templateObj.template !== 'vue' && (
+					<TabPane tab="Charts" key="3">
+						<FieldGroup
+							control={form}
+							render={() => (
+								<DragDropContext
+									onDragEnd={(idx) => handleItemReOrder(idx, 'charts')}
+								>
+									<Droppable droppableId="droppable">
+										{(provided, snapshot) => (
+											<div
+												ref={provided.innerRef}
+												style={{
+													backgroundColor: snapshot.isDraggingOver
+														? 'transparent'
+														: 'transparent',
+												}}
+												{...provided.droppableProps}
+											>
+												<Charts
+													getPreferencesPayload={getPreferencesPayload}
+													form={form}
+													backend={backend}
+												/>
+												{provided.placeholder}
+											</div>
+										)}
+									</Droppable>
+								</DragDropContext>
+							)}
+						/>
+					</TabPane>
+				)}
 				<TabPane tab="Results" key="4">
 					<FieldGroup
 						control={form}

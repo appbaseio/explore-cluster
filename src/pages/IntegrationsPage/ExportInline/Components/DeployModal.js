@@ -17,11 +17,12 @@ const DeployModal = ({
 	uiBuilderName,
 	allVersions,
 	currentVersion,
+	templateObj,
 	deploymentStatus,
 }) => {
 	const [initialDeploy, setIsInitialDeploy] = useState(false);
 	const defaultObj = {
-		projectSettings: {
+		projectSettings: templateObj.projectSettings || {
 			buildCommand: 'yarn build',
 			devCommand: 'yarn dev',
 			installCommand: 'yarn',
@@ -50,6 +51,18 @@ const DeployModal = ({
 	useEffect(() => {
 		setIsInitialDeploy(isInitialDeploy());
 	}, [deploymentStatus]);
+
+	useEffect(() => {
+		const newDeployObj = { ...deployObj };
+		newDeployObj.projectSettings = templateObj.projectSettings || {
+			buildCommand: 'yarn build',
+			devCommand: 'yarn dev',
+			installCommand: 'yarn',
+			outputDirectory: 'build',
+			framework: null,
+		};
+		setDeployObj(newDeployObj);
+	}, [templateObj]);
 
 	const handleInputChange = (key, val) => {
 		if (errMsg && errMsg !== 'Manifest is missing') setErrMsg('');
@@ -228,6 +241,7 @@ DeployModal.propTypes = {
 	allVersions: PropTypes.array,
 	isLoading: PropTypes.bool,
 	currentVersion: PropTypes.object,
+	templateObj: PropTypes.object,
 	deploymentStatus: PropTypes.object,
 };
 
@@ -239,6 +253,7 @@ DeployModal.defaultProps = {
 	allVersions: [],
 	isLoading: false,
 	currentVersion: {},
+	templateObj: {},
 	deploymentStatus: {},
 };
 

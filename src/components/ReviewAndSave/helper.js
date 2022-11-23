@@ -427,6 +427,10 @@ const settingsMap = {
 		title: 'Sponsored Query Profile',
 		description: '',
 	},
+	meta: {
+		title: 'Meta Data',
+		description: '',
+	},
 	description: {
 		title: 'Description',
 		description: '',

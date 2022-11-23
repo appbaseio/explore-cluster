@@ -42,6 +42,36 @@ export const fontWeights = [
 	{ label: '800 - Extra Bold', value: 800 },
 ];
 
+export const webSafeFonts = [
+	{
+		family: 'Arial',
+	},
+	{
+		family: 'Verdana',
+	},
+	{
+		family: 'Tahoma',
+	},
+	{
+		family: 'Trebuchet',
+	},
+	{
+		family: 'Times New Roman',
+	},
+	{
+		family: 'Georgia',
+	},
+	{
+		family: 'Garamond',
+	},
+	{
+		family: 'Courier New',
+	},
+	{
+		family: 'Brush Script MT',
+	},
+];
+
 export const currencies = [
 	{ cc: 'AED', symbol: '\u062f.\u0625;', name: 'UAE dirham' },
 	{ cc: 'AFN', symbol: 'Afs', name: 'Afghan afghani' },
@@ -863,26 +893,17 @@ export const defaultSearchPreferences = {
 	},
 };
 
-function getMetaDataFields(meta) {
-	const newMeta = {};
-	if (Array.isArray(meta || [])) {
-		(meta || []).forEach((obj) => {
-			newMeta[obj.label] = {
-				dataField: obj.dataField,
-				highlight: obj.highlight,
-			};
-		});
-	} else if (meta && typeof meta === 'object' && meta.label) {
-		newMeta[meta.label] = {
-			dataField: meta.dataField,
-			highlight: meta.highlight,
-		};
-	} else if (meta && typeof meta === 'string') {
-		return getMetaDataFields(JSON.parse(meta));
-	}
-
-	return newMeta;
-}
+const getParseJSON = (val) => {
+	if (val)
+		try {
+			const jsonObj = JSON.parse(val);
+			return jsonObj;
+		} catch (err) {
+			console.error(err);
+			return val;
+		}
+	return val;
+};
 
 export const getRecommendationPreferencesPayload = (formValue) => {
 	return JSON.parse(
@@ -995,7 +1016,7 @@ export const getSearchPreferencesPayload = (formValue) => {
 			image: get(displayFields[key], 'resultImage'),
 			handle: get(displayFields[key], 'resultHandle'),
 			handleViewer: get(displayFields[key], 'resultHandleViewer'),
-			userDefinedFields: getMetaDataFields(get(displayFields[key], 'metaDataFields')),
+			userDefinedFields: getParseJSON(get(displayFields[key], 'metaDataFields')),
 			cssSelector: get(displayFields[key], 'cssSelector'),
 		};
 	});
@@ -1065,7 +1086,7 @@ export const getSearchPreferencesPayload = (formValue) => {
 					image: get(formValue, 'resultImage'),
 					handle: get(formValue, 'resultHandle'),
 					handleViewer: get(formValue, 'resultHandleViewer'),
-					userDefinedFields: getMetaDataFields(get(formValue, 'metaDataFields')),
+					userDefinedFields: get(formValue, 'metaDataFields'),
 					cssSelector: get(formValue, 'cssSelector'),
 				},
 				customMessages: {
@@ -1118,7 +1139,7 @@ export const getSearchPreferencesPayload = (formValue) => {
 					image: get(formValue, 'resultImage'),
 					handle: get(formValue, 'resultHandle'),
 					handleViewer: get(formValue, 'resultHandleViewer'),
-					userDefinedFields: getMetaDataFields(get(formValue, 'metaDataFields')),
+					userDefinedFields: get(formValue, 'metaDataFields'),
 					cssSelector: get(formValue, 'cssSelector'),
 				},
 				rsConfig: {
@@ -1428,6 +1449,15 @@ export const perPageDependentKeys = [
 	'indexSettings',
 ];
 
+const returnEmpty = (val) => {
+	if (val === '') return '';
+
+	if (typeof val === 'object' && (JSON.stringify(val) === '{}' || JSON.stringify(val) === '[]'))
+		return '';
+
+	return val;
+};
+
 const getDiffFieldsFromObject = (diffData, field, oldObj, newObj) => {
 	const oldKeys = Object.keys(get(oldObj, field, {}) || {});
 	const newKeys = Object.keys(get(newObj, field, {}) || {});
@@ -1436,8 +1466,7 @@ const getDiffFieldsFromObject = (diffData, field, oldObj, newObj) => {
 	[...oldKeys, ...newKeys].forEach((key) => {
 		const newVal = get(newObj, `${field}.${key}`, '');
 		const oldVal = get(oldObj, `${field}.${key}`, '');
-
-		if ((oldVal || newVal) && !isEqual(oldVal, newVal))
+		if ((oldVal || newVal) && !isEqual(returnEmpty(oldVal), returnEmpty(newVal)))
 			newDiffData = {
 				...newDiffData,
 				[key]: [oldVal, newVal],
@@ -1708,7 +1737,6 @@ export const getDiffData = (oldObj, newObj, isPageLevelDiff = false, isRecommend
 			diffData = {
 				...diffData,
 				fusionSettings: {
-					...diffData.fusionSettings,
 					...getDiffFieldsFromObject(
 						get(diffData, 'fusionSettings', {}),
 						'fusionSettings',
@@ -1991,23 +2019,23 @@ export const getDiffData = (oldObj, newObj, isPageLevelDiff = false, isRecommend
 			const newVal = get(removeEmpty(newObj), 'resultSettings.fields', '');
 			const oldVal = get(removeEmpty(oldObj), 'resultSettings.fields', '');
 			const resultSettings = get(diffData, 'resultSettings.fields', {});
-
+			const newResultSettings = {};
 			Object.keys(resultSettings).forEach((i) => {
 				if (i === 'handleViewer') {
 					const oldData = oldVal[i] || 'link';
 					const newData = newVal[i] || 'link';
-					if (oldData !== newData) resultSettings[i] = [oldData, newData];
+					if (oldData !== newData) newResultSettings[i] = [oldData, newData];
 				} else {
-					const oldData = oldVal[i] || '';
-					const newData = newVal[i] || '';
-					if (oldData !== newData) resultSettings[i] = [oldData, newData];
+					const oldData = returnEmpty(oldVal[i]) || '';
+					const newData = returnEmpty(newVal[i]) || '';
+					if (oldData !== newData) newResultSettings[i] = [oldData, newData];
 				}
 			});
 			diffData = {
 				...diffData,
 				resultSettings: {
 					...diffData.resultSettings,
-					...resultSettings,
+					...newResultSettings,
 				},
 			};
 
@@ -2015,7 +2043,7 @@ export const getDiffData = (oldObj, newObj, isPageLevelDiff = false, isRecommend
 				...diffData,
 				resultSettings: {
 					...diffData.resultSettings,
-					...resultSettings,
+					...newResultSettings,
 				},
 			};
 			delete diffData.resultSettings.fields;

@@ -52,5 +52,14 @@
 		"branch": "main",
 		"manifest_path": "reactivesearch-manifest.json",
 		"repositoryType": "private"
+	},
+	{
+		"organization": "appbaseio",
+		"repository": "vue-ecommerce-template",
+		"version": "",
+		"commit": "",
+		"branch": "master",
+		"manifest_path": "reactivesearch-manifest.json",
+		"repositoryType": "private"
 	}
 ]

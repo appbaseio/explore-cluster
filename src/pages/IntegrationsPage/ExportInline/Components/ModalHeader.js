@@ -72,7 +72,7 @@ const ModalHeader = ({
 	setModalType,
 	setOpenCommitModal,
 	preferences,
-	themeType,
+	themeType: localTheme,
 	setThemeType,
 	getSearchPreferenceVersions,
 	versionState,
@@ -91,6 +91,8 @@ const ModalHeader = ({
 		currentVersion = {},
 		initialCode = {},
 	} = versionState[preferenceId] ?? {};
+	const themeType = get(preferences, 'themeSettings.type', '');
+	const templateObj = getTemplate(themeType);
 	let myInterval = null;
 
 	useEffect(() => {
@@ -114,8 +116,6 @@ const ModalHeader = ({
 	}, [modalType]);
 
 	useEffect(() => {
-		const theme = get(preferences, 'themeSettings.type', '');
-		const templateObj = getTemplate(theme);
 		// eslint-disable-next-line
 		if (templateObj?.manifest_path && !updatedCode[`/${templateObj.manifest_path}`]) {
 			setErrMsg('Manifest is missing');
@@ -182,9 +182,6 @@ const ModalHeader = ({
 
 				// below code is responsible for syhncing the committed code with what appears in the main settings page
 				const newContent = transformContent(body.content);
-				const theme = get(preferences, 'themeSettings.type', '');
-				const templateObj = getTemplate(theme);
-
 				const newPreferences = JSON.parse(
 					newContent[`/${templateObj.preferences_path}`]
 						.replace('const appbasePrefs = ', '')
@@ -359,7 +356,7 @@ const ModalHeader = ({
 						handleCancel={handleCancel}
 						handleCommitCode={handleCommitCode}
 					/>
-					<ThemeSwitch themeType={themeType} setThemeType={setThemeType} />
+					<ThemeSwitch themeType={localTheme} setThemeType={setThemeType} />
 				</div>
 			</div>
 
@@ -407,6 +404,7 @@ const ModalHeader = ({
 				handleCancel={handleCancel}
 				allVersions={allVersions}
 				currentVersion={currentVersion}
+				templateObj={templateObj}
 				deploymentStatus={deploymentStatus}
 			/>
 		</>
@@ -444,9 +442,9 @@ ModalHeader.defaultProps = {
 	setModalType: () => {},
 	setOpenCommitModal: () => {},
 	preferences: {},
-	versionState: {},
 	themeType: localStorage.getItem('theme') || 'light',
 	setThemeType: () => {},
+	versionState: {},
 };
 const mapStateToProps = (state) => {
 	return {

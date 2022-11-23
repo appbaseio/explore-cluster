@@ -195,7 +195,7 @@ const FusionSearch = ({ backend, form, endpoints, getPreferencesPayload }) => {
 														);
 													}}
 												</FieldControl>
-												<FieldControl name="meta" strict={false}>
+												<FieldGroup name="meta" strict={false}>
 													{() => (
 														<FieldControl
 															name="sponsoredProfile"
@@ -243,7 +243,7 @@ const FusionSearch = ({ backend, form, endpoints, getPreferencesPayload }) => {
 															}}
 														</FieldControl>
 													)}
-												</FieldControl>
+												</FieldGroup>
 											</>
 										)}
 									</FieldGroup>

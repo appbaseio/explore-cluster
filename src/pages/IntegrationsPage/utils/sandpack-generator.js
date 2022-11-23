@@ -227,11 +227,10 @@ export const generateInlineSandboxURL = async (preferences) => {
 				}`
 			];
 		if (str) {
-			const newStr = str.replace(
-				`'{{APPBASE_PREFERENCES}}'`,
-				JSON.stringify(newPrefs, null, 2),
-			);
-
+			const replacedString = str.includes(`'{{APPBASE_PREFERENCES}}'`)
+				? `'{{APPBASE_PREFERENCES}}'`
+				: `"{{APPBASE_PREFERENCES}}"`;
+			const newStr = str.replace(replacedString, JSON.stringify(newPrefs, null, 2));
 			newFiles[
 				`/${
 					template && template.preferences_path
