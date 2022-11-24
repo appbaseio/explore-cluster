@@ -1,5 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
+import { PAGE_LOAD_TIME } from './contants';
 
 const indexName = 'clone-airbeds';
 
@@ -23,11 +24,11 @@ describe('Index Suggestion Settings add test flow', () => {
 
 	it('Should login from cluster URL', () => {
 		cy.loginUser(username, password, cluster);
-		cy.wait(3000);
 	});
 
 	it('Should Index suggestion settings page URL', () => {
-		cy.visit(`${base_url}/cluster/suggestions`).wait(2000);
+		cy.visit(`${base_url}/cluster/suggestions`);
+		cy.wait(PAGE_LOAD_TIME);
 		cy.get('.ant-tabs-nav .ant-tabs-tab:nth-child(3)').click();
 	});
 

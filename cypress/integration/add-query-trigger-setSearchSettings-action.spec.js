@@ -1,5 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
+import { PAGE_LOAD_TIME } from './contants';
 
 describe('Query Rule creation with trigger index and script action', () => {
 	before(() => {
@@ -25,12 +26,15 @@ describe('Query Rule creation with trigger index and script action', () => {
 	});
 
 	it('Should open query rules page', () => {
-		cy.visit(`${base_url}/cluster/rules`).wait(2000);
+		cy.visit(`${base_url}/cluster/rules`);
+		cy.wait(PAGE_LOAD_TIME);
+	});
+	it('Should navigate to create query rule page', () => {
+		cy.get('[data-cy=create-query-rule]').click();
+		cy.wait(PAGE_LOAD_TIME);
 	});
 
 	it('Should create a query rule', () => {
-		cy.get('[data-cy=create-query-rule]').click();
-
 		// Enter name and description
 		cy.get('[name="name"]').type('cypress-testing-rule-name');
 		cy.get('[name="description"]').type('cypress-testing-rule-description');
