@@ -49,7 +49,7 @@ export async function getUser(username, password, url) {
 	}
 
 	// Dont use await over here as we dont need these immediately.
-	fetch(`${api}`, {
+	await fetch(`${api}`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Basic ${authToken}`,
@@ -72,7 +72,6 @@ export async function getUser(username, password, url) {
 			// eslint-disable-next-line no-console
 			console.error(e);
 		});
-
 	return {
 		username,
 		password,

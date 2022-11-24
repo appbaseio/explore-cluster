@@ -32,6 +32,7 @@ Cypress.Commands.add('loginUser', (username, password, cluster) => {
 		.blur()
 		.wait(1000);
 	cy.get('[data-cy=signin-button]').click();
+	cy.wait(20000);
 });
 
 Cypress.Commands.add('logoutUser', () => {
