@@ -43,7 +43,6 @@ describe('Query Rule creation with trigger index and script action', () => {
 		cy.wait(2000);
 		// Remove tooltip blocking the select box
 		cy.get('.ant-tooltip').then((tooltipEl) => {
-			console.log({ tooltipEl });
 			tooltipEl.remove();
 		});
 		cy.wait(2000);
