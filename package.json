@@ -82,7 +82,7 @@
 	"dependencies": {
 		"@appbaseio-confidential/importer": "git+https://1dc0d0fc07f05943afdde9bdb85b7aa438a0ce3b:x-oauth-basic@github.com/appbaseio-confidential/importer#bac630477639bf81ee1d918029023f6da2639b69",
 		"@appbaseio-confidential/reactivesearch-playground": "^1.2.16-beta",
-		"@appbaseio/dejavu-browser": "^3.6.0",
+		"@appbaseio/dejavu-browser": "^3.7.0",
 		"@appbaseio/react-filter-box": "^3.4.1",
 		"@appbaseio/reactivemaps": "^3.0.0-beta.14",
 		"@appbaseio/reactivesearch": "^3.42.1",

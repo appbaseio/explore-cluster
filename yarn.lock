@@ -107,10 +107,10 @@
     redux-persist "^6.0.0"
     styled-components "^5.3.0"
 
-"@appbaseio/dejavu-browser@^3.6.0":
-  version "3.6.0"
-  resolved "https://registry.yarnpkg.com/@appbaseio/dejavu-browser/-/dejavu-browser-3.6.0.tgz#3fe33cbb07b0e2e52afe972db9bd2d0a5521bda4"
-  integrity sha512-cHXjxk5qJeUZLG7jXinlVbxmXdR8+7JUnUXIm9JbUldbpzga/BlGEvoXMGPN/0/8Wf9+Dd9432YFhT9C8hMYyw==
+"@appbaseio/dejavu-browser@^3.7.0":
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/@appbaseio/dejavu-browser/-/dejavu-browser-3.7.0.tgz#8bebe479fb9efb34584c6632e4bb374dae4c3ccf"
+  integrity sha512-kjBcUBkZ3tMGSwbF0hBUuIq/gn5/it1aTwJkmWWomtK0Y6lb0aldWs8d8N5usgy+WWhhi6z12UqyzromQlDQVA==
   dependencies:
     "@divyanshu013/media" "^1.0.0"
     "@fortawesome/fontawesome-svg-core" "^1.2.27"
