@@ -1,5 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
+import { PAGE_LOAD_TIME } from './contants';
 
 let indexName = '';
 
@@ -27,7 +28,6 @@ describe('Searchable fields add test flow', () => {
 	});
 
 	it('Should navigate to cluster overview', () => {
-		cy.wait(5000);
 		cy.visit(`${base_url}`);
 	});
 
@@ -74,7 +74,7 @@ describe('Searchable fields add test flow', () => {
 	});
 
 	it('Should open schema URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/schema`).wait(5000);
+		cy.visit(`${base_url}/app/${indexName}/schema`).wait(PAGE_LOAD_TIME);
 	});
 
 	it('Should add new data fields in schema', () => {
@@ -85,7 +85,7 @@ describe('Searchable fields add test flow', () => {
 			.tab()
 			.type('phone')
 			.tab()
-			.type('{enter}{downarrow}{downarrow}{enter}')
+			.type('{enter}{downarrow}{downarrow}{enter}', { force: true })
 			.root()
 			.contains('Add Field')
 			.click()

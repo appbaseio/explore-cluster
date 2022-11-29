@@ -1,5 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
+import { PAGE_LOAD_TIME, REQUEST_RESOLVE_TIME } from './contants';
 
 const indexName = 'clone-airbeds';
 
@@ -27,7 +28,7 @@ describe('Recent Suggestion Settings add test flow', () => {
 	});
 
 	it('Should Recent suggestion settings page URL', () => {
-		cy.visit(`${base_url}/cluster/suggestions`).wait(2000);
+		cy.visit(`${base_url}/cluster/suggestions`).wait(PAGE_LOAD_TIME);
 		cy.get('.ant-tabs-nav .ant-tabs-tab:nth-child(2)').click();
 	});
 
@@ -41,7 +42,7 @@ describe('Recent Suggestion Settings add test flow', () => {
 		cy.get('[data-cy=recent-suggestions-minChars]').clear().type(10);
 
 		cy.get('[data-cy=recent-suggestions-indices]').invoke('val', '');
-		cy.get('[data-cy=recent-suggestions-indices]').click();
+		cy.get('[data-cy=recent-suggestions-indices]').click().type(indexName.substr(0, 3));
 		cy.get(`[data-cy=${indexName}]`).click();
 		cy.get('[data-cy=recent-suggestions-indices-label]').click();
 
@@ -66,6 +67,7 @@ describe('Recent Suggestion Settings add test flow', () => {
 				indices: [indexName],
 			},
 		});
+		cy.wait(REQUEST_RESOLVE_TIME);
 	});
 	it('Should logout user', () => {
 		cy.clearLocalStorage();
