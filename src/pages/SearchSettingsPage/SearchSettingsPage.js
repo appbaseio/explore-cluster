@@ -570,7 +570,7 @@ class SearchSettingsPage extends React.Component {
 											onClick={mappingWrapperProps.reloadMappings}
 											data-cy="reload-mappings-button"
 										>
-											<ReloadOutlined />
+											<ReloadOutlined style={{ margin: '0.25rem' }} />
 											Reload Mappings
 										</Button>
 									</Tooltip>
@@ -589,7 +589,7 @@ class SearchSettingsPage extends React.Component {
 												}
 												disabled={this.disableRemoveAllButton()}
 											>
-												<DeleteOutlined />
+												<DeleteOutlined style={{ margin: '0.25rem' }} />
 												Remove All Fields
 											</Button>
 										</Tooltip>

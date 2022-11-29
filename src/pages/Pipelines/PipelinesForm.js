@@ -783,7 +783,7 @@ const PipelinesForm = (props) => {
 						extra={
 							<Link to="/cluster/pipelines/new">
 								<Button type="primary">
-									<PlusOutlined />
+									<PlusOutlined style={{ margin: "0.25rem" }}/>
 									Create Pipeline
 								</Button>
 							</Link>
@@ -813,7 +813,7 @@ const PipelinesForm = (props) => {
 									}
 									className="create-script-file-link-btn"
 								>
-									<PlusOutlined />
+									<PlusOutlined style={{ margin: "0.25rem" }}/>
 									Add script file
 								</Button>
 							</Fragment>
@@ -879,7 +879,7 @@ const PipelinesForm = (props) => {
 				<Fragment>
 					<Link to="/cluster/pipelines">
 						<Button>
-							<ArrowLeftOutlined />
+							<ArrowLeftOutlined style={{ margin: "0.25rem" }}/>
 							Back to Pipelines
 						</Button>
 					</Link>

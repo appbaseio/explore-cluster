@@ -105,7 +105,7 @@ const SearchBoxPage = (props) => {
 						>
 							<Link to="/cluster/searchboxes/new">
 								<Button block type="primary" size="large" rel="noopener noreferrer">
-									<PlusOutlined />
+									<PlusOutlined style={{ margin: '0.25rem' }} />
 									Create Searchbox
 								</Button>
 							</Link>
@@ -136,7 +136,7 @@ const SearchBoxPage = (props) => {
 						extra={
 							<Link to="/cluster/searchboxes/new">
 								<Button type="primary">
-									<PlusOutlined />
+									<PlusOutlined style={{ margin: '0.25rem' }} />
 									Create Searchbox
 								</Button>
 							</Link>

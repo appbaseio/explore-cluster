@@ -175,7 +175,7 @@ class ImporterPage extends React.Component {
 								target="_blank"
 								rel="noopener noreferrer"
 							>
-								<FormOutlined />
+								<FormOutlined style={{ margin: "0.25rem" }}/>
 								Contact Us
 							</Button>
 							<p

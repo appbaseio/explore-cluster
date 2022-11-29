@@ -547,7 +547,7 @@ class ResultsPage extends React.Component {
 												}}
 												disabled={error}
 											>
-												<PlusOutlined />
+												<PlusOutlined style={{ margin: "0.25rem" }}/>
 												Add Sort Option
 											</Button>
 										</div>

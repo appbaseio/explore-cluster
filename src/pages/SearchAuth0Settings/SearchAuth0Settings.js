@@ -710,7 +710,7 @@ const SearchAuth0Settings = (props) => {
 								<TabPane
 									tab={
 										<>
-											<SettingOutlined />
+											<SettingOutlined style={{ margin: '0.25rem' }} />
 											Login Flow Settings
 										</>
 									}
@@ -721,7 +721,7 @@ const SearchAuth0Settings = (props) => {
 								<TabPane
 									tab={
 										<>
-											<UnlockOutlined />
+											<UnlockOutlined style={{ margin: '0.25rem' }} />
 											Providers
 										</>
 									}
@@ -733,7 +733,9 @@ const SearchAuth0Settings = (props) => {
 									disabled={!clientId}
 									tab={
 										<>
-											<UsergroupDeleteOutlined />
+											<UsergroupDeleteOutlined
+												style={{ margin: '0.25rem' }}
+											/>
 											User Management
 										</>
 									}

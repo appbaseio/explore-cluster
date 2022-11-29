@@ -117,7 +117,7 @@ const Pipelines = (props) => {
 						>
 							<Link to="/cluster/pipelines/new">
 								<Button block type="primary" size="large" rel="noopener noreferrer">
-									<PlusOutlined />
+									<PlusOutlined style={{ margin: "0.25rem" }}/>
 									Create Pipeline
 								</Button>
 							</Link>
@@ -158,7 +158,7 @@ const Pipelines = (props) => {
 						extra={
 							<Link to="/cluster/pipelines/new">
 								<Button type="primary">
-									<PlusOutlined />
+									<PlusOutlined style={{ margin: "0.25rem" }}/>
 									Create Pipeline
 								</Button>
 							</Link>

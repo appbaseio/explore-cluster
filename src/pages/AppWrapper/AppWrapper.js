@@ -410,7 +410,7 @@ class AppWrapper extends Component {
 									)
 								) : (
 									<React.Fragment>
-										<ClusterOutlined />
+										<ClusterOutlined style={{ margin: '0.25rem' }} />
 										Cluster Overview
 									</React.Fragment>
 								)}

@@ -260,7 +260,7 @@ class QueryRules extends Component {
 										rel="noopener noreferrer"
 										data-cy="create-query-rule"
 									>
-										<PlusOutlined />
+										<PlusOutlined style={{ margin: '0.25rem' }} />
 										Create Rule
 									</Button>
 								</Link>
@@ -411,7 +411,7 @@ class QueryRules extends Component {
 							extra={
 								<Link to="/cluster/rules/new">
 									<Button type="primary" data-cy="create-query-rule">
-										<PlusOutlined />
+										<PlusOutlined style={{ margin: '0.25rem' }} />
 										Create Rule
 									</Button>
 								</Link>

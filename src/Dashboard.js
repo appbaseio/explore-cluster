@@ -209,7 +209,7 @@ class Dashboard extends Component {
 
 		if (error) {
 			return (
-                <section
+				<section
 					style={{
 						justifyContent: 'center',
 						alignItems: 'center',
@@ -228,7 +228,7 @@ class Dashboard extends Component {
 						}}
 					>
 						<Button href="/" size="large" type="primary">
-							<HomeOutlined />
+							<HomeOutlined style={{ margin: '0.25rem' }} />
 							Back to Dashboard
 						</Button>
 						<Button
@@ -241,12 +241,12 @@ class Dashboard extends Component {
 								});
 							}}
 						>
-							<InfoCircleOutlined />
+							<InfoCircleOutlined style={{ margin: '0.25rem' }} />
 							Report this problem
 						</Button>
 					</section>
 				</section>
-            );
+			);
 		}
 
 		return (

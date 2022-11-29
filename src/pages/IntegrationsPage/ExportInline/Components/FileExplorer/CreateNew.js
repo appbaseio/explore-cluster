@@ -88,7 +88,7 @@ const CreateNew = ({ path, selectFile, active, onClick, depth, setNewFolder, new
 					setMode('file-add');
 				}}
 			>
-				<FileAddOutlined />
+				<FileAddOutlined style={{ margin: '0.25rem' }} />
 				New File
 			</Menu.Item>
 			<Menu.Item
@@ -97,7 +97,7 @@ const CreateNew = ({ path, selectFile, active, onClick, depth, setNewFolder, new
 					setMode('folder-add');
 				}}
 			>
-				<FolderAddOutlined />
+				<FolderAddOutlined style={{ margin: '0.25rem' }} />
 				New Folder
 			</Menu.Item>
 			<Menu.Item
@@ -105,7 +105,7 @@ const CreateNew = ({ path, selectFile, active, onClick, depth, setNewFolder, new
 					setMode('folder-edit');
 				}}
 			>
-				<EditOutlined />
+				<EditOutlined style={{ margin: '0.25rem' }} />
 				Rename
 			</Menu.Item>
 			<Menu.Item
@@ -114,7 +114,7 @@ const CreateNew = ({ path, selectFile, active, onClick, depth, setNewFolder, new
 					handleDelete();
 				}}
 			>
-				<DeleteOutlined />
+				<DeleteOutlined style={{ margin: '0.25rem' }} />
 				Delete
 			</Menu.Item>
 		</Menu>

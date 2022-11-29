@@ -384,7 +384,7 @@ const SearchBoxForm = (props) => {
 						extra={
 							<Link to="/cluster/searchboxes/new">
 								<Button type="primary">
-									<PlusOutlined />
+									<PlusOutlined style={{ margin: '0.25rem' }} />
 									Create Searchbox
 								</Button>
 							</Link>
@@ -409,7 +409,7 @@ const SearchBoxForm = (props) => {
 					>
 						<Link to="/cluster/searchboxes">
 							<Button>
-								<ArrowLeftOutlined />
+								<ArrowLeftOutlined style={{ margin: '0.25rem' }} />
 								Back to Searchboxes
 							</Button>
 						</Link>

@@ -75,7 +75,7 @@ class ErrorPage extends React.Component {
 							Sentry.showReportDialog();
 						}}
 					>
-						<InfoCircleOutlined />
+						<InfoCircleOutlined style={{ margin: '0.25rem' }} />
 						Report this problem
 					</Button>
 				</section>

@@ -67,7 +67,7 @@ const GlobalVarList = ({ formData, handleClose, credentials, globalVars }) => {
 					onClick={() => setOpen(true)}
 					className="validate-button show-on-hover"
 				>
-					<EditOutlined />
+					<EditOutlined style={{ margin: "0.25rem" }}/>
 					Update
 				</Button>
 				<div

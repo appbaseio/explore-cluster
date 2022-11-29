@@ -90,7 +90,7 @@ const Main = ({ tier, featureEcommerce, getPreferencesN, ...props }) => {
 									<TabPane
 										tab={
 											<span>
-												<SettingOutlined />
+												<SettingOutlined style={{ margin: '0.25rem' }} />
 												General
 											</span>
 										}
@@ -117,7 +117,7 @@ const Main = ({ tier, featureEcommerce, getPreferencesN, ...props }) => {
 									<TabPane
 										tab={
 											<span>
-												<AppstoreOutlined />
+												<AppstoreOutlined style={{ margin: '0.25rem' }} />
 												UI Components
 											</span>
 										}
@@ -132,7 +132,7 @@ const Main = ({ tier, featureEcommerce, getPreferencesN, ...props }) => {
 									<TabPane
 										tab={
 											<span>
-												<UnlockOutlined />
+												<UnlockOutlined style={{ margin: '0.25rem' }} />
 												End-user Authentication
 											</span>
 										}
@@ -143,7 +143,7 @@ const Main = ({ tier, featureEcommerce, getPreferencesN, ...props }) => {
 									<TabPane
 										tab={
 											<span>
-												<DatabaseOutlined />
+												<DatabaseOutlined style={{ margin: '0.25rem' }} />
 												Domain
 											</span>
 										}

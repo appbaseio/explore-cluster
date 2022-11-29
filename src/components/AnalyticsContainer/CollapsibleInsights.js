@@ -205,19 +205,25 @@ class CollapsibleInsights extends React.Component {
 											>
 												{type === 'saved' ? null : (
 													<Menu.Item key="saved">
-														<SaveOutlined />
+														<SaveOutlined
+															style={{ margin: '0.25rem' }}
+														/>
 														Save Insight
 													</Menu.Item>
 												)}
 												{type === 'saved' ? (
 													<Menu.Item key="undo">
-														<SaveOutlined />
+														<SaveOutlined
+															style={{ margin: '0.25rem' }}
+														/>
 														Remove from Saved
 													</Menu.Item>
 												) : null}
 												{type === 'insights' ? (
 													<Menu.Item key="read">
-														<ReadOutlined />
+														<ReadOutlined
+															style={{ margin: '0.25rem' }}
+														/>
 														Mark as Read
 													</Menu.Item>
 												) : null}
@@ -234,7 +240,9 @@ class CollapsibleInsights extends React.Component {
 															)
 														}
 													>
-														<DeleteOutlined />
+														<DeleteOutlined
+															style={{ margin: '0.25rem' }}
+														/>
 														Delete
 													</Popconfirm>
 												</Menu.Item>

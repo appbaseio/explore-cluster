@@ -40,7 +40,7 @@ const menu = [
 		key: '1',
 		label: (
 			<div onClick={handleLogout} data-cy="logout-button">
-				<PoweroffOutlined />
+				<PoweroffOutlined style={{ margin: '0.25rem' }} />
 				Logout
 			</div>
 		),

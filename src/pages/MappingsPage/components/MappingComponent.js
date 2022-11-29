@@ -240,7 +240,9 @@ class MappingComponent extends React.Component {
 														}}
 														onClick={reloadMappings}
 													>
-														<ReloadOutlined />
+														<ReloadOutlined
+															style={{ margin: '0.25rem' }}
+														/>
 														Reload Mappings
 													</Button>
 												</Tooltip>

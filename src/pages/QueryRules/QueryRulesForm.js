@@ -981,7 +981,7 @@ class QueryRulesForm extends React.Component {
 							extra={
 								<Link to="/cluster/rules/new">
 									<Button type="primary" data-cy="create-qyery-rule">
-										<PlusOutlined />
+										<PlusOutlined style={{ margin: '0.25rem' }} />
 										Create Rule
 									</Button>
 								</Link>
@@ -1004,7 +1004,7 @@ class QueryRulesForm extends React.Component {
 			<div className={container}>
 				<Link to="/cluster/rules">
 					<Button>
-						<ArrowLeftOutlined />
+						<ArrowLeftOutlined style={{ margin: '0.25rem' }} />
 						Back to Rules
 					</Button>
 				</Link>
