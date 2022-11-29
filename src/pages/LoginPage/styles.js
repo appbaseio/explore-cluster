@@ -30,7 +30,6 @@ const card = css`
 
 	.ant-input {
 		border: none;
-		background: #f4f4f4;
 	}
 	.ant-card {
 		background: none !important;

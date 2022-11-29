@@ -101,7 +101,7 @@ class InstallPage extends React.Component {
 						<Link to="/login">
 							<Button
 								size="large"
-								ghost
+								type="ghost"
 								css={{
 									border: 0,
 									boxShadow: 'none',
