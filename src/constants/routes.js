@@ -157,7 +157,7 @@ export const CLUSTER_ROUTES = {
 		action: ALLOWED_ACTIONS.DEVELOP,
 		menu: [
 			{ label: 'Import Data', link: 'import', openIndexMenu: true },
-			{ label: 'Browse Data', link: '/cluster/browse' },
+			{ label: 'Browse Data', link: 'browse', openIndexMenu: true },
 			{ label: 'Request Logs', link: '/cluster/request-logs' },
 			{
 				label: 'Search Preview',
