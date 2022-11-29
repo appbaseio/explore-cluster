@@ -184,12 +184,12 @@ class LanguageSettings extends React.Component {
 								<Form.Item
 									style={{ paddingBottom: 0 }}
 									label={
-										<>
+										<span>
 											{settingsMap.language.title}
 											<SettingTooltip
 												title={settingsMap.language.description}
 											/>
-										</>
+										</span>
 									}
 									validateStatus={fallback[language] ? 'warning' : null}
 									help={get(fallback, language)}
@@ -211,12 +211,12 @@ class LanguageSettings extends React.Component {
 								</Form.Item>
 								<Form.Item
 									label={
-										<>
+										<span>
 											{settingsMap.applyStopwords.title}
 											<SettingTooltip
 												title={settingsMap.applyStopwords.description}
 											/>
-										</>
+										</span>
 									}
 								>
 									<Switch
@@ -230,12 +230,12 @@ class LanguageSettings extends React.Component {
 
 								<Form.Item
 									label={
-										<>
+										<span>
 											{settingsMap.customStopwords.title}
 											<SettingTooltip
 												title={settingsMap.customStopwords.description}
 											/>
-										</>
+										</span>
 									}
 								>
 									<Input.TextArea
@@ -249,12 +249,12 @@ class LanguageSettings extends React.Component {
 
 								<Form.Item
 									label={
-										<>
+										<span>
 											{settingsMap.stemmingExceptions.title}
 											<SettingTooltip
 												title={settingsMap.stemmingExceptions.description}
 											/>
-										</>
+										</span>
 									}
 								>
 									<Input.TextArea
@@ -267,12 +267,12 @@ class LanguageSettings extends React.Component {
 								</Form.Item>
 								<Form.Item
 									label={
-										<>
+										<span>
 											{settingsMap.normalizeDiacritics.title}
 											<SettingTooltip
 												title={settingsMap.normalizeDiacritics.description}
 											/>
-										</>
+										</span>
 									}
 								>
 									<Switch

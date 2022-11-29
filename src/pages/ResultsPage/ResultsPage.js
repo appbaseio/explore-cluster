@@ -254,10 +254,10 @@ class ResultsPage extends React.Component {
 							<Card>
 								<Form.Item
 									label={
-										<>
+										<span>
 											{settingsMap.size.title}
 											<SettingTooltip title={settingsMap.size.description} />
-										</>
+										</span>
 									}
 								>
 									<InputNumber
@@ -275,12 +275,12 @@ class ResultsPage extends React.Component {
 							<Card style={{ marginTop: 20 }} title="Fields To Return">
 								<Form.Item
 									label={
-										<>
+										<span>
 											{settingsMap.includeFields.title}
 											<SettingTooltip
 												title={settingsMap.includeFields.description}
 											/>
-										</>
+										</span>
 									}
 								>
 									<Select
@@ -318,12 +318,12 @@ class ResultsPage extends React.Component {
 
 								<Form.Item
 									label={
-										<>
+										<span>
 											{settingsMap.excludeFields.title}
 											<SettingTooltip
 												title={settingsMap.excludeFields.description}
 											/>
-										</>
+										</span>
 									}
 								>
 									<Select
@@ -376,14 +376,14 @@ class ResultsPage extends React.Component {
 									<>
 										<Form.Item
 											label={
-												<>
+												<span>
 													{settingsMap.highlightFields.title}
 													<SettingTooltip
 														title={
 															settingsMap.highlightFields.description
 														}
 													/>
-												</>
+												</span>
 											}
 										>
 											<Select
@@ -410,12 +410,12 @@ class ResultsPage extends React.Component {
 										</Form.Item>
 										<Form.Item
 											label={
-												<>
+												<span>
 													{settingsMap.highlightTag.title}
 													<SettingTooltip
 														title={settingsMap.highlightTag.description}
 													/>
-												</>
+												</span>
 											}
 										>
 											<Input
@@ -432,7 +432,7 @@ class ResultsPage extends React.Component {
 										</Form.Item>
 										<Form.Item
 											label={
-												<>
+												<span>
 													{settingsMap.highlightFragment.title}
 													<SettingTooltip
 														title={
@@ -440,7 +440,7 @@ class ResultsPage extends React.Component {
 																.description
 														}
 													/>
-												</>
+												</span>
 											}
 										>
 											<InputNumber
@@ -457,7 +457,7 @@ class ResultsPage extends React.Component {
 										</Form.Item>
 										<Form.Item
 											label={
-												<>
+												<span>
 													{settingsMap.highlightTotalFragments.title}
 													<SettingTooltip
 														title={
@@ -465,7 +465,7 @@ class ResultsPage extends React.Component {
 																.description
 														}
 													/>
-												</>
+												</span>
 											}
 										>
 											<InputNumber
@@ -547,7 +547,7 @@ class ResultsPage extends React.Component {
 												}}
 												disabled={error}
 											>
-												<PlusOutlined style={{ margin: "0.25rem" }}/>
+												<PlusOutlined style={{ margin: '0.25rem' }} />
 												Add Sort Option
 											</Button>
 										</div>
