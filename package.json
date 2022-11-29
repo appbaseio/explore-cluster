@@ -80,12 +80,13 @@
 		"webpack-dev-server": "^4.4.0"
 	},
 	"dependencies": {
+		"@ant-design/icons": "^4.0.0",
 		"@appbaseio-confidential/importer": "git+https://1dc0d0fc07f05943afdde9bdb85b7aa438a0ce3b:x-oauth-basic@github.com/appbaseio-confidential/importer#fcbcd361fd937b11ab56bf9c3512e77402a82d3a",
 		"@appbaseio-confidential/reactivesearch-playground": "^1.2.16-beta",
 		"@appbaseio/dejavu-browser": "^3.7.0",
 		"@appbaseio/react-filter-box": "^3.4.1",
 		"@appbaseio/reactivemaps": "^3.0.0-beta.14",
-		"@appbaseio/reactivesearch": "^3.42.1",
+		"@appbaseio/reactivesearch": "^3.43.2-alpha.0",
 		"@babel/plugin-proposal-class-properties": "^7.0.0-rc.1",
 		"@codesandbox/sandpack-react": "1.17.0",
 		"@codesandbox/sandpack-themes": "^1.13.0",
@@ -98,7 +99,6 @@
 		"@uppy/core": "^2.1.2",
 		"@uppy/dashboard": "^2.1.1",
 		"antd": "^4.0.0",
-		"@ant-design/icons": "^4.0.0",
 		"appbase-js": "^4.1.2",
 		"brace": "^0.11.1",
 		"can-ndjson-stream": "^1.0.2",
