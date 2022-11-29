@@ -368,7 +368,7 @@ export const reOrderPreferences = (prefs, page = '') => {
 				// If component is a chart
 				if (compSettings[facet].rsConfig.componentType === componentTypes.reactiveChart) {
 					const arr = compSettings[facet].rsConfig.componentId.split('_');
-					const idx = arr.at(-1) || 0;
+					const idx = arr.pop() || 0;
 
 					chartSettings.charts[idx] = compSettings[facet];
 				} else if (compSettings[facet].rsConfig.title) {
@@ -378,7 +378,7 @@ export const reOrderPreferences = (prefs, page = '') => {
 
 					if (compSettings[facet].facetType !== 'static') {
 						const arr = compSettings[facet].rsConfig.componentId.split('_');
-						const idx = arr.at(-1) || 0;
+						const idx = arr.pop() || 0;
 						facetSettings.dynamicFacets[idx] = newFacetObj;
 					}
 				}

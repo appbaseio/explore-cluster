@@ -81,7 +81,7 @@ const TABS_KEYS = {
 };
 
 const getClusterId = (url = '') => {
-	return url.match(/(?<=https:\/\/)(.*)(?=-arc)/s)?.[0];
+	return url.match(/(?:https:\/\/)(.*)(?=-arc)/s)?.[1];
 };
 
 const SearchAuth0Settings = (props) => {

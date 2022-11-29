@@ -40,6 +40,7 @@ import {
 	mapValuesToForm,
 	getAllowedActionsByVersion,
 	defaultRateLimits,
+	defaultTagValues,
 } from './utils';
 import Acl from './Acl';
 import WhiteList from './WhiteList';
@@ -111,7 +112,7 @@ class CreateCredentials extends React.Component {
 							(acl) =>
 								new FormGroup({
 									acl: new FormControl(acl),
-									tag: new FormControl(true),
+									tag: new FormControl(defaultTagValues[acl]),
 									rateLimit: new FormControl(defaultRateLimits[acl], [
 										Validators.min(1),
 									]),
@@ -906,127 +907,85 @@ class CreateCredentials extends React.Component {
 																		</>
 																	)}
 
-																	<Grid
-																		label="Fields Filtering"
-																		toolTipMessage={
-																			Messages.fieldFiltering
-																		}
-																	/>
-																	<FieldControl
-																		strict={false}
-																		name="include_fields"
-																		render={({ handler }) => {
-																			const inputHandler =
-																				handler();
-																			const excludedFields =
-																				this.form.get(
-																					'exclude_fields',
-																				).value;
-																			const uniqueMappings =
-																				{};
-																			return (
-																				<Grid
-																					label={
-																						<span
-																							className={
-																								styles.subHeader
+																	{[
+																		BACKENDS.ELASTICSEARCH.name,
+																		BACKENDS.OPENSEARCH.name,
+																	].includes(backend) ? (
+																		<>
+																			<Grid
+																				label="Fields Filtering"
+																				toolTipMessage={
+																					Messages.fieldFiltering
+																				}
+																			/>
+																			<FieldControl
+																				strict={false}
+																				name="include_fields"
+																				render={({
+																					handler,
+																				}) => {
+																					const inputHandler =
+																						handler();
+																					const excludedFields =
+																						this.form.get(
+																							'exclude_fields',
+																						).value;
+																					const uniqueMappings =
+																						{};
+																					return (
+																						<Grid
+																							label={
+																								<span
+																									className={
+																										styles.subHeader
+																									}
+																								>
+																									Include
+																								</span>
 																							}
-																						>
-																							Include
-																						</span>
-																					}
-																					toolTipMessage={
-																						Messages.include
-																					}
-																					component={
-																						<Select
-																							placeholder="Select field value"
-																							mode="multiple"
-																							notFoundContent={
-																								null
+																							toolTipMessage={
+																								Messages.include
 																							}
-																							style={{
-																								width: '100%',
-																							}}
-																							tokenSeparators={[
-																								',',
-																							]}
-																							{...inputHandler}
-																							value={
-																								inputHandler.value ||
-																								[]
-																							}
-																							onChange={(
-																								value,
-																							) => {
-																								inputHandler.onChange(
-																									calculateValue(
+																							component={
+																								<Select
+																									placeholder="Select field value"
+																									mode="multiple"
+																									notFoundContent={
+																										null
+																									}
+																									style={{
+																										width: '100%',
+																									}}
+																									tokenSeparators={[
+																										',',
+																									]}
+																									{...inputHandler}
+																									value={
+																										inputHandler.value ||
+																										[]
+																									}
+																									onChange={(
 																										value,
-																									),
-																								);
-																							}}
-																						>
-																							<Option key="*">
-																								*
-																								(Include
-																								all
-																								fields)
-																							</Option>
-																							{this
-																								.isApp
-																								? mappings.map(
-																										(
-																											v,
-																										) => {
-																											if (
-																												!(
-																													excludedFields ||
-																													[]
-																												).includes(
-																													v,
-																												)
-																											) {
-																												return (
-																													<Option
-																														key={
-																															v
-																														}
-																														title={
-																															v
-																														}
-																													>
-																														{
-																															v
-																														}
-																													</Option>
-																												);
-																											}
-																											return null;
-																										},
-																								  )
-																								: Object.keys(
-																										filteredMappings,
-																								  ).map(
-																										(
-																											i,
-																										) =>
-																											filteredMappings[
-																												i
-																											].map(
+																									) => {
+																										inputHandler.onChange(
+																											calculateValue(
+																												value,
+																											),
+																										);
+																									}}
+																								>
+																									<Option key="*">
+																										*
+																										(Include
+																										all
+																										fields)
+																									</Option>
+																									{this
+																										.isApp
+																										? mappings.map(
 																												(
 																													v,
 																												) => {
-																													// duplicate keys cause re-rendering issues
-																													if (
-																														uniqueMappings[
-																															v
-																														]
-																													) {
-																														return null;
-																													}
-																													uniqueMappings[
-																														v
-																													] = true;
 																													if (
 																														!(
 																															excludedFields ||
@@ -1040,9 +999,6 @@ class CreateCredentials extends React.Component {
 																																key={
 																																	v
 																																}
-																																value={
-																																	v
-																																}
 																																title={
 																																	v
 																																}
@@ -1050,140 +1006,145 @@ class CreateCredentials extends React.Component {
 																																{
 																																	v
 																																}
-																																<span
-																																	className={
-																																		styles.fieldBadge
-																																	}
-																																>
-																																	{
-																																		i
-																																	}
-																																</span>
 																															</Option>
 																														);
 																													}
 																													return null;
 																												},
-																											),
-																								  )}
-																						</Select>
-																					}
-																				/>
-																			);
-																		}}
-																	/>
-																	<FieldControl
-																		strict={false}
-																		name="exclude_fields"
-																		render={({ handler }) => {
-																			const inputHandler =
-																				handler();
-																			const includedFields =
-																				this.form.get(
-																					'include_fields',
-																				).value;
-																			const uniqueMappings =
-																				{};
-																			return (
-																				<Grid
-																					label={
-																						<span
-																							className={
-																								styles.subHeader
+																										  )
+																										: Object.keys(
+																												filteredMappings,
+																										  ).map(
+																												(
+																													i,
+																												) =>
+																													filteredMappings[
+																														i
+																													].map(
+																														(
+																															v,
+																														) => {
+																															// duplicate keys cause re-rendering issues
+																															if (
+																																uniqueMappings[
+																																	v
+																																]
+																															) {
+																																return null;
+																															}
+																															uniqueMappings[
+																																v
+																															] = true;
+																															if (
+																																!(
+																																	excludedFields ||
+																																	[]
+																																).includes(
+																																	v,
+																																)
+																															) {
+																																return (
+																																	<Option
+																																		key={
+																																			v
+																																		}
+																																		value={
+																																			v
+																																		}
+																																		title={
+																																			v
+																																		}
+																																	>
+																																		{
+																																			v
+																																		}
+																																		<span
+																																			className={
+																																				styles.fieldBadge
+																																			}
+																																		>
+																																			{
+																																				i
+																																			}
+																																		</span>
+																																	</Option>
+																																);
+																															}
+																															return null;
+																														},
+																													),
+																										  )}
+																								</Select>
 																							}
-																						>
-																							Exclude
-																						</span>
-																					}
-																					toolTipMessage={
-																						Messages.exclude
-																					}
-																					component={
-																						<Select
-																							placeholder="Select field value"
-																							mode="multiple"
-																							notFoundContent={
-																								null
+																						/>
+																					);
+																				}}
+																			/>
+																			<FieldControl
+																				strict={false}
+																				name="exclude_fields"
+																				render={({
+																					handler,
+																				}) => {
+																					const inputHandler =
+																						handler();
+																					const includedFields =
+																						this.form.get(
+																							'include_fields',
+																						).value;
+																					const uniqueMappings =
+																						{};
+																					return (
+																						<Grid
+																							label={
+																								<span
+																									className={
+																										styles.subHeader
+																									}
+																								>
+																									Exclude
+																								</span>
 																							}
-																							style={{
-																								width: '100%',
-																							}}
-																							{...inputHandler}
-																							value={
-																								inputHandler.value ||
-																								[]
+																							toolTipMessage={
+																								Messages.exclude
 																							}
-																							onChange={(
-																								value,
-																							) => {
-																								inputHandler.onChange(
-																									calculateValue(
+																							component={
+																								<Select
+																									placeholder="Select field value"
+																									mode="multiple"
+																									notFoundContent={
+																										null
+																									}
+																									style={{
+																										width: '100%',
+																									}}
+																									{...inputHandler}
+																									value={
+																										inputHandler.value ||
+																										[]
+																									}
+																									onChange={(
 																										value,
-																									),
-																								);
-																							}}
-																						>
-																							<Option key="*">
-																								*
-																								(Exclude
-																								all
-																								fields)
-																							</Option>
-																							{this
-																								.isApp
-																								? mappings.map(
-																										(
-																											v,
-																										) => {
-																											if (
-																												!(
-																													includedFields ||
-																													[]
-																												).includes(
-																													v,
-																												)
-																											) {
-																												return (
-																													<Option
-																														key={
-																															v
-																														}
-																														title={
-																															v
-																														}
-																													>
-																														{
-																															v
-																														}
-																													</Option>
-																												);
-																											}
-																											return null;
-																										},
-																								  )
-																								: Object.keys(
-																										filteredMappings,
-																								  ).map(
-																										(
-																											i,
-																										) =>
-																											filteredMappings[
-																												i
-																											].map(
+																									) => {
+																										inputHandler.onChange(
+																											calculateValue(
+																												value,
+																											),
+																										);
+																									}}
+																								>
+																									<Option key="*">
+																										*
+																										(Exclude
+																										all
+																										fields)
+																									</Option>
+																									{this
+																										.isApp
+																										? mappings.map(
 																												(
 																													v,
 																												) => {
-																													// duplicate keys cause re-rendering issues
-																													if (
-																														uniqueMappings[
-																															v
-																														]
-																													) {
-																														return null;
-																													}
-																													uniqueMappings[
-																														v
-																													] = true;
 																													if (
 																														!(
 																															includedFields ||
@@ -1204,28 +1165,79 @@ class CreateCredentials extends React.Component {
 																																{
 																																	v
 																																}
-																																<span
-																																	className={
-																																		styles.fieldBadge
-																																	}
-																																>
-																																	{
-																																		i
-																																	}
-																																</span>
 																															</Option>
 																														);
 																													}
 																													return null;
 																												},
-																											),
-																								  )}
-																						</Select>
-																					}
-																				/>
-																			);
-																		}}
-																	/>
+																										  )
+																										: Object.keys(
+																												filteredMappings,
+																										  ).map(
+																												(
+																													i,
+																												) =>
+																													filteredMappings[
+																														i
+																													].map(
+																														(
+																															v,
+																														) => {
+																															// duplicate keys cause re-rendering issues
+																															if (
+																																uniqueMappings[
+																																	v
+																																]
+																															) {
+																																return null;
+																															}
+																															uniqueMappings[
+																																v
+																															] = true;
+																															if (
+																																!(
+																																	includedFields ||
+																																	[]
+																																).includes(
+																																	v,
+																																)
+																															) {
+																																return (
+																																	<Option
+																																		key={
+																																			v
+																																		}
+																																		title={
+																																			v
+																																		}
+																																	>
+																																		{
+																																			v
+																																		}
+																																		<span
+																																			className={
+																																				styles.fieldBadge
+																																			}
+																																		>
+																																			{
+																																				i
+																																			}
+																																		</span>
+																																	</Option>
+																																);
+																															}
+																															return null;
+																														},
+																													),
+																										  )}
+																								</Select>
+																							}
+																						/>
+																					);
+																				}}
+																			/>
+																		</>
+																	) : null}
 																	<FieldControl
 																		name="ip_limit"
 																		render={({

@@ -84,6 +84,31 @@ export const Types = {
 		ops: ['read', 'write', 'delete'],
 	},
 };
+export const defaultTagValues = {
+	// Search related categories:
+	reactivesearch: true,
+	analytics: true,
+	storedquery: false,
+	// Elasticsearch endpoints related categories:
+	search: false,
+	docs: false,
+	indices: false,
+	clusters: false,
+	cat: false,
+	misc: false,
+	// ReactiveSearch and appbase.io plugins related categories:
+	searchrelevancy: false,
+	suggestions: false,
+	rules: false,
+	synonyms: false,
+	user: false,
+	permission: false,
+	logs: false,
+	auth: false,
+	uibuilder: false,
+	// new categories
+	cache: false,
+};
 export const defaultRateLimits = {
 	// Search related categories:
 	reactivesearch: 10,

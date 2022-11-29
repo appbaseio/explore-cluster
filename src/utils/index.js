@@ -110,7 +110,7 @@ const transformRegexString = (regex, varRegex, str, attrs = { app: 'appbase' }) 
 
 export const getValidURL = (config = {}, attrs = {}) => {
 	const regex = /\${[a-zA-Z0-9_]*}/gm;
-	const varRegex = /(?<=\${)(.*?)(?=\})/;
+	const varRegex = /(?:\${)(.*?)(?=\})/;
 	const { url, qs = [] } = config;
 	let newStr = url;
 
