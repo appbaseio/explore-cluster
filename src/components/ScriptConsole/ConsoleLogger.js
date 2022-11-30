@@ -151,7 +151,14 @@ const ConsoleLogger = ({ consoleArray }) => {
 							onChange={handleFilterValueChange}
 							placeholder="Search for logs..."
 						/>
-						<SearchOutlined style={{ color: 'white' }} />
+						<SearchOutlined
+							style={{
+								color: 'white',
+								position: 'absolute',
+								left: '25px',
+								top: '18px',
+							}}
+						/>
 					</div>
 					{renderConsoleItems()}
 				</>
