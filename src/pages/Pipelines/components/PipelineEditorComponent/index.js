@@ -45,7 +45,7 @@ const dropdownMenuCss = css`
 	border-bottom-right-radius: 4px;
 
 	.stage-menu-item {
-		padding: 0 14px !important;
+		padding: 5px 14px !important;
 		padding-right: 25px !important;
 		position: relative !important;
 		height: 60px !important;
@@ -68,14 +68,17 @@ const dropdownMenuCss = css`
 			height: 36px;
 			text-overflow: ellipsis;
 		}
-
-		p {
-			margin-bottom: 0;
+		.ant-dropdown-menu-title-content {
 			overflow: hidden;
 			text-overflow: ellipsis;
-			max-width: 96%;
-			display: inline-block;
+			white-space: nowrap;
+			padding: 0px 10px;
+		}
+		p {
+			margin-bottom: 0;
+			display: inline;
 			font-size: 12px;
+			width: 100%;
 		}
 
 		&:hover {
@@ -369,6 +372,7 @@ const PipelineEditorComponent = (props) => {
 			<Dropdown
 				className="stages-dropdown"
 				visible={showStagesMenu}
+				overlayStyle={{ zIndex: 999 }}
 				overlay={
 					<StagesMenu
 						pipelineSchema={pipelineSchema}
