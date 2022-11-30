@@ -49,7 +49,7 @@ const dropdownMenuCss = css`
 		padding-right: 25px !important;
 		position: relative !important;
 		height: 60px !important;
-		margin-bottom: 0 !important;
+		margin-bottom: 15px !important;
 
 		.add-icon {
 			position: absolute;
@@ -67,6 +67,8 @@ const dropdownMenuCss = css`
 			overflow: hidden;
 			height: 36px;
 			text-overflow: ellipsis;
+			display: flex;
+			align-items: center;
 		}
 		.ant-dropdown-menu-title-content {
 			overflow: hidden;
@@ -95,6 +97,7 @@ const inputStyle = css`
 		border-bottom-left-radius: 0;
 		border-bottom-right-radius: 0;
 	}
+	width: calc(100% - 8px);
 `;
 
 const QUERY_EDITOR_MODEL_PATH = 'a://b/foo.json';
@@ -137,19 +140,21 @@ const StagesMenu = ({ pipelineSchema, getEditorValue, handleMenuClick }) => {
 				prefix={<SearchOutlined style={{ color: '#1990ff' }} />}
 				css={inputStyle}
 			/>
-			<Menu css={dropdownMenuCss} onClick={handleMenuClick}>
-				{titleAndDescriptionResults.map((stageKey) => {
-					return (
-						<Menu.Item className="stage-menu-item" key={stageKey}>
-							<h4 title={stageKey}>{stageKey}</h4>
-							<p title={prebuiltStages?.stages?.[stageKey]?.description ?? ''}>
-								{prebuiltStages?.stages?.[stageKey]?.description ?? ''}
-							</p>
-							<PlusSquareFilled className="add-icon" />
-						</Menu.Item>
-					);
-				})}
-			</Menu>
+			{titleAndDescriptionResults && titleAndDescriptionResults.length ? (
+				<Menu css={dropdownMenuCss} onClick={handleMenuClick}>
+					{titleAndDescriptionResults.map((stageKey) => {
+						return (
+							<Menu.Item className="stage-menu-item" key={stageKey}>
+								<h4 title={stageKey}>{stageKey}</h4>
+								<p title={prebuiltStages?.stages?.[stageKey]?.description ?? ''}>
+									{prebuiltStages?.stages?.[stageKey]?.description ?? ''}
+								</p>
+								<PlusSquareFilled className="add-icon" />
+							</Menu.Item>
+						);
+					})}
+				</Menu>
+			) : null}
 		</>
 	);
 };
