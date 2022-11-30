@@ -328,7 +328,7 @@ const ModalHeader = ({
 				{currentVersion.version_id === deploymentStatus?.meta?.version_id &&
 				(deploymentStatus.status || deploymentStatus.state) ? (
 					<div className="status-container" onClick={() => setModalType('deploy-logs')}>
-						<Button type="link" style={{ padding: 0, marginLeft: 5 }}>
+						<Button type="link" style={{ padding: 0, marginRight: 5 }}>
 							Deploy Status
 						</Button>
 						{deployStatusMapper[deploymentStatus.status || deploymentStatus.state]}
