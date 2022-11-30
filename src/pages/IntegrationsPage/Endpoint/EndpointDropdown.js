@@ -99,7 +99,7 @@ const EndpointDropdown = ({
 					<InfoCircleOutlined style={{ marginLeft: 5 }} />
 				</Tooltip>
 			</span>
-			<Form className="row-data">
+			<div className="row-data">
 				{isFusion ? (
 					renderFusionFields()
 				) : (
@@ -316,7 +316,7 @@ const EndpointDropdown = ({
 						</Form.Item>
 					</>
 				)}
-			</Form>
+			</div>
 			{isPageLevel ? (
 				<FieldGroup name="endpoint" strict={false}>
 					{(controls) => (
