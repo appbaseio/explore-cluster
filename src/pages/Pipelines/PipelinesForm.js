@@ -158,8 +158,8 @@ const container = css`
 			margin-left: 1rem;
 		}
 	}
-	.ant-tabs.ant-tabs-card .ant-tabs-card-bar .ant-tabs-tab {
-		&:last-child {
+	.ant-tabs .ant-tabs-tab {
+		&:nth-last-child(2) {
 			padding: 0;
 			.add-script-btn {
 				background: transparent;
@@ -167,7 +167,7 @@ const container = css`
 				border: none;
 				padding: 0 12px;
 
-				i {
+				span {
 					margin-right: 0 !important;
 					font-size: 18px;
 				}
@@ -783,7 +783,7 @@ const PipelinesForm = (props) => {
 						extra={
 							<Link to="/cluster/pipelines/new">
 								<Button type="primary">
-									<PlusOutlined style={{ margin: "0.25rem" }}/>
+									<PlusOutlined style={{ margin: '0.25rem' }} />
 									Create Pipeline
 								</Button>
 							</Link>
@@ -813,7 +813,7 @@ const PipelinesForm = (props) => {
 									}
 									className="create-script-file-link-btn"
 								>
-									<PlusOutlined style={{ margin: "0.25rem" }}/>
+									<PlusOutlined style={{ margin: '0.25rem' }} />
 									Add script file
 								</Button>
 							</Fragment>
@@ -879,7 +879,7 @@ const PipelinesForm = (props) => {
 				<Fragment>
 					<Link to="/cluster/pipelines">
 						<Button>
-							<ArrowLeftOutlined style={{ margin: "0.25rem" }}/>
+							<ArrowLeftOutlined style={{ margin: '0.25rem' }} />
 							Back to Pipelines
 						</Button>
 					</Link>
