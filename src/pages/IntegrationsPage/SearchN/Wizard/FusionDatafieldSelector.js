@@ -18,6 +18,9 @@ const suggestionCls = css`
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
+	input::placeholder {
+		text-align: left;
+	}
 `;
 
 const FusionDatafieldSelector = ({

@@ -18,6 +18,14 @@ const selectCls = css`
 	.ant-select-selection {
 		border-color: tomato;
 	}
+	.ant-select-selection-placeholder {
+		text-align: left;
+	}
+`;
+const defaultSelectCls = css`
+	.ant-select-selection-placeholder {
+		text-align: left;
+	}
 `;
 
 const suggestionCls = css`
@@ -241,7 +249,9 @@ class DataFieldSelector extends React.Component {
 										</Tooltip>
 									) : null}
 									<AutoComplete
-										className={touched && invalid ? selectCls : undefined}
+										className={
+											touched && invalid ? selectCls : defaultSelectCls
+										}
 										placeholder="Select dynamic field"
 										allowClear
 										{...selectPropsCalculated}
