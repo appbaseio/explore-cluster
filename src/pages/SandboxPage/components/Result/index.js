@@ -122,7 +122,6 @@ class Result extends React.Component {
 							return (
 								<Alert
 									type="info"
-									showIcon
 									style={{ margin: '0px 0 16px' }}
 									message={
 										<React.Fragment>

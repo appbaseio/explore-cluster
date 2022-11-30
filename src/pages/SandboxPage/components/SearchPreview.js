@@ -669,65 +669,71 @@ class SearchPreview extends React.Component {
 						userId: 'appbase.io dashboard',
 					}}
 				>
-					<Col md={6}>
-						<ErrorToaster>
-							<Filter
-								handleValueChange={this.handleValueChange}
-								app={app}
-								aggs={aggregations}
-								handleModal={handleModal}
-								page={page}
-							/>
-						</ErrorToaster>
-					</Col>
-					<Col md={18}>
-						<ErrorToaster
-							inline
-							title="Something went wrong while displaying Search UI"
-						>
-							<Search
-								handleValueChange={this.handleValueChange}
-								app={app}
-								onValueChange={this.onSelected}
-								search={{
-									...search,
-									...config,
-								}}
-								isTypeahead={isTypeahead}
-								handleModal={handleModal}
-								page={page}
-							/>
-						</ErrorToaster>
-
-						<ErrorToaster>
-							<SandboxContext.Provider
-								value={{
-									app,
-									credentials,
-									url,
-									queryGrades: get(queryGrades, 'docs', {}),
-									recordAnalytics: isAnalyticsEnabled,
-									isGradingEnabled,
-									searchTerm: get(search, 'value', get(search, 'defaultValue')),
-									query: stateSettings,
-									toggleAnalytics: this.toggleAnalytics,
-									onSettingsChange: this.handleSettingsChange,
-								}}
-							>
-								<Result
-									result={result}
+					<Row style={{ columnGap: '10px' }}>
+						<Col md={5}>
+							<ErrorToaster>
+								<Filter
+									handleValueChange={this.handleValueChange}
 									app={app}
-									rules={rules}
-									showFeaturedProducts={showFeaturedProducts}
-									selectButtonLabel={selectButtonLabel}
-									onChange={onChange}
-									value={value}
+									aggs={aggregations}
+									handleModal={handleModal}
 									page={page}
-									withRule={withRule}
 								/>
-							</SandboxContext.Provider>
-						</ErrorToaster>
-					</Col>
+							</ErrorToaster>
+						</Col>
+						<Col md={18}>
+							<ErrorToaster
+								inline
+								title="Something went wrong while displaying Search UI"
+							>
+								<Search
+									handleValueChange={this.handleValueChange}
+									app={app}
+									onValueChange={this.onSelected}
+									search={{
+										...search,
+										...config,
+									}}
+									isTypeahead={isTypeahead}
+									handleModal={handleModal}
+									page={page}
+								/>
+							</ErrorToaster>
+
+							<ErrorToaster>
+								<SandboxContext.Provider
+									value={{
+										app,
+										credentials,
+										url,
+										queryGrades: get(queryGrades, 'docs', {}),
+										recordAnalytics: isAnalyticsEnabled,
+										isGradingEnabled,
+										searchTerm: get(
+											search,
+											'value',
+											get(search, 'defaultValue'),
+										),
+										query: stateSettings,
+										toggleAnalytics: this.toggleAnalytics,
+										onSettingsChange: this.handleSettingsChange,
+									}}
+								>
+									<Result
+										result={result}
+										app={app}
+										rules={rules}
+										showFeaturedProducts={showFeaturedProducts}
+										selectButtonLabel={selectButtonLabel}
+										onChange={onChange}
+										value={value}
+										page={page}
+										withRule={withRule}
+									/>
+								</SandboxContext.Provider>
+							</ErrorToaster>
+						</Col>
+					</Row>
 				</ReactiveBase>
 			</Row>
 		);
