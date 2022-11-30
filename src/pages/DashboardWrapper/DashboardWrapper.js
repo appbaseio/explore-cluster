@@ -365,7 +365,6 @@ class DashboardWrapper extends Component {
 			<Layout>
 				<Sider
 					width={260}
-					collapsedWidth={80}
 					collapsible
 					collapsed={collapsed}
 					onCollapse={this.onCollapse}
@@ -376,6 +375,12 @@ class DashboardWrapper extends Component {
 						openKeys={activeSubMenu}
 						selectedKeys={activeMenuItem}
 						mode="inline"
+						css={{
+							overflow: 'auto',
+							position: 'absolute',
+							width: '100%',
+							height: 'calc(100% - 102px)',
+						}}
 						onOpenChange={(param) => {
 							this.setState({
 								activeSubMenu: param,
