@@ -337,7 +337,9 @@ class DataFieldSelector extends React.Component {
 										</Tooltip>
 									) : null}
 									<AutoComplete
-										className={touched && invalid ? selectCls : undefined}
+										className={
+											touched && invalid ? selectCls : defaultSelectCls
+										}
 										placeholder="Select field"
 										allowClear
 										{...selectPropsCalculated}

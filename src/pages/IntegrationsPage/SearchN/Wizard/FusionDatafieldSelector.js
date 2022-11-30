@@ -18,7 +18,9 @@ const suggestionCls = css`
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
-	input::placeholder {
+`;
+const defaultSelectCls = css`
+	.ant-select-selection-placeholder {
 		text-align: left;
 	}
 `;
@@ -120,6 +122,7 @@ const FusionDatafieldSelector = ({
 			) : null}
 			<AutoComplete
 				placeholder="Select dynamic field"
+				className={defaultSelectCls}
 				allowClear
 				{...selectPropsCalculated}
 				onSearch={(val) => {
