@@ -146,7 +146,7 @@ const SearchBoxCard = (props) => {
 		if (searchBoxItem.created_at) {
 			return (
 				<div>
-					<p>
+					<p style={{ width: 'max-content' }}>
 						Created:{' '}
 						{moment.unix(searchBoxItem.created_at).format('ddd D MMM, hh:mm A')}
 					</p>
