@@ -48,7 +48,7 @@ const SearchSettings = ({ getPreferencesPayload, getPreferences, setIsEditorLoad
 	const templateObj = getTemplate(themeType);
 	return (
 		<div>
-			<Form>
+			<Form layout="vertical">
 				<FieldGroup
 					control={form}
 					strict={false}
