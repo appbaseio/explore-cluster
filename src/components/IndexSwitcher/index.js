@@ -67,6 +67,7 @@ function IndexSwitcher({
 					updateSessionData(value);
 				}}
 				showSearch
+				dropdownStyle={{ zIndex: 1100 }}
 			>
 				{sortedApps.map((app) => (
 					<Select.Option key={app} value={app}>
