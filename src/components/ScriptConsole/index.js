@@ -65,8 +65,15 @@ const scriptConsoleCss = css`
 	.ant-select-sm.ant-select {
 		width: 300px;
 	}
+	.ant-tabs-tabpane {
+		height: 100%;
+	}
+	.ant-tabs-content-holder,
+	.ant-tabs-content {
+		height: 100%;
+	}
 	.tabs-container {
-		height: calc(100% + 4px);
+		height: 100%;
 		width: 100%;
 		.ant-tabs-extra-content {
 			line-height: 35px;
@@ -91,7 +98,6 @@ const scriptConsoleCss = css`
 
 	.monaco-wrapper {
 		width: 100% !important;
-		height: calc(100% - 42px) !important;
 	}
 
 	.save-script-btn-wrapper {
@@ -769,6 +775,7 @@ const ScriptConsole = ({
 					customizeMonacoInstance={(monaco, editorRef) => {
 						scriptEditorRef.current = editorRef;
 					}}
+					height="92%"
 					wrapperClass="monaco-wrapper"
 				/>
 			</Col>
