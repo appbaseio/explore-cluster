@@ -7,6 +7,7 @@ import { css } from 'react-emotion';
 import get from 'lodash/get';
 import Text from 'antd/lib/typography/Text';
 import orderBy from 'lodash/orderBy';
+import { InfoCircleFilled } from '@ant-design/icons';
 import CredentialsForm from '../../components/CreateCredentials';
 import Permission from './Permission';
 import Password from './Password';
@@ -256,6 +257,9 @@ class UserManagementPage extends React.Component {
 					)}
 					<Alert
 						showIcon
+						icon={
+							<InfoCircleFilled style={{ alignSelf: 'flex-start', marginTop: 4 }} />
+						}
 						message={
 							<React.Fragment>
 								<Paragraph>

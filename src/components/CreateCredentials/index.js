@@ -636,7 +636,10 @@ class CreateCredentials extends React.Component {
 										<Collapse
 											bordered={false}
 											expandIcon={({ isActive }) => (
-												<CaretRightOutlined rotate={isActive ? 90 : 0} />
+												<CaretRightOutlined
+													style={{ marginTop: '10px', display: 'block' }}
+													rotate={isActive ? 90 : 0}
+												/>
 											)}
 										>
 											<Collapse.Panel
