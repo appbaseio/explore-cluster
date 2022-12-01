@@ -1449,7 +1449,7 @@ class QueryRulesForm extends React.Component {
 								</DeleteModal>
 							</div>
 						) : null}
-						<div className="flex flex-end">
+						<div style={{ marginTop: 10 }} className="flex flex-end">
 							{errorCount ? (
 								<Alert
 									style={{ marginRight: 10 }}

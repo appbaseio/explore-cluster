@@ -341,15 +341,18 @@ class QueryCard extends React.Component {
 						</div>
 					</Col>
 				</Row>
-				<Alert
-					type="info"
-					showIcon
-					message={
-						usageStatsCount > 0
-							? `Used ${usageStatsCount} times in last 30 days`
-							: 'Not used in the last 30 days'
-					}
-				/>
+				<Row style={{ width: '100%', marginTop: 10 }}>
+					<Alert
+						type="info"
+						showIcon
+						style={{ flex: 1 }}
+						message={
+							usageStatsCount > 0
+								? `Used ${usageStatsCount} times in last 30 days`
+								: 'Not used in the last 30 days'
+						}
+					/>
+				</Row>
 			</Card>
 		);
 	}
