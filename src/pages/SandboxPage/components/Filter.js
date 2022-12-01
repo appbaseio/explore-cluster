@@ -69,8 +69,7 @@ const Filter = (props) => {
 				>
 					<Tooltip title={settingsMap.set_aggs.description}>
 						<Button style={{ marginTop: 8 }} block type="primary">
-							<EditOutlined />
-							{settingsMap.set_aggs.title}
+							<EditOutlined /> <span>{settingsMap.set_aggs.title}</span>
 						</Button>
 					</Tooltip>
 				</Link>

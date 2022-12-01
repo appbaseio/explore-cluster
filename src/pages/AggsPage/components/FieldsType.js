@@ -213,7 +213,7 @@ const FieldType = ({ handleFieldType, handleDelete, fieldTypes, updateToAggsFiel
 										<Col>
 											{mappingHeaderLeft.map((item) => (
 												<p key={item.title}>
-													{item.title}
+													{item.title}{' '}
 													<Tooltip title={item.info}>
 														<InfoCircleOutlined />
 													</Tooltip>
@@ -225,7 +225,7 @@ const FieldType = ({ handleFieldType, handleDelete, fieldTypes, updateToAggsFiel
 												{mappingHeaderRight.map((item) => (
 													<Col key={item.title} xs={12}>
 														<p style={{ width: 155 }}>
-															{item.title}
+															{item.title}{' '}
 															<Tooltip title={item.info}>
 																<InfoCircleOutlined />
 															</Tooltip>

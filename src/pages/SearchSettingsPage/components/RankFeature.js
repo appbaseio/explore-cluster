@@ -356,7 +356,7 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 									<Card>
 										<Flex justifyContent="space-between" className={headerRow}>
 											<p>
-												Field Name
+												Field Name{' '}
 												<Tooltip title="Names of the fields with rank_feature/rank_features. Nested fields are represented with relative indentation.">
 													<InfoCircleOutlined />
 												</Tooltip>

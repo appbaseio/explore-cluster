@@ -255,7 +255,7 @@ class ResultsPage extends React.Component {
 								<Form.Item
 									label={
 										<span>
-											{settingsMap.size.title}
+											{settingsMap.size.title}{' '}
 											<SettingTooltip title={settingsMap.size.description} />
 										</span>
 									}
@@ -276,7 +276,7 @@ class ResultsPage extends React.Component {
 								<Form.Item
 									label={
 										<span>
-											{settingsMap.includeFields.title}
+											{settingsMap.includeFields.title}{' '}
 											<SettingTooltip
 												title={settingsMap.includeFields.description}
 											/>
@@ -319,7 +319,7 @@ class ResultsPage extends React.Component {
 								<Form.Item
 									label={
 										<span>
-											{settingsMap.excludeFields.title}
+											{settingsMap.excludeFields.title}{' '}
 											<SettingTooltip
 												title={settingsMap.excludeFields.description}
 											/>
@@ -377,7 +377,7 @@ class ResultsPage extends React.Component {
 										<Form.Item
 											label={
 												<span>
-													{settingsMap.highlightFields.title}
+													{settingsMap.highlightFields.title}{' '}
 													<SettingTooltip
 														title={
 															settingsMap.highlightFields.description
@@ -411,7 +411,7 @@ class ResultsPage extends React.Component {
 										<Form.Item
 											label={
 												<span>
-													{settingsMap.highlightTag.title}
+													{settingsMap.highlightTag.title}{' '}
 													<SettingTooltip
 														title={settingsMap.highlightTag.description}
 													/>
@@ -433,7 +433,7 @@ class ResultsPage extends React.Component {
 										<Form.Item
 											label={
 												<span>
-													{settingsMap.highlightFragment.title}
+													{settingsMap.highlightFragment.title}{' '}
 													<SettingTooltip
 														title={
 															settingsMap.highlightFragment
@@ -458,7 +458,7 @@ class ResultsPage extends React.Component {
 										<Form.Item
 											label={
 												<span>
-													{settingsMap.highlightTotalFragments.title}
+													{settingsMap.highlightTotalFragments.title}{' '}
 													<SettingTooltip
 														title={
 															settingsMap.highlightTotalFragments

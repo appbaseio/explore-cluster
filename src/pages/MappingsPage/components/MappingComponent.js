@@ -279,7 +279,7 @@ class MappingComponent extends React.Component {
 														<Col>
 															{mappingHeaderLeft.map((item) => (
 																<p key={item.title}>
-																	{item.title}
+																	{item.title}{' '}
 																	<Tooltip title={item.info}>
 																		<InfoCircleOutlined />
 																	</Tooltip>
@@ -295,7 +295,7 @@ class MappingComponent extends React.Component {
 																				width: 155,
 																			}}
 																		>
-																			{item.title}
+																			{item.title}{' '}
 																			<Tooltip
 																				title={item.info}
 																			>

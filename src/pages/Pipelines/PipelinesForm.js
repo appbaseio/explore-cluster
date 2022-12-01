@@ -1075,7 +1075,7 @@ const PipelinesForm = (props) => {
 					<Affix offsetBottom={0}>
 						<Flex className="card-footer">
 							<div>{renderErrorMessges()}</div>
-							<Row style={{ justifyContent: 'flex-end', flex: 2 }}>
+							<Row style={{ justifyContent: 'flex-end', flex: 2 }} gutter={[0, 10]}>
 								<Col>
 									<Button
 										block

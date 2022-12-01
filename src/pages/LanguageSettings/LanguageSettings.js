@@ -185,7 +185,7 @@ class LanguageSettings extends React.Component {
 									style={{ paddingBottom: 0 }}
 									label={
 										<span>
-											{settingsMap.language.title}
+											{settingsMap.language.title}{' '}
 											<SettingTooltip
 												title={settingsMap.language.description}
 											/>
@@ -212,7 +212,7 @@ class LanguageSettings extends React.Component {
 								<Form.Item
 									label={
 										<span>
-											{settingsMap.applyStopwords.title}
+											{settingsMap.applyStopwords.title}{' '}
 											<SettingTooltip
 												title={settingsMap.applyStopwords.description}
 											/>
@@ -231,7 +231,7 @@ class LanguageSettings extends React.Component {
 								<Form.Item
 									label={
 										<span>
-											{settingsMap.customStopwords.title}
+											{settingsMap.customStopwords.title}{' '}
 											<SettingTooltip
 												title={settingsMap.customStopwords.description}
 											/>
@@ -250,7 +250,7 @@ class LanguageSettings extends React.Component {
 								<Form.Item
 									label={
 										<span>
-											{settingsMap.stemmingExceptions.title}
+											{settingsMap.stemmingExceptions.title}{' '}
 											<SettingTooltip
 												title={settingsMap.stemmingExceptions.description}
 											/>
@@ -268,7 +268,7 @@ class LanguageSettings extends React.Component {
 								<Form.Item
 									label={
 										<span>
-											{settingsMap.normalizeDiacritics.title}
+											{settingsMap.normalizeDiacritics.title}{' '}
 											<SettingTooltip
 												title={settingsMap.normalizeDiacritics.description}
 											/>

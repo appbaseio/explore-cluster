@@ -28,7 +28,7 @@ const optionContainer = css`
 const SettingsOptions = ({ handleChange, sortBy, size, includeNullValues, queryFormat }) => (
 	<div className={optionContainer}>
 		<h6>
-			Query Format
+			<span style={{ marginRight: 5 }}>Query Format</span>
 			<Tooltip title={settingsMap.queryFormat.description}>
 				<InfoCircleOutlined style={{ marginLeft: 5 }} />
 			</Tooltip>

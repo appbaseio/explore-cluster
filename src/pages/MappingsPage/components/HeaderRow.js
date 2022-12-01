@@ -10,7 +10,7 @@ const HeaderRow = ({ leftItems, rightItems }) => {
 			<Col>
 				{leftItems.map((item) => (
 					<p key={item.title}>
-						{item.title}
+						{item.title}{' '}
 						<Tooltip title={item.info}>
 							<InfoCircleOutlined />
 						</Tooltip>

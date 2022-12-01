@@ -137,20 +137,20 @@ const SettingsOptions = ({
 			>
 				<Radio value="default">ReactiveSearch</Radio>
 				<Radio value="queryString">
-					{settingsMap.queryString.title}
+					{settingsMap.queryString.title}{' '}
 					<Tooltip title={settingsMap.queryString.description}>
 						<InfoCircleOutlined />
 					</Tooltip>
 				</Radio>
 				<Radio value="searchOperators" data-cy="search-operators-radio-button">
-					{settingsMap.searchOperators.title}
+					{settingsMap.searchOperators.title}{' '}
 					<Tooltip title={settingsMap.searchOperators.description}>
 						<InfoCircleOutlined />
 					</Tooltip>
 				</Radio>
 			</Radio.Group>
 			<h6>
-				Query Format
+				Query Format{' '}
 				<Tooltip title={settingsMap.queryFormat.description}>
 					<InfoCircleOutlined style={{ marginLeft: 5 }} />
 				</Tooltip>
@@ -166,7 +166,7 @@ const SettingsOptions = ({
 				</Radio>
 			</Radio.Group>
 			<h6>
-				{settingsMap.distinctField.title}
+				{settingsMap.distinctField.title}{' '}
 				<Tooltip title={settingsMap.distinctField.description}>
 					<InfoCircleOutlined style={{ marginLeft: 5 }} />
 				</Tooltip>
@@ -202,7 +202,7 @@ const SettingsOptions = ({
 			</VersionController>
 
 			<h6>
-				{settingsMap.enableTypoTolerance.title}
+				{settingsMap.enableTypoTolerance.title}{' '}
 				<Tooltip title={settingsMap.enableTypoTolerance.description}>
 					<InfoCircleOutlined style={{ marginLeft: 5 }} />
 				</Tooltip>
@@ -222,7 +222,7 @@ const SettingsOptions = ({
 			{Boolean(fuzziness) && (
 				<React.Fragment>
 					<h6>
-						{settingsMap.typoToleranceValue.title}
+						{settingsMap.typoToleranceValue.title}{' '}
 						<Tooltip title={settingsMap.typoToleranceValue.description}>
 							<InfoCircleOutlined style={{ marginLeft: 5 }} />
 						</Tooltip>
@@ -245,7 +245,7 @@ const SettingsOptions = ({
 			)}
 
 			<h6>
-				Enable Synonyms
+				Enable Synonyms{' '}
 				<Tooltip title={settingsMap.synonyms.description}>
 					<InfoCircleOutlined style={{ marginLeft: 5 }} />
 				</Tooltip>
@@ -257,7 +257,7 @@ const SettingsOptions = ({
 			/>
 
 			<h6>
-				{settingsMap.enableNgram.title}
+				{settingsMap.enableNgram.title}{' '}
 				<Tooltip title={settingsMap.enableNgram.description}>
 					<InfoCircleOutlined style={{ marginLeft: 5 }} />
 				</Tooltip>
@@ -271,7 +271,7 @@ const SettingsOptions = ({
 				<div>
 					<div style={{ display: 'flex', justifyContent: 'space-between' }}>
 						<h6>
-							N-gram Settings
+							N-gram Settings{' '}
 							<Tooltip title={settingsMap.enableNgram.description}>
 								<InfoCircleOutlined style={{ marginLeft: 5 }} />
 							</Tooltip>
@@ -345,7 +345,7 @@ const SettingsOptions = ({
 				</div>
 			)}
 			<h6>
-				{settingsMap.enableAutoSuggestion.title}
+				{settingsMap.enableAutoSuggestion.title}{' '}
 				<Tooltip title={settingsMap.enableAutoSuggestion.description}>
 					<InfoCircleOutlined style={{ marginLeft: 5 }} />
 				</Tooltip>

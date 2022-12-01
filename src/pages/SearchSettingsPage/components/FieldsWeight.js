@@ -335,7 +335,7 @@ class FieldWeights extends React.Component {
 							<Col>
 								{mappingHeaderLeft.map((item) => (
 									<p key={item.title}>
-										{item.title}
+										<span style={{ marginRight: 5 }}>{item.title}</span>
 										<Tooltip title={item.info}>
 											<InfoCircleOutlined />
 										</Tooltip>
@@ -347,7 +347,7 @@ class FieldWeights extends React.Component {
 									{mappingHeaderRight.map((item) => (
 										<Col key={item.title} xs={12}>
 											<p style={{ width: 155 }}>
-												{item.title}
+												<span style={{ marginRight: 5 }}>{item.title}</span>
 												<Tooltip title={item.info}>
 													<InfoCircleOutlined />
 												</Tooltip>
