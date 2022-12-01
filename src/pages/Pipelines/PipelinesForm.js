@@ -27,6 +27,8 @@ import {
 	Tooltip,
 	Collapse,
 	Tag,
+	Col,
+	Row,
 } from 'antd';
 import yamlToJson from 'js-yaml';
 import { isEqual } from 'lodash';
@@ -1072,42 +1074,48 @@ const PipelinesForm = (props) => {
 					</Card>
 					<Affix offsetBottom={0}>
 						<Flex className="card-footer">
-							<div>{renderErrorMessges()}</div>{' '}
-							<Button
-								block
-								type="primary"
-								size="large"
-								rel="noopener noreferrer"
-								className="create-save-btn"
-								onClick={() => handleSave()}
-								loading={isCreating || isUpdating || isValidating}
-								disabled={!!missingScriptFiles?.length || isVersionCreating}
-								icon={<ButtonIcon />}
-							>
-								{renderButtonLabel()}
-							</Button>
-							{isEditPage && (
-								<Tooltip title="Save pipeline as a new version">
+							<div>{renderErrorMessges()}</div>
+							<Row style={{ justifyContent: 'flex-end', flex: 2 }}>
+								<Col>
 									<Button
 										block
-										type="default"
+										type="primary"
 										size="large"
 										rel="noopener noreferrer"
 										className="create-save-btn"
-										onClick={() => setShowVDescModal(true)}
-										loading={isVersionCreating}
+										onClick={() => handleSave()}
+										loading={isCreating || isUpdating || isValidating}
+										disabled={!!missingScriptFiles?.length || isVersionCreating}
 										icon={<ButtonIcon />}
-										disabled={
-											!!missingScriptFiles?.length ||
-											isCreating ||
-											isUpdating ||
-											isValidating
-										}
 									>
-										Save Pipeline (as new version)
+										{renderButtonLabel()}
 									</Button>
-								</Tooltip>
-							)}
+								</Col>
+								<Col>
+									{isEditPage && (
+										<Tooltip title="Save pipeline as a new version">
+											<Button
+												block
+												type="default"
+												size="large"
+												rel="noopener noreferrer"
+												className="create-save-btn"
+												onClick={() => setShowVDescModal(true)}
+												loading={isVersionCreating}
+												icon={<ButtonIcon />}
+												disabled={
+													!!missingScriptFiles?.length ||
+													isCreating ||
+													isUpdating ||
+													isValidating
+												}
+											>
+												Save Pipeline (as new version)
+											</Button>
+										</Tooltip>
+									)}
+								</Col>
+							</Row>
 						</Flex>
 					</Affix>
 					<PipelineVersionsDrawer
