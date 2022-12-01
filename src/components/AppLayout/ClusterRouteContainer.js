@@ -222,7 +222,7 @@ class ClusterRouteContainer extends React.Component {
 	}
 
 	render() {
-		const { allowedRoutes, backend } = this.props;
+		const { allowedRoutes, backend, backendImage } = this.props;
 
 		return (
 			<ErrorPage {...this.props}>
@@ -377,7 +377,10 @@ class ClusterRouteContainer extends React.Component {
 						path="/cluster/configure-search-engine-backend"
 						render={(props) => (
 							<>
-								{get(allowedRoutes, '/cluster/pipelines') ? (
+								{get(allowedRoutes, '/cluster/pipelines') &&
+								backendImage === 'sls' &&
+								backend !== BACKENDS.FUSION.name &&
+								backend !== BACKENDS.MARKLOGIC.name ? (
 									<AppPageContainer
 										{...props}
 										component={ConfigureSearchBackend}
@@ -708,6 +711,7 @@ class ClusterRouteContainer extends React.Component {
 
 ClusterRouteContainer.defaultProps = {
 	backend: BACKENDS.ELASTICSEARCH.name,
+	backendImage: '',
 };
 
 ClusterRouteContainer.propTypes = {
@@ -716,12 +720,14 @@ ClusterRouteContainer.propTypes = {
 	location: PropTypes.object.isRequired,
 	allowedRoutes: PropTypes.object.isRequired,
 	backend: PropTypes.string,
+	backendImage: PropTypes.string,
 };
 
 const mapStateToProps = (state) => {
 	return {
 		allowedRoutes: getAuthorizedRoutes(get(state, 'clusterRoutes')),
 		backend: get(state, '$getAppPlan.results.backend'),
+		backendImage: get(state, '$getAppPlan.results.image_type'),
 	};
 };
 

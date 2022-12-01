@@ -364,7 +364,13 @@ const ConfigureBackend = (props) => {
 													className="radio-group"
 												>
 													{Object.values(BACKENDS)
-														.slice(0, -1)
+														.filter(
+															(item) =>
+																item.name !==
+																	BACKENDS.FUSION.name &&
+																item.name !==
+																	BACKENDS.MARKLOGIC.name,
+														)
 														.map(({ name, logo }) => (
 															<Radio.Button
 																className="backend-radio-button"

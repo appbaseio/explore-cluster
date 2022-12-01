@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import { FormOutlined } from '@ant-design/icons';
 import { Row, Col, Button, Skeleton, Alert } from 'antd';
-import { injectGlobal } from 'emotion';
+import { css, injectGlobal } from 'emotion';
 import { connect } from 'react-redux';
 import { string, object } from 'prop-types';
 import get from 'lodash/get';
@@ -87,6 +87,13 @@ class ImporterPage extends React.Component {
 			});
 		}
 		this.togglePreparing();
+
+		setTimeout(() => {
+			window.scrollTo({
+				top: document.body.scrollHeight || document.documentElement.scrollHeight,
+				behavior: 'smooth',
+			});
+		}, 1000);
 	}
 
 	componentWillUnmount() {
@@ -175,7 +182,7 @@ class ImporterPage extends React.Component {
 								target="_blank"
 								rel="noopener noreferrer"
 							>
-								<FormOutlined style={{ margin: "0.25rem" }}/>
+								<FormOutlined style={{ margin: '0.25rem' }} />
 								Contact Us
 							</Button>
 							<p
@@ -194,7 +201,17 @@ class ImporterPage extends React.Component {
 					</Row>
 				</Header>
 				<ErrorToaster>
-					<section>
+					<section
+						className={css`
+							.importer-layout-footer {
+								padding-right: 60px !important;
+								flex-direction: row !important;
+								height: auto !important;
+								bottom: 0 !important;
+								padding-top: 26px !important;
+							}
+						`}
+					>
 						{preparingApp ? (
 							<div style={{ maxWidth: '80%', margin: '20px auto' }}>
 								<h2>Preparing app for Import. This may take few seconds.</h2>

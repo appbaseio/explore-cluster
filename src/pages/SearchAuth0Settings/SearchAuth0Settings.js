@@ -112,7 +112,7 @@ const SearchAuth0Settings = (props) => {
 	const auth0Form = useRef(
 		FormBuilder.group({
 			applicationForm: FormBuilder.group({
-				name: [`application_name_${getURL()}`, Validators.required],
+				name: ['', Validators.required],
 				logo_uri: '',
 				callbacks: [
 					// eslint-disable-next-line no-template-curly-in-string
@@ -566,8 +566,7 @@ const SearchAuth0Settings = (props) => {
 
 		const { value: applicationFormValue } = applicationForm;
 		const payload = {
-			name: `application_name_${getURL()}`,
-			// applicationFormValue.name,
+			name: applicationFormValue.name,
 			logo_uri: applicationFormValue.logo_uri,
 			callbacks: applicationFormValue.callbacks
 				? applicationFormValue.callbacks.split(',')

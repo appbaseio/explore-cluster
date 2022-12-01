@@ -147,6 +147,10 @@ class AppWrapper extends Component {
 								action: 'access-control',
 								menu: [
 									{
+										label: 'User Management',
+										link: '/cluster/user-management',
+									},
+									{
 										label: 'API Credentials',
 										link: '/cluster/credentials',
 									},
@@ -279,6 +283,10 @@ class AppWrapper extends Component {
 										icon: 'key',
 										action: 'access-control',
 										menu: [
+											{
+												label: 'User Management',
+												link: '/cluster/user-management',
+											},
 											{
 												label: 'API Credentials',
 												link: '/cluster/credentials',
@@ -453,7 +461,9 @@ class AppWrapper extends Component {
 													item.link.includes(
 														'configure-search-engine-backend',
 													) &&
-													backendImage !== 'sls'
+													(backendImage !== 'sls' ||
+														backend === BACKENDS.FUSION.name ||
+														backend === BACKENDS.MARKLOGIC.name)
 												) {
 													return null;
 												}
