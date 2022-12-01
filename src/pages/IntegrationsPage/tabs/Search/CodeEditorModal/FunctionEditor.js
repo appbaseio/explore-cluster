@@ -440,7 +440,6 @@ const FunctionEditor = ({
 													pipeline={pipeline}
 													prefix={functionProperty}
 													hookOwnRender={(data) => {
-														console.log({ data });
 														if (functionProperty === 'defaultQuery') {
 															setState((s) => ({
 																...s,
