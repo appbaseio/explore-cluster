@@ -2,7 +2,8 @@ import React from 'react';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Alert, Button, Icon } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons';
+import { Alert, Button } from 'antd';
 import { css } from 'emotion';
 import Overlay from '../../components/Overlay';
 import Container from '../../components/Container';
@@ -40,7 +41,6 @@ const bannerDetails = {
 	title: 'Pipeline Logs',
 	description: 'Pipeline logs to glean insights.',
 	buttonText: 'Read Docs',
-	icon: 'info-circle',
 	href: 'https://docs.reactivesearch.io/docs/search/pipelines/',
 };
 
@@ -93,7 +93,7 @@ const PipelineLogsWrapper = ({ appVersion, tier, featurePipelines, pipelineId, h
 								history.push(`/cluster/pipelines/`);
 							}}
 						>
-							<Icon type="arrow-left" /> Pipelines
+							<ArrowLeftOutlined /> Pipelines
 						</Button>
 						<Button
 							type="link"

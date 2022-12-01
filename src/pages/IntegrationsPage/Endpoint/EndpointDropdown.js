@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Form, Icon, Select, Tag, Tooltip } from 'antd';
+import { InfoCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Select, Tag, Tooltip, Form } from 'antd';
 import { array, bool, func, object, string } from 'prop-types';
 import { connect } from 'react-redux';
 import moment from 'moment';
@@ -95,10 +96,10 @@ const EndpointDropdown = ({
 				<>Configure Data Endpoint</>
 
 				<Tooltip title="Data Endpoint is where you specify how the search UI fetches data.">
-					<Icon type="info-circle" style={{ marginLeft: 5 }} />
+					<InfoCircleOutlined style={{ marginLeft: 5 }} />
 				</Tooltip>
 			</span>
-			<Form className="row-data">
+			<div className="row-data">
 				{isFusion ? (
 					renderFusionFields()
 				) : (
@@ -127,24 +128,25 @@ const EndpointDropdown = ({
 										{(filteredApps || [])
 											.filter((k) => !k.includes('metricbeat'))
 											.map((k) => (
-												<Select.Option
-													key={k}
-													onClick={() => {
-														if (isWizard) {
-															form.get('method').setValue('POST');
-															form.get('url').setValue(
-																`/${k}/_reactivesearch`,
-															);
-															form.get('headers').setValue(
-																`{"Authorization":"Basic ${btoa(
-																	exportSettings.credentials ||
-																		'',
-																)}"}`,
-															);
-														}
-													}}
-												>
-													{k}
+												<Select.Option key={k}>
+													<div
+														onClick={() => {
+															if (isWizard) {
+																form.get('method').setValue('POST');
+																form.get('url').setValue(
+																	`/${k}/_reactivesearch`,
+																);
+																form.get('headers').setValue(
+																	`{"Authorization":"Basic ${btoa(
+																		exportSettings.credentials ||
+																			'',
+																	)}"}`,
+																);
+															}
+														}}
+													>
+														{k}
+													</div>
 												</Select.Option>
 											))}
 									</Select>
@@ -167,7 +169,7 @@ const EndpointDropdown = ({
 								value={`${method} ${url}`}
 								notFoundContent={
 									<Button onClick={() => setShowForm(true)}>
-										<Icon type="plus" /> Enter your own endpoint
+										<PlusOutlined /> Enter your own endpoint
 									</Button>
 								}
 							>
@@ -180,34 +182,37 @@ const EndpointDropdown = ({
 										<Select.Option
 											// eslint-disable-next-line
 											key={`${k.route.path}-${k.id}-${idx}`}
-											onClick={() => {
-												if (isPageLevel) {
-													endpointControl
-														.get('method')
-														.setValue(k.route.method);
-													endpointControl
-														.get('url')
-														.setValue(k.route.path);
-													endpointControl
-														.get('headers')
-														.setValue(
+											className={endpointConfigStyles}
+										>
+											<Flex
+												justifyContent="space-between"
+												onClick={() => {
+													if (isPageLevel) {
+														endpointControl
+															.get('method')
+															.setValue(k.route.method);
+														endpointControl
+															.get('url')
+															.setValue(k.route.path);
+														endpointControl
+															.get('headers')
+															.setValue(
+																`{"Authorization":"Basic ${btoa(
+																	exportSettings.credentials ||
+																		'',
+																)}"}`,
+															);
+													} else {
+														form.get('method').setValue(k.route.method);
+														form.get('url').setValue(k.route.path);
+														form.get('headers').setValue(
 															`{"Authorization":"Basic ${btoa(
 																exportSettings.credentials || '',
 															)}"}`,
 														);
-												} else {
-													form.get('method').setValue(k.route.method);
-													form.get('url').setValue(k.route.path);
-													form.get('headers').setValue(
-														`{"Authorization":"Basic ${btoa(
-															exportSettings.credentials || '',
-														)}"}`,
-													);
-												}
-											}}
-											className={endpointConfigStyles}
-										>
-											<Flex justifyContent="space-between">
+													}
+												}}
+											>
 												<div className="overflow description-overflow">
 													{k.route.method}&nbsp;
 													<Tooltip title={k.route.path}>
@@ -236,34 +241,39 @@ const EndpointDropdown = ({
 									.map((k) => (
 										<Select.Option
 											key={`/${k}/_reactivesearch`}
-											onClick={() => {
-												if (isPageLevel) {
-													endpointControl.get('method').setValue('POST');
-													endpointControl
-														.get('url')
-														.setValue(`/${k}/_reactivesearch`);
-													endpointControl
-														.get('headers')
-														.setValue(
+											className={endpointConfigStyles}
+										>
+											<Flex
+												justifyContent="space-between"
+												onClick={() => {
+													if (isPageLevel) {
+														endpointControl
+															.get('method')
+															.setValue('POST');
+														endpointControl
+															.get('url')
+															.setValue(`/${k}/_reactivesearch`);
+														endpointControl
+															.get('headers')
+															.setValue(
+																`{"Authorization":"Basic ${btoa(
+																	exportSettings.credentials ||
+																		'',
+																)}"}`,
+															);
+													} else {
+														form.get('method').setValue('POST');
+														form.get('url').setValue(
+															`/${k}/_reactivesearch`,
+														);
+														form.get('headers').setValue(
 															`{"Authorization":"Basic ${btoa(
 																exportSettings.credentials || '',
 															)}"}`,
 														);
-												} else {
-													form.get('method').setValue('POST');
-													form.get('url').setValue(
-														`/${k}/_reactivesearch`,
-													);
-													form.get('headers').setValue(
-														`{"Authorization":"Basic ${btoa(
-															exportSettings.credentials || '',
-														)}"}`,
-													);
-												}
-											}}
-											className={endpointConfigStyles}
-										>
-											<Flex justifyContent="space-between">
+													}
+												}}
+											>
 												<div className="overflow description-overflow">
 													<Tooltip title={`POST /${k}/_reactivesearch`} />
 													POST /{k}/_reactivesearch
@@ -276,31 +286,37 @@ const EndpointDropdown = ({
 									<Select.Option
 										// eslint-disable-next-line
 										key={`${k.url}-${idx}`}
-										onClick={() => {
-											if (isPageLevel) {
-												endpointControl.get('method').setValue(k.method);
-												endpointControl.get('url').setValue(k.path);
-											} else {
-												form.get('method').setValue(k.method);
-												form.get('url').setValue(k.url);
-											}
-										}}
 										className={endpointConfigStyles}
 									>
-										<div className="overflow description-overflow">
+										<div
+											className="overflow description-overflow"
+											onClick={() => {
+												if (isPageLevel) {
+													endpointControl
+														.get('method')
+														.setValue(k.method);
+													endpointControl.get('url').setValue(k.path);
+												} else {
+													form.get('method').setValue(k.method);
+													form.get('url').setValue(k.url);
+												}
+											}}
+										>
 											{k.method} &nbsp;
 											<Tooltip title={k.url}>{k.url}</Tooltip>
 										</div>
 									</Select.Option>
 								))}
-								<Select.Option key="custom" onClick={() => setShowForm(true)}>
-									<Icon type="plus" /> Enter your own endpoint
+								<Select.Option key="custom">
+									<div onClick={() => setShowForm(true)}>
+										<PlusOutlined /> Enter your own endpoint
+									</div>
 								</Select.Option>
 							</Select>
 						</Form.Item>
 					</>
 				)}
-			</Form>
+			</div>
 			{isPageLevel ? (
 				<FieldGroup name="endpoint" strict={false}>
 					{(controls) => (

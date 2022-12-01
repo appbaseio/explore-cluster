@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
-import { Icon, Popover, InputNumber } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { Popover, InputNumber } from 'antd';
 import { css } from 'react-emotion';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import Grid from '../../../../components/CreateCredentials/Grid';
@@ -67,7 +68,7 @@ function PreferenceForm() {
 													content={content(Messages.indices)}
 													css={styles.iconContainer}
 												>
-													<Icon type="info-circle" />
+													<InfoCircleOutlined />
 												</Popover>
 											</p>
 										}
@@ -101,7 +102,7 @@ function PreferenceForm() {
 													content={content(Messages.minCount)}
 													css={styles.iconContainer}
 												>
-													<Icon type="info-circle" />
+													<InfoCircleOutlined />
 												</Popover>
 											</p>
 										}
@@ -141,7 +142,7 @@ function PreferenceForm() {
 													content={content(Messages.minChars)}
 													css={styles.iconContainer}
 												>
-													<Icon type="info-circle" />
+													<InfoCircleOutlined />
 												</Popover>
 											</p>
 										}

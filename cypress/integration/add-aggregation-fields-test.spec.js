@@ -1,5 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
+import { PAGE_LOAD_TIME, REQUEST_RESOLVE_TIME, LONG_REQUEST_RESOLVE_TIME } from './contants';
 
 let indexName = '';
 
@@ -25,6 +26,11 @@ describe('Aggregation fields add test flow', () => {
 		cy.loginUser(username, password, cluster);
 	});
 
+	it('Should navigate to cluster overview', () => {
+		cy.wait(5000);
+		cy.visit(`${base_url}`);
+	});
+
 	it('Should create new index', () => {
 		cy.wait(5000).get('[data-cy=initialize-new-index-creation]').click().wait(2000);
 		generateName();
@@ -37,6 +43,7 @@ describe('Aggregation fields add test flow', () => {
 
 			.get('[data-cy=create-new-index]')
 			.click();
+		cy.wait(PAGE_LOAD_TIME);
 	});
 
 	it('Should index data', () => {

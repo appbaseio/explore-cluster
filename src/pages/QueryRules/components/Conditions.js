@@ -2,11 +2,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Select, Input, Row, Col, Button } from 'antd';
+import styled from 'react-emotion';
 import { getErrorClass, getErrorMessage } from '../utils/error';
 import { hasValuesChanged } from '../utils';
 import Info from '../../../components/Info';
 
 const { Option } = Select;
+
+const FullWidthRow = styled(Row)`
+	width: 100%;
+`;
 
 class Conditions extends React.Component {
 	shouldComponentUpdate(nextProps) {
@@ -38,15 +43,15 @@ class Conditions extends React.Component {
 		return (
 			<React.Fragment>
 				{condition === 'filter' ? (
-					<>
-						<Row>
-							<Col xs={24}>{getErrorMessage(error.condition)}</Col>
+					<Row>
+						<FullWidthRow>
+							<Col>{getErrorMessage(error.condition)}</Col>
 							<div
 								style={{
 									border: error?.queryValue?.hasError ? '1px solid red' : 'none',
-									height: error?.queryValue?.hasError ? 150 : 0,
 									marginBottom: '15px',
 									padding: 10,
+									width: '100%',
 								}}
 							>
 								{error?.queryValue?.hasError && (
@@ -54,58 +59,61 @@ class Conditions extends React.Component {
 										{error?.queryValue.description}
 									</div>
 								)}
-
-								<Col md={12} sm={24}>
-									<label>
-										Query{' '}
-										<Info
-											content={
-												<>
-													Select a query condition based on which you want
-													to invoke a rule.
-													<a
-														href="https://docs.reactivesearch.io/docs/search/Rules/#configure-if-condition"
-														target="_blank"
-														rel="noopener noreferrer"
-													>
-														Learn more
-													</a>
-												</>
+								<FullWidthRow>
+									<Col md={12} sm={24}>
+										<label>
+											Query{' '}
+											<Info
+												content={
+													<>
+														Select a query condition based on which you
+														want to invoke a rule.
+														<a
+															href="https://docs.reactivesearch.io/docs/search/Rules/#configure-if-condition"
+															target="_blank"
+															rel="noopener noreferrer"
+														>
+															Learn more
+														</a>
+													</>
+												}
+											/>
+										</label>
+										<Select
+											onChange={(value) => onDropdownChange('query', value)}
+											value={query}
+											style={{ width: '100%' }}
+										>
+											<Option value="==">Query is</Option>
+											<Option value="contains">Query contains</Option>
+											<Option value="startsWith">Query starts with</Option>
+											<Option value="endsWith">Query ends with </Option>
+										</Select>
+									</Col>
+									<Col md={12} sm={24}>
+										<label>Value</label>
+										<Input
+											className={
+												queryValue ? '' : getErrorClass(error.condition)
 											}
+											name="queryValue"
+											value={queryValue}
+											onChange={onChange}
+											onBlur={onBlur}
 										/>
-									</label>
-									<Select
-										onChange={(value) => onDropdownChange('query', value)}
-										value={query}
-										style={{ width: '100%' }}
-									>
-										<Option value="==">Query is</Option>
-										<Option value="contains">Query contains</Option>
-										<Option value="startsWith">Query starts with</Option>
-										<Option value="endsWith">Query ends with </Option>
-									</Select>
-								</Col>
-								<Col md={12} sm={24}>
-									<label>Value</label>
-									<Input
-										className={queryValue ? '' : getErrorClass(error.condition)}
-										name="queryValue"
-										value={queryValue}
-										onChange={onChange}
-										onBlur={onBlur}
-									/>
-								</Col>
+									</Col>
+								</FullWidthRow>
 							</div>
-						</Row>
-						<Row>
+						</FullWidthRow>
+						<FullWidthRow>
 							<div
 								style={{
 									border: error?.dataFieldValue?.hasError
 										? '1px solid red'
 										: 'none',
-									height: error?.dataFieldValue?.hasError ? 150 : 0,
 									marginBottom: '15px',
 									padding: 10,
+									width: '100%',
 								}}
 							>
 								{error?.dataFieldValue?.hasError && (
@@ -113,58 +121,64 @@ class Conditions extends React.Component {
 										{error?.dataFieldValue?.description}
 									</div>
 								)}
-								<Col md={12} sm={24}>
-									<label>
-										Filter
-										<Info content="Select a filter field and value which needs to be set before triggering this rule." />
-									</label>
-									<Select
-										onChange={(value) => onDropdownChange('dataField', value)}
-										value={dataField}
-										className={dataField ? '' : getErrorClass(error.condition)}
-										style={{ width: '100%' }}
-										showSearch
-									>
-										{dataFields.map((field) => (
-											<Option key={field}>
-												{field.replace(/.keyword/g, '')}
-											</Option>
-										))}
-									</Select>
-									{dataField || dataFieldValue ? (
-										<Button
-											style={{
-												margin: '4px 0',
-												padding: 0,
-												border: 0,
-												color: '#1890ff',
-											}}
-											ghost
-											size="small"
-											onClick={() => {
-												onDropdownChange('dataField', '');
-												onDropdownChange('dataFieldValue', '');
-											}}
+								<FullWidthRow>
+									<Col md={12} sm={24}>
+										<label>
+											Filter
+											<Info content="Select a filter field and value which needs to be set before triggering this rule." />
+										</label>
+										<Select
+											onChange={(value) =>
+												onDropdownChange('dataField', value)
+											}
+											value={dataField}
+											className={
+												dataField ? '' : getErrorClass(error.condition)
+											}
+											style={{ width: '100%' }}
+											showSearch
 										>
-											Clear Filter
-										</Button>
-									) : null}
-								</Col>
-								<Col md={12} sm={24}>
-									<label>Value</label>
-									<Input
-										className={
-											dataFieldValue ? '' : getErrorClass(error.condition)
-										}
-										name="dataFieldValue"
-										value={dataFieldValue}
-										onChange={onChange}
-										onBlur={onBlur}
-									/>
-								</Col>
+											{dataFields.map((field) => (
+												<Option key={field}>
+													{field.replace(/.keyword/g, '')}
+												</Option>
+											))}
+										</Select>
+										{dataField || dataFieldValue ? (
+											<Button
+												style={{
+													margin: '4px 0',
+													padding: 0,
+													border: 0,
+													color: '#1890ff',
+												}}
+												ghost
+												size="small"
+												onClick={() => {
+													onDropdownChange('dataField', '');
+													onDropdownChange('dataFieldValue', '');
+												}}
+											>
+												Clear Filter
+											</Button>
+										) : null}
+									</Col>
+									<Col md={12} sm={24}>
+										<label>Value</label>
+										<Input
+											className={
+												dataFieldValue ? '' : getErrorClass(error.condition)
+											}
+											name="dataFieldValue"
+											value={dataFieldValue}
+											onChange={onChange}
+											onBlur={onBlur}
+										/>
+									</Col>
+								</FullWidthRow>
 							</div>
-						</Row>
-					</>
+						</FullWidthRow>
+					</Row>
 				) : null}
 			</React.Fragment>
 		);

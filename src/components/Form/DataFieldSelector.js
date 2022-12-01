@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Select, Form, Tooltip, AutoComplete } from 'antd';
+import { Select, Tooltip, AutoComplete, Form } from 'antd';
 import { css } from 'emotion';
 import { string, func, bool, object, element, array } from 'prop-types';
 import get from 'lodash/get';
@@ -17,6 +17,14 @@ import { transformGeneralMappingsToFusionArrayFormat } from '../../pages/Integra
 const selectCls = css`
 	.ant-select-selection {
 		border-color: tomato;
+	}
+	.ant-select-selection-placeholder {
+		text-align: left;
+	}
+`;
+const defaultSelectCls = css`
+	.ant-select-selection-placeholder {
+		text-align: left;
 	}
 `;
 
@@ -241,7 +249,9 @@ class DataFieldSelector extends React.Component {
 										</Tooltip>
 									) : null}
 									<AutoComplete
-										className={touched && invalid ? selectCls : undefined}
+										className={
+											touched && invalid ? selectCls : defaultSelectCls
+										}
 										placeholder="Select dynamic field"
 										allowClear
 										{...selectPropsCalculated}
@@ -327,7 +337,9 @@ class DataFieldSelector extends React.Component {
 										</Tooltip>
 									) : null}
 									<AutoComplete
-										className={touched && invalid ? selectCls : undefined}
+										className={
+											touched && invalid ? selectCls : defaultSelectCls
+										}
 										placeholder="Select field"
 										allowClear
 										{...selectPropsCalculated}

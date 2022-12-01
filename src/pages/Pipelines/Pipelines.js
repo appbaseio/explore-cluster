@@ -1,6 +1,7 @@
 import React, { Fragment, useLayoutEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Col, Icon, Row, Layout, Result, Alert } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { Button, Col, Row, Layout, Result, Alert } from 'antd';
 import { css } from 'emotion';
 import get from 'lodash/get';
 import orderBy from 'lodash/orderBy';
@@ -116,7 +117,7 @@ const Pipelines = (props) => {
 						>
 							<Link to="/cluster/pipelines/new">
 								<Button block type="primary" size="large" rel="noopener noreferrer">
-									<Icon type="plus" />
+									<PlusOutlined style={{ margin: "0.25rem" }}/>
 									Create Pipeline
 								</Button>
 							</Link>
@@ -157,7 +158,7 @@ const Pipelines = (props) => {
 						extra={
 							<Link to="/cluster/pipelines/new">
 								<Button type="primary">
-									<Icon type="plus" />
+									<PlusOutlined style={{ margin: "0.25rem" }}/>
 									Create Pipeline
 								</Button>
 							</Link>

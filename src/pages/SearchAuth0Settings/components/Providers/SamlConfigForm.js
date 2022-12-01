@@ -1,3 +1,4 @@
+import { UploadOutlined } from '@ant-design/icons';
 import { Button, Input, Switch, Upload } from 'antd';
 import TextArea from 'antd/lib/input/TextArea';
 import { css } from 'emotion';
@@ -165,7 +166,7 @@ const SamlConfigForm = () => {
 																	return false;
 																}}
 															>
-																<Button icon="upload">
+																<Button icon={<UploadOutlined />}>
 																	Click to Upload
 																</Button>
 															</Upload>
@@ -294,33 +295,33 @@ const SamlConfigForm = () => {
 									}}
 								/>
 								{/* <FieldControl
-									name="protocol_binding"
-									render={({ handler }) => {
-										return (
-											<Grid
-												label="Protocol Binding"
-												toolTipMessage={Messages.protocol_binding}
-												className="field-wrapper"
-												component={
-													<Select
-														{...handler()}
-														style={{
-															maxWidth: 300,
-															width: 200,
-														}}
-													>
-														<Select.Option key="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect">
-															HTTP-Redirect
-														</Select.Option>
-														<Select.Option key="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST">
-															HTTP-POST
-														</Select.Option>
-													</Select>
-												}
-											/>
-										);
-									}}
-								/> */}
+                                name="protocol_binding"
+                                render={({ handler }) => {
+                                    return (
+                                        <Grid
+                                            label="Protocol Binding"
+                                            toolTipMessage={Messages.protocol_binding}
+                                            className="field-wrapper"
+                                            component={
+                                                <Select
+                                                    {...handler()}
+                                                    style={{
+                                                        maxWidth: 300,
+                                                        width: 200,
+                                                    }}
+                                                >
+                                                    <Select.Option key="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect">
+                                                        HTTP-Redirect
+                                                    </Select.Option>
+                                                    <Select.Option key="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST">
+                                                        HTTP-POST
+                                                    </Select.Option>
+                                                </Select>
+                                            }
+                                        />
+                                    );
+                                }}
+                            /> */}
 								<FieldControl
 									name="idp_domains"
 									strict={false}

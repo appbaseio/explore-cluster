@@ -18,7 +18,6 @@ const bannerDetails = {
 	title: 'Log Details',
 	description: 'Log details',
 	buttonText: 'Read Docs',
-	icon: 'info-circle',
 	href: 'https://docs.reactivesearch.io/docs/pipelines/concepts/',
 };
 

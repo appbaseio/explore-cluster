@@ -1,6 +1,7 @@
 import React from 'react';
 import { FieldControl, FieldGroup } from 'react-reactive-form';
 import { func, object, bool, number, oneOfType, string } from 'prop-types';
+import { CopyOutlined } from '@ant-design/icons';
 import { Button, message } from 'antd';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import {
@@ -44,7 +45,7 @@ const ExportToOther = ({ control, preferences, isRecommendation, widgetId }) => 
 			>
 				<CopyToClipboard text={installationHeadScript} onCopy={copyToClipboard}>
 					<Button
-						icon="copy"
+						icon={<CopyOutlined />}
 						shape="circle"
 						css={{
 							position: 'absolute',
@@ -76,7 +77,7 @@ const ExportToOther = ({ control, preferences, isRecommendation, widgetId }) => 
 			>
 				<CopyToClipboard text={installationBodyScript} onCopy={copyToClipboard}>
 					<Button
-						icon="copy"
+						icon={<CopyOutlined />}
 						shape="circle"
 						css={{
 							position: 'absolute',
@@ -110,7 +111,7 @@ const ExportToOther = ({ control, preferences, isRecommendation, widgetId }) => 
 					>
 						<CopyToClipboard text={recommendationScript} onCopy={copyToClipboard}>
 							<Button
-								icon="copy"
+								icon={<CopyOutlined />}
 								shape="circle"
 								css={{
 									position: 'absolute',
@@ -149,7 +150,7 @@ const ExportToOther = ({ control, preferences, isRecommendation, widgetId }) => 
 									>
 										<CopyToClipboard text={ctaScript} onCopy={copyToClipboard}>
 											<Button
-												icon="copy"
+												icon={<CopyOutlined />}
 												shape="circle"
 												css={{
 													position: 'absolute',

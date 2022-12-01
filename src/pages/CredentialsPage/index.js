@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import get from 'lodash/get';
-import { Card, Table, Tooltip, Button, Alert, Typography, Icon, Result } from 'antd';
+import { WarningOutlined } from '@ant-design/icons';
+import { Card, Table, Tooltip, Button, Alert, Typography, Result } from 'antd';
 import { connect } from 'react-redux';
 import { string, func, bool, array, object } from 'prop-types';
 import Text from 'antd/lib/typography/Text';
@@ -36,9 +37,8 @@ const columns = [
 						placement="topLeft"
 						title="It seems like the permission has been expired."
 					>
-						<Icon
+						<WarningOutlined
 							style={{ color: 'orange', fontSize: 16, cursor: 'pointer' }}
-							type="warning"
 						/>
 					</Tooltip>
 				) : null}{' '}

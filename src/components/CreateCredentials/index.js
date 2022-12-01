@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { css } from 'emotion';
-import { Icon, Modal, Input, Radio, Tooltip, Button, Select, Switch, Collapse } from 'antd';
+import { CaretRightOutlined, LockOutlined, SettingOutlined } from '@ant-design/icons';
+import { Modal, Input, Radio, Tooltip, Button, Select, Switch, Collapse } from 'antd';
 import {
 	FieldArray,
 	FormBuilder,
@@ -590,10 +591,7 @@ class CreateCredentials extends React.Component {
 											<div className={styles.overlay}>
 												<div className={styles.upgradePlan}>
 													<div style={{ marginBottom: 20 }}>
-														<Icon
-															type="lock"
-															style={{ fontSize: 40 }}
-														/>
+														<LockOutlined style={{ fontSize: 40 }} />
 													</div>
 													Upgrade to a paid plan to add advanced security
 													permissions.
@@ -638,15 +636,15 @@ class CreateCredentials extends React.Component {
 										<Collapse
 											bordered={false}
 											expandIcon={({ isActive }) => (
-												<Icon
-													type="caret-right"
+												<CaretRightOutlined
+													style={{ marginTop: '10px', display: 'block' }}
 													rotate={isActive ? 90 : 0}
 												/>
 											)}
 										>
 											<Collapse.Panel
 												header={
-													<Button type="link" icon="settings">
+													<Button type="link" icon={<SettingOutlined />}>
 														Advanced Settings
 													</Button>
 												}

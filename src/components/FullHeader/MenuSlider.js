@@ -1,4 +1,5 @@
 import React from 'react';
+import { MenuFoldOutlined } from '@ant-design/icons';
 import { Drawer, Button, Menu } from 'antd';
 import { Link } from 'react-router-dom';
 import { css } from 'react-emotion';
@@ -58,7 +59,11 @@ class MenuSlider extends React.Component {
 		const { defaultSelectedKeys, isHomepage } = this.props;
 		return (
 			<div className={menuSlider}>
-				<Button className={menuBtn} icon="menu-fold" onClick={this.handleDrawer} />
+				<Button
+					className={menuBtn}
+					icon={<MenuFoldOutlined />}
+					onClick={this.handleDrawer}
+				/>
 				<Drawer
 					title="Menu"
 					placement="right"

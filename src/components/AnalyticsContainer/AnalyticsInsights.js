@@ -1,6 +1,7 @@
 import React from 'react';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
+import { CloseOutlined } from '@ant-design/icons';
 import { Tabs, Button, message, notification, Result } from 'antd';
 import PropTypes from 'prop-types';
 import CollapsibleInsights from './CollapsibleInsights';
@@ -88,11 +89,12 @@ class AnalyticsInsights extends React.Component {
 			JSON.stringify(prevProps.insightUpdates) !== JSON.stringify(updates)
 		) {
 			Object.keys(updates).forEach((id) => {
-				const { success, error: updateError, nextStatus, inProgress } = get(
-					updates,
-					id,
-					{},
-				);
+				const {
+					success,
+					error: updateError,
+					nextStatus,
+					inProgress,
+				} = get(updates, id, {});
 				if (inProgress) {
 					return;
 				}
@@ -165,7 +167,7 @@ class AnalyticsInsights extends React.Component {
 					<h6>Actionable Insights</h6>
 					<p>{this.range}</p>
 				</div>
-				<Button onClick={toggleSidebar} shape="circle" icon="close" />
+				<Button onClick={toggleSidebar} shape="circle" icon={<CloseOutlined />} />
 			</React.Fragment>
 		);
 	};

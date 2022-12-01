@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Icon, Input, Layout, Menu, Tag } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
+import { Input, Layout, Menu, Tag } from 'antd';
 import { Link, Route, Switch, Redirect } from 'react-router-dom';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
@@ -7,6 +8,7 @@ import get from 'lodash/get';
 import keys from 'lodash/keys';
 import { bool, func, object, string } from 'prop-types';
 import { isEqual } from 'lodash';
+import { css } from 'emotion';
 import { ALLOWED_ACTIONS } from '../../constants';
 import Loader from '../../components/Loader';
 // eslint-disable-next-line
@@ -23,6 +25,7 @@ import SidebarAutocomplete from '../../components/SidebarAutocomplete';
 import searchInputStyle from './styles';
 import UnauthorizedPage from '../UnauthorizedPage';
 import { ALLOWED_ACTIONS_BY_BACKEND, BACKENDS } from '../../batteries/utils';
+import { iconMap } from '../../components/iconMap';
 
 const NoMatch = Loadable({
 	loader: () => import(/* webpackChunkName: "NoMatchPage" */ '../../NoMatch'),
@@ -53,6 +56,15 @@ const accountRoute = {
 		],
 	},
 };
+
+const sidebarStyles = css`
+	height: 100vh;
+	position: fixed !important;
+	left: 0;
+	& .ant-layout-sider-children .ant-menu.ant-menu-inline-collapsed {
+		width: 100%;
+	}
+`;
 
 const getActiveMenu = (props, prevActiveSubMenu = [], routes = {}) => {
 	let activeSubMenu = 'App Overview';
@@ -353,14 +365,10 @@ class DashboardWrapper extends Component {
 			<Layout>
 				<Sider
 					width={260}
-					css={{
-						height: '100vh',
-						position: 'fixed !important',
-						left: 0,
-					}}
 					collapsible
 					collapsed={collapsed}
 					onCollapse={this.onCollapse}
+					className={sidebarStyles}
 				>
 					<Menu
 						theme="dark"
@@ -403,7 +411,7 @@ class DashboardWrapper extends Component {
 									value={value}
 									onChange={this.handleSearchTerm}
 									placeholder="Search for a menu item"
-									suffix={<Icon type="search" />}
+									suffix={<SearchOutlined />}
 								/>
 							</div>
 						)}
@@ -423,7 +431,7 @@ class DashboardWrapper extends Component {
 								if (routes[route].menu) {
 									const Title = (
 										<span>
-											<Icon type={routes[route].icon} />
+											{iconMap[routes[route].icon]}
 											<span>{route}</span>
 										</span>
 									);
@@ -473,7 +481,7 @@ class DashboardWrapper extends Component {
 									return (
 										<Menu.Item key={route}>
 											<Link replace to={routes[route].link}>
-												<Icon type={routes[route].icon} />
+												{iconMap[routes[route].icon]}
 												<span>
 													{route}
 													{routes[route].tag ? (
@@ -507,14 +515,14 @@ class DashboardWrapper extends Component {
 												history={history}
 												renderItem={() => (
 													<div>
-														<Icon type={routes[route].icon} />
+														{iconMap[routes[route].icon]}
 														<span>{route}</span>
 													</div>
 												)}
 											/>
 										) : (
 											<Link replace to={routes[route].link}>
-												<Icon type={routes[route].icon} />
+												{iconMap[routes[route].icon]}
 												<span>{route}</span>
 											</Link>
 										)}

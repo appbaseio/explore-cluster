@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Icon, Modal } from 'antd';
+import { EyeOutlined } from '@ant-design/icons';
+import { Modal } from 'antd';
 import { func, object, string } from 'prop-types';
 import styled from 'react-emotion';
 import get from 'lodash/get';
@@ -77,8 +78,7 @@ const SearchPreviewModal = ({ form, backend, getPreferencesPayload }) => {
 
 	return (
 		<>
-			<Icon
-				type="eye"
+			<EyeOutlined
 				onClick={() => setIsOpen(true)}
 				style={{ color: '#40a9ff', marginLeft: 10 }}
 			/>

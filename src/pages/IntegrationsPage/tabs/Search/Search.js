@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import { FieldControl, FieldGroup } from 'react-reactive-form';
-import { Switch, Form, List, Button, Radio } from 'antd';
+import { Switch, List, Button, Radio, Form } from 'antd';
 import IndexSwitcher from '../../../../components/IndexSwitcher';
 import SearchPreviewModal from './SearchPreview';
 import { BACKENDS } from '../../../../batteries/utils';
@@ -61,7 +61,7 @@ const Search = ({ history, pipeline, apps, form, backend, getPreferencesPayload 
 				/>
 			</h2>
 
-			<Form layout="inline">
+			<Form layout="vertical">
 				<List
 					dataSource={defaultSettings}
 					renderItem={(item) => {

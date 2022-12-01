@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { css } from 'emotion';
-import { Card, Icon, Modal, Upload } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { Card, Modal, Upload } from 'antd';
 import JsonView from '../../../components/JsonView';
 
 const uploadClass = css`
@@ -97,7 +98,7 @@ class UploadSynonymsModal extends React.Component {
 				>
 					{file ? null : (
 						<div>
-							<Icon type="plus" />
+							<PlusOutlined />
 							<div className="ant-upload-text">Choose File</div>
 						</div>
 					)}

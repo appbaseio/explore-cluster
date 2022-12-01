@@ -1,4 +1,5 @@
-import { AutoComplete, Form, Icon, Tooltip } from 'antd';
+import { MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons';
+import { AutoComplete, Tooltip, Form } from 'antd';
 import { array, object } from 'prop-types';
 import React, { Component } from 'react';
 import styled from 'react-emotion';
@@ -130,7 +131,7 @@ class Data extends Component {
 										controls.filter((c) => !c.value.label).length > 0
 									}
 								>
-									<Icon type="plus-square" />
+									<PlusSquareOutlined />
 								</AddButton>
 							</Tooltip>
 						</div>
@@ -168,7 +169,7 @@ class Data extends Component {
 													}}
 													disabled={controls.length === 1 && idx === 0}
 												>
-													<Icon type="minus-square" />
+													<MinusSquareOutlined />
 												</RemoveButton>
 											</Form.Item>
 										</MarginHorizontal>

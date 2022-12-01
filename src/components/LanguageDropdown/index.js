@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Form, Select } from 'antd';
+import { Select, Form } from 'antd';
 import get from 'lodash/get';
 import { languages } from '../../constants/es-languages';
 

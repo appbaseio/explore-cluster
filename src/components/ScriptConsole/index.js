@@ -1,4 +1,5 @@
-import { Button, Col, Icon, Row, Select, Tag, Tooltip, Modal, Tabs } from 'antd';
+import { InfoCircleOutlined, SaveOutlined } from '@ant-design/icons';
+import { Button, Col, Row, Select, Tag, Tooltip, Modal, Tabs } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -64,8 +65,15 @@ const scriptConsoleCss = css`
 	.ant-select-sm.ant-select {
 		width: 300px;
 	}
+	.ant-tabs-tabpane {
+		height: 100%;
+	}
+	.ant-tabs-content-holder,
+	.ant-tabs-content {
+		height: 100%;
+	}
 	.tabs-container {
-		height: calc(100% + 4px);
+		height: 100%;
 		width: 100%;
 		.ant-tabs-extra-content {
 			line-height: 35px;
@@ -90,7 +98,6 @@ const scriptConsoleCss = css`
 
 	.monaco-wrapper {
 		width: 100% !important;
-		height: calc(100% - 42px) !important;
 	}
 
 	.save-script-btn-wrapper {
@@ -733,7 +740,7 @@ const ScriptConsole = ({
 							title={getTooltipTitle['query-area']}
 						>
 							<span style={{ marginLeft: 5 }}>
-								<Icon type="info-circle" />
+								<InfoCircleOutlined />
 							</span>
 						</Tooltip>
 					</h3>
@@ -768,6 +775,7 @@ const ScriptConsole = ({
 					customizeMonacoInstance={(monaco, editorRef) => {
 						scriptEditorRef.current = editorRef;
 					}}
+					height="92%"
 					wrapperClass="monaco-wrapper"
 				/>
 			</Col>
@@ -782,7 +790,7 @@ const ScriptConsole = ({
 							>
 								{isSmallScreen ? (
 									<Tooltip title="Save Script" trigger="hover">
-										<Icon type="save" title="" />{' '}
+										<SaveOutlined title="" />{' '}
 									</Tooltip>
 								) : (
 									'Save Script'
@@ -811,7 +819,7 @@ const ScriptConsole = ({
 									autoAdjustOverflow={false}
 								>
 									<span style={{ marginLeft: 5 }}>
-										<Icon type="info-circle" />
+										<InfoCircleOutlined />
 									</span>
 								</Tooltip>
 							</h3>
@@ -843,7 +851,7 @@ const ScriptConsole = ({
 								{isSmallScreen ? RESPONSE_OUTPUT_SHORT : RESPONSE_OUTPUT}{' '}
 								<Tooltip placement="right" title={getTooltipTitle['response-area']}>
 									<span style={{ marginLeft: 5 }}>
-										<Icon type="info-circle" />
+										<InfoCircleOutlined />
 									</span>
 								</Tooltip>
 							</h3>
@@ -875,7 +883,7 @@ const ScriptConsole = ({
 								{isSmallScreen ? CONSOLE_LOGS_SHORT : CONSOLE_LOGS}
 								<Tooltip placement="right" title={getTooltipTitle['console-logs']}>
 									<span style={{ marginLeft: 5 }}>
-										<Icon type="info-circle" />
+										<InfoCircleOutlined />
 									</span>
 								</Tooltip>
 							</h3>

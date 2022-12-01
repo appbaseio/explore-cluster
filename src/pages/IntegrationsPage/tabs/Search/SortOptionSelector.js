@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import PropTypes, { object, string } from 'prop-types';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
-import { AutoComplete, Row, Col, Tooltip, Icon, Input, Radio } from 'antd';
+import { DeleteOutlined, DragOutlined } from '@ant-design/icons';
+import { AutoComplete, Row, Col, Tooltip, Input, Radio } from 'antd';
 import { css } from 'emotion';
 import { Draggable } from 'react-beautiful-dnd';
 import apisMapper from '../../utils/apisMapper';
@@ -33,6 +34,9 @@ const card = css`
 		display: flex;
 		align-items: center;
 	}
+`;
+const autocomplete = css`
+	width: 100%;
 `;
 
 function getItemStyle(isDragging, draggableStyle) {
@@ -122,7 +126,7 @@ function SortOptionSelector({
 							<Col xs={1} style={{ display: 'flex' }}>
 								<Tooltip title="Drag to update the ordering">
 									<span {...provided.dragHandleProps}>
-										<Icon type="drag" className={dragIcon} />
+										<DragOutlined className={dragIcon} />
 									</span>
 								</Tooltip>
 								{item?.dataField &&
@@ -143,6 +147,7 @@ function SortOptionSelector({
 							</Col>
 							<Col xs={8}>
 								<AutoComplete
+									className={autocomplete}
 									filterOption={(inputValue, option) => {
 										if (
 											option.props.children &&
@@ -265,8 +270,7 @@ function SortOptionSelector({
 							</Col>
 							<Col xs={1}>
 								<div className="show-on-hover">
-									<Icon
-										type="delete"
+									<DeleteOutlined
 										style={{
 											color: '#f5222d',
 											cursor: 'pointer',

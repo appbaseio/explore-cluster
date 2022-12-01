@@ -13,6 +13,7 @@ const tableStyle = css`
 	margin-left: 10px;
 	margin-right: 10px;
 	padding: 10px;
+	width: 100%;
 `;
 
 const getFileSizeInBytes = (size) => {

@@ -1,7 +1,8 @@
 /* eslint-disable camelcase */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Card, Button, Slider, Modal, Alert, Icon } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
+import { Card, Button, Slider, Modal, Alert } from 'antd';
 import { cardTitle } from '../../batteries/components/Mappings/styles';
 
 const Replicas = ({
@@ -28,7 +29,7 @@ const Replicas = ({
 						onClick={() => handleModal('replicasModal')}
 						type="primary"
 					>
-						{loading ? <Icon type="loading" /> : null}
+						{loading ? <LoadingOutlined /> : null}
 						Change Replicas
 					</Button>
 				</div>

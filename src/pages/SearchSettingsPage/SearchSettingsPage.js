@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import get from 'lodash/get';
 
 import { connect } from 'react-redux';
-import { Card, Divider, Skeleton, Button, Tooltip, Icon, Modal } from 'antd';
+import { DeleteOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Card, Divider, Skeleton, Button, Tooltip, Modal } from 'antd';
 import {
 	getDefaultSettings,
 	putSettings,
@@ -34,7 +35,6 @@ const bannerDetails = {
 	title: 'Search Settings',
 	buttonText: 'Read Docs',
 	description: `Search Settings enables you to control search query and relevance settings.`,
-	icon: 'info-circle',
 	videoLink: 'https://youtu.be/moxJ2ZB4owI',
 	href: 'https://docs.reactivesearch.io/docs/search/relevancy/#search-settings',
 };
@@ -570,7 +570,7 @@ class SearchSettingsPage extends React.Component {
 											onClick={mappingWrapperProps.reloadMappings}
 											data-cy="reload-mappings-button"
 										>
-											<Icon type="reload" />
+											<ReloadOutlined style={{ margin: '0.25rem' }} />
 											Reload Mappings
 										</Button>
 									</Tooltip>
@@ -589,7 +589,7 @@ class SearchSettingsPage extends React.Component {
 												}
 												disabled={this.disableRemoveAllButton()}
 											>
-												<Icon type="delete" />
+												<DeleteOutlined style={{ margin: '0.25rem' }} />
 												Remove All Fields
 											</Button>
 										</Tooltip>

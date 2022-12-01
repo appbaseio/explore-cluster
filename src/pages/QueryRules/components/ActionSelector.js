@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { css } from 'emotion';
-import { Card, Icon, Select } from 'antd';
+import { CheckCircleTwoTone } from '@ant-design/icons';
+import { Card, Select } from 'antd';
 import { getErrorClass, getErrorMessage } from '../utils/error';
 import { hasValuesChanged } from '../utils';
 
@@ -134,7 +135,7 @@ class ActionSelector extends React.Component {
 							padding: '15px',
 						}}
 					>
-						<Icon type="check-circle" theme="twoTone" style={{ marginRight: 10 }} />
+						<CheckCircleTwoTone style={{ marginRight: 10 }} />
 						All actions defined
 					</div>
 				)}

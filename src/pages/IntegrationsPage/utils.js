@@ -14,6 +14,7 @@ import { BACKENDS } from '../../batteries/utils';
 export const FormContext = React.createContext(null);
 
 export const verticalTab = css`
+	margin-top: 10px;
 	.ant-tabs-bar .ant-tabs-nav-wrap .ant-tabs-nav-scroll .ant-tabs-nav .ant-tabs-tab {
 		text-align: left !important;
 	}

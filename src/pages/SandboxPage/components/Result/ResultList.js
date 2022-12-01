@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Icon, Spin, Button } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
+import { Spin, Button } from 'antd';
 import isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
 import ListItem from './ListItem';
@@ -17,7 +18,7 @@ const LoadMore = ({ size, loadMore, data, loading }) => {
 
 	return (
 		<Button onClick={loadMore} block type="primary" ghost>
-			{loading && <Icon type="loading" />}
+			{loading && <LoadingOutlined />}
 			Load More
 		</Button>
 	);

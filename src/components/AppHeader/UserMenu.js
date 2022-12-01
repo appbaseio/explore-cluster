@@ -1,7 +1,8 @@
 import React from 'react';
 import { object } from 'prop-types';
 import get from 'lodash/get';
-import { Menu, Avatar, Dropdown, Icon } from 'antd';
+import { DownOutlined, PoweroffOutlined, UserOutlined } from '@ant-design/icons';
+import { Avatar, Dropdown } from 'antd';
 import { css } from 'react-emotion';
 import { media } from '../../utils/media';
 
@@ -34,23 +35,26 @@ const handleLogout = () => {
 	window.location.href = '/';
 };
 
-const menu = (
-	<Menu>
-		<Menu.Item onClick={handleLogout} data-cy="logout-button">
-			<Icon type="poweroff" theme="outlined" />
-			Logout
-		</Menu.Item>
-	</Menu>
-);
+const menu = [
+	{
+		key: '1',
+		label: (
+			<div onClick={handleLogout} data-cy="logout-button">
+				<PoweroffOutlined style={{ margin: '0.25rem' }} />
+				Logout
+			</div>
+		),
+	},
+];
 
 const UserMenu = ({ user }) => (
-	<Dropdown overlay={menu} className={userMenu} trigger={['click']}>
+	<Dropdown menu={{ items: menu }} className={userMenu} trigger={['click']}>
 		<div style={{ cursor: 'pointer' }} data-cy="logout-menu">
-			<Avatar icon="user" />
+			<Avatar icon={<UserOutlined />} />
 			&nbsp;&nbsp;
 			{get(user, 'username', 'Loading...')}
 			&nbsp;&nbsp;
-			<Icon type="down" />
+			<DownOutlined />
 		</div>
 	</Dropdown>
 );

@@ -1,5 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
+import { LoadingOutlined } from '@ant-design/icons';
 import {
 	Col,
 	Row,
@@ -8,12 +9,11 @@ import {
 	Card,
 	Typography,
 	Radio,
-	Form,
 	Input,
 	Button,
 	notification,
 	Spin,
-	Icon,
+	Form,
 } from 'antd';
 import { css } from 'emotion';
 import get from 'lodash/get';
@@ -170,7 +170,6 @@ const ConfigureBackend = (props) => {
 		title: 'Search Backend Configuration',
 		description: `This will setup a connector pipeline so you can make search API requests and build search UIs with the configured search engine.`,
 		buttonText: 'Read Docs',
-		icon: 'info-circle',
 		href: 'https://docs.appbase.io/docs/pipelines/concepts/',
 	};
 	const [disabledSave, setDisabledSave] = useState(true);
@@ -289,7 +288,7 @@ const ConfigureBackend = (props) => {
 	return (
 		<Spin
 			spinning={isLoading}
-			indicator={<Icon type="loading" style={{ fontSize: 72 }} spin />}
+			indicator={<LoadingOutlined style={{ fontSize: 72 }} spin />}
 			tip={
 				<div>
 					<h4>

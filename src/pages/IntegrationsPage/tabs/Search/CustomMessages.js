@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
-import { Input, Alert, Card, Button, Icon } from 'antd';
+import { EyeOutlined } from '@ant-design/icons';
+import { Input, Alert, Card, Button } from 'antd';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import { css } from 'emotion';
 import { FormContext } from '../../utils';
@@ -147,14 +148,14 @@ const CustomMessages = () => {
 										<img
 											src={form.get('customMessages').value.redirectUrlIcon}
 											height="15px"
-											weight="15px"
+											width="15px"
 											alt=""
 											style={{
 												marginRight: 5,
 											}}
 										/>
 									) : (
-										<Icon type="eye" />
+										<EyeOutlined />
 									)}
 									{form.get('customMessages').value.redirectUrlText}
 								</Button>

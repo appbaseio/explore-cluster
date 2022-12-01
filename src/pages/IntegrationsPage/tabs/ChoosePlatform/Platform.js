@@ -2,6 +2,7 @@ import React from 'react';
 import { bool, string } from 'prop-types';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
+import { ReloadOutlined } from '@ant-design/icons';
 import { Switch, Radio, List, Button } from 'antd';
 import { FieldControl, FieldGroup } from 'react-reactive-form';
 import { getResyncURL, defaultSettings } from '../../utils';
@@ -76,7 +77,7 @@ const Platform = ({ isRecommendation, index }) => {
 										marginBottom: 50,
 									}}
 									target="blank"
-									icon="reload"
+									icon={<ReloadOutlined />}
 									href={getResyncURL(index, syncPreferences)}
 								>
 									Resync

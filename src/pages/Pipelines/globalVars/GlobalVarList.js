@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Icon, Input, Tooltip, Button, Modal, Alert } from 'antd';
+import { DeleteOutlined, EditOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { Input, Tooltip, Button, Modal, Alert } from 'antd';
 import { getURL } from '../../../constants/config';
 import CreateModal from './CreateModal';
 import { globalVarsCardContainer } from './styles';
@@ -53,7 +54,7 @@ const GlobalVarList = ({ formData, handleClose, credentials, globalVars }) => {
 						)}
 					>
 						<span style={{ marginLeft: 5 }}>
-							<Icon type="info-circle" />
+							<InfoCircleOutlined />
 						</span>
 					</Tooltip>
 				) : null}
@@ -66,7 +67,7 @@ const GlobalVarList = ({ formData, handleClose, credentials, globalVars }) => {
 					onClick={() => setOpen(true)}
 					className="validate-button show-on-hover"
 				>
-					<Icon type="edit" />
+					<EditOutlined style={{ margin: "0.25rem" }}/>
 					Update
 				</Button>
 				<div
@@ -77,7 +78,7 @@ const GlobalVarList = ({ formData, handleClose, credentials, globalVars }) => {
 					}}
 					onClick={() => setDeleteModal(true)}
 				>
-					<Icon type="delete" /> Delete
+					<DeleteOutlined /> Delete
 				</div>
 			</div>
 			<Modal
@@ -87,7 +88,7 @@ const GlobalVarList = ({ formData, handleClose, credentials, globalVars }) => {
 				onCancel={() => setDeleteModal(false)}
 				okText={
 					<div>
-						<Icon type="delete" /> Confirm Deletion
+						<DeleteOutlined /> Confirm Deletion
 					</div>
 				}
 			>

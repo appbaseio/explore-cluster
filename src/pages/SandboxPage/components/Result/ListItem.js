@@ -2,7 +2,8 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Tooltip, Row, Col, Divider, Popover, Tag, Icon, Button } from 'antd';
+import { CheckOutlined, StarOutlined } from '@ant-design/icons';
+import { Tooltip, Row, Col, Divider, Popover, Tag, Button } from 'antd';
 import createDOMPurify from 'dompurify';
 import { listItem } from './styles';
 import Grading from './Grading';
@@ -31,7 +32,7 @@ class ListItem extends React.Component {
 						{_promoted && (
 							<Tooltip title="Item promoted using Query Rules">
 								<Tag color="#faad14">
-									<Icon type="star" />
+									<StarOutlined />
 								</Tag>
 							</Tooltip>
 						)}
@@ -114,7 +115,7 @@ class ListItem extends React.Component {
 							>
 								{value && value.includes(item._id) ? (
 									<>
-										<Icon type="check" /> Featured
+										<CheckOutlined /> Featured
 									</>
 								) : (
 									selectButtonLabel

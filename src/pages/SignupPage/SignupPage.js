@@ -1,6 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Card, Button, Icon, Checkbox } from 'antd';
+import {
+	ArrowRightOutlined,
+	GithubOutlined,
+	GitlabOutlined,
+	GoogleOutlined,
+} from '@ant-design/icons';
+import { Card, Button, Checkbox } from 'antd';
 import { Redirect, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Logo from '../../components/Logo';
@@ -82,7 +88,7 @@ class SignupPage extends React.Component {
 
 					<Button
 						href={getSignupURL('github')}
-						icon="github"
+						icon={<GithubOutlined />}
 						className={githubBtn}
 						disabled={!hasAgreedTOS}
 						size="small"
@@ -92,7 +98,7 @@ class SignupPage extends React.Component {
 
 					<Button
 						href={getSignupURL('google')}
-						icon="google"
+						icon={<GoogleOutlined />}
 						disabled={!hasAgreedTOS}
 						className={googleBtn}
 						size="small"
@@ -102,7 +108,7 @@ class SignupPage extends React.Component {
 
 					<Button
 						href={getSignupURL('gitlab')}
-						icon="gitlab"
+						icon={<GitlabOutlined />}
 						disabled={!hasAgreedTOS}
 						className={gitlabBtn}
 						size="small"
@@ -125,7 +131,7 @@ class SignupPage extends React.Component {
 						}}
 					>
 						Already have account? &nbsp; Login here
-						<Icon type="arrow-right" />
+						<ArrowRightOutlined />
 					</Button>
 				</Link>
 			</section>

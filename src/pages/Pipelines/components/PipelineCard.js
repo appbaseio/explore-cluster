@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { DownloadOutlined, EditOutlined, LoadingOutlined, DeleteOutlined } from '@ant-design/icons';
 import {
 	Alert,
 	Button,
 	Card,
 	Col,
-	Icon,
 	message,
 	notification,
 	Row,
@@ -295,7 +295,7 @@ const PipelineCard = (props) => {
 									}}
 									onClick={handleModal}
 								>
-									<Icon type={pipeline.isDeleting ? 'loading' : 'delete'} />{' '}
+									{pipeline.isDeleting ? <LoadingOutlined /> : <DeleteOutlined />}{' '}
 									Delete
 								</div>
 							)}
@@ -304,7 +304,7 @@ const PipelineCard = (props) => {
 						{showEdit && (
 							<Link to={`/cluster/pipelines/${pipeline.id}`}>
 								<Button size={actionButtonSize} type="primary">
-									<Icon type="edit" /> Edit
+									<EditOutlined /> Edit
 								</Button>
 							</Link>
 						)}
@@ -314,7 +314,7 @@ const PipelineCard = (props) => {
 								size={actionButtonSize}
 								type="primary"
 							>
-								<Icon type="download" /> Export as Zip
+								<DownloadOutlined /> Export as Zip
 							</Button>
 						)}
 					</div>

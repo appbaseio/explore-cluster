@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Icon, Modal, Spin, Tooltip } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
+import { Modal, Spin, Tooltip } from 'antd';
 import PropTypes from 'prop-types';
 import UploadFiles from './UploadFiles';
 
@@ -29,7 +30,7 @@ const UploadModal = ({
 	return (
 		<div>
 			<Tooltip title="Upload project to sandpack editor.">
-				<Icon type="upload" onClick={() => setModalType('upload')} />
+				<UploadOutlined onClick={() => setModalType('upload')} />
 			</Tooltip>
 
 			<Modal

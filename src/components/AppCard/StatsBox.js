@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Card, Col, Icon, Row, Tag, Tooltip } from 'antd';
+import { EllipsisOutlined } from '@ant-design/icons';
+import { Card, Col, Row, Tag, Tooltip } from 'antd';
 import { css } from 'react-emotion';
 import { withRouter } from 'react-router-dom';
 import get from 'lodash/get';
@@ -68,7 +69,7 @@ const noData = (
 
 function StatsBox(props) {
 	let cols = [];
-	const { title, data, style, showDelete } = props;
+	const { title, data, style, showDelete, history } = props;
 	if (typeof data === 'object') {
 		cols = Object.keys(data)
 			.filter((item) => !blackList.includes(item))
@@ -83,7 +84,7 @@ function StatsBox(props) {
 	const cardTitle = (
 		<div
 			onClick={() => {
-				props.history.push(`/app/${get(data, 'alias') || get(data, 'index')}/overview`);
+				history.push(`/app/${get(data, 'alias') || get(data, 'index')}/overview`);
 			}}
 			css={flex}
 		>
@@ -118,7 +119,7 @@ function StatsBox(props) {
 		>
 			<Row
 				onClick={() => {
-					props.history.push(`/app/${get(data, 'alias') || get(data, 'index')}/overview`);
+					history.push(`/app/${get(data, 'alias') || get(data, 'index')}/overview`);
 				}}
 				gutter={8}
 			>
@@ -140,12 +141,12 @@ function StatsBox(props) {
 							width: 'calc(100% - 48px)',
 						}}
 					>
-						<Icon type="ellipsis" theme="outlined" />
+						<EllipsisOutlined />
 					</div>
 
 					<AppActions
 						onExploreClick={() => {
-							props.history.push(
+							history.push(
 								`/app/${get(data, 'alias') || get(data, 'index')}/overview`,
 							);
 						}}

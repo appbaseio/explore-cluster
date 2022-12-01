@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Dropdown, Icon, Menu, message, notification, Typography } from 'antd';
+import { DeleteOutlined, EditOutlined, MoreOutlined } from '@ant-design/icons';
+import { Button, Dropdown, Menu, message, notification, Typography } from 'antd';
 import { css } from 'emotion';
 import { Link } from 'react-router-dom';
 import ClonePipeline from './ClonePipeline';
@@ -23,7 +24,7 @@ const MobileMenu = (props) => {
 					{showEdit && (
 						<Menu.Item key="0">
 							<Link to={`/cluster/pipelines/${pipeline.id}`}>
-								<Icon type="edit" /> <Typography.Text>Edit</Typography.Text>
+								<EditOutlined /> <Typography.Text>Edit</Typography.Text>
 							</Link>
 						</Menu.Item>
 					)}
@@ -52,14 +53,14 @@ const MobileMenu = (props) => {
 						}}
 						key="3"
 					>
-						<Icon style={{ color: '#f5222d' }} type="delete" />{' '}
+						<DeleteOutlined style={{ color: '#f5222d' }} />{' '}
 						<Typography.Text style={{ color: '#f5222d' }}>Delete</Typography.Text>
 					</Menu.Item>
 				</Menu>
 			}
 			trigger={['click']}
 		>
-			<Button shape="circle" icon="more" />
+			<Button shape="circle" icon={<MoreOutlined />} />
 		</Dropdown>
 	);
 };

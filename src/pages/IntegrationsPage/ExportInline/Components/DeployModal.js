@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Alert, Icon, Modal, Select, Tooltip } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { Alert, Modal, Select, Tooltip } from 'antd';
 import { timeDifference, unsafeChars } from '../../utils/index';
 import { commitModalStyles } from './styles';
 import '../styles.css';
@@ -221,7 +222,7 @@ const DeployModal = ({
 							message={errMsg}
 							type="error"
 							showIcon
-							icon={<Icon type="exclamation-circle" />}
+							icon={<ExclamationCircleOutlined />}
 						/>
 					) : null}
 				</div>

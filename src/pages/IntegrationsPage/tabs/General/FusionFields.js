@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Select } from 'antd';
+import { Select, Form } from 'antd';
 import { array, object, string } from 'prop-types';
 import get from 'lodash/get';
 import { connect } from 'react-redux';

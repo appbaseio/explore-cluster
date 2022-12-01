@@ -2,7 +2,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import get from 'lodash/get';
-import { Button, Card, Form, Icon, Input, notification, Popover, Skeleton, Table } from 'antd';
+import {
+	EyeInvisibleOutlined,
+	EyeOutlined,
+	LoadingOutlined,
+	QuestionCircleOutlined,
+	SaveOutlined,
+} from '@ant-design/icons';
+import { Button, Card, Form, Input, notification, Popover, Skeleton, Table } from 'antd';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
@@ -286,7 +293,7 @@ class RoleBaseAccess extends React.Component {
 													</>
 												}
 											>
-												Role Claim <Icon type="question-circle" />
+												Role Claim <QuestionCircleOutlined />
 											</Popover>
 										}
 										style={labelMargin}
@@ -307,7 +314,7 @@ class RoleBaseAccess extends React.Component {
 											type="primary"
 											onClick={this.handleSave}
 										>
-											<Icon type={updatingKeys ? 'loading' : 'save'} />
+											{updatingKeys ? <LoadingOutlined /> : <SaveOutlined />}
 											Save
 										</Button>
 									</Form.Item>
@@ -353,13 +360,11 @@ class RoleBaseAccess extends React.Component {
 													type="normal"
 													onClick={() => this.showKey(value.username)}
 												>
-													<Icon
-														type={
-															visibleKey[`${value.username}`]
-																? 'eye-invisible'
-																: 'eye'
-														}
-													/>
+													{visibleKey[value.username] ? (
+														<EyeInvisibleOutlined />
+													) : (
+														<EyeOutlined />
+													)}
 												</Button>
 											</div>
 										)}
@@ -392,13 +397,11 @@ class RoleBaseAccess extends React.Component {
 													onClick={() => saveRoleFunc(value)}
 													type="primary"
 												>
-													<Icon
-														type={
-															loadingKey && loadingKey[value.username]
-																? 'loading'
-																: 'save'
-														}
-													/>
+													{loadingKey && loadingKey[value.username] ? (
+														<LoadingOutlined />
+													) : (
+														<SaveOutlined />
+													)}
 													Save
 												</Button>
 											);

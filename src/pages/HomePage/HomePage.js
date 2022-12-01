@@ -1,7 +1,13 @@
 import React, { Component, Fragment } from 'react';
 import { connect } from 'react-redux';
 import { css } from 'react-emotion';
-import { Row, Col, Icon, Button, Layout } from 'antd';
+import {
+	BookOutlined,
+	ExclamationCircleOutlined,
+	LinkOutlined,
+	PlusOutlined,
+} from '@ant-design/icons';
+import { Row, Col, Button, Layout } from 'antd';
 import get from 'lodash/get';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
@@ -76,11 +82,7 @@ class HomePage extends Component {
 							paddingTop: '80px',
 						}}
 					>
-						<Icon
-							type="exclamation-circle"
-							theme="outlined"
-							style={{ fontSize: 34, marginBottom: 10 }}
-						/>
+						<ExclamationCircleOutlined style={{ fontSize: 34, marginBottom: 10 }} />
 						<h2>No indices found</h2>
 						{canEdit && (
 							<p>
@@ -130,7 +132,7 @@ class HomePage extends Component {
 
 								{canEdit && (
 									<Link to="/tutorial" className={link}>
-										Interactive Tutorial <Icon type="book" />
+										Interactive Tutorial <BookOutlined />
 									</Link>
 								)}
 								<a
@@ -139,7 +141,7 @@ class HomePage extends Component {
 									target="_blank"
 									rel="noopener noreferrer"
 								>
-									Importing Data <Icon type="link" />
+									Importing Data <LinkOutlined />
 								</a>
 								<a
 									href="https://docs.reactivesearch.io/integrations"
@@ -147,7 +149,7 @@ class HomePage extends Component {
 									target="_blank"
 									rel="noopener noreferrer"
 								>
-									APIs and Integrations <Icon type="link" />
+									APIs and Integrations <LinkOutlined />
 								</a>
 							</Col>
 							<Col
@@ -170,7 +172,7 @@ class HomePage extends Component {
 										onClick={this.handleChange}
 										data-cy="initialize-new-index-creation"
 									>
-										<Icon type="plus" /> Create a new index
+										<PlusOutlined /> Create a new index
 									</Button>
 								)}
 							</Col>

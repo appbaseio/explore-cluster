@@ -1,5 +1,5 @@
-/* eslint-disable camelcase */
-import { Button, Divider, Dropdown, Icon, Menu, notification } from 'antd';
+import { DeleteOutlined, EllipsisOutlined, StopOutlined } from '@ant-design/icons';
+import { Button, Divider, Dropdown, Menu, notification } from 'antd';
 import React, { useState } from 'react';
 import { bool, func, object } from 'prop-types';
 import { connect } from 'react-redux';
@@ -29,6 +29,7 @@ const ActionMenu = ({
 	isDeletingUser,
 	deleteAuth0User,
 }) => {
+	// eslint-disable-next-line camelcase
 	const { identities, name, email, user_id, blocked } = userItem;
 	const [showDetailsModal, setShowDetailsModal] = useState(false);
 	const [showDeleteUserModal, setShowDeleteUserModal] = useState(false);
@@ -172,10 +173,10 @@ const ActionMenu = ({
 			{isBasicAuth && <Menu.Item key={MENU_KEYS.CHANGE_PASSWORD}>Change Password</Menu.Item>}
 			<Divider style={{ margin: '8px 0' }} />
 			<Menu.Item key={MENU_KEYS.BLOCK_USER}>
-				<Icon type="stop" /> {blocked ? 'Unblock' : 'Block'}
+				<StopOutlined /> {blocked ? 'Unblock' : 'Block'}
 			</Menu.Item>
 			<Menu.Item key={MENU_KEYS.DELETE_USER} style={{ color: 'red' }}>
-				<Icon type="delete" /> Delete
+				<DeleteOutlined /> Delete
 			</Menu.Item>
 		</Menu>
 	);
@@ -183,7 +184,7 @@ const ActionMenu = ({
 		<>
 			<Dropdown overlay={menu} trigger={['hover', 'contextMenu']}>
 				<Button style={{ width: '32px', padding: 0 }}>
-					<Icon type="ellipsis" />
+					<EllipsisOutlined />
 				</Button>
 			</Dropdown>
 			{showDetailsModal && (

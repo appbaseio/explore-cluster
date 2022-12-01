@@ -1,4 +1,5 @@
-import { Col, Icon, Tabs, Tag, Tooltip } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { Col, Tabs, Tag, Tooltip } from 'antd';
 import { css } from 'emotion';
 import PropTypes from 'prop-types';
 import React, { useEffect, useRef, useState } from 'react';
@@ -14,14 +15,12 @@ const container = css`
 	display: flex !important;
 	align-items: stretch;
 	height: 100% !important;
-	min-height: 500px;
 	position: relative !important;
 
 	.ant-select-sm.ant-select {
 		width: 300px;
 	}
 	.tabs-container {
-		height: calc(100% + 4px);
 		width: 100%;
 		.ant-tabs-extra-content {
 			line-height: 35px;
@@ -45,8 +44,12 @@ const container = css`
 		}
 	}
 
+	.ant-tabs-tabpane {
+		height: 100%;
+	}
 	.monaco-wrapper {
 		width: 100% !important;
+		height: 100%;
 	}
 
 	h3 {
@@ -60,7 +63,6 @@ const container = css`
 		&.template-area,
 		&.response-area {
 			min-height: 250px;
-			height: calc(100% - 50px);
 		}
 
 		&.response-area {
@@ -349,7 +351,7 @@ const PipelineValidation = ({
 								autoAdjustOverflow={false}
 							>
 								<span style={{ marginLeft: 5 }}>
-									<Icon type="info-circle" />
+									<InfoCircleOutlined />
 								</span>
 							</Tooltip>
 						</h3>
@@ -378,7 +380,7 @@ const PipelineValidation = ({
 							{isSmallScreen ? RESPONSE_OUTPUT_SHORT : RESPONSE_OUTPUT}{' '}
 							<Tooltip placement="right" title="Validated Response">
 								<span style={{ marginLeft: 5 }}>
-									<Icon type="info-circle" />
+									<InfoCircleOutlined />
 								</span>
 							</Tooltip>
 						</h3>
@@ -410,7 +412,7 @@ const PipelineValidation = ({
 							{isSmallScreen ? CONSOLE_LOGS_SHORT : CONSOLE_LOGS}
 							<Tooltip placement="right" title="Console Logs">
 								<span style={{ marginLeft: 5 }}>
-									<Icon type="info-circle" />
+									<InfoCircleOutlined />
 								</span>
 							</Tooltip>
 						</h3>
@@ -426,7 +428,7 @@ const PipelineValidation = ({
 								{isSmallScreen ? STAGE_CHANGES_SHORT : STAGE_CHANGES}
 								<Tooltip placement="right" title="Stage changes">
 									<span style={{ marginLeft: 5 }}>
-										<Icon type="info-circle" />
+										<InfoCircleOutlined />
 									</span>
 								</Tooltip>
 							</h3>

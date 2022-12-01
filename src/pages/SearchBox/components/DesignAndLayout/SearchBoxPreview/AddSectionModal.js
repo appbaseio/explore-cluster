@@ -1,5 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-for */
 /* eslint-disable jsx-a11y/label-has-associated-control */
+import { PlusOutlined } from '@ant-design/icons';
+
 import { Button, Input, Modal } from 'antd';
 import { css } from 'emotion';
 import React, { useState } from 'react';
@@ -67,7 +69,7 @@ const AddSectionModalContent = (props) => {
 				className="add-section-wrapper"
 				type="primary"
 				onClick={triggerModal}
-				icon="plus"
+				icon={<PlusOutlined />}
 			>
 				Add Section
 			</Button>{' '}

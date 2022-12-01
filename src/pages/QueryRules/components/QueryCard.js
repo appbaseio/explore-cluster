@@ -1,11 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
+	CheckCircleTwoTone,
+	DragOutlined,
+	EditOutlined,
+	EditTwoTone,
+	LoadingOutlined,
+	DeleteOutlined,
+} from '@ant-design/icons';
+import {
 	Alert,
 	Button,
 	Card,
 	Col,
-	Icon,
 	InputNumber,
 	message,
 	Row,
@@ -176,7 +183,7 @@ class QueryCard extends React.Component {
 						<div style={{ display: 'flex' }}>
 							<Tooltip title="Drag to update the ordering of rules.">
 								<div {...dragProvided.dragHandleProps} className={dragIcon}>
-									<Icon type="drag" />
+									<DragOutlined />
 								</div>
 							</Tooltip>
 
@@ -225,9 +232,7 @@ class QueryCard extends React.Component {
 								<Tooltip title="Click to edit the order.">
 									{isEdit ? (
 										// eslint-disable-next-line
-										<Icon
-											type="check-circle"
-											theme="twoTone"
+										<CheckCircleTwoTone
 											onClick={() => {
 												if (parseInt(value, 10) !== rule.order) {
 													updateOrder({
@@ -257,9 +262,7 @@ class QueryCard extends React.Component {
 										/>
 									) : (
 										// eslint-disable-next-line
-										<Icon
-											type="edit"
-											theme="twoTone"
+										<EditTwoTone
 											onClick={() => {
 												this.setState({ isEdit: true });
 											}}
@@ -303,7 +306,7 @@ class QueryCard extends React.Component {
 										}}
 										onClick={handleModal}
 									>
-										<Icon type={rule.isDeleting ? 'loading' : 'delete'} />{' '}
+										{rule.isDeleting ? <LoadingOutlined /> : <DeleteOutlined />}{' '}
 										Delete
 									</div>
 								)}
@@ -311,7 +314,7 @@ class QueryCard extends React.Component {
 							<CloneRule rule={rule} buttonSize={actionButtonSize} />
 							<Link to={`/cluster/rules/${rule.id}`}>
 								<Button size={actionButtonSize} type="primary">
-									<Icon type="edit" /> Edit
+									<EditOutlined /> Edit
 								</Button>
 							</Link>
 						</div>
@@ -338,15 +341,18 @@ class QueryCard extends React.Component {
 						</div>
 					</Col>
 				</Row>
-				<Alert
-					type="info"
-					showIcon
-					message={
-						usageStatsCount > 0
-							? `Used ${usageStatsCount} times in last 30 days`
-							: 'Not used in the last 30 days'
-					}
-				/>
+				<Row style={{ width: '100%', marginTop: 10 }}>
+					<Alert
+						type="info"
+						showIcon
+						style={{ flex: 1 }}
+						message={
+							usageStatsCount > 0
+								? `Used ${usageStatsCount} times in last 30 days`
+								: 'Not used in the last 30 days'
+						}
+					/>
+				</Row>
 			</Card>
 		);
 	}

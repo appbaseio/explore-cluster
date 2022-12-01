@@ -12,7 +12,8 @@ import {
 	SelectedFilters,
 	RangeInput,
 } from '@appbaseio/reactivesearch';
-import { Tag, Icon, notification } from 'antd';
+import { StarTwoTone } from '@ant-design/icons';
+import { Tag, notification } from 'antd';
 import appbaseHelpers from '../../utils/appbaseHelpers';
 import { putSettings, getSettings } from '../../../../batteries/modules/actions';
 import { getURL } from '../../../../constants/config';
@@ -158,10 +159,8 @@ const renderResultList = () => (
 											</p>
 											<p> {item.release_year}</p>
 											<p>
-												<Icon
-													type="star"
+												<StarTwoTone
 													style={{ marginLeft: 40, marginRight: 3 }}
-													theme="twoTone"
 												/>{' '}
 												{item.vote_average}/10
 											</p>

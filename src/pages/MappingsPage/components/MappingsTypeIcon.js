@@ -1,5 +1,15 @@
 import React from 'react';
-import { Icon } from 'antd';
+
+import {
+	CalendarOutlined,
+	CheckOutlined,
+	EnvironmentOutlined,
+	FileJpgOutlined,
+	FileTextOutlined,
+	FileUnknownOutlined,
+	RiseOutlined,
+} from '@ant-design/icons';
+
 import PropTypes from 'prop-types';
 import { DenseVector } from '../../../utils/conversionMap';
 
@@ -10,33 +20,33 @@ const MappingsTypeIcon = ({ type }) => {
 		case 'text':
 		case 'string':
 		case 'keyword':
-			return <Icon style={iconStyle} type="file-text" theme="outlined" />;
+			return <FileTextOutlined style={iconStyle} />;
 		case 'long':
 		case 'integer':
 			return <div style={iconStyle}>#</div>;
 		case 'geo_point':
 		case 'geo_shape':
-			return <Icon style={iconStyle} type="environment" theme="outlined" />;
+			return <EnvironmentOutlined style={iconStyle} />;
 		case 'date':
-			return <Icon style={iconStyle} type="calendar" theme="outlined" />;
+			return <CalendarOutlined style={iconStyle} />;
 		case 'double':
 		case 'float':
 			return <div style={iconStyle}>π</div>;
 		case 'boolean':
-			return <Icon style={iconStyle} type="check" theme="outlined" />;
+			return <CheckOutlined style={iconStyle} />;
 		case 'object':
 			return <div style={iconStyle}>{'{...}'}</div>;
 		case 'image':
-			return <Icon style={iconStyle} type="file-jpg" theme="outlined" />;
+			return <FileJpgOutlined style={iconStyle} />;
 
 		case 'rank_feature':
 		case 'rank_features':
-			return <Icon style={iconStyle} type="rise" theme="outlined" />;
+			return <RiseOutlined style={iconStyle} />;
 		case DenseVector:
-			return <Icon style={iconStyle} type="rise" theme="outlined" />;
+			return <RiseOutlined style={iconStyle} />;
 
 		default:
-			return <Icon style={iconStyle} type="file-unknown" theme="outlined" />;
+			return <FileUnknownOutlined style={iconStyle} />;
 	}
 };
 

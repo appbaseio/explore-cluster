@@ -3,7 +3,8 @@ import { connect } from 'react-redux';
 import PropTypes, { string } from 'prop-types';
 import get from 'lodash/get';
 import isEqual from 'lodash/isEqual';
-import { Icon, Alert } from 'antd';
+import { CloseOutlined } from '@ant-design/icons';
+import { Alert } from 'antd';
 
 import { setReIndexingTasks } from '../../batteries/modules/actions/settings';
 import { getURL } from '../../constants/config';
@@ -145,8 +146,7 @@ class ReIndexTracker extends React.Component {
 												won&apos;t be deployed till the re-indexing process
 												is completed.
 											</div>
-											<Icon
-												type="close"
+											<CloseOutlined
 												onClick={() => this.onClose(index)}
 												style={{ marginTop: 5 }}
 											/>
@@ -178,8 +178,7 @@ class ReIndexTracker extends React.Component {
 																{task.appName}.{' '}
 																{get(failure, 'cause.reason')}
 															</div>
-															<Icon
-																type="close"
+															<CloseOutlined
 																onClick={() => this.onClose(index)}
 																style={{ marginTop: 5 }}
 															/>
@@ -208,8 +207,7 @@ class ReIndexTracker extends React.Component {
 														{task.appName}. You may need to reload
 														mappings to see the new changes reflected.
 													</div>
-													<Icon
-														type="close"
+													<CloseOutlined
 														onClick={() => this.onClose(index)}
 														style={{ marginTop: 5 }}
 													/>

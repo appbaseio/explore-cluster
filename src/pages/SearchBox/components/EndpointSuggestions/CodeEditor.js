@@ -73,11 +73,9 @@ const CodeEditor = ({ defaultValue, language, height, control, name, ...controlP
 								setBlur(true);
 							}}
 						/>
-						{isBlur && errors.invalidHeaders ? (
+						{isBlur && errors && errors.invalidHeaders ? (
 							<div className="error">{errors.message}</div>
-						) : (
-							<></>
-						)}
+						) : null}
 					</>
 				);
 			}}

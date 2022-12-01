@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button, Icon, Modal, Popover } from 'antd';
+import { EyeOutlined, DesktopOutlined, MobileOutlined } from '@ant-design/icons';
+import { Button, Modal, Popover } from 'antd';
 import { css } from 'react-emotion';
 import get from 'lodash/get';
 import { func, string, bool, object, number, oneOfType } from 'prop-types';
@@ -162,15 +163,7 @@ class PreviewModal extends React.Component {
 							<span>
 								{!displayProductPicker && !isRecommendation ? (
 									<Button onClick={this.handleViewChange}>
-										<Icon
-											style={{
-												fontSize: 20,
-												position: 'relative',
-												top: '1px',
-												margin: '0 7px',
-											}}
-											type={isMobile ? 'desktop' : 'mobile'}
-										/>
+										{isMobile ? <MobileOutlined /> : <DesktopOutlined />}
 									</Button>
 								) : null}
 							</span>
@@ -222,7 +215,7 @@ class PreviewModal extends React.Component {
 					</div>
 				</Modal>
 				<Button onClick={this.showModal} type="primary" size="large" {...buttonProps}>
-					<Icon type="eye" /> {label}
+					<EyeOutlined /> {label}
 				</Button>
 			</React.Fragment>
 		);

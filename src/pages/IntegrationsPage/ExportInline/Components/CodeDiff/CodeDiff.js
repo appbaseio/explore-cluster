@@ -6,9 +6,16 @@ import ReactDiffViewer from 'react-diff-viewer';
 import { Collapse, Empty, Spin, Tooltip } from 'antd';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { css } from 'emotion';
 import Flex from '../../../../../batteries/components/shared/Flex';
 import DiffStatBlock from './DiffStateBlock';
 import { getChangedDetails } from '../../../utils/sandpack-generator';
+
+const diffViewPanel = css`
+	.ant-collapse-content-box {
+		overflow: auto;
+	}
+`;
 
 const CodeDiff = ({ oldCode, newCode, currentVersion: versionStatus, versionState, match }) => {
 	const [isLoading, setIsLoading] = useState(true);
@@ -124,6 +131,7 @@ const CodeDiff = ({ oldCode, newCode, currentVersion: versionStatus, versionStat
 									</Flex>
 								}
 								key={path}
+								className={diffViewPanel}
 							>
 								<ReactDiffViewer
 									oldValue={oldCode[path] || ''}

@@ -1,4 +1,5 @@
-import { Icon, Tooltip } from 'antd';
+import { DeleteTwoTone, DragOutlined, EditTwoTone } from '@ant-design/icons';
+import { Tooltip } from 'antd';
 import { css } from 'emotion';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -135,7 +136,7 @@ const SuggestionItem = (props) => {
 				>
 					<Tooltip title="Drag to update the ordering">
 						<div {...provided.dragHandleProps}>
-							<Icon type="drag" className={dragIcon} />
+							<DragOutlined className={dragIcon} />
 						</div>
 					</Tooltip>{' '}
 					<div className="icon-wrapper">{getIcon()}</div>
@@ -162,17 +163,10 @@ const SuggestionItem = (props) => {
 						</Flex>
 					</div>{' '}
 					<Tooltip title="Edit Suggestion">
-						<Icon
-							type="edit"
-							theme="twoTone"
-							onClick={onEdit}
-							className="suggestion-edit-icon"
-						/>
+						<EditTwoTone onClick={onEdit} className="suggestion-edit-icon" />
 					</Tooltip>
 					<Tooltip title="Delete Suggestion">
-						<Icon
-							type="delete"
-							theme="twoTone"
+						<DeleteTwoTone
 							twoToneColor="red"
 							onClick={onDelete}
 							className="suggestion-delete-icon"

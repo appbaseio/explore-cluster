@@ -7,8 +7,8 @@ const checkbox = css`
 	display: flex !important;
 
 	.ant-checkbox {
-		margin-top: 5px;
 		height: 16px;
+		align-self: flex-start;
 	}
 `;
 

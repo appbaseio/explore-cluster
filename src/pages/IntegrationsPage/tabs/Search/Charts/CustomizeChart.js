@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button, Modal, Switch, Form, Select, Input, Typography } from 'antd';
+import { Button, Modal, Switch, Select, Input, Typography, Form } from 'antd';
+import { EditOutlined } from '@ant-design/icons';
 import { string, object, func, bool } from 'prop-types';
 import styled from 'react-emotion';
 import get from 'lodash/get';
@@ -180,7 +181,7 @@ class CustomizeChart extends React.Component {
 							>
 								<ModalContainer>
 									<div className="left-container">
-										<Form>
+										<Form layout="vertical">
 											<Form.Item label="Data Field">
 												<DataFieldSelector
 													isAggFields
@@ -468,7 +469,7 @@ class CustomizeChart extends React.Component {
 												<>
 													<CodeEditorCard>
 														<CardButton
-															icon="edit"
+															icon={<EditOutlined />}
 															onClick={() =>
 																this.setState({
 																	currentEditorModal:
@@ -488,7 +489,7 @@ class CustomizeChart extends React.Component {
 													</CodeEditorCard>
 													<CodeEditorCard>
 														<CardButton
-															icon="edit"
+															icon={<EditOutlined />}
 															onClick={() =>
 																this.setState({
 																	currentEditorModal: 'setOption',
@@ -508,7 +509,7 @@ class CustomizeChart extends React.Component {
 													{control.value.useAsFilter ? (
 														<CodeEditorCard>
 															<CardButton
-																icon="edit"
+																icon={<EditOutlined />}
 																onClick={() =>
 																	this.setState({
 																		currentEditorModal:

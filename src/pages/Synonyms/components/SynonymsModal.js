@@ -1,7 +1,8 @@
 /* eslint-disable jsx-a11y/label-has-associated-control,jsx-a11y/label-has-for */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Icon, message, Modal, Select, Tooltip } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { message, Modal, Select, Tooltip } from 'antd';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { css } from 'emotion';
@@ -200,7 +201,7 @@ class SynonymsModal extends React.Component {
 							<label>
 								Select Type{' '}
 								<Tooltip title="Synonym type info">
-									<Icon type="info-circle" />
+									<InfoCircleOutlined />
 								</Tooltip>
 							</label>
 							<Select

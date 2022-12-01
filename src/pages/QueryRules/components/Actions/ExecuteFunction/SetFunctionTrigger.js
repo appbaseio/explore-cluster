@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Dropdown, Icon, Menu, Radio, Result, Skeleton, Table } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+import { Button, Dropdown, Menu, Radio, Result, Skeleton, Table } from 'antd';
 import get from 'lodash/get';
 import { getFunctions } from '../../../../../batteries/utils/app';
 import { dropdown } from '../../../../../batteries/components/Mappings/styles';
@@ -10,7 +11,7 @@ function TriggerDropdown({ overlay, selectedOption }) {
 		<Dropdown overlay={overlay}>
 			<Button className={dropdown}>
 				{selectedOption && selectedOption.label}
-				<Icon type="down" />
+				<DownOutlined />
 			</Button>
 		</Dropdown>
 	);

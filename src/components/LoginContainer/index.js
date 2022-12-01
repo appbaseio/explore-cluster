@@ -1,5 +1,5 @@
 import React from 'react';
-import { Icon } from 'antd';
+import { CheckOutlined } from '@ant-design/icons';
 import PropTypes from 'prop-types';
 import Flex from '../../batteries/components/shared/Flex';
 import AppbaseUsers from '../AppbaseUsers';
@@ -22,15 +22,15 @@ const LoginContainer = ({ children }) => {
 					<div className="signup_description">
 						<ul className="signup_benefits">
 							<li>
-								<Icon type="check" className="icon" />
+								<CheckOutlined className="icon" />
 								<span>Author search UIs with point and click</span>
 							</li>
 							<li>
-								<Icon type="check" className="icon" />
+								<CheckOutlined className="icon" />
 								<span>Extend search UIs with cloud IDE</span>
 							</li>
 							<li>
-								<Icon type="check" className="icon" />
+								<CheckOutlined className="icon" />
 								<span>
 									Configure{' '}
 									<span
@@ -44,7 +44,7 @@ const LoginContainer = ({ children }) => {
 								</span>
 							</li>
 							<li>
-								<Icon type="check" className="icon" />
+								<CheckOutlined className="icon" />
 								<span>
 									{' '}
 									Deploy on the{' '}
@@ -59,7 +59,7 @@ const LoginContainer = ({ children }) => {
 								</span>
 							</li>
 							<li>
-								<Icon type="check" className="icon" />
+								<CheckOutlined className="icon" />
 								<span>
 									Out of the box analytics and insights for your deployed search
 									UI

@@ -1,5 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
+import { PAGE_LOAD_TIME } from './contants';
 
 let indexName = '';
 
@@ -24,6 +25,11 @@ describe('Add field schema settings test flow', () => {
 
 	it('Should login from cluster URL', () => {
 		cy.loginUser(username, password, cluster);
+	});
+
+	it('Should navigate to cluster overview', () => {
+		cy.wait(5000);
+		cy.visit(`${base_url}`);
 	});
 
 	it('Should create new index', () => {
@@ -69,7 +75,8 @@ describe('Add field schema settings test flow', () => {
 	});
 
 	it('Should open schema settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/schema`).wait(5000);
+		cy.visit(`${base_url}/app/${indexName}/schema`);
+		cy.wait(PAGE_LOAD_TIME);
 	});
 
 	it('Should add new data fields in schema', () => {
@@ -78,7 +85,8 @@ describe('Add field schema settings test flow', () => {
 	});
 
 	it('Should confirm the mapping changes', () => {
-		cy.root().contains('Confirm Mapping Changes').click().wait(5000);
+		cy.root().contains('Confirm Mapping Changes').click().wait(15000);
+		cy.reload().wait(15000);
 	});
 
 	it('Should check the newly added data feild', () => {

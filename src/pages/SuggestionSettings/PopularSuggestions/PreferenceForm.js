@@ -1,7 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Select, Checkbox, Icon, Popover, InputNumber } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { Select, Checkbox, Popover, InputNumber } from 'antd';
 import { css } from 'react-emotion';
 import PropTypes from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
@@ -137,7 +138,7 @@ class PreferenceForm extends React.Component {
 													content={content(Messages.numberOfDays)}
 													css={styles.iconContainer}
 												>
-													<Icon type="info-circle" />
+													<InfoCircleOutlined />
 												</Popover>
 											</p>
 										}
@@ -170,7 +171,7 @@ class PreferenceForm extends React.Component {
 													content={content(Messages.minHits)}
 													css={styles.iconContainer}
 												>
-													<Icon type="info-circle" />
+													<InfoCircleOutlined />
 												</Popover>
 											</p>
 										}
@@ -206,7 +207,7 @@ class PreferenceForm extends React.Component {
 														)}
 														css={styles.iconContainer}
 													>
-														<Icon type="info-circle" />
+														<InfoCircleOutlined />
 													</Popover>
 												</p>
 											}
@@ -246,7 +247,7 @@ class PreferenceForm extends React.Component {
 													content={content(Messages.blacklist)}
 													css={styles.iconContainer}
 												>
-													<Icon type="info-circle" />
+													<InfoCircleOutlined />
 												</Popover>
 											</p>
 										}
@@ -297,7 +298,7 @@ class PreferenceForm extends React.Component {
 														)}
 														css={styles.iconContainer}
 													>
-														<Icon type="info-circle" />
+														<InfoCircleOutlined />
 													</Popover>
 												</p>
 											}
@@ -381,7 +382,7 @@ class PreferenceForm extends React.Component {
 														content={content(Messages.indices)}
 														css={styles.iconContainer}
 													>
-														<Icon type="info-circle" />
+														<InfoCircleOutlined />
 													</Popover>
 												</p>
 											}
@@ -422,7 +423,7 @@ class PreferenceForm extends React.Component {
 													content={content(Messages.minCount)}
 													css={styles.iconContainer}
 												>
-													<Icon type="info-circle" />
+													<InfoCircleOutlined />
 												</Popover>
 											</p>
 										}
@@ -454,7 +455,7 @@ class PreferenceForm extends React.Component {
 													content={content(Messages.minChars)}
 													css={styles.iconContainer}
 												>
-													<Icon type="info-circle" />
+													<InfoCircleOutlined />
 												</Popover>
 											</p>
 										}
@@ -490,7 +491,7 @@ class PreferenceForm extends React.Component {
 													content={content(Messages.popularSize)}
 													css={styles.iconContainer}
 												>
-													<Icon type="info-circle" />
+													<InfoCircleOutlined />
 												</Popover>
 											</p>
 										}

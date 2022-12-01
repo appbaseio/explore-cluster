@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import PropTypes, { string } from 'prop-types';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
+import { CodeOutlined } from '@ant-design/icons';
 import { Button, Tooltip } from 'antd';
 import {
 	SandpackConsole,
@@ -169,7 +170,7 @@ const SandPackIntegration = ({
 						<Tooltip title="View Console">
 							<Button
 								shape="circle"
-								icon="code"
+								icon={<CodeOutlined />}
 								size="small"
 								className="sp-button sp-icon-standalone"
 								style={{ padding: 8 }}
