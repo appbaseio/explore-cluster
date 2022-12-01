@@ -97,7 +97,7 @@ const inputStyle = css`
 		border-bottom-left-radius: 0;
 		border-bottom-right-radius: 0;
 	}
-	width: calc(100% - 8px);
+	width: calc(100% - 8px) !important;
 `;
 
 const QUERY_EDITOR_MODEL_PATH = 'a://b/foo.json';
