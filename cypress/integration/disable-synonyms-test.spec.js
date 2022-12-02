@@ -1,5 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
+import { PAGE_LOAD_TIME } from './contants';
 
 let indexName = '';
 
@@ -76,7 +77,7 @@ describe('Disable synonyms test flow', () => {
 	});
 
 	it('Should open search settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/search`).wait(5000);
+		cy.visit(`${base_url}/app/${indexName}/search`).wait(PAGE_LOAD_TIME);
 	});
 
 	it('Should disable synonyms in search settings', () => {

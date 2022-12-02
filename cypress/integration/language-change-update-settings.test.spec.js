@@ -1,5 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
+import { PAGE_LOAD_TIME } from './contants';
 
 let indexName = '';
 
@@ -73,7 +74,7 @@ describe('Disable ngram remove search fields and reindex data test flow', () => 
 	});
 
 	it('Should open language settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/languages`).wait(5000);
+		cy.visit(`${base_url}/app/${indexName}/languages`).wait(PAGE_LOAD_TIME);
 	});
 
 	it('Should change language analyzer from english to universal', () => {
@@ -90,7 +91,7 @@ describe('Disable ngram remove search fields and reindex data test flow', () => 
 	});
 
 	it('Should check the new language analyzer in search settings', () => {
-		cy.visit(`${base_url}/app/${indexName}/search`).wait(5000);
+		cy.visit(`${base_url}/app/${indexName}/search`).wait(PAGE_LOAD_TIME);
 		cy.get('[data-cy=email-popover-icon]').trigger('mouseover');
 		cy.get('[data-cy=email-popover-content]').should('contain', '"analyzer": "universal"');
 		cy.get('[data-cy=name-popover-icon]').trigger('mouseover', { force: true });
