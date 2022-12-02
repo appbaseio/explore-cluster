@@ -10,6 +10,7 @@ import {
 	notification,
 	Row,
 	Switch,
+	Tag,
 	Tooltip,
 	Typography,
 } from 'antd';
@@ -241,8 +242,16 @@ const PipelineCard = (props) => {
 				<div className={mobileMenu}>
 					<MobileMenu pipeline={pipeline} removePipeline={removePipeline} />
 				</div>
-
-				<Col xl={8} lg={8} md={12} sm={24}>
+				<Col xl={1} lg={1} md={1} sm={1}>
+					{typeof pipeline.priority !== 'undefined' ? (
+						<Tooltip title="Pipeline priority">
+							<Tag color="blue" style={{ position: 'relative', left: '-8px' }}>
+								<b>{pipeline.priority}</b>
+							</Tag>
+						</Tooltip>
+					) : null}
+				</Col>
+				<Col xl={7} lg={7} md={11} sm={22}>
 					<h4 className={title}>
 						<Tooltip title={pipeline.id}>{pipeline.id}</Tooltip>
 					</h4>
@@ -323,7 +332,7 @@ const PipelineCard = (props) => {
 			<Flex
 				justifyContent="space-between"
 				alignItems="center"
-				style={{ width: '100%', marginTop: '24px' }}
+				style={{ width: '100%', marginTop: '24px', flexWrap: 'wrap', gap: '10px' }}
 			>
 				<Tooltip title={getCreatedUpdatedStats().title}>
 					{getCreatedUpdatedStats().difftime}
