@@ -124,8 +124,10 @@ const _getFieldsByRelevancy = ({
 		analyzer: 'synonyms',
 		type: 'text',
 	};
-
-	const { ...fields } = originalFields;
+	let fields;
+	if (originalFields) {
+		fields = { ...originalFields };
+	}
 
 	const extraFields = {
 		...(type === 'text' && enableSynonyms
