@@ -10,7 +10,7 @@ describe('Searchable fields remove test flow', () => {
 			win.localStorage.clear();
 			win.sessionStorage.clear();
 		});
-		indexName = 'cypress-alpha-1';
+		indexName = generateName();
 	});
 	beforeEach(() => {
 		cy.restoreLocalStorage();
