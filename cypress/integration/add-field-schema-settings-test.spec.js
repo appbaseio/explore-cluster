@@ -28,8 +28,8 @@ describe('Add field schema settings test flow', () => {
 	});
 
 	it('Should navigate to cluster overview', () => {
-		cy.wait(5000);
 		cy.visit(`${base_url}`);
+		cy.wait(PAGE_LOAD_TIME);
 	});
 
 	it('Should create new index', () => {
@@ -81,12 +81,16 @@ describe('Add field schema settings test flow', () => {
 
 	it('Should add new data fields in schema', () => {
 		cy.get('[data-cy=new-field-button]').click().wait(1000);
-		cy.tab().tab().type('rating').root().contains('Add Field').click().wait(2000);
+		cy.get('input[placeholder="Enter field name"]')
+			.type('rating')
+			.root()
+			.contains('Add Field')
+			.click()
+			.wait(2000);
 	});
 
 	it('Should confirm the mapping changes', () => {
-		cy.root().contains('Confirm Mapping Changes').click().wait(15000);
-		cy.reload().wait(15000);
+		cy.root().contains('Confirm Mapping Changes').click().wait(PAGE_LOAD_TIME);
 	});
 
 	it('Should check the newly added data feild', () => {

@@ -1,5 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
+import { PAGE_LOAD_TIME } from './contants';
 
 let indexName = '';
 
@@ -63,13 +64,15 @@ describe('Copy field schema settings test flow', () => {
 	});
 
 	it('Should open schema settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/schema`).wait(5000);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.visit(`${base_url}/app/${indexName}/schema`);
+		cy.wait('@mapping');
 	});
 
 	it('Should copy field in schema', () => {
 		cy.get('[data-cy=copy-field-age]').click({ force: true });
-		cy.tab()
-			.tab()
+		cy.get('input[placeholder="Enter field name to copy to"]')
 			.type('copied_age')
 			.root()
 			.get('.copy-field-modal-btn')
@@ -78,7 +81,7 @@ describe('Copy field schema settings test flow', () => {
 	});
 
 	it('Should confirm the mapping changes', () => {
-		cy.root().contains('Confirm Mapping Changes').click().wait(5000);
+		cy.root().contains('Confirm Mapping Changes').click().wait(PAGE_LOAD_TIME);
 	});
 
 	it('Should check the newly added data feild', () => {

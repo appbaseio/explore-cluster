@@ -79,7 +79,12 @@ describe('Searchable fields add test flow', () => {
 
 	it('Should add new data fields in schema', () => {
 		cy.get('[data-cy=new-field-button]').click().wait(1000);
-		cy.tab().tab().type('address').root().contains('Add Field').click().wait(2000);
+		cy.get('input[placeholder="Enter field name"]')
+			.type('address')
+			.root()
+			.contains('Add Field')
+			.click()
+			.wait(2000);
 		cy.get('[data-cy=new-field-button]').click().wait(1000);
 		cy.tab()
 			.tab()
