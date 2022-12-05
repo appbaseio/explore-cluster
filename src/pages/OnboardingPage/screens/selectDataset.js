@@ -208,6 +208,7 @@ function selectDataset({ nextScreen, setURL, url: newUrl, handleDataset }) {
 												? 'rgb(234, 245, 255)'
 												: 'white',
 									}}
+									data-cy={data.id}
 									key={data.id}
 									onClick={() => handleSelect(data.name, data.count, data.id)}
 								>
