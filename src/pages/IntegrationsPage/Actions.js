@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button, Popconfirm, Tooltip, Icon } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
+import { Button, Popconfirm, Tooltip } from 'antd';
 import { css } from 'react-emotion';
 import get from 'lodash/get';
 import { string, func, bool, object } from 'prop-types';
@@ -105,7 +106,7 @@ class Actions extends React.Component {
 							okText="Confirm"
 							cancelText="Cancel"
 						>
-							<Icon type="delete" className="" />
+							<DeleteOutlined className="" />
 						</Popconfirm>
 					</Tooltip>
 				</Flex>

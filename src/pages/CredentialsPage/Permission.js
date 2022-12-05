@@ -1,5 +1,14 @@
 import React from 'react';
-import { Button, Popconfirm, Tooltip, notification, Icon } from 'antd';
+
+import {
+	CopyOutlined,
+	DeleteOutlined,
+	EditOutlined,
+	EyeInvisibleOutlined,
+	EyeOutlined,
+} from '@ant-design/icons';
+
+import { Button, Popconfirm, Tooltip, notification } from 'antd';
 import { css } from 'react-emotion';
 import { object, func } from 'prop-types';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -75,13 +84,13 @@ class Permission extends React.Component {
 							title={viewKey ? 'Hide credentials' : 'View credentials'}
 						>
 							<Button onClick={this.handleViewClick} type="normal">
-								{viewKey ? <Icon type="eye-invisible" /> : <Icon type="eye" />}
+								{viewKey ? <EyeInvisibleOutlined /> : <EyeOutlined />}
 							</Button>
 						</Tooltip>
 						<CopyToClipboard text={this.key} onCopy={this.handleCopyCred}>
 							<Tooltip placement="topLeft" title="Copy To Clipboard">
 								<Button type="normal">
-									<Icon type="copy" />
+									<CopyOutlined />
 								</Button>
 							</Tooltip>
 						</CopyToClipboard>
@@ -91,7 +100,7 @@ class Permission extends React.Component {
 								onClick={this.handleEditCred}
 								type="normal"
 							>
-								<Icon type="edit" />
+								<EditOutlined />
 							</Button>
 						</Tooltip>
 					</Flex>
@@ -103,7 +112,7 @@ class Permission extends React.Component {
 					cancelText="No"
 				>
 					<Button type="danger">
-						<Icon type="delete" />
+						<DeleteOutlined />
 					</Button>
 				</Popconfirm>
 			</Flex>

@@ -6,7 +6,21 @@ export const APP_ROUTES = {
 		link: '',
 		action: ALLOWED_ACTIONS.OVERVIEW,
 	},
-	Develop: {
+	'UI Builder': {
+		icon: 'control',
+		action: ALLOWED_ACTIONS.UI_BUILDER,
+		menu: [
+			{ label: 'Search', link: '/cluster/search-builder' },
+			{ label: 'Recommendations', link: '/cluster/recommendations-builder' },
+			{
+				label: 'Searchbox',
+				link: '/cluster/searchboxes',
+			},
+			{ label: 'End-user Authentication', link: '/cluster/search-auth-settings' },
+		],
+		tag: 'Beta',
+	},
+	Data: {
 		icon: 'dashboard',
 		action: ALLOWED_ACTIONS.DEVELOP,
 		menu: [
@@ -17,7 +31,31 @@ export const APP_ROUTES = {
 			{ label: 'Stored Queries', link: 'stored-queries', tag: 'Beta' },
 		],
 	},
-	'Search Relevancy': {
+	Pipelines: {
+		icon: 'deployment-unit',
+		action: ALLOWED_ACTIONS.PIPELINES,
+		menu: [
+			{
+				label: 'View All Pipelines',
+				link: '/cluster/pipelines',
+				hasExactPath: true,
+				tag: 'Beta',
+			},
+			{
+				label: 'Global Envs',
+				link: '/cluster/global-envs',
+				hasExactPath: true,
+				tag: 'Beta',
+			},
+			{
+				label: 'Search Engine Backend',
+				link: '/cluster/configure-search-engine-backend',
+				hasExactPath: true,
+				tag: 'Beta',
+			},
+		],
+	},
+	'Search Relevance': {
 		icon: 'search',
 		action: ALLOWED_ACTIONS.SEARCH_RELEVANCY,
 		menu: [
@@ -48,27 +86,27 @@ export const APP_ROUTES = {
 			},
 		],
 	},
-	Pipelines: {
-		icon: 'deployment-unit',
-		action: ALLOWED_ACTIONS.PIPELINES,
+	'API Credentials': {
+		icon: 'key',
+		action: ALLOWED_ACTIONS.ACCESS_CONTROL,
 		menu: [
 			{
-				label: 'View All Pipelines',
-				link: '/cluster/pipelines',
+				label: 'User Management',
+				link: '/cluster/user-management',
 				hasExactPath: true,
+			},
+			{ label: 'API Credentials', link: 'credentials' },
+			{
+				label: 'Role Based Access',
+				link: '/cluster/role-based-access',
 				tag: 'Beta',
+				hasExactPath: true,
 			},
 			{
-				label: 'Global Envs',
-				link: '/cluster/global-envs',
-				hasExactPath: true,
+				label: 'Node Sync Preferences',
+				link: '/cluster/sync-preferences',
 				tag: 'Beta',
-			},
-			{
-				label: 'Search Engine Backend',
-				link: '/cluster/configure-search-engine-backend',
 				hasExactPath: true,
-				tag: 'Beta',
 			},
 		],
 	},
@@ -100,45 +138,6 @@ export const APP_ROUTES = {
 		action: ALLOWED_ACTIONS.SPEED,
 		menu: [{ label: 'Cache', link: '/cluster/cache', tag: 'Beta', hasExactPath: true }],
 	},
-	'UI Builder': {
-		icon: 'control',
-		action: ALLOWED_ACTIONS.UI_BUILDER,
-		menu: [
-			{ label: 'Search', link: '/cluster/search-builder' },
-			{ label: 'Recommendations', link: '/cluster/recommendations-builder' },
-			{
-				label: 'Searchbox',
-				link: '/cluster/searchboxes',
-			},
-			{ label: 'End-user Authentication', link: '/cluster/search-auth-settings' },
-		],
-		tag: 'Beta',
-	},
-	'Access Control': {
-		icon: 'key',
-		action: ALLOWED_ACTIONS.ACCESS_CONTROL,
-		menu: [
-			{ label: 'API Credentials', link: 'credentials' },
-			{
-				label: 'Role Based Access',
-				link: '/cluster/role-based-access',
-				tag: 'Beta',
-				hasExactPath: true,
-			},
-			{
-				label: 'Node Sync Preferences',
-				link: '/cluster/sync-preferences',
-				tag: 'Beta',
-				hasExactPath: true,
-			},
-		],
-	},
-	'User Management': {
-		icon: 'user',
-		action: ALLOWED_ACTIONS.USER_MANAGEMENT,
-		link: '/cluster/user-management',
-		hasExactPath: true,
-	},
 	Billing: {
 		action: ALLOWED_ACTIONS.BILLING,
 		icon: 'credit-card',
@@ -152,12 +151,30 @@ export const CLUSTER_ROUTES = {
 		link: '/',
 		action: ALLOWED_ACTIONS.OVERVIEW,
 	},
-	Develop: {
+	'UI Builder': {
+		icon: 'control',
+		action: ALLOWED_ACTIONS.UI_BUILDER,
+		menu: [
+			{ label: 'Search', link: '/cluster/search-builder', openIndexMenu: true },
+			{
+				label: 'Recommendations',
+				link: '/cluster/recommendations-builder',
+				openIndexMenu: true,
+			},
+			{
+				label: 'Searchbox',
+				link: '/cluster/searchboxes',
+			},
+			{ label: 'End-user Authentication', link: '/cluster/search-auth-settings' },
+		],
+		tag: 'Beta',
+	},
+	Data: {
 		icon: 'dashboard',
 		action: ALLOWED_ACTIONS.DEVELOP,
 		menu: [
 			{ label: 'Import Data', link: 'import', openIndexMenu: true },
-			{ label: 'Browse Data', link: '/cluster/browse' },
+			{ label: 'Browse Data', link: 'browse', openIndexMenu: true },
 			{ label: 'Request Logs', link: '/cluster/request-logs' },
 			{
 				label: 'Search Preview',
@@ -168,7 +185,28 @@ export const CLUSTER_ROUTES = {
 			{ label: 'Stored Queries', link: '/cluster/stored-queries', tag: 'Beta' },
 		],
 	},
-	'Search Relevancy': {
+	Pipelines: {
+		icon: 'deployment-unit',
+		action: ALLOWED_ACTIONS.PIPELINES,
+		menu: [
+			{
+				label: 'View All Pipelines',
+				link: '/cluster/pipelines',
+				tag: 'Beta',
+			},
+			{
+				label: 'Global Envs',
+				link: '/cluster/global-envs',
+				tag: 'Beta',
+			},
+			{
+				label: 'Search Engine Backend',
+				link: '/cluster/configure-search-engine-backend',
+				tag: 'Beta',
+			},
+		],
+	},
+	'Search Relevance': {
 		icon: 'search',
 		action: ALLOWED_ACTIONS.SEARCH_RELEVANCY,
 		menu: [
@@ -203,23 +241,20 @@ export const CLUSTER_ROUTES = {
 			{ label: 'Grade Evaluation', link: '/cluster/grade-evaluation', tag: 'Beta' },
 		],
 	},
-	Pipelines: {
-		icon: 'deployment-unit',
-		action: ALLOWED_ACTIONS.PIPELINES,
+
+	'API Credentials': {
+		icon: 'key',
+		action: ALLOWED_ACTIONS.ACCESS_CONTROL,
 		menu: [
 			{
-				label: 'View All Pipelines',
-				link: '/cluster/pipelines',
-				tag: 'Beta',
+				label: 'User Management',
+				link: '/cluster/user-management',
 			},
+			{ label: 'API Credentials', link: '/cluster/credentials' },
+			{ label: 'Role Based Access', link: '/cluster/role-based-access', tag: 'Beta' },
 			{
-				label: 'Global Envs',
-				link: '/cluster/global-envs',
-				tag: 'Beta',
-			},
-			{
-				label: 'Search Engine Backend',
-				link: '/cluster/configure-search-engine-backend',
+				label: 'Node Sync Preferences',
+				link: '/cluster/sync-preferences',
 				tag: 'Beta',
 			},
 		],
@@ -251,43 +286,7 @@ export const CLUSTER_ROUTES = {
 		action: ALLOWED_ACTIONS.SPEED,
 		menu: [{ label: 'Cache', link: '/cluster/cache', tag: 'Beta' }],
 	},
-	'UI Builder': {
-		icon: 'control',
-		action: ALLOWED_ACTIONS.UI_BUILDER,
-		menu: [
-			{ label: 'Search', link: '/cluster/search-builder', openIndexMenu: true },
-			{
-				label: 'Recommendations',
-				link: '/cluster/recommendations-builder',
-				openIndexMenu: true,
-			},
-			{
-				label: 'Searchbox',
-				link: '/cluster/searchboxes',
-			},
-			{ label: 'End-user Authentication', link: '/cluster/search-auth-settings' },
-		],
-		tag: 'Beta',
-	},
-	'Access Control': {
-		icon: 'key',
-		action: ALLOWED_ACTIONS.ACCESS_CONTROL,
-		menu: [
-			{ label: 'API Credentials', link: '/cluster/credentials' },
-			{ label: 'Role Based Access', link: '/cluster/role-based-access', tag: 'Beta' },
-			{
-				label: 'Node Sync Preferences',
-				link: '/cluster/sync-preferences',
-				tag: 'Beta',
-			},
-		],
-	},
-	'User Management': {
-		icon: 'user',
-		link: '/cluster/user-management',
-		action: ALLOWED_ACTIONS.USER_MANAGEMENT,
-		hasExactPath: true,
-	},
+
 	Billing: {
 		icon: 'credit-card',
 		action: ALLOWED_ACTIONS.BILLING,

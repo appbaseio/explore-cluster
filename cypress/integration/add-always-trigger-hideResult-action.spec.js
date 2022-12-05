@@ -1,5 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
+import { PAGE_LOAD_TIME } from './contants';
 
 describe('Query Rule creation with trigger index and script action', () => {
 	before(() => {
@@ -25,18 +26,21 @@ describe('Query Rule creation with trigger index and script action', () => {
 	});
 
 	it('Should open query rules page', () => {
-		cy.visit(`${base_url}/cluster/rules`).wait(2000);
+		cy.visit(`${base_url}/cluster/rules`);
+		cy.wait(PAGE_LOAD_TIME);
+	});
+	it('Should navigate to create query rule page', () => {
+		cy.get('[data-cy=create-query-rule]').click();
+		cy.wait(PAGE_LOAD_TIME);
 	});
 
 	it('Should create a query rule', () => {
-		cy.get('[data-cy=create-query-rule]').click();
-
 		// Enter name and description
 		cy.get('[name="name"]').type('cypress-testing-rule-name');
 		cy.get('[name="description"]').type('cypress-testing-rule-description');
 
 		// Select index
-		cy.get('[data-cy=index-dropdown]').click();
+		cy.get('[data-cy=index-dropdown]').click().type('best');
 		cy.get('[data-cy=best-buy-dataset]').click({ force: true, multiple: true });
 
 		// Select always trigger type
@@ -46,7 +50,7 @@ describe('Query Rule creation with trigger index and script action', () => {
 		cy.get('[data-cy=query-rule-action]').click();
 		cy.get('[data-cy=hide_result]').click({ force: true, multiple: true });
 		cy.wait(1000);
-		cy.get('.input-group > div > .ant-input').type('sa');
+		cy.get('.input-group > div > .ant-input').type('sa').wait(5000);
 		cy.get('#GlobalSearch-downshift-item-0').click();
 
 		// Save query rule

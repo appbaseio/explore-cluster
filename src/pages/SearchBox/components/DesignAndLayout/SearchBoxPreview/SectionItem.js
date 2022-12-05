@@ -1,7 +1,14 @@
 import { css } from 'emotion';
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
-import { Button, Empty, Icon, Input, Tooltip } from 'antd';
+import {
+	CheckCircleTwoTone,
+	DeleteTwoTone,
+	DragOutlined,
+	EditTwoTone,
+	PlusOutlined,
+} from '@ant-design/icons';
+import { Button, Empty, Input, Tooltip } from 'antd';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import RenderSuggestions from './RenderSuggestions';
 import { validateHtmlStr } from '../../../utils';
@@ -114,7 +121,7 @@ const SectionItem = (props) => {
 					<div className="section-header">
 						<Tooltip title="Drag to reorder the section">
 							<div className={dragIconWrapper} {...sectionProvided.dragHandleProps}>
-								<Icon type="drag" className="drag-icon" />
+								<DragOutlined className="drag-icon" />
 							</div>
 						</Tooltip>
 						<div className="section-header__title">
@@ -149,15 +156,9 @@ const SectionItem = (props) => {
 								}
 							>
 								{editMode ? (
-									<Icon
-										type="check-circle"
-										theme="twoTone"
-										onClick={handleSaveSectionTitle}
-									/>
+									<CheckCircleTwoTone onClick={handleSaveSectionTitle} />
 								) : (
-									<Icon
-										type="edit"
-										theme="twoTone"
+									<EditTwoTone
 										onClick={() => {
 											setEditMode(true);
 										}}
@@ -170,16 +171,14 @@ const SectionItem = (props) => {
 								className="add-suggestion-btn"
 								type="primary"
 								onClick={handleAddSuggestion}
-								icon="plus"
+								icon={<PlusOutlined />}
 								size="small"
 							>
 								Add Suggestion
 							</Button>
 						)}
 						<Tooltip title="Delete Section">
-							<Icon
-								type="delete"
-								theme="twoTone"
+							<DeleteTwoTone
 								twoToneColor="red"
 								onClick={onDelete}
 								className="section-delete-icon"
@@ -219,7 +218,7 @@ const SectionItem = (props) => {
 										<Button
 											type="primary"
 											onClick={handleAddSuggestion}
-											icon="plus"
+											icon={<PlusOutlined />}
 											size="small"
 										>
 											Add Suggestion

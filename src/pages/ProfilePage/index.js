@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Input, Select, Icon, notification, Button } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
+import { Input, Select, notification, Button } from 'antd';
 import get from 'lodash/get';
 import { css } from 'react-emotion';
 import { connect } from 'react-redux';
@@ -232,8 +233,7 @@ class ProfilePage extends React.Component {
 										disabled={invalid || pristine}
 									>
 										{isSubmitting && (
-											<Icon
-												type="loading"
+											<LoadingOutlined
 												style={{
 													marginRight: '10px',
 												}}

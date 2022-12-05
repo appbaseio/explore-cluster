@@ -19,7 +19,6 @@ const bannerDetails = {
 	description:
 		'Manage node sync preferences for reactivesearch.io when using it in a multi-node setup',
 	buttonText: 'Read Docs',
-	icon: 'info-circle',
 	href: 'https://docs.reactivesearch.io/docs/security/node-sync-preferences/',
 };
 

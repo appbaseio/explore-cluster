@@ -3,6 +3,7 @@ import { withRouter } from 'react-router-dom';
 import get from 'lodash/get';
 import { func, array, bool, object } from 'prop-types';
 import { css } from 'react-emotion';
+import { PlusOutlined } from '@ant-design/icons';
 import { Table, Card, Button } from 'antd';
 import { connect } from 'react-redux';
 import moment from 'moment';
@@ -93,7 +94,7 @@ const List = ({
 			<Card
 				title="Manage Search UIs"
 				extra={
-					<Button onClick={handleCreate} type="primary" icon="plus">
+					<Button onClick={handleCreate} type="primary" icon={<PlusOutlined />}>
 						Create Search UI{' '}
 					</Button>
 				}

@@ -1,17 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import {
-	Icon,
-	Input,
-	InputNumber,
-	List,
-	Modal,
-	notification,
-	Popover,
-	Radio,
-	Row,
-	Select,
-} from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { Input, InputNumber, List, Modal, notification, Popover, Radio, Row, Select } from 'antd';
 import PropTypes from 'prop-types';
 
 import get from 'lodash/get';
@@ -234,7 +224,7 @@ class CreateAppModal extends Component {
 							trigger="click"
 							visible={validationPopOver}
 						>
-							<Icon type="info-circle" onClick={this.handleValidationPopOver} />
+							<InfoCircleOutlined onClick={this.handleValidationPopOver} />
 						</Popover>
 					</Row>
 					<p style={{ fontSize: 14, margin: '-4px 0 8px 0', lineHeight: '20px' }}>
@@ -318,7 +308,7 @@ class CreateAppModal extends Component {
 							}
 							title="Index settings"
 						>
-							<Icon type="info-circle" />
+							<InfoCircleOutlined />
 						</Popover>
 					</Row>
 					<Ace
@@ -375,7 +365,7 @@ class CreateAppModal extends Component {
 							}
 							title="Index mappings"
 						>
-							<Icon type="info-circle" />
+							<InfoCircleOutlined />
 						</Popover>
 					</Row>
 					<Ace

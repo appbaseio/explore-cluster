@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { PlusOutlined } from '@ant-design/icons';
 import { Button, List, Radio } from 'antd';
 import { FieldControl } from 'react-reactive-form';
 import { string, func, object, array, bool } from 'prop-types';
@@ -129,7 +130,7 @@ const DefaultResults = ({
 														onChange(newValue);
 													}}
 													disabled={isError}
-													icon="plus"
+													icon={<PlusOutlined />}
 												>
 													Add additional metadata
 												</Button>

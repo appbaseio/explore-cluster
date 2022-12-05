@@ -1,6 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Card, Icon, message, Popconfirm, Table } from 'antd';
+import {
+	ArrowRightOutlined,
+	DeleteOutlined,
+	EditOutlined,
+	SearchOutlined,
+	SwapOutlined,
+} from '@ant-design/icons';
+import { Button, Card, message, Popconfirm, Table } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
 import chunk from 'lodash/chunk';
@@ -416,7 +423,7 @@ class Synonyms extends React.Component {
 										}}
 										placeholder="Search synonym"
 										className="search"
-										icon={<Icon type="search" />}
+										icon={<SearchOutlined />}
 										dataField={[
 											'synonym',
 											'synonym.autosuggest',
@@ -515,10 +522,7 @@ class Synonyms extends React.Component {
 																		);
 																	})}
 																<span> )</span>
-																<Icon
-																	className="light"
-																	type="arrow-right"
-																/>
+																<ArrowRightOutlined className="light" />
 																{value.split('=>')[1]}
 															</span>
 														);
@@ -536,10 +540,7 @@ class Synonyms extends React.Component {
 																return (
 																	<React.Fragment>
 																		{item}
-																		<Icon
-																			type="swap"
-																			className="light"
-																		/>
+																		<SwapOutlined className="light" />
 																	</React.Fragment>
 																);
 															})}
@@ -569,7 +570,7 @@ class Synonyms extends React.Component {
 																		<Button
 																			shape="circle-outline"
 																			size="small"
-																			icon="edit"
+																			icon={<EditOutlined />}
 																			onClick={handleModal}
 																			style={{
 																				marginRight: 5,
@@ -592,7 +593,7 @@ class Synonyms extends React.Component {
 																	size="small"
 																	loading={isDeleting === value}
 																	type="danger"
-																	icon="delete"
+																	icon={<DeleteOutlined />}
 																/>
 															</Popconfirm>
 														</div>

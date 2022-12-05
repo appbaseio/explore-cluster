@@ -2,7 +2,8 @@ import { css } from 'emotion';
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes, { func, object } from 'prop-types';
 import yamlToJson from 'js-yaml';
-import { Button, Dropdown, Icon, Input, Menu, message } from 'antd';
+import { DownOutlined, PlusSquareFilled, SearchOutlined } from '@ant-design/icons';
+import { Button, Dropdown, Input, Menu, message } from 'antd';
 import { unionWith } from 'lodash';
 import Container from '../../../../components/Container';
 import Monaco from '../../../../batteries/components/SearchSandbox/containers/MonacoEditor';
@@ -44,11 +45,11 @@ const dropdownMenuCss = css`
 	border-bottom-right-radius: 4px;
 
 	.stage-menu-item {
-		padding: 0 14px !important;
+		padding: 5px 14px !important;
 		padding-right: 25px !important;
 		position: relative !important;
 		height: 60px !important;
-		margin-bottom: 0 !important;
+		margin-bottom: 15px !important;
 
 		.add-icon {
 			position: absolute;
@@ -66,15 +67,20 @@ const dropdownMenuCss = css`
 			overflow: hidden;
 			height: 36px;
 			text-overflow: ellipsis;
+			display: flex;
+			align-items: center;
 		}
-
-		p {
-			margin-bottom: 0;
+		.ant-dropdown-menu-title-content {
 			overflow: hidden;
 			text-overflow: ellipsis;
-			max-width: 96%;
-			display: inline-block;
+			white-space: nowrap;
+			padding: 0px 10px;
+		}
+		p {
+			margin-bottom: 0;
+			display: inline;
 			font-size: 12px;
+			width: 100%;
 		}
 
 		&:hover {
@@ -91,6 +97,7 @@ const inputStyle = css`
 		border-bottom-left-radius: 0;
 		border-bottom-right-radius: 0;
 	}
+	width: calc(100% - 8px) !important;
 `;
 
 const QUERY_EDITOR_MODEL_PATH = 'a://b/foo.json';
@@ -130,22 +137,24 @@ const StagesMenu = ({ pipelineSchema, getEditorValue, handleMenuClick }) => {
 				onChange={(e) => setQuery(e.target.value)}
 				allowClear
 				placeholder="Search for stages"
-				prefix={<Icon type="search" style={{ color: '#1990ff' }} />}
+				prefix={<SearchOutlined style={{ color: '#1990ff' }} />}
 				css={inputStyle}
 			/>
-			<Menu css={dropdownMenuCss} onClick={handleMenuClick}>
-				{titleAndDescriptionResults.map((stageKey) => {
-					return (
-						<Menu.Item className="stage-menu-item" key={stageKey}>
-							<h4 title={stageKey}>{stageKey}</h4>
-							<p title={prebuiltStages?.stages?.[stageKey]?.description ?? ''}>
-								{prebuiltStages?.stages?.[stageKey]?.description ?? ''}
-							</p>
-							<Icon type="plus-square" theme="filled" className="add-icon" />
-						</Menu.Item>
-					);
-				})}
-			</Menu>
+			{titleAndDescriptionResults && titleAndDescriptionResults.length ? (
+				<Menu css={dropdownMenuCss} onClick={handleMenuClick}>
+					{titleAndDescriptionResults.map((stageKey) => {
+						return (
+							<Menu.Item className="stage-menu-item" key={stageKey}>
+								<h4 title={stageKey}>{stageKey}</h4>
+								<p title={prebuiltStages?.stages?.[stageKey]?.description ?? ''}>
+									{prebuiltStages?.stages?.[stageKey]?.description ?? ''}
+								</p>
+								<PlusSquareFilled className="add-icon" />
+							</Menu.Item>
+						);
+					})}
+				</Menu>
+			) : null}
 		</>
 	);
 };
@@ -368,6 +377,7 @@ const PipelineEditorComponent = (props) => {
 			<Dropdown
 				className="stages-dropdown"
 				visible={showStagesMenu}
+				overlayStyle={{ zIndex: 999 }}
 				overlay={
 					<StagesMenu
 						pipelineSchema={pipelineSchema}
@@ -380,7 +390,7 @@ const PipelineEditorComponent = (props) => {
 					className="ant-dropdown-link"
 					onClick={() => setShowStagesMenu(!showStagesMenu)}
 				>
-					Add Stages <Icon type="down" />
+					Add Stages <DownOutlined />
 				</Button>
 			</Dropdown>
 			<Monaco

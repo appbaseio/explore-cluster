@@ -1,4 +1,5 @@
 import React from 'react';
+import { CloseOutlined } from '@ant-design/icons';
 import { Col, Select, Row, Button, InputNumber } from 'antd';
 import PropTypes from 'prop-types';
 import get from 'lodash/get';
@@ -157,7 +158,7 @@ class SearchSettings extends React.Component {
 						ghost
 						type="danger"
 						onClick={() => this.deleteItem(item)}
-						icon="close"
+						icon={<CloseOutlined />}
 					/>
 				</Col>
 			</Row>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { CloseOutlined } from '@ant-design/icons';
 import { Col, Select, Row, Button } from 'antd';
 import { css } from 'emotion';
 import PropTypes from 'prop-types';
@@ -105,7 +106,7 @@ const AddFilter = (props) => {
 						ghost
 						type="danger"
 						onClick={() => deleteItem(item)}
-						icon="close"
+						icon={<CloseOutlined />}
 					/>
 				</Col>
 			</Row>

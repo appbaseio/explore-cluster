@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
-import { List, Button, Switch, Icon } from 'antd';
+import { DeleteOutlined, DragOutlined } from '@ant-design/icons';
+import { List, Button, Switch } from 'antd';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import { array, bool, func, number, object, string } from 'prop-types';
 import CustomizeChart from './CustomizeChart';
@@ -104,7 +105,7 @@ const ListItem = ({
 						</>,
 						<Button
 							type="danger"
-							icon="delete"
+							icon={<DeleteOutlined />}
 							onClick={() => {
 								control.parent.removeAt(index);
 							}}
@@ -115,8 +116,7 @@ const ListItem = ({
 						title={
 							<>
 								<span {...provided.dragHandleProps}>
-									<Icon
-										type="drag"
+									<DragOutlined
 										style={{
 											marginRight: 10,
 										}}

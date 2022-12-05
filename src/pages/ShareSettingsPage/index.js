@@ -1,4 +1,5 @@
 import React from 'react';
+import { SettingOutlined } from '@ant-design/icons';
 import { Table, Card, Button } from 'antd';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
@@ -35,7 +36,7 @@ const columns = [
 			<Button
 				onClick={() => handleEdit(settingInfo)}
 				style={{ border: 'none' }}
-				icon="setting"
+				icon={<SettingOutlined />}
 			/>
 		),
 		key: `edit${updateIndex()}`,

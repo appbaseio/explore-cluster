@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Icon, Tabs, Tooltip, message } from 'antd';
+import { CopyOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import { Tabs, Tooltip, message } from 'antd';
 import get from 'lodash/get';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { componentTypes } from '@appbaseio/reactivesearch';
@@ -151,7 +152,7 @@ ${propsBasedOnComponent()}/>
 						<>
 							Complete Code
 							<Tooltip title="Using preferences is ideal so that the component renders with the latest version of saved preferences.">
-								<Icon type="info-circle" style={{ marginLeft: 5 }} />
+								<InfoCircleOutlined style={{ marginLeft: 5 }} />
 							</Tooltip>
 						</>
 					}
@@ -164,7 +165,7 @@ ${propsBasedOnComponent()}/>
 							)}
 							onCopy={copyToClipboard}
 						>
-							<Icon type="copy" theme="outlined" className="icon-active" />
+							<CopyOutlined className="icon-active" />
 						</CopyToClipboard>
 						<pre>{contentWithPreferences(JSON.stringify(transformedPreferences))}</pre>
 					</div>
@@ -174,7 +175,7 @@ ${propsBasedOnComponent()}/>
 						<>
 							Component Code
 							<Tooltip title="Using direct props is useful when you are exporting this component individually without using the preferences.">
-								<Icon type="info-circle" style={{ marginLeft: 5 }} />
+								<InfoCircleOutlined style={{ marginLeft: 5 }} />
 							</Tooltip>
 						</>
 					}
@@ -185,7 +186,7 @@ ${propsBasedOnComponent()}/>
 							text={contentWithoutPreferences()}
 							onCopy={copyToClipboard}
 						>
-							<Icon type="copy" theme="outlined" className="icon-active" />
+							<CopyOutlined className="icon-active" />
 						</CopyToClipboard>
 						<pre>{contentWithoutPreferences()}</pre>
 					</div>

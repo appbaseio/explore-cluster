@@ -1,4 +1,5 @@
-import { Button, Card, Icon, Tooltip } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { Button, Card, Tooltip } from 'antd';
 import { css } from 'emotion';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -120,7 +121,7 @@ const PipelineTemplateChooser = (props) => {
 				<h2>
 					Pipeline Templates{' '}
 					<Tooltip title="Pipelines templates to help you start. Click on a template card to use, or create a fresh pipeline.">
-						<Icon type="info-circle" />
+						<InfoCircleOutlined />
 					</Tooltip>
 				</h2>
 			</div>

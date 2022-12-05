@@ -5,7 +5,8 @@ import { css } from 'emotion';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Button, Card, Icon, Input, notification, Result, Skeleton, Tabs } from 'antd';
+import { ArrowLeftOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Card, Input, notification, Result, Skeleton, Tabs } from 'antd';
 
 import { FieldControl, FieldGroup, FormBuilder, Validators } from 'react-reactive-form';
 import { FormContext } from '../IntegrationsPage/utils';
@@ -383,7 +384,7 @@ const SearchBoxForm = (props) => {
 						extra={
 							<Link to="/cluster/searchboxes/new">
 								<Button type="primary">
-									<Icon type="plus" />
+									<PlusOutlined style={{ margin: '0.25rem' }} />
 									Create Searchbox
 								</Button>
 							</Link>
@@ -408,7 +409,7 @@ const SearchBoxForm = (props) => {
 					>
 						<Link to="/cluster/searchboxes">
 							<Button>
-								<Icon type="arrow-left" />
+								<ArrowLeftOutlined style={{ margin: '0.25rem' }} />
 								Back to Searchboxes
 							</Button>
 						</Link>

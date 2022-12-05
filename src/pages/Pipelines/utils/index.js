@@ -7,7 +7,6 @@ export const pipelinesBannerDetails = {
         creating pre-processing or post-processing flows for
         searching or indexing data.`,
 		buttonText: 'Read Docs',
-		icon: 'info-circle',
 		href: 'https://docs.reactivesearch.io/docs/pipelines/concepts/',
 	},
 	globalVars: {
@@ -15,7 +14,6 @@ export const pipelinesBannerDetails = {
 		description:
 			'Global environments are key/value pairs that can be re-used across multiple pipelines. They can be API keys, database connection configurations, or anything else that makes sense to define once.',
 		buttonText: 'Read More',
-		icon: 'info-circle',
 		href: 'https://docs.reactivesearch.io/docs/pipelines/concepts/global-envs',
 	},
 };

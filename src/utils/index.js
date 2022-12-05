@@ -49,7 +49,7 @@ export async function getUser(username, password, url) {
 	}
 
 	// Dont use await over here as we dont need these immediately.
-	fetch(`${api}`, {
+	await fetch(`${api}`, {
 		method: 'GET',
 		headers: {
 			Authorization: `Basic ${authToken}`,
@@ -72,7 +72,6 @@ export async function getUser(username, password, url) {
 			// eslint-disable-next-line no-console
 			console.error(e);
 		});
-
 	return {
 		username,
 		password,
@@ -111,7 +110,7 @@ const transformRegexString = (regex, varRegex, str, attrs = { app: 'appbase' }) 
 
 export const getValidURL = (config = {}, attrs = {}) => {
 	const regex = /\${[a-zA-Z0-9_]*}/gm;
-	const varRegex = /(?<=\${)(.*?)(?=\})/;
+	const varRegex = /(?:\${)(.*?)(?=\})/;
 	const { url, qs = [] } = config;
 	let newStr = url;
 

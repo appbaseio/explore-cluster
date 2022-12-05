@@ -7,6 +7,15 @@ import { connect } from 'react-redux';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import {
+	ArrowLeftOutlined,
+	DeleteOutlined,
+	InfoCircleOutlined,
+	LinkOutlined,
+	LoadingOutlined,
+	PlusOutlined,
+	SaveOutlined,
+} from '@ant-design/icons';
+import {
 	Affix,
 	Alert,
 	Button,
@@ -15,7 +24,6 @@ import {
 	Checkbox,
 	DatePicker,
 	Divider,
-	Icon,
 	Input,
 	message,
 	notification,
@@ -122,13 +130,9 @@ const container = css`
 const formStyle = css`
 	margin: 15px 0;
 	label {
-		display: block;
 		font-weight: 500;
 		margin-bottom: 5px;
 		color: rgba(0, 0, 0, 0.85);
-	}
-	input {
-		margin-bottom: 15px;
 	}
 	.ant-divider-horizontal {
 		margin: 35px 0;
@@ -138,7 +142,7 @@ const formStyle = css`
 function DocsLink({ url }) {
 	return (
 		<a href={url} className={link} target="_blank" rel="noopener noreferrer">
-			Learn more <Icon type="link" />
+			Learn more <LinkOutlined />
 		</a>
 	);
 }
@@ -977,7 +981,7 @@ class QueryRulesForm extends React.Component {
 							extra={
 								<Link to="/cluster/rules/new">
 									<Button type="primary" data-cy="create-qyery-rule">
-										<Icon type="plus" />
+										<PlusOutlined style={{ margin: '0.25rem' }} />
 										Create Rule
 									</Button>
 								</Link>
@@ -1000,7 +1004,7 @@ class QueryRulesForm extends React.Component {
 			<div className={container}>
 				<Link to="/cluster/rules">
 					<Button>
-						<Icon type="arrow-left" />
+						<ArrowLeftOutlined style={{ margin: '0.25rem' }} />
 						Back to Rules
 					</Button>
 				</Link>
@@ -1292,7 +1296,7 @@ class QueryRulesForm extends React.Component {
 													</React.Fragment>
 												}
 											>
-												<Icon type="info-circle" />
+												<InfoCircleOutlined />
 											</Popover>
 											<Input
 												name="cronExpression"
@@ -1438,13 +1442,14 @@ class QueryRulesForm extends React.Component {
 											ghost
 											type="danger"
 										>
-											<Icon type={isDeleting ? 'loading' : 'delete'} /> Delete
+											{isDeleting ? <LoadingOutlined /> : <DeleteOutlined />}{' '}
+											Delete
 										</Button>
 									)}
 								</DeleteModal>
 							</div>
 						) : null}
-						<div className="flex flex-end">
+						<div style={{ marginTop: 10 }} className="flex flex-end">
 							{errorCount ? (
 								<Alert
 									style={{ marginRight: 10 }}
@@ -1483,7 +1488,7 @@ class QueryRulesForm extends React.Component {
 								type="primary"
 								data-cy="save-query-rule"
 							>
-								<Icon type={isCreating || isUpdating ? 'loading' : 'save'} />
+								{isCreating || isUpdating ? <LoadingOutlined /> : <SaveOutlined />}
 								Save
 							</Button>
 						</div>

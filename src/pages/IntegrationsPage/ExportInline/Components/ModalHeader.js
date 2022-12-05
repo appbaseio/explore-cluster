@@ -2,7 +2,13 @@ import React, { useState, useEffect } from 'react';
 import PropTypes, { object } from 'prop-types';
 import { withRouter } from 'react-router-dom';
 import get from 'lodash/get';
-import { Button, Tooltip, Icon, Modal, message } from 'antd';
+import {
+	ClockCircleOutlined,
+	CloseOutlined,
+	MenuUnfoldOutlined,
+	MenuFoldOutlined,
+} from '@ant-design/icons';
+import { Button, Tooltip, Modal, message } from 'antd';
 import { connect } from 'react-redux';
 import CommitModal from './CommitModal';
 // eslint-disable-next-line import/no-cycle
@@ -297,18 +303,16 @@ const ModalHeader = ({
 
 						<Tooltip title="Past Versions" style={{ fontSize: 14 }}>
 							{/* Past Versions */}
-							<Icon
+							<ClockCircleOutlined
 								style={{
 									cursor: currentVersion.version_id ? 'pointer' : 'not-allowed',
 								}}
-								type="clock-circle"
 								onClick={() => {
 									if (currentVersion.version_id) setVisible(true);
 								}}
 							/>
 						</Tooltip>
-						<Icon
-							type="close"
+						<CloseOutlined
 							onClick={() => {
 								history.push(`/cluster/search-builder/${preferenceId}`);
 								handleSave();
@@ -320,18 +324,24 @@ const ModalHeader = ({
 				{currentVersion.version_id === deploymentStatus?.meta?.version_id &&
 				(deploymentStatus.status || deploymentStatus.state) ? (
 					<div className="status-container" onClick={() => setModalType('deploy-logs')}>
-						<Button type="link" style={{ padding: 0 }}>
+						<Button type="link" style={{ padding: 0, marginRight: 5 }}>
 							Deploy Status
 						</Button>
 						{deployStatusMapper[deploymentStatus.status || deploymentStatus.state]}
 					</div>
 				) : null}
 				<div className="header-icons">
-					<Icon
-						style={{ cursor: 'pointer' }}
-						type={collapsed ? 'menu-unfold' : 'menu-fold'}
-						onClick={() => setIsCollapsed(!collapsed)}
-					/>
+					{collapsed ? (
+						<MenuUnfoldOutlined
+							style={{ cursor: 'pointer' }}
+							onClick={() => setIsCollapsed(!collapsed)}
+						/>
+					) : (
+						<MenuFoldOutlined
+							style={{ cursor: 'pointer' }}
+							onClick={() => setIsCollapsed(!collapsed)}
+						/>
+					)}
 					<UploadModal
 						errMsg={errMsg}
 						setErrMsg={setErrMsg}

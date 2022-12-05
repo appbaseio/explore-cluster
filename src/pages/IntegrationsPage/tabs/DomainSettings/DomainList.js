@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Icon, Tag, Button, Tooltip, Modal, Input, message, Table } from 'antd';
+import { DeleteOutlined, SyncOutlined } from '@ant-design/icons';
+import { Tag, Button, Tooltip, Modal, Input, message, Table } from 'antd';
 import { func, object, string } from 'prop-types';
 import { hoverStyles } from './styles';
 import { deleteDomain } from '../../utils/domain-apis';
@@ -65,15 +66,14 @@ const DomainList = ({
 												disabled={response.verified}
 												onClick={() => getDomainStatus(response.name)}
 											>
-												<Icon type="sync" className="restore-icon" />
+												<SyncOutlined className="restore-icon" />
 											</Button>
 										</Tooltip>
 									</>
 								)}
 							</div>
 							<div>
-								<Icon
-									type="delete"
+								<DeleteOutlined
 									className="delete-icon show-on-hover"
 									onClick={() => setVisible(true)}
 								/>

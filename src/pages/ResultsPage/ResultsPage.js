@@ -2,7 +2,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Card, Form, Input, InputNumber, Select, Switch, Skeleton, Button, Icon } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { Card, Input, InputNumber, Select, Switch, Skeleton, Button, Form } from 'antd';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
@@ -38,7 +39,6 @@ const bannerDetails = {
 	description:
 		'Results settings allow you to control the page size, fields returned, and highlighting settings.',
 	videoLink: 'https://youtu.be/EtqBS6egIfU',
-	icon: 'info-circle',
 	href: 'https://docs.reactivesearch.io/docs/search/relevancy/#result-settings',
 };
 
@@ -254,10 +254,10 @@ class ResultsPage extends React.Component {
 							<Card>
 								<Form.Item
 									label={
-										<>
-											{settingsMap.size.title}
+										<span>
+											{settingsMap.size.title}{' '}
 											<SettingTooltip title={settingsMap.size.description} />
-										</>
+										</span>
 									}
 								>
 									<InputNumber
@@ -275,12 +275,12 @@ class ResultsPage extends React.Component {
 							<Card style={{ marginTop: 20 }} title="Fields To Return">
 								<Form.Item
 									label={
-										<>
-											{settingsMap.includeFields.title}
+										<span>
+											{settingsMap.includeFields.title}{' '}
 											<SettingTooltip
 												title={settingsMap.includeFields.description}
 											/>
-										</>
+										</span>
 									}
 								>
 									<Select
@@ -318,12 +318,12 @@ class ResultsPage extends React.Component {
 
 								<Form.Item
 									label={
-										<>
-											{settingsMap.excludeFields.title}
+										<span>
+											{settingsMap.excludeFields.title}{' '}
 											<SettingTooltip
 												title={settingsMap.excludeFields.description}
 											/>
-										</>
+										</span>
 									}
 								>
 									<Select
@@ -376,14 +376,14 @@ class ResultsPage extends React.Component {
 									<>
 										<Form.Item
 											label={
-												<>
-													{settingsMap.highlightFields.title}
+												<span>
+													{settingsMap.highlightFields.title}{' '}
 													<SettingTooltip
 														title={
 															settingsMap.highlightFields.description
 														}
 													/>
-												</>
+												</span>
 											}
 										>
 											<Select
@@ -410,12 +410,12 @@ class ResultsPage extends React.Component {
 										</Form.Item>
 										<Form.Item
 											label={
-												<>
-													{settingsMap.highlightTag.title}
+												<span>
+													{settingsMap.highlightTag.title}{' '}
 													<SettingTooltip
 														title={settingsMap.highlightTag.description}
 													/>
-												</>
+												</span>
 											}
 										>
 											<Input
@@ -432,15 +432,15 @@ class ResultsPage extends React.Component {
 										</Form.Item>
 										<Form.Item
 											label={
-												<>
-													{settingsMap.highlightFragment.title}
+												<span>
+													{settingsMap.highlightFragment.title}{' '}
 													<SettingTooltip
 														title={
 															settingsMap.highlightFragment
 																.description
 														}
 													/>
-												</>
+												</span>
 											}
 										>
 											<InputNumber
@@ -457,15 +457,15 @@ class ResultsPage extends React.Component {
 										</Form.Item>
 										<Form.Item
 											label={
-												<>
-													{settingsMap.highlightTotalFragments.title}
+												<span>
+													{settingsMap.highlightTotalFragments.title}{' '}
 													<SettingTooltip
 														title={
 															settingsMap.highlightTotalFragments
 																.description
 														}
 													/>
-												</>
+												</span>
 											}
 										>
 											<InputNumber
@@ -547,7 +547,7 @@ class ResultsPage extends React.Component {
 												}}
 												disabled={error}
 											>
-												<Icon type="plus" />
+												<PlusOutlined style={{ margin: '0.25rem' }} />
 												Add Sort Option
 											</Button>
 										</div>
@@ -564,7 +564,6 @@ class ResultsPage extends React.Component {
 }
 
 ResultsPage.propTypes = {
-	form: PropTypes.object.isRequired,
 	isUpdating: PropTypes.bool,
 	resetState: PropTypes.object,
 	settings: PropTypes.object,
@@ -628,6 +627,4 @@ const mapDispatchToProps = (dispatch) => ({
 	updateLocalRelevancy: (name, data) => dispatch(setLocalRelevancyState(name, data)),
 });
 
-const ResultsForm = Form.create({ name: 'results' })(ResultsPage);
-
-export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(ResultsForm));
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(ResultsPage));

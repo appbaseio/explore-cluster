@@ -1,7 +1,8 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
+import { PAGE_LOAD_TIME } from './contants';
 
-let indexName = 'airbeds-test-app';
+const indexName = 'clone-airbeds';
 
 describe('Index Suggestion Settings add test flow', () => {
 	before(() => {
@@ -23,12 +24,12 @@ describe('Index Suggestion Settings add test flow', () => {
 
 	it('Should login from cluster URL', () => {
 		cy.loginUser(username, password, cluster);
-		cy.wait(3000);
 	});
 
 	it('Should Index suggestion settings page URL', () => {
-		cy.visit(`${base_url}/cluster/suggestions`).wait(2000);
-		cy.get('.ant-tabs-nav > :nth-child(1) > :nth-child(3)').click();
+		cy.visit(`${base_url}/cluster/suggestions`);
+		cy.wait(PAGE_LOAD_TIME);
+		cy.get('.ant-tabs-nav .ant-tabs-tab:nth-child(3)').click();
 	});
 
 	it('Should Add Index Suggestions Settings Form Data', () => {
@@ -38,8 +39,9 @@ describe('Index Suggestion Settings add test flow', () => {
 		cy.wait(2000);
 
 		cy.get('[data-cy=index-suggestions-indices]').invoke('val', '');
-		cy.get('[data-cy=index-suggestions-indices]').click();
-		cy.get('[data-cy=airbeds-test-app]').click({ force: true, multiple: true });
+		// In the index selector, type first few letters of the index so it shows up in the list
+		cy.get('[data-cy=index-suggestions-indices]').click().type(indexName.substr(0, 3));
+		cy.get(`[data-cy=${indexName}]`).click({ force: true, multiple: true });
 		cy.get('[data-cy=index-suggestions-fields-container]').click({
 			force: true,
 			multiple: true,
@@ -54,21 +56,21 @@ describe('Index Suggestion Settings add test flow', () => {
 		cy.get('[data-cy=enable-synonyms]').click();
 		cy.get('[data-cy=index-suggestions-size]').clear().type(3);
 
-		cy.get('[data-cy=include-fields]').click();
-		cy.get('[data-cy=bed_type]').click();
-		cy.get('[data-cy=include-fields-label]').click();
+		// cy.get('[data-cy=include-fields]').click();
+		// cy.get('[data-cy=bed_type]').click();
+		// cy.get('[data-cy=include-fields-label]').click();
 
 		// cy.get('[data-cy=exclude-fields]').click();
 		// cy.get('[data-cy=bathrooms]').click({ force: true, multiple: true });
 		// cy.get('[data-cy=exclude-fields-label]').click();
 
-		cy.get('[data-cy=category-field]').click();
-		cy.get('[data-cy=bathrooms]').click({ force: true, multiple: true });
-		cy.get('[data-cy=categoryField-label]').click();
+		// cy.get('[data-cy=category-field]').click();
+		// cy.get('[data-cy=bathrooms]').click({ force: true, multiple: true });
+		// cy.get('[data-cy=categoryField-label]').click();
 
-		cy.get('[data-cy=url-index-setting]').click();
-		cy.get('[data-cy=bathrooms]').click({ force: true, multiple: true });
-		cy.get('[data-cy=url-label]').click();
+		// cy.get('[data-cy=url-index-setting]').click();
+		// cy.get('[data-cy=bathrooms]').click({ force: true, multiple: true });
+		// cy.get('[data-cy=url-label]').click();
 
 		cy.wait(1000);
 		// save button
@@ -96,7 +98,7 @@ describe('Index Suggestion Settings add test flow', () => {
 				enablePredictiveSuggestions: true,
 				enableSynonyms: true,
 				size: 3,
-				indices: ['airbeds-test-app'],
+				indices: [indexName],
 				exludeFields: [''],
 			},
 		});

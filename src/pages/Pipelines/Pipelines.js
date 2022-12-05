@@ -1,6 +1,7 @@
-import React, { Fragment, useLayoutEffect } from 'react';
+import React, { Fragment, useLayoutEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Col, Icon, Row, Layout, Result, Alert } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { Button, Col, Row, Layout, Result, Alert, Radio, Select } from 'antd';
 import { css } from 'emotion';
 import get from 'lodash/get';
 import orderBy from 'lodash/orderBy';
@@ -21,8 +22,59 @@ import { compareVersion } from '../../utils';
 const pipelinesContainer = css`
 	padding: 50px;
 	margin-bottom: 70px;
+
+	.filters-container {
+		width: 100%;
+		padding: 1rem 0;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 1rem;
+	}
 `;
 const { Header } = Layout;
+
+const STATUS_FILTERS_CONSTANT = {
+	// All: () => {
+	// 	return true;
+	// },
+	Enabled: (pipeline) => {
+		return pipeline.enabled;
+	},
+	Disabled: (pipeline) => {
+		return !pipeline.enabled;
+	},
+};
+
+const SORT_KEYS_CONSTANTS = {
+	Priority: {
+		valueFunc: (pipeline) => {
+			return pipeline.priority ?? Number.MIN_SAFE_INTEGER;
+		},
+		order: 'desc',
+	},
+	'Updated Time': {
+		valueFunc: (pipeline) => {
+			return pipeline.updated_at || pipeline.created_at || 0;
+		},
+		order: 'desc',
+	},
+
+	// 'Updated Time ⬆️': {
+	// 	valueFunc: (pipeline) => {
+	// 		return pipeline.updated_at || pipeline.created_at || 0;
+	// 	},
+	// 	order: 'asc',
+	// },
+	// 'Priority ⬆️': {
+	// 	valueFunc: (pipeline) => {
+	// 		return pipeline.priority ?? Number.MIN_SAFE_INTEGER;
+	// 	},
+	// 	order: 'asc',
+	// },
+};
+
 const Pipelines = (props) => {
 	const {
 		isLoading,
@@ -35,7 +87,8 @@ const Pipelines = (props) => {
 		history,
 	} = props;
 	const bannerDetails = pipelinesBannerDetails.allPipelines;
-
+	const [selectedStatus, setSelectedStatus] = useState(Object.keys(STATUS_FILTERS_CONSTANT)[0]);
+	const [sortKey, setSortKey] = useState(Object.keys(SORT_KEYS_CONSTANTS)[0]);
 	useLayoutEffect(() => {
 		if (isValidPlan(tier, featurePipelines)) {
 			fetchPipelines();
@@ -116,7 +169,7 @@ const Pipelines = (props) => {
 						>
 							<Link to="/cluster/pipelines/new">
 								<Button block type="primary" size="large" rel="noopener noreferrer">
-									<Icon type="plus" />
+									<PlusOutlined style={{ margin: '0.25rem' }} />
 									Create Pipeline
 								</Button>
 							</Link>
@@ -135,16 +188,52 @@ const Pipelines = (props) => {
 				</div>
 			</Header>
 			<div className={pipelinesContainer}>
-				{' '}
+				<div className="filters-container">
+					<Radio.Group
+						buttonStyle="solid"
+						onChange={({ target: { value } }) => {
+							setSelectedStatus(value);
+						}}
+						value={selectedStatus}
+					>
+						{Object.keys(STATUS_FILTERS_CONSTANT).map((key) => {
+							return (
+								<Radio.Button value={key} key={key}>
+									{key}
+								</Radio.Button>
+							);
+						})}
+					</Radio.Group>
+
+					<div>
+						<span>Sort by</span>{' '}
+						<Select
+							showSearch
+							style={{ width: 200 }}
+							onChange={(value) => {
+								setSortKey(value);
+							}}
+							value={sortKey}
+						>
+							{Object.keys(SORT_KEYS_CONSTANTS).map((key) => (
+								<Select.Option key={key} value={key}>
+									{key}
+								</Select.Option>
+							))}
+						</Select>
+					</div>
+				</div>
 				{pipelines && pipelines.length ? (
 					<ErrorToaster>
 						<div>
 							{orderBy(
-								pipelines,
+								pipelines.filter((item) =>
+									STATUS_FILTERS_CONSTANT[selectedStatus](item),
+								),
 								(a) => {
-									return a.updated_at || a.created_at || 0;
+									return SORT_KEYS_CONSTANTS[sortKey]?.valueFunc(a);
 								},
-								['desc'],
+								[SORT_KEYS_CONSTANTS[sortKey]?.order ?? 'desc'],
 							).map((item) => (
 								<PipelineCard key={item.id} pipeline={item} history={history} />
 							))}
@@ -157,7 +246,7 @@ const Pipelines = (props) => {
 						extra={
 							<Link to="/cluster/pipelines/new">
 								<Button type="primary">
-									<Icon type="plus" />
+									<PlusOutlined style={{ margin: '0.25rem' }} />
 									Create Pipeline
 								</Button>
 							</Link>

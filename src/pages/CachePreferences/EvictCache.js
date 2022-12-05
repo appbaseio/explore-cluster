@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
-import { Button, Card, notification, Tooltip, Icon } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { Button, Card, notification, Tooltip } from 'antd';
 import get from 'lodash/get';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
@@ -56,7 +57,7 @@ const EvictCache = ({ isLoading, errors, handleEvictCache }) => {
 						overlay="Evict cache action clears the entire content of cache."
 						placement="rightTop"
 					>
-						<Icon type="info-circle" theme="outlined" />
+						<InfoCircleOutlined />
 					</Tooltip>
 				</h3>
 			</div>

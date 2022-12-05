@@ -1,4 +1,5 @@
-import { Icon, Popconfirm, Select, Tooltip } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { Popconfirm, Select, Tooltip } from 'antd';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import React from 'react';
@@ -15,6 +16,7 @@ const popOverClass = css`
 	.ant-popover-inner-content {
 		padding: 12px;
 	}
+	z-index: 1040;
 `;
 
 function IndexSwitcher({
@@ -65,6 +67,7 @@ function IndexSwitcher({
 					updateSessionData(value);
 				}}
 				showSearch
+				dropdownStyle={{ zIndex: 1100 }}
 			>
 				{sortedApps.map((app) => (
 					<Select.Option key={app} value={app}>
@@ -91,13 +94,12 @@ function IndexSwitcher({
 			placement="right"
 			icon={
 				<Tooltip title="Select an index to navigate to.">
-					<Icon
+					<InfoCircleOutlined
 						style={{
 							fontSize: 17,
 							marginTop: 2,
 							color: '#1890ff',
 						}}
-						type="info-circle"
 					/>
 				</Tooltip>
 			}

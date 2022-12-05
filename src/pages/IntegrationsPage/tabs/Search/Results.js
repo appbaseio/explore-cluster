@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { FieldControl } from 'react-reactive-form';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Switch, Form, List, Radio, Button, Icon, InputNumber, Input, Popover } from 'antd';
+import { InfoCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { Switch, List, Radio, Button, InputNumber, Input, Popover, Form } from 'antd';
 import { bool, array, object, string, func } from 'prop-types';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { ReactiveBase } from '@appbaseio/reactivesearch';
@@ -28,7 +29,7 @@ const defaultSettings = [
 			<span>
 				Show applied filters
 				<Popover content="Show applied user filters at the top of results">
-					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+					<InfoCircleOutlined style={{ marginLeft: '5px' }} />
 				</Popover>
 			</span>
 		),
@@ -40,7 +41,7 @@ const defaultSettings = [
 			<span>
 				Show results as
 				<Popover content="Pick the primary layout for showing search results">
-					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+					<InfoCircleOutlined style={{ marginLeft: '5px' }} />
 				</Popover>
 			</span>
 		),
@@ -52,7 +53,7 @@ const defaultSettings = [
 			<span>
 				Show results view switcher
 				<Popover content="Show a search results layout switcher to your end-users">
-					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+					<InfoCircleOutlined style={{ marginLeft: '5px' }} />
 				</Popover>
 			</span>
 		),
@@ -75,7 +76,7 @@ const defaultSettings = [
 			<span>
 				Set sort option selector for results
 				<Popover content="Set sort options picker to allow your end-users to sort search results by">
-					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+					<InfoCircleOutlined style={{ marginLeft: '5px' }} />
 				</Popover>
 			</span>
 		),
@@ -87,7 +88,7 @@ const defaultSettings = [
 			<span>
 				Enable results highlighting
 				<Popover content="Show highlighting of matching content in the search results">
-					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+					<InfoCircleOutlined style={{ marginLeft: '5px' }} />
 				</Popover>
 			</span>
 		),
@@ -120,7 +121,7 @@ const geoDefaultSettings = [
 			<span>
 				Show results as
 				<Popover content="Pick the primary layout for showing search results">
-					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+					<InfoCircleOutlined style={{ marginLeft: '5px' }} />
 				</Popover>
 			</span>
 		),
@@ -132,7 +133,7 @@ const geoDefaultSettings = [
 			<span>
 				Show results view switcher
 				<Popover content="Show a search results layout switcher to your end-users">
-					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+					<InfoCircleOutlined style={{ marginLeft: '5px' }} />
 				</Popover>
 			</span>
 		),
@@ -144,7 +145,7 @@ const geoDefaultSettings = [
 			<span>
 				Pick your map component
 				<Popover content="Choose a map component: OpenStreetMap is free (no API key needed) whereas GoogleMap offers more features (clustering, places search)">
-					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+					<InfoCircleOutlined style={{ marginLeft: '5px' }} />
 				</Popover>
 			</span>
 		),
@@ -156,7 +157,7 @@ const geoDefaultSettings = [
 			<span>
 				Maps API Key
 				<Popover content="Enter your Google Maps API key over here (leave blank for OpenStreetMap)">
-					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+					<InfoCircleOutlined style={{ marginLeft: '5px' }} />
 				</Popover>
 			</span>
 		),
@@ -168,7 +169,7 @@ const geoDefaultSettings = [
 			<span>
 				Set default zoom level
 				<Popover content="Preset map's zoom level, accepts integer values between [0, 20]. 0 is the minimum zoom level, where you can see the entire globe. 20 is the maximum zoom level">
-					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+					<InfoCircleOutlined style={{ marginLeft: '5px' }} />
 				</Popover>
 			</span>
 		),
@@ -180,7 +181,7 @@ const geoDefaultSettings = [
 			<span>
 				Show Search As Move
 				<Popover content="Show a search as move checkbox on the map for end-users to decide when to update the search">
-					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+					<InfoCircleOutlined style={{ marginLeft: '5px' }} />
 				</Popover>
 			</span>
 		),
@@ -192,7 +193,7 @@ const geoDefaultSettings = [
 			<span>
 				Enable Clustering
 				<Popover content="Cluster nearby map markers together (only works with Google Maps)">
-					<Icon type="info-circle" style={{ marginLeft: '5px' }} />
+					<InfoCircleOutlined style={{ marginLeft: '5px' }} />
 				</Popover>
 			</span>
 		),
@@ -627,7 +628,9 @@ const Results = ({
 														}}
 														disabled={error}
 													>
-														<Icon type="plus" />
+														<PlusOutlined
+															style={{ margin: '0.25rem' }}
+														/>
 														Add Sort Option
 													</Button>
 												</div>
@@ -818,7 +821,7 @@ const Results = ({
 	if (withoutForm) {
 		return component();
 	}
-	return <Form layout="inline">{component()}</Form>;
+	return <Form layout="vertical">{component()}</Form>;
 };
 
 Results.defaultProps = {

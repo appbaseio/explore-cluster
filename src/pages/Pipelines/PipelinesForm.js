@@ -6,10 +6,16 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import {
+	ArrowLeftOutlined,
+	ClockCircleOutlined,
+	LinkOutlined,
+	PlusOutlined,
+	EditOutlined,
+} from '@ant-design/icons';
+import {
 	Affix,
 	Button,
 	Card,
-	Icon,
 	Result,
 	Skeleton,
 	Typography,
@@ -21,6 +27,8 @@ import {
 	Tooltip,
 	Collapse,
 	Tag,
+	Col,
+	Row,
 } from 'antd';
 import yamlToJson from 'js-yaml';
 import { isEqual } from 'lodash';
@@ -152,8 +160,8 @@ const container = css`
 			margin-left: 1rem;
 		}
 	}
-	.ant-tabs.ant-tabs-card .ant-tabs-card-bar .ant-tabs-tab {
-		&:last-child {
+	.ant-tabs .ant-tabs-tab {
+		&:nth-last-child(2) {
 			padding: 0;
 			.add-script-btn {
 				background: transparent;
@@ -161,7 +169,7 @@ const container = css`
 				border: none;
 				padding: 0 12px;
 
-				i {
+				span {
 					margin-right: 0 !important;
 					font-size: 18px;
 				}
@@ -199,7 +207,7 @@ const editorAreaContainer = css`
 function DocsLink({ url }) {
 	return (
 		<a href={url} className={link} target="_blank" rel="noopener noreferrer">
-			Learn more <Icon type="link" />
+			Learn more <LinkOutlined />
 		</a>
 	);
 }
@@ -557,7 +565,7 @@ const PipelinesForm = (props) => {
 			setTabPanes(newTabPanes);
 
 			// reset active tab
-			const activeTab = newTabPanes.length ? newTabPanes.at(-1).key : DEFAULT_TAB_KEY;
+			const activeTab = newTabPanes.length ? newTabPanes.pop().key : DEFAULT_TAB_KEY;
 			setactiveTabKey(activeTab);
 
 			// update ScriptFileMap
@@ -777,7 +785,7 @@ const PipelinesForm = (props) => {
 						extra={
 							<Link to="/cluster/pipelines/new">
 								<Button type="primary">
-									<Icon type="plus" />
+									<PlusOutlined style={{ margin: '0.25rem' }} />
 									Create Pipeline
 								</Button>
 							</Link>
@@ -807,7 +815,7 @@ const PipelinesForm = (props) => {
 									}
 									className="create-script-file-link-btn"
 								>
-									<Icon type="plus" />
+									<PlusOutlined style={{ margin: '0.25rem' }} />
 									Add script file
 								</Button>
 							</Fragment>
@@ -826,10 +834,14 @@ const PipelinesForm = (props) => {
 		return `${labelPrefix} Pipeline`;
 	};
 
-	const renderButtonIcon = () => {
+	const ButtonIcon = (buttonIconProps) => {
 		if (isCreating || isUpdating || isValidating) return null;
 
-		const icon = !isEditPage ? 'plus' : 'edit';
+		const icon = !isEditPage ? (
+			<PlusOutlined {...buttonIconProps} />
+		) : (
+			<EditOutlined {...buttonIconProps} />
+		);
 
 		return icon;
 	};
@@ -869,7 +881,7 @@ const PipelinesForm = (props) => {
 				<Fragment>
 					<Link to="/cluster/pipelines">
 						<Button>
-							<Icon type="arrow-left" />
+							<ArrowLeftOutlined style={{ margin: '0.25rem' }} />
 							Back to Pipelines
 						</Button>
 					</Link>
@@ -878,7 +890,7 @@ const PipelinesForm = (props) => {
 							{isEditPage && pipeline?.versions && (
 								<Tooltip title="Versions" style={{ fontSize: 14 }}>
 									{/* Pipeline Versions Versions */}
-									<Icon
+									<ClockCircleOutlined
 										style={{
 											cursor: getCurrentVersion()?._version
 												? 'pointer'
@@ -888,7 +900,6 @@ const PipelinesForm = (props) => {
 												: '#bbb7b7',
 										}}
 										className="version-drawer-triggerer"
-										type="clock-circle"
 										onClick={() => {
 											if (getCurrentVersion()?._version)
 												setShowVersionDrawer(true);
@@ -1051,7 +1062,7 @@ const PipelinesForm = (props) => {
 													handleAddOrRemoveTab(null, TAB_ACTIONS.ADD);
 												}}
 											>
-												<Icon type="plus" />
+												<PlusOutlined />
 											</Button>
 										</Tooltip>
 									}
@@ -1063,42 +1074,48 @@ const PipelinesForm = (props) => {
 					</Card>
 					<Affix offsetBottom={0}>
 						<Flex className="card-footer">
-							<div>{renderErrorMessges()}</div>{' '}
-							<Button
-								block
-								type="primary"
-								size="large"
-								rel="noopener noreferrer"
-								className="create-save-btn"
-								onClick={() => handleSave()}
-								loading={isCreating || isUpdating || isValidating}
-								disabled={!!missingScriptFiles?.length || isVersionCreating}
-								icon={renderButtonIcon()}
-							>
-								{renderButtonLabel()}
-							</Button>
-							{isEditPage && (
-								<Tooltip title="Save pipeline as a new version">
+							<div>{renderErrorMessges()}</div>
+							<Row style={{ justifyContent: 'flex-end', flex: 2 }} gutter={[0, 10]}>
+								<Col>
 									<Button
 										block
-										type="default"
+										type="primary"
 										size="large"
 										rel="noopener noreferrer"
 										className="create-save-btn"
-										onClick={() => setShowVDescModal(true)}
-										loading={isVersionCreating}
-										icon={renderButtonIcon()}
-										disabled={
-											!!missingScriptFiles?.length ||
-											isCreating ||
-											isUpdating ||
-											isValidating
-										}
+										onClick={() => handleSave()}
+										loading={isCreating || isUpdating || isValidating}
+										disabled={!!missingScriptFiles?.length || isVersionCreating}
+										icon={<ButtonIcon />}
 									>
-										Save Pipeline (as new version)
+										{renderButtonLabel()}
 									</Button>
-								</Tooltip>
-							)}
+								</Col>
+								<Col>
+									{isEditPage && (
+										<Tooltip title="Save pipeline as a new version">
+											<Button
+												block
+												type="default"
+												size="large"
+												rel="noopener noreferrer"
+												className="create-save-btn"
+												onClick={() => setShowVDescModal(true)}
+												loading={isVersionCreating}
+												icon={<ButtonIcon />}
+												disabled={
+													!!missingScriptFiles?.length ||
+													isCreating ||
+													isUpdating ||
+													isValidating
+												}
+											>
+												Save Pipeline (as new version)
+											</Button>
+										</Tooltip>
+									)}
+								</Col>
+							</Row>
 						</Flex>
 					</Affix>
 					<PipelineVersionsDrawer

@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Card, Radio, Icon, Row, Button, Alert, Tooltip } from 'antd';
+import { CodeOutlined, EditOutlined, UnorderedListOutlined } from '@ant-design/icons';
+import { Card, Radio, Row, Button, Alert, Tooltip } from 'antd';
 import { StateProvider } from '@appbaseio/reactivesearch';
 import { Link } from 'react-router-dom';
 import { css } from 'emotion';
@@ -87,7 +88,7 @@ class Result extends React.Component {
 							return (
 								<Alert
 									type="info"
-									icon="info"
+									showIcon
 									style={{ margin: '0px 0 16px' }}
 									message={
 										<React.Fragment>
@@ -121,7 +122,6 @@ class Result extends React.Component {
 							return (
 								<Alert
 									type="info"
-									icon="info"
 									style={{ margin: '0px 0 16px' }}
 									message={
 										<React.Fragment>
@@ -191,7 +191,7 @@ class Result extends React.Component {
 						<Link to={`/app/${app}/results/`}>
 							<Tooltip title={settingsMap.set_result.description}>
 								<Button ghost type="primary">
-									<Icon type="edit" />
+									<EditOutlined />
 									{settingsMap.set_result.title}
 								</Button>
 							</Tooltip>
@@ -199,11 +199,11 @@ class Result extends React.Component {
 					)}
 					<Radio.Group value={view} onChange={this.handleViewChange}>
 						<Radio.Button value="list">
-							<Icon style={{ marginRight: 5 }} type="unordered-list" />
+							<UnorderedListOutlined style={{ marginRight: 5 }} />
 							Results
 						</Radio.Button>
 						<Radio.Button value="query" data-cy="raw-request-button">
-							<Icon style={{ marginRight: 5 }} type="code" />
+							<CodeOutlined style={{ marginRight: 5 }} />
 							Raw
 						</Radio.Button>
 					</Radio.Group>

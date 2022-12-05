@@ -323,6 +323,13 @@ const DiffList = ({ diff: diffProp }) => {
 																							.data[1],
 																					},
 																				]}
+																				style={{
+																					height: 'max-content',
+																					marginBottom:
+																						'7px',
+																					overflow:
+																						'auto',
+																				}}
 																				columns={[
 																					{
 																						title: 'Old Value',

@@ -1,6 +1,7 @@
 /* eslint-disable no-bitwise */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
+import { InfoCircleOutlined } from '@ant-design/icons';
 import { Button, Col, Row, Layout, Alert, Select, Typography, Tooltip, Spin, Badge } from 'antd';
 import { css } from 'emotion';
 import get from 'lodash/get';
@@ -598,7 +599,7 @@ const Pipelines = (props) => {
 								size="large"
 								rel="noopener noreferrer"
 								onClick={() => window.open(bannerDetails.href)}
-								icon="info-circle"
+								icon={<InfoCircleOutlined />}
 							>
 								Read Docs
 							</Button>

@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { Card, Form, Input, Select, Switch, Skeleton } from 'antd';
+import { Card, Input, Select, Switch, Skeleton, Form } from 'antd';
 
 import get from 'lodash/get';
 import {
@@ -44,7 +44,6 @@ const bannerDetails = {
 	description: 'Configure language settings to understand search intent.',
 	buttonText: 'Read Docs',
 	videoLink: 'https://youtu.be/wx8ac4IkTas',
-	icon: 'info-circle',
 	href: 'https://docs.reactivesearch.io/docs/search/relevancy/#language-settings',
 };
 
@@ -185,12 +184,12 @@ class LanguageSettings extends React.Component {
 								<Form.Item
 									style={{ paddingBottom: 0 }}
 									label={
-										<>
-											{settingsMap.language.title}
+										<span>
+											{settingsMap.language.title}{' '}
 											<SettingTooltip
 												title={settingsMap.language.description}
 											/>
-										</>
+										</span>
 									}
 									validateStatus={fallback[language] ? 'warning' : null}
 									help={get(fallback, language)}
@@ -212,12 +211,12 @@ class LanguageSettings extends React.Component {
 								</Form.Item>
 								<Form.Item
 									label={
-										<>
-											{settingsMap.applyStopwords.title}
+										<span>
+											{settingsMap.applyStopwords.title}{' '}
 											<SettingTooltip
 												title={settingsMap.applyStopwords.description}
 											/>
-										</>
+										</span>
 									}
 								>
 									<Switch
@@ -231,12 +230,12 @@ class LanguageSettings extends React.Component {
 
 								<Form.Item
 									label={
-										<>
-											{settingsMap.customStopwords.title}
+										<span>
+											{settingsMap.customStopwords.title}{' '}
 											<SettingTooltip
 												title={settingsMap.customStopwords.description}
 											/>
-										</>
+										</span>
 									}
 								>
 									<Input.TextArea
@@ -250,12 +249,12 @@ class LanguageSettings extends React.Component {
 
 								<Form.Item
 									label={
-										<>
-											{settingsMap.stemmingExceptions.title}
+										<span>
+											{settingsMap.stemmingExceptions.title}{' '}
 											<SettingTooltip
 												title={settingsMap.stemmingExceptions.description}
 											/>
-										</>
+										</span>
 									}
 								>
 									<Input.TextArea
@@ -268,12 +267,12 @@ class LanguageSettings extends React.Component {
 								</Form.Item>
 								<Form.Item
 									label={
-										<>
-											{settingsMap.normalizeDiacritics.title}
+										<span>
+											{settingsMap.normalizeDiacritics.title}{' '}
 											<SettingTooltip
 												title={settingsMap.normalizeDiacritics.description}
 											/>
-										</>
+										</span>
 									}
 								>
 									<Switch
@@ -317,7 +316,6 @@ const mapStateToProps = (state) => {
 LanguageSettings.propTypes = {
 	appName: PropTypes.string.isRequired,
 	getSettingsAction: PropTypes.func.isRequired,
-	form: PropTypes.object.isRequired,
 	credentials: PropTypes.string.isRequired,
 	getDefaultSettingsAction: PropTypes.func.isRequired,
 	settings: PropTypes.object,
@@ -356,6 +354,4 @@ const mapDispatchToProps = (dispatch) => ({
 	updateLocalRelevancy: (name, data) => dispatch(setLocalRelevancyState(name, data)),
 });
 
-const LanguageForm = Form.create({ name: 'language' })(LanguageSettings);
-
-export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(LanguageForm));
+export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(LanguageSettings));

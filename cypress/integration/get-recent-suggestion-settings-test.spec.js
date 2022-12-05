@@ -1,8 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
 
-let indexName = 'airbeds-test-app';
-
 describe('Recent Suggestion Settings add test flow', () => {
 	before(() => {
 		cy.window().then((win) => {
@@ -28,7 +26,7 @@ describe('Recent Suggestion Settings add test flow', () => {
 
 	it('Should Recent suggestion settings page URL', () => {
 		cy.visit(`${base_url}/cluster/suggestions`).wait(2000);
-		cy.get('.ant-tabs-nav > :nth-child(1) > :nth-child(2)').click();
+		cy.get('.ant-tabs-nav .ant-tabs-tab:nth-child(2)').click();
 	});
 
 	it('Should Get Recent Suggestions Settings Form Data', () => {

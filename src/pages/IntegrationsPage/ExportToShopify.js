@@ -1,5 +1,6 @@
 import React from 'react';
 import { func, object, bool, number, oneOfType, string } from 'prop-types';
+import { CopyOutlined, QuestionOutlined } from '@ant-design/icons';
 import { Button, message, Modal } from 'antd';
 import { FieldControl, FieldGroup } from 'react-reactive-form';
 import { css } from 'emotion';
@@ -70,7 +71,7 @@ const ExportToShopify = ({ control, preferences, isRecommendation, widgetId }) =
 							>
 								<CopyToClipboard text={installationScript} onCopy={copyToClipboard}>
 									<Button
-										icon="copy"
+										icon={<CopyOutlined />}
 										shape="circle"
 										css={{
 											position: 'absolute',
@@ -113,7 +114,7 @@ const ExportToShopify = ({ control, preferences, isRecommendation, widgetId }) =
 															onCopy={copyToClipboard}
 														>
 															<Button
-																icon="copy"
+																icon={<CopyOutlined />}
 																shape="circle"
 																css={{
 																	position: 'absolute',
@@ -187,7 +188,7 @@ const ExportToShopify = ({ control, preferences, isRecommendation, widgetId }) =
 			>
 				<CopyToClipboard text={installationScript} onCopy={copyToClipboard}>
 					<Button
-						icon="copy"
+						icon={<CopyOutlined />}
 						shape="circle"
 						css={{
 							position: 'absolute',
@@ -206,7 +207,7 @@ const ExportToShopify = ({ control, preferences, isRecommendation, widgetId }) =
 				>
 					{installationScript}
 				</pre>
-				<Button icon="question" onClick={toggleModal}>
+				<Button icon={<QuestionOutlined />} onClick={toggleModal}>
 					Installation Instructions
 				</Button>
 			</div>

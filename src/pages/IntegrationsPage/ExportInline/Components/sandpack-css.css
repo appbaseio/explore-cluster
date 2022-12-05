@@ -222,8 +222,12 @@
 	color: #90e86f;
 	border-bottom: 1px solid #90e86f;
 }
+.dark-theme-wrapper .ant-input-affix-wrapper{
+	background-color: #343434;
+}
 .dark-theme-wrapper .ant-input {
 	background-color: rgb(52, 52, 52);
+	color: white;
 }
 
 .dark-theme-wrapper .ant-input-suffix {

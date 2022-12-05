@@ -122,6 +122,11 @@ class ReviewChanges extends React.Component {
 										newVal: newVal ?? '',
 									},
 								]}
+								style={{
+									height: 'max-content',
+									marginBottom: '7px',
+									overflow: 'auto',
+								}}
 								columns={[
 									{
 										title: 'Old Value',

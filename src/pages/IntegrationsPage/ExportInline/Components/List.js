@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Tooltip, Button, Icon, Divider } from 'antd';
+import { CalendarTwoTone, SwapOutlined, UndoOutlined } from '@ant-design/icons';
+import { Tooltip, Button, Divider } from 'antd';
 import { pastVersionsStyles } from './styles';
 import { timeDifference } from '../../utils/index';
 import CodeDiffModal from './CodeDiff/CodeDiffModal';
@@ -102,11 +103,7 @@ const List = ({
 						<Tooltip
 							title={
 								<>
-									<Icon
-										type="calendar"
-										theme="twoTone"
-										style={{ marginRight: 5 }}
-									/>
+									<CalendarTwoTone style={{ marginRight: 5 }} />
 									<span style={{ fontSize: 12 }}>
 										{new Date(
 											data.updated_at || data.created_at * 1000,
@@ -125,7 +122,7 @@ const List = ({
 						onClick={() => {
 							setOpen(true);
 						}}
-						icon="swap"
+						icon={<SwapOutlined />}
 						className="show-on-hover"
 					>
 						View diff
@@ -137,7 +134,7 @@ const List = ({
 							restoreByVersionId();
 						}}
 						className="show-on-hover"
-						icon="undo"
+						icon={<UndoOutlined />}
 					>
 						Restore
 					</Button>

@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
-import { Icon, Popover } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { Form, Popover } from 'antd';
 import { bool } from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import TextInput from '../../../../components/Form/Input';
@@ -11,7 +12,7 @@ const General = ({ isRecommendation }) => {
 	const form = useContext(FormContext);
 
 	return (
-		<>
+		<Form layout="vertical">
 			<FieldGroup control={form} strict={false}>
 				{({ value }) => {
 					return (
@@ -80,8 +81,7 @@ const General = ({ isRecommendation }) => {
 																</div>
 															}
 														>
-															<Icon
-																type="info-circle"
+															<InfoCircleOutlined
 																style={{ marginLeft: '5px' }}
 															/>
 														</Popover>
@@ -105,7 +105,7 @@ const General = ({ isRecommendation }) => {
 					);
 				}}
 			</FieldGroup>
-		</>
+		</Form>
 	);
 };
 

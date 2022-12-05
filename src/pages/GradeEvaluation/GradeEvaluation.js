@@ -1,12 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
+import { EditOutlined, InfoCircleOutlined, RedoOutlined } from '@ant-design/icons';
 import {
 	Card,
 	Spin,
 	Select,
 	Table,
-	Icon,
 	Typography,
 	Empty,
 	notification,
@@ -187,7 +187,7 @@ class GradeEvaluation extends React.Component {
 					<Typography.Text strong>
 						Select Index
 						<Tooltip title="Select index to add in comparison table">
-							<Icon style={{ marginLeft: 5 }} type="info-circle" />
+							<InfoCircleOutlined style={{ marginLeft: 5 }} />
 						</Tooltip>
 					</Typography.Text>
 					<Select
@@ -281,7 +281,7 @@ class GradeEvaluation extends React.Component {
 				<div className="table-column">
 					{index}
 					<Link to={`/app/${index}/search`}>
-						<Icon type="edit" />
+						<EditOutlined />
 					</Link>
 				</div>
 			),
@@ -293,7 +293,7 @@ class GradeEvaluation extends React.Component {
 						<Button
 							size="small"
 							shape="circle-outline"
-							icon="redo"
+							icon={<RedoOutlined />}
 							className="replay-button"
 							onClick={() => this.handleSearchPreview(query, index)}
 						/>

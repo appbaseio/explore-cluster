@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { css } from 'emotion';
-import { Icon, Popover, List, Row, Col, Tooltip, Input } from 'antd';
+import { CheckCircleTwoTone, DeleteOutlined, DragOutlined, EditTwoTone } from '@ant-design/icons';
+import { Popover, List, Row, Col, Tooltip, Input } from 'antd';
 import { Draggable } from 'react-beautiful-dnd';
 import get from 'lodash/get';
 import JsonView from '../../../../../components/JsonView';
@@ -145,16 +146,15 @@ function PromoteActions({ onDelete, onEdit }) {
 		>
 			{isEdit ? (
 				// eslint-disable-next-line
-				<Icon type="check-circle" theme="twoTone" onClick={handleEditChange} />
+				<CheckCircleTwoTone onClick={handleEditChange} />
 			) : (
 				// eslint-disable-next-line
-				<Icon type="edit" theme="twoTone" onClick={handleEditChange} />
+				<EditTwoTone onClick={handleEditChange} />
 			)}
-			<Icon
+			<DeleteOutlined
 				style={{
 					color: '#ff4d4f',
 				}}
-				type="delete"
 				onClick={onDelete}
 			/>
 		</div>
@@ -216,7 +216,7 @@ function RowData({ item, index, handleDelete, onChange }) {
 									<Col xs={1}>
 										<Tooltip title="Drag to update the ordering of promoted products">
 											<div {...provided.dragHandleProps}>
-												<Icon type="drag" className={dragIcon} />
+												<DragOutlined className={dragIcon} />
 											</div>
 										</Tooltip>
 									</Col>

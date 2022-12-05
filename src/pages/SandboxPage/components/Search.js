@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Card, Button, Icon, Row, Col, Tooltip } from 'antd';
+import { EditOutlined } from '@ant-design/icons';
+import { Card, Button, Row, Col, Tooltip } from 'antd';
 import { Link } from 'react-router-dom';
 import { SearchBox, SelectedFilters } from '@appbaseio/reactivesearch';
 import { css } from 'emotion';
@@ -129,7 +130,7 @@ class Search extends React.Component {
 							>
 								<Tooltip title={settingsMap.set_search.description}>
 									<Button size="large" ghost type="primary">
-										<Icon type="edit" />
+										<EditOutlined />
 										{settingsMap.set_search.title}
 									</Button>
 								</Tooltip>

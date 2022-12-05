@@ -1,5 +1,6 @@
 import React from 'react';
-import { Collapse, Alert, List, Icon, Button, Dropdown, Menu, Empty, Popconfirm } from 'antd';
+import { DeleteOutlined, MoreOutlined, ReadOutlined, SaveOutlined } from '@ant-design/icons';
+import { Collapse, Alert, List, Button, Dropdown, Menu, Empty, Popconfirm } from 'antd';
 import { Link, withRouter } from 'react-router-dom';
 import get from 'lodash/get';
 import moment from 'moment';
@@ -153,14 +154,8 @@ class CollapsibleInsights extends React.Component {
 	};
 
 	render() {
-		const {
-			insights,
-			type,
-			defaultOpen,
-			noDataText,
-			noDataPresent,
-			insightUpdates,
-		} = this.props;
+		const { insights, type, defaultOpen, noDataText, noDataPresent, insightUpdates } =
+			this.props;
 
 		if (insights.length === 0) {
 			return <Empty description={noDataPresent ? noDataText : 'No Data'} />;
@@ -210,19 +205,25 @@ class CollapsibleInsights extends React.Component {
 											>
 												{type === 'saved' ? null : (
 													<Menu.Item key="saved">
-														<Icon type="save" />
+														<SaveOutlined
+															style={{ margin: '0.25rem' }}
+														/>
 														Save Insight
 													</Menu.Item>
 												)}
 												{type === 'saved' ? (
 													<Menu.Item key="undo">
-														<Icon type="save" />
+														<SaveOutlined
+															style={{ margin: '0.25rem' }}
+														/>
 														Remove from Saved
 													</Menu.Item>
 												) : null}
 												{type === 'insights' ? (
 													<Menu.Item key="read">
-														<Icon type="read" />
+														<ReadOutlined
+															style={{ margin: '0.25rem' }}
+														/>
 														Mark as Read
 													</Menu.Item>
 												) : null}
@@ -239,7 +240,9 @@ class CollapsibleInsights extends React.Component {
 															)
 														}
 													>
-														<Icon type="delete" />
+														<DeleteOutlined
+															style={{ margin: '0.25rem' }}
+														/>
 														Delete
 													</Popconfirm>
 												</Menu.Item>
@@ -252,7 +255,7 @@ class CollapsibleInsights extends React.Component {
 											}}
 											shape="circle"
 											size="small"
-											icon="more"
+											icon={<MoreOutlined />}
 											className="icon"
 										/>
 									</Dropdown>

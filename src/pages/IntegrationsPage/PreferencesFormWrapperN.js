@@ -4,6 +4,7 @@ import { string, func, bool, object, array } from 'prop-types';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { css } from 'react-emotion';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import { FormBuilder, Validators } from 'react-reactive-form';
 import { componentTypes } from '@appbaseio/reactivesearch';
@@ -427,13 +428,13 @@ class PreferencesFormWrapperN extends React.Component {
 								componentTypes.reactiveChart
 							) {
 								const arr = facetSettingsObject.rsConfig.componentId.split('_');
-								const idx = arr.at(-1) || 0;
+								const idx = arr.pop() || 0;
 
 								compSettings[facetId] = payload.chartSettings.charts[idx];
 							} else if (facetSettingsObject.rsConfig.title) {
 								if (facetSettingsObject.facetType !== 'static') {
 									const arr = facetSettingsObject.rsConfig.componentId.split('_');
-									const idx = arr.at(-1) || 0;
+									const idx = arr.pop() || 0;
 									compSettings[facetId] =
 										payload.facetSettings.dynamicFacets[idx];
 								}
@@ -1244,7 +1245,7 @@ class PreferencesFormWrapperN extends React.Component {
 							margin: '5px 0px',
 						}}
 						type="link"
-						icon="arrow-left"
+						icon={<ArrowLeftOutlined />}
 						onClick={() => {
 							history.push(`/cluster/recommendations-builder`);
 						}}
@@ -1257,7 +1258,7 @@ class PreferencesFormWrapperN extends React.Component {
 							margin: '5px 0px',
 						}}
 						type="link"
-						icon="arrow-left"
+						icon={<ArrowLeftOutlined />}
 						onClick={closeForm}
 					>
 						Go back to Search UIs

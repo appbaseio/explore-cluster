@@ -1,15 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { DownloadOutlined, EditOutlined, LoadingOutlined, DeleteOutlined } from '@ant-design/icons';
 import {
 	Alert,
 	Button,
 	Card,
 	Col,
-	Icon,
 	message,
 	notification,
 	Row,
 	Switch,
+	Tag,
 	Tooltip,
 	Typography,
 } from 'antd';
@@ -241,8 +242,16 @@ const PipelineCard = (props) => {
 				<div className={mobileMenu}>
 					<MobileMenu pipeline={pipeline} removePipeline={removePipeline} />
 				</div>
-
-				<Col xl={8} lg={8} md={12} sm={24}>
+				<Col xl={1} lg={1} md={1} sm={1}>
+					{typeof pipeline.priority !== 'undefined' ? (
+						<Tooltip title="Pipeline priority">
+							<Tag color="blue" style={{ position: 'relative', left: '-8px' }}>
+								<b>{pipeline.priority}</b>
+							</Tag>
+						</Tooltip>
+					) : null}
+				</Col>
+				<Col xl={7} lg={7} md={11} sm={22}>
 					<h4 className={title}>
 						<Tooltip title={pipeline.id}>{pipeline.id}</Tooltip>
 					</h4>
@@ -295,7 +304,7 @@ const PipelineCard = (props) => {
 									}}
 									onClick={handleModal}
 								>
-									<Icon type={pipeline.isDeleting ? 'loading' : 'delete'} />{' '}
+									{pipeline.isDeleting ? <LoadingOutlined /> : <DeleteOutlined />}{' '}
 									Delete
 								</div>
 							)}
@@ -304,7 +313,7 @@ const PipelineCard = (props) => {
 						{showEdit && (
 							<Link to={`/cluster/pipelines/${pipeline.id}`}>
 								<Button size={actionButtonSize} type="primary">
-									<Icon type="edit" /> Edit
+									<EditOutlined /> Edit
 								</Button>
 							</Link>
 						)}
@@ -314,7 +323,7 @@ const PipelineCard = (props) => {
 								size={actionButtonSize}
 								type="primary"
 							>
-								<Icon type="download" /> Export as Zip
+								<DownloadOutlined /> Export as Zip
 							</Button>
 						)}
 					</div>
@@ -323,7 +332,7 @@ const PipelineCard = (props) => {
 			<Flex
 				justifyContent="space-between"
 				alignItems="center"
-				style={{ width: '100%', marginTop: '24px' }}
+				style={{ width: '100%', marginTop: '24px', flexWrap: 'wrap', gap: '10px' }}
 			>
 				<Tooltip title={getCreatedUpdatedStats().title}>
 					{getCreatedUpdatedStats().difftime}

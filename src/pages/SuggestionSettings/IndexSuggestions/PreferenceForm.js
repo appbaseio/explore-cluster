@@ -1,7 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Select, Switch, Popover, Icon, InputNumber } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { Select, Switch, Popover, InputNumber } from 'antd';
 import { css } from 'react-emotion';
 import PropTypes from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
@@ -180,7 +181,7 @@ class PreferenceForm extends React.Component {
 													content={content(Messages.indices)}
 													css={styles.iconContainer}
 												>
-													<Icon type="info-circle" />
+													<InfoCircleOutlined />
 												</Popover>
 											</p>
 										}
@@ -231,7 +232,7 @@ class PreferenceForm extends React.Component {
 												content={content(Messages.showDistinctSuggestions)}
 												css={styles.iconContainer}
 											>
-												<Icon type="info-circle" />
+												<InfoCircleOutlined />
 											</Popover>
 										</p>
 									}
@@ -263,7 +264,7 @@ class PreferenceForm extends React.Component {
 												)}
 												css={styles.iconContainer}
 											>
-												<Icon type="info-circle" />
+												<InfoCircleOutlined />
 											</Popover>
 										</p>
 									}
@@ -300,7 +301,7 @@ class PreferenceForm extends React.Component {
 													content={content(Messages.maxPredictedWords)}
 													css={styles.iconContainer}
 												>
-													<Icon type="info-circle" />
+													<InfoCircleOutlined />
 												</Popover>
 											</p>
 										}
@@ -336,7 +337,7 @@ class PreferenceForm extends React.Component {
 												content={content(Messages.applyStopwords)}
 												css={styles.iconContainer}
 											>
-												<Icon type="info-circle" />
+												<InfoCircleOutlined />
 											</Popover>
 										</p>
 									}
@@ -366,7 +367,7 @@ class PreferenceForm extends React.Component {
 												content={content(Messages.customStopwords)}
 												css={styles.iconContainer}
 											>
-												<Icon type="info-circle" />
+												<InfoCircleOutlined />
 											</Popover>
 										</p>
 									}
@@ -405,7 +406,7 @@ class PreferenceForm extends React.Component {
 												content={content(Messages.enableSynonyms)}
 												css={styles.iconContainer}
 											>
-												<Icon type="info-circle" />
+												<InfoCircleOutlined />
 											</Popover>
 										</p>
 									}
@@ -435,7 +436,7 @@ class PreferenceForm extends React.Component {
 												content={content(Messages.indexSize)}
 												css={styles.iconContainer}
 											>
-												<Icon type="info-circle" />
+												<InfoCircleOutlined />
 											</Popover>
 										</p>
 									}
@@ -473,7 +474,7 @@ class PreferenceForm extends React.Component {
 												content={content(Messages.includeFields)}
 												css={styles.iconContainer}
 											>
-												<Icon type="info-circle" />
+												<InfoCircleOutlined />
 											</Popover>
 										</p>
 									}
@@ -535,7 +536,7 @@ class PreferenceForm extends React.Component {
 												content={content(Messages.excludeFields)}
 												css={styles.iconContainer}
 											>
-												<Icon type="info-circle" />
+												<InfoCircleOutlined />
 											</Popover>
 										</p>
 									}
@@ -599,7 +600,7 @@ class PreferenceForm extends React.Component {
 												content={content(Messages.categoryField)}
 												css={styles.iconContainer}
 											>
-												<Icon type="info-circle" />
+												<InfoCircleOutlined />
 											</Popover>
 										</p>
 									}
@@ -650,7 +651,7 @@ class PreferenceForm extends React.Component {
 												content={content(Messages.urlField)}
 												css={styles.iconContainer}
 											>
-												<Icon type="info-circle" />
+												<InfoCircleOutlined />
 											</Popover>
 										</p>
 									}
@@ -698,7 +699,7 @@ class PreferenceForm extends React.Component {
 													content={content(Messages.customQuery)}
 													css={styles.iconContainer}
 												>
-													<Icon type="info-circle" />
+													<InfoCircleOutlined />
 												</Popover>
 											</p>
 										}

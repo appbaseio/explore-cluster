@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { EditOutlined } from '@ant-design/icons';
 import { Card, Typography, Tag, Button, Tooltip } from 'antd';
 import { css } from 'emotion';
 import moment from 'moment';
@@ -93,7 +94,7 @@ const VersionCard = ({
 					onClick={() => {
 						setActivePipelineVersion(id, version);
 					}}
-					icon="edit"
+					icon={<EditOutlined />}
 				>
 					Edit this version
 				</Button>

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Tooltip, Icon, Card, Empty, Select } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { Tooltip, Card, Empty, Select } from 'antd';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { css } from 'emotion';
@@ -312,7 +313,7 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 			<div>
 				Boosting search relevancy with rank feature{' '}
 				<Tooltip title="Boosting search relevancy with rank feature">
-					<Icon type="info-circle" />
+					<InfoCircleOutlined />
 				</Tooltip>
 			</div>
 
@@ -355,35 +356,35 @@ const RankFeature = ({ mappingWrapperProps, localRelevancy, updateLocalRelevancy
 									<Card>
 										<Flex justifyContent="space-between" className={headerRow}>
 											<p>
-												Field Name
+												Field Name{' '}
 												<Tooltip title="Names of the fields with rank_feature/rank_features. Nested fields are represented with relative indentation.">
-													<Icon type="info-circle" />
+													<InfoCircleOutlined />
 												</Tooltip>
 											</p>
 											<Flex>
 												<p style={{ width: 100 }}>
 													Boost
 													<Tooltip title="Floating point number used to decrease or increase relevance scores.">
-														<Icon type="info-circle" />
+														<InfoCircleOutlined />
 													</Tooltip>
 												</p>
 												<p style={{ width: 150, marginLeft: 10 }}>
 													Function
 													<Tooltip title="Ranking function to be used for query">
-														<Icon type="info-circle" />
+														<InfoCircleOutlined />
 													</Tooltip>
 												</p>
 												<p style={{ width: 100, marginLeft: 10 }}>
 													Pivot / Scaling Factor
 													<Tooltip title="Pivot value is applicable for saturation and sigmoid functions. Scaling factor value is applicable for log function.">
-														<Icon type="info-circle" />
+														<InfoCircleOutlined />
 													</Tooltip>
 												</p>
 												{hasSigmoidField && (
 													<p style={{ width: 100, marginLeft: 10 }}>
 														Exponent
 														<Tooltip title="Configure the exponent value for sigmoid function">
-															<Icon type="info-circle" />
+															<InfoCircleOutlined />
 														</Tooltip>
 													</p>
 												)}

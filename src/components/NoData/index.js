@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, Icon } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import { hasClusterEditAccess } from '../../utils';
@@ -9,9 +10,7 @@ const NoData = ({ onCreateModalChange, allowedActions }) => {
 	const canEdit = hasClusterEditAccess(allowedActions);
 	return (
 		<>
-			<Icon
-				type="exclamation-circle"
-				theme="outlined"
+			<ExclamationCircleOutlined
 				style={{
 					fontSize: 16,
 					marginBottom: 10,

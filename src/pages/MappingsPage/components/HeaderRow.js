@@ -1,5 +1,6 @@
 import React from 'react';
-import { Row, Col, Tooltip, Icon } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { Row, Col, Tooltip } from 'antd';
 import PropTypes from 'prop-types';
 import { headerRow } from './styles';
 
@@ -9,9 +10,9 @@ const HeaderRow = ({ leftItems, rightItems }) => {
 			<Col>
 				{leftItems.map((item) => (
 					<p key={item.title}>
-						{item.title}
+						{item.title}{' '}
 						<Tooltip title={item.info}>
-							<Icon type="info-circle" />
+							<InfoCircleOutlined />
 						</Tooltip>
 					</p>
 				))}
@@ -23,7 +24,7 @@ const HeaderRow = ({ leftItems, rightItems }) => {
 							<p style={{ width: 155 }}>
 								{item.title}
 								<Tooltip title={item.info}>
-									<Icon type="info-circle" />
+									<InfoCircleOutlined />
 								</Tooltip>
 							</p>
 						</Col>
@@ -38,16 +39,14 @@ HeaderRow.defaultProps = {
 	leftItems: [
 		{
 			title: 'Field Name',
-			info:
-				'Names of the fields and nested-fields are represented with relative indentation.',
+			info: 'Names of the fields and nested-fields are represented with relative indentation.',
 		},
 	],
 
 	rightItems: [
 		{
 			title: 'Use case',
-			info:
-				'We detect the appropriate analyzers and mappings here representing the usecase - search or aggregations.',
+			info: 'We detect the appropriate analyzers and mappings here representing the usecase - search or aggregations.',
 		},
 		{
 			title: 'Data Type',

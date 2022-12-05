@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Icon, Input, Modal, Popconfirm, Popover } from 'antd';
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Input, Modal, Popconfirm, Popover } from 'antd';
 import PropTypes from 'prop-types';
 import { css } from 'react-emotion';
 import get from 'lodash/get';
@@ -144,8 +145,7 @@ const ScriptRule = ({
 									onChange={handleEnvsInputChange}
 									data-env-field={field}
 								/>
-								<Icon
-									type="delete"
+								<DeleteOutlined
 									style={{
 										marginBottom: 15,
 										color: 'red',
@@ -193,11 +193,7 @@ const ScriptRule = ({
 						trigger="click"
 						placement="top"
 					>
-						<Icon
-							type="plus"
-							style={{ color: '#1990ff' }}
-							onClick={handleEnvAddition}
-						/>
+						<PlusOutlined style={{ color: '#1990ff' }} onClick={handleEnvAddition} />
 					</Popover>
 				</div>
 			</div>

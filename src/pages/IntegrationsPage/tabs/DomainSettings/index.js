@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { string, bool, object, func } from 'prop-types';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
-import { Alert, Button, Form, Icon, Input, Spin } from 'antd';
+import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import { Alert, Button, Input, Spin, Form } from 'antd';
 import Overlay from '../../../../components/Overlay';
 import { features, isValidPlan } from '../../../../batteries/utils';
 import { addDomain, getDomainStatus, getAllDomains } from '../../utils/domain-apis';
@@ -218,8 +219,7 @@ const DomainSettingsTab = ({
 									setValue(e.target.value);
 								}}
 								suffix={
-									<Icon
-										type="plus"
+									<PlusOutlined
 										className="add-icon"
 										onClick={() => saveDomain(value)}
 									/>
@@ -237,7 +237,7 @@ const DomainSettingsTab = ({
 						message={errorMsg}
 						type="error"
 						showIcon
-						icon={<Icon type="exclamation-circle" />}
+						icon={<ExclamationCircleOutlined />}
 					/>
 				</div>
 			) : null}

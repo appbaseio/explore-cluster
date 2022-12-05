@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Alert, Icon, Input, Modal } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { Alert, Input, Modal } from 'antd';
 import { commitModalStyles } from './styles';
 import '../styles.css';
 import CodeDiff from './CodeDiff/CodeDiff';
@@ -63,7 +64,7 @@ const CommitModal = ({
 							message={errMsg}
 							type="error"
 							showIcon
-							icon={<Icon type="exclamation-circle" />}
+							icon={<ExclamationCircleOutlined />}
 						/>
 					) : null}
 				</div>

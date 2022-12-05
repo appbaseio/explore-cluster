@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Card, Col, Icon, message, notification, Row, Tooltip } from 'antd';
+import { DownloadOutlined, EditOutlined, DeleteOutlined, LoadingOutlined } from '@ant-design/icons';
+import { Button, Card, Col, message, notification, Row, Tooltip } from 'antd';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
 import moment from 'moment';
@@ -145,7 +146,7 @@ const SearchBoxCard = (props) => {
 		if (searchBoxItem.created_at) {
 			return (
 				<div>
-					<p>
+					<p style={{ width: 'max-content' }}>
 						Created:{' '}
 						{moment.unix(searchBoxItem.created_at).format('ddd D MMM, hh:mm A')}
 					</p>
@@ -221,9 +222,11 @@ const SearchBoxCard = (props) => {
 										}}
 										onClick={handleModal}
 									>
-										<Icon
-											type={searchBoxItem.isDeleting ? 'loading' : 'delete'}
-										/>{' '}
+										{searchBoxItem.isDeleting ? (
+											<LoadingOutlined />
+										) : (
+											<DeleteOutlined />
+										)}{' '}
 										Delete
 									</div>
 								)}
@@ -232,7 +235,7 @@ const SearchBoxCard = (props) => {
 								<Link to={`/cluster/searchboxes/${searchBoxItem.id}`}>
 									<Tooltip title="Edit Searchbox">
 										<Button size={actionButtonSize} type="primary">
-											<Icon type="edit" /> Edit{' '}
+											<EditOutlined /> Edit{' '}
 										</Button>
 									</Tooltip>
 								</Link>
@@ -245,7 +248,7 @@ const SearchBoxCard = (props) => {
 										size={actionButtonSize}
 										type="primary"
 									>
-										<Icon type="download" />
+										<DownloadOutlined />
 									</Button>
 								</Tooltip>
 							)}

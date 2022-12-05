@@ -3,7 +3,8 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import PropTypes from 'prop-types';
 import { css } from 'emotion';
-import { Affix, Button, Icon, notification, Tabs } from 'antd';
+import { SettingOutlined, UnlockOutlined, UsergroupDeleteOutlined } from '@ant-design/icons';
+import { Affix, Button, notification, Tabs } from 'antd';
 import { get, isEmpty } from 'lodash';
 import { connect } from 'react-redux';
 import { FormBuilder, FormControl, Validators } from 'react-reactive-form';
@@ -80,7 +81,7 @@ const TABS_KEYS = {
 };
 
 const getClusterId = (url = '') => {
-	return url.match(/(?<=https:\/\/)(.*)(?=-arc)/s)?.[0];
+	return url.match(/(?:https:\/\/)(.*)(?=-arc)/s)?.[1];
 };
 
 const SearchAuth0Settings = (props) => {
@@ -111,7 +112,7 @@ const SearchAuth0Settings = (props) => {
 	const auth0Form = useRef(
 		FormBuilder.group({
 			applicationForm: FormBuilder.group({
-				name: [`application_name_${getURL()}`, Validators.required],
+				name: ['', Validators.required],
 				logo_uri: '',
 				callbacks: [
 					// eslint-disable-next-line no-template-curly-in-string
@@ -565,8 +566,7 @@ const SearchAuth0Settings = (props) => {
 
 		const { value: applicationFormValue } = applicationForm;
 		const payload = {
-			name: `application_name_${getURL()}`,
-			// applicationFormValue.name,
+			name: applicationFormValue.name,
 			logo_uri: applicationFormValue.logo_uri,
 			callbacks: applicationFormValue.callbacks
 				? applicationFormValue.callbacks.split(',')
@@ -709,7 +709,7 @@ const SearchAuth0Settings = (props) => {
 								<TabPane
 									tab={
 										<>
-											<Icon type="setting" />
+											<SettingOutlined style={{ margin: '0.25rem' }} />
 											Login Flow Settings
 										</>
 									}
@@ -720,7 +720,7 @@ const SearchAuth0Settings = (props) => {
 								<TabPane
 									tab={
 										<>
-											<Icon type="unlock" />
+											<UnlockOutlined style={{ margin: '0.25rem' }} />
 											Providers
 										</>
 									}
@@ -732,7 +732,9 @@ const SearchAuth0Settings = (props) => {
 									disabled={!clientId}
 									tab={
 										<>
-											<Icon type="usergroup-delete" />
+											<UsergroupDeleteOutlined
+												style={{ margin: '0.25rem' }}
+											/>
 											User Management
 										</>
 									}

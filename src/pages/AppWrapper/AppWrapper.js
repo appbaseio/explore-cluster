@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { Icon, Input, Layout, Menu, Tag } from 'antd';
+import { ClusterOutlined, SearchOutlined } from '@ant-design/icons';
+import { Input, Layout, Menu, Tag } from 'antd';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
+import { css } from 'emotion';
 
 import { isEqual } from 'lodash';
 // eslint-disable-next-line import/no-cycle
@@ -27,9 +29,19 @@ import { allowedTiers } from '../../utils/prop-types';
 import searchInputStyle from '../DashboardWrapper/styles';
 import WithRedirectTooltip from '../../components/WithRedirectTooltip';
 import ReIndexTracker from '../../components/ReIndexTracker';
+import { iconMap } from '../../components/iconMap';
 
 const { Sider } = Layout;
 const { SubMenu } = Menu;
+
+const sidebarStyles = css`
+	height: 100vh;
+	position: fixed !important;
+	left: 0;
+	& .ant-layout-sider-children .ant-menu.ant-menu-inline-collapsed {
+		width: 100%;
+	}
+`;
 
 const getActiveMenu = (props, prevActiveSubMenu = [], routes = {}) => {
 	let activeSubMenu = 'App Overview';
@@ -134,6 +146,10 @@ class AppWrapper extends Component {
 								icon: 'key',
 								action: 'access-control',
 								menu: [
+									{
+										label: 'User Management',
+										link: '/cluster/user-management',
+									},
 									{
 										label: 'API Credentials',
 										link: '/cluster/credentials',
@@ -268,6 +284,10 @@ class AppWrapper extends Component {
 										action: 'access-control',
 										menu: [
 											{
+												label: 'User Management',
+												link: '/cluster/user-management',
+											},
+											{
 												label: 'API Credentials',
 												link: '/cluster/credentials',
 											},
@@ -366,11 +386,7 @@ class AppWrapper extends Component {
 			<Layout>
 				<Sider
 					width={260}
-					css={{
-						height: '100vh',
-						position: 'fixed !important',
-						left: 0,
-					}}
+					className={sidebarStyles}
 					collapsible
 					collapsed={collapsed}
 					onCollapse={this.onCollapse}
@@ -402,7 +418,7 @@ class AppWrapper extends Component {
 									)
 								) : (
 									<React.Fragment>
-										<Icon type="cluster" />
+										<ClusterOutlined style={{ margin: '0.25rem' }} />
 										Cluster Overview
 									</React.Fragment>
 								)}
@@ -415,7 +431,7 @@ class AppWrapper extends Component {
 									value={value}
 									onChange={this.handleSearchTerm}
 									placeholder="Search for a menu item"
-									suffix={<Icon type="search" />}
+									suffix={<SearchOutlined />}
 								/>
 							</div>
 						)}
@@ -434,7 +450,7 @@ class AppWrapper extends Component {
 								if (routes[route].menu) {
 									const Title = (
 										<span>
-											<Icon type={routes[route].icon} />
+											{iconMap[routes[route].icon]}
 											<span>{route}</span>
 										</span>
 									);
@@ -445,7 +461,9 @@ class AppWrapper extends Component {
 													item.link.includes(
 														'configure-search-engine-backend',
 													) &&
-													backendImage !== 'sls'
+													(backendImage !== 'sls' ||
+														backend === BACKENDS.FUSION.name ||
+														backend === BACKENDS.MARKLOGIC.name)
 												) {
 													return null;
 												}
@@ -491,7 +509,7 @@ class AppWrapper extends Component {
 									return (
 										<Menu.Item key={route}>
 											<Link replace to={routes[route].link}>
-												<Icon type={routes[route].icon} />
+												{iconMap[routes[route].icon]}
 												<span>
 													{route}
 													{routes[route].tag ? (
@@ -518,7 +536,7 @@ class AppWrapper extends Component {
 								return (
 									<Menu.Item key={route}>
 										<Link replace to={`/app/${appName}/${routes[route].link}`}>
-											<Icon type={routes[route].icon} />
+											{iconMap[routes[route].icon]}
 											<span>{route}</span>
 										</Link>
 									</Menu.Item>

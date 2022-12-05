@@ -1,3 +1,4 @@
+import { PlusOutlined } from '@ant-design/icons';
 import { Avatar, Button, notification, Spin, Table, Tooltip } from 'antd';
 import { css } from 'emotion';
 import { array, bool, func } from 'prop-types';
@@ -123,7 +124,7 @@ const UserManagement = ({
 					<Button
 						className="create-user-btn"
 						onClick={() => setShowCreateUserModal(true)}
-						icon="plus"
+						icon={<PlusOutlined />}
 						type="primary"
 						size="large"
 					>
