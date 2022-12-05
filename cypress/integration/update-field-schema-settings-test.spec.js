@@ -1,5 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
+import { PAGE_LOAD_TIME } from './contants';
 
 let indexName = '';
 
@@ -27,12 +28,12 @@ describe('Update field schema settings test flow', () => {
 	});
 
 	it('Should navigate to cluster overview', () => {
-		cy.wait(5000);
 		cy.visit(`${base_url}`);
+		cy.wait(PAGE_LOAD_TIME);
 	});
 
 	it('Should create new index', () => {
-		cy.wait(5000).get('[data-cy=initialize-new-index-creation]').click().wait(2000);
+		cy.get('[data-cy=initialize-new-index-creation]').click().wait(2000);
 		generateName();
 		cy.get('[data-cy=new-index-name]')
 			.type(`${indexName}`)
@@ -76,7 +77,10 @@ describe('Update field schema settings test flow', () => {
 	});
 
 	it('Should open schema settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/schema`).wait(5000);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.visit(`${base_url}/app/${indexName}/schema`);
+		cy.wait('@mapping');
 	});
 
 	it('Should change the datatype of rating from text to integer', () => {
@@ -89,7 +93,7 @@ describe('Update field schema settings test flow', () => {
 	});
 
 	it('Should confirm the mapping changes', () => {
-		cy.get('[data-cy=confirm-mapping-button]').click().wait(5000);
+		cy.get('[data-cy=confirm-mapping-button]').click().wait(PAGE_LOAD_TIME);
 	});
 
 	it('Should check the data type of rating to integer', () => {

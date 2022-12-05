@@ -28,12 +28,12 @@ describe('Disable ngram remove search fields and reindex data test flow', () => 
 	});
 
 	it('Should navigate to cluster overview', () => {
-		cy.wait(5000);
 		cy.visit(`${base_url}`);
+		cy.wait(PAGE_LOAD_TIME);
 	});
 
 	it('Should create new index', () => {
-		cy.wait(5000).get('[data-cy=initialize-new-index-creation]').click().wait(2000);
+		cy.get('[data-cy=initialize-new-index-creation]').click().wait(2000);
 		generateName();
 		cy.get('[data-cy=new-index-name]')
 			.type(`${indexName}`)

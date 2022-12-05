@@ -33,7 +33,7 @@ describe('Add field schema settings test flow', () => {
 	});
 
 	it('Should create new index', () => {
-		cy.wait(5000).get('[data-cy=initialize-new-index-creation]').click().wait(2000);
+		cy.get('[data-cy=initialize-new-index-creation]').click().wait(2000);
 		generateName();
 		cy.get('[data-cy=new-index-name]')
 			.type(`${indexName}`)
