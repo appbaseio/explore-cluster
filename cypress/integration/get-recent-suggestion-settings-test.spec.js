@@ -25,7 +25,12 @@ describe('Recent Suggestion Settings add test flow', () => {
 	});
 
 	it('Should Recent suggestion settings page URL', () => {
-		cy.visit(`${base_url}/cluster/suggestions`).wait(2000);
+		cy.server();
+		cy.route('/arc/plan').as('plan');
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/cluster/suggestions`);
+		cy.wait(['@plan', '@indices'], { timeout: 25000 });
+		// Second tab is for recent suggestions
 		cy.get('.ant-tabs-nav .ant-tabs-tab:nth-child(2)').click();
 	});
 
@@ -44,7 +49,7 @@ describe('Recent Suggestion Settings add test flow', () => {
 				minHits: parseInt(payload.body.minHits, 10) || 0,
 				size: parseInt(payload.body.size, 10) || 1,
 				minChars: parseInt(payload.body.minChars, 10) || 0,
-				indices: payload.indices || ['*'],
+				indices: payload.indices || [],
 			};
 
 			cy.get('[data-cy=recent-suggestions-min-hits]').should(
@@ -60,11 +65,15 @@ describe('Recent Suggestion Settings add test flow', () => {
 				recentSuggestions.minChars,
 			);
 
-			cy.get('[data-cy=recent-suggestions-indices] > div > ul > li').each(($el, index) => {
-				if (index < payload.body.indices?.length - 1) {
-					expect($el).to.have.text(payload.body.indices[index]);
-				}
-			});
+			if (recentSuggestions.indices.length) {
+				cy.get('[data-cy=recent-suggestions-indices] .ant-select-selection-item').each(
+					($el, i) => {
+						if (i < recentSuggestions.indices.length - 1) {
+							cy.wrap($el).contains(recentSuggestions.indices[i]);
+						}
+					},
+				);
+			}
 		});
 	});
 	it('Should logout user', () => {
