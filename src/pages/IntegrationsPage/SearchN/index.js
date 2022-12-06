@@ -1,11 +1,7 @@
 import React, { useEffect } from 'react';
-import get from 'lodash/get';
 import { connect } from 'react-redux';
-import { bool, string } from 'prop-types';
 import List from './List';
 import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
-import { versionCompare } from '../../../batteries/utils/helpers';
-import Main from './Main';
 import { event, timingEvent } from '../../../utils/gtag';
 import moment from '../../../utils/moment';
 
@@ -17,7 +13,7 @@ const bannerDetailsPaid = {
 	href: 'http://docs.reactivesearch.io/docs/reactivesearch/ui-builder/search/',
 };
 
-const SearchIntegrationsPage = ({ arcVersion }) => {
+const SearchIntegrationsPage = () => {
 	useEffect(() => {
 		const startTime = moment();
 		// triggering custom event for google analytics
@@ -43,26 +39,15 @@ const SearchIntegrationsPage = ({ arcVersion }) => {
 	return (
 		<>
 			<Banner {...bannerDetailsPaid} />
-			{versionCompare(arcVersion, '7.54.0') === -1 ? <Main /> : <List />}
+			<List />
 		</>
 	);
 };
 
-SearchIntegrationsPage.defaultProps = {
-	featureEcommerce: false,
-};
+SearchIntegrationsPage.defaultProps = {};
 
-SearchIntegrationsPage.propTypes = {
-	tier: string.isRequired,
-	featureEcommerce: bool,
-	// System props
-	arcVersion: string.isRequired,
-};
+SearchIntegrationsPage.propTypes = {};
 
-const mapStateToProps = (state) => ({
-	arcVersion: get(state, '$getAppPlan.results.version'),
-	tier: get(state, '$getAppPlan.results.tier'),
-	featureEcommerce: get(state, '$getAppPlan.results.feature_ecommerce', false),
-});
+const mapStateToProps = () => ({});
 
 export default connect(mapStateToProps, null)(SearchIntegrationsPage);
