@@ -445,7 +445,7 @@ class CreateCredentials extends React.Component {
 										</Button>,
 								  ]
 						}
-						visible={show}
+						open={show}
 						onCancel={handleCancel}
 						width="750px"
 					>

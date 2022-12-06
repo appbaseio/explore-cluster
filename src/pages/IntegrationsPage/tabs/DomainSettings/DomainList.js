@@ -92,7 +92,7 @@ const DomainList = ({
 				</>
 			) : null}
 			<Modal
-				visible={visible}
+				open={visible}
 				title="Confirm domain deletion"
 				onOk={() => {
 					handleDelete(response.name);

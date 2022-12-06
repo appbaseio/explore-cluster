@@ -81,7 +81,7 @@ class PaymentButtonMobile extends React.Component {
 					</Link>
 					<Modal
 						title="Update plan"
-						visible={visible}
+						open={visible}
 						onCancel={this.handleCancel}
 						onOk={() => {
 							handleToken(null, plan);

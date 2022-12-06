@@ -86,7 +86,7 @@ class ExportModal extends React.Component {
 					<React.Fragment>
 						<Modal
 							title="Export Code"
-							visible={visible}
+							open={visible}
 							okText={showInstruction ? 'Ok' : 'Continue'}
 							onOk={this.handleOk}
 							onCancel={this.handleCancel}

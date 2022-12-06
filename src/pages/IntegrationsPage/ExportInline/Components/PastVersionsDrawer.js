@@ -88,7 +88,7 @@ const PastVersionsDrawer = ({
 				placement="right"
 				closable={false}
 				onClose={() => setVisible(false)}
-				visible={visible}
+				open={visible}
 			>
 				<Row>
 					<ActiveVersion />

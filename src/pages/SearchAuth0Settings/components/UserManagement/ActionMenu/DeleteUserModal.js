@@ -10,7 +10,7 @@ const DeleteUserModal = ({ username, visible, handleClose, handleDeleteUser, isL
 	return (
 		<Modal
 			className={deleteUserCss}
-			visible={visible}
+			open={visible}
 			onCancel={handleClose}
 			title={<h3>Delete User</h3>}
 			width="max(50vw, 300px)"

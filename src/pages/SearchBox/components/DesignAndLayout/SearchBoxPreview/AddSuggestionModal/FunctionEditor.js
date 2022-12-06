@@ -446,7 +446,7 @@ const FunctionEditor = ({
 	if (openAsModal) {
 		return (
 			<Modal
-				visible={modalVisible}
+				open={modalVisible}
 				footer={null}
 				title={title}
 				onCancel={() => {

@@ -281,7 +281,7 @@ class PreferenceForm extends React.Component {
 						>
 							{(endpointControl) => (
 								<Modal
-									visible={modalVisible.endpoint}
+									open={modalVisible.endpoint}
 									onOk={() => {
 										if (endpointControl.valid) {
 											this.fetchExecutionContextResponse(

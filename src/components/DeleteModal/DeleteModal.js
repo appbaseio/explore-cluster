@@ -45,7 +45,7 @@ class DeleteModal extends React.Component {
 					}}
 					okText="Delete"
 					onOk={this.handleOk}
-					visible={isVisible}
+					open={isVisible}
 					onCancel={this.handleVisibility}
 				>
 					<Typography.Paragraph>

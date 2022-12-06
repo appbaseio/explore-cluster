@@ -100,7 +100,7 @@ class CopyField extends React.Component {
 						style={{
 							maxWidth: '800px',
 						}}
-						visible={isVisible}
+						open={isVisible}
 						onOk={this.copyField}
 						onCancel={this.handleVisible}
 						okButtonProps={{

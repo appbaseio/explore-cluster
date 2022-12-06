@@ -64,7 +64,7 @@ const CreateNewUserModal = ({ visible, handleClose, handleCreateUser, isCreating
 	return (
 		<Modal
 			className={createUserCss}
-			visible={visible}
+			open={visible}
 			onCancel={handleClose}
 			title={<h3>Create user</h3>}
 			width="max(50vw, 300px)"

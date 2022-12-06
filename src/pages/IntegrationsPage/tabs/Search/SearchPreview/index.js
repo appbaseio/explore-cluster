@@ -84,7 +84,7 @@ const SearchPreviewModal = ({ form, backend, getPreferencesPayload }) => {
 			/>
 			<Modal
 				title="Search Preview"
-				visible={isOpen}
+				open={isOpen}
 				onOk={handleCancel}
 				onCancel={handleCancel}
 				width="80%"

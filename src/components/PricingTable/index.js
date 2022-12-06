@@ -396,7 +396,7 @@ class PricingTable extends Component {
 			<React.Fragment>
 				<Modal
 					title="Cancel Subscription"
-					visible={showOtpModal}
+					open={showOtpModal}
 					onCancel={this.closeOtpModal}
 					footer={[
 						<Button key="back1" onClick={this.closeOtpModal}>

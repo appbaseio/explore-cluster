@@ -255,7 +255,7 @@ class SearchPreviewWrapper extends React.Component {
 				{visible && (
 					<Modal
 						className={modalStyles}
-						visible={visible}
+						open={visible}
 						onCancel={this.toggleVisibility}
 						footer={null}
 						destroyOnClose

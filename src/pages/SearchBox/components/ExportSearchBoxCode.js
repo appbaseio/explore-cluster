@@ -31,7 +31,7 @@ const ExportSearchBoxCode = ({ visible, onCancel, searchBoxId, initialCredential
 	return (
 		<Modal
 			title="Export Code"
-			visible={visible}
+			open={visible}
 			onCancel={onCancel}
 			className={modalStyles}
 			footer={null}

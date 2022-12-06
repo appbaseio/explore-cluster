@@ -96,7 +96,7 @@ const ViewDetailsModal = ({
 	return (
 		<Modal
 			className={detailsModalCss}
-			visible={visible}
+			open={visible}
 			onCancel={handleClose}
 			footer={null}
 			title="User Details"

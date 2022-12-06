@@ -36,7 +36,7 @@ const CommitModal = ({
 					Commit code for <b>{uiBuilderName}</b>
 				</div>
 			}
-			visible={open}
+			open={open}
 			onOk={() => {
 				handleOk(value);
 			}}

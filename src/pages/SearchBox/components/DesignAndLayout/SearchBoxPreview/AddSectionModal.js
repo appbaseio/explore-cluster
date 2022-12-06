@@ -74,7 +74,7 @@ const AddSectionModalContent = (props) => {
 				Add Section
 			</Button>{' '}
 			<Modal
-				visible={visible}
+				open={visible}
 				onCancel={onCancel}
 				title="Add Section"
 				className={container}

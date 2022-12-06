@@ -376,7 +376,7 @@ const PipelineEditorComponent = (props) => {
 		<Container css={CSS}>
 			<Dropdown
 				className="stages-dropdown"
-				visible={showStagesMenu}
+				open={showStagesMenu}
 				overlayStyle={{ zIndex: 999 }}
 				overlay={
 					<StagesMenu

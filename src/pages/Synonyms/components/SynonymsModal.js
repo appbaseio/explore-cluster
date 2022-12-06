@@ -186,7 +186,7 @@ class SynonymsModal extends React.Component {
 					})}
 				<Modal
 					title={isAddModal ? 'Add new Synonym' : 'Update Synonym'}
-					visible={showModal}
+					open={showModal}
 					onCancel={this.handleCloseModal}
 					onOk={this.handleSave}
 					okText={isAddModal ? 'Add' : 'Update'}
