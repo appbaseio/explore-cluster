@@ -171,13 +171,13 @@ describe('Searchable fields remove test flow', () => {
 			.should('contain', 'name')
 			.get('[data-cy=old-weight]')
 			.eq(14)
-			.should('contain', 'N/A');
+			.should('contain', 'N/A')
 
-		// .get('[data-cy=search-field-phone]')
-		// .should('contain', 'phone')
-		// .get('[data-cy=old-weight]')
-		// .eq(21)
-		// .should('contain', 'N/A');
+			.get('[data-cy=search-field-phone]')
+			.should('contain', 'phone')
+			.get('[data-cy=old-weight]')
+			.eq(21)
+			.should('contain', 'N/A');
 
 		cy.get('[data-cy=cancel-modal-button]').click();
 	});

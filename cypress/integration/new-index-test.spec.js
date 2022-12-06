@@ -47,16 +47,11 @@ describe('New index test flow', () => {
 	});
 
 	it('Should open language settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/languages`).wait(5000);
+		cy.visit(`${base_url}/app/${indexName}/languages`).wait(PAGE_LOAD_TIME);
 	});
 
 	it('Should check selected language', () => {
-		cy.get('[data-cy=language-value]')
-			.children()
-			.get('.ant-select-selection-selected-value')
-			.then(($div) => {
-				expect($div).to.contain('English');
-			});
+		cy.get('[data-cy=language-value] .ant-select-selection-item').contains('English');
 	});
 
 	it('Should delete index', () => {

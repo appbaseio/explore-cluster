@@ -1,6 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
-import { PAGE_LOAD_TIME } from './contants';
+import { LONG_REQUEST_RESOLVE_TIME, PAGE_LOAD_TIME } from './contants';
 
 let indexName = '';
 
@@ -77,22 +77,16 @@ describe('Reset to default settings test flow', () => {
 	});
 
 	it('Should open search settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/search`).wait(5000);
+		cy.visit(`${base_url}/app/${indexName}/search`).wait(PAGE_LOAD_TIME);
 	});
 
 	it('Should change field weight of email in search settings', () => {
 		cy.get('[data-cy=email-number-input]').click().type('{uparrow}{uparrow}{uparrow}{uparrow}');
-	});
-
-	it('Wait for some time', () => {
 		cy.wait(2000);
 	});
 
 	it('Should not change field weight of name in search settings', () => {
 		cy.get('[data-cy=name-number-input]').click();
-	});
-
-	it('Wait for some time', () => {
 		cy.wait(2000);
 	});
 
@@ -167,7 +161,7 @@ describe('Reset to default settings test flow', () => {
 	});
 
 	it('Should save and deploy the default settings', () => {
-		cy.get('[data-cy=review-save-button]').click().wait(5000);
+		cy.get('[data-cy=review-save-button]').click().wait(LONG_REQUEST_RESOLVE_TIME);
 	});
 
 	it('Should check the deployed default settings', () => {
