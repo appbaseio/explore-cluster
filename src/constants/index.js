@@ -62,29 +62,29 @@ const SIDE_BAR = {
 };
 
 const ALLOWED_ACTIONS = {
-	OVERVIEW: 'overview',
+	UI_BUILDER: 'uibuilder',
 	DEVELOP: 'develop',
-	ANALYTICS: 'analytics',
-	CURATED_INSIGHTS: 'curated-insights',
-	SEARCH_RELEVANCY: 'search-relevancy',
 	PIPELINES: 'pipelines',
-	ACCESS_CONTROL: 'access-control',
+	SEARCH_RELEVANCY: 'search-relevancy',
 	USER_MANAGEMENT: 'user-management',
+	ACCESS_CONTROL: 'access-control',
+	ANALYTICS: 'analytics',
+	OVERVIEW: 'overview',
+	// CURATED_INSIGHTS: 'curated-insights',
 	BILLING: 'billing',
 	DOWNTIME_ALERTS: 'downtime-alerts',
-	UI_BUILDER: 'uibuilder',
 	SPEED: 'speed',
 };
 
 const ALLOWED_ACTIONS_LABELS = {
 	[ALLOWED_ACTIONS.OVERVIEW]: 'Overview',
-	[ALLOWED_ACTIONS.DEVELOP]: 'Develop',
+	[ALLOWED_ACTIONS.DEVELOP]: 'Data',
 	[ALLOWED_ACTIONS.ANALYTICS]: 'Analytics',
 	[ALLOWED_ACTIONS.CURATED_INSIGHTS]: 'Curated Insights',
-	[ALLOWED_ACTIONS.SEARCH_RELEVANCY]: 'Search Relevancy',
+	[ALLOWED_ACTIONS.SEARCH_RELEVANCY]: 'Search Relevance',
 	[ALLOWED_ACTIONS.PIPELINES]: 'Pipelines',
-	[ALLOWED_ACTIONS.ACCESS_CONTROL]: 'Access Control',
-	[ALLOWED_ACTIONS.USER_MANAGEMENT]: 'User Management',
+	[ALLOWED_ACTIONS.ACCESS_CONTROL]: 'API Credentials',
+	[ALLOWED_ACTIONS.USER_MANAGEMENT]: 'User Management', // moved under Access Control menu
 	[ALLOWED_ACTIONS.BILLING]: 'Billing',
 	[ALLOWED_ACTIONS.DOWNTIME_ALERTS]: 'Downtime Alerts',
 	[ALLOWED_ACTIONS.UI_BUILDER]: 'UI Builder',

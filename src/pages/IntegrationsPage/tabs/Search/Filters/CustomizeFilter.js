@@ -210,18 +210,20 @@ class CustomizeFilter extends React.Component {
 																}}
 																form={form}
 															/>
-															{type === 'color' && value.dataField && (
-																<div
-																	style={{
-																		lineHeight: 'normal',
-																		color: 'tomato',
-																	}}
-																>
-																	Field is expected to be of Color
-																	/ List type. Facet may not
-																	render correctly otherwise.
-																</div>
-															)}
+															{type === 'color' &&
+																value.dataField && (
+																	<div
+																		style={{
+																			lineHeight: 'normal',
+																			color: 'tomato',
+																		}}
+																	>
+																		Field is expected to be of
+																		Color / List type. Facet may
+																		not render correctly
+																		otherwise.
+																	</div>
+																)}
 														</Form.Item>
 													)
 												}
@@ -674,100 +676,110 @@ class CustomizeFilter extends React.Component {
 												</>
 											)}
 
-											{!disableListOptions && value?.filterType === 'date' && (
-												<>
-													<FieldControl
-														name="startValue"
-														control={control.get('startValue')}
-													>
-														{({ handler }) => (
-															<div className={DatePickerStyles}>
-																<Form.Item label="Start Value">
-																	<DayPickerInput
-																		placeholder="Enter start value (YYYY-MM-DD)"
+											{!disableListOptions &&
+												value?.filterType === 'date' && (
+													<>
+														<FieldControl
+															name="startValue"
+															control={control.get('startValue')}
+														>
+															{({ handler }) => (
+																<div className={DatePickerStyles}>
+																	<Form.Item label="Start Value">
+																		<DayPickerInput
+																			placeholder="Enter start value (YYYY-MM-DD)"
+																			{...handler()}
+																			onDayChange={(day) => {
+																				handler().onChange(
+																					day,
+																				);
+																			}}
+																		/>
+																	</Form.Item>
+																</div>
+															)}
+														</FieldControl>
+														<FieldControl
+															name="endValue"
+															control={control.get('endValue')}
+														>
+															{({ handler }) => (
+																<div className={DatePickerStyles}>
+																	<Form.Item label="End Value">
+																		<DayPickerInput
+																			placeholder="Enter end value (YYYY-MM-DD)"
+																			{...handler()}
+																			onDayChange={(day) => {
+																				handler().onChange(
+																					day,
+																				);
+																			}}
+																		/>
+																	</Form.Item>
+																</div>
+															)}
+														</FieldControl>
+														<TextInput
+															name="startLabel"
+															label="Start Label"
+															inputProps={{
+																placeholder: 'Enter start label',
+															}}
+															control={control.get('startLabel')}
+														/>
+														<TextInput
+															name="endLabel"
+															label="End Label"
+															inputProps={{
+																placeholder: 'Enter end label',
+															}}
+															control={control.get('endLabel')}
+														/>
+														<FieldControl
+															name="calendarInterval"
+															strict={false}
+															control={control.get(
+																'calendarInterval',
+															)}
+														>
+															{({ handler }) => (
+																<Form.Item label="Calendar Interval">
+																	<Select
 																		{...handler()}
-																		onDayChange={(day) => {
-																			handler().onChange(day);
-																		}}
+																		value={
+																			handler().value ||
+																			undefined
+																		}
+																		allowClear
+																		placeholder="Specify a calendar interval"
+																	>
+																		{CALENDAR_INTERVAL_FIELDS.map(
+																			(item) => (
+																				<Select.Option
+																					key={item.value}
+																				>
+																					{item.label}
+																				</Select.Option>
+																			),
+																		)}
+																	</Select>
+																</Form.Item>
+															)}
+														</FieldControl>
+														<FieldControl
+															name="showHistogram"
+															control={control.get('showHistogram')}
+														>
+															{({ handler }) => (
+																<Form.Item label="Show Histogram">
+																	<Switch
+																		{...handler('checkbox')}
 																	/>
 																</Form.Item>
-															</div>
-														)}
-													</FieldControl>
-													<FieldControl
-														name="endValue"
-														control={control.get('endValue')}
-													>
-														{({ handler }) => (
-															<div className={DatePickerStyles}>
-																<Form.Item label="End Value">
-																	<DayPickerInput
-																		placeholder="Enter end value (YYYY-MM-DD)"
-																		{...handler()}
-																		onDayChange={(day) => {
-																			handler().onChange(day);
-																		}}
-																	/>
-																</Form.Item>
-															</div>
-														)}
-													</FieldControl>
-													<TextInput
-														name="startLabel"
-														label="Start Label"
-														inputProps={{
-															placeholder: 'Enter start label',
-														}}
-														control={control.get('startLabel')}
-													/>
-													<TextInput
-														name="endLabel"
-														label="End Label"
-														inputProps={{
-															placeholder: 'Enter end label',
-														}}
-														control={control.get('endLabel')}
-													/>
-													<FieldControl
-														name="calendarInterval"
-														strict={false}
-														control={control.get('calendarInterval')}
-													>
-														{({ handler }) => (
-															<Form.Item label="Calendar Interval">
-																<Select
-																	{...handler()}
-																	value={
-																		handler().value || undefined
-																	}
-																	allowClear
-																	placeholder="Specify a calendar interval"
-																>
-																	{CALENDAR_INTERVAL_FIELDS.map(
-																		(item) => (
-																			<Select.Option
-																				key={item.value}
-																			>
-																				{item.label}
-																			</Select.Option>
-																		),
-																	)}
-																</Select>
-															</Form.Item>
-														)}
-													</FieldControl>
-													<FieldControl
-														name="showHistogram"
-														control={control.get('showHistogram')}
-													>
-														{({ handler }) => (
-															<Form.Item label="Show Histogram">
-																<Switch {...handler('checkbox')} />
-															</Form.Item>
-														)}
-													</FieldControl>
-												</>
-											)}
+															)}
+														</FieldControl>
+													</>
+												)}
 											{value.dataField ? (
 												<>
 													<CodeEditorCard>

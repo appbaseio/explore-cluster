@@ -164,6 +164,10 @@ class DashboardWrapper extends Component {
 								action: 'access-control',
 								menu: [
 									{
+										label: 'User Management',
+										link: '/cluster/user-management',
+									},
+									{
 										label: 'API Credentials',
 										link: '/cluster/credentials',
 									},
@@ -290,6 +294,10 @@ class DashboardWrapper extends Component {
 										icon: 'key',
 										action: 'access-control',
 										menu: [
+											{
+												label: 'User Management',
+												link: '/cluster/user-management',
+											},
 											{
 												label: 'API Credentials',
 												link: '/cluster/credentials',
@@ -425,7 +433,6 @@ class DashboardWrapper extends Component {
 								resetAutoComplete={this.resetSearch}
 							/>
 						)}
-
 						{!value &&
 							Object.keys(routesFiltered).map((route) => {
 								if (routes[route].menu) {
@@ -442,7 +449,9 @@ class DashboardWrapper extends Component {
 													item.link.includes(
 														'configure-search-engine-backend',
 													) &&
-													backendImage !== 'sls'
+													(backendImage !== 'sls' ||
+														backend === BACKENDS.FUSION.name ||
+														backend === BACKENDS.MARKLOGIC.name)
 												) {
 													return null;
 												}

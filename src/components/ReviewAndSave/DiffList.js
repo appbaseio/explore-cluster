@@ -150,73 +150,69 @@ const DiffList = ({ diff }) => {
 														]}
 													/>
 												)}
-											{item.title === 'rankFeature' &&
-												setting === 'search' && (
-													<Table
-														bordered
-														key={item.title}
-														pagination={false}
-														size="small"
-														rowKey="field"
-														dataSource={item.data}
-														style={{
-															height: 300,
-															overflow: 'auto',
-														}}
-														columns={[
-															{
-																title: 'Field',
-																key: 'field',
-																dataIndex: 'field',
-																render: (field, fieldData) => (
-																	<>
-																		{get(
-																			fieldData,
-																			'isDeleted',
-																		) ? (
-																			<span>
-																				{field}&nbsp;
-																				<Tag color="red">
-																					removed
+											{item.title === 'rankFeature' && setting === 'search' && (
+												<Table
+													bordered
+													key={item.title}
+													pagination={false}
+													size="small"
+													rowKey="field"
+													dataSource={item.data}
+													style={{
+														height: 300,
+														overflow: 'auto',
+													}}
+													columns={[
+														{
+															title: 'Field',
+															key: 'field',
+															dataIndex: 'field',
+															render: (field, fieldData) => (
+																<>
+																	{get(fieldData, 'isDeleted') ? (
+																		<span>
+																			{field}&nbsp;
+																			<Tag color="red">
+																				removed
+																			</Tag>
+																		</span>
+																	) : (
+																		<span>
+																			{field}&nbsp;
+																			{fieldData.oldValue ===
+																				'N/A' && (
+																				<Tag color="green">
+																					new
 																				</Tag>
-																			</span>
-																		) : (
-																			<span>
-																				{field}&nbsp;
-																				{fieldData.oldValue ===
-																					'N/A' && (
-																					<Tag color="green">
-																						new
-																					</Tag>
-																				)}
-																			</span>
-																		)}
-																	</>
-																),
-															},
-															{
-																title: 'Old Function',
-																key: 'oldValue',
-																dataIndex: 'oldValue',
-																render: (ov) => (
-																	<Tag color="volcano">
-																		{ov.toString()}
-																	</Tag>
-																),
-															},
-															{
-																title: 'New Function',
-																key: 'newValue',
-																dataIndex: 'newValue',
-																render: (nv) => (
-																	<Tag color="green">
-																		{nv.toString()}
-																	</Tag>
-																),
-															},
-														]}
-													/>
-												)}
+																			)}
+																		</span>
+																	)}
+																</>
+															),
+														},
+														{
+															title: 'Old Function',
+															key: 'oldValue',
+															dataIndex: 'oldValue',
+															render: (ov) => (
+																<Tag color="volcano">
+																	{ov.toString()}
+																</Tag>
+															),
+														},
+														{
+															title: 'New Function',
+															key: 'newValue',
+															dataIndex: 'newValue',
+															render: (nv) => (
+																<Tag color="green">
+																	{nv.toString()}
+																</Tag>
+															),
+														},
+													]}
+												/>
+											)}
 											{(item.title === 'ngramSettings' ||
 												item.title === 'autosuggestionSettings') &&
 												setting === 'search' && (

@@ -57,7 +57,7 @@ const container = css`
 		.error-span {
 			position: absolute;
 			color: red;
-			bottom: 5px;
+			bottom: -22px;
 			left: 2px;
 			display: block;
 			width: max-content;
@@ -103,7 +103,7 @@ const ApplicationSettings = () => {
 					render={({ touched }) => {
 						return (
 							<div id="application-settings-form">
-								{/* <FieldControl
+								<FieldControl
 									name="name"
 									render={({ handler, errors }) => {
 										const showError = touched && errors?.required;
@@ -129,7 +129,7 @@ const ApplicationSettings = () => {
 											/>
 										);
 									}}
-								/> */}
+								/>
 								{/* <FieldControl name="logo_uri" strict={false}>
 									{({ value }) => {
 										return (

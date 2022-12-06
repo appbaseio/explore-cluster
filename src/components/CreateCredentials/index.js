@@ -400,14 +400,17 @@ class CreateCredentials extends React.Component {
 		const allowedActions = getAllowedActionsByVersion(appbaseVersion, backend);
 
 		// don't show downtime alerts in case of hosted / self hosted arc
-		const actionOptions = isClusterPlan
-			? Object.values(allowedActions).map((i) => ({
-					value: i,
-					label: ALLOWED_ACTIONS_LABELS[i],
-			  }))
-			: Object.values(allowedActions)
-					.filter((i) => i !== allowedActions.DOWNTIME_ALERTS)
-					.map((i) => ({ value: i, label: ALLOWED_ACTIONS_LABELS[i] }));
+		const actionOptions = (
+			isClusterPlan
+				? Object.values(allowedActions).map((i) => ({
+						value: i,
+						label: ALLOWED_ACTIONS_LABELS[i],
+				  }))
+				: Object.values(allowedActions)
+						.filter((i) => i !== allowedActions.DOWNTIME_ALERTS)
+						.map((i) => ({ value: i, label: ALLOWED_ACTIONS_LABELS[i] }))
+		).filter((i) => i.value !== 'overview');
+
 		return (
 			<FieldGroup
 				strict={false}
