@@ -34,6 +34,8 @@ describe('Change normalize diacritics test flow', () => {
 
 	it('Should create new index', () => {
 		cy.wait(1000).get('[data-cy=initialize-new-index-creation]').click().wait(2000);
+		cy.server();
+		cy.route('PUT', `**/${indexName}`).as('indexing');
 		cy.get('[data-cy=new-index-name]')
 			.type(`${indexName}`)
 			.get('[data-cy=new-index-language]')
@@ -42,8 +44,9 @@ describe('Change normalize diacritics test flow', () => {
 			.wait(1000)
 
 			.get('[data-cy=create-new-index]')
-			.click()
-			.wait(5000);
+			.click();
+
+		cy.wait('@indexing').wait(5000);
 	});
 
 	it('Should index data', () => {
@@ -75,7 +78,10 @@ describe('Change normalize diacritics test flow', () => {
 	});
 
 	it('Should open language settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/languages`).wait(PAGE_LOAD_TIME);
+		cy.server();
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/app/${indexName}/languages`);
+		cy.wait('@indices', { timeout: 25000 });
 	});
 
 	it('Should disable Normalize Diacritics', () => {
@@ -90,8 +96,9 @@ describe('Change normalize diacritics test flow', () => {
 			.should('contain', 'false');
 		cy.server();
 		cy.route('**/_mapping').as('mapping');
+		cy.route('POST', '**/_reindex/**').as('reindex');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@mapping'], { timeout: 25000 }).wait(5000);
+		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
 	});
 
 	it('Should fetch setting from the app url & check for asciifolding to be not present in filters', () => {
@@ -149,8 +156,9 @@ describe('Change normalize diacritics test flow', () => {
 			.should('contain', 'true');
 		cy.server();
 		cy.route('**/_mapping').as('mapping');
+		cy.route('POST', '**/_reindex/**').as('reindex');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@mapping'], { timeout: 25000 }).wait(5000);
+		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
 	});
 
 	it('Should check the state for normalizeDiacritics is true from the redux store', () => {
