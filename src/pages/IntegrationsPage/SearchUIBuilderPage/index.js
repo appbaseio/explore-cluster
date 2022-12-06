@@ -1,6 +1,10 @@
+/*
+	route: /cluster/search-builder
+	meta: wrapper around UiBuildersList.js
+*/
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import List from './List';
+import UiBuildersList from './UiBuildersList';
 import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
 import { event, timingEvent } from '../../../utils/gtag';
 import moment from '../../../utils/moment';
@@ -39,7 +43,7 @@ const SearchIntegrationsPage = () => {
 	return (
 		<>
 			<Banner {...bannerDetailsPaid} />
-			<List />
+			<UiBuildersList />
 		</>
 	);
 };

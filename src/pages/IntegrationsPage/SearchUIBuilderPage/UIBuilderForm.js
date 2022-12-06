@@ -1,3 +1,7 @@
+/*
+	route: /cluster/search-builder/:id
+*/
+
 import React, { useEffect, useState } from 'react';
 import { withRouter } from 'react-router-dom';
 import get from 'lodash/get';
