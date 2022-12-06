@@ -11,12 +11,15 @@ import { PlusOutlined } from '@ant-design/icons';
 import { Table, Card, Button } from 'antd';
 import { connect } from 'react-redux';
 import moment from 'moment';
-import Actions from '../Actions';
-import Loader from '../../../batteries/components/shared/Loader/Spinner';
-import Container from '../../../components/Container';
-import { displayErrors } from '../../../batteries/utils/helpers';
-import usePrevious from '../../../batteries/hooks/usePrevious';
-import { getSearchPreferencesN, deleteSearchPreferenceN } from '../../../batteries/modules/actions';
+import Actions from '../../Actions';
+import Loader from '../../../../batteries/components/shared/Loader/Spinner';
+import Container from '../../../../components/Container';
+import { displayErrors } from '../../../../batteries/utils/helpers';
+import usePrevious from '../../../../batteries/hooks/usePrevious';
+import {
+	getSearchPreferencesN,
+	deleteSearchPreferenceN,
+} from '../../../../batteries/modules/actions';
 
 const columns = [
 	{

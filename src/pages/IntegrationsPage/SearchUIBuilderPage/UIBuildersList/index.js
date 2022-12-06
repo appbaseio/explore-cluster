@@ -1,13 +1,13 @@
 /*
 	route: /cluster/search-builder
-	meta: wrapper around UiBuildersList.js
+	meta: wrapper around UIBuildersList.js
 */
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import UiBuildersList from './UiBuildersList';
-import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
-import { event, timingEvent } from '../../../utils/gtag';
-import moment from '../../../utils/moment';
+import UIBuildersList from './UIBuildersList';
+import Banner from '../../../../batteries/components/shared/UpgradePlan/Banner';
+import { event, timingEvent } from '../../../../utils/gtag';
+import moment from '../../../../utils/moment';
 
 const bannerDetailsPaid = {
 	title: 'Search UI Builder',
@@ -43,7 +43,7 @@ const SearchIntegrationsPage = () => {
 	return (
 		<>
 			<Banner {...bannerDetailsPaid} />
-			<UiBuildersList />
+			<UIBuildersList />
 		</>
 	);
 };
