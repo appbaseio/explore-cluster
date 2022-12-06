@@ -1,6 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
-import { PAGE_LOAD_TIME } from './contants';
+import { PAGE_LOAD_TIME } from '../utils/constants';
 
 let indexName = '';
 
@@ -34,7 +34,6 @@ describe('Change normalize diacritics test flow', () => {
 
 	it('Should create new index', () => {
 		cy.wait(1000).get('[data-cy=initialize-new-index-creation]').click().wait(2000);
-		generateName();
 		cy.get('[data-cy=new-index-name]')
 			.type(`${indexName}`)
 			.get('[data-cy=new-index-language]')
@@ -76,7 +75,7 @@ describe('Change normalize diacritics test flow', () => {
 	});
 
 	it('Should open language settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/languages`).wait(5000);
+		cy.visit(`${base_url}/app/${indexName}/languages`).wait(PAGE_LOAD_TIME);
 	});
 
 	it('Should disable Normalize Diacritics', () => {
@@ -89,39 +88,41 @@ describe('Change normalize diacritics test flow', () => {
 			.should('contain', 'true')
 			.get('[data-cy=new-value-normalizeDiacritics-status]')
 			.should('contain', 'false');
-		cy.get('[data-cy=review-save-button]').click().wait(5000);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.get('[data-cy=review-save-button]').click();
+		cy.wait(['@mapping'], { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should fetch setting from the app url & check for asciifolding to be not present in filters', () => {
-		cy.request(`https://${username}:${password}@${cluster}/${indexName}/_settings`)
-			.as('settings')
-			.wait(5000);
-		cy.get('@settings').should((response) => {
-			expect(
-				response.body[indexName].settings.index.analysis.analyzer.autosuggest_analyzer
-					.filter,
-			).to.not.include('asciifolding');
-			expect(
-				response.body[indexName].settings.index.analysis.analyzer.english.filter,
-			).to.not.include('asciifolding');
-			expect(
-				response.body[indexName].settings.index.analysis.analyzer.ngram_analyzer.filter,
-			).to.not.include('asciifolding');
-			expect(
-				response.body[indexName].settings.index.analysis.analyzer.ngram_search_analyzer
-					.filter,
-			).to.not.include('asciifolding');
-			expect(
-				response.body[indexName].settings.index.analysis.analyzer.synonyms.filter,
-			).to.not.include('asciifolding');
-			expect(
-				response.body[indexName].settings.index.analysis.analyzer.universal.filter,
-			).to.not.include('asciifolding');
-			expect(
-				response.body[indexName].settings.index.analysis.analyzer
-					.universal_delimiter_analyzer.filter,
-			).to.not.include('asciifolding');
-		});
+		cy.request(`https://${username}:${password}@${cluster}/${indexName}/_settings`).then(
+			(response) => {
+				expect(
+					response.body[indexName].settings.index.analysis.analyzer.autosuggest_analyzer
+						.filter,
+				).to.not.include('asciifolding');
+				expect(
+					response.body[indexName].settings.index.analysis.analyzer.english.filter,
+				).to.not.include('asciifolding');
+				expect(
+					response.body[indexName].settings.index.analysis.analyzer.ngram_analyzer.filter,
+				).to.not.include('asciifolding');
+				expect(
+					response.body[indexName].settings.index.analysis.analyzer.ngram_search_analyzer
+						.filter,
+				).to.not.include('asciifolding');
+				expect(
+					response.body[indexName].settings.index.analysis.analyzer.synonyms.filter,
+				).to.not.include('asciifolding');
+				expect(
+					response.body[indexName].settings.index.analysis.analyzer.universal.filter,
+				).to.not.include('asciifolding');
+				expect(
+					response.body[indexName].settings.index.analysis.analyzer
+						.universal_delimiter_analyzer.filter,
+				).to.not.include('asciifolding');
+			},
+		);
 	});
 
 	it('Should check the state for normalizeDiacritics is false from the redux store', () => {
@@ -146,7 +147,10 @@ describe('Change normalize diacritics test flow', () => {
 			.should('contain', 'false')
 			.get('[data-cy=new-value-normalizeDiacritics-status]')
 			.should('contain', 'true');
-		cy.get('[data-cy=review-save-button]').click().wait(5000);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.get('[data-cy=review-save-button]').click();
+		cy.wait(['@mapping'], { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should check the state for normalizeDiacritics is true from the redux store', () => {
@@ -162,35 +166,34 @@ describe('Change normalize diacritics test flow', () => {
 	});
 
 	it('Should fetch setting from the app url & check for asciifolding to be present in filters', () => {
-		cy.request(`https://${username}:${password}@${cluster}/${indexName}/_settings`)
-			.as('settings')
-			.wait(5000);
-		cy.get('@settings').should((response) => {
-			expect(
-				response.body[indexName].settings.index.analysis.analyzer.autosuggest_analyzer
-					.filter,
-			).to.include('asciifolding');
-			expect(
-				response.body[indexName].settings.index.analysis.analyzer.english.filter,
-			).to.include('asciifolding');
-			expect(
-				response.body[indexName].settings.index.analysis.analyzer.ngram_analyzer.filter,
-			).to.include('asciifolding');
-			expect(
-				response.body[indexName].settings.index.analysis.analyzer.ngram_search_analyzer
-					.filter,
-			).to.include('asciifolding');
-			expect(
-				response.body[indexName].settings.index.analysis.analyzer.synonyms.filter,
-			).to.include('asciifolding');
-			expect(
-				response.body[indexName].settings.index.analysis.analyzer.universal.filter,
-			).to.include('asciifolding');
-			expect(
-				response.body[indexName].settings.index.analysis.analyzer
-					.universal_delimiter_analyzer.filter,
-			).to.include('asciifolding');
-		});
+		cy.request(`https://${username}:${password}@${cluster}/${indexName}/_settings`).then(
+			(response) => {
+				expect(
+					response.body[indexName].settings.index.analysis.analyzer.autosuggest_analyzer
+						.filter,
+				).to.include('asciifolding');
+				expect(
+					response.body[indexName].settings.index.analysis.analyzer.english.filter,
+				).to.include('asciifolding');
+				expect(
+					response.body[indexName].settings.index.analysis.analyzer.ngram_analyzer.filter,
+				).to.include('asciifolding');
+				expect(
+					response.body[indexName].settings.index.analysis.analyzer.ngram_search_analyzer
+						.filter,
+				).to.include('asciifolding');
+				expect(
+					response.body[indexName].settings.index.analysis.analyzer.synonyms.filter,
+				).to.include('asciifolding');
+				expect(
+					response.body[indexName].settings.index.analysis.analyzer.universal.filter,
+				).to.include('asciifolding');
+				expect(
+					response.body[indexName].settings.index.analysis.analyzer
+						.universal_delimiter_analyzer.filter,
+				).to.include('asciifolding');
+			},
+		);
 	});
 
 	it('Should detect re-indexing and assign index name prior to deletion', () => {
