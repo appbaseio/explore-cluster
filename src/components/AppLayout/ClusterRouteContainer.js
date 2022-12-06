@@ -115,10 +115,10 @@ const StoredQueriesPage = Loadable({
 	loading: Loader,
 });
 
-const SearchIntegrationsPage = Loadable({
+const UIBuildersListPage = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "SearchIntegrationsPage" */ '../../pages/IntegrationsPage/SearchUIBuilderPage'
+			/* webpackChunkName: "UIBuildersListPage" */ '../../pages/IntegrationsPage/SearchUIBuilderPage/index'
 		),
 	loading: Loader,
 });
@@ -150,18 +150,18 @@ const inlineCodesandboxPage = Loadable({
 	loading: Loader,
 });
 
-const SearchPreferencePage = Loadable({
+const UIBuilderFormPage = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "SearchPreferencePage" */ '../../pages/IntegrationsPage/SearchUIBuilderPage/Main'
+			/* webpackChunkName: "UIBuilderFormPage" */ '../../pages/IntegrationsPage/SearchUIBuilderPage/UIBuilderForm'
 		),
 	loading: Loader,
 });
 
-const SearchTemplatePage = Loadable({
+const CreateUIBuilderPage = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "SearchPreferencePage" */ '../../pages/IntegrationsPage/SearchUIBuilderPage/Wizard/index'
+			/* webpackChunkName: "CreateUIBuilderPage" */ '../../pages/IntegrationsPage/SearchUIBuilderPage/CreateUIBuilder'
 		),
 	loading: Loader,
 });
@@ -558,10 +558,7 @@ class ClusterRouteContainer extends React.Component {
 						render={(props) => (
 							<>
 								{get(allowedRoutes, '/cluster/search-builder') ? (
-									<AppPageContainer
-										{...props}
-										component={SearchIntegrationsPage}
-									/>
+									<AppPageContainer {...props} component={UIBuildersListPage} />
 								) : (
 									<UnauthorizedPage />
 								)}
@@ -581,7 +578,7 @@ class ClusterRouteContainer extends React.Component {
 						render={(props) => (
 							<>
 								{get(allowedRoutes, '/cluster/search-builder') ? (
-									<AppPageContainer {...props} component={SearchTemplatePage} />
+									<AppPageContainer {...props} component={CreateUIBuilderPage} />
 								) : (
 									<UnauthorizedPage />
 								)}
@@ -594,7 +591,7 @@ class ClusterRouteContainer extends React.Component {
 						render={(props) => (
 							<>
 								{get(allowedRoutes, '/cluster/search-builder') ? (
-									<AppPageContainer {...props} component={SearchPreferencePage} />
+									<AppPageContainer {...props} component={UIBuilderFormPage} />
 								) : (
 									<UnauthorizedPage />
 								)}

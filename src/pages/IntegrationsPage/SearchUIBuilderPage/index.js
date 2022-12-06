@@ -4,10 +4,10 @@
 */
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import UIBuildersList from './UIBuildersList';
-import Banner from '../../../../batteries/components/shared/UpgradePlan/Banner';
-import { event, timingEvent } from '../../../../utils/gtag';
-import moment from '../../../../utils/moment';
+import UIBuildersList from './UIBuildersList/UIBuildersList';
+import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
+import { event, timingEvent } from '../../../utils/gtag';
+import moment from '../../../utils/moment';
 
 const bannerDetailsPaid = {
 	title: 'Search UI Builder',
