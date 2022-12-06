@@ -3,7 +3,7 @@ import { array, bool, func, object, string } from 'prop-types';
 import React, { useEffect, useState } from 'react';
 import Flex from '../../../../../batteries/components/shared/Flex';
 import DataFieldSelector from '../../../../../components/Form/DataFieldSelector';
-import FusionDatafieldSelector from '../../../SearchN/Wizard/FusionDatafieldSelector';
+import FusionDatafieldSelector from '../../../../../components/Form/FusionDatafieldSelector';
 import PriceUnit from '../PriceUnit';
 
 const Actions = ({ item, value, onChange, pipeline, isFusion, form }) => {

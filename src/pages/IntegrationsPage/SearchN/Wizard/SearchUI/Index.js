@@ -3,7 +3,7 @@ import { List } from 'antd';
 import { FieldControl } from 'react-reactive-form';
 import { string, object, func } from 'prop-types';
 import { ReactiveBase } from '@appbaseio/reactivesearch';
-import FusionDatafieldSelector from '../FusionDatafieldSelector';
+import FusionDatafieldSelector from '../../../../../components/Form/FusionDatafieldSelector';
 import { SearchUIStyles } from '../styles';
 import { getURL } from '../../../../../constants/config';
 import DocType from '../../../tabs/Search/Results/DocType';

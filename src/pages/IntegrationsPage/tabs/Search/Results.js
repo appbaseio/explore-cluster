@@ -8,7 +8,7 @@ import { bool, array, object, string, func } from 'prop-types';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { ReactiveBase } from '@appbaseio/reactivesearch';
 import DataFieldSelector from '../../../../components/Form/DataFieldSelector';
-import FusionDatafieldSelector from '../../SearchN/Wizard/FusionDatafieldSelector';
+import FusionDatafieldSelector from '../../../../components/Form/FusionDatafieldSelector';
 import PriceUnit from './PriceUnit';
 import SortOptionSelector from './SortOptionSelector';
 import DefaultResults from './Results/DefaultResults';
