@@ -1,5 +1,9 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
+import { PAGE_LOAD_TIME } from './contants';
+
+// Track query rule id, to delete later
+let ruleId;
 
 describe('Query Rule creation with trigger index and filter action', () => {
 	before(() => {
@@ -25,12 +29,19 @@ describe('Query Rule creation with trigger index and filter action', () => {
 	});
 
 	it('Should open query rules page', () => {
-		cy.visit(`${base_url}/cluster/rules`).wait(2000);
+		cy.server();
+		cy.route('/arc/plan').as('plan');
+		cy.route('**/_rules').as('rules');
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/cluster/rules`);
+		cy.wait(['@plan', '@rules', '@indices'], { timeout: 25000 });
 	});
 
 	it('Should open new query rule form page', () => {
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
 		cy.get('[data-cy=create-query-rule]').click();
-		cy.wait(3000);
+		cy.wait('@mapping', { timeout: 15000 }).wait(5000);
 	});
 
 	it('Should create a query rule', () => {
@@ -45,8 +56,8 @@ describe('Query Rule creation with trigger index and filter action', () => {
 		cy.get('[data-cy=add_filter]').click({ force: true, multiple: true });
 		cy.wait(1000);
 		cy.get('[data-cy=add-filter-action]').click();
-		cy.get('[data-cy=filter-key]').click().type('br');
-		cy.get('[data-cy=brand]').click();
+		cy.get('[data-cy=filter-key]').click().type('brand{enter}');
+		cy.get('[data-cy=filter-key] .ant-select-selection-item').contains('brand');
 		cy.get('[data-cy=filter-values]').type('apple,samsung,');
 
 		// Save query rule
@@ -58,10 +69,13 @@ describe('Query Rule creation with trigger index and filter action', () => {
 		}).as('save');
 
 		cy.get('[data-cy=save-query-rule]').click();
-		cy.wait('@save', { timeout: 15000 });
-
-		cy.get('@save').then((xhr) => {
-			const ruleId = xhr?.response?.body?.id || null;
+		cy.wait('@save', { timeout: 15000 }).then((xhr) => {
+			ruleId = xhr?.response?.body?.id || null;
+		});
+	});
+	it('Should delete query rule', () => {
+		const credentials = btoa(`${username}:${password}`);
+		if (ruleId) {
 			cy.request({
 				method: 'DELETE',
 				url: `${app_url}_rule/${ruleId}`,
@@ -69,8 +83,8 @@ describe('Query Rule creation with trigger index and filter action', () => {
 					Authorization: `Basic ${credentials}`,
 				},
 			}).wait(2000);
-			cy.visit(`${base_url}/cluster/rules`);
-		});
+			cy.visit(`${base_url}/cluster/rules`).wait(PAGE_LOAD_TIME);
+		}
 	});
 	it('Should logout user', () => {
 		cy.clearLocalStorage();
