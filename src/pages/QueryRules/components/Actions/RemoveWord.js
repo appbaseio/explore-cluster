@@ -16,7 +16,7 @@ const RemoveWord = ({ value = [], onChange }) => {
 			style={{ width: '100%' }}
 			value={value}
 			placeholder="Press enter to add multiple words"
-			dropdownClassName={hideDropdown}
+			popupClassName={hideDropdown}
 			onChange={onChange}
 			tokenSeparators={[',']}
 			data-cy="remove-words"

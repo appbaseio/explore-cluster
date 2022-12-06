@@ -23,7 +23,7 @@ const OneWaySynonym = (props) => {
 			<label>Alternatives</label>
 			<Select
 				mode="tags"
-				dropdownClassName={hideDropdown}
+				popupClassName={hideDropdown}
 				style={{ width: '100%' }}
 				placeholder="Add comma separated alternatives"
 				value={alternatives}

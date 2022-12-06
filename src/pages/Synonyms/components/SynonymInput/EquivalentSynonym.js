@@ -18,7 +18,7 @@ const EquivalentSynonym = (props) => {
 				mode="tags"
 				style={{ width: '100%' }}
 				value={synonyms}
-				dropdownClassName={hideDropdown}
+				popupClassName={hideDropdown}
 				placeholder="Add comma separated synonyms"
 				onChange={handleChange}
 				tokenSeparators={[',']}
