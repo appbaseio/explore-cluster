@@ -103,7 +103,10 @@ describe('Save field schema settings test flow', () => {
 	});
 
 	it('Should confirm the mapping changes', () => {
-		cy.get('[data-cy=confirm-mapping-button]').click().wait(PAGE_LOAD_TIME);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.get('[data-cy=confirm-mapping-button]').click();
+		cy.wait('@mapping', { timeout: 20000 });
 	});
 
 	it('Should check & confirm the mappings from the redux store', () => {

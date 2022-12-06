@@ -1,6 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
-import { PAGE_LOAD_TIME } from './contants';
+import { LONG_REQUEST_RESOLVE_TIME, PAGE_LOAD_TIME } from './contants';
 
 let indexName = '';
 
@@ -93,7 +93,10 @@ describe('Update field schema settings test flow', () => {
 	});
 
 	it('Should confirm the mapping changes', () => {
-		cy.get('[data-cy=confirm-mapping-button]').click().wait(PAGE_LOAD_TIME);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.get('[data-cy=confirm-mapping-button]').click();
+		cy.wait('@mapping', { timeout: 20000 });
 	});
 
 	it('Should check the data type of rating to integer', () => {

@@ -92,7 +92,10 @@ describe('New field from schema should allow it to add to search settings test f
 	});
 
 	it('Should confirm the mapping changes', () => {
-		cy.get('[data-cy=confirm-mapping-button]').click().wait(PAGE_LOAD_TIME);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.get('[data-cy=confirm-mapping-button]').click();
+		cy.wait('@mapping', { timeout: 20000 });
 	});
 
 	it('Should check the newly added data feild', () => {

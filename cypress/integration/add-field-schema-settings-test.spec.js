@@ -90,7 +90,10 @@ describe('Add field schema settings test flow', () => {
 	});
 
 	it('Should confirm the mapping changes', () => {
-		cy.root().contains('Confirm Mapping Changes').click().wait(PAGE_LOAD_TIME);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.get('[data-cy=confirm-mapping-button]').click();
+		cy.wait('@mapping', { timeout: 20000 });
 	});
 
 	it('Should check the newly added data feild', () => {
