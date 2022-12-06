@@ -5,8 +5,6 @@ import get from 'lodash/get';
 import isEqual from 'lodash/isEqual';
 import { connect } from 'react-redux';
 import {
-	saveSearchPreferenceN,
-	saveRecommendationPreferenceN,
 	getSearchPreferencesN,
 	getRecommendationsPreferencesN,
 } from '../../batteries/modules/actions';
@@ -85,39 +83,6 @@ class SavePreferencesN extends React.Component {
 			.diffCount;
 	}
 
-	handleSave = () => {
-		const {
-			isRecommendation,
-			updateSearchPreferences,
-			updateRecommendationsPreferences,
-			getRecommendationsPreferences,
-			getPreferencesPayload,
-			closeForm,
-			clientId,
-		} = this.props;
-
-		if (isRecommendation) {
-			updateRecommendationsPreferences(getPreferencesPayload()).then((action) => {
-				if (!(action && action.error)) {
-					getRecommendationsPreferences();
-				}
-			});
-		} else {
-			const preferencesPayload = getPreferencesPayload();
-
-			// inject auth0 clientId in authentication settings
-			if (preferencesPayload.authenticationSettings && clientId) {
-				preferencesPayload.authenticationSettings.clientId = clientId;
-			}
-
-			updateSearchPreferences(preferencesPayload).then((action) => {
-				if (!(action && action.error)) {
-					closeForm();
-				}
-			});
-		}
-	};
-
 	getOldDataNewData = () => {
 		const { form, getPreferencesPayload } = this.props;
 		const { preferences } = this.state || {};
@@ -192,7 +157,6 @@ SavePreferencesN.defaultProps = {
 		defaultRecommendationsPreferences,
 	),
 	errors: null,
-	clientId: '',
 };
 
 SavePreferencesN.propTypes = {
@@ -200,8 +164,6 @@ SavePreferencesN.propTypes = {
 	preferenceId: string,
 	buttonProps: object,
 	isRecommendation: bool,
-	updateSearchPreferences: func.isRequired,
-	updateRecommendationsPreferences: func.isRequired,
 	getPreferencesPayload: func.isRequired,
 	getPreferences: func.isRequired,
 	getSearchPreferences: func.isRequired,
@@ -211,7 +173,7 @@ SavePreferencesN.propTypes = {
 	form: object.isRequired,
 	errors: arrayOf(object),
 	closeForm: func.isRequired,
-	clientId: string,
+
 	remountComponent: func.isRequired,
 };
 
@@ -224,13 +186,9 @@ const mapStateToProps = (state, props) => ({
 	clientId: get(state, '$getAuth0Preferences.results')?.['_client_id'],
 });
 
-const mapDispatchToProps = (dispatch, props) => ({
+const mapDispatchToProps = (dispatch) => ({
 	getSearchPreferences: () => dispatch(getSearchPreferencesN()),
 	getRecommendationsPreferences: () => dispatch(getRecommendationsPreferencesN()),
-	updateSearchPreferences: (payload) =>
-		dispatch(saveSearchPreferenceN(props.preferenceId, payload)),
-	updateRecommendationsPreferences: (payload) =>
-		dispatch(saveRecommendationPreferenceN(props.preferenceId, payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SavePreferencesN);
