@@ -32,8 +32,9 @@ describe('Searchable fields add test flow', () => {
 	});
 
 	it('Should create new index', () => {
-		cy.get('[data-cy=initialize-new-index-creation]').click().wait(2000);
-		generateName();
+		cy.wait(1000).get('[data-cy=initialize-new-index-creation]').click().wait(2000);
+		cy.server();
+		cy.route('PUT', `**/${indexName}`).as('indexing');
 		cy.get('[data-cy=new-index-name]')
 			.type(`${indexName}`)
 			.get('[data-cy=new-index-language]')
@@ -43,6 +44,8 @@ describe('Searchable fields add test flow', () => {
 
 			.get('[data-cy=create-new-index]')
 			.click();
+
+		cy.wait('@indexing').wait(5000);
 	});
 
 	it('Should index data', () => {
