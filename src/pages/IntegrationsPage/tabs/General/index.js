@@ -5,8 +5,8 @@ import { bool } from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import TextInput from '../../../../components/Form/Input';
 import EndpointDropdown from '../../Endpoint/EndpointDropdown';
-import CredentialsModal from '../../Credentials/CredentialsModal';
 import { FormContext } from '../../utils';
+import CredentialsModal from '../../Credentials/CredentialsModal';
 
 const General = ({ isRecommendation }) => {
 	const form = useContext(FormContext);

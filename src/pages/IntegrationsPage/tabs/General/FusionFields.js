@@ -4,10 +4,10 @@ import { array, object, string } from 'prop-types';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { FieldControl } from 'react-reactive-form';
-import apisMapper from '../../utils/apisMapper';
 import { getApiGeneralization } from '../../utils/be-apis';
 import { BACKENDS } from '../../../../batteries/utils';
 import { transformGeneralMappingsToFusionArrayFormat } from '../../utils/fusion-apis';
+import apisMapper from '../../utils/apisMapper';
 
 const FusionFields = ({ filteredApps, control, backend, endpoints }) => {
 	const [queryProfiles, setQueryProfiles] = useState([]);

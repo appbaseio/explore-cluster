@@ -6,9 +6,9 @@ import { ReactiveBase } from '@appbaseio/reactivesearch';
 import FusionDatafieldSelector from '../../../../../components/Form/FusionDatafieldSelector';
 import { SearchUIStyles } from '../styles';
 import { getURL } from '../../../../../constants/config';
-import DocType from '../../../tabs/Search/Results/DocType';
-import TabLayout from '../../../tabs/Search/Results/TabLayout';
-import DefaultResults from '../../../tabs/Search/Results/DefaultResults';
+import DocType from '../../components/tabs/Search/Results/DocType';
+import TabLayout from '../../components/tabs/Search/Results/TabLayout';
+import DefaultResults from '../../components/tabs/Search/Results/DefaultResults';
 import { getTemplate } from '../../../utils/index';
 
 const defaultSettings = [

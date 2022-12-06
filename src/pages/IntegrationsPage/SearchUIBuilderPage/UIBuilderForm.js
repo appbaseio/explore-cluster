@@ -20,10 +20,6 @@ import { FieldGroup } from 'react-reactive-form';
 import { object, array, func } from 'prop-types';
 import { v4 as uuidv4 } from 'uuid';
 import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
-import LayoutTab from '../tabs/Layout';
-import SearchTab from '../tabs/Search';
-import General from '../tabs/General';
-import DomainSettingsTab from '../tabs/DomainSettings';
 import { container } from '../../ResultsPage/styles';
 import Loader from '../../../components/Loader';
 import PreviewModal from '../PreviewModal';
@@ -31,7 +27,12 @@ import SyncStatus from '../SyncStatus';
 import PreferencesFormWrapper from '../PreferencesFormWrapperN';
 import SavePreferences from '../SavePreferencesN';
 import { getSearchPreferencesN } from '../../../batteries/modules/actions';
-import EndUserAuthentication from '../tabs/EndUserAuthentication';
+
+import EndUserAuthentication from './components/tabs/EndUserAuthentication';
+import LayoutTab from './components/tabs/Layout';
+import SearchTab from './components/tabs/Search';
+import General from '../tabs/General';
+import DomainSettingsTab from './components/tabs/DomainSettings';
 
 const { TabPane } = Tabs;
 
