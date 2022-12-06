@@ -11,7 +11,7 @@ import { createPermission, getPermission } from '../../../../../batteries/module
 import ErrorToaster from '../../../../../batteries/components/shared/ErrorToaster';
 import CreateCredentials from '../../../../../components/CreateCredentials';
 import { configureConnectionStyles, suggestionStyles } from '../styles';
-import EndpointDropdown from '../../../Endpoint/EndpointDropdown';
+import EndpointDropdown from '../../../shared/Endpoint/EndpointDropdown';
 import { BACKENDS } from '../../../../../batteries/utils';
 
 const ConfigureConnection = ({

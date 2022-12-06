@@ -31,7 +31,7 @@ import { getSearchPreferencesN } from '../../../batteries/modules/actions';
 import EndUserAuthentication from './components/tabs/EndUserAuthentication';
 import LayoutTab from './components/tabs/Layout';
 import SearchTab from './components/tabs/Search';
-import General from '../tabs/General';
+import General from '../shared/tabs/General';
 import DomainSettingsTab from './components/tabs/DomainSettings';
 
 const { TabPane } = Tabs;

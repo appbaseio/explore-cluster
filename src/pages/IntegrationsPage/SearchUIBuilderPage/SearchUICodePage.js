@@ -1,14 +1,18 @@
+/*
+	route: /cluster/search-builder/:id/code
+*/
+
 import React from 'react';
 import { Prompt } from 'react-router-dom';
 import { FieldGroup } from 'react-reactive-form';
 import { bool, object } from 'prop-types';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import ExportInline from './ExportInline';
-import PreferencesFormWrapper from './PreferencesFormWrapperN';
-import VersionController from '../../batteries/components/shared/VersionController';
-import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
-import Overlay from '../../components/Overlay';
+import ExportInline from '../ExportInline';
+import PreferencesFormWrapper from '../PreferencesFormWrapperN';
+import VersionController from '../../../batteries/components/shared/VersionController';
+import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
+import Overlay from '../../../components/Overlay';
 
 const bannerMessages = {
 	free: {
@@ -20,7 +24,7 @@ const bannerMessages = {
 	},
 };
 
-const CodeSandboxModal = ({ ...props }) => {
+const SearchUICodePage = ({ ...props }) => {
 	const preferenceId = props.match.params.id;
 
 	const closeForm = () => {
@@ -76,7 +80,7 @@ const CodeSandboxModal = ({ ...props }) => {
 	);
 };
 
-CodeSandboxModal.propTypes = {
+SearchUICodePage.propTypes = {
 	history: object.isRequired,
 	match: object.isRequired,
 	isPaidUser: bool.isRequired,
@@ -86,4 +90,4 @@ const mapStateToProps = (state) => ({
 	isPaidUser: get(state, '$getAppPlan.results.isPaid'),
 });
 
-export default connect(mapStateToProps)(CodeSandboxModal);
+export default connect(mapStateToProps)(SearchUICodePage);

@@ -142,10 +142,10 @@ const SearchBoxForm = Loadable({
 	loading: Loader,
 });
 
-const inlineCodesandboxPage = Loadable({
+const SearchUICodePage = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "inlineCodesandboxPage" */ '../../pages/IntegrationsPage/CodeSandboxModal'
+			/* webpackChunkName: "SearchUICodePage" */ '../../pages/IntegrationsPage/SearchUIBuilderPage/SearchUICodePage'
 		),
 	loading: Loader,
 });
@@ -611,10 +611,7 @@ class ClusterRouteContainer extends React.Component {
 						render={(props) => (
 							<>
 								{get(allowedRoutes, '/cluster/search-builder') ? (
-									<AppPageContainer
-										{...props}
-										component={inlineCodesandboxPage}
-									/>
+									<AppPageContainer {...props} component={SearchUICodePage} />
 								) : (
 									<UnauthorizedPage />
 								)}

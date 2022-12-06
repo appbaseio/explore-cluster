@@ -13,7 +13,7 @@ import CustomMessages from './CustomMessages';
 import FusionSearch from './FusionSearch';
 import Charts from './Charts';
 import PageRoutes from '../../../../PageRoutes';
-import EndpointDropdown from '../../../../Endpoint/EndpointDropdown';
+import EndpointDropdown from '../../../../shared/Endpoint/EndpointDropdown';
 import { BACKENDS } from '../../../../../../batteries/utils';
 import { FormContext, verticalTab } from '../../../../utils';
 
