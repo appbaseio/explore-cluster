@@ -118,7 +118,7 @@ const StoredQueriesPage = Loadable({
 const SearchIntegrationsPage = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "SearchIntegrationsPage" */ '../../pages/IntegrationsPage/SearchN'
+			/* webpackChunkName: "SearchIntegrationsPage" */ '../../pages/IntegrationsPage/SearchUIBuilderPage'
 		),
 	loading: Loader,
 });
@@ -153,7 +153,7 @@ const inlineCodesandboxPage = Loadable({
 const SearchPreferencePage = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "SearchPreferencePage" */ '../../pages/IntegrationsPage/SearchN/Main'
+			/* webpackChunkName: "SearchPreferencePage" */ '../../pages/IntegrationsPage/SearchUIBuilderPage/Main'
 		),
 	loading: Loader,
 });
@@ -161,7 +161,7 @@ const SearchPreferencePage = Loadable({
 const SearchTemplatePage = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "SearchPreferencePage" */ '../../pages/IntegrationsPage/SearchN/Wizard/index'
+			/* webpackChunkName: "SearchPreferencePage" */ '../../pages/IntegrationsPage/SearchUIBuilderPage/Wizard/index'
 		),
 	loading: Loader,
 });

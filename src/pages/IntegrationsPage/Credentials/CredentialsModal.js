@@ -5,7 +5,7 @@ import { array, func, string } from 'prop-types';
 import { Button, Select, Tag, Tooltip } from 'antd';
 import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
-import { suggestionStyles } from '../SearchN/Wizard/styles';
+import { suggestionStyles } from '../SearchUIBuilderPage/Wizard/styles';
 import { getPermission } from '../../../batteries/modules/actions';
 import ErrorToaster from '../../../batteries/components/shared/ErrorToaster';
 import CreateCredentials from '../../../components/CreateCredentials';

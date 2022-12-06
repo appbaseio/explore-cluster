@@ -57,7 +57,7 @@ const SandboxPage = Loadable({
 const SearchIntegrationsPage = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "SearchIntegrationsPage" */ '../../pages/IntegrationsPage/SearchN'
+			/* webpackChunkName: "SearchIntegrationsPage" */ '../../pages/IntegrationsPage/SearchUIBuilderPage'
 		),
 	loading: Loader,
 });
