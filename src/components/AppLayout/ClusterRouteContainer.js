@@ -223,7 +223,7 @@ class ClusterRouteContainer extends React.Component {
 
 	render() {
 		const { allowedRoutes, backend, backendImage } = this.props;
-
+		console.log({ allowedRoutes });
 		return (
 			<ErrorPage {...this.props}>
 				<Switch>
@@ -557,7 +557,16 @@ class ClusterRouteContainer extends React.Component {
 						exact
 						path="/cluster/search-builder"
 						render={(props) => (
-							<AppPageContainer {...props} component={SearchIntegrationsPage} />
+							<>
+								{get(allowedRoutes, '/cluster/search-builder') ? (
+									<AppPageContainer
+										{...props}
+										component={SearchIntegrationsPage}
+									/>
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
@@ -571,14 +580,26 @@ class ClusterRouteContainer extends React.Component {
 						exact
 						path="/cluster/search-builder/new"
 						render={(props) => (
-							<AppPageContainer {...props} component={SearchTemplatePage} />
+							<>
+								{get(allowedRoutes, '/cluster/search-builder') ? (
+									<AppPageContainer {...props} component={SearchTemplatePage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/search-builder/:id"
 						render={(props) => (
-							<AppPageContainer {...props} component={SearchPreferencePage} />
+							<>
+								{get(allowedRoutes, '/cluster/search-builder') ? (
+									<AppPageContainer {...props} component={SearchPreferencePage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					{/* <Route
@@ -592,37 +613,64 @@ class ClusterRouteContainer extends React.Component {
 						exact
 						path="/cluster/search-builder/:id/code"
 						render={(props) => (
-							<AppPageContainer {...props} component={inlineCodesandboxPage} />
+							<>
+								{get(allowedRoutes, '/cluster/search-builder') ? (
+									<AppPageContainer
+										{...props}
+										component={inlineCodesandboxPage}
+									/>
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/recommendations-builder"
 						render={(props) => (
-							<AppPageContainer
-								{...props}
-								component={RecommendationsIntegrationsPage}
-							/>
+							<>
+								{get(allowedRoutes, '/cluster/recommendations-builder') ? (
+									<AppPageContainer
+										{...props}
+										component={RecommendationsIntegrationsPage}
+									/>
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/recommendations-builder/:id"
 						render={(props) => (
-							<AppPageContainer
-								{...props}
-								component={RecommendationsPreferencePage}
-							/>
+							<>
+								{get(allowedRoutes, '/cluster/recommendations-builder') ? (
+									<AppPageContainer
+										{...props}
+										component={RecommendationsPreferencePage}
+									/>
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/recommendations-builder/new"
 						render={(props) => (
-							<AppPageContainer
-								{...props}
-								component={RecommendationsPreferencePage}
-							/>
+							<>
+								{get(allowedRoutes, '/cluster/recommendations-builder') ? (
+									<AppPageContainer
+										{...props}
+										component={RecommendationsPreferencePage}
+									/>
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
