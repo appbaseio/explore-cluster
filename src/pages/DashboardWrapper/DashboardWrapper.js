@@ -204,6 +204,7 @@ class DashboardWrapper extends Component {
 					: {}),
 			};
 		}
+
 		this.state = {
 			appName: props.match.params.appName, // eslint-disable-line
 			showHeader,

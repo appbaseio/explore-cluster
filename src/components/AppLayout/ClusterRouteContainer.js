@@ -223,7 +223,6 @@ class ClusterRouteContainer extends React.Component {
 
 	render() {
 		const { allowedRoutes, backend, backendImage } = this.props;
-		console.log({ allowedRoutes });
 		return (
 			<ErrorPage {...this.props}>
 				<Switch>
