@@ -7,11 +7,11 @@ import moment from 'moment';
 import get from 'lodash/get';
 import { FieldControl, FieldGroup } from 'react-reactive-form';
 import EndpointModal from './EndpointModal';
-import { getPipelines } from '../../../batteries/modules/actions';
-import FusionFields from '../shared/tabs/General/FusionFields';
-import Flex from '../../../batteries/components/shared/Flex';
+import FusionFields from '../../../shared/tabs/General/FusionFields';
+import Flex from '../../../../../batteries/components/shared/Flex';
 import { endpointConfigStyles } from './styles';
-import { BACKENDS } from '../../../batteries/utils';
+import { BACKENDS } from '../../../../../batteries/utils';
+import { getPipelines } from '../../../../../batteries/modules/actions';
 
 const EndpointDropdown = ({
 	pipelines,

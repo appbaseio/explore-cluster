@@ -3,9 +3,9 @@ import { Modal, Select, Form } from 'antd';
 import { css } from 'react-emotion';
 import { array, bool, func, object } from 'prop-types';
 import { FieldControl, FieldGroup, FormBuilder, Validators } from 'react-reactive-form';
-import TextInput from '../../../components/Form/Input';
-import { headersValidator, urlValidator } from '../../SearchAuth0Settings/utils';
-import CodeEditor from '../../SearchBox/components/EndpointSuggestions/CodeEditor';
+import TextInput from '../../../../../components/Form/Input';
+import { headersValidator, urlValidator } from '../../../../SearchAuth0Settings/utils';
+import CodeEditor from '../../../../SearchBox/components/EndpointSuggestions/CodeEditor';
 
 const modal = css`
 	max-width: 800px;
