@@ -129,7 +129,7 @@ class DashboardWrapper extends Component {
 		const allowedActions = get(user, 'data.allowedActions', []).filter((action) => {
 			return ALLOWED_ACTIONS_BY_BACKEND[backend].includes(action);
 		});
-		console.log({ routes });
+
 		if (arcVersion && versionCompare(arcVersion, '7.54.0') !== -1) {
 			routesToSet = {
 				...routes,
