@@ -4,10 +4,10 @@ import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { Tooltip, AutoComplete } from 'antd';
 import { bool, func, object, string } from 'prop-types';
-import { getApiGeneralization } from '../../utils/be-apis';
-import apisMapper from '../../utils/apisMapper';
-import { BACKENDS } from '../../../../batteries/utils';
-import { transformGeneralMappingsToFusionArrayFormat } from '../../utils/fusion-apis';
+import { getApiGeneralization } from '../../pages/IntegrationsPage/utils/be-apis';
+import apisMapper from '../../pages/IntegrationsPage/utils/apisMapper';
+import { BACKENDS } from '../../batteries/utils';
+import { transformGeneralMappingsToFusionArrayFormat } from '../../pages/IntegrationsPage/utils/fusion-apis';
 
 const suggestionCls = css`
 	display: flex;
