@@ -64,7 +64,7 @@ const getURL = () => {
 class SyncStatus extends React.Component {
 	constructor(props) {
 		super(props);
-		const { form, getSearchPreferences } = props;
+		const { form } = props;
 		this.myInterval = null;
 		this.state = {
 			exportType: form.get('exportSettings.type').value,
@@ -81,7 +81,6 @@ class SyncStatus extends React.Component {
 			showPastVersionsDrawer: false,
 		};
 		this.fetchData();
-		getSearchPreferences();
 	}
 
 	componentDidMount() {
