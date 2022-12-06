@@ -1,3 +1,6 @@
+/*
+	route: /cluster/search-builder/new
+*/
 import React, { useState } from 'react';
 import { Tabs, Card } from 'antd';
 import { withRouter } from 'react-router-dom';
