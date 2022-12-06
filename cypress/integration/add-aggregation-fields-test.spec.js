@@ -75,7 +75,7 @@ describe('Aggregation fields add test flow', () => {
 	});
 
 	it('Should open aggregation settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/aggs`).wait(5000);
+		cy.visit(`${base_url}/app/${indexName}/aggs`).wait(PAGE_LOAD_TIME);
 	});
 
 	it('Should add aggregation feilds', () => {
@@ -106,7 +106,7 @@ describe('Aggregation fields add test flow', () => {
 	});
 
 	it('Should check aggregation settings persistence', () => {
-		cy.visit(`${base_url}/app/${indexName}/aggs`).wait(5000);
+		cy.visit(`${base_url}/app/${indexName}/aggs`).wait(PAGE_LOAD_TIME);
 		cy.get('[data-cy=field-name-email]')
 			.should('contain', 'email')
 			.get('[data-cy=field-name-name]')

@@ -99,7 +99,7 @@ describe('Searchable fields add test flow', () => {
 	});
 
 	it('Should open search settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/search`).wait(5000);
+		cy.visit(`${base_url}/app/${indexName}/search`).wait(PAGE_LOAD_TIME);
 	});
 
 	it('Should verify search fields and add new field from schema', () => {

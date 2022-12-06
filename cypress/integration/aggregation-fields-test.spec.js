@@ -75,7 +75,7 @@ describe('Aggregation fields test flow', () => {
 	});
 
 	it('Should open aggregation settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/aggs`).wait(5000);
+		cy.visit(`${base_url}/app/${indexName}/aggs`).wait(PAGE_LOAD_TIME);
 	});
 
 	it('Should check default aggregation settings', () => {
