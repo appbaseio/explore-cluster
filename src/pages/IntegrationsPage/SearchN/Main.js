@@ -13,7 +13,7 @@ import {
 
 import { Tabs, Affix, Button } from 'antd';
 import { FieldGroup } from 'react-reactive-form';
-import { object, array, func, string, bool } from 'prop-types';
+import { object, array, func } from 'prop-types';
 import { v4 as uuidv4 } from 'uuid';
 import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
 import LayoutTab from '../tabs/Layout';
@@ -39,7 +39,7 @@ const bannerDetailsPaid = {
 	href: 'http://docs.reactivesearch.io/docs/reactivesearch/ui-builder/search/',
 };
 
-const Main = ({ tier, featureEcommerce, getPreferencesN, ...props }) => {
+const Main = ({ getPreferencesN, ...props }) => {
 	const [componentKey, setComponentKey] = useState(1);
 	useEffect(() => {
 		getPreferencesN();
@@ -229,22 +229,14 @@ const Main = ({ tier, featureEcommerce, getPreferencesN, ...props }) => {
 Main.propTypes = {
 	history: object.isRequired,
 	match: object.isRequired,
-	preferences: array,
 	getPreferencesN: func.isRequired,
-	tier: string.isRequired,
-	featureEcommerce: bool,
 	searchPreferences: array.isRequired,
 };
 
-Main.defaultProps = {
-	preferences: [],
-	featureEcommerce: false,
-};
+Main.defaultProps = {};
 
 const mapStateToProps = (state) => ({
-	tier: get(state, '$getAppPlan.results.tier'),
 	searchPreferences: get(state, '$getSearchPreferencesN.results', []),
-	featureEcommerce: get(state, '$getAppPlan.results.feature_ecommerce', false),
 });
 
 const mapDispatchToProps = (dispatch) => ({
