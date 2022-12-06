@@ -1,6 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
-import { LONG_REQUEST_RESOLVE_TIME, PAGE_LOAD_TIME } from './contants';
+import { LONG_REQUEST_RESOLVE_TIME, PAGE_LOAD_TIME } from '../utils/constants.js';
 
 let indexName = '';
 

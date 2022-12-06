@@ -1,6 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
-import { PAGE_LOAD_TIME, REQUEST_RESOLVE_TIME } from './contants';
+import { PAGE_LOAD_TIME, REQUEST_RESOLVE_TIME } from '../utils/constants.js';
 let appName = '';
 
 describe('Interactive Tutorial', () => {
