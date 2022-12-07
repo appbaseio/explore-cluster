@@ -37,7 +37,7 @@ const Wizard = ({ history, match }) => {
 	return (
 		<Container>
 			<Card style={{ minHeight: '100vh' }}>
-				<PreferencesFormWrapper closeForm={closeForm} preferenceId={preferenceId}>
+				<PreferencesFormWrapper closeForm={closeForm} preferenceId={preferenceId} isWizard>
 					{/* eslint-disable-next-line */}
 					{({ getPreferences, getPreferencesPayload, form }) => {
 						const pipeline = form.get('pipeline') ? form.get('pipeline').value : null;

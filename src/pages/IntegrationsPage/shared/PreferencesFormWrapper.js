@@ -274,33 +274,35 @@ class PreferencesFormWrapper extends React.Component {
 			getLatestVersionCode,
 			searchPreferences,
 			updateVersionStateForPreference,
+			isWizard,
 		} = this.props;
-
-		getSearchPreferenceVersions(preferenceId);
-		getLatestVersionCode(preferenceId)
-			.then(async (response) => {
-				if (response.payload) {
-					const { res } = response.payload;
-					if (res.content) {
-						const newContent = transformContent(res.content);
-						const updatedCodeResponse = await replaceWithPreferences(
-							newContent,
-							searchPreferences,
-						);
-						updateVersionStateForPreference({
-							preferenceId,
-							patchPayload: {
-								updatedCode: updatedCodeResponse,
-								sandpackCode: updatedCodeResponse,
-								initialCode: newContent,
-							},
-						});
+		if (!isWizard) {
+			getSearchPreferenceVersions(preferenceId);
+			getLatestVersionCode(preferenceId)
+				.then(async (response) => {
+					if (response.payload) {
+						const { res } = response.payload;
+						if (res.content) {
+							const newContent = transformContent(res.content);
+							const updatedCodeResponse = await replaceWithPreferences(
+								newContent,
+								searchPreferences,
+							);
+							updateVersionStateForPreference({
+								preferenceId,
+								patchPayload: {
+									updatedCode: updatedCodeResponse,
+									sandpackCode: updatedCodeResponse,
+									initialCode: newContent,
+								},
+							});
+						}
 					}
-				}
-			})
-			.catch((err) => {
-				console.error('Error to fetch latest version', err);
-			});
+				})
+				.catch((err) => {
+					console.error('Error to fetch latest version', err);
+				});
+		}
 	}
 
 	componentDidMount() {
@@ -1284,6 +1286,7 @@ PreferencesFormWrapper.defaultProps = {
 		defaultRecommendationsPreferences,
 	),
 	backend: BACKENDS.ELASTICSEARCH.name,
+	isWizard: false,
 };
 
 PreferencesFormWrapper.propTypes = {
@@ -1303,6 +1306,7 @@ PreferencesFormWrapper.propTypes = {
 	getSearchPreferenceVersions: func.isRequired,
 	getLatestVersionCode: func.isRequired,
 	updateVersionStateForPreference: func.isRequired,
+	isWizard: bool,
 };
 
 const mapStateToProps = (state, props) => {

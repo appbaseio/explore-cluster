@@ -160,14 +160,18 @@ class CreateCredentials extends React.Component {
 			appbaseCredentials,
 			appbaseVersion,
 			backend,
+			mappings,
 		} = this.props;
-		if (appbaseCredentials) {
+		if (
+			appbaseCredentials &&
+			((Array.isArray(mappings) && mappings.length) ||
+				(typeof mappings === 'object' && Object.keys(mappings || {}).length))
+		) {
 			this.getMappings();
 		}
 		const indicesHandler = this.form.get('indices');
 		if (!this.isApp) {
 			indicesHandler.valueChanges.subscribe((indices) => {
-				const { mappings } = this.props;
 				this.setState({
 					filteredMappings: this.getFilteredMappings(mappings, indices),
 				});
