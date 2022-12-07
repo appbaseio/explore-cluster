@@ -5,10 +5,10 @@ import { array, func, string } from 'prop-types';
 import { Button, Select, Tag, Tooltip } from 'antd';
 import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
-import { suggestionStyles } from '../SearchUIBuilderPage/CreateUIBuilder/styles';
-import { getPermission } from '../../../batteries/modules/actions';
-import ErrorToaster from '../../../batteries/components/shared/ErrorToaster';
-import CreateCredentials from '../../../components/CreateCredentials';
+import { suggestionStyles } from '../../SearchUIBuilderPage/CreateUIBuilder/styles';
+import { getPermission } from '../../../../batteries/modules/actions';
+import ErrorToaster from '../../../../batteries/components/shared/ErrorToaster';
+import CreateCredentials from '../../../../components/CreateCredentials';
 
 const CredentialsModal = ({ value, onChange, permissions, fetchPermissions }) => {
 	const [showForm, setShowForm] = useState(false);
