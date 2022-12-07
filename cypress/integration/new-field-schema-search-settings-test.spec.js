@@ -150,10 +150,9 @@ describe('New field from schema should allow it to add to search settings test f
 			.get('[data-cy=search-field-name-status]')
 			.should('contain', 'new');
 		cy.server();
-		cy.route('**/_mapping').as('mapping');
-		cy.route('POST', '**/_reindex/**').as('reindex');
-		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName}/search`);
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should check search fields after deployment', () => {

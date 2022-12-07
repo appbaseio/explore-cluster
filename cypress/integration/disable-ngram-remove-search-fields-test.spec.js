@@ -98,20 +98,17 @@ describe('Disable ngram remove search fields and reindex data test flow', () => 
 			.get('[data-cy=search-field-name-status]')
 			.should('contain', 'new');
 		cy.server();
-		cy.route('**/_mapping').as('mapping');
-		cy.route('POST', '**/_reindex/**').as('reindex');
+		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
+		cy.wait(['@relevancy'], { timeout: 25000 });
 	});
 
-	it('Should open search settings URL', () => {
+	it('Should check search fields after deployment', () => {
 		cy.server();
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.visit(`${base_url}/app/${indexName}/search`);
 		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
-	});
 
-	it('Should check search fields after deployment', () => {
 		cy.get('[data-cy=field-name-email]')
 			.should('contain', 'email')
 			.get('[data-cy=field-name-name]')
@@ -129,13 +126,17 @@ describe('Disable ngram remove search fields and reindex data test flow', () => 
 			.get('[data-cy=new-value-enableNgram-status]')
 			.should('contain', 'false');
 		cy.server();
-		cy.route('**/_mapping').as('mapping');
-		cy.route('POST', '**/_reindex/**').as('reindex');
+		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
+		cy.wait(['@relevancy'], { timeout: 25000 });
 	});
 
 	it('Should check if .search fields are removed', () => {
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName}/search`);
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+
 		cy.get('[data-cy=email-popover-icon]')
 			.trigger('mouseover')
 			.get('[data-cy=email-popover-content]')
