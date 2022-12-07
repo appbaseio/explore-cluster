@@ -25,7 +25,7 @@ import Loader from '../../../components/Loader';
 import PreviewModal from '../PreviewModal';
 import SyncStatus from '../SyncStatus';
 import PreferencesFormWrapper from '../PreferencesFormWrapperN';
-import SavePreferences from '../SavePreferencesN';
+import SavePreferences from '../shared/SavePreferences';
 import { getSearchPreferencesN } from '../../../batteries/modules/actions';
 
 import EndUserAuthentication from './components/tabs/EndUserAuthentication';

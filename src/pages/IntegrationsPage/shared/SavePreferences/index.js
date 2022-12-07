@@ -7,12 +7,12 @@ import { connect } from 'react-redux';
 import {
 	getSearchPreferencesN,
 	getRecommendationsPreferencesN,
-} from '../../batteries/modules/actions';
+} from '../../../../batteries/modules/actions';
 import {
 	getSearchPreferenceById,
 	getRecommendationPreferenceById,
-} from '../../batteries/modules/selectors';
-import { displayErrors } from '../../batteries/utils/helpers';
+} from '../../../../batteries/modules/selectors';
+import { displayErrors } from '../../../../batteries/utils/helpers';
 import {
 	FormContext,
 	getRecommendationPreferencesPayload,
@@ -20,11 +20,11 @@ import {
 	defaultSearchPreferences,
 	defaultRecommendationsPreferences,
 	getDiffDataAndCount,
-} from './utils';
-import { removeEmpty, reOrderPreferences, transformPreferences } from './utils/index';
+} from '../../utils';
+import { removeEmpty, reOrderPreferences, transformPreferences } from '../../utils/index';
 import ReviewAndSave from './ReviewAndSave';
 
-class SavePreferencesN extends React.Component {
+class SavePreferences extends React.Component {
 	constructor(props) {
 		super(props);
 		this.hasEdited = false;
@@ -147,7 +147,7 @@ class SavePreferencesN extends React.Component {
 	}
 }
 
-SavePreferencesN.defaultProps = {
+SavePreferences.defaultProps = {
 	label: 'Save',
 	preferenceId: null,
 	buttonProps: null,
@@ -159,7 +159,7 @@ SavePreferencesN.defaultProps = {
 	errors: null,
 };
 
-SavePreferencesN.propTypes = {
+SavePreferences.propTypes = {
 	label: string,
 	preferenceId: string,
 	buttonProps: object,
@@ -191,4 +191,4 @@ const mapDispatchToProps = (dispatch) => ({
 	getRecommendationsPreferences: () => dispatch(getRecommendationsPreferencesN()),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(SavePreferencesN);
+export default connect(mapStateToProps, mapDispatchToProps)(SavePreferences);

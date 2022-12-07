@@ -13,7 +13,7 @@ import { container } from '../../ResultsPage/styles';
 import PreviewModal from '../PreviewModal';
 import SyncStatus from '../SyncStatus';
 import PreferencesFormWrapper from '../PreferencesFormWrapperN';
-import SavePreferences from '../SavePreferencesN';
+import SavePreferences from '../shared/SavePreferences';
 
 const { TabPane } = Tabs;
 

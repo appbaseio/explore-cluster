@@ -4,9 +4,11 @@ import PropTypes from 'prop-types';
 import get from 'lodash/get';
 import ReactDiffViewer from 'react-diff-viewer';
 import { isEqual } from 'lodash';
-import relevancyItemTitles, { relevancyTitles } from '../../components/ReviewAndSave/helper';
-import Flex from '../../batteries/components/shared/Flex';
-import { facetKeyLabel } from './utils/index';
+import relevancyItemTitles, {
+	relevancyTitles,
+} from '../../../../../components/ReviewAndSave/helper';
+import Flex from '../../../../../batteries/components/shared/Flex';
+import { facetKeyLabel } from '../../../utils/index';
 
 const DiffList = ({ diff: diffProp }) => {
 	if (!diffProp || !Object.keys(diffProp || {}).length) {
