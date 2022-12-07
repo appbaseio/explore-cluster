@@ -372,7 +372,7 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-	fetchPipelines: () => dispatch(getPipelines()),
+	fetchPipelines: () => dispatch(getPipelines(false)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(EndpointDropdown);
