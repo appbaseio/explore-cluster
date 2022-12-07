@@ -17,8 +17,8 @@ import Container from '../../../components/Container';
 import { displayErrors } from '../../../batteries/utils/helpers';
 import usePrevious from '../../../batteries/hooks/usePrevious';
 import {
-	getRecommendationsPreferencesN,
-	deleteRecommendationPreferenceN,
+	getRecommendationsPreferences,
+	deleteRecommendationPreference,
 } from '../../../batteries/modules/actions';
 
 const columns = [
@@ -150,15 +150,15 @@ RecommendationsUIsList.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-	preferences: get(state, '$getRecommendationsPreferencesN.results'),
-	isFetchingPreferences: get(state, '$getRecommendationsPreferencesN.isFetching'),
-	isDeletingPreference: get(state, '$deleteRecommendationPreferenceN.isFetching'),
-	errors: [get(state, '$deleteRecommendationPreferenceN.error')],
+	preferences: get(state, '$getRecommendationsPreferences.results'),
+	isFetchingPreferences: get(state, '$getRecommendationsPreferences.isFetching'),
+	isDeletingPreference: get(state, '$deleteRecommendationPreference.isFetching'),
+	errors: [get(state, '$deleteRecommendationPreference.error')],
 });
 
 const mapDispatchToProps = (dispatch) => ({
-	getPreferences: () => dispatch(getRecommendationsPreferencesN()),
-	deletePreference: (id) => dispatch(deleteRecommendationPreferenceN(id)),
+	getPreferences: () => dispatch(getRecommendationsPreferences()),
+	deletePreference: (id) => dispatch(deleteRecommendationPreference(id)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(RecommendationsUIsList));

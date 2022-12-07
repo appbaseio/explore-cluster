@@ -5,8 +5,8 @@ import get from 'lodash/get';
 import isEqual from 'lodash/isEqual';
 import { connect } from 'react-redux';
 import {
-	getSearchPreferencesN,
-	getRecommendationsPreferencesN,
+	getSearchPreferences as getSearchPreferencesAction,
+	getRecommendationsPreferences as getRecommendationsPreferencesAction,
 } from '../../../../batteries/modules/actions';
 import {
 	getSearchPreferenceById,
@@ -181,14 +181,14 @@ const mapStateToProps = (state, props) => ({
 	searchPreferences: getSearchPreferenceById(state, props.preferenceId),
 	recommendationsPreferences: getRecommendationPreferenceById(state, props.preferenceId),
 	errors: props.isRecommendation
-		? [get(state, '$saveRecommendationPreferenceN.error')]
-		: [get(state, '$saveSearchPreferenceN.error')],
+		? [get(state, '$saveRecommendationPreference.error')]
+		: [get(state, '$saveSearchPreference.error')],
 	clientId: get(state, '$getAuth0Preferences.results')?.['_client_id'],
 });
 
 const mapDispatchToProps = (dispatch) => ({
-	getSearchPreferences: () => dispatch(getSearchPreferencesN()),
-	getRecommendationsPreferences: () => dispatch(getRecommendationsPreferencesN()),
+	getSearchPreferences: () => dispatch(getSearchPreferencesAction()),
+	getRecommendationsPreferences: () => dispatch(getRecommendationsPreferencesAction()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SavePreferences);

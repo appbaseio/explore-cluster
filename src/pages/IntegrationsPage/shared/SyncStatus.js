@@ -9,11 +9,11 @@ import Flex from '../../../batteries/components/shared/Flex';
 import { getAllVersions, deployUiBuilder, transformPreferences } from '../utils/sandpack-generator';
 import { deployStatusMapper, getTemplate } from '../utils/index';
 import {
-	getSearchPreferenceDeploymentStatus,
-	getSearchPreferencesN,
-	getSearchPreferenceVersionCodeByVersionN,
-	getSearchPreferenceVersionsN,
-	saveSearchPreferenceN,
+	getSearchPreferenceDeploymentStatus as getSearchPreferenceDeploymentStatusAction,
+	getSearchPreferences as getSearchPreferencesAction,
+	getSearchPreferenceVersionCodeByVersion as getSearchPreferenceVersionCodeByVersionAction,
+	getSearchPreferenceVersions as getSearchPreferenceVersionsAction,
+	saveSearchPreference as saveSearchPreferenceAction,
 } from '../../../batteries/modules/actions';
 
 import AppConstants from '../../../batteries/modules/constants';
@@ -451,23 +451,23 @@ SyncStatus.propTypes = {
 
 const mapStateToProps = (state, props) => ({
 	index: props.pipeline || get(state, '$getCurrentApp.name'),
-	versionState: get(state, '$getSearchPreferencesVersionsN.results', {}),
+	versionState: get(state, '$getSearchPreferencesVersions.results', {}),
 });
 const mapDispatchToProps = (dispatch) => ({
-	getSearchPreferences: () => dispatch(getSearchPreferencesN()),
+	getSearchPreferences: () => dispatch(getSearchPreferencesAction()),
 	updateSearchPreferences: (preferenceId, payload) =>
-		dispatch(saveSearchPreferenceN(preferenceId, payload)),
+		dispatch(saveSearchPreferenceAction(preferenceId, payload)),
 	updateVersionStateForPreference: (payload) =>
 		dispatch({
-			type: AppConstants.APP.UI_BUILDERN.SEARCH_PREFERENCE_VERSIONS
+			type: AppConstants.APP.UI_BUILDER.SEARCH_PREFERENCE_VERSIONS
 				.UPDATE_PREFERENCE_STATE_SUCCESS,
 			payload,
 		}),
 	getSearchPreferenceVersions: (preferenceId) =>
-		dispatch(getSearchPreferenceVersionsN(preferenceId)),
+		dispatch(getSearchPreferenceVersionsAction(preferenceId)),
 	getCodeByVersionId: (preferenceId, versionId) =>
-		dispatch(getSearchPreferenceVersionCodeByVersionN(preferenceId, versionId)),
+		dispatch(getSearchPreferenceVersionCodeByVersionAction(preferenceId, versionId)),
 	getDeploymentStatus: (preferenceId) =>
-		dispatch(getSearchPreferenceDeploymentStatus(preferenceId)),
+		dispatch(getSearchPreferenceDeploymentStatusAction(preferenceId)),
 });
 export default connect(mapStateToProps, mapDispatchToProps)(SyncStatus);

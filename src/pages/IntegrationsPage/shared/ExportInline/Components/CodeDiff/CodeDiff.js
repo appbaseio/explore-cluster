@@ -165,7 +165,7 @@ CodeDiff.defaultProps = {
 };
 
 const mapStateToProps = (state) => ({
-	versionState: get(state, '$getSearchPreferencesVersionsN.results', {}),
+	versionState: get(state, '$getSearchPreferencesVersions.results', {}),
 });
 
 export default connect(mapStateToProps, null)(withRouter(CodeDiff));

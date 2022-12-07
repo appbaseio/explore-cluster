@@ -26,7 +26,7 @@ import PreviewModal from '../shared/PreviewModal';
 import SyncStatus from '../shared/SyncStatus';
 import PreferencesFormWrapper from '../shared/PreferencesFormWrapper';
 import SavePreferences from '../shared/SavePreferences';
-import { getSearchPreferencesN } from '../../../batteries/modules/actions';
+import { getSearchPreferences } from '../../../batteries/modules/actions';
 
 import EndUserAuthentication from './components/tabs/EndUserAuthentication';
 import LayoutTab from './components/tabs/Layout';
@@ -241,11 +241,11 @@ Main.propTypes = {
 Main.defaultProps = {};
 
 const mapStateToProps = (state) => ({
-	searchPreferences: get(state, '$getSearchPreferencesN.results', []),
+	searchPreferences: get(state, '$getSearchPreferences.results', []),
 });
 
 const mapDispatchToProps = (dispatch) => ({
-	getPreferencesN: () => dispatch(getSearchPreferencesN()),
+	getPreferencesN: () => dispatch(getSearchPreferences()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Main));

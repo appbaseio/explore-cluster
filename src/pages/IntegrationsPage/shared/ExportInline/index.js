@@ -16,10 +16,10 @@ import {
 	replaceWithPreferences,
 } from '../../utils/sandpack-generator';
 import {
-	saveSearchPreferenceN,
-	getSearchPreferencesN,
-	getSearchPreferenceLatestVersionN,
-	getSearchPreferenceVersionCodeByVersionN,
+	saveSearchPreference,
+	getSearchPreferences as getSearchPreferencesAction,
+	getSearchPreferenceLatestVersion,
+	getSearchPreferenceVersionCodeByVersion,
 } from '../../../../batteries/modules/actions';
 import AppConstants from '../../../../batteries/modules/constants';
 
@@ -434,22 +434,22 @@ ExportInline.propTypes = {
 };
 const mapStateToProps = (state) => {
 	return {
-		versionState: get(state, '$getSearchPreferencesVersionsN.results', {}),
-		isLoading: get(state, '$getSearchPreferencesVersionsN.isLoading', false),
+		versionState: get(state, '$getSearchPreferencesVersions.results', {}),
+		isLoading: get(state, '$getSearchPreferencesVersions.isLoading', false),
 	};
 };
 
 const mapDispatchToProps = (dispatch, props) => ({
-	getSearchPreferences: () => dispatch(getSearchPreferencesN()),
+	getSearchPreferences: () => dispatch(getSearchPreferencesAction()),
 	updateSearchPreferences: (payload) =>
-		dispatch(saveSearchPreferenceN(props.preferenceId, payload)),
+		dispatch(saveSearchPreference(props.preferenceId, payload)),
 	getLatestVersionCode: (preferenceId) =>
-		dispatch(getSearchPreferenceLatestVersionN(preferenceId)),
+		dispatch(getSearchPreferenceLatestVersion(preferenceId)),
 	getCodeByVersionId: (preferenceId, versionId) =>
-		dispatch(getSearchPreferenceVersionCodeByVersionN(preferenceId, versionId)),
+		dispatch(getSearchPreferenceVersionCodeByVersion(preferenceId, versionId)),
 	updateVersionStateForPreference: (payload) =>
 		dispatch({
-			type: AppConstants.APP.UI_BUILDERN.SEARCH_PREFERENCE_VERSIONS
+			type: AppConstants.APP.UI_BUILDER.SEARCH_PREFERENCE_VERSIONS
 				.UPDATE_PREFERENCE_STATE_SUCCESS,
 			payload,
 		}),

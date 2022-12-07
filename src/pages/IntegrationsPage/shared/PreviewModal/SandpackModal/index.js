@@ -16,7 +16,7 @@ import {
 	transformPreferences,
 	transformResultsDefaultFields,
 } from '../../../utils/index';
-import { getSearchPreferenceLatestVersionN } from '../../../../../batteries/modules/actions';
+import { getSearchPreferenceLatestVersion } from '../../../../../batteries/modules/actions';
 import AppConstants from '../../../../../batteries/modules/constants';
 import { transformContent } from '../../ExportInline/Components/ModalHeader';
 
@@ -116,16 +116,16 @@ SandpackModal.defaultProps = {
 
 const mapStateToProps = (state) => {
 	return {
-		versionState: get(state, '$getSearchPreferencesVersionsN.results', {}),
-		isLoading: get(state, '$getSearchPreferencesVersionsN.isLoading', false),
+		versionState: get(state, '$getSearchPreferencesVersions.results', {}),
+		isLoading: get(state, '$getSearchPreferencesVersions.isLoading', false),
 	};
 };
 const mapDispatchToProps = (dispatch) => ({
 	getLatestVersionCode: (preferenceId) =>
-		dispatch(getSearchPreferenceLatestVersionN(preferenceId)),
+		dispatch(getSearchPreferenceLatestVersion(preferenceId)),
 	updateVersionStateForPreference: (payload) =>
 		dispatch({
-			type: AppConstants.APP.UI_BUILDERN.SEARCH_PREFERENCE_VERSIONS
+			type: AppConstants.APP.UI_BUILDER.SEARCH_PREFERENCE_VERSIONS
 				.UPDATE_PREFERENCE_STATE_SUCCESS,
 			payload,
 		}),

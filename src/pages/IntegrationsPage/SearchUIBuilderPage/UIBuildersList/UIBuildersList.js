@@ -17,8 +17,8 @@ import Container from '../../../../components/Container';
 import { displayErrors } from '../../../../batteries/utils/helpers';
 import usePrevious from '../../../../batteries/hooks/usePrevious';
 import {
-	getSearchPreferencesN,
-	deleteSearchPreferenceN,
+	getSearchPreferences,
+	deleteSearchPreference as deleteSearchPreferenceAction,
 } from '../../../../batteries/modules/actions';
 
 const columns = [
@@ -150,15 +150,15 @@ List.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-	preferences: get(state, '$getSearchPreferencesN.results'),
-	isFetchingPreferences: get(state, '$getSearchPreferencesN.isFetching'),
-	isDeletingPreference: get(state, '$deleteSearchPreferenceN.isFetching'),
-	errors: [get(state, '$deleteSearchPreferenceN.error')],
+	preferences: get(state, '$getSearchPreferences.results'),
+	isFetchingPreferences: get(state, '$getSearchPreferences.isFetching'),
+	isDeletingPreference: get(state, '$deleteSearchPreference.isFetching'),
+	errors: [get(state, '$deleteSearchPreference.error')],
 });
 
 const mapDispatchToProps = (dispatch) => ({
-	getPreferences: () => dispatch(getSearchPreferencesN()),
-	deleteSearchPreference: (id) => dispatch(deleteSearchPreferenceN(id)),
+	getPreferences: () => dispatch(getSearchPreferences()),
+	deleteSearchPreference: (id) => dispatch(deleteSearchPreferenceAction(id)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(List));

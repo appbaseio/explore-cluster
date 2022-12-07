@@ -286,7 +286,7 @@ const mapStateToProps = (state) => {
 	return {
 		tier: get(state, '$getAppPlan.results.tier'),
 		featureUIBuilderPremium: get(state, '$getAppPlan.results.feature_uibuilder_premium', false),
-		versionState: get(state, '$getSearchPreferencesVersionsN.results', {}),
+		versionState: get(state, '$getSearchPreferencesVersions.results', {}),
 	};
 };
 

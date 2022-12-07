@@ -25,9 +25,9 @@ import UploadModal from './ProjectUpload/UploadModal';
 import ThemeSwitch from '../../../../../components/ThemeSwitcher';
 import {
 	getSearchPreferenceDeploymentStatus,
-	getSearchPreferencesN,
-	getSearchPreferenceVersionsN,
-	saveSearchPreferenceN,
+	getSearchPreferences as getSearchPreferencesAction,
+	getSearchPreferenceVersions as getSearchPreferenceVersionsAction,
+	saveSearchPreference,
 } from '../../../../../batteries/modules/actions';
 import AppConstants from '../../../../../batteries/modules/constants';
 
@@ -449,22 +449,22 @@ ModalHeader.defaultProps = {
 };
 const mapStateToProps = (state) => {
 	return {
-		versionState: get(state, '$getSearchPreferencesVersionsN.results', {}),
+		versionState: get(state, '$getSearchPreferencesVersions.results', {}),
 	};
 };
 
 const mapDispatchToProps = (dispatch) => ({
-	getSearchPreferences: () => dispatch(getSearchPreferencesN()),
+	getSearchPreferences: () => dispatch(getSearchPreferencesAction()),
 	getSearchPreferenceVersions: (preferenceId) =>
-		dispatch(getSearchPreferenceVersionsN(preferenceId)),
+		dispatch(getSearchPreferenceVersionsAction(preferenceId)),
 	updateVersionStateForPreference: (payload) =>
 		dispatch({
-			type: AppConstants.APP.UI_BUILDERN.SEARCH_PREFERENCE_VERSIONS
+			type: AppConstants.APP.UI_BUILDER.SEARCH_PREFERENCE_VERSIONS
 				.UPDATE_PREFERENCE_STATE_SUCCESS,
 			payload,
 		}),
 	updateSearchPreferences: (preferenceId, payload) =>
-		dispatch(saveSearchPreferenceN(preferenceId, payload)),
+		dispatch(saveSearchPreference(preferenceId, payload)),
 	getDeploymentStatus: (preferenceId) =>
 		dispatch(getSearchPreferenceDeploymentStatus(preferenceId)),
 });

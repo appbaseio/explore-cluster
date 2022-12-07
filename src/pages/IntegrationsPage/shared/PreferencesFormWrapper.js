@@ -32,10 +32,10 @@ import {
 	getRecommendationPreferenceById,
 } from '../../../batteries/modules/selectors';
 import {
-	getSearchPreferencesN,
-	getRecommendationsPreferencesN,
-	getSearchPreferenceLatestVersionN,
-	getSearchPreferenceVersionsN,
+	getSearchPreferences as getSearchPreferencesAction,
+	getRecommendationsPreferences as getRecommendationsPreferencesAction,
+	getSearchPreferenceLatestVersion as getSearchPreferenceLatestVersionAction,
+	getSearchPreferenceVersions as getSearchPreferenceVersionsAction,
 } from '../../../batteries/modules/actions';
 import AppConstants from '../../../batteries/modules/constants';
 import { removeEmpty, reOrderPreferences } from '../utils/index';
@@ -1313,22 +1313,22 @@ const mapStateToProps = (state, props) => {
 	return {
 		searchPreferences: getSearchPreferenceById(state, props.preferenceId),
 		recommendationsPreferences: getRecommendationPreferenceById(state, props.preferenceId),
-		allSearchPreferences: get(state, '$getSearchPreferencesN.results', []),
-		allRecommendationsPreferences: get(state, '$getRecommendationsPreferencesN.results', []),
+		allSearchPreferences: get(state, '$getSearchPreferences.results', []),
+		allRecommendationsPreferences: get(state, '$getRecommendationsPreferences.results', []),
 		backend: get(state, '$getAppPlan.results.backend'),
 	};
 };
 
 const mapDispatchToProps = (dispatch) => ({
-	getSearchPreferences: () => dispatch(getSearchPreferencesN()),
+	getSearchPreferences: () => dispatch(getSearchPreferencesAction()),
 	getLatestVersionCode: (preferenceId) =>
-		dispatch(getSearchPreferenceLatestVersionN(preferenceId)),
+		dispatch(getSearchPreferenceLatestVersionAction(preferenceId)),
 	getSearchPreferenceVersions: (preferenceId) =>
-		dispatch(getSearchPreferenceVersionsN(preferenceId)),
-	getRecommendationsPreferences: () => dispatch(getRecommendationsPreferencesN()),
+		dispatch(getSearchPreferenceVersionsAction(preferenceId)),
+	getRecommendationsPreferences: () => dispatch(getRecommendationsPreferencesAction()),
 	updateVersionStateForPreference: (payload) =>
 		dispatch({
-			type: AppConstants.APP.UI_BUILDERN.SEARCH_PREFERENCE_VERSIONS
+			type: AppConstants.APP.UI_BUILDER.SEARCH_PREFERENCE_VERSIONS
 				.UPDATE_PREFERENCE_STATE_SUCCESS,
 			payload,
 		}),

@@ -5,8 +5,8 @@ import { Affix, Button, message } from 'antd';
 import { connect } from 'react-redux';
 import { func, object, string } from 'prop-types';
 import {
-	getSearchPreferencesN,
-	saveSearchPreferenceN,
+	getSearchPreferences as getSearchPreferencesAction,
+	saveSearchPreference,
 } from '../../../../../batteries/modules/actions';
 import { commitCode, generateInlineSandboxURL } from '../../../utils/sandpack-generator';
 import {
@@ -316,9 +316,9 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch, props) => ({
-	getSearchPreferences: () => dispatch(getSearchPreferencesN()),
+	getSearchPreferences: () => dispatch(getSearchPreferencesAction()),
 	updateSearchPreferences: (payload) =>
-		dispatch(saveSearchPreferenceN(props.preferenceId, payload)),
+		dispatch(saveSearchPreference(props.preferenceId, payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Footer));

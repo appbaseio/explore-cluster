@@ -139,7 +139,7 @@ Actions.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-	versionState: get(state, '$getSearchPreferencesVersionsN.results', {}),
+	versionState: get(state, '$getSearchPreferencesVersions.results', {}),
 });
 
 const mapDispatchToProps = (dispatch) => ({

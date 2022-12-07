@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import { defaultPageSettings, getTemplate, transformPreferences } from '../utils/index';
 import { getLatestVersion, commitCode, preferencesInConstants } from '../utils/sandpack-generator';
 
-import { saveSearchPreferenceN } from '../../../batteries/modules/actions';
+import { saveSearchPreference } from '../../../batteries/modules/actions';
 import { transformContent } from './ExportInline/Components/ModalHeader';
 
 const PageRoutes = ({
@@ -167,7 +167,7 @@ PageRoutes.defaultProps = {
 
 const mapDispatchToProps = (dispatch, props) => ({
 	updateSearchPreferences: (payload) =>
-		dispatch(saveSearchPreferenceN(props.preferences.id, payload)),
+		dispatch(saveSearchPreference(props.preferences.id, payload)),
 });
 
 export default connect(null, mapDispatchToProps)(PageRoutes);
