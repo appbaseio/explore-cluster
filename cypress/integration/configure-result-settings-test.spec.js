@@ -80,7 +80,10 @@ describe('Configure result settings without reindexing test flow', () => {
 	});
 
 	it('Should open result settings url', () => {
-		cy.visit(`${base_url}/app/${indexName}/results`).wait(10000);
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName}/results`);
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should change the page size', () => {
@@ -134,7 +137,11 @@ describe('Configure result settings without reindexing test flow', () => {
 			.should('contain', '5')
 			.get(`[data-cy=new-value-number_of_fragments-status]`)
 			.should('contain', '6');
-		cy.get('[data-cy=review-save-button]').click().wait(5000);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('POST', '**/_reindex/**').as('reindex');
+		cy.get('[data-cy=review-save-button]').click();
+		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
 	});
 
 	it('Should delete index', () => {

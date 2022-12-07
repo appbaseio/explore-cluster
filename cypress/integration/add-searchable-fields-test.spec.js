@@ -102,7 +102,10 @@ describe('Searchable fields add test flow', () => {
 	});
 
 	it('Should open search settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/search`).wait(PAGE_LOAD_TIME);
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName}/search`);
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should verify search fields and add new field from schema', () => {
@@ -136,7 +139,11 @@ describe('Searchable fields add test flow', () => {
 			.should('contain', 'name')
 			.get('[data-cy=search-field-name-status]')
 			.should('contain', 'new');
-		cy.get('[data-cy=review-save-button]').click().wait(5000);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('POST', '**/_reindex/**').as('reindex');
+		cy.get('[data-cy=review-save-button]').click();
+		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
 	});
 
 	it('Should check search fields after deployment', () => {

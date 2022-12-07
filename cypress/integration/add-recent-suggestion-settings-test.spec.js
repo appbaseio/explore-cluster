@@ -28,8 +28,13 @@ describe('Recent Suggestion Settings add test flow', () => {
 	});
 
 	it('Should Recent suggestion settings page URL', () => {
-		cy.visit(`${base_url}/cluster/suggestions`).wait(PAGE_LOAD_TIME);
+		cy.server();
+		cy.route('**/preferences').as('preferences');
+		cy.visit(`${base_url}/cluster/suggestions`);
+		cy.wait('@preferences', { timeout: 30000 });
+		// Second tab is for recent suggestions
 		cy.get('.ant-tabs-nav .ant-tabs-tab:nth-child(2)').click();
+		cy.wait('@preferences', { timeout: 30000 });
 	});
 
 	it('Should Add Recent Suggestions Settings Form Data', () => {

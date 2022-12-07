@@ -80,7 +80,10 @@ describe('Test relevancy use local settings test flow', () => {
 	});
 
 	it('Should open search settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/search`).wait(PAGE_LOAD_TIME);
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName}/search`);
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should remove one field from search settings', () => {

@@ -77,7 +77,10 @@ describe('Aggregation fields add test flow', () => {
 	});
 
 	it('Should open aggregation settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/aggs`).wait(PAGE_LOAD_TIME);
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName}/aggs`);
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should add aggregation feilds', () => {
@@ -104,11 +107,18 @@ describe('Aggregation fields add test flow', () => {
 
 	it('Should review, save & deploy aggregation settings', () => {
 		cy.get('[data-cy=review-deploy-button]').click({ force: true }).wait(5000);
-		cy.get('[data-cy=review-save-button]').click().wait(5000);
+		cy.server();
+		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
+		cy.get('[data-cy=review-save-button]').click();
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should check aggregation settings persistence', () => {
-		cy.visit(`${base_url}/app/${indexName}/aggs`).wait(PAGE_LOAD_TIME);
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName}/aggs`);
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+
 		cy.get('[data-cy=field-name-email]')
 			.should('contain', 'email')
 			.get('[data-cy=field-name-name]')

@@ -50,7 +50,10 @@ describe('New index test flow', () => {
 	});
 
 	it('Should open language settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/languages`).wait(PAGE_LOAD_TIME);
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName}/languages`);
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should check selected language', () => {

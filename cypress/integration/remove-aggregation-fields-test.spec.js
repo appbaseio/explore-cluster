@@ -78,7 +78,10 @@ describe('Aggregation fields remove test flow', () => {
 	});
 
 	it('Should open aggregation settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/aggs`).wait(PAGE_LOAD_TIME);
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName}/aggs`);
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should add aggregation fields', () => {
@@ -96,7 +99,18 @@ describe('Aggregation fields remove test flow', () => {
 
 	it('Should review, save & deploy aggregation settings', () => {
 		cy.get('[data-cy=review-deploy-button]').click({ force: true }).wait(5000);
-		cy.get('[data-cy=review-save-button]').click().wait(5000);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('POST', '**/_reindex/**').as('reindex');
+		cy.get('[data-cy=review-save-button]').click();
+		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
+	});
+
+	it('Should open aggregation settings URL', () => {
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName}/aggs`);
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should delete fields from aggregation settings', () => {
@@ -114,7 +128,11 @@ describe('Aggregation fields remove test flow', () => {
 			.should('contain', 'name')
 			.get('[data-cy=aggregation-field-name-status]')
 			.should('contain', 'removed');
-		cy.get('[data-cy=review-save-button]').click().wait(5000);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('POST', '**/_reindex/**').as('reindex');
+		cy.get('[data-cy=review-save-button]').click();
+		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
 	});
 
 	it('Should check for no fields in aggregation settings', () => {

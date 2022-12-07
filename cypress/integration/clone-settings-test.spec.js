@@ -81,7 +81,10 @@ describe('Clone settings test flow', () => {
 	});
 
 	it('Should open search settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/search`).wait(5000);
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName}/search`);
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should change field weight of email in search settings', () => {
@@ -124,7 +127,11 @@ describe('Clone settings test flow', () => {
 			.get('[data-cy=new-weight]')
 			.eq(14)
 			.should('contain', '4.0');
-		cy.get('[data-cy=review-save-button]').click().wait(5000);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('POST', '**/_reindex/**').as('reindex');
+		cy.get('[data-cy=review-save-button]').click();
+		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
 	});
 
 	it('Should create a new index and clone the settings to it', () => {
@@ -141,7 +148,10 @@ describe('Clone settings test flow', () => {
 	});
 
 	it('Should open search settings URL of the new index', () => {
-		cy.visit(`${base_url}/app/${indexName2}/search`).wait(5000);
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName2}/search`);
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should verify the search settings of the new index', () => {

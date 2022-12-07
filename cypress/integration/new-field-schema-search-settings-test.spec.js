@@ -97,8 +97,9 @@ describe('New field from schema should allow it to add to search settings test f
 	it('Should confirm the mapping changes', () => {
 		cy.server();
 		cy.route('**/_mapping').as('mapping');
+		cy.route('POST', '**/_reindex/**').as('reindex');
 		cy.get('[data-cy=confirm-mapping-button]').click();
-		cy.wait('@mapping', { timeout: 20000 });
+		cy.wait(['@mapping', '@reindex'], { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should check the newly added data feild', () => {
@@ -143,7 +144,11 @@ describe('New field from schema should allow it to add to search settings test f
 			.should('contain', 'name')
 			.get('[data-cy=search-field-name-status]')
 			.should('contain', 'new');
-		cy.get('[data-cy=review-save-button]').click().wait(5000);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('POST', '**/_reindex/**').as('reindex');
+		cy.get('[data-cy=review-save-button]').click();
+		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
 	});
 
 	it('Should check search fields after deployment', () => {

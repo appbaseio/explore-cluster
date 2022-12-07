@@ -80,7 +80,10 @@ describe('Reset to default settings test flow', () => {
 	});
 
 	it('Should open search settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/search`).wait(PAGE_LOAD_TIME);
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName}/search`);
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should change field weight of email in search settings', () => {
@@ -118,7 +121,18 @@ describe('Reset to default settings test flow', () => {
 
 	it('Should save & deploy the changed settings', () => {
 		cy.get('[data-cy=review-deploy-button]').click().wait(5000);
-		cy.get('[data-cy=review-save-button]').click().wait(5000);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('POST', '**/_reindex/**').as('reindex');
+		cy.get('[data-cy=review-save-button]').click();
+		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
+	});
+
+	it('Should open search settings URL', () => {
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName}/search`);
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should check for the default settings', () => {
@@ -164,7 +178,11 @@ describe('Reset to default settings test flow', () => {
 	});
 
 	it('Should save and deploy the default settings', () => {
-		cy.get('[data-cy=review-save-button]').click().wait(LONG_REQUEST_RESOLVE_TIME);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('POST', '**/_reindex/**').as('reindex');
+		cy.get('[data-cy=review-save-button]').click();
+		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
 	});
 
 	it('Should check the deployed default settings', () => {

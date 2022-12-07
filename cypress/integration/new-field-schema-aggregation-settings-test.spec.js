@@ -107,8 +107,9 @@ describe('New field from schema should allow it to add to agg settings test flow
 	it('Should confirm the mapping changes', () => {
 		cy.server();
 		cy.route('**/_mapping').as('mapping');
+		cy.route('POST', '**/_reindex/**').as('reindex');
 		cy.get('[data-cy=confirm-mapping-button]').click();
-		cy.wait('@mapping', { timeout: 20000 });
+		cy.wait(['@mapping', '@reindex'], { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should check & confirm the data fields from the redux store', () => {
@@ -123,7 +124,10 @@ describe('New field from schema should allow it to add to agg settings test flow
 	});
 
 	it('Should open aggregation settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/aggs`).wait(PAGE_LOAD_TIME);
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName}/aggs`);
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should check for the fields availbale to add in aggregation settings', () => {

@@ -78,7 +78,10 @@ describe('Disable ngram remove search fields and reindex data test flow', () => 
 	});
 
 	it('Should open language settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/languages`).wait(PAGE_LOAD_TIME);
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName}/languages`);
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should change language analyzer from english to universal', () => {
@@ -91,7 +94,11 @@ describe('Disable ngram remove search fields and reindex data test flow', () => 
 			.should('contain', 'english')
 			.get('[data-cy=new-value-language-status]')
 			.should('contain', 'universal');
-		cy.get('[data-cy=review-save-button]').click().wait(5000);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('POST', '**/_reindex/**').as('reindex');
+		cy.get('[data-cy=review-save-button]').click();
+		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
 	});
 
 	it('Should check the new language analyzer in search settings', () => {

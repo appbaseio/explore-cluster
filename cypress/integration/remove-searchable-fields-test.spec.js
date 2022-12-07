@@ -98,12 +98,18 @@ describe('Searchable fields remove test flow', () => {
 			.contains('Add Field')
 			.click()
 			.wait(2000);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('POST', '**/_reindex/**').as('reindex');
 		cy.get('[data-cy=confirm-mapping-button]').click();
-		cy.wait(PAGE_LOAD_TIME);
+		cy.wait(['@mapping', '@reindex'], { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should open search settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/search`).wait(PAGE_LOAD_TIME);
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName}/search`);
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should verify search fields and add new field from schema', () => {
@@ -121,7 +127,11 @@ describe('Searchable fields remove test flow', () => {
 
 	it('Should save & deploy search settings', () => {
 		cy.get('[data-cy=review-deploy-button]').click({ force: true }).wait(2000);
-		cy.get('[data-cy=review-save-button]').click().wait(LONG_REQUEST_RESOLVE_TIME);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('POST', '**/_reindex/**').as('reindex');
+		cy.get('[data-cy=review-save-button]').click();
+		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
 	});
 
 	it('Should remove fields from search settings', () => {

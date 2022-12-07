@@ -80,8 +80,9 @@ describe('Save field schema settings test flow', () => {
 	it('Should open schema settings URL', () => {
 		cy.server();
 		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.visit(`${base_url}/app/${indexName}/schema`);
-		cy.wait('@mapping');
+		cy.wait(['@mapping', '@relevancy'], { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should add new data fields in schema', () => {
@@ -108,8 +109,9 @@ describe('Save field schema settings test flow', () => {
 	it('Should confirm the mapping changes', () => {
 		cy.server();
 		cy.route('**/_mapping').as('mapping');
+		cy.route('POST', '**/_reindex/**').as('reindex');
 		cy.get('[data-cy=confirm-mapping-button]').click();
-		cy.wait('@mapping', { timeout: 20000 });
+		cy.wait(['@mapping', '@reindex'], { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should check & confirm the mappings from the redux store', () => {

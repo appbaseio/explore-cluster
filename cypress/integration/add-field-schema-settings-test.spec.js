@@ -78,8 +78,10 @@ describe('Add field schema settings test flow', () => {
 	});
 
 	it('Should open schema settings URL', () => {
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
 		cy.visit(`${base_url}/app/${indexName}/schema`);
-		cy.wait(PAGE_LOAD_TIME);
+		cy.wait('@mapping').wait(5000);
 	});
 
 	it('Should add new data fields in schema', () => {
@@ -96,7 +98,7 @@ describe('Add field schema settings test flow', () => {
 		cy.server();
 		cy.route('**/_mapping').as('mapping');
 		cy.get('[data-cy=confirm-mapping-button]').click();
-		cy.wait('@mapping', { timeout: 20000 });
+		cy.wait('@mapping', { timeout: 20000 }).wait(5000);
 	});
 
 	it('Should check the newly added data feild', () => {

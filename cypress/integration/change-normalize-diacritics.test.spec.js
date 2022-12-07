@@ -79,9 +79,9 @@ describe('Change normalize diacritics test flow', () => {
 
 	it('Should open language settings URL', () => {
 		cy.server();
-		cy.route('**/_aliasedindices').as('indices');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.visit(`${base_url}/app/${indexName}/languages`);
-		cy.wait('@indices', { timeout: 25000 });
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should disable Normalize Diacritics', () => {
@@ -99,6 +99,13 @@ describe('Change normalize diacritics test flow', () => {
 		cy.route('POST', '**/_reindex/**').as('reindex');
 		cy.get('[data-cy=review-save-button]').click();
 		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
+	});
+
+	it('Should open language settings URL', () => {
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName}/languages`);
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should fetch setting from the app url & check for asciifolding to be not present in filters', () => {

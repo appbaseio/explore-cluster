@@ -27,11 +27,11 @@ describe('Index Suggestion Settings add test flow', () => {
 
 	it('Should Index suggestion settings page URL', () => {
 		cy.server();
-		cy.route('/arc/plan').as('plan');
-		cy.route('**/_aliasedindices').as('indices');
+		cy.route('**/preferences').as('preferences');
 		cy.visit(`${base_url}/cluster/suggestions`);
-		cy.wait(['@plan', '@indices'], { timeout: 25000 });
+		cy.wait('@preferences', { timeout: 30000 });
 		cy.get('.ant-tabs-nav .ant-tabs-tab:nth-child(3)').click();
+		cy.wait('@preferences', { timeout: 30000 });
 	});
 
 	it('Should Get Index Suggestions Settings Form Data', () => {
