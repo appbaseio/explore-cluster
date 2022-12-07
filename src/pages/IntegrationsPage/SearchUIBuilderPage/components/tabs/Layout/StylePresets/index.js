@@ -1,19 +1,13 @@
 import React, { Component } from 'react';
-// import { object, func } from 'prop-types';
 import { Select, Row, Col } from 'antd';
 import styled from 'react-emotion';
 import { FieldControl } from 'react-reactive-form';
-// import Helmet from 'react-helmet';
-// import { ReactiveBase, CategorySearch } from '@appbaseio/reactivesearch';
-// import get from 'lodash/get';
-import ColorPicker from '../../../../ColorPicker';
-import { fontWeights, webSafeFonts } from '../../../../utils';
-import ThemePreview from './ThemePreview';
-// import SuggestionsRenderer from './SuggestionRenderer';
+import ColorPicker from './ColorPicker';
+import { fontWeights, webSafeFonts } from '../../../../../utils';
+import ThemePreview from '../ThemePreview';
 
 const { Option } = Select;
 
-// const inputRef = React.createRef(null);
 const InputContainer = styled.div`
 	display: grid;
 	grid-gap: 10px;

@@ -5,9 +5,9 @@ import { css } from 'react-emotion';
 import get from 'lodash/get';
 import { string, func, bool, object } from 'prop-types';
 import { connect } from 'react-redux';
-import DeployLogsModal from './ExportInline/Components/DeployLogsModal';
-import Flex from '../../batteries/components/shared/Flex';
-import { getSearchPreferenceDeploymentStatus } from '../../batteries/modules/actions';
+import DeployLogsModal from '../ExportInline/Components/DeployLogsModal';
+import Flex from '../../../batteries/components/shared/Flex';
+import { getSearchPreferenceDeploymentStatus } from '../../../batteries/modules/actions';
 
 const container = css`
 	gap: 10px;

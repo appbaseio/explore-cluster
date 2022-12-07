@@ -11,14 +11,14 @@ import {
 	getByVersionId,
 	commitCode,
 	preferencesInConstants,
-} from './utils/sandpack-generator';
+} from '../../../utils/sandpack-generator';
 import {
 	saveSearchPreferenceN,
 	saveRecommendationPreferenceN,
-} from '../../batteries/modules/actions';
-import { transformPreferences, transformResultsDefaultFields } from './utils/index';
-import { transformContent } from './ExportInline/Components/ModalHeader';
-import { getDiffDataAndCount } from './utils';
+} from '../../../../../batteries/modules/actions';
+import { transformPreferences, transformResultsDefaultFields } from '../../../utils/index';
+import { transformContent } from '../../../ExportInline/Components/ModalHeader';
+import { getDiffDataAndCount } from '../../../utils';
 
 const Badge = styled.span`
 	background: #f5222d;
