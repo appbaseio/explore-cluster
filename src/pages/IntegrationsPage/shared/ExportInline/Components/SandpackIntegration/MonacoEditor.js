@@ -157,7 +157,7 @@ const MonacoEditor = ({ iframeHeight, highlightLine, path, setOpenCommitModal, s
 				border: 'rgb(52, 52, 52)',
 			}}
 		>
-			<FileTabs showTabs showLineNumbers showInlineErrors wrapContent={false} closableTabs />
+			<FileTabs showTabs showLineNumbers showInlineErrors closableTabs />
 			<div style={{ flex: 1 }}>
 				{isImage ? (
 					<div
