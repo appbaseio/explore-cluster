@@ -1,3 +1,4 @@
+import { PAGE_LOAD_TIME } from '../utils/constants';
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
 
@@ -32,6 +33,7 @@ describe('Stored query create test flow', () => {
 	});
 	it('Should open stored-query URL', () => {
 		cy.openPageSQ(base_url);
+		cy.wait(PAGE_LOAD_TIME);
 	});
 
 	it('Should fill stored-query id', () => {

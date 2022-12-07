@@ -103,6 +103,11 @@ describe('Update field schema settings test flow', () => {
 	});
 
 	it('Should check the data type of rating to integer', () => {
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.visit(`${base_url}/app/${indexName}/schema`);
+		cy.wait('@mapping');
+
 		cy.get('[data-cy=rating-popover-icon]').trigger('mouseover').wait(1000);
 		cy.get('[data-cy=rating-popover-content]').should('contain', '"type": "integer"');
 	});
