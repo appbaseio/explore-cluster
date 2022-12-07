@@ -3,10 +3,10 @@ import { Button, Modal, Switch, Radio, Form } from 'antd';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import { func, object, number, bool, oneOfType, string } from 'prop-types';
 import get from 'lodash/get';
-import ExportToShopify from './ExportToShopify';
-import ExportToOther from './ExportToOther';
+import ExportToShopify from '../../../ExportToShopify';
+import ExportToOther from '../../../ExportToOther';
 import ExportToHackable from './ExportToHackable';
-import { FormContext } from './utils';
+import { FormContext } from '../../../utils';
 
 class ExportModal extends React.Component {
 	state = {

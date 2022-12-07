@@ -14,8 +14,8 @@ import get from 'lodash/get';
 import TextInput from '../../../../../components/Form/Input';
 import DataFieldSelector from '../../../../../components/Form/DataFieldSelector';
 import Flex from '../../../../../batteries/components/shared/Flex';
-import PreviewModal from '../../../PreviewModal';
-import ExportModal from '../../../ExportModal';
+import PreviewModal from '../../PreviewModal';
+import ExportModal from './ExportModal';
 import {
 	FormContext,
 	getRecommendationForm,

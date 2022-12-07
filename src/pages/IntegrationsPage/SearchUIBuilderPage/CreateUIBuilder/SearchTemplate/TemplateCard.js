@@ -3,7 +3,7 @@ import { EyeTwoTone } from '@ant-design/icons';
 import { Card, Modal } from 'antd';
 import { func, object, string } from 'prop-types';
 import Preview from './Preview';
-import { modalStyles } from '../../../PreviewModal';
+import { modalStyles } from '../../../shared/PreviewModal';
 
 const { Meta } = Card;
 

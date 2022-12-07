@@ -4,10 +4,10 @@ import { Select, Tooltip } from 'antd';
 import get from 'lodash/get';
 import { func, object } from 'prop-types';
 import { connect } from 'react-redux';
-import { defaultPageSettings, getTemplate, transformPreferences } from './utils/index';
-import { getLatestVersion, commitCode, preferencesInConstants } from './utils/sandpack-generator';
-import { transformContent } from './ExportInline/Components/ModalHeader';
-import { saveSearchPreferenceN } from '../../batteries/modules/actions';
+import { defaultPageSettings, getTemplate, transformPreferences } from '../utils/index';
+import { getLatestVersion, commitCode, preferencesInConstants } from '../utils/sandpack-generator';
+import { transformContent } from '../ExportInline/Components/ModalHeader';
+import { saveSearchPreferenceN } from '../../../batteries/modules/actions';
 
 const PageRoutes = ({
 	getPreferencesPayload,

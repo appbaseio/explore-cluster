@@ -10,8 +10,8 @@ import SettingsTab from '../shared/tabs/Settings';
 import General from '../shared/tabs/General';
 import RecommendationsTab from '../shared/tabs/Recommendations';
 import { container } from '../../ResultsPage/styles';
-import PreviewModal from '../PreviewModal';
-import SyncStatus from '../SyncStatus';
+import PreviewModal from '../shared/PreviewModal';
+import SyncStatus from '../shared/SyncStatus';
 import PreferencesFormWrapper from '../PreferencesFormWrapperN';
 import SavePreferences from '../shared/SavePreferences';
 

@@ -16,8 +16,9 @@ import {
 } from '../../../utils/index';
 import files from '../../../../../../templates/files';
 import { footerStyles } from '../styles';
-import PreviewModal from '../../../PreviewModal';
+
 import { BACKENDS } from '../../../../../batteries/utils';
+import PreviewModal from '../../../shared/PreviewModal';
 
 const Footer = ({
 	form,

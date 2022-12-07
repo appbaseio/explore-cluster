@@ -5,10 +5,10 @@ import { css } from 'react-emotion';
 import get from 'lodash/get';
 import { func, string, bool, object, number, oneOfType } from 'prop-types';
 import { FieldGroup } from 'react-reactive-form';
-import StoreFrontPreview from './StoreFrontPreview';
-import SandpackModal from './SandpackModal';
-import PageRoutes from './PageRoutes';
-import Loader from '../../components/Loader';
+import StoreFrontPreview from '../../StoreFrontPreview';
+import SandpackModal from '../../SandpackModal';
+import PageRoutes from '../PageRoutes';
+import Loader from '../../../../components/Loader';
 
 export const modalStyles = css`
 	top: 0 !important;
