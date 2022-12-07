@@ -29,7 +29,7 @@ describe('Searchable fields remove test flow', () => {
 
 	it('Should navigate to cluster overview', () => {
 		cy.visit(`${base_url}`);
-		cy.wait(PAGE_LOAD_TIME);
+		cy.wait(5000);
 	});
 
 	it('Should create new index', () => {
@@ -78,7 +78,10 @@ describe('Searchable fields remove test flow', () => {
 	});
 
 	it('Should open schema URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/schema`).wait(PAGE_LOAD_TIME);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.visit(`${base_url}/app/${indexName}/schema`);
+		cy.wait('@mapping', { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should add new data fields in schema', () => {
@@ -105,14 +108,12 @@ describe('Searchable fields remove test flow', () => {
 		cy.wait(['@mapping', '@reindex'], { timeout: 25000 }).wait(5000);
 	});
 
-	it('Should open search settings URL', () => {
+	it('Should verify search fields and add new field from schema', () => {
 		cy.server();
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.visit(`${base_url}/app/${indexName}/search`);
 		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
-	});
 
-	it('Should verify search fields and add new field from schema', () => {
 		cy.get('[data-cy=field-name-address]')
 			.should('contain', 'address')
 			.get('[data-cy=field-name-email]')
@@ -135,6 +136,11 @@ describe('Searchable fields remove test flow', () => {
 	});
 
 	it('Should remove fields from search settings', () => {
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName}/search`);
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+
 		cy.get('[data-cy=remove-field-address]').click({ force: true }).wait(500);
 		cy.get('[data-cy=remove-field-email]').click({ force: true }).wait(500);
 		cy.get('[data-cy=remove-field-name]').click({ force: true }).wait(500);
@@ -162,11 +168,18 @@ describe('Searchable fields remove test flow', () => {
 			.should('contain', 'name')
 			.get('[data-cy=search-field-name-status]')
 			.should('contain', 'removed');
-		cy.get('[data-cy=review-save-button]').click().wait(LONG_REQUEST_RESOLVE_TIME);
+		cy.server();
+		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
+		cy.get('[data-cy=review-save-button]').click();
+		cy.wait(['@relevancy'], { timeout: 25000 });
 	});
 
 	it('Should check the new search settings after deployment', () => {
-		cy.get('[data-cy=reload-mappings-button]').click().wait(LONG_REQUEST_RESOLVE_TIME);
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName}/search`);
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+
 		cy.get('[data-cy=review-deploy-button]').click({ force: true }).wait(2000);
 		cy.get('[data-cy=search-field-address]')
 			.should('contain', 'address')
@@ -195,28 +208,8 @@ describe('Searchable fields remove test flow', () => {
 		cy.get('[data-cy=cancel-modal-button]').click();
 	});
 
-	it('Should detect re-indexing and assign index name prior to deletion', () => {
-		let credentials = btoa(`${username}:${password}`);
-
-		fetch(`${app_url}_alias/${indexName}`, {
-			headers: {
-				Authorization: `Basic ${credentials}`,
-			},
-		})
-			.then((response) => {
-				return response.json();
-			})
-			.then((data) => {
-				indexName = Object.keys(data)[0];
-			})
-			.catch((err) => {
-				console.log(err);
-			});
-	});
-
 	it('Should delete index', () => {
 		let credentials = btoa(`${username}:${password}`);
-
 		cy.request({
 			method: 'DELETE',
 			url: `${app_url}${indexName}`,

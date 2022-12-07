@@ -29,7 +29,7 @@ describe('Remove field schema settings test flow', () => {
 
 	it('Should navigate to cluster overview', () => {
 		cy.visit(`${base_url}`);
-		cy.wait(PAGE_LOAD_TIME);
+		cy.wait(5000);
 	});
 
 	it('Should create new index', () => {
@@ -94,36 +94,25 @@ describe('Remove field schema settings test flow', () => {
 	});
 
 	it('Should confirm the mapping changes', () => {
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('POST', '**/_reindex/**').as('reindex');
 		cy.get('[data-cy=confirm-mapping-button]').click();
-		cy.wait(PAGE_LOAD_TIME);
+		cy.wait(['@mapping', '@reindex'], { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should check & confirm the data fields from the redux store', () => {
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.visit(`${base_url}/app/${indexName}/schema`);
+		cy.wait('@mapping');
+
 		cy.window()
 			.its('store')
 			.invoke('getState')
 			.its('$getAppMappings')
 			.its(`traversedMappings.${indexName}`)
 			.should('be.empty');
-	});
-
-	it('Should detect re-indexing and assign index name prior to deletion', () => {
-		let credentials = btoa(`${username}:${password}`);
-
-		fetch(`${app_url}_alias/${indexName}`, {
-			headers: {
-				Authorization: `Basic ${credentials}`,
-			},
-		})
-			.then((response) => {
-				return response.json();
-			})
-			.then((data) => {
-				indexName = Object.keys(data)[0];
-			})
-			.catch((err) => {
-				console.log(err);
-			});
 	});
 
 	it('Should delete index', () => {

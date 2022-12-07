@@ -28,8 +28,9 @@ describe('Aggregation fields remove test flow', () => {
 	});
 
 	it('Should navigate to cluster overview', () => {
+		cy.server();
 		cy.visit(`${base_url}`);
-		cy.wait(PAGE_LOAD_TIME);
+		cy.wait(5000);
 	});
 
 	it('Should create new index', () => {
@@ -100,10 +101,9 @@ describe('Aggregation fields remove test flow', () => {
 	it('Should review, save & deploy aggregation settings', () => {
 		cy.get('[data-cy=review-deploy-button]').click({ force: true }).wait(5000);
 		cy.server();
-		cy.route('**/_mapping').as('mapping');
-		cy.route('POST', '**/_reindex/**').as('reindex');
+		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
+		cy.wait(['@relevancy'], { timeout: 25000 });
 	});
 
 	it('Should open aggregation settings URL', () => {
@@ -129,36 +129,21 @@ describe('Aggregation fields remove test flow', () => {
 			.get('[data-cy=aggregation-field-name-status]')
 			.should('contain', 'removed');
 		cy.server();
-		cy.route('**/_mapping').as('mapping');
-		cy.route('POST', '**/_reindex/**').as('reindex');
+		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
+		cy.wait(['@relevancy'], { timeout: 25000 });
 	});
 
 	it('Should check for no fields in aggregation settings', () => {
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName}/aggs`);
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+
 		cy.get('[data-cy=aggs-empty-field]')
 			.should('contain', 'Please add aggregation fields from the dropdown below')
 			.get('[data-cy=review-deploy-button]')
 			.should('be.disabled');
-	});
-
-	it('Should detect re-indexing and assign index name prior to deletion', () => {
-		let credentials = btoa(`${username}:${password}`);
-
-		fetch(`${app_url}_alias/${indexName}`, {
-			headers: {
-				Authorization: `Basic ${credentials}`,
-			},
-		})
-			.then((response) => {
-				return response.json();
-			})
-			.then((data) => {
-				indexName = Object.keys(data)[0];
-			})
-			.catch((err) => {
-				console.log(err);
-			});
 	});
 
 	it('Should delete index', () => {

@@ -77,7 +77,11 @@ describe('Searchable fields add test flow', () => {
 	});
 
 	it('Should open schema URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/schema`).wait(PAGE_LOAD_TIME);
+		// Should open schema settings url
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.visit(`${base_url}/app/${indexName}/schema`);
+		cy.wait('@mapping', { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should add new data fields in schema', () => {
@@ -98,17 +102,19 @@ describe('Searchable fields add test flow', () => {
 			.contains('Add Field')
 			.click()
 			.wait(2000);
-		cy.root().contains('Confirm Mapping Changes').click().wait(5000);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.get('[data-cy=confirm-mapping-button]').click();
+		cy.wait('@mapping', { timeout: 25000 }).wait(5000);
 	});
 
-	it('Should open search settings URL', () => {
+	it('Should verify search fields and add new field from schema', () => {
+		// Should open search settings url
 		cy.server();
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.visit(`${base_url}/app/${indexName}/search`);
 		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
-	});
 
-	it('Should verify search fields and add new field from schema', () => {
 		cy.get('[data-cy=field-name-address]')
 			.should('contain', 'address')
 			.get('[data-cy=field-name-email]')
@@ -116,7 +122,6 @@ describe('Searchable fields add test flow', () => {
 			.get('[data-cy=field-name-name]')
 			.should('contain', 'name')
 			.get('[data-cy=searchable-fields-dropdown]')
-			.click()
 			.type('{downarrow}{enter}')
 			.wait(1000);
 	});
@@ -155,44 +160,6 @@ describe('Searchable fields add test flow', () => {
 			.should('contain', 'name')
 			.get('[data-cy=field-name-phone]')
 			.should('contain', 'phone');
-	});
-
-	it('Should detect re-indexing and assign index name prior to deletion', () => {
-		let credentials = btoa(`${username}:${password}`);
-
-		fetch(`${app_url}_alias/${indexName}`, {
-			headers: {
-				Authorization: `Basic ${credentials}`,
-			},
-		})
-			.then((response) => {
-				return response.json();
-			})
-			.then((data) => {
-				indexName = Object.keys(data)[0];
-			})
-			.catch((err) => {
-				console.log(err);
-			});
-	});
-
-	it('Should detect re-indexing and assign index name prior to deletion', () => {
-		let credentials = btoa(`${username}:${password}`);
-
-		fetch(`${app_url}_alias/${indexName}`, {
-			headers: {
-				Authorization: `Basic ${credentials}`,
-			},
-		})
-			.then((response) => {
-				return response.json();
-			})
-			.then((data) => {
-				indexName = Object.keys(data)[0];
-			})
-			.catch((err) => {
-				console.log(err);
-			});
 	});
 
 	it('Should delete index', () => {

@@ -29,7 +29,7 @@ describe('Copy field schema settings test flow', () => {
 
 	it('Should navigate to cluster overview', () => {
 		cy.visit(`${base_url}`);
-		cy.wait(PAGE_LOAD_TIME);
+		cy.wait(5000);
 	});
 
 	it('Should create new index', () => {
@@ -70,7 +70,7 @@ describe('Copy field schema settings test flow', () => {
 		cy.server();
 		cy.route('**/_mapping').as('mapping');
 		cy.visit(`${base_url}/app/${indexName}/schema`);
-		cy.wait('@mapping');
+		cy.wait('@mapping', { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should copy field in schema', () => {
@@ -87,10 +87,16 @@ describe('Copy field schema settings test flow', () => {
 		cy.server();
 		cy.route('**/_mapping').as('mapping');
 		cy.get('[data-cy=confirm-mapping-button]').click();
-		cy.wait('@mapping', { timeout: 20000 });
+		cy.wait('@mapping', { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should check the newly added data feild', () => {
+		// Should open schema settings url
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.visit(`${base_url}/app/${indexName}/schema`);
+		cy.wait('@mapping', { timeout: 25000 }).wait(5000);
+
 		cy.get('[data-cy=field-name-copied_age]').should('contain', 'copied_age');
 	});
 	it('Should check & confirm the data fields from the redux store', () => {
@@ -101,25 +107,6 @@ describe('Copy field schema settings test flow', () => {
 			.its(`traversedMappings.${indexName}`)
 			.then((arr) => {
 				expect(arr).to.have.ordered.members(['age', 'copied_age', 'email', 'name']);
-			});
-	});
-
-	it('Should detect re-indexing and assign index name prior to deletion', () => {
-		let credentials = btoa(`${username}:${password}`);
-
-		fetch(`${app_url}_alias/${indexName}`, {
-			headers: {
-				Authorization: `Basic ${credentials}`,
-			},
-		})
-			.then((response) => {
-				return response.json();
-			})
-			.then((data) => {
-				indexName = Object.keys(data)[0];
-			})
-			.catch((err) => {
-				console.log(err);
 			});
 	});
 
