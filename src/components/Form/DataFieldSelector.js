@@ -64,8 +64,12 @@ class DataFieldSelector extends React.Component {
 	}
 
 	componentDidMount() {
-		const { appbaseCredentials, control } = this.props;
-		if (appbaseCredentials) {
+		const { appbaseCredentials, control, mappings } = this.props;
+		if (
+			appbaseCredentials &&
+			((Array.isArray(mappings) && mappings.length) ||
+				(typeof mappings === 'object' && Object.keys(mappings || {}).length))
+		) {
 			this.getMappings();
 		}
 		if (control && control.value && this.isFusion) this.fetchFields(control.value);
