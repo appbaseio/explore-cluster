@@ -4,7 +4,7 @@ import { CopyOutlined } from '@ant-design/icons';
 import { Button, message } from 'antd';
 import { FieldControl, FieldGroup } from 'react-reactive-form';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { getCSBScript, getRecommendationScript } from '../../../utils';
+import { getCSBScript, getRecommendationScript } from '../../../utils/utils';
 
 const copyToClipboard = () => {
 	message.success('Copied to clipboard', 5);

@@ -15,7 +15,7 @@ import Charts from './Charts';
 import PageRoutes from '../../../../shared/PageRoutes';
 import EndpointDropdown from '../../../../shared/Endpoint/EndpointDropdown';
 import { BACKENDS } from '../../../../../../batteries/utils';
-import { FormContext, verticalTab } from '../../../../utils';
+import { FormContext, verticalTab } from '../../../../utils/utils';
 
 const { TabPane } = Tabs;
 

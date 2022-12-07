@@ -6,7 +6,7 @@ import {
 	getSearchPreferencesPayload,
 	defaultSearchPreferences,
 	filterConfigurationFormDefaultFields,
-} from '../utils';
+} from './utils';
 
 export const deployStatusMapper = {
 	QUEUED: '🕓',

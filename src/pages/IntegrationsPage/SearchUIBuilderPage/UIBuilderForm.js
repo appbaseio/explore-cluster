@@ -69,7 +69,7 @@ const Main = ({ getPreferencesN, ...props }) => {
 				{({ getPreferences, getPreferencesPayload, form }) => {
 					const pipeline = form.get('pipeline') ? form.get('pipeline').value : null;
 					setIsLoading(false);
-
+					console.log(isLoading);
 					if (isLoading) {
 						return <Loader />;
 					}

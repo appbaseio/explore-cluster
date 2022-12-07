@@ -7,7 +7,7 @@ import {
 	getChartConfigurationForm,
 	chartConfigurationFormDefaultFields,
 	getChartKey,
-} from '../../../../../utils';
+} from '../../../../../utils/utils';
 
 // DynamicCharts
 const DynamicCharts = ({ getPreferencesPayload }) => {

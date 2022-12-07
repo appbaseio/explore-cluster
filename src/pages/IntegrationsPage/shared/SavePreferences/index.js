@@ -20,7 +20,7 @@ import {
 	defaultSearchPreferences,
 	defaultRecommendationsPreferences,
 	getDiffDataAndCount,
-} from '../../utils';
+} from '../../utils/utils';
 import { removeEmpty, reOrderPreferences, transformPreferences } from '../../utils/index';
 import ReviewAndSave from './ReviewAndSave';
 

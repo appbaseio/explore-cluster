@@ -3,7 +3,7 @@ import { Select, Row, Col } from 'antd';
 import styled from 'react-emotion';
 import { FieldControl } from 'react-reactive-form';
 import ColorPicker from './ColorPicker';
-import { fontWeights, webSafeFonts } from '../../../../../utils';
+import { fontWeights, webSafeFonts } from '../../../../../utils/utils';
 import ThemePreview from '../ThemePreview';
 
 const { Option } = Select;
