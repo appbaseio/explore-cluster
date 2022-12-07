@@ -28,23 +28,20 @@ describe('Query Rule creation with trigger index and script action', () => {
 		cy.wait(3000);
 	});
 
-	it('Should open query rules page', () => {
+	it('Should create a query rule', () => {
+		// Load query rules page
 		cy.server();
 		cy.route('/arc/plan').as('plan');
 		cy.route('**/_rules').as('rules');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/cluster/rules`);
 		cy.wait(['@plan', '@rules', '@indices'], { timeout: 25000 });
-	});
 
-	it('Should open new query rule form page', () => {
-		cy.server();
+		// Show query rules form
 		cy.route('**/_mapping').as('mapping');
 		cy.get('[data-cy=create-query-rule]').click();
 		cy.wait('@mapping', { timeout: 15000 }).wait(5000);
-	});
 
-	it('Should create a query rule', () => {
 		// Enter name and description
 		cy.get('[name="name"]').type('cypress-testing-rule-name');
 		cy.get('[name="description"]').type('cypress-testing-rule-description');
@@ -69,7 +66,9 @@ describe('Query Rule creation with trigger index and script action', () => {
 		cy.get('[data-cy=script-template]').click().type('a');
 		cy.wait(2000);
 		cy.get('[data-cy=asyncFetch]').click().wait(5000);
+	});
 
+	it('Should save query rule', () => {
 		cy.get('[data-cy=query-rule-save-script]').click();
 		cy.wait(2000);
 
@@ -86,6 +85,7 @@ describe('Query Rule creation with trigger index and script action', () => {
 			ruleId = xhr?.response?.body?.id || null;
 		});
 	});
+
 	it('Should delete query rule', () => {
 		const credentials = btoa(`${username}:${password}`);
 		if (ruleId) {
