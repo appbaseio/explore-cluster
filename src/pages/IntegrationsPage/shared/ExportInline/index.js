@@ -9,21 +9,21 @@ import { sandpackDark, githubLight } from '@codesandbox/sandpack-themes';
 // eslint-disable-next-line
 import SandPackIntegration from './Components/SandpackIntegration/SandpackIntegration';
 import ModalHeader, { transformContent } from './Components/ModalHeader';
-import Loader from '../../../components/Loader';
+import Loader from '../../../../components/Loader';
 import {
 	generateInlineSandboxURL,
 	tabSettings,
 	replaceWithPreferences,
-} from '../utils/sandpack-generator';
+} from '../../utils/sandpack-generator';
 import {
 	saveSearchPreferenceN,
 	getSearchPreferencesN,
 	getSearchPreferenceLatestVersionN,
 	getSearchPreferenceVersionCodeByVersionN,
-} from '../../../batteries/modules/actions';
-import AppConstants from '../../../batteries/modules/constants';
+} from '../../../../batteries/modules/actions';
+import AppConstants from '../../../../batteries/modules/constants';
 
-import { getTemplate } from '../utils/index';
+import { getTemplate } from '../../utils/index';
 
 const modalStyles = css`
 	padding-bottom: 0 !important;

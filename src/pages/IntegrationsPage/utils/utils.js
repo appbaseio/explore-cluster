@@ -7,8 +7,8 @@ import { diff } from 'jsondiffpatch';
 import isEqual from 'lodash/isEqual';
 import { isEqualWith } from 'lodash';
 // eslint-disable-next-line import/no-cycle
-import { removeEmpty } from './utils/index';
-import { BACKENDS } from '../../batteries/utils';
+import { removeEmpty } from './index';
+import { BACKENDS } from '../../../batteries/utils';
 
 // eslint-disable-next-line
 export const FormContext = React.createContext(null);

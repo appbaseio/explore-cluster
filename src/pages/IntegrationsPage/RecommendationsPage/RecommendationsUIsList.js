@@ -1,3 +1,7 @@
+/*
+	route: /cluster/recommendations-builder
+*/
+
 import React, { useEffect } from 'react';
 import { withRouter } from 'react-router-dom';
 import get from 'lodash/get';
@@ -58,7 +62,7 @@ const tableCls = css`
 	}
 `;
 
-const List = ({
+const RecommendationsUIsList = ({
 	getPreferences,
 	errors,
 	preferences,
@@ -129,13 +133,13 @@ const List = ({
 		</Container>
 	);
 };
-List.defaultProps = {
+RecommendationsUIsList.defaultProps = {
 	preferences: [],
 	errors: [],
 	isFetchingPreferences: false,
 	isDeletingPreference: false,
 };
-List.propTypes = {
+RecommendationsUIsList.propTypes = {
 	getPreferences: func.isRequired,
 	deletePreference: func.isRequired,
 	isFetchingPreferences: bool,
@@ -157,4 +161,4 @@ const mapDispatchToProps = (dispatch) => ({
 	deletePreference: (id) => dispatch(deleteRecommendationPreferenceN(id)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(List));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(RecommendationsUIsList));

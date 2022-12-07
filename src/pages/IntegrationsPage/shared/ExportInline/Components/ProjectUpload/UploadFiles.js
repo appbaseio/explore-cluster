@@ -3,7 +3,7 @@ import { fromEvent } from 'file-selector';
 import PropTypes from 'prop-types';
 import { UploadOutlined } from '@ant-design/icons';
 import { uploadStyles } from './styles';
-import { excludedArr } from '../../../utils/sandpack-generator';
+import { excludedArr } from '../../../../utils/sandpack-generator';
 
 const UploadFiles = ({ setErrMsg, setIsFilesFetching, setFileContent, setIsLoading }) => {
 	const inputRef = useRef(null);

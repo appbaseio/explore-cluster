@@ -15,17 +15,21 @@ import CommitModal from './CommitModal';
 import PastVersionsDrawer from './PastVersionsDrawer';
 import DeployLogsModal from './DeployLogsModal';
 import DeployModal from './DeployModal';
-import { deployStatusMapper, getTemplate } from '../../utils/index';
-import { commitCode, deployUiBuilder, transformPreferences } from '../../utils/sandpack-generator';
+import { deployStatusMapper, getTemplate } from '../../../utils/index';
+import {
+	commitCode,
+	deployUiBuilder,
+	transformPreferences,
+} from '../../../utils/sandpack-generator';
 import UploadModal from './ProjectUpload/UploadModal';
-import ThemeSwitch from '../../../../components/ThemeSwitcher';
+import ThemeSwitch from '../../../../../components/ThemeSwitcher';
 import {
 	getSearchPreferenceDeploymentStatus,
 	getSearchPreferencesN,
 	getSearchPreferenceVersionsN,
 	saveSearchPreferenceN,
-} from '../../../../batteries/modules/actions';
-import AppConstants from '../../../../batteries/modules/constants';
+} from '../../../../../batteries/modules/actions';
+import AppConstants from '../../../../../batteries/modules/constants';
 
 export async function asyncCallWithTimeout(asyncPromise, timeLimit) {
 	let timeoutHandle;

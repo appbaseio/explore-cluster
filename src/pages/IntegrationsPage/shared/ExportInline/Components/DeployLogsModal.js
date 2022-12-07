@@ -5,9 +5,9 @@ import { Modal, Card, Skeleton, Tooltip, Button } from 'antd';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import ndjsonStream from 'can-ndjson-stream';
 import Editor from './Editor';
-import { deployStatusMapper, timeDifference } from '../../utils/index';
 import { deployModalStyles, pastVersionsStyles } from './styles';
 import '../styles.css';
+import { deployStatusMapper, timeDifference } from '../../../utils/index';
 
 const DeployLogsModal = ({ open, handleCancel, deploymentStatus, uiBuilderName, preferenceId }) => {
 	const [deployLogs, setDeployLogs] = useState([]);

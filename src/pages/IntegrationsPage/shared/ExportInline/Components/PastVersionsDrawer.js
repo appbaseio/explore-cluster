@@ -5,7 +5,7 @@ import { Drawer, Divider, Row, Tooltip } from 'antd';
 // eslint-disable-next-line import/no-cycle
 import List from './List';
 import { pastVersionsStyles } from './styles';
-import { timeDifference } from '../../utils/index';
+import { timeDifference } from '../../../utils/index';
 
 const PastVersionsDrawer = ({
 	visible,

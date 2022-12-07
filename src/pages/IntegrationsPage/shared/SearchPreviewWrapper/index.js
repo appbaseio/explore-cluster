@@ -4,18 +4,18 @@ import { Button, Modal, Typography } from 'antd';
 import get from 'lodash/get';
 import Loadable from 'react-loadable';
 import { connect } from 'react-redux';
-import Loader from '../../components/Loader';
-import { modalStyles } from '../../components/SearchPreviewModal/SearchPreviewModal';
-import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
+import Loader from '../../../../components/Loader';
+import { modalStyles } from '../../../../components/SearchPreviewModal/SearchPreviewModal';
+import { getRawMappingsByAppName } from '../../../../batteries/modules/selectors';
 import {
 	getDefaultSettings,
 	deleteSettings,
 	getSettings as getSearchRelevancy,
 	setLocalRelevancyState,
-} from '../../batteries/modules/actions';
-import { getMappingsByPath, getMappingsInfo } from '../../utils/mappings';
-import { getSubFields } from '../../utils';
-import { getURL } from '../../constants/config';
+} from '../../../../batteries/modules/actions';
+import { getMappingsByPath, getMappingsInfo } from '../../../../utils/mappings';
+import { getSubFields } from '../../../../utils';
+import { getURL } from '../../../../constants/config';
 import FeaturedProductsWrapper from './FeaturedProductsWrapper';
 
 const { Text } = Typography;
@@ -23,7 +23,7 @@ const { Text } = Typography;
 const SearchPreview = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "SearchPreviewComponent" */ '../SandboxPage/components/SearchPreview'
+			/* webpackChunkName: "SearchPreviewComponent" */ '../../../SandboxPage/components/SearchPreview'
 		),
 	loading: Loader,
 });

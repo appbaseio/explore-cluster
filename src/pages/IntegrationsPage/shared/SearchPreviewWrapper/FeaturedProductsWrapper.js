@@ -4,8 +4,8 @@ import { Tabs, Row, Col } from 'antd';
 import { ReactiveBase } from '@appbaseio/reactivesearch';
 import Loadable from 'react-loadable';
 import { css } from 'emotion';
-import Loader from '../../components/Loader';
-import ListView from '../SandboxPage/components/Result/ListView';
+import Loader from '../../../../components/Loader';
+import ListView from '../../../SandboxPage/components/Result/ListView';
 
 const { TabPane } = Tabs;
 
@@ -25,7 +25,7 @@ const container = css`
 const SearchPreview = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "SearchPreviewComponent" */ '../SandboxPage/components/SearchPreview'
+			/* webpackChunkName: "SearchPreviewComponent" */ '../../../SandboxPage/components/SearchPreview'
 		),
 	loading: Loader,
 });

@@ -4,7 +4,7 @@ import get from 'lodash/get';
 import { SandpackCodeContext } from '../..'; //eslint-disable-line
 import Directory from './Directory'; //eslint-disable-line
 import File from './File'; //eslint-disable-line
-import { excludedArr, templateConfigMap } from '../../../utils/sandpack-generator';
+import { excludedArr, templateConfigMap } from '../../../../utils/sandpack-generator';
 
 const ModuleList = ({ depth, activePath, selectFile, prefixedPath }) => {
 	const { sandpackCode: files, preferences } = useContext(SandpackCodeContext);

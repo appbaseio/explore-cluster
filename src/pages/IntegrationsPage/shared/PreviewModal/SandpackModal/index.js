@@ -4,18 +4,21 @@ import get from 'lodash/get';
 import { SandpackProvider } from '@codesandbox/sandpack-react';
 import { atomDark } from '@codesandbox/sandpack-themes';
 import { connect } from 'react-redux';
-import { transformContent } from './ExportInline/Components/ModalHeader';
 import SandpackPreviewContainer from './SandpackPreviewContainer';
-import ReactivesearchLoader from '../../components/ReactivesearchLoader/ReactivesearchLoader';
-import { generateInlineSandboxURL, preferencesInConstants } from './utils/sandpack-generator';
+import ReactivesearchLoader from '../../../../../components/ReactivesearchLoader/ReactivesearchLoader';
+import {
+	generateInlineSandboxURL,
+	preferencesInConstants,
+} from '../../../utils/sandpack-generator';
 import {
 	getTemplate,
 	removeEmpty,
 	transformPreferences,
 	transformResultsDefaultFields,
-} from './utils/index';
-import { getSearchPreferenceLatestVersionN } from '../../batteries/modules/actions';
-import AppConstants from '../../batteries/modules/constants';
+} from '../../../utils/index';
+import { getSearchPreferenceLatestVersionN } from '../../../../../batteries/modules/actions';
+import AppConstants from '../../../../../batteries/modules/constants';
+import { transformContent } from '../../ExportInline/Components/ModalHeader';
 
 const SandpackModal = ({
 	preferences,

@@ -10,8 +10,9 @@ import { addDomain, getDomainStatus, getAllDomains } from '../../../../utils/dom
 import { domainSettingsTabStyles } from './styles';
 import DomainList from './DomainList';
 import { deployUiBuilder, getAllVersions } from '../../../../utils/sandpack-generator';
-import DeployModal from '../../../../ExportInline/Components/DeployModal';
+
 import { getSearchPreferenceDeploymentStatus } from '../../../../../../batteries/modules/actions';
+import DeployModal from '../../../../shared/ExportInline/Components/DeployModal';
 
 const isValidDomain = require('is-valid-domain');
 

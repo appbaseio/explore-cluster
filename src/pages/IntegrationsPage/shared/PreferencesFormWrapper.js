@@ -26,22 +26,22 @@ import {
 	getChartKey,
 	filterConfigurationFormDefaultFields,
 	perPageDependentKeys,
-} from './utils';
+} from '../utils/utils';
 import {
 	getSearchPreferenceById,
 	getRecommendationPreferenceById,
-} from '../../batteries/modules/selectors';
+} from '../../../batteries/modules/selectors';
 import {
 	getSearchPreferencesN,
 	getRecommendationsPreferencesN,
 	getSearchPreferenceLatestVersionN,
 	getSearchPreferenceVersionsN,
-} from '../../batteries/modules/actions';
-import AppConstants from '../../batteries/modules/constants';
+} from '../../../batteries/modules/actions';
+import AppConstants from '../../../batteries/modules/constants';
+import { removeEmpty, reOrderPreferences } from '../utils/index';
+import { BACKENDS } from '../../../batteries/utils';
+import { replaceWithPreferences } from '../utils/sandpack-generator';
 import { transformContent } from './ExportInline/Components/ModalHeader';
-import { removeEmpty, reOrderPreferences } from './utils/index';
-import { BACKENDS } from '../../batteries/utils';
-import { replaceWithPreferences } from './utils/sandpack-generator';
 
 const modalStyles = css`
 	.header-container {
@@ -102,7 +102,7 @@ const modalStyles = css`
 		display: flex;
 	}
 `;
-class PreferencesFormWrapperN extends React.Component {
+class PreferencesFormWrapper extends React.Component {
 	constructor(props) {
 		super(props);
 		this.isFusion = props.backend === BACKENDS.FUSION.name;
@@ -1276,7 +1276,7 @@ class PreferencesFormWrapperN extends React.Component {
 	}
 }
 
-PreferencesFormWrapperN.defaultProps = {
+PreferencesFormWrapper.defaultProps = {
 	isRecommendation: false,
 	preferenceId: null,
 	searchPreferences: getSearchPreferencesPayload(defaultSearchPreferences),
@@ -1286,7 +1286,7 @@ PreferencesFormWrapperN.defaultProps = {
 	backend: BACKENDS.ELASTICSEARCH.name,
 };
 
-PreferencesFormWrapperN.propTypes = {
+PreferencesFormWrapper.propTypes = {
 	// eslint-disable-next-line
 	preferenceId: string, // this props is being used in mapStateToProps
 	children: func.isRequired,
@@ -1330,4 +1330,4 @@ const mapDispatchToProps = (dispatch) => ({
 		}),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(PreferencesFormWrapperN));
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(PreferencesFormWrapper));

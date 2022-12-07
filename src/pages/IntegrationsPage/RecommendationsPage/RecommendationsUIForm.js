@@ -1,3 +1,7 @@
+/*
+	route: /cluster/recommendations-builder/:id
+*/
+
 import React, { useState } from 'react';
 import { withRouter } from 'react-router-dom';
 import get from 'lodash/get';
@@ -12,7 +16,7 @@ import RecommendationsTab from '../shared/tabs/Recommendations';
 import { container } from '../../ResultsPage/styles';
 import PreviewModal from '../shared/PreviewModal';
 import SyncStatus from '../shared/SyncStatus';
-import PreferencesFormWrapper from '../PreferencesFormWrapperN';
+import PreferencesFormWrapper from '../shared/PreferencesFormWrapper';
 import SavePreferences from '../shared/SavePreferences';
 
 const { TabPane } = Tabs;
@@ -25,7 +29,7 @@ const bannerDetailsPaid = {
 	href: 'http://docs.reactivesearch.io/docs/reactivesearch/ui-builder/recommendations/',
 };
 
-const Main = ({ tier, featureEcommerce, ...props }) => {
+const RecommendationsUIForm = ({ tier, featureEcommerce, ...props }) => {
 	const [activeTab, handleTabChange] = useState('1');
 	const [widgetInfo, handleWidgetInfo] = useState(false);
 	const isSettingsTabActive = activeTab === '3';
@@ -115,12 +119,12 @@ const Main = ({ tier, featureEcommerce, ...props }) => {
 	);
 };
 
-Main.defaultProps = {
+RecommendationsUIForm.defaultProps = {
 	preferenceId: null,
 	featureEcommerce: false,
 };
 
-Main.propTypes = {
+RecommendationsUIForm.propTypes = {
 	preferenceId: string,
 	history: object.isRequired,
 	match: object.isRequired,
@@ -133,4 +137,4 @@ const mapStateToProps = (state) => ({
 	featureEcommerce: get(state, '$getAppPlan.results.feature_ecommerce', false),
 });
 
-export default connect(mapStateToProps, null)(withRouter(Main));
+export default connect(mapStateToProps, null)(withRouter(RecommendationsUIForm));

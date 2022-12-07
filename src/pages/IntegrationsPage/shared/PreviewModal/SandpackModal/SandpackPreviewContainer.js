@@ -7,7 +7,7 @@ import {
 } from '@codesandbox/sandpack-react';
 import { CodeOutlined } from '@ant-design/icons';
 import { Button, Tooltip } from 'antd';
-import ReactivesearchLoader from '../../components/ReactivesearchLoader/ReactivesearchLoader';
+import ReactivesearchLoader from '../../../../../components/ReactivesearchLoader/ReactivesearchLoader';
 
 const SandpackPreviewContainer = () => {
 	const iframeHeight = window.innerHeight - 60;

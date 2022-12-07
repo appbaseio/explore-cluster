@@ -7,9 +7,9 @@ import { Collapse, Empty, Spin, Tooltip } from 'antd';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { css } from 'emotion';
-import Flex from '../../../../../batteries/components/shared/Flex';
 import DiffStatBlock from './DiffStateBlock';
-import { getChangedDetails } from '../../../utils/sandpack-generator';
+import Flex from '../../../../../../batteries/components/shared/Flex';
+import { getChangedDetails } from '../../../../utils/sandpack-generator';
 
 const diffViewPanel = css`
 	.ant-collapse-content-box {

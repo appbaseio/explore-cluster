@@ -3,9 +3,9 @@ import { func, bool, number, oneOfType, string } from 'prop-types';
 import { MobileOutlined, DesktopOutlined } from '@ant-design/icons';
 import { Button, notification } from 'antd';
 import get from 'lodash/get';
-import Loader from '../../components/Loader';
-import SearchPreviewWrapper from './SearchPreviewWrapper';
-import { BaseURL, BaseCSSURL } from './utils';
+import Loader from '../../../../components/Loader';
+import SearchPreviewWrapper from '../SearchPreviewWrapper';
+import { BaseURL, BaseCSSURL } from '../../utils/utils';
 
 class StoreFrontPreview extends React.Component {
 	constructor(props) {

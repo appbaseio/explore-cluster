@@ -16,9 +16,9 @@ import {
 	saveSearchPreferenceN,
 	saveRecommendationPreferenceN,
 } from '../../../../../batteries/modules/actions';
-import { transformPreferences, transformResultsDefaultFields } from '../../../utils/index';
-import { transformContent } from '../../../ExportInline/Components/ModalHeader';
-import { getDiffDataAndCount } from '../../../utils';
+import { getDiffDataAndCount } from '../../../utils/utils';
+import { transformContent } from '../../ExportInline/Components/ModalHeader';
+import { transformResultsDefaultFields, transformPreferences } from '../../../utils';
 
 const Badge = styled.span`
 	background: #f5222d;

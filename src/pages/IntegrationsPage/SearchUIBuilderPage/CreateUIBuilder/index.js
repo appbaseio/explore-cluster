@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { FieldGroup } from 'react-reactive-form';
 import { object } from 'prop-types';
 import Container from '../../../../components/Container';
-import PreferencesFormWrapperN from '../../PreferencesFormWrapperN';
+import PreferencesFormWrapper from '../../shared/PreferencesFormWrapper';
 import SearchTemplate from './SearchTemplate';
 import ConfigureConnection from './ConfigureConnection';
 import SearchUI from './SearchUI/Index';
@@ -37,7 +37,7 @@ const Wizard = ({ history, match }) => {
 	return (
 		<Container>
 			<Card style={{ minHeight: '100vh' }}>
-				<PreferencesFormWrapperN closeForm={closeForm} preferenceId={preferenceId}>
+				<PreferencesFormWrapper closeForm={closeForm} preferenceId={preferenceId}>
 					{/* eslint-disable-next-line */}
 					{({ getPreferences, getPreferencesPayload, form }) => {
 						const pipeline = form.get('pipeline') ? form.get('pipeline').value : null;
@@ -109,7 +109,7 @@ const Wizard = ({ history, match }) => {
 							</>
 						);
 					}}
-				</PreferencesFormWrapperN>
+				</PreferencesFormWrapper>
 			</Card>
 		</Container>
 	);

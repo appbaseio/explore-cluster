@@ -6,7 +6,7 @@ import { css } from 'react-emotion';
 import { func, string } from 'prop-types';
 import get from 'lodash/get';
 import { SandpackCodeContext } from '../..'; // eslint-disable-line
-import { excludedArr, templateConfigMap } from '../../../utils/sandpack-generator';
+import { excludedArr, templateConfigMap } from '../../../../utils/sandpack-generator';
 
 const searchContainerStyles = css`
 	.case-sensitive {

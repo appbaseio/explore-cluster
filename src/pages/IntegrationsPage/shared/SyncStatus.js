@@ -6,11 +6,8 @@ import get from 'lodash/get';
 import { string, object, func } from 'prop-types';
 import { connect } from 'react-redux';
 import Flex from '../../../batteries/components/shared/Flex';
-import DeployModal from '../ExportInline/Components/DeployModal';
-import DeployLogsModal from '../ExportInline/Components/DeployLogsModal';
 import { getAllVersions, deployUiBuilder, transformPreferences } from '../utils/sandpack-generator';
 import { deployStatusMapper, getTemplate } from '../utils/index';
-import PastVersionsDrawer from '../ExportInline/Components/PastVersionsDrawer';
 import {
 	getSearchPreferenceDeploymentStatus,
 	getSearchPreferencesN,
@@ -20,7 +17,10 @@ import {
 } from '../../../batteries/modules/actions';
 
 import AppConstants from '../../../batteries/modules/constants';
-import { transformContent } from '../ExportInline/Components/ModalHeader';
+import DeployLogsModal from './ExportInline/Components/DeployLogsModal';
+import DeployModal from './ExportInline/Components/DeployModal';
+import PastVersionsDrawer from './ExportInline/Components/PastVersionsDrawer';
+import { transformContent } from './ExportInline/Components/ModalHeader';
 
 const headerStyles = css`
 	b {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { css } from 'emotion';
 import PropTypes from 'prop-types';
-import Flex from '../../../../../batteries/components/shared/Flex';
+import Flex from '../../../../../../batteries/components/shared/Flex';
 
 const diffStatStyles = css`
 	.block-added {

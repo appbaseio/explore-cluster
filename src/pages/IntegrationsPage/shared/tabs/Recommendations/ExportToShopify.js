@@ -5,7 +5,11 @@ import { Button, message, Modal } from 'antd';
 import { FieldControl, FieldGroup } from 'react-reactive-form';
 import { css } from 'emotion';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { getInstallationScript, getCTAScript, getInstallationScriptRecommendation } from './utils';
+import {
+	getInstallationScript,
+	getCTAScript,
+	getInstallationScriptRecommendation,
+} from '../../../utils/utils';
 
 const stepsStyles = css`
 	li {

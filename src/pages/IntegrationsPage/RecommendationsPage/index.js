@@ -1,11 +1,13 @@
+/*
+	route: /cluster/recommendations-builder
+	meta: wrapper around RecommendationsUIsList.js
+*/
+
 import React, { useEffect } from 'react';
-import get from 'lodash/get';
-import { connect } from 'react-redux';
-import { bool, string } from 'prop-types';
-import List from './List';
-import { versionCompare } from '../../../batteries/utils/helpers';
+import RecommendationsUIsList from './RecommendationsUIsList';
+
 import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
-import Main from './Main';
+
 import { event, timingEvent } from '../../../utils/gtag';
 import moment from '../../../utils/moment';
 
@@ -17,7 +19,7 @@ const bannerDetailsPaid = {
 	href: 'http://docs.reactivesearch.io/docs/reactivesearch/ui-builder/recommendations/',
 };
 
-const RecommendationsIntegrationsPage = ({ arcVersion }) => {
+const RecommendationsIntegrationsPage = () => {
 	useEffect(() => {
 		const startTime = moment();
 		// triggering custom event for google analytics
@@ -43,26 +45,13 @@ const RecommendationsIntegrationsPage = ({ arcVersion }) => {
 	return (
 		<>
 			<Banner {...bannerDetailsPaid} />
-			{versionCompare(arcVersion, '7.54.0') === -1 ? <Main /> : <List />}
+			<RecommendationsUIsList />
 		</>
 	);
 };
 
-RecommendationsIntegrationsPage.defaultProps = {
-	featureEcommerce: false,
-};
+RecommendationsIntegrationsPage.defaultProps = {};
 
-RecommendationsIntegrationsPage.propTypes = {
-	tier: string.isRequired,
-	featureEcommerce: bool,
-	// System props
-	arcVersion: string.isRequired,
-};
+RecommendationsIntegrationsPage.propTypes = {};
 
-const mapStateToProps = (state) => ({
-	arcVersion: get(state, '$getAppPlan.results.version'),
-	tier: get(state, '$getAppPlan.results.tier'),
-	featureEcommerce: get(state, '$getAppPlan.results.feature_ecommerce', false),
-});
-
-export default connect(mapStateToProps, null)(RecommendationsIntegrationsPage);
+export default RecommendationsIntegrationsPage;

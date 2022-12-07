@@ -24,7 +24,7 @@ import { container } from '../../ResultsPage/styles';
 import Loader from '../../../components/Loader';
 import PreviewModal from '../shared/PreviewModal';
 import SyncStatus from '../shared/SyncStatus';
-import PreferencesFormWrapper from '../PreferencesFormWrapperN';
+import PreferencesFormWrapper from '../shared/PreferencesFormWrapper';
 import SavePreferences from '../shared/SavePreferences';
 import { getSearchPreferencesN } from '../../../batteries/modules/actions';
 

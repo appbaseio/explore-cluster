@@ -9,7 +9,7 @@ import {
 	getInstallationBodyScript,
 	getCTAScript,
 	getRecommendationScript,
-} from './utils';
+} from '../../../utils/utils';
 
 const copyToClipboard = () => {
 	message.success('Copied to clipboard', 5);

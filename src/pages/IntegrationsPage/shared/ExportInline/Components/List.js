@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import { CalendarTwoTone, SwapOutlined, UndoOutlined } from '@ant-design/icons';
 import { Tooltip, Button, Divider } from 'antd';
 import { pastVersionsStyles } from './styles';
-import { timeDifference } from '../../utils/index';
+import { timeDifference } from '../../../utils/index';
 import CodeDiffModal from './CodeDiff/CodeDiffModal';
-import { getByVersionId } from '../../utils/sandpack-generator';
+import { getByVersionId } from '../../../utils/sandpack-generator';
 // eslint-disable-next-line
 import { transformContent } from './ModalHeader';
 

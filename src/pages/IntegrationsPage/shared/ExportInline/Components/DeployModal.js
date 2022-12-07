@@ -3,7 +3,7 @@ import { withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Alert, Modal, Select, Tooltip } from 'antd';
-import { timeDifference, unsafeChars } from '../../utils/index';
+import { timeDifference, unsafeChars } from '../../../utils/index';
 import { commitModalStyles } from './styles';
 import '../styles.css';
 

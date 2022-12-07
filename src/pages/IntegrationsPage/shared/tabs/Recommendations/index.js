@@ -22,8 +22,8 @@ import {
 	RecommendationTypes,
 	RecommendationTypeLabels,
 	messages,
-} from '../../../utils';
-import SearchPreviewWrapper from '../../../SearchPreviewWrapper';
+} from '../../../utils/utils';
+import SearchPreviewWrapper from '../../SearchPreviewWrapper';
 
 const tableStyles = css`
 	tr {
