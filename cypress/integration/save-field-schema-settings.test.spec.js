@@ -77,14 +77,16 @@ describe('Save field schema settings test flow', () => {
 		});
 	});
 
-	it('Should add new data fields in schema', () => {
+	it('Should open schema settings URL', () => {
 		// Visit Schema page
 		cy.server();
 		cy.route('**/_mapping').as('mapping');
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.visit(`${base_url}/app/${indexName}/schema`);
 		cy.wait(['@mapping', '@relevancy'], { timeout: 25000 }).wait(5000);
+	});
 
+	it('Should add new data fields in schema', () => {
 		cy.get('[data-cy=new-field-button]').click().wait(1000);
 		cy.get('input[placeholder="Enter field name"]')
 			.type('rating')
@@ -92,8 +94,9 @@ describe('Save field schema settings test flow', () => {
 			.contains('Add Field')
 			.click()
 			.wait(2000);
+	});
 
-		// Should check for all the sub fields in the newly added data feild
+	it('Should check for all the sub fields in the newly added data feild', () => {
 		cy.get('[data-cy=rating-popover-icon]').trigger('mouseover');
 		cy.get('[data-cy=rating-popover-content]')
 			.should('contain', 'keyword')
@@ -108,8 +111,16 @@ describe('Save field schema settings test flow', () => {
 		cy.route('POST', '**/_reindex/**').as('reindex');
 		cy.get('[data-cy=confirm-mapping-button]').click();
 		cy.wait(['@mapping', '@reindex'], { timeout: 25000 }).wait(5000);
+	});
 
-		// Should check & confirm the mappings from the redux store
+	it('Should check & confirm the mappings from the redux store', () => {
+		// Visit Schema page
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName}/schema`);
+		cy.wait(['@mapping', '@relevancy'], { timeout: 25000 }).wait(5000);
+
 		cy.window()
 			.its('store')
 			.invoke('getState')
@@ -122,6 +133,25 @@ describe('Save field schema settings test flow', () => {
 				expect(obj).to.have.nested.property('delimiter');
 				expect(obj).to.have.nested.property('synonyms');
 				expect(obj).to.have.nested.property('lang');
+			});
+	});
+
+	it('Should assign index name prior to deletion', () => {
+		let credentials = btoa(`${username}:${password}`);
+
+		fetch(`${app_url}_alias/${indexName}`, {
+			headers: {
+				Authorization: `Basic ${credentials}`,
+			},
+		})
+			.then((response) => {
+				return response.json();
+			})
+			.then((data) => {
+				indexName = Object.keys(data)[0];
+			})
+			.catch((err) => {
+				console.log(err);
 			});
 	});
 

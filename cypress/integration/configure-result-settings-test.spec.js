@@ -138,14 +138,33 @@ describe('Configure result settings without reindexing test flow', () => {
 			.get(`[data-cy=new-value-number_of_fragments-status]`)
 			.should('contain', '6');
 		cy.server();
-		cy.route('**/_mapping').as('mapping');
-		cy.route('POST', '**/_reindex/**').as('reindex');
+		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
+		cy.wait(['@relevancy'], { timeout: 25000 });
+	});
+
+	it('Should assign index name prior to deletion', () => {
+		let credentials = btoa(`${username}:${password}`);
+
+		fetch(`${app_url}_alias/${indexName}`, {
+			headers: {
+				Authorization: `Basic ${credentials}`,
+			},
+		})
+			.then((response) => {
+				return response.json();
+			})
+			.then((data) => {
+				indexName = Object.keys(data)[0];
+			})
+			.catch((err) => {
+				console.log(err);
+			});
 	});
 
 	it('Should delete index', () => {
 		let credentials = btoa(`${username}:${password}`);
+
 		cy.request({
 			method: 'DELETE',
 			url: `${app_url}${indexName}`,

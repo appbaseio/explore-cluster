@@ -128,10 +128,9 @@ describe('Clone settings test flow', () => {
 			.eq(14)
 			.should('contain', '4.0');
 		cy.server();
-		cy.route('**/_mapping').as('mapping');
-		cy.route('POST', '**/_reindex/**').as('reindex');
+		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
+		cy.wait(['@relevancy'], { timeout: 25000 });
 	});
 
 	it('Should create a new index and clone the settings to it', () => {
@@ -147,14 +146,12 @@ describe('Clone settings test flow', () => {
 			.wait(10000);
 	});
 
-	it('Should open search settings URL of the new index', () => {
+	it('Should verify the search settings of the new index', () => {
 		cy.server();
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.visit(`${base_url}/app/${indexName2}/search`);
 		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
-	});
 
-	it('Should verify the search settings of the new index', () => {
 		cy.get('[data-cy=field-name-email]')
 			.should('contain', 'email')
 			.get('[data-cy=email-number-input]')
@@ -169,12 +166,41 @@ describe('Clone settings test flow', () => {
 			.should('have.value', '4.0');
 	});
 
+	it('Should assign index name prior to deletion', () => {
+		let credentials = btoa(`${username}:${password}`);
+
+		fetch(`${app_url}_alias/${indexName}`, {
+			headers: {
+				Authorization: `Basic ${credentials}`,
+			},
+		})
+			.then((response) => {
+				return response.json();
+			})
+			.then((data) => {
+				indexName = Object.keys(data)[0];
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	});
+
 	it('Should delete index', () => {
 		let credentials = btoa(`${username}:${password}`);
 
 		cy.request({
 			method: 'DELETE',
 			url: `${app_url}${indexName}`,
+			headers: {
+				Authorization: `Basic ${credentials}`,
+			},
+		});
+
+		cy.wait(5000);
+
+		cy.request({
+			method: 'DELETE',
+			url: `${app_url}${indexName2}`,
 			headers: {
 				Authorization: `Basic ${credentials}`,
 			},

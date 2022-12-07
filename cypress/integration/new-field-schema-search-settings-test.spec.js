@@ -103,6 +103,11 @@ describe('New field from schema should allow it to add to search settings test f
 	});
 
 	it('Should check the newly added data feild', () => {
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.visit(`${base_url}/app/${indexName}/schema`);
+		cy.wait('@mapping');
+
 		cy.get('[data-cy=field-name-rating]').should('contain', 'rating');
 	});
 
@@ -152,6 +157,11 @@ describe('New field from schema should allow it to add to search settings test f
 	});
 
 	it('Should check search fields after deployment', () => {
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.visit(`${base_url}/app/${indexName}/schema`);
+		cy.wait('@mapping');
+
 		cy.get('[data-cy=field-name-email]')
 			.should('contain', 'email')
 			.get('[data-cy=field-name-name]')
@@ -168,6 +178,25 @@ describe('New field from schema should allow it to add to search settings test f
 			.its(`rawMappings.${indexName}.properties.rating.fields`)
 			.then((obj) => {
 				expect(obj).to.have.nested.property('search');
+			});
+	});
+
+	it('Should assign index name prior to deletion', () => {
+		let credentials = btoa(`${username}:${password}`);
+
+		fetch(`${app_url}_alias/${indexName}`, {
+			headers: {
+				Authorization: `Basic ${credentials}`,
+			},
+		})
+			.then((response) => {
+				return response.json();
+			})
+			.then((data) => {
+				indexName = Object.keys(data)[0];
+			})
+			.catch((err) => {
+				console.log(err);
 			});
 	});
 

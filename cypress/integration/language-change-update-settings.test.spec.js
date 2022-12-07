@@ -102,11 +102,34 @@ describe('Disable ngram remove search fields and reindex data test flow', () => 
 	});
 
 	it('Should check the new language analyzer in search settings', () => {
-		cy.visit(`${base_url}/app/${indexName}/search`).wait(PAGE_LOAD_TIME);
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName}/search`);
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+
 		cy.get('[data-cy=email-popover-icon]').trigger('mouseover');
 		cy.get('[data-cy=email-popover-content]').should('contain', '"analyzer": "universal"');
 		cy.get('[data-cy=name-popover-icon]').trigger('mouseover', { force: true });
 		cy.get('[data-cy=name-popover-content]').should('contain', '"analyzer": "universal"');
+	});
+
+	it('Should assign index name prior to deletion', () => {
+		let credentials = btoa(`${username}:${password}`);
+
+		fetch(`${app_url}_alias/${indexName}`, {
+			headers: {
+				Authorization: `Basic ${credentials}`,
+			},
+		})
+			.then((response) => {
+				return response.json();
+			})
+			.then((data) => {
+				indexName = Object.keys(data)[0];
+			})
+			.catch((err) => {
+				console.log(err);
+			});
 	});
 
 	it('Should delete index', () => {

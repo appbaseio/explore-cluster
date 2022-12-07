@@ -104,7 +104,10 @@ describe('Reset to default settings test flow', () => {
 	});
 
 	it('Should open aggregation settings', () => {
-		cy.get('[data-cy=path-sub-AggregationSettings]').click().wait(5000);
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.get('[data-cy=path-sub-AggregationSettings]').click();
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should change query format to and', () => {
@@ -112,7 +115,11 @@ describe('Reset to default settings test flow', () => {
 	});
 
 	it('Should open result settings', () => {
-		cy.get('[data-cy=path-sub-ResultSettings]').click().wait(5000);
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+
+		cy.get('[data-cy=path-sub-ResultSettings]').click();
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should change the page size', () => {
@@ -122,20 +129,17 @@ describe('Reset to default settings test flow', () => {
 	it('Should save & deploy the changed settings', () => {
 		cy.get('[data-cy=review-deploy-button]').click().wait(5000);
 		cy.server();
-		cy.route('**/_mapping').as('mapping');
-		cy.route('POST', '**/_reindex/**').as('reindex');
+		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
-	});
-
-	it('Should open search settings URL', () => {
-		cy.server();
-		cy.route('**/_searchrelevancy/**').as('relevancy');
-		cy.visit(`${base_url}/app/${indexName}/search`);
-		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.wait(['@relevancy'], { timeout: 25000 });
 	});
 
 	it('Should check for the default settings', () => {
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName}/results`);
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+
 		cy.get('[data-cy=reset-default-button]').click().wait(5000);
 		cy.get('[data-cy=search-field-email]')
 			.should('contain', 'email')
@@ -179,30 +183,51 @@ describe('Reset to default settings test flow', () => {
 
 	it('Should save and deploy the default settings', () => {
 		cy.server();
-		cy.route('**/_mapping').as('mapping');
-		cy.route('POST', '**/_reindex/**').as('reindex');
+		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
+		cy.wait(['@relevancy'], { timeout: 25000 });
 	});
 
 	it('Should check the deployed default settings', () => {
-		cy.get('[data-cy=result-page-size]')
-			.should('have.value', '10')
-			.get('[data-cy=path-sub-AggregationSettings]')
-			.click()
-			.wait(5000)
-			.get('[data-cy=query-format-or-radio]')
-			.should('be.checked')
-			.get('[data-cy=path-sub-SearchSettings]')
-			.click()
-			.wait(5000)
-			.get('[data-cy=search-empty-field]')
-			.should('contain', 'No Search Fields Are Present')
-			.get('[data-cy=path-sub-LanguageSettings]')
-			.click()
-			.wait(5000)
-			.get('[data-cy=language-value]')
-			.should('contain', 'Universal');
+		cy.wait(5000);
+		cy.server();
+		// Result settings
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.get('[data-cy=result-page-size]').should('have.value', '10');
+
+		// Aggregation settings
+		cy.get('[data-cy=path-sub-AggregationSettings]').click();
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.get('[data-cy=query-format-or-radio]').should('be.checked');
+
+		// Search settings
+		cy.get('[data-cy=path-sub-SearchSettings]').click();
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.get('[data-cy=search-empty-field]').should('contain', 'No Search Fields Are Present');
+
+		// Language settings
+		cy.get('[data-cy=path-sub-LanguageSettings]').click();
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.get('[data-cy=language-value]').should('contain', 'Universal');
+	});
+
+	it('Should assign index name prior to deletion', () => {
+		let credentials = btoa(`${username}:${password}`);
+
+		fetch(`${app_url}_alias/${indexName}`, {
+			headers: {
+				Authorization: `Basic ${credentials}`,
+			},
+		})
+			.then((response) => {
+				return response.json();
+			})
+			.then((data) => {
+				indexName = Object.keys(data)[0];
+			})
+			.catch((err) => {
+				console.log(err);
+			});
 	});
 
 	it('Should delete index', () => {
@@ -215,6 +240,10 @@ describe('Reset to default settings test flow', () => {
 				Authorization: `Basic ${credentials}`,
 			},
 		});
+	});
+
+	it('Should wait for banner to clear', () => {
+		cy.wait(5000);
 	});
 
 	it('Should logout user', () => {

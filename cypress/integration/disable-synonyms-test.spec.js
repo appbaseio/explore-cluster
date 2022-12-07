@@ -97,13 +97,17 @@ describe('Disable synonyms test flow', () => {
 			.get('[data-cy=new-value-enableSynonyms-status]')
 			.should('contain', 'false');
 		cy.server();
-		cy.route('**/_mapping').as('mapping');
-		cy.route('POST', '**/_reindex/**').as('reindex');
+		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
+		cy.wait(['@relevancy'], { timeout: 25000 });
 	});
 
 	it('Should check & confirm the data fields from the redux store', () => {
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName}/search`);
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+
 		cy.window()
 			.its('store')
 			.invoke('getState')
@@ -114,8 +118,28 @@ describe('Disable synonyms test flow', () => {
 			});
 	});
 
+	it('Should assign index name prior to deletion', () => {
+		let credentials = btoa(`${username}:${password}`);
+
+		fetch(`${app_url}_alias/${indexName}`, {
+			headers: {
+				Authorization: `Basic ${credentials}`,
+			},
+		})
+			.then((response) => {
+				return response.json();
+			})
+			.then((data) => {
+				indexName = Object.keys(data)[0];
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	});
+
 	it('Should delete index', () => {
 		let credentials = btoa(`${username}:${password}`);
+
 		cy.request({
 			method: 'DELETE',
 			url: `${app_url}${indexName}`,
