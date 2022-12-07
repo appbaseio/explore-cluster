@@ -29,6 +29,7 @@ describe('Searchable fields add test flow', () => {
 
 	it('Should navigate to cluster overview', () => {
 		cy.visit(`${base_url}`);
+		cy.wait(5000);
 	});
 
 	it('Should create new index', () => {

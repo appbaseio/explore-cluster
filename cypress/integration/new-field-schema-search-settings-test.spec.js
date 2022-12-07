@@ -29,7 +29,7 @@ describe('New field from schema should allow it to add to search settings test f
 
 	it('Should navigate to cluster overview', () => {
 		cy.visit(`${base_url}`);
-		cy.wait(PAGE_LOAD_TIME);
+		cy.wait(5000);
 	});
 
 	it('Should create new index', () => {
@@ -168,25 +168,6 @@ describe('New field from schema should allow it to add to search settings test f
 			.its(`rawMappings.${indexName}.properties.rating.fields`)
 			.then((obj) => {
 				expect(obj).to.have.nested.property('search');
-			});
-	});
-
-	it('Should detect re-indexing and assign index name prior to deletion', () => {
-		let credentials = btoa(`${username}:${password}`);
-
-		fetch(`${app_url}_alias/${indexName}`, {
-			headers: {
-				Authorization: `Basic ${credentials}`,
-			},
-		})
-			.then((response) => {
-				return response.json();
-			})
-			.then((data) => {
-				indexName = Object.keys(data)[0];
-			})
-			.catch((err) => {
-				console.log(err);
 			});
 	});
 

@@ -29,7 +29,7 @@ describe('Change normalize diacritics test flow', () => {
 
 	it('Should navigate to cluster overview', () => {
 		cy.visit(`${base_url}`);
-		cy.wait(PAGE_LOAD_TIME);
+		cy.wait(5000);
 	});
 
 	it('Should create new index', () => {
@@ -77,18 +77,16 @@ describe('Change normalize diacritics test flow', () => {
 		});
 	});
 
-	it('Should open language settings URL', () => {
+	it('Should disable Normalize Diacritics', () => {
+		// visit language settings url
 		cy.server();
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.visit(`${base_url}/app/${indexName}/languages`);
 		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
-	});
 
-	it('Should disable Normalize Diacritics', () => {
+		// Disable diacritics
 		cy.get('[data-cy=normalize-diacritics-switch]').click().wait(1000);
-	});
 
-	it('Should review, save & deploy the changed settings', () => {
 		cy.get('[data-cy=review-deploy-button]').click().wait(5000);
 		cy.get('[data-cy=old-value-normalizeDiacritics-status]')
 			.should('contain', 'true')
@@ -99,16 +97,8 @@ describe('Change normalize diacritics test flow', () => {
 		cy.route('POST', '**/_reindex/**').as('reindex');
 		cy.get('[data-cy=review-save-button]').click();
 		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
-	});
 
-	it('Should open language settings URL', () => {
-		cy.server();
-		cy.route('**/_searchrelevancy/**').as('relevancy');
-		cy.visit(`${base_url}/app/${indexName}/languages`);
-		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
-	});
-
-	it('Should fetch setting from the app url & check for asciifolding to be not present in filters', () => {
+		// Should fetch setting from the app url & check for asciifolding to be not present in filters
 		cy.request(`https://${username}:${password}@${cluster}/${indexName}/_settings`).then(
 			(response) => {
 				expect(
@@ -137,9 +127,8 @@ describe('Change normalize diacritics test flow', () => {
 				).to.not.include('asciifolding');
 			},
 		);
-	});
 
-	it('Should check the state for normalizeDiacritics is false from the redux store', () => {
+		// Should check the state for normalizeDiacritics is false from the redux store'
 		cy.window()
 			.its('store')
 			.invoke('getState')
@@ -150,12 +139,17 @@ describe('Change normalize diacritics test flow', () => {
 			.its('normalizeDiacritics')
 			.should('eq', false);
 	});
-
 	it('Should enable Normalize Diacritics', () => {
-		cy.get('[data-cy=normalize-diacritics-switch]').click().wait(1000);
-	});
+		// visit language settings url
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.visit(`${base_url}/app/${indexName}/languages`);
+		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
 
-	it('Should review, save & deploy the changed settings', () => {
+		// enable diacritics
+		cy.get('[data-cy=normalize-diacritics-switch]').click().wait(1000);
+
+		// Should review, save & deploy the changed settings
 		cy.get('[data-cy=review-deploy-button]').click().wait(5000);
 		cy.get('[data-cy=old-value-normalizeDiacritics-status]')
 			.should('contain', 'false')
@@ -166,9 +160,8 @@ describe('Change normalize diacritics test flow', () => {
 		cy.route('POST', '**/_reindex/**').as('reindex');
 		cy.get('[data-cy=review-save-button]').click();
 		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
-	});
 
-	it('Should check the state for normalizeDiacritics is true from the redux store', () => {
+		// Should check the state for normalizeDiacritics is true from the redux store
 		cy.window()
 			.its('store')
 			.invoke('getState')
@@ -178,9 +171,7 @@ describe('Change normalize diacritics test flow', () => {
 			.its('language')
 			.its('normalizeDiacritics')
 			.should('eq', true);
-	});
-
-	it('Should fetch setting from the app url & check for asciifolding to be present in filters', () => {
+		// Should fetch setting from the app url & check for asciifolding to be present in filters
 		cy.request(`https://${username}:${password}@${cluster}/${indexName}/_settings`).then(
 			(response) => {
 				expect(
@@ -209,25 +200,6 @@ describe('Change normalize diacritics test flow', () => {
 				).to.include('asciifolding');
 			},
 		);
-	});
-
-	it('Should detect re-indexing and assign index name prior to deletion', () => {
-		let credentials = btoa(`${username}:${password}`);
-
-		fetch(`${app_url}_alias/${indexName}`, {
-			headers: {
-				Authorization: `Basic ${credentials}`,
-			},
-		})
-			.then((response) => {
-				return response.json();
-			})
-			.then((data) => {
-				indexName = Object.keys(data)[0];
-			})
-			.catch((err) => {
-				console.log(err);
-			});
 	});
 
 	it('Should delete index', () => {

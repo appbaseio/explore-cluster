@@ -28,7 +28,6 @@ describe('Aggregation fields remove test flow', () => {
 	});
 
 	it('Should navigate to cluster overview', () => {
-		cy.server();
 		cy.visit(`${base_url}`);
 		cy.wait(5000);
 	});

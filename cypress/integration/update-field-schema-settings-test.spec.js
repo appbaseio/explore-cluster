@@ -29,7 +29,7 @@ describe('Update field schema settings test flow', () => {
 
 	it('Should navigate to cluster overview', () => {
 		cy.visit(`${base_url}`);
-		cy.wait(PAGE_LOAD_TIME);
+		cy.wait(5000);
 	});
 
 	it('Should create new index', () => {
@@ -115,25 +115,6 @@ describe('Update field schema settings test flow', () => {
 			.its(`rawMappings.${indexName}.properties.rating`)
 			.then((obj) => {
 				expect(obj).to.nested.include({ type: 'integer' });
-			});
-	});
-
-	it('Should detect re-indexing and assign index name prior to deletion', () => {
-		let credentials = btoa(`${username}:${password}`);
-
-		fetch(`${app_url}_alias/${indexName}`, {
-			headers: {
-				Authorization: `Basic ${credentials}`,
-			},
-		})
-			.then((response) => {
-				return response.json();
-			})
-			.then((data) => {
-				indexName = Object.keys(data)[0];
-			})
-			.catch((err) => {
-				console.log(err);
 			});
 	});
 
