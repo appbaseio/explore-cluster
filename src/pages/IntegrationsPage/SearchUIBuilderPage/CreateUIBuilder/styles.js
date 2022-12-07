@@ -11,6 +11,7 @@ export const SearchTemplateStyles = css`
 
 	.theme-templates-container {
 		display: flex;
+		flex-wrap: wrap;
 		gap: 40px;
 	}
 
