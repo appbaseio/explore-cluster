@@ -145,6 +145,25 @@ describe('Aggregation fields remove test flow', () => {
 			.should('be.disabled');
 	});
 
+	it('Should assign index name prior to deletion', () => {
+		let credentials = btoa(`${username}:${password}`);
+
+		fetch(`${app_url}_alias/${indexName}`, {
+			headers: {
+				Authorization: `Basic ${credentials}`,
+			},
+		})
+			.then((response) => {
+				return response.json();
+			})
+			.then((data) => {
+				indexName = Object.keys(data)[0];
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	});
+
 	it('Should delete index', () => {
 		let credentials = btoa(`${username}:${password}`);
 

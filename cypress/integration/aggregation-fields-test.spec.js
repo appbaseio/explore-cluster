@@ -77,22 +77,40 @@ describe('Aggregation fields test flow', () => {
 		});
 	});
 
-	it('Should open aggregation settings URL', () => {
+	it('Should check default aggregation settings', () => {
 		cy.server();
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.visit(`${base_url}/app/${indexName}/aggs`);
 		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
-	});
 
-	it('Should check default aggregation settings', () => {
 		cy.get('[data-cy=aggs-empty-field]')
 			.should('contain', 'Please add aggregation fields from the dropdown below')
 			.get('[data-cy=review-deploy-button]')
 			.should('be.disabled');
 	});
 
+	it('Should assign index name prior to deletion', () => {
+		let credentials = btoa(`${username}:${password}`);
+
+		fetch(`${app_url}_alias/${indexName}`, {
+			headers: {
+				Authorization: `Basic ${credentials}`,
+			},
+		})
+			.then((response) => {
+				return response.json();
+			})
+			.then((data) => {
+				indexName = Object.keys(data)[0];
+			})
+			.catch((err) => {
+				console.log(err);
+			});
+	});
+
 	it('Should delete index', () => {
 		let credentials = btoa(`${username}:${password}`);
+
 		cy.request({
 			method: 'DELETE',
 			url: `${app_url}${indexName}`,
