@@ -61,9 +61,6 @@ describe('Query Rule creation with trigger index and script action', () => {
 	});
 
 	it('Should save query rule', () => {
-		cy.get('[data-cy=query-rule-save-script]').click();
-		cy.wait(2000);
-
 		// Save query rule
 		const credentials = btoa(`${username}:${password}`);
 		cy.server();
