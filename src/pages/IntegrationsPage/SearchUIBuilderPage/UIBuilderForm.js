@@ -24,7 +24,7 @@ import PreferencesFormWrapper from '../shared/PreferencesFormWrapper';
 import { getSearchPreferences } from '../../../batteries/modules/actions';
 import EndUserAuthentication from './components/tabs/EndUserAuthentication';
 import LayoutTab from './components/tabs/Layout';
-import SearchTab from './components/tabs/Search';
+import UIComponents from './components/tabs/UIComponents';
 import General from '../shared/tabs/General';
 import DomainSettingsTab from './components/tabs/DomainSettings';
 import Footer from './components/Footer';
@@ -118,7 +118,7 @@ const Main = ({ getPreferencesN, ...props }) => {
 										}
 										key="3"
 									>
-										<SearchTab
+										<UIComponents
 											getPreferences={getPreferences}
 											getPreferencesPayload={getPreferencesPayload}
 											setIsEditorLoading={setIsEditorLoading}

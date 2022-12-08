@@ -19,7 +19,7 @@ import { FormContext, verticalTab } from '../../../../utils/utils';
 
 const { TabPane } = Tabs;
 
-const SearchSettings = ({ getPreferencesPayload, getPreferences, setIsEditorLoading, backend }) => {
+const UIComponents = ({ getPreferencesPayload, getPreferences, setIsEditorLoading, backend }) => {
 	const form = useContext(FormContext);
 	const isFusion = backend === BACKENDS.FUSION.name;
 
@@ -201,11 +201,11 @@ const SearchSettings = ({ getPreferencesPayload, getPreferences, setIsEditorLoad
 	);
 };
 
-SearchSettings.defaultProps = {
+UIComponents.defaultProps = {
 	backend: BACKENDS.ELASTICSEARCH.name,
 };
 
-SearchSettings.propTypes = {
+UIComponents.propTypes = {
 	getPreferencesPayload: func.isRequired,
 	getPreferences: func.isRequired,
 	setIsEditorLoading: func.isRequired,
@@ -216,4 +216,4 @@ const mapStateToProps = (state) => ({
 	backend: get(state, '$getAppPlan.results.backend'),
 });
 
-export default connect(mapStateToProps, null)(SearchSettings);
+export default connect(mapStateToProps, null)(UIComponents);
