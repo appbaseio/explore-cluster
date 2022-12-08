@@ -103,14 +103,14 @@ const EndpointDropdown = ({
 				{isFusion ? (
 					renderFusionFields()
 				) : (
-					<>
+					<Form layout="vertical" style={{ display: 'flex', gap: 10, width: '100%' }}>
 						<FieldControl strict={false} name={isPageLevel ? 'index' : 'pipeline'}>
 							{({ handler }) => (
 								<Form.Item
 									style={{
 										margin: 0,
 										padding: 0,
-										width: '80%',
+										width: '30%',
 									}}
 									required
 									label="Pipeline"
@@ -122,7 +122,6 @@ const EndpointDropdown = ({
 										placeholder="Select an Index"
 										style={{
 											minWidth: 300,
-											width: '80%',
 										}}
 									>
 										{(filteredApps || [])
@@ -158,7 +157,7 @@ const EndpointDropdown = ({
 							style={{
 								margin: 0,
 								padding: 0,
-								width: '100%',
+								width: '80%',
 							}}
 							label="Endpoint"
 						>
@@ -314,7 +313,7 @@ const EndpointDropdown = ({
 								</Select.Option>
 							</Select>
 						</Form.Item>
-					</>
+					</Form>
 				)}
 			</div>
 			{isPageLevel ? (

@@ -9,7 +9,7 @@ const endpointConfigStyles = css`
 
 	.endpoint-dropdown {
 		min-width: 500px;
-		max-width: 500px;
+
 		width: 100%;
 	}
 
