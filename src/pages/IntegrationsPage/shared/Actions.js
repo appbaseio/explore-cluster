@@ -70,8 +70,6 @@ class Actions extends React.Component {
 		return (
 			<div>
 				<Flex alignItems="center" css={container} justifyContent="space-between">
-					{/* <Flex justifyContent="space-between" alignItems="center" className="left-container"> */}
-
 					<Tooltip
 						placement="topLeft"
 						title={isRecommendation ? `Edit Recommendation UI` : `Edit Search UI`}

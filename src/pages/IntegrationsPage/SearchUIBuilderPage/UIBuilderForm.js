@@ -10,29 +10,24 @@ import { connect } from 'react-redux';
 import {
 	AppstoreOutlined,
 	DatabaseOutlined,
-	LoadingOutlined,
 	SettingOutlined,
 	UnlockOutlined,
 } from '@ant-design/icons';
-
-import { Tabs, Affix, Button } from 'antd';
-import { FieldGroup } from 'react-reactive-form';
+import { Tabs } from 'antd';
 import { object, array, func } from 'prop-types';
 import { v4 as uuidv4 } from 'uuid';
 import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
-import { container } from '../../ResultsPage/styles';
+import { container } from './styles';
 import Loader from '../../../components/Loader';
-import PreviewModal from '../shared/PreviewModal';
 import SyncStatus from '../shared/SyncStatus';
 import PreferencesFormWrapper from '../shared/PreferencesFormWrapper';
-import SavePreferences from '../shared/SavePreferences';
 import { getSearchPreferences } from '../../../batteries/modules/actions';
-
 import EndUserAuthentication from './components/tabs/EndUserAuthentication';
 import LayoutTab from './components/tabs/Layout';
 import SearchTab from './components/tabs/Search';
 import General from '../shared/tabs/General';
 import DomainSettingsTab from './components/tabs/DomainSettings';
+import Footer from './components/Footer';
 
 const { TabPane } = Tabs;
 
@@ -45,7 +40,6 @@ const bannerDetailsPaid = {
 };
 
 const Main = ({ getPreferencesN, ...props }) => {
-	const [componentKey, setComponentKey] = useState(1);
 	useEffect(() => {
 		getPreferencesN();
 	}, []);
@@ -61,15 +55,11 @@ const Main = ({ getPreferencesN, ...props }) => {
 	return (
 		<div>
 			<Banner {...bannerDetailsPaid} />
-			<PreferencesFormWrapper
-				key={componentKey}
-				closeForm={closeForm}
-				preferenceId={preferenceId}
-			>
+			<PreferencesFormWrapper closeForm={closeForm} preferenceId={preferenceId}>
 				{({ getPreferences, getPreferencesPayload, form }) => {
 					const pipeline = form.get('pipeline') ? form.get('pipeline').value : null;
 					setIsLoading(false);
-					console.log(isLoading);
+
 					if (isLoading) {
 						return <Loader />;
 					}
@@ -158,70 +148,16 @@ const Main = ({ getPreferencesN, ...props }) => {
 									</TabPane>
 								</Tabs>
 
-								<Affix
-									offsetBottom={0}
-									style={{
-										backgroundColor: '#fff',
-										padding: '15px 10px',
-										width: 'calc(100% - 50px)',
-									}}
-								>
-									<div className="flex space-between card-footer">
-										<div className="flex" style={{ gap: 10 }}>
-											<PreviewModal
-												pipeline={pipeline}
-												preferences={getPreferences}
-												preferenceId={preferenceId}
-												form={form}
-												getPreferencesPayload={getPreferencesPayload}
-												isEditorLoading={isEditorLoading}
-												setIsEditorLoading={setIsEditorLoading}
-											/>
-											<FieldGroup
-												control={form}
-												strict={false}
-												render={() => (
-													<Button
-														onClick={() => {
-															props.history.push(
-																`/cluster/search-builder/${preferenceId}/code`,
-															);
-														}}
-														disabled={isEditorLoading}
-														size="large"
-													>
-														<div className="button-label">
-															{isEditorLoading ? (
-																<LoadingOutlined
-																	style={{ marginRight: 5 }}
-																/>
-															) : (
-																<img
-																	alt="code-icon"
-																	width={15}
-																	src="/static/images/code-icon.svg"
-																/>
-															)}
-															Code Editor
-														</div>
-													</Button>
-												)}
-											/>
-										</div>
-										<div>
-											<SavePreferences
-												form={form}
-												closeForm={closeForm}
-												preferenceId={preferenceId}
-												getPreferences={getPreferences}
-												getPreferencesPayload={getPreferencesPayload}
-												remountComponent={() =>
-													setComponentKey(componentKey + 1)
-												}
-											/>
-										</div>
-									</div>
-								</Affix>
+								<Footer
+									isEditorLoading={isEditorLoading}
+									setIsEditorLoading={setIsEditorLoading}
+									pipeline={pipeline}
+									getPreferences={getPreferences}
+									preferenceId={preferenceId}
+									getPreferencesPayload={getPreferencesPayload}
+									closeForm={closeForm}
+									history={props.history}
+								/>
 							</div>
 						</>
 					);

@@ -115,7 +115,6 @@ class SavePreferences extends React.Component {
 			getPreferencesPayload,
 			getPreferences,
 			closeForm,
-			remountComponent,
 		} = this.props;
 		const { oldData, newData } = this.getOldDataNewData();
 
@@ -140,7 +139,6 @@ class SavePreferences extends React.Component {
 					getPreferencesPayload={getPreferencesPayload}
 					getPreferences={getPreferences}
 					form={form}
-					remountComponent={remountComponent}
 				/>
 			</>
 		);
@@ -173,8 +171,6 @@ SavePreferences.propTypes = {
 	form: object.isRequired,
 	errors: arrayOf(object),
 	closeForm: func.isRequired,
-
-	remountComponent: func.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({
