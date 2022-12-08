@@ -116,7 +116,7 @@ const ReviewAndSave = ({
 
 					commitCode(preferenceId, body)
 						.then((res) => {
-							// update versionId in preferences with res.version_id
+							// update deployed code versionId in preferences with res.version_id
 							form.get('versionId').setValue(res.version_id);
 							// inject auth0 clientId in authentication settings
 							if (newPreferences.authenticationSettings && clientId) {
@@ -163,7 +163,7 @@ const ReviewAndSave = ({
 			};
 			commitCode(preferenceId, body)
 				.then((res) => {
-					// update versionId in preferences with res.version_id
+					// update deployed code versionId in preferences with res.version_id
 					form.get('versionId').setValue(res.version_id);
 					// Save the new preferences
 					// inject auth0 clientId in authentication settings

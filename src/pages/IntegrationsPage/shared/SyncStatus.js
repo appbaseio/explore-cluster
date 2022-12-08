@@ -1,9 +1,9 @@
 import React from 'react';
 import { css } from 'emotion';
-import { ClockCircleOutlined } from '@ant-design/icons';
-import { Card, Button, Tooltip } from 'antd';
+import { BellOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { Card, Button, Tooltip, Badge } from 'antd';
 import get from 'lodash/get';
-import { string, object, func } from 'prop-types';
+import { string, object, func, bool } from 'prop-types';
 import { connect } from 'react-redux';
 import Flex from '../../../batteries/components/shared/Flex';
 import { getAllVersions, deployUiBuilder, transformPreferences } from '../utils/sandpack-generator';
@@ -288,7 +288,15 @@ class SyncStatus extends React.Component {
 			themeType,
 			showPastVersionsDrawer,
 		} = this.state;
-		const { form, versionState, preferenceId, updateVersionStateForPreference } = this.props;
+		const {
+			form,
+			versionState,
+			preferenceId,
+			updateVersionStateForPreference,
+			setShowNotification,
+			setShowTemplateUpdateBanner,
+			showNotification,
+		} = this.props;
 		const title = form.get('name') ? form.get('name').value : '';
 		const pipeline = form.get('pipeline') ? form.get('pipeline').value : '';
 		const templateObj = getTemplate(themeType);
@@ -329,7 +337,25 @@ class SyncStatus extends React.Component {
 							<Flex className="sub-part">
 								{themeType ? (
 									<>
-										<b>Search Template</b>
+										<b>
+											Search Template{' '}
+											{showNotification ? (
+												<Badge dot>
+													<BellOutlined
+														key={
+															form.get('templateVersionId')
+																? form.get('templateVersionId')
+																		.value
+																: 'templateVersionId'
+														}
+														onClick={() => {
+															setShowTemplateUpdateBanner(true);
+															setShowNotification(false);
+														}}
+													/>
+												</Badge>
+											) : null}
+										</b>
 										<>{templateObj.label || themeType}</>
 									</>
 								) : null}
@@ -434,6 +460,9 @@ class SyncStatus extends React.Component {
 SyncStatus.defaultProps = {
 	preferenceId: '',
 	versionState: {},
+	showNotification: false,
+	setShowNotification: () => {},
+	setShowTemplateUpdateBanner: () => {},
 };
 
 SyncStatus.propTypes = {
@@ -447,6 +476,9 @@ SyncStatus.propTypes = {
 	updateSearchPreferences: func.isRequired,
 	getSearchPreferenceVersions: func.isRequired,
 	getDeploymentStatus: func.isRequired,
+	setShowTemplateUpdateBanner: func,
+	setShowNotification: func,
+	showNotification: bool,
 };
 
 const mapStateToProps = (state, props) => ({
