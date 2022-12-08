@@ -124,6 +124,7 @@ const ConfigureConnection = ({
 												setMode('create');
 												setShowForm(true);
 											}}
+											style={{ width: '20%' }}
 										>
 											Create an API credential
 										</Button>
@@ -133,7 +134,7 @@ const ConfigureConnection = ({
 											showSearch
 											placeholder="Choose an existing API credential"
 											style={{
-												minWidth: 500,
+												width: '75%',
 											}}
 											optionLabelProp="value"
 											onSelect={(val) => {

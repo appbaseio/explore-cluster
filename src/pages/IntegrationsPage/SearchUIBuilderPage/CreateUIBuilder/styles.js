@@ -59,6 +59,7 @@ export const configureConnectionStyles = css`
 		margin: 30px 0px 60px 0px;
 		display: flex;
 		justify-content: space-evenly;
+		width: 100%;
 	}
 `;
 
