@@ -13,6 +13,7 @@ const UpgradeVersion = ({
 	templateVersionId,
 	updateSearchPreferences,
 	getPreferencesPayload,
+	setTemplateVersionId,
 }) => {
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -70,7 +71,10 @@ const UpgradeVersion = ({
 					<Button
 						size="small"
 						type="primary"
-						onClick={handleCommitCode}
+						onClick={() => {
+							setTemplateVersionId();
+							handleCommitCode();
+						}}
 						loading={isLoading}
 					>
 						Update
@@ -91,6 +95,7 @@ UpgradeVersion.defaultProps = {
 	preferenceId: '',
 	templateVersionId: '',
 	setShowNotification: () => {},
+	setTemplateVersionId: () => {},
 };
 
 UpgradeVersion.propTypes = {
@@ -100,6 +105,7 @@ UpgradeVersion.propTypes = {
 	getPreferencesPayload: func.isRequired,
 	updateSearchPreferences: func.isRequired,
 	setShowNotification: func,
+	setTemplateVersionId: func,
 };
 
 const mapDispatchToProps = (dispatch, props) => ({

@@ -81,6 +81,7 @@ const Main = ({ getPreferencesN, ...props }) => {
 					if (isLoading) {
 						return <Loader />;
 					}
+
 					return (
 						<>
 							{templateObj.version !== templateVersionId &&
