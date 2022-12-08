@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { FieldControl, FieldGroup } from 'react-reactive-form';
 import { Tabs, Select, Form } from 'antd';
 import { css } from 'emotion';
-import ResultSettings from '../../../SearchUIBuilderPage/components/tabs/Search/Results';
+import ResultSettings from '../../../SearchUIBuilderPage/components/tabs/UIComponents/Results';
 import TextInput from '../../../../../components/Form/Input';
 import { FormContext, CtaActions } from '../../../utils/utils';
 import LayoutTab from '../../../SearchUIBuilderPage/components/tabs/Layout';
