@@ -114,10 +114,10 @@
   dependencies:
     cross-fetch "^3.0.4"
 
-"@appbaseio/dejavu-browser@^3.7.0":
-  version "3.7.0"
-  resolved "https://registry.yarnpkg.com/@appbaseio/dejavu-browser/-/dejavu-browser-3.7.0.tgz#8bebe479fb9efb34584c6632e4bb374dae4c3ccf"
-  integrity sha512-kjBcUBkZ3tMGSwbF0hBUuIq/gn5/it1aTwJkmWWomtK0Y6lb0aldWs8d8N5usgy+WWhhi6z12UqyzromQlDQVA==
+"@appbaseio/dejavu-browser@^3.7.1":
+  version "3.7.1"
+  resolved "https://registry.yarnpkg.com/@appbaseio/dejavu-browser/-/dejavu-browser-3.7.1.tgz#9e767ff1f3a8ad2ca336f8162a0788cc4bce4cb2"
+  integrity sha512-A/5BpKWhD05LWDXFfFqWgt4omBxKOj+4JI68P+0SYC2i+0yAlebGPs54s5dfPkP9tWuXUYajbUrVrK31R2QGWw==
   dependencies:
     "@divyanshu013/media" "^1.0.0"
     "@fortawesome/fontawesome-svg-core" "^1.2.27"
