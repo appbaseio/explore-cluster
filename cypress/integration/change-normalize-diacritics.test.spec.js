@@ -96,7 +96,7 @@ describe('Change normalize diacritics test flow', () => {
 		cy.route('**/_mapping').as('mapping');
 		cy.route('POST', '**/_reindex/**').as('reindex');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
+		cy.wait(['@mapping', '@reindex'], { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should check the state for normalizeDiacritics is false from the redux store', () => {
@@ -168,7 +168,7 @@ describe('Change normalize diacritics test flow', () => {
 		cy.route('**/_mapping').as('mapping');
 		cy.route('POST', '**/_reindex/**').as('reindex');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
+		cy.wait(['@mapping', '@reindex'], { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should check the state for normalizeDiacritics is true from the redux store', () => {

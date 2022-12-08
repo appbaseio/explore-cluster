@@ -149,7 +149,7 @@ describe('Searchable fields add test flow', () => {
 		cy.route('**/_mapping').as('mapping');
 		cy.route('POST', '**/_reindex/**').as('reindex');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
+		cy.wait(['@mapping', '@reindex'], { timeout: 25000 }).wait(5000);
 	});
 
 	it('Should check search fields after deployment', () => {
