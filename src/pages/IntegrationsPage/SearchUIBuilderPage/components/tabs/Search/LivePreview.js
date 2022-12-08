@@ -9,7 +9,7 @@ import {
 import { connect } from 'react-redux';
 import { get } from 'lodash';
 import { getURL } from '../../../../../../constants/config';
-import { FormContext, transformFacets } from '../../../../utils';
+import { FormContext, transformFacets } from '../../../../utils/utils';
 import { BACKENDS } from '../../../../../../batteries/utils';
 
 const DEBOUNCE_TIME = 1000;

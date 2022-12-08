@@ -4,7 +4,7 @@ import { Tabs, Tooltip, message } from 'antd';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { func, object, string } from 'prop-types';
 import get from 'lodash/get';
-import { transformCharts } from '../../../../../utils';
+import { transformCharts } from '../../../../../utils/utils';
 import { getURL } from '../../../../../../../constants/config';
 import { removeEmpty } from '../../../../../utils/index';
 import { BACKENDS } from '../../../../../../../batteries/utils';

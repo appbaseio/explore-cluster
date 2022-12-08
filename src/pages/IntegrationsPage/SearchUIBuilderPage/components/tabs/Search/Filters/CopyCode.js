@@ -5,7 +5,7 @@ import get from 'lodash/get';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import { componentTypes } from '@appbaseio/reactivesearch';
 import { func, object, string } from 'prop-types';
-import { transformFacets } from '../../../../../utils';
+import { transformFacets } from '../../../../../utils/utils';
 import { getURL } from '../../../../../../../constants/config';
 import { removeEmpty } from '../../../../../utils/index';
 import { BACKENDS } from '../../../../../../../batteries/utils';

@@ -7,7 +7,7 @@ import {
 	getFilterConfigurationForm,
 	FormContext,
 	getDynamicFilterKey,
-} from '../../../../../utils';
+} from '../../../../../utils/utils';
 
 const DynamicFilters = ({ getPreferencesPayload }) => {
 	const form = useContext(FormContext);

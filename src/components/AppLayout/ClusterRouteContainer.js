@@ -126,7 +126,7 @@ const UIBuildersListPage = Loadable({
 const RecommendationsIntegrationsPage = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "RecommendationsIntegrationsPage" */ '../../pages/IntegrationsPage/RecommendationsN'
+			/* webpackChunkName: "RecommendationsIntegrationsPage" */ '../../pages/IntegrationsPage/RecommendationsPage'
 		),
 	loading: Loader,
 });
@@ -169,7 +169,7 @@ const CreateUIBuilderPage = Loadable({
 const RecommendationsPreferencePage = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "RecommendationsPreferencePage" */ '../../pages/IntegrationsPage/RecommendationsN/Main'
+			/* webpackChunkName: "RecommendationsPreferencePage" */ '../../pages/IntegrationsPage/RecommendationsPage/RecommendationsUIForm'
 		),
 	loading: Loader,
 });

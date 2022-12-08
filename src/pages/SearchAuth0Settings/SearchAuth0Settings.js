@@ -24,7 +24,7 @@ import {
 	getAuth0ClientConnection,
 	patchAuth0ClientConnection,
 } from '../../batteries/modules/actions';
-import { FormContext } from '../IntegrationsPage/utils';
+import { FormContext } from '../IntegrationsPage/utils/utils';
 import {
 	atleastOneCheckBoxValidator,
 	commaSeparatedStringsValidator,

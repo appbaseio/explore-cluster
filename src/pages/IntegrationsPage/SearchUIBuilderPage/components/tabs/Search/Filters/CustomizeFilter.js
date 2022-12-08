@@ -16,7 +16,7 @@ import { RANGE_FIELDS, CALENDAR_INTERVAL_FIELDS } from '../../../../../../../con
 import { DatePickerStyles, filterModalStyles } from './styles';
 import 'react-day-picker/lib/style.css';
 import Data from './Data';
-import { dataPropFromArray } from '../../../../../utils';
+import { dataPropFromArray } from '../../../../../utils/utils';
 import { BACKENDS } from '../../../../../../../batteries/utils';
 import { CardButton, CodeEditorCard } from '../styles';
 import CodeEditorModal from '../CodeEditorModal';

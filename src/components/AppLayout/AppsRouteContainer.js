@@ -71,7 +71,7 @@ const StoredQueriesPage = Loadable({
 const RecommendationsIntegrationsPage = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "RecommendationsIntegrationsPage" */ '../../pages/IntegrationsPage/RecommendationsN'
+			/* webpackChunkName: "RecommendationsIntegrationsPage" */ '../../pages/IntegrationsPage/RecommendationsPage'
 		),
 	loading: Loader,
 });

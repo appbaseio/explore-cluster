@@ -3,7 +3,7 @@ import { EyeOutlined } from '@ant-design/icons';
 import { Input, Alert, Card, Button } from 'antd';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
 import { css } from 'emotion';
-import { FormContext } from '../../../../utils';
+import { FormContext } from '../../../../utils/utils';
 import AceEditor from '../../../../../../batteries/components/SearchSandbox/containers/AceEditor';
 
 const container = css`

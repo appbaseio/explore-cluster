@@ -6,7 +6,7 @@ import { FieldGroup, FieldControl } from 'react-reactive-form';
 import Grid from '../../../../components/CreateCredentials/Grid';
 import { suggestionsMessages as Messages } from '../../../../utils/messages';
 import styles from '../styles';
-import { FormContext } from '../../../IntegrationsPage/utils';
+import { FormContext } from '../../../IntegrationsPage/utils/utils';
 import IndexMultiSelect from '../PopularSuggestions/IndexMultiSelect';
 
 export const PreferenceFormContext = React.createContext();

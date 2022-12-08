@@ -14,16 +14,16 @@ import get from 'lodash/get';
 import TextInput from '../../../../../components/Form/Input';
 import DataFieldSelector from '../../../../../components/Form/DataFieldSelector';
 import Flex from '../../../../../batteries/components/shared/Flex';
-import PreviewModal from '../../../PreviewModal';
-import ExportModal from '../../../ExportModal';
+import PreviewModal from '../../PreviewModal';
+import ExportModal from './ExportModal';
 import {
 	FormContext,
 	getRecommendationForm,
 	RecommendationTypes,
 	RecommendationTypeLabels,
 	messages,
-} from '../../../utils';
-import SearchPreviewWrapper from '../../../SearchPreviewWrapper';
+} from '../../../utils/utils';
+import SearchPreviewWrapper from '../../SearchPreviewWrapper';
 
 const tableStyles = css`
 	tr {

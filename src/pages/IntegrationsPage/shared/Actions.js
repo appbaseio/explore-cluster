@@ -5,9 +5,9 @@ import { css } from 'react-emotion';
 import get from 'lodash/get';
 import { string, func, bool, object } from 'prop-types';
 import { connect } from 'react-redux';
-import DeployLogsModal from '../ExportInline/Components/DeployLogsModal';
 import Flex from '../../../batteries/components/shared/Flex';
 import { getSearchPreferenceDeploymentStatus } from '../../../batteries/modules/actions';
+import DeployLogsModal from './ExportInline/Components/DeployLogsModal';
 
 const container = css`
 	gap: 10px;
@@ -139,7 +139,7 @@ Actions.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-	versionState: get(state, '$getSearchPreferencesVersionsN.results', {}),
+	versionState: get(state, '$getSearchPreferencesVersions.results', {}),
 });
 
 const mapDispatchToProps = (dispatch) => ({

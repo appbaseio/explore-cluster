@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { string, element, bool } from 'prop-types';
 import { FieldGroup } from 'react-reactive-form';
 import { Tabs } from 'antd';
-import { FormContext, verticalTab } from '../../../../utils';
+import { FormContext, verticalTab } from '../../../../utils/utils';
 import StylePresets from './StylePresets';
 import Branding from './Branding';
 import CustomCss from './CustomCss';

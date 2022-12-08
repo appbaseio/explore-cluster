@@ -13,12 +13,12 @@ import {
 	preferencesInConstants,
 } from '../../../utils/sandpack-generator';
 import {
-	saveSearchPreferenceN,
-	saveRecommendationPreferenceN,
+	saveSearchPreference,
+	saveRecommendationPreference,
 } from '../../../../../batteries/modules/actions';
-import { transformPreferences, transformResultsDefaultFields } from '../../../utils/index';
-import { transformContent } from '../../../ExportInline/Components/ModalHeader';
-import { getDiffDataAndCount } from '../../../utils';
+import { getDiffDataAndCount } from '../../../utils/utils';
+import { transformContent } from '../../ExportInline/Components/ModalHeader';
+import { transformResultsDefaultFields, transformPreferences } from '../../../utils';
 
 const Badge = styled.span`
 	background: #f5222d;
@@ -264,16 +264,16 @@ ReviewAndSave.propTypes = {
 };
 
 const mapStateToProps = (state) => ({
-	isSearchLoading: get(state, '$saveSearchPreferenceN.isFetching'),
-	isRecommLoading: get(state, '$saveRecommendationPreferenceN.isFetching'),
+	isSearchLoading: get(state, '$saveSearchPreference.isFetching'),
+	isRecommLoading: get(state, '$saveRecommendationPreference.isFetching'),
 	clientId: get(state, '$getAuth0Preferences.results')?.['_client_id'],
 });
 
 const mapDispatchToProps = (dispatch, props) => ({
 	updateSearchPreferences: (payload) =>
-		dispatch(saveSearchPreferenceN(props.preferenceId, payload)),
+		dispatch(saveSearchPreference(props.preferenceId, payload)),
 	updateRecommendationsPreferences: (payload) =>
-		dispatch(saveRecommendationPreferenceN(props.preferenceId, payload)),
+		dispatch(saveRecommendationPreference(props.preferenceId, payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(ReviewAndSave));

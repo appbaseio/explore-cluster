@@ -22,11 +22,11 @@ import { v4 as uuidv4 } from 'uuid';
 import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
 import { container } from '../../ResultsPage/styles';
 import Loader from '../../../components/Loader';
-import PreviewModal from '../PreviewModal';
-import SyncStatus from '../SyncStatus';
-import PreferencesFormWrapper from '../PreferencesFormWrapperN';
+import PreviewModal from '../shared/PreviewModal';
+import SyncStatus from '../shared/SyncStatus';
+import PreferencesFormWrapper from '../shared/PreferencesFormWrapper';
 import SavePreferences from '../shared/SavePreferences';
-import { getSearchPreferencesN } from '../../../batteries/modules/actions';
+import { getSearchPreferences } from '../../../batteries/modules/actions';
 
 import EndUserAuthentication from './components/tabs/EndUserAuthentication';
 import LayoutTab from './components/tabs/Layout';
@@ -69,7 +69,7 @@ const Main = ({ getPreferencesN, ...props }) => {
 				{({ getPreferences, getPreferencesPayload, form }) => {
 					const pipeline = form.get('pipeline') ? form.get('pipeline').value : null;
 					setIsLoading(false);
-
+					console.log(isLoading);
 					if (isLoading) {
 						return <Loader />;
 					}
@@ -241,11 +241,11 @@ Main.propTypes = {
 Main.defaultProps = {};
 
 const mapStateToProps = (state) => ({
-	searchPreferences: get(state, '$getSearchPreferencesN.results', []),
+	searchPreferences: get(state, '$getSearchPreferences.results', []),
 });
 
 const mapDispatchToProps = (dispatch) => ({
-	getPreferencesN: () => dispatch(getSearchPreferencesN()),
+	getPreferencesN: () => dispatch(getSearchPreferences()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Main));

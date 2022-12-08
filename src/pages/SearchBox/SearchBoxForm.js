@@ -9,7 +9,7 @@ import { ArrowLeftOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Card, Input, notification, Result, Skeleton, Tabs } from 'antd';
 
 import { FieldControl, FieldGroup, FormBuilder, Validators } from 'react-reactive-form';
-import { FormContext } from '../IntegrationsPage/utils';
+import { FormContext } from '../IntegrationsPage/utils/utils';
 import DesignAndLayout from './components/DesignAndLayout';
 import PopularSuggestions from './components/PopularSuggestions';
 import RecentSuggestions from './components/RecentSuggestions';
