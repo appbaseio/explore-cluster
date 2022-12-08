@@ -728,6 +728,7 @@ export const defaultSearchPreferences = {
 	logoWidth: 200,
 	logoAlignment: 'left',
 	versionId: '',
+	templateVersionId: '',
 	themeType: 'classic',
 	primaryColor: '#0B6AFF',
 	primaryTextColor: '#fff',
@@ -1069,6 +1070,9 @@ export const getSearchPreferencesPayload = (formValue) => {
 					},
 					deploySettings: {
 						versionId: get(formValue, 'versionId'),
+					},
+					templateSettings: {
+						templateVersionId: get(formValue, 'templateVersionId'),
 					},
 				},
 				endpoint: {
