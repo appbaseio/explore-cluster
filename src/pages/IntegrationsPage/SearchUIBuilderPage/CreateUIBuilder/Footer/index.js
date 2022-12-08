@@ -94,8 +94,10 @@ const Footer = ({
 		if (defaultPrefs.authenticationSettings) {
 			newPrefs.authenticationSettings = defaultPrefs.authenticationSettings;
 		}
+		// Set the default UI builder name
 		newPrefs.name = `Search ${newPrefs.pipeline || ''} + ${template.label || ''}`;
-
+		// Set the templateVersionId to the latest template version Id
+		newPrefs.globalSettings.meta.templateSettings.templateVersionId = template.version;
 		return newPrefs;
 	};
 
