@@ -18,15 +18,6 @@ class StoreFrontPreview extends React.Component {
 		};
 	}
 
-	componentDidMount() {
-		const { displayProductPicker } = this.props;
-		if (!displayProductPicker) {
-			if (this.iframeRef.current) {
-				// this.onLoad();
-			}
-		}
-	}
-
 	onLoad = () => {
 		const { preferences, isRecommendation, widgetId } = this.props;
 		const { currentProduct } = this.state;
