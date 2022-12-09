@@ -145,7 +145,6 @@ class PreferencesFormWrapper extends React.Component {
 			priceUnit: undefined,
 			resultImage: '',
 			resultHandle: '',
-			resultHandleViewer: 'link',
 			metaDataFields: [],
 			cssSelector: '',
 			storeInfo: FormBuilder.group({
@@ -179,6 +178,7 @@ class PreferencesFormWrapper extends React.Component {
 				  }
 				: {
 						// Search specific controls
+						resultHandleViewer: 'link',
 						versionId: '',
 						autoSuggestionSettings: FormBuilder.group({
 							enablePopularSuggestions: false,
@@ -878,11 +878,6 @@ class PreferencesFormWrapper extends React.Component {
 							priceUnit: get(preferences, 'resultSettings.fields.priceUnit'),
 							resultImage: get(preferences, 'resultSettings.fields.image'),
 							resultHandle: get(preferences, 'resultSettings.fields.handle'),
-							resultHandleViewer: get(
-								preferences,
-								'resultSettings.fields.handleViewer',
-								'link',
-							),
 							metaDataFields: this.getMetaDataFields(
 								get(preferences, 'resultSettings.fields.userDefinedFields'),
 							),
@@ -942,6 +937,11 @@ class PreferencesFormWrapper extends React.Component {
 										}),
 								  }
 								: {
+										resultHandleViewer: get(
+											preferences,
+											'resultSettings.fields.handleViewer',
+											'link',
+										),
 										versionId: get(
 											preferences,
 											'globalSettings.meta.deploySettings.versionId',
