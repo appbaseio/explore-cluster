@@ -240,10 +240,8 @@ export const currencies = [
 	{ cc: 'ZWR', symbol: 'Z$', name: 'Zimbabwean dollar' },
 ];
 
-export const BaseURL =
-	'https://62a8120ef6db26000970a18e--appbase-ecomm.netlify.app/static/js/main.js';
-export const BaseCSSURL =
-	'https://62a8120ef6db26000970a18e--appbase-ecomm.netlify.app/static/css/main.css';
+export const BaseURL = 'https://recommendations-template.vercel.app/static/js/main.js';
+export const BaseCSSURL = 'https://recommendations-template.vercel.app/static/css/main.css';
 
 export const getInstallationScript = (preferences = {}, credentials) => `
 <script>var APPBASE_SEARCH_PREFERENCES=${JSON.stringify(

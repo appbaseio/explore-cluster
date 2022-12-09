@@ -22,7 +22,7 @@ class StoreFrontPreview extends React.Component {
 		const { displayProductPicker } = this.props;
 		if (!displayProductPicker) {
 			if (this.iframeRef.current) {
-				this.onLoad();
+				// this.onLoad();
 			}
 		}
 	}
@@ -221,6 +221,7 @@ class StoreFrontPreview extends React.Component {
 					width={isMobile ? 400 : '100%'}
 					height={window.innerHeight - 60}
 					src="about:blank"
+					onLoad={this.onLoad}
 				/>
 			</div>
 		);
