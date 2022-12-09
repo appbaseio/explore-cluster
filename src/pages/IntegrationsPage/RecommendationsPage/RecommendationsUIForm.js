@@ -52,7 +52,9 @@ const RecommendationsUIForm = ({ tier, featureEcommerce, ...props }) => {
 					const pipeline = form.get('pipeline') ? form.get('pipeline').value : null;
 					return (
 						<>
-							{pipeline ? <SyncStatus form={form} pipeline={pipeline} /> : null}
+							{pipeline ? (
+								<SyncStatus form={form} pipeline={pipeline} isRecommendation />
+							) : null}
 							<div
 								style={{ backgroundColor: '#fff', padding: '10px 20px' }}
 								className={container}

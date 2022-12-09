@@ -3,7 +3,7 @@ import { css } from 'emotion';
 import { ClockCircleOutlined } from '@ant-design/icons';
 import { Card, Button, Tooltip } from 'antd';
 import get from 'lodash/get';
-import { string, object, func } from 'prop-types';
+import { string, object, func, bool } from 'prop-types';
 import { connect } from 'react-redux';
 import Flex from '../../../batteries/components/shared/Flex';
 import { getAllVersions, deployUiBuilder, transformPreferences } from '../utils/sandpack-generator';
@@ -84,15 +84,18 @@ class SyncStatus extends React.Component {
 	}
 
 	componentDidMount() {
-		const { form, versionState, preferenceId, getSearchPreferenceVersions } = this.props;
+		const { form, versionState, preferenceId, getSearchPreferenceVersions, isRecommendation } =
+			this.props;
 		if (!versionState) getSearchPreferenceVersions(preferenceId);
 		const { deploymentStatus = {} } = versionState[preferenceId] ?? {};
 		const exportTypeHandler = form.get('exportSettings.type');
 		exportTypeHandler.valueChanges.subscribe(this.handleTypeChange);
 		const themeType = form.get('themeType');
 		themeType.valueChanges.subscribe(this.handleThemeTypeChange);
-		this.fetchAllVersions();
-		if (!Object.keys(deploymentStatus).length) this.fetchDeploymentStatus();
+		if (!isRecommendation) {
+			this.fetchAllVersions();
+			if (!Object.keys(deploymentStatus).length) this.fetchDeploymentStatus();
+		}
 	}
 
 	componentWillUnmount() {
@@ -288,7 +291,13 @@ class SyncStatus extends React.Component {
 			themeType,
 			showPastVersionsDrawer,
 		} = this.state;
-		const { form, versionState, preferenceId, updateVersionStateForPreference } = this.props;
+		const {
+			form,
+			versionState,
+			preferenceId,
+			updateVersionStateForPreference,
+			isRecommendation,
+		} = this.props;
 		const title = form.get('name') ? form.get('name').value : '';
 		const pipeline = form.get('pipeline') ? form.get('pipeline').value : '';
 		const templateObj = getTemplate(themeType);
@@ -335,51 +344,55 @@ class SyncStatus extends React.Component {
 								) : null}
 							</Flex>
 							<Flex className="sub-part">
-								<Flex style={{ gap: '10px' }} alignItems="center">
-									<Tooltip title="Past Versions" style={{ fontSize: 14 }}>
-										{/* Past Versions */}
-										<ClockCircleOutlined
-											style={{
-												cursor: currentVersion.version_id
-													? 'pointer'
-													: 'not-allowed',
-												color: currentVersion.version_id
-													? 'rgba(0,0,0,0.65)'
-													: '#bbb7b7',
-											}}
-											onClick={() => {
-												if (currentVersion.version_id)
-													this.setState({
-														showPastVersionsDrawer: true,
-													});
-											}}
-										/>
-									</Tooltip>
+								{!isRecommendation ? (
+									<>
+										<Flex style={{ gap: '10px' }} alignItems="center">
+											<Tooltip title="Past Versions" style={{ fontSize: 14 }}>
+												{/* Past Versions */}
+												<ClockCircleOutlined
+													style={{
+														cursor: currentVersion.version_id
+															? 'pointer'
+															: 'not-allowed',
+														color: currentVersion.version_id
+															? 'rgba(0,0,0,0.65)'
+															: '#bbb7b7',
+													}}
+													onClick={() => {
+														if (currentVersion.version_id)
+															this.setState({
+																showPastVersionsDrawer: true,
+															});
+													}}
+												/>
+											</Tooltip>
 
-									<Button
-										type="primary"
-										onClick={() => {
-											this.setState({ modalType: 'deploy-modal' });
-											this.fetchAllVersions();
-										}}
-									>
-										Deploy
-									</Button>
-								</Flex>
-								{status && status !== 'Not deployed' ? (
-									<span>
-										<Button
-											type="link"
-											className="link-button"
-											style={{ marginRight: 5 }}
-											onClick={() =>
-												this.setState({ modalType: 'deploy-logs' })
-											}
-										>
-											Deploy Status
-										</Button>
-										{deployStatusMapper[status]}
-									</span>
+											<Button
+												type="primary"
+												onClick={() => {
+													this.setState({ modalType: 'deploy-modal' });
+													this.fetchAllVersions();
+												}}
+											>
+												Deploy
+											</Button>
+										</Flex>
+										{status ? (
+											<span>
+												<Button
+													type="link"
+													className="link-button"
+													style={{ marginRight: 5 }}
+													onClick={() =>
+														this.setState({ modalType: 'deploy-logs' })
+													}
+												>
+													Deploy Status
+												</Button>
+												{deployStatusMapper[status]}
+											</span>
+										) : null}
+									</>
 								) : null}
 							</Flex>
 						</Flex>
@@ -434,6 +447,7 @@ class SyncStatus extends React.Component {
 SyncStatus.defaultProps = {
 	preferenceId: '',
 	versionState: {},
+	isRecommendation: false,
 };
 
 SyncStatus.propTypes = {
@@ -447,6 +461,7 @@ SyncStatus.propTypes = {
 	updateSearchPreferences: func.isRequired,
 	getSearchPreferenceVersions: func.isRequired,
 	getDeploymentStatus: func.isRequired,
+	isRecommendation: bool,
 };
 
 const mapStateToProps = (state, props) => ({
