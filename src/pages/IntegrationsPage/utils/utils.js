@@ -702,7 +702,6 @@ export const defaultRecommendationsPreferences = {
 	priceUnit: undefined,
 	resultImage: '',
 	resultHandle: '',
-	resultHandleViewer: 'link',
 	storeInfo: { currency: 'USD' },
 	exportSettings: { exportAs: 'embed', credentials: '', openAsPage: false, type: 'other' },
 	ctaTitle: 'View Product',
