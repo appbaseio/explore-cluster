@@ -28,23 +28,20 @@ describe('Query Rule creation with trigger index and script action', () => {
 		cy.wait(3000);
 	});
 
-	it('Should open query rules page', () => {
+	it('Should create a query rule', () => {
 		cy.server();
 		cy.route('/arc/plan').as('plan');
 		cy.route('**/_rules').as('rules');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/cluster/rules`);
 		cy.wait(['@plan', '@rules', '@indices'], { timeout: 25000 });
-	});
 
-	it('Should open new query rule form page', () => {
+		// Click on create query rule
 		cy.server();
 		cy.route('**/_mapping').as('mapping');
 		cy.get('[data-cy=create-query-rule]').click();
-		cy.wait('@mapping', { timeout: 15000 }).wait(5000);
-	});
+		cy.wait('@mapping', { timeout: 15000 });
 
-	it('Should create a query rule', () => {
 		// Enter name and description
 		cy.get('[name="name"]').type('cypress-testing-rule-name');
 		cy.get('[name="description"]').type('cypress-testing-rule-description');
@@ -81,9 +78,11 @@ describe('Query Rule creation with trigger index and script action', () => {
 				headers: {
 					Authorization: `Basic ${credentials}`,
 				},
-			}).wait(2000);
-			cy.visit(`${base_url}/cluster/rules`).wait(PAGE_LOAD_TIME);
+			});
 		}
+	});
+	it('Should open arc dashboard locally', () => {
+		cy.visit(`${base_url}`).wait(2000);
 	});
 	it('Should logout user', () => {
 		cy.clearLocalStorage();

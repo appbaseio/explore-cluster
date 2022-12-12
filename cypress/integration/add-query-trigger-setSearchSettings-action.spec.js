@@ -40,7 +40,7 @@ describe('Query Rule creation with trigger index and script action', () => {
 		// Show query rules form
 		cy.route('**/_mapping').as('mapping');
 		cy.get('[data-cy=create-query-rule]').click();
-		cy.wait('@mapping', { timeout: 15000 }).wait(5000);
+		cy.wait('@mapping', { timeout: 15000 });
 
 		// Enter name and description
 		cy.get('[name="name"]').type('cypress-testing-rule-name');
@@ -83,9 +83,11 @@ describe('Query Rule creation with trigger index and script action', () => {
 				headers: {
 					Authorization: `Basic ${credentials}`,
 				},
-			}).wait(2000);
-			cy.visit(`${base_url}/cluster/rules`).wait(PAGE_LOAD_TIME);
+			});
 		}
+	});
+	it('Should open arc dashboard locally', () => {
+		cy.visit(`${base_url}`).wait(2000);
 	});
 	it('Should logout user', () => {
 		cy.clearLocalStorage();
