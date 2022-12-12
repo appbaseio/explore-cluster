@@ -89,7 +89,7 @@ describe('Copy field schema settings test flow', () => {
 		cy.server();
 		cy.route('**/_mapping').as('mapping');
 		cy.get('[data-cy=confirm-mapping-button]').click();
-		cy.wait('@mapping', { timeout: 25000 }).wait(5000);
+		cy.wait('@mapping', { timeout: 25000 });
 	});
 
 	it('Should check the newly added data feild', () => {
@@ -117,20 +117,17 @@ describe('Copy field schema settings test flow', () => {
 	it('Should assign index name prior to deletion', () => {
 		let credentials = btoa(`${username}:${password}`);
 
-		fetch(`${app_url}_alias/${indexName}`, {
+		cy.request({
+			method: 'GET',
+			url: `${app_url}_alias/${indexName}`,
 			headers: {
 				Authorization: `Basic ${credentials}`,
 			},
-		})
-			.then((response) => {
-				return response.json();
-			})
-			.then((data) => {
-				indexName = Object.keys(data)[0];
-			})
-			.catch((err) => {
-				console.log(err);
-			});
+		}).then((response) => {
+			const data = response.body;
+			console.log({ response, data });
+			indexName = Object.keys(data)[0];
+		});
 	});
 
 	it('Should delete index', () => {

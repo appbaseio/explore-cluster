@@ -76,16 +76,14 @@ describe('Aggregation fields add test flow', () => {
 		});
 	});
 
-	it('Should open aggregation settings URL', () => {
+	it('Should add aggregation feilds', () => {
 		cy.server();
 		cy.route('**/_mapping').as('mapping');
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/aggs`);
 		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
-	});
 
-	it('Should add aggregation feilds', () => {
 		cy.get('[data-cy=aggregation-fields-dropdown]')
 			.click()
 			.wait(1000)
@@ -112,8 +110,7 @@ describe('Aggregation fields add test flow', () => {
 		cy.server();
 		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
 		cy.get('[data-cy=review-save-button]').click();
-		// Sometimes the reindex call is fired, so wait for 5 seconds.
-		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.wait('@relevancy', { timeout: 25000 });
 	});
 
 	it('Should check aggregation settings persistence', () => {
@@ -128,25 +125,6 @@ describe('Aggregation fields add test flow', () => {
 			.should('contain', 'email')
 			.get('[data-cy=field-name-name]')
 			.should('contain', 'name');
-	});
-
-	it('Should assign index name prior to deletion', () => {
-		let credentials = btoa(`${username}:${password}`);
-
-		fetch(`${app_url}_alias/${indexName}`, {
-			headers: {
-				Authorization: `Basic ${credentials}`,
-			},
-		})
-			.then((response) => {
-				return response.json();
-			})
-			.then((data) => {
-				indexName = Object.keys(data)[0];
-			})
-			.catch((err) => {
-				console.log(err);
-			});
 	});
 
 	it('Should delete index', () => {
