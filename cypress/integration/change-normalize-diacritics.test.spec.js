@@ -46,7 +46,7 @@ describe('Change normalize diacritics test flow', () => {
 			.get('[data-cy=create-new-index]')
 			.click();
 
-		cy.wait('@indexing').wait(5000);
+		cy.wait('@indexing');
 	});
 
 	it('Should index data', () => {
@@ -81,8 +81,9 @@ describe('Change normalize diacritics test flow', () => {
 		// visit language settings url
 		cy.server();
 		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/languages`);
-		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.wait(['@relevancy', '@indices'], { timeout: 25000 });
 
 		// Disable diacritics
 		cy.get('[data-cy=normalize-diacritics-switch]').click().wait(1000);
@@ -96,15 +97,16 @@ describe('Change normalize diacritics test flow', () => {
 		cy.route('**/_mapping').as('mapping');
 		cy.route('POST', '**/_reindex/**').as('reindex');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@mapping', '@reindex'], { timeout: 25000 }).wait(5000);
+		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
 	});
 
 	it('Should check the state for normalizeDiacritics is false from the redux store', () => {
 		// visit language settings url
 		cy.server();
 		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/languages`);
-		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.wait(['@relevancy', '@indices'], { timeout: 25000 });
 
 		cy.window()
 			.its('store')
@@ -152,8 +154,9 @@ describe('Change normalize diacritics test flow', () => {
 		// visit language settings url
 		cy.server();
 		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/languages`);
-		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.wait(['@relevancy', '@indices'], { timeout: 25000 });
 
 		// enable diacritics
 		cy.get('[data-cy=normalize-diacritics-switch]').click().wait(1000);
@@ -168,15 +171,16 @@ describe('Change normalize diacritics test flow', () => {
 		cy.route('**/_mapping').as('mapping');
 		cy.route('POST', '**/_reindex/**').as('reindex');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@mapping', '@reindex'], { timeout: 25000 }).wait(5000);
+		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
 	});
 
 	it('Should check the state for normalizeDiacritics is true from the redux store', () => {
 		// visit language settings url
 		cy.server();
 		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/languages`);
-		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.wait(['@relevancy', '@indices'], { timeout: 25000 });
 
 		cy.window()
 			.its('store')
@@ -223,23 +227,20 @@ describe('Change normalize diacritics test flow', () => {
 	it('Should assign index name prior to deletion', () => {
 		let credentials = btoa(`${username}:${password}`);
 
-		fetch(`${app_url}_alias/${indexName}`, {
+		cy.request({
+			method: 'GET',
+			url: `${app_url}_alias/${indexName}`,
 			headers: {
 				Authorization: `Basic ${credentials}`,
 			},
-		})
-			.then((response) => {
-				return response.json();
-			})
-			.then((data) => {
-				indexName = Object.keys(data)[0];
-			})
-			.catch((err) => {
-				console.log(err);
-			});
+		}).then((response) => {
+			const data = response.body;
+			console.log({ response, data });
+			indexName = Object.keys(data)[0];
+		});
 	});
 
-	it('Should delete index', () => {
+	it('Should delete index', { retries: 4 }, () => {
 		let credentials = btoa(`${username}:${password}`);
 
 		cy.request({
