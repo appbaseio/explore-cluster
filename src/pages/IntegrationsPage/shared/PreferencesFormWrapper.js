@@ -280,8 +280,9 @@ class PreferencesFormWrapper extends React.Component {
 			searchPreferences,
 			updateVersionStateForPreference,
 			isWizard,
+			isRecommendation,
 		} = this.props;
-		if (!isWizard) {
+		if (!isWizard && !isRecommendation) {
 			getSearchPreferenceVersions(preferenceId);
 			getLatestVersionCode(preferenceId)
 				.then(async (response) => {
