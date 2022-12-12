@@ -22,7 +22,7 @@
 		"repository": "faceted-search-template",
 		"version": "0.1.0",
 		"commit": "",
-		"branch": "main",
+		"branch": "support-mongo-db",
 		"manifest_path": "reactivesearch-manifest.json",
 		"repositoryType": "public"
 	},

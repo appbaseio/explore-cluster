@@ -41,11 +41,21 @@ const EndpointDropdown = ({
 		setFilteredApps(Object.keys(apps || {}).filter((app) => !app.startsWith('.')));
 	};
 
+	const handlePipelineSelection = (pipeline) => {
+		if (backend === BACKENDS.MONGODB.name) {
+			const pipelineInfo = apps[pipeline];
+			form.get('db').setValue(pipelineInfo.database);
+			form.get('collection').setValue(pipelineInfo.collection);
+		}
+	};
+
 	const getURL = (value) => {
 		if (value && value.url) {
 			return value.url;
 		}
 		if (isWizard) return '';
+
+		if (backend === BACKENDS.MONGODB.name) return `/_mongodb/_reactivesearch`;
 
 		if (value && value.pipeline) {
 			return `/${value.pipeline}/_reactivesearch`;
@@ -132,9 +142,17 @@ const EndpointDropdown = ({
 														onClick={() => {
 															if (isWizard) {
 																form.get('method').setValue('POST');
-																form.get('url').setValue(
-																	`/${k}/_reactivesearch`,
-																);
+																if (
+																	backend ===
+																	BACKENDS.MONGODB.name
+																)
+																	form.get('url').setValue(
+																		`/_mongodb/_reactivesearch`,
+																	);
+																else
+																	form.get('url').setValue(
+																		`/${k}/_reactivesearch`,
+																	);
 																form.get('headers').setValue(
 																	`{"Authorization":"Basic ${btoa(
 																		exportSettings.credentials ||
@@ -142,9 +160,20 @@ const EndpointDropdown = ({
 																	)}"}`,
 																);
 															}
+															handlePipelineSelection(k);
 														}}
 													>
-														{k}
+														{backend === BACKENDS.MONGODB.name ? (
+															<>
+																<div>{apps[k].index}</div>
+																<div>
+																	{apps[k].database}.
+																	{apps[k].collection}
+																</div>
+															</>
+														) : (
+															k
+														)}
 													</div>
 												</Select.Option>
 											))}
@@ -235,52 +264,59 @@ const EndpointDropdown = ({
 										</Select.Option>
 									);
 								})}
-								{(filteredApps || [])
-									.filter((k) => !k.includes('metricbeat'))
-									.map((k) => (
-										<Select.Option
-											key={`/${k}/_reactivesearch`}
-											className={endpointConfigStyles}
-										>
-											<Flex
-												justifyContent="space-between"
-												onClick={() => {
-													if (isPageLevel) {
-														endpointControl
-															.get('method')
-															.setValue('POST');
-														endpointControl
-															.get('url')
-															.setValue(`/${k}/_reactivesearch`);
-														endpointControl
-															.get('headers')
-															.setValue(
+								{backend !== BACKENDS.MONGODB.name ? (
+									(filteredApps || [])
+										.filter((k) => !k.includes('metricbeat'))
+										.map((k) => (
+											<Select.Option
+												key={`/${k}/_reactivesearch`}
+												className={endpointConfigStyles}
+											>
+												<Flex
+													justifyContent="space-between"
+													onClick={() => {
+														if (isPageLevel) {
+															endpointControl
+																.get('method')
+																.setValue('POST');
+															endpointControl
+																.get('url')
+																.setValue(`/${k}/_reactivesearch`);
+															endpointControl
+																.get('headers')
+																.setValue(
+																	`{"Authorization":"Basic ${btoa(
+																		exportSettings.credentials ||
+																			'',
+																	)}"}`,
+																);
+														} else {
+															form.get('method').setValue('POST');
+															form.get('url').setValue(
+																`/${k}/_reactivesearch`,
+															);
+															form.get('headers').setValue(
 																`{"Authorization":"Basic ${btoa(
 																	exportSettings.credentials ||
 																		'',
 																)}"}`,
 															);
-													} else {
-														form.get('method').setValue('POST');
-														form.get('url').setValue(
-															`/${k}/_reactivesearch`,
-														);
-														form.get('headers').setValue(
-															`{"Authorization":"Basic ${btoa(
-																exportSettings.credentials || '',
-															)}"}`,
-														);
-													}
-												}}
-											>
-												<div className="overflow description-overflow">
-													<Tooltip title={`POST /${k}/_reactivesearch`} />
-													POST /{k}/_reactivesearch
-												</div>
-												<Tag>index</Tag>
-											</Flex>
-										</Select.Option>
-									))}
+														}
+													}}
+												>
+													<div className="overflow description-overflow">
+														<Tooltip
+															title={`POST /${k}/_reactivesearch`}
+														/>
+														POST /{k}/_reactivesearch
+													</div>
+													<Tag>index</Tag>
+												</Flex>
+											</Select.Option>
+										))
+								) : (
+									<></>
+								)}
 								{(customFields || []).map((k, idx) => (
 									<Select.Option
 										// eslint-disable-next-line
