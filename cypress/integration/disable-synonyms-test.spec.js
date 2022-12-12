@@ -46,7 +46,7 @@ describe('Disable synonyms test flow', () => {
 			.get('[data-cy=create-new-index]')
 			.click();
 
-		cy.wait('@indexing').wait(5000);
+		cy.wait('@indexing');
 	});
 
 	it('Should index data', () => {
@@ -81,9 +81,11 @@ describe('Disable synonyms test flow', () => {
 
 	it('Should open search settings URL', () => {
 		cy.server();
+		cy.route('**/_mapping').as('mapping');
 		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/search`);
-		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
 	});
 
 	it('Should disable synonyms in search settings', () => {
@@ -104,9 +106,11 @@ describe('Disable synonyms test flow', () => {
 
 	it('Should check & confirm the data fields from the redux store', () => {
 		cy.server();
+		cy.route('**/_mapping').as('mapping');
 		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/search`);
-		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
 
 		cy.window()
 			.its('store')

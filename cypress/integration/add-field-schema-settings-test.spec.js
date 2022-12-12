@@ -46,7 +46,7 @@ describe('Add field schema settings test flow', () => {
 			.get('[data-cy=create-new-index]')
 			.click();
 
-		cy.wait('@indexing').wait(5000);
+		cy.wait('@indexing');
 	});
 
 	it('Should index data', () => {
@@ -80,8 +80,10 @@ describe('Add field schema settings test flow', () => {
 	it('Should open schema settings URL', () => {
 		cy.server();
 		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/schema`);
-		cy.wait('@mapping').wait(5000);
+		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 25000 });
 	});
 
 	it('Should add new data fields in schema', () => {

@@ -47,7 +47,7 @@ describe('Clone settings test flow', () => {
 			.get('[data-cy=create-new-index]')
 			.click();
 
-		cy.wait('@indexing').wait(5000);
+		cy.wait('@indexing');
 	});
 
 	it('Should index data', () => {
@@ -82,9 +82,11 @@ describe('Clone settings test flow', () => {
 
 	it('Should open search settings URL', () => {
 		cy.server();
+		cy.route('**/_mapping').as('mapping');
 		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/search`);
-		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
 	});
 
 	it('Should change field weight of email in search settings', () => {
@@ -134,6 +136,14 @@ describe('Clone settings test flow', () => {
 	});
 
 	it('Should create a new index and clone the settings to it', () => {
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/app/${indexName}/search`);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
+
+		cy.route('PUT', `**/_searchrelevancy/${indexName2}`).as('clone-relevancy');
 		cy.root().contains('Copy Search Settings').click();
 		cy.get('[data-cy=destination-index-name]')
 			.type(indexName2)
@@ -142,15 +152,17 @@ describe('Clone settings test flow', () => {
 			.get('[data-cy=copy-synonyms]')
 			.click()
 			.get('[data-cy=clone-button]')
-			.click()
-			.wait(10000);
+			.click();
+		cy.wait(['@clone-relevancy'], { timeout: 25000 });
 	});
 
 	it('Should verify the search settings of the new index', () => {
 		cy.server();
+		cy.route('**/_mapping').as('mapping');
 		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName2}/search`);
-		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
 
 		cy.get('[data-cy=field-name-email]')
 			.should('contain', 'email')

@@ -46,7 +46,7 @@ describe('Copy field schema settings test flow', () => {
 			.get('[data-cy=create-new-index]')
 			.click();
 
-		cy.wait('@indexing').wait(5000);
+		cy.wait('@indexing');
 	});
 
 	it('Should index data', () => {
@@ -69,8 +69,10 @@ describe('Copy field schema settings test flow', () => {
 	it('Should open schema settings URL', () => {
 		cy.server();
 		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/schema`);
-		cy.wait('@mapping', { timeout: 25000 }).wait(5000);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
 	});
 
 	it('Should copy field in schema', () => {
@@ -94,8 +96,10 @@ describe('Copy field schema settings test flow', () => {
 		// Should open schema settings url
 		cy.server();
 		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/schema`);
-		cy.wait('@mapping', { timeout: 25000 }).wait(5000);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
 
 		cy.get('[data-cy=field-name-copied_age]').should('contain', 'copied_age');
 	});

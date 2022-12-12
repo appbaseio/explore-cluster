@@ -46,7 +46,7 @@ describe('Configure result settings without reindexing test flow', () => {
 			.get('[data-cy=create-new-index]')
 			.click();
 
-		cy.wait('@indexing').wait(5000);
+		cy.wait('@indexing');
 	});
 
 	it('Should index data', () => {
@@ -81,9 +81,11 @@ describe('Configure result settings without reindexing test flow', () => {
 
 	it('Should open result settings url', () => {
 		cy.server();
+		cy.route('**/_mapping').as('mapping');
 		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/results`);
-		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 25000 });
 	});
 
 	it('Should change the page size', () => {
