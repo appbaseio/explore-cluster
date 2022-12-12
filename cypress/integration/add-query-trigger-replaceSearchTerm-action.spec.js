@@ -34,7 +34,7 @@ describe('Query Rule creation with trigger index and script action', () => {
 		cy.route('**/_rules').as('rules');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/cluster/rules`);
-		cy.wait(['@plan', '@rules', '@indices'], { timeout: 25000 });
+		cy.wait(['@plan', '@rules', '@indices'], { timeout: 30000 });
 
 		// Click on create query rule
 		cy.server();

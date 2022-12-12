@@ -79,29 +79,23 @@ describe('Configure result settings without reindexing test flow', () => {
 		});
 	});
 
-	it('Should open result settings url', () => {
+	it('Should change result settings', () => {
 		cy.server();
 		cy.route('**/_mapping').as('mapping');
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/results`);
 		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 25000 });
-	});
 
-	it('Should change the page size', () => {
+		// Should change page size
 		cy.get('[data-cy=result-page-size]').click().type('{uparrow}');
-	});
 
-	it('Should enable highlighting & set highlighting fields', () => {
+		// Should change highlight settings
 		cy.get('[data-cy=enable-highlight]').click();
 		cy.get('[data-cy=highlight-fields]').click().type('email{enter}name{enter}').wait(1000);
-	});
 
-	it('Should set the number of fragments', () => {
 		cy.get('[data-cy=highlight-fragments]').click().type('{uparrow}').wait(1000);
-	});
 
-	it('Should check for local settings in test relevancy', () => {
 		cy.get('[data-cy=test-search-relevancy-button]').click().wait(2000);
 		cy.get('[data-cy=raw-request-button]').click({ force: true }).wait(2000);
 		cy.window()

@@ -36,7 +36,7 @@ Cypress.Commands.add('loginUser', (username, password, cluster) => {
 	cy.route('/arc/plan').as('plan');
 	cy.route('/').as('root');
 	cy.get('[data-cy=signin-button]').click();
-	cy.wait(['@user', '@plan', '@root'], { timeout: 20000 });
+	cy.wait(['@user', '@plan', '@root'], { timeout: 30000 });
 });
 
 Cypress.Commands.add('logoutUser', () => {
