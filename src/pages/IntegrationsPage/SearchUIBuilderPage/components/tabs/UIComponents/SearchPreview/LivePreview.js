@@ -6,34 +6,41 @@ import { getURL } from '../../../../../../../constants/config';
 import { BACKENDS } from '../../../../../../../batteries/utils';
 
 const LivePreview = ({ form, backend, getSearchConfig, pipeline, indexSettings }) => {
-	const transformRequest =
-		backend === BACKENDS.FUSION.name
-			? (props) => {
+	const isTransformRequest =
+		backend === BACKENDS.FUSION.name || backend === BACKENDS.MONGODB.name;
+	const transformRequest = isTransformRequest
+		? (props) => {
+				// eslint-disable-next-line
+				const newBody = JSON.parse(props.body);
+				if (backend === BACKENDS.FUSION.name) {
 					const mainFusionSettings = form.get('fusionSettings')?.value;
 					const pageFusionSettings = get(
 						indexSettings,
 						'fusionSettings',
 						form.get('fusionSettings')?.value,
 					);
-					const fusionSettings = Object.assign(
-						{},
-						mainFusionSettings,
-						pageFusionSettings,
-					);
-					if (Object.keys(fusionSettings).length) {
-						// eslint-disable-next-line
-						const newBody = JSON.parse(props.body);
-						newBody.metadata = {
-							app: fusionSettings.app,
-							profile: fusionSettings.profile,
-							suggestion_profile: fusionSettings.searchProfile,
-						};
-						// eslint-disable-next-line
-						props.body = JSON.stringify(newBody);
-					}
-					return props;
-			  }
-			: undefined;
+					const fusionSettings = { ...mainFusionSettings, ...pageFusionSettings };
+
+					newBody.metadata = {
+						app: fusionSettings.app,
+						profile: fusionSettings.profile,
+						suggestion_profile: fusionSettings.searchProfile,
+						sponsored_profile: fusionSettings.sponsoredProfile,
+					};
+				} else {
+					const pagemongoDBSettings = get(indexSettings, `mongoDBSettings`);
+					newBody.metadata = {
+						db: form.get('db').value,
+						collection: form.get('collection').value,
+						...pagemongoDBSettings,
+					};
+				}
+				// eslint-disable-next-line no-param-reassign
+				props.body = JSON.stringify(newBody);
+
+				return props;
+		  }
+		: undefined;
 
 	const searchConfig = form && form.value ? getSearchConfig() : {};
 
