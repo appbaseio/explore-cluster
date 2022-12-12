@@ -7,7 +7,7 @@ import { componentTypes } from '@appbaseio/reactivesearch';
 import { func, object, string } from 'prop-types';
 import { transformFacets } from '../../../../../utils/utils';
 import { getURL } from '../../../../../../../constants/config';
-import { removeEmpty } from '../../../../../utils/index';
+import { removeEmpty, getStringifiedObj } from '../../../../../utils/index';
 import { BACKENDS } from '../../../../../../../batteries/utils';
 
 const CopyCode = ({ control, getPreferencesPayload, backend }) => {
@@ -30,21 +30,51 @@ const CopyCode = ({ control, getPreferencesPayload, backend }) => {
 	const contentWithPreferences = (prefs = '') => {
 		const pipeline = get(preferences, 'pipeline', '');
 		const secondaryPipeline = get(preferences, 'indexSettings.index', '');
-		const mainFusionSettings = get(preferences, 'fusionSettings', {});
+		const isTransformRequest =
+			backend === BACKENDS.FUSION.name || backend === BACKENDS.MONGODB.name;
+		let metadataObj = {};
 		const pageSettings = get(preferences, 'pageSettings', {});
-		const pageFusionSettings = get(
-			pageSettings,
-			`pages.${pageSettings.currentPage}.indexSettings.fusionSettings`,
-			mainFusionSettings,
-		);
-		const fusionSettings = Object.assign({}, mainFusionSettings, pageFusionSettings);
+		if (isTransformRequest) {
+			if (backend === BACKENDS.FUSION.name) {
+				const mainFusionSettings = get(preferences, 'fusionSettings', {});
+				const pageFusionSettings = get(
+					pageSettings,
+					`pages.${pageSettings.currentPage}.indexSettings.fusionSettings`,
+					mainFusionSettings,
+				);
+				const fusionSettings = Object.assign({}, mainFusionSettings, pageFusionSettings);
+				metadataObj = {
+					app: fusionSettings.app,
+					profile: fusionSettings.profile,
+					suggestion_profile: fusionSettings.searchProfile,
+					sponsored_profile: fusionSettings.sponsoredProfile,
+				};
+			} else {
+				const globalmongoDBSettings = get(
+					preferences,
+					'globalSettings.meta.mongoDBSettings',
+					{},
+				);
+				const pagemongoDBSettings = get(
+					pageSettings,
+					`pages.${pageSettings.currentPage}.indexSettings.mongoDBSettings`,
+				);
+				const mongoDBSettings = {
+					...(globalmongoDBSettings || {}),
+					...(pagemongoDBSettings || {}),
+				};
+
+				metadataObj = {
+					db: mongoDBSettings.db,
+					collection: mongoDBSettings.collection,
+				};
+			}
+		}
 
 		return `
 import { ReactiveBase, ReactiveComponent } from "@appbaseio/reactivesearch";
-
 export default Filter = () => {
   const preferences = ${prefs};
-
   return (
 	<ReactiveBase
 	  enableAppbase
@@ -53,17 +83,11 @@ export default Filter = () => {
 	  url="${getURL()}"
 	  credentials="${preferences?.exportSettings?.credentials || ''}"
 	  ${
-			backend === BACKENDS.FUSION.name
+			isTransformRequest
 				? `transformRequest={(props) => {
 		const newBody = JSON.parse(props.body);
-		newBody.metadata = {
-			app: "${fusionSettings.app || ''}",
-			profile: "${fusionSettings.profile || ''}",
-			suggestion_profile: "${fusionSettings.searchProfile || ''}",
-			sponsored_profile: "${fusionSettings.sponsoredProfile || ''}",
-		};
+		newBody.metadata = ${getStringifiedObj(metadataObj)};
 		props.body = JSON.stringify(newBody);
-
 		return props;
 	  }}`
 				: ''

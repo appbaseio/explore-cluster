@@ -36,7 +36,6 @@ const Footer = ({
 	backend,
 }) => {
 	const [isLoading, setIsLoading] = useState(false);
-	const isFusion = backend === BACKENDS.FUSION.name;
 
 	const getDefaultPreferences = (preferences) => {
 		let fileName = '';
@@ -124,13 +123,19 @@ const Footer = ({
 		let endpointObj = {};
 		const exportSettings = get(preferences, 'exportSettings', {});
 
-		if (isFusion) {
+		if (backend === BACKENDS.FUSION.name) {
 			endpointObj = {
 				url: `/_fusion/_reactivesearch`,
 				method: 'POST',
 				headers: `{"Authorization":"Basic ${btoa(exportSettings.credentials || '')}"}`,
 			};
 			preferences.fusionSettings.searchProfile = get(fusionSettings, 'profile', '');
+		} else if (backend === BACKENDS.MONGODB.name) {
+			endpointObj = {
+				url: `/_mongodb/_reactivesearch`,
+				method: 'POST',
+				headers: `{"Authorization":"Basic ${btoa(exportSettings.credentials || '')}"}`,
+			};
 		} else {
 			endpointObj = {
 				url: `/${mainPipeline}/_reactivesearch`,
@@ -142,7 +147,7 @@ const Footer = ({
 
 		if (pageSettings && pageSettings.pages) {
 			Object.keys(pageSettings.pages).forEach((page) => {
-				if (isFusion) {
+				if (backend === BACKENDS.FUSION.name) {
 					pageSettings.pages[page].indexSettings = {
 						fusionSettings: {
 							app: get(fusionSettings, 'app', ''),
@@ -151,6 +156,14 @@ const Footer = ({
 							meta: { sponsoredProfile: '' },
 						},
 						index: '_fusion',
+						endpoint: endpointObj,
+					};
+				} else if (backend === BACKENDS.MONGODB.name) {
+					const { globalSettings = {} } = preferences;
+					const mongoDBSettings = get(globalSettings, 'meta.mongoDBSettings', {});
+					pageSettings.pages[page].indexSettings = {
+						mongoDBSettings,
+						index: mainPipeline,
 						endpoint: endpointObj,
 					};
 				} else {

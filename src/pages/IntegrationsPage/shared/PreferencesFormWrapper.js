@@ -106,6 +106,7 @@ class PreferencesFormWrapper extends React.Component {
 	constructor(props) {
 		super(props);
 		this.isFusion = props.backend === BACKENDS.FUSION.name;
+		this.isMongoDB = props.backend === BACKENDS.MONGODB.name;
 		this.form = FormBuilder.group({
 			name: '',
 			description: '',
@@ -119,6 +120,10 @@ class PreferencesFormWrapper extends React.Component {
 				app: '',
 				profile: '',
 				searchProfile: '',
+			}),
+			...(this.isMongoDB && {
+				db: '',
+				collection: '',
 			}),
 			id: '',
 			currentPage: '',
@@ -599,6 +604,14 @@ class PreferencesFormWrapper extends React.Component {
 						profile: get(preferences, 'fusionSettings.profile', ''),
 						searchProfile: get(preferences, 'fusionSettings.searchProfile', ''),
 					}),
+					...(this.isMongoDB && {
+						db: get(preferences, 'globalSettings.meta.mongoDBSettings.db', ''),
+						collection: get(
+							preferences,
+							'globalSettings.meta.mongoDBSettings.collection',
+							'',
+						),
+					}),
 					id: get(preferences, 'id', ''),
 					currentPage: get(preferences, 'pageSettings.currentPage', ''),
 					logoUrl: get(preferences, 'globalSettings.meta.branding.logoUrl', ''),
@@ -825,6 +838,14 @@ class PreferencesFormWrapper extends React.Component {
 								app: get(preferences, 'fusionSettings.app', ''),
 								profile: get(preferences, 'fusionSettings.profile', ''),
 								searchProfile: get(preferences, 'fusionSettings.searchProfile', ''),
+							}),
+							...(this.isMongoDB && {
+								db: get(preferences, 'globalSettings.meta.mongoDBSettings.db', ''),
+								collection: get(
+									preferences,
+									'globalSettings.meta.mongoDBSettings.collection',
+									'',
+								),
 							}),
 							id: get(preferences, 'id', ''),
 							currentPage: get(preferences, 'pageSettings.currentPage', ''),

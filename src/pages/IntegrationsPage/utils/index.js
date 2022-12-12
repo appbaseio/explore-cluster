@@ -17,6 +17,21 @@ export const deployStatusMapper = {
 	CANCELED: '❌',
 };
 
+export const getStringifiedObj = (obj = {}) => {
+	let str = '{\n';
+	Object.entries(obj).forEach(([key, value]) => {
+		str += `\t\t\t"${key}":`;
+		// eslint-disable-next-line
+		if (typeof value === 'boolean' || (typeof value === 'number' && isFinite(value)))
+			str += `{${value}}\n`;
+		else if (typeof value === 'object') str += `{${JSON.stringify(value)}}\n`;
+		else str += `"${value}"\n`;
+	});
+	str += '\t\t}';
+
+	return str;
+};
+
 export function timeDifference(current, previous) {
 	const msPerMinute = 60 * 1000;
 	const msPerHour = msPerMinute * 60;

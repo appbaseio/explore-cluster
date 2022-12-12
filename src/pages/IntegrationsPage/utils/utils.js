@@ -1070,6 +1070,12 @@ export const getSearchPreferencesPayload = (formValue) => {
 					deploySettings: {
 						versionId: get(formValue, 'versionId'),
 					},
+					...(get(formValue, 'backend') === BACKENDS.MONGODB.name && {
+						mongoDBSettings: {
+							db: get(formValue, 'db'),
+							collection: get(formValue, 'collection'),
+						},
+					}),
 				},
 				endpoint: {
 					url: get(formValue, 'url'),
@@ -1202,6 +1208,12 @@ export const getSearchPreferencesPayload = (formValue) => {
 			indexSettings: {
 				index: get(formValue, 'indexSettings.index'),
 				fusionSettings: get(formValue, 'indexSettings.fusionSettings'),
+				...(get(formValue, 'backend') === BACKENDS.MONGODB.name && {
+					mongoDBSettings: {
+						db: get(formValue, 'db', ''),
+						collection: get(formValue, 'collection', ''),
+					},
+				}),
 				endpoint: get(formValue, 'indexSettings.endpoint'),
 			},
 		}),
@@ -1748,6 +1760,20 @@ export const getDiffData = (oldObj, newObj, isPageLevelDiff = false, isRecommend
 			};
 		}
 
+		if (get(diffData, 'mongoDBSettings', null)) {
+			diffData = {
+				...diffData,
+				mongoDBSettings: {
+					...getDiffFieldsFromObject(
+						get(diffData, 'mongoDBSettings', {}),
+						'mongoDBSettings',
+						oldObj,
+						newObj,
+					),
+				},
+			};
+		}
+
 		if (isRecommendation) {
 			if (get(diffData, 'resultSettings', null)) {
 				const newVal = get(removeEmpty(newObj), 'resultSettings.fields', '');
@@ -2159,6 +2185,7 @@ export const getDiffData = (oldObj, newObj, isPageLevelDiff = false, isRecommend
 			authenticationSettings: get(diffData, 'authenticationSettings', {}),
 			recommendationSettings: get(diffData, 'recommendationSettings', {}),
 			fusionSettings: get(diffData, 'fusionSettings', {}),
+			mongoDBSettings: get(diffData, 'mongoDBSettings', {}),
 			...(isRecommendation && {
 				resultSettings: get(diffData, 'resultSettings', {}),
 			}),

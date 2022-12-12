@@ -6,6 +6,7 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 import { func, object, string } from 'prop-types';
 import { getURL } from '../../../../../../../constants/config';
 import { BACKENDS } from '../../../../../../../batteries/utils';
+import { getStringifiedObj } from '../../../../../utils';
 
 const CopyCode = ({
 	getSearchConfig,
@@ -23,41 +24,65 @@ const CopyCode = ({
 
 	const contentWithPreferences = () => {
 		const preferences = getPreferencesPayload();
-		const mainFusionSettings = form.get('fusionSettings')?.value;
-		const pageFusionSettings = get(
-			indexSettings,
-			'fusionSettings',
-			form.get('fusionSettings')?.value,
-		);
-		const fusionSettings = {
-			...mainFusionSettings,
-			...pageFusionSettings,
-		};
+		const secondaryPipeline = get(preferences, 'indexSettings.index', '');
+		const isTransformRequest =
+			backend === BACKENDS.FUSION.name || backend === BACKENDS.MONGODB.name;
+		let metadataObj = {};
+		if (isTransformRequest) {
+			if (backend === BACKENDS.FUSION.name) {
+				const mainFusionSettings = form.get('fusionSettings')?.value;
+				const pageFusionSettings = get(
+					indexSettings,
+					'fusionSettings',
+					form.get('fusionSettings')?.value,
+				);
+				const fusionSettings = {
+					...mainFusionSettings,
+					...pageFusionSettings,
+				};
+
+				metadataObj = {
+					app: fusionSettings.app,
+					profile: fusionSettings.profile,
+					suggestion_profile: fusionSettings.searchProfile,
+					sponsored_profile: fusionSettings.sponsoredProfile,
+				};
+			} else {
+				const globalmongoDBSettings = get(
+					preferences,
+					'globalSettings.meta.mongoDBSettings',
+					{},
+				);
+				const pagemongoDBSettings = get(indexSettings, 'mongoDBSettings', {});
+				const mongoDBSettings = {
+					...(globalmongoDBSettings || {}),
+					...(pagemongoDBSettings || {}),
+				};
+
+				metadataObj = {
+					db: mongoDBSettings.db,
+					collection: mongoDBSettings.collection,
+				};
+			}
+		}
+
 		return `
 import { ReactiveBase, ReactiveComponent } from "@appbaseio/reactivesearch";
-
 export default Search = () => {
   const preferences = ${JSON.stringify(preferences)};
-
   return (
 	<ReactiveBase
 	  enableAppbase
 	  preferences={preferences}
-	  app="${pipeline}"
+	  app="${secondaryPipeline || pipeline}"
 	  url="${getURL()}"
 	  credentials="${preferences?.exportSettings?.credentials || ''}"
 	  ${
-			backend === BACKENDS.FUSION.name
+			isTransformRequest
 				? `transformRequest={(props) => {
 		const newBody = JSON.parse(props.body);
-		newBody.metadata = {
-			app: "${fusionSettings.app || ''}",
-			profile: "${fusionSettings.profile || ''}",
-			suggestion_profile: "${fusionSettings.searchProfile || ''}",
-			sponsored_profile: "${fusionSettings.sponsoredProfile || ''}",
-		};
+		newBody.metadata =${getStringifiedObj(metadataObj)};
 		props.body = JSON.stringify(newBody);
-
 		return props;
 	  }}`
 				: ''
