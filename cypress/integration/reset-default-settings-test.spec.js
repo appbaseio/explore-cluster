@@ -46,7 +46,7 @@ describe('Reset to default settings test flow', () => {
 			.get('[data-cy=create-new-index]')
 			.click();
 
-		cy.wait('@indexing').wait(5000);
+		cy.wait('@indexing');
 	});
 
 	it('Should index data', () => {
@@ -81,9 +81,11 @@ describe('Reset to default settings test flow', () => {
 
 	it('Should open search settings URL', () => {
 		cy.server();
+		cy.route('**/_mapping').as('mapping');
 		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/search`);
-		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
 	});
 
 	it('Should change field weight of email in search settings', () => {
@@ -107,7 +109,7 @@ describe('Reset to default settings test flow', () => {
 		cy.server();
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.get('[data-cy=path-sub-AggregationSettings]').click();
-		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.wait('@relevancy', { timeout: 25000 });
 	});
 
 	it('Should change query format to and', () => {
@@ -119,7 +121,7 @@ describe('Reset to default settings test flow', () => {
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 
 		cy.get('[data-cy=path-sub-ResultSettings]').click();
-		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.wait('@relevancy', { timeout: 25000 });
 	});
 
 	it('Should change the page size', () => {
@@ -136,9 +138,11 @@ describe('Reset to default settings test flow', () => {
 
 	it('Should check for the default settings', () => {
 		cy.server();
+		cy.route('**/_mapping').as('mapping');
 		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/results`);
-		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 25000 });
 
 		cy.get('[data-cy=reset-default-button]').click().wait(5000);
 		cy.get('[data-cy=search-field-email]')
@@ -197,37 +201,34 @@ describe('Reset to default settings test flow', () => {
 
 		// Aggregation settings
 		cy.get('[data-cy=path-sub-AggregationSettings]').click();
-		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.wait('@relevancy', { timeout: 25000 });
 		cy.get('[data-cy=query-format-or-radio]').should('be.checked');
 
 		// Search settings
 		cy.get('[data-cy=path-sub-SearchSettings]').click();
-		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.wait('@relevancy', { timeout: 25000 });
 		cy.get('[data-cy=search-empty-field]').should('contain', 'No Search Fields Are Present');
 
 		// Language settings
 		cy.get('[data-cy=path-sub-LanguageSettings]').click();
-		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.wait('@relevancy', { timeout: 25000 });
 		cy.get('[data-cy=language-value]').should('contain', 'Universal');
 	});
 
 	it('Should assign index name prior to deletion', () => {
 		let credentials = btoa(`${username}:${password}`);
 
-		fetch(`${app_url}_alias/${indexName}`, {
+		cy.request({
+			method: 'GET',
+			url: `${app_url}_alias/${indexName}`,
 			headers: {
 				Authorization: `Basic ${credentials}`,
 			},
-		})
-			.then((response) => {
-				return response.json();
-			})
-			.then((data) => {
-				indexName = Object.keys(data)[0];
-			})
-			.catch((err) => {
-				console.log(err);
-			});
+		}).then((response) => {
+			const data = response.body;
+			console.log({ response, data });
+			indexName = Object.keys(data)[0];
+		});
 	});
 
 	it('Should delete index', () => {

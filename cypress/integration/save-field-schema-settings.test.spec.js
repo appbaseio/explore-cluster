@@ -46,7 +46,7 @@ describe('Save field schema settings test flow', () => {
 			.get('[data-cy=create-new-index]')
 			.click();
 
-		cy.wait('@indexing').wait(5000);
+		cy.wait('@indexing');
 	});
 
 	it('Should index data', () => {
@@ -110,7 +110,7 @@ describe('Save field schema settings test flow', () => {
 		cy.route('**/_mapping').as('mapping');
 		cy.route('POST', '**/_reindex/**').as('reindex');
 		cy.get('[data-cy=confirm-mapping-button]').click();
-		cy.wait(['@mapping', '@reindex'], { timeout: 25000 }).wait(5000);
+		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
 	});
 
 	it('Should check & confirm the mappings from the redux store', () => {
@@ -139,20 +139,17 @@ describe('Save field schema settings test flow', () => {
 	it('Should assign index name prior to deletion', () => {
 		let credentials = btoa(`${username}:${password}`);
 
-		fetch(`${app_url}_alias/${indexName}`, {
+		cy.request({
+			method: 'GET',
+			url: `${app_url}_alias/${indexName}`,
 			headers: {
 				Authorization: `Basic ${credentials}`,
 			},
-		})
-			.then((response) => {
-				return response.json();
-			})
-			.then((data) => {
-				indexName = Object.keys(data)[0];
-			})
-			.catch((err) => {
-				console.log(err);
-			});
+		}).then((response) => {
+			const data = response.body;
+			console.log({ response, data });
+			indexName = Object.keys(data)[0];
+		});
 	});
 
 	it('Should delete index', () => {

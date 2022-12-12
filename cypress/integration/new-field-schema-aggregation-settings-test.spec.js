@@ -46,7 +46,7 @@ describe('New field from schema should allow it to add to agg settings test flow
 			.get('[data-cy=create-new-index]')
 			.click();
 
-		cy.wait('@indexing').wait(5000);
+		cy.wait('@indexing');
 	});
 
 	it('Should index data', () => {
@@ -80,8 +80,10 @@ describe('New field from schema should allow it to add to agg settings test flow
 	it('Should open schema settings URL', () => {
 		cy.server();
 		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/schema`);
-		cy.wait('@mapping');
+		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 25000 });
 	});
 
 	it('Should add new data fields in schema', () => {
@@ -109,10 +111,17 @@ describe('New field from schema should allow it to add to agg settings test flow
 		cy.route('**/_mapping').as('mapping');
 		cy.route('POST', '**/_reindex/**').as('reindex');
 		cy.get('[data-cy=confirm-mapping-button]').click();
-		cy.wait(['@mapping', '@reindex'], { timeout: 25000 }).wait(5000);
+		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
 	});
 
 	it('Should check & confirm the data fields from the redux store', () => {
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/app/${indexName}/schema`);
+		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 25000 });
+
 		cy.window()
 			.its('store')
 			.invoke('getState')
@@ -125,9 +134,11 @@ describe('New field from schema should allow it to add to agg settings test flow
 
 	it('Should open aggregation settings URL', () => {
 		cy.server();
+		cy.route('**/_mapping').as('mapping');
 		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/aggs`);
-		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
 	});
 
 	it('Should check for the fields availbale to add in aggregation settings', () => {
@@ -147,20 +158,17 @@ describe('New field from schema should allow it to add to agg settings test flow
 	it('Should assign index name prior to deletion', () => {
 		let credentials = btoa(`${username}:${password}`);
 
-		fetch(`${app_url}_alias/${indexName}`, {
+		cy.request({
+			method: 'GET',
+			url: `${app_url}_alias/${indexName}`,
 			headers: {
 				Authorization: `Basic ${credentials}`,
 			},
-		})
-			.then((response) => {
-				return response.json();
-			})
-			.then((data) => {
-				indexName = Object.keys(data)[0];
-			})
-			.catch((err) => {
-				console.log(err);
-			});
+		}).then((response) => {
+			const data = response.body;
+			console.log({ response, data });
+			indexName = Object.keys(data)[0];
+		});
 	});
 
 	it('Should delete index', () => {

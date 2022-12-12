@@ -46,7 +46,7 @@ describe('Aggregation fields remove test flow', () => {
 			.get('[data-cy=create-new-index]')
 			.click();
 
-		cy.wait('@indexing').wait(5000);
+		cy.wait('@indexing');
 	});
 
 	it('Should index data', () => {
@@ -79,9 +79,11 @@ describe('Aggregation fields remove test flow', () => {
 
 	it('Should open aggregation settings URL', () => {
 		cy.server();
+		cy.route('**/_mapping').as('mapping');
 		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/aggs`);
-		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
 	});
 
 	it('Should add aggregation fields', () => {
@@ -107,9 +109,11 @@ describe('Aggregation fields remove test flow', () => {
 
 	it('Should open aggregation settings URL', () => {
 		cy.server();
+		cy.route('**/_mapping').as('mapping');
 		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/aggs`);
-		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
 	});
 
 	it('Should delete fields from aggregation settings', () => {
@@ -135,33 +139,16 @@ describe('Aggregation fields remove test flow', () => {
 
 	it('Should check for no fields in aggregation settings', () => {
 		cy.server();
+		cy.route('**/_mapping').as('mapping');
 		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/aggs`);
-		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
 
 		cy.get('[data-cy=aggs-empty-field]')
 			.should('contain', 'Please add aggregation fields from the dropdown below')
 			.get('[data-cy=review-deploy-button]')
 			.should('be.disabled');
-	});
-
-	it('Should assign index name prior to deletion', () => {
-		let credentials = btoa(`${username}:${password}`);
-
-		fetch(`${app_url}_alias/${indexName}`, {
-			headers: {
-				Authorization: `Basic ${credentials}`,
-			},
-		})
-			.then((response) => {
-				return response.json();
-			})
-			.then((data) => {
-				indexName = Object.keys(data)[0];
-			})
-			.catch((err) => {
-				console.log(err);
-			});
 	});
 
 	it('Should delete index', () => {

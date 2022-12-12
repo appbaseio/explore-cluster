@@ -46,37 +46,19 @@ describe('New index test flow', () => {
 			.get('[data-cy=create-new-index]')
 			.click();
 
-		cy.wait('@indexing').wait(5000);
+		cy.wait('@indexing');
 	});
 
 	it('Should open language settings URL', () => {
 		cy.server();
 		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/languages`);
-		cy.wait('@relevancy', { timeout: 25000 }).wait(5000);
+		cy.wait(['@relevancy', '@indices'], { timeout: 25000 });
 	});
 
 	it('Should check selected language', () => {
 		cy.get('[data-cy=language-value] .ant-select-selection-item').contains('English');
-	});
-
-	it('Should assign index name prior to deletion', () => {
-		let credentials = btoa(`${username}:${password}`);
-
-		fetch(`${app_url}_alias/${indexName}`, {
-			headers: {
-				Authorization: `Basic ${credentials}`,
-			},
-		})
-			.then((response) => {
-				return response.json();
-			})
-			.then((data) => {
-				indexName = Object.keys(data)[0];
-			})
-			.catch((err) => {
-				console.log(err);
-			});
 	});
 
 	it('Should delete index', () => {
