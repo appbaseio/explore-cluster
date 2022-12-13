@@ -201,19 +201,23 @@ class StoreFrontPreview extends React.Component {
 						onChange={this.handleProductSelection}
 					/>
 				)}
-				<iframe
-					title="iframe-preview"
-					id="iframe-preview"
-					ref={this.iframeRef}
-					frameBorder="0"
-					style={{
-						border: isMobile ? '1px solid rgb(204, 204, 204)' : undefined,
-					}}
-					width={isMobile ? 400 : '100%'}
-					height={window.innerHeight - 60}
-					src="about:blank"
-					onLoad={this.onLoad}
-				/>
+				{!displayProductPicker || currentProduct ? (
+					<iframe
+						title="iframe-preview"
+						id="iframe-preview"
+						ref={this.iframeRef}
+						frameBorder="0"
+						style={{
+							border: isMobile ? '1px solid rgb(204, 204, 204)' : undefined,
+						}}
+						width={isMobile ? 400 : '100%'}
+						height={window.innerHeight - 60}
+						src="about:blank"
+						onLoad={this.onLoad}
+					/>
+				) : (
+					<></>
+				)}
 			</div>
 		);
 	}
