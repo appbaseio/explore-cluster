@@ -75,7 +75,7 @@ describe('Query Rule creation with trigger index and script action', () => {
 		});
 	});
 	// Sometimes delete returns with 500 because it hasn't deleted from all the clusters but it does delete the query rule. Subsequent retries would return 400.
-	it('Should delete query rule', { failOnStatusCode: false }, () => {
+	it('Should delete query rule', () => {
 		const credentials = btoa(`${username}:${password}`);
 		if (ruleId) {
 			cy.request({
@@ -84,6 +84,7 @@ describe('Query Rule creation with trigger index and script action', () => {
 				headers: {
 					Authorization: `Basic ${credentials}`,
 				},
+				failOnStatusCode: false,
 			});
 		}
 	});
