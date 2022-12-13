@@ -79,64 +79,53 @@ describe('Reset to default settings test flow', () => {
 		});
 	});
 
-	it('Should open search settings URL', () => {
+	it('Should change search relevancy settings', () => {
 		cy.server();
 		cy.route('**/_mapping').as('mapping');
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/search`);
 		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
-	});
 
-	it('Should change field weight of email in search settings', () => {
+		// Wait to not enter a race condition
+		cy.wait(2000);
+
+		// Change search settings
 		cy.get('[data-cy=email-number-input]').click().type('{uparrow}{uparrow}{uparrow}{uparrow}');
 		cy.wait(2000);
-	});
-
-	it('Should not change field weight of name in search settings', () => {
 		cy.get('[data-cy=name-number-input]').click();
 		cy.wait(2000);
-	});
-
-	it('Should change field weight of rating in search settings', () => {
 		cy.get('[data-cy=rating-number-input]')
 			.click()
 			.type('{uparrow}{uparrow}{uparrow}{uparrow}{uparrow}{uparrow}')
 			.wait(2000);
-	});
 
-	it('Should open aggregation settings', () => {
+		// Visit aggregation settings
 		cy.server();
-		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_searchrelevancy/**').as('relevancy-aggs');
 		cy.get('[data-cy=path-sub-AggregationSettings]').click();
-		cy.wait('@relevancy', { timeout: 30000 });
-	});
+		cy.wait('@relevancy-aggs', { timeout: 30000 });
 
-	it('Should change query format to and', () => {
+		// Change aggregation settings
 		cy.get('[data-cy=query-format-and-radio]').click().wait(1000);
-	});
 
-	it('Should open result settings', () => {
+		// Visit result settings
 		cy.server();
-		cy.route('**/_searchrelevancy/**').as('relevancy');
-
+		cy.route('**/_searchrelevancy/**').as('relevancy-results');
 		cy.get('[data-cy=path-sub-ResultSettings]').click();
-		cy.wait('@relevancy', { timeout: 30000 });
-	});
-
-	it('Should change the page size', () => {
+		cy.wait('@relevancy-results', { timeout: 30000 });
+		// Change result settings
 		cy.get('[data-cy=result-page-size]').click().type('{uparrow}');
-	});
 
-	it('Should save & deploy the changed settings', () => {
+		// Save settings
 		cy.get('[data-cy=review-deploy-button]').click().wait(5000);
 		cy.server();
-		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
+		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy-save');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@relevancy'], { timeout: 30000 });
+		cy.wait(['@relevancy-save'], { timeout: 30000 });
 	});
 
-	it('Should check for the default settings', () => {
+	it('Should reset to the default settings', () => {
 		cy.server();
 		cy.route('**/_mapping').as('mapping');
 		cy.route('**/_searchrelevancy/**').as('relevancy');
@@ -183,35 +172,39 @@ describe('Reset to default settings test flow', () => {
 		// .should('contain', 'english')
 		// .get('[data-cy=new-value-language-status]')
 		// .should('contain', 'universal');
-	});
 
-	it('Should save and deploy the default settings', () => {
 		cy.server();
-		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
+		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy-save');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@relevancy'], { timeout: 30000 });
+		cy.wait(['@relevancy-save'], { timeout: 30000 });
 	});
 
 	it('Should check the deployed default settings', () => {
-		cy.wait(5000);
 		cy.server();
 		// Result settings
-		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_mapping').as('results-mapping');
+		cy.route('**/_searchrelevancy/**').as('results-relevancy');
+		cy.route('**/_aliasedindices').as('results-indices');
+		cy.visit(`${base_url}/app/${indexName}/results`);
+		cy.wait(['@results-mapping', '@results-indices', '@results-relevancy'], { timeout: 30000 });
 		cy.get('[data-cy=result-page-size]').should('have.value', '10');
 
 		// Aggregation settings
+		cy.route('**/_searchrelevancy/**').as('relevancy-aggs');
 		cy.get('[data-cy=path-sub-AggregationSettings]').click();
-		cy.wait('@relevancy', { timeout: 30000 });
+		cy.wait('@relevancy-aggs', { timeout: 30000 });
 		cy.get('[data-cy=query-format-or-radio]').should('be.checked');
 
 		// Search settings
+		cy.route('**/_searchrelevancy/**').as('relevancy-search');
 		cy.get('[data-cy=path-sub-SearchSettings]').click();
-		cy.wait('@relevancy', { timeout: 30000 });
+		cy.wait('@relevancy-search', { timeout: 30000 });
 		cy.get('[data-cy=search-empty-field]').should('contain', 'No Search Fields Are Present');
 
 		// Language settings
+		cy.route('**/_searchrelevancy/**').as('relevancy-lang');
 		cy.get('[data-cy=path-sub-LanguageSettings]').click();
-		cy.wait('@relevancy', { timeout: 30000 });
+		cy.wait('@relevancy-lang', { timeout: 30000 });
 		cy.get('[data-cy=language-value]').should('contain', 'Universal');
 	});
 
