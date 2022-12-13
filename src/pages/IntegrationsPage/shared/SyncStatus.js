@@ -3,7 +3,7 @@ import { css } from 'emotion';
 import { BellOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { Card, Button, Tooltip, Badge } from 'antd';
 import get from 'lodash/get';
-import { string, object, func } from 'prop-types';
+import { string, object, func, bool } from 'prop-types';
 import { connect } from 'react-redux';
 import Flex from '../../../batteries/components/shared/Flex';
 import { getAllVersions, deployUiBuilder, transformPreferences } from '../utils/sandpack-generator';
@@ -343,6 +343,7 @@ class SyncStatus extends React.Component {
 			preferenceId,
 			updateVersionStateForPreference,
 			getPreferencesPayload,
+			isSaveSearchLoading,
 		} = this.props;
 		const title = form.get('name') ? form.get('name').value : '';
 		const pipeline = form.get('pipeline') ? form.get('pipeline').value : '';
@@ -431,6 +432,7 @@ class SyncStatus extends React.Component {
 											this.setState({ modalType: 'deploy-modal' });
 											this.fetchAllVersions();
 										}}
+										disabled={isSaveSearchLoading}
 									>
 										Deploy
 									</Button>
@@ -504,6 +506,7 @@ SyncStatus.defaultProps = {
 	preferenceId: '',
 	versionState: {},
 	pipeline: '',
+	isSaveSearchLoading: false,
 	getPreferencesPayload: () => {},
 };
 
@@ -520,11 +523,13 @@ SyncStatus.propTypes = {
 	getDeploymentStatus: func.isRequired,
 	pipeline: string,
 	getPreferencesPayload: func,
+	isSaveSearchLoading: bool,
 };
 
 const mapStateToProps = (state, props) => ({
 	index: props.pipeline || get(state, '$getCurrentApp.name'),
 	versionState: get(state, '$getSearchPreferencesVersions.results', {}),
+	isSaveSearchLoading: get(state, '$saveSearchPreference.isFetching'),
 });
 const mapDispatchToProps = (dispatch) => ({
 	getSearchPreferences: () => dispatch(getSearchPreferencesAction()),

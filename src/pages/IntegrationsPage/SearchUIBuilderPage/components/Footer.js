@@ -1,8 +1,10 @@
 import { LoadingOutlined } from '@ant-design/icons';
 import { Affix, Button } from 'antd';
+import get from 'lodash/get';
 import { bool, func, object, string } from 'prop-types';
 import React, { useContext } from 'react';
 import { FieldGroup } from 'react-reactive-form';
+import { connect } from 'react-redux';
 import PreviewModal from '../../shared/PreviewModal';
 import SavePreferences from '../../shared/SavePreferences';
 import { FormContext } from '../../utils/utils';
@@ -16,6 +18,7 @@ const Footer = ({
 	getPreferencesPayload,
 	closeForm,
 	history,
+	isSaveSearchLoading,
 }) => {
 	const form = useContext(FormContext);
 	return (
@@ -39,7 +42,7 @@ const Footer = ({
 								onClick={() => {
 									history.push(`/cluster/search-builder/${preferenceId}/code`);
 								}}
-								disabled={isEditorLoading}
+								disabled={isEditorLoading || isSaveSearchLoading}
 								size="large"
 							>
 								<div className="button-label">
@@ -81,6 +84,7 @@ Footer.propTypes = {
 	getPreferencesPayload: func.isRequired,
 	closeForm: func,
 	history: object.isRequired,
+	isSaveSearchLoading: bool,
 };
 
 Footer.defaultProps = {
@@ -89,6 +93,11 @@ Footer.defaultProps = {
 	pipeline: '',
 	preferenceId: '',
 	closeForm: () => {},
+	isSaveSearchLoading: false,
 };
 
-export default Footer;
+const mapStateToProps = (state) => ({
+	isSaveSearchLoading: get(state, '$saveSearchPreference.isFetching'),
+});
+
+export default connect(mapStateToProps, null)(Footer);
