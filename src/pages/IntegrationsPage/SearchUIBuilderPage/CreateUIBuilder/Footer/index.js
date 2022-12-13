@@ -96,7 +96,13 @@ const Footer = ({
 		// Set the default UI builder name
 		newPrefs.name = `Search ${newPrefs.pipeline || ''} + ${template.label || ''}`;
 		// Set the templateVersionId to the latest template version Id
-		newPrefs.globalSettings.meta.templateSettings.templateVersionId = template.version;
+		if (newPrefs?.globalSettings?.meta?.templateSettings)
+			newPrefs.globalSettings.meta.templateSettings.templateVersionId = template.version;
+		else if (newPrefs?.globalSettings?.meta)
+			newPrefs.globalSettings.meta = {
+				...newPrefs.globalSettings.meta,
+				templateSettings: { templateVersionId: template.version },
+			};
 		return newPrefs;
 	};
 
