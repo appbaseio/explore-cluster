@@ -277,6 +277,22 @@ class SyncStatus extends React.Component {
 			});
 	};
 
+	renderNotificationBadge = () => {
+		const { showNotification, setShowTemplateUpdateBanner, setShowNotification } = this.props;
+		return showNotification ? (
+			<Badge dot>
+				<BellOutlined
+					onClick={() => {
+						setShowTemplateUpdateBanner(true);
+						setShowNotification(false);
+					}}
+				/>
+			</Badge>
+		) : (
+			<></>
+		);
+	};
+
 	render() {
 		const {
 			documents,
@@ -288,15 +304,7 @@ class SyncStatus extends React.Component {
 			themeType,
 			showPastVersionsDrawer,
 		} = this.state;
-		const {
-			form,
-			versionState,
-			preferenceId,
-			updateVersionStateForPreference,
-			setShowNotification,
-			setShowTemplateUpdateBanner,
-			showNotification,
-		} = this.props;
+		const { form, versionState, preferenceId, updateVersionStateForPreference } = this.props;
 		const title = form.get('name') ? form.get('name').value : '';
 		const pipeline = form.get('pipeline') ? form.get('pipeline').value : '';
 		const templateObj = getTemplate(themeType);
@@ -337,25 +345,7 @@ class SyncStatus extends React.Component {
 							<Flex className="sub-part">
 								{themeType ? (
 									<>
-										<b>
-											Search Template{' '}
-											{showNotification ? (
-												<Badge dot>
-													<BellOutlined
-														key={
-															form.get('templateVersionId')
-																? form.get('templateVersionId')
-																		.value
-																: 'templateVersionId'
-														}
-														onClick={() => {
-															setShowTemplateUpdateBanner(true);
-															setShowNotification(false);
-														}}
-													/>
-												</Badge>
-											) : null}
-										</b>
+										<b>Search Template {this.renderNotificationBadge()}</b>
 										<>{templateObj.label || themeType}</>
 									</>
 								) : null}
