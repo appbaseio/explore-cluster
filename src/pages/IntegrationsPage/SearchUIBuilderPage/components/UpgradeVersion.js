@@ -48,7 +48,7 @@ const UpgradeVersion = ({
 					if (!(action && action.error)) {
 						setShowTemplateUpdateBanner(false);
 						setShowNotification(false);
-						message.info('Code is committed successfully');
+						message.info('Template code updated successfully!');
 					}
 					setIsLoading(false);
 				});
@@ -56,7 +56,7 @@ const UpgradeVersion = ({
 			.catch((err) => {
 				setIsLoading(false);
 				console.error(err);
-				message.error('Failed to commit code.');
+				message.error('There was a problem updating the template code!.');
 			});
 	};
 

@@ -134,7 +134,7 @@ const ReviewAndSave = ({
 						.catch((err) => {
 							setIsLoading(false);
 							console.error(err);
-							message.error('Failed to commit code.');
+							message.error('There was a problem updating the template code!.');
 						});
 				})
 				.catch((err) => {
@@ -180,7 +180,7 @@ const ReviewAndSave = ({
 				.catch((err) => {
 					setIsLoading(false);
 					console.error(err);
-					message.error('Failed to commit code.');
+					message.error('There was a problem updating the template code!.');
 				});
 		}
 	};
