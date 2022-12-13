@@ -85,7 +85,7 @@ describe('Update field schema settings test flow', () => {
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/schema`);
-		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 25000 });
+		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 30000 });
 	});
 
 	it('Should change the datatype of rating from text to integer', () => {
@@ -110,7 +110,7 @@ describe('Update field schema settings test flow', () => {
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/schema`);
-		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 25000 });
+		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 30000 });
 
 		cy.get('[data-cy=rating-popover-icon]').trigger('mouseover').wait(1000);
 		cy.get('[data-cy=rating-popover-content]').should('contain', '"type": "integer"');

@@ -83,7 +83,7 @@ describe('Searchable fields test flow', () => {
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/search`);
-		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
 
 		cy.get('[data-cy=field-name-email]')
 			.should('contain', 'email')

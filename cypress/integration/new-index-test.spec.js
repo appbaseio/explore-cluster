@@ -54,7 +54,7 @@ describe('New index test flow', () => {
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/languages`);
-		cy.wait(['@relevancy', '@indices'], { timeout: 25000 });
+		cy.wait(['@relevancy', '@indices'], { timeout: 30000 });
 	});
 
 	it('Should check selected language', () => {

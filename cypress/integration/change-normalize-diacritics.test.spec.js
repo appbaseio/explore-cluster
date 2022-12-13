@@ -83,7 +83,7 @@ describe('Change normalize diacritics test flow', () => {
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/languages`);
-		cy.wait(['@relevancy', '@indices'], { timeout: 25000 });
+		cy.wait(['@relevancy', '@indices'], { timeout: 30000 });
 
 		// Disable diacritics
 		cy.get('[data-cy=normalize-diacritics-switch]').click().wait(1000);
@@ -97,7 +97,7 @@ describe('Change normalize diacritics test flow', () => {
 		cy.route('**/_mapping').as('mapping');
 		cy.route('POST', '**/_reindex/**').as('reindex');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
+		cy.wait(['@mapping', '@reindex'], { timeout: 30000 });
 	});
 
 	it('Should check the state for normalizeDiacritics is false from the redux store', () => {
@@ -106,7 +106,7 @@ describe('Change normalize diacritics test flow', () => {
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/languages`);
-		cy.wait(['@relevancy', '@indices'], { timeout: 25000 });
+		cy.wait(['@relevancy', '@indices'], { timeout: 30000 });
 
 		cy.window()
 			.its('store')
@@ -156,7 +156,7 @@ describe('Change normalize diacritics test flow', () => {
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/languages`);
-		cy.wait(['@relevancy', '@indices'], { timeout: 25000 });
+		cy.wait(['@relevancy', '@indices'], { timeout: 30000 });
 
 		// enable diacritics
 		cy.get('[data-cy=normalize-diacritics-switch]').click().wait(1000);
@@ -171,7 +171,7 @@ describe('Change normalize diacritics test flow', () => {
 		cy.route('**/_mapping').as('mapping');
 		cy.route('POST', '**/_reindex/**').as('reindex');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
+		cy.wait(['@mapping', '@reindex'], { timeout: 30000 });
 	});
 
 	it('Should check the state for normalizeDiacritics is true from the redux store', () => {
@@ -180,7 +180,7 @@ describe('Change normalize diacritics test flow', () => {
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/languages`);
-		cy.wait(['@relevancy', '@indices'], { timeout: 25000 });
+		cy.wait(['@relevancy', '@indices'], { timeout: 30000 });
 
 		cy.window()
 			.its('store')

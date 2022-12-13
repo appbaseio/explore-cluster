@@ -85,7 +85,7 @@ describe('Configure result settings without reindexing test flow', () => {
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/results`);
-		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 25000 });
+		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 30000 });
 
 		// Should change page size
 		cy.get('[data-cy=result-page-size]').click().type('{uparrow}');
@@ -136,7 +136,7 @@ describe('Configure result settings without reindexing test flow', () => {
 		cy.server();
 		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@relevancy'], { timeout: 25000 });
+		cy.wait(['@relevancy'], { timeout: 30000 });
 	});
 
 	it('Should delete index', () => {

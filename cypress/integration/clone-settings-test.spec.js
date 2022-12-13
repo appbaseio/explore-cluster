@@ -86,7 +86,7 @@ describe('Clone settings test flow', () => {
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/search`);
-		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
 	});
 
 	it('Should change field weight of email in search settings', () => {
@@ -132,7 +132,7 @@ describe('Clone settings test flow', () => {
 		cy.server();
 		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@relevancy'], { timeout: 25000 });
+		cy.wait(['@relevancy'], { timeout: 30000 });
 	});
 
 	it('Should create a new index and clone the settings to it', () => {
@@ -141,7 +141,7 @@ describe('Clone settings test flow', () => {
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/search`);
-		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
 
 		cy.route('PUT', `**/_searchrelevancy/${indexName2}`).as('clone-relevancy');
 		cy.root().contains('Copy Search Settings').click();
@@ -153,7 +153,7 @@ describe('Clone settings test flow', () => {
 			.click()
 			.get('[data-cy=clone-button]')
 			.click();
-		cy.wait(['@clone-relevancy'], { timeout: 25000 });
+		cy.wait(['@clone-relevancy'], { timeout: 30000 });
 	});
 
 	it('Should verify the search settings of the new index', () => {
@@ -162,7 +162,7 @@ describe('Clone settings test flow', () => {
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName2}/search`);
-		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
 
 		cy.get('[data-cy=field-name-email]')
 			.should('contain', 'email')

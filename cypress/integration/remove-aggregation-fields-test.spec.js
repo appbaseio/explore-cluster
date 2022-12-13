@@ -83,7 +83,7 @@ describe('Aggregation fields remove test flow', () => {
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/aggs`);
-		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
 	});
 
 	it('Should add aggregation fields', () => {
@@ -104,7 +104,7 @@ describe('Aggregation fields remove test flow', () => {
 		cy.server();
 		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@relevancy'], { timeout: 25000 });
+		cy.wait(['@relevancy'], { timeout: 30000 });
 	});
 
 	it('Should open aggregation settings URL', () => {
@@ -113,7 +113,7 @@ describe('Aggregation fields remove test flow', () => {
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/aggs`);
-		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
 	});
 
 	it('Should delete fields from aggregation settings', () => {
@@ -134,7 +134,7 @@ describe('Aggregation fields remove test flow', () => {
 		cy.server();
 		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@relevancy'], { timeout: 25000 });
+		cy.wait(['@relevancy'], { timeout: 30000 });
 	});
 
 	it('Should check for no fields in aggregation settings', () => {
@@ -143,7 +143,7 @@ describe('Aggregation fields remove test flow', () => {
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/aggs`);
-		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
 
 		cy.get('[data-cy=aggs-empty-field]')
 			.should('contain', 'Please add aggregation fields from the dropdown below')

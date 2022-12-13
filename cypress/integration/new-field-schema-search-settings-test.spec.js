@@ -83,7 +83,7 @@ describe('New field from schema should allow it to add to search settings test f
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/schema`);
-		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 25000 });
+		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 30000 });
 	});
 
 	it('Should add new data fields in schema', () => {
@@ -101,7 +101,7 @@ describe('New field from schema should allow it to add to search settings test f
 		cy.route('**/_mapping').as('mapping');
 		cy.route('POST', '**/_reindex/**').as('reindex');
 		cy.get('[data-cy=confirm-mapping-button]').click();
-		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
+		cy.wait(['@mapping', '@reindex'], { timeout: 30000 });
 	});
 
 	it('Should check the newly added data feild', () => {
@@ -110,7 +110,7 @@ describe('New field from schema should allow it to add to search settings test f
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/schema`);
-		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 25000 });
+		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 30000 });
 
 		cy.get('[data-cy=field-name-rating]').should('contain', 'rating');
 	});
@@ -158,7 +158,7 @@ describe('New field from schema should allow it to add to search settings test f
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/search`);
-		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
 	});
 
 	it('Should check search fields after deployment', () => {
@@ -167,7 +167,7 @@ describe('New field from schema should allow it to add to search settings test f
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/schema`);
-		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 25000 });
+		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 30000 });
 
 		cy.get('[data-cy=field-name-email]')
 			.should('contain', 'email')

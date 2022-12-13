@@ -83,7 +83,7 @@ describe('Remove field schema settings test flow', () => {
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/schema`);
-		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 25000 });
+		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 30000 });
 	});
 
 	it('Should delete all the data fields in schema', () => {
@@ -100,7 +100,7 @@ describe('Remove field schema settings test flow', () => {
 		cy.route('**/_mapping').as('mapping');
 		cy.route('POST', '**/_reindex/**').as('reindex');
 		cy.get('[data-cy=confirm-mapping-button]').click();
-		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
+		cy.wait(['@mapping', '@reindex'], { timeout: 30000 });
 	});
 
 	it('Should check & confirm the data fields from the redux store', () => {
@@ -109,7 +109,7 @@ describe('Remove field schema settings test flow', () => {
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/schema`);
-		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 25000 });
+		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 30000 });
 
 		cy.window()
 			.its('store')

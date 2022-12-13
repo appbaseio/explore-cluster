@@ -83,7 +83,7 @@ describe('New field from schema should allow it to add to agg settings test flow
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/schema`);
-		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 25000 });
+		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 30000 });
 	});
 
 	it('Should add new data fields in schema', () => {
@@ -111,7 +111,7 @@ describe('New field from schema should allow it to add to agg settings test flow
 		cy.route('**/_mapping').as('mapping');
 		cy.route('POST', '**/_reindex/**').as('reindex');
 		cy.get('[data-cy=confirm-mapping-button]').click();
-		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
+		cy.wait(['@mapping', '@reindex'], { timeout: 30000 });
 	});
 
 	it('Should check & confirm the data fields from the redux store', () => {
@@ -120,7 +120,7 @@ describe('New field from schema should allow it to add to agg settings test flow
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/schema`);
-		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 25000 });
+		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 30000 });
 
 		cy.window()
 			.its('store')
@@ -138,7 +138,7 @@ describe('New field from schema should allow it to add to agg settings test flow
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/aggs`);
-		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
 	});
 
 	it('Should check for the fields availbale to add in aggregation settings', () => {

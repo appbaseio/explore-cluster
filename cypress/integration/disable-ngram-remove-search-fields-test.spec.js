@@ -83,7 +83,7 @@ describe('Disable ngram remove search fields and reindex data test flow', () => 
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/search`);
-		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
 	});
 
 	it('Should add all data feilds as search feilds', () => {
@@ -102,7 +102,7 @@ describe('Disable ngram remove search fields and reindex data test flow', () => 
 		cy.server();
 		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@relevancy'], { timeout: 25000 });
+		cy.wait(['@relevancy'], { timeout: 30000 });
 	});
 
 	it('Should check search fields after deployment', () => {
@@ -111,7 +111,7 @@ describe('Disable ngram remove search fields and reindex data test flow', () => 
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/search`);
-		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
 
 		cy.get('[data-cy=field-name-email]')
 			.should('contain', 'email')
@@ -132,7 +132,7 @@ describe('Disable ngram remove search fields and reindex data test flow', () => 
 		cy.server();
 		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@relevancy'], { timeout: 25000 });
+		cy.wait(['@relevancy'], { timeout: 30000 });
 	});
 
 	it('Should check if .search fields are removed', () => {
@@ -141,7 +141,7 @@ describe('Disable ngram remove search fields and reindex data test flow', () => 
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/search`);
-		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
 
 		cy.get('[data-cy=email-popover-icon]')
 			.trigger('mouseover')

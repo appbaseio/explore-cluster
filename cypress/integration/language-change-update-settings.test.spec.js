@@ -82,7 +82,7 @@ describe('Disable ngram remove search fields and reindex data test flow', () => 
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/languages`);
-		cy.wait(['@relevancy', '@indices'], { timeout: 25000 });
+		cy.wait(['@relevancy', '@indices'], { timeout: 30000 });
 	});
 
 	it('Should change language analyzer from english to universal', () => {
@@ -99,7 +99,7 @@ describe('Disable ngram remove search fields and reindex data test flow', () => 
 		cy.route('**/_mapping').as('mapping');
 		cy.route('POST', '**/_reindex/**').as('reindex');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait(['@mapping', '@reindex'], { timeout: 25000 });
+		cy.wait(['@mapping', '@reindex'], { timeout: 30000 });
 	});
 
 	it('Should check the new language analyzer in search settings', () => {
@@ -108,7 +108,7 @@ describe('Disable ngram remove search fields and reindex data test flow', () => 
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/search`);
-		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
 
 		cy.get('[data-cy=email-popover-icon]').trigger('mouseover');
 		cy.get('[data-cy=email-popover-content]').should('contain', '"analyzer": "universal"');

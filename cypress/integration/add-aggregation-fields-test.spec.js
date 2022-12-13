@@ -82,7 +82,7 @@ describe('Aggregation fields add test flow', () => {
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/aggs`);
-		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
 
 		cy.get('[data-cy=aggregation-fields-dropdown]')
 			.click()
@@ -110,7 +110,7 @@ describe('Aggregation fields add test flow', () => {
 		cy.server();
 		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
 		cy.get('[data-cy=review-save-button]').click();
-		cy.wait('@relevancy', { timeout: 25000 });
+		cy.wait('@relevancy', { timeout: 30000 });
 	});
 
 	it('Should check aggregation settings persistence', () => {
@@ -119,7 +119,7 @@ describe('Aggregation fields add test flow', () => {
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/aggs`);
-		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
 
 		cy.get('[data-cy=field-name-email]')
 			.should('contain', 'email')

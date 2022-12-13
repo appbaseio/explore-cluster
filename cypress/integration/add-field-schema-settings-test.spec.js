@@ -83,7 +83,7 @@ describe('Add field schema settings test flow', () => {
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/schema`);
-		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 25000 });
+		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 30000 });
 	});
 
 	it('Should add new data fields in schema', () => {
@@ -100,7 +100,7 @@ describe('Add field schema settings test flow', () => {
 		cy.server();
 		cy.route('**/_mapping').as('mapping');
 		cy.get('[data-cy=confirm-mapping-button]').click();
-		cy.wait('@mapping', { timeout: 25000 });
+		cy.wait('@mapping', { timeout: 30000 });
 	});
 
 	it('Should check the newly added data feild', () => {
@@ -109,7 +109,7 @@ describe('Add field schema settings test flow', () => {
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/schema`);
-		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 25000 });
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
 
 		cy.get('[data-cy=field-name-rating]').should('contain', 'rating');
 	});
