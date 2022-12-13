@@ -104,7 +104,7 @@ const ListItem = ({
 							)}
 						</>,
 						<Button
-							type="danger"
+							danger
 							icon={<DeleteOutlined />}
 							onClick={() => {
 								control.parent.removeAt(index);

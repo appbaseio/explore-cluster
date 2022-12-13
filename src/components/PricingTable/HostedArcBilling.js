@@ -427,7 +427,7 @@ class HostedArcBilling extends Component {
 						<Button
 							loading={!resending && isSubmitting}
 							key="submit1"
-							type="danger"
+							danger
 							onClick={this.deleteFinalSubscription}
 							disabled={!this.isOtpValid}
 						>

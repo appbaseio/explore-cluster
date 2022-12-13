@@ -352,9 +352,7 @@ const ConfigureBackend = (props) => {
 											>
 												<Card className={`field-label `} bordered={false}>
 													<Typography.Text>
-														<Typography.Text type="danger">
-															*
-														</Typography.Text>
+														<Typography.Text danger>*</Typography.Text>
 														&nbsp; Choose search engine{' '}
 													</Typography.Text>
 												</Card>

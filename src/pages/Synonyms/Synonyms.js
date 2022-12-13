@@ -592,7 +592,7 @@ class Synonyms extends React.Component {
 																	shape="circle-outline"
 																	size="small"
 																	loading={isDeleting === value}
-																	type="danger"
+																	danger
 																	icon={<DeleteOutlined />}
 																/>
 															</Popconfirm>

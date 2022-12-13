@@ -266,7 +266,7 @@ const AddSuggestion = (props) => {
 						<Button onClick={handleSave} type="primary">
 							Save
 						</Button>
-						<Button onClick={onCloseModal} type="danger">
+						<Button onClick={onCloseModal} danger>
 							Cancel
 						</Button>
 					</Flex>

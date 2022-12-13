@@ -195,7 +195,7 @@ const StripeForm = ({
 								{buttonTitle}
 							</Button>
 							<Button
-								type="danger"
+								danger
 								block
 								onClick={cancelHandler}
 								htmlType="button"

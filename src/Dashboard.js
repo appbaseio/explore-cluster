@@ -233,7 +233,7 @@ class Dashboard extends Component {
 						</Button>
 						<Button
 							size="large"
-							type="danger"
+							danger
 							css={{ marginLeft: '8' }}
 							onClick={() => {
 								Sentry.showReportDialog({

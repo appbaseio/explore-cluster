@@ -160,11 +160,7 @@ const ViewDetailsModal = ({
 								<h3>{title}</h3>
 								<p>{description}</p>
 							</Flex>
-							<Button
-								onClick={buttonClickHandler}
-								className="action-btn"
-								type="danger"
-							>
+							<Button onClick={buttonClickHandler} className="action-btn" danger>
 								{buttonText}
 							</Button>
 						</Flex>

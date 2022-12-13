@@ -1436,12 +1436,7 @@ class QueryRulesForm extends React.Component {
 									onDelete={() => handleQueryRuleDelete(rule, removeRule)}
 								>
 									{({ handleModal }) => (
-										<Button
-											size="large"
-											onClick={handleModal}
-											ghost
-											type="danger"
-										>
+										<Button size="large" onClick={handleModal} ghost danger>
 											{isDeleting ? <LoadingOutlined /> : <DeleteOutlined />}{' '}
 											Delete
 										</Button>

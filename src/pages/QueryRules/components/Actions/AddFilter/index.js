@@ -104,7 +104,7 @@ const AddFilter = (props) => {
 						size="small"
 						shape="circle"
 						ghost
-						type="danger"
+						danger
 						onClick={() => deleteItem(item)}
 						icon={<CloseOutlined />}
 					/>

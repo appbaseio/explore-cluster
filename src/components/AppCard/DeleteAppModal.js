@@ -83,7 +83,7 @@ class DeleteAppModal extends React.Component {
 					title="Confirm Delete"
 					okText="Delete"
 					okButtonProps={{
-						type: 'danger',
+						danger: true,
 						disabled,
 						loading,
 						'data-cy': `delete-index-${appName}`,

@@ -156,7 +156,7 @@ class SearchSettings extends React.Component {
 						size="small"
 						shape="circle"
 						ghost
-						type="danger"
+						danger
 						onClick={() => this.deleteItem(item)}
 						icon={<CloseOutlined />}
 					/>

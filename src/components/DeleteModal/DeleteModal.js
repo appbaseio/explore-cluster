@@ -41,7 +41,7 @@ class DeleteModal extends React.Component {
 					title={title}
 					okButtonProps={{
 						disabled: !isMatching,
-						type: 'danger',
+						danger: true,
 					}}
 					okText="Delete"
 					onOk={this.handleOk}

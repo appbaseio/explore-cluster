@@ -111,7 +111,7 @@ class Permission extends React.Component {
 					okText="Yes"
 					cancelText="No"
 				>
-					<Button type="danger">
+					<Button danger>
 						<DeleteOutlined />
 					</Button>
 				</Popconfirm>
