@@ -132,16 +132,14 @@ describe('New field from schema should allow it to add to agg settings test flow
 			});
 	});
 
-	it('Should open aggregation settings URL', () => {
+	it('Should check for the fields availbale to add in aggregation settings', () => {
 		cy.server();
 		cy.route('**/_mapping').as('mapping');
 		cy.route('**/_searchrelevancy/**').as('relevancy');
 		cy.route('**/_aliasedindices').as('indices');
 		cy.visit(`${base_url}/app/${indexName}/aggs`);
 		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
-	});
 
-	it('Should check for the fields availbale to add in aggregation settings', () => {
 		cy.get('[data-cy=aggregation-fields-dropdown]').click().type('phone{enter}').wait(1000);
 		cy.get('[data-cy=aggregation-fields-dropdown]').click().type('rating{enter}');
 	});
