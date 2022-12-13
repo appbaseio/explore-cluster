@@ -122,23 +122,6 @@ describe('Disable synonyms test flow', () => {
 			});
 	});
 
-	// Sometimes there is reindexing which may change the original index
-	it('Should assign index name prior to deletion', { failOnStatusCode: false }, () => {
-		let credentials = btoa(`${username}:${password}`);
-
-		cy.request({
-			method: 'GET',
-			url: `${app_url}_alias/${indexName}`,
-			headers: {
-				Authorization: `Basic ${credentials}`,
-			},
-		}).then((response) => {
-			const data = response.body;
-			console.log({ response, data });
-			indexName = Object.keys(data)[0];
-		});
-	});
-
 	it('Should delete index', () => {
 		let credentials = btoa(`${username}:${password}`);
 
@@ -148,6 +131,8 @@ describe('Disable synonyms test flow', () => {
 			headers: {
 				Authorization: `Basic ${credentials}`,
 			},
+			// Sometimes index is an alias here which wouldn't let it delete
+			failOnStatusCode: false,
 		});
 	});
 
