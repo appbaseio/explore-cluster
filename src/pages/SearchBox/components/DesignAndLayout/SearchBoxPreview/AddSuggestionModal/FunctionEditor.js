@@ -21,7 +21,7 @@ const container = css`
 	margin-top: 2.5rem;
 	h3.container-heading {
 		position: absolute;
-		top: -40px;
+		top: -60px;
 		z-index: 1;
 		font-weight: 500;
 		color: black;
