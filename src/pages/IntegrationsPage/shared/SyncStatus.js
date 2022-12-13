@@ -99,7 +99,10 @@ class SyncStatus extends React.Component {
 
 		const templateVersionIdControl = form.get('templateVersionId');
 		const templateObj = getTemplate(themeType?.value || '');
-		this.handleTemplateVersionIdChanges(templateObj.version, templateVersionIdControl.value);
+
+		templateVersionIdControl.valueChanges.subscribe((val) => {
+			this.handleTemplateVersionIdChanges(templateObj.version, val);
+		});
 	}
 
 	componentWillUnmount() {
@@ -127,10 +130,8 @@ class SyncStatus extends React.Component {
 			});
 			const templateVersionIdControl = form.get('templateVersionId');
 			if (templateVersionIdControl.value && pipeline) {
-				templateVersionIdControl.valueChanges.subscribe((val) => {
-					const templateObj = getTemplate(value);
-					if (pipeline) this.handleTemplateVersionIdChanges(templateObj.version, val);
-				});
+				const templateObj = getTemplate(value);
+				this.handleTemplateVersionIdChanges(templateObj.version, value);
 			}
 		}
 	};
