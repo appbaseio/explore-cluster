@@ -31,37 +31,33 @@ describe('Stored query create test flow', () => {
 	it('Should login from cluster URL', () => {
 		cy.loginUser(username, password, cluster);
 	});
-	it('Should open stored-query URL', () => {
-		cy.openPageSQ(base_url);
-		cy.wait(PAGE_LOAD_TIME);
-	});
+	it('Should create a stored query', () => {
+		cy.server();
+		cy.route('**/_analytics/storedqueries/**').as('analytics');
+		cy.route('**/_storedqueries').as('storedqueries');
+		cy.visit(`${base_url}/cluster/stored-queries`).wait(2500);
+		cy.wait(['@storedqueries', '@analytics'], { timeout: 30000 });
 
-	it('Should fill stored-query id', () => {
+		cy.contains('Create Stored Query').click();
 		cy.wait(1000);
 		cy.get('[data-cy=stored-query-id]').type(storedQueryId);
-	});
 
-	it('Should fill stored-query description', () => {
 		cy.wait(1000);
 		cy.get('[data-cy=stored-query-description]').type('test description');
-	});
 
-	it('Should fill stored-query query ', () => {
 		cy.typeInMonacoEditorSQ(queryValue);
 		cy.scrollTo('top');
-	});
 
-	it('Should review the stored-query entered values', () => {
 		cy.get(`[data-cy=sq-execute]`).click({ force: true });
 		cy.wait(2000);
 		cy.scrollTo('top');
 		cy.get('[data-cy=sq-review-and-save]').click();
 		cy.get(`[data-cy=new-value-StoredQueryId-status]`).should('contain', storedQueryId);
 		cy.get(`[data-cy=new-value-QueryDescription-status]`).should('contain', 'test description');
-	});
 
-	it('Should save new stored-query ', () => {
-		cy.saveSQ(storedQueryId);
+		cy.route('PUT', '**/_storedquery/**').as('put-storedquery');
+		cy.contains('Review and Save').click();
+		cy.wait('@put-storedquery', { timeout: 30000 });
 	});
 
 	it('Should validate stored-query', () => {
