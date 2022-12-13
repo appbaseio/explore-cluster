@@ -148,35 +148,37 @@ const CloneIndex = (props) => {
 			</Row>
 			<Row style={{ paddingTop: '35px' }}>
 				<Checkbox.Group value={action} onChange={setAction}>
-					<div>
-						<Checkbox className={radioStyle} value="settings.mappings">
-							Clone Settings and Mappings
-						</Checkbox>
-					</div>
-					<div>
-						<Checkbox className={radioStyle} value="data">
-							Copy Index Data
-						</Checkbox>
-					</div>
+					<Row>
+						<Row style={{ width: '100%' }}>
+							<Checkbox className={radioStyle} value="settings.mappings">
+								Clone Settings and Mappings
+							</Checkbox>
+						</Row>
+						<Row style={{ width: '100%' }}>
+							<Checkbox className={radioStyle} value="data">
+								Copy Index Data
+							</Checkbox>
+						</Row>
 
-					<div data-cy="copy-search-relevancy-settings">
-						{featureSearchRelevance ? (
-							searchRelevancyCheckbox
-						) : (
-							<Tooltip title="This feature is only available on selected plans.">
-								{searchRelevancyCheckbox}
-							</Tooltip>
-						)}
-					</div>
-					<div data-cy="copy-synonyms">
-						{featureSearchRelevance ? (
-							copySynoynmsCheckbox
-						) : (
-							<Tooltip title="This feature is only available on selected plans.">
-								{copySynoynmsCheckbox}
-							</Tooltip>
-						)}
-					</div>
+						<Row style={{ width: '100%' }} data-cy="copy-search-relevancy-settings">
+							{featureSearchRelevance ? (
+								searchRelevancyCheckbox
+							) : (
+								<Tooltip title="This feature is only available on selected plans.">
+									{searchRelevancyCheckbox}
+								</Tooltip>
+							)}
+						</Row>
+						<Row style={{ width: '100%' }} data-cy="copy-synonyms">
+							{featureSearchRelevance ? (
+								copySynoynmsCheckbox
+							) : (
+								<Tooltip title="This feature is only available on selected plans.">
+									{copySynoynmsCheckbox}
+								</Tooltip>
+							)}
+						</Row>
+					</Row>
 				</Checkbox.Group>
 			</Row>
 		</Modal>
