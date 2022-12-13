@@ -31,9 +31,11 @@ const CodeDiff = ({ oldCode, newCode, currentVersion: versionStatus, versionStat
 				console.error(err);
 				setIsLoading(false);
 			});
-
-		getTotalDiffData();
 	}, []);
+
+	useEffect(() => {
+		if (Object.keys(oldCode).length && Object.keys(newCode).length) getTotalDiffData();
+	}, [oldCode, newCode]);
 
 	const loaderAsyncCall = () => {
 		return new Promise((resolve) => setTimeout(() => resolve(), 2500));
@@ -56,7 +58,7 @@ const CodeDiff = ({ oldCode, newCode, currentVersion: versionStatus, versionStat
 		});
 	};
 
-	if (isLoading)
+	if (isLoading || Object.keys(oldCode).length === 0 || Object.keys(newCode).length === 0)
 		return (
 			<Flex justifyContent="center">
 				<Spin />
@@ -84,19 +86,24 @@ const CodeDiff = ({ oldCode, newCode, currentVersion: versionStatus, versionStat
 					)}
 				</Flex>
 				<Flex justifyContent="space-between">
-					<Tooltip
-						title={
-							currentVersion && currentVersion.version_id
-								? currentVersion.version_id
-								: 'Current Changes'
-						}
-					>
-						<span>
-							{currentVersion && currentVersion.commit
-								? currentVersion.commit
-								: 'Current Changes'}
-						</span>
-					</Tooltip>
+					<span>
+						{currentVersion && currentVersion.commit ? (
+							<>
+								Current Version:{' '}
+								<Tooltip
+									title={
+										currentVersion && currentVersion.version_id
+											? currentVersion.version_id
+											: 'Current Changes'
+									}
+								>
+									{currentVersion.commit}
+								</Tooltip>
+							</>
+						) : (
+							'Current Changes'
+						)}
+					</span>
 					<Tooltip
 						title={
 							versionStatus && versionStatus.version_id

@@ -57,11 +57,16 @@ const DiffStatBlock = ({ changedDetails }) => {
 				'diffstat-block-removed',
 				'diffstat-block-removed',
 				'diffstat-block-removed',
-				'',
+				'diffstat-block-removed',
 			];
 		}
 		if (!removed && added) {
-			return ['diffstat-block-added', 'diffstat-block-added', 'diffstat-block-added', ''];
+			return [
+				'diffstat-block-added',
+				'diffstat-block-added',
+				'diffstat-block-added',
+				'diffstat-block-added',
+			];
 		}
 
 		return ['', '', '', ''];
@@ -71,8 +76,8 @@ const DiffStatBlock = ({ changedDetails }) => {
 	return (
 		<Flex alignItems="center" className={diffStatStyles}>
 			<Flex>
-				{added && <span className="added-color">+{added}&nbsp;</span>}
-				{removed && <span className="removed-color">-{removed}&nbsp;</span>}
+				{added ? <span className="added-color">+{added}&nbsp;</span> : <></>}
+				{removed ? <span className="removed-color">-{removed}&nbsp;</span> : <></>}
 			</Flex>
 			<Flex>
 				<div className={`block-added outline ${blockStyles[0]}`} />
