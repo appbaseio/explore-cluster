@@ -56,7 +56,7 @@ const Main = ({ getPreferencesN, ...props }) => {
 		props.history.push('/cluster/search-builder');
 	};
 
-	const handleTemplateVersionIdChages = (latestTemplateVersion, val) => {
+	const handleTemplateVersionIdChanges = (latestTemplateVersion, val) => {
 		if (val !== latestTemplateVersion) setShowTemplateUpdateBanner(true);
 		else setShowTemplateUpdateBanner(false);
 	};
@@ -71,7 +71,7 @@ const Main = ({ getPreferencesN, ...props }) => {
 					const templateObj = getTemplate(themeType);
 					const templateVersionIdControl = form.get('templateVersionId');
 					templateVersionIdControl.valueChanges.subscribe((val) => {
-						if (pipeline) handleTemplateVersionIdChages(templateObj.version, val);
+						if (pipeline) handleTemplateVersionIdChanges(templateObj.version, val);
 					});
 					const templateVersionId = templateVersionIdControl
 						? templateVersionIdControl.value
