@@ -11,7 +11,6 @@ import { FormContext } from '../../../utils/utils';
 class ExportModal extends React.Component {
 	state = {
 		visible: false,
-		showInstruction: false,
 	};
 
 	getComponentByValue(exportSettingsControl) {
@@ -53,30 +52,21 @@ class ExportModal extends React.Component {
 	};
 
 	handleOk = () => {
-		const { showInstruction } = this.state;
-		if (showInstruction) {
-			this.setState({
-				showInstruction: false,
-				visible: false,
-			});
-		} else {
-			this.setState({
-				showInstruction: true,
-			});
-		}
+		this.setState({
+			visible: false,
+		});
 	};
 
 	handleCancel = () => {
 		this.setState({
 			visible: false,
-			showInstruction: false,
 		});
 	};
 
 	static contextType = FormContext;
 
 	render() {
-		const { visible, showInstruction } = this.state;
+		const { visible } = this.state;
 		const { buttonProps, isRecommendation } = this.props;
 		const { get: getControl } = this.context;
 		const exportSettingsControl = getControl('exportSettings');
@@ -87,7 +77,7 @@ class ExportModal extends React.Component {
 						<Modal
 							title="Export Code"
 							visible={visible}
-							okText={showInstruction ? 'Ok' : 'Continue'}
+							okText="Ok"
 							onOk={this.handleOk}
 							onCancel={this.handleCancel}
 							destroyOnClose
@@ -96,12 +86,10 @@ class ExportModal extends React.Component {
 							}}
 							width="calc(100% - 100px)"
 						>
-							{showInstruction ? (
-								this.getComponentByValue(exportSettingsControl)
-							) : (
-								<Form colon={false}>
-									<FieldControl name="exportAs">
-										{({ handler }) => (
+							<Form colon={false}>
+								<FieldControl name="exportAs">
+									{({ handler }) => (
+										<>
 											<Form.Item label="Select export mode">
 												<Radio.Group {...handler()}>
 													<Radio value="embed">Embed Mode</Radio>
@@ -110,24 +98,25 @@ class ExportModal extends React.Component {
 													</Radio>
 												</Radio.Group>
 											</Form.Item>
+											{this.getComponentByValue(exportSettingsControl)}
+										</>
+									)}
+								</FieldControl>
+								{!isRecommendation && (
+									<FieldControl name="openAsPage">
+										{({ handler }) => (
+											<>
+												<Form.Item
+													label="The search will appear with a CTA button. Do you instead
+										want to show the search view directly?"
+												>
+													<Switch {...handler('checkbox')} />
+												</Form.Item>
+											</>
 										)}
 									</FieldControl>
-									{!isRecommendation && (
-										<FieldControl name="openAsPage">
-											{({ handler }) => (
-												<>
-													<Form.Item
-														label="The search will appear with a CTA button. Do you instead
-										want to show the search view directly?"
-													>
-														<Switch {...handler('checkbox')} />
-													</Form.Item>
-												</>
-											)}
-										</FieldControl>
-									)}
-								</Form>
-							)}
+								)}
+							</Form>
 						</Modal>
 						<Button onClick={this.showModal} size="large" {...buttonProps}>
 							Export Code
