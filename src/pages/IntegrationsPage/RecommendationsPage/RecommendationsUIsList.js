@@ -110,7 +110,11 @@ const RecommendationsUIsList = ({
 					dataSource={preferences.map((preference) => ({
 						id: preference.id,
 						name: preference.name,
-						description: preference.description,
+						description: (
+							<span style={{ overflowWrap: 'anywhere' }}>
+								{preference.description}
+							</span>
+						),
 						pipeline: preference.pipeline,
 						updatedAt:
 							preference.updated_at || preference.created_at
