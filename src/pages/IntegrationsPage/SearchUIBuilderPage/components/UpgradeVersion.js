@@ -2,10 +2,24 @@ import React, { useState } from 'react';
 import { Alert, Button, message } from 'antd';
 import { bool, func, string } from 'prop-types';
 import { connect } from 'react-redux';
+import { css } from 'emotion';
 import { commitCode, generateInlineSandboxURL } from '../../utils/sandpack-generator';
 import { saveSearchPreference } from '../../../../batteries/modules/actions';
 import { transformPreferences } from '../../utils/index';
 
+const updateTemplateBannerStyles = css`
+	margin-bottom: 15px;
+	.banner-container {
+		position: relative;
+		display: flex;
+		align-items: center;
+	}
+	.ant-alert-close-icon {
+		position: absolute;
+		right: 15px;
+		top: 10px;
+	}
+`;
 const UpgradeVersion = ({
 	setShowNotification,
 	setShowTemplateUpdateBanner,
@@ -61,7 +75,7 @@ const UpgradeVersion = ({
 	};
 
 	return (
-		<div style={{ marginBottom: 15 }}>
+		<div className={updateTemplateBannerStyles}>
 			<Alert
 				message={<b>Update v{templateVersionId}</b>}
 				description="A new template update is available. Would you like to update the code? (This will
@@ -85,6 +99,7 @@ const UpgradeVersion = ({
 					setShowTemplateUpdateBanner(false);
 					setShowNotification(true);
 				}}
+				className="banner-container"
 			/>
 		</div>
 	);
