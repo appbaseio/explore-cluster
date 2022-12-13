@@ -61,7 +61,7 @@ const UpgradeVersion = ({
 	};
 
 	return (
-		<div>
+		<div style={{ marginBottom: 15 }}>
 			<Alert
 				message={<b>Update v{templateVersionId}</b>}
 				description="A new template update is available. Would you like to update the code? (This will

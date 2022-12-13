@@ -3,7 +3,7 @@ import { css } from 'emotion';
 import { BellOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { Card, Button, Tooltip, Badge } from 'antd';
 import get from 'lodash/get';
-import { string, object, func, bool } from 'prop-types';
+import { string, object, func } from 'prop-types';
 import { connect } from 'react-redux';
 import Flex from '../../../batteries/components/shared/Flex';
 import { getAllVersions, deployUiBuilder, transformPreferences } from '../utils/sandpack-generator';
@@ -21,6 +21,7 @@ import DeployLogsModal from './ExportInline/Components/DeployLogsModal';
 import DeployModal from './ExportInline/Components/DeployModal';
 import PastVersionsDrawer from './ExportInline/Components/PastVersionsDrawer';
 import { transformContent } from './ExportInline/Components/ModalHeader';
+import UpgradeVersion from '../SearchUIBuilderPage/components/UpgradeVersion';
 
 const headerStyles = css`
 	b {
@@ -79,6 +80,8 @@ class SyncStatus extends React.Component {
 			allVersions: [],
 			themeType: '',
 			showPastVersionsDrawer: false,
+			showTemplateUpdateBanner: false,
+			showNotification: false,
 		};
 		this.fetchData();
 	}
@@ -93,6 +96,10 @@ class SyncStatus extends React.Component {
 		themeType.valueChanges.subscribe(this.handleThemeTypeChange);
 		this.fetchAllVersions();
 		if (!Object.keys(deploymentStatus).length) this.fetchDeploymentStatus();
+
+		const templateVersionIdControl = form.get('templateVersionId');
+		const templateObj = getTemplate(themeType?.value || '');
+		this.handleTemplateVersionIdChanges(templateObj.version, templateVersionIdControl.value);
 	}
 
 	componentWillUnmount() {
@@ -113,10 +120,19 @@ class SyncStatus extends React.Component {
 
 	handleThemeTypeChange = (value) => {
 		const { themeType } = this.state;
-		if (themeType !== value)
+		const { pipeline, form } = this.props;
+		if (themeType !== value) {
 			this.setState({
 				themeType: value,
 			});
+			const templateVersionIdControl = form.get('templateVersionId');
+			if (templateVersionIdControl.value && pipeline) {
+				templateVersionIdControl.valueChanges.subscribe((val) => {
+					const templateObj = getTemplate(value);
+					if (pipeline) this.handleTemplateVersionIdChanges(templateObj.version, val);
+				});
+			}
+		}
 	};
 
 	handleTypeChange = (value) => {
@@ -277,14 +293,29 @@ class SyncStatus extends React.Component {
 			});
 	};
 
+	handleTemplateVersionIdChanges = (latestTemplateVersion, val) => {
+		if (val !== latestTemplateVersion)
+			this.setState({
+				showTemplateUpdateBanner: true,
+			});
+		else
+			this.setState({
+				showTemplateUpdateBanner: false,
+			});
+	};
+
 	renderNotificationBadge = () => {
-		const { showNotification, setShowTemplateUpdateBanner, setShowNotification } = this.props;
+		const { showNotification } = this.state;
 		return showNotification ? (
 			<Badge dot>
 				<BellOutlined
 					onClick={() => {
-						setShowTemplateUpdateBanner(true);
-						setShowNotification(false);
+						this.setState({
+							showTemplateUpdateBanner: true,
+						});
+						this.setState({
+							showNotification: false,
+						});
 					}}
 				/>
 			</Badge>
@@ -303,8 +334,15 @@ class SyncStatus extends React.Component {
 			allVersions,
 			themeType,
 			showPastVersionsDrawer,
+			showTemplateUpdateBanner,
 		} = this.state;
-		const { form, versionState, preferenceId, updateVersionStateForPreference } = this.props;
+		const {
+			form,
+			versionState,
+			preferenceId,
+			updateVersionStateForPreference,
+			getPreferencesPayload,
+		} = this.props;
 		const title = form.get('name') ? form.get('name').value : '';
 		const pipeline = form.get('pipeline') ? form.get('pipeline').value : '';
 		const templateObj = getTemplate(themeType);
@@ -314,9 +352,23 @@ class SyncStatus extends React.Component {
 			deploymentStatus = {},
 		} = versionState[preferenceId] ?? {};
 		const status = deploymentStatus.status || deploymentStatus.state || '';
+		const templateVersionIdControl = form.get('templateVersionId');
+		const templateVersionId = templateVersionIdControl ? templateVersionIdControl.value : '';
 
 		return (
 			<Card>
+				{templateObj.version !== templateVersionId && showTemplateUpdateBanner ? (
+					<UpgradeVersion
+						getPreferencesPayload={getPreferencesPayload}
+						preferenceId={preferenceId}
+						form={form}
+						templateVersionId={templateObj.version}
+						setShowTemplateUpdateBanner={(val) =>
+							this.setState({ showTemplateUpdateBanner: val })
+						}
+						setShowNotification={(val) => this.setState({ showNotification: val })}
+					/>
+				) : null}
 				{pipeline ? (
 					<div className={headerStyles}>
 						<Flex
@@ -450,9 +502,8 @@ class SyncStatus extends React.Component {
 SyncStatus.defaultProps = {
 	preferenceId: '',
 	versionState: {},
-	showNotification: false,
-	setShowNotification: () => {},
-	setShowTemplateUpdateBanner: () => {},
+	pipeline: '',
+	getPreferencesPayload: () => {},
 };
 
 SyncStatus.propTypes = {
@@ -466,9 +517,8 @@ SyncStatus.propTypes = {
 	updateSearchPreferences: func.isRequired,
 	getSearchPreferenceVersions: func.isRequired,
 	getDeploymentStatus: func.isRequired,
-	setShowTemplateUpdateBanner: func,
-	setShowNotification: func,
-	showNotification: bool,
+	pipeline: string,
+	getPreferencesPayload: func,
 };
 
 const mapStateToProps = (state, props) => ({

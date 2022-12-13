@@ -28,8 +28,6 @@ import UIComponents from './components/tabs/UIComponents';
 import General from '../shared/tabs/General';
 import DomainSettingsTab from './components/tabs/DomainSettings';
 import Footer from './components/Footer';
-import { getTemplate } from '../utils/index';
-import UpgradeVersion from './components/UpgradeVersion';
 
 const { TabPane } = Tabs;
 
@@ -42,23 +40,16 @@ const bannerDetailsPaid = {
 };
 
 const Main = ({ getPreferencesN, ...props }) => {
-	const [showTemplateUpdateBanner, setShowTemplateUpdateBanner] = useState(false);
-	const [showNotification, setShowNotification] = useState(false);
-	const [isLoading, setIsLoading] = useState(true);
-	const [isEditorLoading, setIsEditorLoading] = useState(false);
-	const preferenceId = props.match.params.id === 'new' ? uuidv4() : props.match.params.id;
-
 	useEffect(() => {
 		getPreferencesN();
 	}, []);
 
+	const preferenceId = props.match.params.id === 'new' ? uuidv4() : props.match.params.id;
+	const [isLoading, setIsLoading] = useState(true);
+	const [isEditorLoading, setIsEditorLoading] = useState(false);
+
 	const closeForm = () => {
 		props.history.push('/cluster/search-builder');
-	};
-
-	const handleTemplateVersionIdChanges = (latestTemplateVersion, val) => {
-		if (val !== latestTemplateVersion) setShowTemplateUpdateBanner(true);
-		else setShowTemplateUpdateBanner(false);
 	};
 
 	return (
@@ -67,42 +58,18 @@ const Main = ({ getPreferencesN, ...props }) => {
 			<PreferencesFormWrapper closeForm={closeForm} preferenceId={preferenceId}>
 				{({ getPreferences, getPreferencesPayload, form }) => {
 					const pipeline = form.get('pipeline') ? form.get('pipeline').value : null;
-					const themeType = form.get('themeType') ? form.get('themeType').value : '';
-					const templateObj = getTemplate(themeType);
-					const templateVersionIdControl = form.get('templateVersionId');
-					templateVersionIdControl.valueChanges.subscribe((val) => {
-						if (pipeline) handleTemplateVersionIdChanges(templateObj.version, val);
-					});
-					const templateVersionId = templateVersionIdControl
-						? templateVersionIdControl.value
-						: '';
 					setIsLoading(false);
 
 					if (isLoading) {
 						return <Loader />;
 					}
-
 					return (
 						<>
-							{templateObj.version !== templateVersionId &&
-							showTemplateUpdateBanner ? (
-								<UpgradeVersion
-									getPreferencesPayload={getPreferencesPayload}
-									preferenceId={preferenceId}
-									form={form}
-									templateVersionId={templateObj.version}
-									setShowTemplateUpdateBanner={setShowTemplateUpdateBanner}
-									setShowNotification={setShowNotification}
-								/>
-							) : null}
 							<SyncStatus
 								form={form}
 								pipeline={pipeline}
 								preferenceId={preferenceId}
-								showTemplateUpdateBanner={showTemplateUpdateBanner}
-								setShowNotification={setShowNotification}
-								showNotification={showNotification}
-								setShowTemplateUpdateBanner={setShowTemplateUpdateBanner}
+								getPreferencesPayload={getPreferencesPayload}
 							/>
 							<div
 								style={{
