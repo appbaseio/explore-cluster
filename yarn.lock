@@ -127,10 +127,10 @@
   dependencies:
     cross-fetch "^3.0.4"
 
-"@appbaseio/dejavu-browser@^3.7.0":
-  version "3.7.0"
-  resolved "https://registry.yarnpkg.com/@appbaseio/dejavu-browser/-/dejavu-browser-3.7.0.tgz#8bebe479fb9efb34584c6632e4bb374dae4c3ccf"
-  integrity sha512-kjBcUBkZ3tMGSwbF0hBUuIq/gn5/it1aTwJkmWWomtK0Y6lb0aldWs8d8N5usgy+WWhhi6z12UqyzromQlDQVA==
+"@appbaseio/dejavu-browser@^3.7.3":
+  version "3.7.3"
+  resolved "https://registry.yarnpkg.com/@appbaseio/dejavu-browser/-/dejavu-browser-3.7.3.tgz#b800cfb98733583db134dba26ea57a33c4911de9"
+  integrity sha512-xEK2UcOwHwJrmNwhp+5WbXxwYKd3VJ2dvDIk+T1iHUhvDsNkkZqKjFKpTq6sD22lzNvN0PpbMbVqZgg8D1RYXg==
   dependencies:
     "@divyanshu013/media" "^1.0.0"
     "@fortawesome/fontawesome-svg-core" "^1.2.27"
@@ -5948,9 +5948,9 @@ decimal.js-light@^2.4.1:
   integrity sha512-qIMFpTMZmny+MMIitAB6D7iVPEorVw6YQRWkvarTkT4tBeSLLiHzcwj6q0MmYSFCiVpiqPJTJEYIrpcPzVEIvg==
 
 decode-uri-component@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/decode-uri-component/-/decode-uri-component-0.2.0.tgz#eb3913333458775cb84cd1a1fae062106bb87545"
-  integrity sha512-hjf+xovcEn31w/EUYdTXQh/8smFL/dzYjohQGEIgjyNavaJfBY2p5F527Bo1VPATxv0VYTUC2bOcXvqFwk78Og==
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/decode-uri-component/-/decode-uri-component-0.2.2.tgz#e69dbe25d37941171dd540e024c444cd5188e1e9"
+  integrity sha512-FqUYQ+8o158GyGTrMFJms9qh3CqTKvAqgqsTnkLI8sKu0028orqBhxNMFkFen0zGyg6epACD32pjVk58ngIErQ==
 
 decompress-response@^3.3.0:
   version "3.3.0"
