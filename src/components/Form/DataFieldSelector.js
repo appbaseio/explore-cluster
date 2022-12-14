@@ -223,7 +223,7 @@ class DataFieldSelector extends React.Component {
 		if (control || name) {
 			return (
 				<FieldControl strict={false} name={name} control={control} {...controlProps}>
-					{({ value, handler, disabled, touched, invalid }) => {
+					{({ handler, disabled, touched, invalid }) => {
 						const inputHandler = handler();
 						let child;
 						if (hideOnDisabled && disabled) {
@@ -268,25 +268,17 @@ class DataFieldSelector extends React.Component {
 										}}
 										value={dataField || undefined}
 										onSelect={(val) => {
-											if (value === val) {
-												// To unselect
-												if (includeHighlight)
-													inputHandler.onChange(`~${highlight}`);
-												else inputHandler.onChange(undefined);
-											} else {
-												if (includeHighlight)
-													inputHandler.onChange(`${val}~${highlight}`);
-												else inputHandler.onChange(val);
+											if (includeHighlight)
+												inputHandler.onChange(`${val}~${highlight}`);
+											else inputHandler.onChange(val);
 
-												if (setFieldType) {
-													const matchedSuffix = Object.keys(
-														fusionFieldSuffixes,
-													).find((suffix) => val.endsWith(suffix));
-													setFieldType(
-														fusionFieldSuffixes[matchedSuffix],
-													);
-												}
+											if (setFieldType) {
+												const matchedSuffix = Object.keys(
+													fusionFieldSuffixes,
+												).find((suffix) => val.endsWith(suffix));
+												setFieldType(fusionFieldSuffixes[matchedSuffix]);
 											}
+
 											handleReload();
 										}}
 										optionLabelProp="title"
@@ -357,22 +349,14 @@ class DataFieldSelector extends React.Component {
 												.indexOf(inputValue.toUpperCase()) !== -1
 										}
 										onSelect={(val) => {
-											if (value === val) {
-												// To unselect
-												if (includeHighlight)
-													inputHandler.onChange(`~${highlight}`);
-												else inputHandler.onChange(undefined);
-											} else {
-												if (includeHighlight)
-													inputHandler.onChange(`${val}~${highlight}`);
-												else inputHandler.onChange(val);
-												if (setFieldType) {
-													setFieldType(
-														mappings?.properties[
-															val.split('.keyword')[0]
-														]?.type,
-													);
-												}
+											if (includeHighlight)
+												inputHandler.onChange(`${val}~${highlight}`);
+											else inputHandler.onChange(val);
+											if (setFieldType) {
+												setFieldType(
+													mappings?.properties[val.split('.keyword')[0]]
+														?.type,
+												);
 											}
 											handleReload();
 										}}

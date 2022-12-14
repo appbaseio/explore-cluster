@@ -243,6 +243,7 @@ const Results = ({
 	getPreferencesPayload,
 	backend,
 	secondaryPipeline,
+	isRecommendation,
 }) => {
 	const [error, setError] = useState(false);
 	// eslint-disable-next-line
@@ -276,7 +277,7 @@ const Results = ({
 	}, []);
 
 	useEffect(() => {
-		if (credentials && !isFusion) {
+		if (credentials && !isFusion && !isRecommendation) {
 			// Fetch Mappings if permissions are present
 			fetchMappings(secondaryPipeline, credentials, backend);
 		}
@@ -833,6 +834,7 @@ Results.defaultProps = {
 	form: null,
 	secondaryPipeline: '',
 	backend: BACKENDS.ELASTICSEARCH.name,
+	isRecommendation: false,
 };
 
 Results.propTypes = {
@@ -846,10 +848,11 @@ Results.propTypes = {
 	form: object,
 	backend: string,
 	secondaryPipeline: string,
+	isRecommendation: bool,
 };
 
 const mapStateToProps = (state, props) => {
-	const appName = props.secondaryPipeline || get(state, '$getCurrentApp.name');
+	const appName = props.secondaryPipeline || props.pipeline || get(state, '$getCurrentApp.name');
 	const mappings = getRawMappingsByAppName(state, appName);
 	const { username, password } = get(state, 'user.data', {});
 	const backend = get(state, '$getAppPlan.results.backend');

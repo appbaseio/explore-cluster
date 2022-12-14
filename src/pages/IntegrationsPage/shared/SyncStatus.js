@@ -87,22 +87,25 @@ class SyncStatus extends React.Component {
 	}
 
 	componentDidMount() {
-		const { form, versionState, preferenceId, getSearchPreferenceVersions } = this.props;
-		if (!versionState) getSearchPreferenceVersions(preferenceId);
+		const { form, versionState, preferenceId, getSearchPreferenceVersions, isRecommendation } =
+			this.props;
+		if (!versionState && !isRecommendation) getSearchPreferenceVersions(preferenceId);
 		const { deploymentStatus = {} } = versionState[preferenceId] ?? {};
 		const exportTypeHandler = form.get('exportSettings.type');
 		exportTypeHandler.valueChanges.subscribe(this.handleTypeChange);
 		const themeType = form.get('themeType');
 		themeType.valueChanges.subscribe(this.handleThemeTypeChange);
-		this.fetchAllVersions();
-		if (!Object.keys(deploymentStatus).length) this.fetchDeploymentStatus();
+		if (!isRecommendation) {
+			this.fetchAllVersions();
+			if (!Object.keys(deploymentStatus).length) this.fetchDeploymentStatus();
 
-		const templateVersionIdControl = form.get('templateVersionId');
-		const templateObj = getTemplate(themeType?.value || '');
+			const templateVersionIdControl = form.get('templateVersionId');
+			const templateObj = getTemplate(themeType?.value || '');
 
-		templateVersionIdControl.valueChanges.subscribe((val) => {
-			this.handleTemplateVersionIdChanges(templateObj.version, val);
-		});
+			templateVersionIdControl.valueChanges.subscribe((val) => {
+				this.handleTemplateVersionIdChanges(templateObj.version, val);
+			});
+		}
 	}
 
 	componentWillUnmount() {
@@ -344,6 +347,7 @@ class SyncStatus extends React.Component {
 			updateVersionStateForPreference,
 			getPreferencesPayload,
 			isSaveSearchLoading,
+			isRecommendation,
 		} = this.props;
 		const title = form.get('name') ? form.get('name').value : '';
 		const pipeline = form.get('pipeline') ? form.get('pipeline').value : '';
@@ -405,52 +409,56 @@ class SyncStatus extends React.Component {
 								) : null}
 							</Flex>
 							<Flex className="sub-part">
-								<Flex style={{ gap: '10px' }} alignItems="center">
-									<Tooltip title="Past Versions" style={{ fontSize: 14 }}>
-										{/* Past Versions */}
-										<ClockCircleOutlined
-											style={{
-												cursor: currentVersion.version_id
-													? 'pointer'
-													: 'not-allowed',
-												color: currentVersion.version_id
-													? 'rgba(0,0,0,0.65)'
-													: '#bbb7b7',
-											}}
-											onClick={() => {
-												if (currentVersion.version_id)
-													this.setState({
-														showPastVersionsDrawer: true,
-													});
-											}}
-										/>
-									</Tooltip>
+								{!isRecommendation ? (
+									<>
+										<Flex style={{ gap: '10px' }} alignItems="center">
+											<Tooltip title="Past Versions" style={{ fontSize: 14 }}>
+												{/* Past Versions */}
+												<ClockCircleOutlined
+													style={{
+														cursor: currentVersion.version_id
+															? 'pointer'
+															: 'not-allowed',
+														color: currentVersion.version_id
+															? 'rgba(0,0,0,0.65)'
+															: '#bbb7b7',
+													}}
+													onClick={() => {
+														if (currentVersion.version_id)
+															this.setState({
+																showPastVersionsDrawer: true,
+															});
+													}}
+												/>
+											</Tooltip>
 
-									<Button
-										type="primary"
-										onClick={() => {
-											this.setState({ modalType: 'deploy-modal' });
-											this.fetchAllVersions();
-										}}
-										disabled={isSaveSearchLoading}
-									>
-										Deploy
-									</Button>
-								</Flex>
-								{status && status !== 'Not deployed' ? (
-									<span>
-										<Button
-											type="link"
-											className="link-button"
-											style={{ marginRight: 5 }}
-											onClick={() =>
-												this.setState({ modalType: 'deploy-logs' })
-											}
-										>
-											Deploy Status
-										</Button>
-										{deployStatusMapper[status]}
-									</span>
+											<Button
+												type="primary"
+												disabled={isSaveSearchLoading}
+												onClick={() => {
+													this.setState({ modalType: 'deploy-modal' });
+													this.fetchAllVersions();
+												}}
+											>
+												Deploy
+											</Button>
+										</Flex>
+										{status ? (
+											<span>
+												<Button
+													type="link"
+													className="link-button"
+													style={{ marginRight: 5 }}
+													onClick={() =>
+														this.setState({ modalType: 'deploy-logs' })
+													}
+												>
+													Deploy Status
+												</Button>
+												{deployStatusMapper[status]}
+											</span>
+										) : null}
+									</>
 								) : null}
 							</Flex>
 						</Flex>
@@ -508,6 +516,7 @@ SyncStatus.defaultProps = {
 	pipeline: '',
 	isSaveSearchLoading: false,
 	getPreferencesPayload: () => {},
+	isRecommendation: false,
 };
 
 SyncStatus.propTypes = {
@@ -524,6 +533,7 @@ SyncStatus.propTypes = {
 	pipeline: string,
 	getPreferencesPayload: func,
 	isSaveSearchLoading: bool,
+	isRecommendation: bool,
 };
 
 const mapStateToProps = (state, props) => ({

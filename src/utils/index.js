@@ -122,6 +122,7 @@ export const getValidURL = (config = {}, attrs = {}) => {
 
 	// check if newStr has any template string of format ${variable}
 	if (newStr.match(regex)) newStr = transformRegexString(regex, varRegex, newStr, attrs);
+	if (newStr.startsWith('/')) newStr = newStr.slice(1);
 
 	return newStr;
 };

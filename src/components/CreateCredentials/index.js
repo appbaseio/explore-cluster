@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { css } from 'emotion';
 import { CaretRightOutlined, LockOutlined, SettingOutlined } from '@ant-design/icons';
-import { Modal, Input, Radio, Tooltip, Button, Select, Switch, Collapse } from 'antd';
+import { Modal, Input, Radio, Tooltip, Button, Select, Switch, Collapse, Row, Col } from 'antd';
 import {
 	FieldArray,
 	FormBuilder,
@@ -23,7 +23,7 @@ import Loader from '../../batteries/components/shared/Loader/Spinner';
 import { displayErrors } from '../../utils/helper';
 import { getPermission } from '../../batteries/modules/actions/permission';
 import Grid from './Grid';
-import { getAppMappings } from '../../batteries/modules/actions';
+import { getAppMappings, getPipelines } from '../../batteries/modules/actions';
 import { getMessages, hoverMessage } from '../../utils/messages';
 import {
 	getTraversedMappingsByAppName,
@@ -41,6 +41,9 @@ import {
 	getAllowedActionsByVersion,
 	defaultRateLimits,
 	defaultTagValues,
+	shouldHavePipelines,
+	shouldHaveIndices,
+	shouldHaveFieldsFiltering,
 } from './utils';
 import Acl from './Acl';
 import WhiteList from './WhiteList';
@@ -49,6 +52,7 @@ import { ALLOWED_ACTIONS_LABELS } from '../../constants';
 import SwitchGroup from '../SwitchGroup';
 import RsApiRestrictions from './RsApiRestrictions';
 import { versionCompare } from '../../batteries/utils/helpers';
+import { PipelineTags } from './PipelineTags';
 
 const { Option } = Select;
 
@@ -82,8 +86,16 @@ class CreateCredentials extends React.Component {
 		this.state = {
 			filteredMappings: {},
 		};
+		const { backendImage, backend } = props;
 
 		this.allowStoredQuery = versionCompare(props.appbaseVersion, '7.52.0') !== -1;
+
+		const pipelines = shouldHavePipelines(backendImage) ? [['*']] : undefined;
+		let indices = this.isApp
+			? [{ value: [props.appName], disabled: false }]
+			: [{ value: ['*'], disabled: false }];
+		indices = shouldHaveIndices(backendImage) ? indices : undefined;
+
 		this.form = props.isUserManagement
 			? FormBuilder.group({
 					username: ['', Validators.required],
@@ -136,9 +148,8 @@ class CreateCredentials extends React.Component {
 						]),
 						allowDirectDSL: new FormControl(true),
 					}),
-					indices: this.isApp
-						? [{ value: [props.appName], disabled: false }]
-						: [{ value: ['*'], disabled: false }],
+					indices,
+					pipelines,
 					ip_limit: [
 						{ value: 7200, disabled: !props.isPaidUser },
 						[Validators.required, isNegative],
@@ -147,8 +158,12 @@ class CreateCredentials extends React.Component {
 						{ value: -1, disabled: !props.isPaidUser },
 						[Validators.required, isNegativeTTL],
 					],
-					include_fields: [['*']],
-					exclude_fields: [{ value: [], disabled: true }],
+					...(shouldHaveFieldsFiltering(backendImage, backend)
+						? {
+								include_fields: [['*']],
+								exclude_fields: [{ value: [], disabled: true }],
+						  }
+						: {}),
 			  });
 	}
 
@@ -161,6 +176,9 @@ class CreateCredentials extends React.Component {
 			appbaseVersion,
 			backend,
 			mappings,
+			backendImage,
+			pipelines,
+			fetchPipelines,
 		} = this.props;
 		if (
 			appbaseCredentials &&
@@ -197,7 +215,7 @@ class CreateCredentials extends React.Component {
 					}
 				});
 			}
-			if (!isUserManagement) {
+			if (!isUserManagement && shouldHaveFieldsFiltering(backendImage, backend)) {
 				const includeFieldsHandler = this.form.get('include_fields');
 				const excludeFieldsHandler = this.form.get('exclude_fields');
 				includeFieldsHandler.valueChanges.subscribe((value) => {
@@ -224,6 +242,7 @@ class CreateCredentials extends React.Component {
 					JSON.parse(JSON.stringify(initialValues)),
 					!isUserManagement,
 					appbaseVersion,
+					backendImage,
 				),
 				{
 					emitEvent: !isUserManagement,
@@ -245,11 +264,16 @@ class CreateCredentials extends React.Component {
 				}
 			}
 		}
+		// If pipelines not fetched before
+		if (!(pipelines && pipelines.length)) {
+			fetchPipelines();
+		}
 	}
 
 	componentDidUpdate(prevProps) {
 		const { errors, mappings, initialValues, isUserManagement, appbaseVersion, readOnly } =
 			this.props;
+
 		displayErrors(errors, prevProps.errors);
 		if (!this.isApp && mappings !== prevProps.mappings) {
 			const indices = this.form.get('indices') ? this.form.get('indices').value : [];
@@ -396,6 +420,8 @@ class CreateCredentials extends React.Component {
 			appbaseVersion,
 			readOnly,
 			backend,
+			backendImage,
+			pipelines,
 		} = this.props;
 		const mappings = Array.isArray(rawMappings) ? rawMappings : [];
 		const { filteredMappings } = this.state;
@@ -414,7 +440,6 @@ class CreateCredentials extends React.Component {
 						.filter((i) => i !== allowedActions.DOWNTIME_ALERTS)
 						.map((i) => ({ value: i, label: ALLOWED_ACTIONS_LABELS[i] }))
 		).filter((i) => i.value !== 'overview');
-
 		return (
 			<FieldGroup
 				strict={false}
@@ -806,7 +831,9 @@ class CreateCredentials extends React.Component {
 
 															{!isUserManagement && (
 																<React.Fragment>
-																	{this.isApp ? null : (
+																	{this.isApp ||
+																	backendImage ===
+																		'sls' ? null : (
 																		<FieldControl
 																			strict={false}
 																			name="indices"
@@ -892,6 +919,161 @@ class CreateCredentials extends React.Component {
 																			}}
 																		/>
 																	)}
+																	{backendImage === 'sls' ? (
+																		<FieldControl
+																			strict={false}
+																			name="pipelines"
+																			render={({
+																				handler,
+																				value,
+																			}) => {
+																				const inputHandler =
+																					handler();
+																				return (
+																					<Grid
+																						label="Pipelines"
+																						toolTipMessage={
+																							Messages.pipelines
+																						}
+																						component={
+																							<Select
+																								placeholder="Select pipelines"
+																								mode="tags"
+																								style={{
+																									width: '100%',
+																								}}
+																								tokenSeparators={[
+																									',',
+																								]}
+																								tagRender={
+																									PipelineTags
+																								}
+																								{...inputHandler}
+																								value={
+																									value
+																								}
+																								onChange={(
+																									val,
+																								) => {
+																									inputHandler.onChange(
+																										calculateValue(
+																											val,
+																										),
+																									);
+																								}}
+																							>
+																								<Option key="*">
+																									*
+																									(Include
+																									all
+																									pipelines)
+																								</Option>
+																								{(
+																									pipelines ||
+																									[]
+																								).map(
+																									(
+																										pipeline,
+																									) => (
+																										<Select.Option
+																											key={
+																												pipeline.id
+																											}
+																											style={{
+																												borderBottom:
+																													'1px solid gray',
+																											}}
+																										>
+																											<Row
+																												style={{
+																													padding: 15,
+																												}}
+																											>
+																												<Col>
+																													<h4
+																														style={{
+																															textOverflow:
+																																'ellipsis',
+																															overflow:
+																																'hidden',
+																															display:
+																																'block',
+																															fontSize:
+																																'1rem',
+																														}}
+																													>
+																														<Tooltip
+																															title={
+																																pipeline.id
+																															}
+																														>
+																															{
+																																pipeline.id
+																															}
+																														</Tooltip>
+																													</h4>
+
+																													<p
+																														style={{
+																															textOverflow:
+																																'ellipsis',
+																															overflow:
+																																'hidden',
+																															display:
+																																'block',
+																														}}
+																													>
+																														{
+																															pipeline.description
+																														}
+																													</p>
+																												</Col>
+																												<Col
+																													md={
+																														8
+																													}
+																												>
+																													<div>
+																														{pipeline &&
+																															pipeline.routes &&
+																															pipeline.routes.map(
+																																({
+																																	path,
+																																	method,
+																																}) => (
+																																	<span>
+																																		<b>
+																																			{
+																																				method
+																																			}{' '}
+																																			&nbsp;
+																																		</b>
+																																		<code
+																																			key={
+																																				path
+																																			}
+																																		>
+																																			{
+																																				path
+																																			}
+																																		</code>
+																																		<br />
+																																	</span>
+																																),
+																															)}
+																													</div>
+																												</Col>
+																											</Row>
+																										</Select.Option>
+																									),
+																								)}
+																							</Select>
+																						}
+																					/>
+																				);
+																			}}
+																		/>
+																	) : null}
 
 																	{this.shouldRenderRsApiRestrictions() && (
 																		<>
@@ -917,10 +1099,10 @@ class CreateCredentials extends React.Component {
 																		</>
 																	)}
 
-																	{[
-																		BACKENDS.ELASTICSEARCH.name,
-																		BACKENDS.OPENSEARCH.name,
-																	].includes(backend) ? (
+																	{shouldHaveFieldsFiltering(
+																		backendImage,
+																		backend,
+																	) ? (
 																		<>
 																			<Grid
 																				label="Fields Filtering"
@@ -1371,6 +1553,7 @@ CreateCredentials.defaultProps = {
 	readOnly: false,
 	backend: BACKENDS.ELASTICSEARCH.name,
 	onSubmit: () => {},
+	backendImage: '',
 };
 CreateCredentials.propTypes = {
 	isPaidUser: PropTypes.bool,
@@ -1399,6 +1582,7 @@ CreateCredentials.propTypes = {
 	saveButtonText: PropTypes.string,
 	errors: PropTypes.array.isRequired,
 	plan: PropTypes.oneOf(['free', 'growth', 'bootstrap']).isRequired,
+	pipelines: PropTypes.array.isRequired,
 	titleText: PropTypes.string,
 	isUserManagement: PropTypes.bool,
 	appbaseCredentials: PropTypes.string.isRequired,
@@ -1412,6 +1596,8 @@ CreateCredentials.propTypes = {
 	appbaseVersion: PropTypes.string.isRequired,
 	readOnly: PropTypes.bool,
 	backend: PropTypes.string,
+	backendImage: PropTypes.string,
+	fetchPipelines: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => {
@@ -1430,7 +1616,9 @@ const mapStateToProps = (state) => {
 		isLoadingMappings:
 			get(state, '$getAppMappings.isFetching') || get(state, '$getAppPermissions.isFetching'),
 		plan: 'growth',
+		pipelines: get(state, '$getAppPipelines.results'),
 		arcPlan: get(state, '$getAppPlan.results.tier'),
+		backendImage: get(state, '$getAppPlan.results.image_type'),
 		isSubmitting:
 			get(state, '$createAppPermission.isFetching') ||
 			get(state, '$updateAppPermission.isFetching') ||
@@ -1450,6 +1638,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => ({
 	fetchMappings: (appName, credentials) => dispatch(getAppMappings(appName, credentials)),
 	fetchPermissions: (appName) => dispatch(getPermission(appName)),
+	fetchPipelines: () => dispatch(getPipelines()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateCredentials);

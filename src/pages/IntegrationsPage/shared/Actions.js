@@ -36,9 +36,10 @@ class Actions extends React.Component {
 	};
 
 	componentDidMount() {
-		const { versionState, id } = this.props;
+		const { versionState, id, isRecommendation } = this.props;
 		const { deploymentStatus = {} } = versionState[id] ?? {};
-		if (!Object.keys(deploymentStatus).length) this.fetchDeploymentStatus();
+		if (!Object.keys(deploymentStatus).length && !isRecommendation)
+			this.fetchDeploymentStatus();
 	}
 
 	handleEdit = () => {
