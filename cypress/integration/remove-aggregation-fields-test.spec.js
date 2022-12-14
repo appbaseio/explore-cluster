@@ -1,5 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
+import { PAGE_LOAD_TIME } from '../utils/constants.js';
 
 let indexName = '';
 
@@ -27,13 +28,14 @@ describe('Aggregation fields remove test flow', () => {
 	});
 
 	it('Should navigate to cluster overview', () => {
-		cy.wait(5000);
 		cy.visit(`${base_url}`);
+		cy.wait(5000);
 	});
 
 	it('Should create new index', () => {
-		cy.wait(5000).get('[data-cy=initialize-new-index-creation]').click().wait(2000);
-		generateName();
+		cy.wait(1000).get('[data-cy=initialize-new-index-creation]').click().wait(2000);
+		cy.server();
+		cy.route('PUT', `**/${indexName}`).as('indexing');
 		cy.get('[data-cy=new-index-name]')
 			.type(`${indexName}`)
 			.get('[data-cy=new-index-language]')
@@ -43,6 +45,8 @@ describe('Aggregation fields remove test flow', () => {
 
 			.get('[data-cy=create-new-index]')
 			.click();
+
+		cy.wait('@indexing');
 	});
 
 	it('Should index data', () => {
@@ -74,7 +78,12 @@ describe('Aggregation fields remove test flow', () => {
 	});
 
 	it('Should open aggregation settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/aggs`).wait(5000);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/app/${indexName}/aggs`);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
 	});
 
 	it('Should add aggregation fields', () => {
@@ -92,7 +101,19 @@ describe('Aggregation fields remove test flow', () => {
 
 	it('Should review, save & deploy aggregation settings', () => {
 		cy.get('[data-cy=review-deploy-button]').click({ force: true }).wait(5000);
-		cy.get('[data-cy=review-save-button]').click().wait(5000);
+		cy.server();
+		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
+		cy.get('[data-cy=review-save-button]').click();
+		cy.wait(['@relevancy'], { timeout: 30000 });
+	});
+
+	it('Should open aggregation settings URL', () => {
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/app/${indexName}/aggs`);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
 	});
 
 	it('Should delete fields from aggregation settings', () => {
@@ -110,33 +131,24 @@ describe('Aggregation fields remove test flow', () => {
 			.should('contain', 'name')
 			.get('[data-cy=aggregation-field-name-status]')
 			.should('contain', 'removed');
-		cy.get('[data-cy=review-save-button]').click().wait(5000);
+		cy.server();
+		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
+		cy.get('[data-cy=review-save-button]').click();
+		cy.wait(['@relevancy'], { timeout: 30000 });
 	});
 
 	it('Should check for no fields in aggregation settings', () => {
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/app/${indexName}/aggs`);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
+
 		cy.get('[data-cy=aggs-empty-field]')
 			.should('contain', 'Please add aggregation fields from the dropdown below')
 			.get('[data-cy=review-deploy-button]')
 			.should('be.disabled');
-	});
-
-	it('Should detect re-indexing and assign index name prior to deletion', () => {
-		let credentials = btoa(`${username}:${password}`);
-
-		fetch(`${app_url}_alias/${indexName}`, {
-			headers: {
-				Authorization: `Basic ${credentials}`,
-			},
-		})
-			.then((response) => {
-				return response.json();
-			})
-			.then((data) => {
-				indexName = Object.keys(data)[0];
-			})
-			.catch((err) => {
-				console.log(err);
-			});
 	});
 
 	it('Should delete index', () => {

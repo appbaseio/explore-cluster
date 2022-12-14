@@ -1,5 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
+import { PAGE_LOAD_TIME } from '../utils/constants.js';
 
 let indexName = '';
 
@@ -27,13 +28,14 @@ describe('Configure result settings without reindexing test flow', () => {
 	});
 
 	it('Should navigate to cluster overview', () => {
-		cy.wait(5000);
 		cy.visit(`${base_url}`);
+		cy.wait(5000);
 	});
 
 	it('Should create new index', () => {
-		cy.wait(5000).get('[data-cy=initialize-new-index-creation]').click().wait(2000);
-		generateName();
+		cy.wait(1000).get('[data-cy=initialize-new-index-creation]').click().wait(2000);
+		cy.server();
+		cy.route('PUT', `**/${indexName}`).as('indexing');
 		cy.get('[data-cy=new-index-name]')
 			.type(`${indexName}`)
 			.get('[data-cy=new-index-language]')
@@ -42,8 +44,9 @@ describe('Configure result settings without reindexing test flow', () => {
 			.wait(1000)
 
 			.get('[data-cy=create-new-index]')
-			.click()
-			.wait(5000);
+			.click();
+
+		cy.wait('@indexing');
 	});
 
 	it('Should index data', () => {
@@ -76,24 +79,23 @@ describe('Configure result settings without reindexing test flow', () => {
 		});
 	});
 
-	it('Should open result settings url', () => {
-		cy.visit(`${base_url}/app/${indexName}/results`).wait(10000);
-	});
+	it('Should change result settings', () => {
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/app/${indexName}/results`);
+		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 30000 });
 
-	it('Should change the page size', () => {
+		// Should change page size
 		cy.get('[data-cy=result-page-size]').click().type('{uparrow}');
-	});
 
-	it('Should enable highlighting & set highlighting fields', () => {
+		// Should change highlight settings
 		cy.get('[data-cy=enable-highlight]').click();
 		cy.get('[data-cy=highlight-fields]').click().type('email{enter}name{enter}').wait(1000);
-	});
 
-	it('Should set the number of fragments', () => {
 		cy.get('[data-cy=highlight-fragments]').click().type('{uparrow}').wait(1000);
-	});
 
-	it('Should check for local settings in test relevancy', () => {
 		cy.get('[data-cy=test-search-relevancy-button]').click().wait(2000);
 		cy.get('[data-cy=raw-request-button]').click({ force: true }).wait(2000);
 		cy.window()
@@ -131,11 +133,15 @@ describe('Configure result settings without reindexing test flow', () => {
 			.should('contain', '5')
 			.get(`[data-cy=new-value-number_of_fragments-status]`)
 			.should('contain', '6');
-		cy.get('[data-cy=review-save-button]').click().wait(5000);
+		cy.server();
+		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
+		cy.get('[data-cy=review-save-button]').click();
+		cy.wait(['@relevancy'], { timeout: 30000 });
 	});
 
 	it('Should delete index', () => {
 		let credentials = btoa(`${username}:${password}`);
+
 		cy.request({
 			method: 'DELETE',
 			url: `${app_url}${indexName}`,

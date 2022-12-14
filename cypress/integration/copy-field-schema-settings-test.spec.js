@@ -1,5 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
+import { PAGE_LOAD_TIME } from '../utils/constants.js';
 
 let indexName = '';
 
@@ -27,13 +28,14 @@ describe('Copy field schema settings test flow', () => {
 	});
 
 	it('Should navigate to cluster overview', () => {
-		cy.wait(5000);
 		cy.visit(`${base_url}`);
+		cy.wait(5000);
 	});
 
 	it('Should create new index', () => {
-		cy.wait(5000).get('[data-cy=initialize-new-index-creation]').click().wait(2000);
-		generateName();
+		cy.wait(1000).get('[data-cy=initialize-new-index-creation]').click().wait(2000);
+		cy.server();
+		cy.route('PUT', `**/${indexName}`).as('indexing');
 		cy.get('[data-cy=new-index-name]')
 			.type(`${indexName}`)
 			.get('[data-cy=new-index-language]')
@@ -43,6 +45,8 @@ describe('Copy field schema settings test flow', () => {
 
 			.get('[data-cy=create-new-index]')
 			.click();
+
+		cy.wait('@indexing');
 	});
 
 	it('Should index data', () => {
@@ -63,13 +67,17 @@ describe('Copy field schema settings test flow', () => {
 	});
 
 	it('Should open schema settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/schema`).wait(5000);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/app/${indexName}/schema`);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
 	});
 
 	it('Should copy field in schema', () => {
 		cy.get('[data-cy=copy-field-age]').click({ force: true });
-		cy.tab()
-			.tab()
+		cy.get('input[placeholder="Enter field name to copy to"]')
 			.type('copied_age')
 			.root()
 			.get('.copy-field-modal-btn')
@@ -78,10 +86,21 @@ describe('Copy field schema settings test flow', () => {
 	});
 
 	it('Should confirm the mapping changes', () => {
-		cy.root().contains('Confirm Mapping Changes').click().wait(5000);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.get('[data-cy=confirm-mapping-button]').click();
+		cy.wait('@mapping', { timeout: 30000 });
 	});
 
 	it('Should check the newly added data feild', () => {
+		// Should open schema settings url
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/app/${indexName}/schema`);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
+
 		cy.get('[data-cy=field-name-copied_age]').should('contain', 'copied_age');
 	});
 	it('Should check & confirm the data fields from the redux store', () => {
@@ -95,23 +114,20 @@ describe('Copy field schema settings test flow', () => {
 			});
 	});
 
-	it('Should detect re-indexing and assign index name prior to deletion', () => {
+	it('Should assign index name prior to deletion', () => {
 		let credentials = btoa(`${username}:${password}`);
 
-		fetch(`${app_url}_alias/${indexName}`, {
+		cy.request({
+			method: 'GET',
+			url: `${app_url}_alias/${indexName}`,
 			headers: {
 				Authorization: `Basic ${credentials}`,
 			},
-		})
-			.then((response) => {
-				return response.json();
-			})
-			.then((data) => {
-				indexName = Object.keys(data)[0];
-			})
-			.catch((err) => {
-				console.log(err);
-			});
+		}).then((response) => {
+			const data = response.body;
+			console.log({ response, data });
+			indexName = Object.keys(data)[0];
+		});
 	});
 
 	it('Should delete index', () => {

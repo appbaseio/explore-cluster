@@ -1,0 +1,1 @@
+export const LATEST_COMPATIBLE_VERSION = 9;

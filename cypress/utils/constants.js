@@ -1,3 +1,3 @@
 export const PAGE_LOAD_TIME = 15000;
 export const REQUEST_RESOLVE_TIME = 5000;
-export const LONG_REQUEST_RESOLVE_TIME = 20000;
+export const LONG_REQUEST_RESOLVE_TIME = 10000;

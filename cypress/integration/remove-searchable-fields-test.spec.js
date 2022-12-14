@@ -1,5 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
+import { LONG_REQUEST_RESOLVE_TIME, PAGE_LOAD_TIME } from '../utils/constants.js';
 
 let indexName = '';
 
@@ -27,13 +28,14 @@ describe('Searchable fields remove test flow', () => {
 	});
 
 	it('Should navigate to cluster overview', () => {
-		cy.wait(5000);
 		cy.visit(`${base_url}`);
+		cy.wait(5000);
 	});
 
 	it('Should create new index', () => {
-		cy.wait(5000).get('[data-cy=initialize-new-index-creation]').click().wait(2000);
-		generateName();
+		cy.wait(1000).get('[data-cy=initialize-new-index-creation]').click().wait(2000);
+		cy.server();
+		cy.route('PUT', `**/${indexName}`).as('indexing');
 		cy.get('[data-cy=new-index-name]')
 			.type(`${indexName}`)
 			.get('[data-cy=new-index-language]')
@@ -43,6 +45,8 @@ describe('Searchable fields remove test flow', () => {
 
 			.get('[data-cy=create-new-index]')
 			.click();
+
+		cy.wait('@indexing');
 	});
 
 	it('Should index data', () => {
@@ -74,30 +78,46 @@ describe('Searchable fields remove test flow', () => {
 	});
 
 	it('Should open schema URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/schema`).wait(5000);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/app/${indexName}/schema`);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
 	});
 
 	it('Should add new data fields in schema', () => {
 		cy.get('[data-cy=new-field-button]').click().wait(1000);
-		cy.tab().tab().type('address').root().contains('Add Field').click().wait(2000);
-		cy.get('[data-cy=new-field-button]').click().wait(1000);
-		cy.tab()
-			.tab()
-			.type('phone')
-			.tab()
-			.type('{enter}{downarrow}{downarrow}{enter}')
+		cy.get('input[placeholder="Enter field name"]')
+			.type('address')
 			.root()
 			.contains('Add Field')
 			.click()
 			.wait(2000);
-		cy.get('[data-cy=confirm-mapping-button]').click().wait(5000);
-	});
-
-	it('Should open search settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/search`).wait(5000);
+		cy.get('[data-cy=new-field-button]').click().wait(1000);
+		cy.get('input[placeholder="Enter field name"]')
+			.type('phone')
+			.tab()
+			.type('{enter}{downarrow}{downarrow}{enter}', { force: true })
+			.root()
+			.contains('Add Field')
+			.click()
+			.wait(2000);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('POST', '**/_reindex/**').as('reindex');
+		cy.get('[data-cy=confirm-mapping-button]').click();
+		cy.wait(['@mapping', '@reindex'], { timeout: 30000 });
 	});
 
 	it('Should verify search fields and add new field from schema', () => {
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/app/${indexName}/search`);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
+
 		cy.get('[data-cy=field-name-address]')
 			.should('contain', 'address')
 			.get('[data-cy=field-name-email]')
@@ -112,10 +132,21 @@ describe('Searchable fields remove test flow', () => {
 
 	it('Should save & deploy search settings', () => {
 		cy.get('[data-cy=review-deploy-button]').click({ force: true }).wait(2000);
-		cy.get('[data-cy=review-save-button]').click().wait(5000);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('POST', '**/_reindex/**').as('reindex');
+		cy.get('[data-cy=review-save-button]').click();
+		cy.wait(['@mapping', '@reindex'], { timeout: 30000 });
 	});
 
 	it('Should remove fields from search settings', () => {
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/app/${indexName}/search`);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
+
 		cy.get('[data-cy=remove-field-address]').click({ force: true }).wait(500);
 		cy.get('[data-cy=remove-field-email]').click({ force: true }).wait(500);
 		cy.get('[data-cy=remove-field-name]').click({ force: true }).wait(500);
@@ -143,11 +174,20 @@ describe('Searchable fields remove test flow', () => {
 			.should('contain', 'name')
 			.get('[data-cy=search-field-name-status]')
 			.should('contain', 'removed');
-		cy.get('[data-cy=review-save-button]').click().wait(5000);
+		cy.server();
+		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
+		cy.get('[data-cy=review-save-button]').click();
+		cy.wait(['@relevancy'], { timeout: 30000 });
 	});
 
 	it('Should check the new search settings after deployment', () => {
-		cy.get('[data-cy=reload-mappings-button]').click().wait(5000);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/app/${indexName}/search`);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
+
 		cy.get('[data-cy=review-deploy-button]').click({ force: true }).wait(2000);
 		cy.get('[data-cy=search-field-address]')
 			.should('contain', 'address')
@@ -176,23 +216,20 @@ describe('Searchable fields remove test flow', () => {
 		cy.get('[data-cy=cancel-modal-button]').click();
 	});
 
-	it('Should detect re-indexing and assign index name prior to deletion', () => {
+	it('Should assign index name prior to deletion', () => {
 		let credentials = btoa(`${username}:${password}`);
 
-		fetch(`${app_url}_alias/${indexName}`, {
+		cy.request({
+			method: 'GET',
+			url: `${app_url}_alias/${indexName}`,
 			headers: {
 				Authorization: `Basic ${credentials}`,
 			},
-		})
-			.then((response) => {
-				return response.json();
-			})
-			.then((data) => {
-				indexName = Object.keys(data)[0];
-			})
-			.catch((err) => {
-				console.log(err);
-			});
+		}).then((response) => {
+			const data = response.body;
+			console.log({ response, data });
+			indexName = Object.keys(data)[0];
+		});
 	});
 
 	it('Should delete index', () => {
