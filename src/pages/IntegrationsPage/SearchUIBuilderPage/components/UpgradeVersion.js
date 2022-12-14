@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Alert, Button, message } from 'antd';
 import { bool, func, string } from 'prop-types';
 import { connect } from 'react-redux';
@@ -29,11 +29,11 @@ const UpgradeVersion = ({
 	getPreferencesPayload,
 	setTemplateVersionId,
 	getAllVersions,
+	setIsCodeCommitting,
+	isCodeCommitting,
 }) => {
-	const [isLoading, setIsLoading] = useState(false);
-
 	const handleCommitCode = async () => {
-		setIsLoading(true);
+		setIsCodeCommitting(true);
 		const newPreferences = transformPreferences(getPreferencesPayload());
 		// update templateVersionId in preferences with templateVersionId
 		newPreferences.globalSettings.meta.templateSettings.templateVersionId = templateVersionId;
@@ -66,11 +66,12 @@ const UpgradeVersion = ({
 						getAllVersions();
 						message.info('Template code updated successfully!');
 					}
-					setIsLoading(false);
+
+					setIsCodeCommitting(false);
 				});
 			})
 			.catch((err) => {
-				setIsLoading(false);
+				setIsCodeCommitting(false);
 				console.error(err);
 				message.error('There was a problem updating the template code!.');
 			});
@@ -91,7 +92,7 @@ const UpgradeVersion = ({
 							setTemplateVersionId();
 							handleCommitCode();
 						}}
-						loading={isLoading}
+						loading={isCodeCommitting}
 					>
 						Update
 					</Button>
@@ -114,6 +115,8 @@ UpgradeVersion.defaultProps = {
 	setShowNotification: () => {},
 	setTemplateVersionId: () => {},
 	getAllVersions: () => {},
+	setIsCodeCommitting: () => {},
+	isCodeCommitting: false,
 };
 
 UpgradeVersion.propTypes = {
@@ -125,6 +128,8 @@ UpgradeVersion.propTypes = {
 	setShowNotification: func,
 	setTemplateVersionId: func,
 	getAllVersions: func,
+	setIsCodeCommitting: func,
+	isCodeCommitting: bool,
 };
 
 const mapDispatchToProps = (dispatch, props) => ({

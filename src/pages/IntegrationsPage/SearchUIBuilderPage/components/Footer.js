@@ -19,6 +19,7 @@ const Footer = ({
 	closeForm,
 	history,
 	isSaveSearchLoading,
+	isCodeCommitting,
 }) => {
 	const form = useContext(FormContext);
 	return (
@@ -42,11 +43,13 @@ const Footer = ({
 								onClick={() => {
 									history.push(`/cluster/search-builder/${preferenceId}/code`);
 								}}
-								disabled={isEditorLoading || isSaveSearchLoading}
+								disabled={
+									isEditorLoading || isSaveSearchLoading || isCodeCommitting
+								}
 								size="large"
 							>
 								<div className="button-label">
-									{isEditorLoading ? (
+									{isEditorLoading || isSaveSearchLoading || isCodeCommitting ? (
 										<LoadingOutlined style={{ marginRight: 5 }} />
 									) : (
 										<img
@@ -85,6 +88,7 @@ Footer.propTypes = {
 	closeForm: func,
 	history: object.isRequired,
 	isSaveSearchLoading: bool,
+	isCodeCommitting: bool,
 };
 
 Footer.defaultProps = {
@@ -94,6 +98,7 @@ Footer.defaultProps = {
 	preferenceId: '',
 	closeForm: () => {},
 	isSaveSearchLoading: false,
+	isCodeCommitting: false,
 };
 
 const mapStateToProps = (state) => ({
