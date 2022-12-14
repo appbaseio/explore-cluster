@@ -112,37 +112,35 @@ const ListItem = ({
 						/>,
 					]}
 				>
-					<List.Item.Meta
-						title={
-							<>
-								<span {...provided.dragHandleProps}>
-									<DragOutlined
-										style={{
-											marginRight: 10,
-										}}
-									/>
-								</span>
-								{isLoading ||
-									(traversedMappings &&
-									traversedMappings.length &&
-									traversedMappings.includes(
-										get(control, 'value.customize.dataField'),
-									) ? (
-										''
-									) : (
-										<span
-											style={{ color: 'orange', marginRight: 10 }}
-											role="img"
-											aria-label="warning"
-										>
-											⚠️
-										</span>
-									))}
+					<div>
+						<span {...provided.dragHandleProps}>
+							<DragOutlined
+								style={{
+									marginRight: 10,
+								}}
+							/>
+						</span>
+						<span>
+							{isLoading ||
+								(traversedMappings &&
+								traversedMappings.length &&
+								traversedMappings.includes(
+									get(control, 'value.customize.dataField'),
+								) ? (
+									''
+								) : (
+									<span
+										style={{ color: 'orange', marginRight: 10 }}
+										role="img"
+										aria-label="warning"
+									>
+										⚠️
+									</span>
+								))}
 
-								{get(control, 'value.customize.title')}
-							</>
-						}
-					/>
+							{get(control, 'value.customize.title')}
+						</span>
+					</div>
 				</List.Item>
 			)}
 		</FieldGroup>
