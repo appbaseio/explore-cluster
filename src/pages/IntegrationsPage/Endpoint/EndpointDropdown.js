@@ -92,7 +92,7 @@ const EndpointDropdown = ({
 
 	return (
 		<div style={{ marginTop: 20 }} className={endpointConfigStyles}>
-			<span>
+			<span style={{ margin: '5px 0px' }}>
 				<>Configure Data Endpoint</>
 
 				<Tooltip title="Data Endpoint is where you specify how the search UI fetches data.">
