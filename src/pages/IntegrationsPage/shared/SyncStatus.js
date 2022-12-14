@@ -348,6 +348,8 @@ class SyncStatus extends React.Component {
 			getPreferencesPayload,
 			isSaveSearchLoading,
 			isRecommendation,
+			isCodeCommitting,
+			setIsCodeCommitting,
 		} = this.props;
 		const title = form.get('name') ? form.get('name').value : '';
 		const pipeline = form.get('pipeline') ? form.get('pipeline').value : '';
@@ -374,6 +376,8 @@ class SyncStatus extends React.Component {
 						}
 						setShowNotification={(val) => this.setState({ showNotification: val })}
 						getAllVersions={this.fetchAllVersions}
+						isCodeCommitting={isCodeCommitting}
+						setIsCodeCommitting={setIsCodeCommitting}
 					/>
 				) : null}
 				{pipeline ? (
@@ -435,7 +439,7 @@ class SyncStatus extends React.Component {
 
 											<Button
 												type="primary"
-												disabled={isSaveSearchLoading}
+												disabled={isSaveSearchLoading || isCodeCommitting}
 												onClick={() => {
 													this.setState({ modalType: 'deploy-modal' });
 													this.fetchAllVersions();
@@ -518,6 +522,8 @@ SyncStatus.defaultProps = {
 	isSaveSearchLoading: false,
 	getPreferencesPayload: () => {},
 	isRecommendation: false,
+	isCodeCommitting: false,
+	setIsCodeCommitting: () => {},
 };
 
 SyncStatus.propTypes = {
@@ -535,6 +541,8 @@ SyncStatus.propTypes = {
 	getPreferencesPayload: func,
 	isSaveSearchLoading: bool,
 	isRecommendation: bool,
+	isCodeCommitting: bool,
+	setIsCodeCommitting: func,
 };
 
 const mapStateToProps = (state, props) => ({
