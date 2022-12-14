@@ -131,6 +131,7 @@ const Settings = () => {
 										},
 									]}
 									withoutForm
+									isRecommendation
 								/>
 							</Form>
 						)}
