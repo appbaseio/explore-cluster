@@ -76,6 +76,9 @@ export const credentialsMessages = {
 		</>,
 	),
 	indices: Message('Only selected indices are authorized to call the API with this credential.'),
+	pipelines: Message(
+		'Only selected pipelines are authorized to call the API with this credential.',
+	),
 	fieldFiltering: Message(
 		'Restrict fields that are returned when performing a search operation.',
 	),
