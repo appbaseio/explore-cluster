@@ -147,7 +147,7 @@ class DashboardWrapper extends Component {
 									...(backend === BACKENDS.ELASTICSEARCH.name ||
 									backend === BACKENDS.OPENSEARCH.name
 										? [
-												({
+												{
 													label: 'Recommendations',
 													link: '/cluster/recommendations-builder',
 													tag: 'Beta',
@@ -156,7 +156,7 @@ class DashboardWrapper extends Component {
 													label: 'Searchbox',
 													link: '/cluster/searchboxes',
 													tag: 'Beta',
-												}),
+												},
 										  ]
 										: []),
 									{

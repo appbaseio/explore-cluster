@@ -266,7 +266,7 @@ class AppWrapper extends Component {
 											...(backend === BACKENDS.ELASTICSEARCH.name ||
 											backend === BACKENDS.OPENSEARCH.name
 												? [
-														({
+														{
 															label: 'Recommendations',
 															link: '/cluster/recommendations-builder',
 															hasExactPath: true,
@@ -276,7 +276,7 @@ class AppWrapper extends Component {
 															label: 'Searchbox',
 															link: '/cluster/searchboxes',
 															tag: 'Beta',
-														}),
+														},
 												  ]
 												: []),
 											{
