@@ -28,6 +28,7 @@ const UpgradeVersion = ({
 	updateSearchPreferences,
 	getPreferencesPayload,
 	setTemplateVersionId,
+	getAllVersions,
 }) => {
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -62,6 +63,7 @@ const UpgradeVersion = ({
 					if (!(action && action.error)) {
 						setShowTemplateUpdateBanner(false);
 						setShowNotification(false);
+						getAllVersions();
 						message.info('Template code updated successfully!');
 					}
 					setIsLoading(false);
@@ -111,6 +113,7 @@ UpgradeVersion.defaultProps = {
 	templateVersionId: '',
 	setShowNotification: () => {},
 	setTemplateVersionId: () => {},
+	getAllVersions: () => {},
 };
 
 UpgradeVersion.propTypes = {
@@ -121,6 +124,7 @@ UpgradeVersion.propTypes = {
 	updateSearchPreferences: func.isRequired,
 	setShowNotification: func,
 	setTemplateVersionId: func,
+	getAllVersions: func,
 };
 
 const mapDispatchToProps = (dispatch, props) => ({

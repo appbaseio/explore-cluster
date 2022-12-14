@@ -373,6 +373,7 @@ class SyncStatus extends React.Component {
 							this.setState({ showTemplateUpdateBanner: val })
 						}
 						setShowNotification={(val) => this.setState({ showNotification: val })}
+						getAllVersions={this.fetchAllVersions}
 					/>
 				) : null}
 				{pipeline ? (
