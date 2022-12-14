@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { css } from 'emotion';
-import { Button, Input, Modal, Select } from 'antd';
+import { Button, Input, Modal, Select, Tooltip } from 'antd';
 import {
 	FieldControl,
 	FieldGroup,
@@ -294,8 +294,11 @@ const AddSuggestion = (props) => {
 											return (
 												<div className="pos-rel">
 													<Grid
-														label="Icon URL"
-														toolTipMessage="Icon URL has to be specified here"
+														label={
+															<Tooltip title="Icon URL has to be specified here">
+																Icon URL
+															</Tooltip>
+														}
 														component={
 															<Flex flexDirection="column">
 																<Input
@@ -332,8 +335,11 @@ const AddSuggestion = (props) => {
 										<span>*</span>
 										<InputElement
 											name="label"
-											label="Suggestion Label"
-											toolTipMessage="Enter Suggestion Label"
+											label={
+												<Tooltip title="Enter Suggestion Label">
+													Suggestion Label
+												</Tooltip>
+											}
 											placeholder="Enter Suggestion Label"
 											inputProps={{
 												style: {
@@ -347,8 +353,11 @@ const AddSuggestion = (props) => {
 										<span>*</span>
 										<InputElement
 											name="value"
-											label="Suggestion Value"
-											toolTipMessage="Enter Suggestion Value"
+											label={
+												<Tooltip title="Enter Suggestion Value">
+													Suggestion Value
+												</Tooltip>
+											}
 											placeholder="Enter Suggestion Value"
 											inputProps={{
 												style: {
@@ -362,8 +371,11 @@ const AddSuggestion = (props) => {
 										{' '}
 										<InputElement
 											name="description"
-											label="Suggestion Description"
-											toolTipMessage="Enter Suggestion Description"
+											label={
+												<Tooltip title="Enter Suggestion Description">
+													Suggestion Description
+												</Tooltip>
+											}
 											placeholder="Enter Suggestion Description"
 											inputProps={{
 												style: {
@@ -390,8 +402,11 @@ const AddSuggestion = (props) => {
 													<div className="pos-rel">
 														<span>*</span>
 														<Grid
-															label="Action Type"
-															toolTipMessage="Select Action Type"
+															label={
+																<Tooltip title="Select Action Type">
+																	Action Type
+																</Tooltip>
+															}
 															component={
 																<Flex flexDirection="column">
 																	<Select
@@ -466,8 +481,11 @@ const AddSuggestion = (props) => {
 																<div className="pos-rel">
 																	<span>*</span>
 																	<Grid
-																		label="Navigation Type"
-																		toolTipMessage="Select Navigation Type"
+																		label={
+																			<Tooltip title="Select Navigation Type">
+																				Navigation Type
+																			</Tooltip>
+																		}
 																		component={
 																			<Flex flexDirection="column">
 																				<Select
@@ -549,8 +567,11 @@ const AddSuggestion = (props) => {
 																<div className="pos-rel">
 																	<span>*</span>
 																	<Grid
-																		label="Navigation Link"
-																		toolTipMessage="URL has to be specified here"
+																		label={
+																			<Tooltip title="URL has to be specified here">
+																				Navigation Link
+																			</Tooltip>
+																		}
 																		component={
 																			<Flex flexDirection="column">
 																				<Input
