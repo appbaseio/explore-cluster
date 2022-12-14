@@ -197,7 +197,7 @@ const ModalHeader = ({
 					getSearchPreferenceVersions(preferenceId);
 					getSearchPreferences();
 				});
-				message.info('Template code updated successfully!');
+				message.info('Code is committed successfully!');
 			})
 			.catch((err) => {
 				console.error('Error to commit code', err);
