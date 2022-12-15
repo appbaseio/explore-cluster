@@ -84,10 +84,10 @@ function SortOptionSelector({
 	}
 
 	const getDatafields = (query, state = 'initial') => {
-		const profile = form.get('profile') ? form.get('profile').value : 'appbase';
-		const indexSettings = form.get('indexSettings') ? form.get('indexSettings').value : {};
-		const secondaryProfile = get(indexSettings, 'fusionSettings.profile', '');
 		if (isFusion) {
+			const profile = form.get('profile') ? form.get('profile').value : 'appbase';
+			const indexSettings = form.get('indexSettings') ? form.get('indexSettings').value : {};
+			const secondaryProfile = get(indexSettings, 'fusionSettings.profile', '');
 			const schemaConfig = endpoints.schema || apisMapper[backend].schema || {};
 			getApiGeneralization(schemaConfig, { index: secondaryProfile || profile, q: query })
 				.then((res) => res.json())
