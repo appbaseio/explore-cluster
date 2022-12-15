@@ -237,68 +237,59 @@ class CustomizeFilter extends React.Component {
 													>
 														{(formControl) => {
 															return (
-																<Item
-																	actions={[
-																		<Radio.Group
-																			{...formControl.handler()}
-																			onChange={(e) => {
-																				formControl.markAsTouched();
-																				formControl
-																					.handler()
-																					.onChange(
-																						e.target
-																							.value,
-																					);
+																<Form.Item label="Display Filter As">
+																	<Radio.Group
+																		{...formControl.handler()}
+																		onChange={(e) => {
+																			formControl.markAsTouched();
+																			formControl
+																				.handler()
+																				.onChange(
+																					e.target.value,
+																				);
+																			if (
+																				dataFieldType !==
+																					e.target
+																						.value &&
+																				value.dataField
+																			) {
 																				if (
-																					dataFieldType !==
-																						e.target
-																							.value &&
-																					value.dataField
+																					dataFieldType ===
+																					'date'
 																				) {
-																					if (
-																						dataFieldType ===
-																						'date'
-																					) {
-																						this.setState(
-																							{
-																								message:
-																									'Field is expected to be of Date type. Facet may not render correctly otherwise.',
-																							},
-																						);
-																					} else {
-																						this.setState(
-																							{
-																								message:
-																									'Field is expected to be of Numeric type. Facet may not render correctly otherwise.',
-																							},
-																						);
-																					}
+																					this.setState({
+																						message:
+																							'Field is expected to be of Date type. Facet may not render correctly otherwise.',
+																					});
 																				} else {
 																					this.setState({
-																						message: '',
+																						message:
+																							'Field is expected to be of Numeric type. Facet may not render correctly otherwise.',
 																					});
 																				}
-																			}}
-																		>
-																			<Radio value="list">
-																				List
-																			</Radio>
-																			{dataFieldType !==
-																				'list' && (
-																				<>
-																					<Radio value="range">
-																						Range
-																					</Radio>
-																					<Radio value="date">
-																						Date
-																					</Radio>
-																				</>
-																			)}
-																		</Radio.Group>,
-																	]}
-																>
-																	<Item.Meta title="Display Filter As" />
-																</Item>
+																			} else {
+																				this.setState({
+																					message: '',
+																				});
+																			}
+																		}}
+																	>
+																		<Radio value="list">
+																			List
+																		</Radio>
+																		{dataFieldType !==
+																			'list' && (
+																			<>
+																				<Radio value="range">
+																					Range
+																				</Radio>
+																				<Radio value="date">
+																					Date
+																				</Radio>
+																			</>
+																		)}
+																	</Radio.Group>
+																</Form.Item>
 															);
 														}}
 													</FieldControl>
