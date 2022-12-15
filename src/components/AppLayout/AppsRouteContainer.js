@@ -57,7 +57,7 @@ const SandboxPage = Loadable({
 const SearchIntegrationsPage = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "SearchIntegrationsPage" */ '../../pages/IntegrationsPage/SearchN'
+			/* webpackChunkName: "SearchIntegrationsPage" */ '../../pages/IntegrationsPage/SearchUIBuilderPage'
 		),
 	loading: Loader,
 });
@@ -71,7 +71,7 @@ const StoredQueriesPage = Loadable({
 const RecommendationsIntegrationsPage = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "RecommendationsIntegrationsPage" */ '../../pages/IntegrationsPage/RecommendationsN'
+			/* webpackChunkName: "RecommendationsIntegrationsPage" */ '../../pages/IntegrationsPage/RecommendationsPage'
 		),
 	loading: Loader,
 });

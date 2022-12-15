@@ -30,7 +30,7 @@ import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster
 import SettingsFooter from '../../components/SettingsFooter';
 import { event, timingEvent } from '../../utils/gtag';
 import moment from '../../utils/moment';
-import SortOptionSelector from '../IntegrationsPage/tabs/Search/SortOptionSelector';
+import SortOptionSelector from '../IntegrationsPage/SearchUIBuilderPage/components/tabs/UIComponents/SortOptionSelector';
 import { traverseMapping } from '../../batteries/utils/mappings';
 
 const bannerDetails = {

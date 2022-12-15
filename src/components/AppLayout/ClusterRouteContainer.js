@@ -115,10 +115,10 @@ const StoredQueriesPage = Loadable({
 	loading: Loader,
 });
 
-const SearchIntegrationsPage = Loadable({
+const UIBuildersListPage = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "SearchIntegrationsPage" */ '../../pages/IntegrationsPage/SearchN'
+			/* webpackChunkName: "UIBuildersListPage" */ '../../pages/IntegrationsPage/SearchUIBuilderPage/index'
 		),
 	loading: Loader,
 });
@@ -126,7 +126,7 @@ const SearchIntegrationsPage = Loadable({
 const RecommendationsIntegrationsPage = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "RecommendationsIntegrationsPage" */ '../../pages/IntegrationsPage/RecommendationsN'
+			/* webpackChunkName: "RecommendationsIntegrationsPage" */ '../../pages/IntegrationsPage/RecommendationsPage'
 		),
 	loading: Loader,
 });
@@ -142,26 +142,26 @@ const SearchBoxForm = Loadable({
 	loading: Loader,
 });
 
-const inlineCodesandboxPage = Loadable({
+const SearchUICodePage = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "inlineCodesandboxPage" */ '../../pages/IntegrationsPage/CodeSandboxModal'
+			/* webpackChunkName: "SearchUICodePage" */ '../../pages/IntegrationsPage/SearchUIBuilderPage/SearchUICodePage'
 		),
 	loading: Loader,
 });
 
-const SearchPreferencePage = Loadable({
+const UIBuilderFormPage = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "SearchPreferencePage" */ '../../pages/IntegrationsPage/SearchN/Main'
+			/* webpackChunkName: "UIBuilderFormPage" */ '../../pages/IntegrationsPage/SearchUIBuilderPage/UIBuilderForm'
 		),
 	loading: Loader,
 });
 
-const SearchTemplatePage = Loadable({
+const CreateUIBuilderPage = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "SearchPreferencePage" */ '../../pages/IntegrationsPage/SearchN/Wizard/index'
+			/* webpackChunkName: "CreateUIBuilderPage" */ '../../pages/IntegrationsPage/SearchUIBuilderPage/CreateUIBuilder'
 		),
 	loading: Loader,
 });
@@ -169,7 +169,7 @@ const SearchTemplatePage = Loadable({
 const RecommendationsPreferencePage = Loadable({
 	loader: () =>
 		import(
-			/* webpackChunkName: "RecommendationsPreferencePage" */ '../../pages/IntegrationsPage/RecommendationsN/Main'
+			/* webpackChunkName: "RecommendationsPreferencePage" */ '../../pages/IntegrationsPage/RecommendationsPage/RecommendationsUIForm'
 		),
 	loading: Loader,
 });
@@ -223,7 +223,6 @@ class ClusterRouteContainer extends React.Component {
 
 	render() {
 		const { allowedRoutes, backend, backendImage } = this.props;
-
 		return (
 			<ErrorPage {...this.props}>
 				<Switch>
@@ -557,7 +556,13 @@ class ClusterRouteContainer extends React.Component {
 						exact
 						path="/cluster/search-builder"
 						render={(props) => (
-							<AppPageContainer {...props} component={SearchIntegrationsPage} />
+							<>
+								{get(allowedRoutes, '/cluster/search-builder') ? (
+									<AppPageContainer {...props} component={UIBuildersListPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
@@ -571,14 +576,26 @@ class ClusterRouteContainer extends React.Component {
 						exact
 						path="/cluster/search-builder/new"
 						render={(props) => (
-							<AppPageContainer {...props} component={SearchTemplatePage} />
+							<>
+								{get(allowedRoutes, '/cluster/search-builder') ? (
+									<AppPageContainer {...props} component={CreateUIBuilderPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/search-builder/:id"
 						render={(props) => (
-							<AppPageContainer {...props} component={SearchPreferencePage} />
+							<>
+								{get(allowedRoutes, '/cluster/search-builder') ? (
+									<AppPageContainer {...props} component={UIBuilderFormPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					{/* <Route
@@ -592,37 +609,61 @@ class ClusterRouteContainer extends React.Component {
 						exact
 						path="/cluster/search-builder/:id/code"
 						render={(props) => (
-							<AppPageContainer {...props} component={inlineCodesandboxPage} />
+							<>
+								{get(allowedRoutes, '/cluster/search-builder') ? (
+									<AppPageContainer {...props} component={SearchUICodePage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/recommendations-builder"
 						render={(props) => (
-							<AppPageContainer
-								{...props}
-								component={RecommendationsIntegrationsPage}
-							/>
+							<>
+								{get(allowedRoutes, '/cluster/recommendations-builder') ? (
+									<AppPageContainer
+										{...props}
+										component={RecommendationsIntegrationsPage}
+									/>
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/recommendations-builder/:id"
 						render={(props) => (
-							<AppPageContainer
-								{...props}
-								component={RecommendationsPreferencePage}
-							/>
+							<>
+								{get(allowedRoutes, '/cluster/recommendations-builder') ? (
+									<AppPageContainer
+										{...props}
+										component={RecommendationsPreferencePage}
+									/>
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route
 						exact
 						path="/cluster/recommendations-builder/new"
 						render={(props) => (
-							<AppPageContainer
-								{...props}
-								component={RecommendationsPreferencePage}
-							/>
+							<>
+								{get(allowedRoutes, '/cluster/recommendations-builder') ? (
+									<AppPageContainer
+										{...props}
+										component={RecommendationsPreferencePage}
+									/>
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
 						)}
 					/>
 					<Route

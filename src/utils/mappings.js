@@ -358,7 +358,7 @@ export const updateSubFields = ({
 
 	let TOP_FIELD = '';
 
-	if (+ES_VERSION[0] >= 6) {
+	if (ES_VERSION && +ES_VERSION[0] >= 6) {
 		TOP_FIELD = '_doc.properties';
 	}
 

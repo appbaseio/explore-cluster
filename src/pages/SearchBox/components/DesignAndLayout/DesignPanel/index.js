@@ -6,7 +6,7 @@ import { FieldControl, FieldGroup } from 'react-reactive-form';
 import Grid from '../../../../../components/CreateCredentials/Grid';
 import ColorPicker from './ColorPicker';
 import { Heading, Section } from './styles';
-import { FormContext } from '../../../../IntegrationsPage/utils';
+import { FormContext } from '../../../../IntegrationsPage/utils/utils';
 import { DEFAULT_DESIGN_COLORS } from '../../../utils';
 
 const DesignGrid = styled(Grid)`

@@ -25,7 +25,7 @@ export function getDomainStatus(id, domainName) {
 	const url = `${ACC_API}/_uibuilder/${id}/domain/${domainName}`;
 
 	const options = {
-		method: 'POST',
+		method: 'GET',
 		headers: {
 			authorization: `Basic ${token}`,
 			'Content-Type': 'application/json',

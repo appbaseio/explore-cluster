@@ -11,7 +11,7 @@ import {
 	saveSearchBox as saveSearchBoxAction,
 } from '../../../../batteries/modules/actions/searchboxes';
 import { getURL } from '../../../../constants/config';
-import { FormContext } from '../../../IntegrationsPage/utils';
+import { FormContext } from '../../../IntegrationsPage/utils/utils';
 import { parseJSON } from '../../utils';
 import DesignPanel from './DesignPanel';
 

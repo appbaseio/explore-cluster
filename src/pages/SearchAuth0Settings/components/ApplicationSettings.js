@@ -9,7 +9,7 @@ import { FieldControl, FieldGroup } from 'react-reactive-form';
 import Grid from '../../../components/CreateCredentials/Grid';
 import '@uppy/core/dist/style.css';
 import '@uppy/dashboard/dist/style.css';
-import { FormContext } from '../../IntegrationsPage/utils';
+import { FormContext } from '../../IntegrationsPage/utils/utils';
 
 const { TextArea } = Input;
 

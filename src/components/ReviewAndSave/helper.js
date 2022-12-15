@@ -431,6 +431,14 @@ const settingsMap = {
 		title: 'Meta Data',
 		description: '',
 	},
+	db: {
+		title: 'Database',
+		description: '',
+	},
+	collection: {
+		title: 'Collection',
+		description: '',
+	},
 	description: {
 		title: 'Description',
 		description: '',

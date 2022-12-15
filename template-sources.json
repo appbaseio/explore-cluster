@@ -4,7 +4,7 @@
 		"repository": "enterprise-search-ui-template",
 		"version": "",
 		"commit": "",
-		"branch": "main",
+		"branch": "cypress-tests",
 		"manifest_path": "reactivesearch-manifest.json",
 		"repositoryType": "private"
 	},
@@ -13,7 +13,7 @@
 		"repository": "charts-dashboard-template",
 		"version": "",
 		"commit": "",
-		"branch": "main",
+		"branch": "cypress-tests",
 		"manifest_path": "reactivesearch-manifest.json",
 		"repositoryType": "private"
 	},
@@ -22,7 +22,7 @@
 		"repository": "faceted-search-template",
 		"version": "",
 		"commit": "",
-		"branch": "main",
+		"branch": "support-mongo-db",
 		"manifest_path": "reactivesearch-manifest.json",
 		"repositoryType": "public"
 	},
@@ -31,7 +31,7 @@
 		"repository": "geo-search-template",
 		"version": "",
 		"commit": "",
-		"branch": "main",
+		"branch": "cypress-tests",
 		"manifest_path": "reactivesearch-manifest.json",
 		"repositoryType": "public"
 	},
@@ -40,7 +40,7 @@
 		"repository": "multi-page-search",
 		"version": "",
 		"commit": "",
-		"branch": "main",
+		"branch": "cypress-tests",
 		"manifest_path": "reactivesearch-manifest.json",
 		"repositoryType": "private"
 	},
@@ -49,7 +49,7 @@
 		"repository": "enterprise-demo-search-ui-template",
 		"version": "",
 		"commit": "",
-		"branch": "main",
+		"branch": "cypress-tests",
 		"manifest_path": "reactivesearch-manifest.json",
 		"repositoryType": "private"
 	},
