@@ -52,30 +52,17 @@ class ListItem extends React.Component {
 												</Col>
 												<Col md={11} className="text-ellipsis">
 													<Popover
+														style={{ overflow: 'scroll' }}
 														content={
-															typeof rest[key] === 'object' ? (
-																<pre
-																	// eslint-disable-next-line
-																	dangerouslySetInnerHTML={{
-																		__html: DOMPurify.sanitize(
-																			JSON.stringify(
-																				rest[key],
-																			) || 'N/A',
-																		),
-																	}}
-																/>
-															) : (
-																<span
-																	// eslint-disable-next-line
-																	dangerouslySetInnerHTML={{
-																		__html: DOMPurify.sanitize(
-																			JSON.stringify(
-																				rest[key],
-																			) || 'N/A',
-																		),
-																	}}
-																/>
-															)
+															<span
+																// eslint-disable-next-line
+																dangerouslySetInnerHTML={{
+																	__html: DOMPurify.sanitize(
+																		JSON.stringify(rest[key]) ||
+																			'N/A',
+																	),
+																}}
+															/>
 														}
 													>
 														{typeof rest[key] === 'object' ? (
