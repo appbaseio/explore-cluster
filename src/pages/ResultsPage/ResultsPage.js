@@ -146,7 +146,12 @@ class ResultsPage extends React.Component {
 			includeMappings: undefined,
 			includeTypes: undefined,
 		});
-		return ['_score', ...traversedMappings];
+
+		if (Array.isArray(traversedMappings)) return ['_score', ...traversedMappings];
+		if (typeof traversedMappings === 'object')
+			return ['_score', ...Object.keys(traversedMappings)];
+
+		return ['_score'];
 	};
 
 	init = (settings) => {
