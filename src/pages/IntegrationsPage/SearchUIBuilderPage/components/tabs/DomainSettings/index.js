@@ -265,7 +265,9 @@ const DomainSettingsTab = ({
 					/>
 				</div>
 			) : null}
-			{!domainsData.length || !Object.keys(domainStatus).length ? (
+
+			{(!domainsData.length && Object.keys(domainStatus).length) ||
+			(domainsData.length && !Object.keys(domainStatus).length) ? (
 				<Spin />
 			) : (
 				domainsData.map((domain) => (
