@@ -11,7 +11,7 @@ export const domainSettingsTabStyles = css`
 		padding: 20px;
 		margin: 30px 10px 10px 10px;
 		border: 1px solid #ebedf0;
-		width: 85%;
+		width: 90%;
 	}
 
 	.deployment-status-container {

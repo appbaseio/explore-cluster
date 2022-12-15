@@ -25,10 +25,11 @@ const DomainSettingsTab = ({
 }) => {
 	const [errorMsg, setErrorMsg] = useState('');
 	const [domainsData, setDomainsData] = useState([]);
-	const [domainStatus, setDomainStatus] = useState({ name: '', status: '' });
+	const [domainStatus, setDomainStatus] = useState({});
 	const [deploymentStatus, setDeploymentStatus] = useState({});
 	const [open, setOpen] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
+	const [isRefreshing, setIsRefreshing] = useState(false);
 	const [allVersions, setAllVersions] = useState([]);
 	const [value, setValue] = useState('');
 	let myInterval = null;
@@ -74,31 +75,53 @@ const DomainSettingsTab = ({
 	};
 
 	const fetchDomainStatus = (name) => {
-		getDomainStatus(preferenceId, name)
-			.then((res) => res.json())
-			.then((res) => {
-				if (res.error) {
-					setDomainStatus({
-						name,
-						status: res,
-					});
-				} else {
-					setDomainStatus({ name: '', status: '' });
-					const newDomainsData = domainsData.filter((data) => data.name !== res.name);
-					setDomainsData([res, ...newDomainsData]);
-				}
-			})
-			.catch((err) => {
-				console.error('Error to fetch domain status', err);
-				handleErrorMessage(err?.error.message);
+		let newDomainsData = { ...domainStatus };
+		if (Array.isArray(name)) {
+			const promisesArr = name.map((i) => {
+				return new Promise((resolve) => {
+					getDomainStatus(preferenceId, i)
+						.then((res) => res.json())
+						.then((res) => {
+							resolve({ [i]: res });
+						})
+						.catch((err) => {
+							console.error('Error to fetch domain status', err);
+							handleErrorMessage(err?.error.message);
+						});
+				});
 			});
+			Promise.all(promisesArr).then((res) => {
+				res.forEach((i) => {
+					newDomainsData = { ...newDomainsData, ...i };
+				});
+				setDomainStatus(newDomainsData);
+			});
+		} else {
+			getDomainStatus(preferenceId, name)
+				.then((res) => res.json())
+				.then((res) => {
+					newDomainsData = { ...newDomainsData, [name]: res };
+					setDomainStatus(newDomainsData);
+				})
+				.catch((err) => {
+					console.error('Error to fetch domain status', err);
+					handleErrorMessage(err?.error.message);
+				});
+		}
+		setTimeout(() => {
+			setIsRefreshing(false);
+		}, 1000);
 	};
 
 	const fetchAllDomains = () => {
 		getAllDomains(preferenceId)
 			.then((res) => res.json())
 			.then((res) => {
-				if (!res.error) setDomainsData(res.domains || []);
+				if (!res.error) {
+					const newDomainsData = res.domains || [];
+					setDomainsData(newDomainsData);
+					fetchDomainStatus(newDomainsData.map((resp) => resp.name));
+				}
 			})
 			.catch((err) => {
 				console.error('Error to fetch all domains', err);
@@ -242,16 +265,22 @@ const DomainSettingsTab = ({
 					/>
 				</div>
 			) : null}
-			{domainsData.map((domain) => (
-				<DomainList
-					domain={domain}
-					getDomainStatus={fetchDomainStatus}
-					value={value}
-					domainStatus={domainStatus}
-					preferenceId={preferenceId}
-					fetchAllDomains={fetchAllDomains}
-				/>
-			))}
+			{!domainsData.length || !Object.keys(domainStatus).length ? (
+				<Spin />
+			) : (
+				domainsData.map((domain) => (
+					<DomainList
+						domain={domain}
+						getDomainStatus={fetchDomainStatus}
+						value={value}
+						domainStatus={domainStatus[domain.name] || { name: '', status: '' }}
+						preferenceId={preferenceId}
+						fetchAllDomains={fetchAllDomains}
+						setIsRefreshing={setIsRefreshing}
+						isRefreshing={isRefreshing}
+					/>
+				))
+			)}
 			<DeployModal
 				errMsg={errorMsg}
 				setErrMsg={setErrorMsg}
