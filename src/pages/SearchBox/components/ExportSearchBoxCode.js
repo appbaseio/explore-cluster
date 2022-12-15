@@ -27,7 +27,6 @@ const ExportSearchBoxCode = ({ visible, onCancel, searchBoxId, initialCredential
 		}
 		message.success('Copied to clipboard', 5);
 	};
-
 	return (
 		<Modal
 			title="Export Code"
@@ -65,6 +64,7 @@ const ExportSearchBoxCode = ({ visible, onCancel, searchBoxId, initialCredential
 						background: '#eee',
 						padding: '20px',
 						margin: '20px 0',
+						overflow: 'auto',
 					}}
 				>
 					{getExportCode()}

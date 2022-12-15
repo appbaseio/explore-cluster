@@ -38,7 +38,7 @@ export default function Footer({ collapsed, onLivePreview, isEditPage, onSave, i
 	return (
 		<>
 			<ExportSearchBoxCode
-				open={showExportCode}
+				visible={showExportCode}
 				onCancel={() => setShowExportCode(false)}
 				searchBoxId={isEditPage}
 			/>
