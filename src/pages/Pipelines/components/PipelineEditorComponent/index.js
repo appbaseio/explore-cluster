@@ -43,13 +43,12 @@ const dropdownMenuCss = css`
 	width: min(95vw, 600px);
 	border-bottom-left-radius: 4px;
 	border-bottom-right-radius: 4px;
+	border-radius: 0px !important;
 
 	.stage-menu-item {
-		padding: 5px 14px !important;
+		padding: 10px !important;
 		padding-right: 25px !important;
 		position: relative !important;
-		height: 60px !important;
-		margin-bottom: 15px !important;
 
 		.add-icon {
 			position: absolute;
@@ -63,9 +62,8 @@ const dropdownMenuCss = css`
 		h4 {
 			font-weight: 500;
 			font-size: 14px;
-			margin-bottom: 0;
+			margin: 0;
 			overflow: hidden;
-			height: 36px;
 			text-overflow: ellipsis;
 			display: flex;
 			align-items: center;
@@ -97,7 +95,8 @@ const inputStyle = css`
 		border-bottom-left-radius: 0;
 		border-bottom-right-radius: 0;
 	}
-	width: calc(100% - 8px) !important;
+	width: 100% !important;
+	border-radius: 0px;
 `;
 
 const QUERY_EDITOR_MODEL_PATH = 'a://b/foo.json';
@@ -377,7 +376,7 @@ const PipelineEditorComponent = (props) => {
 			<Dropdown
 				className="stages-dropdown"
 				open={showStagesMenu}
-				overlayStyle={{ zIndex: 999 }}
+				overlayStyle={{ zIndex: 999, backgroundColor: 'white' }}
 				overlay={
 					<StagesMenu
 						pipelineSchema={pipelineSchema}
