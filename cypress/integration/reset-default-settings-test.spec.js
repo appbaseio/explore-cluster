@@ -1,5 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
+import { LONG_REQUEST_RESOLVE_TIME, PAGE_LOAD_TIME } from '../utils/constants.js';
 
 let indexName = '';
 
@@ -27,13 +28,14 @@ describe('Reset to default settings test flow', () => {
 	});
 
 	it('Should navigate to cluster overview', () => {
-		cy.wait(5000);
 		cy.visit(`${base_url}`);
+		cy.wait(5000);
 	});
 
 	it('Should create new index', () => {
-		cy.wait(5000).get('[data-cy=initialize-new-index-creation]').click().wait(2000);
-		generateName();
+		cy.wait(1000).get('[data-cy=initialize-new-index-creation]').click().wait(2000);
+		cy.server();
+		cy.route('PUT', `**/${indexName}`).as('indexing');
 		cy.get('[data-cy=new-index-name]')
 			.type(`${indexName}`)
 			.get('[data-cy=new-index-language]')
@@ -43,6 +45,8 @@ describe('Reset to default settings test flow', () => {
 
 			.get('[data-cy=create-new-index]')
 			.click();
+
+		cy.wait('@indexing');
 	});
 
 	it('Should index data', () => {
@@ -75,55 +79,60 @@ describe('Reset to default settings test flow', () => {
 		});
 	});
 
-	it('Should open search settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/search`).wait(5000);
-	});
+	it('Should change search relevancy settings', () => {
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/app/${indexName}/search`);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
 
-	it('Should change field weight of email in search settings', () => {
+		// Wait to not enter a race condition
+		cy.wait(2000);
+
+		// Change search settings
 		cy.get('[data-cy=email-number-input]').click().type('{uparrow}{uparrow}{uparrow}{uparrow}');
-	});
-
-	it('Wait for some time', () => {
 		cy.wait(2000);
-	});
-
-	it('Should not change field weight of name in search settings', () => {
 		cy.get('[data-cy=name-number-input]').click();
-	});
-
-	it('Wait for some time', () => {
 		cy.wait(2000);
-	});
-
-	it('Should change field weight of rating in search settings', () => {
 		cy.get('[data-cy=rating-number-input]')
 			.click()
 			.type('{uparrow}{uparrow}{uparrow}{uparrow}{uparrow}{uparrow}')
 			.wait(2000);
-	});
 
-	it('Should open aggregation settings', () => {
-		cy.get('[data-cy=path-sub-AggregationSettings]').click().wait(5000);
-	});
+		// Visit aggregation settings
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy-aggs');
+		cy.get('[data-cy=path-sub-AggregationSettings]').click();
+		cy.wait('@relevancy-aggs', { timeout: 30000 });
 
-	it('Should change query format to and', () => {
+		// Change aggregation settings
 		cy.get('[data-cy=query-format-and-radio]').click().wait(1000);
-	});
 
-	it('Should open result settings', () => {
-		cy.get('[data-cy=path-sub-ResultSettings]').click().wait(5000);
-	});
-
-	it('Should change the page size', () => {
+		// Visit result settings
+		cy.server();
+		cy.route('**/_searchrelevancy/**').as('relevancy-results');
+		cy.get('[data-cy=path-sub-ResultSettings]').click();
+		cy.wait('@relevancy-results', { timeout: 30000 });
+		// Change result settings
 		cy.get('[data-cy=result-page-size]').click().type('{uparrow}');
-	});
 
-	it('Should save & deploy the changed settings', () => {
+		// Save settings
 		cy.get('[data-cy=review-deploy-button]').click().wait(5000);
-		cy.get('[data-cy=review-save-button]').click().wait(5000);
+		cy.server();
+		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy-save');
+		cy.get('[data-cy=review-save-button]').click();
+		cy.wait(['@relevancy-save'], { timeout: 30000 });
 	});
 
-	it('Should check for the default settings', () => {
+	it('Should reset to the default settings', () => {
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/app/${indexName}/results`);
+		cy.wait(['@mapping', '@indices', '@relevancy'], { timeout: 30000 });
+
 		cy.get('[data-cy=reset-default-button]').click().wait(5000);
 		cy.get('[data-cy=search-field-email]')
 			.should('contain', 'email')
@@ -163,49 +172,56 @@ describe('Reset to default settings test flow', () => {
 		// .should('contain', 'english')
 		// .get('[data-cy=new-value-language-status]')
 		// .should('contain', 'universal');
-	});
 
-	it('Should save and deploy the default settings', () => {
-		cy.get('[data-cy=review-save-button]').click().wait(5000);
+		cy.server();
+		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy-save');
+		cy.get('[data-cy=review-save-button]').click();
+		cy.wait(['@relevancy-save'], { timeout: 30000 });
 	});
 
 	it('Should check the deployed default settings', () => {
-		cy.get('[data-cy=result-page-size]')
-			.should('have.value', '10')
-			.get('[data-cy=path-sub-AggregationSettings]')
-			.click()
-			.wait(5000)
-			.get('[data-cy=query-format-or-radio]')
-			.should('be.checked')
-			.get('[data-cy=path-sub-SearchSettings]')
-			.click()
-			.wait(5000)
-			.get('[data-cy=search-empty-field]')
-			.should('contain', 'No Search Fields Are Present')
-			.get('[data-cy=path-sub-LanguageSettings]')
-			.click()
-			.wait(5000)
-			.get('[data-cy=language-value]')
-			.should('contain', 'Universal');
+		cy.server();
+		// Result settings
+		cy.route('**/_mapping').as('results-mapping');
+		cy.route('**/_searchrelevancy/**').as('results-relevancy');
+		cy.route('**/_aliasedindices').as('results-indices');
+		cy.visit(`${base_url}/app/${indexName}/results`);
+		cy.wait(['@results-mapping', '@results-indices', '@results-relevancy'], { timeout: 30000 });
+		cy.get('[data-cy=result-page-size]').should('have.value', '10');
+
+		// Aggregation settings
+		cy.route('**/_searchrelevancy/**').as('relevancy-aggs');
+		cy.get('[data-cy=path-sub-AggregationSettings]').click();
+		cy.wait('@relevancy-aggs', { timeout: 30000 });
+		cy.get('[data-cy=query-format-or-radio]').should('be.checked');
+
+		// Search settings
+		cy.route('**/_searchrelevancy/**').as('relevancy-search');
+		cy.get('[data-cy=path-sub-SearchSettings]').click();
+		cy.wait('@relevancy-search', { timeout: 30000 });
+		cy.get('[data-cy=search-empty-field]').should('contain', 'No Search Fields Are Present');
+
+		// Language settings
+		cy.route('**/_searchrelevancy/**').as('relevancy-lang');
+		cy.get('[data-cy=path-sub-LanguageSettings]').click();
+		cy.wait('@relevancy-lang', { timeout: 30000 });
+		cy.get('[data-cy=language-value]').should('contain', 'Universal');
 	});
 
-	it('Should detect re-indexing and assign index name prior to deletion', () => {
+	it('Should assign index name prior to deletion', () => {
 		let credentials = btoa(`${username}:${password}`);
 
-		fetch(`${app_url}_alias/${indexName}`, {
+		cy.request({
+			method: 'GET',
+			url: `${app_url}_alias/${indexName}`,
 			headers: {
 				Authorization: `Basic ${credentials}`,
 			},
-		})
-			.then((response) => {
-				return response.json();
-			})
-			.then((data) => {
-				indexName = Object.keys(data)[0];
-			})
-			.catch((err) => {
-				console.log(err);
-			});
+		}).then((response) => {
+			const data = response.body;
+			console.log({ response, data });
+			indexName = Object.keys(data)[0];
+		});
 	});
 
 	it('Should delete index', () => {
@@ -218,6 +234,10 @@ describe('Reset to default settings test flow', () => {
 				Authorization: `Basic ${credentials}`,
 			},
 		});
+	});
+
+	it('Should wait for banner to clear', () => {
+		cy.wait(5000);
 	});
 
 	it('Should logout user', () => {

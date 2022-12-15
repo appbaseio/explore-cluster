@@ -1,5 +1,9 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
+import { PAGE_LOAD_TIME } from '../utils/constants.js';
+
+// Track query rule id, to delete later
+let ruleId;
 
 describe('Query Rule creation with trigger index and script action', () => {
 	before(() => {
@@ -24,12 +28,19 @@ describe('Query Rule creation with trigger index and script action', () => {
 		cy.wait(3000);
 	});
 
-	it('Should open query rules page', () => {
-		cy.visit(`${base_url}/cluster/rules`).wait(2000);
-	});
+	it('Should create a query rule', () => {
+		// Load query rules page
+		cy.server();
+		cy.route('/arc/plan').as('plan');
+		cy.route('**/_rules').as('rules');
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/cluster/rules`);
+		cy.wait(['@plan', '@rules', '@indices'], { timeout: 30000 });
 
-	it('Should create a query rule', { retries: 3 }, () => {
+		// Show query rules form
+		cy.route('**/_mapping').as('mapping');
 		cy.get('[data-cy=create-query-rule]').click();
+		cy.wait('@mapping', { timeout: 15000 });
 
 		// Enter name and description
 		cy.get('[name="name"]').type('cypress-testing-rule-name');
@@ -44,7 +55,8 @@ describe('Query Rule creation with trigger index and script action', () => {
 		// Select script action
 		cy.get('[data-cy=query-rule-action]').click();
 		cy.get('[data-cy=script]').click({ force: true, multiple: true });
-		cy.wait(2000);
+		// Wait until execution context is loaded
+		cy.wait(10000);
 		// Remove tooltip blocking the select box
 		cy.get('.ant-tooltip').then((tooltipEl) => {
 			console.log({ tooltipEl });
@@ -53,9 +65,10 @@ describe('Query Rule creation with trigger index and script action', () => {
 		cy.wait(2000);
 		cy.get('[data-cy=script-template]').click().type('a');
 		cy.wait(2000);
-		cy.get('[data-cy=asyncFetch]').wait(1000).click();
-		cy.wait(2000);
+		cy.get('[data-cy=asyncFetch]').click().wait(5000);
+	});
 
+	it('Should save query rule', () => {
 		cy.get('[data-cy=query-rule-save-script]').click();
 		cy.wait(2000);
 
@@ -68,19 +81,27 @@ describe('Query Rule creation with trigger index and script action', () => {
 		}).as('save');
 
 		cy.get('[data-cy=save-query-rule]').click();
-		cy.wait('@save', { timeout: 15000 });
+		cy.wait('@save', { timeout: 15000 }).then((xhr) => {
+			ruleId = xhr?.response?.body?.id || null;
+		});
+	});
 
-		cy.get('@save').then((xhr) => {
-			const ruleId = xhr?.response?.body?.id || null;
+	// Sometimes delete returns with 500 because it hasn't deleted from all the clusters but it does delete the query rule. Subsequent retries would return 400.
+	it('Should delete query rule', () => {
+		const credentials = btoa(`${username}:${password}`);
+		if (ruleId) {
 			cy.request({
 				method: 'DELETE',
 				url: `${app_url}_rule/${ruleId}`,
 				headers: {
 					Authorization: `Basic ${credentials}`,
 				},
-			}).wait(2000);
-			cy.visit(`${base_url}/cluster/rules`);
-		});
+				failOnStatusCode: false,
+			});
+		}
+	});
+	it('Should open arc dashboard locally', () => {
+		cy.visit(`${base_url}`).wait(2000);
 	});
 	it('Should logout user', () => {
 		cy.clearLocalStorage();

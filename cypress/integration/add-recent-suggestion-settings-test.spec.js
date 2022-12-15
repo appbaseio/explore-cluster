@@ -1,6 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
-import { PAGE_LOAD_TIME, REQUEST_RESOLVE_TIME } from './contants';
+import { PAGE_LOAD_TIME, REQUEST_RESOLVE_TIME } from '../utils/constants.js';
 
 const indexName = 'clone-airbeds';
 
@@ -28,8 +28,13 @@ describe('Recent Suggestion Settings add test flow', () => {
 	});
 
 	it('Should Recent suggestion settings page URL', () => {
-		cy.visit(`${base_url}/cluster/suggestions`).wait(PAGE_LOAD_TIME);
+		cy.server();
+		cy.route('**/preferences').as('preferences');
+		cy.visit(`${base_url}/cluster/suggestions`);
+		cy.wait('@preferences', { timeout: 30000 });
+		// Second tab is for recent suggestions
 		cy.get('.ant-tabs-nav .ant-tabs-tab:nth-child(2)').click();
+		cy.wait('@preferences', { timeout: 30000 });
 	});
 
 	it('Should Add Recent Suggestions Settings Form Data', () => {
