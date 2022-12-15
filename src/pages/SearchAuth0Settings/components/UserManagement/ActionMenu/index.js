@@ -180,9 +180,10 @@ const ActionMenu = ({
 			</Menu.Item>
 		</Menu>
 	);
+
 	return (
 		<>
-			<Dropdown overlay={menu} trigger={['hover', 'contextMenu']}>
+			<Dropdown overlay={menu} trigger={['hover', 'click']} placement="bottomRight">
 				<Button style={{ width: '32px', padding: 0 }}>
 					<EllipsisOutlined />
 				</Button>

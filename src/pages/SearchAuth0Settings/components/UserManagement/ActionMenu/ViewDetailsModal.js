@@ -40,10 +40,6 @@ const detailsModalCss = css`
 				color: rgb(95, 15, 36);
 			}
 		}
-
-		.action-btn {
-			color: white;
-		}
 	}
 `;
 

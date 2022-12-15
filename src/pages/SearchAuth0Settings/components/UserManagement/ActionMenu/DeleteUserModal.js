@@ -2,14 +2,10 @@
 import { Modal } from 'antd';
 import React from 'react';
 import { bool, func, string } from 'prop-types';
-import { css } from 'emotion';
-
-const deleteUserCss = css``;
 
 const DeleteUserModal = ({ username, visible, handleClose, handleDeleteUser, isLoading }) => {
 	return (
 		<Modal
-			className={deleteUserCss}
 			open={visible}
 			onCancel={handleClose}
 			title={<h3>Delete User</h3>}
