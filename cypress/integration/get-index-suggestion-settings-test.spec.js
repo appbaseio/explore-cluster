@@ -1,6 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
-import { PAGE_LOAD_TIME } from './contants';
+import { PAGE_LOAD_TIME } from '../utils/constants.js';
 
 describe('Index Suggestion Settings add test flow', () => {
 	before(() => {
@@ -26,8 +26,12 @@ describe('Index Suggestion Settings add test flow', () => {
 	});
 
 	it('Should Index suggestion settings page URL', () => {
-		cy.visit(`${base_url}/cluster/suggestions`).wait(PAGE_LOAD_TIME);
+		cy.server();
+		cy.route('**/preferences').as('preferences');
+		cy.visit(`${base_url}/cluster/suggestions`);
+		cy.wait('@preferences', { timeout: 30000 });
 		cy.get('.ant-tabs-nav .ant-tabs-tab:nth-child(3)').click();
+		cy.wait('@preferences', { timeout: 30000 });
 	});
 
 	it('Should Get Index Suggestions Settings Form Data', () => {
@@ -51,15 +55,18 @@ describe('Index Suggestion Settings add test flow', () => {
 				indices: payload.body.indices || ['*'],
 				categoryField: payload.body.categoryField || '',
 				urlField: payload.body.urlField || '',
+				includeFields: payload.body.includeFields || [],
+				excludeFields: payload.body.excludeFields || [],
 			};
-
-			cy.get('[data-cy=index-suggestions-indices]').click();
-			cy.get('.ant-select-dropdown .ant-select-item').each(($el, index) => {
-				if (index < payload.body.indices?.length - 1) {
-					cy.wrap($el).contains(payload.body.indices[index]);
-				}
-			});
-			cy.get('[data-cy=index-suggestions-indices]').blur();
+			if (indexSuggestions.indices.length) {
+				cy.get('[data-cy=index-suggestions-indices] .ant-select-selection-item').each(
+					($el, index) => {
+						if (index < payload.body.indices?.length - 1) {
+							cy.wrap($el).contains(payload.body.indices[index]);
+						}
+					},
+				);
+			}
 
 			cy.get('[data-cy=show-distinct-suggestions]').should(
 				'have.value',
@@ -78,13 +85,15 @@ describe('Index Suggestion Settings add test flow', () => {
 				JSON.stringify(indexSuggestions.applyStopwords),
 			);
 
-			cy.get('[data-cy=custom-stopwords]').click();
-			cy.get('.ant-select-dropdown .ant-select-item').each(($el, index) => {
-				if (index < payload.body.indices?.length - 1) {
-					cy($el).wrap(indexSuggestions.customStopwords[index]);
-				}
-			});
-			cy.get('[data-cy=custom-stopwords]').blur();
+			if (indexSuggestions.customStopwords.length) {
+				cy.get('[data-cy=custom-stopwords] .ant-select-selection-item').each(
+					($el, index) => {
+						if (index < payload.body.indices?.length - 1) {
+							cy.wrap($el).contains(indexSuggestions.customStopwords[index]);
+						}
+					},
+				);
+			}
 
 			cy.get('[data-cy=enable-synonyms]').should(
 				'have.value',
@@ -92,24 +101,28 @@ describe('Index Suggestion Settings add test flow', () => {
 			);
 			cy.get('[data-cy=index-suggestions-size]').should('have.value', indexSuggestions.size);
 
-			// cy.get('[data-cy=include-fields] > div > ul > li').each(($el, index) => {
-			// 	if (index < payload.body.indices?.length - 1) {
-			// 		expect($el).to.have.text(payload.body.includeFields[index]);
-			// 	}
-			// });
+			if (indexSuggestions.includeFields.length) {
+				cy.get('[data-cy=include-fields] .ant-select-selection-item').each(($el, index) => {
+					if (index < payload.body.indices?.length - 1) {
+						cy.wrap($el).contains(payload.body.includeFields[index]);
+					}
+				});
+			}
 
-			// cy.get('[data-cy=exclude-fields] > div > ul > li').each(($el, index) => {
-			// 	if (index < payload.body.indices?.length - 1) {
-			// 		expect($el).to.have.text(payload.body.excludeFields[index]);
-			// 	}
-			// });
+			if (indexSuggestions.excludeFields.length) {
+				cy.get('[data-cy=exclude-fields] .ant-select-selection-item').each(($el, index) => {
+					if (index < payload.body.indices?.length - 1) {
+						cy.wrap($el).contains(payload.body.excludeFields[index]);
+					}
+				});
+			}
 
-			// cy.get(
-			// 	'[data-cy=category-field] > div > div.ant-select-selection-selected-value',
-			// ).should('have.text', indexSuggestions.categoryField);
-			// cy.get(
-			// 	'[data-cy=url-index-setting] > div > div.ant-select-selection-selected-value',
-			// ).should('have.text', indexSuggestions.urlField);
+			if (indexSuggestions.categoryField) {
+				cy.get('[data-cy=category-field]').contains(indexSuggestions.categoryField);
+			}
+			if (indexSuggestions.urlField) {
+				cy.get('[data-cy=url-index-setting]').contains(indexSuggestions.urlField);
+			}
 		});
 	});
 	it('Should logout user', () => {

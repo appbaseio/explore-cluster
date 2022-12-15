@@ -25,7 +25,10 @@ describe('Popular Suggestion Settings add test flow', () => {
 	});
 
 	it('Should Popular suggestion settings page URL', () => {
-		cy.visit(`${base_url}/cluster/suggestions`).wait(2000);
+		cy.server();
+		cy.route('**/preferences').as('preferences');
+		cy.visit(`${base_url}/cluster/suggestions`);
+		cy.wait('@preferences', { timeout: 30000 });
 		cy.get('.ant-tabs-nav .ant-tabs-tab:nth-child(1)').click();
 	});
 
@@ -51,11 +54,15 @@ describe('Popular Suggestion Settings add test flow', () => {
 				indices: payload.body.indices || ['*'],
 				transformDiacritics: payload.body.transformDiacritics,
 			};
-			cy.get('[data-cy=popular-suggestions-indices] > div > ul > li').each(($el, index) => {
-				if (index < payload.body.indices?.length - 1) {
-					expect($el).to.have.text(payload.body.indices[index]);
-				}
-			});
+			if (popularSuggestions.indices.length) {
+				cy.get('[data-cy=popular-suggestions-indices] .ant-select-selection-item').each(
+					($el, index) => {
+						if (index < payload.body.indices?.length - 1) {
+							cy.wrap($el).contains(payload.body.indices[index]);
+						}
+					},
+				);
+			}
 
 			cy.get('[data-cy=number-of-days]').should(
 				'have.value',
@@ -75,13 +82,13 @@ describe('Popular Suggestion Settings add test flow', () => {
 				'have.value',
 				popularSuggestions.size,
 			);
-			cy.get('[data-cy=blacklist] > div.ant-select-selection__rendered > ul > li').each(
-				($el, index) => {
-					if (index < popularSuggestions.blacklist?.length - 1) {
-						expect($el).to.have.text(popularSuggestions.blacklist[index]);
+			if (popularSuggestions.blacklist.length) {
+				cy.get('[data-cy=blacklist] .ant-select-selection-item').each(($el, i) => {
+					if (i < popularSuggestions.blacklist?.length - 1) {
+						cy.wrap($el).contains(popularSuggestions.blacklist[i]);
 					}
-				},
-			);
+				});
+			}
 		});
 	});
 	it('Should logout user', () => {
