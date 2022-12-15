@@ -90,9 +90,9 @@
     lodash "^4.17.21"
     resize-observer-polyfill "^1.5.1"
 
-"@appbaseio-confidential/importer@git+https://1dc0d0fc07f05943afdde9bdb85b7aa438a0ce3b:x-oauth-basic@github.com/appbaseio-confidential/importer#52e5d32ec417df1893b994102b5f9d866071f84d":
+"@appbaseio-confidential/importer@git+https://1dc0d0fc07f05943afdde9bdb85b7aa438a0ce3b:x-oauth-basic@github.com/appbaseio-confidential/importer#5215c4ac95bf42babab6f2b70db4197beb6d1ec4":
   version "2.0.0-alpha.1"
-  resolved "git+https://1dc0d0fc07f05943afdde9bdb85b7aa438a0ce3b:x-oauth-basic@github.com/appbaseio-confidential/importer#52e5d32ec417df1893b994102b5f9d866071f84d"
+  resolved "git+https://1dc0d0fc07f05943afdde9bdb85b7aa438a0ce3b:x-oauth-basic@github.com/appbaseio-confidential/importer#5215c4ac95bf42babab6f2b70db4197beb6d1ec4"
   dependencies:
     antd "^3.18.2"
     appbase-js "^5.1.0"
