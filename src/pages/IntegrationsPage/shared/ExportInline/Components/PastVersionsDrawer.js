@@ -36,7 +36,7 @@ const PastVersionsDrawer = ({
 				<div className="title-container">
 					<Tooltip title={currentVersion.commit}>
 						<p
-							style={{ maxWidth: 180 }}
+							style={{ maxWidth: 300 }}
 							className="overflow-container commit-header-font"
 						>
 							{currentVersion.commit}
@@ -51,7 +51,7 @@ const PastVersionsDrawer = ({
 					/>
 					<Tooltip title={currentVersion.version_id}>
 						<p
-							style={{ maxWidth: 180 }}
+							style={{ maxWidth: 300 }}
 							className="overflow-container  versionid-header-font"
 						>
 							{currentVersion.version_id}

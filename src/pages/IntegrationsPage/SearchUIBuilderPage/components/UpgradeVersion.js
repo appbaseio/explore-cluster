@@ -6,6 +6,7 @@ import { css } from 'emotion';
 import { commitCode, generateInlineSandboxURL } from '../../utils/sandpack-generator';
 import { saveSearchPreference } from '../../../../batteries/modules/actions';
 import { transformPreferences } from '../../utils/index';
+import AppConstants from '../../../../batteries/modules/constants';
 
 const updateTemplateBannerStyles = css`
 	margin-bottom: 15px;
@@ -31,6 +32,7 @@ const UpgradeVersion = ({
 	getAllVersions,
 	setIsCodeCommitting,
 	isCodeCommitting,
+	updateVersionStateForPreference,
 }) => {
 	const handleCommitCode = async () => {
 		setIsCodeCommitting(true);
@@ -56,6 +58,16 @@ const UpgradeVersion = ({
 
 		commitCode(preferenceId, body)
 			.then((res) => {
+				updateVersionStateForPreference({
+					preferenceId,
+					patchPayload: {
+						currentVersion: {
+							version_id: res.version_id,
+							updated_at: res.updated_at || res.created_at,
+							commit: 'system commit: update the template code',
+						},
+					},
+				});
 				// update deployed code versionId in preferences with res.version_id
 				newPreferences.globalSettings.meta.deploySettings.versionId = res.version_id;
 				// Save the new preferences
@@ -130,9 +142,16 @@ UpgradeVersion.propTypes = {
 	getAllVersions: func,
 	setIsCodeCommitting: func,
 	isCodeCommitting: bool,
+	updateVersionStateForPreference: func.isRequired,
 };
 
 const mapDispatchToProps = (dispatch, props) => ({
+	updateVersionStateForPreference: (payload) =>
+		dispatch({
+			type: AppConstants.APP.UI_BUILDER.SEARCH_PREFERENCE_VERSIONS
+				.UPDATE_PREFERENCE_STATE_SUCCESS,
+			payload,
+		}),
 	updateSearchPreferences: (payload) =>
 		dispatch(saveSearchPreference(props.preferenceId, payload)),
 });
