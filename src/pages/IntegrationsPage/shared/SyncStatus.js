@@ -1,7 +1,7 @@
 import React from 'react';
 import { css } from 'emotion';
-import { ClockCircleOutlined } from '@ant-design/icons';
-import { Card, Button, Tooltip } from 'antd';
+import { BellOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { Card, Button, Tooltip, Badge } from 'antd';
 import get from 'lodash/get';
 import { string, object, func, bool } from 'prop-types';
 import { connect } from 'react-redux';
@@ -21,6 +21,7 @@ import DeployLogsModal from './ExportInline/Components/DeployLogsModal';
 import DeployModal from './ExportInline/Components/DeployModal';
 import PastVersionsDrawer from './ExportInline/Components/PastVersionsDrawer';
 import { transformContent } from './ExportInline/Components/ModalHeader';
+import UpgradeVersion from '../SearchUIBuilderPage/components/UpgradeVersion';
 
 const headerStyles = css`
 	b {
@@ -79,6 +80,8 @@ class SyncStatus extends React.Component {
 			allVersions: [],
 			themeType: '',
 			showPastVersionsDrawer: false,
+			showTemplateUpdateBanner: false,
+			showNotification: false,
 		};
 		this.fetchData();
 	}
@@ -95,6 +98,13 @@ class SyncStatus extends React.Component {
 		if (!isRecommendation) {
 			this.fetchAllVersions();
 			if (!Object.keys(deploymentStatus).length) this.fetchDeploymentStatus();
+
+			const templateVersionIdControl = form.get('templateVersionId');
+			const templateObj = getTemplate(themeType?.value || '');
+
+			templateVersionIdControl.valueChanges.subscribe((val) => {
+				this.handleTemplateVersionIdChanges(templateObj.version, val);
+			});
 		}
 	}
 
@@ -116,10 +126,17 @@ class SyncStatus extends React.Component {
 
 	handleThemeTypeChange = (value) => {
 		const { themeType } = this.state;
-		if (themeType !== value)
+		const { pipeline, form } = this.props;
+		if (themeType !== value) {
 			this.setState({
 				themeType: value,
 			});
+			const templateVersionIdControl = form.get('templateVersionId');
+			if (templateVersionIdControl.value && pipeline) {
+				const templateObj = getTemplate(value);
+				this.handleTemplateVersionIdChanges(templateObj.version, value);
+			}
+		}
 	};
 
 	handleTypeChange = (value) => {
@@ -280,6 +297,37 @@ class SyncStatus extends React.Component {
 			});
 	};
 
+	handleTemplateVersionIdChanges = (latestTemplateVersion, val) => {
+		if (val !== latestTemplateVersion)
+			this.setState({
+				showTemplateUpdateBanner: true,
+			});
+		else
+			this.setState({
+				showTemplateUpdateBanner: false,
+			});
+	};
+
+	renderNotificationBadge = () => {
+		const { showNotification } = this.state;
+		return showNotification ? (
+			<Badge dot>
+				<BellOutlined
+					onClick={() => {
+						this.setState({
+							showTemplateUpdateBanner: true,
+						});
+						this.setState({
+							showNotification: false,
+						});
+					}}
+				/>
+			</Badge>
+		) : (
+			<></>
+		);
+	};
+
 	render() {
 		const {
 			documents,
@@ -290,13 +338,18 @@ class SyncStatus extends React.Component {
 			allVersions,
 			themeType,
 			showPastVersionsDrawer,
+			showTemplateUpdateBanner,
 		} = this.state;
 		const {
 			form,
 			versionState,
 			preferenceId,
 			updateVersionStateForPreference,
+			getPreferencesPayload,
+			isSaveSearchLoading,
 			isRecommendation,
+			isCodeCommitting,
+			setIsCodeCommitting,
 		} = this.props;
 		const title = form.get('name') ? form.get('name').value : '';
 		const pipeline = form.get('pipeline') ? form.get('pipeline').value : '';
@@ -307,9 +360,26 @@ class SyncStatus extends React.Component {
 			deploymentStatus = {},
 		} = versionState[preferenceId] ?? {};
 		const status = deploymentStatus.status || deploymentStatus.state || '';
+		const templateVersionIdControl = form.get('templateVersionId');
+		const templateVersionId = templateVersionIdControl ? templateVersionIdControl.value : '';
 
 		return (
 			<Card>
+				{templateObj.version !== templateVersionId && showTemplateUpdateBanner ? (
+					<UpgradeVersion
+						getPreferencesPayload={getPreferencesPayload}
+						preferenceId={preferenceId}
+						form={form}
+						templateVersionId={templateObj.version}
+						setShowTemplateUpdateBanner={(val) =>
+							this.setState({ showTemplateUpdateBanner: val })
+						}
+						setShowNotification={(val) => this.setState({ showNotification: val })}
+						getAllVersions={this.fetchAllVersions}
+						isCodeCommitting={isCodeCommitting}
+						setIsCodeCommitting={setIsCodeCommitting}
+					/>
+				) : null}
 				{pipeline ? (
 					<div className={headerStyles}>
 						<Flex
@@ -338,7 +408,7 @@ class SyncStatus extends React.Component {
 							<Flex className="sub-part">
 								{themeType ? (
 									<>
-										<b>Search Template</b>
+										<b>Search Template {this.renderNotificationBadge()}</b>
 										<>{templateObj.label || themeType}</>
 									</>
 								) : null}
@@ -369,6 +439,7 @@ class SyncStatus extends React.Component {
 
 											<Button
 												type="primary"
+												disabled={isSaveSearchLoading || isCodeCommitting}
 												onClick={() => {
 													this.setState({ modalType: 'deploy-modal' });
 													this.fetchAllVersions();
@@ -447,7 +518,12 @@ class SyncStatus extends React.Component {
 SyncStatus.defaultProps = {
 	preferenceId: '',
 	versionState: {},
+	pipeline: '',
+	isSaveSearchLoading: false,
+	getPreferencesPayload: () => {},
 	isRecommendation: false,
+	isCodeCommitting: false,
+	setIsCodeCommitting: () => {},
 };
 
 SyncStatus.propTypes = {
@@ -461,12 +537,18 @@ SyncStatus.propTypes = {
 	updateSearchPreferences: func.isRequired,
 	getSearchPreferenceVersions: func.isRequired,
 	getDeploymentStatus: func.isRequired,
+	pipeline: string,
+	getPreferencesPayload: func,
+	isSaveSearchLoading: bool,
 	isRecommendation: bool,
+	isCodeCommitting: bool,
+	setIsCodeCommitting: func,
 };
 
 const mapStateToProps = (state, props) => ({
 	index: props.pipeline || get(state, '$getCurrentApp.name'),
 	versionState: get(state, '$getSearchPreferencesVersions.results', {}),
+	isSaveSearchLoading: get(state, '$saveSearchPreference.isFetching'),
 });
 const mapDispatchToProps = (dispatch) => ({
 	getSearchPreferences: () => dispatch(getSearchPreferencesAction()),

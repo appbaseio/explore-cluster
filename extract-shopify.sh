@@ -7,7 +7,7 @@ then
 fi
 
 jq -c '.[]' template-sources.json | while read i; do
-    # do stuff with $i
+    # do stuff with $i: object
     version=`echo ${i} | jq -r '.version'`
     commit=`echo ${i} | jq -r '.commit'`
     branch=`echo ${i} | jq -r '.branch'`
@@ -15,11 +15,7 @@ jq -c '.[]' template-sources.json | while read i; do
     repository=`echo ${i} | jq -r '.repository'`
     repositoryType=`echo ${i} | jq -r '.repositoryType'`
 
-    if [ $repositoryType == "private" ]
-    then
-        url="https://codeload.github.com/$organization/$repository/legacy.zip/refs/heads/$branch"
-        fileName="$repository@$branch"
-    elif [ ! -z "$version" ]
+    if [ ! -z "$version" ]
     then
         url="https://codeload.github.com/$organization/$repository/legacy.zip/refs/tags/$version"
         fileName="$repository@$version"
@@ -80,5 +76,3 @@ jq -c '.[]' template-sources.json | while read i; do
         fi
     fi
 done
-
-# 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

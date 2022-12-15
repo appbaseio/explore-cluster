@@ -3,7 +3,6 @@ import { css } from 'emotion';
 export const container = css`
 	padding: 50px;
 	position: relative;
-	margin-bottom: 100px;
 
 	.space-between {
 		display: flex;

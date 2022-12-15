@@ -185,6 +185,7 @@ class PreferencesFormWrapper extends React.Component {
 						// Search specific controls
 						resultHandleViewer: 'link',
 						versionId: '',
+						templateVersionId: '',
 						autoSuggestionSettings: FormBuilder.group({
 							enablePopularSuggestions: false,
 							enableRecentSearches: false,
@@ -656,6 +657,11 @@ class PreferencesFormWrapper extends React.Component {
 						currency: get(preferences, 'globalSettings.currency'),
 					},
 					versionId: get(preferences, 'globalSettings.meta.deploySettings.versionId', ''),
+					templateVersionId: get(
+						preferences,
+						'globalSettings.meta.templateSettings.templateVersionId',
+						'',
+					),
 					autosuggest: get(preferences, 'searchSettings.rsConfig.autosuggest'),
 					showSearchAs: get(preferences, 'searchSettings.showSearchAs', 'sticky'),
 					showVoiceSearch: get(preferences, 'searchSettings.rsConfig.showVoiceSearch'),
@@ -967,6 +973,11 @@ class PreferencesFormWrapper extends React.Component {
 										versionId: get(
 											preferences,
 											'globalSettings.meta.deploySettings.versionId',
+											'',
+										),
+										templateVersionId: get(
+											preferences,
+											'globalSettings.meta.templateSettings.templateVersionId',
 											'',
 										),
 										autosuggest: get(

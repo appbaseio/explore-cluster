@@ -47,6 +47,7 @@ const Main = ({ getPreferencesN, ...props }) => {
 	const preferenceId = props.match.params.id === 'new' ? uuidv4() : props.match.params.id;
 	const [isLoading, setIsLoading] = useState(true);
 	const [isEditorLoading, setIsEditorLoading] = useState(false);
+	const [isCodeCommitting, setIsCodeCommitting] = useState(false);
 
 	const closeForm = () => {
 		props.history.push('/cluster/search-builder');
@@ -69,6 +70,9 @@ const Main = ({ getPreferencesN, ...props }) => {
 								form={form}
 								pipeline={pipeline}
 								preferenceId={preferenceId}
+								getPreferencesPayload={getPreferencesPayload}
+								setIsCodeCommitting={setIsCodeCommitting}
+								isCodeCommitting={isCodeCommitting}
 							/>
 							<div
 								style={{
@@ -157,6 +161,7 @@ const Main = ({ getPreferencesN, ...props }) => {
 									getPreferencesPayload={getPreferencesPayload}
 									closeForm={closeForm}
 									history={props.history}
+									isCodeCommitting={isCodeCommitting}
 								/>
 							</div>
 						</>
