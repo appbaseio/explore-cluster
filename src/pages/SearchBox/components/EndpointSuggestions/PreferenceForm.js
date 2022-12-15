@@ -18,7 +18,7 @@ import styles from '../styles';
 import CodeEditor from './CodeEditor';
 import TextInput from '../../../../components/Form/Input';
 import CodeEditorModal from './CodeEditorModal';
-import { FormContext } from '../../../IntegrationsPage/utils';
+import { FormContext } from '../../../IntegrationsPage/utils/utils';
 import { FUNCTION_EDITOR_TABS_KEYS } from '../DesignAndLayout/SearchBoxPreview/AddSuggestionModal/FunctionEditor';
 import { getURL } from '../../../../constants/config';
 import { isJson } from '../../../../components/ScriptConsole/utils';

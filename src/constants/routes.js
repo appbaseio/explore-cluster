@@ -155,11 +155,10 @@ export const CLUSTER_ROUTES = {
 		icon: 'control',
 		action: ALLOWED_ACTIONS.UI_BUILDER,
 		menu: [
-			{ label: 'Search', link: '/cluster/search-builder', openIndexMenu: true },
+			{ label: 'Search', link: '/cluster/search-builder' },
 			{
 				label: 'Recommendations',
 				link: '/cluster/recommendations-builder',
-				openIndexMenu: true,
 			},
 			{
 				label: 'Searchbox',

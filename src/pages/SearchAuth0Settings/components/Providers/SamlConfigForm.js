@@ -7,7 +7,7 @@ import { FieldControl, FieldGroup } from 'react-reactive-form';
 import Monaco from '../../../../batteries/components/SearchSandbox/containers/MonacoEditor';
 import Flex from '../../../../batteries/components/shared/Flex';
 import Grid from '../../../../components/CreateCredentials/Grid';
-import { FormContext } from '../../../IntegrationsPage/utils';
+import { FormContext } from '../../../IntegrationsPage/utils/utils';
 
 const Messages = {
 	name: 'Name of the Auth application',

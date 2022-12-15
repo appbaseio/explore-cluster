@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Layout } from 'antd';
 import { connect } from 'react-redux';
 
+// eslint-disable-next-line import/no-cycle
 import AppHeader from '../AppHeader';
 import AppsRouteContainer from './AppsRouteContainer';
 import { clearCurrentApp } from '../../batteries/modules/actions';
