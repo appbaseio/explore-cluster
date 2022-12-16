@@ -104,6 +104,8 @@ function IndexSwitcher({
 				</Tooltip>
 			}
 			title={getTitle()}
+			okButtonProps={{ style: { display: 'none' } }}
+			cancelButtonProps={{ style: { display: 'none' } }}
 			disabled={sessionData && disablePopover}
 		>
 			{renderItem ? renderItem() : <LabelTag item={item} />}
