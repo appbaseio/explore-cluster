@@ -38,7 +38,7 @@ class Permission extends React.Component {
 							<Button
 								disabled={!hasEditAccess}
 								onClick={this.handleEditCred}
-								type="normal"
+								type="default"
 							>
 								Update
 							</Button>

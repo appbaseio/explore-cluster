@@ -357,7 +357,7 @@ class RoleBaseAccess extends React.Component {
 														border: 0,
 														background: 'transparent',
 													}}
-													type="normal"
+													type="default"
 													onClick={() => this.showKey(value.username)}
 												>
 													{visibleKey[value.username] ? (
