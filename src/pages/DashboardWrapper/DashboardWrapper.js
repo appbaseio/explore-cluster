@@ -396,7 +396,7 @@ class DashboardWrapper extends Component {
 		return (
 			<Layout>
 				<Sider
-					width={260}
+					width={284}
 					collapsible
 					collapsed={collapsed}
 					onCollapse={this.onCollapse}
@@ -568,7 +568,7 @@ class DashboardWrapper extends Component {
 					css={{
 						paddingTop: showHeader ? 60 : 0,
 						minHeight: '100vh',
-						marginLeft: collapsed ? '80px' : '260px',
+						marginLeft: collapsed ? '80px' : '284px',
 						overflowY: 'auto',
 					}}
 				>

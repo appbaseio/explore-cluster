@@ -398,7 +398,7 @@ class AppWrapper extends Component {
 		return (
 			<Layout>
 				<Sider
-					width={260}
+					width={284}
 					className={sidebarStyles}
 					collapsible
 					collapsed={collapsed}

@@ -83,9 +83,9 @@ const AppHeader = ({
 			<Header
 				className={headerStyles(val)}
 				css={{
-					width: big ? 'calc(100% - 80px)' : 'calc(100% - 260px)',
+					width: big ? 'calc(100% - 80px)' : 'calc(100% - 284px)',
 					justifyContent: minimal ? 'flex-end !important' : 'space-between',
-					left: big ? '80px' : '260px',
+					left: big ? '80px' : '284px',
 				}}
 			>
 				{minimal ? (
