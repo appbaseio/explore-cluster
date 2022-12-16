@@ -65,7 +65,7 @@ const ModalHeader = ({
 	match,
 	updatedCode,
 	uiBuilderName,
-	handleSave,
+
 	collapsed,
 	setIsCollapsed,
 	modalType,
@@ -197,7 +197,7 @@ const ModalHeader = ({
 					getSearchPreferenceVersions(preferenceId);
 					getSearchPreferences();
 				});
-				message.info('Code is committed successfully');
+				message.info('Code is committed successfully!');
 			})
 			.catch((err) => {
 				console.error('Error to commit code', err);
@@ -320,7 +320,6 @@ const ModalHeader = ({
 						<CloseOutlined
 							onClick={() => {
 								history.push(`/cluster/search-builder/${preferenceId}`);
-								handleSave();
 							}}
 						/>
 					</div>
@@ -417,7 +416,6 @@ ModalHeader.propTypes = {
 	match: PropTypes.object.isRequired,
 	uiBuilderName: PropTypes.string,
 	updatedCode: PropTypes.object,
-	handleSave: PropTypes.func,
 	setIsCollapsed: PropTypes.func,
 	collapsed: PropTypes.bool,
 	modalType: PropTypes.string,
@@ -436,7 +434,6 @@ ModalHeader.propTypes = {
 
 ModalHeader.defaultProps = {
 	updatedCode: {},
-	handleSave: () => {},
 	setIsCollapsed: () => {},
 	uiBuilderName: '',
 	collapsed: false,
