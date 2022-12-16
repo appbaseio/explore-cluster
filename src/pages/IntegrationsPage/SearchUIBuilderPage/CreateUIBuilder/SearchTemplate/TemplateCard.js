@@ -54,7 +54,7 @@ const TemplateCard = ({ template, selectedTemplate, setSelectedTemplate }) => {
 			</Card>
 			<Modal
 				title="Preview"
-				visible={visible}
+				open={visible}
 				className={modalStyles}
 				onCancel={handleCancel}
 				footer={null}

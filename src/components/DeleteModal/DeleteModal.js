@@ -41,11 +41,11 @@ class DeleteModal extends React.Component {
 					title={title}
 					okButtonProps={{
 						disabled: !isMatching,
-						type: 'danger',
+						danger: true,
 					}}
 					okText="Delete"
 					onOk={this.handleOk}
-					visible={isVisible}
+					open={isVisible}
 					onCancel={this.handleVisibility}
 				>
 					<Typography.Paragraph>

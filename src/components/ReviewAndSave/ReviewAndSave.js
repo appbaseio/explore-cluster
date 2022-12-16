@@ -1067,7 +1067,7 @@ class ReviewAndSave extends React.Component {
 					</div>
 				</div>
 				<Modal
-					visible={isOpen}
+					open={isOpen}
 					title={
 						isResetting
 							? 'Reset To Default Settings'

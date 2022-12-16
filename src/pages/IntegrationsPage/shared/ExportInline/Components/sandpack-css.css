@@ -222,7 +222,7 @@
 	color: #90e86f;
 	border-bottom: 1px solid #90e86f;
 }
-.dark-theme-wrapper .ant-input-affix-wrapper{
+.dark-theme-wrapper .ant-input-affix-wrapper {
 	background-color: #343434;
 }
 .dark-theme-wrapper .ant-input {
@@ -244,21 +244,29 @@
 }
 .dark-theme-wrapper .header-container {
 	color: #fff;
-	background: rgb(21,21,21);
+	background: rgb(21, 21, 21);
 }
 .dark-theme-wrapper .sp-layout {
-	background: rgb(21,21,21);
+	background: rgb(21, 21, 21);
 	border: none;
 }
 .dark-theme-wrapper .sp-tabs-scrollable-container {
 	color: #fff;
-	background: rgb(21,21,21);
+	background: rgb(21, 21, 21);
 }
 .dark-theme-wrapper .sp-loading {
 	background-color: #151515;
 }
+/*Reset disabled button styles to antd v4*/
+.right-partition .ant-btn:disabled {
+	background: #f5f5f5;
+	border-color: #d9d9d9;
+	box-shadow: none;
+	color: rgba(0, 0, 0, 0.25);
+	text-shadow: none;
+}
 .light-theme-wrapper .header-container {
-	color: rgba(0,0,0,0.65);
+	color: rgba(0, 0, 0, 0.65);
 	background: #fff;
 }
 .sp-tab-button[data-active='true'] {

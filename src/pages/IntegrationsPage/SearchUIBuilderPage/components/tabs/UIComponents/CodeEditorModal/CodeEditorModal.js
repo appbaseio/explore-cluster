@@ -7,7 +7,7 @@ function CodeEditorModal({ visible, onSave, onCancel, width, slot, header, ...pr
 	const [code, setCode] = useState('');
 	return (
 		<Modal
-			visible={visible}
+			open={visible}
 			onOk={() => onSave(code)}
 			onCancel={() => onCancel()}
 			okText="Save"

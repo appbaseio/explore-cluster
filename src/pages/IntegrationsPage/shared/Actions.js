@@ -75,7 +75,7 @@ class Actions extends React.Component {
 						placement="topLeft"
 						title={isRecommendation ? `Edit Recommendation UI` : `Edit Search UI`}
 					>
-						<Button onClick={this.handleEdit} type="normal">
+						<Button onClick={this.handleEdit} type="default">
 							View
 						</Button>
 					</Tooltip>
@@ -87,7 +87,7 @@ class Actions extends React.Component {
 							onClick={() => {
 								this.setState({ modalType: 'deploy-logs' });
 							}}
-							type="normal"
+							type="default"
 						>
 							Deploy Status
 						</Button>

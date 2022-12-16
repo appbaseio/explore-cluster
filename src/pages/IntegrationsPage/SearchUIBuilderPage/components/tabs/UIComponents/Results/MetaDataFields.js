@@ -163,6 +163,7 @@ function MetaDataFields({
 							</Col>
 							<Col xs={8}>
 								<AutoComplete
+									style={{ width: '100%' }}
 									filterOption={(inputValue, option) => {
 										if (
 											option.props.children &&

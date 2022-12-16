@@ -157,12 +157,7 @@ const StripeForm = ({
 					Update Payment Method
 				</Button>
 			)}
-			<Modal
-				title={mainTitle}
-				visible={isShowingModal}
-				footer={null}
-				onCancel={cancelHandler}
-			>
+			<Modal title={mainTitle} open={isShowingModal} footer={null} onCancel={cancelHandler}>
 				<Wrapper>
 					<form>
 						<label>
@@ -200,7 +195,7 @@ const StripeForm = ({
 								{buttonTitle}
 							</Button>
 							<Button
-								type="danger"
+								danger
 								block
 								onClick={cancelHandler}
 								htmlType="button"

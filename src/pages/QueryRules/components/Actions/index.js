@@ -267,7 +267,7 @@ class Actions extends React.Component {
 									<div>
 										<Button
 											size="small"
-											type="danger"
+											danger
 											ghost
 											onClick={() => this.deleteAction(item.type)}
 											className="delete-icon"

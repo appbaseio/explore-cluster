@@ -72,7 +72,7 @@ const EndpointModal = ({ showForm, setShowForm, customFields, setCustomFields, c
 		<FieldGroup control={newForm.current} strict={false}>
 			{() => (
 				<Modal
-					visible={showForm}
+					open={showForm}
 					onOk={() => {
 						handleCustomFields();
 					}}

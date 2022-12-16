@@ -82,7 +82,7 @@ const FieldRow = ({
 					)}
 					<Button
 						className="delete-btn"
-						type="danger"
+						danger
 						size="small"
 						onClick={() => onDelete(path)}
 					>

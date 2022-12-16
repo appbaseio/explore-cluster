@@ -205,7 +205,7 @@ const ReviewAndSave = ({
 				</Button>
 			</div>
 			<Modal
-				visible={isOpen}
+				open={isOpen}
 				title="Review Settings Before Saving"
 				onOk={handleSave}
 				width={1000}

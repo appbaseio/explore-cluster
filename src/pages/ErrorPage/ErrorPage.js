@@ -69,7 +69,7 @@ class ErrorPage extends React.Component {
 					</Button>
 					<Button
 						size="large"
-						type="danger"
+						danger
 						style={{ marginLeft: '8' }}
 						onClick={() => {
 							Sentry.showReportDialog();

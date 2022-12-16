@@ -92,7 +92,7 @@ const AddFilter = (props) => {
 						tokenSeparators={[',']}
 						style={{ width: '100%' }}
 						value={value[item] || []}
-						dropdownClassName={hideDropdown}
+						popupClassName={hideDropdown}
 						placeholder="Press enter to add more values"
 						onChange={(dropdownValue) => handleDropdown(item, dropdownValue)}
 						data-cy="filter-values"
@@ -104,7 +104,7 @@ const AddFilter = (props) => {
 						size="small"
 						shape="circle"
 						ghost
-						type="danger"
+						danger
 						onClick={() => deleteItem(item)}
 						icon={<CloseOutlined />}
 					/>

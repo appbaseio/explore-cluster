@@ -72,7 +72,7 @@ class SearchPreviewModal extends React.Component {
 					className={modalStyles}
 					onCancel={this.toggleVisibilty}
 					destroyOnClose
-					visible={visible}
+					open={visible}
 				>
 					<SearchPreview
 						app={app}

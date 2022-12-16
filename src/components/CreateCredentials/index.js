@@ -474,7 +474,7 @@ class CreateCredentials extends React.Component {
 										</Button>,
 								  ]
 						}
-						visible={show}
+						open={show}
 						onCancel={handleCancel}
 						width="750px"
 					>
@@ -482,7 +482,7 @@ class CreateCredentials extends React.Component {
 							<Loader style={{ marginTop: '-100px', marginBottom: '120px' }} />
 						) : (
 							<React.Fragment>
-								<fieldset disabled={readOnly}>
+								<fieldset style={{ border: 0 }} disabled={readOnly}>
 									<div style={{ position: 'relative' }}>
 										{isUserManagement && (
 											<React.Fragment>

@@ -40,10 +40,6 @@ const detailsModalCss = css`
 				color: rgb(95, 15, 36);
 			}
 		}
-
-		.action-btn {
-			color: white;
-		}
 	}
 `;
 
@@ -96,7 +92,7 @@ const ViewDetailsModal = ({
 	return (
 		<Modal
 			className={detailsModalCss}
-			visible={visible}
+			open={visible}
 			onCancel={handleClose}
 			footer={null}
 			title="User Details"
@@ -160,11 +156,7 @@ const ViewDetailsModal = ({
 								<h3>{title}</h3>
 								<p>{description}</p>
 							</Flex>
-							<Button
-								onClick={buttonClickHandler}
-								className="action-btn"
-								type="danger"
-							>
+							<Button onClick={buttonClickHandler} className="action-btn" danger>
 								{buttonText}
 							</Button>
 						</Flex>

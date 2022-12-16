@@ -127,7 +127,7 @@ const DeployModal = ({
 	return (
 		<Modal
 			title={<div style={{ fontWeight: 'bold' }}>Deploy {uiBuilderName}</div>}
-			visible={open}
+			open={open}
 			afterClose={() => {
 				setDeployObj({
 					...defaultObj,

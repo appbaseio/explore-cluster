@@ -169,7 +169,7 @@ class PreviewModal extends React.Component {
 							</span>
 						</div>
 					}
-					visible={visible}
+					open={visible}
 					okText="Save"
 					onOk={this.handleOk}
 					onCancel={this.handleCancel}

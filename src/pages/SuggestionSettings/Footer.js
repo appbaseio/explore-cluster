@@ -93,7 +93,7 @@ const Footer = ({ originalData, tab, changedData, collapsed, apps }) => {
 						filteredApps={filteredApps}
 						onSelect={(e) => onAppSelect(e)}
 						onCancel={() => toggleVisibility()}
-						visible={visible}
+						open={visible}
 						app={app}
 						page="suggestions"
 					/>

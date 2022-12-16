@@ -21,7 +21,7 @@ class AppLayout extends React.PureComponent {
 				style={{
 					paddingTop: showHeader ? 60 : 0,
 					minHeight: '100vh',
-					marginLeft: collapsed ? '80px' : '260px',
+					marginLeft: collapsed ? '80px' : '284px',
 					position: 'relative',
 					overflowY: 'auto',
 				}}

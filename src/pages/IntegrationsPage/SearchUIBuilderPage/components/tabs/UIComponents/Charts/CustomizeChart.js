@@ -167,7 +167,7 @@ class CustomizeChart extends React.Component {
 						return (
 							<Modal
 								title="Set Chart"
-								visible={visible}
+								open={visible}
 								onOk={this.handleOk}
 								onCancel={this.handleCancel}
 								okButtonProps={{

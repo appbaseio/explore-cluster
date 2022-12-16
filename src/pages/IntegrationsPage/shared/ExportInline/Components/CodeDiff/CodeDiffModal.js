@@ -7,7 +7,7 @@ const CodeDiffModal = ({ open, handleCancel, oldCode, newCode, currentVersion, t
 	return (
 		<div>
 			<Modal
-				visible={open}
+				open={open}
 				onCancel={handleCancel}
 				footer={null}
 				title="Code Changes"

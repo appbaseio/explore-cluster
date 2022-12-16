@@ -216,7 +216,7 @@ const ReviewAndSave = ({ oldData, newData, isLoading }) => {
 				</Button>
 			</div>
 			<Modal
-				visible={isOpen}
+				open={isOpen}
 				title="Review Settings Before Saving"
 				onOk={() => {
 					saveTemplate();

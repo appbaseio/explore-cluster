@@ -180,7 +180,7 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 						<h3>Live Preview</h3>
 					</div>
 				}
-				visible={showLivePreview}
+				open={showLivePreview}
 				onCancel={() => {
 					setShowLivePreview(false);
 

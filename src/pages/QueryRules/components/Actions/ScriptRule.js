@@ -188,7 +188,7 @@ const ScriptRule = ({
 						content={
 							<span style={{ color: '#ff4d4f' }}>Please fill key/ value pair.</span>
 						}
-						visible={envPopoverVisible}
+						open={envPopoverVisible}
 						overlayStyle={{ opacity: '0.9' }}
 						trigger="click"
 						placement="top"
@@ -200,7 +200,7 @@ const ScriptRule = ({
 			{isScriptConsoleOpen && (
 				<Modal
 					className="script-console-modal"
-					visible={isScriptConsoleOpen}
+					open={isScriptConsoleOpen}
 					closable={false}
 					title={
 						<Popconfirm

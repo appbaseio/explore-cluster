@@ -119,7 +119,7 @@ class Search extends React.Component {
 						)}
 					</Col>
 					{page !== 'rules' && (
-						<Col xs={4}>
+						<Col xs={4} style={{ paddingBottom: 14 }}>
 							<Link
 								onClick={
 									window.location.pathname === `/app/${app}/search`

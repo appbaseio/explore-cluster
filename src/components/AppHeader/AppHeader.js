@@ -83,9 +83,9 @@ const AppHeader = ({
 			<Header
 				className={headerStyles(val)}
 				css={{
-					width: big ? 'calc(100% - 80px)' : 'calc(100% - 260px)',
+					width: big ? 'calc(100% - 80px)' : 'calc(100% - 284px)',
 					justifyContent: minimal ? 'flex-end !important' : 'space-between',
-					left: big ? '80px' : '260px',
+					left: big ? '80px' : '284px',
 				}}
 			>
 				{minimal ? (
@@ -126,7 +126,7 @@ const AppHeader = ({
 				{isUsingTrial && showProfile() && (
 					<div style={{ marginRight: 20 }}>
 						<Tooltip title="You are currently on a trial which unlocks all the reactivesearch.io enterprise plan features. You can upgrade to a paid plan anytime till the trial expires. Once your trial expires, you won't be able to access reactivesearch.io.">
-							<Button css={trialBtn} type="danger" href="/cluster/billing">
+							<Button css={trialBtn} danger href="/cluster/billing">
 								<span css={trialText}>
 									{daysLeft > 0
 										? `Trial expires in ${daysLeft} ${

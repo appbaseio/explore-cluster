@@ -36,7 +36,7 @@ const SearchPreviewSwitcher = ({ app, filteredApps, onCancel, onSelect, visible,
 					className={modalStyles}
 					onCancel={onCancel}
 					destroyOnClose
-					visible={visible}
+					open={visible}
 				>
 					<SearchPreview
 						app={app}

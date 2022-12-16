@@ -96,7 +96,7 @@ const ThemePreview = () => {
 			>
 				<Tooltip
 					onVisibleChange={(visible) => handleTooltipChange('root.navbar', visible)}
-					visible={tooltipState.root.navbar.value}
+					open={tooltipState.root.navbar.value}
 					title="Navbar color"
 				>
 					<Navbar style={{ backgroundColor: form.value.navbarBackgroundColor }}>
@@ -104,7 +104,7 @@ const ThemePreview = () => {
 							onVisibleChange={(visible) =>
 								handleTooltipChange('root.navbar.loginButton', visible)
 							}
-							visible={tooltipState.root.navbar.loginButton.value}
+							open={tooltipState.root.navbar.loginButton.value}
 							title="Accent color"
 							placement="topRight"
 						>
@@ -121,7 +121,7 @@ const ThemePreview = () => {
 				</Tooltip>
 				<Tooltip
 					onVisibleChange={(visible) => handleTooltipChange('root.content', visible)}
-					visible={tooltipState.root.content.value}
+					open={tooltipState.root.content.value}
 					title="Body background color"
 					placement="bottom"
 				>
@@ -130,7 +130,7 @@ const ThemePreview = () => {
 							onVisibleChange={(visible) =>
 								handleTooltipChange('root.content.resultCard', visible)
 							}
-							visible={tooltipState.root.content.resultCard.value}
+							open={tooltipState.root.content.resultCard.value}
 							title="Font family, title color gets applied here"
 							placement="bottom"
 						>
@@ -142,7 +142,7 @@ const ThemePreview = () => {
 											visible,
 										)
 									}
-									visible={tooltipState.root.content.resultCard.title.value}
+									open={tooltipState.root.content.resultCard.title.value}
 									title="Title color"
 									placement="topLeft"
 								>
@@ -160,7 +160,7 @@ const ThemePreview = () => {
 											visible,
 										)
 									}
-									visible={tooltipState.root.content.resultCard.description.value}
+									open={tooltipState.root.content.resultCard.description.value}
 									title="Text color"
 									placement="bottom"
 								>
@@ -173,7 +173,7 @@ const ThemePreview = () => {
 									onVisibleChange={(visible) =>
 										handleTooltipChange('root.content.resultCard.link', visible)
 									}
-									visible={tooltipState.root.content.resultCard.link.value}
+									open={tooltipState.root.content.resultCard.link.value}
 									title="Link color"
 									placement="topLeft"
 								>

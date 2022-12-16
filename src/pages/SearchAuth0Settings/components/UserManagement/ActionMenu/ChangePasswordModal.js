@@ -63,7 +63,7 @@ const ChangePasswordModal = ({ visible, handleClose, handleChangePassword, isLoa
 	return (
 		<Modal
 			className={changePasswordCss}
-			visible={visible}
+			open={visible}
 			onCancel={handleClose}
 			title={<h3>Change password</h3>}
 			width="max(50vw, 300px)"

@@ -168,7 +168,7 @@ class CustomizeFilter extends React.Component {
 						return (
 							<Modal
 								title="Set A Custom Facet"
-								visible={visible}
+								open={visible}
 								onOk={this.handleOk}
 								onCancel={this.handleCancel}
 								okButtonProps={{

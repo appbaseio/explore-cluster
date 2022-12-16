@@ -294,6 +294,7 @@ const ModalHeader = ({
 						<Button
 							disabled={JSON.stringify(initialCode) === JSON.stringify(updatedCode)}
 							onClick={() => setModalType('commit')}
+							type="default"
 						>
 							Commit
 						</Button>

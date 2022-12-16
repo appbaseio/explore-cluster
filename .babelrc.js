@@ -16,11 +16,6 @@ const presets = [
 	],
 ];
 
-const plugins = [
-	'emotion',
-	'@babel/plugin-proposal-class-properties',
-	'syntax-dynamic-import',
-	['import', { libraryName: 'antd', libraryDirectory: 'es', style: true }],
-];
+const plugins = ['emotion', '@babel/plugin-proposal-class-properties', 'syntax-dynamic-import'];
 
 module.exports = { presets, plugins };

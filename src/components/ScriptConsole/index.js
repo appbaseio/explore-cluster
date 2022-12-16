@@ -745,7 +745,7 @@ const ScriptConsole = ({
 						</Tooltip>
 					</h3>
 					<Tooltip
-						visible={isNewScriptRule.current}
+						open={isNewScriptRule.current}
 						placement="top"
 						title="Choose a template to start with!"
 					>

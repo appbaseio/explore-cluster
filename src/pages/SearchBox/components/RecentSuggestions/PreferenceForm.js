@@ -71,11 +71,11 @@ function PreferenceForm() {
 										</p>
 									}
 									component={
-										<div>
+										<div style={{ margin: 'auto 0px' }}>
 											<InputNumber
 												{...handler()}
 												className={showError ? 'input-error' : ''}
-												style={{ width: '100%' }}
+												style={{ width: '100%', margin: 'auto' }}
 												defaultValue={value}
 												value={value}
 												min={0}
@@ -105,11 +105,11 @@ function PreferenceForm() {
 										</p>
 									}
 									component={
-										<div>
+										<div style={{ margin: 'auto 0px' }}>
 											<InputNumber
 												{...handler()}
 												className={showError ? 'input-error' : ''}
-												style={{ width: '100%' }}
+												style={{ width: '100%', margin: 'auto' }}
 												defaultValue={value}
 												value={value}
 												min={0}
@@ -145,11 +145,11 @@ function PreferenceForm() {
 										</p>
 									}
 									component={
-										<div>
+										<div style={{ margin: 'auto 0px' }}>
 											<InputNumber
 												{...handler()}
 												className={showError ? 'input-error' : ''}
-												style={{ width: '100%' }}
+												style={{ width: '100%', margin: 'auto' }}
 												defaultValue={value}
 												value={value}
 												min={0}
@@ -187,7 +187,7 @@ function PreferenceForm() {
 										</p>
 									}
 									component={
-										<div>
+										<div style={{ margin: 'auto 0px' }}>
 											<IndexMultiSelect
 												className={errors?.required ? 'select-error' : ''}
 												{...handler()}

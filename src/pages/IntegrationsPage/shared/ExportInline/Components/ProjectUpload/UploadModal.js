@@ -35,7 +35,7 @@ const UploadModal = ({
 
 			<Modal
 				title="Upload Project"
-				visible={open}
+				open={open}
 				onOk={handleOK}
 				okText="Upload"
 				onCancel={() => {

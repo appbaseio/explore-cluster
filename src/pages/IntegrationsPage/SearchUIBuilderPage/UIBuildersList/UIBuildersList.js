@@ -12,7 +12,6 @@ import { Table, Card, Button } from 'antd';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import Actions from '../../shared/Actions';
-import Loader from '../../../../batteries/components/shared/Loader/Spinner';
 import Container from '../../../../components/Container';
 import { displayErrors } from '../../../../batteries/utils/helpers';
 import usePrevious from '../../../../batteries/hooks/usePrevious';
@@ -125,12 +124,10 @@ const List = ({
 						handleEdit,
 						handleDelete,
 					}))}
-					loading={{
-						indicator: <Loader />,
-						spinning: isFetchingPreferences || isDeletingPreference,
-					}}
+					loading={isFetchingPreferences || isDeletingPreference}
 					rowKey={(row) => row.id}
 					columns={columns}
+					style={{ overflow: 'auto', width: '100%' }}
 					css={tableCls}
 				/>
 			</Card>

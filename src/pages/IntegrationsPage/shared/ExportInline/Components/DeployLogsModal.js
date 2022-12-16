@@ -100,7 +100,7 @@ const DeployLogsModal = ({ open, handleCancel, deploymentStatus, uiBuilderName, 
 		<div css={deployModalStyles}>
 			<Modal
 				title={<div style={{ fontWeight: 'bold' }}>Deploy Status</div>}
-				visible={open}
+				open={open}
 				onOk={() => handleCancel()}
 				onCancel={() => handleCancel()}
 				footer={null}

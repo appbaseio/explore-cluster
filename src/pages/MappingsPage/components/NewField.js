@@ -97,7 +97,7 @@ class NewField extends React.Component {
 					style={{
 						maxWidth: '800px',
 					}}
-					visible={isVisible}
+					open={isVisible}
 					onOk={this.addField}
 					onCancel={this.handleVisible}
 					okButtonProps={{
