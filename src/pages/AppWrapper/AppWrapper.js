@@ -475,9 +475,10 @@ class AppWrapper extends Component {
 										<SubMenu key={route} title={Title}>
 											{routes[route].menu.map((item) => {
 												if (
-													item.link.includes(
+													(item.link.includes(
 														'configure-search-engine-backend',
-													) &&
+													) ||
+														item.link.includes('data-usage')) &&
 													(backendImage !== 'sls' ||
 														backend === BACKENDS.FUSION.name ||
 														backend === BACKENDS.MARKLOGIC.name)
