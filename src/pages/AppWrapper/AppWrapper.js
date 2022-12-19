@@ -120,7 +120,8 @@ class AppWrapper extends Component {
 										tag: 'Beta',
 									},
 									...(backend === BACKENDS.ELASTICSEARCH.name ||
-									backend === BACKENDS.OPENSEARCH.name
+									backend === BACKENDS.OPENSEARCH.name ||
+									backend === BACKENDS.SYSTEM.name
 										? [
 												{
 													label: 'Recommendations',
@@ -161,7 +162,8 @@ class AppWrapper extends Component {
 										link: '/cluster/credentials',
 									},
 									...(backend === BACKENDS.ELASTICSEARCH.name ||
-									backend === BACKENDS.OPENSEARCH.name
+									backend === BACKENDS.OPENSEARCH.name ||
+									backend === BACKENDS.SYSTEM.name
 										? [
 												{
 													label: 'Role Based Access',
@@ -264,7 +266,8 @@ class AppWrapper extends Component {
 												tag: 'Beta',
 											},
 											...(backend === BACKENDS.ELASTICSEARCH.name ||
-											backend === BACKENDS.OPENSEARCH.name
+											backend === BACKENDS.OPENSEARCH.name ||
+											backend === BACKENDS.SYSTEM.name
 												? [
 														{
 															label: 'Recommendations',
@@ -305,7 +308,8 @@ class AppWrapper extends Component {
 												link: '/cluster/credentials',
 											},
 											...(backend === BACKENDS.ELASTICSEARCH.name ||
-											backend === BACKENDS.OPENSEARCH.name
+											backend === BACKENDS.OPENSEARCH.name ||
+											backend === BACKENDS.SYSTEM.name
 												? [
 														{
 															label: 'Role Based Access',
