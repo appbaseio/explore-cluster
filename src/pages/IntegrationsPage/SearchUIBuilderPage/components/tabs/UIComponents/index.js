@@ -38,7 +38,7 @@ const UIComponents = ({ getPreferencesPayload, getPreferences, setIsEditorLoadin
 		const destinationPosition = index.destination.index;
 		if (form.get(field)) {
 			const filtersControl = form.get(field);
-			const control = filtersControl[sourcePosition];
+			const control = filtersControl.at(sourcePosition);
 			filtersControl.removeAt(sourcePosition);
 			filtersControl.insert(destinationPosition, control);
 		}
