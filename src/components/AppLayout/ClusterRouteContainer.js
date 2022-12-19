@@ -30,9 +30,16 @@ const PipelinesPage = Loadable({
 	loading: Loader,
 });
 const PipelinesInsightsPage = Loadable({
-	loader: () => import(/* webpackChunkName: "Pipelines" */ '../../pages/PipelinesInsights'),
+	loader: () =>
+		import(/* webpackChunkName: "PipelinesInsightsPage" */ '../../pages/PipelinesInsights'),
 	loading: Loader,
 });
+
+const DataUsagePage = Loadable({
+	loader: () => import(/* webpackChunkName: "DataUsagePage" */ '../../pages/DataUsage'),
+	loading: Loader,
+});
+
 const PipelineLogsPage = Loadable({
 	loader: () => import(/* webpackChunkName: "PipelineLogsPage" */ '../../pages/PipelineLogs'),
 	loading: Loader,
@@ -222,7 +229,8 @@ class ClusterRouteContainer extends React.Component {
 	}
 
 	render() {
-		const { allowedRoutes, backend, backendImage } = this.props;
+		const { allowedRoutes, backend, backendImage, isPlanLoading } = this.props;
+
 		return (
 			<ErrorPage {...this.props}>
 				<Switch>
@@ -463,6 +471,20 @@ class ClusterRouteContainer extends React.Component {
 					/>
 					<Route
 						exact
+						path="/cluster/data-usage"
+						render={(props) => (
+							<>
+								{get(allowedRoutes, '/cluster/data-usage') &&
+								(isPlanLoading || backendImage === 'sls') ? (
+									<AppPageContainer {...props} component={DataUsagePage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
+						)}
+					/>
+					<Route
+						exact
 						path="/cluster/mappings"
 						render={(props) => (
 							<>
@@ -694,6 +716,7 @@ class ClusterRouteContainer extends React.Component {
 							<>
 								{get(allowedRoutes, '/cluster/role-based-access') &&
 								(backend === BACKENDS.ELASTICSEARCH.name ||
+									backend === BACKENDS.SYSTEM.name ||
 									backend === BACKENDS.OPENSEARCH.name) ? (
 									<AppPageContainer {...props} component={RoleBaseAccess} />
 								) : (
@@ -709,6 +732,7 @@ class ClusterRouteContainer extends React.Component {
 							<>
 								{get(allowedRoutes, '/cluster/sync-preferences') &&
 								(backend === BACKENDS.ELASTICSEARCH.name ||
+									backend === BACKENDS.SYSTEM.name ||
 									backend === BACKENDS.OPENSEARCH.name) ? (
 									<AppPageContainer {...props} component={SyncPreferences} />
 								) : (
@@ -762,6 +786,7 @@ ClusterRouteContainer.propTypes = {
 	allowedRoutes: PropTypes.object.isRequired,
 	backend: PropTypes.string,
 	backendImage: PropTypes.string,
+	isPlanLoading: PropTypes.bool.isRequired,
 };
 
 const mapStateToProps = (state) => {
@@ -769,6 +794,7 @@ const mapStateToProps = (state) => {
 		allowedRoutes: getAuthorizedRoutes(get(state, 'clusterRoutes')),
 		backend: get(state, '$getAppPlan.results.backend'),
 		backendImage: get(state, '$getAppPlan.results.image_type'),
+		isPlanLoading: get(state, '$getAppPlan.isFetching'),
 	};
 };
 

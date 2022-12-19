@@ -131,6 +131,12 @@ export const APP_ROUTES = {
 				tag: 'Beta',
 			},
 			{ label: 'Cluster Monitoring', link: '/cluster/monitoring', hasExactPath: true },
+			{
+				label: 'Data Usage',
+				link: '/cluster/data-usage',
+				hasExactPath: true,
+				tag: 'Beta',
+			},
 		],
 	},
 	Speed: {
@@ -278,6 +284,12 @@ export const CLUSTER_ROUTES = {
 				tag: 'Beta',
 			},
 			{ label: 'Cluster Monitoring', link: '/cluster/monitoring' },
+			{
+				label: 'Data Usage',
+				link: '/cluster/data-usage',
+				hasExactPath: true,
+				tag: 'Beta',
+			},
 		],
 	},
 	Speed: {
