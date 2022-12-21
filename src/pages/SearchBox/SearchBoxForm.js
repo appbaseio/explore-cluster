@@ -101,6 +101,8 @@ const container = css`
 	}
 `;
 
+const SEARCHBOX_ID_PATTERN = /^[a-zA-Z0-9_]+$/;
+
 const SearchBoxForm = (props) => {
 	const {
 		match,
@@ -117,7 +119,6 @@ const SearchBoxForm = (props) => {
 	const [triggerLivePreview, setTriggerLivePreview] = useState(false);
 	const [activeTab, setActiveTab] = useState(1);
 
-	// const bannerDetails = SearchBoxBannerDetails;
 	useLayoutEffect(() => {
 		getSearchBoxes();
 	}, []);
@@ -128,7 +129,7 @@ const SearchBoxForm = (props) => {
 				'',
 				[
 					Validators.required,
-					Validators.pattern(/^[a-zA-Z0-9-_]+$/),
+					Validators.pattern(SEARCHBOX_ID_PATTERN),
 					Validators.minLength(3),
 				],
 			],
@@ -256,7 +257,7 @@ const SearchBoxForm = (props) => {
 		if (form.current.invalid) {
 			form.current.handleSubmit();
 			const { controls } = form.current;
-			if (!id || !credentials) {
+			if (!id || !credentials || !id.match(SEARCHBOX_ID_PATTERN)) {
 				return;
 			}
 			if (controls.designAndLayout.status === 'INVALID') {
@@ -282,22 +283,28 @@ const SearchBoxForm = (props) => {
 
 		saveSearchBox(id, payload)
 			.then((res) => {
-				if (res.payload) {
+				if (res.error) {
+					notification.error({
+						message: (
+							<p>
+								{res.error.message
+									? res.error.message
+									: 'Something went wrong while creating the searchbox!'}
+							</p>
+						),
+					});
+				} else if (res.payload) {
 					notification.success({
 						message: `Searchbox ${isEditPage ? 'edited' : 'created'} successfully!`,
 					});
 					if (!isEditPage) {
 						history.push(`/cluster/searchboxes`);
 					}
-				} else if (res.error) {
-					notification.error({
-						message: <p>Something went wrong while creating the searchbox!</p>,
-					});
 				}
 			})
 			.catch((createError) => {
 				notification.error({
-					message: createError,
+					message: String(createError),
 				});
 			});
 	};
@@ -458,6 +465,7 @@ const SearchBoxForm = (props) => {
 																	...(isError && {
 																		borderColor: 'tomato',
 																	}),
+																	minWidth: '200px',
 																}}
 																{...handler()}
 																data-cy="searchbox-id"
@@ -469,7 +477,7 @@ const SearchBoxForm = (props) => {
 																	{(hasError('required') &&
 																		'Enter an id for the searchbox') ||
 																		(hasError('pattern') &&
-																			`Searchbox id cannot use spaces and special characters.`) ||
+																			`Searchbox id can only use numbers, characters and underscores.`) ||
 																		(hasError('minLength') &&
 																			`Searchbox id should have atleast 3 characters.`)}
 																</span>
