@@ -6,6 +6,7 @@ import conversionMap, { DenseVector } from '../../../utils/conversionMap';
 import usecases from '../../../utils/usecases';
 import { getVersion, isUsingOpenSearch } from '../../../constants/config';
 import { capitalizeFirstLetter } from '../../../utils/helper';
+import { LATEST_COMPATIBLE_VERSION } from './constants';
 
 const { Option } = Select;
 const version = parseInt(getVersion()[0], 10);
@@ -13,7 +14,7 @@ const types = Object.keys(conversionMap).filter(
 	(key) =>
 		key !== 'object' &&
 		(isUsingOpenSearch() ||
-			(version < 7 &&
+			(version < LATEST_COMPATIBLE_VERSION &&
 				(key !== 'rank_features' || key !== 'rank_feature') &&
 				key !== DenseVector)),
 );
@@ -96,7 +97,7 @@ class NewField extends React.Component {
 					style={{
 						maxWidth: '800px',
 					}}
-					visible={isVisible}
+					open={isVisible}
 					onOk={this.addField}
 					onCancel={this.handleVisible}
 					okButtonProps={{

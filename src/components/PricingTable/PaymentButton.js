@@ -111,7 +111,7 @@ class PaymentButton extends React.Component {
 					</Button>
 					<Modal
 						title="Update plan"
-						visible={visible}
+						open={visible}
 						onCancel={this.handleCancel}
 						onOk={() => {
 							handleToken(null, plan);

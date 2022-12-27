@@ -83,7 +83,7 @@ const GlobalVarList = ({ formData, handleClose, credentials, globalVars }) => {
 			</div>
 			<Modal
 				title={`Delete global env ${formData.key}`}
-				visible={deleteModal}
+				open={deleteModal}
 				onOk={() => hanldeDelete()}
 				onCancel={() => setDeleteModal(false)}
 				okText={

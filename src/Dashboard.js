@@ -15,7 +15,6 @@ import Loader from './components/Loader';
 import Logo from './components/Logo';
 import { APP_ROUTES, CLUSTER_ROUTES } from './constants/routes';
 import { ALLOWED_ACTIONS_BY_BACKEND, BACKENDS } from './batteries/utils';
-import { fetchAuth0Preferences } from './batteries/modules/actions';
 
 // routes
 const LoginPage = Loadable({
@@ -64,7 +63,7 @@ class Dashboard extends Component {
 	eventId = null;
 
 	componentDidMount() {
-		const { loadArcUser, getAuth0Preferences } = this.props;
+		const { loadArcUser } = this.props;
 		const { pathname, search } = window.location;
 
 		window.addEventListener('error', () => {
@@ -124,8 +123,6 @@ class Dashboard extends Component {
 				isLoading: false,
 			});
 		}
-
-		getAuth0Preferences();
 	}
 
 	static getDerivedStateFromProps(props, state) {
@@ -233,7 +230,7 @@ class Dashboard extends Component {
 						</Button>
 						<Button
 							size="large"
-							type="danger"
+							danger
 							css={{ marginLeft: '8' }}
 							onClick={() => {
 								Sentry.showReportDialog({
@@ -289,7 +286,6 @@ Dashboard.propTypes = {
 	updateClusterRoutes: PropTypes.func.isRequired,
 	backendImage: PropTypes.string,
 	backend: PropTypes.string,
-	getAuth0Preferences: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = ({ user, $getAppPlan }) => ({
@@ -301,7 +297,6 @@ const mapStateToProps = ({ user, $getAppPlan }) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-	getAuth0Preferences: () => dispatch(fetchAuth0Preferences()),
 	loadArcUser: (u, p, url) => dispatch(loadUser(u, p, url)),
 	updateAppRoutes: (routes) => dispatch(setAppRoutes(routes)),
 	updateClusterRoutes: (routes) => dispatch(setClusterRoutes(routes)),

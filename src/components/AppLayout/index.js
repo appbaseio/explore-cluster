@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Layout } from 'antd';
 import { connect } from 'react-redux';
 
+// eslint-disable-next-line import/no-cycle
 import AppHeader from '../AppHeader';
 import AppsRouteContainer from './AppsRouteContainer';
 import { clearCurrentApp } from '../../batteries/modules/actions';
@@ -20,7 +21,7 @@ class AppLayout extends React.PureComponent {
 				style={{
 					paddingTop: showHeader ? 60 : 0,
 					minHeight: '100vh',
-					marginLeft: collapsed ? '80px' : '260px',
+					marginLeft: collapsed ? '80px' : '284px',
 					position: 'relative',
 					overflowY: 'auto',
 				}}

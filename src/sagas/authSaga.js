@@ -1,6 +1,6 @@
 import { take, call, put } from 'redux-saga/effects';
 
-import { USER } from '../constants';
+import { ALLOWED_ACTIONS, USER } from '../constants';
 import { setUser, loadApps, setUserError, loadEndpointsSuccess } from '../actions';
 import { getOriginURL, getUser, getEndpoints } from '../utils';
 
@@ -16,7 +16,8 @@ function* authWorker(username, password, url) {
 		localStorage.setItem('allowedActions', user.allowedActions);
 		if (
 			!window.location.search.includes('redirectTo') &&
-			!window.location.pathname.includes('/cluster/search-builder')
+			!window.location.pathname.includes('/cluster/search-builder') &&
+			user.allowedActions.includes(ALLOWED_ACTIONS.UI_BUILDER)
 		) {
 			window.location.pathname = '/cluster/search-builder';
 		}

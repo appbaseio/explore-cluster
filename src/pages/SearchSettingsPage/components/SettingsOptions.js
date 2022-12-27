@@ -269,7 +269,7 @@ const SettingsOptions = ({
 			/>
 			{enableNgram && (
 				<div>
-					<div style={{ display: 'flex', justifyContent: 'space-between' }}>
+					<div>
 						<h6>
 							N-gram Settings{' '}
 							<Tooltip title={settingsMap.enableNgram.description}>
@@ -277,7 +277,7 @@ const SettingsOptions = ({
 							</Tooltip>
 						</h6>
 						<div style={{ display: 'flex' }}>
-							<div style={{ margin: '10px 10px 5px 40px' }}>
+							<div style={{ margin: '10px 10px 5px 10px' }}>
 								Min Chars
 								<InputNumber
 									style={{ marginLeft: '10px' }}
@@ -357,7 +357,7 @@ const SettingsOptions = ({
 			/>
 			{enableAutoSuggestion && (
 				<div>
-					<div style={{ display: 'flex', justifyContent: 'space-between' }}>
+					<div>
 						<h6>
 							Autosuggestion Settings
 							<Tooltip title={settingsMap.enableAutoSuggestion.description}>
@@ -365,7 +365,7 @@ const SettingsOptions = ({
 							</Tooltip>
 						</h6>
 						<div style={{ display: 'flex' }}>
-							<div style={{ margin: '10px 10px 5px 40px' }}>
+							<div style={{ margin: '10px 10px 5px 10px' }}>
 								Min Chars
 								<InputNumber
 									style={{ marginLeft: '10px' }}

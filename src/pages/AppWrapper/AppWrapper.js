@@ -98,51 +98,58 @@ class AppWrapper extends Component {
 		// const collapsed = window.innerWidth <= breakpoints.medium;
 		const getActiveMenuData = getActiveMenu(props, undefined, props.routes);
 
-		const { routes, arcVersion, backend } = props;
-
+		const { routes, arcVersion, backend, user } = props;
+		const allowedActions = get(user, 'data.allowedActions', []).filter((action) => {
+			return ALLOWED_ACTIONS_BY_BACKEND[backend].includes(action);
+		});
 		let routesToSet = routes;
 		if (versionCompare(arcVersion, '7.54.0') !== -1) {
 			// UPDATE UI Builder route
 			routesToSet = {
 				...routes,
-				'UI Builder': {
-					icon: 'control',
-					action: ALLOWED_ACTIONS.UI_BUILDER,
-					menu: [
-						{
-							label: 'Search',
-							link: '/cluster/search-builder',
-							hasExactPath: true,
-							tag: 'Beta',
-						},
-						...(backend === BACKENDS.ELASTICSEARCH.name ||
-						backend === BACKENDS.OPENSEARCH.name
-							? [
-									{
-										label: 'Recommendations',
-										link: '/cluster/recommendations-builder',
-										tag: 'Beta',
-										hasExactPath: true,
-									},
-									{
-										label: 'Searchbox',
-										link: '/cluster/searchboxes',
-										tag: 'Beta',
-									},
-							  ]
-							: []),
-						{
-							label: 'End-user Authentication',
-							link: '/cluster/auth-settings',
-							hasExactPath: true,
-							tag: 'Beta',
-						},
-					],
-					tag: 'Beta',
-				},
-				...(routes['Access Control']
+				...(allowedActions.includes(ALLOWED_ACTIONS.UI_BUILDER)
 					? {
-							'Access Control': {
+							'UI Builder': {
+								icon: 'control',
+								action: ALLOWED_ACTIONS.UI_BUILDER,
+								menu: [
+									{
+										label: 'Search',
+										link: '/cluster/search-builder',
+										hasExactPath: true,
+										tag: 'Beta',
+									},
+									...(backend === BACKENDS.ELASTICSEARCH.name ||
+									backend === BACKENDS.OPENSEARCH.name ||
+									backend === BACKENDS.SYSTEM.name
+										? [
+												{
+													label: 'Recommendations',
+													link: '/cluster/recommendations-builder',
+													tag: 'Beta',
+													hasExactPath: true,
+												},
+												{
+													label: 'Searchbox',
+													link: '/cluster/searchboxes',
+													tag: 'Beta',
+												},
+										  ]
+										: []),
+									{
+										label: 'End-user Authentication',
+										link: '/cluster/auth-settings',
+										hasExactPath: true,
+										tag: 'Beta',
+									},
+								],
+								tag: 'Beta',
+							},
+					  }
+					: {}),
+				...(routes['API Credentials']
+					? {
+							'API Credentials': {
 								icon: 'key',
 								action: 'access-control',
 								menu: [
@@ -155,7 +162,8 @@ class AppWrapper extends Component {
 										link: '/cluster/credentials',
 									},
 									...(backend === BACKENDS.ELASTICSEARCH.name ||
-									backend === BACKENDS.OPENSEARCH.name
+									backend === BACKENDS.OPENSEARCH.name ||
+									backend === BACKENDS.SYSTEM.name
 										? [
 												{
 													label: 'Role Based Access',
@@ -230,56 +238,64 @@ class AppWrapper extends Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { history, currentApp, match, arcVersion, routes, backend } = this.props;
+		const { history, currentApp, match, arcVersion, routes, backend, user } = this.props;
 		const { appName } = this.state;
 		if (
 			!isEqual(routes, prevProps.routes) ||
 			(arcVersion && arcVersion !== prevProps.arcVersion)
 		) {
 			if (versionCompare(arcVersion, '7.54.0') !== -1) {
+				const allowedActions = get(user, 'data.allowedActions', []).filter((action) => {
+					return ALLOWED_ACTIONS_BY_BACKEND[backend].includes(action);
+				});
 				// UPDATE UIBuilder route
 				// eslint-disable-next-line
 				this.setState({
 					routes: {
 						...routes,
-						'UI Builder': {
-							icon: 'control',
-							action: ALLOWED_ACTIONS.UI_BUILDER,
-							menu: [
-								{
-									label: 'Search',
-									link: '/cluster/search-builder',
-									hasExactPath: true,
-									tag: 'Beta',
-								},
-								...(backend === BACKENDS.ELASTICSEARCH.name ||
-								backend === BACKENDS.OPENSEARCH.name
-									? [
-											({
-												label: 'Recommendations',
-												link: '/cluster/recommendations-builder',
+						...(allowedActions.includes(ALLOWED_ACTIONS.UI_BUILDER)
+							? {
+									'UI Builder': {
+										icon: 'control',
+										action: ALLOWED_ACTIONS.UI_BUILDER,
+										menu: [
+											{
+												label: 'Search',
+												link: '/cluster/search-builder',
 												hasExactPath: true,
 												tag: 'Beta',
 											},
+											...(backend === BACKENDS.ELASTICSEARCH.name ||
+											backend === BACKENDS.OPENSEARCH.name ||
+											backend === BACKENDS.SYSTEM.name
+												? [
+														{
+															label: 'Recommendations',
+															link: '/cluster/recommendations-builder',
+															hasExactPath: true,
+															tag: 'Beta',
+														},
+														{
+															label: 'Searchbox',
+															link: '/cluster/searchboxes',
+															tag: 'Beta',
+														},
+												  ]
+												: []),
 											{
-												label: 'Searchbox',
-												link: '/cluster/searchboxes',
+												label: 'End-user Authentication',
+												link: '/cluster/auth-settings',
 												tag: 'Beta',
-											}),
-									  ]
-									: []),
-								{
-									label: 'End-user Authentication',
-									link: '/cluster/auth-settings',
-									tag: 'Beta',
-									hasExactPath: true,
-								},
-							],
-							tag: 'Beta',
-						},
-						...(routes['Access Control']
+												hasExactPath: true,
+											},
+										],
+										tag: 'Beta',
+									},
+							  }
+							: {}),
+						...(routes['API Credentials']
 							? {
-									'Access Control': {
+									'API Credentials': {
 										icon: 'key',
 										action: 'access-control',
 										menu: [
@@ -292,7 +308,8 @@ class AppWrapper extends Component {
 												link: '/cluster/credentials',
 											},
 											...(backend === BACKENDS.ELASTICSEARCH.name ||
-											backend === BACKENDS.OPENSEARCH.name
+											backend === BACKENDS.OPENSEARCH.name ||
+											backend === BACKENDS.SYSTEM.name
 												? [
 														{
 															label: 'Role Based Access',
@@ -385,7 +402,7 @@ class AppWrapper extends Component {
 		return (
 			<Layout>
 				<Sider
-					width={260}
+					width={284}
 					className={sidebarStyles}
 					collapsible
 					collapsed={collapsed}
@@ -458,9 +475,10 @@ class AppWrapper extends Component {
 										<SubMenu key={route} title={Title}>
 											{routes[route].menu.map((item) => {
 												if (
-													item.link.includes(
+													(item.link.includes(
 														'configure-search-engine-backend',
-													) &&
+													) ||
+														item.link.includes('data-usage')) &&
 													(backendImage !== 'sls' ||
 														backend === BACKENDS.FUSION.name ||
 														backend === BACKENDS.MARKLOGIC.name)
@@ -580,6 +598,7 @@ AppWrapper.propTypes = {
 	updateCurrentApp: PropTypes.func.isRequired,
 	backendImage: PropTypes.string,
 	backend: PropTypes.string,
+	user: PropTypes.object.isRequired,
 };
 
 AppWrapper.defaultProps = {
@@ -596,6 +615,7 @@ AppWrapper.defaultProps = {
 const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');
 	return {
+		user: get(state, 'user'),
 		currentApp: appName,
 		defaultSettings: get(state, '$getAppSettings.defaultSettings'),
 		settings: get(state, ['$getAppSettings', 'settings', appName]),

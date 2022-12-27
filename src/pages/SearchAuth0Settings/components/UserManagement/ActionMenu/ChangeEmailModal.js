@@ -43,7 +43,7 @@ const ChangeEmailModal = ({ email, visible, handleClose, handleChangeEmail, isLo
 	return (
 		<Modal
 			className={changeEmailCss}
-			visible={visible}
+			open={visible}
 			onCancel={handleClose}
 			title={<h3>Edit E-mail</h3>}
 			width="max(50vw, 300px)"

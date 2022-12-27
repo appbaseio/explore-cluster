@@ -131,6 +131,12 @@ export const APP_ROUTES = {
 				tag: 'Beta',
 			},
 			{ label: 'Cluster Monitoring', link: '/cluster/monitoring', hasExactPath: true },
+			{
+				label: 'Data Usage',
+				link: '/cluster/data-usage',
+				hasExactPath: true,
+				tag: 'Beta',
+			},
 		],
 	},
 	Speed: {
@@ -155,11 +161,10 @@ export const CLUSTER_ROUTES = {
 		icon: 'control',
 		action: ALLOWED_ACTIONS.UI_BUILDER,
 		menu: [
-			{ label: 'Search', link: '/cluster/search-builder', openIndexMenu: true },
+			{ label: 'Search', link: '/cluster/search-builder' },
 			{
 				label: 'Recommendations',
 				link: '/cluster/recommendations-builder',
-				openIndexMenu: true,
 			},
 			{
 				label: 'Searchbox',
@@ -279,6 +284,12 @@ export const CLUSTER_ROUTES = {
 				tag: 'Beta',
 			},
 			{ label: 'Cluster Monitoring', link: '/cluster/monitoring' },
+			{
+				label: 'Data Usage',
+				link: '/cluster/data-usage',
+				hasExactPath: true,
+				tag: 'Beta',
+			},
 		],
 	},
 	Speed: {

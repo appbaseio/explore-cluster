@@ -106,6 +106,20 @@ const apisMapper = {
 			method: 'POST',
 		},
 	},
+	system: {
+		index: {
+			url: '/_aliasedindices',
+			method: 'GET',
+		},
+		search: {
+			url: '/${index}/_reactivesearch',
+			method: 'POST',
+		},
+		schema: {
+			url: '/${index}/_mapping',
+			method: 'GET',
+		},
+	},
 };
 
 export default apisMapper;

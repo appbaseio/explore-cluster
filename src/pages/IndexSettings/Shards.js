@@ -29,7 +29,7 @@ const Shards = ({
 			bodyStyle={{ padding: 0 }}
 		/>
 		<Modal
-			visible={shardsModal}
+			open={shardsModal}
 			onOk={updateShards}
 			title="Configure Shards"
 			okText="Update"

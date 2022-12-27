@@ -17,7 +17,7 @@ const BlockUserModal = ({
 	return (
 		<Modal
 			className={blockUserCss}
-			visible={visible}
+			open={visible}
 			onCancel={handleClose}
 			title={<h3>{blocked ? 'Unblock' : 'Block'} User</h3>}
 			width="max(50vw, 300px)"

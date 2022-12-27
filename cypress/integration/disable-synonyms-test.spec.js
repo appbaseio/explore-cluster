@@ -1,5 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
+import { PAGE_LOAD_TIME } from '../utils/constants.js';
 
 let indexName = '';
 
@@ -27,13 +28,14 @@ describe('Disable synonyms test flow', () => {
 	});
 
 	it('Should navigate to cluster overview', () => {
-		cy.wait(5000);
 		cy.visit(`${base_url}`);
+		cy.wait(5000);
 	});
 
 	it('Should create new index', () => {
-		cy.wait(5000).get('[data-cy=initialize-new-index-creation]').click().wait(2000);
-		generateName();
+		cy.wait(1000).get('[data-cy=initialize-new-index-creation]').click().wait(2000);
+		cy.server();
+		cy.route('PUT', `**/${indexName}`).as('indexing');
 		cy.get('[data-cy=new-index-name]')
 			.type(`${indexName}`)
 			.get('[data-cy=new-index-language]')
@@ -43,6 +45,8 @@ describe('Disable synonyms test flow', () => {
 
 			.get('[data-cy=create-new-index]')
 			.click();
+
+		cy.wait('@indexing');
 	});
 
 	it('Should index data', () => {
@@ -76,7 +80,12 @@ describe('Disable synonyms test flow', () => {
 	});
 
 	it('Should open search settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/search`).wait(5000);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/app/${indexName}/search`);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
 	});
 
 	it('Should disable synonyms in search settings', () => {
@@ -89,10 +98,20 @@ describe('Disable synonyms test flow', () => {
 			.should('contain', 'true')
 			.get('[data-cy=new-value-enableSynonyms-status]')
 			.should('contain', 'false');
-		cy.get('[data-cy=review-save-button]').click().wait(5000);
+		cy.server();
+		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
+		cy.get('[data-cy=review-save-button]').click();
+		cy.wait(['@relevancy'], { timeout: 30000 });
 	});
 
 	it('Should check & confirm the data fields from the redux store', () => {
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/app/${indexName}/search`);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
+
 		cy.window()
 			.its('store')
 			.invoke('getState')
@@ -105,12 +124,15 @@ describe('Disable synonyms test flow', () => {
 
 	it('Should delete index', () => {
 		let credentials = btoa(`${username}:${password}`);
+
 		cy.request({
 			method: 'DELETE',
 			url: `${app_url}${indexName}`,
 			headers: {
 				Authorization: `Basic ${credentials}`,
 			},
+			// Sometimes index is an alias here which wouldn't let it delete
+			failOnStatusCode: false,
 		});
 	});
 

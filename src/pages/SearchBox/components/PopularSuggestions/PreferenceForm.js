@@ -6,7 +6,7 @@ import { FieldGroup, FieldControl } from 'react-reactive-form';
 import Grid from '../../../../components/CreateCredentials/Grid';
 import { suggestionsMessages as Messages } from '../../../../utils/messages';
 import styles from '../styles';
-import { FormContext } from '../../../IntegrationsPage/utils';
+import { FormContext } from '../../../IntegrationsPage/utils/utils';
 import IndexMultiSelect from './IndexMultiSelect';
 
 export const PreferenceFormContext = React.createContext();
@@ -73,7 +73,7 @@ function PreferenceForm() {
 											</p>
 										}
 										component={
-											<div>
+											<div style={{ margin: 'auto 0' }}>
 												<IndexMultiSelect
 													className={showError ? 'select-error' : ''}
 													{...handler()}
@@ -107,7 +107,7 @@ function PreferenceForm() {
 											</p>
 										}
 										component={
-											<div>
+											<div style={{ margin: 'auto 0' }}>
 												<InputNumber
 													{...handler()}
 													className={showError ? 'input-error' : ''}
@@ -147,7 +147,7 @@ function PreferenceForm() {
 											</p>
 										}
 										component={
-											<div>
+											<div style={{ margin: 'auto 0' }}>
 												<InputNumber
 													{...handler()}
 													className={showError ? 'input-error' : ''}
@@ -181,12 +181,12 @@ function PreferenceForm() {
 											</p>
 										}
 										component={
-											<div>
+											<div style={{ margin: 'auto 0' }}>
 												<InputNumber
 													{...handler()}
 													className={showError ? 'input-error' : ''}
-													style={{ width: '100%' }}
 													defaultValue={value}
+													style={{ width: '100%' }}
 													value={value}
 													min={0}
 													max={1000}

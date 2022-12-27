@@ -145,7 +145,7 @@ class ClusterInsights extends React.Component {
 									placement="bottom"
 								>
 									<Button
-										type="danger"
+										danger
 										style={{ marginBottom: 10 }}
 										size="large"
 										loading={deletingSubscription}

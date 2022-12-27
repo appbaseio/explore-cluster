@@ -18,7 +18,7 @@ import styles from '../styles';
 import CodeEditor from './CodeEditor';
 import TextInput from '../../../../components/Form/Input';
 import CodeEditorModal from './CodeEditorModal';
-import { FormContext } from '../../../IntegrationsPage/utils';
+import { FormContext } from '../../../IntegrationsPage/utils/utils';
 import { FUNCTION_EDITOR_TABS_KEYS } from '../DesignAndLayout/SearchBoxPreview/AddSuggestionModal/FunctionEditor';
 import { getURL } from '../../../../constants/config';
 import { isJson } from '../../../../components/ScriptConsole/utils';
@@ -281,7 +281,7 @@ class PreferenceForm extends React.Component {
 						>
 							{(endpointControl) => (
 								<Modal
-									visible={modalVisible.endpoint}
+									open={modalVisible.endpoint}
 									onOk={() => {
 										if (endpointControl.valid) {
 											this.fetchExecutionContextResponse(
@@ -391,7 +391,10 @@ class PreferenceForm extends React.Component {
 															className={
 																showError ? 'input-error' : ''
 															}
-															style={{ width: '100%' }}
+															style={{
+																width: '100%',
+																margin: 'auto 0px',
+															}}
 														>
 															<Select.Option key="GET">
 																GET
@@ -532,6 +535,7 @@ class PreferenceForm extends React.Component {
 									component={
 										<Switch
 											data-cy="show-distinct-suggestions"
+											style={{ margin: 'auto 0px' }}
 											checked={checked}
 											{...handler()}
 											onChange={(val) => {
@@ -564,6 +568,7 @@ class PreferenceForm extends React.Component {
 										<Switch
 											data-cy="enable-predictive-suggestions"
 											checked={checked}
+											style={{ margin: 'auto 0px' }}
 											{...handler()}
 											onChange={(val) => {
 												handler().onChange(val);
@@ -596,7 +601,7 @@ class PreferenceForm extends React.Component {
 											</p>
 										}
 										component={
-											<div>
+											<div style={{ margin: 'auto 0px' }}>
 												<InputNumber
 													{...handler()}
 													className={showError ? 'input-error' : ''}
@@ -637,6 +642,7 @@ class PreferenceForm extends React.Component {
 										<Switch
 											data-cy="apply-stopwords"
 											checked={checked}
+											style={{ margin: 'auto 0px' }}
 											{...handler()}
 											onChange={(val) => {
 												handler().onChange(val);
@@ -671,7 +677,7 @@ class PreferenceForm extends React.Component {
 											placeholder="Enter custom stopwords"
 											mode="tags"
 											notFoundContent={null}
-											style={{ width: '100%' }}
+											style={{ width: '100%', margin: 'auto 0px' }}
 											tokenSeparators={[',']}
 											onChange={(val) => {
 												handler().onChange(val);
@@ -701,6 +707,7 @@ class PreferenceForm extends React.Component {
 										<Switch
 											data-cy="enable-synonyms"
 											checked={checked}
+											style={{ margin: 'auto 0px' }}
 											{...handler()}
 											onChange={(val) => {
 												handler().onChange(val);
@@ -738,7 +745,7 @@ class PreferenceForm extends React.Component {
 											placeholder="Enter fields to include"
 											mode="tags"
 											notFoundContent={null}
-											style={{ width: '100%' }}
+											style={{ width: '100%', margin: 'auto 0px' }}
 											tokenSeparators={[',']}
 											onChange={(val) => {
 												if (val.includes('*')) {
@@ -781,7 +788,7 @@ class PreferenceForm extends React.Component {
 											placeholder="Enter fields to exclude"
 											mode="tags"
 											notFoundContent={null}
-											style={{ width: '100%' }}
+											style={{ width: '100%', margin: 'auto 0px' }}
 											tokenSeparators={[',']}
 											onChange={(val) => {
 												if (val.includes('*')) {
@@ -817,7 +824,7 @@ class PreferenceForm extends React.Component {
 											</span>
 										}
 										component={
-											<div>
+											<div style={{ margin: 'auto 0px' }}>
 												<Input
 													{...handler()}
 													className={showError ? 'input-error' : ''}

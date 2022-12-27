@@ -1,5 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
+import { PAGE_LOAD_TIME } from '../utils/constants.js';
 
 let indexName = '',
 	indexName2 = '';
@@ -28,13 +29,14 @@ describe('Clone settings test flow', () => {
 	});
 
 	it('Should navigate to cluster overview', () => {
-		cy.wait(5000);
 		cy.visit(`${base_url}`);
+		cy.wait(5000);
 	});
 
 	it('Should create new index', () => {
-		cy.wait(5000).get('[data-cy=initialize-new-index-creation]').click().wait(2000);
-		generateName();
+		cy.wait(1000).get('[data-cy=initialize-new-index-creation]').click().wait(2000);
+		cy.server();
+		cy.route('PUT', `**/${indexName}`).as('indexing');
 		cy.get('[data-cy=new-index-name]')
 			.type(`${indexName}`)
 			.get('[data-cy=new-index-language]')
@@ -44,6 +46,8 @@ describe('Clone settings test flow', () => {
 
 			.get('[data-cy=create-new-index]')
 			.click();
+
+		cy.wait('@indexing');
 	});
 
 	it('Should index data', () => {
@@ -77,7 +81,12 @@ describe('Clone settings test flow', () => {
 	});
 
 	it('Should open search settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/search`).wait(5000);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/app/${indexName}/search`);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
 	});
 
 	it('Should change field weight of email in search settings', () => {
@@ -120,10 +129,21 @@ describe('Clone settings test flow', () => {
 			.get('[data-cy=new-weight]')
 			.eq(14)
 			.should('contain', '4.0');
-		cy.get('[data-cy=review-save-button]').click().wait(5000);
+		cy.server();
+		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
+		cy.get('[data-cy=review-save-button]').click();
+		cy.wait(['@relevancy'], { timeout: 30000 });
 	});
 
 	it('Should create a new index and clone the settings to it', () => {
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/app/${indexName}/search`);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
+
+		cy.route('PUT', `**/_searchrelevancy/${indexName2}`).as('clone-relevancy');
 		cy.root().contains('Copy Search Settings').click();
 		cy.get('[data-cy=destination-index-name]')
 			.type(indexName2)
@@ -132,15 +152,18 @@ describe('Clone settings test flow', () => {
 			.get('[data-cy=copy-synonyms]')
 			.click()
 			.get('[data-cy=clone-button]')
-			.click()
-			.wait(10000);
-	});
-
-	it('Should open search settings URL of the new index', () => {
-		cy.visit(`${base_url}/app/${indexName2}/search`).wait(5000);
+			.click();
+		cy.wait(['@clone-relevancy'], { timeout: 30000 });
 	});
 
 	it('Should verify the search settings of the new index', () => {
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/app/${indexName2}/search`);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
+
 		cy.get('[data-cy=field-name-email]')
 			.should('contain', 'email')
 			.get('[data-cy=email-number-input]')
@@ -155,31 +178,22 @@ describe('Clone settings test flow', () => {
 			.should('have.value', '4.0');
 	});
 
-	it('Should detect re-indexing and assign index name prior to deletion', () => {
-		let credentials = btoa(`${username}:${password}`);
-
-		fetch(`${app_url}_alias/${indexName}`, {
-			headers: {
-				Authorization: `Basic ${credentials}`,
-			},
-		})
-			.then((response) => {
-				return response.json();
-			})
-			.then((data) => {
-				indexName = Object.keys(data)[0];
-			})
-			.catch((err) => {
-				console.log(err);
-			});
-	});
-
 	it('Should delete index', () => {
 		let credentials = btoa(`${username}:${password}`);
 
 		cy.request({
 			method: 'DELETE',
 			url: `${app_url}${indexName}`,
+			headers: {
+				Authorization: `Basic ${credentials}`,
+			},
+		});
+
+		cy.wait(5000);
+
+		cy.request({
+			method: 'DELETE',
+			url: `${app_url}${indexName2}`,
 			headers: {
 				Authorization: `Basic ${credentials}`,
 			},

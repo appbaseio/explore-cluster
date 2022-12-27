@@ -47,7 +47,7 @@ class ObjectField extends React.Component {
 								{field}
 								<Button
 									className="delete-btn"
-									type="danger"
+									danger
 									size="small"
 									onClick={() => onDelete(path)}
 								>

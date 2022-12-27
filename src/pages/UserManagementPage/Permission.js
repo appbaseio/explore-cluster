@@ -38,7 +38,7 @@ class Permission extends React.Component {
 							<Button
 								disabled={!hasEditAccess}
 								onClick={this.handleEditCred}
-								type="normal"
+								type="default"
 							>
 								Update
 							</Button>
@@ -52,7 +52,7 @@ class Permission extends React.Component {
 						okText="Yes"
 						cancelText="No"
 					>
-						<Button disabled={!hasEditAccess} type="danger">
+						<Button disabled={!hasEditAccess} danger>
 							Delete
 						</Button>
 					</Popconfirm>

@@ -334,7 +334,7 @@ class Credentials extends Component {
 								margin: '10px 10px',
 								float: 'right',
 							}}
-							type="danger"
+							danger
 							size="large"
 						>
 							Delete Index

@@ -1,5 +1,6 @@
 import generateName from '../utils/generateName';
 import { base_url, username, password, app_url, cluster } from '../utils/index';
+import { PAGE_LOAD_TIME } from '../utils/constants.js';
 
 let indexName = '';
 
@@ -27,13 +28,14 @@ describe('Disable ngram remove search fields and reindex data test flow', () => 
 	});
 
 	it('Should navigate to cluster overview', () => {
-		cy.wait(5000);
 		cy.visit(`${base_url}`);
+		cy.wait(5000);
 	});
 
 	it('Should create new index', () => {
-		cy.wait(5000).get('[data-cy=initialize-new-index-creation]').click().wait(2000);
-		generateName();
+		cy.wait(1000).get('[data-cy=initialize-new-index-creation]').click().wait(2000);
+		cy.server();
+		cy.route('PUT', `**/${indexName}`).as('indexing');
 		cy.get('[data-cy=new-index-name]')
 			.type(`${indexName}`)
 			.get('[data-cy=new-index-language]')
@@ -43,6 +45,8 @@ describe('Disable ngram remove search fields and reindex data test flow', () => 
 
 			.get('[data-cy=create-new-index]')
 			.click();
+
+		cy.wait('@indexing');
 	});
 
 	it('Should index data', () => {
@@ -74,7 +78,12 @@ describe('Disable ngram remove search fields and reindex data test flow', () => 
 	});
 
 	it('Should open search settings URL', () => {
-		cy.visit(`${base_url}/app/${indexName}/search`).wait(5000);
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/app/${indexName}/search`);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
 	});
 
 	it('Should add all data feilds as search feilds', () => {
@@ -90,10 +99,20 @@ describe('Disable ngram remove search fields and reindex data test flow', () => 
 			.should('contain', 'name')
 			.get('[data-cy=search-field-name-status]')
 			.should('contain', 'new');
-		cy.get('[data-cy=review-save-button]').click().wait(5000);
+		cy.server();
+		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
+		cy.get('[data-cy=review-save-button]').click();
+		cy.wait(['@relevancy'], { timeout: 30000 });
 	});
 
 	it('Should check search fields after deployment', () => {
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/app/${indexName}/search`);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
+
 		cy.get('[data-cy=field-name-email]')
 			.should('contain', 'email')
 			.get('[data-cy=field-name-name]')
@@ -110,10 +129,20 @@ describe('Disable ngram remove search fields and reindex data test flow', () => 
 			.should('contain', 'true')
 			.get('[data-cy=new-value-enableNgram-status]')
 			.should('contain', 'false');
-		cy.get('[data-cy=review-save-button]').click().wait(5000);
+		cy.server();
+		cy.route('PUT', '**/_searchrelevancy/**').as('relevancy');
+		cy.get('[data-cy=review-save-button]').click();
+		cy.wait(['@relevancy'], { timeout: 30000 });
 	});
 
 	it('Should check if .search fields are removed', () => {
+		cy.server();
+		cy.route('**/_mapping').as('mapping');
+		cy.route('**/_searchrelevancy/**').as('relevancy');
+		cy.route('**/_aliasedindices').as('indices');
+		cy.visit(`${base_url}/app/${indexName}/search`);
+		cy.wait(['@mapping', '@relevancy', '@indices'], { timeout: 30000 });
+
 		cy.get('[data-cy=email-popover-icon]')
 			.trigger('mouseover')
 			.get('[data-cy=email-popover-content]')
@@ -126,23 +155,20 @@ describe('Disable ngram remove search fields and reindex data test flow', () => 
 			.wait(1000);
 	});
 
-	it('Should detect re-indexing and assign index name prior to deletion', () => {
+	it('Should assign index name prior to deletion', () => {
 		let credentials = btoa(`${username}:${password}`);
 
-		fetch(`${app_url}_alias/${indexName}`, {
+		cy.request({
+			method: 'GET',
+			url: `${app_url}_alias/${indexName}`,
 			headers: {
 				Authorization: `Basic ${credentials}`,
 			},
-		})
-			.then((response) => {
-				return response.json();
-			})
-			.then((data) => {
-				indexName = Object.keys(data)[0];
-			})
-			.catch((err) => {
-				console.log(err);
-			});
+		}).then((response) => {
+			const data = response.body;
+			console.log({ response, data });
+			indexName = Object.keys(data)[0];
+		});
 	});
 
 	it('Should delete index', () => {

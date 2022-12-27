@@ -913,9 +913,7 @@ const PipelinesForm = (props) => {
 							{isEditPage ? (
 								<Collapse>
 									<Panel
-										header={
-											<h3 style={{ marginBottom: '0' }}>Pipeline Details</h3>
-										}
+										header={<h3 style={{ margin: 0 }}>Pipeline Details</h3>}
 										key="1"
 									>
 										<PipelineCard

@@ -8,7 +8,7 @@ const header = (val) => css`
 	height: 60px;
 	padding: 0 25px 0 0;
 	background-color: #fff !important;
-	overflow: hidden;
+	overflow: auto;
 	box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.15);
 	z-index: 999;
 	position: fixed;

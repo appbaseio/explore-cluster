@@ -256,6 +256,19 @@ export const aclOptionsMessage = {
 	cache: 'Allow cache related actions',
 };
 
+const SLS = 'sls';
+const MULTI_TENANT = 'multi-tenant-sls';
+
+export const shouldHavePipelines = (backendImage) =>
+	backendImage === SLS || backendImage === MULTI_TENANT;
+
+export const shouldHaveIndices = (backendImage) => backendImage !== SLS;
+
+export const shouldHaveFieldsFiltering = (backendImage, backend) =>
+	[BACKENDS.ELASTICSEARCH.name, BACKENDS.OPENSEARCH.name, BACKENDS.SYSTEM.name].includes(
+		backend,
+	) && backendImage !== SLS;
+
 const filterCategories = (value) => {
 	const limits = value.ip_limit ? { ip_limit: parseFloat(value.ip_limit, 10) } : undefined;
 	const categories = [];
@@ -309,8 +322,10 @@ export const mapFormToValues = (value, hasLimits, appbaseVersion) => {
 	const shouldIncludeReactiveSearchConfig =
 		find(value.categories, { acl: 'reactivesearch' })?.tag &&
 		versionCompare(appbaseVersion, '7.48.1') !== -1;
+
 	const submitValues = {
 		indices: value.indices,
+		pipelines: value.pipelines,
 		description: value.description,
 		ops: value.operationType && value.operationType.ops,
 		referers: value.referers,
@@ -341,20 +356,26 @@ export const mapFormToValues = (value, hasLimits, appbaseVersion) => {
 	return submitValues;
 };
 
-export const mapValuesToForm = (value, hasLimits, appbaseVersion) => ({
-	...value,
-	operationType: value.is_admin ? Types.admin : getOperationType(value),
-	ip_limit: get(value, 'limits.ip_limit'),
-	ttl: parseInt(value.ttl, 10),
-	isAdmin: value.is_admin,
-	indices: value.indices ? filter(value.indices, (o) => o !== '') : undefined,
-	allowedActions: value.allowed_actions || getDefaultAllowedActions(value.is_admin),
-	...(hasLimits && { categories: getCategories(value, appbaseVersion) }),
-	...(value.reactivesearchConfig && {
-		rsApiRestrictions: {
-			maxQuerySize: get(value, 'reactivesearchConfig.maxSize'),
-			maxAggregationSize: get(value, 'reactivesearchConfig.maxAggregationSize'),
-			allowDirectDSL: !get(value, 'reactivesearchConfig.disableQueryDSL'),
-		},
-	}),
-});
+export const mapValuesToForm = (value, hasLimits, appbaseVersion, backendImage) => {
+	// Existing credentials won't have pipelines property.
+	const pipelines = value.pipelines ? value.pipelines : ['*'];
+
+	return {
+		...value,
+		operationType: value.is_admin ? Types.admin : getOperationType(value),
+		ip_limit: get(value, 'limits.ip_limit'),
+		ttl: parseInt(value.ttl, 10),
+		isAdmin: value.is_admin,
+		indices: value.indices ? filter(value.indices, (o) => o !== '') : undefined,
+		pipelines: shouldHavePipelines(backendImage) ? pipelines : undefined,
+		allowedActions: value.allowed_actions || getDefaultAllowedActions(value.is_admin),
+		...(hasLimits && { categories: getCategories(value, appbaseVersion) }),
+		...(value.reactivesearchConfig && {
+			rsApiRestrictions: {
+				maxQuerySize: get(value, 'reactivesearchConfig.maxSize'),
+				maxAggregationSize: get(value, 'reactivesearchConfig.maxAggregationSize'),
+				allowDirectDSL: !get(value, 'reactivesearchConfig.disableQueryDSL'),
+			},
+		}),
+	};
+};

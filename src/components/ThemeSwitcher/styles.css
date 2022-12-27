@@ -40,13 +40,13 @@
 .light-theme-icon {
 	position: absolute;
 	left: 3px;
-	bottom: -7px;
+	bottom: -5px;
 }
 
 .dark-theme-icon {
 	position: absolute;
 	left: 23px;
-	bottom: -7px;
+	bottom: -5px;
 }
 
 @keyframes learn {

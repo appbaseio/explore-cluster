@@ -122,6 +122,7 @@ export const getValidURL = (config = {}, attrs = {}) => {
 
 	// check if newStr has any template string of format ${variable}
 	if (newStr.match(regex)) newStr = transformRegexString(regex, varRegex, newStr, attrs);
+	if (newStr.startsWith('/')) newStr = newStr.slice(1);
 
 	return newStr;
 };
@@ -134,7 +135,7 @@ export async function getESIndices(authToken, backend, endpointConfig = {}) {
 		url = `${ACC_API}/${getValidURL(endpointConfig.app)}`;
 	} else {
 		url = `${ACC_API}/${getValidURL(endpointConfig.index)}`;
-		if (backend === BACKENDS.ELASTICSEARCH.name) {
+		if (backend === BACKENDS.ELASTICSEARCH.name || backend === BACKENDS.SYSTEM.name) {
 			const esVersion = await getESVersion(null, atob(authToken));
 			if (esVersion && esVersion < 6) url = `${ACC_API}/_cat/indices?format=json`;
 		}
@@ -752,7 +753,8 @@ export const getAuthorizedViews = (routes = {}, allowedActions = [], backend) =>
 	const hasOverviewPageAccess =
 		(backend === BACKENDS.ELASTICSEARCH.name ||
 			backend === BACKENDS.OPENSEARCH.name ||
-			backend === BACKENDS.ZINC.name) &&
+			backend === BACKENDS.ZINC.name ||
+			backend === BACKENDS.SYSTEM.name) &&
 		allowedActions.some(
 			(i) =>
 				i === ALLOWED_ACTIONS.DEVELOP ||

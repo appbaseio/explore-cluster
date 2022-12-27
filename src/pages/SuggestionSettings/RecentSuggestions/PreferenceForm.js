@@ -122,7 +122,7 @@ class PreferenceForm extends React.Component {
 										<InputNumber
 											data-cy="recent-suggestions-min-hits"
 											{...handler()}
-											style={{ width: '100%' }}
+											style={{ width: '100%', margin: 'auto' }}
 											min={0}
 											max={1000}
 											defaultValue={value}
@@ -155,7 +155,7 @@ class PreferenceForm extends React.Component {
 										<InputNumber
 											data-cy="recent-suggestions-size"
 											{...handler()}
-											style={{ width: '100%' }}
+											style={{ width: '100%', margin: 'auto' }}
 											defaultValue={value}
 											value={value}
 											min={0}
@@ -187,7 +187,7 @@ class PreferenceForm extends React.Component {
 										<InputNumber
 											data-cy="recent-suggestions-minChars"
 											{...handler()}
-											style={{ width: '100%' }}
+											style={{ width: '100%', margin: 'auto' }}
 											defaultValue={value}
 											value={value}
 											min={0}
@@ -226,7 +226,7 @@ class PreferenceForm extends React.Component {
 												data-cy="recent-suggestions-indices"
 												placeholder="Enter indices"
 												mode="tags"
-												style={{ width: '100%' }}
+												style={{ width: '100%', margin: 'auto' }}
 												tokenSeparators={[',']}
 												value={value}
 												{...inputHandler}

@@ -39,7 +39,7 @@ const Replicas = ({
 		/>
 
 		<Modal
-			visible={replicasModal}
+			open={replicasModal}
 			onOk={updateReplicas}
 			title="Configure Replicas"
 			okText="Update"

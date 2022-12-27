@@ -351,7 +351,7 @@ const CreateModal = ({
 		<div>
 			<Modal
 				title={`${mode} global env`}
-				visible={open}
+				open={open}
 				destroyOnClose
 				onOk={() => handleSave()}
 				onCancel={() => {

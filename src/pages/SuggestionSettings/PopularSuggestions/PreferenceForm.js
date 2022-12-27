@@ -146,7 +146,7 @@ class PreferenceForm extends React.Component {
 											<InputNumber
 												data-cy="number-of-days"
 												{...handler()}
-												style={{ width: '100%' }}
+												style={{ width: '100%', margin: 'auto' }}
 												defaultValue={value}
 												value={value}
 												min={1}
@@ -179,7 +179,7 @@ class PreferenceForm extends React.Component {
 											<InputNumber
 												data-cy="popular-suggestions-min-hits"
 												{...handler()}
-												style={{ width: '100%' }}
+												style={{ width: '100%', margin: 'auto' }}
 												defaultValue={value}
 												value={value}
 												min={0}
@@ -212,7 +212,7 @@ class PreferenceForm extends React.Component {
 												</p>
 											}
 											component={
-												<div style={{ width: '100%' }}>
+												<div style={{ width: '100%', margin: 'auto' }}>
 													<div>
 														<Checkbox
 															data-cy="transform-diacritics"
@@ -260,7 +260,7 @@ class PreferenceForm extends React.Component {
 												placeholder="Enter blacklist queries"
 												mode="tags"
 												notFoundContent={null}
-												style={{ width: '100%' }}
+												style={{ width: '100%', margin: 'auto' }}
 												tokenSeparators={[',']}
 												onChange={(val) => {
 													this.handleChange(
@@ -391,7 +391,7 @@ class PreferenceForm extends React.Component {
 													data-cy="popular-suggestions-indices"
 													placeholder="Enter indices"
 													mode="tags"
-													style={{ width: '100%' }}
+													style={{ width: '100%', margin: 'auto' }}
 													tokenSeparators={[',']}
 													value={value}
 													{...inputHandler}
@@ -430,7 +430,7 @@ class PreferenceForm extends React.Component {
 										component={
 											<InputNumber
 												data-cy="min-count"
-												style={{ width: '100%' }}
+												style={{ width: '100%', margin: 'auto' }}
 												min={0}
 												defaultValue={value}
 												value={value}
@@ -463,7 +463,7 @@ class PreferenceForm extends React.Component {
 											<InputNumber
 												data-cy="min-characters"
 												{...handler()}
-												style={{ width: '100%' }}
+												style={{ width: '100%', margin: 'auto' }}
 												defaultValue={value}
 												value={value}
 												min={0}
@@ -499,7 +499,7 @@ class PreferenceForm extends React.Component {
 											<InputNumber
 												data-cy="popular-suggestions-size"
 												{...handler()}
-												style={{ width: '100%' }}
+												style={{ width: '100%', margin: 'auto' }}
 												defaultValue={value}
 												value={value}
 												min={0}

@@ -396,7 +396,7 @@ class PricingTable extends Component {
 			<React.Fragment>
 				<Modal
 					title="Cancel Subscription"
-					visible={showOtpModal}
+					open={showOtpModal}
 					onCancel={this.closeOtpModal}
 					footer={[
 						<Button key="back1" onClick={this.closeOtpModal}>
@@ -413,7 +413,7 @@ class PricingTable extends Component {
 						<Button
 							loading={!resending && isSubmitting}
 							key="submit1"
-							type="danger"
+							danger
 							onClick={this.deleteFinalSubscription}
 							disabled={!this.isOtpValid}
 						>

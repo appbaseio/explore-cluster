@@ -83,13 +83,13 @@ class Permission extends React.Component {
 							placement="topLeft"
 							title={viewKey ? 'Hide credentials' : 'View credentials'}
 						>
-							<Button onClick={this.handleViewClick} type="normal">
+							<Button onClick={this.handleViewClick} type="default">
 								{viewKey ? <EyeInvisibleOutlined /> : <EyeOutlined />}
 							</Button>
 						</Tooltip>
 						<CopyToClipboard text={this.key} onCopy={this.handleCopyCred}>
 							<Tooltip placement="topLeft" title="Copy To Clipboard">
-								<Button type="normal">
+								<Button type="default">
 									<CopyOutlined />
 								</Button>
 							</Tooltip>
@@ -98,7 +98,7 @@ class Permission extends React.Component {
 							<Button
 								disabled={isExpired}
 								onClick={this.handleEditCred}
-								type="normal"
+								type="default"
 							>
 								<EditOutlined />
 							</Button>
@@ -111,7 +111,7 @@ class Permission extends React.Component {
 					okText="Yes"
 					cancelText="No"
 				>
-					<Button type="danger">
+					<Button danger>
 						<DeleteOutlined />
 					</Button>
 				</Popconfirm>

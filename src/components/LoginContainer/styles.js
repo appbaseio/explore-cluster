@@ -10,6 +10,9 @@ const main = css`
 	> div {
 		width: 100%;
 	}
+	a {
+		color: #1890ff;
+	}
 	.left-container {
 		background: linear-gradient(207.14deg, #20182d -19.78%, #502c7d 84.11%);
 		padding: 80px;

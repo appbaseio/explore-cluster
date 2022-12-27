@@ -190,7 +190,7 @@ class PreferenceForm extends React.Component {
 												data-cy="index-suggestions-indices"
 												placeholder="Enter indices"
 												mode="tags"
-												style={{ width: '100%' }}
+												style={{ width: '100%', margin: 'auto' }}
 												tokenSeparators={[',']}
 												value={app}
 												{...inputHandler}
@@ -240,6 +240,7 @@ class PreferenceForm extends React.Component {
 										<Switch
 											data-cy="show-distinct-suggestions"
 											checked={checked}
+											style={{ margin: 'auto', marginLeft: '0' }}
 											{...handler()}
 											onChange={(val) => {
 												this.handleChange('showDistinctSuggestions', val);
@@ -272,6 +273,7 @@ class PreferenceForm extends React.Component {
 										<Switch
 											data-cy="enable-predictive-suggestions"
 											checked={checked}
+											style={{ margin: 'auto', marginLeft: '0' }}
 											{...handler()}
 											onChange={(val) => {
 												this.handleChange(
@@ -309,7 +311,7 @@ class PreferenceForm extends React.Component {
 											<InputNumber
 												data-cy="max-predicted-words"
 												{...inputHandler}
-												style={{ width: '100%' }}
+												style={{ width: '100%', margin: 'auto' }}
 												defaultValue={count}
 												min={1}
 												max={5}
@@ -345,6 +347,7 @@ class PreferenceForm extends React.Component {
 										<Switch
 											data-cy="apply-stopwords"
 											checked={checked}
+											style={{ margin: 'auto', marginLeft: '0' }}
 											{...handler()}
 											onChange={(val) => {
 												this.handleChange('applyStopwords', val);
@@ -380,7 +383,7 @@ class PreferenceForm extends React.Component {
 											placeholder="Enter custom stopwords"
 											mode="tags"
 											notFoundContent={null}
-											style={{ width: '100%' }}
+											style={{ width: '100%', margin: 'auto' }}
 											tokenSeparators={[',']}
 											onChange={(val) => {
 												this.handleChange(
@@ -414,6 +417,7 @@ class PreferenceForm extends React.Component {
 										<Switch
 											data-cy="enable-synonyms"
 											checked={checked}
+											style={{ margin: 'auto', marginLeft: '0' }}
 											{...handler()}
 											onChange={(val) => {
 												this.handleChange('enableSynonyms', val);
@@ -444,7 +448,7 @@ class PreferenceForm extends React.Component {
 										<InputNumber
 											data-cy="index-suggestions-size"
 											{...handler()}
-											style={{ width: '100%' }}
+											style={{ width: '100%', margin: 'auto' }}
 											defaultValue={count}
 											value={count}
 											min={0}
@@ -485,7 +489,7 @@ class PreferenceForm extends React.Component {
 											placeholder="Select one ore more fields"
 											mode="tags"
 											notFoundContent={null}
-											style={{ width: '100%' }}
+											style={{ width: '100%', margin: 'auto' }}
 											tokenSeparators={[',']}
 											disabled={this.getDisabled(value?.excludeFields)}
 											data-cy="include-fields"
@@ -547,7 +551,7 @@ class PreferenceForm extends React.Component {
 											placeholder="Select one ore more fields"
 											mode="tags"
 											notFoundContent={null}
-											style={{ width: '100%' }}
+											style={{ width: '100%', margin: 'auto' }}
 											tokenSeparators={[',']}
 											disabled={this.getDisabled(value?.includeFields)}
 											data-cy="exclude-fields"
@@ -610,7 +614,7 @@ class PreferenceForm extends React.Component {
 											allowClear
 											placeholder="Add category fields from schema"
 											loading={isFetchingMappings}
-											style={{ width: '100%' }}
+											style={{ width: '100%', margin: 'auto' }}
 											data-cy="category-field"
 											showSearch
 											onChange={(val) => {
@@ -661,7 +665,7 @@ class PreferenceForm extends React.Component {
 											allowClear
 											placeholder="Add URL field from schema"
 											loading={isFetchingMappings}
-											style={{ width: '100%' }}
+											style={{ width: '100%', margin: 'auto' }}
 											data-cy="url-index-setting"
 											showSearch
 											onChange={(val) => {
@@ -708,7 +712,7 @@ class PreferenceForm extends React.Component {
 												data-cy="custom-query"
 												placeholder="Select Custom Query"
 												allowClear
-												style={{ width: '100%' }}
+												style={{ width: '100%', margin: 'auto' }}
 												{...handler()}
 												defaultValue={query}
 												value={query}

@@ -80,7 +80,7 @@ const ReplaceWord = ({ value = {}, onChange }) => {
 							shape="circle"
 							ghost
 							size="small"
-							type="danger"
+							danger
 							icon={<CloseOutlined />}
 							style={{ marginTop: 3 }}
 							onClick={() => deleteWord(word)}

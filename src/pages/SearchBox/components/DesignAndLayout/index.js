@@ -11,7 +11,7 @@ import {
 	saveSearchBox as saveSearchBoxAction,
 } from '../../../../batteries/modules/actions/searchboxes';
 import { getURL } from '../../../../constants/config';
-import { FormContext } from '../../../IntegrationsPage/utils';
+import { FormContext } from '../../../IntegrationsPage/utils/utils';
 import { parseJSON } from '../../utils';
 import DesignPanel from './DesignPanel';
 
@@ -180,7 +180,7 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 						<h3>Live Preview</h3>
 					</div>
 				}
-				visible={showLivePreview}
+				open={showLivePreview}
 				onCancel={() => {
 					setShowLivePreview(false);
 

@@ -45,7 +45,7 @@ const PipelineVersionsDrawer = ({
 				placement="right"
 				closable={false}
 				onClose={() => setVisible(false)}
-				visible={visible}
+				open={visible}
 				css={drawerStyles}
 			>
 				<Typography.Title level={3} style={{ margin: '1rem' }}>
