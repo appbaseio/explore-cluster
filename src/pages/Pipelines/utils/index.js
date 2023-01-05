@@ -45,7 +45,19 @@ export const TAB_ACTIONS = {
 
 export const DEFAULT_EXECUTION_CONTEXT_VALUE = {
 	request: {
-		body: { query: [{ id: 'search', type: 'suggestion', dataField: 'label', value: 'harry' }] },
+		body: {
+			query: [
+				{
+					id: 'search',
+					type: 'search',
+					dataField: 'original_title',
+					value: 'harry',
+				},
+			],
+			settings: {
+				recordAnalytics: false,
+			},
+		},
 		headers: {},
 	},
 	response: {},

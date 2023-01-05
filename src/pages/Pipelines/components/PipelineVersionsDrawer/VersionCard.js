@@ -19,18 +19,17 @@ const versionCardStyles = css`
 		.make-live-btn {
 			display: none;
 		}
-
-		&:hover {
-			.edit-version-btn,
-			.make-live-btn {
-				display: unset;
-			}
-		}
 	}
 
 	.usage-stats-wrapper {
 		gap: 10px;
 		flex-wrap: wrap;
+	}
+	&:hover {
+		.edit-version-btn,
+		.make-live-btn {
+			display: unset;
+		}
 	}
 `;
 const VersionCard = ({

@@ -72,7 +72,6 @@ import PipelineVersionsDrawer from './components/PipelineVersionsDrawer';
 import VersionDescriptionModal from './components/VersionDescriptionModal';
 
 const { Panel } = Collapse;
-const { TabPane } = Tabs;
 const link = css`
 	font-size: 14px;
 	margin-right: 30px;
@@ -565,7 +564,9 @@ const PipelinesForm = (props) => {
 			setTabPanes(newTabPanes);
 
 			// reset active tab
-			const activeTab = newTabPanes.length ? newTabPanes.pop().key : DEFAULT_TAB_KEY;
+			const activeTab = newTabPanes.length
+				? newTabPanes[newTabPanes.length - 1].key
+				: DEFAULT_TAB_KEY;
 			setactiveTabKey(activeTab);
 
 			// update ScriptFileMap
@@ -773,8 +774,7 @@ const PipelinesForm = (props) => {
 			</div>
 		);
 	}
-
-	if (isEditPage && !pipeline) {
+	if (isEditPage && !pipeline.id) {
 		return (
 			<div className={container}>
 				<Card>
@@ -954,120 +954,136 @@ const PipelinesForm = (props) => {
 								type="editable-card"
 								hideAdd
 								activeKey={activeTabKey}
-							>
-								<TabPane tab="Pipeline" key="pipeline_tab" closable={false}>
-									<div className="tab-content">
-										<Flex>
-											<div
-												className="tab-content"
-												style={{
-													width: isValidateMode ? '50%' : '100%',
-													transition: 'all .3s ease-in',
-												}}
-											>
-												<PipelineEditorComponent
-													valueProp={editorPipelineValue}
-													onChange={(value) => {
-														setEditorPipelineValue(value);
-													}}
-													setErrorFlag={setHasError}
-												/>
-											</div>
+								items={[
+									{
+										label: 'Pipeline',
+										key: 'pipeline_tab',
+										children: (
+											<div className="tab-content">
+												<Flex>
+													<div
+														className="tab-content"
+														style={{
+															width: isValidateMode ? '50%' : '100%',
+															transition: 'all .3s ease-in',
+														}}
+													>
+														<PipelineEditorComponent
+															valueProp={editorPipelineValue}
+															onChange={(value) => {
+																setEditorPipelineValue(value);
+															}}
+															setErrorFlag={setHasError}
+														/>
+													</div>
 
-											<div
-												className="tab-content"
-												style={{
-													width: isValidateMode ? '50%' : '0%',
-													transition: 'all .3s ease-in',
-												}}
-											>
-												<PipelineValidation
-													showStageChanges
-													executionContext={executionContext}
-													setExecutionContext={setExecutionContext}
-													isVisible={isValidateMode}
-													onPlayButtonClick={handlePipelineValidation}
-													responseTabValue={
-														pipelineValidationRes
-															? JSON.stringify(
-																	pipelineValidationRes,
-																	null,
-																	4,
-															  )
-															: ''
-													}
-													consoleLogsArray={getConsoleLogsArray(
-														pipelineValidationRes,
-													)}
-													isValidating={isValidatingPipeline}
-												/>
+													<div
+														className="tab-content"
+														style={{
+															width: isValidateMode ? '50%' : '0%',
+															transition: 'all .3s ease-in',
+														}}
+													>
+														<PipelineValidation
+															showStageChanges
+															executionContext={executionContext}
+															setExecutionContext={
+																setExecutionContext
+															}
+															isVisible={isValidateMode}
+															onPlayButtonClick={
+																handlePipelineValidation
+															}
+															responseTabValue={
+																pipelineValidationRes
+																	? JSON.stringify(
+																			pipelineValidationRes,
+																			null,
+																			4,
+																	  )
+																	: ''
+															}
+															consoleLogsArray={getConsoleLogsArray(
+																pipelineValidationRes,
+															)}
+															isValidating={isValidatingPipeline}
+														/>
+													</div>
+												</Flex>
 											</div>
-										</Flex>
-									</div>
-								</TabPane>
-								{tabPanes.map((tab) => (
-									<TabPane
-										tab={getTabTitle(tab.title, tab.key)}
-										key={tab.key}
-										closable
-									>
-										<TabContent
-											onScriptFileChange={(value) => {
-												updateScriptFileMap(
-													tab.key,
-													SCRIPT_FILES_MAP_ACTIONS.ADD,
-													{
-														scriptValue: value,
-													},
-												);
-											}}
-											scriptValueProp={
-												scriptFilesMap?.[tab.key]?.scriptValue ?? ''
-											}
-											onValidatedScriptRuleChange={(validatedScriptValue) => {
-												updateScriptFileMap(
-													tab.key,
-													SCRIPT_FILES_MAP_ACTIONS.ADD,
-													{
-														validatedScripRule: validatedScriptValue,
-													},
-												);
-											}}
-											validationComponentProps={{
-												showStageChanges: true,
-												executionContext,
-												setExecutionContext,
-												isVisible: isValidateMode,
-												onPlayButtonClick: handlePipelineValidation,
-												responseTabValue: pipelineValidationRes
-													? JSON.stringify(pipelineValidationRes, null, 4)
-													: '',
-												consoleLogsArray:
-													getConsoleLogsArray(pipelineValidationRes),
-												isValidating: isValidatingPipeline,
-											}}
-											isValidateMode={isValidateMode}
-										/>
-									</TabPane>
-								))}
-								<TabPane
-									tab={
-										<Tooltip title="Add script file">
-											<Button
-												className="add-script-btn"
-												onClick={(e) => {
-													e.stopPropagation();
-													handleAddOrRemoveTab(null, TAB_ACTIONS.ADD);
+										),
+										closable: false,
+									},
+									...tabPanes.map((tab) => ({
+										label: getTabTitle(tab.title, tab.key),
+										key: tab.key,
+										closable: true,
+										children: (
+											<TabContent
+												onScriptFileChange={(value) => {
+													updateScriptFileMap(
+														tab.key,
+														SCRIPT_FILES_MAP_ACTIONS.ADD,
+														{
+															scriptValue: value,
+														},
+													);
 												}}
-											>
-												<PlusOutlined />
-											</Button>
-										</Tooltip>
-									}
-									key="add_script"
-									closable={false}
-								/>
-							</Tabs>
+												scriptValueProp={
+													scriptFilesMap?.[tab.key]?.scriptValue ?? ''
+												}
+												onValidatedScriptRuleChange={(
+													validatedScriptValue,
+												) => {
+													updateScriptFileMap(
+														tab.key,
+														SCRIPT_FILES_MAP_ACTIONS.ADD,
+														{
+															validatedScripRule:
+																validatedScriptValue,
+														},
+													);
+												}}
+												validationComponentProps={{
+													showStageChanges: true,
+													executionContext,
+													setExecutionContext,
+													isVisible: isValidateMode,
+													onPlayButtonClick: handlePipelineValidation,
+													responseTabValue: pipelineValidationRes
+														? JSON.stringify(
+																pipelineValidationRes,
+																null,
+																4,
+														  )
+														: '',
+													consoleLogsArray:
+														getConsoleLogsArray(pipelineValidationRes),
+													isValidating: isValidatingPipeline,
+												}}
+												isValidateMode={isValidateMode}
+											/>
+										),
+									})),
+									{
+										label: (
+											<Tooltip title="Add script file">
+												<Button
+													className="add-script-btn"
+													onClick={(e) => {
+														e.stopPropagation();
+														handleAddOrRemoveTab(null, TAB_ACTIONS.ADD);
+													}}
+												>
+													<PlusOutlined />
+												</Button>
+											</Tooltip>
+										),
+										key: 'add_script',
+										closable: false,
+									},
+								]}
+							/>
 						</section>
 					</Card>
 					<Affix offsetBottom={0}>
@@ -1119,9 +1135,9 @@ const PipelinesForm = (props) => {
 					<PipelineVersionsDrawer
 						visible={showVersionDrawer}
 						setVisible={setShowVersionDrawer}
-						allVersions={pipeline.versions}
+						allVersions={pipeline?.versions}
 						makePipelineVersionLive={(versionId) => {
-							makePipelineVersionLive(pipeline.id, versionId).then((res) => {
+							makePipelineVersionLive(pipeline?.id, versionId).then((res) => {
 								if (res?.error) {
 									notification.error({
 										message: 'Error',
@@ -1216,11 +1232,11 @@ const mapStateToProps = (state, props) => {
 	};
 
 	if (id) {
-		let pipelineData = defaultState.pipelines.find((pipeline) => pipeline.id === id) || {};
+		let pipelineData = defaultState.pipelines.find((pipeline) => pipeline.id === id) ?? {};
 		// incase editing a non-live(draft) version for a pipeline
 		if (
-			pipelineData.activeVersion !== pipelineData._version &&
-			Array.isArray(pipelineData.versions)
+			pipelineData?.activeVersion !== pipelineData?._version &&
+			Array.isArray(pipelineData?.versions)
 		) {
 			const versionData = pipelineData.versions.find(
 				(version) => version._version === pipelineData.activeVersion,
