@@ -330,7 +330,7 @@
 	padding: 0;
 }
 .sp-button:hover:not(:disabled) {
-	background-color: var(--sp-colors-bg-active);
+	background-color: var(--sp-colors-surface3);
 	color: var(--sp-colors-fg-active);
 }
 .sp-button:disabled {
