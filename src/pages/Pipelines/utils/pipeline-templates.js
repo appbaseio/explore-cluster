@@ -11,6 +11,9 @@ export default {
 				},
 			},
 		],
+		envs: {
+			index: ["good-books-ds"]
+		},
 		stages: [
 			{
 				id: 'auth',
@@ -25,11 +28,12 @@ export default {
 			{
 				id: 'query',
 				use: 'reactivesearchQuery',
+				continueOnError: false
 			},
 			{
 				id: 'es_query',
-				use: 'elasticsearchQuery',
-				async: true,
+				use: 'elasticsearchQuery'
+				continueOnError: false
 			},
 		],
 	},
