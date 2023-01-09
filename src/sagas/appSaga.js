@@ -5,6 +5,8 @@ import { getEndpoints, getESIndices } from '../utils';
 import { loadAppsSuccess, loadAppsError, loadEndpointsSuccess } from '../actions';
 import apisMapper from '../pages/IntegrationsPage/utils/apisMapper';
 import { BACKENDS } from '../batteries/utils';
+import { createAction } from '../batteries/modules/actions/utils';
+import constants from '../batteries/modules/constants';
 
 const getUser = (state) => state.user.data;
 const getPlan = (state) => get(state, '$getAppPlan.results', {});
@@ -12,9 +14,19 @@ function* appWorker() {
 	try {
 		const user = yield select(getUser);
 		const plan = yield select(getPlan);
-
+		yield put(createAction(constants.HEALTH.SET_SEARCH_ENGINE_HEALTH));
 		const endpoints = yield call(getEndpoints);
-		yield put(loadEndpointsSuccess(endpoints));
+
+		if (typeof endpoints === 'object' && !endpoints.status) {
+			yield put(loadEndpointsSuccess(endpoints));
+			yield put(createAction(constants.HEALTH.SET_SEARCH_ENGINE_HEALTH_SUCCESS));
+		} else
+			yield put(
+				createAction(constants.HEALTH.SET_SEARCH_ENGINE_HEALTH_ERROR, {
+					error: endpoints,
+				}),
+			);
+
 		const apps = yield call(
 			getESIndices,
 			user.authToken,
