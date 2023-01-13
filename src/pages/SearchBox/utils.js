@@ -4,7 +4,7 @@ export const SearchBoxBannerDetails = {
 	title: 'Searchbox',
 	description: `GUI to create and manage searchbox UI preferences. Configure design, and suggestions layout: supports featured, popular, recent and endpoint type of suggestions.`,
 	buttonText: 'Read Docs',
-	href: 'https://docs.reactivesearch.io/docs/reactivesearch/ui-builder/searchbox-ui/build-searchbox-elasticsearch/',
+	href: 'https://docs.reactivesearch.io/docs/reactivesearch/ui-builder/searchbox-ui/build-searchbox-with-elasticsearch/',
 };
 
 // function to validate for a valid HTML string
