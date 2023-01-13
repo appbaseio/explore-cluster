@@ -32,7 +32,7 @@ export default {
 			},
 			{
 				id: 'es_query',
-				use: 'elasticsearchQuery'
+				use: 'elasticsearchQuery',
 				continueOnError: false
 			},
 		],
