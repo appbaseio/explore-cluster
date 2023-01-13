@@ -180,11 +180,7 @@ class CreateCredentials extends React.Component {
 			pipelines,
 			fetchPipelines,
 		} = this.props;
-		if (
-			appbaseCredentials &&
-			((Array.isArray(mappings) && mappings.length) ||
-				(typeof mappings === 'object' && Object.keys(mappings || {}).length))
-		) {
+		if (appbaseCredentials) {
 			this.getMappings();
 		}
 		const indicesHandler = this.form.get('indices');
@@ -1605,6 +1601,7 @@ const mapStateToProps = (state) => {
 	const appPermissions = getAppPermissionsByName(state);
 	const { username, password } = get(state, 'user.data', {});
 	const indices = get(state, 'apps.data');
+
 	return {
 		appbaseCredentials: username ? `${username}:${password}` : null,
 		isPaidUser: true,

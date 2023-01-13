@@ -17,10 +17,14 @@ class WhiteList extends React.Component {
 	}
 
 	handleSelectOption = (value) => {
-		this.setState(() => {
+		this.setState((prev) => {
 			const { control } = this.props;
-			if (value && !control.value.includes(value)) {
-				control.onChange([...control.value, value]);
+			let finalValue = value;
+			if (typeof value !== 'string') {
+				finalValue = prev.text;
+			}
+			if (finalValue && !control.value.includes(finalValue)) {
+				control.onChange([...control.value, finalValue]);
 				return {
 					text: undefined,
 				};

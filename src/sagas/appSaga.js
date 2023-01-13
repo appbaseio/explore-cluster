@@ -15,17 +15,19 @@ function* appWorker() {
 		const user = yield select(getUser);
 		const plan = yield select(getPlan);
 		yield put(createAction(constants.HEALTH.SET_SEARCH_ENGINE_HEALTH));
-		const endpoints = yield call(getEndpoints);
+		let endpoints = yield call(getEndpoints);
 
 		if (typeof endpoints === 'object' && !endpoints.status) {
 			yield put(loadEndpointsSuccess(endpoints));
 			yield put(createAction(constants.HEALTH.SET_SEARCH_ENGINE_HEALTH_SUCCESS));
-		} else
+		} else {
 			yield put(
 				createAction(constants.HEALTH.SET_SEARCH_ENGINE_HEALTH_ERROR, {
 					error: endpoints,
 				}),
 			);
+			endpoints = null;
+		}
 
 		const apps = yield call(
 			getESIndices,
