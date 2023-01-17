@@ -16,6 +16,7 @@ import FileExplorer from '../FileExplorer/index';
 import MonacoEditor from './MonacoEditor';
 import '../../styles.css';
 import '../sandpack-css.css';
+import UpgradePlanModal from '../../../../SearchUIBuilderPage/components/UpgradePlanModal';
 
 const SandPackIntegration = ({
 	updatedCode,
@@ -164,19 +165,35 @@ const SandPackIntegration = ({
 				<SandpackPreview
 					style={{ height: `${iframeHeight}px` }}
 					showOpenInCodeSandbox={
-						uiBuilderPremium || tier === 'production' || tier === 'enterprise'
+						uiBuilderPremium ||
+						tier.includes('production') ||
+						tier.includes('enterprise')
 					}
 					actionsChildren={
-						<Tooltip title="View Console">
-							<Button
-								shape="circle"
-								icon={<CodeOutlined />}
-								size="small"
-								className="sp-button sp-icon-standalone"
-								style={{ padding: 8 }}
-								onClick={scrollToBottom}
-							/>
-						</Tooltip>
+						<>
+							<Tooltip title="View Console">
+								<Button
+									shape="circle"
+									icon={<CodeOutlined />}
+									size="small"
+									className="sp-button sp-icon-standalone"
+									style={{ padding: 8, width: 28, height: 28 }}
+									onClick={scrollToBottom}
+								/>
+							</Tooltip>
+							{!(
+								uiBuilderPremium ||
+								tier.includes('production') ||
+								tier.includes('enterprise')
+							) ? (
+								<UpgradePlanModal
+									tooltipProps={{
+										title: 'Export to CodeSandbox',
+									}}
+									iconType="ExternalLink"
+								/>
+							) : null}
+						</>
 					}
 				/>
 			</SandpackLayout>

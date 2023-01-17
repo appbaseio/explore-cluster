@@ -13,6 +13,7 @@ import headerStyles from './styles';
 import AppSwitcher from '../AppSwitcher';
 // eslint-disable-next-line
 import { bannerContext } from '../..';
+import HealthStats from './HealthStats';
 
 const { Header } = Layout;
 const noBorder = css`
@@ -138,7 +139,7 @@ const AppHeader = ({
 						</Tooltip>
 					</div>
 				)}
-
+				<HealthStats />
 				{showProfile() && (
 					<Row justify="space-between" align="middle">
 						<UserMenu user={user} />

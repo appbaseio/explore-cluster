@@ -29,7 +29,7 @@ const UploadModal = ({
 
 	return (
 		<div>
-			<Tooltip title="Upload project to sandpack editor.">
+			<Tooltip title="Upload project to sandpack editor." placement="bottomLeft">
 				<UploadOutlined onClick={() => setModalType('upload')} />
 			</Tooltip>
 

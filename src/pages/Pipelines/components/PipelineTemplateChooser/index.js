@@ -28,9 +28,9 @@ const pipelineTemplateCss = css`
 	.template-cards-wrapper {
 		display: flex;
 		flex-wrap: wrap;
-		flex: 1;
 		overflow: auto;
 		justify-content: center;
+		gap: 2rem;
 		.template-card {
 			cursor: pointer;
 			margin: 7px;
@@ -77,6 +77,8 @@ const pipelineTemplateCss = css`
 	.footer-area {
 		width: 100%;
 		padding: 10px;
+		position: absolute;
+		bottom: 0;
 		button {
 			float: right;
 		}

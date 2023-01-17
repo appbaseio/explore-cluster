@@ -3,7 +3,6 @@
 */
 
 import React from 'react';
-import { Prompt } from 'react-router-dom';
 import { FieldGroup } from 'react-reactive-form';
 import { bool, object } from 'prop-types';
 import { connect } from 'react-redux';
@@ -33,8 +32,6 @@ const SearchUICodePage = ({ ...props }) => {
 
 	return (
 		<React.Fragment>
-			<Prompt message="Are you sure you want to leave?" />
-
 			<div>
 				{props.isPaidUser ? (
 					<VersionController version="8.1.0">

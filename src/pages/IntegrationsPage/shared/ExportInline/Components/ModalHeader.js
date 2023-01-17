@@ -30,6 +30,7 @@ import {
 	saveSearchPreference,
 } from '../../../../../batteries/modules/actions';
 import AppConstants from '../../../../../batteries/modules/constants';
+import UpgradePlanModal from '../../../SearchUIBuilderPage/components/UpgradePlanModal';
 
 export async function asyncCallWithTimeout(asyncPromise, timeLimit) {
 	let timeoutHandle;
@@ -80,6 +81,8 @@ const ModalHeader = ({
 	getSearchPreferences,
 	updateSearchPreferences,
 	getDeploymentStatus,
+	uiBuilderPremium,
+	tier,
 }) => {
 	const [visible, setVisible] = useState(false);
 	const [errMsg, setErrMsg] = useState('');
@@ -346,16 +349,31 @@ const ModalHeader = ({
 							onClick={() => setIsCollapsed(!collapsed)}
 						/>
 					)}
-					<UploadModal
-						errMsg={errMsg}
-						setErrMsg={setErrMsg}
-						setIsLoading={setIsLoading}
-						isLoading={isLoading}
-						open={modalType === 'upload'}
-						setModalType={setModalType}
-						handleCancel={handleCancel}
-						handleCommitCode={handleCommitCode}
-					/>
+					{!(
+						uiBuilderPremium ||
+						tier.includes('production') ||
+						tier.includes('enterprise')
+					) ? (
+						<UpgradePlanModal
+							tooltipProps={{
+								title: 'Upload project to sandpack editor',
+								placement: 'bottomLeft',
+							}}
+							iconType="UploadOutlined"
+						/>
+					) : (
+						<UploadModal
+							errMsg={errMsg}
+							setErrMsg={setErrMsg}
+							setIsLoading={setIsLoading}
+							isLoading={isLoading}
+							open={modalType === 'upload'}
+							setModalType={setModalType}
+							handleCancel={handleCancel}
+							handleCommitCode={handleCommitCode}
+						/>
+					)}
+
 					<ThemeSwitch themeType={localTheme} setThemeType={setThemeType} />
 				</div>
 			</div>
@@ -430,6 +448,8 @@ ModalHeader.propTypes = {
 	updateSearchPreferences: PropTypes.func.isRequired,
 	getSearchPreferences: PropTypes.func.isRequired,
 	getDeploymentStatus: PropTypes.func.isRequired,
+	uiBuilderPremium: PropTypes.string.isRequired,
+	tier: PropTypes.string.isRequired,
 };
 
 ModalHeader.defaultProps = {
@@ -448,6 +468,8 @@ ModalHeader.defaultProps = {
 const mapStateToProps = (state) => {
 	return {
 		versionState: get(state, '$getSearchPreferencesVersions.results', {}),
+		uiBuilderPremium: get(state, '$getAppPlan.results.feature_uibuilder_premium'),
+		tier: get(state, '$getAppPlan.results.tier'),
 	};
 };
 

@@ -850,12 +850,15 @@ export async function getEndpoints() {
 				Authorization: `Basic ${authToken}`,
 			},
 		});
-		const data = await response.json();
+
 		if (response.status >= 400) {
-			throw new Error(data);
+			return response;
 		}
+		const data = await response.json();
+
 		return data;
 	} catch (error) {
 		console.log('Error loading endpoints', error);
+		return error;
 	}
 }
