@@ -89,9 +89,9 @@ const SearchBoxPage = (props) => {
 							<Row>
 								<Col lg={18}>
 									<p>
-										GUI to create and manage search bar UIs. Configure design,
-										layout, and add featured, popular, recent and index
-										suggestion.
+										Create an embeddable searchbox widget with no-code. Export
+										and integrate into any HTML website with ease. Extend with
+										low-code using the ReactiveSearch Searchbox component.
 									</p>
 								</Col>
 							</Row>

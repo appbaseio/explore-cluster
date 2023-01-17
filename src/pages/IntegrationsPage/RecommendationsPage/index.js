@@ -14,7 +14,7 @@ import moment from '../../../utils/moment';
 const bannerDetailsPaid = {
 	title: 'Recommendations UI Builder',
 	description:
-		'Build a WYSIWYG recommendations UI that can be installed to any E-Commerce platform or to your own site.',
+		'Build a WYSIWYG recommendations carousel UI that can be integrated to any E-Commerce platform or to your own site.',
 	buttonText: 'Read Docs',
 	href: 'http://docs.reactivesearch.io/docs/reactivesearch/ui-builder/recommendations/',
 };

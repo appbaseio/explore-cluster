@@ -139,8 +139,19 @@ class DashboardWrapper extends Component {
 								icon: 'control',
 								action: ALLOWED_ACTIONS.UI_BUILDER,
 								menu: [
+									...(backend === BACKENDS.ELASTICSEARCH.name ||
+									backend === BACKENDS.OPENSEARCH.name ||
+									backend === BACKENDS.SYSTEM.name
+										? [
+												{
+													label: 'Searchbox',
+													link: '/cluster/searchboxes',
+													tag: 'Beta',
+												},
+										  ]
+										: []),
 									{
-										label: 'Search',
+										label: 'Search UI',
 										link: '/cluster/search-builder',
 										tag: 'Beta',
 									},
@@ -151,11 +162,6 @@ class DashboardWrapper extends Component {
 												{
 													label: 'Recommendations',
 													link: '/cluster/recommendations-builder',
-													tag: 'Beta',
-												},
-												{
-													label: 'Searchbox',
-													link: '/cluster/searchboxes',
 													tag: 'Beta',
 												},
 										  ]

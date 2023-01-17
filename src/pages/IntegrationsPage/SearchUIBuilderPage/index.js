@@ -12,7 +12,7 @@ import moment from '../../../utils/moment';
 const bannerDetailsPaid = {
 	title: 'Search UI Builder',
 	description:
-		'Build a WYSIWYG storefront search preview that can be installed to your favorite E-Commerce platform.',
+		'Create an entire search UI experience with no-code. Ship to the global edge in a single-click. Extend the search UI with low-code (or your favorite IDE) and manage via dashboard.',
 	buttonText: 'Read Docs',
 	href: 'http://docs.reactivesearch.io/docs/reactivesearch/ui-builder/search/',
 };

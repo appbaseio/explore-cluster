@@ -113,8 +113,19 @@ class AppWrapper extends Component {
 								icon: 'control',
 								action: ALLOWED_ACTIONS.UI_BUILDER,
 								menu: [
+									...(backend === BACKENDS.ELASTICSEARCH.name ||
+									backend === BACKENDS.OPENSEARCH.name ||
+									backend === BACKENDS.SYSTEM.name
+										? [
+												{
+													label: 'Searchbox',
+													link: '/cluster/searchboxes',
+													tag: 'Beta',
+												},
+										  ]
+										: []),
 									{
-										label: 'Search',
+										label: 'Search UI',
 										link: '/cluster/search-builder',
 										hasExactPath: true,
 										tag: 'Beta',
@@ -128,11 +139,6 @@ class AppWrapper extends Component {
 													link: '/cluster/recommendations-builder',
 													tag: 'Beta',
 													hasExactPath: true,
-												},
-												{
-													label: 'Searchbox',
-													link: '/cluster/searchboxes',
-													tag: 'Beta',
 												},
 										  ]
 										: []),
