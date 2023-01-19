@@ -3,7 +3,7 @@ import get from 'lodash/get';
 import { APPS } from '../constants';
 import { getEndpoints, getESIndices } from '../utils';
 import { loadAppsSuccess, loadAppsError, loadEndpointsSuccess } from '../actions';
-import apisMapper from '../pages/IntegrationsPage/utils/apisMapper';
+import apisMapper from '../batteries/utils/apisMapper';
 import { BACKENDS } from '../batteries/utils';
 import { createAction } from '../batteries/modules/actions/utils';
 import constants from '../batteries/modules/constants';

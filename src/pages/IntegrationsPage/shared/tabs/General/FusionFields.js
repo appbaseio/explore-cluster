@@ -7,7 +7,7 @@ import { FieldControl } from 'react-reactive-form';
 import { getApiGeneralization } from '../../../utils/be-apis';
 import { BACKENDS } from '../../../../../batteries/utils';
 import { transformGeneralMappingsToFusionArrayFormat } from '../../../utils/fusion-apis';
-import apisMapper from '../../../utils/apisMapper';
+import apisMapper from '../../../../../batteries/utils/apisMapper';
 
 const FusionFields = ({ filteredApps, control, backend, endpoints }) => {
 	const [queryProfiles, setQueryProfiles] = useState([]);

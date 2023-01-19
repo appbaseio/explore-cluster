@@ -1,8 +1,12 @@
 import PropTypes from 'prop-types';
 import values from 'lodash/values';
-import { ARC_PLANS, CLUSTER_PLANS } from '../batteries/utils';
+import { ARC_PLANS, CLUSTER_PLANS, SLS_PLANS } from '../batteries/utils';
 
-export const allowedTiers = PropTypes.oneOf([...values(ARC_PLANS), ...values(CLUSTER_PLANS)]);
+export const allowedTiers = PropTypes.oneOf([
+	...values(ARC_PLANS),
+	...values(CLUSTER_PLANS),
+	...values(SLS_PLANS),
+]);
 export const children = PropTypes.oneOfType([
 	PropTypes.arrayOf(PropTypes.node),
 	PropTypes.node,

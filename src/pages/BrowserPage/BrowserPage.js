@@ -106,6 +106,7 @@ class BrowserPage extends Component {
 							showHeaders={false}
 							forceReconnect
 							hasCloneApp={false}
+							enableReactivesearch={true}
 						/>
 					</div>
 				) : (

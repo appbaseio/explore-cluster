@@ -8,7 +8,7 @@ import { FieldControl } from 'react-reactive-form';
 import { getAppMappings } from '../../batteries/modules/actions';
 import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import { traverseMapping } from '../../batteries/utils/mappings';
-import apisMapper from '../../pages/IntegrationsPage/utils/apisMapper';
+import apisMapper from '../../batteries/utils/apisMapper';
 import { getApiGeneralization } from '../../pages/IntegrationsPage/utils/be-apis';
 import { BACKENDS } from '../../batteries/utils';
 import { RANGE_FIELDS } from '../../constants';

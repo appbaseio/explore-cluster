@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { Tooltip, AutoComplete } from 'antd';
 import { bool, func, object, string } from 'prop-types';
 import { getApiGeneralization } from '../../pages/IntegrationsPage/utils/be-apis';
-import apisMapper from '../../pages/IntegrationsPage/utils/apisMapper';
+import apisMapper from '../../batteries/utils/apisMapper';
 import { BACKENDS } from '../../batteries/utils';
 import { transformGeneralMappingsToFusionArrayFormat } from '../../pages/IntegrationsPage/utils/fusion-apis';
 

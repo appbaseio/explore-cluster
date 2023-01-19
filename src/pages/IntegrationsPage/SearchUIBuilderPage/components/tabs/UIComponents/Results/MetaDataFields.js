@@ -6,7 +6,7 @@ import { DeleteOutlined, DragOutlined } from '@ant-design/icons';
 import { AutoComplete, Row, Col, Tooltip, Input, Switch } from 'antd';
 import { css } from 'emotion';
 import { Draggable } from 'react-beautiful-dnd';
-import apisMapper from '../../../../../utils/apisMapper';
+import apisMapper from '../../../../../../../batteries/utils/apisMapper';
 import { transformGeneralMappingsToFusionArrayFormat } from '../../../../../utils/fusion-apis';
 import { BACKENDS } from '../../../../../../../batteries/utils';
 import { getApiGeneralization } from '../../../../../utils/be-apis';

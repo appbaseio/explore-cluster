@@ -8,7 +8,7 @@ import { array, bool, func, number, object, string } from 'prop-types';
 import CustomizeChart from './CustomizeChart';
 import CustomizeFilter from '../Filters/CustomizeFilter';
 import { getApiGeneralization } from '../../../../../utils/be-apis';
-import apisMapper from '../../../../../utils/apisMapper';
+import apisMapper from '../../../../../../../batteries/utils/apisMapper';
 import { BACKENDS } from '../../../../../../../batteries/utils';
 import { transformGeneralMappingsToFusionArrayFormat } from '../../../../../utils/fusion-apis';
 

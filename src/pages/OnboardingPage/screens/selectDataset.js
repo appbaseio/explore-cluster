@@ -124,7 +124,7 @@ function selectDataset({ nextScreen, setURL, url: newUrl, handleDataset }) {
 			const config = JSON.parse(url);
 			const { protocol, host, auth } = parser(config.url);
 			const dejavuAddress = `${protocol}://${auth}@${host}`;
-			iframeURL = `https://dejavu.appbase.io/?appname=${config.appname}&url=${dejavuAddress}&footer=false&sidebar=false&appswitcher=false&mode=edit&cloneApp=false&oldBanner=false`;
+			iframeURL = `https://dejavu.appbase.io/?appname=${config.appname}&url=${dejavuAddress}&footer=false&sidebar=false&appswitcher=false&mode=edit&cloneApp=false&oldBanner=false&enablereactivesearch=true`;
 		}
 
 		return (

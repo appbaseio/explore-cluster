@@ -9,7 +9,7 @@ import {
 } from '@ant-design/icons';
 import { Row, Col, Button, Layout } from 'antd';
 import get from 'lodash/get';
-import { Link } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 import Header from '../../components/Header';
@@ -68,8 +68,12 @@ class HomePage extends Component {
 	};
 
 	renderApps = (canEdit) => {
-		const { apps } = this.props;
+		const { apps, history } = this.props;
 		const sortedApps = apps && apps.data ? Object.keys(apps.data) : [];
+		if (!apps.isFetching && !sortedApps.length) {
+			history.push('/tutorial');
+			return null;
+		}
 		return (
 			<Row css={{ padding: 30 }} gutter={20}>
 				{sortedApps.length || apps.isFetching ? null : (
@@ -209,4 +213,4 @@ const mapDispatchToProps = (dispatch) => ({
 	fetchApps: () => dispatch(loadApps()),
 });
 
-export default withErrorToaster(connect(mapStateToProps, mapDispatchToProps)(HomePage));
+export default withErrorToaster(withRouter(connect(mapStateToProps, mapDispatchToProps)(HomePage)));

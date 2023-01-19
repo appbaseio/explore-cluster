@@ -4,7 +4,7 @@ import get from 'lodash/get';
 import { connect } from 'react-redux';
 import { func, object, string } from 'prop-types';
 import { FieldControl, FieldGroup } from 'react-reactive-form';
-import apisMapper from '../../../../utils/apisMapper';
+import apisMapper from '../../../../../../batteries/utils/apisMapper';
 import { getApiGeneralization } from '../../../../utils/be-apis';
 import { BACKENDS } from '../../../../../../batteries/utils';
 import SearchPreviewModal from './SearchPreview';

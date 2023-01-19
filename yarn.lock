@@ -127,10 +127,10 @@
   dependencies:
     cross-fetch "^3.0.4"
 
-"@appbaseio/dejavu-browser@^3.8.1":
-  version "3.8.1"
-  resolved "https://registry.yarnpkg.com/@appbaseio/dejavu-browser/-/dejavu-browser-3.8.1.tgz#5f4e2d9ed47db7c2452fdd6dfcc7b2c06e1b9c50"
-  integrity sha512-92kB9GAjBwOZe+1hx23p4QlCkUnTjcO70egLWeKu8HY5AIS0SjLfmQxW+nLT8FzwwEelWfp9A0xcufhKv8acyA==
+"@appbaseio/dejavu-browser@^3.8.2":
+  version "3.8.2"
+  resolved "https://registry.yarnpkg.com/@appbaseio/dejavu-browser/-/dejavu-browser-3.8.2.tgz#867866d2964b14d60140bef36c1e8ab54702220b"
+  integrity sha512-boUjAEZxHGYBHv4LXin/MiN8U1FDlW/n2apJm/3L7x3Br8GVGgRILAywfQbOhij0Gm9Jm1RkbpOKLNwSawoacg==
   dependencies:
     "@divyanshu013/media" "^1.0.0"
     "@fortawesome/fontawesome-svg-core" "^1.2.27"
@@ -140,11 +140,14 @@
     dayjs "^1.11.7"
     dom-helpers "^3.4.0"
     dompurify "^2.3.6"
+    emotion "9.2.6"
     file-saver "^2.0.0-rc.4"
     flat "^4.1.0"
     ismobilejs "^0.5.1"
+    moment "^2.29.4"
     papaparse "^4.6.1"
     react-custom-scrollbars "^4.2.1"
+    react-joyride "2.0.0-15"
     react-json-editor-ajrm "^2.5.8"
     react-virtualized "^9.21.0"
 
@@ -5382,7 +5385,7 @@ create-emotion@^10.0.14, create-emotion@^10.0.27:
     "@emotion/sheet" "0.9.4"
     "@emotion/utils" "0.11.3"
 
-create-emotion@^9.0.2, create-emotion@^9.2.12:
+create-emotion@^9.0.2, create-emotion@^9.2.12, create-emotion@^9.2.6:
   version "9.2.12"
   resolved "https://registry.yarnpkg.com/create-emotion/-/create-emotion-9.2.12.tgz#0fc8e7f92c4f8bb924b0fef6781f66b1d07cb26f"
   integrity sha512-P57uOF9NL2y98Xrbl2OuiDQUZ30GVmASsv5fbsjF4Hlraip2kyAvMm+2PoYUvFFw03Fhgtxk3RqZSm2/qHL9hA==
@@ -6393,6 +6396,14 @@ emotion-theming@^10.0.27:
     "@babel/runtime" "^7.5.5"
     "@emotion/weak-memoize" "0.2.5"
     hoist-non-react-statics "^3.3.0"
+
+emotion@9.2.6:
+  version "9.2.6"
+  resolved "https://registry.yarnpkg.com/emotion/-/emotion-9.2.6.tgz#48517515e769bca6d8f7ff18425a7f133b010f22"
+  integrity sha512-95/EiWkADklxyy1y1qlJeX5Cepa7WfpJBJSBgbLkDCBzOnP4maluvz52xcV5UaObBTfVnEBq77Go6/bgF7+xaA==
+  dependencies:
+    babel-plugin-emotion "^9.2.6"
+    create-emotion "^9.2.6"
 
 emotion@^10.0.14, emotion@^10.0.9:
   version "10.0.27"
