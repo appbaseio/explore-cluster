@@ -17,11 +17,6 @@ const container = css`
 	@media only screen and (max-width: 980px), (min-width: 1400px) {
 		max-width: 1000px;
 	}
-	.add-section-wrapper {
-		position: absolute;
-		right: 0px;
-		top: -45px;
-	}
 
 	.input-wrapper {
 		border-radius: 6px;
