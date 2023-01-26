@@ -1,6 +1,9 @@
 import { Form, Input, Select, Switch } from 'antd';
 import styled from 'react-emotion';
 import React, { useEffect, useState } from 'react';
+import { InfoCircleOutlined } from '@ant-design/icons';
+import { searchboxMessages } from '../../../../../utils/messages';
+import SearchSvg from './SearchSVG';
 
 const StyledInput = styled(Input)`
 	width: 70%;
@@ -36,6 +39,11 @@ const StyledForm = styled(Form)`
 const StyledSelect = styled(Select)`
 	width: 70% !important;
 `;
+const StyledSearchIcon = styled.div`
+	width: 40px;
+	height: 40px;
+	display: block;
+`;
 
 const KeyboardShortcut = styled.div`
 	font-size: 0.8rem;
@@ -43,14 +51,12 @@ const KeyboardShortcut = styled.div`
 	font-weight: bold;
 `;
 
-const TEMP_ICON_URL =
-	'https://static.vecteezy.com/system/resources/previews/009/876/396/original/realistic-magnifying-glass-clip-art-free-png.png';
-
 const NEW_SHORTCUT_DELAY = 1000;
 
 export default function CustomizeSearchBoxForm() {
-	const [currentShortcut, setCurrentShortcut] = useState('');
+	const [currentShortcuts, setCurrentShortcuts] = useState([]);
 	const [debouncedShortcut, setDebouncedShortcut] = useState('');
+	const iconURL = '';
 
 	const handleShortcutKey = (key) => {
 		if (debouncedShortcut) {
@@ -63,7 +69,7 @@ export default function CustomizeSearchBoxForm() {
 	useEffect(() => {
 		const timerId = setTimeout(() => {
 			if (debouncedShortcut) {
-				setCurrentShortcut(debouncedShortcut);
+				setCurrentShortcuts([...currentShortcuts, debouncedShortcut]);
 				setDebouncedShortcut('');
 			}
 		}, NEW_SHORTCUT_DELAY);
@@ -73,43 +79,90 @@ export default function CustomizeSearchBoxForm() {
 
 	return (
 		<StyledForm labelWrap labelAlign="left" colon={false} labelCol={{ span: 8 }}>
-			<Form.Item label="Search Icon">
+			<Form.Item
+				tooltip={{
+					icon: <InfoCircleOutlined />,
+					title: searchboxMessages.iconURL,
+				}}
+				label="Search Icon"
+			>
 				<IconInputContainer>
 					<IconPreview>
-						<IconImage src={TEMP_ICON_URL} alt="icon preview" />
+						{iconURL ? (
+							<IconImage src={iconURL} alt="Icon preview" />
+						) : (
+							<StyledSearchIcon>
+								<SearchSvg />
+							</StyledSearchIcon>
+						)}
 					</IconPreview>
-					<StyledInput />
+					<StyledInput placeholder="Image URL" />
 				</IconInputContainer>
 			</Form.Item>
-			<Form.Item label="Icon Position">
+			<Form.Item
+				label="Icon Position"
+				tooltip={{
+					icon: <InfoCircleOutlined />,
+					title: searchboxMessages.iconPosition,
+				}}
+			>
 				<div>
 					<span>Left</span>
 					<StyledSwitch />
 					<span>Right</span>
 				</div>
 			</Form.Item>
-			<Form.Item label="Placeholder Text">
-				<StyledInput />
+			<Form.Item
+				tooltip={{
+					icon: <InfoCircleOutlined />,
+					title: searchboxMessages.placeholder,
+				}}
+				label="Placeholder Text"
+			>
+				<StyledInput placeholder="Search for suggestions..." />
 			</Form.Item>
-			<Form.Item label="Keyboard Shortcut">
+			<Form.Item
+				tooltip={{
+					icon: <InfoCircleOutlined />,
+					title: searchboxMessages.focusShortcuts,
+				}}
+				label="Keyboard Shortcut"
+			>
 				<StyledSelect
+					placeholder="Not applied"
 					onInputKeyDown={(e) => {
 						e.preventDefault();
 						handleShortcutKey(e.key);
 					}}
-					onDeselect={() => setCurrentShortcut('')}
+					onDeselect={(option) =>
+						setCurrentShortcuts(
+							currentShortcuts.filter((shortcut) => shortcut !== option),
+						)
+					}
 					mode="tags"
 					open={false}
-					value={currentShortcut ? [currentShortcut] : undefined}
+					value={currentShortcuts}
 					searchValue=""
 				/>
 				<KeyboardShortcut>{debouncedShortcut}</KeyboardShortcut>
 			</Form.Item>
-			<Form.Item label="Addon Before">
-				<StyledInput />
+			<Form.Item
+				tooltip={{
+					icon: <InfoCircleOutlined />,
+					title: searchboxMessages.addonBefore,
+				}}
+				label="Addon Before"
+			>
+				<StyledInput placeholder="Enter <html> markup" />
 			</Form.Item>
-			<Form.Item label="Addon After">
-				<StyledInput />
+			<Form.Item
+				tooltip={{
+					icon: <InfoCircleOutlined />,
+					title: searchboxMessages.addonAfter,
+				}}
+				label="Addon After"
+			>
+				<StyledInput placeholder="Enter <html> markup" />
 			</Form.Item>
 		</StyledForm>
 	);
