@@ -118,8 +118,8 @@ const AddSectionModalContent = (props) => {
 				open={visible.customizeSearchbox}
 				onCancel={() => setVisible({ customizeSearchbox: false })}
 				title="Customize Searchbox"
-				className={container}
 				okText="Save"
+				width="75%"
 			>
 				<CustomizeSearchBoxForm />
 			</Modal>
