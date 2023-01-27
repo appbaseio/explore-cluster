@@ -1,11 +1,12 @@
 import { Form, Input, Select, Switch } from 'antd';
 import styled from 'react-emotion';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { FieldControl, FieldGroup } from 'react-reactive-form';
 import { searchboxMessages } from '../../../../../utils/messages';
 import SearchSvg from './SearchSVG';
 import { FormContext } from '../../../../IntegrationsPage/utils/utils';
+import { useKeyboardShortcutDebounce } from './useDebounce';
 
 const StyledInput = styled(Input)`
 	width: 70%;
@@ -53,33 +54,14 @@ const KeyboardShortcut = styled.div`
 	font-weight: bold;
 `;
 
-const NEW_SHORTCUT_DELAY = 1000;
-
 export default function CustomizeSearchBoxForm() {
 	const mainForm = useContext(FormContext);
 	const form = mainForm.get('designAndLayout');
-	const [currentShortcuts, setCurrentShortcuts] = useState([]);
-	const [debouncedShortcut, setDebouncedShortcut] = useState('');
+	const focusShortcutsControl = form.get('focusShortcuts');
+	const [debouncedShortcut, setDebouncedShortcut] = useKeyboardShortcutDebounce(
+		focusShortcutsControl.handler,
+	);
 	const iconURL = '';
-
-	const handleShortcutKey = (key) => {
-		if (debouncedShortcut) {
-			setDebouncedShortcut(`${debouncedShortcut} + ${key.toUpperCase()}`);
-		} else {
-			setDebouncedShortcut(key.toUpperCase());
-		}
-	};
-
-	useEffect(() => {
-		const timerId = setTimeout(() => {
-			if (debouncedShortcut) {
-				setCurrentShortcuts([...currentShortcuts, debouncedShortcut]);
-				setDebouncedShortcut('');
-			}
-		}, NEW_SHORTCUT_DELAY);
-
-		return () => clearTimeout(timerId);
-	}, [debouncedShortcut]);
 
 	return (
 		<FieldGroup
@@ -160,7 +142,8 @@ export default function CustomizeSearchBoxForm() {
 					/>
 					<FieldControl
 						name="focusShortcuts"
-						render={({ handler }) => (
+						strict={false}
+						render={({ handler, value: focusShortcutsValue }) => (
 							<Form.Item
 								tooltip={{
 									icon: <InfoCircleOutlined />,
@@ -172,18 +155,18 @@ export default function CustomizeSearchBoxForm() {
 									placeholder="Not applied"
 									onInputKeyDown={(e) => {
 										e.preventDefault();
-										handleShortcutKey(e.key);
+										setDebouncedShortcut(e.key);
 									}}
 									onDeselect={(option) => {
 										handler().onChange(
-											currentShortcuts.filter(
+											focusShortcutsValue.filter(
 												(shortcut) => shortcut !== option,
 											),
 										);
 									}}
 									mode="tags"
 									open={false}
-									value={handler().value}
+									value={focusShortcutsValue}
 									searchValue=""
 								/>
 								<KeyboardShortcut>{debouncedShortcut}</KeyboardShortcut>
