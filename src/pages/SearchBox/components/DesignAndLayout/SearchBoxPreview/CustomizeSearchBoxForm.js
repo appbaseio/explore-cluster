@@ -112,7 +112,8 @@ export default function CustomizeSearchBoxForm({ modalProps }) {
 													<StyledSearchIcon>
 														<SearchSvg
 															style={{
-																fill: form?.value?.primaryColor,
+																fill: designAndLayoutform?.value
+																	?.primaryColor,
 															}}
 														/>
 													</StyledSearchIcon>

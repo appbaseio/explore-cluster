@@ -48,6 +48,7 @@ const container = css`
 const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, searchBoxData }) => {
 	const mainForm = useContext(FormContext);
 	const form = mainForm.get('designAndLayout');
+	const customizeSearchBoxForm = form.get('customizeSearchBox');
 	const [showLivePreview, setShowLivePreview] = useState(false);
 	const [previewLoading, setPreviewLoading] = useState(false);
 	const featuredSuggestionsPayload = useRef({});
@@ -217,6 +218,27 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 								enableEndpointSuggestions={form.value.enableEndpointSuggestions}
 								showVoiceSearch={form.value.enableVoiceSearch}
 								highlight={form.value.highlight}
+								iconPosition={customizeSearchBoxForm.value.iconPosition}
+								focusShortcuts={customizeSearchBoxForm.value.focusShortcuts}
+								placeholder={customizeSearchBoxForm.value.placeholder}
+								addonBefore={
+									customizeSearchBoxForm.value.addonBefore ? (
+										<div
+											dangerouslySetInnerHTML={{
+												__html: customizeSearchBoxForm.value.addonBefore,
+											}}
+										/>
+									) : null
+								}
+								addonAfter={
+									customizeSearchBoxForm.value.addonAfter ? (
+										<div
+											dangerouslySetInnerHTML={{
+												__html: customizeSearchBoxForm.value.addonAfter,
+											}}
+										/>
+									) : null
+								}
 								componentId="search_box"
 								size={10}
 								{...(featuredSuggestionsId.current && {
