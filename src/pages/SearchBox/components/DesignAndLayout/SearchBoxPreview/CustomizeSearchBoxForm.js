@@ -173,24 +173,34 @@ export default function CustomizeSearchBoxForm() {
 							</Form.Item>
 						)}
 					/>
-					<Form.Item
-						tooltip={{
-							icon: <InfoCircleOutlined />,
-							title: searchboxMessages.addonBefore,
-						}}
-						label="Addon Before"
-					>
-						<StyledInput placeholder="Enter <html> markup" />
-					</Form.Item>
-					<Form.Item
-						tooltip={{
-							icon: <InfoCircleOutlined />,
-							title: searchboxMessages.addonAfter,
-						}}
-						label="Addon After"
-					>
-						<StyledInput placeholder="Enter <html> markup" />
-					</Form.Item>
+					<FieldControl
+						name="addonBefore"
+						render={({ handler }) => (
+							<Form.Item
+								tooltip={{
+									icon: <InfoCircleOutlined />,
+									title: searchboxMessages.addonBefore,
+								}}
+								label="Addon Before"
+							>
+								<StyledInput placeholder="Enter <html> markup" {...handler()} />
+							</Form.Item>
+						)}
+					/>
+					<FieldControl
+						name="addonAfter"
+						render={({ handler }) => (
+							<Form.Item
+								tooltip={{
+									icon: <InfoCircleOutlined />,
+									title: searchboxMessages.addonAfter,
+								}}
+								label="Addon After"
+							>
+								<StyledInput placeholder="Enter <html> markup" {...handler()} />
+							</Form.Item>
+						)}
+					/>
 				</StyledForm>
 			)}
 		/>
