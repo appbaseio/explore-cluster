@@ -114,15 +114,13 @@ const AllModalContent = (props) => {
 					{error && <span className="error-message">Invalid HTML</span>}
 				</label>
 			</Modal>
-			<Modal
-				open={visible.customizeSearchbox}
-				onCancel={() => setVisible({ customizeSearchbox: false })}
-				title="Customize Searchbox"
-				okText="Save"
-				width="75%"
-			>
-				<CustomizeSearchBoxForm />
-			</Modal>
+			<CustomizeSearchBoxForm
+				modalProps={{
+					open: visible.customizeSearchbox,
+					onCancel: () => setVisible({ customizeSearchbox: false }),
+					onOk: () => setVisible({ customizeSearchbox: false }),
+				}}
+			/>
 		</>
 	);
 };
