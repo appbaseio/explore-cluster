@@ -44,7 +44,7 @@ const container = css`
 		color: red;
 	}
 `;
-const AddSectionModalContent = (props) => {
+const AllModalContent = (props) => {
 	const { onSave } = props;
 
 	const [visible, setVisible] = useState({ addSection: false, customizeSearchbox: false });
@@ -126,7 +126,7 @@ const AddSectionModalContent = (props) => {
 		</>
 	);
 };
-AddSectionModalContent.propTypes = {
+AllModalContent.propTypes = {
 	onSave: PropTypes.func.isRequired,
 };
-export default AddSectionModalContent;
+export default AllModalContent;
