@@ -6,7 +6,7 @@ import { FieldControl, FieldGroup } from 'react-reactive-form';
 import { searchboxMessages } from '../../../../../utils/messages';
 import SearchSvg from './SearchSVG';
 import { FormContext } from '../../../../IntegrationsPage/utils/utils';
-import { useKeyboardShortcutDebounce } from './useDebounce';
+import { useIconURLDebounce, useKeyboardShortcutDebounce } from './useDebounce';
 
 const StyledInput = styled(Input)`
 	width: 70%;
@@ -58,10 +58,12 @@ export default function CustomizeSearchBoxForm() {
 	const mainForm = useContext(FormContext);
 	const form = mainForm.get('designAndLayout');
 	const focusShortcutsControl = form.get('focusShortcuts');
+	const iconURLControl = form.get('iconURL');
 	const [debouncedShortcut, setDebouncedShortcut] = useKeyboardShortcutDebounce(
 		focusShortcutsControl.handler,
 	);
-	const iconURL = '';
+	// below would contain the latest value while the formState value is debounced
+	const [latestIconURL, setLatestIconURL] = useIconURLDebounce(iconURLControl.handler);
 
 	return (
 		<FieldGroup
@@ -73,28 +75,41 @@ export default function CustomizeSearchBoxForm() {
 				<StyledForm labelWrap labelAlign="left" colon={false} labelCol={{ span: 8 }}>
 					<FieldControl
 						name="iconURL"
-						render={({ handler }) => (
-							<Form.Item
-								tooltip={{
-									icon: <InfoCircleOutlined />,
-									title: searchboxMessages.iconURL,
-								}}
-								label="Search Icon"
-							>
-								<IconInputContainer>
-									<IconPreview>
-										{iconURL ? (
-											<IconImage src={iconURL} alt="Icon preview" />
-										) : (
-											<StyledSearchIcon>
-												<SearchSvg />
-											</StyledSearchIcon>
-										)}
-									</IconPreview>
-									<StyledInput placeholder="Image URL" {...handler()} />
-								</IconInputContainer>
-							</Form.Item>
-						)}
+						strict={false}
+						render={({ touched, errors, value: iconURL }) => {
+							const invalidURL = touched && errors?.invalidLink;
+							return (
+								<Form.Item
+									tooltip={{
+										icon: <InfoCircleOutlined />,
+										title: searchboxMessages.iconURL,
+									}}
+									label="Search Icon"
+									hasFeedback={touched}
+									validateStatus={invalidURL ? 'error' : 'success'}
+									help={invalidURL ? 'Please provide a valid image URL.' : ''}
+								>
+									<IconInputContainer>
+										<IconPreview>
+											{iconURL && !invalidURL ? (
+												<IconImage src={iconURL} alt="Icon preview" />
+											) : (
+												<StyledSearchIcon>
+													<SearchSvg
+														style={{ fill: form?.value?.primaryColor }}
+													/>
+												</StyledSearchIcon>
+											)}
+										</IconPreview>
+										<StyledInput
+											placeholder="Image URL"
+											value={latestIconURL}
+											onChange={(e) => setLatestIconURL(e.target.value)}
+										/>
+									</IconInputContainer>
+								</Form.Item>
+							);
+						}}
 					/>
 					<FieldControl
 						name="iconPosition"
