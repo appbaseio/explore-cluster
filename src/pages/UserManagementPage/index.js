@@ -197,7 +197,7 @@ class UserManagementPage extends React.Component {
 	};
 
 	render() {
-		const { users, isFetching, allowedActions, version } = this.props;
+		const { users, isFetching, allowedActions, version, backendImage } = this.props;
 		const { showForm, currentPermissionInfo } = this.state;
 		const hasEditAccess = allowedActions.includes(ALLOWED_ACTIONS.USER_MANAGEMENT);
 		const everyUserHasUpdatedAtData = users.some((user) => user.updated_at || user.created_at);
@@ -247,14 +247,15 @@ class UserManagementPage extends React.Component {
 					}
 				>
 					<Paragraph strong>Login URL for this cluster:</Paragraph>
-					{compareVersion(version, '7.52.0') === -1 && (
-						<Alert
-							type="warning"
-							message="Upgrade reactivesearch.io to v7.52.0 or above for using the new user management features"
-							showIcon
-							style={{ marginBottom: 10 }}
-						/>
-					)}
+					{backendImage !== 'multi-tenant-sls' &&
+						compareVersion(version, '7.52.0') === -1 && (
+							<Alert
+								type="warning"
+								message="Upgrade reactivesearch.io to v7.52.0 or above for using the new user management features"
+								showIcon
+								style={{ marginBottom: 10 }}
+							/>
+						)}
 					<Alert
 						showIcon
 						icon={
@@ -333,6 +334,7 @@ UserManagementPage.propTypes = {
 	users: PropTypes.array, // eslint-disable-line
 	allowedActions: PropTypes.array.isRequired,
 	version: PropTypes.string.isRequired,
+	backendImage: PropTypes.string.isRequired,
 };
 const mapStateToProps = (state) => {
 	const { username, password } = get(state, 'user.data', {});
@@ -342,6 +344,7 @@ const mapStateToProps = (state) => {
 		isFetching: get(state, '$getClusterUsers.isFetching', false),
 		allowedActions: get(state, 'user.data.allowedActions'),
 		version: get(state, '$getAppPlan.results.version'),
+		backendImage: get(state, '$getAppPlan.results.image_type') ?? '',
 	};
 };
 const mapDispatchToProps = (dispatch) => ({

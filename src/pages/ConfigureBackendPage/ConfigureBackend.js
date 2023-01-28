@@ -251,7 +251,7 @@ const ConfigureBackend = (props) => {
 		}
 	}, [backendProp]);
 
-	if (backendImage !== 'sls')
+	if (backendImage !== 'multi-tenant-sls')
 		return (
 			<React.Fragment>
 				<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />

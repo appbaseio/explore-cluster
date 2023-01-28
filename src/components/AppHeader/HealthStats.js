@@ -58,7 +58,7 @@ const HealthStats = ({ healthStats, backendImage }) => {
 	};
 
 	if (
-		backendImage !== 'sls' ||
+		backendImage !== 'multi-tenant-sls' ||
 		healthStats.SEARCH_ENGINE_HEALTH?.loading ||
 		healthStats.SEARCH_ENGINE_HEALTH?.loading
 	) {

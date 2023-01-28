@@ -175,7 +175,7 @@ class Dashboard extends Component {
 			);
 		}
 
-		if (backendImage === 'sls' && !backend && redirectLocation !== '/login') {
+		if (backendImage === 'multi-tenant-sls' && !backend && redirectLocation !== '/login') {
 			window.location.href = '/cluster/configure-search-engine-backend';
 		}
 	}

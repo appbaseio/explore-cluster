@@ -144,7 +144,7 @@ class AppWrapper extends Component {
 										: []),
 									{
 										label: 'End-user Authentication',
-										link: '/cluster/auth-settings',
+										link: '/cluster/search-auth-settings',
 										hasExactPath: true,
 										tag: 'Beta',
 									},
@@ -290,7 +290,7 @@ class AppWrapper extends Component {
 												: []),
 											{
 												label: 'End-user Authentication',
-												link: '/cluster/auth-settings',
+												link: '/cluster/search-auth-settings',
 												tag: 'Beta',
 												hasExactPath: true,
 											},
@@ -481,13 +481,17 @@ class AppWrapper extends Component {
 										<SubMenu key={route} title={Title}>
 											{routes[route].menu.map((item) => {
 												if (
-													(item.link.includes(
+													((item.link.includes(
 														'configure-search-engine-backend',
 													) ||
 														item.link.includes('data-usage')) &&
-													(backendImage !== 'sls' ||
-														backend === BACKENDS.FUSION.name ||
-														backend === BACKENDS.MARKLOGIC.name)
+														(backendImage !== 'multi-tenant-sls' ||
+															backend === BACKENDS.FUSION.name ||
+															backend === BACKENDS.MARKLOGIC.name)) ||
+													((item.link.includes('synonyms') ||
+														item.link.includes('rules') ||
+														item.link.includes('grade-evaluation')) &&
+														backendImage === 'multi-tenant-sls')
 												) {
 													return null;
 												}

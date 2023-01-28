@@ -85,6 +85,7 @@ const Pipelines = (props) => {
 		featurePipelines,
 		fetchUsageStats,
 		history,
+		backendImage,
 	} = props;
 	const bannerDetails = pipelinesBannerDetails.allPipelines;
 	const [selectedStatus, setSelectedStatus] = useState(Object.keys(STATUS_FILTERS_CONSTANT)[0]);
@@ -96,7 +97,7 @@ const Pipelines = (props) => {
 		}
 	}, []);
 
-	if (compareVersion(appVersion, '8.0.0') === -1)
+	if (backendImage !== 'multi-tenant-sls' && compareVersion(appVersion, '8.0.0') === -1)
 		return (
 			<React.Fragment>
 				<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
@@ -267,6 +268,7 @@ Pipelines.propTypes = {
 	appVersion: PropTypes.string,
 	fetchUsageStats: PropTypes.func.isRequired,
 	history: PropTypes.object,
+	backendImage: PropTypes.string.isRequired,
 };
 
 Pipelines.defaultProps = {
@@ -284,6 +286,7 @@ const mapStateToProps = (state) => ({
 	tier: get(state, '$getAppPlan.results.tier'),
 	featurePipelines: get(state, '$getAppPlan.results.feature_pipelines', false),
 	appVersion: get(state, '$getAppPlan.results.version'),
+	backendImage: get(state, '$getAppPlan.results.image_type') ?? '',
 });
 
 const mapDispatchToProps = (dispatch) => ({

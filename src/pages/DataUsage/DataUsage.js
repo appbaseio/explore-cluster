@@ -117,7 +117,15 @@ allowedDateRanges.forEach((rangeLabel) => {
 	finalDateRangesObject[rangeLabel] = dateRanges[rangeLabel];
 });
 const DataUsage = (props) => {
-	const { isLoading, dataUsage, fetchDataUsage, appVersion, selectFilterValue, filters } = props;
+	const {
+		isLoading,
+		dataUsage,
+		fetchDataUsage,
+		appVersion,
+		selectFilterValue,
+		filters,
+		backendImage,
+	} = props;
 	const bannerDetails = dataUsageBannerDetails;
 
 	const [loadingState, setLoadingState] = useState(true);
@@ -164,7 +172,7 @@ const DataUsage = (props) => {
 		}
 	}, [isLoading]);
 
-	if (compareVersion(appVersion, '8.0.0') === -1)
+	if (backendImage !== 'multi-tenant-sls' && compareVersion(appVersion, '8.0.0') === -1)
 		return (
 			<React.Fragment>
 				<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
@@ -323,6 +331,7 @@ DataUsage.propTypes = {
 	history: PropTypes.object,
 	filters: PropTypes.object,
 	selectFilterValue: PropTypes.func.isRequired,
+	backendImage: PropTypes.string.isRequired,
 };
 
 DataUsage.defaultProps = {
@@ -342,6 +351,7 @@ const mapStateToProps = (state) => {
 		appVersion: get(state, '$getAppPlan.results.version'),
 		usageStats: get(state, '$getPipelinesUsageStats.results')?.pipelines ?? [],
 		filters: get(state, `$getSelectedFilters.${filterId}`),
+		backendImage: get(state, '$getAppPlan.results.image_type') ?? '',
 	};
 };
 

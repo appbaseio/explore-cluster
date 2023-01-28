@@ -256,7 +256,7 @@ export const aclOptionsMessage = {
 	cache: 'Allow cache related actions',
 };
 
-const SLS = 'sls';
+const SLS = 'multi-tenant-sls';
 const MULTI_TENANT = 'multi-tenant-sls';
 
 export const shouldHavePipelines = (backendImage) =>

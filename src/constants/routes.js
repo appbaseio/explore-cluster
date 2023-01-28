@@ -10,13 +10,22 @@ export const APP_ROUTES = {
 		icon: 'control',
 		action: ALLOWED_ACTIONS.UI_BUILDER,
 		menu: [
-			{ label: 'Search', link: '/cluster/search-builder' },
-			{ label: 'Recommendations', link: '/cluster/recommendations-builder' },
+			{ label: 'Search', link: '/cluster/search-builder', hasExactPath: true },
+			{
+				label: 'Recommendations',
+				link: '/cluster/recommendations-builder',
+				hasExactPath: true,
+			},
 			{
 				label: 'Searchbox',
 				link: '/cluster/searchboxes',
+				hasExactPath: true,
 			},
-			{ label: 'End-user Authentication', link: '/cluster/search-auth-settings' },
+			{
+				label: 'End-user Authentication',
+				link: '/cluster/search-auth-settings',
+				hasExactPath: true,
+			},
 		],
 		tag: 'Beta',
 	},

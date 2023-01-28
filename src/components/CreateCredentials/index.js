@@ -829,7 +829,7 @@ class CreateCredentials extends React.Component {
 																<React.Fragment>
 																	{this.isApp ||
 																	backendImage ===
-																		'sls' ? null : (
+																		'multi-tenant-sls' ? null : (
 																		<FieldControl
 																			strict={false}
 																			name="indices"
@@ -915,7 +915,8 @@ class CreateCredentials extends React.Component {
 																			}}
 																		/>
 																	)}
-																	{backendImage === 'sls' ? (
+																	{backendImage ===
+																	'multi-tenant-sls' ? (
 																		<FieldControl
 																			strict={false}
 																			name="pipelines"

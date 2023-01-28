@@ -26,7 +26,7 @@ const pipelinesContainer = css`
 `;
 const { Header } = Layout;
 const SearchBoxPage = (props) => {
-	const { isLoading, searchBoxes, getSearchBoxes, appVersion, history } = props;
+	const { isLoading, searchBoxes, getSearchBoxes, appVersion, history, backendImage } = props;
 	const bannerDetails = { ...SearchBoxBannerDetails };
 	const renderSearchBoxCards = () => {
 		return (
@@ -46,7 +46,7 @@ const SearchBoxPage = (props) => {
 		getSearchBoxes();
 	}, []);
 
-	if (compareVersion(appVersion, '8.0.0') === -1)
+	if (backendImage !== 'multi-tenant-sls' && compareVersion(appVersion, '8.0.0') === -1)
 		return (
 			<React.Fragment>
 				<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
@@ -155,6 +155,7 @@ SearchBoxPage.propTypes = {
 	tier: allowedTiers,
 	appVersion: PropTypes.string,
 	history: PropTypes.object,
+	backendImage: PropTypes.string.isRequired,
 };
 
 SearchBoxPage.defaultProps = {
@@ -170,6 +171,7 @@ const mapStateToProps = (state) => ({
 	searchBoxes: get(state, '$getSearchBoxes.results'),
 	tier: get(state, '$getAppPlan.results.tier'),
 	appVersion: get(state, '$getAppPlan.results.version'),
+	backendImage: get(state, '$getAppPlan.results.image_type') ?? '',
 });
 
 const mapDispatchToProps = (dispatch) => ({
