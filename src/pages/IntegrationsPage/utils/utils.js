@@ -679,6 +679,16 @@ export const defaultSettings = [
 	},
 ];
 
+export const templatePreviews = {
+	'auth0-classic': 'https://imgur.com/HXjULmw.png',
+	reactivechart: 'https://imgur.com/QXoDngf.png',
+	classic: 'https://imgur.com/uNt7zmz.png',
+	geo: 'https://imgur.com/eudc9Lm.png',
+	'multi-page': 'https://imgur.com/HxKoPdY.png',
+	'reactivesearch-enterprise-template': 'https://imgur.com/tBmG7M3.png',
+	'vue-ecomm': 'https://imgur.com/JIhhG4N.png',
+};
+
 export const defaultRecommendationsPreferences = {
 	name: '',
 	description: '',
@@ -1067,6 +1077,8 @@ export const getSearchPreferencesPayload = (formValue) => {
 					},
 					deploySettings: {
 						versionId: get(formValue, 'versionId'),
+						deploymentURL: get(formValue, 'deploymentURL'),
+						previewImage: get(formValue, 'previewImage'),
 					},
 					templateSettings: {
 						templateVersionId: get(formValue, 'templateVersionId'),

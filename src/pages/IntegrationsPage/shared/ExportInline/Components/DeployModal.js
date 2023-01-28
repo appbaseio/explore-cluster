@@ -126,7 +126,11 @@ const DeployModal = ({
 
 	return (
 		<Modal
-			title={<div style={{ fontWeight: 'bold' }}>Deploy {uiBuilderName}</div>}
+			title={
+				<div className="overflow" style={{ fontWeight: 'bold' }}>
+					Deploy {uiBuilderName}
+				</div>
+			}
 			open={open}
 			afterClose={() => {
 				setDeployObj({

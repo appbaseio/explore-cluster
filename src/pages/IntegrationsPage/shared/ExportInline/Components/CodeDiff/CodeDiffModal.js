@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Modal } from 'antd';
 import CodeDiff from './CodeDiff';
+import { filePathCorrection } from '../../../../utils/sandpack-generator';
 
 const CodeDiffModal = ({ open, handleCancel, oldCode, newCode, currentVersion, time }) => {
 	return (
@@ -15,8 +16,8 @@ const CodeDiffModal = ({ open, handleCancel, oldCode, newCode, currentVersion, t
 				width="90%"
 			>
 				<CodeDiff
-					oldCode={oldCode}
-					newCode={newCode}
+					oldCode={filePathCorrection(oldCode)}
+					newCode={filePathCorrection(newCode)}
 					currentVersion={currentVersion}
 					time={time}
 				/>

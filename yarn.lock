@@ -14286,6 +14286,13 @@ schema-utils@^4.0.0:
     ajv-formats "^2.1.1"
     ajv-keywords "^5.0.0"
 
+screenshotmachine@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/screenshotmachine/-/screenshotmachine-2.0.0.tgz#25a8b63fadb4fc5a9e2017b854618a94d5c96545"
+  integrity sha512-KM/XWdln9a812YhUO6WGazxBITBn17WJ7YP4j8/xFd3fDFWSGSjC4O5Y3PO8aYyGmMpW9Q4vRmj+V1+bIudxyA==
+  dependencies:
+    request "^2.88.0"
+
 scroll-doc@^0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/scroll-doc/-/scroll-doc-0.2.1.tgz#168f9e9ac598743dd682c992839b44a38ce4dd91"

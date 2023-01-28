@@ -10,11 +10,12 @@ import { connect } from 'react-redux';
 import {
 	AppstoreOutlined,
 	DatabaseOutlined,
+	FormatPainterOutlined,
 	SettingOutlined,
 	UnlockOutlined,
 } from '@ant-design/icons';
 import { Tabs } from 'antd';
-import { object, array, func } from 'prop-types';
+import { object, array, func, bool } from 'prop-types';
 import { v4 as uuidv4 } from 'uuid';
 import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
 import { container } from './styles';
@@ -39,7 +40,7 @@ const bannerDetailsPaid = {
 	href: 'http://docs.reactivesearch.io/docs/reactivesearch/ui-builder/search/',
 };
 
-const Main = ({ getPreferencesN, ...props }) => {
+const Main = ({ getPreferencesN, isDeletingPreference, ...props }) => {
 	useEffect(() => {
 		getPreferencesN();
 	}, []);
@@ -61,7 +62,7 @@ const Main = ({ getPreferencesN, ...props }) => {
 					const pipeline = form.get('pipeline') ? form.get('pipeline').value : null;
 					setIsLoading(false);
 
-					if (isLoading) {
+					if (isLoading || isDeletingPreference) {
 						return <Loader />;
 					}
 					return (
@@ -100,11 +101,8 @@ const Main = ({ getPreferencesN, ...props }) => {
 									<TabPane
 										tab={
 											<span>
-												<img
-													alt="theme-icon"
-													width={15}
-													src="/static/images/theme-icon.svg"
-													style={{ marginRight: 8 }}
+												<FormatPainterOutlined
+													style={{ margin: '0.25rem' }}
 												/>
 												Theme
 											</span>
@@ -172,17 +170,23 @@ const Main = ({ getPreferencesN, ...props }) => {
 	);
 };
 
+Main.defaultProps = {
+	isDeletingPreference: false,
+};
+
 Main.propTypes = {
 	history: object.isRequired,
 	match: object.isRequired,
 	getPreferencesN: func.isRequired,
 	searchPreferences: array.isRequired,
+	isDeletingPreference: bool,
 };
 
 Main.defaultProps = {};
 
 const mapStateToProps = (state) => ({
 	searchPreferences: get(state, '$getSearchPreferences.results', []),
+	isDeletingPreference: get(state, '$deleteSearchPreference.isFetching'),
 });
 
 const mapDispatchToProps = (dispatch) => ({

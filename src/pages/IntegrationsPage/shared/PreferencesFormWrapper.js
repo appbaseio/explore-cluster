@@ -657,6 +657,16 @@ class PreferencesFormWrapper extends React.Component {
 						currency: get(preferences, 'globalSettings.currency'),
 					},
 					versionId: get(preferences, 'globalSettings.meta.deploySettings.versionId', ''),
+					deploymentURL: get(
+						preferences,
+						'globalSettings.meta.deploySettings.deploymentURL',
+						'',
+					),
+					previewImage: get(
+						preferences,
+						'globalSettings.meta.deploySettings.previewImage',
+						'',
+					),
 					templateVersionId: get(
 						preferences,
 						'globalSettings.meta.templateSettings.templateVersionId',
@@ -975,6 +985,11 @@ class PreferencesFormWrapper extends React.Component {
 											'globalSettings.meta.deploySettings.versionId',
 											'',
 										),
+										deploymentURL: get(
+											preferences,
+											'globalSettings.meta.deploySettings.deploymentURL',
+											'',
+										),
 										templateVersionId: get(
 											preferences,
 											'globalSettings.meta.templateSettings.templateVersionId',
@@ -1270,35 +1285,40 @@ class PreferencesFormWrapper extends React.Component {
 	};
 
 	render() {
-		const { children, closeForm, history, isRecommendation } = this.props;
+		const { children, closeForm, history, isRecommendation, showBack } = this.props;
 
 		return (
 			<div className={modalStyles}>
-				{isRecommendation ? (
-					<Button
-						style={{
-							margin: '5px 0px',
-						}}
-						type="link"
-						icon={<ArrowLeftOutlined />}
-						onClick={() => {
-							history.push(`/cluster/recommendations-builder`);
-						}}
-					>
-						Go back to Recommendation UIs
-					</Button>
-				) : (
-					<Button
-						style={{
-							margin: '5px 0px',
-						}}
-						type="link"
-						icon={<ArrowLeftOutlined />}
-						onClick={closeForm}
-					>
-						Go back to Search UIs
-					</Button>
-				)}
+				{showBack ? (
+					<>
+						{isRecommendation ? (
+							<Button
+								style={{
+									margin: '5px 0px',
+								}}
+								type="link"
+								icon={<ArrowLeftOutlined />}
+								onClick={() => {
+									history.push(`/cluster/recommendations-builder`);
+								}}
+							>
+								Go back to Recommendation UIs
+							</Button>
+						) : (
+							<Button
+								style={{
+									margin: '5px 0px',
+								}}
+								type="link"
+								icon={<ArrowLeftOutlined />}
+								onClick={closeForm}
+							>
+								Go back to Search UIs
+							</Button>
+						)}
+					</>
+				) : null}
+
 				<FormContext.Provider value={this.form}>
 					{children({
 						form: this.form,
@@ -1320,6 +1340,7 @@ PreferencesFormWrapper.defaultProps = {
 	),
 	backend: BACKENDS.ELASTICSEARCH.name,
 	isWizard: false,
+	showBack: true,
 };
 
 PreferencesFormWrapper.propTypes = {
@@ -1340,6 +1361,7 @@ PreferencesFormWrapper.propTypes = {
 	getLatestVersionCode: func.isRequired,
 	updateVersionStateForPreference: func.isRequired,
 	isWizard: bool,
+	showBack: bool,
 };
 
 const mapStateToProps = (state, props) => {

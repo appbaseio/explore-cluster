@@ -1,15 +1,31 @@
 import React, { useContext } from 'react';
 import { InfoCircleOutlined } from '@ant-design/icons';
-import { Form, Popover } from 'antd';
-import { bool } from 'prop-types';
+import { Button, Form, List, Popover } from 'antd';
+import { bool, func, object } from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
+import { withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
 import TextInput from '../../../../../components/Form/Input';
 import EndpointDropdown from '../../Endpoint/EndpointDropdown';
 import { FormContext } from '../../../utils/utils';
 import CredentialsModal from '../../Credentials/CredentialsModal';
+import { deleteSearchPreference as deleteSearchPreferenceAction } from '../../../../../batteries/modules/actions';
+import { deleteUIBuilderStyles } from './styles';
+import Flex from '../../../../../batteries/components/shared/Flex';
+import DeleteModal from '../../../../../components/DeleteModal';
 
-const General = ({ isRecommendation }) => {
+const General = ({ isRecommendation, deleteSearchPreference, history }) => {
 	const form = useContext(FormContext);
+
+	const handleDelete = () => {
+		const preferenceId = form.get('id') ? form.get('id').value : '';
+		if (preferenceId)
+			deleteSearchPreference(preferenceId).then((action) => {
+				if (!(action && action.error)) {
+					history.push(`/cluster/search-builder`);
+				}
+			});
+	};
 
 	return (
 		<Form layout="vertical">
@@ -105,6 +121,42 @@ const General = ({ isRecommendation }) => {
 					);
 				}}
 			</FieldGroup>
+			{!isRecommendation ? (
+				<List className={deleteUIBuilderStyles} bordered>
+					<List.Item>
+						<List.Item.Meta
+							description={
+								<div className="delete-message">
+									<b>Delete this search UI</b>
+									<Flex alignItems="center" justifyContent="space-between">
+										<div>
+											Once you delete a search UI, there is no going back.
+											Please be certain.
+										</div>
+										<DeleteModal
+											name="Search UI builder"
+											value={form.get('id') ? form.get('id').value : ''}
+											title="Delete Search UI builder"
+											onDelete={handleDelete}
+											valueType="id"
+										>
+											{({ handleModal }) => (
+												<Button
+													type="primary"
+													onClick={handleModal}
+													className="delete-button"
+												>
+													Delete
+												</Button>
+											)}
+										</DeleteModal>
+									</Flex>
+								</div>
+							}
+						/>
+					</List.Item>
+				</List>
+			) : null}
 		</Form>
 	);
 };
@@ -115,6 +167,12 @@ General.defaultProps = {
 
 General.propTypes = {
 	isRecommendation: bool,
+	deleteSearchPreference: func.isRequired,
+	history: object.isRequired,
 };
 
-export default General;
+const mapDispatchToProps = (dispatch) => ({
+	deleteSearchPreference: (id) => dispatch(deleteSearchPreferenceAction(id)),
+});
+
+export default connect(null, mapDispatchToProps)(withRouter(General));

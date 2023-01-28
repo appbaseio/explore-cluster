@@ -13,3 +13,13 @@
     bottom: 6px;
 	border: 0;
 }
+
+.overflow {
+	display: -webkit-box;
+	-webkit-line-clamp: 1;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+.mx-w-70 {
+	max-width: 70%;
+}

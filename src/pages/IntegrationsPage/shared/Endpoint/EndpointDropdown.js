@@ -203,8 +203,6 @@ const EndpointDropdown = ({
 							>
 								{(pipelineRoutes || []).map((k, idx) => {
 									const timestamp = k.updated_at || k.created_at;
-									const timeInSecondsSinceEpoch =
-										new Date(timestamp).valueOf() / 1000;
 
 									return (
 										<Select.Option
@@ -212,8 +210,7 @@ const EndpointDropdown = ({
 											key={`${k.route.path}-${k.id}-${idx}`}
 											className={endpointConfigStyles}
 										>
-											<Flex
-												justifyContent="space-between"
+											<div
 												onClick={() => {
 													if (isPageLevel) {
 														endpointControl
@@ -241,26 +238,28 @@ const EndpointDropdown = ({
 													}
 												}}
 											>
-												<div className="overflow description-overflow">
-													{k.route.method}&nbsp;
-													<Tooltip title={k.route.path}>
-														{k.route.path}
-													</Tooltip>
-												</div>
-												<Tag>pipeline</Tag>
-											</Flex>
-											<Flex justifyContent="space-between">
-												<div className="overflow description-overflow">
-													<Tooltip title={k.description}>
-														{k.description}
-													</Tooltip>
-												</div>
-												<div>
-													{moment
-														.unix(timeInSecondsSinceEpoch)
-														.format('ddd DD MMM, hh:mm A') || 'NA'}
-												</div>
-											</Flex>
+												<Flex justifyContent="space-between">
+													<div className="overflow description-overflow">
+														{k.route.method}&nbsp;
+														<Tooltip title={k.route.path}>
+															{k.route.path}
+														</Tooltip>
+													</div>
+													<Tag>pipeline</Tag>
+												</Flex>
+												<Flex justifyContent="space-between">
+													<div className="overflow description-overflow">
+														<Tooltip title={k.description}>
+															{k.description}
+														</Tooltip>
+													</div>
+													<div>
+														{moment
+															.unix(timestamp)
+															.format('ddd DD MMM, hh:mm A') || 'NA'}
+													</div>
+												</Flex>
+											</div>
 										</Select.Option>
 									);
 								})}
