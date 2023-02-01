@@ -11,6 +11,7 @@ import { isEqual } from 'lodash';
 // eslint-disable-next-line import/no-cycle
 import AppLayout from '../../components/AppLayout';
 import {
+	clearCurrentApp,
 	getDefaultSettings,
 	getSettings,
 	putSettings,
@@ -344,6 +345,11 @@ class AppWrapper extends Component {
 		}
 	}
 
+	componentWillUnmount() {
+		const { clearApp } = this.props;
+		clearApp();
+	}
+
 	handleSearchTerm = (e) => {
 		this.setState({
 			value: e.target.value,
@@ -609,6 +615,7 @@ AppWrapper.propTypes = {
 	backendImage: PropTypes.string,
 	backend: PropTypes.string,
 	user: PropTypes.object.isRequired,
+	clearApp: PropTypes.func.isRequired,
 };
 
 AppWrapper.defaultProps = {
@@ -645,6 +652,7 @@ const mapDispatchToProps = (dispatch) => ({
 	getSettingsAction: (name) => dispatch(getSettings(name)),
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
 	setIsCollapsed: (collapsed) => dispatch(setIsSidebarCollapsed(collapsed)),
+	clearApp: () => dispatch(clearCurrentApp()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AppWrapper);
