@@ -19,6 +19,7 @@ import { allowedTiers } from '../../utils/prop-types';
 import { compareVersion } from '../../utils';
 import SearchBoxCard from './components/SearchBoxCard';
 import { SearchBoxBannerDetails } from './utils';
+import { ALLOWED_SLS } from '../../constants';
 
 const pipelinesContainer = css`
 	padding: 50px;
@@ -46,7 +47,7 @@ const SearchBoxPage = (props) => {
 		getSearchBoxes();
 	}, []);
 
-	if (backendImage !== 'multi-tenant-sls' && compareVersion(appVersion, '8.0.0') === -1)
+	if (!ALLOWED_SLS.includes(backendImage) && compareVersion(appVersion, '8.0.0') === -1)
 		return (
 			<React.Fragment>
 				<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />

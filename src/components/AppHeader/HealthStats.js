@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import { css } from 'emotion';
 import { colorBar } from '../AppCard/StatsBox';
 import Flex from '../../batteries/components/shared/Flex';
+import { ALLOWED_SLS } from '../../constants';
 
 const healthStatsCSS = css`
 	margin: 0 1rem;
@@ -58,7 +59,7 @@ const HealthStats = ({ healthStats, backendImage }) => {
 	};
 
 	if (
-		backendImage !== 'multi-tenant-sls' ||
+		!ALLOWED_SLS.includes(backendImage) ||
 		healthStats.SEARCH_ENGINE_HEALTH?.loading ||
 		healthStats.SEARCH_ENGINE_HEALTH?.loading
 	) {

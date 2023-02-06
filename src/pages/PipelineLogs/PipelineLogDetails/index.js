@@ -13,6 +13,7 @@ import RequestDetails from '../../../batteries/components/analytics/components/R
 import { getPipelineLogDetails } from '../../../batteries/components/analytics/utils';
 import { isJson } from '../../../components/ScriptConsole/utils';
 import { parseData } from '../../../batteries/components/analytics/components/RequestLogs';
+import { ALLOWED_SLS } from '../../../constants';
 
 const bannerDetails = {
 	title: 'Log Details',
@@ -28,6 +29,7 @@ const PipelineLogDetailsWrapper = ({
 	logId,
 	history,
 	pipelineId,
+	backendImage,
 }) => {
 	const [logDetails, setLogDetails] = useState(null);
 	useEffect(() => {
@@ -44,7 +46,7 @@ const PipelineLogDetailsWrapper = ({
 			});
 	}, []);
 
-	if (compareVersion(appVersion, '7.58.0') === -1)
+	if (!ALLOWED_SLS.includes(backendImage) && compareVersion(appVersion, '7.58.0') === -1)
 		return (
 			<React.Fragment>
 				<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
@@ -136,6 +138,7 @@ PipelineLogDetailsWrapper.propTypes = {
 	logId: PropTypes.string,
 	pipelineId: PropTypes.string,
 	history: PropTypes.object,
+	backendImage: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = (state, props) => {
@@ -147,6 +150,7 @@ const mapStateToProps = (state, props) => {
 		appVersion: get(state, '$getAppPlan.results.version'),
 		logId,
 		pipelineId,
+		backendImage: get(state, '$getAppPlan.results.image_type') ?? '',
 	};
 };
 export default connect(mapStateToProps)(PipelineLogDetailsWrapper);

@@ -18,7 +18,7 @@ import {
 	setCurrentApp,
 } from '../../batteries/modules/actions';
 import Logo from '../../components/Logo';
-import { ALLOWED_ACTIONS } from '../../constants';
+import { ALLOWED_ACTIONS, ALLOWED_SLS } from '../../constants';
 import { versionCompare } from '../../batteries/utils/helpers';
 import { getParam, getParsedRoutes } from '../../utils';
 import { setIsSidebarCollapsed } from '../../actions';
@@ -491,13 +491,13 @@ class AppWrapper extends Component {
 														'configure-search-engine-backend',
 													) ||
 														item.link.includes('data-usage')) &&
-														(backendImage !== 'multi-tenant-sls' ||
+														(!ALLOWED_SLS.includes(backendImage) ||
 															backend === BACKENDS.FUSION.name ||
 															backend === BACKENDS.MARKLOGIC.name)) ||
 													((item.link.includes('synonyms') ||
 														item.link.includes('rules') ||
 														item.link.includes('grade-evaluation')) &&
-														backendImage === 'multi-tenant-sls')
+														ALLOWED_SLS.includes(backendImage))
 												) {
 													return null;
 												}

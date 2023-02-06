@@ -48,7 +48,7 @@ import {
 import Acl from './Acl';
 import WhiteList from './WhiteList';
 import PasswordInput from './PasswordInput';
-import { ALLOWED_ACTIONS_LABELS } from '../../constants';
+import { ALLOWED_ACTIONS_LABELS, ALLOWED_SLS } from '../../constants';
 import SwitchGroup from '../SwitchGroup';
 import RsApiRestrictions from './RsApiRestrictions';
 import { versionCompare } from '../../batteries/utils/helpers';
@@ -829,8 +829,9 @@ class CreateCredentials extends React.Component {
 															{!isUserManagement && (
 																<React.Fragment>
 																	{this.isApp ||
-																	backendImage ===
-																		'multi-tenant-sls' ? null : (
+																	ALLOWED_SLS.includes(
+																		backendImage,
+																	) ? null : (
 																		<FieldControl
 																			strict={false}
 																			name="indices"
@@ -917,7 +918,9 @@ class CreateCredentials extends React.Component {
 																		/>
 																	)}
 																	{backendImage ===
-																	'multi-tenant-sls' ? (
+																	ALLOWED_SLS.includes(
+																		backendImage,
+																	) ? (
 																		<FieldControl
 																			strict={false}
 																			name="pipelines"

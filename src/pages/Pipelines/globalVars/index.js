@@ -14,8 +14,9 @@ import { allowedTiers } from '../../../utils/prop-types';
 import { compareVersion } from '../../../utils';
 import { pipelinesBannerDetails } from '../utils';
 import { container } from '../../ResultsPage/styles';
+import { ALLOWED_SLS } from '../../../constants';
 
-const GlobalVarsPage = ({ tier, featurePipelines, credentials, appVersion }) => {
+const GlobalVarsPage = ({ tier, featurePipelines, credentials, appVersion, backendImage }) => {
 	const [open, setOpen] = useState(false);
 	const [globalVars, setGlobalVars] = useState([]);
 	const bannerDetails = pipelinesBannerDetails.globalVars;
@@ -47,7 +48,7 @@ const GlobalVarsPage = ({ tier, featurePipelines, credentials, appVersion }) => 
 			});
 	};
 
-	if (compareVersion(appVersion, '8.1.0') === -1)
+	if (!ALLOWED_SLS.includes(backendImage) && compareVersion(appVersion, '8.1.0') === -1)
 		return (
 			<React.Fragment>
 				<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
@@ -128,6 +129,7 @@ GlobalVarsPage.propTypes = {
 	featurePipelines: PropTypes.bool,
 	credentials: PropTypes.string.isRequired,
 	appVersion: PropTypes.string,
+	backendImage: PropTypes.string.isRequired,
 };
 
 GlobalVarsPage.defaultProps = {
@@ -143,6 +145,7 @@ const mapStateToProps = (state) => {
 		tier: get(state, '$getAppPlan.results.tier'),
 		credentials: username ? `${username}:${password}` : null,
 		appVersion: get(state, '$getAppPlan.results.version'),
+		backendImage: get(state, '$getAppPlan.results.image_type') ?? '',
 	};
 };
 

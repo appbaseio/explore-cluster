@@ -9,6 +9,7 @@ import { getVersion, isUsingOpenSearch } from '../../../constants/config';
 import { capitalizeFirstLetter } from '../../../utils/helper';
 import { compareVersion } from '../../../utils';
 import { LATEST_COMPATIBLE_VERSION } from './constants';
+import { ALLOWED_SLS } from '../../../constants';
 
 const { Option } = Select;
 const version = parseInt(getVersion()[0], 10);
@@ -85,7 +86,7 @@ class CopyField extends React.Component {
 
 	render() {
 		const { isVisible, fieldName, fieldType, fieldUsecase, fieldNameError } = this.state;
-		const { copiedFieldItem, appVersion, useAsModal } = this.props;
+		const { copiedFieldItem, appVersion, useAsModal, backendImage } = this.props;
 		return (
 			<React.Fragment>
 				{useAsModal ? null : (
@@ -108,7 +109,8 @@ class CopyField extends React.Component {
 							disabled: fieldNameError || !fieldName.trim(),
 						}}
 					>
-						{compareVersion(appVersion, '7.58.0') === -1 ? (
+						{!ALLOWED_SLS.includes(backendImage) &&
+						compareVersion(appVersion, '7.58.0') === -1 ? (
 							<React.Fragment>
 								<div
 									style={{
@@ -235,10 +237,12 @@ CopyField.propTypes = {
 	copiedFieldItem: PropTypes.object.isRequired,
 	onCloseModal: PropTypes.func,
 	appVersion: PropTypes.string,
+	backendImage: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = (state) => ({
 	appVersion: get(state, '$getAppPlan.results.version'),
+	backendImage: get(state, '$getAppPlan.results.image_type') ?? '',
 });
 
 export default connect(mapStateToProps)(CopyField);

@@ -22,7 +22,7 @@ import Container from '../../components/Container';
 import { getURL } from '../../constants/config';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
-import { ALLOWED_ACTIONS } from '../../constants';
+import { ALLOWED_ACTIONS, ALLOWED_SLS } from '../../constants';
 import { compareVersion } from '../../utils';
 import { event, timingEvent } from '../../utils/gtag';
 import moment from '../../utils/moment';
@@ -247,7 +247,7 @@ class UserManagementPage extends React.Component {
 					}
 				>
 					<Paragraph strong>Login URL for this cluster:</Paragraph>
-					{backendImage !== 'multi-tenant-sls' &&
+					{!ALLOWED_SLS.includes(backendImage) &&
 						compareVersion(version, '7.52.0') === -1 && (
 							<Alert
 								type="warning"

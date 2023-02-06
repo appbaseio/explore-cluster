@@ -12,7 +12,7 @@ import AppsAnalyticsRoutes from './AppsAnalyticsRoutes';
 import { versionCompare } from '../../batteries/utils/helpers';
 import UnauthorizedPage from '../../pages/UnauthorizedPage';
 import { getAuthorizedRoutes } from '../../utils';
-import { ALLOWED_ACTIONS } from '../../constants';
+import { ALLOWED_ACTIONS, ALLOWED_SLS } from '../../constants';
 
 const BillingPage = Loadable({
 	loader: () => import(/* webpackChunkName: "BillingPage" */ '../../pages/BillingPage'),
@@ -425,7 +425,7 @@ class RouteContainer extends React.Component {
 							<>
 								{get(allowedRoutes, 'synonyms') &&
 								!isPlanLoading &&
-								backendImage !== 'multi-tenant-sls' ? (
+								!ALLOWED_SLS.includes(backendImage) ? (
 									<AppPageContainer
 										{...props}
 										component={SynonymsPage}

@@ -12,6 +12,7 @@ import ClusterAnalyticsRoutes from './ClusterAnalyticsRoutes';
 import UnauthorizedPage from '../../pages/UnauthorizedPage';
 import { getAuthorizedRoutes } from '../../utils';
 import { BACKENDS } from '../../batteries/utils';
+import { ALLOWED_SLS } from '../../constants';
 
 const ProfilePage = Loadable({
 	loader: () => import(/* webpackChunkName: "ProfilePage" */ '../../pages/ProfilePage'),
@@ -318,7 +319,7 @@ class ClusterRouteContainer extends React.Component {
 						render={(props) => (
 							<>
 								{get(allowedRoutes, '/cluster/rules') &&
-								(isPlanLoading || backendImage !== 'multi-tenant-sls') ? (
+								(isPlanLoading || !ALLOWED_SLS.includes(backendImage)) ? (
 									<AppPageContainer {...props} component={QueryRulesPage} />
 								) : (
 									<UnauthorizedPage />
@@ -332,7 +333,7 @@ class ClusterRouteContainer extends React.Component {
 						render={(props) => (
 							<>
 								{get(allowedRoutes, '/cluster/rules') &&
-								(isPlanLoading || backendImage !== 'multi-tenant-sls') ? (
+								(isPlanLoading || !ALLOWED_SLS.includes(backendImage)) ? (
 									<AppPageContainer {...props} component={QueryRulesForm} />
 								) : (
 									<UnauthorizedPage />
@@ -346,7 +347,7 @@ class ClusterRouteContainer extends React.Component {
 						render={(props) => (
 							<>
 								{get(allowedRoutes, '/cluster/rules') &&
-								(isPlanLoading || backendImage !== 'multi-tenant-sls') ? (
+								(isPlanLoading || !ALLOWED_SLS.includes(backendImage)) ? (
 									<AppPageContainer {...props} component={QueryRulesForm} />
 								) : (
 									<UnauthorizedPage />
@@ -388,7 +389,7 @@ class ClusterRouteContainer extends React.Component {
 						render={(props) => (
 							<>
 								{get(allowedRoutes, '/cluster/pipelines') &&
-								backendImage === 'multi-tenant-sls' &&
+								ALLOWED_SLS.includes(backendImage) &&
 								backend !== BACKENDS.FUSION.name &&
 								backend !== BACKENDS.MARKLOGIC.name ? (
 									<AppPageContainer
@@ -478,7 +479,7 @@ class ClusterRouteContainer extends React.Component {
 						render={(props) => (
 							<>
 								{get(allowedRoutes, '/cluster/data-usage') &&
-								(isPlanLoading || backendImage === 'multi-tenant-sls') ? (
+								(isPlanLoading || ALLOWED_SLS.includes(backendImage)) ? (
 									<AppPageContainer {...props} component={DataUsagePage} />
 								) : (
 									<UnauthorizedPage />
@@ -763,7 +764,7 @@ class ClusterRouteContainer extends React.Component {
 						component={(props) => (
 							<>
 								{get(allowedRoutes, '/cluster/grade-evaluation') &&
-								(isPlanLoading || backendImage !== 'multi-tenant-sls') ? (
+								(isPlanLoading || !ALLOWED_SLS.includes(backendImage)) ? (
 									<AppPageContainer {...props} component={GradeEvaluation} />
 								) : (
 									<UnauthorizedPage />

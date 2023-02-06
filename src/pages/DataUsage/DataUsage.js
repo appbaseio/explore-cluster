@@ -25,6 +25,7 @@ import { getDataUsage } from '../../batteries/modules/actions/billing';
 import { setFilterValue } from '../../batteries/modules/actions';
 import { dateRanges } from '../../batteries/components/analytics/utils';
 import Filter from '../../batteries/components/analytics/components/Filter';
+import { ALLOWED_SLS } from '../../constants';
 
 const dataUsageContainer = css`
 	margin-top: 2rem;
@@ -172,7 +173,7 @@ const DataUsage = (props) => {
 		}
 	}, [isLoading]);
 
-	if (backendImage !== 'multi-tenant-sls' && compareVersion(appVersion, '8.0.0') === -1)
+	if (!ALLOWED_SLS.includes(backendImage) && compareVersion(appVersion, '8.0.0') === -1)
 		return (
 			<React.Fragment>
 				<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
