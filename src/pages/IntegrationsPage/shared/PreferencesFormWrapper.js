@@ -799,7 +799,7 @@ class PreferencesFormWrapper extends React.Component {
 				const recommendationsControl = this.form.get('recommendations');
 				get(preferences, 'recommendationSettings.recommendations', []).forEach(
 					(recommendation) => {
-						const control = getRecommendationForm(recommendation.type);
+						const control = getRecommendationForm(recommendation.type, recommendation);
 						recommendationsControl.push(control);
 					},
 				);

@@ -60,14 +60,14 @@ const EndpointDropdown = ({
 		if (value && value.pipeline) {
 			return `/${value.pipeline}/_reactivesearch`;
 		}
-		return `/_fusion/_reactivesearch`;
+		return ``;
 	};
 
 	const getMethod = () => {
 		if (isWizard) return '';
 		if (formValue && formValue.method && formValue.pipeline) return formValue.method;
 
-		return 'POST';
+		return '';
 	};
 
 	const renderFusionFields = () => {
@@ -192,9 +192,9 @@ const EndpointDropdown = ({
 						>
 							<Select
 								showSearch
-								placeholder="Select an Index"
+								placeholder="Select an endpoint"
 								className="endpoint-dropdown"
-								value={`${method} ${url}`}
+								value={method || url ? `${method} ${url}` : undefined}
 								notFoundContent={
 									<Button onClick={() => setShowForm(true)}>
 										<PlusOutlined /> Enter your own endpoint

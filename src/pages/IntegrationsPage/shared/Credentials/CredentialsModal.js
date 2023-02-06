@@ -5,12 +5,19 @@ import { array, func, string } from 'prop-types';
 import { Button, Select, Tag, Tooltip } from 'antd';
 import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
+import { PlusOutlined } from '@ant-design/icons';
 import { suggestionStyles } from '../../SearchUIBuilderPage/CreateUIBuilder/styles';
-import { getPermission } from '../../../../batteries/modules/actions';
+import { createPermission, getPermission } from '../../../../batteries/modules/actions';
 import ErrorToaster from '../../../../batteries/components/shared/ErrorToaster';
 import CreateCredentials from '../../../../components/CreateCredentials';
 
-const CredentialsModal = ({ value, onChange, permissions, fetchPermissions }) => {
+const CredentialsModal = ({
+	value,
+	onChange,
+	permissions,
+	fetchPermissions,
+	handleCreatePermission,
+}) => {
 	const [showForm, setShowForm] = useState(false);
 	const [currentPermissionInfo, setCurrentPermissionInfo] = useState(undefined);
 	const [mode, setMode] = useState('create');
@@ -22,6 +29,21 @@ const CredentialsModal = ({ value, onChange, permissions, fetchPermissions }) =>
 	const handleCancel = () => {
 		setShowForm(false);
 		setMode('create');
+	};
+
+	// eslint-disable-next-line
+	const handleSubmit = (form, username) => {
+		newPermission(form.mappedValues);
+	};
+
+	const newPermission = (request) => {
+		handleCreatePermission(undefined, request).then(({ payload }) => {
+			if (payload) {
+				onChange(`${payload.username}:${payload.password}`);
+				handleCancel();
+				fetchPermissions();
+			}
+		});
 	};
 
 	const sortedByUpdatedAt = orderBy(
@@ -52,6 +74,18 @@ const CredentialsModal = ({ value, onChange, permissions, fetchPermissions }) =>
 					option.props.title.toLowerCase().indexOf(input.toLowerCase()) >= 0
 				}
 			>
+				<Select.Option key="create credentials" value="" title="create credentials">
+					<Button
+						icon={<PlusOutlined />}
+						onClick={() => {
+							setMode('create');
+							setShowForm(true);
+						}}
+					>
+						{' '}
+						Create Credentials
+					</Button>
+				</Select.Option>
 				{sortedByUpdatedAt.map((permission) => {
 					const timestamp = permission.updated_at || permission.created_at;
 					const timeInSecondsSinceEpoch = new Date(timestamp).valueOf() / 1000;
@@ -108,6 +142,7 @@ const CredentialsModal = ({ value, onChange, permissions, fetchPermissions }) =>
 			<ErrorToaster inline>
 				<CreateCredentials
 					titleText={mode === 'create' ? 'Create Credentials' : 'View Access Details'}
+					onSubmit={handleSubmit}
 					show={showForm}
 					handleCancel={() => handleCancel()}
 					initialValues={currentPermissionInfo}
@@ -129,6 +164,7 @@ CredentialsModal.propTypes = {
 	onChange: func,
 	permissions: array.isRequired,
 	fetchPermissions: func.isRequired,
+	handleCreatePermission: func.isRequired,
 };
 
 const mapStateToProps = (state) => {
@@ -140,6 +176,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => ({
 	fetchPermissions: (appName) => dispatch(getPermission(appName)),
+	handleCreatePermission: (appName, payload) => dispatch(createPermission(appName, payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CredentialsModal);

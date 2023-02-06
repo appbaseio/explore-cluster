@@ -406,7 +406,7 @@ class SyncStatus extends React.Component {
 							</Flex>
 
 							<Flex className="sub-part">
-								{themeType ? (
+								{themeType && !isRecommendation ? (
 									<>
 										<b>Search Template {this.renderNotificationBadge()}</b>
 										<>{templateObj.label || themeType}</>

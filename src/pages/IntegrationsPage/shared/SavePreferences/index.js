@@ -1,5 +1,5 @@
 import React from 'react';
-import { Prompt } from 'react-router-dom';
+import { Prompt, withRouter } from 'react-router-dom';
 import { arrayOf, bool, func, object, string } from 'prop-types';
 import get from 'lodash/get';
 import isEqual from 'lodash/isEqual';
@@ -103,6 +103,16 @@ class SavePreferences extends React.Component {
 		return { oldData, newData };
 	};
 
+	showAlert = () => {
+		const { match, isRecommendation } = this.props;
+		if (isRecommendation) {
+			if (match.params.id === 'new') return false;
+			return true;
+		}
+
+		return true;
+	};
+
 	render() {
 		const {
 			form,
@@ -115,15 +125,20 @@ class SavePreferences extends React.Component {
 			getPreferencesPayload,
 			getPreferences,
 			closeForm,
+			history,
+			match,
 		} = this.props;
 		const { oldData, newData } = this.getOldDataNewData();
 
 		return (
 			<>
-				<Prompt
-					when={this.compareChange}
-					message="You have unsaved changes, are you sure you want to leave?"
-				/>
+				{this.showAlert() ? (
+					<Prompt
+						when={this.compareChange}
+						message="You have unsaved changes, are you sure you want to leave?"
+					/>
+				) : null}
+
 				<ReviewAndSave
 					label={label}
 					isRecommendation={isRecommendation}
@@ -133,8 +148,15 @@ class SavePreferences extends React.Component {
 					oldData={oldData}
 					newData={newData}
 					setHasChanged={() => {
-						// eslint-disable-next-line
-						isRecommendation ? getRecommendationsPreferences() : getSearchPreferences();
+						if (isRecommendation) {
+							getRecommendationsPreferences();
+							if (match.params.id === 'new')
+								setTimeout(() => {
+									history.push(
+										`/cluster/recommendations-builder/${preferenceId}`,
+									);
+								}, 2000);
+						} else getSearchPreferences();
 					}}
 					getPreferencesPayload={getPreferencesPayload}
 					getPreferences={getPreferences}
@@ -171,6 +193,8 @@ SavePreferences.propTypes = {
 	form: object.isRequired,
 	errors: arrayOf(object),
 	closeForm: func.isRequired,
+	history: object.isRequired,
+	match: object.isRequired,
 };
 
 const mapStateToProps = (state, props) => ({
@@ -187,4 +211,4 @@ const mapDispatchToProps = (dispatch) => ({
 	getRecommendationsPreferences: () => dispatch(getRecommendationsPreferencesAction()),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(SavePreferences);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(SavePreferences));

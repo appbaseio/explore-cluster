@@ -50,8 +50,6 @@ const ReviewAndSave = ({
 	isRecommendation,
 	preferenceId,
 	clientId,
-	history,
-	match,
 }) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
@@ -84,11 +82,8 @@ const ReviewAndSave = ({
 				setIsLoading(false);
 				if (!(action && action.error)) {
 					setHasChanged();
-					if (match.params.id === 'new')
-						setTimeout(() => {
-							history.push(`/cluster/recommendations-builder/${preferenceId}`);
-						}, 1000);
 				}
+				setIsLoading(false);
 			});
 		} else {
 			// Update preferences in sandpack
