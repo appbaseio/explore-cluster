@@ -1089,11 +1089,11 @@ export const getSearchPreferencesPayload = (formValue) => {
 							collection: get(formValue, 'collection'),
 						},
 					}),
-				},
-				endpoint: {
-					url: get(formValue, 'url'),
-					method: get(formValue, 'method'),
-					headers: get(formValue, 'headers'),
+					endpoint: {
+						url: get(formValue, 'url'),
+						method: get(formValue, 'method'),
+						headers: get(formValue, 'headers'),
+					},
 				},
 			},
 			exportSettings: get(formValue, 'exportSettings'),
@@ -1619,9 +1619,9 @@ export const getDiffData = (oldObj, newObj, isPageLevelDiff = false, isRecommend
 			};
 		}
 
-		if (get(diffData, 'globalSettings.endpoint', null)) {
-			const newVal = get(newObj, 'globalSettings.endpoint', '');
-			const oldVal = get(oldObj, 'globalSettings.endpoint', '');
+		if (get(diffData, 'globalSettings.meta.endpoint', null)) {
+			const newVal = get(newObj, 'globalSettings.meta.endpoint', '');
+			const oldVal = get(oldObj, 'globalSettings.meta.endpoint', '');
 
 			if (!isEqualWith(oldVal, newVal)) {
 				diffData = {
@@ -1629,8 +1629,8 @@ export const getDiffData = (oldObj, newObj, isPageLevelDiff = false, isRecommend
 					generalSettings: {
 						...diffData.generalSettings,
 						...getDiffFieldsFromObject(
-							get(diffData, `globalSettings.endpoint `, {}),
-							`globalSettings.endpoint`,
+							get(diffData, `globalSettings.meta.endpoint `, {}),
+							`globalSettings.meta.endpoint`,
 							oldObj,
 							newObj,
 						),

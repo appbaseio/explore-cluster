@@ -112,6 +112,7 @@ const CredentialsModal = ({ value, onChange, permissions, fetchPermissions }) =>
 					handleCancel={() => handleCancel()}
 					initialValues={currentPermissionInfo}
 					readOnly={mode !== 'create'}
+					isUIBuilder
 				/>
 			</ErrorToaster>
 		</>

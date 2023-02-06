@@ -151,7 +151,7 @@ const Footer = ({
 				headers: `{"Authorization":"Basic ${btoa(exportSettings.credentials || '')}"}`,
 			};
 		}
-		preferences.globalSettings.endpoint = endpointObj;
+		preferences.globalSettings.meta.endpoint = endpointObj;
 
 		if (pageSettings && pageSettings.pages) {
 			Object.keys(pageSettings.pages).forEach((page) => {

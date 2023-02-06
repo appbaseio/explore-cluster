@@ -107,7 +107,38 @@ const General = ({ isRecommendation, deleteSearchPreference, history }) => {
 													{({ value: formVal, onChange }) => (
 														<CredentialsModal
 															value={formVal}
-															onChange={onChange}
+															onChange={(val) => {
+																onChange(val);
+																if (form.get('indexSettings')) {
+																	const indexSettingsControl =
+																		form.get('indexSettings');
+																	if (
+																		indexSettingsControl.get(
+																			'endpoint',
+																		)
+																	) {
+																		const endpointControl =
+																			indexSettingsControl.get(
+																				'endpoint',
+																			);
+																		if (
+																			endpointControl.get(
+																				'headers',
+																			)
+																		) {
+																			const headersControl =
+																				endpointControl.get(
+																					'headers',
+																				);
+																			headersControl.setValue(
+																				`{"Authorization":"Basic ${btoa(
+																					val || '',
+																				)}"}`,
+																			);
+																		}
+																	}
+																}
+															}}
 														/>
 													)}
 												</FieldControl>

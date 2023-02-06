@@ -238,6 +238,7 @@ const ConfigureConnection = ({
 					initialValues={currentPermissionInfo}
 					readOnly={mode !== 'create'}
 					backend={backend}
+					isUIBuilder
 				/>
 			</ErrorToaster>
 		</div>

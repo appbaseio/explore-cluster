@@ -362,10 +362,11 @@ class CreateCredentials extends React.Component {
 	};
 
 	getMappings() {
-		const { appName, fetchMappings, appbaseCredentials, backend } = this.props;
+		const { appName, fetchMappings, appbaseCredentials, backend, isUIBuilder } = this.props;
 		if (appbaseCredentials && backend !== BACKENDS.FUSION.name) {
 			// Fetch Mappings if permissions are present
-			fetchMappings(appName, appbaseCredentials);
+			if (!isUIBuilder) fetchMappings(appName, appbaseCredentials);
+			else if (appName) fetchMappings(appName, appbaseCredentials);
 		}
 	}
 
@@ -1551,6 +1552,7 @@ CreateCredentials.defaultProps = {
 	backend: BACKENDS.ELASTICSEARCH.name,
 	onSubmit: () => {},
 	backendImage: '',
+	isUIBuilder: false,
 };
 CreateCredentials.propTypes = {
 	isPaidUser: PropTypes.bool,
@@ -1595,6 +1597,7 @@ CreateCredentials.propTypes = {
 	backend: PropTypes.string,
 	backendImage: PropTypes.string,
 	fetchPipelines: PropTypes.func.isRequired,
+	isUIBuilder: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => {
