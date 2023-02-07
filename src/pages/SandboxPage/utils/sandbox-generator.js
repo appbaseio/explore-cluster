@@ -126,7 +126,7 @@ const generateAppCode = ({
 }) => `
 import React from 'react';
 import {
-  DataSearch,
+  SearchBox,
   DynamicRangeSlider,
   RangeSlider,
   MultiList,
