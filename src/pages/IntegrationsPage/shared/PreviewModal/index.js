@@ -110,6 +110,7 @@ class PreviewModal extends React.Component {
 										style={{
 											maxWidth: 400,
 											maxHeight: 600,
+											overflow: 'auto',
 										}}
 									>
 										{JSON.stringify(currentProduct, null, 2)}
