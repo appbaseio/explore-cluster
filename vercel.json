@@ -3,6 +3,7 @@
 		{
 			"source": "/(.*)",
 			"destination": "/",
+      // cache control header
 			"headers": [
 				{
 					"key": "Cache-Control",
