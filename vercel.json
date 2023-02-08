@@ -1,15 +1,14 @@
 {
 	"rewrites": [
 		{
-			"source": "/(.*)",
-			"destination": "/",
-      // cache control header
 			"headers": [
 				{
 					"key": "Cache-Control",
 					"value": "no-cache"
 				}
-			]
+			],
+			"source": "/(.*)",
+			"destination": "/"
 		}
 	]
 }
