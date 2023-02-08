@@ -2,12 +2,7 @@
 	"rewrites": [
 		{
 			"source": "/(.*)",
-			"destination": "/"
-		}
-	],
-	"headers": [
-		{
-			"source": "/(.*)",
+			"destination": "/",
 			"headers": [
 				{
 					"key": "Cache-Control",
