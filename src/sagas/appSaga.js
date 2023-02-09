@@ -14,29 +14,30 @@ function* appWorker() {
 	try {
 		const user = yield select(getUser);
 		const plan = yield select(getPlan);
-		yield put(createAction(constants.HEALTH.SET_SEARCH_ENGINE_HEALTH));
-		let endpoints = yield call(getEndpoints);
+		if (plan && Object.keys(plan).length) {
+			yield put(createAction(constants.HEALTH.SET_SEARCH_ENGINE_HEALTH));
+			let endpoints = yield call(getEndpoints);
 
-		if (typeof endpoints === 'object' && !endpoints.status) {
-			yield put(loadEndpointsSuccess(endpoints));
-			yield put(createAction(constants.HEALTH.SET_SEARCH_ENGINE_HEALTH_SUCCESS));
-		} else {
-			yield put(
-				createAction(constants.HEALTH.SET_SEARCH_ENGINE_HEALTH_ERROR, {
-					error: endpoints,
-				}),
+			if (typeof endpoints === 'object' && !endpoints.status) {
+				yield put(loadEndpointsSuccess(endpoints));
+				yield put(createAction(constants.HEALTH.SET_SEARCH_ENGINE_HEALTH_SUCCESS));
+			} else {
+				yield put(
+					createAction(constants.HEALTH.SET_SEARCH_ENGINE_HEALTH_ERROR, {
+						error: endpoints,
+					}),
+				);
+				endpoints = null;
+			}
+			const apps = yield call(
+				getESIndices,
+				user.authToken,
+				plan.backend || BACKENDS.ELASTICSEARCH.name,
+				endpoints ?? apisMapper[plan.backend || BACKENDS.ELASTICSEARCH.name],
 			);
-			endpoints = null;
+
+			yield put(loadAppsSuccess(apps));
 		}
-
-		const apps = yield call(
-			getESIndices,
-			user.authToken,
-			plan.backend || BACKENDS.ELASTICSEARCH.name,
-			endpoints ?? apisMapper[plan.backend || BACKENDS.ELASTICSEARCH.name],
-		);
-
-		yield put(loadAppsSuccess(apps));
 	} catch (e) {
 		yield put(loadAppsError(e));
 	}
