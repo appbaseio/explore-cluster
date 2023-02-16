@@ -32,7 +32,7 @@ const bannerMessagesAnalytics = {
 	},
 };
 
-const RequestLogsWrapper = ({ appName, plan, isPaidUser }) => {
+const RequestLogsWrapper = ({ appName, plan, isPaidUser, history }) => {
 	useEffect(() => {
 		const startTime = moment();
 		// triggering custom event for google analytics
@@ -59,7 +59,7 @@ const RequestLogsWrapper = ({ appName, plan, isPaidUser }) => {
 				<React.Fragment>
 					{bannerMessagesAnalytics[plan] && <Banner {...bannerMessagesAnalytics[plan]} />}
 					<Container>
-						<RequestLogs appName={appName} />
+						<RequestLogs appName={appName} history={history} />
 					</Container>
 				</React.Fragment>
 			) : (
@@ -85,6 +85,7 @@ RequestLogsWrapper.propTypes = {
 	appName: PropTypes.string.isRequired,
 	plan: PropTypes.string.isRequired,
 	isPaidUser: PropTypes.bool.isRequired,
+	history: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({
