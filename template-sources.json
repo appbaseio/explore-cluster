@@ -11,7 +11,7 @@
 	{
 		"organization": "appbaseio-confidential",
 		"repository": "charts-dashboard-template",
-		"version": "0.3.0",
+		"version": "0.3.1",
 		"commit": "",
 		"branch": "",
 		"manifest_path": "reactivesearch-manifest.json",
@@ -20,7 +20,7 @@
 	{
 		"organization": "appbaseio",
 		"repository": "faceted-search-template",
-		"version": "0.2.0",
+		"version": "0.2.1",
 		"commit": "",
 		"branch": "support-mongo-db",
 		"manifest_path": "reactivesearch-manifest.json",
@@ -38,7 +38,7 @@
 	{
 		"organization": "appbaseio-confidential",
 		"repository": "multi-page-search",
-		"version": "0.2.0",
+		"version": "0.2.1",
 		"commit": "",
 		"branch": "",
 		"manifest_path": "reactivesearch-manifest.json",
@@ -47,7 +47,7 @@
 	{
 		"organization": "appbaseio-confidential",
 		"repository": "enterprise-demo-search-ui-template",
-		"version": "0.4.0",
+		"version": "0.4.1",
 		"commit": "",
 		"branch": "",
 		"manifest_path": "reactivesearch-manifest.json",
