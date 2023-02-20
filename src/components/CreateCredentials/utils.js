@@ -6,7 +6,7 @@ import filter from 'lodash/filter';
 import find from 'lodash/find';
 import { getDefaultAllowedActions } from '../../utils/allowedActions';
 import { versionCompare } from '../../batteries/utils/helpers';
-import { ALLOWED_ACTIONS } from '../../constants';
+import { ALLOWED_ACTIONS, ALLOWED_SLS } from '../../constants';
 import { ALLOWED_ACTIONS_BY_BACKEND, BACKENDS } from '../../batteries/utils';
 
 export const Suggestions = {
@@ -256,18 +256,14 @@ export const aclOptionsMessage = {
 	cache: 'Allow cache related actions',
 };
 
-const SLS = 'sls';
-const MULTI_TENANT = 'multi-tenant-sls';
+export const shouldHavePipelines = (backendImage) => ALLOWED_SLS.includes(backendImage);
 
-export const shouldHavePipelines = (backendImage) =>
-	backendImage === SLS || backendImage === MULTI_TENANT;
-
-export const shouldHaveIndices = (backendImage) => backendImage !== SLS;
+export const shouldHaveIndices = (backendImage) => !ALLOWED_SLS.includes(backendImage);
 
 export const shouldHaveFieldsFiltering = (backendImage, backend) =>
 	[BACKENDS.ELASTICSEARCH.name, BACKENDS.OPENSEARCH.name, BACKENDS.SYSTEM.name].includes(
 		backend,
-	) && backendImage !== SLS;
+	) && !ALLOWED_SLS.includes(backendImage);
 
 const filterCategories = (value) => {
 	const limits = value.ip_limit ? { ip_limit: parseFloat(value.ip_limit, 10) } : undefined;

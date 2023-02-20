@@ -12,6 +12,7 @@ import RequestLogs from '../../batteries/components/analytics/components/Request
 import { isValidPlan } from '../../batteries/utils';
 import { compareVersion } from '../../utils';
 import { allowedTiers } from '../../utils/prop-types';
+import { ALLOWED_SLS } from '../../constants';
 
 const CSS = css`
 	header {
@@ -44,8 +45,15 @@ const bannerDetails = {
 	href: 'https://docs.reactivesearch.io/docs/search/pipelines/',
 };
 
-const PipelineLogsWrapper = ({ appVersion, tier, featurePipelines, pipelineId, history }) => {
-	if (compareVersion(appVersion, '7.58.0') === -1)
+const PipelineLogsWrapper = ({
+	appVersion,
+	tier,
+	featurePipelines,
+	pipelineId,
+	history,
+	backendImage,
+}) => {
+	if (!ALLOWED_SLS.includes(backendImage) && compareVersion(appVersion, '7.58.0') === -1)
 		return (
 			<React.Fragment>
 				<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
@@ -127,6 +135,7 @@ PipelineLogsWrapper.propTypes = {
 	appVersion: PropTypes.string,
 	pipelineId: PropTypes.string,
 	history: PropTypes.object,
+	backendImage: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = (state, props) => {
@@ -136,6 +145,7 @@ const mapStateToProps = (state, props) => {
 		featurePipelines: get(state, '$getAppPlan.results.feature_pipelines', false),
 		appVersion: get(state, '$getAppPlan.results.version'),
 		pipelineId,
+		backendImage: get(state, '$getAppPlan.results.image_type') ?? '',
 	};
 };
 export default connect(mapStateToProps)(PipelineLogsWrapper);

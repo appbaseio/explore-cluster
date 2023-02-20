@@ -272,7 +272,7 @@ const PipelineCard = (props) => {
 				<Col xl={7} lg={7} xs={0}>
 					<div className={actions}>
 						<DeleteModal
-							name="rule"
+							name="pipeline"
 							value={pipeline.id}
 							title="Delete Pipeline"
 							onDelete={() => {

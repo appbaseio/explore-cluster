@@ -9,7 +9,7 @@ import keys from 'lodash/keys';
 import { bool, func, object, string } from 'prop-types';
 import { isEqual } from 'lodash';
 import { css } from 'emotion';
-import { ALLOWED_ACTIONS } from '../../constants';
+import { ALLOWED_ACTIONS, ALLOWED_SLS } from '../../constants';
 import Loader from '../../components/Loader';
 // eslint-disable-next-line
 import AppHeader from '../../components/AppHeader';
@@ -168,7 +168,7 @@ class DashboardWrapper extends Component {
 										: []),
 									{
 										label: 'End-user Authentication',
-										link: '/cluster/auth-settings',
+										link: '/cluster/search-auth-settings',
 										tag: 'Beta',
 									},
 								],
@@ -313,7 +313,7 @@ class DashboardWrapper extends Component {
 												: []),
 											{
 												label: 'End-user Authentication',
-												link: '/cluster/auth-settings',
+												link: '/cluster/search-auth-settings',
 												tag: 'Beta',
 											},
 										],
@@ -480,13 +480,17 @@ class DashboardWrapper extends Component {
 										<SubMenu key={route} title={Title}>
 											{routes[route].menu.map((item) => {
 												if (
-													(item.link.includes(
+													((item.link.includes(
 														'configure-search-engine-backend',
 													) ||
 														item.link.includes('data-usage')) &&
-													(backendImage !== 'sls' ||
-														backend === BACKENDS.FUSION.name ||
-														backend === BACKENDS.MARKLOGIC.name)
+														(!ALLOWED_SLS.includes(backendImage) ||
+															backend === BACKENDS.FUSION.name ||
+															backend === BACKENDS.MARKLOGIC.name)) ||
+													((item.link.includes('synonyms') ||
+														item.link.includes('rules') ||
+														item.link.includes('grade-evaluation')) &&
+														ALLOWED_SLS.includes(backendImage))
 												) {
 													return null;
 												}

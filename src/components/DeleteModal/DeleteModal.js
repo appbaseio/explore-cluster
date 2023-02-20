@@ -30,7 +30,7 @@ class DeleteModal extends React.Component {
 
 	render() {
 		const { input, isVisible } = this.state;
-		const { name, value, children, title, text } = this.props;
+		const { name, value, children, title, text, valueType } = this.props;
 		const isMatching = value === input;
 		return (
 			<React.Fragment>
@@ -51,8 +51,8 @@ class DeleteModal extends React.Component {
 					<Typography.Paragraph>
 						{text || (
 							<React.Fragment>
-								Type the {name} name <strong>{value}</strong> below to delete the{' '}
-								{name}. This action cannot be undone.
+								Type the {name} {valueType || 'name'} <strong>{value}</strong> below
+								to delete the {name}. This action cannot be undone.
 							</React.Fragment>
 						)}
 					</Typography.Paragraph>
@@ -74,11 +74,13 @@ DeleteModal.propTypes = {
 	children: childrenProp.isRequired,
 	onDelete: PropTypes.func.isRequired,
 	title: PropTypes.string.isRequired,
+	valueType: PropTypes.string,
 	text: PropTypes.oneOf([PropTypes.string, PropTypes.node]),
 };
 
 DeleteModal.defaultProps = {
 	text: undefined,
+	valueType: '',
 };
 
 export default DeleteModal;

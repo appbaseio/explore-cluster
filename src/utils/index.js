@@ -447,6 +447,7 @@ export function getDatafields({ mappings, indexes, isSearch = false, isAggs = fa
 	}
 	const dataFields = Object.keys(mappings)
 		.filter((index) => !index.startsWith('.'))
+		.filter((index) => !index.includes('metricbeat-'))
 		.filter((index) => hasAllIndex || indexes?.includes(index))
 		.reduce((acc, key) => {
 			const { properties } =
@@ -531,8 +532,11 @@ export function updateFunction({
 }
 
 export function getSelectedIndexes(selectedIndexes, mappings) {
-	if ((selectedIndexes || []).length === 0 || get(selectedIndexes, 0) === '*') {
-		return keys(mappings).filter((key) => !key.startsWith('.'));
+	if (
+		Array.isArray(selectedIndexes) &&
+		(selectedIndexes.length === 0 || selectedIndexes === '*')
+	) {
+		return ['*'];
 	}
 	return selectedIndexes;
 }

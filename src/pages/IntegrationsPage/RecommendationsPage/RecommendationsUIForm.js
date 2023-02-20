@@ -33,7 +33,6 @@ const RecommendationsUIForm = ({ tier, featureEcommerce, ...props }) => {
 	const [activeTab, handleTabChange] = useState('1');
 	const [widgetInfo, handleWidgetInfo] = useState(false);
 	const isSettingsTabActive = activeTab === '3';
-	const isRecommendationsTabActive = activeTab === '2';
 	const preferenceId = props.match.params.id === 'new' ? uuidv4() : props.match.params.id;
 
 	const closeForm = () => {
@@ -90,8 +89,7 @@ const RecommendationsUIForm = ({ tier, featureEcommerce, ...props }) => {
 								>
 									<div className="flex space-between card-footer">
 										<div>
-											{((isRecommendationsTabActive && widgetInfo) ||
-												isSettingsTabActive) && (
+											{isSettingsTabActive && (
 												<PreviewModal
 													isRecommendation
 													pipeline={pipeline}

@@ -387,7 +387,7 @@ class SyncStatus extends React.Component {
 							// alignItems="center"
 						>
 							<Flex className="sub-part">
-								<b>{title}</b>
+								<b className="overflow">{title}</b>
 								{documents ? (
 									<>
 										<Flex>Number of Documents: {documents}</Flex>
@@ -406,7 +406,7 @@ class SyncStatus extends React.Component {
 							</Flex>
 
 							<Flex className="sub-part">
-								{themeType ? (
+								{themeType && !isRecommendation ? (
 									<>
 										<b>Search Template {this.renderNotificationBadge()}</b>
 										<>{templateObj.label || themeType}</>
@@ -474,6 +474,7 @@ class SyncStatus extends React.Component {
 					handleCancel={this.handleCancel}
 					deploymentStatus={deploymentStatus}
 					uiBuilderName={title}
+					preferenceId={preferenceId}
 				/>
 				<DeployModal
 					errMsg={errMsg}

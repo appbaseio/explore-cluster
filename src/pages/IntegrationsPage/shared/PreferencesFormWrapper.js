@@ -596,9 +596,9 @@ class PreferencesFormWrapper extends React.Component {
 					name: get(preferences, 'name', ''),
 					description: get(preferences, 'description', ''),
 					pipeline: get(preferences, 'pipeline', ''),
-					url: get(preferences, 'globalSettings.endpoint.url', ''),
-					method: get(preferences, 'globalSettings.endpoint.method', ''),
-					headers: get(preferences, 'globalSettings.endpoint.headers', ''),
+					url: get(preferences, 'globalSettings.meta.endpoint.url', ''),
+					method: get(preferences, 'globalSettings.meta.endpoint.method', ''),
+					headers: get(preferences, 'globalSettings.meta.endpoint.headers', ''),
 					backend: backend || BACKENDS.ELASTICSEARCH.name,
 					...(this.isFusion && {
 						pipeline: '_fusion',
@@ -657,6 +657,16 @@ class PreferencesFormWrapper extends React.Component {
 						currency: get(preferences, 'globalSettings.currency'),
 					},
 					versionId: get(preferences, 'globalSettings.meta.deploySettings.versionId', ''),
+					deploymentURL: get(
+						preferences,
+						'globalSettings.meta.deploySettings.deploymentURL',
+						'',
+					),
+					previewImage: get(
+						preferences,
+						'globalSettings.meta.deploySettings.previewImage',
+						'',
+					),
 					templateVersionId: get(
 						preferences,
 						'globalSettings.meta.templateSettings.templateVersionId',
@@ -789,7 +799,7 @@ class PreferencesFormWrapper extends React.Component {
 				const recommendationsControl = this.form.get('recommendations');
 				get(preferences, 'recommendationSettings.recommendations', []).forEach(
 					(recommendation) => {
-						const control = getRecommendationForm(recommendation.type);
+						const control = getRecommendationForm(recommendation.type, recommendation);
 						recommendationsControl.push(control);
 					},
 				);
@@ -836,9 +846,9 @@ class PreferencesFormWrapper extends React.Component {
 							name: get(preferences, 'name', ''),
 							description: get(preferences, 'description', ''),
 							pipeline: get(preferences, 'pipeline', ''),
-							url: get(preferences, 'globalSettings.endpoint.url', ''),
-							method: get(preferences, 'globalSettings.endpoint.method', ''),
-							headers: get(preferences, 'globalSettings.endpoint.headers', ''),
+							url: get(preferences, 'globalSettings.meta.endpoint.url', ''),
+							method: get(preferences, 'globalSettings.meta.endpoint.method', ''),
+							headers: get(preferences, 'globalSettings.meta.endpoint.headers', ''),
 							backend: backend || BACKENDS.ELASTICSEARCH.name,
 							...(this.isFusion && {
 								pipeline: '_fusion',
@@ -973,6 +983,11 @@ class PreferencesFormWrapper extends React.Component {
 										versionId: get(
 											preferences,
 											'globalSettings.meta.deploySettings.versionId',
+											'',
+										),
+										deploymentURL: get(
+											preferences,
+											'globalSettings.meta.deploySettings.deploymentURL',
 											'',
 										),
 										templateVersionId: get(
@@ -1270,35 +1285,40 @@ class PreferencesFormWrapper extends React.Component {
 	};
 
 	render() {
-		const { children, closeForm, history, isRecommendation } = this.props;
+		const { children, closeForm, history, isRecommendation, showBack } = this.props;
 
 		return (
 			<div className={modalStyles}>
-				{isRecommendation ? (
-					<Button
-						style={{
-							margin: '5px 0px',
-						}}
-						type="link"
-						icon={<ArrowLeftOutlined />}
-						onClick={() => {
-							history.push(`/cluster/recommendations-builder`);
-						}}
-					>
-						Go back to Recommendation UIs
-					</Button>
-				) : (
-					<Button
-						style={{
-							margin: '5px 0px',
-						}}
-						type="link"
-						icon={<ArrowLeftOutlined />}
-						onClick={closeForm}
-					>
-						Go back to Search UIs
-					</Button>
-				)}
+				{showBack ? (
+					<>
+						{isRecommendation ? (
+							<Button
+								style={{
+									margin: '5px 0px',
+								}}
+								type="link"
+								icon={<ArrowLeftOutlined />}
+								onClick={() => {
+									history.push(`/cluster/recommendations-builder`);
+								}}
+							>
+								Go back to Recommendation UIs
+							</Button>
+						) : (
+							<Button
+								style={{
+									margin: '5px 0px',
+								}}
+								type="link"
+								icon={<ArrowLeftOutlined />}
+								onClick={closeForm}
+							>
+								Go back to Search UIs
+							</Button>
+						)}
+					</>
+				) : null}
+
 				<FormContext.Provider value={this.form}>
 					{children({
 						form: this.form,
@@ -1320,6 +1340,7 @@ PreferencesFormWrapper.defaultProps = {
 	),
 	backend: BACKENDS.ELASTICSEARCH.name,
 	isWizard: false,
+	showBack: true,
 };
 
 PreferencesFormWrapper.propTypes = {
@@ -1340,6 +1361,7 @@ PreferencesFormWrapper.propTypes = {
 	getLatestVersionCode: func.isRequired,
 	updateVersionStateForPreference: func.isRequired,
 	isWizard: bool,
+	showBack: bool,
 };
 
 const mapStateToProps = (state, props) => {

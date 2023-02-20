@@ -130,7 +130,7 @@ class Recommendations extends React.Component {
 			this.tempForm = getRecommendationForm(
 				undefined,
 				// eslint-disable-next-line
-				this.context.get('exportSettings.type').value,
+				{},
 			);
 			this.tempId = get(this, 'tempForm.value.id');
 			this.recommendationControl.push(this.tempForm);

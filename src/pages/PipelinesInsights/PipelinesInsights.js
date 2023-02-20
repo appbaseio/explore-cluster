@@ -36,6 +36,7 @@ import {
 	getPipelinesErrorRateInsightsPerVersion,
 } from '../../batteries/components/analytics/utils';
 import Filter from '../../batteries/components/analytics/components/Filter';
+import { ALLOWED_SLS } from '../../constants';
 
 const insightsContainer = css`
 	margin-top: 2rem;
@@ -160,6 +161,7 @@ const Pipelines = (props) => {
 		fetchUsageStats,
 		filters,
 		selectFilterValue,
+		backendImage,
 	} = props;
 	const bannerDetails = pipelinesInsightsBannerDetails;
 	const [avgTimeInsights, setAvgTimeInsights] = useState([]);
@@ -355,7 +357,7 @@ const Pipelines = (props) => {
 		}
 	}, [filters]);
 
-	if (compareVersion(appVersion, '8.0.0') === -1)
+	if (!ALLOWED_SLS.includes(backendImage) && compareVersion(appVersion, '8.0.0') === -1)
 		return (
 			<React.Fragment>
 				<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
@@ -835,6 +837,7 @@ Pipelines.propTypes = {
 	usageStats: PropTypes.array.isRequired,
 	filters: PropTypes.object,
 	selectFilterValue: PropTypes.func.isRequired,
+	backendImage: PropTypes.string.isRequired,
 };
 
 Pipelines.defaultProps = {
@@ -855,6 +858,7 @@ const mapStateToProps = (state) => ({
 	appVersion: get(state, '$getAppPlan.results.version'),
 	usageStats: get(state, '$getPipelinesUsageStats.results')?.pipelines ?? [],
 	filters: get(state, `$getSelectedFilters.${filterId}`),
+	backendImage: get(state, '$getAppPlan.results.image_type') ?? '',
 });
 
 const mapDispatchToProps = (dispatch) => ({

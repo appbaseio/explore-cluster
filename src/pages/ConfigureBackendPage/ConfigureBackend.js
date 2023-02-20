@@ -24,6 +24,7 @@ import { BACKENDS } from '../../batteries/utils';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Flex from '../../batteries/components/shared/Flex';
 import { getAppPlan, updateBackendConnection } from '../../batteries/utils/app';
+import { ALLOWED_SLS } from '../../constants';
 
 const container = css`
 	padding: 50px;
@@ -251,7 +252,7 @@ const ConfigureBackend = (props) => {
 		}
 	}, [backendProp]);
 
-	if (backendImage !== 'sls')
+	if (!ALLOWED_SLS.includes(backendImage))
 		return (
 			<React.Fragment>
 				<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
@@ -369,7 +370,8 @@ const ConfigureBackend = (props) => {
 																item.name !==
 																	BACKENDS.FUSION.name &&
 																item.name !==
-																	BACKENDS.MARKLOGIC.name,
+																	BACKENDS.MARKLOGIC.name &&
+																item.name !== BACKENDS.SYSTEM.name,
 														)
 														.map(({ name, logo }) => (
 															<Radio.Button

@@ -48,7 +48,7 @@ import {
 import Acl from './Acl';
 import WhiteList from './WhiteList';
 import PasswordInput from './PasswordInput';
-import { ALLOWED_ACTIONS_LABELS } from '../../constants';
+import { ALLOWED_ACTIONS_LABELS, ALLOWED_SLS } from '../../constants';
 import SwitchGroup from '../SwitchGroup';
 import RsApiRestrictions from './RsApiRestrictions';
 import { versionCompare } from '../../batteries/utils/helpers';
@@ -362,10 +362,11 @@ class CreateCredentials extends React.Component {
 	};
 
 	getMappings() {
-		const { appName, fetchMappings, appbaseCredentials, backend } = this.props;
+		const { appName, fetchMappings, appbaseCredentials, backend, isUIBuilder } = this.props;
 		if (appbaseCredentials && backend !== BACKENDS.FUSION.name) {
 			// Fetch Mappings if permissions are present
-			fetchMappings(appName, appbaseCredentials);
+			if (!isUIBuilder) fetchMappings(appName, appbaseCredentials);
+			else if (appName) fetchMappings(appName, appbaseCredentials);
 		}
 	}
 
@@ -828,8 +829,9 @@ class CreateCredentials extends React.Component {
 															{!isUserManagement && (
 																<React.Fragment>
 																	{this.isApp ||
-																	backendImage ===
-																		'sls' ? null : (
+																	ALLOWED_SLS.includes(
+																		backendImage,
+																	) ? null : (
 																		<FieldControl
 																			strict={false}
 																			name="indices"
@@ -915,7 +917,10 @@ class CreateCredentials extends React.Component {
 																			}}
 																		/>
 																	)}
-																	{backendImage === 'sls' ? (
+																	{backendImage ===
+																	ALLOWED_SLS.includes(
+																		backendImage,
+																	) ? (
 																		<FieldControl
 																			strict={false}
 																			name="pipelines"
@@ -1550,6 +1555,7 @@ CreateCredentials.defaultProps = {
 	backend: BACKENDS.ELASTICSEARCH.name,
 	onSubmit: () => {},
 	backendImage: '',
+	isUIBuilder: false,
 };
 CreateCredentials.propTypes = {
 	isPaidUser: PropTypes.bool,
@@ -1594,6 +1600,7 @@ CreateCredentials.propTypes = {
 	backend: PropTypes.string,
 	backendImage: PropTypes.string,
 	fetchPipelines: PropTypes.func.isRequired,
+	isUIBuilder: PropTypes.bool,
 };
 
 const mapStateToProps = (state) => {

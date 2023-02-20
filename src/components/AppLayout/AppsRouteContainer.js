@@ -12,7 +12,7 @@ import AppsAnalyticsRoutes from './AppsAnalyticsRoutes';
 import { versionCompare } from '../../batteries/utils/helpers';
 import UnauthorizedPage from '../../pages/UnauthorizedPage';
 import { getAuthorizedRoutes } from '../../utils';
-import { ALLOWED_ACTIONS } from '../../constants';
+import { ALLOWED_ACTIONS, ALLOWED_SLS } from '../../constants';
 
 const BillingPage = Loadable({
 	loader: () => import(/* webpackChunkName: "BillingPage" */ '../../pages/BillingPage'),
@@ -124,7 +124,8 @@ class RouteContainer extends React.Component {
 	}
 
 	render() {
-		const { allowedRoutes, allowedActions, arcVersion } = this.props;
+		const { allowedRoutes, allowedActions, arcVersion, backendImage, isPlanLoading } =
+			this.props;
 		const hasSearchRelevancy = allowedActions.includes(ALLOWED_ACTIONS.SEARCH_RELEVANCY);
 		const hasUIBuilder = allowedActions.includes(ALLOWED_ACTIONS.UI_BUILDER);
 
@@ -422,7 +423,9 @@ class RouteContainer extends React.Component {
 						path="/app/:appName/synonyms"
 						render={(props) => (
 							<>
-								{get(allowedRoutes, 'synonyms') ? (
+								{get(allowedRoutes, 'synonyms') &&
+								!isPlanLoading &&
+								!ALLOWED_SLS.includes(backendImage) ? (
 									<AppPageContainer
 										{...props}
 										component={SynonymsPage}
@@ -448,13 +451,21 @@ RouteContainer.propTypes = {
 	allowedRoutes: PropTypes.object.isRequired,
 	arcVersion: PropTypes.string.isRequired,
 	allowedActions: PropTypes.array.isRequired,
+	backendImage: PropTypes.string,
+	isPlanLoading: PropTypes.bool.isRequired,
+};
+
+RouteContainer.defaultProps = {
+	backendImage: '',
 };
 
 const mapStateToProps = (state) => {
 	return {
 		allowedRoutes: getAuthorizedRoutes(get(state, 'appRoutes')),
 		allowedActions: get(state, 'user.data.allowedActions'),
-		arcVersion: get(state, '$getAppPlan.results.version'),
+		arcVersion: get(state, '$getAppPlan.results.version') ?? '',
+		backendImage: get(state, '$getAppPlan.results.image_type'),
+		isPlanLoading: get(state, '$getAppPlan.isFetching'),
 	};
 };
 

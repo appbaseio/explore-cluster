@@ -11,13 +11,14 @@ import { isEqual } from 'lodash';
 // eslint-disable-next-line import/no-cycle
 import AppLayout from '../../components/AppLayout';
 import {
+	clearCurrentApp,
 	getDefaultSettings,
 	getSettings,
 	putSettings,
 	setCurrentApp,
 } from '../../batteries/modules/actions';
 import Logo from '../../components/Logo';
-import { ALLOWED_ACTIONS } from '../../constants';
+import { ALLOWED_ACTIONS, ALLOWED_SLS } from '../../constants';
 import { versionCompare } from '../../batteries/utils/helpers';
 import { getParam, getParsedRoutes } from '../../utils';
 import { setIsSidebarCollapsed } from '../../actions';
@@ -144,7 +145,7 @@ class AppWrapper extends Component {
 										: []),
 									{
 										label: 'End-user Authentication',
-										link: '/cluster/auth-settings',
+										link: '/cluster/search-auth-settings',
 										hasExactPath: true,
 										tag: 'Beta',
 									},
@@ -290,7 +291,7 @@ class AppWrapper extends Component {
 												: []),
 											{
 												label: 'End-user Authentication',
-												link: '/cluster/auth-settings',
+												link: '/cluster/search-auth-settings',
 												tag: 'Beta',
 												hasExactPath: true,
 											},
@@ -342,6 +343,11 @@ class AppWrapper extends Component {
 		if (currentApp && appName !== currentApp) {
 			history.push(`/app/${currentApp}/${route}`);
 		}
+	}
+
+	componentWillUnmount() {
+		const { clearApp } = this.props;
+		clearApp();
 	}
 
 	handleSearchTerm = (e) => {
@@ -481,13 +487,17 @@ class AppWrapper extends Component {
 										<SubMenu key={route} title={Title}>
 											{routes[route].menu.map((item) => {
 												if (
-													(item.link.includes(
+													((item.link.includes(
 														'configure-search-engine-backend',
 													) ||
 														item.link.includes('data-usage')) &&
-													(backendImage !== 'sls' ||
-														backend === BACKENDS.FUSION.name ||
-														backend === BACKENDS.MARKLOGIC.name)
+														(!ALLOWED_SLS.includes(backendImage) ||
+															backend === BACKENDS.FUSION.name ||
+															backend === BACKENDS.MARKLOGIC.name)) ||
+													((item.link.includes('synonyms') ||
+														item.link.includes('rules') ||
+														item.link.includes('grade-evaluation')) &&
+														ALLOWED_SLS.includes(backendImage))
 												) {
 													return null;
 												}
@@ -605,6 +615,7 @@ AppWrapper.propTypes = {
 	backendImage: PropTypes.string,
 	backend: PropTypes.string,
 	user: PropTypes.object.isRequired,
+	clearApp: PropTypes.func.isRequired,
 };
 
 AppWrapper.defaultProps = {
@@ -641,6 +652,7 @@ const mapDispatchToProps = (dispatch) => ({
 	getSettingsAction: (name) => dispatch(getSettings(name)),
 	updateSettingsAction: (name, payload) => dispatch(putSettings(name, payload)),
 	setIsCollapsed: (collapsed) => dispatch(setIsSidebarCollapsed(collapsed)),
+	clearApp: () => dispatch(clearCurrentApp()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AppWrapper);

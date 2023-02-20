@@ -172,3 +172,5 @@ export {
 	CALENDAR_INTERVAL_FIELDS,
 	SET_SESSION_DATA,
 };
+
+export const ALLOWED_SLS = ['sls', 'multi-tenant-sls'];

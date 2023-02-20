@@ -15,6 +15,7 @@ import Loader from './components/Loader';
 import Logo from './components/Logo';
 import { APP_ROUTES, CLUSTER_ROUTES } from './constants/routes';
 import { ALLOWED_ACTIONS_BY_BACKEND, BACKENDS } from './batteries/utils';
+import { ALLOWED_SLS } from './constants';
 
 // routes
 const LoginPage = Loadable({
@@ -175,7 +176,7 @@ class Dashboard extends Component {
 			);
 		}
 
-		if (backendImage === 'sls' && !backend && redirectLocation !== '/login') {
+		if (ALLOWED_SLS.includes(backendImage) && !backend && redirectLocation !== '/login') {
 			window.location.href = '/cluster/configure-search-engine-backend';
 		}
 	}

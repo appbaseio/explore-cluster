@@ -97,6 +97,7 @@ const RequestLogDetailsWrapper = ({ appName, isPaidUser, logId, history }) => {
 								responseChanges={get(logDetails, 'responseChanges', [])}
 								requestChanges={get(logDetails, 'requestChanges', [])}
 								responseBody={get(logDetails, 'response.body', '')}
+								diffLogs={get(logDetails, 'diffLogs', true)}
 							/>
 						)}
 					</Container>

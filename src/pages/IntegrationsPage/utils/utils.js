@@ -532,24 +532,41 @@ export const getPriceFilterConfigurationForm = () => {
 	});
 };
 
-export const getRecommendationForm = (recommendationType, exportType) => {
+const extractFromRegex = (str = '') => {
+	const regex = /\{[a-zA-Z0-9_]*}/gm;
+	const varRegex = /(?:\{)(.*?)(?=\})/;
+	const newStr = str;
+
+	// newStr.match(regex) -> returns array of ${variable} available in the string
+	const tempVar = newStr.match(regex) ? newStr.match(regex)[0] : '' || '';
+	const keyVariable =
+		varRegex.exec(tempVar) && varRegex.exec(tempVar)[1] ? varRegex.exec(tempVar)[1] : '';
+
+	return keyVariable;
+};
+
+export const getRecommendationForm = (recommendationType, recommendationObj = {}) => {
 	const isMostRecent = recommendationType === RecommendationTypes.MOST_RECENT;
 	const isSimilarTo = recommendationType === RecommendationTypes.SIMILAR_PRODUCTS;
 	const isProductsPageURLEnabled = recommendationType === RecommendationTypes.SIMILAR_PRODUCTS;
 	const isFeaturedProducts = recommendationType === RecommendationTypes.FEATURED_PRODUCTS;
+
 	return FormBuilder.group({
-		id: new Date().getTime(),
-		title: 'You might also like',
-		type: RecommendationTypes.MOST_POPULAR_PRODUCTS,
-		maxProducts: [15, Validators.min(1)],
+		id: recommendationObj.id || new Date().getTime(),
+		title: recommendationObj.title || 'You might also like',
+		type: recommendationObj.type || RecommendationTypes.MOST_POPULAR_PRODUCTS,
+		maxProducts: recommendationObj.maxProducts || [15, Validators.min(1)],
 		dataFieldSimilarTo: [
 			{
-				value: isMostRecent && exportType === 'shopify' ? 'created_at' : '',
+				value: recommendationObj.dataField || '',
 				disabled: !isSimilarTo,
 			},
 			Validators.required,
 		],
-		dataFieldMostRecent: [{ value: '', disabled: !isMostRecent }, Validators.required],
+		dataFieldMostRecent: recommendationObj.dataFieldMostRecent || [
+			{ value: recommendationObj.dataField || '', disabled: !isMostRecent },
+			Validators.required,
+		],
 		productsPageHandle: FormBuilder.group({
 			productsPageUrlPrefix: [
 				{ value: '/products/', disabled: !isProductsPageURLEnabled },
@@ -557,13 +574,16 @@ export const getRecommendationForm = (recommendationType, exportType) => {
 			],
 			productsPageUrlField: [
 				{
-					value: exportType === 'shopify' ? 'handle.keyword' : undefined,
+					value: extractFromRegex(recommendationObj.productsPageUrl) || undefined,
 					disabled: !isProductsPageURLEnabled,
 				},
 				Validators.required,
 			],
 		}),
-		docIds: [{ value: [], disabled: !isFeaturedProducts }, Validators.required],
+		docIds: [
+			{ value: recommendationObj.docIds || [], disabled: !isFeaturedProducts },
+			Validators.required,
+		],
 	});
 };
 
@@ -678,6 +698,16 @@ export const defaultSettings = [
 		value: false,
 	},
 ];
+
+export const templatePreviews = {
+	'auth0-classic': 'https://imgur.com/HXjULmw.png',
+	reactivechart: 'https://imgur.com/QXoDngf.png',
+	classic: 'https://imgur.com/uNt7zmz.png',
+	geo: 'https://imgur.com/eudc9Lm.png',
+	'multi-page': 'https://imgur.com/HxKoPdY.png',
+	'reactivesearch-enterprise-template': 'https://imgur.com/tBmG7M3.png',
+	'vue-ecomm': 'https://imgur.com/JIhhG4N.png',
+};
 
 export const defaultRecommendationsPreferences = {
 	name: '',
@@ -1067,6 +1097,8 @@ export const getSearchPreferencesPayload = (formValue) => {
 					},
 					deploySettings: {
 						versionId: get(formValue, 'versionId'),
+						deploymentURL: get(formValue, 'deploymentURL'),
+						previewImage: get(formValue, 'previewImage'),
 					},
 					templateSettings: {
 						templateVersionId: get(formValue, 'templateVersionId'),
@@ -1077,11 +1109,11 @@ export const getSearchPreferencesPayload = (formValue) => {
 							collection: get(formValue, 'collection'),
 						},
 					}),
-				},
-				endpoint: {
-					url: get(formValue, 'url'),
-					method: get(formValue, 'method'),
-					headers: get(formValue, 'headers'),
+					endpoint: {
+						url: get(formValue, 'url'),
+						method: get(formValue, 'method'),
+						headers: get(formValue, 'headers'),
+					},
 				},
 			},
 			exportSettings: get(formValue, 'exportSettings'),
@@ -1607,9 +1639,9 @@ export const getDiffData = (oldObj, newObj, isPageLevelDiff = false, isRecommend
 			};
 		}
 
-		if (get(diffData, 'globalSettings.endpoint', null)) {
-			const newVal = get(newObj, 'globalSettings.endpoint', '');
-			const oldVal = get(oldObj, 'globalSettings.endpoint', '');
+		if (get(diffData, 'globalSettings.meta.endpoint', null)) {
+			const newVal = get(newObj, 'globalSettings.meta.endpoint', '');
+			const oldVal = get(oldObj, 'globalSettings.meta.endpoint', '');
 
 			if (!isEqualWith(oldVal, newVal)) {
 				diffData = {
@@ -1617,8 +1649,8 @@ export const getDiffData = (oldObj, newObj, isPageLevelDiff = false, isRecommend
 					generalSettings: {
 						...diffData.generalSettings,
 						...getDiffFieldsFromObject(
-							get(diffData, `globalSettings.endpoint `, {}),
-							`globalSettings.endpoint`,
+							get(diffData, `globalSettings.meta.endpoint `, {}),
+							`globalSettings.meta.endpoint`,
 							oldObj,
 							newObj,
 						),

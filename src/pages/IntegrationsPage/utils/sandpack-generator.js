@@ -99,6 +99,20 @@ export const tabSettings = {
 	},
 };
 
+export const filePathCorrection = (code) => {
+	const newObj = {};
+	Object.keys(code).forEach((path) => {
+		if (path[0] === '/') {
+			const newPath = path.slice(1);
+			newObj[newPath] = code[path];
+		} else {
+			newObj[path] = code[path];
+		}
+	});
+
+	return newObj;
+};
+
 const getObjectStructure = (value) => {
 	const [dataField = '', highlight = false] =
 		typeof value === 'string' ? value.split('~') : ['', false];

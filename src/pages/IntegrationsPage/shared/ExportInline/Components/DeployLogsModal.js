@@ -111,7 +111,7 @@ const DeployLogsModal = ({ open, handleCancel, deploymentStatus, uiBuilderName, 
 					title={
 						<div style={{ maxHeight: 200 }} css={pastVersionsStyles}>
 							<div className="row-data">
-								<div className="label">{uiBuilderName}</div>
+								<div className="label overflow mx-w-70">{uiBuilderName}</div>
 								<div>
 									<span className="label">Deploy Status: </span>
 									{status} {deployStatusMapper[status]}
