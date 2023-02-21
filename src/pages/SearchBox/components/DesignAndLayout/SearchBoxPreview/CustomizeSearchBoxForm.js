@@ -1,6 +1,6 @@
 import { Form, Input, Modal, Select, Switch } from 'antd';
 import styled from 'react-emotion';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { FieldControl, FieldGroup } from 'react-reactive-form';
 import { object } from 'prop-types';
@@ -66,6 +66,15 @@ export default function CustomizeSearchBoxForm({ modalProps }) {
 	);
 	// below would contain the latest value while the formState value is debounced
 	const [latestIconURL, setLatestIconURL] = useIconURLDebounce(iconURLControl.handler);
+
+	useEffect(() => {
+		// latestIconURL is source of truth.
+		// When iconURLControl.value changes it would always be in sync with latestIconURL.
+		// Handle when the above is false
+		if (iconURLControl.value !== latestIconURL) {
+			setLatestIconURL(iconURLControl.value);
+		}
+	}, [iconURLControl.value]);
 
 	return (
 		<FieldGroup
