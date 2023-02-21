@@ -219,6 +219,7 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 								enableEndpointSuggestions={form.value.enableEndpointSuggestions}
 								showVoiceSearch={form.value.enableVoiceSearch}
 								highlight={form.value.highlight}
+								iconURL={customizeSearchBoxForm.value.iconURL}
 								iconPosition={customizeSearchBoxForm.value.iconPosition}
 								focusShortcuts={customizeSearchBoxForm.value.focusShortcuts}
 								placeholder={customizeSearchBoxForm.value.placeholder}
