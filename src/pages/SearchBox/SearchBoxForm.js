@@ -231,7 +231,7 @@ const SearchBoxForm = (props) => {
 						enableRecentSuggestions: designAndLayout.enableRecentSuggestions,
 						enableVoiceSearch: designAndLayout.enableVoiceSearch,
 						highlight: designAndLayout.highlight,
-						iconURL: designAndLayout.iconURL,
+						iconURL: designAndLayout?.customizeSearchBox?.iconURL,
 						iconPosition: designAndLayout?.customizeSearchBox?.iconPosition,
 						placeholder: designAndLayout?.customizeSearchBox?.placeholder,
 						focusShortcuts: designAndLayout?.customizeSearchBox?.focusShortcuts,
