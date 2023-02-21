@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import {
-	DataSearch,
+	SearchBox,
 	MultiList,
 	ReactiveBase,
 	ReactiveList,
@@ -325,7 +325,7 @@ class EcommSearchApp extends Component {
 						</span>
 					</h2>
 
-					<DataSearch
+					<SearchBox
 						componentId="search"
 						dataField={fields}
 						showIcon={false}

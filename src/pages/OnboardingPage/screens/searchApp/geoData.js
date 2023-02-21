@@ -6,7 +6,7 @@ import get from 'lodash/get';
 import {
 	RangeSlider,
 	MultiList,
-	DataSearch,
+	SearchBox,
 	ReactiveBase,
 	ReactiveList,
 	SelectedFilters,
@@ -294,7 +294,7 @@ class GeoSearchApp extends Component {
 							🌎
 						</span>
 					</h2>
-					<DataSearch
+					<SearchBox
 						componentId="search"
 						dataField={fields}
 						showIcon={false}

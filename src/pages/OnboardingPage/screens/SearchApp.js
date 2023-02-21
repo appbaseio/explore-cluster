@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
-	DataSearch,
+	SearchBox,
 	DynamicRangeSlider,
 	MultiList,
 	ReactiveBase,
@@ -272,7 +272,7 @@ export default class SearchApp extends Component {
 						</span>
 					</h2>
 
-					<DataSearch
+					<SearchBox
 						componentId="search"
 						dataField={fields}
 						showIcon={false}
