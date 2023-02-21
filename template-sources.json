@@ -2,7 +2,7 @@
 	{
 		"organization": "appbaseio-confidential",
 		"repository": "enterprise-search-ui-template",
-		"version": "0.2.1",
+		"version": "0.2.2",
 		"commit": "",
 		"branch": "",
 		"manifest_path": "reactivesearch-manifest.json",
@@ -20,7 +20,7 @@
 	{
 		"organization": "appbaseio",
 		"repository": "faceted-search-template",
-		"version": "0.2.1",
+		"version": "0.2.2",
 		"commit": "",
 		"branch": "support-mongo-db",
 		"manifest_path": "reactivesearch-manifest.json",
