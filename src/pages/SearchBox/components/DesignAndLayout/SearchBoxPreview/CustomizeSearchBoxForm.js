@@ -84,8 +84,6 @@ export default function CustomizeSearchBoxForm({ modalProps }) {
 				<Modal
 					{...modalProps}
 					onCancel={() => {
-						// reset the form to the previous value
-						form.reset();
 						modalProps.onCancel();
 					}}
 					title="Customize Searchbox"
