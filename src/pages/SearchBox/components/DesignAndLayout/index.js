@@ -1,5 +1,6 @@
 import { ReactiveBase, SearchBox } from '@appbaseio/reactivesearch';
 import { Alert, Modal, notification, Spin } from 'antd';
+import DOMPurify from 'dompurify';
 import { css } from 'emotion';
 import { uniqueId } from 'lodash';
 import { any, bool, func, object, oneOfType, string } from 'prop-types';
@@ -225,7 +226,9 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 									customizeSearchBoxForm.value.addonBefore ? (
 										<div
 											dangerouslySetInnerHTML={{
-												__html: customizeSearchBoxForm.value.addonBefore,
+												__html: DOMPurify.sanitize(
+													customizeSearchBoxForm.value.addonBefore,
+												),
 											}}
 										/>
 									) : null
@@ -234,7 +237,9 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 									customizeSearchBoxForm.value.addonAfter ? (
 										<div
 											dangerouslySetInnerHTML={{
-												__html: customizeSearchBoxForm.value.addonAfter,
+												__html: DOMPurify.sanitize(
+													customizeSearchBoxForm.value.addonAfter,
+												),
 											}}
 										/>
 									) : null

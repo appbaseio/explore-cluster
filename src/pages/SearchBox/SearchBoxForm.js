@@ -9,6 +9,7 @@ import { ArrowLeftOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Card, Input, notification, Result, Skeleton, Tabs } from 'antd';
 
 import { FieldControl, FieldGroup, FormBuilder, Validators } from 'react-reactive-form';
+import DOMPurify from 'dompurify';
 import { FormContext } from '../IntegrationsPage/utils/utils';
 import DesignAndLayout from './components/DesignAndLayout';
 import PopularSuggestions from './components/PopularSuggestions';
@@ -234,8 +235,12 @@ const SearchBoxForm = (props) => {
 						iconPosition: designAndLayout?.customizeSearchBox?.iconPosition,
 						placeholder: designAndLayout?.customizeSearchBox?.placeholder,
 						focusShortcuts: designAndLayout?.customizeSearchBox?.focusShortcuts,
-						addonBefore: designAndLayout?.customizeSearchBox?.addonBefore,
-						addonAfter: designAndLayout?.customizeSearchBox?.addonAfter,
+						addonBefore: DOMPurify.sanitize(
+							designAndLayout?.customizeSearchBox?.addonBefore,
+						),
+						addonAfter: DOMPurify.sanitize(
+							designAndLayout?.customizeSearchBox?.addonAfter,
+						),
 						credentials,
 					},
 					...(!isEmpty(designAndLayout.searchbox)
