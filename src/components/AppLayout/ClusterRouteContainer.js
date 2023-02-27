@@ -198,11 +198,6 @@ const SyncPreferences = Loadable({
 	loading: Loader,
 });
 
-const ClusterInsights = Loadable({
-	loader: () => import(/* webpackChunkName: "ClusterInsights" */ '../../pages/ClusterInsights'),
-	loading: Loader,
-});
-
 const GradeEvaluation = Loadable({
 	loader: () => import(/* webpackChunkName: "GradeEvaluation" */ '../../pages/GradeEvaluation'),
 	loading: Loader,
@@ -739,19 +734,6 @@ class ClusterRouteContainer extends React.Component {
 									backend === BACKENDS.SYSTEM.name ||
 									backend === BACKENDS.OPENSEARCH.name) ? (
 									<AppPageContainer {...props} component={SyncPreferences} />
-								) : (
-									<UnauthorizedPage />
-								)}
-							</>
-						)}
-					/>
-					<Route
-						exact
-						path="/cluster/curated-insights"
-						component={(props) => (
-							<>
-								{get(allowedRoutes, '/cluster/curated-insights') ? (
-									<AppPageContainer {...props} component={ClusterInsights} />
 								) : (
 									<UnauthorizedPage />
 								)}

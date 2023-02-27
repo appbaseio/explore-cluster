@@ -91,8 +91,6 @@
 		"@codesandbox/sandpack-themes": "^1.13.0",
 		"@monaco-editor/react": "^4.2.2",
 		"@sentry/browser": "^6.13.2",
-		"@stripe/react-stripe-js": "^1.1.2",
-		"@stripe/stripe-js": "^1.11.0",
 		"@typeform/embed": "^0.14.1",
 		"@ungap/url-search-params": "^0.1.2",
 		"@uppy/core": "^2.1.2",
