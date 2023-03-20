@@ -23,7 +23,7 @@ import {
 import Loadable from 'react-loadable';
 import { container } from '../ResultsPage/styles';
 import SynonymsModal from './components/SynonymsModal';
-import { deleteSynonym, getSynonyms, updateSynonyms } from './api';
+import { deleteAllSynonyms, deleteSynonym, getSynonyms, updateSynonyms } from './api';
 import { getURL, getVersion } from '../../constants/config';
 import { getMappings, getSettings, reIndex } from '../../batteries/utils/mappings';
 import { getSynonymsAnalyzerSettings, parseSynonymsAnalyzer, applySynonymsSettings } from './utils';
@@ -199,6 +199,51 @@ class Synonyms extends React.Component {
 				isDeleting: null,
 			});
 			message.error(err.message || 'Failed while deleting synonym');
+		}
+	};
+
+	handleDeleteAll = async () => {
+		const { credentials, appName } = this.props;
+
+		const url = getURL();
+		this.setState({
+			isDeleting: 'all',
+		});
+		try {
+			const settings = await getSettings(appName, credentials, url).then(
+				(data) => data[appName].settings,
+			);
+
+			const mappings = await getMappings(appName, credentials, url);
+			const synonymsAnalyzerSettings = getSynonymsAnalyzerSettings({
+				settings,
+				isSynonymsAnalyzerPresent: true,
+				synonyms: [],
+			});
+
+			await this.updateSynonymsSettings({
+				needReindex: false,
+				mappings,
+				settings: synonymsAnalyzerSettings,
+				credentials,
+				appName,
+			});
+
+			await deleteAllSynonyms({
+				credentials,
+				appName,
+			});
+
+			this.setState({
+				isDeleting: null,
+			});
+			message.success('Successfully deleted all synonyms');
+			this.handleUpdate([]);
+		} catch (err) {
+			this.setState({
+				isDeleting: null,
+			});
+			message.error(err.message || 'Failed while deleting synonyms');
 		}
 	};
 
@@ -606,6 +651,31 @@ class Synonyms extends React.Component {
 								)}
 							/>
 						</ReactiveBase>
+
+						{synonyms.length > 1 && (
+							<Popconfirm
+								title="Are you sure you want to delete all synonyms？"
+								okText="Yes"
+								cancelText="No"
+								onConfirm={this.handleDeleteAll}
+							>
+								<Button
+									size="small"
+									loading={isDeleting === 'all'}
+									type="ghost"
+									ghost
+									icon={<DeleteOutlined />}
+									css={css`
+										margin-top: 1rem;
+										background-color: #d0d0d0;
+										color: black;
+										float: right;
+									`}
+								>
+									Delete All Synonyms{' '}
+								</Button>
+							</Popconfirm>
+						)}
 					</Card>
 					{synonyms.length > 0 ? (
 						<SettingsFooter

@@ -24,7 +24,7 @@ const PageRoutes = ({
 	const [isLoading, setIsLoading] = useState(true);
 
 	useEffect(() => {
-		fetchLatestVersion();
+		if (preferences.id) fetchLatestVersion();
 	}, [preferences.id]);
 
 	const fetchLatestVersion = () => {

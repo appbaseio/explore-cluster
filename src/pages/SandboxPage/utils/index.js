@@ -117,4 +117,17 @@ const transformQuery = (query) => {
 
 	return [...queryArr];
 };
-export { isValidJSON, generateQuery, flatObject, recordGrade, getQueryGrades, transformQuery };
+
+function removeEmpty(obj) {
+	// eslint-disable-next-line no-unused-vars
+	return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v != null && v !== undefined));
+}
+export {
+	isValidJSON,
+	generateQuery,
+	flatObject,
+	recordGrade,
+	getQueryGrades,
+	transformQuery,
+	removeEmpty,
+};
