@@ -6,8 +6,8 @@ import { transformQuery } from './index';
 import { facetMappings } from './constants';
 
 const dependencies = {
-	react: '16.8.0',
-	'react-dom': '16.8.0',
+	react: '18.2.0',
+	'react-dom': '18.2.0',
 	'@appbaseio/reactivesearch': 'latest',
 	'@appbaseio/reactivemaps': 'latest',
 	antd: '4.17.0',

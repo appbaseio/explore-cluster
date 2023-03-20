@@ -70,6 +70,7 @@ const Footer = ({ originalData, tab, changedData, collapsed, apps }) => {
 		(appName) => !appName.startsWith('.') && !appName.startsWith('metricbeat'),
 	);
 	const { saveTemplate } = useContext(PreferenceFormContext);
+	console.log('visible', visible);
 	return (
 		<div
 			style={{
@@ -93,7 +94,7 @@ const Footer = ({ originalData, tab, changedData, collapsed, apps }) => {
 						filteredApps={filteredApps}
 						onSelect={(e) => onAppSelect(e)}
 						onCancel={() => toggleVisibility()}
-						open={visible}
+						visible={visible}
 						app={app}
 						page="suggestions"
 					/>

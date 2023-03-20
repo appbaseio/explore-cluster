@@ -13,7 +13,6 @@ import {
 	notification,
 } from 'antd';
 import { connect } from 'react-redux';
-import StripeForm from '../../components/StripeForms/StripeForm';
 import BannerHeader from '../../components/Banner/Header';
 import Grid from '../../components/CreateCredentials/Grid';
 import GlobalLoader from '../../batteries/components/shared/Loader/Spinner';
@@ -30,6 +29,7 @@ import { event, timingEvent } from '../../utils/gtag';
 import moment from '../../utils/moment';
 import BillingFrame from '../../components/PricingTable/BillingFrame';
 import Unsubscribe from '../../components/PricingTable/Unsubscribe';
+import { ALLOWED_SLS } from '../../constants';
 
 function numberWithCommas(x) {
 	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -251,6 +251,18 @@ class Billing extends Component {
 		}
 	};
 
+	getBillingPortalURL = () => {
+		let URL = 'https://billing.stripe.com/p/login/fZeeXudKqdV83rGdQQ';
+
+		const signupEmail = sessionStorage.getItem('signup-email');
+
+		if (signupEmail) {
+			URL += `?prefilled_email=${encodeURIComponent(signupEmail)}`;
+		}
+
+		return URL;
+	};
+
 	render() {
 		// prettier-ignore
 		const {
@@ -264,9 +276,10 @@ class Billing extends Component {
 			isHostedArc,
 			isClusterBilling,
 			isFetchingPlan,
-			isSubmitting
+			isSubmitting,
+			backendImage,
 		} = this.props;
-
+		const isSLS = ALLOWED_SLS.includes(backendImage);
 		const { showOtpModal, otp, message, resending, isShowingUnsubscribeArcModal } = this.state;
 
 		if (isFetchingPlan) {
@@ -345,6 +358,7 @@ class Billing extends Component {
 									style={{
 										width: '540px',
 										margin: '0px',
+										alignItems: 'center',
 									}}
 									gridRatio={0.4}
 									label={<h3 className={heading}>Plan</h3>}
@@ -359,6 +373,7 @@ class Billing extends Component {
 											width: '540px',
 											margin: '0px',
 											marginTop: '-35px',
+											alignItems: 'center',
 										}}
 										gridRatio={0.4}
 										label={<h3 className={heading}>Valid Up To</h3>}
@@ -366,13 +381,14 @@ class Billing extends Component {
 									/>
 								</Flex>
 							) : null}
-							{nodeCount ? (
+							{!isSLS && nodeCount ? (
 								<Flex alignItems="center">
 									<Grid
 										style={{
 											width: '540px',
 											margin: '0px',
 											marginTop: '-35px',
+											alignItems: 'center',
 										}}
 										gridRatio={0.4}
 										label={
@@ -389,6 +405,7 @@ class Billing extends Component {
 											width: '540px',
 											margin: '0px',
 											marginTop: '-35px',
+											alignItems: 'center',
 										}}
 										gridRatio={0.4}
 										label={<h3 className={heading}>Effective Monthly Price</h3>}
@@ -396,20 +413,28 @@ class Billing extends Component {
 											isClusterBilling
 												? `$${numberWithCommas(
 														nodeCount * PRICE_BY_PLANS[plan],
-												  )} (calculated at $${
-														EFFECTIVE_PRICE_BY_PLANS[plan]
-												  }/node hour)`
-												: `$${numberWithCommas(
-														PRICE_BY_PLANS[plan],
-												  )} (calculated at $${
-														EFFECTIVE_PRICE_BY_PLANS[plan]
-												  }/hour)`
+												  )} ${
+														isSLS
+															? null
+															: `(calculated at $${EFFECTIVE_PRICE_BY_PLANS[plan]}/node hour)`
+												  }`
+												: `$${numberWithCommas(PRICE_BY_PLANS[plan])} ${
+														isSLS
+															? null
+															: `(calculated at $${EFFECTIVE_PRICE_BY_PLANS[plan]}/hour)`
+												  }`
 										}
 									/>
 								</Flex>
 							) : null}
 							{!isOSS ? (
-								<StripeForm handleToken={this.updatePaymentDetails} />
+								<Button
+									type="primary"
+									href={this.getBillingPortalURL()}
+									target="_blank"
+								>
+									Billing Settings and Invoice History
+								</Button>
 							) : (
 								<p>
 									You are using OSS version of{' '}
@@ -545,6 +570,7 @@ Billing.propTypes = {
 	credentials: PropTypes.string.isRequired,
 	deleteSubscription: PropTypes.func.isRequired,
 	isError: PropTypes.object,
+	backendImage: PropTypes.string.isRequired,
 };
 
 const mapStateToProps = (state) => {
@@ -569,6 +595,7 @@ const mapStateToProps = (state) => {
 			get(state, '$deleteAppSubscription.error'),
 		],
 		credentials: username && password ? `${username}:${password}` : null,
+		backendImage: get(state, '$getAppPlan.results.image_type') ?? '',
 	};
 };
 

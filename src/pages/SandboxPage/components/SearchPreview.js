@@ -19,7 +19,7 @@ import {
 } from '../../../batteries/modules/actions';
 import Search from './Search';
 import Result from './Result/index';
-import { generateQuery, getQueryGrades } from '../utils';
+import { generateQuery, getQueryGrades, removeEmpty } from '../utils';
 import { getAggsMappings } from '../../../batteries/utils/mappings';
 import { getURL } from '../../../constants/config';
 import { getSubFields } from '../../../utils';
@@ -691,8 +691,8 @@ class SearchPreview extends React.Component {
 									app={app}
 									onValueChange={this.onSelected}
 									search={{
-										...search,
-										...config,
+										...removeEmpty(search),
+										...removeEmpty(config),
 									}}
 									isTypeahead={isTypeahead}
 									handleModal={handleModal}

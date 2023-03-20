@@ -120,7 +120,7 @@ class StoreFrontPreview extends React.Component {
 						currentProduct: docId,
 					},
 					() => {
-						this.onLoad();
+						// this.onLoad();
 						if (onSelectProduct) {
 							onSelectProduct(item);
 						}

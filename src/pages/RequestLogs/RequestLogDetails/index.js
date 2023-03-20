@@ -12,6 +12,7 @@ import {
 	isValidJSONFormat,
 } from '../../../batteries/components/analytics/utils';
 import { parseData } from '../../../batteries/components/analytics/components/RequestLogs';
+import Loader from '../../../components/Loader';
 
 const bannerMessagesAnalytics = {
 	free: {
@@ -36,8 +37,10 @@ const bannerMessagesAnalytics = {
 
 const RequestLogDetailsWrapper = ({ appName, isPaidUser, logId, history }) => {
 	const [logDetails, setLogDetails] = useState(null);
+	const [isLoading, setIsLoading] = useState(false);
 
 	useEffect(() => {
+		setIsLoading(true);
 		getRequestLogDetails(logId)
 			.then((res) => {
 				if (res.code === 404) {
@@ -62,8 +65,16 @@ const RequestLogDetailsWrapper = ({ appName, isPaidUser, logId, history }) => {
 				setTimeout(() => {
 					window.location.href = `/cluster${appName ? `/${appName}` : ''}/request-logs`;
 				}, 2000);
+			})
+			.finally(() => {
+				setIsLoading(false);
 			});
 	}, []);
+
+	if (isLoading) {
+		return <Loader />;
+	}
+
 	return (
 		<React.Fragment>
 			{isPaidUser ? (
@@ -73,7 +84,9 @@ const RequestLogDetailsWrapper = ({ appName, isPaidUser, logId, history }) => {
 						showGoBack
 						showButton={false}
 						onClickGoBack={() =>
-							history.push(`/cluster/${appName ? `${appName}/` : ''}request-logs`)
+							history.push(
+								`${appName ? `/app/${appName}/` : '/cluster/'}request-logs`,
+							)
 						}
 					/>
 					<Container>
