@@ -64,3 +64,24 @@ export const deleteSynonym = ({ id, credentials }) => {
 			.catch((e) => reject(e));
 	});
 };
+
+export const deleteAllSynonyms = ({ appName, credentials }) => {
+	const url = getURL();
+	return new Promise((resolve, reject) => {
+		fetch(`${url}/_synonyms_all/${appName}`, {
+			method: 'DELETE',
+			headers: {
+				...getAuthHeaders(credentials),
+				'Content-Type': 'application/json',
+			},
+		})
+			.then((res) => res.json())
+			.then((res) => {
+				if (res.error) {
+					reject(res.error);
+				}
+				resolve(res);
+			})
+			.catch((e) => reject(e));
+	});
+};
