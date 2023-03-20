@@ -14,10 +14,10 @@ function* appWorker() {
 	try {
 		const user = yield select(getUser);
 		const plan = yield select(getPlan);
-		if (plan && Object.keys(plan).length) {
+
+		if (plan) {
 			yield put(createAction(constants.HEALTH.SET_SEARCH_ENGINE_HEALTH));
 			let endpoints = yield call(getEndpoints);
-
 			if (typeof endpoints === 'object' && !endpoints.status) {
 				yield put(loadEndpointsSuccess(endpoints));
 				yield put(createAction(constants.HEALTH.SET_SEARCH_ENGINE_HEALTH_SUCCESS));
