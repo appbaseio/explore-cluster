@@ -1,13 +1,13 @@
 import { Form, Input, Modal, Select, Switch } from 'antd';
 import styled from 'react-emotion';
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { FieldControl, FieldGroup } from 'react-reactive-form';
-import { object } from 'prop-types';
+import { object, string } from 'prop-types';
 import { searchboxMessages } from '../../../../../utils/messages';
 import SearchSvg from './SearchSVG';
 import { FormContext } from '../../../../IntegrationsPage/utils/utils';
-import { useIconURLDebounce, useKeyboardShortcutDebounce } from './useDebounce';
+import { useKeyboardShortcutDebounce } from './useDebounce';
 
 const StyledInput = styled(Input)`
 	width: 70%;
@@ -55,26 +55,37 @@ const KeyboardShortcut = styled.div`
 	font-weight: bold;
 `;
 
+const DebouncedIconImage = ({ src, alt }) => {
+	const [latestIconURL, setLatestIconURL] = useState('');
+
+	useEffect(() => {
+		const DEBOUNCE_ICON_IMAGE_PREVIEW = 500;
+		// latestIconURL is source of truth.
+		// When iconURLControl.value changes it would always be in sync with latestIconURL.
+		// Handle when the above is false
+		const timerId = setTimeout(() => {
+			setLatestIconURL(src);
+		}, DEBOUNCE_ICON_IMAGE_PREVIEW);
+
+		return () => clearTimeout(timerId);
+	}, [src]);
+
+	return <IconImage src={latestIconURL} alt={alt} />;
+};
+
+DebouncedIconImage.propTypes = {
+	src: string.isRequired,
+	alt: string.isRequired,
+};
+
 export default function CustomizeSearchBoxForm({ modalProps }) {
 	const mainForm = useContext(FormContext);
 	const designAndLayoutform = mainForm.get('designAndLayout');
 	const form = designAndLayoutform.get('customizeSearchBox');
 	const focusShortcutsControl = form.get('focusShortcuts');
-	const iconURLControl = form.get('iconURL');
 	const [debouncedShortcut, setDebouncedShortcut] = useKeyboardShortcutDebounce(
 		focusShortcutsControl.handler,
 	);
-	// below would contain the latest value while the formState value is debounced
-	const [latestIconURL, setLatestIconURL] = useIconURLDebounce(iconURLControl.handler);
-
-	useEffect(() => {
-		// latestIconURL is source of truth.
-		// When iconURLControl.value changes it would always be in sync with latestIconURL.
-		// Handle when the above is false
-		if (iconURLControl.value !== latestIconURL) {
-			setLatestIconURL(iconURLControl.value);
-		}
-	}, [iconURLControl.value]);
 
 	return (
 		<FieldGroup
@@ -98,7 +109,7 @@ export default function CustomizeSearchBoxForm({ modalProps }) {
 						<FieldControl
 							name="iconURL"
 							strict={false}
-							render={({ errors, value: iconURL, touched }) => {
+							render={({ errors, value: iconURL, touched, handler }) => {
 								const invalidURL = touched && errors?.invalidLink;
 								return (
 									<Form.Item
@@ -114,7 +125,10 @@ export default function CustomizeSearchBoxForm({ modalProps }) {
 										<IconInputContainer>
 											<IconPreview>
 												{iconURL && !invalidURL ? (
-													<IconImage src={iconURL} alt="Icon preview" />
+													<DebouncedIconImage
+														src={iconURL}
+														alt="Icon preview"
+													/>
 												) : (
 													<StyledSearchIcon>
 														<SearchSvg
@@ -126,11 +140,7 @@ export default function CustomizeSearchBoxForm({ modalProps }) {
 													</StyledSearchIcon>
 												)}
 											</IconPreview>
-											<StyledInput
-												placeholder="Image URL"
-												value={latestIconURL}
-												onChange={(e) => setLatestIconURL(e.target.value)}
-											/>
+											<StyledInput placeholder="Image URL" {...handler()} />
 										</IconInputContainer>
 									</Form.Item>
 								);

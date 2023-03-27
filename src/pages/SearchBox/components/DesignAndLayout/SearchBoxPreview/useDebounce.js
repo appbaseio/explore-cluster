@@ -51,22 +51,3 @@ export function useKeyboardShortcutDebounce(formHandler, delay = 500) {
 
 	return [keyboardShortcut, onKeyboardInput];
 }
-
-// Pass a react-reactive-form control handler to this hook to get a debounced value
-export function useIconURLDebounce(formHandler, delay = 500) {
-	// FormState value is the debounced value
-	const { onChange, value } = formHandler();
-	const [iconURL, setIconURL] = useState('');
-
-	useEffect(() => {
-		const timerId = setTimeout(() => {
-			if (iconURL || (!iconURL && value)) {
-				onChange(iconURL);
-			}
-		}, delay);
-
-		return () => clearTimeout(timerId);
-	}, [iconURL, delay]);
-
-	return [iconURL, setIconURL];
-}
