@@ -126,8 +126,7 @@ export const trimExtension = (string, extension = '.js') => {
 // fot 'inputs' property based on selected stage (under schema.definitions.PreBuiltStage.additionalProperties.stages)
 export const modifySchema = (schema) => {
 	const processedSchema = { ...schema };
-	const prebuiltStages =
-		processedSchema?.definitions?.PreBuiltStage?.additionalProperties?.stages ?? {};
+	const prebuiltStages = processedSchema?.properties.stages.items.properties.use.stages ?? {};
 
 	const schemaObject = {
 		allOf: [],
@@ -163,8 +162,8 @@ export const modifySchema = (schema) => {
 
 	if (processedSchema?.properties?.stages?.items?.properties) {
 		processedSchema.properties.stages.items = {
-			...processedSchema.properties.stages.items,
 			...schemaObject,
+			...processedSchema.properties.stages.items,
 		};
 	}
 	return processedSchema;
