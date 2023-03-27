@@ -108,6 +108,16 @@ const getWeights = (fields) => {
 	return fields.map((item) => weights[item]);
 };
 
+const getFieldsWithWeights = (fields) => {
+	const weights = {
+		place: 10,
+		'place.raw': 10,
+		'place.search': 2,
+	};
+
+	return fields.map((item) => ({ field: item, weight: weights[item] }));
+};
+
 const renderResultList = () => {
 	const mapProps = {
 		dataField: 'location',
@@ -296,12 +306,11 @@ class GeoSearchApp extends Component {
 					</h2>
 					<SearchBox
 						componentId="search"
-						dataField={fields}
+						dataField={getFieldsWithWeights(fields)}
 						showIcon={false}
 						placeholder="Search for places..."
 						autosuggest={false}
 						filterLabel="Search"
-						fieldWeights={getWeights(fields)}
 						highlight
 						style={{
 							maxWidth: '400px',

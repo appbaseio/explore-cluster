@@ -107,6 +107,22 @@ const getWeights = (fields) => {
 	return fields.map((item) => weights[item]);
 };
 
+const getFieldsWithWeights = (fields) => {
+	const weights = {
+		product_name: 10,
+		'product_name.raw': 10,
+		'product_name.search': 2,
+		categories: 3,
+		'categories.raw': 3,
+		'categories.search': 1,
+		description: 1,
+		'description.raw': 1,
+		'description.search': 1,
+	};
+
+	return fields.map((item) => ({ field: item, weight: weights[item] }));
+};
+
 const renderResultList = () => (
 	<ReactiveList
 		componentId="results"
@@ -327,12 +343,11 @@ class EcommSearchApp extends Component {
 
 					<SearchBox
 						componentId="search"
-						dataField={fields}
+						dataField={getFieldsWithWeights(fields)}
 						showIcon={false}
 						placeholder="Search products..."
 						autosuggest={false}
 						filterLabel="Search"
-						fieldWeights={getWeights(fields)}
 						highlight
 						style={{
 							maxWidth: '400px',

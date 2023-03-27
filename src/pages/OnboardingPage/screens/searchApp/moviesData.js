@@ -104,6 +104,19 @@ const getWeights = (fields) => {
 	return fields.map((item) => weights[item]);
 };
 
+const getFieldsWithWeights = (fields) => {
+	const weights = {
+		original_title: 10,
+		'original_title.raw': 10,
+		'original_title.search': 2,
+		overview: 1,
+		'overview.raw': 1,
+		'overview.search': 1,
+	};
+
+	return fields.map((item) => ({ field: item, weight: weights[item] }));
+};
+
 const renderResultList = () => (
 	<ReactiveList
 		componentId="results"
@@ -319,12 +332,11 @@ class MoviesSearchApp extends Component {
 
 					<SearchBox
 						componentId="search"
-						dataField={fields}
+						dataField={getFieldsWithWeights(fields)}
 						showIcon={false}
 						placeholder="Search movies..."
 						autosuggest={false}
 						filterLabel="Search"
-						fieldWeights={getWeights(fields)}
 						highlight
 						style={{
 							maxWidth: '400px',
