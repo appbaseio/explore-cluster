@@ -9,6 +9,7 @@ import { ArrowLeftOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, Card, Input, notification, Result, Skeleton, Tabs } from 'antd';
 
 import { FieldControl, FieldGroup, FormBuilder, Validators } from 'react-reactive-form';
+import DOMPurify from 'dompurify';
 import { FormContext } from '../IntegrationsPage/utils/utils';
 import DesignAndLayout from './components/DesignAndLayout';
 import PopularSuggestions from './components/PopularSuggestions';
@@ -179,6 +180,14 @@ const SearchBoxForm = (props) => {
 				primaryColor: DEFAULT_DESIGN_COLORS.light.primaryColor,
 				textColor: DEFAULT_DESIGN_COLORS.light.textColor,
 				searchbox: {},
+				customizeSearchBox: FormBuilder.group({
+					iconURL: ['', (control) => urlValidator(control, false)],
+					iconPosition: 'left',
+					placeholder: '',
+					focusShortcuts: [['/']],
+					addonBefore: '',
+					addonAfter: '',
+				}),
 			}),
 		}),
 	);
@@ -222,6 +231,16 @@ const SearchBoxForm = (props) => {
 						enableRecentSuggestions: designAndLayout.enableRecentSuggestions,
 						enableVoiceSearch: designAndLayout.enableVoiceSearch,
 						highlight: designAndLayout.highlight,
+						iconURL: designAndLayout?.customizeSearchBox?.iconURL,
+						iconPosition: designAndLayout?.customizeSearchBox?.iconPosition,
+						placeholder: designAndLayout?.customizeSearchBox?.placeholder,
+						focusShortcuts: designAndLayout?.customizeSearchBox?.focusShortcuts,
+						addonBefore: DOMPurify.sanitize(
+							designAndLayout?.customizeSearchBox?.addonBefore,
+						),
+						addonAfter: DOMPurify.sanitize(
+							designAndLayout?.customizeSearchBox?.addonAfter,
+						),
 						credentials,
 					},
 					...(!isEmpty(designAndLayout.searchbox)
@@ -341,6 +360,14 @@ const SearchBoxForm = (props) => {
 						searchBoxData.searchbox?.featured?.design?.enableRecentSuggestions,
 					enableVoiceSearch: searchBoxData.searchbox?.featured?.design?.enableVoiceSearch,
 					highlight: searchBoxData.searchbox?.featured?.design?.highlight,
+					customizeSearchBox: {
+						iconURL: searchBoxData.searchbox?.featured?.design?.iconURL,
+						iconPosition: searchBoxData.searchbox?.featured?.design?.iconPosition,
+						placeholder: searchBoxData.searchbox?.featured?.design?.placeholder,
+						focusShortcuts: searchBoxData.searchbox?.featured?.design?.focusShortcuts,
+						addonBefore: searchBoxData.searchbox?.featured?.design?.addonBefore,
+						addonAfter: searchBoxData.searchbox?.featured?.design?.addonAfter,
+					},
 					searchbox: {
 						sections: searchBoxData.searchbox?.featured?.layout?.sections,
 						sectionsOrder: searchBoxData.searchbox?.featured?.layout?.sectionsOrder,

@@ -14,7 +14,7 @@ import chunk from 'lodash/chunk';
 import get from 'lodash/get';
 import flatten from 'lodash/flatten';
 import {
-	DataSearch,
+	SearchBox,
 	ReactiveBase,
 	ReactiveList,
 	SingleDropdownList,
@@ -462,7 +462,7 @@ class Synonyms extends React.Component {
 										placeholder="Select a Type"
 										react={{ and: ['index'] }}
 									/>
-									<DataSearch
+									<SearchBox
 										innerClass={{
 											input: 'ant-input',
 										}}
