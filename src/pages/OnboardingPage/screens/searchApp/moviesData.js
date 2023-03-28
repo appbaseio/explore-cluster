@@ -91,19 +91,6 @@ const getFields = (fields, suffix) => {
 	return newFields;
 };
 
-const getWeights = (fields) => {
-	const weights = {
-		original_title: 10,
-		'original_title.raw': 10,
-		'original_title.search': 2,
-		overview: 1,
-		'overview.raw': 1,
-		'overview.search': 1,
-	};
-
-	return fields.map((item) => weights[item]);
-};
-
 const getFieldsWithWeights = (fields) => {
 	const weights = {
 		original_title: 10,
@@ -265,7 +252,7 @@ class MoviesSearchApp extends Component {
 	updateAppSettings = async (fields) => {
 		const { settings, app, updateSettingsAction } = this.props;
 		const dataField = [...fields];
-		const fieldWeights = getWeights(fields);
+		const fieldWeights = getFieldsWithWeights(fields).map((f) => f.weight);
 		const newSettings = { ...settings };
 
 		const settingsData = {

@@ -98,16 +98,6 @@ const getFields = (fields, suffix) => {
 	return newFields;
 };
 
-const getWeights = (fields) => {
-	const weights = {
-		place: 10,
-		'place.raw': 10,
-		'place.search': 2,
-	};
-
-	return fields.map((item) => weights[item]);
-};
-
 const getFieldsWithWeights = (fields) => {
 	const weights = {
 		place: 10,
@@ -238,7 +228,7 @@ class GeoSearchApp extends Component {
 	updateAppSettings = async (fields) => {
 		const { settings, app, updateSettingsAction } = this.props;
 		const dataField = [...fields];
-		const fieldWeights = getWeights(fields);
+		const fieldWeights = getFieldsWithWeights(fields).map((f) => f.weight);
 		const newSettings = { ...settings };
 
 		const settingsData = {

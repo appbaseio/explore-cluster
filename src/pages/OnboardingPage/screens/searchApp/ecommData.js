@@ -91,22 +91,6 @@ const getFields = (fields, suffix) => {
 	return newFields;
 };
 
-const getWeights = (fields) => {
-	const weights = {
-		product_name: 10,
-		'product_name.raw': 10,
-		'product_name.search': 2,
-		categories: 3,
-		'categories.raw': 3,
-		'categories.search': 1,
-		description: 1,
-		'description.raw': 1,
-		'description.search': 1,
-	};
-
-	return fields.map((item) => weights[item]);
-};
-
 const getFieldsWithWeights = (fields) => {
 	const weights = {
 		product_name: 10,
@@ -275,7 +259,7 @@ class EcommSearchApp extends Component {
 	updateAppSettings = async (fields) => {
 		const { settings, app, updateSettingsAction } = this.props;
 		const dataField = [...fields];
-		const fieldWeights = getWeights(fields);
+		const fieldWeights = getFieldsWithWeights(fields).map((f) => f.weight);
 		const newSettings = { ...settings };
 
 		const settingsData = {
