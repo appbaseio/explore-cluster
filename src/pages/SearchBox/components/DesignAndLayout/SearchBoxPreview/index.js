@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import PropTypes from 'prop-types';
 import { uniqueId } from 'lodash';
-import AddSectionModal from './AddSectionModal';
+import AllModal from './AllModal';
 import AddSuggestion from './AddSuggestionModal';
 import RenderSections from './RenderSections';
 import { generateFeaturedSuggestionPayload } from '../../../utils';
@@ -16,11 +16,6 @@ const container = css`
 	max-width: 500px;
 	@media only screen and (max-width: 980px), (min-width: 1400px) {
 		max-width: 1000px;
-	}
-	.add-section-wrapper {
-		position: absolute;
-		right: 0px;
-		top: -45px;
 	}
 
 	.input-wrapper {
@@ -361,7 +356,7 @@ const SearchBoxPreview = ({ stateCollector, searchBoxData }) => {
 	return (
 		<>
 			<div className={container}>
-				<AddSectionModal onSave={handleAddSection} />
+				<AllModal onSave={handleAddSection} />
 				<div className="input-wrapper">
 					<Input
 						type="text"
