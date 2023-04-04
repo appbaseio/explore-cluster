@@ -135,9 +135,13 @@ export async function getESIndices(authToken, backend, endpointConfig = {}) {
 		url = `${ACC_API}/${getValidURL(endpointConfig.app)}`;
 	} else {
 		url = `${ACC_API}/${getValidURL(endpointConfig.index)}`;
-		if (backend === BACKENDS.ELASTICSEARCH.name || backend === BACKENDS.SYSTEM.name) {
-			const esVersion = await getESVersion(null, atob(authToken));
-			if (esVersion && esVersion < 6) url = `${ACC_API}/_cat/indices?format=json`;
+		try {
+			if (backend === BACKENDS.ELASTICSEARCH.name || backend === BACKENDS.SYSTEM.name) {
+				const esVersion = await getESVersion(null, atob(authToken));
+				if (esVersion && esVersion < 6) url = `${ACC_API}/_cat/indices?format=json`;
+			}
+		} catch (error) {
+			console.log(error);
 		}
 	}
 
