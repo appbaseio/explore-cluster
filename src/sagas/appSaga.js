@@ -55,7 +55,8 @@ export default function* appSaga() {
 	// discrepency in fetching indices
 	// thus this effect
 	yield take(constants.APP.GET_PLAN_SUCCESS);
-	if (!Object.keys(getPlan).length) {
+	const plan = yield select(getPlan);
+	if (!Object.keys(plan).length) {
 		yield call(appWorker);
 	}
 }
