@@ -10,6 +10,7 @@ import constants from '../batteries/modules/constants';
 
 const getUser = (state) => state.user.data;
 const getPlan = (state) => get(state, '$getAppPlan.results', {});
+const getApps = (state) => state.apps.data;
 function* appWorker() {
 	try {
 		const user = yield select(getUser);
@@ -55,8 +56,8 @@ export default function* appSaga() {
 	// discrepency in fetching indices
 	// thus this effect
 	yield take(constants.APP.GET_PLAN_SUCCESS);
-	const plan = yield select(getPlan);
-	if (!Object.keys(plan).length) {
+	const apps = yield select(getApps);
+	if (!apps || !Object.keys(apps).length) {
 		yield call(appWorker);
 	}
 }
