@@ -1,4 +1,4 @@
-import { takeEvery, call, put, select } from 'redux-saga/effects';
+import { takeEvery, call, put, select, take } from 'redux-saga/effects';
 import get from 'lodash/get';
 import { APPS } from '../constants';
 import { getEndpoints, getESIndices } from '../utils';
@@ -14,7 +14,7 @@ function* appWorker() {
 	try {
 		const user = yield select(getUser);
 		const plan = yield select(getPlan);
-		if (plan) {
+		if (plan && Object.keys(plan).length) {
 			yield put(createAction(constants.HEALTH.SET_SEARCH_ENGINE_HEALTH));
 			let endpoints;
 			if (plan.backend) {
@@ -50,4 +50,12 @@ function* appWorker() {
 
 export default function* appSaga() {
 	yield takeEvery(APPS.LOAD, appWorker);
+
+	// the _plan api call delays sometimes leading to
+	// discrepency in fetching indices
+	// thus this effect
+	yield take(constants.APP.GET_PLAN_SUCCESS);
+	if (Object.keys(getPlan).length) {
+		yield call(appWorker);
+	}
 }
