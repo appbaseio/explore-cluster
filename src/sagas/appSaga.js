@@ -38,7 +38,9 @@ function* appWorker() {
 				endpoints ?? apisMapper[plan.backend || BACKENDS.ELASTICSEARCH.name],
 			);
 
-			yield put(loadAppsSuccess(apps));
+			if (Object.keys(apps).length) {
+				yield put(loadAppsSuccess(apps));
+			}
 		}
 	} catch (e) {
 		console.log('appSaga reporteed', e);

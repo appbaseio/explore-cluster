@@ -153,6 +153,10 @@ export async function getESIndices(authToken, backend, endpointConfig = {}) {
 	});
 	const data = await response.json();
 	if (response.status >= 400) {
+		if (response.status === 404) {
+			console.error('code 404 received while trying to fetch indices');
+			return {};
+		}
 		throw new Error(data);
 	}
 
