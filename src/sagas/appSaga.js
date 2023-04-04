@@ -41,6 +41,7 @@ function* appWorker() {
 			yield put(loadAppsSuccess(apps));
 		}
 	} catch (e) {
+		console.log('appSaga reporteed', e);
 		yield put(loadAppsError(e));
 	}
 }
