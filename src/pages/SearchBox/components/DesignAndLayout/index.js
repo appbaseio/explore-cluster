@@ -1,6 +1,5 @@
 import { ReactiveBase, SearchBox } from '@appbaseio/reactivesearch';
 import { Alert, Modal, notification, Spin } from 'antd';
-import DOMPurify from 'dompurify';
 import { css } from 'emotion';
 import { uniqueId } from 'lodash';
 import { any, bool, func, object, oneOfType, string } from 'prop-types';
@@ -49,7 +48,6 @@ const container = css`
 const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, searchBoxData }) => {
 	const mainForm = useContext(FormContext);
 	const form = mainForm.get('designAndLayout');
-	const customizeSearchBoxForm = form.get('customizeSearchBox');
 	const [showLivePreview, setShowLivePreview] = useState(false);
 	const [previewLoading, setPreviewLoading] = useState(false);
 	const featuredSuggestionsPayload = useRef({});
@@ -219,32 +217,6 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 								enableEndpointSuggestions={form.value.enableEndpointSuggestions}
 								showVoiceSearch={form.value.enableVoiceSearch}
 								highlight={form.value.highlight}
-								iconURL={customizeSearchBoxForm.value.iconURL}
-								iconPosition={customizeSearchBoxForm.value.iconPosition}
-								focusShortcuts={customizeSearchBoxForm.value.focusShortcuts}
-								placeholder={customizeSearchBoxForm.value.placeholder}
-								addonBefore={
-									customizeSearchBoxForm.value.addonBefore ? (
-										<div
-											dangerouslySetInnerHTML={{
-												__html: DOMPurify.sanitize(
-													customizeSearchBoxForm.value.addonBefore,
-												),
-											}}
-										/>
-									) : null
-								}
-								addonAfter={
-									customizeSearchBoxForm.value.addonAfter ? (
-										<div
-											dangerouslySetInnerHTML={{
-												__html: DOMPurify.sanitize(
-													customizeSearchBoxForm.value.addonAfter,
-												),
-											}}
-										/>
-									) : null
-								}
 								componentId="search_box"
 								size={10}
 								{...(featuredSuggestionsId.current && {

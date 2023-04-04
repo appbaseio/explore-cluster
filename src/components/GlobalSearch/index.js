@@ -48,18 +48,6 @@ class GlobalSearch extends PureComponent {
 		const { className, dataFields, onValueSelected, subprops, dataFieldSettings } = this.props;
 		const { searchValue } = this.state;
 		const isFieldDefined = Array.isArray(dataFieldSettings) && dataFieldSettings.length;
-		const isFieldWeightDefined =
-			subprops &&
-			subprops.fieldWeights &&
-			Array.isArray(subprops.fieldWeights) &&
-			subprops.length;
-		const fieldWithWeights = isFieldDefined
-			? dataFields.map((field, i) => ({
-					field,
-					weight: isFieldWeightDefined ? subprops.fieldWeights[i] : 1,
-			  }))
-			: null;
-
 		return (
 			<div className={inputBox} style={{ position: 'relative' }}>
 				<SearchBox
@@ -91,7 +79,8 @@ class GlobalSearch extends PureComponent {
 					}}
 					{...subprops}
 					// Prioritize the data fields from search settings
-					dataField={isFieldDefined ? undefined : fieldWithWeights}
+					dataField={isFieldDefined ? undefined : dataFields}
+					fieldWeights={isFieldDefined ? undefined : subprops.fieldWeights}
 					render={({ rawData, downshiftProps }) => {
 						const suggestionsArr = rawData?.hits?.hits;
 						if (suggestionsArr && suggestionsArr?.length && downshiftProps.isOpen) {

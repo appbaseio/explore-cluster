@@ -6,7 +6,7 @@ import get from 'lodash/get';
 import {
 	RangeSlider,
 	MultiList,
-	SearchBox,
+	DataSearch,
 	ReactiveBase,
 	ReactiveList,
 	SelectedFilters,
@@ -98,14 +98,14 @@ const getFields = (fields, suffix) => {
 	return newFields;
 };
 
-const getFieldsWithWeights = (fields) => {
+const getWeights = (fields) => {
 	const weights = {
 		place: 10,
 		'place.raw': 10,
 		'place.search': 2,
 	};
 
-	return fields.map((item) => ({ field: item, weight: weights[item] }));
+	return fields.map((item) => weights[item]);
 };
 
 const renderResultList = () => {
@@ -228,7 +228,7 @@ class GeoSearchApp extends Component {
 	updateAppSettings = async (fields) => {
 		const { settings, app, updateSettingsAction } = this.props;
 		const dataField = [...fields];
-		const fieldWeights = getFieldsWithWeights(fields).map((f) => f.weight);
+		const fieldWeights = getWeights(fields);
 		const newSettings = { ...settings };
 
 		const settingsData = {
@@ -294,13 +294,14 @@ class GeoSearchApp extends Component {
 							🌎
 						</span>
 					</h2>
-					<SearchBox
+					<DataSearch
 						componentId="search"
-						dataField={getFieldsWithWeights(fields)}
+						dataField={fields}
 						showIcon={false}
 						placeholder="Search for places..."
 						autosuggest={false}
 						filterLabel="Search"
+						fieldWeights={getWeights(fields)}
 						highlight
 						style={{
 							maxWidth: '400px',
