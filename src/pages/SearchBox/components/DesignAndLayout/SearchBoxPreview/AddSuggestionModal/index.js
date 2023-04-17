@@ -124,6 +124,7 @@ const container = css`
 const ALLOWED_ACTIONS = {
 	NAVIGATE: { value: 'navigate', label: 'Navigate' },
 	FUNCTION: { value: 'function', label: 'Function' },
+	SELECT: { value: 'select', label: 'Select' },
 };
 
 const NAVIGATION_TYPES = { 'Same Tab': '_self', 'New Tab': '_blank' };
@@ -179,9 +180,7 @@ const AddSuggestion = (props) => {
 			label: ['', Validators.required],
 			value: ['', Validators.required],
 			description: '',
-			action: [ALLOWED_ACTIONS.NAVIGATE.value, Validators.required],
-			navigationType: [NAVIGATION_TYPES['New Tab'], Validators.required],
-			link: ['', Validators.required, linkValidator],
+			action: [ALLOWED_ACTIONS.SELECT.value, Validators.required],
 			iconURL: ['', null, linkValidator],
 		};
 	};

@@ -235,12 +235,16 @@ const SearchBoxForm = (props) => {
 						: {}),
 				},
 				endpoint: {
-					endpoint: {
-						url: endpoint?.endpoint?.url,
-						headers: parseJSON(endpoint?.endpoint?.headers),
-						body: parseJSON(endpoint?.endpoint?.body),
-						method: endpoint?.endpoint?.method,
-					},
+					...(designAndLayout.enableEndpointSuggestions
+						? {
+								endpoint: {
+									url: endpoint?.endpoint?.url,
+									headers: parseJSON(endpoint?.endpoint?.headers),
+									body: parseJSON(endpoint?.endpoint?.body),
+									method: endpoint?.endpoint?.method,
+								},
+						  }
+						: {}),
 					applyStopwords: endpoint.applyStopwords,
 					customStopwords: endpoint.customStopwords || [],
 					enableSynonyms: endpoint.enableSynonyms,
@@ -248,8 +252,12 @@ const SearchBoxForm = (props) => {
 					includeFields: endpoint.includeFields,
 					maxPredictedWords: endpoint.maxPredictedWords,
 					showDistinctSuggestions: endpoint.showDistinctSuggestions,
-					transformResponse: endpoint.transformResponse,
-					urlField: endpoint.urlField,
+					...(endpoint?.transformResponse
+						? {
+								transformResponse: endpoint?.transformResponse,
+						  }
+						: {}),
+					...(endpoint?.urlField ? { urlField: endpoint?.urlField } : {}),
 				},
 			},
 		};
@@ -348,7 +356,7 @@ const SearchBoxForm = (props) => {
 				},
 				endpoint: {
 					endpoint: {
-						url: searchBoxData.searchbox?.endpoint?.endpoint.url,
+						url: searchBoxData.searchbox?.endpoint?.endpoint?.url,
 						headers: stringifyJSON(
 							searchBoxData.searchbox?.endpoint?.endpoint?.headers,
 						),
