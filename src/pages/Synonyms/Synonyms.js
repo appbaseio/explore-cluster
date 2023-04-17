@@ -26,7 +26,12 @@ import SynonymsModal from './components/SynonymsModal';
 import { deleteAllSynonyms, deleteSynonym, getSynonyms, updateSynonyms } from './api';
 import { getURL, getVersion } from '../../constants/config';
 import { getMappings, getSettings, reIndex } from '../../batteries/utils/mappings';
-import { getSynonymsAnalyzerSettings, parseSynonymsAnalyzer, applySynonymsSettings } from './utils';
+import {
+	getSynonymsAnalyzerSettings,
+	parseSynonymsAnalyzer,
+	applySynonymsSettings,
+	optimizeSynonyms,
+} from './utils';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import SettingsFooter from '../../components/SettingsFooter';
 import Loader from '../../components/Loader';
@@ -301,17 +306,35 @@ class Synonyms extends React.Component {
 		this.setState({ uploading: true });
 		const { appName, credentials, url } = this.props;
 		const { synonyms: allSynonyms } = this.state;
-
 		const indexSynonyms = allSynonyms.map((item) => item.synonym);
+
+		// optimize synonyms rows into normalized format
+		// input : ['tea, chai', 'chai, garam chai']
+		// output: ['tea, chai, garam chai']
+		const oneWayNewSynonyms = [];
+		const twoWayNewSynonyms = [];
+		newSynonyms.forEach((_ns) => {
+			if (_ns.type === 'one-way') {
+				oneWayNewSynonyms.push(_ns);
+			} else {
+				twoWayNewSynonyms.push(_ns);
+			}
+		});
+		const optimisedNewSynonyms = optimizeSynonyms([
+			...twoWayNewSynonyms.map((item) => (item.synonym || '').toLowerCase()),
+		]).map((_s) => ({ type: 'equivalent', synonym: _s }));
+		optimisedNewSynonyms.push(...oneWayNewSynonyms);
+
+		const optimizedSynonyms = optimizeSynonyms([
+			...indexSynonyms.map((item) => item.toLowerCase()),
+			...newSynonyms.map((item) => (item.synonym || '').toLowerCase()),
+		]);
 
 		const { mappings, hasSubfield, synonymsAnalyzerSettings } = await parseSynonymsAnalyzer({
 			appName,
 			credentials,
 			url,
-			synonyms: [
-				...indexSynonyms.map((item) => item.toLowerCase()),
-				...newSynonyms.map((item) => (item.synonym || '').toLowerCase()),
-			],
+			synonyms: [...optimizedSynonyms],
 		});
 
 		try {
@@ -322,18 +345,53 @@ class Synonyms extends React.Component {
 				credentials,
 				appName,
 			});
-			const chunkedData = chunk(newSynonyms, chunkSize);
+			const chunkedData = chunk(optimisedNewSynonyms, chunkSize);
 			Promise.all(
-				chunkedData.map((chunkSynonyms) =>
-					updateSynonyms({
+				chunkedData.map((chunkSynonyms) => {
+					// finds if the existing synonyms in state are
+					// reuploaded by the file
+					// avoids duplication of synonyms
+					const newChunkSynonyms = [];
+					for (let i = 0; i < chunkSynonyms.length; i += 1) {
+						const { synonym: synonymValue } = chunkSynonyms[i];
+
+						const existingSynonymObj = allSynonyms.find((t) => {
+							return synonymValue
+								.split(',')
+								.some((synonymValueToken) =>
+									t.synonym.includes(synonymValueToken?.trim()),
+								);
+						});
+
+						if (existingSynonymObj) {
+							newChunkSynonyms.push({
+								...chunkSynonyms[i],
+								synonym: Array.from(
+									new Set([
+										...(chunkSynonyms[i]?.synonym
+											?.split(',')
+											?.map((item) => item.trim()) ?? []),
+										...(existingSynonymObj?.synonym
+											?.split(',')
+											?.map((item) => item.trim()) ?? []),
+									]),
+								).join(','),
+
+								_id: existingSynonymObj._id,
+							});
+						} else {
+							newChunkSynonyms.push({ ...chunkSynonyms[i] });
+						}
+					}
+					return updateSynonyms({
 						appName,
 						credentials,
-						synonyms: chunkSynonyms.map((synonym) => ({
+						synonyms: newChunkSynonyms.map((synonym) => ({
 							...synonym,
 							index: appName,
 						})),
-					}),
-				),
+					});
+				}),
 			)
 				.then((res) => {
 					this.setState({ uploading: false, file: null, fileList: null });
@@ -399,7 +457,10 @@ class Synonyms extends React.Component {
 							type: 'one-way',
 							synonym,
 						};
-					return { type: 'equivalent', synonym };
+					return {
+						type: 'equivalent',
+						synonym: synonym?.replace(';', ',')?.replace('\r', ''),
+					};
 				});
 				this.handleSave(synonymsPayload, refetchReIndexingInfo);
 			}

@@ -8,7 +8,12 @@ import { connect } from 'react-redux';
 import { css } from 'emotion';
 
 import SynonymInput from './SynonymInput';
-import { getParsedSynonyms, getSynonymsState, parseSynonymsAnalyzer } from '../utils';
+import {
+	getParsedSynonyms,
+	getSynonymsState,
+	optimizeSynonyms,
+	parseSynonymsAnalyzer,
+} from '../utils';
 import { getURL } from '../../../constants/config';
 import { updateSynonyms } from '../api';
 import { children, synonymTypes } from '../../../utils/prop-types';
@@ -75,6 +80,7 @@ class SynonymsModal extends React.Component {
 	handleCloseModal = () => {
 		this.setState({
 			showModal: false,
+			isLoading: false,
 		});
 		const { resetInputOnClose } = this.props;
 
@@ -118,20 +124,43 @@ class SynonymsModal extends React.Component {
 		} = this.props;
 		const { type, alternatives, synonyms, searchTerm } = this.state;
 
-		// TODO: We need to consider already exisiting synonyms
-		const indexSynonyms = id
-			? allSynonyms.filter((syn) => syn._id !== id).map((item) => item.synonym)
+		let parsedSynonyms = getParsedSynonyms({ type, alternatives, synonyms, searchTerm });
+		let docIdToUpdate = isAddModal ? null : id;
+
+		// We need to consider already exisiting synonyms
+		const indexSynonyms = docIdToUpdate
+			? allSynonyms.filter((syn) => syn._id !== docIdToUpdate).map((item) => item.synonym)
 			: allSynonyms.map((item) => item.synonym);
 
-		const parsedSynonyms = getParsedSynonyms({ type, alternatives, synonyms, searchTerm });
+		for (let i = 0; i < allSynonyms.length; i += 1) {
+			const { synonym, _id } = allSynonyms[i];
+			const shouldMergeinAlreadyPresentSynonym = synonyms.some((_) =>
+				synonym.includes(_.trim().toLowerCase()),
+			);
+			if (shouldMergeinAlreadyPresentSynonym) {
+				docIdToUpdate = _id;
+				parsedSynonyms = getParsedSynonyms({
+					type,
+					alternatives,
+					synonyms: [...new Set([...synonyms, ...synonym.split(',')])],
+					searchTerm,
+				})
+					.replace(/ ,/g, ',')
+					.replace(/, /g, ',');
+				break;
+			}
+		}
+
+		const optimizedSynonyms = optimizeSynonyms([
+			...indexSynonyms.map((item) => item.toLowerCase()),
+			parsedSynonyms.toLowerCase(),
+		]);
+
 		const { mappings, hasSubfield, synonymsAnalyzerSettings } = await parseSynonymsAnalyzer({
 			appName,
 			credentials,
 			url,
-			synonyms: [
-				...indexSynonyms.map((item) => item.toLowerCase()),
-				parsedSynonyms.toLowerCase(),
-			],
+			synonyms: optimizedSynonyms,
 		});
 
 		try {
@@ -145,13 +174,16 @@ class SynonymsModal extends React.Component {
 			const res = await updateSynonyms({
 				appName,
 				credentials,
-				synonyms: isAddModal
-					? [{ synonym: parsedSynonyms, type, index: appName }]
-					: [{ _id: id, synonym: parsedSynonyms, type, index: appName }],
+				synonyms:
+					!docIdToUpdate && isAddModal
+						? [{ synonym: parsedSynonyms, type, index: appName }]
+						: [{ _id: docIdToUpdate, synonym: parsedSynonyms, type, index: appName }],
 			});
 			this.toggleLoading();
 			this.handleModal();
-			const filteredSynonyms = id ? allSynonyms.filter((syn) => syn._id !== id) : allSynonyms;
+			const filteredSynonyms = docIdToUpdate
+				? allSynonyms.filter((syn) => syn._id !== docIdToUpdate)
+				: allSynonyms;
 			handleSynonyms([...filteredSynonyms, ...res]);
 			message.success('Synonyms updated Successfully');
 		} catch (err) {
