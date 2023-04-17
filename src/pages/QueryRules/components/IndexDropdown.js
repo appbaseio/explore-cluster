@@ -38,7 +38,7 @@ class IndexDropdown extends React.Component {
 	};
 
 	render() {
-		const { apps, error, selectedIndexes } = this.props;
+		const { apps, error, selectedIndexes, allowAllIndex } = this.props;
 
 		if (!apps) {
 			return null;
@@ -57,7 +57,7 @@ class IndexDropdown extends React.Component {
 				onChange={this.handleChange}
 				data-cy="index-dropdown"
 			>
-				<Option key="*">* (Include all index)</Option>
+				{allowAllIndex && <Option key="*">* (Include all index)</Option>}
 				{filteredApps.map((app) => (
 					<Option key={app} data-cy={app}>
 						{app}
@@ -74,12 +74,14 @@ IndexDropdown.propTypes = {
 	selectedIndexes: PropTypes.array,
 	onChange: PropTypes.func.isRequired,
 	error: PropTypes.object,
+	allowAllIndex: PropTypes.bool,
 };
 
 IndexDropdown.defaultProps = {
 	apps: null,
 	selectedIndexes: [],
 	error: {},
+	allowAllIndex: true,
 };
 
 const mapStateToProps = (state) => ({

@@ -8,6 +8,7 @@ import {
 	HomeOutlined,
 	KeyOutlined,
 	LineChartOutlined,
+	RobotOutlined,
 	SearchOutlined,
 	SettingOutlined,
 	ThunderboltOutlined,
@@ -27,4 +28,5 @@ export const iconMap = {
 	'credit-card': <CreditCardOutlined />,
 	cluster: <ClusterOutlined />,
 	setting: <SettingOutlined />,
+	robot: <RobotOutlined />,
 };

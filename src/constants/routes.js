@@ -40,6 +40,18 @@ export const APP_ROUTES = {
 			{ label: 'Stored Queries', link: 'stored-queries', tag: 'Beta' },
 		],
 	},
+	AI: {
+		icon: 'robot',
+		action: ALLOWED_ACTIONS.UI_BUILDER,
+		menu: [
+			{
+				label: 'AI Preferences',
+				link: '/cluster/ai-preferences',
+				hasExactPath: true,
+			},
+		],
+		tag: 'Beta',
+	},
 	Pipelines: {
 		icon: 'deployment-unit',
 		action: ALLOWED_ACTIONS.PIPELINES,
@@ -95,30 +107,6 @@ export const APP_ROUTES = {
 			},
 		],
 	},
-	'API Credentials': {
-		icon: 'key',
-		action: ALLOWED_ACTIONS.ACCESS_CONTROL,
-		menu: [
-			{
-				label: 'User Management',
-				link: '/cluster/user-management',
-				hasExactPath: true,
-			},
-			{ label: 'API Credentials', link: 'credentials' },
-			{
-				label: 'Role Based Access',
-				link: '/cluster/role-based-access',
-				tag: 'Beta',
-				hasExactPath: true,
-			},
-			{
-				label: 'Node Sync Preferences',
-				link: '/cluster/sync-preferences',
-				tag: 'Beta',
-				hasExactPath: true,
-			},
-		],
-	},
 	Analytics: {
 		icon: 'line-chart',
 		action: ALLOWED_ACTIONS.ANALYTICS,
@@ -152,6 +140,30 @@ export const APP_ROUTES = {
 		icon: 'thunderbolt',
 		action: ALLOWED_ACTIONS.SPEED,
 		menu: [{ label: 'Cache', link: '/cluster/cache', tag: 'Beta', hasExactPath: true }],
+	},
+	'API Credentials': {
+		icon: 'key',
+		action: ALLOWED_ACTIONS.ACCESS_CONTROL,
+		menu: [
+			{
+				label: 'User Management',
+				link: '/cluster/user-management',
+				hasExactPath: true,
+			},
+			{ label: 'API Credentials', link: 'credentials' },
+			{
+				label: 'Role Based Access',
+				link: '/cluster/role-based-access',
+				tag: 'Beta',
+				hasExactPath: true,
+			},
+			{
+				label: 'Node Sync Preferences',
+				link: '/cluster/sync-preferences',
+				tag: 'Beta',
+				hasExactPath: true,
+			},
+		],
 	},
 	Billing: {
 		action: ALLOWED_ACTIONS.BILLING,
@@ -198,6 +210,17 @@ export const CLUSTER_ROUTES = {
 			},
 			{ label: 'Stored Queries', link: '/cluster/stored-queries', tag: 'Beta' },
 		],
+	},
+	AI: {
+		icon: 'robot',
+		action: ALLOWED_ACTIONS.UI_BUILDER,
+		menu: [
+			{
+				label: 'AI Preferences',
+				link: '/cluster/ai-preferences',
+			},
+		],
+		tag: 'Beta',
 	},
 	Pipelines: {
 		icon: 'deployment-unit',
@@ -255,24 +278,6 @@ export const CLUSTER_ROUTES = {
 			{ label: 'Grade Evaluation', link: '/cluster/grade-evaluation', tag: 'Beta' },
 		],
 	},
-
-	'API Credentials': {
-		icon: 'key',
-		action: ALLOWED_ACTIONS.ACCESS_CONTROL,
-		menu: [
-			{
-				label: 'User Management',
-				link: '/cluster/user-management',
-			},
-			{ label: 'API Credentials', link: '/cluster/credentials' },
-			{ label: 'Role Based Access', link: '/cluster/role-based-access', tag: 'Beta' },
-			{
-				label: 'Node Sync Preferences',
-				link: '/cluster/sync-preferences',
-				tag: 'Beta',
-			},
-		],
-	},
 	Analytics: {
 		icon: 'line-chart',
 		action: ALLOWED_ACTIONS.ANALYTICS,
@@ -306,7 +311,23 @@ export const CLUSTER_ROUTES = {
 		action: ALLOWED_ACTIONS.SPEED,
 		menu: [{ label: 'Cache', link: '/cluster/cache', tag: 'Beta' }],
 	},
-
+	'API Credentials': {
+		icon: 'key',
+		action: ALLOWED_ACTIONS.ACCESS_CONTROL,
+		menu: [
+			{
+				label: 'User Management',
+				link: '/cluster/user-management',
+			},
+			{ label: 'API Credentials', link: '/cluster/credentials' },
+			{ label: 'Role Based Access', link: '/cluster/role-based-access', tag: 'Beta' },
+			{
+				label: 'Node Sync Preferences',
+				link: '/cluster/sync-preferences',
+				tag: 'Beta',
+			},
+		],
+	},
 	Billing: {
 		icon: 'credit-card',
 		action: ALLOWED_ACTIONS.BILLING,
