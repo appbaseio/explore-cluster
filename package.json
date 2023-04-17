@@ -95,7 +95,7 @@
 		"@ungap/url-search-params": "^0.1.2",
 		"@uppy/core": "^2.1.2",
 		"@uppy/dashboard": "^2.1.1",
-		"antd": "^5.0.0",
+		"antd": "~5.0.0",
 		"appbase-js": "^4.1.2",
 		"brace": "^0.11.1",
 		"can-ndjson-stream": "^1.0.2",
