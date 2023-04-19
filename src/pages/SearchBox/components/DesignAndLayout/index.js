@@ -202,7 +202,6 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 							app="featured_suggestions"
 							credentials={mainForm.value.credentials}
 							url={getURL()}
-							enableAppbase
 							themePreset={form.value.theme}
 							theme={{
 								colors: {

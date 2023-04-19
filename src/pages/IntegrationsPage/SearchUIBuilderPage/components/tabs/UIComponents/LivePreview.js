@@ -223,7 +223,6 @@ const LivePreview = React.memo(
 								app={secondaryPipeline || pipeline}
 								url={getURL()}
 								credentials={atob(localStorage.getItem('authToken'))}
-								enableAppbase
 								transformRequest={transformRequest}
 								preferences={preferences}
 							>

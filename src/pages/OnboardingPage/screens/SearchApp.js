@@ -250,7 +250,6 @@ export default class SearchApp extends Component {
 			<ReactiveBase
 				{...this.appConfig}
 				url={SCALR_API}
-				enableAppbase
 				className="search-app"
 				theme={{
 					colors: {
