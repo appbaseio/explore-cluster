@@ -135,9 +135,13 @@ export async function getESIndices(authToken, backend, endpointConfig = {}) {
 		url = `${ACC_API}/${getValidURL(endpointConfig.app)}`;
 	} else {
 		url = `${ACC_API}/${getValidURL(endpointConfig.index)}`;
-		if (backend === BACKENDS.ELASTICSEARCH.name || backend === BACKENDS.SYSTEM.name) {
-			const esVersion = await getESVersion(null, atob(authToken));
-			if (esVersion && esVersion < 6) url = `${ACC_API}/_cat/indices?format=json`;
+		try {
+			if (backend === BACKENDS.ELASTICSEARCH.name || backend === BACKENDS.SYSTEM.name) {
+				const esVersion = await getESVersion(null, atob(authToken));
+				if (esVersion && esVersion < 6) url = `${ACC_API}/_cat/indices?format=json`;
+			}
+		} catch (error) {
+			console.log(error);
 		}
 	}
 
@@ -801,26 +805,63 @@ export const hasClusterEditAccess = (allowedActions = []) =>
 	allowedActions.some(
 		(i) => i === ALLOWED_ACTIONS.DEVELOP || i === ALLOWED_ACTIONS.SEARCH_RELEVANCY,
 	);
+// Compare pre-release identifiers
+const comparePreRelease = (preReleaseA, preReleaseB) => {
+	// If both pre-release identifiers are absent, they are equal
+	if (!preReleaseA && !preReleaseB) return 0;
+	// If pre-release identifier A is absent, it is considered higher version
+	if (!preReleaseA) return 1;
+	// If pre-release identifier B is absent, it is considered higher version
+	if (!preReleaseB) return -1;
 
-// Return -1 if versionA < versionB
-// Return 0 if versionA === versionB
-// Return 1 if versionA > versionB
+	// Split pre-release identifiers by '.' and compare each part
+	const preReleaseASplit = preReleaseA.split('.');
+	const preReleaseBSplit = preReleaseB.split('.');
+
+	// Iterate through parts of pre-release identifiers and compare them
+	for (let i = 0; i < Math.max(preReleaseASplit.length, preReleaseBSplit.length); i++) {
+		const partA = parseInt(preReleaseASplit[i], 10) || 0;
+		const partB = parseInt(preReleaseBSplit[i], 10) || 0;
+
+		if (partA > partB) {
+			return 1;
+		} else if (partA < partB) {
+			return -1;
+		}
+	}
+
+	// If all parts are equal, the pre-release identifiers are equal
+	return 0;
+};
+
+// Compare two version numbers with optional pre-release identifiers
 export const compareVersion = (versionA = '0.0.0', versionB = '0.0.0') => {
+	// If the version numbers are equal, there is no need to compare further
 	if (versionA === versionB) {
 		return 0;
 	}
-	const versionASplit = versionA.split('.');
-	const versionBSplit = versionB.split('.');
 
-	const majorMinorA = Number(`${versionASplit[0]}.${versionASplit[1]}`);
-	const majorMinorB = Number(`${versionBSplit[0]}.${versionBSplit[1]}`);
-	const patchA = Number(versionASplit[2]);
-	const patchB = Number(versionBSplit[2]);
-	if (majorMinorA > majorMinorB || (majorMinorA === majorMinorB && patchA >= patchB)) {
-		return 1;
+	// Split the main version numbers and pre-release identifiers
+	const [mainVersionA, preReleaseA] = versionA.split('-');
+	const [mainVersionB, preReleaseB] = versionB.split('-');
+
+	const versionASplit = mainVersionA.split('.');
+	const versionBSplit = mainVersionB.split('.');
+
+	// Compare the main version numbers (major, minor, patch)
+	for (let i = 0; i < versionASplit.length; i++) {
+		const partA = parseInt(versionASplit[i], 10);
+		const partB = parseInt(versionBSplit[i], 10);
+
+		if (partA > partB) {
+			return 1;
+		} else if (partA < partB) {
+			return -1;
+		}
 	}
 
-	return -1;
+	// If the main version numbers are equal, compare the pre-release identifiers
+	return comparePreRelease(preReleaseA, preReleaseB);
 };
 
 export const unflattenObject = (flatObj) =>

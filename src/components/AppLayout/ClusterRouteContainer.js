@@ -14,6 +14,11 @@ import { getAuthorizedRoutes } from '../../utils';
 import { BACKENDS } from '../../batteries/utils';
 import { ALLOWED_SLS } from '../../constants';
 
+const AIPreferencesPage = Loadable({
+	loader: () => import(/* webpackChunkName: "AIPreferencesPage" */ '../../pages/AIPreferences'),
+	loading: Loader,
+});
+
 const ProfilePage = Loadable({
 	loader: () => import(/* webpackChunkName: "ProfilePage" */ '../../pages/ProfilePage'),
 	loading: Loader,
@@ -750,6 +755,17 @@ class ClusterRouteContainer extends React.Component {
 									<AppPageContainer {...props} component={GradeEvaluation} />
 								) : (
 									<UnauthorizedPage />
+								)}
+							</>
+						)}
+					/>
+					<Route
+						exact
+						path="/cluster/ai-preferences"
+						component={(props) => (
+							<>
+								{get(allowedRoutes, '/cluster/ai-preferences') && (
+									<AppPageContainer {...props} component={AIPreferencesPage} />
 								)}
 							</>
 						)}

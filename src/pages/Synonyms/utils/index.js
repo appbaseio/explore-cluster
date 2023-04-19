@@ -1,4 +1,5 @@
 import get from 'lodash/get';
+import { uniqueId } from 'lodash';
 import { getVersion } from '../../../constants/config';
 import {
 	closeIndex,
@@ -218,4 +219,34 @@ export async function parseSynonymsAnalyzer({ appName, credentials, url, synonym
 		hasSubfield,
 		synonymsAnalyzerSettings,
 	};
+}
+
+// Takes an array of comma-separated synonym sets and returns an optimized structure of synonyms
+export function optimizeSynonyms(synonymSets) {
+	const optimized = {}; // Object to store the optimized synonym sets
+
+	// Iterate through each synonym set using forEach
+	synonymSets.forEach((set) => {
+		const synonyms = set.split(',').map((_) => _.trim()); // Split the comma-separated set into an array of synonyms
+		let existingKey = null;
+
+		// Use find() to check if any synonym in the current set already exists in the optimized object
+		const foundKey = synonyms.find((synonym) =>
+			Object.keys(optimized).find((key) => optimized[key].includes(synonym)),
+		);
+
+		if (foundKey) {
+			existingKey = Object.keys(optimized).find((key) => optimized[key].includes(foundKey));
+		}
+
+		// If a synonym exists in the optimized object, merge the current set with the existing set
+		if (existingKey) {
+			optimized[existingKey] = Array.from(new Set([...optimized[existingKey], ...synonyms]));
+		} else {
+			// If no synonym exists in the optimized object, create a new entry with a unique identifier
+			optimized[uniqueId()] = synonyms;
+		}
+	});
+
+	return Object.values(optimized).map((val) => val.join(', '));
 }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
-	SearchBox,
+	DataSearch,
 	DynamicRangeSlider,
 	MultiList,
 	ReactiveBase,
@@ -88,7 +88,7 @@ const getFields = (fields, suffix) => {
 	return newFields;
 };
 
-const getFieldsWithWeights = (fields) => {
+const getWeights = (fields) => {
 	const weights = {
 		original_title: 10,
 		'original_title.raw': 10,
@@ -104,7 +104,7 @@ const getFieldsWithWeights = (fields) => {
 		'overview.search': 1,
 	};
 
-	return fields.map((item) => ({ field: item, weight: weights[item] }));
+	return fields.map((item) => weights[item]);
 };
 
 const renderResultList = () => (
@@ -272,13 +272,14 @@ export default class SearchApp extends Component {
 						</span>
 					</h2>
 
-					<SearchBox
+					<DataSearch
 						componentId="search"
-						dataField={getFieldsWithWeights(fields)}
+						dataField={fields}
 						showIcon={false}
 						placeholder="Search movies..."
 						autosuggest={false}
 						filterLabel="Search"
+						fieldWeights={getWeights(fields)}
 						highlight
 						style={{
 							maxWidth: '400px',

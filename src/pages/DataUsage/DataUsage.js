@@ -261,7 +261,7 @@ const DataUsage = (props) => {
 		<ErrorToaster>
 			<Header style={{ background: 'white', height: 'auto' }}>
 				<div
-					className={{
+					style={{
 						padding: '25px 0px',
 						margin: '0 auto',
 					}}

@@ -219,6 +219,7 @@ class DashboardWrapper extends Component {
 			routes: routesToSet,
 			value: '',
 			...getActiveMenuData,
+			readOnlySearchInput: true,
 		};
 	}
 
@@ -388,8 +389,13 @@ class DashboardWrapper extends Component {
 		this.setState({ activeSubMenu: [] });
 	};
 
+	handleFocus = () => {
+		this.setState({ readOnlySearchInput: false });
+	};
+
 	render() {
-		const { showHeader, routes, activeSubMenu, activeMenuItem, value } = this.state;
+		const { showHeader, routes, activeSubMenu, activeMenuItem, value, readOnlySearchInput } =
+			this.state;
 		const { apps, history, match, collapsed, sessionData, backendImage, backend } = this.props;
 		const filteredApps = keys(apps).filter((app) => !app.startsWith('.'));
 		const routesFiltered = {};
@@ -450,6 +456,8 @@ class DashboardWrapper extends Component {
 						{collapsed ? null : (
 							<div className={searchInputStyle}>
 								<Input
+									readOnly={readOnlySearchInput}
+									onFocus={this.handleFocus}
 									value={value}
 									onChange={this.handleSearchTerm}
 									placeholder="Search for a menu item"
