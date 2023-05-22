@@ -8450,6 +8450,19 @@ iferr@^0.1.5:
   resolved "https://registry.yarnpkg.com/iferr/-/iferr-0.1.5.tgz#c60eed69e6d8fdb6b3104a1fcbca1c192dc5b501"
   integrity sha512-DUNFN5j7Tln0D+TxzloUjKB+CtVu6myn0JEFak6dG18mNt9YkQ6lzGCdafwofISZ1lLF3xRHJ98VKy9ynkcFaA==
 
+iframe-resizer-react@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/iframe-resizer-react/-/iframe-resizer-react-1.1.0.tgz#5009e019b7a5c7f1c009bff5bcdf0dbf33557465"
+  integrity sha512-FrytSq91AIJaDgE+6uK/Vdd6IR8CrwLoZ6eGmL2qQMPTzF0xlSV2jaSzRRUh5V2fttD7vzl21jvBl97bV40eBw==
+  dependencies:
+    iframe-resizer "^4.3.0"
+    warning "^4.0.3"
+
+iframe-resizer@^4.3.0:
+  version "4.3.6"
+  resolved "https://registry.yarnpkg.com/iframe-resizer/-/iframe-resizer-4.3.6.tgz#61d92c1adefe5d416bff4fbf80c7f1f74be70ec0"
+  integrity sha512-wz0WodRIF6eP0oGQa5NIP1yrITAZ59ZJvVaVJqJRjaeCtfm461vy2C3us6CKx0e7pooqpIGLpVMSTzrfAjX9Sg==
+
 ignore@^4.0.6:
   version "4.0.6"
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-4.0.6.tgz#750e3db5862087b4737ebac8207ffd1ef27b25fc"
@@ -13447,10 +13460,10 @@ react-proptype-conditional-require@^1.0.4:
   resolved "https://registry.yarnpkg.com/react-proptype-conditional-require/-/react-proptype-conditional-require-1.0.4.tgz#69c2d5741e6df5e08f230f36bbc2944ee1222555"
   integrity sha512-nopsRn7KnGgazBe2c3H2+Kf+Csp6PGDRLiBkYEDMKY8o/EIgft/WnIm/OnAKTawZiLnJXHAqhpFBddvs6NiXlw==
 
-react-reactive-form@^1.0.28:
-  version "1.0.32"
-  resolved "https://registry.yarnpkg.com/react-reactive-form/-/react-reactive-form-1.0.32.tgz#42b651350f2ab6feb341521d249489c6704ae175"
-  integrity sha512-6CPA+Mitr2citquMHj5mYkvuzqN5r4xt6r8NxKGbjw/+/Qe6uGlhnL+dlwcyZmolptY548QTbXlrAt/Sc4eLZQ==
+react-reactive-form@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/react-reactive-form/-/react-reactive-form-2.0.1.tgz#3b21cb8b3a5e6ab8ef1ffd171311ceea8272ef1f"
+  integrity sha512-yvU6jKPVmRCcghEhfhiJ3gJmH4KYjzKj7XzyPyRHDIlNqVbg1q+/0kZlmh8zzCK2Svd9WCjUVhsAgzr9PkFx5w==
   dependencies:
     opencollective "^1.0.3"
     opencollective-postinstall "^2.0.2"

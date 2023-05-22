@@ -110,6 +110,7 @@
 		"fuse.js": "^6.6.1",
 		"hex-rgb": "^3.0.0",
 		"husky": "^4.2.5",
+		"iframe-resizer-react": "^1.1.0",
 		"imagekit": "^3.2.3",
 		"imagekit-uppy-plugin": "^1.0.2",
 		"imagekitio-react": "^1.0.11",

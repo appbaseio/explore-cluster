@@ -570,7 +570,8 @@ class ClusterRouteContainer extends React.Component {
 						path="/cluster/stored-queries"
 						render={(props) => (
 							<>
-								{get(allowedRoutes, '/cluster/stored-queries') ? (
+								{get(allowedRoutes, '/cluster/stored-queries') &&
+								(isPlanLoading || !ALLOWED_SLS.includes(backendImage)) ? (
 									<AppPageContainer {...props} component={StoredQueriesPage} />
 								) : (
 									<UnauthorizedPage />
