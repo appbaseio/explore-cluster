@@ -37,7 +37,7 @@ const bannerMessagesAnalytics = {
 	},
 };
 
-const AnalyticsView = ({ appName, isPaidUser, plan }) => {
+const AnalyticsView = ({ appName, isPaidUser, plan, history }) => {
 	useEffect(() => {
 		const startTime = moment();
 		// triggering custom event for google analytics
@@ -70,6 +70,7 @@ const AnalyticsView = ({ appName, isPaidUser, plan }) => {
 							displayReplaySearch={window.location.pathname.startsWith('/app')}
 							chartWidth={window.innerWidth - 400}
 							appName={appName}
+							history={history}
 						/>
 					</Container>
 				</React.Fragment>
@@ -92,6 +93,7 @@ AnalyticsView.propTypes = {
 	appName: PropTypes.string.isRequired,
 	isPaidUser: PropTypes.bool.isRequired,
 	plan: PropTypes.string.isRequired,
+	history: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = (state) => ({

@@ -19,6 +19,11 @@ const AIPreferencesPage = Loadable({
 	loading: Loader,
 });
 
+const AIFAQsPage = Loadable({
+	loader: () => import(/* webpackChunkName: "AIFAQsPage" */ '../../pages/AIFAQs'),
+	loading: Loader,
+});
+
 const ProfilePage = Loadable({
 	loader: () => import(/* webpackChunkName: "ProfilePage" */ '../../pages/ProfilePage'),
 	loading: Loader,
@@ -38,6 +43,11 @@ const PipelinesPage = Loadable({
 const PipelinesInsightsPage = Loadable({
 	loader: () =>
 		import(/* webpackChunkName: "PipelinesInsightsPage" */ '../../pages/PipelinesInsights'),
+	loading: Loader,
+});
+
+const AIInsightsPage = Loadable({
+	loader: () => import(/* webpackChunkName: "AIInsightsPage" */ '../../pages/AIInsights'),
 	loading: Loader,
 });
 
@@ -475,6 +485,19 @@ class ClusterRouteContainer extends React.Component {
 					/>
 					<Route
 						exact
+						path="/cluster/ai-insights"
+						render={(props) => (
+							<>
+								{get(allowedRoutes, '/cluster/ai-insights') ? (
+									<AppPageContainer {...props} component={AIInsightsPage} />
+								) : (
+									<UnauthorizedPage />
+								)}
+							</>
+						)}
+					/>
+					<Route
+						exact
 						path="/cluster/data-usage"
 						render={(props) => (
 							<>
@@ -767,6 +790,17 @@ class ClusterRouteContainer extends React.Component {
 							<>
 								{get(allowedRoutes, '/cluster/ai-preferences') && (
 									<AppPageContainer {...props} component={AIPreferencesPage} />
+								)}
+							</>
+						)}
+					/>
+					<Route
+						exact
+						path="/cluster/ai-faqs"
+						component={(props) => (
+							<>
+								{get(allowedRoutes, '/cluster/ai-faqs') && (
+									<AppPageContainer {...props} component={AIFAQsPage} />
 								)}
 							</>
 						)}

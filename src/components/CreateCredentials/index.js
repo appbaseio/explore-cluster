@@ -1654,7 +1654,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => ({
 	fetchMappings: (appName, credentials) => dispatch(getAppMappings(appName, credentials)),
 	fetchPermissions: (appName) => dispatch(getPermission(appName)),
-	fetchPipelines: () => dispatch(getPipelines()),
+	fetchPipelines: () => dispatch(getPipelines(false)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateCredentials);
