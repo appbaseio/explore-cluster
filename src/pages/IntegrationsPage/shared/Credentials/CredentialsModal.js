@@ -7,9 +7,18 @@ import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
 import { PlusOutlined } from '@ant-design/icons';
 import { suggestionStyles } from '../../SearchUIBuilderPage/CreateUIBuilder/styles';
-import { createPermission, getPermission } from '../../../../batteries/modules/actions';
+import {
+	createPermission,
+	getPermission,
+	updatePermission,
+} from '../../../../batteries/modules/actions';
 import ErrorToaster from '../../../../batteries/components/shared/ErrorToaster';
 import CreateCredentials from '../../../../components/CreateCredentials';
+
+const ACCESS_MODES = {
+	CREATE: 'create',
+	VIEW: 'view',
+};
 
 const CredentialsModal = ({
 	value,
@@ -17,10 +26,11 @@ const CredentialsModal = ({
 	permissions,
 	fetchPermissions,
 	handleCreatePermission,
+	handleEditPermission,
 }) => {
 	const [showForm, setShowForm] = useState(false);
 	const [currentPermissionInfo, setCurrentPermissionInfo] = useState(undefined);
-	const [mode, setMode] = useState('create');
+	const [mode, setMode] = useState(ACCESS_MODES.CREATE);
 
 	useEffect(() => {
 		fetchPermissions();
@@ -28,11 +38,25 @@ const CredentialsModal = ({
 
 	const handleCancel = () => {
 		setShowForm(false);
-		setMode('create');
+		setMode(ACCESS_MODES.CREATE);
+	};
+
+	const handleUpdatePermisson = (request, username) => {
+		handleEditPermission(undefined, username, request).then(({ payload }) => {
+			if (payload) {
+				onChange(`${currentPermissionInfo.username}:${currentPermissionInfo.password}`);
+				handleCancel();
+				fetchPermissions();
+			}
+		});
 	};
 
 	// eslint-disable-next-line
 	const handleSubmit = (form, username) => {
+		if (mode === ACCESS_MODES.VIEW) {
+			handleUpdatePermisson(form.mappedValues, username);
+			return;
+		}
 		newPermission(form.mappedValues);
 	};
 
@@ -78,7 +102,7 @@ const CredentialsModal = ({
 					<Button
 						icon={<PlusOutlined />}
 						onClick={() => {
-							setMode('create');
+							setMode(ACCESS_MODES.CREATE);
 							setShowForm(true);
 						}}
 					>
@@ -121,7 +145,7 @@ const CredentialsModal = ({
 										type="link"
 										style={{ padding: 0 }}
 										onClick={() => {
-											setMode('view');
+											setMode(ACCESS_MODES.VIEW);
 											setShowForm(true);
 											setCurrentPermissionInfo(permission);
 										}}
@@ -141,12 +165,14 @@ const CredentialsModal = ({
 			</Select>
 			<ErrorToaster inline>
 				<CreateCredentials
-					titleText={mode === 'create' ? 'Create Credentials' : 'View Access Details'}
+					titleText={
+						mode === ACCESS_MODES.CREATE ? 'Create Credentials' : 'View Access Details'
+					}
 					onSubmit={handleSubmit}
 					show={showForm}
 					handleCancel={() => handleCancel()}
-					initialValues={currentPermissionInfo}
-					readOnly={mode !== 'create'}
+					initialValues={mode === ACCESS_MODES.CREATE ? null : currentPermissionInfo}
+					readOnly={false}
 					isUIBuilder
 				/>
 			</ErrorToaster>
@@ -165,6 +191,7 @@ CredentialsModal.propTypes = {
 	permissions: array.isRequired,
 	fetchPermissions: func.isRequired,
 	handleCreatePermission: func.isRequired,
+	handleEditPermission: func.isRequired,
 };
 
 const mapStateToProps = (state) => {
@@ -177,6 +204,8 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => ({
 	fetchPermissions: (appName) => dispatch(getPermission(appName)),
 	handleCreatePermission: (appName, payload) => dispatch(createPermission(appName, payload)),
+	handleEditPermission: (appName, username, payload) =>
+		dispatch(updatePermission(appName, username, payload)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CredentialsModal);

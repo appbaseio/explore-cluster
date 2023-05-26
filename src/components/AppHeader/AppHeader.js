@@ -141,7 +141,7 @@ const AppHeader = ({
 				)}
 				<HealthStats />
 				{showProfile() && (
-					<Row justify="space-between" align="middle">
+					<Row justify="space-between" align="middle" style={{ lineHeight: 'initial' }}>
 						<UserMenu user={user} />
 					</Row>
 				)}

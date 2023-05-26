@@ -292,7 +292,8 @@ class RouteContainer extends React.Component {
 						path="/app/:appName/stored-queries"
 						render={(props) => (
 							<>
-								{get(allowedRoutes, 'stored-queries') ? (
+								{get(allowedRoutes, 'stored-queries') &&
+								(isPlanLoading || !ALLOWED_SLS.includes(backendImage)) ? (
 									<AppPageContainer
 										{...props}
 										component={StoredQueriesPage}
@@ -367,7 +368,8 @@ class RouteContainer extends React.Component {
 						path="/app/:appName/index-settings"
 						render={(props) => (
 							<>
-								{get(allowedRoutes, 'index-settings') ? (
+								{get(allowedRoutes, 'index-settings') &&
+								(isPlanLoading || !ALLOWED_SLS.includes(backendImage)) ? (
 									<AppPageContainer
 										{...props}
 										component={IndexSettingsPage}

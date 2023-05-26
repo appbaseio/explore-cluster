@@ -74,7 +74,7 @@ const ALLOWED_ACTIONS = {
 	BILLING: 'billing',
 	DOWNTIME_ALERTS: 'downtime-alerts',
 	SPEED: 'speed',
-	AI_PREFERENCES: 'ai-preferences',
+	AI_PREFERENCES: 'ai',
 };
 
 const ALLOWED_ACTIONS_LABELS = {
@@ -90,7 +90,7 @@ const ALLOWED_ACTIONS_LABELS = {
 	[ALLOWED_ACTIONS.DOWNTIME_ALERTS]: 'Downtime Alerts',
 	[ALLOWED_ACTIONS.UI_BUILDER]: 'UI Builder',
 	[ALLOWED_ACTIONS.SPEED]: 'Speed',
-	[ALLOWED_ACTIONS.AI_PREFERENCES]: 'AI Preferences',
+	[ALLOWED_ACTIONS.AI_PREFERENCES]: 'AI',
 };
 
 const ROUTES_ACTION = {
