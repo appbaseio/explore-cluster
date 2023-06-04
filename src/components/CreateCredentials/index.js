@@ -269,7 +269,8 @@ class CreateCredentials extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { errors, mappings, initialValues, isUserManagement, appbaseVersion } = this.props;
+		const { errors, mappings, initialValues, isUserManagement, appbaseVersion, isUIBuilder } =
+			this.props;
 
 		displayErrors(errors, prevProps.errors);
 		if (!this.isApp && mappings !== prevProps.mappings) {
@@ -307,7 +308,7 @@ class CreateCredentials extends React.Component {
 					indicesHandler.disable();
 				}
 			}
-		} else if (!initialValues) {
+		} else if (!initialValues && isUIBuilder) {
 			this.form.patchValue(
 				mapValuesToForm(
 					JSON.parse(JSON.stringify(this.initialFormValues)),
