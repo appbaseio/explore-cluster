@@ -127,10 +127,10 @@
   dependencies:
     cross-fetch "^3.0.4"
 
-"@appbaseio/dejavu-browser@^4.0.0-rc.1":
-  version "4.0.0-rc.1"
-  resolved "https://registry.yarnpkg.com/@appbaseio/dejavu-browser/-/dejavu-browser-4.0.0-rc.1.tgz#af9ea17d3a4ae3b0cfdc1130710c1438a5727373"
-  integrity sha512-pNesbrPIWJEAYHWPY01GCl5u6+GLJIPXJeBcl6rUHv3clQlnus7DeZ8Z8nOaGa0LBNFyxoTyWCeXbztGdgznKA==
+"@appbaseio/dejavu-browser@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@appbaseio/dejavu-browser/-/dejavu-browser-4.0.0.tgz#9dadd2182c157b32dab8104a175f07a58343ec11"
+  integrity sha512-oQKdbqXecltqx+KRbbEn5eJVTfkY6nyDSPv33medag85MIejWd/WAe+6lYuby+HbMW3iPazZQtgijUChrL5xtw==
   dependencies:
     "@divyanshu013/media" "^1.0.0"
     "@fortawesome/fontawesome-svg-core" "^1.2.27"
@@ -163,10 +163,10 @@
     react-codemirror2 "^5.1.0"
     react-dom "^16.6.3"
 
-"@appbaseio/reactivecore@10.0.0-alpha.11":
-  version "10.0.0-alpha.11"
-  resolved "https://registry.yarnpkg.com/@appbaseio/reactivecore/-/reactivecore-10.0.0-alpha.11.tgz#a7f86b77a962fd64d33e51af47f381c8d91505cc"
-  integrity sha512-6k4s7I3q6cD3vtkgvDhnI4vyh2/QWhbA7mJHdQPcSRzPobsfAH1WBfQ57d1xKP1DXQ7K++rAk0trT6ApH1Vu8A==
+"@appbaseio/reactivecore@10.0.0-alpha.25":
+  version "10.0.0-alpha.25"
+  resolved "https://registry.yarnpkg.com/@appbaseio/reactivecore/-/reactivecore-10.0.0-alpha.25.tgz#a93921ae90a73b9ac25bfcef71755514d99f9971"
+  integrity sha512-iemIE58vdq62L88kwAkyrcIPeYJ1GMMsfLdC3HrUPKibE1O4rhQ4ESchNCTyFpSLwBInIpq6nG9x0AeAzEzVTA==
   dependencies:
     cross-fetch "^3.0.4"
     dayjs "^1.11.7"
@@ -191,13 +191,13 @@
     prop-types "^15.6.0"
     react-leaflet "^2.1.3"
 
-"@appbaseio/reactivesearch@^4.0.0-rc.9":
-  version "4.0.0-rc.9"
-  resolved "https://registry.yarnpkg.com/@appbaseio/reactivesearch/-/reactivesearch-4.0.0-rc.9.tgz#82954c6e9a112fb289077f38abda4f84449aa6ac"
-  integrity sha512-/zHT+YivBDaY/i92rClUZTpsEMmRn8siZGwsKYqKx8WIZ8eCNjUeCx9aJSgEDr5CnungSrCpjW4rtzURFNQdAg==
+"@appbaseio/reactivesearch@latest":
+  version "4.0.0-rc.18.2"
+  resolved "https://registry.yarnpkg.com/@appbaseio/reactivesearch/-/reactivesearch-4.0.0-rc.18.2.tgz#e98c2e5b134ea6f1b2003729bb134bd767f7a8d1"
+  integrity sha512-dAKJNRSkuCeUCOXzHHbG6U3t8cjtK/8BJkrTQijYdvN7LzfTWv6KwQCeKDlNrnAai7Swcq/+3Uiv4H4AhEKItA==
   dependencies:
     "@appbaseio/analytics" "^1.2.0-alpha.1"
-    "@appbaseio/reactivecore" "10.0.0-alpha.11"
+    "@appbaseio/reactivecore" "10.0.0-alpha.25"
     "@appbaseio/rheostat" "^1.0.0-alpha.15"
     "@emotion/core" "^10.0.28"
     "@emotion/styled" "^10.0.27"

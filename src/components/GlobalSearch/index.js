@@ -56,7 +56,10 @@ class GlobalSearch extends PureComponent {
 		const fieldWithWeights = isFieldDefined
 			? dataFields.map((field, i) => ({
 					field,
-					weight: isFieldWeightDefined ? subprops.fieldWeights[i] : 1,
+					weight:
+						isFieldWeightDefined && subprops.fieldWeights[i]
+							? subprops.fieldWeights[i]
+							: 1,
 			  }))
 			: null;
 
