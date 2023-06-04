@@ -133,6 +133,8 @@ export const defaultRateLimits = {
 	uibuilder: 10,
 	// new categories
 	cache: 10,
+	pipelines: 10,
+	ai: 10,
 };
 // Acl options
 export const aclOptions = [
@@ -161,6 +163,8 @@ export const aclOptions = [
 const newCategories = {
 	cache: { version: '7.42.0', insertAfter: 'searchrelevancy' },
 	storedquery: { version: '7.48.1', insertAfter: 'analytics' },
+	pipelines: { version: '8.0.0', insertAfter: 'uibuilder' },
+	ai: { version: '8.12.0', insertAfter: 'uibuilder' },
 };
 // Default Selected Acl
 export const defaultAclOptions = aclOptions;
@@ -224,6 +228,8 @@ export const aclOptionsLabel = {
 	uibuilder: 'UI Builder',
 	// new Categories
 	cache: 'Cache',
+	ai: 'AI',
+	pipelines: 'Pipelines',
 };
 
 // Acl options Message
@@ -254,6 +260,8 @@ export const aclOptionsMessage = {
 	uibuilder: 'Allow UI builder related actions',
 	// new Categories
 	cache: 'Allow cache related actions',
+	pipelines: 'Allow pipelines feature',
+	ai: 'Allow AI preferences configuration',
 };
 
 export const shouldHavePipelines = (backendImage) => ALLOWED_SLS.includes(backendImage);

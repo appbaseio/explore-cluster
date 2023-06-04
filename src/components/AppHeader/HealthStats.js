@@ -11,6 +11,7 @@ import { ALLOWED_SLS } from '../../constants';
 
 const healthStatsCSS = css`
 	margin: 0 1rem;
+	line-height: initial;
 
 	> span {
 		display: flex;

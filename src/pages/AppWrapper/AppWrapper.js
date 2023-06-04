@@ -496,7 +496,9 @@ class AppWrapper extends Component {
 															backend === BACKENDS.MARKLOGIC.name)) ||
 													((item.link.includes('synonyms') ||
 														item.link.includes('rules') ||
-														item.link.includes('grade-evaluation')) &&
+														item.link.includes('grade-evaluation') ||
+														item.link.includes('index-settings') ||
+														item.link.includes('stored-queries')) &&
 														ALLOWED_SLS.includes(backendImage))
 												) {
 													return null;

@@ -112,6 +112,8 @@ class SyncStatus extends React.Component {
 		const { form } = this.props;
 		const exportTypeHandler = form.get('exportSettings.type');
 		exportTypeHandler.valueChanges.unsubscribe(this.handleTypeChange);
+
+		clearInterval(this.myInterval);
 	}
 
 	get resyncURL() {
