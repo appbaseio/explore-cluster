@@ -702,7 +702,6 @@ const Results = ({
 																	preferences?.exportSettings
 																		?.credentials || ''
 																}
-																enableAppbase
 																transformRequest={(props) => {
 																	const newBody = JSON.parse(
 																		// eslint-disable-next-line

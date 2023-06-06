@@ -117,8 +117,7 @@ class HideResults extends Component {
 					url={getURL()}
 					credentials={atob(localStorage.getItem('authToken'))}
 					style={{ marginBottom: 12 }}
-					enableAppbase
-					appbaseConfig={{
+					reactivesearchAPIConfig={{
 						recordAnalytics: false,
 						enableQueryRules: false,
 						useCache: false,
