@@ -106,7 +106,7 @@ class CreateAppModal extends Component {
 			const { actual } = createdApp.error;
 			const { error } = actual ?? {};
 
-			if (error && (error.code === 400 || error.code === 402)) {
+			if (error && error.code === 402) {
 				const modalRef = Modal.error({
 					icon: null,
 					okButtonProps: { style: { display: 'none' } },
