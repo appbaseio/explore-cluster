@@ -656,14 +656,13 @@ class SearchPreview extends React.Component {
 				</Col>
 				<ReactiveBase
 					app={app}
-					enableAppbase
 					credentials={credentials}
 					url={url}
 					transformRequest={(props) => {
 						const newProps = this.transformRequest(props);
 						return newProps;
 					}}
-					appbaseConfig={{
+					reactivesearchAPIConfig={{
 						recordAnalytics: showFeaturedProducts ? false : isAnalyticsEnabled,
 						enableQueryRules: page !== 'rules',
 						userId: 'appbase.io dashboard',

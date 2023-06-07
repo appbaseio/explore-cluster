@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import {
-	DataSearch,
+	SearchBox,
 	MultiList,
 	ReactiveBase,
 	ReactiveList,
@@ -91,7 +91,7 @@ const getFields = (fields, suffix) => {
 	return newFields;
 };
 
-const getWeights = (fields) => {
+const getFieldsWithWeights = (fields) => {
 	const weights = {
 		product_name: 10,
 		'product_name.raw': 10,
@@ -104,7 +104,7 @@ const getWeights = (fields) => {
 		'description.search': 1,
 	};
 
-	return fields.map((item) => weights[item]);
+	return fields.map((item) => ({ field: item, weight: weights[item] }));
 };
 
 const renderResultList = () => (
@@ -259,7 +259,7 @@ class EcommSearchApp extends Component {
 	updateAppSettings = async (fields) => {
 		const { settings, app, updateSettingsAction } = this.props;
 		const dataField = [...fields];
-		const fieldWeights = getWeights(fields);
+		const fieldWeights = getFieldsWithWeights(fields).map((f) => f.weight);
 		const newSettings = { ...settings };
 
 		const settingsData = {
@@ -303,7 +303,6 @@ class EcommSearchApp extends Component {
 			<ReactiveBase
 				{...this.appConfig}
 				url={SCALR_API}
-				enableAppbase
 				className="search-app"
 				theme={{
 					colors: {
@@ -325,14 +324,13 @@ class EcommSearchApp extends Component {
 						</span>
 					</h2>
 
-					<DataSearch
+					<SearchBox
 						componentId="search"
-						dataField={fields}
+						dataField={getFieldsWithWeights(fields)}
 						showIcon={false}
 						placeholder="Search products..."
 						autosuggest={false}
 						filterLabel="Search"
-						fieldWeights={getWeights(fields)}
 						highlight
 						style={{
 							maxWidth: '400px',

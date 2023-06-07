@@ -61,13 +61,13 @@ class ListView extends React.Component {
 						}
 						componentId={result.id}
 						showLoader={false}
-						render={({ data, loading, loadMore, triggerAnalytics }) => {
+						render={({ data, loading, loadMore, triggerClickAnalytics }) => {
 							return (
 								<ResultList
 									data={data}
 									loading={loading}
 									loadMore={loadMore}
-									triggerAnalytics={triggerAnalytics}
+									triggerAnalytics={triggerClickAnalytics}
 									pagination={result.pagination}
 									size={get(result, 'size', 10)}
 									showFeaturedProducts={showFeaturedProducts}

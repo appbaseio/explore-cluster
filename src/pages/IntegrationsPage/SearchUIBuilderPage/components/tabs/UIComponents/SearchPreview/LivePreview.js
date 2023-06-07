@@ -52,7 +52,6 @@ const LivePreview = ({ form, backend, getSearchConfig, pipeline, indexSettings }
 					app={pipeline}
 					url={getURL()}
 					credentials={atob(localStorage.getItem('authToken'))}
-					enableAppbase
 					preferences={{
 						search: { rsConfig: { ...searchConfig } },
 					}}

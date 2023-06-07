@@ -120,17 +120,17 @@
     redux-persist "^6.0.0"
     styled-components "^5.3.0"
 
-"@appbaseio/analytics@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@appbaseio/analytics/-/analytics-1.1.1.tgz#398ff80ad3d7d20bc0e66efc1c0b2c50bb2a959e"
-  integrity sha512-8ydvIbn9otjldUHKuYg48nqUvpdC4jMUl6BZNxTWniBnFi5ihxWI94cKabu2+L65uNJR3Aioa1FV0t6d4am2oQ==
+"@appbaseio/analytics@^1.2.0-alpha.1":
+  version "1.2.0-alpha.1"
+  resolved "https://registry.yarnpkg.com/@appbaseio/analytics/-/analytics-1.2.0-alpha.1.tgz#786fce19ac03930aa8698aaf6929856c208778d6"
+  integrity sha512-IoRR71bah4w7LwgdokL7RVa67CX/CDmusNacupqOtFo8o81tA2w91Lq8NIpT1EVn3Cm3RD2TxzRJBs3Ls1nmGg==
   dependencies:
     cross-fetch "^3.0.4"
 
-"@appbaseio/dejavu-browser@^3.8.2":
-  version "3.8.2"
-  resolved "https://registry.yarnpkg.com/@appbaseio/dejavu-browser/-/dejavu-browser-3.8.2.tgz#867866d2964b14d60140bef36c1e8ab54702220b"
-  integrity sha512-boUjAEZxHGYBHv4LXin/MiN8U1FDlW/n2apJm/3L7x3Br8GVGgRILAywfQbOhij0Gm9Jm1RkbpOKLNwSawoacg==
+"@appbaseio/dejavu-browser@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@appbaseio/dejavu-browser/-/dejavu-browser-4.0.0.tgz#9dadd2182c157b32dab8104a175f07a58343ec11"
+  integrity sha512-oQKdbqXecltqx+KRbbEn5eJVTfkY6nyDSPv33medag85MIejWd/WAe+6lYuby+HbMW3iPazZQtgijUChrL5xtw==
   dependencies:
     "@divyanshu013/media" "^1.0.0"
     "@fortawesome/fontawesome-svg-core" "^1.2.27"
@@ -142,10 +142,10 @@
     dompurify "^2.3.6"
     emotion "9.2.6"
     file-saver "^2.0.0-rc.4"
-    flat "^4.1.0"
+    flat "^5.0.1"
     ismobilejs "^0.5.1"
     moment "^2.29.4"
-    papaparse "^4.6.1"
+    papaparse "^5.2.0"
     react-custom-scrollbars "^4.2.1"
     react-joyride "2.0.0-15"
     react-json-editor-ajrm "^2.5.8"
@@ -163,10 +163,10 @@
     react-codemirror2 "^5.1.0"
     react-dom "^16.6.3"
 
-"@appbaseio/reactivecore@9.14.39":
-  version "9.14.39"
-  resolved "https://registry.yarnpkg.com/@appbaseio/reactivecore/-/reactivecore-9.14.39.tgz#c9b9914ca6a6e8134b314d29060079db1d9b6427"
-  integrity sha512-g1+1JNnnPAocbOeMFSnI7PMn3oaAvMPUkZp9mGUPJrSGXJodhvx9+/5NClk/OR+8+FtthSxlDN2GOUC4SSW8Gg==
+"@appbaseio/reactivecore@10.0.0-alpha.25":
+  version "10.0.0-alpha.25"
+  resolved "https://registry.yarnpkg.com/@appbaseio/reactivecore/-/reactivecore-10.0.0-alpha.25.tgz#a93921ae90a73b9ac25bfcef71755514d99f9971"
+  integrity sha512-iemIE58vdq62L88kwAkyrcIPeYJ1GMMsfLdC3HrUPKibE1O4rhQ4ESchNCTyFpSLwBInIpq6nG9x0AeAzEzVTA==
   dependencies:
     cross-fetch "^3.0.4"
     dayjs "^1.11.7"
@@ -191,13 +191,13 @@
     prop-types "^15.6.0"
     react-leaflet "^2.1.3"
 
-"@appbaseio/reactivesearch@^3.43.2-alpha.0":
-  version "3.43.8"
-  resolved "https://registry.yarnpkg.com/@appbaseio/reactivesearch/-/reactivesearch-3.43.8.tgz#3467d4de74a1c712f569808b7efc3628600a784d"
-  integrity sha512-NemRlFcQ4UQ10Q+VB4vafvbRa4+q+e/2tkpkPHY+w3slxhIji96j5Jh7yLzN7luDxkZ8vWX/HcIVlT6rsZ+13w==
+"@appbaseio/reactivesearch@latest":
+  version "4.0.0-rc.18.2"
+  resolved "https://registry.yarnpkg.com/@appbaseio/reactivesearch/-/reactivesearch-4.0.0-rc.18.2.tgz#e98c2e5b134ea6f1b2003729bb134bd767f7a8d1"
+  integrity sha512-dAKJNRSkuCeUCOXzHHbG6U3t8cjtK/8BJkrTQijYdvN7LzfTWv6KwQCeKDlNrnAai7Swcq/+3Uiv4H4AhEKItA==
   dependencies:
-    "@appbaseio/analytics" "^1.1.1"
-    "@appbaseio/reactivecore" "9.14.39"
+    "@appbaseio/analytics" "^1.2.0-alpha.1"
+    "@appbaseio/reactivecore" "10.0.0-alpha.25"
     "@appbaseio/rheostat" "^1.0.0-alpha.15"
     "@emotion/core" "^10.0.28"
     "@emotion/styled" "^10.0.27"
@@ -214,6 +214,7 @@
     prop-types "^15.6.0"
     react-day-picker "^7.0.5"
     react-redux "^6.0.1"
+    remarkable "^2.0.1"
     url-search-params-polyfill "^7.0.0"
     xss "^1.0.11"
 
@@ -7484,12 +7485,10 @@ flat-cache@^2.0.1:
     rimraf "2.6.3"
     write "1.0.3"
 
-flat@^4.1.0:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/flat/-/flat-4.1.1.tgz#a392059cc382881ff98642f5da4dde0a959f309b"
-  integrity sha512-FmTtBsHskrU6FJ2VxCnsDb84wu9zhmO3cUX2kGFb5tuwhfXxGciiT0oRY+cck35QmG+NmGh5eLz6lLCpWTqwpA==
-  dependencies:
-    is-buffer "~2.0.3"
+flat@^5.0.1:
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/flat/-/flat-5.0.2.tgz#8ca6fe332069ffa9d324c327198c598259ceb241"
+  integrity sha512-b6suED+5/3rTpUBdG1gupIl8MPFCAMA0QXwmljLhvCUKcUvdE4gWky9zpuGCcXHOsz4J9wPGNWq6OKpmIzz3hQ==
 
 flatted@^2.0.0:
   version "2.0.2"
@@ -8795,11 +8794,6 @@ is-buffer@^1.1.5:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/is-buffer/-/is-buffer-1.1.6.tgz#efaa2ea9daa0d7ab2ea13a97b2b8ad51fefbe8be"
   integrity sha512-NcdALwpXkTm5Zvvbk7owOUSvVvBKDgKP5/ewfXEznmQFfs4ZRmanOeKBTjRVjka3QFoN6XJ+9F3USqfHqTaU5w==
-
-is-buffer@~2.0.3:
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/is-buffer/-/is-buffer-2.0.5.tgz#ebc252e400d22ff8d77fa09888821a24a658c191"
-  integrity sha512-i2R6zNFDwgEHJyQUtJEk0XFi1i0dPFn/oqjK3/vPCcDeJvW5NQ83V8QbicfF1SupOaB0h8ntgBC2YiE7dfyctQ==
 
 is-callable@^1.1.3, is-callable@^1.1.4, is-callable@^1.2.7:
   version "1.2.7"
@@ -11508,10 +11502,10 @@ pako@~1.0.2:
   resolved "https://registry.yarnpkg.com/pako/-/pako-1.0.11.tgz#6c9599d340d54dfd3946380252a35705a6b992bf"
   integrity sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==
 
-papaparse@^4.6.1:
-  version "4.6.3"
-  resolved "https://registry.yarnpkg.com/papaparse/-/papaparse-4.6.3.tgz#742e5eaaa97fa6c7e1358d2934d8f18f44aee781"
-  integrity sha512-LRq7BrHC2kHPBYSD50aKuw/B/dGcg29omyJbKWY3KsYUZU69RKwaBHu13jGmCYBtOc4odsLCrFyk6imfyNubJQ==
+papaparse@^5.2.0:
+  version "5.4.1"
+  resolved "https://registry.yarnpkg.com/papaparse/-/papaparse-5.4.1.tgz#f45c0f871853578bd3a30f92d96fdcfb6ebea127"
+  integrity sha512-HipMsgJkZu8br23pW15uvo6sib6wne/4woLZPlFf3rpDyMe9ywEXUsuD7+6K9PRkJlVT51j/sCOYDKGGS3ZJrw==
 
 parallel-transform@^1.1.0:
   version "1.2.0"
