@@ -105,36 +105,39 @@ class CreateAppModal extends Component {
 		} else if (!isEqual(prevProps.createdApp, createdApp) && createdApp && createdApp.error) {
 			const { actual } = createdApp.error;
 			const { error } = actual ?? {};
-
-			if (error && error.code === 402) {
+			if (error) {
 				const modalRef = Modal.error({
-					icon: null,
+					...(error.code === 402 ? { icon: null } : { title: error.code }),
 					okButtonProps: { style: { display: 'none' } },
-					content: (
-						<Flex flexDirection="column">
-							<Typography.Text strong type="danger">
-								<Icon component={CloseCircleFilled} twoToneColor="#1890ff" />{' '}
-								You&lsquo;ve hit the plan limits
-							</Typography.Text>
-							<br />
-							<Typography.Paragraph>
-								<span
-									style={{
-										cursor: 'pointer',
-										color: 'dodgerblue',
-									}}
-									onClick={() => {
-										window.Intercom('show');
-										modalRef.destroy();
-										handleModal();
-									}}
-								>
-									Contact Support
-								</span>{' '}
-								to upgrade your plan
-							</Typography.Paragraph>
-						</Flex>
-					),
+					closable: error.code !== 402,
+					content:
+						error.code === 402 ? (
+							<Flex flexDirection="column">
+								<Typography.Text strong type="danger">
+									<Icon component={CloseCircleFilled} twoToneColor="#1890ff" />{' '}
+									You&lsquo;ve hit the plan limits
+								</Typography.Text>
+								<br />
+								<Typography.Paragraph>
+									<span
+										style={{
+											cursor: 'pointer',
+											color: 'dodgerblue',
+										}}
+										onClick={() => {
+											window.Intercom('show');
+											modalRef.destroy();
+											handleModal();
+										}}
+									>
+										Contact Support
+									</span>{' '}
+									to upgrade your plan
+								</Typography.Paragraph>
+							</Flex>
+						) : (
+							<Typography.Paragraph>{error.message}</Typography.Paragraph>
+						),
 				});
 			}
 		}
