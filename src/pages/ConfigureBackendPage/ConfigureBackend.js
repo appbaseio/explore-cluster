@@ -130,36 +130,27 @@ const urlValidator = (control) => {
 		if (!control.value) {
 			return null;
 		}
-		let invalidLink = null;
-		const matcher =
+
+		const urlRegex =
 			// eslint-disable-next-line no-useless-escape
 			/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/;
+		const credentialsRegex = /(?<=:\/\/)(.*)(?=@)/;
 
-		invalidLink = !matcher.test(control.value);
+		const urlMatches = control.value.match(urlRegex);
+		const credentialsMatches = control.value.match(credentialsRegex);
 
-		return invalidLink ? { invalidLink } : null;
+		if (!urlMatches || !urlMatches[0]) {
+			return { invalidLink: true };
+		}
+		if (credentialsMatches && !credentialsMatches[0]) {
+			return {
+				invalidCredentials: true,
+			};
+		}
+		return null;
 	} catch (e) {
 		return {
 			invalidLink: true,
-		};
-	}
-};
-
-const credentialsValidator = (control) => {
-	try {
-		if (!control.value) {
-			return null;
-		}
-		let invalidCredentials = null;
-		// eslint-disable-next-line no-useless-escape
-		const matcher = /^[0-9a-zA-Z]+:[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+$/;
-
-		invalidCredentials = !matcher.test(control.value);
-
-		return invalidCredentials ? { invalidCredentials } : null;
-	} catch (e) {
-		return {
-			invalidCredentials: true,
 		};
 	}
 };
@@ -175,25 +166,28 @@ const ConfigureBackend = (props) => {
 	};
 	const [disabledSave, setDisabledSave] = useState(true);
 	const [isLoading, setIsLoading] = useState(false);
+	const [isURLRequired, setIsURLRequired] = useState(true);
 	const form = useRef(
 		FormBuilder.group({
 			backend: ['', [Validators.required]],
 			url: ['', [Validators.required, urlValidator]],
-			credentials: ['', [Validators.required, credentialsValidator]],
 		}),
 	);
 
+	const _urlInputRef = useRef(null);
+
 	const handeConfigureBackend = () => {
 		setIsLoading(true);
-		const { backend, url, credentials } = form.current.value;
-
-		const { host, protocol } = new URL(url);
+		const { backend, url } = form.current.value;
 		const payload = {
 			backend,
-			protocol: `${protocol.substring(0, protocol.length - 1)}`,
-			host,
-			basic_auth: credentials,
 		};
+		if (backend !== BACKENDS.SYSTEM.name) {
+			const { host, protocol, username, password } = new URL(url);
+			payload.host = host;
+			payload.protocol = `${protocol.substring(0, protocol.length - 1)}`;
+			payload.basic_auth = `${username}:${password}`;
+		}
 
 		const checkForServerRestart = () => {
 			// insist user to not leave the current page
@@ -210,8 +204,11 @@ const ConfigureBackend = (props) => {
 						message: 'Success',
 						description: 'Successfully updated search backend.',
 					});
+					form.current.get('url').markAsPristine();
+					form.current.get('url').markAsUntouched();
 					// reset form values, exception is selected backend
-					form.current.patchValue({ url: '', credentials: '' });
+					form.current.reset({ url: '', backend });
+
 					// remove unload event listener
 					window.onbeforeunload = null;
 				})
@@ -232,6 +229,9 @@ const ConfigureBackend = (props) => {
 					message: 'Error',
 					description: 'Updating search backend failed!',
 				});
+			})
+			.finally(() => {
+				setIsLoading(false);
 			});
 	};
 
@@ -240,9 +240,24 @@ const ConfigureBackend = (props) => {
 			setDisabledSave(status === 'INVALID');
 		};
 
-		form.current.statusChanges.subscribe(valueChangeListener);
+		const backendValListener = (val) => {
+			if (!isURLRequired && val !== BACKENDS.SYSTEM.name) {
+				form.current.get('url').setValue('');
+				form.current.get('url').markAsUntouched();
+			}
+			setIsURLRequired(val !== BACKENDS.SYSTEM.name);
+			if (val === BACKENDS.SYSTEM.name && disabledSave) {
+				setDisabledSave(false);
+			} else {
+				setDisabledSave(true);
+			}
+		};
+
+		form.current.get('url').statusChanges.subscribe(valueChangeListener);
+		form.current.get('backend').valueChanges.subscribe(backendValListener);
 		return () => {
 			form.current.statusChanges.unsubscribe(valueChangeListener);
+			form.current.get('backend').valueChanges.unsubscribe(backendValListener);
 		};
 	}, []);
 
@@ -358,6 +373,15 @@ const ConfigureBackend = (props) => {
 														</Typography.Text>
 														&nbsp; Choose search engine{' '}
 													</Typography.Text>
+													<br />
+													{inputHandler.value ===
+														BACKENDS.SYSTEM.name && (
+														<p style={{ maxWidth: '200px' }}>
+															System backend provides you with 2
+															geo-distributed search indexes on
+															OpenSearch out of the box.
+														</p>
+													)}
 												</Card>
 												<Radio.Group
 													{...inputHandler}
@@ -371,7 +395,7 @@ const ConfigureBackend = (props) => {
 																	BACKENDS.FUSION.name &&
 																item.name !==
 																	BACKENDS.MARKLOGIC.name &&
-																item.name !== BACKENDS.SYSTEM.name,
+																item.name !== BACKENDS.ZINC.name,
 														)
 														.map(({ name, logo }) => (
 															<Radio.Button
@@ -379,8 +403,8 @@ const ConfigureBackend = (props) => {
 																value={name}
 																key={name}
 															>
-																{name === 'fusion' ? (
-																	<h4>Fusion</h4>
+																{name === BACKENDS.SYSTEM.name ? (
+																	<h4>System</h4>
 																) : (
 																	<img
 																		src={logo}
@@ -395,82 +419,60 @@ const ConfigureBackend = (props) => {
 										);
 									}}
 								/>
-								<Flex className="card-wrapper">
-									<Card className="field-label" bordered={false}>
-										<Typography.Text>Connect to your cluster!</Typography.Text>
-									</Card>
-									<div className="fields-wrapper">
-										<FieldControl
-											strict={false}
-											name="url"
-											render={({ handler, hasError, touched }) => {
-												const inputHandler = handler();
-												let errorMessage = '';
-												if (hasError && touched) {
-													if (hasError('required')) {
-														errorMessage = 'URL is a required field';
-													} else if (hasError('invalidLink')) {
-														errorMessage = 'Enter a valid link';
+								{isURLRequired && (
+									<Flex className="card-wrapper">
+										<Card className="field-label" bordered={false}>
+											<Typography.Text>
+												Connect to your cluster!
+											</Typography.Text>
+										</Card>
+										<div className="fields-wrapper">
+											<FieldControl
+												strict={false}
+												name="url"
+												render={({ handler, hasError, touched }) => {
+													const inputHandler = handler();
+													let errorMessage = '';
+													if (hasError && touched) {
+														if (hasError('required')) {
+															errorMessage =
+																'URL is a required field';
+														} else if (hasError('invalidLink')) {
+															errorMessage = 'Enter a valid link';
+														} else if (hasError('invalidCredentials')) {
+															errorMessage =
+																'The credentials are invalid';
+														}
 													}
-												}
-												return (
-													<Form.Item
-														label="URL"
-														name="url"
-														required
-														labelAlign="left"
-														validateStatus={
-															errorMessage ? 'error' : undefined
-														}
-														colon={false}
-														extra={
-															<span className="error-span">
-																{errorMessage}
-															</span>
-														}
-													>
-														<Input {...inputHandler} />
-													</Form.Item>
-												);
-											}}
-										/>
-										<FieldControl
-											strict={false}
-											name="credentials"
-											render={({ handler, hasError, touched }) => {
-												const inputHandler = handler();
-												let errorMessage = '';
-												if (hasError && touched) {
-													if (hasError('required')) {
-														errorMessage =
-															'Credentials is a required field';
-													} else if (hasError('invalidCredentials')) {
-														errorMessage = 'Enter valid credentials';
-													}
-												}
-												return (
-													<Form.Item
-														label="Credentials"
-														name="credentials"
-														required
-														labelAlign="left"
-														validateStatus={
-															errorMessage ? 'error' : undefined
-														}
-														colon={false}
-														extra={
-															<span className="error-span">
-																{errorMessage}
-															</span>
-														}
-													>
-														<Input {...inputHandler} />
-													</Form.Item>
-												);
-											}}
-										/>
-									</div>
-								</Flex>
+
+													return (
+														<Form.Item
+															label="URL"
+															name="url"
+															required
+															labelAlign="left"
+															validateStatus={
+																errorMessage ? 'error' : undefined
+															}
+															colon={false}
+															extra={
+																<span className="error-span">
+																	{errorMessage}
+																</span>
+															}
+															tooltip="Include credentials in the URL itself, e.g., https://username:password@example.com"
+														>
+															<Input
+																{...inputHandler}
+																ref={_urlInputRef}
+															/>
+														</Form.Item>
+													);
+												}}
+											/>
+										</div>
+									</Flex>
+								)}
 							</Flex>
 						);
 					}}
