@@ -312,7 +312,7 @@ export const getOperationType = (value) => {
 	let operationType;
 	Object.keys(Types).every((k) => {
 		const type = Types[k];
-		if (isEqual(sortBy(value.ops), sortBy(type.ops))) {
+		if (isEqual(sortBy(value?.ops), sortBy(type?.ops))) {
 			operationType = type;
 			return false;
 		}
@@ -366,8 +366,10 @@ export const mapValuesToForm = (value, hasLimits, appbaseVersion, backendImage) 
 
 	return {
 		...value,
-		operationType: value.is_admin ? Types.admin : getOperationType(value),
-		ip_limit: get(value, 'limits.ip_limit'),
+		operationType: value.is_admin
+			? Types.admin
+			: getOperationType(value) ?? getOperationType(value.operationType),
+		ip_limit: get(value, 'limits.ip_limit') ?? get(value, 'ip_limit'),
 		ttl: parseInt(value.ttl, 10),
 		isAdmin: value.is_admin,
 		indices: value.indices ? filter(value.indices, (o) => o !== '') : undefined,
