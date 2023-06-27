@@ -2,7 +2,7 @@
 import React, { Fragment, useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { css } from 'emotion';
-import { Link } from 'react-router-dom';
+import { Link, Prompt } from 'react-router-dom';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import {
@@ -55,6 +55,7 @@ import {
 	getConsoleLogsArray,
 	TAB_ACTIONS,
 	trimExtension,
+	DEFAULT_SCRIPT_FILE_VALUE,
 } from './utils';
 import PipelineCard from './components/PipelineCard';
 import TabContent from './components/TabContent';
@@ -70,6 +71,7 @@ import PipelineEditorComponent from './components/PipelineEditorComponent';
 import { isJson } from '../../components/ScriptConsole/utils';
 import PipelineVersionsDrawer from './components/PipelineVersionsDrawer';
 import VersionDescriptionModal from './components/VersionDescriptionModal';
+import DeleteModal from '../../components/DeleteModal';
 
 const { Panel } = Collapse;
 const link = css`
@@ -243,6 +245,7 @@ const PipelinesForm = (props) => {
 		updatePipelineVersion,
 		isVersionCreating,
 	} = props;
+
 	const isEditPage = get(match, 'params.id');
 	const [showTemplateChoser, setShowTemplateChoser] = useState(!isEditPage);
 	const [selectedTemplate, setSelectedTemplate] = useState('');
@@ -342,6 +345,57 @@ const PipelinesForm = (props) => {
 			}
 		}
 		setScriptFilesMap(newFilesMap);
+	};
+
+	const hasPipelineFormChanged = () => {
+		let initialPipelineEditorValue = '';
+		if (pipeline?.content) {
+			let pipelineValue;
+			if (pipeline.extension === 'yaml') {
+				pipelineValue = JSON.stringify(yamlToJson.load(pipeline.content));
+			} else if (pipeline.extension === 'json') {
+				pipelineValue = pipeline.content;
+			}
+
+			initialPipelineEditorValue = JSON.stringify(JSON.parse(pipelineValue), null, 4);
+		}
+		let initialScriptFilesMap = {};
+		const scriptFileNames = Object.keys(pipelineScripts) ?? [];
+		if (scriptFileNames.length) {
+			const newScriptFilesMap = {};
+			scriptFileNames.forEach((fileKey) => {
+				if (
+					!(newScriptFilesMap[fileKey] || newScriptFilesMap[trimExtension(fileKey)]) ||
+					!isEqual(
+						pipelineScripts[fileKey]?.content,
+						newScriptFilesMap[fileKey]?.scriptValue,
+					)
+				) {
+					Object.assign(newScriptFilesMap, {
+						[fileKey]: {
+							scriptValue: pipelineScripts[fileKey].content,
+							validatedScripRule: '',
+						},
+					});
+				}
+			});
+			initialScriptFilesMap = newScriptFilesMap;
+		}
+
+		return !isEqual(
+			Object.fromEntries(
+				generatePipelinePayload(
+					initialPipelineEditorValue,
+					filterScriptFilesMap(initialPipelineEditorValue, initialScriptFilesMap),
+				).entries(),
+			),
+			Object.fromEntries(
+				generatePipelinePayload(
+					editorPipelineValue,
+					filterScriptFilesMap(editorPipelineValue, scriptFilesMap),
+				).entries(),
+			),
+		);
 	};
 
 	useLayoutEffect(() => {
@@ -448,6 +502,13 @@ const PipelinesForm = (props) => {
 	useEffect(() => {
 		// validate when either pipeline or script tab is removed
 		validateMissingScriptFiles();
+		if (hasPipelineFormChanged()) {
+			window.onbeforeunload = () => {
+				return 'You have unsaved changes, are you sure you want to leave?';
+			};
+		} else {
+			window.onbeforeunload = () => {};
+		}
 	}, [editorPipelineValue, scriptFilesMap]);
 
 	const getCurrentVersion = useCallback(() => {
@@ -554,46 +615,68 @@ const PipelinesForm = (props) => {
 
 			// update ScriptFileMap
 			updateScriptFileMap(newTabKey, SCRIPT_FILES_MAP_ACTIONS.ADD, {
-				scriptValue: '',
+				scriptValue: DEFAULT_SCRIPT_FILE_VALUE,
 				validatedScriptValue: '',
 			});
 		} else if (action === TAB_ACTIONS.REMOVE) {
-			const newTabPanes = tabPanes.filter((tabItem) => {
-				return !(tabItem.key === targetKey);
+			DeleteModal.open({
+				name: `script file`,
+				value: targetKey,
+				title: `Delete ${targetKey} file`,
+				onDelete: () => {
+					const newTabPanes = tabPanes.filter((tabItem) => {
+						return !(tabItem.key === targetKey);
+					});
+					setTabPanes(newTabPanes);
+
+					// reset active tab
+					const activeTab = newTabPanes.length
+						? newTabPanes[newTabPanes.length - 1].key
+						: DEFAULT_TAB_KEY;
+					setactiveTabKey(activeTab);
+
+					// update ScriptFileMap
+					updateScriptFileMap(targetKey, SCRIPT_FILES_MAP_ACTIONS.REMOVE);
+				},
+				text: (
+					<p>
+						This action will remove the code for the
+						<b> {targetKey} </b>
+						file. Unsaved changes will be permanently 
+						removed. Type the file name below to confirm,
+					</p>
+				),
 			});
-			setTabPanes(newTabPanes);
-
-			// reset active tab
-			const activeTab = newTabPanes.length
-				? newTabPanes[newTabPanes.length - 1].key
-				: DEFAULT_TAB_KEY;
-			setactiveTabKey(activeTab);
-
-			// update ScriptFileMap
-			updateScriptFileMap(targetKey, SCRIPT_FILES_MAP_ACTIONS.REMOVE);
 		}
 	};
 
 	// this is used to get rid of script files which aren't part of pipeline yaml
 	const filterScriptFilesMap = (pipelineJSONString, scriptFilesMapParam) => {
-		const newScriptFilesMap = {};
-		const pipelinesStages = JSON.parse(pipelineJSONString)?.stages;
-		if (Array.isArray(pipelinesStages) && pipelinesStages.length) {
-			pipelinesStages.forEach((stageItem) => {
-				if (stageItem?.scriptRef) {
-					if (Object.keys(scriptFilesMap).includes(stageItem?.scriptRef)) {
-						newScriptFilesMap[stageItem?.scriptRef] =
-							scriptFilesMapParam[stageItem?.scriptRef];
-					} else if (
-						Object.keys(scriptFilesMap).includes(trimExtension(stageItem?.scriptRef))
-					) {
-						newScriptFilesMap[stageItem?.scriptRef] =
-							scriptFilesMapParam[trimExtension(stageItem?.scriptRef)];
+		try {
+			const newScriptFilesMap = {};
+			const pipelinesStages = JSON.parse(pipelineJSONString)?.stages;
+			if (Array.isArray(pipelinesStages) && pipelinesStages.length) {
+				pipelinesStages.forEach((stageItem) => {
+					if (stageItem?.scriptRef) {
+						if (Object.keys(scriptFilesMap).includes(stageItem?.scriptRef)) {
+							newScriptFilesMap[stageItem?.scriptRef] =
+								scriptFilesMapParam[stageItem?.scriptRef];
+						} else if (
+							Object.keys(scriptFilesMap).includes(
+								trimExtension(stageItem?.scriptRef),
+							)
+						) {
+							newScriptFilesMap[stageItem?.scriptRef] =
+								scriptFilesMapParam[trimExtension(stageItem?.scriptRef)];
+						}
 					}
-				}
-			});
+				});
+			}
+			return newScriptFilesMap;
+		} catch (error) {
+			console.error(error);
+			return {};
 		}
-		return newScriptFilesMap;
 	};
 
 	const handlePipelineValidation = () => {
@@ -868,6 +951,10 @@ const PipelinesForm = (props) => {
 
 	return (
 		<div className={container}>
+			<Prompt
+				when={hasPipelineFormChanged()}
+				message="You have unsaved changes, are you sure you want to leave?"
+			/>
 			{showTemplateChoser ? (
 				<PipelineTemplateChooser
 					isVisible={showTemplateChoser}

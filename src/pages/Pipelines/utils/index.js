@@ -168,3 +168,6 @@ export const modifySchema = (schema) => {
 	}
 	return processedSchema;
 };
+
+export const DEFAULT_SCRIPT_FILE_VALUE =
+	"// your function handler should always be named as handleRequest() \n function handleRequest() { \n // Accessible variables within the function: context,\n // e.g. 1. context.envs contains the envs set by the pipeline and dynamically at runtime\n //      2. JSON.parse(context.request.body) provides the JSON of the request body - useful for changes to request body\n//      3. JSON.parse(context.response.body) provides the JSON of the request body - useful for enriching the response body\n // The function expects a return value of the context if you're making changes to the request or response body or setting a variable\n // e.g. return { ...context, myVar: myVar }\n console.log(\"request body is: \", context.request.body);\n var myVar = 'test';\n 	// sets myVar at the top-level in the context,\n return { ...context, myVar };}";

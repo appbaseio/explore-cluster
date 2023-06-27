@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes, { object } from 'prop-types';
-import { withRouter } from 'react-router-dom';
+import { Prompt, withRouter } from 'react-router-dom';
 import get from 'lodash/get';
 import {
 	ClockCircleOutlined,
@@ -98,6 +98,9 @@ const ModalHeader = ({
 	const templateObj = getTemplate(themeType);
 	let myInterval = null;
 
+	const hasCodeChanged = () => {
+		return JSON.stringify(initialCode) !== JSON.stringify(updatedCode);
+	};
 	useEffect(() => {
 		getSearchPreferenceVersions(preferenceId);
 		const { deploymentStatus = {} } = versionState[preferenceId] ?? {};
@@ -124,6 +127,14 @@ const ModalHeader = ({
 			setErrMsg('Manifest is missing');
 		} else {
 			setErrMsg('');
+		}
+
+		if (hasCodeChanged()) {
+			window.onbeforeunload = () => {
+				return 'You have unsaved changes, are you sure you want to leave?';
+			};
+		} else {
+			window.onbeforeunload = () => {};
 		}
 	}, [updatedCode]);
 
@@ -260,8 +271,13 @@ const ModalHeader = ({
 	};
 
 	const { deploymentStatus = {} } = versionState[preferenceId] ?? {};
+
 	return (
 		<>
+			<Prompt
+				when={hasCodeChanged()}
+				message="You have unsaved changes, are you sure you want to leave?"
+			/>
 			<div className="header-container">
 				<div className="header-title-container" style={{ width: '100%' }}>
 					<div className="header-font">Code Editor</div>
