@@ -247,6 +247,7 @@ const PipelinesForm = (props) => {
 	} = props;
 
 	const isEditPage = get(match, 'params.id');
+	const [showUnloadPrompt, setShowUnloadPrompt] = useState(true);
 	const [showTemplateChoser, setShowTemplateChoser] = useState(!isEditPage);
 	const [selectedTemplate, setSelectedTemplate] = useState('');
 
@@ -642,8 +643,8 @@ const PipelinesForm = (props) => {
 					<p>
 						This action will remove the code for the
 						<b> {targetKey} </b>
-						file. Unsaved changes will be permanently 
-						removed. Type the file name below to confirm,
+						file. Unsaved changes will be permanently removed. Type the file name below
+						to confirm,
 					</p>
 				),
 			});
@@ -808,11 +809,12 @@ const PipelinesForm = (props) => {
 								message.success(
 									`successfully updated pipeline version: ${pipeline.activeVersion}`,
 								);
-								history.push('/cluster/pipelines');
+								fetchPipelines();
 							}
 						});
 				}
 			} else {
+				setShowUnloadPrompt(false);
 				createPipeline(pipelinePayload).then((res) => {
 					if (res?.error) {
 						notification.error({
@@ -823,6 +825,7 @@ const PipelinesForm = (props) => {
 						});
 					} else if (res.payload) {
 						message.success('successfully created pipeline');
+
 						history.push('/cluster/pipelines');
 					}
 				});
@@ -951,10 +954,12 @@ const PipelinesForm = (props) => {
 
 	return (
 		<div className={container}>
-			<Prompt
-				when={hasPipelineFormChanged()}
-				message="You have unsaved changes, are you sure you want to leave?"
-			/>
+			{showUnloadPrompt && (
+				<Prompt
+					when={hasPipelineFormChanged()}
+					message="You have unsaved changes, are you sure you want to leave?"
+				/>
+			)}
 			{showTemplateChoser ? (
 				<PipelineTemplateChooser
 					isVisible={showTemplateChoser}
