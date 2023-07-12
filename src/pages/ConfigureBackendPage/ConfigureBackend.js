@@ -376,7 +376,13 @@ const ConfigureBackend = (props) => {
 													<br />
 													{inputHandler.value ===
 														BACKENDS.SYSTEM.name && (
-														<p style={{ maxWidth: '200px' }}>
+														<p
+															style={{
+																maxWidth: '200px',
+																fontWeight: 'normal',
+																fontSize: '14px',
+															}}
+														>
 															System backend provides you with 2
 															geo-distributed search indexes on
 															OpenSearch out of the box.

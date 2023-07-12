@@ -192,7 +192,7 @@ const AIPreferences = (props) => {
 			</React.Fragment>
 		);
 
-	if (!isValidPlan(tier, featureAI, features.AI)) {
+	if (!ALLOWED_SLS.includes(backendImage) && !isValidPlan(tier, featureAI, features.AI)) {
 		return (
 			<React.Fragment>
 				<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />

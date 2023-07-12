@@ -109,7 +109,7 @@ class CreateAppModal extends Component {
 				const modalRef = Modal.error({
 					...(error.code === 402 ? { icon: null } : { title: error.code }),
 					okButtonProps: { style: { display: 'none' } },
-					closable: error.code !== 402,
+					closable: true,
 					content:
 						error.code === 402 ? (
 							<Flex flexDirection="column">

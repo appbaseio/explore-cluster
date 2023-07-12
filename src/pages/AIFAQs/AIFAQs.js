@@ -92,7 +92,7 @@ const AIFAQsComponent = (props) => {
 			</React.Fragment>
 		);
 
-	if (!isValidPlan(tier, featureAI, features.AI)) {
+	if (!ALLOWED_SLS.includes(backendImage) && !isValidPlan(tier, featureAI, features.AI)) {
 		return (
 			<React.Fragment>
 				<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
@@ -210,6 +210,7 @@ const mapStateToProps = (state) => ({
 	isAIFAQsLoading: get(state, '$getAIReducer.faqs.isFetching', false),
 	featureAI: get(state, '$getAppPlan.results.feature_openai', false),
 	AIFAQs: get(state, '$getAIReducer.faqs.data', null),
+	backendImage: get(state, '$getAppPlan.results.image_type') ?? '',
 });
 
 const mapDispatchToProps = (dispatch) => ({
