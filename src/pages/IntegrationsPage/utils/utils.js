@@ -804,6 +804,9 @@ export const defaultSearchPreferences = {
 		redirectUrlIcon: '',
 	},
 	autosuggest: true,
+	searchEnableAI: false,
+	searchAISettings: {},
+	showAIAnswer: false,
 	showSearchAs: 'sticky',
 	showVoiceSearch: true,
 	autoSuggestionSettings: {
@@ -1141,6 +1144,7 @@ export const getSearchPreferencesPayload = (formValue) => {
 							? componentTypes.reactiveMap
 							: componentTypes.reactiveList,
 				},
+				showAIAnswer: get(formValue, 'showAIAnswer'),
 				sortOptionSelector: get(formValue, 'sortOptionSelector'),
 				resultHighlight: get(formValue, 'resultHighlight'),
 				layout: get(formValue, 'layout'),
@@ -1184,6 +1188,20 @@ export const getSearchPreferencesPayload = (formValue) => {
 				},
 				rsConfig: {
 					autosuggest: get(formValue, 'autosuggest'),
+					enableAI: get(formValue, 'searchEnableAI'),
+					AIUIConfig: {
+						showSourceDocuments: get(
+							formValue,
+							'searchAISettings.showSourceDocuments',
+							undefined,
+						),
+						sourceDocumentLabel: get(
+							formValue,
+							'searchAISettings.sourceDocumentLabel',
+							undefined,
+						),
+						askButton: get(formValue, 'searchAISettings.askButton', undefined),
+					},
 					enablePopularSuggestions: get(
 						formValue,
 						'autoSuggestionSettings.enablePopularSuggestions',
@@ -1491,6 +1509,9 @@ export const perPageDependentKeys = [
 	'categoryFieldValue',
 	'autosuggest',
 	'autoSuggestionSettings',
+	'searchEnableAI',
+	'searchAISettings',
+	'showAIAnswer',
 	'showVoiceSearch',
 	'indexSettings',
 ];
@@ -1724,8 +1745,8 @@ export const getDiffData = (oldObj, newObj, isPageLevelDiff = false, isRecommend
 			const oldVal = get(oldObj, 'globalSettings.showSelectedFilters', '');
 			diffData = {
 				...diffData,
-				resultSettings: {
-					...diffData.resultSettings,
+				globalSettings: {
+					...diffData.globalSettings,
 					showSelectedFilters: [oldVal, newVal],
 				},
 			};
@@ -1905,10 +1926,25 @@ export const getDiffData = (oldObj, newObj, isPageLevelDiff = false, isRecommend
 		}
 		if (get(diffData, 'searchSettings.rsConfig', null)) {
 			const searchSettings = get(diffData, 'searchSettings.rsConfig', {});
+
 			Object.keys(searchSettings).forEach((field) => {
 				if (searchSettings[field].length !== 2) {
 					const newVal = get(newObj, `searchSettings.rsConfig.${field}`, '');
 					const oldVal = get(oldObj, `searchSettings.rsConfig.${field}`, '');
+					searchSettings[field] = [oldVal, newVal];
+				}
+				// Handle nested object case
+				if (field === 'AIUIConfig' && searchSettings[field]) {
+					const newVal = { ...get(newObj, `searchSettings.rsConfig.${field}`, {}) };
+					const oldVal = { ...get(oldObj, `searchSettings.rsConfig.${field}`, {}) };
+
+					const propertyInDiff = Object.keys({ ...oldVal, ...newVal });
+					propertyInDiff.forEach((p) => {
+						if (oldVal[p] === newVal[p]) {
+							delete oldVal[p];
+							delete newVal[p];
+						}
+					});
 					searchSettings[field] = [oldVal, newVal];
 				}
 			});

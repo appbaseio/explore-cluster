@@ -4,7 +4,7 @@ import {
 	componentTypes,
 	ReactiveBase,
 	ReactiveChart,
-	ReactiveComponent,
+	ReactiveComponentPrivate,
 } from '@appbaseio/reactivesearch';
 import { connect } from 'react-redux';
 import { get } from 'lodash';
@@ -234,14 +234,14 @@ const LivePreview = React.memo(
 									/>
 								) : (
 									<>
-										<ReactiveComponent
+										<ReactiveComponentPrivate
 											componentId={RS_COMPONENT_ID}
 											preferencesPath={RS_COMPONENT_ID}
 											{...functions.component}
 										/>
 										{typeof functions.hiddenComponent.render === 'function' ? (
 											<div style={hiddenComponentStyles}>
-												<ReactiveComponent
+												<ReactiveComponentPrivate
 													componentId={HIDDEN_RS_COMPONENT_ID}
 													preferencesPath={HIDDEN_RS_COMPONENT_ID}
 													{...functions.hiddenComponent}
@@ -250,7 +250,7 @@ const LivePreview = React.memo(
 										) : null}
 										{typeof functions.result.render === 'function' ? (
 											<div style={hiddenComponentStyles}>
-												<ReactiveComponent
+												<ReactiveComponentPrivate
 													componentId={HIDDEN_RESULT_COMPONENT_ID}
 													preferencesPath={HIDDEN_RESULT_COMPONENT_ID}
 													render={functions.result.render}

@@ -96,6 +96,98 @@ const DiffList = ({ diff: diffProp }) => {
 		}
 		return null;
 	};
+	const renderObject = (item) => {
+		const propertiesToDiff =
+			item.data &&
+			typeof item.data === 'object' &&
+			Object.keys({ ...item.data[0], ...item.data[1] });
+		const dataSource = propertiesToDiff.map((field) => ({
+			key: field,
+			oldVal: item.data[0] && item.data[0][field],
+			newVal: item.data[1] && item.data[1][field],
+		}));
+
+		return (
+			<>
+				<h4>{item.title}</h4>
+				<Table
+					bordered
+					key={item.title}
+					pagination={false}
+					size="small"
+					rowKey="field"
+					dataSource={dataSource}
+					style={{
+						height: 'max-content',
+						marginBottom: '7px',
+						overflow: 'auto',
+					}}
+					columns={[
+						{
+							title: 'Property',
+							key: 'key',
+							dataIndex: 'key',
+							render: (field) => (
+								<>
+									<span>{field}</span>
+								</>
+							),
+						},
+						{
+							title: 'Old Value',
+							key: 'oldVal',
+							dataIndex: 'oldVal',
+							width: '50%',
+							render: (ov) => (
+								<Tag
+									color="volcano"
+									style={{
+										textDecoration: 'line-through',
+									}}
+									data-cy={`old-value-${item.title}-status`}
+								>
+									{typeof ov === 'boolean' ||
+									(typeof ov === 'object' && ov !== null) ? (
+										<pre
+											css={{
+												margin: 0,
+											}}
+										>
+											{JSON.stringify(ov, null, 4)}
+										</pre>
+									) : (
+										ov
+									)}
+								</Tag>
+							),
+						},
+						{
+							title: 'New Value',
+							key: 'newVal',
+							dataIndex: 'newVal',
+							width: '50%',
+							render: (nv) => (
+								<Tag color="green" data-cy={`new-value-${item.title}-status`}>
+									{typeof nv === 'boolean' ||
+									(typeof nv === 'object' && nv !== null) ? (
+										<pre
+											css={{
+												margin: 0,
+											}}
+										>
+											{JSON.stringify(nv, null, 4)}
+										</pre>
+									) : (
+										nv
+									)}
+								</Tag>
+							),
+						},
+					]}
+				/>
+			</>
+		);
+	};
 	const renderDiffUI = (diffObject) => {
 		let diff = diffObject;
 		let { sectionTitle } = diff;
@@ -220,15 +312,14 @@ const DiffList = ({ diff: diffProp }) => {
 																			'data.length',
 																			0,
 																	  ) === 2 &&
-																	  item.title !== 'dataField' &&
-																	  item.title !==
-																			'fieldWeights' &&
-																	  item.title !==
-																			'ngramSettings' &&
-																	  item.title !==
-																			'autosuggestionSettings' &&
-																	  item.title !==
-																			'rankFeature' &&
+																	  ![
+																			'dataField',
+																			'fieldWeights',
+																			'ngramSettings',
+																			'autosuggestionSettings',
+																			'rankFeature',
+																			'AIUIConfig',
+																	  ].includes(item.title) &&
 																	  (typeof item.data[0] ===
 																			'object' &&
 																	  item.data[0] !== null ? (
@@ -412,6 +503,9 @@ const DiffList = ({ diff: diffProp }) => {
 																				]}
 																			/>
 																	  ))
+																	: null}
+																{item.title === 'AIUIConfig'
+																	? renderObject(item)
 																	: null}
 																{(item.title === 'charts' ||
 																	item.title ===

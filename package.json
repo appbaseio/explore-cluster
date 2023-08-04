@@ -7,6 +7,9 @@
 	"author": "Deepak Grover <deepakgrover333@gmail.com>",
 	"license": "MIT",
 	"private": false,
+	"engines": {
+		"node": ">=14 <=18"
+	},
 	"scripts": {
 		"start": "NODE_ENV=development webpack-dev-server --mode development . --history-api-fallback  --hot --progress --port 3333 --no-client-overlay",
 		"lint": "eslint --cache .",
@@ -82,10 +85,10 @@
 		"@ant-design/icons": "^4.0.0",
 		"@appbaseio-confidential/importer": "git+https://1dc0d0fc07f05943afdde9bdb85b7aa438a0ce3b:x-oauth-basic@github.com/appbaseio-confidential/importer#5215c4ac95bf42babab6f2b70db4197beb6d1ec4",
 		"@appbaseio-confidential/reactivesearch-playground": "^1.2.16-beta",
-		"@appbaseio/dejavu-browser": "^4.0.0",
+		"@appbaseio/dejavu-browser": "^4.0.1",
 		"@appbaseio/react-filter-box": "^3.4.1",
 		"@appbaseio/reactivemaps": "^3.0.0-beta.14",
-		"@appbaseio/reactivesearch": "latest",
+		"@appbaseio/reactivesearch": "4.0.0-rc.21",
 		"@babel/plugin-proposal-class-properties": "^7.0.0-rc.1",
 		"@codesandbox/sandpack-react": "1.17.0",
 		"@codesandbox/sandpack-themes": "^1.13.0",

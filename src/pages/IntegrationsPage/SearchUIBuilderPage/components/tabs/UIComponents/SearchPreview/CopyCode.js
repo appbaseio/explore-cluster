@@ -67,7 +67,7 @@ const CopyCode = ({
 		}
 
 		return `
-import { ReactiveBase, ReactiveComponent } from "@appbaseio/reactivesearch";
+import { ReactiveBase, ReactiveComponentPrivate } from "@appbaseio/reactivesearch";
 export default Search = () => {
   const preferences = ${JSON.stringify(preferences)};
   return (
@@ -88,7 +88,7 @@ export default Search = () => {
 				: ''
 		}
 	>
-	  <ReactiveComponent
+	  <ReactiveComponentPrivate
 		componentId="search"
 		preferencesPath="pageSettings.pages.${
 			preferences?.pageSettings?.currentPage || 'home'

@@ -4,32 +4,13 @@ import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
 import { FieldControl, FieldGroup } from 'react-reactive-form';
-import { Switch, List, Button, Radio, Form } from 'antd';
+import { Switch, Button, Radio, Form, Divider, Input } from 'antd';
 import IndexSwitcher from '../../../../../../components/IndexSwitcher';
 import SearchPreviewModal from './SearchPreview';
 import { BACKENDS } from '../../../../../../batteries/utils';
+import { searchboxMessages } from '../../../../../../utils/messages';
 
-const { Item } = List;
-
-export const defaultSettings = [
-	{
-		id: 'autosuggest',
-		label: 'Show Autosuggestions',
-		value: true,
-	},
-	{
-		id: 'showVoiceSearch',
-		label: 'Enable Voice Search',
-		value: true,
-	},
-	{
-		id: 'showSearchAs',
-		label: 'CSS position of search bar',
-		value: true,
-	},
-];
-
-export const autosuggestionSettings = [
+const autosuggestionSettings = [
 	{
 		id: 'enablePopularSuggestions',
 		label: 'Show popular suggestions (based on analytics data)',
@@ -61,97 +42,145 @@ const Search = ({ history, pipeline, apps, form, backend, getPreferencesPayload 
 				/>
 			</h2>
 
-			<Form layout="vertical">
-				<List
-					dataSource={defaultSettings}
-					renderItem={(item) => {
-						if (item.id === 'showSearchAs') {
-							return (
-								<div>
-									<FieldControl name={item.id} strict={false}>
-										{(control) => {
-											return (
-												<Item
-													actions={[
-														<Radio.Group
-															{...control.handler()}
-															onChange={(e) => {
-																control.markAsTouched();
-																control
-																	.handler()
-																	.onChange(e.target.value);
-															}}
-														>
-															<Radio value="sticky">Sticky</Radio>
-															<Radio value="relative">Relative</Radio>
-														</Radio.Group>,
-													]}
-												>
-													<Item.Meta
-														title={
-															typeof item.label === 'function'
-																? item.label()
-																: item.label
-														}
-													/>
-												</Item>
-											);
-										}}
-									</FieldControl>
-									<div />
-								</div>
-							);
+			<Form
+				colon={false}
+				layout="horizontal"
+				labelWrap
+				labelCol={{ span: 18 }}
+				labelAlign="left"
+			>
+				<FieldControl name="autosuggest">
+					{({ value, onChange }) => (
+						<Form.Item label={<b>Show Autosuggestions</b>} name="autosuggest">
+							<Switch checked={value} onChange={onChange} />
+						</Form.Item>
+					)}
+				</FieldControl>
+				<FieldGroup name="autoSuggestionSettings">
+					{({ disabled }) => {
+						if (disabled || disabled === undefined) {
+							return null;
 						}
 
 						return (
 							<>
-								<FieldControl name={item.id}>
-									{({ value, onChange }) => (
-										<Item
-											actions={[
-												<Switch checked={value} onChange={onChange} />,
-											]}
-										>
-											<Item.Meta title={item.label} />
-										</Item>
-									)}
-								</FieldControl>
-								{item.id === 'autosuggest' && (
-									<FieldGroup name="autoSuggestionSettings">
-										{({ disabled }) => {
-											if (disabled || disabled === undefined) {
-												return null;
-											}
-
-											return (
-												<List
-													dataSource={autosuggestionSettings}
-													renderItem={(data) => (
-														<FieldControl name={data.id}>
-															{({ value, onChange }) => (
-																<Item
-																	style={{ paddingLeft: '20px' }}
-																	actions={[
-																		<Switch
-																			checked={value}
-																			onChange={onChange}
-																		/>,
-																	]}
-																>
-																	<Item.Meta title={data.label} />
-																</Item>
-															)}
-														</FieldControl>
-													)}
-												/>
-											);
-										}}
-									</FieldGroup>
-								)}
+								{autosuggestionSettings.map((data) => (
+									<FieldControl name={data.id}>
+										{({ value, onChange }) => (
+											<Form.Item
+												style={{ paddingLeft: '20px' }}
+												label={data.label}
+												name={data.id}
+											>
+												<Switch checked={value} onChange={onChange} />
+											</Form.Item>
+										)}
+									</FieldControl>
+								))}
 							</>
 						);
 					}}
-				/>
+				</FieldGroup>
+				<Divider />
+
+				<FieldControl name="searchEnableAI">
+					{({ value, onChange }) => (
+						<Form.Item label={<b>Enable AI Search</b>} name="searchEnableAI">
+							<Switch checked={value} onChange={onChange} />
+						</Form.Item>
+					)}
+				</FieldControl>
+				<FieldGroup name="searchAISettings">
+					{({ disabled }) => {
+						if (disabled || disabled === undefined) {
+							return null;
+						}
+						return (
+							<>
+								<FieldControl name="askButton">
+									{({ value, onChange }) => {
+										if (value === null) {
+											onChange(false);
+										}
+										return (
+											<Form.Item
+												style={{ paddingLeft: '20px' }}
+												label="Show ask button"
+												name="askButton"
+												tooltip={searchboxMessages.askButton}
+											>
+												<Switch checked={value} onChange={onChange} />
+											</Form.Item>
+										);
+									}}
+								</FieldControl>
+
+								<FieldControl name="showSourceDocuments">
+									{({ value, onChange }) => {
+										if (value === null) {
+											onChange(false);
+										}
+										return (
+											<Form.Item
+												style={{ paddingLeft: '20px' }}
+												label="Show source documents"
+												name="showSourceDocuments"
+												tooltip={searchboxMessages.showSourceDocuments}
+											>
+												<Switch
+													defaultChecked={false}
+													checked={value}
+													onChange={onChange}
+												/>
+											</Form.Item>
+										);
+									}}
+								</FieldControl>
+
+								<FieldControl name="sourceDocumentLabel">
+									{({ value, onChange }) => (
+										<Form.Item
+											style={{ paddingLeft: '20px' }}
+											label="Source document label"
+											tooltip={searchboxMessages.sourceDocumentLabel}
+										>
+											<Input
+												placeholder="Write a field name"
+												value={value}
+												onChange={onChange}
+											/>
+										</Form.Item>
+									)}
+								</FieldControl>
+							</>
+						);
+					}}
+				</FieldGroup>
+				<Divider />
+				<FieldControl name="showVoiceSearch">
+					{({ value, onChange }) => (
+						<Form.Item label={<b>Enable Voice Search</b>} name="showVoiceSearch">
+							<Switch checked={value} onChange={onChange} />
+						</Form.Item>
+					)}
+				</FieldControl>
+				<Divider />
+				<FieldControl name="showSearchAs" strict={false}>
+					{(control) => (
+						<Form.Item label={<b>CSS position of search bar</b>} name="showSearchAs">
+							<Radio.Group
+								{...control.handler()}
+								onChange={(e) => {
+									control.markAsTouched();
+									control.handler().onChange(e.target.value);
+								}}
+							>
+								<Radio value="sticky">Sticky</Radio>
+								<Radio value="relative">Relative</Radio>
+							</Radio.Group>
+						</Form.Item>
+					)}
+				</FieldControl>
 			</Form>
 			<p style={{ marginTop: '1em' }}>
 				Set search query settings such as fields to search on, weights to apply, typo

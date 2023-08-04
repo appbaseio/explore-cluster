@@ -101,6 +101,36 @@ export default JSON.stringify(appbasePrefs);
 	`;
 };
 
+/**
+ * object below means: string, array, object
+// Returns null if object is empty else returns the original object
+ * @param {Object} o (All objects including an array)
+ * @returns null if object is empty
+ */
+export function returnNullIfEmpty(obj) {
+	if (typeof o !== 'object') {
+		return o;
+	}
+	if (o === undefined) {
+		return null;
+	}
+	if (o === null) {
+		return null;
+	}
+	const o = removeEmpty(obj);
+	if (Array.isArray(o)) {
+		return o.length ? o : null;
+	}
+	return Object.keys(o).length ? o : null;
+}
+
+/**
+ * Remove null value properties in all types object(including arrays).
+ * Primitive values(numbers, string, booleans) are left as is.
+ * Supports nested object structure.
+ * @param {Object} obj
+ * @returns Object with properties having null value removed
+ */
 export const removeEmpty = (obj) => {
 	const isArray = Array.isArray(obj);
 	Object.keys(obj).forEach((k) => {
@@ -321,7 +351,11 @@ export const defaultPageSettings = (fields = {}) => {
 	return componentSettings;
 };
 
-// Trasform the preferences from B.E to get resultSettings, searchSettings, facetSettings from pageSettings of currentPage selected.
+/**
+ * Trasform the preferences from B.E to get resultSettings, searchSettings, facetSettings from pageSettings of currentPage selected.
+ * resultSettings and searchSettings are old keys which are not updated in new preferences.
+ * Instead pageSettings.componentSettings.result and pageSettings.componentSettings.search is used.
+ * */
 export const reOrderPreferences = (prefs, page = '') => {
 	let newPreferences = {};
 	let compSettings = {};

@@ -102,6 +102,12 @@ export const searchboxMessages = {
 	focusShortcuts: 'Enter the keyboard shortcut combination to open the searchbox',
 	addonBefore: 'HTML markup to show to the left side of the searchbox',
 	addonAfter: 'HTML markup to show to the right side of the searchbox',
+	showSourceDocuments:
+		'Whether to show the documents from which the AIAnswer is generated or not.',
+	sourceDocumentLabel:
+		"Set a custom label by setting string or JSX. source variable can be used to render the document data, e.g. setting 'title: '+ source.title will eval to 'title: W3C Snapshot 2023' for a title field with this value.",
+	askButton:
+		'When set, the AI answer action and the corresponding display of AIAnswer would be triggered when user presses the Ask button.',
 };
 
 // Messages for popular suggestions
