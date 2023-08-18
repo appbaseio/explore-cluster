@@ -72,6 +72,7 @@ import { isJson } from '../../components/ScriptConsole/utils';
 import PipelineVersionsDrawer from './components/PipelineVersionsDrawer';
 import VersionDescriptionModal from './components/VersionDescriptionModal';
 import DeleteModal from '../../components/DeleteModal';
+import { isValidJSONFormat } from '../../batteries/components/analytics/utils';
 
 const { Panel } = Collapse;
 const link = css`
@@ -254,7 +255,10 @@ const PipelinesForm = (props) => {
 	const [isValidateMode, setIsValidateMode] = useState(false);
 	const [isValidatingPipeline, setIsValidatingPipeline] = useState(false);
 	const [pipelineValidationRes, setPipelineValidationRes] = useState(null);
-	const [executionContext, setExecutionContext] = useState(DEFAULT_EXECUTION_CONTEXT_VALUE);
+	/* Store below as a string */
+	const [executionContext, setExecutionContext] = useState(
+		JSON.stringify(DEFAULT_EXECUTION_CONTEXT_VALUE),
+	);
 
 	const [editorPipelineValue, setEditorPipelineValue] = useState('');
 	// eslint-disable-next-line no-unused-vars
@@ -385,16 +389,19 @@ const PipelinesForm = (props) => {
 
 		return !isEqual(
 			Object.fromEntries(
-				generatePipelinePayload(
-					initialPipelineEditorValue,
-					filterScriptFilesMap(initialPipelineEditorValue, initialScriptFilesMap),
-				).entries(),
+				generatePipelinePayload({
+					pipelineJSON: initialPipelineEditorValue,
+					scriptRefsMap: filterScriptFilesMap(
+						initialPipelineEditorValue,
+						initialScriptFilesMap,
+					),
+				}).entries(),
 			),
 			Object.fromEntries(
-				generatePipelinePayload(
-					editorPipelineValue,
-					filterScriptFilesMap(editorPipelineValue, scriptFilesMap),
-				).entries(),
+				generatePipelinePayload({
+					pipelineJSON: editorPipelineValue,
+					scriptRefsMap: filterScriptFilesMap(editorPipelineValue, scriptFilesMap),
+				}).entries(),
 			),
 		);
 	};
@@ -461,6 +468,10 @@ const PipelinesForm = (props) => {
 			if (!pipeline.versions && !pipeline.isFetchingVersions) {
 				fetchPipelineVersions(pipeline?.id);
 			}
+		}
+
+		if (pipeline?.validateContext) {
+			setExecutionContext(pipeline?.validateContext);
 		}
 	}, [pipeline]);
 
@@ -684,13 +695,19 @@ const PipelinesForm = (props) => {
 		try {
 			setIsValidatingPipeline(true);
 			setPipelineValidationRes({});
-			const pipelinePayload = generatePipelinePayload(
-				editorPipelineValue,
-				filterScriptFilesMap(editorPipelineValue, scriptFilesMap),
-			);
+			const pipelinePayload = generatePipelinePayload({
+				pipelineJSON: editorPipelineValue,
+				scriptRefsMap: filterScriptFilesMap(editorPipelineValue, scriptFilesMap),
+			});
 			pipelinePayload.append('pipeline_id', pipeline.id);
 
-			const { request = {}, response = {}, envs = {} } = executionContext;
+			const {
+				request = {},
+				response = {},
+				envs = {},
+			} = isValidJSONFormat(executionContext)
+				? JSON.parse(executionContext)
+				: DEFAULT_EXECUTION_CONTEXT_VALUE;
 			if (request instanceof Object && !isEmpty(request)) {
 				const payloadRequestObject = {};
 				Object.assign(payloadRequestObject, {
@@ -764,10 +781,14 @@ const PipelinesForm = (props) => {
 	const handleSave = (versionSave = false, versionDescription) => {
 		try {
 			const { createPipeline } = props;
-			const pipelinePayload = generatePipelinePayload(
-				editorPipelineValue,
-				filterScriptFilesMap(editorPipelineValue, scriptFilesMap),
-			);
+
+			const pipelinePayload = generatePipelinePayload({
+				pipelineJSON: editorPipelineValue,
+				scriptRefsMap: filterScriptFilesMap(editorPipelineValue, scriptFilesMap),
+				executionContext: isValidJSONFormat(executionContext)
+					? executionContext
+					: JSON.stringify(DEFAULT_EXECUTION_CONTEXT_VALUE),
+			});
 			if (versionDescription) {
 				pipelinePayload.append('versionDescription', versionDescription);
 			}
