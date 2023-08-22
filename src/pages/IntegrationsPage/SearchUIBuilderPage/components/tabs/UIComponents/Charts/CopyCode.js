@@ -57,7 +57,7 @@ const CopyCode = ({ control, getPreferencesPayload, backend }) => {
 		}
 
 		return `
-import { ReactiveBase, ReactiveComponent } from "@appbaseio/reactivesearch";
+import { ReactiveBase, ReactiveComponentPrivate } from "@appbaseio/reactivesearch";
 export default Chart = () => {
   const preferences = ${prefs};
   return (
@@ -78,7 +78,7 @@ export default Chart = () => {
 				: ''
 		}
 	>
-	  <ReactiveComponent
+	  <ReactiveComponentPrivate
 		componentId="${control.componentId ? control.componentId : 'chartComponent'}"
 		preferencesPath="pageSettings.pages.${
 			preferences?.pageSettings?.currentPage || 'home'

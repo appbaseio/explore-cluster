@@ -133,6 +133,8 @@ export const defaultRateLimits = {
 	uibuilder: 10,
 	// new categories
 	cache: 10,
+	pipelines: 10,
+	ai: 10,
 };
 // Acl options
 export const aclOptions = [
@@ -161,6 +163,8 @@ export const aclOptions = [
 const newCategories = {
 	cache: { version: '7.42.0', insertAfter: 'searchrelevancy' },
 	storedquery: { version: '7.48.1', insertAfter: 'analytics' },
+	pipelines: { version: '8.0.0', insertAfter: 'uibuilder' },
+	ai: { version: '8.12.0', insertAfter: 'uibuilder' },
 };
 // Default Selected Acl
 export const defaultAclOptions = aclOptions;
@@ -224,6 +228,8 @@ export const aclOptionsLabel = {
 	uibuilder: 'UI Builder',
 	// new Categories
 	cache: 'Cache',
+	ai: 'AI',
+	pipelines: 'Pipelines',
 };
 
 // Acl options Message
@@ -254,6 +260,8 @@ export const aclOptionsMessage = {
 	uibuilder: 'Allow UI builder related actions',
 	// new Categories
 	cache: 'Allow cache related actions',
+	pipelines: 'Allow pipelines feature',
+	ai: 'Allow AI preferences configuration',
 };
 
 export const shouldHavePipelines = (backendImage) => ALLOWED_SLS.includes(backendImage);
@@ -304,7 +312,7 @@ export const getOperationType = (value) => {
 	let operationType;
 	Object.keys(Types).every((k) => {
 		const type = Types[k];
-		if (isEqual(sortBy(value.ops), sortBy(type.ops))) {
+		if (isEqual(sortBy(value?.ops), sortBy(type?.ops))) {
 			operationType = type;
 			return false;
 		}
@@ -358,8 +366,10 @@ export const mapValuesToForm = (value, hasLimits, appbaseVersion, backendImage) 
 
 	return {
 		...value,
-		operationType: value.is_admin ? Types.admin : getOperationType(value),
-		ip_limit: get(value, 'limits.ip_limit'),
+		operationType: value.is_admin
+			? Types.admin
+			: getOperationType(value) ?? getOperationType(value.operationType),
+		ip_limit: get(value, 'limits.ip_limit') ?? get(value, 'ip_limit'),
 		ttl: parseInt(value.ttl, 10),
 		isAdmin: value.is_admin,
 		indices: value.indices ? filter(value.indices, (o) => o !== '') : undefined,

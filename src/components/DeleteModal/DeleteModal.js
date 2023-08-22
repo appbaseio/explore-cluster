@@ -1,13 +1,30 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import { Modal, Input, Typography } from 'antd';
 import { children as childrenProp } from '../../utils/prop-types';
 
 class DeleteModal extends React.Component {
-	state = {
-		input: '',
-		isVisible: false,
+	static open = (props) => {
+		const container = document.createElement('div');
+		document.body.appendChild(container);
+
+		const handleClose = () => {
+			props.onDelete();
+			ReactDOM.unmountComponentAtNode(container);
+			document.body.removeChild(container);
+		};
+
+		ReactDOM.render(<DeleteModal {...props} onDelete={handleClose} isVisible />, container);
 	};
+
+	constructor(props) {
+		super(props);
+		this.state = {
+			input: '',
+			isVisible: !!props.isVisible,
+		};
+	}
 
 	handleVisibility = () => {
 		this.setState((prevState) => ({
@@ -34,9 +51,11 @@ class DeleteModal extends React.Component {
 		const isMatching = value === input;
 		return (
 			<React.Fragment>
-				{children({
-					handleModal: this.handleVisibility,
-				})}
+				{children
+					? children({
+							handleModal: this.handleVisibility,
+					  })
+					: null}
 				<Modal
 					title={title}
 					okButtonProps={{
@@ -71,16 +90,19 @@ class DeleteModal extends React.Component {
 DeleteModal.propTypes = {
 	name: PropTypes.string.isRequired,
 	value: PropTypes.string.isRequired,
-	children: childrenProp.isRequired,
+	children: childrenProp,
 	onDelete: PropTypes.func.isRequired,
 	title: PropTypes.string.isRequired,
 	valueType: PropTypes.string,
 	text: PropTypes.oneOf([PropTypes.string, PropTypes.node]),
+	isVisible: PropTypes.bool,
 };
 
 DeleteModal.defaultProps = {
 	text: undefined,
 	valueType: '',
+	isVisible: false,
+	children: () => <></>,
 };
 
 export default DeleteModal;

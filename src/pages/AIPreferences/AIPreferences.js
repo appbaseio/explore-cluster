@@ -56,6 +56,38 @@ const AIpreferencesContainer = css`
 
 const { Header } = Layout;
 
+const controlsNameMap = {
+	DEFAULT_MAX_TOKENS: 'defaultMaxTokens',
+	DEFAULT_MIN_TOKENS: 'defaultMinTokens',
+};
+
+const maxMinTokensValidator = (control, name) => {
+	try {
+		if (name === controlsNameMap.DEFAULT_MAX_TOKENS) {
+			if (+control.value < +control._parent.get(controlsNameMap.DEFAULT_MIN_TOKENS).value) {
+				return {
+					invalidMaxTokenValue: true,
+				};
+			}
+			return null;
+		}
+		if (name === controlsNameMap.DEFAULT_MIN_TOKENS) {
+			if (+control.value > +control._parent.get(controlsNameMap.DEFAULT_MAX_TOKENS).value) {
+				return {
+					invalidMinTokenValue: true,
+				};
+			}
+			return null;
+		}
+
+		return null;
+	} catch (e) {
+		return {
+			invalidMinTokenValue: true,
+			invalidMaxTokenValue: true,
+		};
+	}
+};
 const AIPreferences = (props) => {
 	const { appVersion, backendImage, isAppsLoading, featureAI, tier } = props;
 	const bannerDetails = AIPreferencesBannerDetails;
@@ -68,6 +100,14 @@ const AIPreferences = (props) => {
 			defaultModel: ['gpt-3.5-turbo'],
 			defaultSystemPrompt: [''],
 			enabledIndexes: [[]],
+			defaultMinTokens: [
+				100,
+				(ctrl) => maxMinTokensValidator(ctrl, controlsNameMap.DEFAULT_MIN_TOKENS),
+			],
+			defaultMaxTokens: [
+				800,
+				(ctrl) => maxMinTokensValidator(ctrl, controlsNameMap.DEFAULT_MAX_TOKENS),
+			],
 		}),
 	);
 
@@ -93,7 +133,11 @@ const AIPreferences = (props) => {
 			return;
 		}
 
-		const payload = form.current.value;
+		const payload = {
+			...form.current.value,
+			defaultMinTokens: +form.current.value.defaultMinTokens,
+			defaultMaxTokens: +form.current.value.defaultMaxTokens,
+		};
 
 		setLoadingState(true);
 		updateAIPreferences(payload)
@@ -148,7 +192,7 @@ const AIPreferences = (props) => {
 			</React.Fragment>
 		);
 
-	if (!isValidPlan(tier, featureAI, features.AI)) {
+	if (!ALLOWED_SLS.includes(backendImage) && !isValidPlan(tier, featureAI, features.AI)) {
 		return (
 			<React.Fragment>
 				<Banner {...bannerDetails} onClick={() => window.open(bannerDetails.href)} />
@@ -313,7 +357,98 @@ const AIPreferences = (props) => {
 												}
 											/>
 										)}
-									/>{' '}
+									/>
+									<FieldControl
+										strict={false}
+										control={form.current.get('defaultMinTokens')}
+										render={({ handler, hasError }) => (
+											<Grid
+												label="Default Min Tokens"
+												gridRatio={0.4}
+												toolTipMessage={
+													<span>
+														Minimum number of tokens to generate in the
+														response. Whenever possible, max tokens is
+														respected, however when the input context +
+														max tokens combined exceed the model limit,
+														the min tokens value is used to calibrate
+														for an optimum output token. Defaults to{' '}
+														<code>100</code>
+													</span>
+												}
+												component={
+													<Flex
+														flexDirection="column"
+														alignItems="flex-start"
+														style={{ width: '100%' }}
+													>
+														<Input
+															placeholder="Enter min tokens"
+															type="number"
+															min={1}
+															{...handler('number')}
+															style={{
+																...(hasError(
+																	'invalidMinTokenValue',
+																) && {
+																	borderColor: 'tomato',
+																}),
+															}}
+														/>
+														<span className="error">
+															{hasError('invalidMinTokenValue') &&
+																'Default min tokens should be less than or equal to default max tokens.'}
+														</span>
+													</Flex>
+												}
+											/>
+										)}
+									/>
+									<FieldControl
+										strict={false}
+										control={form.current.get('defaultMaxTokens')}
+										render={({ handler, hasError }) => (
+											<Grid
+												label="Default Max Tokens"
+												gridRatio={0.4}
+												toolTipMessage={
+													<span>
+														Maximum number of tokens to generate in the
+														response. Defaults to <code>800</code>
+													</span>
+												}
+												component={
+													<Flex
+														flexDirection="column"
+														alignItems="flex-start"
+														style={{ width: '100%' }}
+													>
+														<Input
+															placeholder="Enter max tokens"
+															type="number"
+															min={
+																form.current.get('defaultMinTokens')
+																	.value
+															}
+															{...handler('number')}
+															style={{
+																...(hasError(
+																	'invalidMaxTokenValue',
+																) && {
+																	borderColor: 'tomato',
+																}),
+															}}
+														/>
+
+														<span className="error">
+															{hasError('invalidMaxTokenValue') &&
+																'Default max tokens should be greater than or equal to default min tokens.'}
+														</span>
+													</Flex>
+												}
+											/>
+										)}
+									/>
 									<FieldControl
 										strict={false}
 										control={form.current.get('defaultSystemPrompt')}

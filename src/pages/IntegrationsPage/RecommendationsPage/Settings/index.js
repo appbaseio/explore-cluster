@@ -2,10 +2,10 @@ import React, { useContext } from 'react';
 import { FieldControl, FieldGroup } from 'react-reactive-form';
 import { Tabs, Select, Form } from 'antd';
 import { css } from 'emotion';
-import ResultSettings from '../../../SearchUIBuilderPage/components/tabs/UIComponents/Results';
-import TextInput from '../../../../../components/Form/Input';
-import { FormContext, CtaActions } from '../../../utils/utils';
-import LayoutTab from '../../../SearchUIBuilderPage/components/tabs/Layout';
+import ResultSettings from './Results';
+import TextInput from '../../../../components/Form/Input';
+import { FormContext, CtaActions } from '../../utils/utils';
+import LayoutTab from '../../SearchUIBuilderPage/components/tabs/Layout';
 
 const formItemStyle = css`
 	.ant-form-item-label {
@@ -77,61 +77,6 @@ const Settings = () => {
 											: undefined
 									}
 									form={form}
-									dataSource={[
-										{
-											id: 'resultTitle',
-											label: (
-												<span>
-													Select the data field to display the{' '}
-													<strong>title</strong> of the result item
-												</span>
-											),
-											value: true,
-										},
-										{
-											id: 'resultDescription',
-											label: (
-												<span>
-													Select the data field to display the{' '}
-													<strong>description</strong> of the result item
-												</span>
-											),
-											value: true,
-										},
-										{
-											id: 'resultPrice',
-											label: (
-												<span>
-													Select the data field to display the{' '}
-													<strong>price</strong> of the result item
-												</span>
-											),
-											value: true,
-										},
-										{
-											id: 'resultImage',
-											label: (
-												<span>
-													Select the data field to display the{' '}
-													<strong>image</strong> of the result item
-												</span>
-											),
-											value: true,
-										},
-										{
-											id: 'resultHandle',
-											label: (
-												<span>
-													Select the data field to define the{' '}
-													<strong>redirect url</strong> for the result
-													item
-												</span>
-											),
-											value: true,
-										},
-									]}
-									withoutForm
-									isRecommendation
 								/>
 							</Form>
 						)}

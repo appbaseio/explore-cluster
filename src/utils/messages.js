@@ -94,6 +94,22 @@ export const credentialsMessages = {
 For example, if x-forwarded-header value is client, proxy1, proxy2, proxy3 and you want to specify proxy2 as the IP to be used for IP sources validation then you must set sources_xff_value as 2.`),
 };
 
+export const searchboxMessages = {
+	iconURL:
+		'Set search icon to display, accepts an image URL. An empty value implies the search icon isn’t shown',
+	iconPosition: 'Set search icon position to the left or right',
+	placeholder: 'Placeholder text your searchbox users will see',
+	focusShortcuts: 'Enter the keyboard shortcut combination to open the searchbox',
+	addonBefore: 'HTML markup to show to the left side of the searchbox',
+	addonAfter: 'HTML markup to show to the right side of the searchbox',
+	showSourceDocuments:
+		'Whether to show the documents from which the AIAnswer is generated or not.',
+	sourceDocumentLabel:
+		"Set a custom label by setting string or JSX. source variable can be used to render the document data, e.g. setting 'title: '+ source.title will eval to 'title: W3C Snapshot 2023' for a title field with this value.",
+	askButton:
+		'When set, the AI answer action and the corresponding display of AIAnswer would be triggered when user presses the Ask button.',
+};
+
 // Messages for popular suggestions
 export const suggestionsMessages = {
 	blacklist: Message(

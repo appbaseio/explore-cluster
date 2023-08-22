@@ -1,10 +1,22 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { InfoCircleOutlined } from '@ant-design/icons';
-import { Input, InputNumber, List, Modal, notification, Popover, Radio, Row, Select } from 'antd';
+import { CloseCircleFilled, InfoCircleOutlined } from '@ant-design/icons';
+import {
+	Input,
+	InputNumber,
+	List,
+	Modal,
+	notification,
+	Popover,
+	Radio,
+	Row,
+	Select,
+	Typography,
+} from 'antd';
 import PropTypes from 'prop-types';
 
 import get from 'lodash/get';
+import Icon from '@ant-design/icons/lib/components/Icon';
 import { input, modalHeading, radiobtn } from './styles';
 import { validateAppName, validationsList, validateJSON } from '../../utils/helper';
 
@@ -13,10 +25,11 @@ import LanguageDropdown from '../../components/LanguageDropdown';
 import languages from '../../constants/language';
 import { getDefaultSettings, putSettings } from '../../batteries/modules/actions';
 import { getLanguageFallback } from '../../utils/language';
-import { features, isValidPlan } from '../../batteries/utils';
+import { features, isEqual, isValidPlan } from '../../batteries/utils';
 import { allowedTiers } from '../../utils/prop-types';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 import Ace from '../../batteries/components/SearchSandbox/containers/AceEditor';
+import Flex from '../../batteries/components/shared/Flex';
 
 const RadioGroup = Radio.Group;
 
@@ -41,7 +54,7 @@ class CreateAppModal extends Component {
 		if (!defaultSettings) getDefaultSettingsAction();
 	}
 
-	componentDidUpdate = async () => {
+	componentDidUpdate = async (prevProps) => {
 		const {
 			createdApp,
 			history,
@@ -50,6 +63,7 @@ class CreateAppModal extends Component {
 			getDefaultSettingsAction,
 			tier,
 			featureSearchRelevancy,
+			handleModal,
 		} = this.props;
 		const { hasJSON, appName } = this.state;
 		let { language } = this.state;
@@ -87,6 +101,44 @@ class CreateAppModal extends Component {
 				history.push(`app/${appName}/import`);
 			} else {
 				history.push(`app/${appName}`);
+			}
+		} else if (!isEqual(prevProps.createdApp, createdApp) && createdApp && createdApp.error) {
+			const { actual } = createdApp.error;
+			const { error } = actual ?? {};
+			if (error) {
+				const modalRef = Modal.error({
+					...(error.code === 402 ? { icon: null } : { title: error.code }),
+					okButtonProps: { style: { display: 'none' } },
+					closable: true,
+					content:
+						error.code === 402 ? (
+							<Flex flexDirection="column">
+								<Typography.Text strong type="danger">
+									<Icon component={CloseCircleFilled} twoToneColor="#1890ff" />{' '}
+									You&lsquo;ve hit the plan limits
+								</Typography.Text>
+								<br />
+								<Typography.Paragraph>
+									<span
+										style={{
+											cursor: 'pointer',
+											color: 'dodgerblue',
+										}}
+										onClick={() => {
+											window.Intercom('show');
+											modalRef.destroy();
+											handleModal();
+										}}
+									>
+										Contact Support
+									</span>{' '}
+									to upgrade your plan
+								</Typography.Paragraph>
+							</Flex>
+						) : (
+							<Typography.Paragraph>{error.message}</Typography.Paragraph>
+						),
+				});
 			}
 		}
 	};

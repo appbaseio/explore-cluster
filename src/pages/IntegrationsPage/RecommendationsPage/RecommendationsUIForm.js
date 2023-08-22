@@ -10,7 +10,7 @@ import { Tabs, Affix } from 'antd';
 import { string, object, bool } from 'prop-types';
 import { v4 as uuidv4 } from 'uuid';
 import Banner from '../../../batteries/components/shared/UpgradePlan/Banner';
-import SettingsTab from '../shared/tabs/Settings';
+import SettingsTab from './Settings';
 import General from '../shared/tabs/General';
 import RecommendationsTab from '../shared/tabs/Recommendations';
 import { container } from '../../ResultsPage/styles';

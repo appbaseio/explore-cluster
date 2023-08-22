@@ -87,10 +87,9 @@ const FeaturedProductsWrapper = (props) => {
 					<Col xs={24}>
 						<ReactiveBase
 							app={appName}
-							enableAppbase
 							credentials={credentials}
 							url={url}
-							appbaseConfig={{
+							reactivesearchAPIConfig={{
 								recordAnalytics: false,
 							}}
 						>

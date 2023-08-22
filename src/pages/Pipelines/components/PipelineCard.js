@@ -167,11 +167,11 @@ const PipelineCard = (props) => {
 			...yamlToJson.load(pipeline.content),
 			enabled: value,
 		});
-		const pipelinePayload = generatePipelinePayload(
-			modifiedPipelineValue,
-			pipelineScripts,
-			'content',
-		);
+		const pipelinePayload = generatePipelinePayload({
+			pipelineJSON: modifiedPipelineValue,
+			scriptRefsMap: pipelineScripts,
+			scriptValKey: 'content',
+		});
 		pipelinePayload.append('enabled', value);
 		togglePipeline(pipeline.id, pipeline._version, {
 			id: pipeline.id,

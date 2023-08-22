@@ -10,6 +10,7 @@ import ConsoleLogger from '../../../../components/ScriptConsole/ConsoleLogger';
 import { isJson } from '../../../../components/ScriptConsole/utils';
 import { monacoOptions } from '../../utils';
 import ButtonLoadingSvg from './ButtonLoadingSvg';
+import { isValidJSONFormat } from '../../../../batteries/components/analytics/utils';
 
 const container = css`
 	display: flex !important;
@@ -360,10 +361,24 @@ const PipelineValidation = ({
 				>
 					<Col span={24} className="pipeline-console template-area">
 						<Monaco
-							defaultValue={JSON.stringify(executionContext)}
+							defaultValue={
+								isValidJSONFormat(executionContext)
+									? JSON.stringify(JSON.parse(executionContext), null, 4)
+									: executionContext
+							}
 							language="json"
-							value={JSON.stringify(executionContext, null, 4)}
-							onChange={(value) => setExecutionContext(JSON.parse(value))}
+							value={
+								isValidJSONFormat(executionContext)
+									? JSON.stringify(JSON.parse(executionContext), null, 4)
+									: executionContext
+							}
+							onChange={(value) =>
+								setExecutionContext(
+									isValidJSONFormat(value)
+										? JSON.stringify(JSON.parse(value), null, 4)
+										: value,
+								)
+							}
 							customizeMonacoInstance={(monaco, editorRef) => {
 								executionContextEditorRef.current = editorRef;
 							}}
@@ -453,7 +468,7 @@ const PipelineValidation = ({
 };
 
 PipelineValidation.propTypes = {
-	executionContext: PropTypes.object.isRequired,
+	executionContext: PropTypes.string.isRequired,
 	setExecutionContext: PropTypes.func.isRequired,
 	isVisible: PropTypes.bool,
 	onPlayButtonClick: PropTypes.func,

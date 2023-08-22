@@ -40,42 +40,6 @@ export const APP_ROUTES = {
 			{ label: 'Stored Queries', link: 'stored-queries', tag: 'Beta' },
 		],
 	},
-	AI: {
-		icon: 'robot',
-		action: ALLOWED_ACTIONS.UI_BUILDER,
-		menu: [
-			{
-				label: 'AI Preferences',
-				link: '/cluster/ai-preferences',
-				hasExactPath: true,
-			},
-		],
-		tag: 'Beta',
-	},
-	Pipelines: {
-		icon: 'deployment-unit',
-		action: ALLOWED_ACTIONS.PIPELINES,
-		menu: [
-			{
-				label: 'View All Pipelines',
-				link: '/cluster/pipelines',
-				hasExactPath: true,
-				tag: 'Beta',
-			},
-			{
-				label: 'Global Envs',
-				link: '/cluster/global-envs',
-				hasExactPath: true,
-				tag: 'Beta',
-			},
-			{
-				label: 'Search Engine Backend',
-				link: '/cluster/configure-search-engine-backend',
-				hasExactPath: true,
-				tag: 'Beta',
-			},
-		],
-	},
 	'Search Relevance': {
 		icon: 'search',
 		action: ALLOWED_ACTIONS.SEARCH_RELEVANCY,
@@ -107,6 +71,47 @@ export const APP_ROUTES = {
 			},
 		],
 	},
+	'AI Search': {
+		icon: 'robot',
+		action: ALLOWED_ACTIONS.UI_BUILDER,
+		menu: [
+			{
+				label: 'AI Preferences',
+				link: '/cluster/ai-preferences',
+				hasExactPath: true,
+			},
+			{
+				label: 'FAQs',
+				link: '/cluster/ai-faqs',
+				hasExactPath: true,
+			},
+		],
+		tag: 'Beta',
+	},
+	Pipelines: {
+		icon: 'deployment-unit',
+		action: ALLOWED_ACTIONS.PIPELINES,
+		menu: [
+			{
+				label: 'View All Pipelines',
+				link: '/cluster/pipelines',
+				hasExactPath: true,
+				tag: 'Beta',
+			},
+			{
+				label: 'Global Envs',
+				link: '/cluster/global-envs',
+				hasExactPath: true,
+				tag: 'Beta',
+			},
+			{
+				label: 'Search Engine Backend',
+				link: '/cluster/configure-search-engine-backend',
+				hasExactPath: true,
+				tag: 'Beta',
+			},
+		],
+	},
 	Analytics: {
 		icon: 'line-chart',
 		action: ALLOWED_ACTIONS.ANALYTICS,
@@ -121,6 +126,12 @@ export const APP_ROUTES = {
 			{ label: 'Geo Distribution', link: 'geo-distribution' },
 			{ label: 'Requests Per Minute', link: 'requests-per-minute' },
 			{ label: 'Search Latency', link: 'search-latency' },
+			{
+				label: 'AI Insights',
+				link: '/cluster/ai-insights',
+				hasExactPath: true,
+				tag: 'Beta',
+			},
 			{
 				label: 'Pipelines Insights',
 				link: '/cluster/pipeline-insights',
@@ -141,7 +152,7 @@ export const APP_ROUTES = {
 		action: ALLOWED_ACTIONS.SPEED,
 		menu: [{ label: 'Cache', link: '/cluster/cache', tag: 'Beta', hasExactPath: true }],
 	},
-	'API Credentials': {
+	'Access Control': {
 		icon: 'key',
 		action: ALLOWED_ACTIONS.ACCESS_CONTROL,
 		menu: [
@@ -211,38 +222,6 @@ export const CLUSTER_ROUTES = {
 			{ label: 'Stored Queries', link: '/cluster/stored-queries', tag: 'Beta' },
 		],
 	},
-	AI: {
-		icon: 'robot',
-		action: ALLOWED_ACTIONS.UI_BUILDER,
-		menu: [
-			{
-				label: 'AI Preferences',
-				link: '/cluster/ai-preferences',
-			},
-		],
-		tag: 'Beta',
-	},
-	Pipelines: {
-		icon: 'deployment-unit',
-		action: ALLOWED_ACTIONS.PIPELINES,
-		menu: [
-			{
-				label: 'View All Pipelines',
-				link: '/cluster/pipelines',
-				tag: 'Beta',
-			},
-			{
-				label: 'Global Envs',
-				link: '/cluster/global-envs',
-				tag: 'Beta',
-			},
-			{
-				label: 'Search Engine Backend',
-				link: '/cluster/configure-search-engine-backend',
-				tag: 'Beta',
-			},
-		],
-	},
 	'Search Relevance': {
 		icon: 'search',
 		action: ALLOWED_ACTIONS.SEARCH_RELEVANCY,
@@ -278,6 +257,42 @@ export const CLUSTER_ROUTES = {
 			{ label: 'Grade Evaluation', link: '/cluster/grade-evaluation', tag: 'Beta' },
 		],
 	},
+	'AI Search': {
+		icon: 'robot',
+		action: ALLOWED_ACTIONS.UI_BUILDER,
+		menu: [
+			{
+				label: 'AI Preferences',
+				link: '/cluster/ai-preferences',
+			},
+			{
+				label: 'FAQs',
+				link: '/cluster/ai-faqs',
+			},
+		],
+		tag: 'Beta',
+	},
+	Pipelines: {
+		icon: 'deployment-unit',
+		action: ALLOWED_ACTIONS.PIPELINES,
+		menu: [
+			{
+				label: 'View All Pipelines',
+				link: '/cluster/pipelines',
+				tag: 'Beta',
+			},
+			{
+				label: 'Global Envs',
+				link: '/cluster/global-envs',
+				tag: 'Beta',
+			},
+			{
+				label: 'Search Engine Backend',
+				link: '/cluster/configure-search-engine-backend',
+				tag: 'Beta',
+			},
+		],
+	},
 	Analytics: {
 		icon: 'line-chart',
 		action: ALLOWED_ACTIONS.ANALYTICS,
@@ -292,6 +307,11 @@ export const CLUSTER_ROUTES = {
 			{ label: 'Geo Distribution', link: '/cluster/geo-distribution' },
 			{ label: 'Requests Per Minute', link: '/cluster/requests-per-minute' },
 			{ label: 'Search Latency', link: '/cluster/search-latency' },
+			{
+				label: 'AI Insights',
+				link: '/cluster/ai-insights',
+				tag: 'Beta',
+			},
 			{
 				label: 'Pipelines Insights',
 				link: '/cluster/pipeline-insights',
@@ -311,7 +331,7 @@ export const CLUSTER_ROUTES = {
 		action: ALLOWED_ACTIONS.SPEED,
 		menu: [{ label: 'Cache', link: '/cluster/cache', tag: 'Beta' }],
 	},
-	'API Credentials': {
+	'Access Control': {
 		icon: 'key',
 		action: ALLOWED_ACTIONS.ACCESS_CONTROL,
 		menu: [

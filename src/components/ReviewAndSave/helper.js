@@ -22,6 +22,10 @@ export const relevancyTitles = {
 	chartSettings: 'Chart Settings',
 };
 
+/**
+ * This are the props which are saved in backend.
+ * This would be passed to reactivesearch components in `rsConfig`.
+ * */
 const settingsMap = {
 	categoryFields: {
 		title: 'Category Fields',
@@ -237,6 +241,18 @@ const settingsMap = {
 		title: 'Enable Autosuggestion (prefix) search',
 		description:
 			'reactivesearch.io adds an edge n-grams tokenizer to enable prefix matching of search terms, but this comes with a substantial storage increase. By disabling autosuggestions search, you can save significant storage space.',
+	},
+	enableAI: {
+		title: 'Enable AI',
+		description: 'show AI response as a part of SearchBox',
+	},
+	showAIAnswer: {
+		title: 'Show AIAnswer component',
+		description: 'Display an AI answer along with the results',
+	},
+	AIUIConfig: {
+		title: 'AI Configuration',
+		description: 'Settings for UI of AI response',
 	},
 	ngramSettings: {
 		title: 'N-gram settings',

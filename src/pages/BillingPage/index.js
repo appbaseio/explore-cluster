@@ -21,7 +21,6 @@ import { getAppPlanByName } from '../../batteries/modules/selectors';
 import { getAppPlan, deleteAppSubscription } from '../../batteries/modules/actions';
 import Loader from '../../batteries/components/shared/Loader';
 import { displayErrors } from '../../utils/helper';
-import ClusterPricingTable from '../../components/PricingTable/ClusterPricingTable';
 import { PRICE_BY_PLANS, EFFECTIVE_PRICE_BY_PLANS } from '../../batteries/utils';
 import { getAuthHeaders } from '../../batteries/utils/mappings';
 import { getURL } from '../../constants/config';
@@ -30,6 +29,7 @@ import moment from '../../utils/moment';
 import BillingFrame from '../../components/PricingTable/BillingFrame';
 import Unsubscribe from '../../components/PricingTable/Unsubscribe';
 import { ALLOWED_SLS } from '../../constants';
+import PricingComponent from './PricingComponent';
 
 function numberWithCommas(x) {
 	return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -105,7 +105,7 @@ class Billing extends Component {
 		if (isClusterBilling) {
 			return (
 				<Card bodyStyle={{ padding: '20px 50px' }}>
-					<ClusterPricingTable />
+					<PricingComponent />
 					<p style={{ paddingTop: '20px' }}>
 						Read more about the pricing plans over{' '}
 						<a

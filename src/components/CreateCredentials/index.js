@@ -165,6 +165,8 @@ class CreateCredentials extends React.Component {
 						  }
 						: {}),
 			  });
+
+		this.initialFormValues = this.form.value;
 	}
 
 	componentDidMount() {
@@ -267,7 +269,7 @@ class CreateCredentials extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { errors, mappings, initialValues, isUserManagement, appbaseVersion, readOnly } =
+		const { errors, mappings, initialValues, isUserManagement, appbaseVersion, isUIBuilder } =
 			this.props;
 
 		displayErrors(errors, prevProps.errors);
@@ -279,7 +281,7 @@ class CreateCredentials extends React.Component {
 			});
 		}
 
-		if (readOnly && initialValues !== prevProps.initialValues) {
+		if (initialValues && initialValues !== prevProps.initialValues) {
 			this.form.patchValue(
 				mapValuesToForm(
 					JSON.parse(JSON.stringify(initialValues)),
@@ -306,6 +308,17 @@ class CreateCredentials extends React.Component {
 					indicesHandler.disable();
 				}
 			}
+		} else if (!initialValues && isUIBuilder) {
+			this.form.patchValue(
+				mapValuesToForm(
+					JSON.parse(JSON.stringify(this.initialFormValues)),
+					!isUserManagement,
+					appbaseVersion,
+				),
+				{
+					emitEvent: !isUserManagement,
+				},
+			);
 		}
 	}
 
@@ -1642,7 +1655,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => ({
 	fetchMappings: (appName, credentials) => dispatch(getAppMappings(appName, credentials)),
 	fetchPermissions: (appName) => dispatch(getPermission(appName)),
-	fetchPipelines: () => dispatch(getPipelines()),
+	fetchPipelines: () => dispatch(getPipelines(false)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreateCredentials);

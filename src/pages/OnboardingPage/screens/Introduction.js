@@ -85,6 +85,11 @@ export default class Introduction extends Component {
 							},
 							nextScreen,
 						);
+					} else if (res.error && res.error.code === 402) {
+						this.setError(
+							res.error.message ?? 'Something went wrong while creating the index',
+						);
+						this.input.focus();
 					} else {
 						this.setError(
 							'Your app name is not unique. Please try with a different app name.',

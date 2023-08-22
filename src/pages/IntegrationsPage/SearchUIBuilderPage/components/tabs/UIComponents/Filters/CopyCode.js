@@ -72,7 +72,7 @@ const CopyCode = ({ control, getPreferencesPayload, backend }) => {
 		}
 
 		return `
-import { ReactiveBase, ReactiveComponent } from "@appbaseio/reactivesearch";
+import { ReactiveBase, ReactiveComponentPrivate } from "@appbaseio/reactivesearch";
 export default Filter = () => {
   const preferences = ${prefs};
   return (
@@ -93,7 +93,7 @@ export default Filter = () => {
 				: ''
 		}
 	>
-	  <ReactiveComponent
+	  <ReactiveComponentPrivate
 		componentId="${control.componentId ? control.componentId : 'facet'}"
 		preferencesPath="pageSettings.pages.${
 			preferences?.pageSettings?.currentPage || 'home'

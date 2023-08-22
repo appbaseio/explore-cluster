@@ -82,7 +82,6 @@ const SearchUI = ({ pipeline, tabsValidated, setTabsValidated, preferences, form
 																preferences?.exportSettings
 																	?.credentials || ''
 															}
-															enableAppbase
 															transformRequest={(props) => {
 																const newBody = JSON.parse(
 																	// eslint-disable-next-line

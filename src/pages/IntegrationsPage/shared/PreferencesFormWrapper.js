@@ -107,6 +107,12 @@ class PreferencesFormWrapper extends React.Component {
 		super(props);
 		this.isFusion = props.backend === BACKENDS.FUSION.name;
 		this.isMongoDB = props.backend === BACKENDS.MONGODB.name;
+		/**
+		 * Cases to keep in mind while assigning default values
+		 * Case 1: Introducing a new property
+		 * 		1(a): Property doesn't exist in response returned by backend.
+		 *
+		 * */
 		this.form = FormBuilder.group({
 			name: '',
 			description: '',
@@ -193,6 +199,13 @@ class PreferencesFormWrapper extends React.Component {
 						}),
 						showSearchAs: 'sticky',
 						autosuggest: true,
+						searchEnableAI: false,
+						searchAISettings: FormBuilder.group({
+							askButton: false,
+							showSourceDocuments: false,
+							sourceDocumentLabel: '',
+						}),
+						showAIAnswer: false,
 						showVoiceSearch: true,
 						enablePredictiveSuggestions: false,
 						enablePopularSuggestions: false,
@@ -673,6 +686,25 @@ class PreferencesFormWrapper extends React.Component {
 						'',
 					),
 					autosuggest: get(preferences, 'searchSettings.rsConfig.autosuggest'),
+					searchEnableAI: get(preferences, 'searchSettings.rsConfig.enableAI'),
+					searchAISettings: {
+						askButton: get(
+							preferences,
+							'searchSettings.rsConfig.AIUIConfig.askButton',
+							undefined,
+						),
+						showSourceDocuments: get(
+							preferences,
+							'searchSettings.rsConfig.AIUIConfig.showSourceDocuments',
+							undefined,
+						),
+						sourceDocumentLabel: get(
+							preferences,
+							'searchSettings.rsConfig.AIUIConfig.sourceDocumentLabel',
+							undefined,
+						),
+					},
+					showAIAnswer: get(preferences, 'resultSettings.showAIAnswer'),
 					showSearchAs: get(preferences, 'searchSettings.showSearchAs', 'sticky'),
 					showVoiceSearch: get(preferences, 'searchSettings.rsConfig.showVoiceSearch'),
 					enablePopularSuggestions: get(
@@ -999,6 +1031,31 @@ class PreferencesFormWrapper extends React.Component {
 											preferences,
 											'searchSettings.rsConfig.autosuggest',
 										),
+										searchEnableAI: get(
+											preferences,
+											'searchSettings.rsConfig.enableAI',
+										),
+										searchAISettings: {
+											askButton: get(
+												preferences,
+												'searchSettings.rsConfig.AIUIConfig.askButton',
+												undefined,
+											),
+											showSourceDocuments: get(
+												preferences,
+												'searchSettings.rsConfig.AIUIConfig.showSourceDocuments',
+												undefined,
+											),
+											sourceDocumentLabel: get(
+												preferences,
+												'searchSettings.rsConfig.AIUIConfig.sourceDocumentLabel',
+												undefined,
+											),
+										},
+										showAIAnswer: get(
+											preferences,
+											'resultSettings.showAIAnswer',
+										),
 										showSearchAs: get(
 											preferences,
 											'searchSettings.showSearchAs',
@@ -1228,6 +1285,19 @@ class PreferencesFormWrapper extends React.Component {
 				}
 			});
 			this.form.get('autoSuggestionSettings').valueChanges.subscribe(() => {});
+		}
+		if (this.form.get('searchEnableAI')) {
+			this.form.get('searchEnableAI').valueChanges.subscribe((value) => {
+				const searchAISettingsControl = this.form.get('searchAISettings');
+				if (searchAISettingsControl) {
+					if (value) {
+						searchAISettingsControl.enable();
+					} else {
+						searchAISettingsControl.disable();
+					}
+				}
+			});
+			this.form.get('searchAISettings').valueChanges.subscribe(() => {});
 		}
 
 		if (!this.form.get('currentPage').valueChanges.observers.length) {
