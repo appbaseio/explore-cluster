@@ -177,7 +177,10 @@ const AIPreferences = (props) => {
 							<h2>AI Preferences</h2>
 							<Row>
 								<Col lg={18}>
-									<p>Manage your AI preferences</p>
+									<p>
+										ReactiveSearch uses OpenAI for providing AI Answer feature.
+										You can configure preferences for this here.
+									</p>
 								</Col>
 							</Row>
 						</Col>
