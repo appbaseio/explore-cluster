@@ -163,5 +163,9 @@
 		"urlsafe-base64": "https://github.com/farhan687/urlsafe-base64.git",
 		"util": "^0.12.4",
 		"uuid": "^8.3.2"
+	},
+	"volta": {
+		"node": "16.20.2",
+		"yarn": "1.22.19"
 	}
 }

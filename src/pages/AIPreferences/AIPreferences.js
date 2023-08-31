@@ -2,11 +2,30 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { EyeInvisibleOutlined, EyeTwoTone, InfoCircleOutlined } from '@ant-design/icons';
-import { Button, Col, Row, Layout, Alert, Switch, Input, message, Spin, notification } from 'antd';
+import {
+	Button,
+	Col,
+	Row,
+	Layout,
+	Alert,
+	Switch,
+	Input,
+	message,
+	Spin,
+	notification,
+	Select,
+	Form,
+} from 'antd';
 import { css } from 'emotion';
 import get from 'lodash/get';
 import { connect } from 'react-redux';
-import { FieldControl, FieldGroup, FormBuilder, Validators } from 'react-reactive-form';
+import {
+	FieldControl,
+	FieldGroup,
+	FormBuilder,
+	FormControl,
+	Validators,
+} from 'react-reactive-form';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
@@ -88,11 +107,58 @@ const maxMinTokensValidator = (control, name) => {
 		};
 	}
 };
+
+const urlValidator = (control) => {
+	try {
+		if (!control.value) {
+			return null;
+		}
+
+		const urlRegex =
+			// eslint-disable-next-line no-useless-escape
+			/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+
+		const urlMatches = control.value.match(urlRegex);
+
+		if (!urlMatches || !urlMatches[0]) {
+			return { invalidURL: true };
+		}
+		return null;
+	} catch (e) {
+		return {
+			invalidURL: true,
+		};
+	}
+};
+
+const apiVersionValidator = (control) => {
+	try {
+		if (!control.value) {
+			return null;
+		}
+
+		const apiVersionRegex =
+			// eslint-disable-next-line no-useless-escape
+			/^\d{4}-\d{2}-\d{2}.*$/;
+
+		const apiVersionMatches = control.value.match(apiVersionRegex);
+
+		if (!apiVersionMatches || !apiVersionMatches[0]) {
+			return { invalidAPIVersion: true };
+		}
+		return null;
+	} catch (e) {
+		return {
+			invalidAPIVersion: true,
+		};
+	}
+};
+
 const AIPreferences = (props) => {
 	const { appVersion, backendImage, isAppsLoading, featureAI, tier } = props;
 	const bannerDetails = AIPreferencesBannerDetails;
 	const [loadingState, setLoadingState] = useState(false);
-
+	const [submitted, setSubmitted] = useState(false);
 	const form = useRef(
 		FormBuilder.group({
 			enable: [false], // id of the selected pipeline
@@ -108,6 +174,7 @@ const AIPreferences = (props) => {
 				800,
 				(ctrl) => maxMinTokensValidator(ctrl, controlsNameMap.DEFAULT_MAX_TOKENS),
 			],
+			apiType: ['openai'],
 		}),
 	);
 
@@ -129,6 +196,7 @@ const AIPreferences = (props) => {
 	};
 
 	const handleSaveAIPreferences = () => {
+		setSubmitted(true);
 		if (form.current.invalid) {
 			return;
 		}
@@ -496,6 +564,190 @@ const AIPreferences = (props) => {
 													}
 												/>
 											);
+										}}
+									/>
+									<FieldControl
+										strict={false}
+										control={form.current.get('apiType')}
+										render={({ handler }) => {
+											const { value: apiTypeValue, onChange } = handler();
+											// First parameter is value
+											const handleAPITypeChange = (v) => {
+												if (v === 'azure') {
+													// Add controls
+													const currentForm = form.current;
+													if (currentForm) {
+														currentForm.addControl(
+															'azureBaseURL',
+															new FormControl('', [
+																urlValidator,
+																Validators.required,
+															]),
+														);
+														currentForm.addControl(
+															'apiVersion',
+															new FormControl('', [
+																apiVersionValidator,
+																Validators.required,
+															]),
+														);
+													}
+												} else {
+													// Remove the controls
+													const currentForm = form.current;
+													if (currentForm) {
+														currentForm.removeControl('azureBaseURL');
+														currentForm.removeControl('apiVersion');
+													}
+												}
+												onChange(v);
+											};
+											return (
+												<Grid
+													gridRatio={0.4}
+													label="API Type"
+													toolTipMessage={
+														<span>API Type for making AI calls</span>
+													}
+													style={{
+														width: '100%',
+														marginBottom: 0,
+													}}
+													component={
+														<Flex
+															flexDirection="column"
+															alignItems="flex-start"
+															style={{
+																width: '100%',
+																marginBottom: 0,
+															}}
+														>
+															<Select
+																options={[
+																	{
+																		value: 'openai',
+																		label: 'Open AI',
+																	},
+																	{
+																		value: 'azure',
+																		label: 'Azure',
+																	},
+																]}
+																value={apiTypeValue}
+																onChange={(v) =>
+																	handleAPITypeChange(v)
+																}
+															/>
+														</Flex>
+													}
+												/>
+											);
+										}}
+									/>
+									{/*
+									 * This is a common pattern we have in the code
+									 * Problem: We want to show/hide controls(slave) on basis of value of some other control(master)
+									 * Solution: We use the master control(here apiType) as a FieldControl and use the render method
+									 * which is called everytime the value of the master is changed.
+									 */}
+									<FieldControl
+										strict={false}
+										control={form.current.get('apiType')}
+										render={({ value: apiTypeValue }) => {
+											return apiTypeValue === 'azure' ? (
+												<Form
+													labelCol={{
+														xs: { span: 24 },
+														sm: { span: 6 },
+													}}
+													wrapperCol={{
+														xs: { span: 24 },
+														sm: { span: 14 },
+													}}
+													style={{
+														width: '100%',
+														marginLeft: '2em',
+														backgroundColor: '#f5f5f5',
+														padding: '1em',
+													}}
+												>
+													<FieldControl
+														strict={false}
+														control={form.current.get('azureBaseURL')}
+														render={({
+															handler: urlHandler,
+															hasError,
+															touched,
+														}) => {
+															const shouldShowError =
+																touched || submitted;
+															const hasSomeError =
+																hasError('invalidURL') ||
+																hasError('required');
+															const isValid =
+																hasSomeError && shouldShowError
+																	? 'error'
+																	: 'success';
+															return (
+																<Form.Item
+																	label="Azure Base URL"
+																	tooltip={
+																		<span>
+																			Base URL of the Azure
+																			OpenAI resource.
+																			Required when apiType is
+																			set as Azure.
+																		</span>
+																	}
+																	validateStatus={isValid}
+																	help="Should be a valid URL. eg. https://example.com"
+																>
+																	<Input
+																		placeholder="Enter default system prompt"
+																		{...urlHandler()}
+																	/>
+																</Form.Item>
+															);
+														}}
+													/>
+													<FieldControl
+														strict={false}
+														control={form.current.get('apiVersion')}
+														render={({
+															handler,
+															hasError,
+															touched,
+														}) => {
+															const shouldShowError =
+																touched || submitted;
+															const hasSomeError =
+																hasError('invalidAPIVersion') ||
+																hasError('required');
+															const isValid =
+																hasSomeError && shouldShowError
+																	? 'error'
+																	: 'success';
+															return (
+																<Form.Item
+																	label="API Version"
+																	tooltip={`Version of Azure API to use
+																		(e.g. 2023-05-15) - this
+																		will be a YYYY-MM-DD format
+																		string. Required when
+																		apiType is set as Azure.`}
+																	validateStatus={isValid}
+																	help="Should be a valid Azure version. They start with a date eg. 2023-05-15 (YYYY-MM-DD format)"
+																>
+																	<Input
+																		placeholder="2023-05-15 (YYYY-MM-DD format)"
+																		{...handler()}
+																	/>
+																</Form.Item>
+															);
+														}}
+													/>
+												</Form>
+											) : null;
 										}}
 									/>
 								</Flex>
