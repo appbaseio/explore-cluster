@@ -376,7 +376,7 @@ const PipelineEditorComponent = (props) => {
 			<Dropdown
 				className="stages-dropdown"
 				open={showStagesMenu}
-				overlayStyle={{ zIndex: 999, backgroundColor: 'white' }}
+				overlayStyle={{ zIndex: 10000, backgroundColor: 'white' }}
 				overlay={
 					<StagesMenu
 						pipelineSchema={pipelineSchema}
@@ -384,6 +384,8 @@ const PipelineEditorComponent = (props) => {
 						handleMenuClick={handleMenuClick}
 					/>
 				}
+				trigger={['click']}
+				onOpenChange={(open) => setShowStagesMenu(open)}
 			>
 				<Button
 					className="ant-dropdown-link"

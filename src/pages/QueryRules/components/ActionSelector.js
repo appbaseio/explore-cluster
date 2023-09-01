@@ -60,7 +60,7 @@ const actions = {
 };
 
 class ActionSelector extends React.Component {
-	state = { healthy: true };
+	state = { healthy: true, actionName: null };
 
 	shouldComponentUpdate(nextProps, nextState) {
 		const { healthy } = this.state;
@@ -89,6 +89,7 @@ class ActionSelector extends React.Component {
 
 	render() {
 		const { actions: selectedActions, error, condition } = this.props;
+		const { actionName } = this.state;
 		let specificActions;
 		if (condition === 'index' || condition === 'cron') {
 			specificActions = {
@@ -112,7 +113,10 @@ class ActionSelector extends React.Component {
 						onChange={this.handleDropdown}
 						placeholder="Select Appropriate Action"
 						style={{ width: '100%' }}
-						value={undefined}
+						value={actionName}
+						onSelect={() => {
+							this.setState({ actionName: null });
+						}}
 						showSearch
 						data-cy="query-rule-action"
 					>

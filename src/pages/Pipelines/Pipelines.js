@@ -49,31 +49,18 @@ const STATUS_FILTERS_CONSTANT = {
 };
 
 const SORT_KEYS_CONSTANTS = {
-	Priority: {
-		valueFunc: (pipeline) => {
-			return pipeline.priority ?? Number.MIN_SAFE_INTEGER;
-		},
-		order: 'desc',
-	},
 	'Updated Time': {
 		valueFunc: (pipeline) => {
 			return pipeline.updated_at || pipeline.created_at || 0;
 		},
 		order: 'desc',
 	},
-
-	// 'Updated Time ⬆️': {
-	// 	valueFunc: (pipeline) => {
-	// 		return pipeline.updated_at || pipeline.created_at || 0;
-	// 	},
-	// 	order: 'asc',
-	// },
-	// 'Priority ⬆️': {
-	// 	valueFunc: (pipeline) => {
-	// 		return pipeline.priority ?? Number.MIN_SAFE_INTEGER;
-	// 	},
-	// 	order: 'asc',
-	// },
+	Priority: {
+		valueFunc: (pipeline) => {
+			return pipeline.priority ?? Number.MIN_SAFE_INTEGER;
+		},
+		order: 'desc',
+	},
 };
 
 const Pipelines = (props) => {

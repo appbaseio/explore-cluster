@@ -11,6 +11,8 @@ import {
 	LinkOutlined,
 	PlusOutlined,
 	EditOutlined,
+	DeleteOutlined,
+	ExpandOutlined,
 } from '@ant-design/icons';
 import {
 	Affix,
@@ -32,6 +34,7 @@ import {
 } from 'antd';
 import yamlToJson from 'js-yaml';
 import { isEqual } from 'lodash';
+import styled from 'react-emotion';
 import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import Overlay from '../../components/Overlay';
 import { mediaKey } from '../../utils/media';
@@ -206,6 +209,24 @@ const editorAreaContainer = css`
 	}
 `;
 
+const FullScreenButton = styled(Button)`
+	position: relative;
+	top: 100px;
+	z-index: 100;
+	left: 5px;
+`;
+
+const fullScreenStyles = {
+	position: 'fixed',
+	zIndex: '1000',
+	background: 'white',
+	top: '0px',
+	left: '0px',
+	width: '100%',
+	height: '100%',
+	overflow: 'auto',
+};
+
 function DocsLink({ url }) {
 	return (
 		<a href={url} className={link} target="_blank" rel="noopener noreferrer">
@@ -281,6 +302,7 @@ const PipelinesForm = (props) => {
 	// version drawer control
 	const [showVersionDrawer, setShowVersionDrawer] = useState(false);
 	const [showVDescModal, setShowVDescModal] = useState(false);
+	const [fullscreenMode, setFullScreenMode] = useState(false);
 
 	const bannerDetails = pipelinesBannerDetails.allPipelines;
 
@@ -976,10 +998,7 @@ const PipelinesForm = (props) => {
 	return (
 		<div className={container}>
 			{showUnloadPrompt && (
-				<Prompt
-					when={hasPipelineFormChanged()}
-					message="You have unsaved changes, are you sure you want to leave?"
-				/>
+				<Prompt message="Are you sure you want to navigate away? Any unsaved changes will be lost." />
 			)}
 			{showTemplateChoser ? (
 				<PipelineTemplateChooser
@@ -998,7 +1017,11 @@ const PipelinesForm = (props) => {
 							Back to Pipelines
 						</Button>
 					</Link>
-					<Card style={{ marginTop: 15 }} bodyStyle={{ paddingBottom: 0 }} hoverable>
+					<Card
+						style={fullscreenMode ? fullScreenStyles : { marginTop: 15 }}
+						bodyStyle={{ paddingBottom: 0 }}
+						hoverable
+					>
 						<div className="card-header-wrapper">
 							{isEditPage && pipeline?.versions && (
 								<Tooltip title="Versions" style={{ fontSize: 14 }}>
@@ -1041,6 +1064,12 @@ const PipelinesForm = (props) => {
 							) : null}
 						</div>
 						<section className={editorAreaContainer}>
+							<FullScreenButton
+								shape="circle"
+								icon={<ExpandOutlined />}
+								title="Toggle Fullscreen Mode"
+								onClick={() => setFullScreenMode(!fullscreenMode)}
+							/>
 							<Tabs
 								defaultActiveKey="pipeline_tab"
 								onChange={handleTabChange}
@@ -1131,6 +1160,7 @@ const PipelinesForm = (props) => {
 										label: getTabTitle(tab.title, tab.key),
 										key: tab.key,
 										closable: true,
+										closeIcon: <DeleteOutlined />,
 										children: (
 											<TabContent
 												onScriptFileChange={(value) => {
