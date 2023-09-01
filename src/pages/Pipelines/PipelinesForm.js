@@ -209,6 +209,15 @@ const editorAreaContainer = css`
 	}
 `;
 
+const editorAreaContainerFullScreen = css`
+	margin: 15px 0;
+
+	.tab-content {
+		min-height: 450px;
+		height: 80vh;
+	}
+`;
+
 const FullScreenButton = styled(Button)`
 	position: relative;
 	top: 100px;
@@ -1017,53 +1026,61 @@ const PipelinesForm = (props) => {
 							Back to Pipelines
 						</Button>
 					</Link>
+
 					<Card
 						style={fullscreenMode ? fullScreenStyles : { marginTop: 15 }}
 						bodyStyle={{ paddingBottom: 0 }}
 						hoverable
 					>
-						<div className="card-header-wrapper">
-							{isEditPage && pipeline?.versions && (
-								<Tooltip title="Versions" style={{ fontSize: 14 }}>
-									{/* Pipeline Versions Versions */}
-									<ClockCircleOutlined
-										style={{
-											cursor: getCurrentVersion()?._version
-												? 'pointer'
-												: 'not-allowed',
-											color: getCurrentVersion()?._version
-												? 'rgba(0,0,0,0.65)'
-												: '#bbb7b7',
-										}}
-										className="version-drawer-triggerer"
-										onClick={() => {
-											if (getCurrentVersion()?._version)
-												setShowVersionDrawer(true);
-										}}
-									/>
-								</Tooltip>
-							)}
-							<Typography.Title level={3}>
-								{isEditPage ? 'Update' : 'Create'} Pipeline {renderLiveVersionTag()}
-							</Typography.Title>
-							{isEditPage ? (
-								<Collapse>
-									<Panel
-										header={<h3 style={{ margin: 0 }}>Pipeline Details</h3>}
-										key="1"
-									>
-										<PipelineCard
-											pipeline={pipeline}
-											showDrag={false}
-											showEdit={false}
-											showExport
-											history={history}
+						{!fullscreenMode && (
+							<div className="card-header-wrapper">
+								{isEditPage && pipeline?.versions && (
+									<Tooltip title="Versions" style={{ fontSize: 14 }}>
+										{/* Pipeline Versions Versions */}
+										<ClockCircleOutlined
+											style={{
+												cursor: getCurrentVersion()?._version
+													? 'pointer'
+													: 'not-allowed',
+												color: getCurrentVersion()?._version
+													? 'rgba(0,0,0,0.65)'
+													: '#bbb7b7',
+											}}
+											className="version-drawer-triggerer"
+											onClick={() => {
+												if (getCurrentVersion()?._version)
+													setShowVersionDrawer(true);
+											}}
 										/>
-									</Panel>
-								</Collapse>
-							) : null}
-						</div>
-						<section className={editorAreaContainer}>
+									</Tooltip>
+								)}
+								<Typography.Title level={3}>
+									{isEditPage ? 'Update' : 'Create'} Pipeline{' '}
+									{renderLiveVersionTag()}
+								</Typography.Title>
+								{isEditPage ? (
+									<Collapse>
+										<Panel
+											header={<h3 style={{ margin: 0 }}>Pipeline Details</h3>}
+											key="1"
+										>
+											<PipelineCard
+												pipeline={pipeline}
+												showDrag={false}
+												showEdit={false}
+												showExport
+												history={history}
+											/>
+										</Panel>
+									</Collapse>
+								) : null}
+							</div>
+						)}
+						<section
+							className={
+								fullscreenMode ? editorAreaContainerFullScreen : editorAreaContainer
+							}
+						>
 							<FullScreenButton
 								shape="circle"
 								icon={<ExpandOutlined />}
