@@ -11,6 +11,7 @@ import { isJson } from '../../../../components/ScriptConsole/utils';
 import { monacoOptions } from '../../utils';
 import ButtonLoadingSvg from './ButtonLoadingSvg';
 import { isValidJSONFormat } from '../../../../batteries/components/analytics/utils';
+import { PositionalTooltip } from './PositionalTooltip';
 
 const container = css`
 	display: flex !important;
@@ -165,6 +166,8 @@ const {
 	STAGE_CHANGES_SHORT,
 } = TABS_KEYS;
 
+const MAX_TOOLTIP_LENGTH = 40;
+
 const PipelineValidation = ({
 	isVisible,
 	executionContext,
@@ -180,6 +183,13 @@ const PipelineValidation = ({
 	const [validationResponse, setValidationResponse] = useState('');
 	const [stageChanges, setStateChanges] = useState([]);
 	const executionContextEditorRef = useRef(null);
+	const responseTooltipClearTimeout = useRef(null);
+	const [responseTooltip, setResponseTooltip] = useState({
+		content: '',
+		visible: false,
+		position: { x: 0, y: 0 },
+	});
+	const responseEditorRef = useRef();
 	const [isSmallScreen, setIsSmallScreen] = useState(false);
 	useEffect(() => {
 		const updateSmallScreenVariable = () => {
@@ -317,9 +327,65 @@ const PipelineValidation = ({
 		);
 	};
 
+	useEffect(() => {
+		if (responseTooltip.visible) setResponseTooltip({ ...responseTooltip, visible: false });
+	}, []);
+
+	const showResponseTooltip = (position: any, domElement: HTMLElement) => {
+		if (!responseEditorRef.current) {
+			return;
+		}
+		const lineContent = responseEditorRef.current
+			?.getModel()
+			.getLineContent(position.lineNumber);
+
+		if (lineContent.length > MAX_TOOLTIP_LENGTH) {
+			const rect = domElement.getBoundingClientRect();
+
+			responseTooltipClearTimeout.current = setTimeout(() => {
+				setResponseTooltip({
+					content: lineContent,
+					visible: true,
+					position: { x: rect.left, y: rect.top },
+				});
+			}, 2000);
+		} else {
+			setResponseTooltip({ ...responseTooltip, visible: false });
+		}
+	};
+
+	const handleResponseEditorMount = (_, editor) => {
+		if (!editor) return;
+
+		responseEditorRef.current = editor;
+		editor.onMouseMove(({ event, target }) => {
+			if (responseTooltipClearTimeout.current) {
+				clearTimeout(responseTooltipClearTimeout.current);
+				responseTooltipClearTimeout.current = null;
+			}
+
+			const eventType = event?.browserEvent?.type;
+			if (eventType === 'mousemove') {
+				if (!editor) {
+					return;
+				}
+				const lineContent = editor?.getModel().getLineContent(target.position.lineNumber);
+
+				if (lineContent.length > MAX_TOOLTIP_LENGTH) {
+					showResponseTooltip(target.position, target.element);
+				} else {
+					setResponseTooltip({ ...responseTooltip, visible: false });
+				}
+			} else {
+				setResponseTooltip({ ...responseTooltip, visible: false });
+			}
+		});
+	};
+
 	if (!isVisible) {
 		return null;
 	}
+	console.log({ responseTooltip });
 
 	return (
 		<div className={container}>
@@ -404,6 +470,11 @@ const PipelineValidation = ({
 				>
 					<Col span={24} className="pipeline-console response-area">
 						<div className="response-stats-wrapper">{renderResponseCodeTime()}</div>
+						<PositionalTooltip
+							content={responseTooltip.content}
+							visible={responseTooltip.visible}
+							position={responseTooltip.position}
+						/>
 						{validationResponse ? (
 							<Monaco
 								defaultValue="// Run the request to see the response output"
@@ -413,6 +484,7 @@ const PipelineValidation = ({
 								options={monacoOptions}
 								readOnly
 								wrapperClass="monaco-wrapper"
+								customizeMonacoInstance={handleResponseEditorMount}
 							/>
 						) : (
 							<div id="response-area-placeholder">
