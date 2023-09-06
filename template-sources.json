@@ -38,7 +38,7 @@
 	{
 		"organization": "appbaseio-confidential",
 		"repository": "multi-page-search",
-		"version": "0.3.7",
+		"version": "0.3.8",
 		"commit": "",
 		"branch": "",
 		"manifest_path": "reactivesearch-manifest.json",
