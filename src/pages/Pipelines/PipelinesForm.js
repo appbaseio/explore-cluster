@@ -210,11 +210,10 @@ const editorAreaContainer = css`
 `;
 
 const editorAreaContainerFullScreen = css`
-	margin: 15px 0;
-
+	margin: 0 5px;
 	.tab-content {
 		min-height: 450px;
-		height: 80vh;
+		height: 90vh;
 	}
 `;
 
@@ -225,16 +224,28 @@ const FullScreenButton = styled(Button)`
 	left: 5px;
 `;
 
-const fullScreenStyles = {
-	position: 'fixed',
-	zIndex: '1000',
-	background: 'white',
-	top: '0px',
-	left: '0px',
-	width: '100%',
-	height: '100%',
-	overflow: 'auto',
-};
+const FullScreenCard = styled(Card)`
+	${({ fullscreenMode }) =>
+		fullscreenMode
+			? `position: fixed;
+	z-index: 1000;
+	background: white;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	padding: 0px;
+	margin: 0px;
+
+	.ant-card-body {
+		padding: 0px;
+		margin: 0px;
+	}`
+			: `
+	margin-top: 15px;
+	`}
+`;
 
 function DocsLink({ url }) {
 	return (
@@ -1027,8 +1038,8 @@ const PipelinesForm = (props) => {
 						</Button>
 					</Link>
 
-					<Card
-						style={fullscreenMode ? fullScreenStyles : { marginTop: 15 }}
+					<FullScreenCard
+						fullscreenMode={fullscreenMode}
 						bodyStyle={{ paddingBottom: 0 }}
 						hoverable
 					>
@@ -1245,7 +1256,7 @@ const PipelinesForm = (props) => {
 								]}
 							/>
 						</section>
-					</Card>
+					</FullScreenCard>
 					<Affix offsetBottom={0}>
 						<Flex className="card-footer">
 							<div>{renderErrorMessges()}</div>
