@@ -1203,6 +1203,7 @@ const PipelinesForm = (props) => {
 												scriptValueProp={
 													scriptFilesMap?.[tab.key]?.scriptValue ?? ''
 												}
+												fullscreen={fullscreenMode}
 												onValidatedScriptRuleChange={(
 													validatedScriptValue,
 												) => {

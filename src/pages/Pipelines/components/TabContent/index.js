@@ -53,7 +53,13 @@ const container = css`
 
 // component to render each script tab content
 const TabContent = (props) => {
-	const { scriptValueProp, onScriptFileChange, validationComponentProps, isValidateMode } = props;
+	const {
+		scriptValueProp,
+		onScriptFileChange,
+		validationComponentProps,
+		isValidateMode,
+		fullscreen,
+	} = props;
 	const scriptEditorRef = useRef(null);
 	const [scriptValue, setScriptValue] = useState(scriptValueProp);
 
@@ -84,6 +90,7 @@ const TabContent = (props) => {
 				style={{
 					width: isValidateMode ? '50%' : '100%',
 					transition: 'all .3s ease-in',
+					height: fullscreen ? '90vh' : undefined,
 				}}
 			>
 				<Monaco
@@ -106,6 +113,7 @@ const TabContent = (props) => {
 				style={{
 					width: isValidateMode ? '50%' : '0%',
 					transition: 'all .3s ease-in',
+					height: fullscreen ? '90vh' : undefined,
 				}}
 			>
 				<PipelineValidation {...validationComponentProps} isScriptValidation={false} />
@@ -120,6 +128,7 @@ TabContent.propTypes = {
 	onScriptFileChange: PropTypes.func.isRequired,
 	validationComponentProps: PropTypes.object.isRequired,
 	isValidateMode: PropTypes.bool.isRequired,
+	fullscreen: PropTypes.bool.isRequired,
 };
 
 TabContent.defaultProps = {
