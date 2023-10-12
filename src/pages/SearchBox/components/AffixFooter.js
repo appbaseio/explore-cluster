@@ -1,5 +1,5 @@
 import { Button, Tooltip } from 'antd';
-import { any, bool, func } from 'prop-types';
+import { any, bool, func, object } from 'prop-types';
 import React, { useCallback, useState } from 'react';
 import styled from 'react-emotion';
 import ExportSearchBoxCode from './ExportSearchBoxCode';
@@ -30,7 +30,14 @@ const Row = styled.div`
 	}
 `;
 
-export default function Footer({ collapsed, onLivePreview, isEditPage, onSave, isSaving }) {
+export default function Footer({
+	collapsed,
+	onLivePreview,
+	isEditPage,
+	onSave,
+	isSaving,
+	searchBoxItem,
+}) {
 	const [showExportCode, setShowExportCode] = useState(false);
 	const handleExportCode = useCallback(async () => {
 		setShowExportCode(true);
@@ -41,6 +48,8 @@ export default function Footer({ collapsed, onLivePreview, isEditPage, onSave, i
 				visible={showExportCode}
 				onCancel={() => setShowExportCode(false)}
 				searchBoxId={isEditPage}
+				index={searchBoxItem?.index}
+				pipeline={searchBoxItem?.pipeline}
 			/>
 			<Container collapsed={collapsed}>
 				<Row>
@@ -78,4 +87,5 @@ Footer.propTypes = {
 	isEditPage: any.isRequired,
 	onSave: func.isRequired,
 	isSaving: bool.isRequired,
+	searchBoxItem: object.isRequired,
 };

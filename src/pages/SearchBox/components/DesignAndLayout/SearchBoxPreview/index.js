@@ -12,10 +12,9 @@ import { generateFeaturedSuggestionPayload } from '../../../utils';
 
 const container = css`
 	position: relative;
-	margin-left: auto;
 	max-width: 500px;
 	@media only screen and (max-width: 980px), (min-width: 1400px) {
-		max-width: 1000px;
+		max-width: 800px;
 	}
 
 	.input-wrapper {
@@ -50,7 +49,7 @@ const container = css`
 		box-shadow: rgb(0 0 0 / 20%) 0px 10px 15px;
 		border-top: 1px solid rgb(242, 240, 240);
 		overflow: auto;
-		max-height: 400px;
+		max-height: 450px;
 		min-height: 300px;
 	}
 `;

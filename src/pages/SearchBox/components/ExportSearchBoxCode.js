@@ -12,13 +12,21 @@ import CredentialsSelector from './CredentialsSelector';
 const modalStyles = css`
 	width: 80vw !important;
 `;
-const ExportSearchBoxCode = ({ visible, onCancel, searchBoxId, initialCredentials = '' }) => {
+
+const ExportSearchBoxCode = ({
+	visible,
+	onCancel,
+	searchBoxId,
+	initialCredentials = '',
+	index,
+	pipeline,
+}) => {
 	const [credentialValue, setCredentialValue] = useState(initialCredentials);
 
 	function getExportCode() {
-		return `<head>\n  <script defer src="https://export-rs-searchbox.vercel.app/static/js/main.js"></script> \n  <link rel="stylesheet" href="https://export-rs-searchbox.vercel.app/static/css/main.css" > \n</head>\n<div id="searchbox-root" searchbox-id="${searchBoxId}" cluster-url="${getURL()}" credentials="${
+		return `<head>\n\t<script defer src="https://export-rs-searchbox.vercel.app/static/js/main.js"></script>\n\t<link rel="stylesheet" href="https://export-rs-searchbox.vercel.app/static/css/main.css" >\n</head>\n<div id="searchbox-root" searchbox-id="${searchBoxId}" cluster-url="${getURL()}" credentials="${
 			credentialValue ?? 'Select a credential from the dropdown'
-		}" />`;
+		}" index="${index}" pipeline='${JSON.stringify(pipeline)}'/>`;
 	}
 	const copyToClipboard = () => {
 		if (!credentialValue) {
@@ -75,12 +83,16 @@ const ExportSearchBoxCode = ({ visible, onCancel, searchBoxId, initialCredential
 };
 ExportSearchBoxCode.defaultProps = {
 	initialCredentials: '',
+	index: '',
+	pipeline: {},
 };
 ExportSearchBoxCode.propTypes = {
 	visible: PropTypes.bool.isRequired,
 	onCancel: PropTypes.func.isRequired,
 	searchBoxId: PropTypes.oneOfType([PropTypes.string, PropTypes.any]).isRequired,
 	initialCredentials: PropTypes.string,
+	index: PropTypes.string,
+	pipeline: PropTypes.object,
 };
 const mapStateToProps = (state, props) => {
 	const searchBoxData = get(state, '$getSearchBoxes.results', []).find(

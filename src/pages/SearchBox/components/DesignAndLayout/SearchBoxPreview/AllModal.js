@@ -13,11 +13,10 @@ import CustomizeSearchBoxForm from './CustomizeSearchBoxForm';
 const buttonContainer = css`
 	display: flex;
 	padding: 10px;
-	justify-content: flex-end;
 `;
 
 const button = css`
-	margin-left: 1rem;
+	margin-right: 1rem;
 `;
 
 const container = css`

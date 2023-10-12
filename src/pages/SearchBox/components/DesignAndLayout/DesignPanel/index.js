@@ -1,26 +1,17 @@
-import { Select, Switch } from 'antd';
+import { Col, Row, Select, Switch, Tooltip } from 'antd';
 import { object } from 'prop-types';
 import React, { useContext } from 'react';
 import styled from 'react-emotion';
 import { FieldControl, FieldGroup } from 'react-reactive-form';
-import Grid from '../../../../../components/CreateCredentials/Grid';
+import { InfoCircleOutlined } from '@ant-design/icons';
 import ColorPicker from './ColorPicker';
 import { Heading, Section } from './styles';
 import { FormContext } from '../../../../IntegrationsPage/utils/utils';
 import { DEFAULT_DESIGN_COLORS } from '../../../utils';
 
-const DesignGrid = styled(Grid)`
-	margin: 20px 0px;
-	justify-content: center;
+const StyledRow = styled(Row)`
 	align-items: center;
-
-	& > div:first-child {
-		& > div:first-child {
-			span:first-child {
-				white-space: nowrap;
-			}
-		}
-	}
+	margin: 1rem 0rem;
 `;
 
 // Component
@@ -35,15 +26,15 @@ export default function DesignPanel() {
 			render={(
 				{ invalid: invalidForm }, // eslint-disable-line
 			) => (
-				<>
+				<Row>
 					<Section>
 						<Heading>Design</Heading>
 						<FieldControl
 							name="theme"
 							render={({ handler }) => (
-								<DesignGrid
-									label="Theme"
-									component={
+								<StyledRow>
+									<Col xs={14}>Theme</Col>
+									<Col xs={10}>
 										<Select
 											{...handler()}
 											onChange={(value) => {
@@ -59,94 +50,168 @@ export default function DesignPanel() {
 											<Select.Option value="dark">Dark</Select.Option>
 											<Select.Option value="light">Light</Select.Option>
 										</Select>
-									}
-								/>
+									</Col>
+								</StyledRow>
 							)}
 						/>
 						<FieldControl
 							name="textColor"
 							render={({ handler }) => (
-								<DesignGrid
-									gridRatio={0.35}
-									label="Text color"
-									component={<ColorPicker {...handler()} />}
-								/>
+								<StyledRow>
+									<Col xs={14}>Text color</Col>
+									<Col xs={10}>
+										<ColorPicker {...handler()} />
+									</Col>
+								</StyledRow>
 							)}
 						/>
 						<FieldControl
 							name="primaryColor"
 							render={({ handler }) => (
-								<DesignGrid
-									gridRatio={0.35}
-									label="Accent color"
-									component={<ColorPicker {...handler()} />}
-								/>
+								<StyledRow>
+									<Col xs={14}>Accent color</Col>
+									<Col xs={10}>
+										<ColorPicker {...handler()} />
+									</Col>
+								</StyledRow>
 							)}
 						/>
 						<FieldControl
 							name="enableVoiceSearch"
 							render={({ handler }) => (
-								<DesignGrid
-									gridRatio={0.35}
-									label="Voice search"
-									component={<Switch {...handler('checkbox')} />}
-								/>
+								<StyledRow>
+									<Col xs={14}>Voice search</Col>
+									<Col xs={10}>
+										<Switch {...handler('checkbox')} />
+									</Col>
+								</StyledRow>
+							)}
+						/>
+						<FieldControl
+							name="enableImageSearch"
+							render={({ handler }) => (
+								<StyledRow>
+									<Col xs={14}>Image search</Col>
+									<Col xs={10}>
+										<Switch {...handler('checkbox')} />
+									</Col>
+								</StyledRow>
 							)}
 						/>
 						<FieldControl
 							name="highlight"
 							render={({ handler }) => (
-								<DesignGrid
-									gridRatio={0.35}
-									label="Highlight"
-									component={<Switch {...handler('checkbox')} />}
-								/>
+								<StyledRow>
+									<Col xs={14}>Highlight</Col>
+									<Col xs={10}>
+										<Switch {...handler('checkbox')} />
+									</Col>
+								</StyledRow>
 							)}
 						/>
 					</Section>
 					<Section>
 						<Heading>Display Suggestions</Heading>
-
-						<FieldControl
-							name="enableFeaturedSuggestions"
-							render={({ handler }) => (
-								<DesignGrid
-									label="Featured"
-									component={<Switch {...handler('checkbox')} />}
-								/>
-							)}
-						/>
-
 						<FieldControl
 							name="enablePopularSuggestions"
 							render={({ handler }) => (
-								<DesignGrid
-									label="Popular"
-									component={<Switch {...handler('checkbox')} />}
-								/>
+								<StyledRow>
+									<Col xs={14}>Popular</Col>
+									<Col xs={10}>
+										<Switch {...handler('checkbox')} />
+									</Col>
+								</StyledRow>
 							)}
 						/>
 
 						<FieldControl
 							name="enableRecentSuggestions"
 							render={({ handler }) => (
-								<DesignGrid
-									label="Recent"
-									component={<Switch {...handler('checkbox')} />}
-								/>
+								<StyledRow>
+									<Col xs={14}>Recent</Col>
+									<Col xs={10}>
+										<Switch {...handler('checkbox')} />
+									</Col>
+								</StyledRow>
 							)}
 						/>
 						<FieldControl
 							name="enableEndpointSuggestions"
 							render={({ handler }) => (
-								<DesignGrid
-									label="Endpoint"
-									component={<Switch {...handler('checkbox')} />}
-								/>
+								<StyledRow>
+									<Col xs={14}>Endpoint</Col>
+									<Col xs={10}>
+										<Switch {...handler('checkbox')} />
+									</Col>
+								</StyledRow>
+							)}
+						/>
+						<FieldControl
+							name="enableFAQSuggestions"
+							render={({ handler }) => (
+								<StyledRow>
+									<Col xs={14}>
+										<span>FAQs </span>
+										<Tooltip
+											title={
+												<div style={{ color: 'black' }}>
+													Set FAQs from{' '}
+													<a href="/cluster/ai-faqs">this page</a> and
+													associate them with the searchbox id(
+													<code>{mainForm.value.id}</code>) for FAQ
+													suggestions to be displayed here. Currently,
+													they only show when the searchbox is exported.
+												</div>
+											}
+											color="white"
+										>
+											<InfoCircleOutlined />
+										</Tooltip>
+									</Col>
+									<Col xs={10}>
+										<Switch {...handler('checkbox')} />
+									</Col>
+								</StyledRow>
+							)}
+						/>
+						<FieldControl
+							name="enableFeaturedSuggestions"
+							render={({ handler }) => (
+								<StyledRow>
+									<Col xs={14}>Featured</Col>
+									<Col xs={10}>
+										<Switch {...handler('checkbox')} />
+									</Col>
+								</StyledRow>
+							)}
+						/>
+						<FieldControl
+							name="enableAI"
+							render={({ handler }) => (
+								<StyledRow>
+									<Col xs={14}>
+										<span>AI Answer </span>
+										<Tooltip
+											title={
+												<div style={{ color: 'black' }}>
+													Configure AI Preferences from{' '}
+													<a href="/cluster/ai-preferences">this page</a>{' '}
+													to enable AI Answer
+												</div>
+											}
+											color="white"
+										>
+											<InfoCircleOutlined />
+										</Tooltip>
+									</Col>
+									<Col xs={10}>
+										<Switch {...handler('checkbox')} />
+									</Col>
+								</StyledRow>
 							)}
 						/>
 					</Section>
-				</>
+				</Row>
 			)}
 		/>
 	);

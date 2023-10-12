@@ -18,10 +18,5 @@ export const Heading = styled.h1`
 export const Section = styled.section`
 	padding: 1rem;
 	width: 100%;
-
-	@media only screen and (max-width: 980px), (min-width: 1400px) {
-		display: inline-block;
-		float: left;
-		width: 50%;
-	}
+	max-width: 350px;
 `;

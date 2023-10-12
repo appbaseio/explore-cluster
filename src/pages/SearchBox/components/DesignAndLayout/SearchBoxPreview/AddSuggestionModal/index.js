@@ -13,8 +13,8 @@ import { uniqueId } from 'lodash';
 import Flex from '../../../../../../batteries/components/shared/Flex';
 import InputElement from '../../../../../../components/InputElement';
 import Grid from '../../../../../../components/CreateCredentials/Grid';
-import { isUrlValid } from '../../../../utils';
 import FunctionEditor, { FUNCTION_EDITOR_TABS_KEYS } from './FunctionEditor';
+import { isUrlValid } from '../../../../utils';
 
 const container = css`
 	width: 80vw !important;
@@ -129,16 +129,19 @@ const ALLOWED_ACTIONS = {
 
 const NAVIGATION_TYPES = { 'Same Tab': '_self', 'New Tab': '_blank' };
 
-const linkValidator = async (control) => {
-	return new Promise((resolve, reject) => {
+const linkValidator = (control) => {
+	try {
 		if (!control.value || isUrlValid(control.value)) {
-			return resolve(null);
+			return null;
 		}
-		// eslint-disable-next-line no-throw-literal
-		// eslint-disable-next-line prefer-promise-reject-errors
-		return reject({ invalidLink: true });
-	});
+		return { invalidLink: true };
+	} catch (e) {
+		return {
+			invalidLink: true,
+		};
+	}
 };
+
 const AddSuggestion = (props) => {
 	const { onSave, editMode, parentSectionId, onCloseModal, suggestion } = props;
 	const DEFAULT_FUNCTION_VALUE =
@@ -164,6 +167,7 @@ const AddSuggestion = (props) => {
 				// eslint-disable-next-line prefer-destructuring
 				link = JSON.parse(subAction).link;
 			}
+
 			return {
 				label: [label, Validators.required],
 				value: [value, Validators.required],
@@ -173,7 +177,7 @@ const AddSuggestion = (props) => {
 					navigationType: [navigationType, Validators.required],
 					link: [link, Validators.required, linkValidator],
 				}),
-				iconURL: [iconURL, null, linkValidator],
+				iconURL: [iconURL, linkValidator],
 			};
 		}
 		return {
@@ -181,33 +185,11 @@ const AddSuggestion = (props) => {
 			value: ['', Validators.required],
 			description: '',
 			action: [ALLOWED_ACTIONS.SELECT.value, Validators.required],
-			iconURL: ['', null, linkValidator],
+			iconURL: ['', linkValidator],
 		};
 	};
 
 	const form = useRef(FormBuilder.group(getFormControls()));
-
-	useEffect(() => {
-		form.current.valueChanges.subscribe((value) => {
-			// do something
-
-			if (
-				form.current.get('navigationType') &&
-				form.current.get('link') &&
-				value.action === ALLOWED_ACTIONS.FUNCTION.value
-			) {
-				form.current.removeControl('navigationType');
-				form.current.removeControl('link');
-			} else if (
-				!form.current.get('navigationType') &&
-				!form.current.get('link') &&
-				value.action === ALLOWED_ACTIONS.NAVIGATE.value
-			) {
-				form.current.addControl('navigationType', new FormControl('', Validators.required));
-				form.current.addControl('link', new FormControl('', Validators.required));
-			}
-		});
-	}, []);
 
 	useEffect(() => {
 		if (suggestion.action === ALLOWED_ACTIONS.FUNCTION.value && editMode) {
@@ -394,9 +376,40 @@ const AddSuggestion = (props) => {
 											strict={false}
 											name="action"
 											render={({ handler, touched, hasError }) => {
-												const inputHandler = handler();
-												const { value: actionValue } =
-													form.current.get('action');
+												const { value: actionType, onChange } = handler();
+
+												// First parameter is value
+												const handleActionTypeChange = (v) => {
+													if (v === ALLOWED_ACTIONS.NAVIGATE.value) {
+														// Add controls
+														const currentForm = form.current;
+														if (currentForm) {
+															currentForm.addControl(
+																'navigationType',
+																new FormControl('', [
+																	Validators.required,
+																]),
+															);
+															currentForm.addControl(
+																'link',
+																new FormControl('', [
+																	Validators.required,
+																	linkValidator,
+																]),
+															);
+														}
+													} else {
+														// Remove the controls
+														const currentForm = form.current;
+														if (currentForm) {
+															currentForm.removeControl(
+																'navigationType',
+															);
+															currentForm.removeControl('link');
+														}
+													}
+													onChange(v);
+												};
 												return (
 													<div className="pos-rel">
 														<span>*</span>
@@ -420,14 +433,11 @@ const AddSuggestion = (props) => {
 																				: ''
 																		}
 																		value={
-																			actionValue || undefined
+																			actionType || undefined
 																		}
-																		{...inputHandler}
-																		onChange={(val) => {
-																			inputHandler.onChange(
-																				val,
-																			);
-																		}}
+																		onChange={
+																			handleActionTypeChange
+																		}
 																	>
 																		{Object.values(
 																			ALLOWED_ACTIONS,
@@ -459,166 +469,176 @@ const AddSuggestion = (props) => {
 												);
 											}}
 										/>
-										{form.current.get('action').value ===
-											ALLOWED_ACTIONS.NAVIGATE.value &&
-											form.current.get('navigationType') &&
-											form.current.get('link') && (
-												<>
-													<FieldControl
-														strict={false}
-														name="navigationType"
-														render={({
-															handler,
-															touched,
-															hasError,
-														}) => {
-															const inputHandler = handler();
-															const { value: navigationTypeValue } =
-																form.current.get('navigationType');
+										<FieldControl
+											strict={false}
+											name="action"
+											render={({ value: actionType }) => {
+												if (actionType === ALLOWED_ACTIONS.NAVIGATE.value) {
+													return (
+														<>
+															<FieldControl
+																strict={false}
+																name="navigationType"
+																render={({
+																	handler,
+																	touched,
+																	hasError,
+																	value: navigationTypeValue,
+																}) => {
+																	const inputHandler = handler();
 
-															return (
-																<div className="pos-rel">
-																	<span>*</span>
-																	<Grid
-																		label={
-																			<Tooltip title="Select Navigation Type">
-																				Navigation Type
-																			</Tooltip>
-																		}
-																		component={
-																			<Flex flexDirection="column">
-																				<Select
-																					placeholder="Select Navigation Type"
-																					style={{
-																						width: '300px',
-																					}}
-																					className={
-																						touched &&
-																						hasError(
-																							'required',
-																						)
-																							? 'select-error'
-																							: ''
-																					}
-																					value={
-																						navigationTypeValue
-																					}
-																					{...inputHandler}
-																					onChange={(
-																						val,
-																					) => {
-																						inputHandler.onChange(
-																							val,
-																						);
-																					}}
-																				>
-																					{Object.keys(
-																						NAVIGATION_TYPES,
-																					).map(
-																						(index) => {
-																							return (
-																								<Select.Option
-																									key={
-																										NAVIGATION_TYPES[
-																											index
-																										]
-																									}
-																								>
-																									{
-																										index
-																									}
-																								</Select.Option>
-																							);
-																						},
-																					)}
-																				</Select>{' '}
-																				<div>
-																					<span
-																						style={{
-																							color: 'red',
-																						}}
-																					>
-																						{touched &&
-																							hasError(
-																								'required',
-																							) &&
-																							'Navigation Type is required'}
-																					</span>
-																				</div>
-																			</Flex>
-																		}
-																	/>
-																</div>
-															);
-														}}
-													/>
-													<FieldControl
-														strict={false}
-														name="link"
-														render={({
-															handler,
-															hasError,
-															touched,
-														}) => {
-															const { value: linkValue } =
-																form.current.get('link');
-															return (
-																<div className="pos-rel">
-																	<span>*</span>
-																	<Grid
-																		label={
-																			<Tooltip title="URL has to be specified here">
-																				Navigation Link
-																			</Tooltip>
-																		}
-																		component={
-																			<Flex flexDirection="column">
-																				<Input
-																					{...handler()}
-																					type="text"
-																					placeholder="URL has to be specified here"
-																					value={
-																						linkValue
-																					}
-																					style={{
-																						borderColor:
-																							hasError(
-																								'invalidLink',
-																							) ||
-																							(touched &&
+																	return (
+																		<div className="pos-rel">
+																			<span>*</span>
+																			<Grid
+																				label={
+																					<Tooltip title="Select Navigation Type">
+																						Navigation
+																						Type
+																					</Tooltip>
+																				}
+																				component={
+																					<Flex flexDirection="column">
+																						<Select
+																							placeholder="Select Navigation Type"
+																							style={{
+																								width: '300px',
+																							}}
+																							className={
+																								touched &&
 																								hasError(
 																									'required',
-																								))
-																								? 'red'
-																								: '#d9d9d9',
-																					}}
-																				/>
-																				<div>
-																					<span
-																						style={{
-																							color: 'red',
-																						}}
-																					>
-																						{hasError(
-																							'invalidLink',
-																						) &&
-																							'Invalid URL'}
-																						{touched &&
-																							hasError(
-																								'required',
-																							) &&
-																							'URL is required'}
-																					</span>
-																				</div>
-																			</Flex>
-																		}
-																	/>
-																</div>
-															);
-														}}
-													/>
-												</>
-											)}
+																								)
+																									? 'select-error'
+																									: ''
+																							}
+																							value={
+																								navigationTypeValue
+																							}
+																							{...inputHandler}
+																							onChange={(
+																								val,
+																							) => {
+																								inputHandler.onChange(
+																									val,
+																								);
+																							}}
+																						>
+																							{Object.keys(
+																								NAVIGATION_TYPES,
+																							).map(
+																								(
+																									index,
+																								) => {
+																									return (
+																										<Select.Option
+																											key={
+																												NAVIGATION_TYPES[
+																													index
+																												]
+																											}
+																										>
+																											{
+																												index
+																											}
+																										</Select.Option>
+																									);
+																								},
+																							)}
+																						</Select>{' '}
+																						<div>
+																							<span
+																								style={{
+																									color: 'red',
+																								}}
+																							>
+																								{touched &&
+																									hasError(
+																										'required',
+																									) &&
+																									'Navigation Type is required'}
+																							</span>
+																						</div>
+																					</Flex>
+																				}
+																			/>
+																		</div>
+																	);
+																}}
+															/>
+															<FieldControl
+																strict={false}
+																name="link"
+																render={({
+																	handler,
+																	hasError,
+																	touched,
+																	submitted,
+																	value: linkValue,
+																}) => {
+																	const isError =
+																		(submitted || touched) &&
+																		(hasError('required') ||
+																			hasError(
+																				'invalidLink',
+																			));
+																	return (
+																		<div className="pos-rel">
+																			<span>*</span>
+																			<Grid
+																				label={
+																					<Tooltip title="URL has to be specified here">
+																						Navigation
+																						Link
+																					</Tooltip>
+																				}
+																				component={
+																					<Flex flexDirection="column">
+																						<Input
+																							{...handler()}
+																							type="text"
+																							placeholder="URL has to be specified here"
+																							value={
+																								linkValue
+																							}
+																							style={{
+																								borderColor:
+																									isError
+																										? 'red'
+																										: '#d9d9d9',
+																							}}
+																						/>
+																						{isError ? (
+																							<div>
+																								<span
+																									style={{
+																										color: 'red',
+																									}}
+																								>
+																									{hasError(
+																										'invalidLink',
+																									) &&
+																										'Invalid URL'}
+																									{hasError(
+																										'required',
+																									) &&
+																										'URL is required'}
+																								</span>
+																							</div>
+																						) : null}
+																					</Flex>
+																				}
+																			/>
+																		</div>
+																	);
+																}}
+															/>
+														</>
+													);
+												}
+												return null;
+											}}
+										/>
 									</Flex>
 								</Flex>
 								{form.current.get('action').value ===

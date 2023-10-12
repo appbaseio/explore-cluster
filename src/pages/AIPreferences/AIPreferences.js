@@ -648,6 +648,8 @@ const AIPreferences = (props) => {
 									 * This is a common pattern we have in the code
 									 * Problem: We want to show/hide controls(slave) on basis of value of some other control(master)
 									 * Solution: We use the master control(here apiType) as a FieldControl and use the render method
+									 *
+									 * Note: The master control also removes and adds the control on some event.
 									 * which is called everytime the value of the master is changed.
 									 */}
 									<FieldControl

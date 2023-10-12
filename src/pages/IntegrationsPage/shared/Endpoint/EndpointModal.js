@@ -4,7 +4,7 @@ import { css } from 'react-emotion';
 import { array, bool, func, object } from 'prop-types';
 import { FieldControl, FieldGroup, FormBuilder, Validators } from 'react-reactive-form';
 import TextInput from '../../../../components/Form/Input';
-import { headersValidator, urlValidator } from '../../../SearchAuth0Settings/utils';
+import { headersValidator, relativeURLValidator } from '../../../SearchAuth0Settings/utils';
 import CodeEditor from '../../../SearchBox/components/EndpointSuggestions/CodeEditor';
 
 const modal = css`
@@ -29,7 +29,7 @@ const modal = css`
 const EndpointModal = ({ showForm, setShowForm, customFields, setCustomFields, control }) => {
 	const newForm = useRef(
 		FormBuilder.group({
-			url: ['', [Validators.required, urlValidator]],
+			url: ['', [Validators.required, relativeURLValidator]],
 			method: ['POST', Validators.required],
 			headers: ['{}', headersValidator],
 		}),
@@ -78,7 +78,7 @@ const EndpointModal = ({ showForm, setShowForm, customFields, setCustomFields, c
 					}}
 					onCancel={() => handleCancel()}
 					okButtonProps={{
-						disabled: newForm?.current?.invalid || newForm?.current?.pristine,
+						disabled: newForm?.current?.invalid,
 					}}
 				>
 					<div className={modal}>

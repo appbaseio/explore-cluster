@@ -2,11 +2,16 @@
 import React, { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { css } from 'emotion';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { ArrowLeftOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Card, Input, notification, Result, Skeleton, Tabs } from 'antd';
+import {
+	ArrowLeftOutlined,
+	ArrowRightOutlined,
+	InfoCircleOutlined,
+	PlusOutlined,
+} from '@ant-design/icons';
+import { Button, Card, Divider, Input, notification, Result, Row, Skeleton, Tabs } from 'antd';
 
 import { FieldControl, FieldGroup, FormBuilder, Validators } from 'react-reactive-form';
 import DOMPurify from 'dompurify';
@@ -27,6 +32,18 @@ import { urlValidator } from '../SearchAuth0Settings/utils';
 import { isEmpty } from '../../utils';
 import CredentialsSelector from './components/CredentialsSelector';
 import { DEFAULT_DESIGN_COLORS, parseJSON } from './utils';
+import { formIndexPipeline } from './components/PipelineSwitcher';
+import FeaturedSuggestions from './components/FeaturedSuggestions';
+import {
+	EndpointRow,
+	FormLabel,
+	StyledIndexSwitcher,
+	StyledPipelineSwitcher,
+	FormTooltip,
+	FormRow,
+	EndpointInnerLabel,
+	EndpointCol,
+} from './SearchBoxFormStyles';
 
 const { TabPane } = Tabs;
 
@@ -46,6 +63,7 @@ function stringifyJSON(input) {
 export const arrayValidator = (control) => {
 	// when not touched
 	if (!control.value) {
+		// can be used as hasError('required')
 		return { required: true };
 	}
 	if (!control.value.length) {
@@ -124,6 +142,17 @@ const SearchBoxForm = (props) => {
 		getSearchBoxes();
 	}, []);
 
+	/**
+	 * All the values you need to remember for the particular searchbox
+	 *
+	 * Some values like index, credentials, pipeline, id etc. don't have a special meaning for the backend.
+	 * They need to be explicitly passed to Reactivesearch components. We save it in the backend to just for persistence.
+	 *
+	 * Some values like featured.layout have a special meaning.
+	 * eg.
+	 * 	They don't need to be explicitly passed to Reactivesearch components, once saved with a searchboxId.
+	 * 	Just the searchboxId needs to passed in such case. The values are fetched from the backend.
+	 */
 	const form = useRef(
 		FormBuilder.group({
 			id: [
@@ -136,6 +165,8 @@ const SearchBoxForm = (props) => {
 			],
 			description: '',
 			credentials: ['', [Validators.required]],
+			index: [''],
+			pipeline: [{}],
 			popular: FormBuilder.group({
 				minCount: [0, [Validators.min(0), Validators.max(1000)]],
 				minChars: [0, [Validators.min(0)]],
@@ -170,11 +201,14 @@ const SearchBoxForm = (props) => {
 				}),
 			}),
 			designAndLayout: FormBuilder.group({
+				enableFAQSuggestions: false,
+				enableAI: false,
 				enableFeaturedSuggestions: true,
 				enablePopularSuggestions: false,
 				enableEndpointSuggestions: false,
 				enableRecentSuggestions: false,
 				enableVoiceSearch: false,
+				enableImageSearch: false,
 				highlight: false,
 				theme: 'light',
 				primaryColor: DEFAULT_DESIGN_COLORS.light.primaryColor,
@@ -191,6 +225,7 @@ const SearchBoxForm = (props) => {
 			}),
 		}),
 	);
+
 	const handleSaveSearchBox = () => {
 		const { value: formValue } = form.current;
 		const {
@@ -201,8 +236,9 @@ const SearchBoxForm = (props) => {
 			designAndLayout = {},
 			endpoint = {},
 			credentials,
+			index,
+			pipeline,
 		} = formValue;
-
 		const payload = {
 			enabled: true,
 			hidden: false,
@@ -225,11 +261,14 @@ const SearchBoxForm = (props) => {
 						primaryColor: designAndLayout.primaryColor,
 						textColor: designAndLayout.textColor,
 						theme: designAndLayout.theme,
+						enableFAQSuggestions: designAndLayout.enableFAQSuggestions,
+						enableAI: designAndLayout.enableAI,
 						enableFeaturedSuggestions: designAndLayout.enableFeaturedSuggestions,
 						enablePopularSuggestions: designAndLayout.enablePopularSuggestions,
 						enableEndpointSuggestions: designAndLayout.enableEndpointSuggestions,
 						enableRecentSuggestions: designAndLayout.enableRecentSuggestions,
 						enableVoiceSearch: designAndLayout.enableVoiceSearch,
+						enableImageSearch: designAndLayout.enableImageSearch,
 						highlight: designAndLayout.highlight,
 						iconURL: designAndLayout?.customizeSearchBox?.iconURL,
 						iconPosition: designAndLayout?.customizeSearchBox?.iconPosition,
@@ -241,7 +280,12 @@ const SearchBoxForm = (props) => {
 						addonAfter: DOMPurify.sanitize(
 							designAndLayout?.customizeSearchBox?.addonAfter,
 						),
+						/**
+						 * The below values are not top level because they don't get saved in the backend otherwise.
+						 * */
 						credentials,
+						index,
+						pipeline,
 					},
 					...(!isEmpty(designAndLayout.searchbox)
 						? {
@@ -282,29 +326,39 @@ const SearchBoxForm = (props) => {
 		};
 
 		if (form.current.invalid) {
+			// Below runs the validations so we can use the status on each control below
 			form.current.handleSubmit();
-			const { controls } = form.current;
-			if (!id || !credentials || !id.match(SEARCHBOX_ID_PATTERN)) {
-				return;
-			}
-			if (controls.designAndLayout.status === 'INVALID') {
-				setActiveTab('1');
-				return;
-			}
-			if (controls.popular.status === 'INVALID' && designAndLayout.enablePopularSuggestions) {
-				setActiveTab('2');
-				return;
-			}
-			if (controls.recent.status === 'INVALID' && designAndLayout.enableRecentSuggestions) {
-				setActiveTab('3');
-				return;
-			}
-			if (
-				controls.endpoint.status === 'INVALID' &&
-				designAndLayout.enableEndpointSuggestions
-			) {
-				setActiveTab('4');
-				return;
+			const { controls } = form.current || {};
+
+			if (controls) {
+				if (controls.credentials.status === 'INVALID' || controls.id.status === 'INVALID') {
+					return;
+				}
+				if (controls.designAndLayout.status === 'INVALID') {
+					setActiveTab('1');
+					return;
+				}
+				if (
+					controls.popular.status === 'INVALID' &&
+					designAndLayout.enablePopularSuggestions
+				) {
+					setActiveTab('2');
+					return;
+				}
+				if (
+					controls.recent.status === 'INVALID' &&
+					designAndLayout.enableRecentSuggestions
+				) {
+					setActiveTab('3');
+					return;
+				}
+				if (
+					controls.endpoint.status === 'INVALID' &&
+					designAndLayout.enableEndpointSuggestions
+				) {
+					setActiveTab('4');
+					return;
+				}
 			}
 		}
 
@@ -342,6 +396,8 @@ const SearchBoxForm = (props) => {
 				id: searchBoxData.id,
 				description: searchBoxData.description ?? '',
 				credentials: searchBoxData.searchbox?.featured?.design?.credentials ?? '',
+				index: searchBoxData.searchbox?.featured?.design?.index ?? '',
+				pipeline: searchBoxData.searchbox?.featured?.design?.pipeline ?? {},
 				popular: {
 					minCount: searchBoxData.searchbox?.popular?.minCount,
 					minChars: searchBoxData.searchbox?.popular?.minChars,
@@ -358,6 +414,9 @@ const SearchBoxForm = (props) => {
 					textColor: searchBoxData.searchbox?.featured.design.textColor,
 					theme: searchBoxData.searchbox?.featured?.design?.theme,
 					primaryColor: searchBoxData.searchbox?.featured?.design?.primaryColor,
+					enableFAQSuggestions:
+						searchBoxData.searchbox?.featured?.design?.enableFAQSuggestions,
+					enableAI: searchBoxData.searchbox?.featured?.design?.enableAI,
 					enableFeaturedSuggestions:
 						searchBoxData.searchbox?.featured?.design?.enableFeaturedSuggestions,
 					enablePopularSuggestions:
@@ -367,6 +426,7 @@ const SearchBoxForm = (props) => {
 					enableRecentSuggestions:
 						searchBoxData.searchbox?.featured?.design?.enableRecentSuggestions,
 					enableVoiceSearch: searchBoxData.searchbox?.featured?.design?.enableVoiceSearch,
+					enableImageSearch: searchBoxData.searchbox?.featured?.design?.enableImageSearch,
 					highlight: searchBoxData.searchbox?.featured?.design?.highlight,
 					customizeSearchBox: {
 						iconURL: searchBoxData.searchbox?.featured?.design?.iconURL,
@@ -466,9 +526,11 @@ const SearchBoxForm = (props) => {
 										toolTipProps={{
 											overlayClassName: css`
 												.ant-tooltip-inner {
-													background-color: #000;
+													background-color: white;
+													color: black;
 												}
 											`,
+											color: 'white',
 										}}
 										className="top-row"
 										gridRatio={0.35}
@@ -528,9 +590,11 @@ const SearchBoxForm = (props) => {
 										toolTipProps={{
 											overlayClassName: css`
 												.ant-tooltip-inner {
-													background-color: #000;
+													background-color: white;
+													color: black;
 												}
 											`,
+											color: 'white',
 										}}
 										gridRatio={0.35}
 										style={{ marginTop: '1rem', alignItems: 'center' }}
@@ -568,9 +632,11 @@ const SearchBoxForm = (props) => {
 										toolTipProps={{
 											overlayClassName: css`
 												.ant-tooltip-inner {
-													background-color: #000;
+													background-color: white;
+													color: black;
 												}
 											`,
+											color: 'white',
 										}}
 										gridRatio={0.35}
 										key={JSON.stringify(searchBoxData)}
@@ -624,6 +690,116 @@ const SearchBoxForm = (props) => {
 											/>
 										}
 									/>
+									<Row>
+										<Divider />
+										<FormRow>
+											<FormLabel>Configure endpoint</FormLabel>
+											<FormTooltip
+												color="white"
+												title={
+													<FormTooltip.Text>
+														Configure pipeline and endpoint
+													</FormTooltip.Text>
+												}
+											>
+												<InfoCircleOutlined />
+											</FormTooltip>
+										</FormRow>
+										<EndpointRow>
+											<EndpointCol xs={6}>
+												{/* Here we call indexes as pipelines. */}
+												<EndpointInnerLabel>Pipeline</EndpointInnerLabel>
+												<FieldControl
+													name="index"
+													strict={false}
+													render={({ value }) => {
+														return (
+															<Flex alignItems="center" css="flex: 1">
+																<StyledIndexSwitcher
+																	value={value}
+																	placeholder="Choose an index"
+																	showSearch
+																	onChange={(valueParam) => {
+																		form.current.patchValue({
+																			index: valueParam || '',
+																		});
+																		// If pipeline is not set, set it to index pipeline
+																		if (
+																			!form.current?.value
+																				?.pipeline?.id
+																		) {
+																			const indexPipeline =
+																				formIndexPipeline(
+																					valueParam,
+																				);
+																			form.current.patchValue(
+																				{
+																					pipeline: {
+																						id: indexPipeline.id,
+																						method: indexPipeline
+																							.route
+																							.method,
+																						url: indexPipeline
+																							.route
+																							.path,
+																					},
+																				},
+																			);
+																		}
+																	}}
+																/>
+															</Flex>
+														);
+													}}
+												/>
+											</EndpointCol>
+											<EndpointCol xs={18}>
+												<EndpointInnerLabel>Endpoint</EndpointInnerLabel>
+												<FieldControl
+													name="pipeline"
+													strict={false}
+													render={({ value }) => {
+														return (
+															<Flex
+																alignItems="center"
+																css="width:100%"
+															>
+																<StyledPipelineSwitcher
+																	value={
+																		value.url
+																			? `${value.method} ${value.url}`
+																			: ''
+																	}
+																	placeholder="Choose a pipeline"
+																	showSearch
+																	onChange={(
+																		_value,
+																		{ pipeline },
+																	) => {
+																		form.current.patchValue({
+																			pipeline: {
+																				id:
+																					pipeline.id ||
+																					'',
+																				method:
+																					pipeline?.route
+																						?.method ||
+																					'',
+																				url:
+																					pipeline?.route
+																						.path || '',
+																			},
+																		});
+																	}}
+																/>
+															</Flex>
+														);
+													}}
+												/>
+											</EndpointCol>
+										</EndpointRow>
+										<Divider />
+									</Row>
 								</React.Fragment>
 							);
 						}}
@@ -653,13 +829,32 @@ const SearchBoxForm = (props) => {
 						<TabPane tab="Endpoint Suggestions" key="4" data-cy="index-suggestions-tab">
 							<EndpointSuggestions />
 						</TabPane>
+						<TabPane
+							tab={
+								<div>
+									<span>FAQs Suggestions</span>{' '}
+									<span>
+										<ArrowRightOutlined
+											style={{ transform: 'rotate(315deg)' }}
+										/>
+									</span>
+								</div>
+							}
+							key="5"
+							data-cy="faq-suggestions-tab"
+						>
+							<Redirect to="/cluster/ai-faqs" />
+						</TabPane>
+						<TabPane tab="Featured Suggestions" key="6">
+							<FeaturedSuggestions searchBoxData={searchBoxData} />
+						</TabPane>
 					</Tabs>
 				</FormContext.Provider>
 			</div>
 			<Footer
 				collapsed={collapsed}
 				onLivePreview={() => {
-					if (form.current.value.credentials) {
+					if (form.current.value.credentials || form.current.value.index) {
 						setTriggerLivePreview(true);
 
 						setTimeout(() => {
@@ -671,6 +866,7 @@ const SearchBoxForm = (props) => {
 				}}
 				isEditPage={isEditPage}
 				onSave={handleSaveSearchBox}
+				searchBoxItem={form.current.value}
 				isSaving={isCreating || searchBoxData?.update?.isLoading}
 			/>
 		</>
@@ -686,6 +882,7 @@ SearchBoxForm.propTypes = {
 	saveSearchBox: PropTypes.func.isRequired,
 	history: PropTypes.object.isRequired,
 	isCreating: PropTypes.bool,
+	apps: PropTypes.array.isRequired,
 };
 
 SearchBoxForm.defaultProps = {
@@ -706,6 +903,7 @@ const mapStateToProps = (state, props) => {
 		collapsed,
 		isCreating: get(state, '$getSearchBoxes')?.create?.isLoading ?? false,
 		permissions: get(appPermissions, 'results', []),
+		apps: Object.keys(get(state, 'apps.data') || {}).filter((app) => !app.startsWith('.')),
 	};
 
 	if (id) {

@@ -20,6 +20,29 @@ export const urlValidator = (control, allowUrlsWithForwardSlahes) => {
 		};
 	}
 };
+export const relativeURLValidator = (control, allowUrlsWithForwardSlahes) => {
+	try {
+		if (!control.value) {
+			return null;
+		}
+		let invalidLink = null;
+		// match any relative url
+		// eslint-disable-next-line no-useless-escape
+		const matcher = /^\/[^\s\.]+\S*$/;
+
+		invalidLink = !matcher.test(control.value);
+		if (invalidLink) {
+			if (allowUrlsWithForwardSlahes) {
+				invalidLink = !control.value.startsWith('/');
+			}
+		}
+		return invalidLink ? { invalidLink } : null;
+	} catch (e) {
+		return {
+			invalidLink: true,
+		};
+	}
+};
 /* eslint-disable no-useless-escape */
 export const validUrlPattern = /^(?:\w+:)?\/\/([^\s\.]+\.\S{2}|localhost[\:?\d]*)\S*$/;
 export const validDomainPattern =

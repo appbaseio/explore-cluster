@@ -155,6 +155,7 @@ const SearchBoxCard = (props) => {
 		}
 		return null;
 	};
+
 	return (
 		<>
 			<Card
@@ -266,6 +267,8 @@ const SearchBoxCard = (props) => {
 				visible={showExportCode}
 				onCancel={() => setShowExportCode(false)}
 				searchBoxId={searchBoxItem.id}
+				index={searchBoxItem?.searchbox?.featured?.design?.index}
+				pipeline={searchBoxItem?.searchbox?.featured?.design?.pipeline}
 			/>
 		</>
 	);

@@ -1,5 +1,5 @@
 import { ReactiveBase, SearchBox } from '@appbaseio/reactivesearch';
-import { Alert, Modal, notification, Spin } from 'antd';
+import { Modal, notification, Spin } from 'antd';
 import DOMPurify from 'dompurify';
 import { css } from 'emotion';
 import { uniqueId } from 'lodash';
@@ -16,13 +16,10 @@ import { FormContext } from '../../../IntegrationsPage/utils/utils';
 import { parseJSON } from '../../utils';
 import DesignPanel from './DesignPanel';
 
-import SearchBoxPreview from './SearchBoxPreview';
-
 const container = css`
 	flex-wrap: wrap;
 	gap: 1.5rem;
 	height: 100%;
-	padding-top: 3.5rem;
 	overflow: auto;
 
 	& > div {
@@ -32,44 +29,22 @@ const container = css`
 			border-right: 1px solid white;
 			height: max-content;
 			margin-bottom: 40px;
-			flex-grow: 1;
-			@media only screen and (max-width: 980px) {
-				border-bottom: 1px solid #bfbfbf;
-			}
-		}
-		&:nth-of-type(2) {
-			flex-grow: 1;
-			padding: 0 1rem 1rem 0;
-			margin-left: 1rem;
-			width: 48%;
+			flex-grow: 11;
 		}
 	}
 `;
 
-const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, searchBoxData }) => {
+const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview }) => {
 	const mainForm = useContext(FormContext);
 	const form = mainForm.get('designAndLayout');
 	const customizeSearchBoxForm = form.get('customizeSearchBox');
 	const [showLivePreview, setShowLivePreview] = useState(false);
 	const [previewLoading, setPreviewLoading] = useState(false);
-	const featuredSuggestionsPayload = useRef({});
 	const featuredSuggestionsId = useRef('');
-
-	const collectSearchBoxPreviewState = useCallback(
-		(stateObject) => {
-			featuredSuggestionsPayload.current = stateObject;
-			form.patchValue({
-				searchbox: {
-					...featuredSuggestionsPayload.current,
-				},
-			});
-		},
-		[featuredSuggestionsPayload],
-	);
 
 	const handleLivePreview = useCallback(async () => {
 		try {
-			if (featuredSuggestionsPayload.current) {
+			if (form.value && form.value.searchbox) {
 				setPreviewLoading(true);
 				setShowLivePreview(true);
 				const { endpoint = {}, popular = {}, recent = {} } = mainForm.value;
@@ -79,7 +54,7 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 						searchbox: {
 							featured: {
 								layout: {
-									...featuredSuggestionsPayload.current,
+									...form.value.searchbox,
 								},
 							},
 							endpoint: {
@@ -149,30 +124,13 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 			handleLivePreview();
 		}
 	}, [triggerLivePreview]);
+	const CLUSTER_URL = getURL();
 
 	return (
 		<>
 			<Flex className={container}>
 				<div style={{ position: 'relative', paddingBottom: '60px' }}>
 					<DesignPanel />
-					<Alert
-						type="info"
-						showIcon
-						style={{
-							minHeight: '38px',
-							maxHeight: '60px',
-							width: 'fit-content',
-							position: 'absolute',
-							bottom: '11px',
-						}}
-						message="Design elements are only testable with live preview"
-					/>
-				</div>
-				<div>
-					<SearchBoxPreview
-						stateCollector={collectSearchBoxPreviewState}
-						searchBoxData={searchBoxData}
-					/>
 				</div>
 			</Flex>
 
@@ -199,8 +157,22 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 				<Spin style={{ margin: 'auto', width: '100%' }} spinning={previewLoading}>
 					{previewLoading ? null : (
 						<ReactiveBase
-							app="featured_suggestions"
+							// Older searchbox didn't have a index field. So, they had "featured_suggestions" passed as the index.
+							app={mainForm.value.index || 'featured_suggestions'}
 							credentials={mainForm.value.credentials}
+							endpoint={
+								mainForm.value.pipeline?.id
+									? {
+											url: `${CLUSTER_URL}${mainForm.value.pipeline.url}`,
+											headers: {
+												Authorization: `Basic ${btoa(
+													mainForm.value.credentials,
+												)}`,
+											},
+											method: mainForm.value.pipeline?.method,
+									  }
+									: undefined
+							}
 							url={getURL()}
 							themePreset={form.value.theme}
 							theme={{
@@ -209,14 +181,21 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 									textColor: form.value.textColor,
 								},
 							}}
+							style={{
+								height: 'calc(100vh - 200px)',
+							}}
 						>
 							<SearchBox
 								enableRecentSuggestions={form.value.enableRecentSuggestions}
 								enablePopularSuggestions={form.value.enablePopularSuggestions}
+								enableFAQSuggestions={form.value.enableFAQSuggestions}
+								enableAI={form.value.enableAI}
 								enableFeaturedSuggestions={form.value.enableFeaturedSuggestions}
-								enableIndexSuggestions={false}
-								enableEndpointSuggestions={form.value.enableEndpointSuggestions}
+								// Below is temporarily disabled due to an issue with the backend, which is returning empty hits
+								// enableEndpointSuggestions={form.value.enableEndpointSuggestions}
+								enableIndexSuggestions={!!mainForm.value.index}
 								showVoiceSearch={form.value.enableVoiceSearch}
+								showImageSearch={form.value.enableImageSearch}
 								highlight={form.value.highlight}
 								iconURL={customizeSearchBoxForm.value.iconURL}
 								iconPosition={customizeSearchBoxForm.value.iconPosition}
@@ -249,8 +228,7 @@ const DesignAndLayout = ({ saveSearchBox, deleteSearchBox, triggerLivePreview, s
 								{...(featuredSuggestionsId.current && {
 									searchboxId: featuredSuggestionsId.current,
 									featuredSuggestionsConfig: {
-										sectionsOrder:
-											featuredSuggestionsPayload.current.sectionsOrder,
+										sectionsOrder: form.value?.searchbox?.sectionsOrder,
 									},
 								})}
 							/>
