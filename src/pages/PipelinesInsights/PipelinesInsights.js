@@ -169,6 +169,8 @@ const Pipelines = (props) => {
 	const [errorRateInsights, setErrorRateInsights] = useState([]);
 	const [errorRateInsightsPerVersion, setErrorRateInsightsPerVersion] = useState([]);
 	const [loadingState, setLoadingState] = useState(isLoading);
+	const [isSettingPipelineValue, setIsSettingPipelineValue] = useState(false);
+
 	const chartWrapperRef = useRef(null);
 	const form = useRef(
 		FormBuilder.group({
@@ -197,6 +199,7 @@ const Pipelines = (props) => {
 		setLoadingState(true);
 		getPipelinesAvgTimeTakenInsights(pipelineId, getQueryParams())
 			.then((res) => {
+				console.log('avg time insights: ', res);
 				setAvgTimeInsights(
 					res.map((item) => {
 						const dataItem = {};
@@ -327,6 +330,12 @@ const Pipelines = (props) => {
 		selectFilterValue(filterId, 'from', dateRanges['Last 30 days'].from);
 		selectFilterValue(filterId, 'to', dateRanges['Last 30 days'].to);
 		const pipelineListenerCb = (value) => {
+			if (isSettingPipelineValue) {
+				// Reset the flag to false for future changes
+				setIsSettingPipelineValue(false);
+				return; // Exit the callback early
+			}
+
 			if (value) {
 				// reset version form control
 				form.current.get('version').reset();
@@ -334,7 +343,9 @@ const Pipelines = (props) => {
 			}
 		};
 
-		form.current.get('pipeline').valueChanges.subscribe(pipelineListenerCb);
+		const pipelineSubscription = form.current
+			.get('pipeline')
+			.valueChanges.subscribe(pipelineListenerCb);
 
 		const versionListenerCb = (value) => {
 			if (value) {
@@ -342,11 +353,13 @@ const Pipelines = (props) => {
 			}
 		};
 
-		form.current.get('version').valueChanges.subscribe(versionListenerCb);
+		const versionSubscription = form.current
+			.get('version')
+			.valueChanges.subscribe(versionListenerCb);
 
 		return () => {
-			form.current.get('pipeline').valueChanges.unsubscribe(pipelineListenerCb);
-			form.current.get('version').valueChanges.unsubscribe(versionListenerCb);
+			pipelineSubscription.unsubscribe();
+			versionSubscription.unsubscribe();
 		};
 	}, []);
 
@@ -356,6 +369,18 @@ const Pipelines = (props) => {
 			makePipelineVersionRelatedCalls();
 		}
 	}, [filters]);
+
+	useEffect(() => {
+		if (Array.isArray(pipelines) && pipelines.length > 0) {
+			const pipelineValue = form.current?.get('pipeline')?.value;
+			if (!pipelineValue) {
+				setIsSettingPipelineValue(true);
+				form.current.patchValue({
+					pipeline: pipelines[0].id,
+				});
+			}
+		}
+	}, [pipelines]);
 
 	if (!ALLOWED_SLS.includes(backendImage) && compareVersion(appVersion, '8.0.0') === -1)
 		return (
@@ -473,6 +498,7 @@ const Pipelines = (props) => {
 								}
 							});
 						});
+						const allKeys = [...new Set(dataArray.flatMap((obj) => Object.keys(obj)))];
 						ChartComponent = () => (
 							<LineChart
 								height={350}
@@ -515,7 +541,7 @@ const Pipelines = (props) => {
 									}}
 								/>
 
-								{Object.keys(dataArray[0] ?? {}).map((key, index) => {
+								{allKeys.map((key, index) => {
 									if (key === xAxisDataKey) {
 										return null;
 									}
