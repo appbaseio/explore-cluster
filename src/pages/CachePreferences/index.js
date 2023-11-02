@@ -20,8 +20,8 @@ const main = css`
 `;
 
 const bannerDetails = {
-	title: 'Build ⚡️ fast search for your end users with reactivesearch.io cache',
-	description: "Tailor reactivesearch.io's caching preferences based on your search use-case",
+	title: 'Build ⚡️ fast search for your end users with application cache',
+	description: "Use ReactiveSearch's built-in cache or integrate with your own cache.",
 	buttonText: 'Read Docs',
 	href: 'https://docs.reactivesearch.io/docs/speed/cache-management/',
 };

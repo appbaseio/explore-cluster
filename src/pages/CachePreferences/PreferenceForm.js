@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Select, Button, Switch } from 'antd';
+import { Select, Button, Switch, Input, Typography } from 'antd';
 import { css } from 'react-emotion';
 import PropTypes from 'prop-types';
 import { FieldGroup, FieldControl } from 'react-reactive-form';
@@ -36,7 +36,13 @@ const modal = css`
 	}
 `;
 
-const PreferenceForm = ({ control, handleSaveTemplate, isLoading, apps }) => {
+// Function to validate Redis address format
+const validateRedisAddress = (value) => {
+	const pattern = /^([^:]+)(:\d+)?$/; // Regex pattern to match "host" or "host:port"
+	return pattern.test(value) || value === '';
+};
+
+const PreferenceForm = ({ control, handleSaveTemplate, showRedisGroup, isLoading, apps }) => {
 	const indices = useMemo(
 		() =>
 			Object.keys(apps || {})
@@ -115,6 +121,91 @@ const PreferenceForm = ({ control, handleSaveTemplate, isLoading, apps }) => {
 							);
 						}}
 					/>
+					{showRedisGroup && (
+						<div
+							style={{
+								backgroundColor: 'rgb(245, 245, 245)',
+								padding: '10px 20px',
+								borderRadius: '4px',
+							}}
+						>
+							<Typography.Title level={5} style={{ marginBottom: '20px' }}>
+								Configure dedicated cache with Redis{' '}
+								<span
+									style={{
+										backgroundColor: '#f5f5f5',
+										fontFamily: 'monospace',
+										fontSize: '12px',
+										fontWeight: 'normal',
+										padding: '2px 8px',
+										marginLeft: '10px',
+										borderRadius: '4px',
+										border: '1px solid #dcdcdc',
+									}}
+								>
+									New since v8.20.0
+								</span>
+							</Typography.Title>
+							<FieldControl
+								name="addr"
+								render={({ handler, touched, hasError }) => (
+									<Grid
+										label="Redis Address"
+										toolTipMessage={Messages.redisAddr}
+										component={
+											<Input
+												{...handler()}
+												name="addr"
+												autoComplete="off"
+												placeholder="localhost:6379"
+												style={{ width: '100%' }}
+												// Add validation status based on the touched state and if there's an error
+												status={touched && hasError('format') && 'error'}
+												// Helper text to show when there's an error
+												help={
+													touched &&
+													hasError('format') &&
+													'Invalid address format.'
+												}
+											/>
+										}
+									/>
+								)}
+								validators={{
+									// Validate format only if the addr is not empty
+									format: (value) => !value || validateRedisAddress(value),
+								}}
+							/>
+
+							{/* Redis Password Input */}
+							<InputElement
+								name="password"
+								label="Redis Password"
+								autoComplete="off"
+								inputProps={{
+									type: 'password',
+									style: {
+										width: '100%',
+									},
+									placeholder: 'Password (optional)',
+								}}
+							/>
+
+							{/* Redis Database Input */}
+							<InputElement
+								name="database"
+								label="Redis Database"
+								inputProps={{
+									type: 'number',
+									style: {
+										width: '100%',
+									},
+									placeholder: 'Database (default: 0)',
+									min: 0, // Assuming Redis database index starts at 0
+								}}
+							/>
+						</div>
+					)}
 					<div
 						style={{
 							display: 'flex',
@@ -143,11 +234,13 @@ PreferenceForm.propTypes = {
 	handleSaveTemplate: PropTypes.func.isRequired,
 	control: PropTypes.object.isRequired,
 	isLoading: PropTypes.bool.isRequired,
+	showRedisGroup: PropTypes.bool,
 	apps: PropTypes.object,
 };
 
 PreferenceForm.defaultProps = {
 	apps: {},
+	showRedisGroup: false,
 };
 
 const mapStateToProps = (state) => ({

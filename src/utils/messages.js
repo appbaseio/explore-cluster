@@ -195,6 +195,8 @@ export const cacheMessages = {
 		'The max memory limit that is reserved for the entire cache. The default value is 128MB.',
 	),
 	indices: Message('Only selected indices will be considered to be cached.'),
+	redisAddr: Message('The Redis address to use for caching. Should be in the format: host:port'),
+	redisPassword: Message('(Optional) The password to use for Redis authentication.'),
 };
 
 export const accessControlMessages = {

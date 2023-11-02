@@ -20,6 +20,8 @@ class Main extends React.Component {
 		if (versionCompare(props.appbaseVersion, '7.43.1') !== -1) {
 			maxDuration = 24 * 60 * 60;
 		}
+		// Determine whether to show Redis configuration group
+		this.showRedisGroup = versionCompare(props.appbaseVersion, '8.19.1') !== -1;
 		this.form = FormBuilder.group({
 			enable_cache: false,
 			// This property is in seconds. It should be in between 60s to 86400s (24h)
@@ -30,6 +32,15 @@ class Main extends React.Component {
 			// This property is in MB. It should be in between 128MB to 4GB
 			max_size: [128, [Validators.required, Validators.min(128), Validators.max(4 * 1000)]],
 			indices: [['*']],
+			addr: [
+				'', // Default value for Redis address
+				[Validators.pattern(/^([^:]+)(:\d+)?$/)], // Pattern validator for the address
+			],
+			password: '', // Default value for Redis password
+			database: [
+				0, // Default value for Redis database
+				[Validators.min(0)], // Validator to ensure the database number is not negative
+			],
 		});
 		if (isValidPlan(props.tier, props.featureCache)) {
 			props.getPreferences().then((action) => {
@@ -40,6 +51,9 @@ class Main extends React.Component {
 						max_duration: parseInt(payload.max_duration, 10),
 						max_size: parseInt(payload.max_size, 10),
 						indices: payload.indices || ['*'],
+						addr: payload.addr || '',
+						password: payload.password || '',
+						database: parseInt(payload.database, 10) || 0,
 					});
 				}
 			});
@@ -92,6 +106,7 @@ class Main extends React.Component {
 					<PreferenceForm
 						handleSaveTemplate={this.handleSaveTemplate}
 						control={this.form}
+						showRedisGroup={this.showRedisGroup}
 					/>
 				</ErrorToaster>
 			</>
