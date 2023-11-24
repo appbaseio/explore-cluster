@@ -22,6 +22,12 @@ class Main extends React.Component {
 		}
 		// Determine whether to show Redis configuration group
 		this.showRedisGroup = versionCompare(props.appbaseVersion, '8.19.1') !== -1;
+		if (!this.showRedisGroup) {
+			this.showRedisGroup = versionCompare(props.appbaseVersion, '1.0.21') !== -1;
+			if (this.showRedisGroup) {
+				this.isSLS = true;
+			}
+		}
 		this.form = FormBuilder.group({
 			enable_cache: false,
 			// This property is in seconds. It should be in between 60s to 86400s (24h)
@@ -107,6 +113,7 @@ class Main extends React.Component {
 						handleSaveTemplate={this.handleSaveTemplate}
 						control={this.form}
 						showRedisGroup={this.showRedisGroup}
+						isSLS={this.isSLS}
 					/>
 				</ErrorToaster>
 			</>

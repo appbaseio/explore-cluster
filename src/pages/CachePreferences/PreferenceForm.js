@@ -42,7 +42,14 @@ const validateRedisAddress = (value) => {
 	return pattern.test(value) || value === '';
 };
 
-const PreferenceForm = ({ control, handleSaveTemplate, showRedisGroup, isLoading, apps }) => {
+const PreferenceForm = ({
+	control,
+	handleSaveTemplate,
+	showRedisGroup,
+	isLoading,
+	apps,
+	isSLS,
+}) => {
 	const indices = useMemo(
 		() =>
 			Object.keys(apps || {})
@@ -121,7 +128,7 @@ const PreferenceForm = ({ control, handleSaveTemplate, showRedisGroup, isLoading
 							);
 						}}
 					/>
-					{showRedisGroup && (
+					{showRedisGroup && !isSLS && (
 						<div
 							style={{
 								backgroundColor: 'rgb(245, 245, 245)',
@@ -176,10 +183,9 @@ const PreferenceForm = ({ control, handleSaveTemplate, showRedisGroup, isLoading
 									format: (value) => !value || validateRedisAddress(value),
 								}}
 							/>
-
 							{/* Redis Password Input */}
 							<InputElement
-								name="password"
+								name="redis-password"
 								label="Redis Password"
 								autoComplete="off"
 								inputProps={{
@@ -190,7 +196,70 @@ const PreferenceForm = ({ control, handleSaveTemplate, showRedisGroup, isLoading
 									placeholder: 'Password (optional)',
 								}}
 							/>
-
+							{/* Redis Database Input */}
+							<InputElement
+								name="database"
+								label="Redis Database"
+								inputProps={{
+									type: 'number',
+									style: {
+										width: '100%',
+									},
+									placeholder: 'Database (default: 0)',
+									min: 0, // Assuming Redis database index starts at 0
+								}}
+							/>
+						</div>
+					)}
+					{showRedisGroup && isSLS && (
+						<div
+							style={{
+								borderRadius: '4px',
+							}}
+						>
+							<FieldControl
+								name="addr"
+								render={({ handler, touched, hasError }) => (
+									<Grid
+										label="Redis Address *"
+										toolTipMessage={Messages.redisAddr}
+										component={
+											<Input
+												{...handler()}
+												name="addr"
+												autoComplete="off"
+												placeholder="my-cloud-redis:6379"
+												style={{ width: '100%' }}
+												// Add validation status based on the touched state and if there's an error
+												status={touched && hasError('format') && 'error'}
+												// Helper text to show when there's an error
+												help={
+													touched &&
+													hasError('format') &&
+													'Invalid address format.'
+												}
+											/>
+										}
+									/>
+								)}
+								validators={{
+									// Validate format only if the addr is not empty
+									format: (value) => !value || validateRedisAddress(value),
+								}}
+							/>
+							{/* Redis Password Input */}
+							<InputElement
+								name="redis-password"
+								label="Redis Password"
+								autoComplete="off"
+								inputProps={{
+									type: 'password',
+									style: {
+										width: '100%',
+									},
+									placeholder: 'Password (optional)',
+								}}
+							/>
 							{/* Redis Database Input */}
 							<InputElement
 								name="database"
@@ -235,6 +304,7 @@ PreferenceForm.propTypes = {
 	control: PropTypes.object.isRequired,
 	isLoading: PropTypes.bool.isRequired,
 	showRedisGroup: PropTypes.bool,
+	isSLS: PropTypes.bool.isRequired,
 	apps: PropTypes.object,
 };
 
