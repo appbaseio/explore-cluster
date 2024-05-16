@@ -2,7 +2,7 @@
 	{
 		"organization": "appbaseio-confidential",
 		"repository": "enterprise-search-ui-template",
-		"version": "0.3.4",
+		"version": "0.3.5",
 		"commit": "",
 		"branch": "",
 		"manifest_path": "reactivesearch-manifest.json",
