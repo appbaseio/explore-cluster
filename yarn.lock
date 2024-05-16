@@ -106,10 +106,10 @@
     url-search-params "^1.1.0"
     uuid "^3.3.2"
 
-"@appbaseio-confidential/reactivesearch-playground@^1.2.16-beta":
-  version "1.2.16-beta"
-  resolved "https://npm.pkg.github.com/download/@appbaseio-confidential/reactivesearch-playground/1.2.16-beta/a3c04a5cbea395f751575a594c991d74e69fd641#a3c04a5cbea395f751575a594c991d74e69fd641"
-  integrity sha512-xDkj8T/6scpgCes9ULqm00GNwHWrLs91T5lMHjYszgkJUuKIuO+20wqc+BVj7+rhrevOtduIHVKL84S+bqFGZw==
+"@appbaseio-confidential/reactivesearch-playground@^1.3.0-beta.6":
+  version "1.3.0-beta.9"
+  resolved "https://npm.pkg.github.com/download/@appbaseio-confidential/reactivesearch-playground/1.3.0-beta.9/8e9d4d5c13ffb7006e02497f4ae58f3649b2ad0b#8e9d4d5c13ffb7006e02497f4ae58f3649b2ad0b"
+  integrity sha512-mINaImKfZUIrECdD2VZbX/48/BMo1LeItoTJMOkspskwKcw7b+FgJInq4hvRRW12w19x4R9TNhQvVuHDeaYkCg==
   dependencies:
     "@monaco-editor/react" "^4.3.1"
     "@reduxjs/toolkit" "^1.6.0"
@@ -119,6 +119,7 @@
     redux-logger "^3.0.6"
     redux-persist "^6.0.0"
     styled-components "^5.3.0"
+    xss "^1.0.14"
 
 "@appbaseio/analytics@^1.2.0-alpha.1":
   version "1.2.0"
@@ -16561,6 +16562,14 @@ xss@^1.0.11:
   version "1.0.14"
   resolved "https://registry.yarnpkg.com/xss/-/xss-1.0.14.tgz#4f3efbde75ad0d82e9921cc3c95e6590dd336694"
   integrity sha512-og7TEJhXvn1a7kzZGQ7ETjdQVS2UfZyTlsEdDOqvQF7GoxNfY+0YLCzBy1kPdsDDx4QuNAonQPddpsn6Xl/7sw==
+  dependencies:
+    commander "^2.20.3"
+    cssfilter "0.0.10"
+
+xss@^1.0.14:
+  version "1.0.15"
+  resolved "https://registry.yarnpkg.com/xss/-/xss-1.0.15.tgz#96a0e13886f0661063028b410ed1b18670f4e59a"
+  integrity sha512-FVdlVVC67WOIPvfOwhoMETV72f6GbW7aOabBC3WxN/oUdoEMDyLz4OgRv5/gck2ZeNqEQu+Tb0kloovXOfpYVg==
   dependencies:
     commander "^2.20.3"
     cssfilter "0.0.10"
