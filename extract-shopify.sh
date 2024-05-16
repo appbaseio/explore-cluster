@@ -40,7 +40,7 @@ jq -c '.[]' template-sources.json | while read i; do
             if [ $repositoryType == "private" ]; then
                 curl \
                 -H "Accept: application/vnd.github+json" \
-                -H "Authorization: token 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" \
+                -H "Authorization: token REDACTED_GITHUB_TOKEN" \
                 $url > file.zip      && \
                 unzip file.zip                                   && \
                 rm file.zip
@@ -61,7 +61,7 @@ jq -c '.[]' template-sources.json | while read i; do
         if [ $repositoryType == "private" ]; then
             curl \
             -H "Accept: application/vnd.github+json" \
-            -H "Authorization: token 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" \
+            -H "Authorization: token REDACTED_GITHUB_TOKEN" \
             $url > file.zip      && \
             unzip file.zip                                   && \
             rm file.zip
