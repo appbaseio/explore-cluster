@@ -907,3 +907,18 @@ export async function getEndpoints() {
 		return error;
 	}
 }
+
+// util function to get the index expression
+export function getIndexExpr(selectIndexes) {
+	const indexExpr = [];
+	for (let i = 0; i < selectIndexes.length; i += 1) {
+		if (selectIndexes[i] === '*') {
+			return '';
+		}
+		indexExpr.push(`'${selectIndexes[i]}' in $index`);
+	}
+	if (indexExpr.length === 0) {
+		return '';
+	}
+	return `(${indexExpr.join(' or ')})`;
+}

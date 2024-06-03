@@ -264,14 +264,26 @@ export const unParseExpression = (query = '') => {
 export const getRawQuery = (showAdvancedEditor, unparsedRule) => {
 	let rawQuery = '';
 	let indexes = ['*'];
-	if (showAdvancedEditor && ['filter', 'index'].includes(get(unparsedRule, 'trigger.type'))) {
+	if (['filter', 'index'].includes(get(unparsedRule, 'trigger.type'))) {
 		rawQuery = get(unparsedRule, 'trigger.expression', '');
-		rawQuery = rawQuery.split('in $index and ');
-		const pattern = /'(.*?)'/;
-		indexes = rawQuery[0].match(pattern)[1].split(',');
-		if (rawQuery && rawQuery.length > 1) {
-			// eslint-disable-next-line prefer-destructuring
-			rawQuery = rawQuery[1];
+		// Pattern: ('rs-metro-sap-en' in $index or 'rs-metro-sap-fr' in $index) and $type in ['search']
+		// Pattern: 'rs-metro-sap-en' in $index
+		const indexPattern = /'([^']+)'\s+in\s+\$index/g;
+		let match = indexPattern.exec(rawQuery);
+		if (match) {
+			indexes = [];
+		}
+		while (match) {
+			indexes.push(match[1]);
+			match = indexPattern.exec(rawQuery);
+		}
+		if (indexes.length === 1) {
+			indexes = indexes[0].split(',');
+		}
+		const splitQuery = rawQuery.split(' and ');
+		// The remainder of the string after the index check is the second element of the array
+		if (splitQuery && splitQuery.length > 1) {
+			[, rawQuery] = splitQuery;
 		} else {
 			rawQuery = '';
 		}

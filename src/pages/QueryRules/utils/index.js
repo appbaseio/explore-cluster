@@ -1,6 +1,7 @@
 /* eslint-disable prefer-destructuring */
 import get from 'lodash/get';
 import React from 'react';
+import { getIndexExpr } from '../../../utils';
 
 const getParsedRule = (rule = {}) => {
 	if (rule) {
@@ -101,9 +102,7 @@ const getExpressionFromValue = ({
 	condition,
 	type,
 }) => {
-	let expression = Array.isArray(selectedIndexes)
-		? `'${selectedIndexes.join(',')}' in $index`
-		: '';
+	let expression = Array.isArray(selectedIndexes) ? `${getIndexExpr(selectedIndexes)}` : '';
 
 	if (condition === 'filter') {
 		if (query && queryValue) {
@@ -115,7 +114,10 @@ const getExpressionFromValue = ({
 		}
 
 		if (type?.length) {
-			expression = `${expression} and $type in ${JSON.stringify(type)}`;
+			expression =
+				expression === ''
+					? `$type in ${JSON.stringify(type)}`
+					: `${expression} and $type in ${JSON.stringify(type)}`;
 		}
 	}
 	return expression;

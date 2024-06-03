@@ -55,6 +55,7 @@ import {
 	getSelectedIndexes,
 	handleQueryRuleDelete,
 	updateFunction,
+	getIndexExpr,
 } from '../../utils';
 import { bannerDetails, getExpressionFromValue, getParsedRule } from './utils';
 import DeleteModal from '../../components/DeleteModal';
@@ -269,7 +270,7 @@ class QueryRulesForm extends React.Component {
 				...rule,
 				rawQuery,
 				advancedExpression: rawQuery,
-				selectedIndexes: show_advance_editor ? indexes : rule.selectedIndexes,
+				selectedIndexes: indexes,
 			});
 		}
 
@@ -310,7 +311,7 @@ class QueryRulesForm extends React.Component {
 					...rule,
 					rawQuery,
 					advancedExpression: rawQuery,
-					selectedIndexes: show_advance_editor ? indexes : rule.selectedIndexes,
+					selectedIndexes: indexes,
 				},
 				() => {
 					if (condition !== 'index' && condition !== 'cron') {
@@ -539,10 +540,14 @@ class QueryRulesForm extends React.Component {
 				return '';
 			}
 			if (condition === 'filter') {
+				const exprVal = `${getIndexExpr(selectedIndexes)} ${
+					advancedExpression ? suffixExpression : ''
+				}`;
+				// eslint-disable-next-line no-nested-ternary
 				return show_advance_editor
-					? `'${(selectedIndexes || []).join(',')}' in $index ${
-							advancedExpression ? suffixExpression : ''
-					  } and $type in ${JSON.stringify(type)}`
+					? exprVal === ''
+						? `$type in ${JSON.stringify(type)}`
+						: `${exprVal} and $type in ${JSON.stringify(type)}`
 					: getExpressionFromValue({
 							selectedIndexes,
 							dataFieldValue,
@@ -554,9 +559,9 @@ class QueryRulesForm extends React.Component {
 					  });
 			}
 			if (condition === 'index') {
-				return `'${(selectedIndexes || []).join(
-					',',
-				)}' in $index and $acl in ${JSON.stringify(indexType)}`;
+				return `${getIndexExpr(selectedIndexes)}` === ''
+					? `$acl in ${JSON.stringify(indexType)}`
+					: `${getIndexExpr(selectedIndexes)} and $acl in ${JSON.stringify(indexType)}`;
 			}
 			return cronExpression;
 		}
@@ -795,10 +800,14 @@ class QueryRulesForm extends React.Component {
 		const suffixExpression = `and ${parseExpression(advancedExpression, fieldMap)}`;
 
 		function getExpression() {
+			const exprValue = `${getIndexExpr(selectedIndexes)} ${
+				advancedExpression ? suffixExpression : ''
+			}`;
+			// eslint-disable-next-line no-nested-ternary
 			return show_advance_editor
-				? `'${(selectedIndexes || []).join(',')}' in $index ${
-						advancedExpression ? suffixExpression : ''
-				  } and $type in ${JSON.stringify(type)}`
+				? exprValue === ''
+					? `$type in ${JSON.stringify(type)}`
+					: `${exprValue} and $type in ${JSON.stringify(type)}`
 				: getExpressionFromValue({
 						selectedIndexes,
 						dataFieldValue,
