@@ -163,7 +163,7 @@ const AIPreferences = (props) => {
 		FormBuilder.group({
 			enable: [false], // id of the selected pipeline
 			apiKey: ['', Validators.required],
-			defaultModel: ['gpt-3.5-turbo'],
+			defaultModel: ['gpt-4o'],
 			defaultSystemPrompt: [''],
 			enabledIndexes: [[]],
 			defaultMinTokens: [
@@ -186,6 +186,9 @@ const AIPreferences = (props) => {
 					...form.current.value,
 					...res,
 				});
+				if (res.apiType === 'azure') {
+					handleAPITypeChange('azure', res);
+				}
 			})
 			.catch(() => {
 				message.error('Whoa! There was an error fetching the AI preferences.');
@@ -227,6 +230,32 @@ const AIPreferences = (props) => {
 	useEffect(() => {
 		if (isValidPlan(tier, featureAI, features.AI)) fetchAIPreferences();
 	}, []);
+
+	const handleAPITypeChange = (v, initialValues = {}) => {
+		const currentForm = form.current;
+		if (v === 'azure') {
+			if (currentForm) {
+				currentForm.addControl(
+					'azureBaseURL',
+					new FormControl(initialValues.azureBaseURL || '', [
+						urlValidator,
+						Validators.required,
+					]),
+				);
+				currentForm.addControl(
+					'apiVersion',
+					new FormControl(initialValues.apiVersion || '', [
+						apiVersionValidator,
+						Validators.required,
+					]),
+				);
+			}
+		} else if (currentForm) {
+			currentForm.removeControl('azureBaseURL');
+			currentForm.removeControl('apiVersion');
+		}
+		currentForm.patchValue({ apiType: v, ...initialValues });
+	};
 
 	if (!ALLOWED_SLS.includes(backendImage) && compareVersion(appVersion, '8.12.0') === -1)
 		return (
@@ -413,13 +442,13 @@ const AIPreferences = (props) => {
 												toolTipMessage={
 													<span>
 														OpenAI model to use, defaults to{' '}
-														<code>gpt-3.5-turbo</code>. This can also be
-														passed at runtime.
+														<code>gpt-4o</code>. For Azure OpenAI, this
+														should be the deployment name.
 													</span>
 												}
 												component={
 													<Input
-														placeholder="Enter default model"
+														placeholder="Enter default model or deployment name"
 														{...handler()}
 													/>
 												}
@@ -571,37 +600,8 @@ const AIPreferences = (props) => {
 										control={form.current.get('apiType')}
 										render={({ handler }) => {
 											const { value: apiTypeValue, onChange } = handler();
+											console.log('apiTypeValue', apiTypeValue);
 											// First parameter is value
-											const handleAPITypeChange = (v) => {
-												if (v === 'azure') {
-													// Add controls
-													const currentForm = form.current;
-													if (currentForm) {
-														currentForm.addControl(
-															'azureBaseURL',
-															new FormControl('', [
-																urlValidator,
-																Validators.required,
-															]),
-														);
-														currentForm.addControl(
-															'apiVersion',
-															new FormControl('', [
-																apiVersionValidator,
-																Validators.required,
-															]),
-														);
-													}
-												} else {
-													// Remove the controls
-													const currentForm = form.current;
-													if (currentForm) {
-														currentForm.removeControl('azureBaseURL');
-														currentForm.removeControl('apiVersion');
-													}
-												}
-												onChange(v);
-											};
 											return (
 												<Grid
 													gridRatio={0.4}
@@ -634,9 +634,10 @@ const AIPreferences = (props) => {
 																	},
 																]}
 																value={apiTypeValue}
-																onChange={(v) =>
-																	handleAPITypeChange(v)
-																}
+																onChange={(v) => {
+																	handleAPITypeChange(v);
+																	onChange(v);
+																}}
 															/>
 														</Flex>
 													}
@@ -673,81 +674,84 @@ const AIPreferences = (props) => {
 														padding: '1em',
 													}}
 												>
-													<FieldControl
-														strict={false}
-														control={form.current.get('azureBaseURL')}
-														render={({
-															handler: urlHandler,
-															hasError,
-															touched,
-														}) => {
-															const shouldShowError =
-																touched || submitted;
-															const hasSomeError =
-																hasError('invalidURL') ||
-																hasError('required');
-															const isValid =
-																hasSomeError && shouldShowError
-																	? 'error'
-																	: 'success';
-															return (
-																<Form.Item
-																	label="Azure Base URL"
-																	tooltip={
-																		<span>
-																			Base URL of the Azure
-																			OpenAI resource.
-																			Required when apiType is
-																			set as Azure.
-																		</span>
-																	}
-																	validateStatus={isValid}
-																	help="Should be a valid URL. eg. https://example.com"
-																>
-																	<Input
-																		placeholder="Enter default system prompt"
-																		{...urlHandler()}
-																	/>
-																</Form.Item>
-															);
-														}}
-													/>
-													<FieldControl
-														strict={false}
-														control={form.current.get('apiVersion')}
-														render={({
-															handler,
-															hasError,
-															touched,
-														}) => {
-															const shouldShowError =
-																touched || submitted;
-															const hasSomeError =
-																hasError('invalidAPIVersion') ||
-																hasError('required');
-															const isValid =
-																hasSomeError && shouldShowError
-																	? 'error'
-																	: 'success';
-															return (
-																<Form.Item
-																	label="API Version"
-																	tooltip={`Version of Azure API to use
-																		(e.g. 2023-05-15) - this
-																		will be a YYYY-MM-DD format
-																		string. Required when
-																		apiType is set as Azure.`}
-																	validateStatus={isValid}
-																	help="Should be a valid Azure version. They start with a date eg. 2023-05-15 (YYYY-MM-DD format)"
-																>
-																	<Input
-																		placeholder="2023-05-15 (YYYY-MM-DD format)"
-																		{...handler()}
-																	/>
-																</Form.Item>
-															);
-														}}
-													/>
+													{form.current.get('azureBaseURL') && (
+														<FieldControl
+															strict={false}
+															control={form.current.get(
+																'azureBaseURL',
+															)}
+															render={({
+																handler: urlHandler,
+																hasError,
+																touched,
+															}) => {
+																const shouldShowError =
+																	touched || submitted;
+																const hasSomeError =
+																	hasError('invalidURL') ||
+																	hasError('required');
+																const isValid =
+																	hasSomeError && shouldShowError
+																		? 'error'
+																		: 'success';
+																return (
+																	<Form.Item
+																		label="Azure OpenAI Endpoint"
+																		tooltip={
+																			<span>
+																				Endpoint of the
+																				Azure OpenAI
+																				resource. Required
+																				when apiType is set
+																				as Azure.
+																			</span>
+																		}
+																		validateStatus={isValid}
+																		help="Should be a valid URL. eg. https://domain.openai.azure.com"
+																	>
+																		<Input
+																			placeholder="Enter Azure OpenAI Endpoint"
+																			{...urlHandler()}
+																		/>
+																	</Form.Item>
+																);
+															}}
+														/>
+													)}
+													{form.current.get('apiVersion') && (
+														<FieldControl
+															strict={false}
+															control={form.current.get('apiVersion')}
+															render={({
+																handler,
+																hasError,
+																touched,
+															}) => {
+																const shouldShowError =
+																	touched || submitted;
+																const hasSomeError =
+																	hasError('invalidAPIVersion') ||
+																	hasError('required');
+																const isValid =
+																	hasSomeError && shouldShowError
+																		? 'error'
+																		: 'success';
+																return (
+																	<Form.Item
+																		label="API Version"
+																		tooltip="Version of Azure API to use (e.g. 2023-05-15) - this will be a YYYY-MM-DD format string. Required when apiType is set as Azure."
+																		validateStatus={isValid}
+																		help="Should be a valid Azure version. It should start with a date eg. 2024-02-01 (YYYY-MM-DD format)"
+																	>
+																		<Input
+																			placeholder="2024-02-01 (YYYY-MM-DD format)"
+																			{...handler()}
+																		/>
+																	</Form.Item>
+																);
+															}}
+														/>
+													)}
 												</Form>
 											) : null;
 										}}
