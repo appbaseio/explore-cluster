@@ -113,7 +113,7 @@ const SaveAIFAQModal = ({
 			question: ['', Validators.required],
 			context: '',
 			temperature: 1,
-			maxTokens: 2000,
+			maxTokens: 800,
 			answer: ['', Validators.required],
 			model: '',
 			searchboxes: [[], Validators.required],
@@ -133,6 +133,10 @@ const SaveAIFAQModal = ({
 		getAIPreferences()
 			.then((res) => {
 				setAIPrefs(res);
+				form.current.patchValue({
+					model: res.defaultModel || 'gpt-4o',
+					maxTokens: res.defaultMaxTokens || 800,
+				});
 			})
 			.catch(() => {
 				message.error('Whoa! There was an error fetching the AI preferences.');
@@ -440,18 +444,12 @@ const SaveAIFAQModal = ({
 													label="Model"
 													toolTipMessage={<span>Select the model</span>}
 													component={
-														<Select
+														<Input
 															{...handler()}
-															value={handler().value || undefined}
+															value={handler().value || ''}
 															style={{ width: '100%' }}
-														>
-															<Select.Option value="gpt-3.5-turbo">
-																GPT 3.5 (gpt-3.5-turbo)
-															</Select.Option>
-															<Select.Option value="gpt-4">
-																GPT 4 (gpt-4)
-															</Select.Option>
-														</Select>
+															placeholder="Enter model"
+														/>
 													}
 												/>
 											)}
