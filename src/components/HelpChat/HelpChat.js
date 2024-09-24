@@ -21,23 +21,14 @@ class HelpButton extends React.Component {
 				window.Intercom('show');
 				break;
 			}
-			case 'support':
-				window.open('https://appbase.io/pricing/#support', '_blank');
-				break;
 			case 'twitter':
-				window.open('https://twitter.com/appbaseio', '_blank');
+				window.open('https://x.com/reactiveCo', '_blank');
 				break;
 			case 'updates':
-				window.open('https://appbase.io/', '_blank');
+				window.open('https://reactivesearch.io/', '_blank');
 				break;
 			case 'privacy':
-				window.open('https://appbase.io/privacy/', '_blank');
-				break;
-			case 'whats_new':
-				window.open(
-					'https://www.notion.so/appbase/Appbase-io-Change-Log-506702ad91c147c3a6674e988ba59f91',
-					'_blank',
-				);
+				window.open('https://reactivesearch.io/privacy/', '_blank');
 				break;
 			default:
 		}
@@ -55,15 +46,8 @@ class HelpButton extends React.Component {
 					</h3>
 					<p className={subHeading}>We reply to every issue.</p>
 				</Menu.Item>
-				<Menu.Item key="support">
-					<h3 className={heading}>Get Support!</h3>
-				</Menu.Item>
-				<Menu.Item key="whats_new">
-					{/* eslint-disable-next-line react/jsx-curly-brace-presence */}
-					<p className={subHeading}>See what{`'`}s new ✨</p>
-				</Menu.Item>
 				<Menu.Item key="twitter">
-					<p className={subHeading}>@appbaseio - Twitter</p>
+					<p className={subHeading}>@reactiveCo - Twitter/X</p>
 				</Menu.Item>
 				<Menu.Item key="privacy">
 					<p className={subHeading}>Terms & Privacy</p>
