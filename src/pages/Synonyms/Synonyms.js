@@ -503,7 +503,7 @@ class Synonyms extends React.Component {
 									textColor: 'rgba(0,0,0,.65)',
 								},
 							}}
-							app=".synonyms"
+							app=".rs-synonyms,.synonyms"
 							credentials={credentials}
 							url={url}
 						>
