@@ -105,7 +105,7 @@
 		"codesandbox": "1.2.16",
 		"d3-scale": "^2.1.2",
 		"diff-match-patch": "1.0.5",
-		"dompurify": "^2.3.6",
+		"dompurify": "^2.5.4",
 		"dotenv": "^8.0.0",
 		"emotion": "^9.2.6",
 		"file-saver": "^2.0.5",
