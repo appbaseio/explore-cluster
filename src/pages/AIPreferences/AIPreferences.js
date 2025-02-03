@@ -164,6 +164,7 @@ const AIPreferences = (props) => {
 			enable: [false], // id of the selected pipeline
 			apiKey: ['', Validators.required],
 			defaultModel: ['gpt-4o'],
+			defaultEmbeddingModel: ['text-embedding-3-small'],
 			defaultSystemPrompt: [''],
 			enabledIndexes: [[]],
 			defaultMinTokens: [
@@ -450,6 +451,44 @@ const AIPreferences = (props) => {
 													<Input
 														placeholder="Enter default model or deployment name"
 														{...handler()}
+													/>
+												}
+											/>
+										)}
+									/>
+									{/* New Embedding Model Field */}
+									<FieldControl
+										strict={false}
+										control={form.current.get('defaultEmbeddingModel')}
+										render={({ handler }) => (
+											<Grid
+												label="Default Embedding Model"
+												gridRatio={0.4}
+												toolTipMessage={
+													<span>
+														Select the default embedding model to use
+														for generating vector embedding when
+														performing KNN search
+													</span>
+												}
+												component={
+													<Select
+														placeholder="Select Embedding Model"
+														{...handler()}
+														options={[
+															{
+																value: 'text-embedding-3-small',
+																label: 'text-embedding-3-small',
+															},
+															{
+																value: 'text-embedding-3-large',
+																label: 'text-embedding-3-large',
+															},
+															{
+																value: 'text-embedding-ada-002',
+																label: 'text-embedding-ada-002',
+															},
+														]}
 													/>
 												}
 											/>
