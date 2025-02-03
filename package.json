@@ -8,7 +8,7 @@
 	"license": "MIT",
 	"private": false,
 	"engines": {
-		"node": ">=14 <=18"
+		"node": ">=14"
 	},
 	"scripts": {
 		"start": "NODE_ENV=development webpack-dev-server --mode development . --history-api-fallback  --hot --progress --port 3333 --no-client-overlay",
