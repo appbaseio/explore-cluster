@@ -93,7 +93,7 @@
 		"@codesandbox/sandpack-react": "1.17.0",
 		"@codesandbox/sandpack-themes": "^1.13.0",
 		"@monaco-editor/react": "^4.2.2",
-		"@sentry/browser": "^6.13.2",
+		"@sentry/browser": "^7.119.1",
 		"@typeform/embed": "^0.14.1",
 		"@ungap/url-search-params": "^0.1.2",
 		"@uppy/core": "^2.1.2",
