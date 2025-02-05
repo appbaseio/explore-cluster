@@ -14,6 +14,19 @@ const iconMap = {
 	'check-circle': <CheckCircleOutlined />,
 };
 
+const formatValueIfJSON = (value) => {
+	if (!value) return '';
+	try {
+		// Try to parse as JSON
+		const parsed = JSON.parse(value);
+		// If successful, return pretty printed
+		return JSON.stringify(parsed, null, 2);
+	} catch (e) {
+		// If not valid JSON, return as is
+		return value;
+	}
+};
+
 const CreateModal = ({
 	mode,
 	open,
@@ -70,7 +83,7 @@ const CreateModal = ({
 				setModalFormData(newData);
 			})
 			.catch((error) => {
-				console.error(error);
+				setErrorMessage('Failed to fetch global variable', error.message);
 			});
 	};
 
@@ -111,9 +124,24 @@ const CreateModal = ({
 	const handleSave = () => {
 		if (!handleError(modalFormData)) {
 			const ACC_API = getURL();
-			const transformedModalFormData = Object.fromEntries(
-				Object.entries(modalFormData).filter(([_, v]) => v), // eslint-disable-line
-			);
+			const transformedModalFormData = { ...modalFormData };
+
+			// Try to compact JSON if value is valid JSON
+			try {
+				const parsed = JSON.parse(modalFormData.value);
+				transformedModalFormData.value = JSON.stringify(parsed);
+			} catch (e) {
+				// If not valid JSON, use as is
+				transformedModalFormData.value = modalFormData.value;
+			}
+
+			// Remove the filtered variable and directly filter transformedModalFormData
+			Object.keys(transformedModalFormData).forEach((key) => {
+				if (!transformedModalFormData[key]) {
+					delete transformedModalFormData[key];
+				}
+			});
+
 			const transformedValidateObj = Object.fromEntries(
 				Object.entries(modalFormData.validate).filter(([_, v]) => v), // eslint-disable-line
 			);
@@ -156,8 +184,7 @@ const CreateModal = ({
 						}
 					})
 					.catch((error) => {
-						setErrorMessage('Failed to update');
-						console.error('Failed to update', error);
+						setErrorMessage('Failed to update', error.message);
 					});
 			} else {
 				fetch(`${ACC_API}/_pipelines/env`, {
@@ -177,8 +204,7 @@ const CreateModal = ({
 						}
 					})
 					.catch((error) => {
-						setErrorMessage('Failed to save');
-						console.error('Failed to save', error);
+						setErrorMessage('Failed to save', error.message);
 					});
 			}
 		}
@@ -251,7 +277,7 @@ const CreateModal = ({
 					},
 				};
 			} catch (err) {
-				console.log(err);
+				setErrorMessage('Invalid headers format');
 			}
 
 			setIconType('loading');
@@ -305,7 +331,6 @@ const CreateModal = ({
 							setErrorMessage('Cannot make the API request. Is your input valid?');
 						}
 					}
-					console.error('Error in Validate api', err);
 				});
 		} else {
 			setErrorMessage('Enter a valid URL.');
@@ -416,11 +441,12 @@ const CreateModal = ({
 								<InfoCircleOutlined />
 							</Tooltip>
 						</div>
-						<Input
-							value={modalFormData.value}
+						<Input.TextArea
+							value={formatValueIfJSON(modalFormData.value)}
 							onChange={(e) => {
 								handleInputChange('value', e.target.value);
 							}}
+							autoSize={{ minRows: 1, maxRows: 12 }}
 						/>
 					</div>
 					<div className="form-field-container" style={{ marginTop: 20 }}>
