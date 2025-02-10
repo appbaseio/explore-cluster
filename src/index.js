@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { injectGlobal } from 'emotion';
 import { Layout } from 'antd';
 import { PersistGate } from 'redux-persist/integration/react';
 import * as Sentry from '@sentry/browser';
-import AnnouncementBanner from './AnnouncementBanner';
 import configureStore from './store';
 import Dashboard from './Dashboard';
 
@@ -50,32 +49,16 @@ p {
 }
 `;
 
-const { Header, Content } = Layout;
+const { Content } = Layout;
 const { store, persistor } = configureStore();
-export const bannerContext = React.createContext('');
 
 const App = () => {
-	const [showBanner, setShowBanner] = useState(
-		localStorage.getItem('announcementBanner') === 'true',
-	);
-	if (localStorage.getItem('announcementBanner') === null) {
-		localStorage.setItem('announcementBanner', 'true');
-		setShowBanner(true);
-	}
-
 	return (
 		<div>
-			<Header style={{ height: 35, display: showBanner ? 'block' : 'none' }}>
-				<AnnouncementBanner showBanner={showBanner} setShowBanner={setShowBanner} />
-			</Header>
 			<Content>
 				<PersistGate loading={null} persistor={persistor}>
 					<Provider store={store}>
-						<>
-							<bannerContext.Provider value={showBanner}>
-								<Dashboard />
-							</bannerContext.Provider>
-						</>
+						<Dashboard />
 					</Provider>
 				</PersistGate>
 			</Content>

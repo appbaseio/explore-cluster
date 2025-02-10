@@ -11,8 +11,6 @@ import UserMenu from './UserMenu';
 import { media } from '../../utils/media';
 import headerStyles from './styles';
 import AppSwitcher from '../AppSwitcher';
-// eslint-disable-next-line
-import { bannerContext } from '../..';
 import HealthStats from './HealthStats';
 
 const { Header } = Layout;
@@ -79,76 +77,72 @@ const AppHeader = ({
 	collapsed,
 	onToggle,
 }) => (
-	<bannerContext.Consumer>
-		{(val) => (
-			<Header
-				className={headerStyles(val)}
-				css={{
-					width: big ? 'calc(100% - 80px)' : 'calc(100% - 284px)',
-					justifyContent: minimal ? 'flex-end !important' : 'space-between',
-					left: big ? '80px' : '284px',
-				}}
-			>
-				{minimal ? (
-					<MenuIcon
-						style={{ position: 'absolute', left: 20 }}
-						collapsed={collapsed}
-						className="trigger"
-						onClick={onToggle}
-					/>
-				) : (
-					<StyledMenu mode="horizontal">
-						<Menu.Item key="back" className={noBorder} style={{ padding: 0 }}>
-							<MenuIcon className="trigger" onClick={onToggle} />
-						</Menu.Item>
-						<StyledMenuItem
-							className={noBorder}
-							style={{ display: 'flex', alignItems: 'center' }}
-							key="breadcrumb"
-						>
-							<Breadcrumb>
-								<Breadcrumb.Item>
-									<Link to="/">Cluster Overview</Link>
-								</Breadcrumb.Item>
-								{showApp && (
-									<Breadcrumb.Item>
-										<AppSwitcher
-											currentApp={currentApp || 'Loading...'}
-											history={history}
-											match={match}
-										/>
-									</Breadcrumb.Item>
-								)}
-							</Breadcrumb>
-						</StyledMenuItem>
-					</StyledMenu>
-				)}
-
-				{isUsingTrial && showProfile() && (
-					<div style={{ marginRight: 20 }}>
-						<Tooltip title="You are currently on a trial which unlocks all the reactivesearch.io enterprise plan features. You can upgrade to a paid plan anytime till the trial expires. Once your trial expires, you won't be able to access reactivesearch.io.">
-							<Button css={trialBtn} danger href="/cluster/billing">
-								<span css={trialText}>
-									{daysLeft > 0
-										? `Trial expires in ${daysLeft} ${
-												daysLeft > 1 ? 'days' : 'day'
-										  }. Upgrade now`
-										: 'Trial has expired. Upgrade Now'}
-								</span>
-							</Button>
-						</Tooltip>
-					</div>
-				)}
-				<HealthStats />
-				{showProfile() && (
-					<Row justify="space-between" align="middle" style={{ lineHeight: 'initial' }}>
-						<UserMenu user={user} />
-					</Row>
-				)}
-				<MenuSlider />
-			</Header>
+	<Header
+		className={headerStyles()}
+		css={{
+			width: big ? 'calc(100% - 80px)' : 'calc(100% - 284px)',
+			justifyContent: minimal ? 'flex-end !important' : 'space-between',
+			left: big ? '80px' : '284px',
+		}}
+	>
+		{minimal ? (
+			<MenuIcon
+				style={{ position: 'absolute', left: 20 }}
+				collapsed={collapsed}
+				className="trigger"
+				onClick={onToggle}
+			/>
+		) : (
+			<StyledMenu mode="horizontal">
+				<Menu.Item key="back" className={noBorder} style={{ padding: 0 }}>
+					<MenuIcon className="trigger" onClick={onToggle} />
+				</Menu.Item>
+				<StyledMenuItem
+					className={noBorder}
+					style={{ display: 'flex', alignItems: 'center' }}
+					key="breadcrumb"
+				>
+					<Breadcrumb>
+						<Breadcrumb.Item>
+							<Link to="/">Cluster Overview</Link>
+						</Breadcrumb.Item>
+						{showApp && (
+							<Breadcrumb.Item>
+								<AppSwitcher
+									currentApp={currentApp || 'Loading...'}
+									history={history}
+									match={match}
+								/>
+							</Breadcrumb.Item>
+						)}
+					</Breadcrumb>
+				</StyledMenuItem>
+			</StyledMenu>
 		)}
-	</bannerContext.Consumer>
+
+		{isUsingTrial && showProfile() && (
+			<div style={{ marginRight: 20 }}>
+				<Tooltip title="You are currently on a trial which unlocks all the reactivesearch.io enterprise plan features. You can upgrade to a paid plan anytime till the trial expires. Once your trial expires, you won't be able to access reactivesearch.io.">
+					<Button css={trialBtn} danger href="/cluster/billing">
+						<span css={trialText}>
+							{daysLeft > 0
+								? `Trial expires in ${daysLeft} ${
+										daysLeft > 1 ? 'days' : 'day'
+								  }. Upgrade now`
+								: 'Trial has expired. Upgrade Now'}
+						</span>
+					</Button>
+				</Tooltip>
+			</div>
+		)}
+		<HealthStats />
+		{showProfile() && (
+			<Row justify="space-between" align="middle" style={{ lineHeight: 'initial' }}>
+				<UserMenu user={user} />
+			</Row>
+		)}
+		<MenuSlider />
+	</Header>
 );
 
 AppHeader.propTypes = {
