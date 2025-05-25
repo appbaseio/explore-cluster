@@ -12,7 +12,7 @@ pids
 *.pid.lock
 
 # Directory for extracted reactivesearch-shopify-plugin
-constants
+/constants
 templates
 template-sources-output.json
 
