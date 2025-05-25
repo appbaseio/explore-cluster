@@ -28,6 +28,18 @@
 			z-index: 100;
 		}
 
+		/* Hide Tawk.to widget container before initialization */
+		.tawk-min-container {
+			opacity: 0 !important;
+			visibility: hidden !important;
+		}
+
+		/* Hide iframe from Tawk.to before it's toggled */
+		iframe[title="chat widget"] {
+			opacity: 0 !important;
+			visibility: hidden !important;
+		}
+
 		/* for browsers supporting webkit */
 		::-webkit-scrollbar {
 			width: 8px;
@@ -128,6 +140,33 @@
 	<script> iFrameResize({ log: true }, '#softr-0bda9055-b056-42d5-8fe3-040a77024336-pricing-dashboard-bye');</script>
 	<script> iFrameResize({ log: true }, '#softr-bf3757e1-4c3b-4d90-97e6-ee9e66034603-pricing-dashboard-self-host');</script>
 	<script src="https://cdn.jsdelivr.net/npm/diff@5.1.0/dist/diff.min.js"></script>
+	<!--Start of Tawk.to Script-->
+	<script type="text/javascript">
+		var Tawk_API=Tawk_API||{};
+		// Configure widget to be initially hidden
+		Tawk_API.visitor = {
+			name: 'Visitor'
+		};
+		// Hide widget on page load
+		Tawk_API.onBeforeLoad = function() {
+			Tawk_API.hideWidget();
+		};
+		// Also hide when loaded (double protection)
+		Tawk_API.onLoad = function() {
+			Tawk_API.hideWidget();
+		};
+		var Tawk_LoadStart=new Date();
+		(function(){
+			var s1=document.createElement("script"),
+				s0=document.getElementsByTagName("script")[0];
+			s1.async=true;
+			s1.src='https://embed.tawk.to/681c942e344cd2190b37935b/1iqnq5m8a';
+			s1.charset='UTF-8';
+			s1.setAttribute('crossorigin','*');
+			s0.parentNode.insertBefore(s1,s0);
+		})();
+	</script>
+	<!--End of Tawk.to Script-->
 </body>
 
 </html>

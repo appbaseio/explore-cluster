@@ -163,7 +163,11 @@ class Billing extends Component {
 	};
 
 	openChatWindow = () => {
-		window.Intercom('show');
+		if (window.Tawk_API) {
+			window.Tawk_API.toggle();
+		} else if (window.Intercom) {
+			window.Intercom('show');
+		}
 	};
 
 	closeOtpModal = () => {

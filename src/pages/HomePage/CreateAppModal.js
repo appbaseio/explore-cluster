@@ -125,7 +125,11 @@ class CreateAppModal extends Component {
 											color: 'dodgerblue',
 										}}
 										onClick={() => {
-											window.Intercom('show');
+											if (window.Tawk_API) {
+												window.Tawk_API.toggle();
+											} else if (window.Intercom) {
+												window.Intercom('show');
+											}
 											modalRef.destroy();
 											handleModal();
 										}}

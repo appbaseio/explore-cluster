@@ -18,7 +18,12 @@ class HelpButton extends React.Component {
 		const { key } = e;
 		switch (key) {
 			case 'chat': {
-				window.Intercom('show');
+				if (window.Tawk_API) {
+					window.Tawk_API.toggle();
+				} else if (window.Intercom) {
+					// Fallback to Intercom if Tawk.to is not loaded
+					window.Intercom('show');
+				}
 				break;
 			}
 			case 'twitter':

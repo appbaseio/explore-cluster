@@ -9,7 +9,11 @@ const StyledLink = styled.a`
 `;
 
 const openChatWindow = () => {
-	window.Intercom('show');
+	if (window.Tawk_API) {
+		window.Tawk_API.toggle();
+	} else if (window.Intercom) {
+		window.Intercom('show');
+	}
 };
 
 const BillingFrame = ({ id, url }) => (
