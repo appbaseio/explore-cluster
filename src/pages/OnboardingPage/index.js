@@ -88,8 +88,8 @@ export default class Onboarding extends Component {
 	handleDataset = (selectedDataset) => {
 		this.setState({
 			selectedDataset,
-		})
-	}
+		});
+	};
 
 	setSearchFields = (searchFields) => {
 		this.setState({
@@ -116,7 +116,8 @@ export default class Onboarding extends Component {
 	};
 
 	renderCurrentScreen = () => {
-		const { currentScreen, hasJSON, url, searchFields, facetFields, newApp, selectedDataset } = this.state;
+		const { currentScreen, hasJSON, url, searchFields, facetFields, newApp, selectedDataset } =
+			this.state;
 		const RenderScreen = screens[currentScreen];
 		let props = {};
 
@@ -130,7 +131,7 @@ export default class Onboarding extends Component {
 				url,
 				setURL: this.setURL,
 			};
-		}else if (currentScreen === 2) {
+		} else if (currentScreen === 2) {
 			props = {
 				url,
 				setURL: this.setURL,
@@ -192,7 +193,7 @@ export default class Onboarding extends Component {
 					<ul>
 						<li>
 							<a className={currentScreen === 0 ? 'active' : null}>
-								Create your first app
+								Create your first index
 							</a>
 						</li>
 						<li>

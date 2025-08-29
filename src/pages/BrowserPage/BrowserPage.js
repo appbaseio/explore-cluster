@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { string, func, bool } from 'prop-types';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import Loadable from 'react-loadable';
 import { injectGlobal } from 'emotion';
 import URL from 'url-parser-lite';
 import { event, timingEvent } from '../../utils/gtag';
@@ -26,10 +25,7 @@ injectGlobal`
 	}
 `;
 
-const DejavuComponent = Loadable({
-	loader: () => import(/* webpackChunkName: "DejavuComponent" */ '@appbaseio/dejavu-browser'),
-	loading: Loader,
-});
+// Removed Dejavu npm component in favor of iframe embed
 
 class BrowserPage extends Component {
 	constructor(props) {
@@ -88,6 +84,21 @@ class BrowserPage extends Component {
 			url,
 			appname: isCluster ? '*' : appName,
 		};
+
+		// Build iframe src with query params
+		const params = new URLSearchParams({
+			appname: dejavu.appname || '*',
+			url: dejavu.url,
+			footer: false,
+			sidebar: false,
+			appswitcher: false,
+			mode: 'edit',
+			cloneApp: false,
+			oldBanner: false,
+			enablereactivesearch: 'true',
+		});
+		const iframeSrc = `https://dejavu.reactivesearch.io/?${params.toString()}`;
+		console.log('iframe src: ', iframeSrc);
 		return (
 			<section
 				style={{
@@ -97,16 +108,20 @@ class BrowserPage extends Component {
 				}}
 			>
 				{credentials ? (
-					<div>
-						<DejavuComponent
-							app={dejavu.appname || '*'}
-							url={dejavu.url}
-							credentials={credentials}
-							URLParams={false}
-							showHeaders={false}
-							forceReconnect
-							hasCloneApp={false}
-							enableReactivesearch={true}
+					<div style={{ height: '100%' }}>
+						<iframe
+							src={iframeSrc}
+							title="Dejavu (embedded)"
+							style={{
+								width: '100%',
+								height: '100%',
+								border: 0,
+								borderRadius: 12,
+								overflow: 'hidden',
+							}}
+							loading="lazy"
+							allowFullScreen
+							referrerPolicy="no-referrer-when-downgrade"
 						/>
 					</div>
 				) : (

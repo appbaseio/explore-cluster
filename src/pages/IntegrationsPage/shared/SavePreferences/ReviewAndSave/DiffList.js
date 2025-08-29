@@ -10,6 +10,8 @@ import relevancyItemTitles, {
 import Flex from '../../../../../batteries/components/shared/Flex';
 import { facetKeyLabel } from '../../../utils/index';
 
+//
+
 const DiffList = ({ diff: diffProp }) => {
 	if (!diffProp || !Object.keys(diffProp || {}).length) {
 		return (

@@ -6,7 +6,6 @@ import { PlusOutlined } from '@ant-design/icons';
 import { Card, Input, InputNumber, Select, Switch, Skeleton, Button, Form } from 'antd';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import get from 'lodash/get';
-import isEmpty from 'lodash/isEmpty';
 import {
 	getAppMappings,
 	getDefaultSettings,
@@ -18,10 +17,7 @@ import Banner from '../../batteries/components/shared/UpgradePlan/Banner';
 import { container, label } from './styles';
 import SettingTooltip from '../../components/SettingTooltip';
 import settingsMap from '../../components/ReviewAndSave/helper';
-import {
-	getRawMappingsByAppName,
-	getTraversedMappingsByAppName,
-} from '../../batteries/modules/selectors';
+import { getRawMappingsByAppName } from '../../batteries/modules/selectors';
 import { features, isValidPlan } from '../../batteries/utils';
 import Overlay from '../../components/Overlay';
 import { allowedTiers } from '../../utils/prop-types';
@@ -140,18 +136,8 @@ class ResultsPage extends React.Component {
 	}
 
 	getDatafields = () => {
-		const { rawMappings } = this.props;
-		const traversedMappings = traverseMapping(rawMappings || {}, undefined, {
-			isAggFields: true,
-			includeMappings: undefined,
-			includeTypes: undefined,
-		});
-
-		if (Array.isArray(traversedMappings)) return ['_score', ...traversedMappings];
-		if (typeof traversedMappings === 'object')
-			return ['_score', ...Object.keys(traversedMappings)];
-
-		return ['_score'];
+		const { mappings } = this.props;
+		return ['_score', ...mappings];
 	};
 
 	init = (settings) => {
@@ -602,15 +588,23 @@ ResultsPage.defaultProps = {
 
 const mapStateToProps = (state) => {
 	const appName = get(state, '$getCurrentApp.name');
-	const mappings = getTraversedMappingsByAppName(state);
 	const rawMappings = getRawMappingsByAppName(state);
-	// when elasticsearch v6, mappings is an object with values corresponding to _doc key
-	const parsedMappings = Array.isArray(mappings) ? mappings : get(mappings, '_doc', []);
+	const traversedMappings = traverseMapping(rawMappings || {}, undefined, {
+		isAggFields: false,
+		includeMappings: undefined,
+		includeTypes: undefined,
+	});
+	let fieldsArray = [];
+	if (Array.isArray(traversedMappings)) {
+		fieldsArray = traversedMappings;
+	} else if (typeof traversedMappings === 'object') {
+		fieldsArray = Object.values(traversedMappings).flat();
+	}
 	const { username, password } = get(state, 'user.data', {});
 	const localRelevancy = get(state, ['$getLocalRelevancy', appName], null);
 	return {
 		appName,
-		mappings: isEmpty(parsedMappings) ? [] : parsedMappings,
+		mappings: fieldsArray,
 		rawMappings,
 		credentials: `${username}:${password}`,
 		isLoading: get(state, '$getAppSettings.isFetching'),

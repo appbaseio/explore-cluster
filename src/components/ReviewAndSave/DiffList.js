@@ -71,7 +71,11 @@ const DiffList = ({ diff }) => {
 															dataIndex: 'oldWeight',
 															key: 'oldWeight',
 															render: (ow) => (
-																<Tag color="volcano">{ow}</Tag>
+																<Tag color="volcano">
+																	{Number.isFinite(parseFloat(ow))
+																		? parseFloat(ow)
+																		: ow}
+																</Tag>
 															),
 														},
 														{
@@ -79,7 +83,11 @@ const DiffList = ({ diff }) => {
 															dataIndex: 'newWeight',
 															key: 'newWeight',
 															render: (nw) => (
-																<Tag color="green">{nw}</Tag>
+																<Tag color="green">
+																	{Number.isFinite(parseFloat(nw))
+																		? parseFloat(nw)
+																		: nw}
+																</Tag>
 															),
 														},
 													]}
@@ -346,7 +354,9 @@ const DiffList = ({ diff }) => {
 																	color="volcano"
 																	data-cy="old-weight"
 																>
-																	{ov.toString()}
+																	{Number.isFinite(parseFloat(ov))
+																		? parseFloat(ov)
+																		: ov.toString()}
 																</Tag>
 															),
 														},
@@ -359,7 +369,9 @@ const DiffList = ({ diff }) => {
 																	color="green"
 																	data-cy="new-weight"
 																>
-																	{nv.toString()}
+																	{Number.isFinite(parseFloat(nv))
+																		? parseFloat(nv)
+																		: nv.toString()}
 																</Tag>
 															),
 														},

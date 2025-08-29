@@ -187,11 +187,11 @@ export default class Search extends Component {
 						<header>
 							<h2>Set searchable fields</h2>
 							<p>
-								All fields in reactivesearch.io are indexed to allow for a blazing
-								fast querying performance.
+								All fields in reactivesearch.io index are indexed to allow for a
+								blazing fast querying performance.
 							</p>
 							<p>
-								However, all fields aren ’t created equal. When you set a field as{' '}
+								However, all fields aren’t created equal. When you set a field as{' '}
 								<strong>Searchable</strong>, it gets an additional n-gram based
 								analyzer applied which enables blazing fast auto-completion and
 								partial match features.

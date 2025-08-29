@@ -6,28 +6,6 @@ export const APP_ROUTES = {
 		link: '',
 		action: ALLOWED_ACTIONS.OVERVIEW,
 	},
-	'UI Builder': {
-		icon: 'control',
-		action: ALLOWED_ACTIONS.UI_BUILDER,
-		menu: [
-			{ label: 'Search', link: '/cluster/search-builder', hasExactPath: true },
-			{
-				label: 'Recommendations',
-				link: '/cluster/recommendations-builder',
-				hasExactPath: true,
-			},
-			{
-				label: 'Searchbox',
-				link: '/cluster/searchboxes',
-				hasExactPath: true,
-			},
-			{
-				label: 'End-user Authentication',
-				link: '/cluster/search-auth-settings',
-				hasExactPath: true,
-			},
-		],
-	},
 	Data: {
 		icon: 'dashboard',
 		action: ALLOWED_ACTIONS.DEVELOP,
@@ -62,22 +40,6 @@ export const APP_ROUTES = {
 			},
 		],
 	},
-	'AI Search': {
-		icon: 'robot',
-		action: ALLOWED_ACTIONS.UI_BUILDER,
-		menu: [
-			{
-				label: 'AI Preferences',
-				link: '/cluster/ai-preferences',
-				hasExactPath: true,
-			},
-			{
-				label: 'FAQs',
-				link: '/cluster/ai-faqs',
-				hasExactPath: true,
-			},
-		],
-	},
 	Pipelines: {
 		icon: 'deployment-unit',
 		action: ALLOWED_ACTIONS.PIPELINES,
@@ -95,6 +57,44 @@ export const APP_ROUTES = {
 			{
 				label: 'Search Engine Backend',
 				link: '/cluster/configure-search-engine-backend',
+				hasExactPath: true,
+			},
+		],
+	},
+	'AI Search': {
+		icon: 'robot',
+		action: ALLOWED_ACTIONS.UI_BUILDER,
+		menu: [
+			{
+				label: 'AI Preferences',
+				link: '/cluster/ai-preferences',
+				hasExactPath: true,
+			},
+			{
+				label: 'FAQs',
+				link: '/cluster/ai-faqs',
+				hasExactPath: true,
+			},
+		],
+	},
+	'UI Builder': {
+		icon: 'control',
+		action: ALLOWED_ACTIONS.UI_BUILDER,
+		menu: [
+			{ label: 'Search', link: '/cluster/search-builder', hasExactPath: true },
+			{
+				label: 'Recommendations',
+				link: '/cluster/recommendations-builder',
+				hasExactPath: true,
+			},
+			{
+				label: 'Searchbox',
+				link: '/cluster/searchboxes',
+				hasExactPath: true,
+			},
+			{
+				label: 'End-user Authentication',
+				link: '/cluster/search-auth-settings',
 				hasExactPath: true,
 			},
 		],

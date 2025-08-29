@@ -44,7 +44,7 @@ import {
 	getSettings as getAppSettings,
 	reIndex,
 } from '../../batteries/utils/mappings';
-import { getURL, getVersion } from '../../constants/config';
+import { getURL, getVersion, isUsingOpenSearch } from '../../constants/config';
 
 const Badge = styled.span`
 	background: #f5222d;
@@ -61,6 +61,36 @@ const Badge = styled.span`
 	z-index: 100;
 `;
 
+// helper to compare weights numerically; treats "10.0" and "10" as equal
+const isWeightEqual = (a, b) => {
+	const na = parseFloat(a);
+	const nb = parseFloat(b);
+	if (Number.isFinite(na) && Number.isFinite(nb)) {
+		return na === nb;
+	}
+	return a === b;
+};
+
+// helper for tracing: detect presence of `.synonyms` sub-fields in mappings (read-only)
+const mappingHasSynonymsField = (mappingsObj) => {
+	if (!mappingsObj) return false;
+	const rootProps =
+		get(mappingsObj, 'properties') ||
+		get(mappingsObj, '_doc.properties') ||
+		get(mappingsObj, 'mappings.properties') ||
+		null;
+	const traverse = (node) => {
+		if (!node || typeof node !== 'object') return false;
+		if (get(node, 'fields.synonyms')) return true;
+		const props = get(node, 'properties');
+		if (props && typeof props === 'object') {
+			return Object.keys(props).some((k) => traverse(props[k]));
+		}
+		return false;
+	};
+	return traverse(rootProps || mappingsObj);
+};
+
 const getDiffData = (oldObj, newObj, analyzerSettings) => {
 	let diffData = diff({ ...oldObj }, { ...newObj });
 	if (!diffData) {
@@ -74,7 +104,7 @@ const getDiffData = (oldObj, newObj, analyzerSettings) => {
 		const newFieldWeights = dataField.reduce((agg, item, index) => {
 			// const hasSubfield = subFields.some((s) => item.includes(s));
 			let dataToReturn = [...agg];
-			if (olderWeight[index] !== fieldWeights[index]) {
+			if (!isWeightEqual(olderWeight[index], fieldWeights[index])) {
 				dataToReturn = [
 					...dataToReturn,
 					{ field: item, oldWeight: olderWeight[index], newWeight: fieldWeights[index] },
@@ -90,6 +120,14 @@ const getDiffData = (oldObj, newObj, analyzerSettings) => {
 				fieldWeights: newFieldWeights,
 			},
 		};
+
+		// remove empty fieldWeights to avoid showing false diffs
+		if (!newFieldWeights.length) {
+			delete diffData.search.fieldWeights;
+			if (!Object.keys(diffData.search).length) {
+				delete diffData.search;
+			}
+		}
 	}
 
 	if (!get(diffData, 'search.fieldWeights', null) && get(diffData, 'search.dataField', null)) {
@@ -134,7 +172,7 @@ const getDiffData = (oldObj, newObj, analyzerSettings) => {
 			const oldWeight = olderWeights[olderDataFields.findIndex((x) => x === item)];
 			const newWeight = fieldWeights[index];
 			let dataToReturn = [...agg];
-			if (oldWeight !== newWeight && !isPartOfDataField) {
+			if (!isWeightEqual(oldWeight, newWeight) && !isPartOfDataField) {
 				dataToReturn = [
 					...dataToReturn,
 					{
@@ -206,7 +244,7 @@ const getDiffData = (oldObj, newObj, analyzerSettings) => {
 			const oldWeight = olderWeights[olderDataFields.findIndex((x) => x === item)];
 			const newWeight = fieldWeights[index];
 			let dataToReturn = [...agg];
-			if (oldWeight !== newWeight && !isPartOfDataField) {
+			if (!isWeightEqual(oldWeight, newWeight) && !isPartOfDataField) {
 				dataToReturn = [
 					...dataToReturn,
 					{
@@ -695,6 +733,12 @@ class ReviewAndSave extends React.Component {
 		this.setState({
 			isSaving: true,
 		});
+		// correlate one run of save with a short id
+		const runId = Date.now().toString(36);
+		// eslint-disable-next-line no-console
+		const log = (msg, obj) => console.log(`[ReviewAndSave:${runId}] ${msg}`, obj || '');
+		// eslint-disable-next-line no-console
+		const errorLog = (msg, obj) => console.error(`[ReviewAndSave:${runId}] ${msg}`, obj || '');
 		const { isResetting } = this.state;
 		const {
 			updateSettingsAction,
@@ -719,312 +763,508 @@ class ReviewAndSave extends React.Component {
 			value: null,
 		});
 
-		let newSettings = isResetting ? defaultSettings : currentSettings;
-
-		let updatedMappings = {
-			...(localMapping || mappings),
-		};
-
-		if (!updatedMappings || !Object.keys(updatedMappings).length) {
-			const mappingRes = await fetchMappings(appName, credentials, getURL());
-			updatedMappings = get(mappingRes, 'payload');
-		}
-
-		let updatedSettings = {};
-		let shouldUpdateSettings = false;
-		const hasToReIndex = shouldReIndex(localMapping, oldSettings, newSettings);
-
-		// decide if re-indexing is required based on language, index and search settings
-		/**
-		 * 1. If localMapping exists then data should be re-indexed as it indicated change in subfields for a some of the fields
-		 * 2. Enable/disable ngrams should add/remove .search fields from the mapping
-		 * 3. Language change should trigger setting (analyzer) change + mapping change
-		 */
-
-		if (
-			get(newSettings, 'indexSettings.enableNgram') !==
-			get(oldSettings, 'indexSettings.enableNgram')
-		) {
-			const newNgramSettings = get(newSettings, 'indexSettings.ngramSettings', {});
-			shouldUpdateSettings = true;
-			const isNgramEnabled = get(newSettings, 'indexSettings.enableNgram');
-
-			updatedSettings = await getAppSettings(appName, credentials).then(
-				(data) => data[appName].settings,
-			);
-
-			updatedMappings = {
-				properties: applyNgramMapping(get(updatedMappings, 'properties'), isNgramEnabled),
-			};
-
-			// if ngram is enabled .search field should be added before saving as it requires re-indexing of data
-			if (get(newSettings, 'indexSettings.enableNgram')) {
-				const currentDataFields = get(newSettings, 'search.dataField');
-				// eslint-disable-next-line
-				const [ngramDataFields, ngramFieldWeights] =
-					applyNgramDataFields(currentDataFields);
-				newSettings = {
-					...newSettings,
-					search: {
-						...get(newSettings, 'search'),
-						dataField: [
-							...currentDataFields,
-							// ...ngramDataFields
-						],
-						fieldWeights: [
-							...get(newSettings, 'search.fieldWeights'),
-							// ...ngramFieldWeights,
-						],
-					},
-				};
-			}
-			updatedSettings = {
-				index: {
-					...get(updatedSettings, 'index', {}),
-					analysis: {
-						...get(updatedSettings, 'index.analysis', {}),
-						filter: {
-							...get(updatedSettings, 'index.analysis.filter', {}),
-							ngram_filter: {
-								...get(updatedSettings, 'index.analysis.filter.ngram_filter', {}),
-								...newNgramSettings,
-							},
-						},
-					},
-				},
-			};
-			delete updatedSettings.index.creation_date;
-		}
-
-		if (
-			get(newSettings, 'indexSettings.enableAutoSuggestion', false) !==
-			get(oldSettings, 'indexSettings.enableAutoSuggestion', false)
-		) {
-			const newSuggestionSettings = get(
-				newSettings,
-				'indexSettings.autosuggestionSettings',
-				{},
-			);
-			const isAutosuggestionEnabled = get(
-				newSettings,
-				'indexSettings.enableAutoSuggestion',
-				false,
-			);
-			shouldUpdateSettings = true;
-			updatedSettings = await getAppSettings(appName, credentials).then(
-				(data) => data[appName].settings,
-			);
-
-			updatedMappings = {
-				properties: applyAutosuggestionMapping(
-					get(updatedMappings, 'properties'),
-					isAutosuggestionEnabled,
-				),
-			};
-
-			// if autosuggestion is enabled .autosuggest field should be added before saving as it requires re-indexing of data
-			if (get(newSettings, 'indexSettings.enableAutoSuggestion')) {
-				const currentDataFields = get(newSettings, 'search.dataField');
-				// eslint-disable-next-line
-				const [autosuggestDataFields, autosuggestFieldsWeights] =
-					applyAutosuggestionDataFields(currentDataFields);
-
-				newSettings = {
-					...newSettings,
-					search: {
-						...get(newSettings, 'search'),
-						dataField: [
-							...currentDataFields,
-							// ...autosuggestDataFields
-						],
-						fieldWeights: [
-							...get(newSettings, 'search.fieldWeights'),
-							// ...autosuggestFieldsWeights,
-						],
-					},
-				};
-			}
-			updatedSettings = {
-				index: {
-					...get(updatedSettings, 'index', {}),
-					analysis: {
-						...get(updatedSettings, 'index.analysis', {}),
-						tokenizer: {
-							...get(updatedSettings, 'index.analysis.tokenizer', {}),
-							autosuggest_tokenizer: {
-								...get(
-									updatedSettings,
-									'index.analysis.tokenizer.autosuggest_tokenizer',
-									{},
-								),
-								...newSuggestionSettings,
-							},
-						},
-					},
-				},
-			};
-
-			delete updatedSettings.index.creation_date;
-		}
-
-		if (
-			JSON.stringify(get(newSettings, 'language')) !==
-			JSON.stringify(get(oldSettings, 'language'))
-		) {
-			shouldUpdateSettings = true;
-			updatedSettings = await getAppSettings(appName, credentials).then(
-				(data) => data[appName].settings,
-			);
-			const newLangSettings = get(newSettings, 'language');
-			const language = getLanguageFallback(get(newLangSettings, 'language'));
-			const analysis = buildLanguageAnalysis(language, newLangSettings);
-
-			const { analyzer, filter } = get(updatedSettings, 'index.analysis', {});
-			const { analyzer: analyzerNew, filter: filterNew } = analysis || {};
-
-			let updatedAnalyzer = {
-				...omit(analyzer, [newLangSettings, 'standard_asciifolding']),
-				...analyzerNew,
-			};
-
-			if (newLangSettings.normalizeDiacritics) {
-				updatedAnalyzer = Object.keys(updatedAnalyzer).reduce((obj, a) => {
-					const { filter: analyzerFilter } = updatedAnalyzer[a];
-					// asciifolding should appear before [x]_stop word filter
-					// inorder to do that find that index and splice before it
-					if (analyzerFilter) {
-						let stopIndex = analyzerFilter.findIndex((f) => f.includes('_stop'));
-						if (stopIndex === -1) stopIndex = 0;
-						analyzerFilter.splice(stopIndex, 0, 'asciifolding');
-					}
-					return {
-						...obj,
-						[a]: {
-							...updatedAnalyzer[a],
-							// save the unique values of filter
-							filter: analyzerFilter.filter((v, i, x) => x.indexOf(v) === i),
-						},
-					};
-				}, {});
-			} else {
-				updatedAnalyzer = Object.keys(updatedAnalyzer).reduce((obj, a) => {
-					const { filter: analyzerFilter } = updatedAnalyzer[a];
-					return {
-						...obj,
-						[a]: {
-							...updatedAnalyzer[a],
-							filter: analyzerFilter.filter((i) => i !== 'asciifolding'),
-						},
-					};
-				}, {});
-			}
-
-			updatedMappings = {
-				properties: applyLanguageMapping(get(updatedMappings, 'properties'), language),
-			};
-
-			updatedSettings = {
-				analysis: {
-					analyzer: updatedAnalyzer,
-					filter: {
-						...omitBy(filter, (key, value) =>
-							(value || '').startsWith(get(newSettings, 'language.language')),
-						),
-						...filterNew,
-					},
-				},
-			};
-		}
+		log('handleSave called', {
+			appName,
+			isResetting,
+			hasLocalRelevancy: !!currentSettings,
+			hasOldSettings: !!oldSettings,
+			hasLocalMapping: !!localMapping,
+			hasMappings: !!mappings,
+		});
 
 		try {
-			// convert field weights to float otherwise it can fail indexing data in ES
-			const settingsData = {
-				...newSettings,
-				search: {
-					...newSettings.search,
-					fieldWeights: newSettings.search.fieldWeights.map((i) =>
-						parseFloat(i).toFixed(1),
-					),
-				},
-			};
+			let newSettings = isResetting ? defaultSettings : currentSettings;
+			log('settings snapshot', {
+				newSettingsDefined: !!newSettings,
+				newSettingsKeys: Object.keys(newSettings || {}),
+				searchKeys: Object.keys(get(newSettings, 'search', {}) || {}),
+			});
 
-			const savedSettings = await updateSettingsAction(appName, settingsData);
-			if (isResetting) {
-				updateLocalRelevancyState(appName, defaultSettings);
-			}
-			if (savedSettings && savedSettings.error) {
-				notification.error({
-					message: 'Failed to save Search Settings',
-					description: get(savedSettings, 'error.message'),
+			const baseMappings = localMapping || mappings;
+			let updatedMappings = baseMappings ? { ...baseMappings } : {};
+			if (!baseMappings) {
+				log('base mappings missing; fetching from server', { appName });
+				const mappingRes = await fetchMappings(appName, credentials, getURL());
+				updatedMappings = get(mappingRes, 'payload') || {};
+				log('fetched mappings', {
+					rootKeys: Object.keys(updatedMappings || {}),
+					propKeys: Object.keys(get(updatedMappings, 'properties', {}) || {}),
 				});
 			} else {
-				notification.success({
-					message: `Search relevancy for ${appName} saved successfully`,
-					description: ``,
+				log('using provided mappings', {
+					rootKeys: Object.keys(updatedMappings || {}),
 				});
 			}
 
-			this.setState({
-				isSaving: false,
-				isOpen: false,
-				isResetting: false,
-			});
+			let updatedSettings = {};
+			let shouldUpdateSettings = false;
+			const hasToReIndex = shouldReIndex(localMapping, oldSettings, newSettings);
+			log('shouldReIndex evaluated', { hasToReIndex });
 
-			if (hasToReIndex) {
-				const esVersion = getVersion() || (await getESVersion(appName, credentials));
+			/* eslint-disable indent */
+			// decide if re-indexing is required based on language, index and search settings
+			/**
+			 * 1. If localMapping exists then data should be re-indexed as it indicated change in subfields for a some of the fields
+			 * 2. Enable/disable ngrams should add/remove .search fields from the mapping
+			 * 3. Language change should trigger setting (analyzer) change + mapping change
+			 */
 
-				const reIndexingData = {
-					mappings:
-						parseInt(esVersion[0], 10) === 6
-							? { _doc: updatedMappings }
-							: updatedMappings,
-					appId: appName,
-					version: esVersion,
-					credentials,
+			if (
+				get(newSettings, 'indexSettings.enableNgram') !==
+				get(oldSettings, 'indexSettings.enableNgram')
+			) {
+				log('ngram enable flag changed', {
+					old: get(oldSettings, 'indexSettings.enableNgram'),
+					new: get(newSettings, 'indexSettings.enableNgram'),
+				});
+				const newNgramSettings = get(newSettings, 'indexSettings.ngramSettings', {});
+				shouldUpdateSettings = true;
+				const isNgramEnabled = get(newSettings, 'indexSettings.enableNgram');
+
+				updatedSettings = await getAppSettings(appName, credentials).then(
+					(data) => data[appName].settings,
+				);
+
+				updatedMappings = {
+					properties: applyNgramMapping(
+						get(updatedMappings, 'properties'),
+						isNgramEnabled,
+					),
 				};
 
-				if (shouldUpdateSettings) {
-					reIndexingData.settings = updatedSettings;
+				// if ngram is enabled .search field should be added before saving as it requires re-indexing of data
+				if (get(newSettings, 'indexSettings.enableNgram')) {
+					const currentDataFields = get(newSettings, 'search.dataField');
+					// eslint-disable-next-line
+					const [ngramDataFields, ngramFieldWeights] =
+						applyNgramDataFields(currentDataFields);
+					newSettings = {
+						...newSettings,
+						search: {
+							...get(newSettings, 'search'),
+							dataField: [
+								...currentDataFields,
+								// ...ngramDataFields
+							],
+							fieldWeights: [
+								...get(newSettings, 'search.fieldWeights'),
+								// ...ngramFieldWeights,
+							],
+						},
+					};
+				}
+				updatedSettings = {
+					index: {
+						...get(updatedSettings, 'index', {}),
+						analysis: {
+							...get(updatedSettings, 'index.analysis', {}),
+							filter: {
+								...get(updatedSettings, 'index.analysis.filter', {}),
+								ngram_filter: {
+									...get(
+										updatedSettings,
+										'index.analysis.filter.ngram_filter',
+										{},
+									),
+									...newNgramSettings,
+								},
+							},
+						},
+					},
+				};
+				delete updatedSettings.index.creation_date;
+			}
+
+			if (
+				get(newSettings, 'indexSettings.enableAutoSuggestion', false) !==
+				get(oldSettings, 'indexSettings.enableAutoSuggestion', false)
+			) {
+				log('autosuggestion enable flag changed', {
+					old: get(oldSettings, 'indexSettings.enableAutoSuggestion', false),
+					new: get(newSettings, 'indexSettings.enableAutoSuggestion', false),
+				});
+				const newSuggestionSettings = get(
+					newSettings,
+					'indexSettings.autosuggestionSettings',
+					{},
+				);
+				const isAutosuggestionEnabled = get(
+					newSettings,
+					'indexSettings.enableAutoSuggestion',
+					false,
+				);
+				shouldUpdateSettings = true;
+				updatedSettings = await getAppSettings(appName, credentials).then(
+					(data) => data[appName].settings,
+				);
+
+				updatedMappings = {
+					properties: applyAutosuggestionMapping(
+						get(updatedMappings, 'properties'),
+						isAutosuggestionEnabled,
+					),
+				};
+
+				// if autosuggestion is enabled .autosuggest field should be added before saving as it requires re-indexing of data
+				if (get(newSettings, 'indexSettings.enableAutoSuggestion')) {
+					const currentDataFields = get(newSettings, 'search.dataField');
+					// eslint-disable-next-line
+					const [autosuggestDataFields, autosuggestFieldsWeights] =
+						applyAutosuggestionDataFields(currentDataFields);
+
+					newSettings = {
+						...newSettings,
+						search: {
+							...get(newSettings, 'search'),
+							dataField: [
+								...currentDataFields,
+								// ...autosuggestDataFields
+							],
+							fieldWeights: [
+								...get(newSettings, 'search.fieldWeights'),
+								// ...autosuggestFieldsWeights,
+							],
+						},
+					};
+				}
+				updatedSettings = {
+					index: {
+						...get(updatedSettings, 'index', {}),
+						analysis: {
+							...get(updatedSettings, 'index.analysis', {}),
+							tokenizer: {
+								...get(updatedSettings, 'index.analysis.tokenizer', {}),
+								autosuggest_tokenizer: {
+									...get(
+										updatedSettings,
+										'index.analysis.tokenizer.autosuggest_tokenizer',
+										{},
+									),
+									...newSuggestionSettings,
+								},
+							},
+						},
+					},
+				};
+
+				delete updatedSettings.index.creation_date;
+			}
+
+			if (
+				JSON.stringify(get(newSettings, 'indexSettings.ngramSettings')) !==
+				JSON.stringify(get(oldSettings, 'indexSettings.ngramSettings'))
+			) {
+				log('ngram settings changed', {
+					old: get(oldSettings, 'indexSettings.ngramSettings'),
+					new: get(newSettings, 'indexSettings.ngramSettings'),
+				});
+				shouldUpdateSettings = true;
+				updatedSettings = await getAppSettings(appName, credentials).then(
+					(data) => data[appName].settings,
+				);
+
+				const newNgramSettings = get(newSettings, 'indexSettings.ngramSettings', {});
+				const oldNgramSettings = get(oldSettings, 'indexSettings.ngramSettings', {});
+
+				// Calculate diffs
+				const oldMin = parseInt(oldNgramSettings.min_gram || 3, 10);
+				const oldMax = parseInt(oldNgramSettings.max_gram || 7, 10);
+				const newMin = parseInt(newNgramSettings.min_gram || 3, 10);
+				const newMax = parseInt(newNgramSettings.max_gram || 7, 10);
+
+				const oldDiff = oldMax - oldMin;
+				const newDiff = newMax - newMin;
+
+				updatedSettings = {
+					index: {
+						...get(updatedSettings, 'index', {}),
+						analysis: {
+							...get(updatedSettings, 'index.analysis', {}),
+							filter: {
+								...get(updatedSettings, 'index.analysis.filter', {}),
+								ngram_filter: {
+									...get(
+										updatedSettings,
+										'index.analysis.filter.ngram_filter',
+										{},
+									),
+									...newNgramSettings,
+								},
+							},
+						},
+					},
+				};
+
+				// ngram diff updated above; no console logs to avoid lint issues
+
+				if (newDiff > oldDiff) {
+					updatedSettings.index.max_ngram_diff = newDiff;
 				}
 
-				const reIndexPromise = reIndex(reIndexingData);
-
-				reIndexPromise
-					.then((res) => {
-						if (get(res, 'failures', []).length) {
-							get(res, 'failures', []).forEach((fail) => {
-								message.error(`Re-indexing failed: ${fail.cause.reason}`);
-							});
-							return;
-						}
-						if (res.task) {
-							updateReIndexingTasks(res.task);
-						} else if (credentials && appName) {
-							message.success(`Re-indexing completed successfully`);
-							updateLocalMappingState(appName, null);
-							fetchMappings(appName, credentials, this.URL);
-						}
-					})
-					.catch((reIndexErr) => {
-						// eslint-disable-next-line no-console
-						console.error('Re-indexing error = ', reIndexErr);
-						this.setState({ isSaving: false });
-
-						notification.error({
-							message: 'Reindexing Failed',
-							description:
-								reIndexErr.message ||
-								'Reindexing might be in progress, please wait till the current process is completed!',
-						});
-					});
+				delete updatedSettings.index.creation_date;
 			}
-		} catch (err) {
-			this.setState({
-				isSaving: false,
-			});
+
+			if (
+				JSON.stringify(get(newSettings, 'language')) !==
+				JSON.stringify(get(oldSettings, 'language'))
+			) {
+				shouldUpdateSettings = true;
+				updatedSettings = await getAppSettings(appName, credentials).then(
+					(data) => data[appName].settings,
+				);
+				const newLangSettings = get(newSettings, 'language');
+				const language = getLanguageFallback(get(newLangSettings, 'language'));
+				const analysis = buildLanguageAnalysis(language, newLangSettings);
+				// eslint-disable-next-line no-console
+				console.debug('[ReviewAndSave] language change detected', {
+					language,
+					normalizeDiacritics: get(newLangSettings, 'normalizeDiacritics'),
+				});
+
+				const { analyzer, filter } = get(updatedSettings, 'index.analysis', {});
+				const { analyzer: analyzerNew, filter: filterNew } = analysis || {};
+
+				let updatedAnalyzer = {
+					...omit(analyzer, [newLangSettings, 'standard_asciifolding']),
+					...analyzerNew,
+				};
+
+				if (newLangSettings.normalizeDiacritics) {
+					updatedAnalyzer = Object.keys(updatedAnalyzer).reduce((obj, a) => {
+						const { filter: analyzerFilter } = updatedAnalyzer[a];
+						// asciifolding should appear before [x]_stop word filter
+						// inorder to do that find that index and splice before it
+						if (analyzerFilter) {
+							let stopIndex = analyzerFilter.findIndex((f) => f.includes('_stop'));
+							if (stopIndex === -1) stopIndex = 0;
+							analyzerFilter.splice(stopIndex, 0, 'asciifolding');
+						}
+						return {
+							...obj,
+							[a]: {
+								...updatedAnalyzer[a],
+								// save the unique values of filter
+								filter: analyzerFilter.filter((v, i, x) => x.indexOf(v) === i),
+							},
+						};
+					}, {});
+				} else {
+					updatedAnalyzer = Object.keys(updatedAnalyzer).reduce((obj, a) => {
+						const { filter: analyzerFilter } = updatedAnalyzer[a];
+						return {
+							...obj,
+							[a]: {
+								...updatedAnalyzer[a],
+								filter: analyzerFilter.filter((i) => i !== 'asciifolding'),
+							},
+						};
+					}, {});
+				}
+
+				updatedMappings = {
+					properties: applyLanguageMapping(get(updatedMappings, 'properties'), language),
+				};
+				// eslint-disable-next-line no-console
+				console.debug('[ReviewAndSave] mappings updated for language', {
+					mappingsHasSynonyms: mappingHasSynonymsField(updatedMappings),
+				});
+
+				// Preserve existing max_ngram_diff when language changes to avoid ES errors
+				// if the current ngram (max_gram - min_gram) exceeds the default of 1.
+				const prevMaxNgramDiff = get(
+					updatedSettings,
+					'index.max_ngram_diff',
+					get(oldSettings, 'index.max_ngram_diff'),
+				);
+
+				updatedSettings = {
+					index: {
+						...get(updatedSettings, 'index', {}),
+						analysis: {
+							analyzer: updatedAnalyzer,
+							filter: {
+								...omitBy(filter, (key, value) =>
+									(value || '').startsWith(get(newSettings, 'language.language')),
+								),
+								...filterNew,
+							},
+						},
+						// carry forward max_ngram_diff if it existed previously
+						...(prevMaxNgramDiff !== undefined
+							? { max_ngram_diff: prevMaxNgramDiff }
+							: {}),
+					},
+				};
+			}
+
+			/* eslint-enable indent */
+			try {
+				// convert field weights to float otherwise it can fail indexing data in ES
+				const fieldWeights = Array.isArray(get(newSettings, 'search.fieldWeights'))
+					? get(newSettings, 'search.fieldWeights').map((i) => parseFloat(i).toFixed(1))
+					: [];
+				const settingsData = {
+					...newSettings,
+					search: {
+						...get(newSettings, 'search', {}),
+						fieldWeights,
+					},
+				};
+
+				log('saving settings', {
+					dataKeys: Object.keys(settingsData || {}),
+					searchKeys: Object.keys(get(settingsData, 'search', {}) || {}),
+					fieldWeightsLen: get(settingsData, 'search.fieldWeights', []).length,
+				});
+
+				const savedSettings = await updateSettingsAction(appName, settingsData);
+				log('save response received', {
+					hasError: !!get(savedSettings, 'error'),
+					errorMsg: get(savedSettings, 'error.message'),
+				});
+				if (isResetting) {
+					updateLocalRelevancyState(appName, defaultSettings);
+				}
+				if (savedSettings && savedSettings.error) {
+					notification.error({
+						message: 'Failed to save Search Settings',
+						description: get(savedSettings, 'error.message'),
+					});
+				} else {
+					notification.success({
+						message: `Search relevancy for ${appName} saved successfully`,
+						description: ``,
+					});
+				}
+
+				this.setState({
+					isSaving: false,
+					isOpen: false,
+					isResetting: false,
+				});
+
+				if (hasToReIndex) {
+					const esVersion = getVersion() || (await getESVersion(appName, credentials));
+
+					const majorVersion = parseInt(esVersion.split('.')[0], 10);
+					const isOpenSearch = isUsingOpenSearch();
+					const shouldAddDoc = !isOpenSearch ? majorVersion === 6 : majorVersion < 3;
+					log('reindex plan', { esVersion, majorVersion, isOpenSearch, shouldAddDoc });
+
+					// Always ensure synonyms analyzer exists in settings before reindex
+					const ensureSynonymsAnalyzer = (baseSettings = {}) => {
+						const next = JSON.parse(JSON.stringify(baseSettings || {}));
+						const hasIndexWrapper = !!(next && next.index);
+						const root = hasIndexWrapper ? next.index : next;
+						root.analysis = root.analysis || {};
+						root.analysis.analyzer = root.analysis.analyzer || {};
+						root.analysis.filter = root.analysis.filter || {};
+						if (!root.analysis.analyzer.synonyms) {
+							root.analysis.analyzer.synonyms = {
+								tokenizer: 'standard',
+								filter: ['lowercase', 'synonym_graph'],
+							};
+						}
+						let existingSynonyms = [];
+						if (
+							root &&
+							root.analysis &&
+							root.analysis.filter &&
+							root.analysis.filter.synonym_graph &&
+							Array.isArray(root.analysis.filter.synonym_graph.synonyms)
+						) {
+							existingSynonyms = root.analysis.filter.synonym_graph.synonyms;
+						}
+						root.analysis.filter.synonym_graph = {
+							type: 'synonym_graph',
+							lenient: true,
+							synonyms: existingSynonyms,
+						};
+						return next;
+					};
+
+					// If caller hasn't prepared settings, load existing settings as base
+					if (!shouldUpdateSettings) {
+						shouldUpdateSettings = true;
+						updatedSettings = await getAppSettings(appName, credentials).then(
+							(data) => data[appName].settings,
+						);
+					}
+					updatedSettings = ensureSynonymsAnalyzer(updatedSettings);
+
+					// delete blacklisted keys if present, as these shouldn't be provided by user
+					/* eslint-disable camelcase */
+					if (updatedSettings.index) {
+						delete updatedSettings.index.creation_date;
+						delete updatedSettings.index.uuid;
+						delete updatedSettings.index.version;
+						delete updatedSettings.index.provided_name;
+					}
+					/* eslint-enable camelcase */
+
+					const reIndexingData = {
+						mappings: shouldAddDoc ? { _doc: updatedMappings } : updatedMappings,
+						appId: appName,
+						version: esVersion,
+						credentials,
+						settings: updatedSettings,
+					};
+					log('reindex request prepared', {
+						mappingRootKeys: Object.keys(reIndexingData.mappings || {}),
+						settingsHasIndex:
+							!!get(updatedSettings, 'index') || !!get(updatedSettings, 'analysis'),
+					});
+
+					const reIndexPromise = reIndex(reIndexingData);
+
+					reIndexPromise
+						.then((res) => {
+							log('reindex response', {
+								hasTask: !!res?.task,
+								failures: get(res, 'failures', []).length,
+							});
+							if (get(res, 'failures', []).length) {
+								get(res, 'failures', []).forEach((fail) => {
+									message.error(`Re-indexing failed: ${fail.cause.reason}`);
+								});
+								return;
+							}
+							if (res.task) {
+								updateReIndexingTasks(res.task);
+							} else if (credentials && appName) {
+								message.success(`Re-indexing completed successfully`);
+								updateLocalMappingState(appName, null);
+								fetchMappings(appName, credentials, this.URL);
+							}
+						})
+						.catch((reIndexErr) => {
+							// eslint-disable-next-line no-console
+							errorLog('Re-indexing error', reIndexErr);
+							this.setState({ isSaving: false });
+
+							notification.error({
+								message: 'Reindexing Failed',
+								description:
+									reIndexErr.message ||
+									'Reindexing might be in progress, please wait till the current process is completed!',
+							});
+						});
+				}
+			} catch (err) {
+				this.setState({
+					isSaving: false,
+				});
+				notification.error({
+					message: 'Failed to save Search Settings',
+					description: err.message,
+				});
+			}
+		} catch (outerErr) {
+			this.setState({ isSaving: false });
+			errorLog('Pre-save failure', outerErr);
 			notification.error({
 				message: 'Failed to save Search Settings',
-				description: err.message,
+				description: outerErr?.message || 'Unknown error occurred before saving',
 			});
 		}
 	};

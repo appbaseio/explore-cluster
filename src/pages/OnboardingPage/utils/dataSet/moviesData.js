@@ -49828,8 +49828,7 @@ module.exports = [
 		popularity: 30.466,
 		poster_path: 'https://www.themoviedb.org/t/p/w1280/4E0qUqbevK4DAW2RRbvZmjjPsOd.jpg',
 		release_date: '2007-03-10',
-		title:
-			"Doraemon the Movie: Nobita's New Great Adventure Into the Underworld - The Seven Magic Users",
+		title: "Doraemon the Movie: Nobita's New Great Adventure Into the Underworld - The Seven Magic Users",
 		video: false,
 		vote_average: 6.9,
 		vote_count: 29,
@@ -81378,8 +81377,7 @@ module.exports = [
 		popularity: 17.457,
 		poster_path: 'https://www.themoviedb.org/t/p/w1280/kfkyALfD4G1mlBJI1lOt2QCra4i.jpg',
 		release_date: '2006-11-01',
-		title:
-			'Borat: Cultural Learnings of America for Make Benefit Glorious Nation of Kazakhstan',
+		title: 'Borat: Cultural Learnings of America for Make Benefit Glorious Nation of Kazakhstan',
 		video: false,
 		vote_average: 6.7,
 		vote_count: 4112,
@@ -133530,8 +133528,7 @@ module.exports = [
 		popularity: 11.591,
 		poster_path: 'https://www.themoviedb.org/t/p/w1280/kKzopOFXz9YfsCTqg3XpF0GoypX.jpg',
 		release_date: '2017-09-05',
-		title:
-			'Jim & Andy: The Great Beyond - Featuring a Very Special, Contractually Obligated Mention of Tony Clifton',
+		title: 'Jim & Andy: The Great Beyond - Featuring a Very Special, Contractually Obligated Mention of Tony Clifton',
 		video: false,
 		vote_average: 7.6,
 		vote_count: 503,
@@ -138560,8 +138557,7 @@ module.exports = [
 		popularity: 12.469,
 		poster_path: 'https://www.themoviedb.org/t/p/w1280/f2YtZ8HHVt0F7sHg8r7GwlSKmKW.jpg',
 		release_date: '2013-01-14',
-		title:
-			'30 Nights of Paranormal Activity With the Devil Inside the Girl With the Dragon Tattoo',
+		title: '30 Nights of Paranormal Activity With the Devil Inside the Girl With the Dragon Tattoo',
 		video: false,
 		vote_average: 4.2,
 		vote_count: 84,
@@ -139639,8 +139635,7 @@ module.exports = [
 		popularity: 7.535,
 		poster_path: 'https://www.themoviedb.org/t/p/w1280/cEMYFKZdLMNlYoGixnCzFsDsW3d.jpg',
 		release_date: '1994-08-20',
-		title:
-			'Ranma ½: The Movie 3 — The Super Non-Discriminatory Showdown: Team Ranma vs. the Legendary Phoenix',
+		title: 'Ranma ½: The Movie 3 — The Super Non-Discriminatory Showdown: Team Ranma vs. the Legendary Phoenix',
 		video: false,
 		vote_average: 7.3,
 		vote_count: 20,

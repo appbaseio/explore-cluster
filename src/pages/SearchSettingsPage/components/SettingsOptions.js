@@ -35,9 +35,7 @@ const SettingsOptions = ({
 	indexSettings,
 }) => {
 	const [ngramSettings, setNgramSettings] = useState({});
-	const [autosuggestionSettings, setSuggestionSettings] = useState({});
 	const [errorMsgNgram, setErrorMsgNgram] = useState('');
-	const [errorMsgSuggestion, setErrorMsgSuggestion] = useState('');
 
 	useEffect(() => {
 		if (
@@ -51,10 +49,7 @@ const SettingsOptions = ({
 			});
 		} else if (updatedSettings && updatedSettings.index) {
 			if (!updatedSettings.index.analysis) {
-				notification.error({
-					message: `The index doesn't contain any analyzers, it's not possible to add N-gram related settings`,
-					description: `The index doesn't contain any analyzers, it's not possible to add N-gram related settings`,
-				});
+				// Don't show notification on mount, only when user tries to enable
 			} else if (!updatedSettings.index.analysis.filter.ngram_filter) {
 				setNgramSettings({
 					min_gram: 3,
@@ -73,50 +68,9 @@ const SettingsOptions = ({
 				});
 			}
 		}
-
-		if (
-			indexSettings.autosuggestionSettings &&
-			indexSettings.autosuggestionSettings.min_gram &&
-			indexSettings.autosuggestionSettings.max_gram
-		) {
-			setSuggestionSettings({
-				min_gram: indexSettings.autosuggestionSettings.min_gram,
-				max_gram: indexSettings.autosuggestionSettings.max_gram,
-			});
-		} else if (updatedSettings && updatedSettings.index) {
-			if (!updatedSettings.index.analysis) {
-				notification.error({
-					message: `The index doesn't contain any analyzers, it's not possible to add N-gram related settings`,
-					description: `The index doesn't contain any analyzers, it's not possible to add N-gram related settings`,
-				}); // eslint-disable-next-line
-			} else if (!updatedSettings.index.analysis?.tokenizer?.autosuggest_tokenizer) {
-				setSuggestionSettings({
-					min_gram: 3,
-					max_gram: 7,
-				});
-			} else {
-				setSuggestionSettings({
-					min_gram: parseInt(
-						updatedSettings.index.analysis.tokenizer.autosuggest_tokenizer.min_gram,
-						10,
-					),
-					max_gram: parseInt(
-						updatedSettings.index.analysis.tokenizer.autosuggest_tokenizer.max_gram,
-						10,
-					),
-				});
-			}
-		}
-	}, []);
-
-	function validateChars(min, max, type) {
+	}, [updatedSettings, indexSettings]);
+	function validateChars(min, max) {
 		if (min && max && max >= min) {
-			if (type === 'ngram') {
-				if (max - min <= 5) {
-					return true;
-				}
-				return false;
-			}
 			return true;
 		}
 		return false;
@@ -258,13 +212,32 @@ const SettingsOptions = ({
 
 			<h6>
 				{settingsMap.enableNgram.title}{' '}
-				<Tooltip title={settingsMap.enableNgram.description}>
+				<Tooltip
+					title={`${settingsMap.enableNgram.description} Note: This feature requires the index to have analyzers.`}
+				>
 					<InfoCircleOutlined style={{ marginLeft: 5 }} />
 				</Tooltip>
 			</h6>
 			<Switch
 				checked={enableNgram}
-				onChange={(value) => handleChange('enableNgram', value)}
+				disabled={
+					!updatedSettings || !updatedSettings.index || !updatedSettings.index.analysis
+				}
+				onChange={(value) => {
+					if (
+						value &&
+						updatedSettings &&
+						updatedSettings.index &&
+						!updatedSettings.index.analysis
+					) {
+						notification.warning({
+							message: `The index doesn't contain any analyzers, it's not possible to add N-gram related settings`,
+							description: `The index doesn't contain any analyzers, it's not possible to add N-gram related settings`,
+						});
+						return;
+					}
+					handleChange('enableNgram', value);
+				}}
 				data-cy="ngram-switch"
 			/>
 			{enableNgram && (
@@ -290,7 +263,7 @@ const SettingsOptions = ({
 											min_gram: val,
 										});
 										if (
-											validateChars(val, ngramSettings.max_gram, 'ngram') &&
+											validateChars(val, ngramSettings.max_gram) &&
 											enableNgram
 										) {
 											setErrorMsgNgram('');
@@ -301,9 +274,7 @@ const SettingsOptions = ({
 												},
 											});
 										} else {
-											setErrorMsgNgram(
-												`max chars - min chars should be ≤ 5 and max ≥ min`,
-											);
+											setErrorMsgNgram(`max chars vaue ≥ min chars value`);
 										}
 									}}
 								/>
@@ -321,7 +292,7 @@ const SettingsOptions = ({
 											max_gram: val,
 										});
 										if (
-											validateChars(ngramSettings.min_gram, val, 'ngram') &&
+											validateChars(ngramSettings.min_gram, val) &&
 											enableNgram
 										) {
 											setErrorMsgNgram('');
@@ -346,109 +317,34 @@ const SettingsOptions = ({
 			)}
 			<h6>
 				{settingsMap.enableAutoSuggestion.title}{' '}
-				<Tooltip title={settingsMap.enableAutoSuggestion.description}>
+				<Tooltip
+					title={`${settingsMap.enableAutoSuggestion.description} Note: This feature requires the index to have analyzers.`}
+				>
 					<InfoCircleOutlined style={{ marginLeft: 5 }} />
 				</Tooltip>
 			</h6>
 			<Switch
 				checked={enableAutoSuggestion}
-				onChange={(value) => handleChange('enableAutoSuggestion', value)}
+				disabled={
+					!updatedSettings || !updatedSettings.index || !updatedSettings.index.analysis
+				}
+				onChange={(value) => {
+					if (
+						value &&
+						updatedSettings &&
+						updatedSettings.index &&
+						!updatedSettings.index.analysis
+					) {
+						notification.warning({
+							message: `The index doesn't contain any analyzers, it's not possible to add N-gram related settings`,
+							description: `The index doesn't contain any analyzers, it's not possible to add N-gram related settings`,
+						});
+						return;
+					}
+					handleChange('enableAutoSuggestion', value);
+				}}
 				data-cy="autosuggestion-switch"
 			/>
-			{enableAutoSuggestion && (
-				<div>
-					<div>
-						<h6>
-							Autosuggestion Settings
-							<Tooltip title={settingsMap.enableAutoSuggestion.description}>
-								<InfoCircleOutlined style={{ marginLeft: 5 }} />
-							</Tooltip>
-						</h6>
-						<div style={{ display: 'flex' }}>
-							<div style={{ margin: '10px 10px 5px 10px' }}>
-								Min Chars
-								<InputNumber
-									style={{ marginLeft: '10px' }}
-									value={autosuggestionSettings.min_gram}
-									min={1}
-									max={20}
-									onChange={(val) => {
-										setSuggestionSettings({
-											...autosuggestionSettings,
-											min_gram: val,
-										});
-										if (
-											validateChars(
-												val,
-												autosuggestionSettings.max_gram,
-												'suggestion',
-											) &&
-											enableAutoSuggestion
-										) {
-											setErrorMsgSuggestion('');
-											handleChange(
-												'autosuggestionSettings',
-												enableAutoSuggestion,
-												{
-													autosuggestionSettings: {
-														...autosuggestionSettings,
-														min_gram: val,
-													},
-												},
-											);
-										} else {
-											setErrorMsgSuggestion(
-												`max should be greather than equal to min`,
-											);
-										}
-									}}
-								/>
-							</div>
-							<div style={{ margin: '10px 0px 5px 10px' }}>
-								Max Chars
-								<InputNumber
-									style={{ marginLeft: '10px' }}
-									defaultValue={20}
-									value={autosuggestionSettings.max_gram}
-									min={1}
-									max={20}
-									onChange={(val) => {
-										setSuggestionSettings({
-											...autosuggestionSettings,
-											max_gram: val,
-										});
-										if (
-											validateChars(
-												autosuggestionSettings.min_gram,
-												val,
-												'suggestion',
-											) &&
-											enableAutoSuggestion
-										) {
-											setErrorMsgSuggestion('');
-											handleChange(
-												'autosuggestionSettings',
-												enableAutoSuggestion,
-												{
-													autosuggestionSettings: {
-														...autosuggestionSettings,
-														max_gram: val,
-													},
-												},
-											);
-										} else {
-											setErrorMsgSuggestion(
-												`max should be greather than equal to min`,
-											);
-										}
-									}}
-								/>
-							</div>
-						</div>
-					</div>
-					<div style={{ color: 'tomato' }}>{errorMsgSuggestion}</div>
-				</div>
-			)}
 		</div>
 	);
 };

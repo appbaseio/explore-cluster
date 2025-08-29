@@ -42,17 +42,17 @@ export default class Introduction extends Component {
 		let app = {};
 
 		this.setState({
-			status: 'Creating your app... Please wait!',
+			status: 'Creating your index... Please wait!',
 			error: '',
 		});
 
 		if (!value || !value.trim()) {
-			this.setError('App name cannot be left empty.');
+			this.setError('Index name cannot be left empty.');
 			this.input.focus();
 		} else if (!isValidAppName) {
-			this.setError('Invalid App name. Please follow the validations rules.');
+			this.setError('Invalid index name. Please follow the validations rules.');
 			notification.error({
-				message: 'Invalid App name',
+				message: 'Invalid Index name',
 				description: (
 					<List
 						bordered={false}
@@ -61,7 +61,7 @@ export default class Introduction extends Component {
 						renderItem={(item) => <List.Item>{item}</List.Item>}
 					/>
 				),
-				duration: 10,
+				duration: 20,
 			});
 			this.input.focus();
 		} else {
@@ -85,21 +85,21 @@ export default class Introduction extends Component {
 							},
 							nextScreen,
 						);
-					} else if (res.error && res.error.code === 402) {
-						this.setError(
-							res.error.message ?? 'Something went wrong while creating the index',
-						);
+					} else if (res.error) {
+						const defaultMsg =
+							'Your index name is not unique. Please try with a different index name.';
+						this.setError(res.error.message || defaultMsg);
 						this.input.focus();
 					} else {
 						this.setError(
-							'Your app name is not unique. Please try with a different app name.',
+							'Your index name is not unique. Please try with a different index name.',
 						);
 						this.input.focus();
 					}
 				})
 				.catch(() => {
 					this.setError(
-						'Some error occurred. Please try again with a different app name.',
+						'Some error occurred. Please try again with a different index name.',
 					);
 				});
 		}
@@ -110,10 +110,8 @@ export default class Introduction extends Component {
 		return (
 			<div className="search-field-container small" style={{ marginLeft: 0 }}>
 				<div>
-					<h3>Pick a unique app name</h3>
-					<p>
-						Get started by creating an app which will serve as your elasticsearch index.
-					</p>
+					<h3>Pick a unique index name</h3>
+					<p>Get started by creating a search index.</p>
 				</div>
 				<div className="input-wrapper">
 					<input
@@ -149,17 +147,16 @@ export default class Introduction extends Component {
 					</div>
 					<div className="content">
 						<header>
-							<h2>Creating your first app with reactivesearch.io</h2>
+							<h2>Creating your first index with ReactiveSearch</h2>
 							<p>
-								An app in reactivesearch.io is equivalent to an index in
-								Elasticsearch (or like a database in SQL).
+								An index in ReactiveSearch is the same as an
+								Elasticsearch/OpenSearch index—roughly like a table in SQL.
 							</p>
 						</header>
 						{this.renderAppInput()}
 						<div style={{ width: 600 }}>
 							<img
-								src="/static/images/onboarding/app.png"
-								srcSet="/static/images/onboarding/app.png 351w, /static/images/onboarding/app@2x.png 702w"
+								src="/static/images/onboarding/app-index.png"
 								alt="App"
 								style={{
 									width: 300,
@@ -168,7 +165,7 @@ export default class Introduction extends Component {
 								}}
 							/>
 							<p>
-								An app holds all the data as JSON documents that can be searched
+								An index holds all the data as JSON documents that can be searched
 								with rich queries and aggregations.
 							</p>
 						</div>
