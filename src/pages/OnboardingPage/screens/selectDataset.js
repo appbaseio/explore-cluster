@@ -15,10 +15,10 @@ const datsetMappings = [
 		id: 'movies',
 		name: 'Movies Dataset',
 		description:
-			'A dataset of 10,000 movies obtained from TMDB. This is ideal to experiment with SaaS use-cases.',
+			'A dataset of 18,000 movies obtained from TMDB. This is ideal to experiment with SaaS use-cases.',
 		url: 'https://www.themoviedb.org/t/p/w1280/xmbU4JTUm8rsdtn7Y3Fcm30GpeT.jpg',
 		alt: 'movies-image',
-		count: '10,000',
+		count: '18,000',
 	},
 	{
 		id: 'products',
@@ -41,7 +41,7 @@ const datsetMappings = [
 ];
 
 function selectDataset({ nextScreen, setURL, url: newUrl, handleDataset }) {
-	const [dataset, setDataSet] = useState({ name: 'Movies Dataset', count: '10,000' });
+	const [dataset, setDataSet] = useState({ name: 'Movies Dataset', count: '18,000' });
 	const [layout, setLayout] = useState(0);
 	const [url, saveUrl] = useState(newUrl);
 	const [loading, setLoading] = useState(false);
