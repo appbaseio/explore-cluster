@@ -36,14 +36,37 @@ const trialBtn = css`
 	`)};
 `;
 const StyledMenu = styled(Menu)`
-	min-width: 400px;
+	display: inline-flex !important;
+	min-width: 0;
+	width: auto !important;
+	max-width: 60%;
+	flex: 0 0 auto;
+	margin: 0 10px !important;
+	/* Prevent horizontal menu items from truncating to ellipsis */
+	&.ant-menu-horizontal > .ant-menu-item > a,
+	&.ant-menu-horizontal > .ant-menu-submenu > .ant-menu-submenu-title {
+		overflow: visible !important;
+		text-overflow: initial !important;
+		white-space: nowrap;
+	}
 `;
 const StyledMenuItem = styled(Menu.Item)`
 	display: flex;
 	align-items: center;
+	overflow: visible !important;
+	max-width: none !important;
+	/* Ensure breadcrumb stays inline and isn't ellipsized by Menu's default anchor styles */
+	& > a {
+		overflow: visible !important;
+		text-overflow: initial !important;
+		white-space: nowrap;
+		max-width: none !important;
+	}
 	& .ant-breadcrumb ol {
 		display: flex;
 		align-items: center;
+		overflow: visible;
+		white-space: nowrap;
 	}
 `;
 
@@ -93,13 +116,13 @@ const AppHeader = ({
 				onClick={onToggle}
 			/>
 		) : (
-			<StyledMenu mode="horizontal">
+			<StyledMenu mode="horizontal" disabledOverflow>
 				<Menu.Item key="back" className={noBorder} style={{ padding: 0 }}>
 					<MenuIcon className="trigger" onClick={onToggle} />
 				</Menu.Item>
 				<StyledMenuItem
 					className={noBorder}
-					style={{ display: 'flex', alignItems: 'center' }}
+					style={{ display: 'flex', alignItems: 'center', minWidth: 0 }}
 					key="breadcrumb"
 				>
 					<Breadcrumb>

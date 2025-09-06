@@ -124,7 +124,7 @@ function selectDataset({ nextScreen, setURL, url: newUrl, handleDataset }) {
 			const config = JSON.parse(url);
 			const { protocol, host, auth } = parser(config.url);
 			const dejavuAddress = `${protocol}://${auth}@${host}`;
-			iframeURL = `https://dejavu.appbase.io/?appname=${config.appname}&url=${dejavuAddress}&footer=false&sidebar=false&appswitcher=false&mode=edit&cloneApp=false&oldBanner=false&enablereactivesearch=true`;
+			iframeURL = `https://dejavu.reactivesearch.io/?appname=${config.appname}&url=${dejavuAddress}&footer=false&sidebar=false&appswitcher=false&mode=edit&cloneApp=false&oldBanner=false&enablereactivesearch=true`;
 		}
 
 		return (
@@ -135,7 +135,7 @@ function selectDataset({ nextScreen, setURL, url: newUrl, handleDataset }) {
 					</div>
 					<div className="content">
 						<header className="vcenter">
-							<h2>Import data into your app</h2>
+							<h2>Import data into your index</h2>
 							{url ? (
 								<p>{`Explore your imported ${dataset.name}.`}</p>
 							) : (

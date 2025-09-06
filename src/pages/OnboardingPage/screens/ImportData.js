@@ -144,7 +144,7 @@ export default class Introduction extends Component {
 					</div>
 					<div className="content">
 						<header className="vcenter">
-							<h2>Import data into your app</h2>
+							<h2>Import data into your index</h2>
 						</header>
 						<div>
 							<h3>There are three ways to bring your data into reactivesearch.io:</h3>
@@ -160,7 +160,7 @@ export default class Introduction extends Component {
 									</div>
 									<p>
 										Dashboard offers a GUI for importing JSON/CSV files when
-										creating a new app.
+										creating a new index.
 									</p>
 								</div>
 								<div>
@@ -236,7 +236,7 @@ export default class Introduction extends Component {
 					</div>
 					<div className="content">
 						<header className="vcenter">
-							<h2>Import data into your app</h2>
+							<h2>Import data into your index</h2>
 							{url ? (
 								<p>Explore your imported dataset for the movies store.</p>
 							) : (

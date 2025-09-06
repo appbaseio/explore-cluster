@@ -108,9 +108,11 @@ class AppbaseUtils {
 				'content-type': 'application/json',
 				Authorization: `Basic ${this.authToken}`,
 			},
-			// body: JSON.stringify({
-			// 	es_version: '5',
-			// }),
+			body: JSON.stringify({
+				settings: {
+					'index.max_ngram_diff': 7,
+				},
+			}),
 		});
 	}
 

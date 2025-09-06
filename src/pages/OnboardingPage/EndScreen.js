@@ -46,7 +46,7 @@ function EndScreen({ sandboxURL }) {
 					)}
 					<div className="banner-row">
 						<div className="big-card">
-							<h2>WEB APP</h2>
+							<h2>WEB SEARCH UI</h2>
 
 							<div>
 								<div className="col">
@@ -71,16 +71,16 @@ function EndScreen({ sandboxURL }) {
 										srcSet="/static/images/onboarding/finish-screen/Webapp.png 245w, /static/images/onboarding/finish-screen/Webapp@2x.png 490w"
 										alt="Webapp"
 									/>
-									<h3>Learn how to build a web app</h3>
+									<h3>Learn how to build a web search UI</h3>
 									<p>
-										reactivesearch.io UI components for building data-driven web
-										apps.
+										Reactivesearch.io UI components for building search
+										experiences.
 									</p>
 									<a
 										target="_blank"
 										rel="noreferrer"
 										className="button"
-										href="https://docs.reactivesearch.io/docs/reactivesearch/v3/overview/quickstart/"
+										href="https://docs.reactivesearch.io/docs/reactivesearch/react/overview/quickstart/"
 									>
 										Get Started
 									</a>
@@ -107,7 +107,7 @@ function EndScreen({ sandboxURL }) {
 									margin: '20px auto',
 								}}
 							>
-								Create an app or browse your current apps via the dashboard.
+								Create an index or browse your current indices via the dashboard.
 							</p>
 							<a
 								className="button"
@@ -120,17 +120,20 @@ function EndScreen({ sandboxURL }) {
 
 					<div className="card-row">
 						<div className="card">
-							<h2>MOBILE APP</h2>
+							<h2>MOBILE SEARCH</h2>
 							<img
 								src="/static/images/onboarding/finish-screen/ReactiveNative.svg"
 								alt="Reactive search"
 							/>
-							<p>reactivesearch.io UI components for building mobile apps.</p>
+							<p>
+								reactivesearch.io Flutter UI components for building mobile search
+								experiences.
+							</p>
 							<a
 								className="button"
 								target="_blank"
 								rel="noreferrer"
-								href="https://docs.reactivesearch.io/docs/reactivesearch/react-native-searchbox/quickstart/"
+								href="https://docs.reactivesearch.io/docs/reactivesearch/flutter-searchbox/quickstart/"
 							>
 								Learn More
 							</a>
@@ -142,14 +145,13 @@ function EndScreen({ sandboxURL }) {
 								alt="Reactive maps"
 							/>
 							<p>
-								reactivesearch.io UI components for building realtime geolocation
-								apps.
+								reactivesearch.io UI components for building geo search experiences.
 							</p>
 							<a
 								className="button"
 								target="_blank"
 								rel="noreferrer"
-								href="https://docs.reactivesearch.io/docs/reactivesearch/v3/overview/reactivemaps/"
+								href="https://docs.reactivesearch.io/docs/reactivesearch/react/overview/reactivemaps/"
 							>
 								Learn More
 							</a>
@@ -164,7 +166,7 @@ function EndScreen({ sandboxURL }) {
 							/>
 							<p>
 								Get started with the APIs for indexing, querying and searching data
-								with appbase.
+								with ReactiveSearch.
 							</p>
 							<a
 								className="button"

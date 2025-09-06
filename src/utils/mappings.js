@@ -1,10 +1,21 @@
 import get from 'lodash/get';
 import omit from 'lodash/omit';
-import { getVersion, getURL } from '../constants/config';
+import { getURL } from '../constants/config';
 import mappingUsecase from '../batteries/utils/mappingUsecase';
 import { getAuthHeaders } from '../batteries/utils/mappings';
 import { getPossibleSubFields, unflattenObject } from '.';
 import { SUB_FIELDS, RANGE_FIELDS } from '../constants';
+
+// Detects the root path for properties in a mapping object across ES/OS versions.
+// Supports both `{ _doc: { properties: ... } }` (ES6) and `{ properties: ... }` (ES7+, OS 3+).
+export const resolveTopFieldPath = (mappings) => {
+	if (get(mappings, 'properties')) return 'properties';
+	if (get(mappings, '_doc.properties')) return '_doc.properties';
+	// Sometimes callers may pass the full index mapping object
+	// e.g. { mappings: { properties: ... } }
+	if (get(mappings, 'mappings.properties')) return 'mappings.properties';
+	return null;
+};
 
 export const getMappingsInfo = ({
 	mappings: originalMappings,
@@ -21,22 +32,8 @@ export const getMappingsInfo = ({
 		language,
 	});
 
-	const ES_VERSION = getVersion();
-	if (!ES_VERSION) {
-		return {};
-	}
-
-	let TOP_FIELD = 'properties';
-
-	if (+ES_VERSION[0] >= 6) {
-		TOP_FIELD = '_doc.properties';
-	}
-
-	if (+ES_VERSION[0] >= 7) {
-		TOP_FIELD = 'properties';
-	}
-
-	if (!get(mappings, TOP_FIELD, null)) {
+	const TOP_FIELD = resolveTopFieldPath(mappings);
+	if (!TOP_FIELD || !get(mappings, TOP_FIELD, null)) {
 		return {};
 	}
 	const fields = get(mappings, TOP_FIELD);
@@ -252,17 +249,7 @@ const _updateNestedMapping = ({
 
 export const updateMapping = ({ originalMapping, type, usecase, path, settings, properties }) => {
 	const mapping = JSON.parse(JSON.stringify(originalMapping));
-
-	const ES_VERSION = getVersion();
-	let TOP_FIELD = '';
-
-	if (+ES_VERSION[0] >= 6) {
-		TOP_FIELD = '_doc.properties';
-	}
-
-	if (+ES_VERSION[0] >= 7) {
-		TOP_FIELD = 'properties';
-	}
+	const TOP_FIELD = resolveTopFieldPath(mapping) || 'properties';
 
 	const updatedMappings = _updateNestedMapping({
 		mapping: get(mapping, TOP_FIELD),
@@ -273,7 +260,9 @@ export const updateMapping = ({ originalMapping, type, usecase, path, settings, 
 		settings,
 		properties,
 	});
-	if (+ES_VERSION[0] >= 6 && +ES_VERSION[0] < 7) {
+
+	// Reconstruct preserving container key
+	if (TOP_FIELD === '_doc.properties') {
 		return {
 			_doc: {
 				properties: {
@@ -282,9 +271,17 @@ export const updateMapping = ({ originalMapping, type, usecase, path, settings, 
 			},
 		};
 	}
-
+	if (TOP_FIELD === 'mappings.properties') {
+		return {
+			mappings: {
+				properties: {
+					...updatedMappings,
+				},
+			},
+		};
+	}
 	return {
-		[TOP_FIELD]: {
+		properties: {
 			...updatedMappings,
 		},
 	};
@@ -292,21 +289,11 @@ export const updateMapping = ({ originalMapping, type, usecase, path, settings, 
 
 export const deleteMappingField = ({ originalMapping, path }) => {
 	const mapping = JSON.parse(JSON.stringify(originalMapping));
-
-	const ES_VERSION = getVersion();
-	let TOP_FIELD = '';
-
-	if (+ES_VERSION[0] >= 6) {
-		TOP_FIELD = '_doc.properties';
-	}
-
-	if (+ES_VERSION[0] >= 7) {
-		TOP_FIELD = 'properties';
-	}
+	const TOP_FIELD = resolveTopFieldPath(mapping) || 'properties';
 
 	const updatedMappings = omit(get(mapping, TOP_FIELD), path);
 
-	if (+ES_VERSION[0] >= 6 && +ES_VERSION[0] < 7) {
+	if (TOP_FIELD === '_doc.properties') {
 		return {
 			_doc: {
 				properties: {
@@ -315,11 +302,20 @@ export const deleteMappingField = ({ originalMapping, path }) => {
 			},
 		};
 	}
-
+	if (TOP_FIELD === 'mappings.properties') {
+		return {
+			deletedPath: path,
+			mappings: {
+				properties: {
+					...updatedMappings,
+				},
+			},
+		};
+	}
 	return {
 		deletedPath: path,
 		mappings: {
-			[TOP_FIELD]: {
+			properties: {
 				...updatedMappings,
 			},
 		},
@@ -327,21 +323,7 @@ export const deleteMappingField = ({ originalMapping, path }) => {
 };
 
 export const getMappingsByPath = ({ mappings, path }) => {
-	const ES_VERSION = getVersion();
-
-	if (!ES_VERSION) {
-		return {};
-	}
-
-	let TOP_FIELD = '';
-
-	if (+ES_VERSION[0] >= 6) {
-		TOP_FIELD = '_doc.properties';
-	}
-
-	if (+ES_VERSION[0] >= 7) {
-		TOP_FIELD = 'properties';
-	}
+	const TOP_FIELD = resolveTopFieldPath(mappings) || 'properties';
 	const updatedPath = path.split('.').join('.properties.');
 	return get(mappings, `${TOP_FIELD}.${updatedPath}`);
 };
@@ -354,34 +336,26 @@ export const updateSubFields = ({
 	language,
 }) => {
 	const mappings = JSON.parse(JSON.stringify(originalMappings));
-	const ES_VERSION = getVersion();
-
-	let TOP_FIELD = '';
-
-	if (ES_VERSION && +ES_VERSION[0] >= 6) {
-		TOP_FIELD = '_doc.properties';
-	}
-
-	if (+ES_VERSION[0] >= 7) {
-		TOP_FIELD = 'properties';
-	}
+	const TOP_FIELD = resolveTopFieldPath(mappings) || 'properties';
 
 	if (!get(mappings, TOP_FIELD, null)) {
 		return mappings;
 	}
-	const mappingFields = Object.keys(get(mappings, TOP_FIELD, {}));
+	const root = get(mappings, TOP_FIELD, {});
+	const mappingFields = Object.keys(root || {});
 
 	const updatedMappings = mappingFields.reduce((agg, field) => {
-		const { type } = mappings.properties[field];
+		const currentField = get(root, field);
+		const { type } = currentField || {};
 
-		if ((mappings.properties[field].properties || null) && type !== 'nested') {
+		if ((get(currentField, 'properties') || null) && type !== 'nested') {
 			return {
 				...agg,
 
 				properties: {
 					...agg.properties,
 					[field]: updateSubFields({
-						mappings: mappings.properties[field] || {},
+						mappings: currentField || {},
 						enableSynonyms,
 						enableNgram,
 						enableAutoSuggestion,
@@ -398,11 +372,11 @@ export const updateSubFields = ({
 				enableAutoSuggestion,
 				language,
 				type,
-				fields: get(mappings, `properties.${field}.fields`, {}),
+				fields: get(currentField, 'fields', {}),
 			}),
 		};
 		const fieldData = {
-			...get(mappings, `properties.${field}`, {}),
+			...currentField,
 			...(Object.keys(fields).length ? { fields } : {}),
 		};
 		if (type.trim()) {
@@ -418,14 +392,20 @@ export const updateSubFields = ({
 		};
 	}, {});
 
-	if (+ES_VERSION[0] >= 6 && +ES_VERSION[0] < 7) {
+	if (TOP_FIELD === '_doc.properties') {
 		return {
 			_doc: {
 				...updatedMappings,
 			},
 		};
 	}
-
+	if (TOP_FIELD === 'mappings.properties') {
+		return {
+			mappings: {
+				...updatedMappings,
+			},
+		};
+	}
 	return { ...updatedMappings };
 };
 

@@ -5,10 +5,12 @@ const header = (val) => css`
 	flex-direction: row;
 	align-items: center;
 	justify-content: space-between;
+	flex-wrap: nowrap;
 	height: 60px;
 	padding: 0 25px 0 0;
 	background-color: #fff !important;
-	overflow: auto;
+	overflow-x: hidden;
+	overflow-y: hidden;
 	box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.15);
 	z-index: 999;
 	position: fixed;
@@ -21,6 +23,7 @@ const header = (val) => css`
 		margin: 0 30px;
 		letter-spacing: 0.01rem;
 		font-size: 13px;
+		white-space: nowrap;
 	}
 `;
 
