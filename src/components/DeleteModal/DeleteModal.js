@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import PropTypes from 'prop-types';
 import { Modal, Input, Typography } from 'antd';
 import { children as childrenProp } from '../../utils/prop-types';
@@ -9,13 +9,15 @@ class DeleteModal extends React.Component {
 		const container = document.createElement('div');
 		document.body.appendChild(container);
 
+		const root = createRoot(container);
+
 		const handleClose = () => {
 			props.onDelete();
-			ReactDOM.unmountComponentAtNode(container);
+			root.unmount();
 			document.body.removeChild(container);
 		};
 
-		ReactDOM.render(<DeleteModal {...props} onDelete={handleClose} isVisible />, container);
+		root.render(<DeleteModal {...props} onDelete={handleClose} isVisible />);
 	};
 
 	constructor(props) {

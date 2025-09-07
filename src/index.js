@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { injectGlobal } from 'emotion';
 import { Layout } from 'antd';
@@ -75,4 +75,6 @@ Sentry.init({
 	dsn: 'https://8e07fb23ba8f46d8a730e65496bb7f00@o27644.ingest.sentry.io/58038',
 });
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const container = document.getElementById('root');
+const root = createRoot(container);
+root.render(<App />);

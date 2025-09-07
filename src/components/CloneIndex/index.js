@@ -9,7 +9,6 @@ import flatten from 'lodash/flatten';
 import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import map from 'lodash/map';
-import { validationsList } from '@appbaseio-confidential/importer/lib/utils';
 import { cloneApp } from '../../utils';
 import { validateAppName } from '../../utils/helper';
 import { getSettings, putSettings, setCurrentApp } from '../../batteries/modules/actions';
@@ -26,6 +25,13 @@ const radioStyle = css`
 	height: 30px;
 	line-height: 30px;
 `;
+
+const validationsList = [
+	'Lowercase only',
+	'Cannot include \\, /, *, ?, ", <, >, |, ` ` (space character), ,, #',
+	'Cannot start with -, _, +',
+	'Cannot be . or ..',
+];
 
 const CloneIndex = (props) => {
 	const { handleCancel, index, existingApps, history, tier, featureSearchRelevancy } = props;

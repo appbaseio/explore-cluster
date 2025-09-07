@@ -171,22 +171,6 @@ export const CLUSTER_ROUTES = {
 		link: '/',
 		action: ALLOWED_ACTIONS.OVERVIEW,
 	},
-	'UI Builder': {
-		icon: 'control',
-		action: ALLOWED_ACTIONS.UI_BUILDER,
-		menu: [
-			{ label: 'Search', link: '/cluster/search-builder' },
-			{
-				label: 'Recommendations',
-				link: '/cluster/recommendations-builder',
-			},
-			{
-				label: 'Searchbox',
-				link: '/cluster/searchboxes',
-			},
-			{ label: 'End-user Authentication', link: '/cluster/search-auth-settings' },
-		],
-	},
 	Data: {
 		icon: 'dashboard',
 		action: ALLOWED_ACTIONS.DEVELOP,
@@ -232,20 +216,6 @@ export const CLUSTER_ROUTES = {
 			{ label: 'Query Rules', link: '/cluster/rules' },
 		],
 	},
-	'AI Search': {
-		icon: 'robot',
-		action: ALLOWED_ACTIONS.UI_BUILDER,
-		menu: [
-			{
-				label: 'AI Preferences',
-				link: '/cluster/ai-preferences',
-			},
-			{
-				label: 'FAQs',
-				link: '/cluster/ai-faqs',
-			},
-		],
-	},
 	Pipelines: {
 		icon: 'deployment-unit',
 		action: ALLOWED_ACTIONS.PIPELINES,
@@ -262,6 +232,36 @@ export const CLUSTER_ROUTES = {
 				label: 'Search Engine Backend',
 				link: '/cluster/configure-search-engine-backend',
 			},
+		],
+	},
+	'AI Search': {
+		icon: 'robot',
+		action: ALLOWED_ACTIONS.UI_BUILDER,
+		menu: [
+			{
+				label: 'AI Preferences',
+				link: '/cluster/ai-preferences',
+			},
+			{
+				label: 'FAQs',
+				link: '/cluster/ai-faqs',
+			},
+		],
+	},
+	'UI Builder': {
+		icon: 'control',
+		action: ALLOWED_ACTIONS.UI_BUILDER,
+		menu: [
+			{ label: 'Search', link: '/cluster/search-builder' },
+			{
+				label: 'Recommendations',
+				link: '/cluster/recommendations-builder',
+			},
+			{
+				label: 'Searchbox',
+				link: '/cluster/searchboxes',
+			},
+			{ label: 'End-user Authentication', link: '/cluster/search-auth-settings' },
 		],
 	},
 	Analytics: {

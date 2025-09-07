@@ -1,20 +1,11 @@
 import React, { Fragment } from 'react';
-import { FormOutlined } from '@ant-design/icons';
-import { Row, Col, Button, Skeleton, Alert } from 'antd';
+import { Skeleton } from 'antd';
 import { css, injectGlobal } from 'emotion';
-import { connect } from 'react-redux';
-import { string, object } from 'prop-types';
-import get from 'lodash/get';
-import Importer from '@appbaseio-confidential/importer';
+import { Importer } from '@appbaseio/importer';
 import { event, timingEvent } from '../../utils/gtag';
 import moment from '../../utils/moment';
 
-import Header from '../../components/Header';
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
-import { getUrlParams } from '../../utils/helper';
-
-import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
-import { getURL, getVersion } from '../../constants/config';
 
 // eslint-disable-next-line no-unused-expressions
 injectGlobal`
@@ -33,7 +24,6 @@ class ImporterPage extends React.Component {
 		this.startTime = moment();
 		this.state = {
 			preparingApp: true,
-			destinationParams: null,
 		};
 	}
 
@@ -45,39 +35,6 @@ class ImporterPage extends React.Component {
 			label: 'visit',
 			value: null,
 		});
-		const { type, appName: index } = this.props;
-		const cluster = sessionStorage.getItem('cluster') || '';
-		const { host, protocol } = new URL(
-			localStorage.getItem('url') || sessionStorage.getItem('url'),
-		);
-		const username = localStorage.getItem('username') || sessionStorage.getItem('username');
-		const password = localStorage.getItem('password') || sessionStorage.getItem('password');
-		const uri = `${protocol}//${username}:${password}@${host}`;
-
-		if (type === 'cluster') {
-			this.setState({
-				destinationParams: {
-					index,
-					cluster,
-					type: 'AppbaseCluster',
-					uri: `${uri}/${index}`,
-					tier: 'paid',
-					url: uri,
-				},
-			});
-		} else {
-			this.setState({
-				destinationParams: {
-					type: 'AppbaseCluster',
-					clusterType: 'self-hosted',
-					index,
-					cluster: uri || '',
-					uri: index ? `${uri}/${index}` : uri,
-					tier: 'paid',
-					url: uri,
-				},
-			});
-		}
 		this.togglePreparing();
 
 		setTimeout(() => {
@@ -106,99 +63,16 @@ class ImporterPage extends React.Component {
 	};
 
 	render() {
-		const { user, apps } = this.props;
-
-		const { destinationParams, preparingApp } = this.state;
-		const isLocalES = destinationParams
-			? destinationParams.uri.includes('localhost') ||
-			  destinationParams.uri.includes('127.0.0.1') ||
-			  destinationParams.uri.includes('0.0.0.0')
-			: false;
-		const urlParams = getUrlParams(window.location.search);
-		const loadSample = urlParams['load-data'] && JSON.parse(urlParams['load-data']);
-		const sourceParams = loadSample
-			? {
-					subType: 'url',
-					uri: 'https://raw.githubusercontent.com/appbaseio/cdn/dev/appbase/ecommerce_data.json',
-					extraType: 'SourceFile',
-					type: 'json',
-					useBulk: true,
-			  }
-			: undefined;
+		const { preparingApp } = this.state;
 		return (
 			<Fragment>
-				<Header compact>
-					<Row type="flex" justify="space-between" gutter={16}>
-						<Col lg={18}>
-							<h2>Import Data</h2>
-							<Row>
-								<Col lg={18}>
-									<p>
-										Bring data from JSON/CSV/Elasticsearch/SQL sources into
-										reactivesearch.io via GUI.
-										<br />
-										<br />
-										Want to use other sources like MongoDB or 3rd party APIs?
-										Read the{' '}
-										<a
-											href="https://docs.reactivesearch.io/docs/data/Import/"
-											target="_blank"
-											rel="noopener noreferrer"
-										>
-											docs
-										</a>
-										.
-									</p>
-									{isLocalES ? (
-										<Alert
-											message={`Importer requires a reachable URL, you're currently using ${destinationParams.cluster} which doesn't seem to be reachable from an external service.`}
-											type="warning"
-											showIcon
-										/>
-									) : null}
-								</Col>
-							</Row>
-						</Col>
-						<Col
-							lg={6}
-							css={{
-								display: 'flex !important',
-								flexDirection: 'column-reverse !important',
-								paddingBottom: 20,
-							}}
-						>
-							<Button
-								size="large"
-								type="primary"
-								href="https://appbase.io/contact/"
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								<FormOutlined style={{ margin: '0.25rem' }} />
-								Contact Us
-							</Button>
-							<p
-								css={{
-									marginTop: 20,
-									fontSize: 13,
-									textAlign: 'center',
-									lineHeight: '20px',
-								}}
-							>
-								Need help with your dataset?
-								<br />
-								We now offer paid support.
-							</p>
-						</Col>
-					</Row>
-				</Header>
 				<ErrorToaster>
 					<section
 						className={css`
 							.importer-layout-footer {
 								padding-right: 60px !important;
 								flex-direction: row !important;
-								height: auto !important;
+								height: auto;
 								bottom: 0 !important;
 								padding-top: 26px !important;
 							}
@@ -211,37 +85,12 @@ class ImporterPage extends React.Component {
 							</div>
 						) : (
 							<Importer
-								initSource={sourceParams}
-								arc
-								embed
-								initDestination={destinationParams}
-								initUser={{
-									apps: { ...apps },
-									'deployment-timeframe': 'This is a hobby project',
-									email: user?.data?.email ?? 'info@appbase.io',
-									name: localStorage.getItem('username'),
-									picture:
-										'https://lh3.googleusercontent.com/a/ALm5wu1DDcWwt2VDhwJdTsPgNPGx6IHjeKMfMX6R7MPa=s96-c',
-									reactive_apps: {},
-									usecase: 'A web app',
-									verified_email: true,
-								}}
-								initClusters={[
-									{
-										es_version: getVersion(),
-										name: localStorage.getItem('clusterId'),
-										id: localStorage.getItem('clusterId'),
+								config={{
+									sampleDataset: {
+										url: '/samples/moviesData.json', // any JSON/NDJSON/JSON array URL
+										label: 'Load sample movies',
+										filename: 'movies.json',
 									},
-								]}
-								clusterInfo={{
-									url: getURL(),
-									username:
-										localStorage.getItem('username') ||
-										sessionStorage.getItem('username'),
-									password:
-										localStorage.getItem('password') ||
-										sessionStorage.getItem('password'),
-									es_version: getVersion(),
 								}}
 							/>
 						)}
@@ -252,27 +101,4 @@ class ImporterPage extends React.Component {
 	}
 }
 
-ImporterPage.propTypes = {
-	appName: string.isRequired,
-	user: object,
-	type: string,
-	apps: object,
-};
-
-ImporterPage.defaultProps = {
-	user: {},
-	type: '',
-	apps: {},
-};
-
-const mapStateToProps = (state) => {
-	const { username, password } = get(state, 'user.data', {});
-	return {
-		credentials: username ? `${username}:${password}` : '',
-		type: get(state, '$getAppPlan.results.billing_type'),
-		user: get(state, 'user', { data: { email: 'user@arc.appbase.io' } }),
-		apps: get(state, 'apps.data', {}),
-	};
-};
-
-export default withErrorToaster(connect(mapStateToProps)(ImporterPage));
+export default ImporterPage;
