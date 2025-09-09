@@ -16,7 +16,7 @@ const datsetMappings = [
 		name: 'Movies Dataset',
 		description:
 			'A dataset of 18,000 movies obtained from TMDB. This is ideal to experiment with SaaS use-cases.',
-		url: 'https://www.themoviedb.org/t/p/w1280/xmbU4JTUm8rsdtn7Y3Fcm30GpeT.jpg',
+		url: 'https://image.tmdb.org/t/p/w342/xmbU4JTUm8rsdtn7Y3Fcm30GpeT.jpg',
 		alt: 'movies-image',
 		count: '18,000',
 	},

@@ -68,7 +68,7 @@ const renderFilters = (fields) => {
 							showHistogram
 							range={{
 								start: 1950,
-								end: 2021,
+								end: 2026,
 							}}
 						/>
 					);
