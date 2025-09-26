@@ -150,6 +150,8 @@ class MappingComponent extends React.Component {
 					type={typeVal}
 					mapping={getMappingsByPath({ mappings, path: `${path}${field}` })}
 					path={`${path}${field}`}
+					mappings={mappings}
+					updateState={rest.updateState}
 					setMapping={({ type: fieldType, path: fieldPath, usecase: fieldUseCase }) =>
 						setMapping([
 							{

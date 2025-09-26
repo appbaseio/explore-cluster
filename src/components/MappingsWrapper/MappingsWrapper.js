@@ -193,7 +193,6 @@ class MappingsWrapper extends React.Component {
 				this.getMappings();
 			})
 			.catch((err) => {
-				console.log(err);
 				notification.error({
 					message: 'Re-indexing failed',
 					description: err.message || '',

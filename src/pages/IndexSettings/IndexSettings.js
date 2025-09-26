@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import get from 'lodash/get';
-import { Card, notification, message } from 'antd';
+import { Card, notification, message, Button, Modal, Input, Typography } from 'antd';
 
 import { getAppMappings, setCurrentApp, addReIndexingTasks } from '../../batteries/modules/actions';
 import { getURL, getVersion } from '../../constants/config';
@@ -29,11 +29,43 @@ import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster
 import { event, timingEvent } from '../../utils/gtag';
 import moment from '../../utils/moment';
 
+// helper to call ES with basic auth
+const esRequest = async ({ path, method = 'GET', credentials, body }) => {
+	const url = `${getURL()}${path}`;
+	const headers = {
+		'Content-Type': 'application/json',
+		Authorization: `Basic ${btoa(credentials)}`,
+	};
+	const res = await fetch(url, {
+		method,
+		headers,
+		body: body ? JSON.stringify(body) : undefined,
+	});
+	if (!res.ok) {
+		const text = await res.text();
+		throw new Error(text || `${method} ${path} failed with ${res.status}`);
+	}
+	return res.json().catch(() => ({}));
+};
+
 const bannerMessage = {
 	title: 'Index Settings',
 	buttonText: 'Read Docs',
 	href: 'https://docs.reactivesearch.io/docs/search/relevancy/#index-settings',
 	videoLink: 'https://youtu.be/oRIsIHkTN9Y',
+};
+
+const sortObjectDeep = (obj) => {
+	if (Array.isArray(obj)) return obj.map(sortObjectDeep);
+	if (obj && typeof obj === 'object') {
+		return Object.keys(obj)
+			.sort((a, b) => a.localeCompare(b))
+			.reduce((acc, k) => {
+				acc[k] = sortObjectDeep(obj[k]);
+				return acc;
+			}, {});
+	}
+	return obj;
 };
 
 class IndexSettings extends React.Component {
@@ -51,6 +83,10 @@ class IndexSettings extends React.Component {
 			shardsModal: false,
 			replicasModal: false,
 			isUpdating: false,
+			showAnalysisEditor: false,
+			analysisJson: '{}',
+			analysisLoading: false,
+			analysisJsonValid: true,
 		};
 	}
 
@@ -122,6 +158,80 @@ class IndexSettings extends React.Component {
 		this.setState({
 			[name]: value,
 		});
+	};
+
+	loadAnalysis = async () => {
+		const { appName, credentials } = this.props;
+		this.setState({ analysisLoading: true });
+		try {
+			// Prefer current settings; fall back to defaults if present
+			const data = await getSettings(appName, credentials);
+			const current = get(data, [appName, 'settings', 'index', 'analysis'], {}) || {};
+			const sorted = sortObjectDeep(current || {});
+			this.setState({
+				analysisJson: JSON.stringify(sorted, null, 2),
+				showAnalysisEditor: true,
+				analysisJsonValid: true,
+			});
+		} catch (e) {
+			notification.error({ message: 'Failed to load analysis', description: e.message });
+		} finally {
+			this.setState({ analysisLoading: false });
+		}
+	};
+
+	closeIndex = async () => {
+		const { appName, credentials } = this.props;
+		// POST /{index}/_close
+		return esRequest({ path: `/${appName}/_close`, method: 'POST', credentials });
+	};
+
+	openIndex = async () => {
+		const { appName, credentials } = this.props;
+		// POST /{index}/_open
+		return esRequest({ path: `/${appName}/_open`, method: 'POST', credentials });
+	};
+
+	saveAnalysis = async () => {
+		const { appName, credentials } = this.props;
+		const { analysisJson } = this.state;
+		let parsed;
+		try {
+			parsed = JSON.parse(analysisJson);
+		} catch (e) {
+			message.error('Invalid JSON');
+			return;
+		}
+
+		this.setState({ analysisLoading: true });
+		try {
+			// Close → PUT settings → Open
+			await this.closeIndex();
+			const res = await updateSettings({
+				appName,
+				settings: { index: { analysis: parsed } },
+				credentials,
+			});
+			if (!res.acknowledged) {
+				throw new Error(res.message || 'Update not acknowledged');
+			}
+			await this.openIndex();
+			message.success('Analysis updated');
+			this.setState({ showAnalysisEditor: false });
+			// refresh shards/replicas display to keep UI in sync
+			this.initializeSettings();
+		} catch (e) {
+			notification.error({ message: 'Failed to update analysis', description: e.message });
+			// best effort re-open in case it failed after close
+			try {
+				await this.openIndex();
+			} catch (err) {
+				// eslint-disable-next-line no-console
+				console.debug('Failed to re-open index after analysis update error', err);
+			}
+		} finally {
+			this.setState({ analysisLoading: false });
+		}
 	};
 
 	updateReplicas = () => {
@@ -220,6 +330,7 @@ class IndexSettings extends React.Component {
 				});
 			})
 			.catch((err) => {
+				// eslint-disable-next-line no-console
 				console.error(err);
 				message.error(err.message || `Failed to update shards`);
 				this.setState({
@@ -238,6 +349,10 @@ class IndexSettings extends React.Component {
 			replicasModal,
 			totalNodes,
 			isUpdating,
+			showAnalysisEditor,
+			analysisJson,
+			analysisLoading,
+			analysisJsonValid,
 		} = this.state;
 		const { allocated_replicas, allocated_shards } = this;
 		const { isFetchingMapping } = this.props;
@@ -283,7 +398,107 @@ class IndexSettings extends React.Component {
 							allocated_replicas={allocated_replicas}
 						/>
 					</ErrorToaster>
+
+					<ErrorToaster>
+						{/* Scoped styles for the card title */}
+						<style>{`
+                            .analysis-card-title {
+                                display: flex;
+                                justify-content: space-between;
+                                align-items: center;
+                            }
+                            .analysis-card-title h4 {
+                                font-weight: 600;
+                                margin: 5px 0;
+                            }
+                            .analysis-card-title p {
+                                margin: 5px 0;
+                                color: rgba(0, 0, 0, 0.65);
+                                font-size: 14px;
+                                white-space: initial;
+                            }
+                            @media (max-width: 768px) {
+                                .analysis-card-title {
+                                    width: 100%;
+                                    flex-direction: column;
+                                }
+                                .analysis-card-title p {
+                                    margin: 2px 0;
+                                }
+                            }
+                        `}</style>
+
+						<Card
+							title={
+								<div className="analysis-card-title">
+									<div>
+										<h4>Analysis (JSON)</h4>
+										<p>Add or edit analyzers, tokenizers, and filters.</p>
+									</div>
+									<Button
+										type="primary"
+										onClick={this.loadAnalysis}
+										loading={analysisLoading}
+									>
+										Edit JSON
+									</Button>
+								</div>
+							}
+							bodyStyle={{ padding: 0 }}
+						/>
+					</ErrorToaster>
 				</div>
+
+				<Modal
+					title="Edit analysis JSON"
+					open={showAnalysisEditor}
+					width={900}
+					onCancel={() => this.setState({ showAnalysisEditor: false })}
+					footer={
+						<div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+							<Button
+								type="primary"
+								onClick={this.saveAnalysis}
+								loading={analysisLoading}
+								disabled={!analysisJsonValid}
+							>
+								Update Analysis Settings
+							</Button>
+							<div>
+								<Button
+									onClick={() => this.setState({ showAnalysisEditor: false })}
+								>
+									Cancel
+								</Button>
+							</div>
+						</div>
+					}
+				>
+					<Input.TextArea
+						autoSize={{ minRows: 18 }}
+						value={analysisJson}
+						onChange={(e) => {
+							const val = e.target.value;
+							let isValid = true;
+							try {
+								JSON.parse(val);
+							} catch (_) {
+								isValid = false;
+							}
+							this.setState({ analysisJson: val, analysisJsonValid: isValid });
+						}}
+						style={{
+							borderColor: analysisJsonValid ? undefined : '#ff4d4f',
+						}}
+					/>
+					<div style={{ marginTop: 8 }}>
+						<Typography.Text type="secondary">
+							This will POST <code>/{'{index}'}/_close</code>, update{' '}
+							<code>settings.index.analysis</code>, then POST{' '}
+							<code>/{'{index}'}/_open</code>.
+						</Typography.Text>
+					</div>
+				</Modal>
 			</React.Fragment>
 		);
 	}
