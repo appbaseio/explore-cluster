@@ -48,7 +48,7 @@ class StylePresets extends Component {
 	getFontFamily = async () => {
 		try {
 			await fetch(
-				'https://www.googleapis.com/webfonts/v1/webfonts?key=REDACTED_GOOGLE_API_KEY&sort=popularity',
+				'https://www.googleapis.com/webfonts/v1/webfonts?key=REPLACE_WITH_GOOGLE_FONTS_API_KEY&sort=popularity',
 			)
 				.then((res) => res.json())
 				.then((data) => {

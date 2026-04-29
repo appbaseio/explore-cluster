@@ -1,30 +1,35 @@
 #!/bin/bash
-yum install jq -y
+set -euo pipefail
 
-if [[ -d ./templates ]]
-then
-    rm -rf templates
+GITHUB_TOKEN="${GITHUB_TOKEN:-}"
+
+if ! command -v jq >/dev/null 2>&1; then
+    echo "jq is required to extract templates."
+    echo "Install jq and retry (macOS: brew install jq)."
+    exit 1
 fi
 
-jq -c '.[]' template-sources.json | while read i; do
-    # do stuff with $i: object
-    version=`echo ${i} | jq -r '.version'`
-    commit=`echo ${i} | jq -r '.commit'`
-    branch=`echo ${i} | jq -r '.branch'`
-    organization=`echo ${i} | jq -r '.organization'`
-    repository=`echo ${i} | jq -r '.repository'`
-    repositoryType=`echo ${i} | jq -r '.repositoryType'`
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TEMPLATES_DIR="$ROOT_DIR/templates"
 
-    if [ ! -z "$version" ]
-    then
+rm -rf "$TEMPLATES_DIR"
+mkdir -p "$TEMPLATES_DIR"
+
+jq -c '.[]' "$ROOT_DIR/template-sources.json" | while read -r i; do
+    version=$(echo "${i}" | jq -r '.version')
+    commit=$(echo "${i}" | jq -r '.commit')
+    branch=$(echo "${i}" | jq -r '.branch')
+    organization=$(echo "${i}" | jq -r '.organization')
+    repository=$(echo "${i}" | jq -r '.repository')
+    repositoryType=$(echo "${i}" | jq -r '.repositoryType')
+
+    if [ -n "$version" ] && [ "$version" != "null" ]; then
         url="https://codeload.github.com/$organization/$repository/legacy.zip/refs/tags/$version"
         fileName="$repository@$version"
-    elif [ ! -z "$commit" ]
-    then
+    elif [ -n "$commit" ] && [ "$commit" != "null" ]; then
         url="https://codeload.github.com/$organization/$repository/legacy.zip/$commit"
         fileName="$repository@$commit"
-    elif [ ! -z "$branch" ]
-    then
+    elif [ -n "$branch" ] && [ "$branch" != "null" ]; then
         url="https://codeload.github.com/$organization/$repository/legacy.zip/refs/heads/$branch"
         fileName="$repository@$branch"
     else
@@ -32,47 +37,24 @@ jq -c '.[]' template-sources.json | while read i; do
         fileName="$repository"
     fi
 
-    if [[ -d ./templates ]]; then
-        cd templates
-        if [[ ! -d $fileName ]]; then
-            mkdir -p $fileName
-            cd $fileName
-            if [ $repositoryType == "private" ]; then
-                curl \
-                -H "Accept: application/vnd.github+json" \
-                -H "Authorization: token REDACTED_GITHUB_TOKEN" \
-                $url > file.zip      && \
-                unzip file.zip                                   && \
-                rm file.zip
-                cd ..
-            else
-                curl -sS $url > file.zip            && \
-                unzip file.zip                      && \
-                rm file.zip                         && \
-                cd ..
-            fi
-        fi
-        cd ..
-    else
-        mkdir -p ./templates
-        cd templates
-        mkdir -p $fileName                  && \
-        cd $fileName
-        if [ $repositoryType == "private" ]; then
-            curl \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: token REDACTED_GITHUB_TOKEN" \
-            $url > file.zip      && \
-            unzip file.zip                                   && \
-            rm file.zip
-            cd ..
-            cd ..
-        else
-            curl -sS $url > file.zip            && \
-            unzip file.zip                      && \
-            rm file.zip                         && \
-            cd ..
-            cd ..
-        fi
+    if [ "$repositoryType" = "private" ] && [ -z "$GITHUB_TOKEN" ]; then
+        echo "Skipping private repository $organization/$repository (missing GITHUB_TOKEN)"
+        continue
     fi
+
+    targetDir="$TEMPLATES_DIR/$fileName"
+    mkdir -p "$targetDir"
+    cd "$targetDir"
+
+    if [ "$repositoryType" = "private" ]; then
+        curl -sS \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: token $GITHUB_TOKEN" \
+            "$url" > file.zip
+    else
+        curl -sS "$url" > file.zip
+    fi
+
+    unzip -oq file.zip
+    rm -f file.zip
 done

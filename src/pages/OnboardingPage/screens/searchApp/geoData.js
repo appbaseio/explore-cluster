@@ -273,7 +273,7 @@ class GeoSearchApp extends Component {
 				{...this.appConfig}
 				url={SCALR_API}
 				className="search-app"
-				mapKey="REDACTED_GOOGLE_API_KEY"
+				mapKey="REPLACE_WITH_GOOGLE_MAPS_API_KEY"
 				theme={{
 					colors: {
 						primaryColor: '#FF307A',

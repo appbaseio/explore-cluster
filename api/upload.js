@@ -1,11 +1,20 @@
 export default function upload(request, response) {
 	try {
 		var ImageKit = require('imagekit');
+		const { IMAGEKIT_PUBLIC_KEY, IMAGEKIT_URL_ENDPOINT, IMAGEKIT_PRIVATE_KEY } = process.env;
+
+		if (!IMAGEKIT_PUBLIC_KEY || !IMAGEKIT_URL_ENDPOINT || !IMAGEKIT_PRIVATE_KEY) {
+			response.statusCode = 500;
+			response.json({
+				message: 'Missing ImageKit environment configuration.',
+			});
+			return;
+		}
 
 		var imagekit = new ImageKit({
-			publicKey: 'REDACTED_IMAGEKIT_PUBLIC_KEY',
-			urlEndpoint: 'https://ik.imagekit.io/appbaseio/',
-			privateKey: 'REDACTED_IMAGEKIT_PRIVATE_KEY=',
+			publicKey: IMAGEKIT_PUBLIC_KEY,
+			urlEndpoint: IMAGEKIT_URL_ENDPOINT,
+			privateKey: IMAGEKIT_PRIVATE_KEY,
 		});
 
 		var authenticationParameters = imagekit.getAuthenticationParameters();

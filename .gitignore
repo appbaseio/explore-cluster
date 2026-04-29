@@ -61,6 +61,11 @@ typings/
 
 # dotenv environment variables file
 .env
+.env.local
+.env.*.local
+
+# local auth configuration
+cypress.env.json
 
 *.DS_Store
 
@@ -75,3 +80,6 @@ dist
 cypress/videos
 cypress/screenshots
 .vercel/**
+
+# local request scratch files
+*.http

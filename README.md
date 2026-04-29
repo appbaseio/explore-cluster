@@ -1,34 +1,65 @@
-## reactivesearch.io dashboard
+# Arc Dashboard
 
-sugar, spice and everything nice
+This repository contains the Arc Dashboard frontend.
 
-### Setup
+## Project status
 
-After cloning this repo, sync the (batteries) submodule via:
+The repository is published as-is for community reference and contributions.
+There is currently no guaranteed maintenance SLA.
 
-```
+## Requirements
+
+- Node.js 16.x (see `.nvmrc` / Volta config)
+- Yarn 1.x
+
+## Setup
+
+After cloning this repo, sync the `batteries` submodule:
+
+```bash
 git submodule init
 git submodule update --recursive --remote
 
-# checkout to arc branch on batteries
 cd src/batteries
 git fetch origin
 git checkout arc
-
+cd ../..
 ```
 
-### Installation and development
+Copy environment examples and update values:
 
+```bash
+cp .env.example .env
+cp cypress.env.example.json cypress.env.json
 ```
+
+## Installation and development
+
+```bash
 yarn
-yarn start
+yarn dev
 ```
 
-### Debugging
-If your tests are failing, do make sure your `localhost:3333` is up and running.
+The app runs on `http://localhost:3333`.
 
-Server will run on port `3333`.
+## Build and test
 
+```bash
+yarn lint
+yarn test
+yarn build
+```
 
-### Testing for each PR
-Once a feature/work is complete run `yarn cypress:run` to validate test cases. This will run the test and generate a report which will automatically update the PR with the results via a Cypress Bot. For local testing run `yarn cypress:open` and execute the relevant test suite from the GUI
+For Cypress:
+
+```bash
+yarn cypress:open
+# or
+yarn cypress:run
+```
+
+## Security and secrets
+
+- Do not commit real credentials, API keys, or tokens.
+- Keep `.env`, `cypress.env.json`, and local auth tokens out of version control.
+- For vulnerability disclosures, see `SECURITY.md`.

@@ -3,18 +3,18 @@
 	"env": {
 		"arc-dashboard": {
 			"PROD": {
-				"base_url": "https://arc-dashboard.appbase.io",
-				"username": "REDACTED_USERNAME",
-				"password": "REDACTED_PASSWORD",
-				"app_url": "https://appbase-demo-ansible-abxiydt-arc.searchbase.io/",
-				"cluster": "appbase-demo-ansible-abxiydt-arc.searchbase.io"
+				"base_url": "http://localhost:3333",
+				"username": "example_username",
+				"password": "example_password",
+				"app_url": "https://example-cluster.searchbase.io/",
+				"cluster": "example-cluster.searchbase.io"
 			},
 			"DEV": {
 				"base_url": "http://localhost:3333",
-				"username": "REDACTED_USERNAME",
-				"password": "REDACTED_PASSWORD",
-				"app_url": "https://appbase-demo-ansible-abxiydt-arc.searchbase.io/",
-				"cluster": "appbase-demo-ansible-abxiydt-arc.searchbase.io"
+				"username": "example_username",
+				"password": "example_password",
+				"app_url": "https://example-cluster.searchbase.io/",
+				"cluster": "example-cluster.searchbase.io"
 			}
 		}
 	},

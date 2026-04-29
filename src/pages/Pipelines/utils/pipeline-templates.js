@@ -12,7 +12,7 @@ export default {
 			},
 		],
 		envs: {
-			index: ["good-books-ds"]
+			index: ['good-books-ds'],
 		},
 		stages: [
 			{
@@ -28,12 +28,12 @@ export default {
 			{
 				id: 'query',
 				use: 'reactivesearchQuery',
-				continueOnError: false
+				continueOnError: false,
 			},
 			{
 				id: 'es_query',
 				use: 'elasticsearchQuery',
-				continueOnError: false
+				continueOnError: false,
 			},
 		],
 	},
@@ -53,7 +53,7 @@ export default {
 		envs: {
 			category: 'reactivesearch',
 			index: ['test'],
-			knowledgeGraphAPIKey: 'REDACTED_GOOGLE_API_KEY',
+			knowledgeGraphAPIKey: 'REPLACE_WITH_KNOWLEDGE_GRAPH_API_KEY',
 		},
 		stages: [
 			{
@@ -106,7 +106,7 @@ export default {
 			category: 'reactivesearch',
 			index: ['good-books-ds-pipeline'],
 			saved_search_index: 'savedsearch',
-			saved_search_credentials: 'REDACTED_CREDENTIALS',
+			saved_search_credentials: 'REPLACE_WITH_USERNAME_PASSWORD',
 		},
 		stages: [
 			{
@@ -317,7 +317,7 @@ export default {
 				async: true,
 				inputs: {
 					method: 'POST',
-					url: 'https://REDACTED_USERNAME:REDACTED_PASSWORD@appbase-demo-ansible-abxiydt-es.searchbase.io/good-books-ds/_search',
+					url: 'https://REPLACE_WITH_USERNAME:REPLACE_WITH_PASSWORD@example-es.searchbase.io/good-books-ds/_search',
 					body: '{"query": {"match_all": {}}, "size": 5}',
 					headers: {
 						'Content-Type': 'application/json',

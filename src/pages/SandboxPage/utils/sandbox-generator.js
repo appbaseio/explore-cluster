@@ -61,7 +61,7 @@ const geoHtml = `
     />
     <script
       type="text/javascript"
-      src="https://maps.googleapis.com/maps/api/js?libraries=places&key=REDACTED_GOOGLE_API_KEY"
+      src="https://maps.googleapis.com/maps/api/js?libraries=places&key=REPLACE_WITH_GOOGLE_MAPS_API_KEY"
     ></script>
     <title>React App</title>
   </head>
@@ -152,7 +152,7 @@ const App = () => {
 			enableAppbase
 			url="${url}"
 			className="search-app"
-			mapKey="REDACTED_GOOGLE_API_KEY"
+			mapKey="REPLACE_WITH_GOOGLE_MAPS_API_KEY"
 			theme={{
 				colors: {
 					primaryColor: '#FF307A',

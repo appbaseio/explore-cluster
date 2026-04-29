@@ -59,6 +59,11 @@ async function generateTemplatesOutput() {
 		promises.push(
 			new Promise((resolve, reject) => {
 				const testFolder = `./templates/${fileName}/`;
+				if (!fs.existsSync(testFolder)) {
+					console.warn(`Skipping template source not available locally: ${fileName}`);
+					resolve({});
+					return;
+				}
 				fs.readdirSync(testFolder).forEach((file) => {
 					walk(`${testFolder}${file}`, function (err, results) {
 						const filesObj = {};
