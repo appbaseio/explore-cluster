@@ -118,7 +118,7 @@
 		"imagekitio-react": "^1.0.11",
 		"is-cidr": "^4.0.2",
 		"is-valid-domain": "^0.1.6",
-		"js-yaml": "^4.1.0",
+		"js-yaml": "^4.1.1",
 		"jsondiffpatch": "^0.4.1",
 		"jszip": "^3.7.1",
 		"lint-staged": "^10.1.7",
