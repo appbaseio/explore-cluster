@@ -122,6 +122,7 @@ class BrowserPage extends Component {
 							loading="lazy"
 							allowFullScreen
 							referrerPolicy="no-referrer-when-downgrade"
+							allow="local-network-access"
 						/>
 					</div>
 				) : (
