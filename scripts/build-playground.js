@@ -28,10 +28,26 @@ if (fs.existsSync(distIndex)) {
 	process.exit(0);
 }
 
+/**
+ * tsdx emits .d.ts with declaration: true. Nested yarn install inside the
+ * playground package duplicates redux/styled-components types, which triggers
+ * TS2742 when naming inferred exports. explore-cluster only consumes JS.
+ */
+function patchPlaygroundTsconfig() {
+	const tsconfigPath = path.join(playgroundPath, 'tsconfig.json');
+	let source = fs.readFileSync(tsconfigPath, 'utf8');
+	if (source.includes('"declaration": false')) {
+		return;
+	}
+	source = source.replace('"declaration": true', '"declaration": false');
+	fs.writeFileSync(tsconfigPath, source);
+}
+
 console.log(
 	'[build-playground] building @appbaseio/reactivesearch-playground from source...',
 );
-execSync('yarn install --production=false && yarn build', {
+patchPlaygroundTsconfig();
+execSync('yarn install --production=false --ignore-scripts && yarn build', {
 	cwd: playgroundPath,
 	stdio: 'inherit',
 });
