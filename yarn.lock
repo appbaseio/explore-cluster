@@ -58,21 +58,6 @@
     lodash "^4.17.21"
     resize-observer-polyfill "^1.5.1"
 
-"@appbaseio-confidential/reactivesearch-playground@^1.3.0-beta.6":
-  version "1.3.0-beta.9"
-  resolved "https://npm.pkg.github.com/download/@appbaseio-confidential/reactivesearch-playground/1.3.0-beta.9/8e9d4d5c13ffb7006e02497f4ae58f3649b2ad0b#8e9d4d5c13ffb7006e02497f4ae58f3649b2ad0b"
-  integrity sha512-mINaImKfZUIrECdD2VZbX/48/BMo1LeItoTJMOkspskwKcw7b+FgJInq4hvRRW12w19x4R9TNhQvVuHDeaYkCg==
-  dependencies:
-    "@monaco-editor/react" "^4.3.1"
-    "@reduxjs/toolkit" "^1.6.0"
-    "@types/styled-components" "^5.1.11"
-    firebase "^8.8.0"
-    react-redux "^7.2.4"
-    redux-logger "^3.0.6"
-    redux-persist "^6.0.0"
-    styled-components "^5.3.0"
-    xss "^1.0.14"
-
 "@appbaseio/analytics@^1.2.0-alpha.1":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@appbaseio/analytics/-/analytics-1.2.0.tgz#e48da3fcd4ca78029aa9981d7e4c9689fe9aa078"
@@ -134,6 +119,20 @@
     ngeohash "^0.6.3"
     prop-types "^15.6.0"
     react-leaflet "^2.1.3"
+
+"@appbaseio/reactivesearch-playground@github:appbaseio/reactivesearch-playground#e7060229f4baee86b90a94f92c8a66ff17aaa6e4":
+  version "1.3.0"
+  resolved "https://codeload.github.com/appbaseio/reactivesearch-playground/tar.gz/e7060229f4baee86b90a94f92c8a66ff17aaa6e4"
+  dependencies:
+    "@monaco-editor/react" "^4.3.1"
+    "@reduxjs/toolkit" "^1.6.0"
+    "@types/styled-components" "^5.1.11"
+    firebase "^8.8.0"
+    react-redux "^7.2.4"
+    redux-logger "^3.0.6"
+    redux-persist "^6.0.0"
+    styled-components "^5.3.0"
+    xss "^1.0.14"
 
 "@appbaseio/reactivesearch@^4.3.0":
   version "4.3.0"

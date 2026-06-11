@@ -23,7 +23,7 @@
 		"cypress:chrome": "cypress run --headless chrome",
 		"cypress:install": "npx cypress@5.6.0 install",
 		"setup:templates": "./extract-shopify.sh && node preinstall-server.js",
-		"postinstall": "node ./scripts/patch-importer.js"
+		"postinstall": "node ./scripts/build-playground.js && node ./scripts/patch-importer.js"
 	},
 	"husky": {
 		"hooks": {
@@ -85,7 +85,7 @@
 	"dependencies": {
 		"@ant-design/icons": "^4.0.0",
 		"@appbaseio/importer": "^0.1.4",
-		"@appbaseio-confidential/reactivesearch-playground": "^1.3.0-beta.6",
+		"@appbaseio/reactivesearch-playground": "github:appbaseio/reactivesearch-playground#e7060229f4baee86b90a94f92c8a66ff17aaa6e4",
 		"@appbaseio/react-filter-box": "^3.4.1",
 		"@appbaseio/reactivemaps": "^3.0.0-beta.14",
 		"@appbaseio/reactivesearch": "^4.3.0",
