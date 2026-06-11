@@ -26,7 +26,7 @@ const plugins = [
 		filename: 'index.html',
 	}),
 	new CopyWebpackPlugin({
-		patterns: [{ from: 'static', to: 'static' }, '_redirects'],
+		patterns: [{ from: 'static', to: 'static' }, { from: 'samples', to: 'samples' }, '_redirects'],
 	}),
 	new webpack.IgnorePlugin({
 		resourceRegExp: /^\.\/locale$/,

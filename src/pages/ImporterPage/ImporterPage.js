@@ -6,6 +6,7 @@ import { event, timingEvent } from '../../utils/gtag';
 import moment from '../../utils/moment';
 
 import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
+import { getImporterClusterConfig } from '../../utils/importerCluster';
 
 // eslint-disable-next-line no-unused-expressions
 injectGlobal`
@@ -24,6 +25,7 @@ class ImporterPage extends React.Component {
 		this.startTime = moment();
 		this.state = {
 			preparingApp: true,
+			importerConfig: null,
 		};
 	}
 
@@ -35,7 +37,10 @@ class ImporterPage extends React.Component {
 			label: 'visit',
 			value: null,
 		});
-		this.togglePreparing();
+		this.setState({
+			preparingApp: false,
+			importerConfig: this.buildImporterConfig(),
+		});
 
 		setTimeout(() => {
 			window.scrollTo({
@@ -56,14 +61,20 @@ class ImporterPage extends React.Component {
 		});
 	}
 
-	togglePreparing = () => {
-		this.setState((prevState) => ({
-			preparingApp: !prevState.preparingApp,
-		}));
+	buildImporterConfig = () => {
+		const cluster = getImporterClusterConfig();
+		return {
+			sampleDataset: {
+				url: '/samples/moviesData.json',
+				label: 'Load sample movies',
+				filename: 'movies.json',
+			},
+			...(cluster ? { cluster } : {}),
+		};
 	};
 
 	render() {
-		const { preparingApp } = this.state;
+		const { preparingApp, importerConfig } = this.state;
 		return (
 			<Fragment>
 				<ErrorToaster>
@@ -84,15 +95,7 @@ class ImporterPage extends React.Component {
 								<Skeleton active />
 							</div>
 						) : (
-							<Importer
-								config={{
-									sampleDataset: {
-										url: '/samples/moviesData.json', // any JSON/NDJSON/JSON array URL
-										label: 'Load sample movies',
-										filename: 'movies.json',
-									},
-								}}
-							/>
+							<Importer config={importerConfig} />
 						)}
 					</section>
 				</ErrorToaster>

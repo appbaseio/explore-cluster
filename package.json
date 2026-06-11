@@ -11,9 +11,9 @@
 		"node": ">=14"
 	},
 	"scripts": {
-		"dev": "NODE_ENV=development webpack-dev-server --mode development . --history-api-fallback  --hot --progress --port 3333 --no-client-overlay",
+		"dev": "node ./scripts/generate-movies-sample.js && NODE_ENV=development webpack-dev-server --mode development . --history-api-fallback  --hot --progress --port 3333 --no-client-overlay",
 		"lint": "eslint --cache .",
-		"build": "NODE_ENV=production node ./scripts/create-env.js && node --max_old_space_size=8192 ./node_modules/webpack/bin/webpack.js --mode production --progress",
+		"build": "node ./scripts/generate-movies-sample.js && NODE_ENV=production node ./scripts/create-env.js && node --max_old_space_size=8192 ./node_modules/webpack/bin/webpack.js --mode production --progress",
 		"glow": "glow --watch",
 		"format": "prettier --write --use-tabs 'src/!(batteries*)**/**/*.js'",
 		"analyze": "source-map-explorer 'dist/*.js'",
@@ -22,7 +22,8 @@
 		"cypress:open": " cypress open",
 		"cypress:chrome": "cypress run --headless chrome",
 		"cypress:install": "npx cypress@5.6.0 install",
-		"setup:templates": "./extract-shopify.sh && node preinstall-server.js"
+		"setup:templates": "./extract-shopify.sh && node preinstall-server.js",
+		"postinstall": "node ./scripts/patch-importer.js"
 	},
 	"husky": {
 		"hooks": {
