@@ -744,6 +744,7 @@ class ClusterRouteContainer extends React.Component {
 							<>
 								{get(allowedRoutes, '/cluster/role-based-access') &&
 								(backend === BACKENDS.ELASTICSEARCH.name ||
+									backend === BACKENDS.ELASTICSEARCH_SERVERLESS.name ||
 									backend === BACKENDS.SYSTEM.name ||
 									backend === BACKENDS.OPENSEARCH.name) ? (
 									<AppPageContainer {...props} component={RoleBaseAccess} />
@@ -760,6 +761,7 @@ class ClusterRouteContainer extends React.Component {
 							<>
 								{get(allowedRoutes, '/cluster/sync-preferences') &&
 								(backend === BACKENDS.ELASTICSEARCH.name ||
+									backend === BACKENDS.ELASTICSEARCH_SERVERLESS.name ||
 									backend === BACKENDS.SYSTEM.name ||
 									backend === BACKENDS.OPENSEARCH.name) ? (
 									<AppPageContainer {...props} component={SyncPreferences} />

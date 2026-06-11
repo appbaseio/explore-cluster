@@ -24,7 +24,7 @@ import { loadApps, setIsSidebarCollapsed } from '../../actions';
 import SidebarAutocomplete from '../../components/SidebarAutocomplete';
 import searchInputStyle from './styles';
 import UnauthorizedPage from '../UnauthorizedPage';
-import { ALLOWED_ACTIONS_BY_BACKEND, BACKENDS } from '../../batteries/utils';
+import { ALLOWED_ACTIONS_BY_BACKEND, BACKENDS, isSystemIndex } from '../../batteries/utils';
 import { iconMap } from '../../components/iconMap';
 
 const NoMatch = Loadable({
@@ -140,6 +140,7 @@ class DashboardWrapper extends Component {
 								action: ALLOWED_ACTIONS.UI_BUILDER,
 								menu: [
 									...(backend === BACKENDS.ELASTICSEARCH.name ||
+									backend === BACKENDS.ELASTICSEARCH_SERVERLESS.name ||
 									backend === BACKENDS.OPENSEARCH.name ||
 									backend === BACKENDS.SYSTEM.name
 										? [
@@ -156,6 +157,7 @@ class DashboardWrapper extends Component {
 										tag: 'Beta',
 									},
 									...(backend === BACKENDS.ELASTICSEARCH.name ||
+									backend === BACKENDS.ELASTICSEARCH_SERVERLESS.name ||
 									backend === BACKENDS.OPENSEARCH.name ||
 									backend === BACKENDS.SYSTEM.name
 										? [
@@ -191,6 +193,7 @@ class DashboardWrapper extends Component {
 										link: '/cluster/credentials',
 									},
 									...(backend === BACKENDS.ELASTICSEARCH.name ||
+									backend === BACKENDS.ELASTICSEARCH_SERVERLESS.name ||
 									backend === BACKENDS.OPENSEARCH.name ||
 									backend === BACKENDS.SYSTEM.name
 										? [
@@ -297,6 +300,7 @@ class DashboardWrapper extends Component {
 												tag: 'Beta',
 											},
 											...(backend === BACKENDS.ELASTICSEARCH.name ||
+											backend === BACKENDS.ELASTICSEARCH_SERVERLESS.name ||
 											backend === BACKENDS.OPENSEARCH.name ||
 											backend === BACKENDS.SYSTEM.name
 												? [
@@ -337,6 +341,7 @@ class DashboardWrapper extends Component {
 												link: '/cluster/credentials',
 											},
 											...(backend === BACKENDS.ELASTICSEARCH.name ||
+											backend === BACKENDS.ELASTICSEARCH_SERVERLESS.name ||
 											backend === BACKENDS.OPENSEARCH.name ||
 											backend === BACKENDS.SYSTEM.name
 												? [
@@ -397,7 +402,7 @@ class DashboardWrapper extends Component {
 		const { showHeader, routes, activeSubMenu, activeMenuItem, value, readOnlySearchInput } =
 			this.state;
 		const { apps, history, match, collapsed, sessionData, backendImage, backend } = this.props;
-		const filteredApps = keys(apps).filter((app) => !app.startsWith('.'));
+		const filteredApps = keys(apps).filter((app) => app && !isSystemIndex(app));
 		const routesFiltered = {};
 
 		Object.keys(routes).forEach((key) => {

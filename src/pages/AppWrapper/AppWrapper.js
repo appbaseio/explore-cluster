@@ -115,6 +115,7 @@ class AppWrapper extends Component {
 								action: ALLOWED_ACTIONS.UI_BUILDER,
 								menu: [
 									...(backend === BACKENDS.ELASTICSEARCH.name ||
+									backend === BACKENDS.ELASTICSEARCH_SERVERLESS.name ||
 									backend === BACKENDS.OPENSEARCH.name ||
 									backend === BACKENDS.SYSTEM.name
 										? [
@@ -132,6 +133,7 @@ class AppWrapper extends Component {
 										tag: 'Beta',
 									},
 									...(backend === BACKENDS.ELASTICSEARCH.name ||
+									backend === BACKENDS.ELASTICSEARCH_SERVERLESS.name ||
 									backend === BACKENDS.OPENSEARCH.name ||
 									backend === BACKENDS.SYSTEM.name
 										? [
@@ -169,6 +171,7 @@ class AppWrapper extends Component {
 										link: '/cluster/credentials',
 									},
 									...(backend === BACKENDS.ELASTICSEARCH.name ||
+									backend === BACKENDS.ELASTICSEARCH_SERVERLESS.name ||
 									backend === BACKENDS.OPENSEARCH.name ||
 									backend === BACKENDS.SYSTEM.name
 										? [
@@ -273,6 +276,7 @@ class AppWrapper extends Component {
 												tag: 'Beta',
 											},
 											...(backend === BACKENDS.ELASTICSEARCH.name ||
+											backend === BACKENDS.ELASTICSEARCH_SERVERLESS.name ||
 											backend === BACKENDS.OPENSEARCH.name ||
 											backend === BACKENDS.SYSTEM.name
 												? [
@@ -315,6 +319,7 @@ class AppWrapper extends Component {
 												link: '/cluster/credentials',
 											},
 											...(backend === BACKENDS.ELASTICSEARCH.name ||
+											backend === BACKENDS.ELASTICSEARCH_SERVERLESS.name ||
 											backend === BACKENDS.OPENSEARCH.name ||
 											backend === BACKENDS.SYSTEM.name
 												? [

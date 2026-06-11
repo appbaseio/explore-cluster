@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { css } from 'emotion';
 import { loadApps, updateAppScreenPreferences } from '../../actions';
+import { getAppIndexName, isSystemIndex } from '../../batteries/utils';
 import { children as childrenProp } from '../../utils/prop-types';
 
 const commonFlex = css`
@@ -44,13 +45,11 @@ function AppFilters({ apps, children, preferences, updatePreferences, fetchApps 
 	const setFilteredData = () => {
 		const dataToPonder = systemIndices
 			? apps
-			: apps.filter(
-					(dataItem) =>
-						dataItem.index &&
-						dataItem.index[0] !== '.' &&
-						!dataItem.index.includes('metricbeat-'),
-			  );
-		setData(dataToPonder.filter((dataItem) => (dataItem.index || '').includes(searchTerm)));
+			: apps.filter((dataItem) => {
+					const indexName = getAppIndexName(dataItem);
+					return indexName && !isSystemIndex(indexName);
+			  });
+		setData(dataToPonder.filter((dataItem) => getAppIndexName(dataItem).includes(searchTerm)));
 	};
 	const handleInputChange = (e) => {
 		setSearchTerm(e.target.value);

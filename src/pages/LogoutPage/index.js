@@ -22,6 +22,7 @@ const LogoutPage = () => {
 		localStorage.removeItem('allowedActions');
 		localStorage.removeItem('authToken');
 		localStorage.removeItem('isUsingOpenSearch');
+		localStorage.removeItem('isUsingElasticsearchServerless');
 		localStorage.removeItem('clusterId');
 		window.location.href = '/';
 	};

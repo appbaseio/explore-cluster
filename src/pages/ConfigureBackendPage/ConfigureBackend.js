@@ -156,6 +156,17 @@ const urlValidator = (control) => {
 };
 
 const { Header } = Layout;
+
+const renderBackendOption = (name, logo) => {
+	if (name === BACKENDS.SYSTEM.name) {
+		return <h4>System</h4>;
+	}
+	if (name === BACKENDS.ELASTICSEARCH_SERVERLESS.name) {
+		return <h4>Elasticsearch Serverless</h4>;
+	}
+	return <img src={logo} alt={name} width="120px" />;
+};
+
 const ConfigureBackend = (props) => {
 	const { backendImage, backend: backendProp } = props;
 	const bannerDetails = {
@@ -409,15 +420,7 @@ const ConfigureBackend = (props) => {
 																value={name}
 																key={name}
 															>
-																{name === BACKENDS.SYSTEM.name ? (
-																	<h4>System</h4>
-																) : (
-																	<img
-																		src={logo}
-																		alt={name}
-																		width="120px"
-																	/>
-																)}
+																{renderBackendOption(name, logo)}
 															</Radio.Button>
 														))}
 												</Radio.Group>

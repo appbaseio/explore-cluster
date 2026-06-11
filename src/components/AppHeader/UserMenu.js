@@ -32,6 +32,7 @@ const handleLogout = () => {
 	localStorage.removeItem('allowedActions');
 	localStorage.removeItem('authToken');
 	localStorage.removeItem('isUsingOpenSearch');
+	localStorage.removeItem('isUsingElasticsearchServerless');
 	window.location.href = '/';
 };
 

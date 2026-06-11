@@ -7,6 +7,7 @@ import get from 'lodash/get';
 import { css } from 'emotion';
 import { connect } from 'react-redux';
 import LabelTag from '../LabelTag';
+import { isSystemIndex } from '../../batteries/utils';
 import { setSessionData } from '../../actions';
 
 const popOverClass = css`
@@ -31,7 +32,7 @@ function IndexSwitcher({
 	disablePopover,
 	sessionData,
 }) {
-	const userApps = filteredApps.filter((index) => index && !index.includes('metricbeat-'));
+	const userApps = filteredApps.filter((index) => index && !isSystemIndex(index));
 	if (userApps.length === 1 && item.link)
 		return (
 			<Link to={`/app/${userApps[0]}/${item.link}`}>
