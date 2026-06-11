@@ -1,61 +1,34 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { QuestionOutlined } from '@ant-design/icons';
+import { BugOutlined } from '@ant-design/icons';
 import { Button, Dropdown, Menu } from 'antd';
 import { css } from 'emotion';
 
 import { heading, subHeading } from './styles';
 
+const GITHUB_ISSUES_URL = 'https://github.com/appbaseio/explore-cluster/issues/new';
+
 const helpIcon = css`
-	i {
+	.anticon {
 		font-size: 22px !important;
 		position: relative;
+		top: -1px;
 	}
 `;
 
 class HelpButton extends React.Component {
-	handleClick = (e) => {
-		const { key } = e;
-		switch (key) {
-			case 'chat': {
-				if (window.Tawk_API) {
-					window.Tawk_API.toggle();
-				} else if (window.Intercom) {
-					// Fallback to Intercom if Tawk.to is not loaded
-					window.Intercom('show');
-				}
-				break;
-			}
-			case 'twitter':
-				window.open('https://x.com/reactiveCo', '_blank');
-				break;
-			case 'updates':
-				window.open('https://reactivesearch.io/', '_blank');
-				break;
-			case 'privacy':
-				window.open('https://reactivesearch.io/privacy/', '_blank');
-				break;
-			default:
+	handleClick = ({ key }) => {
+		if (key === 'github') {
+			window.open(GITHUB_ISSUES_URL, '_blank');
 		}
 	};
 
 	render() {
 		const menu = (
 			<Menu onClick={this.handleClick}>
-				<Menu.Item key="chat" style={{ padding: '10px 15px' }}>
-					<h3 className={heading}>
-						Ask us anything!{' '}
-						<span role="img" aria-label="Wave">
-							👋
-						</span>
-					</h3>
-					<p className={subHeading}>We reply to every issue.</p>
-				</Menu.Item>
-				<Menu.Item key="twitter">
-					<p className={subHeading}>@reactiveCo - Twitter/X</p>
-				</Menu.Item>
-				<Menu.Item key="privacy">
-					<p className={subHeading}>Terms & Privacy</p>
+				<Menu.Item key="github" style={{ padding: '10px 15px' }}>
+					<h3 className={heading}>Found a bug?</h3>
+					<p className={subHeading}>Report it on GitHub</p>
 				</Menu.Item>
 			</Menu>
 		);
@@ -67,7 +40,7 @@ class HelpButton extends React.Component {
 						type="primary"
 						size="large"
 						shape="circle"
-						icon={<QuestionOutlined />}
+						icon={<BugOutlined />}
 					/>
 				</Dropdown>
 			</React.Fragment>
