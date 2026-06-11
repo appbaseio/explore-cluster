@@ -1,7 +1,7 @@
 module.exports = {
 	plugins: ['cypress'],
 	env: {
-		'cypress/global': true,
+		'cypress/globals': true,
 	},
 	rules: {
 		'cypress/no-assigning-return-values': 'error',
