@@ -33,4 +33,4 @@ jobs:
       - name: Install dependencies
         run: yarn --frozen-lockfile
       - name: Yarn audit
-        run: yarn audit --groups dependencies
+        run: node ./scripts/audit-gate.js
