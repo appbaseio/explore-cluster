@@ -9,7 +9,7 @@ There is currently no guaranteed maintenance SLA.
 
 ## Requirements
 
-- Node.js 16.x (see `.nvmrc` / Volta config)
+- Node.js 20.x (see `.nvmrc` / Volta config)
 - Yarn 1.x
 
 ## Setup

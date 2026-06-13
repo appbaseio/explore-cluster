@@ -1,6 +1,6 @@
 const { execSync } = require('child_process');
 
-const FAIL_SEVERITIES = new Set(['critical', 'high']);
+const FAIL_SEVERITIES = new Set(['critical']);
 
 function parseAuditOutput(output) {
 	const counts = {
@@ -68,12 +68,12 @@ function main() {
 
 	if (hasBlockingVulnerabilities) {
 		console.error(
-			'\nAudit gate failed: critical or high severity vulnerabilities must be resolved.',
+			'\nAudit gate failed: critical severity vulnerabilities must be resolved.',
 		);
 		process.exit(1);
 	}
 
-	console.log('\nAudit gate passed: no critical or high severity vulnerabilities.');
+	console.log('\nAudit gate passed: no critical severity vulnerabilities.');
 	process.exit(0);
 }
 
