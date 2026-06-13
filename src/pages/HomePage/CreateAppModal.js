@@ -25,7 +25,13 @@ import LanguageDropdown from '../../components/LanguageDropdown';
 import languages from '../../constants/language';
 import { getDefaultSettings, putSettings } from '../../batteries/modules/actions';
 import { getLanguageFallback } from '../../utils/language';
-import { features, isEqual, isValidPlan } from '../../batteries/utils';
+import {
+	features,
+	isEqual,
+	isValidPlan,
+	stripIndexShardsAndReplicas,
+	supportsIndexShardsAndReplicas,
+} from '../../batteries/utils';
 import { allowedTiers } from '../../utils/prop-types';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 import Ace from '../../batteries/components/SearchSandbox/containers/AceEditor';
@@ -149,7 +155,8 @@ class CreateAppModal extends Component {
 
 	handleOk = async () => {
 		const { appName, shards, replicas, indexSettings, indexMappings, hasJSON } = this.state;
-		const { handleCreateApp } = this.props;
+		const { handleCreateApp, backend } = this.props;
+		const includeShardsAndReplicas = supportsIndexShardsAndReplicas(backend);
 		let { language } = this.state;
 		language = getLanguageFallback(language);
 		// validate advanced settings
@@ -174,15 +181,25 @@ class CreateAppModal extends Component {
 				return;
 			}
 		}
+		let settings = {
+			...(indexSettings ? JSON.parse(indexSettings) : null),
+			...(includeShardsAndReplicas
+				? {
+						'index.number_of_shards': shards,
+						'index.number_of_replicas': replicas,
+				  }
+				: {}),
+			analysis: get(languages, [language, 'analysis']),
+		};
+
+		if (!includeShardsAndReplicas) {
+			settings = stripIndexShardsAndReplicas(settings);
+		}
+
 		const options = {
 			appName,
 			hasJSON,
-			settings: {
-				...(indexSettings ? JSON.parse(indexSettings) : null),
-				'index.number_of_shards': shards,
-				'index.number_of_replicas': replicas,
-				analysis: get(languages, [language, 'analysis']),
-			},
+			settings,
 			mappings: {
 				...(indexMappings ? JSON.parse(indexMappings) : null),
 			},
@@ -246,7 +263,8 @@ class CreateAppModal extends Component {
 			indexSettings,
 			indexMappings,
 		} = this.state;
-		const { createdApp, showModal } = this.props;
+		const { createdApp, showModal, backend } = this.props;
+		const showShardsAndReplicas = supportsIndexShardsAndReplicas(backend);
 
 		return (
 			<Modal
@@ -316,32 +334,36 @@ class CreateAppModal extends Component {
 							</Select.Option>
 						)}
 					/>
-					<h3 style={{ marginTop: 20 }} className={modalHeading}>
-						Shards
-					</h3>
-					<InputNumber
-						placeholder="Enter number of shards"
-						name="shards"
-						max={100}
-						style={{ width: '100%' }}
-						min={0}
-						step={1}
-						onChange={(value) => this.handleInputNumber('shards', value)}
-						value={shards}
-					/>
-					<h3 style={{ marginTop: 20 }} className={modalHeading}>
-						Replicas
-					</h3>
-					<InputNumber
-						placeholder="Enter number of replicas"
-						name="replicas"
-						max={2}
-						min={0}
-						style={{ width: '100%' }}
-						step={1}
-						onChange={(value) => this.handleInputNumber('replicas', value)}
-						value={replicas}
-					/>
+					{showShardsAndReplicas ? (
+						<React.Fragment>
+							<h3 style={{ marginTop: 20 }} className={modalHeading}>
+								Shards
+							</h3>
+							<InputNumber
+								placeholder="Enter number of shards"
+								name="shards"
+								max={100}
+								style={{ width: '100%' }}
+								min={0}
+								step={1}
+								onChange={(value) => this.handleInputNumber('shards', value)}
+								value={shards}
+							/>
+							<h3 style={{ marginTop: 20 }} className={modalHeading}>
+								Replicas
+							</h3>
+							<InputNumber
+								placeholder="Enter number of replicas"
+								name="replicas"
+								max={2}
+								min={0}
+								style={{ width: '100%' }}
+								step={1}
+								onChange={(value) => this.handleInputNumber('replicas', value)}
+								value={replicas}
+							/>
+						</React.Fragment>
+					) : null}
 					<Row type="flex" justify="space-between" align="middle">
 						<h3 style={{ marginTop: 20 }} className={modalHeading}>
 							Additional Index Settings
@@ -498,12 +520,14 @@ CreateAppModal.propTypes = {
 	defaultSettings: PropTypes.object,
 	getDefaultSettingsAction: PropTypes.func.isRequired,
 	handleCreateApp: PropTypes.func.isRequired,
+	backend: PropTypes.string,
 	tier: allowedTiers,
 	featureSearchRelevancy: PropTypes.bool,
 };
 
 CreateAppModal.defaultProps = {
 	defaultSettings: null,
+	backend: '',
 	tier: undefined,
 	featureSearchRelevancy: false,
 };
@@ -515,6 +539,7 @@ const mapStateToProps = (state) => ({
 	defaultSettings: get(state, '$getAppSettings.defaultSettings'),
 	tier: get(state, '$getAppPlan.results.tier'),
 	featureSearchRelevancy: get(state, '$getAppPlan.results.feature_search_relevancy', false),
+	backend: get(state, '$getAppPlan.results.backend', ''),
 });
 
 const mapDispatchToProps = (dispatch) => ({

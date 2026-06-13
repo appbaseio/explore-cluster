@@ -70,6 +70,7 @@ cypress.env.json
 *.DS_Store
 
 dist
+samples/moviesData.json
 .idea
 
 # sentry

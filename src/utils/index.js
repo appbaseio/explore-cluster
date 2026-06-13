@@ -11,7 +11,7 @@ import { getESVersion } from '../batteries/utils/mappings';
 import { doGet } from '../batteries/utils/requestService';
 import { getDefaultAllowedActions } from './allowedActions';
 import { ALLOWED_ACTIONS, SUB_FIELDS } from '../constants';
-import { getURL } from '../constants/config';
+import { getURL, persistElasticsearchServerlessFlavor } from '../constants/config';
 
 export async function getUser(username, password, url) {
 	const ACC_API = getURL();
@@ -63,6 +63,7 @@ export async function getUser(username, password, url) {
 				'isUsingOpenSearch',
 				esResponse?.version?.distribution === 'opensearch',
 			);
+			persistElasticsearchServerlessFlavor(esResponse);
 			localStorage.setItem('version', version);
 			localStorage.setItem('clusterId', clusterId);
 		})
@@ -136,7 +137,11 @@ export async function getESIndices(authToken, backend, endpointConfig = {}) {
 	} else {
 		url = `${ACC_API}/${getValidURL(endpointConfig.index)}`;
 		try {
-			if (backend === BACKENDS.ELASTICSEARCH.name || backend === BACKENDS.SYSTEM.name) {
+			if (
+				backend === BACKENDS.ELASTICSEARCH.name ||
+				backend === BACKENDS.ELASTICSEARCH_SERVERLESS.name ||
+				backend === BACKENDS.SYSTEM.name
+			) {
 				const esVersion = await getESVersion(null, atob(authToken));
 				// older endpoint
 				// Note: OpenSearch v3 resolves to esVersion as 3, and should use the new endpoint.
@@ -762,6 +767,7 @@ export const getAuthorizedViews = (routes = {}, allowedActions = [], backend) =>
 	// overview page is showed only if user has develop, analytics or search relevancy access
 	const hasOverviewPageAccess =
 		(backend === BACKENDS.ELASTICSEARCH.name ||
+			backend === BACKENDS.ELASTICSEARCH_SERVERLESS.name ||
 			backend === BACKENDS.OPENSEARCH.name ||
 			backend === BACKENDS.ZINC.name ||
 			backend === BACKENDS.SYSTEM.name) &&

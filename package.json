@@ -8,12 +8,12 @@
 	"license": "MIT",
 	"private": false,
 	"engines": {
-		"node": ">=14"
+		"node": ">=20"
 	},
 	"scripts": {
-		"dev": "NODE_ENV=development webpack-dev-server --mode development . --history-api-fallback  --hot --progress --port 3333 --no-client-overlay",
+		"dev": "node ./scripts/generate-movies-sample.js && NODE_ENV=development webpack-dev-server --mode development . --history-api-fallback  --hot --progress --port 3333 --no-client-overlay",
 		"lint": "eslint --cache .",
-		"build": "NODE_ENV=production node ./scripts/create-env.js && node --max_old_space_size=8192 ./node_modules/webpack/bin/webpack.js --mode production --progress",
+		"build": "node ./scripts/extract-templates.js && node preinstall-server.js && node ./scripts/generate-movies-sample.js && NODE_ENV=production node ./scripts/create-env.js && node --max_old_space_size=8192 ./node_modules/webpack/bin/webpack.js --mode production --progress",
 		"glow": "glow --watch",
 		"format": "prettier --write --use-tabs 'src/!(batteries*)**/**/*.js'",
 		"analyze": "source-map-explorer 'dist/*.js'",
@@ -21,7 +21,9 @@
 		"cypress:run": "cypress run",
 		"cypress:open": " cypress open",
 		"cypress:chrome": "cypress run --headless chrome",
-		"preinstall": "./extract-shopify.sh && node preinstall-server.js"
+		"cypress:install": "npx cypress@5.6.0 install",
+		"setup:templates": "node ./scripts/extract-templates.js && node preinstall-server.js",
+		"postinstall": "node ./scripts/build-playground.js && node ./scripts/patch-importer.js"
 	},
 	"husky": {
 		"hooks": {
@@ -50,7 +52,6 @@
 		"copy-webpack-plugin": "^9.0.1",
 		"css-loader": "^1.0.0",
 		"css-minimizer-webpack-plugin": "^3.1.1",
-		"cypress": "^5.0.0",
 		"cypress-plugin-tab": "^1.0.5",
 		"cypress-terminal-report": "^1.4.1",
 		"cypress-xpath": "^1.6.1",
@@ -84,7 +85,7 @@
 	"dependencies": {
 		"@ant-design/icons": "^4.0.0",
 		"@appbaseio/importer": "^0.1.4",
-		"@appbaseio-confidential/reactivesearch-playground": "^1.3.0-beta.6",
+		"@appbaseio/reactivesearch-playground": "github:appbaseio/reactivesearch-playground#e7060229f4baee86b90a94f92c8a66ff17aaa6e4",
 		"@appbaseio/react-filter-box": "^3.4.1",
 		"@appbaseio/reactivemaps": "^3.0.0-beta.14",
 		"@appbaseio/reactivesearch": "^4.3.0",
@@ -102,7 +103,6 @@
 		"brace": "^0.11.1",
 		"can-ndjson-stream": "^1.0.2",
 		"codesandbox": "1.2.16",
-		"d3-scale": "^2.1.2",
 		"diff-match-patch": "1.0.5",
 		"dompurify": "^3.2.4",
 		"dotenv": "^8.0.0",
@@ -119,7 +119,7 @@
 		"is-cidr": "^4.0.2",
 		"is-valid-domain": "^0.1.6",
 		"js-yaml": "^4.1.0",
-		"jsondiffpatch": "^0.4.1",
+		"jsondiffpatch": "^0.7.6",
 		"jszip": "^3.7.1",
 		"lint-staged": "^10.1.7",
 		"lodash": "^4.17.10",
@@ -163,8 +163,11 @@
 		"util": "^0.12.4",
 		"uuid": "^8.3.2"
 	},
+	"resolutions": {
+		"uuid": "8.3.2"
+	},
 	"volta": {
-		"node": "16.20.2",
+		"node": "20.18.0",
 		"yarn": "1.22.19"
 	}
 }

@@ -7,6 +7,7 @@ import get from 'lodash/get';
 import keys from 'lodash/keys';
 import { css } from 'emotion';
 import { setCurrentApp } from '../../batteries/modules/actions';
+import { isSystemIndex } from '../../batteries/utils';
 import { loadApps } from '../../actions';
 
 const selectStyle = css`
@@ -137,9 +138,7 @@ class AppSwitcher extends React.Component {
 		const { computedWidth } = this.state;
 		const route = get(match, 'params.route');
 
-		const filteredApps = keys(apps).filter((app) => !app.startsWith('.'));
-
-		const userApps = filteredApps.filter((index) => index && !index.includes('metricbeat-'));
+		const userApps = keys(apps).filter((app) => app && !isSystemIndex(app));
 
 		const sortedApps = (userApps || []).sort((a, b) => {
 			if (a < b) {

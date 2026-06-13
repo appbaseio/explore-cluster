@@ -1,5 +1,5 @@
 import React from 'react';
-import Playground from '@appbaseio-confidential/reactivesearch-playground';
+import Playground from '@appbaseio/reactivesearch-playground';
 import PropTypes from 'prop-types';
 import get from 'lodash/get';
 import { connect } from 'react-redux';

@@ -2,6 +2,13 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const templatesConstants = require('./template-sources.json');
+const ROOT_DIR = path.resolve(__dirname);
+
+function readProjectFile(filePath, encoding) {
+	return fs.readFileSync(path.join(ROOT_DIR, path.relative(ROOT_DIR, filePath)), {
+		encoding,
+	});
+}
 
 var walk = function (dir, done) {
 	let results = [];
@@ -71,49 +78,22 @@ async function generateTemplatesOutput() {
 
 						if (err) throw err;
 
-						results.forEach((path) => {
+						results.forEach((filePath) => {
 							// Read file contents and store in files.js
-							const fileName = path.split(`${file}`)[1];
-							if (fileName.includes('.ico') || fileName.includes('.png')) {
-								const data = fs.readFileSync(
-									`./${
-										path.split('arc-dashboard/')[1] ||
-										path.split('repo/')[1] ||
-										path.split('vercel/path0/')[1]
-									}`,
-									{
-										encoding: 'base64',
-									},
-								);
-								filesObj[fileName] = data; //content for files.js
+							const relativeFileName = filePath.split(`${file}`)[1];
+							if (relativeFileName.includes('.ico') || relativeFileName.includes('.png')) {
+								const fileData = readProjectFile(filePath, 'base64');
+								filesObj[relativeFileName] = fileData; //content for files.js
 							} else {
-								if (!fileName.includes('build')) {
-									const data = fs.readFileSync(
-										`./${
-											path.split('arc-dashboard/')[1] ||
-											path.split('repo/')[1] ||
-											path.split('vercel/path0/')[1]
-										}`,
-										{
-											encoding: 'utf8',
-										},
-									);
-									filesObj[fileName] = data; //content for files.js
+								if (!relativeFileName.includes('build')) {
+									const fileData = readProjectFile(filePath, 'utf8');
+									filesObj[relativeFileName] = fileData; //content for files.js
 								}
 							}
 
 							// Check if manifest file exists in the repo
-							if (data.manifest_path === path.split(`${file}/`)[1]) {
-								const templateData = fs.readFileSync(
-									`./${
-										path.split('arc-dashboard/')[1] ||
-										path.split('repo/')[1] ||
-										path.split('vercel/path0/')[1]
-									}`,
-									{
-										encoding: 'utf8',
-									},
-								);
+							if (data.manifest_path === filePath.split(`${file}/`)[1]) {
+								const templateData = readProjectFile(filePath, 'utf8');
 
 								templateOutputObj = {
 									...data,

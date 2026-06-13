@@ -28,6 +28,7 @@ import ErrorToaster from '../../batteries/components/shared/ErrorToaster';
 import { withErrorToaster } from '../../batteries/components/shared/ErrorToaster/ErrorToaster';
 import { event, timingEvent } from '../../utils/gtag';
 import moment from '../../utils/moment';
+import { supportsIndexShardsAndReplicas } from '../../batteries/utils';
 
 // helper to call ES with basic auth
 const esRequest = async ({ path, method = 'GET', credentials, body }) => {
@@ -109,9 +110,9 @@ class IndexSettings extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		const { appName } = this.props;
+		const { appName, backend } = this.props;
 
-		if (prevProps.appName !== appName) {
+		if (prevProps.appName !== appName || prevProps.backend !== backend) {
 			this.initializeSettings();
 		}
 	}
@@ -134,24 +135,33 @@ class IndexSettings extends React.Component {
 	};
 
 	initializeSettings = async () => {
-		const { credentials, appName } = this.props;
-
+		const { credentials, appName, backend } = this.props;
 		const esVersion = getVersion() || (await getESVersion(appName, credentials));
-		const nodes = await getNodes(appName, credentials);
+		const showShardsAndReplicas = supportsIndexShardsAndReplicas(backend);
 
-		this.setState({
-			esVersion: esVersion.split('.')[0],
-			totalNodes: nodes._nodes.total,
-		});
+		if (showShardsAndReplicas) {
+			const nodes = await getNodes(appName, credentials);
 
-		fetchSettings({ appName, credentials }).then(({ shards, replicas }) => {
-			this.allocated_replicas = replicas;
-			this.allocated_shards = shards;
 			this.setState({
-				shards,
-				replicas,
+				esVersion: esVersion.split('.')[0],
+				totalNodes: nodes._nodes.total,
+				shardsReplicasSupported: true,
 			});
-		});
+
+			fetchSettings({ appName, credentials }).then(({ shards, replicas }) => {
+				this.allocated_replicas = replicas;
+				this.allocated_shards = shards;
+				this.setState({
+					shards,
+					replicas,
+				});
+			});
+		} else {
+			this.setState({
+				esVersion: esVersion.split('.')[0],
+				shardsReplicasSupported: false,
+			});
+		}
 	};
 
 	handleSlider = (name, value) => {
@@ -293,7 +303,8 @@ class IndexSettings extends React.Component {
 			(data) => data[appName].settings,
 		);
 
-		appSettings = getUpdatedSettings({ settings: appSettings, shards, replicas });
+		const { backend } = this.props;
+		appSettings = getUpdatedSettings({ settings: appSettings, shards, replicas, backend });
 
 		const reIndexPromise = reIndex({
 			mappings,
@@ -355,7 +366,12 @@ class IndexSettings extends React.Component {
 			analysisJsonValid,
 		} = this.state;
 		const { allocated_replicas, allocated_shards } = this;
-		const { isFetchingMapping } = this.props;
+		const { isFetchingMapping, backend } = this.props;
+		const { shardsReplicasSupported } = this.state;
+		const showShardsAndReplicas =
+			shardsReplicasSupported !== undefined
+				? shardsReplicasSupported
+				: supportsIndexShardsAndReplicas(backend);
 
 		if (isFetchingMapping) {
 			return (
@@ -375,29 +391,33 @@ class IndexSettings extends React.Component {
 
 				<Loader show={isReindexing} message="Re-indexing your data... Please wait!" />
 				<div className={container}>
-					<ErrorToaster>
-						<Shards
-							handleSlider={this.handleSlider}
-							updateShards={() => this.updateShards()}
-							handleModal={this.handleModal}
-							shardsModal={shardsModal}
-							shards={shards}
-							allocated_shards={allocated_shards}
-						/>
-					</ErrorToaster>
+					{showShardsAndReplicas ? (
+						<ErrorToaster>
+							<Shards
+								handleSlider={this.handleSlider}
+								updateShards={() => this.updateShards()}
+								handleModal={this.handleModal}
+								shardsModal={shardsModal}
+								shards={shards}
+								allocated_shards={allocated_shards}
+							/>
+						</ErrorToaster>
+					) : null}
 
-					<ErrorToaster>
-						<Replicas
-							handleSlider={this.handleSlider}
-							updateReplicas={this.updateReplicas}
-							handleModal={this.handleModal}
-							replicasModal={replicasModal}
-							totalNodes={totalNodes}
-							replicas={replicas}
-							loading={isUpdating}
-							allocated_replicas={allocated_replicas}
-						/>
-					</ErrorToaster>
+					{showShardsAndReplicas ? (
+						<ErrorToaster>
+							<Replicas
+								handleSlider={this.handleSlider}
+								updateReplicas={this.updateReplicas}
+								handleModal={this.handleModal}
+								replicasModal={replicasModal}
+								totalNodes={totalNodes}
+								replicas={replicas}
+								loading={isUpdating}
+								allocated_replicas={allocated_replicas}
+							/>
+						</ErrorToaster>
+					) : null}
 
 					<ErrorToaster>
 						{/* Scoped styles for the card title */}
@@ -514,12 +534,14 @@ IndexSettings.propTypes = {
 	apps: PropTypes.object,
 	isFetchingMapping: PropTypes.bool,
 	updateReIndexingTasks: PropTypes.func.isRequired,
+	backend: PropTypes.string,
 };
 
 IndexSettings.defaultProps = {
 	mappings: null,
 	apps: {},
 	isFetchingMapping: false,
+	backend: '',
 };
 
 const mapStateToProps = (state) => {
@@ -533,6 +555,7 @@ const mapStateToProps = (state) => {
 		mappings,
 		isFetchingMapping: get(state, '$getAppMappings.isFetching'),
 		appName,
+		backend: get(state, '$getAppPlan.results.backend', ''),
 	};
 };
 

@@ -16,6 +16,16 @@ export const getVersion = () => {
 export const isUsingOpenSearch = () => {
 	return localStorage.getItem('isUsingOpenSearch') === 'true';
 };
+
+export const isUsingElasticsearchServerless = () => {
+	return localStorage.getItem('isUsingElasticsearchServerless') === 'true';
+};
+
+export const persistElasticsearchServerlessFlavor = (esResponse) => {
+	const isServerless = esResponse?.version?.['build_flavor'] === 'serverless';
+	localStorage.setItem('isUsingElasticsearchServerless', isServerless ? 'true' : 'false');
+	return isServerless;
+};
 export const SCALR_URL = 'scalr.api.appbase.io';
 export const ACC_API = 'https://accapi.appbase.io';
 export const SCALR_API = 'https://scalr.api.appbase.io';

@@ -269,9 +269,12 @@ export const shouldHavePipelines = (backendImage) => ALLOWED_SLS.includes(backen
 export const shouldHaveIndices = (backendImage) => !ALLOWED_SLS.includes(backendImage);
 
 export const shouldHaveFieldsFiltering = (backendImage, backend) =>
-	[BACKENDS.ELASTICSEARCH.name, BACKENDS.OPENSEARCH.name, BACKENDS.SYSTEM.name].includes(
-		backend,
-	) && !ALLOWED_SLS.includes(backendImage);
+	[
+		BACKENDS.ELASTICSEARCH.name,
+		BACKENDS.ELASTICSEARCH_SERVERLESS.name,
+		BACKENDS.OPENSEARCH.name,
+		BACKENDS.SYSTEM.name,
+	].includes(backend) && !ALLOWED_SLS.includes(backendImage);
 
 const filterCategories = (value) => {
 	const limits = value.ip_limit ? { ip_limit: parseFloat(value.ip_limit, 10) } : undefined;
